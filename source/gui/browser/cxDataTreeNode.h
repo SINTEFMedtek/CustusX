@@ -48,7 +48,7 @@ class DataTreeNode : public TreeNodeImpl
   Q_OBJECT
 public:
 	DataTreeNode(TreeRepositoryWeakPtr repo, DataPtr data);
-	virtual ~DataTreeNode() {}
+	virtual ~DataTreeNode();
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual QString getType() const;

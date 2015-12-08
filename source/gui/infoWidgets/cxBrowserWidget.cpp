@@ -66,14 +66,17 @@ void BrowserWidget::createGUI()
 	layout->setSpacing(0);
 
 	mModel = new TreeItemModel(mOptions.descend("model"), mServices, this);
-	connect(mModel, &TreeItemModel::hasBeenReset, this, &BrowserWidget::setModified);
+	connect(mModel, &TreeItemModel::modelAboutToBeReset, this, &BrowserWidget::setModified);
 	connect(mModel, &TreeItemModel::currentItemChanged, this, &BrowserWidget::onCurrentItemChanged);
+	connect(mModel, &TreeItemModel::loaded, this, &BrowserWidget::onLoaded);
 
 	//layout
 	mTreeView = new QTreeView(this);
 //	mTreeView->setRootIsDecorated(false);
 //	mTreeView->setTreePosition(1);
 	mTreeView->setModel(mModel);
+	connect(mTreeView, &QTreeView::collapsed, this, &BrowserWidget::onNodeCollapsed);
+	connect(mTreeView, &QTreeView::expanded, this, &BrowserWidget::onNodeExpanded);
 	mModel->setSelectionModel(mTreeView->selectionModel());
 
 	mPopupWidget = new PopupToolbarWidget(this);
@@ -90,6 +93,18 @@ void BrowserWidget::createGUI()
 	mSplitter->addRightWidget(mPropertiesWidget, "properties");
 
 	this->createButtonWidget(mPopupWidget->getToolbar());
+}
+
+void BrowserWidget::onNodeCollapsed(const QModelIndex & index)
+{
+	mExpanded.removeAll(mModel->getNodeFromIndex(index)->getUid());
+}
+
+void BrowserWidget::onNodeExpanded(const QModelIndex & index)
+{
+	QString uid = mModel->getNodeFromIndex(index)->getUid();
+	if (!mExpanded.contains(uid))
+		mExpanded.push_back(uid);
 }
 
 void BrowserWidget::onPopup()
@@ -186,11 +201,9 @@ XmlOptionItem BrowserWidget::getShowToolbarOption()
 void BrowserWidget::expandDefault(QModelIndex index)
 {
 	TreeNodePtr node = mModel->getNodeFromIndex(index);
-//	CX_LOG_CHANNEL_DEBUG("CA") << "check expand " << node->getName() << ", " <<  node->isDefaultExpanded();
 	if (!node->isDefaultExpanded())
 		return;
 
-//	CX_LOG_CHANNEL_DEBUG("CA") << "   did expand" << node->getName();
 	mTreeView->expand(index);
 
 	int rc = mModel->rowCount(index);
@@ -201,26 +214,105 @@ void BrowserWidget::expandDefault(QModelIndex index)
 	}
 }
 
+void BrowserWidget::expandRestore(QModelIndex index)
+{
+	TreeNodePtr node = mModel->getNodeFromIndex(index);
+	if (index.isValid() && !mExpanded.contains(node->getUid()))
+		return;
+//	CX_LOG_CHANNEL_DEBUG("CA") << " expandRestore " << node->getUid();
+
+	mTreeView->expand(index);
+
+	int rc = mModel->rowCount(index);
+	for (int r=0; r<rc; ++r)
+	{
+		QModelIndex child = mModel->index(r, 0, index);
+		this->expandRestore(child);
+	}
+}
+
+bool BrowserWidget::setCurrentNode(QString uid, QModelIndex index)
+{
+	TreeNodePtr node = mModel->getNodeFromIndex(index);
+//	CX_LOG_CHANNEL_DEBUG("CA") << " setCurrentNode: inspecting node " << node->getUid();
+
+	if (node && (node->getUid()==uid))
+	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << " setCurrentNode: HIT, setting current index " << node->getUid();
+//		boost::function<void()> f =
+//				boost::bind(&QItemSelectionModel::setCurrentIndex,
+//							mTreeView->selectionModel(),
+//							index,
+//							QItemSelectionModel::Current);
+//		QTimer::singleShot(0, f);
+		mTreeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Select);
+//		mTreeView->selectionModel()->setCurrentIndex(index, QItemSelectionModel::Current);
+		return true;
+	}
+
+	int rc = mModel->rowCount(index);
+	for (int r=0; r<rc; ++r)
+	{
+		QModelIndex child = mModel->index(r, 0, index);
+		if (this->setCurrentNode(uid, child))
+			return true;
+	}
+	return false;
+}
+
 void BrowserWidget::resetView()
 {
 	mTreeView->setRootIsDecorated(mModel->repo()->getMode()!="spaces");
-	this->expandDefault(QModelIndex());
-//	mTreeView->expandToDepth(4);
-		
-	for (unsigned i=0; i<mModel->columnCount(); ++i)
-		mTreeView->resizeColumnToContents(i);
+
+	if (mExpanded.empty())
+	{
+		this->expandDefault(QModelIndex());
+//		CX_LOG_CHANNEL_DEBUG("CA") << "===BrowserWidget:: rebuild default()";
+
+		for (unsigned i=0; i<mModel->columnCount(); ++i)
+			mTreeView->resizeColumnToContents(i);
+	}
+	else
+	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "===BrowserWidget::reset content() ";// << mExpanded.join("\n ");
+		this->expandRestore(QModelIndex());
+	}
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << "===BrowserWidget::setCurrentNode  " << mActiveNodeUid;
+	this->setCurrentNode(mActiveNodeUid, QModelIndex());
+
+//.	mActiveNodeUid = node->getUid();
+}
+
+void BrowserWidget::onLoaded()
+{
+	mExpanded.clear();
+	this->setModified();
 }
 
 void BrowserWidget::onCurrentItemChanged()
 {
+//	CX_LOG_CHANNEL_DEBUG("CA") << " ***********  BrowserWidget::onCurrentItemChanged()";
+
 	TreeNodePtr node = mModel->getCurrentItem();
+
+	if (node->getUid() == mActiveNodeUid)
+		return;
+	if (node->getUid() == mModel->repo()->getTopNode()->getUid())
+		return;
+
 	mRemoveButton->setEnabled(node && node->isRemovable());
 	this->updateNodeName();
 
 	if (node)
 	{
+		mActiveNodeUid = node->getUid();
+//		CX_LOG_CHANNEL_DEBUG("CA") << "   store CurrentNode  " << mActiveNodeUid;
 		QWidget* widget = node->createPropertiesWidget();
 		mPropertiesWidget->setWidget(widget);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "mPropertiesWidget: " << mPropertiesWidget->parent();
+//		if (widget)
+//			CX_LOG_CHANNEL_DEBUG("CA") << "                 : " << widget->parent();
 	}
 }
 

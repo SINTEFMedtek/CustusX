@@ -56,12 +56,14 @@ public:
 		if (mWidget)
 		{
 			mLayout->takeAt(0);
+			mWidget->hide();
 			mWidget->setParent(NULL);
 		}
 		mWidget = widget;
 		if (mWidget)
 		{
 			mLayout->addWidget(mWidget);
+			mWidget->show();
 		}
 	}
 	void setWidgetDeleteOld(QWidget* widget)

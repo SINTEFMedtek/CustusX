@@ -105,7 +105,7 @@ void TreeRepository::createModeProperty()
 											   allModes.front(),
 											   allModes,
 											   mOptions.getElement());
-	connect(mModeProperty.get(), &Property::changed, this, &TreeRepository::invalidate);
+	connect(mModeProperty.get(), &Property::changed, this, &TreeRepository::loaded);
 }
 
 TreeRepository::~TreeRepository()
@@ -130,15 +130,18 @@ void TreeRepository::invalidate()
 
 void TreeRepository::startListen()
 {
-	connect(this->getServices()->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
-	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
+	connect(this->getServices()->patient().get(), &PatientModelService::patientChanged, this, &TreeRepository::loaded);
+	connect(this->getServices()->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &TreeRepository::invalidate);
+	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::loaded);
 	connect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
 }
+
 void TreeRepository::stopListen()
 {
+	disconnect(this->getServices()->patient().get(), &PatientModelService::patientChanged, this, &TreeRepository::loaded);
+	disconnect(this->getServices()->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &TreeRepository::invalidate);
+	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::loaded);
 	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
-	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::invalidate);
-	disconnect(this->getServices()->patient().get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(invalidate()));
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()
@@ -202,6 +205,10 @@ void TreeRepository::insertTopNode()
 void TreeRepository::rebuild()
 {
 	mNodes.clear();
+	for (unsigned i=0; i<mNodes.size(); ++i)
+		disconnect(mNodes[i].get(), &TreeNode::changed, this, &TreeRepository::changed);
+
+
 	this->insertTopNode();
 
 	QStringList groups = QStringList() << "tool" << "data" << "space" << "view";
@@ -282,8 +289,18 @@ void TreeRepository::appendNode(TreeNode* rawNode)
 	TreeNodePtr node(new CachedTreeNode(bnode));
 
 	if (!this->getNode(node->getUid()))
+	{
+		connect(node.get(), &TreeNode::changed, this, &TreeRepository::changed);
+		connect(node.get(), &TreeNode::changed, this, &TreeRepository::invalidated);
+//		connect(node.get(), &TreeNode::changed, this, &TreeRepository::onChanged);
 		mNodes.push_back(node);
+	}
 }
+
+//void TreeRepository::onChanged()
+//{
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeRepository::onChanged()";
+//}
 
 void TreeRepository::insertSpaceNode(CoordinateSystem space)
 {

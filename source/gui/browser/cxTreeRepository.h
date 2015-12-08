@@ -104,9 +104,12 @@ public slots:
 signals:
 	void changed();
 	void invalidated();
+	void loaded();
+
 private:
 	void createVisibilityProperty();
 	void createModeProperty();
+//	void onChanged();
 
 	std::vector<TreeNodePtr> mNodes;
 	TreeRepositoryWeakPtr mSelf;

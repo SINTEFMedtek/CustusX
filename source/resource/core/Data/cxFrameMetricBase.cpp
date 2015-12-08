@@ -53,6 +53,11 @@ FrameMetricBase::~FrameMetricBase()
 {
 }
 
+QString FrameMetricBase::getParentSpace()
+{
+	return mSpaceProvider->convertToSpecific(mSpace).mRefObject;
+}
+
 void FrameMetricBase::setFrame(const Transform3D& rMt)
 {
 	mFrame = rMt;

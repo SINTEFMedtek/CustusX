@@ -71,6 +71,7 @@ public:
 	virtual CoordinateSystem getD(DataPtr data) = 0;///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
 	virtual CoordinateSystem getPr() = 0;
 	virtual CoordinateSystem getR() = 0; ///<data references coordinate system
+	virtual CoordinateSystem convertToSpecific(CoordinateSystem space) = 0; ///< convert "active" references to specific tool/data instances
 
 signals:
 	void spaceAddedOrRemoved();

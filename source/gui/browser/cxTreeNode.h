@@ -79,8 +79,9 @@ public:
 	virtual std::vector<TreeNodePtr> getVisibleChildren() const = 0;
 	virtual TreeNodePtr getVisibleParent() const = 0;
 
-//signals:
-//  void changed();
+signals:
+	void parentChanged(TreeNodePtr prev, TreeNodePtr next);
+	void changed();
 };
 
 /**
@@ -120,6 +121,7 @@ private:
 	mutable QString mType;
 //	mutable std::vector<TreeNodeWeakPtr> mVisibleChildren;
 	mutable TreeNodeWeakPtr mVisibleParent;
+	void clearCache();
 
 	TreeNodePtr mBase;
 };

@@ -262,6 +262,26 @@ CoordinateSystem SpaceProviderImpl::getR()
 	return r;
 }
 
+CoordinateSystem SpaceProviderImpl::convertToSpecific(CoordinateSystem space)
+{
+	if (space.mRefObject!="active")
+		return space;
+
+	if (( space.mId==csDATA )||( space.mId==csDATA_VOXEL ))
+	{
+		DataPtr data = mDataManager->getActiveData()->getActiveUsingRegexp("image|trackedStream|mesh");
+//		DataPtr data = mDataManager->getActiveData()->getActive();
+		space.mRefObject = (data!=0) ? data->getUid() : "";
+	}
+	else if (( space.mId==csTOOL )||( space.mId==csSENSOR )||( space.mId==csTOOL_OFFSET))
+	{
+		ToolPtr tool = mTrackingService->getActiveTool();
+		space.mRefObject = (tool!=0) ? tool->getUid() : "";
+	}
+
+	return space;
+}
+
 Transform3D SpaceProviderImpl::get_rMr()
 {
 	return Transform3D::Identity(); // ref_M_ref

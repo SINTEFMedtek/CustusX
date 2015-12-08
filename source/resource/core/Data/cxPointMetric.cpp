@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
 #include "cxCoordinateSystemHelpers.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -60,6 +61,13 @@ PointMetricPtr PointMetric::create(QString uid, QString name, PatientModelServic
 
 PointMetric::~PointMetric()
 {
+}
+
+QString PointMetric::getParentSpace()
+{
+//	CX_LOG_CHANNEL_DEBUG("CA") << "QString PointMetric::getParentSpace() " << mSpace.toString();
+//	return "";
+	return mSpaceProvider->convertToSpecific(mSpace).mRefObject;
 }
 
 void PointMetric::setCoordinate(const Vector3D& p)
@@ -122,8 +130,6 @@ DoubleBoundingBox3D PointMetric::boundingBox() const
 
 void PointMetric::resetCachedValues()
 {
-//	std::cout << " ** PointMetric::resetCachedValues" << std::endl;
-
 	mCachedRefCoord.reset();
 }
 
@@ -132,12 +138,8 @@ void PointMetric::resetCachedValues()
  */
 Vector3D PointMetric::getRefCoord() const
 {
-//	std::cout << " ** PointMetric::getRefCoord" << std::endl;
-
-//	return Vector3D(1,2,3);
 	if (!mCachedRefCoord.isValid())
 	{
-//		std::cout << " ** PointMetric::getRefCoord FILL CACHE" << std::endl;
 		Transform3D rM1 = mSpaceProvider->get_toMfrom(this->getSpace(), CoordinateSystem(csREF));
 		Vector3D val = rM1.coord(this->getCoordinate());
 		mCachedRefCoord.set(val);

@@ -172,21 +172,24 @@ ImagePtr ActiveData::getDerivedActiveImage() const
 QList<DataPtr> ActiveData::getActiveDataHistory(QString typeRegexp) const
 {
 	QRegExp reg(typeRegexp);
-	QList<DataPtr> activeDatas = this->getActiveDataHistory();
+	QList<DataPtr> active = this->getActiveDataHistory();
+	QList<DataPtr> retval;
 
-	for(int i = 0; i < activeDatas.size(); )
+	for(int i = 0; i < active.size(); ++i)
 	{
-		int current = i++;
-		if(!activeDatas.at(current)->getType().contains(reg))
-			activeDatas.removeAt(current);
+		DataPtr current = active[i];
+		if(current->getType().contains(reg))
+			retval.push_back(current);
 	}
 
-	return activeDatas;
+	return retval;
 }
 
 void ActiveData::setActive(DataPtr activeData)
 {
 	if (!activeData)
+		return;
+	if (!mActiveData.empty() && mActiveData.last() == activeData)
 		return;
 
 	mActiveData.removeAll(activeData);

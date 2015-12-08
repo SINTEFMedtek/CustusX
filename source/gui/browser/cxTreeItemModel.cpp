@@ -36,7 +36,8 @@ TreeItemModel::TreeItemModel(XmlOptionFile options, VisServicesPtr services, QOb
 	this->onShowColumnsChanged();
 
 	mRepository = TreeRepository::create(options.descend("repository"), services);
-	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::hasBeenReset);
+	connect(mRepository.get(), &TreeRepository::invalidated, this, &TreeItemModel::beginResetModel);
+	connect(mRepository.get(), &TreeRepository::loaded, this, &TreeItemModel::loaded);
 	connect(mRepository.get(), &TreeRepository::changed, this, &TreeItemModel::onRepositoryChanged);
 }
 
@@ -84,6 +85,7 @@ void TreeItemModel::createShowColumnsProperty()
 
 void TreeItemModel::onShowColumnsChanged()
 {
+//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeItemModel::onShowColumnsChanged()";
 	this->beginResetModel();
 
 	int none = 1000;
@@ -104,8 +106,8 @@ void TreeItemModel::onShowColumnsChanged()
 //	CX_LOG_CHANNEL_DEBUG("CA") << "mViewGroupCount: " << mViewGroupCount;
 //	CX_LOG_CHANNEL_DEBUG("CA") << "mColumnCount: " << mColumnCount;
 
-	this->endResetModel();
-	emit hasBeenReset();
+//	this->endResetModel();
+//	emit hasBeenReset();
 }
 
 
@@ -166,7 +168,6 @@ int TreeItemModel::rowCount(const QModelIndex& parent) const
 	TreeNode *parentItem = this->itemFromIndex(parent);
 	return parentItem->getVisibleChildren().size();
 }
-
 
 QVariant TreeItemModel::data(const QModelIndex& index, int role) const
 {
@@ -348,7 +349,7 @@ QColor TreeItemModel::adjustColorToContrastWithWhite(QColor color) const
 	double s = color.hsvSaturationF();
 	double v = color.valueF();
 
-	double isChromatic = s > 0.1; // out definition
+	double isChromatic = s > 0.1; // our definition
 	if (isChromatic)
 	{
 		s = s+(1.0-s)/2;

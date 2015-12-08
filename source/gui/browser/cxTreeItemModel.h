@@ -50,7 +50,8 @@ public:
   StringListPropertyPtr getShowColumnsProperty() { return mShowColumnsProperty; }
 
 signals:
-  void hasBeenReset();
+//  void hasBeenReset();
+  void loaded();
   void currentItemChanged();
 
 public slots:

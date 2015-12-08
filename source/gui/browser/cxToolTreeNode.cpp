@@ -65,13 +65,17 @@ TreeNodePtr ToolTreeNode::getParent() const
 	if (this->repo()->getMode()=="flat")
 		return this->repo()->getNodeForGroup("tool");
 
+	if (mTool->getUid() == this->getServices()->tracking()->getManualTool()->getUid())
+		return this->repo()->getNode(CoordinateSystem(csPATIENTREF).toString());
+
 	if (mTool->hasType(Tool::TOOL_REFERENCE))
 		return this->repo()->getNode(CoordinateSystem(csPATIENTREF).toString());
-//		return this->repo()->getNode(CoordinateSystem(csREF).toString());
+
 	ToolPtr ref = this->getServices()->tracking()->getReferenceTool();
 	if (ref)
 		return this->repo()->getNode(ref->getUid());
-	return TreeNodePtr();
+
+	return this->repo()->getNode(CoordinateSystem(csPATIENTREF).toString());
 }
 
 void ToolTreeNode::activate()

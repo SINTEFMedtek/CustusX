@@ -37,7 +37,15 @@ namespace cx
 
 CachedTreeNode::CachedTreeNode(TreeNodePtr base) : mBase(base)
 {
+	connect(mBase.get(), &TreeNode::changed, this, &CachedTreeNode::clearCache);
+	connect(mBase.get(), &TreeNode::changed, this, &TreeNode::changed);
+}
 
+void CachedTreeNode::clearCache()
+{
+	mUid = QString();
+	mType = QString();
+	mVisibleParent.reset();
 }
 
 QString CachedTreeNode::getUid() const
@@ -61,10 +69,10 @@ std::vector<TreeNodePtr> CachedTreeNode::getVisibleChildren() const
 
 TreeNodePtr CachedTreeNode::getVisibleParent() const
 {
-//	return mBase->getVisibleParent();
-	if (!mVisibleParent.lock())
-		mVisibleParent = mBase->getVisibleParent();
-	return mVisibleParent.lock();
+	return mBase->getVisibleParent();
+//	if (!mVisibleParent.lock())
+//		mVisibleParent = mBase->getVisibleParent();
+//	return mVisibleParent.lock();
 }
 
 
