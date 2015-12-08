@@ -75,7 +75,6 @@ namespace cx
 //---------------------------------------------------------
 
 vtkStandardNewMacro(TextureSlicePainter);
-vtkCxxRevisionMacro(TextureSlicePainter, "$Revision: 647 $");
 
 SingleVolumePainterHelper::SingleVolumePainterHelper(int index) :
 		mWindow(0.0),

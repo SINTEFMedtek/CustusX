@@ -182,7 +182,7 @@ class VTK(CppComponent):
         repo = '%s/VTK' % self.controlData.gitrepo_open_site_base
         branch = 'VTK-CX-modifications'
         #tag = 'VTK-6-1-0.cx_patch_2'
-        tag = 'VTK-6-2-0.cx_patch_1'
+        tag = 'VTK-6-3-0.cx_patch_1'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         self._getBuilder().gitCheckout(tag)
     def configure(self):
@@ -352,7 +352,7 @@ class IGSTK(CppComponent):
         repo = '%s/IGSTK' % base
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        self._getBuilder().gitCheckout('d29479aa7a5e2679a879105b7c11c8a9c8eaa7cf')
+        self._getBuilder().gitCheckout('c737daa56c5c99740c0b185699f12531b81f867e')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
