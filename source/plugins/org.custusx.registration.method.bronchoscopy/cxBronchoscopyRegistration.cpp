@@ -302,6 +302,18 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	CTPositions = branchVector[0]->getPositions();
 	CTOrientations = branchVector[0]->getOrientations();
 
+	if (CTPositions.cols() < 10)
+	{
+		std::cout << "Warning: Too few positions in centerline to perform registration." << std::endl;
+		return Eigen::Matrix4d::Identity();
+	}
+
+	if (trackingPositions.cols() < 10)
+	{
+		std::cout << "Warning: Too few positions in tracking data to perform registration." << std::endl;
+		return Eigen::Matrix4d::Identity();
+	}
+
 	for (int i = 1; i < branchVector.size(); i++)
     {
         Eigen::MatrixXd CTPositionsNew(CTPositions.rows() , CTPositions.cols() + branchVector[i]->getPositions().cols());
