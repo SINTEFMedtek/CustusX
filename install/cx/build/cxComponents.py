@@ -522,10 +522,10 @@ class FAST(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('MODULE_OpenIGTLink:BOOL', False)
-        add('BUILD_EXAMPLES:BOOL', False)
-        add('BUILD_TESTS:BOOL', False)
-        add('VTK_INTEROP:BOOL', True)
+        add('FAST_MODULE_OpenIGTLink:BOOL', False)
+        add('FAST_BUILD_EXAMPLES:BOOL', False)
+        add('FAST_BUILD_TESTS:BOOL', False)
+        add('FAST_VTK_INTEROP:BOOL', True)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())        
         builder.configureCMake()
