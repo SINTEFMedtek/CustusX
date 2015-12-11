@@ -181,7 +181,7 @@ class VTK(CppComponent):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
         repo = '%s/VTK' % self.controlData.gitrepo_open_site_base
         branch = 'VTK-CX-modifications'
-        tag = 'VTK-6-3-0.cx_patch_2'
+        tag = 'VTK-6-3-0.cx_patch_3'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         self._getBuilder().gitCheckout(tag)
     def configure(self):
