@@ -243,7 +243,7 @@ void BronchoscopyRegistrationWidget::useLocalRegistration(QDomElement root)
 void BronchoscopyRegistrationWidget::createMaxLocalRegistrationDistance(QDomElement root)
 {
 	mMaxLocalRegistrationDistance = DoubleProperty::initialize("Max local registration distance (mm)", "",
-	"Set max distance for local registration in mm", 30, DoubleRange(1, 100, 1), 0,
+	"Set max distance for local registration in mm", 30, DoubleRange(1, 200, 1), 0,
 					root);
 	mMaxLocalRegistrationDistance->setGuiRepresentation(DoubleProperty::grSLIDER);
 }
