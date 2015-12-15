@@ -156,7 +156,7 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.6.1')
+        self._getBuilder().gitCheckout('v4.8.2')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
