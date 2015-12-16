@@ -88,6 +88,7 @@ private:
 	BoolPropertyPtr mUseLocalRegistration;
 	BoolPropertyPtr mUseSubsetOfGenerations;
 	DoublePropertyPtr mMaxNumberOfGenerations;
+	DoublePropertyPtr mMaxLocalRegistrationDistance;
 	XmlOptionFile mOptions;
 	MeshPtr mMesh;
 
@@ -103,6 +104,7 @@ private:
 	void createMaxNumberOfGenerations(QDomElement root);
 	void selectSubsetOfBranches(QDomElement root);
 	void useLocalRegistration(QDomElement root);
+	void createMaxLocalRegistrationDistance(QDomElement root);
 };
 
 } //namespace cx

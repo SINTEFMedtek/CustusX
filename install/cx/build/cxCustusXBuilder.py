@@ -300,6 +300,7 @@ class CustusXBuilder:
                 '--enable=all',
                 '--xml-version=2',
                 '-i%s/source/ThirdParty/' % sourceDir,
+                '-i%s/source/plugins/org.custusx.anglecorrection/core/Tests/catch.hpp' % sourceDir,
                 '-i%s/source/resource/testUtilities/cisst_code/' % sourceDir,
                 '%s/source 2> %s/cppcheck-result.xml' % (sourceDir, rootDir)
                 ])

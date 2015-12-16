@@ -49,18 +49,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxProfile.h"
+#include "cxVisServices.h"
+#include "cxSelectClippersForDataWidget.h"
 
 namespace cx
 {
+MeshPropertiesWidget::MeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
+		TabbedWidget(parent, "MeshPropertiesWidget", "Mesh Properties")
+{
+	this->setToolTip("Mesh properties");
 
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+	activeMeshProperty->setValueName("Active Mesh");
+
+	this->insertWidgetAtTop(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
+
+	this->addTab(new MeshInfoWidget(services->patient(), services->view(), this), "Info");
+	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
+}
+
+/// -------------------------------------------------------
 
 MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-	InfoWidget(parent, "MeshInfoWidget", "Mesh Properties"),
+	InfoWidget(parent, "MeshInfoWidget", "Mesh Info"),
 	mPatientModelService(patientModelService),
-	mViewService(viewService)
+	mViewService(viewService),
+	mActiveMeshProperty(StringPropertyActiveData::New(patientModelService, "mesh"))
 {
 	this->addWidgets(patientModelService);
 	this->meshSelectedSlot();
+
+	connect(mActiveMeshProperty.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 }
 
 MeshInfoWidget::~MeshInfoWidget()
@@ -77,24 +96,26 @@ void MeshInfoWidget::setColorSlot()
 
 void MeshInfoWidget::setColorSlotDelayed()
 {
-  mMesh->setColor(mColorAdapter->getValue());
+	if(!mMesh)
+	  return;
+	mMesh->setColor(mColorAdapter->getValue());
 }
 
 void MeshInfoWidget::meshSelectedSlot()
 {
-	if (mMesh == mSelectMeshWidget->getMesh())
+	if (mMesh == mActiveMeshProperty->getData())
 	return;
 
 	if(mMesh)
 	{
         mMesh->setVisSize((double) mVisSizeWidget->getValue());
-        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
-		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+//        disconnect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+//		disconnect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
         disconnect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
     }
 
-	mMesh = mSelectMeshWidget->getMesh();
+	mMesh = boost::dynamic_pointer_cast<Mesh>(mActiveMeshProperty->getData());
 
 	if (!mMesh)
 	{
@@ -108,14 +129,14 @@ void MeshInfoWidget::meshSelectedSlot()
 		return;
 	}
 
-	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+//	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+//	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
     mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
     mVisSizeWidget->setValue(mMesh->getVisSize());
 
-	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
-	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
+//	connect(mBackfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setBackfaceCullingSlot(bool)));
+//	connect(mFrontfaceCullingCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setFrontfaceCullingSlot(bool)));
     connect(mGlyphVisualizationCheckBox, SIGNAL(toggled(bool)), mMesh.get(), SLOT(setShowGlyph(bool)));
 
     connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
@@ -147,8 +168,8 @@ void MeshInfoWidget::importTransformSlot()
 void MeshInfoWidget::meshChangedSlot()
 {
     if(!mMesh) return;
-	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+//	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+//	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
     mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
 	mColorAdapter->setValue(mMesh->getColor());
@@ -167,18 +188,16 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
 
 void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 {
-    mSelectMeshWidget = StringPropertySelectMesh::New(patientModelService);
-    mSelectMeshWidget->setValueName("Surface: ");
-	connect(mSelectMeshWidget.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
-
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
 	QString uid("Color");
 	QString name("");
 	QString help("Color of the mesh.");
 	QColor color("red");
 
-	if(mSelectMeshWidget->getMesh())
-		color = mSelectMeshWidget->getMesh()->getColor();
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mActiveMeshProperty->getData());
+
+	if(mesh)
+		color = mesh->getColor();
 
 	mColorAdapter = ColorProperty::initialize(uid, name, help, color, options.getElement());
 	connect(mColorAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
@@ -196,12 +215,12 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
-	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
-	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
-	optionsLayout->addWidget(mBackfaceCullingCheckBox);
-	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
-	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
-	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
+//	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
+//	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
+//	optionsLayout->addWidget(mBackfaceCullingCheckBox);
+//	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
+//	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
+//	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
     optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
 
     optionsLayout->addStretch(1);
@@ -222,7 +241,6 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	int gridLayoutRow = 1;
 
-	gridLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget), gridLayoutRow++, 0, 1, 2);
 	new LabeledLineEditWidget(this, mUidAdapter, gridLayout, gridLayoutRow++);
 	new LabeledLineEditWidget(this, mNameAdapter, gridLayout, gridLayoutRow++);
     new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, gridLayoutRow++);

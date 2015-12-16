@@ -259,8 +259,8 @@ void Acquisition::cancelRecord()
 		return;
 	}
 	reporter()->playCancelSound();
-	mLatestSession.reset();
 	mLatestSession->cancelLastInterval();
+	mLatestSession.reset();
 	mCurrentContext = AcquisitionService::TYPES();
 	this->setState(AcquisitionService::sNOT_RUNNING);
 	emit cancelled();

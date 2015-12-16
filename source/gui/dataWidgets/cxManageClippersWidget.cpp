@@ -50,7 +50,6 @@ ClippingPropertiesWidget::ClippingPropertiesWidget(VisServicesPtr services, QWid
 {
 	this->setToolTip("Clipping properties");
 
-	this->addTab(new SelectClippersForDataWidget(services, this), "Select clippers");
 	this->addTab(new ManageClippersWidget(services, this), "Edit clippers");
 }
 
@@ -121,16 +120,8 @@ void ManageClippersWidget::clipperChanged()
 		return;
 
 	mCurrentClipper = getClippers()->getClipper(clipperName);
-//	this->setupClipperUI();
 	mClipperWidget->setClipper(mCurrentClipper);
 }
-
-//void ClippersWidget::setupClipperUI()
-//{
-//	ClipperWidget *clipperWidget = new ClipperWidget(mCurrentClipper, this);
-////	mLayout->addWidget(clipperWidget);
-////	mLayout->addStretch();
-//}
 
 void ManageClippersWidget::newClipperButtonClicked()
 {

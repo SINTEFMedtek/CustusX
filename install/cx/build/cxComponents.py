@@ -156,7 +156,7 @@ class ITK(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
-        self._getBuilder().gitCheckout('v4.6.1')
+        self._getBuilder().gitCheckout('v4.8.2')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -181,8 +181,7 @@ class VTK(CppComponent):
         # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
         repo = '%s/VTK' % self.controlData.gitrepo_open_site_base
         branch = 'VTK-CX-modifications'
-        #tag = 'VTK-6-1-0.cx_patch_2'
-        tag = 'VTK-6-2-0.cx_patch_1'
+        tag = 'VTK-6-3-0.cx_patch_3'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         self._getBuilder().gitCheckout(tag)
     def configure(self):
@@ -352,7 +351,7 @@ class IGSTK(CppComponent):
         repo = '%s/IGSTK' % base
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        self._getBuilder().gitCheckout('d29479aa7a5e2679a879105b7c11c8a9c8eaa7cf')
+        self._getBuilder().gitCheckout('c737daa56c5c99740c0b185699f12531b81f867e')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -518,15 +517,15 @@ class FAST(CppComponent):
         self._getBuilder().gitClone('git@github.com:smistad/FAST')
     def update(self):
         #self._getBuilder().gitCheckoutBranch('development', submodules=True)
-        self._getBuilder().gitCheckout('c288f30dd5b2e684355dc02d4078b0c642cbd8c4')
-        self._getBuilder()._gitSubmoduleUpdate()
+        self._getBuilder().gitCheckout('924542af95c6a6e2d29d99de8c592add7ac45880')
+#        self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
-        add('MODULE_OpenIGTLink:BOOL', False)
-        add('BUILD_EXAMPLES:BOOL', False)
-        add('BUILD_TESTS:BOOL', False)
-        add('VTK_INTEROP:BOOL', True)
+        add('FAST_MODULE_OpenIGTLink:BOOL', False)
+        add('FAST_BUILD_EXAMPLES:BOOL', False)
+        add('FAST_BUILD_TESTS:BOOL', False)
+        add('FAST_VTK_INTEROP:BOOL', True)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())        
         builder.configureCMake()

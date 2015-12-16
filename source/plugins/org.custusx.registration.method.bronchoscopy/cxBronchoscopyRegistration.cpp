@@ -302,6 +302,15 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	CTPositions = branchVector[0]->getPositions();
 	CTOrientations = branchVector[0]->getOrientations();
 
+	std::cout << "Positions in centerline:" << CTPositions.cols() << std::endl;
+	std::cout << "Positions in tracking data:" << trackingPositions.cols() << std::endl;
+
+	if (trackingPositions.cols() < 10)
+	{
+		std::cout << "Warning: Too few positions in tracking data to perform registration." << std::endl;
+		return Eigen::Matrix4d::Identity();
+	}
+
 	for (int i = 1; i < branchVector.size(); i++)
     {
         Eigen::MatrixXd CTPositionsNew(CTPositions.rows() , CTPositions.cols() + branchVector[i]->getPositions().cols());
@@ -313,6 +322,12 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
         CTPositions.swap(CTPositionsNew);
         CTOrientations.swap(CTOrientationsNew);
     }
+
+	if (CTPositions.cols() < 10)
+	{
+		std::cout << "Warning: Too few positions in centerline to perform registration." << std::endl;
+		return Eigen::Matrix4d::Identity();
+	}
 
 	std::pair<Eigen::MatrixXd , Eigen::MatrixXd> qualityCheckedData = RemoveInvalidData(CTPositions, CTOrientations);
 	CTPositions = qualityCheckedData.first;
@@ -457,7 +472,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 
 Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration)
 {
-
     if(trackingData_prMt.empty())
 		reportError("BronchoscopyRegistration::runBronchoscopyRegistration(): No tracking data");
 

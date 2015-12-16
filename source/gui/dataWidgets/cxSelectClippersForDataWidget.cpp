@@ -31,6 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxSelectClippersForDataWidget.h"
+#include "boost/bind.hpp"
 #include <QTableWidget>
 #include <QLabel>
 #include <QCheckBox>
@@ -46,28 +47,62 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "SelectClippersForImageWidget", "Select Clippers")
+{
+	StringPropertyActiveImagePtr activeImageProperty = StringPropertyActiveImage::New(services->patient());
+
+	QVBoxLayout *mLayout = new QVBoxLayout(this);
+
+	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
+	selectClippersWidget->setActiveDataProperty(activeImageProperty);
+
+	mLayout->addWidget(selectClippersWidget);
+}
+
+/// -------------------------------------------------------
+
+SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services, QWidget* parent) :
+	BaseWidget(parent, "SelectClippersForMeshWidget", "Select Clippers")
+{
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+
+	QVBoxLayout *mLayout = new QVBoxLayout(this);
+
+	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
+	selectClippersWidget->setActiveDataProperty(activeMeshProperty);
+
+	mLayout->addWidget(selectClippersWidget);
+}
+
+/// -------------------------------------------------------
+
 SelectClippersForDataWidget::SelectClippersForDataWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "SelectClippersForDataWidget", "Select Clippers"),
 	mServices(services),
-	mActiveData(services->patient()->getActiveData())
+	mActiveDataProperty(StringPropertyActiveData::New(services->patient()))
 {
 	this->initUI();
 
 	ClippersPtr clippers = mServices->view()->getClippers();
-	connect(clippers.get(), &Clippers::changed, this, &SelectClippersForDataWidget::updateCheckboxesFromClippers);
-	connect(mActiveData.get(), &ActiveData::activeDataChanged, this, &SelectClippersForDataWidget::updateCheckboxesFromClippers);
+	connect(clippers.get(), &Clippers::changed, this, &SelectClippersForDataWidget::setModified);
+	connect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
+}
+
+void SelectClippersForDataWidget::setActiveDataProperty(SelectDataStringPropertyBasePtr property)
+{
+	disconnect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
+	mActiveDataProperty = property;
+	connect(mActiveDataProperty.get(), &Property::changed, this, &SelectClippersForDataWidget::setModified);
 }
 
 void SelectClippersForDataWidget::initUI()
 {
-	StringPropertyActiveDataPtr activeDataProperty = StringPropertyActiveData::New(mServices->patient());
-
 	mClipperTableWidget = new QTableWidget(this);
 
 	mHeading = new QLabel("Active clippers");
 
 	mLayout = new QVBoxLayout(this);
-	mLayout->addWidget(new DataSelectWidget(mServices->view(), mServices->patient(), this, activeDataProperty));
 	mLayout->addWidget(mHeading);
 	mLayout->addWidget(mClipperTableWidget);
 
@@ -78,18 +113,15 @@ void SelectClippersForDataWidget::initUI()
 void SelectClippersForDataWidget::setupClipperSelectorUI()
 {
 	ClippersPtr clippers = mServices->view()->getClippers();
-	mClipperTableWidget->setColumnCount(2);
+	mClipperTableWidget->setColumnCount(3);
 	mClipperTableWidget->setRowCount(clippers->size());
 	QStringList horizontalHeaders;
-	horizontalHeaders << "Clip data" << "Clipper";
+	horizontalHeaders << "Clip data" << "Clipper" << "Invert";
 	mClipperTableWidget->setHorizontalHeaderLabels(horizontalHeaders);
-	mClipperTableWidget->setColumnWidth(2, 300);
 }
 
 void SelectClippersForDataWidget::createNewCheckBoxesBasedOnClippers()
 {
-	mDataCheckBoxes.clear();
-
 	ClippersPtr clippers = mServices->view()->getClippers();
 	QStringList clipperNames = clippers->getClipperNames();
 
@@ -106,11 +138,30 @@ void SelectClippersForDataWidget::createNewCheckBoxesBasedOnClippers()
 
 void SelectClippersForDataWidget::createDataCheckBox(int row, QString clipperName)
 {
-	QCheckBox *checkbox = this->createCheckBox(clipperName);
-	mClipperTableWidget->setCellWidget(row, 0, checkbox);
+	QCheckBox *dataCheckBox = this->createCheckBox(clipperName);
+	QCheckBox *invertCheckbox = this->createCheckBox(clipperName);
+	mClipperTableWidget->setCellWidget(row, 0, dataCheckBox);
+	mClipperTableWidget->setCellWidget(row, 2, invertCheckbox);
 
-	connect(checkbox, &QCheckBox::clicked, this, &SelectClippersForDataWidget::clipDataClicked);
-	mDataCheckBoxes[clipperName] = checkbox;
+	boost::function<void()> func = boost::bind(&SelectClippersForDataWidget::clipDataClicked, this, dataCheckBox, clipperName);
+	connect(dataCheckBox, &QCheckBox::clicked, this, func);
+
+	boost::function<void()> invertFunc = boost::bind(&SelectClippersForDataWidget::invertClicked, this, invertCheckbox, clipperName);
+	connect(invertCheckbox, &QCheckBox::clicked, this, invertFunc);
+
+	this->updateCheckBoxesFromClipper(dataCheckBox, invertCheckbox, clipperName);
+}
+
+void SelectClippersForDataWidget::updateCheckBoxesFromClipper(QCheckBox *dataCheckBox, QCheckBox *invertCheckBox, QString clipperName)
+{
+	cx::InteractiveClipperPtr clipper = this->getClipper(clipperName);
+	DataPtr activeData = mActiveDataProperty->getData();
+
+	bool checkData = clipper->exists(activeData);
+	dataCheckBox->setChecked(checkData);
+
+	bool checkInvert = clipper->getInvertPlane();
+	invertCheckBox->setChecked(checkInvert);
 }
 
 QCheckBox *SelectClippersForDataWidget::createCheckBox(QString clipperName)
@@ -120,45 +171,36 @@ QCheckBox *SelectClippersForDataWidget::createCheckBox(QString clipperName)
 	return checkbox;
 }
 
-void SelectClippersForDataWidget::updateCheckboxesFromClippers()
+cx::InteractiveClipperPtr SelectClippersForDataWidget::getClipper(QString clipperName)
 {
 	ClippersPtr clippers = mServices->view()->getClippers();
-	QStringList clipperNames = clippers->getClipperNames();
-	DataPtr activeData = mActiveData->getActive<Data>();
-
-	for(int i = 0; i < clipperNames.size(); ++i)
-	{
-		QString clipperName = clipperNames.at(i);
-		if(clippers->getClipper(clipperName)->exists(activeData))
-			mDataCheckBoxes[clipperName]->setChecked(true);
-		else
-			mDataCheckBoxes[clipperName]->setChecked(false);
-	}
+	cx::InteractiveClipperPtr clipper = clippers->getClipper(clipperName);
+	return clipper;
 }
 
-void SelectClippersForDataWidget::clipDataClicked(bool checked)
+void SelectClippersForDataWidget::clipDataClicked(QCheckBox *checkBox, QString clipperName)
 {
-	this->addDataToClippers();
+	DataPtr activeData = mActiveDataProperty->getData();
+	cx::InteractiveClipperPtr clipper = this->getClipper(clipperName);
+	bool checked = checkBox->isChecked();
+
+	if(checked)
+		clipper->addData(activeData);
+	else
+		clipper->removeData(activeData);
 }
 
-void SelectClippersForDataWidget::addDataToClippers()
+void SelectClippersForDataWidget::invertClicked(QCheckBox *checkBox, QString clipperName)
 {
-	ClippersPtr clippers = mServices->view()->getClippers();
-	DataPtr activeData = mActiveData->getActive<Data>();
-
-	clippers->blockSignals(true);
-	QMap<QString, QCheckBox*>::const_iterator iter = mDataCheckBoxes.constBegin();
-	 while (iter != mDataCheckBoxes.constEnd())
-	 {
-		 cx::InteractiveClipperPtr clipper = clippers->getClipper(iter.key());
-//		 CX_LOG_DEBUG() << "clipper: " << iter.key() << " " << iter.value()->isChecked();
-		 if(iter.value()->isChecked())
-			 clipper->addData(activeData);
-		 else
-			 clipper->removeData(activeData);
-		 ++iter;
-	 }
-	 clippers->blockSignals(false);
+	bool checked = checkBox->isChecked();
+	this->getClipper(clipperName)->invertPlane(checked);
 }
+
+void SelectClippersForDataWidget::prePaintEvent()
+{
+	this->createNewCheckBoxesBasedOnClippers();
+}
+
+
 }//cx
 

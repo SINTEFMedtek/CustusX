@@ -56,8 +56,8 @@ ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mV
 {
 	if (!mImage)
 		return;
-	connect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
-	connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(applyCropping()));
+	connect(mImage.get(), &Data::clipPlanesChanged, this, &ImageMapperMonitor::clipPlanesChangedSlot);
+	connect(mImage.get(), &Image::cropBoxChanged, this, &ImageMapperMonitor::applyCropping);
 }
 
 void ImageMapperMonitor::init()
@@ -73,7 +73,6 @@ ImageMapperMonitor::~ImageMapperMonitor()
 
 void ImageMapperMonitor::clipPlanesChangedSlot()
 {
-//	this->clearClipping();
 	this->applyClipping();
 }
 

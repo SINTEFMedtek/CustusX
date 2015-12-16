@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QStringList>
 #include "cxForwardDeclarations.h"
+class QDomNode;
 
 namespace cx {
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 
 /**\brief Clipper container. Used by ClippersWidget.
  *
@@ -61,6 +61,8 @@ public:
 	int size() {return mClippers.size();}
 	QStringList getClipperNames();
 
+	void parseXml(QDomNode parentNode);
+	void addXml(QDomNode &parentNode);
 signals:
 	void changed();
 

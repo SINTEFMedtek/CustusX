@@ -99,6 +99,9 @@ void BronchoscopyRegistrationWidget::setup()
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
 	mProcessCenterlineButton->setToolTip(this->defaultWhatsThis());
 
+//	mBronchoscopeRegistrationPtr = BronchoscopeRegistrationPtr(new BronchoscopePositionProjection());
+//	mProjectionCenterlinePtr->createMaxDistanceToCenterlineOption(mOptions.getElement());
+
 	mRegisterButton = new QPushButton("Register");
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
@@ -116,12 +119,16 @@ void BronchoscopyRegistrationWidget::setup()
 	this->selectSubsetOfBranches(mOptions.getElement());
 	this->createMaxNumberOfGenerations(mOptions.getElement());
 	this->useLocalRegistration(mOptions.getElement());
+	this->createMaxLocalRegistrationDistance(mOptions.getElement());
+
+//	PropertyPtr maxLocalRegistrationDistance = mProjectionCenterlinePtr->getMaxLocalRegistrationDistanceOption();
 
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
 	mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mMaxNumberOfGenerations));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
 	mVerticalLayout->addWidget(mRecordTrackingWidget);
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
+	mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mMaxLocalRegistrationDistance));
 	mVerticalLayout->addWidget(mRegisterButton);
 
 	mVerticalLayout->addStretch();
@@ -188,11 +195,15 @@ void BronchoscopyRegistrationWidget::registerSlot()
     }
 
 	Transform3D new_rMpr;
-	double maxDistanceForLocalRegistration = 30; //mm
-	if(mUseLocalRegistration->getValue())
-		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,maxDistanceForLocalRegistration));
-	else
+
+    if(mUseLocalRegistration->getValue()){
+		std::cout << "Running local registration with max distance " << mMaxLocalRegistrationDistance->getValue() << " mm." << std::endl;
+		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,mMaxLocalRegistrationDistance->getValue()));
+    }
+    else{
+        std::cout << "Running global registration." << std::endl;
 		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
+    }
 
     new_rMpr = new_rMpr*old_rMpr;//output
 	mServices->registration()->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
@@ -228,5 +239,14 @@ void BronchoscopyRegistrationWidget::useLocalRegistration(QDomElement root)
 																			"Use local registration", false,
 																				root);
 }
+
+void BronchoscopyRegistrationWidget::createMaxLocalRegistrationDistance(QDomElement root)
+{
+	mMaxLocalRegistrationDistance = DoubleProperty::initialize("Max local registration distance (mm)", "",
+	"Set max distance for local registration in mm", 30, DoubleRange(1, 200, 1), 0,
+					root);
+	mMaxLocalRegistrationDistance->setGuiRepresentation(DoubleProperty::grSLIDER);
+}
+
 
 } //namespace cx

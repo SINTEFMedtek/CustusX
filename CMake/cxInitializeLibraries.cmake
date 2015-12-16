@@ -198,7 +198,11 @@ macro(cx_initialize_VTK)
 	#
 	find_package(VTK COMPONENTS
 		vtkCommonCore
-		vtkRenderingCore vtkRenderingQt vtkRenderingOpenGL vtkRenderingFreeTypeOpenGL vtkInteractionStyle
+		vtkRenderingCore
+		vtkRenderingQt
+		vtkRenderingOpenGL
+#		vtkRenderingFreeTypeOpenGL
+		vtkInteractionStyle
 		vtkRenderingVolume vtkRenderingVolumeOpenGL
 		vtkIOGeometry vtkIOLegacy vtkIOMINC
 		vtkIOXMLParser

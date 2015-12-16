@@ -40,11 +40,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxDataInterface.h"
 #include "cxInfoWidget.h"
+#include "cxTabbedWidget.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+
+class cxGui_EXPORT MeshPropertiesWidget : public TabbedWidget
+{
+  Q_OBJECT
+public:
+	MeshPropertiesWidget(VisServicesPtr services, QWidget* parent);
+  virtual ~MeshPropertiesWidget() {}
+};
+
+/// -------------------------------------------------------
 
 /**
  * \class MeshInfoWidget
@@ -83,10 +94,10 @@ private:
   StringPropertyParentFramePtr mParentFrameAdapter;
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
-  StringPropertySelectMeshPtr mSelectMeshWidget;
+  SelectDataStringPropertyBasePtr mActiveMeshProperty;
   ColorPropertyPtr mColorAdapter;
-  QCheckBox* mBackfaceCullingCheckBox;
-  QCheckBox* mFrontfaceCullingCheckBox;
+//  QCheckBox* mBackfaceCullingCheckBox;
+//  QCheckBox* mFrontfaceCullingCheckBox;
   DoublePropertyPtr mVisSizeWidget;
   QCheckBox* mGlyphVisualizationCheckBox;
   StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;

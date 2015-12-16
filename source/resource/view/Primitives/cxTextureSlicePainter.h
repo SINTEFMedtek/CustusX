@@ -93,7 +93,7 @@ class cxResourceVisualization_EXPORT TextureSlicePainter : public vtkOpenGLRepre
 {
 public:
 	static TextureSlicePainter* New();
-	vtkTypeRevisionMacro(TextureSlicePainter, vtkOpenGLRepresentationPainter);
+	vtkTypeMacro(TextureSlicePainter, vtkOpenGLRepresentationPainter);
 
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);

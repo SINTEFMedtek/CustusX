@@ -162,6 +162,7 @@ QString VLCRecorder::getVLCDefaultRecorderArguments(QString saveFile)
 	defaultArguements = " -I luacli screen:// :screen-fps=10.000000 :live-caching=300 :sout=#transcode{vcodec=h264,acodec=none}:file{dst="+saveFile+"} :sout-keep ";
 #endif
 #ifdef CX_APPLE
+    CX_LOG_WARNING("VLC 2.2.1 fails on Mac. VLC version 2.1.2 works.");
 	defaultArguements = " -I cli screen:// \":sout=#transcode{vcodec=h264,vb=800,fps=10,scale=1,acodec=none}:duplicate{dst=standard{access=file,mux=mp4,dst="+saveFile+"}}\"";
 #endif
 #ifdef CX_LINUX

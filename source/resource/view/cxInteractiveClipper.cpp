@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxCoreServices.h"
 #include "cxLogger.h"
+#include "cxEnumConverter.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
@@ -71,6 +73,49 @@ InteractiveClipper::InteractiveClipper(CoreServicesPtr services) :
 	this->changedSlot();
 }
 
+void InteractiveClipper::addXml(QDomNode& dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+
+	QString plane = enum2string<PLANE_TYPE>(this->getSlicePlane());
+
+	elem.setAttribute("plane", plane);
+	elem.setAttribute("invert", this->getInvertPlane());
+	elem.setAttribute("uids", this->getDataUids());
+	}
+
+void InteractiveClipper::parseXml(QDomNode dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+
+	QString existingPlane = enum2string<PLANE_TYPE>(this->getSlicePlane());
+	PLANE_TYPE newPlane = string2enum<PLANE_TYPE>(elem.attribute("plane", existingPlane));
+
+	this->setSlicePlane(newPlane);
+	this->invertPlane(elem.attribute("invert", QString::number(this->getInvertPlane())).toInt());
+	this->setDataUids(elem.attribute("uids", this->getDataUids()));
+}
+
+QString InteractiveClipper::getDataUids()
+{
+	QStringList dataUids;
+	std::map<QString, DataPtr>::iterator iter = mDatas.begin();
+	for (; iter != mDatas.end(); ++iter)
+	{
+		dataUids << iter->first;
+	}
+	return dataUids.join(" ");
+}
+
+void InteractiveClipper::setDataUids(QString uids)
+{
+	QStringList dataUids = uids.split(" ");
+	for(int i = 0; i < dataUids.size(); ++i)
+	{
+		DataPtr data = mServices->patient()->getData(dataUids.at(i));
+		this->addData(data);
+	}
+}
 
 void InteractiveClipper::setSlicePlane(PLANE_TYPE plane)
 {
@@ -159,8 +204,8 @@ void InteractiveClipper::removeData(DataPtr data)
 	std::map<QString, DataPtr>::iterator iter = mDatas.find(data->getUid());
 	if(iter != mDatas.end())
 	{
-		mDatas.erase(iter);
 		iter->second->removeInteractiveClipPlane(mSlicePlaneClipper->getClipPlane());
+		mDatas.erase(iter);
 	}
 	this->updateClipPlanesInData();
 }

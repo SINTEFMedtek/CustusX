@@ -120,11 +120,17 @@ QString DataLocations::getPersistentWritablePath()
 
 QString DataLocations::getBundlePath()
 {
+    // This method is becoming problematic (2015-11-30/CA):
+    // the APPLE case returns path to folder enclosing the bundle
+    // while the LINUX/WIN case returns path to bin folder.
+    // This is not symmetric - it should be. Try to migrate away from this
+    // method, using applicationDirPath instead, and remove it.
+    //
 #ifdef __APPLE__
 	QString path(qApp->applicationDirPath()+"/../../..");
 	QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
 	if (QFileInfo(bundle).isBundle())
-		return path;
+        return QDir(path).canonicalPath();
 	else
 		return qApp->applicationDirPath();
 #else
@@ -178,7 +184,8 @@ QStringList DataLocations::getRootConfigPaths()
 {
 	if(!isRunFromBuildFolder())
 	{
-		QString path = getBundlePath() + "/" + CX_CONFIG_ROOT_RELATIVE_INSTALLED; // look for installed location
+         // look for installed location
+        QString path = QString("%1/%2").arg(qApp->applicationDirPath()).arg(CX_CONFIG_ROOT_RELATIVE_INSTALLED);
 		if (QDir(path).exists())
 			return QStringList() << QDir(path).canonicalPath();
 		else
@@ -201,7 +208,8 @@ QString DataLocations::getDocPath()
 {
 	if(!isRunFromBuildFolder())
 	{
-		QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
+        QString path = QString("%1/%2").arg(qApp->applicationDirPath()).arg(CX_DOC_ROOT_RELATIVE_INSTALLED);
+//		QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
 		if (QDir(path).exists())
 			return QDir(path).canonicalPath();
 		else
@@ -287,14 +295,14 @@ QString DataLocations::checkExecutableExist(QString path, QString filename)
 QString DataLocations::findExecutableInStandardLocations(QString filename)
 {
 	QString result;
-#ifdef __APPLE__
-	// run from installed folder on mac
-	result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
-	if (!result.isEmpty())
-		return result;
-#endif
+//#ifdef __APPLE__
+//	// run from installed folder on mac
+//	result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
+//	if (!result.isEmpty())
+//		return result;
+//#endif
 	// run from installed or build bin folder
-	result = DataLocations::checkExecutableExist(DataLocations::getBundlePath(), filename);
+    result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
 	if (!result.isEmpty())
 		return result;
 

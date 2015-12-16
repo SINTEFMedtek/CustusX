@@ -187,18 +187,23 @@ void ViewImplService::onSessionCleared()
 {
 	viewManager()->clear();
 }
+
+//TODO: save/load clippers
 void ViewImplService::onSessionLoad(QDomElement& node)
 {
 	XMLNodeParser root(node);
 	QDomElement viewManagerNode = root.descend("managers/viewManager").node().toElement();
 	if (!viewManagerNode.isNull())
 		viewManager()->parseXml(viewManagerNode);
+
+	mClippers->parseXml(node);
 }
 void ViewImplService::onSessionSave(QDomElement& node)
 {
 	XMLNodeAdder root(node);
 	QDomElement managerNode = root.descend("managers").node().toElement();
 	viewManager()->addXml(managerNode);
+	mClippers->addXml(node);
 }
 
 
