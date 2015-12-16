@@ -70,6 +70,7 @@ vtkImageDataPtr ViewCollectionImageWriter::grab()
 
 	for (unsigned i=0; i<views.size(); ++i)
 	{
+//        CX_LOG_CHANNEL_DEBUG("CA") << "chec pos for view " << i;
         vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
         QPoint vtkpos = this->getVtkPositionOfView(views[i]);
         this->drawImageAtPos(target, vtkImage, vtkpos);
@@ -81,10 +82,14 @@ vtkImageDataPtr ViewCollectionImageWriter::grab()
 QPoint ViewCollectionImageWriter::getVtkPositionOfView(ViewPtr view)
 {
 	QPoint qpos_ul = mWidget->getPosition(view); // UL position in qt-space of mWidget
-	Eigen::Array2i size(view->getRenderWindow()->GetSize());
-	QPoint qpos_ll = qpos_ul + QPoint(0, size[1]-1); // LL position in qt-space of mWidget
-	QPoint vtkpos_ll = this->qt2vtk(qpos_ll);
-	return vtkpos_ll;
+//    CX_LOG_CHANNEL_DEBUG("CA") << "  qpos_ul " << qpos_ul.x() << " " << qpos_ul.y();
+    Eigen::Array2i size_view(view->getRenderer()->GetSize());
+//    CX_LOG_CHANNEL_DEBUG("CA") << "  size " << size;
+    QPoint qpos_ll = qpos_ul + QPoint(0, size_view[1]-1); // LL position in qt-space of mWidget
+//    CX_LOG_CHANNEL_DEBUG("CA") << "  qpos_ll " << qpos_ll.x() << " " << qpos_ll.y();
+    QPoint vtkpos_ll = this->qt2vtk(qpos_ll);
+//    CX_LOG_CHANNEL_DEBUG("CA") << "  vtkpos_ll " << vtkpos_ll.x() << " " << vtkpos_ll.y();
+    return vtkpos_ll;
 }
 
 QPoint ViewCollectionImageWriter::qt2vtk(QPoint qpos)
