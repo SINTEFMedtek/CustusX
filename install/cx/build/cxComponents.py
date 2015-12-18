@@ -527,7 +527,9 @@ class FAST(CppComponent):
         add('FAST_BUILD_TESTS:BOOL', False)
         add('FAST_VTK_INTEROP:BOOL', True)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())        
+        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
+        if(platform.system() == 'Windows'):
+            add('BUILD_SHARED_LIBS:BOOL', 'OFF')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
