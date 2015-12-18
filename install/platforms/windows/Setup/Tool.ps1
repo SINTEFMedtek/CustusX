@@ -144,10 +144,10 @@ Function Get-ToolList{
 				"", 
 				"ninja", 
 				"Enables support for compiling using more than one core.")
-    # CMake 3.0.1 (x86)
+    # CMake 3.4.1 (x86)
     $toollist += New-Object Tool(
 				"cmake", 
-				"http://www.cmake.org/files/v3.0/cmake-3.0.1-win32-x86.exe", 
+				"https://cmake.org/files/v3.4/cmake-3.4.1-win32-x86.exe", 
 				"$ToolFolder\cmake-installer.exe", 
 				"NSIS package", 
 				"$script:CX_PROGRAM_FILES_X86\CMake\bin",
