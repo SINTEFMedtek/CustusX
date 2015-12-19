@@ -27,10 +27,19 @@ private slots:
     void goToOrigoButtonSlot();
     void blendRadiusChangedSlot();
     void sendMessageSlot();
+    void runVelocityVTKSlot();
+
+    void startLoggingSlot();
+    void stopLoggingSlot();
+    void clearPoseQueueSlot();
+    void moveToInitialPositionButtonSlot();
 
 private:
-    QPushButton *runVTKButton, *openVTKButton;
+    QPushButton *runVTKButton, *openVTKButton, *runVelocityVTKButton;
     QPushButton *sendMessageButton;
+    QPushButton *startLoggingButton, *stopLoggingButton;
+    QPushButton *clearPoseQueueButton;
+    QPushButton *moveToInitialPositionButton;
 
     QLineEdit *vtkLineEdit;
 

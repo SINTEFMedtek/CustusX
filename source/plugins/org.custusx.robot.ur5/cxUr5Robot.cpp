@@ -1,21 +1,22 @@
 #include "cxUr5Robot.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
 Ur5Robot::Ur5Robot():
     moveInProgress(false),
+    velocityMoveInProgress(false),
     mBlendRadius(0.001),
     rtPort(30003),
     secPort(30002)
 {
-    moveInProgress = false;
-
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(this,&Ur5Robot::atTarget,this,&Ur5Robot::atTargetSlot);
-
-    mBlendRadius=0.001;
+    connect(this,&Ur5Robot::startLogging,this,&Ur5Robot::startLoggingSlot);
+    connect(this,&Ur5Robot::stopLogging,this,&Ur5Robot::stopLoggingSlot);
+    connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
 }
 
 Ur5Robot::~Ur5Robot()
@@ -38,8 +39,8 @@ void Ur5Robot::nextMove()
         }
         else
         {
-        mTargetState.jointPosition = mProgramEncoder.jointPositionQueue[0];
-        this->move("movej",mTargetState.jointPosition,moveAcceleration,moveVelocity);
+            mTargetState.jointPosition = mProgramEncoder.jointPositionQueue[0];
+            this->move("movej",mTargetState.jointPosition,moveAcceleration,moveVelocity);
         }
     }
     else if(moveInProgress && !mProgramEncoder.poseQueue.empty())
@@ -51,9 +52,31 @@ void Ur5Robot::nextMove()
         }
         else
         {
-        mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
-        mTargetState.cartAngles = mStartPosition.cartAngles;
-        this->move("movej",mTargetState,moveAcceleration,moveVelocity);
+            mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
+            mTargetState.cartAngles = mStartPosition.cartAngles;
+            this->move("movej",mTargetState,moveAcceleration,moveVelocity);
+        }
+    }
+    else if(velocityMoveInProgress && !mProgramEncoder.poseQueue.empty())
+    {
+        mProgramEncoder.poseQueue.erase(mProgramEncoder.poseQueue.begin());
+        if(mProgramEncoder.poseQueue.empty())
+        {
+            velocityMoveInProgress=false;
+            this->move("stopj",mTargetState,moveAcceleration,moveVelocity);
+        }
+        else
+        {
+            if(mProgramEncoder.poseQueue.size()>1)
+            {
+                mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
+                mTargetState.cartAngles = mStartPosition.cartAngles;
+                Vector3D tangent = mProgramEncoder.poseQueue[1].cartAxis-mCurrentState.cartAxis;
+                Eigen::RowVectorXd velocityEndEffector(6);
+                velocityEndEffector << moveVelocity*tangent(0)/tangent.norm(),moveVelocity*tangent(1)/tangent.norm(),moveVelocity*tangent(2)/tangent.norm(),0,0,0;
+                mTargetState.jointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
+                this->move("speedj",mTargetState,moveAcceleration,moveVelocity,0,20);
+            }
         }
     }
 }
@@ -65,15 +88,20 @@ void Ur5Robot::updateCurrentState()
     Ur5State currentState;
 
     currentState.timeSinceStart=mRTMonitor.getCurrentState().timeSinceStart;
-    currentState.cartAngles=mSecMonitor.getCurrentState().cartAngles;
-    currentState.cartAxis=mSecMonitor.getCurrentState().cartAxis;
-    currentState.force=mRTMonitor.getCurrentState().force;
-    currentState.torque=mRTMonitor.getCurrentState().torque;
+    //currentState.force=mRTMonitor.getCurrentState().force;
+    //currentState.torque=mRTMonitor.getCurrentState().torque;
     currentState.jointPosition=mRTMonitor.getCurrentState().jointPosition;
     currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;
-    currentState.tcpAngles=mRTMonitor.getCurrentState().tcpAngles;
-    currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
+    //currentState.tcpAngles=mRTMonitor.getCurrentState().tcpAngles;
+    //currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
+
+    currentState.cartAngles=mSecMonitor.getCurrentState().cartAngles;
+    currentState.Tbe = mKinematics.forward2(currentState.jointPosition);
+    currentState.cartAxis= mKinematics.T2transl(currentState.Tbe);
     currentState.baseMee = mSecMonitor.getCurrentState().baseMee;
+    currentState.jacobian = mKinematics.jacobian(currentState.jointPosition);
+    currentState.opVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
+
 
     emit transform("RobotTracker",currentState.baseMee,currentState.timeSinceStart);
 
@@ -184,6 +212,8 @@ void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, do
         sendMessage(mMessageEncoder.speedl(targetState,acc,t));
     else if(typeOfMovement =="speedj")
         sendMessage(mMessageEncoder.speedj(targetState,acc,t));
+    else if(typeOfMovement =="stopj")
+        sendMessage(mMessageEncoder.stopj(acc));
 }
 
 void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double t, double rad)
@@ -196,8 +226,21 @@ void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, doub
         sendMessage(mMessageEncoder.speedl(targetState,acc,t));
     else if(typeOfMovement =="speedj")
         sendMessage(mMessageEncoder.speedj(targetState,acc,t));
+    else if(typeOfMovement =="stopj")
+        sendMessage(mMessageEncoder.stopj(acc));
 
 }
+
+void Ur5Robot::move(Ur5MovementInfo movementInfo)
+{
+    mTargetState.jointPosition = movementInfo.targetJointConfiguration;
+
+    if(movementInfo.typeOfMovement=="movej")
+        sendMessage(mMessageEncoder.movej(movementInfo));
+    if(movementInfo.typeOfMovement=="speedj")
+        sendMessage(mMessageEncoder.speedj(movementInfo));
+}
+
 
 void Ur5Robot::addToMoveQueue(Eigen::RowVectorXd target)
 {
@@ -212,7 +255,14 @@ void Ur5Robot::addToProgramQueue(QString str)
 void Ur5Robot::clearProgramQueue()
 {
     if(!mProgramEncoder.programQueue.empty())
+    {
         mProgramEncoder.programQueue.clear();
+        mProgramEncoder.poseQueue.clear();
+    }
+    if(!mProgramEncoder.poseQueue.empty())
+    {
+        mProgramEncoder.clearQueues();
+    }
 }
 
 void Ur5Robot::stopMove(QString typeOfStop, double acc)
@@ -234,10 +284,10 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
     {
         mProgramEncoder.movejProgram(mProgramEncoder.poseQueue,acceleration,velocity,radius);
         mStartPosition = this->getCurrentState();
-        Ur5State bah;
-        bah.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
-        bah.cartAngles = mStartPosition.cartAngles;
-        this->move("movej",bah,acceleration,velocity);
+        Ur5State initState;
+        initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
+        initState.cartAngles = mStartPosition.cartAngles;
+        this->move("movej",initState,acceleration,velocity);
         moveInProgress=true;
         moveAcceleration=acceleration;
         moveVelocity=velocity;
@@ -249,6 +299,17 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
         moveInProgress=true;
         moveAcceleration=acceleration;
         moveVelocity=velocity;
+    }
+    else if(typeOfProgram == "speedj")
+    {
+        mStartPosition = this->getCurrentState();
+        Ur5State initState;
+        initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
+        initState.cartAngles = mStartPosition.cartAngles;
+        this->move("movej",initState,acceleration,velocity);
+        moveAcceleration=acceleration;
+        moveVelocity=velocity;
+        velocityMoveInProgress=true;
     }
     else
     {
@@ -304,6 +365,34 @@ bool Ur5Robot::isValidWorkspace(Eigen::RowVectorXd jointPosition)
     return(abs(jointPosition.maxCoeff())<=2*3.15);
 }
 
+void Ur5Robot::startLoggingSlot()
+{
+    connect(this,&Ur5Robot::stateUpdated,this,&Ur5Robot::dataLogger);
+    CX_LOG_INFO() << "Logging started";
+}
+
+void Ur5Robot::stopLoggingSlot()
+{
+    disconnect(this,&Ur5Robot::stateUpdated,this,&Ur5Robot::dataLogger);
+    CX_LOG_INFO() << "Logging stopped";
+}
+
+void Ur5Robot::dataLogger()
+{
+     CX_LOG_CHANNEL_INFO("jointConfiguration") << mCurrentState.jointPosition;
+     CX_LOG_CHANNEL_INFO("jointVelocitites") << mCurrentState.jointVelocity;
+     CX_LOG_CHANNEL_INFO("operationalPosition") << mCurrentState.cartAxis;
+     CX_LOG_CHANNEL_INFO("operationalVelocity") << mCurrentState.opVelocity;
+}
+
+void Ur5Robot::moveToInitialPositionSlot(double acceleration, double velocity)
+{
+    mStartPosition = this->getCurrentState();
+    Ur5State initState;
+    initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
+    initState.cartAngles = mStartPosition.cartAngles;
+    this->move("movej",initState,acceleration,velocity);
+}
 
 } // cx
 

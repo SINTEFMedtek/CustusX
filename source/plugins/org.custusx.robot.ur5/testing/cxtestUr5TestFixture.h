@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXTESTUR5TESTFIXTURE_H
 
 #include "cxUr5Robot.h"
+#include "cxUr5Kinematics.h"
 
 #include "cxtest_org_custusx_robot_ur5_export.h"
 
@@ -47,9 +48,11 @@ public:
 
     cx::Ur5Robot mUr5Robot;
     cx::Ur5Connection mUr5Connection;
+    cx::Ur5Kinematics mUr5Kinematics;
 
     QByteArray getTestData(int packetSize);
     Eigen::MatrixXd jacobianUr5(Eigen::RowVectorXd jointPositions);
+    void printMatrix(Eigen::MatrixXd matrix);
 };
 
 } //cxtest

@@ -72,6 +72,18 @@ QByteArray Ur5TestFixture::getTestData(int packetSize)
     }
 }
 
+void Ur5TestFixture::printMatrix(Eigen::MatrixXd matrix)
+{
+    for(int i=0;i<matrix.rows(); i++)
+    {
+        for(int j=0;j<matrix.cols(); j++)
+        {
+            std::cout << matrix(i,j) << "\t";
+        }
+        std::cout << std::endl;
+    }
+}
+
 Eigen::MatrixXd Ur5TestFixture::jacobianUr5(Eigen::RowVectorXd jointPositions)
 {
     Eigen::RowVectorXd s(6), c(6);
