@@ -106,9 +106,13 @@ void Ur5Connection::updateCurrentState(QByteArray rawData)
 {
     mCurrentState = mMessageDecoder.analyzeRawPacket(rawData);
     if(mCurrentState.updated == false)
+    {
         mCurrentState = mPreviousState;
-
-    emit(stateChanged());
+    }
+    else
+    {
+       emit(stateChanged());
+    }
 }
 
 void Ur5Connection::clearCurrentTCP()

@@ -23,6 +23,46 @@ QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double t)
             .arg(p(0)).arg(p(1)).arg(p(2)).arg(p(3)).arg(p(4)).arg(p(5)).arg(t);
 }
 
+QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
+{
+    if(m.time != 0 && m.spaceFlag == "jointConfiguration")
+    {
+        return QString("movej([%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
+                .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
+                .arg(m.targetJointConfiguration(2)).arg(m.targetJointConfiguration(3))
+                .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
+                .arg(m.time);
+    }
+    else if(m.time > 0 && m.spaceFlag == "jointConfiguration")
+    {
+        return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
+                .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
+                .arg(m.targetJointConfiguration(2)).arg(m.targetJointConfiguration(3))
+                .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
+                .arg(m.acceleration).arg(m.velocity).arg(m.time).arg(m.radius);
+    }
+    if(m.time != 0 && m.spaceFlag == "operationalConfiguration")
+    {
+        return QString("movej(p[%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
+                .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
+                .arg(m.targetJointConfiguration(2)).arg(m.targetJointConfiguration(3))
+                .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
+                .arg(m.time);
+    }
+    else if(m.time > 0 && m.spaceFlag == "operationalConfiguration")
+    {
+        return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
+                .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
+                .arg(m.targetJointConfiguration(2)).arg(m.targetJointConfiguration(3))
+                .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
+                .arg(m.acceleration).arg(m.velocity).arg(m.time).arg(m.radius);
+    }
+    else
+    {
+        return QString("invalid");
+    }
+}
+
 QString Ur5MessageEncoder::movel(Ur5State p,double a, double v)
 {
     return QString("movel(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)")
@@ -52,6 +92,15 @@ QString Ur5MessageEncoder::speedj(Eigen::RowVectorXd jointVelocity, double a, do
     return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
             .arg(jointVelocity(0)).arg(jointVelocity(1)).arg(jointVelocity(2)).arg(jointVelocity(3))
             .arg(jointVelocity(4)).arg(jointVelocity(5)).arg(a).arg(t);
+}
+
+QString Ur5MessageEncoder::speedj(Ur5MovementInfo m)
+{
+    return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(m.targetJointVelocity(0)).arg(m.targetJointVelocity(1))
+            .arg(m.targetJointVelocity(2)).arg(m.targetJointVelocity(3))
+            .arg(m.targetJointVelocity(4)).arg(m.targetJointVelocity(5))
+            .arg(m.acceleration).arg(m.time);
 }
 
 QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)

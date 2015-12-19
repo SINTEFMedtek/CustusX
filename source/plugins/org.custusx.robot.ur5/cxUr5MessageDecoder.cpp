@@ -46,10 +46,10 @@ Ur5State Ur5MessageDecoder::setRTState(QByteArray data)
     state.timeSinceStart = pickDouble(data,0);
     state.jointPosition = getJointPositionsRT(data);
     state.jointVelocity = getJointVelocitiesRT(data);
-    state.tcpAxis = getTCPAxisRT(data);
-    state.tcpAngles = getTCPAnglesRT(data);
-    state.force = getForceRT(data);
-    state.torque = getTorqueRT(data);
+    //state.tcpAxis = getTCPAxisRT(data);
+    //state.tcpAngles = getTCPAnglesRT(data);
+    //state.force = getForceRT(data);
+    //state.torque = getTorqueRT(data);
     state.updated = true;
 
     return state;

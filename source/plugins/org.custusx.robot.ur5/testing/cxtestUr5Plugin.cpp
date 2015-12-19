@@ -37,59 +37,86 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
-{
-    Ur5TestFixture fixture;
-    fixture.mUr5Robot.connectToRobot("169.254.62.100");
-    CHECK(fixture.mUr5Robot.isConnectedToRobot());
-}
+//TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
+//{
+//    Ur5TestFixture fixture;
+//    fixture.mUr5Robot.connectToRobot("169.254.62.100");
+//    CHECK(fixture.mUr5Robot.isConnectedToRobot());
+//}
 
-TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
-{
-    Ur5TestFixture fixture;
+//TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
+//{
+//    Ur5TestFixture fixture;
 
-    QByteArray rawData560 = fixture.getTestData(560);
-    fixture.mUr5Connection.updateCurrentState(rawData560);
-    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+//    QByteArray rawData560 = fixture.getTestData(560);
+//    fixture.mUr5Connection.updateCurrentState(rawData560);
+//    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
 
-    QByteArray rawData1254 = fixture.getTestData(1254);
-    fixture.mUr5Connection.updateCurrentState(rawData1254);
-    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+//    QByteArray rawData1254 = fixture.getTestData(1254);
+//    fixture.mUr5Connection.updateCurrentState(rawData1254);
+//    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
 
-    QByteArray rawData1460 = fixture.getTestData(1460);
-    fixture.mUr5Connection.updateCurrentState(rawData1460);
-    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
-}
+//    QByteArray rawData1460 = fixture.getTestData(1460);
+//    fixture.mUr5Connection.updateCurrentState(rawData1460);
+//    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+//}
 
 
-TEST_CASE("Ur5Plugin: Read VTK data", "[manual][plugins][org.custusx.robot.ur5]")
-{
-    Ur5TestFixture fixture;
+//TEST_CASE("Ur5Plugin: Read VTK data", "[manual][plugins][org.custusx.robot.ur5]")
+//{
+//    Ur5TestFixture fixture;
 
-    QString path = "C:/line.vtk";
-    fixture.mUr5Robot.openVTKfile(path);
+//    QString path = "C:/line.vtk";
+//    fixture.mUr5Robot.openVTKfile(path);
 
-    QString path2 = "C:/artery_centerline_fixed_2.vtk";
-    fixture.mUr5Robot.openVTKfile(path2);
-}
+//    QString path2 = "C:/artery_centerline_fixed_2.vtk";
+//    fixture.mUr5Robot.openVTKfile(path2);
+//}
 
-TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition")
+//TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition", "[manual][plugins][org.custusx.robot.ur5]")
+//{
+//    Ur5TestFixture fixture;
+
+//    Eigen::RowVectorXd jointPositions(6);
+//    jointPositions << 0.7722,-1.7453,1.7070,-1.5739,-1.6277,0.0717;
+//    //jointPositions = fixture.mUr5Robot.getCurrentState().jointPosition;
+
+//    Eigen::MatrixXd J(6,6);
+//    J = fixture.jacobianUr5(jointPositions);
+
+//    Eigen::RowVectorXd movePose(6);
+//    movePose << 0.1,0,0,0,0,0;
+
+//    std::cout << J.determinant() << std::endl;
+//    std::cout << jointPositions << std::endl;
+//    std::cout << (J.inverse()*movePose.transpose()) << std::endl;
+//}
+
+TEST_CASE("Ur5Plugin: Compute forward and inverse kinematics", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
 
     Eigen::RowVectorXd jointPositions(6);
     jointPositions << 0.7722,-1.7453,1.7070,-1.5739,-1.6277,0.0717;
-    //jointPositions = fixture.mUr5Robot.getCurrentState().jointPosition;
 
-    Eigen::MatrixXd J(6,6);
-    J = fixture.jacobianUr5(jointPositions);
+    Eigen::RowVectorXd jointPos(6);
+    jointPos << 0, -3.14/2, 0, -3.14/2, 0, 0;
 
-    Eigen::RowVectorXd movePose(6);
-    movePose << 0.1,0,0,0,0,0;
+    Eigen::RowVectorXd velocityEndEffector(6);
+    velocityEndEffector << 0.1,0.1,0.1,0,0,0;
 
-    std::cout << J.determinant() << std::endl;
-    std::cout << jointPositions << std::endl;
-    std::cout << (J.inverse()*movePose.transpose()) << std::endl;
+    Eigen::RowVectorXd jp1(6);
+    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // x = -96.75 mm, y = -300.99, z = 400.55
+
+
+    //fixture.printMatrix(fixture.mUr5Kinematics.forward(jointPos));
+    Eigen::MatrixXd test = fixture.mUr5Kinematics.forward2(jp1);
+    std::cout << fixture.mUr5Kinematics.T2transl(test) << std::endl;
+
+    //std::cout << fixture.mUr5Kinematics.T2transl(fixture.mUr5Kinematics.forward(jointPositions));
+    //std::cout << fixture.mUr5Kinematics.jacobian(jointPositions)*velocityEndEffector.transpose() << std::endl;
+    //fixture.printMatrix(fixture.mUr5Kinematics.forward2(jointPos));
+    //fixture.printMatrix(fixture.mUr5Kinematics.jacobian(jointPositions).inverse()*velocityEndEffector);
 }
 
 } //cxtest

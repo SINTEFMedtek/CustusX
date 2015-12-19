@@ -1,4 +1,5 @@
 #include "cxUr5ProgramEncoder.h"
+#include "cxLogger.h"
 
 #include <vtkPolyDataReader.h>
 #include <vtkGenericDataObjectReader.h>
@@ -79,6 +80,13 @@ void Ur5ProgramEncoder::addPath(vtkPolyData* output)
     }
 }
 
+void Ur5ProgramEncoder::clearQueues()
+{
+    poseQueue.clear();
+    programQueue.clear();
+    movementQueue.clear();
+    CX_LOG_INFO() << poseQueue.size();
+}
 
 } //cx
 

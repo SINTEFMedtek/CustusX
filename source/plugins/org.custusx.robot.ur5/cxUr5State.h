@@ -31,13 +31,40 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
 
     Eigen::RowVectorXd jointPosition;
     Eigen::RowVectorXd jointVelocity;
+    Eigen::RowVectorXd opVelocity;
 
     Transform3D baseMee;
+
+    Eigen::MatrixXd jacobian, Tbe;
 
     double timeSinceStart;
 
     bool updated;
 };
+
+struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
+{
+    Ur5MovementInfo();
+    ~Ur5MovementInfo();
+
+    QString typeOfMovement;
+    QString spaceFlag;
+
+    Eigen::RowVectorXd targetJointConfiguration;
+    Eigen::RowVectorXd targetSpatialConfiguration;
+
+    Eigen::RowVectorXd targetJointVelocity;
+    Eigen::RowVectorXd targetSpatialVelocity;
+
+    double acceleration;
+    double velocity;
+    double radius;
+    double time;
+
+    bool isJointMove();
+};
+
+
 
 
 } // cx

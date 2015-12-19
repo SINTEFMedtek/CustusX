@@ -6,6 +6,7 @@
 #include "cxUr5Connection.h"
 #include "cxUr5MessageEncoder.h"
 #include "cxUr5State.h"
+#include "cxUr5Kinematics.h"
 
 namespace cx
 {
@@ -28,6 +29,8 @@ public:
 
     void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad = 0, double t = 0);
     void move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double rad = 0, double t = 0);
+    void move(Ur5MovementInfo movementInformation);
+
     void stopMove(QString typeOfStop,double acc);
 
     void addToProgramQueue(QString string);
@@ -53,6 +56,11 @@ private slots:
     void atTargetSlot();
     void updateCurrentState();
 
+    void startLoggingSlot();
+    void stopLoggingSlot();
+    void dataLogger();
+
+    void moveToInitialPositionSlot(double acceleration, double velocity);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
@@ -65,6 +73,10 @@ signals:
 
     void shuttingdown();
     void atTarget();
+
+    void startLogging();
+    void stopLogging();
+    void moveToInitialPosition(double acceleration, double velocity);
 
 private:
     void setCurrentState(Ur5State currentState);
@@ -97,8 +109,11 @@ private:
     void connectToPort(int port);
     void disconnectFromPort(int port);
     bool moveInProgress;
+    bool velocityMoveInProgress;
 
     double mBlendRadius;
+
+    Ur5Kinematics mKinematics;
 };
 
 } // cx

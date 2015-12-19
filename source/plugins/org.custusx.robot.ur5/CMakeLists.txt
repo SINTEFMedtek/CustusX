@@ -11,6 +11,7 @@ set(PLUGIN_SRCS
   cxUr5MessageDecoder.cpp
   cxUr5ProgramEncoder.cpp
   cxUr5GUIExtenderService.cpp
+  cxUr5Kinematics.cpp
 
   cxUr5Widget.cpp
   widgets/cxUr5MiscInformation.cpp
@@ -35,6 +36,7 @@ set(PLUGIN_MOC_SRCS
   cxUr5MessageDecoder.h
   cxUr5ProgramEncoder.h
   cxUr5GUIExtenderService.h
+  cxUr5Kinematics.h
 
   cxUr5Widget.h
   widgets/cxUr5MiscInformation.h

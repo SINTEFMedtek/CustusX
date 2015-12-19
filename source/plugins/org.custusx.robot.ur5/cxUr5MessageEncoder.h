@@ -15,10 +15,14 @@ public:
     QString movej(Ur5State pose,double a, double v, double r);
     QString movej(Eigen::RowVectorXd pose, double a, double v, double t, double r);
     QString movej(Eigen::RowVectorXd pose, double t);
+    QString movej(Ur5MovementInfo movementInformation);
+
     QString movel(Ur5State pose,double a, double v);
 
     QString speedj(Ur5State p, double a, double t);
     QString speedj(Eigen::RowVectorXd p, double a, double t);
+    QString speedj(Ur5MovementInfo movementInformation);
+
     QString speedl(Ur5State p, double a, double t);
     QString speedl(Eigen::RowVectorXd p, double a, double t);
 
