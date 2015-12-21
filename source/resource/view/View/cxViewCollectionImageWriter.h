@@ -52,7 +52,7 @@ class ViewCollectionWidget;
  *  to a vtkImageData.
  *
  */
-class ViewCollectionImageWriter
+class cxResourceVisualization_EXPORT ViewCollectionImageWriter
 {
 public:
 	explicit ViewCollectionImageWriter(ViewCollectionWidget* widget);

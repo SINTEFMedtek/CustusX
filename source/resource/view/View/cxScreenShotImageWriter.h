@@ -46,7 +46,7 @@ typedef boost::shared_ptr<class ScreenShotImageWriter> ScreenShotImageWriterPtr;
 /**
  *
  */
-class ScreenShotImageWriter
+class cxResourceVisualization_EXPORT ScreenShotImageWriter
 {
 public:
 	static ScreenShotImageWriterPtr create(PatientModelServicePtr patient) { return ScreenShotImageWriterPtr(new ScreenShotImageWriter(patient)); }
