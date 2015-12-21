@@ -12,6 +12,8 @@ macro(cx_initialize_FAST)
     cx_install_add_library_dirs(${FAST_LIBRARY_DIRS})
 endmacro()
 
+find_package(GLEW REQUIRED)
+find_package(OpenCL REQUIRED)
 cx_initialize_FAST()
 
 #### Enable C++11
@@ -63,9 +65,12 @@ set(PLUGIN_target_libraries
     PRIVATE
     OpenCLUtilityLibrary
     FAST
+    Qt5::OpenGL
+    ${OPENCL_LIBRARIES}
+    ${GLEW_LIBRARY}
     cxResource
     cxResourceFilter
-	cxResourceVisualization
+    cxResourceVisualization
     cxPluginUtilities
 )
 
