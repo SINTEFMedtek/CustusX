@@ -156,7 +156,7 @@ private:
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-	Slices3DRepPtr mSlices3DRep;
+//	Slices3DRepPtr mSlices3DRep;
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 

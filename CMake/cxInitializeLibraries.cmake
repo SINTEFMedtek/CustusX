@@ -200,10 +200,12 @@ macro(cx_initialize_VTK)
 		vtkCommonCore
 		vtkRenderingCore
 		vtkRenderingQt
-		vtkRenderingOpenGL
-#		vtkRenderingFreeTypeOpenGL
+#		vtkRenderingOpenGL
+		vtkRenderingOpenGL2
 		vtkInteractionStyle
-		vtkRenderingVolume vtkRenderingVolumeOpenGL
+		vtkRenderingVolume
+#		vtkRenderingVolumeOpenGL
+		vtkRenderingVolumeOpenGL2
 		vtkIOGeometry vtkIOLegacy vtkIOMINC
 		vtkIOXMLParser
 		vtkFiltersModeling

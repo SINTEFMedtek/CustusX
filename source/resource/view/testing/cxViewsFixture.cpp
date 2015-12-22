@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyToolManager.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
-#include "cxTexture3DSlicerRep.h"
+//#include "cxTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
 #include "cxViewsWindow.h"
@@ -111,14 +111,14 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const QString& imageFilena
 
 bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
 {
-	cx::ViewPtr view = mWindow->add2DView(r, c);
+//	cx::ViewPtr view = mWindow->add2DView(r, c);
 
-	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
-	rep->setShaderPath(mShaderFolder);
-	rep->setSliceProxy(proxy);
-	rep->setImages(images);
-	view->addRep(rep);
+//	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
+//	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
+//	rep->setShaderPath(mShaderFolder);
+//	rep->setSliceProxy(proxy);
+//	rep->setImages(images);
+//	view->addRep(rep);
 
 	return true;
 }

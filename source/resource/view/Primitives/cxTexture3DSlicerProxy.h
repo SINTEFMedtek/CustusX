@@ -83,6 +83,7 @@ public:
 	static bool isSupported(vtkRenderWindowPtr window);
 };
 
+//TODO: Make this ifdef dependant of VTK_RENDERING_BACKEND (OpenGL or OpenGL2)
 #ifndef WIN32
 
 /**

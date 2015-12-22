@@ -74,7 +74,7 @@ TEST_CASE("MultiVolume3DRepProducer creates 1 rep using vtkVolumeTextureMapper3D
 
 	cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(0);
 	REQUIRE(rep);
-	CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
+	CHECK(dynamic_cast<vtkVolumeMapper*>(rep->getVtkVolume()->GetMapper()));
 }
 
 TEST_CASE("MultiVolume3DRepProducer creates 0 reps using invalid type for 1 added image.", "[unit]")
@@ -126,7 +126,7 @@ TEST_CASE("MultiVolume3DRepProducer creates 3 reps using vtkVolumeTextureMapper3
 	{
 		cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(i);
 		REQUIRE(rep);
-		CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
+		CHECK(dynamic_cast<vtkVolumeMapper*>(rep->getVtkVolume()->GetMapper()));
 	}
 }
 
@@ -146,7 +146,7 @@ TEST_CASE("MultiVolume3DRepProducer creates 2 reps using vtkVolumeTextureMapper3
 	{
 		cx::VolumetricRepPtr rep = fixture.downcastRep<cx::VolumetricRep>(i);
 		REQUIRE(rep);
-		CHECK(dynamic_cast<vtkVolumeTextureMapper3D*>(rep->getVtkVolume()->GetMapper()));
+		CHECK(dynamic_cast<vtkVolumeMapper*>(rep->getVtkVolume()->GetMapper()));
 	}
 }
 

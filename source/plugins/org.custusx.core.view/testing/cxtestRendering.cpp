@@ -46,7 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
 #include <vtkCamera.h>
-#include <vtkVolumeTextureMapper3D.h>
+//#include <vtkVolumeTextureMapper3D.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkPiecewiseFunction.h>
 
@@ -92,7 +93,7 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 
 	mRenderer->ResetCamera();
 	renderWindow->Render();
-	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
+//	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
 
 	int numRenders = 3000;
 	for (int i = 0; i < numRenders; ++i)

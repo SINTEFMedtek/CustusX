@@ -145,7 +145,7 @@ private:
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
 
-	Texture3DSlicerRepPtr mMultiSliceRep;
+//	Texture3DSlicerRepPtr mMultiSliceRep;
 	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;

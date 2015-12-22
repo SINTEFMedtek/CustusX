@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkTriangleFilter.h>
 #include <vtkStripper.h>
 #include <vtkImageData.h>
-#include <vtkPainterPolyDataMapper.h>
+//#include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
 
 #include "cxImage.h"

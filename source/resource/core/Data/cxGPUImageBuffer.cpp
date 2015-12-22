@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
-#include <vtkgl.h>
+//#include <vtkgl.h>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
