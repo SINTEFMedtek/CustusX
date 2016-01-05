@@ -356,4 +356,10 @@ Eigen::MatrixXd Ur5Kinematics::getRotation(Eigen::MatrixXd pose)
 {
     return pose.block(0,0,3,3);
 }
+
+Eigen::MatrixXd Ur5Kinematics::pseudoInverse(Eigen::MatrixXd matrix)
+{
+    return matrix.transpose()*(matrix*matrix.transpose()).inverse();
+}
+
 } // cx

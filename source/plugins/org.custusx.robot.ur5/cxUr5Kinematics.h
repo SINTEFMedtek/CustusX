@@ -30,6 +30,7 @@ public:
 
     Eigen::MatrixXd getRotation(Eigen::MatrixXd pose);
     Eigen::RowVectorXd errorVector(Eigen::MatrixXd desiredPose, Eigen::MatrixXd currentPose);
+    Eigen::MatrixXd pseudoInverse(Eigen::MatrixXd matrix);
 private:
     double d1 = 0.089159;
     double a2 = -0.42500;
