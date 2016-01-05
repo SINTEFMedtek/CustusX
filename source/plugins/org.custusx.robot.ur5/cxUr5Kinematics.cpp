@@ -308,4 +308,30 @@ Vector3D Ur5Kinematics::T2transl(Transform3D T)
     return points;
 }
 
+Eigen::RowVectorXd Ur5Kinematics::inverseJ(Eigen::MatrixXd desiredPose, Eigen::RowVectorXd guessedJointConfiguration)
+{
+    double errorThreshold = 10^-6;
+    double K = 1;
+
+    Eigen::RowVectorXd jointConfiguration(6),error(6),dq(6);
+    jointConfiguration = guessedJointConfiguration;
+
+    Eigen::MatrixXd jacobi(6,6), currentPose(4,4);
+
+    currentPose = forward2(jointConfiguration);
+    error = errorVector(desiredPose,currentPose);
+
+    while(error.length()>errorThreshold)
+    {
+        jacobi = jacobian(jointConfiguration);
+        currentPose = forward2(jointConfiguration);
+
+        dq = K*pseudoInverse(jacobi)*errorVector(desiredPose,currentPose);
+        jointConfiguration = jointConfiguration + dq;
+
+        error = errorVector(desiredPose,currentPose);
+    }
+
+    return jointConfiguration;
+}
 } // cx

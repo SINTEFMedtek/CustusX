@@ -21,6 +21,7 @@ public:
     Eigen::MatrixXd jacobian(Eigen::RowVectorXd jointConfiguration);
 
     Eigen::MatrixXd inverse(Eigen::MatrixXd operationalConfiguration);
+    Eigen::RowVectorXd inverseJ(Eigen::MatrixXd desiredPose, Eigen::RowVectorXd guessedJointConfiguration);
 
     Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);
 
