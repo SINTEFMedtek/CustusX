@@ -28,6 +28,7 @@ public:
     Vector3D T2transl(Eigen::MatrixXd T);
     Vector3D T2transl(Transform3D T);
 
+    Eigen::MatrixXd getRotation(Eigen::MatrixXd pose);
     Eigen::RowVectorXd errorVector(Eigen::MatrixXd desiredPose, Eigen::MatrixXd currentPose);
 private:
     double d1 = 0.089159;

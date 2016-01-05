@@ -351,4 +351,9 @@ Eigen::RowVectorXd Ur5Kinematics::errorVector(Eigen::MatrixXd desiredPose, Eigen
 
     return e;
 }
+
+Eigen::MatrixXd Ur5Kinematics::getRotation(Eigen::MatrixXd pose)
+{
+    return pose.block(0,0,3,3);
+}
 } // cx
