@@ -334,4 +334,21 @@ Eigen::RowVectorXd Ur5Kinematics::inverseJ(Eigen::MatrixXd desiredPose, Eigen::R
 
     return jointConfiguration;
 }
+
+Eigen::RowVectorXd Ur5Kinematics::errorVector(Eigen::MatrixXd desiredPose, Eigen::MatrixXd currentPose)
+{
+    Eigen::RowVectorXd e(6);
+
+    e << desiredPose(0,3)-currentPose(0,3),desiredPose(1,3)-currentPose(1,3), desiredPose(2,3)-currentPose(2,3);
+
+    Eigen::MatrixXd Rqd, Rqe, R;
+    Rqd = getRotation(desiredPose);
+    Rqe = getRotation(currentPose);
+
+    R = Rqd*Rqe.transpose();
+
+    e << 0.5*(R(2,1)-R(1,2)), 0.5*(R(0,2)-R(2,0)), 0.5*(R(1,0)-R(0,1));
+
+    return e;
+}
 } // cx
