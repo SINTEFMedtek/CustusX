@@ -52,7 +52,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep2D/cxOrientationAnnotation2DRep
 
     Primitives/cxImageMapperMonitor
-#    Primitives/cxTexture3DSlicerProxy
+    Primitives/cxTexture3DSlicerProxy
     Primitives/cxSlicePlaneClipper
     Primitives/cxToolTracer
     Primitives/cxVolumeProperty
@@ -99,7 +99,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxDepthPeeling
     Primitives/cxGraphicalTorus3D
     Primitives/cxVtkHelperClasses
-#    Primitives/cxTextureSlicePainter
+    Primitives/cxTextureSlicePainter
     Primitives/cxUltrasoundSectorSource
     Rep3D/cxAxesRep
     Rep/cxDisplayTextRep

@@ -40,7 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTextureSlicePainter.h"
 
-#ifndef WIN32
+//#ifndef WIN32
+#ifndef CX_VTK_OPENGL2
 #include <QtCore>
 #include <vtkOpenGLExtensionManager.h>
 #include <vtkRenderer.h>
@@ -409,4 +410,6 @@ void TextureSlicePainter::ClearGraphicsResources()
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
-#endif //WIN32
+
+#endif //CX_VTK_OPENGL2
+//#endif //WIN32

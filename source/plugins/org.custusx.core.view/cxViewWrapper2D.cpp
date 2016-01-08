@@ -470,6 +470,10 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 
 bool ViewWrapper2D::useGPU2DRendering()
 {
+#ifdef CX_VTK_OPENGL2
+	return false;
+#endif //CX_VTK_OPENGL2
+
     return settings()->value("useGPU2DRendering").toBool();
 }
 
