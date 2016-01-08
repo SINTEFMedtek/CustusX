@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
+#include "cxTransform3D.h"
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -64,6 +65,7 @@ private:
 	TrackingServicePtr			mTrackingService;
 	PatientModelServicePtr		mPatientModelService;
 	ViewServicePtr				mViewService;
+	GeometricRepPtr				mRep;
 	ToolPtr						mManualTool;
 
 	int							mNumberOfInputPoints;
@@ -73,7 +75,9 @@ private:
 	double						mLastCameraViewAngle;
 	double						mLastCameraRotAngle;
 
-	void updateManualToolPosition();
+	void		updateManualToolPosition();
+	void		generateSplineCurve(MeshPtr mesh);
+	void		generateMeshData(MeshPtr cameraPath, Transform3D r_M_d);
 
 public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,

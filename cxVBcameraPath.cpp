@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyData.h"
 #include "vtkCardinalSpline.h"
 #include "vtkPoints.h"
+#include "vtkCellArray.h"
 #include "vtkCamera.h"
 
 #include "cxVBcameraPath.h"
@@ -43,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewServiceProxy.h"
 #include "cxView.h"
+#include "cxGeometricRep.h"
+#include "cxRegistrationTransform.h"
 
 
 
@@ -52,56 +55,128 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 	mTrackingService(tracker), mPatientModelService(patientModel), mViewService(visualization)
 {
 	mManualTool = mTrackingService->getManualTool();
+	mRep = GeometricRep::New();
+	mSplineX = vtkSmartPointer<vtkCardinalSpline>::New();
+	mSplineY = vtkSmartPointer<vtkCardinalSpline>::New();
+	mSplineZ = vtkSmartPointer<vtkCardinalSpline>::New();
+
 }
 
 void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 {
-	// Check correct meshobject (or limit in selector) Read vtkPolyData, process spline, change layout ?
-	// Lage Polyline for visualisering ?
+	// Check correct meshobject (or limit in selector)
+	MeshPtr cameraPath;
+	QString uidCameraPath;
+	QString nameCameraPath;
 
-	vtkPolyDataPtr	polyDataInput = mesh->getVtkPolyData();
-	vtkPoints		*vtkpoints = polyDataInput->GetPoints();
-	// Get datamatrix
+	if(!mesh)
+	{
+		std::cout << "cameraRawPointsSlot is empty !" << std::endl;
+		return;
+	}
+	// Get data transform matrix
 	Transform3D r_M_d = mesh->get_rMd();
 
-	mNumberOfInputPoints = polyDataInput->GetNumberOfPoints();
-//	std::cout << "cxVBcameraPath::cameraRawPointsSlot() - Number of Points : "
-//			  << mNumberOfInputPoints << std::endl;
-//	std::cout << "cxVBcameraPath, Route to target - rMd matrix : " << r_M_d << std::endl;
+	QString uidCameraPathSubstring = QString("_cameraPath");
+	QString uidCameraPathInput = mesh->getUid();
+	QString nameCameraPathInput = mesh->getName();
 
+
+	std::map<QString, MeshPtr> meshes = mPatientModelService->getDataOfType<Mesh>();
+	for (std::map<QString, MeshPtr>::iterator iter=meshes.begin(); iter!=meshes.end(); ++iter)
+		if (iter->first.contains(uidCameraPathSubstring)) {
+			// Find existing camera path object and remove if found
+			std::cout << "Camera path object found .."  << std::endl;
+			MeshPtr retval = iter->second;
+			mPatientModelService->removeData(retval->getUid());
+		}
+	// Create new camera path
+	if(nameCameraPathInput.contains(uidCameraPathSubstring)) {
+		nameCameraPath = nameCameraPathInput;
+		uidCameraPath = uidCameraPathInput;
+	} else {
+		nameCameraPath = nameCameraPathInput + uidCameraPathSubstring;
+		uidCameraPath = uidCameraPathInput + uidCameraPathSubstring;
+	}
+	cameraPath = mPatientModelService->createSpecificData<Mesh>(uidCameraPath, nameCameraPath);
+	this->generateSplineCurve(mesh);
+	this->generateMeshData(cameraPath, r_M_d);
+
+}
+
+void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
+{
+	vtkPolyDataPtr	polyDataInput = mesh->getVtkPolyData();
+	vtkPoints		*vtkpoints = polyDataInput->GetPoints();
+
+	mNumberOfInputPoints = polyDataInput->GetNumberOfPoints();
+
+	// Decimate the number of controlpoints to smooth the interpolated spline camera path
 	mNumberOfControlPoints = mNumberOfInputPoints / 10;
 	std::cout << "NumberOfControlPoints : " << mNumberOfControlPoints << std::endl;
-
-	mSplineX = vtkSmartPointer<vtkCardinalSpline>::New();
-	mSplineY = vtkSmartPointer<vtkCardinalSpline>::New();
-	mSplineZ = vtkSmartPointer<vtkCardinalSpline>::New();
 
 	// Setting the spline curve points
 	double p[3];
 	int indexCntrl;
 	int indexPoints;
 
+	// First clean up previous stored data
+	mSplineX->RemoveAllPoints();
+	mSplineY->RemoveAllPoints();
+	mSplineZ->RemoveAllPoints();
+
 	for(int i=0;i<=mNumberOfControlPoints;i++)
 	{
 		int indexP = (i*mNumberOfInputPoints-1)/mNumberOfControlPoints;
 		std::cout << "Adding index : " << i << " , " << indexP << std::endl;
+		std::cout << "Point : " << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
 		vtkpoints->GetPoint(indexP,p);
 		mSplineX->AddPoint(i,p[0]);
 		mSplineY->AddPoint(i,p[1]);
 		mSplineZ->AddPoint(i,p[2]);
 	}
-
 }
+
+void CXVBcameraPath::generateMeshData(MeshPtr cameraPath, Transform3D r_M_d)
+{
+	vtkPolyDataPtr	curvePolyData = vtkPolyDataPtr::New();
+	vtkPointsPtr	curvePoints = vtkPointsPtr::New();
+	vtkCellArrayPtr curveLines = vtkCellArrayPtr::New();
+
+	double splineParameter; // [0, 8] ?
+
+	for(int i=0;i<=79;i++)
+	{
+		splineParameter = i / 10.0;
+		double x = mSplineX->Evaluate(splineParameter);
+		double y = mSplineY->Evaluate(splineParameter);
+		double z = mSplineZ->Evaluate(splineParameter);
+		curvePoints->InsertPoint(i,x,y,z);
+
+		std::cout << "Curve Point : " << i << " , ( "
+				  << x << ", " << y << ", " << z << " )" << std::endl;
+
+		if((i%2==0) && (i<100))	// even iterations
+		{
+			curveLines->InsertNextCell(2);
+		}
+		curveLines->InsertCellPoint(i);
+	}
+
+	curvePolyData->SetPoints(curvePoints);
+	curvePolyData->SetLines(curveLines);
+
+	cameraPath->setVtkPolyData(curvePolyData);
+	cameraPath->get_rMd_History()->setRegistration(r_M_d);
+	mPatientModelService->insertData(cameraPath);
+	mRep->setMesh(cameraPath);
+	mViewService->get3DView()->addRep(mRep);
+}
+
+
 
 void CXVBcameraPath::cameraPathPositionSlot(int pos)
 {
-//	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos " << pos << std::endl;
-//	std::cout << "Check spline -------- " << std::endl;
-//	std::cout << "Spline point : " << mSplineX->Evaluate(pos) << " , " << mSplineY->Evaluate(pos)
-//			  << " , " << mSplineZ->Evaluate(pos) << std::endl;
-//	std::cout << "Manual Tool : " << std::endl;
-//	std::cout << mManualTool->get_prMt() << std::endl;
-//	std::cout << "Patient registration : " << std::endl;
 
 //	Transform3D rMpr = mPatientModelService->get_rMpr();
 //	Transform3D rMt = rMpr * mManualTool->get_prMt();
@@ -136,9 +211,6 @@ void CXVBcameraPath::cameraPathPositionSlot(int pos)
 
 void CXVBcameraPath::updateManualToolPosition()
 {
-//	Vector3D xVector = Vector3D(0,1,0);
-//	Vector3D yVector = Vector3D(1,0,0);
-//	Vector3D zVector = Vector3D(0,0,-1);
 	// New View direction
 	Vector3D viewDirection_r = (mLastCameraFocus_r - mLastCameraPos_r).normalized();
 	Vector3D xVector = Vector3D(0,1,0);
@@ -161,9 +233,9 @@ void CXVBcameraPath::updateManualToolPosition()
 
 }
 
+
 void CXVBcameraPath::cameraViewAngleSlot(int angle)
 {
-//	std::cout << "CXVBcameraPath::cameraViewAngleSlot : " << angle << std::endl;
 	mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
 	mViewService->get3DView()->setModified();
@@ -171,7 +243,6 @@ void CXVBcameraPath::cameraViewAngleSlot(int angle)
 
 void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
-	std::cout << "CXVBcameraPath::cameraRotateAngleSlot : " << angle << std::endl;
 	mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
 	mViewService->get3DView()->setModified();
