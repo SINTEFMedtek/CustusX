@@ -198,12 +198,13 @@ macro(cx_initialize_VTK)
 #		find_package(VTK COMPONENTS vtkRenderingOpenGL vtkRenderingVolumeOpenGL NO_MODULE)
 #	ENDIF()
 
+#TODO: Need VTK variables for this to work
     # Support both VTK OpenGL 1 and 2
-    IF(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
-        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2)
-    ELSE()
-        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL vtkRenderingVolumeOpenGL)
-    ENDIF()
+#    IF(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
+#        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2)
+#    ELSE()
+#        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL vtkRenderingVolumeOpenGL)
+#    ENDIF()
 
 	# vtk consist of (as of 6.1) 120 libs. This explicit inclusion brings is down to about half.
 	# gives about 15% compile speed increase
@@ -224,10 +225,14 @@ macro(cx_initialize_VTK)
 		vtkFiltersParallel
 		vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics
 		${VTK_OPENGL_LIBS}
+#		vtkRenderingOpenGL2
+#		vtkRenderingVolumeOpenGL2
+		vtkRenderingOpenGL
+		vtkRenderingVolumeOpenGL
 		NO_MODULE)
 
 
-	#find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
+#    find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
     include(${VTK_USE_FILE})
 endmacro()
 

@@ -83,10 +83,6 @@ public:
 
 	static bool isSupported(vtkRenderWindowPtr window);
 
-protected slots:
-	void transformChangedSlot() {}
-	void updateColorAttributeSlot() {}
-	void imageChanged() {}
 };
 
 //#ifndef WIN32
@@ -108,6 +104,7 @@ protected slots:
  */
 class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {
+	Q_OBJECT
 public:
 	static Texture3DSlicerProxyPtr New();
 	virtual ~Texture3DSlicerProxyImpl();
@@ -124,6 +121,11 @@ public:
 protected:
 	Texture3DSlicerProxyImpl();
 	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
+
+protected slots:
+	void transformChangedSlot();
+	void updateColorAttributeSlot();
+	void imageChanged();
 
 private:
 	void resetGeometryPlane();
@@ -148,6 +150,16 @@ private:
 };
 
 //#endif // WIN32
+#else
+//Dummy code to make file compile with Qt moc. This is needed because Qt moc ignores ifdef.
+class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
+{
+	Q_OBJECT
+protected slots:
+	void transformChangedSlot() {}
+	void updateColorAttributeSlot() {}
+	void imageChanged() {}
+};
 #endif //CX_VTK_OPENGL2
 
 
