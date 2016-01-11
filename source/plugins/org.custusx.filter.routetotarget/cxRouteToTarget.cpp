@@ -50,6 +50,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline)
 	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline);
 
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
+	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
@@ -120,14 +121,19 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints()
 	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
 	vtkPointsPtr points = vtkPointsPtr::New();
 	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
-	for (int j = mRoutePositions.size() - 1; j >= 0; j--)
+	int numberOfPositions = mRoutePositions.size();
+	for (int j = numberOfPositions - 1; j >= 0; j--)
 	{
 		vtkIdType cells[1] = { points->GetNumberOfPoints() };
 		points->InsertNextPoint(mRoutePositions[j](0),mRoutePositions[j](1),mRoutePositions[j](2));
-		lines->InsertNextCell(1, cells);
+	}
+	for (int j = 0; j < numberOfPositions-1; j++)
+	{
+		vtkIdType connection[2] = {j, j+1};
+		lines->InsertNextCell(2, connection);
 	}
 	retval->SetPoints(points);
-	retval->SetVerts(lines);
+	retval->SetLines(lines);
 	return retval;
 }
 

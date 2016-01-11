@@ -59,6 +59,8 @@ public:
 	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();
+	void interpolateBranchPositions(int interpolationFactor);
+	void smoothBranchPositions();
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 
 };
