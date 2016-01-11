@@ -174,8 +174,9 @@ void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timest
 
 	Vector3D pos_old(camera->GetPosition());
 	Vector3D focus_old(camera->GetFocalPoint());
+	Vector3D vup_old(camera->GetViewUp());
 
-	if (similar(pos_old, camera_r, 1) && similar(focus_old, focus_r, 1))
+	if (similar(pos_old, camera_r, 1) && similar(focus_old, focus_r, 1) && similar(vup_old, vup_r,0.1 ))
 		return; // break update loop: this event is triggered by camera change.
 
 //	std::cout << "pos " << pos_old << " to " << camera_r << std::endl;
