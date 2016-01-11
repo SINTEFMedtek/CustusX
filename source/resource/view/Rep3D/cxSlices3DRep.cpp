@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkTriangleFilter.h>
 #include <vtkStripper.h>
 #include <vtkImageData.h>
-#include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
 #include "cxLogger.h"
 #include "cxImage.h"
@@ -57,6 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
+
+#ifndef CX_VTK_OPENGL2
+#include <vtkPainterPolyDataMapper.h>
+#endif
+
 
 
 //---------------------------------------------------------
