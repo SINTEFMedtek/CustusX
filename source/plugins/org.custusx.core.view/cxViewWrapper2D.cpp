@@ -68,7 +68,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxSliceComputer.h"
 #include "cxGeometricRep2D.h"
-//#include "cxTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxGLHelpers.h"
@@ -87,6 +86,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxViewService.h"
+
+#ifndef CX_VTK_OPENGL2
+#include "cxTexture3DSlicerRep.h"
+#endif
 
 namespace cx
 {
@@ -277,20 +280,24 @@ void ViewWrapper2D::removeAndResetSliceRep()
 
 void ViewWrapper2D::removeAndResetMultiSliceRep()
 {
-//    if (mMultiSliceRep)
-//    {
-//        mView->removeRep(mMultiSliceRep);
-//        mMultiSliceRep.reset();
-//    }
+#ifndef CX_VTK_OPENGL2
+	if (mMultiSliceRep)
+	{
+		mView->removeRep(mMultiSliceRep);
+		mMultiSliceRep.reset();
+	}
+#endif
 }
 
 void ViewWrapper2D::createAndAddMultiSliceRep()
 {
-//    mMultiSliceRep = Texture3DSlicerRep::New();
-//    mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-//    mMultiSliceRep->setSliceProxy(mSliceProxy);
+#ifndef CX_VTK_OPENGL2
+	mMultiSliceRep = Texture3DSlicerRep::New();
+	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
+	mMultiSliceRep->setSliceProxy(mSliceProxy);
 
-//    mView->addRep(mMultiSliceRep);
+	mView->addRep(mMultiSliceRep);
+#endif
 }
 
 /**Hack: gpu slicer recreate and fill with images every time,
@@ -307,8 +314,10 @@ void ViewWrapper2D::recreateMultiSlicer()
 
     this->createAndAddMultiSliceRep();
 
-//    if (mGroupData)
-//		mMultiSliceRep->setImages(this->getImagesToView());
+#ifndef CX_VTK_OPENGL2
+	if (mGroupData)
+		mMultiSliceRep->setImages(this->getImagesToView());
+#endif
 
     this->viewportChanged();
 }

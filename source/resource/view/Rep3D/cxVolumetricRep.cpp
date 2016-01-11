@@ -36,8 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPiecewiseFunction.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkVolumeProperty.h>
-//#include <vtkVolumeTextureMapper3D.h>
+
+#ifndef CX_VTK_OPENGL2
+#include <vtkVolumeTextureMapper3D.h>
+#else
 #include <vtkSmartVolumeMapper.h>
+#endif
 
 //#if VTK_MINOR_VERSION >= 6
 	#include <vtkGPUVolumeRayCastMapper.h>
@@ -93,7 +97,9 @@ void VolumetricRep::setUseVolumeTextureMapper()
 	mMapper = mapper;
 
 	// from snws
-//	mapper->SetPreferredMethodToNVidia();
+#ifndef CX_VTK_OPENGL2
+	mapper->SetPreferredMethodToNVidia();
+#endif
 	mMapper->SetBlendModeToComposite();
 
 	mVolume->SetMapper( mMapper );

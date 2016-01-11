@@ -21,8 +21,8 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxToolRep3D
     Rep3D/cxPickerRep
     Rep3D/cxVolumetricRep
-#    Rep3D/cxTexture3DSlicerRep
-#    Rep3D/cxSlices3DRep
+    Rep3D/cxTexture3DSlicerRep
+    Rep3D/cxSlices3DRep
     Rep3D/cxSlicePlanes3DRep
     Rep3D/cxGeometricRep
     Rep3D/cxFiberBundleRep
