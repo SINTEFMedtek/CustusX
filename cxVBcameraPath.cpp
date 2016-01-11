@@ -86,7 +86,7 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 	for (std::map<QString, MeshPtr>::iterator iter=meshes.begin(); iter!=meshes.end(); ++iter)
 		if (iter->first.contains(uidCameraPathSubstring)) {
 			// Find existing camera path object and remove if found
-			std::cout << "Camera path object found .."  << std::endl;
+//			std::cout << "Camera path object found .."  << std::endl;
 			MeshPtr retval = iter->second;
 			mPatientModelService->removeData(retval->getUid());
 		}
@@ -113,7 +113,7 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
 
 	// Decimate the number of controlpoints to smooth the interpolated spline camera path
 	mNumberOfControlPoints = mNumberOfInputPoints / 10;
-	std::cout << "NumberOfControlPoints : " << mNumberOfControlPoints << std::endl;
+//	std::cout << "NumberOfControlPoints : " << mNumberOfControlPoints << std::endl;
 
 	// Setting the spline curve points
 	double p[3];
@@ -128,8 +128,8 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
 	for(int i=0;i<=mNumberOfControlPoints;i++)
 	{
 		int indexP = (i*mNumberOfInputPoints-1)/mNumberOfControlPoints;
-		std::cout << "Adding index : " << i << " , " << indexP << std::endl;
-		std::cout << "Point : " << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
+//		std::cout << "Adding index : " << i << " , " << indexP << std::endl;
+//		std::cout << "Point : " << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
 		vtkpoints->GetPoint(indexP,p);
 		mSplineX->AddPoint(i,p[0]);
 		mSplineY->AddPoint(i,p[1]);
@@ -153,8 +153,8 @@ void CXVBcameraPath::generateMeshData(MeshPtr cameraPath, Transform3D r_M_d)
 		double z = mSplineZ->Evaluate(splineParameter);
 		curvePoints->InsertPoint(i,x,y,z);
 
-		std::cout << "Curve Point : " << i << " , ( "
-				  << x << ", " << y << ", " << z << " )" << std::endl;
+//		std::cout << "Curve Point : " << i << " , ( "
+//				  << x << ", " << y << ", " << z << " )" << std::endl;
 
 		if((i%2==0) && (i<100))	// even iterations
 		{
