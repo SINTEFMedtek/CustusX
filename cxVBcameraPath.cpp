@@ -170,7 +170,6 @@ void CXVBcameraPath::generateMeshData(MeshPtr cameraPath, Transform3D r_M_d)
 	cameraPath->get_rMd_History()->setRegistration(r_M_d);
 	mPatientModelService->insertData(cameraPath);
 	mRep->setMesh(cameraPath);
-	mViewService->get3DView()->addRep(mRep);
 }
 
 
