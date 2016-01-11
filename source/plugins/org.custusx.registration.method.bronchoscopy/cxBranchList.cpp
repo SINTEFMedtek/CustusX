@@ -34,8 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
+#include "vtkCardinalSpline.h"
 
-
+typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
 namespace cx
 {
@@ -132,6 +133,72 @@ void BranchList::smoothOrientations()
 	}
 }
 
+void BranchList::interpolateBranchPositions(int interpolationFactor){
+
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+		std::vector<Eigen::Vector3d> interpolatedPositions;
+		for (int j = 0; j < positions.cols()-1; j++)
+		{
+			for (int k = 0; k < interpolationFactor; k++){
+				Eigen::Vector3d interpolationPoint;
+				interpolationPoint[0] = (positions(0,j)*(interpolationFactor-k) + positions(0,j+1)*(k) ) / interpolationFactor;
+				interpolationPoint[1] = (positions(1,j)*(interpolationFactor-k) + positions(1,j+1)*(k) ) / interpolationFactor;
+				interpolationPoint[2] = (positions(2,j)*(interpolationFactor-k) + positions(2,j+1)*(k) ) / interpolationFactor;
+				interpolatedPositions.push_back(interpolationPoint);
+			}
+		}
+		Eigen::MatrixXd interpolationResult(3 , interpolatedPositions.size());
+		for (int j = 0; j < interpolatedPositions.size(); j++)
+		{
+			interpolationResult(0,j) = interpolatedPositions[j](0);
+			interpolationResult(1,j) = interpolatedPositions[j](1);
+			interpolationResult(2,j) = interpolatedPositions[j](2);
+		}
+		mBranches[i]->setPositions(interpolationResult);
+	}
+
+}
+
+void BranchList::smoothBranchPositions()
+{
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+		int numberOfInputPoints = positions.cols();
+		int controlPointFactor = 10;
+		int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
+
+		vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
+		vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
+		vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
+
+		if (numberOfControlPoints >= 2)
+		{
+			//add control points to spline
+			for(int j=0; j<numberOfControlPoints; j++)
+			{
+				int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
+
+				splineX->AddPoint(j,positions(0,indexP));
+				splineY->AddPoint(j,positions(1,indexP));
+				splineZ->AddPoint(j,positions(2,indexP));
+			}
+
+			//evaluate spline - get smoothed positions
+			Eigen::MatrixXd smoothingResult(3 , numberOfInputPoints);
+			for(int j=0; j<numberOfInputPoints; j++)
+			{
+				double splineParameter = j / controlPointFactor;
+				smoothingResult(0,j) = splineX->Evaluate(splineParameter);
+				smoothingResult(1,j) = splineY->Evaluate(splineParameter);
+				smoothingResult(2,j) = splineZ->Evaluate(splineParameter);
+			}
+			mBranches[i]->setPositions(smoothingResult);
+		}
+	}
+}
 
 void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 {
