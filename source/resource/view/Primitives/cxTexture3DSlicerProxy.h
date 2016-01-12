@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxConfig.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 //---------------------------------------------------------
@@ -81,9 +82,11 @@ public:
 	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
 
 	static bool isSupported(vtkRenderWindowPtr window);
+
 };
 
-#ifndef WIN32
+//#ifndef WIN32
+#ifndef CX_VTK_OPENGL2
 
 /**
  * \brief Slice volumes using a SliceProxy.
@@ -101,7 +104,7 @@ public:
  */
 class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	static Texture3DSlicerProxyPtr New();
 	virtual ~Texture3DSlicerProxyImpl();
@@ -119,10 +122,11 @@ protected:
 	Texture3DSlicerProxyImpl();
 	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
-private slots:
+protected slots:
 	void transformChangedSlot();
 	void updateColorAttributeSlot();
 	void imageChanged();
+
 private:
 	void resetGeometryPlane();
 	void updateCoordinates(int index);
@@ -145,7 +149,18 @@ private:
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
 };
 
-#endif // WIN32
+//#endif // WIN32
+#else
+//Dummy code to make file compile with Qt moc. This is needed because Qt moc ignores ifdef.
+class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
+{
+	Q_OBJECT
+protected slots:
+	void transformChangedSlot() {}
+	void updateColorAttributeSlot() {}
+	void imageChanged() {}
+};
+#endif //CX_VTK_OPENGL2
 
 
 //---------------------------------------------------------

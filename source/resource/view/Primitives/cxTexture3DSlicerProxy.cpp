@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include "cxTexture3DSlicerProxy.h"
-#include "cxTextureSlicePainter.h"
 
 #include <vtkRenderer.h>
 #include <vtkFloatArray.h>
@@ -48,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkTriangleFilter.h>
 #include <vtkStripper.h>
 #include <vtkImageData.h>
-#include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
 #include <vtkOpenGLRenderWindow.h>
 
@@ -59,14 +57,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGPUImageBuffer.h"
 #include "cxReporter.h"
+#include "cxConfig.h"
 
+
+#include "cxTextureSlicePainter.h"
+#ifndef CX_VTK_OPENGL2
+#include <vtkPainterPolyDataMapper.h>
+#endif
 
 //---------------------------------------------------------
 namespace cx
 {
 //---------------------------------------------------------
 
-#ifdef WIN32
+//#ifdef WIN32
+#ifdef CX_VTK_OPENGL2
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
 {
@@ -419,7 +424,8 @@ void Texture3DSlicerProxyImpl::update()
 	}
 }
 
-#endif // WIN32
+//#endif // WIN32
+#endif //CX_VTK_OPENGL2
 
 
 //---------------------------------------------------------

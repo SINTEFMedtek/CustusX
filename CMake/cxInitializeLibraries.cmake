@@ -191,6 +191,21 @@ endmacro()
 macro(cx_initialize_VTK)
 	# this path add should be automatic, but fails at least on ca/macosx10.8
 	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${VTK_DIR}/lib)
+	# Support both VTK OpenGL 1 and 2
+#	IF(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
+#		find_package(VTK COMPONENTS vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2 NO_MODULE)
+#	ELSE()
+#		find_package(VTK COMPONENTS vtkRenderingOpenGL vtkRenderingVolumeOpenGL NO_MODULE)
+#	ENDIF()
+
+#TODO: Need VTK variables for this to work
+    # Support both VTK OpenGL 1 and 2
+#    IF(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
+#        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2)
+#    ELSE()
+#        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL vtkRenderingVolumeOpenGL)
+#    ENDIF()
+
 	# vtk consist of (as of 6.1) 120 libs. This explicit inclusion brings is down to about half.
 	# gives about 15% compile speed increase
 	#
@@ -200,10 +215,8 @@ macro(cx_initialize_VTK)
 		vtkCommonCore
 		vtkRenderingCore
 		vtkRenderingQt
-		vtkRenderingOpenGL
-#		vtkRenderingFreeTypeOpenGL
 		vtkInteractionStyle
-		vtkRenderingVolume vtkRenderingVolumeOpenGL
+		vtkRenderingVolume
 		vtkIOGeometry vtkIOLegacy vtkIOMINC
 		vtkIOXMLParser
 		vtkFiltersModeling
@@ -211,8 +224,15 @@ macro(cx_initialize_VTK)
 		vtkParallelCore
 		vtkFiltersParallel
 		vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics
+		${VTK_OPENGL_LIBS}
+#		vtkRenderingOpenGL2
+#		vtkRenderingVolumeOpenGL2
+		vtkRenderingOpenGL
+		vtkRenderingVolumeOpenGL
 		NO_MODULE)
-	#find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
+
+
+#    find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
     include(${VTK_USE_FILE})
 endmacro()
 

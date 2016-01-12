@@ -156,7 +156,9 @@ private:
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
+#ifndef CX_VTK_OPENGL2
 	Slices3DRepPtr mSlices3DRep;
+#endif
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 

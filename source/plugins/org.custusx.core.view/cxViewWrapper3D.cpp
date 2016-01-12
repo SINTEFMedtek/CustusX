@@ -75,7 +75,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
 #include "cxTexture3DSlicerRep.h"
-#include "cxSlices3DRep.h"
 #include "cxEnumConverter.h"
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
@@ -107,6 +106,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamRep3D.h"
 #include "cxStream2DRep3D.h"
 #include "cxActiveData.h"
+
+#ifndef CX_VTK_OPENGL2
+#include "cxSlices3DRep.h"
+#endif
 
 namespace cx
 {
@@ -764,8 +767,10 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
+#ifndef CX_VTK_OPENGL2
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
+#endif
 
 	if (!mGroupData)
 		return;
@@ -778,15 +783,15 @@ void ViewWrapper3D::updateSlices()
 	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
 	if (planes.empty())
 		return;
-
+#ifndef CX_VTK_OPENGL2
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
 	for (unsigned i=0; i<planes.size(); ++i)
 		mSlices3DRep->addPlane(planes[i], mServices->patient());
 	mSlices3DRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mSlices3DRep->setImages(images);
 	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
-
 	mView->addRep(mSlices3DRep);
+#endif
 }
 
 ViewPtr ViewWrapper3D::getView()
@@ -798,8 +803,10 @@ void ViewWrapper3D::activeToolChangedSlot()
 {
 	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 	mPickerRep->setTool(activeTool);
+#ifndef CX_VTK_OPENGL2
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(activeTool);
+#endif
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

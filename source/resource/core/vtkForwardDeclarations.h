@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTKFORWARDDECLARATIONS_H_
 
 #include <vtkSmartPointer.h>
+#include "cxConfig.h"
 
 /**
  * \brief File for vtk forwarddeclarations
@@ -155,10 +156,14 @@ typedef vtkSmartPointer<class vtkUnsignedShortArray> vtkUnsignedShortArrayPtr;
 typedef vtkSmartPointer<class vtkVectorText> vtkVectorTextPtr;
 typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
 typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
-typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
 typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 typedef vtkSmartPointer<class vtkWindowedSincPolyDataFilter> vtkWindowedSincPolyDataFilterPtr;
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
+#ifndef CX_VTK_OPENGL2
+typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
+#else
+typedef vtkSmartPointer<class vtkSmartVolumeMapper> vtkVolumeTextureMapper3DPtr;
+#endif
 
 typedef std::pair<vtkVectorTextPtr,vtkFollowerPtr> vtkVectorTextFollowerPair;
 

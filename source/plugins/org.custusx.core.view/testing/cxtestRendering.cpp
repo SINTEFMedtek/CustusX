@@ -46,9 +46,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
 #include <vtkCamera.h>
-#include <vtkVolumeTextureMapper3D.h>
+#include <vtkSmartVolumeMapper.h>
 #include <vtkVolumeProperty.h>
 #include <vtkPiecewiseFunction.h>
+
+#ifndef CX_VTK_OPENGL2
+#include <vtkVolumeTextureMapper3D.h>
+#endif
 
 namespace cxtest
 {
@@ -92,7 +96,10 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 
 	mRenderer->ResetCamera();
 	renderWindow->Render();
+
+#ifndef CX_VTK_OPENGL2
 	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
+#endif
 
 	int numRenders = 3000;
 	for (int i = 0; i < numRenders; ++i)

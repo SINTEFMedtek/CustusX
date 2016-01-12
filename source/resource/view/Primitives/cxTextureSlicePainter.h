@@ -44,18 +44,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxResourceVisualizationExport.h"
 
 #include <boost/shared_ptr.hpp>
-#include <vtkOpenGLRepresentationPainter.h>
 #include <QString>
 #include <vector>
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxConfig.h"
+
+#ifndef CX_VTK_OPENGL2
+#include <vtkOpenGLRepresentationPainter.h>
+#endif
+
 class vtkOpenGLRenderWindow;
 class vtkUniformVariables;
 //---------------------------------------------------------
 namespace cx
 {
 
-#ifndef WIN32
+//#ifndef WIN32
+#ifndef CX_VTK_OPENGL2
 
 class cxResourceVisualization_EXPORT SingleVolumePainterHelper
 {
@@ -129,7 +135,8 @@ private:
 	std::vector<SingleVolumePainterHelper> mElement;
 };
 
-#endif // WIN32
+#endif //CX_VTK_OPENGL2
+//#endif // WIN32
 
 
 //---------------------------------------------------------

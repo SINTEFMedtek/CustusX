@@ -16,6 +16,13 @@
 #    set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ../config)
 #endif (APPLE)
 
+#message( STATUS "VTK_RENDERING_BACKEND: " ${VTK_RENDERING_BACKEND} )
+if(VTK_RENDERING_BACKEND STREQUAL OpenGL2)
+#        message( STATUS "VTK_RENDERING_BACKEND == OpenGL2. setting CX_VTK_OPENGL2" )
+        option(CX_VTK_OPENGL2 "VTK build with VTK_RENDERING_BACKEND = OpenGL2" ON)
+endif()
+
+
 # location of configuration files during development (in the source tree)
 set (CX_CONFIG_ROOT ${CustusX_SOURCE_DIR}/config)
 # hack: the internal project CustusXSetup need a way to inject its own config for use 

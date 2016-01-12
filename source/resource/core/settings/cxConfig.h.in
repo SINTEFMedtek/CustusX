@@ -17,6 +17,7 @@
 #cmakedefine CX_CUSTUS_SINTEF
 #cmakedefine CX_BUILD_MEHDI_VTKMULTIVOLUME
 #cmakedefine CX_BUILD_US_SIMULATOR
+#cmakedefine CX_VTK_OPENGL2
 
 // location of documentation files during compilation
 #define CX_DOC_ROOT "@CX_DOC_ROOT@"
