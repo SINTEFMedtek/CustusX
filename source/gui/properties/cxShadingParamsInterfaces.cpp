@@ -42,6 +42,7 @@ DoublePropertyShadingBase::DoublePropertyShadingBase(ActiveDataPtr activeData) :
 	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &DoublePropertyShadingBase::activeImageChanged);
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &Property::changed);
+	this->activeImageChanged();
 }
 
 void DoublePropertyShadingBase::activeImageChanged()

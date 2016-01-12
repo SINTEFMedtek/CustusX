@@ -3,7 +3,22 @@
 ###########################################################
 
 cx_add_class_qt_moc(cxGui_SRCS
-        filterWidgets/cxFilterSetupWidget
+	browser/cxTreeNode
+	browser/cxTreeRepository
+	browser/cxTreeItemModel
+	browser/cxDataTreeNode
+	browser/cxSpaceTreeNode
+	browser/cxGroupTreeNode
+	browser/cxTopTreeNode
+	browser/cxToolTreeNode
+	browser/cxTreeNodeImpl
+	browser/cxControllableSplitter
+	browser/cxShowDataTreeNode
+	browser/cxViewServiceTreeNode
+	browser/cxViewGroupTreeNode
+	browser/cxViewServicePropertiesWidget
+	browser/cxViewGroupPropertiesWidget
+		filterWidgets/cxFilterSetupWidget
         filterWidgets/cxFiltersWidget
 	#----------------------
 	properties/cxDataInterface
@@ -35,6 +50,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     dataWidgets/cxTransferFunction2DOpacityWidget
     dataWidgets/cxImagePropertiesWidget
     dataWidgets/cxStreamPropertiesWidget
+	dataWidgets/cxImagePropertiesWidget
     #----------------------
     infoWidgets/cxStatusBar
     infoWidgets/cxPointSamplingWidget
@@ -44,6 +60,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     infoWidgets/cxFrameMetricWrapper
     infoWidgets/cxToolMetricWrapper
     infoWidgets/cxMetricManager
+    infoWidgets/cxBrowserWidget
 
     #----------------------
     navigationWidgets/cxNavigationWidget
@@ -82,7 +99,8 @@ cx_add_class_qt_moc(cxGui_SRCS
 
 cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
-        cxMainWindowApplicationComponent.h
+	browser/cxReplacableContentWidget
+		cxMainWindowApplicationComponent.h
 )
 
 cx_create_export_header("cxGui")
@@ -109,7 +127,8 @@ target_include_directories(cxGui
     ./streamingWidgets
     ./toolWidgets
     ./utilities
-    ./pluginFrameworkWidgets
+	./browser
+	./pluginFrameworkWidgets
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CustusX_SOURCE_DIR}/source/ThirdParty
 )

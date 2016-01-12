@@ -44,6 +44,7 @@ namespace cx
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+class EraseDataToolButton;
 
 /** Widget for selecting/showing/removing a Data.
   *
@@ -62,22 +63,18 @@ public:
 	DataSelectWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, SelectDataStringPropertyBasePtr data, QGridLayout* gridLayout = NULL, int row=0);
 	~DataSelectWidget();
 
-signals:
-
 private slots:
-    void requestEraseData();
-    void cancelRemovalSlot();
     void toggleShowData();
     void updateDataVisibility();
     void viewGroupChangedSlot();
 private:
-    void setRemoveIcon();
+	void eraseData();
     void setShowIcon();
     ViewGroupDataPtr getActiveViewGroupData();
 	SelectDataStringPropertyBasePtr mData;
     ViewGroupDataPtr mCurrentViewGroup;
     QAction* mToggleShowAction;
-    QAction* mRemoveAction;
+	EraseDataToolButton* mRemoveButton;
 	ViewServicePtr mViewService;
 	PatientModelServicePtr mPatientModelService;
 };
@@ -97,16 +94,16 @@ class cxResourceWidgets_EXPORT EraseDataToolButton : public CXSmallToolButton
 {
     Q_OBJECT
 public:
-    EraseDataToolButton(QWidget* parent) : CXSmallToolButton(parent) {}
+	EraseDataToolButton(QWidget* parent);
+	void reset(); ///< reset button to initial state
 signals:
-    void rightClick();
+	void eraseData(); ///< indicates that erase has been requested by user.
 private:
-    void mousePressEvent(QMouseEvent* e)
-    {
-        CXSmallToolButton::mousePressEvent(e);
-        if (e->button() == Qt::RightButton)
-            emit rightClick();
-    }
+	void cancelRemovalSlot();
+	void setRemoveIcon();
+	void requestEraseData();
+	void mousePressEvent(QMouseEvent* e);
+	QAction* mRemoveAction;
 };
 
 } // namespace cx

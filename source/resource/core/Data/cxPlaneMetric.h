@@ -84,6 +84,7 @@ public:
 	{
 		return "planeMetric";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_plane.png");}
 	virtual QString getAsSingleLineString() const;
 
 	Plane3D getRefPlane() const;

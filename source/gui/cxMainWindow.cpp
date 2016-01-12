@@ -72,6 +72,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFiltersWidget.h"
 #include "cxPluginFrameworkWidget.h"
 #include "cxManageClippersWidget.h"
+#include "cxBrowserWidget.h"
+#include "cxActiveToolProxy.h"
 
 namespace cx
 {
@@ -113,10 +115,10 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new MetricWidget(mServices->view(), mServices->patient(), this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(mServices, this), "Properties");
-	this->addAsDockWidget(new MeshPropertiesWidget(mServices, this), "Properties");
+	this->addAsDockWidget(new ActiveMeshPropertiesWidget(mServices, this), "Properties");
 	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
-	this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
+	this->addAsDockWidget(new ActiveToolPropertiesWidget(mServices->tracking(), mServices->spaceProvider(), this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
 	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget", "Console"), "Utility");
 	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget2", "Extra Console"), "Utility");
@@ -126,6 +128,8 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");
+
+	this->addAsDockWidget(new BrowserWidget(this, mServices), "Browsing");
 
 	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
@@ -528,7 +532,8 @@ void MainWindow::createToolBars()
 	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
-	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, DoublePropertyActiveToolOffset::create());
+	DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(mServices->tracking()));
+	SpinBoxAndSliderGroupWidget* offsetWidget = new SpinBoxAndSliderGroupWidget(this, offset);
 	offsetWidget->showLabel(false);
 	toolOffsetToolBar->addWidget(offsetWidget);
 

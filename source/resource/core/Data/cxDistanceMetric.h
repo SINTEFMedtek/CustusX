@@ -64,6 +64,7 @@ public:
 	virtual ~DistanceMetric();
 	static DistanceMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_distance.png");}
 	double getDistance() const;
     std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
     virtual Vector3D getRefCoord() const;

@@ -74,6 +74,8 @@ public:
 
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_angle.png");}
+
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
     virtual bool isValid() const;

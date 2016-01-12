@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxTool.h"
 #include "cxActiveData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -80,7 +81,9 @@ void SpaceListenerImpl::doConnect()
 			connect(activeData.get(), &ActiveData::activeDataChanged, this, &SpaceListenerImpl::reconnect);
 
 		DataPtr data = mDataManager->getData(mSpace.mRefObject);
-		if (data)
+		// NOTE: metrics have no own space, and thus are ignored if connected to.
+		//       this breaks a loop if e.g. a dist depends on a pt and the dist becomes active.
+		if (data && !data->getSpace().isEmpty())
 		{
 			connect(data.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
 			connect(mDataManager.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(changed()));

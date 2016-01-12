@@ -51,6 +51,7 @@ class QStackedLayout;
 
 namespace cx
 {
+class PopupToolbarWidget;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 
 class LogMessageDisplayWidget : public QWidget
@@ -109,24 +110,6 @@ private:
 	bool mScrollToBottomEnabled;
 };
 
-class PopupButton : public QFrame
-{
-	Q_OBJECT
-public:
-	PopupButton(QWidget *parent = NULL);
-	bool getShowPopup() const;
-
-signals:
-	void popup(bool show);
-private slots:
-	void onTriggered();
-protected:
-//	void mouseMoveEvent(QMouseEvent* event);
-private:
-	QAction* mAction;
-	QToolButton* mShowHeaderButton;
-
-};
 
 /**\brief Widget for displaying status messages.
  *
@@ -178,7 +161,7 @@ private:
 	void updateSeverityIndicator();
 	QString getDetailTypeFromButton() const;
 	void selectMessagesWidget();
-	void createButtonWidget();
+	void createButtonWidget(QWidget *widget);
 
 //	QAction* mLineWrappingAction;
 	QAction* mSeverityAction;
@@ -191,10 +174,7 @@ private:
 	MessageListenerPtr mMessageListener;
 	boost::shared_ptr<class MessageFilterConsole> mMessageFilter;
 	XmlOptionFile mOptions;
-	QWidget* mButtonWidget;
-	QHBoxLayout* mControlLayout;
-	PopupButton* mShowControlsButton;
-
+	PopupToolbarWidget* mPopupWidget;
 
 	LogPtr mLog;
 };

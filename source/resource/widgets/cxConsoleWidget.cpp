@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include "cxProfile.h"
 #include "cxTime.h"
+#include "cxPopupToolbarWidget.h"
 
 namespace cx
 {
@@ -323,59 +324,6 @@ void SimpleLogMessageDisplayWidget::format(const Message& message)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-PopupButton::PopupButton(QWidget* parent)
-{
-//	this->setMouseTracking(true);
-	//	this->setFrameStyle(QFrame::Box);
-
-	QVBoxLayout* layout = new QVBoxLayout(this);
-	layout->setMargin(0);
-	this->setLayout(layout);
-
-	//	QToolButton* expandButton = new QToolButton(this);
-	QToolButton* expandButton = new CXSmallToolButton(this);
-	mShowHeaderButton = expandButton;
-	this->setFixedSize(expandButton->sizeHint());
-
-	QAction* action = new QAction(QIcon(":icons/open_icon_library/layer-lower-3.png"), "Controls", this);
-	QString tip = "Show Controls";
-	action->setStatusTip(tip);
-	action->setWhatsThis(tip);
-	action->setToolTip(tip);
-	connect(action, SIGNAL(triggered()), this, SLOT(onTriggered()));
-	mAction = action;
-
-	mShowHeaderButton->setDefaultAction(action);
-	layout->addWidget(mShowHeaderButton);
-
-	action->setCheckable(true);
-}
-
-//void PopupButton::mouseMoveEvent(QMouseEvent* event)
-//{
-//	std::cout << "mouse move" << std::endl;
-//}
-
-bool PopupButton::getShowPopup() const
-{
-	return mShowHeaderButton->isChecked();
-}
-
-void PopupButton::onTriggered()
-{
-	if (this->getShowPopup())
-		mAction->setIcon(QIcon(":icons/open_icon_library/layer-raise-3.png"));
-	else
-		mAction->setIcon(QIcon(":icons/open_icon_library/layer-lower-3.png"));
-
-	emit popup(this->getShowPopup());
-}
-
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 ConsoleWidget::ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log) :
 	BaseWidget(parent, uid, name),
   mSeverityAction(NULL),
@@ -425,17 +373,10 @@ void ConsoleWidget::createUI()
 	layout->setSpacing(0);
 	this->setLayout(layout);
 
-	mControlLayout = new QHBoxLayout;
-	mControlLayout->setMargin(0);
-	layout->addLayout(mControlLayout);
-
-	mShowControlsButton = new PopupButton(this);
-	mControlLayout->addWidget(mShowControlsButton);
-	connect(mShowControlsButton, &PopupButton::popup, this, &ConsoleWidget::updateShowHeader);
-
-	this->createButtonWidget();
-
-	mControlLayout->addStretch(1);
+	mPopupWidget = new PopupToolbarWidget(this);
+	connect(mPopupWidget, &PopupToolbarWidget::popup, this, &ConsoleWidget::updateShowHeader);
+	layout->addWidget(mPopupWidget);
+	this->createButtonWidget(mPopupWidget->getToolbar());
 
 	mMessagesLayout = new QVBoxLayout;
 	mMessagesLayout->setMargin(0);
@@ -457,16 +398,11 @@ void ConsoleWidget::createUI()
 	this->updateUI();
 }
 
-void ConsoleWidget::createButtonWidget()
+void ConsoleWidget::createButtonWidget(QWidget* widget)
 {
-	mButtonWidget = new QWidget(this);
-	mControlLayout->addWidget(mButtonWidget);
-
-	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	QHBoxLayout* buttonLayout = new QHBoxLayout(widget);
 	buttonLayout->setMargin(0);
 	buttonLayout->setSpacing(0);
-
-	mButtonWidget->setLayout(buttonLayout);
 
 	this->addSeverityButtons(buttonLayout);
 	buttonLayout->addSpacing(8);
@@ -485,24 +421,8 @@ void ConsoleWidget::createButtonWidget()
 
 void ConsoleWidget::updateShowHeader()
 {
-	bool show = mShowControlsButton->getShowPopup();
-
+	bool show = mPopupWidget->popupIsVisible();
 	mMessagesWidget->showHeader(show);
-	mButtonWidget->setVisible(show);
-
-	if (show)
-	{
-		mControlLayout->insertWidget(0, mShowControlsButton);
-	}
-	else
-	{
-		// remove from layout, add to top of this
-		mControlLayout->removeWidget(mShowControlsButton);
-		mShowControlsButton->setParent(NULL);
-		mShowControlsButton->setParent(this);
-		mShowControlsButton->setVisible(true);
-
-	}
 }
 
 
@@ -659,6 +579,7 @@ void ConsoleWidget::updateUI()
 	this->setWindowTitle("Console: " + mChannelSelector->getValue());
 	this->selectMessagesWidget();
 	this->updateShowHeader();
+	mPopupWidget->refresh();
 
 	// reset content of browser
 	QTimer::singleShot(0, this, SLOT(clearTable())); // let the messages recently emitted be processed before clearing

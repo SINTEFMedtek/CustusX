@@ -35,40 +35,56 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QVBoxLayout>
 #include "cxImage.h"
+#include <QComboBox>
+#include <QTabWidget>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include "cxLabeledComboBoxWidget.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxImage.h"
+#include "cxTransferFunctionWidget.h"
+#include "cxCroppingWidget.h"
+#include "cxClippingWidget.h"
+#include "cxShadingWidget.h"
+#include "cxDataInterface.h"
+#include "cxDataSelectWidget.h"
+#include "cxSelectDataStringProperty.h"
+#include "cxVolumeInfoWidget.h"
+#include "cxVolumeHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxPatientModelService.h"
+#include "cxVisServices.h"
+#include "cxOverlayWidget.h"
+#include "cxColorWidget.h"
 
 namespace cx
 {
 
-ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
-		BaseWidget(parent, "ImagePropertiesWidget", "Image Properties"),
-		mImage(ImagePtr())
+ImagePropertiesWidget::ImagePropertiesWidget(VisServicesPtr services, QWidget *parent) :
+		TabbedWidget(parent, "ImagePropertiesWidget", "Image Properties")
 {
-	mInterpolationType = new QComboBox(this);
-	mInterpolationType->insertItem(0, "Nearest");
-	mInterpolationType->insertItem(1, "Linear");
-	mInterpolationType->insertItem(2, "Cubic");
-	mInterpolationType->setToolTip("Change VTK interpolation type");
+	this->setToolTip("Image properties");
+//	this->insertWidgetAtTop(new ActiveVolumeWidget(services->patient(), services->view(), this));
 
-	connect(mInterpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationTypeChanged(int)));
+	bool connectToActiveImage = true;
 
-	QLabel* interpolationTypeLabel = new QLabel("Volume interpolation type", this);
+	TabbedWidget* props2D = new TabbedWidget(NULL, "2D", "2D");
+	TabbedWidget* props3D = new TabbedWidget(NULL, "3D", "3D");
 
-	QHBoxLayout* layout =  new QHBoxLayout(this);
-	layout->addWidget(interpolationTypeLabel);
-	layout->addWidget(mInterpolationType);
+	this->addTab(new VolumeInfoWidget(services->patient(), this), "Info");
+	this->addTab(props2D, "2D");
+	this->addTab(props3D, "3D");
+
+	props3D->addTab(new TransferFunctionWidget(services->patient(), this, connectToActiveImage), QString("Transfer Functions"));
+	props3D->addTab(new ShadingWidget(services->patient()->getActiveData(), this, connectToActiveImage), "Properties");
+	props3D->addTab(new CroppingWidget(services->patient(), services->view(), this), "Crop");
+	props3D->addTab(new ClippingWidget(services, this), "Clip");
+
+	props2D->addTab(new ColorWidget(services->patient(), this), "Color");
+	props2D->addTab(new OverlayWidget(services->patient(), services->view(), this), "Overlay");
+
+	mTabWidget->setCurrentWidget(props3D);
 }
 
-void ImagePropertiesWidget::interpolationTypeChanged(int index)
-{
-	if (mImage)
-		mImage->setInterpolationType(index);
-}
-
-void ImagePropertiesWidget::imageChanged(ImagePtr image)
-{
-	mImage = image;
-	if (mImage)
-		mInterpolationType->setCurrentIndex(mImage->getInterpolationType());
-}
 
 }//end namespace cx

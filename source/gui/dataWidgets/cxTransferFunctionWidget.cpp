@@ -211,6 +211,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWi
 	  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
 	  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
   }
+  this->activeImageChangedSlot();
 }
 
 void TransferFunction3DWidget::activeImageChangedSlot()
@@ -270,6 +271,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWi
   new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
+  this->activeImageChangedSlot();
 }
 
 void TransferFunction2DWidget::activeImageChangedSlot()

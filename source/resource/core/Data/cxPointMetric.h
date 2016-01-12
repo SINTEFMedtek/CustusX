@@ -67,6 +67,7 @@ public:
 	virtual ~PointMetric();
 //    static PointMetricPtr create(QDomNode node);
 	static PointMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
+	virtual QString getParentSpace();
 
 	void setCoordinate(const Vector3D& p);
 	Vector3D getCoordinate() const;
@@ -80,6 +81,7 @@ public:
 	{
 		return "pointMetric";
 	}
+	virtual QIcon getIcon() {return QIcon(":/icons/metric_point.png");}
 	virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 

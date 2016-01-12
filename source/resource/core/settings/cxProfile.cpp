@@ -59,6 +59,11 @@ Profile::Profile(QString path, SettingsPtr settings)
 	mSettings = settings;
 }
 
+Profile::~Profile()
+{
+	this->getXmlSettings().save();
+}
+
 void Profile::activate()
 {
 	// this will trigger lots of change signals. Do after Profile object is in place.

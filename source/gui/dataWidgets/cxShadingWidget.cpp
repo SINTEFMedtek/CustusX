@@ -49,13 +49,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+ImageRenderPropertiesWidget::ImageRenderPropertiesWidget(QWidget* parent) :
+		BaseWidget(parent, "ImagePropertiesWidget", "Image Properties"),
+		mImage(ImagePtr())
+{
+	mInterpolationType = new QComboBox(this);
+	mInterpolationType->insertItem(0, "Nearest");
+	mInterpolationType->insertItem(1, "Linear");
+	mInterpolationType->insertItem(2, "Cubic");
+	mInterpolationType->setToolTip("Change VTK interpolation type");
+
+	connect(mInterpolationType, SIGNAL(currentIndexChanged(int)), this, SLOT(interpolationTypeChanged(int)));
+
+	QLabel* interpolationTypeLabel = new QLabel("Volume interpolation type", this);
+
+	QHBoxLayout* layout =  new QHBoxLayout(this);
+	layout->addWidget(interpolationTypeLabel);
+	layout->addWidget(mInterpolationType);
+}
+
+void ImageRenderPropertiesWidget::interpolationTypeChanged(int index)
+{
+	if (mImage)
+		mImage->setInterpolationType(index);
+}
+
+void ImageRenderPropertiesWidget::imageChanged(ImagePtr image)
+{
+	mImage = image;
+	if (mImage)
+		mInterpolationType->setCurrentIndex(mImage->getInterpolationType());
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 ShadingWidget::ShadingWidget(ActiveDataPtr activeData, QWidget* parent,  bool connectToActiveImage) :
 	BaseWidget(parent, "ShadingWidget", "Shading"),
 	mLayout(new QVBoxLayout(this)),
 	mActiveData(activeData),
 	mActiveImageProxy(ActiveImageProxyPtr()),
 	mImage(ImagePtr()),
-	mImagePropertiesWidget(ImagePropertiesWidgetPtr())
+	mImagePropertiesWidget(ImageRenderPropertiesWidgetPtr())
 {
   this->init(connectToActiveImage);
 }
@@ -89,10 +125,11 @@ void ShadingWidget::init(bool connectToActiveImage)
 		connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &ShadingWidget::activeImageChangedSlot);
 	}
 
-	mImagePropertiesWidget = ImagePropertiesWidgetPtr(new ImagePropertiesWidget(NULL));
+	mImagePropertiesWidget.reset(new ImageRenderPropertiesWidget(NULL));
 	shadingLayput->addWidget(mImagePropertiesWidget.get(), 5, 0, 1, 2);
 	mLayout->addLayout(shadingLayput);
 	mLayout->addStretch(1);
+	this->activeImageChangedSlot();
 }
 
 void ShadingWidget::shadingToggledSlot(bool val)

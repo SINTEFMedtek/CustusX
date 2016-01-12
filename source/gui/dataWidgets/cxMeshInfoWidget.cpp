@@ -54,8 +54,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-MeshPropertiesWidget::MeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
-		TabbedWidget(parent, "MeshPropertiesWidget", "Mesh Properties")
+ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
+		TabbedWidget(parent, "MeshInfoWidget", "Mesh Properties")
 {
 	this->setToolTip("Mesh properties");
 
@@ -64,26 +64,55 @@ MeshPropertiesWidget::MeshPropertiesWidget(VisServicesPtr services, QWidget *par
 
 	this->insertWidgetAtTop(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
 
-	this->addTab(new MeshInfoWidget(services->patient(), services->view(), this), "Info");
+	this->addTab(new MeshInfoWidget(activeMeshProperty, services->patient(), services->view(), this), "Info");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
 }
 
-/// -------------------------------------------------------
+//<<<<<<< HEAD
+//SelectedMeshInfoWidget::SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
+//	BaseWidget(parent, "MeshInfoWidget", "Mesh Properties")
+//{
+//	StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(patientModelService);
+//	meshSelector->setValueName("Surface: ");
 
-MeshInfoWidget::MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-	InfoWidget(parent, "MeshInfoWidget", "Mesh Info"),
+//	QVBoxLayout* layout = new QVBoxLayout(this);
+//	layout->setMargin(0);
+//	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, meshSelector));
+
+//	MeshInfoWidget* info = new MeshInfoWidget(meshSelector, patientModelService, viewService, this);
+//	info->layout()->setMargin(0);
+//	layout->addWidget(info);
+//}
+
+//SelectedMeshInfoWidget::~SelectedMeshInfoWidget()
+//{
+//}
+
+
+
+
+
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+MeshInfoWidget::MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
+							   PatientModelServicePtr patientModelService,
+							   ViewServicePtr viewService,
+							   QWidget* parent) :
+	InfoWidget(parent, "MeshCoreInfoWidget", "Mesh Properties"),
 	mPatientModelService(patientModelService),
 	mViewService(viewService),
-	mActiveMeshProperty(StringPropertyActiveData::New(patientModelService, "mesh"))
+	mMeshSelector(meshSelector)
 {
-	this->addWidgets(patientModelService);
+	this->addWidgets();
 	this->meshSelectedSlot();
-
-	connect(mActiveMeshProperty.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
 }
 
 MeshInfoWidget::~MeshInfoWidget()
-{}
+{
+}
 
 void MeshInfoWidget::setColorSlot()
 {
@@ -103,7 +132,7 @@ void MeshInfoWidget::setColorSlotDelayed()
 
 void MeshInfoWidget::meshSelectedSlot()
 {
-	if (mMesh == mActiveMeshProperty->getData())
+	if (mMesh == mMeshSelector->getData())
 	return;
 
 	if(mMesh)
@@ -115,7 +144,7 @@ void MeshInfoWidget::meshSelectedSlot()
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
     }
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mActiveMeshProperty->getData());
+	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	if (!mMesh)
 	{
@@ -167,10 +196,11 @@ void MeshInfoWidget::importTransformSlot()
   
 void MeshInfoWidget::meshChangedSlot()
 {
-    if(!mMesh) return;
-//	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-//	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
-    mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
+	if(!mMesh)
+		return;
+	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
+	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
+	mGlyphVisualizationCheckBox->setChecked(mMesh->showGlyph());
     mGlyphVisualizationCheckBox->setEnabled(mMesh->hasGlyph());
 	mColorAdapter->setValue(mMesh->getColor());
     mMesh->setVisSize((double) mVisSizeWidget->getValue());
@@ -186,15 +216,17 @@ void MeshInfoWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
-void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
+void MeshInfoWidget::addWidgets()
 {
+	connect(mMeshSelector.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
+
 	XmlOptionFile options = profile()->getXmlSettings().descend("MeshInfoWidget");
 	QString uid("Color");
 	QString name("");
 	QString help("Color of the mesh.");
 	QColor color("red");
 
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mActiveMeshProperty->getData());
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	if(mesh)
 		color = mesh->getColor();
@@ -215,12 +247,13 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
 
 	QWidget* optionsWidget = new QWidget(this);
 	QHBoxLayout* optionsLayout = new QHBoxLayout(optionsWidget);
-//	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
-//	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
-//	optionsLayout->addWidget(mBackfaceCullingCheckBox);
-//	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
-//	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
-//	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
+	optionsLayout->setMargin(0);
+	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
+	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
+	optionsLayout->addWidget(mBackfaceCullingCheckBox);
+	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
+	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
+	optionsLayout->addWidget(mFrontfaceCullingCheckBox);
     optionsLayout->addWidget(sscCreateDataWidget(this, mColorAdapter));
 
     optionsLayout->addStretch(1);
@@ -232,6 +265,7 @@ void MeshInfoWidget::addWidgets(PatientModelServicePtr patientModelService)
     int gridGlyphLayoutRow = 1;
     QWidget* glyphWidget = new QWidget(this);
     QGridLayout* glyphLayout = new QGridLayout(glyphWidget);
+	glyphLayout->setMargin(0);
     mGlyphVisualizationCheckBox = new QCheckBox("Enable glyph visualization");
     mGlyphVisualizationCheckBox->setToolTip("Enable glyph visualization");
     glyphLayout->addWidget(mGlyphVisualizationCheckBox, gridGlyphLayoutRow++,0);

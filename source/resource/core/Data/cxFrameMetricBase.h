@@ -68,6 +68,7 @@ public:
 	virtual QString getValueAsString() const { return ""; }
 	virtual bool showValueInGraphics() const { return false; }
 
+	virtual QString getParentSpace();
 protected:
 	QString matrixAsSingleLineString() const;
 	CoordinateSystem mSpace;

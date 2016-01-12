@@ -47,15 +47,24 @@ namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-class cxGui_EXPORT MeshPropertiesWidget : public TabbedWidget
+class cxGui_EXPORT ActiveMeshPropertiesWidget : public TabbedWidget
 {
   Q_OBJECT
 public:
-	MeshPropertiesWidget(VisServicesPtr services, QWidget* parent);
-  virtual ~MeshPropertiesWidget() {}
+	ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget* parent);
+  virtual ~ActiveMeshPropertiesWidget() {}
 };
 
 /// -------------------------------------------------------
+
+//class cxGui_EXPORT SelectedMeshInfoWidget : public BaseWidget
+//{
+//  Q_OBJECT
+
+//public:
+//	SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
+//  virtual ~SelectedMeshInfoWidget();
+//};
 
 /**
  * \class MeshInfoWidget
@@ -73,8 +82,12 @@ class cxGui_EXPORT MeshInfoWidget : public InfoWidget
   Q_OBJECT
 
 public:
-	MeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
+	MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
+				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+				   QWidget* parent);
   virtual ~MeshInfoWidget();
+
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
 
 protected slots:
   void setColorSlot();
@@ -88,16 +101,16 @@ protected:
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
-	void addWidgets(cx::PatientModelServicePtr patientModelService);
+	void addWidgets();
 
   MeshPtr mMesh;
   StringPropertyParentFramePtr mParentFrameAdapter;
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
-  SelectDataStringPropertyBasePtr mActiveMeshProperty;
+  SelectDataStringPropertyBasePtr mMeshSelector;
   ColorPropertyPtr mColorAdapter;
-//  QCheckBox* mBackfaceCullingCheckBox;
-//  QCheckBox* mFrontfaceCullingCheckBox;
+  QCheckBox* mBackfaceCullingCheckBox;
+  QCheckBox* mFrontfaceCullingCheckBox;
   DoublePropertyPtr mVisSizeWidget;
   QCheckBox* mGlyphVisualizationCheckBox;
   StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;

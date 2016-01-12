@@ -50,6 +50,8 @@ namespace cx
 typedef boost::shared_ptr<class CameraData> CameraDataPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
+
 
 /**
  * \file
@@ -129,9 +131,9 @@ public:
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
 
-//	std::vector<ImagePtr> get3DSliceImages();
-	PlaneTypeCollection getSliceDefinitions() { return mSliceDefinitions; }
-	void setSliceDefinitions(PlaneTypeCollection val) { mSliceDefinitions = val; emit optionsChanged(); }
+	PlaneTypeCollection getSliceDefinitions();
+	void setSliceDefinitions(PlaneTypeCollection val);
+	StringListPropertyPtr getSliceDefinitionProperty();
 
 	// view options for this group.
 	struct Options
@@ -164,11 +166,11 @@ private:
 	QString mVideoSource;
 	typedef std::pair<QString, DataViewProperties> DataAndViewProperties;
 	std::vector<DataAndViewProperties> mData;
-	PlaneTypeCollection mSliceDefinitions;
 	CameraDataPtr mCamera3D;
 	Options mOptions;
 	SyncedValuePtr mGroup2DZoom;
 	SyncedValuePtr mGlobal2DZoom;
+	StringListPropertyPtr mSliceDefinitionProperty;
 	DataPtr getData(QString uid) const;
 
 	struct data_equals
@@ -184,6 +186,7 @@ private:
 	template<class DATA_TYPE>
 	std::vector<boost::shared_ptr<DATA_TYPE> > getDataOfType(DataViewProperties requiredProperties) const;
 	bool contains(QString uid) const;
+	void createSliceDefinitionProperty();
 };
 
 

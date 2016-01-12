@@ -68,6 +68,7 @@ public:
 	virtual CoordinateSystem getD(DataPtr data);///<datas coordinate system	static CoordinateSystem getPr(); ///<patient references coordinate system
 	virtual CoordinateSystem getPr();
 	virtual CoordinateSystem getR(); ///<data references coordinate system
+	virtual CoordinateSystem convertToSpecific(CoordinateSystem space);
 
 private:
 	Transform3D get_rMfrom(CoordinateSystem from); ///< ref_M_from

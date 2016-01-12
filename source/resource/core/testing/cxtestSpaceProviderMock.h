@@ -68,6 +68,7 @@ public:
 	virtual cx::CoordinateSystem getD(cx::DataPtr data) { return cx::CoordinateSystem(cx::csDATA); }
 	virtual cx::CoordinateSystem getPr() { return cx::CoordinateSystem(cx::csPATIENTREF); }
 	virtual cx::CoordinateSystem getR() { return cx::CoordinateSystem(cx::csREF); }
+	virtual cx::CoordinateSystem convertToSpecific(cx::CoordinateSystem space) { return cx::CoordinateSystem(cx::csREF); }
 };
 
 } // namespace cxtest

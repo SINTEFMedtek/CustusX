@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxViewGroupData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -65,17 +66,8 @@ DataSelectWidget::DataSelectWidget(ViewServicePtr viewService, PatientModelServi
     CXSmallToolButton* toggleShowButton = new CXSmallToolButton();
     toggleShowButton->setDefaultAction(mToggleShowAction);
 
-    mRemoveAction = this->createAction(this,
-                                       QIcon(),
-                                       "<html><h4>Permanently delete data.</h4><p>Press button twice to delete.<br>"
-                                       "Right-click after the first click to cancel.<p></html>"
-                                       , "",
-                                       SLOT(requestEraseData()),
-                                       NULL);
-    mRemoveAction->setCheckable(true);
-    EraseDataToolButton* removeButton = new EraseDataToolButton(this);
-    connect(removeButton, SIGNAL(rightClick()), this, SLOT(cancelRemovalSlot()));
-    removeButton->setDefaultAction(mRemoveAction);
+	mRemoveButton = new EraseDataToolButton(this);
+	connect(mRemoveButton, &EraseDataToolButton::eraseData, this, &DataSelectWidget::eraseData);
 
     if(gridLayout)
     {
@@ -83,19 +75,18 @@ DataSelectWidget::DataSelectWidget(ViewServicePtr viewService, PatientModelServi
     	gridLayout->setSpacing(0);
     	QHBoxLayout* lay = new QHBoxLayout;
     	lay->addWidget(toggleShowButton);
-    	lay->addWidget(removeButton);
+		lay->addWidget(mRemoveButton);
     	gridLayout->addLayout(lay, row, 2);
     }else
     {
 		layout->addWidget(widget);
 		layout->addWidget(toggleShowButton);
-		layout->addWidget(removeButton);
+		layout->addWidget(mRemoveButton);
     }
 
 	connect(mViewService.get(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
     connect(mData.get(), SIGNAL(changed()), this, SLOT(updateDataVisibility()));
 
-    this->setRemoveIcon();
 	this->viewGroupChangedSlot();
 }
 
@@ -138,7 +129,7 @@ void DataSelectWidget::viewGroupChangedSlot()
 void DataSelectWidget::updateDataVisibility()
 {
     mToggleShowAction->setEnabled(mData->getData() && (mCurrentViewGroup!=0));
-    mRemoveAction->setEnabled(mData->getData() ? true : false);
+	mRemoveButton->setEnabled(mData->getData() ? true : false);
 
     bool visible = false;
     if (mData->getData())
@@ -153,38 +144,16 @@ void DataSelectWidget::updateDataVisibility()
     mToggleShowAction->blockSignals(true);
     mToggleShowAction->setChecked(visible);
     mToggleShowAction->blockSignals(false);
-    this->cancelRemovalSlot();
+	mRemoveButton->reset();
     this->setShowIcon();
 }
 
-/** If button is checked (first press), do nothing, except
-  * change button icon to show remove in progress.
-  * If button is unchecked (second press), remove data.
-  */
-void DataSelectWidget::requestEraseData()
+void DataSelectWidget::eraseData()
 {
-    this->setRemoveIcon();
-
-    if (mRemoveAction->isChecked())
-    {
-        return;
-    }
-    if (!mData->getData())
-        return;
+	if (!mData->getData())
+		return;
 
 	mPatientModelService->removeData(mData->getData()->getUid());
-}
-
-void DataSelectWidget::setRemoveIcon()
-{
-    if (mRemoveAction->isChecked())
-    {
-        mRemoveAction->setIcon(QIcon(":/icons/preset_remove.png"));
-    }
-    else
-    {
-        mRemoveAction->setIcon(QIcon(":/icons/open_icon_library/edit-delete-2.png"));
-    }
 }
 
 void DataSelectWidget::setShowIcon()
@@ -197,17 +166,6 @@ void DataSelectWidget::setShowIcon()
     {
         mToggleShowAction->setIcon(QIcon(":/icons/eye.png"));
     }
-}
-
-/** Uncheck the remove button without triggering a remove.
-  *
-  */
-void DataSelectWidget::cancelRemovalSlot()
-{
-    mRemoveAction->blockSignals(true);
-    mRemoveAction->setChecked(false);
-    this->setRemoveIcon();
-    mRemoveAction->blockSignals(false);
 }
 
 void DataSelectWidget::toggleShowData()
@@ -223,6 +181,74 @@ void DataSelectWidget::toggleShowData()
     {
 		mCurrentViewGroup->removeData(mData->getData()->getUid());
     }
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+EraseDataToolButton::EraseDataToolButton(QWidget *parent) :
+	CXSmallToolButton(parent)
+{
+	QString tip("<html><h4>Permanently delete data.</h4><p>Press button twice to delete.<br>"
+				 "Right-click after the first click to cancel.<p></html>");
+
+	mRemoveAction = new QAction(this);
+	mRemoveAction->setToolTip(tip);
+	connect(mRemoveAction, &QAction::triggered, this, &EraseDataToolButton::requestEraseData);
+	mRemoveAction->setCheckable(true);
+	this->setDefaultAction(mRemoveAction);
+
+	this->setRemoveIcon();
+}
+
+void EraseDataToolButton::reset()
+{
+	this->cancelRemovalSlot();
+}
+
+void EraseDataToolButton::mousePressEvent(QMouseEvent *e)
+{
+	CXSmallToolButton::mousePressEvent(e);
+	if (e->button() == Qt::RightButton)
+		this->cancelRemovalSlot();
+}
+
+/** Uncheck the remove button without triggering a remove.
+  *
+  */
+void EraseDataToolButton::cancelRemovalSlot()
+{
+	mRemoveAction->blockSignals(true);
+	mRemoveAction->setChecked(false);
+	this->setRemoveIcon();
+	mRemoveAction->blockSignals(false);
+}
+
+void EraseDataToolButton::setRemoveIcon()
+{
+	if (mRemoveAction->isChecked())
+	{
+		mRemoveAction->setIcon(QIcon(":/icons/preset_remove.png"));
+	}
+	else
+	{
+		mRemoveAction->setIcon(QIcon(":/icons/open_icon_library/edit-delete-2.png"));
+	}
+}
+
+/** If button is checked (first press), do nothing, except
+  * change button icon to show remove in progress.
+  * If button is unchecked (second press), remove data.
+  */
+void EraseDataToolButton::requestEraseData()
+{
+	this->setRemoveIcon();
+
+	if (mRemoveAction->isChecked())
+		return;
+
+	emit eraseData();
 }
 
 

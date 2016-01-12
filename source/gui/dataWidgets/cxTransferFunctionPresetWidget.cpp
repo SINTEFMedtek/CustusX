@@ -76,6 +76,7 @@ void TransferFunctionPresetWidget::toggleSlot() {
 	settings()->setValue("applyTransferFunctionPresetsToAll", mApplyToAll);
 
 	this->updateToggles();
+	this->populatePresetListSlot();
 }
 
 void TransferFunctionPresetWidget::updateToggles()
