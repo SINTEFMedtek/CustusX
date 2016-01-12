@@ -36,6 +36,7 @@ private:
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
+	void smoothPositions();
 };
 
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);

@@ -6,6 +6,9 @@
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include <vtkCellArray.h>
+#include "vtkCardinalSpline.h"
+
+typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
 namespace cx
 {
@@ -50,7 +53,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline)
 	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline);
 
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
-	mBranchListPtr->smoothBranchPositions();
+//	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
@@ -111,6 +114,8 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate)
 	findClosestPointInBranches(targetCoordinate);
 	findRoutePositions();
 
+	smoothPositions();
+
 	vtkPolyDataPtr retval = addVTKPoints();
 
 	return retval;
@@ -136,6 +141,45 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints()
 	retval->SetLines(lines);
 	return retval;
 }
+
+void RouteToTarget::smoothPositions()
+{
+	int numberOfInputPoints = mRoutePositions.size();
+	int controlPointFactor = 10;
+	int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
+
+	vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
+	vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
+	vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
+
+	if (numberOfControlPoints >= 2)
+	{
+		//add control points to spline
+		for(int j=0; j<numberOfControlPoints; j++)
+		{
+			int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
+
+			splineX->AddPoint(j,mRoutePositions[indexP](0));
+			splineY->AddPoint(j,mRoutePositions[indexP](1));
+			splineZ->AddPoint(j,mRoutePositions[indexP](2));
+		}
+
+		//evaluate spline - get smoothed positions
+		std::vector< Eigen::Vector3d > smoothingResult;
+		for(int j=0; j<=numberOfInputPoints; j++)
+		{
+			double splineParameter = j / controlPointFactor;
+			Eigen::Vector3d tempPoint;
+			tempPoint(0) = splineX->Evaluate(splineParameter);
+			tempPoint(1) = splineY->Evaluate(splineParameter);
+			tempPoint(2) = splineZ->Evaluate(splineParameter);
+			smoothingResult.push_back(tempPoint);
+		}
+		mRoutePositions.clear();
+		mRoutePositions = smoothingResult;
+	}
+}
+
 
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 {
