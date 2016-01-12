@@ -225,10 +225,10 @@ macro(cx_initialize_VTK)
 		vtkFiltersParallel
 		vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics
 		${VTK_OPENGL_LIBS}
-#		vtkRenderingOpenGL2
-#		vtkRenderingVolumeOpenGL2
-		vtkRenderingOpenGL
-		vtkRenderingVolumeOpenGL
+		vtkRenderingOpenGL2
+		vtkRenderingVolumeOpenGL2
+#		vtkRenderingOpenGL
+#		vtkRenderingVolumeOpenGL
 		NO_MODULE)
 
 
