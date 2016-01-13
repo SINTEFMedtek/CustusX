@@ -77,15 +77,16 @@ public:
 	virtual void setVisible(bool vis);
 
 private slots:
-	void read3DCrossHairSlot(double toolTipOffset);
+	void read3DCrossHairSlot(double toolTipOffset) const;
 private:
 	// constant data
 	ProbeDefinition mSector;
 	vtkSTLReaderPtr mSTLReader;
-	vtkCursor3DPtr mCrossHair;
+	mutable vtkCursor3DPtr mCrossHair;
 
 	bool mVisible;
 	double mTimestamp;
+	void update3DCrossHair(double toolTipOffset) const;
 };
 
 typedef boost::shared_ptr<ManualTool> ManualToolPtr;

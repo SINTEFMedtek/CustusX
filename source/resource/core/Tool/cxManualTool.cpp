@@ -47,7 +47,7 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 {
 	mTimestamp = 0;
 	mVisible = false;
-	read3DCrossHairSlot(0);
+//	read3DCrossHairSlot(0);
 	connect(this, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
@@ -55,7 +55,14 @@ ManualTool::~ManualTool()
 {
 }
 
-void ManualTool::read3DCrossHairSlot(double toolTipOffset)
+void ManualTool::read3DCrossHairSlot(double toolTipOffset) const
+{
+	if (!mCrossHair)
+		return;
+	this->update3DCrossHair(toolTipOffset);
+}
+
+void ManualTool::update3DCrossHair(double toolTipOffset) const
 {
 	if (!mCrossHair)
 	{
@@ -90,6 +97,7 @@ std::set<Tool::Type> ManualTool::getTypes() const
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 {
+	this->update3DCrossHair(0);
 	return mCrossHair->GetOutput();
 }
 
