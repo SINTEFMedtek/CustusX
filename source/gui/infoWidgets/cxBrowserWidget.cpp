@@ -75,8 +75,8 @@ void BrowserWidget::createGUI()
 //	mTreeView->setRootIsDecorated(false);
 //	mTreeView->setTreePosition(1);
 	mTreeView->setModel(mModel);
-	connect(mTreeView, &QTreeView::collapsed, this, &BrowserWidget::onNodeCollapsed);
-	connect(mTreeView, &QTreeView::expanded, this, &BrowserWidget::onNodeExpanded);
+	connect(mTreeView.data(), &QTreeView::collapsed, this, &BrowserWidget::onNodeCollapsed);
+	connect(mTreeView.data(), &QTreeView::expanded, this, &BrowserWidget::onNodeExpanded);
 	mModel->setSelectionModel(mTreeView->selectionModel());
 
 	mPopupWidget = new PopupToolbarWidget(this);
