@@ -73,6 +73,8 @@ void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline
 	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, prMd);
 
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
+	mBranchListPtr->interpolateBranchPositions(10);
+	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
@@ -100,7 +102,9 @@ Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMd, d
 
 		P.minCoeff(&index);
 		if (P.minCoeff() < maxDistance)
+		{
 			new_prMd.matrix().topRightCorner(3 , 1) = mCLpoints.col(index);
+		}
 
 	return new_prMd;
 }
@@ -133,10 +137,11 @@ Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform
 		if (minDistance < maxDistance)
 		{
 			Eigen::MatrixXd positions = minDistanceBranch->getPositions();
-            new_prMd.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
+			new_prMd.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
 			mProjectedBranchPtr = minDistanceBranch;
 			mProjectedIndex = minDistancePositionIndex;
 			isPreviousProjectedPointSet = true;
+			new_prMd = updateProjectedCameraOrientation(new_prMd, mProjectedBranchPtr, mProjectedIndex);
 		}
 		else
 		{
@@ -174,6 +179,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 		mProjectedBranchPtr = minDistanceBranch;
 		mProjectedIndex = minDistancePositionIndex;
 		isPreviousProjectedPointSet = true;
+		new_prMd = updateProjectedCameraOrientation(new_prMd, mProjectedBranchPtr, mProjectedIndex);
 	}
 	else
 	{
@@ -284,6 +290,33 @@ double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 	double D = sqrt( d0*d0 + d1*d1 + d2*d2 );
 
 	return D;
+}
+
+Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Transform3D prMd, BranchPtr branch, int index)
+{
+	Eigen::MatrixXd currentPosition;
+	Eigen::MatrixXd nextPosition;
+	Eigen::MatrixXd branchPositions = branch->getPositions();
+	if (branchPositions.cols() < index+1)
+	{
+		currentPosition = branchPositions.col(index);
+		nextPosition = branchPositions.col(index+1);
+	}
+	else
+	{
+		currentPosition = branchPositions.col(index-1);
+		nextPosition = branchPositions.col(index);
+	}
+
+	Vector3D viewDirection = (nextPosition - currentPosition).normalized();
+	Vector3D xVector = Vector3D(0,1,0);
+	Vector3D yVector = cross(viewDirection, xVector).normalized();
+
+	prMd.matrix().col(0).head(3) = xVector;
+	prMd.matrix().col(1).head(3) = yVector;
+	prMd.matrix().col(2).head(3) = viewDirection;
+
+	return prMd;
 }
 
 } /* namespace cx */

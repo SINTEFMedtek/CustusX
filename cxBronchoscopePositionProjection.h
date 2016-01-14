@@ -33,6 +33,7 @@ public:
 	void searchBranchDown(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
 	Transform3D findProjectedPoint(Transform3D prMd, double maxDistance);
 	bool isAdvancedCenterlineProjectionSelected();
+	Transform3D updateProjectedCameraOrientation(Transform3D prMd, BranchPtr branch, int index);
 
 private:
 	bool isPreviousProjectedPointSet;
@@ -44,6 +45,7 @@ private:
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	bool mUseAdvancedCenterlineProjection;
+	Vector3D mProjectedViewDirection;
 };
 
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
