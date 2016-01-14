@@ -54,6 +54,9 @@ public:
 	QAction* getMoveLeftAction();
 	QAction* getMoveRightAction();
 
+private slots:
+	void initializeSettings();
+
 private:
 	void onMoveSplitterLeft();
 	void onMoveSplitterRight();
@@ -61,7 +64,6 @@ private:
 	bool splitterShowsBoth() const;
 	void onSplitterMoved();
 
-	void initializeSettings();
 	int getShiftState() const;
 	void setShiftState(int shiftState);
 	void enableActions();

@@ -57,7 +57,7 @@ ControllableSplitter::ControllableSplitter(XmlOptionFile options, QWidget *paren
 	mSplitterRatio = this->getSplitterRatioOption().readValue(QString::number(0.5)).toDouble();
 
 	// must set geometry after sizes have been set, i.e. after return to the main loop:
-	QTimer::singleShot(0, this, &ControllableSplitter::initializeSettings);
+	QTimer::singleShot(0, this, SLOT(initializeSettings()));
 }
 
 ControllableSplitter::~ControllableSplitter()

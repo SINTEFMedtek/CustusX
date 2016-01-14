@@ -53,7 +53,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline)
 	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline);
 
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
-//	mBranchListPtr->smoothBranchPositions();
+
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
@@ -158,17 +158,21 @@ void RouteToTarget::smoothPositions()
 		for(int j=0; j<numberOfControlPoints; j++)
 		{
 			int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
-
-			splineX->AddPoint(j,mRoutePositions[indexP](0));
-			splineY->AddPoint(j,mRoutePositions[indexP](1));
-			splineZ->AddPoint(j,mRoutePositions[indexP](2));
+			splineX->AddPoint(indexP,mRoutePositions[indexP](0));
+			splineY->AddPoint(indexP,mRoutePositions[indexP](1));
+			splineZ->AddPoint(indexP,mRoutePositions[indexP](2));
 		}
+		//Always add the lasp point to complete spline
+		splineX->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](0));
+		splineY->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](1));
+		splineZ->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](2));
+
 
 		//evaluate spline - get smoothed positions
 		std::vector< Eigen::Vector3d > smoothingResult;
-		for(int j=0; j<=numberOfInputPoints; j++)
+		for(int j=0; j<numberOfInputPoints; j++)
 		{
-			double splineParameter = j / controlPointFactor;
+			double splineParameter = j; //	j / controlPointFactor;
 			Eigen::Vector3d tempPoint;
 			tempPoint(0) = splineX->Evaluate(splineParameter);
 			tempPoint(1) = splineY->Evaluate(splineParameter);
