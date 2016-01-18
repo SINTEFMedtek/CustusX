@@ -155,8 +155,10 @@ QString Profile::getSessionRootFolder() const
 	// Create folders
 	if (!QDir().exists(folder))
 	{
-		QDir().mkdir(folder);
-		report("Made a new patient folder: " + folder);
+		if(QDir().mkpath(folder))
+			report("Made a new patient folder: " + folder);
+		else
+			reportWarning("Cannot make new patient folder: " + folder);
 	}
 
 	return folder;
