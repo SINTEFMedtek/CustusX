@@ -297,7 +297,7 @@ Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Tra
 	Eigen::MatrixXd currentPosition;
 	Eigen::MatrixXd nextPosition;
 	Eigen::MatrixXd branchPositions = branch->getPositions();
-	if (branchPositions.cols() < index+1)
+	if (branchPositions.cols() > index+1)
 	{
 		currentPosition = branchPositions.col(index);
 		nextPosition = branchPositions.col(index+1);
