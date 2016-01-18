@@ -294,21 +294,12 @@ double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 
 Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Transform3D prMd, BranchPtr branch, int index)
 {
-	Eigen::MatrixXd currentPosition;
-	Eigen::MatrixXd nextPosition;
 	Eigen::MatrixXd branchPositions = branch->getPositions();
-	if (branchPositions.cols() > index+1)
-	{
-		currentPosition = branchPositions.col(index);
-		nextPosition = branchPositions.col(index+1);
-	}
-	else
-	{
-		currentPosition = branchPositions.col(index-1);
-		nextPosition = branchPositions.col(index);
-	}
+	int numberOfPositions = branchPositions.cols();
+	int lookBack = std::max(0 , index-5);
+	int lookForward = std::min(numberOfPositions , index+5);
 
-	Vector3D viewDirection = (nextPosition - currentPosition).normalized();
+	Vector3D viewDirection = (branchPositions.col(lookForward) - branchPositions.col(lookBack)).normalized();
 	Vector3D xVector = Vector3D(0,1,0);
 	Vector3D yVector = cross(viewDirection, xVector).normalized();
 
