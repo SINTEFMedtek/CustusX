@@ -129,7 +129,6 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints()
 	int numberOfPositions = mRoutePositions.size();
 	for (int j = numberOfPositions - 1; j >= 0; j--)
 	{
-		vtkIdType cells[1] = { points->GetNumberOfPoints() };
 		points->InsertNextPoint(mRoutePositions[j](0),mRoutePositions[j](1),mRoutePositions[j](2));
 	}
 	for (int j = 0; j < numberOfPositions-1; j++)
@@ -162,7 +161,7 @@ void RouteToTarget::smoothPositions()
 			splineY->AddPoint(indexP,mRoutePositions[indexP](1));
 			splineZ->AddPoint(indexP,mRoutePositions[indexP](2));
 		}
-		//Always add the lasp point to complete spline
+		//Always add the last point to complete spline
 		splineX->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](0));
 		splineY->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](1));
 		splineZ->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](2));
@@ -172,7 +171,7 @@ void RouteToTarget::smoothPositions()
 		std::vector< Eigen::Vector3d > smoothingResult;
 		for(int j=0; j<numberOfInputPoints; j++)
 		{
-			double splineParameter = j; //	j / controlPointFactor;
+			double splineParameter = j;
 			Eigen::Vector3d tempPoint;
 			tempPoint(0) = splineX->Evaluate(splineParameter);
 			tempPoint(1) = splineY->Evaluate(splineParameter);

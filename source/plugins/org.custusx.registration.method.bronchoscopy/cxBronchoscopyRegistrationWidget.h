@@ -80,6 +80,7 @@ protected:
 private slots:
 	void processCenterlineSlot();
 	void registerSlot();
+	void clearDataOnNewPatient();
 private:
 	void setup();
 

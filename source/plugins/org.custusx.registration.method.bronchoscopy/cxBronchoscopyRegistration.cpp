@@ -440,6 +440,8 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	{
 		mBranchListPtr->selectGenerations(numberOfGenerations);
 	}
+
+	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
@@ -448,18 +450,23 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
 
 	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
+	int positionCounter = 0;
 	for (int i = 0; i < branches.size(); i++)
 	{
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-			vtkIdType cells[1] = { points->GetNumberOfPoints() };
+			positionCounter ++;
 			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
-			lines->InsertNextCell(1, cells);
+			if (j	 < positions.cols()-1)
+			{
+				vtkIdType connection[2] = {positionCounter-1, positionCounter};
+				lines->InsertNextCell(2, connection);
+			}
 		}
 	}
 	retval->SetPoints(points);
-	retval->SetVerts(lines);
+	retval->SetLines(lines);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 

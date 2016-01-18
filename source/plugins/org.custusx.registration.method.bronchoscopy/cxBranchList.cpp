@@ -167,7 +167,7 @@ void BranchList::smoothBranchPositions()
 	{
 		Eigen::MatrixXd positions = mBranches[i]->getPositions();
 		int numberOfInputPoints = positions.cols();
-		int controlPointFactor = 10;
+		int controlPointFactor = 5;
 		int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
 
 		vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
@@ -181,16 +181,20 @@ void BranchList::smoothBranchPositions()
 			{
 				int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
 
-				splineX->AddPoint(j,positions(0,indexP));
-				splineY->AddPoint(j,positions(1,indexP));
-				splineZ->AddPoint(j,positions(2,indexP));
+				splineX->AddPoint(indexP,positions(0,indexP));
+				splineY->AddPoint(indexP,positions(1,indexP));
+				splineZ->AddPoint(indexP,positions(2,indexP));
 			}
+			//Always add the last point to complete spline
+			splineX->AddPoint(numberOfInputPoints-1,positions(0,numberOfInputPoints-1));
+			splineY->AddPoint(numberOfInputPoints-1,positions(1,numberOfInputPoints-1));
+			splineZ->AddPoint(numberOfInputPoints-1,positions(2,numberOfInputPoints-1));
 
 			//evaluate spline - get smoothed positions
 			Eigen::MatrixXd smoothingResult(3 , numberOfInputPoints);
 			for(int j=0; j<numberOfInputPoints; j++)
 			{
-				double splineParameter = j / controlPointFactor;
+				double splineParameter = j;
 				smoothingResult(0,j) = splineX->Evaluate(splineParameter);
 				smoothingResult(1,j) = splineY->Evaluate(splineParameter);
 				smoothingResult(2,j) = splineZ->Evaluate(splineParameter);

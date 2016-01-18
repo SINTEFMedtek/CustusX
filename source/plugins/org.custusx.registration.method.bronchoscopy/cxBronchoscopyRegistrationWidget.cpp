@@ -95,6 +95,8 @@ void BronchoscopyRegistrationWidget::setup()
 
 	//this->initializeTrackingService();
 
+	connect(mServices->patient().get(),&PatientModelService::patientChanged,this,&BronchoscopyRegistrationWidget::clearDataOnNewPatient);
+
 	mProcessCenterlineButton = new QPushButton("Process centerline");
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
 	mProcessCenterlineButton->setToolTip(this->defaultWhatsThis());
@@ -166,6 +168,8 @@ void BronchoscopyRegistrationWidget::processCenterlineSlot()
 	{
 		QString uid = mSelectMeshWidget->getMesh()->getUid() + "_cl%1";
 		QString name = mSelectMeshWidget->getMesh()->getName()+" cl_processed%1";
+		std::cout << "name: " << name << std::endl;
+		std::cout << "uid: " << uid << std::endl;
 		mMesh = mServices->patient()->createSpecificData<Mesh>(uid, name);
 	}
 	mMesh->setVtkPolyData(processedCenterline);
@@ -248,5 +252,8 @@ void BronchoscopyRegistrationWidget::createMaxLocalRegistrationDistance(QDomElem
 	mMaxLocalRegistrationDistance->setGuiRepresentation(DoubleProperty::grSLIDER);
 }
 
-
+void BronchoscopyRegistrationWidget::clearDataOnNewPatient()
+{
+	mMesh.reset();
+}
 } //namespace cx
