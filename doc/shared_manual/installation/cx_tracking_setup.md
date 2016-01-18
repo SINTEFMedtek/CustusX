@@ -22,7 +22,6 @@ Setup connection between CustusX and IGSTK:
 	sudo chmod a+rwx /Library/CustusX/igstk.links
 
 ### Mac
-Should work out of the box.
 
 The folder 
 

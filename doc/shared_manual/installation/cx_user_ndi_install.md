@@ -6,7 +6,12 @@ CustusX requires that you first install the NDI ToolBox
 and follow the install instructions. This will install the Track application, which can be used with 
 the NDI systems independently of CustusX. *Note: A user account is required to download.*
 
-Mac and Windows install should work out of the box.
+Windows install should work out of the box.
+
+Mac
+-----------------------------------------------------------
+For OSX 10.9 and higher you need to install the appropriate FTDI driver to get the USB connection working.
+Restart the machine after installing: <http://www.ftdichip.com/Drivers/VCP.htm>
 
 
 Linux
