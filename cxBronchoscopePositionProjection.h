@@ -26,14 +26,14 @@ public:
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd);
 	void processCenterline(vtkPolyDataPtr centerline, Transform3D prMd);
 	Transform3D findClosestPoint(Transform3D prMt, double maxDistance);
-	Transform3D findClosestPointInBranches(Transform3D prMd, double maxDistance);
-	Transform3D findClosestPointInSearchPositions(Transform3D prMd, double maxDistance);
+	Transform3D findClosestPointInBranches(Transform3D prMt, double maxDistance);
+	Transform3D findClosestPointInSearchPositions(Transform3D prMt, double maxDistance);
 	void findSearchPositions(double maxSearchDistance);
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
 	void searchBranchDown(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
-	Transform3D findProjectedPoint(Transform3D prMd, double maxDistance);
+	Transform3D findProjectedPoint(Transform3D prMt, double maxDistance);
 	bool isAdvancedCenterlineProjectionSelected();
-	Transform3D updateProjectedCameraOrientation(Transform3D prMd, BranchPtr branch, int index);
+	Transform3D updateProjectedCameraOrientation(Transform3D prMt, BranchPtr branch, int index);
 
 private:
 	bool isPreviousProjectedPointSet;

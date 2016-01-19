@@ -73,7 +73,7 @@ void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline
 	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, prMd);
 
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
-	mBranchListPtr->interpolateBranchPositions(10);
+	//mBranchListPtr->interpolateBranchPositions(10);
 	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
@@ -83,12 +83,12 @@ void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline
 
 
 
-Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMd, double maxDistance)
+Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMt, double maxDistance)
 {
 
-	Eigen::VectorXd toolPos  = prMd.matrix().topRightCorner(3 , 1);
+	Eigen::VectorXd toolPos  = prMt.matrix().topRightCorner(3 , 1);
 	Eigen::MatrixXd::Index index;
-	Transform3D new_prMd = prMd;
+	Transform3D new_prMt = prMt;
 
 		Eigen::VectorXd P(mCLpoints.cols());
 		for (int i = 0; i < mCLpoints.cols(); i++)
@@ -103,17 +103,17 @@ Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMd, d
 		P.minCoeff(&index);
 		if (P.minCoeff() < maxDistance)
 		{
-			new_prMd.matrix().topRightCorner(3 , 1) = mCLpoints.col(index);
+			new_prMt.matrix().topRightCorner(3 , 1) = mCLpoints.col(index);
 		}
 
-	return new_prMd;
+	return new_prMt;
 }
 
-Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform3D prMd, double maxDistance)
+Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform3D prMt, double maxDistance)
 {
 
-	Eigen::VectorXd toolPos  = prMd.matrix().topRightCorner(3 , 1);
-	Transform3D new_prMd = prMd;
+	Eigen::VectorXd toolPos  = prMt.matrix().topRightCorner(3 , 1);
+	Transform3D new_prMt = prMt;
 
 	double minDistance = 100000;
 	int minDistancePositionIndex;
@@ -137,24 +137,24 @@ Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform
 		if (minDistance < maxDistance)
 		{
 			Eigen::MatrixXd positions = minDistanceBranch->getPositions();
-			new_prMd.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
+			new_prMt.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
 			mProjectedBranchPtr = minDistanceBranch;
 			mProjectedIndex = minDistancePositionIndex;
 			isPreviousProjectedPointSet = true;
-			new_prMd = updateProjectedCameraOrientation(new_prMd, mProjectedBranchPtr, mProjectedIndex);
+			new_prMt = updateProjectedCameraOrientation(new_prMt, mProjectedBranchPtr, mProjectedIndex);
 		}
 		else
 		{
 			isPreviousProjectedPointSet = false;
 		}
 
-	return new_prMd;
+	return new_prMt;
 }
 
-Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Transform3D prMd, double maxDistance)
+Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Transform3D prMt, double maxDistance)
 {
-	Eigen::VectorXd toolPos  = prMd.matrix().topRightCorner(3 , 1);
-	Transform3D new_prMd = prMd;
+	Eigen::VectorXd toolPos  = prMt.matrix().topRightCorner(3 , 1);
+	Transform3D new_prMt = prMt;
 
 	double minDistance = 100000;
 	int minDistancePositionIndex;
@@ -175,18 +175,18 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 	if (minDistance < maxDistance)
 	{
 		Eigen::MatrixXd positions = minDistanceBranch->getPositions();
-        new_prMd.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
+		new_prMt.matrix().topRightCorner(3 , 1) = positions.col(minDistancePositionIndex);
 		mProjectedBranchPtr = minDistanceBranch;
 		mProjectedIndex = minDistancePositionIndex;
 		isPreviousProjectedPointSet = true;
-		new_prMd = updateProjectedCameraOrientation(new_prMd, mProjectedBranchPtr, mProjectedIndex);
+		new_prMt = updateProjectedCameraOrientation(new_prMt, mProjectedBranchPtr, mProjectedIndex);
 	}
 	else
 	{
 		isPreviousProjectedPointSet = false;
 	}
 
-	return new_prMd;
+	return new_prMt;
 
 }
 
@@ -261,19 +261,19 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 		searchBranchDown(childBranches[i], 0,currentSearchDistance,maxSearchDistance);
 }
 
-Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMd, double maxDistance)
+Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMt, double maxDistance)
 {
     double maxSearchDistance = 25; //mm
-	Transform3D new_prMd;
+	Transform3D new_prMt;
 	if (isPreviousProjectedPointSet)
 	{
 		findSearchPositions(maxSearchDistance);
-		new_prMd = findClosestPointInSearchPositions(prMd, maxDistance);
+		new_prMt = findClosestPointInSearchPositions(prMt, maxDistance);
 	}
 	else
-        new_prMd = findClosestPointInBranches(prMd, maxDistance);
+		new_prMt = findClosestPointInBranches(prMt, maxDistance);
 
-	return new_prMd;
+	return new_prMt;
 }
 
 bool BronchoscopePositionProjection::isAdvancedCenterlineProjectionSelected()
@@ -292,22 +292,26 @@ double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 	return D;
 }
 
-Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Transform3D prMd, BranchPtr branch, int index)
+Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Transform3D prMt, BranchPtr branch, int index)
 {
 	Eigen::MatrixXd branchPositions = branch->getPositions();
 	int numberOfPositions = branchPositions.cols();
-	int lookBack = std::max(0 , index-5);
-	int lookForward = std::min(numberOfPositions , index+5);
+	int lookBackIndex = std::max(0 , index-50);
+	int lookForwardIndex = std::min(numberOfPositions , index+50);
 
-	Vector3D viewDirection = (branchPositions.col(lookForward) - branchPositions.col(lookBack)).normalized();
-	Vector3D xVector = Vector3D(0,1,0);
-	Vector3D yVector = cross(viewDirection, xVector).normalized();
+	Vector3D viewDirection = (branchPositions.col(lookForwardIndex) - branchPositions.col(lookBackIndex)).normalized();
+	//Vector3D xVector = Vector3D(0,1,0);
+	//Vector3D yVector = cross(viewDirection, xVector).normalized();
 
-	prMd.matrix().col(0).head(3) = xVector;
-	prMd.matrix().col(1).head(3) = yVector;
-	prMd.matrix().col(2).head(3) = viewDirection;
+	//prMt.matrix().col(0).head(3) = xVector;
+	//prMt.matrix().col(1).head(3) = yVector;
+	prMt.matrix().col(2).head(3) = viewDirection;
 
-	return prMd;
+	//debug
+	std::cout << "Top position: " << branchPositions.col(lookBackIndex) << std::endl;
+	std::cout << "Bottom position: " << branchPositions.col(lookForwardIndex) << std::endl;
+
+	return prMt;
 }
 
 } /* namespace cx */
