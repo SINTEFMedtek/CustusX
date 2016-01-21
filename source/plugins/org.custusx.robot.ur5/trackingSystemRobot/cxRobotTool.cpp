@@ -129,19 +129,21 @@ bool RobotTool::isInitialized() const
 
 void RobotTool::setVisible(bool vis)
 {
-    CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
 }
 
 
 void RobotTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
 {
     mTimestamp = timestamp;// /1000000;
-    Transform3D prMt = prMs;
-    Transform3D prMt_filtered = prMt;
+    Transform3D bMe = prMs;
 
-    (*mPositionHistory)[mTimestamp] = prMt; // store original in history
+    Transform3D prMt_filtered = mServices->patient()->get_rMpr()*prMb*bMe;//*createTransformRotateX(3.14);
+
+    (*mPositionHistory)[mTimestamp] = bMe; // store original in history
     m_prMt = prMt_filtered;
     emit toolTransformAndTimestamp(m_prMt, mTimestamp);
+
+    this->updateActors();
 }
 
 void RobotTool::calculateTpsSlot()
