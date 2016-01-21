@@ -40,7 +40,6 @@ void Ur5ManualMoveTab::setupUi(QWidget *parent)
    setJointMoveWidget(rightColumnLayout);
 
    mainLayout->addWidget(leftColumnWidgets,0,Qt::AlignTop|Qt::AlignLeft);
-   //mainLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
    mainLayout->addWidget(rightColumnWidgets,0,Qt::AlignTop|Qt::AlignRight);
 
    mainLayout->setSpacing(5);
