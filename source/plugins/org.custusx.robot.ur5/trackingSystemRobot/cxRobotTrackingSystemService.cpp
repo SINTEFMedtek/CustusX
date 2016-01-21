@@ -59,7 +59,7 @@ Tool::State RobotTrackingSystemService::getState() const
 
 void RobotTrackingSystemService::setState(const Tool::State val)
 {
-    if (mState==val)
+    if (mState==val || this->isRobotTrackingEnabled==false)
         return;
 
     if (val > mState) // up
@@ -87,12 +87,19 @@ void RobotTrackingSystemService::startTracking()
     this->configure();
     this->internalSetState(Tool::tsTRACKING);
     connect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
+    this->isRobotTrackingEnabled = true;
+
+    mUr5Robot->stateUpdated();
+
+    mRobotTool = this->getTool("RobotTracker");
+    mRobotTool->addRobotActors();
 }
 
 void RobotTrackingSystemService::stopTracking()
 {
     disconnect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
     this->deconfigure();
+    this->isRobotTrackingEnabled = false;
 }
 
 std::vector<ToolPtr> RobotTrackingSystemService::getTools()
