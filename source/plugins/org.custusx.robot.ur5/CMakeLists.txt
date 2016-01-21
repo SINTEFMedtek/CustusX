@@ -65,8 +65,9 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxResource
+    cxResourceWidgets
     cxGUIExtenderService
-    #cxLogicManager
+    cxLogicManager
     cxPluginUtilities
     Qt5::Widgets
     )
