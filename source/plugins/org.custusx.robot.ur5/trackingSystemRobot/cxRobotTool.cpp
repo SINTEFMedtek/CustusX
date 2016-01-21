@@ -164,7 +164,7 @@ void RobotTool::createPolyData()
 
         vtkSTLReaderPtr eeSTL = vtkSTLReaderPtr::New();
 
-        eeSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "ee.stl")));
+        eeSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "eenew.stl")));
         eeSTL->Update();
 
         mPolyData = eeSTL->GetOutput();
@@ -244,13 +244,17 @@ void RobotTool::addRobotActors()
 
     ViewPtr view = mServices->view()->get3DView();
 
-
+    baseActor->SetPosition(0,-1,8);
     baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&this->prMb));
+    link1Actor->SetPosition(0,-4,0);
     link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
-    link2Actor->SetPosition(0,0,130);
+    link2Actor->SetPosition(0,-4,134);
     link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
+    link3Actor->SetPosition(4,0,0);
     link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition))));
+    link4Actor->SetPosition(0,0,-4);
     link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition))));
+    link5Actor->SetPosition(0,4,0);
     link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition))));
 
     //std::cout << baseActor->GetCenter()[0] << " " <<  baseActor->GetCenter()[1] << " " <<  baseActor->GetCenter()[2] << std::endl;
