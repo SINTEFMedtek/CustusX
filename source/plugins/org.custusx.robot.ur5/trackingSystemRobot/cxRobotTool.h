@@ -64,6 +64,7 @@ private:
     double mTimestamp;
 
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
+    QString mGraphicsFolderName = QString("C:\\robotSTL/");
 };
 
 } /* namespace cx */
