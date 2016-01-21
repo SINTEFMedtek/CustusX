@@ -280,10 +280,22 @@ void RobotTool::updateActors()
 void RobotTool::set_prMb_calibration()
 {
     prMb = Transform3D::Identity();
-    //prMb = createTransformRotateZ(1.57);
-    //prMb(0,3) = 35;
-    //prMb(1,3) = 300;
-    //prMb(2,3) = 0;
+    prMb = createTransformRotateZ(1.57);
+    prMb(0,3) = 35;
+    prMb(1,3) = 300;
+    prMb(2,3) = 0;
+}
+
+void RobotTool::removeActors()
+{
+    ViewPtr view = mServices->view()->get3DView();
+
+    view->getRenderer()->RemoveActor(link1Actor);
+    view->getRenderer()->RemoveActor(link2Actor);
+    view->getRenderer()->RemoveActor(link3Actor);
+    view->getRenderer()->RemoveActor(link4Actor);
+    view->getRenderer()->RemoveActor(link5Actor);
+    view->getRenderer()->RemoveActor(baseActor);
 }
 
 
