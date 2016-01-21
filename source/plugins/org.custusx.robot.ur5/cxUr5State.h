@@ -26,8 +26,8 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
     ~Ur5State();
 
     Vector3D cartAxis,cartAngles;
-    Vector3D force,torque;
-    Vector3D tcpAxis,tcpAngles;
+    //Vector3D force,torque;
+    //Vector3D tcpAxis,tcpAngles;
 
     Eigen::RowVectorXd jointPosition;
     Eigen::RowVectorXd jointVelocity;
@@ -35,7 +35,8 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
 
     Transform3D baseMee;
 
-    Eigen::MatrixXd jacobian, Tbe;
+    Eigen::MatrixXd jacobian;
+    Transform3D Tbe;
 
     double timeSinceStart;
 
