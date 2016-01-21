@@ -33,11 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUr5GUIExtenderService.h"
 #include "ctkPluginContext.h"
 #include "cxUr5Widget.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
-Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context, Ur5RobotPtr robot) :
+Ur5GUIExtenderService::Ur5GUIExtenderService(ctkPluginContext *context,VisServicesPtr services, Ur5RobotPtr robot) :
   mContext(context),
+  mServices(services),
   mUr5Robot(robot)
 {
 }
