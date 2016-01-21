@@ -132,12 +132,6 @@ void Ur5InitializeTab::setRobotTrackingLayout(QVBoxLayout *parent)
     stopTrackingButton = new QPushButton(tr("Stop tracking"));
 
     int row = 0;
-//    mainLayout->addWidget(configureTrackingButton, row, 0,1,1);
-//    mainLayout->addWidget(deconfigureTrackingButton,row,3,1,1);
-
-//    row++;
-//    mainLayout->addWidget(initializeTrackingButton,row,0,1,1);
-//    mainLayout->addWidget(deinitializeTrackingButton,row,3,1,1);
 
 //    row++;
     mainLayout->addWidget(startTrackingButton,row,0,1,1);
@@ -147,6 +141,10 @@ void Ur5InitializeTab::setRobotTrackingLayout(QVBoxLayout *parent)
 void Ur5InitializeTab::startTrackingSlot()
 {
     mUr5Robot->startTracking();
+
+    Transform3D trackingMatrix = Transform3D(mUr5Robot->getCurrentState().Tbe); // Fjærnes
+    trackingMatrix.translation() = trackingMatrix.translation()*1000; // Fjærnes
+    mUr5Robot->transform("RobotTracker",trackingMatrix,0); // Bør fjærnes
 }
 
 void Ur5InitializeTab::stopTrackingSlot()
