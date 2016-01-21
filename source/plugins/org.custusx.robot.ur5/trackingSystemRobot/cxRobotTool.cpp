@@ -1,9 +1,25 @@
-
 #include "cxRobotTool.h"
 #include "cxProbeImpl.h"
 #include "cxLogger.h"
+#include "cxPatientModelService.h"
+#include <Qdir>
+#include "cxUr5State.h"
 
-
+#include <vtkActor.h>
+#include <vtkSTLReader.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkDataSet.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransform.h>
+#include <vtkAppendPolyData.h>
+#include <vtkMatrix4x4.h>
+#include "cxTransform3D.h"
+#include <vtkAssembly.h>
+#include "cxVisServices.h"
+#include "cxViewService.h"
+#include "cxView.h"
+#include <vtkRenderer.h>
+#include "cxUr5Kinematics.h"
 
 namespace cx
 {
