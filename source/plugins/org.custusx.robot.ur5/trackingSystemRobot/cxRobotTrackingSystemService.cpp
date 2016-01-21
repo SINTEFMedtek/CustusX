@@ -140,12 +140,18 @@ void RobotTrackingSystemService::serverIsDisconnected()
 
 void RobotTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
-    if(mTimer==0 || timestamp>mTimer+tps)
+    if(mTimer==0)
     {
-    RobotToolPtr tool = this->getTool(devicename); 
-    tool->toolTransformAndTimestampSlot(transform,timestamp);
-    tool->tps(1/(timestamp-mTimer));
-    mTimer = timestamp;
+        mRobotTool = this->getTool(devicename);
+        mRobotTool->toolTransformAndTimestampSlot(transform,timestamp);
+        mRobotTool->tps(0);
+        mTimer = timestamp;
+    }
+    else if(timestamp>mTimer+tps)
+    {
+        mRobotTool->toolTransformAndTimestampSlot(transform,timestamp);
+        mRobotTool->tps(1/(timestamp-mTimer));
+        mTimer = timestamp;
     }
 }
 
