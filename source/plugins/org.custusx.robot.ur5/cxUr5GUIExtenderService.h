@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGUIExtenderService.h"
 #include "org_custusx_robot_ur5_Export.h"
 #include "cxUr5Robot.h"
+#include "cxPatientModelServiceProxy.h"
 
 class ctkPluginContext;
 
@@ -54,7 +55,7 @@ class org_custusx_robot_ur5_EXPORT Ur5GUIExtenderService : public GUIExtenderSer
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-    Ur5GUIExtenderService(ctkPluginContext *context, Ur5RobotPtr robot);
+    Ur5GUIExtenderService(ctkPluginContext *context,VisServicesPtr services, Ur5RobotPtr robot);
 	virtual ~Ur5GUIExtenderService() {};
 
 	std::vector<CategorizedWidget> createWidgets() const;
@@ -62,8 +63,7 @@ public:
 private:
   ctkPluginContext* mContext;
   Ur5RobotPtr mUr5Robot;
-
-
+  VisServicesPtr mServices;
 };
 typedef boost::shared_ptr<Ur5GUIExtenderService> Ur5GUIExtenderServicePtr;
 
