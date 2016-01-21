@@ -40,6 +40,7 @@ public:
 
     virtual void setVisible(bool vis);
 
+    void addRobotActors();
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp);
     void calculateTpsSlot();

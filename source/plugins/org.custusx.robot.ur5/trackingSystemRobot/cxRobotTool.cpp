@@ -220,6 +220,32 @@ void RobotTool::initiateActors()
     eeActor->SetMapper(eeMapper);
 }
 
+void RobotTool::addRobotActors()
+{
+    Ur5Kinematics kinematic;
+
+    ViewPtr view = mServices->view()->get3DView();
+
+
+    baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&this->prMb));
+    link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
+    link2Actor->SetPosition(0,0,130);
+    link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
+    link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition))));
+    link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition))));
+    link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition))));
+
+    //std::cout << baseActor->GetCenter()[0] << " " <<  baseActor->GetCenter()[1] << " " <<  baseActor->GetCenter()[2] << std::endl;
+    //std::cout << baseActor->GetPosition()[0] << " " <<  baseActor->GetPosition()[1] << " " <<  baseActor->GetPosition()[2] << std::endl;
+    //std::cout << baseActor->GetOrigin()[0] << " " <<  baseActor->GetOrigin()[1] << " " <<  baseActor->GetOrigin()[2] << std::endl;
+
+    view->getRenderer()->AddActor(link1Actor);
+    view->getRenderer()->AddActor(link2Actor);
+    view->getRenderer()->AddActor(link3Actor);
+    view->getRenderer()->AddActor(link4Actor);
+    view->getRenderer()->AddActor(link5Actor);
+    view->getRenderer()->AddActor(baseActor);
+}
 void RobotTool::set_prMb_calibration()
 {
     prMb = Transform3D::Identity();
