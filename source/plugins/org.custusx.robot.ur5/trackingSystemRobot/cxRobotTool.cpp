@@ -14,11 +14,25 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot):
     mUr5Robot(robot),
     mTimestamp(0)
 {
-    //connect(&mTpsTimer, &QTimer::timeout, this, &RobotTool::calculateTpsSlot);
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
 
     this->createPolyData();
     this->toolVisibleSlot(true);
+}
+
+RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
+    ToolImpl(uid,uid),
+    mPolyData(NULL),
+    mUr5Robot(robot),
+    mServices(services),
+    mTimestamp(0)
+{
+    mTypes = this->determineTypesBasedOnUid(Tool::mUid);
+
+    this->createPolyData();
+    this->toolVisibleSlot(true);
+
+    this->set_prMb_calibration();
 }
 
 RobotTool::~RobotTool()
