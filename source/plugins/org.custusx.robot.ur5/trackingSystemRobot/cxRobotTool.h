@@ -46,6 +46,7 @@ private slots:
 
 private:
     void createPolyData();
+    void set_prMb_calibration();
 
     std::set<Type> mTypes;
 
