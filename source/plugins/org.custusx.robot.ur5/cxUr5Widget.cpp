@@ -59,6 +59,15 @@ Ur5Widget::Ur5Widget(Ur5RobotPtr robot, QWidget* parent) :
     setupUi(this);
 }
 
+Ur5Widget::Ur5Widget(Ur5RobotPtr robot, VisServicesPtr services, QWidget* parent) :
+    QWidget(parent),
+    mUr5Robot(robot),
+    mServices(services)
+{
+    setupUi(this);
+}
+
+
 Ur5Widget::~Ur5Widget()
 {
 }
