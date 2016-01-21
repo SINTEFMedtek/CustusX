@@ -92,31 +92,38 @@ namespace cxtest
 //    std::cout << (J.inverse()*movePose.transpose()) << std::endl;
 //}
 
-TEST_CASE("Ur5Plugin: Compute forward and inverse kinematics", "[manual][plugins][org.custusx.robot.ur5]")
+TEST_CASE("Ur5Plugin: Compute positions using forward kinematics", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
+    double threshold = 0.0001;
+
+    Eigen::RowVectorXd jp1(6);
+    Eigen::Vector3d operationalPosition, deviation;
+
+    operationalPosition << -96.75/1000, -300.99/1000, 400.55/1000; // Sensor values x = -96.75 mm, y = -300.99 mm, z = 400.55 mm
+    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values corresponding to above values
+
+    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
+    deviation = fixture.mUr5Kinematics.T2transl(computedOperationalPositon)-operationalPosition;
+
+    std::cout << Eigen::Affine3d(computedOperationalPositon) << std::endl;
+
+    REQUIRE(deviation(0)<=threshold);
+    REQUIRE(deviation(1)<=threshold);
+    REQUIRE(deviation(2)<=threshold);
+}
+
+TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
 
-    Eigen::RowVectorXd jointPositions(6);
-    jointPositions << 0.7722,-1.7453,1.7070,-1.5739,-1.6277,0.0717;
-
-    Eigen::RowVectorXd jointPos(6);
-    jointPos << 0, -3.14/2, 0, -3.14/2, 0, 0;
-
-    Eigen::RowVectorXd velocityEndEffector(6);
-    velocityEndEffector << 0.1,0.1,0.1,0,0,0;
-
     Eigen::RowVectorXd jp1(6);
-    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // x = -96.75 mm, y = -300.99, z = 400.55
 
+    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values
 
-    //fixture.printMatrix(fixture.mUr5Kinematics.forward(jointPos));
-    Eigen::MatrixXd test = fixture.mUr5Kinematics.forward2(jp1);
-    std::cout << fixture.mUr5Kinematics.T2transl(test) << std::endl;
+    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
 
-    //std::cout << fixture.mUr5Kinematics.T2transl(fixture.mUr5Kinematics.forward(jointPositions));
-    //std::cout << fixture.mUr5Kinematics.jacobian(jointPositions)*velocityEndEffector.transpose() << std::endl;
-    //fixture.printMatrix(fixture.mUr5Kinematics.forward2(jointPos));
-    //fixture.printMatrix(fixture.mUr5Kinematics.jacobian(jointPositions).inverse()*velocityEndEffector);
+    std::cout << fixture.mUr5Kinematics.T2rangles(Eigen::Affine3d(computedOperationalPositon)) << std::endl;
 }
 
 } //cxtest
