@@ -117,6 +117,14 @@ void BronchoscopyNavigationWidget::processCenterlineSlot()
 	Transform3D prMd = rMpr.inverse()*rMd;
 
 	mProjectionCenterlinePtr->processCenterline(centerline, prMd);
+
+	//debug
+	std::cout << "rMd:" << std::endl;
+	std::cout << rMd << std::endl;
+	std::cout << "rMpr:" << std::endl;
+	std::cout << rMpr << std::endl;
+	std::cout << "prMd:" << std::endl;
+	std::cout << prMd << std::endl;
 }
 
 void BronchoscopyNavigationWidget::enableSlot()
@@ -134,7 +142,7 @@ void BronchoscopyNavigationWidget::enableSlot()
     Transform3D rMpr = mPatientModelService->get_rMpr();
     Transform3D prMd = rMpr.inverse()*rMd;
 
-	mProjectionCenterlinePtr->setCenterline(centerline, prMd, mUseAdvancedCenterlineProjection->getValue());
+	mProjectionCenterlinePtr->setCenterline(centerline, prMd, rMpr, mUseAdvancedCenterlineProjection->getValue());
 	if (!mTrackingSystem)
 	{
 		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr));

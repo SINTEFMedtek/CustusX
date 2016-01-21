@@ -29,10 +29,11 @@ BronchoscopePositionProjection::~BronchoscopePositionProjection()
 {
 }
 
-void BronchoscopePositionProjection::setCenterline(vtkPolyDataPtr centerline, Transform3D prMd, bool useAdvancedCenterlineProjection)
+void BronchoscopePositionProjection::setCenterline(vtkPolyDataPtr centerline, Transform3D prMd, Transform3D rMpr, bool useAdvancedCenterlineProjection)
 {
 	mCLpoints = this->getCenterlinePositions(centerline, prMd);
 	mUseAdvancedCenterlineProjection = useAdvancedCenterlineProjection;
+	m_rMpr = rMpr;
 }
 
 void BronchoscopePositionProjection::createMaxDistanceToCenterlineOption(QDomElement root)
@@ -305,8 +306,11 @@ Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Tra
 
 	//prMt.matrix().col(0).head(3) = xVector;
 	//prMt.matrix().col(1).head(3) = yVector;
-	prMt.matrix().col(2).head(3) = viewDirection;
+	Transform3D rMt = m_rMpr * prMt;
 
+	rMt.matrix().col(2).head(3) = viewDirection;
+
+	prMt = m_rMpr.inv() * rMt;
 	//debug
 	std::cout << "Top position: " << branchPositions.col(lookBackIndex) << std::endl;
 	std::cout << "Bottom position: " << branchPositions.col(lookForwardIndex) << std::endl;
