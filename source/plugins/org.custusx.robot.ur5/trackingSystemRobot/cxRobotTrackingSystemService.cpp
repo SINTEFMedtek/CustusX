@@ -35,7 +35,7 @@ RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot, VisSer
     mTimer(0),
     mUr5Robot(robot),
     mServices(services),
-    tps(0.05),
+    tps(0.04),
     isRobotTrackingEnabled(false)
 {
     if(robot == NULL)
@@ -100,6 +100,8 @@ void RobotTrackingSystemService::stopTracking()
     disconnect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
     this->deconfigure();
     this->isRobotTrackingEnabled = false;
+
+    mRobotTool->removeActors();
 }
 
 std::vector<ToolPtr> RobotTrackingSystemService::getTools()
