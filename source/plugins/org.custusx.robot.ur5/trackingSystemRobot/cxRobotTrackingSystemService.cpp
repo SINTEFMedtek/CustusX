@@ -135,7 +135,7 @@ void RobotTrackingSystemService::receiveTransform(QString devicename, Transform3
 {
     if(mTimer==0 || timestamp>mTimer+tps)
     {
-    RobotToolPtr tool = this->getTool(devicename);
+    RobotToolPtr tool = this->getTool(devicename); 
     tool->toolTransformAndTimestampSlot(transform,timestamp);
     tool->tps(1/(timestamp-mTimer));
     mTimer = timestamp;
@@ -181,7 +181,7 @@ RobotToolPtr RobotTrackingSystemService::getTool(QString devicename)
     std::map<QString, RobotToolPtr>::iterator it = mTools.find(devicename);
     if(it == mTools.end())
     {
-        retval = RobotToolPtr(new RobotTool(devicename, mUr5Robot));
+        retval = RobotToolPtr(new RobotTool(devicename, mUr5Robot, mServices));
         mTools[devicename] = retval;
         //todo: will this work?
         emit stateChanged();

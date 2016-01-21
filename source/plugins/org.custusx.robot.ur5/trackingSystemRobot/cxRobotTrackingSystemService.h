@@ -61,6 +61,10 @@ private:
     ToolPtr mReference;
 
     Ur5RobotPtr mUr5Robot;
+    VisServicesPtr mServices;
+
+    RobotToolPtr mRobotTool;
+
     double mTimer;
     double tps;
 };
