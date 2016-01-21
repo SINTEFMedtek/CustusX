@@ -60,6 +60,7 @@ private:
     QTimer mTpsTimer;
     Transform3D m_prMt,m_sMt_calibration;
     Ur5RobotPtr mUr5Robot;
+    VisServicesPtr mServices;
     double mTimestamp;
 
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
