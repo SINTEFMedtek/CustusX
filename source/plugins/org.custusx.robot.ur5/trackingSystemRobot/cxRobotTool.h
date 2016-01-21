@@ -41,6 +41,7 @@ public:
     virtual void setVisible(bool vis);
 
     void addRobotActors();
+
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp);
     void calculateTpsSlot();
@@ -49,6 +50,7 @@ private slots:
 private:
     void createPolyData();
     void initiateActors();
+    void updateActors();
     void set_prMb_calibration();
 
     std::set<Type> mTypes;

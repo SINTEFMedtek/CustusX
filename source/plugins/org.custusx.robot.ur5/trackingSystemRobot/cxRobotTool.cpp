@@ -155,10 +155,6 @@ void RobotTool::createPolyData()
 
 void RobotTool::toolVisibleSlot(bool on)
 {
-//    if (on)
-//        mTpsTimer.start(1000); //calculate tps every 1 seconds
-//    else
-//        mTpsTimer.stop();
 }
 
 void RobotTool::initiateActors()
@@ -246,6 +242,19 @@ void RobotTool::addRobotActors()
     view->getRenderer()->AddActor(link5Actor);
     view->getRenderer()->AddActor(baseActor);
 }
+
+void RobotTool::updateActors()
+{
+    Ur5Kinematics kinematic;
+
+    baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&this->prMb));
+    link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
+    link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
+    link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition))));
+    link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition))));
+    link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition))));
+}
+
 void RobotTool::set_prMb_calibration()
 {
     prMb = Transform3D::Identity();
