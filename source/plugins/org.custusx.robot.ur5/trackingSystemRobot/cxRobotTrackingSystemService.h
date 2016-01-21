@@ -19,6 +19,7 @@ class org_custusx_robot_ur5_EXPORT RobotTrackingSystemService : public TrackingS
 
 public:
     RobotTrackingSystemService(Ur5RobotPtr robot);
+    RobotTrackingSystemService(Ur5RobotPtr robot, VisServicesPtr services);
     virtual ~RobotTrackingSystemService();
 
     virtual QString getUid() const {return "org.custusx.robot.ur5";}
