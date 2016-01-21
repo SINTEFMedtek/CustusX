@@ -19,6 +19,7 @@ class org_custusx_robot_ur5_EXPORT RobotTool: public ToolImpl
 
 public:
     RobotTool(QString uid, Ur5RobotPtr robot);
+    RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services);
     virtual ~RobotTool();
 
     virtual std::set<Type> getTypes() const;
