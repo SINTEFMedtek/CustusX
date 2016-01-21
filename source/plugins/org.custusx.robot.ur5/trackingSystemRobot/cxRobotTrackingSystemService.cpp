@@ -20,13 +20,31 @@ RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot) :
     mState(Tool::tsNONE),
     mTimer(0),
     mUr5Robot(robot),
-    tps(0.1)
+    tps(0.05),
+    isRobotTrackingEnabled(false)
 {
     if(robot == NULL)
         return;
 
     connect(mUr5Robot.get(), &Ur5Robot::startTracking, this, &RobotTrackingSystemService::startTracking);
     connect(mUr5Robot.get(), &Ur5Robot::stopTracking, this, &RobotTrackingSystemService::stopTracking);
+}
+
+RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot, VisServicesPtr services) :
+    mState(Tool::tsNONE),
+    mTimer(0),
+    mUr5Robot(robot),
+    mServices(services),
+    tps(0.05),
+    isRobotTrackingEnabled(false)
+{
+    if(robot == NULL)
+        return;
+
+    connect(mUr5Robot.get(), &Ur5Robot::startTracking, this, &RobotTrackingSystemService::startTracking);
+    connect(mUr5Robot.get(), &Ur5Robot::stopTracking, this, &RobotTrackingSystemService::stopTracking);
+
+    this->getTool("RobotTracker"); // Må fjærnes etterhvert
 }
 
 RobotTrackingSystemService::~RobotTrackingSystemService()
