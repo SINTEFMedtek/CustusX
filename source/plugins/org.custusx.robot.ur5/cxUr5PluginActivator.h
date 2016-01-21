@@ -42,6 +42,7 @@ namespace cx
 
 typedef boost::shared_ptr<class Ur5GUIExtenderService> Ur5GUIExtenderServicePtr;
 typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * Activator for the UR5 plugin
@@ -68,6 +69,7 @@ public:
 private:
     RegisteredServicePtr mRegistrationGui;
     RegisteredServicePtr mRegistrationTracking;
+    VisServicesPtr mServices;
 
     Ur5RobotPtr mUr5Robot;
 };
