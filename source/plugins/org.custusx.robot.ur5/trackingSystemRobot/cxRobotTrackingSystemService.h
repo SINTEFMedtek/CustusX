@@ -67,6 +67,7 @@ private:
 
     double mTimer;
     double tps;
+    bool isRobotTrackingEnabled;
 };
 
 } /* namespace cx */
