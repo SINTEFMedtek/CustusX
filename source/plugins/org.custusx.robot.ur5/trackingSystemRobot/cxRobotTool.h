@@ -12,6 +12,8 @@ namespace cx
 {
 typedef boost::shared_ptr<class RobotTool> RobotToolPtr;
 
+#define PI M_PI
+
 class org_custusx_robot_ur5_EXPORT RobotTool: public ToolImpl
 {
     friend class RobotTrackingSystemService;
@@ -41,6 +43,7 @@ public:
     virtual void setVisible(bool vis);
 
     void addRobotActors();
+    void removeActors();
 
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp);
