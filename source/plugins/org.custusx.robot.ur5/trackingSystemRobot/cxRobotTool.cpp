@@ -272,7 +272,9 @@ void RobotTool::updateActors()
     baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&this->prMb));
     link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
     link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition))));
+    link2Actor->SetOrientation(0,0,mUr5Robot->getCurrentState().jointPosition(1)*180/M_PI+90);
     link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition))));
+    link3Actor->SetOrientation(0,0,mUr5Robot->getCurrentState().jointPosition(2)*180/M_PI);
     link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition))));
     link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition))));
 }
