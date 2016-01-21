@@ -17,6 +17,11 @@ Ur5Robot::Ur5Robot():
     connect(this,&Ur5Robot::startLogging,this,&Ur5Robot::startLoggingSlot);
     connect(this,&Ur5Robot::stopLogging,this,&Ur5Robot::stopLoggingSlot);
     connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
+
+    this->mCurrentState.jointPosition << 0,-1.57075,0,-1.57075,0,0;
+    this->mCurrentState.Tbe = mKinematics.forward(mCurrentState.jointPosition);
+
+    emit(stateUpdated());
 }
 
 Ur5Robot::~Ur5Robot()
@@ -88,22 +93,18 @@ void Ur5Robot::updateCurrentState()
     Ur5State currentState;
 
     currentState.timeSinceStart=mRTMonitor.getCurrentState().timeSinceStart;
-    //currentState.force=mRTMonitor.getCurrentState().force;
-    //currentState.torque=mRTMonitor.getCurrentState().torque;
     currentState.jointPosition=mRTMonitor.getCurrentState().jointPosition;
     currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;
-    //currentState.tcpAngles=mRTMonitor.getCurrentState().tcpAngles;
-    //currentState.tcpAxis=mRTMonitor.getCurrentState().tcpAxis;
-
-    currentState.cartAngles=mSecMonitor.getCurrentState().cartAngles;
-    currentState.Tbe = mKinematics.forward2(currentState.jointPosition);
+    currentState.Tbe = mKinematics.forward(currentState.jointPosition);
     currentState.cartAxis= mKinematics.T2transl(currentState.Tbe);
-    currentState.baseMee = mSecMonitor.getCurrentState().baseMee;
+    currentState.cartAngles = mKinematics.T2rangles(currentState.Tbe);
     currentState.jacobian = mKinematics.jacobian(currentState.jointPosition);
     currentState.opVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
 
+    Transform3D trackingMatrix = Transform3D(currentState.Tbe);
+    trackingMatrix.translation() = trackingMatrix.translation()*1000;
 
-    emit transform("RobotTracker",currentState.baseMee,currentState.timeSinceStart);
+    emit transform("RobotTracker",trackingMatrix,currentState.timeSinceStart);
 
     this->setCurrentState(currentState);
     emit(stateUpdated());
@@ -240,7 +241,6 @@ void Ur5Robot::move(Ur5MovementInfo movementInfo)
     if(movementInfo.typeOfMovement=="speedj")
         sendMessage(mMessageEncoder.speedj(movementInfo));
 }
-
 
 void Ur5Robot::addToMoveQueue(Eigen::RowVectorXd target)
 {
