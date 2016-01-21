@@ -38,12 +38,12 @@ public:
     Transform3D T05(Eigen::RowVectorXd jointConfiguration);
 
 private:
-    double d1 = 0.089159;
-    double a2 = -0.42500;
-    double a3 = -0.39225;
-    double d4 = 0.10915;
-    double d5 = 0.09465;
-    double d6 = 0.0823;
+    static const double d1 = 0.089159;
+    static const double a2 = -0.42500;
+    static const double a3 = -0.39225;
+    static const double d4 = 0.10915;
+    static const double d5 = 0.09465;
+    static const double d6 = 0.0823;
 };
 
 } // cx
