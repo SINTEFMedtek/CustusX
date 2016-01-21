@@ -65,6 +65,7 @@ private:
 
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
     QString mGraphicsFolderName = QString("C:\\robotSTL/");
+    Transform3D prMb;
 };
 
 } /* namespace cx */
