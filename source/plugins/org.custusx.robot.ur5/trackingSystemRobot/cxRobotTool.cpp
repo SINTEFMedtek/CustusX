@@ -150,7 +150,27 @@ void RobotTool::calculateTpsSlot()
 
 void RobotTool::createPolyData()
 {
-    mPolyData = Tool::createDefaultPolyDataCone();
+    Ur5State currentState;
+    currentState=mUr5Robot->getCurrentState();
+    currentState.Tbe.translation() = currentState.Tbe.translation()*1000;
+
+    QDir dir;
+    if (!this->mGraphicsFolderName.isEmpty()
+                    && dir.exists(this->mGraphicsFolderName))
+    {
+        this->initiateActors();
+
+        vtkSTLReaderPtr eeSTL = vtkSTLReaderPtr::New();
+
+        eeSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "ee.stl")));
+        eeSTL->Update();
+
+        mPolyData = eeSTL->GetOutput();
+    }
+    else
+    {
+        mPolyData = Tool::createDefaultPolyDataCone();
+    }
 }
 
 void RobotTool::toolVisibleSlot(bool on)
