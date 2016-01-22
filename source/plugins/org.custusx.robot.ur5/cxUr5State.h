@@ -35,6 +35,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
     Eigen::RowVectorXd opVelocity;
 
     Transform3D baseMee;
+    Eigen::RowVectorXd operationalVelocity;
 
     Eigen::MatrixXd jacobian;
     Transform3D bMee;
