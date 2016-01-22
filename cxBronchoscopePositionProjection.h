@@ -20,11 +20,11 @@ public:
 	BronchoscopePositionProjection();
     BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D prMd);
 	virtual ~BronchoscopePositionProjection();
-	void setCenterline(vtkPolyDataPtr centerline, Transform3D prMd, Transform3D rMpr, bool useAdvancedCenterlineProjection);
+	void setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection);
 	void createMaxDistanceToCenterlineOption(QDomElement root);
     DoublePropertyPtr getMaxDistanceToCenterlineOption();
-    Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd);
-	void processCenterline(vtkPolyDataPtr centerline, Transform3D prMd);
+	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd);
+	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, Transform3D rMpr);
 	Transform3D findClosestPoint(Transform3D prMt, double maxDistance);
 	Transform3D findClosestPointInBranches(Transform3D prMt, double maxDistance);
 	Transform3D findClosestPointInSearchPositions(Transform3D prMt, double maxDistance);

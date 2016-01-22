@@ -29,11 +29,9 @@ BronchoscopePositionProjection::~BronchoscopePositionProjection()
 {
 }
 
-void BronchoscopePositionProjection::setCenterline(vtkPolyDataPtr centerline, Transform3D prMd, Transform3D rMpr, bool useAdvancedCenterlineProjection)
+void BronchoscopePositionProjection::setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection)
 {
-	mCLpoints = this->getCenterlinePositions(centerline, prMd);
 	mUseAdvancedCenterlineProjection = useAdvancedCenterlineProjection;
-	m_rMpr = rMpr;
 }
 
 void BronchoscopePositionProjection::createMaxDistanceToCenterlineOption(QDomElement root)
@@ -50,7 +48,7 @@ DoublePropertyPtr BronchoscopePositionProjection::getMaxDistanceToCenterlineOpti
 	return mMaxDistanceToCenterline;
 }
 
-Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D prMd)
+Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd)
 {
 
 	int N = centerline->GetNumberOfPoints();
@@ -61,27 +59,42 @@ Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDa
 		centerline->GetPoint(i,p);
 		Eigen::Vector3d position;
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-		CLpoints.block(0 , i , 3 , 1) = prMd.coord(position);
+		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
 		}
 	return CLpoints;
 }
 
-void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline, Transform3D prMd)
+void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, Transform3D rMpr)
 {
+	m_rMpr = rMpr;
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline, prMd);
+	mCLpoints = getCenterlinePositions(centerline, rMd);
 
-	mBranchListPtr->findBranchesInCenterline(CLpoints);
+	mBranchListPtr->findBranchesInCenterline(mCLpoints);
 	//mBranchListPtr->interpolateBranchPositions(10);
 	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
-}
 
+	//debug
+//	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
+//	for (int i = 0; i < branches.size(); i++)
+//	{
+//		Eigen::MatrixXd positions = branches[i]->getPositions();
+//		for (int j = 0; j < positions.cols(); j++)
+//		{
+//			std::cout << positions.col(j)[0] <<  " " <<  positions.col(j)[1] <<  " " <<  positions.col(j)[2] <<  " " << i << std::endl;
+//		}
+//	}
+//	for (int i = 0; i < mCLpoints.cols(); i++){
+//		std::cout << mCLpoints.col(i)[0] <<  " " <<  mCLpoints.col(i)[1] <<  " " <<  mCLpoints.col(i)[2] << std::endl;
+//	}
+
+}
 
 
 Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMt, double maxDistance)

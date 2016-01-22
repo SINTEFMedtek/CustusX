@@ -56,6 +56,8 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
     QWidget(parent),
     mVerticalLayout(new QVBoxLayout(this))
 {
+	mIsCenerlineProcessed = false;
+
     mOptions = profile()->getXmlSettings().descend("bronchoscopynavigationwidget");
 
 	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
@@ -116,8 +118,8 @@ void BronchoscopyNavigationWidget::processCenterlineSlot()
 	Transform3D rMpr = mPatientModelService->get_rMpr();
 	Transform3D prMd = rMpr.inverse()*rMd;
 
-	mProjectionCenterlinePtr->processCenterline(centerline, prMd);
-
+	mProjectionCenterlinePtr->processCenterline(centerline, rMd, rMpr);
+	mIsCenerlineProcessed = true;
 	//debug
 	std::cout << "rMd:" << std::endl;
 	std::cout << rMd << std::endl;
@@ -132,17 +134,17 @@ void BronchoscopyNavigationWidget::enableSlot()
 	std::cout << "BronchoscopyNavigation started. Position locked to centerline." << std::endl;
 //	mTool = toolManager()->getDominantTool();
 
-	if(!mSelectMeshWidget->getMesh())
+	if(!mIsCenerlineProcessed)
 	{
-		reportError("No centerline");
+		reportError("Centerline not processed");
 		return;
 	}
-	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
-	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
-    Transform3D rMpr = mPatientModelService->get_rMpr();
-    Transform3D prMd = rMpr.inverse()*rMd;
+//	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
+//	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
+//    Transform3D rMpr = mPatientModelService->get_rMpr();
+//    Transform3D prMd = rMpr.inverse()*rMd;
 
-	mProjectionCenterlinePtr->setCenterline(centerline, prMd, rMpr, mUseAdvancedCenterlineProjection->getValue());
+	mProjectionCenterlinePtr->setAdvancedCenterlineOption(mUseAdvancedCenterlineProjection->getValue());
 	if (!mTrackingSystem)
 	{
 		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr));
