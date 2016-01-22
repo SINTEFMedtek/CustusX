@@ -117,7 +117,8 @@ void Ur5Connection::updateCurrentState(QByteArray rawData)
 
 bool Ur5Connection::isPotentialPacket(qint64 bytes)
 {
-    return (bytes == 1460 || bytes == 560 || bytes == 812 || bytes == 1624 || bytes ==1254);
+    return (bytes == 812 || bytes == 1624 || bytes == 1460);
+    //return (bytes == 1460 || bytes == 560 || bytes == 812 || bytes == 1624 || bytes ==1254); // RTPort: 812, 1624 & SecPort: 560, 1254
 }
 
 Ur5State Ur5Connection::getCurrentState()
