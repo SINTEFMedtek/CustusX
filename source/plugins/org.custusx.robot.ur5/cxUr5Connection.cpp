@@ -115,13 +115,6 @@ void Ur5Connection::updateCurrentState(QByteArray rawData)
     }
 }
 
-void Ur5Connection::clearCurrentTCP()
-{
-    Ur5State clearState(0,0,0,0,0,0);
-    sendMessage(mMessageEncoder.set_tcp(clearState));
-    waitForUpdate();
-}
-
 bool Ur5Connection::isPotentialPacket(qint64 bytes)
 {
     return (bytes == 1460 || bytes == 560 || bytes == 812 || bytes == 1624 || bytes ==1254);
