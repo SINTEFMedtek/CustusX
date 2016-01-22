@@ -48,7 +48,7 @@ std::vector<GUIExtenderService::CategorizedWidget> Ur5GUIExtenderService::create
 {
 	std::vector<CategorizedWidget> retval;
 
-    retval.push_back(GUIExtenderService::CategorizedWidget(new Ur5Widget(mUr5Robot), "Utility"));
+    retval.push_back(GUIExtenderService::CategorizedWidget(new Ur5Widget(mUr5Robot, mServices), "Utility"));
 
 	return retval;
 }
