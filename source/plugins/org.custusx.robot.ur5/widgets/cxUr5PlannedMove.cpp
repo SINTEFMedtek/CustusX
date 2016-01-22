@@ -166,11 +166,6 @@ void Ur5PlannedMoveTab::openVTKfileSlot()
      mUr5Robot->openVTKfile(vtkLineEdit->text());
 }
 
-void Ur5PlannedMoveTab::goToOrigoButtonSlot()
-{
-    mUr5Robot->move("movej",Ur5State(0,0,0,0,0,0),accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble());
-}
-
 void Ur5PlannedMoveTab::startLoggingSlot()
 {
     mUr5Robot->startLogging();

@@ -24,7 +24,6 @@ public:
 private slots:
     void runVTKfileSlot();
     void openVTKfileSlot();
-    void goToOrigoButtonSlot();
     void blendRadiusChangedSlot();
     void sendMessageSlot();
     void runVelocityVTKSlot();
