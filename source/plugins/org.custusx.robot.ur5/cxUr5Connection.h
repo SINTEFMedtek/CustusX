@@ -85,8 +85,6 @@ signals:
     void stateChanged();
 
 private:
-    void clearCurrentTCP();
-
     bool waitForUpdate();
     bool isPotentialPacket(qint64 bytes);
 
