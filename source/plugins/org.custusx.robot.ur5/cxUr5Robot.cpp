@@ -9,7 +9,8 @@ Ur5Robot::Ur5Robot():
     velocityMoveInProgress(false),
     mBlendRadius(0.001),
     rtPort(30003),
-    secPort(30002)
+    secPort(30002),
+    motionSpace(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);

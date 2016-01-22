@@ -113,6 +113,7 @@ private:
 
     double mBlendRadius;
 
+    Transform3D motionSpace;
     Ur5Kinematics mKinematics;
 };
 
