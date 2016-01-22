@@ -10,6 +10,15 @@
 
 namespace cx
 {
+/**
+ * Robotobject umbrella class
+ *
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \author Andreas Østvik
+ *
+ */
+
 typedef boost::shared_ptr<class Ur5Robot> Ur5RobotPtr;
 
 class org_custusx_robot_ur5_EXPORT Ur5Robot : public QObject
