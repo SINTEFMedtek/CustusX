@@ -137,7 +137,7 @@ void RobotTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp
     mTimestamp = timestamp;// /1000000;
     Transform3D bMe = prMs;
 
-    Transform3D prMt_filtered = mServices->patient()->get_rMpr()*prMb*bMe;//*createTransformRotateX(3.14);
+    Transform3D prMt_filtered = prMb*bMe;//*createTransformRotateX(3.14);
 
     (*mPositionHistory)[mTimestamp] = bMe; // store original in history
     m_prMt = prMt_filtered;
@@ -248,25 +248,26 @@ void RobotTool::addRobotActors()
 
     ViewPtr view = mServices->view()->get3DView();
 
+    Transform3D rMb = mServices->patient()->get_rMpr()*this->prMb;
+    Transform3D rMl1 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl2 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl3 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl4 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl5 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition);
+
+
     baseActor->SetPosition(0,-1,8);
-    baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&this->prMb));
+    baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMb)));
     link1Actor->SetPosition(0,-4,0);
-
-    Transform3D prMl1 = this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl2 = this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl3 = this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl4 = this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl5 = this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition);
-
-    link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl1)));
+    link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl1)));
     link2Actor->SetPosition(0,-4,134);
-    link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl2)));
+    link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl2)));
     link3Actor->SetPosition(4,0,0);
-    link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl3)));
+    link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl3)));
     link4Actor->SetPosition(0,0,-4);
-    link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl4)));
+    link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl4)));
     link5Actor->SetPosition(0,4,0);
-    link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl5)));
+    link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl5)));
 
     view->getRenderer()->AddActor(link1Actor);
     view->getRenderer()->AddActor(link2Actor);
@@ -280,20 +281,21 @@ void RobotTool::updateActors()
 {
     Ur5Kinematics kinematic;
 
-    Transform3D prMl1 = this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl2 = this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl3 = this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl4 = this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition);
-    Transform3D prMl5 = this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMb = mServices->patient()->get_rMpr()*this->prMb;
+    Transform3D rMl1 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl2 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T01(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl3 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T02(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl4 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T04(mUr5Robot->getCurrentState().jointPosition);
+    Transform3D rMl5 = mServices->patient()->get_rMpr()*this->prMb*kinematic.T05(mUr5Robot->getCurrentState().jointPosition);
 
-    baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&this->prMb));
-    link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl1)));
-    link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl2)));
+    baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMb)));
+    link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl1)));
+    link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl2)));
     link2Actor->SetOrientation(0,0,mUr5Robot->getCurrentState().jointPosition(1)*180/M_PI+90);
-    link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl3)));
+    link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl3)));
     link3Actor->SetOrientation(0,0,mUr5Robot->getCurrentState().jointPosition(2)*180/M_PI);
-    link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl4)));
-    link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(prMl5)));
+    link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl4)));
+    link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl5)));
 }
 
 void RobotTool::set_prMb_calibration()
