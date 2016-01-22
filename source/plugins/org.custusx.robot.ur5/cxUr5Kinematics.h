@@ -9,6 +9,15 @@
 
 namespace cx
 {
+/**
+ * Implementation of UR5 Kinematics.
+ *
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \author Andreas Østvik
+ */
+
+
 #define ZERO_THRESH 0.00000001
 #define SIGN(x) ( ( (x) > 0 ) - ( (x) < 0 ) )
 #define PI M_PI

@@ -7,6 +7,15 @@
 
 namespace cx
 {
+/**
+ * Class that handles encoding of UR5 messages.
+ *
+ * \ingroup org_custusx_robot_ur5
+ *
+ * \author Andreas Østvik
+ *
+ */
+
 
 class org_custusx_robot_ur5_EXPORT Ur5MessageEncoder
 {

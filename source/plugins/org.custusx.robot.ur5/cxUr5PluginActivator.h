@@ -49,8 +49,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
  *
  * \ingroup org_custusx_robot_ur5
  *
- * \date 2014-04-15
- * \author Christian Askeland
+ * \author Andreas Østvik
  */
 class Ur5PluginActivator :  public QObject, public ctkPluginActivator
 {

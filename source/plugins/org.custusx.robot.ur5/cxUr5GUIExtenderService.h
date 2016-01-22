@@ -44,12 +44,11 @@ namespace cx
 {
 
 /**
- * Implementation of UR5 service.
+ * Implementation of UR5 GUI service.
  *
  * \ingroup org_custusx_robot_ur5
  *
- * \date 2014-04-01
- * \author Christian Askeland
+ * \author Andreas Østvik
  */
 class org_custusx_robot_ur5_EXPORT Ur5GUIExtenderService : public GUIExtenderService
 {
