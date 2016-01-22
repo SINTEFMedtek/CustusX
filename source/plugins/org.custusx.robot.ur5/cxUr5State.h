@@ -20,21 +20,15 @@ typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
 
 struct org_custusx_robot_ur5_EXPORT Ur5State
 {
-    Ur5State();
-    Ur5State(double x,double y,double z,double rx,double ry,double rz);
-    Ur5State(bool updated);
+    //Ur5State();
+    Ur5State(bool updated = false);
     ~Ur5State();
 
     Vector3D cartAxis,cartAngles;
-    //Vector3D force,torque;
-    //Vector3D tcpAxis,tcpAngles;
 
-    Eigen::RowVectorXd jointPosition;
     Eigen::RowVectorXd jointConfiguration;
     Eigen::RowVectorXd jointVelocity;
-    Eigen::RowVectorXd opVelocity;
 
-    Transform3D baseMee;
     Eigen::RowVectorXd operationalVelocity;
 
     Eigen::MatrixXd jacobian;
