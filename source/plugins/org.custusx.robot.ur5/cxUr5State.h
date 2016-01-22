@@ -37,7 +37,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
     Transform3D baseMee;
 
     Eigen::MatrixXd jacobian;
-    Transform3D Tbe;
+    Transform3D bMee;
 
     double timeSinceStart;
 

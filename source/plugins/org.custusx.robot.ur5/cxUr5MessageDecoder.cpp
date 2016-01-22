@@ -180,8 +180,8 @@ void Ur5MessageDecoder::pushState(QByteArray data,Ur5State &state)
 
 void Ur5MessageDecoder::setTransformationMatrix(Ur5State &state)
 {
-    state.baseMee = Eigen::AngleAxisd(state.cartAngles.norm(),state.cartAngles/state.cartAngles.norm());
-    state.baseMee.translation() = state.cartAxis*1000;
+    state.bMee = Eigen::AngleAxisd(state.cartAngles.norm(),state.cartAngles/state.cartAngles.norm());
+    state.bMee.translation() = state.cartAxis*1000;
 }
 
 QByteArray Ur5MessageDecoder::removeHeader(QByteArray data)

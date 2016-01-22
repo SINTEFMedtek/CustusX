@@ -102,7 +102,7 @@ void Ur5Robot::updateCurrentState()
     currentState.jacobian = mKinematics.jacobian(currentState.jointConfiguration);
     currentState.operationalVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
 
-    Transform3D trackingMatrix = Transform3D(currentState.Tbe);
+    Transform3D trackingMatrix = Transform3D(currentState.bMee);
     trackingMatrix.translation() = trackingMatrix.translation()*1000;
 
     emit transform("RobotTracker",trackingMatrix,currentState.timeSinceStart);
