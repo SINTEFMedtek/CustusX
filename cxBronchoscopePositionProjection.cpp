@@ -301,10 +301,29 @@ Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Tra
 {
 	Eigen::MatrixXd branchPositions = branch->getPositions();
 	int numberOfPositions = branchPositions.cols();
-    int lookBackIndex = std::max(0 , index-20);
-    int lookForwardIndex = std::min(numberOfPositions-1 , index+20);
+	int lookBackIndex; // = std::max(0 , index-20);
+	Vector3D lookBackPosition;
+	if (index >=20){
+		lookBackIndex = index-20;
+		lookBackPosition = branchPositions.col(lookBackIndex);
+	}
+	else if (branch->getParentBranch())
+	{
+		Eigen::MatrixXd parentBranchPositions = branch->getParentBranch()->getPositions();
+		lookBackIndex = parentBranchPositions.cols() - 1 - index - 20;
+		lookBackIndex = std::max(0 , index-20);
+	}
+	else
+	{
+		lookBackIndex = 0;
+		lookBackPosition = branchPositions.col(lookBackIndex);
+	}
 
-	Vector3D viewDirection = (branchPositions.col(lookForwardIndex) - branchPositions.col(lookBackIndex)).normalized();
+
+    int lookForwardIndex = std::min(numberOfPositions-1 , index+20);
+	Vector3D lookForwardPosition = branchPositions.col(lookForwardIndex);
+
+	Vector3D viewDirection = (lookForwardPosition - lookBackPosition).normalized();
 
     prMt.matrix().col(2).head(3) = viewDirection;
 
