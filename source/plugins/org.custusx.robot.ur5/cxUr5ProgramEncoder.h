@@ -17,7 +17,7 @@ namespace cx
  * \ingroup org_custusx_robot_ur5
  *
  * \author Andreas Østvik
- * \date 2015-07-10
+ *
  */
 
 class org_custusx_robot_ur5_EXPORT Ur5ProgramEncoder
