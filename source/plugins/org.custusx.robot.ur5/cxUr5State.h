@@ -30,6 +30,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
     //Vector3D tcpAxis,tcpAngles;
 
     Eigen::RowVectorXd jointPosition;
+    Eigen::RowVectorXd jointConfiguration;
     Eigen::RowVectorXd jointVelocity;
     Eigen::RowVectorXd opVelocity;
 

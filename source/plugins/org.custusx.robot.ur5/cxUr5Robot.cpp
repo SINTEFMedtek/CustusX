@@ -19,8 +19,8 @@ Ur5Robot::Ur5Robot():
     connect(this,&Ur5Robot::stopLogging,this,&Ur5Robot::stopLoggingSlot);
     connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
 
-    this->mCurrentState.jointPosition << 0,-1.57075,0,-1.57075,0,0;
-    this->mCurrentState.Tbe = mKinematics.forward(mCurrentState.jointPosition);
+    this->mCurrentState.jointConfiguration << 0,-1.57075,0,-1.57075,0,0;
+    this->mCurrentState.bMee = mKinematics.forward(mCurrentState.jointConfiguration);
 
     emit(stateUpdated());
 }
@@ -45,8 +45,8 @@ void Ur5Robot::nextMove()
         }
         else
         {
-            mTargetState.jointPosition = mProgramEncoder.jointPositionQueue[0];
-            this->move("movej",mTargetState.jointPosition,moveAcceleration,moveVelocity);
+            mTargetState.jointConfiguration = mProgramEncoder.jointPositionQueue[0];
+            this->move("movej",mTargetState.jointConfiguration,moveAcceleration,moveVelocity);
         }
     }
     else if(moveInProgress && !mProgramEncoder.poseQueue.empty())
@@ -94,13 +94,13 @@ void Ur5Robot::updateCurrentState()
     Ur5State currentState;
 
     currentState.timeSinceStart=mRTMonitor.getCurrentState().timeSinceStart;
-    currentState.jointPosition=mRTMonitor.getCurrentState().jointPosition;
+    currentState.jointConfiguration=mRTMonitor.getCurrentState().jointConfiguration;
     currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;
-    currentState.Tbe = mKinematics.forward(currentState.jointPosition);
-    currentState.cartAxis= mKinematics.T2transl(currentState.Tbe);
-    currentState.cartAngles = mKinematics.T2rangles(currentState.Tbe);
-    currentState.jacobian = mKinematics.jacobian(currentState.jointPosition);
-    currentState.opVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
+    currentState.bMee = mKinematics.forward(currentState.jointConfiguration);
+    currentState.cartAxis= mKinematics.T2transl(currentState.bMee);
+    currentState.cartAngles = mKinematics.T2rangles(currentState.bMee);
+    currentState.jacobian = mKinematics.jacobian(currentState.jointConfiguration);
+    currentState.operationalVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
 
     Transform3D trackingMatrix = Transform3D(currentState.Tbe);
     trackingMatrix.translation() = trackingMatrix.translation()*1000;
@@ -220,7 +220,7 @@ void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, do
 
 void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double t, double rad)
 {
-    mTargetState.jointPosition = targetState;
+    mTargetState.jointConfiguration = targetState;
 
     if(typeOfMovement=="movej")
         sendMessage(mMessageEncoder.movej(targetState,acc,vel,t,rad));
@@ -235,7 +235,7 @@ void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, doub
 
 void Ur5Robot::move(Ur5MovementInfo movementInfo)
 {
-    mTargetState.jointPosition = movementInfo.targetJointConfiguration;
+    mTargetState.jointConfiguration = movementInfo.targetJointConfiguration;
 
     if(movementInfo.typeOfMovement=="movej")
         sendMessage(mMessageEncoder.movej(movementInfo));
@@ -320,7 +320,7 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
 
 bool Ur5Robot::atTargetState()
 {
-    if((mCurrentState.jointPosition-mTargetState.jointPosition).length()<mBlendRadius)
+    if((mCurrentState.jointConfiguration-mTargetState.jointConfiguration).length()<mBlendRadius)
     {
         emit atTarget();
         return true;
@@ -358,7 +358,7 @@ std::vector<QString> Ur5Robot::getProgramQueue()
 
 bool Ur5Robot::isValidWorkspace()
 {
-    return(abs(this->getCurrentState().jointPosition.maxCoeff())<=2*3.15);
+    return(abs(this->getCurrentState().jointConfiguration.maxCoeff())<=2*3.15);
 }
 
 bool Ur5Robot::isValidWorkspace(Eigen::RowVectorXd jointPosition)
@@ -380,7 +380,7 @@ void Ur5Robot::stopLoggingSlot()
 
 void Ur5Robot::dataLogger()
 {
-     CX_LOG_CHANNEL_INFO("jointConfiguration") << mCurrentState.jointPosition;
+     CX_LOG_CHANNEL_INFO("jointConfiguration") << mCurrentState.jointConfiguration;
      CX_LOG_CHANNEL_INFO("jointVelocitites") << mCurrentState.jointVelocity;
      CX_LOG_CHANNEL_INFO("operationalPosition") << mCurrentState.cartAxis;
      CX_LOG_CHANNEL_INFO("operationalVelocity") << mCurrentState.opVelocity;

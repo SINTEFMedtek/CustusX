@@ -106,19 +106,12 @@ void Ur5MiscInformationTab::updatePositionSlot()
     ryLineEdit->setText(QString::number(mUr5Robot->getCurrentState().cartAngles(1),'f',4));
     rzLineEdit->setText(QString::number(mUr5Robot->getCurrentState().cartAngles(2),'f',4));
 
-    jxPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointPosition(0),'f',4));
-    jyPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointPosition(1),'f',4));
-    jzPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointPosition(2),'f',4));
-    jrxLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointPosition(3),'f',4));
-    jryLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointPosition(4),'f',4));
-    jrzLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointPosition(5),'f',4));
-
-    //txPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().tcpAxis(0),'f',2));
-    //tyPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().tcpAxis(1),'f',2));
-    //tzPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().tcpAxis(2),'f',2));
-    //trxLineEdit->setText(QString::number(mUr5Robot->getCurrentState().tcpAngles(0),'f',4));
-    //tryLineEdit->setText(QString::number(mUr5Robot->getCurrentState().tcpAngles(1),'f',4));
-    //trzLineEdit->setText(QString::number(mUr5Robot->getCurrentState().tcpAngles(2),'f',4));
+    jxPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(0),'f',4));
+    jyPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(1),'f',4));
+    jzPosLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(2),'f',4));
+    jrxLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(3),'f',4));
+    jryLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(4),'f',4));
+    jrzLineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(5),'f',4));
 }
 
 } // cx
