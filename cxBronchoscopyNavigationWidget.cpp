@@ -120,29 +120,17 @@ void BronchoscopyNavigationWidget::processCenterlineSlot()
 
 	mProjectionCenterlinePtr->processCenterline(centerline, rMd, rMpr);
 	mIsCenerlineProcessed = true;
-	//debug
-	std::cout << "rMd:" << std::endl;
-	std::cout << rMd << std::endl;
-	std::cout << "rMpr:" << std::endl;
-	std::cout << rMpr << std::endl;
-	std::cout << "prMd:" << std::endl;
-	std::cout << prMd << std::endl;
 }
 
 void BronchoscopyNavigationWidget::enableSlot()
 {
 	std::cout << "BronchoscopyNavigation started. Position locked to centerline." << std::endl;
-//	mTool = toolManager()->getDominantTool();
 
 	if(!mIsCenerlineProcessed)
 	{
 		reportError("Centerline not processed");
 		return;
 	}
-//	vtkPolyDataPtr centerline = mSelectMeshWidget->getMesh()->getVtkPolyData();//input
-//	Transform3D rMd = mSelectMeshWidget->getMesh()->get_rMd();
-//    Transform3D rMpr = mPatientModelService->get_rMpr();
-//    Transform3D prMd = rMpr.inverse()*rMd;
 
 	mProjectionCenterlinePtr->setAdvancedCenterlineOption(mUseAdvancedCenterlineProjection->getValue());
 	if (!mTrackingSystem)
