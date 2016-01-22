@@ -101,7 +101,7 @@ void Ur5InitializeTab::setRobotConnectionLayout(QVBoxLayout *parent)
     mainLayout->addWidget(ipLineEdit, row, 1,1,2);
     mainLayout->addWidget(connectButton,row,3,1,1);
 
-    ipLineEdit->setText("169.254.62.100");
+    ipLineEdit->setText("10.218.140.144");
 
     QIcon icon;
     icon.addFile("/icons/network-idle.ico", QSize(), QIcon::Normal, QIcon::Off);
