@@ -156,7 +156,11 @@ void RobotTool::createPolyData()
     currentState=mUr5Robot->getCurrentState();
     currentState.Tbe.translation() = currentState.Tbe.translation()*1000;
 
-    QDir dir;
+    QDir dir = QDir::current();
+    dir.cdUp();
+    dir.cdUp();
+    mGraphicsFolderName = dir.path()+mGraphicsFolderName;
+
     if (!this->mGraphicsFolderName.isEmpty()
                     && dir.exists(this->mGraphicsFolderName))
     {

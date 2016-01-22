@@ -67,7 +67,7 @@ private:
     double mTimestamp;
 
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
-    QString mGraphicsFolderName = QString("/home/developer/dev/cx/CX/CX/source/plugins/org.custusx.robot.ur5/trackingSystemRobot/robotSTL/");
+    QString mGraphicsFolderName = QString("/CX/source/plugins/org.custusx.robot.ur5/trackingSystemRobot/robotSTL/");
 
     vtkActorPtr eeActor, baseActor, link1Actor, link2Actor, link3Actor, link4Actor, link5Actor;
 
