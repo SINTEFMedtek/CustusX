@@ -383,7 +383,7 @@ void Ur5Robot::dataLogger()
      CX_LOG_CHANNEL_INFO("jointConfiguration") << mCurrentState.jointConfiguration;
      CX_LOG_CHANNEL_INFO("jointVelocitites") << mCurrentState.jointVelocity;
      CX_LOG_CHANNEL_INFO("operationalPosition") << mCurrentState.cartAxis;
-     CX_LOG_CHANNEL_INFO("operationalVelocity") << mCurrentState.opVelocity;
+     CX_LOG_CHANNEL_INFO("operationalVelocity") << mCurrentState.operationalVelocity;
 }
 
 void Ur5Robot::moveToInitialPositionSlot(double acceleration, double velocity)
