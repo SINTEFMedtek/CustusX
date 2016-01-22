@@ -55,7 +55,6 @@ class org_custusx_robot_ur5_EXPORT Ur5Widget : public QWidget
 {
     Q_OBJECT
 public:
-    Ur5Widget(Ur5RobotPtr robot, QWidget* parent = 0);
     Ur5Widget(Ur5RobotPtr robot, VisServicesPtr services, QWidget* parent = 0);
     virtual ~Ur5Widget();
 
