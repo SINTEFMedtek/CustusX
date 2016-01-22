@@ -154,7 +154,7 @@ void RobotTool::createPolyData()
 {
     Ur5State currentState;
     currentState=mUr5Robot->getCurrentState();
-    currentState.Tbe.translation() = currentState.Tbe.translation()*1000;
+    currentState.bMee.translation() = currentState.bMee.translation()*1000;
 
     QDir dir = QDir::current();
     dir.cdUp();
