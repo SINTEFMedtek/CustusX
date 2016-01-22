@@ -44,7 +44,7 @@ Ur5State Ur5MessageDecoder::setRTState(QByteArray data)
     Ur5State state;
 
     state.timeSinceStart = pickDouble(data,0);
-    state.jointPosition = getJointPositionsRT(data);
+    state.jointConfiguration = getJointPositionsRT(data);
     state.jointVelocity = getJointVelocitiesRT(data);
     //state.tcpAxis = getTCPAxisRT(data);
     //state.tcpAngles = getTCPAnglesRT(data);
@@ -208,7 +208,7 @@ void Ur5MessageDecoder::setJointData(QByteArray jointData, Ur5State &state)
 {
     for(int i=0;i<6;i++)
     {
-        state.jointPosition(i) = pickDouble(jointData,i*41);
+        state.jointConfiguration(i) = pickDouble(jointData,i*41);
         state.jointVelocity(i) = pickDouble(jointData,i*41+sizeof(double));
     }
 }

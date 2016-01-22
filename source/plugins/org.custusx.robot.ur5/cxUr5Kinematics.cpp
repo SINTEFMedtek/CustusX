@@ -8,15 +8,16 @@ Transform3D Ur5Kinematics::forward(Eigen::RowVectorXd jointConfiguration)
     Eigen::Matrix4d matrix;
 
     double s1 = sin(jointConfiguration(0)), c1 = cos(jointConfiguration(0));
-    double q234 = jointConfiguration(1), s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
-    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2)); q234 += jointConfiguration(2);
-    q234 += jointConfiguration(3);
+    double s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
+    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2));
     double s4 = sin(jointConfiguration(3)), c4 = cos(jointConfiguration(3));
-    double s23 = sin(jointConfiguration(1)+jointConfiguration(2));
-    double c23 = cos(jointConfiguration(1)+jointConfiguration(2));
     double s5 = sin(jointConfiguration(4)), c5 = cos(jointConfiguration(4));
     double s6 = sin(jointConfiguration(5)), c6 = cos(jointConfiguration(5));
-    double s234 = sin(q234), c234 = cos(q234);
+
+    double s23 = sin(jointConfiguration(1)+jointConfiguration(2));
+    double c23 = cos(jointConfiguration(1)+jointConfiguration(2));
+    double s234 = sin(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+    double c234 = cos(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
 
     matrix << c6*(s1*s5 + c234*c1*c5) - s234*c1*s6,
             - s6*(s1*s5 + c234*c1*c5) - s234*c1*c6,
@@ -239,11 +240,13 @@ Transform3D Ur5Kinematics::T04(Eigen::RowVectorXd jointConfiguration)
     Eigen::Matrix4d matrix;
 
     double s1 = sin(jointConfiguration(0)), c1 = cos(jointConfiguration(0));
-    double q234 = jointConfiguration(1), s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
-    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2)); q234 += jointConfiguration(2);
-    q234 += jointConfiguration(3);
+    double s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
+    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2));
+
     double s23 = sin(jointConfiguration(1)+jointConfiguration(2));
-    double s234 = sin(q234), c234 = cos(q234);
+    double s234 = sin(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+    double c234 = cos(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+
 
     matrix << c234*c1,  s1,     s234*c1,    (d4*s1 + a2*c1*c2 + a3*c1*c2*c3 - a3*c1*s2*s3)*1000,
               c234*s1, -c1,     s234*s1,    (a2*c2*s1 - d4*c1 + a3*c2*c3*s1 - a3*s1*s2*s3)*1000,
@@ -258,13 +261,15 @@ Transform3D Ur5Kinematics::T05(Eigen::RowVectorXd jointConfiguration)
     Eigen::Matrix4d matrix;
 
     double s1 = sin(jointConfiguration(0)), c1 = cos(jointConfiguration(0));
-    double q234 = jointConfiguration(1), s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
-    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2)); q234 += jointConfiguration(2);
-    q234 += jointConfiguration(3);
+    double s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
+    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2));
     double s4 = sin(jointConfiguration(3)), c4 = cos(jointConfiguration(3));
     double s5 = sin(jointConfiguration(4)), c5 = cos(jointConfiguration(4));
+
     double s23 = sin(jointConfiguration(1)+jointConfiguration(2));
-    double s234 = sin(q234), c234 = cos(q234);
+    double s234 = sin(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+    double c234 = cos(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+
 
     matrix << s1*s5 + c234*c1*c5, -s234*c1,   c5*s1 - c234*c1*s5, (d5*(c4*(c1*c2*s3 + c1*c3*s2) - s4*(c1*s2*s3 - c1*c2*c3)) + d4*s1 + a2*c1*c2 + a3*c1*c2*c3 - a3*c1*s2*s3)*1000,
               c234*c5*s1 - c1*s5, -s234*s1, - c1*c5 - c234*s1*s5, (d5*(c4*(c2*s1*s3 + c3*s1*s2) - s4*(s1*s2*s3 - c2*c3*s1)) - d4*c1 + a2*c2*s1 + a3*c2*c3*s1 - a3*s1*s2*s3)*1000,

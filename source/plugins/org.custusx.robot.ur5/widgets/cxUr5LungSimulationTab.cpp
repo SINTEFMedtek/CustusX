@@ -124,7 +124,7 @@ void Ur5LungSimulationTab::setMoveLayout(QVBoxLayout *parent)
 
 void Ur5LungSimulationTab::setStartPosLineEdit()
 {
-    jointStartPosition = mUr5Robot->getCurrentState().jointPosition;
+    jointStartPosition = mUr5Robot->getCurrentState().jointConfiguration;
     QString str("(");
     for(int i = 0; i<2; i++)
         str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(i))+",");
@@ -133,7 +133,7 @@ void Ur5LungSimulationTab::setStartPosLineEdit()
 
 void Ur5LungSimulationTab::setStopPosLineEdit()
 {
-    jointStopPosition = mUr5Robot->getCurrentState().jointPosition;
+    jointStopPosition = mUr5Robot->getCurrentState().jointConfiguration;
     QString str("(");
     for(int i = 0; i<2; i++)
         str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(i))+",");
