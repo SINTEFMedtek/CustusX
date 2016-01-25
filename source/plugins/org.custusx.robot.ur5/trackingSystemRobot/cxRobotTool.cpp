@@ -120,17 +120,15 @@ void RobotTool::setVisible(bool vis)
 }
 
 
-void RobotTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
+void RobotTool::toolTransformAndTimestampSlot(Transform3D bMe, double timestamp)
 {
     mTimestamp = timestamp;// /1000000;
-    Transform3D bMe = prMs;
 
-    Transform3D prMt_filtered = prMb*bMe;//*createTransformRotateX(3.14);
+    m_prMt = this->prMb*bMe*this->eMt;
 
     (*mPositionHistory)[mTimestamp] = bMe; // store original in history
-    m_prMt = prMt_filtered;
-    emit toolTransformAndTimestamp(m_prMt, mTimestamp);
 
+    emit toolTransformAndTimestamp(m_prMt, mTimestamp);
     this->updateActors();
 }
 

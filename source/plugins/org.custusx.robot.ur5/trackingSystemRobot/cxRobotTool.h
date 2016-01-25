@@ -45,7 +45,7 @@ public:
     void removeActors();
 
 private slots:
-    void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp);
+    void toolTransformAndTimestampSlot(Transform3D bMe, double timestamp);
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
 
