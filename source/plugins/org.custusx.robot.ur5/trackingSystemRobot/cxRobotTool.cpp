@@ -188,17 +188,12 @@ void RobotTool::addRobotActors()
     Transform3D rMl4 = this->get_rMb()*Ur5Kinematics::T04(mUr5Robot->getCurrentState().jointConfiguration);
     Transform3D rMl5 = this->get_rMb()*Ur5Kinematics::T05(mUr5Robot->getCurrentState().jointConfiguration);
 
-    baseActor->SetPosition(0,-1,8);
     baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMb)));
-    link1Actor->SetPosition(0,-4,0);
     link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl1)));
     link2Actor->SetPosition(0,0,134);
     link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl2)));
-    link3Actor->SetPosition(4,0,0);
     link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl3)));
-    link4Actor->SetPosition(0,0,-4);
     link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl4)));
-    link5Actor->SetPosition(0,4,0);
     link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl5)));
 
     view->getRenderer()->AddActor(link1Actor);
