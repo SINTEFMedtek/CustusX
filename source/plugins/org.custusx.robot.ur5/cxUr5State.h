@@ -57,7 +57,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     double radius;
     double time;
 
-    enum class movementType
+    enum movementType
     {
         movej,
         movel,
@@ -65,14 +65,14 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
         speedl,
         stopj,
         stopl,
-        undefined
+        undefinedMove
     };
 
-    enum class spaceType
+    enum spaceType
     {
         jointSpace,
         operationalSpace,
-        undefined
+        undefinedSpace
     };
 
     movementType typeOfMovement;

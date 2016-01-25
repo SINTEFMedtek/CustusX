@@ -18,6 +18,9 @@ Ur5ManualMoveTab::Ur5ManualMoveTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
     connectJointButtons();
 
     connect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5ManualMoveTab::updatePositions);
+
+    std::cout << rotNegXButton->autoRepeatDelay() << std::endl;
+    std::cout << rotNegXButton->autoRepeatInterval() << std::endl;
 }
 
 Ur5ManualMoveTab::~Ur5ManualMoveTab()
@@ -66,26 +69,32 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     negYButton = new QPushButton(tr("-y")); // QIcon("/icons/arrow-right.png"),"");
 
     posZButton->setAutoRepeat(true);
+    posZButton->setAutoRepeatInterval(150);
     posZButton->setToolTip("Move in positive Z direction");
     posZButton->setMaximumWidth(32);
 
     negZButton->setAutoRepeat(true);
+    negZButton->setAutoRepeatInterval(150);
     negZButton->setToolTip("Move in negative Z direction");
     negZButton->setMaximumWidth(32);
 
     posXButton->setAutoRepeat(true);
+    posXButton->setAutoRepeatInterval(150);
     posXButton->setToolTip("Move in positive Y direction");
     posXButton->setMaximumWidth(32);
 
     negXButton->setAutoRepeat(true);
+    negXButton->setAutoRepeatInterval(150);
     negXButton->setToolTip("Move in negative Y direction");
     negXButton->setMaximumWidth(32);
 
     posYButton->setAutoRepeat(true);
+    posYButton->setAutoRepeatInterval(150);
     posYButton->setToolTip("Move in positive X direction");
     posYButton->setMaximumWidth(32);
 
     negYButton->setAutoRepeat(true);
+    negYButton->setAutoRepeatInterval(150);
     negYButton->setToolTip("Move in negative X direction");
     negYButton->setMaximumWidth(32);
 
@@ -97,26 +106,32 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     rotNegZButton = new QPushButton(tr("-rz"));
 
     rotPosXButton->setAutoRepeat(true);
+    rotPosXButton->setAutoRepeatInterval(150);
     rotPosXButton->setToolTip("Rotate counter-clockwise around X axis");
     rotPosXButton->setMaximumWidth(32);
 
     rotNegXButton->setAutoRepeat(true);
+    rotNegXButton->setAutoRepeatInterval(150);
     rotNegXButton->setToolTip("Rotate clockwise around X axis");
     rotNegXButton->setMaximumWidth(32);
 
     rotPosYButton->setAutoRepeat(true);
+    rotPosYButton->setAutoRepeatInterval(150);
     rotPosYButton->setToolTip("Rotate counter-clockwise around Y axis");
     rotPosYButton->setMaximumWidth(32);
 
     rotNegYButton->setAutoRepeat(true);
+    rotNegYButton->setAutoRepeatInterval(150);
     rotNegYButton->setToolTip("Rotate clockwise around Y axis");
     rotNegYButton->setMaximumWidth(32);
 
     rotPosZButton->setAutoRepeat(true);
+    rotPosZButton->setAutoRepeatInterval(150);
     rotPosZButton->setToolTip("Rotate counter-clockwise around Z axis");
     rotPosZButton->setMaximumWidth(32);
 
     rotNegZButton->setAutoRepeat(true);
+    rotNegZButton->setAutoRepeatInterval(150);
     rotNegZButton->setToolTip("Rotate clockwise around Z axis");
     rotNegZButton->setMaximumWidth(32);
 
@@ -412,7 +427,7 @@ void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 {
     Ur5State velocity;
     velocity.jointVelocity(angle+3)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
+    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::posZButtonPressed()

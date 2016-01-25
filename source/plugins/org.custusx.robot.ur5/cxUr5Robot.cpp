@@ -239,9 +239,9 @@ void Ur5Robot::move(Ur5MovementInfo movementInfo)
 {
     mTargetState.jointConfiguration = movementInfo.targetJointConfiguration;
 
-    if(movementInfo.typeOfMovement==Ur5MovementInfo::movementType::movej)
+    if(movementInfo.typeOfMovement==Ur5MovementInfo::movej)
         sendMessage(mMessageEncoder.movej(movementInfo));
-    if(movementInfo.typeOfMovement==Ur5MovementInfo::movementType::speedj)
+    else if(movementInfo.typeOfMovement==Ur5MovementInfo::speedj)
         sendMessage(mMessageEncoder.speedj(movementInfo));
 }
 
