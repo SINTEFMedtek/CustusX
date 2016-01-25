@@ -38,8 +38,8 @@ public:
     static Transform3D T04(Eigen::RowVectorXd jointConfiguration);
     static Transform3D T05(Eigen::RowVectorXd jointConfiguration);
 
-    Vector3D T2transl(Transform3D T);
-    Vector3D T2rangles(Transform3D T);
+    static Vector3D T2transl(Transform3D T);
+    static Vector3D T2rangles(Transform3D T);
 
 
 private:
