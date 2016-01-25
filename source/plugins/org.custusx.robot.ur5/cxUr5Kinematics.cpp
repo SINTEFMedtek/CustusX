@@ -165,14 +165,6 @@ Transform3D Ur5Kinematics::poseToMatrix(Eigen::RowVectorXd poseConfiguration)
     return matrix;
 }
 
-Vector3D Ur5Kinematics::T2transl(Eigen::MatrixXd T)
-{
-    Vector3D points;
-
-    points << T(0,3), T(1,3), T(2,3);
-    return points;
-}
-
 Vector3D Ur5Kinematics::T2transl(Transform3D T)
 {
     Vector3D points;
