@@ -252,6 +252,11 @@ void RobotTool::removeActors()
     view->getRenderer()->RemoveActor(baseActor);
 }
 
+Transform3D RobotTool::get_rMb()
+{
+    return (mServices->patient()->get_rMpr()*this->prMb);
+}
+
 vtkActorPtr RobotTool::vtkSourceToActor(QString filename)
 {
     vtkSTLReaderPtr source = vtkSTLReaderPtr::New();
