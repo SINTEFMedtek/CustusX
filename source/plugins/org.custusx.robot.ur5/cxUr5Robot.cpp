@@ -20,7 +20,7 @@ Ur5Robot::Ur5Robot():
     connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
 
     this->mCurrentState.jointConfiguration << 0,-1.57075,0,-1.57075,0,0;
-    this->mCurrentState.bMee = mKinematics.forward(mCurrentState.jointConfiguration);
+    this->mCurrentState.bMee = Ur5Kinematics::forward(mCurrentState.jointConfiguration);
 
     emit(stateUpdated());
 }
@@ -95,11 +95,13 @@ void Ur5Robot::updateCurrentState()
 
     currentState.timeSinceStart=mRTMonitor.getCurrentState().timeSinceStart;
     currentState.jointConfiguration=mRTMonitor.getCurrentState().jointConfiguration;
-    currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;
-    currentState.bMee = mKinematics.forward(currentState.jointConfiguration);
-    currentState.cartAxis= mKinematics.T2transl(currentState.bMee);
-    currentState.cartAngles = mKinematics.T2rangles(currentState.bMee);
-    currentState.jacobian = mKinematics.jacobian(currentState.jointConfiguration);
+    currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;    
+
+    currentState.bMee = Ur5Kinematics::forward(currentState.jointConfiguration);
+    currentState.cartAxis= Ur5Kinematics::T2transl(currentState.bMee);
+    currentState.cartAngles = Ur5Kinematics::T2rangles(currentState.bMee);
+    currentState.jacobian = Ur5Kinematics::jacobian(currentState.jointConfiguration);
+
     currentState.operationalVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
 
     Transform3D trackingMatrix = Transform3D(currentState.bMee);
