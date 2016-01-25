@@ -29,6 +29,7 @@ class org_custusx_robot_ur5_EXPORT Ur5Kinematics
 public:
     static Transform3D forward(Eigen::RowVectorXd jointConfiguration);
     static Eigen::MatrixXd jacobian(Eigen::RowVectorXd jointConfiguration);
+    static Eigen::MatrixXd jacobian2(Eigen::RowVectorXd jointConfiguration);
 
     Eigen::RowVectorXd inverseJ(Transform3D desiredPose, Eigen::RowVectorXd guessedJointConfiguration);
 

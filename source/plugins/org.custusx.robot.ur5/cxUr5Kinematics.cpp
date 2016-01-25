@@ -36,7 +36,7 @@ Transform3D Ur5Kinematics::forward(Eigen::RowVectorXd jointConfiguration)
     return Eigen::Affine3d(matrix);
 }
 
-Eigen::MatrixXd Ur5Kinematics::jacobian(Eigen::RowVectorXd jointConfiguration)
+Eigen::MatrixXd Ur5Kinematics::jacobian2(Eigen::RowVectorXd jointConfiguration)
 {
     Eigen::RowVectorXd s(6), c(6);
 
@@ -85,6 +85,66 @@ Eigen::MatrixXd Ur5Kinematics::jacobian(Eigen::RowVectorXd jointConfiguration)
                 0,
                 s(3)*(c(1)*s(2) + c(2)*s(1)) - c(3)*(c(1)*c(2) - s(1)*s(2)),
                 -s(4)*(c(3)*(c(1)*s(2) + c(2)*s(1)) + s(3)*(c(1)*c(2) - s(1)*s(2)));
+
+    return matrix;
+}
+
+Eigen::MatrixXd Ur5Kinematics::jacobian(Eigen::RowVectorXd jointConfiguration)
+{
+    double s1 = sin(jointConfiguration(0)), c1 = cos(jointConfiguration(0));
+    double s2 = sin(jointConfiguration(1)), c2 = cos(jointConfiguration(1));
+    double s3 = sin(jointConfiguration(2)), c3 = cos(jointConfiguration(2));
+    double s4 = sin(jointConfiguration(3)), c4 = cos(jointConfiguration(3));
+    double s5 = sin(jointConfiguration(4)), c5 = cos(jointConfiguration(4));
+    double s6 = sin(jointConfiguration(5)), c6 = cos(jointConfiguration(5));
+
+    double s23 = sin(jointConfiguration(1)+jointConfiguration(2));
+    double c23 = cos(jointConfiguration(1)+jointConfiguration(2));
+    double s234 = sin(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+    double c234 = cos(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3));
+    double s2345 = sin(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3)+jointConfiguration(4));
+    double s234m5 = sin(jointConfiguration(1)+jointConfiguration(2)+jointConfiguration(3)-jointConfiguration(4));
+
+
+    Eigen::MatrixXd matrix(6,6);
+
+    matrix << d6*(c1*c5 + c234*s1*s5) + d4*c1 - a2*c2*s1 - d5*s234*s1 - a3*c2*c3*s1 + a3*s1*s2*s3,
+              -c1*(d5*(s23*s4 - c23*c4) + a3*s23 + a2*s2 - d6*s5*(c23*s4 + s23*c4)),
+              c1*(d5*c234 - a3*s23 + d6*s234*s5),
+              c1*(d5*c234 + d6*s234*s5),
+              d6*c1*c2*c5*s3*s4 - d6*s1*s5 + d6*c1*c3*c5*s2*s4 + d6*c1*c4*c5*s2*s3 - d6*c1*c2*c3*c4*c5,
+              0,
+              d6*(c5*s1 - c234*c1*s5) + d4*s1 + a2*c1*c2 + d5*s234*c1 + a3*c1*c2*c3 - a3*c1*s2*s3,
+              -s1*(d5*(s23*s4 - c23*c4) + a3*s23 + a2*s2 - d6*s5*(c23*s4 + s23*c4)),
+              s1*(d5*c234 - a3*s23 + d6*s234*s5),
+              s1*(d5*c234 + d6*s234*s5),
+              d6*c1*s5 - d6*c2*c3*c4*c5*s1 + d6*c2*c5*s1*s3*s4 + d6*c3*c5*s1*s2*s4 + d6*c4*c5*s1*s2*s3,
+              0,
+              0,
+              a3*c23 - (d6*s2345)/2 + a2*c2 + (d6*s234m5)/2 + d5*s234,
+              a3*c23 - (d6*s2345)/2 + (d6*s234m5)/2 + d5*s234,
+              (d6*s234m5)/2 - (d6*s2345)/2 + d5*s234,
+              -d6*(s234m5/2 + s2345/2),
+              0,
+              0,
+              s1,
+              s1,
+              s1,
+              s234*c1,
+              c5*s1 - c234*c1*s5,
+              0,
+              -c1,
+              -c1,
+              -c1,
+              s234*s1,
+              - c1*c5 - c234*s1*s5,
+              1,
+              0,
+              0,
+              0,
+              -c234,
+              -s234*s5;
+
 
     return matrix;
 }
