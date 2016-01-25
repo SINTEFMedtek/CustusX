@@ -50,6 +50,8 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     Eigen::RowVectorXd targetJointVelocity;
     Eigen::RowVectorXd targetSpatialVelocity;
 
+    Transform3D motionReference; // Patient reference with respect to base (bMpr)
+
     double acceleration;
     double velocity;
     double radius;
