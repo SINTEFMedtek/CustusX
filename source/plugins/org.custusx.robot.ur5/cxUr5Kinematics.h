@@ -17,6 +17,12 @@ namespace cx
  * \author Andreas Østvik
  */
 
+#define d1 0.089159
+#define a2 -0.42500
+#define a3 -0.39225
+#define d4 0.10915
+#define d5 0.09465
+#define d6 0.0823
 
 class org_custusx_robot_ur5_EXPORT Ur5Kinematics
 {
@@ -43,12 +49,6 @@ public:
     Transform3D T05(Eigen::RowVectorXd jointConfiguration);
 
 private:
-    const double d1 = 0.089159;
-    const double a2 = -0.42500;
-    const double a3 = -0.39225;
-    const double d4 = 0.10915;
-    const double d5 = 0.09465;
-    const double d6 = 0.0823;
 };
 
 } // cx
