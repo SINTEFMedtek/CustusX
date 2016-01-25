@@ -29,7 +29,9 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     mPolyData(NULL),
     mUr5Robot(robot),
     mServices(services),
-    mTimestamp(0)
+    mTimestamp(0),
+    eMt(Transform3D::Identity()),
+    prMb(Transform3D::Identity())
 {
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
 
