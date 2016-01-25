@@ -21,7 +21,7 @@ RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot, VisSer
     mTimer(0),
     mUr5Robot(robot),
     mServices(services),
-    tps(0.04),
+    tps(0.05),
     isRobotTrackingEnabled(false)
 {
     if(robot == NULL)
@@ -72,8 +72,6 @@ void RobotTrackingSystemService::startTracking()
     this->internalSetState(Tool::tsTRACKING);
     connect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
     this->isRobotTrackingEnabled = true;
-
-    //mUr5Robot->stateUpdated();
 
     mRobotTool = this->getTool("RobotTracker");
     mRobotTool->addRobotActors();
@@ -133,10 +131,10 @@ void RobotTrackingSystemService::receiveTransform(QString devicename, Transform3
         mRobotTool->tps(0);
         mTimer = timestamp;
     }
-    else //if(timestamp>mTimer+tps)
+    else if(timestamp>mTimer+tps)
     {
         mRobotTool->toolTransformAndTimestampSlot(transform,timestamp);
-        //mRobotTool->tps(1/(timestamp-mTimer));
+        mRobotTool->tps(1/(timestamp-mTimer));
         mTimer = timestamp;
     }
 }

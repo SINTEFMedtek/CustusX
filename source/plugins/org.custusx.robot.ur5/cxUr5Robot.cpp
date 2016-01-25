@@ -13,13 +13,13 @@ Ur5Robot::Ur5Robot():
     motionSpace(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
-    //connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
+    connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(this,&Ur5Robot::atTarget,this,&Ur5Robot::atTargetSlot);
     connect(this,&Ur5Robot::startLogging,this,&Ur5Robot::startLoggingSlot);
     connect(this,&Ur5Robot::stopLogging,this,&Ur5Robot::stopLoggingSlot);
     connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
 
-    this->mCurrentState.jointConfiguration << 0,-1.57075,0,-1.57075,0,0;
+    this->mCurrentState.jointConfiguration << 0,-M_PI/2,0,-M_PI/2,0,0;
     this->mCurrentState.bMee = Ur5Kinematics::forward(mCurrentState.jointConfiguration);
 
     emit(stateUpdated());
@@ -102,7 +102,7 @@ void Ur5Robot::updateCurrentState()
     currentState.cartAngles = Ur5Kinematics::T2rangles(currentState.bMee);
     currentState.jacobian = Ur5Kinematics::jacobian(currentState.jointConfiguration);
 
-    currentState.operationalVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
+    //currentState.operationalVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
 
     Transform3D trackingMatrix = Transform3D(currentState.bMee);
     trackingMatrix.translation() = trackingMatrix.translation()*1000;
@@ -111,7 +111,9 @@ void Ur5Robot::updateCurrentState()
 
     this->setCurrentState(currentState);
     emit(stateUpdated());
-    this->atTargetState();
+
+    if(moveInProgress)
+        this->atTargetState();
 }
 
 Ur5State Ur5Robot::getCurrentState()
@@ -239,10 +241,12 @@ void Ur5Robot::move(Ur5MovementInfo movementInfo)
 {
     mTargetState.jointConfiguration = movementInfo.targetJointConfiguration;
 
-    if(movementInfo.typeOfMovement==Ur5MovementInfo::movej)
+    if(movementInfo.typeOfMovement == Ur5MovementInfo::movej)
         sendMessage(mMessageEncoder.movej(movementInfo));
-    else if(movementInfo.typeOfMovement==Ur5MovementInfo::speedj)
+    else if(movementInfo.typeOfMovement == Ur5MovementInfo::speedj)
         sendMessage(mMessageEncoder.speedj(movementInfo));
+    else if(movementInfo.typeOfMovement == Ur5MovementInfo::speedl)
+        ;
 }
 
 void Ur5Robot::addToMoveQueue(Eigen::RowVectorXd target)
