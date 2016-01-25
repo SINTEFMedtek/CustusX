@@ -230,8 +230,7 @@ void RobotTool::updateActors()
 
 void RobotTool::set_prMb_calibration()
 {
-    prMb = Transform3D::Identity();
-    prMb = createTransformRotateZ(1.57);
+    prMb = createTransformRotateZ(M_PI/2);
     prMb(0,3) = 35;
     prMb(1,3) = 300;
     prMb(2,3) = 0;
