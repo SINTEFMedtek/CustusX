@@ -13,7 +13,7 @@ Ur5Robot::Ur5Robot():
     motionSpace(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
-    connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
+    //connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(this,&Ur5Robot::atTarget,this,&Ur5Robot::atTargetSlot);
     connect(this,&Ur5Robot::startLogging,this,&Ur5Robot::startLoggingSlot);
     connect(this,&Ur5Robot::stopLogging,this,&Ur5Robot::stopLoggingSlot);
