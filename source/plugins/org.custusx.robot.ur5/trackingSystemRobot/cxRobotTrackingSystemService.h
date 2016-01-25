@@ -18,7 +18,6 @@ class org_custusx_robot_ur5_EXPORT RobotTrackingSystemService : public TrackingS
     Q_OBJECT
 
 public:
-    RobotTrackingSystemService(Ur5RobotPtr robot);
     RobotTrackingSystemService(Ur5RobotPtr robot, VisServicesPtr services);
     virtual ~RobotTrackingSystemService();
 

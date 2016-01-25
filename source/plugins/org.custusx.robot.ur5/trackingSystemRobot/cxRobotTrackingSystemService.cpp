@@ -16,20 +16,6 @@ std::vector<ToolPtr> toVector(std::map<QString, RobotToolPtr> map)
     return retval;
 }
 
-RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot) :
-    mState(Tool::tsNONE),
-    mTimer(0),
-    mUr5Robot(robot),
-    tps(0.05),
-    isRobotTrackingEnabled(false)
-{
-    if(robot == NULL)
-        return;
-
-    connect(mUr5Robot.get(), &Ur5Robot::startTracking, this, &RobotTrackingSystemService::startTracking);
-    connect(mUr5Robot.get(), &Ur5Robot::stopTracking, this, &RobotTrackingSystemService::stopTracking);
-}
-
 RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot, VisServicesPtr services) :
     mState(Tool::tsNONE),
     mTimer(0),
@@ -43,8 +29,6 @@ RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot, VisSer
 
     connect(mUr5Robot.get(), &Ur5Robot::startTracking, this, &RobotTrackingSystemService::startTracking);
     connect(mUr5Robot.get(), &Ur5Robot::stopTracking, this, &RobotTrackingSystemService::stopTracking);
-
-    this->getTool("RobotTracker"); // Må fjærnes etterhvert
 }
 
 RobotTrackingSystemService::~RobotTrackingSystemService()
@@ -89,7 +73,7 @@ void RobotTrackingSystemService::startTracking()
     connect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
     this->isRobotTrackingEnabled = true;
 
-    mUr5Robot->stateUpdated();
+    //mUr5Robot->stateUpdated();
 
     mRobotTool = this->getTool("RobotTracker");
     mRobotTool->addRobotActors();
