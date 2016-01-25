@@ -68,13 +68,11 @@ private:
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
     QString mGraphicsFolderName = QString("/CX/source/plugins/org.custusx.robot.ur5/trackingSystemRobot/robotSTL/");
 
-    vtkActorPtr eeActor, baseActor, link1Actor, link2Actor, link3Actor, link4Actor, link5Actor;
-
-    Transform3D prMb;
-
+    Transform3D prMb, eMt;
     Transform3D get_rMb();
 
     vtkActorPtr vtkSourceToActor(QString filename);
+    vtkActorPtr eeActor, baseActor, link1Actor, link2Actor, link3Actor, link4Actor, link5Actor;
 };
 
 } /* namespace cx */
