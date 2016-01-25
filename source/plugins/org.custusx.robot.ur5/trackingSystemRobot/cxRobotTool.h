@@ -72,6 +72,7 @@ private:
 
     Transform3D prMb;
 
+    Transform3D get_rMb();
 
     vtkActorPtr vtkSourceToActor(QString filename);
 };
