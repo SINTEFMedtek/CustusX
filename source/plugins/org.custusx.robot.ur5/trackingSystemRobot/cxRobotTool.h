@@ -73,6 +73,7 @@ private:
     Transform3D prMb;
 
 
+    vtkActorPtr vtkSourceToActor(QString filename);
 };
 
 } /* namespace cx */

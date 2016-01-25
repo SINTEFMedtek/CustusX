@@ -302,6 +302,19 @@ void RobotTool::removeActors()
     view->getRenderer()->RemoveActor(baseActor);
 }
 
+vtkActorPtr RobotTool::vtkSourceToActor(QString filename)
+{
+    vtkSTLReaderPtr source = vtkSTLReaderPtr::New();
+    source->SetFileName(cstring_cast(QString(mGraphicsFolderName + filename)));
+
+    vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
+    mapper->SetInputConnection(source->GetOutputPort());
+
+    vtkActorPtr actor = vtkActorPtr::New();
+    actor->SetMapper(mapper);
+
+    return actor;
+}
 
 
 } // namespace cx
