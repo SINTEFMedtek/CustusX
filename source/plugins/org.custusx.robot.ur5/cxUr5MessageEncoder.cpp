@@ -1,4 +1,5 @@
 #include "cxUr5MessageEncoder.h"
+#include "cxUr5State.h"
 
 
 namespace cx
@@ -25,7 +26,7 @@ QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double t)
 
 QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
 {
-    if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::spaceType::jointSpace)
+    if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::jointSpace)
     {
         return QString("movej([%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
@@ -33,7 +34,7 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
                 .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
                 .arg(m.time);
     }
-    else if(m.time > 0 && m.spaceFlag == Ur5MovementInfo::spaceType::jointSpace)
+    else if(m.time > 0 && m.spaceFlag == Ur5MovementInfo::jointSpace)
     {
         return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
@@ -41,7 +42,7 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
                 .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
                 .arg(m.acceleration).arg(m.velocity).arg(m.time).arg(m.radius);
     }
-    if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::spaceType::operationalSpace)
+    if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::operationalSpace)
     {
         return QString("movej(p[%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
@@ -49,7 +50,7 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
                 .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
                 .arg(m.time);
     }
-    else if(m.time > 0 && m.spaceFlag == Ur5MovementInfo::spaceType::operationalSpace)
+    else if(m.time > 0 && m.spaceFlag == Ur5MovementInfo::operationalSpace)
     {
         return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))

@@ -133,10 +133,10 @@ void RobotTrackingSystemService::receiveTransform(QString devicename, Transform3
         mRobotTool->tps(0);
         mTimer = timestamp;
     }
-    else if(timestamp>mTimer+tps)
+    else //if(timestamp>mTimer+tps)
     {
         mRobotTool->toolTransformAndTimestampSlot(transform,timestamp);
-        mRobotTool->tps(1/(timestamp-mTimer));
+        //mRobotTool->tps(1/(timestamp-mTimer));
         mTimer = timestamp;
     }
 }
