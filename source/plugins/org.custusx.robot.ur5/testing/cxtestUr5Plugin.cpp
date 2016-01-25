@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 #include "cxtestUr5TestFixture.h"
+#include <boost/chrono.hpp>
+#include <chrono>
 
 namespace cxtest
 {
@@ -92,26 +94,26 @@ namespace cxtest
 //    std::cout << (J.inverse()*movePose.transpose()) << std::endl;
 //}
 
-TEST_CASE("Ur5Plugin: Compute positions using forward kinematics", "[manual][plugins][org.custusx.robot.ur5]")
-{
-    Ur5TestFixture fixture;
-    double threshold = 0.0001;
+//TEST_CASE("Ur5Plugin: Compute positions using forward kinematics", "[manual][plugins][org.custusx.robot.ur5]")
+//{
+//    Ur5TestFixture fixture;
+//    double threshold = 0.0001;
 
-    Eigen::RowVectorXd jp1(6);
-    Eigen::Vector3d operationalPosition, deviation;
+//    Eigen::RowVectorXd jp1(6);
+//    Eigen::Vector3d operationalPosition, deviation;
 
-    operationalPosition << -96.75/1000, -300.99/1000, 400.55/1000; // Sensor values x = -96.75 mm, y = -300.99 mm, z = 400.55 mm
-    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values corresponding to above values
+//    operationalPosition << -96.75/1000, -300.99/1000, 400.55/1000; // Sensor values x = -96.75 mm, y = -300.99 mm, z = 400.55 mm
+//    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values corresponding to above values
 
-    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
-    deviation = fixture.mUr5Kinematics.T2transl(computedOperationalPositon)-operationalPosition;
+//    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
+//    deviation = fixture.mUr5Kinematics.T2transl(computedOperationalPositon)-operationalPosition;
 
-    std::cout << Eigen::Affine3d(computedOperationalPositon) << std::endl;
+//    //std::cout << Eigen::Affine3d(computedOperationalPositon) << std::endl;
 
-    REQUIRE(deviation(0)<=threshold);
-    REQUIRE(deviation(1)<=threshold);
-    REQUIRE(deviation(2)<=threshold);
-}
+//    REQUIRE(deviation(0)<=threshold);
+//    REQUIRE(deviation(1)<=threshold);
+//    REQUIRE(deviation(2)<=threshold);
+//}
 
 TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
 {
@@ -121,9 +123,22 @@ TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
 
     jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values
 
-    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
+    //jp1 << 0,-M_PI/2,0,-M_PI/2,0,0;
 
-    std::cout << fixture.mUr5Kinematics.T2rangles(Eigen::Affine3d(computedOperationalPositon)) << std::endl;
+    boost::chrono::high_resolution_clock::time_point t1 =
+        boost::chrono::high_resolution_clock::now();
+
+    fixture.mUr5Kinematics.jacobian(jp1)*jp1.transpose();
+
+    boost::chrono::high_resolution_clock::time_point t2 =
+        boost::chrono::high_resolution_clock::now();
+    std::cout << boost::chrono::duration_cast<boost::chrono::nanoseconds>(t2-t1) << "\n";
+
+
+    //cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
+
+    //std::cout << fixture.mUr5Kinematics.T2rangles(Eigen::Affine3d(computedOperationalPositon)) << std::endl;
+
 }
 
 } //cxtest
