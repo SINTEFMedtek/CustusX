@@ -46,10 +46,7 @@ public:
 private:
     Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);
 
-    Vector3D T2transl(Eigen::MatrixXd T);
-
     Eigen::MatrixXd getRotation(Transform3D pose) const;
-
     Eigen::RowVectorXd errorVector(Transform3D desiredPose, Transform3D currentPose) const;
     Eigen::MatrixXd pseudoInverse(Eigen::MatrixXd matrix) const;
 };
