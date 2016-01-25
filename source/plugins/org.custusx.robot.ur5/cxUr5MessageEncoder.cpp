@@ -25,7 +25,7 @@ QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double t)
 
 QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
 {
-    if(m.time != 0 && m.spaceFlag == "jointConfiguration")
+    if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::spaceType::jointSpace)
     {
         return QString("movej([%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
@@ -33,7 +33,7 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
                 .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
                 .arg(m.time);
     }
-    else if(m.time > 0 && m.spaceFlag == "jointConfiguration")
+    else if(m.time > 0 && m.spaceFlag == Ur5MovementInfo::spaceType::jointSpace)
     {
         return QString("movej([%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
@@ -41,7 +41,7 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
                 .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
                 .arg(m.acceleration).arg(m.velocity).arg(m.time).arg(m.radius);
     }
-    if(m.time != 0 && m.spaceFlag == "operationalConfiguration")
+    if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::spaceType::operationalSpace)
     {
         return QString("movej(p[%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
@@ -49,7 +49,7 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
                 .arg(m.targetJointConfiguration(4)).arg(m.targetJointConfiguration(5))
                 .arg(m.time);
     }
-    else if(m.time > 0 && m.spaceFlag == "operationalConfiguration")
+    else if(m.time > 0 && m.spaceFlag == Ur5MovementInfo::spaceType::operationalSpace)
     {
         return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
                 .arg(m.targetJointConfiguration(0)).arg(m.targetJointConfiguration(1))
