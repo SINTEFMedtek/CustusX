@@ -398,14 +398,14 @@ void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
     velocity.jointVelocity(axis)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
+    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::jointButtonPressed(int joint,int sign)
 {
     Ur5State velocity;
     velocity.jointVelocity(joint)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->move("speedj",velocity,accelerationLineEdit->text().toDouble(),0,0,timeLineEdit->text().toDouble());
+    mUr5Robot->move("speedj",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)

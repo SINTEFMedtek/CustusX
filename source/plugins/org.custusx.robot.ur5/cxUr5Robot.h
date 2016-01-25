@@ -36,8 +36,8 @@ public:
     Ur5State getCurrentState();
     Ur5State getPreviousState();
 
-    void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad = 0, double t = 0);
-    void move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double rad = 0, double t = 0);
+    void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double t = 0, double rad = 0);
+    void move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double t = 0, double rad = 0);
     void move(Ur5MovementInfo movementInformation);
 
     void stopMove(QString typeOfStop,double acc);

@@ -204,7 +204,7 @@ void Ur5Robot::sendMessage(QString message)
     mSecMonitor.sendMessage(message);
 }
 
-void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double rad, double t)
+void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double t, double rad)
 {
     mTargetState = targetState;
 
