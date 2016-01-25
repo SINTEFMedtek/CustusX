@@ -27,28 +27,30 @@ namespace cx
 class org_custusx_robot_ur5_EXPORT Ur5Kinematics
 {
 public:
-    Transform3D forward(Eigen::RowVectorXd jointConfiguration);
-    Eigen::MatrixXd jacobian(Eigen::RowVectorXd jointConfiguration);
+    static Transform3D forward(Eigen::RowVectorXd jointConfiguration);
+    static Eigen::MatrixXd jacobian(Eigen::RowVectorXd jointConfiguration);
 
     Eigen::RowVectorXd inverseJ(Transform3D desiredPose, Eigen::RowVectorXd guessedJointConfiguration);
 
-    Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);
+    static Transform3D T01(Eigen::RowVectorXd jointConfiguration);
+    static Transform3D T02(Eigen::RowVectorXd jointConfiguration);
+    static Transform3D T03(Eigen::RowVectorXd jointConfiguration);
+    static Transform3D T04(Eigen::RowVectorXd jointConfiguration);
+    static Transform3D T05(Eigen::RowVectorXd jointConfiguration);
 
-    Vector3D T2transl(Eigen::MatrixXd T);
     Vector3D T2transl(Transform3D T);
     Vector3D T2rangles(Transform3D T);
 
-    Eigen::MatrixXd getRotation(Transform3D pose);
-    Eigen::RowVectorXd errorVector(Transform3D desiredPose, Transform3D currentPose);
-    Eigen::MatrixXd pseudoInverse(Eigen::MatrixXd matrix);
-
-    Transform3D T01(Eigen::RowVectorXd jointConfiguration);
-    Transform3D T02(Eigen::RowVectorXd jointConfiguration);
-    Transform3D T03(Eigen::RowVectorXd jointConfiguration);
-    Transform3D T04(Eigen::RowVectorXd jointConfiguration);
-    Transform3D T05(Eigen::RowVectorXd jointConfiguration);
 
 private:
+    Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);
+
+    Vector3D T2transl(Eigen::MatrixXd T);
+
+    Eigen::MatrixXd getRotation(Transform3D pose) const;
+
+    Eigen::RowVectorXd errorVector(Transform3D desiredPose, Transform3D currentPose) const;
+    Eigen::MatrixXd pseudoInverse(Eigen::MatrixXd matrix) const;
 };
 
 } // cx
