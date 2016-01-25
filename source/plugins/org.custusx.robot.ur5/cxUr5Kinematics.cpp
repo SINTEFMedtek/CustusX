@@ -161,7 +161,7 @@ Eigen::RowVectorXd Ur5Kinematics::inverseJ(Transform3D desiredPose, Eigen::RowVe
     return jointConfiguration;
 }
 
-Eigen::RowVectorXd Ur5Kinematics::errorVector(Transform3D desiredPose, Transform3D currentPose)
+Eigen::RowVectorXd Ur5Kinematics::errorVector(Transform3D desiredPose, Transform3D currentPose) const
 {
     Eigen::RowVectorXd e(6);
 
@@ -178,12 +178,12 @@ Eigen::RowVectorXd Ur5Kinematics::errorVector(Transform3D desiredPose, Transform
     return e;
 }
 
-Eigen::MatrixXd Ur5Kinematics::getRotation(Transform3D pose)
+Eigen::MatrixXd Ur5Kinematics::getRotation(Transform3D pose) const
 {
     return pose.rotation();
 }
 
-Eigen::MatrixXd Ur5Kinematics::pseudoInverse(Eigen::MatrixXd matrix)
+Eigen::MatrixXd Ur5Kinematics::pseudoInverse(Eigen::MatrixXd matrix) const
 {
     return matrix.transpose()*(matrix*matrix.transpose()).inverse();
 }
