@@ -44,9 +44,6 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     Ur5MovementInfo();
     ~Ur5MovementInfo();
 
-    QString typeOfMovement;
-    QString spaceFlag;
-
     Eigen::RowVectorXd targetJointConfiguration;
     Eigen::RowVectorXd targetSpatialConfiguration;
 
@@ -58,7 +55,26 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     double radius;
     double time;
 
-    bool isJointMove();
+    enum class movementType
+    {
+        movej,
+        movel,
+        speedj,
+        speedl,
+        stopj,
+        stopl,
+        undefined
+    };
+
+    enum class spaceType
+    {
+        jointSpace,
+        operationalSpace,
+        undefined
+    };
+
+    movementType typeOfMovement;
+    spaceType spaceFlag;
 };
 
 
