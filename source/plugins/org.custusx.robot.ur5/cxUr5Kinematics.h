@@ -18,10 +18,6 @@ namespace cx
  */
 
 
-#define ZERO_THRESH 0.00000001
-#define SIGN(x) ( ( (x) > 0 ) - ( (x) < 0 ) )
-#define PI M_PI
-
 class org_custusx_robot_ur5_EXPORT Ur5Kinematics
 {
 public:

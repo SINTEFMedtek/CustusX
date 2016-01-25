@@ -24,18 +24,6 @@
 namespace cx
 {
 
-RobotTool::RobotTool(QString uid, Ur5RobotPtr robot):
-    ToolImpl(uid,uid),
-    mPolyData(NULL),
-    mUr5Robot(robot),
-    mTimestamp(0)
-{
-    mTypes = this->determineTypesBasedOnUid(Tool::mUid);
-
-    this->createPolyData();
-    this->toolVisibleSlot(true);
-}
-
 RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     ToolImpl(uid,uid),
     mPolyData(NULL),
@@ -152,17 +140,12 @@ void RobotTool::calculateTpsSlot()
 
 void RobotTool::createPolyData()
 {
-    Ur5State currentState;
-    currentState=mUr5Robot->getCurrentState();
-    currentState.bMee.translation() = currentState.bMee.translation()*1000;
-
     QDir dir = QDir::current();
     dir.cdUp();
     dir.cdUp();
     mGraphicsFolderName = dir.path()+mGraphicsFolderName;
 
-    if (!this->mGraphicsFolderName.isEmpty()
-                    && dir.exists(this->mGraphicsFolderName))
+    if (!this->mGraphicsFolderName.isEmpty() && dir.exists(this->mGraphicsFolderName))
     {
         this->initiateActors();
 
