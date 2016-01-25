@@ -168,61 +168,13 @@ void RobotTool::toolVisibleSlot(bool on)
 
 void RobotTool::initiateActors()
 {
-    vtkSTLReaderPtr baseSTL = vtkSTLReaderPtr::New();
-    baseSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "base.stl")));
-    vtkPolyDataMapperPtr baseMapper = vtkPolyDataMapperPtr::New();
-    baseMapper->SetInputConnection(baseSTL->GetOutputPort());
-
-    baseActor = vtkActorPtr::New();
-    baseActor->SetMapper(baseMapper);
-
-    vtkSTLReaderPtr link1STL = vtkSTLReaderPtr::New();
-    link1STL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "link1.stl")));
-    vtkPolyDataMapperPtr link1Mapper = vtkPolyDataMapperPtr::New();
-    link1Mapper->SetInputConnection(link1STL->GetOutputPort());
-
-    link1Actor = vtkActorPtr::New();
-    link1Actor->SetMapper(link1Mapper);
-
-    vtkSTLReaderPtr link2STL = vtkSTLReaderPtr::New();
-    link2STL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "link2.stl")));
-    vtkPolyDataMapperPtr link2Mapper = vtkPolyDataMapperPtr::New();
-    link2Mapper->SetInputConnection(link2STL->GetOutputPort());
-
-    link2Actor = vtkActorPtr::New();
-    link2Actor->SetMapper(link2Mapper);
-
-    vtkSTLReaderPtr link3STL = vtkSTLReaderPtr::New();
-    link3STL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "link3.stl")));
-    vtkPolyDataMapperPtr link3Mapper = vtkPolyDataMapperPtr::New();
-    link3Mapper->SetInputConnection(link3STL->GetOutputPort());
-
-    link3Actor = vtkActorPtr::New();
-    link3Actor->SetMapper(link3Mapper);
-
-    vtkSTLReaderPtr link4STL = vtkSTLReaderPtr::New();
-    link4STL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "link4.stl")));
-    vtkPolyDataMapperPtr link4Mapper = vtkPolyDataMapperPtr::New();
-    link4Mapper->SetInputConnection(link4STL->GetOutputPort());
-
-    link4Actor = vtkActorPtr::New();
-    link4Actor->SetMapper(link4Mapper);
-
-    vtkSTLReaderPtr link5STL = vtkSTLReaderPtr::New();
-    link5STL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "link5.stl")));
-    vtkPolyDataMapperPtr link5Mapper = vtkPolyDataMapperPtr::New();
-    link5Mapper->SetInputConnection(link5STL->GetOutputPort());
-
-    link5Actor = vtkActorPtr::New();
-    link5Actor->SetMapper(link5Mapper);
-
-    vtkSTLReaderPtr eeSTL = vtkSTLReaderPtr::New();
-    eeSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "ee.stl")));
-    vtkPolyDataMapperPtr eeMapper = vtkPolyDataMapperPtr::New();
-    eeMapper->SetInputConnection(eeSTL->GetOutputPort());
-
-    eeActor = vtkActorPtr::New();
-    eeActor->SetMapper(eeMapper);
+    baseActor = this->vtkSourceToActor("base.stl");
+    link1Actor = this->vtkSourceToActor("link1.stl");
+    link2Actor = this->vtkSourceToActor("link2.stl");
+    link3Actor = this->vtkSourceToActor("link3.stl");
+    link4Actor = this->vtkSourceToActor("link4.stl");
+    link5Actor = this->vtkSourceToActor("link5.stl");
+    eeActor = this->vtkSourceToActor("eenew.stl");
 }
 
 void RobotTool::addRobotActors()
