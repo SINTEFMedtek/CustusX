@@ -30,8 +30,9 @@ public:
     static Transform3D forward(Eigen::RowVectorXd jointConfiguration);
     static Eigen::MatrixXd jacobian(Eigen::RowVectorXd jointConfiguration);
     static Eigen::MatrixXd jacobian2(Eigen::RowVectorXd jointConfiguration);
+    static Eigen::MatrixXd invJacobian(Eigen::RowVectorXd jointConfiguration);
 
-    Eigen::RowVectorXd inverseJ(Transform3D desiredPose, Eigen::RowVectorXd guessedJointConfiguration);
+    Eigen::RowVectorXd inverseJmethod(Transform3D desiredPose, Eigen::RowVectorXd guessedJointConfiguration);
 
     static Transform3D T01(Eigen::RowVectorXd jointConfiguration);
     static Transform3D T02(Eigen::RowVectorXd jointConfiguration);
