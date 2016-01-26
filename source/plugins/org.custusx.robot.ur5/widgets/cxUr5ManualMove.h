@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QGridLayout>
 #include <QScrollBar>
+#include <QButtonGroup>
 
 namespace cx
 {
@@ -79,6 +80,8 @@ private:
     QPushButton *q4PosButton, *q4NegButton;
     QPushButton *q5PosButton, *q5NegButton;
     QPushButton *q6PosButton, *q6NegButton;
+
+    QButtonGroup *linearMotionButtons, *rotationMotionButtons, *jointConfigurationButtons;
 
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit;
 
