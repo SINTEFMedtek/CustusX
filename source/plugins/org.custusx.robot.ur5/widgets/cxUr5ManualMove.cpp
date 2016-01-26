@@ -76,7 +76,8 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     linearMotionButtons->addButton(negYButton);
 
     this->setAutoRepeat(true,linearMotionButtons);
-    this->setAutoRepeatInterval(150,linearMotionButtons);
+    //this->setAutoRepeatInterval(100,linearMotionButtons);
+    //this->setAutoRepeatDelay(100,linearMotionButtons);
     this->setMaximumWidth(32,linearMotionButtons);
 
     posZButton->setToolTip("Move in positive Z direction");
@@ -103,7 +104,7 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
     rotationMotionButtons->addButton(rotNegZButton);
 
     this->setAutoRepeat(true, rotationMotionButtons);
-    this->setAutoRepeatInterval(150, rotationMotionButtons);
+    //this->setAutoRepeatInterval(150, rotationMotionButtons);
     this->setMaximumWidth(32, rotationMotionButtons);
 
     rotPosXButton->setToolTip("Rotate counter-clockwise around X axis");
@@ -343,9 +344,9 @@ void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
-    velocity.jointVelocity(axis) = (sign)*velocityLineEdit->text().toDouble();
-    velocity.jointVelocity = Ur5Kinematics::jacobian(mUr5Robot->getCurrentState().jointConfiguration).inverse()*velocity.jointVelocity;
-    mUr5Robot->move("speedj",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
+    velocity.operationalVelocity(axis) = (sign)*velocityLineEdit->text().toDouble();
+    //velocity.jointVelocity = mUr5Robot->getCurrentState().jacobian.inverse()*velocity.operationalVelocity.transpose();
+    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::jointButtonPressed(int joint,int sign)
@@ -595,6 +596,15 @@ void Ur5ManualMoveTab::setAutoRepeatInterval(int intervalms, QButtonGroup *butto
     }
 }
 
+void Ur5ManualMoveTab::setAutoRepeatDelay(int intervalms, QButtonGroup *buttons)
+{
+    for(int i=0; i<buttons->buttons().size(); i++)
+    {
+        buttons->buttons()[i]->setAutoRepeatDelay(intervalms);
+    }
+}
+
+
 void Ur5ManualMoveTab::setMaximumWidth(int width, QButtonGroup *buttons)
 {
     for(int i=0; i<buttons->buttons().size(); i++)
@@ -602,6 +612,5 @@ void Ur5ManualMoveTab::setMaximumWidth(int width, QButtonGroup *buttons)
         buttons->buttons()[i]->setMaximumWidth(width);
     }
 }
-
 
 } // cx

@@ -226,9 +226,9 @@ void RobotTool::updateActors()
 void RobotTool::set_prMb_calibration()
 {
     prMb = createTransformRotateZ(M_PI/2);
-    prMb(0,3) = 35;
-    prMb(1,3) = 300;
-    prMb(2,3) = 0;
+    prMb(0,3) = 41;
+    prMb(1,3) = 281;
+    prMb(2,3) = -24;
 }
 
 void RobotTool::removeActors()

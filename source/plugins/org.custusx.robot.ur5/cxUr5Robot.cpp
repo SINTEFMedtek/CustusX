@@ -100,7 +100,7 @@ void Ur5Robot::updateCurrentState()
     currentState.bMee = Ur5Kinematics::forward(currentState.jointConfiguration);
     currentState.cartAxis= Ur5Kinematics::T2transl(currentState.bMee);
     currentState.cartAngles = Ur5Kinematics::T2rangles(currentState.bMee);
-    currentState.jacobian = Ur5Kinematics::jacobian(currentState.jointConfiguration);
+    currentState.jacobian = Ur5Kinematics::jacobian2(currentState.jointConfiguration);
 
     //currentState.operationalVelocity = currentState.jacobian*currentState.jointVelocity.transpose();
 

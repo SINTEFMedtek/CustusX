@@ -107,8 +107,8 @@ QString Ur5MessageEncoder::speedj(Ur5MovementInfo m)
 QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)
 {
     return QString("speedl([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
-            .arg(p.jointVelocity(0)).arg(p.jointVelocity(1)).arg(p.jointVelocity(2)).arg(p.jointVelocity(3))
-            .arg(p.jointVelocity(4)).arg(p.jointVelocity(5)).arg(a).arg(t);
+            .arg(p.operationalVelocity(0)).arg(p.operationalVelocity(1)).arg(p.operationalVelocity(2))
+            .arg(p.operationalVelocity(3)).arg(p.operationalVelocity(4)).arg(p.operationalVelocity(5)).arg(a).arg(t);
 }
 
 QString Ur5MessageEncoder::speedl(Eigen::RowVectorXd linearVelocity, double a, double t)

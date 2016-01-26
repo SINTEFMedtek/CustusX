@@ -91,6 +91,7 @@ private:
     
     void setAutoRepeat(bool isRepeated, QButtonGroup *buttons);
     void setAutoRepeatInterval(int intervalms, QButtonGroup *buttons);
+    void setAutoRepeatDelay(int intervalms, QButtonGroup *buttons);
     void setMaximumWidth(int width, QButtonGroup *buttons);
 
 };
