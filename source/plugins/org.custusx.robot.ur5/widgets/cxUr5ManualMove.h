@@ -85,6 +85,10 @@ private:
     void coordButtonPressed(int axis,int sign);
     void rotButtonPressed(int axis,int sign);
     void jointButtonPressed(int joint,int sign);
+    
+    void setAutoRepeat(bool isRepeated, QButtonGroup *buttons);
+    void setAutoRepeatInterval(int intervalms, QButtonGroup *buttons);
+    void setMaximumWidth(int width, QButtonGroup *buttons);
 
 };
 

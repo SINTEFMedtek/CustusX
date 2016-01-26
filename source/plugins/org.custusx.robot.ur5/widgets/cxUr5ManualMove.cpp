@@ -647,5 +647,29 @@ void Ur5ManualMoveTab::q6NegButtonPressed()
     jointButtonPressed(5,-1);
 }
 
+void Ur5ManualMoveTab::setAutoRepeat(bool isRepeated, QButtonGroup *buttons)
+{
+    for(int i=0; i<buttons->buttons().size(); i++)
+    {
+        buttons->buttons()[i]->setAutoRepeat(isRepeated);
+    }
+}
+
+void Ur5ManualMoveTab::setAutoRepeatInterval(int intervalms, QButtonGroup *buttons)
+{
+    for(int i=0; i<buttons->buttons().size(); i++)
+    {
+        buttons->buttons()[i]->setAutoRepeatInterval(intervalms);
+    }
+}
+
+void Ur5ManualMoveTab::setMaximumWidth(int width, QButtonGroup *buttons)
+{
+    for(int i=0; i<buttons->buttons().size(); i++)
+    {
+        buttons->buttons()[i]->setMaximumWidth(width);
+    }
+}
+
 
 } // cx
