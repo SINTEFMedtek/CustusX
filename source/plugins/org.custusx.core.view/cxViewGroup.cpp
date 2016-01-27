@@ -121,14 +121,6 @@ ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(QString viewUid)
 	return ViewWrapperPtr();
 }
 
-void ViewGroup::syncOrientationMode(SyncedValuePtr val)
-{
-	for (unsigned i = 0; i < mViewWrappers.size(); ++i)
-	{
-		mViewWrappers[i]->setOrientationMode(val);
-	}
-}
-
 void ViewGroup::mouseClickInViewGroupSlot()
 {
 	std::vector<ImagePtr> images = mViewGroupData->getImages(DataViewProperties::createFull());

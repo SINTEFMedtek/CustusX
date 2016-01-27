@@ -99,10 +99,6 @@ public:
 	virtual ViewPtr getView() = 0;
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
-
-//	virtual void setZoom2D(SyncedValuePtr value) {}
-	virtual void setOrientationMode(SyncedValuePtr value) {}
-
 	virtual void updateView() = 0;
 
 signals:

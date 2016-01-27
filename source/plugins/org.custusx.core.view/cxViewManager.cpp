@@ -127,7 +127,6 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	connect(mLayoutRepository.get(), &LayoutRepository::layoutChanged, this, &ViewManager::onLayoutRepositoryChanged);
 	this->initializeGlobal2DZoom();
     this->initializeActiveView();
-    this->syncOrientationMode(SyncedValue::create(0));
 
 	// set start layout
 	this->setActiveLayout("LAYOUT_3D_ACS_SINGLE", 0);
@@ -308,14 +307,6 @@ int ViewManager::getActiveViewGroup() const
 	}
 
 	return retval;
-}
-
-void ViewManager::syncOrientationMode(SyncedValuePtr val)
-{
-	for (unsigned i = 0; i < mViewGroups.size(); ++i)
-	{
-		mViewGroups[i]->syncOrientationMode(val);
-	}
 }
 
 void ViewManager::addXml(QDomNode& parentNode)

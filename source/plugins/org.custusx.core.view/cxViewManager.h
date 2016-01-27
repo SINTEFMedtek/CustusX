@@ -192,9 +192,6 @@ protected slots:
 
 protected:
 	ViewManager(VisServicesPtr backend);
-
-	void syncOrientationMode(SyncedValuePtr val);
-//	void storeLayoutData(const LayoutData& data);
 	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
 	void activateView(ViewCollectionWidget* widget, LayoutViewData viewData);

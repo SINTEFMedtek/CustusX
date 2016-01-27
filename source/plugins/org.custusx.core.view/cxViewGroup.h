@@ -85,7 +85,6 @@ public:
 	CameraStylePtr getCameraStyle() { return mCameraStyle; }
 
 	bool contains3DView() const;
-	void syncOrientationMode(SyncedValuePtr val);
 	void initializeActiveView(SyncedValuePtr val);
 
 private slots:
