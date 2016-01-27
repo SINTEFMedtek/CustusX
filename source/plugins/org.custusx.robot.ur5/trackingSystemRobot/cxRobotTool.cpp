@@ -151,7 +151,7 @@ void RobotTool::createPolyData()
 
         vtkSTLReaderPtr eeSTL = vtkSTLReaderPtr::New();
 
-        eeSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "eenew.stl")));
+        eeSTL->SetFileName(cstring_cast(QString(mGraphicsFolderName + "ee.stl")));
         eeSTL->Update();
 
         mPolyData = eeSTL->GetOutput();
@@ -174,7 +174,7 @@ void RobotTool::initiateActors()
     link3Actor = this->vtkSourceToActor("link3.stl");
     link4Actor = this->vtkSourceToActor("link4.stl");
     link5Actor = this->vtkSourceToActor("link5.stl");
-    eeActor = this->vtkSourceToActor("eenew.stl");
+    eeActor = this->vtkSourceToActor("ee.stl");
 }
 
 void RobotTool::addRobotActors()
@@ -190,7 +190,7 @@ void RobotTool::addRobotActors()
 
     baseActor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMb)));
     link1Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl1)));
-    link2Actor->SetPosition(0,0,134);
+    link2Actor->SetPosition(0,0,121);
     link2Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl2)));
     link3Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl3)));
     link4Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl4)));
