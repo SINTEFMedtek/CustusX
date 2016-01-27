@@ -345,7 +345,6 @@ void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
     Ur5State velocity;
     velocity.operationalVelocity(axis) = (sign)*velocityLineEdit->text().toDouble();
-    //velocity.jointVelocity = mUr5Robot->getCurrentState().jacobian.inverse()*velocity.operationalVelocity.transpose();
     mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
