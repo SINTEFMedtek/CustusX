@@ -75,7 +75,7 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     Ur5WidgetLayout->addWidget(tabWidget);
     tabWidget->addTab(new Ur5InitializeTab(mUr5Robot), tr("Initialize"));
     tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot),tr("Manual movement"));
-    tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot),tr("Planned movement"));
+    tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot, mServices),tr("Planned movement"));
     tabWidget->addTab(new Ur5LungSimulationTab(mUr5Robot),tr("Lung simulation"));
     //tabWidget->addTab(new Ur5MiscInformationTab(mUr5Robot),tr("Misc information"));
 
