@@ -44,6 +44,9 @@ public:
     void addRobotActors();
     void removeActors();
 
+    Transform3D get_prMb();
+    Transform3D get_eMt();
+
 private slots:
     void toolTransformAndTimestampSlot(Transform3D bMe, double timestamp);
     void calculateTpsSlot();

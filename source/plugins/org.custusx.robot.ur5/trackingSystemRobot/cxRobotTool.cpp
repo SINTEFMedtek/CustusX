@@ -21,6 +21,9 @@
 #include <vtkRenderer.h>
 #include "cxUr5Kinematics.h"
 
+#include "cxSpaceProvider.h"
+#include "cxLandmark.h"
+
 namespace cx
 {
 
@@ -260,6 +263,16 @@ vtkActorPtr RobotTool::vtkSourceToActor(QString filename)
     actor->SetMapper(mapper);
 
     return actor;
+}
+
+Transform3D RobotTool::get_prMb()
+{
+    return (this->prMb);
+}
+
+Transform3D RobotTool::get_eMt()
+{
+    return (this->eMt);
 }
 
 
