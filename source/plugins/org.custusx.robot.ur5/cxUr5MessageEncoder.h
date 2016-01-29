@@ -25,6 +25,7 @@ public:
     QString movej(Eigen::RowVectorXd pose, double a, double v, double t, double r);
     QString movej(Eigen::RowVectorXd pose, double t);
     QString movej(Ur5MovementInfo movementInformation);
+    QString movejp(Eigen::RowVectorXd pose, double a, double v, double t, double r);
 
     QString movel(Ur5State pose,double a, double v);
 
