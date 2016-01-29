@@ -125,7 +125,6 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 
 	mZoom2D.reset(new Zoom2DHandler());
 	connect(mZoom2D.get(), SIGNAL(zoomChanged()), this, SLOT(viewportChanged()));
-	setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
 	connect(mServices->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 	connect(mView.get(), SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
@@ -160,27 +159,7 @@ void ViewWrapper2D::samplePoint(Vector3D click_vp)
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 {
-	QAction* obliqueAction = new QAction("Oblique", &contextMenu);
-	obliqueAction->setCheckable(true);
-	obliqueAction->setData(qstring_cast(otOBLIQUE));
-	obliqueAction->setChecked(getOrientationType() == otOBLIQUE);
-	connect(obliqueAction, SIGNAL(triggered()), this, SLOT(orientationActionSlot()));
-
-	QAction* ortogonalAction = new QAction("Ortogonal", &contextMenu);
-	ortogonalAction->setCheckable(true);
-	ortogonalAction->setData(qstring_cast(otORTHOGONAL));
-	ortogonalAction->setChecked(getOrientationType() == otORTHOGONAL);
-	connect(ortogonalAction, SIGNAL(triggered()), this, SLOT(orientationActionSlot()));
-
-	//TODO remove actiongroups?
-	mOrientationActionGroup->addAction(obliqueAction);
-	mOrientationActionGroup->addAction(ortogonalAction);
-
-	contextMenu.addSeparator();
-	contextMenu.addAction(obliqueAction);
-	contextMenu.addAction(ortogonalAction);
-	contextMenu.addSeparator();
-
+    contextMenu.addSeparator();
 	mZoom2D->addActionsToMenu(&contextMenu);
 }
 
@@ -202,19 +181,6 @@ void ViewWrapper2D::optionChangedSlot()
 		mPickerGlyphRep->setMesh(options.mPickerGlyph);
 	}
 }
-
-/** Slot for the orientation action.
- *  Set the orientation mode.
- */
-void ViewWrapper2D::orientationActionSlot()
-{
-	QAction* theAction = static_cast<QAction*>(sender());if(!theAction)
-	return;
-
-	ORIENTATION_TYPE type = string2enum<ORIENTATION_TYPE>(theAction->data().toString());
-	mOrientationMode->set(type);
-}
-
 
 void ViewWrapper2D::addReps()
 {
@@ -408,9 +374,6 @@ void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 //	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
-	// do this to force sync global and local type - must think on how we want this to work
-	this->changeOrientationType(getOrientationType());
-
 	bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
 	mToolRep2D->setUseCrosshair(!isOblique);
 //  mToolRep2D->setUseToolLine(!isOblique);
@@ -422,34 +385,6 @@ void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
 {
 	return mSliceProxy->getComputer().getOrientationType();
-}
-
-/** Slot called when the synced orientation has changed.
- *  Update the slice proxy orientation.
- */
-void ViewWrapper2D::orientationModeChanged()
-{
-	ORIENTATION_TYPE type = static_cast<ORIENTATION_TYPE>(mOrientationMode->get().toInt());
-
-    if	(type == this->getOrientationType())
-        return;
-	if (!mSliceProxy)
-        return;
-
-	SliceComputer computer = mSliceProxy->getComputer();
-	computer.switchOrientationMode(type);
-
-	PLANE_TYPE plane = computer.getPlaneType();
-//  mOrientationAnnotationRep->setPlaneType(plane);
-					mPlaneTypeText->setText(0, qstring_cast(plane));
-					mSliceProxy->setComputer(computer);
-				}
-
-	/** Set the synced orientation mode.
-	 */
-void ViewWrapper2D::changeOrientationType(ORIENTATION_TYPE type)
-{
-	mOrientationMode->set(type);
 }
 
 ViewPtr ViewWrapper2D::getView()
@@ -619,17 +554,6 @@ void ViewWrapper2D::activeToolChangedSlot()
 {
 	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 	mSliceProxy->setTool(activeTool);
-}
-
-void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)
-{
-	if (mOrientationMode)
-		disconnect(mOrientationMode.get(), SIGNAL(changed()), this, SLOT(orientationModeChanged()));
-	mOrientationMode = value;
-	if (mOrientationMode)
-		connect(mOrientationMode.get(), SIGNAL(changed()), this, SLOT(orientationModeChanged()));
-
-	orientationModeChanged();
 }
 
 /**Part of the mouse interactor:

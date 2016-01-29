@@ -89,7 +89,6 @@ public:
 	SlicePlane getPlane() const;
 
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset = false);
-	void switchOrientationMode(ORIENTATION_TYPE type);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
 	Transform3D getToolPosition() const;

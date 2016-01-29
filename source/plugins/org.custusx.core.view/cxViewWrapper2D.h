@@ -82,7 +82,6 @@ public:
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewPtr getView();
-	virtual void setOrientationMode(SyncedValuePtr value);
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy);
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
@@ -104,8 +103,6 @@ private slots:
 	void mousePressSlot(int x, int y, Qt::MouseButtons buttons);
 	void mouseMoveSlot(int x, int y, Qt::MouseButtons buttons);
 	void mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
-	void orientationActionSlot();
-	void orientationModeChanged();
 	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
 
@@ -121,7 +118,6 @@ private:
 	void shiftAxisPos(Vector3D delta_vp);
 
 	ORIENTATION_TYPE getOrientationType() const;
-	void changeOrientationType(ORIENTATION_TYPE type);
 
 	virtual void imageAdded(ImagePtr image);
     //virtual void imageRemoved(const QString& uid);
@@ -166,7 +162,6 @@ private:
 	// synchronized data
 	Zoom2DHandlerPtr mZoom2D;
 
-	SyncedValuePtr mOrientationMode;
 	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;

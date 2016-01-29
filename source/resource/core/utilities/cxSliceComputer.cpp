@@ -100,43 +100,6 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 	}
 }
 
-/**Switch an existing plane definition to its dual definition, i.e.
- * Axial<->Radial
- * Coronal<->Any
- * Sagittal<->Dual
- * Use initializeFromPlane() to set connected parameters.
- */
-void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
-{
-	if (type==mOrientType)
-		return; // no change
-
-	PLANE_TYPE newType = mPlaneType;
-
-	if (type==otOBLIQUE) // ACS->ADR
-	{
-		switch (mPlaneType)
-		{
-		case ptSAGITTAL : newType = ptSIDEPLANE; break;
-		case ptCORONAL  : newType = ptANYPLANE; break;
-		case ptAXIAL    : newType = ptRADIALPLANE; break;
-		default: break;
-		}
-	}
-	else if (type==otORTHOGONAL)
-	{
-		switch (mPlaneType)
-		{
-		case ptSIDEPLANE   : newType = ptSAGITTAL; break;
-		case ptANYPLANE    : newType = ptCORONAL; break;
-		case ptRADIALPLANE : newType = ptAXIAL; break;
-		default: break;
-		}
-	}
-
-	initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mClinicalApplication);
-}
-
 void SliceComputer::setClinicalApplication(CLINICAL_VIEW application)
 {
 	mClinicalApplication = application;
