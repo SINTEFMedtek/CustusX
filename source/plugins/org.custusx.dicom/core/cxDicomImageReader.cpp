@@ -73,6 +73,7 @@ ctkDICOMItemPtr DicomImageReader::item() const
 
 double DicomImageReader::getDouble(const DcmTagKey& tag, const unsigned long pos, const OFBool searchIntoSub) const
 {
+//	return this->getDouble(mDataset, tag, pos, searchIntoSub);
 	double retval = 0;
 	OFCondition condition;
 	condition = mDataset->findAndGetFloat64(tag, retval, pos, searchIntoSub);
@@ -83,6 +84,35 @@ double DicomImageReader::getDouble(const DcmTagKey& tag, const unsigned long pos
 	}
 	return retval;
 }
+//double DicomImageReader::getDouble(DcmObject* dcmObject, const DcmTagKey& tag, const unsigned long pos, const OFBool searchIntoSub) const
+//{
+//	DcmStack stack;
+//	dcmObject->search(tag, stack);
+
+//	DcmElement* element = dynamic_cast<DcmElement*>(stack.top());
+
+//		if(!element)
+//		{
+//			QString tagName = this->item()->TagDescription(tag);
+//			this->error(QString("Failed to get DcmAttributeTag with tag %1/%2").arg(tagName).arg(pos));
+//			return 0;
+//		}
+//		else
+//		{
+//			double val;
+//			element->getFloat64(val);
+//		}
+
+//	double retval = 0;
+//	OFCondition condition;
+//	condition = element->getFloat64(retval, pos);
+//	if (!condition.good())
+//	{
+//		QString tagName = this->item()->TagDescription(tag);
+//		this->error(QString("Failed to get tag %1/%2").arg(tagName).arg(pos));
+//	}
+//	return retval;
+//}
 
 DicomImageReader::WindowLevel DicomImageReader::getWindowLevel() const
 {
@@ -138,18 +168,17 @@ Transform3D DicomImageReader::getImageTransformPatient() const
 		pos[i] = this->getDouble(DCM_ImagePositionPatient, i, OFTrue);
 	}
 
-    Vector3D zero_vec(0,0,0);
-    if( similar(e_x,zero_vec) && similar(e_y,zero_vec)) // Zero matrix
-    {
-        report("Set transform matrix to identity");
-        e_x[0]=1;
-        e_y[1]=1;
-    }
+	Vector3D zero_vec(0,0,0);
+	if( similar(e_x,zero_vec) && similar(e_y,zero_vec)) // Zero matrix
+	{
+		report("Set transform matrix to identity");
+		e_x[0]=1;
+		e_y[1]=1;
+	}
 
 	Transform3D retval = cx::createTransformIJC(e_x, e_y, pos);
 	return retval;
 }
-
 ctkDICOMItemPtr DicomImageReader::wrapInCTK(DcmItem* item) const
 {
 	if (!item)
@@ -166,6 +195,8 @@ void DicomImageReader::error(QString message) const
 
 vtkImageDataPtr DicomImageReader::createVtkImageData()
 {
+	//TODO: Use DicomImage::createMonochromeImage() to get a monochrome copy for convenience
+
 	DicomImage dicomImage(mFilename.toLatin1().data()); //, CIF_MayDetachPixelData );
 	const DiPixel *pixels = dicomImage.getInterData();
 	if (!pixels)
@@ -227,10 +258,97 @@ Eigen::Array3d DicomImageReader::getSpacing() const
 	Eigen::Array3d spacing;
 	spacing[0] = this->getDouble(DCM_PixelSpacing, 0, OFTrue);
 	spacing[1] = this->getDouble(DCM_PixelSpacing, 1, OFTrue);
-	spacing[2] = this->getDouble(DCM_SliceThickness, 0, OFTrue);
+
+	double sliceThickness = this->getDouble(DCM_SliceThickness, 0, OFTrue);
+	spacing[2] = sliceThickness;
+
+	if(this->isMultiFrameImage())
+	{
+		double sliceSpacing = this->getSliceSpacing();
+		if(similar(sliceSpacing, 0))
+			CX_LOG_WARNING() << "Cannot get slice spacing. Using slice thickness instead: " << sliceThickness;
+		else
+			spacing[2] = sliceSpacing;
+	}
+
+//	double spacingBetweenSlices = this->getDouble(DCM_SpacingBetweenSlices, 0, OFTrue);//Usually only for MR
+//	std::cout << "DCM_SpacingBetweenSlices: " << spacingBetweenSlices << std::endl;
+
 //	std::cout << "  spacing: " << spacing << std::endl;
 	return spacing;
 }
+
+bool DicomImageReader::isMultiFrameImage() const
+{
+	//For now, just use number of z positions as indicator
+	QVector<double> zPos = this->getZPositions();
+	if(zPos.size() < 2)
+		return false;
+	return true;
+}
+
+double DicomImageReader::getSliceSpacing() const
+{
+	double retval;
+
+	QVector<double> zPos = this->getZPositions();
+	if(zPos.size() < 2)
+		return 0;
+	retval = zPos[1] - zPos[0];
+
+	for(int i = 2; i < zPos.size(); ++i)
+	{
+		double dist = zPos[i] - zPos[i-1];
+		if(!similar(dist, retval))
+			CX_LOG_WARNING() << "Distance between frame: " << i << " and " << i+1 << " is: " << dist << " != " << "dist between frame 0 and 1: " << retval;
+	}
+	if(retval < 0)
+		retval = zPos[0] - zPos[1];
+	return retval;
+}
+
+QVector<double> DicomImageReader::getZPositions() const
+{
+	QVector<double> retval;
+	DcmStack cleanStack;
+	DcmElement* stackElement;
+	OFCondition condition;
+	int i = 0;
+	do
+	{
+		do
+			condition = mDataset->nextObject(cleanStack, OFTrue);
+		while(condition.good() && cleanStack.top()->getTag() != DCM_ImagePositionPatient);
+
+		++i;
+		if(condition.good())
+		{
+			stackElement = dynamic_cast<DcmElement*>(cleanStack.top());
+			double val;
+			condition = stackElement->getFloat64(val, 2);
+			if(condition.bad())
+			{
+				CX_LOG_WARNING() << "Cannot get z pos for frame " << i;
+				return retval;
+			}
+			retval << val;
+//			CX_LOG_DEBUG() << "frame " << i << " z pos: " << val;
+		}
+	}
+	while(condition.good());
+	return retval;
+}
+
+//Transform3D DicomImageReader::getTransform(DcmItem* dcmItem)
+//{
+
+//		e_x[i] = this->getDouble(DCM_ImageOrientationPatient, i, OFTrue);
+//		e_y[i] = this->getDouble(DCM_ImageOrientationPatient, i+3, OFTrue);
+//		pos[i] = this->getDouble(DCM_ImagePositionPatient, i, OFTrue);
+
+
+//	condition = stackElement->findAndGetOFString(DCM_ImagePositionPatient, value, 2, OFTrue);
+//}
 
 Eigen::Array3i DicomImageReader::getDim(const DicomImage& dicomImage) const
 {
