@@ -37,6 +37,8 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
 
     connect(sendMessageButton,&QPushButton::clicked,this,&Ur5PlannedMoveTab::sendMessageSlot);
     connect(moveToInitialPositionButton,SIGNAL(clicked()),this,SLOT(moveToInitialPositionButtonSlot()));
+
+    connect(getActiveLandmarkButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::getActiveLandmarkSlot);
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -157,6 +159,9 @@ void Ur5PlannedMoveTab::setTextEditorWidget(QVBoxLayout *parent)
 
     sendMessageButton = new QPushButton(tr("Send message"));
     textEditLayout->addWidget(sendMessageButton,2,1,1,1);
+
+    getActiveLandmarkButton = new QPushButton(tr("Get point"));
+    textEditLayout->addWidget(getActiveLandmarkButton,2,0,1,1);
 }
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
@@ -194,6 +199,35 @@ void Ur5PlannedMoveTab::clearPoseQueueSlot()
 void Ur5PlannedMoveTab::moveToInitialPositionButtonSlot()
 {
     mUr5Robot->moveToInitialPosition(accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble());
+}
+
+void Ur5PlannedMoveTab::getActiveLandmarkSlot()
+{
+    DataPtr data = mServices->patient()->getData("point1");
+
+    PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
+    //std::cout << pointMetric->getCoordinate() << std::endl;
+    //std::cout << pointMetric->getSpace().toString() << std::endl;
+
+    ToolPtr test1 = mServices->tracking()->getTool("RobotTracker");
+    RobotToolPtr test = boost::dynamic_pointer_cast<RobotTool>(test1);
+
+    Transform3D bMee = mUr5Robot->getCurrentState().bMee;
+    bMee.translation() = bMee.translation()*1000;
+
+    //std::cout << bMee << std::endl;
+    //std::cout << test->get_eMt() << std::endl;
+    //std::cout << test->get_prMb() << std::endl;
+
+    Transform3D eMt = test->get_eMt();
+    eMt(2,3) = 10;
+
+    Vector3D p = (eMt.inverse()*test->get_prMb().inverse()*pointMetric->getCoordinate());
+    Eigen::RowVectorXd point(6);
+    point << p(0), p(1), p(2), 0, 0, 0;
+
+    std::cout << point << std::endl;
+    mUr5Robot->move("movejp",point,0.3,0.1);
 }
 
 } // cx
