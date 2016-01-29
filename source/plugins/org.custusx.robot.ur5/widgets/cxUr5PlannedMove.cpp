@@ -5,16 +5,25 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QApplication>
-#include "cxLogger.h"
 
+#include "cxLogger.h"
+#include "cxVisServices.h"
+#include "cxPatientModelService.h"
+#include "cxSpaceProvider.h"
+#include "cxSessionStorageService.h"
+#include "cxPointMetric.h"
+#include "cxViewService.h"
+#include "cxTrackingService.h"
+#include "trackingSystemRobot/cxRobotTool.h"
 
 
 namespace cx
 {
 
-Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent) :
+Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr services, QWidget *parent) :
     QWidget(parent),
-    mUr5Robot(Ur5Robot)
+    mUr5Robot(Ur5Robot),
+    mServices(services)
 {
     setupUi(this);
 

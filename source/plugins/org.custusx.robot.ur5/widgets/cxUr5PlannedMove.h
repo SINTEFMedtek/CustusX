@@ -17,7 +17,7 @@ class org_custusx_robot_ur5_EXPORT Ur5PlannedMoveTab : public QWidget
 {
     Q_OBJECT
 public:
-    Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, QWidget *parent = 0);
+    Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, VisServicesPtr services, QWidget *parent = 0);
     virtual ~Ur5PlannedMoveTab();
 
 
