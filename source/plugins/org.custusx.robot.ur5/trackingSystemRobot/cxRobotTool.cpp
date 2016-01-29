@@ -42,6 +42,7 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     this->toolVisibleSlot(true);
 
     this->set_prMb_calibration();
+    this->set_eMt_calibration();
 }
 
 RobotTool::~RobotTool()
@@ -129,7 +130,7 @@ void RobotTool::toolTransformAndTimestampSlot(Transform3D bMe, double timestamp)
 {
     mTimestamp = timestamp;// /1000000;
 
-    m_prMt = this->prMb*bMe*this->eMt;
+    m_prMt = this->prMb*bMe;
 
     (*mPositionHistory)[mTimestamp] = bMe; // store original in history
 
@@ -229,9 +230,16 @@ void RobotTool::updateActors()
 void RobotTool::set_prMb_calibration()
 {
     prMb = createTransformRotateZ(M_PI/2);
-    prMb(0,3) = 41;
-    prMb(1,3) = 281;
-    prMb(2,3) = -24;
+    prMb(0,3) = 35;
+    prMb(1,3) = 283;
+    prMb(2,3) = -23;
+}
+
+void RobotTool::set_eMt_calibration()
+{
+    eMt(0,3) = 133;
+    eMt(1,3) = 24;
+    eMt(2,3) = 102;
 }
 
 void RobotTool::removeActors()
