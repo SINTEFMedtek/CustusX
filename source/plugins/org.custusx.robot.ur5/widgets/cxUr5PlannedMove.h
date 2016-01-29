@@ -53,6 +53,7 @@ private:
     void setTextEditorWidget(QVBoxLayout *parent);
 
     QTextEdit *textEditor;
+    VisServicesPtr mServices;
 };
 
 } // cx
