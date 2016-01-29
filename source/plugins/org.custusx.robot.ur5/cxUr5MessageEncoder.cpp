@@ -24,6 +24,12 @@ QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double t)
             .arg(p(0)).arg(p(1)).arg(p(2)).arg(p(3)).arg(p(4)).arg(p(5)).arg(t);
 }
 
+QString Ur5MessageEncoder::movejp(Eigen::RowVectorXd p,double a, double v,double t,double r)
+{
+    return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
+            .arg(p(0)).arg(p(1)).arg(p(2)).arg(p(3)).arg(p(4)).arg(p(5)).arg(a).arg(v).arg(t).arg(r);
+}
+
 QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
 {
     if(m.time != 0 && m.spaceFlag == Ur5MovementInfo::jointSpace)
