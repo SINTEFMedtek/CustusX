@@ -228,6 +228,8 @@ void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, doub
 
     if(typeOfMovement=="movej")
         sendMessage(mMessageEncoder.movej(targetState,acc,vel,t,rad));
+    else if(typeOfMovement=="movejp")
+        sendMessage(mMessageEncoder.movejp(targetState,acc, vel, t, rad));
     else if(typeOfMovement=="speedl")
         sendMessage(mMessageEncoder.speedl(targetState,acc,t));
     else if(typeOfMovement =="speedj")
