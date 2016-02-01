@@ -125,19 +125,23 @@ TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
 
     //jp1 << 0,-M_PI/2,0,-M_PI/2,0,0;
 
-    boost::chrono::high_resolution_clock::time_point t1 =
-        boost::chrono::high_resolution_clock::now();
+//    boost::chrono::high_resolution_clock::time_point t1 =
+//        boost::chrono::high_resolution_clock::now();
 
-    fixture.mUr5Kinematics.jacobian(jp1)*jp1.transpose();
+//    fixture.mUr5Kinematics.jacobian(jp1)*jp1.transpose();
 
-    boost::chrono::high_resolution_clock::time_point t2 =
-        boost::chrono::high_resolution_clock::now();
-    std::cout << boost::chrono::duration_cast<boost::chrono::nanoseconds>(t2-t1) << "\n";
+//    boost::chrono::high_resolution_clock::time_point t2 =
+//        boost::chrono::high_resolution_clock::now();
+//    std::cout << boost::chrono::duration_cast<boost::chrono::nanoseconds>(t2-t1) << "\n";
 
 
     //cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
 
     //std::cout << fixture.mUr5Kinematics.T2rangles(Eigen::Affine3d(computedOperationalPositon)) << std::endl;
+
+    //std::cout << fixture.mUr5Kinematics.T2OperationalConfiguration(fixture.mUr5Kinematics.forward(jp1)) << std::endl;
+
+    std::cout << "Hei" << std::endl;
 
 }
 
