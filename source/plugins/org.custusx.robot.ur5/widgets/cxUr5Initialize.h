@@ -21,6 +21,10 @@ public:
     Ur5InitializeTab(Ur5RobotPtr Ur5Robot,QWidget *parent = 0);
     virtual ~Ur5InitializeTab();
 
+signals:
+    void addApplicationTab(QString typeOfTab);
+    void removeApplicationTab(QString typeOfTab);
+
 private slots:
     void connectButtonSlot();
     void disconnectButtonSlot();
@@ -28,6 +32,9 @@ private slots:
 
     void startTrackingSlot();
     void stopTrackingSlot();
+    void addRobotLinkSlot();
+    void removeRobotLinkSlot();
+
 
 private:
     void setupUi(QWidget *parent);
@@ -37,6 +44,7 @@ private:
     QPushButton *connectButton, *disconnectButton,*shutdownButton;
     QComboBox *presetOrigoComboBox;
     QPushButton *startTrackingButton, *stopTrackingButton;
+    QPushButton *addLinksButton, *removeLinksButton;
 
     void setRobotConnectionLayout(QVBoxLayout *parent);
     void setRobotTrackingLayout(QVBoxLayout *parent);

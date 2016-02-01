@@ -51,6 +51,9 @@ private slots:
 
     void receiveTransform(QString devicename, Transform3D transform, double timestamp);
 
+    void addLinksSlot();
+    void removeLinksSlot();
+
 private:
     void internalSetState(Tool::State state);
     RobotToolPtr getTool(QString devicename);

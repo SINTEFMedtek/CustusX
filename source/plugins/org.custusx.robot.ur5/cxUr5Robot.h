@@ -79,6 +79,8 @@ signals:
 
     void startTracking();
     void stopTracking();
+    void addRobotVisualizationLinks();
+    void removeRobotVisualizationLinks();
 
     void shuttingdown();
     void atTarget();

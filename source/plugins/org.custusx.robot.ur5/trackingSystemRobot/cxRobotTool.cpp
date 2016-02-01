@@ -34,7 +34,8 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     mServices(services),
     mTimestamp(0),
     eMt(Transform3D::Identity()),
-    prMb(Transform3D::Identity())
+    prMb(Transform3D::Identity()),
+    isRobotLinksVisualized(false)
 {
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
 
@@ -135,7 +136,9 @@ void RobotTool::toolTransformAndTimestampSlot(Transform3D bMe, double timestamp)
     (*mPositionHistory)[mTimestamp] = bMe; // store original in history
 
     emit toolTransformAndTimestamp(m_prMt, mTimestamp);
-    this->updateActors();
+
+    if(this->isRobotLinksVisualized)
+        this->updateActors();
 }
 
 void RobotTool::calculateTpsSlot()
@@ -206,6 +209,8 @@ void RobotTool::addRobotActors()
     view->getRenderer()->AddActor(link4Actor);
     view->getRenderer()->AddActor(link5Actor);
     view->getRenderer()->AddActor(baseActor);
+
+    this->isRobotLinksVisualized = true;
 }
 
 void RobotTool::updateActors()
@@ -252,6 +257,8 @@ void RobotTool::removeActors()
     view->getRenderer()->RemoveActor(link4Actor);
     view->getRenderer()->RemoveActor(link5Actor);
     view->getRenderer()->RemoveActor(baseActor);
+
+    this->isRobotLinksVisualized = false;
 }
 
 Transform3D RobotTool::get_rMb()
