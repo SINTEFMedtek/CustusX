@@ -5,6 +5,10 @@
 #include <QApplication>
 #include <QGroupBox>
 #include <QList>
+#include <cxVisServices.h>
+#include <cxTrackingService.h>
+#include "trackingSystemRobot/cxRobotTool.h"
+
 
 namespace cx
 {
@@ -15,6 +19,10 @@ Ur5SettingsTab::Ur5SettingsTab(Ur5RobotPtr Ur5Robot,VisServicesPtr services, QWi
     mServices(services)
 {
     setupUi(this);
+
+    updateCombobox();
+
+    connect(autoCalibrateButton, &QPushButton::clicked, this, &Ur5SettingsTab::autoCalibrateSlot);
 }
 
 Ur5SettingsTab::~Ur5SettingsTab()
@@ -28,22 +36,15 @@ void Ur5SettingsTab::setupUi(QWidget *parent)
    QWidget *leftColumnWidgets = new QWidget();
    QVBoxLayout *leftColumnLayout = new QVBoxLayout(leftColumnWidgets);
 
-   QWidget *rightColumnWidgets = new QWidget();
-   QVBoxLayout *rightColumnLayout = new QVBoxLayout(rightColumnWidgets);
-
-   setMoveToolLayout(leftColumnLayout);
-   //setCoordInfoWidget(rightColumnLayout);
-   //setMoveSettingsWidget(leftColumnLayout);
-   //setJointMoveWidget(rightColumnLayout);
+   setToolConfigurationLayout(leftColumnLayout);
 
    mainLayout->addWidget(leftColumnWidgets,0,Qt::AlignTop|Qt::AlignLeft);
-   mainLayout->addWidget(rightColumnWidgets,0,Qt::AlignTop|Qt::AlignRight);
 
    mainLayout->setSpacing(5);
    mainLayout->setMargin(5);
 }
 
-void Ur5SettingsTab::setMoveToolLayout(QVBoxLayout *parent)
+void Ur5SettingsTab::setToolConfigurationLayout(QVBoxLayout *parent)
 {
     QGroupBox* group = new QGroupBox("Tool Configuration");
     group->setFlat(true);
@@ -51,48 +52,43 @@ void Ur5SettingsTab::setMoveToolLayout(QVBoxLayout *parent)
 
     QGridLayout *keyLayout = new QGridLayout();
     group->setLayout(keyLayout);
-    keyLayout->setSpacing(0);
-    keyLayout->setMargin(0);
-    keyLayout->setContentsMargins(0,0,0,0);
+
+    keyLayout->addWidget(new QLabel("Select tool:"), 0,0, 1, 1, Qt::AlignHCenter);
+
+    toolComboBox = new QComboBox;
+    keyLayout->addWidget(toolComboBox,0,1,1,1);
+
+    autoCalibrateButton = new QPushButton(tr("Auto calibrate"));
+    keyLayout->addWidget(autoCalibrateButton,0,2,1,1);
 }
 
-void Ur5SettingsTab::setMoveSettingsWidget(QVBoxLayout *parent)
+void Ur5SettingsTab::updateCombobox()
 {
-    QGroupBox* group = new QGroupBox("Move settings");
-    group->setFlat(true);
-    parent->addWidget(group);
-
-    QGridLayout *velAccLayout = new QGridLayout();
-    group->setLayout(velAccLayout);
-
-    velAccLayout->setSpacing(5);
-    velAccLayout->setMargin(5);
+    ToolMap tools = mServices->tracking()->getTools();
+    for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+        toolComboBox->addItem(iter->second->getUid());
 }
 
-void Ur5SettingsTab::setCoordInfoWidget(QVBoxLayout *parent)
+void Ur5SettingsTab::autoCalibrateSlot()
 {
-    QGroupBox* group = new QGroupBox("Tool position");
-    group->setFlat(true);
-    parent->addWidget(group);
+    ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
+    RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    QGridLayout *coordInfoLayout = new QGridLayout();
-    group->setLayout(coordInfoLayout);
-
-    coordInfoLayout->setSpacing(5);
-    coordInfoLayout->setMargin(5);
+    createCalibrationMatrix();
 }
 
-void Ur5SettingsTab::setJointMoveWidget(QVBoxLayout *parent)
+void Ur5SettingsTab::createCalibrationMatrix()
 {
-    QGroupBox* group = new QGroupBox("Move joints");
-    group->setFlat(true);
-    parent->addWidget(group);
+    Transform3D calMatrix = Transform3D::Identity();
 
-    QGridLayout *coordInfoLayout = new QGridLayout();
-    group->setLayout(coordInfoLayout);
+    ToolPtr rtool = mServices->tracking()->getTool("RobotTracker");
+    RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(rtool);
 
-    coordInfoLayout->setSpacing(5);
-    coordInfoLayout->setMargin(5);
+    ToolPtr tool = mServices->tracking()->getTool("ManualTool");
+
+    //std::cout << tool->get_prMt().inverse() << std::endl;
+    //std::cout << robotTool->get_prMb() << std::endl;
+    //std::cout << mUr5Robot->getCurrentState().bMee << std::endl;
 }
 
 } // cx

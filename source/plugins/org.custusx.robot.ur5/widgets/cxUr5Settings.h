@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include <QScrollBar>
 #include <QButtonGroup>
+#include <QComboBox>
 
 namespace cx
 {
@@ -20,6 +21,9 @@ public:
     Ur5SettingsTab(Ur5RobotPtr Ur5Robot, VisServicesPtr services, QWidget *parent = 0);
     virtual ~Ur5SettingsTab();
 
+private slots:
+    void autoCalibrateSlot();
+
 private:
     QHBoxLayout *mainLayout;
     void setupUi(QWidget *parent);
@@ -27,10 +31,13 @@ private:
     Ur5RobotPtr mUr5Robot;
     VisServicesPtr mServices;
 
-    void setMoveToolLayout(QVBoxLayout *vLayout);
-    void setMoveSettingsWidget(QVBoxLayout *vLayout);
-    void setCoordInfoWidget(QVBoxLayout *vLayout);
-    void setJointMoveWidget(QVBoxLayout *vLayout);
+    void setToolConfigurationLayout(QVBoxLayout *vLayout);
+
+    QComboBox *toolComboBox;
+    QPushButton *autoCalibrateButton;
+
+    void updateCombobox();
+    void createCalibrationMatrix();
 };
 
 } // cx
