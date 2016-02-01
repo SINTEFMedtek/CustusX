@@ -176,6 +176,10 @@ void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     velAccLayout->addWidget(timeLineEdit, 2, 1, 1, 1);
     timeLineEdit->setText(QApplication::translate("Ur5Widget", "0.5", 0));
     velAccLayout->addWidget(new QLabel("s"), 2, 2, 1, 1);
+
+    timeLineEdit->setMinimumWidth(40);
+    velocityLineEdit->setMinimumWidth(40);
+    accelerationLineEdit->setMinimumWidth(40);
 }
 
 void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
@@ -191,9 +195,9 @@ void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
     coordInfoLayout->setMargin(5);
 
     // Position label
-    coordInfoLayout->addWidget(new QLabel("X"), 0, 0, 1, 1, Qt::AlignHCenter);
-    coordInfoLayout->addWidget(new QLabel("Y"), 1, 0, 1, 1, Qt::AlignHCenter);
-    coordInfoLayout->addWidget(new QLabel("Z"), 3, 0, 1, 1, Qt::AlignHCenter);
+    coordInfoLayout->addWidget(new QLabel("X"), 0, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Y"), 1, 0, 1, 1);
+    coordInfoLayout->addWidget(new QLabel("Z"), 3, 0, 1, 1);
 
     // mm label
     coordInfoLayout->addWidget(new QLabel("mm"), 0, 3, 1, 1);
@@ -233,6 +237,13 @@ void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
     // Line edit for RZ orientation
     rzLineEdit = new QLineEdit();
     coordInfoLayout->addWidget(rzLineEdit, 7, 2, 1, 1);
+
+    //xPosLineEdit->setMinimumWidth(40);
+    //yPosLineEdit->setMinimumWidth(40);
+    //zPosLineEdit->setMinimumWidth(40);
+    //rxLineEdit->setMinimumWidth(40);
+    //ryLineEdit->setMinimumWidth(40);
+    //rzLineEdit->setMinimumWidth(40);
 }
 
 void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
@@ -339,6 +350,13 @@ void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
     coordInfoLayout->addWidget(q6PosButton,row,2,1,1);
     coordInfoLayout->addWidget(q6LineEdit, row, 3, 1, 1);
     coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
+
+    //q1LineEdit->setMinimumWidth(40);
+    //q2LineEdit->setMinimumWidth(40);
+    //q3LineEdit->setMinimumWidth(40);
+    //q4LineEdit->setMinimumWidth(40);
+    //q5LineEdit->setMinimumWidth(40);
+    //q6LineEdit->setMinimumWidth(40);
 }
 
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
