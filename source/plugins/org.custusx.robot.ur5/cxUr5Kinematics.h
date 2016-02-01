@@ -42,7 +42,7 @@ public:
 
     static Vector3D T2transl(Transform3D T);
     static Vector3D T2rangles(Transform3D T);
-
+    static Eigen::RowVectorXd T2OperationalConfiguration(Transform3D pose);
 
 private:
     Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);

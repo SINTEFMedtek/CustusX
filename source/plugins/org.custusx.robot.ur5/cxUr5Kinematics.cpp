@@ -380,4 +380,13 @@ Transform3D Ur5Kinematics::T05(Eigen::RowVectorXd jointConfiguration)
     return Eigen::Affine3d(matrix);
 }
 
+Eigen::RowVectorXd Ur5Kinematics::T2OperationalConfiguration(Transform3D pose)
+{
+    Eigen::RowVectorXd operationalConfiguration(6);
+
+    operationalConfiguration << T2transl(pose), T2rangles(pose);
+
+    return operationalConfiguration;
+}
+
 } // cx
