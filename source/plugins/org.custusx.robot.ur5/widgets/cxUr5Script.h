@@ -2,7 +2,9 @@
 #define UR5SCRIPT_H
 
 #include <QWidget>
-#include <QLineEdit>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QVBoxLayout>
 
 #include "cxUr5Robot.h"
 #include "org_custusx_robot_ur5_Export.h"
@@ -18,9 +20,17 @@ public:
     virtual ~Ur5ScriptTab();
 
 private slots:
+    void sendMessageSlot();
 
 private:
     void setupUi(QWidget *parent);
+
+    QPushButton *sendMessageButton;
+
+    void setTextEditorWidget(QVBoxLayout *parent);
+
+    QTextEdit *textEditor;
+
 
     Ur5RobotPtr mUr5Robot;
     VisServicesPtr mServices;
