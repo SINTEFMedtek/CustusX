@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonValue>
+#include <QApplication>
 
 namespace cx
 {
@@ -303,7 +304,7 @@ void HttpRequestHandler::process_mainpage(QHttpRequest *req, QHttpResponse *resp
 void HttpRequestHandler::reply_mainpage(QHttpResponse *resp)
 {
     QString body("</body>"
-                 "CustusX REST API"
+				 "%1 REST API"
                  "<p>"
                  "Arguments are passed using JSON format."
                  "</p>"
@@ -312,7 +313,6 @@ void HttpRequestHandler::reply_mainpage(QHttpResponse *resp)
                  "<tr><th>method</th><th>resource</th><th>description</th><th>arguments</th></tr>"
                  ""
                  "<tr><td>GET</td><td>/</td><td>main page: short server info</td><td>html page</td></tr>"
-                 "<tr><td>GET</td><td>/screen</td><td>get screenshot</td><td>png image</td></tr>"
                  "<tr><td>GET</td><td>/layout</td><td>return list of all layouts</td><td>layouts</td></tr>"
                  ""
                  "<tr>"
@@ -323,16 +323,14 @@ void HttpRequestHandler::reply_mainpage(QHttpResponse *resp)
                  "<tr><td>GET</td><td>/layout/display</td><td>get image of layout</td><td>png image</td></tr>"
                  "<tr><td>DELETE</td><td>/layout/display</td><td>delete display</td></tr>"
                  ""
-                 "<tr>"
-                 "<td>PUT</td><td>/layout/display/stream</td>"
-                 "<td>start streamer on port </td>"
-                 "<td>port=(int)</td>"
-                 "</tr>"
-                 "<tr><td>DELETE</td><td>/layout/display/stream</td><td>stop streamer</td></tr>"
+				 "%2"
                  ""
                  "</table>"
                  "</body>"
                  "");
+	body = body
+			.arg(qApp->applicationDisplayName())
+			.arg(this->getAdditionalMainPageDescription());
 
     QByteArray ba = body.toUtf8();
 
@@ -373,14 +371,14 @@ void HttpRequestHandler::reply_method_not_allowed(QHttpResponse *resp)
 void HttpRequestHandler::process_screen(QHttpRequest *req, QHttpResponse *resp)
 {
     CX_ASSERT(req->path()=="/screen");
-    std::cout << "handle_screenshot" << std::endl;
 //    GET    /screen                                        : get screenshot
 
-    if (req->method()==QHttpRequest::HTTP_GET)
-    {
-        this->reply_screenshot(resp);
-    }
-    else
+	// disabled: security problem
+//    if (req->method()==QHttpRequest::HTTP_GET)
+//    {
+//        this->reply_screenshot(resp);
+//    }
+//    else
     {
         this->reply_method_not_allowed(resp);
     }
@@ -397,44 +395,6 @@ void HttpRequestHandler::reply_screenshot(QHttpResponse *resp)
     resp->write(ba);
     resp->end();
 }
-
-//void HttpRequestHandler::handle_helloworld(QHttpRequest *req, QHttpResponse *resp)
-//{
-//	std::cout << "GOT WEB SERVER REQUEST: " << req->path().toStdString() << std::endl;
-
-//	resp->setHeader("Content-Length", "11");
-//	resp->writeHead(200); // everything is OK
-//	resp->write("Hello World");
-//	resp->end();
-//}
-
-//void HttpRequestHandler::handle_stream(QHttpRequest *req, QHttpResponse *resp)
-//{
-//	std::cout << "GOT WEB SERVER REQUEST: " << req->path().toStdString() << std::endl;
-//	new Responder(req, resp);
-//}
-
-//void HttpRequestHandler::handle_users_reply(QHttpRequest *req, QHttpResponse *resp)
-//{
-//	std::cout << "GOT WEB SERVER REQUEST: " << req->path().toStdString() << std::endl;
-
-//	QRegExp exp("^/user/([a-z]+)$");
-//	if( exp.indexIn(req->path()) != -1 )
-//	{
-//		resp->setHeader("Content-Type", "text/html");
-//		resp->writeHead(200);
-
-//		QString name = exp.capturedTexts()[1];
-//		QString body = tr("<html><head><title>Greeting App</title></head><body><h1>Hello %1!</h1></body></html>");
-//		resp->end(body.arg(name).toUtf8());
-//	}
-//	else
-//	{
-//		resp->writeHead(403);
-//		resp->end(QByteArray("You aren't allowed here!"));
-//	}
-
-//}
 
 
 } // namespace cx
