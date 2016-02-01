@@ -34,10 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXUR5WIDGET_H_
 
 #include <QWidget>
+#include <QTabWidget>
 
 #include "cxUr5Robot.h"
 #include "org_custusx_robot_ur5_Export.h"
 #include "cxTrackingService.h"
+
+#include "widgets/cxUr5Initialize.h"
 
 class ctkPluginContext;
 
@@ -58,10 +61,21 @@ public:
     Ur5Widget(Ur5RobotPtr robot, VisServicesPtr services, QWidget* parent = 0);
     virtual ~Ur5Widget();
 
+private slots:
+    void addApplicationTab(QString typeOfTab);
+    void removeApplicationTab(QString typeOfTab);
+
 private:
     void setupUi(QWidget *parent);
     Ur5RobotPtr mUr5Robot;
     VisServicesPtr mServices;
+
+    Ur5InitializeTab *mUr5InitializeTab;
+
+    QTabWidget *tabWidget;
+
+    int getTabIndex(QString tabLabel);
+    bool isTabExisting(QString tabLabel);
 };
 
 

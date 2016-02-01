@@ -34,11 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUr5Widget.h"
 #include "cxUr5Connection.h"
 
-#include "widgets/cxUr5MiscInformation.h"
+#include "widgets/cxUr5Script.h"
 #include "widgets/cxUr5Initialize.h"
 #include "widgets/cxUr5ManualMove.h"
 #include "widgets/cxUr5PlannedMove.h"
 #include "widgets/cxUr5LungSimulationTab.h"
+#include "widgets/cxUr5Settings.h"
 
 #include <QLabel>
 #include <QSlider>
@@ -57,7 +58,12 @@ Ur5Widget::Ur5Widget(Ur5RobotPtr robot, VisServicesPtr services, QWidget* parent
     mUr5Robot(robot),
     mServices(services)
 {
+    mUr5InitializeTab = new Ur5InitializeTab(mUr5Robot);
+
     setupUi(this);
+
+    connect(mUr5InitializeTab, &Ur5InitializeTab::addApplicationTab, this, &Ur5Widget::addApplicationTab);
+    connect(mUr5InitializeTab, &Ur5InitializeTab::removeApplicationTab, this, &Ur5Widget::removeApplicationTab);
 }
 
 
@@ -71,15 +77,64 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
     Ur5Widget->setWindowTitle("UR5 Robot");
 
     QLayout* Ur5WidgetLayout = new QVBoxLayout(Ur5Widget);
-    QTabWidget* tabWidget = new QTabWidget(Ur5Widget);
+    tabWidget = new QTabWidget(Ur5Widget);
     Ur5WidgetLayout->addWidget(tabWidget);
-    tabWidget->addTab(new Ur5InitializeTab(mUr5Robot), tr("Initialize"));
-    tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot),tr("Manual movement"));
-    tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot, mServices),tr("Planned movement"));
-    tabWidget->addTab(new Ur5LungSimulationTab(mUr5Robot),tr("Lung simulation"));
-    //tabWidget->addTab(new Ur5MiscInformationTab(mUr5Robot),tr("Misc information"));
+    tabWidget->insertTab(0,mUr5InitializeTab, tr("Initialize"));
+    //tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot),tr("Manual movement"));
+    //tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot, mServices),tr("Planned movement"));
+    //tabWidget->addTab(new Ur5LungSimulationTab(mUr5Robot),tr("Lung simulation"));
+    //tabWidget->addTab(new Ur5ScriptTab(mUr5Robot, mServices),tr("UR5 Script"));
+    //tabWidget->addTab(new Ur5SettingsTab(mUr5Robot, mServices),tr("Settings"));
 
     QMetaObject::connectSlotsByName(Ur5Widget);
+}
+
+void Ur5Widget::addApplicationTab(QString typeOfTab)
+{
+    if(typeOfTab == "Manual" && !this->isTabExisting("Manual movement"))
+        tabWidget->addTab(new Ur5ManualMoveTab(mUr5Robot), tr("Manual movement"));
+    if(typeOfTab == "Planned" && !this->isTabExisting("Planned movement"))
+        tabWidget->addTab(new Ur5PlannedMoveTab(mUr5Robot, mServices),tr("Planned movement"));
+    if(typeOfTab == "LungSimulation" && !this->isTabExisting("Lung simulation"))
+        tabWidget->addTab(new Ur5LungSimulationTab(mUr5Robot),tr("Lung simulation"));
+    if(typeOfTab == "UR5Script" && !this->isTabExisting("UR5 Script"))
+        tabWidget->addTab(new Ur5ScriptTab(mUr5Robot, mServices),tr("UR5 Script"));
+    if(typeOfTab == "Settings" && !this->isTabExisting("Settings"))
+        tabWidget->addTab(new Ur5SettingsTab(mUr5Robot, mServices),tr("Settings"));
+}
+
+void Ur5Widget::removeApplicationTab(QString typeOfTab)
+{
+    if(typeOfTab == "Manual")
+        tabWidget->removeTab(getTabIndex("Manual movement"));
+    if(typeOfTab == "Planned")
+        tabWidget->removeTab(getTabIndex("Planned movement"));
+    if(typeOfTab == "LungSimulation")
+        tabWidget->removeTab(getTabIndex("Lung simulation"));
+    if(typeOfTab == "UR5Script")
+        tabWidget->removeTab(getTabIndex("UR5 Script"));
+    if(typeOfTab == "Settings")
+        tabWidget->removeTab(getTabIndex("Settings"));
+}
+
+int Ur5Widget::getTabIndex(QString tabText)
+{
+    for(int i=0; i<tabWidget->count(); i++)
+    {
+        if(tabText == tabWidget->tabText(i))
+            return i;
+    }
+    return (tabWidget->count()+1);
+}
+
+bool Ur5Widget::isTabExisting(QString tabText)
+{
+    for(int i=0; i<tabWidget->count(); i++)
+    {
+        if(tabText == tabWidget->tabText(i))
+            return true;
+    }
+    return false;
 }
 
 } /* namespace cx */

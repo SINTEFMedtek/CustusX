@@ -6,6 +6,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QVBoxLayout>
+#include <QCheckBox>
 
 #include "cxUr5Robot.h"
 
@@ -35,9 +36,12 @@ private slots:
     void addRobotLinkSlot();
     void removeRobotLinkSlot();
 
+    void addCheckedApplicationSlot();
 
 private:
     void setupUi(QWidget *parent);
+    void setupConnections(QWidget *parent);
+
     Ur5RobotPtr mUr5Robot;
 
     QLineEdit *ipLineEdit, *manualCoordinatesLineEdit;
@@ -47,7 +51,12 @@ private:
     QPushButton *addLinksButton, *removeLinksButton;
 
     void setRobotConnectionLayout(QVBoxLayout *parent);
-    void setRobotTrackingLayout(QVBoxLayout *parent);
+    void setRobotTrackingLayout(QHBoxLayout *parent);
+    void setRobotApplicationLayout(QHBoxLayout *parent);
+
+    QCheckBox *toggleManual, *togglePlanned, *toggleUr5Script, *toggleLungSimulation, *toggleSettings;
+
+
 };
 
 } // cx
