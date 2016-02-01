@@ -29,6 +29,8 @@ RobotTrackingSystemService::RobotTrackingSystemService(Ur5RobotPtr robot, VisSer
 
     connect(mUr5Robot.get(), &Ur5Robot::startTracking, this, &RobotTrackingSystemService::startTracking);
     connect(mUr5Robot.get(), &Ur5Robot::stopTracking, this, &RobotTrackingSystemService::stopTracking);
+    connect(mUr5Robot.get(), &Ur5Robot::addRobotVisualizationLinks, this, &RobotTrackingSystemService::addLinksSlot);
+    connect(mUr5Robot.get(), &Ur5Robot::removeRobotVisualizationLinks, this, &RobotTrackingSystemService::removeLinksSlot);
 }
 
 RobotTrackingSystemService::~RobotTrackingSystemService()
@@ -74,7 +76,6 @@ void RobotTrackingSystemService::startTracking()
     this->isRobotTrackingEnabled = true;
 
     mRobotTool = this->getTool("RobotTracker");
-    mRobotTool->addRobotActors();
 }
 
 void RobotTrackingSystemService::stopTracking()
@@ -82,8 +83,6 @@ void RobotTrackingSystemService::stopTracking()
     disconnect(mUr5Robot.get(), &Ur5Robot::transform, this, &RobotTrackingSystemService::receiveTransform);
     this->deconfigure();
     this->isRobotTrackingEnabled = false;
-
-    mRobotTool->removeActors();
 }
 
 std::vector<ToolPtr> RobotTrackingSystemService::getTools()
@@ -190,5 +189,19 @@ RobotToolPtr RobotTrackingSystemService::getTool(QString devicename)
 
     return retval;
 }
+
+void RobotTrackingSystemService::addLinksSlot()
+{
+    if(this->isRobotTrackingEnabled)
+        mRobotTool->addRobotActors();
+}
+
+
+void RobotTrackingSystemService::removeLinksSlot()
+{
+    mRobotTool->removeActors();
+}
+
+
 
 } // namespace cx

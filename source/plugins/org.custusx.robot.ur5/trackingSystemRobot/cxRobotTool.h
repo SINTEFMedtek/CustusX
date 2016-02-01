@@ -77,6 +77,8 @@ private:
 
     vtkActorPtr vtkSourceToActor(QString filename);
     vtkActorPtr eeActor, baseActor, link1Actor, link2Actor, link3Actor, link4Actor, link5Actor;
+
+    bool isRobotLinksVisualized;
 };
 
 } /* namespace cx */

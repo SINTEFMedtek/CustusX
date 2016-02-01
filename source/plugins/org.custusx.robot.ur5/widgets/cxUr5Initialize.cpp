@@ -83,6 +83,16 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
 //    initializeButton_2->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
 
 
+void Ur5InitializeTab::setupConnections(QWidget *parent)
+{
+    connect(connectButton,&QPushButton::clicked,this,&Ur5InitializeTab::connectButtonSlot);
+    connect(disconnectButton,&QPushButton::clicked,this,&Ur5InitializeTab::disconnectButtonSlot);
+    connect(shutdownButton,&QPushButton::clicked,this,&Ur5InitializeTab::shutdownButtonSlot);
+    connect(startTrackingButton,&QPushButton::clicked,this,&Ur5InitializeTab::startTrackingSlot);
+    connect(stopTrackingButton,&QPushButton::clicked,this,&Ur5InitializeTab::stopTrackingSlot);
+    connect(addLinksButton, &QPushButton::clicked, this, &Ur5InitializeTab::addRobotLinkSlot);
+    connect(removeLinksButton, &QPushButton::clicked, this, &Ur5InitializeTab::removeRobotLinkSlot);
+
 }
 
 void Ur5InitializeTab::setRobotConnectionLayout(QVBoxLayout *parent)
@@ -130,12 +140,18 @@ void Ur5InitializeTab::setRobotTrackingLayout(QVBoxLayout *parent)
 
     startTrackingButton = new QPushButton(tr("Start tracking"));
     stopTrackingButton = new QPushButton(tr("Stop tracking"));
+    addLinksButton = new QPushButton(tr("Add links"));
+    removeLinksButton = new QPushButton(tr("Remove links"));
 
     int row = 0;
-
-//    row++;
     mainLayout->addWidget(startTrackingButton,row,0,1,1);
-    mainLayout->addWidget(stopTrackingButton,row,3,1,1);
+    mainLayout->addWidget(stopTrackingButton,row,1,1,1);
+
+    row++;
+    mainLayout->addWidget(addLinksButton,row,0,1,1);
+    mainLayout->addWidget(removeLinksButton,row,1,1,1);
+}
+
 }
 
 void Ur5InitializeTab::startTrackingSlot()
@@ -179,6 +195,16 @@ void Ur5InitializeTab::disconnectButtonSlot()
 void Ur5InitializeTab::shutdownButtonSlot()
 {
     mUr5Robot->shutdown();
+}
+
+void Ur5InitializeTab::addRobotLinkSlot()
+{
+    mUr5Robot->addRobotVisualizationLinks();
+}
+
+void Ur5InitializeTab::removeRobotLinkSlot()
+{
+    mUr5Robot->removeRobotVisualizationLinks();
 }
 
 } // cx
