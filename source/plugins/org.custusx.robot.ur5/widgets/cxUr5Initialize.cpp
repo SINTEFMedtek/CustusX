@@ -9,6 +9,9 @@
 #include <QLabel>
 #include <QApplication>
 #include <QGroupBox>
+#include <QRadioButton>
+#include <QCheckBox>
+
 
 namespace cx
 {
@@ -19,12 +22,7 @@ Ur5InitializeTab::Ur5InitializeTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
     mUr5Robot(Ur5Robot)
 {
     setupUi(this);
-
-    connect(connectButton,&QPushButton::clicked,this,&Ur5InitializeTab::connectButtonSlot);
-    connect(disconnectButton,&QPushButton::clicked,this,&Ur5InitializeTab::disconnectButtonSlot);
-    connect(shutdownButton,&QPushButton::clicked,this,&Ur5InitializeTab::shutdownButtonSlot);
-    connect(startTrackingButton,&QPushButton::clicked,this,&Ur5InitializeTab::startTrackingSlot);
-    connect(stopTrackingButton,&QPushButton::clicked,this,&Ur5InitializeTab::stopTrackingSlot);
+    setupConnections(this);
 }
 
 Ur5InitializeTab::~Ur5InitializeTab()
@@ -35,53 +33,18 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
 {   
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
+    QWidget *secondaryWidget = new QWidget();
+    QHBoxLayout *secondaryLayout = new QHBoxLayout(secondaryWidget);
+
     setRobotConnectionLayout(mainLayout);
-    setRobotTrackingLayout(mainLayout);
+    setRobotTrackingLayout(secondaryLayout);
+    setRobotApplicationLayout(secondaryLayout);
+
+    mainLayout->addWidget(secondaryWidget);
 
     mainLayout->setSpacing(5);
     mainLayout->setMargin(5);
-
-//    row ++;
-//    mainLayout->addWidget(new QLabel("Set origo for robot workspace"),row,0,1,2);
-
-//    row++;
-//    QTabWidget *setCoordinatesTab = new QTabWidget();
-//    QWidget *presetCoordinatesTab = new QWidget();
-//    QWidget *manualCoordinatesTab = new QWidget();
-//    setCoordinatesTab->addTab(presetCoordinatesTab,tr("Preset coordinates"));
-//    setCoordinatesTab->addTab(manualCoordinatesTab,tr("Manual coordinates"));
-//    mainLayout->addWidget(setCoordinatesTab,row,0,1,4);
-
-//    QHBoxLayout *presetCoordLayout = new QHBoxLayout(presetCoordinatesTab);
-//    presetCoordLayout->setAlignment(Qt::AlignTop);
-
-//    presetCoordLayout->addWidget(new QLabel("Choose origo: "));
-//    presetOrigoComboBox = new QComboBox();
-//    initializeButton=new QPushButton();
-//    presetCoordLayout->addWidget(presetOrigoComboBox);
-//    presetCoordLayout->addWidget(initializeButton);
-
-//    presetOrigoComboBox->clear();
-//    presetOrigoComboBox->insertItems(0, QStringList()
-//                                     << QApplication::translate("Ur5Widget", "Buttom right corner", 0)
-//                                     << QApplication::translate("Ur5Widget", "Current position", 0)
-//                                     );
-
-//    initializeButton->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
-//    initializeButton->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
-
-//    QGridLayout *manualCoordLayout = new QGridLayout(manualCoordinatesTab);
-//    manualCoordinatesLineEdit=new QLineEdit();
-//    initializeButton_2=new QPushButton();
-//    manualCoordLayout->setAlignment(Qt::AlignTop);
-//    manualCoordLayout->addWidget(new QLabel("Set coordinates: "), 0, 0, 1, 1);
-//    manualCoordLayout->addWidget(manualCoordinatesLineEdit,0,1,1,1);
-//    manualCoordLayout->addWidget(initializeButton_2,0,2,1,1);
-
-//    manualCoordinatesLineEdit->setText(QApplication::translate("Ur5Widget", "(x,y,z,rx,ry,rz)", 0));
-//    initializeButton_2->setToolTip(QApplication::translate("Ur5Widget", "Initialize workspace", 0));
-//    initializeButton_2->setText(QApplication::translate("Ur5Widget", "Initialize", 0));
-
+}
 
 void Ur5InitializeTab::setupConnections(QWidget *parent)
 {
@@ -93,11 +56,16 @@ void Ur5InitializeTab::setupConnections(QWidget *parent)
     connect(addLinksButton, &QPushButton::clicked, this, &Ur5InitializeTab::addRobotLinkSlot);
     connect(removeLinksButton, &QPushButton::clicked, this, &Ur5InitializeTab::removeRobotLinkSlot);
 
+    connect(toggleManual, &QCheckBox::stateChanged, this, &Ur5InitializeTab::addCheckedApplicationSlot);
+    connect(toggleLungSimulation, &QCheckBox::stateChanged, this, &Ur5InitializeTab::addCheckedApplicationSlot);
+    connect(togglePlanned, &QCheckBox::stateChanged, this, &Ur5InitializeTab::addCheckedApplicationSlot);
+    connect(toggleSettings, &QCheckBox::stateChanged, this, &Ur5InitializeTab::addCheckedApplicationSlot);
+    connect(toggleUr5Script, &QCheckBox::stateChanged, this, &Ur5InitializeTab::addCheckedApplicationSlot);
 }
 
 void Ur5InitializeTab::setRobotConnectionLayout(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Robot connection");
+    QGroupBox* group = new QGroupBox("Robot Connection");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -108,8 +76,8 @@ void Ur5InitializeTab::setRobotConnectionLayout(QVBoxLayout *parent)
     ipLineEdit = new QLineEdit();
     connectButton = new QPushButton();
     mainLayout->addWidget(new QLabel("IP Address: "), row, 0, 1, 1);
-    mainLayout->addWidget(ipLineEdit, row, 1,1,2);
-    mainLayout->addWidget(connectButton,row,3,1,1);
+    mainLayout->addWidget(ipLineEdit, row, 1,1,1);
+    mainLayout->addWidget(connectButton,row,2,1,1);
 
     ipLineEdit->setText("10.218.140.144");
 
@@ -126,10 +94,10 @@ void Ur5InitializeTab::setRobotConnectionLayout(QVBoxLayout *parent)
     shutdownButton = new QPushButton(QIcon("/icons/application-exit-4.png"),"Shutdown");
     disconnectButton = new QPushButton(QIcon("/icons/network-offline.ico"),"Disconnect");
     mainLayout->addWidget(shutdownButton,row,0,1,1);
-    mainLayout->addWidget(disconnectButton,row,3,1,1);
+    mainLayout->addWidget(disconnectButton,row,2,1,1);
 }
 
-void Ur5InitializeTab::setRobotTrackingLayout(QVBoxLayout *parent)
+void Ur5InitializeTab::setRobotTrackingLayout(QHBoxLayout *parent)
 {
     QGroupBox* group = new QGroupBox("Robot Tracking");
     group->setFlat(true);
@@ -152,6 +120,26 @@ void Ur5InitializeTab::setRobotTrackingLayout(QVBoxLayout *parent)
     mainLayout->addWidget(removeLinksButton,row,1,1,1);
 }
 
+void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Robot Applications");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *mainLayout = new QGridLayout();
+    group->setLayout(mainLayout);
+
+    toggleManual = new QCheckBox(tr("Manual movement"));
+    togglePlanned = new QCheckBox(tr("Planned movement"));
+    toggleUr5Script = new QCheckBox(tr("UR5 Script"));
+    toggleLungSimulation = new QCheckBox(tr("Lung simulation"));
+    toggleSettings = new QCheckBox(tr("Settings"));
+
+    mainLayout->addWidget(toggleManual,0,1,1,1);
+    mainLayout->addWidget(togglePlanned,1,1,1,1);
+    mainLayout->addWidget(toggleUr5Script,2,1,1,1);
+    mainLayout->addWidget(toggleLungSimulation,3,1,1,1);
+    mainLayout->addWidget(toggleSettings,4,1,1,1);
 }
 
 void Ur5InitializeTab::startTrackingSlot()
@@ -205,6 +193,54 @@ void Ur5InitializeTab::addRobotLinkSlot()
 void Ur5InitializeTab::removeRobotLinkSlot()
 {
     mUr5Robot->removeRobotVisualizationLinks();
+}
+
+void Ur5InitializeTab::addCheckedApplicationSlot()
+{
+    if(toggleManual->isChecked())
+    {
+        this->addApplicationTab("Manual");
+    }
+    else
+    {
+        this->removeApplicationTab("Manual");
+    }
+
+    if(togglePlanned->isChecked())
+    {
+        this->addApplicationTab("Planned");
+    }
+    else
+    {
+        this->removeApplicationTab("Planned");
+    }
+
+    if(toggleUr5Script->isChecked())
+    {
+        this->addApplicationTab("UR5Script");
+    }
+    else
+    {
+        this->removeApplicationTab("UR5Script");
+    }
+
+    if(toggleLungSimulation->isChecked())
+    {
+        this->addApplicationTab("LungSimulation");
+    }
+    else
+    {
+        this->removeApplicationTab("LungSimulation");
+    }
+
+    if(toggleSettings->isChecked())
+    {
+        this->addApplicationTab("Settings");
+    }
+    else
+    {
+        this->removeApplicationTab("Settings");
+    }
 }
 
 } // cx
