@@ -1,23 +1,8 @@
 #include "cxUr5Script.h"
 
-#include <QtCore/QVariant>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QFrame>
-#include <QtWidgets/QGridLayout>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMainWindow>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QScrollBar>
-#include <QtWidgets/QSpacerItem>
-#include <QtWidgets/QTabWidget>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QWidget>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QGroupBox>
 
 namespace cx
 {
@@ -28,6 +13,8 @@ Ur5ScriptTab::Ur5ScriptTab(Ur5RobotPtr Ur5Robot, VisServicesPtr services, QWidge
     mServices(services)
 {
     setupUi(this);
+
+    connect(sendMessageButton,&QPushButton::clicked,this,&Ur5ScriptTab::sendMessageSlot);
 }
 
 Ur5ScriptTab::~Ur5ScriptTab()
@@ -37,7 +24,32 @@ Ur5ScriptTab::~Ur5ScriptTab()
 
 void Ur5ScriptTab::setupUi(QWidget *parent)
 {
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setAlignment(Qt::AlignTop);
 
+    setTextEditorWidget(mainLayout);
+}
+
+void Ur5ScriptTab::setTextEditorWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Ur5 Script");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *textEditLayout = new QGridLayout();
+    group->setLayout(textEditLayout);
+
+    textEditor = new QTextEdit();
+    textEditLayout->addWidget(textEditor,0,0,2,2);
+    textEditor->setText("movej([0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054],a=0.8,v=0.3)");
+
+    sendMessageButton = new QPushButton(tr("Send message"));
+    textEditLayout->addWidget(sendMessageButton,2,1,1,1);
+}
+
+void Ur5ScriptTab::sendMessageSlot()
+{
+    mUr5Robot->sendMessage(textEditor->toPlainText());
 }
 
 
