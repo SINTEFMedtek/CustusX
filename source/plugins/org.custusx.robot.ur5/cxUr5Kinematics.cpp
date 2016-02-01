@@ -1,4 +1,5 @@
 #include "cxUr5Kinematics.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
@@ -384,7 +385,11 @@ Eigen::RowVectorXd Ur5Kinematics::T2OperationalConfiguration(Transform3D pose)
 {
     Eigen::RowVectorXd operationalConfiguration(6);
 
-    operationalConfiguration << T2transl(pose), T2rangles(pose);
+    Vector3D translation = T2transl(pose)/1000;
+    Vector3D rotation = T2rangles(pose);
+
+    operationalConfiguration << translation(0), translation(1), translation(2),
+                                rotation(0), rotation(1), rotation(2);
 
     return operationalConfiguration;
 }

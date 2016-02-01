@@ -16,6 +16,7 @@
 #include "cxViewService.h"
 #include "cxTrackingService.h"
 #include "trackingSystemRobot/cxRobotTool.h"
+#include "cxUr5Kinematics.h"
 
 
 namespace cx
@@ -205,9 +206,6 @@ void Ur5PlannedMoveTab::moveToPointSlot()
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    Transform3D bMee = mUr5Robot->getCurrentState().bMee;
-    bMee.translation() = bMee.translation()*1000;
-
     Transform3D eMt = robotTool->get_eMt();
 
     Vector3D p = (eMt*robotTool->get_prMb().inverse()*pointMetric->getCoordinate());
@@ -222,17 +220,12 @@ void Ur5PlannedMoveTab::moveToPointSlot()
 void Ur5PlannedMoveTab::moveToFrameSlot()
 {
     DataPtr data = mServices->patient()->getData("frame1");
-
     FrameMetricPtr frameMetric = boost::dynamic_pointer_cast<FrameMetric>(data);
 
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    Transform3D bMee = mUr5Robot->getCurrentState().bMee;
-    bMee.translation() = bMee.translation()*1000;
-
     Transform3D eMt = robotTool->get_eMt();
-
     Transform3D pose = (eMt*robotTool->get_prMb().inverse()*frameMetric->getFrame());
 
     mUr5Robot->move("movejp",Ur5Kinematics::T2OperationalConfiguration(pose),0.3,0.1);

@@ -32,9 +32,9 @@ void Ur5SettingsTab::setupUi(QWidget *parent)
    QVBoxLayout *rightColumnLayout = new QVBoxLayout(rightColumnWidgets);
 
    setMoveToolLayout(leftColumnLayout);
-   setCoordInfoWidget(rightColumnLayout);
-   setMoveSettingsWidget(leftColumnLayout);
-   setJointMoveWidget(rightColumnLayout);
+   //setCoordInfoWidget(rightColumnLayout);
+   //setMoveSettingsWidget(leftColumnLayout);
+   //setJointMoveWidget(rightColumnLayout);
 
    mainLayout->addWidget(leftColumnWidgets,0,Qt::AlignTop|Qt::AlignLeft);
    mainLayout->addWidget(rightColumnWidgets,0,Qt::AlignTop|Qt::AlignRight);
@@ -45,7 +45,7 @@ void Ur5SettingsTab::setupUi(QWidget *parent)
 
 void Ur5SettingsTab::setMoveToolLayout(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Move tool");
+    QGroupBox* group = new QGroupBox("Tool Configuration");
     group->setFlat(true);
     parent->addWidget(group);
 
