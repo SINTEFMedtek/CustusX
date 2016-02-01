@@ -12,7 +12,6 @@
 
 namespace cx
 {
-//typedef boost::shared_ptr<class Data> DataPtr;
 
 class org_custusx_robot_ur5_EXPORT Ur5PlannedMoveTab : public QWidget
 {
@@ -26,22 +25,23 @@ private slots:
     void runVTKfileSlot();
     void openVTKfileSlot();
     void blendRadiusChangedSlot();
-    void sendMessageSlot();
     void runVelocityVTKSlot();
 
     void startLoggingSlot();
     void stopLoggingSlot();
     void clearPoseQueueSlot();
     void moveToInitialPositionButtonSlot();
-    void getActiveLandmarkSlot();
+
+    void moveToPointSlot();
+    void moveToFrameSlot();
 
 private:
     QPushButton *runVTKButton, *openVTKButton, *runVelocityVTKButton;
-    QPushButton *sendMessageButton;
     QPushButton *startLoggingButton, *stopLoggingButton;
     QPushButton *clearPoseQueueButton;
     QPushButton *moveToInitialPositionButton;
-    QPushButton *getActiveLandmarkButton;
+
+    QPushButton *moveToPointButton, *moveToFrameButton;
 
     QLineEdit *vtkLineEdit;
 
@@ -55,7 +55,6 @@ private:
     void setMoveSettingsWidget(QVBoxLayout *parent);
     void setTextEditorWidget(QVBoxLayout *parent);
 
-    QTextEdit *textEditor;
     VisServicesPtr mServices;
 };
 
