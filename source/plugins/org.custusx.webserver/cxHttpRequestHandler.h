@@ -78,6 +78,8 @@ protected:
     virtual void create_stream(QHttpRequest *req, QHttpResponse *resp);
     virtual void delete_stream(QHttpResponse *resp);
 
+	virtual QString getAdditionalMainPageDescription() const { return ""; }
+
 protected:
 	RemoteAPIPtr mApi;
 
