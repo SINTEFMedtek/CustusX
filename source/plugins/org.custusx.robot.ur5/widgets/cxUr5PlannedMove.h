@@ -34,6 +34,8 @@ private slots:
 
     void moveToPointSlot();
     void moveToFrameSlot();
+    void followActiveToolSlot();
+    void startFollowingActiveToolSlot(Transform3D matrix, double timestamp);
 
 private:
     QPushButton *runVTKButton, *openVTKButton, *runVelocityVTKButton;
@@ -41,7 +43,7 @@ private:
     QPushButton *clearPoseQueueButton;
     QPushButton *moveToInitialPositionButton;
 
-    QPushButton *moveToPointButton, *moveToFrameButton;
+    QPushButton *moveToPointButton, *moveToFrameButton, *followActiveToolButton;
 
     QLineEdit *vtkLineEdit;
 

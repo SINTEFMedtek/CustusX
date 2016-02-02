@@ -41,6 +41,7 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
 
     connect(moveToPointButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToPointSlot);
     connect(moveToFrameButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToFrameSlot);
+    connect(followActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::followActiveToolSlot);
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -158,6 +159,10 @@ void Ur5PlannedMoveTab::setTextEditorWidget(QVBoxLayout *parent)
 
     moveToFrameButton = new QPushButton(tr("Move to frame"));
     textEditLayout->addWidget(moveToFrameButton,0,1,1,1);
+
+    followActiveToolButton = new QPushButton(tr("Follow active tool"));
+    textEditLayout->addWidget(followActiveToolButton,1,0,1,2);
+    followActiveToolButton->setCheckable(true);
 }
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
@@ -229,6 +234,30 @@ void Ur5PlannedMoveTab::moveToFrameSlot()
     Transform3D pose = (eMt*robotTool->get_prMb().inverse()*frameMetric->getFrame());
 
     mUr5Robot->move("movejp",Ur5Kinematics::T2OperationalConfiguration(pose),0.3,0.1);
+}
+
+void Ur5PlannedMoveTab::followActiveToolSlot()
+{
+    if(followActiveToolButton->isChecked())
+        connect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp, this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
+    else
+        disconnect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp, this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
+}
+
+void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double timestamp)
+{
+    ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
+    RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
+
+    Transform3D eMt = robotTool->get_eMt();
+
+    Transform3D p = (eMt*robotTool->get_prMb().inverse()*matrix);
+
+    Eigen::RowVectorXd point(6);
+    point << p(0,3), p(1,3), p(2,3),
+            mUr5Robot->getCurrentState().cartAngles(0), mUr5Robot->getCurrentState().cartAngles(1), mUr5Robot->getCurrentState().cartAngles(2);
+
+    mUr5Robot->move("movejp",point,0.3,0.05);
 }
 
 } // cx
