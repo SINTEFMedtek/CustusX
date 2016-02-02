@@ -402,6 +402,7 @@ void Ur5Robot::moveToInitialPositionSlot(double acceleration, double velocity)
 void Ur5Robot::set_eMt(Transform3D eMt)
 {
     this->eMt = eMt;
+    emit eMtChanged(eMt);
 }
 
 Transform3D Ur5Robot::get_eMt()

@@ -43,7 +43,9 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     this->toolVisibleSlot(true);
 
     this->set_prMb_calibration();
-    this->set_eMt_calibration();
+    this->set_eMt_calibration(mUr5Robot->get_eMt());
+
+    connect(mUr5Robot.get(), &Ur5Robot::eMtChanged, this, &RobotTool::set_eMt_calibration);
 }
 
 RobotTool::~RobotTool()
@@ -240,12 +242,9 @@ void RobotTool::set_prMb_calibration()
     prMb(2,3) = -23;
 }
 
-void RobotTool::set_eMt_calibration()
+void RobotTool::set_eMt_calibration(Transform3D calibration)
 {
-    //eMt(0,3) = 133;
-    //eMt(1,3) = 24;
-    //eMt(2,3) = 102;
-    eMt = mUr5Robot->get_eMt();
+    eMt = calibration;
 }
 
 void RobotTool::removeActors()

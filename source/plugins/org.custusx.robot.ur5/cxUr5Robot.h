@@ -92,6 +92,8 @@ signals:
     void stopLogging();
     void moveToInitialPosition(double acceleration, double velocity);
 
+    void eMtChanged(Transform3D eMt);
+
 private:
     void setCurrentState(Ur5State currentState);
     void setPreviousState(Ur5State previousState);
