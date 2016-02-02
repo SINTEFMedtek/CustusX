@@ -17,6 +17,7 @@
 #include "cxTrackingService.h"
 #include "trackingSystemRobot/cxRobotTool.h"
 #include "cxUr5Kinematics.h"
+#include "cxTool.h"
 
 
 namespace cx
@@ -29,19 +30,18 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
 {
     setupUi(this);
 
-    //connect(openVTKButton,SIGNAL(clicked()),this, SLOT(openVTKfileSlot()));
-    //connect(runVTKButton,SIGNAL(clicked()),this,SLOT(runVTKfileSlot()));
-    //connect(runVelocityVTKButton,SIGNAL(clicked()),this,SLOT(runVelocityVTKSlot()));
-    //connect(blendRadiusLineEdit,SIGNAL(textChanged(QString)),this,SLOT(blendRadiusChangedSlot()));
-    //connect(startLoggingButton,SIGNAL(clicked()),this,SLOT(startLoggingSlot()));
-    //connect(stopLoggingButton,SIGNAL(clicked()),this,SLOT(stopLoggingSlot()));
-    //connect(clearPoseQueueButton,SIGNAL(clicked()),this,SLOT(clearPoseQueueSlot()));
-
-    //connect(moveToInitialPositionButton,SIGNAL(clicked()),this,SLOT(moveToInitialPositionButtonSlot()));
+    //connect(startLoggingButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::startLoggingSlot);
+    //connect(stopLoggingButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::stopLoggingSlot);
+    //connect(clearPoseQueueButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::clearPoseQueueSlot);
 
     connect(moveToPointButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToPointSlot);
     connect(moveToFrameButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToFrameSlot);
     connect(followActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::followActiveToolSlot);
+
+    connect(openVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::openVTKfileSlot);
+    connect(runVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVTKfileSlot);
+    connect(runVelocityVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVelocityVTKSlot);
+    connect(blendRadiusLineEdit, &QLineEdit::textChanged, this, &Ur5PlannedMoveTab::blendRadiusChangedSlot);
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -54,9 +54,10 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignTop);
 
-    //setMoveVTKWidget(mainLayout);
+
     setTextEditorWidget(mainLayout);
-    //setMoveSettingsWidget(mainLayout);
+    setMoveVTKWidget(mainLayout);
+    setMoveSettingsWidget(mainLayout);
 }
 
 void Ur5PlannedMoveTab::blendRadiusChangedSlot()
@@ -97,10 +98,6 @@ void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
     layout1->addWidget(openVTKButton);
     layout2->addWidget(runVTKButton);
     layout2->addWidget(runVelocityVTKButton);
-    //layout3->addWidget(startLoggingButton);
-    //layout3->addWidget(stopLoggingButton);
-    //layout4->addWidget(clearPoseQueueButton);
-    //layout4->addWidget(moveToInitialPositionButton);
 
     runVTKButton->setToolTip("Follow VTK line");
 
