@@ -55,6 +55,9 @@ public:
     bool isValidWorkspace();
     bool isValidWorkspace(Eigen::RowVectorXd jointPosition);
 
+    void set_eMt(Transform3D eMt);
+    Transform3D get_eMt();
+
 public slots:
     void connectToRobot(QString IPaddress);
     void disconnectFromRobot();
@@ -124,7 +127,7 @@ private:
 
     double mBlendRadius;
 
-    Transform3D motionSpace;
+    Transform3D motionSpace, eMt;
 };
 
 } // cx

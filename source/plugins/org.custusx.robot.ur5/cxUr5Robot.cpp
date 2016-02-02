@@ -10,7 +10,8 @@ Ur5Robot::Ur5Robot():
     mBlendRadius(0.001),
     rtPort(30003),
     secPort(30002),
-    motionSpace(Transform3D::Identity())
+    motionSpace(Transform3D::Identity()),
+    eMt(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
@@ -396,6 +397,16 @@ void Ur5Robot::moveToInitialPositionSlot(double acceleration, double velocity)
     initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
     initState.cartAngles = mStartPosition.cartAngles;
     this->move("movej",initState,acceleration,velocity);
+}
+
+void Ur5Robot::set_eMt(Transform3D eMt)
+{
+    this->eMt = eMt;
+}
+
+Transform3D Ur5Robot::get_eMt()
+{
+    return (this->eMt);
 }
 
 } // cx
