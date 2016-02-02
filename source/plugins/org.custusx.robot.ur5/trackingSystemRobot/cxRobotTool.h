@@ -51,13 +51,14 @@ private slots:
     void toolTransformAndTimestampSlot(Transform3D bMe, double timestamp);
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
+    void set_eMt_calibration(Transform3D calibration);
 
 private:
     void createPolyData();
     void initiateActors();
     void updateActors();
     void set_prMb_calibration();
-    void set_eMt_calibration();
+
 
     std::set<Type> mTypes;
 
