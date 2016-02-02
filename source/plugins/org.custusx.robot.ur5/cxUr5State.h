@@ -20,7 +20,6 @@ typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
 
 struct org_custusx_robot_ur5_EXPORT Ur5State
 {
-    //Ur5State();
     Ur5State(bool updated = false);
     ~Ur5State();
 
@@ -45,10 +44,10 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     ~Ur5MovementInfo();
 
     Eigen::RowVectorXd targetJointConfiguration;
-    Eigen::RowVectorXd targetSpatialConfiguration;
+    Eigen::RowVectorXd targetOperationalConfiguration;
 
     Eigen::RowVectorXd targetJointVelocity;
-    Eigen::RowVectorXd targetSpatialVelocity;
+    Eigen::RowVectorXd targetOperationalVelocity;
 
     Transform3D motionReference; // Patient reference with respect to base (bMpr)
 
