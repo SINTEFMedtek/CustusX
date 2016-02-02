@@ -242,9 +242,10 @@ void RobotTool::set_prMb_calibration()
 
 void RobotTool::set_eMt_calibration()
 {
-    eMt(0,3) = 133;
-    eMt(1,3) = 24;
-    eMt(2,3) = 102;
+    //eMt(0,3) = 133;
+    //eMt(1,3) = 24;
+    //eMt(2,3) = 102;
+    eMt = mUr5Robot->get_eMt();
 }
 
 void RobotTool::removeActors()
