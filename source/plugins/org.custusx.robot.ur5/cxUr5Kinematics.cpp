@@ -23,15 +23,15 @@ Transform3D Ur5Kinematics::forward(Eigen::RowVectorXd jointConfiguration)
     matrix << c6*(s1*s5 + c234*c1*c5) - s234*c1*s6,
             - s6*(s1*s5 + c234*c1*c5) - s234*c1*c6,
             c5*s1 - c234*c1*s5,
-            d6*(c5*s1 - c234*c1*s5) + d4*s1 + a2*c1*c2 + d5*s234*c1 + a3*c1*c2*c3 - a3*c1*s2*s3,
+            (d6*(c5*s1 - c234*c1*s5) + d4*s1 + a2*c1*c2 + d5*s234*c1 + a3*c1*c2*c3 - a3*c1*s2*s3)*1000,
             - c6*(c1*s5 - c234*c5*s1) - s234*s1*s6,
             s6*(c1*s5 - c234*c5*s1) - s234*c6*s1,
             - c1*c5 - c234*s1*s5,
-            a2*c2*s1 - d4*c1 - d6*(c1*c5 + c234*s1*s5) + d5*s234*s1 + a3*c2*c3*s1 - a3*s1*s2*s3,
+            (a2*c2*s1 - d4*c1 - d6*(c1*c5 + c234*s1*s5) + d5*s234*s1 + a3*c2*c3*s1 - a3*s1*s2*s3)*1000,
             c234*s6 + s234*c5*c6,
             c234*c6 - s234*c5*s6,
             -s234*s5,
-            d1 + d5*(s23*s4 - c23*c4) + a3*s23 + a2*s2 - d6*s5*(c23*s4 + s23*c4),
+            (d1 + d5*(s23*s4 - c23*c4) + a3*s23 + a2*s2 - d6*s5*(c23*s4 + s23*c4))*1000,
             0, 0, 0, 1;
 
     return Eigen::Affine3d(matrix);
@@ -385,7 +385,7 @@ Eigen::RowVectorXd Ur5Kinematics::T2OperationalConfiguration(Transform3D pose)
 {
     Eigen::RowVectorXd operationalConfiguration(6);
 
-    Vector3D translation = T2transl(pose)/1000;
+    Vector3D translation = T2transl(pose);
     Vector3D rotation = T2rangles(pose);
 
     operationalConfiguration << translation(0), translation(1), translation(2),
