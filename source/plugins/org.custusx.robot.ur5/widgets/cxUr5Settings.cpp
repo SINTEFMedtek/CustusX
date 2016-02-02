@@ -71,9 +71,6 @@ void Ur5SettingsTab::updateCombobox()
 
 void Ur5SettingsTab::autoCalibrateSlot()
 {
-    ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
-    RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
-
     createCalibrationMatrix();
 }
 
@@ -84,11 +81,13 @@ void Ur5SettingsTab::createCalibrationMatrix()
     ToolPtr rtool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(rtool);
 
-    ToolPtr tool = mServices->tracking()->getTool("ManualTool");
+    ToolPtr tool = mServices->tracking()->getTool(toolComboBox->currentText());
 
-    //std::cout << tool->get_prMt().inverse() << std::endl;
-    //std::cout << robotTool->get_prMb() << std::endl;
-    //std::cout << mUr5Robot->getCurrentState().bMee << std::endl;
+    calMatrix = tool->get_prMt().inverse()*robotTool->get_prMb()*mUr5Robot->getCurrentState().bMee;
+
+    std::cout << calMatrix << std::endl;
+
+    mUr5Robot->set_eMt(calMatrix);
 }
 
 } // cx
