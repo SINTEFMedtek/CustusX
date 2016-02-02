@@ -71,7 +71,8 @@ namespace cx
 //---------------------------------------------------------
 
 //#ifdef WIN32
-#ifdef CX_VTK_OPENGL2
+//#ifdef CX_VTK_OPENGL2
+#if defined(CX_VTK_OPENGL2) || defined(WIN32)
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
 {
