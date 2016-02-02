@@ -36,6 +36,9 @@ private slots:
     void addRobotLinkSlot();
     void removeRobotLinkSlot();
 
+    void trackingSlot();
+    void robotLinkSlot();
+
     void addCheckedApplicationSlot();
 
 private:
@@ -50,13 +53,17 @@ private:
     QPushButton *startTrackingButton, *stopTrackingButton;
     QPushButton *addLinksButton, *removeLinksButton;
 
+    QPushButton *trackingButton, *linksButton;
+
     void setRobotConnectionLayout(QVBoxLayout *parent);
     void setRobotTrackingLayout(QHBoxLayout *parent);
     void setRobotApplicationLayout(QHBoxLayout *parent);
 
-    QCheckBox *toggleManual, *togglePlanned, *toggleUr5Script, *toggleLungSimulation, *toggleSettings;
+    QPushButton *toggleManual, *togglePlanned, *toggleUr5Script, *toggleLungSimulation, *toggleSettings;
 
+    QString mGraphicsFolderName = QString("/CX/source/plugins/org.custusx.robot.ur5/widgets/icons/");
 
+    QString onoffButtonStyleSheet();
 };
 
 } // cx
