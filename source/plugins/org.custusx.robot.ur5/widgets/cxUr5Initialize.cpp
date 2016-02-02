@@ -146,9 +146,7 @@ void Ur5InitializeTab::startTrackingSlot()
 {
     mUr5Robot->startTracking();
 
-    Transform3D trackingMatrix = Transform3D(mUr5Robot->getCurrentState().bMee); // Fjærnes
-    trackingMatrix.translation() = trackingMatrix.translation()*1000; // Fjærnes
-    mUr5Robot->transform("RobotTracker",trackingMatrix,0); // Bør fjærnes
+    mUr5Robot->transform("RobotTracker",mUr5Robot->getCurrentState().bMee,0); // Bør fjærnes
 }
 
 void Ur5InitializeTab::stopTrackingSlot()

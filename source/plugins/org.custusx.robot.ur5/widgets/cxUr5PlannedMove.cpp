@@ -211,7 +211,7 @@ void Ur5PlannedMoveTab::moveToPointSlot()
     Vector3D p = (eMt*robotTool->get_prMb().inverse()*pointMetric->getCoordinate());
 
     Eigen::RowVectorXd point(6);
-    point << p(0)/1000, p(1)/1000, p(2)/1000,
+    point << p(0), p(1), p(2),
             mUr5Robot->getCurrentState().cartAngles(0), mUr5Robot->getCurrentState().cartAngles(1), mUr5Robot->getCurrentState().cartAngles(2);
 
     mUr5Robot->move("movejp",point,0.3,0.1);

@@ -455,9 +455,9 @@ void Ur5ManualMoveTab::updatePositions()
     Ur5State currentState;
     currentState=mUr5Robot->getCurrentState();
 
-    xPosLineEdit->setText(QString::number(1000*(currentState.cartAxis(0)),'f',2));
-    yPosLineEdit->setText(QString::number(1000*(currentState.cartAxis(1)),'f',2));
-    zPosLineEdit->setText(QString::number(1000*(currentState.cartAxis(2)),'f',2));
+    xPosLineEdit->setText(QString::number((currentState.cartAxis(0)),'f',2));
+    yPosLineEdit->setText(QString::number((currentState.cartAxis(1)),'f',2));
+    zPosLineEdit->setText(QString::number((currentState.cartAxis(2)),'f',2));
     rxLineEdit->setText(QString::number(currentState.cartAngles(0),'f',4));
     ryLineEdit->setText(QString::number(currentState.cartAngles(1),'f',4));
     rzLineEdit->setText(QString::number(currentState.cartAngles(2),'f',4));
