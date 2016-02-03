@@ -238,6 +238,8 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	fixture.checkImagesEqual(convertedImage, referenceImage);
 }
 
+
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
@@ -278,8 +280,6 @@ TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration]
 	}
 }
 
-
-#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("DicomConverter: US data from SW, missing position data", "[integration][plugins][org.custusx.dicom]")
 {
     //Transform matrix should be identity and not zero

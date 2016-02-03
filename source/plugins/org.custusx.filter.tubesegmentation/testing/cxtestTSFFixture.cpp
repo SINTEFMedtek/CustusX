@@ -67,7 +67,7 @@ void TestTubeSegmentationFramework::testParameters()
 {
 	std::string path = std::string(PARAMETERS_DIR);
 	{
-		INFO("Could not find parameter file.");
+		INFO("Could not find parameter file: "+path);
 		REQUIRE(ifstream(path.c_str()));
 	}
 
