@@ -58,6 +58,8 @@ private:
     void setTextEditorWidget(QVBoxLayout *parent);
 
     VisServicesPtr mServices;
+
+    Transform3D prevMatrix;
 };
 
 } // cx
