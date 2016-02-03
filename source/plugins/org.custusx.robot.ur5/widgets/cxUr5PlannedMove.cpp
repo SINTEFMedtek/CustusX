@@ -210,22 +210,18 @@ void Ur5PlannedMoveTab::moveToPointSlot()
 
     Transform3D eMt = robotTool->get_eMt();
 
-    Transform3D mat = Transform3D::Identity();
-    mat.translation() = pointMetric->getCoordinate();
+    Transform3D prMt_d = Transform3D::Identity();
+    prMt_d.translation() = pointMetric->getCoordinate();
 
-    std::cout << pointMetric->getCoordinate() << std::endl;
-    std::cout << robotTool->get_prMb().inverse()*pointMetric->getCoordinate() << std::endl;
-    std::cout << robotTool->get_prMb().inverse()*mat*eMt << std::endl;
-
-    Vector3D p = robotTool->get_prMb().inverse()*pointMetric->getCoordinate();
-
-    std::cout << p << std::endl;
+    Transform3D bMt_d = robotTool->get_prMb().inverse()*prMt_d;
 
     Eigen::RowVectorXd point(6);
-    point << p(0), p(1), p(2),
-            mUr5Robot->getCurrentState().cartAngles(0), mUr5Robot->getCurrentState().cartAngles(1), mUr5Robot->getCurrentState().cartAngles(2);
 
-    //mUr5Robot->move("movejp",point,0.3,0.1);
+    point << bMt_d(0,3), bMt_d(1,3), bMt_d(2,3),
+            mUr5Robot->getCurrentState().cartAngles(0), mUr5Robot->getCurrentState().cartAngles(1),
+            mUr5Robot->getCurrentState().cartAngles(2);
+
+    mUr5Robot->move("movejp",point,0.3,0.1);
 }
 
 void Ur5PlannedMoveTab::moveToFrameSlot()
