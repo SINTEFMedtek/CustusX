@@ -84,6 +84,25 @@ void OptionsWidget::rebuild()
 	this->populate(mShowAdvanced);
 }
 
+bool OptionsWidget::hasOptions() const
+{
+    if(mOptions.size() == 0)
+        return false;
+
+    return true;
+}
+
+bool OptionsWidget::hasAdvancedOptions() const
+{
+    for(std::vector<PropertyPtr>::const_iterator it = mOptions.begin(); it != mOptions.end(); ++it)
+    {
+        if(it->get()->getAdvanced())
+            return true;
+    }
+
+    return false;
+}
+
 void OptionsWidget::toggleAdvanced()
 {
 	this->showAdvanced(!mShowAdvanced);
