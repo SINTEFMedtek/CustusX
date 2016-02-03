@@ -130,6 +130,8 @@ private:
     double mBlendRadius;
 
     Transform3D motionSpace, eMt;
+
+    void set_tcp(Transform3D eMt);
 };
 
 } // cx
