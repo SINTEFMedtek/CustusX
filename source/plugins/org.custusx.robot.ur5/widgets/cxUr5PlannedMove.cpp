@@ -240,25 +240,46 @@ void Ur5PlannedMoveTab::moveToFrameSlot()
 void Ur5PlannedMoveTab::followActiveToolSlot()
 {
     if(followActiveToolButton->isChecked())
-        connect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp, this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
+    {
+        connect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
+                this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
+        prevMatrix=Transform3D::Identity();
+    }
     else
-        disconnect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp, this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
+    {
+        disconnect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
+                   this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
+        mUr5Robot->stopMove("stopj",accelerationLineEdit->text().toDouble());
+    }
 }
 
 void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double timestamp)
 {
+    Vector3D deviation = Ur5Kinematics::T2transl(matrix)-Ur5Kinematics::T2transl(prevMatrix);
+
+    //if(deviation.length()>blendRadiusLineEdit->text().toDouble()/1000)
+    //{
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    Transform3D eMt = robotTool->get_eMt();
+    double moveVelocity = velocityLineEdit->text().toDouble()/1000;
 
-    Transform3D p = (eMt*robotTool->get_prMb().inverse()*matrix);
+    Transform3D currentToolPose = mUr5Robot->getCurrentState().bMee*mUr5Robot->get_eMt();
 
-    Eigen::RowVectorXd point(6);
-    point << p(0,3), p(1,3), p(2,3),
-            mUr5Robot->getCurrentState().cartAngles(0), mUr5Robot->getCurrentState().cartAngles(1), mUr5Robot->getCurrentState().cartAngles(2);
+    Vector3D tangent = Ur5Kinematics::T2transl(robotTool->get_prMb().inverse()*matrix)-Ur5Kinematics::T2transl(currentToolPose);
 
-    mUr5Robot->move("movejp",point,0.3,0.05);
+
+    Eigen::RowVectorXd velocityEndEffector(6), jointVelocity(6);
+    velocityEndEffector << moveVelocity*tangent(0)/tangent.norm(),moveVelocity*tangent(1)/tangent.norm(),moveVelocity*tangent(2)/tangent.norm()
+                            ,0,0,0;
+
+    jointVelocity = mUr5Robot->getCurrentState().jacobian.inverse()*velocityEndEffector.transpose();
+
+    mUr5Robot->move("speedj",jointVelocity,accelerationLineEdit->text().toDouble()/1000,0,1,0);
+    //}
+
+
+    prevMatrix = matrix;
 }
 
 } // cx
