@@ -1,6 +1,6 @@
 #include "cxUr5MessageEncoder.h"
 #include "cxUr5State.h"
-
+#include "cxUr5Kinematics.h"
 
 namespace cx
 {
@@ -130,6 +130,15 @@ QString Ur5MessageEncoder::set_tcp(Ur5State p)
     return QString("set_tcp(p[%1,%2,%3,%4,%5,%6])")
             .arg(p.cartAxis(0)).arg(p.cartAxis(1)).arg(p.cartAxis(2)).arg(p.cartAngles(0))
             .arg(p.cartAngles(1)).arg(p.cartAngles(2));
+}
+
+QString Ur5MessageEncoder::set_tcp(Transform3D p)
+{
+    Vector3D rangles = Ur5Kinematics::T2rangles(p);
+
+    return QString("set_tcp(p[%1,%2,%3,%4,%5,%6])")
+            .arg(p(0,3)/1000).arg(p(1,3)/1000).arg(p(2,3)/1000).arg(rangles(0))
+            .arg(rangles(1)).arg(rangles(2));
 }
 
 QString Ur5MessageEncoder::stopl(double a)

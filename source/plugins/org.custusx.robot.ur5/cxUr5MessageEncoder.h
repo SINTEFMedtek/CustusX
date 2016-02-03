@@ -40,6 +40,7 @@ public:
     QString stopl(double a);
 
     QString set_tcp(Ur5State pose);
+    QString set_tcp(Transform3D pose);
 
     QString powerdown();
     QString set_gravity(Vector3D direction);
