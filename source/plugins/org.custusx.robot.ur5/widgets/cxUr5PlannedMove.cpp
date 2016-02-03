@@ -232,8 +232,7 @@ void Ur5PlannedMoveTab::moveToFrameSlot()
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    Transform3D eMt = robotTool->get_eMt();
-    Transform3D pose = (eMt*robotTool->get_prMb().inverse()*frameMetric->getFrame());
+    Transform3D pose = (robotTool->get_prMb().inverse()*frameMetric->getFrame());
 
     mUr5Robot->move("movejp",Ur5Kinematics::T2OperationalConfiguration(pose),0.3,0.1);
 }
