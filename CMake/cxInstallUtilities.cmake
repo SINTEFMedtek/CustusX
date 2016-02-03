@@ -505,13 +505,15 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	install(DIRECTORY "${QT_PLUGINS_DIR}/" 
 		DESTINATION ${INSTALL_QTPLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-		REGEX "/sqldrivers/" EXCLUDE
+#		REGEX "/sqldrivers/" EXCLUDE
+		PATTERN "*sqldrivers*" EXCLUDE
 	)
 
 	install(DIRECTORY "${QT_PLUGINS_DIR}/"
 		DESTINATION ${INSTALL_QTPLUGIN_DIR}
 		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-		REGEX "/sqldrivers/libqsqlite"
+#		REGEX "/sqldrivers/libqsqlite"
+		PATTERN "*qsqlite*"
 	)
 
 	message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
