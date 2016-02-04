@@ -73,7 +73,7 @@ FilterSetupWidget::FilterSetupWidget(VisServicesPtr services, QWidget* parent, X
 	mOutputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mOptionsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mPresetWidget = new FilterPresetWidget(this);
-	mAdvancedButton = new QCheckBox("Show &advanced options", this);
+    mAdvancedButton = new QCheckBox("Show advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));
 
 	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
@@ -125,6 +125,13 @@ QString FilterSetupWidget::generateHelpText() const
 	               "</html>").arg(name).arg(help);
 }
 
+void FilterSetupWidget::setVisibilityOfOptionsAndAdvancedOptions()
+{
+    mAdvancedButton->setVisible(mOptionsWidget->hasAdvancedOptions());
+    this->showAdvancedOptions(mAdvancedButton->isChecked());
+    mOptionsGroupBox->setVisible(mOptionsWidget->hasOptions());
+}
+
 void FilterSetupWidget::setFilter(FilterPtr filter)
 {
 	if (filter==mCurrentFilter)
@@ -159,6 +166,8 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 			mPresetWidget->hide();
 
 		this->setObjectName(mCurrentFilter->getType());
+
+        this->setVisibilityOfOptionsAndAdvancedOptions();
 	}
 	else
 	{
@@ -174,8 +183,12 @@ void FilterSetupWidget::toggleDetailed()
 {
 	if(mOptionsGroupBox->isHidden())
 	{
-		mOptionsGroupBox->show();
-		mAdvancedButton->show();
+        if(mOptionsWidget->hasOptions())
+        {
+            mOptionsGroupBox->show();
+            if(mOptionsWidget->hasAdvancedOptions())
+                mAdvancedButton->show();
+        }
 		mPresetWidget->showDetailed(true);
 	}
 	else

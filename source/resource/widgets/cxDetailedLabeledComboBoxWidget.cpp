@@ -43,7 +43,7 @@ DetailedLabeledComboBoxWidget::DetailedLabeledComboBoxWidget(QWidget* parent, St
 	//Add detailed button
 	QAction* detailsAction = this->createAction(this,
 		  QIcon(":/icons/open_icon_library/system-run-5.png"),
-		  "Details", "Show Details",
+          "Details", "Toggle Details",
 		  SLOT(toggleDetailsSlot()),
 		  NULL);
 

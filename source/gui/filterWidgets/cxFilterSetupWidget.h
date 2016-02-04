@@ -72,6 +72,7 @@ private slots:
 	void rebuildOptions();
 
 private:
+    void setVisibilityOfOptionsAndAdvancedOptions();
 
 	VisServicesPtr mServices;
 	XmlOptionFile mOptions;
