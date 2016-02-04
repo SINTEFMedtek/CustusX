@@ -79,7 +79,7 @@ public:
 	virtual void setValueFromVariant(QVariant val) = 0;
 
 	virtual bool getEnabled() const; ///< Get the enabled/disabled state of the Property.
-	virtual bool getAdvanced() const; ///< Set the advanced flag of the adapter
+    virtual bool getAdvanced() const; ///< Get the advanced flag of the adapter
 	virtual QString getGroup() const; ///< Flag the adapter as part of a group
 
 public slots:
