@@ -35,7 +35,8 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     mTimestamp(0),
     eMt(Transform3D::Identity()),
     prMb(Transform3D::Identity()),
-    isRobotLinksVisualized(false)
+    isRobotLinksVisualized(false),
+    mGraphicsFolderName("/CX/source/plugins/org.custusx.robot.ur5/trackingSystemRobot/robotSTL/")
 {
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
 

@@ -71,7 +71,7 @@ private:
     double mTimestamp;
 
     std::set<Type> determineTypesBasedOnUid(const QString uid) const;
-    QString mGraphicsFolderName = QString("/CX/source/plugins/org.custusx.robot.ur5/trackingSystemRobot/robotSTL/");
+    QString mGraphicsFolderName;
 
     Transform3D prMb, eMt;
     Transform3D get_rMb();

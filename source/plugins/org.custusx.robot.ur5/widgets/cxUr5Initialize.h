@@ -61,7 +61,7 @@ private:
 
     QPushButton *toggleManual, *togglePlanned, *toggleUr5Script, *toggleLungSimulation, *toggleSettings;
 
-    QString mGraphicsFolderName = QString("/CX/source/plugins/org.custusx.robot.ur5/widgets/icons/");
+    QString mGraphicsFolderName;
 
     QString onoffButtonStyleSheet();
 };

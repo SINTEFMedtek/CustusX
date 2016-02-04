@@ -21,7 +21,8 @@ namespace cx
 
 Ur5InitializeTab::Ur5InitializeTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
     QWidget(parent),
-    mUr5Robot(Ur5Robot)
+    mUr5Robot(Ur5Robot),
+    mGraphicsFolderName("/CX/source/plugins/org.custusx.robot.ur5/widgets/icons/")
 {
     setupUi(this);
     setupConnections(this);
