@@ -41,7 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTextureSlicePainter.h"
 
 //#ifndef WIN32
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
+#if !defined(CX_VTK_OPENGL2) && !defined(WIN32)
 #include <QtCore>
 #include <vtkOpenGLExtensionManager.h>
 #include <vtkRenderer.h>

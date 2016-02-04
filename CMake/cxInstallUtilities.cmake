@@ -501,9 +501,22 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	ENDIF(APPLE)
 
 	# Install needed Qt plugins by copying directories from the qt installation
+	# Only install one sql driver (libqsqlite), as the other ones need additional packages installed to work
 	install(DIRECTORY "${QT_PLUGINS_DIR}/" 
 		DESTINATION ${INSTALL_QTPLUGIN_DIR}
-		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
+		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+#		REGEX "/sqldrivers/" EXCLUDE
+		FILES_MATCHING PATTERN "*sqldrivers*" EXCLUDE
+	)
+
+	install(DIRECTORY "${QT_PLUGINS_DIR}/"
+		DESTINATION ${INSTALL_QTPLUGIN_DIR}
+		DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+#		REGEX "/sqldrivers/libqsqlite"
+		FILES_MATCHING PATTERN "*qsqlite*"
+	)
+
+	message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
 
 	# install runtime plugins
         set(CX_PLUGIN_DIR "/plugins")

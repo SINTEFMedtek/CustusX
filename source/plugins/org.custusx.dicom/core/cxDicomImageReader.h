@@ -92,9 +92,13 @@ private:
 	Eigen::Array3i getDim(const DicomImage& dicomImage) const;
 	void error(QString message) const;
 	double getDouble(const DcmTagKey& tag, const unsigned long pos=0, const OFBool searchIntoSub = OFFalse) const;
+//	double getDouble(DcmObject *dcmObject, const DcmTagKey &tag, const unsigned long pos, const bool searchIntoSub) const;
 	QString formatPatientName(QString rawName) const;
 
 	ctkDICOMItemPtr wrapInCTK(DcmItem* item) const;
+	double getSliceSpacing() const;
+	QVector<double> getZPositions() const;
+	bool isMultiFrameImage() const;
 };
 
 

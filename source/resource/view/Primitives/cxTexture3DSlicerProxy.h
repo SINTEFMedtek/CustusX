@@ -85,8 +85,10 @@ public:
 
 };
 
+//#ifndef CX_VTK_OPENGL2
 //#ifndef WIN32
-#ifndef CX_VTK_OPENGL2
+
+#if !defined(CX_VTK_OPENGL2) && !defined(WIN32)
 
 /**
  * \brief Slice volumes using a SliceProxy.

@@ -240,6 +240,46 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 
 
 #ifdef CX_CUSTUS_SINTEF
+TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration][plugins][org.custusx.dicom]")
+{
+	cx::Reporter::initialize();
+	bool verbose = true;
+	DicomConverterTestFixture fixture;
+
+	QString inputDicomDataDirectory = cx::DataLocations::getLargeTestDataPath()+"/testing/Person5/DICOM/";
+
+	{
+		INFO(inputDicomDataDirectory);
+		REQUIRE(QDir(inputDicomDataDirectory).exists());
+	}
+
+	ctkDICOMDatabasePtr db = fixture.loadDirectory(inputDicomDataDirectory);
+
+	QString patient = fixture.getOneFromList(db->patients());
+	QString study = fixture.getOneFromList(db->studiesForPatient(patient));
+	QString series = "1.3.46.670589.11.5710.5.0.8052.2008052116071954458"; //s3DI/MC6 (210 images)
+	QStringList files = db->filesForSeries(series);
+
+	if (verbose)
+	{
+		std::cout << "patient " << patient << std::endl;
+		std::cout << "study " << study << std::endl;
+		std::cout << "series " << series << std::endl;
+		std::cout << "files " << files.join("\n") << std::endl;
+	}
+
+	cx::DicomConverter converter;
+	converter.setDicomDatabase(db.data());
+	cx::ImagePtr convertedImage = converter.convertToImage(series);
+
+	REQUIRE(convertedImage);
+	{
+		INFO(convertedImage->getSpacing()[2]);
+		INFO(" == 0.5");
+		REQUIRE(cx::similar(convertedImage->getSpacing()[2], 0.5, 0.001));
+	}
+}
+
 TEST_CASE("DicomConverter: US data from SW, missing position data", "[integration][plugins][org.custusx.dicom]")
 {
     //Transform matrix should be identity and not zero

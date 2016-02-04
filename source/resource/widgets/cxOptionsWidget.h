@@ -64,6 +64,8 @@ public:
 	QString getCurrentUid();
 	void showAdvanced(bool show); //whether or not to display adapters marked as advanced
 	void rebuild();
+    bool hasOptions() const;
+    bool hasAdvancedOptions() const;
 
 public slots:
 	void toggleAdvanced();
