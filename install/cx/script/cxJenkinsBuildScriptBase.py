@@ -68,7 +68,6 @@ class Controller(cxBuildScript.BuildScript):
                 target_platform=self.controlData().getTargetPlatform(),                                                                    
                 root_dir=self.controlData().getRootDir(),
                 install_root=self.cxInstaller.getInstalledFolder(),
-                test_data_path=custusxdata.sourcePath(),
                 system_base_name=self.controlData().system_base_name)
 
     def resetInstallerStep(self):
