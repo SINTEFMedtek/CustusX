@@ -40,9 +40,9 @@ set(PLUGIN_resources
 install(FILES
         ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels.cl
         ${Tube-Segmentation-Framework_KERNELS_DIR}/kernels_no_3d_write.cl
-        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/)
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/tsf/)
 install(DIRECTORY ${Tube-Segmentation-Framework_PARAMETERS_DIR}
-        DESTINATION ${CX_INSTALL_ROOT_DIR}/config/tsf/
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/tsf/
         FILE_PERMISSIONS ${CX_FULL_PERMISSIONS}
         DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS})
 
@@ -81,6 +81,7 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+  ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
 target_include_directories(org_custusx_filter_tubesegmentation
