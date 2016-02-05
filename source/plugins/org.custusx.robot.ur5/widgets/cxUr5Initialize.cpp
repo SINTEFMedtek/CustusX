@@ -321,7 +321,7 @@ void Ur5InitializeTab::addCheckedApplicationSlot()
 
 QString Ur5InitializeTab::onoffButtonStyleSheet()
 {
-    QString str = "QPushButton{background-color: transparent;}";
+    QString str = "QPushButton{background-color: transparent; outline: none} /";
 
     return str;
 }
