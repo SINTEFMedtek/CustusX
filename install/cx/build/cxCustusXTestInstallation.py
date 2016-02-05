@@ -33,7 +33,7 @@ class CustusXTestInstallation:
     Represents one installed version of CustusX,
     along with functionality for testing it.
     '''
-    def __init__(self, target_platform, root_dir, install_root, test_data_path, system_base_name):
+    def __init__(self, target_platform, root_dir, install_root, system_base_name):
         '''
         target_platform: cxUtilities.PlatformInfo instance describing target platform
         root_dir: root dir for user data. Test results can be placed here.
@@ -43,11 +43,13 @@ class CustusXTestInstallation:
         self.target_platform = target_platform
         self.root_dir = root_dir
         self.install_root = install_root
-        self.test_data_path = test_data_path
         self.system_base_name = system_base_name
         
     def getTestDataPath(self):
-        return self.test_data_path
+        return "%s/CX/data/" % self.root_dir
+
+    def getLargeTestDataPath(self):
+        return "%s/CX/largedata/" % self.root_dir
 
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
@@ -130,6 +132,10 @@ class CustusXTestInstallation:
         dataLocationFile = '%s/data_root_location.txt' % settingsPath
         cx.utils.cxUtilities.writeToNewFile(filename=dataLocationFile, text=self.getTestDataPath())
         cx.utils.cxUtilities.assertTrue(os.path.exists(self.getTestDataPath()), 'Looking for installed data path.')
+
+        dataLocationFile = '%s/large_data_root_location.txt' % settingsPath
+        cx.utils.cxUtilities.writeToNewFile(filename=dataLocationFile, text=self.getLargeTestDataPath())
+        cx.utils.cxUtilities.assertTrue(os.path.exists(self.getLargeTestDataPath()), 'Looking for installed large data path.')
     
     def _getInstalledSettingsPath(self):
         return '%s/config/settings' % self.install_root
