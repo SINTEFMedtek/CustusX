@@ -46,10 +46,10 @@ class CustusXTestInstallation:
         self.system_base_name = system_base_name
         
     def getTestDataPath(self):
-        return "%s/CX/data/" % self.root_dir
+        return "%s/CX/CX/data/" % self.root_dir
 
     def getLargeTestDataPath(self):
-        return "%s/CX/largedata/" % self.root_dir
+        return "%s/CX/CX/largedata/" % self.root_dir
 
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
@@ -131,11 +131,11 @@ class CustusXTestInstallation:
         settingsPath = self._getInstalledSettingsPath()
         dataLocationFile = '%s/data_root_location.txt' % settingsPath
         cx.utils.cxUtilities.writeToNewFile(filename=dataLocationFile, text=self.getTestDataPath())
-        cx.utils.cxUtilities.assertTrue(os.path.exists(self.getTestDataPath()), 'Looking for installed data path.')
+        cx.utils.cxUtilities.assertTrue(os.path.exists(self.getTestDataPath()), 'Looking for installed data path: %s'%self.getTestDataPath())
 
+        #Optional
         dataLocationFile = '%s/large_data_root_location.txt' % settingsPath
         cx.utils.cxUtilities.writeToNewFile(filename=dataLocationFile, text=self.getLargeTestDataPath())
-        cx.utils.cxUtilities.assertTrue(os.path.exists(self.getLargeTestDataPath()), 'Looking for installed large data path.')
     
     def _getInstalledSettingsPath(self):
         return '%s/config/settings' % self.install_root
