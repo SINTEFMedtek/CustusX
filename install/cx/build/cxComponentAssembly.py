@@ -78,7 +78,8 @@ class LibraryAssembly(object):
         self.selectedLibraryNames = self.getLibnames()
                       
     def selectTestLibraries(self):
-        self.selectedLibraryNames = [lib for lib in self.getLibnames() if self.getComponent(lib).useInIntegrationTesting()]
+        libs = [lib for lib in self.libraries if lib.useInIntegrationTesting()]
+        self.selectedLibraryNames = [lib.name() for lib in libs]
                         
     def getSelectedLibraries(self):
         return self.selectedLibraryNames
