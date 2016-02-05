@@ -92,6 +92,9 @@ class Component(object):
     def addConfigurationToDownstreamLib(self, builder):
         'called during the configuration step of CustusX: insert necessary cmake stuff into builder'
         pass
+    def useInIntegrationTesting(self):
+        'use during integration test'
+        return False
 
         
 # ---------------------------------------------------------
@@ -421,6 +424,9 @@ class CustusX(CppComponent):
         if self.controlData.mGraphviz:
             cmakeOptions = '--graphviz=graph.dot'
         builder.configureCMake(cmakeOptions)
+    def useInIntegrationTesting(self):
+        'use during integration test'
+        return True
         
 # ---------------------------------------------------------
 
@@ -563,6 +569,9 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % base
     def makeClean(self):
         pass
+    def useInIntegrationTesting(self):
+        'use during integration test'
+        return True
 # ---------------------------------------------------------
 
 class QHttpServer(CppComponent):

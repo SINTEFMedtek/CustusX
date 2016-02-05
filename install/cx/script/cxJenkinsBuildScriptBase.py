@@ -153,9 +153,10 @@ class Controller(cxBuildScript.BuildScript):
     def checkoutCustusXAndData(self):
         'checkout only CustusX and data. Required if the first build step was not run, f.ex. during integration tests'
         assembly = self.cxBuilder.assembly
-        PrintFormatter.printHeader('Checkout CustusX and CustusXData', level=2)
-        custusx = assembly.getComponent(cx.build.cxComponents.CustusX)
-        cxdata = assembly.getComponent(cx.build.cxComponents.CustusXData)
+        PrintFormatter.printHeader('Checkout libraries required for integration test', level=2)
+        #custusx = assembly.getComponent(cx.build.cxComponents.CustusX)
+        #cxdata = assembly.getComponent(cx.build.cxComponents.CustusXData)
 
-        assembly.selectLibraries([custusx.name(), cxdata.name()])
+        #assembly.selectLibraries([custusx.name(), cxdata.name()])
+        assembly.selectTestLibraries()
         assembly.process(checkout=True)
