@@ -275,4 +275,14 @@ void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double 
     }
 }
 
+void Ur5PlannedMoveTab::startLoggingActiveTool(Transform3D matrix, double timestamp)
+{
+
+}
+
+void Ur5PlannedMoveTab::runLoggedActiveToolSequence()
+{
+
+}
+
 } // cx

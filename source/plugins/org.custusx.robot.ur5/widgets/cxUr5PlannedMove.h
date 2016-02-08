@@ -37,6 +37,9 @@ private slots:
     void followActiveToolSlot();
     void startFollowingActiveToolSlot(Transform3D matrix, double timestamp);
 
+    void startLoggingActiveTool(Transform3D matrix, double timestamp);
+    void runLoggedActiveToolSequence();
+
 private:
     QPushButton *runVTKButton, *openVTKButton, *runVelocityVTKButton;
     QPushButton *startLoggingButton, *stopLoggingButton;
