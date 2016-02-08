@@ -252,14 +252,15 @@ void Ur5PlannedMoveTab::followActiveToolSlot()
 
 void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double timestamp)
 {
-    if((Ur5Kinematics::T2transl(matrix)-mUr5Robot->getCurrentState().cartAxis).length()<blendRadiusLineEdit->text().toDouble())
-    {
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
+    Transform3D currentToolPose = mUr5Robot->getCurrentState().bMee*mUr5Robot->get_eMt();
+
+    if((Ur5Kinematics::T2transl((robotTool->get_prMb().inverse()*matrix))-Ur5Kinematics::T2transl(currentToolPose)).length()>blendRadiusLineEdit->text().toDouble())
+    {
 
     double moveVelocity = velocityLineEdit->text().toDouble()/1000;
 
-    Transform3D currentToolPose = mUr5Robot->getCurrentState().bMee*mUr5Robot->get_eMt();
 
     Vector3D tangent = Ur5Kinematics::T2transl(robotTool->get_prMb().inverse()*matrix)-Ur5Kinematics::T2transl(currentToolPose);
 
