@@ -252,8 +252,8 @@ void Ur5PlannedMoveTab::followActiveToolSlot()
 
 void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double timestamp)
 {
-    //if(deviation.length()>blendRadiusLineEdit->text().toDouble()/1000)
-    //{
+    if((Ur5Kinematics::T2transl(matrix)-mUr5Robot->getCurrentState().cartAxis).length()<blendRadiusLineEdit->text().toDouble())
+    {
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
