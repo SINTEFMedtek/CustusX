@@ -68,7 +68,6 @@ void Ur5ProgramEncoder::printVTKline(vtkPolyData* output)
 
 void Ur5ProgramEncoder::addPath(vtkPolyData* output)
 {
-    std::cout << output->GetLines()->GetNumberOfConnectivityEntries() << std::endl;
     for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
     {
         Ur5State pose;
