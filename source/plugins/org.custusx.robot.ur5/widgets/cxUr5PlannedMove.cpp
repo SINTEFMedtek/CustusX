@@ -208,8 +208,6 @@ void Ur5PlannedMoveTab::moveToPointSlot()
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    Transform3D eMt = robotTool->get_eMt();
-
     Transform3D prMt_d = Transform3D::Identity();
     prMt_d.translation() = pointMetric->getCoordinate();
 
@@ -243,7 +241,6 @@ void Ur5PlannedMoveTab::followActiveToolSlot()
     {
         connect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
                 this, &Ur5PlannedMoveTab::startFollowingActiveToolSlot);
-        prevMatrix=Transform3D::Identity();
     }
     else
     {
@@ -255,8 +252,6 @@ void Ur5PlannedMoveTab::followActiveToolSlot()
 
 void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double timestamp)
 {
-    Vector3D deviation = Ur5Kinematics::T2transl(matrix)-Ur5Kinematics::T2transl(prevMatrix);
-
     //if(deviation.length()>blendRadiusLineEdit->text().toDouble()/1000)
     //{
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
@@ -276,10 +271,7 @@ void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double 
     jointVelocity = mUr5Robot->getCurrentState().jacobian.inverse()*velocityEndEffector.transpose();
 
     mUr5Robot->move("speedj",jointVelocity,accelerationLineEdit->text().toDouble()/1000,0,1,0);
-    //}
-
-
-    prevMatrix = matrix;
+    }
 }
 
 } // cx
