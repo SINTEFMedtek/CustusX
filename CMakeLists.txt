@@ -63,12 +63,17 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}   
     cxGUIExtenderService
-    #cxLogicManager
     cxPluginUtilities
     Qt5::Widgets
     cxGui
     org_custusx_registration_method_bronchoscopy
     )
+
+set(PLUGIN_OUTPUT_DIR "")
+if(CX_WINDOWS)
+    #on windows we want dlls to be placed with the executables
+    set(PLUGIN_OUTPUT_DIR "../")
+endif(CX_WINDOWS)
 
 ctkMacroBuildPlugin(
   NAME ${PROJECT_NAME}
@@ -78,6 +83,8 @@ ctkMacroBuildPlugin(
   UI_FORMS ${PLUGIN_UI_FORMS}
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
+  OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+  ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
 #add_subdirectory(testing)

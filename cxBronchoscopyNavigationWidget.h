@@ -87,6 +87,7 @@ private:
 	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
 	BronchoscopePositionProjectionPtr mProjectionCenterlinePtr;
 
+	bool mIsCenerlineProcessed;
 
 	PatientModelServicePtr mPatientModelService;
 	ViewServicePtr mViewService;
