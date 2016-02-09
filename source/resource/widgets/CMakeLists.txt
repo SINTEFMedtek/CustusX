@@ -70,3 +70,5 @@ target_link_libraries(cxResourceWidgets
     cxResourceFilter
 	cxResourceVisualization
 )
+
+add_subdirectory(testing)
