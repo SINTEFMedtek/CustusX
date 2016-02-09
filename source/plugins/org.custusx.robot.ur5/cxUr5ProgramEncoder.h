@@ -43,6 +43,7 @@ private:
 
     vtkPolyDataPtr getPolyDataFromFile(QString inputFilename) const;
     std::vector<Transform3D> getTransformationsFromPolyData(vtkPolyData* output);
+    Ur5MovementInfo createMovementInfoWithTransformation(Transform3D transform);
 
     std::vector<Ur5MovementInfo> mMovementQueue;
 };
