@@ -23,12 +23,12 @@ namespace cx
 class org_custusx_robot_ur5_EXPORT Ur5ProgramEncoder
 {
 public:
-    int openVTKfile(QString filename);
-    void clearQueues();
+    int openVTKfile(QString filename); // Mål å fjærne
+    void clearQueues(); // Mål å fjærne
 
-    std::vector<Ur5State> poseQueue;
-    std::vector<QString> programQueue;
-    std::vector<Eigen::RowVectorXd> jointPositionQueue;
+    std::vector<Ur5State> poseQueue; // Mål å fjærne
+    std::vector<QString> programQueue; // Mål å fjærne
+    std::vector<Eigen::RowVectorXd> jointPositionQueue; // Mål å fjærne
 
     void createMovementQueueFromVTKFile(QString inputFilename);
     void createMovementQueueFromTransformations(std::vector<Transform3D> transformations);
@@ -41,9 +41,8 @@ public:
     std::vector<Ur5MovementInfo> getMovementQueue();
 
 private:
-    void addPath(vtkPolyData* output);
-    void addToPoseQueue(Ur5State pose);
-    Ur5MessageEncoder mMessageEncoder;
+    void addPath(vtkPolyData* output); // Mål å fjærne
+    void addToPoseQueue(Ur5State pose); // Mål å fjærne
 
     vtkPolyDataPtr getPolyDataFromFile(QString inputFilename) const;
     std::vector<Transform3D> getTransformationsFromPolyData(vtkPolyData* output);
