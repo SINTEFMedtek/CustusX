@@ -121,6 +121,11 @@ void Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Trans
     this->mMovementQueue = movementQueue;
 }
 
+std::vector<Ur5MovementInfo> Ur5ProgramEncoder::getMovementQueue()
+{
+    return mMovementQueue;
+}
+
 } //cx
 
 

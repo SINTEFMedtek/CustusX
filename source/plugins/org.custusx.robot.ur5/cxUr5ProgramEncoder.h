@@ -34,6 +34,7 @@ public:
     void createMovementQueueFromTransformations(std::vector<Transform3D> transformations);
 
 
+    std::vector<Ur5MovementInfo> getMovementQueue();
 
 private:
     void addPath(vtkPolyData* output);
