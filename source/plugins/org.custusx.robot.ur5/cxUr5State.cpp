@@ -32,10 +32,8 @@ Ur5MovementInfo::Ur5MovementInfo():
     acceleration(0),
     velocity(0),
     time(0),
-    radius(0),
-    motionReference(Transform3D::Identity())
+    radius(0)
 {   
-    spaceFlag = undefinedSpace;
     typeOfMovement = undefinedMove;
 }
 

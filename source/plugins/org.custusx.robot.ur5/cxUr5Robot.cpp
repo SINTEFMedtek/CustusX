@@ -237,14 +237,7 @@ void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, doub
 
 void Ur5Robot::move(Ur5MovementInfo movementInfo)
 {
-    mTargetState.jointConfiguration = movementInfo.targetJointConfiguration;
 
-    if(movementInfo.typeOfMovement == Ur5MovementInfo::movej)
-        sendMessage(mMessageEncoder.movej(movementInfo));
-    else if(movementInfo.typeOfMovement == Ur5MovementInfo::speedj)
-        sendMessage(mMessageEncoder.speedj(movementInfo));
-    else if(movementInfo.typeOfMovement == Ur5MovementInfo::speedl)
-        ;
 }
 
 void Ur5Robot::addToMoveQueue(Eigen::RowVectorXd target)

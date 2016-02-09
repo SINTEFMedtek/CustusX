@@ -8,6 +8,8 @@
 namespace cx
 {
 typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
+
+
 /**
  * Struct that holds UR5 robot information.
  *
@@ -27,7 +29,6 @@ struct org_custusx_robot_ur5_EXPORT Ur5State
 
     Eigen::RowVectorXd jointConfiguration;
     Eigen::RowVectorXd jointVelocity;
-
     Eigen::RowVectorXd operationalVelocity;
 
     Eigen::MatrixXd jacobian;
@@ -43,13 +44,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     Ur5MovementInfo();
     ~Ur5MovementInfo();
 
-    Eigen::RowVectorXd targetJointConfiguration;
-    Eigen::RowVectorXd targetOperationalConfiguration;
-
-    Eigen::RowVectorXd targetJointVelocity;
-    Eigen::RowVectorXd targetOperationalVelocity;
-
-    Transform3D motionReference; // Patient reference with respect to base (bMpr)
+    Transform3D target_bMe;
 
     double acceleration;
     double velocity;
@@ -67,15 +62,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
         undefinedMove
     };
 
-    enum spaceType
-    {
-        jointSpace,
-        operationalSpace,
-        undefinedSpace
-    };
-
     movementType typeOfMovement;
-    spaceType spaceFlag;
 };
 
 
