@@ -46,8 +46,6 @@ namespace cx
 
 Ur5PluginActivator::Ur5PluginActivator()
 {
-    //std::cout << "Created Ur5PluginActivator" << std::endl;
-
 }
 
 Ur5PluginActivator::~Ur5PluginActivator()
@@ -56,8 +54,6 @@ Ur5PluginActivator::~Ur5PluginActivator()
 void Ur5PluginActivator::start(ctkPluginContext* context)
 {   
     mServices = VisServices::create(context);
-
-    //PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 
     mUr5Robot = Ur5RobotPtr(new Ur5Robot);
 

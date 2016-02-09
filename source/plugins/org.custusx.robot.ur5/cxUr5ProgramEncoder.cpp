@@ -19,22 +19,6 @@ void Ur5ProgramEncoder::addToPoseQueue(Ur5State pose)
     poseQueue.push_back(pose);
 }
 
-void Ur5ProgramEncoder::movejProgram(std::vector<Ur5State> poseQueue,double a, double v, double r)
-{
-    for(int i=0;i<poseQueue.size();i++)
-    {
-        programQueue.push_back(mMessageEncoder.movej(poseQueue[i],a,v,r));
-    }
-}
-
-void Ur5ProgramEncoder::movejProgram(std::vector<Eigen::RowVectorXd> jointPositionQueue,double a, double v, double t, double r)
-{
-    for(int i=0;i<jointPositionQueue.size();i++)
-    {
-        programQueue.push_back(mMessageEncoder.movej(jointPositionQueue[i],a,v,t,r));
-    }
-}
-
 int Ur5ProgramEncoder::openVTKfile(QString inputFilename)
 {
     vtkSmartPointer<vtkGenericDataObjectReader> reader =
@@ -51,18 +35,6 @@ int Ur5ProgramEncoder::openVTKfile(QString inputFilename)
       }
 
     return EXIT_SUCCESS;
-}
-
-void Ur5ProgramEncoder::printVTKline(vtkPolyData* output)
-{
-    std::cout << "line has " << output->GetLines()->GetNumberOfConnectivityEntries() << " points" << std::endl;
-
-    for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
-    {
-        double p[3];
-        output->GetPoint(output->GetCell(0)->GetPointId(i),p);
-        std::cout << "Point " << output->GetCell(0)->GetPointId(i) << " : (" << p[0] << " " << p[1] << " " << p[2] << ")" << std::endl;
-    }
 }
 
 void Ur5ProgramEncoder::addPath(vtkPolyData* output)

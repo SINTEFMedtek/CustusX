@@ -240,11 +240,6 @@ void Ur5Robot::move(Ur5MovementInfo movementInfo)
 
 }
 
-void Ur5Robot::addToMoveQueue(Eigen::RowVectorXd target)
-{
-    mProgramEncoder.jointPositionQueue.push_back(target);
-}
-
 void Ur5Robot::addToProgramQueue(QString str)
 {
     mProgramEncoder.programQueue.push_back(str);
@@ -280,7 +275,6 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
 {
     if(typeOfProgram == "movej")
     {
-        mProgramEncoder.movejProgram(mProgramEncoder.poseQueue,acceleration,velocity,radius);
         mStartPosition = this->getCurrentState();
         Ur5State initState;
         initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
@@ -292,7 +286,6 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
     }
     else if(typeOfProgram == "movej2")
     {
-        mProgramEncoder.movejProgram(mProgramEncoder.jointPositionQueue,acceleration,velocity,radius);
         this->move("movej",mProgramEncoder.jointPositionQueue[0],acceleration,velocity);
         moveInProgress=true;
         moveAcceleration=acceleration;
@@ -328,18 +321,6 @@ bool Ur5Robot::atTargetState()
         return true;
     }
     return false;
-}
-
-void Ur5Robot::printMoveQueue()
-{
-    for(int i = 0; i<mProgramEncoder.jointPositionQueue.size(); i++)
-        std::cout << mProgramEncoder.jointPositionQueue[i] << std::endl;
-}
-
-void Ur5Robot::printProgramQueue()
-{
-    for(int i = 0; i<mProgramEncoder.programQueue.size(); i++)
-        std::cout << mProgramEncoder.programQueue[i].toStdString() << std::endl;
 }
 
 void Ur5Robot::setBlendRadius(double blendRadius)

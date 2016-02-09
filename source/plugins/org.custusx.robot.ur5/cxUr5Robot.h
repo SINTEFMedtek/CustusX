@@ -105,13 +105,9 @@ private:
 
     void runProgramQueue(std::vector<QString> programQueue);
 
-    void printMoveQueue();
-    void printProgramQueue();
-
     std::vector<QString> getProgramQueue();
 
-    int rtPort;
-    int secPort;
+    int rtPort, secPort;
     QString IPaddress;
     Ur5Connection mSecMonitor,mRTMonitor;
     Ur5ProgramEncoder mProgramEncoder;

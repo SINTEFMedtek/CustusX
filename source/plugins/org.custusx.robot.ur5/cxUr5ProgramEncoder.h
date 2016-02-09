@@ -29,8 +29,6 @@ public:
 
     std::vector<Eigen::RowVectorXd> jointPositionQueue;
 
-    void movejProgram(std::vector<Ur5State> poseQueue, double a, double v, double r);
-    void movejProgram(std::vector<Eigen::RowVectorXd> jointPositionQueue, double a, double v, double t = 0, double r = 0);
 
     int openVTKfile(QString filename);
     void printVTKline(vtkPolyData* output);
