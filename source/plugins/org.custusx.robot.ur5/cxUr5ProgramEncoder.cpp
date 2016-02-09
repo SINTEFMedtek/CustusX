@@ -10,6 +10,8 @@
 #include <vtkCellArray.h>
 #include <string>
 
+#include "cxUr5State.h"
+
 
 namespace cx
 {
@@ -54,7 +56,7 @@ void Ur5ProgramEncoder::clearQueues()
 {
     poseQueue.clear();
     programQueue.clear();
-    movementQueue.clear();
+    mMovementQueue.clear();
     CX_LOG_INFO() << poseQueue.size();
 }
 

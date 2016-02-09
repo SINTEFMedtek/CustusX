@@ -23,23 +23,22 @@ namespace cx
 class org_custusx_robot_ur5_EXPORT Ur5ProgramEncoder
 {
 public:
+    int openVTKfile(QString filename);
+    void clearQueues();
+
     std::vector<Ur5State> poseQueue;
     std::vector<QString> programQueue;
-    std::vector<Ur5MovementInfo> movementQueue;
-
     std::vector<Eigen::RowVectorXd> jointPositionQueue;
 
 
-    int openVTKfile(QString filename);
-    void printVTKline(vtkPolyData* output);
 
-    void clearQueues();
 
 private:
     void addPath(vtkPolyData* output);
     void addToPoseQueue(Ur5State pose);
     Ur5MessageEncoder mMessageEncoder;
 
+    std::vector<Ur5MovementInfo> mMovementQueue;
 };
 
 
