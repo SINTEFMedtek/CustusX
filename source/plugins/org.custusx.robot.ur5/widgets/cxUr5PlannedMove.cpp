@@ -5,6 +5,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QApplication>
+#include <QDir>
 
 #include "cxLogger.h"
 #include "cxVisServices.h"
@@ -18,6 +19,7 @@
 #include "trackingSystemRobot/cxRobotTool.h"
 #include "cxUr5Kinematics.h"
 #include "cxTool.h"
+#include "cxUr5ProgramEncoder.h"
 
 
 namespace cx
@@ -30,8 +32,7 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
 {
     setupUi(this);
 
-    //connect(startLoggingButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::startLoggingSlot);
-    //connect(stopLoggingButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::stopLoggingSlot);
+
     //connect(clearPoseQueueButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::clearPoseQueueSlot);
 
     connect(moveToPointButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToPointSlot);
@@ -54,8 +55,7 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignTop);
 
-
-    setTextEditorWidget(mainLayout);
+    setMovementAssignmentWidget(mainLayout);
     setMoveVTKWidget(mainLayout);
     setMoveSettingsWidget(mainLayout);
 }
@@ -87,8 +87,6 @@ void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
     runVTKButton = new QPushButton(tr("Run P2P Profile"));
     openVTKButton = new QPushButton(tr("Open"));
     runVelocityVTKButton = new QPushButton(tr("Run Velocity Profile"));
-    startLoggingButton = new QPushButton(tr("Start logging"));
-    stopLoggingButton = new QPushButton(tr("Stop logging"));
     clearPoseQueueButton = new QPushButton(tr("Clear pose queue"));
     moveToInitialPositionButton = new QPushButton(tr("Move to start"));
 
@@ -100,8 +98,7 @@ void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
     layout2->addWidget(runVelocityVTKButton);
 
     runVTKButton->setToolTip("Follow VTK line");
-
-    vtkLineEdit->setText("C:\\line.vtk");
+    vtkLineEdit->setText("testing/testdata/line200.vtk");
 }
 
 void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
@@ -115,7 +112,6 @@ void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
 
     velAccLayout->setSpacing(5);
     velAccLayout->setMargin(5);
-    //velAccLayout->setContentsMargins(0,0,0,0);
 
     // Velocity
     velAccLayout->addWidget(new QLabel("Velocity"), 0, 0, 1, 1);
@@ -142,7 +138,7 @@ void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     velAccLayout->addWidget(new QLabel("mm"));
 }
 
-void Ur5PlannedMoveTab::setTextEditorWidget(QVBoxLayout *parent)
+void Ur5PlannedMoveTab::setMovementAssignmentWidget(QVBoxLayout *parent)
 {
     QGroupBox* group = new QGroupBox("Assign movement");
     group->setFlat(true);
@@ -175,28 +171,14 @@ void Ur5PlannedMoveTab::runVelocityVTKSlot()
 
 void Ur5PlannedMoveTab::openVTKfileSlot()
 {
-     mUr5Robot->openVTKfile(vtkLineEdit->text());
-}
-
-void Ur5PlannedMoveTab::startLoggingSlot()
-{
-    mUr5Robot->startLogging();
-}
-
-void Ur5PlannedMoveTab::stopLoggingSlot()
-{
-    mUr5Robot->stopLogging();
+    //mProgramEncoder.createMovementQueueFromVTKFile(getPathToPlugin()+vtkLineEdit->text());
+    mUr5Robot->openVTKfile(getPathToPlugin()+vtkLineEdit->text());
 }
 
 void Ur5PlannedMoveTab::clearPoseQueueSlot()
 {
     CX_LOG_DEBUG() << "Enters clear queue";
     mUr5Robot->clearProgramQueue();
-}
-
-void Ur5PlannedMoveTab::moveToInitialPositionButtonSlot()
-{
-    mUr5Robot->moveToInitialPosition(accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble());
 }
 
 void Ur5PlannedMoveTab::moveToPointSlot()
@@ -283,6 +265,17 @@ void Ur5PlannedMoveTab::startLoggingActiveTool(Transform3D matrix, double timest
 void Ur5PlannedMoveTab::runLoggedActiveToolSequence()
 {
 
+}
+
+QString Ur5PlannedMoveTab::getPathToPlugin()
+{
+    QDir dir = QDir::current();
+    dir.cdUp();
+    dir.cdUp();
+
+    QString pluginFolder = "/CX/source/plugins/org.custusx.robot.ur5/";
+
+    return (dir.path() + pluginFolder);
 }
 
 } // cx

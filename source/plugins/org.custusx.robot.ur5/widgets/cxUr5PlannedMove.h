@@ -27,10 +27,7 @@ private slots:
     void blendRadiusChangedSlot();
     void runVelocityVTKSlot();
 
-    void startLoggingSlot();
-    void stopLoggingSlot();
     void clearPoseQueueSlot();
-    void moveToInitialPositionButtonSlot();
 
     void moveToPointSlot();
     void moveToFrameSlot();
@@ -42,7 +39,7 @@ private slots:
 
 private:
     QPushButton *runVTKButton, *openVTKButton, *runVelocityVTKButton;
-    QPushButton *startLoggingButton, *stopLoggingButton;
+
     QPushButton *clearPoseQueueButton;
     QPushButton *moveToInitialPositionButton;
 
@@ -54,13 +51,17 @@ private:
 
 
     void setupUi(QWidget *parent);
-    Ur5RobotPtr mUr5Robot;
 
     void setMoveVTKWidget(QVBoxLayout *parent);
     void setMoveSettingsWidget(QVBoxLayout *parent);
-    void setTextEditorWidget(QVBoxLayout *parent);
+    void setMovementAssignmentWidget(QVBoxLayout *parent);
+
+    Ur5ProgramEncoder mProgramEncoder;
 
     VisServicesPtr mServices;
+    Ur5RobotPtr mUr5Robot;
+
+    QString getPathToPlugin();
 };
 
 } // cx
