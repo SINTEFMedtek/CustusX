@@ -93,6 +93,21 @@ std::vector<Transform3D> Ur5ProgramEncoder::getTransformationsFromPolyData(vtkPo
     return transformations;
 }
 
+void Ur5ProgramEncoder::createMovementQueueFromVTKFile(QString inputFilename)
+{
+    std::vector<Ur5MovementInfo> movementQueue;
+
+    std::vector<Transform3D> transformations
+            = this->getTransformationsFromPolyData(this->getPolyDataFromFile(inputFilename));
+
+    for(int i=0; i<transformations.size(); i++)
+    {
+        movementQueue.push_back(createMovementInfoWithTransformation(transformations.at(i)));
+    }
+
+    this->mMovementQueue = movementQueue;
+}
+
 } //cx
 
 

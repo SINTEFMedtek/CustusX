@@ -30,6 +30,7 @@ public:
     std::vector<QString> programQueue;
     std::vector<Eigen::RowVectorXd> jointPositionQueue;
 
+    void createMovementQueueFromVTKFile(QString inputFilename);
 
 
 
