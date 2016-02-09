@@ -39,41 +39,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-//TEST_CASE("Ur5Plugin: Connect to robot", "[manual][plugins][org.custusx.robot.ur5]")
-//{
-//    Ur5TestFixture fixture;
-//    fixture.mUr5Robot.connectToRobot("169.254.62.100");
-//    CHECK(fixture.mUr5Robot.isConnectedToRobot());
-//}
+TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
 
-//TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manual][plugins][org.custusx.robot.ur5]")
-//{
-//    Ur5TestFixture fixture;
+    QByteArray rawData560 = fixture.getByteArrayFromTxt("cxDataFromRobot560.txt");
+    fixture.mUr5Connection.updateCurrentState(rawData560);
+    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
 
-//    QByteArray rawData560 = fixture.getTestData(560);
-//    fixture.mUr5Connection.updateCurrentState(rawData560);
-//    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+    QByteArray rawData1254 = fixture.getByteArrayFromTxt("cxDataFromRobot1254.txt");
+    fixture.mUr5Connection.updateCurrentState(rawData1254);
+    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
 
-//    QByteArray rawData1254 = fixture.getTestData(1254);
-//    fixture.mUr5Connection.updateCurrentState(rawData1254);
-//    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
-
-//    QByteArray rawData1460 = fixture.getTestData(1460);
-//    fixture.mUr5Connection.updateCurrentState(rawData1460);
-//    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
-//}
+    QByteArray rawData1460 = fixture.getByteArrayFromTxt("cxDataFromRobot1460.txt");
+    fixture.mUr5Connection.updateCurrentState(rawData1460);
+    REQUIRE(fixture.mUr5Connection.getCurrentState().updated == true);
+}
 
 
-//TEST_CASE("Ur5Plugin: Read VTK data", "[manual][plugins][org.custusx.robot.ur5]")
-//{
-//    Ur5TestFixture fixture;
+TEST_CASE("Ur5Plugin: Read VTK polyline and return homogeneous transformation matrix", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
 
-//    QString path = "C:/line.vtk";
-//    fixture.mUr5Robot.openVTKfile(path);
-
-//    QString path2 = "C:/artery_centerline_fixed_2.vtk";
-//    fixture.mUr5Robot.openVTKfile(path2);
-//}
+    QString path = fixture.getTestDataFolderPath()+"line.vtk";
+    fixture.mUr5Robot.openVTKfile(path);
+}
 
 //TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition", "[manual][plugins][org.custusx.robot.ur5]")
 //{
@@ -115,13 +105,13 @@ namespace cxtest
 //    REQUIRE(deviation(2)<=threshold);
 //}
 
-TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
-{
-    Ur5TestFixture fixture;
+//TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
+//{
+    //Ur5TestFixture fixture;
 
-    Eigen::RowVectorXd jp1(6);
+    //Eigen::RowVectorXd jp1(6);
 
-    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values
+    //jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values
 
     //jp1 << 0,-M_PI/2,0,-M_PI/2,0,0;
 
@@ -140,9 +130,6 @@ TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
     //std::cout << fixture.mUr5Kinematics.T2rangles(Eigen::Affine3d(computedOperationalPositon)) << std::endl;
 
     //std::cout << fixture.mUr5Kinematics.T2OperationalConfiguration(fixture.mUr5Kinematics.forward(jp1)) << std::endl;
-
-    std::cout << "Hei" << std::endl;
-
-}
+//}
 
 } //cxtest
