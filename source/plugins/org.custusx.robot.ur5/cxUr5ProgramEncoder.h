@@ -33,6 +33,10 @@ public:
     void createMovementQueueFromVTKFile(QString inputFilename);
     void createMovementQueueFromTransformations(std::vector<Transform3D> transformations);
 
+    void setMovementSettings(double acceleration = 0, double velocity = 0,
+                             double time = 0, double radius = 0);
+    void setTypeOfMovement(Ur5MovementInfo::movementType typeOfMovement);
+    void setMotionReference(Transform3D prMb);
 
     std::vector<Ur5MovementInfo> getMovementQueue();
 

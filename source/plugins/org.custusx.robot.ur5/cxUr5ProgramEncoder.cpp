@@ -133,6 +133,33 @@ std::vector<Ur5MovementInfo> Ur5ProgramEncoder::getMovementQueue()
     return mMovementQueue;
 }
 
+void Ur5ProgramEncoder::setMovementSettings(double acceleration, double velocity, double time, double radius)
+{
+    for(int i=0; i<this->mMovementQueue.size(); i++)
+    {
+        mMovementQueue.at(i).acceleration = acceleration;
+        mMovementQueue.at(i).velocity = velocity;
+        mMovementQueue.at(i).time = time;
+        mMovementQueue.at(i).radius = radius;
+    }
+}
+
+void Ur5ProgramEncoder::setTypeOfMovement(Ur5MovementInfo::movementType typeOfMovement)
+{
+    for(int i=0; i<(this->mMovementQueue.size()); i++)
+    {
+        mMovementQueue.at(i).typeOfMovement = typeOfMovement;
+    }
+}
+
+void Ur5ProgramEncoder::setMotionReference(Transform3D prMb)
+{
+    for(int i=0; i<(this->mMovementQueue.size()); i++)
+    {
+        mMovementQueue.at(i).motionReference = prMb;
+    }
+}
+
 } //cx
 
 
