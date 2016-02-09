@@ -20,6 +20,7 @@ set(PLUGIN_SRCS
   widgets/cxUr5PlannedMove.cpp
   widgets/cxUr5LungSimulationTab.cpp
   widgets/cxUr5Settings.cpp
+  widgets/cxUr5Misc.cpp
 
   trackingSystemRobot/cxRobotTrackingSystemService.cpp
   trackingSystemRobot/cxRobotTool.cpp
@@ -46,6 +47,7 @@ set(PLUGIN_MOC_SRCS
   widgets/cxUr5PlannedMove.h
   widgets/cxUr5LungSimulationTab.h
   widgets/cxUr5Settings.h
+  widgets/cxUr5Misc.h
 
   trackingSystemRobot/cxRobotTrackingSystemService.h
   trackingSystemRobot/cxRobotTool.h
