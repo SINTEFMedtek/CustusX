@@ -44,7 +44,8 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     Ur5MovementInfo();
     ~Ur5MovementInfo();
 
-    Transform3D target_bMe;
+    Transform3D target_xMe;
+    Transform3D motionReference; // prMx
 
     double acceleration;
     double velocity;
