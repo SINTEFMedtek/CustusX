@@ -1,6 +1,6 @@
 #include "cxUr5ProgramEncoder.h"
-#include "cxLogger.h"
 
+#include "cxLogger.h"
 #include <vtkPolyDataReader.h>
 #include <vtkGenericDataObjectReader.h>
 #include <vtkStructuredGrid.h>
@@ -115,7 +115,6 @@ void Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Trans
     for(int i=0; i<transformations.size(); i++)
     {
         movementQueue.at(i).target_xMe = transformations.at(i);
-        //movementQueue.push_back(createMovementInfoWithTransformation(transformations.at(i)));
     }
 
     this->mMovementQueue = movementQueue;
