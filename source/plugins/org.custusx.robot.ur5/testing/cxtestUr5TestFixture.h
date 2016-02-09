@@ -51,8 +51,16 @@ public:
     cx::Ur5Kinematics mUr5Kinematics;
 
     QByteArray getTestData(int packetSize);
-    Eigen::MatrixXd jacobianUr5(Eigen::RowVectorXd jointPositions);
+    QByteArray getByteArrayFromTxt(QString filename);
+    QString getTestDataFolderPath();
+
     void printMatrix(Eigen::MatrixXd matrix);
+
+private:
+    QString mTestDataFolderName;
+    QString getSourcePath();
+
+
 };
 
 } //cxtest
