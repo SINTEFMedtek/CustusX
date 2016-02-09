@@ -45,24 +45,28 @@ char* testLabels("[unit][resource][widgets]");
 
 struct testWidget
 {
-    cx::OptionsWidget optionsWidget;
+    cx::OptionsWidget mOptionsWidget;
+    bool mExpectedHasOptionsValue;
+    bool mExpectedHasAdvancedOptionsValue;
 
-    testWidget() :
-        optionsWidget(cx::ViewServicePtr(), cx::PatientModelServicePtr(), NULL)
+    testWidget(bool expectedHasOptionsValue, bool expectedHasAdvancedOptionsValue) :
+        mExpectedHasOptionsValue(expectedHasOptionsValue),
+        mExpectedHasAdvancedOptionsValue(expectedHasAdvancedOptionsValue),
+        mOptionsWidget(cx::ViewServicePtr(), cx::PatientModelServicePtr(), NULL)
     {
     }
 
-    void checkOptions(bool hasOptions, bool hasAdvancedOptions)
+    void testThatHasOptionsMethodsReturnTheExpected()
     {
-        CHECK(optionsWidget.hasOptions() == hasOptions);
-        CHECK(optionsWidget.hasAdvancedOptions() == hasAdvancedOptions);
+        CHECK(mOptionsWidget.hasOptions() == mExpectedHasOptionsValue);
+        CHECK(mOptionsWidget.hasAdvancedOptions() == mExpectedHasAdvancedOptionsValue);
     }
 
     void addDummyOption(cx::BoolPropertyPtr boolOption)
     {
         std::vector<cx::PropertyPtr> options;
         options.push_back(boolOption);
-        optionsWidget.setOptions("uid2", options, false);
+        mOptionsWidget.setOptions("uid2", options, false);
     }
 };
 
@@ -70,29 +74,29 @@ struct testWidget
 
 TEST_CASE("OptionsWidget with no options (and hence no advanced options)", testLabels)
 {
-    testWidget t;
-    t.checkOptions(false, false);
+    testWidget tw(false, false);
+    tw.testThatHasOptionsMethodsReturnTheExpected();
 }
 
 TEST_CASE("OptionsWidget with one option which is not advanced", testLabels)
 {
-    testWidget t;
+    testWidget tw(true, false);
 
     cx::BoolPropertyPtr boolOption = cx::BoolProperty::initialize("uid", "name", "help", true);
 
-    t.addDummyOption(boolOption);
-    t.checkOptions(true, false);
+    tw.addDummyOption(boolOption);
+    tw.testThatHasOptionsMethodsReturnTheExpected();
 }
 
 TEST_CASE("OptionsWidget with one advanced option", testLabels)
 {
-    testWidget t;
+    testWidget tw(true, true);
 
     cx::BoolPropertyPtr boolOption = cx::BoolProperty::initialize("uid", "name", "help", true);
     boolOption->setAdvanced(true);
 
-    t.addDummyOption(boolOption);
-    t.checkOptions(true, true);
+    tw.addDummyOption(boolOption);
+    tw.testThatHasOptionsMethodsReturnTheExpected();
 }
 
 
