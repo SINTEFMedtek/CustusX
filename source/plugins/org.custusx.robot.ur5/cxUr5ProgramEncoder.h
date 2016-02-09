@@ -31,6 +31,7 @@ public:
     std::vector<Eigen::RowVectorXd> jointPositionQueue;
 
     void createMovementQueueFromVTKFile(QString inputFilename);
+    void createMovementQueueFromTransformations(std::vector<Transform3D> transformations);
 
 
 

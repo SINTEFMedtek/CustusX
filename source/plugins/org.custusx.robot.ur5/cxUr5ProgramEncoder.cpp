@@ -108,6 +108,19 @@ void Ur5ProgramEncoder::createMovementQueueFromVTKFile(QString inputFilename)
     this->mMovementQueue = movementQueue;
 }
 
+void Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Transform3D> transformations)
+{
+    std::vector<Ur5MovementInfo> movementQueue(transformations.size());
+
+    for(int i=0; i<transformations.size(); i++)
+    {
+        movementQueue.at(i).target_xMe = transformations.at(i);
+        //movementQueue.push_back(createMovementInfoWithTransformation(transformations.at(i)));
+    }
+
+    this->mMovementQueue = movementQueue;
+}
+
 } //cx
 
 
