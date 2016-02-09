@@ -76,6 +76,23 @@ vtkPolyDataPtr Ur5ProgramEncoder::getPolyDataFromFile(QString inputFilename) con
     return vtkPolyDataPtr::New();
 }
 
+std::vector<Transform3D> Ur5ProgramEncoder::getTransformationsFromPolyData(vtkPolyData* output)
+{
+    std::vector<Transform3D> transformations;
+
+    for(vtkIdType i=0; i<output->GetCell(0)->GetNumberOfPoints(); i++)
+    {
+        Transform3D pose = Transform3D::Identity();
+        double p[3];
+        output->GetPoint(output->GetCell(0)->GetPointId(i),p);
+        pose.translation() = Vector3D(p[0],p[1],p[2]);
+
+        transformations.push_back(pose);
+    }
+
+    return transformations;
+}
+
 } //cx
 
 
