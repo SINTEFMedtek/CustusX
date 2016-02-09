@@ -38,6 +38,7 @@ private:
     void addToPoseQueue(Ur5State pose);
     Ur5MessageEncoder mMessageEncoder;
 
+    vtkPolyDataPtr getPolyDataFromFile(QString inputFilename) const;
     std::vector<Ur5MovementInfo> mMovementQueue;
 };
 

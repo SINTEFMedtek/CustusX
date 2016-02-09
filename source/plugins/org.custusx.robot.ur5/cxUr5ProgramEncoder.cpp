@@ -60,6 +60,22 @@ void Ur5ProgramEncoder::clearQueues()
     CX_LOG_INFO() << poseQueue.size();
 }
 
+vtkPolyDataPtr Ur5ProgramEncoder::getPolyDataFromFile(QString inputFilename) const
+{
+    vtkSmartPointer<vtkGenericDataObjectReader> reader =
+        vtkSmartPointer<vtkGenericDataObjectReader>::New();
+
+    reader->SetFileName(inputFilename.toStdString().c_str());
+    reader->Update();
+
+    if(reader->IsFilePolyData())
+      {
+      return reader->GetPolyDataOutput();
+      }
+
+    return vtkPolyDataPtr::New();
+}
+
 } //cx
 
 
