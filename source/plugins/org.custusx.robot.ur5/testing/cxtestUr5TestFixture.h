@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUr5Robot.h"
 #include "cxUr5Kinematics.h"
+#include "cxUr5ProgramEncoder.h"
 
 #include "cxtest_org_custusx_robot_ur5_export.h"
 
@@ -49,6 +50,7 @@ public:
     cx::Ur5Robot mUr5Robot;
     cx::Ur5Connection mUr5Connection;
     cx::Ur5Kinematics mUr5Kinematics;
+    cx::Ur5ProgramEncoder mUr5ProgramEncoder;
 
     QByteArray getTestData(int packetSize);
     QByteArray getByteArrayFromTxt(QString filename);

@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 #include "cxtestUr5TestFixture.h"
 #include <boost/chrono.hpp>
+#include "cxUr5State.h"
 //#include <chrono>
 
 namespace cxtest
@@ -57,12 +58,32 @@ TEST_CASE("Ur5Plugin: Analyze raw data packet and update current state", "[manua
 }
 
 
-TEST_CASE("Ur5Plugin: Read VTK polyline and return homogeneous transformation matrix", "[manual][plugins][org.custusx.robot.ur5]")
+TEST_CASE("Ur5Plugin: Read points from .vtk file with polydata and return movementQueue with homogeneous transformation matrices", "[manual][plugins][org.custusx.robot.ur5]")
 {
     Ur5TestFixture fixture;
 
-    QString path = fixture.getTestDataFolderPath()+"line.vtk";
-    fixture.mUr5Robot.openVTKfile(path);
+    QString path = fixture.getTestDataFolderPath()+"line298.vtk";
+    fixture.mUr5ProgramEncoder.createMovementQueueFromVTKFile(path);
+
+    std::vector<cx::Ur5MovementInfo> movementQueue = fixture.mUr5ProgramEncoder.getMovementQueue();
+
+    REQUIRE(movementQueue.size() == 298);
+}
+
+TEST_CASE("Ur5Plugin: Setup program queue", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
+
+    QString path = fixture.getTestDataFolderPath()+"line298.vtk";
+
+    fixture.mUr5ProgramEncoder.createMovementQueueFromVTKFile(path);
+    fixture.mUr5ProgramEncoder.setMovementSettings(0.30,0.1);
+    fixture.mUr5ProgramEncoder.setTypeOfMovement(cx::Ur5MovementInfo::movej);
+
+    std::vector<cx::Ur5MovementInfo> movementQueue = fixture.mUr5ProgramEncoder.getMovementQueue();
+
+    REQUIRE(movementQueue.at(3).velocity == 0.1);
+    REQUIRE(movementQueue.at(3).typeOfMovement == cx::Ur5MovementInfo::movej);
 }
 
 //TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition", "[manual][plugins][org.custusx.robot.ur5]")
