@@ -47,7 +47,6 @@ int Ur5ProgramEncoder::openVTKfile(QString inputFilename)
       {
       std::cout << "Output is a polydata" << std::endl;
       vtkPolyData* output = reader->GetPolyDataOutput();
-      std::cout << output->GetNumberOfPoints() << std::endl;
       addPath(output);
       }
 
