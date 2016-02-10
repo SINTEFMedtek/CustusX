@@ -30,25 +30,21 @@ public:
     std::vector<QString> programQueue; // Mål å fjærne
     std::vector<Eigen::RowVectorXd> jointPositionQueue; // Mål å fjærne
 
-    void createMovementQueueFromVTKFile(QString inputFilename);
-    void createMovementQueueFromTransformations(std::vector<Transform3D> transformations);
+    static MovementQueue createMovementQueueFromVTKFile(QString inputFilename);
+    static MovementQueue createMovementQueueFromTransformations(std::vector<Transform3D> transforms);
 
-    void setMovementSettings(double acceleration = 0, double velocity = 0,
-                             double time = 0, double radius = 0);
-    void setTypeOfMovement(Ur5MovementInfo::movementType typeOfMovement);
-    void setMotionReference(Transform3D prMb);
-
-    std::vector<Ur5MovementInfo> getMovementQueue();
+    static MovementQueue addMovementSettings(MovementQueue mq, double acc = 0, double vel = 0,
+                              double time = 0, double radius = 0);
+    static MovementQueue addTypeOfMovement(MovementQueue mq, Ur5MovementInfo::movementType mtype);
+    static MovementQueue addMotionReference(MovementQueue mq, Transform3D prMb);
 
 private:
     void addPath(vtkPolyData* output); // Mål å fjærne
     void addToPoseQueue(Ur5State pose); // Mål å fjærne
 
-    vtkPolyDataPtr getPolyDataFromFile(QString inputFilename) const;
-    std::vector<Transform3D> getTransformationsFromPolyData(vtkPolyData* output);
-    Ur5MovementInfo createMovementInfoWithTransformation(Transform3D transform);
-
-    std::vector<Ur5MovementInfo> mMovementQueue;
+    static vtkPolyDataPtr getPolyDataFromFile(QString inputFilename);
+    static std::vector<Transform3D> getTransformationsFromPolyData(vtkPolyData* output);
+    static Ur5MovementInfo createMovementInfoWithTransformation(Transform3D transform);
 };
 
 
