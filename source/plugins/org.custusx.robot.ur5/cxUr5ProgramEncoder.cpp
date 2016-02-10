@@ -56,11 +56,10 @@ void Ur5ProgramEncoder::clearQueues()
 {
     poseQueue.clear();
     programQueue.clear();
-    mMovementQueue.clear();
     CX_LOG_INFO() << poseQueue.size();
 }
 
-vtkPolyDataPtr Ur5ProgramEncoder::getPolyDataFromFile(QString inputFilename) const
+vtkPolyDataPtr Ur5ProgramEncoder::getPolyDataFromFile(QString inputFilename)
 {
     vtkSmartPointer<vtkGenericDataObjectReader> reader =
         vtkSmartPointer<vtkGenericDataObjectReader>::New();
@@ -93,22 +92,44 @@ std::vector<Transform3D> Ur5ProgramEncoder::getTransformationsFromPolyData(vtkPo
     return transformations;
 }
 
-void Ur5ProgramEncoder::createMovementQueueFromVTKFile(QString inputFilename)
+Ur5MovementInfo Ur5ProgramEncoder::createMovementInfoWithTransformation(Transform3D transform)
 {
-    std::vector<Ur5MovementInfo> movementQueue;
-
-    std::vector<Transform3D> transformations
-            = this->getTransformationsFromPolyData(this->getPolyDataFromFile(inputFilename));
-
-    for(int i=0; i<transformations.size(); i++)
-    {
-        movementQueue.push_back(createMovementInfoWithTransformation(transformations.at(i)));
-    }
-
-    this->mMovementQueue = movementQueue;
+    Ur5MovementInfo movementInfo;
+    movementInfo.target_xMe = transform;
+    return movementInfo;
 }
 
-void Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Transform3D> transformations)
+MovementQueue Ur5ProgramEncoder::addMovementSettings(MovementQueue mq, double acceleration, double velocity, double time, double radius)
+{
+    for(int i=0; i<(mq.size()); i++)
+    {
+        mq.at(i).acceleration = acceleration;
+        mq.at(i).velocity = velocity;
+        mq.at(i).time = time;
+        mq.at(i).radius = radius;
+    }
+    return mq;
+}
+
+MovementQueue Ur5ProgramEncoder::addTypeOfMovement(MovementQueue mq, Ur5MovementInfo::movementType typeOfMovement)
+{
+    for(int i=0; i<(mq.size()); i++)
+    {
+        mq.at(i).typeOfMovement = typeOfMovement;
+    }
+    return mq;
+}
+
+MovementQueue Ur5ProgramEncoder::addMotionReference(MovementQueue mq, Transform3D prMb)
+{
+    for(int i=0; i<(mq.size()); i++)
+    {
+        mq.at(i).motionReference = prMb;
+    }
+    return mq;
+}
+
+MovementQueue Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Transform3D> transformations)
 {
     std::vector<Ur5MovementInfo> movementQueue(transformations.size());
 
@@ -117,46 +138,22 @@ void Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Trans
         movementQueue.at(i).target_xMe = transformations.at(i);
     }
 
-    this->mMovementQueue = movementQueue;
+    return movementQueue;
 }
 
-Ur5MovementInfo Ur5ProgramEncoder::createMovementInfoWithTransformation(Transform3D transform)
+MovementQueue Ur5ProgramEncoder::createMovementQueueFromVTKFile(QString inputFilename)
 {
-    Ur5MovementInfo movementInfo;
-    movementInfo.target_xMe = transform;
-    return movementInfo;
-}
+    std::vector<Ur5MovementInfo> movementQueue;
 
-std::vector<Ur5MovementInfo> Ur5ProgramEncoder::getMovementQueue()
-{
-    return mMovementQueue;
-}
+    std::vector<Transform3D> transformations
+            = getTransformationsFromPolyData(getPolyDataFromFile(inputFilename));
 
-void Ur5ProgramEncoder::setMovementSettings(double acceleration, double velocity, double time, double radius)
-{
-    for(int i=0; i<this->mMovementQueue.size(); i++)
+    for(int i=0; i<transformations.size(); i++)
     {
-        mMovementQueue.at(i).acceleration = acceleration;
-        mMovementQueue.at(i).velocity = velocity;
-        mMovementQueue.at(i).time = time;
-        mMovementQueue.at(i).radius = radius;
+        movementQueue.push_back(createMovementInfoWithTransformation(transformations.at(i)));
     }
-}
 
-void Ur5ProgramEncoder::setTypeOfMovement(Ur5MovementInfo::movementType typeOfMovement)
-{
-    for(int i=0; i<(this->mMovementQueue.size()); i++)
-    {
-        mMovementQueue.at(i).typeOfMovement = typeOfMovement;
-    }
-}
-
-void Ur5ProgramEncoder::setMotionReference(Transform3D prMb)
-{
-    for(int i=0; i<(this->mMovementQueue.size()); i++)
-    {
-        mMovementQueue.at(i).motionReference = prMb;
-    }
+    return movementQueue;
 }
 
 } //cx
