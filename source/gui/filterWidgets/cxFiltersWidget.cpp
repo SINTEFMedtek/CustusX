@@ -184,7 +184,6 @@ void FiltersWidget::configureFilterSelector(XmlOptionFile options)
     {
         availableFilters << "FILTER NOT FOUND";
     }
-    CX_LOG_DEBUG() << "availableFilters[0]  " << availableFilters[0];
     mFilterSelector = StringProperty::initialize("filterSelector",
                                                 "Filter",
                                                 "Select which filter to use.",

@@ -73,7 +73,6 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkConnec
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
 {
     this->deconfigure();
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "shutting down opentigtlink thread and destructing OpenIGTLinkTrackingSystemService";
 }
 
 QString OpenIGTLinkTrackingSystemService::getUid() const
@@ -90,8 +89,6 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 {
     if (mState==val)
         return;
-
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "setState " << val;
 
     if (val > mState) // up
     {
@@ -134,13 +131,11 @@ void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
 
 void OpenIGTLinkTrackingSystemService::configure()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "configure";
     this->serverIsConfigured();
 }
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "deconfigure";
     mTools.clear();
     mReference.reset();
     this->serverIsDeconfigured();
@@ -148,26 +143,22 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
 
 void OpenIGTLinkTrackingSystemService::initialize()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "initialize";
     //emit connectToServer();
 }
 
 void OpenIGTLinkTrackingSystemService::uninitialize()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "uninitialize";
     emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::startTracking()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "startTracking";
     //emit startListenToServer();
     //emit connectToServer();
 }
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "stopTracking";
     //emit stopListenToServer();
     emit disconnectFromServer();
 }

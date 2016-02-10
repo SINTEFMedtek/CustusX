@@ -254,7 +254,7 @@ void OpenIGTLinkProtocol::processPack()
 
 void OpenIGTLinkProtocol::setReadyToReceive(bool ready)
 {
-    CX_LOG_DEBUG() << (ready ? "Is " : "NOT ") << "ready to receive";
+    //CX_LOG_DEBUG() << (ready ? "Is " : "NOT ") << "ready to receive";
     mReadyToReceive = ready;
 
 }
