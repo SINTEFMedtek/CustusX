@@ -46,7 +46,6 @@ private:
     QPushButton *moveToPointButton, *moveToFrameButton, *followActiveToolButton;
 
     QLineEdit *vtkLineEdit;
-
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit, *blendRadiusLineEdit;
 
 

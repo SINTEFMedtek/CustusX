@@ -160,13 +160,13 @@ void Ur5PlannedMoveTab::setMovementAssignmentWidget(QVBoxLayout *parent)
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
 {
-    mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble()/1000,velocityLineEdit->text().toDouble()/1000,0);
+    mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
 }
 
 void Ur5PlannedMoveTab::runVelocityVTKSlot()
 {
     CX_LOG_INFO() << "Starting velocity profile sequence";
-    mUr5Robot->moveProgram("speedj",accelerationLineEdit->text().toDouble()/1000,velocityLineEdit->text().toDouble()/1000,0);
+    mUr5Robot->moveProgram("speedj",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
 }
 
 void Ur5PlannedMoveTab::openVTKfileSlot()
