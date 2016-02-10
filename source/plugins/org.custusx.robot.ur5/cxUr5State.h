@@ -8,7 +8,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<struct Ur5State> Ur5StatePtr;
-
+typedef std::vector<struct Ur5MovementInfo> MovementQueue;
 
 /**
  * Struct that holds UR5 robot information.
