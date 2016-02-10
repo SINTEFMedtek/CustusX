@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOptionsWidget.h"
 #include "cxBoolProperty.h"
 
+#include "cxtestresourcewidgets_export.h"
+
 
 namespace cxtest
 {
@@ -43,7 +45,7 @@ namespace  {
 
 char* testLabels("[unit][resource][widgets]");
 
-struct testWidget
+struct CXTESTRESOURCEWIDGETS_EXPORT testWidget
 {
     cx::OptionsWidget mOptionsWidget;
     bool mExpectedHasOptionsValue;
