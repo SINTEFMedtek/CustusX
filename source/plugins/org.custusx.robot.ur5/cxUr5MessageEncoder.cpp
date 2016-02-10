@@ -9,7 +9,7 @@ QString Ur5MessageEncoder::movej(Ur5State p,double a, double v,double r)
 {
     return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
             .arg(p.cartAxis(0)/1000).arg(p.cartAxis(1)/1000).arg(p.cartAxis(2)/1000)
-            .arg(p.cartAngles(0)).arg(p.cartAngles(1)).arg(p.cartAngles(2)).arg(a).arg(v).arg(r);
+            .arg(p.cartAngles(0)).arg(p.cartAngles(1)).arg(p.cartAngles(2)).arg(a/1000).arg(v/1000).arg(r/1000);
 }
 
 QString Ur5MessageEncoder::movej(Eigen::RowVectorXd p,double a, double v,double t,double r)

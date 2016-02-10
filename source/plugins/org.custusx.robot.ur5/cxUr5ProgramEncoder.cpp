@@ -46,7 +46,7 @@ void Ur5ProgramEncoder::addPath(vtkPolyData* output)
         Ur5State pose;
         double p[3];
         output->GetPoint(output->GetCell(0)->GetPointId(i),p);
-        pose.cartAxis = Vector3D(p[0],p[1],p[2])/1000;
+        pose.cartAxis = Vector3D(p[0],p[1],p[2]);
         pose.cartAngles = Vector3D(0,0,0);
         addToPoseQueue(pose);
     }

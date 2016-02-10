@@ -7,7 +7,7 @@ namespace cx
 Ur5Robot::Ur5Robot():
     moveInProgress(false),
     velocityMoveInProgress(false),
-    mBlendRadius(0.001),
+    mBlendRadius(1),
     rtPort(30003),
     secPort(30002),
     motionSpace(Transform3D::Identity()),
@@ -78,11 +78,12 @@ void Ur5Robot::nextMove()
             {
                 mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
                 mTargetState.cartAngles = mStartPosition.cartAngles;
-                Vector3D tangent = mProgramEncoder.poseQueue[1].cartAxis-mCurrentState.cartAxis;
+                Vector3D tangent = (mProgramEncoder.poseQueue[1].cartAxis-mCurrentState.cartAxis)/1000;
                 Eigen::RowVectorXd velocityEndEffector(6);
-                velocityEndEffector << moveVelocity*tangent(0)/tangent.norm(),moveVelocity*tangent(1)/tangent.norm(),moveVelocity*tangent(2)/tangent.norm(),0,0,0;
+                velocityEndEffector << moveVelocity*tangent(0)/(1000*tangent.norm()),moveVelocity*tangent(1)/(1000*tangent.norm()),moveVelocity*tangent(2)/(1000*tangent.norm())
+                                    ,0,0,0;
                 mTargetState.jointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
-                this->move("speedj",mTargetState,moveAcceleration,moveVelocity,0,20);
+                this->move("speedj",mTargetState,moveAcceleration/1000,moveVelocity/1000,20,0);
             }
         }
     }
@@ -108,7 +109,7 @@ void Ur5Robot::updateCurrentState()
     this->setCurrentState(currentState);
     emit(stateUpdated());
 
-    if(moveInProgress)
+    if(moveInProgress || velocityMoveInProgress)
         this->atTargetState();
 }
 
@@ -310,12 +311,7 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
 
 bool Ur5Robot::atTargetState()
 {
-    if((mCurrentState.jointConfiguration-mTargetState.jointConfiguration).length()<mBlendRadius)
-    {
-        emit atTarget();
-        return true;
-    }
-    else if((mCurrentState.cartAxis-mTargetState.cartAxis).length()<mBlendRadius)
+    if((mCurrentState.cartAxis-mTargetState.cartAxis).length()<mBlendRadius)
     {
         emit atTarget();
         return true;
