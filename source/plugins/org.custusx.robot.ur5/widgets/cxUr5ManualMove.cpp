@@ -453,21 +453,18 @@ void Ur5ManualMoveTab::jointButtonReleased()
 
 void Ur5ManualMoveTab::updatePositions()
 {
-    Ur5State currentState;
-    currentState=mUr5Robot->getCurrentState();
-
-    xPosLineEdit->setText(QString::number((currentState.cartAxis(0)),'f',2));
-    yPosLineEdit->setText(QString::number((currentState.cartAxis(1)),'f',2));
-    zPosLineEdit->setText(QString::number((currentState.cartAxis(2)),'f',2));
-    rxLineEdit->setText(QString::number(currentState.cartAngles(0),'f',4));
-    ryLineEdit->setText(QString::number(currentState.cartAngles(1),'f',4));
-    rzLineEdit->setText(QString::number(currentState.cartAngles(2),'f',4));
-    q1LineEdit->setText(QString::number(currentState.jointConfiguration(0),'f',4));
-    q2LineEdit->setText(QString::number(currentState.jointConfiguration(1),'f',4));
-    q3LineEdit->setText(QString::number(currentState.jointConfiguration(2),'f',4));
-    q4LineEdit->setText(QString::number(currentState.jointConfiguration(3),'f',4));
-    q5LineEdit->setText(QString::number(currentState.jointConfiguration(4),'f',4));
-    q6LineEdit->setText(QString::number(currentState.jointConfiguration(5),'f',4));
+    xPosLineEdit->setText(QString::number((mUr5Robot->getCurrentState().cartAxis(0)),'f',2));
+    yPosLineEdit->setText(QString::number((mUr5Robot->getCurrentState().cartAxis(1)),'f',2));
+    zPosLineEdit->setText(QString::number((mUr5Robot->getCurrentState().cartAxis(2)),'f',2));
+    rxLineEdit->setText(QString::number(mUr5Robot->getCurrentState().cartAngles(0),'f',4));
+    ryLineEdit->setText(QString::number(mUr5Robot->getCurrentState().cartAngles(1),'f',4));
+    rzLineEdit->setText(QString::number(mUr5Robot->getCurrentState().cartAngles(2),'f',4));
+    q1LineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(0),'f',4));
+    q2LineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(1),'f',4));
+    q3LineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(2),'f',4));
+    q4LineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(3),'f',4));
+    q5LineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(4),'f',4));
+    q6LineEdit->setText(QString::number(mUr5Robot->getCurrentState().jointConfiguration(5),'f',4));
 }
 
 void Ur5ManualMoveTab::connectMovementButtons()
