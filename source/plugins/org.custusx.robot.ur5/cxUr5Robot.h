@@ -120,6 +120,9 @@ private:
 
     void set_tcp(Transform3D eMt);
     void initializeOfflineRobot();
+
+    Transform3D mTargetPose;
+    MovementQueue mMovementQueue;
 };
 
 } // cx
