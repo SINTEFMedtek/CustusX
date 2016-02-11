@@ -37,6 +37,9 @@ Ur5MovementInfo::Ur5MovementInfo():
     motionReference(Transform3D::Identity())
 {   
     typeOfMovement = undefinedMove;
+
+    targetJointVelocity = Eigen::RowVectorXd(6);
+    targetJointVelocity << 0,0,0,0,0,0;
 }
 
 

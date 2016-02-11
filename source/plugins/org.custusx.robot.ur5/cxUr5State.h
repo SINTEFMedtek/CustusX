@@ -64,6 +64,8 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     };
 
     movementType typeOfMovement;
+
+    Eigen::RowVectorXd targetJointVelocity;
 };
 
 
