@@ -15,9 +15,10 @@ Ur5ManualMoveTab::Ur5ManualMoveTab(Ur5RobotPtr Ur5Robot,QWidget *parent) :
 {
     setupUi(this);
 
-    connectMovementButtons();
-    connectJointButtons();
+    this->connectMovementButtons();
+    this->connectJointButtons();
 
+    this->updatePositions();
     connect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5ManualMoveTab::updatePositions);
 }
 
