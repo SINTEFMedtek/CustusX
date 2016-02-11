@@ -5,8 +5,8 @@ namespace cx
 {
 
 Ur5Robot::Ur5Robot():
-    moveInProgress(false),
-    velocityMoveInProgress(false),
+    isMoveInProgress(false),
+    isVelocityMoveInProgress(false),
     mBlendRadius(1),
     rtPort(30003),
     secPort(30002),
@@ -31,6 +31,8 @@ void Ur5Robot::atTargetSlot()
     this->nextMove();
 }
 
+    if(isMoveInProgress || isVelocityMoveInProgress)
+        if(this->isAtTargetState())
 void Ur5Robot::nextMove()
 {
     if(moveInProgress && !mProgramEncoder.jointPositionQueue.empty())
@@ -272,32 +274,32 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
 {
     if(typeOfProgram == "movej")
     {
-        mStartPosition = this->getCurrentState();
+        mInitialState = this->getCurrentState();
         Ur5State initState;
         initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
-        initState.cartAngles = mStartPosition.cartAngles;
+        initState.cartAngles = mInitialState.cartAngles;
         this->move("movej",initState,acceleration,velocity);
-        moveInProgress=true;
+        isMoveInProgress=true;
         moveAcceleration=acceleration;
         moveVelocity=velocity;
     }
     else if(typeOfProgram == "movej2")
     {
         this->move("movej",mProgramEncoder.jointPositionQueue[0],acceleration,velocity);
-        moveInProgress=true;
+        isMoveInProgress=true;
         moveAcceleration=acceleration;
         moveVelocity=velocity;
     }
     else if(typeOfProgram == "speedj")
     {
-        mStartPosition = this->getCurrentState();
+        mInitialState = this->getCurrentState();
         Ur5State initState;
         initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
-        initState.cartAngles = mStartPosition.cartAngles;
+        initState.cartAngles = mInitialState.cartAngles;
         this->move("movej",initState,acceleration,velocity);
         moveAcceleration=acceleration;
         moveVelocity=velocity;
-        velocityMoveInProgress=true;
+        isVelocityMoveInProgress=true;
     }
     else
     {

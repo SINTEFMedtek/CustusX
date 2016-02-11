@@ -101,16 +101,17 @@ private:
     Ur5Connection mSecMonitor,mRTMonitor;
     Ur5ProgramEncoder mProgramEncoder;
     Ur5MessageEncoder mMessageEncoder;
-    Ur5State mCurrentState, mPreviousState, mTargetState, mStartPosition;
+    Ur5State mCurrentState, mPreviousState, mTargetState, mInitialState;
 
     double moveVelocity,moveAcceleration;
 
-    bool atTargetState();
+    bool isAtTargetState();
 
     void connectToPort(int port);
     void disconnectFromPort(int port);
-    bool moveInProgress;
-    bool velocityMoveInProgress;
+
+    bool isMoveInProgress;
+    bool isVelocityMoveInProgress;
 
     double mBlendRadius;
 
