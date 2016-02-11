@@ -9,6 +9,8 @@
 #include <cxTrackingService.h>
 #include "trackingSystemRobot/cxRobotTool.h"
 
+#include "cxLogger.h"
+
 
 namespace cx
 {
@@ -55,12 +57,22 @@ void Ur5MiscellaneousTab::setLoggingLayout(QVBoxLayout *parent)
 
 void Ur5MiscellaneousTab::startLoggingSlot()
 {
-    mUr5Robot->startLogging();
+    connect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5MiscellaneousTab::dataLogger);
+    CX_LOG_INFO() << "Logging started";
 }
 
 void Ur5MiscellaneousTab::stopLoggingSlot()
 {
-    mUr5Robot->stopLogging();
+    disconnect(mUr5Robot.get(),&Ur5Robot::stateUpdated,this,&Ur5MiscellaneousTab::dataLogger);
+    CX_LOG_INFO() << "Logging stopped";
+}
+
+void Ur5MiscellaneousTab::dataLogger()
+{
+     CX_LOG_CHANNEL_INFO("jointConfiguration") << mUr5Robot->getCurrentState().jointConfiguration;
+     CX_LOG_CHANNEL_INFO("jointVelocitites") << mUr5Robot->getCurrentState().jointVelocity;
+     CX_LOG_CHANNEL_INFO("operationalPosition") << mUr5Robot->getCurrentState().cartAxis;
+     CX_LOG_CHANNEL_INFO("operationalVelocity") << mUr5Robot->getCurrentState().operationalVelocity;
 }
 
 

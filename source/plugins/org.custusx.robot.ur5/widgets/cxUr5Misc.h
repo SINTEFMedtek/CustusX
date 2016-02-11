@@ -24,6 +24,7 @@ public:
 private slots:
     void startLoggingSlot();
     void stopLoggingSlot();
+    void dataLogger();
 
 private:
     QHBoxLayout *mainLayout;

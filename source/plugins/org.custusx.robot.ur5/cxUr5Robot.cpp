@@ -16,8 +16,6 @@ Ur5Robot::Ur5Robot():
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(this,&Ur5Robot::atTarget,this,&Ur5Robot::atTargetSlot);
-    connect(this,&Ur5Robot::startLogging,this,&Ur5Robot::startLoggingSlot);
-    connect(this,&Ur5Robot::stopLogging,this,&Ur5Robot::stopLoggingSlot);
     connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
 
     this->mCurrentState.jointConfiguration << 0,-M_PI/2,0,-M_PI/2,0,0;
@@ -338,35 +336,6 @@ bool Ur5Robot::isValidWorkspace()
 bool Ur5Robot::isValidWorkspace(Eigen::RowVectorXd jointPosition)
 {
     return(abs(jointPosition.maxCoeff())<=2*3.15);
-}
-
-void Ur5Robot::startLoggingSlot()
-{
-    connect(this,&Ur5Robot::stateUpdated,this,&Ur5Robot::dataLogger);
-    CX_LOG_INFO() << "Logging started";
-}
-
-void Ur5Robot::stopLoggingSlot()
-{
-    disconnect(this,&Ur5Robot::stateUpdated,this,&Ur5Robot::dataLogger);
-    CX_LOG_INFO() << "Logging stopped";
-}
-
-void Ur5Robot::dataLogger()
-{
-     CX_LOG_CHANNEL_INFO("jointConfiguration") << mCurrentState.jointConfiguration;
-     CX_LOG_CHANNEL_INFO("jointVelocitites") << mCurrentState.jointVelocity;
-     CX_LOG_CHANNEL_INFO("operationalPosition") << mCurrentState.cartAxis;
-     CX_LOG_CHANNEL_INFO("operationalVelocity") << mCurrentState.operationalVelocity;
-}
-
-void Ur5Robot::moveToInitialPositionSlot(double acceleration, double velocity)
-{
-    mStartPosition = this->getCurrentState();
-    Ur5State initState;
-    initState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
-    initState.cartAngles = mStartPosition.cartAngles;
-    this->move("movej",initState,acceleration,velocity);
 }
 
 void Ur5Robot::set_eMt(Transform3D eMt)

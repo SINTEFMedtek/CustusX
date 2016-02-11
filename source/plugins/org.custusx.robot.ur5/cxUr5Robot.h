@@ -68,9 +68,6 @@ private slots:
     void atTargetSlot();
     void updateCurrentState();
 
-    void startLoggingSlot();
-    void stopLoggingSlot();
-    void dataLogger();
 
     void moveToInitialPositionSlot(double acceleration, double velocity);
 
@@ -88,8 +85,6 @@ signals:
     void shuttingdown();
     void atTarget();
 
-    void startLogging();
-    void stopLogging();
     void moveToInitialPosition(double acceleration, double velocity);
 
     void eMtChanged(Transform3D eMt);
