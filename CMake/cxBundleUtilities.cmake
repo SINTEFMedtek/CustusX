@@ -456,9 +456,8 @@ function(set_bundle_key_values keys_var context item exepath dirs copyflag)
 
     gp_item_default_embedded_path("${item}" default_embedded_path)
 
-    # fix a bug where dylibs within a .framework was falsely attempted added as frameworks.
-    # This fix reuses the check used in gp_item_default_embedded_path() to check for framework true/false.
-    if(default_embedded_path MATCHES "/Frameworks") 
+    if((item NOT MATCHES "\\.dylib$") AND (item MATCHES "[^/]+\\.framework/"))    
+    #if(default_embedded_path MATCHES "/Frameworks") 
     #if(item MATCHES "[^/]+\\.framework/")
       # For frameworks, construct the name under the embedded path from the
       # opening "${item_name}.framework/" to the closing "/${item_name}":
