@@ -160,19 +160,29 @@ void Ur5PlannedMoveTab::setMovementAssignmentWidget(QVBoxLayout *parent)
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
 {
-    mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    mMovementQueue = Ur5ProgramEncoder::addMovementSettings(mMovementQueue, accelerationLineEdit->text().toDouble(),
+                                                            velocityLineEdit->text().toDouble());
+    mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::movej);
+    mUr5Robot->moveProgram(mMovementQueue);
+
+    //mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
 }
 
 void Ur5PlannedMoveTab::runVelocityVTKSlot()
 {
-    CX_LOG_INFO() << "Starting velocity profile sequence";
-    mUr5Robot->moveProgram("speedj",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    mMovementQueue = Ur5ProgramEncoder::addMovementSettings(mMovementQueue, accelerationLineEdit->text().toDouble(),
+                                                            velocityLineEdit->text().toDouble());
+    mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::speedj);
+    mUr5Robot->moveProgram(mMovementQueue);
+
+    //mUr5Robot->moveProgram("speedj",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
 }
 
 void Ur5PlannedMoveTab::openVTKfileSlot()
 {
     //mProgramEncoder.createMovementQueueFromVTKFile(getPathToPlugin()+vtkLineEdit->text());
-    mUr5Robot->openVTKfile(getPathToPlugin()+vtkLineEdit->text());
+    //mUr5Robot->openVTKfile(getPathToPlugin()+vtkLineEdit->text());
+    mMovementQueue = Ur5ProgramEncoder::createMovementQueueFromVTKFile(getPathToPlugin()+vtkLineEdit->text());
 }
 
 void Ur5PlannedMoveTab::clearPoseQueueSlot()
