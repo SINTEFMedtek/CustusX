@@ -269,6 +269,7 @@ AutomationTab::AutomationTab(QWidget *parent) :
 	mAutoSaveCheckBox = NULL;
 	mAutoLoadPatientCheckBox = NULL;
 	mAutoShowNewDataCheckBox = NULL;
+    mAutoDeleteDICOMDBCheckBox = NULL;
 	mMainLayout = NULL;
 }
 
@@ -311,6 +312,11 @@ void AutomationTab::init()
   mAutoLoadPatientCheckBox->setToolTip("Load the last saved patient if within a chosen number of hours.");
   mAutoLoadPatientCheckBox->setChecked(autoLoadPatient);
 
+  bool autoDeleteDICOMDB = settings()->value("Automation/autoDeleteDICOMDatabase").toBool();
+  mAutoDeleteDICOMDBCheckBox = new QCheckBox("Auto Delete DICOM Database");
+  mAutoDeleteDICOMDBCheckBox->setToolTip("Delete the DICOM database on shutdown.");
+  mAutoDeleteDICOMDBCheckBox->setChecked(autoDeleteDICOMDB);
+
   double autoLoadPatientWithinHours = settings()->value("Automation/autoLoadRecentPatientWithinHours").toDouble();
   mAutoLoadPatientWithinHours = DoubleProperty::initialize("Auto load within hours", "Auto load within hours", "Load the last patient if within this number of hours (and auto load is enabled)", autoLoadPatientWithinHours, DoubleRange(0.1,1000,0.1), 1, QDomNode());
 
@@ -324,6 +330,7 @@ void AutomationTab::init()
   mMainLayout->addWidget(mAutoSaveCheckBox);
   mMainLayout->addWidget(mAutoShowNewDataCheckBox);
   mMainLayout->addWidget(mAutoLoadPatientCheckBox);
+  mMainLayout->addWidget(mAutoDeleteDICOMDBCheckBox);
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAutoLoadPatientWithinHours));
 
   mTopLayout->addLayout(mMainLayout);
@@ -340,6 +347,7 @@ void AutomationTab::saveParametersSlot()
   settings()->setValue("Automation/autoShowNewData", mAutoShowNewDataCheckBox->isChecked());
   settings()->setValue("Automation/autoLoadRecentPatient", mAutoLoadPatientCheckBox->isChecked());
   settings()->setValue("Automation/autoLoadRecentPatientWithinHours", mAutoLoadPatientWithinHours->getValue());
+  settings()->setValue("Automation/autoDeleteDICOMDatabase", mAutoDeleteDICOMDBCheckBox->isChecked());
 }
 
 //==============================================================================
