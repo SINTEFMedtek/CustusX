@@ -26,9 +26,19 @@ Ur5Robot::~Ur5Robot()
 {
 }
 
-void Ur5Robot::atTargetSlot()
+void Ur5Robot::initializeOfflineRobot()
 {
-    this->nextMove();
+    Ur5State currentState;
+
+    currentState.jointConfiguration << 0,-M_PI/2,0,-M_PI/2,0,0;
+    currentState.bMee = Ur5Kinematics::forward(currentState.jointConfiguration);
+    currentState.cartAxis = Ur5Kinematics::T2transl(currentState.bMee);
+    currentState.cartAngles = Ur5Kinematics::T2rangles(currentState.bMee);
+    currentState.jacobian = Ur5Kinematics::jacobian2(currentState.jointConfiguration);
+
+    this->setCurrentState(currentState);
+
+    emit(stateUpdated());
 }
 
     if(isMoveInProgress || isVelocityMoveInProgress)

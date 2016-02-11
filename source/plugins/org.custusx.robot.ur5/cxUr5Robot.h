@@ -118,6 +118,7 @@ private:
     Transform3D motionSpace, eMt;
 
     void set_tcp(Transform3D eMt);
+    void initializeOfflineRobot();
 };
 
 } // cx
