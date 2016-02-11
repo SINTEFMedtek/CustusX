@@ -52,7 +52,7 @@ namespace cx
  *
  * \author Ole Vegard Solberg, SINTEF
  * \author Andreas Østvik
- * \date 2015-06-25
+ *
  */
 typedef boost::shared_ptr<class Ur5Connection> Ur5ConnectionPtr;
 
@@ -69,7 +69,6 @@ public:
     bool isConnectedToRobot();
 
     Ur5State getCurrentState();
-    Ur5State getTargetState();
     Ur5State getPreviousState();
 
     bool sendMessage(QString message);
@@ -88,9 +87,8 @@ private:
     bool waitForUpdate();
     bool isPotentialPacket(qint64 bytes);
 
-    Ur5MessageEncoder mMessageEncoder;
     Ur5MessageDecoder mMessageDecoder;
-    Ur5State mCurrentState,mTargetState,mPreviousState;
+    Ur5State mCurrentState, mPreviousState;
 
     ConnectionInfo info;
 };
