@@ -20,7 +20,6 @@ public:
     Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot, VisServicesPtr services, QWidget *parent = 0);
     virtual ~Ur5PlannedMoveTab();
 
-
 private slots:
     void runVTKfileSlot();
     void openVTKfileSlot();
@@ -61,6 +60,8 @@ private:
     Ur5RobotPtr mUr5Robot;
 
     QString getPathToPlugin();
+
+    MovementQueue mMovementQueue;
 };
 
 } // cx
