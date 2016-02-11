@@ -47,6 +47,7 @@ public:
 
     void openVTKfile(QString filename);
     void moveProgram(QString typeOfProgram,double acceleration, double velocity, double radius, double t = 0);
+    void moveProgram(MovementQueue movementQueue);
 
     void setBlendRadius(double blendRadius);
 

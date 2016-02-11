@@ -38,84 +38,128 @@ void Ur5Robot::initializeOfflineRobot()
     emit(stateUpdated());
 }
 
-    if(isMoveInProgress || isVelocityMoveInProgress)
-        if(this->isAtTargetState())
-void Ur5Robot::nextMove()
-{
-    if(moveInProgress && !mProgramEncoder.jointPositionQueue.empty())
-    {
-        mProgramEncoder.jointPositionQueue.erase(mProgramEncoder.jointPositionQueue.begin());
-        if(mProgramEncoder.jointPositionQueue.empty())
-        {
-            moveInProgress=false;
-        }
-        else
-        {
-            mTargetState.jointConfiguration = mProgramEncoder.jointPositionQueue[0];
-            this->move("movej",mTargetState.jointConfiguration,moveAcceleration,moveVelocity);
-        }
-    }
-    else if(moveInProgress && !mProgramEncoder.poseQueue.empty())
-    {
-        mProgramEncoder.poseQueue.erase(mProgramEncoder.poseQueue.begin());
-        if(mProgramEncoder.poseQueue.empty())
-        {
-            moveInProgress=false;
-        }
-        else
-        {
-            mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
-            mTargetState.cartAngles = mStartPosition.cartAngles;
-            this->move("movej",mTargetState,moveAcceleration,moveVelocity);
-        }
-    }
-    else if(velocityMoveInProgress && !mProgramEncoder.poseQueue.empty())
-    {
-        mProgramEncoder.poseQueue.erase(mProgramEncoder.poseQueue.begin());
-        if(mProgramEncoder.poseQueue.empty())
-        {
-            velocityMoveInProgress=false;
-            this->move("stopj",mTargetState,moveAcceleration,moveVelocity);
-        }
-        else
-        {
-            if(mProgramEncoder.poseQueue.size()>1)
-            {
-                mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
-                mTargetState.cartAngles = mStartPosition.cartAngles;
-                Vector3D tangent = (mProgramEncoder.poseQueue[1].cartAxis-mCurrentState.cartAxis)/1000;
-                Eigen::RowVectorXd velocityEndEffector(6);
-                velocityEndEffector << moveVelocity*tangent(0)/(1000*tangent.norm()),moveVelocity*tangent(1)/(1000*tangent.norm()),moveVelocity*tangent(2)/(1000*tangent.norm())
-                                    ,0,0,0;
-                mTargetState.jointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
-                this->move("speedj",mTargetState,moveAcceleration/1000,moveVelocity/1000,20,0);
-            }
-        }
-    }
-}
-
 void Ur5Robot::updateCurrentState()
 {
-    this->setPreviousState(getCurrentState());
+    this->setPreviousState(mCurrentState);
 
     Ur5State currentState;
 
-    currentState.timeSinceStart=mRTMonitor.getCurrentState().timeSinceStart;
-    currentState.jointConfiguration=mRTMonitor.getCurrentState().jointConfiguration;
-    currentState.jointVelocity=mRTMonitor.getCurrentState().jointVelocity;    
+    currentState.timeSinceStart = mRTMonitor.getCurrentState().timeSinceStart;
+    currentState.jointConfiguration = mRTMonitor.getCurrentState().jointConfiguration;
+    currentState.jointVelocity = mRTMonitor.getCurrentState().jointVelocity;
 
     currentState.bMee = Ur5Kinematics::forward(currentState.jointConfiguration);
-    currentState.cartAxis= Ur5Kinematics::T2transl(currentState.bMee);
+    currentState.cartAxis = Ur5Kinematics::T2transl(currentState.bMee);
     currentState.cartAngles = Ur5Kinematics::T2rangles(currentState.bMee);
     currentState.jacobian = Ur5Kinematics::jacobian2(currentState.jointConfiguration);
 
     emit transform("RobotTracker",currentState.bMee,currentState.timeSinceStart);
 
     this->setCurrentState(currentState);
+
     emit(stateUpdated());
 
-    if(moveInProgress || velocityMoveInProgress)
-        this->atTargetState();
+    if(isMoveInProgress || isVelocityMoveInProgress)
+        if(this->isAtTargetState())
+            this->nextMove();
+}
+
+//void Ur5Robot::nextMove()
+//{
+//    if(isMoveInProgress && !mProgramEncoder.jointPositionQueue.empty())
+//    {
+//        mProgramEncoder.jointPositionQueue.erase(mProgramEncoder.jointPositionQueue.begin());
+//        if(mProgramEncoder.jointPositionQueue.empty())
+//        {
+//            isMoveInProgress=false;
+//        }
+//        else
+//        {
+//            mTargetState.jointConfiguration = mProgramEncoder.jointPositionQueue[0];
+//            this->move("movej",mTargetState.jointConfiguration,moveAcceleration,moveVelocity);
+//        }
+//    }
+//    else if(isMoveInProgress && !mProgramEncoder.poseQueue.empty())
+//    {
+//        mProgramEncoder.poseQueue.erase(mProgramEncoder.poseQueue.begin());
+//        if(mProgramEncoder.poseQueue.empty())
+//        {
+//            isMoveInProgress=false;
+//        }
+//        else
+//        {
+//            mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis; //+ mStartPosition.cartAxis;
+//            mTargetState.cartAngles = mInitialState.cartAngles;
+//            this->move("movej",mTargetState,moveAcceleration,moveVelocity);
+//        }
+//    }
+//    else if(isVelocityMoveInProgress && !mProgramEncoder.poseQueue.empty())
+//    {
+//        mProgramEncoder.poseQueue.erase(mProgramEncoder.poseQueue.begin());
+//        if(mProgramEncoder.poseQueue.empty())
+//        {
+//            isVelocityMoveInProgress=false;
+//            this->move("stopj",mTargetState,moveAcceleration,moveVelocity);
+//        }
+//        else
+//        {
+//            if(mProgramEncoder.poseQueue.size()>1)
+//            {
+//                mTargetState.cartAxis = mProgramEncoder.poseQueue[0].cartAxis;
+//                mTargetState.cartAngles = mInitialState.cartAngles;
+//                Vector3D tangent = (mProgramEncoder.poseQueue[1].cartAxis-mCurrentState.cartAxis)/1000;
+//                Eigen::RowVectorXd velocityEndEffector(6);
+//                velocityEndEffector << moveVelocity*tangent(0)/(1000*tangent.norm()),moveVelocity*tangent(1)/(1000*tangent.norm()),moveVelocity*tangent(2)/(1000*tangent.norm())
+//                                    ,0,0,0;
+//                mTargetState.jointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
+//                this->move("speedj",mTargetState,moveAcceleration/1000,moveVelocity/1000,20,0);
+//            }
+//        }
+//    }
+//}
+
+void Ur5Robot::nextMove()
+{
+    if(isMoveInProgress && !mMovementQueue.empty())
+    {
+        mMovementQueue.erase(mMovementQueue.begin());
+
+        if(mMovementQueue.empty())
+        {
+            isMoveInProgress=false;
+        }
+        else
+        {
+            mTargetPose = mMovementQueue.front().target_xMe;
+            this->move(mMovementQueue.front());
+        }
+    }
+    else if(isVelocityMoveInProgress && !mMovementQueue.empty())
+    {
+        mMovementQueue.erase(mMovementQueue.begin());
+
+        if(mMovementQueue.empty())
+        {
+            isVelocityMoveInProgress=false;
+            this->stopMove("stopj", 0.3);
+        }
+        else
+        {
+            if(mProgramEncoder.poseQueue.size()>1)
+            {
+                mTargetPose = mMovementQueue.front().target_xMe;
+
+                Vector3D tangent = (Ur5Kinematics::T2transl(mTargetPose)-mCurrentState.cartAxis)/1000;
+                tangent = tangent/tangent.norm();
+                Vector3D velocity =  tangent*mMovementQueue.front().velocity/1000;
+
+                Eigen::RowVectorXd velocityEndEffector(6);
+                velocityEndEffector << velocity(0),velocity(1),velocity(2),0,0,0;
+                mMovementQueue.front().targetJointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
+                this->move(mMovementQueue.front());
+            }
+        }
+    }
 }
 
 Ur5State Ur5Robot::getCurrentState()
@@ -145,7 +189,7 @@ void Ur5Robot::setAddress(QString address)
 
 QString Ur5Robot::getAddress()
 {
-    return (this->IPaddress);
+    return IPaddress;
 }
 
 void Ur5Robot::connectToRobot(QString IPaddress)
@@ -241,8 +285,16 @@ void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, doub
 
 }
 
-void Ur5Robot::move(Ur5MovementInfo movementInfo)
+void Ur5Robot::move(Ur5MovementInfo minfo)
 {
+    mTargetPose = minfo.target_xMe;
+
+    if(minfo.typeOfMovement == Ur5MovementInfo::movej)
+        sendMessage(mMessageEncoder.movej(minfo));
+    else if(minfo.typeOfMovement == Ur5MovementInfo::speedj)
+        sendMessage(mMessageEncoder.speedj(minfo));
+    else if(minfo.typeOfMovement == Ur5MovementInfo::stopj)
+        sendMessage(mMessageEncoder.stopj(minfo));
 
 }
 
@@ -314,6 +366,31 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
     }
 }
 
+
+void Ur5Robot::moveProgram(MovementQueue mq)
+{
+    if(mq.front().typeOfMovement == Ur5MovementInfo::movej)
+    {
+        mInitialState = this->getCurrentState();
+        this->move(mq.front());
+        isMoveInProgress=true;
+    }
+    else if(mq.front().typeOfMovement == Ur5MovementInfo::speedj)
+    {
+        mInitialState = this->getCurrentState();
+        mq.front().typeOfMovement = Ur5MovementInfo::movej;
+        this->move(mq.front());
+        isVelocityMoveInProgress=true;
+    }
+    else
+    {
+        return;
+    }
+
+    mMovementQueue = mq;
+}
+
+bool Ur5Robot::isAtTargetState()
 {
     if((mCurrentState.cartAxis-mTargetState.cartAxis).length()<mBlendRadius)
     {
