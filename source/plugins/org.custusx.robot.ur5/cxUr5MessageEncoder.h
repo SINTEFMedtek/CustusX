@@ -24,7 +24,7 @@ public:
     QString movej(Ur5State pose,double a, double v, double r);
     QString movej(Eigen::RowVectorXd pose, double a, double v, double t, double r);
     QString movej(Eigen::RowVectorXd pose, double t);
-    QString movej(Ur5MovementInfo movementInformation);
+    QString movej(Ur5MovementInfo minfo);
     QString movejp(Eigen::RowVectorXd pose, double a, double v, double t, double r);
 
     QString movel(Ur5State pose,double a, double v);
@@ -37,6 +37,7 @@ public:
     QString speedl(Eigen::RowVectorXd p, double a, double t);
 
     QString stopj(double a);
+    QString stopj(Ur5MovementInfo minfo);
     QString stopl(double a);
 
     QString set_tcp(Ur5State pose);

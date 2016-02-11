@@ -31,9 +31,13 @@ QString Ur5MessageEncoder::movejp(Eigen::RowVectorXd p,double a, double v,double
             .arg(p(3)).arg(p(4)).arg(p(5)).arg(a).arg(v).arg(r);
 }
 
-QString Ur5MessageEncoder::movej(Ur5MovementInfo m)
+QString Ur5MessageEncoder::movej(Ur5MovementInfo minfo)
 {
-    return QString("invalid");
+    Eigen::RowVectorXd op = Ur5Kinematics::T2OperationalConfiguration(minfo.target_xMe);
+
+    return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
+            .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000).arg(op(3)).arg(op(4)).arg(op(5))
+            .arg(minfo.acceleration/1000).arg(minfo.velocity/1000).arg(minfo.radius/1000);
 }
 
 QString Ur5MessageEncoder::movel(Ur5State p,double a, double v)
@@ -67,9 +71,12 @@ QString Ur5MessageEncoder::speedj(Eigen::RowVectorXd jointVelocity, double a, do
             .arg(jointVelocity(4)).arg(jointVelocity(5)).arg(a).arg(t);
 }
 
-QString Ur5MessageEncoder::speedj(Ur5MovementInfo m)
+QString Ur5MessageEncoder::speedj(Ur5MovementInfo minfo)
 {
-    return QString("");
+    return QString("speedj([%1,%2,%3,%4,%5,%6],a=%7,t_min=%8)")
+            .arg(minfo.targetJointVelocity(0)).arg(minfo.targetJointVelocity(1)).arg(minfo.targetJointVelocity(2))
+            .arg(minfo.targetJointVelocity(3)).arg(minfo.targetJointVelocity(4)).arg(minfo.targetJointVelocity(5))
+            .arg(minfo.acceleration/1000).arg(minfo.time);
 }
 
 QString Ur5MessageEncoder::speedl(Ur5State p, double a, double t)
@@ -111,6 +118,12 @@ QString Ur5MessageEncoder::stopj(double a)
 {
     return QString("stopj(%1)").arg(a);
 }
+
+QString Ur5MessageEncoder::stopj(Ur5MovementInfo minfo)
+{
+    return QString("stopj(%1)").arg(minfo.acceleration);
+}
+
 
 QString Ur5MessageEncoder::powerdown()
 {
