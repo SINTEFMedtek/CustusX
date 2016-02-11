@@ -126,14 +126,9 @@ Ur5State Ur5Connection::getCurrentState()
     return (this->mCurrentState);
 }
 
-Ur5State Ur5Connection::getTargetState()
-{
-    return (this->mCurrentState);
-}
-
 Ur5State Ur5Connection::getPreviousState()
 {
-    return (this->mCurrentState);
+    return (this->mPreviousState);
 }
 
 } // cx
