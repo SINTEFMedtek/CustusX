@@ -392,7 +392,7 @@ void Ur5Robot::moveProgram(MovementQueue mq)
 
 bool Ur5Robot::isAtTargetState()
 {
-    if((mCurrentState.cartAxis-mTargetState.cartAxis).length()<mBlendRadius)
+    if((mCurrentState.cartAxis-Ur5Kinematics::T2transl(mTargetPose)).length()<mBlendRadius)
     {
         emit atTarget();
         return true;
