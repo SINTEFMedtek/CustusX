@@ -113,17 +113,9 @@ void Ur5LungSimulationTab::setMoveLayout(QVBoxLayout *parent)
     mainLayout->addWidget(stopMoveButton,row,1,1,1);
 }
 
-//void Ur5LungSimulationTab::setStartPosLineEdit()
-//{
-//    jointStartPosition = mUr5Robot->getCurrentState().jointPosition;
-//    QString str("(");
-//    for(int i = 0; i<5; i++)
-//        str.append(QString::number(jointStartPosition(i))+",");
-//    startPosLineEdit->setText(str.append(QString::number(jointStartPosition(5))+")"));
-//}
-
 void Ur5LungSimulationTab::setStartPosLineEdit()
 {
+    // this->startMovementInformation =
     jointStartPosition = mUr5Robot->getCurrentState().jointConfiguration;
     QString str("(");
     for(int i = 0; i<2; i++)
@@ -144,16 +136,18 @@ void Ur5LungSimulationTab::startSimulationSlot()
 {  
     if(this->isParametersSet() && mUr5Robot->isValidWorkspace(jointStartPosition) && mUr5Robot->isValidWorkspace(jointStopPosition))
     {
-    mUr5Robot->clearProgramQueue();
+        mUr5Robot->clearProgramQueue();
+        MovementQueue mq;
 
-    for(int i=0;i<500;i++)
-    {
-    mUr5Robot->addToProgramQueue(mMessageEncoder.movej(jointStartPosition,inspirationTimeLineEdit->text().toDouble()));
-    mUr5Robot->addToProgramQueue(mMessageEncoder.movej(jointStopPosition,expirationTimeLineEdit->text().toDouble()));
-    }
+        for(int i=0;i<500;i++)
+        {
 
-    mLungSimulation->lungMovement(inspirationTimeLineEdit->text().toDouble(),inspiratoryPauseTimeLineEdit->text().toDouble(),
-                                  expirationTimeLineEdit->text().toDouble(),expiratoryPauseTimeLineEdit->text().toDouble());
+            mUr5Robot->addToProgramQueue(mMessageEncoder.movej(jointStartPosition,inspirationTimeLineEdit->text().toDouble()));
+            mUr5Robot->addToProgramQueue(mMessageEncoder.movej(jointStopPosition,expirationTimeLineEdit->text().toDouble()));
+        }
+
+        mLungSimulation->lungMovement(inspirationTimeLineEdit->text().toDouble(),inspiratoryPauseTimeLineEdit->text().toDouble(),
+                                      expirationTimeLineEdit->text().toDouble(),expiratoryPauseTimeLineEdit->text().toDouble());
     }
     else
     {
