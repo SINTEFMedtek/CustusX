@@ -15,8 +15,6 @@ Ur5Robot::Ur5Robot():
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
     connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
-    connect(this,&Ur5Robot::atTarget,this,&Ur5Robot::atTargetSlot);
-    connect(this,&Ur5Robot::moveToInitialPosition,this,&Ur5Robot::moveToInitialPositionSlot);
 
     this->mCurrentState.jointConfiguration << 0,-M_PI/2,0,-M_PI/2,0,0;
     this->mCurrentState.bMee = Ur5Kinematics::forward(mCurrentState.jointConfiguration);
@@ -307,7 +305,6 @@ void Ur5Robot::moveProgram(QString typeOfProgram,double acceleration,double velo
     }
 }
 
-bool Ur5Robot::atTargetState()
 {
     if((mCurrentState.cartAxis-mTargetState.cartAxis).length()<mBlendRadius)
     {

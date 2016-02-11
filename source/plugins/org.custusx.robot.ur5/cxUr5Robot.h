@@ -65,11 +65,7 @@ public slots:
 
 private slots:
     void nextMove();
-    void atTargetSlot();
     void updateCurrentState();
-
-
-    void moveToInitialPositionSlot(double acceleration, double velocity);
 
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
@@ -84,8 +80,6 @@ signals:
 
     void shuttingdown();
     void atTarget();
-
-    void moveToInitialPosition(double acceleration, double velocity);
 
     void eMtChanged(Transform3D eMt);
 
