@@ -14,12 +14,9 @@ Ur5Robot::Ur5Robot():
     eMt(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
-    connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
+    connect(&mSecMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState); 
 
-    this->mCurrentState.jointConfiguration << 0,-M_PI/2,0,-M_PI/2,0,0;
-    this->mCurrentState.bMee = Ur5Kinematics::forward(mCurrentState.jointConfiguration);
-
-    emit(stateUpdated());
+    this->initializeOfflineRobot();
 }
 
 Ur5Robot::~Ur5Robot()
