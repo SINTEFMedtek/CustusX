@@ -148,6 +148,7 @@ protected:
   QCheckBox* mAutoSaveCheckBox;
   QCheckBox* mAutoShowNewDataCheckBox;
   QCheckBox* mAutoLoadPatientCheckBox;
+  QCheckBox* mAutoDeleteDICOMDBCheckBox;
   DoublePropertyPtr mAutoLoadPatientWithinHours;
   QVBoxLayout *mMainLayout;
 };

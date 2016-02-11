@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDicomImageReader.h"
 #include "cxVisServices.h"
 #include "cxViewService.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -174,8 +175,8 @@ void DicomWidget::onImportIntoCustusXAction()
 void DicomWidget::deleteDICOMDB()
 {
    CX_LOG_CHANNEL_INFO("dicom") << "Deleting DICOM database: " << this->getDICOMDatabaseDirectory();
-   bool autoDeleteDICOMDBOnShutdown = true;
-   if(autoDeleteDICOMDBOnShutdown)
+   bool autoDeleteDICOMDB = settings()->value("Automation/autoDeleteDICOMDatabase").toBool();
+   if(autoDeleteDICOMDB)
    {
         QStringList patients = this->getDatabase()->patients();
         foreach(QString patient , patients)
