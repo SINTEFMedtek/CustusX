@@ -32,9 +32,6 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
 {
     setupUi(this);
 
-
-    //connect(clearPoseQueueButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::clearPoseQueueSlot);
-
     connect(moveToPointButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToPointSlot);
     connect(moveToFrameButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToFrameSlot);
     connect(followActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::followActiveToolSlot);
@@ -186,7 +183,7 @@ void Ur5PlannedMoveTab::openVTKfileSlot()
 void Ur5PlannedMoveTab::clearPoseQueueSlot()
 {
     CX_LOG_DEBUG() << "Enters clear queue";
-    mUr5Robot->clearProgramQueue();
+    mUr5Robot->clearMovementQueue();
 }
 
 void Ur5PlannedMoveTab::moveToPointSlot()
