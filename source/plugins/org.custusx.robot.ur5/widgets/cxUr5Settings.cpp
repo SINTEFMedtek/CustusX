@@ -87,6 +87,10 @@ void Ur5SettingsTab::createCalibrationMatrix()
 
     ToolPtr tool = mServices->tracking()->getTool(toolComboBox->currentText());
 
+    std::cout << tool->get_prMt() << std::endl << std::endl;
+    std::cout << robotTool->get_prMb() << std::endl << std::endl;
+    std::cout << mUr5Robot->getCurrentState().bMee << std::endl << std::endl;
+
     calMatrix = (tool->get_prMt().inverse()*robotTool->get_prMb()*mUr5Robot->getCurrentState().bMee).inverse();
 
     std::cout << calMatrix << std::endl;

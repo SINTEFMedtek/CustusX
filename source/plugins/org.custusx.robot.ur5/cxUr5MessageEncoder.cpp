@@ -100,18 +100,18 @@ QString Ur5MessageEncoder::set_tcp(Ur5State p)
             .arg(p.cartAngles(1)).arg(p.cartAngles(2));
 }
 
-QString Ur5MessageEncoder::set_tcp(Transform3D p)
+QString Ur5MessageEncoder::set_tcp(Transform3D eMt)
 {
-    if(similar(p,Transform3D::Identity()))
+    if(similar(eMt,Transform3D::Identity()))
     {
         return QString("set_tcp(p[0,0,0,0,0,0])");
     }
     else
     {
-        Vector3D rangles = Ur5Kinematics::T2rangles(p);
+        Eigen::RowVectorXd tcp = Ur5Kinematics::T2OperationalConfiguration(eMt);
         return QString("set_tcp(p[%1,%2,%3,%4,%5,%6])")
-                .arg(p(0,3)/1000).arg(p(1,3)/1000).arg(p(2,3)/1000).arg(rangles(0))
-                .arg(rangles(1)).arg(rangles(2));
+                .arg(tcp(0)/1000).arg(tcp(1)/1000).arg(tcp(2)/1000).arg(tcp(3))
+                .arg(tcp(4)).arg(tcp(5));
     }
 }
 

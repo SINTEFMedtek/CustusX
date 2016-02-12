@@ -202,12 +202,12 @@ void Ur5PlannedMoveTab::moveToPointSlot()
     prMt_d.translation() = pointMetric->getCoordinate();
 
     Transform3D bMt_d = robotTool->get_prMb().inverse()*prMt_d;
+    Vector3D rangles = Ur5Kinematics::T2rangles(mUr5Robot->getCurrentState().bMee*mUr5Robot->get_eMt());
 
     Eigen::RowVectorXd point(6);
 
     point << bMt_d(0,3), bMt_d(1,3), bMt_d(2,3),
-            mUr5Robot->getCurrentState().cartAngles(0), mUr5Robot->getCurrentState().cartAngles(1),
-            mUr5Robot->getCurrentState().cartAngles(2);
+            rangles(0), rangles(1), rangles(2);
 
     mUr5Robot->move("movejp",point,0.3,0.1);
 }
