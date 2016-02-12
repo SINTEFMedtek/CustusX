@@ -25,8 +25,6 @@ class org_custusx_robot_ur5_EXPORT Ur5Robot : public QObject
 {
     Q_OBJECT
 
-    friend class Ur5LungSimulation;
-
 public:
     Ur5Robot();
     ~Ur5Robot();
@@ -42,8 +40,7 @@ public:
 
     void stopMove(QString typeOfStop,double acc);
 
-    void addToProgramQueue(QString string);
-    void clearProgramQueue();
+    void clearMovementQueue();
 
     void openVTKfile(QString filename);
     void moveProgram(QString typeOfProgram,double acceleration, double velocity, double radius, double t = 0);
