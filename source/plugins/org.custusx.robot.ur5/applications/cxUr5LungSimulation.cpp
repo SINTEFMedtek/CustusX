@@ -34,6 +34,7 @@ void Ur5LungSimulation::lungMovementSlot(MovementQueue mq, double inspiratoryPau
     double inspirationTime = mq.front().time;
     double expirationTime = mq.at(1).time;
 
+    mMovementQueue = mq;
     mUr5Robot->move(mq.front());
 
     lungMovementTiming = Eigen::RowVectorXd(4);

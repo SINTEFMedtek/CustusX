@@ -35,9 +35,19 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo minfo)
 {
     Eigen::RowVectorXd op = Ur5Kinematics::T2OperationalConfiguration(minfo.target_xMe);
 
-    return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,r=%9)")
-            .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000).arg(op(3)).arg(op(4)).arg(op(5))
-            .arg(minfo.acceleration/1000).arg(minfo.velocity/1000).arg(minfo.radius/1000);
+    if(minfo.acceleration == 0 && minfo.velocity == 0 && minfo.time != 0)
+    {
+        return QString("movej(p[%1,%2,%3,%4,%5,%6],a=1.4,v=1.05,t=%7)")
+                .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000).arg(op(3)).arg(op(4)).arg(op(5))
+                .arg(minfo.time);
+    }
+    else
+    {
+        return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
+                .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000).arg(op(3)).arg(op(4)).arg(op(5))
+                .arg(minfo.acceleration/1000).arg(minfo.velocity/1000).arg(minfo.time)
+                .arg(minfo.radius/1000);
+    }
 }
 
 QString Ur5MessageEncoder::movel(Ur5State p,double a, double v)

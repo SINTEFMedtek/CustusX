@@ -131,7 +131,7 @@ MovementQueue Ur5ProgramEncoder::addMotionReference(MovementQueue mq, Transform3
 
 MovementQueue Ur5ProgramEncoder::createMovementQueueFromTransformations(std::vector<Transform3D> transformations)
 {
-    std::vector<Ur5MovementInfo> movementQueue(transformations.size());
+    MovementQueue movementQueue(transformations.size());
 
     for(int i=0; i<transformations.size(); i++)
     {

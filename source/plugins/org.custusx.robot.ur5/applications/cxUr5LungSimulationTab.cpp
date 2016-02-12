@@ -138,9 +138,11 @@ void Ur5LungSimulationTab::startSimulationSlot()
             && mUr5Robot->isValidWorkspace(expirationState.jointConfiguration))
     {
         mUr5Robot->clearMovementQueue();
-        MovementQueue mq;
 
-        for(int i=0;i<500;i+=2)
+        int nCycles = 500;
+        MovementQueue mq(nCycles);
+
+        for(int i=0;i<nCycles;i+=2)
         {
             mq.at(i).target_xMe = inspirationState.bMee;
             mq.at(i).time = inspirationTimeLineEdit->text().toDouble();
