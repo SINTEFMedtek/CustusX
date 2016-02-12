@@ -20,11 +20,11 @@ public:
     ~Ur5LungSimulation();
 
 signals:
-    void lungMovement(double t1, double t2, double t3, double t4);
+    void lungMovement(MovementQueue mq, double inspiratoryPauseTime, double expiratoryPauseTime);
     void stopLungMovement();
 
 private slots:
-    void lungMovementSlot(double t1, double t2, double t3, double t4);
+    void lungMovementSlot(MovementQueue mq, double inspiratoryPauseTime, double expiratoryPauseTime);
     void continueLungMove();
     void stopLungMove();
     void startInspirationSequence();
@@ -35,7 +35,7 @@ private:
     QTimer *inspiration, *expiration, *inspirationTiming, *expirationTiming;
     Eigen::RowVectorXd lungMovementTiming;
 
-    std::vector<QString> mProgramQueue;
+    MovementQueue mMovementQueue;
 
     void stopTimers();
 };

@@ -29,27 +29,28 @@ Ur5LungSimulation::~Ur5LungSimulation()
 
 }
 
-void Ur5LungSimulation::lungMovementSlot(double t1, double t2, double t3, double t4)
+void Ur5LungSimulation::lungMovementSlot(MovementQueue mq, double inspiratoryPauseTime, double expiratoryPauseTime)
 {
-    mProgramQueue = mUr5Robot->getProgramQueue();
+    double inspirationTime = mq.front().time;
+    double expirationTime = mq.at(1).time;
 
-    mUr5Robot->sendMessage(mProgramQueue[0]);
+    mUr5Robot->move(mq.front());
 
     lungMovementTiming = Eigen::RowVectorXd(4);
-    lungMovementTiming << t1, t2, t3, t4;
+    lungMovementTiming << inspirationTime, inspiratoryPauseTime, expirationTime, expiratoryPauseTime;
 
-    expirationTiming->setInterval((t1+t2)*1000);
+    expirationTiming->setInterval((inspirationTime+inspiratoryPauseTime)*1000);
     expirationTiming->setSingleShot(true);
     connect(expirationTiming, SIGNAL(timeout()), SLOT(startExpirationSequence()));
 
-    inspirationTiming->setInterval((t1+t2+t3+t4)*1000);
+    inspirationTiming->setInterval((inspirationTime+inspiratoryPauseTime+expirationTime+expiratoryPauseTime)*1000);
     inspirationTiming->setSingleShot(true);
     connect(inspirationTiming, SIGNAL(timeout()), SLOT(startInspirationSequence()));
 
     expirationTiming->start();
     inspirationTiming->start();
 
-    CX_LOG_INFO() << "Moving to inspiratory position. Simulation will start in " << t1+t2+lungMovementTiming.sum() << " seconds.";
+    CX_LOG_INFO() << "Moving to inspiratory position. Simulation will start in " << inspirationTime + inspiratoryPauseTime + lungMovementTiming.sum() << " seconds.";
 }
 
 void Ur5LungSimulation::startInspirationSequence()
@@ -66,19 +67,16 @@ void Ur5LungSimulation::startExpirationSequence()
 
 void Ur5LungSimulation::continueLungMove()
 {
-    mProgramQueue.erase(mProgramQueue.begin());
+    mMovementQueue.erase(mMovementQueue.begin());
 
-    if(mProgramQueue.empty())
+    if(mMovementQueue.empty())
     {
-        inspirationTiming->stop();
-        expirationTiming->stop();
-        inspiration->stop();
-        expiration->stop();
         std::cout << "Empty programQueue" << std::endl;
+        this->stopTimers();
     }
     else
     {
-        mUr5Robot->sendMessage(mProgramQueue[0]);
+        mUr5Robot->move(mMovementQueue.front());
     }
 }
 
@@ -86,8 +84,8 @@ void Ur5LungSimulation::stopLungMove()
 {
     this->stopTimers();
 
-    if(!mProgramQueue.empty())
-        mProgramQueue.clear();
+    if(!mMovementQueue.empty())
+        mMovementQueue.clear();
 
     CX_LOG_INFO() << "Lung simulation stopped";
 }

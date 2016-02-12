@@ -24,8 +24,8 @@ public:
     ~Ur5LungSimulationTab();
 
 private slots:
-    void setStartPosLineEdit();
-    void setStopPosLineEdit();
+    void setInspirationPosLineEdit();
+    void setExpirationPosLineEdit();
     void startSimulationSlot();
     void stopSimulationSlot();
 
@@ -37,18 +37,15 @@ private:
     void setMoveLayout(QVBoxLayout *parent);
     void setSettingsLayout(QVBoxLayout *parent);
 
-    QLineEdit *startPosLineEdit, *stopPosLineEdit;
-    QPushButton *setStartPosButton, *setStopPosButton, *startMoveButton, *stopMoveButton;
+    QLineEdit *inspirationPosLineEdit, *expirationPosLineEdit;
+    QPushButton *setInspirationPosButton, *setExpirationPosButton, *startMoveButton, *stopMoveButton;
     QComboBox *velocityProfileCBox;
 
-    QLineEdit *velocityLineEdit, *accelerationLineEdit, *nCyclesLineEdit;
     QLineEdit *inspirationTimeLineEdit, *inspiratoryPauseTimeLineEdit;
     QLineEdit *expirationTimeLineEdit, *expiratoryPauseTimeLineEdit;
 
     Ur5MessageEncoder mMessageEncoder;
-    Eigen::RowVectorXd jointStartPosition, jointStopPosition;
-
-    Ur5MovementInfo startMovementInformation, stopMovementInformation;
+    Ur5State inspirationState, expirationState;
 
     bool isParametersSet();
 

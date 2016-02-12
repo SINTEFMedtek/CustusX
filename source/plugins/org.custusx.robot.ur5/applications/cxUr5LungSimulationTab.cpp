@@ -20,8 +20,8 @@ Ur5LungSimulationTab::Ur5LungSimulationTab(Ur5RobotPtr Ur5Robot,QWidget *parent)
 {
     setupUi(this);
 
-    connect(setStartPosButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::setStartPosLineEdit);
-    connect(setStopPosButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::setStopPosLineEdit);
+    connect(setInspirationPosButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::setInspirationPosLineEdit);
+    connect(setExpirationPosButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::setExpirationPosLineEdit);
     connect(startMoveButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::startSimulationSlot);
     connect(stopMoveButton, &QPushButton::clicked,this,&Ur5LungSimulationTab::stopSimulationSlot);
 
@@ -51,19 +51,19 @@ void Ur5LungSimulationTab::setSettingsLayout(QVBoxLayout *parent)
     group->setLayout(mainLayout);
 
     int row = 0;
-    startPosLineEdit = new QLineEdit();
-    setStartPosButton = new QPushButton(tr("Set position"));
+    inspirationPosLineEdit = new QLineEdit();
+    setInspirationPosButton = new QPushButton(tr("Set position"));
 
     mainLayout->addWidget(new QLabel("Inspiration position: "), row, 0, 1, 1);
-    mainLayout->addWidget(startPosLineEdit, row, 1,1,2);
-    mainLayout->addWidget(setStartPosButton,row,3,1,1);
+    mainLayout->addWidget(inspirationPosLineEdit, row, 1,1,2);
+    mainLayout->addWidget(setInspirationPosButton,row,3,1,1);
 
     row ++;
-    stopPosLineEdit = new QLineEdit();
-    setStopPosButton = new QPushButton(tr("Set position"));
+    expirationPosLineEdit = new QLineEdit();
+    setExpirationPosButton = new QPushButton(tr("Set position"));
     mainLayout->addWidget(new QLabel("Expiration position: "), row, 0, 1, 1);
-    mainLayout->addWidget(stopPosLineEdit, row, 1,1,2);
-    mainLayout->addWidget(setStopPosButton,row,3,1,1);
+    mainLayout->addWidget(expirationPosLineEdit, row, 1,1,2);
+    mainLayout->addWidget(setExpirationPosButton,row,3,1,1);
 
     row++;
     velocityProfileCBox = new QComboBox;
@@ -113,41 +113,44 @@ void Ur5LungSimulationTab::setMoveLayout(QVBoxLayout *parent)
     mainLayout->addWidget(stopMoveButton,row,1,1,1);
 }
 
-void Ur5LungSimulationTab::setStartPosLineEdit()
+void Ur5LungSimulationTab::setInspirationPosLineEdit()
 {
-    // this->startMovementInformation =
-    jointStartPosition = mUr5Robot->getCurrentState().jointConfiguration;
+    inspirationState = mUr5Robot->getCurrentState();
     QString str("(");
     for(int i = 0; i<2; i++)
-        str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(i))+",");
-    startPosLineEdit->setText(str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(2))+")"));
+        str.append(QString::number(inspirationState.cartAxis(i))+",");
+    inspirationPosLineEdit->setText(str.append(QString::number(inspirationState.cartAxis(2))+")"));
 }
 
-void Ur5LungSimulationTab::setStopPosLineEdit()
+void Ur5LungSimulationTab::setExpirationPosLineEdit()
 {
-    jointStopPosition = mUr5Robot->getCurrentState().jointConfiguration;
+    expirationState = mUr5Robot->getCurrentState();
     QString str("(");
     for(int i = 0; i<2; i++)
-        str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(i))+",");
-    stopPosLineEdit->setText(str.append(QString::number(mUr5Robot->getCurrentState().cartAxis(2))+")"));
+        str.append(QString::number(expirationState.cartAxis(i))+",");
+    expirationPosLineEdit->setText(str.append(QString::number(expirationState.cartAxis(2))+")"));
 }
 
 void Ur5LungSimulationTab::startSimulationSlot()
 {  
-    if(this->isParametersSet() && mUr5Robot->isValidWorkspace(jointStartPosition) && mUr5Robot->isValidWorkspace(jointStopPosition))
+    if(this->isParametersSet()
+            && mUr5Robot->isValidWorkspace(inspirationState.jointConfiguration)
+            && mUr5Robot->isValidWorkspace(expirationState.jointConfiguration))
     {
-        mUr5Robot->clearProgramQueue();
+        mUr5Robot->clearMovementQueue();
         MovementQueue mq;
 
-        for(int i=0;i<500;i++)
+        for(int i=0;i<500;i+=2)
         {
-
-            mUr5Robot->addToProgramQueue(mMessageEncoder.movej(jointStartPosition,inspirationTimeLineEdit->text().toDouble()));
-            mUr5Robot->addToProgramQueue(mMessageEncoder.movej(jointStopPosition,expirationTimeLineEdit->text().toDouble()));
+            mq.at(i).target_xMe = inspirationState.bMee;
+            mq.at(i).time = inspirationTimeLineEdit->text().toDouble();
+            mq.at(i).typeOfMovement = Ur5MovementInfo::movej;
+            mq.at(i+1).target_xMe = expirationState.bMee;
+            mq.at(i+1).time = expirationTimeLineEdit->text().toDouble();
+            mq.at(i+1).typeOfMovement = Ur5MovementInfo::movej;
         }
 
-        mLungSimulation->lungMovement(inspirationTimeLineEdit->text().toDouble(),inspiratoryPauseTimeLineEdit->text().toDouble(),
-                                      expirationTimeLineEdit->text().toDouble(),expiratoryPauseTimeLineEdit->text().toDouble());
+        mLungSimulation->lungMovement(mq, inspiratoryPauseTimeLineEdit->text().toDouble(), expiratoryPauseTimeLineEdit->text().toDouble());
     }
     else
     {
@@ -157,7 +160,7 @@ void Ur5LungSimulationTab::startSimulationSlot()
 
 void Ur5LungSimulationTab::stopSimulationSlot()
 {
-    mUr5Robot->clearProgramQueue();
+    mUr5Robot->clearMovementQueue();
     mLungSimulation->stopLungMovement();
     mUr5Robot->stopMove("stopj",0.5);
 }
@@ -166,7 +169,7 @@ bool Ur5LungSimulationTab::isParametersSet()
 {
     return(!(inspirationTimeLineEdit->text().isEmpty()) && !(expirationTimeLineEdit->text().isEmpty()) &&
            !(expiratoryPauseTimeLineEdit->text().isEmpty()) && !(inspiratoryPauseTimeLineEdit->text().isEmpty()) &&
-           !(stopPosLineEdit->text().isEmpty()) && !(startPosLineEdit->text().isEmpty()));
+           !(expirationPosLineEdit->text().isEmpty()) && !(inspirationPosLineEdit->text().isEmpty()));
 }
 
 } // cx
