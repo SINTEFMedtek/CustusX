@@ -41,7 +41,7 @@ void Ur5ScriptTab::setTextEditorWidget(QVBoxLayout *parent)
 
     textEditor = new QTextEdit();
     textEditLayout->addWidget(textEditor,0,0,2,2);
-    textEditor->setText("movej([0.9019,-2.0358,2.0008,-1.5708,-1.5708,-0.7854],a=0.8,v=0.3)");
+    textEditor->setText("movej([0.9019,-2.0358,2.0008,-1.5708,-1.5708, 2.3562],a=0.8,v=0.3)");
 
     sendMessageButton = new QPushButton(tr("Send message"));
     textEditLayout->addWidget(sendMessageButton,2,1,1,1);

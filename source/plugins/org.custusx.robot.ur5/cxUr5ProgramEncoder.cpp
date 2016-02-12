@@ -156,6 +156,15 @@ MovementQueue Ur5ProgramEncoder::createMovementQueueFromVTKFile(QString inputFil
     return movementQueue;
 }
 
+MovementQueue Ur5ProgramEncoder::setConstantOrientation(MovementQueue mq, Transform3D mat)
+{
+    for(int i=0; i<(mq.size()); i++)
+    {
+        mq.at(i).target_xMe.linear() = mat.linear();
+    }
+    return mq;
+}
+
 } //cx
 
 

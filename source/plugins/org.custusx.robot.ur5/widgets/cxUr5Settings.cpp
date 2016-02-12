@@ -23,6 +23,7 @@ Ur5SettingsTab::Ur5SettingsTab(Ur5RobotPtr Ur5Robot,VisServicesPtr services, QWi
     updateCombobox();
 
     connect(autoCalibrateButton, &QPushButton::clicked, this, &Ur5SettingsTab::autoCalibrateSlot);
+    connect(clearCalibrationButton, &QPushButton::clicked, this, &Ur5SettingsTab::clearCalibrationSlot);
 }
 
 Ur5SettingsTab::~Ur5SettingsTab()
@@ -58,8 +59,11 @@ void Ur5SettingsTab::setToolConfigurationLayout(QVBoxLayout *parent)
     toolComboBox = new QComboBox;
     keyLayout->addWidget(toolComboBox,0,1,1,1);
 
-    autoCalibrateButton = new QPushButton(tr("Auto calibrate"));
+    autoCalibrateButton = new QPushButton(tr("Auto calibration"));
     keyLayout->addWidget(autoCalibrateButton,0,2,1,1);
+
+    clearCalibrationButton = new QPushButton(tr("Clear calibration"));
+    keyLayout->addWidget(clearCalibrationButton,1,2,1,1);
 }
 
 void Ur5SettingsTab::updateCombobox()
@@ -88,6 +92,11 @@ void Ur5SettingsTab::createCalibrationMatrix()
     std::cout << calMatrix << std::endl;
 
     mUr5Robot->set_eMt(calMatrix);
+}
+
+void Ur5SettingsTab::clearCalibrationSlot()
+{
+    mUr5Robot->set_eMt(Transform3D::Identity());
 }
 
 } // cx

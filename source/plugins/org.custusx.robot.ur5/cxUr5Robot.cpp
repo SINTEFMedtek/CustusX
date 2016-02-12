@@ -145,7 +145,7 @@ void Ur5Robot::nextMove()
         }
         else
         {
-            if(mProgramEncoder.poseQueue.size()>1)
+            if(mMovementQueue.size()>1)
             {
                 mTargetPose = mMovementQueue.front().target_xMe;
 
@@ -155,6 +155,7 @@ void Ur5Robot::nextMove()
 
                 Eigen::RowVectorXd velocityEndEffector(6);
                 velocityEndEffector << velocity(0),velocity(1),velocity(2),0,0,0;
+
                 mMovementQueue.front().targetJointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
                 this->move(mMovementQueue.front());
             }
@@ -202,6 +203,7 @@ void Ur5Robot::connectToRobot(QString IPaddress)
 
     if(isConnectedToRobot())
         emit(connected());
+
 }
 
 void Ur5Robot::disconnectFromRobot()
@@ -268,18 +270,18 @@ void Ur5Robot::move(QString typeOfMovement, Ur5State targetState, double acc, do
         sendMessage(mMessageEncoder.stopj(acc));
 }
 
-void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double t, double rad)
+void Ur5Robot::move(QString typeOfMovement, Eigen::RowVectorXd targetConfiguration, double acc, double vel, double t, double rad)
 {
-    mTargetState.jointConfiguration = targetState;
+    mTargetState.jointConfiguration = targetConfiguration;
 
     if(typeOfMovement=="movej")
-        sendMessage(mMessageEncoder.movej(targetState,acc,vel,t,rad));
+        sendMessage(mMessageEncoder.movej(targetConfiguration,acc,vel,t,rad));
     else if(typeOfMovement=="movejp")
-        sendMessage(mMessageEncoder.movejp(targetState,acc, vel, t, rad));
+        sendMessage(mMessageEncoder.movejp(targetConfiguration,acc, vel, t, rad));
     else if(typeOfMovement=="speedl")
-        sendMessage(mMessageEncoder.speedl(targetState,acc,t));
+        sendMessage(mMessageEncoder.speedl(targetConfiguration,acc,t));
     else if(typeOfMovement =="speedj")
-        sendMessage(mMessageEncoder.speedj(targetState,acc,t));
+        sendMessage(mMessageEncoder.speedj(targetConfiguration,acc,t));
     else if(typeOfMovement =="stopj")
         sendMessage(mMessageEncoder.stopj(acc));
 
@@ -391,6 +393,7 @@ void Ur5Robot::moveProgram(MovementQueue mq)
         return;
     }
 
+    mMovementQueue.clear();
     mMovementQueue = mq;
 }
 
@@ -406,7 +409,7 @@ bool Ur5Robot::isAtTargetState()
 
 void Ur5Robot::setBlendRadius(double blendRadius)
 {
-    std::cout << "Blend radius set to " << blendRadius << std::endl;
+    CX_LOG_INFO() << "Blend radius set to " << blendRadius;
     mBlendRadius=blendRadius;
 }
 

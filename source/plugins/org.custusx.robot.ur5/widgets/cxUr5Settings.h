@@ -23,6 +23,7 @@ public:
 
 private slots:
     void autoCalibrateSlot();
+    void clearCalibrationSlot();
 
 private:
     QHBoxLayout *mainLayout;
@@ -34,7 +35,7 @@ private:
     void setToolConfigurationLayout(QVBoxLayout *vLayout);
 
     QComboBox *toolComboBox;
-    QPushButton *autoCalibrateButton;
+    QPushButton *autoCalibrateButton, *clearCalibrationButton;
 
     void updateCombobox();
     void createCalibrationMatrix();

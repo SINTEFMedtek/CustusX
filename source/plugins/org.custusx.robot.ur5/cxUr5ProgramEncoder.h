@@ -37,6 +37,7 @@ public:
                               double time = 0, double radius = 0);
     static MovementQueue addTypeOfMovement(MovementQueue mq, Ur5MovementInfo::movementType mtype);
     static MovementQueue addMotionReference(MovementQueue mq, Transform3D prMb);
+    static MovementQueue setConstantOrientation(MovementQueue mq, Transform3D mat);
 
 private:
     void addPath(vtkPolyData* output); // Mål å fjærne

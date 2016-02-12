@@ -164,25 +164,23 @@ void Ur5PlannedMoveTab::runVTKfileSlot()
                                                             velocityLineEdit->text().toDouble());
     mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::movej);
     mUr5Robot->moveProgram(mMovementQueue);
-
-    //mUr5Robot->moveProgram("movej",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    mMovementQueue.clear();
 }
 
 void Ur5PlannedMoveTab::runVelocityVTKSlot()
 {
     mMovementQueue = Ur5ProgramEncoder::addMovementSettings(mMovementQueue, accelerationLineEdit->text().toDouble(),
-                                                            velocityLineEdit->text().toDouble());
+                                                            velocityLineEdit->text().toDouble(),10);
     mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::speedj);
     mUr5Robot->moveProgram(mMovementQueue);
-
-    //mUr5Robot->moveProgram("speedj",accelerationLineEdit->text().toDouble(),velocityLineEdit->text().toDouble(),0);
+    mMovementQueue.clear();
 }
 
 void Ur5PlannedMoveTab::openVTKfileSlot()
 {
-    //mProgramEncoder.createMovementQueueFromVTKFile(getPathToPlugin()+vtkLineEdit->text());
-    //mUr5Robot->openVTKfile(getPathToPlugin()+vtkLineEdit->text());
+    mMovementQueue.clear();
     mMovementQueue = Ur5ProgramEncoder::createMovementQueueFromVTKFile(getPathToPlugin()+vtkLineEdit->text());
+    mMovementQueue = Ur5ProgramEncoder::setConstantOrientation(mMovementQueue, mUr5Robot->getCurrentState().bMee);
 }
 
 void Ur5PlannedMoveTab::clearPoseQueueSlot()
