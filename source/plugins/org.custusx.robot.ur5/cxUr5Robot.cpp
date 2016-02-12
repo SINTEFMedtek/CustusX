@@ -314,6 +314,10 @@ void Ur5Robot::clearProgramQueue()
     {
         mProgramEncoder.clearQueues();
     }
+    if(!mMovementQueue.empty())
+    {
+        mMovementQueue.clear();
+    }
 }
 
 void Ur5Robot::stopMove(QString typeOfStop, double acc)
