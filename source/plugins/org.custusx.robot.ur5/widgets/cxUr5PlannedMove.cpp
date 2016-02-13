@@ -160,7 +160,7 @@ void Ur5PlannedMoveTab::runVTKfileSlot()
     mMovementQueue = Ur5ProgramEncoder::addMovementSettings(mMovementQueue, accelerationLineEdit->text().toDouble(),
                                                             velocityLineEdit->text().toDouble());
     mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::movej);
-    mUr5Robot->moveProgram(mMovementQueue);
+    mUr5Robot->runMoveProgram(mMovementQueue);
     mMovementQueue.clear();
 }
 
@@ -169,7 +169,7 @@ void Ur5PlannedMoveTab::runVelocityVTKSlot()
     mMovementQueue = Ur5ProgramEncoder::addMovementSettings(mMovementQueue, accelerationLineEdit->text().toDouble(),
                                                             velocityLineEdit->text().toDouble(),10);
     mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::speedj);
-    mUr5Robot->moveProgram(mMovementQueue);
+    mUr5Robot->runMoveProgram(mMovementQueue);
     mMovementQueue.clear();
 }
 

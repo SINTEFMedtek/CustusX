@@ -38,6 +38,7 @@ public:
     void move(Ur5MovementInfo movementInformation);
     void stopMove(QString typeOfStop,double acc);
 
+    void runMoveProgram(MovementQueue movementQueue);
     void clearMovementQueue();
 
     void setBlendRadius(double blendRadius);
