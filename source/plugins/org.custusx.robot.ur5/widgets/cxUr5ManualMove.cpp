@@ -362,23 +362,26 @@ void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
 
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)
 {
-    Ur5State velocity;
-    velocity.operationalVelocity(axis) = (sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
+    Eigen::RowVectorXd operationalVelocity(6);
+    operationalVelocity << 0,0,0,0,0,0;
+    operationalVelocity(axis) = (sign)*velocityLineEdit->text().toDouble();
+    mUr5Robot->move("speedl",operationalVelocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::jointButtonPressed(int joint,int sign)
 {
-    Ur5State velocity;
-    velocity.jointVelocity(joint)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->move("speedj",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
+    Eigen::RowVectorXd jointVelocity(6);
+    jointVelocity << 0,0,0,0,0,0;
+    jointVelocity(joint)=(sign)*velocityLineEdit->text().toDouble();
+    mUr5Robot->move("speedj",jointVelocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::rotButtonPressed(int angle, int sign)
 {
-    Ur5State velocity;
-    velocity.jointVelocity(angle+3)=(sign)*velocityLineEdit->text().toDouble();
-    mUr5Robot->move("speedl",velocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
+    Eigen::RowVectorXd operationalVelocity(6);
+    operationalVelocity << 0,0,0,0,0,0;
+    operationalVelocity(angle+3)=(sign)*velocityLineEdit->text().toDouble();
+    mUr5Robot->move("speedl",operationalVelocity,accelerationLineEdit->text().toDouble(),0,timeLineEdit->text().toDouble(),0);
 }
 
 void Ur5ManualMoveTab::posZButtonPressed()
