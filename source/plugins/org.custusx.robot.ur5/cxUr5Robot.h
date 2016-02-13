@@ -34,23 +34,16 @@ public:
     Ur5State getCurrentState();
     Ur5State getPreviousState();
 
-    void move(QString typeOfMovement, Ur5State targetState, double acc, double vel, double t = 0, double rad = 0);
     void move(QString typeOfMovement, Eigen::RowVectorXd targetState, double acc, double vel, double t = 0, double rad = 0);
     void move(Ur5MovementInfo movementInformation);
-
     void stopMove(QString typeOfStop,double acc);
 
     void clearMovementQueue();
-
-    void openVTKfile(QString filename);
-    void moveProgram(QString typeOfProgram,double acceleration, double velocity, double radius, double t = 0);
-    void moveProgram(MovementQueue movementQueue);
 
     void setBlendRadius(double blendRadius);
 
     void sendMessage(QString message);
 
-    bool isValidWorkspace();
     bool isValidWorkspace(Eigen::RowVectorXd jointPosition);
 
     void set_eMt(Transform3D eMt);
