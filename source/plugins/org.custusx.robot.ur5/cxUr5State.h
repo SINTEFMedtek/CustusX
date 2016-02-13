@@ -55,6 +55,7 @@ struct org_custusx_robot_ur5_EXPORT Ur5MovementInfo
     enum movementType
     {
         movej,
+        movep,
         movel,
         speedj,
         speedl,
