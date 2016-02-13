@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkCamera.h"
+#include "vtkParametricSpline.h"
+#include "vtkSpline.h"
 
 #include "cxVBcameraPath.h"
 #include "cxMesh.h"
@@ -44,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewServiceProxy.h"
 #include "cxView.h"
-#include "cxGeometricRep.h"
 #include "cxRegistrationTransform.h"
 
 
@@ -55,52 +56,21 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 	mTrackingService(tracker), mPatientModelService(patientModel), mViewService(visualization)
 {
 	mManualTool = mTrackingService->getManualTool();
-	mRep = GeometricRep::New();
-	mSplineX = vtkSmartPointer<vtkCardinalSpline>::New();
-	mSplineY = vtkSmartPointer<vtkCardinalSpline>::New();
-	mSplineZ = vtkSmartPointer<vtkCardinalSpline>::New();
+    mSpline = vtkParametricSplinePtr::New();
+    mLastStoredViewVector.Identity();
 
 }
 
 void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 {
-	// Check correct meshobject (or limit in selector)
-	MeshPtr cameraPath;
-	QString uidCameraPath;
-	QString nameCameraPath;
 
 	if(!mesh)
 	{
 		std::cout << "cameraRawPointsSlot is empty !" << std::endl;
 		return;
 	}
-	// Get data transform matrix
-	Transform3D r_M_d = mesh->get_rMd();
 
-	QString uidCameraPathSubstring = QString("_cameraPath");
-	QString uidCameraPathInput = mesh->getUid();
-	QString nameCameraPathInput = mesh->getName();
-
-
-	std::map<QString, MeshPtr> meshes = mPatientModelService->getDataOfType<Mesh>();
-	for (std::map<QString, MeshPtr>::iterator iter=meshes.begin(); iter!=meshes.end(); ++iter)
-		if (iter->first.contains(uidCameraPathSubstring)) {
-			// Find existing camera path object and remove if found
-//			std::cout << "Camera path object found .."  << std::endl;
-			MeshPtr retval = iter->second;
-			mPatientModelService->removeData(retval->getUid());
-		}
-	// Create new camera path
-	if(nameCameraPathInput.contains(uidCameraPathSubstring)) {
-		nameCameraPath = nameCameraPathInput;
-		uidCameraPath = uidCameraPathInput;
-	} else {
-		nameCameraPath = nameCameraPathInput + uidCameraPathSubstring;
-		uidCameraPath = uidCameraPathInput + uidCameraPathSubstring;
-	}
-	cameraPath = mPatientModelService->createSpecificData<Mesh>(uidCameraPath, nameCameraPath);
-	this->generateSplineCurve(mesh);
-	this->generateMeshData(cameraPath, r_M_d);
+    this->generateSplineCurve(mesh);
 
 }
 
@@ -111,108 +81,59 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
 
 	mNumberOfInputPoints = polyDataInput->GetNumberOfPoints();
 
-	// Decimate the number of controlpoints to smooth the interpolated spline camera path
-	mNumberOfControlPoints = mNumberOfInputPoints / 10;
-//	std::cout << "NumberOfControlPoints : " << mNumberOfControlPoints << std::endl;
+    mNumberOfControlPoints = mNumberOfInputPoints;
 
 	// Setting the spline curve points
-	double p[3];
-	int indexCntrl;
-	int indexPoints;
-
 	// First clean up previous stored data
-	mSplineX->RemoveAllPoints();
-	mSplineY->RemoveAllPoints();
-	mSplineZ->RemoveAllPoints();
+    mSpline->GetXSpline()->RemoveAllPoints();
+    mSpline->GetYSpline()->RemoveAllPoints();
+    mSpline->GetZSpline()->RemoveAllPoints();
 
-	for(int i=0;i<=mNumberOfControlPoints;i++)
-	{
-		int indexP = (i*mNumberOfInputPoints-1)/mNumberOfControlPoints;
-//		std::cout << "Adding index : " << i << " , " << indexP << std::endl;
-//		std::cout << "Point : " << p[0] << ", " << p[1] << ", " << p[2] << std::endl;
-		vtkpoints->GetPoint(indexP,p);
-		mSplineX->AddPoint(i,p[0]);
-		mSplineY->AddPoint(i,p[1]);
-		mSplineZ->AddPoint(i,p[2]);
-	}
+    mSpline->SetPoints(vtkpoints);
 }
 
-void CXVBcameraPath::generateMeshData(MeshPtr cameraPath, Transform3D r_M_d)
-{
-	vtkPolyDataPtr	curvePolyData = vtkPolyDataPtr::New();
-	vtkPointsPtr	curvePoints = vtkPointsPtr::New();
-	vtkCellArrayPtr curveLines = vtkCellArrayPtr::New();
-
-	double splineParameter; // [0, 8] ?
-
-	for(int i=0;i<=79;i++)
-	{
-		splineParameter = i / 10.0;
-		double x = mSplineX->Evaluate(splineParameter);
-		double y = mSplineY->Evaluate(splineParameter);
-		double z = mSplineZ->Evaluate(splineParameter);
-		curvePoints->InsertPoint(i,x,y,z);
-
-//		std::cout << "Curve Point : " << i << " , ( "
-//				  << x << ", " << y << ", " << z << " )" << std::endl;
-
-		if((i%2==0) && (i<100))	// even iterations
-		{
-			curveLines->InsertNextCell(2);
-		}
-		curveLines->InsertCellPoint(i);
-	}
-
-	curvePolyData->SetPoints(curvePoints);
-	curvePolyData->SetLines(curveLines);
-
-	cameraPath->setVtkPolyData(curvePolyData);
-	cameraPath->get_rMd_History()->setRegistration(r_M_d);
-	mPatientModelService->insertData(cameraPath);
-	mRep->setMesh(cameraPath);
-}
 
 
 
 void CXVBcameraPath::cameraPathPositionSlot(int pos)
 {
 
-//	Transform3D rMpr = mPatientModelService->get_rMpr();
-//	Transform3D rMt = rMpr * mManualTool->get_prMt();
-//	std::cout << rMt << std::endl;
-	double splineParameter = pos*mNumberOfControlPoints / 100.0;
+    double splineParameter = pos / 100.0;
+
 //	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos : " << pos
 //			  << ", spline parameter : " << splineParameter << std::endl;
 
-	double pos_r[3], focus_r[3];
+    double pos_r[3], focus_r[3], d_r[3];
+    double splineParameterArray[3];
+    splineParameterArray[0] = splineParameter;
+    splineParameterArray[1] = splineParameter;
+    splineParameterArray[2] = splineParameter;
 
-	pos_r[0] = mSplineX->Evaluate(splineParameter);
-	pos_r[1] = mSplineY->Evaluate(splineParameter);
-	pos_r[2] = mSplineZ->Evaluate(splineParameter);
-	focus_r[0] = mSplineX->Evaluate(splineParameter+0.5);
-	focus_r[1] = mSplineY->Evaluate(splineParameter+0.5);
-	focus_r[2] = mSplineZ->Evaluate(splineParameter+0.5);
+    mSpline->Evaluate(splineParameterArray, pos_r, d_r);
+    splineParameterArray[0] = splineParameter+0.1;
+    splineParameterArray[1] = splineParameter+0.1;
+    splineParameterArray[2] = splineParameter+0.1;
+    mSpline->Evaluate(splineParameterArray, focus_r, d_r);
 
-
-	// If camera position approaches end point on spline, keep the last position
-	// and focus to make sure it wont be set to invalid values
-	if(splineParameter<((double)(mNumberOfControlPoints)-0.5)) {
-		mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
-		mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
-	}
-
-//	std::cout << "Position : " << pos_r[0] << ", " << pos_r[1] << ", " << pos_r[2] << std::endl;
-//	std::cout << "Focus: " << focus_r[0] << ", " << focus_r[1] << ", " << focus_r[2] << std::endl;
-
-	this->updateManualToolPosition();
+    mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
+    mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
+    this->updateManualToolPosition();
 
 }
 
 void CXVBcameraPath::updateManualToolPosition()
 {
+    Vector3D viewDirection_r;
 	// New View direction
-	Vector3D viewDirection_r = (mLastCameraFocus_r - mLastCameraPos_r).normalized();
-	Vector3D xVector = Vector3D(0,1,0);
+    if(similar(mLastCameraFocus_r, mLastCameraPos_r, 0.01)) {
+        viewDirection_r = mLastStoredViewVector;
+    } else {
+        viewDirection_r = (mLastCameraFocus_r - mLastCameraPos_r).normalized();
+        mLastStoredViewVector = viewDirection_r;
+    }
+
+
+    Vector3D xVector = Vector3D(0,1,0);
 	Vector3D yVector = cross(viewDirection_r, xVector).normalized();
 
 	// Construct tool transform

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
+typedef vtkSmartPointer<class vtkParametricSpline> vtkParametricSplinePtr;
 
 namespace cx {
 
@@ -59,25 +60,22 @@ class CXVBcameraPath : public QObject
 	Q_OBJECT
 
 private:
-	vtkCardinalSplinePtr		mSplineX;
-	vtkCardinalSplinePtr		mSplineY;
-	vtkCardinalSplinePtr		mSplineZ;
+    vtkParametricSplinePtr      mSpline;
 	TrackingServicePtr			mTrackingService;
 	PatientModelServicePtr		mPatientModelService;
 	ViewServicePtr				mViewService;
-	GeometricRepPtr				mRep;
 	ToolPtr						mManualTool;
 
 	int							mNumberOfInputPoints;
 	int							mNumberOfControlPoints;
 	Vector3D					mLastCameraPos_r;
 	Vector3D					mLastCameraFocus_r;
+    Vector3D                    mLastStoredViewVector;
 	double						mLastCameraViewAngle;
 	double						mLastCameraRotAngle;
 
 	void		updateManualToolPosition();
 	void		generateSplineCurve(MeshPtr mesh);
-	void		generateMeshData(MeshPtr cameraPath, Transform3D r_M_d);
 
 public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
