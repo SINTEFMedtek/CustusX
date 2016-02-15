@@ -40,6 +40,8 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
     connect(runVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVTKfileSlot);
     connect(runVelocityVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVelocityVTKSlot);
     connect(blendRadiusLineEdit, &QLineEdit::textChanged, this, &Ur5PlannedMoveTab::blendRadiusChangedSlot);
+
+    connect(logActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::logActiveToolSlot);
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -153,6 +155,14 @@ void Ur5PlannedMoveTab::setMovementAssignmentWidget(QVBoxLayout *parent)
     followActiveToolButton = new QPushButton(tr("Follow active tool"));
     textEditLayout->addWidget(followActiveToolButton,1,0,1,2);
     followActiveToolButton->setCheckable(true);
+
+    logActiveToolButton = new QPushButton(tr("Log active tool"));
+    textEditLayout->addWidget(logActiveToolButton,2,0,1,1);
+    logActiveToolButton->setCheckable(true);
+
+    runLoggedActiveToolButton = new QPushButton(tr("Move along sequence"));
+    textEditLayout->addWidget(runLoggedActiveToolButton,2,1,1,1);
+
 }
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
@@ -262,14 +272,38 @@ void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double 
     }
 }
 
-void Ur5PlannedMoveTab::startLoggingActiveTool(Transform3D matrix, double timestamp)
+void Ur5PlannedMoveTab::logActiveToolSlot()
 {
-
+    if(followActiveToolButton->isChecked())
+    {
+        connect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
+                this, &Ur5PlannedMoveTab::startLogActiveToolSlot);
+        mTransforms.clear();
+    }
+    else
+    {
+        disconnect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
+                   this, &Ur5PlannedMoveTab::startLogActiveToolSlot);
+    }
 }
 
-void Ur5PlannedMoveTab::runLoggedActiveToolSequence()
+void Ur5PlannedMoveTab::startLogActiveToolSlot(Transform3D matrix, double timestamp)
 {
+    ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
+    RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
+    mTransforms.push_back(robotTool->get_prMb().inverse()*matrix);
+}
+
+void Ur5PlannedMoveTab::runLoggedActiveToolSlot()
+{
+    mMovementQueue.clear();
+    mMovementQueue = Ur5ProgramEncoder::createMovementQueueFromTransformations(mTransforms);
+    mMovementQueue = Ur5ProgramEncoder::addMovementSettings(mMovementQueue, accelerationLineEdit->text().toDouble(),
+                                                            velocityLineEdit->text().toDouble(), 5);
+    mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::speedj);
+
+    mUr5Robot->runMoveProgram(mMovementQueue);
 }
 
 QString Ur5PlannedMoveTab::getPathToPlugin()

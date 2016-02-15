@@ -33,8 +33,9 @@ private slots:
     void followActiveToolSlot();
     void startFollowingActiveToolSlot(Transform3D matrix, double timestamp);
 
-    void startLoggingActiveTool(Transform3D matrix, double timestamp);
-    void runLoggedActiveToolSequence();
+    void logActiveToolSlot();
+    void startLogActiveToolSlot(Transform3D matrix, double timestamp);
+    void runLoggedActiveToolSlot();
 
 private:
     QPushButton *runVTKButton, *openVTKButton, *runVelocityVTKButton;
@@ -43,6 +44,7 @@ private:
     QPushButton *moveToInitialPositionButton;
 
     QPushButton *moveToPointButton, *moveToFrameButton, *followActiveToolButton;
+    QPushButton *logActiveToolButton, *runLoggedActiveToolButton;
 
     QLineEdit *vtkLineEdit;
     QLineEdit *accelerationLineEdit, *velocityLineEdit, *timeLineEdit, *blendRadiusLineEdit;
@@ -62,6 +64,7 @@ private:
     QString getPathToPlugin();
 
     MovementQueue mMovementQueue;
+    std::vector<Transform3D> mTransforms;
 };
 
 } // cx
