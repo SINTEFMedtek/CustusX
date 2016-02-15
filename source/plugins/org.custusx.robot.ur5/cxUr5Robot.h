@@ -91,7 +91,6 @@ private:
     int rtPort, secPort;
     QString IPaddress;
     Ur5Connection mSecMonitor,mRTMonitor;
-    Ur5ProgramEncoder mProgramEncoder;
     Ur5MessageEncoder mMessageEncoder;
     Ur5State mCurrentState, mPreviousState, mTargetState, mInitialState;
 
