@@ -147,7 +147,7 @@ void CXVBcameraPath::updateManualToolPosition()
 	Transform3D rotateZ = createTransformRotateZ(mLastCameraRotAngle);
 
 	Transform3D rMpr = mPatientModelService->get_rMpr();
-	Transform3D prMt = rMpr.inv() * rMt * rotateX * rotateZ;
+    Transform3D prMt = rMpr.inv() * rMt * rotateZ * rotateX;
 
 	mManualTool->set_prMt(prMt);
 
@@ -156,14 +156,14 @@ void CXVBcameraPath::updateManualToolPosition()
 
 void CXVBcameraPath::cameraViewAngleSlot(int angle)
 {
-	mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180);
+    mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180.0);
 	this->updateManualToolPosition();
 	mViewService->get3DView()->setModified();
 }
 
 void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
-	mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180);
+    mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180.0);
 	this->updateManualToolPosition();
 	mViewService->get3DView()->setModified();
 }

@@ -84,11 +84,9 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	mPlaybackSlider = new QSlider(Qt::Horizontal);
 	QLabel		*labelStart = new QLabel(tr("Start "));
 	QLabel		*labelTarget = new QLabel(tr(" Target"));
-//	QSpinBox	*speedSpinbox = new QSpinBox();
 	playbackHBox->addWidget(labelStart);
 	playbackHBox->addWidget(mPlaybackSlider);
 	playbackHBox->addWidget(labelTarget);
-//	playbackHBox->addWidget(speedSpinbox);
 	playbackBox->setLayout(playbackHBox);
 	mHorizontalLayout->addWidget(playbackBox);
 	mPlaybackSlider->setMinimum(0);
@@ -99,14 +97,14 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	QGridLayout	*endoscopeControlLayout = new QGridLayout;
 	QLabel		*labelRot = new QLabel(tr("Rotate"));
 	QLabel		*labelView = new QLabel(tr("View Direction (degrees left/right)"));
-	QLabel		*label1 = new QLabel(tr("-30 "));
-	QLabel		*label2 = new QLabel(tr(" 30"));
+    QLabel		*label1 = new QLabel(tr("-90 "));
+    QLabel		*label2 = new QLabel(tr(" 90"));
 	mRotateDial = new QDial;
 	mRotateDial->setMinimum(-180);
 	mRotateDial->setMaximum(180);
 	mViewSlider = new QSlider(Qt::Horizontal);
-	mViewSlider->setMinimum(-30);
-	mViewSlider->setMaximum(30);
+    mViewSlider->setMinimum(-90);
+    mViewSlider->setMaximum(90);
 
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
@@ -130,8 +128,6 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	connect(mViewSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 
-//	mHorizontalLayout->addStretch();
-//	mHorizontalLayout->addWidget(new QLabel("Virtual Bronchoscopy functionality ..."));
 }
 
 VBWidget::~VBWidget()
