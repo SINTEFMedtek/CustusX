@@ -872,6 +872,21 @@
     </USScanner>
     <USScanner>
         <Name>Ultrasonix</Name>
+	<USProbe>
+            <Name>LAP9-4</Name>
+            <Type>LinearArray</Type>
+            <DefaultRTSource>Digital</DefaultRTSource>
+            <Notes>Generated 20160215</Notes>
+            <RTSource>
+                <Name>Digital</Name>
+                <TemporalCalibration>114</TemporalCalibration>
+                <DefaultConfig>Digital</DefaultConfig>
+                <Config>
+                    <ID>Digital</ID>
+                    <Name>Digital streaming</Name>
+                </Config>
+            </RTSource>
+	</USProbe>
         <USProbe>
             <Name>C5-2</Name>
             <Type>CurvedLinearArray</Type>
