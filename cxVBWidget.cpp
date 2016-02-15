@@ -116,6 +116,8 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mHorizontalLayout->addWidget(endoscopeBox);
 
+    this->setLayout(mHorizontalLayout);
+
 
 	this->enableControls(false);
 
