@@ -85,7 +85,7 @@ void Ur5MiscellaneousTab::dataLogger()
 
 void Ur5MiscellaneousTab::logForCalibrationSlot()
 {
-    ToolPtr tool = mServices->tracking()->getTool("Sonowand 12FLA-L");
+    ToolPtr tool = mServices->tracking()->getTool("Sonowand_12FLA-L");
 
     CX_LOG_CHANNEL_INFO("prMt") << tool->get_prMt();
     CX_LOG_CHANNEL_INFO("bMe") << mUr5Robot->getCurrentState().bMee;
