@@ -238,9 +238,9 @@ void RobotTool::updateActors()
 void RobotTool::set_prMb_calibration()
 {
     Eigen::Matrix4d calMat;
-    calMat << 0.0262, -0.9951, 0.0950,  47,
-            0.9147,  0.0623, 0.3993, 296,
-           -0.4033,  0.0764, 0.9119, -23,
+    calMat <<   0.1566,  -0.9510,  -0.2664,  47,
+                0.9859,   0.1666,  -0.0151, 296,
+                0.0587,  -0.2603,   0.9637, -23,
                  0,       0,      0,   1;
 
     prMb = Eigen::Affine3d(calMat);
