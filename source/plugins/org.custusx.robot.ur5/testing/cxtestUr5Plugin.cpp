@@ -84,45 +84,40 @@ TEST_CASE("Ur5Plugin: Setup program queue", "[manual][plugins][org.custusx.robot
     REQUIRE(movementQueue.at(3).typeOfMovement == cx::Ur5MovementInfo::movej);
 }
 
-//TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition", "[manual][plugins][org.custusx.robot.ur5]")
-//{
-//    Ur5TestFixture fixture;
+TEST_CASE("Ur5Plugin: Compute the jacobian of the robot at given jointPosition", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
 
-//    Eigen::RowVectorXd jointPositions(6);
-//    jointPositions << 0.7722,-1.7453,1.7070,-1.5739,-1.6277,0.0717;
-//    //jointPositions = fixture.mUr5Robot.getCurrentState().jointPosition;
+    Eigen::RowVectorXd q1(6);
+    q1 << 0.7722,-1.7453,1.7070,-1.5739,-1.6277,0.0717;
 
-//    Eigen::MatrixXd J(6,6);
-//    J = fixture.jacobianUr5(jointPositions);
+    Eigen::RowVectorXd q2(6);
+    q2 << 0, 0, 0, 0, 0, 0;
 
-//    Eigen::RowVectorXd movePose(6);
-//    movePose << 0.1,0,0,0,0,0;
+    Eigen::MatrixXd J(6,6);
+    J = cx::Ur5Kinematics::jacobian(q2);
+}
 
-//    std::cout << J.determinant() << std::endl;
-//    std::cout << jointPositions << std::endl;
-//    std::cout << (J.inverse()*movePose.transpose()) << std::endl;
-//}
+TEST_CASE("Ur5Plugin: Compute positions using forward kinematics", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Ur5TestFixture fixture;
+    double threshold = 0.01;
 
-//TEST_CASE("Ur5Plugin: Compute positions using forward kinematics", "[manual][plugins][org.custusx.robot.ur5]")
-//{
-//    Ur5TestFixture fixture;
-//    double threshold = 0.0001;
+    Eigen::RowVectorXd q1(6);
+    Eigen::Vector3d operationalPosition, deviation;
 
-//    Eigen::RowVectorXd jp1(6);
-//    Eigen::Vector3d operationalPosition, deviation;
+    operationalPosition << -96.75, -300.99, 400.55; // Sensor values x = -96.75 mm, y = -300.99 mm, z = 400.55 mm
+    q1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values corresponding to above values
 
-//    operationalPosition << -96.75/1000, -300.99/1000, 400.55/1000; // Sensor values x = -96.75 mm, y = -300.99 mm, z = 400.55 mm
-//    jp1 << 0.9019,-2.0358,2.0008,-1.5364,-1.5514,-3.6054; // Sensor values corresponding to above values
+    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(q1);
+    deviation = cx::Ur5Kinematics::T2transl(computedOperationalPositon)-operationalPosition;
 
-//    cx::Transform3D computedOperationalPositon = fixture.mUr5Kinematics.forward(jp1);
-//    deviation = fixture.mUr5Kinematics.T2transl(computedOperationalPositon)-operationalPosition;
+    //std::cout << Eigen::Affine3d(computedOperationalPositon) << std::endl;
 
-//    //std::cout << Eigen::Affine3d(computedOperationalPositon) << std::endl;
-
-//    REQUIRE(deviation(0)<=threshold);
-//    REQUIRE(deviation(1)<=threshold);
-//    REQUIRE(deviation(2)<=threshold);
-//}
+    REQUIRE(deviation(0)<=threshold);
+    REQUIRE(deviation(1)<=threshold);
+    REQUIRE(deviation(2)<=threshold);
+}
 
 //TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
 //{
