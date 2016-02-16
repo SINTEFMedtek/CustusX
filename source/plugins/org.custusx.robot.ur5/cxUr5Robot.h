@@ -106,7 +106,7 @@ private:
 
     double mBlendRadius;
 
-    Transform3D motionSpace, eMt;
+    Transform3D mMotionSpace, eMt;
 
     void set_tcp(Transform3D eMt);
     void initializeOfflineRobot();

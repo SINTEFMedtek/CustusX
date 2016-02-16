@@ -42,6 +42,7 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
     connect(blendRadiusLineEdit, &QLineEdit::textChanged, this, &Ur5PlannedMoveTab::blendRadiusChangedSlot);
 
     connect(logActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::logActiveToolSlot);
+    connect(runLoggedActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runLoggedActiveToolSlot);
 }
 
 Ur5PlannedMoveTab::~Ur5PlannedMoveTab()
@@ -274,16 +275,17 @@ void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double 
 
 void Ur5PlannedMoveTab::logActiveToolSlot()
 {
-    if(followActiveToolButton->isChecked())
+    if(logActiveToolButton->isChecked())
     {
+        mTransforms.clear();
         connect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
                 this, &Ur5PlannedMoveTab::startLogActiveToolSlot);
-        mTransforms.clear();
     }
     else
     {
         disconnect(mServices->tracking()->getActiveTool().get(), &Tool::toolTransformAndTimestamp,
                    this, &Ur5PlannedMoveTab::startLogActiveToolSlot);
+        std::cout << mTransforms.size() << std::endl;
     }
 }
 

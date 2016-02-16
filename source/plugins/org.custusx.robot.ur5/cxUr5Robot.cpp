@@ -10,7 +10,7 @@ Ur5Robot::Ur5Robot():
     mBlendRadius(1),
     rtPort(30003),
     secPort(30002),
-    motionSpace(Transform3D::Identity()),
+    mMotionSpace(Transform3D::Identity()),
     eMt(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
@@ -95,7 +95,7 @@ void Ur5Robot::nextMove()
             {
                 mTargetPose = mMovementQueue.front().target_xMe;
 
-                Vector3D tangent = (Ur5Kinematics::T2transl(mTargetPose)-mCurrentState.cartAxis)/1000;
+                Vector3D tangent = (Ur5Kinematics::T2transl(mTargetPose)-Ur5Kinematics::T2transl(mCurrentState.bMee*this->eMt))/1000;
                 tangent = tangent/tangent.norm();
                 Vector3D velocity =  tangent*mMovementQueue.front().velocity/1000;
 
@@ -271,7 +271,7 @@ void Ur5Robot::runMoveProgram(MovementQueue mq)
 
 bool Ur5Robot::isAtTargetState()
 {
-    if((mCurrentState.cartAxis-Ur5Kinematics::T2transl(mTargetPose)).length()<mBlendRadius)
+    if((Ur5Kinematics::T2transl(mCurrentState.bMee*this->eMt)-Ur5Kinematics::T2transl(mTargetPose)).length()<mBlendRadius)
     {
         emit atTarget();
         return true;
