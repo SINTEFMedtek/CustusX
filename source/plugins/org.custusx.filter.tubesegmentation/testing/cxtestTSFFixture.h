@@ -61,6 +61,7 @@ public:
 private:
 	paramList loadPreset(QString preset);
 	void runFilter(QString preset);
+	QString getParametersDir();
 };
 
 #endif /* CXTESTTSFFIXTURE_H_ */

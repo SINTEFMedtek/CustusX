@@ -63,9 +63,15 @@ void TestTubeSegmentationFramework::testConstructor()
 {
 }
 
+QString TestTubeSegmentationFramework::getParametersDir()
+{
+	QString path = cx::DataLocations::findConfigFolder("/tsf", QString(KERNELS_DIR)) + "/parameters";
+	return path;
+}
+
 void TestTubeSegmentationFramework::testParameters()
 {
-	std::string path = std::string(PARAMETERS_DIR);
+	std::string path = getParametersDir().toStdString();
 	{
 		INFO("Could not find parameter file: "+path);
 		REQUIRE(ifstream(path.c_str()));
@@ -160,7 +166,7 @@ void TestTubeSegmentationFramework::testLoadParameterFile()
 
 paramList TestTubeSegmentationFramework::loadPreset(QString preset)
 {
-	std::string path = std::string(PARAMETERS_DIR);
+	std::string path = getParametersDir().toStdString();
 	paramList parameters = initParameters(path);
 	setParameter(parameters, "parameters", preset.toStdString());
 	loadParameterPreset(parameters, path);
