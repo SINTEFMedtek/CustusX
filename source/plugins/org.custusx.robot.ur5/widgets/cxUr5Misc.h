@@ -24,6 +24,7 @@ public:
 private slots:
     void startLoggingSlot();
     void stopLoggingSlot();
+    void logForCalibrationSlot();
     void dataLogger();
 
 private:
@@ -36,6 +37,7 @@ private:
     void setLoggingLayout(QVBoxLayout *vLayout);
 
     QPushButton *startLoggingButton, *stopLoggingButton;
+    QPushButton *logForCalibrationButton;
 };
 
 } // cx
