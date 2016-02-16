@@ -237,10 +237,13 @@ void RobotTool::updateActors()
 
 void RobotTool::set_prMb_calibration()
 {
-    prMb = createTransformRotateZ(M_PI/2);
-    prMb(0,3) = 47;
-    prMb(1,3) = 296;
-    prMb(2,3) = -23;
+    Eigen::Matrix4d calMat;
+    calMat << 0.0262, -0.9951, 0.0950,  47,
+            0.9147,  0.0623, 0.3993, 296,
+           -0.4033,  0.0764, 0.9119, -23,
+                 0,       0,      0,   1;
+
+    prMb = Eigen::Affine3d(calMat);
 }
 
 void RobotTool::set_eMt_calibration(Transform3D calibration)
