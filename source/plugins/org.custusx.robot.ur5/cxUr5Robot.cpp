@@ -10,7 +10,7 @@ Ur5Robot::Ur5Robot():
     mBlendRadius(1),
     rtPort(30003),
     secPort(30002),
-    mMotionSpace(Transform3D::Identity()),
+    prMb(Transform3D::Identity()),
     eMt(Transform3D::Identity())
 {
     connect(&mRTMonitor,&Ur5Connection::stateChanged,this,&Ur5Robot::updateCurrentState);
@@ -297,10 +297,22 @@ void Ur5Robot::set_eMt(Transform3D eMt)
     emit eMtChanged(eMt);
 }
 
+void Ur5Robot::set_prMb(Transform3D prMb)
+{
+    this->prMb = prMb;
+    emit prMbChanged(prMb);
+}
+
 Transform3D Ur5Robot::get_eMt()
 {
     return (this->eMt);
 }
+
+Transform3D Ur5Robot::get_prMb()
+{
+    return (this->prMb);
+}
+
 
 void Ur5Robot::set_tcp(Transform3D eMt)
 {

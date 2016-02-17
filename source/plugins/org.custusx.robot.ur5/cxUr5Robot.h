@@ -48,7 +48,10 @@ public:
     bool isValidWorkspace(Eigen::RowVectorXd jointPosition);
 
     void set_eMt(Transform3D eMt);
+    void set_prMb(Transform3D prMb);
+
     Transform3D get_eMt();
+    Transform3D get_prMb();
 
 public slots:
     void connectToRobot(QString IPaddress);
@@ -74,6 +77,7 @@ signals:
     void atTarget();
 
     void eMtChanged(Transform3D eMt);
+    void prMbChanged(Transform3D prMb);
 
 private:
     void setCurrentState(Ur5State currentState);
@@ -106,7 +110,7 @@ private:
 
     double mBlendRadius;
 
-    Transform3D mMotionSpace, eMt;
+    Transform3D eMt, prMb;
 
     void set_tcp(Transform3D eMt);
     void initializeOfflineRobot();
