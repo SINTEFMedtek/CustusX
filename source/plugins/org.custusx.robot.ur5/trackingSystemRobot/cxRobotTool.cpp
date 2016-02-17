@@ -43,10 +43,10 @@ RobotTool::RobotTool(QString uid, Ur5RobotPtr robot, VisServicesPtr services):
     this->createPolyData();
     this->toolVisibleSlot(true);
 
-    this->set_prMb_calibration();
     this->set_eMt_calibration(mUr5Robot->get_eMt());
 
     connect(mUr5Robot.get(), &Ur5Robot::eMtChanged, this, &RobotTool::set_eMt_calibration);
+    connect(mUr5Robot.get(), &Ur5Robot::prMbChanged, this, &RobotTool::set_prMb_calibration);
 }
 
 RobotTool::~RobotTool()
@@ -235,20 +235,16 @@ void RobotTool::updateActors()
     link5Actor->SetUserTransform(cx_transform3D_internal::getVtkTransform(&(rMl5)));
 }
 
-void RobotTool::set_prMb_calibration()
+void RobotTool::set_prMb_calibration(Transform3D calibration)
 {
-    Eigen::Matrix4d calMat;
-    calMat << 0.0439, -0.9990, -0.0017, 41.3387,
-              0.9990,  0.0439, -0.0002, 300.9398,
-              0.0003, -0.0017,  1.0000, -23.7073,
-                   0,       0,       0,   1.0000;
-
-    prMb = Eigen::Affine3d(calMat);
+    prMb = calibration;
+    CX_LOG_INFO() << prMb;
 }
 
 void RobotTool::set_eMt_calibration(Transform3D calibration)
 {
     eMt = calibration;
+    CX_LOG_INFO() << eMt;
 }
 
 void RobotTool::removeActors()

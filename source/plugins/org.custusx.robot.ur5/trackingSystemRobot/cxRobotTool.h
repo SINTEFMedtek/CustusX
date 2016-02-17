@@ -52,12 +52,13 @@ private slots:
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
     void set_eMt_calibration(Transform3D calibration);
+    void set_prMb_calibration(Transform3D calibration);
 
 private:
     void createPolyData();
     void initiateActors();
     void updateActors();
-    void set_prMb_calibration();
+
 
 
     std::set<Type> mTypes;
