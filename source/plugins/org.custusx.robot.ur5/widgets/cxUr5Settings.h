@@ -25,6 +25,9 @@ private slots:
     void autoCalibrateSlot();
     void clearCalibrationSlot();
 
+    void logForCalibrationSlot();
+    void clearLogForCalibrationSlot();
+
 private:
     QHBoxLayout *mainLayout;
     void setupUi(QWidget *parent);
@@ -36,9 +39,13 @@ private:
 
     QComboBox *toolComboBox;
     QPushButton *autoCalibrateButton, *clearCalibrationButton;
+    QPushButton *logForCalibrationButton, *clearLogForCalibrationButton;
+
+    std::vector<Transform3D> _prMt, _bMe, _tMpr, _eMb;
 
     void updateCombobox();
     void createCalibrationMatrix();
+    void createCalibrationMatrices();
 };
 
 } // cx

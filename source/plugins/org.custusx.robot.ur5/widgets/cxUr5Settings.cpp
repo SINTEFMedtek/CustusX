@@ -24,6 +24,9 @@ Ur5SettingsTab::Ur5SettingsTab(Ur5RobotPtr Ur5Robot,VisServicesPtr services, QWi
 
     connect(autoCalibrateButton, &QPushButton::clicked, this, &Ur5SettingsTab::autoCalibrateSlot);
     connect(clearCalibrationButton, &QPushButton::clicked, this, &Ur5SettingsTab::clearCalibrationSlot);
+
+    connect(logForCalibrationButton, &QPushButton::clicked, this, &Ur5SettingsTab::logForCalibrationSlot);
+    connect(clearLogForCalibrationButton, &QPushButton::clicked, this, &Ur5SettingsTab::clearLogForCalibrationSlot);
 }
 
 Ur5SettingsTab::~Ur5SettingsTab()
@@ -59,11 +62,17 @@ void Ur5SettingsTab::setToolConfigurationLayout(QVBoxLayout *parent)
     toolComboBox = new QComboBox;
     keyLayout->addWidget(toolComboBox,0,1,1,1);
 
-    autoCalibrateButton = new QPushButton(tr("Auto calibration"));
-    keyLayout->addWidget(autoCalibrateButton,0,2,1,1);
+    logForCalibrationButton = new QPushButton(tr("Log transformations"));
+    keyLayout->addWidget(logForCalibrationButton,1,0,1,1);
+
+    clearLogForCalibrationButton = new QPushButton(tr("Clear Log"));
+    keyLayout->addWidget(clearLogForCalibrationButton,1,1,1,1);
+
+    autoCalibrateButton = new QPushButton(tr("Calibrate"));
+    keyLayout->addWidget(autoCalibrateButton,2,0,1,1);
 
     clearCalibrationButton = new QPushButton(tr("Clear calibration"));
-    keyLayout->addWidget(clearCalibrationButton,1,2,1,1);
+    keyLayout->addWidget(clearCalibrationButton,2,1,1,1);
 }
 
 void Ur5SettingsTab::updateCombobox()
@@ -75,7 +84,8 @@ void Ur5SettingsTab::updateCombobox()
 
 void Ur5SettingsTab::autoCalibrateSlot()
 {
-    createCalibrationMatrix();
+    //createCalibrationMatrix();
+    this->createCalibrationMatrices();
 }
 
 void Ur5SettingsTab::createCalibrationMatrix()
@@ -94,9 +104,33 @@ void Ur5SettingsTab::createCalibrationMatrix()
     mUr5Robot->set_eMt(calMatrix);
 }
 
+void Ur5SettingsTab::createCalibrationMatrices()
+{
+    mUr5Robot->set_eMt(Ur5Kinematics::calibrate_iMk(_eMb,_tMpr));
+    mUr5Robot->set_prMb(Ur5Kinematics::calibrate_iMk(_prMt,_bMe));
+}
+
 void Ur5SettingsTab::clearCalibrationSlot()
 {
     mUr5Robot->set_eMt(Transform3D::Identity());
+}
+
+void Ur5SettingsTab::logForCalibrationSlot()
+{
+    ToolPtr tool = mServices->tracking()->getTool(toolComboBox->currentText());
+
+    _prMt.push_back(tool->get_prMt());
+    _tMpr.push_back(tool->get_prMt().inverse());
+    _bMe.push_back(mUr5Robot->getCurrentState().bMee);
+    _eMb.push_back(mUr5Robot->getCurrentState().bMee.inverse());
+}
+
+void Ur5SettingsTab::clearLogForCalibrationSlot()
+{
+    _prMt.clear();
+    _tMpr.clear();
+    _bMe.clear();
+    _eMb.clear();
 }
 
 } // cx
