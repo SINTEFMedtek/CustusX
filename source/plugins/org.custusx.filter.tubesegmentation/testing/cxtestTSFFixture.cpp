@@ -69,8 +69,7 @@ QString TestTubeSegmentationFramework::getParametersDir()
 {
 	QString path = cx::DataLocations::findConfigFolder("/tsf", QString(KERNELS_DIR)) + "parameters";
 
-	QDir dir(path);
-	return dir.path();
+	return QDir::toNativeSeparators(path);
 }
 
 void TestTubeSegmentationFramework::testParameters()
