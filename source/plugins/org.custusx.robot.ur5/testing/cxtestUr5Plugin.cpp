@@ -119,6 +119,54 @@ TEST_CASE("Ur5Plugin: Compute positions using forward kinematics", "[manual][plu
     REQUIRE(deviation(2)<=threshold);
 }
 
+TEST_CASE("Ur5Plugin: Compute calibration of prMb and eMt (AX = XB problematique)", "[manual][plugins][org.custusx.robot.ur5]")
+{
+    Eigen::Matrix4d prMt1, prMt2, prMt3;
+    Eigen::Matrix4d bMe1, bMe2, bMe3;
+
+    std::vector<cx::Transform3D> prMt, bMe;
+
+    bMe1 << 0.940208, -0.286317, 0.184478,   79.8462,
+            -0.33989, -0.823711, 0.453844, -253.451,
+             0.022013,  -0.48941, -0.871776,   381.233,
+                    0,         0,         0,         1;
+
+    bMe2 << 0.950807, -0.296844, 0.0886027,   71.1305,
+            -0.244507, -0.894724, -0.373744,  -326.797,
+             0.190219,  0.333694,  -0.92329,   456.429,
+                    0,         0,         0,         1;
+
+    bMe3 << 0.95206,  -0.297485, -0.0713082,    159.371,
+            -0.300551,   -0.86616,  -0.399295,   -328.802,
+             0.0570201,   0.401585,  -0.914045,    457.184,
+                     0,         0,          0,          1;
+
+    prMt1 << 0.401498, 0.79695, -0.451299, 171.994,
+             0.91586,    -0.349759,     0.197154,      204.777,
+           -0.000724455,    -0.492483,    -0.870322,      264.889,
+                     0,            0,            0,            1;
+
+    prMt2 << 0.319993,  0.872892,  0.368327,   352.566,
+            0.932267, -0.359359, 0.0417084,   172.098,
+            0.168768, 0.330032,  -0.92876,   293.292,
+                   0,        0,         0,         1;
+
+    prMt3 << 0.372151,   0.842622,    0.38922,    347.901,
+             0.926245,   -0.36416, -0.0972532,    247.515,
+            0.0597906,   0.396705,  -0.915997,    322.485,
+                    0,          0,          0,          1;
+
+    prMt.push_back(cx::Transform3D(prMt1));
+    prMt.push_back(cx::Transform3D(prMt2));
+    prMt.push_back(cx::Transform3D(prMt3));
+
+    bMe.push_back(cx::Transform3D(bMe1));
+    bMe.push_back(cx::Transform3D(bMe2));
+    bMe.push_back(cx::Transform3D(bMe3));
+
+    std::cout << cx::Ur5Kinematics::calibrate_iMk(prMt,bMe) << std::endl;
+}
+
 //TEST_CASE("Ur5Plugin: Dummy test", "[manual][plugins][org.custusx.robot.ur5]")
 //{
     //Ur5TestFixture fixture;
