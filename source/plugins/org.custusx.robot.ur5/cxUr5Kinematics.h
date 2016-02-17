@@ -42,7 +42,10 @@ public:
 
     static Vector3D T2transl(Transform3D T);
     static Vector3D T2rangles(Transform3D T);
+    static Vector3D T2Euler(Transform3D T);
     static Eigen::RowVectorXd T2OperationalConfiguration(Transform3D pose);
+
+    static Transform3D calibrate_iMk(std::vector<Transform3D> iMj, std::vector<Transform3D> kMl);
 
 private:
     Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);

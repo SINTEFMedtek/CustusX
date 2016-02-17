@@ -1,5 +1,6 @@
 #include "cxUr5Kinematics.h"
 #include "cxVector3D.h"
+#include <unsupported/Eigen/MatrixFunctions>
 
 namespace cx
 {
@@ -231,9 +232,9 @@ Vector3D Ur5Kinematics::T2rangles(Transform3D T)
 
     angle = acos((T(0,0)+T(1,1)+T(2,2)-1)/2);
     k << (T(2,1)-T(1,2)),(T(0,2)-T(2,0)),(T(1,0)-T(0,1));
-    k = (1/(2*sin(angle)))*k*angle;
+    k = (1/(2*sin(angle)))*k;
 
-    return k;
+    return angle*k;
 }
 
 Eigen::RowVectorXd Ur5Kinematics::inverseJmethod(Transform3D desiredPose, Eigen::RowVectorXd guessedJointConfiguration)
@@ -393,5 +394,59 @@ Eigen::RowVectorXd Ur5Kinematics::T2OperationalConfiguration(Transform3D pose)
 
     return operationalConfiguration;
 }
+
+Transform3D Ur5Kinematics::calibrate_iMk(std::vector<Transform3D> iMj, std::vector<Transform3D> kMl)
+{
+    int nMatrices = int(iMj.size());
+    int nPossibilities = (nMatrices*nMatrices-nMatrices)/2;
+
+    std::vector<Transform3D> A(nPossibilities), B(nPossibilities);
+
+    int k = 0;
+    for(int i = 0; i<nMatrices; i++)
+    {
+        for(int j=i+1; j<nMatrices; j++)
+        {
+        A.at(k) = iMj.at(j)*iMj.at(i).inverse();
+        B.at(k) = kMl.at(j)*kMl.at(i).inverse();
+        k++;
+        }
+    }
+
+    Eigen::Matrix3d M;
+    M.setZero();
+
+    Eigen::Matrix4d iMk;
+    iMk.setIdentity();
+
+    Transform3D I = Transform3D::Identity();
+
+    Eigen::Vector3d a, b;
+
+    for(int i = 0; i<A.size(); i++)
+    {
+        a = T2rangles(A.at(i));
+        b = T2rangles(B.at(i));
+        M = M + Eigen::Matrix3d(b*a.transpose());
+    }
+
+    iMk.block<3,3>(0,0) = ((M.transpose()*M).sqrt()).inverse()*M.transpose();
+
+    Eigen::MatrixXd C(A.size()*3,3);
+    Eigen::MatrixXd d(A.size()*3,1);
+
+    int j = 0;
+    for(int i = 0; i < (A.size()*3); i=i+3)
+    {
+        C.block<3,3>(i,0) = I.rotation()-A.at(j).rotation();
+        d.block<3,1>(i,0) = T2transl(A.at(j))-iMk.block<3,3>(0,0)*T2transl(B.at(j));
+        j++;
+    }
+
+    iMk.block<3,1>(0,3) = (C.transpose()*C).inverse()*C.transpose()*d;
+
+    return Transform3D(iMk);
+}
+
 
 } // cx
