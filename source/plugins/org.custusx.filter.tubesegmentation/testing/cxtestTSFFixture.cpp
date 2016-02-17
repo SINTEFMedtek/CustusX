@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "SIPL/Exceptions.hpp"
 #include "cxSessionStorageService.h"
 
+#include <QDir>
+
 #include "catch.hpp"
 
 TestTubeSegmentationFramework::TestTubeSegmentationFramework() 
@@ -66,7 +68,9 @@ void TestTubeSegmentationFramework::testConstructor()
 QString TestTubeSegmentationFramework::getParametersDir()
 {
 	QString path = cx::DataLocations::findConfigFolder("/tsf", QString(KERNELS_DIR)) + "parameters";
-	return path;
+
+	QDir dir(path);
+	return dir.path();
 }
 
 void TestTubeSegmentationFramework::testParameters()
