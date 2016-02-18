@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestTSFFixture.h"
 
 #include <fstream>
+#include <QDir>
+#include <QFile>
 #include "cxData.h"
 #include "cxLogicManager.h"
 
@@ -40,13 +42,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxTypeConversions.h"
 
 #include "parameters.hpp"
 #include "tsf-config.h"
 #include "SIPL/Exceptions.hpp"
 #include "cxSessionStorageService.h"
-
-#include <QDir>
 
 #include "catch.hpp"
 
@@ -77,7 +78,7 @@ void TestTubeSegmentationFramework::testParameters()
 	std::string path = getParametersDir().toStdString();
 	{
 		INFO("Could not find parameter file: "+path);
-		REQUIRE(ifstream(path.c_str()));
+		REQUIRE(QFile::exists(qstring_cast(path)));
 	}
 
 	{
