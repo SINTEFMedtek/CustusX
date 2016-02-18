@@ -56,11 +56,15 @@ public:
     QByteArray getByteArrayFromTxt(QString filename);
     QString getTestDataFolderPath();
 
+    std::vector<cx::Transform3D> getMatrixVectorFromFile(QString filename);
+
     void printMatrix(Eigen::MatrixXd matrix);
+    void printMatrices(std::vector<cx::Transform3D> matrices);
 
 private:
     QString mTestDataFolderName;
     QString getSourcePath();
+
 
 
 };

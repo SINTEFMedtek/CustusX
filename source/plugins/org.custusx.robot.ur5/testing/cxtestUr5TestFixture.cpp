@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QFile>
 #include <QDir>
+#include <QTextStream>
 
 namespace cxtest
 {
@@ -88,5 +89,54 @@ QString Ur5TestFixture::getTestDataFolderPath()
     return (this->getSourcePath()+mTestDataFolderName);
 }
 
+std::vector<cx::Transform3D> Ur5TestFixture::getMatrixVectorFromFile(QString filename)
+{
+    QString fullPath = this->getTestDataFolderPath() + filename;
+    QFile inputFile(fullPath);
+    std::vector<cx::Transform3D> matrices;
+
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+        QTextStream  textFile(&inputFile);
+        cx::Transform3D matrix = cx::Transform3D::Identity();
+
+        int i = 0, j = 0;
+
+        while ( !textFile.atEnd() )
+        {
+            double value;
+            textFile >> value;
+            if(j<3)
+            {
+                matrix(i,j) = value;
+                j++;
+            }
+            else if(i<3)
+            {
+                matrix(i,j) = value;
+                j = 0;
+                i++;
+            }
+            else
+            {
+                matrices.push_back(matrix);
+                matrix = cx::Transform3D::Identity();
+                j = 0;
+                i = 0;
+            }
+        }
+    }
+    inputFile.close();
+
+    return matrices;
+}
+
+void Ur5TestFixture::printMatrices(std::vector<cx::Transform3D> matrices)
+{
+    for(int i=0; i<matrices.size(); i++)
+    {
+        std::cout << matrices.at(i) << std::endl << std::endl;
+    }
+}
 
 } //cxtest
