@@ -46,6 +46,7 @@ public:
     static Eigen::RowVectorXd T2OperationalConfiguration(Transform3D pose);
 
     static Transform3D calibrate_iMk(std::vector<Transform3D> iMj, std::vector<Transform3D> kMl);
+    static std::vector<Transform3D> invertMatrices(std::vector<Transform3D> matrices);
 
 private:
     Transform3D poseToMatrix(Eigen::RowVectorXd poseConfiguration);
@@ -54,12 +55,12 @@ private:
     Eigen::RowVectorXd errorVector(Transform3D desiredPose, Transform3D currentPose) const;
     Eigen::MatrixXd pseudoInverse(Eigen::MatrixXd matrix) const;
 
-    static const double d1 = 0.089159;
-    static const double a2 = -0.42500;
-    static const double a3 = -0.39225;
-    static const double d4 = 0.10915;
-    static const double d5 = 0.09465;
-    static const double d6 = 0.0823;
+    static const double d1(){return 0.089159;}
+    static const double a2(){return -0.42500;}
+    static const double a3(){return -0.39225;}
+    static const double d4(){return 0.10915;}
+    static const double d5(){return 0.09465;}
+    static const double d6(){return 0.0823;}
 };
 
 } // cx
