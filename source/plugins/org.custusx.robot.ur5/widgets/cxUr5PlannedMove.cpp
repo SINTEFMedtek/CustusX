@@ -209,7 +209,7 @@ void Ur5PlannedMoveTab::moveToPointSlot()
     Transform3D prMt_d = Transform3D::Identity();
     prMt_d.translation() = pointMetric->getCoordinate();
 
-    Transform3D bMt_d = robotTool->get_prMb().inverse()*prMt_d;
+    Transform3D bMt_d = mUr5Robot->get_prMb().inverse()*prMt_d;
     Vector3D rangles = Ur5Kinematics::T2rangles(mUr5Robot->getCurrentState().bMee*mUr5Robot->get_eMt());
 
     Eigen::RowVectorXd point(6);
@@ -228,7 +228,7 @@ void Ur5PlannedMoveTab::moveToFrameSlot()
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    Transform3D pose = (robotTool->get_prMb().inverse()*frameMetric->getFrame());
+    Transform3D pose = (mUr5Robot->get_prMb().inverse()*frameMetric->getFrame());
 
     mUr5Robot->move("movejp",Ur5Kinematics::T2OperationalConfiguration(pose),0.3,0.1);
 }
@@ -254,13 +254,13 @@ void Ur5PlannedMoveTab::startFollowingActiveToolSlot(Transform3D matrix, double 
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
     Transform3D currentToolPose = mUr5Robot->getCurrentState().bMee*mUr5Robot->get_eMt();
 
-    if((Ur5Kinematics::T2transl((robotTool->get_prMb().inverse()*matrix))-Ur5Kinematics::T2transl(currentToolPose)).length()>blendRadiusLineEdit->text().toDouble())
+    if((Ur5Kinematics::T2transl((mUr5Robot->get_prMb().inverse()*matrix))-Ur5Kinematics::T2transl(currentToolPose)).length()>blendRadiusLineEdit->text().toDouble())
     {
 
     double moveVelocity = velocityLineEdit->text().toDouble()/1000;
 
 
-    Vector3D tangent = Ur5Kinematics::T2transl(robotTool->get_prMb().inverse()*matrix)-Ur5Kinematics::T2transl(currentToolPose);
+    Vector3D tangent = Ur5Kinematics::T2transl(mUr5Robot->get_prMb().inverse()*matrix)-Ur5Kinematics::T2transl(currentToolPose);
 
 
     Eigen::RowVectorXd velocityEndEffector(6), jointVelocity(6);
@@ -294,7 +294,7 @@ void Ur5PlannedMoveTab::startLogActiveToolSlot(Transform3D matrix, double timest
     ToolPtr tool = mServices->tracking()->getTool("RobotTracker");
     RobotToolPtr robotTool = boost::dynamic_pointer_cast<RobotTool>(tool);
 
-    mTransforms.push_back(robotTool->get_prMb().inverse()*matrix);
+    mTransforms.push_back(mUr5Robot->get_prMb().inverse()*matrix);
 }
 
 void Ur5PlannedMoveTab::runLoggedActiveToolSlot()
