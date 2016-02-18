@@ -238,13 +238,13 @@ void RobotTool::updateActors()
 void RobotTool::set_prMb_calibration(Transform3D calibration)
 {
     prMb = calibration;
-    CX_LOG_INFO() << prMb;
+    std::cout << prMb << std::endl << std::endl;
 }
 
 void RobotTool::set_eMt_calibration(Transform3D calibration)
 {
     eMt = calibration;
-    CX_LOG_INFO() << eMt;
+    std::cout << eMt << std::endl << std::endl;
 }
 
 void RobotTool::removeActors()
