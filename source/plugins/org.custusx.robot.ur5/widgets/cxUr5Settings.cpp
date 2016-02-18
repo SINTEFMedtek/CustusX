@@ -84,8 +84,16 @@ void Ur5SettingsTab::updateCombobox()
 
 void Ur5SettingsTab::autoCalibrateSlot()
 {
-    //createCalibrationMatrix();
-    this->createCalibrationMatrices();
+    if(!_prMt.empty() && !_bMe.empty())
+    {
+        this->createCalibrationMatrices();
+    }
+    else
+    {
+        mUr5Robot->set_prMb(getPreCalibrated_prMb());
+        mUr5Robot->set_eMt(getPreCalibrated_eMt());
+    }
+
 }
 
 void Ur5SettingsTab::createCalibrationMatrix()
@@ -106,6 +114,10 @@ void Ur5SettingsTab::createCalibrationMatrix()
 
 void Ur5SettingsTab::createCalibrationMatrices()
 {
+    std::vector<Transform3D> _eMb, _tMpr;
+    _eMb = Ur5Kinematics::invertMatrices(_bMe);
+    _tMpr = Ur5Kinematics::invertMatrices(_prMt);
+
     mUr5Robot->set_eMt(Ur5Kinematics::calibrate_iMk(_eMb,_tMpr));
     mUr5Robot->set_prMb(Ur5Kinematics::calibrate_iMk(_prMt,_bMe));
 }
@@ -120,17 +132,37 @@ void Ur5SettingsTab::logForCalibrationSlot()
     ToolPtr tool = mServices->tracking()->getTool(toolComboBox->currentText());
 
     _prMt.push_back(tool->get_prMt());
-    _tMpr.push_back(tool->get_prMt().inverse());
     _bMe.push_back(mUr5Robot->getCurrentState().bMee);
-    _eMb.push_back(mUr5Robot->getCurrentState().bMee.inverse());
 }
 
 void Ur5SettingsTab::clearLogForCalibrationSlot()
 {
     _prMt.clear();
-    _tMpr.clear();
     _bMe.clear();
-    _eMb.clear();
+}
+
+Transform3D Ur5SettingsTab::getPreCalibrated_prMb()
+{
+    Eigen::Matrix4d prMb;
+
+    prMb <<  0.0434563, -0.99905, -0.00326434, 44.1563,
+             0.999052,   0.0434477,  0.00265485,     301.521,
+            -0.00251049, -0.00337662 ,   0.999991,    -26.5665,
+                     0,           0,           0,           1;
+
+    return Transform3D(prMb);
+}
+
+Transform3D Ur5SettingsTab::getPreCalibrated_eMt()
+{
+    Eigen::Matrix4d eMt;
+
+    eMt << 0.999292, -0.0361184, -0.010557,  -208.438,
+           0.036101,  0.999346, -0.00182802, -3.54387,
+           0.0106161,  0.0014456,    0.999943,     106.812,
+                  0,           0,           0,           1;
+
+    return Transform3D(eMt);
 }
 
 } // cx

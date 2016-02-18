@@ -41,11 +41,14 @@ private:
     QPushButton *autoCalibrateButton, *clearCalibrationButton;
     QPushButton *logForCalibrationButton, *clearLogForCalibrationButton;
 
-    std::vector<Transform3D> _prMt, _bMe, _tMpr, _eMb;
+    std::vector<Transform3D> _prMt, _bMe;
 
     void updateCombobox();
     void createCalibrationMatrix();
     void createCalibrationMatrices();
+
+    Transform3D getPreCalibrated_prMb();
+    Transform3D getPreCalibrated_eMt();
 };
 
 } // cx
