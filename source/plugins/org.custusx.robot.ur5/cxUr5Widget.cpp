@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "widgets/cxUr5Misc.h"
 
 #include "applications/cxUr5LungSimulationTab.h"
+#include "applications/cxUr5USTrackerTab.h"
 
 #include <QLabel>
 #include <QSlider>
@@ -99,6 +100,8 @@ void Ur5Widget::addApplicationTab(QString typeOfTab)
         tabWidget->addTab(new Ur5ScriptTab(mUr5Robot, mServices),tr("UR5 Script"));
     if(typeOfTab == "Settings" && !this->isTabExisting("Settings"))
         tabWidget->addTab(new Ur5SettingsTab(mUr5Robot, mServices),tr("Settings"));
+    if(typeOfTab == "USTracker" && !this->isTabExisting("USTracker"))
+        tabWidget->addTab(new Ur5USTrackerTab(mUr5Robot, mServices),tr("US Tracker"));
 }
 
 void Ur5Widget::removeApplicationTab(QString typeOfTab)
@@ -113,6 +116,8 @@ void Ur5Widget::removeApplicationTab(QString typeOfTab)
         tabWidget->removeTab(getTabIndex("UR5 Script"));
     if(typeOfTab == "Settings")
         tabWidget->removeTab(getTabIndex("Settings"));
+    if(typeOfTab == "USTracker")
+        tabWidget->removeTab(getTabIndex("USTracker"));
 }
 
 int Ur5Widget::getTabIndex(QString tabText)

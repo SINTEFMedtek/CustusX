@@ -59,7 +59,8 @@ private:
     void setRobotTrackingLayout(QHBoxLayout *parent);
     void setRobotApplicationLayout(QHBoxLayout *parent);
 
-    QPushButton *toggleManual, *togglePlanned, *toggleUr5Script, *toggleLungSimulation, *toggleSettings;
+    QPushButton *toggleManual, *togglePlanned, *toggleUr5Script;
+    QPushButton *toggleLungSimulation, *toggleSettings, *toggleUSTracker;
 
     QString mGraphicsFolderName;
 

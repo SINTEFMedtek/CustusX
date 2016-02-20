@@ -26,6 +26,8 @@ set(PLUGIN_SRCS
 
   applications/cxUr5LungSimulation.cpp
   applications/cxUr5LungSimulationTab.cpp
+  applications/cxUr5USTracker.cpp
+  applications/cxUr5USTrackerTab.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -53,6 +55,8 @@ set(PLUGIN_MOC_SRCS
 
   applications/cxUr5LungSimulation.h
   applications/cxUr5LungSimulationTab.h
+  applications/cxUr5USTracker.h
+  applications/cxUr5USTrackerTab.h
 )
 
 # Qt Designer files which should be processed by Qts uic

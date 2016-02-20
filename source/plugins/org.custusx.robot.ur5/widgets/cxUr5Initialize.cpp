@@ -64,6 +64,7 @@ void Ur5InitializeTab::setupConnections(QWidget *parent)
     connect(togglePlanned, &QPushButton::toggled, this, &Ur5InitializeTab::addCheckedApplicationSlot);
     connect(toggleSettings, &QPushButton::toggled, this, &Ur5InitializeTab::addCheckedApplicationSlot);
     connect(toggleUr5Script, &QPushButton::toggled, this, &Ur5InitializeTab::addCheckedApplicationSlot);
+    connect(toggleUSTracker, &QPushButton::toggled, this, &Ur5InitializeTab::addCheckedApplicationSlot);
 }
 
 void Ur5InitializeTab::setRobotConnectionLayout(QVBoxLayout *parent)
@@ -204,6 +205,13 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     toggleSettings->setFixedHeight(24);
     toggleSettings->setIconSize(toggleManual->size());
 
+    toggleUSTracker = new QPushButton(onoffIcon,"");
+    toggleUSTracker->setCheckable(true);
+    toggleUSTracker->setStyleSheet(this->onoffButtonStyleSheet());
+    toggleUSTracker->setFixedWidth(40);
+    toggleUSTracker->setFixedHeight(24);
+    toggleUSTracker->setIconSize(toggleManual->size());
+
     mainLayout->addWidget(new QLabel(tr("Manual movement")),0,0,1,1);
     mainLayout->addWidget(toggleManual,0,1,1,1);
 
@@ -218,6 +226,9 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
 
     mainLayout->addWidget(new QLabel(tr("Settings")),4,0,1,1);
     mainLayout->addWidget(toggleSettings,4,1,1,1);
+
+    mainLayout->addWidget(new QLabel(tr("US Tracker")),5,0,1,1);
+    mainLayout->addWidget(toggleUSTracker,5,1,1,1);
 }
 
 void Ur5InitializeTab::startTrackingSlot()
@@ -316,6 +327,15 @@ void Ur5InitializeTab::addCheckedApplicationSlot()
     else
     {
         this->removeApplicationTab("Settings");
+    }
+
+    if(toggleUSTracker->isChecked())
+    {
+        this->addApplicationTab("USTracker");
+    }
+    else
+    {
+        this->removeApplicationTab("USTracker");
     }
 }
 
