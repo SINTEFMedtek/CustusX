@@ -180,6 +180,7 @@ void StateServiceImpl::fillDefaultSettings()
 	this->fillDefault("View3D/depthPeeling", false);
 	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
+	this->fillDefault("View/shadingOn", true);
 
 	this->fillDefault("stillUpdateRate", 0.001);
 
