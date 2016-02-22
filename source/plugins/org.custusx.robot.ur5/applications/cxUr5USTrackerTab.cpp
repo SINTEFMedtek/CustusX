@@ -12,15 +12,27 @@
 #include "cxViewService.h"
 #include "cxView.h"
 #include <vtkRenderer.h>
+#include <vtkImageCast.h>
+#include "cxImage.h"
+#include "cxProbe.h"
+#include "cxTool.h"
+#include "cxRep.h"
+#include "cxRepContainer.h"
+#include "cxRepImpl.h"
+#include "cxStreamerService.h"
 
 #include "vtkImageCanvasSource2D.h"
+#include "cxActiveData.h"
 
 #include "cxLogger.h"
+#include "cxVolumeHelpers.h"
 
 #include <QGroupBox>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QLabel>
+
+#include <vtkImageActor.h>
 
 
 namespace cx
@@ -73,17 +85,23 @@ void Ur5USTrackerTab::setMoveLayout(QVBoxLayout *parent)
 
 void Ur5USTrackerTab::testSlot()
 {
-    mVideoSource = mServices->video()->getActiveVideoSource();
+    mVideoSource.reset(new BasicVideoSource(mServices->video()->getActiveVideoSource()->getUid()));
+
     vtkImageDataPtr inputImage = mVideoSource->getVtkImageData();
+    itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromVTKImage(inputImage);
+    vtkImageDataPtr outputImage = AlgorithmHelper::getVTKFromITK(itkImage);
 
-    //itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromVTKImage(inputImage);
+    mVideoSource->start();
+    mVideoSource->overrideTimeout(true);
 
-    // Find center of image
-    int center[2];
-    center[0] = (inputImage->GetExtent()[1] + inputImage->GetExtent()[0]) / 2;
-    center[1] = (inputImage->GetExtent()[3] + inputImage->GetExtent()[2]) / 2;
+    vtkImageDataPtr emptyImage = generateVtkImageData(Eigen::Array3i(3,3,1),
+                                                           Vector3D(1,1,1),
+                                                           0);
 
-    connect(mVideoSource.get(), &VideoSource::newFrame, this, &Ur5USTrackerTab::newFrameSlot);
+    vtkImageActorPtr imageActor = vtkImageActorPtr::New();
+    imageActor->SetInputData(inputImage);
+
+    mServices->view()->get3DView()->getRenderer()->AddActor(imageActor);
 }
 
 void Ur5USTrackerTab::newFrameSlot()

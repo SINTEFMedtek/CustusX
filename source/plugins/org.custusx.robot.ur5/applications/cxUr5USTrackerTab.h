@@ -10,6 +10,8 @@
 #include <QPushButton>
 #include <QComboBox>
 
+#include "cxBasicVideoSource.h"
+
 #include "applications/cxUr5USTracker.h"
 #include "cxUr5Robot.h"
 
@@ -38,7 +40,7 @@ private:
 
     QPushButton *testButton;
 
-    VideoSourcePtr mVideoSource;
+    BasicVideoSourcePtr mVideoSource;
 };
 
 
