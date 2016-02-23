@@ -22,6 +22,7 @@
 #include "cxStreamerService.h"
 
 #include "vtkImageCanvasSource2D.h"
+#include "vtkImageBlend.h"
 #include "cxActiveData.h"
 
 #include "cxLogger.h"
@@ -34,6 +35,15 @@
 
 #include <vtkImageActor.h>
 
+#include "itkVTKImageToImageFilter.h"
+#include "itkHoughTransform2DCirclesImageFilter.h"
+#include "itkImageRegionIterator.h"
+#include "itkThresholdImageFilter.h"
+#include "itkMinimumMaximumImageCalculator.h"
+#include <itkGradientMagnitudeImageFilter.h>
+#include <itkDiscreteGaussianImageFilter.h>
+#include <itkCastImageFilter.h>
+#include <itkExtractImageFilter.h>
 
 namespace cx
 {
@@ -85,29 +95,23 @@ void Ur5USTrackerTab::setMoveLayout(QVBoxLayout *parent)
 
 void Ur5USTrackerTab::testSlot()
 {
-    mVideoSource.reset(new BasicVideoSource(mServices->video()->getActiveVideoSource()->getUid()));
+    mVideoSource = mServices->video()->getActiveVideoSource();
 
     vtkImageDataPtr inputImage = mVideoSource->getVtkImageData();
     itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromVTKImage(inputImage);
     vtkImageDataPtr outputImage = AlgorithmHelper::getVTKFromITK(itkImage);
 
-    mVideoSource->start();
-    mVideoSource->overrideTimeout(true);
-
-    vtkImageDataPtr emptyImage = generateVtkImageData(Eigen::Array3i(3,3,1),
-                                                           Vector3D(1,1,1),
-                                                           0);
-
     vtkImageActorPtr imageActor = vtkImageActorPtr::New();
-    imageActor->SetInputData(inputImage);
+    imageActor->SetInputData(outputImage);
 
     mServices->view()->get3DView()->getRenderer()->AddActor(imageActor);
+
+    connect(mVideoSource.get(),&VideoSource::newFrame, this, &Ur5USTrackerTab::newFrameSlot);
 }
 
 void Ur5USTrackerTab::newFrameSlot()
 {
-    vtkImageDataPtr inputImage = mVideoSource->getVtkImageData();
-    itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromVTKImage(inputImage);
+
 }
 
 } // cx

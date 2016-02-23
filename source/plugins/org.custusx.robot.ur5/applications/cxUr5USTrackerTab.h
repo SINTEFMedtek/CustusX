@@ -40,7 +40,7 @@ private:
 
     QPushButton *testButton;
 
-    BasicVideoSourcePtr mVideoSource;
+    VideoSourcePtr mVideoSource;
 };
 
 
