@@ -128,16 +128,23 @@ void ViewGroup::mouseClickInViewGroupSlot()
 	std::vector<TrackedStreamPtr> trackedStreams = mViewGroupData->getTrackedStreams(DataViewProperties::createFull());
 	ActiveDataPtr activeData = mBackend->patient()->getActiveData();
 
-	if(!meshes.empty())
+	if(shouldUpdateActiveData(activeData->getActive<Mesh>(), meshes))
 		activeData->setActive(meshes.front()->getUid());
-	if(!images.empty())
+	if(shouldUpdateActiveData(activeData->getActive<Image>(), images))
 		activeData->setActive(images.front()->getUid());
-	if(!trackedStreams.empty())
+	if(shouldUpdateActiveData(activeData->getActive<TrackedStream>(), trackedStreams))
 		activeData->setActive(trackedStreams.front()->getUid());
 
 	View* view = static_cast<View*>(this->sender());
 	if (view && mActiveView)
 		mActiveView->set(view->getUid());
+}
+
+template<class T>
+bool ViewGroup::shouldUpdateActiveData(T data, std::vector<T> datas)
+{
+	bool activeDataExistsInGroup = std::find(datas.begin(), datas.end(), data) != datas.end();
+	return !activeDataExistsInGroup && !datas.empty();
 }
 
 std::vector<ViewPtr> ViewGroup::getViews() const
