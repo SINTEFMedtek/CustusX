@@ -99,8 +99,12 @@ void Ur5Robot::nextMove()
                 tangent = tangent/tangent.norm();
                 Vector3D velocity =  tangent*mMovementQueue.front().velocity/1000;
 
+                Vector3D rtangent = (Ur5Kinematics::T2rangles(mTargetPose)-Ur5Kinematics::T2rangles(mCurrentState.bMee*this->eMt));
+                rtangent = rtangent/rtangent.norm();
+                Vector3D rvelocity = rvelocity*mMovementQueue.front().velocity/1000;
+
                 Eigen::RowVectorXd velocityEndEffector(6);
-                velocityEndEffector << velocity(0),velocity(1),velocity(2),0,0,0;
+                velocityEndEffector << velocity(0),velocity(1),velocity(2), 0, 0, 0;
 
                 mMovementQueue.front().targetJointVelocity = mCurrentState.jacobian.inverse()*velocityEndEffector.transpose();
                 this->move(mMovementQueue.front());
