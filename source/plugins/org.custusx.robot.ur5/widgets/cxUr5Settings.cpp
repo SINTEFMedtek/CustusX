@@ -41,6 +41,7 @@ void Ur5SettingsTab::setupUi(QWidget *parent)
    QVBoxLayout *leftColumnLayout = new QVBoxLayout(leftColumnWidgets);
 
    setToolConfigurationLayout(leftColumnLayout);
+   setRobotCalibrationLayout(leftColumnLayout);
 
    mainLayout->addWidget(leftColumnWidgets,0,Qt::AlignTop|Qt::AlignLeft);
 
@@ -62,17 +63,27 @@ void Ur5SettingsTab::setToolConfigurationLayout(QVBoxLayout *parent)
     toolComboBox = new QComboBox;
     keyLayout->addWidget(toolComboBox,0,1,1,1);
 
+    autoCalibrateButton = new QPushButton(tr("Configure"));
+    keyLayout->addWidget(autoCalibrateButton,1,0,1,1);
+
+    clearCalibrationButton = new QPushButton(tr("Clear configuration"));
+    keyLayout->addWidget(clearCalibrationButton,1,1,1,1);
+}
+
+void Ur5SettingsTab::setRobotCalibrationLayout(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Robot Calibration");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *keyLayout = new QGridLayout();
+    group->setLayout(keyLayout);
+
     logForCalibrationButton = new QPushButton(tr("Log transformations"));
     keyLayout->addWidget(logForCalibrationButton,1,0,1,1);
 
     clearLogForCalibrationButton = new QPushButton(tr("Clear Log"));
     keyLayout->addWidget(clearLogForCalibrationButton,1,1,1,1);
-
-    autoCalibrateButton = new QPushButton(tr("Calibrate"));
-    keyLayout->addWidget(autoCalibrateButton,2,0,1,1);
-
-    clearCalibrationButton = new QPushButton(tr("Clear calibration"));
-    keyLayout->addWidget(clearCalibrationButton,2,1,1,1);
 }
 
 void Ur5SettingsTab::updateCombobox()
@@ -106,8 +117,6 @@ void Ur5SettingsTab::createCalibrationMatrix()
     ToolPtr tool = mServices->tracking()->getTool(toolComboBox->currentText());
 
     calMatrix = (tool->get_prMt().inverse()*robotTool->get_prMb()*mUr5Robot->getCurrentState().bMee).inverse();
-
-    std::cout << calMatrix << std::endl;
 
     mUr5Robot->set_eMt(calMatrix);
 }

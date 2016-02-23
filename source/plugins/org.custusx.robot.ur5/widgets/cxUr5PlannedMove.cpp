@@ -36,9 +36,9 @@ Ur5PlannedMoveTab::Ur5PlannedMoveTab(Ur5RobotPtr Ur5Robot,VisServicesPtr service
     connect(moveToFrameButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::moveToFrameSlot);
     connect(followActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::followActiveToolSlot);
 
-    connect(openVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::openVTKfileSlot);
-    connect(runVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVTKfileSlot);
-    connect(runVelocityVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVelocityVTKSlot);
+    //connect(openVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::openVTKfileSlot);
+    //connect(runVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVTKfileSlot);
+    //connect(runVelocityVTKButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::runVelocityVTKSlot);
     connect(blendRadiusLineEdit, &QLineEdit::textChanged, this, &Ur5PlannedMoveTab::blendRadiusChangedSlot);
 
     connect(logActiveToolButton, &QPushButton::clicked, this, &Ur5PlannedMoveTab::logActiveToolSlot);
@@ -55,8 +55,9 @@ void Ur5PlannedMoveTab::setupUi(QWidget *parent)
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->setAlignment(Qt::AlignTop);
 
-    setMovementAssignmentWidget(mainLayout);
-    setMoveVTKWidget(mainLayout);
+    setMovementAssignmentMetricWidget(mainLayout);
+    setMovementAssignmentToolWidget(mainLayout);
+    //setMoveVTKWidget(mainLayout);
     setMoveSettingsWidget(mainLayout);
 }
 
@@ -103,9 +104,9 @@ void Ur5PlannedMoveTab::setMoveVTKWidget(QVBoxLayout *parent)
 
 void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Move settings");
+    QGroupBox* group = new QGroupBox("Movement Settings");
     group->setFlat(true);
-    parent->addWidget(group);
+    parent->addWidget(group, 0, Qt::AlignLeft);
 
     QGridLayout *velAccLayout = new QGridLayout();
     group->setLayout(velAccLayout);
@@ -138,33 +139,45 @@ void Ur5PlannedMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
     velAccLayout->addWidget(new QLabel("mm"));
 }
 
-void Ur5PlannedMoveTab::setMovementAssignmentWidget(QVBoxLayout *parent)
+void Ur5PlannedMoveTab::setMovementAssignmentMetricWidget(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Assign movement");
+    QGroupBox* group = new QGroupBox("Assign Movement with Metric Widget");
     group->setFlat(true);
     parent->addWidget(group);
 
     QGridLayout *textEditLayout = new QGridLayout();
     group->setLayout(textEditLayout);
 
-    moveToPointButton = new QPushButton(tr("Move to point"));
+    moveToPointButton = new QPushButton(tr("Move to Selected Point"));
     textEditLayout->addWidget(moveToPointButton,0,0,1,1);
 
-    moveToFrameButton = new QPushButton(tr("Move to frame"));
-    textEditLayout->addWidget(moveToFrameButton,0,1,1,1);
+    moveToFrameButton = new QPushButton(tr("Move to Selected Frame"));
+    textEditLayout->addWidget(moveToFrameButton,1,0,1,1);
+}
 
-    followActiveToolButton = new QPushButton(tr("Follow active tool"));
-    textEditLayout->addWidget(followActiveToolButton,1,0,1,2);
+void Ur5PlannedMoveTab::setMovementAssignmentToolWidget(QVBoxLayout *parent)
+{
+    QGroupBox* group = new QGroupBox("Assign Movement with Active Tool");
+    group->setFlat(true);
+    parent->addWidget(group);
+
+    QGridLayout *textEditLayout = new QGridLayout();
+    group->setLayout(textEditLayout);
+
+    followActiveToolButton = new QPushButton(tr("Follow Active Tool (Real-Time)"));
+    textEditLayout->addWidget(followActiveToolButton,0,0,1,1);
     followActiveToolButton->setCheckable(true);
 
-    logActiveToolButton = new QPushButton(tr("Log active tool"));
+    textEditLayout->addWidget(new QLabel(),1,0,1,1);
+
+    logActiveToolButton = new QPushButton(tr("Define Path with Active Tool"));
     textEditLayout->addWidget(logActiveToolButton,2,0,1,1);
     logActiveToolButton->setCheckable(true);
 
-    runLoggedActiveToolButton = new QPushButton(tr("Move along sequence"));
-    textEditLayout->addWidget(runLoggedActiveToolButton,2,1,1,1);
-
+    runLoggedActiveToolButton = new QPushButton(tr("Move along Defined Path"));
+    textEditLayout->addWidget(runLoggedActiveToolButton,3,0,1,1);
 }
+
 
 void Ur5PlannedMoveTab::runVTKfileSlot()
 {

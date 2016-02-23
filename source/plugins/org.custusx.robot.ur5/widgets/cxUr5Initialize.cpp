@@ -112,7 +112,7 @@ void Ur5InitializeTab::setRobotTrackingLayout(QHBoxLayout *parent)
     onoffIcon.addFile(dir.path()+mGraphicsFolderName+"off.ico", QSize(), QIcon::Normal, QIcon::Off);
     onoffIcon.addFile(dir.path()+mGraphicsFolderName+"on.ico", QSize(), QIcon::Normal, QIcon::On);
 
-    QGroupBox* group = new QGroupBox("Robot Tracking");
+    QGroupBox* group = new QGroupBox("Robot Tracking and Settings");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -133,16 +133,24 @@ void Ur5InitializeTab::setRobotTrackingLayout(QHBoxLayout *parent)
     linksButton->setFixedHeight(24);
     linksButton->setIconSize(trackingButton->size());
 
+    toggleSettings = new QPushButton(onoffIcon,"");
+    toggleSettings->setCheckable(true);
+    toggleSettings->setStyleSheet(this->onoffButtonStyleSheet());
+    toggleSettings->setFixedWidth(40);
+    toggleSettings->setFixedHeight(24);
+    toggleSettings->setIconSize(trackingButton->size());
+
     int row = 0;
     mainLayout->addWidget(new QLabel(tr("Tracking")),row,0,1,1, Qt::AlignVCenter);
     mainLayout->addWidget(trackingButton,row,1,1,1, Qt::AlignVCenter);
 
     row++;
-    mainLayout->addWidget(new QLabel(tr("Visualize links")),row,0,1,1, Qt::AlignVCenter);
+    mainLayout->addWidget(new QLabel(tr("Visualize Links")),row,0,1,1, Qt::AlignVCenter);
     mainLayout->addWidget(linksButton,row,1,1,1, Qt::AlignVCenter);
 
     row++;
-    mainLayout->addWidget(new QLabel(),row,0,1,1);
+    mainLayout->addWidget(new QLabel(tr("Settings")),row,0,1,1);
+    mainLayout->addWidget(toggleSettings,row,1,1,1);
 
     row++;
     mainLayout->addWidget(new QLabel(),row,0,1,1);
@@ -198,13 +206,6 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     toggleLungSimulation->setFixedHeight(24);
     toggleLungSimulation->setIconSize(toggleManual->size());
 
-    toggleSettings = new QPushButton(onoffIcon,"");
-    toggleSettings->setCheckable(true);
-    toggleSettings->setStyleSheet(this->onoffButtonStyleSheet());
-    toggleSettings->setFixedWidth(40);
-    toggleSettings->setFixedHeight(24);
-    toggleSettings->setIconSize(toggleManual->size());
-
     toggleUSTracker = new QPushButton(onoffIcon,"");
     toggleUSTracker->setCheckable(true);
     toggleUSTracker->setStyleSheet(this->onoffButtonStyleSheet());
@@ -212,10 +213,10 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     toggleUSTracker->setFixedHeight(24);
     toggleUSTracker->setIconSize(toggleManual->size());
 
-    mainLayout->addWidget(new QLabel(tr("Manual movement")),0,0,1,1);
+    mainLayout->addWidget(new QLabel(tr("Manual Movement")),0,0,1,1);
     mainLayout->addWidget(toggleManual,0,1,1,1);
 
-    mainLayout->addWidget(new QLabel(tr("Planned movement")),1,0,1,1);
+    mainLayout->addWidget(new QLabel(tr("Planned Movement")),1,0,1,1);
     mainLayout->addWidget(togglePlanned,1,1,1,1);
 
     mainLayout->addWidget(new QLabel(tr("UR5 Script")),2,0,1,1);
@@ -224,11 +225,8 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     mainLayout->addWidget(new QLabel(tr("Lung Simulation")),3,0,1,1);
     mainLayout->addWidget(toggleLungSimulation,3,1,1,1);
 
-    mainLayout->addWidget(new QLabel(tr("Settings")),4,0,1,1);
-    mainLayout->addWidget(toggleSettings,4,1,1,1);
-
-    mainLayout->addWidget(new QLabel(tr("US Tracker")),5,0,1,1);
-    mainLayout->addWidget(toggleUSTracker,5,1,1,1);
+//    mainLayout->addWidget(new QLabel(tr("US Tracker")),5,0,1,1);
+//    mainLayout->addWidget(toggleUSTracker,5,1,1,1);
 }
 
 void Ur5InitializeTab::startTrackingSlot()

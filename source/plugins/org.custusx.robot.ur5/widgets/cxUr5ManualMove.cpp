@@ -50,7 +50,7 @@ void Ur5ManualMoveTab::setupUi(QWidget *parent)
 
 void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Move tool");
+    QGroupBox* group = new QGroupBox("Move Tool");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -147,7 +147,7 @@ void Ur5ManualMoveTab::setMoveToolLayout(QVBoxLayout *parent)
 
 void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Move settings");
+    QGroupBox* group = new QGroupBox("Movement Settings");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -185,7 +185,7 @@ void Ur5ManualMoveTab::setMoveSettingsWidget(QVBoxLayout *parent)
 
 void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Tool position");
+    QGroupBox* group = new QGroupBox("Tool Position");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -249,7 +249,7 @@ void Ur5ManualMoveTab::setCoordInfoWidget(QVBoxLayout *parent)
 
 void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
 {
-    QGroupBox* group = new QGroupBox("Move joints");
+    QGroupBox* group = new QGroupBox("Move Joints");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -351,13 +351,6 @@ void Ur5ManualMoveTab::setJointMoveWidget(QVBoxLayout *parent)
     coordInfoLayout->addWidget(q6PosButton,row,2,1,1);
     coordInfoLayout->addWidget(q6LineEdit, row, 3, 1, 1);
     coordInfoLayout->addWidget(new QLabel("Rad"), row, 4, 1, 1);
-
-    //q1LineEdit->setMinimumWidth(40);
-    //q2LineEdit->setMinimumWidth(40);
-    //q3LineEdit->setMinimumWidth(40);
-    //q4LineEdit->setMinimumWidth(40);
-    //q5LineEdit->setMinimumWidth(40);
-    //q6LineEdit->setMinimumWidth(40);
 }
 
 void Ur5ManualMoveTab::coordButtonPressed(int axis, int sign)

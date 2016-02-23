@@ -54,7 +54,8 @@ private:
 
     void setMoveVTKWidget(QVBoxLayout *parent);
     void setMoveSettingsWidget(QVBoxLayout *parent);
-    void setMovementAssignmentWidget(QVBoxLayout *parent);
+    void setMovementAssignmentMetricWidget(QVBoxLayout *parent);
+    void setMovementAssignmentToolWidget(QVBoxLayout *parent);
 
     Ur5ProgramEncoder mProgramEncoder;
 

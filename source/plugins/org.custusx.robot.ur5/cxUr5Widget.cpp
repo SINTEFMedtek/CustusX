@@ -81,9 +81,9 @@ void Ur5Widget::setupUi(QWidget *Ur5Widget)
 
     QLayout* Ur5WidgetLayout = new QVBoxLayout(Ur5Widget);
     tabWidget = new QTabWidget(Ur5Widget);
-    Ur5WidgetLayout->addWidget(tabWidget);
     tabWidget->insertTab(0,mUr5InitializeTab, tr("Initialize"));
-    //tabWidget->addTab(new Ur5MiscellaneousTab(mUr5Robot, mServices), tr("Miscellaneous"));
+
+    Ur5WidgetLayout->addWidget(tabWidget);
 
     QMetaObject::connectSlotsByName(Ur5Widget);
 }

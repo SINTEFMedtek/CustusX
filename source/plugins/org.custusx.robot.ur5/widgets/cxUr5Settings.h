@@ -36,6 +36,7 @@ private:
     VisServicesPtr mServices;
 
     void setToolConfigurationLayout(QVBoxLayout *vLayout);
+    void setRobotCalibrationLayout(QVBoxLayout *vLayout);
 
     QComboBox *toolComboBox;
     QPushButton *autoCalibrateButton, *clearCalibrationButton;
