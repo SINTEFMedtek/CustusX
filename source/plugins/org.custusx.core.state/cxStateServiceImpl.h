@@ -72,9 +72,6 @@ public:
 private:
 	WorkflowStateMachinePtr getWorkflow();
 	void initialize(StateServiceBackendPtr backend);
-	void fillDefaultSettings();
-	template<class T>
-	void fillDefault(QString name, T value);
 	StateServiceBackendPtr createBackend(ctkPluginContext* context);
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;

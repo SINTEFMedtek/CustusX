@@ -246,7 +246,7 @@ TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration]
 	bool verbose = true;
 	DicomConverterTestFixture fixture;
 
-	QString inputDicomDataDirectory = cx::DataLocations::getLargeTestDataPath()+"/testing/Person5/DICOM/";
+	QString inputDicomDataDirectory = cx::DataLocations::getLargeTestDataPath()+"/testing/Person5/";
 
 	{
 		INFO(inputDicomDataDirectory);

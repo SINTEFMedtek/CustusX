@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDefaultTFGenerator.h"
 #include "cxDataReaderWriter.h"
 #include "cxNullDeleter.h"
+#include "cxSettings.h"
 
 #include "cxUnsignedDerivedImage.h"
 
@@ -70,7 +71,7 @@ namespace cx
 
 Image::ShadingStruct::ShadingStruct()
 {
-	on = true;
+	on = settings()->value("View/shadingOn").value<bool>();
 	ambient = 0.2;
 	diffuse = 0.9;
 	specular = 0.3;

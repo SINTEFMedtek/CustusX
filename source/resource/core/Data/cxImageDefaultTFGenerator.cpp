@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
 #include "math.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -50,7 +51,7 @@ void ImageDefaultTFGenerator::resetShading()
 {
 	// add shading for known preoperative modalities
 	if (mImage->getModality().contains("CT") || mImage->getModality().contains("MR"))
-		mImage->setShadingOn(true);
+		mImage->setShadingOn(settings()->value("View/shadingOn").value<bool>());
 }
 
 ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
