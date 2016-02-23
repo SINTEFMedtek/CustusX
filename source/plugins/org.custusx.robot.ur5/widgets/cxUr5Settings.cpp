@@ -91,7 +91,7 @@ void Ur5SettingsTab::autoCalibrateSlot()
     else
     {
         mUr5Robot->set_prMb(getPreCalibrated_prMb());
-        mUr5Robot->set_eMt(getPreCalibrated_eMt());
+        this->createCalibrationMatrix();
     }
 
 }
