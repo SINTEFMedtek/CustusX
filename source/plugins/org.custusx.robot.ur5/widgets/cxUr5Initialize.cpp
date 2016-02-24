@@ -39,11 +39,16 @@ void Ur5InitializeTab::setupUi(QWidget *parent)
     QWidget *secondaryWidget = new QWidget();
     QHBoxLayout *secondaryLayout = new QHBoxLayout(secondaryWidget);
 
+    QWidget *thirdWidget = new QWidget();
+    QHBoxLayout *thirdLayout = new QHBoxLayout(thirdWidget);
+
     setRobotConnectionLayout(mainLayout);
+    setRobotBasicApplicationLayout(secondaryLayout);
     setRobotTrackingLayout(secondaryLayout);
-    setRobotApplicationLayout(secondaryLayout);
+    setRobotMedicalApplicationLayout(thirdLayout);
 
     mainLayout->addWidget(secondaryWidget);
+    mainLayout->addWidget(thirdWidget);
     mainLayout->addWidget(new QWidget());
 
     mainLayout->setSpacing(5);
@@ -152,15 +157,15 @@ void Ur5InitializeTab::setRobotTrackingLayout(QHBoxLayout *parent)
     mainLayout->addWidget(new QLabel(tr("Settings")),row,0,1,1);
     mainLayout->addWidget(toggleSettings,row,1,1,1);
 
-    row++;
-    mainLayout->addWidget(new QLabel(),row,0,1,1);
+//    row++;
+//    mainLayout->addWidget(new QLabel(),row,0,1,1);
 
-    row++;
-    mainLayout->addWidget(new QLabel(),row,0,1,1);
+//    row++;
+//    mainLayout->addWidget(new QLabel(),row,0,1,1);
 
 }
 
-void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
+void Ur5InitializeTab::setRobotBasicApplicationLayout(QHBoxLayout *parent)
 {
     QDir dir = QDir::current();
     dir.cdUp();
@@ -170,7 +175,7 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     onoffIcon.addFile(dir.path()+mGraphicsFolderName+"off.ico", QSize(), QIcon::Normal, QIcon::Off);
     onoffIcon.addFile(dir.path()+mGraphicsFolderName+"on.ico", QSize(), QIcon::Normal, QIcon::On);
 
-    QGroupBox* group = new QGroupBox("Robot Applications");
+    QGroupBox* group = new QGroupBox("Robot Basic Applications");
     group->setFlat(true);
     parent->addWidget(group);
 
@@ -199,19 +204,12 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     toggleUr5Script->setFixedHeight(24);
     toggleUr5Script->setIconSize(toggleManual->size());
 
-    toggleLungSimulation = new QPushButton(onoffIcon,"");
-    toggleLungSimulation->setCheckable(true);
-    toggleLungSimulation->setStyleSheet(this->onoffButtonStyleSheet());
-    toggleLungSimulation->setFixedWidth(40);
-    toggleLungSimulation->setFixedHeight(24);
-    toggleLungSimulation->setIconSize(toggleManual->size());
-
-    toggleUSTracker = new QPushButton(onoffIcon,"");
-    toggleUSTracker->setCheckable(true);
-    toggleUSTracker->setStyleSheet(this->onoffButtonStyleSheet());
-    toggleUSTracker->setFixedWidth(40);
-    toggleUSTracker->setFixedHeight(24);
-    toggleUSTracker->setIconSize(toggleManual->size());
+//    toggleLungSimulation = new QPushButton(onoffIcon,"");
+//    toggleLungSimulation->setCheckable(true);
+//    toggleLungSimulation->setStyleSheet(this->onoffButtonStyleSheet());
+//    toggleLungSimulation->setFixedWidth(40);
+//    toggleLungSimulation->setFixedHeight(24);
+//    toggleLungSimulation->setIconSize(toggleManual->size());
 
     mainLayout->addWidget(new QLabel(tr("Manual Movement")),0,0,1,1);
     mainLayout->addWidget(toggleManual,0,1,1,1);
@@ -222,11 +220,47 @@ void Ur5InitializeTab::setRobotApplicationLayout(QHBoxLayout *parent)
     mainLayout->addWidget(new QLabel(tr("UR5 Script")),2,0,1,1);
     mainLayout->addWidget(toggleUr5Script,2,1,1,1);
 
+//    mainLayout->addWidget(new QLabel(tr("Lung Simulation")),3,0,1,1);
+//    mainLayout->addWidget(toggleLungSimulation,3,1,1,1);
+}
+
+void Ur5InitializeTab::setRobotMedicalApplicationLayout(QHBoxLayout *parent)
+{
+    QDir dir = QDir::current();
+    dir.cdUp();
+    dir.cdUp();
+
+    QIcon onoffIcon;
+    onoffIcon.addFile(dir.path()+mGraphicsFolderName+"off.ico", QSize(), QIcon::Normal, QIcon::Off);
+    onoffIcon.addFile(dir.path()+mGraphicsFolderName+"on.ico", QSize(), QIcon::Normal, QIcon::On);
+
+    QGroupBox* group = new QGroupBox("Robot Medical Applications");
+    group->setFlat(true);
+    parent->addWidget(group);
+    parent->addWidget(new QWidget());
+
+    QGridLayout *mainLayout = new QGridLayout();
+    group->setLayout(mainLayout);
+
+    toggleLungSimulation = new QPushButton(onoffIcon,"");
+    toggleLungSimulation->setCheckable(true);
+    toggleLungSimulation->setStyleSheet(this->onoffButtonStyleSheet());
+    toggleLungSimulation->setFixedWidth(40);
+    toggleLungSimulation->setFixedHeight(24);
+    toggleLungSimulation->setIconSize(toggleLungSimulation->size());
+
+    toggleUSTracker = new QPushButton(onoffIcon,"");
+    toggleUSTracker->setCheckable(true);
+    toggleUSTracker->setStyleSheet(this->onoffButtonStyleSheet());
+    toggleUSTracker->setFixedWidth(40);
+    toggleUSTracker->setFixedHeight(24);
+    toggleUSTracker->setIconSize(toggleLungSimulation->size());
+
     mainLayout->addWidget(new QLabel(tr("Lung Simulation")),3,0,1,1);
     mainLayout->addWidget(toggleLungSimulation,3,1,1,1);
 
-//    mainLayout->addWidget(new QLabel(tr("US Tracker")),5,0,1,1);
-//    mainLayout->addWidget(toggleUSTracker,5,1,1,1);
+    mainLayout->addWidget(new QLabel(tr("US Tracker")),5,0,1,1);
+    mainLayout->addWidget(toggleUSTracker,5,1,1,1);
 }
 
 void Ur5InitializeTab::startTrackingSlot()

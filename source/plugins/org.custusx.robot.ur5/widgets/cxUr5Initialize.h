@@ -57,7 +57,8 @@ private:
 
     void setRobotConnectionLayout(QVBoxLayout *parent);
     void setRobotTrackingLayout(QHBoxLayout *parent);
-    void setRobotApplicationLayout(QHBoxLayout *parent);
+    void setRobotBasicApplicationLayout(QHBoxLayout *parent);
+    void setRobotMedicalApplicationLayout(QHBoxLayout *parent);
 
     QPushButton *toggleManual, *togglePlanned, *toggleUr5Script;
     QPushButton *toggleLungSimulation, *toggleSettings, *toggleUSTracker;
