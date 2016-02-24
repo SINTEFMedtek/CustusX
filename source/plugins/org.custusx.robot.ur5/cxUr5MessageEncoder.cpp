@@ -43,10 +43,9 @@ QString Ur5MessageEncoder::movej(Ur5MovementInfo minfo)
     }
     else
     {
-        return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8,t=%9,r=%10)")
+        return QString("movej(p[%1,%2,%3,%4,%5,%6],a=%7,v=%8)")
                 .arg(op(0)/1000).arg(op(1)/1000).arg(op(2)/1000).arg(op(3)).arg(op(4)).arg(op(5))
-                .arg(minfo.acceleration/1000).arg(minfo.velocity/1000).arg(minfo.time)
-                .arg(minfo.radius/1000);
+                .arg(minfo.acceleration/1000).arg(minfo.velocity/1000);
     }
 }
 

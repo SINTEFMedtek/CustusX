@@ -89,7 +89,7 @@ void Ur5SettingsTab::setRobotCalibrationLayout(QVBoxLayout *parent)
 void Ur5SettingsTab::updateCombobox()
 {
     ToolMap tools = mServices->tracking()->getTools();
-    for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+    for (TrackingService::ToolMap::reverse_iterator iter=tools.rbegin(); iter!=tools.rend(); ++iter)
         toolComboBox->addItem(iter->second->getUid());
 }
 

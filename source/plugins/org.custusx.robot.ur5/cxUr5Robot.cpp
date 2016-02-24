@@ -261,6 +261,7 @@ void Ur5Robot::runMoveProgram(MovementQueue mq)
     {
         mInitialState = this->getCurrentState();
         mq.front().typeOfMovement = Ur5MovementInfo::movej;
+        mq.front().velocity = 30;
         this->move(mq.front());
         isVelocityMoveInProgress=true;
     }
@@ -285,7 +286,6 @@ bool Ur5Robot::isAtTargetState()
 
 void Ur5Robot::setBlendRadius(double blendRadius)
 {
-    CX_LOG_INFO() << "Blend radius set to " << blendRadius;
     mBlendRadius=blendRadius;
 }
 

@@ -318,6 +318,7 @@ void Ur5PlannedMoveTab::runLoggedActiveToolSlot()
                                                             velocityLineEdit->text().toDouble(), 5);
     mMovementQueue = Ur5ProgramEncoder::addTypeOfMovement(mMovementQueue, Ur5MovementInfo::speedj);
 
+    mUr5Robot->setBlendRadius(10);
     mUr5Robot->runMoveProgram(mMovementQueue);
 }
 
