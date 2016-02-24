@@ -86,8 +86,7 @@ public:
 
 	bool contains3DView() const;
 	void initializeActiveView(SyncedValuePtr val);
-
-private slots:
+protected slots:
 //	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();
 
@@ -102,7 +101,7 @@ protected:
 
 private:
 	template<class T>
-	bool shouldUpdateActiveData(T data, std::vector<T> datas);
+	const bool shouldUpdateActiveData(T activeData, std::vector<T> datas);
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
