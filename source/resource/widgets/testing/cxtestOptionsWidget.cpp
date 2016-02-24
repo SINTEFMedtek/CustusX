@@ -43,7 +43,7 @@ namespace cxtest
 
 namespace  {
 
-char* testLabels("[unit][resource][widgets]");
+const char* testLabels = QString("[unit][resource][widgets]").toStdString().c_str();
 
 struct CXTESTRESOURCEWIDGETS_EXPORT testWidget
 {

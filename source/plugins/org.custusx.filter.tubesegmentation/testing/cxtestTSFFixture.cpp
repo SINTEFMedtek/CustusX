@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestTSFFixture.h"
 
 #include <fstream>
+#include <QDir>
+#include <QFile>
 #include "cxData.h"
 #include "cxLogicManager.h"
 
@@ -40,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxFilterTimedAlgorithm.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxTypeConversions.h"
 
 #include "parameters.hpp"
 #include "tsf-config.h"
@@ -63,12 +66,19 @@ void TestTubeSegmentationFramework::testConstructor()
 {
 }
 
+QString TestTubeSegmentationFramework::getParametersDir()
+{
+	QString path = cx::DataLocations::findConfigFolder("/tsf", QString(KERNELS_DIR)) + "parameters";
+
+	return QDir::toNativeSeparators(path);
+}
+
 void TestTubeSegmentationFramework::testParameters()
 {
-	std::string path = std::string(PARAMETERS_DIR);
+	std::string path = getParametersDir().toStdString();
 	{
 		INFO("Could not find parameter file: "+path);
-		REQUIRE(ifstream(path.c_str()));
+		REQUIRE(QFile::exists(qstring_cast(path)));
 	}
 
 	{
@@ -160,7 +170,7 @@ void TestTubeSegmentationFramework::testLoadParameterFile()
 
 paramList TestTubeSegmentationFramework::loadPreset(QString preset)
 {
-	std::string path = std::string(PARAMETERS_DIR);
+	std::string path = getParametersDir().toStdString();
 	paramList parameters = initParameters(path);
 	setParameter(parameters, "parameters", preset.toStdString());
 	loadParameterPreset(parameters, path);

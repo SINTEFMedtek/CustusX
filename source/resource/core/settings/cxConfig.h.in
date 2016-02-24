@@ -1,3 +1,6 @@
+// Base system name from CMake (CMake getting this from the Python installer script)
+#define CX_SYSTEM_BASE_NAME "@CX_SYSTEM_BASE_NAME@"
+
 // location of test data
 #define CX_DATA_ROOT "@CX_DATA_ROOT@"
 #define CX_LARGE_DATA_ROOT "@CX_LARGE_DATA_ROOT@"

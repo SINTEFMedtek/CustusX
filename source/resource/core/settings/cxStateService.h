@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxForwardDeclarations.h"
 #include <QObject>
+#include "cxSettings.h"
 class QActionGroup;
 class ctkPluginContext;
 
@@ -139,6 +140,14 @@ public:
 
 	virtual bool isNull() = 0;
 	static StateServicePtr getNullObject();
+
+protected:
+	void fillDefaultSettings();
+	template<class T>
+	void fillDefault(QString name, T value)
+	{
+		settings()->fillDefault(name, value);
+	}
 
 signals:
 	void workflowStateChanged();

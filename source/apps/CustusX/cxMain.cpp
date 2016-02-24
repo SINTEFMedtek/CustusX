@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
   cx::Application app(argc, argv);
   app.setOrganizationName("CustusX");
   app.setOrganizationDomain("www.custusx.org");
-  app.setApplicationName("CustusX");
+  app.setApplicationName(CX_SYSTEM_BASE_NAME);
   app.setWindowIcon(QIcon(":/icons/CustusX/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
