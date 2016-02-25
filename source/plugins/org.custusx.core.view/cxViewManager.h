@@ -162,7 +162,6 @@ public:
 	QString getActiveLayout(int widgetIndex=0) const; ///< returns the active layout
 	void setActiveLayout(const QString& uid, int widgetIndex=0); ///< change the layout
 
-	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
 	CyclicActionLoggerPtr getRenderTimer();
@@ -221,7 +220,6 @@ protected:
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobal2DZoomVal;
 
-	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 

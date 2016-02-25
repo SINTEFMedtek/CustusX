@@ -140,11 +140,6 @@ void ViewImplService::setActiveLayout(const QString& uid, int widgetIndex)
 	viewManager()->setActiveLayout(uid, widgetIndex);
 }
 
-InteractiveClipperPtr ViewImplService::getClipper()
-{
-	return viewManager()->getClipper();
-}
-
 ClippersPtr ViewImplService::getClippers()
 {
 	return this->mClippers;

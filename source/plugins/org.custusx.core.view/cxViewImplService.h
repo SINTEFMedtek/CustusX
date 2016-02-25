@@ -72,7 +72,6 @@ public:
     virtual QWidget* getLayoutWidget(int index);
     virtual QString getActiveLayout(int widgetIndex) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual InteractiveClipperPtr getClipper();
 	virtual ClippersPtr getClippers();
 	virtual InteractiveCropperPtr getCropper();
 	virtual CyclicActionLoggerPtr getRenderTimer();
