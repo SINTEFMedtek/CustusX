@@ -101,7 +101,7 @@ protected:
 
 private:
 	template<class T>
-	const bool shouldUpdateActiveData(T activeData, std::vector<T> datas);
+    bool shouldUpdateActiveData(T activeData, std::vector<T> datas) const;
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

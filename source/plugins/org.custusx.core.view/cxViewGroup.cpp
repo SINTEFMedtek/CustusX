@@ -141,7 +141,7 @@ void ViewGroup::mouseClickInViewGroupSlot()
 }
 
 template<class T>
-const bool ViewGroup::shouldUpdateActiveData(T activeData, std::vector<T> datas)
+bool ViewGroup::shouldUpdateActiveData(T activeData, std::vector<T> datas) const
 {
 	bool activeDataExistsInGroup = std::find(datas.begin(), datas.end(), activeData) != datas.end();
 	return !activeDataExistsInGroup && !datas.empty();
