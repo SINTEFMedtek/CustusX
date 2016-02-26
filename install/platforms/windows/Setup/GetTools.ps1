@@ -57,7 +57,7 @@ Function Tool-Exists{
     )
     $exists = $false
     
-    if(($tool.get_name() -eq "cppunit") -or ($tool.get_name() -eq "boost")){
+    if(($tool.get_name() -eq "cppunit") -or ($tool.get_name() -eq "boost") -or ($tool.get_name() -eq "glew")){
         if(Test-Path $tool.get_installedBinFolder())
             {$exists = $true}
     }elseif($tool.get_executableName() -and (Command-Exists $tool.get_executableName()))
@@ -542,8 +542,8 @@ param (
     [ValidateSet('full', 'download', 'install', 'environment')]
     [string[]]$mode,
     ## Manually picking tools
-    [Parameter(Mandatory=$false, HelpMessage="Select tool(s). (7-Zip, cppunit, ninja, git, cmake, python, eclipse, qt, boost, MSVC2013, console2, nsis, firefox, cuda, ussf)")]
-    [ValidateSet('7-Zip', 'cppunit', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2013', 'console2', 'nsis', 'firefox', 'cuda', 'ussf')]
+    [Parameter(Mandatory=$false, HelpMessage="Select tool(s). (7-Zip, cppunit, ninja, git, cmake, python, eclipse, qt, boost, MSVC2013, console2, nsis, firefox, cuda, ussf, glew)")]
+    [ValidateSet('7-Zip', 'cppunit', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2013', 'console2', 'nsis', 'firefox', 'cuda', 'ussf', 'glew')]
     [string[]]$tools
 )
 #Information 
