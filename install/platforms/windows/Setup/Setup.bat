@@ -17,5 +17,5 @@ powershell -noprofile -command "&{"^
  "Import-Module ..\Setup -Force;"^
  "Get-Tools 'full' -tools @('console2', 'MSVC2013', '7-Zip', 'cppunit', 'git' , 'python', 'ninja', 'cmake', 'nsis', 'ussf', 'cuda', 'boost');"^
  "Get-Tools 'full' -tools 'qt';"^
- "(Invoke-WebRequest https://bootstrap.pypa.io/ez_setup.py).Content | python -;"^
+ "(Invoke-WebRequest - UseBasicParsing https://bootstrap.pypa.io/ez_setup.py).Content | python -;"^
  "}"
