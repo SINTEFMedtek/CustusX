@@ -85,7 +85,6 @@ public:
     virtual QString getActiveLayout(int widgetIndex=0) const = 0;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex=0) = 0;
 	virtual void deactivateLayout();
-	virtual InteractiveClipperPtr getClipper() = 0;
 	virtual ClippersPtr getClippers() = 0;
 	virtual InteractiveCropperPtr getCropper() = 0;
 	virtual CyclicActionLoggerPtr getRenderTimer() = 0;

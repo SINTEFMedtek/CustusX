@@ -126,7 +126,7 @@ RenderTester::RenderTester(vtkRenderWindowPtr renderWindow) :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-	CX_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
+//	CX_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
 }
 
 RenderTester::RenderTester(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer) :

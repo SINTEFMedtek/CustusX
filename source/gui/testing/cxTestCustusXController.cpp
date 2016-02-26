@@ -51,6 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxSessionStorageService.h"
+#include "cxClippers.h"
+
+#include "catch.hpp"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -116,8 +119,10 @@ void CustusXController::loadPatientSlot()
 
 void CustusXController::enableSlicingSlot()
 {
-		cx::InteractiveClipperPtr interactiveClipper = cx::viewService()->getClipper();
-		interactiveClipper->setSlicePlane(cx::ptAXIAL);
+	cx::ClippersPtr clippers = cx::viewService()->getClippers();
+	QString clipperName("Axial");
+	REQUIRE(clippers->exists(clipperName));
+	cx::InteractiveClipperPtr interactiveClipper = clippers->getClipper(clipperName);
 
 		std::map<QString, cx::ImagePtr> imageMap = cx::patientService()->getDataOfType<cx::Image>();
 		if(!imageMap.empty())
