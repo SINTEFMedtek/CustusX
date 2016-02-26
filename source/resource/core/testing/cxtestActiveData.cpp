@@ -38,30 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestDirectSignalListener.h"
 #include "cxTestVideoSource.h"
 #include "cxPatientModelService.h"
-
-
-namespace
-{
-struct testDataStructures
-{
-	cx::ImagePtr image1;
-	cx::ImagePtr image2;
-	cx::MeshPtr mesh1;
-	cx::TrackedStreamPtr trackedStream1;
-	testDataStructures()
-	{
-		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
-		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
-		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
-		mesh1 = cx::Mesh::create("meshUid1","meshName1");
-		trackedStream1 = cx::TrackedStream::create("trackedStreamUid1","trackedStreamName1");
-	}
-};
-} // namespace
+#include "cxtestTestDataStructures.h"
 
 TEST_CASE("ActiveData: set/get", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	activeData.setActive(testData.image1);
@@ -75,7 +56,7 @@ TEST_CASE("ActiveData: set/get", "[unit]")
 
 TEST_CASE("ActiveData: Active Image set/get", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	activeData.setActive(testData.image1);
@@ -89,7 +70,7 @@ TEST_CASE("ActiveData: Active Image set/get", "[unit]")
 
 TEST_CASE("ActiveData: Active Image - activeImageChanged signal", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	cxtest::DirectSignalListener signalListener(&activeData, SIGNAL(activeImageChanged(QString)));
@@ -107,7 +88,7 @@ TEST_CASE("ActiveData: Active Image - activeImageChanged signal", "[unit]")
 
 TEST_CASE("ActiveData: Get data of specific type", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	activeData.setActive(testData.image1);
@@ -126,7 +107,7 @@ TEST_CASE("ActiveData: Get data of specific type", "[unit]")
 
 TEST_CASE("ActiveData: activeDataChanged signal", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	cxtest::DirectSignalListener signalListener(&activeData, SIGNAL(activeDataChanged(QString)));
@@ -140,7 +121,7 @@ TEST_CASE("ActiveData: activeDataChanged signal", "[unit]")
 
 TEST_CASE("ActiveData: Call set multiple times", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	activeData.setActive(testData.image1);
@@ -156,7 +137,7 @@ TEST_CASE("ActiveData: Call set multiple times", "[unit]")
 
 TEST_CASE("ActiveData: Get using type regexp", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 
 	activeData.setActive(testData.image2);
@@ -173,7 +154,7 @@ TEST_CASE("ActiveData: Get using type regexp", "[unit]")
 
 TEST_CASE("ActiveData: Get images both from Image and TrackedStream", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 	activeData.setActive(testData.image1);
 
@@ -186,7 +167,7 @@ TEST_CASE("ActiveData: Get images both from Image and TrackedStream", "[unit]")
 
 TEST_CASE("ActiveData: Get image from TrackedStream with VideoSource", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 	activeData.setActive(testData.trackedStream1);
 
@@ -199,7 +180,7 @@ TEST_CASE("ActiveData: Get image from TrackedStream with VideoSource", "[unit]")
 
 TEST_CASE("ActiveData: getActiveImageUid", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 	activeData.setActive(testData.image1);
 	CHECK(activeData.getActiveImageUid() == testData.image1->getUid());
@@ -207,7 +188,7 @@ TEST_CASE("ActiveData: getActiveImageUid", "[unit]")
 
 TEST_CASE("ActiveData: remove", "[unit]")
 {
-	testDataStructures testData;
+	cxtest::TestDataStructures testData;
 	cx::ActiveData activeData(cx::PatientModelService::getNullObject(), cx::SessionStorageService::getNullObject());
 	activeData.setActive(testData.image1);
 	activeData.setActive(testData.image2);

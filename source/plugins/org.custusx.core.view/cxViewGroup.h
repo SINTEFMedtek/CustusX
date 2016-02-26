@@ -68,7 +68,7 @@ typedef boost::shared_ptr<class Navigation> NavigationPtr;
  */
 class org_custusx_core_view_EXPORT ViewGroup: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	explicit ViewGroup(CoreServicesPtr backend);
 	virtual ~ViewGroup();
@@ -86,8 +86,7 @@ public:
 
 	bool contains3DView() const;
 	void initializeActiveView(SyncedValuePtr val);
-
-private slots:
+protected slots:
 //	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();
 
@@ -99,6 +98,10 @@ protected:
 	CameraStylePtr mCameraStyle;
 	CoreServicesPtr mBackend;
 	SyncedValuePtr mActiveView;
+
+private:
+	template<class T>
+    bool shouldUpdateActiveData(T activeData, std::vector<T> datas) const;
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
