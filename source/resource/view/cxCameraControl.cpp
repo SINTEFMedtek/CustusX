@@ -149,12 +149,17 @@ void CameraControl::translateByFocusTo(Vector3D p_r)
 	camera->SetPosition(p.begin());
 }
 
+void CameraControl::setSuperiorView()
+{
+	mSuperiorViewAction->trigger();
+}
+
 QActionGroup* CameraControl::createStandard3DViewActions()
 {
 	QActionGroup* group = new QActionGroup(this);
 	this->addStandard3DViewAction("A", "Anterior View", Vector3D(0, 1, 0), group);
 	this->addStandard3DViewAction("P", "Posterior View", Vector3D(0, -1, 0), group);
-	this->addStandard3DViewAction("S", "Superior View", Vector3D(0, 0, -1), group);
+	mSuperiorViewAction = this->addStandard3DViewAction("S", "Superior View", Vector3D(0, 0, -1), group);
 	this->addStandard3DViewAction("I", "Inferior View", Vector3D(0, 0, 1), group);
 	this->addStandard3DViewAction("L", "Left View", Vector3D(-1, 0, 0), group);
 	this->addStandard3DViewAction("R", "Right View", Vector3D(1, 0, 0), group);
@@ -177,7 +182,7 @@ QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, V
 	//    font.setPointSize(font.pointSize()*1.5);
 	//  action->setFont(font);
 	action->setData(QVariant(qstring_cast(viewDirection)));
-	connect(action, SIGNAL(triggered()), this, SLOT(setStandard3DViewActionSlot()));
+	connect(action, &QAction::triggered, this, &CameraControl::setStandard3DViewActionSlot);
 	return action;
 }
 
