@@ -42,8 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//TESTING :)
-
 AcquisitionImplService::AcquisitionImplService(ctkPluginContext *context) :
 	mContext(context),
 	mUsReconstructService(new UsReconstructionServiceProxy(context))
