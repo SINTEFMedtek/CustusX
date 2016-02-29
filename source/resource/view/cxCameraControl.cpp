@@ -149,7 +149,7 @@ void CameraControl::translateByFocusTo(Vector3D p_r)
 	camera->SetPosition(p.begin());
 }
 
-void CameraControl::setSuperiorView()
+void CameraControl::setSuperiorView() const
 {
 	mSuperiorViewAction->trigger();
 }

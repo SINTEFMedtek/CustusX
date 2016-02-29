@@ -82,6 +82,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoLoadRecentPatient", true);
 	this->fillDefault("Automation/autoLoadRecentPatientWithinHours", 8);
 	this->fillDefault("Automation/autoShowNewData", false);
+    this->fillDefault("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData", false);
 
 	this->fillDefault("TrackingPositionFilter/enabled", false);
 
