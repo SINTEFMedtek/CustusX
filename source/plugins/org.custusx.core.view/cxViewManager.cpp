@@ -605,9 +605,16 @@ int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
 
 void ViewManager::autoShowData(DataPtr data)
 {
-    if (settings()->value("Automation/autoShowNewData").toBool()  && data)
+	if (settings()->value("Automation/autoShowNewData").toBool() && data)
 	{
 		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
+        if(settings()->value("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData").toBool())
+		{
+			for (unsigned i=0; i<mViewGroups.size(); ++i)
+				if (mViewGroups[i]->contains3DView())
+					mCameraControl->setSuperiorView();
+		}
+
 	}
 }
 

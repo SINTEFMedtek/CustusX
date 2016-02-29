@@ -99,6 +99,7 @@ public:
 	void setView(ViewPtr view);
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);
+    void setSuperiorView() const;
 
 signals:
 
@@ -111,6 +112,7 @@ private:
 	void defineRotateLayout();
 	void definePanLayout();
 	ViewPtr mView;
+	QAction* mSuperiorViewAction;
 
 	QAction* addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection, QActionGroup* group);
 };
