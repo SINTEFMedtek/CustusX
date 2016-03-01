@@ -33,5 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--directory', required=False, help='specify directory to run the commit command in', default=os.getcwd())
     args = parser.parse_args()
 
+    print args
+
     commit(args.name, args.email, args.message, args.directory)
     
