@@ -109,6 +109,10 @@ void USAcquisition::checkIfReadySlot()
 	bool streaming = this->getServices()->video()->isConnected();
 	ToolPtr tool = this->getServices()->tracking()->getFirstProbe();
     ToolPtr reference_frame = this->getServices()->tracking()->getReferenceTool();
+    if(tracking && reference_frame)
+    {
+        QObject::connect(reference_frame.get(), &Tool::toolVisible, this, &USAcquisition::checkIfReadySlot, Qt::UniqueConnection);
+    }
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
