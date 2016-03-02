@@ -457,7 +457,7 @@ class TubeSegmentationFramework(CppComponent):
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', platform.system() != 'Windows');
+        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', 'ON');
 
  # ---------------------------------------------------------
 
