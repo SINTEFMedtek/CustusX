@@ -87,10 +87,10 @@ class Common(object):
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID(server, "%s/user_doc"%root_folder, user) 
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID(server, "%s/gcov"%root_folder, user) 
 
-
-        self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
+        #self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
         self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
-        
+        self.gitrepo_main_site_base = self.gitrepo_open_site_base 
+
         self.system_base_name = "CustusX"
 
     def printSettings(self):

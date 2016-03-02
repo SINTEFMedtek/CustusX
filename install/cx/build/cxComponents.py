@@ -44,9 +44,13 @@ class Component(object):
     def help(self):
         'description of item'
         return ''
+    def sourceFolder(self):
+        return self.name()
     def path(self):
-        'return path where component will be installed'
-        raise "Not Implemented"
+        return self.controlData.getWorkingPath() + "/" + self.name()
+#    def path(self):
+#        'return path where component will be installed'
+#        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
             print "*** %s already exists, checkout ignored." % path
@@ -60,9 +64,16 @@ class Component(object):
         if self._checkout_check_exist('%s/.svn'%path):
             return
         self._rawCheckout()
+#    def _rawCheckout(self):
+#        'checkout the component source from external source to this computer (svn co or similar)'
+#        raise "Not Implemented"
     def _rawCheckout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
-        raise "Not Implemented"
+        repo = self.repository()
+        if repo=="":
+            raise "Not Implemented"            
+        #self.sourceFolder()
+        self._getBuilder().gitClone(self.repository(), self.sourceFolder())
     def update(self):
         'update the component source (svn up or similar)'
         pass
@@ -95,6 +106,9 @@ class Component(object):
     def useInIntegrationTesting(self):
         'use during integration test'
         return False
+    def repository(self):
+        'url of repository'
+        return ""
 
         
 # ---------------------------------------------------------
@@ -107,8 +121,6 @@ class CppComponent(Component):
     '''
     def __init__(self):
         pass
-    def sourceFolder(self):
-        return self.name()
     def buildFolder(self):
         return self.controlData.getBuildFolder()
     def _changeDirTo(self, folder):
@@ -130,8 +142,6 @@ class CppComponent(Component):
         return self.path()+'/'+self.sourceFolder()
     def installPath(self):
         return self.buildPath()
-    def _rawCheckout(self):
-        raise "Not Implemented"
     def configure(self):
         raise "Not Implemented"
     def reset(self):
@@ -150,14 +160,12 @@ class ITK(CppComponent):
         return "ITK"
     def help(self):
         return 'itk.org'
-    def path(self):
-        return self.controlData.getExternalPath() + "/ITK"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/ITK"
     def sourceFolder(self):
         return 'ITK'
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git://itk.org/ITK.git')
     def update(self):
         self._getBuilder().gitCheckout('v4.8.2')
     def configure(self):
@@ -166,6 +174,8 @@ class ITK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         builder.configureCMake()
+    def repository(self):
+        return 'git://itk.org/ITK.git'
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -173,19 +183,15 @@ class VTK(CppComponent):
         return "VTK"
     def help(self):
         return 'vtk.org'
-    def path(self):
-        return self.controlData.getExternalPath() + "/VTK"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/VTK"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        base = self.controlData.gitrepo_open_site_base
-        self._getBuilder().gitClone('%s/VTK' % base)
+    def repository(self):
+        return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
-        # this fix should rebase repo from the original Kitware/VTK to our own fork on GitHub.
-        repo = '%s/VTK' % self.controlData.gitrepo_open_site_base
-        branch = 'VTK-CX-modifications'
+        #branch = 'VTK-CX-modifications'
         tag = 'VTK-6-3-0.cx_patch_3'
-        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         builder = self._getBuilder()
@@ -219,23 +225,21 @@ class CTK(CppComponent):
         return "CTK"
     def help(self):
         return 'commontk.org'
-    def path(self):
-        return self.controlData.getExternalPath() + "/CTK"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/CTK"
 #    def buildFolder(self):
 #        return "%s/CTK-build" % self.controlData.getBuildFolder()
 #    def configPath(self):
 #        return self.buildPath() + "/CTK-build/"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _getRepo(self):
+    def repository(self):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
-    def _rawCheckout(self):
-        self._getBuilder().gitClone(self._getRepo())
     def update(self):
-        repo = self._getRepo()
-        branch = 'CTK-CX-modifications'
-        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
+        #repo = self._getRepo()
+        #branch = 'CTK-CX-modifications'
+        #self._getBuilder().gitSetRemoteURL(repo, branch=branch)
         #self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a') 
         self._getBuilder().gitCheckout('f9478bdb4d5ecc6357b3a579a4bf8a927debd5e3') # new 2015-10-19
     def configure(self):
@@ -258,12 +262,12 @@ class OpenCV(CppComponent):
         return "OpenCV"
     def help(self):
         return 'http://opencv.willowgarage.com'
-    def path(self):
-        return self.controlData.getExternalPath() + "/OpenCV"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/OpenCV"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('https://github.com/Itseez/opencv.git', 'OpenCV')
+    def repository(self):
+        return 'https://github.com/Itseez/opencv.git'
     def update(self):
         self._getBuilder().gitCheckout('2.4.11')
     def configure(self):
@@ -286,14 +290,14 @@ class Eigen(CppComponent):
         return "eigen"
     def help(self):
         return 'http://eigen.tuxfamily.org/'
-    def path(self):
-        return self.controlData.getExternalPath() + "/eigen"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/eigen"
     def configPath(self):
         return self.sourcePath()
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:RLovelett/eigen.git', 'eigen')
+    def repository(self):
+        return 'git@github.com:RLovelett/eigen.git'
     def update(self):
         #did not find a 3.2.1 release on the github fork... using a sha instead
         testedSHA = '36cd8ffd9dfcdded4717efb96daad9f6353f6351'
@@ -318,12 +322,12 @@ class OpenIGTLink(CppComponent):
         return "OpenIGTLink"
     def help(self):
         return 'http://www.na-mic.org/Wiki/index.php/OpenIGTLink/Library/Build'
-    def path(self):
-        return self.controlData.getExternalPath() + "/OpenIGTLink"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/OpenIGTLink"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git://github.com/openigtlink/OpenIGTLink.git')
+    def repository(self):
+        return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
     def configure(self):
@@ -343,12 +347,12 @@ class IGSTK(CppComponent):
         return "IGSTK"
     def help(self):
         return 'igstk.org'
-    def path(self):
-        return self.controlData.getExternalPath() + "/IGSTK"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/IGSTK"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git://igstk.org/IGSTK.git')
+    def repository(self):
+        return 'git://igstk.org/IGSTK.git'
     def update(self):
         base = self.controlData.gitrepo_open_site_base
         repo = '%s/IGSTK' % base
@@ -384,10 +388,10 @@ class CustusX(CppComponent):
         #return '%s/%s' % (self.controlData.getWorkingPath(), self.sourceFolder())    
     def sourceFolder(self):
         return self.controlData.getRepoFolderName()
+    def repository(self):
+        return '%s/CustusX.git' % self.controlData.gitrepo_main_site_base
     def _rawCheckout(self):
-        base = self.controlData.gitrepo_open_site_base    
-        repo = '%s/CustusX.git' % base
-        self._getBuilder().gitCloneIntoExistingDirectory(repo, self.controlData.main_branch)
+        self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
     def update(self):
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
     def configure(self):
@@ -436,11 +440,11 @@ class TubeSegmentationFramework(CppComponent):
         return "Tube-Segmentation-Framework"
     def help(self):
         return 'Tube-Segmentation-Framework'
-    def path(self):
-        return self.controlData.getWorkingPath() + "/Tube-Segmentation-Framework"
-    def _rawCheckout(self):
+#    def path(self):
+#        return self.controlData.getWorkingPath() + "/Tube-Segmentation-Framework"
+    def repository(self):
         base = self.controlData.gitrepo_open_site_base
-        self._getBuilder().gitClone('%s/Tube-Segmentation-Framework.git' % base)
+        return '%s/Tube-Segmentation-Framework.git' % base
     def update(self):
         self._getBuilder().gitCheckout('9faceef98c6ee943a1301b0d57f9db0deb7e59e9')
         self._getBuilder()._gitSubmoduleUpdate()
@@ -466,15 +470,14 @@ class LevelSetSegmentation(CppComponent):
         return "Level-Set-Segmentation"
     def help(self):
         return 'Level-Set-Segmentation'
-    def path(self):
-        return self.controlData.getWorkingPath() + "/Level-Set-Segmentation"
-    def _rawCheckout(self):
-        base = self.controlData.gitrepo_open_site_base
-        self._getBuilder().gitClone('%s/Level-Set-Segmentation' % base)
+#    def path(self):
+#        return self.controlData.getWorkingPath() + "/" + self.name()
+    def repository(self):
+        return '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
     def update(self):
         # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
-        repo = '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
-        self._getBuilder().gitSetRemoteURL(repo, branch="master")
+        #repo = '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
+        #self._getBuilder().gitSetRemoteURL(repo, branch="master")
         self._getBuilder().gitCheckout('e49217188925845be9b336adcb2b9e81c26ea784')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
@@ -495,12 +498,11 @@ class OpenCLUtilityLibrary(CppComponent):
         return "OpenCLUtilityLibrary"
     def help(self):
         return 'OpenCLUtilityLibrary. Functions for interacting with OpenCL.'
-    def path(self):
-        return self.controlData.getWorkingPath() + "/OpenCLUtilityLibrary"
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:smistad/OpenCLUtilityLibrary')
+#    def path(self):
+#        return self.controlData.getWorkingPath() + "/OpenCLUtilityLibrary"
+    def repository(self):
+        return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
-        #self._getBuilder().gitCheckoutBranch('custusx', submodules=False)
         self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
     def configure(self):
         builder = self._getBuilder()
@@ -515,16 +517,14 @@ class FAST(CppComponent):
         return "FAST"
     def help(self):
         return 'FAST.'
-    def path(self):
-        return self.controlData.getWorkingPath() + "/FAST"
+#    def path(self):
+#        return self.controlData.getWorkingPath() + "/FAST"
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/source"
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('git@github.com:smistad/FAST')
+    def repository(self):
+        return 'git@github.com:smistad/FAST'
     def update(self):
-        #self._getBuilder().gitCheckoutBranch('development', submodules=True)
         self._getBuilder().gitCheckout('924542af95c6a6e2d29d99de8c592add7ac45880')
-#        self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -542,7 +542,6 @@ class FAST(CppComponent):
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
         add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
-        
 # ---------------------------------------------------------
 
 class CustusXData(CppComponent):
@@ -555,18 +554,14 @@ class CustusXData(CppComponent):
         return custusx.path() + "/" + custusx.sourceFolder()
     def sourceFolder(self):
         return 'data'
-    def _rawCheckout(self):
-        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
+    def repository(self):
+        return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.gitRepository(), self.controlData.main_branch)
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
     def configure(self):
         pass
     def build(self):
         pass
-    def gitRepository(self):
-        base = self.controlData.gitrepo_open_site_base
-        return '%s/CustusXData.git' % base
     def makeClean(self):
         pass
     def useInIntegrationTesting(self):
@@ -579,35 +574,19 @@ class QHttpServer(CppComponent):
         return "QHttpServer"
     def help(self):
         return 'https://github.com/nikhilm/qhttpserver'
-    def path(self):
-        return self.controlData.getExternalPath() + "/QHttpServer"
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/QHttpServer"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
-    def _rawCheckout(self):
-        self._getBuilder().gitClone('%s %s' % (self._getRepo(), self.sourceFolder()))
-    def update(self):
-        self._getBuilder().gitSetRemoteURL(self._getRepo(), branch='master')
-        self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
-#    def configure(self):
-#        builder = self._getBuilder()
-#        changeDir(self.buildPath())
-#        shell.run('qmake %s' % self.sourcePath())
-    def _getRepo(self):
+    def repository(self):
         return 'git@github.com:SINTEFMedtek/qhttpserver.git'
+    def update(self):
+        #self._getBuilder().gitSetRemoteURL(self._getRepo(), branch='master')
+        self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()    
-#    def build(self):
-#        changeDir(self.buildPath())
-#        shell.run('make')
-#    def makeClean(self):
-#        changeDir(self.buildPath())
-#        shell.run('make clean')
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
         add('qhttpserver_DIR:PATH', self.buildPath())
-        #add('QHTTPSERVERCPP_LIBRARY_DIR:PATH', self.buildPath()+'/lib')
-        #add('QHTTPSERVERCPP_INCLUDE_DIR:PATH', self.sourcePath()+'/src')
-        #add('QHttpServer_ROOT_DIR:PATH', self.path())
-        #add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
 

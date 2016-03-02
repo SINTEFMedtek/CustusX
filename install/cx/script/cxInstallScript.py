@@ -123,7 +123,9 @@ Available components are:
 
         # info + verification
         assembly.controlData.printSettings()
-        print 'Use the following components:\n ', '\n  '.join(assembly.getSelectedLibraries())
+        libs = [lib for lib in assembly.libraries if lib.name() in assembly.selectedLibraryNames]
+        text = ['%45s     %s' % (lib.name(), lib.repository()) for lib in libs]
+        print 'Use the following components:\n ', '\n  '.join(text)
         
         print ''
         print '*********************************************************************'
