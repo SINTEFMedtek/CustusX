@@ -45,6 +45,7 @@ Presets::Presets(XmlOptionFile presetFile, XmlOptionFile customFile)
 	mPresetFile = presetFile;
 	mCustomFile = customFile;
 	mLastCustomPresetAdded = "";
+    mId = mPresetFile.getFileName();
 }
 
 void Presets::deleteCustomPreset(QString name)
@@ -131,7 +132,12 @@ void Presets::print(QDomElement element)
 	QTextStream stream(stdout);
 	stream << "\n";
 	element.save(stream, 4);
-	stream << "\n";
+    stream << "\n";
+}
+
+QString Presets::getId()
+{
+    return mId;
 }
 
 

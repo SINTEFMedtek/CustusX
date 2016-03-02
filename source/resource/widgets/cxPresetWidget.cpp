@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QComboBox>
 #include <QInputDialog>
 #include "cxLogger.h"
+#include "cxSettings.h"
 
 namespace cx {
 
@@ -116,6 +117,16 @@ void PresetWidget::setPresets(PresetsPtr presets)
 	connect(mPresets.get(), SIGNAL(changed()), this, SLOT(populatePresetListSlot()));
 
 	this->populatePresetListSlot();
+    this->selectLastUsedPreset();
+}
+
+QString PresetWidget::getLastUsedPresetNameFromSettingsFile()
+{
+    QString id = mPresets->getId();
+    settings()->fillDefault(id, mPresets->getPresetList().first());
+
+    QString lastUsedPresetName = settings()->value(id).toString();
+    return lastUsedPresetName;
 }
 
 void PresetWidget::resetSlot()
@@ -142,6 +153,7 @@ void PresetWidget::populatePresetListSlot()
 
 void PresetWidget::presetsBoxChangedSlot(const QString& name)
 {
+    settings()->setValue(mPresets->getId(), name);
 	emit presetSelected(name);
 }
 
@@ -209,7 +221,13 @@ QString PresetWidget::getNewPresetName(bool withoutSpaces = false)
 	if(withoutSpaces)
 		retval = retval.replace(" ", "-");
 
-	return retval;
+    return retval;
+}
+
+void PresetWidget::selectLastUsedPreset()
+{
+    QString lastUsedPreset = this->getLastUsedPresetNameFromSettingsFile();
+    this->requestSetCurrentPreset(lastUsedPreset);
 }
 
 
