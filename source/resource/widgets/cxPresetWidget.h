@@ -66,7 +66,7 @@ public:
 
 	virtual void setPresets(PresetsPtr presets);
 
-    QString getLastUsedPresetNameFromSettingsFile();
+    QString getLastUsedPresetNameFromSettingsFile() const;
 
 signals:
 	void presetSelected(QString name);

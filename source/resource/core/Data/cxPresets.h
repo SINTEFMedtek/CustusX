@@ -66,7 +66,7 @@ public:
 	Presets(XmlOptionFile presetFile, XmlOptionFile customFile); //used
 	virtual ~Presets(){};
 
-    QString getId();
+    QString getId() const;
 
 	void addCustomPreset(QDomElement& element); ///< adds a custom preset
 	virtual void deleteCustomPreset(QString name); ///< deletes the custom preset with the given name if it exists

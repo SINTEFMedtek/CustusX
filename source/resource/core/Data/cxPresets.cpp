@@ -135,7 +135,7 @@ void Presets::print(QDomElement element)
     stream << "\n";
 }
 
-QString Presets::getId()
+QString Presets::getId() const
 {
     return mId;
 }
