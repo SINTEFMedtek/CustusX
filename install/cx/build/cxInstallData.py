@@ -87,10 +87,10 @@ class Common(object):
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID(server, "%s/user_doc"%root_folder, user) 
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID(server, "%s/gcov"%root_folder, user) 
 
-
-        self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
+        #self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
         self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
-        
+        self.gitrepo_main_site_base = self.gitrepo_open_site_base 
+
         self.system_base_name = "CustusX"
 
     def printSettings(self):
@@ -126,6 +126,8 @@ class Common(object):
         p.add_boolean_inverter('--graph', default=self.mGraphviz, dest='mGraphviz', help='Make dependency graph.')
         p.add_argument('-ev', '--eclipse_version', default='3.6', dest='eclipse_version', choices=['3.2', '3.3', '3.4', '3.5', '3.6', '3.7', '4.2', '4.3'], help='The Eclipse version number')
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
+        
+        p.add_argument('--gitrepo_main_site_base', default=self.gitrepo_main_site_base, dest='gitrepo_main_site_base', help='Base url for the core open repositories default=%s.' % self.gitrepo_main_site_base)
         return p
 
     def getArgParser_extended_build(self):
