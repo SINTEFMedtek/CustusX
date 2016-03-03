@@ -166,8 +166,8 @@ bool ImageDefaultTFGenerator::looksLikeBinaryImage() const
 
 double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range) const
 {
-	range.first = int(range.first+0.5);
-	range.second = int(range.second+0.5);
+	range.first = std::round(range.first);
+	range.second = std::round(range.second);
 	range.second = std::max(range.second, range.first+1);
 	return range;
 }
