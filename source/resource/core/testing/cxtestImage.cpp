@@ -31,23 +31,77 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+#include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxDataLocations.h"
 #include "cxDataReaderWriter.h"
-#include <vtkImageData.h>
+#include "cxImageTF3D.h"
+#include "cxTransferFunctions3DPresets.h"
+
+#include "cxProfile.h"
 
 namespace
 {
-cx::ImagePtr readTestImage()
-{
-	QString uid = "testImage";
-	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
 
+cx::ImagePtr readTestImage(QString uid, QString filename)
+{
 	//Copied from loadImageFromFile() in cxtestDicomConverter.cpp
 	cx::ImagePtr image = cx::Image::create(uid,uid);
 	cx::MetaImageReader().readInto(image, filename);
 	return image;
 }
+
+cx::ImagePtr readTestImage()
+{
+	QString uid = "testImage";
+	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
+	return readTestImage(uid, filename);
+}
+
+cx::ImagePtr readKaisaTestImage()
+{
+	QString uid = "kaisaTestImage";
+	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
+	return readTestImage(uid, filename);
+}
+
+class TransferFunctionPresetsHelper
+{
+public:
+	TransferFunctionPresetsHelper()
+	{
+	cx::XmlOptionFile preset(cx::DataLocations::findConfigFilePath("presets.xml", "/transferFunctions"));
+	cx::XmlOptionFile custom = cx::profile()->getXmlSettings().descend("presetTransferFunctions");
+	transferFunctionPresets = cx::TransferFunctions3DPresetsPtr(new cx::TransferFunctions3DPresets(preset, custom));
+	REQUIRE(transferFunctionPresets);
+
+	}
+	void changeToNonExistingTransferFunction(cx::ImagePtr image)
+	{
+		QString transferFunctionName = "non existing transfer function";
+		transferFunctionPresets->load3D(transferFunctionName, image);
+	}
+
+	void changeToExistingTransferFunction(cx::ImagePtr image)
+	{
+		QString transferFunctionName = "3D CT Abdomen";
+		transferFunctionPresets->load3D(transferFunctionName, image);
+	}
+
+	void checkInitialWindowWidth(cx::ImagePtr image, double initialWindowWidth, bool transferFunctionChanged = false)
+	{
+		CHECK(image->getInitialWindowWidth() == initialWindowWidth);
+		cx::ImageTF3DPtr transferFunction = image->getTransferFunctions3D();
+		if(transferFunctionChanged)
+			CHECK(image->getInitialWindowWidth() != transferFunction->getWindow());
+		else
+			CHECK(image->getInitialWindowWidth() == transferFunction->getWindow());
+	}
+
+	private:
+	cx::TransferFunctions3DPresetsPtr transferFunctionPresets;
+};
+
 } //namespace
 
 namespace cxtest
@@ -95,7 +149,36 @@ TEST_CASE("Image copy: Voxels equal", "[unit][resource][core]")
 	}
 //	std::cout << "Voxels larger than zero: " << voxelsAboveZero << std::endl;
 	REQUIRE(voxelsAboveZero > 1000);
+}
 
+TEST_CASE("Image initial window width imported", "[unit][resource][core]")
+{
+	cx::ImagePtr image = readKaisaTestImage();
+	double windowWidth = image->getInitialWindowWidth();
+	REQUIRE(windowWidth > 0);
+}
+
+TEST_CASE("Image initial window width is kept after changing transfer function", "[unit][resource][core]")
+{
+	cx::ImagePtr image = readKaisaTestImage();
+	image->resetTransferFunctions();
+	double initialWindowWidth = image->getInitialWindowWidth();
+	REQUIRE(initialWindowWidth > 0);
+
+	cx::ImageTF3DPtr transferFunction = image->getTransferFunctions3D();
+	image->setTransferFunctions3D(transferFunction);
+
+	TransferFunctionPresetsHelper helper;
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+
+	helper.changeToNonExistingTransferFunction(image);
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+
+	helper.changeToExistingTransferFunction(image);
+	helper.checkInitialWindowWidth(image, initialWindowWidth, true);
+
+	image->resetTransferFunctions();
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
 }
 
 } // namespace cxtest
