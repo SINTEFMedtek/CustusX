@@ -98,6 +98,14 @@ public:
 			CHECK(image->getInitialWindowWidth() == transferFunction->getWindow());
 	}
 
+	void runAddAndParseXml(cx::ImagePtr image)
+	{
+		QDomDocument domdoc;
+		QDomElement node = domdoc.createElement("Image test");
+		image->addXml(node);
+		image->parseXml(node);
+	}
+
 	private:
 	cx::TransferFunctions3DPresetsPtr transferFunctionPresets;
 };
@@ -178,6 +186,52 @@ TEST_CASE("Image initial window width is kept after changing transfer function",
 	helper.checkInitialWindowWidth(image, initialWindowWidth, true);
 
 	image->resetTransferFunctions();
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+}
+
+TEST_CASE("Image: Initial window width is kept after using UnsignedDerivedImage", "[unit][resource][core]")
+{
+	cx::ImagePtr image = readKaisaTestImage();
+	image->resetTransferFunctions();
+	double initialWindowWidth = image->getInitialWindowWidth();
+
+	cx::ImagePtr unsignedImage = image->getUnsigned(image);
+	TransferFunctionPresetsHelper helper;
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+
+	helper.changeToNonExistingTransferFunction(image);
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+
+	helper.changeToExistingTransferFunction(image);
+	helper.checkInitialWindowWidth(image, initialWindowWidth, true);
+
+	image->resetTransferFunctions();
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+}
+
+TEST_CASE("Image: Initial window width from mdh file is kept after using addXml and parseXml", "[unit][resource][core]")
+{
+	cx::ImagePtr image = readKaisaTestImage();
+	double initialWindowWidth = image->getInitialWindowWidth();
+
+	TransferFunctionPresetsHelper helper;
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+
+	helper.runAddAndParseXml(image);
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+}
+
+TEST_CASE("Image: Changed initial window width is kept after using addXml and parseXml", "[unit][resource][core]")
+{
+	cx::ImagePtr image = readKaisaTestImage();
+	image->setInitialWindowLevel(20, 30);
+	image->resetTransferFunctions();
+	double initialWindowWidth = image->getInitialWindowWidth();
+
+	TransferFunctionPresetsHelper helper;
+	helper.checkInitialWindowWidth(image, initialWindowWidth);
+
+	helper.runAddAndParseXml(image);
 	helper.checkInitialWindowWidth(image, initialWindowWidth);
 }
 
