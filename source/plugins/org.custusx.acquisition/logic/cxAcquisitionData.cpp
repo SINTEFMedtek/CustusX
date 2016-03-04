@@ -186,7 +186,11 @@ void Acquisition::checkIfReadySlot()
 {
 	bool tracking = this->getServices()->tracking()->getState()>=Tool::tsTRACKING;
 	ToolPtr tool = this->getServices()->tracking()->getActiveTool();
-
+    ToolPtr reference_frame = this->getServices()->tracking()->getReferenceTool();
+    if(tracking && reference_frame)
+    {
+        connect(reference_frame.get(), &Tool::toolVisible, this, &Acquisition::checkIfReadySlot, Qt::UniqueConnection);
+    }
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
 
@@ -197,6 +201,10 @@ void Acquisition::checkIfReadySlot()
 		{
 			mWhatsMissing += "<font color=orange>Tool not visible</font><br>";
 		}
+        if(!reference_frame || !reference_frame->getVisible())
+        {
+            mWhatsMissing += "<font color=orange>Reference frame not visible.</font><br>";
+        }
 	}
 	else
 	{
