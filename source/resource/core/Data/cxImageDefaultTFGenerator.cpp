@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImageDefaultTFGenerator.h"
 
+#include <cmath>
 #include "vtkImageData.h"
 #include "cxImage.h"
 #include "cxImageLUT2D.h"
