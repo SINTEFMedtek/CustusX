@@ -158,6 +158,7 @@ cx_add_class(cxResource_SOURCE
     Math/cxTransform3D
     Math/cxFrame3D
     Math/cxMathBase.h
+    Math/cxMathUtils
 
     utilities/cxXmlOptionItem
     utilities/cxDoubleRange.h

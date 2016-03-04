@@ -32,13 +32,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImageDefaultTFGenerator.h"
 
-#include <cmath>
 #include "vtkImageData.h"
 #include "cxImage.h"
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
 #include "math.h"
 #include "cxSettings.h"
+#include "cxMathUtils.h"
 
 namespace cx
 {
@@ -77,14 +77,6 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	return tf;
 }
 
-namespace
-{
-int myround(double val)
-{
-	return int(val+0.5);
-}
-}
-
 ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 {
 	ImageTF3DPtr tf(new ImageTF3D());
@@ -99,9 +91,9 @@ ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 	// Note the ordering: add in descending order to ensure zero is
 	// always written into smin, also for binary volumes
 	// Round is required for binary volumes.
-	opacity[smin + myround(0.5*srange)] = 255;
-	opacity[smin + myround(0.3*srange)] = 255.0 * 0.7;
-	opacity[smin + myround(0.1*srange)] = 0;
+	opacity[smin + roundAwayFromZero(0.5*srange)] = 255;
+	opacity[smin + roundAwayFromZero(0.3*srange)] = 255.0 * 0.7;
+	opacity[smin + roundAwayFromZero(0.1*srange)] = 0;
 	tf->resetAlpha(opacity);
 
 	ColorMap colors;
@@ -167,8 +159,8 @@ bool ImageDefaultTFGenerator::looksLikeBinaryImage() const
 
 double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range) const
 {
-	range.first = std::round(range.first);
-	range.second = std::round(range.second);
+	range.first = roundAwayFromZero(range.first);
+	range.second = roundAwayFromZero(range.second);
 	range.second = std::max(range.second, range.first+1);
 	return range;
 }
