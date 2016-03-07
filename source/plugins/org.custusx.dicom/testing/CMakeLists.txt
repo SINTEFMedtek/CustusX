@@ -17,7 +17,11 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_dicom PRIVATE org_custusx_dicom cxCatch)
+    target_link_libraries(cxtest_org_custusx_dicom
+        PRIVATE
+        org_custusx_dicom
+        cxLogicManager
+        cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_dicom)
 
 endif(BUILD_TESTING)
