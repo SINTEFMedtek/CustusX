@@ -59,7 +59,8 @@ typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
 typedef vtkSmartPointer<vtkMetaImageWriter> vtkMetaImageWriterPtr;
 typedef QSharedPointer<ctkDICOMDatabase> ctkDICOMDatabasePtr;
 
-namespace cxtest {
+namespace cxtest
+{
 
 class DicomConverterTestFixture
 {
@@ -323,6 +324,7 @@ TEST_CASE("DicomConverter: US data from SW, missing position data", "[integratio
     fixture.checkImagesEqual(referenceImage, referenceImage); //
     fixture.checkImagesEqual(convertedImage, referenceImage);
 }
+#endif
 
 TEST_CASE("DicomConverter: Auto delete database", "[integration][plugins][org.custusx.dicom]")
 {
@@ -355,4 +357,3 @@ TEST_CASE("DicomConverter: Auto delete database", "[integration][plugins][org.cu
 
 }//cxtest
 
-#endif
