@@ -88,14 +88,21 @@ public:
 		transferFunctionPresets->load3D(transferFunctionName, image);
 	}
 
-	void checkInitialWindowWidth(cx::ImagePtr image, double initialWindowWidth, bool transferFunctionChanged = false)
+	void checkInitialWindow(cx::ImagePtr image, double initialWindowWidth, double initialWindowlevel, bool transferFunctionChanged = false)
 	{
 		CHECK(image->getInitialWindowWidth() == initialWindowWidth);
+		CHECK(image->getInitialWindowLevel() == initialWindowlevel);
 		cx::ImageTF3DPtr transferFunction = image->getTransferFunctions3D();
 		if(transferFunctionChanged)
+		{
 			CHECK(image->getInitialWindowWidth() != transferFunction->getWindow());
+			CHECK(image->getInitialWindowLevel() != transferFunction->getLevel());
+		}
 		else
+		{
 			CHECK(image->getInitialWindowWidth() == transferFunction->getWindow());
+			CHECK(image->getInitialWindowLevel() == transferFunction->getLevel());
+		}
 	}
 
 	void runAddAndParseXml(cx::ImagePtr image)
@@ -159,80 +166,86 @@ TEST_CASE("Image copy: Voxels equal", "[unit][resource][core]")
 	REQUIRE(voxelsAboveZero > 1000);
 }
 
-TEST_CASE("Image initial window width imported", "[unit][resource][core]")
+TEST_CASE("Image initial window imported", "[unit][resource][core]")
 {
 	cx::ImagePtr image = readKaisaTestImage();
 	double windowWidth = image->getInitialWindowWidth();
+	double windowLevel = image->getInitialWindowLevel();
 	REQUIRE(windowWidth > 0);
+	REQUIRE(windowLevel > 0);
 }
 
-TEST_CASE("Image initial window width is kept after changing transfer function", "[unit][resource][core]")
+TEST_CASE("Image initial window is kept after changing transfer function", "[unit][resource][core]")
 {
 	cx::ImagePtr image = readKaisaTestImage();
 	image->resetTransferFunctions();
 	double initialWindowWidth = image->getInitialWindowWidth();
+	double initialWindowlevel = image->getInitialWindowLevel();
 	REQUIRE(initialWindowWidth > 0);
 
 	cx::ImageTF3DPtr transferFunction = image->getTransferFunctions3D();
 	image->setTransferFunctions3D(transferFunction);
 
 	TransferFunctionPresetsHelper helper;
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	helper.changeToNonExistingTransferFunction(image);
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	helper.changeToExistingTransferFunction(image);
-	helper.checkInitialWindowWidth(image, initialWindowWidth, true);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel, true);
 
 	image->resetTransferFunctions();
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 }
 
-TEST_CASE("Image: Initial window width is kept after using UnsignedDerivedImage", "[unit][resource][core]")
+TEST_CASE("Image: Initial window is kept after using UnsignedDerivedImage", "[unit][resource][core]")
 {
 	cx::ImagePtr image = readKaisaTestImage();
 	image->resetTransferFunctions();
 	double initialWindowWidth = image->getInitialWindowWidth();
+	double initialWindowlevel = image->getInitialWindowLevel();
 
 	cx::ImagePtr unsignedImage = image->getUnsigned(image);
 	TransferFunctionPresetsHelper helper;
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	helper.changeToNonExistingTransferFunction(image);
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	helper.changeToExistingTransferFunction(image);
-	helper.checkInitialWindowWidth(image, initialWindowWidth, true);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel, true);
 
 	image->resetTransferFunctions();
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 }
 
-TEST_CASE("Image: Initial window width from mdh file is kept after using addXml and parseXml", "[unit][resource][core]")
+TEST_CASE("Image: Initial window from mdh file is kept after using addXml and parseXml", "[unit][resource][core]")
 {
 	cx::ImagePtr image = readKaisaTestImage();
 	double initialWindowWidth = image->getInitialWindowWidth();
+	double initialWindowlevel = image->getInitialWindowLevel();
 
 	TransferFunctionPresetsHelper helper;
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	helper.runAddAndParseXml(image);
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 }
 
-TEST_CASE("Image: Changed initial window width is kept after using addXml and parseXml", "[unit][resource][core]")
+TEST_CASE("Image: Changed initial window is kept after using addXml and parseXml", "[unit][resource][core]")
 {
 	cx::ImagePtr image = readKaisaTestImage();
 	image->setInitialWindowLevel(20, 30);
 	image->resetTransferFunctions();
 	double initialWindowWidth = image->getInitialWindowWidth();
+	double initialWindowlevel = image->getInitialWindowLevel();
 
 	TransferFunctionPresetsHelper helper;
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	helper.runAddAndParseXml(image);
-	helper.checkInitialWindowWidth(image, initialWindowWidth);
+	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 }
 
 } // namespace cxtest
