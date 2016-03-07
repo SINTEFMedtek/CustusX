@@ -168,6 +168,11 @@ public:
 	DicomWidgetFixture(ctkPluginContext* context) :
 		cx::DicomWidget(context, NULL)
 	{
+		this->init();
+	}
+
+	void init()
+	{
 		this->prePaintEvent();
 	}
 
@@ -346,13 +351,14 @@ TEST_CASE("DicomConverter: Auto delete database", "[integration][plugins][org.cu
 	//delete widget and create new
 	delete widgetFixture;
 	widgetFixture = new DicomWidgetFixture(context);
+	widgetFixture->init();
 
 	database = widgetFixture->getDb();
 	patients = database->patients();
 	REQUIRE(patients.empty());
 
-	delete widgetFixture;
 	cx::LogicManager::shutdown();
+	delete widgetFixture;
 }
 
 }//cxtest
