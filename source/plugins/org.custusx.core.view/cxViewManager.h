@@ -229,6 +229,8 @@ protected:
 private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
+	void autoShowInViewGroups(DataPtr data);
+	void autoResetCameraToSuperiorView();
 };
 
 /**

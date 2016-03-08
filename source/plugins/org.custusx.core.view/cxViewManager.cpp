@@ -602,19 +602,36 @@ int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
 	return -1;
 }
 
-
 void ViewManager::autoShowData(DataPtr data)
 {
 	if (settings()->value("Automation/autoShowNewData").toBool() && data)
 	{
-		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
-        if(settings()->value("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData").toBool())
-		{
-			for (unsigned i=0; i<mViewGroups.size(); ++i)
-				if (mViewGroups[i]->contains3DView())
-					mCameraControl->setSuperiorView();
-		}
+		this->autoShowInViewGroups(data);
+		this->autoResetCameraToSuperiorView();
+	}
+}
 
+void ViewManager::autoShowInViewGroups(DataPtr data)
+{
+	if(settings()->value("Automation/autoShowNewDataInViewGroup0").toBool())
+		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
+	if(settings()->value("Automation/autoShowNewDataInViewGroup1").toBool())
+		this->getViewGroups()[1]->getData()->addDataSorted(data->getUid());
+	if(settings()->value("Automation/autoShowNewDataInViewGroup2").toBool())
+		this->getViewGroups()[2]->getData()->addDataSorted(data->getUid());
+	if(settings()->value("Automation/autoShowNewDataInViewGroup3").toBool())
+		this->getViewGroups()[3]->getData()->addDataSorted(data->getUid());
+	if(settings()->value("Automation/autoShowNewDataInViewGroup4").toBool())
+		this->getViewGroups()[4]->getData()->addDataSorted(data->getUid());
+}
+
+void ViewManager::autoResetCameraToSuperiorView()
+{
+	if(settings()->value("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData").toBool())
+	{
+		for (unsigned i=0; i<mViewGroups.size(); ++i)
+			if (mViewGroups[i]->contains3DView())
+				mCameraControl->setSuperiorView();
 	}
 }
 

@@ -82,6 +82,11 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoLoadRecentPatient", true);
 	this->fillDefault("Automation/autoLoadRecentPatientWithinHours", 8);
 	this->fillDefault("Automation/autoShowNewData", false);
+	this->fillDefault("Automation/autoShowNewDataInViewGroup0", true);
+	this->fillDefault("Automation/autoShowNewDataInViewGroup1", false);
+	this->fillDefault("Automation/autoShowNewDataInViewGroup3", false);
+	this->fillDefault("Automation/autoShowNewDataInViewGroup2", false);
+	this->fillDefault("Automation/autoShowNewDataInViewGroup4", false);
 	this->fillDefault("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData", false);
 	this->fillDefault("Automation/autoDeleteDICOMDatabase", true);
 
