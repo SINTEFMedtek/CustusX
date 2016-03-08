@@ -66,6 +66,7 @@ public:
     QString getDICOMDatabaseDirectory();
 protected:
 	virtual void prePaintEvent();
+	ctkDICOMDatabase* getDatabase() const;
 
 private slots:
     void onViewHeader();
@@ -83,7 +84,6 @@ private:
 	void importSeries(QString seriesUid);
 	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
 	QStringList currentSeriesSelection();
-	ctkDICOMDatabase* getDatabase() const;
 };
 
 } /* namespace cx */

@@ -178,11 +178,15 @@ void DicomWidget::deleteDICOMDB()
    bool autoDeleteDICOMDB = settings()->value("Automation/autoDeleteDICOMDatabase").toBool();
    if(autoDeleteDICOMDB)
    {
-        QStringList patients = this->getDatabase()->patients();
-        foreach(QString patient , patients)
-        {
-            this->getDatabase()->removePatient(patient);
-        }
+	   ctkDICOMDatabase* database = this->getDatabase();
+	   if(database)
+	   {
+		   QStringList patients = database->patients();
+		   foreach(QString patient , patients)
+		   {
+			   this->getDatabase()->removePatient(patient);
+		   }
+	   }
    }
 }
 
@@ -219,7 +223,10 @@ void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
 
 ctkDICOMDatabase* DicomWidget::getDatabase() const
 {
-	return mBrowser->database();
+	if(mBrowser)
+		return mBrowser->database();
+	else
+		return NULL;
 }
 
 } /* namespace cx */
