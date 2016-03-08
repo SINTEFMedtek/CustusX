@@ -30,28 +30,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTUR5TESTFIXTURE_H
-#define CXTESTUR5TESTFIXTURE_H
-
-#include "cxUr5Robot.h"
-
-#include "cxtest_org_custusx_robot_ur5_export.h"
-
-namespace cxtest
+#include "cxMathUtils.h"
+namespace cx {
+double roundAwayFromZero(double val)
 {
+	if(val >= 0)
+		return int(val+0.5);
+	else
+		return int(val-0.5);
+}
 
-class CXTEST_ORG_CUSTUSX_ROBOT_UR5_EXPORT Ur5TestFixture
-{
-public:
-    Ur5TestFixture();
-
-    cx::Ur5Robot mUr5Robot;
-    cx::Ur5Connection mUr5Connection;
-
-    QByteArray getTestData(int packetSize);
-    Eigen::MatrixXd jacobianUr5(Eigen::RowVectorXd jointPositions);
-};
-
-} //cxtest
-
-#endif // CXTESTUR5TESTFIXTURE_H
+}
