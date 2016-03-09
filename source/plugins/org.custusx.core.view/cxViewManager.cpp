@@ -614,16 +614,25 @@ void ViewManager::autoShowData(DataPtr data)
 
 void ViewManager::autoShowInViewGroups(DataPtr data)
 {
+	QList<unsigned> showInViewGroups = this->getViewGroupsToAutoShowIn();
+	foreach (unsigned i, showInViewGroups)
+		this->getViewGroups()[i]->getData()->addDataSorted(data->getUid());
+}
+
+QList<unsigned> ViewManager::getViewGroupsToAutoShowIn()
+{
+	QList<unsigned> showInViewGroups;
 	if(settings()->value("Automation/autoShowNewDataInViewGroup0").toBool())
-		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
+		showInViewGroups  << 0;
 	if(settings()->value("Automation/autoShowNewDataInViewGroup1").toBool())
-		this->getViewGroups()[1]->getData()->addDataSorted(data->getUid());
+		showInViewGroups  << 1;
 	if(settings()->value("Automation/autoShowNewDataInViewGroup2").toBool())
-		this->getViewGroups()[2]->getData()->addDataSorted(data->getUid());
+		showInViewGroups  << 2;
 	if(settings()->value("Automation/autoShowNewDataInViewGroup3").toBool())
-		this->getViewGroups()[3]->getData()->addDataSorted(data->getUid());
+		showInViewGroups  << 3;
 	if(settings()->value("Automation/autoShowNewDataInViewGroup4").toBool())
-		this->getViewGroups()[4]->getData()->addDataSorted(data->getUid());
+		showInViewGroups  << 4;
+	return showInViewGroups;
 }
 
 void ViewManager::autoResetCameraToSuperiorView()
@@ -639,7 +648,12 @@ void ViewManager::autoResetCameraToSuperiorView()
 void ViewManager::autoCenterToImageCenter()
 {
 	if(settings()->value("Automation/autoCenterToImageCenterViewWhenAutoShowingNewData").toBool())
-		this->getNavigation()->centerToDataInActiveViewGroup();
+	{
+		QList<unsigned> showInViewGroups = this->getViewGroupsToAutoShowIn();
+
+		foreach (unsigned i, showInViewGroups)
+			this->getNavigation()->centerToDataInViewGroup(this->getViewGroup(i));
+	}
 }
 
 CyclicActionLoggerPtr ViewManager::getRenderTimer()

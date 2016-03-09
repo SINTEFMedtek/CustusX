@@ -232,6 +232,7 @@ private:
 	void autoShowInViewGroups(DataPtr data);
 	void autoResetCameraToSuperiorView();
 	void autoCenterToImageCenter();
+	QList<unsigned> getViewGroupsToAutoShowIn();
 };
 
 /**
