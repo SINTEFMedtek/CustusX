@@ -31,9 +31,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+//#include "TestVisServices.h"
+#include "cxVisServices.h"
+#include "cxtestfilter_export.h"
+#include "cxBinaryThresholdImageFilter.h"
 
-
-TEST_CASE("BinaryThresholdImageFilter: thresholdSlot with no image", "[unit][jon]")
+class CXTESTFILTER_EXPORT TestVisServices : public cx::VisServices
 {
+
+
+};
+
+TEST_CASE("BinaryThresholdImageFilter: update threshold with no image selected", "[unit][jon]")
+{
+    TestVisServices t;
+    boost::shared_ptr<cx::VisServices> ptr(&t);
+
+    cx::BinaryThresholdImageFilter filter(ptr);
+    filter.setActive(true);
+
+    //pcompile error? private func? How to call a non-private function which changes the threshold???
+    //filter.thresholdSlot();
+
+
     CHECK(1 == 2);
 }
