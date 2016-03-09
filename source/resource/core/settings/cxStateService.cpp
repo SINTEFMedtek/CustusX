@@ -88,6 +88,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoShowNewDataInViewGroup2", false);
 	this->fillDefault("Automation/autoShowNewDataInViewGroup4", false);
 	this->fillDefault("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData", false);
+	this->fillDefault("Automation/autoCenterToImageCenterViewWhenAutoShowingNewData", false);
 	this->fillDefault("Automation/autoDeleteDICOMDatabase", true);
 
 	this->fillDefault("TrackingPositionFilter/enabled", false);

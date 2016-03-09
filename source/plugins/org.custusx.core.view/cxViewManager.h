@@ -231,6 +231,7 @@ private:
 	ViewManager& operator=(ViewManager const&);
 	void autoShowInViewGroups(DataPtr data);
 	void autoResetCameraToSuperiorView();
+	void autoCenterToImageCenter();
 };
 
 /**

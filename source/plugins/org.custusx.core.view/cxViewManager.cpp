@@ -608,6 +608,7 @@ void ViewManager::autoShowData(DataPtr data)
 	{
 		this->autoShowInViewGroups(data);
 		this->autoResetCameraToSuperiorView();
+		this->autoCenterToImageCenter();
 	}
 }
 
@@ -633,6 +634,12 @@ void ViewManager::autoResetCameraToSuperiorView()
 			if (mViewGroups[i]->contains3DView())
 				mCameraControl->setSuperiorView();
 	}
+}
+
+void ViewManager::autoCenterToImageCenter()
+{
+	if(settings()->value("Automation/autoCenterToImageCenterViewWhenAutoShowingNewData").toBool())
+		this->getNavigation()->centerToDataInActiveViewGroup();
 }
 
 CyclicActionLoggerPtr ViewManager::getRenderTimer()
