@@ -116,10 +116,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
 	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patient()->getActiveData()));
-	mInteractiveClipper.reset(new InteractiveClipper(mBackend));
-	connect(this, SIGNAL(activeLayoutChanged()), mInteractiveClipper.get(), SIGNAL(changed()));
 	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
-	connect(mInteractiveClipper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
     this->loadGlobalSettings();
@@ -268,11 +265,6 @@ void ViewManager::settingsChangedSlot(QString key)
 	}
 }
 
-InteractiveClipperPtr ViewManager::getClipper()
-{
-	return mInteractiveClipper;
-}
-
 InteractiveCropperPtr ViewManager::getCropper()
 {
 	return mInteractiveCropper;
@@ -328,12 +320,6 @@ void ViewManager::addXml(QDomNode& parentNode)
 		viewGroupNode.setAttribute("index", i);
 		mViewGroups[i]->addXml(viewGroupNode);
 	}
-
-	if (mInteractiveClipper)
-	{
-		QString clippedImage = (mInteractiveClipper->getData()) ? mInteractiveClipper->getData()->getUid() : "";
-		base.addTextToElement("clippedImage", clippedImage);
-	}
 }
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
@@ -341,7 +327,6 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 	XMLNodeParser base(viewmanagerNode);
 
 	QString clippedImage = base.parseTextFromElement("clippedImage");
-	mInteractiveClipper->setData(mBackend->patient()->getData<Image>(clippedImage));
 
 	base.parseDoubleFromElementWithDefault("global2DZoom", mGlobal2DZoomVal->get().toDouble());
 
@@ -620,9 +605,16 @@ int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
 
 void ViewManager::autoShowData(DataPtr data)
 {
-    if (settings()->value("Automation/autoShowNewData").toBool()  && data)
+	if (settings()->value("Automation/autoShowNewData").toBool() && data)
 	{
 		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
+        if(settings()->value("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData").toBool())
+		{
+			for (unsigned i=0; i<mViewGroups.size(); ++i)
+				if (mViewGroups[i]->contains3DView())
+					mCameraControl->setSuperiorView();
+		}
+
 	}
 }
 

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
+#include "catch.hpp"
 
 namespace cxtest
 {
@@ -155,7 +156,7 @@ void TestRenderSpeed::createViews(int num)
 
 void TestRenderSpeed::showViews()
 {
-	CX_ASSERT(mMainWidget);
+	REQUIRE(mMainWidget);
 
 	mMainWidget->resize(1000,500);
 	mMainWidget->show();

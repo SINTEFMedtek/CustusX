@@ -22,6 +22,7 @@ if(BUILD_TESTING)
     target_link_libraries(cxtest_org_custusx_filter_tubesegmentation
         PRIVATE
         cxResource
+        cxResourceWidgets
         cxResourceFilter
         cxLogicManager
         tubeSegmentationLib

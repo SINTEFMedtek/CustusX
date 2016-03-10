@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
+#include "cxMathUtils.h"
 
 
 namespace cx
@@ -191,7 +192,7 @@ int TransferFunctionColorWidget::imageIntensity2screenX(int intensity)
 int TransferFunctionColorWidget::screenX2imageIntensity(int screenX)
 {
 	double i = mImage->getMin() + mImage->getRange() * double(screenX - mPlotArea.left()) /(mPlotArea.width()-1);
-	int retval = int(i+0.5);
+	int retval = roundAwayFromZero(i);
 	return retval;
 }
 

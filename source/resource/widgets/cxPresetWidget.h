@@ -66,6 +66,8 @@ public:
 
 	virtual void setPresets(PresetsPtr presets);
 
+    QString getLastUsedPresetNameFromSettingsFile() const;
+
 signals:
 	void presetSelected(QString name);
 
@@ -87,6 +89,7 @@ protected:
 	PresetsPtr mPresets;
 
 private:
+    void selectLastUsedPreset(); ///< reads settings file to select last used preset
 	QComboBox* mPresetsComboBox; ///< combobox for selecting presets
 	QHBoxLayout* mButtonLayout; ///< the layout where all the buttons are
 	QVBoxLayout* mLayout; ///< main layout

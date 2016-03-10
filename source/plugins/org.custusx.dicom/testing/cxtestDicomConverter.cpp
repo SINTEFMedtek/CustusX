@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxVolumeHelpers.h"
 #include "org_custusx_dicom_Export.h"
+#include "cxDicomWidget.h"
+#include "cxLogicManager.h"
 
 
 
@@ -56,6 +58,9 @@ typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
 typedef vtkSmartPointer<vtkMetaImageWriter> vtkMetaImageWriterPtr;
 typedef QSharedPointer<ctkDICOMDatabase> ctkDICOMDatabasePtr;
+
+namespace cxtest
+{
 
 class DicomConverterTestFixture
 {
@@ -154,6 +159,28 @@ public:
 		REQUIRE(strings.size()==1);
 		return strings.front();
 	}
+};
+
+typedef boost::shared_ptr<class DicomWidgetFixture> DicomWidgetFixturePtr;
+class DicomWidgetFixture : public cx::DicomWidget
+{
+public:
+	DicomWidgetFixture(ctkPluginContext* context) :
+		cx::DicomWidget(context, NULL)
+	{
+		this->init();
+	}
+
+	void init()
+	{
+		this->prePaintEvent();
+	}
+
+	ctkDICOMDatabase* getDb() const
+	{
+		return this->getDatabase();
+	}
+
 };
 
 TEST_CASE("DicomConverter: Fixture test", "[unit][plugins][org.custusx.dicom]")
@@ -303,3 +330,36 @@ TEST_CASE("DicomConverter: US data from SW, missing position data", "[integratio
     fixture.checkImagesEqual(convertedImage, referenceImage);
 }
 #endif
+
+TEST_CASE("DicomConverter: Auto delete database", "[integration][plugins][org.custusx.dicom]")
+{
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+
+	DicomWidgetFixture* widgetFixture = new DicomWidgetFixture(context);
+
+	//load DICOM
+	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
+	ctkDICOMDatabase* database = widgetFixture->getDb();
+	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
+	DICOMIndexer->addDirectory(*database,inputDicomDataDirectory,"");
+
+	QStringList patients = database->patients();
+	REQUIRE(patients.size() == 1);
+
+	//delete widget and create new
+	delete widgetFixture;
+	widgetFixture = new DicomWidgetFixture(context);
+	widgetFixture->init();
+
+	database = widgetFixture->getDb();
+	patients = database->patients();
+	REQUIRE(patients.empty());
+
+	cx::LogicManager::shutdown();
+	delete widgetFixture;
+}
+
+}//cxtest
+
