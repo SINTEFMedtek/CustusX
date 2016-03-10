@@ -70,10 +70,11 @@ public:
 	SelectRecordSession(XmlOptionFile options,
 						 AcquisitionServicePtr acquisitionService,
 						 VisServicesPtr services);
-	virtual ~SelectRecordSession()	{}
+	virtual ~SelectRecordSession();
 
 	void setTool(ToolPtr tool);
 	ToolPtr getTool();
+	void setVisible(bool on);
 	TimedTransformMap getRecordedTrackerData_prMt();
 	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
 
@@ -88,6 +89,7 @@ private:
 
 	StringPropertyPtr mSessionSelector;
 	ToolPtr mToolOverride;
+	bool mVisible;
 
 	void initSessionSelector();
 	ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);

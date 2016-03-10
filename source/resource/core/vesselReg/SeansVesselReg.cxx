@@ -250,9 +250,14 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 //	targetPolyData->Update();
 //	inputSourcePolyData->Update();
 	//Make sure we have stuff to work with
-	if (!inputSourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
+	if (!inputSourcePolyData->GetNumberOfPoints())
 	{
-		std::cerr << "Can't execute with empty source or target data" << std::endl;
+		std::cerr << "Can't execute with empty source data for source=" << source->getName() << std::endl;
+		return ContextPtr();
+	}
+	if (!targetPolyData->GetNumberOfPoints())
+	{
+		std::cerr << "Can't execute with empty target data for target=" << target->getName() << std::endl;
 		return ContextPtr();
 	}
 
@@ -506,16 +511,16 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sorte
 
 vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+//	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 
-	if (image)
-	{
-		//Grab the information from the files of target then
-		//filter out points not fit for the threshold
-		return this->extractPolyData(image, mt_singlePointThreshold, 0);
-	}
-	else if (mesh)
+//	if (image)
+//	{
+//		//Grab the information from the files of target then
+//		//filter out points not fit for the threshold
+//		return this->extractPolyData(image, mt_singlePointThreshold, 0);
+//	}
+	if (mesh)
 	{
 		return mesh->getTransformedPolyData(mesh->get_rMd());
 	}

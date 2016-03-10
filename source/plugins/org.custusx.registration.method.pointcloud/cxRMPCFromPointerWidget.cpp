@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionService.h"
 #include "cxRecordSessionSelector.h"
 #include "cxLogger.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -79,6 +80,8 @@ void RMPCFromPointerWidget::setup()
 	connect(mRecordTrackingWidget->getSessionSelector().get(), &StringProperty::changed,
 			this, &RMPCFromPointerWidget::inputChanged);
 	this->connectAutoRegistration();
+
+	connect(mServices->tracking().get(), &TrackingService::activeToolChanged, this, &RMPCFromPointerWidget::setModified);
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	layout->setMargin(0);
@@ -134,7 +137,8 @@ MeshPtr RMPCFromPointerWidget::getTrackerDataAsMesh()
 {
 	Transform3D rMpr = mServices->patient()->get_rMpr();
 
-	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
+	//	return mSelectRecordSession->getRecordedTrackerData_prMt();
+	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getSelectRecordSession()->getRecordedTrackerData_prMt();
 	vtkPolyDataPtr trackerdata_r = polydataFromTransforms(trackerRecordedData_prMt, rMpr);
 
 	MeshPtr moving(new Mesh("tracker_temp"));
@@ -151,6 +155,7 @@ void RMPCFromPointerWidget::inputChanged()
 	mSpaceListenerFixed->setSpace(mServices->spaceProvider()->getD(fixed));
 
 	this->onSpacesChanged();
+	this->setModified();
 }
 
 void RMPCFromPointerWidget::queuedAutoRegistration()
