@@ -107,7 +107,7 @@ ColorPropertyPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
 void BinaryThresholdImageFilter::createOptions()
 {
 	mThresholdOption = this->getThresholdOption(mOptions);
-	connect(mThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
+	connect(mThresholdOption.get(), &Property::changed, this, &BinaryThresholdImageFilter::thresholdSlot);
 	mOptionsAdapters.push_back(mThresholdOption);
 	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(mOptions));
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
@@ -165,8 +165,8 @@ void BinaryThresholdImageFilter::thresholdSlot()
 	if (mActive)
 	{
 		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-        if(!mPreviewImage)
-            return;
+		if(!mPreviewImage)
+			return;
 		Eigen::Vector2d threshold = Eigen::Vector2d(mThresholdOption->getValue()[0],  mThresholdOption->getValue()[1]);
 		mPreviewImage->startThresholdPreview(threshold);
 	}

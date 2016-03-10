@@ -31,28 +31,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
-//#include "TestVisServices.h"
-#include "cxVisServices.h"
 #include "cxtestfilter_export.h"
 #include "cxBinaryThresholdImageFilter.h"
+#include "cxtestVisServices.h"
 
-class CXTESTFILTER_EXPORT TestVisServices : public cx::VisServices
+namespace
 {
-
+typedef boost::shared_ptr<class BinaryThresholdImageFilterFixture> BinaryThresholdImageFilterFixturePtr;
+class BinaryThresholdImageFilterFixture : public cx::BinaryThresholdImageFilter
+{
+public:
+	BinaryThresholdImageFilterFixture(cx::VisServicesPtr services) :
+		cx::BinaryThresholdImageFilter(services)
+	{}
+	void init()
+	{
+		this->getOptions();
+		this->getInputTypes();
+		this->getOutputTypes();
+		this->setActive(true);
+	}
+	void callThresholdSlot()
+	{
+		this->thresholdSlot();
+	}
+	cx::ImagePtr getPreviewImage()
+	{
+		return mPreviewImage;
+	}
 
 };
+}
 
-TEST_CASE("BinaryThresholdImageFilter: update threshold with no image selected", "[unit][jon]")
+TEST_CASE("BinaryThresholdImageFilter: update threshold with no image selected", "[unit]")
 {
-    TestVisServices t;
-    boost::shared_ptr<cx::VisServices> ptr(&t);
+	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
+	BinaryThresholdImageFilterFixturePtr filterFixture = BinaryThresholdImageFilterFixturePtr(new BinaryThresholdImageFilterFixture(dummyservices));
+	REQUIRE(filterFixture);
 
-    cx::BinaryThresholdImageFilter filter(ptr);
-    filter.setActive(true);
-
-    //pcompile error? private func? How to call a non-private function which changes the threshold???
-    //filter.thresholdSlot();
-
-
-    CHECK(1 == 2);
+	filterFixture->init();
+	filterFixture->callThresholdSlot();
+	REQUIRE_FALSE(filterFixture->getPreviewImage());
 }
