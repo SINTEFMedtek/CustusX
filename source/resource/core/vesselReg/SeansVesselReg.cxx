@@ -250,12 +250,12 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 //	targetPolyData->Update();
 //	inputSourcePolyData->Update();
 	//Make sure we have stuff to work with
-	if (!inputSourcePolyData->GetNumberOfPoints())
+	if (!inputSourcePolyData || !inputSourcePolyData->GetNumberOfPoints())
 	{
 		std::cerr << "Can't execute with empty source data for source=" << source->getName() << std::endl;
 		return ContextPtr();
 	}
-	if (!targetPolyData->GetNumberOfPoints())
+	if (!targetPolyData || !targetPolyData->GetNumberOfPoints())
 	{
 		std::cerr << "Can't execute with empty target data for target=" << target->getName() << std::endl;
 		return ContextPtr();
