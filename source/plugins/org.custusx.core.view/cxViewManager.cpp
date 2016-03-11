@@ -170,9 +170,9 @@ void ViewManager::initializeActiveView()
 }
 
 
-
-NavigationPtr ViewManager::getNavigation()
+NavigationPtr ViewManager::getNavigation(int group)
 {
+	mCameraControl->refreshView(this->get3DView(group));
 	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
@@ -641,7 +641,10 @@ void ViewManager::autoResetCameraToSuperiorView()
 	{
 		for (unsigned i=0; i<mViewGroups.size(); ++i)
 			if (mViewGroups[i]->contains3DView())
+			{
+				mCameraControl->setView(this->get3DView(i));
 				mCameraControl->setSuperiorView();
+			}
 	}
 }
 
@@ -652,7 +655,7 @@ void ViewManager::autoCenterToImageCenter()
 		QList<unsigned> showInViewGroups = this->getViewGroupsToAutoShowIn();
 
 		foreach (unsigned i, showInViewGroups)
-			this->getNavigation()->centerToDataInViewGroup(this->getViewGroup(i));
+			this->getNavigation(i)->centerToDataInViewGroup(this->getViewGroup(i));
 	}
 }
 

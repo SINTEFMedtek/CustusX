@@ -147,7 +147,7 @@ public:
 	LayoutRepositoryPtr getLayoutRepository();
 
 	QActionGroup* createInteractorStyleActionGroup();
-	NavigationPtr getNavigation();
+	NavigationPtr getNavigation(int group = 0);
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
@@ -229,6 +229,7 @@ protected:
 private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
+protected:
 	void autoShowInViewGroups(DataPtr data);
 	void autoResetCameraToSuperiorView();
 	void autoCenterToImageCenter();
