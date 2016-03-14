@@ -37,13 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "cxViewGroupData.h"
-#include "cxtestTestDataStructures.h"
-#include "cxLogicManager.h"
-#include "cxView.h"
-#include "cxLogger.h"
-#include "cxPatientModelService.h"
-
 
 namespace cxtest
 {
@@ -57,10 +50,6 @@ public:
 	QList<unsigned> getAutoShowViewGroupNumbers()
 	{
 		return this->getViewGroupsToAutoShowIn();
-	}
-	void resetCameraToSuperiorView()
-	{
-		this->autoResetCameraToSuperiorView();
 	}
 };
 
@@ -76,50 +65,6 @@ TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.
     REQUIRE(showInViewGroups.size() == 2);
     CHECK(showInViewGroups[0] == 0);
     CHECK(showInViewGroups[1] == 4);
-}
-
-TEST_CASE("ViewManager: Auto reset camera to superior view", "[unit][plugins][org.custusx.core.view]")
-{
-    cx::LogicManager::initialize();
-    cx::DataLocations::setTestMode();
-
-    TestDataStructures testData;
-
-
-    cx::settings()->setValue("Automation/autoShowNewDataInViewGroup0", true);
-    cx::settings()->setValue("Automation/autoShowNewDataInViewGroup4", true);
-
-//    cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
-    cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
-
-    services->patient()->insertData(testData.image1);
-
-    ViewManagerFixturePtr viewManager = ViewManagerFixturePtr(new ViewManagerFixture(services));
-    viewManager->createLayoutWidget(NULL, 0);
-
-    cx::CameraControlPtr camera = viewManager->getCameraControl();
-
-    cx::ViewGroupDataPtr viewGroupData = viewManager->getViewGroup(0);
-    viewGroupData->addDataSorted(testData.image1->getUid());
-
-    cx::ViewPtr view0 = viewManager->get3DView(0);
-    REQUIRE(view0);
-    vtkCameraPtr vtkCamera = viewManager->get3DView(0)->getRenderer()->GetActiveCamera();
-    cx::Vector3D position(vtkCamera->GetPosition());
-    CX_LOG_DEBUG() << "camera pos: " << position;
-    CX_LOG_DEBUG() << "focal point: " << cx::Vector3D(vtkCamera->GetFocalPoint());
-    CX_LOG_DEBUG() << "View up: " << cx::Vector3D(vtkCamera->GetViewUp());
-    viewManager->resetCameraToSuperiorView();
-    vtkRendererPtr renderer = view0->getRenderer();
-    REQUIRE(renderer);
-//    renderer->ResetCamera();
-    cx::Vector3D changedposition(vtkCamera->GetPosition());
-    CX_LOG_DEBUG() << "camera pos: " << changedposition;
-    CX_LOG_DEBUG() << "focal point: " << cx::Vector3D(vtkCamera->GetFocalPoint());
-    CX_LOG_DEBUG() << "View up: " << cx::Vector3D(vtkCamera->GetViewUp());
-    REQUIRE_FALSE(cx::similar(position, changedposition));
-
-    cx::LogicManager::shutdown();
 }
 
 } // cxtest
