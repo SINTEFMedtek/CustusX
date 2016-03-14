@@ -655,8 +655,13 @@ void ViewManager::autoCenterToImageCenter()
 		QList<unsigned> showInViewGroups = this->getViewGroupsToAutoShowIn();
 
 		foreach (unsigned i, showInViewGroups)
-			this->getNavigation(i)->centerToDataInViewGroup(this->getViewGroup(i));
+			this->centerToImageCenterInViewGroup(i);
 	}
+}
+
+void ViewManager::centerToImageCenterInViewGroup(unsigned groupNr)
+{
+	this->getNavigation(groupNr)->centerToDataInViewGroup(this->getViewGroup(groupNr));
 }
 
 CyclicActionLoggerPtr ViewManager::getRenderTimer()

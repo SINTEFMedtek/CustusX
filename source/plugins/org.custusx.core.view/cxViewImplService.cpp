@@ -160,6 +160,11 @@ NavigationPtr ViewImplService::getNavigation()
 	return viewManager()->getNavigation();
 }
 
+void ViewImplService::centerToImageCenterInActiveViewGroup()
+{
+	viewManager()->centerToImageCenterInViewGroup(this->getActiveGroupId());
+}
+
 LayoutRepositoryPtr ViewImplService::getLayoutRepository()
 {
 	return viewManager()->getLayoutRepository();

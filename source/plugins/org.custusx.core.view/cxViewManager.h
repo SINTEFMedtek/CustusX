@@ -174,6 +174,7 @@ public:
 	void addXml(QDomNode& parentNode);
 	void parseXml(QDomNode viewmanagerNode);
 
+	void centerToImageCenterInViewGroup(unsigned groupNr);
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes

@@ -79,6 +79,7 @@ public:
 	virtual LayoutRepositoryPtr getLayoutRepository();
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* createInteractorStyleActionGroup();
+	virtual void centerToImageCenterInActiveViewGroup();
 
 	virtual bool isNull();
 
