@@ -119,7 +119,7 @@ protected:
 	void printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation);
 	vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints);
 	vtkAbstractTransformPtr nonLinearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints);
-	vtkPolyDataPtr convertToPolyData(DataPtr data);
+	vtkPolyDataPtr convertToPolyData(DataPtr data, QString id);
 	vtkPointsPtr transformPoints(vtkPointsPtr input, vtkAbstractTransformPtr transform);
 	vtkPointsPtr createSortedPoints(vtkIdListPtr sortedIDList, vtkPointsPtr unsortedPoints, int numPoints);
 	vtkPolyDataPtr crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, double margin);

@@ -83,10 +83,10 @@ PrepareVesselsWidget::PrepareVesselsWidget(RegServicesPtr services, QWidget* par
   connect(mColorProperty.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
 
   QPushButton* fixedButton = new QPushButton("Set as Fixed");
-  fixedButton->setToolTip("Set output of centerline generation as the Fixed Volume in Registration");
+  fixedButton->setToolTip("Set output of centerline generation as the Fixed Data in Registration");
   connect(fixedButton, SIGNAL(clicked()), this, SLOT(toFixedSlot()));
   QPushButton* movingButton = new QPushButton("Set as Moving");
-  movingButton->setToolTip("Set output of centerline generation as the Moving Volume in Registration");
+  movingButton->setToolTip("Set output of centerline generation as the Moving Data in Registration");
   connect(movingButton, SIGNAL(clicked()), this, SLOT(toMovingSlot()));
 
   QLayout* buttonsLayout = new QHBoxLayout;
