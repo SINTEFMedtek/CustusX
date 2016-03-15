@@ -133,7 +133,7 @@ void DataViewPropertiesInteractor::dataActionSlot()
 
 	if (firstData)
 	{
-		Navigation(mServices).centerToDataInActiveViewGroup(); // reset center for convenience
+		Navigation(mServices).centerToDataInViewGroup(mGroupData);
 		mGroupData->requestInitialize();
 	}
 }

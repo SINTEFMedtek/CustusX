@@ -30,52 +30,41 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXVIEWSERVICENULL_H_
-#define CXVIEWSERVICENULL_H_
+#include "catch.hpp"
+#include <vtkCamera.h>
+#include <vtkRenderer.h>
+#include "cxtestVisServices.h"
+#include "cxViewManager.h"
+#include "cxDataLocations.h"
+#include "cxSettings.h"
 
-#include "cxResourceVisualizationExport.h"
-
-#include "cxViewService.h"
-
-namespace cx
+namespace cxtest
 {
-class cxResourceVisualization_EXPORT ViewServiceNull : public ViewService
+typedef boost::shared_ptr<class ViewManagerFixture> ViewManagerFixturePtr;
+class ViewManagerFixture : public cx::ViewManager
 {
 public:
-	ViewServiceNull();
-
-	virtual ViewPtr get3DView(int group = 0, int index = 0);
-
-	virtual int getActiveGroupId() const;
-	virtual ViewGroupDataPtr getGroup(int groupIdx) const;
-	virtual void setRegistrationMode(REGISTRATION_STATUS mode);
-
-	virtual void autoShowData(DataPtr data);
-	virtual void enableRender(bool val);
-	virtual bool renderingIsEnabled() const;
-
-    virtual QWidget* createLayoutWidget(QWidget* parent, int index);
-    virtual QWidget* getLayoutWidget(int index);
-    virtual QString getActiveLayout(int widgetIndex) const;
-	virtual void setActiveLayout(const QString& uid, int widgetIndex);
-	virtual ClippersPtr getClippers();
-	virtual InteractiveCropperPtr getCropper();
-	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
-	virtual LayoutRepositoryPtr getLayoutRepository();
-	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
-	virtual void centerToImageCenterInActiveViewGroup();
-
-	virtual bool isNull();
-
-public slots:
-    virtual void aboutToStop(){}
-
-private:
-	void printWarning() const;
-	QActionGroup* mActionGroup;
-
+	ViewManagerFixture(cx::VisServicesPtr services) :
+		cx::ViewManager(services)
+	{}
+	QList<unsigned> getAutoShowViewGroupNumbers()
+	{
+		return this->getViewGroupsToAutoShowIn();
+	}
 };
-} //cx
-#endif // CXVIEWSERVICENULL_H_
+
+TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.core.view]")
+{
+    cx::DataLocations::setTestMode();
+
+    cx::settings()->setValue("Automation/autoShowNewDataInViewGroup0", true);
+    cx::settings()->setValue("Automation/autoShowNewDataInViewGroup4", true);
+    cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
+    ViewManagerFixturePtr viewManager = ViewManagerFixturePtr(new ViewManagerFixture(dummyservices));
+    QList<unsigned> showInViewGroups = viewManager->getAutoShowViewGroupNumbers();
+    REQUIRE(showInViewGroups.size() == 2);
+    CHECK(showInViewGroups[0] == 0);
+    CHECK(showInViewGroups[1] == 4);
+}
+
+} // cxtest
