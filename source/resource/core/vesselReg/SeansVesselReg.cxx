@@ -248,6 +248,9 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target, "target");
 	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source, "source");
 
+	if (!targetPolyData || !inputSourcePolyData) // error message has already been emitted in convertToPolyData()
+		return ContextPtr();
+
 	vtkPolyDataPtr sourcePolyData = this->crop(inputSourcePolyData, targetPolyData, margin);
 
 	//Make sure we have stuff to work with
