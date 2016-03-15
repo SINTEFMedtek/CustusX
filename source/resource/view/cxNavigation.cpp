@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxViewService.h"
 #include "cxActiveData.h"
-#include "cxLogger.h"
 
 namespace cx
 {

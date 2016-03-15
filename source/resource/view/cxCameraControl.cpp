@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include <QDomNode>
 #include "cxTypeConversions.h"
-#include "cxLogger.h"
 
 namespace cx
 {
