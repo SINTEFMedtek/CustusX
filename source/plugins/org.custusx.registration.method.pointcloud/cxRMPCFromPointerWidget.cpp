@@ -144,7 +144,7 @@ MeshPtr RMPCFromPointerWidget::getTrackerDataAsMesh()
 	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getSelectRecordSession()->getRecordedTrackerData_prMt();
 	vtkPolyDataPtr trackerdata_r = polydataFromTransforms(trackerRecordedData_prMt, rMpr);
 
-	MeshPtr moving(new Mesh("tracker_temp"));
+	MeshPtr moving(new Mesh("tracker_points"));
 	moving->setVtkPolyData(trackerdata_r);
 	return moving;
 }

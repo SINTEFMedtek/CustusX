@@ -524,7 +524,7 @@ vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data, QString id)
 
 	vtkPolyDataPtr poly = mesh->getTransformedPolyData(mesh->get_rMd());
 
-	if (!poly)
+	if (!poly || !poly->GetNumberOfPoints())
 	{
 		CX_LOG_ERROR(QString("Can't execute: %1=%2 is empty").arg(id, data->getName()));
 		return vtkPolyDataPtr();
@@ -628,7 +628,6 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 
 	// clip the source data with a box
 	vtkPlanesPtr box = vtkPlanesPtr::New();
-	//  std::cout << "bounds" << std::endl;
 	box->SetBounds(targetBounds);
 	if (mt_verbose)
 		std::cout << "bb: " << DoubleBoundingBox3D(targetBounds) << std::endl;
@@ -639,7 +638,13 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	clipper->Update();
 
 	int oldSource = input->GetPoints()->GetNumberOfPoints();
-	int clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
+
+	int clippedSource = 0;
+
+	if (clipper->GetOutput()->GetPoints())
+	{
+		clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
+	}
 
 	if (clippedSource < oldSource)
 	{
