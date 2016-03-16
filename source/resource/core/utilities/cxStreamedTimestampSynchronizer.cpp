@@ -68,8 +68,8 @@ double StreamedTimestampSynchronizer::average(ITER begin, ITER end) const
 {
     int size = std::distance(begin, end);
     double sum = 0;
-    for (; begin != end; ++begin)
-        sum += *begin;
+	for (; begin != end; ++begin)
+		sum += *begin;
     return sum / size;
 }
 
