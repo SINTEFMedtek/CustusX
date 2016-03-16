@@ -97,6 +97,8 @@ private:
     mutable double mLastComputedTimestampShift;
     QList<double> mDeltaWindow;
     int mMaxWindowSize;
+
+//	double mLastTimeStamp;
 };
 
 

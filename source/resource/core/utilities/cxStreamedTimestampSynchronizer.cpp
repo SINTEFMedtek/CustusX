@@ -57,7 +57,8 @@ public:
 
 StreamedTimestampSynchronizer::StreamedTimestampSynchronizer() :
     mLastComputedTimestampShift(0),
-    mMaxWindowSize(20)
+	mMaxWindowSize(20)
+//	mLastTimeStamp(0)
 {
 
 }
@@ -75,9 +76,14 @@ double StreamedTimestampSynchronizer::average(ITER begin, ITER end) const
 void StreamedTimestampSynchronizer::syncToCurrentTime(ImagePtr imgMsg)
 {
     QDateTime ts = imgMsg->getAcquisitionTime();
+	imgMsg->setOriginalAcquisitionTime(ts);
+//	CX_LOG_DEBUG() << "GE time: " << ts.toMSecsSinceEpoch() << " diff: " << ts.toMSecsSinceEpoch() - mLastTimeStamp;
+//	mLastTimeStamp = ts.toMSecsSinceEpoch();;
     this->addTimestamp(ts);
     ts = ts.addMSecs(this->getShift());
+//	CX_LOG_DEBUG() << "CX time: " << ts.toMSecsSinceEpoch() << " shift: " << std::setprecision(17) << this->getShift();
 
+	//TODO: Store 3 time types: Original from scanner, software acquisition time, and modified time created here
     imgMsg->setAcquisitionTime(ts);
 }
 

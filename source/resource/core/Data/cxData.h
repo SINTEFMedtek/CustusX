@@ -60,6 +60,13 @@ typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
+struct TimeInfo
+{
+	QDateTime mAcquisitionTime;///< Possibly modified time stamp
+	QDateTime mSoftwareAcquisitionTime;///< Time stamp created in at arrival in CX or CX related software
+	QDateTime mOriginalAcquisitionTime;///< Original aquisition time (from hardware if possible)
+};
+
 
 /** \brief Superclass for all data objects.
  *
@@ -77,6 +84,8 @@ public:
 	void setUid(const QString& uid);
 	void setName(const QString& name);
 	void setAcquisitionTime(QDateTime time);
+	void setSoftwareAcquisitionTime(QDateTime time);
+	void setOriginalAcquisitionTime(QDateTime time);
 	virtual RegistrationHistoryPtr get_rMd_History();
 	LandmarksPtr getLandmarks();
 
@@ -84,6 +93,7 @@ public:
 	virtual QString getName() const; /// \return a descriptive name for this instance
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
 	virtual QDateTime getAcquisitionTime() const;
+	virtual TimeInfo getAdvancedTimeInfo() const;
 	virtual QString getType() const
 	{
         return "data";
@@ -129,7 +139,7 @@ protected:
 	QString mUid;
 	QString mName;
 	QString mFilename;
-	QDateTime mAcquisitionTime;
+	TimeInfo mTimeInfo;
 	LandmarksPtr mLandmarks;
 
 	REGISTRATION_STATUS mRegistrationStatus;
