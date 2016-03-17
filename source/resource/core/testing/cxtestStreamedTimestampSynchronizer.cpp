@@ -107,11 +107,11 @@ TEST_CASE("StreamedTimestampSynchronizer: convergence to new value", "[unit]")
     CHECK(fabs(shift-diff+offset)<tol);
 }
 
-TEST_CASE("StreamedTimestampSynchronizer: unordered time stamps", "[unit]")
+TEST_CASE("StreamedTimestampSynchronizer: Outlayers", "[unit]")
 {
 	cx::StreamedTimestampSynchronizer syncer;
 
-	double tol = 1;
+	double tol = 2;
 	int diff = 1000;
 	QDateTime ts = QDateTime::currentDateTime();
 	ts = ts.addMSecs(-diff);
