@@ -30,74 +30,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXUR5CONNECTION_H
-#define CXUR5CONNECTION_H
-
-#include "cxSocketConnection.h"
-#include "org_custusx_robot_ur5_Export.h"
-#include "cxTransform3D.h"
-#include "cxVector3D.h"
-#include "cxUr5State.h"
-#include "cxUr5MessageDecoder.h"
-#include "cxUr5MessageEncoder.h"
-#include "cxUr5ProgramEncoder.h"
-
-
-namespace cx
+#include "cxMathUtils.h"
+namespace cx {
+double roundAwayFromZero(double val)
 {
-/**
- * Class that handles UR5 robot TCP connection.
- *
- * \ingroup org_custusx_robot_ur5
- *
- * \author Ole Vegard Solberg, SINTEF
- * \author Andreas Østvik
- * \date 2015-06-25
- */
-typedef boost::shared_ptr<class Ur5Connection> Ur5ConnectionPtr;
+	if(val >= 0)
+		return int(val+0.5);
+	else
+		return int(val-0.5);
+}
 
-class org_custusx_robot_ur5_EXPORT Ur5Connection : public SocketConnection
-{
-    Q_OBJECT
-
-public:
-    Ur5Connection(QString address, int port);
-    Ur5Connection();
-    ~Ur5Connection();
-
-    void setAddress(QString address, int port);
-    bool isConnectedToRobot();
-
-    Ur5State getCurrentState();
-    Ur5State getTargetState();
-    Ur5State getPreviousState();
-
-    bool sendMessage(QString message);
-
-    void updateCurrentState(QByteArray buffer);
-
-    void setProtocol(QString protocolname);
-
-private slots:
-    void internalDataAvailable();
-
-signals:
-    void stateChanged();
-
-private:
-    void clearCurrentTCP();
-
-    bool waitForUpdate();
-    bool isPotentialPacket(qint64 bytes);
-
-    Ur5MessageEncoder mMessageEncoder;
-    Ur5MessageDecoder mMessageDecoder;
-    Ur5State mCurrentState,mTargetState,mPreviousState;
-
-    ConnectionInfo info;
-};
-
-
-} // cx
-
-#endif // CXUR5CONNECTION_H
+}

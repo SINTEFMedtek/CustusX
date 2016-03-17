@@ -17,6 +17,7 @@ if(BUILD_TESTING)
     set(CXTEST_SOURCES_TO_MOC
     )
     set(CXTEST_PLUGINALGORITHM_SOURCES
+        cxtestBinaryThresholdImageFilter.cpp
         cxtestDilationFilter.cpp
         cxtestDummyAlgorithm.h
         cxtestDummyAlgorithm.cpp

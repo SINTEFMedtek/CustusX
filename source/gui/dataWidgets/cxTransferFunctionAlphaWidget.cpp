@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "vtkDataArray.h"
 #include "cxReporter.h"
+#include "cxMathUtils.h"
 
 
 namespace cx
@@ -352,8 +353,8 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
 
   double dposition = mImage->getMin() + mImage->getRange() * double(pos.x() - mPlotArea.left()) / mPlotArea.width();
   double dvalue = mImage->getMaxAlphaValue() * double(mPlotArea.bottom() - pos.y())/mPlotArea.height();
-  point.position = int(dposition+0.5);
-  point.value = int(dvalue+0.5);
+  point.position = roundAwayFromZero(dposition);
+  point.value = roundAwayFromZero(dvalue);
 
   point.position = constrainValue(point.position, mImage->getMin(), mImage->getMax());
   point.value = constrainValue(point.value, 0, mImage->getMaxAlphaValue());

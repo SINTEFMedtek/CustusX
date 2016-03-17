@@ -30,28 +30,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTUR5TESTFIXTURE_H
-#define CXTESTUR5TESTFIXTURE_H
+#include "catch.hpp"
+#include "cxtestfilter_export.h"
+#include "cxBinaryThresholdImageFilter.h"
+#include "cxtestVisServices.h"
 
-#include "cxUr5Robot.h"
-
-#include "cxtest_org_custusx_robot_ur5_export.h"
-
-namespace cxtest
+namespace
 {
-
-class CXTEST_ORG_CUSTUSX_ROBOT_UR5_EXPORT Ur5TestFixture
+typedef boost::shared_ptr<class BinaryThresholdImageFilterFixture> BinaryThresholdImageFilterFixturePtr;
+class BinaryThresholdImageFilterFixture : public cx::BinaryThresholdImageFilter
 {
 public:
-    Ur5TestFixture();
+	BinaryThresholdImageFilterFixture(cx::VisServicesPtr services) :
+		cx::BinaryThresholdImageFilter(services)
+	{}
+	void init()
+	{
+		this->getOptions();
+		this->getInputTypes();
+		this->getOutputTypes();
+		this->setActive(true);
+	}
+	void callThresholdSlot()
+	{
+		this->thresholdSlot();
+	}
+	cx::ImagePtr getPreviewImage()
+	{
+		return mPreviewImage;
+	}
 
-    cx::Ur5Robot mUr5Robot;
-    cx::Ur5Connection mUr5Connection;
-
-    QByteArray getTestData(int packetSize);
-    Eigen::MatrixXd jacobianUr5(Eigen::RowVectorXd jointPositions);
 };
+}
 
-} //cxtest
+TEST_CASE("BinaryThresholdImageFilter: update threshold with no image selected", "[unit]")
+{
+	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
+	BinaryThresholdImageFilterFixturePtr filterFixture = BinaryThresholdImageFilterFixturePtr(new BinaryThresholdImageFilterFixture(dummyservices));
+	REQUIRE(filterFixture);
 
-#endif // CXTESTUR5TESTFIXTURE_H
+	filterFixture->init();
+	filterFixture->callThresholdSlot();
+	REQUIRE_FALSE(filterFixture->getPreviewImage());
+}

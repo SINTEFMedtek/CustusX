@@ -66,7 +66,7 @@ ImagePtr UnsignedDerivedImage::create(ImagePtr base)
     return retval;
 }
 
-UnsignedDerivedImage::UnsignedDerivedImage(ImagePtr base) : Image(base->getUid()+"_u", base->getBaseVtkImageData(), base->getName())
+UnsignedDerivedImage::UnsignedDerivedImage(ImagePtr base) : Image(base->getUid()+"_u", vtkImageDataPtr(), base->getName())
 {
     this->mBase = base;
 
