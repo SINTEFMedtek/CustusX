@@ -65,6 +65,38 @@ struct TimeInfo
 	QDateTime mAcquisitionTime;///< Possibly modified time stamp
 	QDateTime mSoftwareAcquisitionTime;///< Time stamp created in at arrival in CX or CX related software
 	QDateTime mOriginalAcquisitionTime;///< Original aquisition time (from hardware if possible)
+
+	TimeInfo() :
+		mAcquisitionTime(QDateTime()),
+		mSoftwareAcquisitionTime(QDateTime()),
+		mOriginalAcquisitionTime(QDateTime())
+	{
+	}
+	TimeInfo(double acquisitionTime) :
+		mSoftwareAcquisitionTime(QDateTime()),
+		mOriginalAcquisitionTime(QDateTime())
+	{
+		this->setAcquisitionTime(acquisitionTime);
+	}
+
+	double getAcquisitionTime() const
+	{
+		return mAcquisitionTime.toMSecsSinceEpoch();
+	}
+	void setAcquisitionTime(double mSecsSinceEpoch)
+	{
+		mAcquisitionTime.setMSecsSinceEpoch(mSecsSinceEpoch);
+	}
+
+	double getSoftwareAcquisitionTime() const
+	{
+		return mSoftwareAcquisitionTime.toMSecsSinceEpoch();
+	}
+	double getScannerAcquisitionTime() const
+	{
+		return mOriginalAcquisitionTime.toMSecsSinceEpoch();
+	}
+
 };
 
 

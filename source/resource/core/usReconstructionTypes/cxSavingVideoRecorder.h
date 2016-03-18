@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxData.h"
 
 namespace cx
 {
@@ -77,14 +78,14 @@ public:
 	/**
 	  * Add data to be saved.
 	  */
-	QString addData(double timestamp, vtkImageDataPtr data);
+	QString addData(TimeInfo timestamp, vtkImageDataPtr data);
 	void stop();
 	void cancel();
 
 protected:
 	struct DataType
 	{
-		double mTimestamp;
+		TimeInfo mTimestamp;
 		QString mImageFilename;
 		vtkImageDataPtr mImage;
 	};
@@ -107,6 +108,7 @@ protected:
 	bool openTimestampsFile();
 	bool closeTimestampsFile();
 	void write(DataType data);
+	void writeTimeStampsFile(TimeInfo timeStamps);
 };
 
 /** \brief Recorder for a VideoSource.
@@ -133,7 +135,7 @@ public:
 	void cancel();
 
 	CachedImageDataContainerPtr getImageData();
-	std::vector<double> getTimestamps();
+	std::vector<TimeInfo> getTimestamps();
 	QString getSaveFolder() { return mSaveFolder; }
 
 	/** Call to force complete the writing of data to disk.
@@ -150,7 +152,7 @@ private:
 	  */
 	void deleteFolder(QString folder);
 	CachedImageDataContainerPtr mImages;
-	std::vector<double> mTimestamps;
+	std::vector<TimeInfo> mTimestamps;
 	QString mSaveFolder;
 	QString mPrefix;
 	VideoSourcePtr mSource;

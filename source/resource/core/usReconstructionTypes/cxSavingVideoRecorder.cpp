@@ -72,7 +72,7 @@ VideoRecorderSaveThread::~VideoRecorderSaveThread()
 {
 }
 
-QString VideoRecorderSaveThread::addData(double timestamp, vtkImageDataPtr image)
+QString VideoRecorderSaveThread::addData(TimeInfo timestamp, vtkImageDataPtr image)
 {
 	if (!image)
 		return "";
@@ -117,22 +117,19 @@ bool VideoRecorderSaveThread::closeTimestampsFile()
 {
 	mTimestampsFile.close();
 
-	QFileInfo info(mTimestampsFile);
-	if (!mCancel)
-	{
+//	QFileInfo info(mTimestampsFile);
+//	if (!mCancel)
+//	{
 //		report(QString("Saved %1 timestamps to file %2")
 //										.arg(mImageIndex)
 //										.arg(info.fileName()));
-	}
+//	}
 	return true;
 }
 
 void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 {
-	// write timestamp
-	QTextStream stream(&mTimestampsFile);
-	stream << qstring_cast(data.mTimestamp);
-	stream << endl;
+	this->writeTimeStampsFile(data.mTimestamp);
 
 	// convert to 8 bit data if applicable.
 	if (!mWriteColor && data.mImage->GetNumberOfScalarComponents()>2)
@@ -150,6 +147,13 @@ void VideoRecorderSaveThread::write(VideoRecorderSaveThread::DataType data)
 	writer->SetFileName(cstring_cast(data.mImageFilename));
 	writer->SetCompression(mCompressed);
 	writer->Write();
+}
+
+void VideoRecorderSaveThread::writeTimeStampsFile(TimeInfo timeStamps)
+{
+	QTextStream stream(&mTimestampsFile);
+	stream << qstring_cast(timeStamps.getAcquisitionTime());
+	stream << endl;
 }
 
 /** Write all pending images to file.
@@ -227,8 +231,7 @@ void SavingVideoRecorder::newFrameSlot()
 		return;
 
 	vtkImageDataPtr image = mSource->getVtkImageData();
-//	image->Update();
-	double timestamp = mSource->getTimestamp();
+	TimeInfo timestamp = mSource->getAdvancedTimeInfo();
 	QString filename = mSaveThread->addData(timestamp, image);
 
 	mImages->append(filename);
@@ -240,7 +243,7 @@ CachedImageDataContainerPtr SavingVideoRecorder::getImageData()
 	return mImages;
 }
 
-std::vector<double> SavingVideoRecorder::getTimestamps()
+std::vector<TimeInfo> SavingVideoRecorder::getTimestamps()
 {
 	return mTimestamps;
 }

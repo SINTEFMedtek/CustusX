@@ -144,7 +144,7 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory_prMt(mRecordingTool, mSession, true);
 
 	CachedImageDataContainerPtr imageData = videoRecorder->getImageData();
-	std::vector<double> imageTimestamps = videoRecorder->getTimestamps();
+	std::vector<TimeInfo> imageTimestamps = videoRecorder->getTimestamps();
 	QString streamSessionName = mSession->getDescription()+"_"+videoRecorder->getSource()->getUid();
 
 	UsReconstructionFileMakerPtr fileMaker;
