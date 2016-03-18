@@ -60,7 +60,7 @@ typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 
-struct TimeInfo
+struct cxResource_EXPORT TimeInfo
 {
 	QDateTime mAcquisitionTime;///< Possibly modified time stamp
 	QDateTime mSoftwareAcquisitionTime;///< Time stamp created in at arrival in CX or CX related software
