@@ -25,7 +25,10 @@ if(BUILD_TESTING)
         cxtest_org_custusx_core_tracking
         PRIVATE
         cxtestUtilities
-        org_custusx_core_tracking cxCatch)
+        cxResource
+        org_custusx_core_tracking
+        cxCatch
+    )
     cx_add_tests_to_catch(cxtest_org_custusx_core_tracking)
         
 endif(BUILD_TESTING)
