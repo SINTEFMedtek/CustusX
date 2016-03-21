@@ -46,12 +46,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QDateTime>
+#include "cxData.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
-class TimeInfo;
 
 /** \brief video source interface.
  *
