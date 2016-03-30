@@ -64,7 +64,7 @@ TrackedStream::~TrackedStream()
 {
 	if(mVideoSource)
 	{
-		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrameSlot);
 		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
 	}
 }
@@ -120,7 +120,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
 	if(mVideoSource)
 	{
-		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrameSlot);
 		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
 	}
 
@@ -138,7 +138,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 void TrackedStream::newFrameSlot()
 {
 	//TODO: Check if we need to turn this on/off
-	if (mImage && mVideoSource)
+	if (mImage && mVideoSource && mVideoSource->isStreaming())
 	{
 		mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
 		emit newFrame();
