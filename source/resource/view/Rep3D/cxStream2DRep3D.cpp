@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxVideoSourceGraphics.h"
 #include "cxView.h"
+#include "cxLogger.h"
 
 namespace cx
 {
