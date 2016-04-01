@@ -46,17 +46,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxView.h"
-
+#include "cxSessionStorageServiceProxy.h"
+#include "cxPatientStorage.h"
+#include "cxVisServices.h"
 
 
 
 namespace cx
 {
 
-VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
+VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
 	mHorizontalLayout(new QHBoxLayout(this)),
-	mControlsEnabled(false)
+	mControlsEnabled(false),
+	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
 	this->setObjectName("Virtual Bronchoscopy Widget");
 	this->setWindowTitle("Virtual Bronchoscopy");
@@ -64,16 +67,15 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	this->setFocusPolicy(Qt::StrongFocus);  // Widget needs focus to handle Key events
 
-	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	mViewService = ViewServicePtr(new ViewServiceProxy(context));
-	mTrackingService = TrackingServiceProxy::create(context);
-
-	mRouteToTarget = StringPropertySelectMesh::New(mPatientModelService);
+	mRouteToTarget = StringPropertySelectMesh::New(services->patient());
 	mRouteToTarget->setValueName("Route to target path: ");
+	mStorage->storeVariable("routeToTarget",
+							boost::bind(&StringPropertySelectMesh::getValue, mRouteToTarget),
+							boost::bind(&StringPropertySelectMesh::setValue, mRouteToTarget, _1));
 
 	// Selector for route to target
 	QVBoxLayout *inputVbox = new QVBoxLayout;
-	inputVbox->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this,mRouteToTarget));
+	inputVbox->addWidget(new DataSelectWidget(services->view(), services->patient(), this,mRouteToTarget));
 	QGroupBox *inputBox = new QGroupBox(tr("Input"));
 	inputBox->setLayout(inputVbox);
 	mHorizontalLayout->addWidget(inputBox);
@@ -121,7 +123,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	this->enableControls(false);
 
-	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService, mViewService);
+	mCameraPath = new CXVBcameraPath(services->tracking(), services->patient(), services->view());
 
 	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,
 			this, &VBWidget::inputChangedSlot);

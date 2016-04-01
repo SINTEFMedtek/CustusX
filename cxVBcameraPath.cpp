@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewServiceProxy.h"
 #include "cxView.h"
+#include "cxLogger.h"
 
 
 
@@ -171,7 +172,7 @@ void CXVBcameraPath::cameraViewAngleSlot(int angle)
 
 void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
-	std::cout << "CXVBcameraPath::cameraRotateAngleSlot : " << angle << std::endl;
+//	std::cout << "CXVBcameraPath::cameraRotateAngleSlot : " << angle << std::endl;
 	mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
 	mViewService->get3DView()->setModified();

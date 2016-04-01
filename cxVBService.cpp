@@ -33,19 +33,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVBService.h"
 #include "ctkPluginContext.h"
 #include "cxVBWidget.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-VBGUIExtenderService::VBGUIExtenderService(ctkPluginContext *context) :
-	mContext(context)
+VBGUIExtenderService::VBGUIExtenderService(VisServicesPtr services) :
+	mServices(services)
 {
 }
 std::vector<GUIExtenderService::CategorizedWidget> VBGUIExtenderService::createWidgets() const
 {
 	std::vector<CategorizedWidget> retval;
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-						 new VBWidget(mContext, NULL),
+						 new VBWidget(mServices, NULL),
 						 "Utility"));
 
 	return retval;
