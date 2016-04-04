@@ -164,18 +164,14 @@ void CXVBcameraPath::updateManualToolPosition()
 
 void CXVBcameraPath::cameraViewAngleSlot(int angle)
 {
-//	std::cout << "CXVBcameraPath::cameraViewAngleSlot : " << angle << std::endl;
 	mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
-	mViewService->get3DView()->setModified();
 }
 
 void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
-//	std::cout << "CXVBcameraPath::cameraRotateAngleSlot : " << angle << std::endl;
 	mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180);
 	this->updateManualToolPosition();
-	mViewService->get3DView()->setModified();
 }
 
 } /* namespace cx */
