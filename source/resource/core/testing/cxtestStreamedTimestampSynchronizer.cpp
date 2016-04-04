@@ -60,7 +60,7 @@ TEST_CASE("StreamedTimestampSynchronizer: many ts and outliers", "[unit]")
 
     // initialize syncer with one value
     syncer.addTimestamp(ts);
-    syncer.getShift();
+	syncer.getShift();
 
     // add lots of normal values
     for (int i=0; i<18; ++i)
@@ -105,6 +105,34 @@ TEST_CASE("StreamedTimestampSynchronizer: convergence to new value", "[unit]")
 
     double shift = syncer.getShift();
     CHECK(fabs(shift-diff+offset)<tol);
+}
+
+TEST_CASE("StreamedTimestampSynchronizer: Outlayers", "[unit]")
+{
+	cx::StreamedTimestampSynchronizer syncer;
+
+	double tol = 2;
+	int diff = 1000;
+	QDateTime ts = QDateTime::currentDateTime();
+	ts = ts.addMSecs(-diff);
+
+	// Initialize filter with "normal" values
+	for (int i=0; i<20; ++i)
+		syncer.addTimestamp(ts.addMSecs(0));
+
+	syncer.getShift(); //Needed initialize
+
+	syncer.addTimestamp(ts.addMSecs(+ 100));
+	CHECK(fabs(syncer.getShift()-diff)<tol);
+
+	syncer.addTimestamp(ts.addMSecs(- 200));
+	CHECK(fabs(syncer.getShift()-diff)<tol);
+
+	syncer.addTimestamp(ts.addMSecs(+ 300));
+	CHECK(fabs(syncer.getShift()-diff)<tol);
+
+	syncer.addTimestamp(ts.addMSecs(+ 400));
+	CHECK(fabs(syncer.getShift()-diff)<tol);
 }
 
 } // namespace cxtest

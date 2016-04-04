@@ -70,6 +70,7 @@ public:
 	virtual QString getName();
 	virtual vtkImageDataPtr getVtkImageData();
 	virtual double getTimestamp();
+	virtual TimeInfo getAdvancedTimeInfo();
 
 	virtual QString getInfoString() const;
 	virtual QString getStatusString() const;

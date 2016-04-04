@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QDateTime>
+#include "cxData.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
@@ -71,6 +72,7 @@ public:
 	virtual QString getName() = 0;
 	virtual vtkImageDataPtr getVtkImageData() = 0;
 	virtual double getTimestamp() = 0;
+	virtual TimeInfo getAdvancedTimeInfo() = 0;
 
 	virtual QString getInfoString() const = 0; ///< an information text intended to be visible along with the data stream at all times
 	virtual QString getStatusString() const = 0; ///< status text describing the stream state, display instead of stream when the stream is invalid.
