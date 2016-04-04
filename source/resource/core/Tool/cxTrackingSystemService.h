@@ -38,7 +38,6 @@ public:
 
 signals:
 	void stateChanged();
-	void newProbe(const ToolPtr probe);
 
 };
 } //namespace cx

@@ -95,6 +95,7 @@ signals:
 
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
+	virtual void videoSourcesChangedSlot();
 
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
