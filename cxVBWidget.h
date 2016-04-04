@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVBcameraPath.h"
 
 
-class QHBoxLayout;
+class QVBoxLayout;
 class QDial;
 class QSlider;
 
@@ -69,10 +69,10 @@ public:
 
 private:
 	QString defaultWhatsThis() const;
-	QHBoxLayout*				mHorizontalLayout;
+	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;
 	QDial*						mRotateDial;
-	QSlider*					mViewSlider;
+	QDial*						mViewSlider;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;

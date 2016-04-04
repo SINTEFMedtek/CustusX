@@ -57,7 +57,7 @@ namespace cx
 
 VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
-	mHorizontalLayout(new QHBoxLayout(this)),
+	mVerticalLayout(new QVBoxLayout(this)),
 	mControlsEnabled(false),
 	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
@@ -78,7 +78,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	inputVbox->addWidget(new DataSelectWidget(services->view(), services->patient(), this,mRouteToTarget));
 	QGroupBox *inputBox = new QGroupBox(tr("Input"));
 	inputBox->setLayout(inputVbox);
-	mHorizontalLayout->addWidget(inputBox);
+	mVerticalLayout->addWidget(inputBox);
 
 	// Selectors for position along path and play/pause
 	QHBoxLayout *playbackHBox = new QHBoxLayout;
@@ -92,7 +92,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	playbackHBox->addWidget(labelTarget);
 //	playbackHBox->addWidget(speedSpinbox);
 	playbackBox->setLayout(playbackHBox);
-	mHorizontalLayout->addWidget(playbackBox);
+	mVerticalLayout->addWidget(playbackBox);
 	mPlaybackSlider->setMinimum(0);
 	mPlaybackSlider->setMaximum(100);
 
@@ -100,13 +100,11 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QGroupBox	*endoscopeBox = new QGroupBox(tr("Endoscope"));
 	QGridLayout	*endoscopeControlLayout = new QGridLayout;
 	QLabel		*labelRot = new QLabel(tr("Rotate"));
-	QLabel		*labelView = new QLabel(tr("View Direction (degrees left/right)"));
-	QLabel		*label1 = new QLabel(tr("-30 "));
-	QLabel		*label2 = new QLabel(tr(" 30"));
+	QLabel		*labelView = new QLabel(tr("Left/right (30 deg)"));
 	mRotateDial = new QDial;
 	mRotateDial->setMinimum(-180);
 	mRotateDial->setMaximum(180);
-	mViewSlider = new QSlider(Qt::Horizontal);
+	mViewSlider = new QDial;
 	mViewSlider->setMinimum(-30);
 	mViewSlider->setMaximum(30);
 
@@ -114,11 +112,9 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
-	endoscopeControlLayout->addWidget(label1,1,1);
 	endoscopeControlLayout->addWidget(mViewSlider,1,2);
-	endoscopeControlLayout->addWidget(label2,1,3);
 	endoscopeBox->setLayout(endoscopeControlLayout);
-	mHorizontalLayout->addWidget(endoscopeBox);
+	mVerticalLayout->addWidget(endoscopeBox);
 
 
 	this->enableControls(false);
@@ -132,6 +128,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	connect(mViewSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 
+	mVerticalLayout->addStretch();
 //	mHorizontalLayout->addStretch();
 //	mHorizontalLayout->addWidget(new QLabel("Virtual Bronchoscopy functionality ..."));
 }
