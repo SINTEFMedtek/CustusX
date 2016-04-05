@@ -47,6 +47,10 @@ class Component(object):
     def sourceFolder(self):
         return self.name()
     def path(self):
+        print "path start"
+        print "path 1", self.controlData.getWorkingPath()
+        print "path 2", self.name()
+        print "path 3"
         return self.controlData.getWorkingPath() + "/" + self.name()
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
