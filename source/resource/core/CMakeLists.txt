@@ -219,7 +219,6 @@ cx_add_class(cxResource_SOURCE
     settings/cxSettings
     settings/cxSessionStorageServiceProxy
     settings/cxRequestEnterStateTransition.h
-    settings/cxStateServiceBackend
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx

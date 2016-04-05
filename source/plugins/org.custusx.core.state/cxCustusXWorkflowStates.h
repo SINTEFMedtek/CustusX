@@ -48,14 +48,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 class org_custusx_core_state_EXPORT PatientDataWorkflowState: public WorkflowState
 {
 Q_OBJECT
 
 public:
-	PatientDataWorkflowState(QState* parent, StateServiceBackendPtr backend) :
+	PatientDataWorkflowState(QState* parent, CoreServicesPtr backend) :
 					WorkflowState(parent, "PatientDataUid", "Patient Data", backend)
 	{}
 	virtual ~PatientDataWorkflowState() {}
@@ -69,7 +68,7 @@ class org_custusx_core_state_EXPORT NavigationWorkflowState: public WorkflowStat
 Q_OBJECT
 
 public:
-	NavigationWorkflowState(QState* parent, StateServiceBackendPtr backend);
+	NavigationWorkflowState(QState* parent, CoreServicesPtr services);
 	virtual ~NavigationWorkflowState() {}
 	virtual QIcon getIcon() const
 	{
@@ -84,7 +83,7 @@ class org_custusx_core_state_EXPORT RegistrationWorkflowState: public WorkflowSt
 Q_OBJECT
 
 public:
-	RegistrationWorkflowState(QState* parent, StateServiceBackendPtr backend);
+	RegistrationWorkflowState(QState* parent, CoreServicesPtr services);
 
 	virtual ~RegistrationWorkflowState() {}
 	virtual QIcon getIcon() const
@@ -100,7 +99,7 @@ class org_custusx_core_state_EXPORT PreOpPlanningWorkflowState: public WorkflowS
 Q_OBJECT
 
 public:
-	PreOpPlanningWorkflowState(QState* parent, StateServiceBackendPtr backend);
+	PreOpPlanningWorkflowState(QState* parent, CoreServicesPtr services);
 
 	virtual ~PreOpPlanningWorkflowState()
 	{}
@@ -117,7 +116,7 @@ class org_custusx_core_state_EXPORT IntraOpImagingWorkflowState: public Workflow
 Q_OBJECT
 
 public:
-	IntraOpImagingWorkflowState(QState* parent, StateServiceBackendPtr backend);
+	IntraOpImagingWorkflowState(QState* parent, CoreServicesPtr services);
 	virtual ~IntraOpImagingWorkflowState()
 	{}
 	virtual QIcon getIcon() const
@@ -134,7 +133,7 @@ class org_custusx_core_state_EXPORT PostOpControllWorkflowState: public Workflow
 Q_OBJECT
 
 public:
-	PostOpControllWorkflowState(QState* parent, StateServiceBackendPtr backend);
+	PostOpControllWorkflowState(QState* parent, CoreServicesPtr services);
 	virtual ~PostOpControllWorkflowState() {}
 	virtual QIcon getIcon() const
 	{

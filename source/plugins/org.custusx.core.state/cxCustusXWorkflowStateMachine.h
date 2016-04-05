@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /** \brief State Machine for the Workflow Steps for CustusX
  *
@@ -55,7 +54,7 @@ class org_custusx_core_state_EXPORT CustusXWorkflowStateMachine : public Workflo
 {
 Q_OBJECT
 public:
-        CustusXWorkflowStateMachine(StateServiceBackendPtr backend);
+		CustusXWorkflowStateMachine(CoreServicesPtr services);
         virtual ~CustusXWorkflowStateMachine();
 
 };

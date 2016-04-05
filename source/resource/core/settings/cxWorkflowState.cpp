@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxTool.h"
 #include "cxVideoService.h"
-#include "cxStateServiceBackend.h"
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
@@ -100,9 +100,9 @@ void WorkflowState::setActionSlot()
 void WorkflowState::autoStartHardware()
 {
 	if (settings()->value("Automation/autoStartTracking").toBool())
-		mBackend->tracking()->setState(Tool::tsTRACKING);
+		mServices->tracking()->setState(Tool::tsTRACKING);
 	if (settings()->value("Automation/autoStartStreaming").toBool())
-		mBackend->video()->openConnection();
+		mServices->video()->openConnection();
 }
 
 
