@@ -40,7 +40,7 @@ class Component(object):
         return retval
     def name(self):
         'return name of component'
-        raise "Not Implemented"
+        raise RuntimeError("Not Implemented")
     def help(self):
         'description of item'
         return ''
@@ -48,9 +48,6 @@ class Component(object):
         return self.name()
     def path(self):
         return self.controlData.getWorkingPath() + "/" + self.name()
-#    def path(self):
-#        'return path where component will be installed'
-#        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
             print "*** %s already exists, checkout ignored." % path
@@ -64,15 +61,11 @@ class Component(object):
         if self._checkout_check_exist('%s/.svn'%path):
             return
         self._rawCheckout()
-#    def _rawCheckout(self):
-#        'checkout the component source from external source to this computer (svn co or similar)'
-#        raise "Not Implemented"
     def _rawCheckout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         repo = self.repository()
         if repo=="":
-            raise "Not Implemented"            
-        #self.sourceFolder()
+            raise RuntimeError("Not Implemented")
         self._getBuilder().gitClone(self.repository(), self.sourceFolder())
     def update(self):
         'update the component source (svn up or similar)'
@@ -143,7 +136,7 @@ class CppComponent(Component):
     def installPath(self):
         return self.buildPath()
     def configure(self):
-        raise "Not Implemented"
+        raise RuntimeError("Not Implemented")
     def reset(self):
         'delete build folder(s)'
         self._getBuilder().reset()
