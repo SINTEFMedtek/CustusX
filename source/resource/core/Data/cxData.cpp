@@ -51,7 +51,9 @@ namespace cx
 Data::Data(const QString& uid, const QString& name) :
 	mUid(uid), mFilename(""), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
 {
-	mAcquisitionTime = QDateTime::currentDateTime();
+	mTimeInfo.mAcquisitionTime = QDateTime::currentDateTime();
+	mTimeInfo.mSoftwareAcquisitionTime = QDateTime();
+	mTimeInfo.mOriginalAcquisitionTime = QDateTime();
 
 	if (name == "")
 		mName = mUid;
@@ -136,7 +138,7 @@ void Data::addXml(QDomNode& dataNode)
 	dataNode.appendChild(filePathNode);
 
 	QDomElement acqTimeNode = doc.createElement("acqusitionTime");
-	acqTimeNode.appendChild(doc.createTextNode(mAcquisitionTime.toString(timestampMilliSecondsFormat())));
+	acqTimeNode.appendChild(doc.createTextNode(mTimeInfo.mAcquisitionTime.toString(timestampMilliSecondsFormat())));
 	dataNode.appendChild(acqTimeNode);
 
 	if (!mLandmarks->getLandmarks().empty())
@@ -156,7 +158,7 @@ void Data::parseXml(QDomNode& dataNode)
 	m_rMd_History->parseXml(registrationHistory);
 
 	if (!dataNode.namedItem("acqusitionTime").toElement().isNull())
-		mAcquisitionTime = QDateTime::fromString(dataNode.namedItem("acqusitionTime").toElement().text(),
+		mTimeInfo.mAcquisitionTime = QDateTime::fromString(dataNode.namedItem("acqusitionTime").toElement().text(),
 			timestampMilliSecondsFormat());
 
 	if (mLandmarks)
@@ -168,8 +170,8 @@ void Data::parseXml(QDomNode& dataNode)
  */
 QDateTime Data::getAcquisitionTime() const
 {
-	if (!mAcquisitionTime.isNull())
-		return mAcquisitionTime;
+	if (!mTimeInfo.mAcquisitionTime.isNull())
+		return mTimeInfo.mAcquisitionTime;
 	// quickie implementation: Assume uid contains time on format timestampSecondsFormat():
 
 	// retrieve timestamp as
@@ -182,9 +184,24 @@ QDateTime Data::getAcquisitionTime() const
 	return QDateTime();
 }
 
+TimeInfo Data::getAdvancedTimeInfo() const
+{
+	return mTimeInfo;
+}
+
 void Data::setAcquisitionTime(QDateTime time)
 {
-	mAcquisitionTime = time;
+	mTimeInfo.mAcquisitionTime = time;
+}
+
+void Data::setSoftwareAcquisitionTime(QDateTime time)
+{
+	mTimeInfo.mSoftwareAcquisitionTime = time;
+}
+
+void Data::setOriginalAcquisitionTime(QDateTime time)
+{
+	mTimeInfo.mOriginalAcquisitionTime = time;
 }
 
 LandmarksPtr Data::getLandmarks()

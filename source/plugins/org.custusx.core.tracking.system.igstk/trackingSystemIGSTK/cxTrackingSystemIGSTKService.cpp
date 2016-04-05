@@ -214,8 +214,6 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 		if (tool->isValid())
 		{
 			mTools.push_back(tool);
-			if (tool->getProbe())
-				emit newProbe(tool);
 		}
 		else
 			reportWarning("Creation of the cxTool " + it->second->getUid() + " failed.");

@@ -68,7 +68,6 @@ void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
 	connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &TrackingService::activeToolChanged);
-	connect(mTrackingService.get(), &TrackingService::newProbe, this, &TrackingService::newProbe);
 
     emit stateChanged();
     emit activeToolChanged(mTrackingService->getActiveTool()->getUid());
@@ -78,7 +77,6 @@ void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
 {
 	disconnect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
 	disconnect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &TrackingService::activeToolChanged);
-	disconnect(mTrackingService.get(), &TrackingService::newProbe, this, &TrackingService::newProbe);
 
 	mTrackingService = TrackingService::getNullObject();
 
