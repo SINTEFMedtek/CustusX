@@ -43,8 +43,6 @@ namespace cxtest
 
 namespace  {
 
-const char* testLabels = QString("[unit][resource][widgets]").toStdString().c_str();
-
 struct CXTESTRESOURCEWIDGETS_EXPORT testWidget
 {
     cx::OptionsWidget mOptionsWidget;
@@ -74,13 +72,13 @@ struct CXTESTRESOURCEWIDGETS_EXPORT testWidget
 
 } //namespace
 
-TEST_CASE("OptionsWidget with no options (and hence no advanced options)", testLabels)
+TEST_CASE("OptionsWidget with no options (and hence no advanced options)", "[unit][resource][widgets]")
 {
     testWidget tw(false, false);
     tw.testThatHasOptionsMethodsReturnTheExpected();
 }
 
-TEST_CASE("OptionsWidget with one option which is not advanced", testLabels)
+TEST_CASE("OptionsWidget with one option which is not advanced", "[unit][resource][widgets]")
 {
     testWidget tw(true, false);
 
@@ -90,7 +88,7 @@ TEST_CASE("OptionsWidget with one option which is not advanced", testLabels)
     tw.testThatHasOptionsMethodsReturnTheExpected();
 }
 
-TEST_CASE("OptionsWidget with one advanced option", testLabels)
+TEST_CASE("OptionsWidget with one advanced option", "[unit][resource][widgets]")
 {
     testWidget tw(true, true);
 

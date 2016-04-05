@@ -147,7 +147,7 @@ public:
 	LayoutRepositoryPtr getLayoutRepository();
 
 	QActionGroup* createInteractorStyleActionGroup();
-	NavigationPtr getNavigation();
+	NavigationPtr getNavigation(int group = 0);
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
@@ -174,6 +174,7 @@ public:
 	void addXml(QDomNode& parentNode);
 	void parseXml(QDomNode viewmanagerNode);
 
+	void centerToImageCenterInViewGroup(unsigned groupNr);
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
@@ -229,6 +230,11 @@ protected:
 private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
+protected:
+	void autoShowInViewGroups(DataPtr data);
+	void autoResetCameraToSuperiorView();
+	void autoCenterToImageCenter();
+	QList<unsigned> getViewGroupsToAutoShowIn();
 };
 
 /**

@@ -188,6 +188,11 @@ QActionGroup* ViewServiceProxy::createInteractorStyleActionGroup()
 	return mViewService->createInteractorStyleActionGroup();
 }
 
+void ViewServiceProxy::centerToImageCenterInActiveViewGroup()
+{
+	return mViewService->centerToImageCenterInActiveViewGroup();
+}
+
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {
 	return mViewService->getClippers();
