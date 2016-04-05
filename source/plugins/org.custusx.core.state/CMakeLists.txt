@@ -16,6 +16,7 @@ set(PLUGIN_SRCS
     cxStatePluginActivator.cpp
     cxApplicationsParser.h
     cxApplicationsParser.cpp
+    cxWorkflowStateMachine.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -24,6 +25,7 @@ set(PLUGIN_MOC_SRCS
     cxCustusXWorkflowStates.h
     cxStateServiceImpl.h
     cxStatePluginActivator.h
+    cxWorkflowStateMachine.h
 )
 
 # Qt Designer files which should be processed by Qts uic
