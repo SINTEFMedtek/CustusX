@@ -54,7 +54,7 @@ class org_custusx_core_state_EXPORT CustusXWorkflowStateMachine : public Workflo
 {
 Q_OBJECT
 public:
-		CustusXWorkflowStateMachine(CoreServicesPtr services);
+		CustusXWorkflowStateMachine(VisServicesPtr services);
         virtual ~CustusXWorkflowStateMachine();
 
 };

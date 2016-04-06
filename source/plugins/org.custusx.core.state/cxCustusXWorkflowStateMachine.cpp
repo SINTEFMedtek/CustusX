@@ -32,19 +32,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCustusXWorkflowStateMachine.h"
 #include "cxCustusXWorkflowStates.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-CustusXWorkflowStateMachine::CustusXWorkflowStateMachine(CoreServicesPtr services) :
+CustusXWorkflowStateMachine::CustusXWorkflowStateMachine(VisServicesPtr services) :
 	WorkflowStateMachine(services)
 {
-	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, mServices));
-	this->newState(new RegistrationWorkflowState(mParentState, mServices));
-	this->newState(new PreOpPlanningWorkflowState(mParentState, mServices));
-	this->newState(new NavigationWorkflowState(mParentState, mServices));
-	this->newState(new IntraOpImagingWorkflowState(mParentState, mServices));
-	this->newState(new PostOpControllWorkflowState(mParentState, mServices));
+	WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState, services));
+	this->newState(new RegistrationWorkflowState(mParentState, services));
+	this->newState(new PreOpPlanningWorkflowState(mParentState, services));
+	this->newState(new NavigationWorkflowState(mParentState, services));
+	this->newState(new IntraOpImagingWorkflowState(mParentState, services));
+	this->newState(new PostOpControllWorkflowState(mParentState, services));
 
 	//set initial state on all levels
 	this->setInitialState(mParentState);
