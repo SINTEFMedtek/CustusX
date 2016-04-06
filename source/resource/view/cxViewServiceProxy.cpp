@@ -193,6 +193,11 @@ void ViewServiceProxy::centerToImageCenterInActiveViewGroup()
 	return mViewService->centerToImageCenterInActiveViewGroup();
 }
 
+void ViewServiceProxy::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	mViewService->setCameraStyle(style, groupIdx);
+}
+
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {
 	return mViewService->getClippers();

@@ -66,6 +66,7 @@ public:
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* createInteractorStyleActionGroup();
 	virtual void centerToImageCenterInActiveViewGroup();
+	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 
 	virtual bool isNull();
 

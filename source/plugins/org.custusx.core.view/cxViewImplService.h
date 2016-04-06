@@ -83,6 +83,7 @@ public:
 
 	virtual bool isNull();
 
+	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 public slots:
     virtual void aboutToStop();
 

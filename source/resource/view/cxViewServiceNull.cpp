@@ -105,6 +105,11 @@ void ViewServiceNull::centerToImageCenterInActiveViewGroup()
 	printWarning();
 }
 
+void ViewServiceNull::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	printWarning();
+}
+
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {
 	return ClippersPtr();

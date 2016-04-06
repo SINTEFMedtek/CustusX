@@ -206,5 +206,9 @@ void ViewImplService::onSessionSave(QDomElement& node)
 	mClippers->addXml(node);
 }
 
+void ViewImplService::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	viewManager()->setCameraStyle(style, groupIdx);
+}
 
 } /* namespace cx */

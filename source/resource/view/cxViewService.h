@@ -55,6 +55,10 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
 
+enum cxResourceVisualization_EXPORT CAMERA_STYLE_TYPE
+{
+	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
+};
 
 /** \brief Visualization services
  *
@@ -93,6 +97,7 @@ public:
 	virtual CameraControlPtr getCameraControl() = 0;
 	virtual QActionGroup* createInteractorStyleActionGroup() = 0;
 	virtual void centerToImageCenterInActiveViewGroup() = 0;
+	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx) = 0;
 
 	virtual bool isNull() = 0;
 	static ViewServicePtr getNullObject();

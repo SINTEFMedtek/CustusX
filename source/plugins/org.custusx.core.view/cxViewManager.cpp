@@ -669,4 +669,10 @@ CyclicActionLoggerPtr ViewManager::getRenderTimer()
 	return mRenderLoop->getRenderTimer();
 }
 
+void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	if (( groupIdx>=0 )&&( groupIdx < mViewGroups.size() ))
+		return mViewGroups[groupIdx]->getCameraStyle()->setCameraStyle(style);
+}
+
 } //namespace cx

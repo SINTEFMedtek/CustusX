@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
 #include "cxEnumConverter.h"
+#include "cxViewService.h"
 class QIcon;
 class QWidget;
 class QMenu;
@@ -55,12 +56,6 @@ using cx::Transform3D;
  * \addtogroup org_custusx_core_view
  * @{
  */
-
-
-enum org_custusx_core_view_EXPORT CAMERA_STYLE_TYPE
-{
-	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
-};
 
 
 /**
