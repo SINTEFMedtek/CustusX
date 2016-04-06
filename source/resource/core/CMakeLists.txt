@@ -101,6 +101,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     settings/cxSessionStorageService
 	settings/cxProfile
 	settings/cxPatientStorage
+    settings/cxWorkflowStateMachine
     settings/cxWorkflowState
 
     algorithms/cxTimedAlgorithm.h
