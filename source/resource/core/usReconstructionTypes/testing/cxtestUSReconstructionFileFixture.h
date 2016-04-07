@@ -63,7 +63,7 @@ protected:
 		bool writeColor;
 		cx::ToolPtr tool;
 		cx::ImageDataContainerPtr imageData;
-		std::vector<double> imageTimestamps;
+		std::vector<cx::TimeInfo> imageTimestamps;
 		cx::Transform3D rMpr;
 	};
 

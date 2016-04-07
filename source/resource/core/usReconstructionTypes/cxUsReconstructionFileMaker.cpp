@@ -77,10 +77,10 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData()
  *
  */
 USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataContainerPtr imageData,
-                                                                          std::vector<double> imageTimestamps,
-                                                                          TimedTransformMap trackerRecordedData,
-                                                                          ToolPtr tool,
-                                                                          bool writeColor, Transform3D rMpr)
+																	 std::vector<TimeInfo> imageTimestamps,
+																	 TimedTransformMap trackerRecordedData,
+																	 ToolPtr tool,
+																	 bool writeColor, Transform3D rMpr)
 {
 	if(trackerRecordedData.empty())
 		reportWarning("No tracking data for writing to reconstruction file.");
@@ -95,15 +95,17 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 	{
 		TimedPosition current;
 		current.mTime = it->first;
+		current.mTimeInfo.setAcquisitionTime(it->first);
 		current.mPos = it->second;
 		retval.mPositions.push_back(current);
 	}
 
-	std::vector<double> fts = imageTimestamps;
+	std::vector<TimeInfo> fts = imageTimestamps;
 	for (unsigned i=0; i<fts.size(); ++i)
 	{
 		TimedPosition current;
-		current.mTime = fts[i];
+		current.mTimeInfo = fts[i];
+		current.mTime = current.mTimeInfo.getAcquisitionTime();
 		current.mPos = Transform3D::Identity();
 		// current.mPos = not written - will be found from track positions during reconstruction.
 		retval.mFrames.push_back(current);
@@ -140,11 +142,20 @@ bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFol
 
 bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
 {
-	return this->writeTimestamps(reconstructionFolder+"/"+session+".fts",
-								 ts, "frame timestamps");
+	bool retval = true;
+
+	retval = this->writeTimestamps(reconstructionFolder+"/"+session+".fts",
+								 ts, "frame timestamps", Modified);
+
+	retval &= this->writeTimestamps(reconstructionFolder+"/"+session+".scanner.frameTimestamps",
+								 ts, "frame scanner timestamps", Scanner);
+
+	retval &= this->writeTimestamps(reconstructionFolder+"/"+session+".softwareArrive.frameTimestamps",
+								 ts, "frame arrive in software timestamps", SoftwareArrive);
+	return retval;
 }
 
-bool UsReconstructionFileMaker::writeTimestamps(QString filename, std::vector<TimedPosition> ts, QString type)
+bool UsReconstructionFileMaker::writeTimestamps(QString filename, std::vector<TimedPosition> ts, QString type, TimeStampType timeStampType)
 {
 	bool success = false;
 
@@ -158,7 +169,21 @@ bool UsReconstructionFileMaker::writeTimestamps(QString filename, std::vector<Ti
 
 	for (unsigned i=0; i<ts.size(); ++i)
 	{
-		stream << qstring_cast(ts[i].mTime);
+		switch(timeStampType)
+		{
+		case Modified:
+			stream << qstring_cast(ts[i].mTimeInfo.getAcquisitionTime());
+			break;
+		case SoftwareArrive:
+			stream << qstring_cast(ts[i].mTimeInfo.getSoftwareAcquisitionTime());
+			break;
+		case Scanner:
+			stream << qstring_cast(ts[i].mTimeInfo.getScannerAcquisitionTime());
+			break;
+		default:
+			stream << qstring_cast(ts[i].mTime); // Is the same as mTimeInfo.getAcquisitionTime()
+			break;
+		}
 		stream << endl;
 	}
 	file.close();

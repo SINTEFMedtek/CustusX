@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include "cxProbeSector.h"
+#include "cxData.h"
 
 namespace cx
 {
@@ -56,6 +57,7 @@ class cxResource_EXPORT TimedPosition
 {
 public:
 	double mTime;// Should always be in ms
+	TimeInfo mTimeInfo;
 	Transform3D mPos;
 };
 cxResource_EXPORT inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)

@@ -45,10 +45,12 @@ class QDir;
 
 namespace cx
 {
+class TimeInfo;
 typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 typedef boost::shared_ptr<class ImageDataContainer> ImageDataContainerPtr;
 //typedef boost::shared_ptr<class CachedImageDataContainer> CachedImageDataContainerPtr;
 typedef boost::shared_ptr<class SavingVideoRecorder> SavingVideoRecorderPtr;
+
 
 /**
 * \file
@@ -86,7 +88,7 @@ public:
 	 * If writeColor set to true, colors will be saved even if settings is set to 8 bit
 	 */
 	USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
-												   std::vector<double> imageTimestamps,
+												   std::vector<cx::TimeInfo> imageTimestamps,
 	                                               TimedTransformMap trackerRecordedData,
 	                                               ToolPtr tool,
 	                                               bool writeColor,
@@ -94,6 +96,13 @@ public:
 	void setReconstructData(USReconstructInputData data) { mReconstructData = data; }
 
 private:
+	enum TimeStampType
+	{
+		Modified,
+		Scanner,
+		SoftwareArrive,
+		Unknown
+	};
 	bool writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	bool writeUSTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
@@ -102,7 +111,7 @@ private:
 	void writeUSImages(QString path, ImageDataContainerPtr images, bool compression, std::vector<TimedPosition> pos);
 	void writeMask(QString path, QString session, vtkImageDataPtr mask);
 	void writeREADMEFile(QString reconstructionFolder, QString session);
-	bool writeTimestamps(QString filename, std::vector<TimedPosition> ts, QString type);
+	bool writeTimestamps(QString filename, std::vector<TimedPosition> ts, QString type, TimeStampType timeStampType = Modified);
 
 	bool writeTransforms(QString filename, std::vector<TimedPosition> ts, QString type);
 	static bool findNewSubfolder(QString subfolderAbsolutePath);
