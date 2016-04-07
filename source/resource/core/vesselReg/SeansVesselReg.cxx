@@ -245,18 +245,12 @@ SeansVesselReg::ContextPtr SeansVesselReg::createContext(DataPtr source, DataPtr
 	if (!source || !target)
 		return SeansVesselReg::ContextPtr();
 
-	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
-	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source);
-//	targetPolyData->Update();
-//	inputSourcePolyData->Update();
-	//Make sure we have stuff to work with
-	if (!inputSourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
-	{
-		std::cerr << "Can't execute with empty source or target data" << std::endl;
-		return ContextPtr();
-	}
+	vtkPolyDataPtr targetPolyData = this->convertToPolyData(target, "target");
+	vtkPolyDataPtr inputSourcePolyData = this->convertToPolyData(source, "source");
 
-//	double margin = 40;
+	if (!targetPolyData || !inputSourcePolyData) // error message has already been emitted in convertToPolyData()
+		return ContextPtr();
+
 	vtkPolyDataPtr sourcePolyData = this->crop(inputSourcePolyData, targetPolyData, margin);
 
 	//Make sure we have stuff to work with
@@ -504,23 +498,39 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPointsPtr sorte
 	return tps;
 }
 
-vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data)
+vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data, QString id)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	if (!data)
+	{
+		CX_LOG_ERROR(QString("Can't execute: %1 is not set").arg(id));
+		return vtkPolyDataPtr();
+	}
+
+	//	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 
-	if (image)
+//	if (image)
+//	{
+//		//Grab the information from the files of target then
+//		//filter out points not fit for the threshold
+//		return this->extractPolyData(image, mt_singlePointThreshold, 0);
+//	}
+
+	if (!mesh)
 	{
-		//Grab the information from the files of target then
-		//filter out points not fit for the threshold
-		return this->extractPolyData(image, mt_singlePointThreshold, 0);
-	}
-	else if (mesh)
-	{
-		return mesh->getTransformedPolyData(mesh->get_rMd());
+		CX_LOG_ERROR(QString("Can't execute: %1=%2 is not a mesh").arg(id, data->getName()));
+		return vtkPolyDataPtr();
 	}
 
-	return vtkPolyDataPtr();
+	vtkPolyDataPtr poly = mesh->getTransformedPolyData(mesh->get_rMd());
+
+	if (!poly || !poly->GetNumberOfPoints())
+	{
+		CX_LOG_ERROR(QString("Can't execute: %1=%2 is empty").arg(id, data->getName()));
+		return vtkPolyDataPtr();
+	}
+
+	return poly;
 }
 
 vtkPolyDataPtr SeansVesselReg::Context::getMovingPoints()
@@ -618,7 +628,6 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 
 	// clip the source data with a box
 	vtkPlanesPtr box = vtkPlanesPtr::New();
-	//  std::cout << "bounds" << std::endl;
 	box->SetBounds(targetBounds);
 	if (mt_verbose)
 		std::cout << "bb: " << DoubleBoundingBox3D(targetBounds) << std::endl;
@@ -629,7 +638,13 @@ vtkPolyDataPtr SeansVesselReg::crop(vtkPolyDataPtr input, vtkPolyDataPtr fixed, 
 	clipper->Update();
 
 	int oldSource = input->GetPoints()->GetNumberOfPoints();
-	int clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
+
+	int clippedSource = 0;
+
+	if (clipper->GetOutput()->GetPoints())
+	{
+		clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
+	}
 
 	if (clippedSource < oldSource)
 	{

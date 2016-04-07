@@ -127,6 +127,7 @@ void RecordTrackingWidget::acquisitionStopped()
 	{
 		activeRep3D->getTracer()->stop();
 	}
+	mRecordingTool.reset();
 
 	emit acquisitionCompleted();
 }
@@ -139,6 +140,7 @@ void RecordTrackingWidget::acquisitionCancelled()
 		activeRep3D->getTracer()->stop();
 		activeRep3D->getTracer()->clear();
 	}
+	mRecordingTool.reset();
 }
 
 void RecordTrackingWidget::onMergeChanged()
@@ -166,7 +168,7 @@ void RecordTrackingWidget::obscuredSlot(bool obscured)
 		connect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped, Qt::QueuedConnection);
 		connect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
 		connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &RecordTrackingWidget::onToolChanged);
-		mSelectRecordSession->setTool(this->getSuitableRecordingTool());
+		connect(mServices->tracking().get(), &TrackingService::activeToolChanged, this, &RecordTrackingWidget::onToolChanged);
 	}
 	else
 	{
@@ -174,13 +176,15 @@ void RecordTrackingWidget::obscuredSlot(bool obscured)
 		disconnect(mAcquisitionService.get(), &AcquisitionService::acquisitionStopped, this, &RecordTrackingWidget::acquisitionStopped);
 		disconnect(mAcquisitionService.get(), &AcquisitionService::cancelled, this, &RecordTrackingWidget::acquisitionCancelled);
 		disconnect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &RecordTrackingWidget::onToolChanged);
-		mSelectRecordSession->setTool(ToolPtr());
+		disconnect(mServices->tracking().get(), &TrackingService::activeToolChanged, this, &RecordTrackingWidget::onToolChanged);
 	}
+
+	mSelectRecordSession->setVisible(!obscured);
 }
 
 void RecordTrackingWidget::onToolChanged()
 {
-	mSelectRecordSession->setTool(this->getSuitableRecordingTool());
+	mSelectRecordSession->setTool(mToolSelector->getTool());
 }
 
 

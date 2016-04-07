@@ -67,6 +67,12 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnType(std::map<Q
 	return input;
 }
 
+void SelectDataStringPropertyBase::setTypeRegexp(QString regexp)
+{
+	mTypeRegexp = regexp;
+	emit changed();
+}
+
 /**
 	* Erase all data with uid not conforming to input regexp.
 	*/
@@ -89,6 +95,7 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnUid(std::map<QS
 void SelectDataStringPropertyBase::setUidRegexp(QString regexp)
 {
 	mUidRegexp = regexp;
+	emit changed();
 }
 
 QStringList SelectDataStringPropertyBase::getValueRange() const
