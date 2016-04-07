@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "cxViewGroup.h"
+#include "cxCameraStyle.h"
+#include "cxCameraStyleForView.h"
 
 namespace cxtest
 {
@@ -50,6 +53,10 @@ public:
 	QList<unsigned> getAutoShowViewGroupNumbers()
 	{
 		return this->getViewGroupsToAutoShowIn();
+	}
+	cx::CAMERA_STYLE_TYPE getCameraStyleForGroup0()
+	{
+		return mViewGroups[0]->getCameraStyle()->getCameraStyle();
 	}
 };
 
@@ -65,6 +72,19 @@ TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.
     REQUIRE(showInViewGroups.size() == 2);
     CHECK(showInViewGroups[0] == 0);
     CHECK(showInViewGroups[1] == 4);
+}
+
+TEST_CASE("ViewManager: set/get CameraStyle", "[unit][plugins][org.custusx.core.view]")
+{
+	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
+	ViewManagerFixturePtr viewManager = ViewManagerFixturePtr(new ViewManagerFixture(dummyservices));
+
+	cx::CAMERA_STYLE_TYPE cameraStyle = viewManager->getCameraStyleForGroup0();
+	CHECK(cameraStyle == cx::cstDEFAULT_STYLE);
+
+	viewManager->setCameraStyle(cx::cstTOOL_STYLE, 0);
+	cameraStyle = viewManager->getCameraStyleForGroup0();
+	REQUIRE(cameraStyle == cx::cstTOOL_STYLE);
 }
 
 } // cxtest

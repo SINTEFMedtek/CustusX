@@ -288,4 +288,9 @@ void CameraStyleForView::setCameraStyle(CAMERA_STYLE_TYPE style)
 	this->connectTool();
 }
 
+CAMERA_STYLE_TYPE CameraStyleForView::getCameraStyle()
+{
+	return mCameraStyleForView;
+}
+
 }//namespace cx

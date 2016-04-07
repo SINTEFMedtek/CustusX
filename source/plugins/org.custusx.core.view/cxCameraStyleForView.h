@@ -79,6 +79,7 @@ public:
 	/** Select tool style. This replaces the vtkInteractor Style.
 	  */
 	void setCameraStyle(CAMERA_STYLE_TYPE style);
+	CAMERA_STYLE_TYPE getCameraStyle();
 
 private slots:
 	void setModified();
