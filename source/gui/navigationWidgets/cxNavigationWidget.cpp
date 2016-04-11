@@ -63,7 +63,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 
   QToolBar* toolBar = new QToolBar(this);
   mCameraGroupLayout->addWidget(toolBar);
-  toolBar->addActions(viewService()->createInteractorStyleActionGroup()->actions());
+  toolBar->addActions(viewService()->getInteractorStyleActionGroup()->actions());
 
   DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(trackingService()));
   QWidget* toolOffsetWidget = new SliderGroupWidget(this, offset);

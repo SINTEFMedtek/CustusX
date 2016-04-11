@@ -175,9 +175,9 @@ CameraControlPtr ViewImplService::getCameraControl()
 	return viewManager()->getCameraControl();
 }
 
-QActionGroup* ViewImplService::createInteractorStyleActionGroup()
+QActionGroup* ViewImplService::getInteractorStyleActionGroup()
 {
-	return viewManager()->createInteractorStyleActionGroup();
+	return viewManager()->getInteractorStyleActionGroup();
 }
 
 void ViewImplService::onSessionChanged()

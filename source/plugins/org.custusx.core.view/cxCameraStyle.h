@@ -108,7 +108,7 @@ class org_custusx_core_view_EXPORT CameraStyleInteractor: public QObject
 Q_OBJECT
 public:
 	explicit CameraStyleInteractor();
-	QActionGroup* createInteractorStyleActionGroup();
+	QActionGroup* getInteractorStyleActionGroup();
 	void connectCameraStyle(CameraStylePtr style);
 
 private slots:

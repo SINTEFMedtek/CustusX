@@ -307,7 +307,6 @@ void ViewManager::addXml(QDomNode& parentNode)
 	XMLNodeAdder base(parent.addElement("viewManager"));
 
 	base.addTextToElement("global2DZoom", qstring_cast(mGlobal2DZoomVal->get().toDouble()));
-	base.addTextToElement("activeView", mActiveView->value<QString>());
 
 	QDomElement slicePlanes3DNode = base.addElement("slicePlanes3D");
 	slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
@@ -355,8 +354,6 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 
 		viewgroup = viewgroup.nextSibling();
 	}
-
-	this->setActiveView(base.parseTextFromElement("activeView"));
 }
 
 void ViewManager::clear()
@@ -565,9 +562,9 @@ void ViewManager::saveGlobalSettings()
 	file.save();
 }
 
-QActionGroup* ViewManager::createInteractorStyleActionGroup()
+QActionGroup* ViewManager::getInteractorStyleActionGroup()
 {
-	return mCameraStyleInteractor->createInteractorStyleActionGroup();
+	return mCameraStyleInteractor->getInteractorStyleActionGroup();
 }
 
 void ViewManager::updateCameraStyleActions()
@@ -671,8 +668,16 @@ CyclicActionLoggerPtr ViewManager::getRenderTimer()
 
 void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 {
-	if (( groupIdx>=0 )&&( groupIdx < mViewGroups.size() ))
-		return mViewGroups[groupIdx]->getCameraStyle()->setCameraStyle(style);
+	//Set active view before changing camerastyle
+	if (!mViewGroups[groupIdx]->getViews().empty())
+		this->setActiveView(mViewGroups[groupIdx]->getViews()[0]->getUid());
+
+	QList<QAction*> actions = this->getInteractorStyleActionGroup()->actions();
+	for(int i = 0; i < actions.size(); ++i)
+	{
+		if (actions[i]->data().toString() == enum2string(style))
+			actions[i]->setChecked(true);
+	}
 }
 
 } //namespace cx

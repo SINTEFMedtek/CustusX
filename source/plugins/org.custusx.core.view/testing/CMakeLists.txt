@@ -36,6 +36,7 @@ if(BUILD_TESTING)
     cxtestResource
     cxCatch
     cxLogicManager
+    cxGUIExtenderService
     )
   cx_add_tests_to_catch(cxtest_org_custusx_core_view)
 

@@ -31,10 +31,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
+#include <QActionGroup>
+#include <QTimer>
 #include "cxVisServices.h"
 #include "cxViewService.h"
 #include "cxtestDirectSignalListener.h"
 #include "cxtestVisualizationHelper.h"
+#include "cxViewServiceNull.h"
+#include "cxLogicManager.h"
+#include "cxStateService.h"
+#include "cxMainWindowApplicationComponent.h"
+#include "cxMainWindow.h"
+#include "cxDataLocations.h"
+
+namespace
+{
+typedef boost::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
+class ViewServiceFixture : public cx::ViewServiceNull
+{
+public:
+	ViewServiceFixture() :
+		cx::ViewServiceNull()
+	{
+		cx::DataLocations::setTestMode();
+		cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
+		cx::LogicManager::initialize(mainwindow);
+		services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+	}
+	~ViewServiceFixture()
+	{
+		cx::LogicManager::shutdown();
+	}
+
+	void quickRun()
+	{
+		QTimer::singleShot(100, qApp, SLOT(quit()));
+		qApp->exec();
+	}
+
+	cx::VisServicesPtr services;
+};
+}
 
 TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.view][hide]")
 {
@@ -54,4 +91,44 @@ TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[unit][plug
 
 	visHelper.viewWrapper->emitPointSampled();
 	CHECK(signalListener.isReceived());
+}
+
+TEST_CASE("ViewService: Get active view group", "[integration][plugins][org.custusx.core.view]")
+{
+	ViewServiceFixture fixture;
+	fixture.quickRun();
+
+	CHECK(fixture.services->view()->getActiveViewGroup());
+	CHECK(fixture.services->view()->getActiveGroupId() == 0);
+}
+
+TEST_CASE("ViewService: Get camera style interactor action group and actions", "[integration][plugins][org.custusx.core.view]")
+{
+	ViewServiceFixture fixture;
+	fixture.quickRun();
+
+	QActionGroup* actionGroup = fixture.services->view()->getInteractorStyleActionGroup();
+	REQUIRE(actionGroup);
+
+	QList<QAction*> actions = actionGroup->actions();
+	REQUIRE(actions.size() >= 4);
+}
+
+TEST_CASE("ViewService: Setting camera style also marks action as selected in camera style action group", "[integration][plugins][org.custusx.core.view]")
+{
+	ViewServiceFixture fixture;
+	fixture.quickRun();
+
+	QActionGroup* actionGroup = fixture.services->view()->getInteractorStyleActionGroup();
+	REQUIRE(actionGroup);
+
+	fixture.services->view()->setCameraStyle(cx::cstDEFAULT_STYLE, 0);
+
+	QAction* selecetdAction = actionGroup->checkedAction();
+	CHECK(selecetdAction);
+
+	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
+
+	QAction* selecetdAction2 = actionGroup->checkedAction();
+	CHECK(selecetdAction != selecetdAction2);
 }

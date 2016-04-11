@@ -183,9 +183,9 @@ CameraControlPtr ViewServiceProxy::getCameraControl()
 	return mViewService->getCameraControl();
 }
 
-QActionGroup* ViewServiceProxy::createInteractorStyleActionGroup()
+QActionGroup* ViewServiceProxy::getInteractorStyleActionGroup()
 {
-	return mViewService->createInteractorStyleActionGroup();
+	return mViewService->getInteractorStyleActionGroup();
 }
 
 void ViewServiceProxy::centerToImageCenterInActiveViewGroup()

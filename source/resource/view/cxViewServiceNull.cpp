@@ -98,7 +98,7 @@ CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLog
 NavigationPtr ViewServiceNull::getNavigation() { return NavigationPtr(); }
 LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
-QActionGroup* ViewServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
+QActionGroup* ViewServiceNull::getInteractorStyleActionGroup() { return mActionGroup; }
 
 void ViewServiceNull::centerToImageCenterInActiveViewGroup()
 {

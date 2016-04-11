@@ -100,7 +100,7 @@ void CameraStyleInteractor::connectCameraStyle(CameraStylePtr style)
 	this->updateActionGroup();
 }
 
-QActionGroup* CameraStyleInteractor::createInteractorStyleActionGroup()
+QActionGroup* CameraStyleInteractor::getInteractorStyleActionGroup()
 {
 	if (mCameraStyleGroup)
 		return mCameraStyleGroup;
@@ -124,7 +124,6 @@ QActionGroup* CameraStyleInteractor::createInteractorStyleActionGroup()
 	                               enum2string(cstUNICAM_STYLE),
 	                               QIcon(":/icons/camera-u.png"),
 	                               "Set 3D interaction to a single-button style, useful for touch screens.");
-
 	return mCameraStyleGroup;
 }
 
@@ -152,12 +151,11 @@ void CameraStyleInteractor::updateActionGroup()
 		for (int i=0; i<actions.size(); ++i)
 		{
 			actions[i]->blockSignals(true);
-			actions[i]->setChecked(actions[i]->data().toString() == currentStyle);
 			actions[i]->setEnabled(mStyle!=0);
 			actions[i]->blockSignals(false);
+			actions[i]->setChecked(actions[i]->data().toString() == currentStyle);
 		}
 	}
-
 }
 
 void CameraStyleInteractor::setInteractionStyleActionSlot()

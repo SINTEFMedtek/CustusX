@@ -147,7 +147,7 @@ public:
 
 	LayoutRepositoryPtr getLayoutRepository();
 
-	QActionGroup* createInteractorStyleActionGroup();
+	QActionGroup* getInteractorStyleActionGroup();
 	NavigationPtr getNavigation(int group = 0);
 
 	/** Initialize the widget and fill with the default view layout.
