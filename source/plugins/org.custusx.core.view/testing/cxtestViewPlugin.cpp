@@ -124,11 +124,29 @@ TEST_CASE("ViewService: Setting camera style also marks action as selected in ca
 
 	fixture.services->view()->setCameraStyle(cx::cstDEFAULT_STYLE, 0);
 
-	QAction* selecetdAction = actionGroup->checkedAction();
-	CHECK(selecetdAction);
+	QAction* selectedAction = actionGroup->checkedAction();
+	CHECK(selectedAction);
 
 	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
 
-	QAction* selecetdAction2 = actionGroup->checkedAction();
-	CHECK(selecetdAction != selecetdAction2);
+	QAction* selectedAction2 = actionGroup->checkedAction();
+	CHECK(selectedAction != selectedAction2);
+}
+
+TEST_CASE("ViewService: set/get camera style", "[integration][plugins][org.custusx.core.view]")
+{
+	ViewServiceFixture fixture;
+	fixture.quickRun();
+
+	QActionGroup* actionGroup = fixture.services->view()->getInteractorStyleActionGroup();
+	REQUIRE(actionGroup);
+
+	QAction* selectedAction = actionGroup->checkedAction();
+	REQUIRE(selectedAction);
+	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstDEFAULT_STYLE));
+
+	REQUIRE(fixture.services->view()->getActiveGroupId() == 0);
+	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
+	selectedAction = actionGroup->checkedAction();
+	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstTOOL_STYLE));
 }
