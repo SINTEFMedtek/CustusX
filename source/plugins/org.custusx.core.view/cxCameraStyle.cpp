@@ -150,10 +150,10 @@ void CameraStyleInteractor::updateActionGroup()
 		QList<QAction*> actions = mCameraStyleGroup->actions();
 		for (int i=0; i<actions.size(); ++i)
 		{
-			actions[i]->blockSignals(true);
 			actions[i]->setEnabled(mStyle!=0);
-			actions[i]->blockSignals(false);
-			actions[i]->setChecked(actions[i]->data().toString() == currentStyle);
+			bool check = actions[i]->data().toString() == currentStyle;
+			if(actions[i]->isChecked() != check)
+				actions[i]->setChecked(check);
 		}
 	}
 }
