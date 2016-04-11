@@ -54,10 +54,6 @@ public:
 	{
 		return this->getViewGroupsToAutoShowIn();
 	}
-	cx::CAMERA_STYLE_TYPE getCameraStyleForGroup0()
-	{
-		return mViewGroups[0]->getCameraStyle()->getCameraStyle();
-	}
 };
 
 TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.core.view]")
@@ -73,18 +69,4 @@ TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.
     CHECK(showInViewGroups[0] == 0);
     CHECK(showInViewGroups[1] == 4);
 }
-
-TEST_CASE("ViewManager: set/get CameraStyle", "[unit][plugins][org.custusx.core.view]")
-{
-	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
-	ViewManagerFixturePtr viewManager = ViewManagerFixturePtr(new ViewManagerFixture(dummyservices));
-
-	cx::CAMERA_STYLE_TYPE cameraStyle = viewManager->getCameraStyleForGroup0();
-	CHECK(cameraStyle == cx::cstDEFAULT_STYLE);
-
-	viewManager->setCameraStyle(cx::cstTOOL_STYLE, 0);
-	cameraStyle = viewManager->getCameraStyleForGroup0();
-	REQUIRE(cameraStyle == cx::cstTOOL_STYLE);
-}
-
 } // cxtest
