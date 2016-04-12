@@ -1,0 +1,7 @@
+<?xml version = "1.0"?>
+<configuration clinical_app="Laboratory">
+    <tracker type="polaris">
+        <toolfile reference="no">../Tools/shared/NDI-Pointer-8700340_POLARIS/NDI_pnt.xml</toolfile>
+        <toolfile reference="yes">../Tools/shared/NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml</toolfile>
+    </tracker>
+</configuration>
