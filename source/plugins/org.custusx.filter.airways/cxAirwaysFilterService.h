@@ -84,9 +84,7 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	DoublePropertyPtr getSensitivityOption(QDomElement root);
-	DoublePropertyPtr getNoiseLevelOption(QDomElement root);
-	BoolPropertyPtr getCroppingOption(QDomElement root);
+	//DoublePropertyPtr getNoiseLevelOption(QDomElement root);
 	vtkImageDataPtr mSegmentationOutput;
 	vtkPolyDataPtr mCenterlineOutput;
 	Transform3D mTransformation;

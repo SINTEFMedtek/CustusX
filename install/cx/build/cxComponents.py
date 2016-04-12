@@ -523,7 +523,7 @@ class FAST(CppComponent):
         self._getBuilder().gitClone('git@github.com:smistad/FAST')
     def update(self):
         #self._getBuilder().gitCheckoutBranch('development', submodules=True)
-        self._getBuilder().gitCheckout('924542af95c6a6e2d29d99de8c592add7ac45880')
+        self._getBuilder().gitCheckout('1a82ff02eaea6a2ccbe9e283cc6519b10ac9af93')
 #        self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
         builder = self._getBuilder()
