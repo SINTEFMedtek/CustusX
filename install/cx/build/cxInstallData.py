@@ -128,6 +128,7 @@ class Common(object):
         p.add_argument('--print_control_data', action='store_true', default=False, help='Print all control data at startup')
         
         p.add_argument('--gitrepo_main_site_base', default=self.gitrepo_main_site_base, dest='gitrepo_main_site_base', help='Base url for the core open repositories default=%s.' % self.gitrepo_main_site_base)
+        p.add_argument('--build_folder', dest='build_folder_overrides', help='Specify build folder names for given components. The argument is a comma-separated list of <component>=<build_folder> pairs, e.g.: "--build_folder CustusX=my_build_folder,ITK=my_itk_folder,..."')
         return p
 
     def getArgParser_extended_build(self):
@@ -207,7 +208,26 @@ class Common(object):
     def setBuildShared(self, value):
         self.static = not value
     
-    def getBuildFolder(self):
+    def getBuildFolder(self, component_name):
+        override = self._getBuildFolderOverride(component_name)
+        if override:
+            return override
+        else:
+            return self._getDefaultBuildFolder()
+    
+    def _getBuildFolderOverride(self, component_name):
+        'check --build_folder_overrides for possible override of build folder name for component_name'
+        if not self.build_folder_overrides:
+            return None
+        parts = self.build_folder_overrides.split(',')
+        comps = {}
+        for part in parts:
+            comps[part.split('=')[0]] = part.split('=')[1]
+        if component_name in comps:
+            return comps[component_name]
+        return None
+
+    def _getDefaultBuildFolder(self):
         retval = []
         self._appendToBuildFolder(retval, self._addLongOrShortPathID("build", "b"))
         self._appendToBuildFolder(retval, self.build_type)

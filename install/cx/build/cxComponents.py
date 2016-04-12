@@ -122,7 +122,7 @@ class CppComponent(Component):
     def __init__(self):
         pass
     def buildFolder(self):
-        return self.controlData.getBuildFolder()
+        return self.controlData.getBuildFolder(self.name())
     def _changeDirTo(self, folder):
         changeDir(self.path()+'/'+folder)
     def _changeDirToBase(self):
@@ -225,22 +225,12 @@ class CTK(CppComponent):
         return "CTK"
     def help(self):
         return 'commontk.org'
-#    def path(self):
-#        return self.controlData.getExternalPath() + "/CTK"
-#    def buildFolder(self):
-#        return "%s/CTK-build" % self.controlData.getBuildFolder()
-#    def configPath(self):
-#        return self.buildPath() + "/CTK-build/"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        #repo = self._getRepo()
-        #branch = 'CTK-CX-modifications'
-        #self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        #self._getBuilder().gitCheckout('1056228ab4aeefa9bf6db4fc32a8826db283475a') 
         self._getBuilder().gitCheckout('f9478bdb4d5ecc6357b3a579a4bf8a927debd5e3') # new 2015-10-19
     def configure(self):
         builder = self._getBuilder()
@@ -262,8 +252,6 @@ class OpenCV(CppComponent):
         return "OpenCV"
     def help(self):
         return 'http://opencv.willowgarage.com'
-#    def path(self):
-#        return self.controlData.getExternalPath() + "/OpenCV"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
@@ -290,8 +278,6 @@ class Eigen(CppComponent):
         return "eigen"
     def help(self):
         return 'http://eigen.tuxfamily.org/'
-#    def path(self):
-#        return self.controlData.getExternalPath() + "/eigen"
     def configPath(self):
         return self.sourcePath()
     def getBuildType(self):
@@ -322,8 +308,6 @@ class OpenIGTLink(CppComponent):
         return "OpenIGTLink"
     def help(self):
         return 'http://www.na-mic.org/Wiki/index.php/OpenIGTLink/Library/Build'
-#    def path(self):
-#        return self.controlData.getExternalPath() + "/OpenIGTLink"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):

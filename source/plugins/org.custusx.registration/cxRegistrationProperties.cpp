@@ -44,7 +44,7 @@ StringPropertyRegistrationFixedImage::StringPropertyRegistrationFixedImage(Regis
 	mRegistrationService(registrationService),
 	mPatientModelService(patientModelService)
 {
-  mValueName = "Fixed Volume";
+  mValueName = "Fixed Data";
   mHelp = "Select the fixed registration data";
 	connect(mRegistrationService.get(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
 }
@@ -74,7 +74,7 @@ StringPropertyRegistrationMovingImage::StringPropertyRegistrationMovingImage(Reg
 	mRegistrationService(registrationService),
 	mPatientModelService(patientModelService)
 {
-	mValueName = "Moving Volume";
+	mValueName = "Moving Data";
 	mHelp = "Select the moving registration data";
 	connect(mRegistrationService.get(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
 }
