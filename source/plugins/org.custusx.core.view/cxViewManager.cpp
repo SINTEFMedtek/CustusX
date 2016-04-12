@@ -676,7 +676,7 @@ void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	for(int i = 0; i < actions.size(); ++i)
 	{
 		if (actions[i]->data().toString() == enum2string(style))
-			actions[i]->setChecked(true);
+			actions[i]->trigger();
 	}
 }
 
