@@ -37,6 +37,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "cxViewGroup.h"
+#include "cxCameraStyle.h"
+#include "cxCameraStyleForView.h"
 
 namespace cxtest
 {
@@ -66,5 +69,4 @@ TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.
     CHECK(showInViewGroups[0] == 0);
     CHECK(showInViewGroups[1] == 4);
 }
-
 } // cxtest

@@ -175,9 +175,9 @@ CameraControlPtr ViewImplService::getCameraControl()
 	return viewManager()->getCameraControl();
 }
 
-QActionGroup* ViewImplService::createInteractorStyleActionGroup()
+QActionGroup* ViewImplService::getInteractorStyleActionGroup()
 {
-	return viewManager()->createInteractorStyleActionGroup();
+	return viewManager()->getInteractorStyleActionGroup();
 }
 
 void ViewImplService::onSessionChanged()
@@ -206,5 +206,9 @@ void ViewImplService::onSessionSave(QDomElement& node)
 	mClippers->addXml(node);
 }
 
+void ViewImplService::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	viewManager()->setCameraStyle(style, groupIdx);
+}
 
 } /* namespace cx */

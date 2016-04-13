@@ -78,11 +78,12 @@ public:
 	virtual NavigationPtr getNavigation();
 	virtual LayoutRepositoryPtr getLayoutRepository();
 	virtual CameraControlPtr getCameraControl();
-	virtual QActionGroup* createInteractorStyleActionGroup();
+	virtual QActionGroup* getInteractorStyleActionGroup();
 	virtual void centerToImageCenterInActiveViewGroup();
 
 	virtual bool isNull();
 
+	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 public slots:
     virtual void aboutToStop();
 

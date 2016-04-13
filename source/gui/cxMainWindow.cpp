@@ -301,7 +301,7 @@ void MainWindow::createActions()
 	mResetDesktopAction->setToolTip("Reset desktop for workflow step");
 	connect(mResetDesktopAction, &QAction::triggered, this, &MainWindow::resetDesktopSlot);
 
-	mInteractorStyleActionGroup = viewService()->createInteractorStyleActionGroup();
+	mInteractorStyleActionGroup = viewService()->getInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
 	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);

@@ -45,6 +45,7 @@ typedef boost::shared_ptr<class VideoService> VideoServicePtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef boost::shared_ptr<class StateService> StateServicePtr;
 
 /**
  * Convenience class combining all services in resource/core.
@@ -66,6 +67,7 @@ public:
 	VideoServicePtr video() { return mVideoService; }
 	SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
 	SessionStorageServicePtr session() { return mSessionStorageService; }
+	StateServicePtr state() { return mStateService; }
 
 protected:
 	PatientModelServicePtr mPatientModelService;
@@ -73,6 +75,7 @@ protected:
 	VideoServicePtr mVideoService;
 	SpaceProviderPtr mSpaceProvider;
 	SessionStorageServicePtr mSessionStorageService;
+	StateServicePtr mStateService;
 
 protected:
 	CoreServices();

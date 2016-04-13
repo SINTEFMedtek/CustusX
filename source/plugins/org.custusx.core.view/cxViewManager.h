@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 //#include "cxLayoutData.h"
+#include "cxViewService.h"
 
 class QActionGroup;
 class QAction;
@@ -146,7 +147,7 @@ public:
 
 	LayoutRepositoryPtr getLayoutRepository();
 
-	QActionGroup* createInteractorStyleActionGroup();
+	QActionGroup* getInteractorStyleActionGroup();
 	NavigationPtr getNavigation(int group = 0);
 
 	/** Initialize the widget and fill with the default view layout.
@@ -175,6 +176,7 @@ public:
 	void parseXml(QDomNode viewmanagerNode);
 
 	void centerToImageCenterInViewGroup(unsigned groupNr);
+	void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes

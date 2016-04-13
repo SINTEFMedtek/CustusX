@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustusXWorkflowStateMachine.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
-#include "cxStateServiceBackend.h"
 
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
@@ -53,25 +52,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplicationsParser.h"
 #include "cxProfile.h"
 #include "cxLogger.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
 StateServiceImpl::StateServiceImpl(ctkPluginContext* context)
 {
-	this->initialize(this->createBackend(context));
-}
 
-StateServiceBackendPtr StateServiceImpl::createBackend(ctkPluginContext* context)
-{
-	TrackingServicePtr tracker = TrackingServiceProxy::create(context);
-	PatientModelServicePtr pasm = PatientModelServiceProxy::create(context);
-	SpaceProviderPtr spacer(new SpaceProviderImpl(tracker, pasm));
-	VideoServicePtr video = VideoServiceProxy::create(context);
-
-	StateServiceBackendPtr backend;
-	backend.reset(new StateServiceBackend(tracker, video, spacer, pasm));
-	return backend;
+	mServices = VisServices::create(context);
+	this->initialize();
 }
 
 StateServiceImpl::~StateServiceImpl()
@@ -83,14 +73,13 @@ bool StateServiceImpl::isNull()
 	return false;
 }
 
-void StateServiceImpl::initialize(StateServiceBackendPtr backend)
+void StateServiceImpl::initialize()
 {
-	mBackend = backend;
 	this->fillDefaultSettings();
 
 	ProfileManager::initialize();
 
-    mWorkflowStateMachine.reset(new CustusXWorkflowStateMachine(mBackend));
+	mWorkflowStateMachine.reset(new CustusXWorkflowStateMachine(mServices));
 	mWorkflowStateMachine->start();
 
 	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateChanged, this, &StateServiceImpl::workflowStateChanged);
