@@ -80,6 +80,7 @@ public:
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* getInteractorStyleActionGroup();
 	virtual void centerToImageCenterInActiveViewGroup();
+	virtual void addDefaultLayout(LayoutData layoutData);
 
 	virtual bool isNull();
 

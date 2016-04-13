@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLayoutRepository.h"
 #include "cxLayoutData.h"
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -47,7 +48,18 @@ LayoutData LayoutRepository::get(const QString uid) const
 	unsigned pos = this->indexOf(uid);
 	if (pos != mLayouts.size())
 		return mLayouts[pos];
+	if(!uid.isEmpty())
+		CX_LOG_WARNING() << "Layout don't exist: " << uid;
 	return LayoutData();
+}
+
+bool LayoutRepository::exists(const QString uid) const
+{
+	unsigned pos = this->indexOf(uid);
+	if (pos != mLayouts.size())
+		return true;
+	else
+		return false;
 }
 
 std::vector<QString> LayoutRepository::getAvailable() const

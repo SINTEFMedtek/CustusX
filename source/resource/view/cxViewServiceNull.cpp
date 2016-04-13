@@ -110,6 +110,11 @@ void ViewServiceNull::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	printWarning();
 }
 
+void ViewServiceNull::addDefaultLayout(LayoutData layoutData)
+{
+	printWarning();
+}
+
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {
 	return ClippersPtr();
