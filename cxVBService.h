@@ -39,6 +39,7 @@ class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /**
  * Virtual Bronchoscopy service interface.
@@ -52,13 +53,13 @@ class org_custusx_virtualbronchoscopy_EXPORT VBGUIExtenderService : public GUIEx
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	VBGUIExtenderService(ctkPluginContext *context);
+	VBGUIExtenderService(VisServicesPtr services);
 	virtual ~VBGUIExtenderService() {}
 	std::vector<CategorizedWidget> createWidgets() const;
 
 //	virtual QString getWidgetName() {return QString("org_custusx_virtualbronchoscopy_widget");}
 private:
-	ctkPluginContext* mContext;
+	VisServicesPtr mServices;
 };
 typedef boost::shared_ptr<VBGUIExtenderService> VBGUIExtenderServicePtr;
 

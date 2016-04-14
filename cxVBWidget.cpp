@@ -46,17 +46,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataSelectWidget.h"
 #include "cxTrackingServiceProxy.h"
 #include "cxView.h"
-
+#include "cxSessionStorageServiceProxy.h"
+#include "cxPatientStorage.h"
+#include "cxVisServices.h"
 
 
 
 namespace cx
 {
 
-VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
+VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
-	mHorizontalLayout(new QHBoxLayout(this)),
-	mControlsEnabled(false)
+	mVerticalLayout(new QVBoxLayout(this)),
+	mControlsEnabled(false),
+	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
 	this->setObjectName("Virtual Bronchoscopy Widget");
 	this->setWindowTitle("Virtual Bronchoscopy");
@@ -64,19 +67,18 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 
 	this->setFocusPolicy(Qt::StrongFocus);  // Widget needs focus to handle Key events
 
-	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	mViewService = ViewServicePtr(new ViewServiceProxy(context));
-	mTrackingService = TrackingServiceProxy::create(context);
-
-	mRouteToTarget = StringPropertySelectMesh::New(mPatientModelService);
+	mRouteToTarget = StringPropertySelectMesh::New(services->patient());
 	mRouteToTarget->setValueName("Route to target path: ");
+	mStorage->storeVariable("routeToTarget",
+							boost::bind(&StringPropertySelectMesh::getValue, mRouteToTarget),
+							boost::bind(&StringPropertySelectMesh::setValue, mRouteToTarget, _1));
 
 	// Selector for route to target
 	QVBoxLayout *inputVbox = new QVBoxLayout;
-	inputVbox->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this,mRouteToTarget));
+	inputVbox->addWidget(new DataSelectWidget(services->view(), services->patient(), this,mRouteToTarget));
 	QGroupBox *inputBox = new QGroupBox(tr("Input"));
 	inputBox->setLayout(inputVbox);
-	mHorizontalLayout->addWidget(inputBox);
+	mVerticalLayout->addWidget(inputBox);
 
 	// Selectors for position along path and play/pause
 	QHBoxLayout *playbackHBox = new QHBoxLayout;
@@ -88,7 +90,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	playbackHBox->addWidget(mPlaybackSlider);
 	playbackHBox->addWidget(labelTarget);
 	playbackBox->setLayout(playbackHBox);
-	mHorizontalLayout->addWidget(playbackBox);
+	mVerticalLayout->addWidget(playbackBox);
 	mPlaybackSlider->setMinimum(0);
 	mPlaybackSlider->setMaximum(100);
 
@@ -96,32 +98,28 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	QGroupBox	*endoscopeBox = new QGroupBox(tr("Endoscope"));
 	QGridLayout	*endoscopeControlLayout = new QGridLayout;
 	QLabel		*labelRot = new QLabel(tr("Rotate"));
-	QLabel		*labelView = new QLabel(tr("View Direction (degrees left/right)"));
-    QLabel		*label1 = new QLabel(tr("-90 "));
-    QLabel		*label2 = new QLabel(tr(" 90"));
+	QLabel		*labelView = new QLabel(tr("Left/right (30 deg)"));
 	mRotateDial = new QDial;
 	mRotateDial->setMinimum(-180);
 	mRotateDial->setMaximum(180);
-	mViewSlider = new QSlider(Qt::Horizontal);
-    mViewSlider->setMinimum(-90);
-    mViewSlider->setMaximum(90);
+	mViewSlider = new QDial;
+	mViewSlider->setMinimum(-30);
+	mViewSlider->setMaximum(30);
 
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
-	endoscopeControlLayout->addWidget(label1,1,1);
 	endoscopeControlLayout->addWidget(mViewSlider,1,2);
-	endoscopeControlLayout->addWidget(label2,1,3);
 	endoscopeBox->setLayout(endoscopeControlLayout);
-	mHorizontalLayout->addWidget(endoscopeBox);
+	mVerticalLayout->addWidget(endoscopeBox);
 
-    this->setLayout(mHorizontalLayout);
+	this->setLayout(mVerticalLayout);
 
 
 	this->enableControls(false);
 
-	mCameraPath = new CXVBcameraPath(mTrackingService, mPatientModelService, mViewService);
+	mCameraPath = new CXVBcameraPath(services->tracking(), services->patient(), services->view());
 
 	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,
 			this, &VBWidget::inputChangedSlot);
@@ -130,6 +128,7 @@ VBWidget::VBWidget(ctkPluginContext *context, QWidget *parent) :
 	connect(mViewSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 
+	mVerticalLayout->addStretch();
 }
 
 VBWidget::~VBWidget()

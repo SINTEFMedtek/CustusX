@@ -46,9 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewServiceProxy.h"
 #include "cxView.h"
-#include "cxRegistrationTransform.h"
-
-
 
 namespace cx {
 
@@ -158,14 +155,12 @@ void CXVBcameraPath::cameraViewAngleSlot(int angle)
 {
     mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180.0);
 	this->updateManualToolPosition();
-	mViewService->get3DView()->setModified();
 }
 
 void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
     mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180.0);
 	this->updateManualToolPosition();
-	mViewService->get3DView()->setModified();
 }
 
 } /* namespace cx */

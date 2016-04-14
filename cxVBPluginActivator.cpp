@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxVBService.h"
 #include "cxRegisteredService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -53,7 +54,8 @@ VBPluginActivator::~VBPluginActivator()
 
 void VBPluginActivator::start(ctkPluginContext* context)
 {
-	mVBregistration = RegisteredService::create<VBGUIExtenderService>(context, GUIExtenderService_iid);
+	VisServicesPtr services = VisServices::create(context);
+	mVBregistration = RegisteredServicePtr(new RegisteredService(context, new VBGUIExtenderService(services), GUIExtenderService_iid));
 }
 
 void VBPluginActivator::stop(ctkPluginContext* context)

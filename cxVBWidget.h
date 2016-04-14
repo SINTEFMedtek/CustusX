@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVBcameraPath.h"
 
 
-class QHBoxLayout;
+class QVBoxLayout;
 class QDial;
 class QSlider;
 
@@ -50,6 +50,7 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class StringPropertySelectMesh> StringPropertySelectMeshPtr;
+typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
 
 /**
  * Widget for Virtual Bronchoscopy
@@ -63,24 +64,23 @@ class VBWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	VBWidget(ctkPluginContext *context, QWidget *parent = 0);
+	VBWidget(VisServicesPtr services, QWidget *parent = 0);
 	virtual ~VBWidget();
 
 private:
 	QString defaultWhatsThis() const;
-	QHBoxLayout*				mHorizontalLayout;
+	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;
 	QDial*						mRotateDial;
-	QSlider*					mViewSlider;
+	QDial*						mViewSlider;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
-	PatientModelServicePtr		mPatientModelService;
-	ViewServicePtr				mViewService;
-	TrackingServicePtr			mTrackingService;
 	CXVBcameraPath*				mCameraPath;
 	bool						mControlsEnabled;
 
 	void						enableControls(bool enable);
+
+	PatientStoragePtr mStorage;
 
 signals:
 	void						cameraPathChanged(MeshPtr pathMesh);
