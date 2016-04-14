@@ -86,11 +86,9 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mPlaybackSlider = new QSlider(Qt::Horizontal);
 	QLabel		*labelStart = new QLabel(tr("Start "));
 	QLabel		*labelTarget = new QLabel(tr(" Target"));
-//	QSpinBox	*speedSpinbox = new QSpinBox();
 	playbackHBox->addWidget(labelStart);
 	playbackHBox->addWidget(mPlaybackSlider);
 	playbackHBox->addWidget(labelTarget);
-//	playbackHBox->addWidget(speedSpinbox);
 	playbackBox->setLayout(playbackHBox);
 	mVerticalLayout->addWidget(playbackBox);
 	mPlaybackSlider->setMinimum(0);
@@ -116,6 +114,8 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
+	this->setLayout(mVerticalLayout);
+
 
 	this->enableControls(false);
 
@@ -129,8 +129,6 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 
 	mVerticalLayout->addStretch();
-//	mHorizontalLayout->addStretch();
-//	mHorizontalLayout->addWidget(new QLabel("Virtual Bronchoscopy functionality ..."));
 }
 
 VBWidget::~VBWidget()
