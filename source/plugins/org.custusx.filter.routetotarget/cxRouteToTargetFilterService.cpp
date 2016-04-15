@@ -100,7 +100,6 @@ void RouteToTargetFilter::createInputTypes()
 	targetPoint = StringPropertySelectPointMetric::New(mServices->patient());
 	targetPoint->setValueName("Target point");
 	targetPoint->setHelp("Select point metric input");
-	connect(targetPoint.get(), SIGNAL(dataChanged(QString)), this, SLOT(pointMetricChangedSlot(QString)));
 	mInputTypes.push_back(targetPoint);
 
 }
