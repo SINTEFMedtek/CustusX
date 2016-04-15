@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxStringPropertySelectPointMetric.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxViewService.h"
 
 
 namespace cx
@@ -151,6 +152,7 @@ bool RouteToTargetFilter::postProcess()
 	outputCenterline->get_rMd_History()->setRegistration(inputMesh->get_rMd());
 
 	patientService()->insertData(outputCenterline);
+	mServices->view()->autoShowData(outputCenterline);
 
 	mOutputTypes[0]->setValue(outputCenterline->getUid());
 
