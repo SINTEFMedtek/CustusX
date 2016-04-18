@@ -1,5 +1,7 @@
 project(org_custusx_filter_airways)
 
+add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED)
+
 include(cxInstallUtilities)
 
 macro(cx_initialize_FAST)
