@@ -1,5 +1,7 @@
 project(org_custusx_filter_airways)
 
+add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED)
+
 include(cxInstallUtilities)
 
 macro(cx_initialize_FAST)
@@ -89,6 +91,7 @@ ctkMacroBuildPlugin(
   RESOURCES ${PLUGIN_resources}
   TARGET_LIBRARIES ${PLUGIN_target_libraries}
   OUTPUT_DIR ${PLUGIN_OUTPUT_DIR}
+  ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
 target_include_directories(org_custusx_filter_airways
