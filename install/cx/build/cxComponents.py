@@ -231,7 +231,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('f9478bdb4d5ecc6357b3a579a4bf8a927debd5e3') # new 2015-10-19
+        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224') # new 2015-10-19
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
