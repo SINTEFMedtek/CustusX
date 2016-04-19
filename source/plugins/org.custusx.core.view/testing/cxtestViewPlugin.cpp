@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMainWindowApplicationComponent.h"
 #include "cxMainWindow.h"
 #include "cxDataLocations.h"
+#include "cxLayoutData.h"
 
 namespace
 {
@@ -149,4 +150,21 @@ TEST_CASE("ViewService: set/get camera style", "[integration][plugins][org.custu
 	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
 	selectedAction = actionGroup->checkedAction();
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstTOOL_STYLE));
+}
+
+TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.custusx.core.view]")
+{
+	ViewServiceFixture fixture;
+
+	//Test layout
+	QString testLayoutName("TEST_LAYOUT");
+	cx::LayoutData layout = cx::LayoutData::create(testLayoutName, "TESTLAYOUT", 1, 1);
+	layout.setView(1, cx::ptAXIAL, cx::LayoutRegion(0, 0));
+
+	fixture.services->view()->setActiveLayout(testLayoutName);
+	CHECK_FALSE(fixture.services->view()->getActiveLayout() == testLayoutName);
+
+	fixture.services->view()->addDefaultLayout(layout);
+	fixture.services->view()->setActiveLayout(testLayoutName);
+	REQUIRE(fixture.services->view()->getActiveLayout() == testLayoutName);
 }

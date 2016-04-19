@@ -198,6 +198,11 @@ void ViewServiceProxy::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	mViewService->setCameraStyle(style, groupIdx);
 }
 
+void ViewServiceProxy::addDefaultLayout(LayoutData layoutData)
+{
+	mViewService->addDefaultLayout(layoutData);
+}
+
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {
 	return mViewService->getClippers();

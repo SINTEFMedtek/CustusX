@@ -165,6 +165,11 @@ void ViewImplService::centerToImageCenterInActiveViewGroup()
 	viewManager()->centerToImageCenterInViewGroup(this->getActiveGroupId());
 }
 
+void ViewImplService::addDefaultLayout(LayoutData layoutData)
+{
+	viewManager()->addDefaultLayout(layoutData);
+}
+
 LayoutRepositoryPtr ViewImplService::getLayoutRepository()
 {
 	return viewManager()->getLayoutRepository();

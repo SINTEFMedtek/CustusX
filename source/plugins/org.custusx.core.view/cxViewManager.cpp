@@ -413,6 +413,9 @@ ViewGroupDataPtr ViewManager::getViewGroup(int groupIdx) const
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 {
+	if(!mLayoutRepository->exists(layout))
+		return;
+
 	CX_ASSERT(mActiveLayout.size() > widgetIndex);
 
 	if (mActiveLayout[widgetIndex] == layout)
@@ -678,6 +681,11 @@ void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 		if (actions[i]->data().toString() == enum2string(style))
 			actions[i]->trigger();
 	}
+}
+
+void ViewManager::addDefaultLayout(LayoutData layoutData)
+{
+	mLayoutRepository->addDefault(layoutData);
 }
 
 } //namespace cx

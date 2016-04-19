@@ -177,6 +177,7 @@ public:
 
 	void centerToImageCenterInViewGroup(unsigned groupNr);
 	void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
+	void addDefaultLayout(LayoutData layoutData);
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
