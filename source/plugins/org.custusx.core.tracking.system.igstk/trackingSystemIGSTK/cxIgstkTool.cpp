@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxTransformFile.h"
+#include "cxIgstkToolManager.h"
 
 namespace cx
 {
@@ -82,6 +83,9 @@ IgstkTool::IgstkTool(ToolFileParser::ToolInternalStructure internalStructure) :
 								false)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
+	qRegisterMetaType<ToolPositionMetadata>("ToolPositionMetadata");
+
+	mLatestEmittedTimestamp = 0;
 
 	mInternalStructure = internalStructure;
 
@@ -154,6 +158,84 @@ void IgstkTool::setTracker(TrackerPtr tracker)
 	mTracker = tracker;
 }
 
+igstk::NDITracker::TrackingSampleInfo IgstkTool::getSampleInfo()
+{
+	igstk::NDITracker::TrackingSampleInfo retval;
+	retval.m_FrameNumber = 0;
+
+	TrackerPtr tracker = mTracker.lock();
+	if (!tracker)
+		return retval;
+	igstk::NDITracker* ndiTracker = dynamic_cast<igstk::NDITracker*>(tracker->getPointer());
+	if (!ndiTracker)
+		return retval;
+
+	// hacking into the IGSTK internals...
+	std::map<std::string,igstk::NDITracker::TrackingSampleInfo> info = ndiTracker->GetTrackingSampleInfo();
+	return info[mTool->GetTrackerToolIdentifier()];
+}
+
+bool IgstkTool::validReferenceForResult(igstk::CoordinateSystemTransformToResult result)
+{
+	const igstk::CoordinateSystem* destination = result.GetDestination();
+	IgstkToolPtr refTool = mReferenceTool.lock();
+
+	if (refTool) //if we are tracking with a reftool it must be visible
+	{
+		if (!refTool->getPointer()->IsCoordinateSystem(destination))
+			return false;
+	}
+	else //if we dont have a reftool we use the tracker as patientref
+	{
+		TrackerPtr tracker = mTracker.lock();
+		if (!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
+			return false;
+	}
+
+	return true;
+}
+
+Transform3D IgstkTool::igstk2Transform3D(const igstk::Transform& input) const
+{
+	vtkMatrix4x4Ptr vtkMatrix = vtkMatrix4x4Ptr::New();
+	input.ExportTransform(*vtkMatrix.GetPointer());
+	return Transform3D(vtkMatrix.GetPointer());
+}
+
+void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformToResult result)
+{
+	if (!this->validReferenceForResult(result))
+		return;
+
+	if (!mVisible)
+		return;
+
+	igstk::NDITracker::TrackingSampleInfo sampleInfo = this->getSampleInfo();
+
+	// ignore duplicate positions
+	if (similar(mLatestEmittedTimestamp, sampleInfo.m_TimeStamp.GetStartTime(),1.0E-3))
+	{
+		CX_LOG_CHANNEL_DEBUG("CA") << "*********************************************   duplicate transform";
+		return;
+	}
+	mLatestEmittedTimestamp = sampleInfo.m_TimeStamp.GetStartTime();
+
+	QDomDocument doc;
+	QDomElement root = doc.createElement("info");
+	doc.appendChild(root);
+	sampleInfo2xml(sampleInfo, root);
+	ToolPositionMetadata metadata;
+	metadata.mData = doc.toString();
+
+	igstk::Transform transform = result.GetTransform();
+//		if (transform.IsIdentity())
+//			return; // we want to update metadata for identity tools too.
+	Transform3D prMt = igstk2Transform3D(transform);
+	double timestamp = transform.GetStartTime();
+
+	emit toolTransformAndTimestamp(prMt, timestamp, metadata);
+}
+
 void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 {
 	if (igstk::CoordinateSystemTransformToEvent().CheckEvent(&event))
@@ -161,44 +243,8 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 		const igstk::CoordinateSystemTransformToEvent *transformEvent;
 		transformEvent = dynamic_cast<const igstk::CoordinateSystemTransformToEvent*>(&event);
 		if (!transformEvent)
-			return;
-
-		igstk::CoordinateSystemTransformToResult result = transformEvent->Get();
-		igstk::Transform transform = result.GetTransform();
-		if (transform.IsIdentity())
-			return;
-		if (!transform.IsValidNow())
-		{
-			//What to do? this happens alot, dunno why. Ignore? Seems to work ok.
-			//CA20100901: Probable cause: we work on the main (render) thread. This causes several hundred ms lag. Move IGSTK+Toolmanager internals to separate thread.
-			//TODO need to find out why this happens, we get duplicate transforms, it seems, this is not good
-			//return;
-		}
-		if (!mVisible)
-			return; // quickfix replacement for IsValidNow()
-
-		const igstk::CoordinateSystem* destination = result.GetDestination();
-		IgstkToolPtr strongReference = mReferenceTool.lock();
-
-		if (strongReference) //if we are tracking with a reftool it must be visible
-		{
-			if (!strongReference->getPointer()->IsCoordinateSystem(destination))
-				return;
-		}
-		else //if we dont have a reftool we use the tracker as patientref
-		{
-			TrackerPtr tracker = mTracker.lock();
-			if (!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
-				return;
-		}
-
-		vtkMatrix4x4Ptr vtkMatrix = vtkMatrix4x4Ptr::New();
-		transform.ExportTransform(*vtkMatrix.GetPointer());
-
-		const Transform3D prMt(vtkMatrix.GetPointer()); //prMt, transform from tool to patientref
-		double timestamp = transform.GetStartTime();
-
-		emit toolTransformAndTimestamp(prMt, timestamp);
+			return;		
+		this->processReceivedTransformResult(transformEvent->Get());
 	}
 	//Successes
 	else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))

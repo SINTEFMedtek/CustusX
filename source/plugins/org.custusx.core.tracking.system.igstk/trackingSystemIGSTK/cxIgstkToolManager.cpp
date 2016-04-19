@@ -38,6 +38,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+void sampleInfo2xml(const igstk::NDITracker::TrackingSampleInfo& info, QDomElement& node)
+{
+	node.setAttribute("timestamp", QString("%1").arg(info.m_TimeStamp.GetStartTime(), 0, 'f', 0));
+	node.setAttribute("error", QString("%1").arg(QString("%1").arg(info.m_Error, 0, 'f', 3)));
+	node.setAttribute("frame", QString("%1").arg(QString("%1").arg(info.m_FrameNumber)));
+	node.setAttribute("portstatus", QString("%1").arg(QString("%1").arg(info.m_PortStatus)));
+	node.setAttribute("toolinformation", QString("%1").arg(QString("%1").arg(info.m_ToolInformation)));
+	QString markers;
+	for (unsigned i=0; i<info.m_MarkerInformation.size(); ++i)
+		markers += QString::number(info.m_MarkerInformation[i]);
+	node.setAttribute("markers", markers);
+}
+
+
 IgstkToolManager::IgstkToolManager(ToolFileParser::TrackerInternalStructure trackerStructure,
                 std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
                 ToolFileParser::ToolInternalStructure referenceToolStructure) :
@@ -59,19 +73,12 @@ IgstkToolManager::IgstkToolManager(ToolFileParser::TrackerInternalStructure trac
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransformSlot()));
 
 	igstk::RealTimeClock::Initialize();
-
-	//WARNING will this work when newing several pulsegenerators in different threads????
-	mPulseGenerator = igstk::PulseGenerator::New();
-	mPulseGenerator->RequestSetFrequency(30.0);
-	mPulseGenerator->RequestStart();
 }
 
 IgstkToolManager::~IgstkToolManager()
 {
 	this->trackSlot(false);
 	this->initializeSlot(false);
-
-	mPulseGenerator->RequestStop();
 }
 
 std::map<QString, IgstkToolPtr> IgstkToolManager::getTools()
@@ -145,8 +152,9 @@ IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructu
 
 void IgstkToolManager::trackerTrackingSlot(bool isTracking)
 {
+	int igstkPulsingDriveRate = 10;
 	if (isTracking)
-		mTimer->start(33);
+		mTimer->start(igstkPulsingDriveRate);
 	else
 		mTimer->stop();
 }
@@ -177,13 +185,16 @@ void IgstkToolManager::trackSlot(bool on)
 
 void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 {
-	mPulseGenerator->CheckTimeouts();
+	igstk::PulseGenerator::CheckTimeouts();
 
 	std::map<QString, IgstkToolPtr>::iterator it = mTools.begin();
 	for (; it != mTools.end(); ++it)
 	{
 		if (!it->second)
 			continue;
+
+//		CX_LOG_CHANNEL_DEBUG("CA") << "tool to emit: " << it->first;
+
 		if (mReferenceTool)
 			it->second->getPointer()->RequestComputeTransformTo(mReferenceTool->getPointer());
 		else

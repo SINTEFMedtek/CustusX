@@ -38,13 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 
 #include <vector>
+#include <QTextEdit>
 #include "cxForwardDeclarations.h"
 #include "cxDoubleWidgets.h"
 #include "cxSpaceProperty.h"
 #include "cxStringProperty.h"
 #include "cxTransform3DWidget.h"
 #include "cxPointMetric.h"
-
+#include "cxTrackingService.h"
 
 class QCheckBox;
 class QGroupBox;
@@ -85,13 +86,10 @@ signals:
 
 protected slots:
   void activeToolChangedSlot();
-  void referenceToolChangedSlot();
   void manualToolWidgetChanged();
   void spacesChangedSlot();
 
 protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
   void setupUI();
   virtual void prePaintEvent();
 
@@ -99,12 +97,12 @@ private:
   ToolPropertiesWidget();
   void toolPositionChanged();
   void updateFrontend();
-//  void populateUSSectorConfigBox();
+  void reconnectTools();
   StringPropertyBasePtr mSelector;
   TrackingServicePtr mTrackingService;
   SpaceProviderPtr mSpaceProvider;
-  ToolPtr mReferenceTool;
   ToolPtr mTool;
+  TrackingService::ToolMap mTools;
 
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
@@ -112,13 +110,16 @@ private:
   SpacePropertyPtr mSpaceSelector;
   DoublePropertyToolOffsetPtr mToolOffset;
 
-//  SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
   
   LabeledComboBoxWidget* mUSSectorConfigBox;
+
+  QTextEdit* mMetadataLabel;
+  void updateBrowser();
+  QString createDescriptionForTool(ToolPtr current);
 };
 
 }//end namespace cx

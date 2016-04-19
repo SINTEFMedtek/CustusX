@@ -49,6 +49,8 @@ public:
 	virtual std::set<Type> getTypes() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual TimedTransformMapPtr getPositionHistory();
+	virtual ToolPositionMetadata getMetadata() const;
+	virtual const std::map<double, ToolPositionMetadata>& getMetadataHistory();
 
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
@@ -79,6 +81,9 @@ public:
 
 	virtual bool isNull();
 	static ToolPtr getNullObject();
+
+private:
+	std::map<double, ToolPositionMetadata> mMetadata;
 };
 
 } // namespace cx

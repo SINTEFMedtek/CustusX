@@ -69,5 +69,12 @@ ToolPtr Tool::getNullObject()
 		mNull.reset(new ToolNull, null_deleter());
 	return mNull;
 }
+
+QString ToolPositionMetadata::toString() const
+{
+	return mData;
+//	return mData.toElement().ownerDocument().toString();
+}
+
 } //cx
 

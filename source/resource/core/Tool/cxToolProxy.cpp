@@ -77,6 +77,16 @@ TimedTransformMapPtr ToolProxy::getPositionHistory()
 	return mTool->getPositionHistory();
 }
 
+ToolPositionMetadata ToolProxy::getMetadata() const
+{
+	return mTool->getMetadata();
+}
+
+const std::map<double, ToolPositionMetadata>& ToolProxy::getMetadataHistory()
+{
+	return mTool->getMetadataHistory();
+}
+
 bool ToolProxy::getVisible() const
 {
 	return mTool->getVisible();
