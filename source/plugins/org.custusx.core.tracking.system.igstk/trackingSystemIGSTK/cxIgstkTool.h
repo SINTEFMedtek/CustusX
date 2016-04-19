@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
+#include "igstkNDITracker.h"
 
 namespace cx
 {
@@ -107,8 +108,7 @@ signals:
 	void attachedToTracker(bool);
 	void tracked(bool);
 	void toolVisible(bool);
-	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
-	void tps(int); ///< transforms per second
+	void toolTransformAndTimestamp(Transform3D matrix, double timestamp, ToolPositionMetadata metadata);
 
 private:
 	void toolTransformCallback(const itk::EventObject &event);
@@ -118,6 +118,8 @@ private:
 	void internalTracked(bool value);
 	void internalVisible(bool value);
 	void addLogging(); ///< adds igstk logging to the internal igstk trackertool
+	igstk::NDITracker::TrackingSampleInfo getSampleInfo();
+	bool validReferenceForResult(igstk::CoordinateSystemTransformToResult result);
 
     ToolFileParser::ToolInternalStructure mInternalStructure; ///< the structure that defines the tool characteristics
 	igstk::TrackerTool::Pointer mTool; ///< pointer to the base class of the igstk tool
@@ -127,6 +129,7 @@ private:
 	igstk::Logger::Pointer mLogger; ///< logging the internal igstk behavior
 	itk::StdStreamLogOutput::Pointer mLogOutput; ///< output to write the log to
 
+	double mLatestEmittedTimestamp;
 	//internal states
 	//TODO is volatile enough for thread safety?
 	volatile bool mValid; ///< whether or not the tool is valid or not
@@ -134,6 +137,8 @@ private:
 	volatile bool mAttachedToTracker; ///< whether the tool is attached to a tracker or not
 	volatile bool mTracked; ///< whether the tool is being tracked or not
 
+	Transform3D igstk2Transform3D(const igstk::Transform &input) const;
+	void processReceivedTransformResult(igstk::CoordinateSystemTransformToResult result);
 };
 
 /**
