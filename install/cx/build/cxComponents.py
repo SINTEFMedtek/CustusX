@@ -167,6 +167,7 @@ class ITK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('v4.8.2')
     def configure(self):
         builder = self._getBuilder()
@@ -190,7 +191,7 @@ class VTK(CppComponent):
     def repository(self):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
-        #branch = 'VTK-CX-modifications'
+        self._getBuilder().gitSetRemoteURL(self.repository())
         tag = 'VTK-6-3-0.cx_patch_3'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
@@ -231,6 +232,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('f9478bdb4d5ecc6357b3a579a4bf8a927debd5e3') # new 2015-10-19
     def configure(self):
         builder = self._getBuilder()
@@ -257,6 +259,7 @@ class OpenCV(CppComponent):
     def repository(self):
         return 'https://github.com/Itseez/opencv.git'
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('2.4.11')
     def configure(self):
         builder = self._getBuilder()
@@ -285,6 +288,7 @@ class Eigen(CppComponent):
     def repository(self):
         return 'git@github.com:RLovelett/eigen.git'
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         #did not find a 3.2.1 release on the github fork... using a sha instead
         testedSHA = '36cd8ffd9dfcdded4717efb96daad9f6353f6351'
         self._getBuilder().gitCheckout(testedSHA)
@@ -313,6 +317,7 @@ class OpenIGTLink(CppComponent):
     def repository(self):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
     def configure(self):
         builder = self._getBuilder()
@@ -377,6 +382,7 @@ class CustusX(CppComponent):
     def _rawCheckout(self):
         self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
     def configure(self):
         builder = self._getBuilder()
@@ -430,6 +436,7 @@ class TubeSegmentationFramework(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/Tube-Segmentation-Framework.git' % base
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('9faceef98c6ee943a1301b0d57f9db0deb7e59e9')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
@@ -462,6 +469,7 @@ class LevelSetSegmentation(CppComponent):
         # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
         #repo = '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
         #self._getBuilder().gitSetRemoteURL(repo, branch="master")
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('e49217188925845be9b336adcb2b9e81c26ea784')
         self._getBuilder()._gitSubmoduleUpdate()
     def configure(self):
@@ -487,6 +495,7 @@ class OpenCLUtilityLibrary(CppComponent):
     def repository(self):
         return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
     def configure(self):
         builder = self._getBuilder()
@@ -508,6 +517,7 @@ class FAST(CppComponent):
     def repository(self):
         return 'git@github.com:smistad/FAST'
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('8656587b6e6a1192f90789f6c1ffb760484a39d5')
     def configure(self):
         builder = self._getBuilder()
@@ -541,6 +551,7 @@ class CustusXData(CppComponent):
     def repository(self):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
     def configure(self):
         pass
@@ -565,7 +576,7 @@ class QHttpServer(CppComponent):
     def repository(self):
         return 'git@github.com:SINTEFMedtek/qhttpserver.git'
     def update(self):
-        #self._getBuilder().gitSetRemoteURL(self._getRepo(), branch='master')
+        self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
