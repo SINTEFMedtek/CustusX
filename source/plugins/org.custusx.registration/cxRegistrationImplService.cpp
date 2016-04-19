@@ -61,7 +61,7 @@ RegistrationImplService::RegistrationImplService(ctkPluginContext *context) :
 	mSession(SessionStorageServiceProxy::create(context))
 {
 	connect(mSession.get(), &SessionStorageService::cleared, this, &RegistrationImplService::clearSlot);
-	connect(mSession.get(), &SessionStorageService::isLoading, this, &RegistrationImplService::duringLoadPatientSlot);
+    connect(mSession.get(), &SessionStorageService::isLoadingSecond, this, &RegistrationImplService::duringLoadPatientSlot);
 	connect(mSession.get(), &SessionStorageService::isSaving, this, &RegistrationImplService::duringSavePatientSlot);
 }
 
