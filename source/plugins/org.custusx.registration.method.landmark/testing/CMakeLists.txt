@@ -6,6 +6,7 @@ if(BUILD_TESTING)
     set(CXTEST_PLUGINREGISTRATION_SOURCES ${CXTEST_PLUGINREGISTRATION_SOURCES}
         cxtestFastPatientRegistration.cpp
         cxtestFastPatientRegistrationWidgetFixture.cpp
+        cxtestLandmarkPatientRegistration.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -27,6 +28,7 @@ if(BUILD_TESTING)
         cxtestResourceVisualization
         cxCatch
         cxLogicManager
+        cxtest_org_custusx_core_patientmodel
     )
     cx_add_tests_to_catch(cxtest_org_custusx_registration_method_landmark)
 
