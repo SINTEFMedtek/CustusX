@@ -41,10 +41,10 @@ namespace cx
 void sampleInfo2xml(const igstk::NDITracker::TrackingSampleInfo& info, QDomElement& node)
 {
 	node.setAttribute("timestamp", QString("%1").arg(info.m_TimeStamp.GetStartTime(), 0, 'f', 0));
-	node.setAttribute("error", QString("%1").arg(QString("%1").arg(info.m_Error, 0, 'f', 3)));
-	node.setAttribute("frame", QString("%1").arg(QString("%1").arg(info.m_FrameNumber)));
-	node.setAttribute("portstatus", QString("%1").arg(QString("%1").arg(info.m_PortStatus)));
-	node.setAttribute("toolinformation", QString("%1").arg(QString("%1").arg(info.m_ToolInformation)));
+	node.setAttribute("error", QString("%1").arg(info.m_Error, 0, 'f', 3));
+	node.setAttribute("frame", QString("%1").arg(info.m_FrameNumber));
+	node.setAttribute("portstatus", QString("0b%1").arg(info.m_PortStatus, 16, 2, QChar('0')));
+	node.setAttribute("toolinformation", QString("0b%1").arg(info.m_ToolInformation, 8, 2, QChar('0')));
 	QString markers;
 	for (unsigned i=0; i<info.m_MarkerInformation.size(); ++i)
 		markers += QString::number(info.m_MarkerInformation[i]);

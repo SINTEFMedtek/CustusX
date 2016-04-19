@@ -240,6 +240,7 @@ void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double ti
 
 	mTimestamp = timestamp;
 	mMetadata[timestamp] = metadata;
+
 	(*mPositionHistory)[timestamp] = matrix; // store original in history
 	m_prMt = prMt_filtered;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);

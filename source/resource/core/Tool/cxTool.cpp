@@ -72,7 +72,7 @@ ToolPtr Tool::getNullObject()
 
 QString ToolPositionMetadata::toString() const
 {
-	return mData;
+	return mData.trimmed();
 //	return mData.toElement().ownerDocument().toString();
 }
 

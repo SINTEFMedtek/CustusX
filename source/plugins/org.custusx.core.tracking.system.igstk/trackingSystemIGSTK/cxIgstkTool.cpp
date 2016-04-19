@@ -207,15 +207,18 @@ void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformT
 	if (!this->validReferenceForResult(result))
 		return;
 
-	if (!mVisible)
-		return;
+//	if (!mVisible)
+//		CX_LOG_CHANNEL_DEBUG("CA") << "*********************************************   not visible" << this->mInternalStructure.mName;
+
+//	if (!mVisible)
+//		return;
 
 	igstk::NDITracker::TrackingSampleInfo sampleInfo = this->getSampleInfo();
 
 	// ignore duplicate positions
 	if (similar(mLatestEmittedTimestamp, sampleInfo.m_TimeStamp.GetStartTime(),1.0E-3))
 	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "*********************************************   duplicate transform";
+//		CX_LOG_CHANNEL_DEBUG("CA") << "*********************************************   duplicate transform";
 		return;
 	}
 	mLatestEmittedTimestamp = sampleInfo.m_TimeStamp.GetStartTime();

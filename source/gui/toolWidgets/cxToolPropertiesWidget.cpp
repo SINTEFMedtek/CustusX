@@ -206,7 +206,7 @@ void ToolPropertiesWidget::toolPositionChanged()
 QString ToolPropertiesWidget::createDescriptionForTool(ToolPtr current)
 {
 	QString meta = current->getMetadata().toString();
-	return QString("Tool=%1: visible=%2\n%3")
+	return QString("Tool=%1: visible=%2\n%3\n")
 			.arg(current->getName())
 			.arg(current->getVisible())
 			.arg(meta);
