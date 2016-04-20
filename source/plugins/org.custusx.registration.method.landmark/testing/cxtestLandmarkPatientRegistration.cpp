@@ -30,68 +30,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#include "catch.hpp"
 #include "cxtestSessionStorageTestFixture.h"
+#include "cxPatientModelService.h"
+#include "cxVector3D.h"
+#include "cxLandmark.h"
+#include "cxRegServices.h"
+#include "cxtestDirectSignalListener.h"
+#include "cxRegistrationService.h"
+#include "cxSessionStorageService.h"
 
-#include "cxDataLocations.h"
-#include "cxLogicManager.h"
-#include "cxSessionStorageServiceProxy.h"
-#include "cxPatientModelServiceProxy.h"
-#include "cxVisServices.h"
 
 namespace cxtest
 {
 
-SessionStorageTestFixture::SessionStorageTestFixture() :
-	mSessionsCreated(false)
+TEST_CASE("RegistrationPlugin: Patient landmarks visible after registering, save, quit and load patient", "[unit][plugins][org.custusx.registration]")
 {
-	cx::DataLocations::setTestMode();
-	cx::LogicManager::initialize();
-    mContext = cx::LogicManager::getInstance()->getPluginContext();
-    mSessionStorageService = cx::SessionStorageServiceProxy::create(mContext);
-    mPatientModelService = cx::PatientModelServiceProxy::create(mContext);
-    mServices = cx::VisServices::create(mContext);
+    SessionStorageTestFixture storageFixture;
+    cx::RegServicesPtr regServices = cx::RegServices::create(storageFixture.mContext);
+    cx::PatientModelServicePtr patientModelService = regServices->patient();
+    TestDataStructures testData;
 
-	mSession1 = QString("/temp/TestPatient1.cx3");
-	mSession2 = QString("/temp/TestPatient2.cx3");
-}
+    storageFixture.createSessions();
+    storageFixture.loadSession1();
+    patientModelService->insertData(testData.image1);
 
-SessionStorageTestFixture::~SessionStorageTestFixture()
-{
-	cx::LogicManager::shutdown();
-}
+    cx::Vector3D p_target(0,0,0);
+    REQUIRE(patientModelService->getPatientLandmarks()->getLandmarks().size()==0);
+    regServices->registration()->setFixedData(testData.image1);
+    patientModelService->getPatientLandmarks()->setLandmark(cx::Landmark(testData.image1->getUid(), p_target));
+    REQUIRE(patientModelService->getPatientLandmarks()->getLandmarks().size()==1);
+    storageFixture.saveSession();
 
-void SessionStorageTestFixture::createSessions()
-{
-	if(!mSessionsCreated)
-	{
-		this->loadSession2();
-		this->loadSession1();
-	}
-}
+    storageFixture.loadSession2();
+    REQUIRE(patientModelService->getPatientLandmarks()->getLandmarks().size()==0);
+    storageFixture.saveSession();
 
-void SessionStorageTestFixture::saveSession()
-{
-	mSessionStorageService->save();
+    cxtest::DirectSignalListener fixedDataChangedSignal(regServices->registration().get(), SIGNAL(fixedDataChanged(QString)));
+    cxtest::DirectSignalListener isLoadingSecondSignal(regServices->session().get(), SIGNAL(isLoadingSecond(QDomElement&)));
+    storageFixture.loadSession1();
+    CHECK(fixedDataChangedSignal.isReceived());
+    CHECK(isLoadingSecondSignal.isReceived());
+    REQUIRE(patientModelService->getPatientLandmarks()->getLandmarks().size()==1);
 }
 
-void SessionStorageTestFixture::loadSession1()
-{
-	mSessionStorageService->load(cx::DataLocations::getTestDataPath() + mSession1);
-}
-
-void SessionStorageTestFixture::loadSession2()
-{
-	mSessionStorageService->load(cx::DataLocations::getTestDataPath() + mSession2);
-}
-void SessionStorageTestFixture::reloadSession1()
-{
-	this->loadSession2();
-	this->loadSession1();
-}
-void SessionStorageTestFixture::reloadSession2()
-{
-	this->loadSession1();
-	this->loadSession2();
-}
-
-} //cxtest
+}//cxtest
