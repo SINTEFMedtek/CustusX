@@ -189,7 +189,10 @@ MACRO(cx_set_version_today_alpha)
 	string(REPLACE "-" ";" TODAY_DATE_LIST ${TODAY_DATE})
 	# truncate branch name - this is encoded into the exename and should be
 	# kept within reasonable size (think windows filepath restrictions)
-	string(SUBSTRING ${GIT_BRANCH} 0, 30, GIT_BRANCH)
+	string(LENGTH ${GIT_BRANCH} TEXT_LENGTH)
+	if(${TEXT_LENGTH} GREATER 30)
+		string(SUBSTRING ${GIT_BRANCH} 0, 30, GIT_BRANCH)
+	endif()
 
 	list(GET TODAY_DATE_LIST 0 YEAR)
 	list(GET TODAY_DATE_LIST 1 MONTH)
