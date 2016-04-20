@@ -62,8 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AirwaysFilter::AirwaysFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(VisServices::create(pluginContext))
+AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 
 }
@@ -86,16 +86,19 @@ QString AirwaysFilter::getHelp() const
 	        "</html>";
 }
 
-
 bool AirwaysFilter::execute()
 {
 	std::cout << "EXECUTING AIRWAYS FILTER" << std::endl;
     ImagePtr input = this->getCopiedInputImage();
-    	if (!input)
-    		return false;
-    mInputImage = input;
+	return this->execute(input);
+}
 
-	std::string filename = (patientService()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
+bool AirwaysFilter::execute(ImagePtr inputImage)
+{
+	if (!inputImage)
+		return false;
+	mInputImage = inputImage;
+	std::string filename = (patientService()->getActivePatientFolder()+"/"+mInputImage->getFilename()).toStdString();
 
 	try {
 		// Import image data from disk
