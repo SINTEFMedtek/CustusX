@@ -40,7 +40,7 @@ namespace cx
 
 void sampleInfo2xml(const igstk::NDITracker::TrackingSampleInfo& info, QDomElement& node)
 {
-	node.setAttribute("timestamp", QString("%1").arg(info.m_TimeStamp.GetStartTime(), 0, 'f', 0));
+	node.setAttribute("timestamp", QString("%1").arg(info.m_TimeStamp, 0, 'f', 0));
 	node.setAttribute("error", QString("%1").arg(info.m_Error, 0, 'f', 3));
 	node.setAttribute("frame", QString("%1").arg(info.m_FrameNumber));
 	node.setAttribute("portstatus", QString("0b%1").arg(info.m_PortStatus, 16, 2, QChar('0')));

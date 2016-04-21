@@ -212,11 +212,11 @@ void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformT
 	igstk::NDITracker::TrackingSampleInfo sampleInfo = this->getSampleInfo();
 
 	// ignore duplicate positions
-	if (similar(mLatestEmittedTimestamp, sampleInfo.m_TimeStamp.GetStartTime(),1.0E-3))
+	if (similar(mLatestEmittedTimestamp, sampleInfo.m_TimeStamp,1.0E-3))
 	{
 		return;
 	}
-	mLatestEmittedTimestamp = sampleInfo.m_TimeStamp.GetStartTime();
+	mLatestEmittedTimestamp = sampleInfo.m_TimeStamp;
 
 	QDomDocument doc;
 	QDomElement root = doc.createElement("info");
