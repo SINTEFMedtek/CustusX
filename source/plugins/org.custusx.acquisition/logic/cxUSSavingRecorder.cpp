@@ -150,11 +150,12 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 	UsReconstructionFileMakerPtr fileMaker;
 	fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
 	USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
-																				imageTimestamps,
-																				trackerRecordedData,
-																				mRecordingTool,
-																				mDoWriteColor,
-																				m_rMpr);
+																		   imageTimestamps,
+																		   trackerRecordedData,
+																		   mRecordingTool,
+																		   videoRecorder->getSource()->getUid(),
+																		   mDoWriteColor,
+																		   m_rMpr);
 	return reconstructData;
 }
 

@@ -79,7 +79,7 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataContainerPtr imageData,
 																	 std::vector<TimeInfo> imageTimestamps,
 																	 TimedTransformMap trackerRecordedData,
-																	 ToolPtr tool,
+																	 ToolPtr tool, QString streamUid,
 																	 bool writeColor, Transform3D rMpr)
 {
 	if(trackerRecordedData.empty())
@@ -113,7 +113,7 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 
 	if (tool && tool->getProbe())
 	{
-		retval.mProbeDefinition.setData(tool->getProbe()->getProbeDefinition());
+		retval.mProbeDefinition.setData(tool->getProbe()->getProbeDefinition(streamUid));
 	}
 
 	if (tool)
