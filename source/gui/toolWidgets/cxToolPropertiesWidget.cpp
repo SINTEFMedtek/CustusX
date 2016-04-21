@@ -166,8 +166,6 @@ void ToolPropertiesWidget::setupUI()
   mMetadataLabel = new QTextEdit;
   mToptopLayout->addWidget(mMetadataLabel);
 
-//  mToptopLayout->addStretch();
-
   connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::reconnectTools);
   connect(mSelector.get(), &StringPropertyBase::changed, this, &ToolPropertiesWidget::activeToolChangedSlot);
   connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::setModified);

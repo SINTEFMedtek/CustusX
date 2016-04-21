@@ -113,7 +113,6 @@ void USSavingRecorder::stopRecord()
 	{
 		// complete writing of images to temporary storage. Do this before using the image data.
 		mVideoRecorder[i]->completeSave();
-//		std::cout << QString("completed save of cached video stream %1").arg(i) << std::endl;
 	}
 }
 

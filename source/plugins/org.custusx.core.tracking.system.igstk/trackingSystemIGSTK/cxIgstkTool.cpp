@@ -207,18 +207,13 @@ void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformT
 	if (!this->validReferenceForResult(result))
 		return;
 
-//	if (!mVisible)
-//		CX_LOG_CHANNEL_DEBUG("CA") << "*********************************************   not visible" << this->mInternalStructure.mName;
-
-//	if (!mVisible)
-//		return;
+	// emit even if not visible: need error metadata
 
 	igstk::NDITracker::TrackingSampleInfo sampleInfo = this->getSampleInfo();
 
 	// ignore duplicate positions
 	if (similar(mLatestEmittedTimestamp, sampleInfo.m_TimeStamp.GetStartTime(),1.0E-3))
 	{
-//		CX_LOG_CHANNEL_DEBUG("CA") << "*********************************************   duplicate transform";
 		return;
 	}
 	mLatestEmittedTimestamp = sampleInfo.m_TimeStamp.GetStartTime();
@@ -231,8 +226,6 @@ void IgstkTool::processReceivedTransformResult(igstk::CoordinateSystemTransformT
 	metadata.mData = doc.toString();
 
 	igstk::Transform transform = result.GetTransform();
-//		if (transform.IsIdentity())
-//			return; // we want to update metadata for identity tools too.
 	Transform3D prMt = igstk2Transform3D(transform);
 	double timestamp = transform.GetStartTime();
 
@@ -252,7 +245,6 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	//Successes
 	else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))
 	{
-		//this->internalConfigured(true);
 		report(QString("Configured [%1] with the tracking system").arg(mInternalStructure.mUid));
 	}
 	else if (igstk::TrackerToolAttachmentToTrackerEvent().CheckEvent(&event))
@@ -266,12 +258,10 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	else if (igstk::TrackerToolMadeTransitionToTrackedStateEvent().CheckEvent(&event))
 	{
 		this->internalVisible(true);
-		//report(mInternalStructure.mUid+" is visible."); //SPAM
 	}
 	else if (igstk::TrackerToolNotAvailableToBeTrackedEvent().CheckEvent(&event))
 	{
 		this->internalVisible(false);
-		//report(mInternalStructure.mUid+" is hidden."); //SPAM
 	}
 	else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
 	{

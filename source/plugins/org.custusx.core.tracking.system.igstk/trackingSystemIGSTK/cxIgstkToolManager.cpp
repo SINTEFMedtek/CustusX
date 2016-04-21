@@ -193,8 +193,6 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 		if (!it->second)
 			continue;
 
-//		CX_LOG_CHANNEL_DEBUG("CA") << "tool to emit: " << it->first;
-
 		if (mReferenceTool)
 			it->second->getPointer()->RequestComputeTransformTo(mReferenceTool->getPointer());
 		else
