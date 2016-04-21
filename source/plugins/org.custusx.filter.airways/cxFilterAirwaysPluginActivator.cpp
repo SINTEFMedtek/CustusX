@@ -54,7 +54,7 @@ void FilterAirwaysPluginActivator::start(ctkPluginContext* context)
 {
 	VisServicesPtr services = VisServices::create(context);
 	AirwaysFilter *airwaysFilter = new AirwaysFilter(services);
-	mRegistration = RegisteredServicePtr(new RegisteredService(context, airwaysFilter, FilterService_iid));
+	mRegistration = RegisteredService::create(context, airwaysFilter, FilterService_iid);
 }
 
 void FilterAirwaysPluginActivator::stop(ctkPluginContext* context)
