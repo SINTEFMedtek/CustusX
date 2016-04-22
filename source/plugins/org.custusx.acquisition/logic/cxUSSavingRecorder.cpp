@@ -76,11 +76,12 @@ void USSavingRecorder::set_rMpr(Transform3D rMpr)
 	m_rMpr = rMpr;
 }
 
-void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, std::vector<VideoSourcePtr> video)
+void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video)
 {
 	this->clearRecording(); // clear previous data if any
 
 	mRecordingTool = tool;
+	mReference = reference;
 	mSession = session;
 
 	QString tempBaseFolder = DataLocations::getCachePath()+"/usacq/"+QDateTime::currentDateTime().toString(timestampSecondsFormat());
@@ -112,7 +113,6 @@ void USSavingRecorder::stopRecord()
 	{
 		// complete writing of images to temporary storage. Do this before using the image data.
 		mVideoRecorder[i]->completeSave();
-//		std::cout << QString("completed save of cached video stream %1").arg(i) << std::endl;
 	}
 }
 
@@ -142,6 +142,10 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 	SavingVideoRecorderPtr videoRecorder = mVideoRecorder[videoRecorderIndex];
 	videoRecorder->completeSave(); // just in case - should have been done earlier.
 	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory_prMt(mRecordingTool, mSession, true);
+	std::map<double, cx::ToolPositionMetadata> trackerMetadata = RecordSession::getToolHistory_metadata(mRecordingTool, mSession, true);
+	std::map<double, cx::ToolPositionMetadata> referenceTrackerMetadata = RecordSession::getToolHistory_metadata(mReference, mSession, true);
+	std::cout << "----------- "
+				 "trackerMetadata : " << trackerMetadata.size() << std::endl;
 
 	CachedImageDataContainerPtr imageData = videoRecorder->getImageData();
 	std::vector<TimeInfo> imageTimestamps = videoRecorder->getTimestamps();
@@ -150,11 +154,13 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 	UsReconstructionFileMakerPtr fileMaker;
 	fileMaker.reset(new UsReconstructionFileMaker(streamSessionName));
 	USReconstructInputData reconstructData = fileMaker->getReconstructData(imageData,
-																				imageTimestamps,
-																				trackerRecordedData,
-																				mRecordingTool,
-																				mDoWriteColor,
-																				m_rMpr);
+																		   imageTimestamps,
+																		   trackerRecordedData,
+																		   trackerMetadata,
+																		   referenceTrackerMetadata,
+																		   mRecordingTool,
+																		   mDoWriteColor,
+																		   m_rMpr);
 	return reconstructData;
 }
 
@@ -162,8 +168,6 @@ void USSavingRecorder::startSaveData(QString baseFolder, bool compressImages)
 {
 	if (!mSession)
 		return;
-
-	TimedTransformMap trackerRecordedData = RecordSession::getToolHistory_prMt(mRecordingTool, mSession, true);
 
 	for (unsigned i=0; i<mVideoRecorder.size(); ++i)
 	{
@@ -174,8 +178,6 @@ void USSavingRecorder::startSaveData(QString baseFolder, bool compressImages)
 
 		this->saveStreamSession(data, saveFolder, streamSessionName, compressImages);
 	}
-
-//	this->clearRecording();
 }
 
 void USSavingRecorder::clearRecording()

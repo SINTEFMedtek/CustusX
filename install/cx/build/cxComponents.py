@@ -347,7 +347,7 @@ class IGSTK(CppComponent):
         repo = '%s/IGSTK' % base
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(repo, branch=branch)
-        self._getBuilder().gitCheckout('e94aab676973452be7706e01ddb9f77f79c52ae8')
+        self._getBuilder().gitCheckout('34f4a9f46d54d4674e0a19acdb24bbbc4dcb1ffe')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption

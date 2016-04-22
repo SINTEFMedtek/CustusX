@@ -58,6 +58,9 @@ public:
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
 	virtual Transform3D get_prMt() const;
 
+	virtual ToolPositionMetadata getMetadata() const;
+	virtual const std::map<double, ToolPositionMetadata>& getMetadataHistory();
+
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
@@ -72,7 +75,8 @@ protected:
 	TimedTransformMapPtr mPositionHistory;
 	Transform3D m_prMt; ///< the transform from the tool to the patient reference
 	TrackingPositionFilterPtr mTrackingPositionFilter;
-private slots:
+	std::map<double, ToolPositionMetadata> mMetadata;
+
 private:
 	double mTooltipOffset;
 };

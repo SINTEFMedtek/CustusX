@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include "cxForwardDeclarations.h"
 #include "cxTransform3D.h"
+#include "cxTool.h"
 
 class QDomNode;
 
@@ -84,6 +85,7 @@ public:
 	void parseXml(QDomNode& node);
 
 	static TimedTransformMap getToolHistory_prMt(ToolPtr tool, RecordSessionPtr session, bool verbose);
+	static std::map<double, ToolPositionMetadata> getToolHistory_metadata(ToolPtr tool, RecordSessionPtr session, bool verbose);
 
 protected:
 	QDateTime getTimestamp() const;

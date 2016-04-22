@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxProbeSector.h"
 #include "cxData.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -72,6 +73,8 @@ struct cxResource_EXPORT USReconstructInputData
 	USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
 	std::vector<TimedPosition> mFrames;
 	std::vector<TimedPosition> mPositions;
+	std::map<double, ToolPositionMetadata> mTrackerRecordedMetadata;
+	std::map<double, ToolPositionMetadata> mReferenceRecordedMetadata;
 	ProbeSector mProbeDefinition;
 	QString mProbeUid;
 	Transform3D rMpr; ///< patient registration
