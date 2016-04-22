@@ -56,8 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RouteToTargetFilter::RouteToTargetFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(VisServicesPtr(new VisServices(pluginContext)) )
+RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 	mRouteToTarget = RouteToTargetPtr(new RouteToTarget());
 }

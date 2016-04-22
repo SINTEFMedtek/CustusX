@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRouteToTargetFilterService.h"
 #include "cxRegisteredService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -51,7 +52,9 @@ FilterRouteToTargetPluginActivator::~FilterRouteToTargetPluginActivator()
 
 void FilterRouteToTargetPluginActivator::start(ctkPluginContext* context)
 {
-    mRegistration = RegisteredService::create<RouteToTargetFilter>(context, FilterService_iid);
+	VisServicesPtr services = VisServices::create(context);
+	RouteToTargetFilter *routeToTargetFilter = new RouteToTargetFilter(services);
+	mRegistration = RegisteredService::create(context, routeToTargetFilter, FilterService_iid);
 }
 
 void FilterRouteToTargetPluginActivator::stop(ctkPluginContext* context)
