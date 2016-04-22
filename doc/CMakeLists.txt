@@ -137,8 +137,13 @@ macro(cx_doc_set_common_userdoc_definitions)
     SET(CX_DOXYGEN_EXCLUDE )
     SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/*")   
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
-    set(CX_USE_MDFILE_AS_MAINPAGE {CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_main_page.md)
 
+    get_property(CX_DOC_USER_MAINPAGE_OVERRIDE GLOBAL PROPERTY CX_DOC_USER_MAINPAGE_OVERRIDE)
+    # remove the default mainpage if an override is defined:
+    if(CX_DOC_USER_MAINPAGE_OVERRIDE)
+        set(CX_DOXYGEN_EXCLUDE ${CX_DOXYGEN_EXCLUDE} "${CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_main_page.md")
+    endif()
+    
     # tweaks that remove source code stuff
     SET(CX_DOXYGEN_SOURCE_BROWSER NO)
     SET(CX_SHOW_FILES NO)

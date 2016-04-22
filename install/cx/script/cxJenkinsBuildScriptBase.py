@@ -84,7 +84,24 @@ class Controller(cxBuildScript.BuildScript):
             self.cxBuilder.runUnitTests()
         if not skip_package:
             self.cxBuilder.createInstallerPackage()   
-        
+                
+    def testPackageStep(self, 
+                        skip_extra_install_step_checkout=False, 
+                        skip_install=False, 
+                        skip_unit_tests=False, 
+                        skip_installation_test=False, 
+                        skip_integration_test=False):
+        if not skip_extra_install_step_checkout:
+            self.checkoutCustusXAndData()
+        if not skip_install:
+            self.cxInstaller.installPackage()
+        if not skip_unit_tests:
+            self.cxInstallation.runUnitTests()
+        if not skip_installation_test:            
+            self.cxInstallation.testInstallation()
+        if not skip_integration_test:
+            self.cxInstallation.runIntegrationTests()
+
     def integrationTestPackageStep(self, 
                                    skip_extra_install_step_checkout=False, 
                                    skip_install=False, 
