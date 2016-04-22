@@ -61,7 +61,7 @@ typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPt
  * Additional information describing each tool position,
  * typically device-dependent info.
  */
-struct ToolPositionMetadata
+struct cxResource_EXPORT ToolPositionMetadata
 {
 	QString mData;
 	QString toString() const;
