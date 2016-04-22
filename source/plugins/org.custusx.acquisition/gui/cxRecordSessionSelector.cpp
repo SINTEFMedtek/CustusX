@@ -131,8 +131,6 @@ TimedTransformMap SelectRecordSession::getRecordedTrackerData_prMt()
 {
 	RecordSessionPtr session = this->getSession();
 	ToolPtr tool = this->getTool();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "session " << (session ? session->getHumanDescription() :  "-");
-//	CX_LOG_CHANNEL_DEBUG("CA") << "  session Tool " << (tool ? tool->getName() :  "-");
 
 	TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(tool, session, false);
 

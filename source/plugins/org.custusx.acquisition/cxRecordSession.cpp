@@ -231,6 +231,33 @@ TimedTransformMap RecordSession::getToolHistory_prMt(ToolPtr tool, RecordSession
 	return retval;
 }
 
+std::map<double, cx::ToolPositionMetadata> RecordSession::getToolHistory_metadata(ToolPtr tool, RecordSessionPtr session, bool verbose)
+{
+	std::map<double, cx::ToolPositionMetadata> retval;
+
+	if(tool && session)
+	{
+		for (unsigned i=0; i<session->mIntervals.size(); ++i)
+		{
+			double startTime = session->mIntervals[i].first.toMSecsSinceEpoch();
+			double stopTime = session->mIntervals[i].second.toMSecsSinceEpoch();
+			const std::map<double, cx::ToolPositionMetadata>& values = tool->getMetadataHistory();
+
+			retval.insert(values.lower_bound(startTime),
+						  values.upper_bound(stopTime));
+		}
+	}
+
+	if(retval.empty() && session && verbose)
+	{
+		CX_LOG_ERROR() << QString("Could not find any tracking meta data for tool [%1] in session [%2]. ")
+						  .arg(tool.get() ? tool->getName() : "NULL")
+						  .arg(session.get() ? session->getHumanDescription() : "NULL");
+	}
+
+	return retval;
+}
+
 std::pair<QDateTime, QDateTime> RecordSession::getInterval(int i)
 {
 	return mIntervals[i];

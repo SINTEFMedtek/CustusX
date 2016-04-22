@@ -79,6 +79,8 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData()
 USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataContainerPtr imageData,
 																	 std::vector<TimeInfo> imageTimestamps,
 																	 TimedTransformMap trackerRecordedData,
+																	 std::map<double, ToolPositionMetadata> trackerRecordedMetadata,
+																	 std::map<double, ToolPositionMetadata> referenceRecordedMetadata,
 																	 ToolPtr tool, QString streamUid,
 																	 bool writeColor, Transform3D rMpr)
 {
@@ -90,6 +92,8 @@ USReconstructInputData UsReconstructionFileMaker::getReconstructData(ImageDataCo
 	retval.mFilename = mSessionDescription; // not saved yet - no filename
 	retval.mUsRaw = USFrameData::create(mSessionDescription, imageData);
 	retval.rMpr = rMpr;
+	retval.mTrackerRecordedMetadata = trackerRecordedMetadata;
+	retval.mReferenceRecordedMetadata = referenceRecordedMetadata;
 
 	for (TimedTransformMap::iterator it = trackerRecordedData.begin(); it != trackerRecordedData.end(); ++it)
 	{
@@ -203,6 +207,42 @@ bool UsReconstructionFileMaker::writeTimestamps(QString filename, std::vector<Ti
 bool UsReconstructionFileMaker::writeUSTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
 {
 	return this->writeTransforms(reconstructionFolder+"/"+session+".fp", ts, "frame transforms rMu");
+}
+
+bool UsReconstructionFileMaker::writeTrackerMetadata(QString reconstructionFolder, QString session, const std::map<double, ToolPositionMetadata>& ts)
+{
+	QString filename = reconstructionFolder+"/"+session+".probe.toolmeta";
+	return this->writeMetadata(filename, ts, "tracker metadata");
+}
+
+bool UsReconstructionFileMaker::writeReferenceMetadata(QString reconstructionFolder, QString session, const std::map<double, ToolPositionMetadata>& ts)
+{
+	QString filename = reconstructionFolder+"/"+session+".ref.toolmeta";
+	return this->writeMetadata(filename, ts, "tracker metadata");
+}
+
+bool UsReconstructionFileMaker::writeMetadata(QString filename, const std::map<double, ToolPositionMetadata>& ts, QString type)
+{
+	bool success = false;
+	QFile file(filename);
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		reportError("Cannot open "+file.fileName());
+		return success;
+	}
+	QTextStream stream(&file);
+
+	for (std::map<double, ToolPositionMetadata>::const_iterator i=ts.begin(); i!=ts.end(); ++i)
+	{
+		stream << i->second.toString() << endl;
+	}
+	file.close();
+	success = true;
+
+	QFileInfo info(file);
+	mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(ts.size())+" " + type + ".";
+
+	return success;
 }
 
 bool UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts)
@@ -383,6 +423,8 @@ QString UsReconstructionFileMaker::writeToNewFolder(QString path, bool compressi
 	mReport << "Made reconstruction folder: " + path;
 	QString session = mSessionDescription;
 
+	this->writeTrackerMetadata(path, session, mReconstructData.mTrackerRecordedMetadata);
+	this->writeReferenceMetadata(path, session, mReconstructData.mReferenceRecordedMetadata);
 	this->writeTrackerTimestamps(path, session, mReconstructData.mPositions);
 	this->writeTrackerTransforms(path, session, mReconstructData.mPositions);
 	this->writeUSTimestamps(path, session, mReconstructData.mFrames);

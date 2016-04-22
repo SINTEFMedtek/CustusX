@@ -65,8 +65,6 @@ PointMetric::~PointMetric()
 
 QString PointMetric::getParentSpace()
 {
-//	CX_LOG_CHANNEL_DEBUG("CA") << "QString PointMetric::getParentSpace() " << mSpace.toString();
-//	return "";
 	return mSpaceProvider->convertToSpecific(mSpace).mRefObject;
 }
 

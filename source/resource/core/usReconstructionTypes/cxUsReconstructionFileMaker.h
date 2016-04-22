@@ -90,6 +90,8 @@ public:
 	USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
 											  std::vector<cx::TimeInfo> imageTimestamps,
 											  TimedTransformMap trackerRecordedData,
+											  std::map<double, ToolPositionMetadata> trackerRecordedMetadata,
+											  std::map<double, ToolPositionMetadata> referenceRecordedMetadata,
 											  ToolPtr tool,
 											  QString streamUid,
 											  bool writeColor,
@@ -106,6 +108,9 @@ private:
 	};
 	bool writeUSTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	bool writeUSTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
+	bool writeTrackerMetadata(QString reconstructionFolder, QString session, const std::map<double, ToolPositionMetadata>& ts);
+	bool writeReferenceMetadata(QString reconstructionFolder, QString session, const std::map<double, ToolPositionMetadata>& ts);
+	bool writeMetadata(QString filename, const std::map<double, ToolPositionMetadata>& ts, QString type);
 	bool writeTrackerTransforms(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	bool writeTrackerTimestamps(QString reconstructionFolder, QString session, std::vector<TimedPosition> ts);
 	void writeProbeConfiguration(QString reconstructionFolder, QString session, ProbeDefinition data, QString uid);

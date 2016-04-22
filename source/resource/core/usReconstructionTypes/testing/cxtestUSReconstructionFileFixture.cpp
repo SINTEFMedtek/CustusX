@@ -146,9 +146,14 @@ cx::USReconstructInputData USReconstructionFileFixture::createUSReconstructData(
 	fileMaker.reset(new cx::UsReconstructionFileMaker(input.sessionName));
 
 	cx::USReconstructInputData reconstructData;
-	reconstructData = fileMaker->getReconstructData(input.imageData, input.imageTimestamps,
-													input.trackerData, input.tool, input.streamUid,
-													input.writeColor, input.rMpr);
+	reconstructData = fileMaker->getReconstructData(input.imageData,
+													input.imageTimestamps,
+													input.trackerData,
+													std::map<double, cx::ToolPositionMetadata>(),
+													std::map<double, cx::ToolPositionMetadata>(),
+													input.tool, input.streamUid,
+													input.writeColor,
+													input.rMpr);
 	return reconstructData;
 }
 
