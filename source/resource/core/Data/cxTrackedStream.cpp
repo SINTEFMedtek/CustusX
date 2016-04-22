@@ -97,7 +97,8 @@ void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp
 Transform3D TrackedStream::get_tMu()
 {
 	//Made tMu by copying and modifying code from ProbeSector::get_tMu()
-	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeDefinition();
+	QString streamUid = mVideoSource->getUid();
+	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeDefinition(streamUid);
 	Vector3D origin_p = probeDefinition.getOrigin_p();
 	Vector3D spacing = probeDefinition.getSpacing();
 	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);

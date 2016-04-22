@@ -88,13 +88,14 @@ public:
 	 * If writeColor set to true, colors will be saved even if settings is set to 8 bit
 	 */
 	USReconstructInputData getReconstructData(cx::ImageDataContainerPtr imageData,
-												   std::vector<cx::TimeInfo> imageTimestamps,
-	                                               TimedTransformMap trackerRecordedData,
-												   std::map<double, ToolPositionMetadata> trackerRecordedMetadata,
+											  std::vector<cx::TimeInfo> imageTimestamps,
+											  TimedTransformMap trackerRecordedData,
+											  std::map<double, ToolPositionMetadata> trackerRecordedMetadata,
 											  std::map<double, ToolPositionMetadata> referenceRecordedMetadata,
-												   ToolPtr tool,
-	                                               bool writeColor,
-	                                               Transform3D rMpr);
+											  ToolPtr tool,
+											  QString streamUid,
+											  bool writeColor,
+											  Transform3D rMpr);
 	void setReconstructData(USReconstructInputData data) { mReconstructData = data; }
 
 private:

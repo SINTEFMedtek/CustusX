@@ -159,6 +159,7 @@ USReconstructInputData USSavingRecorder::getDataForStream(unsigned videoRecorder
 																		   trackerMetadata,
 																		   referenceTrackerMetadata,
 																		   mRecordingTool,
+																		   videoRecorder->getSource()->getUid(),
 																		   mDoWriteColor,
 																		   m_rMpr);
 	return reconstructData;
