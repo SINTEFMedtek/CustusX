@@ -66,6 +66,7 @@ class VBWidget : public QWidget
 public:
 	VBWidget(VisServicesPtr services, QWidget *parent = 0);
 	virtual ~VBWidget();
+	void setRouteToTarget(QString uid);
 
 private:
 	QString defaultWhatsThis() const;
