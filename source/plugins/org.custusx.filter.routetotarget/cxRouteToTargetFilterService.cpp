@@ -148,6 +148,7 @@ bool RouteToTargetFilter::postProcess()
 	if (!outputCenterline)
 		return false;
 
+	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
 	outputCenterline->get_rMd_History()->setRegistration(inputMesh->get_rMd());
 
 	patientService()->insertData(outputCenterline);
