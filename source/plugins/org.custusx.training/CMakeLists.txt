@@ -61,3 +61,11 @@ target_include_directories(org_custusx_training
 
 #add_subdirectory(testing)
 
+cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_add_non_source_file("doc/org_custusx_training.md")
+cx_add_non_source_file("doc/org_custusx_training_sessionA_step1.md")
+cx_add_non_source_file("doc/org_custusx_training_sessionA_step2.md")
+cx_add_non_source_file("doc/org_custusx_training_sessionA_step3.md")
+#cx_add_non_source_file("doc/org_custusx_training.h")
+
+

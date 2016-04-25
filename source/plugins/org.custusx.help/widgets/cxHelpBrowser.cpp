@@ -43,7 +43,6 @@ namespace cx
 HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
 	: QTextBrowser(parent), mEngine(engine)
 {
-	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
 }
 
 void HelpBrowser::showHelpForKeyword(const QString &id)
@@ -67,6 +66,11 @@ void HelpBrowser::setSource(const QUrl& name)
 		QDesktopServices::openUrl(name);
 	}
 
+}
+
+void HelpBrowser::listenToEngineKeywordActivated()
+{
+	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
 }
 
 QVariant HelpBrowser::loadResource(int type, const QUrl &name)
