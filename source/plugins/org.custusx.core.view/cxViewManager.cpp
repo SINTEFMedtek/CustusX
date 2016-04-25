@@ -170,9 +170,9 @@ void ViewManager::initializeActiveView()
 }
 
 
-
-NavigationPtr ViewManager::getNavigation()
+NavigationPtr ViewManager::getNavigation(int group)
 {
+	mCameraControl->refreshView(this->get3DView(group));
 	return NavigationPtr(new Navigation(mBackend, mCameraControl));
 }
 
@@ -307,7 +307,6 @@ void ViewManager::addXml(QDomNode& parentNode)
 	XMLNodeAdder base(parent.addElement("viewManager"));
 
 	base.addTextToElement("global2DZoom", qstring_cast(mGlobal2DZoomVal->get().toDouble()));
-	base.addTextToElement("activeView", mActiveView->value<QString>());
 
 	QDomElement slicePlanes3DNode = base.addElement("slicePlanes3D");
 	slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
@@ -355,8 +354,6 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 
 		viewgroup = viewgroup.nextSibling();
 	}
-
-	this->setActiveView(base.parseTextFromElement("activeView"));
 }
 
 void ViewManager::clear()
@@ -416,6 +413,9 @@ ViewGroupDataPtr ViewManager::getViewGroup(int groupIdx) const
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
 {
+	if(!mLayoutRepository->exists(layout))
+		return;
+
 	CX_ASSERT(mActiveLayout.size() > widgetIndex);
 
 	if (mActiveLayout[widgetIndex] == layout)
@@ -565,9 +565,9 @@ void ViewManager::saveGlobalSettings()
 	file.save();
 }
 
-QActionGroup* ViewManager::createInteractorStyleActionGroup()
+QActionGroup* ViewManager::getInteractorStyleActionGroup()
 {
-	return mCameraStyleInteractor->createInteractorStyleActionGroup();
+	return mCameraStyleInteractor->getInteractorStyleActionGroup();
 }
 
 void ViewManager::updateCameraStyleActions()
@@ -602,25 +602,90 @@ int ViewManager::findGroupContaining3DViewGivenGuess(int preferredGroup)
 	return -1;
 }
 
-
 void ViewManager::autoShowData(DataPtr data)
 {
 	if (settings()->value("Automation/autoShowNewData").toBool() && data)
 	{
-		this->getViewGroups()[0]->getData()->addDataSorted(data->getUid());
-        if(settings()->value("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData").toBool())
-		{
-			for (unsigned i=0; i<mViewGroups.size(); ++i)
-				if (mViewGroups[i]->contains3DView())
-					mCameraControl->setSuperiorView();
-		}
-
+		this->autoShowInViewGroups(data);
+		this->autoResetCameraToSuperiorView();
+		this->autoCenterToImageCenter();
 	}
+}
+
+void ViewManager::autoShowInViewGroups(DataPtr data)
+{
+	QList<unsigned> showInViewGroups = this->getViewGroupsToAutoShowIn();
+	foreach (unsigned i, showInViewGroups)
+		this->getViewGroups()[i]->getData()->addDataSorted(data->getUid());
+}
+
+QList<unsigned> ViewManager::getViewGroupsToAutoShowIn()
+{
+	QList<unsigned> showInViewGroups;
+	if(settings()->value("Automation/autoShowNewDataInViewGroup0").toBool())
+		showInViewGroups  << 0;
+	if(settings()->value("Automation/autoShowNewDataInViewGroup1").toBool())
+		showInViewGroups  << 1;
+	if(settings()->value("Automation/autoShowNewDataInViewGroup2").toBool())
+		showInViewGroups  << 2;
+	if(settings()->value("Automation/autoShowNewDataInViewGroup3").toBool())
+		showInViewGroups  << 3;
+	if(settings()->value("Automation/autoShowNewDataInViewGroup4").toBool())
+		showInViewGroups  << 4;
+	return showInViewGroups;
+}
+
+void ViewManager::autoResetCameraToSuperiorView()
+{
+	if(settings()->value("Automation/autoResetCameraToSuperiorViewWhenAutoShowingNewData").toBool())
+	{
+		for (unsigned i=0; i<mViewGroups.size(); ++i)
+			if (mViewGroups[i]->contains3DView())
+			{
+				mCameraControl->setView(this->get3DView(i));
+				mCameraControl->setSuperiorView();
+			}
+	}
+}
+
+void ViewManager::autoCenterToImageCenter()
+{
+	if(settings()->value("Automation/autoCenterToImageCenterViewWhenAutoShowingNewData").toBool())
+	{
+		QList<unsigned> showInViewGroups = this->getViewGroupsToAutoShowIn();
+
+		foreach (unsigned i, showInViewGroups)
+			this->centerToImageCenterInViewGroup(i);
+	}
+}
+
+void ViewManager::centerToImageCenterInViewGroup(unsigned groupNr)
+{
+	this->getNavigation(groupNr)->centerToDataInViewGroup(this->getViewGroup(groupNr));
 }
 
 CyclicActionLoggerPtr ViewManager::getRenderTimer()
 {
 	return mRenderLoop->getRenderTimer();
+}
+
+void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	//Set active view before changing camerastyle
+	if (!mViewGroups[groupIdx]->getViews().empty())
+		this->setActiveView(mViewGroups[groupIdx]->getViews()[0]->getUid());
+
+	QList<QAction*> actions = this->getInteractorStyleActionGroup()->actions();
+	for(int i = 0; i < actions.size(); ++i)
+	{
+		if (actions[i]->data().toString() == enum2string(style))
+			actions[i]->trigger();
+	}
+}
+
+void ViewManager::addDefaultLayout(LayoutData layoutData)
+{
+	mLayoutRepository->addDefault(layoutData);
 }
 
 } //namespace cx

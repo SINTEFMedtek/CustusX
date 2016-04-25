@@ -133,6 +133,8 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	connect(mView.get(), SIGNAL(mouseMove(int, int, Qt::MouseButtons)), this, SLOT(mouseMoveSlot(int, int, Qt::MouseButtons)));
 	connect(mView.get(), SIGNAL(mouseWheel(int, int, int, int, Qt::MouseButtons)), this, SLOT(mouseWheelSlot(int, int, int, int, Qt::MouseButtons)));
 
+	connect(mServices->patient().get(), &PatientModelService::videoAddedToTrackedStream, this, &ViewWrapper2D::videoSourcesChangedSlot);
+
 	this->activeToolChangedSlot();
 	this->updateView();
 }
@@ -683,6 +685,11 @@ void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
 
 	mView->addRep(mSlicePlanes3DMarker);
+}
+
+void ViewWrapper2D::videoSourcesChangedSlot()
+{
+	this->updateView();
 }
 
 //------------------------------------------------------------------------------

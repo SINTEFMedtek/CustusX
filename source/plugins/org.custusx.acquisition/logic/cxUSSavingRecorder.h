@@ -83,7 +83,7 @@ public:
 	/**
 	  * Start recording
 	  */
-	void startRecord(RecordSessionPtr session, ToolPtr tool, std::vector<VideoSourcePtr> video);
+	void startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video);
 	void stopRecord();
 	void cancelRecord();
 
@@ -117,6 +117,7 @@ private:
 	// video and tool used at start of recording:
 	std::vector<SavingVideoRecorderPtr> mVideoRecorder;
 	ToolPtr mRecordingTool;
+	ToolPtr mReference;
 	bool mDoWriteColor;
 	Transform3D m_rMpr;
 };

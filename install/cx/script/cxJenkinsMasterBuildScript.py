@@ -43,6 +43,8 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         
         runs = p.add_argument_group('Run options')
         runs.add_argument('--reset_installer', action='store_true', default=False, help='Remove installer files and current installation')
+        runs.add_argument('--create_package', action='store_true', default=False, help='run checkout/configure/build, package')
+        runs.add_argument('--test_package', action='store_true', default=False, help='install package, run tests: unit, installation, integration')
         runs.add_argument('--create_unit_tested_package', action='store_true', default=False, help='run checkout/configure/build, unit test, package')
         runs.add_argument('--integration_test_package', action='store_true', default=False, help='install package, installation tests, integration tests')
         runs.add_argument('--unstable_test_package', action='store_true', default=False, help='install package, unstable tests')
@@ -74,6 +76,16 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
             self.createUnitTestedPackageStep(skip_build=options.skip_build,  
                                              skip_unit_tests=options.skip_unit_tests,
                                              skip_package=options.skip_package)
+        if options.create_package:
+            self.createUnitTestedPackageStep(skip_build=options.skip_build,
+                                             skip_unit_tests=True,
+                                             skip_package=options.skip_package)
+        if options.test_package:
+            self.testPackageStep(skip_extra_install_step_checkout=options.skip_extra_install_step_checkout,
+                                 skip_install=options.skip_install,
+                                 skip_unit_tests=options.skip_unit_tests,
+                                 skip_installation_test=options.skip_installation_test,            
+                                 skip_integration_test=options.skip_integration_test)
         if options.integration_test_package:
             self.integrationTestPackageStep(skip_extra_install_step_checkout=options.skip_extra_install_step_checkout,
                                             skip_install=options.skip_install,

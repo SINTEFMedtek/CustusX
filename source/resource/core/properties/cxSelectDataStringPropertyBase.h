@@ -71,6 +71,7 @@ public: // interface extension
 	virtual void setHelp(QString text);
 	virtual void setUidRegexp(QString regexp);
 	static std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp);
+	virtual void setTypeRegexp(QString regexp);
 
 signals:
 	void dataChanged(QString);

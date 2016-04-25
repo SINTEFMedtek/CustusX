@@ -57,7 +57,8 @@ SelectRecordSession::SelectRecordSession(XmlOptionFile options,
 										 VisServicesPtr services) :
 	mServices(services),
 	mOptions(options),
-	mAcquisitionService(acquisitionService)
+	mAcquisitionService(acquisitionService),
+	mVisible(true)
 {
 	mSessionSelector = StringProperty::initialize("tracking_session",
 												  "Tracking Data",
@@ -67,6 +68,11 @@ SelectRecordSession::SelectRecordSession(XmlOptionFile options,
 	connect(mSessionSelector.get(), &StringProperty::changed, this, &SelectRecordSession::showSelectedRecordingInView);
 
 	this->recordedSessionsChanged();
+}
+
+SelectRecordSession::~SelectRecordSession()
+{
+	this->clearTracer();
 }
 
 void SelectRecordSession::setTool(ToolPtr tool)
@@ -90,6 +96,9 @@ void SelectRecordSession::recordedSessionsChanged()
 		uids << uid;
 		names[uid] = sessions[i]->getHumanDescription();
 	}
+	uids << "";
+	names[""] = "<none>";
+
 	mSessionSelector->setValueRange(uids);
 	mSessionSelector->setDisplayNames(names);
 
@@ -140,6 +149,12 @@ ToolPtr SelectRecordSession::getTool()
 	return tool;
 }
 
+void SelectRecordSession::setVisible(bool on)
+{
+	mVisible = on;
+	this->showSelectedRecordingInView();
+}
+
 ToolPtr SelectRecordSession::findToolContainingMostDataForSession(std::map<QString, ToolPtr> tools, RecordSessionPtr session)
 {
 	std::map<int,ToolPtr> tooldata;
@@ -163,9 +178,11 @@ ToolRep3DPtr SelectRecordSession::getToolRepIn3DView(ToolPtr tool)
 
 void SelectRecordSession::showSelectedRecordingInView()
 {
-	this->warnIfNoTrackingDataInSession();
-
 	this->clearTracer();
+	if (!mVisible)
+		return;
+
+	this->warnIfNoTrackingDataInSession();
 
 	TimedTransformMap trackerRecordedData_prMt = this->getRecordedTrackerData_prMt();
 	if (trackerRecordedData_prMt.empty())

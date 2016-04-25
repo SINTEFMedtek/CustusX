@@ -41,8 +41,9 @@ class RemoteFileTransfer:
     def connect(self, remoteServer, user=None):
         self.host_name = remoteServer
 
+        print "connecting to %s, user=%s" % (remoteServer, user)
         self.client = self.paramiko.client.SSHClient()
-        self.client.set_missing_host_key_policy(self.paramiko.client.AutoAddPolicy)
+        self.client.set_missing_host_key_policy(self.paramiko.client.AutoAddPolicy())
         self.client.load_system_host_keys()
         self.client.connect(remoteServer, 22, user)
         self.sftp = self.client.open_sftp()

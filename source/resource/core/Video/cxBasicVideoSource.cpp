@@ -112,6 +112,11 @@ double BasicVideoSource::getTimestamp()
 	return mReceivedImage->getAcquisitionTime().toMSecsSinceEpoch();
 }
 
+TimeInfo BasicVideoSource::getAdvancedTimeInfo()
+{
+	return mReceivedImage->getAdvancedTimeInfo();
+}
+
 bool BasicVideoSource::isConnected() const
 {
 	return (mReceivedImage!=mEmptyImage);

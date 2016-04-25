@@ -71,6 +71,7 @@ public:
 	virtual QString getName() { return mName; }
 	virtual vtkImageDataPtr getVtkImageData();
 	virtual double getTimestamp();
+	virtual TimeInfo getAdvancedTimeInfo();
 
 	virtual QString getInfoString() const { return QString("TestVideo Info"); }
 	virtual QString getStatusString() const { return QString("TestVideo Status"); }

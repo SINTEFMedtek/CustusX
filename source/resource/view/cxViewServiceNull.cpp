@@ -98,7 +98,22 @@ CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLog
 NavigationPtr ViewServiceNull::getNavigation() { return NavigationPtr(); }
 LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
-QActionGroup* ViewServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
+QActionGroup* ViewServiceNull::getInteractorStyleActionGroup() { return mActionGroup; }
+
+void ViewServiceNull::centerToImageCenterInActiveViewGroup()
+{
+	printWarning();
+}
+
+void ViewServiceNull::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	printWarning();
+}
+
+void ViewServiceNull::addDefaultLayout(LayoutData layoutData)
+{
+	printWarning();
+}
 
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {

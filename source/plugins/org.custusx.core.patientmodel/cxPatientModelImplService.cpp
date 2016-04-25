@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxVideoSource.h"
 #include "cxActiveData.h"
+#include "cxVideoServiceProxy.h"
 
 namespace cx
 {
@@ -68,13 +69,15 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 
-	connect(mTrackingService.get(), &TrackingService::newProbe, this, &PatientModelImplService::newProbe);
+	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &PatientModelImplService::probesChanged);
 }
 
 void PatientModelImplService::createInterconnectedDataAndSpace()
 {
 	// prerequisites:
 	mTrackingService = TrackingServiceProxy::create(mContext);
+
+	mVideoService = VideoServiceProxy::create(mContext);
 
 	// build object(s):
 	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(mContext);
@@ -107,10 +110,7 @@ void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 
 	requireUnique(mDataService, "DataService");
 	mDataService.reset();
-
-
 }
-
 
 PatientModelImplService::~PatientModelImplService()
 {
@@ -275,18 +275,38 @@ PatientDataPtr PatientModelImplService::patientData() const
 	return mPatientData;
 }
 
-void PatientModelImplService::newProbe(const ToolPtr tool)
+void PatientModelImplService::probesChanged()
 {
-	ProbePtr probe = tool->getProbe();
-	if(!probe)
-	{
-		reportWarning("PatientModelImplService::newProbe: Tool is not a probe");
-		return;
-	}
-	//Move mProbeTools to DataManager?
-	mProbeTools[tool->getUid()] = tool;
+	this->disconnectProbes();
+	mProbeTools.clear();
+	this->connectProbes();
+}
 
-	connect(probe.get(), &Probe::videoSourceAdded, this, &PatientModelImplService::videoSourceAdded);
+void PatientModelImplService::disconnectProbes()
+{
+	for (std::map<QString, ToolPtr>::const_iterator iter = mProbeTools.begin(); iter != mProbeTools.end(); ++iter)
+	{
+		ProbePtr probe = iter->second->getProbe();
+		if(probe)
+			disconnect(probe.get(), &Probe::videoSourceAdded, this, &PatientModelImplService::videoSourceAdded);
+		else
+			CX_LOG_WARNING() << "PatientModelImplService::disconnectProbes: Tool is not a probe: " << iter->second->getUid();
+	}
+}
+
+void PatientModelImplService::connectProbes()
+{
+	ToolMap tools = mTrackingService->getTools();
+	for (ToolMap::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
+	{
+		ToolPtr tool = iter->second;
+		ProbePtr probe = tool->getProbe();
+		if(tool->getProbe())
+		{
+			mProbeTools[iter->first] = tool;
+			connect(probe.get(), &Probe::videoSourceAdded, this, &PatientModelImplService::videoSourceAdded);
+		}
+	}
 }
 
 void PatientModelImplService::videoSourceAdded(VideoSourcePtr source)

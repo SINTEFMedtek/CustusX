@@ -97,7 +97,7 @@ public:
 	virtual bool isNull();
 
 private slots:
-	void newProbe(const ToolPtr tool);
+	void probesChanged();
 	void videoSourceAdded(VideoSourcePtr source);
 private:
 	ctkPluginContext *mContext;
@@ -116,11 +116,14 @@ private:
 	DataFactoryPtr mDataFactory;
 
 	TrackingServicePtr mTrackingService;
+	VideoServicePtr mVideoService;
 
 	std::map<QString, ToolPtr> mProbeTools;
 
 	ActiveDataPtr mActiveData;
 
+	void disconnectProbes();
+	void connectProbes();
 };
 typedef boost::shared_ptr<PatientModelImplService> PatientModelImplServicePtr;
 

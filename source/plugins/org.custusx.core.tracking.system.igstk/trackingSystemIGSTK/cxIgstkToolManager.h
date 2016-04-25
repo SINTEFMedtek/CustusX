@@ -52,6 +52,10 @@ namespace cx
  * @{
  */
 
+
+void sampleInfo2xml(const igstk::NDITracker::TrackingSampleInfo& info, QDomElement &node);
+
+
 /**
  * \brief Manager for IGSTK interface.
  * \ingroup org_custusx_core_tracking_igstk
@@ -107,7 +111,6 @@ private:
 	IgstkToolPtr mReferenceTool;
 
 	QTimer* mTimer; ///< timer controlling the demand of transforms
-	igstk::PulseGenerator::Pointer mPulseGenerator;
 
 	bool mInternalInitialized;
 

@@ -52,10 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
 // Test
+#include "FAST/Algorithms/AirwaySegmentation/AirwaySegmentation.hpp"
+#include "FAST/Algorithms/CenterlineExtraction/CenterlineExtraction.hpp"
 #include "FAST/Importers/ImageFileImporter.hpp"
 #include "FAST/Exporters/VTKImageExporter.hpp"
 #include "FAST/Exporters/VTKLineSetExporter.hpp"
-#include "FAST/Algorithms/TubeSegmentationAndCenterlineExtraction/TubeSegmentationAndCenterlineExtraction.hpp"
 #include "FAST/Data/Segmentation.hpp"
 #include "FAST/SceneGraph.hpp"
 
@@ -81,7 +82,7 @@ QString AirwaysFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Airway Segmentation.</h3>"
-	        "<p><i>Extracts the centerline and creates a segmentation. </br>GPU-based algorithm written by Erik Smistad (NTNU).</i></p>"
+	        "<p><i>Extracts segmentation and centerline from a CT volume. If method fails, try to crop volume. </br>Algorithm written by Erik Smistad.</i></p>"
 	        "</html>";
 }
 
@@ -106,42 +107,31 @@ bool AirwaysFilter::execute()
 	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
 	    std::cout << "IMAGE LOADED" << std::endl;
 
-	    // Set up algorithm
-		fast::TubeSegmentationAndCenterlineExtraction::pointer tubeExtraction = fast::TubeSegmentationAndCenterlineExtraction::New();
-	    tubeExtraction->setInputConnection(importer->getOutputPort());
-	    tubeExtraction->extractDarkTubes();
-	    if(getCroppingOption(mOptions)->getValue())
-			tubeExtraction->enableAutomaticCropping(true);
-	    // Set min and max intensity based on HU unit scale
-	    if(image->getDataType() == fast::TYPE_UINT16) {
-	        tubeExtraction->setMinimumIntensity(0);
-	        tubeExtraction->setMaximumIntensity(1124);
-	    } else {
-	        tubeExtraction->setMinimumIntensity(-1024);
-	        tubeExtraction->setMaximumIntensity(100);
-	    }
-	    tubeExtraction->setMinimumRadius(0.5);
-	    tubeExtraction->setMaximumRadius(50);
-	    tubeExtraction->setSensitivity(getSensitivityOption(mOptions)->getValue());
-	    // TODO set blur amount..
+	    // Do segmentation
+		fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
+	    segmentation->setInputConnection(importer->getOutputPort());
 
 	    // Convert fast segmentation data to VTK data which CX can use
         vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
-	    vtkExporter->setInputConnection(tubeExtraction->getSegmentationOutputPort());
+	    vtkExporter->setInputConnection(segmentation->getOutputPort());
 	    vtkExporter->Update();
 	    mSegmentationOutput = vtkExporter->GetOutput();
 	    std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
 
 	    // Get output segmentation data
-	    fast::Segmentation::pointer segmentation = tubeExtraction->getOutputData<fast::Segmentation>(0);
+	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
 	    // Get the transformation of the segmentation
-	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentation);
+	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
 	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
+
+        // Extract centerline
+        fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
+        centerline->setInputConnection(segmentation->getOutputPort());
 
 	    // Get centerline
 	    vtkSmartPointer<fast::VTKLineSetExporter> vtkCenterlineExporter = fast::VTKLineSetExporter::New();
-	    vtkCenterlineExporter->setInputConnection(tubeExtraction->getCenterlineOutputPort());
+	    vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
 	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();
 	    vtkCenterlineExporter->Update();
 
@@ -213,9 +203,7 @@ bool AirwaysFilter::postProcess()
 
 void AirwaysFilter::createOptions()
 {
-	mOptionsAdapters.push_back(getCroppingOption(mOptions));
-	mOptionsAdapters.push_back(getSensitivityOption(mOptions));
-	mOptionsAdapters.push_back(getNoiseLevelOption(mOptions));
+	//mOptionsAdapters.push_back(getNoiseLevelOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -246,16 +234,7 @@ void AirwaysFilter::createOutputTypes()
 
 }
 
-DoublePropertyPtr AirwaysFilter::getSensitivityOption(QDomElement root)
-{
-	DoublePropertyPtr retval = DoubleProperty::initialize("Sensitivity",
-			"", "Select sensitivity for the segmentation", 0.85,
-			DoubleRange(0.01, 1, 0.01), 2, root);
-	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
-	return retval;
-
-}
-
+/*
 DoublePropertyPtr AirwaysFilter::getNoiseLevelOption(QDomElement root)
 {
 	DoublePropertyPtr retval = DoubleProperty::initialize("Noise level",
@@ -264,14 +243,7 @@ DoublePropertyPtr AirwaysFilter::getNoiseLevelOption(QDomElement root)
 	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
 	return retval;
 }
-
-BoolPropertyPtr AirwaysFilter::getCroppingOption(QDomElement root)
-{
-	BoolPropertyPtr retval = BoolProperty::initialize("Automatic cropping", "", "Turn on or off automatic cropping. "
-			"If you turn off cropping you should crop the dataset yourself.", true, root);
-	return retval;
-}
-
+*/
 
 AirwaysFilter::~AirwaysFilter() {
 }

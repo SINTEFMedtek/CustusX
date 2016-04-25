@@ -75,8 +75,6 @@ private slots:
 	void streamActionSlot();
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid) {}
-
-protected:
 //	virtual void dataAdded(DataPtr data) {}
 //	virtual void dataRemoved(const QString& uid) {}
 	virtual void videoSourceChangedSlot(QString uid);

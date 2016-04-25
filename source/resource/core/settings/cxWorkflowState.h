@@ -43,11 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
 #include "boost/shared_ptr.hpp"
+#include "cxForwardDeclarations.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 /**
  * \file
@@ -65,12 +65,12 @@ class cxResource_EXPORT WorkflowState: public QState
 Q_OBJECT
 
 public:
-	WorkflowState(QState* parent, QString uid, QString name, StateServiceBackendPtr backend) :
+	WorkflowState(QState* parent, QString uid, QString name, CoreServicesPtr services) :
 		QState(parent),
 		mUid(uid),
 		mName(name),
 		mAction(NULL),
-		mBackend(backend)
+		mServices(services)
 	{}
 
 	virtual ~WorkflowState() {}
@@ -99,15 +99,15 @@ protected:
 	QString mUid;
 	QString mName;
 	QAction* mAction;
-	StateServiceBackendPtr mBackend;
+	CoreServicesPtr mServices;
 };
 
 class cxResource_EXPORT ParentWorkflowState: public WorkflowState
 {
 Q_OBJECT
 public:
-	ParentWorkflowState(QState* parent, StateServiceBackendPtr backend) :
-					WorkflowState(parent, "ParentUid", "Parent", backend) {}
+	ParentWorkflowState(QState* parent, CoreServicesPtr services) :
+					WorkflowState(parent, "ParentUid", "Parent", services) {}
 	virtual ~ParentWorkflowState() {}
 	virtual void onEntry(QEvent * event) {}
 	virtual void onExit(QEvent * event) {}

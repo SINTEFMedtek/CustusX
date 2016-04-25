@@ -63,7 +63,7 @@ endfunction()
 #
 ###############################################################################
 function(cx_doc_define_user_docs PLUGIN_DOC_FOLDER)
-    cx_add_string_to_global_property_list(CX_PLUGIN_DOC_FOLDERS "${PLUGIN_DOC_FOLDER}")
+	cx_add_string_to_global_property_list(CX_PLUGIN_DOC_FOLDERS "${PLUGIN_DOC_FOLDER}")
 endfunction()
 
 ###############################################################################

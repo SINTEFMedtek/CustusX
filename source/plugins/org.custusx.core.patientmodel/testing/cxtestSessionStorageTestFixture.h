@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxImage.h"
 #include "cxMesh.h"
+#include <ctkPluginContext.h>
 
 namespace cx
 {
@@ -82,6 +83,7 @@ public:
 	cx::SessionStorageServicePtr mSessionStorageService;
 	cx::PatientModelServicePtr mPatientModelService;
 	cx::VisServicesPtr mServices;
+    ctkPluginContext* mContext;
 private:
 	bool mSessionsCreated;
 	QString mSession1;

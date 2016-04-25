@@ -69,10 +69,11 @@ public:
 	void load(XmlOptionFile file);
 	void save(XmlOptionFile file);
 
+	void addDefault(LayoutData data);
+	bool exists(const QString uid) const;
 signals:
 	void layoutChanged(QString uid);
 private:
-	void addDefault(LayoutData data);
 	void addDefaults();
 	unsigned indexOf(const QString uid) const;
 

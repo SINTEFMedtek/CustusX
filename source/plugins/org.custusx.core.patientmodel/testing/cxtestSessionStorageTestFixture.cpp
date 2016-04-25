@@ -46,10 +46,10 @@ SessionStorageTestFixture::SessionStorageTestFixture() :
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
-	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
-	mSessionStorageService = cx::SessionStorageServiceProxy::create(context);
-	mPatientModelService = cx::PatientModelServiceProxy::create(context);
-	mServices = cx::VisServices::create(context);
+    mContext = cx::LogicManager::getInstance()->getPluginContext();
+    mSessionStorageService = cx::SessionStorageServiceProxy::create(mContext);
+    mPatientModelService = cx::PatientModelServiceProxy::create(mContext);
+    mServices = cx::VisServices::create(mContext);
 
 	mSession1 = QString("/temp/TestPatient1.cx3");
 	mSession2 = QString("/temp/TestPatient2.cx3");
