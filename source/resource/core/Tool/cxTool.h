@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
+#include <QDomNode>
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
 #include "cxIndent.h"
@@ -55,6 +56,16 @@ typedef std::map<QString, ToolPtr> ToolMap;
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 typedef boost::shared_ptr<class TrackingPositionFilter> TrackingPositionFilterPtr;
+
+/**
+ * Additional information describing each tool position,
+ * typically device-dependent info.
+ */
+struct cxResource_EXPORT ToolPositionMetadata
+{
+	QString mData;
+	QString toString() const;
+};
 
 /** \brief Interface to a tool,
  * i.e. a pointer, US probe or similar.
@@ -97,6 +108,10 @@ public:
 		TOOL_US_PROBE,  ///< Ultrasond probe. The tool has a Probe subinterface with a sector and a video stream.
 		TOOL_MICROSCOPE ///< A tool following the focus point of a microscope
 	};
+
+	virtual ToolPositionMetadata getMetadata() const = 0;
+	virtual const std::map<double, ToolPositionMetadata>& getMetadataHistory() = 0;
+
 	virtual std::set<Type> getTypes() const = 0;
 	/**
 	 * \return true is the tool has properties of the input type.

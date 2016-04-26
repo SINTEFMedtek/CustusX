@@ -63,6 +63,7 @@ protected:
 		bool writeColor;
 		cx::ToolPtr tool;
 		cx::ImageDataContainerPtr imageData;
+		QString streamUid;
 		std::vector<cx::TimeInfo> imageTimestamps;
 		cx::Transform3D rMpr;
 	};

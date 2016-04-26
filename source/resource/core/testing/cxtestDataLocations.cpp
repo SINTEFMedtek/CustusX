@@ -30,65 +30,28 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTSESSIONSTORAGETESTFIXTURE_H
-#define CXTESTSESSIONSTORAGETESTFIXTURE_H
-
-#include "cxtest_org_custusx_core_patientmodel_export.h"
-
-#include <QString>
-#include <boost/shared_ptr.hpp>
-#include "cxForwardDeclarations.h"
-#include "cxImage.h"
-#include "cxMesh.h"
-#include <ctkPluginContext.h>
+#include "catch.hpp"
+#include "cxDataLocations.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+
+TEST_CASE("Website url can be set", "[unit][datalocations]")
+{
+    CHECK(DataLocations::getWebsiteURL().isEmpty());
+    cx::DataLocations::setWebsiteURL("www.custusx.org");
+    CHECK(!DataLocations::getWebsiteURL().isEmpty());
 }
 
-namespace cxtest
+TEST_CASE("Uploads url is set", "[unit][datalocations]")
 {
-typedef boost::shared_ptr<class SessionStorageTestFixture> SessionStorageTestFixturePtr;
+    CHECK(!DataLocations::getUploadsUrl().isEmpty());
+}
 
-struct TestDataStructures
+TEST_CASE("User documentation url is set", "[unit][datalocations]")
 {
-	cx::ImagePtr image1;
-	cx::ImagePtr image2;
-	cx::MeshPtr mesh1;
-	TestDataStructures()
-	{
-		vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
-		image1 = cx::ImagePtr(new cx::Image("imageUid1", dummyImageData, "imageName1"));
-		image2 = cx::ImagePtr(new cx::Image("imageUid2", dummyImageData, "imageName2"));
-		mesh1 = cx::Mesh::create("meshUid1","meshName1");
-	}
-};
+    CHECK(!DataLocations::getWebsiteUserDocumentationURL().isEmpty());
+}
 
-class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT SessionStorageTestFixture
-{
-public:
-	SessionStorageTestFixture();
+} // namespace cx
 
-	~SessionStorageTestFixture();
-
-	void createSessions();
-	void loadSession1();
-	void loadSession2();
-	void reloadSession1();
-	void reloadSession2();
-	void saveSession();
-
-	cx::SessionStorageServicePtr mSessionStorageService;
-	cx::PatientModelServicePtr mPatientModelService;
-	cx::VisServicesPtr mServices;
-    ctkPluginContext* mContext;
-private:
-	bool mSessionsCreated;
-	QString mSession1;
-	QString mSession2;
-};
-
-} //cxtest
-#endif // CXTESTSESSIONSTORAGETESTFIXTURE_H

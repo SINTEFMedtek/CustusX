@@ -116,7 +116,10 @@ TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plu
 	fixture.setupHelpBrowserInsideMainWindow();
 
 	CHECK("qthelp://org.custusx.core/doc/index.html#user_doc_overview" == fixture.browser->source().toString());
-	CHECK(fixture.browser->toPlainText().contains("CustusX User Documentation"));
+	// this can be a tricky test for overriding applications: they must have this string in the main page in order to
+	// succeed.
+	CHECK(fixture.browser->toPlainText().contains("CustusX"));
+	CHECK(fixture.browser->toPlainText().contains("User Documentation"));
 
 //	fixture.printBrowserContents();
 

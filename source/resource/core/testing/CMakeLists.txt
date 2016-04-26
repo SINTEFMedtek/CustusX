@@ -38,6 +38,7 @@ if(BUILD_TESTING)
         cxtestStreamedTimestampSynchronizer.cpp
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
+        cxtestDataLocations.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

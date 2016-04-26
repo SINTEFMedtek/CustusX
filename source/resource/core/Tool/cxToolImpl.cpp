@@ -50,6 +50,18 @@ ToolImpl::~ToolImpl()
 
 }
 
+ToolPositionMetadata ToolImpl::getMetadata() const
+{
+	if (mMetadata.empty())
+		return ToolPositionMetadata();
+	return mMetadata.rbegin()->second;
+}
+
+const std::map<double, ToolPositionMetadata>& ToolImpl::getMetadataHistory()
+{
+	return mMetadata;
+}
+
 double ToolImpl::getTooltipOffset() const
 {
 	return mTooltipOffset;

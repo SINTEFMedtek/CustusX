@@ -80,12 +80,13 @@ class CppBuilder:
         runShell('git fetch')
         runShell('git checkout -t origin/%s' % branch)        
 
-    def gitSetRemoteURL(self, new_remote_origin_repository, branch):
+    def gitSetRemoteURL(self, new_remote_origin_repository, branch=None):
         self._changeDirToSource()
         runShell('git remote set-url origin %s' % new_remote_origin_repository)
         runShell('git fetch')
         # old (1.7) syntax - update if needed to 'git branch --set-upstream-to origin/<branch>' 
-        runShell('git branch --set-upstream %s origin/%s' % (branch, branch), ignoreFailure=True) # can fail if branch does not exist, might happen if a nonstandard branch is selected.
+        if branch!=None:
+            runShell('git branch --set-upstream %s origin/%s' % (branch, branch), ignoreFailure=True) # can fail if branch does not exist, might happen if a nonstandard branch is selected.
         #runShell('git branch -u origin/%s' % branch)
 
     def _gitSubmoduleUpdate(self):
