@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxAirwaysFilterService.h"
 #include "cxRegisteredService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -51,7 +52,9 @@ FilterAirwaysPluginActivator::~FilterAirwaysPluginActivator()
 
 void FilterAirwaysPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<AirwaysFilter>(context, FilterService_iid);
+	VisServicesPtr services = VisServices::create(context);
+	AirwaysFilter *airwaysFilter = new AirwaysFilter(services);
+	mRegistration = RegisteredService::create(context, airwaysFilter, FilterService_iid);
 }
 
 void FilterAirwaysPluginActivator::stop(ctkPluginContext* context)
