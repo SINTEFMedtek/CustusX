@@ -90,14 +90,9 @@ bool AirwaysFilter::execute()
 {
 	std::cout << "EXECUTING AIRWAYS FILTER" << std::endl;
     ImagePtr input = this->getCopiedInputImage();
-	return this->execute(input);
-}
-
-bool AirwaysFilter::execute(ImagePtr inputImage)
-{
-	if (!inputImage)
+	if (!input)
 		return false;
-	mInputImage = inputImage;
+	mInputImage = input;
 	std::string filename = (patientService()->getActivePatientFolder()+"/"+mInputImage->getFilename()).toStdString();
 
 	try {
@@ -119,13 +114,13 @@ bool AirwaysFilter::execute(ImagePtr inputImage)
 	    vtkExporter->setInputConnection(segmentation->getOutputPort());
 	    vtkExporter->Update();
 	    mSegmentationOutput = vtkExporter->GetOutput();
-	    std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
+		std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
 
 	    // Get output segmentation data
 	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
 	    // Get the transformation of the segmentation
-	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
+		Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
 	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
 
         // Extract centerline
