@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMainWindowApplicationComponent.h"
 #include "cxLogicManager.h"
 #include "cxApplication.h"
+#include "cxDataLocations.h"
 
 int main(int argc, char *argv[])
 {
@@ -52,6 +53,7 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
+  cx::DataLocations::setWebsiteURL("http://www.custusx.org");
   cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
   cx::LogicManager::initialize(mainwindow);
 

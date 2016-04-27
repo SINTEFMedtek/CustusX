@@ -29,63 +29,29 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTOOLNULL_H
-#define CXTOOLNULL_H
 
-#include "cxTool.h"
+#include "catch.hpp"
+#include "cxDataLocations.h"
 
 namespace cx
 {
 
-/** Null implementation of Tool
- *
- * \ingroup cx_resource_core_tool
- */
-class cxResource_EXPORT ToolNull: public Tool
+TEST_CASE("Website url can be set", "[unit][datalocations]")
 {
-public:
-	virtual ~ToolNull() {}
+    CHECK(DataLocations::getWebsiteURL().isEmpty());
+    cx::DataLocations::setWebsiteURL("www.custusx.org");
+    CHECK(!DataLocations::getWebsiteURL().isEmpty());
+}
 
-	virtual std::set<Type> getTypes() const;
-	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual TimedTransformMapPtr getPositionHistory();
-	virtual ToolPositionMetadata getMetadata() const;
-	virtual const std::map<double, ToolPositionMetadata>& getMetadataHistory();
+TEST_CASE("Uploads url is set", "[unit][datalocations]")
+{
+    CHECK(!DataLocations::getUploadsUrl().isEmpty());
+}
 
-	virtual bool getVisible() const;
-	virtual bool isInitialized() const;
-
-	virtual QString getUid() const;
-	virtual QString getName() const;
-
-	virtual bool isCalibrated() const;
-	virtual Transform3D getCalibration_sMt() const;
-	virtual void setCalibration_sMt(Transform3D calibration);
-
-	virtual ProbePtr getProbe() const;
-	virtual double getTimestamp() const;
-	virtual void printSelf(std::ostream &os, Indent indent);
-
-	virtual double getTooltipOffset() const;
-	virtual void setTooltipOffset(double val);
-	virtual std::map<int, Vector3D> getReferencePoints() const;
-	virtual bool hasReferencePointWithId(int id);
-
-	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
-	virtual Transform3D get_prMt() const;
-
-	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
-
-	virtual void set_prMt(const Transform3D& prMt, double timestamp);
-	virtual void setVisible(bool vis);
-
-	virtual bool isNull();
-	static ToolPtr getNullObject();
-
-private:
-	std::map<double, ToolPositionMetadata> mMetadata;
-};
+TEST_CASE("User documentation url is set", "[unit][datalocations]")
+{
+    CHECK(!DataLocations::getWebsiteUserDocumentationURL().isEmpty());
+}
 
 } // namespace cx
 
-#endif // CXTOOLNULL_H

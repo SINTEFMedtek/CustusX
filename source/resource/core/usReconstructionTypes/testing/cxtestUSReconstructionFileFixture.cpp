@@ -97,8 +97,9 @@ void USReconstructionFileFixture::assertCorrespondence(ReconstructionData input,
 	CHECK( output.mPositions.size() == input.trackerData.size() );
 
 	CHECK( output.mProbeUid == input.tool->getUid() );
+	CHECK( output.mProbeDefinition.mData.getUid() == input.streamUid );
 
-	CHECK( output.mProbeDefinition.mData.getType() == input.tool->getProbe()->getProbeDefinition().getType() );
+	CHECK( output.mProbeDefinition.mData.getType() == input.tool->getProbe()->getProbeDefinition(input.streamUid).getType() );
 	// might add more here: compare timestamps and transforms, frame sizes, probe sector
 }
 
@@ -124,6 +125,7 @@ USReconstructionFileFixture::ReconstructionData USReconstructionFileFixture::cre
 	cx::ProbeDefinition probeDefinition = cx::DummyToolTestUtilities::createProbeDefinitionLinear(10, 5, frameSize);
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(probeDefinition);
 	retval.tool = tool;
+	retval.streamUid = probeDefinition.getUid();
 
 	// add frames spaced 2 seconds apart
 	unsigned framesCount = 10;
@@ -144,7 +146,14 @@ cx::USReconstructInputData USReconstructionFileFixture::createUSReconstructData(
 	fileMaker.reset(new cx::UsReconstructionFileMaker(input.sessionName));
 
 	cx::USReconstructInputData reconstructData;
-	reconstructData = fileMaker->getReconstructData(input.imageData, input.imageTimestamps, input.trackerData, input.tool, input.writeColor, input.rMpr);
+	reconstructData = fileMaker->getReconstructData(input.imageData,
+													input.imageTimestamps,
+													input.trackerData,
+													std::map<double, cx::ToolPositionMetadata>(),
+													std::map<double, cx::ToolPositionMetadata>(),
+													input.tool, input.streamUid,
+													input.writeColor,
+													input.rMpr);
 	return reconstructData;
 }
 

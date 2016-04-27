@@ -177,6 +177,7 @@ QAction* MainWindowActions::createAction(QString uid, QString text, QIcon icon,
 										 T triggerSlot)
 {
 	QAction* retval = new QAction(icon, text, this);
+    retval->setObjectName(uid);
 	retval->setShortcut(shortcut);
 	retval->setStatusTip(help);
 	connect(retval, &QAction::triggered, this, triggerSlot);

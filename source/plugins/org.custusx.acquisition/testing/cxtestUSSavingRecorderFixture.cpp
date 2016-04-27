@@ -118,7 +118,7 @@ void USSavingRecorderFixture::startRecord()
 //	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
 	mSession.reset(new cx::RecordSession(0, "session"));
 	mSession->startNewInterval();
-	mRecorder->startRecord(mSession, mTool, mVideo);
+	mRecorder->startRecord(mSession, mTool, cx::ToolPtr(), mVideo);
 }
 
 void USSavingRecorderFixture::stopRecord()

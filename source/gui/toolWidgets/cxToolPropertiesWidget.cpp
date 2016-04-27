@@ -163,14 +163,15 @@ void ToolPropertiesWidget::setupUI()
   mToolOffset = DoublePropertyToolOffset::create(mTool);
   gridLayout->addWidget(new SpinBoxAndSliderGroupWidget(this, mToolOffset));
 
-  mToptopLayout->addStretch();
+  mMetadataLabel = new QTextEdit;
+  mToptopLayout->addWidget(mMetadataLabel);
 
-  connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::referenceToolChangedSlot);
+  connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::reconnectTools);
   connect(mSelector.get(), &StringPropertyBase::changed, this, &ToolPropertiesWidget::activeToolChangedSlot);
   connect(ts.get(), &TrackingService::stateChanged, this, &ToolPropertiesWidget::setModified);
 
+  this->reconnectTools();
   this->activeToolChangedSlot();
-  this->referenceToolChangedSlot();
   this->spacesChangedSlot();
 }
 
@@ -196,6 +197,39 @@ void ToolPropertiesWidget::toolPositionChanged()
 
   mManualToolWidget->setMatrix(qMt);
   mManualToolWidget->blockSignals(false);
+
+  this->updateBrowser();
+}
+
+QString ToolPropertiesWidget::createDescriptionForTool(ToolPtr current)
+{
+	QString meta = current->getMetadata().toString();
+	return QString("Tool=%1: visible=%2\n%3\n")
+			.arg(current->getName())
+			.arg(current->getVisible())
+			.arg(meta);
+}
+
+void ToolPropertiesWidget::updateBrowser()
+{
+	QString text;
+
+	for (TrackingService::ToolMap::iterator i=mTools.begin(); i!=mTools.end(); ++i)
+	{
+		text += this->createDescriptionForTool(i->second) + "\n";
+	}
+
+	int sstart = mMetadataLabel->textCursor().selectionStart();
+	int send = mMetadataLabel->textCursor().selectionEnd();
+	int textPos = mMetadataLabel->textCursor().position();
+
+	mMetadataLabel->setPlainText(text);
+	QTextCursor cursor = mMetadataLabel->textCursor();
+
+	cursor.setPosition(sstart, QTextCursor::MoveAnchor);
+	cursor.setPosition(send, QTextCursor::KeepAnchor);
+
+	mMetadataLabel->setTextCursor(cursor);
 }
 
 void ToolPropertiesWidget::manualToolWidgetChanged()
@@ -222,41 +256,33 @@ void ToolPropertiesWidget::spacesChangedSlot()
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));
 	this->setModified();
-	this->toolPositionChanged();
+//	this->toolPositionChanged();
+}
+
+void ToolPropertiesWidget::reconnectTools()
+{
+	for (TrackingService::ToolMap::iterator i=mTools.begin(); i!=mTools.end(); ++i)
+	{
+		disconnect(i->second.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
+		disconnect(i->second.get(), &Tool::toolTransformAndTimestamp, this, &ToolPropertiesWidget::setModified);
+	}
+	mTools = mTrackingService->getTools();
+	for (TrackingService::ToolMap::iterator i=mTools.begin(); i!=mTools.end(); ++i)
+	{
+		connect(i->second.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
+		connect(i->second.get(), &Tool::toolTransformAndTimestamp, this, &ToolPropertiesWidget::setModified);
+	}
 }
 
 void ToolPropertiesWidget::activeToolChangedSlot()
 {
-  if (mTool)
-  {
-	  disconnect(mTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
-	  disconnect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ToolPropertiesWidget::setModified);
-  }
-
   mTool = mTrackingService->getTool(mSelector->getValue());
-
-  if (mTool)
-  {
-	  connect(mTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
-	  connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ToolPropertiesWidget::setModified);
-  }
 
   mToolOffset->setTool(mTool);
   mUSSectorConfigBox->setVisible(mTool && mTool->hasType(Tool::TOOL_US_PROBE));
   mToptopLayout->update();
 
   this->setModified();
-}
-
-void ToolPropertiesWidget::referenceToolChangedSlot()
-{
-  if (mReferenceTool)
-	disconnect(mReferenceTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
-
-  mReferenceTool = mTrackingService->getReferenceTool();
-
-  if (mReferenceTool)
-	  connect(mReferenceTool.get(), &Tool::toolVisible, this, &ToolPropertiesWidget::setModified);
 }
 
 void ToolPropertiesWidget::updateFrontend()
@@ -273,9 +299,10 @@ void ToolPropertiesWidget::updateFrontend()
     mActiveToolVisibleLabel->setText("");
   }
 
-  if (mReferenceTool)
+  ToolPtr reference = mTrackingService->getReferenceTool();
+  if (reference)
   {
-	QString text = mReferenceTool->getVisible() ? "Visible" : "Not Visible";
+	QString text = reference->getVisible() ? "Visible" : "Not Visible";
     mReferenceStatusLabel->setText("Reference " + text);
   }
   else
@@ -292,16 +319,5 @@ void ToolPropertiesWidget::updateFrontend()
 	status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
-
-void ToolPropertiesWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void ToolPropertiesWidget::hideEvent(QCloseEvent* event)
-{
-  QWidget::closeEvent(event);
-}
-
 
 }//end namespace cx

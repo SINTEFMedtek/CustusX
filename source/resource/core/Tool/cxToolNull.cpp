@@ -18,6 +18,16 @@ TimedTransformMapPtr ToolNull::getPositionHistory()
 	return TimedTransformMapPtr();
 }
 
+ToolPositionMetadata ToolNull::getMetadata() const
+{
+	return ToolPositionMetadata();
+}
+
+const std::map<double, ToolPositionMetadata>& ToolNull::getMetadataHistory()
+{
+	return mMetadata;
+}
+
 bool ToolNull::getVisible() const
 {
 	return false;
