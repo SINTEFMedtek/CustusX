@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxStringPropertySelectPointMetric.h"
 #include "cxPatientModelServiceProxy.h"
+#include "cxViewService.h"
 
 
 namespace cx
@@ -99,7 +100,6 @@ void RouteToTargetFilter::createInputTypes()
 	targetPoint = StringPropertySelectPointMetric::New(mServices->patient());
 	targetPoint->setValueName("Target point");
 	targetPoint->setHelp("Select point metric input");
-	connect(targetPoint.get(), SIGNAL(dataChanged(QString)), this, SLOT(pointMetricChangedSlot(QString)));
 	mInputTypes.push_back(targetPoint);
 
 }
@@ -151,6 +151,7 @@ bool RouteToTargetFilter::postProcess()
 	outputCenterline->get_rMd_History()->setRegistration(inputMesh->get_rMd());
 
 	patientService()->insertData(outputCenterline);
+	mServices->view()->autoShowData(outputCenterline);
 
 	mOutputTypes[0]->setValue(outputCenterline->getUid());
 
