@@ -78,7 +78,6 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
-	bool execute(ImagePtr inputImage);
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
