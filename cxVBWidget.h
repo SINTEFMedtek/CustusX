@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxMesh.h"
 #include "cxVBcameraPath.h"
+#include "org_custusx_virtualbronchoscopy_Export.h"
 
 
 class QVBoxLayout;
@@ -60,12 +61,13 @@ typedef boost::shared_ptr<class PatientStorage> PatientStoragePtr;
  * \date Aug 27, 2015
  * \author Geir Arne Tangen, SINTEF
  */
-class VBWidget : public QWidget
+class org_custusx_virtualbronchoscopy_EXPORT VBWidget : public QWidget
 {
 	Q_OBJECT
 public:
 	VBWidget(VisServicesPtr services, QWidget *parent = 0);
 	virtual ~VBWidget();
+	void setRouteToTarget(QString uid);
 
 private:
 	QString defaultWhatsThis() const;

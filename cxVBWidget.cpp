@@ -135,6 +135,11 @@ VBWidget::~VBWidget()
 {
 }
 
+void VBWidget::setRouteToTarget(QString uid)
+{
+	mRouteToTarget->setValue(uid);
+}
+
 void  VBWidget::enableControls(bool enable)
 {
 	mPlaybackSlider->setEnabled(enable);

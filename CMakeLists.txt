@@ -28,14 +28,17 @@ set(PLUGIN_resources
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
-set(PLUGIN_target_libraries 
+set(PLUGIN_target_libraries
+    PUBLIC
     ${PLUGIN_target_libraries}
+
+    PRIVATE
     cxGUIExtenderService
     cxPluginUtilities
     cxResource
     cxResourceVisualization
     cxResourceWidgets
-      Qt5::Widgets
+    Qt5::Widgets
     )
 
 set(PLUGIN_OUTPUT_DIR "")

@@ -44,12 +44,10 @@ namespace cx
 
 VBPluginActivator::VBPluginActivator()
 {
-	std::cout << "Created VirtualBronchoscopyPluginActivator" << std::endl;
 }
 
 VBPluginActivator::~VBPluginActivator()
 {
-	std::cout << "VirtualBronchoscopyPluginActivator destr" << std::endl;
 }
 
 void VBPluginActivator::start(ctkPluginContext* context)
