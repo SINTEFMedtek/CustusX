@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "boost/shared_ptr.hpp"
 #include <QTextBrowser>
+#include "org_custusx_help_Export.h"
 
 namespace cx
 {
@@ -47,7 +48,7 @@ typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
  * \date 2014-09-30
  * \author Christian Askeland
  */
-class HelpBrowser : public QTextBrowser
+class org_custusx_help_EXPORT HelpBrowser : public QTextBrowser
 {
 	Q_OBJECT
 
