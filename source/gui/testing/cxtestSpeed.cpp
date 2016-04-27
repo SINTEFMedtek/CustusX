@@ -66,7 +66,7 @@ void requireVolumeIn3DScene()
 	vtkImageDataPtr output = renderTester->renderToImage();
 	double fractionNonZeroPixels = Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
 
-	REQUIRE(fractionNonZeroPixels > 0.2);//Expect more than the pointer in the 3D scene
+	REQUIRE(fractionNonZeroPixels > 0.19);//Expect more than the pointer in the 3D scene
 }
 
 double calculateFPS(bool slicing)
