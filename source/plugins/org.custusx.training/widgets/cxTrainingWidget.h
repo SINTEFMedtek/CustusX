@@ -42,6 +42,7 @@ class QPushButton;
 namespace cx {
 
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+class HelpBrowser;
 
 /**
  * Top-level help widget
@@ -64,7 +65,21 @@ public:
 
 	HelpEnginePtr mEngine;
 
+//private slots:
+//	void onPrevious();
+//	void onNext();
 
+private:
+	CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
+	void stepTo(int step);
+	void onStep(int delta);
+
+	QAction* mPreviousAction;
+	QAction* mNextAction;
+	QAction* mCurrentAction;
+	HelpBrowser* mBrowser;
+	QStringList mSessionIDs;
+	int mCurrentStep;
 };
 
 } /* namespace cx */

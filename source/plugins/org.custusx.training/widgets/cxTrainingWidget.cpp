@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QPushButton>
 #include "cxHelpEngine.h"
 #include "cxHelpBrowser.h"
+#include "cxLogger.h"
+#include "boost/bind.hpp"
+#include "boost/function.hpp"
 
 namespace cx {
 
@@ -43,14 +46,11 @@ TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
 {
 	mEngine.reset(new HelpEngine);
 
-	HelpBrowser *browser = new HelpBrowser(this, mEngine);
-//	connect(this, &HelpWidget::requestShowLink,
-//			browser, &HelpBrowser::setSource);
-//	mBrowser = browser;
+	mBrowser = new HelpBrowser(this, mEngine);
 
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-	topLayout->addWidget(browser);
+	topLayout->addWidget(mBrowser);
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	topLayout->addLayout(buttonLayout);
@@ -59,13 +59,82 @@ TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
 //	mPreviousStepButton->add
 	mNextStepButton = new QPushButton("Next");
 
-	buttonLayout->addWidget(mPreviousStepButton);
 	buttonLayout->addStretch(1);
-	buttonLayout->addWidget(mNextStepButton);
+
+	mPreviousAction = this->createAction2(this,
+											QIcon(":/icons/open_icon_library/arrow-left-3.png"),
+											"Previous", "Go to previous training step",
+//											SLOT(onPrevious()),
+											NULL);
+	connect(mPreviousAction, &QAction::triggered,
+			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
+	this->addToolButtonFor(buttonLayout, mPreviousAction);
+
+	mCurrentAction = this->createAction2(this,
+											QIcon(":/icons/open_icon_library/button-green.png"),
+											"Reload", "Reload the current training step",
+											NULL);
+	connect(mCurrentAction, &QAction::triggered,
+			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
+	CXToolButton* button = this->addToolButtonFor(buttonLayout, mCurrentAction);
+	button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+	mNextAction = this->createAction2(this,
+											QIcon(":/icons/open_icon_library/arrow-right-3.png"),
+											"Next", "Go to next training step",
+//											SLOT(onNext()),
+											NULL);
+	connect(mNextAction, &QAction::triggered,
+			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
+	this->addToolButtonFor(buttonLayout, mNextAction);
+
+	for (unsigned i=1; i<=3; ++i)
+		mSessionIDs << QString("org_custusx_training_sessionA_step%1").arg(i);
+	mCurrentStep = -1;
+	this->stepTo(0);
+}
+
+CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* action)
+{
+	CXToolButton* button = new CXToolButton();
+	button->setDefaultAction(action);
+	button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+//	button->setToolTip(action->toolTip());
+	layout->addWidget(button);
+	return button;
 }
 
 TrainingWidget::~TrainingWidget()
 {
+}
+
+//void TrainingWidget::onPrevious()
+//{
+//	this->stepTo(mCurrentStep-1);
+//}
+
+//void TrainingWidget::onNext()
+//{
+//	this->stepTo(mCurrentStep+1);
+//}
+
+//void TrainingWidget::onCurrent()
+//{
+//	this->stepTo(mCurrentStep);
+//}
+
+void TrainingWidget::onStep(int delta)
+{
+	this->stepTo(mCurrentStep+delta);
+}
+
+void TrainingWidget::stepTo(int step)
+{
+	step = std::min<int>(step, mSessionIDs.size()-1);
+	step = std::max<int>(step, 0);
+	mCurrentStep = step;
+
+	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
 }
 
 } /* namespace cx */

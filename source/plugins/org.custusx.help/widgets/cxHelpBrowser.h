@@ -55,6 +55,8 @@ class org_custusx_help_EXPORT HelpBrowser : public QTextBrowser
 public:
 	HelpBrowser(QWidget *parent, HelpEnginePtr engine);
 	virtual void setSource(const QUrl& name);
+	void listenToEngineKeywordActivated();
+
 public slots:
 	void showHelpForKeyword(const QString &id);
 
