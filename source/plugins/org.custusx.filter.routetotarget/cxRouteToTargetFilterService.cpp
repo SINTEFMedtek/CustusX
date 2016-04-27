@@ -56,8 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-RouteToTargetFilter::RouteToTargetFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(VisServicesPtr(new VisServices(pluginContext)) )
+RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 	mRouteToTarget = RouteToTargetPtr(new RouteToTarget());
 }
@@ -148,6 +148,7 @@ bool RouteToTargetFilter::postProcess()
 	if (!outputCenterline)
 		return false;
 
+	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
 	outputCenterline->get_rMd_History()->setRegistration(inputMesh->get_rMd());
 
 	patientService()->insertData(outputCenterline);
