@@ -164,6 +164,7 @@ void RenderLoop::renderViews()
 	}
 
 	mCyclicLogger->time("render");
+	emit renderFinished();
 }
 
 bool RenderLoop::pollForSmartRenderingThisCycle()
