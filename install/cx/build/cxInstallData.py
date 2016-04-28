@@ -44,6 +44,7 @@ import pprint
 import cx.utils.cxArgParse
 import cx.utils.cxUtilities
 import cx.utils.cxSSH
+import cx.utils.cxRepoHandler
         
 class Common(object):
     '''
@@ -52,7 +53,6 @@ class Common(object):
     '''
     def __init__(self):
         self.m32bit = False
-        self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
         self.ninja = self.ninja_installed()                
@@ -77,6 +77,8 @@ class Common(object):
         self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
+
+        self.main_branch = cxRepoHandler.getBranchForRepo(self.getRepoFolderName(), fallback='master')
 
         # for the build of CustusX on the custusx.org website
         user = "custusx"

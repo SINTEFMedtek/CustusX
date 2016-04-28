@@ -26,11 +26,11 @@ def runShell(cmd, path):
         return out.strip()
     return None
 
-def getBranchForRepo(path):
+def getBranchForRepo(path, fallback=None):
     'Find the git branch in the repo in the input path, None if detached'
     branch = runShell('git rev-parse --abbrev-ref HEAD', path)
     if branch=="HEAD":
-        return None
+        return fallback
     return branch
 
 
@@ -66,12 +66,11 @@ class RepoHandler:
          - checkout folder
          - root path
         '''
-        print "self.getUrl()     ", self.getUrl()
         pathfound = os.path.exists(self.repo_path)
         if pathfound:
             return
         
-        print '*** %s will be cloned in [%s]' % (self.getName, self.root_path)
+        print '*** %s will be cloned in [%s]' % (self.getName(), self.root_path)
         doprompt = not (self.silent or args.silent_mode)
         self._promptToContinue(doprompt)
         
