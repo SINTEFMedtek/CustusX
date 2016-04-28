@@ -68,7 +68,7 @@ Q_OBJECT
 Q_INTERFACES(cx::Filter)
 
 public:
-	AirwaysFilter(ctkPluginContext *pluginContext);
+	AirwaysFilter(VisServicesPtr services);
 	virtual ~AirwaysFilter();
 
 	virtual QString getType() const;
