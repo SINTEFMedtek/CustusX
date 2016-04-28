@@ -61,6 +61,7 @@ CustusXController::CustusXController(QObject* parent) : QObject(parent)
 	mBaseTime = 1000;
 	mMeasuredFPS = 0;
 	mEnableSlicing = false;
+    mNumInitialRenders = 0;
 }
 
 CustusXController::~CustusXController()
@@ -144,6 +145,10 @@ void CustusXController::initialBeginCheckRenderSlot()
 
 void CustusXController::initialEndCheckRenderSlot()
 {
+    mNumInitialRenders++;
+    if(mNumInitialRenders < 2)
+        return;
+
 	disconnect(cx::viewService().get(), &cx::ViewService::renderFinished, this, &CustusXController::initialEndCheckRenderSlot);
   // start next timing
   cx::viewService()->getRenderTimer()->reset(5*mBaseTime);
