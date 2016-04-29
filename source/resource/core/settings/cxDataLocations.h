@@ -62,6 +62,7 @@ public:
 
 	static QString getDocPath(); ///< return path to folder containing documentation files
 	static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
+    static void deletePersistentWritablePath(); ///< Deletes the folder called *_settings
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
 
