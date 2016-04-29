@@ -18,6 +18,9 @@ def runShell(cmd, path):
     print '[shell cmd] %s [%s]' % (cmd, path)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
     out, err = p.communicate("") # wait for process to complete
+    print 'OUT', out
+    print 'ERR', err
+    print 'RET', p.returncode
     if out:
         print out.strip()
     if err:
@@ -110,12 +113,16 @@ class RepoHandler:
         print 'Checkout+pull %s to to the first existing branch in list [%s]' % (self.getName(), ','.join(branches))
         
         for branch in branches:
-            if runShell('git checkout %s' % branch, self.repo_path):
+            result = runShell('git checkout %s' % branch, self.repo_path)
+            print 'RESULT ', result
+            if result:
+                runShell('git pull origin %s' % branch, self.repo_path)
                 break
-            
-        for branch in branches:
-            if runShell('git pull origin %s' % branch, self.repo_path):
-                break
+        print 'COMPLETE'
+                    
+#        for branch in branches:
+#            if runShell('git pull origin %s' % branch, self.repo_path):
+#                break
             
     def cleanBranchList(self, branches):
         retval = []

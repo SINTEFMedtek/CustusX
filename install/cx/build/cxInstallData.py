@@ -78,7 +78,7 @@ class Common(object):
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
 
-        self.main_branch = cx.utils.cxRepoHandler.getBranchForRepo(self.getRepoFolderName(), fallback='master')
+        self.main_branch = cx.utils.cxRepoHandler.getBranchForRepo(self.getCustusXRepositoryPath(), fallback='master')
 
         # for the build of CustusX on the custusx.org website
         user = "custusx"
@@ -282,6 +282,10 @@ class Common(object):
         loc = self.getCustusXRepositoryLocation()
         repoFolder = loc[2]
         return repoFolder
+    
+    def getCustusXRepositoryPath(self):
+        loc = self.getCustusXRepositoryLocation()
+        return '/'.join(loc) 
 
     def getCustusXRepositoryLocation(self):
         '''
