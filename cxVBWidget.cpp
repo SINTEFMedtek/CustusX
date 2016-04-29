@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSessionStorageServiceProxy.h"
 #include "cxPatientStorage.h"
 #include "cxVisServices.h"
+#include "cxLogger.h"
 
 
 
@@ -138,6 +139,7 @@ VBWidget::~VBWidget()
 void VBWidget::setRouteToTarget(QString uid)
 {
 	mRouteToTarget->setValue(uid);
+	mPlaybackSlider->setValue(5);
 }
 
 void  VBWidget::enableControls(bool enable)
