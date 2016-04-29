@@ -65,11 +65,13 @@ public slots:
     void initialEndCheckRenderSlot();
     void secondEndCheckRenderSlot();
     void displayResultsSlot();
-	void changeToNewProfile();
+    void changeToNewProfile();
 
 private:
 	typedef cx::MainWindowApplicationComponent<cx::MainWindow> MainWindowComponent;
 	boost::shared_ptr<MainWindowComponent> mApplicationComponent;
+
+    int mNumInitialRenders;
 };
 
 #endif /* CXTESTCUSTUSXCONTROLLER_H_ */
