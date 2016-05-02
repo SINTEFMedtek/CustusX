@@ -100,34 +100,37 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
-    mOrientationArrayList.clear();
-    mColorArrayList.clear();
+	mOrientationArrayList.clear();
+	mColorArrayList.clear();
 
-    int num;
-    for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
-    {
-        num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
-        if(num==3)
-        {
-            if(strlen(mOrientationArray.c_str())==0)
-            {
-                mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
-                mHasGlyph=true;
-            }
-            mOrientationArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
-        }
-    }
-    mColorArrayList << "";
-    mColorArray="";
-    for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
-    {
-        num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
-        if(num==1)
-        {
-            mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
-        }
-    }
-    mShowGlyph = shouldGlyphBeEnableByDefault();
+	if (mVtkPolyData)
+	{
+		int num;
+		for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
+		{
+			num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
+			if(num==3)
+			{
+				if(strlen(mOrientationArray.c_str())==0)
+				{
+					mOrientationArray=mVtkPolyData->GetPointData()->GetArrayName(k);
+					mHasGlyph=true;
+				}
+				mOrientationArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
+			}
+		}
+		mColorArrayList << "";
+		mColorArray="";
+		for(int k=0; k <  mVtkPolyData->GetPointData()->GetNumberOfArrays(); k++)
+		{
+			num=mVtkPolyData->GetPointData()->GetArray(k)->GetNumberOfComponents();
+			if(num==1)
+			{
+				mColorArrayList << mVtkPolyData->GetPointData()->GetArrayName(k);
+			}
+		}
+	}
+	mShowGlyph = shouldGlyphBeEnableByDefault();
 
 	emit meshChanged();
 }
@@ -286,7 +289,8 @@ bool Mesh::showGlyph()
 bool Mesh::shouldGlyphBeEnableByDefault()
 {
     if(! mHasGlyph) return false;
-    if(mVtkPolyData->GetNumberOfVerts() > 0) return false;
+	if(!mVtkPolyData) return false;
+	if(mVtkPolyData->GetNumberOfVerts() > 0) return false;
     if(mVtkPolyData->GetNumberOfLines() > 0) return false;
     if(mVtkPolyData->GetNumberOfPolys() > 0) return false;
     if(mVtkPolyData->GetNumberOfStrips() > 0) return false;
