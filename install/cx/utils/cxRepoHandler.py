@@ -13,18 +13,18 @@ import pprint
 import argparse
 
 def runShell(cmd, path):
+    '''
+    simple shell implementation.
+    Return value is last stdout line, None if failure.
+    Note: May return an empty string that indicated success, but evaluates to False.
+    '''
     if not os.path.exists(path):
         os.makedirs(path)
     print '[shell cmd] %s [%s]' % (cmd, path)
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
     out, err = p.communicate("") # wait for process to complete
-    print 'OUT', out
-    print 'ERR', err
-    print 'RET', p.returncode
     if out:
         print out.strip()
-    if err:
-        print err.strip()
     if p.returncode == 0:
         return out.strip()
     return None
@@ -101,7 +101,7 @@ class RepoHandler:
         tag = self.args.git_tag
         if tag:
             print 'Checking out %s to tag=%s' % (self.getName(), tag)
-            if not runShell('git checkout %s' % tag, self.repo_path):
+            if runShell('git checkout %s' % tag, self.repo_path) is None:
                 exit("tag checkout failed")
             return
         
@@ -114,8 +114,7 @@ class RepoHandler:
         
         for branch in branches:
             result = runShell('git checkout %s' % branch, self.repo_path)
-            print 'RESULT ', result
-            if result:
+            if result is not None:
                 runShell('git pull origin %s' % branch, self.repo_path)
                 break
         print 'COMPLETE'
