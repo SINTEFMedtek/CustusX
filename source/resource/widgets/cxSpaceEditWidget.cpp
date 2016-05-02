@@ -83,7 +83,6 @@ SpaceEditWidget::SpaceEditWidget(QWidget* parent, SpacePropertyBasePtr dataInter
 
 void SpaceEditWidget::attemptSetValue(COORDINATE_SYSTEM id, QString ref)
 {
-//	std::cout << "setting space " << QString::number(id) << " -- " << ref << std::endl;
 	Space space(id, ref);
 
 	QStringList refs = this->getAvailableSpaceRefs(space.mId);
@@ -100,7 +99,6 @@ void SpaceEditWidget::attemptSetValue(COORDINATE_SYSTEM id, QString ref)
 		return;
 	}
 
-//	std::cout << "setting space3 " << space.toString() << std::endl;
 	mData->setValue(space);
 }
 
@@ -117,7 +115,6 @@ void SpaceEditWidget::showLabel(bool on)
 
 void SpaceEditWidget::rebuildIdCombobox()
 {
-	mIdCombo->blockSignals(true);
 	mIdCombo->clear();
 
 	Space currentValue = mData->getValue();
@@ -153,7 +150,6 @@ std::vector<COORDINATE_SYSTEM> SpaceEditWidget::getAvailableSpaceIds()
 
 void SpaceEditWidget::rebuildRefCombobox()
 {
-	mRefCombo->blockSignals(true);
 	mRefCombo->clear();
 
 	Space currentValue = mData->getValue();
@@ -170,7 +166,23 @@ void SpaceEditWidget::rebuildRefCombobox()
 			currentIndex = i;
 	}
 	mRefCombo->setCurrentIndex(currentIndex);
-	mRefCombo->setVisible(!refs.empty());
+
+	// Cannot set visibility inside a paint event.
+	// Instead do it by placing a call in the queue.
+	this->setRefComboVisibilityQueued();
+}
+
+void SpaceEditWidget::setRefComboVisibilityQueued()
+{
+	bool show = mRefCombo->count();
+
+	if (mRefCombo->isVisible()==show)
+		return;
+
+	if (show)
+		QMetaObject::invokeMethod(mRefCombo, "show", Qt::QueuedConnection);
+	else
+		QMetaObject::invokeMethod(mRefCombo, "hide", Qt::QueuedConnection);
 }
 
 QStringList SpaceEditWidget::getAvailableSpaceRefs(COORDINATE_SYSTEM id)
