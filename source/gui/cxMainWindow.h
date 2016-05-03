@@ -86,6 +86,7 @@ public:
 
 protected slots:
 	void patientChangedSlot();
+	void delayedShow();
 
 	//application menu
 	void aboutSlot();
