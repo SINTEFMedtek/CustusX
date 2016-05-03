@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
+#include "cxUtilHelpers.h"
 // Test
 #include "FAST/Algorithms/AirwaySegmentation/AirwaySegmentation.hpp"
 #include "FAST/Algorithms/CenterlineExtraction/CenterlineExtraction.hpp"
@@ -88,7 +89,7 @@ QString AirwaysFilter::getHelp() const
 
 bool AirwaysFilter::execute()
 {
-	std::cout << "EXECUTING AIRWAYS FILTER" << std::endl;
+    CX_LOG_INFO() << "EXECUTING AIRWAYS FILTER";
     ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
@@ -103,7 +104,6 @@ bool AirwaysFilter::execute()
 	    // Need to know the data type
 	    importer->update();
 	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
-	    std::cout << "IMAGE LOADED" << std::endl;
 
 	    // Do segmentation
 		fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
@@ -114,7 +114,11 @@ bool AirwaysFilter::execute()
 	    vtkExporter->setInputConnection(segmentation->getOutputPort());
 	    vtkExporter->Update();
 	    mSegmentationOutput = vtkExporter->GetOutput();
-		std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
+        CX_LOG_SUCCESS() << "FINISHED AIRWAY SEGMENTATION";
+
+        //HACK: there is some kind of race condition where data is not ready to be accessed, thus we need to wait a bit
+        //This only happens on mac release build (disapears if cout's are added for example.)
+        sleep_ms(500);
 
 	    // Get output segmentation data
 	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
