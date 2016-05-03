@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringPropertySelectPointMetric.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewService.h"
+#include "cxLog.h"
 
 
 namespace cx
@@ -59,7 +60,6 @@ namespace cx
 RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services) :
 	FilterImpl(services)
 {
-	mRouteToTarget = RouteToTargetPtr(new RouteToTarget());
 }
 
 QString RouteToTargetFilter::getName() const
@@ -119,16 +119,20 @@ void RouteToTargetFilter::createOutputTypes()
 
 bool RouteToTargetFilter::execute()
 {
+    mRouteToTarget.reset(new RouteToTarget());
+
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 
-	vtkPolyDataPtr centerline = mesh->getVtkPolyData();
+    vtkPolyDataPtr centerline_r = mesh->getTransformedPolyData(mesh->get_rMd());
 
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 
-	Vector3D targetCoordinate = targetPoint->getCoordinate();
+    Vector3D targetCoordinate_r = targetPoint->getCoordinate();
 
-	mRouteToTarget->processCenterline(centerline);
-	mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate);
+    mRouteToTarget->processCenterline(centerline_r);
+
+    //note: mOutput is in reference space
+    mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate_r);
 
 	return true;
 }
@@ -143,19 +147,19 @@ bool RouteToTargetFilter::postProcess()
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
 
-	outputCenterline->setVtkPolyData(mOutput);
+    //note: mOutput and outputCenterline is in reference(r) space
+    outputCenterline->setVtkPolyData(mOutput);
 
 	if (!outputCenterline)
 		return false;
 
-	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
-	outputCenterline->get_rMd_History()->setRegistration(inputMesh->get_rMd());
+    //Meshes are expected to be in data(d) space
+    outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
 	patientService()->insertData(outputCenterline);
 	mServices->view()->autoShowData(outputCenterline);
 
 	mOutputTypes[0]->setValue(outputCenterline->getUid());
-
 
 	return true;
 }

@@ -127,7 +127,7 @@ bool AirwaysFilter::execute()
         fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
         centerline->setInputConnection(segmentation->getOutputPort());
 
-	    // Get centerline
+        // Get centerline
 	    vtkSmartPointer<fast::VTKLineSetExporter> vtkCenterlineExporter = fast::VTKLineSetExporter::New();
 	    vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
 	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();

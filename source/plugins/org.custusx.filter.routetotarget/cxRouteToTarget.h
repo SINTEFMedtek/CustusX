@@ -19,13 +19,13 @@ class RouteToTarget
 public:
 	RouteToTarget();
 	virtual ~RouteToTarget();
-	void setCenterline(vtkPolyDataPtr centerline);
-	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline);
-	void processCenterline(vtkPolyDataPtr centerline);
-	void	 findClosestPointInBranches(Vector3D targetCoordinate);
+    //void setCenterline(vtkPolyDataPtr centerline);
+    Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
+    void processCenterline(vtkPolyDataPtr centerline_r);
+    void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findRoutePositions();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
-	vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate);
+    vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
 	vtkPolyDataPtr addVTKPoints();
 
 private:
