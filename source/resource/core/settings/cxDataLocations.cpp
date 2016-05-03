@@ -178,7 +178,9 @@ QString DataLocations::getRootConfigPath()
 	QStringList paths = getRootConfigPaths();
 	if (paths.empty())
 		return "";
-	return paths.front();
+	// Those who ask for a single (legacy) config path need
+	// the default CX path, not the override.
+	return paths.back();
 }
 
 QStringList DataLocations::getRootConfigPaths()
