@@ -117,7 +117,6 @@ class RepoHandler:
             if result is not None:
                 runShell('git pull origin %s' % branch, self.repo_path)
                 break
-        print 'COMPLETE'
                     
 #        for branch in branches:
 #            if runShell('git pull origin %s' % branch, self.repo_path):
