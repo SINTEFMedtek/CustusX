@@ -140,7 +140,6 @@ MeshPtr RMPCFromPointerWidget::getTrackerDataAsMesh()
 {
 	Transform3D rMpr = mServices->patient()->get_rMpr();
 
-	//	return mSelectRecordSession->getRecordedTrackerData_prMt();
 	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getSelectRecordSession()->getRecordedTrackerData_prMt();
 	vtkPolyDataPtr trackerdata_r = polydataFromTransforms(trackerRecordedData_prMt, rMpr);
 
