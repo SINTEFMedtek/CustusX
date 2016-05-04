@@ -3,7 +3,8 @@ This script package is developed to be used as a fresh install.
 Using it to update your system might or might not work. :)
 
 Prerequisites:
-- GitHub account with uploaded id_rsa.pub (public ssh-key)- Windows 8.1, 64 bit
+- GitHub account with uploaded id_rsa.pub (public ssh-key)- Windows 10, 64 bit
+- Manual installation of Visual studio 2015 community edition. See problem 0 below.
 - Powershell installed
 - NVIDIA graphicscard - because of cuda
 
@@ -23,6 +24,11 @@ NOTE) When the installer tries to install Qt you have to manually click install 
 ---------------------------------------------------------------------------------------------------------------------------
 
 PROBLEM SOLVING:
+
+(Problem 0)
+Visual studio 2015 community edition must be installed manually. At the time no working direct 
+link to the installer which the script could use was found. Also, remember to choose
+custom installation and make sure to install the C++ compiler.
 
 (Problem 1) 
 After installing eclipse I get the following error:
