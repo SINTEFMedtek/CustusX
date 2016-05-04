@@ -162,6 +162,8 @@ ToolPtr SelectRecordSession::findToolContainingMostDataForSession(std::map<QStri
 
 	for (TrackingService::ToolMap::iterator i=tools.begin(); i!=tools.end(); ++i)
 	{
+		if (i->second->hasType(Tool::TOOL_REFERENCE))
+			continue;
 		TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(i->second, session, false);
 		tooldata[trackerRecordedData_prMt.size()] = i->second;
 	}
