@@ -112,9 +112,8 @@ void PatientData::onSessionSave(QDomElement &node)
 	DataManager::ImagesMap images = mDataManager->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		CustomMetaImagePtr customReader = CustomMetaImage::create(
-						mSession->getRootFolder() + "/" + iter->second->getFilename());
-		customReader->setTransform(iter->second->get_rMd());
+        CustomMetaImagePtr customReader = CustomMetaImage::create(mSession->getRootFolder() + "/" + iter->second->getFilename());
+        customReader->setTransform(iter->second->get_rMd());
 	}
 
 }
