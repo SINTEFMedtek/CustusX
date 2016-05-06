@@ -97,6 +97,8 @@ bool AirwaysFilter::execute()
 	std::string filename = (patientService()->getActivePatientFolder()+"/"+mInputImage->getFilename()).toStdString();
 
 	try {
+        QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
+        fast::DeviceManager::getInstance().setKernelRootPath(kernelDir.toStdString());
 		// Import image data from disk
 		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
 		importer->setFilename(filename);
@@ -106,7 +108,7 @@ bool AirwaysFilter::execute()
 	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
 
 	    // Do segmentation
-		fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
+        fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
 	    segmentation->setInputConnection(importer->getOutputPort());
 
 	    // Convert fast segmentation data to VTK data which CX can use
@@ -116,12 +118,14 @@ bool AirwaysFilter::execute()
 	    mSegmentationOutput = vtkExporter->GetOutput();
         CX_LOG_SUCCESS() << "FINISHED AIRWAY SEGMENTATION";
 
+	    // Get output segmentation data
+	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
+
         //HACK: there is some kind of race condition where data is not ready to be accessed, thus we need to wait a bit
         //This only happens on mac release build (disapears if cout's are added for example.)
         sleep_ms(500);
-
-	    // Get output segmentation data
-	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
+        std::cout << segmentationData << std::endl;
+        std::cout << segmentationData->getTimestamp() << std::endl;
 
 	    // Get the transformation of the segmentation
 		Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);

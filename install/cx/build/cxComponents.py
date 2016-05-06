@@ -515,10 +515,12 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/source"
     def repository(self):
-        return 'git@github.com:smistad/FAST'
+		#return 'git@github.com:smistad/FAST'
+		return 'git@github.com:jbake/FAST'
     def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('8656587b6e6a1192f90789f6c1ffb760484a39d5')
+		self._getBuilder().gitSetRemoteURL(self.repository())
+		#self._getBuilder().gitCheckout('8656587b6e6a1192f90789f6c1ffb760484a39d5')
+		self._getBuilder().gitCheckout('73788db37710993bb0501264a05e648edd93f6b8')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

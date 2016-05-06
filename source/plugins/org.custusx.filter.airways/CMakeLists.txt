@@ -58,6 +58,18 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+# Make sure OpenCL kernel files are copied to the installer
+install(FILES
+		${FAST_SOURCE_DIR}/Algorithms/AirwaySegmentation/AirwaySegmentation.cl
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/AirwaySegmentation/)
+install(FILES
+		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter2D.cl
+		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter3D.cl
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/GaussianSmoothingFilter/)
+install(FILES
+		${FAST_SOURCE_DIR}/Algorithms/CenterlineExtraction/CenterlineExtraction.cl
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/CenterlineExtraction/)
+
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
