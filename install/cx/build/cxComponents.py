@@ -290,7 +290,8 @@ class Eigen(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #did not find a 3.2.1 release on the github fork... using a sha instead
-        testedSHA = '36cd8ffd9dfcdded4717efb96daad9f6353f6351'
+        #Update eigen to compile FAST on VS 2015.
+        testedSHA = 'fb666682a94f4665760e622d7ab2e573059f95f5'
         self._getBuilder().gitCheckout(testedSHA)
         pass
     def configure(self):
@@ -518,7 +519,7 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('8656587b6e6a1192f90789f6c1ffb760484a39d5')
+        self._getBuilder().gitCheckout('d5acd3aa16ff1fca5ebdd83f25ba089b37d118f3')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
