@@ -246,6 +246,7 @@ bool BinaryThresholdImageFilter::postProcess()
 
 	mRawResult = NULL;
 
+	output->setInitialWindowLevel(-1, -1);
 	output->resetTransferFunctions();
 	mServices->patient()->insertData(output);
 
