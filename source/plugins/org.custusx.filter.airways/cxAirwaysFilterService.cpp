@@ -121,12 +121,6 @@ bool AirwaysFilter::execute()
 	    // Get output segmentation data
 	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
-        //HACK: there is some kind of race condition where data is not ready to be accessed, thus we need to wait a bit
-        //This only happens on mac release build (disapears if cout's are added for example.)
-        sleep_ms(500);
-        std::cout << segmentationData << std::endl;
-        std::cout << segmentationData->getTimestamp() << std::endl;
-
 	    // Get the transformation of the segmentation
 		Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
 	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double

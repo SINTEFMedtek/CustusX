@@ -524,6 +524,7 @@ class FAST(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        append = builder.appendCMakeOption
         add('FAST_MODULE_OpenIGTLink:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
@@ -532,6 +533,7 @@ class FAST(CppComponent):
         add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
+        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()

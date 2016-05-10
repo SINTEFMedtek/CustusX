@@ -183,6 +183,18 @@ class CppBuilder:
     def addCMakeOption(self, key, value):
         self.cmakeOptions[key] = value
 
+    def appendCMakeOption(self, key, value):
+        temp = ""
+        if(self.cmakeOptions.has_key(key)):
+            temp = self.cmakeOptions[key]
+            print key+" was set to "+temp
+        if(not temp):
+            new = value
+        else:
+            new = temp+" "+value
+        print key+" is now set to "+new
+        self.cmakeOptions[key] = new
+
     def configureCMake(self, options=''): 
         self._addDefaultCmakeOptions()
         generator = self.controlData.getCMakeGenerator()
@@ -196,8 +208,9 @@ class CppBuilder:
 
     def _addDefaultCmakeOptions(self):
         add = self.addCMakeOption
+        append = self.appendCMakeOption
         if(platform.system() != 'Windows'):
-            add('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+            append('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
