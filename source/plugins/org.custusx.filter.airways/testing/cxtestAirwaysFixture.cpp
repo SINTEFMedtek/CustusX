@@ -51,12 +51,10 @@ namespace cxtest
 
 AirwaysFixture::AirwaysFixture()
 {
-    cx::LogicManager::initialize();
 }
 
 AirwaysFixture::~AirwaysFixture()
 {
-    cx::LogicManager::shutdown();
 }
 
 
@@ -85,7 +83,7 @@ void AirwaysFixture::runFilter(QString preset)
         INFO("Using "+filename.toStdString()+" as testdata.");
         REQUIRE(QFile::exists(filename));
     }
-    cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
+    dummyservices->session()->load(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
     QString info;
     cx::DataPtr input_image = dummyservices->patient()->importData(filename, info);
     {
