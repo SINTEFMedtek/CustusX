@@ -94,7 +94,16 @@ bool AirwaysFilter::execute()
 	if (!input)
 		return false;
 	mInputImage = input;
-    std::string filename = mInputImage->getFilename().toStdString();
+
+    QString q_filename = "";
+    QString activePatienFolder = patientService()->getActivePatientFolder();
+    QString inputImageFileName = mInputImage->getFilename();
+    if(!activePatienFolder.isEmpty())
+        q_filename = activePatienFolder+"/"+inputImageFileName;
+    else
+        q_filename = inputImageFileName;
+
+    std::string filename = q_filename.toStdString();
 
 	try {
         QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
