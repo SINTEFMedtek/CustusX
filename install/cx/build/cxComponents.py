@@ -519,8 +519,7 @@ class FAST(CppComponent):
 		return 'git@github.com:jbake/FAST'
     def update(self):
 		self._getBuilder().gitSetRemoteURL(self.repository())
-		#self._getBuilder().gitCheckout('8656587b6e6a1192f90789f6c1ffb760484a39d5')
-		self._getBuilder().gitCheckout('b61af8b53c63aa0a18e5a77d54b499c47a3445a1')
+		self._getBuilder().gitCheckout('3eb7e813b35c7bd6d166bfff9fb87f901fdaa551')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
