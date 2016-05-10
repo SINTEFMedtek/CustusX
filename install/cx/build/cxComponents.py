@@ -520,7 +520,7 @@ class FAST(CppComponent):
     def update(self):
 		self._getBuilder().gitSetRemoteURL(self.repository())
 		#self._getBuilder().gitCheckout('8656587b6e6a1192f90789f6c1ffb760484a39d5')
-		self._getBuilder().gitCheckout('d85a00e5a8c30ce7e5a67d5f448086801feb5c87')
+		self._getBuilder().gitCheckout('b61af8b53c63aa0a18e5a77d54b499c47a3445a1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
