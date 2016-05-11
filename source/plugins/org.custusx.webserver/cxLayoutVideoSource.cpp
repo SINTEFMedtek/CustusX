@@ -58,7 +58,12 @@ QString LayoutVideoSource::getName()
 
 double LayoutVideoSource::getTimestamp()
 {
-    return mTimestamp.toMSecsSinceEpoch();
+	return mTimestamp.toMSecsSinceEpoch();
+}
+
+TimeInfo LayoutVideoSource::getAdvancedTimeInfo()
+{
+	return TimeInfo(mTimestamp.toMSecsSinceEpoch());
 }
 
 void LayoutVideoSource::start()
