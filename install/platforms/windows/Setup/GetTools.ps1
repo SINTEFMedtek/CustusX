@@ -4,7 +4,7 @@ Script that prepares a Windows machine for software development.
 
 .DESCRIPTION
 Downloads, installs and sets up environment for:
--Microsoft Visual Studio Community 2013
+-Microsoft Visual Studio Community 2015
 -7-zip
 -CppUnit
 -ninja
@@ -62,7 +62,7 @@ Function Tool-Exists{
             {$exists = $true}
     }elseif($tool.get_executableName() -and (Command-Exists $tool.get_executableName()))
         {$exists = $true}
-    elseif($tool.get_name() -eq "MSVC2013"){$exists=Test-MSVCInstalled}
+    elseif($tool.get_name() -eq "MSVC2015"){$exists=Test-MSVCInstalled}
     
     if($exists -eq $true)
         {Add-Logging 'INFO' ($tool.get_name()+" already exists")}
@@ -475,7 +475,7 @@ Function Create-Environment{
 
     #Check that prerequirements are met
     if(!(Test-MSVCInstalled)){
-        Add-Logging 'ERROR' "You need to have Microsoft Visual Studio 2013 installed before setting up a environment."
+        Add-Logging 'ERROR' "You need to have Microsoft Visual Studio 2015 installed before setting up a environment."
         return "Abort"
     }
     
@@ -542,8 +542,8 @@ param (
     [ValidateSet('full', 'download', 'install', 'environment')]
     [string[]]$mode,
     ## Manually picking tools
-    [Parameter(Mandatory=$false, HelpMessage="Select tool(s). (7-Zip, cppunit, ninja, git, cmake, python, eclipse, qt, boost, MSVC2013, console2, nsis, firefox, cuda, ussf, glew)")]
-    [ValidateSet('7-Zip', 'cppunit', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2013', 'console2', 'nsis', 'firefox', 'cuda', 'ussf', 'glew')]
+    [Parameter(Mandatory=$false, HelpMessage="Select tool(s). (7-Zip, cppunit, ninja, git, cmake, python, eclipse, qt, boost, MSVC2015, console2, nsis, firefox, cuda, ussf, glew)")]
+    [ValidateSet('7-Zip', 'cppunit', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2015', 'console2', 'nsis', 'firefox', 'cuda', 'ussf', 'glew')]
     [string[]]$tools
 )
 #Information 

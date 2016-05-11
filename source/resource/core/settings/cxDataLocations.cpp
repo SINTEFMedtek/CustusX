@@ -118,6 +118,14 @@ QString DataLocations::getPersistentWritablePath()
 	return homepath;
 }
 
+void DataLocations::deletePersistentWritablePath()
+{
+    QString pathToDelete = DataLocations::getPersistentWritablePath();
+    QDir dir(pathToDelete);
+    CX_LOG_INFO() << "Going to delete:" << dir.absolutePath();
+    dir.removeRecursively();
+}
+
 
 QString DataLocations::getBundlePath()
 {

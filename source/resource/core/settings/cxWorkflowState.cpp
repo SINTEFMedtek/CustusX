@@ -82,6 +82,7 @@ QAction* WorkflowState::createAction(QActionGroup* group)
 
 	connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
 
+	this->enableAction(mEnableAction);
 	return mAction;
 }
 
@@ -105,6 +106,12 @@ void WorkflowState::autoStartHardware()
 		mServices->video()->openConnection();
 }
 
+void WorkflowState::enableAction(bool enable)
+{
+	mEnableAction = enable;
+	if(mAction)
+		mAction->setEnabled(enable);
+}
 
 } //namespace cx
 

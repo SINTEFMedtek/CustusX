@@ -62,6 +62,20 @@
 		    <color></color>
 		</transferfunctions>
 	</Preset>
+
+        <Preset name="2D CT Lung" modality="CT">
+            <lookuptable2D>
+                <alpha>-1025=0 -1024=255</alpha>
+                <color>-1429=0/0/0 239=255/255/255</color>
+            </lookuptable2D>
+        </Preset>
+
+        <Preset name="2D CT Abdomen" modality="CT">
+            <lookuptable2D>
+                <alpha>-1025=0 -1024=255</alpha>
+                <color>-1024=0/0/0 640=255/255/255</color>
+            </lookuptable2D>
+        </Preset>
 	
 	<Preset modality="US" name="US Angio">
 		<transferfunctions window="255" alpha="1" llr="0" level="128">

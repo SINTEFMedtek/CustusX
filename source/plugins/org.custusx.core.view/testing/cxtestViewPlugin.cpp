@@ -100,7 +100,7 @@ TEST_CASE("ViewService: Get active view group", "[integration][plugins][org.cust
 	fixture.quickRun();
 
 	CHECK(fixture.services->view()->getActiveViewGroup());
-	CHECK(fixture.services->view()->getActiveGroupId() == 0);
+	CHECK(fixture.services->view()->getActiveGroupId() >= 0);
 }
 
 TEST_CASE("ViewService: Get camera style interactor action group and actions", "[integration][plugins][org.custusx.core.view]")
@@ -146,7 +146,6 @@ TEST_CASE("ViewService: set/get camera style", "[integration][plugins][org.custu
 	REQUIRE(selectedAction);
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstDEFAULT_STYLE));
 
-	REQUIRE(fixture.services->view()->getActiveGroupId() == 0);
 	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
 	selectedAction = actionGroup->checkedAction();
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstTOOL_STYLE));

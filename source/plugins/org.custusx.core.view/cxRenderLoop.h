@@ -76,6 +76,7 @@ public slots:
 signals:
 	void preRender();
 	void fps(int number); ///< Emits number of frames per second
+	void renderFinished();
 
 private slots:
 	void timeoutSlot();

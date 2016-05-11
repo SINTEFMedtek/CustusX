@@ -62,8 +62,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AirwaysFilter::AirwaysFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(VisServices::create(pluginContext))
+AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
 
 }
@@ -86,16 +86,14 @@ QString AirwaysFilter::getHelp() const
 	        "</html>";
 }
 
-
 bool AirwaysFilter::execute()
 {
 	std::cout << "EXECUTING AIRWAYS FILTER" << std::endl;
     ImagePtr input = this->getCopiedInputImage();
-    	if (!input)
-    		return false;
-    mInputImage = input;
-
-	std::string filename = (patientService()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
+	if (!input)
+		return false;
+	mInputImage = input;
+	std::string filename = (patientService()->getActivePatientFolder()+"/"+mInputImage->getFilename()).toStdString();
 
 	try {
 		// Import image data from disk
@@ -116,13 +114,13 @@ bool AirwaysFilter::execute()
 	    vtkExporter->setInputConnection(segmentation->getOutputPort());
 	    vtkExporter->Update();
 	    mSegmentationOutput = vtkExporter->GetOutput();
-	    std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
+		std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
 
 	    // Get output segmentation data
 	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
 	    // Get the transformation of the segmentation
-	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
+		Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
 	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
 
         // Extract centerline

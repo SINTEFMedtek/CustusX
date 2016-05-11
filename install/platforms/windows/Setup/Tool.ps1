@@ -85,13 +85,13 @@ Function Get-ToolList{
 	#		ExecutableName, 
 	#		HelpText )
 
-    # Microsoft Visual C++ Studio Community 2013
+    # Microsoft Visual C++ Studio Community 2015
 	$toollist += New-Object Tool(
-				"MSVC2013", 
-				"http://go.microsoft.com/?linkid=9863608", 
-				"$ToolFolder\vs_community.exe", 
+				"MSVC2015", 
+				"http://go.microsoft.com/fwlink/?LinkId=691978&clcid=0x409", 
+				"$ToolFolder\vs_community_ENU.exe", 
 				"EXE", 
-				"$script:CX_PROGRAM_FILES_X86\Microsoft Visual Studio 12.0\VC\bin", 
+				"$script:CX_PROGRAM_FILES_X86\Microsoft Visual Studio 14.0\VC\bin", 
 				"",
 				"", 
 				"nmake", 
@@ -156,12 +156,12 @@ Function Get-ToolList{
 				"", 
 				"ninja", 
 				"Enables support for compiling using more than one core.")
-    # CMake 3.4.1 (x86)
+    # CMake 3.5.2 (x86)
     $toollist += New-Object Tool(
 				"cmake", 
-				"https://cmake.org/files/v3.4/cmake-3.4.1-win32-x86.exe", 
-				"$ToolFolder\cmake-installer.exe", 
-				"NSIS package", 
+				"https://cmake.org/files/v3.5/cmake-3.5.2-win32-x86.msi", 
+				"$ToolFolder\cmake-installer.msi", 
+				"MSI", 
 				"$script:CX_PROGRAM_FILES_X86\CMake\bin",
 				"",
 				"", 
@@ -195,10 +195,10 @@ Function Get-ToolList{
     # Python 2.7
     $toollist += New-Object Tool(
 				"python", 
-			    "http://www.python.org/ftp/python/2.7.3/python-2.7.3.msi", 
+				"https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi", 
 			    "$ToolFolder\python-installer.msi", 
 			    "MSI", 
-			    "$script:CX_DEFAULT_DRIVE\Python27",
+			    "$script:CX_DEFAULT_DRIVE\Python27;$script:CX_DEFAULT_DRIVE\Python27\Scripts",
 				"",				
 			    "", 
 			    "python", 
@@ -216,26 +216,26 @@ Function Get-ToolList{
 			    "eclipse", 
 			    "Editor. Kepler (4.3)"
 				)
-    # Qt 5.4 vs2013, 64 bit libs only, installer
+    # Qt 5.6 vs2015, 64 bit libs only, installer
     $toollist += New-Object Tool(
 				"qt", 
-				"http://download.qt.io/archive/qt/5.4/5.4.0/qt-opensource-windows-x86-msvc2013_64_opengl-5.4.0.exe", 
+				"http://download.qt.io/archive/qt/5.6/5.6.0/qt-opensource-windows-x86-msvc2015_64-5.6.0.exe", 
 			    "$ToolFolder\qt.exe", 
 			    "NSIS package", 
-			    "$script:CX_DEFAULT_DRIVE\Qt\Qt5.4.0\5.4\msvc2013_64_opengl\bin",
-				"$script:CX_DEFAULT_DRIVE\Qt\Qt5.4.0\Tools\QtCreator\bin",
+			    "$script:CX_DEFAULT_DRIVE\Qt\Qt5.6.0\5.6\msvc2015_64\bin",
+				"$script:CX_DEFAULT_DRIVE\Qt\Qt5.6.0\Tools\QtCreator\bin",
 			    "",
 			    "qmake", 
 			    "Only 64 bit libs."
 			    )
-    # Boost 1.56.0
+    # Boost 1.60.0
     $toollist += New-Object Tool(
 				"boost", 
-				"http://downloads.sourceforge.net/project/boost/boost-binaries/1.56.0/boost_1_56_0-msvc-12.0-64.exe?r=http%3A%2F%2Fsourceforge.net%2Fprojects%2Fboost%2Ffiles%2Fboost-binaries%2F1.56.0%2F&ts=1410340910&use_mirror=softlayer-ams", 
+				"https://sourceforge.net/projects/boost/files/boost-binaries/1.60.0/boost_1_60_0-msvc-14.0-64.exe/download", 
 				"$ToolFolder\boost.exe", 
 				"Inno Setup package", 
-				"$script:CX_DEFAULT_DRIVE\local\boost_1_56_0", 
-				"$script:CX_DEFAULT_DRIVE\local\boost_1_56_0\lib64-msvc-12.0",
+				"$script:CX_DEFAULT_DRIVE\local\boost_1_60_0", 
+				"$script:CX_DEFAULT_DRIVE\local\boost_1_60_0\lib64-msvc-14.0",
 				"", 
 				"", 
 				"Utility library."
@@ -269,7 +269,7 @@ Function Get-ToolList{
     # Universal Silent Switch Finder 1.5.0.0
     $toollist += New-Object Tool(
 				"ussf", 
-				"http://download.softpedia.com/dl/2f06f2807bcc03275a125f4f0e7eae3e/5589272f/100180984/software/system/ussf.exe",
+				"http://www.softpedia.com/dyn-postdownload.php/a5af3d7a8fa43dc5e12712c1051fc259/572360c1/2c2f8/4/1?tsf=0",
 				"$ToolFolder\ussf.exe", 
 				"", 
 				"$ToolFolder", 
@@ -277,6 +277,18 @@ Function Get-ToolList{
 				"", 
 				"ussf", 
 				"Useful tool for detecting installer switches."
+				)
+	# Doxygen
+    $toollist += New-Object Tool(
+				"doxygen", 
+				"", 
+				"", 
+				"", 
+				"", 
+				"C:\Program Files\doxygen\bin", 
+				"", 
+				"", 
+				"For creating documentation."
 				)
 							
 	return $toollist

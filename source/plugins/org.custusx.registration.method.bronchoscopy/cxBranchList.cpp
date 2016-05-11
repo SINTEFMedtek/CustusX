@@ -277,7 +277,8 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 					 // existing branch
 				{
 					newBranch->setParentBranch(branchToSplit->getParentBranch());
-					branchToSplit->getParentBranch()->addChildBranch(newBranch);
+					if(branchToSplit->getParentBranch())
+						branchToSplit->getParentBranch()->addChildBranch(newBranch);
 				}
 				else if (branchToSplit->getPositions().cols() - splitIndex - 1 < 5)
 					// If the new branch is close to the end of the existing

@@ -65,6 +65,7 @@ public:
 	void setActiveUid(QString uid);
 	QString getActiveUid() const { return mActiveLandmark; }
 	void exportMetricsToFile(QString filename);
+    PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1",  QColor color = QColor(240, 170, 255, 255));
 
 signals:
 	void activeMetricChanged();
@@ -83,7 +84,6 @@ public slots:
 
 private:
 	void setManualToolPosition(Vector3D p_r);
-    PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1",  QColor color = QColor(240, 170, 255, 255));
 	std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
 	std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
 	void installNewMetric(DataMetricPtr metric);
