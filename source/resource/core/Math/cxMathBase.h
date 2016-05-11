@@ -81,7 +81,6 @@ typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "cxPlainObjectEigenAddons.h"
 #define EIGEN_MATRIXBASE_PLUGIN "cxMatrixBaseEigenAddons.h"
 #define EIGEN_TRANSFORM_PLUGIN "cxTransformEigenAddons.h"
-#define EIGEN_DONT_ALIGN
 
 // Eigen library
 #include <Eigen/Core>
