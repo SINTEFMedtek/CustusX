@@ -32,6 +32,23 @@
 
 
 ###############################################################################
+# Adding compiler flags to the CMAKE_CXX_FLAGS variable
+#
+###############################################################################
+function(cx_add_defintions)
+    message(STATUS 'Before CMAKE_CXX_FLAGS ' ${CMAKE_CXX_FLAGS})
+    message(STATUS 'CX_CMAKE_CXX_FLAGS ' ${CX_CMAKE_CXX_FLAGS})
+    foreach(_ITER ${CX_CMAKE_CXX_FLAGS})
+        message(STATUS '            _ITER ' ${_ITER})
+        add_definitions(${_ITER})
+    endforeach()
+    message(STATUS 'After CMAKE_CXX_FLAGS ' ${CMAKE_CXX_FLAGS})
+
+    get_directory_property( DirDefs DIRECTORY ${CMAKE_SOURCE_DIR} COMPILE_DEFINITIONS )
+    message( STATUS "DirDefs: " ${DirDefs} )
+endfunction()
+
+###############################################################################
 # Make file path absolute if needed. Assuming
 #
 ## Input variables:
