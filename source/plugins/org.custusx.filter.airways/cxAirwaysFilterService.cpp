@@ -66,7 +66,13 @@ namespace cx {
 AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
 	FilterImpl(services)
 {
+    //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
+    fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
+    Q_UNUSED(importer)
+}
 
+
+AirwaysFilter::~AirwaysFilter() {
 }
 
 QString AirwaysFilter::getName() const
@@ -104,11 +110,13 @@ bool AirwaysFilter::execute()
         q_filename = inputImageFileName;
 
     std::string filename = q_filename.toStdString();
-
 	try {
         QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
         fast::DeviceManager::getInstance().setKernelRootPath(kernelDir.toStdString());
-		// Import image data from disk
+        QString cacheDir = cx::DataLocations::getCachePath();
+        fast::DeviceManager::getInstance().setWritableCachePath(cacheDir.toStdString());
+
+        // Import image data from disk
 		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
 		importer->setFilename(filename);
 
@@ -116,7 +124,7 @@ bool AirwaysFilter::execute()
 	    importer->update();
 	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
 
-	    // Do segmentation
+        // Do segmentation
         fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
 	    segmentation->setInputConnection(importer->getOutputPort());
 
@@ -127,7 +135,7 @@ bool AirwaysFilter::execute()
 	    mSegmentationOutput = vtkExporter->GetOutput();
         CX_LOG_SUCCESS() << "FINISHED AIRWAY SEGMENTATION";
 
-	    // Get output segmentation data
+        // Get output segmentation data
 	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
 	    // Get the transformation of the segmentation
@@ -161,7 +169,7 @@ bool AirwaysFilter::execute()
 		reportError("Airway segmentation algorithm threw a unknown exception.");
 
 		return false;
-	}
+    }
  	return true;
 }
 
@@ -212,7 +220,6 @@ bool AirwaysFilter::postProcess()
 
 void AirwaysFilter::createOptions()
 {
-	//mOptionsAdapters.push_back(getNoiseLevelOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -243,19 +250,6 @@ void AirwaysFilter::createOutputTypes()
 
 }
 
-/*
-DoublePropertyPtr AirwaysFilter::getNoiseLevelOption(QDomElement root)
-{
-	DoublePropertyPtr retval = DoubleProperty::initialize("Noise level",
-			"", "Select the amount of noise present in the image", 0.5,
-			DoubleRange(0.0, 2, 0.5), 1, root);
-	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
-	return retval;
-}
-*/
-
-AirwaysFilter::~AirwaysFilter() {
-}
 
 } /* namespace cx */
 
