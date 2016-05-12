@@ -242,6 +242,12 @@ std::vector<TimelineEvent> PlaybackWidget::convertRegistrationHistoryToEvents(Re
 	return events;
 }
 
+
+bool PlaybackWidget::isInterestingTool(ToolPtr tool) const
+{
+	return !tool->hasType(Tool::TOOL_MANUAL) && !tool->hasType(Tool::TOOL_REFERENCE);
+}
+
 std::vector<TimelineEvent> PlaybackWidget::createEvents()
 {
 	typedef std::vector<TimelineEvent> TimelineEventVector;
@@ -251,7 +257,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 	TrackingService::ToolMap tools = trackingService()->getTools();
 	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
-		if(!iter->second->hasType(Tool::TOOL_MANUAL))
+		if(this->isInterestingTool(iter->second))
 		{
 			TimelineEventVector current = convertHistoryToEvents(iter->second);
 			copy(current.begin(), current.end(), std::back_inserter(events));

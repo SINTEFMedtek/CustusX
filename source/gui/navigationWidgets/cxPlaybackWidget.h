@@ -86,6 +86,7 @@ private:
 	void showDetails();
 	QColor generateRandomToolColor() const;
 	QString convertMillisecsToNiceString(qint64 ms) const;
+	bool isInterestingTool(ToolPtr tool) const;
 
 	QLabel* mLabel;
 	QLabel* mTotalLengthLabel;
