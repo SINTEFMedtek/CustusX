@@ -37,10 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionFileMaker.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxUSFrameData.h"
+#include "cxDataLocations.h"
 
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create unique folders", "[unit][resource][usReconstructionTypes]")
 {
+	cx::DataLocations::setTestMode();
 	QString sessionName = "test_session";
 
 	QString uniqueFolder = cx::UsReconstructionFileMaker::createUniqueFolder(this->getDataPath(), sessionName);
@@ -53,6 +55,7 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Cre
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create folder", "[unit][resource][usReconstructionTypes]")
 {
+	cx::DataLocations::setTestMode();
 	QString sessionName = "test_session";
 
 	QString folder = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), sessionName);
