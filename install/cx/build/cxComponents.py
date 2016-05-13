@@ -290,7 +290,8 @@ class Eigen(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #did not find a 3.2.1 release on the github fork... using a sha instead
-        testedSHA = '36cd8ffd9dfcdded4717efb96daad9f6353f6351'
+        #Update eigen to compile FAST on VS 2015.
+        testedSHA = 'fb666682a94f4665760e622d7ab2e573059f95f5'
         self._getBuilder().gitCheckout(testedSHA)
         pass
     def configure(self):
@@ -341,12 +342,12 @@ class IGSTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git://igstk.org/IGSTK.git'
-    def update(self):
         base = self.controlData.gitrepo_open_site_base
-        repo = '%s/IGSTK' % base
+        repo = '%s/IGSTK.git' % base
+        return repo
+    def update(self):
         branch = 'IGSTK-CX-modifications'
-        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
+        self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
         self._getBuilder().gitCheckout('34f4a9f46d54d4674e0a19acdb24bbbc4dcb1ffe')
     def configure(self):        
         builder = self._getBuilder()
@@ -380,10 +381,14 @@ class CustusX(CppComponent):
     def repository(self):
         return '%s/CustusX.git' % self.controlData.gitrepo_main_site_base
     def _rawCheckout(self):
-        self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
+        pass # should never happen. This file is in the repo.
+        #self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        # warning: if this call checks out a different tag/branch than the current, 
+        # the script and code will be inconsistent. The user should have set the correct
+        # tag/branch either manually or by using a wrapper script (e.g cxCustusXFinder).
+        self._getBuilder().gitCheckoutDefaultBranch()    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -558,7 +563,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        self._getBuilder().gitCheckoutDefaultBranch()    
     def configure(self):
         pass
     def build(self):
