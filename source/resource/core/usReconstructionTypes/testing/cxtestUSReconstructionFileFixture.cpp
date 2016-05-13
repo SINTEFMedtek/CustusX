@@ -58,17 +58,21 @@ USReconstructionFileFixture::~USReconstructionFileFixture()
 	cx::removeNonemptyDirRecursively(this->getDataPath());
 }
 
-
 void USReconstructionFileFixture::assertValidFolderForSession(QString path, QString sessionName)
 {
 	QFileInfo info(path);
 
-	CHECK(info.exists());
-	// assert path is subfolder of datapath
-	CHECK(info.absoluteFilePath().contains(this->getDataPath()));
+	REQUIRE(info.exists());
+	{
+		INFO(info.absoluteFilePath() + "   ( info.absoluteFilePath() )");
+		INFO("contains");
+		QFileInfo dataPath(this->getDataPath());
+		INFO(dataPath.absoluteFilePath() + "   ( dataPath.absoluteFilePath() )");
+		// assert path is subfolder of datapath
+		CHECK(info.absoluteFilePath().contains(dataPath.absoluteFilePath()));
+	}
 	CHECK(info.absoluteFilePath().contains(sessionName));
 }
-
 
 QString USReconstructionFileFixture::write(ReconstructionData input)
 {
