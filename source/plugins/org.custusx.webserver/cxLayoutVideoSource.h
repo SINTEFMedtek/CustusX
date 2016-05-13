@@ -54,6 +54,7 @@ public:
     virtual QString getName();
     virtual vtkImageDataPtr getVtkImageData();
     virtual double getTimestamp();
+	virtual TimeInfo getAdvancedTimeInfo();
 
     virtual QString getInfoString() const { return ""; }
     virtual QString getStatusString() const { return ""; }
