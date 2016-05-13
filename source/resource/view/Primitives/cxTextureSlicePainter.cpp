@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkShader2Collection.h>
 #include <vtkUniformVariables.h>
 #include <vtkObjectFactory.h>
-
+#include <vtkOpenGLRenderWindow.h>
 
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #else
 #define GL_GLEXT_PROTOTYPES
 #include <GL/glu.h>
+#include <GL/glext.h>
 #endif
 
 #ifdef WIN32
@@ -71,7 +72,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
 
-#include <vtkOpenGLRenderWindow.h>
 
 //---------------------------------------------------------
 namespace cx
