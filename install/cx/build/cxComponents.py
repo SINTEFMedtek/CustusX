@@ -527,7 +527,12 @@ class FAST(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #self._getBuilder().gitCheckout('3eb7e813b35c7bd6d166bfff9fb87f901fdaa551')
-        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
+#        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
+        branch = 'set_kernel_root_dir'
+        self._getBuilder()._changeDirToSource()
+        runShell('git checkout %s' % branch, ignoreFailure=False)
+        runShell('git pull origin %s' % branch, ignoreFailure=False)
+
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
