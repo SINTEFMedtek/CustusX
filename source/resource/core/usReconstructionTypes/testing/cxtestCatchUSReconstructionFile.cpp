@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUsReconstructionFileMaker.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxUSFrameData.h"
-#include "cxLogger.h"
 
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create unique folders", "[unit][resource][usReconstructionTypes]")
@@ -47,13 +46,8 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Cre
 	QString uniqueFolder = cx::UsReconstructionFileMaker::createUniqueFolder(this->getDataPath(), sessionName);
 	this->assertValidFolderForSession(uniqueFolder, sessionName);
 
-    CX_LOG_INFO() << "uniqueFolder = " << uniqueFolder;
-
 	QString uniqueFolder2 = cx::UsReconstructionFileMaker::createUniqueFolder(this->getDataPath(), sessionName);
 	this->assertValidFolderForSession(uniqueFolder2, sessionName);
-
-    CX_LOG_INFO() << "uniqueFolder2 = " << uniqueFolder2;
-    CX_LOG_INFO() << "this->getDataPath() = " << this->getDataPath();
 	CHECK(uniqueFolder!=uniqueFolder2);
 }
 
@@ -63,9 +57,6 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Cre
 
 	QString folder = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), sessionName);
 	this->assertValidFolderForSession(folder, sessionName);
-
-    CX_LOG_INFO() << "folder = " << folder;
-    CX_LOG_INFO() << "this->getDataPath() = " << this->getDataPath();
 
 	// assert that a new call gives the same folder
 	QString folder2 = cx::UsReconstructionFileMaker::createFolder(this->getDataPath(), sessionName);
