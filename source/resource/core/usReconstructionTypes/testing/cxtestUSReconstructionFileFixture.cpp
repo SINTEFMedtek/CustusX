@@ -58,7 +58,6 @@ USReconstructionFileFixture::~USReconstructionFileFixture()
 	cx::removeNonemptyDirRecursively(this->getDataPath());
 }
 
-
 void USReconstructionFileFixture::assertValidFolderForSession(QString path, QString sessionName)
 {
 	QFileInfo info(path);
@@ -75,7 +74,6 @@ void USReconstructionFileFixture::assertValidFolderForSession(QString path, QStr
 	}
 	CHECK(info.absoluteFilePath().contains(sessionName));
 }
-
 
 QString USReconstructionFileFixture::write(ReconstructionData input)
 {
