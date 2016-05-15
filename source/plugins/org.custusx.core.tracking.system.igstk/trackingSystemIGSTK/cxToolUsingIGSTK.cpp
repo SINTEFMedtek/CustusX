@@ -241,7 +241,9 @@ void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double ti
 	mTimestamp = timestamp;
 	mMetadata[timestamp] = metadata;
 
-	(*mPositionHistory)[timestamp] = matrix; // store original in history
+	// Store positions in history, but only if visible - the history has no concept of visibility
+	if (this->getVisible())
+		(*mPositionHistory)[timestamp] = matrix;
 	m_prMt = prMt_filtered;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 

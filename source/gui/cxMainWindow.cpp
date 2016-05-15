@@ -141,6 +141,12 @@ MainWindow::MainWindow() :
 	popupMenu->setTitle("Window");
 	this->menuBar()->insertMenu(mHelpMenuAction, popupMenu);
 
+	// show after window has been initialized
+	QTimer::singleShot(0, this, SLOT(delayedShow()));
+}
+
+void MainWindow::delayedShow()
+{
 	// Restore saved window states
 	// Must be done after all DockWidgets are created
 	if (restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
@@ -153,7 +159,9 @@ MainWindow::MainWindow() :
 	}
 
 	if (settings()->value("gui/fullscreen").toBool())
+	{
 		this->setWindowState(this->windowState() | Qt::WindowFullScreen);
+	}
 }
 
 void MainWindow::changeEvent(QEvent * event)

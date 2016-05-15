@@ -37,12 +37,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // TSF library tests
 //=================================================================
 
+#include "cxtestTSFFixture.h"
+#include <QString>
 #include "parameters.hpp"
 #include "tsf-config.h"
 
 SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF][unit]"){
 	GIVEN("we init the parameters with default values"){
-		std::string path = std::string(PARAMETERS_DIR);
+		TestTubeSegmentationFramework helper;
+		std::string path = helper.getParametersDir().toStdString();
 		paramList neuroVesselsUSAParameters;
 		REQUIRE_NOTHROW(neuroVesselsUSAParameters = initParameters(path));
 
@@ -82,7 +85,8 @@ SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF][unit]"){
 
 SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF][unit]"){
 	GIVEN("we init the parameters with default values"){
-		std::string path = std::string(PARAMETERS_DIR);
+		TestTubeSegmentationFramework helper;
+		std::string path = helper.getParametersDir().toStdString();
 		paramList phantomAccUSParameters;
 		REQUIRE_NOTHROW(phantomAccUSParameters = initParameters(path));
 

@@ -75,12 +75,12 @@ private:
 	std::vector<COORDINATE_SYSTEM> getAvailableSpaceIds();
 	void rebuildRefCombobox();
 	QStringList getAvailableSpaceRefs(COORDINATE_SYSTEM id);
+	void setRefComboVisibilityQueued();
 
 	QLabel* mLabel;
 	QComboBox* mIdCombo;
 	QComboBox* mRefCombo;
 	SpacePropertyBasePtr mData;
-
 };
 
 } // namespace cx

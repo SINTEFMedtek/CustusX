@@ -98,6 +98,7 @@ private:
 	RecordSessionPtr getSession();
 	void warnIfNoTrackingDataInSession();
 	ToolPtr findToolContainingMostDataForSession(std::map<QString,ToolPtr> tools, RecordSessionPtr session);
+	void updateHelpText();
 };
 
 } //namespace cx

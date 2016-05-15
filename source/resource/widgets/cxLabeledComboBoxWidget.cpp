@@ -91,7 +91,6 @@ void LabeledComboBoxWidget::showLabel(bool on)
 void LabeledComboBoxWidget::prePaintEvent()
 {
 	mCombo->blockSignals(true);
-	mCombo->clear();
 
 	this->setEnabled(mData->getEnabled());
 	mLabel->setEnabled(mData->getEnabled());
@@ -99,11 +98,16 @@ void LabeledComboBoxWidget::prePaintEvent()
 
 	QString currentValue = mData->getValue();
 	QStringList range = mData->getValueRange();
+	if (range.size()!=mCombo->count())
+	{
+		mCombo->clear();
+		mCombo->addItems(range);
+	}
 	int currentIndex = -1;
 	for (int i = 0; i < range.size(); ++i)
 	{
-		QIcon icon = this->getIcon(range[i]);
-		mCombo->addItem(icon, mData->convertInternal2Display(range[i]));
+		mCombo->setItemIcon(i, this->getIcon(range[i]));
+		mCombo->setItemText(i, mData->convertInternal2Display(range[i]));
 		mCombo->setItemData(i, range[i]);
 		if (range[i] == currentValue)
 			currentIndex = i;

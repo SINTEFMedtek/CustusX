@@ -186,7 +186,9 @@ QString DataLocations::getRootConfigPath()
 	QStringList paths = getRootConfigPaths();
 	if (paths.empty())
 		return "";
-	return paths.front();
+	// Those who ask for a single (legacy) config path need
+	// the default CX path, not the override.
+	return paths.back();
 }
 
 QStringList DataLocations::getRootConfigPaths()
@@ -204,11 +206,13 @@ QStringList DataLocations::getRootConfigPaths()
 		}
 	}
 
+	// add folders with the most important first: If the same file exists in both locations,
+	// the first should be prefered.
 	QStringList retval;
-	if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
-		retval << QDir(CX_CONFIG_ROOT).canonicalPath();
-	if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
+	if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for override folder in source code
 		retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
+	if (QDir(CX_CONFIG_ROOT).exists()) // look for default folder in source code
+		retval << QDir(CX_CONFIG_ROOT).canonicalPath();
 
 	return retval;
 }

@@ -211,8 +211,7 @@ void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
     mSource = vtkPolyDataAlgorithmPtr();
     mData = data;
 
-    if (mData)
-        mMapper->SetInputData(mData);
+	mMapper->SetInputData(mData);
 }
 
 
