@@ -43,7 +43,6 @@ namespace cx
 
 BronchoscopyNavigationPluginActivator::BronchoscopyNavigationPluginActivator()
 {
-	std::cout << "Created BronchoscopyNavigationPluginActivator" << std::endl;
 }
 
 BronchoscopyNavigationPluginActivator::~BronchoscopyNavigationPluginActivator()
@@ -51,9 +50,6 @@ BronchoscopyNavigationPluginActivator::~BronchoscopyNavigationPluginActivator()
 
 void BronchoscopyNavigationPluginActivator::start(ctkPluginContext* context)
 {
-	//ViewServicePtr viewService = ViewServicePtr(context);
-//	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-//	ViewServicePtr viewService = ViewServicePtr(new ViewServiceProxy(context));
 	BronchoscopyNavigationGUIExtenderService *bronchoscopyNavigationService = new BronchoscopyNavigationGUIExtenderService(context);
 	mRegistration = RegisteredServicePtr(new RegisteredService(context, bronchoscopyNavigationService, GUIExtenderService_iid));
 }
