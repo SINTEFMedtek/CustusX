@@ -167,7 +167,7 @@ void BranchList::smoothBranchPositions()
 	{
 		Eigen::MatrixXd positions = mBranches[i]->getPositions();
 		int numberOfInputPoints = positions.cols();
-		int controlPointFactor = 5;
+        int controlPointFactor = 10;
 		int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
 
 		vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();

@@ -50,6 +50,18 @@ ToolImpl::~ToolImpl()
 
 }
 
+ToolPositionMetadata ToolImpl::getMetadata() const
+{
+	if (mMetadata.empty())
+		return ToolPositionMetadata();
+	return mMetadata.rbegin()->second;
+}
+
+const std::map<double, ToolPositionMetadata>& ToolImpl::getMetadataHistory()
+{
+	return mMetadata;
+}
+
 double ToolImpl::getTooltipOffset() const
 {
 	return mTooltipOffset;
@@ -91,7 +103,9 @@ void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 	}
 
 	m_prMt = prMt;
-	(*mPositionHistory)[timestamp] = m_prMt;
+	// Store positions in history, but only if visible - the history has no concept of visibility
+	if (this->getVisible())
+		(*mPositionHistory)[timestamp] = m_prMt;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
 

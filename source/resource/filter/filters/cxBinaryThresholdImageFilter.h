@@ -76,11 +76,12 @@ protected:
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
+protected slots:
+	void thresholdSlot();
 private slots:
 	/** Set new value+range of the threshold option.
 	  */
 	void imageChangedSlot(QString uid);
-	void thresholdSlot();
 
 private:
 	void stopPreview();
@@ -88,6 +89,8 @@ private:
 	DoublePairPropertyPtr mThresholdOption;
 	vtkImageDataPtr mRawResult;
 	vtkPolyDataPtr mRawContour;
+
+protected:
 	ImagePtr mPreviewImage;
 };
 typedef boost::shared_ptr<class BinaryThresholdImageFilter> BinaryThresholdImageFilterPtr;

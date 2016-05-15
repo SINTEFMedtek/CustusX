@@ -40,7 +40,6 @@ namespace cx
 {
 typedef boost::shared_ptr<class ApplicationStateMachine> ApplicationStateMachinePtr;
 typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
-typedef boost::shared_ptr<class StateServiceBackend> StateServiceBackendPtr;
 
 
 /**
@@ -71,14 +70,10 @@ public:
 
 private:
 	WorkflowStateMachinePtr getWorkflow();
-	void initialize(StateServiceBackendPtr backend);
-	void fillDefaultSettings();
-	template<class T>
-	void fillDefault(QString name, T value);
-	StateServiceBackendPtr createBackend(ctkPluginContext* context);
+	void initialize();
 
 	WorkflowStateMachinePtr mWorkflowStateMachine;
-	StateServiceBackendPtr mBackend;
+	VisServicesPtr mServices;
 };
 
 }

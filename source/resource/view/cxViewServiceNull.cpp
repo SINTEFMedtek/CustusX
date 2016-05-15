@@ -93,13 +93,27 @@ QWidget* ViewServiceNull::createLayoutWidget(QWidget *parent, int index) { retur
 QWidget* ViewServiceNull::getLayoutWidget(int index) { return NULL; }
 QString ViewServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
 void ViewServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
-InteractiveClipperPtr ViewServiceNull::getClipper() { return InteractiveClipperPtr(); }
 InteractiveCropperPtr ViewServiceNull::getCropper() { return InteractiveCropperPtr(); }
 CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
 NavigationPtr ViewServiceNull::getNavigation() { return NavigationPtr(); }
 LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
-QActionGroup* ViewServiceNull::createInteractorStyleActionGroup() { return mActionGroup; }
+QActionGroup* ViewServiceNull::getInteractorStyleActionGroup() { return mActionGroup; }
+
+void ViewServiceNull::centerToImageCenterInActiveViewGroup()
+{
+	printWarning();
+}
+
+void ViewServiceNull::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	printWarning();
+}
+
+void ViewServiceNull::addDefaultLayout(LayoutData layoutData)
+{
+	printWarning();
+}
 
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {

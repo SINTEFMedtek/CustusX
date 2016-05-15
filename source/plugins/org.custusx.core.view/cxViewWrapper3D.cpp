@@ -418,8 +418,8 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 {
 	ViewWrapper::setViewGroup(group);
 
-	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
-	connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
+	connect(group.get(), &ViewGroupData::initialized, this, &ViewWrapper3D::resetCameraActionSlot);
+	connect(group.get(), &ViewGroupData::optionsChanged, this, &ViewWrapper3D::optionChangedSlot);
 	mView->getRenderer()->SetActiveCamera(mGroupData->getCamera3D()->getCamera());
 
 	// Set eye angle after camera change. Maybe create a cameraChangedSlot instead

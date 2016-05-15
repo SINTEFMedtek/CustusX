@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageTF3D.h"
 
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -99,7 +100,10 @@ void ImageTFData::addXml(QDomNode dataNode)
 void ImageTFData::parseXml(QDomNode dataNode)
 {
 	if (dataNode.isNull())
+	{
+		CX_LOG_WARNING() << "ImageTFData::parseXml empty data node";
 		return;
+	}
 
 	QDomNode alphaNode = dataNode.namedItem("alpha");
 	// Read alpha node if it exists
@@ -118,8 +122,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	}
 	else
 	{
-		std::cout << "Warning: ImageTF3D::parseXml() found no alpha transferfunction";
-		std::cout << std::endl;
+		CX_LOG_WARNING() << "ImageTF3D::parseXml() found no alpha transferfunction";
 	}
 
 	QDomNode colorNode = dataNode.namedItem("color");
@@ -138,8 +141,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	}
 	else
 	{
-		std::cout << "Warning: ImageTF3D::parseXml() found no color transferfunction";
-		std::cout << std::endl;
+		CX_LOG_WARNING() << "ImageTF3D::parseXml() found no color transferfunction";
 	}
 
 	this->internalsHaveChanged();

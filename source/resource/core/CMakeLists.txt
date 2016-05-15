@@ -158,6 +158,7 @@ cx_add_class(cxResource_SOURCE
     Math/cxTransform3D
     Math/cxFrame3D
     Math/cxMathBase.h
+    Math/cxMathUtils
 
     utilities/cxXmlOptionItem
     utilities/cxDoubleRange.h
@@ -218,7 +219,6 @@ cx_add_class(cxResource_SOURCE
     settings/cxSettings
     settings/cxSessionStorageServiceProxy
     settings/cxRequestEnterStateTransition.h
-    settings/cxStateServiceBackend
 
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx

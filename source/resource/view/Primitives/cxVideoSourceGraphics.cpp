@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVideoGraphics.h"
 #include "cxVideoSource.h"
 #include "cxSpaceProvider.h"
+#include "cxLogger.h"
 
 namespace cx
 {

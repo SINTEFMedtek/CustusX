@@ -78,7 +78,6 @@ void ICPRegistrationBaseWidget::prePaintEvent()
 		this->setup();
 	}
 
-
 	this->initializeRegistrator();
 
 	mICPWidget->enableRegistration(mRegistrator->isValid());
@@ -116,6 +115,21 @@ void ICPRegistrationBaseWidget::initializeProperties()
 										   80, DoubleRange(20,100,1), 0, mOptions.getElement());
 	connect(mLTSRatio.get(), &DoubleProperty::changed, this, &ICPRegistrationBaseWidget::onSettingsChanged);
 
+	mNumberOfIterations = DoubleProperty::initialize("Iterations", "Iterations",
+										   "Number of iterations",
+										   500, DoubleRange(1,1000,1), 0, mOptions.getElement());
+	connect(mNumberOfIterations.get(), &DoubleProperty::changed, this, &ICPRegistrationBaseWidget::onSettingsChanged);
+
+	mStopThreshold = DoubleProperty::initialize("StopThreshold", "Stop Threshold",
+										   "Differential RMS stop threshold, between iterations",
+										   0.001, DoubleRange(0.0001,1,0.0001), 4, mOptions.getElement());
+	connect(mStopThreshold.get(), &DoubleProperty::changed, this, &ICPRegistrationBaseWidget::onSettingsChanged);
+
+	mMaxTime = DoubleProperty::initialize("MaxTime", "Max Time",
+										   "Maximum time spent iterating, in seconds",
+										   60, DoubleRange(1,300,1), 0, mOptions.getElement());
+	connect(mMaxTime.get(), &DoubleProperty::changed, this, &ICPRegistrationBaseWidget::onSettingsChanged);
+
 	mMargin = DoubleProperty::initialize("Margin", "Margin",
 										   "Data outside a bounding box defined by the intersection\n"
 										   "of the fixed/moving by a margin are cropped.",
@@ -146,6 +160,9 @@ std::vector<PropertyPtr> ICPRegistrationBaseWidget::getAllProperties()
 	properties.push_back(mLinear);
 	properties.push_back(mDisplayProgress);
 	properties.push_back(mOneStep);
+	properties.push_back(mNumberOfIterations);
+	properties.push_back(mStopThreshold);
+	properties.push_back(mMaxTime);
 	return properties;
 }
 
@@ -183,6 +200,9 @@ void ICPRegistrationBaseWidget::onSettingsChanged()
 	mRegistrator->mt_ltsRatio = mLTSRatio->getValue();
 	mRegistrator->mt_doOnlyLinear = mLinear->getValue();
 	mRegistrator->margin = mMargin->getValue();
+	mRegistrator->mt_maximumNumberOfIterations = mNumberOfIterations->getValue();
+	mRegistrator->mt_distanceDeltaStopThreshold = mStopThreshold->getValue();
+	mRegistrator->mt_maximumDurationSeconds = mMaxTime->getValue();
 }
 
 void ICPRegistrationBaseWidget::registerSlot()
@@ -220,8 +240,15 @@ void ICPRegistrationBaseWidget::registerSlot()
 	}
 
 	Transform3D linearTransform = mRegistrator->getLinearResult();
+
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
+
+	if ((boost::math::isnan)(linearTransform(0,0)))
+	{
+		reportWarning("ICP registration failed.");
+		return;
+	}
 
 	mRegistrator->checkQuality(linearTransform);
 

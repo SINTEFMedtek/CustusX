@@ -111,6 +111,10 @@ protected:
 	BoolPropertyPtr mDisplayProgress;
 	BoolPropertyPtr mOneStep;
 
+	DoublePropertyPtr mNumberOfIterations;
+	DoublePropertyPtr mStopThreshold;
+	DoublePropertyPtr mMaxTime;
+
 	ICPWidget* mICPWidget;
 	XmlOptionFile mOptions;
 	SeansVesselRegPtr mRegistrator;

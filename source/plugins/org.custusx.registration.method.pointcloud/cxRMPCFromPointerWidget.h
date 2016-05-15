@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
 #include "cxICPRegistrationBaseWidget.h"
+#include "cxRegistrationProperties.h"
 
 namespace cx
 {
@@ -87,7 +88,7 @@ private:
 	MeshPtr getTrackerDataAsMesh();
 	QVBoxLayout* createVBoxInGroupBox(QVBoxLayout* parent, QString header);
 
-	StringPropertyBasePtr mFixedImage;
+	StringPropertyRegistrationFixedImagePtr mFixedImage;
 	RecordTrackingWidget* mRecordTrackingWidget;
 
 	SpaceListenerPtr mSpaceListenerMoving;

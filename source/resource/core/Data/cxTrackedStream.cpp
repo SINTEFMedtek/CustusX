@@ -64,7 +64,7 @@ TrackedStream::~TrackedStream()
 {
 	if(mVideoSource)
 	{
-		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrameSlot);
 		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
 	}
 }
@@ -97,7 +97,8 @@ void TrackedStream::toolTransformAndTimestamp(Transform3D prMt, double timestamp
 Transform3D TrackedStream::get_tMu()
 {
 	//Made tMu by copying and modifying code from ProbeSector::get_tMu()
-	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeDefinition();
+	QString streamUid = mVideoSource->getUid();
+	ProbeDefinition probeDefinition = mProbeTool->getProbe()->getProbeDefinition(streamUid);
 	Vector3D origin_p = probeDefinition.getOrigin_p();
 	Vector3D spacing = probeDefinition.getSpacing();
 	Vector3D origin_u(origin_p[0]*spacing[0], origin_p[1]*spacing[1], origin_p[2]*spacing[2]);
@@ -120,7 +121,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 {
 	if(mVideoSource)
 	{
-		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrame);
+		disconnect(mVideoSource.get(), &VideoSource::newFrame, this, &TrackedStream::newFrameSlot);
 		disconnect(mVideoSource.get(), &VideoSource::streaming, this, &TrackedStream::streaming);
 	}
 
@@ -138,7 +139,7 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 void TrackedStream::newFrameSlot()
 {
 	//TODO: Check if we need to turn this on/off
-	if (mImage && mVideoSource)
+	if (mImage && mVideoSource && mVideoSource->isStreaming())
 	{
 		mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
 		emit newFrame();

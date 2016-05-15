@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDefaultTFGenerator.h"
 #include "cxDataReaderWriter.h"
 #include "cxNullDeleter.h"
+#include "cxSettings.h"
 
 #include "cxUnsignedDerivedImage.h"
 
@@ -70,7 +71,7 @@ namespace cx
 
 Image::ShadingStruct::ShadingStruct()
 {
-	on = true;
+	on = settings()->value("View/shadingOn").value<bool>();
 	ambient = 0.2;
 	diffuse = 0.9;
 	specular = 0.3;
@@ -565,6 +566,7 @@ void Image::addXml(QDomNode& dataNode)
 	QDomElement initialWindowNode = doc.createElement("initialWindow");
 	initialWindowNode.setAttribute("width", mInitialWindowWidth);
 	initialWindowNode.setAttribute("level", mInitialWindowLevel);
+	imageNode.appendChild(initialWindowNode);
 }
 
 double Image::loadAttribute(QDomNode dataNode, QString name, double defVal)
@@ -604,8 +606,8 @@ void Image::parseXml(QDomNode& dataNode)
 		std::cout << std::endl;
 	}
 
-	mInitialWindowWidth = this->loadAttribute(dataNode.namedItem("initialWindow"), "width", -1);
-	mInitialWindowLevel = this->loadAttribute(dataNode.namedItem("initialWindow"), "level", -1);
+	mInitialWindowWidth = this->loadAttribute(dataNode.namedItem("initialWindow"), "width", mInitialWindowWidth);
+	mInitialWindowLevel = this->loadAttribute(dataNode.namedItem("initialWindow"), "level", mInitialWindowLevel);
 
 	this->getUnmodifiedLookupTable2D()->parseXml(dataNode.namedItem("lookuptable2D"));
 

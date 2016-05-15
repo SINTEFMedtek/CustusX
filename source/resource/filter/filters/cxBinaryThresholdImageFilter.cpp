@@ -84,7 +84,7 @@ QString BinaryThresholdImageFilter::getHelp() const
 DoublePairPropertyPtr BinaryThresholdImageFilter::getThresholdOption(QDomElement root)
 {
 	DoublePairPropertyPtr retval = DoublePairProperty::initialize("Thresholds", "",
-																			  "Select lower and upper threshold for the segmentation", DoubleRange(0, 100, 1), 0,
+                                                                              "Select the lower and upper thresholds for the segmentation", DoubleRange(0, 100, 1), 0,
 																			  root);
 	return retval;
 }
@@ -100,14 +100,14 @@ BoolPropertyPtr BinaryThresholdImageFilter::getGenerateSurfaceOption(QDomElement
 ColorPropertyPtr BinaryThresholdImageFilter::getColorOption(QDomElement root)
 {
 	return ColorProperty::initialize("Color", "",
-	                                            "Color of output model.",
+                                                "The color of the output model.",
 	                                            QColor("green"), root);
 }
 
 void BinaryThresholdImageFilter::createOptions()
 {
 	mThresholdOption = this->getThresholdOption(mOptions);
-	connect(mThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
+	connect(mThresholdOption.get(), &Property::changed, this, &BinaryThresholdImageFilter::thresholdSlot);
 	mOptionsAdapters.push_back(mThresholdOption);
 	mOptionsAdapters.push_back(this->getGenerateSurfaceOption(mOptions));
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
@@ -162,10 +162,11 @@ void BinaryThresholdImageFilter::stopPreview()
 
 void BinaryThresholdImageFilter::thresholdSlot()
 {
-//	this->stopPreview();
 	if (mActive)
 	{
 		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
+		if(!mPreviewImage)
+			return;
 		Eigen::Vector2d threshold = Eigen::Vector2d(mThresholdOption->getValue()[0],  mThresholdOption->getValue()[1]);
 		mPreviewImage->startThresholdPreview(threshold);
 	}
@@ -245,6 +246,7 @@ bool BinaryThresholdImageFilter::postProcess()
 
 	mRawResult = NULL;
 
+	output->setInitialWindowLevel(-1, -1);
 	output->resetTransferFunctions();
 	mServices->patient()->insertData(output);
 

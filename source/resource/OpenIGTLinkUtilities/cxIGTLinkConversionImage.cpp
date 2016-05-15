@@ -334,31 +334,11 @@ void IGTLinkConversionImage::decode_rMd(igtl::ImageMessage *msg, ImagePtr out)
 	Vector3D c = out->boundingBox().center();
 	Transform3D igtlMd = createTransformTranslate(-c);
 
-//	Transform3D rMs; // s is the inbound reference system, i.e. LPS or RAS.
-
-//	this->getIgtlCoordinateSystem(externalSpace)
-//	Transform3D sMr = createTransformFromReferenceToExternal(externalSpace);
-//	outmsg->SetCoordinateSystem(this->getIgtlCoordinateSystem(externalSpace));
-
 	// s is the inbound reference system, i.e. LPS or RAS.
 	PATIENT_COORDINATE_SYSTEM s = this->getPatientCoordinateSystem(msg->GetCoordinateSystem());
 	Transform3D rMs = createTransformFromReferenceToExternal(s).inv();
 
-//	if (msg->GetCoordinateSystem() == igtl::ImageMessage::COORDINATE_RAS)
-//	{
-//		rMs = createTransformLPS2RAS().inv();
-//	}
-//	else
-//	{
-//		// igtl::ImageMessage::COORDINATE_LPS, this is the internally supported one.
-//		rMs = Transform3D::Identity();
-//	}
-
 	Transform3D rMd = rMs * sMigtl * igtlMd;
-
-//	CX_LOG_CHANNEL_DEBUG("ca") << "sMigtl\n" << sMigtl;
-//	CX_LOG_CHANNEL_DEBUG("ca") << "rMs\n" << rMs;
-//	CX_LOG_CHANNEL_DEBUG("ca") << "rMd decode\n" << rMd;
 
 	out->get_rMd_History()->setRegistration(rMd);
 }

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -172,11 +173,7 @@ bool ToolTracer::isRunning() const
 
 void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	Transform3D rMpr = Transform3D::Identity(); // handle rMpr in actor
-//	Transform3D rMpr = mSpaceProvider->get_rMpr();
-	Transform3D rMt = rMpr * prMt;
-
-	Vector3D p = rMt.coord(Vector3D(0,0,0));
+	Vector3D p = prMt.coord(Vector3D(0,0,0));
 
 	if (mMinDistance > 0.0)
 	{

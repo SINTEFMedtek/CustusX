@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxUltrasoundSectorSource.h"
 #include "cxBoundingBox3D.h"
+#include "cxLogger.h"
 
 namespace cx
 {

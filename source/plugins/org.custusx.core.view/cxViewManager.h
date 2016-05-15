@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
 //#include "cxLayoutData.h"
+#include "cxViewService.h"
 
 class QActionGroup;
 class QAction;
@@ -146,8 +147,8 @@ public:
 
 	LayoutRepositoryPtr getLayoutRepository();
 
-	QActionGroup* createInteractorStyleActionGroup();
-	NavigationPtr getNavigation();
+	QActionGroup* getInteractorStyleActionGroup();
+	NavigationPtr getNavigation(int group = 0);
 
 	/** Initialize the widget and fill with the default view layout.
 	  * Return the top widget, it should be added to the calling gui.
@@ -162,7 +163,6 @@ public:
 	QString getActiveLayout(int widgetIndex=0) const; ///< returns the active layout
 	void setActiveLayout(const QString& uid, int widgetIndex=0); ///< change the layout
 
-	InteractiveClipperPtr getClipper();
 	InteractiveCropperPtr getCropper();
 
 	CyclicActionLoggerPtr getRenderTimer();
@@ -175,6 +175,9 @@ public:
 	void addXml(QDomNode& parentNode);
 	void parseXml(QDomNode viewmanagerNode);
 
+	void centerToImageCenterInViewGroup(unsigned groupNr);
+	void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
+	void addDefaultLayout(LayoutData layoutData);
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
@@ -221,7 +224,6 @@ protected:
 	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 	SyncedValuePtr mGlobal2DZoomVal;
 
-	InteractiveClipperPtr mInteractiveClipper;
 	InteractiveCropperPtr mInteractiveCropper;
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
@@ -231,6 +233,11 @@ protected:
 private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
+protected:
+	void autoShowInViewGroups(DataPtr data);
+	void autoResetCameraToSuperiorView();
+	void autoCenterToImageCenter();
+	QList<unsigned> getViewGroupsToAutoShowIn();
 };
 
 /**

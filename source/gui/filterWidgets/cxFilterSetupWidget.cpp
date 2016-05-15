@@ -141,7 +141,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		mCurrentFilter->setActive(false);
 
 	mCurrentFilter = filter;
-	connect(mCurrentFilter.get(), SIGNAL(changed()), this, SLOT(rebuildOptions()));
+	connect(mCurrentFilter.get(), &Filter::changed, this, &FilterSetupWidget::rebuildOptions);
 
 	if (mFrame)
 		mFrame->setTitle(mCurrentFilter->getName());
@@ -157,7 +157,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 		//presets
 		if(mCurrentFilter->hasPresets())
 		{
-			connect(mPresetWidget, SIGNAL(presetSelected(QString)), mCurrentFilter.get(), SLOT(requestSetPresetSlot(QString)));
+			connect(mPresetWidget, &PresetWidget::presetSelected, mCurrentFilter.get(), &Filter::requestSetPresetSlot);
 			//mPresetWidget->setPresets(mCurrentFilter->getPresets());
 			mPresetWidget->setFilter(mCurrentFilter);
 			mCurrentFilter->requestSetPresetSlot("default");

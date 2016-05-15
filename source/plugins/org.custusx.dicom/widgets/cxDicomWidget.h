@@ -63,11 +63,16 @@ public:
 	DicomWidget(ctkPluginContext* context, QWidget* parent = 0);
 	virtual ~DicomWidget();
 
-private slots:
-	void onViewHeader();
-	void onImportIntoCustusXAction();
+    QString getDICOMDatabaseDirectory();
 protected:
 	virtual void prePaintEvent();
+	ctkDICOMDatabase* getDatabase() const;
+
+private slots:
+    void onViewHeader();
+    void onImportIntoCustusXAction();
+    void deleteDICOMDB();
+
 private:
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 	DICOMAppWidget* mBrowser;
@@ -79,7 +84,6 @@ private:
 	void importSeries(QString seriesUid);
 	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
 	QStringList currentSeriesSelection();
-	ctkDICOMDatabase* getDatabase() const;
 };
 
 } /* namespace cx */

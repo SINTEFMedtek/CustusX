@@ -121,6 +121,18 @@ Function Get-ToolList{
 			   "", 
 			   "Old way to write tests in CustusX."
 			   )
+    # GLEW 1.13.0
+    $toollist += New-Object Tool(
+			   "glew", 
+			   "http://downloads.sourceforge.net/project/glew/glew/1.13.0/glew-1.13.0-win32.zip?r=http%3A%2F%2Fglew.sourceforge.net%2Findex.html&ts=1456483577&use_mirror=netcologne", 
+			   "$ToolFolder\GLEW.zip", 
+			   "ZIP", 
+			   "$script:CX_EXTERNAL_CODE\glew-1.13.0\bin\Release\x64", 
+			   "$script:CX_EXTERNAL_CODE\glew-1.13.0\lib\Release\x64;$script:CX_EXTERNAL_CODE\glew-1.13.0\include;$script:CX_EXTERNAL_CODE\glew-1.13.0\include\GL",
+			   "$script:CX_EXTERNAL_CODE", 
+			   "glewinfo.exe", 
+			   "Library needed by FAST."
+			   )
     # git 1.7.10 (x86?)
     $toollist += New-Object Tool(
 				"git", 

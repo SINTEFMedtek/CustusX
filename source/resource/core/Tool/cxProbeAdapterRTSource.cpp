@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
+#include "cxData.h"
 
 
 namespace cx
@@ -89,6 +90,13 @@ double ProbeAdapterRTSource::getTimestamp()
 		return mBase->getTimestamp() - probe->getProbeDefinition(uid).getTemporalCalibration();
 	else
 		return mBase->getTimestamp();
+}
+
+TimeInfo ProbeAdapterRTSource::getAdvancedTimeInfo()
+{
+	TimeInfo retval;
+	retval.mAcquisitionTime.setMSecsSinceEpoch(this->getTimestamp());
+	return retval;
 }
 
 QString ProbeAdapterRTSource::getInfoString() const

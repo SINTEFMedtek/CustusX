@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include "cxProbeSector.h"
+#include "cxData.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -56,6 +58,7 @@ class cxResource_EXPORT TimedPosition
 {
 public:
 	double mTime;// Should always be in ms
+	TimeInfo mTimeInfo;
 	Transform3D mPos;
 };
 cxResource_EXPORT inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
@@ -70,6 +73,8 @@ struct cxResource_EXPORT USReconstructInputData
 	USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
 	std::vector<TimedPosition> mFrames;
 	std::vector<TimedPosition> mPositions;
+	std::map<double, ToolPositionMetadata> mTrackerRecordedMetadata;
+	std::map<double, ToolPositionMetadata> mReferenceRecordedMetadata;
 	ProbeSector mProbeDefinition;
 	QString mProbeUid;
 	Transform3D rMpr; ///< patient registration

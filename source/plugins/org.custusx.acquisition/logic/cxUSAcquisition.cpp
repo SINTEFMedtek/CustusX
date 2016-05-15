@@ -108,6 +108,11 @@ void USAcquisition::checkIfReadySlot()
 	bool tracking = this->getServices()->tracking()->getState()>=Tool::tsTRACKING;
 	bool streaming = this->getServices()->video()->isConnected();
 	ToolPtr tool = this->getServices()->tracking()->getFirstProbe();
+    ToolPtr reference_frame = this->getServices()->tracking()->getReferenceTool();
+    if(tracking && reference_frame)
+    {
+        QObject::connect(reference_frame.get(), &Tool::toolVisible, this, &USAcquisition::checkIfReadySlot, Qt::UniqueConnection);
+    }
 
 	QString mWhatsMissing;
 	mWhatsMissing.clear();
@@ -117,8 +122,12 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing = "<font color=green>Ready to record!</font><br>";
 		if (!tool || !tool->getVisible())
 		{
-			mWhatsMissing += "<font color=orange>Probe not visible</font><br>";
-		}
+            mWhatsMissing += "<font color=orange>Probe not visible.</font><br>";
+        }
+        if(!reference_frame || !reference_frame->getVisible())
+        {
+            mWhatsMissing += "<font color=orange>Reference frame not visible.</font><br>";
+        }
 	}
 	else
 	{
@@ -167,7 +176,10 @@ void USAcquisition::recordStarted()
 
 	ToolPtr tool = this->getServices()->tracking()->getFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
-	mCore->startRecord(mBase->getLatestSession(), tool, this->getRecordingVideoSources(tool));
+	mCore->startRecord(mBase->getLatestSession(),
+					   tool,
+					   this->getServices()->tracking()->getReferenceTool(),
+					   this->getRecordingVideoSources(tool));
 }
 
 void USAcquisition::recordStopped()

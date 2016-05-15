@@ -74,14 +74,18 @@ public:
 	static QString findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
 	static QString findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath = "");
 
+    static void setWebsiteURL(QString websiteUrl);
 	static QString getWebsiteURL();
+    static QString getUploadsUrl();
 	static QString getWebsiteUserDocumentationURL();
 
-	static bool isRunFromBuildFolder();
+    static bool isRunFromBuildFolder();
+
 private:
 	static bool mTestMode;
 	static bool mRunFromBuildFolder;
 	static bool mBuildFolderChecked;
+    static QString mWebsiteUrl;
 	static QString readTestDataPathFromFile(QString filename);
 	static QString checkExecutableExist(QString path, QString filename);
 

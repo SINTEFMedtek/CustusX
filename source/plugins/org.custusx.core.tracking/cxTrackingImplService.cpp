@@ -152,7 +152,6 @@ void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 {
 	mTrackingSystems.push_back(system);
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
-	connect(system.get(), &TrackingSystemService::newProbe, this, &TrackingImplService::newProbe);
 	this->onSystemStateChanged();
 }
 
@@ -222,19 +221,16 @@ void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *cont
 
 void TrackingImplService::onTrackingSystemAdded(TrackingSystemService* service)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Added TrackinsSystemService: " << service->getUid();
     this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Removed TrackinsSystemService: " << service->getUid();
     this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)
 {
-    CX_LOG_CHANNEL_DEBUG("janne beate ") << "Modified TrackinsSystemService: " << service->getUid();
 }
 
 void TrackingImplService::rebuildCachedTools()
@@ -264,9 +260,6 @@ void TrackingImplService::imbueManualToolWithRealProperties()
 			continue;
 		mManualTool->setBase(iter->second);
 		mManualTool->startEmittingContinuousPositions(100);
-
-		if(iter->second->hasType(Tool::TOOL_US_PROBE))
-			emit newProbe(mManualTool);
 
 		report("Manual tool imbued with properties from " + iter->first);
 		break;

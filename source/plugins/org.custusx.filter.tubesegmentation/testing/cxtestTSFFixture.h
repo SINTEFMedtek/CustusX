@@ -58,6 +58,8 @@ public:
 
 	void testLoadParameterFile(); ///< Test to see if the options(adapters) are correctly fill with information form the parameter file
 
+	QString getParametersDir();
+
 private:
 	paramList loadPreset(QString preset);
 	void runFilter(QString preset);

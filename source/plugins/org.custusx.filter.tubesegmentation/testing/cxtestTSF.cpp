@@ -83,13 +83,13 @@ TEST_CASE("TubeSegmentationFramework NeuroVesselsMRAPreset works", "[integration
 	helper.testNeuroVesselsMRAPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework testNeuroVesselsUSAPreset works", "[integration][not_apple][tsf]")
+TEST_CASE("TubeSegmentationFramework testNeuroVesselsUSAPreset works", "[integration][not_apple][not_win64][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testNeuroVesselsUSAPreset();
 }
 
-TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integration][not_apple][tsf]")
+TEST_CASE("TubeSegmentationFramework testLungAirwaysCTPreset works", "[integration][not_apple][not_win64][tsf]")
 {
 	TestTubeSegmentationFramework helper;
 	helper.testLungAirwaysCTPreset();

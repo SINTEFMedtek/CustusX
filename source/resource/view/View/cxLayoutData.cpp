@@ -98,7 +98,7 @@ LayoutData::LayoutData() :
 	mName("unnamed")
 {
 	mSize = LayoutPosition(0, 0);
-	this->resize(1, 3);
+	this->resize(0, 0);
 }
 
 void LayoutData::resetUid(const QString& uid)

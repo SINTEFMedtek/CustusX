@@ -36,18 +36,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QApplication>
 #include <QByteArray>
 #include <QDir>
-#include "cxDefinitions.h"
 #include "cxEnumConverter.h"
 #include "cxXmlOptionItem.h"
 
-#include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxCustusXWorkflowStateMachine.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
-#include "cxVLCRecorder.h"
-#include "cxStateServiceBackend.h"
 
 #include "cxTrackingServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
@@ -56,25 +52,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplicationsParser.h"
 #include "cxProfile.h"
 #include "cxLogger.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
 StateServiceImpl::StateServiceImpl(ctkPluginContext* context)
 {
-	this->initialize(this->createBackend(context));
-}
 
-StateServiceBackendPtr StateServiceImpl::createBackend(ctkPluginContext* context)
-{
-	TrackingServicePtr tracker = TrackingServiceProxy::create(context);
-	PatientModelServicePtr pasm = PatientModelServiceProxy::create(context);
-	SpaceProviderPtr spacer(new SpaceProviderImpl(tracker, pasm));
-	VideoServicePtr video = VideoServiceProxy::create(context);
-
-	StateServiceBackendPtr backend;
-	backend.reset(new StateServiceBackend(tracker, video, spacer, pasm));
-	return backend;
+	mServices = VisServices::create(context);
+	this->initialize();
 }
 
 StateServiceImpl::~StateServiceImpl()
@@ -86,14 +73,13 @@ bool StateServiceImpl::isNull()
 	return false;
 }
 
-void StateServiceImpl::initialize(StateServiceBackendPtr backend)
+void StateServiceImpl::initialize()
 {
-	mBackend = backend;
 	this->fillDefaultSettings();
 
 	ProfileManager::initialize();
 
-    mWorkflowStateMachine.reset(new CustusXWorkflowStateMachine(mBackend));
+	mWorkflowStateMachine.reset(new CustusXWorkflowStateMachine(mServices));
 	mWorkflowStateMachine->start();
 
 	connect(mWorkflowStateMachine.get(), &WorkflowStateMachine::activeStateChanged, this, &StateServiceImpl::workflowStateChanged);
@@ -131,80 +117,6 @@ void StateServiceImpl::setWorkFlowState(QString uid)
 {
 	mWorkflowStateMachine->setActiveState(uid);
 }
-
-template<class T>
-void StateServiceImpl::fillDefault(QString name, T value)
-{
-	settings()->fillDefault(name, value);
-}
-
-/**Enter all default Settings here.
- *
- */
-void StateServiceImpl::fillDefaultSettings()
-{
-	this->fillDefault("Automation/autoStartTracking", true);
-	this->fillDefault("Automation/autoStartStreaming", true);
-	this->fillDefault("Automation/autoReconstruct", true);
-	this->fillDefault("Automation/autoSelectActiveTool", true);
-	this->fillDefault("Automation/autoSave", true);
-	this->fillDefault("Automation/autoLoadRecentPatient", true);
-	this->fillDefault("Automation/autoLoadRecentPatientWithinHours", 8);
-	this->fillDefault("Automation/autoShowNewData", false);
-
-	this->fillDefault("TrackingPositionFilter/enabled", false);
-
-	this->fillDefault("renderingInterval", 33);
-//	this->fillDefault("backgroundColor", QColor("black"));
-	this->fillDefault("backgroundColor", QColor(30,60,70)); // a dark, grey-blue hue
-	this->fillDefault("vlcPath", vlc()->getVLCPath());
-	this->fillDefault("globalPatientNumber", 1);
-	this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
-	this->fillDefault("Ultrasound/8bitAcquisitionData", false);
-	this->fillDefault("Ultrasound/CompressAcquisition", true);
-	this->fillDefault("View3D/sphereRadius", 1.0);
-	this->fillDefault("View3D/labelSize", 2.5);
-	this->fillDefault("Navigation/anyplaneViewOffset", 0.25);
-	this->fillDefault("Navigation/followTooltip", true);
-	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
-
-	this->fillDefault("showSectorInRTView", true);
-    this->fillDefault("View/showOrientationAnnotation", true);
-    this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);
-	this->fillDefault("View3D/eyeAngle", 4.0);
-	this->fillDefault("View/showDataText", true);
-	this->fillDefault("View/showLabels", true);
-	this->fillDefault("View/showMetricNamesInCorner", false);
-	this->fillDefault("View3D/annotationModelSize", 0.2);
-	this->fillDefault("View3D/annotationModel", "woman.stl");
-	this->fillDefault("View3D/depthPeeling", false);
-	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
-	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
-
-	this->fillDefault("stillUpdateRate", 0.001);
-
-#ifdef __APPLE__
-	this->fillDefault("useGPU2DRendering", true);
-#elif WIN32
-	this->fillDefault("useGPU2DRendering", false);
-#else
-	this->fillDefault("useGPU2DRendering", true);
-#endif
-
-	this->fillDefault("optimizedViews", true);
-	this->fillDefault("smartRender", true);
-
-	this->fillDefault("IGSTKDebugLogging", false);
-	this->fillDefault("giveManualToolPhysicalProperties", false);
-	this->fillDefault("renderSpeedLogging", false);
-
-	this->fillDefault("applyTransferFunctionPresetsToAll", false);
-
-	this->fillDefault("USsimulation/type", "Original data");
-	this->fillDefault("USsimulation/volume", "");
-	this->fillDefault("USsimulation/gain", 0.70);
-}
-
 
 Desktop StateServiceImpl::getActiveDesktop()
 {

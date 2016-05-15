@@ -57,7 +57,7 @@ public:
 
 StreamedTimestampSynchronizer::StreamedTimestampSynchronizer() :
     mLastComputedTimestampShift(0),
-    mMaxWindowSize(20)
+	mMaxWindowSize(20)
 {
 
 }
@@ -67,14 +67,15 @@ double StreamedTimestampSynchronizer::average(ITER begin, ITER end) const
 {
     int size = std::distance(begin, end);
     double sum = 0;
-    for (; begin != end; ++begin)
-        sum += *begin;
+	for (; begin != end; ++begin)
+		sum += *begin;
     return sum / size;
 }
 
 void StreamedTimestampSynchronizer::syncToCurrentTime(ImagePtr imgMsg)
 {
     QDateTime ts = imgMsg->getAcquisitionTime();
+	imgMsg->setOriginalAcquisitionTime(ts);
     this->addTimestamp(ts);
     ts = ts.addMSecs(this->getShift());
 

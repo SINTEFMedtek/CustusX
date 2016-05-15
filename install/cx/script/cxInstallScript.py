@@ -5,37 +5,7 @@
 # Author: Christian Askeland, SINTEF Medical Technology
 # Date:   2012.01.19
 #
-# Description:
-#
-# Script for installation of new workstation for CustusX
-# based on description from:
-# http://cxserver.sintef.no:16080/wiki/index.php/Installeringsveiviser
-#
 # Run cxInstaller --help to get usage info.
-#
-# prerequisites:
-# boost, cmake, cppunit, eclipse
-# Need a github key installed.
-#
-# Default values:
-# - change the class Common
-#
-# default folder setup (feel free to modify)
-#
-# --root---external---ITK---ITK
-#    |         |       |----build_Debug  
-#    |         |       |----build_Release
-#    |         |       |----build32_Debug
-#    |         |
-#    |         |------VTK---VTK
-#    |                 |----build_Debug  
-#    |                 |----build_Release
-#    |                 |----build32_Debug
-#    |-----workspace
-#              |------CustusX---CustusX
-#                      |--------build_Debug  
-#                      |--------build_Release
-#                      |--------build32_Debug
 #             
 #################################################             
 
@@ -91,7 +61,7 @@ Available components are:
 
     def getArgParser(self):
         p = argparse.ArgumentParser(add_help=False)
-        p.add_argument('--checkout', '--co', action='store_true', help='checkout all selected components')
+        p.add_argument('--checkout', action='store_true', dest='checkout', help='checkout all selected components')
         p.add_argument('--configure_clean', action='store_true', help='delete build folder(s), configure all selected components')
         p.add_argument('--configure', '--conf', action='store_true', help='configure all selected components')
         p.add_argument('-m', '-b', '--make', action='store_true', help='build all selected components')
@@ -123,7 +93,9 @@ Available components are:
 
         # info + verification
         assembly.controlData.printSettings()
-        print 'Use the following components:\n ', '\n  '.join(assembly.getSelectedLibraries())
+        libs = [lib for lib in assembly.libraries if lib.name() in assembly.selectedLibraryNames]
+        text = ['%45s     %s' % (lib.name(), lib.repository()) for lib in libs]
+        print 'Use the following components:\n ', '\n  '.join(text)
         
         print ''
         print '*********************************************************************'

@@ -57,7 +57,8 @@ SelectRecordSession::SelectRecordSession(XmlOptionFile options,
 										 VisServicesPtr services) :
 	mServices(services),
 	mOptions(options),
-	mAcquisitionService(acquisitionService)
+	mAcquisitionService(acquisitionService),
+	mVisible(true)
 {
 	mSessionSelector = StringProperty::initialize("tracking_session",
 												  "Tracking Data",
@@ -67,6 +68,12 @@ SelectRecordSession::SelectRecordSession(XmlOptionFile options,
 	connect(mSessionSelector.get(), &StringProperty::changed, this, &SelectRecordSession::showSelectedRecordingInView);
 
 	this->recordedSessionsChanged();
+	this->updateHelpText();
+}
+
+SelectRecordSession::~SelectRecordSession()
+{
+	this->clearTracer();
 }
 
 void SelectRecordSession::setTool(ToolPtr tool)
@@ -90,6 +97,9 @@ void SelectRecordSession::recordedSessionsChanged()
 		uids << uid;
 		names[uid] = sessions[i]->getHumanDescription();
 	}
+	uids << "";
+	names[""] = "<none>";
+
 	mSessionSelector->setValueRange(uids);
 	mSessionSelector->setDisplayNames(names);
 
@@ -140,12 +150,20 @@ ToolPtr SelectRecordSession::getTool()
 	return tool;
 }
 
+void SelectRecordSession::setVisible(bool on)
+{
+	mVisible = on;
+	this->showSelectedRecordingInView();
+}
+
 ToolPtr SelectRecordSession::findToolContainingMostDataForSession(std::map<QString, ToolPtr> tools, RecordSessionPtr session)
 {
 	std::map<int,ToolPtr> tooldata;
 
 	for (TrackingService::ToolMap::iterator i=tools.begin(); i!=tools.end(); ++i)
 	{
+		if (i->second->hasType(Tool::TOOL_REFERENCE))
+			continue;
 		TimedTransformMap trackerRecordedData_prMt = RecordSession::getToolHistory_prMt(i->second, session, false);
 		tooldata[trackerRecordedData_prMt.size()] = i->second;
 	}
@@ -156,6 +174,14 @@ ToolPtr SelectRecordSession::findToolContainingMostDataForSession(std::map<QStri
 	return ToolPtr();
 }
 
+void SelectRecordSession::updateHelpText()
+{
+	ToolPtr tool = this->getTool();
+	QString toolname = tool ? tool->getName() : "<none>";
+	mSessionSelector->setHelp(QString("Select tracker data, current data uses tool %2")
+							  .arg(toolname));
+}
+
 ToolRep3DPtr SelectRecordSession::getToolRepIn3DView(ToolPtr tool)
 {
 	return mServices->view()->get3DReps(0, 0)->findFirst<ToolRep3D>(tool);
@@ -163,15 +189,18 @@ ToolRep3DPtr SelectRecordSession::getToolRepIn3DView(ToolPtr tool)
 
 void SelectRecordSession::showSelectedRecordingInView()
 {
-	this->warnIfNoTrackingDataInSession();
-
 	this->clearTracer();
+	if (!mVisible)
+		return;
+
+	this->warnIfNoTrackingDataInSession();
 
 	TimedTransformMap trackerRecordedData_prMt = this->getRecordedTrackerData_prMt();
 	if (trackerRecordedData_prMt.empty())
 		return;
 
 	mCurrentTracedTool = this->getTool();
+	this->updateHelpText();
 
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView(mCurrentTracedTool);
 	if(!activeRep3D)

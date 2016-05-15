@@ -36,21 +36,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolBar>
 #include "cxWorkflowState.h"
 #include "cxRequestEnterStateTransition.h"
-#include "cxStateServiceBackend.h"
 #include "cxPatientModelService.h"
+#include "cxCoreServices.h"
 
 namespace cx
 {
 
-WorkflowStateMachine::WorkflowStateMachine(StateServiceBackendPtr backend) : mBackend(backend)
+WorkflowStateMachine::WorkflowStateMachine(CoreServicesPtr services) : mServices(services)
 {
 	mStarted = false;
 	connect(this, SIGNAL(started()), this, SLOT(startedSlot()));
 	mActionGroup = new QActionGroup(this);
 
-	mParentState = new ParentWorkflowState(this, mBackend);
+	mParentState = new ParentWorkflowState(this, mServices);
 
-	connect(mBackend->patient().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+	connect(mServices->patient().get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
 WorkflowStateMachine::~WorkflowStateMachine()

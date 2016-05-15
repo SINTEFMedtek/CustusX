@@ -37,12 +37,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // TSF library tests
 //=================================================================
 
+#include "cxtestTSFFixture.h"
+#include <QString>
 #include "parameters.hpp"
 #include "tsf-config.h"
 
 SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF][unit]"){
 	GIVEN("we init the parameters with default values"){
-		std::string path = std::string(PARAMETERS_DIR);
+		TestTubeSegmentationFramework helper;
+		std::string path = helper.getParametersDir().toStdString();
 		paramList neuroVesselsUSAParameters;
 		REQUIRE_NOTHROW(neuroVesselsUSAParameters = initParameters(path));
 
@@ -82,7 +85,8 @@ SCENARIO("Loading the Neuro-Vessels-USA (gpu) preset", "[TSF][unit]"){
 
 SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF][unit]"){
 	GIVEN("we init the parameters with default values"){
-		std::string path = std::string(PARAMETERS_DIR);
+		TestTubeSegmentationFramework helper;
+		std::string path = helper.getParametersDir().toStdString();
 		paramList phantomAccUSParameters;
 		REQUIRE_NOTHROW(phantomAccUSParameters = initParameters(path));
 
@@ -121,14 +125,32 @@ SCENARIO("Loading the Phantom-Acc-US (gpu) preset", "[TSF][unit]"){
 // TSFPresets tests
 //=================================================================
 #include "cxTSFPresets.h"
+#include "cxPresetWidget.h"
 #include <QStringList>
 
 TEST_CASE("should load tsf presets from file location and get more than 0 presets", "[TSF][TSFPresets][unit]"){
 	cx::TSFPresetsPtr presets(new cx::TSFPresets());
 
 	QStringList presetList = presets->getPresetList();
-	CHECK(presetList.size() > 0);
+    REQUIRE(presetList.size() > 0);
+}
 
-//	foreach ( QString item, presetList)
-//		std::cout << item.toStdString() << std::endl;
+TEST_CASE("should be able to get id of tsfpreset", "[TSF][TSFPresets][unit]"){
+    cx::TSFPresetsPtr presets(new cx::TSFPresets());
+
+    QString presetId = presets->getId();
+    REQUIRE(!(presetId.isNull() || presetId.isEmpty()));
+}
+
+TEST_CASE("should be able to read from settings file last used preset", "[TSF][TSFPresets][unit]"){
+    cx::TSFPresetsPtr presets(new cx::TSFPresets());
+
+    cx::PresetWidget* widget = new cx::PresetWidget(NULL);
+    widget->setPresets(presets);
+    QString selectedPreset = "Synthetic-Vascusynth";
+    REQUIRE(widget->requestSetCurrentPreset(selectedPreset));
+    QString lastUsedPresetName = widget->getLastUsedPresetNameFromSettingsFile();
+    REQUIRE(!(lastUsedPresetName.isNull() || lastUsedPresetName.isEmpty()));
+    REQUIRE(lastUsedPresetName.compare(selectedPreset) == 0);
+    delete widget;
 }

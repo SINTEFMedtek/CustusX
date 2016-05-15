@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDicomImageReader.h"
 #include "cxVisServices.h"
 #include "cxViewService.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -62,6 +63,12 @@ DicomWidget::DicomWidget(ctkPluginContext *context, QWidget *parent) :
 	mContext(context)
 {
 	this->setModified();
+
+}
+
+DicomWidget::~DicomWidget()
+{
+    this->deleteDICOMDB();
 }
 
 void DicomWidget::prePaintEvent()
@@ -98,13 +105,16 @@ void DicomWidget::createUI()
 	this->setupDatabaseDirectory();
 }
 
-DicomWidget::~DicomWidget()
+QString DicomWidget::getDICOMDatabaseDirectory()
 {
+    QString databaseDirectory = profile()->getSettingsPath() + "/DICOMDatabase";
+
+    return databaseDirectory;
 }
 
 void DicomWidget::setupDatabaseDirectory()
 {
-	QString databaseDirectory = profile()->getSettingsPath() + "/DICOMDatabase";
+    QString databaseDirectory = this->getDICOMDatabaseDirectory();
 
 	QDir qdir(databaseDirectory);
 	if ( !qdir.exists(databaseDirectory) )
@@ -112,12 +122,10 @@ void DicomWidget::setupDatabaseDirectory()
 		if ( !qdir.mkpath(databaseDirectory) )
 		{
 			CX_LOG_CHANNEL_ERROR("dicom") << "Could not create database directory \"" << databaseDirectory;
-//			std::cerr << "Could not create database directory \"" << databaseDirectory.toLatin1().data() << "\".\n";
 		}
 	}
 
-//	CX_LOG_CHANNEL_INFO("dicom") << "databaseDirectory: " << databaseDirectory;
-//	std::cout << "databaseDirectory: " << databaseDirectory << std::endl;
+    CX_LOG_CHANNEL_INFO("dicom") << "DatabaseDirectory set to: " << databaseDirectory;
 	mBrowser->setDatabaseDirectory(databaseDirectory);
 }
 
@@ -138,8 +146,6 @@ void DicomWidget::onViewHeader()
 		files.append(current);
 	}
 	files.sort();
-//	std::cout << "files:" << std::endl;
-//	std::cout << files.join("\n").toStdString() << std::endl;
 
 	ctkDICOMObjectListWidget* window = new ctkDICOMObjectListWidget;
 	window->setWindowTitle("DICOM File Header");
@@ -158,12 +164,30 @@ void DicomWidget::onImportIntoCustusXAction()
 	QStringList series = this->currentSeriesSelection();
 
 	if (series.empty())
-		CX_LOG_WARNING() << "No DICOM series selected, import failed.";
+        CX_LOG_CHANNEL_WARNING("dicom") << "No DICOM series selected, import failed.";
 
 	for (unsigned i=0; i<series.size(); ++i)
 	{
 		this->importSeries(series[i]);
-	}
+    }
+}
+
+void DicomWidget::deleteDICOMDB()
+{
+   CX_LOG_CHANNEL_INFO("dicom") << "Deleting DICOM database: " << this->getDICOMDatabaseDirectory();
+   bool autoDeleteDICOMDB = settings()->value("Automation/autoDeleteDICOMDatabase").toBool();
+   if(autoDeleteDICOMDB)
+   {
+	   ctkDICOMDatabase* database = this->getDatabase();
+	   if(database)
+	   {
+		   QStringList patients = database->patients();
+		   foreach(QString patient , patients)
+		   {
+			   this->getDatabase()->removePatient(patient);
+		   }
+	   }
+   }
 }
 
 void DicomWidget::importSeries(QString seriesUid)
@@ -199,7 +223,10 @@ void DicomWidget::loadIntoPatientModel(ImagePtr image, QString seriesUid)
 
 ctkDICOMDatabase* DicomWidget::getDatabase() const
 {
-	return mBrowser->database();
+	if(mBrowser)
+		return mBrowser->database();
+	else
+		return NULL;
 }
 
 } /* namespace cx */

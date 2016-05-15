@@ -158,11 +158,6 @@ void ViewServiceProxy::setActiveLayout(const QString& uid, int widgetIndex)
 	mViewService->setActiveLayout(uid, widgetIndex);
 }
 
-InteractiveClipperPtr ViewServiceProxy::getClipper()
-{
-	return mViewService->getClipper();
-}
-
 InteractiveCropperPtr ViewServiceProxy::getCropper()
 {
 	return mViewService->getCropper();
@@ -188,9 +183,24 @@ CameraControlPtr ViewServiceProxy::getCameraControl()
 	return mViewService->getCameraControl();
 }
 
-QActionGroup* ViewServiceProxy::createInteractorStyleActionGroup()
+QActionGroup* ViewServiceProxy::getInteractorStyleActionGroup()
 {
-	return mViewService->createInteractorStyleActionGroup();
+	return mViewService->getInteractorStyleActionGroup();
+}
+
+void ViewServiceProxy::centerToImageCenterInActiveViewGroup()
+{
+	return mViewService->centerToImageCenterInActiveViewGroup();
+}
+
+void ViewServiceProxy::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	mViewService->setCameraStyle(style, groupIdx);
+}
+
+void ViewServiceProxy::addDefaultLayout(LayoutData layoutData)
+{
+	mViewService->addDefaultLayout(layoutData);
 }
 
 cx::ClippersPtr ViewServiceProxy::getClippers()

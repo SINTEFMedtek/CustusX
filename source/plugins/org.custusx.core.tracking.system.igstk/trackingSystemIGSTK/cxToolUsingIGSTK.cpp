@@ -62,8 +62,8 @@ ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 
 	this->createPolyData();
 
-	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
-					SLOT(toolTransformAndTimestampSlot(Transform3D, double)));
+	connect(mTool.get(), &IgstkTool::toolTransformAndTimestamp, this,
+					&ToolUsingIGSTK::toolTransformAndTimestampSlot);
 	connect(mTool.get(), SIGNAL(attachedToTracker(bool)), this, SIGNAL(attachedToTracker(bool)));
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
@@ -228,7 +228,7 @@ void ToolUsingIGSTK::parseXml(QDomNode& dataNode)
 	}
 }
 
-void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp)
+void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double timestamp, ToolPositionMetadata metadata)
 {
 	Transform3D prMt_filtered = matrix;
 
@@ -239,7 +239,11 @@ void ToolUsingIGSTK::toolTransformAndTimestampSlot(Transform3D matrix, double ti
 	}
 
 	mTimestamp = timestamp;
-	(*mPositionHistory)[timestamp] = matrix; // store original in history
+	mMetadata[timestamp] = metadata;
+
+	// Store positions in history, but only if visible - the history has no concept of visibility
+	if (this->getVisible())
+		(*mPositionHistory)[timestamp] = matrix;
 	m_prMt = prMt_filtered;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 

@@ -379,7 +379,7 @@ void MainWindowActions::updateStreamingActionSlot()
 
 void MainWindowActions::centerToImageCenterSlot()
 {
-	viewService()->getNavigation()->centerToDataInActiveViewGroup();
+	viewService()->centerToImageCenterInActiveViewGroup();
 }
 
 void MainWindowActions::centerToTooltipSlot()

@@ -48,6 +48,7 @@ namespace cx
 bool DataLocations::mTestMode = false;
 bool DataLocations::mRunFromBuildFolder = false;
 bool DataLocations::mBuildFolderChecked = false;
+QString DataLocations::mWebsiteUrl = "";
 //---------------------------------------------------------
 
 void DataLocations::setTestMode()
@@ -109,7 +110,7 @@ QString DataLocations::readTestDataPathFromFile(QString filename)
 
 QString DataLocations::getPersistentWritablePath()
 {
-	QString homepath = QDir::homePath() + "/cx_settings";
+	QString homepath = QDir::homePath() + "/" + CX_SYSTEM_BASE_NAME + "_settings";
 
 	if (mTestMode)
 		homepath = getTestDataPath() + "/temp";
@@ -177,7 +178,9 @@ QString DataLocations::getRootConfigPath()
 	QStringList paths = getRootConfigPaths();
 	if (paths.empty())
 		return "";
-	return paths.front();
+	// Those who ask for a single (legacy) config path need
+	// the default CX path, not the override.
+	return paths.back();
 }
 
 QStringList DataLocations::getRootConfigPaths()
@@ -195,11 +198,13 @@ QStringList DataLocations::getRootConfigPaths()
 		}
 	}
 
+	// add folders with the most important first: If the same file exists in both locations,
+	// the first should be prefered.
 	QStringList retval;
-	if (QDir(CX_CONFIG_ROOT).exists()) // look for folder in source code
-		retval << QDir(CX_CONFIG_ROOT).canonicalPath();
-	if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for folder in source code
+	if (QDir(CX_OPTIONAL_CONFIG_ROOT).exists()) // look for override folder in source code
 		retval << QDir(CX_OPTIONAL_CONFIG_ROOT).canonicalPath();
+	if (QDir(CX_CONFIG_ROOT).exists()) // look for default folder in source code
+		retval << QDir(CX_CONFIG_ROOT).canonicalPath();
 
 	return retval;
 }
@@ -260,7 +265,7 @@ QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QStrin
 QString DataLocations::findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
 	QFileInfo filePath(findConfigFilePath(fileName, pathRelativeToConfigRoot, alternativeAbsolutePath));
-	return filePath.absolutePath() + "/";
+    return filePath.absolutePath() + "/";
 }
 
 QString DataLocations::findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
@@ -309,11 +314,19 @@ QString DataLocations::findExecutableInStandardLocations(QString filename)
 	return result;
 }
 
+void DataLocations::setWebsiteURL(QString websiteUrl)
+{
+    mWebsiteUrl = websiteUrl;
+}
+
 QString DataLocations::getWebsiteURL()
 {
-	QString url("http://custusx.org");
-	return url;
+    return mWebsiteUrl;
+}
 
+QString DataLocations::getUploadsUrl()
+{
+    return QString("http://custusx.org/uploads");
 }
 
 QString DataLocations::getWebsiteUserDocumentationURL()
@@ -321,8 +334,8 @@ QString DataLocations::getWebsiteUserDocumentationURL()
 	QString version(CustusX_VERSION_STRING);
 	if (version.contains("dev"))
 		version = "nightly";
-	QString url = QString("%1/uploads/user_doc/%2")
-			.arg(DataLocations::getWebsiteURL())
+    QString url = QString("%1/user_doc/%2")
+            .arg(DataLocations::getUploadsUrl())
 			.arg(version);
 	return url;
 }
