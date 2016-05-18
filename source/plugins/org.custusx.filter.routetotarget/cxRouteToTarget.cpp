@@ -24,20 +24,22 @@ RouteToTarget::~RouteToTarget()
 {
 }
 
+/*
 void RouteToTarget::setCenterline(vtkPolyDataPtr centerline)
 {
 	mCLpoints = this->getCenterlinePositions(centerline);
 }
+*/
 
-Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline)
+Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
 
-	int N = centerline->GetNumberOfPoints();
+    int N = centerline_r->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
 		{
 		double p[3];
-		centerline->GetPoint(i,p);
+        centerline_r->GetPoint(i,p);
 		Eigen::Vector3d position;
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
 		CLpoints.block(0 , i , 3 , 1) = position;
@@ -45,14 +47,14 @@ Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline)
 	return CLpoints;
 }
 
-void RouteToTarget::processCenterline(vtkPolyDataPtr centerline)
+void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-	Eigen::MatrixXd CLpoints = getCenterlinePositions(centerline);
+    Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
 
-	mBranchListPtr->findBranchesInCenterline(CLpoints);
+    mBranchListPtr->findBranchesInCenterline(CLpoints_r);
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
@@ -61,7 +63,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline)
 }
 
 
-void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate)
+void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 {
 
 	double minDistance = 100000;
@@ -73,7 +75,7 @@ void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate)
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-			double D = findDistance(positions.col(j), targetCoordinate);
+            double D = findDistance(positions.col(j), targetCoordinate_r);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -108,10 +110,10 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 {
 
-	findClosestPointInBranches(targetCoordinate);
+    findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
 
 	smoothPositions();

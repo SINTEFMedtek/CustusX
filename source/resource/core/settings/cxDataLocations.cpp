@@ -261,7 +261,7 @@ QString changeExtension(QString name, QString ext)
 
 QString DataLocations::getCachePath()
 {
-	QString path(getPersistentWritablePath()+"/cache/");
+    QString path(getPersistentWritablePath()+"/cache");
 	return path;
 }
 

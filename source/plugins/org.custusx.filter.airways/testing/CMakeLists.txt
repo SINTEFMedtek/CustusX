@@ -1,6 +1,8 @@
 
 if(BUILD_TESTING)
     cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}
+		cxtestAirwaysFixture
+		cxtestAirways.cpp
     )
     set(CXTEST_SOURCES_TO_MOC
     )
@@ -16,11 +18,12 @@ if(BUILD_TESTING)
     )
     target_link_libraries(cxtest_org_custusx_filter_airways
         PRIVATE
+		cxtestResource
         cxResource
         cxResourceFilter
         cxLogicManager
-        airwaysLib
-        SIPL
+		OpenCLUtilityLibrary
+		FAST
         org_custusx_filter_airways
         cxCatch
     )

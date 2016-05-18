@@ -114,8 +114,7 @@ void PatientData::onSessionSave(QDomElement &node)
 	{
 		if(!iter->second->getFilename().isEmpty())
 		{
-			CustomMetaImagePtr customReader = CustomMetaImage::create(
-						mSession->getRootFolder() + "/" + iter->second->getFilename());
+			CustomMetaImagePtr customReader = CustomMetaImage::create(mSession->getRootFolder() + "/" + iter->second->getFilename());
 			customReader->setTransform(iter->second->get_rMd());
 		}
 	}

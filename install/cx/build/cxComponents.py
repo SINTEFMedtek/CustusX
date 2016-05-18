@@ -392,6 +392,7 @@ class CustusX(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        append = builder.appendCMakeOption
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
@@ -411,6 +412,7 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
         
         
         libs = self.assembly.libraries
@@ -520,13 +522,21 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/source"
     def repository(self):
-        return 'git@github.com:smistad/FAST'
+		#return 'git@github.com:smistad/FAST'
+		return 'git@github.com:jbake/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('d5acd3aa16ff1fca5ebdd83f25ba089b37d118f3')
+        #self._getBuilder().gitCheckout('3eb7e813b35c7bd6d166bfff9fb87f901fdaa551')
+#        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
+        branch = 'set_kernel_root_dir'
+        self._getBuilder()._changeDirToSource()
+        runShell('git checkout %s' % branch, ignoreFailure=False)
+        runShell('git pull origin %s' % branch, ignoreFailure=False)
+
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        append = builder.appendCMakeOption
         add('FAST_MODULE_OpenIGTLink:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
@@ -535,6 +545,8 @@ class FAST(CppComponent):
         add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
+        append('FAST_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
+        append('FAST_CMAKE_CXX_FLAGS:STRING', '-D_USE_MATH_DEFINES')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
