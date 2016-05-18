@@ -546,6 +546,7 @@ class FAST(CppComponent):
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
         append('FAST_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
+        append('FAST_CMAKE_CXX_FLAGS:STRING', '-D_USE_MATH_DEFINES')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
