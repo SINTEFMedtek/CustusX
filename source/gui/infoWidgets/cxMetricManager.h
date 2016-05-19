@@ -65,7 +65,7 @@ public:
 	void setActiveUid(QString uid);
 	QString getActiveUid() const { return mActiveLandmark; }
 	void exportMetricsToFile(QString filename);
-    PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString name="point%1",  QColor color = QColor(240, 170, 255, 255));
+    PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
 
 signals:
 	void activeMetricChanged();

@@ -220,7 +220,7 @@ void CustomMetaImage::setTransform(const Transform3D M)
 
   if (!file.open(QIODevice::ReadWrite))
   {
-    reportError("Failed to open file " + mFilename + ".");
+    reportWarning("Could not save transform because: Failed to open file " + mFilename);
     return;
   }
 

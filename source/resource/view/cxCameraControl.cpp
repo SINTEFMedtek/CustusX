@@ -120,14 +120,13 @@ void CameraData::parseXml(QDomNode dataNode)
 
 
 CameraControl::CameraControl(QObject* parent) :
-	QObject(parent)
+    QObject(parent),
+    mSuperiorViewAction(NULL)
 {
-
 }
 
 CameraControl::~CameraControl()
 {
-
 }
 
 /*Move the camera focus to p_r. Keep the view direction and distance constant
@@ -151,7 +150,8 @@ void CameraControl::translateByFocusTo(Vector3D p_r)
 
 void CameraControl::setSuperiorView() const
 {
-	mSuperiorViewAction->trigger();
+    if(mSuperiorViewAction)
+        mSuperiorViewAction->trigger();
 }
 
 QActionGroup* CameraControl::createStandard3DViewActions()

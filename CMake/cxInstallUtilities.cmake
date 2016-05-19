@@ -585,6 +585,12 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
     set(CMAKE_MODULE_PATH
         ${CMAKE_MODULE_PATH}
         ${PROJECT_SOURCE_DIR}/CMake)
+function(gp_resolved_file_type_override resolved_file type_var)
+	if(resolved_file MATCHES \"^/usr/lib/libGLEW\")
+		message(\"resolving \${resolved_file} as other\")
+		set(\${type_var} other PARENT_SCOPE)
+	endif()
+endfunction()
     include(cxBundleUtilities)
     message(STATUS \"CMAKE_INSTALL_PREFIX:  \${CMAKE_INSTALL_PREFIX}\")
     message(STATUS \"APPS_LOCAL:  ${APPS_LOCAL}\")

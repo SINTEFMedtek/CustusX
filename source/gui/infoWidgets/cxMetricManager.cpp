@@ -122,9 +122,9 @@ void MetricManager::setManualToolPosition(Vector3D p_r)
 	tool->set_prMt(createTransformTranslate(p_pr - p0_pr) * tool->get_prMt());
 }
 
-PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, QString name, QColor color)
+PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, QString uid, QColor color)
 {
-    PointMetricPtr p1 =	patientService()->createSpecificData<PointMetric>(name);
+    PointMetricPtr p1 =	patientService()->createSpecificData<PointMetric>(uid);
 	p1->get_rMd_History()->setParentSpace("reference");
 	p1->setSpace(space);
 	p1->setCoordinate(point);

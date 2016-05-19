@@ -90,8 +90,9 @@ public:
 signals:
 	void aboutToExit();
 
-protected slots:
+public slots:
 	void canEnterSlot();
+protected slots:
 	void setActionSlot();
 
 protected:

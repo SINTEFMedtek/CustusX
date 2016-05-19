@@ -131,8 +131,6 @@ void SessionStorageServiceImpl::save()
 {
 	if (!this->isValid())
 		return;
-//	if (mActivePatientFolder.isEmpty())
-//		return;
 
 	//Gather all the information that needs to be saved
 	QDomDocument doc;
@@ -145,7 +143,6 @@ void SessionStorageServiceImpl::save()
 	this->writeXmlFile(doc, filename);
 
 	report("Saved patient " + mActivePatientFolder);
-//	this->writeRecentPatientData();
 }
 
 void SessionStorageServiceImpl::writeXmlFile(QDomDocument doc, QString filename)
