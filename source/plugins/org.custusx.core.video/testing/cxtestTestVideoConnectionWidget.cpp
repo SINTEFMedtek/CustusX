@@ -66,7 +66,7 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
 	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(connected(bool)), 1000));
-	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), 2000));
+	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), 10000));
 	cx::VideoSourcePtr stream = mServices->video()->getActiveVideoSource();
 	REQUIRE(waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 1000));
 	bool canStream = stream->isStreaming();
