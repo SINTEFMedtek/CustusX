@@ -167,4 +167,15 @@ bool CustomMetric::getFlat() const
 	return mFlat;
 }
 
+void CustomMetric::setSTLFile(QString val)
+{
+    mSTLFile = val;
+    emit propertiesChanged();
+}
+
+QString CustomMetric::getSTLFile() const
+{
+    return mSTLFile;
+}
+
 }

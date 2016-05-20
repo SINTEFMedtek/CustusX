@@ -718,6 +718,8 @@ QWidget* CustomMetricWrapper::createWidget()
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
     mHeight =  this->createHeightSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
+    mSTLFile = this->createSTLFileSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mSTLFile));
 
     this->addColorWidget(topLayout);
     topLayout->addStretch();
@@ -751,6 +753,7 @@ void CustomMetricWrapper::update()
     mThickness->setValue(mData->getThickness());
     mHeight->setValue(mData->getHeight());
     mFlat->setValue(mData->getFlat());
+    mSTLFile->setValue(mData->getSTLFile());
     mInternalUpdate = false;
 }
 
@@ -774,6 +777,7 @@ void CustomMetricWrapper::guiChanged()
     mData->setThickness(mThickness->getValue());
     mData->setHeight(mHeight->getValue());
     mData->setFlat(mFlat->getValue());
+    mData->setSTLFile(mSTLFile->getValue());
     mInternalUpdate = false;
 }
 
@@ -833,6 +837,24 @@ BoolPropertyPtr CustomMetricWrapper::createFlatSelector() const
                                               QDomNode());
 
     connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
+
+FilePathPropertyPtr CustomMetricWrapper::createSTLFileSelector() const
+{
+    QStringList paths = QStringList() << qApp->applicationDirPath();
+#ifdef __APPLE__
+    // special case for running from the build tree, server built as bundle.
+    //Jon, necessary?? no compile
+    //paths << QString("%1/%2.app/Contents/MacOS").arg(DataLocations::getBundlePath()).arg(filename);
+#endif
+
+    FilePathPropertyPtr retval;
+    retval = FilePathProperty::initialize("selectSTLFile",
+                                          "STL File",
+                                          "STL geometry file",
+                                          "",
+                                          paths);
     return retval;
 }
 

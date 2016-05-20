@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxSpaceProperty.h"
+#include "cxFilePathProperty.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -262,12 +263,14 @@ private:
   DoublePropertyPtr createThicknessSelector() const;
   DoublePropertyPtr createHeightSelector() const;
   BoolPropertyPtr createFlatSelector() const;
+  FilePathPropertyPtr createSTLFileSelector() const;
 
   CustomMetricPtr mData;
   DoublePropertyPtr mRadius;
   DoublePropertyPtr mThickness;
   DoublePropertyPtr mHeight;
   BoolPropertyPtr mFlat;
+  FilePathPropertyPtr mSTLFile;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 

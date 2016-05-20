@@ -77,6 +77,8 @@ public:
 	double getHeight() const;
 	bool getFlat() const;
 	void setFlat(bool val);
+    void setSTLFile(QString val);
+    QString getSTLFile() const;
 
 	Vector3D getPosition();
 	Vector3D getDirection();
@@ -98,12 +100,13 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-        CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
+    CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;
 	double mHeight;
 	bool mFlat;
+    QString mSTLFile;
 };
 
 /**
