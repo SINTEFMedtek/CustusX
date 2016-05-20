@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamerServiceUtilities.h"
 #include "cxProfile.h"
 #include "cxActiveData.h"
+#include "catch.hpp"
 
 namespace cxtest
 {
