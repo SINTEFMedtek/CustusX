@@ -49,6 +49,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mThickness = 2;
 	mHeight = 0;
 	mFlat = true;
+    mSTLFile = "";
 }
 
 CustomMetricPtr CustomMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
@@ -69,6 +70,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	dataNode.toElement().setAttribute("thickness", mThickness);
 	dataNode.toElement().setAttribute("height", mHeight);
 	dataNode.toElement().setAttribute("flat", mFlat);
+    dataNode.toElement().setAttribute("STLFile", mSTLFile);
 }
 
 void CustomMetric::parseXml(QDomNode& dataNode)
@@ -80,6 +82,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
 	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
 	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
+    mSTLFile = dataNode.toElement().attribute("STLFile", qstring_cast(mSTLFile));
 }
 
 bool CustomMetric::isValid() const
@@ -149,6 +152,7 @@ double CustomMetric::getThickness() const
 void CustomMetric::setHeight(double val)
 {
 	mHeight = val;
+    emit propertiesChanged();
 }
 
 double CustomMetric::getHeight() const

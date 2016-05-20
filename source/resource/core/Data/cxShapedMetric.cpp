@@ -149,6 +149,7 @@ double DonutMetric::getThickness() const
 void DonutMetric::setHeight(double val)
 {
 	mHeight = val;
+    emit propertiesChanged();
 }
 
 double DonutMetric::getHeight() const

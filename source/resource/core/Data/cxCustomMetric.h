@@ -62,8 +62,8 @@ class cxResource_EXPORT CustomMetric: public DataMetric
 {
 Q_OBJECT
 public:
-        virtual ~CustomMetric();
-        static CustomMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
+    virtual ~CustomMetric();
+    static CustomMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;

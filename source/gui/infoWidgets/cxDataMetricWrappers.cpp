@@ -854,7 +854,9 @@ FilePathPropertyPtr CustomMetricWrapper::createSTLFileSelector() const
                                           "STL File",
                                           "STL geometry file",
                                           "",
-                                          paths);
+                                          paths,
+                                          QDomNode());
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
     return retval;
 }
 
