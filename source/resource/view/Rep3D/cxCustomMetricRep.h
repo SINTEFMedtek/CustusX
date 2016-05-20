@@ -30,74 +30,56 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxDataFactory.h"
+#ifndef CXCUSTOMMETRICREP_H
+#define CXCUSTOMMETRICREP_H
 
-#include "cxImage.h"
-#include "cxMesh.h"
-#include "cxTrackedStream.h"
-#include "cxPointMetric.h"
-#include "cxDistanceMetric.h"
-#include "cxPlaneMetric.h"
-#include "cxAngleMetric.h"
-#include "cxShapedMetric.h"
-#include "cxCustomMetric.h"
-#include "cxSphereMetric.h"
-#include "cxFrameMetric.h"
-#include "cxToolMetric.h"
+#include "cxResourceVisualizationExport.h"
 
-#include "cxPatientModelService.h"
+#include "cxDataMetricRep.h"
+#include "vtkForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
+class QColor;
 
+typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
+typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
+typedef boost::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
+typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
+typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 
-DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
-	mDataManager(dataManager),
-	mSpaceProvider(spaceProvider)
+/**Rep for visualizing a CustomMetric.
+ *
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
+ *
+ * \date 2014-02-11
+ * \author Christian Askeland, SINTEF
+ */
+class cxResourceVisualization_EXPORT CustomMetricRep: public DataMetricRep
 {
+Q_OBJECT
+public:
+        static CustomMetricRepPtr New(const QString& uid = ""); ///constructor
+        virtual ~CustomMetricRep() {}
+
+        virtual QString getType() const { return "CustomMetricRep"; }
+
+protected:
+	virtual void clear();
+	virtual void onModifiedStartRender();
+
+private:
+        CustomMetricRep();
+        CustomMetricPtr getCustomMetric();
+	void updateTorus();
+	void updateDisc();
+
+	GraphicalTorus3DPtr mTorus;
+	GraphicalDiskPtr mDisk;
+};
 
 }
 
-#define CREATE_IF_MATCH(typeName, TYPE) \
-{ \
-	if (typeName==TYPE::getTypeName()) \
-		return TYPE::create(uid, ""); \
-}
-#define CREATE_METRIC_IF_MATCH(typeName, TYPE) \
-{ \
-	if (typeName==TYPE::getTypeName()) \
-		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
-}
-
-DataPtr DataFactory::createRaw(QString type, QString uid)
-{
-	CREATE_IF_MATCH(type, Image);
-	CREATE_IF_MATCH(type, Mesh);
-	CREATE_IF_MATCH(type, TrackedStream);
-	CREATE_METRIC_IF_MATCH(type, PointMetric);
-	CREATE_METRIC_IF_MATCH(type, PlaneMetric);
-	CREATE_METRIC_IF_MATCH(type, DistanceMetric);
-	CREATE_METRIC_IF_MATCH(type, AngleMetric);
-	CREATE_METRIC_IF_MATCH(type, FrameMetric);
-	CREATE_METRIC_IF_MATCH(type, ToolMetric);
-	CREATE_METRIC_IF_MATCH(type, DonutMetric);
-    CREATE_METRIC_IF_MATCH(type, CustomMetric);
-	CREATE_METRIC_IF_MATCH(type, SphereMetric);
-	return DataPtr ();
-}
-
-DataPtr DataFactory::create(QString type, QString uid, QString name)
-{
-//	if (mDataManager)
-//		mDataManager->generateUidAndName(&uid, &name);
-
-	DataPtr retval = this->createRaw(type, uid);
-	if (name.isEmpty())
-		name = uid;
-	if (retval)
-		retval->setName(name);
-	return retval;
-}
-
-} // namespace cx
-
+#endif // CXCUSTOMMETRICREP_H

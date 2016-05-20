@@ -686,6 +686,155 @@ BoolPropertyPtr DonutMetricWrapper::createFlatSelector() const
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+CustomMetricWrapper::CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data) :
+    MetricBase(viewService, patientModelService),
+    mData(data)
+{
+    mArguments.setArguments(data->getArguments());
+    mInternalUpdate = false;
+    connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+}
+
+QWidget* CustomMetricWrapper::createWidget()
+{
+    QWidget* widget = new QWidget;
+    QVBoxLayout* topLayout = new QVBoxLayout(widget);
+    QHBoxLayout* hLayout = new QHBoxLayout;
+    hLayout->setMargin(0);
+    topLayout->setMargin(0);
+    topLayout->addLayout(hLayout);
+
+    mArguments.addWidgets(hLayout);
+
+    mRadius =  this->createRadiusSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRadius));
+    mThickness =  this->createThicknessSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mThickness));
+    mFlat =  this->createFlatSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
+    mHeight =  this->createHeightSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
+
+    this->addColorWidget(topLayout);
+    topLayout->addStretch();
+
+    this->dataChangedSlot();
+    return widget;
+}
+
+DataMetricPtr CustomMetricWrapper::getData() const
+{
+    return mData;
+}
+QString CustomMetricWrapper::getType() const
+{
+    return "Custom";
+}
+
+QString CustomMetricWrapper::getArguments() const
+{
+    return mArguments.getAsString();
+}
+
+void CustomMetricWrapper::update()
+{
+    mArguments.update();
+
+    if (mInternalUpdate)
+        return;
+    mInternalUpdate = true;
+    mRadius->setValue(mData->getRadius());
+    mThickness->setValue(mData->getThickness());
+    mHeight->setValue(mData->getHeight());
+    mFlat->setValue(mData->getFlat());
+    mInternalUpdate = false;
+}
+
+void CustomMetricWrapper::dataChangedSlot()
+{
+//	if (mInternalUpdate)
+//		return;
+//	mInternalUpdate = true;
+//	mRadius->setValue(mData->getRadius());
+//	mThickness->setValue(mData->getThickness());
+//	mFlat->setValue(mData->getFlat());
+//	mInternalUpdate = false;
+}
+
+void CustomMetricWrapper::guiChanged()
+{
+    if (mInternalUpdate)
+        return;
+    mInternalUpdate = true;
+    mData->setRadius(mRadius->getValue());
+    mData->setThickness(mThickness->getValue());
+    mData->setHeight(mHeight->getValue());
+    mData->setFlat(mFlat->getValue());
+    mInternalUpdate = false;
+}
+
+
+DoublePropertyPtr CustomMetricWrapper::createRadiusSelector() const
+{
+    DoublePropertyPtr retval;
+    retval = DoubleProperty::initialize("selectRadius",
+                                              "Radius",
+                                              "Custom Radius",
+                                              mData->getRadius(),
+                                              DoubleRange(0, 50, 1),
+                                              1,
+                                              QDomNode());
+
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createThicknessSelector() const
+{
+    DoublePropertyPtr retval;
+    retval = DoubleProperty::initialize("selectThickness",
+                                              "Thickness",
+                                              "Custom Thickness",
+                                              mData->getThickness(),
+                                              DoubleRange(0.05, 1, 0.05),
+                                              2,
+                                              QDomNode());
+
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createHeightSelector() const
+{
+    DoublePropertyPtr retval;
+    retval = DoubleProperty::initialize("selectHeight",
+                                              "Height",
+                                              "Disc height, NA to torus",
+                                              mData->getHeight(),
+                                              DoubleRange(0.0, 100, 1),
+                                              1,
+                                              QDomNode());
+
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createFlatSelector() const
+{
+    BoolPropertyPtr retval;
+    retval = BoolProperty::initialize("selectFlat",
+                                              "Flat",
+                                              "Flat disk or torus",
+                                              mData->getFlat(),
+                                              QDomNode());
+
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------

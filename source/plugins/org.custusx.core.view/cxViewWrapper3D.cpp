@@ -92,8 +92,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetric.h"
 #include "cxSphereMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxSphereMetricRep.h"
 #include "cxDonutMetricRep.h"
+#include "cxCustomMetricRep.h"
 
 #include "cxDepthPeeling.h"
 #include "cxAxisConnector.h"
@@ -690,6 +692,8 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
 		rep = PlaneMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
 		rep = DonutMetricRep::New();
+    else if (boost::dynamic_pointer_cast<CustomMetric>(data))
+        rep = CustomMetricRep::New();
 	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
 		rep = SphereMetricRep::New();
 
