@@ -71,8 +71,8 @@ protected:
 	virtual void onModifiedStartRender();
 
 private:
-        CustomMetricRep();
-        CustomMetricPtr getCustomMetric();
+    CustomMetricRep();
+    CustomMetricPtr getCustomMetric();
 	void updateTorus();
 	void updateDisc();
 

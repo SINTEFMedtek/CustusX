@@ -55,7 +55,7 @@ namespace cx
 
 CustomMetricRepPtr CustomMetricRep::New(const QString& uid)
 {
-        return wrap_new(new CustomMetricRep(), uid);
+    return wrap_new(new CustomMetricRep(), uid);
 }
 
 CustomMetricRep::CustomMetricRep()
@@ -71,7 +71,7 @@ void CustomMetricRep::clear()
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
 {
-        return boost::dynamic_pointer_cast<CustomMetric>(mMetric);
+    return boost::dynamic_pointer_cast<CustomMetric>(mMetric);
 }
 
 void CustomMetricRep::onModifiedStartRender()
@@ -90,9 +90,9 @@ void CustomMetricRep::updateTorus()
 	if (!mMetric)
 		return;
 
-        CustomMetricPtr custom = this->getCustomMetric();
+    CustomMetricPtr custom = this->getCustomMetric();
 
-        if (custom->getFlat())
+    if (custom->getFlat())
 	{
 		mTorus.reset();
 		return;
@@ -104,11 +104,11 @@ void CustomMetricRep::updateTorus()
 	if (!mTorus)
 		return;
 
-        mTorus->setPosition(custom->getPosition());
-        mTorus->setDirection(custom->getDirection());
-        mTorus->setRadius(custom->getRadius());
-        mTorus->setThickness(custom->getThickness());
-        mTorus->setColor(custom->getColor());
+    mTorus->setPosition(custom->getPosition());
+    mTorus->setDirection(custom->getDirection());
+    mTorus->setRadius(custom->getRadius());
+    mTorus->setThickness(custom->getThickness());
+    mTorus->setColor(custom->getColor());
 }
 
 void CustomMetricRep::updateDisc()
@@ -116,9 +116,9 @@ void CustomMetricRep::updateDisc()
 	if (!mMetric)
 		return;
 
-        CustomMetricPtr custom = this->getCustomMetric();
+    CustomMetricPtr custom = this->getCustomMetric();
 
-        if (!custom->getFlat())
+    if (!custom->getFlat())
 	{
 		mDisk.reset();
 		return;
@@ -133,13 +133,13 @@ void CustomMetricRep::updateDisc()
 	if (!mDisk)
 		return;
 
-        mDisk->setPosition(custom->getPosition());
-        mDisk->setDirection(custom->getDirection());
-        mDisk->setRadius(custom->getRadius());
-        mDisk->setHeight(custom->getHeight());
-        mDisk->setColor(custom->getColor());
-        mDisk->setOutlineColor(custom->getColor());
-        mDisk->setOutlineWidth(custom->getThickness());
+    mDisk->setPosition(custom->getPosition());
+    mDisk->setDirection(custom->getDirection());
+    mDisk->setRadius(custom->getRadius());
+    mDisk->setHeight(custom->getHeight());
+    mDisk->setColor(custom->getColor());
+    mDisk->setOutlineColor(custom->getColor());
+    mDisk->setOutlineWidth(custom->getThickness());
 	mDisk->setFillVisible(false);
 	mDisk->setLighting(true);
 
