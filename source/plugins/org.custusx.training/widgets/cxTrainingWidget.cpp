@@ -1,0 +1,140 @@
+/*=========================================================================
+This file is part of CustusX, an Image Guided Therapy Application.
+
+Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+=========================================================================*/
+
+#include "cxTrainingWidget.h"
+#include <QtWidgets>
+#include <QPushButton>
+#include "cxHelpEngine.h"
+#include "cxHelpBrowser.h"
+#include "cxLogger.h"
+#include "boost/bind.hpp"
+#include "boost/function.hpp"
+
+namespace cx {
+
+TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
+		BaseWidget(parent, "TrainingWidget", "Training")
+{
+	mEngine.reset(new HelpEngine);
+
+	mBrowser = new HelpBrowser(this, mEngine);
+
+	QVBoxLayout* topLayout = new QVBoxLayout(this);
+
+	topLayout->addWidget(mBrowser);
+
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+	topLayout->addLayout(buttonLayout);
+
+	mPreviousStepButton = new QPushButton("Previous");
+//	mPreviousStepButton->add
+	mNextStepButton = new QPushButton("Next");
+
+	buttonLayout->addStretch(1);
+
+	mPreviousAction = this->createAction2(this,
+											QIcon(":/icons/open_icon_library/arrow-left-3.png"),
+											"Previous", "Go to previous training step",
+//											SLOT(onPrevious()),
+											NULL);
+	connect(mPreviousAction, &QAction::triggered,
+			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
+	this->addToolButtonFor(buttonLayout, mPreviousAction);
+
+	mCurrentAction = this->createAction2(this,
+											QIcon(":/icons/open_icon_library/button-green.png"),
+											"Reload", "Reload the current training step",
+											NULL);
+	connect(mCurrentAction, &QAction::triggered,
+			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
+	CXToolButton* button = this->addToolButtonFor(buttonLayout, mCurrentAction);
+	button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
+	mNextAction = this->createAction2(this,
+											QIcon(":/icons/open_icon_library/arrow-right-3.png"),
+											"Next", "Go to next training step",
+//											SLOT(onNext()),
+											NULL);
+	connect(mNextAction, &QAction::triggered,
+			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
+	this->addToolButtonFor(buttonLayout, mNextAction);
+
+	for (unsigned i=1; i<=3; ++i)
+		mSessionIDs << QString("org_custusx_training_sessionA_step%1").arg(i);
+	mCurrentStep = -1;
+	this->stepTo(0);
+}
+
+CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* action)
+{
+	CXToolButton* button = new CXToolButton();
+	button->setDefaultAction(action);
+	button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+//	button->setToolTip(action->toolTip());
+	layout->addWidget(button);
+	return button;
+}
+
+TrainingWidget::~TrainingWidget()
+{
+}
+
+//void TrainingWidget::onPrevious()
+//{
+//	this->stepTo(mCurrentStep-1);
+//}
+
+//void TrainingWidget::onNext()
+//{
+//	this->stepTo(mCurrentStep+1);
+//}
+
+//void TrainingWidget::onCurrent()
+//{
+//	this->stepTo(mCurrentStep);
+//}
+
+void TrainingWidget::onStep(int delta)
+{
+	this->stepTo(mCurrentStep+delta);
+}
+
+void TrainingWidget::stepTo(int step)
+{
+	step = std::min<int>(step, mSessionIDs.size()-1);
+	step = std::max<int>(step, 0);
+	mCurrentStep = step;
+
+	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
+}
+
+} /* namespace cx */

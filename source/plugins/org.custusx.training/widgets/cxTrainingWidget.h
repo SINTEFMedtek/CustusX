@@ -30,63 +30,57 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpBrowser.h"
+#ifndef CXTRAININGWIDGET_H_
+#define CXTRAININGWIDGET_H_
 
-#include <QHelpEngine>
-#include "cxHelpEngine.h"
-#include "cxTypeConversions.h"
-#include <iostream>
-#include <QDesktopServices>
+#include "cxBaseWidget.h"
+#include "boost/shared_ptr.hpp"
+#include "org_custusx_training_Export.h"
+class ctkPluginContext;
+class QPushButton;
 
-namespace cx
+namespace cx {
+
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+class HelpBrowser;
+
+/**
+ * Top-level help widget
+ *
+ * \ingroup org_custusx_training
+ *
+ * \date 2016-03-14
+ * \author Christian Askeland
+ */
+class org_custusx_training_EXPORT TrainingWidget : public BaseWidget
 {
-HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
-	: QTextBrowser(parent), mEngine(engine)
-{
-}
+	Q_OBJECT
 
-void HelpBrowser::showHelpForKeyword(const QString &id)
-{
-	if (mEngine->engine())
-	{
-		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
-		if (links.count())
-		{
-			setSource(links.first());
-		}
-	}
-}
+public:
+	explicit TrainingWidget(ctkPluginContext* context, QWidget* parent = NULL);
+	virtual ~TrainingWidget();
 
-void HelpBrowser::setSource(const QUrl& name)
-{
-	if (name.scheme() == "qthelp")
-		QTextBrowser::setSource(name);
-	else
-	{
-		QDesktopServices::openUrl(name);
-	}
+	QPushButton* mPreviousStepButton;
+	QPushButton* mNextStepButton;
 
-}
+	HelpEnginePtr mEngine;
 
-void HelpBrowser::listenToEngineKeywordActivated()
-{
-	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
-}
+//private slots:
+//	void onPrevious();
+//	void onNext();
 
-QVariant HelpBrowser::loadResource(int type, const QUrl &name)
-{
-	if (type < 4 && mEngine->engine())
-	{
-		QUrl url(name);
-		if (name.isRelative())
-			url = source().resolved(url);
+private:
+	CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
+	void stepTo(int step);
+	void onStep(int delta);
 
-		if (url.scheme() == "qthelp")
-			return QVariant(mEngine->engine()->fileData(url));
-		else
-			return QTextBrowser::loadResource(type, url);
-	}
-	return QVariant();
-}
+	QAction* mPreviousAction;
+	QAction* mNextAction;
+	QAction* mCurrentAction;
+	HelpBrowser* mBrowser;
+	QStringList mSessionIDs;
+	int mCurrentStep;
+};
 
-}//end namespace cx
+} /* namespace cx */
+#endif /* CXTRAININGWIDGET_H_ */
