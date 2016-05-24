@@ -77,6 +77,7 @@ private:
 	HelpBrowser* mBrowser;
 	QStringList mSessionIDs;
 	int mCurrentStep;
+	void resetSteps();
 };
 
 } /* namespace cx */

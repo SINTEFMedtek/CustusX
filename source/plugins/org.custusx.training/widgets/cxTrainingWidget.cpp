@@ -95,8 +95,8 @@ TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
 
 	for (unsigned i=1; i<=3; ++i)
 		mSessionIDs << QString("org_custusx_training_sessionA_step%1").arg(i);
-	mCurrentStep = -1;
-	this->stepTo(0);
+
+	this->resetSteps();
 }
 
 CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* action)
@@ -111,6 +111,12 @@ CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* act
 
 TrainingWidget::~TrainingWidget()
 {
+}
+
+void TrainingWidget::resetSteps()
+{
+	mCurrentStep = -1;
+	this->stepTo(0);
 }
 
 void TrainingWidget::onStep(int delta)
@@ -130,6 +136,8 @@ void TrainingWidget::stepTo(int step)
 void TrainingWidget::onImport()
 {
 	triggerMainWindowActionWithObjectName("ImportData");
+
+	this->resetSteps();
 
 	//TODO: Prepare data
 }
