@@ -63,8 +63,8 @@ public:
 
 	HelpEnginePtr mEngine;
 
-private slots:
-	void onImport();
+protected slots:
+	virtual void onImport();
 private:
 	CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
 	void stepTo(int step);

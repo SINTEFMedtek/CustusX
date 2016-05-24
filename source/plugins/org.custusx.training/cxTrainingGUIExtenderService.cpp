@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrainingGUIExtenderService.h"
 #include "ctkPluginContext.h"
-#include "cxTrainingWidget.h"
+#include "cxNeuroTrainingWidget.h"
 
 namespace cx
 {
