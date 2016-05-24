@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStreamerServiceUtilities.h"
 #include "cxProfile.h"
 #include "cxActiveData.h"
+#include "catch.hpp"
 
 namespace cxtest
 {
@@ -64,10 +65,10 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
 
-	waitForQueuedSignal(mServices->video().get(), SIGNAL(connected(bool)), 1000);
-	waitForQueuedSignal(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), 2000);
+	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(connected(bool)), 1000));
+	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), 2000));
 	cx::VideoSourcePtr stream = mServices->video()->getActiveVideoSource();
-	waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 1000);
+	REQUIRE(waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 1000));
 	bool canStream = stream->isStreaming();
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //disconnect

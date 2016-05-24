@@ -52,7 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
+//TODO: Disabled this test temporarily for OSX
+TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming][not_apple]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
