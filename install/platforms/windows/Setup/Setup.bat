@@ -20,6 +20,7 @@ powershell -noprofile -command "&{"^
  "pip install --upgrade pip;"^
  "pip install lxml;"^
  "pip install paramiko;"^
+ "pip install numpy;"^
  "Get-PackageProvider –Name Chocolatey -ForceBootstrap;"
  "Set-PackageSource Chocolatey;"
  "Install-Package doxygen.install -RequiredVersion "1.8.10";"^
