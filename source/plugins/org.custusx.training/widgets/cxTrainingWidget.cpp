@@ -113,21 +113,6 @@ TrainingWidget::~TrainingWidget()
 {
 }
 
-//void TrainingWidget::onPrevious()
-//{
-//	this->stepTo(mCurrentStep-1);
-//}
-
-//void TrainingWidget::onNext()
-//{
-//	this->stepTo(mCurrentStep+1);
-//}
-
-//void TrainingWidget::onCurrent()
-//{
-//	this->stepTo(mCurrentStep);
-//}
-
 void TrainingWidget::onStep(int delta)
 {
 	this->stepTo(mCurrentStep+delta);
