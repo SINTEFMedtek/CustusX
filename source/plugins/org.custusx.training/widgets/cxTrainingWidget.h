@@ -44,6 +44,7 @@ namespace cx {
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
 class HelpBrowser;
 
+
 /**
  * Top-level help widget
  *
@@ -60,15 +61,10 @@ public:
 	explicit TrainingWidget(ctkPluginContext* context, QWidget* parent = NULL);
 	virtual ~TrainingWidget();
 
-	QPushButton* mPreviousStepButton;
-	QPushButton* mNextStepButton;
-
 	HelpEnginePtr mEngine;
 
-//private slots:
-//	void onPrevious();
-//	void onNext();
-
+private slots:
+	void onImport();
 private:
 	CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
 	void stepTo(int step);
@@ -77,6 +73,7 @@ private:
 	QAction* mPreviousAction;
 	QAction* mNextAction;
 	QAction* mCurrentAction;
+	QAction* mImportAction;
 	HelpBrowser* mBrowser;
 	QStringList mSessionIDs;
 	int mCurrentStep;

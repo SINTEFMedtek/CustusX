@@ -33,11 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrainingWidget.h"
 #include <QtWidgets>
 #include <QPushButton>
+#include "boost/bind.hpp"
+#include "boost/function.hpp"
 #include "cxHelpEngine.h"
 #include "cxHelpBrowser.h"
 #include "cxLogger.h"
-#include "boost/bind.hpp"
-#include "boost/function.hpp"
+#include "cxApplication.h"
 
 namespace cx {
 
@@ -55,11 +56,15 @@ TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	topLayout->addLayout(buttonLayout);
 
-	mPreviousStepButton = new QPushButton("Previous");
-//	mPreviousStepButton->add
-	mNextStepButton = new QPushButton("Next");
 
 	buttonLayout->addStretch(1);
+
+	mImportAction = this->createAction(this,
+											QIcon(":/icons/open_icon_library/document-open-7.png"),
+											"Import new training dataset", "Import new training patient folder",
+											SLOT(onImport()),
+											NULL);
+	this->addToolButtonFor(buttonLayout, mImportAction);
 
 	mPreviousAction = this->createAction2(this,
 											QIcon(":/icons/open_icon_library/arrow-left-3.png"),
@@ -135,6 +140,13 @@ void TrainingWidget::stepTo(int step)
 	mCurrentStep = step;
 
 	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
+}
+
+void TrainingWidget::onImport()
+{
+	triggerMainWindowActionWithObjectName("ImportData");
+
+	//TODO: Prepare data
 }
 
 } /* namespace cx */
