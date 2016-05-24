@@ -55,7 +55,7 @@ class cxResourceVisualization_EXPORT GraphicalTorus3D
 {
 	public:
 		GraphicalTorus3D(vtkRendererPtr renderer = vtkRendererPtr());
-	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+        void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 		~GraphicalTorus3D();
 		void setRadius(double value);
 		void setThickness(double radius);

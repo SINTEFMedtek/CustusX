@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxGraphicalPrimitives.h"
 class QColor;
 
 typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
@@ -61,10 +62,10 @@ class cxResourceVisualization_EXPORT CustomMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-        static CustomMetricRepPtr New(const QString& uid = ""); ///constructor
-        virtual ~CustomMetricRep() {}
+    static CustomMetricRepPtr New(const QString& uid = ""); ///constructor
+    virtual ~CustomMetricRep() {}
 
-        virtual QString getType() const { return "CustomMetricRep"; }
+    virtual QString getType() const { return "CustomMetricRep"; }
 
 protected:
 	virtual void clear();
@@ -75,9 +76,11 @@ private:
     CustomMetricPtr getCustomMetric();
 	void updateTorus();
 	void updateDisc();
+    void updateSTLModel();
 
 	GraphicalTorus3DPtr mTorus;
 	GraphicalDiskPtr mDisk;
+    GraphicalSTLPolyData3DPtr mSTLModel;
 };
 
 }

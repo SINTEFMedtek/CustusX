@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
+#include <QFileInfo>
 #include "cxTypeConversions.h"
 #include "vtkTextActor.h"
 #include "cxGraphicalPrimitives.h"
@@ -49,6 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMatrix4x4.h"
 #include "cxGraphicalTorus3D.h"
 #include "cxGraphicalDisk.h"
+#include "vtkSTLReader.h"
+#include <vtkPolyDataNormals.h>
+
 
 namespace cx
 {
@@ -67,6 +71,7 @@ void CustomMetricRep::clear()
 	DataMetricRep::clear();
 	mTorus.reset();
 	mDisk.reset();
+    mSTLModel.reset();
 }
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
@@ -81,6 +86,7 @@ void CustomMetricRep::onModifiedStartRender()
 
 	this->updateTorus();
 	this->updateDisc();
+    this->updateSTLModel();
 
 	this->drawText();
 }
@@ -143,7 +149,60 @@ void CustomMetricRep::updateDisc()
 	mDisk->setFillVisible(false);
 	mDisk->setLighting(true);
 
-	mDisk->update();
+    mDisk->update();
+}
+
+void CustomMetricRep::updateSTLModel()
+{
+    if (!mMetric)
+        return;
+
+    CustomMetricPtr custom = this->getCustomMetric();
+
+    if (!mSTLModel && this->getView() && mMetric)
+    {
+        mSTLModel.reset(new GraphicalSTLPolyData3D());
+        mSTLModel->setRenderer(this->getRenderer());
+    }
+
+    if(!mSTLModel)
+        return;
+
+    QString filename = custom.get()->getSTLFile();
+
+    if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
+    {
+        //std::out << "STL file not found in: " << filename << "\n";
+        //return this->createCube();
+        return;
+    }
+
+//	std::cout << "OrientationAnnotation3DRep::readMarkerFromFile " << filename << std::endl;
+
+    vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
+    STLReader->SetFileName(cstring_cast(filename));
+
+//	vtkPolyDataPtr person = STLReader->GetOutput();
+
+    vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+    normals->SetInputConnection(STLReader->GetOutputPort());
+    normals->Update();
+//	person = normals->GetOutput();
+
+    //JON vtkPolyDataMapperPtr polyDataMapper = vtkPolyDataMapperPtr::New();
+    vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
+    polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
+    polyDataMapper->Update();
+
+
+    //JON vtkActorPtr actor = vtkActorPtr::New();
+    vtkActorPtr actor = mSTLModel->getActor();
+    actor->SetMapper(polyDataMapper);
+    actor->GetProperty()->SetColor(0.5, 1, 1);
+    actor->GetProperty()->SetSpecularPower(15);
+    actor->GetProperty()->SetSpecular(0.3);
+
+
 }
 
 }
