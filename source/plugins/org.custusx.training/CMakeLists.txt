@@ -7,12 +7,14 @@ set(PLUGIN_SRCS
   cxTrainingGUIExtenderService.cpp
   cxTrainingGUIExtenderService.h
   widgets/cxTrainingWidget.cpp
+  widgets/cxNeuroTrainingWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxTrainingPluginActivator.h
   widgets/cxTrainingWidget.h
+  widgets/cxNeuroTrainingWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic

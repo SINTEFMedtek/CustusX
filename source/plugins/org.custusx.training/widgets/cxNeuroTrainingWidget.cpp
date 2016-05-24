@@ -30,33 +30,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxTrainingGUIExtenderService.h"
-#include "ctkPluginContext.h"
-#include "cxTrainingWidget.h"
+#include "cxNeuroTrainingWidget.h"
 
 namespace cx
 {
 
-
-TrainingGUIExtenderService::TrainingGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+NeuroTrainingWidget::NeuroTrainingWidget(ctkPluginContext *context, QWidget *parent) :
+	TrainingWidget(context, parent)
 {
+
 }
 
-TrainingGUIExtenderService::~TrainingGUIExtenderService()
+void NeuroTrainingWidget::onRegisterStep()
 {
+	//TODO: Change workflow
 }
 
-std::vector<GUIExtenderService::CategorizedWidget> TrainingGUIExtenderService::createWidgets() const
+void NeuroTrainingWidget::onUse2DUSStep()
 {
-	std::vector<CategorizedWidget> retval;
+	//TODO: Change workflow and widgets
+}
 
-	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new NeuroTrainingWidget(mContext),
-			"Simulator"));
-
-	return retval;
+void NeuroTrainingWidget::on3DUSAcqStep()
+{
+	//TODO: Change workflow and widgets
 }
 
 
-} /* namespace cx */
+} // cx

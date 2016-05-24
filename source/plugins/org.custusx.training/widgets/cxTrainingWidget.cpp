@@ -139,7 +139,9 @@ void TrainingWidget::onImport()
 
 	this->resetSteps();
 
-	//TODO: Prepare data
+	//TODO: Prepare data, hide US and Kaisa
+//	this->hideUSData();
+//	this->hideKaisa();
 }
 
 } /* namespace cx */
