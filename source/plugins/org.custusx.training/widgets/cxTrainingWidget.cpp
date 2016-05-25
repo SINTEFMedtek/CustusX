@@ -139,16 +139,15 @@ void TrainingWidget::stepTo(int step)
 
 void TrainingWidget::onImport()
 {
-	triggerMainWindowActionWithObjectName("ImportData");
+	triggerMainWindowActionWithObjectName("LoadFile");
 
 	this->resetSteps();
 
 	//TODO: Prepare data, hide US and Kaisa
-//	this->hideUSData();
-//	this->hideKaisa();
+	this->hideUSDataAndKaisa();
 }
 
-void TrainingWidget::hideUSData()
+void TrainingWidget::hideUSDataAndKaisa()
 {
 	std::map<QString, DataPtr> datas = mServices->patient()->getData();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
@@ -160,8 +159,10 @@ void TrainingWidget::hideUSData()
 
 		if (image && image->getModality().toUpper().contains("US"))
 			mServices->patient()->makeUnavailable(image->getUid());
-	}
 
+		if (data && data->getUid().contains("Kaisa"))
+			mServices->patient()->makeUnavailable(data->getUid());
+	}
 }
 
 } /* namespace cx */

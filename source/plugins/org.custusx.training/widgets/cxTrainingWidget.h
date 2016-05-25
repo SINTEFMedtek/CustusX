@@ -65,7 +65,7 @@ public:
 	HelpEnginePtr mEngine;
 
 protected:
-	void hideUSData();
+	void hideUSDataAndKaisa();
 	VisServicesPtr mServices;
 
 protected slots:
