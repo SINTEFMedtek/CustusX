@@ -116,20 +116,6 @@ private:
 typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
 
 
-/** \brief Helper for rendering a custom STL polydata in 3D
- */
-class cxResourceVisualization_EXPORT GraphicalSTLPolyData3D : public GraphicalPolyData3D
-{
-public:
-    GraphicalSTLPolyData3D(){}
-    ~GraphicalSTLPolyData3D(){}
-private:
-    Vector3D mPoint;
-    Vector3D mDirection;
-};
-typedef boost::shared_ptr<GraphicalSTLPolyData3D> GraphicalSTLPolyData3DPtr;
-
-
 /** \brief Helper for rendering a a glyph in 3D
  */
 class cxResourceVisualization_EXPORT GraphicalGlyph3DData : public GraphicalGeometricBase

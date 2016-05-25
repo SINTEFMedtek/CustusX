@@ -161,7 +161,7 @@ void CustomMetricRep::updateSTLModel()
 
     if (!mSTLModel && this->getView() && mMetric)
     {
-        mSTLModel.reset(new GraphicalSTLPolyData3D());
+        mSTLModel.reset(new GraphicalObjectWithDirection());
         mSTLModel->setRenderer(this->getRenderer());
     }
 
@@ -202,7 +202,8 @@ void CustomMetricRep::updateSTLModel()
     actor->GetProperty()->SetSpecularPower(15);
     actor->GetProperty()->SetSpecular(0.3);
 
-
+    mSTLModel->setPosition(custom->getPosition());
+    mSTLModel->setDirection(custom->getDirection());
 }
 
 }

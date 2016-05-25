@@ -45,10 +45,10 @@ namespace cx
 GraphicalTorus3D::GraphicalTorus3D(vtkRendererPtr renderer)
     : GraphicalObjectWithDirection(renderer)
 {
-	source->SetToroidal(true);
-	source->SetSize(10);
-	source->SetThickness(0.5);
-	source->SetThetaResolution(source->GetThetaResolution()*2);
+    mSource->SetToroidal(true);
+    mSource->SetSize(10);
+    mSource->SetThickness(0.5);
+    mSource->SetThetaResolution(mSource->GetThetaResolution()*2);
 }
 
 GraphicalTorus3D::~GraphicalTorus3D()
@@ -57,17 +57,17 @@ GraphicalTorus3D::~GraphicalTorus3D()
 
 void GraphicalTorus3D::setRadius(double value)
 {
-	source->SetSize(value);
+    mSource->SetSize(value);
 }
 
 void GraphicalTorus3D::setThickness(double value)
 {
-	source->SetThickness(value);
+    mSource->SetThickness(value);
 }
 
 void GraphicalTorus3D::setColor(QColor color)
 {
-	setColorAndOpacity(actor->GetProperty(), color);
+    setColorAndOpacity(mActor->GetProperty(), color);
 }
 
 } // namespace cx

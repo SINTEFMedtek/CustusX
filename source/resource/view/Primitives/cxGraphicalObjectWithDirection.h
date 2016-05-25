@@ -55,8 +55,9 @@ public:
     GraphicalObjectWithDirection(vtkRendererPtr renderer = vtkRendererPtr());
     virtual ~GraphicalObjectWithDirection();
 
-    vtkActorPtr getActor();
-    vtkPolyDataPtr getPolyData();
+    vtkActorPtr getActor() const;
+    vtkPolyDataPtr getPolyData() const;
+    vtkPolyDataMapperPtr getMapper() const;
     void setPosition(Vector3D point);
     void setDirection(Vector3D direction);
     void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
@@ -64,14 +65,15 @@ public:
 protected:
     void updateOrientation();
 
-    vtkSuperquadricSourcePtr source;
-    vtkPolyDataMapperPtr mapper;
-    vtkActorPtr actor;
+    vtkSuperquadricSourcePtr mSource;
+    vtkPolyDataMapperPtr mMapper;
+    vtkActorPtr mActor;
     vtkRendererPtr mRenderer;
 
     Vector3D mPoint;
     Vector3D mDirection;
 };
+typedef boost::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
 
 } // namespace cx
 

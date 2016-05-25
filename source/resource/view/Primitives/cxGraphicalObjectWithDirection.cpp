@@ -46,13 +46,13 @@ GraphicalObjectWithDirection::GraphicalObjectWithDirection(vtkRendererPtr render
 {
     mPoint = Vector3D(0,0,0);
     mDirection = Vector3D(0,1,0);
-    source = vtkSuperquadricSourcePtr::New();
+    mSource = vtkSuperquadricSourcePtr::New();
 
-    mapper = vtkPolyDataMapperPtr::New();
-    mapper->SetInputConnection(source->GetOutputPort());
+    mMapper = vtkPolyDataMapperPtr::New();
+    mMapper->SetInputConnection(mSource->GetOutputPort());
 
-    actor = vtkActorPtr::New();
-    actor->SetMapper(mapper);
+    mActor = vtkActorPtr::New();
+    mActor->SetMapper(mMapper);
 
     this->setRenderer(renderer);
 }
@@ -62,14 +62,19 @@ GraphicalObjectWithDirection::~GraphicalObjectWithDirection()
     this->setRenderer(NULL);
 }
 
-vtkActorPtr GraphicalObjectWithDirection::getActor()
+vtkActorPtr GraphicalObjectWithDirection::getActor() const
 {
-    return actor;
+    return mActor;
 }
 
-vtkPolyDataPtr GraphicalObjectWithDirection::getPolyData()
+vtkPolyDataPtr GraphicalObjectWithDirection::getPolyData() const
 {
-    return source->GetOutput();
+    return mSource->GetOutput();
+}
+
+vtkPolyDataMapperPtr GraphicalObjectWithDirection::getMapper() const
+{
+    return mMapper;
 }
 
 void GraphicalObjectWithDirection::setPosition(Vector3D point)
@@ -87,10 +92,10 @@ void GraphicalObjectWithDirection::setDirection(Vector3D direction)
 void GraphicalObjectWithDirection::setRenderer(vtkRendererPtr renderer)
 {
     if (mRenderer)
-            mRenderer->RemoveActor(actor);
+            mRenderer->RemoveActor(mActor);
     mRenderer = renderer;
     if (mRenderer)
-            mRenderer->AddActor(actor);
+            mRenderer->AddActor(mActor);
 }
 
 void GraphicalObjectWithDirection::updateOrientation()
@@ -116,7 +121,7 @@ void GraphicalObjectWithDirection::updateOrientation()
 
 //	std::cout << "M end:\n" << M << std::endl;
 ////	actor->SetPosition(point.begin());
-    actor->SetUserMatrix(M.getVtkMatrix());
+    mActor->SetUserMatrix(M.getVtkMatrix());
 }
 
 } // namespace cx

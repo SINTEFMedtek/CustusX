@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
-#include "cxGraphicalPrimitives.h"
+#include "cxGraphicalObjectWithDirection.h"
 
 
 namespace cx
@@ -78,7 +78,7 @@ private:
 
 	GraphicalTorus3DPtr mTorus;
 	GraphicalDiskPtr mDisk;
-    GraphicalSTLPolyData3DPtr mSTLModel;
+    GraphicalObjectWithDirectionPtr mSTLModel;
 };
 
 }
