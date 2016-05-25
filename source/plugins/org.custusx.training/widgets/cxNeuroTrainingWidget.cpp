@@ -35,8 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-NeuroTrainingWidget::NeuroTrainingWidget(ctkPluginContext *context, QWidget *parent) :
-	TrainingWidget(context, parent)
+NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *parent) :
+	TrainingWidget(services, parent)
 {
 
 }

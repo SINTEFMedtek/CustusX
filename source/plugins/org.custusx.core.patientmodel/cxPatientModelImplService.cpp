@@ -70,6 +70,8 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &PatientModelImplService::probesChanged);
+
+	mUnavailableData.clear();
 }
 
 void PatientModelImplService::createInterconnectedDataAndSpace()
@@ -142,7 +144,15 @@ DataPtr PatientModelImplService::createData(QString type, QString uid, QString n
 
 std::map<QString, DataPtr> PatientModelImplService::getData() const
 {
-	return dataService()->getData();
+	std::map<QString, DataPtr> retval = dataService()->getData();
+
+	for(int i = 0; i < mUnavailableData.size(); ++i)
+	{
+		if (retval.count(mUnavailableData[i]))
+			retval.erase(mUnavailableData[i]);
+	}
+
+	return retval;
 }
 
 DataPtr PatientModelImplService::getData(const QString& uid) const
@@ -182,6 +192,11 @@ void PatientModelImplService::autoSave()
 bool PatientModelImplService::isNull()
 {
 	return false;
+}
+
+void PatientModelImplService::makeUnavailable(const QString &uid)
+{
+	mUnavailableData.push_back(uid);
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const

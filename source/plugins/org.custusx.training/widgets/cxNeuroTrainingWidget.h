@@ -42,7 +42,7 @@ class NeuroTrainingWidget : public TrainingWidget
 {
 	Q_OBJECT
 public:
-	explicit NeuroTrainingWidget(ctkPluginContext* context, QWidget* parent = NULL);
+	explicit NeuroTrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
 private:
 	void onRegisterStep();
 	void onUse2DUSStep();

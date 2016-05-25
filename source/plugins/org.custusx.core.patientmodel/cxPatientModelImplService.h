@@ -96,6 +96,8 @@ public:
 	virtual void autoSave();
 	virtual bool isNull();
 
+	virtual void makeUnavailable(const QString& uid);
+
 private slots:
 	void probesChanged();
 	void videoSourceAdded(VideoSourcePtr source);
@@ -121,6 +123,8 @@ private:
 	std::map<QString, ToolPtr> mProbeTools;
 
 	ActiveDataPtr mActiveData;
+
+	std::vector<QString> mUnavailableData;
 
 	void disconnectProbes();
 	void connectProbes();

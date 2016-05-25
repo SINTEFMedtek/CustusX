@@ -39,11 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelpBrowser.h"
 #include "cxLogger.h"
 #include "cxApplication.h"
+#include "cxPatientModelService.h"
+#include "cxVisServices.h"
+#include "cxImage.h"
 
 namespace cx {
 
-TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
-		BaseWidget(parent, "TrainingWidget", "Training")
+TrainingWidget::TrainingWidget(VisServicesPtr services, QWidget* parent) :
+		BaseWidget(parent, "TrainingWidget", "Training"),
+		mServices(services)
 {
 	mEngine.reset(new HelpEngine);
 
@@ -142,6 +146,22 @@ void TrainingWidget::onImport()
 	//TODO: Prepare data, hide US and Kaisa
 //	this->hideUSData();
 //	this->hideKaisa();
+}
+
+void TrainingWidget::hideUSData()
+{
+	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	std::map<QString, DataPtr>::iterator iter = datas.begin();
+
+	for(; iter != datas.end(); ++iter)
+	{
+		DataPtr data = iter->second;
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+
+		if (image && image->getModality().toUpper().contains("US"))
+			mServices->patient()->makeUnavailable(image->getUid());
+	}
+
 }
 
 } /* namespace cx */

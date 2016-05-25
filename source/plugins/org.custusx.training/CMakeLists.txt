@@ -35,6 +35,7 @@ set(PLUGIN_target_libraries
     Qt5::Xml
     cxPluginUtilities
     cxResource
+    cxResourceVisualization
 )
 
 set(PLUGIN_OUTPUT_DIR "")
