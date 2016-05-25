@@ -34,13 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXGRAPHICALTORUS3D_H
 
 #include "cxResourceVisualizationExport.h"
-
 #include "vtkForwardDeclarations.h"
-#include "cxForwardDeclarations.h"
-#include "cxVector3D.h"
+#include "cxGraphicalObjectWithDirection.h"
+
 class QColor;
 
-typedef vtkSmartPointer<class vtkSuperquadricSource> vtkSuperquadricSourcePtr;
 
 namespace cx
 {
@@ -51,30 +49,14 @@ namespace cx
  * \date 12.02.2014-02-12
  * \author christiana
  */
-class cxResourceVisualization_EXPORT GraphicalTorus3D
+class cxResourceVisualization_EXPORT GraphicalTorus3D : public GraphicalObjectWithDirection
 {
-	public:
-		GraphicalTorus3D(vtkRendererPtr renderer = vtkRendererPtr());
-        void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
-		~GraphicalTorus3D();
-		void setRadius(double value);
-		void setThickness(double radius);
-		void setColor(QColor color);
-		void setPosition(Vector3D point);
-		void setDirection(Vector3D direction);
-		vtkActorPtr getActor();
-		vtkPolyDataPtr getPolyData();
-
-	private:
-		void updateOrientation();
-
-		vtkSuperquadricSourcePtr source;
-		vtkPolyDataMapperPtr mapper;
-		vtkActorPtr actor;
-		vtkRendererPtr mRenderer;
-
-		Vector3D mPoint;
-		Vector3D mDirection;
+public:
+    GraphicalTorus3D(vtkRendererPtr renderer = vtkRendererPtr());
+    ~GraphicalTorus3D();
+    void setRadius(double value);
+    void setThickness(double radius);
+    void setColor(QColor color);
 };
 typedef boost::shared_ptr<GraphicalTorus3D> GraphicalTorus3DPtr;
 

@@ -109,6 +109,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalAxes3D
     Primitives/cxImageEnveloper
     Primitives/cxGraphicalDisk
+    Primitives/cxGraphicalObjectWithDirection
     cxRepContainer
 )
 
