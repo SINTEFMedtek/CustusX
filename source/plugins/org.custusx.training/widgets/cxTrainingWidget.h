@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
 #include "org_custusx_training_Export.h"
+#include <boost/function.hpp>
 class ctkPluginContext;
 class QPushButton;
 
@@ -52,32 +53,43 @@ class HelpBrowser;
  *
  * \date 2016-03-14
  * \author Christian Askeland
+ * \author Janne Beate Bakeng
  */
 class org_custusx_training_EXPORT TrainingWidget : public BaseWidget
 {
 	Q_OBJECT
 
 public:
-	explicit TrainingWidget(ctkPluginContext* context, QWidget* parent = NULL);
-	virtual ~TrainingWidget();
+    explicit TrainingWidget(ctkPluginContext* context, QWidget* parent = NULL);
+    virtual ~TrainingWidget();
 
-	HelpEnginePtr mEngine;
+protected:
+    void resetSteps();
 
-protected slots:
-	virtual void onImport();
+    typedef boost::function<void(void)> func_t;
+    typedef std::vector<func_t> funcs_t;
+    void registrateTransition( func_t transition);
+
 private:
-	CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
-	void stepTo(int step);
-	void onStep(int delta);
+    void createActions();
+    void createSteps(unsigned numberOfSteps);
+    CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
+    void onImportSimulatedPatient();
+    void onStep(int delta);
+    void stepTo(int step);
+    void transitionToStep(int step);
 
-	QAction* mPreviousAction;
-	QAction* mNextAction;
-	QAction* mCurrentAction;
-	QAction* mImportAction;
-	HelpBrowser* mBrowser;
-	QStringList mSessionIDs;
-	int mCurrentStep;
-	void resetSteps();
+    HelpEnginePtr mEngine;
+    HelpBrowser* mBrowser;
+
+    funcs_t mTransitions;
+
+    int mCurrentStep;
+    QAction* mPreviousAction;
+    QAction* mNextAction;
+    QAction* mCurrentAction;
+    QAction* mImportAction;
+    QStringList mSessionIDs;
 };
 
 } /* namespace cx */

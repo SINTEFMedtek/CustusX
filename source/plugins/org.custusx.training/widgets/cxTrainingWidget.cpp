@@ -42,61 +42,86 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
+
 TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
 		BaseWidget(parent, "TrainingWidget", "Training")
 {
 	mEngine.reset(new HelpEngine);
-
 	mBrowser = new HelpBrowser(this, mEngine);
 
+    this->createActions();
+
 	QVBoxLayout* topLayout = new QVBoxLayout(this);
+    QHBoxLayout* buttonLayout = new QHBoxLayout;
 
-	topLayout->addWidget(mBrowser);
-
-	QHBoxLayout* buttonLayout = new QHBoxLayout;
-	topLayout->addLayout(buttonLayout);
-
+    topLayout->addWidget(mBrowser);
+    topLayout->addLayout(buttonLayout);
 
 	buttonLayout->addStretch(1);
-
-	mImportAction = this->createAction(this,
-											QIcon(":/icons/open_icon_library/document-open-7.png"),
-											"Import new training dataset", "Import new training patient folder",
-											SLOT(onImport()),
-											NULL);
 	this->addToolButtonFor(buttonLayout, mImportAction);
-
-	mPreviousAction = this->createAction2(this,
-											QIcon(":/icons/open_icon_library/arrow-left-3.png"),
-											"Previous", "Go to previous training step",
-//											SLOT(onPrevious()),
-											NULL);
-	connect(mPreviousAction, &QAction::triggered,
-			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
 	this->addToolButtonFor(buttonLayout, mPreviousAction);
+    CXToolButton* button = this->addToolButtonFor(buttonLayout, mCurrentAction);
+    button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-	mCurrentAction = this->createAction2(this,
-											QIcon(":/icons/open_icon_library/button-green.png"),
-											"Reload", "Reload the current training step",
-											NULL);
-	connect(mCurrentAction, &QAction::triggered,
-			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
-	CXToolButton* button = this->addToolButtonFor(buttonLayout, mCurrentAction);
-	button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
-	mNextAction = this->createAction2(this,
-											QIcon(":/icons/open_icon_library/arrow-right-3.png"),
-											"Next", "Go to next training step",
-//											SLOT(onNext()),
-											NULL);
-	connect(mNextAction, &QAction::triggered,
-			boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
 	this->addToolButtonFor(buttonLayout, mNextAction);
 
-	for (unsigned i=1; i<=3; ++i)
-		mSessionIDs << QString("org_custusx_training_sessionA_step%1").arg(i);
+    connect(mImportAction, &QAction::triggered, this, &TrainingWidget::onImportSimulatedPatient);
+    connect(mPreviousAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
+    connect(mCurrentAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
+    connect(mNextAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
+}
 
-	this->resetSteps();
+TrainingWidget::~TrainingWidget()
+{
+}
+
+void TrainingWidget::resetSteps()
+{
+    mCurrentStep = -1;
+    this->stepTo(0);
+}
+
+void TrainingWidget::registrateTransition(func_t transition)
+{
+    mTransitions.push_back(transition);
+    int numberOfSteps = mTransitions.size()-1;
+    this->createSteps(numberOfSteps);
+}
+
+void TrainingWidget::createActions()
+{
+    mImportAction = this->createAction(this,
+                                            QIcon(":/icons/open_icon_library/document-open-7.png"),
+                                            "Import new training dataset", "Import new training patient folder",
+                                            SLOT(onImport()),
+                                            NULL);
+
+    mPreviousAction = this->createAction2(this,
+                                            QIcon(":/icons/open_icon_library/arrow-left-3.png"),
+                                            "Previous", "Go to previous training step",
+//											SLOT(onPrevious()),
+                                            NULL);
+
+    mCurrentAction = this->createAction2(this,
+                                            QIcon(":/icons/open_icon_library/button-green.png"),
+                                            "Reload", "Reload the current training step",
+                                            NULL);
+
+    mNextAction = this->createAction2(this,
+                                            QIcon(":/icons/open_icon_library/arrow-right-3.png"),
+                                            "Next", "Go to next training step",
+//											SLOT(onNext()),
+                                            NULL);
+}
+
+void TrainingWidget::createSteps(unsigned numberOfSteps)
+{
+    mSessionIDs.clear();
+
+    for (unsigned i=1; i<=numberOfSteps; ++i)
+        mSessionIDs << QString("org_custusx_training_sessionA_step%1").arg(i);
+
+    this->resetSteps();
 }
 
 CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* action)
@@ -109,14 +134,15 @@ CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* act
 	return button;
 }
 
-TrainingWidget::~TrainingWidget()
+void TrainingWidget::onImportSimulatedPatient()
 {
-}
+    triggerMainWindowActionWithObjectName("ImportData");
 
-void TrainingWidget::resetSteps()
-{
-	mCurrentStep = -1;
-	this->stepTo(0);
+    this->resetSteps();
+
+    //TODO: Prepare data, hide US and Kaisa
+//	this->hideUSData();
+//	this->hideKaisa();
 }
 
 void TrainingWidget::onStep(int delta)
@@ -131,17 +157,23 @@ void TrainingWidget::stepTo(int step)
 	mCurrentStep = step;
 
 	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
+
+    this->transitionToStep(step);
 }
 
-void TrainingWidget::onImport()
+void TrainingWidget::transitionToStep(int step)
 {
-	triggerMainWindowActionWithObjectName("ImportData");
-
-	this->resetSteps();
-
-	//TODO: Prepare data, hide US and Kaisa
-//	this->hideUSData();
-//	this->hideKaisa();
+    CX_LOG_DEBUG() << "Transitioning to step " << step;
+    int transitionNumber = step-1;
+    if(transitionNumber >= 0)
+    {
+        CX_LOG_DEBUG() << "Going to execute transition number " << transitionNumber;
+        func_t transition = mTransitions.at(transitionNumber);
+        if(transition)
+        {
+            transition();
+        }
+    }
 }
 
 } /* namespace cx */
