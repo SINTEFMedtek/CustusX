@@ -84,7 +84,7 @@ public:
 	virtual void autoSave();
 	virtual bool isNull();
 
-	virtual void makeUnavailable(const QString& uid);
+	virtual void makeAvailable(const QString& uid, bool available);
 
 private:
 	void printWarning() const;

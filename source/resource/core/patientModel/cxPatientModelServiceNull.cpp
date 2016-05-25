@@ -92,7 +92,7 @@ bool PatientModelServiceNull::isNull()
 	return true;
 }
 
-void PatientModelServiceNull::makeUnavailable(const QString &uid)
+void PatientModelServiceNull::makeAvailable(const QString &uid, bool available)
 {
 	printWarning();
 }

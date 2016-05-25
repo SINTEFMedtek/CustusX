@@ -158,9 +158,9 @@ bool PatientModelServiceProxy::isNull()
 	return mPatientModelService->isNull();
 }
 
-void PatientModelServiceProxy::makeUnavailable(const QString &uid)
+void PatientModelServiceProxy::makeAvailable(const QString &uid, bool available)
 {
-	mPatientModelService->makeUnavailable(uid);
+	mPatientModelService->makeAvailable(uid, available);
 }
 
 std::map<QString, VideoSourcePtr> PatientModelServiceProxy::getStreams() const

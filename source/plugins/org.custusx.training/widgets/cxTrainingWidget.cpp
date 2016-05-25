@@ -158,10 +158,10 @@ void TrainingWidget::hideUSDataAndKaisa()
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 
 		if (image && image->getModality().toUpper().contains("US"))
-			mServices->patient()->makeUnavailable(image->getUid());
+			mServices->patient()->makeAvailable(image->getUid(), false);
 
 		if (data && data->getUid().contains("Kaisa"))
-			mServices->patient()->makeUnavailable(data->getUid());
+			mServices->patient()->makeAvailable(data->getUid(), false);
 	}
 }
 

@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TEST_CASE("PatientModelPlugin: Make unavailable works", "[unit][plugins][org.custusx.core.patientmodel]")
+TEST_CASE("PatientModelPlugin: makeAvailable works", "[unit][plugins][org.custusx.core.patientmodel]")
 {
 	TestDataStructures testData;
 	cx::ImagePtr image = testData.image1;
@@ -54,9 +54,13 @@ TEST_CASE("PatientModelPlugin: Make unavailable works", "[unit][plugins][org.cus
 	patientModelService->insertData(image);
 	REQUIRE(patientModelService->getData(imageUid));
 
-	patientModelService->makeUnavailable(imageUid);
+	patientModelService->makeAvailable(imageUid, false);
 	CHECK_FALSE(patientModelService->getData(imageUid));
 	CHECK_FALSE(patientModelService->getData().count(imageUid));
+
+
+	patientModelService->makeAvailable(imageUid, true);
+	CHECK(patientModelService->getData(imageUid));
 
 	cx::LogicManager::shutdown();
 }

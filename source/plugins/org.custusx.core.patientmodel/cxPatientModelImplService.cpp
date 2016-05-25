@@ -194,9 +194,16 @@ bool PatientModelImplService::isNull()
 	return false;
 }
 
-void PatientModelImplService::makeUnavailable(const QString &uid)
+void PatientModelImplService::makeAvailable(const QString &uid, bool available)
 {
-	mUnavailableData.push_back(uid);
+	if(!available)
+		mUnavailableData.push_back(uid);
+	else
+	{
+		std::vector<QString>::iterator iter = std::find(mUnavailableData.begin(), mUnavailableData.end(), uid);
+		if(iter != mUnavailableData.end())
+			mUnavailableData.erase(iter);
+	}
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const

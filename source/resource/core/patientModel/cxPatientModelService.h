@@ -150,7 +150,7 @@ public:
 
 	static PatientModelServicePtr getNullObject();
 
-	virtual void makeUnavailable(const QString& uid) = 0;///<Exclude this data from getData()
+	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getData()
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.
