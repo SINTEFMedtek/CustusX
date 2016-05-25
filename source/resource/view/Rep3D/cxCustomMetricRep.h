@@ -39,9 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxGraphicalPrimitives.h"
-class QColor;
 
-typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
