@@ -65,7 +65,7 @@ public:
 	HelpEnginePtr mEngine;
 
 protected:
-	void hideUSDataAndKaisa();
+	void makeUnavailable(QString uidPart, bool makeModalityUnavailable = false);
 	VisServicesPtr mServices;
 
 protected slots:

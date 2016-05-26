@@ -143,11 +143,11 @@ void TrainingWidget::onImport()
 
 	this->resetSteps();
 
-	//TODO: Prepare data, hide US and Kaisa
-	this->hideUSDataAndKaisa();
+	this->makeUnavailable("Kaisa");
+	this->makeUnavailable("US", true);
 }
 
-void TrainingWidget::hideUSDataAndKaisa()
+void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailable)
 {
 	std::map<QString, DataPtr> datas = mServices->patient()->getData();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
@@ -157,10 +157,9 @@ void TrainingWidget::hideUSDataAndKaisa()
 		DataPtr data = iter->second;
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 
-		if (image && image->getModality().toUpper().contains("US"))
+		if (makeModalityUnavailable && image && image->getModality().contains(uidPart))
 			mServices->patient()->makeAvailable(image->getUid(), false);
-
-		if (data && data->getUid().contains("Kaisa"))
+		else if (data && data->getUid().contains(uidPart))
 			mServices->patient()->makeAvailable(data->getUid(), false);
 	}
 }
