@@ -96,6 +96,8 @@ public:
 	virtual void autoSave();
 	virtual bool isNull();
 
+	virtual void makeUnavailable(const QString& uid);
+
 private:
 	void initServiceListener();
 	void onServiceAdded(PatientModelService* service);

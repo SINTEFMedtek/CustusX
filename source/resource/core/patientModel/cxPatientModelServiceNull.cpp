@@ -92,6 +92,11 @@ bool PatientModelServiceNull::isNull()
 	return true;
 }
 
+void PatientModelServiceNull::makeUnavailable(const QString &uid)
+{
+	printWarning();
+}
+
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
 {
 	printWarning();

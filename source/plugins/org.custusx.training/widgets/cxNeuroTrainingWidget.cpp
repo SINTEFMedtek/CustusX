@@ -38,14 +38,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-NeuroTrainingWidget::NeuroTrainingWidget(ctkPluginContext *context, QWidget *parent) :
-    TrainingWidget(context, parent)
+NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *parent) :
+	TrainingWidget(services, parent)
 {
 
     func_t transitionToStep1 = boost::bind(&NeuroTrainingWidget::onImport, this);
     func_t transitionToStep2 = boost::bind(&NeuroTrainingWidget::onRegisterStep, this);
     func_t transitionToStep3 = boost::bind(&NeuroTrainingWidget::onUse2DUSStep, this);
     func_t transitionToStep4 = boost::bind(&NeuroTrainingWidget::on3DUSAcqStep, this);
+
     TrainingWidget::registrateTransition(transitionToStep1);
     TrainingWidget::registrateTransition(transitionToStep2);
     TrainingWidget::registrateTransition(transitionToStep3);
@@ -62,7 +63,7 @@ void NeuroTrainingWidget::onRegisterStep()
     std::cout << "onRegisterStep" << std::endl;
     //TODO:
     // Change workflow
-    triggerMainWindowActionWithObjectName("Registration");
+    //triggerMainWindowActionWithObjectName("Registration");
     // Focus on the registration widget
 
     // Populate the registration widget
@@ -72,13 +73,13 @@ void NeuroTrainingWidget::onRegisterStep()
 void NeuroTrainingWidget::onUse2DUSStep()
 {
     std::cout << "onUse2DUSStep" << std::endl;
-	//TODO: Change workflow and widgets
+    //TODO: Change workflow and widgets
 }
 
 void NeuroTrainingWidget::on3DUSAcqStep()
 {
     std::cout << "on3DUSAcqStep" << std::endl;
-	//TODO: Change workflow and widgets
+    //TODO: Change workflow and widgets
 }
 
 

@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrainingGUIExtenderService.h"
 #include "ctkPluginContext.h"
 #include "cxNeuroTrainingWidget.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -51,8 +52,10 @@ std::vector<GUIExtenderService::CategorizedWidget> TrainingGUIExtenderService::c
 {
 	std::vector<CategorizedWidget> retval;
 
+	VisServicesPtr services = VisServices::create(mContext);
+
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new NeuroTrainingWidget(mContext),
+			new NeuroTrainingWidget(services),
 			"Simulator"));
 
 	return retval;

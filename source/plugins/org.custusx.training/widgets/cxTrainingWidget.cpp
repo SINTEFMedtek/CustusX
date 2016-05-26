@@ -39,12 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelpBrowser.h"
 #include "cxLogger.h"
 #include "cxApplication.h"
+#include "cxPatientModelService.h"
+#include "cxVisServices.h"
+#include "cxImage.h"
 
 namespace cx {
 
-
-TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
-		BaseWidget(parent, "TrainingWidget", "Training")
+TrainingWidget::TrainingWidget(VisServicesPtr services, QWidget* parent) :
+		BaseWidget(parent, "TrainingWidget", "Training"),
+		mServices(services)
 {
 	mEngine.reset(new HelpEngine);
 	mBrowser = new HelpBrowser(this, mEngine);
@@ -69,6 +72,10 @@ TrainingWidget::TrainingWidget(ctkPluginContext* context, QWidget* parent) :
     connect(mPreviousAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, -1)));
     connect(mCurrentAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, 0)));
     connect(mNextAction, &QAction::triggered, boost::function<void()>(boost::bind(&TrainingWidget::onStep, this, +1)));
+
+    //must always be the initial step
+    func_t welcome = boost::bind(&TrainingWidget::toWelcomeStep, this);
+    TrainingWidget::registrateTransition(welcome);
 }
 
 TrainingWidget::~TrainingWidget()
@@ -90,10 +97,10 @@ void TrainingWidget::registrateTransition(func_t transition)
 
 void TrainingWidget::createActions()
 {
-    mImportAction = this->createAction(this,
+    mImportAction = this->createAction2(this,
                                             QIcon(":/icons/open_icon_library/document-open-7.png"),
                                             "Import new training dataset", "Import new training patient folder",
-                                            SLOT(onImport()),
+                                            //SLOT(onImport()),
                                             NULL);
 
     mPreviousAction = this->createAction2(this,
@@ -131,18 +138,23 @@ CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* act
 	button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 //	button->setToolTip(action->toolTip());
 	layout->addWidget(button);
-	return button;
+    return button;
+}
+
+void TrainingWidget::toWelcomeStep()
+{
+    this->resetSteps();
 }
 
 void TrainingWidget::onImportSimulatedPatient()
 {
-    triggerMainWindowActionWithObjectName("ImportData");
-
-    this->resetSteps();
+    triggerMainWindowActionWithObjectName("LoadFile");
 
     //TODO: Prepare data, hide US and Kaisa
-//	this->hideUSData();
-//	this->hideKaisa();
+    this->hideUSDataAndKaisa();
+
+    //Transition to first step after welcome
+    this->stepTo(1);
 }
 
 void TrainingWidget::onStep(int delta)
@@ -155,6 +167,7 @@ void TrainingWidget::stepTo(int step)
 	step = std::min<int>(step, mSessionIDs.size()-1);
 	step = std::max<int>(step, 0);
 	mCurrentStep = step;
+    CX_LOG_DEBUG() << "Current step is now " << mCurrentStep;
 
 	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
 
@@ -163,8 +176,8 @@ void TrainingWidget::stepTo(int step)
 
 void TrainingWidget::transitionToStep(int step)
 {
-    CX_LOG_DEBUG() << "Transitioning to step " << step;
-    int transitionNumber = step-1;
+    CX_LOG_DEBUG() << "Want to transition to step " << step;
+    int transitionNumber = step;
     if(transitionNumber >= 0)
     {
         CX_LOG_DEBUG() << "Going to execute transition number " << transitionNumber;
@@ -174,6 +187,25 @@ void TrainingWidget::transitionToStep(int step)
             transition();
         }
     }
+
+}
+
+void TrainingWidget::hideUSDataAndKaisa()
+{
+	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	std::map<QString, DataPtr>::iterator iter = datas.begin();
+
+	for(; iter != datas.end(); ++iter)
+	{
+		DataPtr data = iter->second;
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+
+		if (image && image->getModality().toUpper().contains("US"))
+			mServices->patient()->makeUnavailable(image->getUid());
+
+		if (data && data->getUid().contains("Kaisa"))
+			mServices->patient()->makeUnavailable(data->getUid());
+	}
 }
 
 } /* namespace cx */

@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include "org_custusx_training_Export.h"
 #include <boost/function.hpp>
+#include "cxForwardDeclarations.h"
 class ctkPluginContext;
 class QPushButton;
 
@@ -60,8 +61,8 @@ class org_custusx_training_EXPORT TrainingWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-    explicit TrainingWidget(ctkPluginContext* context, QWidget* parent = NULL);
-    virtual ~TrainingWidget();
+	explicit TrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
+	virtual ~TrainingWidget();
 
 protected:
     void resetSteps();
@@ -70,11 +71,18 @@ protected:
     typedef std::vector<func_t> funcs_t;
     void registrateTransition( func_t transition);
 
+protected:
+	void hideUSDataAndKaisa();
+	VisServicesPtr mServices;
+
+private slots:
+    void onImportSimulatedPatient();
+
 private:
     void createActions();
     void createSteps(unsigned numberOfSteps);
     CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
-    void onImportSimulatedPatient();
+    void toWelcomeStep();
     void onStep(int delta);
     void stepTo(int step);
     void transitionToStep(int step);
