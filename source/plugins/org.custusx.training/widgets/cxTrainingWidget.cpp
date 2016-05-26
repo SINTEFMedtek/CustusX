@@ -85,13 +85,13 @@ TrainingWidget::~TrainingWidget()
 void TrainingWidget::resetSteps()
 {
     mCurrentStep = -1;
-    this->stepTo(0);
+    //this->stepTo(0);
 }
 
 void TrainingWidget::registrateTransition(func_t transition)
 {
     mTransitions.push_back(transition);
-    int numberOfSteps = mTransitions.size()-1;
+    int numberOfSteps = mTransitions.size();
     this->createSteps(numberOfSteps);
 }
 
@@ -123,6 +123,7 @@ void TrainingWidget::createActions()
 
 void TrainingWidget::createSteps(unsigned numberOfSteps)
 {
+    CX_LOG_DEBUG() << "Creating " << numberOfSteps << " steps!";
     mSessionIDs.clear();
 
     for (unsigned i=1; i<=numberOfSteps; ++i)
@@ -143,7 +144,7 @@ CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* act
 
 void TrainingWidget::toWelcomeStep()
 {
-    this->resetSteps();
+    std::cout << "toWelcomeStep" << std::endl;
 }
 
 void TrainingWidget::onImportSimulatedPatient()
@@ -154,7 +155,7 @@ void TrainingWidget::onImportSimulatedPatient()
     this->hideUSDataAndKaisa();
 
     //Transition to first step after welcome
-    this->stepTo(1);
+    this->onStep(1);
 }
 
 void TrainingWidget::onStep(int delta)
@@ -164,6 +165,7 @@ void TrainingWidget::onStep(int delta)
 
 void TrainingWidget::stepTo(int step)
 {
+    CX_LOG_DEBUG() << "stepTo " << step;
 	step = std::min<int>(step, mSessionIDs.size()-1);
 	step = std::max<int>(step, 0);
 	mCurrentStep = step;
@@ -184,6 +186,7 @@ void TrainingWidget::transitionToStep(int step)
         func_t transition = mTransitions.at(transitionNumber);
         if(transition)
         {
+            CX_LOG_DEBUG() << "Transitioning";
             transition();
         }
     }
