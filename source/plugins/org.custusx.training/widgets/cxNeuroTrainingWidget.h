@@ -43,7 +43,8 @@ class NeuroTrainingWidget : public TrainingWidget
 	Q_OBJECT
 public:
 	explicit NeuroTrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
-private:
+
+    void onImport();
 	void onRegisterStep();
 	void onUse2DUSStep();
 	void on3DUSAcqStep();
