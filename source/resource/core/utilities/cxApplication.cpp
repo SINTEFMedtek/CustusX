@@ -127,13 +127,19 @@ void bringWindowToFront(QWidget* window)
 	window->raise();
 }
 
+QWidget* getMainWindow()
+{
+	QWidget *mainwindow = Q_NULLPTR;
+	foreach(mainwindow, QApplication::topLevelWidgets()) {
+	  if(mainwindow->objectName() == "MainWindow")
+		break;
+	}
+	return mainwindow;
+}
+
 void triggerMainWindowActionWithObjectName(QString actionName)
 {
-    QWidget *mainwindow = Q_NULLPTR;
-    foreach(mainwindow, QApplication::topLevelWidgets()) {
-      if(mainwindow->objectName() == "MainWindow")
-        break;
-    }
+	QWidget *mainwindow = getMainWindow();
     QAction* action = mainwindow->findChild<QAction*>(actionName);
     if(action)
     {

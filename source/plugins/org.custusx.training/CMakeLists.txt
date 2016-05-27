@@ -36,6 +36,7 @@ set(PLUGIN_target_libraries
     cxPluginUtilities
     cxResource
     cxResourceVisualization
+    org_custusx_core_state
 )
 
 set(PLUGIN_OUTPUT_DIR "")

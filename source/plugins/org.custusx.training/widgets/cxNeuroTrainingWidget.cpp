@@ -37,7 +37,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxVisServices.h"
 #include "cxStateService.h"
+#include "cxApplicationsParser.h"
 
+//Test code
+#include <QDockWidget>
+#include <QMainWindow>
 
 namespace cx
 {
@@ -65,6 +69,7 @@ void NeuroTrainingWidget::onImport()
 
 	this->makeUnavailable("Kaisa");
 	this->makeUnavailable("US", true);
+
 }
 
 void NeuroTrainingWidget::onRegisterStep()
@@ -72,8 +77,10 @@ void NeuroTrainingWidget::onRegisterStep()
     std::cout << "onRegisterStep" << std::endl;
 
 	this->startTracking();
+//	this->changeRegistrationWorkflowDesktop();//Can't get this to work
 	this->changeWorkflowToRegistration();
 
+//	this->addSimulatorWidget();//Can't get this to work
 
     //TODO:
     // Focus on the registration widget
@@ -92,6 +99,55 @@ void NeuroTrainingWidget::on3DUSAcqStep()
 {
     std::cout << "on3DUSAcqStep" << std::endl;
     //TODO: Change workflow and widgets
+}
+
+void NeuroTrainingWidget::changeRegistrationWorkflowDesktop()
+{
+//	Desktop desktop = Desktop("LAYOUT_3D_ACS", QByteArray::fromBase64(""));
+
+	ApplicationsParser parser;
+
+//	Desktop desktop = mServices->state()->getActiveDesktop();
+	Desktop desktop = parser.getDesktop("RegistrationUid");
+
+	QStringList toolbars;
+	toolbars << "Workflow" << "Navigation" << "Tools" << "Screenshot" << "Desktop" << "RegistrationHistory" << "Help";
+
+	//Copied from ApplicationsParser::addToolbarsToDesktop
+	for (int i=0; i<toolbars.size(); ++i)
+	{
+		desktop.addPreset(toolbars[i]+"ToolBar", Qt::TopToolBarArea);
+	}
+
+	desktop.addPreset("org_custusx_registration_gui_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("RegistrationHistoryWidget", Qt::LeftDockWidgetArea, false);
+	desktop.addPreset("NeuroSimulatorWidget", Qt::LeftDockWidgetArea, false);
+
+//	desktop.mLayoutUid = "RegistrationUid";//Only if creating new
+
+	parser.setDesktop("RegistrationUid", desktop);
+
+}
+
+void NeuroTrainingWidget::addSimulatorWidget()
+{
+	QMainWindow* mainwindow = dynamic_cast<QMainWindow*>(getMainWindow());
+	if(!mainwindow)
+		CX_LOG_WARNING() << "Cannot find MainWindow";
+	else
+		CX_LOG_DEBUG() << "Found MainWindow";
+
+	//Test code from DynamicMainWindowWidgets::restorePreset()
+	QString widgetName = "NeuroSimulatorWidget";
+	QDockWidget* dw = mainwindow->findChild<QDockWidget*>(widgetName+"DockWidget");
+
+	if(!dw)
+		CX_LOG_WARNING() << "Cannot find dockwidget: " << widgetName;
+	else
+		CX_LOG_DEBUG() << "Found dockwidget: " << widgetName;
+
+	dw->show();
+	mainwindow->addDockWidget(Qt::LeftDockWidgetArea, dw);
 }
 
 void NeuroTrainingWidget::startTracking()
