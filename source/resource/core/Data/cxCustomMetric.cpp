@@ -49,12 +49,13 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mThickness = 2;
 	mHeight = 0;
 	mFlat = true;
+    mDirectionDefinesUp = true;
     mSTLFile = "";
 }
 
 CustomMetricPtr CustomMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
-        return CustomMetricPtr(new CustomMetric(uid, name, dataManager, spaceProvider));
+    return CustomMetricPtr(new CustomMetric(uid, name, dataManager, spaceProvider));
 }
 
 CustomMetric::~CustomMetric()
@@ -70,6 +71,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	dataNode.toElement().setAttribute("thickness", mThickness);
 	dataNode.toElement().setAttribute("height", mHeight);
 	dataNode.toElement().setAttribute("flat", mFlat);
+    dataNode.toElement().setAttribute("directiondefinesup", mDirectionDefinesUp);
     dataNode.toElement().setAttribute("STLFile", mSTLFile);
 }
 
@@ -82,6 +84,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
 	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
 	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
+    mDirectionDefinesUp = dataNode.toElement().attribute("directiondefinesup", qstring_cast(mDirectionDefinesUp)).toInt();
     mSTLFile = dataNode.toElement().attribute("STLFile", qstring_cast(mSTLFile));
 }
 
@@ -169,6 +172,16 @@ void CustomMetric::setFlat(bool val)
 bool CustomMetric::getFlat() const
 {
 	return mFlat;
+}
+
+bool CustomMetric::getDirectionDefinesUp() const
+{
+    return mDirectionDefinesUp;
+}
+
+void CustomMetric::setDirectionDefinesUp(bool directionDefinesUp)
+{
+    mDirectionDefinesUp = directionDefinesUp;
 }
 
 void CustomMetric::setSTLFile(QString val)

@@ -77,6 +77,8 @@ public:
 	double getHeight() const;
 	bool getFlat() const;
 	void setFlat(bool val);
+    bool getDirectionDefinesUp() const;
+    void setDirectionDefinesUp(bool directionDefinesUp);
     void setSTLFile(QString val);
     QString getSTLFile() const;
 
@@ -106,6 +108,7 @@ private:
 	double mThickness;
 	double mHeight;
 	bool mFlat;
+    bool mDirectionDefinesUp;
     QString mSTLFile;
 };
 

@@ -716,6 +716,8 @@ QWidget* CustomMetricWrapper::createWidget()
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mThickness));
     mFlat =  this->createFlatSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
+    mDirectionDefinesUp =  this->createDirectionDefinesUpSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDirectionDefinesUp));
     mHeight =  this->createHeightSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
     mSTLFile = this->createSTLFileSelector();
@@ -753,6 +755,7 @@ void CustomMetricWrapper::update()
     mThickness->setValue(mData->getThickness());
     mHeight->setValue(mData->getHeight());
     mFlat->setValue(mData->getFlat());
+    mDirectionDefinesUp->setValue(mData->getDirectionDefinesUp());
     mSTLFile->setValue(mData->getSTLFile());
     mInternalUpdate = false;
 }
@@ -777,6 +780,7 @@ void CustomMetricWrapper::guiChanged()
     mData->setThickness(mThickness->getValue());
     mData->setHeight(mHeight->getValue());
     mData->setFlat(mFlat->getValue());
+    mData->setDirectionDefinesUp(mDirectionDefinesUp->getValue());
     mData->setSTLFile(mSTLFile->getValue());
     mInternalUpdate = false;
 }
@@ -834,6 +838,19 @@ BoolPropertyPtr CustomMetricWrapper::createFlatSelector() const
                                               "Flat",
                                               "Flat disk or torus",
                                               mData->getFlat(),
+                                              QDomNode());
+
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createDirectionDefinesUpSelector() const
+{
+    BoolPropertyPtr retval;
+    retval = BoolProperty::initialize("selectDirectionDefinesUp",
+                                              "Direction point p1 defines up",
+                                              "The up vector of the metric will be connected to the up vector of the direction point, p1, which might well be a tool with a moving up vector.",
+                                              mData->getDirectionDefinesUp(),
                                               QDomNode());
 
     connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
