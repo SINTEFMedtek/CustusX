@@ -56,7 +56,7 @@ std::vector<GUIExtenderService::CategorizedWidget> TrainingGUIExtenderService::c
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
 			new NeuroTrainingWidget(services),
-			"Neuro Simulator"));
+			"Simulator"));
 
 	return retval;
 }

@@ -41,6 +41,9 @@ namespace cx
 class NeuroTrainingWidget : public TrainingWidget
 {
 	Q_OBJECT
+	void startTracking();
+	void changeWorkflowToRegistration();
+	void changeWorkflowToUSAcquisition();
 public:
 	explicit NeuroTrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
 

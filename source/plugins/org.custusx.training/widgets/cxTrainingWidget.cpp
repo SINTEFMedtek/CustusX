@@ -45,8 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-TrainingWidget::TrainingWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "TrainingWidget", "Training"),
+TrainingWidget::TrainingWidget(VisServicesPtr services, QString objectName, QString windowTitle, QWidget* parent) :
+	BaseWidget(parent, objectName, windowTitle),
 	mServices(services)
 {
 	mEngine.reset(new HelpEngine);

@@ -61,7 +61,7 @@ class org_custusx_training_EXPORT TrainingWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	explicit TrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
+	explicit TrainingWidget(VisServicesPtr services, QString objectName, QString windowTitle, QWidget* parent = NULL);
 	virtual ~TrainingWidget();
 
 protected:

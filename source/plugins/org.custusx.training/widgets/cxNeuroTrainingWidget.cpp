@@ -35,13 +35,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplication.h"
 #include "cxSettings.h"
 #include "cxLogger.h"
+#include "cxVisServices.h"
+#include "cxStateService.h"
 
 
 namespace cx
 {
 
 NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *parent) :
-	TrainingWidget(services, parent)
+	TrainingWidget(services, "NeuroSimulatorWidget", "Neuro Simulator", parent)
 {
 
     func_t transitionToStep1 = boost::bind(&NeuroTrainingWidget::onImport, this);
@@ -68,19 +70,22 @@ void NeuroTrainingWidget::onImport()
 void NeuroTrainingWidget::onRegisterStep()
 {
     std::cout << "onRegisterStep" << std::endl;
-    //TODO:
-    // Change workflow
-    //triggerMainWindowActionWithObjectName("Registration");
-    // Focus on the registration widget
 
+	this->startTracking();
+	this->changeWorkflowToRegistration();
+
+
+    //TODO:
+    // Focus on the registration widget
     // Populate the registration widget
-    // Start tracking
 }
 
 void NeuroTrainingWidget::onUse2DUSStep()
 {
     std::cout << "onUse2DUSStep" << std::endl;
     //TODO: Change workflow and widgets
+
+	this->changeWorkflowToUSAcquisition();
 }
 
 void NeuroTrainingWidget::on3DUSAcqStep()
@@ -89,5 +94,19 @@ void NeuroTrainingWidget::on3DUSAcqStep()
     //TODO: Change workflow and widgets
 }
 
+void NeuroTrainingWidget::startTracking()
+{
+	triggerMainWindowActionWithObjectName("TrackingTools");
+}
+
+void NeuroTrainingWidget::changeWorkflowToRegistration()
+{
+	mServices->state()->setWorkFlowState("RegistrationUid");
+}
+
+void NeuroTrainingWidget::changeWorkflowToUSAcquisition()
+{
+	mServices->state()->setWorkFlowState("IntraOpImagingUid");
+}
 
 } // cx
