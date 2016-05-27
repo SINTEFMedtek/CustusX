@@ -76,6 +76,11 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getData() const
 	return mData;
 }
 
+std::map<QString, cx::DataPtr> PatientModelServiceMock::getAllData() const
+{
+	return mData;
+}
+
 cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText)
 {
 	QString type = cx::DataReaderWriter().findDataTypeFromFile(fileName);
