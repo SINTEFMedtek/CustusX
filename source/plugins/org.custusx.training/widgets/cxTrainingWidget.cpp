@@ -43,8 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxImage.h"
 
-//#include "cxSettings.h"//needed by temporary test code
-
 namespace cx {
 
 TrainingWidget::TrainingWidget(VisServicesPtr services, QWidget* parent) :
@@ -152,19 +150,6 @@ void TrainingWidget::toWelcomeStep()
 void TrainingWidget::onImportSimulatedPatient()
 {
 	triggerMainWindowActionWithObjectName("LoadFile");
-
-    //Transition to first step after welcome
-//    this->stepTo(1);
-
-	//Test code copied from NeuroTrainingWidget::onImport() for now
-//	QString usUid = this->getFirstUSVolume();
-//	CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
-//	settings()->setValue("USsimulation/volume", usUid);
-
-//	this->makeUnavailable("Kaisa");
-//	this->makeUnavailable("US", true);
-
-//	this->hideUSDataAndKaisa();
 
 	//Transition to first step after welcome
 	this->onStep(1);
