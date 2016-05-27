@@ -128,6 +128,11 @@ std::map<QString, DataPtr> PatientModelServiceProxy::getData() const
 	return mPatientModelService->getData();
 }
 
+std::map<QString, DataPtr> PatientModelServiceProxy::getAllData() const
+{
+	return mPatientModelService->getAllData();
+}
+
 DataPtr PatientModelServiceProxy::getData(const QString& uid) const
 {
 	return mPatientModelService->getData(uid);

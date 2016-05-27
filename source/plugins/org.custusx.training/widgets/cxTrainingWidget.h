@@ -75,6 +75,7 @@ protected:
 	void makeUnavailable(QString uidPart, bool makeModalityUnavailable = false);
 	VisServicesPtr mServices;
 
+	QString getFirstUSVolume();
 private slots:
     void onImportSimulatedPatient();
 

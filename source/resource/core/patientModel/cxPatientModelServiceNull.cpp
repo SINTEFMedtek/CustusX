@@ -62,6 +62,12 @@ std::map<QString, DataPtr> PatientModelServiceNull::getData() const
 	return retval;
 }
 
+std::map<QString, DataPtr> PatientModelServiceNull::getAllData() const
+{
+	printWarning();
+	std::map<QString, DataPtr> retval;
+	return retval;
+}
 
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {

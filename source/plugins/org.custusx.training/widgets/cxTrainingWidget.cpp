@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxImage.h"
 
+//#include "cxSettings.h"//needed by temporary test code
+
 namespace cx {
 
 TrainingWidget::TrainingWidget(VisServicesPtr services, QWidget* parent) :
@@ -90,9 +92,10 @@ void TrainingWidget::resetSteps()
 
 void TrainingWidget::registrateTransition(func_t transition)
 {
+	CX_LOG_DEBUG() << "TrainingWidget::registrateTransition";
     mTransitions.push_back(transition);
-    int numberOfSteps = mTransitions.size()-1;
-    this->createSteps(numberOfSteps);
+	int numberOfSteps = mTransitions.size();
+//    this->createSteps(numberOfSteps);
 }
 
 void TrainingWidget::createActions()
@@ -151,7 +154,15 @@ void TrainingWidget::onImportSimulatedPatient()
     triggerMainWindowActionWithObjectName("LoadFile");
 
     //Transition to first step after welcome
-    this->stepTo(1);
+//    this->stepTo(1);
+
+	//Test code copied from NeuroTrainingWidget::onImport() for now
+//	QString usUid = this->getFirstUSVolume();
+//	CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
+//	settings()->setValue("USsimulation/volume", usUid);
+
+//	this->makeUnavailable("Kaisa");
+//	this->makeUnavailable("US", true);
 }
 
 void TrainingWidget::onStep(int delta)
@@ -165,6 +176,7 @@ void TrainingWidget::stepTo(int step)
 	step = std::max<int>(step, 0);
 	mCurrentStep = step;
     CX_LOG_DEBUG() << "Current step is now " << mCurrentStep;
+	CX_LOG_DEBUG() << "mSessionIDs.size(): " << mSessionIDs.size();
 
 	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
 
@@ -185,6 +197,22 @@ void TrainingWidget::transitionToStep(int step)
         }
     }
 
+}
+
+QString TrainingWidget::getFirstUSVolume()
+{
+	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	std::map<QString, DataPtr>::iterator iter = datas.begin();
+
+	for(; iter != datas.end(); ++iter)
+	{
+		DataPtr data = iter->second;
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+
+		if (image && image->getModality().contains("US"))
+			return image->getUid();
+	}
+	return QString();
 }
 
 void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailable)

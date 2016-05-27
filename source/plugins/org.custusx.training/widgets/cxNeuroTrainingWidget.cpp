@@ -31,8 +31,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxNeuroTrainingWidget.h"
-#include "cxApplication.h"
 #include <boost/bind.hpp>
+#include "cxApplication.h"
+#include "cxSettings.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -55,7 +57,9 @@ NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *paren
 
 void NeuroTrainingWidget::onImport()
 {
-    std::cout << "onImport" << std::endl;
+	QString usUid = this->getFirstUSVolume();
+	CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
+	settings()->setValue("USsimulation/volume", usUid);
 
 	this->makeUnavailable("Kaisa");
 	this->makeUnavailable("US", true);
