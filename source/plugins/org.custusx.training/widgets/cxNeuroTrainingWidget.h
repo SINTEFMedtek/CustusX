@@ -44,8 +44,6 @@ class NeuroTrainingWidget : public TrainingWidget
 	void startTracking();
 	void changeWorkflowToRegistration();
 	void changeWorkflowToUSAcquisition();
-	void changeRegistrationWorkflowDesktop();
-	void addSimulatorWidget();
 public:
 	explicit NeuroTrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
 
