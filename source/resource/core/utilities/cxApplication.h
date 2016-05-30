@@ -62,7 +62,7 @@ private:
 };
 
 void cxResource_EXPORT bringWindowToFront(QWidget* window);
-QWidget* cxResource_EXPORT getMainWindow();
+cxResource_EXPORT QWidget* getMainWindow();
 void cxResource_EXPORT triggerMainWindowActionWithObjectName(QString actionName);
 
 } // namespace cx
