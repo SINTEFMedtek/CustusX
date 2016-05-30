@@ -407,7 +407,10 @@ void MainWindow::toggleFullScreenSlot()
 void MainWindow::showControlPanelActionSlot()
 {
 	if (!mControlPanel)
-		mControlPanel = new SecondaryMainWindow(this);
+	{
+		TrackPadWidget* trackPadWidget = new TrackPadWidget(this);
+		mControlPanel = new SecondaryMainWindow(this, trackPadWidget);
+	}
 	mControlPanel->show();
 }
 
