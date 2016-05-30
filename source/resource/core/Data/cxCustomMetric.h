@@ -84,6 +84,7 @@ public:
 
 	Vector3D getPosition();
 	Vector3D getDirection();
+    Vector3D getVectorUp();
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels

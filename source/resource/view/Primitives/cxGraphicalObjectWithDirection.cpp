@@ -46,6 +46,7 @@ GraphicalObjectWithDirection::GraphicalObjectWithDirection(vtkRendererPtr render
 {
     mPoint = Vector3D(0,0,0);
     mDirection = Vector3D(0,1,0);
+    mVectorUp = Vector3D(1,0,0);
     mSource = vtkSuperquadricSourcePtr::New();
 
     mMapper = vtkPolyDataMapperPtr::New();
@@ -89,6 +90,12 @@ void GraphicalObjectWithDirection::setDirection(Vector3D direction)
     this->updateOrientation();
 }
 
+void GraphicalObjectWithDirection::setVectorUp(const Vector3D &up)
+{
+    mVectorUp = up;
+    this->updateOrientation();
+}
+
 void GraphicalObjectWithDirection::setRenderer(vtkRendererPtr renderer)
 {
     if (mRenderer)
@@ -101,27 +108,40 @@ void GraphicalObjectWithDirection::setRenderer(vtkRendererPtr renderer)
 void GraphicalObjectWithDirection::updateOrientation()
 {
 //	Transform3D M = createTransformRotationBetweenVectors(Vector3D::UnitY(), mDirection.normal());
-    Transform3D M;
-    bool directionAlongYAxis = similar(dot(Vector3D::UnitY(), mDirection.normal()), 1.0);
+    Transform3D R;
+//    bool directionAlongYAxis = similar(dot(Vector3D::UnitY(), mDirection.normal()), 1.0);
 
-    if (directionAlongYAxis)
+//    if (directionAlongYAxis)
+//    {
+//            M = Transform3D::Identity();
+//    }
+    bool directionAlongUp = similar(dot(mVectorUp, mDirection.normal()), 1.0);
+
+    if (directionAlongUp)
     {
-            M = Transform3D::Identity();
+            R = Transform3D::Identity();
     }
+
     else
     {
-            Vector3D ivec = cross(Vector3D::UnitY(), mDirection).normal();
+//            Vector3D ivec = cross(Vector3D::UnitY(), mDirection).normal();
             Vector3D jvec = mDirection.normal();
+            Vector3D kvec = cross(mVectorUp, mDirection).normal();
+            Vector3D ivec = cross(jvec, kvec).normal();
             Vector3D center = Vector3D::Zero();
-            M = createTransformIJC(ivec, jvec, center);
+            R = createTransformIJC(ivec, jvec, center);
     }
 
     Transform3D T = createTransformTranslate(mPoint);
-    M = T*M;
+    Transform3D M = T*R;
+
+    //Jon
+//    M = Transform3D::Identity();
 
 //	std::cout << "M end:\n" << M << std::endl;
 ////	actor->SetPosition(point.begin());
     mActor->SetUserMatrix(M.getVtkMatrix());
 }
+
 
 } // namespace cx

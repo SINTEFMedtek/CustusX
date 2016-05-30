@@ -79,6 +79,8 @@ struct cxResource_EXPORT OperatingTable
         : rMtb(tr)
     {}
     Transform3D rMtb; ///< Transform from OT to reference space.
+
+    Vector3D getVectorUp() const {return rMtb.vector(Vector3D(0,-1,0));}
 };
 
 

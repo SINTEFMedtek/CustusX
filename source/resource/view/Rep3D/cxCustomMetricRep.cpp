@@ -204,6 +204,7 @@ void CustomMetricRep::updateSTLModel()
 
     mSTLModel->setPosition(custom->getPosition());
     mSTLModel->setDirection(custom->getDirection());
+    mSTLModel->setVectorUp(custom->getVectorUp());
 }
 
 }

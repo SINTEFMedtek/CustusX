@@ -119,7 +119,12 @@ Vector3D CustomMetric::getDirection()
 	Vector3D diff = (coords[1]-coords[0]);
 	if (similar(diff.length(), 0.0))
 		return Vector3D(0,1,0);
-	return diff.normal();
+    return diff.normal();
+}
+
+Vector3D CustomMetric::getVectorUp()
+{
+    return this->mDataManager->getOperatingTable().getVectorUp();
 }
 
 
