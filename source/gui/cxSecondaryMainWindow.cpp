@@ -39,7 +39,7 @@ namespace cx
 SecondaryMainWindow::SecondaryMainWindow(QWidget* parent, QWidget* widget) :
 	QMainWindow(parent, Qt::WindowStaysOnTopHint)
 {
-	this->setWindowTitle("Control Panel");
+//	this->setWindowTitle("Control Panel");
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
 	widget->setParent(this);

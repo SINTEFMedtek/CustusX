@@ -191,7 +191,10 @@ void MainWindow::onGUIExtenderServiceAdded(GUIExtenderService* service)
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
 	for (unsigned j = 0; j < widgets.size(); ++j)
 	{
-		mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+		if(!widgets[j].mPlaceInSeparateWindow)
+			mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+		else
+			this->createActionForWidgetInSeparateWindow(widgets[j].mWidget);
 	}
 
 	std::vector<QToolBar*> toolBars = service->createToolBars();
@@ -402,6 +405,23 @@ void MainWindow::toggleFullScreenSlot()
 	this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
 
 	settings()->setValue("gui/fullscreen", (this->windowState() & Qt::WindowFullScreen)!=0);
+}
+
+void MainWindow::createActionForWidgetInSeparateWindow(QWidget* widget)
+{
+	QString uid = widget->objectName();
+	if(mSecondaryMainWindows.find(uid) == mSecondaryMainWindows.end())
+	{
+		SecondaryMainWindow* secondaryMainWindow = new SecondaryMainWindow(this, widget);
+		QAction* action = new QAction(widget->windowTitle(), this);
+
+		mSecondaryMainWindows[uid] = secondaryMainWindow;
+		mSecondaryMainWindowsActions[uid] = action;
+
+		connect(action, &QAction::triggered, secondaryMainWindow, &QWidget::show);
+
+		mFileMenu->addAction(action);
+	}
 }
 
 void MainWindow::showControlPanelActionSlot()
