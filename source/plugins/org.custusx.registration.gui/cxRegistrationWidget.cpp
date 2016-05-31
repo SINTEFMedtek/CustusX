@@ -145,7 +145,7 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 
 void RegistrationWidget::selectRegistrationMethod(QString registrationType, QString registrationMethodName)
 {
-	QWidget* widget = mRegistrationTypeMap[registrationType];
+	RegistrationTypeWidget* widget = mRegistrationTypeMap[registrationType];
 	if(widget)
 		widget->selectRegistrationMethod(registrationMethodName);
 }
