@@ -39,10 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateService.h"
 #include "cxApplicationsParser.h"
 
-//Test code
-#include <QDockWidget>
-#include <QMainWindow>
-
 namespace cx
 {
 
@@ -59,6 +55,7 @@ NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *paren
     TrainingWidget::registrateTransition(transitionToStep2);
     TrainingWidget::registrateTransition(transitionToStep3);
     TrainingWidget::registrateTransition(transitionToStep4);
+
 }
 
 void NeuroTrainingWidget::onImport()
@@ -70,6 +67,7 @@ void NeuroTrainingWidget::onImport()
 	this->makeUnavailable("Kaisa");
 	this->makeUnavailable("US", true);
 
+	this->changeWorkflowToImport();
 }
 
 void NeuroTrainingWidget::onRegisterStep()
@@ -77,11 +75,25 @@ void NeuroTrainingWidget::onRegisterStep()
     std::cout << "onRegisterStep" << std::endl;
 
 	this->startTracking();
-	this->changeWorkflowToRegistration();
 
     //TODO:
     // Focus on the registration widget
     // Populate the registration widget
+
+
+	//Changing options is to late at this point
+//	XmlOptionFile mOptions = profile()->getXmlSettings().descend("RegistrationWidget");
+//	XmlOptionItem store = XmlOptionItem("ImageToPatient", mOptions.getElement().toElement());
+
+//	store.writeValue("Fast");
+//	mOptions.save();
+
+	this->changeWorkflowToRegistration();
+
+	//TODO: Need to access RegistrationWidget and change to Fast registration
+//	RegistrationWidget registrationWidget = this->getRegistrationWidget();
+
+
 }
 
 void NeuroTrainingWidget::onUse2DUSStep()
@@ -101,6 +113,11 @@ void NeuroTrainingWidget::on3DUSAcqStep()
 void NeuroTrainingWidget::startTracking()
 {
 	triggerMainWindowActionWithObjectName("TrackingTools");
+}
+
+void NeuroTrainingWidget::changeWorkflowToImport()
+{
+	mServices->state()->setWorkFlowState("PatientDataUid");
 }
 
 void NeuroTrainingWidget::changeWorkflowToRegistration()

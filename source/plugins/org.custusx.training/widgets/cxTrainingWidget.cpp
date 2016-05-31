@@ -152,7 +152,7 @@ void TrainingWidget::onImportSimulatedPatient()
 	triggerMainWindowActionWithObjectName("LoadFile");
 
 	//Transition to first step after welcome
-	this->onStep(1);
+	this->stepTo(1);
 }
 
 void TrainingWidget::onStep(int delta)
