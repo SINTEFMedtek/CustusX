@@ -137,14 +137,22 @@ QWidget* getMainWindow()
 	return mainwindow;
 }
 
-void triggerMainWindowActionWithObjectName(QString actionName)
+template<typename T>
+T findMainWindowChildWithObjectName(QString objectName)
 {
 	QWidget *mainwindow = getMainWindow();
-    QAction* action = mainwindow->findChild<QAction*>(actionName);
+	T object = mainwindow->findChild<T>(objectName);
+	return object;
+}
+
+void triggerMainWindowActionWithObjectName(QString actionName)
+{
+	QAction* action = findMainWindowChildWithObjectName<QAction*>(actionName);
     if(action)
     {
         action->trigger();
     }
 }
+
 
 } // namespace cx

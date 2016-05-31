@@ -52,6 +52,7 @@ public:
 	void onRegisterStep();
 	void onUse2DUSStep();
 	void on3DUSAcqStep();
+	void changeImageToPatientRegistrationToFast();
 };
 
 } // cx
