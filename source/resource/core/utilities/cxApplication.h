@@ -67,9 +67,6 @@ template<typename T>
 cxResource_EXPORT T findMainWindowChildWithObjectName(QString objectName);
 void cxResource_EXPORT triggerMainWindowActionWithObjectName(QString actionName);
 
-
-template
-cxResource_EXPORT QWidget* findMainWindowChildWithObjectName(QString objectName);
 } // namespace cx
 
 #endif // CXAPPLICATION_H_

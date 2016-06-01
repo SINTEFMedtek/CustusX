@@ -154,5 +154,7 @@ void triggerMainWindowActionWithObjectName(QString actionName)
     }
 }
 
+template
+cxResource_EXPORT QWidget* findMainWindowChildWithObjectName(QString objectName);
 
 } // namespace cx
