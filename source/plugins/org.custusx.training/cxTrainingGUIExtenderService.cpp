@@ -55,7 +55,7 @@ std::vector<GUIExtenderService::CategorizedWidget> TrainingGUIExtenderService::c
 	VisServicesPtr services = VisServices::create(mContext);
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new NeuroTrainingWidget(services),
+			new NeuroTrainingWidget(services, mContext),
 			"Simulator", true));
 
 	return retval;

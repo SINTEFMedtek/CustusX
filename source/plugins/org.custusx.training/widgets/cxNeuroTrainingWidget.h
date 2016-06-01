@@ -46,13 +46,17 @@ class NeuroTrainingWidget : public TrainingWidget
 	void changeWorkflowToUSAcquisition();
 	void changeWorkflowToImport();
 public:
-	explicit NeuroTrainingWidget(VisServicesPtr services, QWidget* parent = NULL);
+	explicit NeuroTrainingWidget(VisServicesPtr services, ctkPluginContext *context, QWidget* parent = NULL);
 
     void onImport();
 	void onRegisterStep();
 	void onUse2DUSStep();
 	void on3DUSAcqStep();
 	void changeImageToPatientRegistrationToFast();
+
+private:
+	ctkPluginContext* mPluginContext;
+	void setUSSimulatorInput();
 };
 
 } // cx

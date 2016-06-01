@@ -40,11 +40,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplicationsParser.h"
 #include "cxRegistrationWidget.h"
 
+#include "cxSimulatedImageStreamerService.h"
+#include "cxStreamerServiceUtilities.h"
+
 namespace cx
 {
 
-NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *parent) :
-	TrainingWidget(services, "NeuroSimulatorWidget", "Neuro Simulator", parent)
+NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, ctkPluginContext* context, QWidget *parent) :
+	TrainingWidget(services, "NeuroSimulatorWidget", "Neuro Simulator", parent),
+	mPluginContext(context)
 {
 
     func_t transitionToStep1 = boost::bind(&NeuroTrainingWidget::onImport, this);
@@ -61,14 +65,25 @@ NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, QWidget *paren
 
 void NeuroTrainingWidget::onImport()
 {
-	QString usUid = this->getFirstUSVolume();
-	CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
-	settings()->setValue("USsimulation/volume", usUid);
-
+	this->setUSSimulatorInput();
 	this->makeUnavailable("Kaisa");
 	this->makeUnavailable("US", true);
 
 	this->changeWorkflowToImport();
+}
+
+void NeuroTrainingWidget::setUSSimulatorInput()
+{
+	cx::StreamerService* streamerService = cx::StreamerServiceUtilities::getStreamerServiceFromType("ussimulator_streamer", mPluginContext);
+	SimulatedImageStreamerService* simulatorStreamerService = dynamic_cast<SimulatedImageStreamerService*>(streamerService);
+	if(simulatorStreamerService)
+	{
+		QString usUid = this->getFirstUSVolume();
+		CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
+		simulatorStreamerService->setImageToStream(usUid);
+	}
+	else
+		CX_LOG_WARNING() << "Cannot find SimulatedImageStreamerService";
 }
 
 void NeuroTrainingWidget::changeImageToPatientRegistrationToFast()
