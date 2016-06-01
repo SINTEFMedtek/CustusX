@@ -44,6 +44,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
+    mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	mRadius = 5;
 	mThickness = 2;
@@ -124,7 +125,19 @@ Vector3D CustomMetric::getDirection()
 
 Vector3D CustomMetric::getVectorUp()
 {
-    return this->mDataManager->getOperatingTable().getVectorUp();
+    if(mDirectionDefinesUp)
+    {
+        std::vector<Transform3D> transforms = mArguments->getRefFrames();
+        if (transforms.size()<2)
+            return Vector3D::UnitZ();
+
+        Transform3D rMframe = transforms[1];
+        Vector3D upVector = rMframe.vector(Vector3D(-1,0,0));
+
+        return upVector;
+    }
+    else
+        return mDataManager->getOperatingTable().getVectorUp();
 }
 
 

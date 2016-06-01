@@ -97,7 +97,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-                return "CustomMetric";
+        return "CustomMetric";
 	}
 	virtual QString getValueAsString() const { return ""; }
 	virtual bool showValueInGraphics() const { return false; }
