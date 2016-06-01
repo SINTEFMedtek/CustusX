@@ -81,6 +81,24 @@ public:
 	virtual StreamerPtr createStreamer(QDomElement root) = 0;
 };
 
+/**
+ * \brief Abstract class. Interface to Simulated Streamers
+ *
+ * \ingroup cx_resource_core_video
+ *
+ * \date Jun 01, 2016
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class cxResource_EXPORT SimulatedStreamerService : public StreamerService
+{
+	Q_OBJECT
+public:
+	SimulatedStreamerService() {}
+
+public slots:
+	virtual void setImageToStream(QString imageUid) = 0;
+};
+
 } //end namespace cx
 Q_DECLARE_INTERFACE(cx::StreamerService, StreamerService_iid)
 

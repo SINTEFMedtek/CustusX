@@ -39,7 +39,6 @@ set(PLUGIN_target_libraries
     org_custusx_core_state
     org_custusx_registration_gui
     org_custusx_core_video
-    org_custusx_ussimulator
 )
 
 set(PLUGIN_OUTPUT_DIR "")

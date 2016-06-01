@@ -39,8 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateService.h"
 #include "cxApplicationsParser.h"
 #include "cxRegistrationWidget.h"
-
-#include "cxSimulatedImageStreamerService.h"
 #include "cxStreamerServiceUtilities.h"
 
 namespace cx
@@ -75,7 +73,7 @@ void NeuroTrainingWidget::onImport()
 void NeuroTrainingWidget::setUSSimulatorInput()
 {
 	cx::StreamerService* streamerService = cx::StreamerServiceUtilities::getStreamerServiceFromType("ussimulator_streamer", mPluginContext);
-	SimulatedImageStreamerService* simulatorStreamerService = dynamic_cast<SimulatedImageStreamerService*>(streamerService);
+	SimulatedStreamerService* simulatorStreamerService = dynamic_cast<SimulatedStreamerService*>(streamerService);
 	if(simulatorStreamerService)
 	{
 		QString usUid = this->getFirstUSVolume();
