@@ -56,7 +56,7 @@ public:
 
 private:
 	ctkPluginContext* mPluginContext;
-	void setUSSimulatorInput();
+	void setUSSimulatorInput(QString usUid);
 };
 
 } // cx

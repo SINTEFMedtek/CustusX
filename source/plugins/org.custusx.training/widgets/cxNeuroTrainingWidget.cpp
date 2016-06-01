@@ -63,20 +63,19 @@ NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, ctkPluginConte
 
 void NeuroTrainingWidget::onImport()
 {
-	this->setUSSimulatorInput();
+	this->setUSSimulatorInput(this->getFirstUSVolume());
 	this->makeUnavailable("Kaisa");
 	this->makeUnavailable("US", true);
 
 	this->changeWorkflowToImport();
 }
 
-void NeuroTrainingWidget::setUSSimulatorInput()
+void NeuroTrainingWidget::setUSSimulatorInput(QString usUid)
 {
 	cx::StreamerService* streamerService = cx::StreamerServiceUtilities::getStreamerServiceFromType("ussimulator_streamer", mPluginContext);
 	SimulatedStreamerService* simulatorStreamerService = dynamic_cast<SimulatedStreamerService*>(streamerService);
 	if(simulatorStreamerService)
 	{
-		QString usUid = this->getFirstUSVolume();
 		CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
 		simulatorStreamerService->setImageToStream(usUid);
 	}
