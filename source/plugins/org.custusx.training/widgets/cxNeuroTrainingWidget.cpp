@@ -48,17 +48,15 @@ NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, ctkPluginConte
 	TrainingWidget(services, "NeuroSimulatorWidget", "Neuro Simulator", parent),
 	mPluginContext(context)
 {
+	func_t transitionToStep1 = boost::bind(&NeuroTrainingWidget::onImport, this);
+	func_t transitionToStep2 = boost::bind(&NeuroTrainingWidget::onRegisterStep, this);
+	func_t transitionToStep3 = boost::bind(&NeuroTrainingWidget::onUse2DUSStep, this);
+	func_t transitionToStep4 = boost::bind(&NeuroTrainingWidget::on3DUSAcqStep, this);
 
-    func_t transitionToStep1 = boost::bind(&NeuroTrainingWidget::onImport, this);
-    func_t transitionToStep2 = boost::bind(&NeuroTrainingWidget::onRegisterStep, this);
-    func_t transitionToStep3 = boost::bind(&NeuroTrainingWidget::onUse2DUSStep, this);
-    func_t transitionToStep4 = boost::bind(&NeuroTrainingWidget::on3DUSAcqStep, this);
-
-    TrainingWidget::registrateTransition(transitionToStep1);
-    TrainingWidget::registrateTransition(transitionToStep2);
-    TrainingWidget::registrateTransition(transitionToStep3);
-    TrainingWidget::registrateTransition(transitionToStep4);
-
+	TrainingWidget::registrateTransition(transitionToStep1);
+	TrainingWidget::registrateTransition(transitionToStep2);
+	TrainingWidget::registrateTransition(transitionToStep3);
+	TrainingWidget::registrateTransition(transitionToStep4);
 }
 
 void NeuroTrainingWidget::onImport()
