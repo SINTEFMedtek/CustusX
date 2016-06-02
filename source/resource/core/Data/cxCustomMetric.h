@@ -77,14 +77,14 @@ public:
 	double getHeight() const;
 	bool getFlat() const;
 	void setFlat(bool val);
-    bool getDirectionDefinesUp() const;
-    void setDirectionDefinesUp(bool directionDefinesUp);
+    QString getDefineVectorUpMethod() const;
+    void setDefineVectorUpMethod(QString defineVectorUpMethod);
     void setSTLFile(QString val);
     QString getSTLFile() const;
 
-	Vector3D getPosition();
-	Vector3D getDirection();
-    Vector3D getVectorUp();
+    Vector3D getPosition() const;
+    Vector3D getDirection() const;
+    Vector3D getVectorUp() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -103,14 +103,31 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
+    struct DefineVectorUpMethods
+    {
+        DefineVectorUpMethods()
+        {
+            table = "tableDefinesUp";
+            connectedFrameInP1 = "connectedFrameDefinesUp";
+        }
+        QString table;
+        QString connectedFrameInP1;
+        QStringList getAvailableDefineVectorUpMethods() const;
+        std::map<QString, QString> getAvailableDefineVectorUpMethodsDisplayNames() const;
+    };
+
     CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
 	double mRadius;
 	double mThickness;
 	double mHeight;
 	bool mFlat;
-    bool mDirectionDefinesUp;
+    QString mDefineVectorUpMethod;
     QString mSTLFile;
+    DefineVectorUpMethods mDefineVectorUpMethods;
+
+public:
+    CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 };
 
 /**

@@ -716,8 +716,8 @@ QWidget* CustomMetricWrapper::createWidget()
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mThickness));
     mFlat =  this->createFlatSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
-    mDirectionDefinesUp =  this->createDirectionDefinesUpSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDirectionDefinesUp));
+    mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
     mHeight =  this->createHeightSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
     mSTLFile = this->createSTLFileSelector();
@@ -755,7 +755,7 @@ void CustomMetricWrapper::update()
     mThickness->setValue(mData->getThickness());
     mHeight->setValue(mData->getHeight());
     mFlat->setValue(mData->getFlat());
-    mDirectionDefinesUp->setValue(mData->getDirectionDefinesUp());
+    mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
     mSTLFile->setValue(mData->getSTLFile());
     mInternalUpdate = false;
 }
@@ -780,7 +780,7 @@ void CustomMetricWrapper::guiChanged()
     mData->setThickness(mThickness->getValue());
     mData->setHeight(mHeight->getValue());
     mData->setFlat(mFlat->getValue());
-    mData->setDirectionDefinesUp(mDirectionDefinesUp->getValue());
+    mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
     mData->setSTLFile(mSTLFile->getValue());
     mInternalUpdate = false;
 }
@@ -844,14 +844,17 @@ BoolPropertyPtr CustomMetricWrapper::createFlatSelector() const
     return retval;
 }
 
-BoolPropertyPtr CustomMetricWrapper::createDirectionDefinesUpSelector() const
+StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const
 {
-    BoolPropertyPtr retval;
-    retval = BoolProperty::initialize("selectDirectionDefinesUp",
-                                              "Direction point p1 defines up",
-                                              "The up vector of the metric will be connected to the up vector of the direction point, p1, which might well be a tool with a moving up vector.",
-                                              mData->getDirectionDefinesUp(),
+    StringPropertyPtr retval;
+    retval = StringProperty::initialize("selectDefineVectorUp",
+                                              "Use to define the vector up",
+                                              "The vector up of the metric will be connected to the static up vector of the operating table or to a frame in p1, which might well be connected to a tool giving a dynamic up vector.",
+                                              mData->getDefineVectorUpMethod(),
+                                              mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethods(),
                                               QDomNode());
+    retval->setDisplayNames(mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethodsDisplayNames());
+
 
     connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
     return retval;

@@ -50,8 +50,13 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mThickness = 2;
 	mHeight = 0;
 	mFlat = true;
-    mDirectionDefinesUp = true;
+    mDefineVectorUpMethod = mDefineVectorUpMethods.table;
     mSTLFile = "";
+}
+
+CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
+{
+    return mDefineVectorUpMethods;
 }
 
 CustomMetricPtr CustomMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
@@ -72,7 +77,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	dataNode.toElement().setAttribute("thickness", mThickness);
 	dataNode.toElement().setAttribute("height", mHeight);
 	dataNode.toElement().setAttribute("flat", mFlat);
-    dataNode.toElement().setAttribute("directiondefinesup", mDirectionDefinesUp);
+    dataNode.toElement().setAttribute("definevectorup", mDefineVectorUpMethod);
     dataNode.toElement().setAttribute("STLFile", mSTLFile);
 }
 
@@ -85,7 +90,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
 	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
 	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
-    mDirectionDefinesUp = dataNode.toElement().attribute("directiondefinesup", qstring_cast(mDirectionDefinesUp)).toInt();
+    mDefineVectorUpMethod = dataNode.toElement().attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
     mSTLFile = dataNode.toElement().attribute("STLFile", qstring_cast(mSTLFile));
 }
 
@@ -104,7 +109,7 @@ DoubleBoundingBox3D CustomMetric::boundingBox() const
 	return DoubleBoundingBox3D::fromCloud(mArguments->getRefCoords());
 }
 
-Vector3D CustomMetric::getPosition()
+Vector3D CustomMetric::getPosition() const
 {
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	if (coords.empty())
@@ -112,7 +117,7 @@ Vector3D CustomMetric::getPosition()
 	return coords[0];
 }
 
-Vector3D CustomMetric::getDirection()
+Vector3D CustomMetric::getDirection() const
 {
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	if (coords.size()<2)
@@ -123,9 +128,9 @@ Vector3D CustomMetric::getDirection()
     return diff.normal();
 }
 
-Vector3D CustomMetric::getVectorUp()
+Vector3D CustomMetric::getVectorUp() const
 {
-    if(mDirectionDefinesUp)
+    if(mDefineVectorUpMethod == mDefineVectorUpMethods.connectedFrameInP1)
     {
         std::vector<Transform3D> transforms = mArguments->getRefFrames();
         if (transforms.size()<2)
@@ -192,14 +197,14 @@ bool CustomMetric::getFlat() const
 	return mFlat;
 }
 
-bool CustomMetric::getDirectionDefinesUp() const
+QString CustomMetric::getDefineVectorUpMethod() const
 {
-    return mDirectionDefinesUp;
+    return mDefineVectorUpMethod;
 }
 
-void CustomMetric::setDirectionDefinesUp(bool directionDefinesUp)
+void CustomMetric::setDefineVectorUpMethod(QString defineVectorUpMethod)
 {
-    mDirectionDefinesUp = directionDefinesUp;
+    mDefineVectorUpMethod = defineVectorUpMethod;
 }
 
 void CustomMetric::setSTLFile(QString val)
@@ -211,6 +216,22 @@ void CustomMetric::setSTLFile(QString val)
 QString CustomMetric::getSTLFile() const
 {
     return mSTLFile;
+}
+
+QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethods() const
+{
+    QStringList retval;
+    retval << table;
+    retval << connectedFrameInP1;
+    return retval;
+}
+
+std::map<QString, QString> CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethodsDisplayNames() const
+{
+    std::map<QString, QString> names;
+    names[table] = "The operating table";
+    names[connectedFrameInP1] = "The connected frame in p1";
+    return names;
 }
 
 }
