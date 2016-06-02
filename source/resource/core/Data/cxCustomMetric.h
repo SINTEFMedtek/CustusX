@@ -103,7 +103,7 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-    struct DefineVectorUpMethods
+    struct cxResource_EXPORT DefineVectorUpMethods
     {
         DefineVectorUpMethods()
         {
