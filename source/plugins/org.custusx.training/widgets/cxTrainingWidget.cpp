@@ -150,7 +150,7 @@ void TrainingWidget::toWelcomeStep()
 void TrainingWidget::onImportSimulatedPatient()
 {
 	triggerMainWindowActionWithObjectName("ClearPatient");
-	triggerMainWindowActionWithObjectName("LoadFile");
+	triggerMainWindowActionWithObjectName("LoadFileCopy");
 
 	//Transition to first step after welcome
 	this->stepTo(1);

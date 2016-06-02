@@ -152,6 +152,12 @@ void MainWindowActions::createPatientActions()
 					   "Load patient file",
 					   &MainWindowActions::loadPatientFileSlot);
 
+	this->createAction("LoadFileCopy", "Load a copy of the Patient",
+					   QIcon(":/icons/open_icon_library/document-open-7.png"),
+					   QKeySequence(),
+					   "Load a copy of the patient file",
+					   &MainWindowActions::loadPatientFileCopySlot);
+
 	this->createAction("ClearPatient", "Clear Patient",
 					   QIcon(),
 					   QKeySequence(),
@@ -261,6 +267,73 @@ void MainWindowActions::loadPatientFileSlot()
 		return;
 
 	mServices->session()->load(folder);
+}
+
+void MainWindowActions::loadPatientFileCopySlot()
+{
+	QString patientDatafolder = this->getExistingSessionFolder();
+
+	// Open file dialog
+	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
+	if (folder.isEmpty())
+		return;
+
+	QString newFolder = folder+"_temp";
+
+	if(!this->copyPath(folder, newFolder, true))
+	{
+		CX_LOG_WARNING() << "MainWindowActions::loadPatientFileCopySlot(): Cannot copy patient folder: " << folder;
+		return;
+	}
+
+	mServices->session()->load(newFolder);
+}
+
+bool MainWindowActions::copyPath(QString sourceDir, QString destinationDir, bool overWriteDirectory)
+{
+	QDir originDirectory(sourceDir);
+
+	if (! originDirectory.exists())
+	{
+		return false;
+	}
+
+	QDir destinationDirectory(destinationDir);
+
+	if(destinationDirectory.exists() && !overWriteDirectory)
+	{
+		return false;
+	}
+	else if(destinationDirectory.exists() && overWriteDirectory)
+	{
+		destinationDirectory.removeRecursively();
+	}
+
+	originDirectory.mkpath(destinationDir);
+
+	foreach (QString directoryName, originDirectory.entryList(QDir::Dirs | \
+															  QDir::NoDotAndDotDot))
+	{
+		QString destinationPath = destinationDir + "/" + directoryName;
+		originDirectory.mkpath(destinationPath);
+		copyPath(sourceDir + "/" + directoryName, destinationPath, overWriteDirectory);
+	}
+
+	foreach (QString fileName, originDirectory.entryList(QDir::Files))
+	{
+		QFile::copy(sourceDir + "/" + fileName, destinationDir + "/" + fileName);
+	}
+
+	/*! Possible race-condition mitigation? */
+	QDir finalDestination(destinationDir);
+	finalDestination.refresh();
+
+	if(finalDestination.exists())
+	{
+		return true;
+	}
+
+	return false;
 }
 
 void MainWindowActions::exportDataSlot()
