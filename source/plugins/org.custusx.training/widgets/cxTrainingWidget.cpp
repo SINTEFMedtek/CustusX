@@ -123,7 +123,7 @@ void TrainingWidget::createActions()
 
 void TrainingWidget::createSteps(unsigned numberOfSteps)
 {
-	CX_LOG_DEBUG() << "Creating " << numberOfSteps << " steps!";
+//	CX_LOG_DEBUG() << "Creating " << numberOfSteps << " steps!";
 	mSessionIDs.clear();
 
 	for (unsigned i=1; i<=numberOfSteps; ++i)
@@ -144,7 +144,7 @@ CXToolButton* TrainingWidget::addToolButtonFor(QHBoxLayout* layout, QAction* act
 
 void TrainingWidget::toWelcomeStep()
 {
-	std::cout << "toWelcomeStep" << std::endl;
+//	std::cout << "toWelcomeStep" << std::endl;
 }
 
 void TrainingWidget::onImportSimulatedPatient()
@@ -162,12 +162,12 @@ void TrainingWidget::onStep(int delta)
 
 void TrainingWidget::stepTo(int step)
 {
-	CX_LOG_DEBUG() << "stepTo " << step;
+//	CX_LOG_DEBUG() << "stepTo " << step;
 	step = std::min<int>(step, mSessionIDs.size()-1);
 	step = std::max<int>(step, 0);
 	mCurrentStep = step;
-    CX_LOG_DEBUG() << "Current step is now " << mCurrentStep;
-	CX_LOG_DEBUG() << "mSessionIDs.size(): " << mSessionIDs.size();
+//    CX_LOG_DEBUG() << "Current step is now " << mCurrentStep;
+//	CX_LOG_DEBUG() << "mSessionIDs.size(): " << mSessionIDs.size();
 
 	mBrowser->showHelpForKeyword(mSessionIDs[mCurrentStep]);
 
@@ -176,15 +176,15 @@ void TrainingWidget::stepTo(int step)
 
 void TrainingWidget::transitionToStep(int step)
 {
-	CX_LOG_DEBUG() << "Want to transition to step " << step;
+//	CX_LOG_DEBUG() << "Want to transition to step " << step;
 	int transitionNumber = step;
 	if(transitionNumber >= 0)
 	{
-		CX_LOG_DEBUG() << "Going to execute transition number " << transitionNumber;
+//		CX_LOG_DEBUG() << "Going to execute transition number " << transitionNumber;
 		func_t transition = mTransitions.at(transitionNumber);
 		if(transition)
 		{
-			CX_LOG_DEBUG() << "Transitioning";
+//			CX_LOG_DEBUG() << "Transitioning";
 			transition();
 		}
 	}
