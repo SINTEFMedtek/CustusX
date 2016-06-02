@@ -70,6 +70,11 @@ void NeuroTrainingWidget::onImport()
 
 void NeuroTrainingWidget::setUSSimulatorInput(QString usUid)
 {
+	if(usUid.isEmpty())
+	{
+		CX_LOG_DEBUG() << "NeuroTrainingWidget::setUSSimulatorInput: usUid is empty, not changing existing.";
+		return;
+	}
 	cx::StreamerService* streamerService = cx::StreamerServiceUtilities::getStreamerServiceFromType("ussimulator_streamer", mPluginContext);
 	SimulatedStreamerService* simulatorStreamerService = dynamic_cast<SimulatedStreamerService*>(streamerService);
 	if(simulatorStreamerService)
