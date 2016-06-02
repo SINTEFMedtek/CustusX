@@ -99,7 +99,7 @@ void TrainingWidget::createActions()
 {
 	mImportAction = this->createAction2(this,
 										QIcon(":/icons/open_icon_library/document-open-7.png"),
-										"Import new training dataset", "Import new training patient folder",
+										"Import new training dataset", "Clear current data and import new training patient folder",
 										//SLOT(onImport()),
 										NULL);
 
@@ -149,6 +149,7 @@ void TrainingWidget::toWelcomeStep()
 
 void TrainingWidget::onImportSimulatedPatient()
 {
+	triggerMainWindowActionWithObjectName("ClearPatient");
 	triggerMainWindowActionWithObjectName("LoadFile");
 
 	//Transition to first step after welcome
