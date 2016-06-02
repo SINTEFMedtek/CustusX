@@ -62,7 +62,7 @@ NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, ctkPluginConte
 void NeuroTrainingWidget::onImport()
 {
 	this->setUSSimulatorInput(this->getFirstUSVolume());
-	this->makeUnavailable("Kaisa");
+//	this->makeUnavailable("Kaisa");
 	this->makeUnavailable("US", true);
 
 	this->changeWorkflowToImport();
