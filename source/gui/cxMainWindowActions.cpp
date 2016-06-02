@@ -289,6 +289,7 @@ void MainWindowActions::loadPatientFileCopySlot()
 	mServices->session()->load(newFolder);
 }
 
+//From http://stackoverflow.com/questions/2536524/copy-directory-using-qt
 bool MainWindowActions::copyPath(QString sourceDir, QString destinationDir, bool overWriteDirectory)
 {
 	QDir originDirectory(sourceDir);

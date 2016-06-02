@@ -46,7 +46,7 @@ SecondaryMainWindow::SecondaryMainWindow(QWidget* parent, QWidget* widget) :
 	this->addAsDockWidget(widget, true);
 
 	//Define geometry to prevent the window from being placed in the center of the screen.
-	this->setGeometry(100, 600, 400, 400);
+	this->setGeometry(0, 600, 600, 400);
 }
 
 SecondaryMainWindow::~SecondaryMainWindow()
