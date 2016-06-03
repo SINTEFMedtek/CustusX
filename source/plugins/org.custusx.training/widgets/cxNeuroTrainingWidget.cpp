@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationService.h"
 #include "cxMesh.h"
 #include "cxRegServices.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -130,7 +131,7 @@ void NeuroTrainingWidget::on3DUSAcqStep()
 
 void NeuroTrainingWidget::startTracking()
 {
-	triggerMainWindowActionWithObjectName("TrackingTools");
+	mServices->tracking()->setState(Tool::tsTRACKING);;
 }
 
 void NeuroTrainingWidget::changeWorkflowToImport()
