@@ -61,7 +61,7 @@ class org_custusx_training_EXPORT TrainingWidget : public BaseWidget
 	Q_OBJECT
 
 public:
-	explicit TrainingWidget(VisServicesPtr services, QString objectName, QString windowTitle, QWidget* parent = NULL);
+	explicit TrainingWidget(RegServicesPtr services, QString objectName, QString windowTitle, QWidget* parent = NULL);
 	virtual ~TrainingWidget();
 
 protected:
@@ -73,9 +73,10 @@ protected:
 
 protected:
 	void makeUnavailable(QString uidPart, bool makeModalityUnavailable = false);
-	VisServicesPtr mServices;
+	RegServicesPtr mServices;
 
 	QString getFirstUSVolume();
+	MeshPtr getMesh(QString uidPart);
 private slots:
     void onImportSimulatedPatient();
 

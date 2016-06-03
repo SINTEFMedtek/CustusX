@@ -37,6 +37,7 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceVisualization
     org_custusx_core_state
+    org_custusx_registration
     org_custusx_registration_gui
     org_custusx_core_video
 )

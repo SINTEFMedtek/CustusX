@@ -46,7 +46,7 @@ class NeuroTrainingWidget : public TrainingWidget
 	void changeWorkflowToUSAcquisition();
 	void changeWorkflowToImport();
 public:
-	explicit NeuroTrainingWidget(VisServicesPtr services, ctkPluginContext *context, QWidget* parent = NULL);
+	explicit NeuroTrainingWidget(RegServicesPtr services, ctkPluginContext *context, QWidget* parent = NULL);
 
     void onImport();
 	void onRegisterStep();
@@ -57,6 +57,7 @@ public:
 private:
 	ctkPluginContext* mPluginContext;
 	void setUSSimulatorInput(QString usUid);
+	void setSurfaceForPointCloudRegistration(QString uidPart);
 };
 
 } // cx

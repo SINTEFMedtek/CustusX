@@ -40,12 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxApplication.h"
 #include "cxPatientModelService.h"
-#include "cxVisServices.h"
 #include "cxImage.h"
+#include "cxMesh.h"
+#include "cxRegServices.h"
 
 namespace cx {
 
-TrainingWidget::TrainingWidget(VisServicesPtr services, QString objectName, QString windowTitle, QWidget* parent) :
+TrainingWidget::TrainingWidget(RegServicesPtr services, QString objectName, QString windowTitle, QWidget* parent) :
 	BaseWidget(parent, objectName, windowTitle),
 	mServices(services)
 {
@@ -206,6 +207,19 @@ QString TrainingWidget::getFirstUSVolume()
 			return image->getUid();
 	}
 	return QString();
+}
+
+MeshPtr TrainingWidget::getMesh(QString uidPart)
+{
+	std::map<QString, MeshPtr> datas = mServices->patient()->getDataOfType<Mesh>();
+	std::map<QString, MeshPtr>::iterator iter = datas.begin();
+	for(; iter != datas.end(); ++iter)
+	{
+		MeshPtr mesh = iter->second;
+		if(mesh && mesh->getUid().contains(uidPart))
+			return mesh;
+	}
+	return MeshPtr();
 }
 
 void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailable)

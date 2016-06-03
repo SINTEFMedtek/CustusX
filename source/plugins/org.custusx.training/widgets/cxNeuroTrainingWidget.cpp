@@ -35,16 +35,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxApplication.h"
 #include "cxSettings.h"
 #include "cxLogger.h"
-#include "cxVisServices.h"
 #include "cxStateService.h"
 #include "cxApplicationsParser.h"
 #include "cxRegistrationWidget.h"
 #include "cxStreamerServiceUtilities.h"
+#include "cxRegistrationService.h"
+#include "cxMesh.h"
+#include "cxRegServices.h"
 
 namespace cx
 {
 
-NeuroTrainingWidget::NeuroTrainingWidget(VisServicesPtr services, ctkPluginContext* context, QWidget *parent) :
+NeuroTrainingWidget::NeuroTrainingWidget(RegServicesPtr services, ctkPluginContext* context, QWidget *parent) :
 	TrainingWidget(services, "NeuroSimulatorWidget", "Neuro Simulator", parent),
 	mPluginContext(context)
 {
@@ -79,7 +81,7 @@ void NeuroTrainingWidget::setUSSimulatorInput(QString usUid)
 	SimulatedStreamerService* simulatorStreamerService = dynamic_cast<SimulatedStreamerService*>(streamerService);
 	if(simulatorStreamerService)
 	{
-		CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
+//		CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
 		simulatorStreamerService->setImageToStream(usUid);
 	}
 	else
@@ -101,33 +103,28 @@ void NeuroTrainingWidget::changeImageToPatientRegistrationToFast()
 
 void NeuroTrainingWidget::onRegisterStep()
 {
-    std::cout << "onRegisterStep" << std::endl;
-
 	this->startTracking();
 
-    //TODO:
-    // Focus on the registration widget
-    // Populate the registration widget
-
 	this->changeWorkflowToRegistration();
-
+	this->setSurfaceForPointCloudRegistration("Kaisa");
 	this->changeImageToPatientRegistrationToFast();
+}
 
+void NeuroTrainingWidget::setSurfaceForPointCloudRegistration(QString uidPart)
+{
+	MeshPtr mesh = this->getMesh(uidPart);
+	if(mesh)
+		CX_LOG_DEBUG() << "Setting registration fixed data to: " << mesh->getUid();
+	mServices->registration()->setFixedData(mesh);
 }
 
 void NeuroTrainingWidget::onUse2DUSStep()
 {
-    std::cout << "onUse2DUSStep" << std::endl;
-    //TODO: Change workflow and widgets
-
 	this->changeWorkflowToUSAcquisition();
 }
 
 void NeuroTrainingWidget::on3DUSAcqStep()
 {
-    std::cout << "on3DUSAcqStep" << std::endl;
-    //TODO: Change workflow and widgets
-
 	this->changeWorkflowToUSAcquisition();
 }
 
