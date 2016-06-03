@@ -82,7 +82,7 @@ void NeuroTrainingWidget::setUSSimulatorInput(QString usUid)
 	SimulatedStreamerService* simulatorStreamerService = dynamic_cast<SimulatedStreamerService*>(streamerService);
 	if(simulatorStreamerService)
 	{
-//		CX_LOG_DEBUG() << "Setting US simulator input to: " << usUid;
+		CX_LOG_INFO() << "Setting US simulator input to: " << usUid;
 		simulatorStreamerService->setImageToStream(usUid);
 	}
 	else
@@ -115,7 +115,7 @@ void NeuroTrainingWidget::setSurfaceForPointCloudRegistration(QString uidPart)
 {
 	MeshPtr mesh = this->getMesh(uidPart);
 	if(mesh)
-		CX_LOG_DEBUG() << "Setting registration fixed data to: " << mesh->getUid();
+		CX_LOG_INFO() << "Setting registration fixed data to: " << mesh->getUid();
 	mServices->registration()->setFixedData(mesh);
 }
 
