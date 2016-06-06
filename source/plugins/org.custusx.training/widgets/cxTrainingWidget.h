@@ -73,6 +73,7 @@ protected:
 
 protected:
 	void makeUnavailable(QString uidPart, bool makeModalityUnavailable = false);
+	void makeAvailable(QString uidPart, bool makeModalityUnavailable);
 	RegServicesPtr mServices;
 
 	QString getFirstUSVolume();
@@ -88,6 +89,7 @@ private:
     void onStep(int delta);
     void stepTo(int step);
     void transitionToStep(int step);
+	void setAvailability(std::map<QString, DataPtr> datas, bool available, QString uidPart, bool makeModalityUnavailable);
 
     HelpEnginePtr mEngine;
     HelpBrowser* mBrowser;
@@ -99,7 +101,7 @@ private:
     QAction* mNextAction;
     QAction* mCurrentAction;
     QAction* mImportAction;
-    QStringList mSessionIDs;
+	QStringList mSessionIDs;
 };
 
 } /* namespace cx */

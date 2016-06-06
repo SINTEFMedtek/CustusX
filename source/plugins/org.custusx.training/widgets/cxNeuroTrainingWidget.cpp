@@ -55,11 +55,13 @@ NeuroTrainingWidget::NeuroTrainingWidget(RegServicesPtr services, ctkPluginConte
 	func_t transitionToStep2 = boost::bind(&NeuroTrainingWidget::onRegisterStep, this);
 	func_t transitionToStep3 = boost::bind(&NeuroTrainingWidget::onUse2DUSStep, this);
 	func_t transitionToStep4 = boost::bind(&NeuroTrainingWidget::on3DUSAcqStep, this);
+	func_t transitionToStep5 = boost::bind(&NeuroTrainingWidget::onShowAllUSStep, this);
 
 	TrainingWidget::registrateTransition(transitionToStep1);
 	TrainingWidget::registrateTransition(transitionToStep2);
 	TrainingWidget::registrateTransition(transitionToStep3);
 	TrainingWidget::registrateTransition(transitionToStep4);
+	TrainingWidget::registrateTransition(transitionToStep5);
 }
 
 void NeuroTrainingWidget::onImport()
@@ -129,6 +131,12 @@ void NeuroTrainingWidget::on3DUSAcqStep()
 	this->changeWorkflowToUSAcquisition();
 }
 
+void NeuroTrainingWidget::onShowAllUSStep()
+{
+	this->makeAvailable("US", true);
+	this->changeWorkflowToNavigation();
+}
+
 void NeuroTrainingWidget::startTracking()
 {
 	mServices->tracking()->setState(Tool::tsTRACKING);;
@@ -147,6 +155,11 @@ void NeuroTrainingWidget::changeWorkflowToRegistration()
 void NeuroTrainingWidget::changeWorkflowToUSAcquisition()
 {
 	mServices->state()->setWorkFlowState("IntraOpImagingUid");
+}
+
+void NeuroTrainingWidget::changeWorkflowToNavigation()
+{
+	mServices->state()->setWorkFlowState("NavigationUid");
 }
 
 } // cx

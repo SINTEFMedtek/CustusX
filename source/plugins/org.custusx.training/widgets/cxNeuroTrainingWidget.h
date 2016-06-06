@@ -45,6 +45,7 @@ class NeuroTrainingWidget : public TrainingWidget
 	void changeWorkflowToRegistration();
 	void changeWorkflowToUSAcquisition();
 	void changeWorkflowToImport();
+	void changeWorkflowToNavigation();
 public:
 	explicit NeuroTrainingWidget(RegServicesPtr services, ctkPluginContext *context, QWidget* parent = NULL);
 
@@ -53,6 +54,7 @@ public:
 	void onUse2DUSStep();
 	void on3DUSAcqStep();
 	void changeImageToPatientRegistrationToFast();
+	void onShowAllUSStep();
 
 private:
 	ctkPluginContext* mPluginContext;

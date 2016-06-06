@@ -225,6 +225,18 @@ MeshPtr TrainingWidget::getMesh(QString uidPart)
 void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailable)
 {
 	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	this->setAvailability(datas, false, uidPart, makeModalityUnavailable);
+}
+
+
+void TrainingWidget::makeAvailable(QString uidPart, bool makeModalityUnavailable)
+{
+	std::map<QString, DataPtr> datas = mServices->patient()->getAllData();
+	this->setAvailability(datas, true, uidPart, makeModalityUnavailable);
+}
+
+void TrainingWidget::setAvailability(std::map<QString, DataPtr> datas, bool available, QString uidPart, bool makeModalityUnavailable)
+{
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 
 	for(; iter != datas.end(); ++iter)
@@ -233,9 +245,9 @@ void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailab
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 
 		if (makeModalityUnavailable && image && image->getModality().contains(uidPart))
-			mServices->patient()->makeAvailable(image->getUid(), false);
+			mServices->patient()->makeAvailable(image->getUid(), available);
 		else if (data && data->getUid().contains(uidPart))
-			mServices->patient()->makeAvailable(data->getUid(), false);
+			mServices->patient()->makeAvailable(data->getUid(), available);
 	}
 }
 
