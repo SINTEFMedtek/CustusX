@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxEnumConverter.h"
 #include "cxViewService.h"
+#include "cxViewGroupData.h"
 class QIcon;
 class QWidget;
 class QMenu;
@@ -56,7 +57,6 @@ using cx::Transform3D;
  * \addtogroup org_custusx_core_view
  * @{
  */
-
 
 /**
  * \class CameraStyleForView
@@ -78,8 +78,8 @@ public:
 
 	/** Select tool style. This replaces the vtkInteractor Style.
 	  */
-	void setCameraStyle(CAMERA_STYLE_TYPE style);
-	CAMERA_STYLE_TYPE getCameraStyle();
+	void setCameraStyle(CameraStyleData style);
+	CameraStyleData getCameraStyle();
 
 private slots:
 	void setModified();
@@ -90,16 +90,16 @@ private:
 	vtkRendererPtr getRenderer() const;
 	vtkCameraPtr getCamera() const;
 	ToolRep3DPtr getToolRep() const;
-	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
+	bool isToolFollowingStyle() const;
 	void onPreRender();
-	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
+	void applyCameraStyle(); ///< receives transforms from the tool which the camera should follow
 
 	void connectTool();
 	void disconnectTool();
 	void viewportChangedSlot();
-	void updateCamera();
+//	void updateCamera();
 
-	CAMERA_STYLE_TYPE mCameraStyleForView; ///< the current CameraStyleForView
+	CameraStyleData mStyle; ///< the current CameraStyleForView
 	ToolPtr mFollowingTool; ///< the tool the camera is following
 	ViewportListenerPtr mViewportListener;
 	ViewportPreRenderListenerPtr mPreRenderListener;
@@ -107,6 +107,17 @@ private:
 
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
+//	void moveCameraDefaultStyle();
+	Vector3D elevateCamera(double angle, Vector3D camera, Vector3D focus, Vector3D vup);
+	Vector3D orthogonalize_vup(Vector3D vup, Vector3D vpn, Vector3D vup_fallback);
+	DoubleBoundingBox3D getMaxROI();
+	DoubleBoundingBox3D getROI();
+	std::vector<Vector3D> getCorners_r(DataPtr data);
+	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin);
+	double findCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
+	double findMaxCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D &bb);
+public:
+	static Vector3D findCameraPosOnLineFixedDistanceFromFocus(Vector3D p_line, Vector3D e_line, double distance, Vector3D focus);
 };
 
 /**

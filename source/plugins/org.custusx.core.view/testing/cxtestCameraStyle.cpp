@@ -30,64 +30,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxViewService.h"
-#include "cxViewServiceNull.h"
-#include "cxNullDeleter.h"
+#include "catch.hpp"
+#include "cxCameraStyleForView.h"
 
-#include "cxRepContainer.h"
-#include "cxView.h"
-#include "cxEnumConverter.h"
-
-SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
+void test_findCameraPosOnLineFixedDistanceFromFocus(cx::Vector3D p_line, cx::Vector3D e_line, double distance, cx::Vector3D focus)
 {
-	"DEFAULT_STYLE",
-	"TOOL_STYLE",
-	"ANGLED_TOOL_STYLE",
-	"UNICAM_STYLE"
-}
-SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CAMERA_STYLE_TYPE, cstCOUNT)
-
-namespace cx
-{
-ViewServicePtr ViewService::getNullObject()
-{
-	static ViewServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new ViewServiceNull, null_deleter());
-	return mNull;
+	cx::Vector3D p = cx::CameraStyleForView::findCameraPosOnLineFixedDistanceFromFocus(p_line, e_line, distance, focus);
+	CHECK(cx::similar((p-focus).length(), distance));
 }
 
-
-unsigned ViewService::groupCount() const
+TEST_CASE("CameraStyleForView: findCameraPosOnLineFixedDistanceFromFocus ", "[unit]")
 {
-	int count = 0;
-	while(this->getGroup(count))
-		++count;
-	return count;
+	test_findCameraPosOnLineFixedDistanceFromFocus(cx::Vector3D(0,0,0), cx::Vector3D(0,1,0),  2, cx::Vector3D(1,0,0));
+	test_findCameraPosOnLineFixedDistanceFromFocus(cx::Vector3D(0,0,0), cx::Vector3D(0,1,0), 10, cx::Vector3D(1,1,0));
+	test_findCameraPosOnLineFixedDistanceFromFocus(cx::Vector3D(2,2,0), cx::Vector3D(0,1,0), 10, cx::Vector3D(1,1,0));
+	test_findCameraPosOnLineFixedDistanceFromFocus(cx::Vector3D(2,2,0), cx::Vector3D(1,1,0), 20, cx::Vector3D(1,2,0));
+	test_findCameraPosOnLineFixedDistanceFromFocus(cx::Vector3D(2,2,0), cx::Vector3D(1,1,0), 20, cx::Vector3D(1,2,4));
 }
-
-void ViewService::deactivateLayout()
-{
-	this->setActiveLayout("", 0);
-	this->setActiveLayout("", 1);
-}
-
-RepContainerPtr ViewService::get3DReps(int group, int index)
-{
-	ViewPtr view = this->get3DView(group, index);
-
-	if(view)
-		return RepContainerPtr(new RepContainer(view->getReps()));
-	else
-		return RepContainerPtr(new RepContainer(std::vector<RepPtr>()));
-}
-
-ViewGroupDataPtr ViewService::getActiveViewGroup()
-{
-	int groupId = this->getActiveGroupId();
-	return this->getGroup(groupId);
-}
-
-} //cx
-
 

@@ -1,3 +1,6 @@
+#ifndef CXCAMERASTYLEINTERACTOR_H
+#define CXCAMERASTYLEINTERACTOR_H
+
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
@@ -30,64 +33,63 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxViewService.h"
-#include "cxViewServiceNull.h"
-#include "cxNullDeleter.h"
+#include "cxResourceVisualizationExport.h"
 
-#include "cxRepContainer.h"
-#include "cxView.h"
+#include <QPointer>
+#include "cxTransform3D.h"
+#include "cxForwardDeclarations.h"
 #include "cxEnumConverter.h"
-
-SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
-{
-	"DEFAULT_STYLE",
-	"TOOL_STYLE",
-	"ANGLED_TOOL_STYLE",
-	"UNICAM_STYLE"
-}
-SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CAMERA_STYLE_TYPE, cstCOUNT)
+class QIcon;
+class QWidget;
+class QMenu;
+class QActionGroup;
 
 namespace cx
 {
-ViewServicePtr ViewService::getNullObject()
+
+typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+
+/**
+ * \file
+ * \addtogroup org_custusx_core_view
+ * @{
+ */
+
+
+/** GUI interaction for the CameraStyle.
+ *
+ * Connect to one CameraStyle instance, then
+ * connect the internal actions to that instance.
+ * The actions can be used by calling createInteractorStyleActionGroup.
+ *
+ * \date Dec 9, 2008
+ * \author Janne Beate Bakeng, SINTEF
+ * \author Christian Askeland, SINTEF
+ */
+class cxResourceVisualization_EXPORT CameraStyleInteractor: public QObject
 {
-	static ViewServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new ViewServiceNull, null_deleter());
-	return mNull;
-}
+Q_OBJECT
+public:
+	explicit CameraStyleInteractor();
+	QActionGroup* getInteractorStyleActionGroup();
+	void connectCameraStyle(ViewGroupDataPtr vg);
+
+private slots:
+	void setInteractionStyleActionSlot();
+	void updateActionGroup();
+private:
+	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
+					QString helptext);
+	QPointer<QActionGroup> mCameraStyleGroup;
+	ViewGroupDataPtr mGroup;
+	CoreServicesPtr mBackend;
+};
+typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
+
+/**
+ * @}
+ */
+} //namespace cx
 
 
-unsigned ViewService::groupCount() const
-{
-	int count = 0;
-	while(this->getGroup(count))
-		++count;
-	return count;
-}
-
-void ViewService::deactivateLayout()
-{
-	this->setActiveLayout("", 0);
-	this->setActiveLayout("", 1);
-}
-
-RepContainerPtr ViewService::get3DReps(int group, int index)
-{
-	ViewPtr view = this->get3DView(group, index);
-
-	if(view)
-		return RepContainerPtr(new RepContainer(view->getReps()));
-	else
-		return RepContainerPtr(new RepContainer(std::vector<RepPtr>()));
-}
-
-ViewGroupDataPtr ViewService::getActiveViewGroup()
-{
-	int groupId = this->getActiveGroupId();
-	return this->getGroup(groupId);
-}
-
-} //cx
-
-
+#endif // CXCAMERASTYLEINTERACTOR_H

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxPlaneTypeCollection.h"
+#include "cxViewService.h"
 class QDomNode;
 
 namespace cx
@@ -58,7 +59,24 @@ typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
  * \addtogroup cx_resource_view
  * @{
  */
+struct CameraStyleData
+{
+	CameraStyleData();
+	explicit CameraStyleData(CAMERA_STYLE_TYPE style);
+	void setCameraStyle(CAMERA_STYLE_TYPE style);
+	CAMERA_STYLE_TYPE getStyle();
+	void clear();
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode dataNode);
 
+	bool mCameraFollowTool;
+	bool mFocusFollowTool;
+	bool mTableLock;
+	double mElevation;
+	bool mUniCam;
+	QString mAutoZoomROI; // name of ROI to zoom to, and set focus in.
+};
+bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs);
 
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
@@ -141,7 +159,9 @@ public:
 		Options();
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
+//		bool mLockToTable; ///< lock the 3D view orientation to have Table down.
 		MeshPtr mPickerGlyph;
+		CameraStyleData mCameraStyle;
 	};
 
 	Options getOptions() const;

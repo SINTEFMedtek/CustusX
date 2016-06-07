@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QToolButton>
 #include <QIcon>
 #include "cxBaseWidget.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -69,12 +70,12 @@ PopupButton::PopupButton(QWidget* parent)
 
 bool PopupButton::getShowPopup() const
 {
-	return mShowHeaderButton->isChecked();
+	return mAction->isChecked();
 }
 
 void PopupButton::setShowPopup(bool val)
 {
-	mShowHeaderButton->setChecked(val);
+	mAction->setChecked(val);
 }
 
 void PopupButton::onTriggered()

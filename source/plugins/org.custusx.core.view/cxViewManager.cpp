@@ -74,6 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
 #include "cxPatientModelService.h"
+#include "cxCameraStyleInteractor.h"
 
 namespace cx
 {
@@ -578,12 +579,12 @@ void ViewManager::updateCameraStyleActions()
 
 	if (index<0)
 	{
-		mCameraStyleInteractor->connectCameraStyle(CameraStylePtr());
+		mCameraStyleInteractor->connectCameraStyle(ViewGroupDataPtr());
 	}
 	else
 	{
 		ViewGroupPtr group = this->getViewGroups()[index];
-		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+		mCameraStyleInteractor->connectCameraStyle(group->getData());
 		mCameraControl->setView(this->get3DView(index, 0));
 	}
 

@@ -101,7 +101,8 @@ protected:
 
 private:
 	template<class T>
-    bool shouldUpdateActiveData(T activeData, std::vector<T> datas) const;
+	bool shouldUpdateActiveData(T activeData, std::vector<T> datas) const;
+	void optionChangedSlot();
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
