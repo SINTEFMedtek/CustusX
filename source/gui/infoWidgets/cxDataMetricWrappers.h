@@ -263,7 +263,7 @@ private:
   DoublePropertyPtr createThicknessSelector() const;
   DoublePropertyPtr createHeightSelector() const;
   BoolPropertyPtr createFlatSelector() const;
-  BoolPropertyPtr createDirectionDefinesUpSelector() const;
+  StringPropertyPtr createDefineVectorUpMethodSelector() const;
   FilePathPropertyPtr createSTLFileSelector() const;
 
   CustomMetricPtr mData;
@@ -271,7 +271,7 @@ private:
   DoublePropertyPtr mThickness;
   DoublePropertyPtr mHeight;
   BoolPropertyPtr mFlat;
-  BoolPropertyPtr mDirectionDefinesUp;
+  StringPropertyPtr mDefineVectorUpMethod;
   FilePathPropertyPtr mSTLFile;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
