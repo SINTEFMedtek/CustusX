@@ -110,10 +110,10 @@ private:
 //	void moveCameraDefaultStyle();
 	Vector3D elevateCamera(double angle, Vector3D camera, Vector3D focus, Vector3D vup);
 	Vector3D orthogonalize_vup(Vector3D vup, Vector3D vpn, Vector3D vup_fallback);
-	DoubleBoundingBox3D getMaxROI();
+//	DoubleBoundingBox3D getMaxROI();
 	DoubleBoundingBox3D getROI();
-	std::vector<Vector3D> getCorners_r(DataPtr data);
-	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin);
+//	std::vector<Vector3D> getCorners_r(DataPtr data);
+//	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin);
 	double findCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
 	double findMaxCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D &bb);
 public:

@@ -53,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
 #include "cxSpaceProperty.h"
-
+#include "cxStringListProperty.h"
+#include "cxStringListSelectWidget.h"
 //TODO :remove
 #include "cxLegacySingletons.h"
 
@@ -962,6 +963,117 @@ DoublePropertyPtr SphereMetricWrapper::createRadiusSelector() const
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+RegionOfInterestMetricWrapper::RegionOfInterestMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, RegionOfInterestMetricPtr data) :
+	MetricBase(viewService, patientModelService),
+	mData(data)
+{
+//	mArguments.setArguments(data->getArguments());
+	mInternalUpdate = false;
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+}
+
+QWidget* RegionOfInterestMetricWrapper::createWidget()
+{
+	QWidget* widget = new QWidget;
+	QVBoxLayout* topLayout = new QVBoxLayout(widget);
+	QHBoxLayout* hLayout = new QHBoxLayout;
+	hLayout->setMargin(0);
+	topLayout->setMargin(0);
+	topLayout->addLayout(hLayout);
+
+	mDataListProperty = this->createDataListProperty();
+	StringListSelectWidget* datalistwidget = new StringListSelectWidget(widget, mDataListProperty);
+	topLayout->addWidget(datalistwidget);
+
+	mUseActiveTooltipProperty = this->createUseActiveTooltipSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mUseActiveTooltipProperty));
+
+	this->addColorWidget(topLayout);
+	topLayout->addStretch();
+
+	this->dataChangedSlot();
+	return widget;
+}
+
+DataMetricPtr RegionOfInterestMetricWrapper::getData() const
+{
+	return mData;
+}
+QString RegionOfInterestMetricWrapper::getType() const
+{
+	return "roi";
+}
+
+QString RegionOfInterestMetricWrapper::getArguments() const
+{
+	return "";
+}
+
+void RegionOfInterestMetricWrapper::dataChangedSlot()
+{
+
+}
+
+StringListPropertyPtr RegionOfInterestMetricWrapper::createDataListProperty()
+{
+	StringListPropertyPtr retval = StringListProperty::initialize("data_list",
+														"Data",
+														"Select data to define ROI",
+														QStringList(),
+														QStringList());
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+BoolPropertyPtr RegionOfInterestMetricWrapper::createUseActiveTooltipSelector() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Use Tool Tip", "",
+											  "Include tool tip in the roi",
+											  false);
+
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+
+void RegionOfInterestMetricWrapper::update()
+{
+	mInternalUpdate = true;
+
+	QStringList data;
+	std::map<QString, QString> names;
+	std::map<QString, DataPtr> alldata = mPatientModelService->getData();
+	for (std::map<QString, DataPtr>::iterator i=alldata.begin(); i!=alldata.end(); ++i)
+	{
+		if (i->first == mData->getUid())
+			continue;
+		data << i->first;
+		names[i->first] = i->second->getName();
+	}
+
+	mDataListProperty->setValue(mData->getDataList());
+	mDataListProperty->setValueRange(data);
+	mDataListProperty->setDisplayNames(names);
+
+	mUseActiveTooltipProperty->setValue(mData->getUseActiveTooltip());
+
+	mInternalUpdate = false;
+}
+
+void RegionOfInterestMetricWrapper::guiChanged()
+{
+	if (mInternalUpdate)
+		return;
+	mData->setDataList(mDataListProperty->getValue());
+	mData->setUseActiveTooltip(mUseActiveTooltipProperty->getValue());
+}
+
 
 
 

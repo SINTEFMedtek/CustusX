@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include "cxLogger.h"
 #include "cxCameraStyleInteractor.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx
 {
@@ -142,11 +143,12 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 									   true);
 	mCameraStyleProperties.push_back(mUniCam);
 
-	mAutoZoomROI = StringProperty::initialize("Auto Zoom ROI", "",
-											  "Zoom so that the given ROI always is visible",
-											  "",
-											  QStringList()
-											  );
+	StringPropertySelectDataPtr autozoom = StringPropertySelectData::New(mServices->patient());
+	autozoom->setValueName("Auto Zoom ROI");
+	autozoom->setHelp("Zoom so that the given ROI always is visible");
+	autozoom->setTypeRegexp("roi");
+	mAutoZoomROI = autozoom;
+
 	mCameraStyleProperties.push_back(mAutoZoomROI);
 
 	for (unsigned i=0; i<mCameraStyleProperties.size(); ++i)
@@ -175,7 +177,6 @@ void ViewGroupPropertiesWidget::createCameraStyleWidget()
 	QGridLayout *cameraStyleLayout = new QGridLayout;
 	layout->addLayout(cameraStyleLayout);
 	cameraStyleLayout->setMargin(0);
-	groupBox->setLayout(cameraStyleLayout);
 	int count = 0;
 	for (unsigned i=0; i<mCameraStyleProperties.size(); ++i)
 	{

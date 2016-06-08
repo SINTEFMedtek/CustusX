@@ -76,7 +76,7 @@ private:
   BoolPropertyPtr mTableLock;
   BoolPropertyPtr mUniCam;
   DoublePropertyPtr mElevation;
-  StringPropertyPtr mAutoZoomROI;
+  StringPropertyBasePtr mAutoZoomROI;
   std::vector<PropertyPtr> mCameraStyleProperties;
   CameraStyleInteractorPtr mCameraStyleInteractor;
 

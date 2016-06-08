@@ -65,15 +65,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustomMetaImage.h"
 #include "cxConfig.h"
 
-//#include "cxPointMetric.h"
-//#include "cxDistanceMetric.h"
-//#include "cxPlaneMetric.h"
-//#include "cxAngleMetric.h"
-//#include "cxShapedMetric.h"
-//#include "cxSphereMetric.h"
-//#include "cxFrameMetric.h"
-//#include "cxToolMetric.h"
-
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
 

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxRepContainer.h"
 #include "cxLogger.h"
+#include "cxRegionOfInterestMetric.h"
 
 namespace cx
 {
@@ -162,29 +163,23 @@ void CameraStyleForView::applyCameraStyle()
 
 		if (mStyle.mCameraFollowTool)
 		{
-			// Set camera on line from focus point to tool offset point,
+//			// Set camera on line from focus point to tool offset point,
+//			Vector3D tooloffset = rMt.coord(Vector3D(0, 0, offset));
+//			Vector3D vpn = tooloffset - focus_r;
+//			// Solve zero line cases by using tool line
+//			if (vpn.length()<0.01)
+//				vpn = rMt.vector(Vector3D(0,0,-1));
+//			vpn = vpn.normal();
+//			// ... at a distance cameraOffset from the focus point.
+
+			// set camera on the tool line, at a distance 'cameraOffset' from the focus.
 			Vector3D tooloffset = rMt.coord(Vector3D(0, 0, offset));
-			Vector3D vpn = tooloffset - focus_r;
-			// Solve zero line cases by using tool line
-			if (vpn.length()<0.01)
-				vpn = rMt.vector(Vector3D(0,0,-1));
-			vpn = vpn.normal();
-			// ... at a distance cameraOffset from the focus point.
-
-
 			Vector3D e_tool = rMt.vector(Vector3D(0, 0, 1));
 			camera_r = this->findCameraPosOnLineFixedDistanceFromFocus(tooloffset, e_tool, cameraOffset, focus_r);
-
 
 //			camera_r = focus_r + cameraOffset * vpn;
 		}
 	}
-
-//	CX_LOG_CHANNEL_DEBUG("CA") << "\nCameraStyleForView::applyCameraStyle()";
-//	std::cout << "pos " << pos_old << " to " << camera_r << std::endl;
-//	std::cout << "foc " << focus_old << " to " << focus_r << std::endl;
-//	std::cout << "vpn " << (camera_r-focus_r).normal() << std::endl;
-//	std::cout << "vup " << vup_old << " to " << vup_r << std::endl;
 
 	if (mStyle.mTableLock)
 	{
@@ -209,18 +204,21 @@ void CameraStyleForView::applyCameraStyle()
 
 	if (!mStyle.mAutoZoomROI.isEmpty())
 	{
-		DoubleBoundingBox3D roi_r = this->getMaxROI();
-		double viewAngle = camera->GetViewAngle()/180.0*M_PI;
-		Vector3D vpn = (camera_r-focus_r).normal();
-		double dist = this->findMaxCameraDistance(viewAngle, focus_r, vpn, roi_r);
-		Vector3D camera_r_t = focus_r + vpn*dist;
-//		std::cout << "      roi_r: <" << roi_r << std::endl;
-//		std::cout << "      camera_r: < " << camera_r << " >" << std::endl;
-//		std::cout << "      vpn: < " << vpn << " >" << std::endl;
-//		std::cout << "      focus_r: < " << focus_r << " >" << std::endl;
-//		std::cout << "      dist: < " << dist << " >" << std::endl;
-//		std::cout << "      "  << std::endl;
-		camera_r = camera_r_t;
+		DoubleBoundingBox3D roi_r = this->getROI();
+		if (roi_r != DoubleBoundingBox3D::zero())
+		{
+			double viewAngle = camera->GetViewAngle()/180.0*M_PI;
+			Vector3D vpn = (camera_r-focus_r).normal();
+			double dist = this->findMaxCameraDistance(viewAngle, focus_r, vpn, roi_r);
+			Vector3D camera_r_t = focus_r + vpn*dist;
+					std::cout << "      roi_r: <" << roi_r << std::endl;
+			//		std::cout << "      camera_r: < " << camera_r << " >" << std::endl;
+			//		std::cout << "      vpn: < " << vpn << " >" << std::endl;
+			//		std::cout << "      focus_r: < " << focus_r << " >" << std::endl;
+			//		std::cout << "      dist: < " << dist << " >" << std::endl;
+			//		std::cout << "      "  << std::endl;
+			camera_r = camera_r_t;
+		}
 	}
 
 //	CX_LOG_CHANNEL_DEBUG("CA") << " pos " << Vector3D(camera->GetPosition());
@@ -315,90 +313,99 @@ double CameraStyleForView::findCameraDistance(double viewAngle, Vector3D focus, 
 
 DoubleBoundingBox3D CameraStyleForView::getROI()
 {
-	// create a dummy ROI containing vol center and tool plus margin
-	std::map<QString, DataPtr> alldata = mBackend->patient()->getData();
-	std::map<QString, DataPtr> data;
-	// spike: add one data
-	data["point1"] = alldata["point1"];
-
-	std::vector<Vector3D> points;
-	// create a max ROI containing all data plus margin
-	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
-	{
-		std::vector<Vector3D> c = this->getCorners_r(i->second);
-		std::copy(c.begin(), c.end(), back_inserter(points));
-	}
-
-	if (mFollowingTool)
-	{
-		Transform3D rMpr = mBackend->patient()->get_rMpr();
-		Transform3D prMt = mFollowingTool->get_prMt();
-		Transform3D rMt = rMpr * prMt;
-		double offset = mFollowingTool->getTooltipOffset();
-		Vector3D tp = rMt.coord(Vector3D(0, 0, offset));
-		points.push_back(tp);
-	}
-
-	double margin = 20;
-	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, margin);
-	return bb;
+	DataPtr data = mBackend->patient()->getData(mStyle.mAutoZoomROI);
+	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+	if (roi)
+		return roi->getROI();
+	return DoubleBoundingBox3D::zero();
 }
 
-DoubleBoundingBox3D CameraStyleForView::getMaxROI()
-{
-	std::map<QString, DataPtr> alldata = mBackend->patient()->getData();
-	if (alldata.empty())
-		return DoubleBoundingBox3D::zero();
-	std::vector<Vector3D> points;
-	// create a max ROI containing all data plus margin
-	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
-	{
-		std::vector<Vector3D> c = this->getCorners_r(i->second);
-		std::copy(c.begin(), c.end(), back_inserter(points));
-	}
+//DoubleBoundingBox3D CameraStyleForView::getROI()
+//{
+//	// create a dummy ROI containing vol center and tool plus margin
+//	std::map<QString, DataPtr> alldata = mBackend->patient()->getData();
+//	std::map<QString, DataPtr> data;
+//	// spike: add one data
+//	data["point1"] = alldata["point1"];
+
+//	std::vector<Vector3D> points;
+//	// create a max ROI containing all data plus margin
+//	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
+//	{
+//		std::vector<Vector3D> c = this->getCorners_r(i->second);
+//		std::copy(c.begin(), c.end(), back_inserter(points));
+//	}
 
 //	if (mFollowingTool)
-	{
-		Transform3D rMpr = mBackend->patient()->get_rMpr();
-		Transform3D prMt = mBackend->tracking()->getActiveTool()->get_prMt();
-		Transform3D rMt = rMpr * prMt;
-		double offset = 0;
-		Vector3D tp = rMt.coord(Vector3D(0, 0, offset));
-		points.push_back(tp);
-	}
+//	{
+//		Transform3D rMpr = mBackend->patient()->get_rMpr();
+//		Transform3D prMt = mFollowingTool->get_prMt();
+//		Transform3D rMt = rMpr * prMt;
+//		double offset = mFollowingTool->getTooltipOffset();
+//		Vector3D tp = rMt.coord(Vector3D(0, 0, offset));
+//		points.push_back(tp);
+//	}
+
+//	double margin = 20;
+//	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, margin);
+//	return bb;
+//}
+
+//DoubleBoundingBox3D CameraStyleForView::getMaxROI()
+//{
+//	std::map<QString, DataPtr> alldata = mBackend->patient()->getData();
+//	if (alldata.empty())
+//		return DoubleBoundingBox3D::zero();
+//	std::vector<Vector3D> points;
+//	// create a max ROI containing all data plus margin
+//	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
+//	{
+//		std::vector<Vector3D> c = this->getCorners_r(i->second);
+//		std::copy(c.begin(), c.end(), back_inserter(points));
+//	}
+
+////	if (mFollowingTool)
+//	{
+//		Transform3D rMpr = mBackend->patient()->get_rMpr();
+//		Transform3D prMt = mBackend->tracking()->getActiveTool()->get_prMt();
+//		Transform3D rMt = rMpr * prMt;
+//		double offset = 0;
+//		Vector3D tp = rMt.coord(Vector3D(0, 0, offset));
+//		points.push_back(tp);
+//	}
 
 
-	double margin = 20;
-	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, margin);
-	return bb;
-}
+//	double margin = 20;
+//	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, margin);
+//	return bb;
+//}
 
-DoubleBoundingBox3D CameraStyleForView::generateROIFromPointsAndMargin(const std::vector<Vector3D>& points, double margin)
-{
-	DoubleBoundingBox3D bb = DoubleBoundingBox3D::fromCloud(points);
-	Vector3D vmargin(margin,margin, margin);
-	Vector3D bl = bb.bottomLeft() - vmargin;
-	Vector3D tr = bb.topRight() + vmargin;
-	bb = DoubleBoundingBox3D(bl, tr);
+//DoubleBoundingBox3D CameraStyleForView::generateROIFromPointsAndMargin(const std::vector<Vector3D>& points, double margin)
+//{
+//	DoubleBoundingBox3D bb = DoubleBoundingBox3D::fromCloud(points);
+//	Vector3D vmargin(margin,margin, margin);
+//	Vector3D bl = bb.bottomLeft() - vmargin;
+//	Vector3D tr = bb.topRight() + vmargin;
+//	bb = DoubleBoundingBox3D(bl, tr);
 
-	return bb;
-}
+//	return bb;
+//}
 
-std::vector<Vector3D> CameraStyleForView::getCorners_r(DataPtr data)
-{
-	DoubleBoundingBox3D bb = data->boundingBox();
-	std::vector<Vector3D> retval;
+//std::vector<Vector3D> CameraStyleForView::getCorners_r(DataPtr data)
+//{
+//	DoubleBoundingBox3D bb = data->boundingBox();
+//	std::vector<Vector3D> retval;
 
-	for (unsigned x=0; x<2; ++x)
-		for (unsigned y=0; y<2; ++y)
-			for (unsigned z=0; z<2; ++z)
-				retval.push_back(bb.corner(x,y,z));
+//	for (unsigned x=0; x<2; ++x)
+//		for (unsigned y=0; y<2; ++y)
+//			for (unsigned z=0; z<2; ++z)
+//				retval.push_back(bb.corner(x,y,z));
 
-	for (unsigned i=0; i<retval.size(); ++i)
-		retval[i] = data->get_rMd().coord(retval[i]);
+//	for (unsigned i=0; i<retval.size(); ++i)
+//		retval[i] = data->get_rMd().coord(retval[i]);
 
-	return retval;
-}
+//	return retval;
+//}
 
 /**
  * find a vup orthogonal to vpn
