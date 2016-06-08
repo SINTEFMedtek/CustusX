@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
+
 
 /**\brief Class that listens to changes in a coordinate system,
  * and emits a signal if that system changes.
@@ -67,6 +69,7 @@ private:
 
 	TrackingServicePtr mTrackingService;
 	PatientModelServicePtr mDataManager;
+	ActiveToolProxyPtr mActiveTool;
 };
 
 } // namespace cx

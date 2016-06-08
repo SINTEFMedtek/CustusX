@@ -110,7 +110,12 @@ void RegionOfInterestMetric::setUseActiveTooltip(bool val)
 
 void RegionOfInterestMetric::onContentChanged()
 {
+	for (unsigned i=0; i<mListeners.size(); ++i)
+	{
+		disconnect(mListeners[i].get(), &SpaceListener::changed, this, &RegionOfInterestMetric::onContentTransformsChanged);
+	}
 	mListeners.clear();
+
 	this->listenTo(CoordinateSystem(csTOOL_OFFSET, "active"));
 	for (unsigned i=0; i<mContainedData.size(); ++i)
 	{
@@ -130,7 +135,7 @@ void RegionOfInterestMetric::listenTo(CoordinateSystem space)
 void RegionOfInterestMetric::onContentTransformsChanged()
 {
 	emit transformChanged();
-	CX_LOG_CHANNEL_DEBUG("CA") << "ROI " << this->getROI();
+	CX_LOG_CHANNEL_DEBUG("CA") << "RegionOfInterestMetric::onContentTransformsChanged() ROI=" << this->getROI();
 }
 
 DoubleBoundingBox3D RegionOfInterestMetric::boundingBox() const
