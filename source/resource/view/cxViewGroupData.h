@@ -59,7 +59,7 @@ typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
  * \addtogroup cx_resource_view
  * @{
  */
-struct CameraStyleData
+struct cxResourceVisualization_EXPORT CameraStyleData
 {
 	CameraStyleData();
 	explicit CameraStyleData(CAMERA_STYLE_TYPE style);
@@ -76,7 +76,7 @@ struct CameraStyleData
 	bool mUniCam;
 	QString mAutoZoomROI; // name of ROI to zoom to, and set focus in.
 };
-bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs);
+cxResourceVisualization_EXPORT bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs);
 
 /**Define a priority for the input data.
  * High means display on top, low means in the back.

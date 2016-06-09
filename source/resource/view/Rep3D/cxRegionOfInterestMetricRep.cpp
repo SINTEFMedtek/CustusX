@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 
-#include "cxRegionOFInterestMetricRep.h"
+#include "cxRegionOfInterestMetricRep.h"
 #include "cxView.h"
 
 #include <vtkVectorText.h>
