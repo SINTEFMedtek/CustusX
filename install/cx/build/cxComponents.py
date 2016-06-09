@@ -232,7 +232,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('7a50c2d3fda652155ff5d7bde54abafee56d0479')
+        self._getBuilder().gitCheckout('4955717b2f835dda9461361c3074712cc462dc9e')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
