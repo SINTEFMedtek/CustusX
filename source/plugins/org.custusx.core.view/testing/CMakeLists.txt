@@ -17,7 +17,7 @@ if(BUILD_TESTING)
     cxtestVisualizationHelper.cpp
     cxtestViewGroup.cpp
     cxtestViewManager.cpp
-	cxtestCameraStyle.cpp
+	cxtestNavigationAlgorithms.cpp
 	)
   qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
   add_library(cxtest_org_custusx_core_view ${CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES})

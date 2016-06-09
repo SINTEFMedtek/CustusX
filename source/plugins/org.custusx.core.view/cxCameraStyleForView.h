@@ -43,6 +43,7 @@ class QIcon;
 class QWidget;
 class QMenu;
 class QActionGroup;
+class vtkInteractorStyle;
 
 namespace cx
 {
@@ -97,28 +98,17 @@ private:
 	void connectTool();
 	void disconnectTool();
 	void viewportChangedSlot();
-//	void updateCamera();
+	DoubleBoundingBox3D getROI();
+	void setInteractor(vtkSmartPointer<vtkInteractorStyle> style);
 
 	CameraStyleData mStyle; ///< the current CameraStyleForView
 	ToolPtr mFollowingTool; ///< the tool the camera is following
 	ViewportListenerPtr mViewportListener;
 	ViewportPreRenderListenerPtr mPreRenderListener;
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
-
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
-//	void moveCameraDefaultStyle();
-	Vector3D elevateCamera(double angle, Vector3D camera, Vector3D focus, Vector3D vup);
-	Vector3D orthogonalize_vup(Vector3D vup, Vector3D vpn, Vector3D vup_fallback);
-//	DoubleBoundingBox3D getMaxROI();
-	DoubleBoundingBox3D getROI();
-//	std::vector<Vector3D> getCorners_r(DataPtr data);
-//	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin);
-	double findCameraDistanceKeepPointInViewOneAxis(Vector3D n, double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
-	double findCameraDistanceKeepPointInView(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
-	double findMaxCameraDistance(Vector3D n, double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D &bb);
-public:
-	static Vector3D findCameraPosOnLineFixedDistanceFromFocus(Vector3D p_line, Vector3D e_line, double distance, Vector3D focus);
+
 };
 
 /**

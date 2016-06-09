@@ -69,9 +69,7 @@ RegionOfInterestMetricPtr RegionOfInterestMetricRep::getRegionOfInterestMetric()
 
 void RegionOfInterestMetricRep::onModifiedStartRender()
 {
-//	std::cout << "  RegionOfInterestMetricRep::onModifiedStartRender()" << this << "  " << this->getName() << std::endl;
 	RegionOfInterestMetricPtr metric = this->getRegionOfInterestMetric();
-	std::cout << "     " << metric.get() << std::endl;
 	if (!metric)
 		return;
 
