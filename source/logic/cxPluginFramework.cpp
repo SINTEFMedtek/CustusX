@@ -132,8 +132,11 @@ std::vector<PluginFrameworkManager::PluginLoadInfo> PluginFrameworkManager::getP
 
 void PluginFrameworkManager::loadState()
 {
+    CX_LOG_DEBUG() << "mSettingsSearchPaths: " << mSettingsSearchPaths;
 	QStringList paths = settings()->value(mSettingsSearchPaths, QStringList()).toStringList();
 	this->setSearchPaths(paths);
+    CX_LOG_DEBUG() << "mSettingsSearchPaths: " << mSettingsSearchPaths;
+    CX_LOG_DEBUG() << "paths: " << paths.join(", ");
 
 	QStringList names = this->getPluginSymbolicNames();
 	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
@@ -146,7 +149,7 @@ void PluginFrameworkManager::loadState()
 			this->install(info[i].symbolicName);
 	}
 
-
+    CX_LOG_DEBUG() << "start all plugins";
 	// start all plugins
 	for (unsigned i=0; i< info.size(); ++i)
 	{
@@ -281,7 +284,7 @@ void PluginFrameworkManager::startFramework()
 
 void PluginFrameworkManager::install(const QString& symbolicName)
 {
-
+    CX_LOG_DEBUG() << "PluginFrameworkManager::install: " << symbolicName;
 	this->initializeFramework();
 	if (!this->frameworkInitialized())
 		return;
