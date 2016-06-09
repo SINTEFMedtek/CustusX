@@ -114,8 +114,9 @@ private:
 	DoubleBoundingBox3D getROI();
 //	std::vector<Vector3D> getCorners_r(DataPtr data);
 //	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin);
-	double findCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
-	double findMaxCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D &bb);
+	double findCameraDistanceKeepPointInViewOneAxis(Vector3D n, double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
+	double findCameraDistanceKeepPointInView(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p);
+	double findMaxCameraDistance(Vector3D n, double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D &bb);
 public:
 	static Vector3D findCameraPosOnLineFixedDistanceFromFocus(Vector3D p_line, Vector3D e_line, double distance, Vector3D focus);
 };

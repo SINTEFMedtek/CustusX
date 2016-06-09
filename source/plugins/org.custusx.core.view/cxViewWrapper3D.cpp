@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkRep.h"
 #include "cxPointMetricRep.h"
 #include "cxDistanceMetricRep.h"
+#include "cxRegionOfInterestMetricRep.h"
 #include "cxAngleMetricRep.h"
 #include "cxPlaneMetricRep.h"
 #include "cxFrameMetricRep.h"
@@ -696,6 +697,8 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
         rep = CustomMetricRep::New();
 	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
 		rep = SphereMetricRep::New();
+	else if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(data))
+		rep = RegionOfInterestMetricRep::New();
 
     if (rep)
     {

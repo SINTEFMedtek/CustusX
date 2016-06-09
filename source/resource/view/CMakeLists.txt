@@ -41,6 +41,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxMetricNamesRep
     Rep3D/cxStreamRep3D
     Rep3D/cxStream2DRep3D
+	Rep3D/cxRegionOfInterestMetricRep
 
     Rep2D/cxOrientationAnnotationRep
     Rep2D/cxSlicerRepSW
@@ -59,6 +60,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxVolumeProperty
     Primitives/cxVideoSourceGraphics
     Primitives/cxViewFollower
+	Primitives/cxGraphicalBox
 
     RepVideo/cxVideoRep
 

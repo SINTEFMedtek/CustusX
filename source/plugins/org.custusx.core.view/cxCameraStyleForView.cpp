@@ -209,14 +209,58 @@ void CameraStyleForView::applyCameraStyle()
 		{
 			double viewAngle = camera->GetViewAngle()/180.0*M_PI;
 			Vector3D vpn = (camera_r-focus_r).normal();
-			double dist = this->findMaxCameraDistance(viewAngle, focus_r, vpn, roi_r);
+
+//			Transform3D rMpr = mBackend->patient()->get_rMpr();
+//			Transform3D prMt = mBackend->tracking()->getActiveTool()->get_prMt();
+//			Transform3D rMt = rMpr * prMt;
+//			Vector3D tp = rMt.coord(Vector3D(0, 0, 0));
+
+//			double t_dist = this->findCameraDistance(viewAngle, focus_r, vpn, tp);
+
+			this->getRenderer()->ComputeAspect();
+			double aspect[2];
+			this->getRenderer()->GetAspect(aspect);
+
+//			double angle = viewAngle;
+//			if(aspect[0]>=1.0) // horizontal window, deal with vertical angle|scale
+//			  {
+//			  if(this->getCamera()->GetUseHorizontalViewAngle())
+//				{
+//				angle=2.0*atan(tan(angle*0.5)/aspect[0]);
+//				}
+//			  }
+//			else // vertical window, deal with horizontal angle|scale
+//			  {
+//			  if(!this->getCamera()->GetUseHorizontalViewAngle())
+//				{
+//				angle=2.0*atan(tan(angle*0.5)*aspect[0]);
+//				}
+
+////			  parallelScale=parallelScale/aspect[0];
+//			  }
+//			std::cout << "      apect+angle" << aspect[0] << " " << aspect[1] << " " << angle << std::endl;
+////			viewAngle = angle;
+
+			double viewAngle_vertical = viewAngle;
+			double viewAngle_horizontal = viewAngle*aspect[0];
+
+			Vector3D n_vertical(1, 0, 0);
+			double dist_v = this->findMaxCameraDistance(n_vertical, viewAngle_vertical, focus_r, vpn, roi_r);
+			Vector3D n_horizontal(0, 1, 0);
+			double dist_h = this->findMaxCameraDistance(n_horizontal, viewAngle_horizontal, focus_r, vpn, roi_r);
+			double dist = std::max(dist_v, dist_h);
+
+
+//			Vector3D camera_r_t = focus_r + vpn*t_dist;
 			Vector3D camera_r_t = focus_r + vpn*dist;
-					std::cout << "      roi_r: <" << roi_r << std::endl;
-			//		std::cout << "      camera_r: < " << camera_r << " >" << std::endl;
-			//		std::cout << "      vpn: < " << vpn << " >" << std::endl;
-			//		std::cout << "      focus_r: < " << focus_r << " >" << std::endl;
-			//		std::cout << "      dist: < " << dist << " >" << std::endl;
-			//		std::cout << "      "  << std::endl;
+//					std::cout << "      roi_r: <" << roi_r << std::endl;
+//					std::cout << "      camera_r: < " << camera_r << " >" << std::endl;
+//					std::cout << "      vpn: < " << vpn << " >" << std::endl;
+//					std::cout << "      focus_r: < " << focus_r << " >" << std::endl;
+//					std::cout << "      dist: < " << dist << " >" << std::endl;
+//					std::cout << "      t_dist: < " << dist << " >" << std::endl;
+//					std::cout << "      camera_r_t: < " << camera_r_t << " >" << std::endl;
+//					std::cout << "      "  << std::endl;
 			camera_r = camera_r_t;
 		}
 	}
@@ -235,6 +279,7 @@ void CameraStyleForView::applyCameraStyle()
 	camera->SetPosition(camera_r.begin());
 	camera->SetFocalPoint(focus_r.begin());
 	camera->SetViewUp(vup_r.begin());
+	camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 10));
 	if (mStyle.mCameraFollowTool && mFollowingTool)
 		camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 1.5));
 	mBlockCameraUpdate = false;
@@ -280,7 +325,7 @@ Vector3D CameraStyleForView::findCameraPosOnLineFixedDistanceFromFocus(Vector3D 
 	}
 }
 
-double CameraStyleForView::findMaxCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D& bb)
+double CameraStyleForView::findMaxCameraDistance(Vector3D n, double viewAngle, Vector3D focus, Vector3D vpn, const DoubleBoundingBox3D& bb)
 {
 	std::vector<double> dists;
 	for (unsigned x=0; x<2; ++x)
@@ -288,7 +333,7 @@ double CameraStyleForView::findMaxCameraDistance(double viewAngle, Vector3D focu
 			for (unsigned z=0; z<2; ++z)
 			{
 				Vector3D p = bb.corner(x,y,z);
-				double d = this->findCameraDistance(viewAngle, focus, vpn, p);
+				double d = this->findCameraDistanceKeepPointInViewOneAxis(n, viewAngle, focus, vpn, p);
 				dists.push_back(d);
 			}
 
@@ -302,10 +347,32 @@ double CameraStyleForView::findMaxCameraDistance(double viewAngle, Vector3D focu
  * The resulting distance is the minimum camera distance required to see p.
  *
  */
-double CameraStyleForView::findCameraDistance(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p)
+double CameraStyleForView::findCameraDistanceKeepPointInViewOneAxis(Vector3D n, double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p)
+{
+	// project all items into plane	n
+	Vector3D focus_p = focus - dot(focus, n)*n;
+	Vector3D p_p = p - dot(p, n)*n;
+	Vector3D vpn_p = (vpn - dot(vpn, n)*n).normal();
+
+	// find distance in projection plane n
+	double d_p = this->findCameraDistanceKeepPointInView(viewAngle, focus_p, vpn_p, p_p);
+
+	// recalculate non-projected distance.
+	double cos_plane_angle = dot(vpn, vpn_p); // cosine(angle) between plane n and original vpn direction
+	d_p = d_p / cos_plane_angle;
+	return d_p;
+}
+
+/**
+ * Find the camera distance required to keep p in view,
+ * give a viewangle, focus and vpn.
+ * The resulting distance is the minimum camera distance required to see p.
+ *
+ */
+double CameraStyleForView::findCameraDistanceKeepPointInView(double viewAngle, Vector3D focus, Vector3D vpn, Vector3D p)
 {
 	Vector3D pp = focus + vpn*dot(p-focus, vpn); // p projected onto the camera line defined by focus and vpn.
-	double beta = (p-pp).length() / tan(viewAngle); // distance from pp to camera
+	double beta = (p-pp).length() / tan(viewAngle/2); // distance from pp to camera
 	beta = fabs(beta);
 	double dist = beta + dot(pp-focus, vpn); // total distance from focus to camera
 	return dist;
