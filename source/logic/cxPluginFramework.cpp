@@ -146,7 +146,10 @@ void PluginFrameworkManager::loadState()
 	for (unsigned i=0; i< info.size(); ++i)
 	{
 		if (info[i].targetState != ctkPlugin::UNINSTALLED)
+        {
+            CX_LOG_DEBUG() << "plugin skal installeres";
 			this->install(info[i].symbolicName);
+        }
 	}
 
     CX_LOG_DEBUG() << "start all plugins";
@@ -240,7 +243,11 @@ QSharedPointer<ctkPluginFramework> PluginFrameworkManager::getPluginFramework()
 void PluginFrameworkManager::initializeFramework()
 {
 	if (this->frameworkInitialized())
+    {
+        CX_LOG_DEBUG() << "framework er allerede initialisert, return";
 		return;
+    }
+    CX_LOG_DEBUG() << "initializeFramework()";
 
 	QSharedPointer<ctkPluginFramework> framework = mFrameworkFactory->getFramework();
 
@@ -471,16 +478,19 @@ QString PluginFrameworkManager::getPluginPath(const QString& symbolicName)
 	pluginFileName.replace(".", "_");
 	foreach(QString searchPath, mPluginSearchPaths)
 	{
+        CX_LOG_DEBUG() << "searchPath: " << searchPath;
 		QDirIterator dirIter(searchPath, mPluginLibFilter, QDir::Files, QDirIterator::Subdirectories);
 		while(dirIter.hasNext())
 		{
 			dirIter.next();
 			QFileInfo fileInfo = dirIter.fileInfo();
 			QString fileBaseName = fileInfo.baseName();
+            CX_LOG_DEBUG() << "fileBaseName: " << fileBaseName;
 			if (fileBaseName.startsWith("lib")) fileBaseName = fileBaseName.mid(3);
 
 			if (fileBaseName == pluginFileName)
 			{
+                CX_LOG_DEBUG() << "fileInfo.canonicalFilePath(): " << fileInfo.canonicalFilePath();
 				return fileInfo.canonicalFilePath();
 			}
 		}
