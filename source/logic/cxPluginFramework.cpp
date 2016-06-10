@@ -302,7 +302,9 @@ void PluginFrameworkManager::install(const QString& symbolicName)
 
 	try
 	{
+        CX_LOG_DEBUG() << "PluginFrameworkManager::install: 1, before \n" ;
 		ctkPluginContext* pc = this->getPluginContext();
+        CX_LOG_DEBUG() << "PluginFrameworkManager::install: 2, after \n" ;
 		pc->installPlugin(QUrl::fromLocalFile(pluginPath))->getPluginId();
 	}
 	catch (const ctkPluginException& exc)
