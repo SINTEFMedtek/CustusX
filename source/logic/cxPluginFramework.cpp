@@ -485,12 +485,12 @@ QString PluginFrameworkManager::getPluginPath(const QString& symbolicName)
 			dirIter.next();
 			QFileInfo fileInfo = dirIter.fileInfo();
 			QString fileBaseName = fileInfo.baseName();
-            CX_LOG_DEBUG() << "fileBaseName: " << fileBaseName;
+            //CX_LOG_DEBUG() << "fileBaseName: " << fileBaseName;
 			if (fileBaseName.startsWith("lib")) fileBaseName = fileBaseName.mid(3);
 
 			if (fileBaseName == pluginFileName)
 			{
-                CX_LOG_DEBUG() << "fileInfo.canonicalFilePath(): " << fileInfo.canonicalFilePath();
+                CX_LOG_DEBUG() << "return pluginpath, fileInfo.canonicalFilePath(): " << fileInfo.canonicalFilePath();
 				return fileInfo.canonicalFilePath();
 			}
 		}
