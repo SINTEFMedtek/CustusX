@@ -107,7 +107,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
 	{
-		ViewGroupPtr group(new ViewGroup(mBackend));
+		ViewGroupPtr group(new ViewGroup(mBackend, QString::number(i)));
 		mViewGroups.push_back(group);
 	}
 

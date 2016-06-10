@@ -64,10 +64,10 @@ namespace cx
 {
 
 
-ViewGroup::ViewGroup(CoreServicesPtr backend)
+ViewGroup::ViewGroup(CoreServicesPtr backend, QString uid)
 {
 	mBackend = backend;
-	mViewGroupData.reset(new ViewGroupData(backend));
+	mViewGroupData.reset(new ViewGroupData(backend, uid));
 	mCameraStyle.reset(new CameraStyle(mBackend, mViewGroupData));
 
 	connect(mViewGroupData.get(), &ViewGroupData::optionsChanged, this, &ViewGroup::optionChangedSlot);

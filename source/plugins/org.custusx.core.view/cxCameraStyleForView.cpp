@@ -215,12 +215,6 @@ void CameraStyleForView::applyCameraStyle()
 			// and can be used to define a ROI bounding box aligned to the viewport.
 			Vector3D left = cross(vup_r,vpn);
 			Transform3D M_proj = createTransformIJC(left, vup_r, focus_r).inv();
-//			CX_LOG_CHANNEL_DEBUG("CA") << "vup_r" << vup_r;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "vpn" << vpn;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "left" << left;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "focus_r" << focus_r;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "M_proj \n" << M_proj;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "roi_r.getBox()" << roi_r.getBox();
 			Vector3D proj_focus(0,0,0);
 			Vector3D proj_vup(0,1,0);
 			Vector3D proj_vpn(0,0,1);
@@ -231,15 +225,9 @@ void CameraStyleForView::applyCameraStyle()
 																					proj_vup,
 																					proj_vpn,
 																					proj_bb);
-//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_focus " << proj_focus;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_vup " << proj_vup;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_vpn " << proj_vpn;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_bb " << proj_bb;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "camera_r_t " << camera_r_t;
-//			CX_LOG_CHANNEL_DEBUG("CA") << "\n";
 			camera_r_t = M_proj.inv().coord(camera_r_t);
 
-
+			// calculate BB in R space - did lead to large unnatural BBs.
 //			Vector3D camera_r_t = NavigationAlgorithms::findCameraPosByZoomingToROI(viewAngle_vertical,
 //																					viewAngle_horizontal,
 //																					focus_r,

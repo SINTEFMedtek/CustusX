@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class ViewGroupFixture> ViewGroupFixturePtr;
 class ViewGroupFixture : public cx::ViewGroup
 {
 public:
-	ViewGroupFixture(cx::CoreServicesPtr backend) : ViewGroup(backend)
+	ViewGroupFixture(cx::CoreServicesPtr backend) : ViewGroup(backend, "0")
 	{
 		mBackend->patient()->insertData(mTestData.image1);
 		mBackend->patient()->insertData(mTestData.image2);

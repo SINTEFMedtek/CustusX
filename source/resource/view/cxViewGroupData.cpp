@@ -311,9 +311,10 @@ ViewGroupData::Options::Options() :
 {
 }
 
-ViewGroupData::ViewGroupData(CoreServicesPtr services) :
+ViewGroupData::ViewGroupData(CoreServicesPtr services, QString uid) :
 	mServices(services),
-	mCamera3D(CameraData::create())
+	mCamera3D(CameraData::create()),
+	mUid(uid)
 {
 	if(mServices)
 		connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);

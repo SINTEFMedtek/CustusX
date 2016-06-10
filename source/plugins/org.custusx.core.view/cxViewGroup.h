@@ -70,7 +70,7 @@ class org_custusx_core_view_EXPORT ViewGroup: public QObject
 {
 	Q_OBJECT
 public:
-	explicit ViewGroup(CoreServicesPtr backend);
+	explicit ViewGroup(CoreServicesPtr backend, QString uid);
 	virtual ~ViewGroup();
 
 	void addView(ViewWrapperPtr wrapper);

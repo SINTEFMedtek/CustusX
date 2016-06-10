@@ -47,6 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxNavigation.h"
 #include "cxActiveData.h"
+#include "cxSettings.h"
+#include "cxDisplayTextRep.h"
 
 namespace cx
 {
@@ -163,6 +165,16 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 	mShow3DSlicesInteractor.reset(new DataViewPropertiesInteractor(mServices, mGroupData));
 	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
+
+	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+}
+
+void ViewWrapper::settingsChangedSlot(QString key)
+{
+	if (key.startsWith("View"))
+	{
+		this->updateView();
+	}
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
@@ -207,6 +219,41 @@ QStringList ViewWrapper::getAllDataNames(DataViewProperties properties) const
 	}
 	std::reverse(text.begin(), text.end());
 	return text;
+}
+
+void ViewWrapper::updateView()
+{
+	// view description
+	QString annotationText;
+	if (settings()->value("View/showOrientationAnnotation").value<bool>())
+	{
+		annotationText = QString("%1-%2")
+				.arg(this->getViewDescription())
+				.arg(mGroupData ? mGroupData->getUid() : "");
+	}
+	mPlaneTypeText->setText(0, annotationText);
+
+	// data description
+	QString showDataText;
+	if (settings()->value("View/showDataText").value<bool>())
+	{
+		showDataText = this->getDataDescription();
+	}
+	mDataNameText->setText(0, showDataText);
+	mDataNameText->setFontSize(std::max(12, 22 - 2 * showDataText.size()));
+}
+
+void ViewWrapper::addReps()
+{
+	// plane type text rep
+	mPlaneTypeText = DisplayTextRep::New();
+	mPlaneTypeText->addText(QColor(Qt::green), "--", Vector3D(0.98, 0.02, 0.0));
+	this->getView()->addRep(mPlaneTypeText);
+
+	//data name text rep
+	mDataNameText = DisplayTextRep::New();
+	mDataNameText->addText(QColor(Qt::green), "--", Vector3D(0.02, 0.02, 0.0));
+	this->getView()->addRep(mDataNameText);
 }
 
 } //namespace cx

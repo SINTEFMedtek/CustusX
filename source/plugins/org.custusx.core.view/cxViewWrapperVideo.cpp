@@ -72,7 +72,7 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisServicesPtr services) :
 	connect(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), this, SLOT(connectStream()));
 	connect(mServices->tracking().get(), SIGNAL(activeToolChanged(QString)), this, SLOT(connectStream()));
 
-	addReps();
+	this->addReps();
 
 	this->connectStream();
 }
@@ -104,7 +104,6 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 
 	contextMenu.addSeparator();
 
-//	QActionGroup sourceGroup = new QActionGroup(&contextMenu);
 	QMenu* sourceMenu = new QMenu("Video Source", &contextMenu);
 	std::vector<VideoSourcePtr> sources = mServices->video()->getVideoSources();
 	this->addStreamAction("active", sourceMenu);
@@ -112,7 +111,6 @@ void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 		this->addStreamAction(sources[i]->getUid(), sourceMenu);
 	contextMenu.addMenu(sourceMenu);
 
-//	contextMenu.addSeparator();
 	contextMenu.addAction(showSectorAction);
 }
 
@@ -161,13 +159,7 @@ void ViewWrapperVideo::connectStream()
 {
 	if (!mGroupData)
 		return;
-//	std::cout << "ViewWrapperVideo::connectStream() selected=" << mViewGroup->getVideoSource()  << std::endl;
 	VideoSourcePtr source = this->getSourceFromService(mGroupData->getVideoSource());
-//	if (source)
-//		std::cout << "ViewWrapperVideo::connectStream() " << source->getUid() << std::endl;
-//	else
-//		std::cout << "ViewWrapperVideo::connectStream() NULL" << std::endl;
-
 
 	QString uid;
 	if (source)
@@ -181,11 +173,6 @@ void ViewWrapperVideo::connectStream()
 		{
 			newTool = tool;
 			source = tool->getProbe()->getRTSource(uid);
-
-//			if (source)
-//				std::cout << "ViewWrapperVideo::connectStream() from probe " << source->getUid() << std::endl;
-//			else
-//				std::cout << "ViewWrapperVideo::connectStream() from probe NULL" << std::endl;
 		}
 	}
 
@@ -235,8 +222,6 @@ void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 
 	mStreamRep->setRealtimeStream(mSource);
 	mStreamRep->setTool(tool);
-//	mDataNameText->setText(0, "initialized");
-	mDataNameText->setText(0, mSource->getName());
 	mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
 //	report(
@@ -249,20 +234,19 @@ void ViewWrapperVideo::updateSlot()
 {
 	if (!mSource)
 		return;
-	mDataNameText->setText(0, mSource->getName());
+	this->updateView();
 }
 
-void ViewWrapperVideo::addReps()
+QString ViewWrapperVideo::getDataDescription()
 {
-	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New();
-	mPlaneTypeText->addText(QColor(Qt::green), "RT", Vector3D(0.98, 0.02, 0.0));
-	mView->addRep(mPlaneTypeText);
+	if (mSource)
+		return mSource->getName();
+	return "not initialized";
+}
 
-	//data name text rep
-	mDataNameText = DisplayTextRep::New();
-	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
-	mView->addRep(mDataNameText);
+QString ViewWrapperVideo::getViewDescription()
+{
+	return "RT";
 }
 
 //------------------------------------------------------------------------------

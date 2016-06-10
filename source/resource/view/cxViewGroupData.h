@@ -126,8 +126,9 @@ class cxResourceVisualization_EXPORT ViewGroupData: public QObject
 {
 Q_OBJECT
 public:
-	explicit ViewGroupData(CoreServicesPtr services);
+	explicit ViewGroupData(CoreServicesPtr services, QString uid);
 	void requestInitialize();
+	QString getUid() const { return mUid; }
 //	std::vector<DataPtr> getData() const;
 	std::vector<DataPtr> getData(DataViewProperties properties=DataViewProperties::createFull()) const;
 	QString getVideoSource() const;
@@ -183,6 +184,7 @@ signals:
 	void optionsChanged();
 
 private:
+	QString mUid;
 	CoreServicesPtr mServices;
 	QString mVideoSource;
 	typedef std::pair<QString, DataViewProperties> DataAndViewProperties;
