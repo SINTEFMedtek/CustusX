@@ -417,7 +417,7 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 
 SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base) const
 {
-
+    return base;
 }
 
 
