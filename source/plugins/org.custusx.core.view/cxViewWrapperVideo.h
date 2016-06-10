@@ -65,7 +65,6 @@ public:
 	virtual ~ViewWrapperVideo();
 	virtual ViewPtr getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
-	virtual void updateView() {}
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 private slots:

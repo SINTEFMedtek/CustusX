@@ -75,6 +75,8 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisServicesPtr services) :
 	this->addReps();
 
 	this->connectStream();
+
+	this->updateView();
 }
 
 ViewWrapperVideo::~ViewWrapperVideo()
@@ -232,8 +234,6 @@ void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 
 void ViewWrapperVideo::updateSlot()
 {
-	if (!mSource)
-		return;
 	this->updateView();
 }
 
