@@ -214,6 +214,12 @@ SlicePlane SliceComputer::getPlane()  const
 		plane.j = m_rMt.vector(plane.j);
 	}
 
+    //orient the plane, so that even if the tool has been rotated, the up vector or gravity vector can be projected on this plane.
+    if (mPlaneType == ptTOOLSIDEPLANE)
+    {
+        plane = this->orientToGravityAroundToolZAxis(plane);
+    }
+
 	// orient planes so that gravity is down
 	plane = orientToGravity(plane);
 
@@ -406,7 +412,12 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	retval.i = retval.i.normal(); // |i|==1 
 	retval.j = cross(k, retval.i);
 
-	return retval;
+    return retval;
+}
+
+SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base) const
+{
+
 }
 
 
