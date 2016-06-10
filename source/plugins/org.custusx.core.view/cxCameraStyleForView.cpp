@@ -146,7 +146,7 @@ void CameraStyleForView::applyCameraStyle()
 
 	if (!mStyle.mFocusROI.isEmpty())
 	{
-		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mFocusROI);
+		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mFocusROI).getBox();
 		if (roi_r != DoubleBoundingBox3D::zero())
 			focus_r = roi_r.center();
 	}
@@ -197,8 +197,8 @@ void CameraStyleForView::applyCameraStyle()
 
 	if (!mStyle.mAutoZoomROI.isEmpty())
 	{
-		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mAutoZoomROI);
-		if (roi_r != DoubleBoundingBox3D::zero())
+		RegionOfInterest roi_r = this->getROI(mStyle.mAutoZoomROI);
+		if (roi_r.isValid())
 		{
 			double viewAngle = camera->GetViewAngle()/180.0*M_PI;
 			Vector3D vpn = (camera_r-focus_r).normal();
@@ -210,12 +210,42 @@ void CameraStyleForView::applyCameraStyle()
 			double viewAngle_vertical = viewAngle;
 			double viewAngle_horizontal = viewAngle*aspect[0];
 
+			// move all calculations into a space (x,y,c)=(left,vup,focus)
+			// the space is oriented towards the camera,
+			// and can be used to define a ROI bounding box aligned to the viewport.
+			Vector3D left = cross(vup_r,vpn);
+			Transform3D M_proj = createTransformIJC(left, vup_r, focus_r).inv();
+//			CX_LOG_CHANNEL_DEBUG("CA") << "vup_r" << vup_r;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "vpn" << vpn;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "left" << left;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "focus_r" << focus_r;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "M_proj \n" << M_proj;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "roi_r.getBox()" << roi_r.getBox();
+			Vector3D proj_focus(0,0,0);
+			Vector3D proj_vup(0,1,0);
+			Vector3D proj_vpn(0,0,1);
+			DoubleBoundingBox3D proj_bb = roi_r.getBox(M_proj);
 			Vector3D camera_r_t = NavigationAlgorithms::findCameraPosByZoomingToROI(viewAngle_vertical,
 																					viewAngle_horizontal,
-																					focus_r,
-																					vup_r,
-																					vpn,
-																					roi_r);
+																					proj_focus,
+																					proj_vup,
+																					proj_vpn,
+																					proj_bb);
+//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_focus " << proj_focus;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_vup " << proj_vup;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_vpn " << proj_vpn;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "proj_bb " << proj_bb;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "camera_r_t " << camera_r_t;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "\n";
+			camera_r_t = M_proj.inv().coord(camera_r_t);
+
+
+//			Vector3D camera_r_t = NavigationAlgorithms::findCameraPosByZoomingToROI(viewAngle_vertical,
+//																					viewAngle_horizontal,
+//																					focus_r,
+//																					vup_r,
+//																					vpn,
+//																					roi_r.getBox());
 
 			camera_r = camera_r_t;
 		}
@@ -234,13 +264,13 @@ void CameraStyleForView::applyCameraStyle()
 	mBlockCameraUpdate = false;
 }
 
-DoubleBoundingBox3D CameraStyleForView::getROI(QString uid)
+RegionOfInterest CameraStyleForView::getROI(QString uid)
 {
 	DataPtr data = mBackend->patient()->getData(uid);
 	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 	if (roi)
 		return roi->getROI();
-	return DoubleBoundingBox3D::zero();
+	return RegionOfInterest();
 }
 
 void CameraStyleForView::activeToolChangedSlot()

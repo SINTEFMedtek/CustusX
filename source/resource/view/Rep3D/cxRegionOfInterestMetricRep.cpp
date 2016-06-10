@@ -84,7 +84,7 @@ void RegionOfInterestMetricRep::onModifiedStartRender()
 
 	if (mGraphicalBox)
 	{
-		mGraphicalBox->setBoundingBox(metric->getROI());
+		mGraphicalBox->setBoundingBox(metric->getROI().getBox());
 		mGraphicalBox->setPosition(Transform3D::Identity());
 //		mGraphicalBox->setPosition(metric->get_rMd()); // ROI is already in r
 //		mGraphicalBox->setColor(mMetric->getColor());

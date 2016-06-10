@@ -260,7 +260,7 @@ std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data)
 DoubleBoundingBox3D DoubleBoundingBox3D::fromCloud(std::vector<Vector3D> cloud)
 {
 	if (cloud.empty())
-		return DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
+		return DoubleBoundingBox3D::zero();
 
 	Vector3D a = cloud[0]; // min
 	Vector3D b = cloud[0]; // max

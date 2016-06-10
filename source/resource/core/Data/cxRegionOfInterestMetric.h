@@ -48,6 +48,34 @@ namespace cx
  * @{
  */
 
+/**
+ * Representation of a Region of Interest,
+ * a way to define an extent in 3D.
+ *
+ * The indended usage is as a bounding box,
+ * although the internal representation is given in
+ * points. This eases coordinate transformations.
+ */
+class cxResource_EXPORT RegionOfInterest
+{
+public:
+	RegionOfInterest();
+	bool isValid() const { return !mPoints.empty(); }
+	/**
+	 * Calculate a bounding box based on the points and margin,
+	 * oriented in the space q, assuming the points are in space d.
+	 */
+	DoubleBoundingBox3D getBox(Transform3D qMd = Transform3D::Identity());
+
+	double mMargin;
+	std::vector<Vector3D> mPoints;
+	std::vector<Vector3D> mMaxBoundsPoints;
+
+private:
+	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin) const;
+	std::vector<Vector3D> transform(const std::vector<Vector3D> &points, Transform3D M) const;
+};
+
 typedef boost::shared_ptr<class RegionOfInterestMetric> RegionOfInterestMetricPtr;
 
 /**
@@ -80,7 +108,7 @@ public:
 	}
 
 	virtual QString getValueAsString() const;
-	virtual bool showValueInGraphics() const { return true; }
+	virtual bool showValueInGraphics() const { return false; }
 
 	QStringList getDataList() { return mContainedData; }
 	void setDataList(QStringList val);
@@ -94,13 +122,13 @@ public:
 	QString getMaxBoundsData() { return mMaxBoundsData; }
 	void setMaxBoundsData(QString val);
 
-	DoubleBoundingBox3D getROI() const;
+	RegionOfInterest getROI() const; // return a ROI in ref space.
 
 private:
 	RegionOfInterestMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
-	DoubleBoundingBox3D getMaxROI() const;
-	DoubleBoundingBox3D getBasicROI() const;
+//	DoubleBoundingBox3D getMaxROI() const;
+//	DoubleBoundingBox3D getBasicROI() const;
 
 	QString mMaxBoundsData;
 	QStringList mContainedData;
@@ -109,11 +137,12 @@ private:
 
 	std::vector<SpaceListenerPtr> mListeners;
 	std::vector<Vector3D> getCorners_r(DataPtr data) const;
-	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin) const;
+//	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin) const;
 	void listenTo(CoordinateSystem space);
 	void onContentTransformsChanged();
 	void onContentChanged();
-	std::vector<Vector3D> getCorners_r_FromNonROI(std::map<QString, DataPtr> data) const;
+//	std::vector<Vector3D> getCorners_r_FromNonROI(std::map<QString, DataPtr> data) const;
+	Vector3D getToolTip_r() const;
 };
 
 /**

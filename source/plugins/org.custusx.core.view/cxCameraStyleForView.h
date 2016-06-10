@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
+#include "cxRegionOfInterestMetric.h"
 class QIcon;
 class QWidget;
 class QMenu;
@@ -98,7 +99,7 @@ private:
 	void connectTool();
 	void disconnectTool();
 	void viewportChangedSlot();
-	DoubleBoundingBox3D getROI(QString uid);
+	RegionOfInterest getROI(QString uid);
 	void setInteractor(vtkSmartPointer<vtkInteractorStyle> style);
 
 	CameraStyleData mStyle; ///< the current CameraStyleForView
