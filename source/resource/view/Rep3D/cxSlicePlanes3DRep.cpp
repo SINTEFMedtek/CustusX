@@ -76,6 +76,9 @@ SlicePlanesProxy::SlicePlanesProxy()
 	mProperties.mColor[ptRADIALPLANE] = color3;
 	mProperties.mSymbol[ptRADIALPLANE] = "X";
 
+    mProperties.mColor[ptTOOLSIDEPLANE] = color2;
+    mProperties.mSymbol[ptTOOLSIDEPLANE] = "T";
+
 	mProperties.m2DFontSize = 20;
 	mProperties.m3DFontSize = 28;
 //	mProperties.mPointPos_normvp = Vector3D(0.1, 0.8, 0.0);

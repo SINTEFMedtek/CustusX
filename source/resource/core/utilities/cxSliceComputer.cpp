@@ -90,7 +90,7 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 		setOrientationType(otORTHOGONAL);
 		setFollowType(ftFIXED_CENTER);
 	}
-	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+    else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE || plane==ptTOOLSIDEPLANE)
 	{
 		setOrientationType(otOBLIQUE);
 		setFollowType(ftFOLLOW_TOOL);
@@ -312,6 +312,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() cons
 	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
 	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
 	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+    case ptTOOLSIDEPLANE: return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1)); //SIDE
 	default:
 		throw std::exception();
 	}
@@ -333,6 +334,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() cons
 	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
 	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
 	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+    case ptTOOLSIDEPLANE: return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1)); //SIDE
 	default:
 		throw std::exception();
 	}

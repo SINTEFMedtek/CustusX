@@ -182,4 +182,81 @@ TEST_CASE("SliceComputer handles anyplanes using follow tool", "[unit][resource]
 	CHECK(cx::similar(slicer.getPlane(), radialPlaneG));
 }
 
+/** ToolSidePlane where the plane should always be oriented with the gravity/up vector.
+ *  anyplanes with no gravity, tool in standard position with
+ *  tip down and from towards nose
+ */
+TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][resource][core][jon]")
+{
+    cx::SliceComputer slicer;
+    slicer.setOrientationType(cx::otOBLIQUE);
+    slicer.setFollowType(cx::ftFOLLOW_TOOL);
 
+    cx::Vector3D c_tool(5, 40, -50);
+    cx::Vector3D center(44, 55, 66);
+    // position the tool with the tip pointing down
+    // and the front towards the nose.
+    // this is the case when the surgeon stands behind the upright head
+    // and aligns the tool with his left hand with the tip towards the feet.
+//    cx::Transform3D R = cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D T = cx::createTransformTranslate(c_tool);
+    cx::Transform3D rMt = T*R;
+    //CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0, -1))); // tip down
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip pointing down and in the direction of the nose
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(1, 0, 0))); // leftprobe to leftpatient
+    slicer.setToolPosition(rMt);
+    slicer.setFixedCenter(center);
+
+
+
+    //TOOLSIDE
+    slicer.setPlaneType(cx::ptTOOLSIDEPLANE);
+    cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, -1, 0), cx::Vector3D( 0, 0, 1));
+// TODO create check here    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+
+
+    cx::SlicePlane toolSidePlane2(c_tool, cx::Vector3D( 0, -0.707107, -0.707107), cx::Vector3D( 0, -0.707107, 0.707107));
+    std::cout << "toolSidePlane \n" << toolSidePlane;
+    std::cout << "slicerplan FØR rotasjon \n" << slicer.getPlane();
+    //Transform tool so that the handle tilts 45 degrees towards the top of the head of the patient.
+    //cx::Transform3D rotateTowardsHead = cx::createTransformRotateX(M_PI_4);
+    cx::Transform3D rotateTowardsHead = cx::createTransformRotateX(M_PI_4);
+    //rMt = rMt * rotateTowardsHead;
+    //rMt = rotateTowardsHead * rMt;
+    rMt = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D rMt1 = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D rMt11 = T*rMt1;
+    CHECK(cx::similar(rMt11.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip right
+    CHECK(cx::similar(rMt11.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(1, 0, 0))); // leftprobe to leftpatient
+    rMt = T*rMt;
+    //slicer.setToolPosition(rMt);
+
+//    cx::SliceComputer slicer3;
+//    slicer3.setOrientationType(cx::otOBLIQUE);
+//    slicer3.setFollowType(cx::ftFOLLOW_TOOL);
+    slicer.setToolPosition(rMt);
+//    slicer3.setFixedCenter(center);
+//    slicer3.setPlaneType(cx::ptTOOLSIDEPLANE);
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane2));
+    std::cout << "slicerplan ENDELIG \n" << slicer.getPlane();
+//    CHECK(cx::similar(slicer3.getPlane(), toolSidePlane));
+//    std::cout << "slicerplan ENDELIG \n" << slicer3.getPlane();
+
+
+
+    cx::SliceComputer slicer2;
+    slicer2.setOrientationType(cx::otOBLIQUE);
+    slicer2.setFollowType(cx::ftFOLLOW_TOOL);
+    cx::Transform3D R2 = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D T2 = cx::createTransformTranslate(c_tool);
+    cx::Transform3D rMt2 = T2*R2;
+    CHECK(cx::similar(rMt2.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip right
+    CHECK(cx::similar(rMt2.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(1, 0, 0))); // leftprobe to leftpatient
+    slicer2.setToolPosition(rMt2);
+    slicer2.setFixedCenter(center);
+    slicer2.setPlaneType(cx::ptTOOLSIDEPLANE);
+    cx::SlicePlane sidePlane3(c_tool, cx::Vector3D( 0, -0.707107, -0.707107), cx::Vector3D( 0, -0.707107, 0.707107));
+    CHECK(cx::similar(slicer2.getPlane(), sidePlane3));
+    std::cout << "slicer2 \n" << slicer2.getPlane();
+}

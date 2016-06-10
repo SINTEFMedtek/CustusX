@@ -46,7 +46,8 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, PLANE_TYPE, ptCOUNT)
 	"Axial",
 	"Any",
 	"Dual",
-	"Radial"
+    "Radial",
+    "ToolSide"
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, PLANE_TYPE, ptCOUNT)
 

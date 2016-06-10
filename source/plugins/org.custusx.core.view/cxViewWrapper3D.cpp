@@ -383,6 +383,7 @@ void ViewWrapper3D::createSlicesActions(QWidget* parent)
 	this->createSlicesAction(PlaneTypeCollection(ptANYPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptRADIALPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSIDEPLANE), parent);
+    this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);
 }
 
 QAction* ViewWrapper3D::createSlicesAction(PlaneTypeCollection planes, QWidget* parent)
