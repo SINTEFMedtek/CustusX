@@ -94,7 +94,6 @@ private:
 	QAction* createAction(QString uid, QString text, QIcon icon,
 											 QKeySequence shortcut, QString help,
 						  T triggerSlot);
-	bool copyPath(QString sourceDir, QString destinationDir, bool overWriteDirectory);
 };
 
 } // namespace cx
