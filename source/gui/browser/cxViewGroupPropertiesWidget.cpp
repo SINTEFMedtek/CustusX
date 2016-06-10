@@ -107,6 +107,7 @@ void ViewGroupPropertiesWidget::updateFrontend()
 	mUniCam->setValue(data.mUniCam);
 	mElevation->setValue(data.mElevation);
 	mAutoZoomROI->setValue(data.mAutoZoomROI);
+	mFocusROI->setValue(data.mFocusROI);
 }
 
 ViewGroupDataPtr ViewGroupPropertiesWidget::getViewGroup()
@@ -116,7 +117,13 @@ ViewGroupDataPtr ViewGroupPropertiesWidget::getViewGroup()
 
 void ViewGroupPropertiesWidget::createCameraStyleProperties()
 {
-	//	bool filterToolPositions = settings()->value("TrackingPositionFilter/enabled").value<bool>();
+	StringPropertySelectDataPtr focusroi = StringPropertySelectData::New(mServices->patient());
+	focusroi->setValueName("Focus ROI");
+	focusroi->setHelp("Set focus to center of ROI");
+	focusroi->setTypeRegexp("roi");
+	mFocusROI = focusroi;
+	mCameraStyleProperties.push_back(mFocusROI);
+
 	mCameraFollowTool = BoolProperty::initialize("Camera Follow Tool", "",
 												 "Camera position is fixed to the tool and moving along with it.",
 												 true);
@@ -148,7 +155,6 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 	autozoom->setHelp("Zoom so that the given ROI always is visible");
 	autozoom->setTypeRegexp("roi");
 	mAutoZoomROI = autozoom;
-
 	mCameraStyleProperties.push_back(mAutoZoomROI);
 
 	for (unsigned i=0; i<mCameraStyleProperties.size(); ++i)
@@ -196,6 +202,7 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 	data.mUniCam = mUniCam->getValue();
 	data.mElevation = mElevation->getValue();
 	data.mAutoZoomROI = mAutoZoomROI->getValue();
+	data.mFocusROI = mFocusROI->getValue();
 
 	options.mCameraStyle = data;
 	group->setOptions(options);

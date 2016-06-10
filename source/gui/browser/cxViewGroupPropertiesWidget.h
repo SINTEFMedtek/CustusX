@@ -77,6 +77,7 @@ private:
   BoolPropertyPtr mUniCam;
   DoublePropertyPtr mElevation;
   StringPropertyBasePtr mAutoZoomROI;
+  StringPropertyBasePtr mFocusROI;
   std::vector<PropertyPtr> mCameraStyleProperties;
   CameraStyleInteractorPtr mCameraStyleInteractor;
 

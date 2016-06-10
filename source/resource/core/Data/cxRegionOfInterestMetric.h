@@ -88,20 +88,32 @@ public:
 	bool getUseActiveTooltip() { return mUseActiveTooltip; }
 	void setUseActiveTooltip(bool val);
 
-	DoubleBoundingBox3D getMaxROI() const;
+	double getMargin() { return mMargin; }
+	void setMargin(double val);
+
+	QString getMaxBoundsData() { return mMaxBoundsData; }
+	void setMaxBoundsData(QString val);
+
 	DoubleBoundingBox3D getROI() const;
 
 private:
 	RegionOfInterestMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
+	DoubleBoundingBox3D getMaxROI() const;
+	DoubleBoundingBox3D getBasicROI() const;
+
+	QString mMaxBoundsData;
 	QStringList mContainedData;
 	bool mUseActiveTooltip;
+	double mMargin;
+
 	std::vector<SpaceListenerPtr> mListeners;
 	std::vector<Vector3D> getCorners_r(DataPtr data) const;
 	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin) const;
 	void listenTo(CoordinateSystem space);
 	void onContentTransformsChanged();
 	void onContentChanged();
+	std::vector<Vector3D> getCorners_r_FromNonROI(std::map<QString, DataPtr> data) const;
 };
 
 /**

@@ -98,7 +98,7 @@ private:
 	void connectTool();
 	void disconnectTool();
 	void viewportChangedSlot();
-	DoubleBoundingBox3D getROI();
+	DoubleBoundingBox3D getROI(QString uid);
 	void setInteractor(vtkSmartPointer<vtkInteractorStyle> style);
 
 	CameraStyleData mStyle; ///< the current CameraStyleForView

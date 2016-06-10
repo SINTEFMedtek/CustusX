@@ -49,6 +49,7 @@ RegionOfInterestMetric::RegionOfInterestMetric(const QString& uid, const QString
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mUseActiveTooltip = false;
+	mMargin = 20;
 }
 
 RegionOfInterestMetricPtr RegionOfInterestMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
@@ -79,6 +80,8 @@ void RegionOfInterestMetric::addXml(QDomNode& dataNode)
 		adder.addTextToElement("content", mContainedData[i]);
 
 	adder.addTextToElement("useActiveTooltip", QString::number(mUseActiveTooltip));
+	adder.addTextToElement("margin", QString::number(mMargin));
+	adder.addTextToElement("maxBoundsData", mMaxBoundsData);
 }
 
 void RegionOfInterestMetric::parseXml(QDomNode& dataNode)
@@ -88,6 +91,9 @@ void RegionOfInterestMetric::parseXml(QDomNode& dataNode)
 	XMLNodeParser parser(dataNode);
 	mContainedData = parser.parseTextFromDuplicateElements("content");
 	mUseActiveTooltip = parser.parseTextFromElement("useActiveTooltip").toInt();
+	mMargin = parser.parseTextFromElement("margin").toDouble();
+	mMaxBoundsData = parser.parseTextFromElement("maxBoundsData");
+
 	this->onContentChanged();
 }
 
@@ -106,6 +112,18 @@ void RegionOfInterestMetric::setUseActiveTooltip(bool val)
 {
 	mUseActiveTooltip = val;
 
+	this->onContentChanged();
+}
+
+void RegionOfInterestMetric::setMargin(double val)
+{
+	mMargin = val;
+	this->onContentChanged();
+}
+
+void RegionOfInterestMetric::setMaxBoundsData(QString val)
+{
+	mMaxBoundsData = val;
 	this->onContentChanged();
 }
 
@@ -149,52 +167,68 @@ QString RegionOfInterestMetric::getAsSingleLineString() const
 	return "bb";
 }
 
-
 DoubleBoundingBox3D RegionOfInterestMetric::getROI() const
+{
+	DoubleBoundingBox3D bb = this->getBasicROI();
+
+	DoubleBoundingBox3D bb_max = this->getMaxROI();
+	if (bb_max!=DoubleBoundingBox3D::zero())
+		bb = intersection(bb, bb_max);
+
+	return bb;
+}
+
+DoubleBoundingBox3D RegionOfInterestMetric::getBasicROI() const
 {
 	// create a dummy ROI containing vol center and tool plus margin
 	std::map<QString, DataPtr> alldata = mDataManager->getData();
+	std::map<QString, DataPtr> data;
 
-	std::vector<Vector3D> points;
-	// create a max ROI containing all data plus margin
 	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
-	{
-		if (!mContainedData.contains(i->first))
-			continue;
-		std::vector<Vector3D> c = this->getCorners_r(i->second);
-		std::copy(c.begin(), c.end(), back_inserter(points));
-	}
+		if (mContainedData.contains(i->first))
+			data[i->first] = i->second;
+
+	std::vector<Vector3D> points = getCorners_r_FromNonROI(data);
 
 	if (mUseActiveTooltip)
 	{
 		Transform3D rMto = mSpaceProvider->get_toMfrom(CoordinateSystem(csTOOL_OFFSET, "active"),
 													 CoordinateSystem::reference());
-
 		Vector3D tp = rMto.coord(Vector3D(0, 0, 0));
 		points.push_back(tp);
 	}
 
-	double margin = 20;
-	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, margin);
+	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, mMargin);
 	return bb;
 }
 
 DoubleBoundingBox3D RegionOfInterestMetric::getMaxROI() const
 {
-	std::map<QString, DataPtr> alldata = mDataManager->getData();
-	if (alldata.empty())
+	std::map<QString, DataPtr> data;
+	if (!mDataManager->getData(mMaxBoundsData))
 		return DoubleBoundingBox3D::zero();
+	data[mMaxBoundsData] = mDataManager->getData(mMaxBoundsData);
+
+	std::vector<Vector3D> points = getCorners_r_FromNonROI(data);
+
+	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, mMargin);
+	return bb;
+}
+
+std::vector<Vector3D> RegionOfInterestMetric::getCorners_r_FromNonROI(std::map<QString, DataPtr> data) const
+{
 	std::vector<Vector3D> points;
 	// create a max ROI containing all data plus margin
-	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
+	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
 	{
-		std::vector<Vector3D> c = this->getCorners_r(i->second);
+		DataPtr current = i->second;
+		if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(current))
+			continue;
+		std::vector<Vector3D> c = this->getCorners_r(current);
 		std::copy(c.begin(), c.end(), back_inserter(points));
 	}
 
-	double margin = 20;
-	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, margin);
-	return bb;
+	return points;
 }
 
 DoubleBoundingBox3D RegionOfInterestMetric::generateROIFromPointsAndMargin(const std::vector<Vector3D>& points, double margin) const

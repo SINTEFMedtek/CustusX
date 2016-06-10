@@ -972,7 +972,6 @@ RegionOfInterestMetricWrapper::RegionOfInterestMetricWrapper(ViewServicePtr view
 	MetricBase(viewService, patientModelService),
 	mData(data)
 {
-//	mArguments.setArguments(data->getArguments());
 	mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 }
@@ -992,6 +991,12 @@ QWidget* RegionOfInterestMetricWrapper::createWidget()
 
 	mUseActiveTooltipProperty = this->createUseActiveTooltipSelector();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mUseActiveTooltipProperty));
+
+	mMaxBoundsDataProperty = this->createMaxBoundsDataSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMaxBoundsDataProperty));
+
+	mMarginProperty = this->createMarginSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMarginProperty));
 
 	this->addColorWidget(topLayout);
 	topLayout->addStretch();
@@ -1030,6 +1035,34 @@ StringListPropertyPtr RegionOfInterestMetricWrapper::createDataListProperty()
 	return retval;
 }
 
+StringPropertyPtr RegionOfInterestMetricWrapper::createMaxBoundsDataSelector()
+{
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("max_bounds_data",
+										"Max Bounds",
+										"Select data to define maximal extent of ROI",
+										"",
+										QStringList(),
+										QDomNode());
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+DoublePropertyPtr RegionOfInterestMetricWrapper::createMarginSelector() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("margin",
+										"Margin",
+										"Margin added outside the data",
+										0,
+										DoubleRange(0, 100, 1),
+										1,
+										QDomNode());
+
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
 BoolPropertyPtr RegionOfInterestMetricWrapper::createUseActiveTooltipSelector() const
 {
 	BoolPropertyPtr retval;
@@ -1061,6 +1094,11 @@ void RegionOfInterestMetricWrapper::update()
 	mDataListProperty->setValueRange(data);
 	mDataListProperty->setDisplayNames(names);
 
+	mMaxBoundsDataProperty->setValue(mData->getMaxBoundsData());
+	mMaxBoundsDataProperty->setValueRange(data);
+	mMaxBoundsDataProperty->setDisplayNames(names);
+
+	mMarginProperty->setValue(mData->getMargin());
 	mUseActiveTooltipProperty->setValue(mData->getUseActiveTooltip());
 
 	mInternalUpdate = false;
@@ -1072,6 +1110,8 @@ void RegionOfInterestMetricWrapper::guiChanged()
 		return;
 	mData->setDataList(mDataListProperty->getValue());
 	mData->setUseActiveTooltip(mUseActiveTooltipProperty->getValue());
+	mData->setMargin(mMarginProperty->getValue());
+	mData->setMaxBoundsData(mMaxBoundsDataProperty->getValue());
 }
 
 

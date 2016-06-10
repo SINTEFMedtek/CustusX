@@ -74,7 +74,8 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;
-	QString mAutoZoomROI; // name of ROI to zoom to, and set focus in.
+	QString mFocusROI; // name of ROI to set focus in.
+	QString mAutoZoomROI; // name of ROI to zoom to.
 };
 cxResourceVisualization_EXPORT bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs);
 

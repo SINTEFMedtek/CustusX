@@ -144,6 +144,13 @@ void CameraStyleForView::applyCameraStyle()
 	Vector3D focus_r = focus_old;
 	Vector3D vup_r = vup_old;
 
+	if (!mStyle.mFocusROI.isEmpty())
+	{
+		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mFocusROI);
+		if (roi_r != DoubleBoundingBox3D::zero())
+			focus_r = roi_r.center();
+	}
+
 	if (mFollowingTool)
 	{
 		Transform3D rMpr = mBackend->patient()->get_rMpr();
@@ -181,7 +188,7 @@ void CameraStyleForView::applyCameraStyle()
 	if (mStyle.mCameraFollowTool)
 		camera_r = NavigationAlgorithms::elevateCamera(mStyle.mElevation, camera_r, focus_r, vup_r);
 
-	// reset vup based on vpn
+	// reset vup based on vpn (do not change vpn after this point)
 	if (!similar(vup_r, vup_old))
 	{
 		Vector3D vpn_r = (camera_r-focus_r).normal();
@@ -190,18 +197,11 @@ void CameraStyleForView::applyCameraStyle()
 
 	if (!mStyle.mAutoZoomROI.isEmpty())
 	{
-		DoubleBoundingBox3D roi_r = this->getROI();
+		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mAutoZoomROI);
 		if (roi_r != DoubleBoundingBox3D::zero())
 		{
 			double viewAngle = camera->GetViewAngle()/180.0*M_PI;
 			Vector3D vpn = (camera_r-focus_r).normal();
-
-//			Transform3D rMpr = mBackend->patient()->get_rMpr();
-//			Transform3D prMt = mBackend->tracking()->getActiveTool()->get_prMt();
-//			Transform3D rMt = rMpr * prMt;
-//			Vector3D tp = rMt.coord(Vector3D(0, 0, 0));
-
-//			double t_dist = this->findCameraDistance(viewAngle, focus_r, vpn, tp);
 
 			this->getRenderer()->ComputeAspect();
 			double aspect[2];
@@ -217,25 +217,9 @@ void CameraStyleForView::applyCameraStyle()
 																					vpn,
 																					roi_r);
 
-
-//					std::cout << "      roi_r: <" << roi_r << std::endl;
-//					std::cout << "      camera_r: < " << camera_r << " >" << std::endl;
-//					std::cout << "      vpn: < " << vpn << " >" << std::endl;
-//					std::cout << "      focus_r: < " << focus_r << " >" << std::endl;
-//					std::cout << "      dist: < " << dist << " >" << std::endl;
-//					std::cout << "      t_dist: < " << dist << " >" << std::endl;
-//					std::cout << "      camera_r_t: < " << camera_r_t << " >" << std::endl;
-//					std::cout << "      "  << std::endl;
 			camera_r = camera_r_t;
 		}
 	}
-
-//	CX_LOG_CHANNEL_DEBUG("CA") << " pos " << Vector3D(camera->GetPosition());
-//	CX_LOG_CHANNEL_DEBUG("CA") << " foc " << Vector3D(camera->GetFocalPoint());
-//	CX_LOG_CHANNEL_DEBUG("CA") << " vup " << Vector3D(camera->GetViewUp());
-//	CX_LOG_CHANNEL_DEBUG("CA") << " vpn " << Vector3D(camera->GetViewPlaneNormal());
-//	CX_LOG_CHANNEL_DEBUG("CA") << "view angle " << camera->GetViewAngle();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "";
 
 	if (similar(pos_old, camera_r, 0.1) && similar(focus_old, focus_r, 0.1) && similar(vup_old, vup_r,0.1 ))
 		return; // break update loop: this event is triggered by camera change.
@@ -250,9 +234,9 @@ void CameraStyleForView::applyCameraStyle()
 	mBlockCameraUpdate = false;
 }
 
-DoubleBoundingBox3D CameraStyleForView::getROI()
+DoubleBoundingBox3D CameraStyleForView::getROI(QString uid)
 {
-	DataPtr data = mBackend->patient()->getData(mStyle.mAutoZoomROI);
+	DataPtr data = mBackend->patient()->getData(uid);
 	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 	if (roi)
 		return roi->getROI();

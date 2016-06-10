@@ -110,6 +110,7 @@ void CameraStyleData::clear()
 	mElevation = 0;
 	mUniCam = false;
 	mAutoZoomROI = "";
+	mFocusROI = "";
 }
 
 void CameraStyleData::addXml(QDomNode &dataNode)
@@ -121,7 +122,7 @@ void CameraStyleData::addXml(QDomNode &dataNode)
 	elem.setAttribute("elevation", mElevation);
 	elem.setAttribute("uniCam", mUniCam);
 	elem.setAttribute("autoZoomROI", mAutoZoomROI);
-//	elem.setAttribute("style", mStyle);
+	elem.setAttribute("focusROI", mFocusROI);
 }
 
 void CameraStyleData::parseXml(QDomNode dataNode)
@@ -133,7 +134,7 @@ void CameraStyleData::parseXml(QDomNode dataNode)
 	mElevation = elem.attribute("elevation", QString::number(mElevation)).toDouble();
 	mUniCam = elem.attribute("uniCam", QString::number(mUniCam)).toInt();
 	mAutoZoomROI = elem.attribute("autoZoomROI", mAutoZoomROI);
-	//	mStyle = elem.attribute("mStyle", QString::number(mStyle)).toInt();
+	mFocusROI = elem.attribute("focusROI", mFocusROI);
 }
 
 bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs)
@@ -143,7 +144,8 @@ bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs)
 			(lhs.mTableLock==rhs.mTableLock) &&
 			similar(lhs.mElevation, rhs.mElevation) &&
 			(lhs.mUniCam==rhs.mUniCam) &&
-			(lhs.mAutoZoomROI==rhs.mAutoZoomROI)
+			(lhs.mAutoZoomROI==rhs.mAutoZoomROI) &&
+			(lhs.mFocusROI==rhs.mFocusROI)
 			);
 }
 

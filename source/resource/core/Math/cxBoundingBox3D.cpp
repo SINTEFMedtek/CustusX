@@ -306,6 +306,25 @@ DoubleBoundingBox3D DoubleBoundingBox3D::unionWith(const DoubleBoundingBox3D& ot
 	return fromCloud(cloud);
 }
 
+DoubleBoundingBox3D intersection(DoubleBoundingBox3D a, DoubleBoundingBox3D b)
+{
+	DoubleBoundingBox3D bb = a;
+
+	for (int i=0; i<3; ++i)
+	{
+		bb[2*i]   = std::max(a[2*i],   b[2*i]);
+		bb[2*i+1] = std::min(a[2*i+1], b[2*i+1]);
+	}
+
+	// check for no intersection
+	Vector3D range = bb.range();
+	for (int i=0; i<3; ++i)
+		if (range[i]<0.0)
+			return DoubleBoundingBox3D::zero();
+
+	return bb;
+}
+
 // --------------------------------------------------------
 //} // namespace utils
 } // namespace cx

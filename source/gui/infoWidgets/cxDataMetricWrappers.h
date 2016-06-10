@@ -240,7 +240,6 @@ private:
   BoolPropertyPtr mFlat;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
-
 };
 
 class cxGui_EXPORT CustomMetricWrapper : public MetricBase
@@ -325,10 +324,16 @@ private slots:
 private:
   StringListPropertyPtr mDataListProperty;
   BoolPropertyPtr mUseActiveTooltipProperty;
+  StringPropertyPtr mMaxBoundsDataProperty;
+  DoublePropertyPtr mMarginProperty;
+
   RegionOfInterestMetricPtr mData;
   bool mInternalUpdate;
+
+  DoublePropertyPtr createMarginSelector() const;
   StringListPropertyPtr createDataListProperty();
   BoolPropertyPtr createUseActiveTooltipSelector() const;
+  StringPropertyPtr createMaxBoundsDataSelector();
 };
 
 
