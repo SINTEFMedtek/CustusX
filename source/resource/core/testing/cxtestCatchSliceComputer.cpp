@@ -208,12 +208,19 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
     slicer.setToolPosition(rMt);
     slicer.setFixedCenter(center);
 
-
+    slicer.setGravity(true, cx::Vector3D(0, 0, -1));
 
     //TOOLSIDE
     slicer.setPlaneType(cx::ptTOOLSIDEPLANE);
     cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, -1, 0), cx::Vector3D( 0, 0, 1));
-// TODO create check here    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+
+
+
+
+
+
+
 
 
     cx::SlicePlane toolSidePlane2(c_tool, cx::Vector3D( 0, -0.707107, -0.707107), cx::Vector3D( 0, -0.707107, 0.707107));
