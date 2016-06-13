@@ -519,12 +519,7 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames(const QString& search
 bool PluginFrameworkManager::nameIsProbablyPlugin(QString name) const
 {
 	// heuristic check for plugin-ish name
-	if (name.count(".")<2) // some libs contain a _, they generate too much spam in installed version
-		return false;
-	if (name.contains("cxtest"))
-		return false;
-	return true;
-
+	return name.startsWith("org.custusx");
 }
 
 } /* namespace cx */
