@@ -56,7 +56,7 @@ DataPtr PatientModelService::getData(const QString& uid) const
 	if (uid=="active")
 		return this->getActiveData()->getActive();
 
-	std::map<QString, DataPtr> all = this->getData();
+	std::map<QString, DataPtr> all = this->getAllData();
 	std::map<QString, DataPtr>::const_iterator iter = all.find(uid);
 	if (iter == all.end())
 		return DataPtr();

@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXREGISTRATIONWIDGET_H_
 #define CXREGISTRATIONWIDGET_H_
 
+#include "org_custusx_registration_gui_Export.h"
 #include "cxTabbedWidget.h"
 #include "cxServiceTrackerListener.h"
 #include "cxRegistrationMethodService.h"
@@ -64,6 +65,8 @@ public:
 	RegistrationTypeWidget(QString type, QString defVal, XmlOptionFile options, QWidget* parent = 0);
 	virtual ~RegistrationTypeWidget() {}
 
+	void selectRegistrationMethod(QString registrationMethodName);
+
 	void addMethod(RegistrationMethodService* service);
 	void removeMethod(RegistrationMethodService *service);
 
@@ -86,12 +89,14 @@ private:
  * \author Ole Vegard Solberg, SINTEF
  * \author Geir Arne Tangen, SINTEF
  */
-class RegistrationWidget : public TabbedWidget
+class org_custusx_registration_gui_EXPORT RegistrationWidget : public TabbedWidget
 {
 	Q_OBJECT
 public:
 	RegistrationWidget(ctkPluginContext *pluginContext, QWidget* parent = 0);
 	virtual ~RegistrationWidget() {}
+
+	void selectRegistrationMethod(QString registrationType, QString registrationMethodName);
 
 private slots:
 	void onCurrentChanged(int index);
