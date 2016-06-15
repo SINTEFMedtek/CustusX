@@ -64,9 +64,11 @@ public:
 	struct CategorizedWidget
 	{
 		CategorizedWidget() {}
-		CategorizedWidget(QWidget* widget, QString category) : mWidget(widget), mCategory(category) {}
+		CategorizedWidget(QWidget* widget, QString category, bool placeInSeparateWindow = false) :
+			mWidget(widget), mCategory(category), mPlaceInSeparateWindow(placeInSeparateWindow) {}
 		QWidget* mWidget;
 		QString mCategory;
+		bool mPlaceInSeparateWindow;
 	};
 	virtual ~GUIExtenderService() {}
 

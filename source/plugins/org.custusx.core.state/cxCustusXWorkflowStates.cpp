@@ -54,6 +54,7 @@ NavigationWorkflowState::NavigationWorkflowState(QState* parent, CoreServicesPtr
 
 void NavigationWorkflowState::onEntry(QEvent * event)
 {
+	WorkflowState::onEntry(event);
 	this->autoStartHardware();
 }
 
@@ -114,6 +115,7 @@ IntraOpImagingWorkflowState::IntraOpImagingWorkflowState(QState* parent, CoreSer
 
 void IntraOpImagingWorkflowState::onEntry(QEvent * event)
 {
+	WorkflowState::onEntry(event);
 	this->autoStartHardware();
 }
 

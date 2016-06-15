@@ -30,63 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpBrowser.h"
-
-#include <QHelpEngine>
-#include "cxHelpEngine.h"
-#include "cxTypeConversions.h"
-#include <iostream>
-#include <QDesktopServices>
+#include "cxTrainingGUIExtenderService.h"
+#include "ctkPluginContext.h"
+#include "cxNeuroTrainingWidget.h"
+#include "cxRegServices.h"
 
 namespace cx
 {
-HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
-	: QTextBrowser(parent), mEngine(engine)
+
+
+TrainingGUIExtenderService::TrainingGUIExtenderService(ctkPluginContext *context) :
+  mContext(context)
 {
 }
 
-void HelpBrowser::showHelpForKeyword(const QString &id)
+TrainingGUIExtenderService::~TrainingGUIExtenderService()
 {
-	if (mEngine->engine())
-	{
-		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
-		if (links.count())
-		{
-			setSource(links.first());
-		}
-	}
 }
 
-void HelpBrowser::setSource(const QUrl& name)
+std::vector<GUIExtenderService::CategorizedWidget> TrainingGUIExtenderService::createWidgets() const
 {
-	if (name.scheme() == "qthelp")
-		QTextBrowser::setSource(name);
-	else
-	{
-		QDesktopServices::openUrl(name);
-	}
+	std::vector<CategorizedWidget> retval;
 
+	RegServicesPtr services = RegServices::create(mContext);
+
+	retval.push_back(GUIExtenderService::CategorizedWidget(
+			new NeuroTrainingWidget(services, mContext),
+			"Simulator", true));
+
+	return retval;
 }
 
-void HelpBrowser::listenToEngineKeywordActivated()
-{
-	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
-}
 
-QVariant HelpBrowser::loadResource(int type, const QUrl &name)
-{
-	if (type < 4 && mEngine->engine())
-	{
-		QUrl url(name);
-		if (name.isRelative())
-			url = source().resolved(url);
-
-		if (url.scheme() == "qthelp")
-			return QVariant(mEngine->engine()->fileData(url));
-		else
-			return QTextBrowser::loadResource(type, url);
-	}
-	return QVariant();
-}
-
-}//end namespace cx
+} /* namespace cx */

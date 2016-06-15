@@ -30,42 +30,79 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXHELPBROWSER_H
-#define CXHELPBROWSER_H
+#ifndef CXTRAININGWIDGET_H_
+#define CXTRAININGWIDGET_H_
 
+#include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
-#include <QTextBrowser>
-#include "org_custusx_help_Export.h"
+#include "org_custusx_training_Export.h"
+#include <boost/function.hpp>
+#include "cxForwardDeclarations.h"
+class ctkPluginContext;
+class QPushButton;
 
-namespace cx
-{
+namespace cx {
+
 typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+class HelpBrowser;
+
 
 /**
+ * Top-level help widget
  *
- * \ingroup org_custusx_help
+ * \ingroup org_custusx_training
  *
- * \date 2014-09-30
+ * \date 2016-03-14
  * \author Christian Askeland
+ * \author Janne Beate Bakeng
  */
-class org_custusx_help_EXPORT HelpBrowser : public QTextBrowser
+class org_custusx_training_EXPORT TrainingWidget : public BaseWidget
 {
 	Q_OBJECT
 
 public:
-	HelpBrowser(QWidget *parent, HelpEnginePtr engine);
-	virtual void setSource(const QUrl& name);
-	void listenToEngineKeywordActivated();
+	explicit TrainingWidget(RegServicesPtr services, QString objectName, QString windowTitle, QWidget* parent = NULL);
+	virtual ~TrainingWidget();
 
-public slots:
-	void showHelpForKeyword(const QString &id);
+protected:
+    void resetSteps();
+
+    typedef boost::function<void(void)> func_t;
+    typedef std::vector<func_t> funcs_t;
+    void registrateTransition( func_t transition);
+
+protected:
+	void makeUnavailable(QString uidPart, bool makeModalityUnavailable = false);
+	void makeAvailable(QString uidPart, bool makeModalityUnavailable);
+	RegServicesPtr mServices;
+
+	QString getFirstUSVolume();
+	MeshPtr getMesh(QString uidPart);
+private slots:
+    void onImportSimulatedPatient();
 
 private:
-	virtual QVariant loadResource(int type, const QUrl &name);
-	HelpEnginePtr mEngine;
+    void createActions();
+    void createSteps(unsigned numberOfSteps);
+    CXToolButton *addToolButtonFor(QHBoxLayout *layout, QAction *action);
+    void toWelcomeStep();
+    void onStep(int delta);
+    void stepTo(int step);
+    void transitionToStep(int step);
+	void setAvailability(std::map<QString, DataPtr> datas, bool available, QString uidPart, bool makeModalityUnavailable);
+
+    HelpEnginePtr mEngine;
+    HelpBrowser* mBrowser;
+
+    funcs_t mTransitions;
+
+    int mCurrentStep;
+    QAction* mPreviousAction;
+    QAction* mNextAction;
+    QAction* mCurrentAction;
+    QAction* mImportAction;
+	QStringList mSessionIDs;
 };
 
-
-}//end namespace cx
-
-#endif // CXHELPBROWSER_H
+} /* namespace cx */
+#endif /* CXTRAININGWIDGET_H_ */
