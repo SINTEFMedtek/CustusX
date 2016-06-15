@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxLogger.h"
 #include "cxStateService.h"
-#include "cxApplicationsParser.h"
 #include "cxRegistrationWidget.h"
 #include "cxStreamerServiceUtilities.h"
 #include "cxRegistrationService.h"
