@@ -52,8 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-//Test: Run test as integration to get more output for debugging (in addition to unit)
-TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming][integration]")
+TEST_CASE("VideoConnectionWidget can stream", "[gui][not_win32][widget][streaming][integration]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
