@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class RegionOfInterestMetric> RegionOfInterestMetricPtr;
 typedef boost::shared_ptr<class ViewFollower> ViewFollowerPtr;
 
 /**
@@ -57,8 +59,14 @@ public:
 	static ViewFollowerPtr create(PatientModelServicePtr dataManager);
 	void setSliceProxy(SliceProxyPtr sliceProxy);
 	void setView(DoubleBoundingBox3D bb_s);
+//	void setROI(DoubleBoundingBox3D bb_s);
+	void setAutoZoomROI(QString uid);
+
+signals:
+	void newZoom(double);
 
 private slots:
+	void updateView();
 	void ensureCenterWithinView();
 private:
 	explicit ViewFollower(PatientModelServicePtr dataManager);
@@ -67,11 +75,19 @@ private:
 	Vector3D findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s);
 	void applyShiftToCenter(Vector3D shift_s);
 	Vector3D findVirtualTooltip_s();
+	void autoZoom();
 
 	SliceProxyPtr mSliceProxy;
 	DoubleBoundingBox3D mBB_s;
+//	QString mAutoZoomRoi;
+//	DoubleBoundingBox3D mROI_s;
 	PatientModelServicePtr mDataManager;
-private:
+	RegionOfInterestMetricPtr mRoi;
+
+	double findZoomRequiredToIncludeRoi(DoubleBoundingBox3D base, DoubleBoundingBox3D roi);
+	Vector3D findShiftFromBoxToROI(DoubleBoundingBox3D BB, DoubleBoundingBox3D roi);
+	DoubleBoundingBox3D getROI_BB_s();
+	Vector3D findShiftedCenter_r(Vector3D shift_s);
 };
 
 

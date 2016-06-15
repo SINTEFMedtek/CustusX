@@ -164,6 +164,8 @@ private:
 	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
+	//	void sendROItoFollower();
+	void changeZoom(double delta);
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

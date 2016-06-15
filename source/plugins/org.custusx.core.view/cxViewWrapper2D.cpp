@@ -86,6 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxViewService.h"
+#include "cxRegionOfInterestMetric.h"
 
 #ifndef CX_VTK_OPENGL2
 #include "cxTexture3DSlicerRep.h"
@@ -119,6 +120,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 
 	mViewFollower = ViewFollower::create(mServices->patient());
 	mViewFollower->setSliceProxy(mSliceProxy);
+//	connect(mViewFollower.get(), &ViewFollower::newZoom, this, &ViewWrapper2D::changeZoom);
 
 	addReps();
 
@@ -142,6 +144,16 @@ ViewWrapper2D::~ViewWrapper2D()
 {
 	if (mView)
 		mView->removeReps();
+}
+
+void ViewWrapper2D::changeZoom(double delta)
+{
+	double zoom = mZoom2D->getFactor();
+	CX_LOG_CHANNEL_DEBUG("CA") << "changing zoom from " << zoom << " by " << delta;
+	zoom *= delta;
+	CX_LOG_CHANNEL_DEBUG("CA") << "            new zoom:" << zoom;
+	mZoom2D->setFactor(zoom);
+	CX_LOG_CHANNEL_DEBUG("CA") << "            got zoom:" << mZoom2D->getFactor();
 }
 
 void ViewWrapper2D::samplePoint(Vector3D click_vp)
@@ -181,6 +193,12 @@ void ViewWrapper2D::optionChangedSlot()
 	{
 		mPickerGlyphRep->setMesh(options.mPickerGlyph);
 	}
+
+//	if (mViewFollower)
+//	{
+//		QString roiUid = mGroupData->getOptions().mCameraStyle.mAutoZoomROI;
+//		mViewFollower->setAutoZoomROI(roiUid);
+//	}
 }
 
 void ViewWrapper2D::addReps()

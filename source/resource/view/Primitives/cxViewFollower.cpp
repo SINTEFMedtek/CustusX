@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewFollower.h"
 
+#include <QTimer>
 #include "cxSliceProxy.h"
 #include "cxSettings.h"
 #include "cxSliceComputer.h"
@@ -40,7 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 
 #include "cxPatientModelService.h"
-
+#include "cxLogger.h"
+#include "cxRegionOfInterestMetric.h"
 
 namespace cx
 {
@@ -53,7 +55,7 @@ ViewFollowerPtr ViewFollower::create(PatientModelServicePtr dataManager)
 ViewFollower::ViewFollower(PatientModelServicePtr dataManager) :
 	mDataManager(dataManager)
 {
-
+//	mROI_s = DoubleBoundingBox3D::zero();
 }
 
 
@@ -68,14 +70,54 @@ void ViewFollower::setSliceProxy(SliceProxyPtr sliceProxy)
 
 	if (mSliceProxy)
 	{
-		connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
+		connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(updateView()));
 	}
 }
 
 void ViewFollower::setView(DoubleBoundingBox3D bb_s)
 {
 	mBB_s = bb_s;
-	this->ensureCenterWithinView();
+	this->updateView();
+}
+
+void ViewFollower::setAutoZoomROI(QString uid)
+{
+//	mAutoZoomRoi = uid;
+
+	if (mRoi)
+		disconnect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
+
+	DataPtr data = mDataManager->getData(uid);
+	mRoi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+
+	if (mRoi)
+		connect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
+
+	this->updateView();
+}
+
+DoubleBoundingBox3D ViewFollower::getROI_BB_s()
+{
+//	QString roiUid = mAutoZoomROI;
+//	DataPtr data = mDataManager->getData(roiUid);
+//	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+	if (!mRoi)
+	{
+		return DoubleBoundingBox3D::zero();
+	}
+
+	CX_LOG_CHANNEL_DEBUG("CA") << "generate bb_roi_s";
+	Transform3D sMr = mSliceProxy->get_sMr();
+	DoubleBoundingBox3D bb_s = mRoi->getROI().getBox(sMr);
+	return bb_s;
+}
+
+void ViewFollower::updateView()
+{
+	QTimer::singleShot(0, this, &ViewFollower::ensureCenterWithinView);
+	QTimer::singleShot(0, this, &ViewFollower::autoZoom);
+//	this->ensureCenterWithinView();
+//	this->autoZoom();
 }
 
 void ViewFollower::ensureCenterWithinView()
@@ -90,12 +132,88 @@ void ViewFollower::ensureCenterWithinView()
 		return;
 
 	// this applies only to orthogonal views: oblique follows tool anyway
-	if (mSliceProxy->getComputer().getOrientationType()!=otORTHOGONAL)
-		return;
-
-	Vector3D shift_s = this->findCenterShift_s();
-	this->applyShiftToCenter(shift_s);
+	if (mSliceProxy->getComputer().getOrientationType()==otORTHOGONAL)
+	{
+		Vector3D shift_s = this->findCenterShift_s();
+		this->applyShiftToCenter(shift_s);
+	}
 }
+
+void ViewFollower::autoZoom()
+{
+	DoubleBoundingBox3D roi_s = this->getROI_BB_s();
+	// autozoom
+	// if orthogonal: zoom to centered box
+	//                shift pos to box
+	//
+	// if oblique:    zoom to actual box
+	//
+	if (mSliceProxy->getComputer().getOrientationType()==otORTHOGONAL)
+	{
+		// roi: bb defining region of interest
+		// box: viewable section
+		//
+		// find centered roi
+		// find zoom needed to see entire centered roi
+		// apply zoom to box and emit zoom
+		// find shift required to see entire roi
+		// set center based on shift
+
+		CX_LOG_CHANNEL_DEBUG("CA") << "";
+
+		Transform3D T = createTransformTranslate(-roi_s.center());
+		DoubleBoundingBox3D roi_sc = transform(T, roi_s);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "roi_s " << roi_s;
+//		CX_LOG_CHANNEL_DEBUG("CA") << "roi_sc " << roi_sc;
+//		CX_LOG_CHANNEL_DEBUG("CA") << "mBB_s " << mBB_s;
+
+		double zoom = this->findZoomRequiredToIncludeRoi(mBB_s, roi_sc);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "autozoom zoom " << zoom;
+		Transform3D S = createTransformScale(Vector3D::Ones()*zoom);
+		DoubleBoundingBox3D bb_zoomed = transform(S, mBB_s);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "bb_zoomed " << bb_zoomed;
+
+		// find shift
+		Vector3D shift = this->findShiftFromBoxToROI(bb_zoomed, roi_s);
+//		CX_LOG_CHANNEL_DEBUG("CA") << "autozoom shift " << shift;
+
+		Vector3D newcenter_r = this->findShiftedCenter_r(shift);
+
+		if (!similar(zoom, 1.0))
+		{
+			CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom " << zoom;
+			emit newZoom(1.0/zoom);
+		}
+		if (!similar(shift, Vector3D::Zero()))
+		{
+			CX_LOG_CHANNEL_DEBUG("CA") << this << "autozoom shift " << shift;
+			mDataManager->setCenter(newcenter_r);
+		}
+	}
+	else
+	{
+		// find zoom needed to see entire box
+		// emit zoom
+		double zoom = this->findZoomRequiredToIncludeRoi(mBB_s, roi_s);
+		CX_LOG_CHANNEL_DEBUG("CA") << "autozoom zoom " << zoom;
+		emit newZoom(zoom);
+	}
+}
+
+double ViewFollower::findZoomRequiredToIncludeRoi(DoubleBoundingBox3D base, DoubleBoundingBox3D roi)
+{
+	double scale = 0;
+	// find zoom in x and y
+	for (int i=0; i<2; ++i)
+	{
+		double base_max = fabs(std::max(base[2*i], base[2*i+1]));
+		double roi_max = fabs(std::max(roi[2*i], roi[2*i+1]));
+		scale = std::max(scale, roi_max/base_max);
+	}
+
+	return scale;
+}
+
 
 Vector3D ViewFollower::findCenterShift_s()
 {
@@ -140,6 +258,9 @@ DoubleBoundingBox3D ViewFollower::findStaticBox()
 	return BB_s;
 }
 
+/**
+ * Find the shift required to move BB_s to include pt_s.
+ */
 Vector3D ViewFollower::findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s)
 {
 	Vector3D shift = Vector3D::Zero();
@@ -155,12 +276,44 @@ Vector3D ViewFollower::findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector
 	return shift;
 }
 
-void ViewFollower::applyShiftToCenter(Vector3D shift_s)
+/**
+ * Find the shift required to move BB_s to include roi_s.
+ */
+Vector3D ViewFollower::findShiftFromBoxToROI(DoubleBoundingBox3D bb, DoubleBoundingBox3D roi)
+{
+	Vector3D shift = Vector3D::Zero();
+
+	for (unsigned i=0; i<2; ++i) // loop over two first dimensions, check if roi outside of bb
+	{
+		if (roi[2*i  ] < bb[2*i  ])
+			shift[i] += roi[2*i  ] - bb[2*i ];
+		if (roi[2*i+1] > bb[2*i+1])
+			shift[i] += roi[2*i+1] - bb[2*i+1];
+	}
+
+//	for (unsigned i=0; i<2; ++i) // loop over two first dimensions, check if roi outside of bb
+//	{
+//		if (roi_s[2*i+1] < BB_s[2*i])
+//			shift[i] += roi_s[2*i+1] - BB_s[2*i];
+//		if (roi_s[2*i] > BB_s[2*i+1])
+//			shift[i] += roi_s[i] - BB_s[2*i+1];
+//	}
+
+	return shift;
+}
+
+Vector3D ViewFollower::findShiftedCenter_r(Vector3D shift_s)
 {
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Vector3D c_s = sMr.coord(mDataManager->getCenter());
 	Vector3D newcenter_s = c_s + shift_s;
 	Vector3D newcenter_r = sMr.inv().coord(newcenter_s);
+	return newcenter_r;
+}
+
+void ViewFollower::applyShiftToCenter(Vector3D shift_s)
+{
+	Vector3D newcenter_r = this->findShiftedCenter_r(shift_s);
 	mDataManager->setCenter(newcenter_r);
 }
 
