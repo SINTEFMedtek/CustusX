@@ -90,7 +90,7 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 		setOrientationType(otORTHOGONAL);
 		setFollowType(ftFIXED_CENTER);
 	}
-    else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE || plane==ptTOOLSIDEPLANE)
+    else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
 	{
 		setOrientationType(otOBLIQUE);
 		setFollowType(ftFOLLOW_TOOL);
@@ -98,6 +98,19 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 		setGravity(useGravity, gravityDir);
 		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, useConstrainedViewOffset); // TODO finish this one
 	}
+    else if (plane==ptTOOLSIDEPLANE)
+    {
+        setOrientationType(otOBLIQUE);
+        //setOrientationType(otORTHOGONAL);
+        setFollowType(ftFIXED_CENTER); //skal være dette
+        //setFollowType(ftFOLLOW_TOOL);
+
+
+
+
+        //HALLO, HALLO! Alle plasser som kaller denne metoden må bruke bordets ned-vektor!
+        setGravity(true, Vector3D(0,0,-1));
+    }
 }
 
 void SliceComputer::setClinicalApplication(CLINICAL_VIEW application)
@@ -423,7 +436,7 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
  * Orient the plane so that k is perpendicular to the up vector:
  *
  * k' = -up x i
- * j' = k x i
+ * j' = k' x i
  */
 SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base) const
 {
