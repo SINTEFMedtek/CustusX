@@ -163,6 +163,18 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 	emit centerChanged();
 }
 
+void DataManagerImpl::setOperatingTable(const OperatingTable &ot)
+{
+    mOperatingTable = ot;
+    emit operatingTableChanged();
+}
+
+OperatingTable DataManagerImpl::getOperatingTable() const
+{
+    return mOperatingTable;
+}
+
+
 void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
 {
 	mLandmarkProperties.clear();
@@ -321,6 +333,10 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
 	dataManagerNode.appendChild(centerNode);
 
+    QDomElement otNode = doc.createElement("operatingTable");
+    otNode.appendChild(doc.createTextNode(qstring_cast(mOperatingTable.rMtb)));
+    dataManagerNode.appendChild(otNode);
+
 	for (DataMap::const_iterator iter = mData.begin(); iter != mData.end(); ++iter)
 	{
 		QDomElement dataNode = doc.createElement("data");
@@ -391,6 +407,16 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 				this->setCenter(center);
 			}
 		}
+        if (child.toElement().tagName() == "operatingTable")
+        {
+            const QString ot = child.toElement().text();
+            if (!ot.isEmpty())
+            {
+                Transform3D tr = Transform3D::fromString(ot);
+                OperatingTable t(tr);
+                this->setOperatingTable(t);
+            }
+        }
 		child = child.nextSibling();
 	}
 }

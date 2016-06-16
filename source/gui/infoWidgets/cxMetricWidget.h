@@ -111,6 +111,7 @@ protected slots:
   void addDistanceButtonClickedSlot();
   void addSphereButtonClickedSlot();
   void addDonutButtonClickedSlot();
+  void addCustomButtonClickedSlot();
 
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);

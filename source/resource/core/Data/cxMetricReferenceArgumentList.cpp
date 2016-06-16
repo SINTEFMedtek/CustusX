@@ -109,6 +109,19 @@ std::vector<Vector3D> MetricReferenceArgumentList::getRefCoords() const
 	return p;
 }
 
+std::vector<Transform3D> MetricReferenceArgumentList::getRefFrames() const
+{
+    std::vector<Transform3D> p(this->getCount());
+    for (unsigned i = 0; i < p.size(); ++i)
+    {
+        DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(mArgument[i]);
+        if (!metric)
+            return std::vector<Transform3D>();
+        p[i] = metric->getRefFrame();
+    }
+    return p;
+}
+
 void MetricReferenceArgumentList::addXml(QDomNode& dataNode)
 {
 	for (unsigned i = 0; i < mArgument.size(); ++i)

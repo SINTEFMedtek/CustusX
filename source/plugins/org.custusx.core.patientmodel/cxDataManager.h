@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
+#include "cxPatientModelService.h"
 
 #include "vtkForwardDeclarations.h"
 #include "cxVector3D.h"
@@ -96,6 +97,8 @@ public:
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 	virtual void setCenter(const Vector3D& center) = 0;
+    virtual void setOperatingTable(const OperatingTable &ot) = 0;
+    virtual OperatingTable getOperatingTable() const = 0;
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
@@ -125,6 +128,7 @@ public:
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.
+    void operatingTableChanged();
 	void dataAddedOrRemoved();
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void clinicalApplicationChanged();

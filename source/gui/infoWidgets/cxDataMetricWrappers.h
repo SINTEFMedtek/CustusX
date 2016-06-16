@@ -45,11 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaneMetric.h"
 #include "cxSphereMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxStringProperty.h"
 #include "cxVector3DProperty.h"
 #include "cxColorProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxSpaceProperty.h"
+#include "cxFilePathProperty.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -234,6 +236,43 @@ private:
   DoublePropertyPtr mThickness;
   DoublePropertyPtr mHeight;
   BoolPropertyPtr mFlat;
+  bool mInternalUpdate;
+  MetricReferenceArgumentListGui mArguments;
+
+};
+
+class cxGui_EXPORT CustomMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data);
+  virtual ~CustomMetricWrapper() {}
+  virtual QWidget* createWidget();
+//  virtual QString getValue() const;
+  virtual DataMetricPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+    virtual void update();
+
+private slots:
+  void dataChangedSlot();
+  void guiChanged();
+
+private:
+  DoublePropertyPtr createRadiusSelector() const;
+  DoublePropertyPtr createThicknessSelector() const;
+  DoublePropertyPtr createHeightSelector() const;
+  BoolPropertyPtr createFlatSelector() const;
+  StringPropertyPtr createDefineVectorUpMethodSelector() const;
+  FilePathPropertyPtr createSTLFileSelector() const;
+
+  CustomMetricPtr mData;
+  DoublePropertyPtr mRadius;
+  DoublePropertyPtr mThickness;
+  DoublePropertyPtr mHeight;
+  BoolPropertyPtr mFlat;
+  StringPropertyPtr mDefineVectorUpMethod;
+  FilePathPropertyPtr mSTLFile;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 

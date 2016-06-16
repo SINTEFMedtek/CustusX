@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolMetric.h"
 #include "cxPlaneMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxAngleMetric.h"
 #include "cxSphereMetric.h"
 #include "cxDataFactory.h"
@@ -310,6 +311,17 @@ void MetricManager::addDonutButtonClickedSlot()
 	d0->getArguments()->set(1, args[1]);
 
 	this->installNewMetric(d0);
+}
+
+void MetricManager::addCustomButtonClickedSlot()
+{
+    CustomMetricPtr d0 = patientService()->createSpecificData<CustomMetric>("Custom%1");
+    d0->get_rMd_History()->setParentSpace("reference");
+    std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+    d0->getArguments()->set(0, args[0]);
+    d0->getArguments()->set(1, args[1]);
+
+    this->installNewMetric(d0);
 }
 
 void MetricManager::installNewMetric(DataMetricPtr metric)

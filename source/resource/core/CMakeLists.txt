@@ -22,6 +22,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxToolMetric
     Data/cxFrameMetricBase
     Data/cxShapedMetric
+    Data/cxCustomMetric
     Data/cxSphereMetric
     Data/cxMetricReferenceArgumentList
     Data/cxLandmark

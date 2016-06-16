@@ -30,24 +30,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXDONUTMETRICREP_H
-#define CXDONUTMETRICREP_H
+#ifndef CXCUSTOMMETRICREP_H
+#define CXCUSTOMMETRICREP_H
 
 #include "cxResourceVisualizationExport.h"
 
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
+#include "cxGraphicalObjectWithDirection.h"
 
 
 namespace cx
 {
 typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
-typedef boost::shared_ptr<class DonutMetricRep> DonutMetricRepPtr;
-typedef boost::shared_ptr<class DonutMetric> DonutMetricPtr;
+typedef boost::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
+typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
 typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 
-/**Rep for visualizing a DonutMetric.
+/**Rep for visualizing a CustomMetric.
  *
  * \ingroup cx_resource_view
  * \ingroup cx_resource_view_rep3D
@@ -55,29 +56,31 @@ typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
  * \date 2014-02-11
  * \author Christian Askeland, SINTEF
  */
-class cxResourceVisualization_EXPORT DonutMetricRep: public DataMetricRep
+class cxResourceVisualization_EXPORT CustomMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-	static DonutMetricRepPtr New(const QString& uid = ""); ///constructor
-	virtual ~DonutMetricRep() {}
+    static CustomMetricRepPtr New(const QString& uid = ""); ///constructor
+    virtual ~CustomMetricRep() {}
 
-	virtual QString getType() const { return "DonutMetricRep"; }
+    virtual QString getType() const { return "CustomMetricRep"; }
 
 protected:
 	virtual void clear();
 	virtual void onModifiedStartRender();
 
 private:
-	DonutMetricRep();
-	DonutMetricPtr getDonutMetric();
+    CustomMetricRep();
+    CustomMetricPtr getCustomMetric();
 	void updateTorus();
 	void updateDisc();
+    void updateSTLModel();
 
 	GraphicalTorus3DPtr mTorus;
 	GraphicalDiskPtr mDisk;
+    GraphicalObjectWithDirectionPtr mSTLModel;
 };
 
 }
 
-#endif // CXDONUTMETRICREP_H
+#endif // CXCUSTOMMETRICREP_H

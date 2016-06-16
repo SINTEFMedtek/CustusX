@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
@@ -40,27 +40,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-DonutMetric::DonutMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
+CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
+    mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	mRadius = 5;
 	mThickness = 2;
 	mHeight = 0;
 	mFlat = true;
+    mDefineVectorUpMethod = mDefineVectorUpMethods.table;
+    mSTLFile = "";
 }
 
-DonutMetricPtr DonutMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
+CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
 {
-	return DonutMetricPtr(new DonutMetric(uid, name, dataManager, spaceProvider));
+    return mDefineVectorUpMethods;
 }
 
-DonutMetric::~DonutMetric()
+CustomMetricPtr CustomMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
+{
+    return CustomMetricPtr(new CustomMetric(uid, name, dataManager, spaceProvider));
+}
+
+CustomMetric::~CustomMetric()
 {
 }
 
-void DonutMetric::addXml(QDomNode& dataNode)
+void CustomMetric::addXml(QDomNode& dataNode)
 {
 	DataMetric::addXml(dataNode);
 
@@ -69,9 +77,11 @@ void DonutMetric::addXml(QDomNode& dataNode)
 	dataNode.toElement().setAttribute("thickness", mThickness);
 	dataNode.toElement().setAttribute("height", mHeight);
 	dataNode.toElement().setAttribute("flat", mFlat);
+    dataNode.toElement().setAttribute("definevectorup", mDefineVectorUpMethod);
+    dataNode.toElement().setAttribute("STLFile", mSTLFile);
 }
 
-void DonutMetric::parseXml(QDomNode& dataNode)
+void CustomMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 
@@ -80,24 +90,26 @@ void DonutMetric::parseXml(QDomNode& dataNode)
 	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
 	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
 	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
+    mDefineVectorUpMethod = dataNode.toElement().attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
+    mSTLFile = dataNode.toElement().attribute("STLFile", qstring_cast(mSTLFile));
 }
 
-bool DonutMetric::isValid() const
+bool CustomMetric::isValid() const
 {
 	return !mArguments->getRefCoords().empty();
 }
 
-Vector3D DonutMetric::getRefCoord() const
+Vector3D CustomMetric::getRefCoord() const
 {
 	return mArguments->getRefCoords().front();
 }
 
-DoubleBoundingBox3D DonutMetric::boundingBox() const
+DoubleBoundingBox3D CustomMetric::boundingBox() const
 {
 	return DoubleBoundingBox3D::fromCloud(mArguments->getRefCoords());
 }
 
-Vector3D DonutMetric::getPosition()
+Vector3D CustomMetric::getPosition() const
 {
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	if (coords.empty())
@@ -105,7 +117,7 @@ Vector3D DonutMetric::getPosition()
 	return coords[0];
 }
 
-Vector3D DonutMetric::getDirection()
+Vector3D CustomMetric::getDirection() const
 {
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	if (coords.size()<2)
@@ -113,59 +125,113 @@ Vector3D DonutMetric::getDirection()
 	Vector3D diff = (coords[1]-coords[0]);
 	if (similar(diff.length(), 0.0))
 		return Vector3D(0,1,0);
-	return diff.normal();
+    return diff.normal();
+}
+
+Vector3D CustomMetric::getVectorUp() const
+{
+    if(mDefineVectorUpMethod == mDefineVectorUpMethods.connectedFrameInP1)
+    {
+        std::vector<Transform3D> transforms = mArguments->getRefFrames();
+        if (transforms.size()<2)
+            return Vector3D::UnitZ();
+
+        Transform3D rMframe = transforms[1];
+        Vector3D upVector = rMframe.vector(Vector3D(-1,0,0));
+
+        return upVector;
+    }
+    else
+        return mDataManager->getOperatingTable().getVectorUp();
 }
 
 
-QString DonutMetric::getAsSingleLineString() const
+QString CustomMetric::getAsSingleLineString() const
 {
 	return QString("%1 %2")
 			.arg(this->getSingleLineHeader())
 			.arg(qstring_cast(""));
 }
 
-void DonutMetric::setRadius(double val)
+void CustomMetric::setRadius(double val)
 {
 	mRadius = val;
 	emit propertiesChanged();
 }
 
-double DonutMetric::getRadius() const
+double CustomMetric::getRadius() const
 {
 	return mRadius;
 }
 
-void DonutMetric::setThickness(double val)
+void CustomMetric::setThickness(double val)
 {
 	mThickness = val;
 	emit propertiesChanged();
 }
 
-double DonutMetric::getThickness() const
+double CustomMetric::getThickness() const
 {
 	return mThickness;
 }
 
-void DonutMetric::setHeight(double val)
+void CustomMetric::setHeight(double val)
 {
 	mHeight = val;
     emit propertiesChanged();
 }
 
-double DonutMetric::getHeight() const
+double CustomMetric::getHeight() const
 {
 	return mHeight;
 }
 
-void DonutMetric::setFlat(bool val)
+void CustomMetric::setFlat(bool val)
 {
 	mFlat = val;
 	emit propertiesChanged();
 }
 
-bool DonutMetric::getFlat() const
+bool CustomMetric::getFlat() const
 {
 	return mFlat;
+}
+
+QString CustomMetric::getDefineVectorUpMethod() const
+{
+    return mDefineVectorUpMethod;
+}
+
+void CustomMetric::setDefineVectorUpMethod(QString defineVectorUpMethod)
+{
+    mDefineVectorUpMethod = defineVectorUpMethod;
+}
+
+void CustomMetric::setSTLFile(QString val)
+{
+    mSTLFile = val;
+    emit propertiesChanged();
+}
+
+QString CustomMetric::getSTLFile() const
+{
+    return mSTLFile;
+}
+
+QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethods() const
+{
+    QStringList retval;
+    retval << table;
+    retval << connectedFrameInP1;
+    return retval;
+}
+
+std::map<QString, QString> CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethodsDisplayNames() const
+{
+    std::map<QString, QString> names;
+    names[table] = "The operating table";
+    names[connectedFrameInP1] = "The connected frame in p1";
+    return names;
 }
 
 }

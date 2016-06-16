@@ -65,6 +65,7 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
 	connect(this->dataService().get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
+    connect(this->dataService().get(), &DataManager::operatingTableChanged, this, &PatientModelService::operatingTableChanged);
 	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
@@ -244,6 +245,15 @@ Vector3D PatientModelImplService::getCenter() const
 	return this->dataService()->getCenter();
 }
 
+void PatientModelImplService::setOperatingTable(const OperatingTable &ot)
+{
+    this->dataService()->setOperatingTable(ot);
+}
+
+OperatingTable PatientModelImplService::getOperatingTable() const
+{
+    return this->dataService()->getOperatingTable();
+}
 
 QString PatientModelImplService::addLandmark()
 {
