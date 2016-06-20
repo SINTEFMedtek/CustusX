@@ -39,8 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include "cxOpenIGTLinkTrackingSystemService.h"
 //#include "cxOpenIGTLinkGuiExtenderService.h"
 //#include "cxNetworkConnection.h"
-//#include "cxRegisteredService.h"
+#include "cxRegisteredService.h"
 //#include "cxNetworkServiceImpl.h"
+
+#include "cxOpenIGTLinkGuiExtenderService.h"
 
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkIGTLIOLogic> vtkIGTLIOLogicPointer;
@@ -59,9 +61,6 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-
-    vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
-    logic->Print(std::cout);
     /*
 	mNetworkConnections.reset(new NetworkServiceImpl());
 
@@ -69,10 +68,12 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
+    */
 
-	OpenIGTLinkGuiExtenderService* gui = new OpenIGTLinkGuiExtenderService(context, mNetworkConnections);
+    OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context);
 
-    mRegistrationGui = RegisteredService::create<OpenIGTLinkGuiExtenderService>(context, gui, GUIExtenderService_iid);
+    mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
+    /*
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
     mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
     */
@@ -80,8 +81,8 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 {
-    /*
     mRegistrationGui.reset();
+    /*
     mRegistrationTracking.reset();
     mRegistrationStreaming.reset();
     Q_UNUSED(context);

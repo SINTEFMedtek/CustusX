@@ -6,6 +6,9 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
     cxOpenIGTLinkPluginActivator.cpp
+
+    guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
+    guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -32,8 +35,9 @@ set(PLUGIN_target_libraries
     igtlioLogic
     igtlioDevices
     igtlioConverter
+    igtlioGUI
     #cxGrabber
-    #cxGUIExtenderService
+    cxGUIExtenderService
     #OpenIGTLink
     )
 
@@ -63,7 +67,7 @@ target_include_directories(${PROJECT_NAME}
     #openigtlinkClient/protocols
     #trackingSystemService
     #streamerService
-    #guiExtenderService
+    guiExtenderService
     #dataTransfer
 )
 
