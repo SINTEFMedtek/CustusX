@@ -43,6 +43,7 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.ITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
+        self.addComponent(cxComponents.OpenIGTLinkIO())
         self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
