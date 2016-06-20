@@ -420,6 +420,7 @@ class CustusX(CppComponent):
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
