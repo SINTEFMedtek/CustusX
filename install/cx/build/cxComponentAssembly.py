@@ -105,18 +105,19 @@ class LibraryAssembly(object):
         if build:
             operations.append('build')
             
-        for oper in operations:
-            self._operation(selectedLibraries, oper)
+        for lib in selectedLibraries:
+            for oper in operations:
+                self._operation(lib, oper)
 
-    def _operation(self, libraries, methodname):
-        for lib in libraries:
+
+    def _operation(self, lib, methodname):
             #print '\n================== %s %s========================' % (methodname, lib.name())
             #print '\n%s %-*s %s' % ('='*20, 20, methodname + " " + lib.name(), '='*20)
-            text = methodname+" "+lib.name()
-            PrintFormatter.printHeader(text)
+        text = methodname+" "+lib.name()
+        PrintFormatter.printHeader(text)
 #            print '\n%s %s' % ('='*20, " %s ".ljust(60, '=')%text)
-            method = getattr(lib, methodname)
-            method()
+        method = getattr(lib, methodname)
+        method()
             
             
 
