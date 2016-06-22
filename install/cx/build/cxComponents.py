@@ -341,7 +341,7 @@ class OpenIGTLinkIO(CppComponent):
 	def update(self):
 		self._getBuilder().gitSetRemoteURL(self.repository())
 #		self._getBuilder().gitCheckout('e49b636d54edd8c38c1b4ef6a33f3ebb21fcffc7')
-		self._getBuilder().gitCheckoutDefaultBranch()
+		self._getBuilder().gitCheckoutBranch('master')
 	def configure(self):
 		builder = self._getBuilder()
 		add = builder.addCMakeOption
