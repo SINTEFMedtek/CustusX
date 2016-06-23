@@ -1,8 +1,11 @@
 #include "cxtestReceiver.h"
 
+#include "cxLogger.h"
+
 namespace cxtest {
 
-Receiver::Receiver()
+Receiver::Receiver() :
+	mEventsReceived(0)
 {}
 
 Receiver::~Receiver()
@@ -10,19 +13,15 @@ Receiver::~Receiver()
 
 void Receiver::listen(vtkIGTLIODevicePointer device)
 {
-	foreach(int evendId, QList<int>()
-			<< vtkIGTLIODevice::DeviceModifiedEvent
-			)
-	{
-		qvtkReconnect(NULL, device, evendId,
-					  this, SLOT(onDeviceModified(vtkObject*, void*, unsigned long, void*)));
-	}
+	CX_LOG_DEBUG() << "Listening to a device: " << device->GetDeviceName();
+	qvtkReconnect(NULL, device, vtkCommand::ModifiedEvent, this, SLOT(onDeviceModified(vtkObject*, void*, unsigned long, void*)));
+
 }
 
 void Receiver::onDeviceModified(vtkObject*, void*, unsigned long, void*)
 {
-	std::cout << "received" << std::endl;
-	CHECK(true);
+	mEventsReceived += 1;
+	emit done();
 }
 
 }//namespace cxtest

@@ -17,14 +17,19 @@ class org_custusx_core_openigtlink3_EXPORT Receiver : public QObject
 	Q_OBJECT
 	QVTK_OBJECT
 
-	public:
-		Receiver();
-		virtual ~Receiver();
+public:
+	Receiver();
+	virtual ~Receiver();
 
 	void listen(vtkIGTLIODevicePointer device);
 
+	int mEventsReceived;
+
+signals:
+	void done();
+
 public slots:
-	void onDeviceModified(vtkObject*, void*, unsigned long, void*);
+	void onDeviceModified(vtkObject *, void *, unsigned long, void *);
 
 };
 

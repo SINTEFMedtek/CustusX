@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -31,11 +31,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
+#include <QEventLoop>
 #include "vtkTimerLog.h"
 #include "vtkIGTLIOConnector.h"
 #include "vtkIGTLIODevice.h"
 #include "cxNetworkHandler.h"
 #include "cxtestReceiver.h"
+
+#include "cxtestQueuedSignalListener.h"
+#include "cxtestDirectSignalListener.h"
+
+#include "cxLogger.h"
 
 namespace cxtest
 {
@@ -43,45 +49,53 @@ namespace cxtest
 
 TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
 {
-    vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
-    cx::NetworkHandlerPtr network = cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
+	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+	cx::NetworkHandlerPtr network = cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
 
-    vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
-    connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
-    connector->Start();
+	vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
+	connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
+	connector->Start();
 
-    double timeout = 2;
-    double starttime = vtkTimerLog::GetUniversalTime();
+	double timeout = 1;
+	double starttime = vtkTimerLog::GetUniversalTime();
 
-    while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
-    {
-      logic->PeriodicProcess();
+	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
+	{
+		logic->PeriodicProcess();
 
-      if (connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED)
-      {
-        break;
-      }
-      if (connector->GetState() == vtkIGTLIOConnector::STATE_OFF)
-      {
-        std::cout << "FAILURE to connect to server" << std::endl;
-      }
-    }
+		if (connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED)
+		{
+			REQUIRE(true);
+			break;
+		}
+		if (connector->GetState() == vtkIGTLIOConnector::STATE_OFF)
+		{
+			REQUIRE(false);
+		}
+	}
 
-    REQUIRE(connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED);
+	REQUIRE(connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED);
 
-    int index = logic->GetNumberOfDevices();
-    Receiver receiver;
-    for(int i=0; i<index; ++i)
-    {
-        vtkIGTLIODevicePointer device = logic->GetDevice(index);
-        receiver.listen(device);
-    }
+	starttime = vtkTimerLog::GetUniversalTime();
+	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
+	{
+		logic->PeriodicProcess();
+	}
 
-    starttime = vtkTimerLog::GetUniversalTime();
-    while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
-    {
-      logic->PeriodicProcess();
-    }
+	Receiver receiver;
+	int index = logic->GetNumberOfDevices();
+	for(int i=0; i<index; ++i)
+	{
+		receiver.listen(logic->GetDevice(i));
+	}
+
+	starttime = vtkTimerLog::GetUniversalTime();
+	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
+	{
+		logic->PeriodicProcess();
+	}
+
+	REQUIRE(receiver.mEventsReceived > 0);
 }
 
 
