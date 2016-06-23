@@ -1,7 +1,7 @@
 #ifndef CXTEST_RECEIVER_H
 #define CXTEST_RECEIVER_H
 
-#include "org_custusx_core_openigtlink3_Export.h"
+#include "cxtest_org_custusx_core_openigtlink3_export.h"
 
 #include "catch.hpp"
 
@@ -12,7 +12,7 @@
 namespace cxtest
 {
 
-class org_custusx_core_openigtlink3_EXPORT Receiver : public QObject
+class cxtest_org_custusx_core_openigtlink3_EXPORTS Receiver : public QObject
 {
 	Q_OBJECT
 	QVTK_OBJECT
