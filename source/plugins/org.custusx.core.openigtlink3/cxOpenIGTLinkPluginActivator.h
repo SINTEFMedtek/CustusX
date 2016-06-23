@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include <QThread>
 
+#include "cxNetworkHandler.h"
+
 namespace cx
 {
 
@@ -71,6 +73,7 @@ public:
 
 private:
     RegisteredServicePtr mRegistrationGui;
+    NetworkHandlerPtr mNetworkHandler;
     //RegisteredServicePtr mRegistrationTracking;
     //RegisteredServicePtr mRegistrationStreaming;
 //    QThread mOpenIGTLinkThread;

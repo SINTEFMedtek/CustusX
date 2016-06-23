@@ -44,8 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkIGTLIOLogic> vtkIGTLIOLogicPointer;
 #include "vtkIGTLIOLogic.h"
 
 namespace cx
@@ -70,7 +68,9 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
     */
 
-    OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context);
+    vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+    mNetworkHandler.reset(new NetworkHandler(logic));
+    OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
     mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
     /*

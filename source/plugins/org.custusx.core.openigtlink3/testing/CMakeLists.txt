@@ -9,7 +9,7 @@ if(BUILD_TESTING)
         ${MOC_SOURCE_FILES}
         cxtestExportHack.h
         cxtestExportHack.cpp
-        #cxtestOpenIGTLinkTrackingSystemPlugin.cpp
+        cxtestOpenIGTLinkIO.cpp
     )
 
     qt5_wrap_cpp(MOC_SOURCE_FILES ${MOC_SOURCE_FILES})

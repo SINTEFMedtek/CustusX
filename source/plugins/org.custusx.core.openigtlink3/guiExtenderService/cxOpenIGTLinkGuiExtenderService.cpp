@@ -42,14 +42,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "qIGTLIOClientWidget.h"
-#include "vtkIGTLIOLogic.h"
 #include "qIGTLIOLogicController.h"
 
 namespace cx
 {
-OpenIGTLink3GuiExtenderService::OpenIGTLink3GuiExtenderService(ctkPluginContext *context)
+OpenIGTLink3GuiExtenderService::OpenIGTLink3GuiExtenderService(ctkPluginContext *context, vtkIGTLIOLogicPointer logic)
 {
 	mContext = context;
+    mLogic = logic;
     //mConnections = connections;
 
     /*
@@ -64,15 +64,13 @@ OpenIGTLink3GuiExtenderService::~OpenIGTLink3GuiExtenderService()
 
 std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLink3GuiExtenderService::createWidgets() const
 {
-
-    vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
-    qIGTLIOLogicController logicController;
-    logicController.setLogic(logic);
+    qIGTLIOLogicController* logicController = new qIGTLIOLogicController();
+    logicController->setLogic(mLogic);
 
     qIGTLIOClientWidget* widget = new qIGTLIOClientWidget();
     widget->setWindowTitle("OpenIGTLink3");
     widget->setObjectName("Object_OpenIGTLink_3");
-    widget->setLogic(logic);
+    widget->setLogic(mLogic);
 
     std::vector<CategorizedWidget> retval;
     retval.push_back(GUIExtenderService::CategorizedWidget( widget, "OpenIGTLink"));

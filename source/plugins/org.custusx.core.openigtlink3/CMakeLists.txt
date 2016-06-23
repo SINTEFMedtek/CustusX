@@ -1,5 +1,6 @@
 project(org_custusx_core_openigtlink3)
 
+cx_initialize_CTK()
 cx_initialize_OpenIGTLinkIO()
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
@@ -9,11 +10,15 @@ set(PLUGIN_SRCS
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
+
+    network/cxNetworkHandler.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
+
+    network/cxNetworkHandler.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -28,17 +33,18 @@ set(PLUGIN_resources
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
     ${PLUGIN_target_libraries}
-    #cxResourceWidgets
-    #cxResourceVisualization
-    #cxResource
+    cxGUIExtenderService
+    cxResource
     cxPluginUtilities
     igtlioLogic
     igtlioDevices
     igtlioConverter
     igtlioGUI
+    CTKVisualizationVTKCore
     #cxGrabber
-    cxGUIExtenderService
     #OpenIGTLink
+    #cxResourceWidgets
+    #cxResourceVisualization
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -63,12 +69,8 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
-    #openigtlinkClient
-    #openigtlinkClient/protocols
-    #trackingSystemService
-    #streamerService
+    network
     guiExtenderService
-    #dataTransfer
 )
 
 
