@@ -38,9 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNetworkHandler.h"
 #include "cxtestReceiver.h"
 
-#include "cxtestQueuedSignalListener.h"
-#include "cxtestDirectSignalListener.h"
-
 #include "cxLogger.h"
 
 namespace cxtest

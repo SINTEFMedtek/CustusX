@@ -25,11 +25,8 @@ public:
 
 	int mEventsReceived;
 
-signals:
-	void done();
-
 public slots:
-	void onDeviceModified(vtkObject *, void *, unsigned long, void *);
+	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
 
 };
 
