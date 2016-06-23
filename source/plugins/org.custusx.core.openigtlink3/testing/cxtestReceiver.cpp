@@ -52,6 +52,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 		CX_LOG_DEBUG() << "Command: "	<< " id: " << content.id
 										<< " name: " << content.name
 										<< " content: " << content.content;
+
 	}
 	else if(device_type == igtl::StatusConverter::GetIGTLTypeName())
 	{

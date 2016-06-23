@@ -12,6 +12,9 @@ set(PLUGIN_SRCS
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
 
     network/cxNetworkHandler.cpp
+
+    converter/cxConverter.h
+    converter/cxConverter.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -41,10 +44,6 @@ set(PLUGIN_target_libraries
     igtlioConverter
     igtlioGUI
     CTKVisualizationVTKCore
-    #cxGrabber
-    #OpenIGTLink
-    #cxResourceWidgets
-    #cxResourceVisualization
     )
 
 set(PLUGIN_OUTPUT_DIR "")
