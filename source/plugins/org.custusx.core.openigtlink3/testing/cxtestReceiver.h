@@ -12,7 +12,7 @@
 namespace cxtest
 {
 
-class cxtest_org_custusx_core_openigtlink3_EXPORTS Receiver : public QObject
+class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT Receiver : public QObject
 {
 	Q_OBJECT
 	QVTK_OBJECT
