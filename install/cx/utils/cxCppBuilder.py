@@ -104,6 +104,16 @@ class CppBuilder:
         repo.setBranchDefault(self.controlData.main_branch)
         repo.syncToGitRef()
 
+    def gitCheckoutBranch(self, branch, submodules=False):
+        '''
+        pull latest version of branch, include submodules if asked.
+        '''
+        self._changeDirToSource()
+        runShell('git fetch')
+        runShell('git checkout %s' % branch)
+        runShell('git pull origin %s' % branch)
+
+
     def gitCheckoutTag(self, tag):
         '''
         Update git to the given tag.
