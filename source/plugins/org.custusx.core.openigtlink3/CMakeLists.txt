@@ -1,7 +1,7 @@
 project(org_custusx_core_openigtlink3)
 
 cx_initialize_CTK()
-cx_initialize_OpenIGTLinkIO()
+#cx_initialize_OpenIGTLinkIO()
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
