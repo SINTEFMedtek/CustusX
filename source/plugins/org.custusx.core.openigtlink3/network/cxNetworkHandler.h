@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CX_NETWORKHANDLER_H_
 #define CX_NETWORKHANDLER_H_
 
+#include "org_custusx_core_openigtlink3_Export.h"
 #include "vtkIGTLIOLogic.h"
 
 #include "cxTransform3D.h"
@@ -47,7 +48,7 @@ namespace cx
 
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
 
-class NetworkHandler : public QObject
+class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
 {
     Q_OBJECT
     QVTK_OBJECT
