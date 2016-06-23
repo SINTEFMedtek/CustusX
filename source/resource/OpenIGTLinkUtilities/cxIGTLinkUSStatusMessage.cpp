@@ -51,7 +51,7 @@ IGTLinkUSStatusMessage::IGTLinkUSStatusMessage():
     mDataOrigin[i] = 0.0;
   }
 
-  m_DefaultBodyType  = "CX_US_ST";
+  m_SendMessageType  = "CX_US_ST";
 }
 
 IGTLinkUSStatusMessage::~IGTLinkUSStatusMessage()
