@@ -31,12 +31,57 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "catch.hpp"
 
+#include "vtkTimerLog.h"
+#include "vtkIGTLIOConnector.h"
+#include "vtkIGTLIODevice.h"
+#include "cxNetworkHandler.h"
+#include "cxtestReceiver.h"
+
 namespace cxtest
 {
 
-TEST_CASE("TEST", "[unit][plugins][org.custusx.core.openigtlink3]")
+
+TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
 {
-    CHECK(true);
+    vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+    cx::NetworkHandlerPtr network = cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
+
+    vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
+    connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
+    connector->Start();
+
+    double timeout = 2;
+    double starttime = vtkTimerLog::GetUniversalTime();
+
+    while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
+    {
+      logic->PeriodicProcess();
+
+      if (connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED)
+      {
+        break;
+      }
+      if (connector->GetState() == vtkIGTLIOConnector::STATE_OFF)
+      {
+        std::cout << "FAILURE to connect to server" << std::endl;
+      }
+    }
+
+    REQUIRE(connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED);
+
+    int index = logic->GetNumberOfDevices();
+    Receiver receiver;
+    for(int i=0; i<index; ++i)
+    {
+        vtkIGTLIODevicePointer device = logic->GetDevice(index);
+        receiver.listen(device);
+    }
+
+    starttime = vtkTimerLog::GetUniversalTime();
+    while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
+    {
+      logic->PeriodicProcess();
+    }
 }
 
 

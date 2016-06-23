@@ -4,11 +4,11 @@ if(BUILD_TESTING)
         cxtest_${PROJECT_NAME}
     )
     set(MOC_SOURCE_FILES
+        cxtestReceiver.h
     )
     set(SOURCE_FILES
         ${MOC_SOURCE_FILES}
-        cxtestExportHack.h
-        cxtestExportHack.cpp
+        cxtestReceiver.cpp
         cxtestOpenIGTLinkIO.cpp
     )
 
