@@ -313,11 +313,12 @@ class OpenIGTLink(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git://github.com/openigtlink/OpenIGTLink.git'
+#        return 'git://github.com/openigtlink/OpenIGTLink.git'
+        return 'git@github.com:IGSIO/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
-        self._getBuilder().gitCheckout('0cb87aa5e3e8aa5d8fab3fe9180ace2d7ba3e43e') #version3
+        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
