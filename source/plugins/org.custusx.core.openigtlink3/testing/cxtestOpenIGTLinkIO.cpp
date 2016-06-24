@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxImage.h"
 #include "cxTransform3D.h"
+#include "cxtestQueuedSignalListener.h"
 
 namespace cxtest
 {
@@ -121,10 +122,12 @@ TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[
 	tryToConnect(logic, connector);
 
 	Receiver receiver(logic);
-	REQUIRE(receiver.image_received);
-	REQUIRE(receiver.transform_received);
 
 	tryToReceiveEvents(logic, connector, receiver);
+	cxtest::waitForQueuedSignal(&receiver, SIGNAL(done()), 500, false);
+
+	REQUIRE(receiver.image_received);
+	REQUIRE(receiver.transform_received);
 
 }
 

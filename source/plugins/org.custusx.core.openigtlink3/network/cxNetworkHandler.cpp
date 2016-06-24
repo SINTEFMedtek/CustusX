@@ -32,8 +32,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxNetworkHandler.h"
 
+#include <QTimer>
 #include "vtkIGTLIOLogic.h"
+#include "vtkIGTLIOImageDevice.h"
 #include "cxLogger.h"
+#include "igtlImageConverter.h"
 
 namespace cx
 {
@@ -42,31 +45,50 @@ NetworkHandler::NetworkHandler(vtkIGTLIOLogicPointer logic) :
 	mTimer(new QTimer(this))
 {
 	mLogic = logic;
-	foreach(int evendId, QList<int>()
+	foreach(int eventId, QList<int>()
 			<< vtkIGTLIOLogic::ConnectionAddedEvent
 			<< vtkIGTLIOLogic::ConnectionAboutToBeRemovedEvent
 			)
 	{
 		CX_LOG_DEBUG() << "connecting to the vtkIGTIOLogic events";
-		qvtkReconnect(NULL, mLogic, evendId,
+		qvtkReconnect(NULL, mLogic, eventId,
 					  this, SLOT(onConnectionEvent(vtkObject*, void*, unsigned long, void*)));
 	}
-	foreach(int evendId, QList<int>()
+	foreach(int eventId, QList<int>()
 			<< vtkIGTLIOLogic::NewDeviceEvent
 			<< vtkIGTLIOLogic::RemovedDeviceEvent
 			)
 	{
+		CX_LOG_DEBUG() << "connecting onDeviceAddedOrRemoved to the vtkIGTIOLogic events";
 		qvtkReconnect(NULL, mLogic, eventId,
 					this, SLOT(onDeviceAddedOrRemoved(vtkObject*, void*, unsigned long, void*)));
 	}
 
+
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(periodicProcess()));
-	timer->start(5);
+	mTimer->start(5);
 }
 
 NetworkHandler::~NetworkHandler()
 {
 	mTimer->stop();
+}
+
+
+void NetworkHandler::onDeviceModified(vtkObject* caller, void* device, unsigned long event , void*)
+{
+	CX_LOG_DEBUG() << "NetworkHandler::onDeviceModified";
+	vtkSmartPointer<vtkIGTLIODevice> receivedDevice(reinterpret_cast<vtkIGTLIODevice*>(caller));
+	igtl::BaseConverter::HeaderData header = receivedDevice->GetHeader();
+	std::string device_type = receivedDevice->GetDeviceType();
+	if(device_type == igtl::ImageConverter::GetIGTLTypeName())//Only process image messages for now
+	{
+		vtkSmartPointer<vtkIGTLIOImageDevice> imageDevice = vtkIGTLIOImageDevice::SafeDownCast(receivedDevice);
+		igtl::ImageConverter::ContentData content = imageDevice->GetContent();
+		ImagePtr cximage = ImagePtr(new Image("uid", content.image));
+		emit image(cximage);
+	}
+
 }
 
 void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsigned long event , void*)
@@ -87,12 +109,24 @@ void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsig
 	}
 }
 
-void NetworkHandler::onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*)
+void NetworkHandler::onDeviceAddedOrRemoved(vtkObject*caller, void* connector, unsigned long event, void* callData)
 {
+	CX_LOG_DEBUG("") << "NetworkHandler::onDeviceAddedOrRemoved";
 	if (event==vtkIGTLIOLogic::NewDeviceEvent)
 	{
 		CX_LOG_DEBUG("") << "on add devices event";
 		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
+
+//		vtkIGTLIODevicePointer device = mLogic->GetDevice(i);
+		vtkIGTLIODevicePointer device(reinterpret_cast<vtkIGTLIODevice*>(callData));
+
+		if(device)
+		{
+			CX_LOG_DEBUG() << "Found a device";
+			qvtkReconnect(NULL, device, vtkIGTLIODevice::ModifiedEvent, this, SLOT(onDeviceModified(vtkObject*, void*, unsigned long, void*)));
+		}
+		else
+			CX_LOG_ERROR() << "Not a device";
 	}
 	if (event==vtkIGTLIOLogic::RemovedDeviceEvent)
 	{
@@ -104,6 +138,7 @@ void NetworkHandler::onDeviceAddedOrRemoved(vtkObject*caller, void*connector, un
 
 void NetworkHandler::periodicProcess()
 {
+	CX_LOG_DEBUG() << "NetworkHandler::periodicProcess()";
 	mLogic->PeriodicProcess();
 }
 

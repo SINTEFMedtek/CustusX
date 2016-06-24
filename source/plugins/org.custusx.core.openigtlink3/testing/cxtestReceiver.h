@@ -31,6 +31,9 @@ public:
 	bool image_received;
 	bool transform_received;
 
+signals:
+	void done();
+
 public slots:
 	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
 

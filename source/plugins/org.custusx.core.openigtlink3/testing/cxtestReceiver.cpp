@@ -110,6 +110,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 void Receiver::checkImage(cx::ImagePtr image)
 {
 	image_received = true;
+	emit done();
 }
 
 void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp)
