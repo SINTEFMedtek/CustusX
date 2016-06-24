@@ -44,10 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-static ImagePtr convert(igtl::ImageConverter::ContentData data);
-static Transform3D convert(igtl::TransformConverter::ContentData data);
-static QString convert(igtl::StatusConverter::ContentData data);
-static void convert(igtl::CommandConverter::ContentData data);
+static ImagePtr convert(vtkSmartPointer<vtkImageData> image);
 
 } // namespace cx
 

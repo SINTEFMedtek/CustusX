@@ -38,41 +38,73 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-NetworkHandler::NetworkHandler(vtkIGTLIOLogicPointer logic)
+NetworkHandler::NetworkHandler(vtkIGTLIOLogicPointer logic) :
+	mTimer(new QTimer(this))
 {
-    mLogic = logic;
-    foreach(int evendId, QList<int>()
-            << vtkIGTLIOLogic::ConnectionAddedEvent
-            << vtkIGTLIOLogic::ConnectionAboutToBeRemovedEvent
-            )
-    {
-        CX_LOG_DEBUG() << "connecting to the vtkIGTIOLogic events";
-        qvtkReconnect(NULL, mLogic, evendId,
-                      this, SLOT(onConnectionEvent(vtkObject*, void*, unsigned long, void*)));
-    }
+	mLogic = logic;
+	foreach(int evendId, QList<int>()
+			<< vtkIGTLIOLogic::ConnectionAddedEvent
+			<< vtkIGTLIOLogic::ConnectionAboutToBeRemovedEvent
+			)
+	{
+		CX_LOG_DEBUG() << "connecting to the vtkIGTIOLogic events";
+		qvtkReconnect(NULL, mLogic, evendId,
+					  this, SLOT(onConnectionEvent(vtkObject*, void*, unsigned long, void*)));
+	}
+	foreach(int evendId, QList<int>()
+			<< vtkIGTLIOLogic::NewDeviceEvent
+			<< vtkIGTLIOLogic::RemovedDeviceEvent
+			)
+	{
+		qvtkReconnect(NULL, mLogic, eventId,
+					this, SLOT(onDeviceAddedOrRemoved(vtkObject*, void*, unsigned long, void*)));
+	}
+
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(periodicProcess()));
+	timer->start(5);
 }
 
 NetworkHandler::~NetworkHandler()
 {
-
+	mTimer->stop();
 }
 
 void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsigned long event , void*)
 {
-    if (event==vtkIGTLIOLogic::ConnectionAddedEvent)
-      {
-        CX_LOG_DEBUG("") << "on add connected event";
-        vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
-        //this->ReconnectConnector(NULL, c);
-        //this->resetModel();
-      }
-    if (event==vtkIGTLIOLogic::ConnectionAboutToBeRemovedEvent)
-      {
-        CX_LOG_DEBUG() << "on remove connected event";
-        vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
-        //this->ReconnectConnector(c, NULL);
-        //this->resetModel();
-      }
+	if (event==vtkIGTLIOLogic::ConnectionAddedEvent)
+	{
+		CX_LOG_DEBUG("") << "on add connected event";
+		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
+		//this->ReconnectConnector(NULL, c);
+		//this->resetModel();
+	}
+	if (event==vtkIGTLIOLogic::ConnectionAboutToBeRemovedEvent)
+	{
+		CX_LOG_DEBUG() << "on remove connected event";
+		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
+		//this->ReconnectConnector(c, NULL);
+		//this->resetModel();
+	}
+}
+
+void NetworkHandler::onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*)
+{
+	if (event==vtkIGTLIOLogic::NewDeviceEvent)
+	{
+		CX_LOG_DEBUG("") << "on add devices event";
+		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
+	}
+	if (event==vtkIGTLIOLogic::RemovedDeviceEvent)
+	{
+		CX_LOG_DEBUG() << "on remove device event";
+		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
+
+	}
+}
+
+void NetworkHandler::periodicProcess()
+{
+	mLogic->PeriodicProcess();
 }
 
 } // namespace cx

@@ -39,20 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestReceiver.h"
 
 #include "cxLogger.h"
+#include "cxImage.h"
+#include "cxTransform3D.h"
 
 namespace cxtest
 {
 
 
-TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
+void tryToConnect(vtkIGTLIOLogicPointer logic, vtkIGTLIOConnectorPointer connector)
 {
-	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
-	cx::NetworkHandlerPtr network = cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
-
-	vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
-	connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
-	connector->Start();
-
 	double timeout = 1;
 	double starttime = vtkTimerLog::GetUniversalTime();
 
@@ -72,14 +67,17 @@ TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[
 	}
 
 	REQUIRE(connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED);
+}
 
-	starttime = vtkTimerLog::GetUniversalTime();
+void tryToReceiveEvents(vtkIGTLIOLogicPointer logic, vtkIGTLIOConnectorPointer connector, Receiver &receiver)
+{
+	double timeout = 1;
+	double starttime = vtkTimerLog::GetUniversalTime();
 	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
 	{
 		logic->PeriodicProcess();
 	}
 
-	Receiver receiver;
 	int index = logic->GetNumberOfDevices();
 	for(int i=0; i<index; ++i)
 	{
@@ -93,7 +91,43 @@ TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[
 	}
 
 	REQUIRE(receiver.mEventsReceived > 0);
+
 }
+
+
+TEST_CASE("OpenIGTLinkIO can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
+{
+	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+
+	vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
+	connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
+	connector->Start();
+
+	tryToConnect(logic, connector);
+
+	Receiver receiver(logic);
+
+	tryToReceiveEvents(logic, connector, receiver);
+}
+
+TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
+{
+	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+
+	vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
+	connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
+	connector->Start();
+
+	tryToConnect(logic, connector);
+
+	Receiver receiver(logic);
+	REQUIRE(receiver.image_received);
+	REQUIRE(receiver.transform_received);
+
+	tryToReceiveEvents(logic, connector, receiver);
+
+}
+
 
 
 } //namespace cxtest

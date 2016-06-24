@@ -17,11 +17,19 @@
 #include "igtlTransformConverter.h"
 #include "igtlStatusConverter.h"
 
+#include "cxNetworkHandler.h"
+
 namespace cxtest {
 
-Receiver::Receiver() :
-	mEventsReceived(0)
-{}
+Receiver::Receiver(vtkIGTLIOLogicPointer logic) :
+	mEventsReceived(0),
+	image_received(false),
+	transform_received(false)
+{
+	cx::NetworkHandler network(logic);
+	QObject::connect(&network, &cx::NetworkHandler::image, this, &Receiver::checkImage);
+	QObject::connect(&network, &cx::NetworkHandler::transform, this, &Receiver::checkTransform);
+}
 
 Receiver::~Receiver()
 {}
@@ -42,6 +50,11 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 				   << " from " << receivedDevice->GetDeviceName()
 				   << " which is of type " << receivedDevice->GetDeviceType();
 
+	igtl::BaseConverter::HeaderData header = receivedDevice->GetHeader();
+	CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName
+								<< " timestamp: " << header.timestamp;
+
+
 	std::string device_type = receivedDevice->GetDeviceType();
 	if(device_type == igtl::CommandConverter::GetIGTLTypeName())
 	{
@@ -49,7 +62,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 		REQUIRE(command);
 
 		igtl::CommandConverter::ContentData content = command->GetContent();
-		CX_LOG_DEBUG() << "Command: "	<< " id: " << content.id
+		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
 										<< " name: " << content.name
 										<< " content: " << content.content;
 
@@ -60,7 +73,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 		REQUIRE(status);
 
 		igtl::StatusConverter::ContentData content = status->GetContent();
-		CX_LOG_DEBUG() << "Status: "	<< " code: " << content.code
+		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
 										<< " subcode: " << content.subcode
 										<< " errorname: " << content.errorname //errorname is an optional field, will only be filled when there is an error
 										<< " statusstring: " << content.statusstring;
@@ -72,7 +85,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 		REQUIRE(image);
 
 		igtl::ImageConverter::ContentData content = image->GetContent();
-		CX_LOG_DEBUG() << "Image: "	<< " image class name: " << content.image->GetClassName()
+		CX_LOG_DEBUG() << "IMAGE: "	<< " image class name: " << content.image->GetClassName()
 										<< " transform: " << content.transform;
 	}
 	else if(device_type == igtl::TransformConverter::GetIGTLTypeName())
@@ -81,7 +94,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 		REQUIRE(transform);
 
 		igtl::TransformConverter::ContentData content = transform->GetContent();
-		CX_LOG_DEBUG() << "Transform: "	<< " transform: " << content.transform
+		CX_LOG_DEBUG() << "TRANSFORM: "	<< " transform: " << content.transform
 										<< " deviceName: " << content.deviceName;
 
 	}
@@ -92,6 +105,16 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 	}
 
 	mEventsReceived += 1;
+}
+
+void Receiver::checkImage(cx::ImagePtr image)
+{
+	image_received = true;
+}
+
+void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp)
+{
+	transform_received = true;
 }
 
 }//namespace cxtest

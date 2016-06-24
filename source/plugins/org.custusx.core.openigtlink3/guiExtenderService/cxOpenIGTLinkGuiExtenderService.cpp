@@ -49,13 +49,8 @@ namespace cx
 OpenIGTLink3GuiExtenderService::OpenIGTLink3GuiExtenderService(ctkPluginContext *context, vtkIGTLIOLogicPointer logic)
 {
 	mContext = context;
-    mLogic = logic;
-    //mConnections = connections;
+	mLogic = logic;
 
-    /*
-	NetworkConnectionHandlePtr connection = mConnections->getConnection("dataTransfer");
-	mDataTransfer.reset(new NetworkDataTransfer(mContext, connection));
-    */
 }
 
 OpenIGTLink3GuiExtenderService::~OpenIGTLink3GuiExtenderService()
@@ -64,16 +59,16 @@ OpenIGTLink3GuiExtenderService::~OpenIGTLink3GuiExtenderService()
 
 std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLink3GuiExtenderService::createWidgets() const
 {
-    qIGTLIOLogicController* logicController = new qIGTLIOLogicController();
-    logicController->setLogic(mLogic);
+	qIGTLIOLogicController* logicController = new qIGTLIOLogicController();
+	logicController->setLogic(mLogic);
 
-    qIGTLIOClientWidget* widget = new qIGTLIOClientWidget();
-    widget->setWindowTitle("OpenIGTLink3");
-    widget->setObjectName("Object_OpenIGTLink_3");
-    widget->setLogic(mLogic);
+	qIGTLIOClientWidget* widget = new qIGTLIOClientWidget();
+	widget->setWindowTitle("OpenIGTLink3");
+	widget->setObjectName("Object_OpenIGTLink_3");
+	widget->setLogic(mLogic);
 
-    std::vector<CategorizedWidget> retval;
-    retval.push_back(GUIExtenderService::CategorizedWidget( widget, "OpenIGTLink"));
+	std::vector<CategorizedWidget> retval;
+	retval.push_back(GUIExtenderService::CategorizedWidget( widget, "OpenIGTLink"));
 	return retval;
 }
 }//namespace cx

@@ -60,15 +60,18 @@ public:
 signals:
     void transform(QString devicename, Transform3D transform, double timestamp);
     void calibration(QString devicename, Transform3D calibration);
-    void image(ImagePtr image);
+	void image(ImagePtr image);
     void mesh(MeshPtr image);
     void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private slots:
     void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
+	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*);
+	void periodicProcess();
 
 private:
     vtkIGTLIOLogicPointer mLogic;
+	QTimer *mTimer;
 };
 
 } // namespace cx

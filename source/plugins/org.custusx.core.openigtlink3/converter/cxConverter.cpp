@@ -36,27 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ImagePtr convert(igtl::ImageConverter::ContentData data)
+ImagePtr convert(vtkSmartPointer<vtkImageData> image)
 {
-	ImagePtr image;
-	CX_LOG_DEBUG() << "TODO";
-	return image;
+	ImagePtr cximage;
+	return cximage;
 }
 
-Transform3D convert(igtl::TransformConverter::ContentData data)
-{
-	Transform3D transform = Transform3D::fromVtkMatrix(data.transform);
-	return transform;
-}
-
-QString convert(igtl::StatusConverter::ContentData data)
-{
-	QString status = data.statusstring.c_str();
-	return status;
-}
-
-void convert(igtl::CommandConverter::ContentData data)
-{
-	CX_LOG_DEBUG() << "Command message incoming, do not know what to do with it.";
-}
 } //namespace cx
