@@ -17,7 +17,6 @@
 #include "igtlTransformConverter.h"
 #include "igtlStatusConverter.h"
 
-#include "cxNetworkHandler.h"
 
 namespace cxtest {
 
@@ -26,13 +25,15 @@ Receiver::Receiver(vtkIGTLIOLogicPointer logic) :
 	image_received(false),
 	transform_received(false)
 {
-	cx::NetworkHandler network(logic);
-	QObject::connect(&network, &cx::NetworkHandler::image, this, &Receiver::checkImage);
-	QObject::connect(&network, &cx::NetworkHandler::transform, this, &Receiver::checkTransform);
+	mNetwork = new cx::NetworkHandler(logic);
+	QObject::connect(mNetwork, &cx::NetworkHandler::image, this, &Receiver::checkImage);
+	QObject::connect(mNetwork, &cx::NetworkHandler::transform, this, &Receiver::checkTransform);
 }
 
 Receiver::~Receiver()
-{}
+{
+	delete mNetwork;
+}
 
 void Receiver::listen(vtkIGTLIODevicePointer device)
 {
@@ -105,12 +106,15 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 	}
 
 	mEventsReceived += 1;
+	if(mEventsReceived > 10)
+	{
+		emit done();
+	}
 }
 
 void Receiver::checkImage(cx::ImagePtr image)
 {
 	image_received = true;
-	emit done();
 }
 
 void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp)

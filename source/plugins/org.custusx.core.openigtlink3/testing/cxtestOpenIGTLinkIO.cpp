@@ -124,7 +124,6 @@ TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[
 	Receiver receiver(logic);
 
 	tryToReceiveEvents(logic, connector, receiver);
-	cxtest::waitForQueuedSignal(&receiver, SIGNAL(done()), 500, false);
 
 	REQUIRE(receiver.image_received);
 	REQUIRE(receiver.transform_received);

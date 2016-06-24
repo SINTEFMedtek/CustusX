@@ -13,6 +13,8 @@
 #include "cxImage.h"
 #include "cxTransform3D.h"
 
+#include "cxNetworkHandler.h"
+
 namespace cxtest
 {
 
@@ -40,6 +42,9 @@ public slots:
 private slots:
 	void checkImage(cx::ImagePtr image);
 	void checkTransform(QString devicename, cx::Transform3D transform, double timestamp);
+
+private:
+	cx::NetworkHandler* mNetwork;
 
 
 };
