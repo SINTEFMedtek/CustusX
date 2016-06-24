@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QtPlugin>
 #include <iostream>
 
-//#include "cxOpenIGTLinkStreamerService.h"
+#include "cxOpenIGTLinkStreamerService.h"
 //#include "cxOpenIGTLinkTrackingSystemService.h"
 //#include "cxOpenIGTLinkGuiExtenderService.h"
 //#include "cxNetworkConnection.h"
@@ -65,18 +65,19 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 	NetworkConnectionHandlePtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
 
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
-	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(defaultConnection);
-    */
+	*/
 
     vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
     mNetworkHandler.reset(new NetworkHandler(logic));
     OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
+	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler);
+
     mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
     /*
     mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
-    mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
-    */
+	*/
+	mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
 }
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)

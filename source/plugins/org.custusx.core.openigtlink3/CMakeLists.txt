@@ -15,6 +15,10 @@ set(PLUGIN_SRCS
 
     converter/cxConverter.h
     converter/cxConverter.cpp
+
+    streamerService/cxOpenIGTLinkStreamer.cpp
+    streamerService/cxOpenIGTLinkStreamerService.h
+    streamerService/cxOpenIGTLinkStreamerService.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -22,6 +26,8 @@ set(PLUGIN_MOC_SRCS
     cxOpenIGTLinkPluginActivator.h
 
     network/cxNetworkHandler.h
+
+    streamerService/cxOpenIGTLinkStreamer.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -44,6 +50,7 @@ set(PLUGIN_target_libraries
     igtlioConverter
     igtlioGUI
     CTKVisualizationVTKCore
+    cxGrabber
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -70,6 +77,7 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_BINARY_DIR}
     network
     guiExtenderService
+    streamerService
 )
 
 

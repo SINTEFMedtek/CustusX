@@ -75,7 +75,7 @@ private:
     RegisteredServicePtr mRegistrationGui;
     NetworkHandlerPtr mNetworkHandler;
     //RegisteredServicePtr mRegistrationTracking;
-    //RegisteredServicePtr mRegistrationStreaming;
+	RegisteredServicePtr mRegistrationStreaming;
 //    QThread mOpenIGTLinkThread;
 //	NetworkConnectionHandlePtr mOpenIGTLink;
 

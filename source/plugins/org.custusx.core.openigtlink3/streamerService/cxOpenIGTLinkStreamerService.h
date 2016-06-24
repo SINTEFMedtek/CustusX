@@ -30,54 +30,36 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CX_NETWORKHANDLER_H_
-#define CX_NETWORKHANDLER_H_
+#ifndef CXOPENIGTLINKSTREAMERSERVICE_H
+#define CXOPENIGTLINKSTREAMERSERVICE_H
 
 #include "org_custusx_core_openigtlink3_Export.h"
-#include "vtkIGTLIOLogic.h"
+#include "cxStreamerService.h"
+#include "cxOpenIGTLinkStreamer.h"
 
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxMesh.h"
-#include "cxProbeDefinition.h"
-
-#include "ctkVTKObject.h"
 
 namespace cx
 {
-
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
 
-class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
+
+class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
-    Q_OBJECT
-    QVTK_OBJECT
 
 public:
-    NetworkHandler(vtkIGTLIOLogicPointer logic);
-    ~NetworkHandler();
+	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler);
+    ~OpenIGTLinkStreamerService();
 
-signals:
-	void connected();
-	void disconnected();
+    virtual QString getName();
+    virtual QString getType() const;
+    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
+    virtual StreamerPtr createStreamer(QDomElement root);
 
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-	void image(ImagePtr image);
-    void mesh(MeshPtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-
-private slots:
-    void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
-	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*callData);
-	void periodicProcess();
-
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
 private:
-    vtkIGTLIOLogicPointer mLogic;
-	QTimer *mTimer;
+    OpenIGTLinkStreamerPtr mStreamer;
+	NetworkHandlerPtr mConnection;
 };
+typedef boost::shared_ptr<OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
+} //namespace cx
 
-} // namespace cx
-
-#endif /* CX_NETWORKHANDLER_H_ */
+#endif //CXOPENIGTLINKSTREAMERSERVICE_H

@@ -29,55 +29,60 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-
-#ifndef CX_NETWORKHANDLER_H_
-#define CX_NETWORKHANDLER_H_
+#ifndef CXOPENIGTLINKSTREAMER_H
+#define CXOPENIGTLINKSTREAMER_H
 
 #include "org_custusx_core_openigtlink3_Export.h"
-#include "vtkIGTLIOLogic.h"
+#include "cxStreamer.h"
 
-#include "cxTransform3D.h"
 #include "cxImage.h"
-#include "cxMesh.h"
 #include "cxProbeDefinition.h"
-
-#include "ctkVTKObject.h"
+#include "cxIGTLinkUSStatusMessage.h"
+#include "cxIGTLinkImageMessage.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
-
-class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
+/**
+ * Streamer that listens to an OpenIGTLink connection, then
+ * streams the incoming data.
+ *
+ * \addtogroup org_custusx_core_openigtlink
+ * \author Janne Beate Bakeng, SINTEF
+ * \date 2015-03-25
+ */
+class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamer : public Streamer
 {
     Q_OBJECT
-    QVTK_OBJECT
 
 public:
-    NetworkHandler(vtkIGTLIOLogicPointer logic);
-    ~NetworkHandler();
+    OpenIGTLinkStreamer();
+    virtual ~OpenIGTLinkStreamer();
 
-signals:
-	void connected();
-	void disconnected();
+    virtual void startStreaming(SenderPtr sender);
+	virtual void stopStreaming();
+    virtual bool isStreaming();
+	virtual QString getType();
 
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-	void image(ImagePtr image);
-    void mesh(MeshPtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+public slots:
+    void receivedConnected();
+    void receivedDisconnected();
+    void receivedError();
+    void receivedImage(ImagePtr image);
+    void receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef);
+//    void receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage);
+//    void receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message);
 
-private slots:
-    void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
-	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*callData);
-	void periodicProcess();
+protected slots:
+    virtual void streamSlot();
 
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
 private:
-    vtkIGTLIOLogicPointer mLogic;
-	QTimer *mTimer;
+    SenderPtr mSender;
+    IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
+
 };
+typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
 
 } // namespace cx
 
-#endif /* CX_NETWORKHANDLER_H_ */
+#endif // CXOPENIGTLINKSTREAMER_H

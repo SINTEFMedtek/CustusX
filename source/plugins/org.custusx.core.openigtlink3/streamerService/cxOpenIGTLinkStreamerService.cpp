@@ -30,54 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CX_NETWORKHANDLER_H_
-#define CX_NETWORKHANDLER_H_
-
-#include "org_custusx_core_openigtlink3_Export.h"
-#include "vtkIGTLIOLogic.h"
-
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxMesh.h"
-#include "cxProbeDefinition.h"
-
-#include "ctkVTKObject.h"
+#include "cxOpenIGTLinkStreamerService.h"
+//#include "cxNetworkConnection.h"
+#include "cxNetworkHandler.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
-
-class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
+OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler) :
+	mConnection(networkHandler)
 {
-    Q_OBJECT
-    QVTK_OBJECT
+	//NetworkConnection* client = mConnection->getNetworkConnection();
+    mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
 
-public:
-    NetworkHandler(vtkIGTLIOLogicPointer logic);
-    ~NetworkHandler();
+	connect(mConnection.get(), &NetworkHandler::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
+	connect(mConnection.get(), &NetworkHandler::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
+	connect(mConnection.get(), &NetworkHandler::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
+	/*
+	connect(client, &NetworkConnection::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
+    connect(client, &NetworkConnection::probedefinition, mStreamer.get(), &OpenIGTLinkStreamer::receivedProbedefinition);
+	*/
+}
 
-signals:
-	void connected();
-	void disconnected();
+OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
+{
 
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-	void image(ImagePtr image);
-    void mesh(MeshPtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+}
 
-private slots:
-    void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
-	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*callData);
-	void periodicProcess();
+QString OpenIGTLinkStreamerService::getName()
+{
+	return "OpenIGTLink streamer 3";
+}
 
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
-private:
-    vtkIGTLIOLogicPointer mLogic;
-	QTimer *mTimer;
-};
+QString OpenIGTLinkStreamerService::getType() const
+{
+	return "openigtlink_streamer3";
+}
 
-} // namespace cx
+std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
+{
+    std::vector<PropertyPtr> retval;
+    return retval;
+}
 
-#endif /* CX_NETWORKHANDLER_H_ */
+StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
+{
+    return mStreamer;
+}
+
+} //namespace cx

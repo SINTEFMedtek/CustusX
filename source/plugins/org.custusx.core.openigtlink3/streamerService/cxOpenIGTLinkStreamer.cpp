@@ -29,55 +29,75 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#include "cxOpenIGTLinkStreamer.h"
 
-#ifndef CX_NETWORKHANDLER_H_
-#define CX_NETWORKHANDLER_H_
-
-#include "org_custusx_core_openigtlink3_Export.h"
-#include "vtkIGTLIOLogic.h"
-
-#include "cxTransform3D.h"
-#include "cxImage.h"
-#include "cxMesh.h"
-#include "cxProbeDefinition.h"
-
-#include "ctkVTKObject.h"
+#include "cxLogger.h"
+#include "cxSender.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+OpenIGTLinkStreamer::OpenIGTLinkStreamer()
+{}
 
-class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
+OpenIGTLinkStreamer::~OpenIGTLinkStreamer()
+{}
+
+
+void OpenIGTLinkStreamer::startStreaming(SenderPtr sender)
 {
-    Q_OBJECT
-    QVTK_OBJECT
+	mSender = sender;
+}
 
-public:
-    NetworkHandler(vtkIGTLIOLogicPointer logic);
-    ~NetworkHandler();
+void OpenIGTLinkStreamer::stopStreaming()
+{
+    mSender.reset();
+}
 
-signals:
-	void connected();
-	void disconnected();
+bool OpenIGTLinkStreamer::isStreaming()
+{
+    return true;
+}
 
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
-	void image(ImagePtr image);
-    void mesh(MeshPtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+QString OpenIGTLinkStreamer::getType()
+{
+    return "OpenIGTLinkStreamer";
+}
 
-private slots:
-    void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
-	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*callData);
-	void periodicProcess();
+void OpenIGTLinkStreamer::receivedConnected()
+{
+}
 
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
-private:
-    vtkIGTLIOLogicPointer mLogic;
-	QTimer *mTimer;
-};
+void OpenIGTLinkStreamer::receivedDisconnected()
+{
+}
+
+void OpenIGTLinkStreamer::receivedError()
+{
+}
+
+void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
+{
+    PackagePtr package(new Package());
+    package->mImage = image;
+    if(mSender)
+        mSender->send(package);
+}
+
+void OpenIGTLinkStreamer::receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef)
+{
+    PackagePtr package(new Package());
+    package->mProbe = probedef;
+    if(mSender)
+        mSender->send(package);
+}
+
+
+void OpenIGTLinkStreamer::streamSlot()
+{
+
+}
 
 } // namespace cx
 
-#endif /* CX_NETWORKHANDLER_H_ */
+

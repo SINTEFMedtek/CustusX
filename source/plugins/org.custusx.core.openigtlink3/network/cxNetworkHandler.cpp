@@ -128,16 +128,12 @@ void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsig
 	if (event==vtkIGTLIOLogic::ConnectionAddedEvent)
 	{
 		CX_LOG_CHANNEL_DEBUG("NetworkHandler") << "on add connected event";
-		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
-		//this->ReconnectConnector(NULL, c);
-		//this->resetModel();
+		emit connected();
 	}
 	if (event==vtkIGTLIOLogic::ConnectionAboutToBeRemovedEvent)
 	{
 		CX_LOG_CHANNEL_DEBUG("NetworkHandler") << "on remove connected event";
-		//vtkIGTLIOConnector* c = static_cast<vtkIGTLIOConnector*>(connector);
-		//this->ReconnectConnector(c, NULL);
-		//this->resetModel();
+		emit disconnected();
 	}
 }
 
