@@ -96,10 +96,19 @@ void NetworkHandler::onDeviceModified(vtkObject* caller, void* device, unsigned 
 	if(device_type == igtl::ImageConverter::GetIGTLTypeName())//Only process image messages for now
 	{
 		vtkSmartPointer<vtkIGTLIOImageDevice> imageDevice = vtkIGTLIOImageDevice::SafeDownCast(receivedDevice);
+
 		igtl::ImageConverter::ContentData content = imageDevice->GetContent();
-		ImagePtr cximage = ImagePtr(new Image("uid", content.image));
+
+		QString deviceName(header.deviceName.c_str());
+		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
+		// get timestamp from igtl second-format:;
+		double timestampMS = header.timestamp * 1000;
+		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(timestampMS));
+		//this->decode_rMd(msg, retval);
+
 		emit image(cximage);
-	}else if(device_type == igtl::TransformConverter::GetIGTLTypeName())
+	}
+	else if(device_type == igtl::TransformConverter::GetIGTLTypeName())
 	{
 		vtkSmartPointer<vtkIGTLIOTransformDevice> transformDevice = vtkIGTLIOTransformDevice::SafeDownCast(receivedDevice);
 		igtl::TransformConverter::ContentData content = transformDevice->GetContent();

@@ -81,6 +81,7 @@ ImagePtr IGTLinkConversionImage::decode(igtl::ImageMessage *msg)
 }
 
 
+
 namespace { // unnamed namespace
 
 //---------------------------------------------------------------------------
