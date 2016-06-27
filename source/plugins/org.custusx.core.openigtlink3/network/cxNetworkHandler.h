@@ -70,9 +70,9 @@ signals:
 private slots:
     void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
 	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*callData);
+	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
 	void periodicProcess();
 
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
 private:
     vtkIGTLIOLogicPointer mLogic;
 	QTimer *mTimer;

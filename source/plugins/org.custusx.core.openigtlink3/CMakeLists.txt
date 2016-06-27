@@ -16,6 +16,9 @@ set(PLUGIN_SRCS
     streamerService/cxOpenIGTLinkStreamer.cpp
     streamerService/cxOpenIGTLinkStreamerService.h
     streamerService/cxOpenIGTLinkStreamerService.cpp
+
+    trackingSystemService/cxOpenIGTLinkTrackingSystemService.cpp
+    trackingSystemService/cxOpenIGTLinkTool.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -25,6 +28,9 @@ set(PLUGIN_MOC_SRCS
     network/cxNetworkHandler.h
 
     streamerService/cxOpenIGTLinkStreamer.h
+
+    trackingSystemService/cxOpenIGTLinkTrackingSystemService.h
+    trackingSystemService/cxOpenIGTLinkTool.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -75,6 +81,7 @@ target_include_directories(${PROJECT_NAME}
     network
     guiExtenderService
     streamerService
+    trackingSystemService
 )
 
 

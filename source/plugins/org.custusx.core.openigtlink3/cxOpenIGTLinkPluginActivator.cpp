@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxOpenIGTLinkStreamerService.h"
-//#include "cxOpenIGTLinkTrackingSystemService.h"
+#include "cxOpenIGTLinkTrackingSystemService.h"
 #include "cxRegisteredService.h"
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
@@ -56,16 +56,16 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-	//OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
 
 	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
 	mNetworkHandler.reset(new NetworkHandler(logic));
 	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler);
+	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mNetworkHandler);
 
 	mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
-	//mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
+	mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
 	mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
 }
 
@@ -74,7 +74,7 @@ void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 	Q_UNUSED(context);
 	mRegistrationGui.reset();
 	mRegistrationStreaming.reset();
-	//mRegistrationTracking.reset();
+	mRegistrationTracking.reset();
 }
 
 } // namespace cx

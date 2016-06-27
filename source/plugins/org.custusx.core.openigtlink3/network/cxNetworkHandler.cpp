@@ -164,7 +164,6 @@ void NetworkHandler::onDeviceAddedOrRemoved(vtkObject*caller, void* void_device,
 
 void NetworkHandler::periodicProcess()
 {
-	CX_LOG_CHANNEL_DEBUG("NetworkHandler") << "NetworkHandler::periodicProcess()";
 	mLogic->PeriodicProcess();
 }
 

@@ -61,7 +61,7 @@ class OpenIGTLinkPluginActivator :  public QObject, public ctkPluginActivator
 {
     Q_OBJECT
     Q_INTERFACES(ctkPluginActivator)
-    Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink")
+	Q_PLUGIN_METADATA(IID "org_custusx_core_openigtlink3")
 
 public:
 
@@ -74,10 +74,8 @@ public:
 private:
     RegisteredServicePtr mRegistrationGui;
     NetworkHandlerPtr mNetworkHandler;
-    //RegisteredServicePtr mRegistrationTracking;
+	RegisteredServicePtr mRegistrationTracking;
 	RegisteredServicePtr mRegistrationStreaming;
-//    QThread mOpenIGTLinkThread;
-//	NetworkConnectionHandlePtr mOpenIGTLink;
 
     NetworkServiceImplPtr mNetworkConnections;
 };
