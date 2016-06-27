@@ -32,15 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
-/*
-#include "cxNetworkConnection.h"
-#include "cxNetworkConnectionWidget.h"
-#include "cxNetworkDataTransferWidget.h"
-#include "cxNetworkServiceImpl.h"
-#include "cxNetworkDataTransfer.h"
-#include "cxNetworkConnectionsWidget.h"
-*/
-
 #include "qIGTLIOClientWidget.h"
 #include "qIGTLIOLogicController.h"
 

@@ -13,9 +13,6 @@ set(PLUGIN_SRCS
 
     network/cxNetworkHandler.cpp
 
-    converter/cxConverter.h
-    converter/cxConverter.cpp
-
     streamerService/cxOpenIGTLinkStreamer.cpp
     streamerService/cxOpenIGTLinkStreamerService.h
     streamerService/cxOpenIGTLinkStreamerService.cpp

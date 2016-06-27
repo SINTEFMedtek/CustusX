@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -37,10 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkStreamerService.h"
 //#include "cxOpenIGTLinkTrackingSystemService.h"
-//#include "cxOpenIGTLinkGuiExtenderService.h"
-//#include "cxNetworkConnection.h"
 #include "cxRegisteredService.h"
-//#include "cxNetworkServiceImpl.h"
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
 
@@ -59,37 +56,25 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
-    /*
-	mNetworkConnections.reset(new NetworkServiceImpl());
+	//OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
 
-	NetworkConnectionHandlePtr defaultConnection = mNetworkConnections->getConnection("org.custusx.core.openigtlink");
-
-	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(defaultConnection);
-	*/
-
-    vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
-    mNetworkHandler.reset(new NetworkHandler(logic));
-    OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
+	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+	mNetworkHandler.reset(new NetworkHandler(logic));
+	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler);
 
-    mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
-    /*
-    mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
-	*/
+	mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
+	//mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);
 	mRegistrationStreaming = RegisteredService::create<OpenIGTLinkStreamerService>(context, streamer, StreamerService_iid);
 }
 
 void OpenIGTLinkPluginActivator::stop(ctkPluginContext* context)
 {
-    mRegistrationGui.reset();
-    /*
-    mRegistrationTracking.reset();
-    mRegistrationStreaming.reset();
-    Q_UNUSED(context);
-
-	mNetworkConnections.reset();
-    */
+	Q_UNUSED(context);
+	mRegistrationGui.reset();
+	mRegistrationStreaming.reset();
+	//mRegistrationTracking.reset();
 }
 
 } // namespace cx

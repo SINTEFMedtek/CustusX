@@ -40,16 +40,11 @@ namespace cx
 OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler) :
 	mConnection(networkHandler)
 {
-	//NetworkConnection* client = mConnection->getNetworkConnection();
     mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
 
 	connect(mConnection.get(), &NetworkHandler::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
 	connect(mConnection.get(), &NetworkHandler::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
 	connect(mConnection.get(), &NetworkHandler::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
-	/*
-	connect(client, &NetworkConnection::error, mStreamer.get(), &OpenIGTLinkStreamer::receivedError);
-    connect(client, &NetworkConnection::probedefinition, mStreamer.get(), &OpenIGTLinkStreamer::receivedProbedefinition);
-	*/
 }
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()

@@ -44,12 +44,12 @@ namespace cx
 {
 
 /**
- * Streamer that listens to an OpenIGTLink connection, then
+ * Streamer that listens to an OpenIGTLink3 connection, then
  * streams the incoming data.
  *
- * \addtogroup org_custusx_core_openigtlink
+ * \addtogroup org_custusx_core_openigtlink3
  * \author Janne Beate Bakeng, SINTEF
- * \date 2015-03-25
+ * \date 2016-06-24
  */
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamer : public Streamer
 {
@@ -70,15 +70,12 @@ public slots:
     void receivedError();
     void receivedImage(ImagePtr image);
     void receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef);
-//    void receiveIgtlImage(IGTLinkImageMessage::Pointer igtlimage);
-//    void receivedUSStatusMessage(IGTLinkUSStatusMessage::Pointer message);
 
 protected slots:
     virtual void streamSlot();
 
 private:
     SenderPtr mSender;
-    IGTLinkUSStatusMessage::Pointer mUnsentUSStatusMessage; ///< received message, will be added to queue when next image arrives
 
 };
 typedef boost::shared_ptr<OpenIGTLinkStreamer> OpenIGTLinkStreamerPtr;
