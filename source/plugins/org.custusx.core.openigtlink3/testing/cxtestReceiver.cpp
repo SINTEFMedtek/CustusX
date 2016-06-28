@@ -21,13 +21,15 @@
 namespace cxtest {
 
 Receiver::Receiver(vtkIGTLIOLogicPointer logic) :
-	mEventsReceived(0),
+	number_of_events_received(0),
 	image_received(false),
-	transform_received(false)
+	transform_received(false),
+	command_received(false)
 {
 	mNetwork = new cx::NetworkHandler(logic);
 	QObject::connect(mNetwork, &cx::NetworkHandler::image, this, &Receiver::checkImage);
 	QObject::connect(mNetwork, &cx::NetworkHandler::transform, this, &Receiver::checkTransform);
+	QObject::connect(mNetwork, &cx::NetworkHandler::commandRespons, this, &Receiver::checkCommand);
 }
 
 Receiver::~Receiver()
@@ -35,21 +37,40 @@ Receiver::~Receiver()
 	delete mNetwork;
 }
 
-void Receiver::listen(vtkIGTLIODevicePointer device)
+void Receiver::connect()
 {
-	CX_LOG_DEBUG() << "Listening to a device: " << device->GetDeviceName();
-	qvtkReconnect(NULL, device, vtkIGTLIODevice::ModifiedEvent, this, SLOT(onDeviceModified(vtkObject*, void*, unsigned long, void*)));
+	mSession = mNetwork->requestConnectToServer("localhost", -1, igtlio::BLOCKING);
+}
+
+void Receiver::listen(vtkIGTLIODevicePointer device, bool verbose)
+{
+	QString deviceName(device->GetDeviceName().c_str());
+	CX_LOG_DEBUG() << "Listening to a device: " << deviceName;
+	if(verbose)
+	{
+		qvtkReconnect(NULL, device, vtkIGTLIODevice::ModifiedEvent, this, SLOT(onDeviceModifiedPrint(vtkObject*, void*, unsigned long, void*)));
+	}
+	qvtkReconnect(NULL, device, vtkIGTLIODevice::ModifiedEvent, this, SLOT(onDeviceModifiedCount(vtkObject*, void*, unsigned long, void*)));
 
 }
 
-void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long event , void*)
+void Receiver::sendCommand()
 {
+	vtkSmartPointer<vtkIGTLIOCommandDevice> device;
+	device = mSession->SendCommandQuery("jb_0",
+										"GetCapabilities",
+										"Jannis");
+	std::cout << "*** Sent message from Client to Server" << std::endl;
+}
 
+void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event , void*)
+{
 	vtkSmartPointer<vtkIGTLIODevice> receivedDevice(reinterpret_cast<vtkIGTLIODevice*>(caller));
 	REQUIRE(receivedDevice);
-	CX_LOG_DEBUG() << "Received event " << event
+	CX_LOG_DEBUG() << "\n\n *** Received event " << event
 				   << " from " << receivedDevice->GetDeviceName()
-				   << " which is of type " << receivedDevice->GetDeviceType();
+				   << " which is of type " << receivedDevice->GetDeviceType()
+				   << " ***";
 
 	igtl::BaseConverter::HeaderData header = receivedDevice->GetHeader();
 	CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName
@@ -59,7 +80,7 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 	std::string device_type = receivedDevice->GetDeviceType();
 	if(device_type == igtl::CommandConverter::GetIGTLTypeName())
 	{
-		vtkSmartPointer<vtkIGTLIOCommandDevice> command = vtkIGTLIOCommandDevice::SafeDownCast(receivedDevice);
+		vtkIGTLIOCommandDevicePointer command = vtkIGTLIOCommandDevice::SafeDownCast(receivedDevice);
 		REQUIRE(command);
 
 		igtl::CommandConverter::ContentData content = command->GetContent();
@@ -104,9 +125,12 @@ void Receiver::onDeviceModified(vtkObject* caller, void* device, unsigned long e
 		INFO("Receiving unknown device type.");
 		REQUIRE(false);
 	}
+}
 
-	mEventsReceived += 1;
-	if(mEventsReceived > 10)
+void Receiver::onDeviceModifiedCount(vtkObject* caller, void* device, unsigned long event , void*)
+{
+	number_of_events_received += 1;
+	if(number_of_events_received > 10)
 	{
 		emit done();
 	}
@@ -120,6 +144,11 @@ void Receiver::checkImage(cx::ImagePtr image)
 void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp)
 {
 	transform_received = true;
+}
+
+void Receiver::checkCommand(QString devicename, QString xml)
+{
+	command_received = true;
 }
 
 }//namespace cxtest

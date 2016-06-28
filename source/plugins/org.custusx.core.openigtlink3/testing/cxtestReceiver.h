@@ -27,26 +27,31 @@ public:
 	Receiver(vtkIGTLIOLogicPointer logic);
 	virtual ~Receiver();
 
-	void listen(vtkIGTLIODevicePointer device);
+	void connect();
+	void listen(vtkIGTLIODevicePointer device, bool verbose=true);
 
-	int mEventsReceived;
+	void sendCommand();
+
+	int number_of_events_received;
 	bool image_received;
 	bool transform_received;
+	bool command_received;
 
 signals:
 	void done();
 
 public slots:
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
+	void onDeviceModifiedPrint(vtkObject *caller, void *device, unsigned long event, void *);
+	void onDeviceModifiedCount(vtkObject *caller, void *device, unsigned long event, void *);
 
 private slots:
 	void checkImage(cx::ImagePtr image);
 	void checkTransform(QString devicename, cx::Transform3D transform, double timestamp);
+	void checkCommand(QString devicename, QString xml);
 
 private:
 	cx::NetworkHandler* mNetwork;
-
-
+	vtkIGTLIOSessionPointer mSession;
 };
 
 }//namespace cxtest

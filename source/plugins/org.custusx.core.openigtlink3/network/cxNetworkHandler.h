@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "org_custusx_core_openigtlink3_Export.h"
 #include "vtkIGTLIOLogic.h"
+#include "vtkIGTLIOSession.h"
 
 #include "cxTransform3D.h"
 #include "cxImage.h"
@@ -50,31 +51,38 @@ typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
 
 class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
 {
-    Q_OBJECT
-    QVTK_OBJECT
+	Q_OBJECT
+	QVTK_OBJECT
 
 public:
-    NetworkHandler(vtkIGTLIOLogicPointer logic);
-    ~NetworkHandler();
+	NetworkHandler(vtkIGTLIOLogicPointer logic);
+	~NetworkHandler();
+
+	vtkIGTLIOSessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
 
 signals:
 	void connected();
 	void disconnected();
 
-    void transform(QString devicename, Transform3D transform, double timestamp);
-    void calibration(QString devicename, Transform3D calibration);
+	void transform(QString devicename, Transform3D transform, double timestamp);
 	void image(ImagePtr image);
-    void mesh(MeshPtr image);
-    void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	void commandRespons(QString devicename, QString xml);
+	//void mesh(MeshPtr image);
+	//void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	//void calibration(QString devicename, Transform3D calibration);
 
 private slots:
-    void onConnectionEvent(vtkObject*caller, void*connector, unsigned long event, void*);
-	void onDeviceAddedOrRemoved(vtkObject*caller, void*connector, unsigned long event, void*callData);
-	void onDeviceModified(vtkObject *caller, void *device, unsigned long event, void *);
+	void onConnectionEvent(vtkObject* caller, void* connector, unsigned long event, void*);
+	void onDeviceAddedOrRemoved(vtkObject* caller, void* connector, unsigned long event, void*callData);
+	void onDeviceModified(vtkObject * caller_device, void * unknown, unsigned long event, void *);
 	void periodicProcess();
 
 private:
-    vtkIGTLIOLogicPointer mLogic;
+	void connectToConnectionEvents();
+	void connectToDeviceEvents();
+
+	vtkIGTLIOLogicPointer mLogic;
+	vtkIGTLIOSessionPointer mSession;
 	QTimer *mTimer;
 };
 

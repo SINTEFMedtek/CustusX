@@ -35,6 +35,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 #include "vtkIGTLIOConnector.h"
 #include "vtkIGTLIODevice.h"
+#include "vtkIGTLIOSession.h"
+#include "vtkIGTLIOCommandDevice.h"
+
 #include "cxNetworkHandler.h"
 #include "cxtestReceiver.h"
 
@@ -47,10 +50,12 @@ namespace cxtest
 {
 
 
-void tryToConnect(vtkIGTLIOLogicPointer logic, vtkIGTLIOConnectorPointer connector)
+void checkIfConnected(vtkIGTLIOLogicPointer logic)
 {
 	double timeout = 1;
 	double starttime = vtkTimerLog::GetUniversalTime();
+
+	vtkIGTLIOConnectorPointer connector = logic->GetConnector(0);
 
 	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
 	{
@@ -70,63 +75,55 @@ void tryToConnect(vtkIGTLIOLogicPointer logic, vtkIGTLIOConnectorPointer connect
 	REQUIRE(connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED);
 }
 
-void tryToReceiveEvents(vtkIGTLIOLogicPointer logic, vtkIGTLIOConnectorPointer connector, Receiver &receiver)
+void tryToReceiveEvents(vtkIGTLIOLogicPointer logic, Receiver &receiver)
 {
+	vtkIGTLIOConnectorPointer connector = logic->GetConnector(0);
+
 	double timeout = 1;
 	double starttime = vtkTimerLog::GetUniversalTime();
 	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
 	{
 		logic->PeriodicProcess();
 	}
+}
 
+void listenToAllDevicesToCountMessages(vtkIGTLIOLogicPointer logic, Receiver &receiver)
+{
 	int index = logic->GetNumberOfDevices();
 	for(int i=0; i<index; ++i)
 	{
-		receiver.listen(logic->GetDevice(i));
+		receiver.listen(logic->GetDevice(i), true);
 	}
+}
 
-	starttime = vtkTimerLog::GetUniversalTime();
-	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
-	{
-		logic->PeriodicProcess();
-	}
-
-	REQUIRE(receiver.mEventsReceived > 0);
-
+bool isConnected(vtkIGTLIOLogicPointer logic)
+{
+	return logic->GetConnector(0)->GetState() == vtkIGTLIOConnector::STATE_CONNECTED;
 }
 
 
-TEST_CASE("OpenIGTLinkIO can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
+TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
 {
 	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
 
-	vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
-	connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
-	connector->Start();
-
-	tryToConnect(logic, connector);
-
 	Receiver receiver(logic);
+	receiver.connect();
 
-	tryToReceiveEvents(logic, connector, receiver);
-}
+	tryToReceiveEvents(logic, receiver);
 
-TEST_CASE("NetworkHandler can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
-{
-	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+	REQUIRE(isConnected(logic));
+	listenToAllDevicesToCountMessages(logic, receiver);
+	tryToReceiveEvents(logic, receiver);
 
-	vtkIGTLIOConnectorPointer connector = logic->CreateConnector();
-	connector->SetTypeClient(connector->GetServerHostname(), connector->GetServerPort());
-	connector->Start();
-
-	tryToConnect(logic, connector);
-
-	Receiver receiver(logic);
-
-	tryToReceiveEvents(logic, connector, receiver);
-
+	REQUIRE(receiver.number_of_events_received > 0);
 	REQUIRE(receiver.image_received);
 	REQUIRE(receiver.transform_received);
+
+	receiver.sendCommand();
+	tryToReceiveEvents(logic, receiver);
+	/*
+	REQUIRE(receiver.command_respons_received);
+	*/
 
 }
 
