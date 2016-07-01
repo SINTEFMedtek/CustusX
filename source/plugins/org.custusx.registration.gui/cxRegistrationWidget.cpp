@@ -74,6 +74,11 @@ RegistrationTypeWidget::RegistrationTypeWidget(QString type, QString defVal, Xml
 	layoutV->addWidget(mStackedWidget);
 }
 
+void RegistrationTypeWidget::selectRegistrationMethod(QString selectRegistrationMethod)
+{
+	mMethodSelector->setValue(selectRegistrationMethod);
+}
+
 void RegistrationTypeWidget::onIndexChanged()
 {
 	QString method = mMethodSelector->getValue();
@@ -136,6 +141,13 @@ RegistrationWidget::RegistrationWidget(ctkPluginContext *pluginContext, QWidget*
 	connect(mTabWidget, &QTabWidget::currentChanged, this, &RegistrationWidget::onCurrentChanged);
 	this->initRegistrationTypesWidgets();
 	this->initServiceListener();
+}
+
+void RegistrationWidget::selectRegistrationMethod(QString registrationType, QString registrationMethodName)
+{
+	RegistrationTypeWidget* widget = mRegistrationTypeMap[registrationType];
+	if(widget)
+		widget->selectRegistrationMethod(registrationMethodName);
 }
 
 void RegistrationWidget::initRegistrationTypesWidgets()

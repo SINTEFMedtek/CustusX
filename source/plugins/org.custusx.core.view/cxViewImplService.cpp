@@ -69,6 +69,7 @@ ViewImplService::ViewImplService(ctkPluginContext *context) :
 	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
 	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
 	connect(viewManager(), &ViewManager::pointSampled, this, &ViewService::pointSampled);
+	connect(viewManager(), &ViewManager::renderFinished, this, &ViewService::renderFinished);
 }
 
 ViewImplService::~ViewImplService()

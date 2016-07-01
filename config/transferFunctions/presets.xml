@@ -56,12 +56,33 @@
 		</transferfunctions>
 	    <shading on="1" ambient="0.15" diffuse="0.90" specular="0.30" specularPower="15.0"/>
 	</Preset>
+	<Preset  modality="CT" name="3D CT Virtual Bronchoscopy">
+		<transferfunctions>
+			<alpha>-1024=0 -666=0 -499=255 -99=255 -98=0 3071=0</alpha>
+			<color>-1024=0/0/0 -1023=255/179/244 -701=255/208/231 485=255/0/0 3071=255/0/0</color>
+		</transferfunctions>
+		<shading specular="0.72" specularPower="15" ambient="0.2" on="1" diffuse="0.54"/>
+	</Preset>
 	<Preset name="Default">
 		<transferfunctions>
 		    <alpha></alpha>
 		    <color></color>
 		</transferfunctions>
 	</Preset>
+
+        <Preset name="2D CT Lung" modality="CT">
+            <lookuptable2D>
+                <alpha>-1025=0 -1024=255</alpha>
+                <color>-1429=0/0/0 239=255/255/255</color>
+            </lookuptable2D>
+        </Preset>
+
+        <Preset name="2D CT Abdomen" modality="CT">
+            <lookuptable2D>
+                <alpha>-1025=0 -1024=255</alpha>
+                <color>-1024=0/0/0 640=255/255/255</color>
+            </lookuptable2D>
+        </Preset>
 	
 	<Preset modality="US" name="US Angio">
 		<transferfunctions window="255" alpha="1" llr="0" level="128">

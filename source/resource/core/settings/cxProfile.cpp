@@ -180,11 +180,11 @@ cxResource_EXPORT ProfilePtr profile()
 
 ProfileManager *ProfileManager::mInstance = NULL;
 
-ProfileManager* ProfileManager::getInstance()
+ProfileManager* ProfileManager::getInstance(QString defaultProfile)
 {
 	if (mInstance == NULL)
 	{
-		mInstance = new ProfileManager();
+		mInstance = new ProfileManager(defaultProfile);
 	}
 	return mInstance;
 }
@@ -200,14 +200,14 @@ void ProfileManager::shutdown()
 	mInstance = NULL;
 }
 
-ProfileManager::ProfileManager()
+ProfileManager::ProfileManager(QString defaultProfile)
 {
-	QString defaultProfile = this->getDefaultProfileUid();
-	defaultProfile = this->getGenericSettings()->value("profile", defaultProfile).toString();
+	QString profileUid = this->getDefaultProfileUid(defaultProfile);
+	profileUid = this->getGenericSettings()->value("profile", profileUid).toString();
 
 	mSettings.reset(new Settings());
 
-	this->setActiveProfile(defaultProfile);
+	this->setActiveProfile(profileUid);
 }
 
 ProfileManager::~ProfileManager()
@@ -215,12 +215,12 @@ ProfileManager::~ProfileManager()
 
 }
 
-QString ProfileManager::getDefaultProfileUid()
+QString ProfileManager::getDefaultProfileUid(QString defaultProfile)
 {
 	QStringList installed = this->getInstalledProfiles();
-	if (installed.contains("Laboratory"))
+	if (installed.contains(defaultProfile))
 	{
-		return "Laboratory";
+		return defaultProfile;
 	}
 	else if (!installed.isEmpty())
 	{
@@ -292,7 +292,7 @@ void ProfileManager::copyProfile(QString base, QString uid)
 {
 	QString newPath = this->getPathForCustom(uid);
 
-	if (!copyRecursively(base, newPath))
+	if (!copyRecursively(base, newPath, true))
 		CX_LOG_WARNING() << "Failed to copy profile " << base << " to " << newPath;
 
 	this->profilesChanged();

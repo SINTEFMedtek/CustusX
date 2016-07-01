@@ -66,6 +66,7 @@ void USReconstructionFileFixture::assertValidFolderForSession(QString path, QStr
 	{
 		INFO(info.absoluteFilePath() + "   ( info.absoluteFilePath() )");
 		INFO("contains");
+//		INFO(this->getDataPath() + "   ( this->getDataPath() )");
 		QFileInfo dataPath(this->getDataPath());
 		INFO(dataPath.absoluteFilePath() + "   ( dataPath.absoluteFilePath() )");
 		// assert path is subfolder of datapath

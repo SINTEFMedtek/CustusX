@@ -55,7 +55,7 @@ public:
 	void deleteBranch(BranchPtr b);
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
-	void findBranchesInCenterline(Eigen::MatrixXd positions);
+    void findBranchesInCenterline(Eigen::MatrixXd positions_r);
 	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();

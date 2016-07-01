@@ -92,6 +92,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), SIGNAL(preRender()), this, SLOT(updateViews()));
 	connect(mRenderLoop.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+	connect(mRenderLoop.get(), &RenderLoop::renderFinished, this, &ViewManager::renderFinished);
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
 	mLayoutRepository.reset(new LayoutRepository());

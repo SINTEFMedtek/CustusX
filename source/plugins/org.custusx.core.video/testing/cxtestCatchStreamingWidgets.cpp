@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TEST_CASE("VideoConnectionWidget can stream", "[unit][gui][not_win32][widget][streaming]")
+TEST_CASE("VideoConnectionWidget can stream", "[gui][not_win32][widget][streaming][integration]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();

@@ -232,8 +232,8 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
+        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224')
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224') # new 2015-10-19
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -290,6 +290,7 @@ class Eigen(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #did not find a 3.2.1 release on the github fork... using a sha instead
+        #Update eigen to compile FAST on VS 2015.
         testedSHA = 'fb666682a94f4665760e622d7ab2e573059f95f5'
         self._getBuilder().gitCheckout(testedSHA)
         pass
@@ -341,12 +342,12 @@ class IGSTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git://igstk.org/IGSTK.git'
-    def update(self):
         base = self.controlData.gitrepo_open_site_base
-        repo = '%s/IGSTK' % base
+        repo = '%s/IGSTK.git' % base
+        return repo
+    def update(self):
         branch = 'IGSTK-CX-modifications'
-        self._getBuilder().gitSetRemoteURL(repo, branch=branch)
+        self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
         self._getBuilder().gitCheckout('34f4a9f46d54d4674e0a19acdb24bbbc4dcb1ffe')
     def configure(self):        
         builder = self._getBuilder()
@@ -380,13 +381,18 @@ class CustusX(CppComponent):
     def repository(self):
         return '%s/CustusX.git' % self.controlData.gitrepo_main_site_base
     def _rawCheckout(self):
-        self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
+        pass # should never happen. This file is in the repo.
+        #self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        # warning: if this call checks out a different tag/branch than the current, 
+        # the script and code will be inconsistent. The user should have set the correct
+        # tag/branch either manually or by using a wrapper script (e.g cxCustusXFinder).
+        self._getBuilder().gitCheckoutDefaultBranch()    
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        append = builder.appendCMakeOption
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
@@ -406,6 +412,7 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
         
         
         libs = self.assembly.libraries
@@ -515,13 +522,21 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/source"
     def repository(self):
-        return 'git@github.com:smistad/FAST'
+		#return 'git@github.com:smistad/FAST'
+		return 'git@github.com:jbake/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('d5acd3aa16ff1fca5ebdd83f25ba089b37d118f3')
+        self._getBuilder().gitCheckout('60247acddd2708bc6a0a4b6bfd051ba477e6af71')
+#        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
+#        branch = 'set_kernel_root_dir'
+#        self._getBuilder()._changeDirToSource()
+#        runShell('git checkout %s' % branch, ignoreFailure=False)
+#        runShell('git pull origin %s' % branch, ignoreFailure=False)
+
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        append = builder.appendCMakeOption
         add('FAST_MODULE_OpenIGTLink:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
@@ -530,6 +545,8 @@ class FAST(CppComponent):
         add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
+        append('FAST_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
+        append('FAST_CMAKE_CXX_FLAGS:STRING', '-D_USE_MATH_DEFINES')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
@@ -552,7 +569,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutDefaultBranch(submodules=True)    
+        self._getBuilder().gitCheckout('1726a9b5c0c489ee75498c5c86c5666dedc19f17')
     def configure(self):
         pass
     def build(self):

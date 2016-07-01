@@ -204,17 +204,17 @@ void BranchList::smoothBranchPositions()
 	}
 }
 
-void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
+void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r)
 {
-	positions = sortMatrix(2,positions);
-	Eigen::MatrixXd positionsNotUsed = positions;
+    positions_r = sortMatrix(2,positions_r);
+    Eigen::MatrixXd positionsNotUsed_r = positions_r;
 
 //	int minIndex;
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
 	BranchPtr branchToSplit;
-    while (positionsNotUsed.cols() > 0)
+    while (positionsNotUsed_r.cols() > 0)
 	{
 		if (!mBranches.empty())
 		{
@@ -222,7 +222,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 			for (int i = 0; i < mBranches.size(); i++)
 			{
 				std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
-				distances = dsearchn(positionsNotUsed, mBranches[i]->getPositions());
+                distances = dsearchn(positionsNotUsed_r, mBranches[i]->getPositions());
 				double d = distances.second.minCoeff(&index);
 				if (d < minDistance)
 				{
@@ -233,15 +233,15 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 						break;
 				}
 			}
-			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed.col(startIndex) , branchToSplit->getPositions());
+            std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
 			splitIndex = dsearchResult.first;
 		}
 		else //if this is the first branch. Select the top position (Trachea).
-			startIndex = positionsNotUsed.cols() - 1;
+            startIndex = positionsNotUsed_r.cols() - 1;
 
-		std::pair<Eigen::MatrixXd,Eigen::MatrixXd > connectedPointsResult = findConnectedPointsInCT(startIndex , positionsNotUsed);
+        std::pair<Eigen::MatrixXd,Eigen::MatrixXd > connectedPointsResult = findConnectedPointsInCT(startIndex , positionsNotUsed_r);
 		Eigen::MatrixXd branchPositions = connectedPointsResult.first;
-		positionsNotUsed = connectedPointsResult.second;
+        positionsNotUsed_r = connectedPointsResult.second;
 
 		if (branchPositions.cols() >= 5) //only include brances of length >= 5 points
 		{
@@ -277,7 +277,8 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions)
 					 // existing branch
 				{
 					newBranch->setParentBranch(branchToSplit->getParentBranch());
-					branchToSplit->getParentBranch()->addChildBranch(newBranch);
+					if(branchToSplit->getParentBranch())
+						branchToSplit->getParentBranch()->addChildBranch(newBranch);
 				}
 				else if (branchToSplit->getPositions().cols() - splitIndex - 1 < 5)
 					// If the new branch is close to the end of the existing

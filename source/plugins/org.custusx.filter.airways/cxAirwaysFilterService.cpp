@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
+#include "cxUtilHelpers.h"
 // Test
 #include "FAST/Algorithms/AirwaySegmentation/AirwaySegmentation.hpp"
 #include "FAST/Algorithms/CenterlineExtraction/CenterlineExtraction.hpp"
@@ -62,10 +63,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-AirwaysFilter::AirwaysFilter(ctkPluginContext *pluginContext) :
-	FilterImpl(VisServices::create(pluginContext))
+AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
+	FilterImpl(services)
 {
+    //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
+    fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
+    Q_UNUSED(importer)
+}
 
+
+AirwaysFilter::~AirwaysFilter() {
 }
 
 QString AirwaysFilter::getName() const
@@ -86,29 +93,39 @@ QString AirwaysFilter::getHelp() const
 	        "</html>";
 }
 
-
 bool AirwaysFilter::execute()
 {
-	std::cout << "EXECUTING AIRWAYS FILTER" << std::endl;
+    CX_LOG_INFO() << "EXECUTING AIRWAYS FILTER";
     ImagePtr input = this->getCopiedInputImage();
-    	if (!input)
-    		return false;
-    mInputImage = input;
+	if (!input)
+		return false;
+	mInputImage = input;
 
-	std::string filename = (patientService()->getActivePatientFolder()+"/"+input->getFilename()).toStdString();
+    QString q_filename = "";
+    QString activePatienFolder = patientService()->getActivePatientFolder();
+    QString inputImageFileName = mInputImage->getFilename();
+    if(!activePatienFolder.isEmpty())
+        q_filename = activePatienFolder+"/"+inputImageFileName;
+    else
+        q_filename = inputImageFileName;
 
+    std::string filename = q_filename.toStdString();
 	try {
-		// Import image data from disk
+        QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
+        fast::DeviceManager::getInstance().setKernelRootPath(kernelDir.toStdString());
+        QString cacheDir = cx::DataLocations::getCachePath();
+        fast::DeviceManager::getInstance().setWritableCachePath(cacheDir.toStdString());
+
+        // Import image data from disk
 		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
 		importer->setFilename(filename);
 
 	    // Need to know the data type
 	    importer->update();
 	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
-	    std::cout << "IMAGE LOADED" << std::endl;
 
-	    // Do segmentation
-		fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
+        // Do segmentation
+        fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
 	    segmentation->setInputConnection(importer->getOutputPort());
 
 	    // Convert fast segmentation data to VTK data which CX can use
@@ -116,20 +133,20 @@ bool AirwaysFilter::execute()
 	    vtkExporter->setInputConnection(segmentation->getOutputPort());
 	    vtkExporter->Update();
 	    mSegmentationOutput = vtkExporter->GetOutput();
-	    std::cout << "FINISHED AIRWAY SEGMENTATION" << std::endl;
+        CX_LOG_SUCCESS() << "FINISHED AIRWAY SEGMENTATION";
 
-	    // Get output segmentation data
+        // Get output segmentation data
 	    fast::Segmentation::pointer segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
 	    // Get the transformation of the segmentation
-	    Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
+		Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
 	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
 
         // Extract centerline
         fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
         centerline->setInputConnection(segmentation->getOutputPort());
 
-	    // Get centerline
+        // Get centerline
 	    vtkSmartPointer<fast::VTKLineSetExporter> vtkCenterlineExporter = fast::VTKLineSetExporter::New();
 	    vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
 	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();
@@ -152,7 +169,7 @@ bool AirwaysFilter::execute()
 		reportError("Airway segmentation algorithm threw a unknown exception.");
 
 		return false;
-	}
+    }
  	return true;
 }
 
@@ -203,7 +220,6 @@ bool AirwaysFilter::postProcess()
 
 void AirwaysFilter::createOptions()
 {
-	//mOptionsAdapters.push_back(getNoiseLevelOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -234,19 +250,6 @@ void AirwaysFilter::createOutputTypes()
 
 }
 
-/*
-DoublePropertyPtr AirwaysFilter::getNoiseLevelOption(QDomElement root)
-{
-	DoublePropertyPtr retval = DoubleProperty::initialize("Noise level",
-			"", "Select the amount of noise present in the image", 0.5,
-			DoubleRange(0.0, 2, 0.5), 1, root);
-	retval->setGuiRepresentation(DoubleProperty::grSLIDER);
-	return retval;
-}
-*/
-
-AirwaysFilter::~AirwaysFilter() {
-}
 
 } /* namespace cx */
 

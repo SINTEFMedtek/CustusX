@@ -74,6 +74,7 @@ private slots:
     void deleteDICOMDB();
 
 private:
+    virtual QSize sizeHint () const { return QSize(600, 100);};///< Define a recommended size
 	QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 	DICOMAppWidget* mBrowser;
 	ctkPluginContext* mContext;

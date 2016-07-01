@@ -44,6 +44,7 @@ import pprint
 import cx.utils.cxArgParse
 import cx.utils.cxUtilities
 import cx.utils.cxSSH
+import cx.utils.cxRepoHandler
         
 class Common(object):
     '''
@@ -52,7 +53,6 @@ class Common(object):
     '''
     def __init__(self):
         self.m32bit = False
-        self.main_branch = "master"
         self.static = False # build as shared or static libraries
         self.jom = False
         self.ninja = self.ninja_installed()                
@@ -77,6 +77,8 @@ class Common(object):
         self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
         self.publish_user_documentation_target      = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder") 
+
+        self.main_branch = cx.utils.cxRepoHandler.getBranchForRepo(self.getCustusXRepositoryPath(), fallback='master')
 
         # for the build of CustusX on the custusx.org website
         user = "custusx"
@@ -113,7 +115,7 @@ class Common(object):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out core repositories. None means checkout default branch.')
-        p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type, default=Debug')
+        p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type, default=%s'%self.build_type)
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
         p.add_argument('--main_branch', default=self.main_branch, dest='main_branch', help='Default branch to checkout/pull, for projects not using a custom branch or tag, default=%s. When empty, checkout is skipped.' % self.main_branch)
         p.add_boolean_inverter('--static', default=self.static, dest='static', help='Link statically.')        
@@ -280,6 +282,10 @@ class Common(object):
         loc = self.getCustusXRepositoryLocation()
         repoFolder = loc[2]
         return repoFolder
+    
+    def getCustusXRepositoryPath(self):
+        loc = self.getCustusXRepositoryLocation()
+        return '/'.join(loc) 
 
     def getCustusXRepositoryLocation(self):
         '''

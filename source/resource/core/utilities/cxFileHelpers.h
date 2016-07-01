@@ -56,10 +56,8 @@ namespace cx
  */
 cxResource_EXPORT bool removeNonemptyDirRecursively(const QString& dirName);
 
-/** https://qt.gitorious.org/qt-creator/qt-creator/source/1a37da73abb60ad06b7e33983ca51b266be5910e:src/app/main.cpp#L13-189
- *  taken from utils/fileutils.cpp. We can not use utils here since that depends app_version.h.
- */
-cxResource_EXPORT bool copyRecursively(const QString &srcFilePath, const QString &tgtFilePath);
+//From http://stackoverflow.com/questions/2536524/copy-directory-using-qt
+cxResource_EXPORT bool copyRecursively(QString sourceDir, QString destinationDir, bool overWriteDirectory);
 
 cxResource_EXPORT QFileInfoList getDirs(QString path);
 cxResource_EXPORT QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool includeSubDirs = false);

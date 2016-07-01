@@ -65,12 +65,13 @@ class cxResource_EXPORT WorkflowState: public QState
 Q_OBJECT
 
 public:
-	WorkflowState(QState* parent, QString uid, QString name, CoreServicesPtr services) :
+	WorkflowState(QState* parent, QString uid, QString name, CoreServicesPtr services, bool enableAction = true) :
 		QState(parent),
 		mUid(uid),
 		mName(name),
 		mAction(NULL),
-		mServices(services)
+		mServices(services),
+		mEnableAction(enableAction)
 	{}
 
 	virtual ~WorkflowState() {}
@@ -84,11 +85,14 @@ public:
 	std::vector<WorkflowState*> getChildStates();
 	QAction* createAction(QActionGroup* group);
 
+	virtual void enableAction(bool enable);
+
 signals:
 	void aboutToExit();
 
-protected slots:
+public slots:
 	void canEnterSlot();
+protected slots:
 	void setActionSlot();
 
 protected:
@@ -100,6 +104,9 @@ protected:
 	QString mName;
 	QAction* mAction;
 	CoreServicesPtr mServices;
+
+private:
+	bool mEnableAction;
 };
 
 class cxResource_EXPORT ParentWorkflowState: public WorkflowState

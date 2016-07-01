@@ -118,6 +118,14 @@ QString DataLocations::getPersistentWritablePath()
 	return homepath;
 }
 
+void DataLocations::deletePersistentWritablePath()
+{
+    QString pathToDelete = DataLocations::getPersistentWritablePath();
+    QDir dir(pathToDelete);
+    CX_LOG_INFO() << "Going to delete:" << dir.absolutePath();
+    dir.removeRecursively();
+}
+
 
 QString DataLocations::getBundlePath()
 {
@@ -253,7 +261,7 @@ QString changeExtension(QString name, QString ext)
 
 QString DataLocations::getCachePath()
 {
-	QString path(getPersistentWritablePath()+"/cache/");
+    QString path(getPersistentWritablePath()+"/cache");
 	return path;
 }
 

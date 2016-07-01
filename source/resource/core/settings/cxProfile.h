@@ -136,7 +136,7 @@ class cxResource_EXPORT ProfileManager : public QObject
 {
 	Q_OBJECT
 public:
-	static ProfileManager* getInstance(); ///< returns the only instance of this class
+	static ProfileManager* getInstance(QString defaultProfile = QString("Laboratory")); ///< returns the only instance of this class
 	static void initialize();
 	static void shutdown();
 
@@ -154,7 +154,7 @@ signals:
 	void activeProfileChanged();
 
 private:
-	ProfileManager();
+	ProfileManager(QString defaultProfile);
 	~ProfileManager();
 	static ProfileManager* mInstance; ///< The only instance of this class that can exist.
 	ProfilePtr mActive;
@@ -162,7 +162,7 @@ private:
 
 	SettingsPtr mSettings; ///< used by Profile, changes content for each profile change
 
-	QString getDefaultProfileUid();
+	QString getDefaultProfileUid(QString defaultProfile);
 	void profilesChanged();
 	QStringList getInstalledProfiles();
 	QStringList getCustomProfiles();

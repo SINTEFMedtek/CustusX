@@ -59,7 +59,7 @@ class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public Filte
 	Q_INTERFACES(cx::Filter)
 
 public:
-    RouteToTargetFilter(ctkPluginContext *pluginContext);
+	RouteToTargetFilter(VisServicesPtr services);
 	virtual ~RouteToTargetFilter() {}
 
 	virtual QString getType() const;

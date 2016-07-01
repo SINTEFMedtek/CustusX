@@ -31,6 +31,7 @@ include(cxDocumentation)
 # Add some compiler flags (preprocessor definitions)
 #------------------------------------------------------------------------------
 
+cx_add_defintions()
 cx_set_os_identifiers()
 
 # _USE_MATH_DEFINES Must be defined before math.h is included
@@ -41,11 +42,7 @@ endif(CX_WINDOWS)
 # required to compile some eigen code on at least Ubuntu
 if(CX_LINUX)
     SET ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
-#    SET ( CMAKE_CXX_FLAGS "-ftemplate-depth=1024" CACHE STRING "Allow heavy templated Eigen code" FORCE)
 endif(CX_LINUX)
-
-#set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 if(SSC_PRINT_CALLER_INFO)
         add_definitions(-DSSC_PRINT_CALLER_INFO)

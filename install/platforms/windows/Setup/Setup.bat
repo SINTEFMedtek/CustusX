@@ -15,7 +15,13 @@ powershell -command "& {Set-ExecutionPolicy Unrestricted}"
 :: which will setup a CustusX developer environment
 powershell -noprofile -command "&{"^
  "Import-Module ..\Setup -Force;"^
- "Get-Tools 'full' -tools @('console2', 'MSVC2013', '7-Zip', 'cppunit', 'git' , 'python', 'ninja', 'cmake', 'nsis', 'ussf', 'cuda', 'boost', 'glew');"^
+ "Get-Tools 'full' -tools @('console2', 'MSVC2015', '7-Zip', 'cppunit', 'git' , 'python', 'ninja', 'cmake', 'nsis', 'ussf', 'cuda', 'boost', 'glew');"^
  "Get-Tools 'full' -tools 'qt';"^
- "(Invoke-WebRequest -UseBasicParsing https://bootstrap.pypa.io/ez_setup.py).Content | python -;"^
+ "pip install --upgrade pip;"^
+ "pip install lxml;"^
+ "pip install paramiko;"^
+ "pip install numpy;"^
+ "Get-PackageProvider –Name Chocolatey -ForceBootstrap;"
+ "Set-PackageSource Chocolatey;"
+ "Install-Package doxygen.install -RequiredVersion "1.8.10";"^
  "}"

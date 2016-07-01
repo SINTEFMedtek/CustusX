@@ -26,10 +26,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
     check_cxx_compiler_flag(--std=c++0x SUPPORTS_STD_CXX01)
     if(SUPPORTS_STD_CXX11)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c++11")
     elseif(SUPPORTS_STD_CXX01)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --std=c++0x")
     else()
         message(ERROR "Compiler does not support --std=c++11 or --std=c++0x.")
     endif()
@@ -57,6 +55,18 @@ set(PLUGIN_UI_FORMS
 # QRC Files which should be compiled into the plugin
 set(PLUGIN_resources
 )
+
+# Make sure OpenCL kernel files are copied to the installer
+install(FILES
+		${FAST_SOURCE_DIR}/Algorithms/AirwaySegmentation/AirwaySegmentation.cl
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/AirwaySegmentation/)
+install(FILES
+		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter2D.cl
+		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter3D.cl
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/GaussianSmoothingFilter/)
+install(FILES
+		${FAST_SOURCE_DIR}/Algorithms/CenterlineExtraction/CenterlineExtraction.cl
+		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/CenterlineExtraction/)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -103,5 +113,5 @@ target_include_directories(org_custusx_filter_airways
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/org.custusx.filter.airways.md")
 
-#add_subdirectory(testing)
+add_subdirectory(testing)
 

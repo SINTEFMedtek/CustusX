@@ -92,6 +92,7 @@ void ViewServiceProxy::onServiceAdded(ViewService* service)
 	connect(service, &ViewService::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
 	connect(service, &ViewService::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
 	connect(service, &ViewService::pointSampled, this, &ViewService::pointSampled);
+	connect(service, &ViewService::renderFinished, this, &ViewService::renderFinished);
 
 	emit activeLayoutChanged();
 	emit activeViewChanged();
@@ -105,6 +106,7 @@ void ViewServiceProxy::onServiceRemoved(ViewService *service)
 	disconnect(service, &ViewService::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
 	disconnect(service, &ViewService::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
 	disconnect(service, &ViewService::pointSampled, this, &ViewService::pointSampled);
+	disconnect(service, &ViewService::renderFinished, this, &ViewService::renderFinished);
 
 	mViewService = ViewService::getNullObject();
 

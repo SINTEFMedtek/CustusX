@@ -19,6 +19,7 @@ import urllib
 import getpass
 import platform
 import shutil
+import cxRepoHandler
 
 from cxShell import *
     
@@ -94,42 +95,16 @@ class CppBuilder:
         runShell('git submodule sync') # from tsf 
         runShell('git submodule update --init --recursive')                    
 
-    def gitCheckoutDefaultBranch(self, submodules=False):
+    def gitCheckoutDefaultBranch(self):
         '''
         checkout the default branch as set by default or user.
         '''
-        tag = self.controlData.getGitTag()
-        branch = self.controlData.main_branch
-        if (tag==None) or (tag=="\"\""):
-            self.gitCheckoutBranch(branch, submodules)
-        else:
-            self.gitCheckoutTag(tag, submodules=submodules)
+        repo = cxRepoHandler.RepoHandler()
+        repo.setRepoInfo(root_path=self.mBasePath, repo_path=self.mSourcePath)
+        repo.setBranchDefault(self.controlData.main_branch)
+        repo.syncToGitRef()
 
-    def gitCheckoutBranch(self, branch, submodules=False):
-        '''
-        pull latest version of branch, include submodules if asked.
-        '''
-        self._changeDirToSource()
-        #if branch contains only '' set as empty .... todo
-
-        runShell('git fetch')
-	# If the branch doesn't exist, this might be ok: 
-	# only a subset of the repos need have the branch defined.
-	# In this case, checkout the latest stuff on the master branch. - changed - see discussion below.
-        if runShell('git checkout %s' % branch, ignoreFailure=True):
-                runShell('git pull origin %s' % branch, ignoreFailure=True)
-        else:
-                # This fallback is becoming problematic: if input branch is fex feature/something, and this
-                # undefined in some repos, we would like to fallback to the develop branch, IF using git flow,
-                # but if working on a release, we want master. 
-                # Best guess: develop.
-                print "* Warning: checkout branch %s failed: guessing at branch develop as fallback:" % branch
-                runShell('git checkout develop', ignoreFailure=True)
-                runShell('git pull origin develop', ignoreFailure=True)
-        if submodules:
-            self._gitSubmoduleUpdate()
-
-    def gitCheckoutTag(self, tag, submodules=False):
+    def gitCheckoutTag(self, tag):
         '''
         Update git to the given tag.
         Skip if HEAD already is at tag.
@@ -138,18 +113,13 @@ class CppBuilder:
         if self._checkGitIsAtTag(tag):
             return        
         runShell('git fetch')
-        if not runShell('git checkout %s' % tag):
-            # fallback: this is a guess only
-            print "* Warning: checkout tag %s failed: guessing at branch develop as fallback:" % tag
-            runShell('git checkout develop')
-        if submodules:
-            self._gitSubmoduleUpdate()
+        runShell('git checkout %s' % tag)
         
-    def gitCheckout(self, tag, submodules=False):
+    def gitCheckout(self, tag):
         '''
         Backwards compatibility
         '''
-        self.gitCheckoutTag(tag, submodules)
+        self.gitCheckoutTag(tag)
 
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')
@@ -181,7 +151,22 @@ class CppBuilder:
             runShell('make clean')
 
     def addCMakeOption(self, key, value):
+        if('CMAKE_CXX_FLAGS:STRING' == key):
+            print 'WARNING: CMAKE_CXX_FLAGS must be added by CMakeFiles, skipping: '+value
+            return
         self.cmakeOptions[key] = value
+
+    def appendCMakeOption(self, key, value):
+        temp = ""
+        if(self.cmakeOptions.has_key(key)):
+            temp = self.cmakeOptions[key]
+            print key+" was set to "+temp
+        if(not temp):
+            new = value
+        else:
+            new = temp+" "+value
+        print key+" is now set to "+new
+        self.cmakeOptions[key] = new
 
     def configureCMake(self, options=''): 
         self._addDefaultCmakeOptions()
@@ -196,8 +181,9 @@ class CppBuilder:
 
     def _addDefaultCmakeOptions(self):
         add = self.addCMakeOption
+        append = self.appendCMakeOption
         if(platform.system() != 'Windows'):
-            add('CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')

@@ -32,7 +32,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 
-TEST_CASE("PatientModelPlugin: Check nothing", "[unit][plugins][org.custusx.core.patientmodel][hide]")
+#include "cxPatientModelServiceProxy.h"
+#include "cxtestVisServices.h"
+#include "cxtestTestDataStructures.h"
+#include "cxLogicManager.h"
+
+namespace cxtest
 {
-	CHECK(true);
+
+TEST_CASE("PatientModelPlugin: makeAvailable works", "[unit][plugins][org.custusx.core.patientmodel]")
+{
+	TestDataStructures testData;
+	cx::ImagePtr image = testData.image1;
+	QString imageUid = image->getUid();
+
+	cx::LogicManager::initialize();
+	ctkPluginContext* pluginContext = cx::LogicManager::getInstance()->getPluginContext();
+
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelServiceProxy::create(pluginContext);
+
+	patientModelService->insertData(image);
+	REQUIRE(patientModelService->getData(imageUid));
+
+	patientModelService->makeAvailable(imageUid, false);
+	CHECK(patientModelService->getData(imageUid));//Setting available to false should only remove data from the list, not when asking for a specific uid
+	CHECK_FALSE(patientModelService->getData().count(imageUid));
+	CHECK(patientModelService->getAllData().count(imageUid));
+
+
+	patientModelService->makeAvailable(imageUid, true);
+	CHECK(patientModelService->getData().count(imageUid));
+
+	cx::LogicManager::shutdown();
 }
+
+}//cxtest

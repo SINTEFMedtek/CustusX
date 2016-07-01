@@ -89,6 +89,7 @@ cxResource_EXPORT DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<Image
 
 
 cxResource_EXPORT vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image);
+cxResource_EXPORT vtkImageDataPtr convertFrom4To3Components(vtkImageDataPtr image);
 
 cxResource_EXPORT vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);///< Have never been used or tested. Create a test for it
 

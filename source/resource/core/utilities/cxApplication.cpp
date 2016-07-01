@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QThread>
 #include <QWidget>
 #include <QFile>
+#include <QAction>
 
 #include <iostream>
 
@@ -125,5 +126,35 @@ void bringWindowToFront(QWidget* window)
 #endif
 	window->raise();
 }
+
+QWidget* getMainWindow()
+{
+	QWidget *mainwindow = Q_NULLPTR;
+	foreach(mainwindow, QApplication::topLevelWidgets()) {
+	  if(mainwindow->objectName() == "MainWindow")
+		break;
+	}
+	return mainwindow;
+}
+
+template<typename T>
+T findMainWindowChildWithObjectName(QString objectName)
+{
+	QWidget *mainwindow = getMainWindow();
+	T object = mainwindow->findChild<T>(objectName);
+	return object;
+}
+
+void triggerMainWindowActionWithObjectName(QString actionName)
+{
+	QAction* action = findMainWindowChildWithObjectName<QAction*>(actionName);
+    if(action)
+    {
+        action->trigger();
+    }
+}
+
+template
+cxResource_EXPORT QWidget* findMainWindowChildWithObjectName(QString objectName);
 
 } // namespace cx

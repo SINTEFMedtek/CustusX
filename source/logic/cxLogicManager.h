@@ -113,6 +113,8 @@ public:
    */
   void restartWithNewProfile(QString uid);
 
+  void restartServicesWithProfile(QString uid);
+
   PluginFrameworkManagerPtr getPluginFramework();
   ctkPluginContext* getPluginContext();
 
