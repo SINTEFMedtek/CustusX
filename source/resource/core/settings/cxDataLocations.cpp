@@ -55,7 +55,6 @@ void DataLocations::setTestMode()
 {
 	mTestMode = true;
 	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp");
-    cx::removeNonemptyDirRecursively(getPersistentWritablePath() + "/temp");
 }
 
 QString DataLocations::getTestDataPath()
@@ -114,7 +113,7 @@ QString DataLocations::getPersistentWritablePath()
 	QString homepath = QDir::homePath() + "/" + CX_SYSTEM_BASE_NAME + "_settings";
 
 	if (mTestMode)
-        homepath = homepath + "/temp";
+		homepath = getTestDataPath() + "/temp";
 
 	return homepath;
 }
