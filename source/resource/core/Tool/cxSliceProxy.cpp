@@ -190,27 +190,19 @@ void SliceProxy::clinicalApplicationChangedSlot()
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
 {
-	mCutplane->initializeFromPlane(plane,
-								   useGravity, gravityDir,
+    //test
+    Vector3D gravityDir2 = -mDataManager->getOperatingTable().getVectorUp();
+    useGravity = true;
+    std::cout << "gravityDir2: \n" << gravityDir2 << std::endl;
+    //
+
+    mCutplane->initializeFromPlane(plane,
+                                   useGravity, gravityDir2 /*gravityDir*/,
 								   useViewOffset, viewportHeight, toolViewOffset,
 								   mDataManager->getClinicalApplication(),
 								   useConstrainedViewOffset);
+
 	changed();
-//	setPlane(plane);
-//	//Logger::log("vm.log"," set plane to proxy ");
-//	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
-//	{
-//		setOrientation(otORTHOGONAL);
-//		setFollowType(ftFIXED_CENTER);
-//	}
-//	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
-//	{
-//		setOrientation(otOBLIQUE);
-//		setFollowType(ftFOLLOW_TOOL);
-//
-//		setGravity(useGravity, gravityDir);
-//		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
-//	}
 }
 
 SliceComputer SliceProxy::getComputer() const

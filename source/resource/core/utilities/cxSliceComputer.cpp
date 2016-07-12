@@ -100,16 +100,22 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 	}
     else if (plane==ptTOOLSIDEPLANE)
     {
-        setOrientationType(otOBLIQUE);
-        //setOrientationType(otORTHOGONAL);
-        setFollowType(ftFIXED_CENTER); //skal være dette
-        //setFollowType(ftFOLLOW_TOOL);
-
-
-
+        setOrientationType(otOBLIQUE); //skal være dette, som side. Eller skal det det? Ja, tror det. Må henge på toolen når du roterer rundt global z-akse.
+        setFollowType(ftFIXED_CENTER); //skal være dette, men er ikke sikker på at det funker med oblique... Nei.
 
         //HALLO, HALLO! Alle plasser som kaller denne metoden må bruke bordets ned-vektor!
-        setGravity(true, Vector3D(0,0,-1));
+        //Satt i kallet til denne funksjonen.
+        setGravity(useGravity, gravityDir);
+
+        //NYNY test. Må ha dette for at planet skal henge på tool-spissen. Kanskje ikke nå lengre! Etter å ha sørget for at center er inne i view
+        //setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, useConstrainedViewOffset); // TODO finish this one
+
+        //setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, false); // TODO finish this one
+//        useViewOffset 1
+//         viewportHeight 92.5743
+//         toolViewOffset 0.25
+//         useConstrainedViewOffset 1
+
     }
 }
 
@@ -126,6 +132,11 @@ ORIENTATION_TYPE SliceComputer::getOrientationType() const
 PLANE_TYPE SliceComputer::getPlaneType() const
 {
 	return mPlaneType;
+}
+
+FOLLOW_TYPE SliceComputer::getFollowType() const
+{
+    return mFollowType;
 }
 
 Transform3D SliceComputer::getToolPosition() const
@@ -227,14 +238,13 @@ SlicePlane SliceComputer::getPlane()  const
 		plane.j = m_rMt.vector(plane.j);
 	}
 
-    //orient the plane, so that even if the tool has been rotated, the up vector and gravity vector will lie in this plane.
     if (mPlaneType == ptTOOLSIDEPLANE)
     {
+        // orient planes so that gravity is down
+     //   plane = orientToGravity(plane);
+        //orient the plane, so that even if the tool has been rotated, the up vector and gravity vector will lie in this plane.
         plane = this->orientToGravityAroundToolZAxis(plane);
     }
-
-	// orient planes so that gravity is down
-	plane = orientToGravity(plane);
 
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo
@@ -359,7 +369,6 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() cons
 	}
 }
 
-
 /**Generate a viewdata containing a slice that always keeps the center 
  * of the observed image at center, but the z-component varies according 
  * to cross.
@@ -412,7 +421,9 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	w_n = w_n*w_n; // square to keep stability near normal use.
 
 	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
-	Vector3D i_n = base.i; // |i_n|==1
+    //Seemed to me that i_n needed a change to be good in the singularity situation. //jone, 20160712
+    //Vector3D i_n = base.i; // |i_n|==1
+    Vector3D i_n = -base.j; // |i_n|==1
 
 
 	// set i vector to a weighted mean of the two definitions
@@ -440,14 +451,73 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
  */
 SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base) const
 {
+    if (!mUseGravity)
+    {
+        return base;
+    }
+
     SlicePlane retval = base;
     Vector3D up;
     up = -mGravityDirection; // normal case
     const Vector3D k_mark = cross(-up, base.i); // plane normal. Constant
     const Vector3D j_mark = cross(k_mark, base.i); // plane normal. Constant
 
-    retval.i = base.i;
-    retval.j = j_mark.normal();
+    //ORIG
+//    retval.i = base.i;
+//    retval.j = j_mark.normal();
+
+//    retval.i = Vector3D(-1, 0, 0); //Dette er globalt, så det blir jo feil å hardkode!
+//    retval.j = Vector3D(0, -1, 0);
+
+//    retval.i = m_rMt.vector(Vector3D(0, 0, -1)); //Heller ikke bra. Da følger rotasjonen bare toolen.
+//    retval.j = m_rMt.vector(Vector3D(0, -1, 0));
+
+//    retval.i = m_rMt.inv().vector(Vector3D(0, 0, -1)); //Ble litt bedre, men fremdeles helt sprøtt.
+//    retval.j = m_rMt.inv().vector(Vector3D(0, -1, 0));
+
+    //Vector3D toolVector = m_rMt.coord(Vector3D(0,0,0)).normal(); //orig
+    //Vector3D toolVector = m_rMt.inv().coord(Vector3D(retval.c)).normal();
+    //Vector3D toolVector = m_rMt.vector(Vector3D(mFixedCenter)).normal();
+    Vector3D toolVector = retval.c.normal();
+    Vector3D i_mm = cross(up, toolVector).normal();
+    Vector3D i_m = cross(i_mm, up).normal();
+    Vector3D j_m = cross(i_m, i_mm).normal();
+    //std::cout << "Vectors: " << toolVector << std::endl << i_mm << std::endl << i_m << std::endl << j_m << std::endl;
+
+    //m_rMt.coord(Vector3D(0,0,0)).normal();
+//Vectors: -0.548367 -0.547154  0.632389
+//-0.755514        -0 -0.655133
+//-0.655133         0  0.755514
+// 0 -1  0
+
+//    m_rMt.inv().coord(Vector3D(0,0,0)).normal();
+//Vectors:  0.582887 -0.620096 -0.525095
+//0.669314        0 0.742979
+// 0.742979         0 -0.669314
+// 0 -1  0
+
+
+    //m_rMt.vector(Vector3D(0,0,0)).normal();
+    //bare 0
+
+    //m_rMt.coord(Vector3D(retval.c)).normal();
+    //ble tull. Riktig orientert, men følger ikke toolens akse!
+
+    //m_rMt.coord(Vector3D(mFixedCenter)).normal();
+    //også tull. Riktig orientert, men følger ikke toolens akse!
+
+    //m_rMt.inv().vector(Vector3D(mFixedCenter)).normal();
+    //samme her
+
+    //m_rMt.vector(Vector3D(retval.c)).normal();
+    //og her
+
+    //plane.c og mFixedCenter
+    //samme!
+
+    retval.i = i_m;
+    retval.j = j_m;
+
     return retval;
 }
 
