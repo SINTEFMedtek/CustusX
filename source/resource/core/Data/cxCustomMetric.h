@@ -67,7 +67,7 @@ public:
 
 	virtual bool isValid() const;
 	virtual QString getAsSingleLineString() const;
-	virtual QIcon getIcon() {return QIcon(":/icons/metric_torus.png");}
+    virtual QIcon getIcon() {return QIcon(":/icons/metric_custom.png");}
 
     QString getDefineVectorUpMethod() const;
     void setDefineVectorUpMethod(QString defineVectorUpMethod);
