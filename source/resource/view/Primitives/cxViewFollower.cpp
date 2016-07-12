@@ -89,9 +89,9 @@ void ViewFollower::ensureCenterWithinView()
 	if (!followTooltip)
 		return;
 
-	// this applies only to orthogonal views: oblique follows tool anyway
-	if (mSliceProxy->getComputer().getOrientationType()!=otORTHOGONAL)
-		return;
+    // views which follow the tool don't need any correction
+    if (mSliceProxy->getComputer().getFollowType()==ftFOLLOW_TOOL)
+        return;
 
 	Vector3D shift_s = this->findCenterShift_s();
 	this->applyShiftToCenter(shift_s);

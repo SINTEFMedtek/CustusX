@@ -91,7 +91,8 @@ public:
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset = false);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
-	Transform3D getToolPosition() const;
+    FOLLOW_TYPE getFollowType() const;
+    Transform3D getToolPosition() const;
 
 private:
 	std::pair<Vector3D,Vector3D> generateBasisVectors() const;
