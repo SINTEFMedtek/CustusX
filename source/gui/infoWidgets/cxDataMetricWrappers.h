@@ -260,18 +260,10 @@ private slots:
   void guiChanged();
 
 private:
-  DoublePropertyPtr createRadiusSelector() const;
-  DoublePropertyPtr createThicknessSelector() const;
-  DoublePropertyPtr createHeightSelector() const;
-  BoolPropertyPtr createFlatSelector() const;
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
   FilePathPropertyPtr createSTLFileSelector() const;
 
   CustomMetricPtr mData;
-  DoublePropertyPtr mRadius;
-  DoublePropertyPtr mThickness;
-  DoublePropertyPtr mHeight;
-  BoolPropertyPtr mFlat;
   StringPropertyPtr mDefineVectorUpMethod;
   FilePathPropertyPtr mSTLFile;
   bool mInternalUpdate;

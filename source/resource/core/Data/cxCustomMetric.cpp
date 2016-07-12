@@ -46,10 +46,6 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
-	mRadius = 5;
-	mThickness = 2;
-	mHeight = 0;
-	mFlat = true;
     mDefineVectorUpMethod = mDefineVectorUpMethods.table;
     mSTLFile = "";
 }
@@ -73,10 +69,6 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	DataMetric::addXml(dataNode);
 
 	mArguments->addXml(dataNode);
-	dataNode.toElement().setAttribute("radius", mRadius);
-	dataNode.toElement().setAttribute("thickness", mThickness);
-	dataNode.toElement().setAttribute("height", mHeight);
-	dataNode.toElement().setAttribute("flat", mFlat);
     dataNode.toElement().setAttribute("definevectorup", mDefineVectorUpMethod);
     dataNode.toElement().setAttribute("STLFile", mSTLFile);
 }
@@ -86,10 +78,6 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	DataMetric::parseXml(dataNode);
 
 	mArguments->parseXml(dataNode, mDataManager->getData());
-	mRadius = dataNode.toElement().attribute("radius", qstring_cast(mRadius)).toDouble();
-	mThickness = dataNode.toElement().attribute("thickness", qstring_cast(mThickness)).toDouble();
-	mHeight = dataNode.toElement().attribute("height", qstring_cast(mHeight)).toDouble();
-	mFlat = dataNode.toElement().attribute("flat", qstring_cast(mFlat)).toInt();
     mDefineVectorUpMethod = dataNode.toElement().attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
     mSTLFile = dataNode.toElement().attribute("STLFile", qstring_cast(mSTLFile));
 }
@@ -151,50 +139,6 @@ QString CustomMetric::getAsSingleLineString() const
 	return QString("%1 %2")
 			.arg(this->getSingleLineHeader())
 			.arg(qstring_cast(""));
-}
-
-void CustomMetric::setRadius(double val)
-{
-	mRadius = val;
-	emit propertiesChanged();
-}
-
-double CustomMetric::getRadius() const
-{
-	return mRadius;
-}
-
-void CustomMetric::setThickness(double val)
-{
-	mThickness = val;
-	emit propertiesChanged();
-}
-
-double CustomMetric::getThickness() const
-{
-	return mThickness;
-}
-
-void CustomMetric::setHeight(double val)
-{
-	mHeight = val;
-    emit propertiesChanged();
-}
-
-double CustomMetric::getHeight() const
-{
-	return mHeight;
-}
-
-void CustomMetric::setFlat(bool val)
-{
-	mFlat = val;
-	emit propertiesChanged();
-}
-
-bool CustomMetric::getFlat() const
-{
-	return mFlat;
 }
 
 QString CustomMetric::getDefineVectorUpMethod() const

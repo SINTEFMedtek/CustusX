@@ -69,14 +69,6 @@ public:
 	virtual QString getAsSingleLineString() const;
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_torus.png");}
 
-	void setRadius(double val);
-	double getRadius() const;
-	void setThickness(double val);
-	double getThickness() const;
-	void setHeight(double val);
-	double getHeight() const;
-	bool getFlat() const;
-	void setFlat(bool val);
     QString getDefineVectorUpMethod() const;
     void setDefineVectorUpMethod(QString defineVectorUpMethod);
     void setSTLFile(QString val);
@@ -118,10 +110,6 @@ private:
 
     CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
-	double mRadius;
-	double mThickness;
-	double mHeight;
-	bool mFlat;
     QString mDefineVectorUpMethod;
     QString mSTLFile;
     DefineVectorUpMethods mDefineVectorUpMethods;

@@ -48,8 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustomMetric.h"
 #include "cxGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
-#include "cxGraphicalTorus3D.h"
-#include "cxGraphicalDisk.h"
 #include "vtkSTLReader.h"
 #include <vtkPolyDataNormals.h>
 
@@ -69,8 +67,6 @@ CustomMetricRep::CustomMetricRep()
 void CustomMetricRep::clear()
 {
 	DataMetricRep::clear();
-	mTorus.reset();
-	mDisk.reset();
     mSTLModel.reset();
 }
 
@@ -84,72 +80,8 @@ void CustomMetricRep::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-	this->updateTorus();
-	this->updateDisc();
     this->updateSTLModel();
-
 	this->drawText();
-}
-
-void CustomMetricRep::updateTorus()
-{
-	if (!mMetric)
-		return;
-
-    CustomMetricPtr custom = this->getCustomMetric();
-
-    if (custom->getFlat())
-	{
-		mTorus.reset();
-		return;
-	}
-
-	if (!mTorus && this->getView() && mMetric)
-		mTorus.reset(new GraphicalTorus3D(this->getRenderer()));
-
-	if (!mTorus)
-		return;
-
-    mTorus->setPosition(custom->getPosition());
-    mTorus->setDirection(custom->getDirection());
-    mTorus->setRadius(custom->getRadius());
-    mTorus->setThickness(custom->getThickness());
-    mTorus->setColor(custom->getColor());
-}
-
-void CustomMetricRep::updateDisc()
-{
-	if (!mMetric)
-		return;
-
-    CustomMetricPtr custom = this->getCustomMetric();
-
-    if (!custom->getFlat())
-	{
-		mDisk.reset();
-		return;
-	}
-
-	if (!mDisk && this->getView() && mMetric)
-	{
-		mDisk.reset(new GraphicalDisk());
-		mDisk->setRenderer(this->getRenderer());
-	}
-
-	if (!mDisk)
-		return;
-
-    mDisk->setPosition(custom->getPosition());
-    mDisk->setDirection(custom->getDirection());
-    mDisk->setRadius(custom->getRadius());
-    mDisk->setHeight(custom->getHeight());
-    mDisk->setColor(custom->getColor());
-    mDisk->setOutlineColor(custom->getColor());
-    mDisk->setOutlineWidth(custom->getThickness());
-	mDisk->setFillVisible(false);
-	mDisk->setLighting(true);
-
-    mDisk->update();
 }
 
 void CustomMetricRep::updateSTLModel()
@@ -177,25 +109,17 @@ void CustomMetricRep::updateSTLModel()
         return;
     }
 
-//	std::cout << "OrientationAnnotation3DRep::readMarkerFromFile " << filename << std::endl;
-
     vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
     STLReader->SetFileName(cstring_cast(filename));
-
-//	vtkPolyDataPtr person = STLReader->GetOutput();
 
     vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
     normals->SetInputConnection(STLReader->GetOutputPort());
     normals->Update();
-//	person = normals->GetOutput();
 
-    //JON vtkPolyDataMapperPtr polyDataMapper = vtkPolyDataMapperPtr::New();
     vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
     polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
     polyDataMapper->Update();
 
-
-    //JON vtkActorPtr actor = vtkActorPtr::New();
     vtkActorPtr actor = mSTLModel->getActor();
     actor->SetMapper(polyDataMapper);
     actor->GetProperty()->SetColor(0.5, 1, 1);
