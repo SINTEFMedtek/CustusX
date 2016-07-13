@@ -53,6 +53,7 @@ public:
 	virtual void insertData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getData() const;
+	virtual std::map<QString, DataPtr> getAllData() const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
@@ -85,6 +86,8 @@ public:
 
 	virtual void autoSave();
 	virtual bool isNull();
+	virtual void makeAvailable(const QString& uid, bool available);
+
 private:
 	void printWarning() const;
 };

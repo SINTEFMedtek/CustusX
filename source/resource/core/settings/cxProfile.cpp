@@ -292,7 +292,7 @@ void ProfileManager::copyProfile(QString base, QString uid)
 {
 	QString newPath = this->getPathForCustom(uid);
 
-	if (!copyRecursively(base, newPath))
+	if (!copyRecursively(base, newPath, true))
 		CX_LOG_WARNING() << "Failed to copy profile " << base << " to " << newPath;
 
 	this->profilesChanged();

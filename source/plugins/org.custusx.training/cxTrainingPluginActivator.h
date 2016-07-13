@@ -30,63 +30,51 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpBrowser.h"
+#ifndef CXTRAININGPLUGINACTIVATOR_H_
+#define CXTRAININGPLUGINACTIVATOR_H_
 
-#include <QHelpEngine>
-#include "cxHelpEngine.h"
-#include "cxTypeConversions.h"
-#include <iostream>
-#include <QDesktopServices>
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
 
 namespace cx
 {
-HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
-	: QTextBrowser(parent), mEngine(engine)
+/**
+ * \defgroup org_custusx_training
+ * \ingroup cx_plugins
+ *
+ *
+ */
+
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef boost::shared_ptr<class HelpEngine> HelpEnginePtr;
+
+/**
+ * Activator for the training plugin
+ *
+ * \ingroup org_custusx_training
+ *
+ * \date 2016-03-14
+ * \author Christian Askeland
+ */
+class TrainingPluginActivator :  public QObject, public ctkPluginActivator
 {
-}
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+  Q_PLUGIN_METADATA(IID "org_custusx_training")
 
-void HelpBrowser::showHelpForKeyword(const QString &id)
-{
-	if (mEngine->engine())
-	{
-		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
-		if (links.count())
-		{
-			setSource(links.first());
-		}
-	}
-}
+public:
 
-void HelpBrowser::setSource(const QUrl& name)
-{
-	if (name.scheme() == "qthelp")
-		QTextBrowser::setSource(name);
-	else
-	{
-		QDesktopServices::openUrl(name);
-	}
+  TrainingPluginActivator();
+  ~TrainingPluginActivator();
 
-}
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
-void HelpBrowser::listenToEngineKeywordActivated()
-{
-	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
-}
+private:
+  RegisteredServicePtr mGUIExtender;
+//  HelpEnginePtr mEngine;
+};
 
-QVariant HelpBrowser::loadResource(int type, const QUrl &name)
-{
-	if (type < 4 && mEngine->engine())
-	{
-		QUrl url(name);
-		if (name.isRelative())
-			url = source().resolved(url);
+} // namespace cx
 
-		if (url.scheme() == "qthelp")
-			return QVariant(mEngine->engine()->fileData(url));
-		else
-			return QTextBrowser::loadResource(type, url);
-	}
-	return QVariant();
-}
-
-}//end namespace cx
+#endif /* CXTRAININGPLUGINACTIVATOR_H_ */

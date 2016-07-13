@@ -173,11 +173,14 @@ private:
 	//widgets
 	QPointer<class SecondaryMainWindow> mControlPanel;
 	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
+	QMap<QString, QPointer<class SecondaryMainWindow> > mSecondaryMainWindows;
+	QMap<QString, QPointer<QAction> > mSecondaryMainWindowsActions;
 
 	DynamicMainWindowWidgets* mDockWidgets;
 	MainWindowActions* mActions;
 
 	VisServicesPtr mServices;
+	void createActionForWidgetInSeparateWindow(QWidget *widget);
 };
 
 }//namespace cx
