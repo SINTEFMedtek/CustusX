@@ -152,7 +152,7 @@ void MetricWidget::createActions(QActionGroup* group)
 	this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_sphere.png", "Sphere", "Create a new SphereMetric",   SLOT(addSphereButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_torus.png", "Torus", "Create a new Torus Metric",   SLOT(addDonutButtonClickedSlot()));
-    this->createAction(group, ":/icons/metric_torus.png", "Custom", "Create a new Custom Metric",   SLOT(addCustomButtonClickedSlot()));
+    this->createAction(group, ":/icons/metric_custom.png", "Custom", "Create a new Custom Metric",   SLOT(addCustomButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric.png", "ROI", "Create a new Region of Interest Metric",   SLOT(addROIButtonClickedSlot()));
 
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);

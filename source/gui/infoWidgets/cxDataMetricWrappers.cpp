@@ -711,16 +711,8 @@ QWidget* CustomMetricWrapper::createWidget()
 
     mArguments.addWidgets(hLayout);
 
-    mRadius =  this->createRadiusSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRadius));
-    mThickness =  this->createThicknessSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mThickness));
-    mFlat =  this->createFlatSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
     mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
-    mHeight =  this->createHeightSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
     mSTLFile = this->createSTLFileSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mSTLFile));
 
@@ -752,10 +744,6 @@ void CustomMetricWrapper::update()
     if (mInternalUpdate)
         return;
     mInternalUpdate = true;
-    mRadius->setValue(mData->getRadius());
-    mThickness->setValue(mData->getThickness());
-    mHeight->setValue(mData->getHeight());
-    mFlat->setValue(mData->getFlat());
     mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
     mSTLFile->setValue(mData->getSTLFile());
     mInternalUpdate = false;
@@ -777,72 +765,9 @@ void CustomMetricWrapper::guiChanged()
     if (mInternalUpdate)
         return;
     mInternalUpdate = true;
-    mData->setRadius(mRadius->getValue());
-    mData->setThickness(mThickness->getValue());
-    mData->setHeight(mHeight->getValue());
-    mData->setFlat(mFlat->getValue());
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
     mData->setSTLFile(mSTLFile->getValue());
     mInternalUpdate = false;
-}
-
-
-DoublePropertyPtr CustomMetricWrapper::createRadiusSelector() const
-{
-    DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("selectRadius",
-                                              "Radius",
-                                              "Custom Radius",
-                                              mData->getRadius(),
-                                              DoubleRange(0, 50, 1),
-                                              1,
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
-}
-
-DoublePropertyPtr CustomMetricWrapper::createThicknessSelector() const
-{
-    DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("selectThickness",
-                                              "Thickness",
-                                              "Custom Thickness",
-                                              mData->getThickness(),
-                                              DoubleRange(0.05, 1, 0.05),
-                                              2,
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
-}
-
-DoublePropertyPtr CustomMetricWrapper::createHeightSelector() const
-{
-    DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("selectHeight",
-                                              "Height",
-                                              "Disc height, NA to torus",
-                                              mData->getHeight(),
-                                              DoubleRange(0.0, 100, 1),
-                                              1,
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
-}
-
-BoolPropertyPtr CustomMetricWrapper::createFlatSelector() const
-{
-    BoolPropertyPtr retval;
-    retval = BoolProperty::initialize("selectFlat",
-                                              "Flat",
-                                              "Flat disk or torus",
-                                              mData->getFlat(),
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
 }
 
 StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const
