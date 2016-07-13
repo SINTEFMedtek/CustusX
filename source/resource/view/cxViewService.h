@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxData.h"
 #include "cxLayoutData.h"
+#include "cxEnumConverter.h"
 class QActionGroup;
 
 #define ViewService_iid "cx::ViewService"
@@ -60,6 +61,13 @@ enum cxResourceVisualization_EXPORT CAMERA_STYLE_TYPE
 {
 	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT
 };
+
+} //cx
+
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CAMERA_STYLE_TYPE);
+
+namespace cx
+{
 
 /** \brief Visualization services
  *
