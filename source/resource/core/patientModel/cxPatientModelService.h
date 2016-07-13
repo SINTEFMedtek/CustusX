@@ -110,6 +110,7 @@ public:
 	// core Data interface
 	virtual void insertData(DataPtr data) = 0;
 	virtual std::map<QString, DataPtr> getData() const = 0;
+	virtual std::map<QString, DataPtr> getAllData() const = 0;
 	/** Create Data object of given type.
 	 *
 	 *  uid must be unique, or contain the string %1 that will be replaced with a running
@@ -173,6 +174,8 @@ public:
 	virtual bool isNull() = 0;
 
 	static PatientModelServicePtr getNullObject();
+
+	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getData()
 
 signals:
     void operatingTableChanged();

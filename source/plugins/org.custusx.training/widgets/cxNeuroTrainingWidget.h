@@ -30,63 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxHelpBrowser.h"
+#ifndef CXNEUROTRAININGWIDGET_H
+#define CXNEUROTRAININGWIDGET_H
 
-#include <QHelpEngine>
-#include "cxHelpEngine.h"
-#include "cxTypeConversions.h"
-#include <iostream>
-#include <QDesktopServices>
+#include "cxTrainingWidget.h"
 
 namespace cx
 {
-HelpBrowser::HelpBrowser(QWidget *parent, HelpEnginePtr engine)
-	: QTextBrowser(parent), mEngine(engine)
+
+class NeuroTrainingWidget : public TrainingWidget
 {
-}
+	Q_OBJECT
+	void startTracking();
+	void changeWorkflowToRegistration();
+	void changeWorkflowToUSAcquisition();
+	void changeWorkflowToImport();
+	void changeWorkflowToNavigation();
+public:
+	explicit NeuroTrainingWidget(RegServicesPtr services, ctkPluginContext *context, QWidget* parent = NULL);
 
-void HelpBrowser::showHelpForKeyword(const QString &id)
-{
-	if (mEngine->engine())
-	{
-		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
-		if (links.count())
-		{
-			setSource(links.first());
-		}
-	}
-}
+    void onImport();
+	void onRegisterStep();
+	void onUse2DUSStep();
+	void on3DUSAcqStep();
+	void changeImageToPatientRegistrationToFast();
+	void onShowAllUSStep();
 
-void HelpBrowser::setSource(const QUrl& name)
-{
-	if (name.scheme() == "qthelp")
-		QTextBrowser::setSource(name);
-	else
-	{
-		QDesktopServices::openUrl(name);
-	}
+private:
+	ctkPluginContext* mPluginContext;
+	void setUSSimulatorInput(QString usUid);
+	void setSurfaceForPointCloudRegistration(QString uidPart);
+};
 
-}
-
-void HelpBrowser::listenToEngineKeywordActivated()
-{
-	connect(mEngine.get(), SIGNAL(keywordActivated(QString)), this, SLOT(showHelpForKeyword(const QString&)));
-}
-
-QVariant HelpBrowser::loadResource(int type, const QUrl &name)
-{
-	if (type < 4 && mEngine->engine())
-	{
-		QUrl url(name);
-		if (name.isRelative())
-			url = source().resolved(url);
-
-		if (url.scheme() == "qthelp")
-			return QVariant(mEngine->engine()->fileData(url));
-		else
-			return QTextBrowser::loadResource(type, url);
-	}
-	return QVariant();
-}
-
-}//end namespace cx
+} // cx
+#endif // CXNEUROTRAININGWIDGET_H

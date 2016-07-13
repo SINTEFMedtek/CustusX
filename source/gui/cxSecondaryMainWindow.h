@@ -53,7 +53,7 @@ class cxGui_EXPORT SecondaryMainWindow: public QMainWindow
 Q_OBJECT
 
 public:
-	SecondaryMainWindow(QWidget* parent);
+	SecondaryMainWindow(QWidget* parent, QWidget *widget);
 	~SecondaryMainWindow();
 private:
 	void addAsDockWidget(QWidget* widget, bool visible);
