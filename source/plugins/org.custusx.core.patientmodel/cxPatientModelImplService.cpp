@@ -71,6 +71,8 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &PatientModelImplService::probesChanged);
+
+	mUnavailableData.clear();
 }
 
 void PatientModelImplService::createInterconnectedDataAndSpace()
@@ -141,14 +143,27 @@ DataPtr PatientModelImplService::createData(QString type, QString uid, QString n
 	return dataService()->getDataFactory()->create(type, uid, name);
 }
 
-std::map<QString, DataPtr> PatientModelImplService::getData() const
+std::map<QString, DataPtr> PatientModelImplService::getAllData() const
 {
 	return dataService()->getData();
 }
 
+std::map<QString, DataPtr> PatientModelImplService::getData() const
+{
+	std::map<QString, DataPtr> retval = this->getAllData();
+
+	for(int i = 0; i < mUnavailableData.size(); ++i)
+	{
+		if (retval.count(mUnavailableData[i]))
+			retval.erase(mUnavailableData[i]);
+	}
+
+	return retval;
+}
+
 DataPtr PatientModelImplService::getData(const QString& uid) const
 {
-	std::map<QString, DataPtr> dataMap = this->getData();
+	std::map<QString, DataPtr> dataMap = this->getAllData();
 	std::map<QString, DataPtr>::const_iterator iter = dataMap.find(uid);
 	if (iter == dataMap.end())
 		return DataPtr();
@@ -183,6 +198,18 @@ void PatientModelImplService::autoSave()
 bool PatientModelImplService::isNull()
 {
 	return false;
+}
+
+void PatientModelImplService::makeAvailable(const QString &uid, bool available)
+{
+	if(!available)
+		mUnavailableData.push_back(uid);
+	else
+	{
+		std::vector<QString>::iterator iter = std::find(mUnavailableData.begin(), mUnavailableData.end(), uid);
+		if(iter != mUnavailableData.end())
+			mUnavailableData.erase(iter);
+	}
 }
 
 CLINICAL_VIEW PatientModelImplService::getClinicalApplication() const

@@ -36,13 +36,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-SecondaryMainWindow::SecondaryMainWindow(QWidget* parent) :
-	QMainWindow(parent)
+SecondaryMainWindow::SecondaryMainWindow(QWidget* parent, QWidget* widget) :
+	QMainWindow(parent, Qt::WindowStaysOnTopHint)
 {
-	this->setWindowTitle("Control Panel");
+//	this->setWindowTitle("Control Panel");
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	this->addAsDockWidget(new TrackPadWidget(this), true);
+	widget->setParent(this);
+	this->addAsDockWidget(widget, true);
+
+	//Define geometry to prevent the window from being placed in the center of the screen.
+	this->setGeometry(0, 600, 600, 400);
 }
 
 SecondaryMainWindow::~SecondaryMainWindow()

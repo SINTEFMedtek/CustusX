@@ -1,0 +1,6 @@
+set(Require-Plugin org.custusx.help)
+set(Plugin-Name "Training")
+set(Plugin-Version "0.1.0")
+set(Plugin-Vendor "SINTEF")
+set(Plugin-Category "Training")
+#set(Plugin-ContactAddress "")

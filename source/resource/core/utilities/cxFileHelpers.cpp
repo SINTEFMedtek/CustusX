@@ -38,33 +38,52 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-bool copyRecursively(const QString &srcFilePath,
-							const QString &tgtFilePath)
+//From http://stackoverflow.com/questions/2536524/copy-directory-using-qt
+bool copyRecursively(QString sourceDir, QString destinationDir, bool overWriteDirectory)
 {
-	QFileInfo srcFileInfo(srcFilePath);
-	if (srcFileInfo.isDir())
+	QDir originDirectory(sourceDir);
+
+	if (! originDirectory.exists())
 	{
-		QDir targetDir(tgtFilePath);
-		if (!targetDir.mkpath("."))
-			return false;
-//		targetDir.cdUp();
-//		if (!targetDir.mkdir(QFileInfo(tgtFilePath).fileName()))
-//			return false;
-		QDir sourceDir(srcFilePath);
-		QStringList fileNames = sourceDir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
-		foreach (const QString &fileName, fileNames)
-		{
-			const QString newSrcFilePath = srcFilePath + QLatin1Char('/') + fileName;
-			const QString newTgtFilePath = tgtFilePath + QLatin1Char('/') + fileName;
-			if (!copyRecursively(newSrcFilePath, newTgtFilePath))
-				return false;
-		}
-	} else
-	{
-		if (!QFile::copy(srcFilePath, tgtFilePath))
-			return false;
+		return false;
 	}
-	return true;
+
+	QDir destinationDirectory(destinationDir);
+
+	if(destinationDirectory.exists() && !overWriteDirectory)
+	{
+		return false;
+	}
+	else if(destinationDirectory.exists() && overWriteDirectory)
+	{
+		destinationDirectory.removeRecursively();
+	}
+
+	originDirectory.mkpath(destinationDir);
+
+	foreach (QString directoryName, originDirectory.entryList(QDir::Dirs | \
+															  QDir::NoDotAndDotDot))
+	{
+		QString destinationPath = destinationDir + "/" + directoryName;
+		originDirectory.mkpath(destinationPath);
+		copyRecursively(sourceDir + "/" + directoryName, destinationPath, overWriteDirectory);
+	}
+
+	foreach (QString fileName, originDirectory.entryList(QDir::Files))
+	{
+		QFile::copy(sourceDir + "/" + fileName, destinationDir + "/" + fileName);
+	}
+
+	/*! Possible race-condition mitigation? */
+	QDir finalDestination(destinationDir);
+	finalDestination.refresh();
+
+	if(finalDestination.exists())
+	{
+		return true;
+	}
+
+	return false;
 }
 
 bool removeNonemptyDirRecursively(const QString & dirName)

@@ -34,6 +34,7 @@
 #include "cxScreenShotImageWriter.h"
 #include "cxViewCollectionWidget.h"
 #include "cxViewCollectionImageWriter.h"
+#include "cxFileHelpers.h"
 
 namespace cx
 {
@@ -152,6 +153,12 @@ void MainWindowActions::createPatientActions()
 					   "Load patient file",
 					   &MainWindowActions::loadPatientFileSlot);
 
+	this->createAction("LoadFileCopy", "Load a copy of the Patient",
+					   QIcon(":/icons/open_icon_library/document-open-7.png"),
+					   QKeySequence(),
+					   "Load a copy of the patient file",
+					   &MainWindowActions::loadPatientFileCopySlot);
+
 	this->createAction("ClearPatient", "Clear Patient",
 					   QIcon(),
 					   QKeySequence(),
@@ -261,6 +268,26 @@ void MainWindowActions::loadPatientFileSlot()
 		return;
 
 	mServices->session()->load(folder);
+}
+
+void MainWindowActions::loadPatientFileCopySlot()
+{
+	QString patientDatafolder = this->getExistingSessionFolder();
+
+	// Open file dialog
+	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
+	if (folder.isEmpty())
+		return;
+
+	QString newFolder = folder+"_temp";
+
+	if(!copyRecursively(folder, newFolder, true))
+	{
+		CX_LOG_WARNING() << "MainWindowActions::loadPatientFileCopySlot(): Cannot copy patient folder: " << folder;
+		return;
+	}
+
+	mServices->session()->load(newFolder);
 }
 
 void MainWindowActions::exportDataSlot()

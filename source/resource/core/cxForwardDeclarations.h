@@ -132,6 +132,7 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 // Services
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
+typedef boost::shared_ptr<class RegServices> RegServicesPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
