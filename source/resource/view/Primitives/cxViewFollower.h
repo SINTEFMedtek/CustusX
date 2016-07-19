@@ -68,6 +68,8 @@ signals:
 private slots:
 	void updateView();
 	void ensureCenterWithinView();
+    void autoZoom();
+
 private:
 	explicit ViewFollower(PatientModelServicePtr dataManager);
 	Vector3D findCenterShift_s();
@@ -75,7 +77,6 @@ private:
 	Vector3D findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s);
 	void applyShiftToCenter(Vector3D shift_s);
 	Vector3D findVirtualTooltip_s();
-	void autoZoom();
 
 	SliceProxyPtr mSliceProxy;
 	DoubleBoundingBox3D mBB_s;

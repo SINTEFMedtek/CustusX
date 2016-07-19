@@ -114,8 +114,8 @@ DoubleBoundingBox3D ViewFollower::getROI_BB_s()
 
 void ViewFollower::updateView()
 {
-	QTimer::singleShot(0, this, &ViewFollower::ensureCenterWithinView);
-	QTimer::singleShot(0, this, &ViewFollower::autoZoom);
+    QTimer::singleShot(0, this, SLOT(ensureCenterWithinView()));
+    QTimer::singleShot(0, this, SLOT(autoZoom()));
 //	this->ensureCenterWithinView();
 //	this->autoZoom();
 }
