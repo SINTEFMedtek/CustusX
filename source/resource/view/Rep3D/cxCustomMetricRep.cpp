@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMatrix4x4.h"
 #include "vtkSTLReader.h"
 #include <vtkPolyDataNormals.h>
+#include "cxLogger.h"
 
 
 namespace cx
@@ -104,8 +105,7 @@ void CustomMetricRep::updateSTLModel()
 
     if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
     {
-        //std::out << "STL file not found in: " << filename << "\n";
-        //return this->createCube();
+        reportWarning("File not found: " + filename + ", failed to update the STL model.");
         return;
     }
 
