@@ -199,22 +199,38 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
     // this is the case when the surgeon stands behind the upright head
     // and aligns the tool with his left hand with the tip towards the feet.
 //    cx::Transform3D R = cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
-    cx::Transform3D R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    // BRUKER DENNE cx::Transform3D R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
     //cx::Transform3D R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateY(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
     cx::Transform3D T = cx::createTransformTranslate(c_tool);
-    cx::Transform3D rMt = T*R;
+    // BRUKER DENNE cx::Transform3D rMt = T*R;
     //CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0, -1))); // tip down
-    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip pointing down and in the direction of the nose
-    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(1, 0, 0))); // leftprobe to leftpatient
-    //CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(1, 0, 0))); // leftprobe to leftpatient
-    slicer.setToolPosition(rMt);
+    // BRUKER DENNE CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip pointing down and in the direction of the nose
+    // BRUKER DENNE CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(1, 0, 0))); // leftprobe to leftpatient
+    //BRUKER DENNE slicer.setToolPosition(rMt);
     slicer.setFixedCenter(center);
 
 
     //TOOLSIDE
+    slicer.setGravity(true, cx::Vector3D(0, 0, -1));
     slicer.setPlaneType(cx::ptTOOLSIDEPLANE);
+    std::cout << "TOOLSIDE slicerplan \n" << slicer.getPlane();
     cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, -1, 0), cx::Vector3D( 0, 0, 1));
+    //BRUKER DENNE CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+
+    //Case 1: The tool is pointing straight down and the front towards the nose
+    cx::Transform3D R = cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D rMt = T*R;
+    slicer.setToolPosition(rMt);
     CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+
+    //Case 2: The tool is parallel to the table with the tip pointing towards the nose
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    //Case 3: The tool is parallel to the table with the tip pointing towards the nose
+    //        and rotated 45 degrees towards the left side of the patient
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    //Case 4: The tool is pointing down 45 degrees towards the nose and rotated 45 degrees to the left.
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+
 
 
 
