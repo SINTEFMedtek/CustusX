@@ -221,7 +221,7 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
 
 
 
-
+/*
 
 
     cx::SlicePlane toolSidePlane2(c_tool, cx::Vector3D( 0, -0.707107, -0.707107), cx::Vector3D( 0, -0.707107, 0.707107));
@@ -267,4 +267,6 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
     cx::SlicePlane sidePlane3(c_tool, cx::Vector3D( 0, -0.707107, -0.707107), cx::Vector3D( 0, -0.707107, 0.707107));
     //CHECK(cx::similar(slicer2.getPlane(), sidePlane3));
     std::cout << "slicer2 \n" << slicer2.getPlane();
+
+*/
 }

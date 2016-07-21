@@ -131,7 +131,7 @@ TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 	REQUIRE(activeDataProperty->getValue() == testData.image1->getUid());
 }
 
-TEST_CASE("Operating table set and get", "[unit][org.custusx.core.patientmodel][jon]")
+TEST_CASE("Operating table set and get", "[unit][org.custusx.core.patientmodel]")
 {
     SessionStorageTestFixture storageFixture;
     cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;

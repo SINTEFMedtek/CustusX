@@ -243,7 +243,7 @@ SlicePlane SliceComputer::getPlane()  const
         // orient planes so that gravity is down
      //   plane = orientToGravity(plane);
         //orient the plane, so that even if the tool has been rotated, the up vector and gravity vector will lie in this plane.
-        plane = this->orientToGravityAroundToolZAxis(plane);
+        plane = this->orientToGravityAroundToolZAxisAndAlongTheOperatingTable(plane);
     }
 
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
@@ -440,16 +440,25 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 }
 
 /**
- * @brief SliceComputer::orientToGravityAroundToolZAxis
+ * @brief SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTable
  * @param base
- * @return Plane oriented around the tool axis to be always upright
+ * @return There are two steps to orient a plane fully to gravity. First one can rotate the plane around the tool Z axis. Secondly one can tilt the plane so that the side edges are
+ * parallel to the gravity direction. This method combines these steps.
  *
- * Orient the plane so that k is perpendicular to the up vector:
+ * We use the vector along the tool axis and find a vector, i_perpendicular, which is perpendicular to the tool and the up vector.
+ * We use this and the up vector to find the tool vector's projection, i', down on the plane which is perpendicular to the up vector.
+ * Since the plane should be oriented to gravity, we can use the up vector for j'.
  *
- * k' = -up x i
- * j' = k' x i
+ * i_perpendicular = up x toolvector
+ * i' = i_perpendicular x up
+ * j' = up
+ *
+ * As the tool vector gets parallel to the up vector the orientation of the plane will be undefined.
+ * Therefore we use the plane normal, k, as i_perpendicular in this case. This is done through a
+ * weighting of i_perpendicular and k depending of the angle between the tool vector and up.
+ *
  */
-SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base) const
+SlicePlane SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTable(const SlicePlane &base) const
 {
     if (!mUseGravity)
     {
@@ -459,8 +468,10 @@ SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base)
     SlicePlane retval = base;
     Vector3D up;
     up = -mGravityDirection; // normal case
+    /* ORIGORIG
     const Vector3D k_mark = cross(-up, base.i); // plane normal. Constant
     const Vector3D j_mark = cross(k_mark, base.i); // plane normal. Constant
+    */
 
     //ORIG
 //    retval.i = base.i;
@@ -478,10 +489,26 @@ SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base)
     //Vector3D toolVector = m_rMt.coord(Vector3D(0,0,0)).normal(); //orig
     //Vector3D toolVector = m_rMt.inv().coord(Vector3D(retval.c)).normal();
     //Vector3D toolVector = m_rMt.vector(Vector3D(mFixedCenter)).normal();
-    Vector3D toolVector = retval.c.normal();
-    Vector3D i_mm = cross(up, toolVector).normal();
-    Vector3D i_m = cross(i_mm, up).normal();
-    Vector3D j_m = cross(i_m, i_mm).normal();
+    //Vector3D toolVector = retval.c.normal();
+
+    Vector3D k = -cross(base.i, base.j);
+    Vector3D toolVector = m_rMt.vector(Vector3D(0, 0, 1));
+    Vector3D i_perpendicular = cross(up, toolVector).normal();
+    double w_n = dot(up, toolVector);
+    w_n = w_n*w_n; // square to keep stability near normal use.
+    //retval.i = i_g*(1.0-w_n) + i_n*w_n;
+
+    //Må ha noe her antakelig,
+    i_perpendicular = i_perpendicular*(1.0-w_n) + k*w_n;
+
+    Vector3D i_mark = cross(i_perpendicular, up).normal();
+    //Vector3D j_mark = cross(i_mark, i_perpendicular).normal();
+    Vector3D j_mark = up;
+
+    //j_mark = j_mark*(1.0-w_n) + -toolVector*w_n;
+
+
+
     //std::cout << "Vectors: " << toolVector << std::endl << i_mm << std::endl << i_m << std::endl << j_m << std::endl;
 
     //m_rMt.coord(Vector3D(0,0,0)).normal();
@@ -515,8 +542,8 @@ SlicePlane SliceComputer::orientToGravityAroundToolZAxis(const SlicePlane &base)
     //plane.c og mFixedCenter
     //samme!
 
-    retval.i = i_m;
-    retval.j = j_m;
+    retval.i = i_mark;
+    retval.j = j_mark;
 
     return retval;
 }
