@@ -110,7 +110,7 @@ public:
 	void setOrientation(ORIENTATION_TYPE orientation );
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
-	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);
+    void initializeFromPlane(PLANE_TYPE plane, bool useGravity, Vector3D gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);
 
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);

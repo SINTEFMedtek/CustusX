@@ -245,6 +245,10 @@ SlicePlane SliceComputer::getPlane()  const
         //orient the plane, so that even if the tool has been rotated, the up vector and gravity vector will lie in this plane.
         plane = this->orientToGravityAroundToolZAxisAndAlongTheOperatingTable(plane);
     }
+    else
+    {
+        plane = orientToGravity(plane);
+    }
 
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo

@@ -188,16 +188,16 @@ void SliceProxy::clinicalApplicationChangedSlot()
 
 /**Group the typical plane definition uses together.
  */
-void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
+void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, Vector3D gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
 {
-    //test
-    Vector3D gravityDir2 = -mDataManager->getOperatingTable().getVectorUp();
-    useGravity = true;
-    std::cout << "gravityDir2: \n" << gravityDir2 << std::endl;
-    //
+    if (plane==ptTOOLSIDEPLANE)
+    {
+        gravityDir = -mDataManager->getOperatingTable().getVectorUp();
+        useGravity = true;
+    }
 
     mCutplane->initializeFromPlane(plane,
-                                   useGravity, gravityDir2 /*gravityDir*/,
+                                   useGravity, gravityDir,
 								   useViewOffset, viewportHeight, toolViewOffset,
 								   mDataManager->getClinicalApplication(),
 								   useConstrainedViewOffset);
