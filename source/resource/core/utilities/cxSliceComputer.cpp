@@ -421,7 +421,7 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	w_n = w_n*w_n; // square to keep stability near normal use.
 
 	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
-    Vector3D i_n = base.i; // |i_n|==1 //It seems to me that i_n might need a change to e.g. i_n = -base.j, to be good in the singularity situation. jone, 20160712
+    Vector3D i_n = base.i; // |i_n|==1 //It seems to me that i_n might need a change to e.g. i_n = -base.j, to be good in the singularity situation. Look into that if using this method later. jone, 20160712
 
 	// set i vector to a weighted mean of the two definitions
 	// can also experiment with a tanh function or simply a linear interpolation
