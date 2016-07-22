@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAngleMetric.h"
 #include "cxPlaneMetric.h"
 #include "cxSphereMetric.h"
+#include "cxRegionOfInterestMetric.h"
 #include "cxShapedMetric.h"
 #include "cxCustomMetric.h"
 #include "cxStringProperty.h"
@@ -52,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxSpaceProperty.h"
 #include "cxFilePathProperty.h"
+#include "cxStringListProperty.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -238,7 +240,6 @@ private:
   BoolPropertyPtr mFlat;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
-
 };
 
 class cxGui_EXPORT CustomMetricWrapper : public MetricBase
@@ -259,18 +260,10 @@ private slots:
   void guiChanged();
 
 private:
-  DoublePropertyPtr createRadiusSelector() const;
-  DoublePropertyPtr createThicknessSelector() const;
-  DoublePropertyPtr createHeightSelector() const;
-  BoolPropertyPtr createFlatSelector() const;
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
   FilePathPropertyPtr createSTLFileSelector() const;
 
   CustomMetricPtr mData;
-  DoublePropertyPtr mRadius;
-  DoublePropertyPtr mThickness;
-  DoublePropertyPtr mHeight;
-  BoolPropertyPtr mFlat;
   StringPropertyPtr mDefineVectorUpMethod;
   FilePathPropertyPtr mSTLFile;
   bool mInternalUpdate;
@@ -303,6 +296,39 @@ private:
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 };
+
+class cxGui_EXPORT RegionOfInterestMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit RegionOfInterestMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, RegionOfInterestMetricPtr data);
+  virtual ~RegionOfInterestMetricWrapper() {}
+  virtual QWidget* createWidget();
+  virtual DataMetricPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+	virtual void update();
+
+private slots:
+  void dataChangedSlot();
+  void guiChanged();
+
+private:
+  StringListPropertyPtr mDataListProperty;
+  BoolPropertyPtr mUseActiveTooltipProperty;
+  StringPropertyPtr mMaxBoundsDataProperty;
+  DoublePropertyPtr mMarginProperty;
+
+  RegionOfInterestMetricPtr mData;
+  bool mInternalUpdate;
+
+  DoublePropertyPtr createMarginSelector() const;
+  StringListPropertyPtr createDataListProperty();
+  BoolPropertyPtr createUseActiveTooltipSelector() const;
+  StringPropertyPtr createMaxBoundsDataSelector();
+};
+
+
 
 /**
  * @}

@@ -109,7 +109,6 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	double length = clipDepth*10;
 	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
-	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
 	// slice proxy
 	mSliceProxy = SliceProxy::create(mServices->patient());
@@ -190,15 +189,7 @@ void ViewWrapper2D::addReps()
 	mOrientationAnnotationRep = OrientationAnnotationSmartRep::New();
 	mView->addRep(mOrientationAnnotationRep);
 
-	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New();
-	mPlaneTypeText->addText(QColor(Qt::green), "not initialized", Vector3D(0.98, 0.02, 0.0));
-	mView->addRep(mPlaneTypeText);
-
-	//data name text rep
-	mDataNameText = DisplayTextRep::New();
-	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
-	mView->addRep(mDataNameText);
+	this->ViewWrapper::addReps();
 
 	// tool rep
 	mToolRep2D = ToolRep2D::New(mServices->spaceProvider(), "Tool2D_" + mView->getName());
@@ -218,14 +209,8 @@ void ViewWrapper2D::addReps()
 
 void ViewWrapper2D::settingsChangedSlot(QString key)
 {
-	if (key == "View/showDataText")
-	{
-		this->updateView();
-	}
-	if (key == "View/showOrientationAnnotation")
-	{
-		this->updateView();
-	}
+	this->ViewWrapper::settingsChangedSlot(key);
+
 	if (key == "useGPU2DRendering")
 	{
 		this->updateView();
@@ -235,7 +220,6 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 		this->updateView();
 	}
 }
-
 
 void ViewWrapper2D::removeAndResetSliceRep()
 {
@@ -367,17 +351,12 @@ void ViewWrapper2D::showSlot()
 
 void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
-//  mOrientationAnnotationRep->setPlaneType(plane);
-	mPlaneTypeText->setText(0, qstring_cast(plane));
-//	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
 	double viewHeight = mView->getViewport_s().range()[1];
 	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
-//	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
-//	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
 
 	bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
-	mToolRep2D->setUseCrosshair(!isOblique);
+	mToolRep2D->setUseCrosshair(!isOblique && settings()->value("View/toolCrosshair", true).toBool());
 //  mToolRep2D->setUseToolLine(!isOblique);
 
 }
@@ -433,8 +412,40 @@ void ViewWrapper2D::createAndAddSliceRep()
     }
 }
 
-void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
+QString ViewWrapper2D::getDataDescription()
 {
+	QString text;
+	if (this->useGPU2DRendering())
+	{
+		text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
+	}
+	else //software rendering
+	{
+		ImagePtr image = this->getImageToDisplay();
+		if (!image)
+			return "";
+		// list all meshes and one image.
+		QStringList textList;
+		std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
+		for (unsigned i = 0; i < mesh.size(); ++i)
+			textList << qstring_cast(mesh[i]->getName());
+		if (image)
+			textList << image->getName();
+		text = textList.join("\n");
+	}
+	return text;
+}
+
+QString ViewWrapper2D::getViewDescription()
+{
+	return qstring_cast(mSliceProxy->getComputer().getPlaneType());
+}
+
+void ViewWrapper2D::updateItemsFromViewGroup()
+{
+	if (!mGroupData)
+		return;
+
     ImagePtr image = this->getImageToDisplay();
 
     if (image)
@@ -445,7 +456,6 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
         if (this->useGPU2DRendering())
         {
             this->recreateMultiSlicer();
-            text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
         }
         else //software rendering
         {
@@ -453,15 +463,6 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
             this->createAndAddSliceRep();
 
             mSliceRep->setImage(image);
-
-            // list all meshes and one image.
-            QStringList textList;
-            std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
-            for (unsigned i = 0; i < mesh.size(); ++i)
-            textList << qstring_cast(mesh[i]->getName());
-            if (image)
-                textList << image->getName();
-            text = textList.join("\n");
         }
     }
     else //no images to display in the view
@@ -471,40 +472,13 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
     }
 }
 
-/**
- * @brief Set the text and font size of the annotation in the lower left corner of the view
- *
- * @param text the text that will be displayed
- */
-void ViewWrapper2D::setDataNameText(QString &text)
-{
-    mDataNameText->setText(0, text);
-    mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
-}
-
-/**
- * @brief Update the annotation in the lower left corner.
- * @param text
- */
-void ViewWrapper2D::updateDataNameText(QString &text)
-{
-    bool show = settings()->value("View/showDataText").value<bool>();
-    if (!show)
-        text = QString();
-
-    this->setDataNameText(text);
-}
-
 void ViewWrapper2D::updateView()
 {
-    QString annotationTextForLowerLeftCorner;
-    if (mGroupData) //the view is a part of a viewgroup
-	{
-        this->updateItemsFromViewGroup(annotationTextForLowerLeftCorner);
-	}
+	if (!this->getView())
+		return;
+	this->updateItemsFromViewGroup();
 
-    //UPDATE VIEWS DATA LIST ANNOTATION
-    this->updateDataNameText(annotationTextForLowerLeftCorner);
+	this->ViewWrapper::updateView();
 
     //UPDATE ORIENTATION ANNOTATION
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
@@ -512,14 +486,6 @@ void ViewWrapper2D::updateView()
     //UPDATE DATA METRIC ANNOTATION
 	mDataRepContainer->updateSettings();
 }
-
-
-//DELETE - NOT USED...
-//void ViewWrapper2D::imageRemoved(const QString& uid)
-//{
-//    CX_LOG_DEBUG() << "imageRemoved uid: " << uid;
-//	updateView();
-//}
 
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 {
@@ -530,7 +496,6 @@ void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 		this->dataAdded(data);
 	else
 		this->dataRemoved(uid);
-
 }
 
 void ViewWrapper2D::dataAdded(DataPtr data)

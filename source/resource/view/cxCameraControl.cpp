@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include <QDomNode>
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -231,9 +232,15 @@ void CameraControl::setStandard3DViewActionSlot()
 	//Vector3D dir = (focus-direction).normal();
 
 	Vector3D left = cross(vup, viewDirection);
+//	CX_LOG_CHANNEL_DEBUG("CA") << "    cross(vup, viewDirection) " << cross(vup, viewDirection);
 	if (similar(left.length(), 0.0))
 		left = Vector3D(1, 0, 0);
 	vup = cross(viewDirection, left).normal();
+
+	CX_LOG_CHANNEL_DEBUG("CA") << "CameraControl::setStandard3DViewActionSlot()";
+	CX_LOG_CHANNEL_DEBUG("CA") << "    viewDirection " << viewDirection;
+	CX_LOG_CHANNEL_DEBUG("CA") << "    left " << left;
+	CX_LOG_CHANNEL_DEBUG("CA") << "    vup " << vup;
 
 	camera->SetPosition(pos.begin());
 	camera->SetViewUp(vup.begin());

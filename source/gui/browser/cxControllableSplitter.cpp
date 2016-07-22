@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QVBoxLayout>
 #include <QAction>
 #include <QTimer>
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -168,6 +169,11 @@ int ControllableSplitter::getShiftState() const
 		return 0;
 }
 
+/**
+ * state = -1: show props
+ * state =  0: show both
+ * state =  1: show browser
+ */
 void ControllableSplitter::setShiftState(int shiftState)
 {
 	QList<int> sizes = mSplitter->sizes();
@@ -177,17 +183,20 @@ void ControllableSplitter::setShiftState(int shiftState)
 		sizes[0] = 0;
 		sizes[1] = 1;
 	}
-	else if (shiftState>0) // show both
+	else if (shiftState>0) // show browser
 	{
 		sizes[0] = 1;
 		sizes[1] = 0;
 	}
-	else // shop browser
+	else // show both
 	{
 		int sizesum = sizes[0]+sizes[1];
+		if (sizesum==0) // if size has not been initialized
+			sizesum = 1000;
 		sizes[0] = mSplitterRatio * sizesum;
 		sizes[1] = (1.0-mSplitterRatio) * sizesum;
 	}
+
 	mSplitter->setSizes(sizes);
 
 	this->onSplitterMoved();

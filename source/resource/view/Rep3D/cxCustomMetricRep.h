@@ -43,18 +43,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class GraphicalTorus3D> GraphicalTorus3DPtr;
 typedef boost::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
 typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
-typedef boost::shared_ptr<class GraphicalDisk> GraphicalDiskPtr;
 
 /**Rep for visualizing a CustomMetric.
  *
  * \ingroup cx_resource_view
  * \ingroup cx_resource_view_rep3D
  *
- * \date 2014-02-11
- * \author Christian Askeland, SINTEF
+ * \date 2016-05-11
+ * \author Jon Eiesland, SINTEF
  */
 class cxResourceVisualization_EXPORT CustomMetricRep: public DataMetricRep
 {
@@ -72,12 +70,8 @@ protected:
 private:
     CustomMetricRep();
     CustomMetricPtr getCustomMetric();
-	void updateTorus();
-	void updateDisc();
     void updateSTLModel();
 
-	GraphicalTorus3DPtr mTorus;
-	GraphicalDiskPtr mDisk;
     GraphicalObjectWithDirectionPtr mSTLModel;
 };
 

@@ -95,13 +95,13 @@ QVariant ViewGroupTreeNode::getFont() const
 
 QWidget* ViewGroupTreeNode::createPropertiesWidget() const
 {
-	DoublePropertyPtr selector;
-	selector = DoubleProperty::initialize("viewgroupindex", "View", "",
-										  mGroupIndex,
-										  DoubleRange(0, this->getServices()->view()->groupCount(), 1),
-										  0);
-	return new ViewGroupPropertiesWidget(selector,
-							  this->getServices()->view(),
+//	DoublePropertyPtr selector;
+//	selector = DoubleProperty::initialize("viewgroupindex", "View", "",
+//										  mGroupIndex,
+//										  DoubleRange(0, this->getServices()->view()->groupCount(), 1),
+//										  0);
+	return new ViewGroupPropertiesWidget(mGroupIndex,
+							  this->getServices(),
 							  NULL);
 }
 

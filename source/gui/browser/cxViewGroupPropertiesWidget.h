@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
+typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
 /**
  */
@@ -51,7 +52,7 @@ class cxGui_EXPORT ViewGroupPropertiesWidget : public BaseWidget
   Q_OBJECT
 
 public:
-	ViewGroupPropertiesWidget(DoublePropertyBasePtr selector, ViewServicePtr viewService, QWidget* parent);
+	ViewGroupPropertiesWidget(int groupIndex, VisServicesPtr services, QWidget* parent);
   virtual ~ViewGroupPropertiesWidget();
 
 signals:
@@ -62,15 +63,27 @@ protected:
   virtual void prePaintEvent();
 
 private:
-  void onSelectorChanged();
   void updateFrontend();
+
+//  DoublePropertyBasePtr mSelector;
+  int mGroupIndex;
   ViewGroupDataPtr getViewGroup();
-
-  DoublePropertyBasePtr mSelector;
-  ViewServicePtr mViewService;
+  VisServicesPtr mServices;
   QVBoxLayout* mLayout;
-  QWidget* mWidget;
 
+  BoolPropertyPtr mCameraFollowTool;
+  BoolPropertyPtr mFocusFollowTool;
+  BoolPropertyPtr mTableLock;
+  BoolPropertyPtr mUniCam;
+  DoublePropertyPtr mElevation;
+  StringPropertyBasePtr mAutoZoomROI;
+  StringPropertyBasePtr mFocusROI;
+  std::vector<PropertyPtr> mCameraStyleProperties;
+  CameraStyleInteractorPtr mCameraStyleInteractor;
+
+  void createCameraStyleProperties();
+  void onCameraStyleChanged();
+  void createCameraStyleWidget();
 };
 
 }//end namespace cx

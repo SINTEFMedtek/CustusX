@@ -109,6 +109,7 @@ protected slots:
   void addPlaneButtonClickedSlot();
   void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
+  void addROIButtonClickedSlot();
   void addSphereButtonClickedSlot();
   void addDonutButtonClickedSlot();
   void addCustomButtonClickedSlot();

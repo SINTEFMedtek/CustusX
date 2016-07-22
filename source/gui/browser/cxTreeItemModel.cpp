@@ -277,7 +277,7 @@ QVariant TreeItemModel::headerData(int section, Qt::Orientation orientation, int
 	if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
 	{
 		if (section==mNameIndex)
-			return "Item";
+			return "    Item";
 		if (section==mColorIndex)
 			return ""; // keep short + out of the way of the toolbar button
 		if (this->isViewGroupColumn(section))

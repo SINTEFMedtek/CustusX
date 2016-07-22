@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustomMetric.h"
 #include "cxAngleMetric.h"
 #include "cxSphereMetric.h"
+#include "cxRegionOfInterestMetric.h"
 #include "cxDataFactory.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
@@ -242,6 +243,13 @@ std::vector<DataPtr> MetricManager::refinePointArguments(std::vector<DataPtr> ar
   }
 
   return args;
+}
+
+void MetricManager::addROIButtonClickedSlot()
+{
+	RegionOfInterestMetricPtr d0 = patientService()->createSpecificData<RegionOfInterestMetric>("roi%1");
+	d0->get_rMd_History()->setParentSpace("reference");
+	this->installNewMetric(d0);
 }
 
 void MetricManager::addDistanceButtonClickedSlot()

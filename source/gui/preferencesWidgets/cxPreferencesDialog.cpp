@@ -90,6 +90,12 @@ void VisualizationTab::init()
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
 
+  bool toolCrosshair = settings()->value("View/toolCrosshair").value<bool>();
+  mToolCrosshair = BoolProperty::initialize("Tool crosshair", "",
+										 "Show a crosshair centered on tool for orthogonal (ACS) views.",
+										 toolCrosshair);
+
+
   bool showMetricNamesInCorner = settings()->value("View/showMetricNamesInCorner").value<bool>();
   mShowMetricNamesInCorner = BoolProperty::initialize("Corner Metrics", "",
 												 "Show the metric data in the upper right corner of the view instead of in the scene.",
@@ -158,6 +164,7 @@ void VisualizationTab::init()
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowDataText));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowLabels));
+  mMainLayout->addWidget(sscCreateDataWidget(this, mToolCrosshair));
   mMainLayout->addWidget(sscCreateDataWidget(this, mShowMetricNamesInCorner));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mLabelSize));
   mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize));
@@ -241,6 +248,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
+  settings()->setValue("View/toolCrosshair", mToolCrosshair->getValue());
   settings()->setValue("View/showMetricNamesInCorner", mShowMetricNamesInCorner->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());

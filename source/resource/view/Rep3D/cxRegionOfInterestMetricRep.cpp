@@ -30,64 +30,72 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxViewService.h"
-#include "cxViewServiceNull.h"
-#include "cxNullDeleter.h"
 
-#include "cxRepContainer.h"
+#include "cxRegionOfInterestMetricRep.h"
 #include "cxView.h"
-#include "cxEnumConverter.h"
 
-SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
-{
-	"DEFAULT_STYLE",
-	"TOOL_STYLE",
-	"ANGLED_TOOL_STYLE",
-	"UNICAM_STYLE"
-}
-SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CAMERA_STYLE_TYPE, cstCOUNT)
+#include <vtkVectorText.h>
+#include <vtkFollower.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkCamera.h>
+#include <vtkRenderWindow.h>
+#include "cxTypeConversions.h"
+#include "cxGraphicalBox.h"
 
 namespace cx
 {
-ViewServicePtr ViewService::getNullObject()
+
+RegionOfInterestMetricRepPtr RegionOfInterestMetricRep::New(const QString& uid)
 {
-	static ViewServicePtr mNull;
-	if (!mNull)
-		mNull.reset(new ViewServiceNull, null_deleter());
-	return mNull;
+	return wrap_new(new RegionOfInterestMetricRep(), uid);
+}
+
+RegionOfInterestMetricRep::RegionOfInterestMetricRep()
+{
+}
+
+void RegionOfInterestMetricRep::clear()
+{
+	DataMetricRep::clear();
+	mGraphicalBox.reset();
+}
+
+RegionOfInterestMetricPtr RegionOfInterestMetricRep::getRegionOfInterestMetric()
+{
+	return boost::dynamic_pointer_cast<RegionOfInterestMetric>(mMetric);
+}
+
+void RegionOfInterestMetricRep::onModifiedStartRender()
+{
+	RegionOfInterestMetricPtr metric = this->getRegionOfInterestMetric();
+	if (!metric)
+		return;
+
+	if (!mMetric->isValid())
+		return;
+
+	if (!mGraphicalBox && this->getView())
+	{
+		mGraphicalBox.reset(new GraphicalBox());
+		mGraphicalBox->setRenderWindow(this->getView()->getRenderWindow());
+	}
+
+	if (mGraphicalBox)
+	{
+		mGraphicalBox->setBoundingBox(metric->getROI().getBox());
+		mGraphicalBox->setPosition(Transform3D::Identity());
+//		mGraphicalBox->setPosition(metric->get_rMd()); // ROI is already in r
+//		mGraphicalBox->setColor(mMetric->getColor());
+	}
+
+
+		mGraphicalBox->setInteractive(false);
+//	mGraphicalBox->setVisible(false);
+
+	this->drawText();
 }
 
 
-unsigned ViewService::groupCount() const
-{
-	int count = 0;
-	while(this->getGroup(count))
-		++count;
-	return count;
 }
-
-void ViewService::deactivateLayout()
-{
-	this->setActiveLayout("", 0);
-	this->setActiveLayout("", 1);
-}
-
-RepContainerPtr ViewService::get3DReps(int group, int index)
-{
-	ViewPtr view = this->get3DView(group, index);
-
-	if(view)
-		return RepContainerPtr(new RepContainer(view->getReps()));
-	else
-		return RepContainerPtr(new RepContainer(std::vector<RepPtr>()));
-}
-
-ViewGroupDataPtr ViewService::getActiveViewGroup()
-{
-	int groupId = this->getActiveGroupId();
-	return this->getGroup(groupId);
-}
-
-} //cx
-
-

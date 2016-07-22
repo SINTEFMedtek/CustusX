@@ -110,6 +110,12 @@ cxResource_EXPORT bool similar(const DoubleBoundingBox3D& a, const DoubleBoundin
 cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data);
 
 /**
+ * Create the bounding box that is contained in both a and b.
+ * No intersection gives a zero box.
+ */
+cxResource_EXPORT DoubleBoundingBox3D intersection(DoubleBoundingBox3D a, DoubleBoundingBox3D b);
+
+/**
  * @}
  */
 

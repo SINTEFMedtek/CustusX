@@ -82,6 +82,7 @@ public slots:
 	void addSphereButtonClickedSlot();
 	void addDonutButtonClickedSlot();
     void addCustomButtonClickedSlot();
+	void addROIButtonClickedSlot();
 
 private:
 	void setManualToolPosition(Vector3D p_r);

@@ -93,6 +93,7 @@ protected:
   DoublePropertyPtr mLabelSize;
   BoolPropertyPtr mShowDataText;
   BoolPropertyPtr mShowLabels;
+  BoolPropertyPtr mToolCrosshair;
   BoolPropertyPtr mShowMetricNamesInCorner;
   StringPropertyPtr mAnnotationModel;
   DoublePropertyPtr mAnnotationModelSize;

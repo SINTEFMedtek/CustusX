@@ -107,14 +107,7 @@ void GraphicalObjectWithDirection::setRenderer(vtkRendererPtr renderer)
 
 void GraphicalObjectWithDirection::updateOrientation()
 {
-//	Transform3D M = createTransformRotationBetweenVectors(Vector3D::UnitY(), mDirection.normal());
     Transform3D R;
-//    bool directionAlongYAxis = similar(dot(Vector3D::UnitY(), mDirection.normal()), 1.0);
-
-//    if (directionAlongYAxis)
-//    {
-//            M = Transform3D::Identity();
-//    }
     bool directionAlongUp = similar(dot(mVectorUp, mDirection.normal()), 1.0);
 
     if (directionAlongUp)
@@ -124,7 +117,6 @@ void GraphicalObjectWithDirection::updateOrientation()
 
     else
     {
-//            Vector3D ivec = cross(Vector3D::UnitY(), mDirection).normal();
             Vector3D jvec = mDirection.normal();
             Vector3D kvec = cross(mVectorUp, mDirection).normal();
             Vector3D ivec = cross(jvec, kvec).normal();
@@ -134,12 +126,6 @@ void GraphicalObjectWithDirection::updateOrientation()
 
     Transform3D T = createTransformTranslate(mPoint);
     Transform3D M = T*R;
-
-    //Jon
-//    M = Transform3D::Identity();
-
-//	std::cout << "M end:\n" << M << std::endl;
-////	actor->SetPosition(point.begin());
     mActor->SetUserMatrix(M.getVtkMatrix());
 }
 

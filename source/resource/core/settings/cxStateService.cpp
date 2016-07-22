@@ -113,6 +113,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
 	this->fillDefault("View/showMetricNamesInCorner", false);
+	this->fillDefault("View/toolCrosshair", false);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);

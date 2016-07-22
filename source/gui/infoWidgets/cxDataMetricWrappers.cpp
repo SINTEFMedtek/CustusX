@@ -53,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
 #include "cxSpaceProperty.h"
-
+#include "cxStringListProperty.h"
+#include "cxStringListSelectWidget.h"
 //TODO :remove
 #include "cxLegacySingletons.h"
 
@@ -710,16 +711,8 @@ QWidget* CustomMetricWrapper::createWidget()
 
     mArguments.addWidgets(hLayout);
 
-    mRadius =  this->createRadiusSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRadius));
-    mThickness =  this->createThicknessSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mThickness));
-    mFlat =  this->createFlatSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mFlat));
     mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
-    mHeight =  this->createHeightSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mHeight));
     mSTLFile = this->createSTLFileSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mSTLFile));
 
@@ -751,10 +744,6 @@ void CustomMetricWrapper::update()
     if (mInternalUpdate)
         return;
     mInternalUpdate = true;
-    mRadius->setValue(mData->getRadius());
-    mThickness->setValue(mData->getThickness());
-    mHeight->setValue(mData->getHeight());
-    mFlat->setValue(mData->getFlat());
     mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
     mSTLFile->setValue(mData->getSTLFile());
     mInternalUpdate = false;
@@ -776,72 +765,9 @@ void CustomMetricWrapper::guiChanged()
     if (mInternalUpdate)
         return;
     mInternalUpdate = true;
-    mData->setRadius(mRadius->getValue());
-    mData->setThickness(mThickness->getValue());
-    mData->setHeight(mHeight->getValue());
-    mData->setFlat(mFlat->getValue());
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
     mData->setSTLFile(mSTLFile->getValue());
     mInternalUpdate = false;
-}
-
-
-DoublePropertyPtr CustomMetricWrapper::createRadiusSelector() const
-{
-    DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("selectRadius",
-                                              "Radius",
-                                              "Custom Radius",
-                                              mData->getRadius(),
-                                              DoubleRange(0, 50, 1),
-                                              1,
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
-}
-
-DoublePropertyPtr CustomMetricWrapper::createThicknessSelector() const
-{
-    DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("selectThickness",
-                                              "Thickness",
-                                              "Custom Thickness",
-                                              mData->getThickness(),
-                                              DoubleRange(0.05, 1, 0.05),
-                                              2,
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
-}
-
-DoublePropertyPtr CustomMetricWrapper::createHeightSelector() const
-{
-    DoublePropertyPtr retval;
-    retval = DoubleProperty::initialize("selectHeight",
-                                              "Height",
-                                              "Disc height, NA to torus",
-                                              mData->getHeight(),
-                                              DoubleRange(0.0, 100, 1),
-                                              1,
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
-}
-
-BoolPropertyPtr CustomMetricWrapper::createFlatSelector() const
-{
-    BoolPropertyPtr retval;
-    retval = BoolProperty::initialize("selectFlat",
-                                              "Flat",
-                                              "Flat disk or torus",
-                                              mData->getFlat(),
-                                              QDomNode());
-
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
 }
 
 StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const
@@ -962,6 +888,157 @@ DoublePropertyPtr SphereMetricWrapper::createRadiusSelector() const
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+RegionOfInterestMetricWrapper::RegionOfInterestMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, RegionOfInterestMetricPtr data) :
+	MetricBase(viewService, patientModelService),
+	mData(data)
+{
+	mInternalUpdate = false;
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+}
+
+QWidget* RegionOfInterestMetricWrapper::createWidget()
+{
+	QWidget* widget = new QWidget;
+	QVBoxLayout* topLayout = new QVBoxLayout(widget);
+	QHBoxLayout* hLayout = new QHBoxLayout;
+	hLayout->setMargin(0);
+	topLayout->setMargin(0);
+	topLayout->addLayout(hLayout);
+
+	mDataListProperty = this->createDataListProperty();
+	StringListSelectWidget* datalistwidget = new StringListSelectWidget(widget, mDataListProperty);
+	topLayout->addWidget(datalistwidget);
+
+	mUseActiveTooltipProperty = this->createUseActiveTooltipSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mUseActiveTooltipProperty));
+
+	mMaxBoundsDataProperty = this->createMaxBoundsDataSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMaxBoundsDataProperty));
+
+	mMarginProperty = this->createMarginSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMarginProperty));
+
+	this->addColorWidget(topLayout);
+	topLayout->addStretch();
+
+	this->dataChangedSlot();
+	return widget;
+}
+
+DataMetricPtr RegionOfInterestMetricWrapper::getData() const
+{
+	return mData;
+}
+QString RegionOfInterestMetricWrapper::getType() const
+{
+	return "roi";
+}
+
+QString RegionOfInterestMetricWrapper::getArguments() const
+{
+	return "";
+}
+
+void RegionOfInterestMetricWrapper::dataChangedSlot()
+{
+
+}
+
+StringListPropertyPtr RegionOfInterestMetricWrapper::createDataListProperty()
+{
+	StringListPropertyPtr retval = StringListProperty::initialize("data_list",
+														"Data",
+														"Select data to define ROI",
+														QStringList(),
+														QStringList());
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+StringPropertyPtr RegionOfInterestMetricWrapper::createMaxBoundsDataSelector()
+{
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("max_bounds_data",
+										"Max Bounds",
+										"Select data to define maximal extent of ROI",
+										"",
+										QStringList(),
+										QDomNode());
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+DoublePropertyPtr RegionOfInterestMetricWrapper::createMarginSelector() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("margin",
+										"Margin",
+										"Margin added outside the data",
+										0,
+										DoubleRange(0, 100, 1),
+										1,
+										QDomNode());
+
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr RegionOfInterestMetricWrapper::createUseActiveTooltipSelector() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Use Tool Tip", "",
+											  "Include tool tip in the roi",
+											  false);
+
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+
+void RegionOfInterestMetricWrapper::update()
+{
+	mInternalUpdate = true;
+
+	QStringList data;
+	std::map<QString, QString> names;
+	std::map<QString, DataPtr> alldata = mPatientModelService->getData();
+	for (std::map<QString, DataPtr>::iterator i=alldata.begin(); i!=alldata.end(); ++i)
+	{
+		if (i->first == mData->getUid())
+			continue;
+		data << i->first;
+		names[i->first] = i->second->getName();
+	}
+
+	mDataListProperty->setValue(mData->getDataList());
+	mDataListProperty->setValueRange(data);
+	mDataListProperty->setDisplayNames(names);
+
+	mMaxBoundsDataProperty->setValue(mData->getMaxBoundsData());
+	mMaxBoundsDataProperty->setValueRange(data);
+	mMaxBoundsDataProperty->setDisplayNames(names);
+
+	mMarginProperty->setValue(mData->getMargin());
+	mUseActiveTooltipProperty->setValue(mData->getUseActiveTooltip());
+
+	mInternalUpdate = false;
+}
+
+void RegionOfInterestMetricWrapper::guiChanged()
+{
+	if (mInternalUpdate)
+		return;
+	mData->setDataList(mDataListProperty->getValue());
+	mData->setUseActiveTooltip(mUseActiveTooltipProperty->getValue());
+	mData->setMargin(mMarginProperty->getValue());
+	mData->setMaxBoundsData(mMaxBoundsDataProperty->getValue());
+}
+
 
 
 
