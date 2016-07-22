@@ -186,7 +186,7 @@ TEST_CASE("SliceComputer handles anyplanes using follow tool", "[unit][resource]
  *  anyplanes with no gravity, tool in standard position with
  *  tip down and from towards nose
  */
-TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][resource][core][jon]")
+TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][resource][core]")
 {
     cx::SliceComputer slicer;
     slicer.setOrientationType(cx::otOBLIQUE);
@@ -211,26 +211,48 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
 
 
     //TOOLSIDE
-    slicer.setGravity(true, cx::Vector3D(0, 0, -1));
+    slicer.setGravity(true, cx::Vector3D(0, 1, 0)); //As the definition of the operating table
     slicer.setPlaneType(cx::ptTOOLSIDEPLANE);
-    std::cout << "TOOLSIDE slicerplan \n" << slicer.getPlane();
-    cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, -1, 0), cx::Vector3D( 0, 0, 1));
+    // OLD cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, -1, 0), cx::Vector3D( 0, 0, 1));
+    cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, 0, -1), cx::Vector3D( 0, -1, 0));
     //BRUKER DENNE CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
 
-    //Case 1: The tool is pointing straight down and the front towards the nose
+
+    //Case 1: The tool is parallel with the table, the patient lies on his back and the tool is behind the head pointing towards the feet.
     cx::Transform3D R = cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
     cx::Transform3D rMt = T*R;
     slicer.setToolPosition(rMt);
     CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    std::cout << "TOOLSIDE slicerplan, Case 1 \n" << slicer.getPlane();
 
-    //Case 2: The tool is parallel to the table with the tip pointing towards the nose
-    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
-    //Case 3: The tool is parallel to the table with the tip pointing towards the nose
+    //Case 2: The tool is parallel to the table with the tip pointing towards the feet
     //        and rotated 45 degrees towards the left side of the patient
+    R = cx::createTransformRotateZ(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    rMt = T*R;
+    slicer.setToolPosition(rMt);
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0, -1))); // tip towards feet
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(0.707107, 0.707107, 0))); // left of the probe left and down
     CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
-    //Case 4: The tool is pointing down 45 degrees towards the nose and rotated 45 degrees to the left.
-    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    std::cout << "TOOLSIDE slicerplan, Case 2 \n" << slicer.getPlane();
 
+    //Case 3: The tool is pointing down along the gravity with the front of the tool towards the feet
+    R = cx::createTransformRotateX(M_PI_2) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    rMt = T*R;
+    slicer.setToolPosition(rMt);
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 1, 0))); // tip along gravity
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    std::cout << "TOOLSIDE slicerplan, Case 3 \n" << slicer.getPlane();
+
+
+    //Case 4: The tool is pointing down 45 degrees towards the nose and rotated 45 degrees to the left.
+    //        This will start to turn the plane slightly as we approach the singularity case
+    cx::SlicePlane singularityTestPlane(c_tool, cx::Vector3D(0.281085, 0, -0.959683), cx::Vector3D(0, -1, 0));
+    R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateZ(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    rMt = T*R;
+    slicer.setToolPosition(rMt);
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip down and towards the feet
+    CHECK(cx::similar(slicer.getPlane(), singularityTestPlane));
+    std::cout << "TOOLSIDE slicerplan, Case 4 \n" << slicer.getPlane();
 
 
 
