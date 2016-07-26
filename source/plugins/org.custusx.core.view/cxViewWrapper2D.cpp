@@ -403,6 +403,9 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
+    if (!mGroupData)
+        return ImagePtr();
+
 	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), true);
     ImagePtr image;
     if (!images.empty())
