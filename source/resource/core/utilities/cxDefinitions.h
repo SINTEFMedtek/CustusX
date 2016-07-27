@@ -60,6 +60,7 @@ namespace cx
 		ptANYPLANE,   ///< a plane aligned with the tool base plane
 		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
 		ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
+        ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
 		ptCOUNT
 	};
 	enum cxResource_EXPORT FOLLOW_TYPE

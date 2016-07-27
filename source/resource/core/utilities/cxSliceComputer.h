@@ -91,12 +91,14 @@ public:
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset = false);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
-	Transform3D getToolPosition() const;
+    FOLLOW_TYPE getFollowType() const;
+    Transform3D getToolPosition() const;
 
 private:
 	std::pair<Vector3D,Vector3D> generateBasisVectors() const;
 	Vector3D generateFixedIJCenter(const Vector3D& center_r, const Vector3D& cross_r, const Vector3D& i, const Vector3D& j) const;
 	SlicePlane orientToGravity(const SlicePlane& base) const;
+    SlicePlane orientToGravityAroundToolZAxisAndAlongTheOperatingTable(const SlicePlane& base) const;
 	SlicePlane applyViewOffset(const SlicePlane& base) const;
 	double getViewOffsetAbsoluteFromCenter() const;
 
@@ -120,6 +122,7 @@ private:
 	double mViewportHeight;
 	double mViewOffset;
 	bool mUseConstrainedViewOffset;
+	double getWeightForAngularDifference(Vector3D a, Vector3D b) const;
 };
 
 } // namespace cx
