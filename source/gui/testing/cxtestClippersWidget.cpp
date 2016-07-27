@@ -106,13 +106,13 @@ TEST_CASE("VisServices: Init default clippers", "[unit][gui][widget][clip]")
 	REQUIRE(clippers);
 	clippers->importList(QString());//Init with default clippers
 
-	REQUIRE(clippers->size() == 6);
+    REQUIRE(clippers->size() == 7);
 }
 
 TEST_CASE_METHOD(cxtest::ClippersFixture, "Clippers: Init default clippers", "[unit][gui][widget][clip]")
 {
-	REQUIRE(this->getInitialClipperNames().size() == 6);
-	REQUIRE(this->size() == 6);
+    REQUIRE(this->getInitialClipperNames().size() == 7);
+    REQUIRE(this->size() == 7);
 }
 
 TEST_CASE("ClippersWidget: Select clipper", "[unit][gui][widget][clip]")
@@ -177,7 +177,7 @@ TEST_CASE("ClippersWidget: Load clipper names", "[unit][gui][widget][clip]")
 	ManageClippersWidgetTestHelper helper;
 
 	QStringList range = helper.fixture->getClipperSelector()->getValueRange();
-	REQUIRE(range.size() == 6);
+    REQUIRE(range.size() == 7);
 	QString clipperName = range.first();
 	INFO(QString("clipperName: %1").arg(clipperName));
 	CHECK(clipperName.length() > 1);
@@ -191,7 +191,7 @@ TEST_CASE("ClippersWidget: New patient gets default clippers", "[unit][gui][widg
 	storageFixture.loadSession1();
 
 	QStringList range = fixture->getClipperSelector()->getValueRange();
-	CHECK(range.size() == 6);
+    CHECK(range.size() == 7);
 }
 
 //TEST_CASE_METHOD(cxtest::ManageClippersWidgetFixture, "ClippersWidget: Clipper is set on new patient", "[unit][gui][widget][clip]")
