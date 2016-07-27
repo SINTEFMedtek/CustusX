@@ -225,13 +225,13 @@ TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][reso
     CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
     std::cout << "TOOLSIDE slicerplan, Case 3 \n" << slicer.getPlane();
 
-    //Case 4: The tool is pointing down 45 degrees towards the nose and rotated 45 degrees to the left.
-    //        This will start to turn the plane slightly as we approach the singularity case
-    cx::SlicePlane singularityTestPlane(c_tool, cx::Vector3D(0.281085, 0, -0.959683), cx::Vector3D(0, -1, 0));
-    R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateZ(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
-    rMt = T*R;
-    slicer.setToolPosition(rMt);
-    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip down and towards the feet
-    CHECK(cx::similar(slicer.getPlane(), singularityTestPlane));
-    std::cout << "TOOLSIDE slicerplan, Case 4 \n" << slicer.getPlane();
+	//Case 4: The tool is pointing down 45 degrees towards the nose and rotated 45 degrees to the left.
+	//        The plane is still attached fully to the tool side plane.
+	cx::SlicePlane singularityTestPlane(c_tool, cx::Vector3D(0.281085, 0, -0.959683), cx::Vector3D(0, -1, 0));
+	R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateZ(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+	rMt = T*R;
+	slicer.setToolPosition(rMt);
+	CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip down and towards the feet
+	CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+	std::cout << "TOOLSIDE slicerplan, Case 4 \n" << slicer.getPlane();
 }
