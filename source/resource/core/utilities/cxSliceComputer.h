@@ -122,6 +122,7 @@ private:
 	double mViewportHeight;
 	double mViewOffset;
 	bool mUseConstrainedViewOffset;
+	double getWeightForAngularDifference(Vector3D a, Vector3D b) const;
 };
 
 } // namespace cx

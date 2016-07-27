@@ -427,12 +427,16 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 /**
  * @brief SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTable
  * @param base
- * @return There are two steps to orient a plane fully to gravity. First one can rotate the plane around the tool Z axis. Secondly one can tilt the plane so that the side edges are
- * parallel to the gravity direction. This method combines these steps.
+ * @return There are two steps to orient a plane fully to gravity. First one
+ * can rotate the plane around the tool Z axis. Secondly one can tilt the plane
+ * so that the side edges are parallel to the gravity direction. This method
+ * combines these steps.
  *
- * We use the vector along the tool axis and find a vector, i_perpendicular, which is perpendicular to the tool and the up vector.
- * We use this and the up vector to find the tool vector's projection, i', down on the plane which is perpendicular to the up vector.
- * Since the plane should be oriented to gravity, we can use the up vector for j'.
+ * We use the vector along the tool axis and find a vector, i_perpendicular,
+ * which is perpendicular to the tool and the up vector. We use this and the up
+ * vector to find the tool vector's projection, i', down on the plane which is
+ * perpendicular to the up vector. Since the plane should be oriented to
+ * gravity, we can use the up vector for j'.
  *
  * i_perpendicular = up x toolvector
  * i' = i_perpendicular x up
@@ -457,9 +461,9 @@ SlicePlane SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTabl
     Vector3D toolVector = m_rMt.vector(Vector3D(0, 0, 1));
     Vector3D i_perpendicular = cross(up, toolVector).normal();
 
-    double w_n = dot(up, toolVector);
-    w_n = w_n*w_n; // square to keep stability near normal use.
-    i_perpendicular = i_perpendicular*(1.0-w_n) + k_neg*w_n;
+	double w_n = this->getWeightForAngularDifference(up, toolVector);
+
+	i_perpendicular = i_perpendicular*(1.0-w_n) + k_neg*w_n;
 
     Vector3D i_mark = cross(i_perpendicular, up).normal();
     Vector3D j_mark = up;
@@ -468,6 +472,26 @@ SlicePlane SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTabl
     retval.j = j_mark;
 
     return retval;
+}
+
+/**
+ * Find a weight describing the angular difference between two vectors.
+ * A large difference gives weight=0,
+ * small difference (0 or 180) gives weight=1
+ */
+double SliceComputer::getWeightForAngularDifference(Vector3D a, Vector3D b) const
+{
+	double w_n = dot(a, b);
+	w_n = fabs(w_n);
+	// w_n = 0 : normal case
+	// w_n = 1 : singularity
+
+	double cutoff = sqrt(3.0)/2.0; // cutoff at 30*, i.e. use only toolvector up to that angle between up and tool
+	if (w_n<cutoff)
+		w_n = 0;
+	else
+		w_n = (w_n-cutoff)/(1.0-cutoff);
+	return w_n;
 }
 
 
