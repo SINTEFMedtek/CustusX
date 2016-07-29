@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxRegionOfInterestMetric.h"
+#include "cxSliceAutoViewportCalculator.h"
 
 namespace cx
 {
@@ -56,185 +57,94 @@ ViewFollower::ViewFollower(PatientModelServicePtr dataManager) :
 	mDataManager(dataManager)
 {
 //	mROI_s = DoubleBoundingBox3D::zero();
+	mCalculator.reset(new SliceAutoViewportCalculator);
 }
 
+ViewFollower::~ViewFollower()
+{
+
+}
 
 void ViewFollower::setSliceProxy(SliceProxyPtr sliceProxy)
 {
-	if (mSliceProxy)
-	{
-		disconnect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
-	}
+//	if (mSliceProxy)
+//	{
+//		disconnect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
+//	}
 
 	mSliceProxy = sliceProxy;
 
-	if (mSliceProxy)
-	{
-		connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(updateView()));
-	}
+//	if (mSliceProxy)
+//	{
+//		connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(updateView()));
+//	}
 }
 
 void ViewFollower::setView(DoubleBoundingBox3D bb_s)
 {
 	mBB_s = bb_s;
-	this->updateView();
+//	this->updateView();
 }
 
 void ViewFollower::setAutoZoomROI(QString uid)
 {
-//	mAutoZoomRoi = uid;
+	mRoi = uid;
+//	if (mRoi)
+//		disconnect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
 
-	if (mRoi)
-		disconnect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
+//	DataPtr data = mDataManager->getData(uid);
+//	mRoi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 
-	DataPtr data = mDataManager->getData(uid);
-	mRoi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+//	if (mRoi)
+//		connect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
 
-	if (mRoi)
-		connect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
+//	this->updateView();
+}
 
-	this->updateView();
+SliceAutoViewportCalculator::ReturnType ViewFollower::calculate()
+{
+	if (!mSliceProxy)
+		return SliceAutoViewportCalculator::ReturnType();
+	if (!mSliceProxy->getTool())
+		return SliceAutoViewportCalculator::ReturnType();
+
+	mCalculator->mFollowTooltip = settings()->value("Navigation/followTooltip").value<bool>();
+	mCalculator->mFollowTooltipBoundary = settings()->value("Navigation/followTooltipBoundary").toDouble();
+	mCalculator->mBB_s = mBB_s;
+	mCalculator->mTooltip_s = this->findVirtualTooltip_s();
+	mCalculator->mFollowType = mSliceProxy->getComputer().getFollowType();
+	mCalculator->mROI_s = this->getROI_BB_s();
+
+	SliceAutoViewportCalculator::ReturnType result = mCalculator->calculate();
+	return result;
+
+//	if (!similar(result.zoom, 1.0))
+//	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom " << result.zoom;
+//		emit newZoom(1.0/result.zoom);
+//	}
+//	if (!similar(result.center_shift_s, Vector3D::Zero()))
+//	{
+//		Vector3D newcenter_r = this->findCenter_r_fromShift_s(result.center_shift_s);
+//		CX_LOG_CHANNEL_DEBUG("CA") << this << "autozoom shift " << result.center_shift_s;
+//		mDataManager->setCenter(newcenter_r);
+//	}
 }
 
 DoubleBoundingBox3D ViewFollower::getROI_BB_s()
 {
-//	QString roiUid = mAutoZoomROI;
-//	DataPtr data = mDataManager->getData(roiUid);
-//	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
-	if (!mRoi)
+	DataPtr data = mDataManager->getData(mRoi);
+	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+
+	if (!roi)
 	{
 		return DoubleBoundingBox3D::zero();
 	}
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "generate bb_roi_s";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "generate bb_roi_s";
 	Transform3D sMr = mSliceProxy->get_sMr();
-	DoubleBoundingBox3D bb_s = mRoi->getROI().getBox(sMr);
+	DoubleBoundingBox3D bb_s = roi->getROI().getBox(sMr);
 	return bb_s;
-}
-
-void ViewFollower::updateView()
-{
-    QTimer::singleShot(0, this, SLOT(ensureCenterWithinView()));
-    QTimer::singleShot(0, this, SLOT(autoZoom()));
-//	this->ensureCenterWithinView();
-//	this->autoZoom();
-}
-
-void ViewFollower::ensureCenterWithinView()
-{
-	if (!mSliceProxy)
-		return;
-	if (!mSliceProxy->getTool())
-		return;
-
-	bool followTooltip = settings()->value("Navigation/followTooltip").value<bool>();
-	if (!followTooltip)
-		return;
-
-	// this applies only to orthogonal views: oblique follows tool anyway
-	if (mSliceProxy->getComputer().getOrientationType()==otORTHOGONAL)
-	{
-		Vector3D shift_s = this->findCenterShift_s();
-		this->applyShiftToCenter(shift_s);
-	}
-}
-
-void ViewFollower::autoZoom()
-{
-	DoubleBoundingBox3D roi_s = this->getROI_BB_s();
-	// autozoom
-	// if orthogonal: zoom to centered box
-	//                shift pos to box
-	//
-	// if oblique:    zoom to actual box
-	//
-	if (mSliceProxy->getComputer().getOrientationType()==otORTHOGONAL)
-	{
-		// roi: bb defining region of interest
-		// box: viewable section
-		//
-		// find centered roi
-		// find zoom needed to see entire centered roi
-		// apply zoom to box and emit zoom
-		// find shift required to see entire roi
-		// set center based on shift
-
-		CX_LOG_CHANNEL_DEBUG("CA") << "";
-
-		Transform3D T = createTransformTranslate(-roi_s.center());
-		DoubleBoundingBox3D roi_sc = transform(T, roi_s);
-//		CX_LOG_CHANNEL_DEBUG("CA") << "roi_s " << roi_s;
-//		CX_LOG_CHANNEL_DEBUG("CA") << "roi_sc " << roi_sc;
-//		CX_LOG_CHANNEL_DEBUG("CA") << "mBB_s " << mBB_s;
-
-		double zoom = this->findZoomRequiredToIncludeRoi(mBB_s, roi_sc);
-//		CX_LOG_CHANNEL_DEBUG("CA") << "autozoom zoom " << zoom;
-		Transform3D S = createTransformScale(Vector3D::Ones()*zoom);
-		DoubleBoundingBox3D bb_zoomed = transform(S, mBB_s);
-//		CX_LOG_CHANNEL_DEBUG("CA") << "bb_zoomed " << bb_zoomed;
-
-		// find shift
-		Vector3D shift = this->findShiftFromBoxToROI(bb_zoomed, roi_s);
-//		CX_LOG_CHANNEL_DEBUG("CA") << "autozoom shift " << shift;
-
-		Vector3D newcenter_r = this->findShiftedCenter_r(shift);
-
-		if (!similar(zoom, 1.0))
-		{
-			CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom " << zoom;
-			emit newZoom(1.0/zoom);
-		}
-		if (!similar(shift, Vector3D::Zero()))
-		{
-			CX_LOG_CHANNEL_DEBUG("CA") << this << "autozoom shift " << shift;
-			mDataManager->setCenter(newcenter_r);
-		}
-	}
-	else
-	{
-		// find zoom needed to see entire box
-		// emit zoom
-		double zoom = this->findZoomRequiredToIncludeRoi(mBB_s, roi_s);
-		CX_LOG_CHANNEL_DEBUG("CA") << "autozoom zoom " << zoom;
-		emit newZoom(zoom);
-	}
-}
-
-double ViewFollower::findZoomRequiredToIncludeRoi(DoubleBoundingBox3D base, DoubleBoundingBox3D roi)
-{
-	double scale = 0;
-	// find zoom in x and y
-	for (int i=0; i<2; ++i)
-	{
-		double base_max = fabs(std::max(base[2*i], base[2*i+1]));
-		double roi_max = fabs(std::max(roi[2*i], roi[2*i+1]));
-		scale = std::max(scale, roi_max/base_max);
-	}
-
-	return scale;
-}
-
-
-Vector3D ViewFollower::findCenterShift_s()
-{
-	Vector3D shift = Vector3D::Zero();
-
-	Vector3D pt_s = this->findVirtualTooltip_s();
-	DoubleBoundingBox3D BB_s = this->findStaticBox();
-	shift = this->findShiftFromBoxToTool_s(BB_s, pt_s);
-
-//	if (!similar(shift, Vector3D::Zero()))
-//	{
-//		std::cout << "type: " << enum2string(mSliceProxy->getComputer().getPlaneType()) << std::endl;
-//		std::cout << "mBB_s: " << mBB_s << std::endl;
-//		std::cout << "BB_s: " << BB_s << std::endl;
-//		std::cout << "pt_s: " << pt_s << std::endl;
-//		Vector3D pt_r = rMpr * prMt.coord(Vector3D(0,0,tool->getTooltipOffset()));
-//		std::cout << "pt_r: " << pt_r << std::endl;
-//		std::cout << "shift: " << shift << std::endl;
-//	}
-
-	return shift;
 }
 
 Vector3D ViewFollower::findVirtualTooltip_s()
@@ -248,73 +158,15 @@ Vector3D ViewFollower::findVirtualTooltip_s()
 	return pt_s;
 }
 
-DoubleBoundingBox3D ViewFollower::findStaticBox()
-{
-	double followTooltipBoundary = settings()->value("Navigation/followTooltipBoundary").toDouble();
-	followTooltipBoundary = constrainValue(followTooltipBoundary, 0.0, 0.5);
-	Transform3D S = createTransformScale(Vector3D::Ones()*(1.0-2.0*followTooltipBoundary));
-	Transform3D T = createTransformTranslate(mBB_s.center());
-	DoubleBoundingBox3D BB_s = transform(T*S*T.inv(), mBB_s);
-	return BB_s;
-}
-
-/**
- * Find the shift required to move BB_s to include pt_s.
- */
-Vector3D ViewFollower::findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s)
-{
-	Vector3D shift = Vector3D::Zero();
-
-	for (unsigned i=0; i<2; ++i) // loop over two first dimensions, check if pt outside of bb
-	{
-		if (pt_s[i] < BB_s[2*i])
-			shift[i] += pt_s[i] - BB_s[2*i];
-		if (pt_s[i] > BB_s[2*i+1])
-			shift[i] += pt_s[i] - BB_s[2*i+1];
-	}
-
-	return shift;
-}
-
-/**
- * Find the shift required to move BB_s to include roi_s.
- */
-Vector3D ViewFollower::findShiftFromBoxToROI(DoubleBoundingBox3D bb, DoubleBoundingBox3D roi)
-{
-	Vector3D shift = Vector3D::Zero();
-
-	for (unsigned i=0; i<2; ++i) // loop over two first dimensions, check if roi outside of bb
-	{
-		if (roi[2*i  ] < bb[2*i  ])
-			shift[i] += roi[2*i  ] - bb[2*i ];
-		if (roi[2*i+1] > bb[2*i+1])
-			shift[i] += roi[2*i+1] - bb[2*i+1];
-	}
-
-//	for (unsigned i=0; i<2; ++i) // loop over two first dimensions, check if roi outside of bb
-//	{
-//		if (roi_s[2*i+1] < BB_s[2*i])
-//			shift[i] += roi_s[2*i+1] - BB_s[2*i];
-//		if (roi_s[2*i] > BB_s[2*i+1])
-//			shift[i] += roi_s[i] - BB_s[2*i+1];
-//	}
-
-	return shift;
-}
-
-Vector3D ViewFollower::findShiftedCenter_r(Vector3D shift_s)
+Vector3D ViewFollower::findCenter_r_fromShift_s(Vector3D shift_s)
 {
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Vector3D c_s = sMr.coord(mDataManager->getCenter());
+
 	Vector3D newcenter_s = c_s + shift_s;
+
 	Vector3D newcenter_r = sMr.inv().coord(newcenter_s);
 	return newcenter_r;
-}
-
-void ViewFollower::applyShiftToCenter(Vector3D shift_s)
-{
-	Vector3D newcenter_r = this->findShiftedCenter_r(shift_s);
-	mDataManager->setCenter(newcenter_r);
 }
 
 } // namespace cx

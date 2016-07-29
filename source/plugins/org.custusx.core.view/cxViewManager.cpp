@@ -91,8 +91,8 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 {
 	mBackend = backend;
 	mRenderLoop.reset(new RenderLoop());
-	connect(mRenderLoop.get(), SIGNAL(preRender()), this, SLOT(updateViews()));
-	connect(mRenderLoop.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewManager::updateViews);
+	connect(mRenderLoop.get(), &RenderLoop::fps, this, &ViewManager::fps);
 	connect(mRenderLoop.get(), &RenderLoop::renderFinished, this, &ViewManager::renderFinished);
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
@@ -118,7 +118,6 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
 	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patient()->getActiveData()));
-	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
     this->loadGlobalSettings();

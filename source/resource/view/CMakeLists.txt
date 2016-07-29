@@ -112,7 +112,8 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxImageEnveloper
     Primitives/cxGraphicalDisk
     Primitives/cxGraphicalObjectWithDirection
-    cxRepContainer
+	Primitives/cxSliceAutoViewportCalculator
+	cxRepContainer
 )
 
 configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)

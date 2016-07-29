@@ -120,7 +120,6 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 
 	mViewFollower = ViewFollower::create(mServices->patient());
 	mViewFollower->setSliceProxy(mSliceProxy);
-//	connect(mViewFollower.get(), &ViewFollower::newZoom, this, &ViewWrapper2D::changeZoom);
 
 	addReps();
 
@@ -148,12 +147,15 @@ ViewWrapper2D::~ViewWrapper2D()
 
 void ViewWrapper2D::changeZoom(double delta)
 {
+	if (similar(delta, 1.0))
+		return;
+
 	double zoom = mZoom2D->getFactor();
-	CX_LOG_CHANNEL_DEBUG("CA") << "changing zoom from " << zoom << " by " << delta;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "changing zoom from " << zoom << " by " << delta;
 	zoom *= delta;
-	CX_LOG_CHANNEL_DEBUG("CA") << "            new zoom:" << zoom;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "            new zoom:" << zoom;
 	mZoom2D->setFactor(zoom);
-	CX_LOG_CHANNEL_DEBUG("CA") << "            got zoom:" << mZoom2D->getFactor();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "            got zoom:" << mZoom2D->getFactor();
 }
 
 void ViewWrapper2D::samplePoint(Vector3D click_vp)
@@ -193,12 +195,6 @@ void ViewWrapper2D::optionChangedSlot()
 	{
 		mPickerGlyphRep->setMesh(options.mPickerGlyph);
 	}
-
-//	if (mViewFollower)
-//	{
-//		QString roiUid = mGroupData->getOptions().mCameraStyle.mAutoZoomROI;
-//		mViewFollower->setAutoZoomROI(roiUid);
-//	}
 }
 
 void ViewWrapper2D::addReps()
@@ -317,7 +313,7 @@ bool ViewWrapper2D::isAnyplane()
 void ViewWrapper2D::viewportChanged()
 {
 	if (!mView->getRenderer()->IsActiveCameraCreated())
-		return;
+		return;	
 
 	mView->setZoomFactor(mZoom2D->getFactor());
 
@@ -346,8 +342,21 @@ void ViewWrapper2D::viewportChanged()
 	{
 		mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, BB_s);
 	}
+}
 
-	mViewFollower->setView(BB_s);
+void ViewWrapper2D::applyViewFollower()
+{
+	if (!mGroupData)
+		return;
+	QString roiUid = mGroupData->getOptions().mCameraStyle.mAutoZoomROI;
+	mViewFollower->setAutoZoomROI(roiUid);
+	mViewFollower->setView(this->getViewport_s());
+	SliceAutoViewportCalculator::ReturnType result = mViewFollower->calculate();
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom=" << result.zoom << ", center=" << result.center_shift_s;
+	this->changeZoom(result.zoom);
+	Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
+	mServices->patient()->setCenter(newcenter_r);
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -506,6 +515,16 @@ void ViewWrapper2D::updateView()
 
     //UPDATE DATA METRIC ANNOTATION
 	mDataRepContainer->updateSettings();
+
+	this->applyViewFollower();
+}
+
+DoubleBoundingBox3D ViewWrapper2D::getViewport_s() const
+{
+	DoubleBoundingBox3D BB_vp = getViewport();
+	Transform3D vpMs = mView->get_vpMs();
+	DoubleBoundingBox3D BB_s = transform(vpMs.inv(), BB_vp);
+	return BB_s;
 }
 
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
@@ -666,9 +685,10 @@ void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 	mSlicePlanes3DMarker->setProxy(plane, proxy);
 
-	DoubleBoundingBox3D BB_vp = getViewport();
-	Transform3D vpMs = mView->get_vpMs();
-	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+//	DoubleBoundingBox3D BB_vp = getViewport();
+//	Transform3D vpMs = mView->get_vpMs();
+//	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, this->getViewport_s());
 
 	mView->addRep(mSlicePlanes3DMarker);
 }

@@ -166,6 +166,8 @@ private:
 	QActionGroup* mOrientationActionGroup;
 	//	void sendROItoFollower();
 	void changeZoom(double delta);
+	void applyViewFollower();
+	DoubleBoundingBox3D getViewport_s() const;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

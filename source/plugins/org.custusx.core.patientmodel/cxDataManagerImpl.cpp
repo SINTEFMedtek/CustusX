@@ -159,6 +159,8 @@ Vector3D DataManagerImpl::getCenter() const
 }
 void DataManagerImpl::setCenter(const Vector3D& center)
 {
+	if (similar(mCenter, center))
+		return;
 	mCenter = center;
 	emit centerChanged();
 }
