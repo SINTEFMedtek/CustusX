@@ -47,7 +47,12 @@ namespace cx
 ToolTreeNode::ToolTreeNode(TreeRepositoryWeakPtr repo, ToolPtr tool) :
 	TreeNodeImpl(repo), mTool(tool)
 {
+	connect(mTool.get(), &Tool::toolVisible, this, &TreeNode::changed);
 
+}
+
+ToolTreeNode::~ToolTreeNode()
+{
 }
 
 QString ToolTreeNode::getUid() const

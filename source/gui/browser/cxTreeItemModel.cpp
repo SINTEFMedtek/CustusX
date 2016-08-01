@@ -41,9 +41,21 @@ TreeItemModel::TreeItemModel(XmlOptionFile options, VisServicesPtr services, QOb
 	connect(mRepository.get(), &TreeRepository::changed, this, &TreeItemModel::onRepositoryChanged);
 }
 
-void TreeItemModel::onRepositoryChanged()
+void TreeItemModel::onRepositoryChanged(TreeNode* node)
 {
-	emit dataChanged(QModelIndex(),QModelIndex());
+	if (node)
+	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "change on node=" << node->getName();
+
+		QModelIndex index0 = this->createIndex(0, 0, node);
+		QModelIndex index1 = this->createIndex(0, mColumnCount, node);
+		emit dataChanged(index0, index1);
+	}
+	else
+	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "change on all";
+		emit dataChanged(QModelIndex(),QModelIndex());
+	}
 }
 
 
@@ -156,15 +168,15 @@ TreeNode* TreeItemModel::itemFromIndex(const QModelIndex& index) const
 
 int TreeItemModel::columnCount(const QModelIndex& parent) const
 {
-//	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
-//		return 0;
+	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
+		return 0;
 	return mColumnCount;
 }
 
 int TreeItemModel::rowCount(const QModelIndex& parent) const
 {
-//	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
-//		return 0;
+	if (parent.isValid() && (parent.column() != mNameIndex)) // ignore for all but first column
+		return 0;
 	TreeNode *parentItem = this->itemFromIndex(parent);
 	return parentItem->getVisibleChildren().size();
 }
@@ -227,8 +239,6 @@ QVariant TreeItemModel::data(const QModelIndex& index, int role) const
 				{
 					QColor oldColor = color.value<QColor>().toHsv();
 					QColor newColor = this->adjustColorToContrastWithWhite(oldColor);
-//					CX_LOG_CHANNEL_DEBUG("CA") << "color " << item->getName() << "";
-//					qDebug() << "color " << item->getName() << " " << oldColor << " new=" << newColor;
 					return newColor;
 				}
 			}

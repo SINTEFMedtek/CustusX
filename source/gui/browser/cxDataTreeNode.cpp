@@ -56,12 +56,14 @@ namespace cx
 DataTreeNode::DataTreeNode(TreeRepositoryWeakPtr repo, DataPtr data) :
 	TreeNodeImpl(repo), mData(data)
 {
-	connect(mData.get(), &Data::transformChanged, this, &TreeNode::changed);
+	// too expensive: this happens for every position change in some cases (metrics),
+	// while nothing is changed in the gui.
+//	connect(mData.get(), &Data::transformChanged, this, &TreeNode::changed);
 }
 
 DataTreeNode::~DataTreeNode()
 {
-	disconnect(mData.get(), &Data::transformChanged, this, &TreeNode::changed);
+//	disconnect(mData.get(), &Data::transformChanged, this, &TreeNode::changed);
 }
 
 QString DataTreeNode::getUid() const
