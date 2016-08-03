@@ -69,8 +69,7 @@ SliceComputer::SliceComputer() :
 	mGravityDirection(Vector3D(0,0,-1)) ,
 	mUseViewOffset(false),
 	mViewportHeight(1),
-	mViewOffset(0.5),
-	mUseConstrainedViewOffset(false)
+	mViewOffset(0.5)
 {
 }
 
@@ -80,7 +79,7 @@ SliceComputer::~SliceComputer()
 
 /**Group the typical plane definition uses together.
  */
-void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset)
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application)
 {
 	setPlaneType(plane);
 	mClinicalApplication = application;
@@ -96,7 +95,7 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 		setFollowType(ftFOLLOW_TOOL);
 
 		setGravity(useGravity, gravityDir);
-		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, useConstrainedViewOffset); // TODO finish this one
+		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
 	}
     else if (plane==ptTOOLSIDEPLANE)
     {
@@ -191,12 +190,11 @@ void SliceComputer::setToolOffset(double val)
  * top of a viewport. This is handled by setting the plane center accordingly.
  * Overrides FollowType.
  */
-void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset, bool useConstrainedViewOffset) 
+void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset)
 {
 	mUseViewOffset = use; 
 	mViewportHeight = viewportHeight; 
 	mViewOffset = viewOffset;
-	mUseConstrainedViewOffset = useConstrainedViewOffset;
 }
 
 /**see setToolViewOffset()
@@ -246,14 +244,12 @@ SlicePlane SliceComputer::getPlane()  const
 
 /**Apply the view offset which is defined as follows:
  * 
- * Position the tool tip in the viewport such that it is
- * a given distance from the top. The distance is given by
- * viewport height times a ratio: the viewOffset.
- * 
- * For p=tooltip, H=viewportHeight, V=viewOffset:
- * q = p - H(1/2-V)*j
- * where we are interested in only the j-component:
- * c_new = c + j*(q-c)*j
+ *
+ * Position the (p_tooltip,p_tooloffset) points in the slice so that both
+ * are within a limit, prioritizing showing the p_tooloffset.
+ *
+ * The limit is given as H=viewportHeight, V=viewOffset:
+ *   limit = H(1/2-V)
  */
 SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 {
@@ -265,25 +261,21 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	double centerOffset = this->getViewOffsetAbsoluteFromCenter();
 
 	SlicePlane retval = base;
-	if (mUseConstrainedViewOffset)
-	{
-		Vector3D toolOffsetCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-		Vector3D newCenter = toolOffsetCenter + centerOffset * base.j;
-		double toolOffsetDistance = dot(newCenter - base.c, base.j);
 
-		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
-		newCenter = toolCenter - centerOffset * base.j;
-		double toolDistance = dot(newCenter - base.c, base.j);
-		double usedDistance = std::min(toolOffsetDistance, toolDistance);
-		retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
-	}
-	else
-	{
-		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-		Vector3D newCenter = toolCenter - centerOffset * base.j;
-		double distance = dot(newCenter - base.c, base.j);
-		retval.c = base.c + distance * base.j; // extract j-component of newCenter
-	}
+	// limit by tooloffset
+	Vector3D toolOffsetCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
+	Vector3D newCenter = toolOffsetCenter + centerOffset * base.j;
+	double toolOffsetDistance = dot(newCenter - base.c, base.j);
+
+	// limit by tooltip
+	Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
+	newCenter = toolCenter - centerOffset * base.j;
+	double toolDistance = dot(newCenter - base.c, base.j);
+
+	// select a dist and apply
+	double usedDistance = std::min(toolOffsetDistance, toolDistance);
+	retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
+
 	return retval;
 }
 

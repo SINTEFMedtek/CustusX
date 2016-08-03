@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-
 RegionOfInterest::RegionOfInterest() : mMargin(0)
 {
 
@@ -85,24 +84,9 @@ DoubleBoundingBox3D RegionOfInterest::generateROIFromPointsAndMargin(const std::
 	return bb;
 }
 
-//RegionOfInterest RegionOfInterestMetric::getROI() const
-//{
-//	DoubleBoundingBox3D bb = this->getBasicROI();
-
-//	DoubleBoundingBox3D bb_max = this->getMaxROI();
-//	if (bb_max!=DoubleBoundingBox3D::zero())
-//		bb = intersection(bb, bb_max);
-
-//	return bb;
-//}
-
-
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-
 
 RegionOfInterestMetric::RegionOfInterestMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
 				DataMetric(uid, name, dataManager, spaceProvider)
@@ -213,13 +197,11 @@ void RegionOfInterestMetric::listenTo(CoordinateSystem space)
 void RegionOfInterestMetric::onContentTransformsChanged()
 {
 	emit transformChanged();
-//	CX_LOG_CHANNEL_DEBUG("CA") << "RegionOfInterestMetric::onContentTransformsChanged() ROI=" << this->getROI();
 }
 
 DoubleBoundingBox3D RegionOfInterestMetric::boundingBox() const
 {
 	return this->getROI().getBox(this->get_rMd().inv());
-//	return transform(this->get_rMd().inv(), this->getROI());
 }
 
 QString RegionOfInterestMetric::getAsSingleLineString() const
@@ -266,86 +248,6 @@ Vector3D RegionOfInterestMetric::getToolTip_r() const
 	Vector3D tp = rMto.coord(Vector3D(0, 0, 0));
 	return tp;
 }
-
-//DoubleBoundingBox3D RegionOfInterestMetric::getBasicROI() const
-//{
-//	// create a dummy ROI containing vol center and tool plus margin
-//	std::map<QString, DataPtr> alldata = mDataManager->getData();
-//	std::map<QString, DataPtr> data;
-
-//	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
-//		if (mContainedData.contains(i->first))
-//			data[i->first] = i->second;
-
-//	std::vector<Vector3D> points = getCorners_r_FromNonROI(data);
-
-//	if (mUseActiveTooltip)
-//	{
-//		Transform3D rMto = mSpaceProvider->get_toMfrom(CoordinateSystem(csTOOL_OFFSET, "active"),
-//													 CoordinateSystem::reference());
-//		Vector3D tp = rMto.coord(Vector3D(0, 0, 0));
-//		points.push_back(tp);
-//	}
-
-//	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, mMargin);
-//	return bb;
-//}
-
-//DoubleBoundingBox3D RegionOfInterestMetric::getMaxROI() const
-//{
-//	std::map<QString, DataPtr> data;
-//	if (!mDataManager->getData(mMaxBoundsData))
-//		return DoubleBoundingBox3D::zero();
-//	data[mMaxBoundsData] = mDataManager->getData(mMaxBoundsData);
-
-//	std::vector<Vector3D> points = getCorners_r_FromNonROI(data);
-
-//	DoubleBoundingBox3D bb = this->generateROIFromPointsAndMargin(points, mMargin);
-//	return bb;
-//}
-
-//void RegionOfInterestMetric::getCorners_r_FromNonROI(std::vector<Vector3D>* sink, DataPtr data) const
-//{
-//	std::vector<Vector3D> points;
-//	// create a max ROI containing all data plus margin
-//	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
-//	{
-//		DataPtr current = i->second;
-//		if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(current))
-//			continue;
-//		std::vector<Vector3D> c = this->getCorners_r(current);
-//		std::copy(c.begin(), c.end(), back_inserter(points));
-//	}
-
-//	return points;
-//}
-
-//std::vector<Vector3D> RegionOfInterestMetric::getCorners_r_FromNonROI(std::map<QString, DataPtr> data) const
-//{
-//	std::vector<Vector3D> points;
-//	// create a max ROI containing all data plus margin
-//	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
-//	{
-//		DataPtr current = i->second;
-//		if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(current))
-//			continue;
-//		std::vector<Vector3D> c = this->getCorners_r(current);
-//		std::copy(c.begin(), c.end(), back_inserter(points));
-//	}
-
-//	return points;
-//}
-
-//DoubleBoundingBox3D RegionOfInterestMetric::generateROIFromPointsAndMargin(const std::vector<Vector3D>& points, double margin) const
-//{
-//	DoubleBoundingBox3D bb = DoubleBoundingBox3D::fromCloud(points);
-//	Vector3D vmargin(margin,margin, margin);
-//	Vector3D bl = bb.bottomLeft() - vmargin;
-//	Vector3D tr = bb.topRight() + vmargin;
-//	bb = DoubleBoundingBox3D(bl, tr);
-
-//	return bb;
-//}
 
 std::vector<Vector3D> RegionOfInterestMetric::getCorners_r(DataPtr data) const
 {

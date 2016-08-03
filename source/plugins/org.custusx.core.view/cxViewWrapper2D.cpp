@@ -330,7 +330,7 @@ void ViewWrapper2D::viewportChanged()
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
 	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
-	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
+	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, true, viewHeight, anyplaneViewOffset);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
 	Transform3D vpMs = mView->get_vpMs();
@@ -353,6 +353,7 @@ void ViewWrapper2D::applyViewFollower()
 	mViewFollower->setView(this->getViewport_s());
 	SliceAutoViewportCalculator::ReturnType result = mViewFollower->calculate();
 
+//	CX_LOG_CHANNEL_DEBUG("CA") << "roi=" << roiUid;
 //	CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom=" << result.zoom << ", center=" << result.center_shift_s;
 	this->changeZoom(result.zoom);
 	Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
@@ -379,13 +380,8 @@ void ViewWrapper2D::showSlot()
 void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
 	double viewHeight = mView->getViewport_s().range()[1];
-	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
+	mSliceProxy->initializeFromPlane(plane, false, true, viewHeight, 0.25);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
-
-	bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
-	mToolRep2D->setUseCrosshair(!isOblique && settings()->value("View/toolCrosshair", true).toBool());
-//  mToolRep2D->setUseToolLine(!isOblique);
-
 }
 
 /** get the orientation type directly from the slice proxy
@@ -516,6 +512,13 @@ void ViewWrapper2D::updateView()
     //UPDATE DATA METRIC ANNOTATION
 	mDataRepContainer->updateSettings();
 
+	if (mToolRep2D)
+	{
+		bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
+		bool useCrosshair = settings()->value("View/toolCrosshair", true).toBool();
+		mToolRep2D->setUseCrosshair(!isOblique && useCrosshair);
+	}
+
 	this->applyViewFollower();
 }
 
@@ -611,6 +614,7 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 	val += delta / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
 	double newZoom = pow(10.0, val);
 
+	CX_LOG_CHANNEL_DEBUG("CA") << "mouse zoom " << newZoom;
 	mZoom2D->setFactor(newZoom);
 
 	Navigation(mServices).centerToTooltip(); // side effect: center on tool

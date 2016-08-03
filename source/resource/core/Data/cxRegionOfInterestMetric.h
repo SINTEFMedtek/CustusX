@@ -89,7 +89,6 @@ public:
 	virtual ~RegionOfInterestMetric();
 	static RegionOfInterestMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
-//	virtual QIcon getIcon() {return QIcon(":/icons/metric.png");}
 	virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 
@@ -127,9 +126,6 @@ public:
 private:
 	RegionOfInterestMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
-//	DoubleBoundingBox3D getMaxROI() const;
-//	DoubleBoundingBox3D getBasicROI() const;
-
 	QString mMaxBoundsData;
 	QStringList mContainedData;
 	bool mUseActiveTooltip;
@@ -137,11 +133,9 @@ private:
 
 	std::vector<SpaceListenerPtr> mListeners;
 	std::vector<Vector3D> getCorners_r(DataPtr data) const;
-//	DoubleBoundingBox3D generateROIFromPointsAndMargin(const std::vector<Vector3D> &points, double margin) const;
 	void listenTo(CoordinateSystem space);
 	void onContentTransformsChanged();
 	void onContentChanged();
-//	std::vector<Vector3D> getCorners_r_FromNonROI(std::map<QString, DataPtr> data) const;
 	Vector3D getToolTip_r() const;
 };
 

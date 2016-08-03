@@ -10,8 +10,9 @@ namespace cx
 SliceAutoViewportCalculator::ReturnType SliceAutoViewportCalculator::calculate()
 {
 	ReturnType retval;
-	retval.center_shift_s = Vector3D::Zero();
-	retval.zoom = 0;
+//	retval.center_shift_s = Vector3D::Zero();
+//	retval.zoom = 0;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "rois" << mROI_s;
 
 	if (mFollowType==ftFIXED_CENTER)
 	{

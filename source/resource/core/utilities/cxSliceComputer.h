@@ -83,12 +83,12 @@ public:
 	void setFollowType(FOLLOW_TYPE val); 
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolOffset(double val); 
-	void setToolViewOffset(bool use, double viewportHeight, double viewOffset, bool useConstrainedViewOffset = false);
+	void setToolViewOffset(bool use, double viewportHeight, double viewOffset);
 	void setToolViewportHeight(double viewportHeight);
 	void setClinicalApplication(CLINICAL_VIEW application);
 	SlicePlane getPlane() const;
 
-	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset = false);
+	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
     FOLLOW_TYPE getFollowType() const;
@@ -121,7 +121,6 @@ private:
 	bool mUseViewOffset;
 	double mViewportHeight;
 	double mViewOffset;
-	bool mUseConstrainedViewOffset;
 	double getWeightForAngularDifference(Vector3D a, Vector3D b) const;
 };
 
