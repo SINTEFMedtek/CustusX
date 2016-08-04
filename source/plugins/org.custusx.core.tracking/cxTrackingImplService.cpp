@@ -242,8 +242,10 @@ void TrackingImplService::rebuildCachedTools()
     }
     mTools[mManualTool->getUid()] = mManualTool;
     this->imbueManualToolWithRealProperties();
-    this->setActiveTool(this->getManualTool()->getUid());
     this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
+	this->resetTrackingPositionFilters();
+	this->onTooltipOffset(mToolTipOffset);
+	this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
 }
 
 void TrackingImplService::imbueManualToolWithRealProperties()
@@ -451,13 +453,18 @@ void TrackingImplService::globalConfigurationFileChangedSlot(QString key)
 
 void TrackingImplService::resetTrackingPositionFilters()
 {
-	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toInt();
+	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toBool();
+	double cutoff = settings()->value("TrackingPositionFilter/cutoffFrequency", 0).toDouble();
 
 	for (ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
 	{
 		TrackingPositionFilterPtr filter;
 		if (enabled)
+		{
 			filter.reset(new TrackingPositionFilter());
+			if (cutoff>0.01)
+				filter->setCutOffFrequency(cutoff);
+		}
 		iter->second->resetTrackingPositionFilter(filter);
 	}
 }

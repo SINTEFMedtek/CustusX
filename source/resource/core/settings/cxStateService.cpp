@@ -92,6 +92,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoDeleteDICOMDatabase", true);
 
 	this->fillDefault("TrackingPositionFilter/enabled", false);
+	this->fillDefault("TrackingPositionFilter/cutoffFrequency", 3.0);
 
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor(30,60,70)); // a dark, grey-blue hue
