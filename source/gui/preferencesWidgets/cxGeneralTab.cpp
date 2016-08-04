@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxHelperWidgets.h"
 #include <QAction>
 #include <QInputDialog>
+#include <QGroupBox>
 #include "cxProfile.h"
 #include "cxLogicManager.h"
 
@@ -102,6 +103,13 @@ void GeneralTab::init()
 												 "Smooth the tool tracking positions using a low-pass filter.",
 												 filterToolPositions);
 
+
+  double filterToolPositionsCutoff = settings()->value("TrackingPositionFilter/cutoffFrequency").value<double>();
+  mFilterToolPositionsCutoff
+	 = DoubleProperty::initialize("filterToolPositionsCutoff", "Cutoff Frequency",
+								  "If filtering enabled,\nfilter out tool movements faster than this frequency (Hz)",
+								  filterToolPositionsCutoff, DoubleRange(0.1, 10, 0.1), 1);
+
   QToolButton* addProfileButton = this->createAddProfileButton();
 
   // Layout
@@ -119,8 +127,11 @@ void GeneralTab::init()
   mainLayout->addWidget(mVLCPathComboBox, 2, 1);
   mainLayout->addWidget(browseVLCPathButton, 2, 2);
 
-  createDataWidget(mViewService, mPatientModelService, this, mFilterToolPositions, mainLayout, 3);
-//  mainLayout->addWidget(createDataWidget(this, mFilterToolPositions ));
+  QGroupBox* filterToolPositionsGroupBox = new QGroupBox("Filter Tool Positions");
+  QGridLayout* filterToolPositionsLayout = new QGridLayout(filterToolPositionsGroupBox);
+  createDataWidget(mViewService, mPatientModelService, this, mFilterToolPositions, filterToolPositionsLayout, 0);
+  createDataWidget(mViewService, mPatientModelService, this, mFilterToolPositionsCutoff, filterToolPositionsLayout, 1);
+  mainLayout->addWidget(filterToolPositionsGroupBox, 3, 0, 1, 3 );
 
   mTopLayout->addLayout(mainLayout);
 }
@@ -247,6 +258,8 @@ void GeneralTab::saveParametersSlot()
 	profile()->setSessionRootFolder(mGlobalPatientDataFolder);
   settings()->setValue("vlcPath", mVLCPath);
   settings()->setValue("TrackingPositionFilter/enabled", mFilterToolPositions->getValue());
+  settings()->setValue("TrackingPositionFilter/cutoffFrequency", mFilterToolPositionsCutoff->getValue());
+
   settings()->sync();
 
   emit savedParameters();
