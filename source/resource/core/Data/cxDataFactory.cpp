@@ -40,9 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPlaneMetric.h"
 #include "cxAngleMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxSphereMetric.h"
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
+#include "cxRegionOfInterestMetric.h"
 
 #include "cxPatientModelService.h"
 
@@ -80,7 +82,9 @@ DataPtr DataFactory::createRaw(QString type, QString uid)
 	CREATE_METRIC_IF_MATCH(type, FrameMetric);
 	CREATE_METRIC_IF_MATCH(type, ToolMetric);
 	CREATE_METRIC_IF_MATCH(type, DonutMetric);
+    CREATE_METRIC_IF_MATCH(type, CustomMetric);
 	CREATE_METRIC_IF_MATCH(type, SphereMetric);
+	CREATE_METRIC_IF_MATCH(type, RegionOfInterestMetric);
 	return DataPtr ();
 }
 

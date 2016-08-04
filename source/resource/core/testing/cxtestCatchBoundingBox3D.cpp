@@ -140,5 +140,18 @@ TEST_CASE("DoubleBoundingBox3D: Convert to QString and back", "[unit][resource][
   }
 }
 
+TEST_CASE("DoubleBoundingBox3D: intersection", "[unit][resource][core]")
+{
+  DoubleBoundingBox3D bb0(0, 1, 0, 1, 0, 1);
+  DoubleBoundingBox3D bb1(0.5, 1.5, -0.5, 0.5, -5, 5);
+  DoubleBoundingBox3D bb2(2, 3, 2, 3, 0, 1);
+
+  DoubleBoundingBox3D bb01 = intersection(bb0, bb1);
+  CHECK(similar(bb01, DoubleBoundingBox3D(0.5, 1, 0, 0.5, 0, 1)));
+
+  DoubleBoundingBox3D bb02 = intersection(bb0, bb2);
+  CHECK(similar(bb02, DoubleBoundingBox3D::zero()));
+}
+
 
 

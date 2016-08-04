@@ -153,6 +153,16 @@ Vector3D PatientModelServiceNull::getCenter() const
 	return Vector3D::Zero();
 }
 
+void PatientModelServiceNull::setOperatingTable(const OperatingTable &ot)
+{
+    printWarning();
+}
+
+OperatingTable PatientModelServiceNull::getOperatingTable() const
+{
+    return OperatingTable(Transform3D::Identity());
+}
+
 QString PatientModelServiceNull::addLandmark()
 {
 	printWarning();

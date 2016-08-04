@@ -79,12 +79,13 @@ public:
 
 	virtual void setCenter(const Vector3D& center);
 	virtual Vector3D getCenter() const;
+    void setOperatingTable(const OperatingTable &ot);
+    OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
 
 	virtual void autoSave();
 	virtual bool isNull();
-
 	virtual void makeAvailable(const QString& uid, bool available);
 
 private:

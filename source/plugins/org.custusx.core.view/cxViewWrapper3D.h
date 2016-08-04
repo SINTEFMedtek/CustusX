@@ -97,6 +97,7 @@ public:
 
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
+	virtual void settingsChangedSlot(QString key);
 private slots:
 	void showSlices();
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -114,11 +115,13 @@ private slots:
 	void centerToolActionSlot();
 	void optionChangedSlot();
 	void showOrientationSlot(bool visible);
-	void globalConfigurationFileChangedSlot(QString key);
 	void setStereoEyeAngle(double angle);
-	void settingsChangedSlot(QString key);
 	void pickerRepDataPickedSlot(QString);
 	void updateView();
+
+protected:
+	virtual QString getDataDescription();
+	virtual QString getViewDescription();
 
 private:
 	virtual void appendToContextMenu(QMenu& contextMenu);
@@ -150,8 +153,6 @@ private:
 	RepMap mDataReps;
 	LandmarkRepPtr mLandmarkRep;
 	PickerRepPtr mPickerRep;
-	DisplayTextRepPtr mPlaneTypeText;
-	DisplayTextRepPtr mDataNameText;
 	MetricNamesRepPtr mMetricNames;
 	std::vector<AxisConnectorPtr> mAxis;
 

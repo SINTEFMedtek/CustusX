@@ -59,7 +59,7 @@ public slots:
 
 private slots:
   void currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous);
-  void onRepositoryChanged();
+  void onRepositoryChanged(TreeNode* node);
 
 private:
   int mViewGroupCount, mViewGroupIndex, mColorIndex, mNameIndex, mColumnCount;

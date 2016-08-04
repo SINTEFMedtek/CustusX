@@ -86,6 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxViewService.h"
+#include "cxRegionOfInterestMetric.h"
 
 #ifndef CX_VTK_OPENGL2
 #include "cxTexture3DSlicerRep.h"
@@ -109,7 +110,6 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	double length = clipDepth*10;
 	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
-	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
 	// slice proxy
 	mSliceProxy = SliceProxy::create(mServices->patient());
@@ -143,6 +143,19 @@ ViewWrapper2D::~ViewWrapper2D()
 {
 	if (mView)
 		mView->removeReps();
+}
+
+void ViewWrapper2D::changeZoom(double delta)
+{
+	if (similar(delta, 1.0))
+		return;
+
+	double zoom = mZoom2D->getFactor();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "changing zoom from " << zoom << " by " << delta;
+	zoom *= delta;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "            new zoom:" << zoom;
+	mZoom2D->setFactor(zoom);
+//	CX_LOG_CHANNEL_DEBUG("CA") << "            got zoom:" << mZoom2D->getFactor();
 }
 
 void ViewWrapper2D::samplePoint(Vector3D click_vp)
@@ -190,15 +203,7 @@ void ViewWrapper2D::addReps()
 	mOrientationAnnotationRep = OrientationAnnotationSmartRep::New();
 	mView->addRep(mOrientationAnnotationRep);
 
-	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New();
-	mPlaneTypeText->addText(QColor(Qt::green), "not initialized", Vector3D(0.98, 0.02, 0.0));
-	mView->addRep(mPlaneTypeText);
-
-	//data name text rep
-	mDataNameText = DisplayTextRep::New();
-	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
-	mView->addRep(mDataNameText);
+	this->ViewWrapper::addReps();
 
 	// tool rep
 	mToolRep2D = ToolRep2D::New(mServices->spaceProvider(), "Tool2D_" + mView->getName());
@@ -218,14 +223,8 @@ void ViewWrapper2D::addReps()
 
 void ViewWrapper2D::settingsChangedSlot(QString key)
 {
-	if (key == "View/showDataText")
-	{
-		this->updateView();
-	}
-	if (key == "View/showOrientationAnnotation")
-	{
-		this->updateView();
-	}
+	this->ViewWrapper::settingsChangedSlot(key);
+
 	if (key == "useGPU2DRendering")
 	{
 		this->updateView();
@@ -235,7 +234,6 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 		this->updateView();
 	}
 }
-
 
 void ViewWrapper2D::removeAndResetSliceRep()
 {
@@ -315,7 +313,7 @@ bool ViewWrapper2D::isAnyplane()
 void ViewWrapper2D::viewportChanged()
 {
 	if (!mView->getRenderer()->IsActiveCameraCreated())
-		return;
+		return;	
 
 	mView->setZoomFactor(mZoom2D->getFactor());
 
@@ -332,7 +330,7 @@ void ViewWrapper2D::viewportChanged()
 
 	mSliceProxy->setToolViewportHeight(viewHeight);
 	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
-	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, Vector3D(0, 0, 1), true, viewHeight, anyplaneViewOffset, true);
+	mSliceProxy->initializeFromPlane(mSliceProxy->getComputer().getPlaneType(), false, true, viewHeight, anyplaneViewOffset);
 
 	DoubleBoundingBox3D BB_vp = getViewport();
 	Transform3D vpMs = mView->get_vpMs();
@@ -344,8 +342,22 @@ void ViewWrapper2D::viewportChanged()
 	{
 		mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, BB_s);
 	}
+}
 
-	mViewFollower->setView(BB_s);
+void ViewWrapper2D::applyViewFollower()
+{
+	if (!mGroupData)
+		return;
+	QString roiUid = mGroupData->getOptions().mCameraStyle.mAutoZoomROI;
+	mViewFollower->setAutoZoomROI(roiUid);
+	mViewFollower->setView(this->getViewport_s());
+	SliceAutoViewportCalculator::ReturnType result = mViewFollower->calculate();
+
+//	CX_LOG_CHANNEL_DEBUG("CA") << "roi=" << roiUid;
+//	CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom=" << result.zoom << ", center=" << result.center_shift_s;
+	this->changeZoom(result.zoom);
+	Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
+	mServices->patient()->setCenter(newcenter_r);
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -367,19 +379,9 @@ void ViewWrapper2D::showSlot()
 
 void ViewWrapper2D::initializePlane(PLANE_TYPE plane)
 {
-//  mOrientationAnnotationRep->setPlaneType(plane);
-	mPlaneTypeText->setText(0, qstring_cast(plane));
-//	double viewHeight = mView->heightMM() / mZoom2D->getFactor();
 	double viewHeight = mView->getViewport_s().range()[1];
-	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, viewHeight, 0.25);
-//	double anyplaneViewOffset = settings()->value("Navigation/anyplaneViewOffset").toDouble();
-//	mSliceProxy->initializeFromPlane(plane, false, Vector3D(0, 0, 1), true, 1, 0);
+	mSliceProxy->initializeFromPlane(plane, false, true, viewHeight, 0.25);
 	mOrientationAnnotationRep->setSliceProxy(mSliceProxy);
-
-	bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
-	mToolRep2D->setUseCrosshair(!isOblique);
-//  mToolRep2D->setUseToolLine(!isOblique);
-
 }
 
 /** get the orientation type directly from the slice proxy
@@ -406,6 +408,9 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
+    if (!mGroupData)
+        return ImagePtr();
+
 	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), true);
     ImagePtr image;
     if (!images.empty())
@@ -433,8 +438,40 @@ void ViewWrapper2D::createAndAddSliceRep()
     }
 }
 
-void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
+QString ViewWrapper2D::getDataDescription()
 {
+	QString text;
+	if (this->useGPU2DRendering())
+	{
+		text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
+	}
+	else //software rendering
+	{
+		ImagePtr image = this->getImageToDisplay();
+		if (!image)
+			return "";
+		// list all meshes and one image.
+		QStringList textList;
+		std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
+		for (unsigned i = 0; i < mesh.size(); ++i)
+			textList << qstring_cast(mesh[i]->getName());
+		if (image)
+			textList << image->getName();
+		text = textList.join("\n");
+	}
+	return text;
+}
+
+QString ViewWrapper2D::getViewDescription()
+{
+	return qstring_cast(mSliceProxy->getComputer().getPlaneType());
+}
+
+void ViewWrapper2D::updateItemsFromViewGroup()
+{
+	if (!mGroupData)
+		return;
+
     ImagePtr image = this->getImageToDisplay();
 
     if (image)
@@ -445,7 +482,6 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
         if (this->useGPU2DRendering())
         {
             this->recreateMultiSlicer();
-            text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
         }
         else //software rendering
         {
@@ -453,15 +489,6 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
             this->createAndAddSliceRep();
 
             mSliceRep->setImage(image);
-
-            // list all meshes and one image.
-            QStringList textList;
-            std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
-            for (unsigned i = 0; i < mesh.size(); ++i)
-            textList << qstring_cast(mesh[i]->getName());
-            if (image)
-                textList << image->getName();
-            text = textList.join("\n");
         }
     }
     else //no images to display in the view
@@ -471,55 +498,37 @@ void ViewWrapper2D::updateItemsFromViewGroup(QString &text)
     }
 }
 
-/**
- * @brief Set the text and font size of the annotation in the lower left corner of the view
- *
- * @param text the text that will be displayed
- */
-void ViewWrapper2D::setDataNameText(QString &text)
-{
-    mDataNameText->setText(0, text);
-    mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
-}
-
-/**
- * @brief Update the annotation in the lower left corner.
- * @param text
- */
-void ViewWrapper2D::updateDataNameText(QString &text)
-{
-    bool show = settings()->value("View/showDataText").value<bool>();
-    if (!show)
-        text = QString();
-
-    this->setDataNameText(text);
-}
-
 void ViewWrapper2D::updateView()
 {
-    QString annotationTextForLowerLeftCorner;
-    if (mGroupData) //the view is a part of a viewgroup
-	{
-        this->updateItemsFromViewGroup(annotationTextForLowerLeftCorner);
-	}
+	if (!this->getView())
+		return;
+	this->updateItemsFromViewGroup();
 
-    //UPDATE VIEWS DATA LIST ANNOTATION
-    this->updateDataNameText(annotationTextForLowerLeftCorner);
+	this->ViewWrapper::updateView();
 
     //UPDATE ORIENTATION ANNOTATION
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 
     //UPDATE DATA METRIC ANNOTATION
 	mDataRepContainer->updateSettings();
+
+	if (mToolRep2D)
+	{
+		bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
+		bool useCrosshair = settings()->value("View/toolCrosshair", true).toBool();
+		mToolRep2D->setUseCrosshair(!isOblique && useCrosshair);
+	}
+
+	this->applyViewFollower();
 }
 
-
-//DELETE - NOT USED...
-//void ViewWrapper2D::imageRemoved(const QString& uid)
-//{
-//    CX_LOG_DEBUG() << "imageRemoved uid: " << uid;
-//	updateView();
-//}
+DoubleBoundingBox3D ViewWrapper2D::getViewport_s() const
+{
+	DoubleBoundingBox3D BB_vp = getViewport();
+	Transform3D vpMs = mView->get_vpMs();
+	DoubleBoundingBox3D BB_s = transform(vpMs.inv(), BB_vp);
+	return BB_s;
+}
 
 void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 {
@@ -530,7 +539,6 @@ void ViewWrapper2D::dataViewPropertiesChangedSlot(QString uid)
 		this->dataAdded(data);
 	else
 		this->dataRemoved(uid);
-
 }
 
 void ViewWrapper2D::dataAdded(DataPtr data)
@@ -606,6 +614,7 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 	val += delta / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
 	double newZoom = pow(10.0, val);
 
+	CX_LOG_CHANNEL_DEBUG("CA") << "mouse zoom " << newZoom;
 	mZoom2D->setFactor(newZoom);
 
 	Navigation(mServices).centerToTooltip(); // side effect: center on tool
@@ -680,9 +689,10 @@ void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 	mSlicePlanes3DMarker->setProxy(plane, proxy);
 
-	DoubleBoundingBox3D BB_vp = getViewport();
-	Transform3D vpMs = mView->get_vpMs();
-	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+//	DoubleBoundingBox3D BB_vp = getViewport();
+//	Transform3D vpMs = mView->get_vpMs();
+//	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+	mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, this->getViewport_s());
 
 	mView->addRep(mSlicePlanes3DMarker);
 }

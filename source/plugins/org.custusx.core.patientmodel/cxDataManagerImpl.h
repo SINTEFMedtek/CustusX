@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataManager.h"
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
+#include "cxPatientModelService.h"
 
 class QDomElement;
 
@@ -94,6 +95,8 @@ public:
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const;
 	virtual void setCenter(const Vector3D& center);
+    void setOperatingTable(const OperatingTable &ot);
+    OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
 	virtual void setLandmarkNames(std::vector<QString> names);
@@ -125,6 +128,7 @@ protected:
 	std::map<QString, VideoSourcePtr> mStreams;
 	DataMap mData;
 	Vector3D mCenter;
+    OperatingTable mOperatingTable;
 	CLINICAL_VIEW mClinicalApplication;
 	void deleteFiles(DataPtr data, QString basePath);
 

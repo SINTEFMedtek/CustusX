@@ -99,13 +99,14 @@ public:
 	virtual ViewPtr getView() = 0;
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
-	virtual void updateView() = 0;
+	virtual void updateView();
 
 signals:
 	void orientationChanged(ORIENTATION_TYPE type);
 
 protected slots:
 	void contextMenuSlot(const QPoint& point);
+	void settingsChangedSlot(QString key);
 
 	virtual void dataViewPropertiesChangedSlot(QString uid) = 0;
 	virtual void videoSourceChangedSlot(QString uid) {}
@@ -114,6 +115,8 @@ protected:
 	ViewWrapper(VisServicesPtr backend);
 
 	void connectContextMenu(ViewPtr view);
+	virtual QString getDataDescription() = 0;
+	virtual QString getViewDescription() = 0;
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
 
@@ -122,7 +125,10 @@ protected:
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 
-
+	virtual void addReps();
+private:
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
 };
 
 /**

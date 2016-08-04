@@ -70,8 +70,8 @@ public:
 
 	CyclicActionLoggerPtr getRenderTimer() { return mCyclicLogger; }
 
-public slots:
-	void requestPreRenderSignal();
+//public slots:
+//	void requestPreRenderSignal();
 
 signals:
 	void preRender();
@@ -97,7 +97,7 @@ private:
 	CyclicActionLoggerPtr mCyclicLogger;
 
 	bool mSmartRender;
-	bool mPreRenderSignalRequested;
+//	bool mPreRenderSignalRequested;
 	int mBaseRenderInterval;
 	bool mLogging;
 

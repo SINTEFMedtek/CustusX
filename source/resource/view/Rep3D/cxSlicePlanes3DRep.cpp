@@ -57,6 +57,7 @@ SlicePlanesProxy::SlicePlanesProxy()
 	QColor color1 = QColor::fromRgbF(0, 1, 1);
 	QColor color2 = QColor::fromRgbF(0, 0.6, 1);
 	QColor color3 = QColor::fromRgbF(0.5, 0.5, 1);
+    QColor color4 = QColor::fromRgbF(0.75, 0.75, 1);
 
 	mProperties.mColor[ptAXIAL] = color1;
 	mProperties.mSymbol[ptAXIAL] = "A";
@@ -75,6 +76,9 @@ SlicePlanesProxy::SlicePlanesProxy()
 
 	mProperties.mColor[ptRADIALPLANE] = color3;
 	mProperties.mSymbol[ptRADIALPLANE] = "X";
+
+    mProperties.mColor[ptTOOLSIDEPLANE] = color4;
+    mProperties.mSymbol[ptTOOLSIDEPLANE] = "T";
 
 	mProperties.m2DFontSize = 20;
 	mProperties.m3DFontSize = 28;
@@ -143,7 +147,7 @@ void SlicePlanesProxy::setViewportData(PLANE_TYPE type, SliceProxyPtr slice, con
 void SlicePlanesProxy::addSimpleSlicePlane(PLANE_TYPE type, PatientModelServicePtr dataManager)
 {
 	SliceProxyPtr slice = SliceProxy::create(dataManager);
-	slice->initializeFromPlane(type, false, Vector3D(0, 0, 1), true, 1, 0.25);
+	slice->initializeFromPlane(type, false, true, 1, 0.25);
 
 	this->setViewportData(type, slice, DoubleBoundingBox3D(0, 1, 0, 1, 0, 1));
 }

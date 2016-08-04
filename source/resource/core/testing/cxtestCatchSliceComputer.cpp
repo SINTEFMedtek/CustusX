@@ -182,4 +182,56 @@ TEST_CASE("SliceComputer handles anyplanes using follow tool", "[unit][resource]
 	CHECK(cx::similar(slicer.getPlane(), radialPlaneG));
 }
 
+/** ToolSidePlane where the plane should always be oriented with the gravity/up vector.
+ *  anyplanes with no gravity, tool in standard position with
+ *  tip down and from towards nose
+ */
+TEST_CASE("SliceComputer handles TOOLSIDE plane using follow tool", "[unit][resource][core]")
+{
+    cx::SliceComputer slicer;
+    slicer.setOrientationType(cx::otOBLIQUE);
+    slicer.setFollowType(cx::ftFOLLOW_TOOL);
+    slicer.setGravity(true, cx::Vector3D(0, 1, 0)); //Following the definition of the operating table
+    slicer.setPlaneType(cx::ptTOOLSIDEPLANE);
+    cx::Vector3D c_tool(5, 40, -50);
+    cx::Vector3D center(44, 55, 66);    
+    slicer.setFixedCenter(center);
+    cx::Transform3D T = cx::createTransformTranslate(c_tool);
 
+    cx::SlicePlane toolSidePlane(c_tool, cx::Vector3D( 0, 0, -1), cx::Vector3D( 0, -1, 0));
+
+    //Case 1: The tool is parallel with the table, the patient lies on his back and the tool is behind the head pointing towards the feet.
+    cx::Transform3D R = cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    cx::Transform3D rMt = T*R;
+    slicer.setToolPosition(rMt);
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    std::cout << "TOOLSIDE slicerplan, Case 1 \n" << slicer.getPlane();
+
+    //Case 2: The tool is parallel to the table with the tip pointing towards the feet
+    //        and rotated 45 degrees towards the left side of the patient
+    R = cx::createTransformRotateZ(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    rMt = T*R;
+    slicer.setToolPosition(rMt);
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0, -1))); // tip towards feet
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 1, 0)), cx::Vector3D(0.707107, 0.707107, 0))); // left of the probe left and down
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    std::cout << "TOOLSIDE slicerplan, Case 2 \n" << slicer.getPlane();
+
+    //Case 3: The tool is pointing down along the gravity with the front of the tool towards the feet
+    R = cx::createTransformRotateX(M_PI_2) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+    rMt = T*R;
+    slicer.setToolPosition(rMt);
+    CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 1, 0))); // tip along gravity
+    CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+    std::cout << "TOOLSIDE slicerplan, Case 3 \n" << slicer.getPlane();
+
+	//Case 4: The tool is pointing down 45 degrees towards the nose and rotated 45 degrees to the left.
+	//        The plane is still attached fully to the tool side plane.
+	cx::SlicePlane singularityTestPlane(c_tool, cx::Vector3D(0.281085, 0, -0.959683), cx::Vector3D(0, -1, 0));
+	R = cx::createTransformRotateX(M_PI_4) * cx::createTransformRotateZ(M_PI_4) * cx::createTransformRotateY(M_PI) * cx::createTransformRotateZ(M_PI_2);
+	rMt = T*R;
+	slicer.setToolPosition(rMt);
+	CHECK(cx::similar(rMt.vector(cx::Vector3D(0, 0, 1)), cx::Vector3D(0, 0.707107, -0.707107))); // tip down and towards the feet
+	CHECK(cx::similar(slicer.getPlane(), toolSidePlane));
+	std::cout << "TOOLSIDE slicerplan, Case 4 \n" << slicer.getPlane();
+}

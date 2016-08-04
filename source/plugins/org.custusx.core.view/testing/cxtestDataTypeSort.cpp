@@ -93,7 +93,7 @@ TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][vi
 	for (unsigned i=0; i<unsorted2.size(); ++i)
 		nullBackend->patient()->insertData(unsorted2[i]);
 
-	cx::ViewGroupData vgData(nullBackend);
+	cx::ViewGroupData vgData(nullBackend, "0");
 	for (unsigned i=0; i<unsorted2.size(); ++i)
 		vgData.addDataSorted(unsorted2[i]->getUid());
 	std::vector<cx::DataPtr> sorted2 = vgData.getData();

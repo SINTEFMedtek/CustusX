@@ -93,9 +93,14 @@ public:
 signals:
 	void pointSampled(Vector3D p_r);
 
+protected:
+	virtual QString getDataDescription();
+	virtual QString getViewDescription();
+
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void videoSourcesChangedSlot();
+	virtual void settingsChangedSlot(QString key);
 
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -104,7 +109,6 @@ private slots:
 	void mousePressSlot(int x, int y, Qt::MouseButtons buttons);
 	void mouseMoveSlot(int x, int y, Qt::MouseButtons buttons);
 	void mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
-	void settingsChangedSlot(QString key);
 	void optionChangedSlot();
 
 protected slots:
@@ -127,10 +131,7 @@ private:
 	virtual void dataRemoved(const QString& uid);
 
     void recreateMultiSlicer();
-    void updateItemsFromViewGroup(QString &text);
-
-    void setDataNameText(QString &text);
-    void updateDataNameText(QString &text);
+	void updateItemsFromViewGroup();
 
     void createAndAddSliceRep();
     void removeAndResetSliceRep();
@@ -153,12 +154,9 @@ private:
 	SliceRepSWPtr mSliceRep;
 	ToolRep2DPtr mToolRep2D;
 	OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
-	DisplayTextRepPtr mPlaneTypeText;
-	DisplayTextRepPtr mDataNameText;
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
 	ViewPtr mView;
 	ViewFollowerPtr mViewFollower;
-
 
 	// synchronized data
 	Zoom2DHandlerPtr mZoom2D;
@@ -166,6 +164,10 @@ private:
 	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
+	//	void sendROItoFollower();
+	void changeZoom(double delta);
+	void applyViewFollower();
+	DoubleBoundingBox3D getViewport_s() const;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

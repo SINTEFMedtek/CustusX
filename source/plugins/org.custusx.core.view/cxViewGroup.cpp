@@ -64,16 +64,23 @@ namespace cx
 {
 
 
-ViewGroup::ViewGroup(CoreServicesPtr backend)
+ViewGroup::ViewGroup(CoreServicesPtr backend, QString uid)
 {
 	mBackend = backend;
-	mCameraStyle.reset(new CameraStyle(mBackend));
+	mViewGroupData.reset(new ViewGroupData(backend, uid));
+	mCameraStyle.reset(new CameraStyle(mBackend, mViewGroupData));
 
-	mViewGroupData.reset(new ViewGroupData(backend));
+	connect(mViewGroupData.get(), &ViewGroupData::optionsChanged, this, &ViewGroup::optionChangedSlot);
+	this->optionChangedSlot();
 }
 
 ViewGroup::~ViewGroup()
 {
+}
+
+void ViewGroup::optionChangedSlot()
+{
+	mCameraStyle->setCameraStyle(mViewGroupData->getOptions().mCameraStyle);
 }
 
 /**Add one view wrapper and setup the necessary connections.

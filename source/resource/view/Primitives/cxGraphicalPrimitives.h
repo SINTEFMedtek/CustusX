@@ -116,11 +116,6 @@ private:
 typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
 
 
-/**
- * \addtogroup cx_resource_view
- * @{
- */
-
 /** \brief Helper for rendering a a glyph in 3D
  */
 class cxResourceVisualization_EXPORT GraphicalGlyph3DData : public GraphicalGeometricBase
@@ -139,10 +134,6 @@ private:
     vtkGlyph3DMapperPtr mMapper;
 };
 typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
-
-
-
-
 
 
 /** \brief Helper for rendering a point in 3D

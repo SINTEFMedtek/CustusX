@@ -92,6 +92,9 @@ public:
 	virtual void setCenter(const Vector3D& center);
 	virtual Vector3D getCenter() const;
 
+    virtual void setOperatingTable(const OperatingTable& ot);
+    virtual OperatingTable getOperatingTable() const;
+
 	virtual QString addLandmark();
 
 	virtual void autoSave();

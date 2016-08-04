@@ -119,7 +119,8 @@ public:
 private:
 	mutable QString mUid;
 	mutable QString mType;
-//	mutable std::vector<TreeNodeWeakPtr> mVisibleChildren;
+	mutable std::vector<TreeNodeWeakPtr> mVisibleChildren;
+	mutable bool mVisibleChildrenSet;
 	mutable TreeNodeWeakPtr mVisibleParent;
 	void clearCache();
 

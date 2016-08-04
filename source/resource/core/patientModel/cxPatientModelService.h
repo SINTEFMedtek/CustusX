@@ -63,6 +63,27 @@ typedef boost::shared_ptr<class Landmarks> LandmarksPtr;
 typedef boost::shared_ptr<class TransferFunctions3DPresets> PresetTransferFunctions3DPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
+/**
+ * @brief The OperatingTable class
+ *
+ * The OT class holds a transform and is a coordinate system fixed relative to the OR.
+ * Can be used to find up and down vectors.
+ * Definition is like Dicom given that the patient lies on the back on the table, LPS.
+ */
+struct cxResource_EXPORT OperatingTable
+{
+    explicit OperatingTable()
+        : rMtb(Transform3D::Identity())
+    {}
+    explicit OperatingTable(Transform3D tr)
+        : rMtb(tr)
+    {}
+    Transform3D rMtb; ///< Transform from OT to reference space.
+
+	Vector3D getVectorUp() const {return rMtb.vector(Vector3D(0,-1,0));}
+};
+
+
 /** \brief The virtual patient
  *
  * PatientModelService provides access to the Patient Specific Model (PaSM).
@@ -143,6 +164,9 @@ public:
 	virtual void setCenter(const Vector3D& center) = 0;
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 
+    virtual void setOperatingTable(const OperatingTable& ot) = 0;
+    virtual OperatingTable getOperatingTable() const = 0;
+
 	virtual CLINICAL_VIEW getClinicalApplication() const = 0;
 	virtual void setClinicalApplication(CLINICAL_VIEW application) = 0;
 
@@ -154,6 +178,7 @@ public:
 	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getData()
 
 signals:
+    void operatingTableChanged();
 	void centerChanged(); ///< emitted when center is changed.
 	void dataAddedOrRemoved();
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
