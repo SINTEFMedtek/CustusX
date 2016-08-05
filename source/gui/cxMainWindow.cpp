@@ -85,7 +85,7 @@ MainWindow::MainWindow() :
 	mDockWidgets(new DynamicMainWindowWidgets(this)),
 	mActions(NULL)
 {
-	this->setObjectName("MainWindow");
+	this->setObjectName("main_window");
 
 	mServices = VisServices::create(logicManager()->getPluginContext());
 	mLayoutInteractor.reset(new LayoutInteractor());
