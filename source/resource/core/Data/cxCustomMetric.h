@@ -74,9 +74,16 @@ public:
     void setSTLFile(QString val);
     QString getSTLFile() const;
 
+	void setScaleToP1(bool val);
+	bool getScaleToP1() const;
+	void setOffsetFromP0(double val);
+	double getOffsetFromP0() const;
+
+
     Vector3D getPosition() const;
     Vector3D getDirection() const;
     Vector3D getVectorUp() const;
+	Vector3D getScale(DoubleBoundingBox3D bounds) const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -113,6 +120,11 @@ private:
     QString mDefineVectorUpMethod;
     QString mSTLFile;
     DefineVectorUpMethods mDefineVectorUpMethods;
+	bool mScaleToP1;
+	double mOffsetFromP0;
+
+//	SpaceListenerPtr mToolListener;
+
 
 public:
     CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
+#include <vtkLightCollection.h>
+#include <vtkLight.h>
 
 #include "cxTrackingService.h"
 #include "cxToolRep3D.h"
@@ -52,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxRegionOfInterestMetric.h"
 #include "cxNavigationAlgorithms.h"
+#include "cxDoubleRange.h"
 
 namespace cx
 {
@@ -225,22 +228,34 @@ void CameraStyleForView::applyCameraStyle()
 																					proj_vup,
 																					proj_vpn,
 																					proj_bb);
+			camera_r_t = this->smoothZoomedCameraPosition(camera_r_t);
 			camera_r_t = M_proj.inv().coord(camera_r_t);
-
-			// calculate BB in R space - did lead to large unnatural BBs.
-//			Vector3D camera_r_t = NavigationAlgorithms::findCameraPosByZoomingToROI(viewAngle_vertical,
-//																					viewAngle_horizontal,
-//																					focus_r,
-//																					vup_r,
-//																					vpn,
-//																					roi_r.getBox());
-
 			camera_r = camera_r_t;
 		}
 	}
 
+	if (mStyle.mCameraOnTooltip && mFollowingTool)
+	{
+		// Move the camera onto the tool tip, keeping the distance vector constant.
+		// This gives the effect of _sitting on the tool tip_ while moving.
+		// Alternative: Dont change focal point, change view angle instead.
+
+		Transform3D rMpr = mBackend->patient()->get_rMpr();
+		Transform3D prMt = mFollowingTool->get_prMt();
+		Transform3D rMt = rMpr * prMt;
+		double offset = mFollowingTool->getTooltipOffset();
+		Vector3D tool_r = rMt.coord(Vector3D(0, 0, offset));
+
+		Vector3D delta = tool_r - camera_r;
+
+		camera_r += delta;
+		focus_r += delta;
+	}
+
 	if (similar(pos_old, camera_r, 0.1) && similar(focus_old, focus_r, 0.1) && similar(vup_old, vup_r,0.1 ))
 		return; // break update loop: this event is triggered by camera change.
+
+//	this->handleLights();
 
 	mBlockCameraUpdate = true;
 	camera->SetPosition(camera_r.begin());
@@ -249,7 +264,42 @@ void CameraStyleForView::applyCameraStyle()
 	camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 10));
 	if (mStyle.mCameraFollowTool && mFollowingTool)
 		camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 1.5));
+//	CX_LOG_CHANNEL_DEBUG("CA") << (camera_r-focus_r).length() <<  " |||  camera_r " << camera_r << ", focus_r " << focus_r;
 	mBlockCameraUpdate = false;
+}
+
+void CameraStyleForView::handleLights()
+{
+	vtkRendererPtr renderer = this->getRenderer();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "#lights: " << renderer->GetLights()->GetNumberOfItems();
+	renderer->GetLights()->InitTraversal();
+	vtkLight* light = renderer->GetLights()->GetNextItem();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "light ";
+//	light->PrintSelf(std::cout, vtkIndent(2));
+
+	// experiment: set a light to the left of the camera, pointing at focus
+	light->SetConeAngle(160);
+	light->SetLightTypeToCameraLight();
+	light->SetPosition(-0.5,0,1);
+}
+
+/**
+ * Remove jitter on the camera position: find the previous position, then stick to it
+ * until a threshold is exceeded.
+ */
+Vector3D CameraStyleForView::smoothZoomedCameraPosition(Vector3D pos)
+{
+	Vector3D filteredPos = pos;
+	filteredPos[2] = mZoomJitterFilter.newValue(pos[2]);
+//	if (similar(pos[2], filteredPos[2]))
+//	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "---CHANGED " << filteredPos[2];
+//	}
+//	else
+//	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "---filtered " << pos[2] << ", --> " << filteredPos[2];
+//	}
+	return filteredPos;
 }
 
 RegionOfInterest CameraStyleForView::getROI(QString uid)
@@ -352,6 +402,34 @@ void CameraStyleForView::setInteractor(vtkSmartPointer<vtkInteractorStyle> style
 CameraStyleData CameraStyleForView::getCameraStyle()
 {
 	return mStyle;
+}
+
+JitterFilter::JitterFilter()
+{
+	currentValue = 0;
+	range = DoubleRange(0,0,0.1);
+}
+
+double JitterFilter::newValue(double value)
+{
+	// If outside range:
+	// reset interval and return value.
+	if (( value<=range.min() )||( value>=range.max() ))
+	{
+		double minimumInterval = 5.0;
+		double interval = std::min(minimumInterval, value/20);
+		double level = 0;
+
+		if (value<range.min())
+			level = value + interval/2;
+		else if (value>range.max())
+			level = value - interval/2;
+
+		range = DoubleRange(level-interval/2, level+interval/2, interval/10);
+
+		currentValue = value;
+	}
+	return currentValue;
 }
 
 }//namespace cx

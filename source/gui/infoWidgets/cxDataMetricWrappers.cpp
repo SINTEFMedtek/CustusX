@@ -716,6 +716,11 @@ QWidget* CustomMetricWrapper::createWidget()
     mSTLFile = this->createSTLFileSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mSTLFile));
 
+	mOffsetFromP0 = this->createOffsetFromP0();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
+	mScaleToP1 = this->createScaletoP1();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1));
+
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
@@ -767,7 +772,30 @@ void CustomMetricWrapper::guiChanged()
     mInternalUpdate = true;
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
     mData->setSTLFile(mSTLFile->getValue());
-    mInternalUpdate = false;
+	mData->setOffsetFromP0(mOffsetFromP0->getValue());
+	mData->setScaleToP1(mScaleToP1->getValue());
+
+	mInternalUpdate = false;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createScaletoP1() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Scale to P1", "",
+										  "Scale model so that it fits between P0 and P1",
+										  mData->getScaleToP1());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Offset from P1", "",
+											"Position model an offset from P0 towards P1",
+											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
 }
 
 StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const

@@ -262,13 +262,16 @@ private slots:
 private:
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
   FilePathPropertyPtr createSTLFileSelector() const;
+  DoublePropertyPtr createOffsetFromP0() const;
+  BoolPropertyPtr createScaletoP1() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
+  BoolPropertyPtr mScaleToP1;
+  DoublePropertyPtr mOffsetFromP0;
   FilePathPropertyPtr mSTLFile;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
-
 };
 
 class cxGui_EXPORT SphereMetricWrapper : public MetricBase

@@ -103,6 +103,7 @@ void ViewGroupPropertiesWidget::updateFrontend()
 
 	mCameraFollowTool->setValue(data.mCameraFollowTool);
 	mFocusFollowTool->setValue(data.mFocusFollowTool);
+	mCameraOnTooltip->setValue(data.mCameraOnTooltip);
 	mTableLock->setValue(data.mTableLock);
 	mUniCam->setValue(data.mUniCam);
 	mElevation->setValue(data.mElevation);
@@ -125,7 +126,8 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 	mCameraStyleProperties.push_back(mFocusROI);
 
 	mCameraFollowTool = BoolProperty::initialize("Camera Follow Tool", "",
-												 "Camera position is fixed to the tool and moving along with it.",
+												 "Camera position is fixed to the tool and moving along with it.\n"
+												 "Zooming causes the position to slide along the tool axis",
 												 true);
 	mCameraStyleProperties.push_back(mCameraFollowTool);
 
@@ -133,6 +135,11 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 												"Scene focus is fixed to the tool and moving along with it.",
 												true);
 	mCameraStyleProperties.push_back(mFocusFollowTool);
+
+	mCameraOnTooltip = BoolProperty::initialize("Camera on Tooltip", "",
+												"Camera position is located exactly on the tool tip",
+												true);
+	mCameraStyleProperties.push_back(mCameraOnTooltip);
 
 	mTableLock = BoolProperty::initialize("Table lock", "",
 										  "Table is always set down in the scene.",
@@ -198,6 +205,7 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 
 	data.mCameraFollowTool = mCameraFollowTool->getValue();
 	data.mFocusFollowTool = mFocusFollowTool->getValue();
+	data.mCameraOnTooltip = mCameraOnTooltip->getValue();
 	data.mTableLock = mTableLock->getValue();
 	data.mUniCam = mUniCam->getValue();
 	data.mElevation = mElevation->getValue();

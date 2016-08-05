@@ -122,7 +122,7 @@ namespace cx
 ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr services):
 	ViewWrapper(services)
 {
-	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
+	view->getRenderer()->GetActiveCamera()->SetClippingRange(0.1, 2000);
 	if (!view->getRenderWindow()->GetStereoCapableWindow())
 		view->getRenderWindow()->StereoCapableWindowOn(); // Just set all 3D views 3D capable
 

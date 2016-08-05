@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSTLReader.h"
 #include <vtkPolyDataNormals.h>
 #include "cxLogger.h"
+#include "cxBoundingBox3D.h"
 
 
 namespace cx
@@ -85,50 +86,85 @@ void CustomMetricRep::onModifiedStartRender()
 	this->drawText();
 }
 
+void CustomMetricRep::reloadSTLModel()
+{
+	if (mSTLModel && !this->filenameHasChanged())
+		return;
+
+	mSTLModel.reset();
+
+	CustomMetricPtr custom = this->getCustomMetric();
+
+	if (!this->getView() || !custom)
+	   return;
+
+	QString filename = custom->getSTLFile();
+
+	if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
+	{
+		reportWarning("File not found: " + filename + ", failed to update the STL model.");
+		return;
+	}
+
+	mSTLModel.reset(new GraphicalObjectWithDirection());
+	mSTLModel->setRenderer(this->getRenderer());
+
+	vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
+	STLReader->SetFileName(cstring_cast(filename));
+	mLoadedFilename = filename;
+
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	normals->SetInputConnection(STLReader->GetOutputPort());
+	normals->Update();
+
+	vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
+	polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
+	polyDataMapper->Update();
+
+	vtkActorPtr actor = mSTLModel->getActor();
+	actor->SetMapper(polyDataMapper);
+}
+
+bool CustomMetricRep::filenameHasChanged()
+{
+	CustomMetricPtr custom = this->getCustomMetric();
+	if (!custom)
+		return true;
+	return mLoadedFilename != custom->getSTLFile();
+}
+
 void CustomMetricRep::updateSTLModel()
 {
-    if (!mMetric)
-        return;
+	this->reloadSTLModel();
 
-    CustomMetricPtr custom = this->getCustomMetric();
+	if(!mSTLModel)
+		return;
 
-    if (!mSTLModel && this->getView() && mMetric)
-    {
-        mSTLModel.reset(new GraphicalObjectWithDirection());
-        mSTLModel->setRenderer(this->getRenderer());
-    }
+	CustomMetricPtr custom = this->getCustomMetric();
 
-    if(!mSTLModel)
-        return;
+	vtkActorPtr actor = mSTLModel->getActor();
+	vtkPropertyPtr property = actor->GetProperty();
+	property->SetColor(this->getColorAsVector3D().begin());
+	property->SetSpecularPower(15);
+	property->SetSpecular(0.3);
 
-    QString filename = custom.get()->getSTLFile();
+	property->SetAmbient( 0.3 );
+	property->SetDiffuse( 0.7 );
 
-    if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
-    {
-        reportWarning("File not found: " + filename + ", failed to update the STL model.");
-        return;
-    }
-
-    vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
-    STLReader->SetFileName(cstring_cast(filename));
-
-    vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-    normals->SetInputConnection(STLReader->GetOutputPort());
-    normals->Update();
-
-    vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
-    polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
-    polyDataMapper->Update();
-
-    vtkActorPtr actor = mSTLModel->getActor();
-    actor->SetMapper(polyDataMapper);
-    actor->GetProperty()->SetColor(0.5, 1, 1);
-    actor->GetProperty()->SetSpecularPower(15);
-    actor->GetProperty()->SetSpecular(0.3);
+//	actor->GetProperty()->SetRepresentationToWireframe();
+	property->SetEdgeVisibility(true);
+	Vector3D color = this->getColorAsVector3D();
+//	for (int i=0; i<3; ++i)
+//		color[i] = 1.0 - (1.0-color[i])*0.75;
+	property->SetEdgeColor(color.begin());
 
     mSTLModel->setPosition(custom->getPosition());
     mSTLModel->setDirection(custom->getDirection());
     mSTLModel->setVectorUp(custom->getVectorUp());
+
+	vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
+	DoubleBoundingBox3D bounds(polyDataMapper->GetInput()->GetBounds());
+	mSTLModel->setScale(custom->getScale(bounds));
 }
 
 }

@@ -73,6 +73,9 @@ private:
     void updateSTLModel();
 
     GraphicalObjectWithDirectionPtr mSTLModel;
+	QString mLoadedFilename;
+	bool filenameHasChanged();
+	void reloadSTLModel();
 };
 
 }

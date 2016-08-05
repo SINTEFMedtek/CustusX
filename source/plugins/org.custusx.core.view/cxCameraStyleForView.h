@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxViewGroupData.h"
 #include "cxRegionOfInterestMetric.h"
+#include "cxDoubleRange.h"
 class QIcon;
 class QWidget;
 class QMenu;
@@ -59,6 +60,25 @@ using cx::Transform3D;
  * \addtogroup org_custusx_core_view
  * @{
  */
+
+/**
+ * Reduce jitter during zooming.
+ *
+ * Input a suggested zoom value, output the smoothed value.
+ *  - Maintain a interval where the value can move inside without
+ *    changing the smoothed value.
+ *  - If the value moves outside interval, the interval will move
+ *    along, and the smoothed value will be set to the input value.
+ */
+class JitterFilter
+{
+public:
+	JitterFilter();
+	double newValue(double value);
+private:
+	DoubleRange range;
+	double currentValue;
+};
 
 /**
  * \class CameraStyleForView
@@ -110,6 +130,11 @@ private:
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
 
+//	Vector3D mPreviousZoomCameraPos;
+	JitterFilter mZoomJitterFilter;
+
+	Vector3D smoothZoomedCameraPosition(Vector3D pos);
+	void handleLights();
 };
 
 /**

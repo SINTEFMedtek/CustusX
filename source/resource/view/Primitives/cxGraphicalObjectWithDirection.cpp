@@ -47,7 +47,8 @@ GraphicalObjectWithDirection::GraphicalObjectWithDirection(vtkRendererPtr render
     mPoint = Vector3D(0,0,0);
     mDirection = Vector3D(0,1,0);
     mVectorUp = Vector3D(1,0,0);
-    mSource = vtkSuperquadricSourcePtr::New();
+	mScale = Vector3D(1,1,1);
+	mSource = vtkSuperquadricSourcePtr::New();
 
     mMapper = vtkPolyDataMapperPtr::New();
     mMapper->SetInputConnection(mSource->GetOutputPort());
@@ -96,6 +97,12 @@ void GraphicalObjectWithDirection::setVectorUp(const Vector3D &up)
     this->updateOrientation();
 }
 
+void GraphicalObjectWithDirection::setScale(Vector3D scale)
+{
+	mScale = scale;
+	this->updateOrientation();
+}
+
 void GraphicalObjectWithDirection::setRenderer(vtkRendererPtr renderer)
 {
     if (mRenderer)
@@ -124,8 +131,9 @@ void GraphicalObjectWithDirection::updateOrientation()
             R = createTransformIJC(ivec, jvec, center);
     }
 
-    Transform3D T = createTransformTranslate(mPoint);
-    Transform3D M = T*R;
+	Transform3D S = createTransformScale(mScale);
+	Transform3D T = createTransformTranslate(mPoint);
+	Transform3D M = T*R*S;
     mActor->SetUserMatrix(M.getVtkMatrix());
 }
 

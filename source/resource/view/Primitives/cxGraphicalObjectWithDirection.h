@@ -61,7 +61,8 @@ public:
     void setPosition(Vector3D point);
     void setDirection(Vector3D direction);
     void setVectorUp(const Vector3D &up);
-    void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+	void setScale(Vector3D scale);
+	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 
 protected:
     void updateOrientation();
@@ -74,6 +75,7 @@ protected:
     Vector3D mPoint;
     Vector3D mDirection;
     Vector3D mVectorUp;
+	Vector3D mScale;
 };
 typedef boost::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
 
