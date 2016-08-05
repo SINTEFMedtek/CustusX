@@ -61,7 +61,7 @@ namespace cx
 /// -------------------------------------------------------
 
 ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-  BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
+  BaseWidget(parent, "active_volume_widget", "Active Volume")
 {
 	this->setToolTip("The currently selected active volume");
   QVBoxLayout* layout = new QVBoxLayout(this);
