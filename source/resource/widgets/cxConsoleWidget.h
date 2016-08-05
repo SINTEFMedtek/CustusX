@@ -123,7 +123,7 @@ class cxResourceWidgets_EXPORT ConsoleWidget: public BaseWidget
 Q_OBJECT
 
 public:
-	ConsoleWidget(QWidget* parent, QString uid="ConsoleWidget", QString name="Console");
+	ConsoleWidget(QWidget* parent, QString uid="console_widget", QString name="Console");
 	ConsoleWidget(QWidget* parent, QString uid, QString name, XmlOptionFile options, LogPtr log);
 	~ConsoleWidget();
 

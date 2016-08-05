@@ -54,7 +54,7 @@ namespace cx
 {
 
 PlaybackWidget::PlaybackWidget(QWidget* parent) :
-				BaseWidget(parent, "PlaybackWidget", "Playback")
+				BaseWidget(parent, "playback_widget", "Playback")
 {
 	mOpen = false;
 	this->setToolTip("Replay current session");

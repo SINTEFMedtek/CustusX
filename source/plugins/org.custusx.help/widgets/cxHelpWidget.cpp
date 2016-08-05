@@ -54,7 +54,7 @@ namespace cx
 {
 
 HelpWidget::HelpWidget(HelpEnginePtr engine, QWidget* parent) :
-	BaseWidget(parent, "HelpWidget", "Help"),
+	BaseWidget(parent, "help_widget", "Help"),
 	mVerticalLayout(NULL),
 	mTabWidget(NULL),
 	mEngine(engine)

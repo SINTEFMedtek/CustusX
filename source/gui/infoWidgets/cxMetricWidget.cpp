@@ -69,7 +69,7 @@ namespace cx
 //---------------------------------------------------------
 
 MetricWidget::MetricWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent) :
-  BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
+  BaseWidget(parent, "metric_widget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
   mPatientModelService(patientModelService),

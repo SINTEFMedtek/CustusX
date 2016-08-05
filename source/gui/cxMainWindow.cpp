@@ -120,8 +120,8 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ActiveToolPropertiesWidget(mServices->tracking(), mServices->spaceProvider(), this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
-	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget", "Console"), "Utility");
-	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget2", "Extra Console"), "Utility");
+	this->addAsDockWidget(new ConsoleWidget(this, "console_widget", "Console"), "Utility");
+	this->addAsDockWidget(new ConsoleWidget(this, "console_widget_2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");

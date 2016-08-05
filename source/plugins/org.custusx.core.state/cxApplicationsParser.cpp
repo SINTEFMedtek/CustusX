@@ -77,12 +77,12 @@ ApplicationsParser::ApplicationsParser()
 	QStringList toolbars;
 	toolbars << standardToolbars << "Data" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("MeshInfoWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("VolumePropertiesWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("SlicePropertiesWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("DicomWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, false);
-	desktop.addPreset("HelpWidget", Qt::RightDockWidgetArea, false);
+	desktop.addPreset("mesh_info_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("volume_properties_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("slice_properties_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("dicom_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("console_widget", Qt::LeftDockWidgetArea, false);
+	desktop.addPreset("help_widget", Qt::RightDockWidgetArea, false);
 	mWorkflowDefaultDesktops["PatientDataUid"] = desktop;
 	//-----------------------------------------------------
 
@@ -91,9 +91,9 @@ ApplicationsParser::ApplicationsParser()
 	toolbars.clear();
 	toolbars << standardToolbars << "RegistrationHistory" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("console_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("org_custusx_registration_gui_widget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("RegistrationHistoryWidget", Qt::LeftDockWidgetArea, false);
+	desktop.addPreset("registration_history_widget", Qt::LeftDockWidgetArea, false);
 	mWorkflowDefaultDesktops["RegistrationUid"] = desktop;
 	//-----------------------------------------------------
 
@@ -102,10 +102,10 @@ ApplicationsParser::ApplicationsParser()
 	toolbars.clear();
 	toolbars << standardToolbars << "Camera3DViews" << "Sampler" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("MeshInfoWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("VolumePropertiesWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("SlicePropertiesWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, false);
+	desktop.addPreset("mesh_info_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("volume_properties_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("slice_properties_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("console_widget", Qt::LeftDockWidgetArea, false);
 	mWorkflowDefaultDesktops["PreOpPlanningUid"] = desktop;
 	//-----------------------------------------------------
 
@@ -122,8 +122,8 @@ ApplicationsParser::ApplicationsParser()
 	toolbars.clear();
 	toolbars << standardToolbars << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("IGTLinkWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("USReconstruction", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("igt_link_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("us_reconstruction", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("org_custusx_acquisition_widgets_acquisition", Qt::LeftDockWidgetArea, true);
 	mWorkflowDefaultDesktops["IntraOpImagingUid"] = desktop;
 	//-----------------------------------------------------
@@ -133,12 +133,12 @@ ApplicationsParser::ApplicationsParser()
 	toolbars.clear();
 	toolbars << standardToolbars << "Sampler" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("MeshInfoWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("VolumePropertiesWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("SlicePropertiesWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("MetricWidget", Qt::LeftDockWidgetArea, true);
-	desktop.addPreset("ConsoleWidget", Qt::LeftDockWidgetArea, false);
-	desktop.addPreset("PlaybackWidget", Qt::BottomDockWidgetArea, false);
+	desktop.addPreset("mesh_info_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("volume_properties_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("slice_properties_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("metric_widget", Qt::LeftDockWidgetArea, true);
+	desktop.addPreset("console_widget", Qt::LeftDockWidgetArea, false);
+	desktop.addPreset("playback_widget", Qt::BottomDockWidgetArea, false);
 	mWorkflowDefaultDesktops["PostOpControllUid"] = desktop;
 	//-----------------------------------------------------
 }

@@ -74,7 +74,7 @@ ActiveVolumeWidget::ActiveVolumeWidget(PatientModelServicePtr patientModelServic
 /// -------------------------------------------------------
 
 VolumePropertiesWidget::VolumePropertiesWidget(VisServicesPtr services, QWidget *parent) :
-		TabbedWidget(parent, "VolumePropertiesWidget", "Volume Properties")
+		TabbedWidget(parent, "volume_properties_widget", "Volume Properties")
 {
 	this->setToolTip("Volume properties");
 	this->insertWidgetAtTop(new ActiveVolumeWidget(services->patient(), services->view(), this));

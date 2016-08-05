@@ -142,8 +142,8 @@ bool HelpEngine::isBreakChar(QString text, int index) const
 
 QString HelpEngine::convertToKeyword(QString id) const
 {
-	// convert camel case strings into whitespace-separated lowercase strings:
-	// MyWidget -> my widget
+	// convert camel case strings into underscore-separated lowercase strings:
+	// MyWidget -> my_widget
 	// myFancy3DWidget2D -> my Fancy 3D Widget 2D -> my fancy 3d widget 2d
 	// myFancyDWidget -> my Fancy D Widget -> my fancy D widget
 	QString retval;

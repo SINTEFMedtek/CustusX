@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
-		TabbedWidget(parent, "MeshInfoWidget", "Mesh Properties")
+		TabbedWidget(parent, "mesh_info_widget", "Mesh Properties")
 {
 	this->setToolTip("Mesh properties");
 
