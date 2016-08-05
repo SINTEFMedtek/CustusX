@@ -43,7 +43,7 @@ namespace cx
 {
 
 FrameTreeWidget::FrameTreeWidget(PatientModelServicePtr patientService, QWidget* parent) :
-  BaseWidget(parent, "FrameTreeWidget", "Frame Tree"),
+  BaseWidget(parent, "frame_tree_widget", "Frame Tree"),
   mPatientService(patientService)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);

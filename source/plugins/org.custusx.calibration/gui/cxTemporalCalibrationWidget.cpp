@@ -64,7 +64,7 @@ typedef unsigned char uchar;
 
 
 TemporalCalibrationWidget::TemporalCalibrationWidget(VisServicesPtr services, AcquisitionServicePtr acquisitionService, QWidget* parent) :
-	BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
+	BaseWidget(parent, "temporal_calibration_widget", "Temporal Calibration"),
 	mInfoLabel(new QLabel(""))
 {
 	mServices = services;

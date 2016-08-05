@@ -82,7 +82,7 @@ QString AirwaysFilter::getName() const
 
 QString AirwaysFilter::getType() const
 {
-	return "AirwaysFilter";
+	return "airways_filter";
 }
 
 QString AirwaysFilter::getHelp() const

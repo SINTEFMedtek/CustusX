@@ -55,7 +55,7 @@ namespace cx
 
 //------------------------------------------------------------------------------
 LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent) :
-    BaseWidget(parent, "LapFrameToolCalibrationWidget", "LapFrame Calibrate"),
+	BaseWidget(parent, "lap_frame_tool_calibration_widget", "LapFrame Calibrate"),
 	mServices(services),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),

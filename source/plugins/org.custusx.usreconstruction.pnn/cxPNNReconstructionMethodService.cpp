@@ -53,7 +53,7 @@ PNNReconstructionMethodService::~PNNReconstructionMethodService()
 
 QString PNNReconstructionMethodService::getName() const
 {
-	return "PNN";
+	return "pnn";
 }
 
 std::vector<PropertyPtr> PNNReconstructionMethodService::getSettings(QDomElement root)

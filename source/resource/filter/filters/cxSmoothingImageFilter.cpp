@@ -63,7 +63,7 @@ QString SmoothingImageFilter::getName() const
 
 QString SmoothingImageFilter::getType() const
 {
-	return "SmoothingImageFilter";
+	return "smoothing_image_filter";
 }
 
 QString SmoothingImageFilter::getHelp() const

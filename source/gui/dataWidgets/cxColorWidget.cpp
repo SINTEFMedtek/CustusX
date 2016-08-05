@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 ColorWidget::ColorWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
-		BaseWidget(parent, "ColorWidget", "Color")
+		BaseWidget(parent, "color_widget", "Color")
 {
 	this->setToolTip("Set 2D image properties");
 	QVBoxLayout* layout = new QVBoxLayout(this);

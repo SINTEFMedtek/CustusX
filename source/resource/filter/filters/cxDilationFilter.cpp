@@ -65,7 +65,7 @@ QString DilationFilter::getName() const
 
 QString DilationFilter::getType() const
 {
-	return "DilationFilter";
+	return "dilation_filter";
 }
 
 QString DilationFilter::getHelp() const

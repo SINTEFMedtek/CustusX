@@ -60,7 +60,7 @@ QString BinaryThinningImageFilter3DFilter::getName() const
 
 QString BinaryThinningImageFilter3DFilter::getType() const
 {
-	return "BinaryThinningImageFilter3DFilter";
+	return "binary_thinning_image_filter_3d_filter";
 }
 
 QString BinaryThinningImageFilter3DFilter::getHelp() const
