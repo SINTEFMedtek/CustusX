@@ -68,7 +68,7 @@ QString ContourFilter::getName() const
 
 QString ContourFilter::getType() const
 {
-	return "ContourFilter";
+	return "contour_filter";
 }
 
 QString ContourFilter::getHelp() const

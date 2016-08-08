@@ -86,7 +86,7 @@ void ImageRenderPropertiesWidget::imageChanged(ImagePtr image)
 //---------------------------------------------------------
 
 ShadingWidget::ShadingWidget(ActiveDataPtr activeData, QWidget* parent,  bool connectToActiveImage) :
-	BaseWidget(parent, "ShadingWidget", "Shading"),
+	BaseWidget(parent, "shading_widget", "Shading"),
 	mLayout(new QVBoxLayout(this)),
 	mActiveData(activeData),
 	mActiveImageProxy(ActiveImageProxyPtr()),

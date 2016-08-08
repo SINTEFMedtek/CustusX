@@ -48,7 +48,7 @@ namespace cx
 {
 
 SamplerWidget::SamplerWidget(QWidget* parent) :
-  BaseWidget(parent, "SamplerWidget", "Point Sampler")
+  BaseWidget(parent, "sampler_widget", "Point Sampler")
 {
 	this->setToolTip("Display current tool tip position");
 	mListener = spaceProvider()->createListener();

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) : BaseWidget(parent, "ProbeConfigWidget", "Probe Configuration")
+ProbeConfigWidget::ProbeConfigWidget(VisServicesPtr services, QWidget* parent) : BaseWidget(parent, "probe_config_widget", "Probe Configuration")
 {
 	mServices = services;
 	mUpdating = false;

@@ -57,7 +57,7 @@ namespace cx
 {
 
 DicomWidget::DicomWidget(ctkPluginContext *context, QWidget *parent) :
-	BaseWidget(parent, "DicomWidget", "Dicom"),
+	BaseWidget(parent, "dicom_widget", "Dicom"),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mBrowser(NULL),
 	mContext(context)

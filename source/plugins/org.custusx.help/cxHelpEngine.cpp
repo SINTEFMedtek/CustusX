@@ -140,33 +140,11 @@ bool HelpEngine::isBreakChar(QString text, int index) const
 	return false;
 }
 
-QString HelpEngine::convertToKeyword(QString id) const
-{
-	// convert camel case strings into whitespace-separated lowercase strings:
-	// MyWidget -> my widget
-	// myFancy3DWidget2D -> my Fancy 3D Widget 2D -> my fancy 3d widget 2d
-	// myFancyDWidget -> my Fancy D Widget -> my fancy D widget
-	QString retval;
-	retval.push_back(id[0]);
-	for (int i=1; i<id.size(); ++i)
-	{
-		// break condition Q is (uppercase or digit)
-		// insert whitespace before Q
-		// ignore if previous was Q
-		if (this->isBreakChar(id, i))
-		{
-			retval.push_back("_"); // cant't get doxygenerated anchors to work properly with whitespace
-		}
-		retval.push_back(id[i]);
-	}
-	return retval.toLower();
-}
-
 QString HelpEngine::findBestMatchingKeyword(QObject* object)
 {
 	while (object)
 	{
-		QString id = this->convertToKeyword(object->objectName());
+		QString id = object->objectName();
 #ifdef DEBUG_HELP_SYSTEM
 		CX_LOG_CHANNEL_DEBUG("HELP_DB") << QString("    examining [%1](%2)")
 										   .arg(id)

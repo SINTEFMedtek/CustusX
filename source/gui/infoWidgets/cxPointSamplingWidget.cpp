@@ -54,7 +54,7 @@ namespace cx
 {
 
 PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
-  BaseWidget(parent, "PointSamplingWidget", "Point sampler/3D ruler"),
+  BaseWidget(parent, "point_sampling_widget", "Point sampler/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
   mActiveLandmark(""),

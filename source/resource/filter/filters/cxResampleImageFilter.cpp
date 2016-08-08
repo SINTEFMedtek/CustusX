@@ -57,7 +57,7 @@ QString ResampleImageFilter::getName() const
 
 QString ResampleImageFilter::getType() const
 {
-	return "ResampleImageFilter";
+	return "resample_image_filter";
 }
 
 QString ResampleImageFilter::getHelp() const

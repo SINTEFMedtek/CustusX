@@ -49,7 +49,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 
 	ReconstructionAlgorithmFixture fixture;
 	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("PNN");
+	QDomElement settings = domdoc.createElement("pnn");
 
 	fixture.setOverallBoundsAndSpacing(100, 5);
 	fixture.setVerbose(true);
@@ -76,7 +76,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
 
 	QDomDocument domdoc;
-	QDomElement settings = domdoc.createElement("PNN");
+	QDomElement settings = domdoc.createElement("pnn");
 
 	ReconstructionAlgorithmFixture fixture;
 	fixture.setVerbose(false);

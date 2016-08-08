@@ -45,7 +45,7 @@ namespace cx
 {
 
 SoundSpeedConverterWidget::SoundSpeedConverterWidget(TrackingServicePtr trackingService, QWidget* parent) :
-    BaseWidget(parent, "SoundSpeedConverterWidget", "Sound Speed Converter"),
+	BaseWidget(parent, "sound_speed_converter_widget", "Sound Speed Converter"),
     mScannerSoundSpeed(1540.0),
     mApplyButton(new QPushButton("Apply compensation")),
     mResetButton(new QPushButton("Reset")),

@@ -45,7 +45,7 @@ namespace cx
 {
 
 VolumeInfoWidget::VolumeInfoWidget(PatientModelServicePtr patientModelService, QWidget* parent) :
-  InfoWidget(parent, "VolumeInfoWidget", "Volume Info"),
+  InfoWidget(parent, "volume_info_widget", "Volume Info"),
   mPatientModelService(patientModelService),
   mActiveData(patientModelService->getActiveData())
 {

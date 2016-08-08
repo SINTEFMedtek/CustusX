@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(ActiveDataPtr activeData, QWidget* parent) :
-  BaseWidget(parent, "TransferFunctionAlphaWidget", "Alpha Transfer Function"),
+  BaseWidget(parent, "transfer_function_alpha_widget", "Alpha Transfer Function"),
   mBorder(5),
   mReadOnly(false)
 {

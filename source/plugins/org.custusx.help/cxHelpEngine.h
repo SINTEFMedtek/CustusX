@@ -76,7 +76,6 @@ private:
 
 	bool isBreakChar(QChar c) const;
 	bool isBreakChar(QString text, int index) const;
-	QString convertToKeyword(QString id) const;
 
 	void setupDocFile();
 };

@@ -47,7 +47,7 @@ namespace cx
 {
 
 ReconstructionWidget::ReconstructionWidget(QWidget* parent, UsReconstructionServicePtr reconstructer) :
-	BaseWidget(parent, "USReconstruction", "US Reconstruction"),
+	BaseWidget(parent, "us_reconstruction", "US Reconstruction"),
 	mReconstructer(reconstructer),
 	mFileSelectWidget( new FileSelectWidget(this))
 {

@@ -137,7 +137,7 @@ bool ReconstructionExecuter::canCoresRunInParallel(std::vector<ReconstructCorePt
 
 	std::vector<ReconstructCorePtr>::iterator it;
 	for(it = cores.begin(); it != cores.end(); ++it)
-		parallelizable = parallelizable && (it->get()->getInputParams().mAlgorithmUid == "PNN");
+		parallelizable = parallelizable && (it->get()->getInputParams().mAlgorithmUid == "pnn");
 
 	return parallelizable;
 }
