@@ -237,10 +237,10 @@ void CameraControl::setStandard3DViewActionSlot()
 		left = Vector3D(1, 0, 0);
 	vup = cross(viewDirection, left).normal();
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "CameraControl::setStandard3DViewActionSlot()";
-	CX_LOG_CHANNEL_DEBUG("CA") << "    viewDirection " << viewDirection;
-	CX_LOG_CHANNEL_DEBUG("CA") << "    left " << left;
-	CX_LOG_CHANNEL_DEBUG("CA") << "    vup " << vup;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "CameraControl::setStandard3DViewActionSlot()";
+//	CX_LOG_CHANNEL_DEBUG("CA") << "    viewDirection " << viewDirection;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "    left " << left;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "    vup " << vup;
 
 	camera->SetPosition(pos.begin());
 	camera->SetViewUp(vup.begin());

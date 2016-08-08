@@ -114,8 +114,6 @@ QVariant ToolTreeNode::getColor() const
 		return QColor("green");
 	else
 		return QColor("red");
-
-	CX_LOG_CHANNEL_DEBUG("CA") << "tool " << mTool->getName() << ": init=" << mTool->isInitialized() << ", v=" << mTool->getVisible();
 }
 
 QVariant ToolTreeNode::getFont() const
