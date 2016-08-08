@@ -57,15 +57,6 @@ public:
 
 /// -------------------------------------------------------
 
-//class cxGui_EXPORT SelectedMeshInfoWidget : public BaseWidget
-//{
-//  Q_OBJECT
-
-//public:
-//	SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
-//  virtual ~SelectedMeshInfoWidget();
-//};
-
 /**
  * \class MeshInfoWidget
  *
@@ -90,8 +81,6 @@ public:
 	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
 
 protected slots:
-  void setColorSlot();
-  void setColorSlotDelayed();
   void meshSelectedSlot();
   void importTransformSlot();
   void meshChangedSlot();
@@ -108,15 +97,6 @@ private:
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
   SelectDataStringPropertyBasePtr mMeshSelector;
-  ColorPropertyPtr mColorAdapter;
-  QCheckBox* mBackfaceCullingCheckBox;
-  QCheckBox* mFrontfaceCullingCheckBox;
-  DoublePropertyPtr mVisSizeWidget;
-  QCheckBox* mGlyphVisualizationCheckBox;
-  StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;
-  StringPropertyGlyphColorArrayPtr mGlyphColorArrayAdapter;
-  StringPropertyGlyphLUTPtr mGlyphColorLUTAdapter;
-
 
   PatientModelServicePtr mPatientModelService;
   ViewServicePtr mViewService;
