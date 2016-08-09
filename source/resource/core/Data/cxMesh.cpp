@@ -61,17 +61,22 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 	return MeshPtr(new Mesh(uid, name));
 }
 
-Mesh::Mesh(const QString& uid, const QString& name) :
-	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mHasGlyph(false), mOrientationArray(""), mColorArray("")
-{
-    mShowGlyph = shouldGlyphBeEnableByDefault();
-    mGlyphLUT ="Citrus";
-	this->setAcquisitionTime(QDateTime::currentDateTime());
-}
-Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
+//Mesh::Mesh(const QString& uid, const QString& name) :
+//	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mHasGlyph(false), mOrientationArray(""), mColorArray("")
+//{
+//	connect(&mProperties, &MeshPropertyData::changed, this, &Mesh::meshChanged);
+
+//    mShowGlyph = shouldGlyphBeEnableByDefault();
+//    mGlyphLUT ="Citrus";
+//	this->setAcquisitionTime(QDateTime::currentDateTime());
+//}
+Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData) :
 	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
-    mShowGlyph = shouldGlyphBeEnableByDefault();
+	if (!mVtkPolyData)
+		mVtkPolyData = vtkPolyDataPtr::New();
+	connect(&mProperties, &MeshPropertyData::changed, this, &Mesh::meshChanged);
+	mShowGlyph = shouldGlyphBeEnableByDefault();
     mGlyphLUT ="Citrus";
     this->setAcquisitionTime(QDateTime::currentDateTime());
 }
@@ -79,14 +84,15 @@ Mesh::~Mesh()
 {
 }
 
+
 void Mesh::setIsWireframe(bool on)
 {
-	mProperties.mWireframe = on;
-	emit meshChanged();
+	mProperties.mWireframeRepresentation->setValue(on);
+//	emit meshChanged();
 }
 bool Mesh::getIsWireframe() const
 {
-	return mProperties.mWireframe;
+	return mProperties.mWireframeRepresentation->getValue();
 }
 
 bool Mesh::load(QString path)
@@ -188,29 +194,29 @@ void Mesh::parseXml(QDomNode& dataNode)
 
 void Mesh::setColor(const QColor& color)
 {
-	mProperties.mColor = color;
-	emit meshChanged();
+	mProperties.mColor->setValue(color);
+//	emit meshChanged();
 }
 
 QColor Mesh::getColor()
 {
-	return mProperties.mColor;
+	return mProperties.mColor->getValue();
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
 {
-	mProperties.mBackfaceCulling = backfaceCulling;
-	emit meshChanged();
+	mProperties.mBackfaceCulling->setValue(backfaceCulling);
+//	emit meshChanged();
 }
 
 bool Mesh::getBackfaceCulling()
 {
-	return mProperties.mBackfaceCulling;
+	return mProperties.mBackfaceCulling->getValue();
 }
 
 void Mesh::setFrontfaceCullingSlot(bool frontfaceCulling)
 {
-	mProperties.mFrontfaceCulling = frontfaceCulling;
+	mProperties.mFrontfaceCulling->setValue(frontfaceCulling);
 	emit meshChanged();
 }
 
@@ -261,15 +267,16 @@ void Mesh::setOrientationArray(const char * orientationArray)
 
 double Mesh::getVisSize()
 {
-	return mProperties.mVisSize;
+	return mProperties.mVisSize->getValue();
 }
 
 void Mesh::setVisSize(double size)
 {
-	if(mProperties.mVisSize==size) return;
+	mProperties.mVisSize->setValue(size);
+//	if(mProperties.mVisSize==size) return;
 
-	mProperties.mVisSize=size;
-    emit meshChanged();
+//	mProperties.mVisSize=size;
+//    emit meshChanged();
 }
 
 const char * Mesh::getColorArray()
@@ -305,13 +312,13 @@ QStringList Mesh::getColorArrayList()
 	return mColorArrayList;
 }
 
-void Mesh::setProperties(const MeshPropertyData &val)
-{
-	mProperties = val;
-	emit meshChanged();
-}
+//void Mesh::setProperties(const MeshPropertyData &val)
+//{
+//	mProperties = val;
+//	emit meshChanged();
+//}
 
-MeshPropertyData Mesh::getProperties() const
+const MeshPropertyData& Mesh::getProperties() const
 {
 	return mProperties;
 }

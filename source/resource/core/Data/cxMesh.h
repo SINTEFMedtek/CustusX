@@ -65,8 +65,8 @@ class cxResource_EXPORT Mesh: public Data
 Q_OBJECT
 public:
 	static MeshPtr create(const QString& uid, const QString& name = "");
-	Mesh(const QString& uid, const QString& name = "");
-	Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData);
+//	Mesh(const QString& uid, const QString& name =vtkPolyDataPtr "");
+	Mesh(const QString& uid, const QString& name="", vtkPolyDataPtr polyData=vtkPolyDataPtr());
 	virtual ~Mesh();
 
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
@@ -103,8 +103,8 @@ public:
     const char * getGlyphLUT();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
-	void setProperties(const MeshPropertyData& data);
-	MeshPropertyData getProperties() const;
+//	void setProperties(const MeshPropertyData& data);
+	const MeshPropertyData& getProperties() const;
 
 	virtual void save(const QString &basePath);
 signals:

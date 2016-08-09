@@ -34,7 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 #include "cxPrecompiledHeader.h"
-#include <QColor>
+#include "cxColorProperty.h"
+#include "cxBoolProperty.h"
+#include "cxDoubleProperty.h"
+
 class QDomNode;
 
 namespace cx
@@ -43,34 +46,36 @@ namespace cx
 /**
  * Mesh data used in a vtkProperty
  */
-class cxResource_EXPORT MeshPropertyData
+class cxResource_EXPORT MeshPropertyData : public QObject
 {
+	Q_OBJECT
 public:
 	MeshPropertyData();
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
 
-//	std::vector<PropertyPtr> mProperties;
+	std::vector<PropertyPtr> mProperties;
 
-	QColor mColor;
-	bool mWireframe;
-	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
-	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
-	double mVisSize;
+	ColorPropertyPtr mColor;
+	DoublePropertyPtr mVisSize;
+	BoolPropertyPtr mBackfaceCulling;
+	BoolPropertyPtr mFrontfaceCulling;
+	BoolPropertyPtr mWireframeRepresentation;
 
-	bool mWireframeRepresentation;
-	bool mPointsRepresentation;
-	bool mEdgeVisibility;
-	QColor mEdgeColor;
-	bool mShading;
-	double mAmbient;
-	double mDiffuse;
-	double mSpecular;
-	double mSpecularPower;
+//	BoolPropertyPtr mPointsRepresentation;
+//	BoolPropertyPtr mEdgeVisibility;
+//	ColorPropertyPtr mEdgeColor;
+//	BoolPropertyPtr mShading;
+//	DoublePropertyPtr mAmbient;
+//	DoublePropertyPtr mDiffuse;
+//	DoublePropertyPtr mSpecular;
+//	DoublePropertyPtr mSpecularPower;
 
+signals:
+	void changed();
 private:
-	QColor parseColorFromXml(QDomNode dataNode, QColor defval);
-	void addColorToXml(QDomNode &node, QColor color);
+	void addProperty(PropertyPtr property);
+	void initialize();
 };
 
 } // namespace cx

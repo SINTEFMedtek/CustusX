@@ -33,140 +33,90 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QDomDocument>
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-MeshPropertyData::MeshPropertyData() :
-	mWireframe(false),
-	mBackfaceCulling(false),
-	mFrontfaceCulling(false),
-	mVisSize(2.0),
-	mColor(255, 0, 0, 255),
-	mWireframeRepresentation(false),
-	mPointsRepresentation(false),
-	mEdgeVisibility(false),
-	mEdgeColor("white"),
-	mShading(false),
-	mAmbient(0.2),
-	mDiffuse(0.9),
-	mSpecular(0.3),
-	mSpecularPower(15)
+MeshPropertyData::MeshPropertyData()
+//	mWireframe(false),
+//	mBackfaceCulling(false),
+//	mFrontfaceCulling(false),
+//	mVisSize(2.0),
+//	mColor(255, 0, 0, 255),
+//	mWireframeRepresentation(false),
+//	mPointsRepresentation(false),
+//	mEdgeVisibility(false),
+//	mEdgeColor("white"),
+//	mShading(false),
+//	mAmbient(0.2),
+//	mDiffuse(0.9),
+//	mSpecular(0.3),
+//	mSpecularPower(15)
 {
-
+	this->initialize();
 }
 
-void MeshPropertyData::addColorToXml(QDomNode &node, QColor color)
+void MeshPropertyData::initialize()
 {
-	QDomDocument doc = node.ownerDocument();
-	QDomElement elem = node.toElement();
-
-	QDomElement colorNode = doc.createElement("color");
-	QDomElement subNode = doc.createElement("red");
-	subNode.appendChild(doc.createTextNode(string_cast(color.red()).c_str()));
-	colorNode.appendChild(subNode);
-	subNode = doc.createElement("green");
-	subNode.appendChild(doc.createTextNode(string_cast(color.green()).c_str()));
-	colorNode.appendChild(subNode);
-	subNode = doc.createElement("blue");
-	subNode.appendChild(doc.createTextNode(string_cast(color.blue()).c_str()));
-	colorNode.appendChild(subNode);
-	subNode = doc.createElement("alpha");
-	subNode.appendChild(doc.createTextNode(string_cast(color.alpha()).c_str()));
-	colorNode.appendChild(subNode);
-	elem.appendChild(colorNode);
+	//-------------------------------------------------------------------------
+	mColor = ColorProperty::initialize("Color", "",
+									   "Mesh color",
+									   QColor("red"));
+	this->addProperty(mColor);
+	//-------------------------------------------------------------------------
+	mVisSize = DoubleProperty::initialize("visSize", "Point size",
+										  "Visualized size of points, glyphs etc.",
+										  1, DoubleRange(1, 20, 1), 0);
+	mVisSize->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+	this->addProperty(mVisSize);
+	//-------------------------------------------------------------------------
+	mBackfaceCulling = BoolProperty::initialize("backfaceCulling", "Backface culling",
+									   "Set backface culling on. This makes transparent meshes work, "
+									   "but only draws outside mesh walls "
+									   "(eg. navigating inside meshes will not work).",
+									   true);
+	this->addProperty(mBackfaceCulling);
+	//-------------------------------------------------------------------------
+	mFrontfaceCulling = BoolProperty::initialize("frontfaceCulling", "Frontface culling",
+									   "Set frontface culling on. Can be used to make transparent "
+									   "meshes work from inside the meshes.",
+									   true);
+	this->addProperty(mFrontfaceCulling);
+	//-------------------------------------------------------------------------
+	mWireframeRepresentation = BoolProperty::initialize("wireframeRepresentation", "Wireframe",
+														"Show model as wireframe",
+														false);
+	this->addProperty(mWireframeRepresentation);
+	//-------------------------------------------------------------------------
 }
 
-QColor MeshPropertyData::parseColorFromXml(QDomNode dataNode, QColor defval)
+void MeshPropertyData::addProperty(PropertyPtr property)
 {
-	QDomNode colorNode = dataNode.namedItem("color");
-	if (!colorNode.isNull())
-	{
-		int red = 255;
-		int green = 255;
-		int blue = 255;
-		int alpha = 255;
-
-		QDomNode node = colorNode.namedItem("red");
-		if (!node.isNull())
-			red = node.toElement().text().toInt();
-
-		node = colorNode.namedItem("green");
-		if (!node.isNull())
-			green = node.toElement().text().toInt();
-
-		node = colorNode.namedItem("blue");
-		if (!node.isNull())
-			blue = node.toElement().text().toInt();
-
-		node = colorNode.namedItem("alpha");
-		if (!node.isNull())
-			alpha = node.toElement().text().toInt();
-
-		return QColor(red, green, blue, alpha);
-	}
-	return defval;
+	mProperties.push_back(property);
+	connect(property.get(), &Property::changed, this, &MeshPropertyData::changed);
 }
-
 
 void MeshPropertyData::addXml(QDomNode &dataNode)
 {
-	QDomDocument doc = dataNode.ownerDocument();
-	QDomElement elem = dataNode.toElement();
-
-	this->addColorToXml(dataNode, mColor);
-
-	QDomElement cullingNode = doc.createElement("culling").toElement();
-	cullingNode.setAttribute("backfaceCulling", mBackfaceCulling);
-	cullingNode.setAttribute("frontfaceCulling", mFrontfaceCulling);
-	elem.appendChild(cullingNode);
-
-	elem.setAttribute("visSize", mVisSize);
-
-//	bool mWireframeRepresentation;
-//	bool mPointsRepresentation;
-//	bool mEdgeVisibility;
-//	QColor mEdgeColor;
-//	bool mShading;
-//	double mAmbient;
-//	double mDiffuse;
-//	double mSpecular;
-//	double mSpecularPower;
-//	elem.setAttribute("wireframeRepresentation", mWireframeRepresentation);
-//	elem.setAttribute("pointsRepresentation", mPointsRepresentation);
-//	elem.setAttribute("mEdgeVisibility", mEdgeVisibility);
-//	elem.setAttribute("mEdgeColor", mEdgeColor);
-//	elem.setAttribute("mShading", mShading);
-//	elem.setAttribute("mAmbient", mAmbient);
-//	elem.setAttribute("mDiffuse", mDiffuse);
-//	elem.setAttribute("mSpecular", mSpecular);
-//	elem.setAttribute("mSpecularPower", mSpecularPower);
+	for (unsigned i=0; i<mProperties.size(); ++i)
+	{
+		XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
+		item.writeVariant(mProperties[i]->getValueAsVariant());
+	}
 }
 
 void MeshPropertyData::parseXml(QDomNode dataNode)
 {
-	mColor = this->parseColorFromXml(dataNode, mColor);
-	QDomElement elem = dataNode.toElement();
-
-	QDomElement cullingNode = dataNode.namedItem("culling").toElement();
-	if (!cullingNode.isNull())
+	for (unsigned i=0; i<mProperties.size(); ++i)
 	{
-		mBackfaceCulling = cullingNode.attribute("backfaceCulling", QString::number(mBackfaceCulling)).toInt();
-		mFrontfaceCulling = cullingNode.attribute("frontfaceCulling", QString::number(mFrontfaceCulling)).toInt();
+		XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
+		CX_LOG_CHANNEL_DEBUG("CA") << "reading " << mProperties[i]->getUid()
+								   << " , old=" << mProperties[i]->getValueAsVariant().value<QColor>().name()
+								   << " newval=" << item.readVariant().value<QColor>().name();
+		QVariant orgval = mProperties[i]->getValueAsVariant();
+		mProperties[i]->setValueFromVariant(item.readVariant(orgval));
 	}
-
-	mVisSize =  elem.attribute("visSize", QString::number(mVisSize)).toDouble();
-
-
-//	QDomElement elem = dataNode.toElement();
-//	mCameraFollowTool = elem.attribute("cameraFollowTool", QString::number(mCameraFollowTool)).toInt();
-//	mFocusFollowTool = elem.attribute("focusFollowTool", QString::number(mFocusFollowTool)).toInt();
-//	mCameraOnTooltip = elem.attribute("cameraOnTooltip", QString::number(mCameraOnTooltip)).toInt();
-//	mTableLock = elem.attribute("tableLock", QString::number(mTableLock)).toInt();
-//	mElevation = elem.attribute("elevation", QString::number(mElevation)).toDouble();
-//	mUniCam = elem.attribute("uniCam", QString::number(mUniCam)).toInt();
-//	mAutoZoomROI = elem.attribute("autoZoomROI", mAutoZoomROI);
-//	mFocusROI = elem.attribute("focusROI", mFocusROI);
 }
 
 } // namespace cx

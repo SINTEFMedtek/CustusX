@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGuiExport.h"
 
 #include <vector>
-#include <QtWidgets>
+//#include <QtWidgets>
 
 #include "cxMesh.h"
 #include "cxDataInterface.h"
@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+class ReplacableContentWidget;
 
 /**
  * \class MeshPropertiesWidget
@@ -75,29 +76,19 @@ private:
   void updateFrontend();
 
 protected slots:
-//	void setColorSlot();
-//	void setColorSlotDelayed();
   void meshSelectedSlot();
 
 private:
   MeshPtr mMesh;
   SelectDataStringPropertyBasePtr mMeshSelector;
-  std::vector<PropertyPtr> mProperties;
 
-  ColorPropertyPtr mColor;
-  DoublePropertyPtr mVisSize;
-  BoolPropertyPtr mBackfaceCulling;
-  BoolPropertyPtr mFrontfaceCulling;
+  ReplacableContentWidget* mPropertiesWidget;
 
   PatientModelServicePtr mPatientModelService;
   ViewServicePtr mViewService;
-  QVBoxLayout* mLayout;
-  QGridLayout* mPropertiesLayout;
 
   MeshPropertiesWidget();
-  void onGuiChanged();
-  void addProperty(PropertyPtr property);
-  void meshSelectedSlot2();
+  void clearUI();
 };
 
 }//end namespace cx
