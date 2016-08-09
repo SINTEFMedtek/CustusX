@@ -57,7 +57,7 @@ FrameMetricWrapper::~FrameMetricWrapper()
 
 QWidget* FrameMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("frame_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);

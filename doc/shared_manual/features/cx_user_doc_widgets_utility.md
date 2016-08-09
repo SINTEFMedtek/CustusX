@@ -3,56 +3,6 @@ Utility Widgets {#utility_widgets}
 
 [TOC]
 
-
-\addindex metric_widget
-Metrics Widget {#utility_widgets_metrics}
-===========================================================
-
-3D measurement tools.
-
-Define points, distances and angles.
-
-Point Metric
------------------------------------------------------------
-Point in selected coordinate system. Used by several other metrics.
-
-Frame Metric
------------------------------------------------------------
-Position and orientation. Stored as 4x4 matrix.
-
-Tool Metric
------------------------------------------------------------
-Store tool position and orientation.
-
-Distance Metric
------------------------------------------------------------
-Distance between 2 point metrics
-
-Angle Metric
------------------------------------------------------------
-Angle between 2 lines. Defined as 4 points.
-
-Plane Metric
------------------------------------------------------------
-Plane. Defined as 2 points.
-
-Sphere Metric
------------------------------------------------------------
-Spere. Defined as 1 point and radius.
-
-Torus Metric
------------------------------------------------------------
-Torus/donut. Defined with 1 point in center and facing 2nd point.
-
-Custom Metric
------------------------------------------------------------
-Custom metric. Load a STL model for visualizaion.
-
-Region Of Interest Metric
------------------------------------------------------------
-Used for setting ROI for Camera Style.
-
-
 \addindex igt_link_widget
 Video Connection Widget {#utility_widgets_video_connection}
 ===========================================================
