@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxBoolProperty.h"
 
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
@@ -59,100 +60,145 @@ MeshPropertiesWidget::MeshPropertiesWidget(SelectDataStringPropertyBasePtr meshS
 							   PatientModelServicePtr patientModelService,
 							   ViewServicePtr viewService,
 							   QWidget* parent) :
-	BaseWidget(parent, "mesh_glyphs_widget", "Glyphs"),
+	BaseWidget(parent, "mesh_properties_widget", "Properties"),
 	mPatientModelService(patientModelService),
 	mViewService(viewService),
 	mMeshSelector(meshSelector)
 {
+	mLayout = new QVBoxLayout(this);
+
 	connect(mMeshSelector.get(), &Property::changed, this, &MeshPropertiesWidget::meshSelectedSlot);
-	this->addWidgets();
-	this->meshSelectedSlot();
+	this->setModified();
 }
 
 MeshPropertiesWidget::~MeshPropertiesWidget()
 {
 }
 
-void MeshPropertiesWidget::setColorSlot()
+void MeshPropertiesWidget::prePaintEvent()
 {
-  if(!mMesh)
-	return;
-  // Implement like TransferFunctionColorWidget::setColorSlot()
-  // to prevent crash problems
-  QTimer::singleShot(1, this, SLOT(setColorSlotDelayed()));
+	this->setupUI();
+	this->updateFrontend();
 }
 
-void MeshPropertiesWidget::setColorSlotDelayed()
+void MeshPropertiesWidget::updateFrontend()
 {
-	if(!mMesh)
-	  return;
-	mMesh->setColor(mColorAdapter->getValue());
+	MeshPropertyData data;
+	if (mMesh)
+		data = mMesh->getProperties();
+
+	mVisSize->setValue(data.mVisSize);
+	mColor->setValue(data.mColor);
+	mBackfaceCulling->setValue(data.mBackfaceCulling);
+	mFrontfaceCulling->setValue(data.mFrontfaceCulling);
 }
+
+void MeshPropertiesWidget::onGuiChanged()
+{
+	if (!mMesh)
+		return;
+
+	MeshPropertyData data = mMesh->getProperties();
+
+	data.mBackfaceCulling = mBackfaceCulling->getValue();
+	data.mFrontfaceCulling = mFrontfaceCulling->getValue();
+	data.mVisSize = mVisSize->getValue();
+	data.mColor = mColor->getValue();
+
+	mMesh->setProperties(data);
+}
+
+template <class T, class SOURCE_SIGNAL, class TARGET, class TARGET_SIGNAL>
+bool cxqreconnect(boost::shared_ptr<T> old_source, boost::shared_ptr<T> new_source,
+								  SOURCE_SIGNAL source_signal,
+								  TARGET* target,
+								  TARGET_SIGNAL target_signal)
+{
+	if (old_source == new_source)
+		return false;
+
+	if(old_source)
+	{
+		target->disconnect(old_source.get(), source_signal, target, target_signal);
+	}
+	if(new_source)
+	{
+		target->connect(new_source.get(), source_signal, target, target_signal);
+	}
+
+	return true;
+}
+
+template<class T>
+class cxqConnector
+{
+public:
+	boost::shared_ptr<T> object;
+
+	template <class SOURCE_SIGNAL, class TARGET, class TARGET_SIGNAL>
+	bool reconnect(boost::shared_ptr<T> new_source,
+									  SOURCE_SIGNAL source_signal,
+									  TARGET* target,
+									  TARGET_SIGNAL target_signal)
+	{
+		if (!cxqreconnect(object,  new_source, source_signal, target, target_signal))
+			return false;
+		object = new_source;
+		return true;
+	}
+};
 
 void MeshPropertiesWidget::meshSelectedSlot()
 {
 	if (mMesh == mMeshSelector->getData())
 		return;
 
-	if(mMesh)
-	{
-		mMesh->setVisSize((double) mVisSizeWidget->getValue());
-		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-	}
+	MeshPtr newmesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
-	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
-
-	if (!mMesh)
-	{
-		return;
-	}
-
-	mVisSizeWidget->setValue(mMesh->getVisSize());
-	mColorAdapter->setValue(mMesh->getColor());
-
-	connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+	cxqreconnect(mMesh,  newmesh, &Mesh::meshChanged, this, &MeshPropertiesWidget::setModified);
+	mMesh = newmesh;
+	this->setModified();
 }
 
-void MeshPropertiesWidget::meshChangedSlot()
+void MeshPropertiesWidget::setupUI()
 {
-	if(!mMesh)
+	if (mLayout->count()) // already created
 		return;
-	mBackfaceCullingCheckBox->setChecked(mMesh->getBackfaceCulling());
-	mFrontfaceCullingCheckBox->setChecked(mMesh->getFrontfaceCulling());
-	mColorAdapter->setValue(mMesh->getColor());
-	mMesh->setVisSize((double) mVisSizeWidget->getValue());
+
+	mPropertiesLayout = new QGridLayout;
+	mPropertiesLayout->setMargin(0);
+	mLayout->addLayout(mPropertiesLayout);
+
+	//-------------------------------------------------------------------------
+	mColor = ColorProperty::initialize("Color", "", "Mesh color", QColor("red"));//, options.getElement());
+	this->addProperty(mColor);
+	//-------------------------------------------------------------------------
+	mVisSize = DoubleProperty::initialize("visSize", "Point size", "Visualized size of points, glyphs etc.",1, DoubleRange(1, 20, 1), 0);
+	mVisSize->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+	this->addProperty(mVisSize);
+	//-------------------------------------------------------------------------
+	mBackfaceCulling = BoolProperty::initialize("Backface culling", "",
+									   "Set backface culling on. This makes transparent meshes work, "
+									   "but only draws outside mesh walls "
+									   "(eg. navigating inside meshes will not work).",
+									   true);
+	this->addProperty(mBackfaceCulling);
+	//-------------------------------------------------------------------------
+	mFrontfaceCulling = BoolProperty::initialize("Frontface culling", "",
+									   "Set frontface culling on. Can be used to make transparent "
+									   "meshes work from inside the meshes.",
+									   true);
+	this->addProperty(mFrontfaceCulling);
+	//-------------------------------------------------------------------------
+
+	mLayout->addStretch();
 }
 
-void MeshPropertiesWidget::addWidgets()
+void MeshPropertiesWidget::addProperty(PropertyPtr property)
 {
-	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-	QGridLayout* gridLayout = new QGridLayout;
-	gridLayout->setMargin(0);
-	toptopLayout->addLayout(gridLayout);
-
-	mColorAdapter = ColorProperty::initialize("Color", "", "Mesh color", QColor("red"));//, options.getElement());
-	connect(mColorAdapter.get(), SIGNAL(changed()), this, SLOT(setColorSlot()));
-
-	mVisSizeWidget= DoubleProperty::initialize("visSize", "Point size", "Visualized size of points, glyphs etc.",1, DoubleRange(1, 20, 1), 0);
-	mVisSizeWidget->setGuiRepresentation(DoublePropertyBase::grSLIDER);
-	connect(mVisSizeWidget.get(), &Property::changed, this, &MeshPropertiesWidget::meshChangedSlot);
-
-	int row = 1;
-
-	mBackfaceCullingCheckBox = new QCheckBox("Backface culling");
-	mBackfaceCullingCheckBox->setToolTip("Set backface culling on. This makes transparent meshes work, but only draws outside mesh walls (eg. navigating inside meshes will not work).");
-	gridLayout->addWidget(mBackfaceCullingCheckBox, row++, 0);
-
-	mFrontfaceCullingCheckBox = new QCheckBox("Frontface culling");
-	mFrontfaceCullingCheckBox->setToolTip("Set frontface culling on. Can be used to make transparent meshes work from inside the meshes.");
-	gridLayout->addWidget(mFrontfaceCullingCheckBox, row++, 0);
-
-	gridLayout->addWidget(sscCreateDataWidget(this, mColorAdapter, gridLayout, row++));
-	gridLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, mVisSizeWidget),row++,0);
-
-	toptopLayout->addStretch();
+	mProperties.push_back(property);
+	connect(property.get(), &Property::changed, this, &MeshPropertiesWidget::onGuiChanged);
+	createDataWidget(mViewService, mPatientModelService, this, property, mPropertiesLayout, mProperties.size()-1);
 }
-
-
 
 }//end namespace cx

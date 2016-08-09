@@ -29,77 +29,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXMESHPROPERTIESWIDGET_H
-#define CXMESHPROPERTIESWIDGET_H
+#ifndef CXMESHPROPERTYDATA_H
+#define CXMESHPROPERTYDATA_H
 
-#include "cxGuiExport.h"
-
-#include <vector>
-#include <QtWidgets>
-
-#include "cxMesh.h"
-#include "cxDataInterface.h"
-#include "cxBaseWidget.h"
-
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+#include <QColor>
+class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
 /**
- * \class MeshPropertiesWidget
- *
- * \brief Widget for displaying glyps information about meshes.
- *
- * \ingroup cx_gui
- *
- * split from class MeshInfoWidget
+ * Mesh data used in a vtkProperty
  */
-class cxGui_EXPORT MeshPropertiesWidget : public BaseWidget
+class cxResource_EXPORT MeshPropertyData
 {
-  Q_OBJECT
-
 public:
-	MeshPropertiesWidget(SelectDataStringPropertyBasePtr meshSelector,
-				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
-				   QWidget* parent);
-  virtual ~MeshPropertiesWidget();
+	MeshPropertyData();
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode dataNode);
 
-	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+//	std::vector<PropertyPtr> mProperties;
 
-protected:
-  void setupUI();
-  virtual void prePaintEvent();
+	QColor mColor;
+	bool mWireframe;
+	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
+	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
+	double mVisSize;
+
+	bool mWireframeRepresentation;
+	bool mPointsRepresentation;
+	bool mEdgeVisibility;
+	QColor mEdgeColor;
+	bool mShading;
+	double mAmbient;
+	double mDiffuse;
+	double mSpecular;
+	double mSpecularPower;
 
 private:
-  void updateFrontend();
-
-protected slots:
-//	void setColorSlot();
-//	void setColorSlotDelayed();
-  void meshSelectedSlot();
-
-private:
-  MeshPtr mMesh;
-  SelectDataStringPropertyBasePtr mMeshSelector;
-  std::vector<PropertyPtr> mProperties;
-
-  ColorPropertyPtr mColor;
-  DoublePropertyPtr mVisSize;
-  BoolPropertyPtr mBackfaceCulling;
-  BoolPropertyPtr mFrontfaceCulling;
-
-  PatientModelServicePtr mPatientModelService;
-  ViewServicePtr mViewService;
-  QVBoxLayout* mLayout;
-  QGridLayout* mPropertiesLayout;
-
-  MeshPropertiesWidget();
-  void onGuiChanged();
-  void addProperty(PropertyPtr property);
-  void meshSelectedSlot2();
+	QColor parseColorFromXml(QDomNode dataNode, QColor defval);
+	void addColorToXml(QDomNode &node, QColor color);
 };
 
-}//end namespace cx
+} // namespace cx
 
-#endif // CXMESHPROPERTIESWIDGET_H
+#endif // CXMESHPROPERTYDATA_H

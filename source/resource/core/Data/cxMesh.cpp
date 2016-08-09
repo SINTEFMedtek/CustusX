@@ -49,23 +49,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 MeshPtr Mesh::create(const QString& uid, const QString& name)
 {
 	return MeshPtr(new Mesh(uid, name));
 }
 
 Mesh::Mesh(const QString& uid, const QString& name) :
-    Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mVisSize(2.0)
+	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
-	mColor = QColor(255, 0, 0, 255);
     mShowGlyph = shouldGlyphBeEnableByDefault();
     mGlyphLUT ="Citrus";
 	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) :
-    Data(uid, name), mVtkPolyData(polyData), mWireframe(false), mBackfaceCulling(false), mFrontfaceCulling(false),mHasGlyph(false), mOrientationArray(""), mColorArray(""),mVisSize(2.0)
+	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
-	mColor = QColor(255, 0, 0, 255);
     mShowGlyph = shouldGlyphBeEnableByDefault();
     mGlyphLUT ="Citrus";
     this->setAcquisitionTime(QDateTime::currentDateTime());
@@ -76,12 +81,12 @@ Mesh::~Mesh()
 
 void Mesh::setIsWireframe(bool on)
 {
-	mWireframe = on;
+	mProperties.mWireframe = on;
 	emit meshChanged();
 }
 bool Mesh::getIsWireframe() const
 {
-	return mWireframe;
+	return mProperties.mWireframe;
 }
 
 bool Mesh::load(QString path)
@@ -145,26 +150,7 @@ void Mesh::addXml(QDomNode& dataNode)
 
 	QDomNode meshNode = dataNode;
 
-	QDomElement colorNode = doc.createElement("color");
-	QDomElement subNode = doc.createElement("red");
-	subNode.appendChild(doc.createTextNode(string_cast(mColor.red()).c_str()));
-	colorNode.appendChild(subNode);
-	subNode = doc.createElement("green");
-	subNode.appendChild(doc.createTextNode(string_cast(mColor.green()).c_str()));
-	colorNode.appendChild(subNode);
-	subNode = doc.createElement("blue");
-	subNode.appendChild(doc.createTextNode(string_cast(mColor.blue()).c_str()));
-	colorNode.appendChild(subNode);
-	subNode = doc.createElement("alpha");
-	subNode.appendChild(doc.createTextNode(string_cast(mColor.alpha()).c_str()));
-	colorNode.appendChild(subNode);
-	meshNode.appendChild(colorNode);
-
-	QDomElement cullingNode = doc.createElement("culling");
-	QDomElement elem = cullingNode.toElement();
-    elem.setAttribute("backfaceCulling", mBackfaceCulling);
-    elem.setAttribute("frontfaceCulling", mFrontfaceCulling);
-	meshNode.appendChild(cullingNode);
+	mProperties.addXml(dataNode);
 
     QDomElement glyphNode = doc.createElement("glyph");
     QDomElement elemGlyph = glyphNode.toElement();
@@ -172,7 +158,6 @@ void Mesh::addXml(QDomNode& dataNode)
     elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
     elemGlyph.setAttribute("colorArray", mColorArray.c_str());
     elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
-    elemGlyph.setAttribute("glyphVisSize", mVisSize);
     meshNode.appendChild(elemGlyph);
 
 }
@@ -187,42 +172,7 @@ void Mesh::parseXml(QDomNode& dataNode)
 	if (dataNode.isNull())
 		return;
 
-	//  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
-	//  m_rMd_History->parseXml(registrationHistory);
-
-	QDomNode colorNode = dataNode.namedItem("color");
-	if (!colorNode.isNull())
-	{
-		int red = 255;
-		int green = 255;
-		int blue = 255;
-		int alpha = 255;
-
-		QDomNode node = colorNode.namedItem("red");
-		if (!node.isNull())
-			red = node.toElement().text().toInt();
-
-		node = colorNode.namedItem("green");
-		if (!node.isNull())
-			green = node.toElement().text().toInt();
-
-		node = colorNode.namedItem("blue");
-		if (!node.isNull())
-			blue = node.toElement().text().toInt();
-
-		node = colorNode.namedItem("alpha");
-		if (!node.isNull())
-			alpha = node.toElement().text().toInt();
-
-		mColor = QColor(red, green, blue, alpha);
-	}
-
-    QDomNode cullingNode = dataNode.namedItem("culling");
-    if (!cullingNode.isNull())
-    {
-        mBackfaceCulling = cullingNode.toElement().attribute("backfaceCulling").toInt();
-        mFrontfaceCulling = cullingNode.toElement().attribute("frontfaceCulling").toInt();
-    }
+	mProperties.parseXml(dataNode);
 
     QDomNode glyphNode = dataNode.namedItem("glyph");
     if (!glyphNode.isNull())
@@ -231,7 +181,6 @@ void Mesh::parseXml(QDomNode& dataNode)
         mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
         mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
         mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
-        mVisSize =  glyphNode.toElement().attribute("glyphVisSize").toDouble();
     }
 
 	emit meshChanged();
@@ -239,35 +188,35 @@ void Mesh::parseXml(QDomNode& dataNode)
 
 void Mesh::setColor(const QColor& color)
 {
-	mColor = color;
+	mProperties.mColor = color;
 	emit meshChanged();
 }
 
 QColor Mesh::getColor()
 {
-	return mColor;
+	return mProperties.mColor;
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
 {
-	mBackfaceCulling = backfaceCulling;
+	mProperties.mBackfaceCulling = backfaceCulling;
 	emit meshChanged();
 }
 
 bool Mesh::getBackfaceCulling()
 {
-	return mBackfaceCulling;
+	return mProperties.mBackfaceCulling;
 }
 
 void Mesh::setFrontfaceCullingSlot(bool frontfaceCulling)
 {
-	mFrontfaceCulling = frontfaceCulling;
+	mProperties.mFrontfaceCulling = frontfaceCulling;
 	emit meshChanged();
 }
 
 bool Mesh::getFrontfaceCulling()
 {
-	return mFrontfaceCulling;
+	return mProperties.mFrontfaceCulling;
 }
 
 void Mesh::setShowGlyph(bool val)
@@ -312,14 +261,14 @@ void Mesh::setOrientationArray(const char * orientationArray)
 
 double Mesh::getVisSize()
 {
-    return mVisSize;
+	return mProperties.mVisSize;
 }
 
 void Mesh::setVisSize(double size)
 {
-    if(mVisSize==size) return;
+	if(mProperties.mVisSize==size) return;
 
-    mVisSize=size;
+	mProperties.mVisSize=size;
     emit meshChanged();
 }
 
@@ -353,10 +302,19 @@ QStringList Mesh::getOrientationArrayList()
 
 QStringList Mesh::getColorArrayList()
 {
-    return mColorArrayList;
+	return mColorArrayList;
 }
 
+void Mesh::setProperties(const MeshPropertyData &val)
+{
+	mProperties = val;
+	emit meshChanged();
+}
 
+MeshPropertyData Mesh::getProperties() const
+{
+	return mProperties;
+}
 
 DoubleBoundingBox3D Mesh::boundingBox() const
 {
