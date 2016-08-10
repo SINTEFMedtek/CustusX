@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorProperty.h"
 #include "cxBoolProperty.h"
 #include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
 
 class QDomNode;
 
@@ -60,16 +61,15 @@ public:
 	DoublePropertyPtr mVisSize;
 	BoolPropertyPtr mBackfaceCulling;
 	BoolPropertyPtr mFrontfaceCulling;
-	BoolPropertyPtr mWireframeRepresentation;
+	StringPropertyPtr mRepresentation;
 
-//	BoolPropertyPtr mPointsRepresentation;
-//	BoolPropertyPtr mEdgeVisibility;
-//	ColorPropertyPtr mEdgeColor;
-//	BoolPropertyPtr mShading;
-//	DoublePropertyPtr mAmbient;
-//	DoublePropertyPtr mDiffuse;
-//	DoublePropertyPtr mSpecular;
-//	DoublePropertyPtr mSpecularPower;
+	BoolPropertyPtr mEdgeVisibility;
+	ColorPropertyPtr mEdgeColor;
+
+	DoublePropertyPtr mAmbient;
+	DoublePropertyPtr mDiffuse;
+	DoublePropertyPtr mSpecular;
+	DoublePropertyPtr mSpecularPower;
 
 signals:
 	void changed();

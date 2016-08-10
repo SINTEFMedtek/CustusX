@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxBoundingBox3D.h"
 #include "cxDataReaderWriter.h"
+#include "vtkProperty.h"
 
 namespace cx
 {
@@ -61,15 +62,6 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 	return MeshPtr(new Mesh(uid, name));
 }
 
-//Mesh::Mesh(const QString& uid, const QString& name) :
-//	Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New()), mHasGlyph(false), mOrientationArray(""), mColorArray("")
-//{
-//	connect(&mProperties, &MeshPropertyData::changed, this, &Mesh::meshChanged);
-
-//    mShowGlyph = shouldGlyphBeEnableByDefault();
-//    mGlyphLUT ="Citrus";
-//	this->setAcquisitionTime(QDateTime::currentDateTime());
-//}
 Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData) :
 	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
@@ -80,19 +72,22 @@ Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData) :
     mGlyphLUT ="Citrus";
     this->setAcquisitionTime(QDateTime::currentDateTime());
 }
+
 Mesh::~Mesh()
 {
 }
 
-
 void Mesh::setIsWireframe(bool on)
 {
-	mProperties.mWireframeRepresentation->setValue(on);
-//	emit meshChanged();
+	if (on)
+		mProperties.mRepresentation->setValue(QString::number(VTK_WIREFRAME));
+	else
+		mProperties.mRepresentation->setValue(QString::number(VTK_SURFACE));
 }
+
 bool Mesh::getIsWireframe() const
 {
-	return mProperties.mWireframeRepresentation->getValue();
+	return mProperties.mRepresentation->getValue().toInt() == VTK_WIREFRAME;
 }
 
 bool Mesh::load(QString path)
@@ -195,7 +190,6 @@ void Mesh::parseXml(QDomNode& dataNode)
 void Mesh::setColor(const QColor& color)
 {
 	mProperties.mColor->setValue(color);
-//	emit meshChanged();
 }
 
 QColor Mesh::getColor()
@@ -206,7 +200,6 @@ QColor Mesh::getColor()
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
 {
 	mProperties.mBackfaceCulling->setValue(backfaceCulling);
-//	emit meshChanged();
 }
 
 bool Mesh::getBackfaceCulling()
@@ -273,10 +266,6 @@ double Mesh::getVisSize()
 void Mesh::setVisSize(double size)
 {
 	mProperties.mVisSize->setValue(size);
-//	if(mProperties.mVisSize==size) return;
-
-//	mProperties.mVisSize=size;
-//    emit meshChanged();
 }
 
 const char * Mesh::getColorArray()
@@ -301,7 +290,6 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
     emit meshChanged();
 }
 
-
 QStringList Mesh::getOrientationArrayList()
 {
     return mOrientationArrayList;
@@ -311,12 +299,6 @@ QStringList Mesh::getColorArrayList()
 {
 	return mColorArrayList;
 }
-
-//void Mesh::setProperties(const MeshPropertyData &val)
-//{
-//	mProperties = val;
-//	emit meshChanged();
-//}
 
 const MeshPropertyData& Mesh::getProperties() const
 {

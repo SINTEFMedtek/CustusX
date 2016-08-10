@@ -34,25 +34,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomDocument>
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
+#include "vtkProperty.h"
 
 namespace cx
 {
 
 MeshPropertyData::MeshPropertyData()
-//	mWireframe(false),
-//	mBackfaceCulling(false),
-//	mFrontfaceCulling(false),
-//	mVisSize(2.0),
-//	mColor(255, 0, 0, 255),
-//	mWireframeRepresentation(false),
-//	mPointsRepresentation(false),
-//	mEdgeVisibility(false),
-//	mEdgeColor("white"),
-//	mShading(false),
-//	mAmbient(0.2),
-//	mDiffuse(0.9),
-//	mSpecular(0.3),
-//	mSpecularPower(15)
 {
 	this->initialize();
 }
@@ -67,7 +54,7 @@ void MeshPropertyData::initialize()
 	//-------------------------------------------------------------------------
 	mVisSize = DoubleProperty::initialize("visSize", "Point size",
 										  "Visualized size of points, glyphs etc.",
-										  1, DoubleRange(1, 20, 1), 0);
+										  2, DoubleRange(1, 20, 1), 0);
 	mVisSize->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 	this->addProperty(mVisSize);
 	//-------------------------------------------------------------------------
@@ -84,10 +71,53 @@ void MeshPropertyData::initialize()
 									   true);
 	this->addProperty(mFrontfaceCulling);
 	//-------------------------------------------------------------------------
-	mWireframeRepresentation = BoolProperty::initialize("wireframeRepresentation", "Wireframe",
-														"Show model as wireframe",
+	mRepresentation = StringProperty::initialize("representation", "Representation",
+												 "How to represent model visually",
+												 QString::number(VTK_SURFACE),
+												 QStringList()
+												 << QString::number(VTK_SURFACE)
+												 << QString::number(VTK_WIREFRAME)
+												 << QString::number(VTK_POINTS));
+	std::map<QString,QString> representationNames;
+	representationNames[QString::number(VTK_SURFACE)] = "Surface";
+	representationNames[QString::number(VTK_WIREFRAME)] = "Wireframe";
+	representationNames[QString::number(VTK_POINTS)] = "Points";
+	mRepresentation->setDisplayNames(representationNames);
+	this->addProperty(mRepresentation);
+	//-------------------------------------------------------------------------
+	mEdgeVisibility = BoolProperty::initialize("edgeVisibility", "Show Edges",
+														"Show model edges",
 														false);
-	this->addProperty(mWireframeRepresentation);
+	this->addProperty(mEdgeVisibility);
+	//-------------------------------------------------------------------------
+	mEdgeColor = ColorProperty::initialize("edgeColor", "Edge color",
+										   "Edge color, used when edges are visible.",
+										   QColor("green"));
+	this->addProperty(mEdgeColor);
+	//-------------------------------------------------------------------------
+	mAmbient = DoubleProperty::initialize("ambient", "Ambient",
+										  "Ambient color coefficient",
+										  0.2, DoubleRange(0, 1, 0.05), 2);
+	mAmbient->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+	this->addProperty(mAmbient);
+	//-------------------------------------------------------------------------
+	mDiffuse = DoubleProperty::initialize("diffuse", "Diffuse",
+										  "Diffuse color coefficient",
+										  0.9, DoubleRange(0, 1, 0.05), 2);
+	mDiffuse->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+	this->addProperty(mDiffuse);
+	//-------------------------------------------------------------------------
+	mSpecular = DoubleProperty::initialize("specular", "Specular",
+										  "Specular color coefficient",
+										  0.3, DoubleRange(0, 1, 0.05), 2);
+	mSpecular->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+	this->addProperty(mSpecular);
+	//-------------------------------------------------------------------------
+	mSpecularPower = DoubleProperty::initialize("specularPower", "Specular Power",
+										  "Specular color power",
+										  15, DoubleRange(1, 30, 1), 0);
+	mSpecularPower->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+	this->addProperty(mSpecularPower);
 	//-------------------------------------------------------------------------
 }
 
@@ -111,9 +141,6 @@ void MeshPropertyData::parseXml(QDomNode dataNode)
 	for (unsigned i=0; i<mProperties.size(); ++i)
 	{
 		XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
-		CX_LOG_CHANNEL_DEBUG("CA") << "reading " << mProperties[i]->getUid()
-								   << " , old=" << mProperties[i]->getValueAsVariant().value<QColor>().name()
-								   << " newval=" << item.readVariant().value<QColor>().name();
 		QVariant orgval = mProperties[i]->getValueAsVariant();
 		mProperties[i]->setValueFromVariant(item.readVariant(orgval));
 	}

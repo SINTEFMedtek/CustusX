@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 
 #include "cxTypeConversions.h"
+#include "cxVtkHelperClasses.h"
 
 namespace cx
 {
@@ -134,8 +135,6 @@ bool GeometricRep::hasMesh(MeshPtr mesh) const
 
 void GeometricRep::meshChangedSlot()
 {
-    //    mMapper->SetLookupTable(); //mMesh.getLookupTable()
-
     mGraphicalGlyph3DDataPtr->setVisibility(mMesh->showGlyph());
     if(mMesh->showGlyph())
     {
@@ -148,17 +147,24 @@ void GeometricRep::meshChangedSlot()
     }
 
     mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
-    mGraphicalPolyDataPtr->setIsWireFrame(mMesh->getIsWireframe());
-    mGraphicalPolyDataPtr->setPointSize(mMesh->getVisSize());
     mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
-    //Set mesh color
+	//Set mesh color, opacity
     mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-    //Set mesh opacity
     mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
-    mGraphicalPolyDataPtr->setRepresentation();
-    //Set backface and frontface culling
-    mGraphicalPolyDataPtr->setBackfaceCulling(mMesh->getBackfaceCulling());
-    mGraphicalPolyDataPtr->setFrontfaceCulling(mMesh->getFrontfaceCulling());
+	//Set other properties
+	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
+	const MeshPropertyData& src = mMesh->getProperties();
+
+	dest->SetPointSize(src.mVisSize->getValue());
+	dest->SetBackfaceCulling(src.mBackfaceCulling->getValue());
+	dest->SetFrontfaceCulling(src.mFrontfaceCulling->getValue());
+	dest->SetRepresentation(src.mRepresentation->getValue().toInt());
+	dest->SetEdgeVisibility(src.mEdgeVisibility->getValue());
+	dest->SetEdgeColor(cx::getColorAsVector3D(src.mEdgeColor->getValue()).begin());
+	dest->SetAmbient(src.mAmbient->getValue());
+	dest->SetDiffuse(src.mDiffuse->getValue());
+	dest->SetSpecular(src.mSpecular->getValue());
+	dest->SetSpecularPower(src.mSpecularPower->getValue());
 }
 
 /**called when transform is changed
