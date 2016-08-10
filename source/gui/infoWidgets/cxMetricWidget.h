@@ -131,8 +131,6 @@ private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   void enablebuttons();
-  MetricBasePtr createMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, DataPtr data);
-  std::vector<MetricBasePtr> createMetricWrappers(ViewServicePtr viewService, PatientModelServicePtr patientModelService);
   virtual void prePaintEvent();
   std::set<QString> getSelectedUids();
   void createActions(QActionGroup* group);
