@@ -215,7 +215,7 @@ void Mesh::setFrontfaceCullingSlot(bool frontfaceCulling)
 
 bool Mesh::getFrontfaceCulling()
 {
-	return mProperties.mFrontfaceCulling;
+	return mProperties.mFrontfaceCulling->getValue();
 }
 
 void Mesh::setShowGlyph(bool val)
