@@ -713,8 +713,8 @@ QWidget* CustomMetricWrapper::createWidget()
 
     mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
-    mSTLFile = this->createSTLFileSelector();
-    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mSTLFile));
+	mMesh = this->createMeshSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMesh));
 
 	mOffsetFromP0 = this->createOffsetFromP0();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
@@ -750,7 +750,7 @@ void CustomMetricWrapper::update()
         return;
     mInternalUpdate = true;
     mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
-    mSTLFile->setValue(mData->getSTLFile());
+	mMesh->setValue(mData->getMeshUid());
     mInternalUpdate = false;
 }
 
@@ -771,7 +771,7 @@ void CustomMetricWrapper::guiChanged()
         return;
     mInternalUpdate = true;
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
-    mData->setSTLFile(mSTLFile->getValue());
+	mData->setMeshUid(mMesh->getValue());
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
 
@@ -814,23 +814,11 @@ StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() cons
     return retval;
 }
 
-FilePathPropertyPtr CustomMetricWrapper::createSTLFileSelector() const
+StringPropertySelectMeshPtr CustomMetricWrapper::createMeshSelector() const
 {
-    QStringList paths = QStringList() << qApp->applicationDirPath();
-#ifdef __APPLE__
-    // special case for running from the build tree, server built as bundle.
-    //Jon, necessary?? no compile
-    //paths << QString("%1/%2.app/Contents/MacOS").arg(DataLocations::getBundlePath()).arg(filename);
-#endif
-
-    FilePathPropertyPtr retval;
-    retval = FilePathProperty::initialize("selectSTLFile",
-                                          "STL File",
-                                          "STL geometry file",
-                                          "",
-                                          paths,
-                                          QDomNode());
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	StringPropertySelectMeshPtr retval;
+	retval = StringPropertySelectMesh::New(mPatientModelService);
+	connect(retval.get(), &StringPropertySelectMesh::changed, this, &CustomMetricWrapper::guiChanged);
     return retval;
 }
 

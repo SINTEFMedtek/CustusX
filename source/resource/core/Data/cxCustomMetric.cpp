@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -49,14 +50,13 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
     mDefineVectorUpMethod = mDefineVectorUpMethods.table;
-    mSTLFile = "";
+	mMeshUid = "";
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
 
 //	mToolListener = spaceProvider->createListener();
 //	mToolListener->setSpace(CoordinateSystem(csTOOL, "active"));
 //	connect(mToolListener.get(), &SpaceListener::changed, this, &CustomMetric::transformChanged);
-
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -81,7 +81,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 
 	QDomElement elem = dataNode.toElement();
 	elem.setAttribute("definevectorup", mDefineVectorUpMethod);
-	elem.setAttribute("STLFile", mSTLFile);
+	elem.setAttribute("meshUid", mMeshUid);
 
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
@@ -95,7 +95,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 
 	QDomElement elem = dataNode.toElement();
 	mDefineVectorUpMethod = elem.attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
-	mSTLFile = elem.attribute("STLFile", qstring_cast(mSTLFile));
+	mMeshUid = elem.attribute("meshUid", qstring_cast(mMeshUid));
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 }
@@ -156,12 +156,14 @@ Vector3D CustomMetric::getVectorUp() const
 		return mDataManager->getOperatingTable().getVectorUp();
 }
 
-Vector3D CustomMetric::getScale(DoubleBoundingBox3D bounds) const
+Vector3D CustomMetric::getScale() const
 {
 //	bounds.range();
 
 	if (!mScaleToP1)
 		return Vector3D::Ones();
+
+	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();
 
 //	Vector3D p_to = mSpaceProvider->getActiveToolTipPoint(CoordinateSystem::reference(), true);
 
@@ -182,9 +184,11 @@ Vector3D CustomMetric::getScale(DoubleBoundingBox3D bounds) const
 //	height/=3; // emphasis
 //	std::cout << ""
 
-//	double diameter = 10; // scale max diameter of object
+	double diameter = 10; // scale max diameter of object
 //	Vector3D scale(diameter, height, diameter);
-	Vector3D scale(1, height/bounds.range()[1], 1);
+	Vector3D scale(diameter/bounds.range()[0],
+			height/bounds.range()[1],
+			diameter/bounds.range()[2]);
 	return scale;
 }
 
@@ -205,15 +209,20 @@ void CustomMetric::setDefineVectorUpMethod(QString defineVectorUpMethod)
     mDefineVectorUpMethod = defineVectorUpMethod;
 }
 
-void CustomMetric::setSTLFile(QString val)
+void CustomMetric::setMeshUid(QString val)
 {
-    mSTLFile = val;
+	mMeshUid = val;
     emit propertiesChanged();
 }
 
-QString CustomMetric::getSTLFile() const
+QString CustomMetric::getMeshUid() const
 {
-	return mSTLFile;
+	return mMeshUid;
+}
+
+MeshPtr CustomMetric::getMesh() const
+{
+	return mDataManager->getData<Mesh>(mMeshUid);
 }
 
 void CustomMetric::setScaleToP1(bool val)

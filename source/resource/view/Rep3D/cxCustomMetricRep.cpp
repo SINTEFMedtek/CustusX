@@ -52,7 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyDataNormals.h>
 #include "cxLogger.h"
 #include "cxBoundingBox3D.h"
-
+#include "cxGeometricRep.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -69,7 +70,7 @@ CustomMetricRep::CustomMetricRep()
 void CustomMetricRep::clear()
 {
 	DataMetricRep::clear();
-    mSTLModel.reset();
+	mGeometry.reset();
 }
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
@@ -86,85 +87,56 @@ void CustomMetricRep::onModifiedStartRender()
 	this->drawText();
 }
 
-void CustomMetricRep::reloadSTLModel()
+void CustomMetricRep::updateSTLModel()
 {
-	if (mSTLModel && !this->filenameHasChanged())
-		return;
-
-	mSTLModel.reset();
-
 	CustomMetricPtr custom = this->getCustomMetric();
 
 	if (!this->getView() || !custom)
 	   return;
 
-	QString filename = custom->getSTLFile();
-
-	if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
+	if (!mGeometry)
 	{
-		reportWarning("File not found: " + filename + ", failed to update the STL model.");
-		return;
+		mGeometry.reset(new GraphicalGeometric);
+		mGeometry->setRenderer(this->getRenderer());
 	}
 
-	mSTLModel.reset(new GraphicalObjectWithDirection());
-	mSTLModel->setRenderer(this->getRenderer());
+	mGeometry->setMesh(custom->getMesh());
 
-	vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
-	STLReader->SetFileName(cstring_cast(filename));
-	mLoadedFilename = filename;
+	Vector3D pos = custom->getPosition();
+	Vector3D dir = custom->getDirection();
+	Vector3D vup = custom->getVectorUp();
+	Vector3D scale = custom->getScale();
 
-	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-	normals->SetInputConnection(STLReader->GetOutputPort());
-	normals->Update();
-
-	vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
-	polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
-	polyDataMapper->Update();
-
-	vtkActorPtr actor = mSTLModel->getActor();
-	actor->SetMapper(polyDataMapper);
+	Transform3D M = this->calculateOrientation(pos, dir, vup, scale);
+	mGeometry->setTransformOffset(M);
 }
 
-bool CustomMetricRep::filenameHasChanged()
+/**
+ * Based on a position+direction, view up and scale,
+ * calculate an orientation matrix combining these.
+ */
+Transform3D CustomMetricRep::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale)
 {
-	CustomMetricPtr custom = this->getCustomMetric();
-	if (!custom)
-		return true;
-	return mLoadedFilename != custom->getSTLFile();
-}
+	Transform3D R;
+	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
 
-void CustomMetricRep::updateSTLModel()
-{
-	this->reloadSTLModel();
+	if (directionAlongUp)
+	{
+		R = Transform3D::Identity();
+	}
+	else
+	{
+		Vector3D jvec = dir.normal();
+		Vector3D kvec = cross(vup, dir).normal();
+		Vector3D ivec = cross(jvec, kvec).normal();
+		Vector3D center = Vector3D::Zero();
+		R = createTransformIJC(ivec, jvec, center);
+	}
 
-	if(!mSTLModel)
-		return;
-
-	CustomMetricPtr custom = this->getCustomMetric();
-
-	vtkActorPtr actor = mSTLModel->getActor();
-	vtkPropertyPtr property = actor->GetProperty();
-	property->SetColor(this->getColorAsVector3D().begin());
-	property->SetSpecularPower(15);
-	property->SetSpecular(0.3);
-
-	property->SetAmbient( 0.3 );
-	property->SetDiffuse( 0.7 );
-
-//	actor->GetProperty()->SetRepresentationToWireframe();
-	property->SetEdgeVisibility(true);
-	Vector3D color = this->getColorAsVector3D();
-//	for (int i=0; i<3; ++i)
-//		color[i] = 1.0 - (1.0-color[i])*0.75;
-	property->SetEdgeColor(color.begin());
-
-    mSTLModel->setPosition(custom->getPosition());
-    mSTLModel->setDirection(custom->getDirection());
-    mSTLModel->setVectorUp(custom->getVectorUp());
-
-	vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
-	DoubleBoundingBox3D bounds(polyDataMapper->GetInput()->GetBounds());
-	mSTLModel->setScale(custom->getScale(bounds));
+	Transform3D S = createTransformScale(scale);
+	Transform3D T = createTransformTranslate(pos);
+	Transform3D M = T*R*S;
+	return M;
 }
 
 }

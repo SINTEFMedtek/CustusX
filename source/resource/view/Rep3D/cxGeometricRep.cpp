@@ -51,57 +51,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-GeometricRep::GeometricRep() :
-    RepImpl()
+GraphicalGeometric::GraphicalGeometric()
 {
-    mGraphicalPolyDataPtr.reset(new GraphicalPolyData3D());
+	m_dMu = Transform3D::Identity();
+	mGraphicalPolyDataPtr.reset(new GraphicalPolyData3D());
 	mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
-
 }
-GeometricRep::~GeometricRep()
+GraphicalGeometric::~GraphicalGeometric()
 {
-}
-GeometricRepPtr GeometricRep::New(const QString& uid)
-{
-    return wrap_new(new GeometricRep(), uid);
 }
 
-void GeometricRep::addRepActorsToViewRenderer(ViewPtr view)
+void GraphicalGeometric::setMesh(MeshPtr mesh)
 {
-    mGraphicalPolyDataPtr->setRenderer(view->getRenderer());
-    mGraphicalGlyph3DDataPtr->setRenderer(view->getRenderer());
-}
-
-void GeometricRep::removeRepActorsFromViewRenderer(ViewPtr view)
-{
-    mGraphicalPolyDataPtr->setRenderer(NULL);
-    mGraphicalGlyph3DDataPtr->setRenderer(NULL);
-}
-
-void GeometricRep::setMesh(MeshPtr mesh)
-{
-    if (mesh == mMesh)
-        return;
-    if (mMesh)
-    {
-		disconnect(mMesh.get(), &Mesh::meshChanged, this, &GeometricRep::meshChangedSlot);
-		disconnect(mMesh.get(), &Data::transformChanged, this, &GeometricRep::transformChangedSlot);
-		disconnect(mMesh.get(), &Data::clipPlanesChanged, this, &GeometricRep::clipPlanesChangedSlot);
-    }
-    mMesh = mesh;
-    if (mMesh)
-    {
-		connect(mMesh.get(), &Mesh::meshChanged, this, &GeometricRep::meshChangedSlot);
-		connect(mMesh.get(), &Data::transformChanged, this, &GeometricRep::transformChangedSlot);
-		connect(mMesh.get(), &Data::clipPlanesChanged, this, &GeometricRep::clipPlanesChangedSlot);
-        this->meshChangedSlot();
-        this->transformChangedSlot();
+	if (mesh == mMesh)
+		return;
+	if (mMesh)
+	{
+		disconnect(mMesh.get(), &Mesh::meshChanged, this, &GraphicalGeometric::meshChangedSlot);
+		disconnect(mMesh.get(), &Data::transformChanged, this, &GraphicalGeometric::transformChangedSlot);
+		disconnect(mMesh.get(), &Data::clipPlanesChanged, this, &GraphicalGeometric::clipPlanesChangedSlot);
+	}
+	mMesh = mesh;
+	if (mMesh)
+	{
+		connect(mMesh.get(), &Mesh::meshChanged, this, &GraphicalGeometric::meshChangedSlot);
+		connect(mMesh.get(), &Data::transformChanged, this, &GraphicalGeometric::transformChangedSlot);
+		connect(mMesh.get(), &Data::clipPlanesChanged, this, &GraphicalGeometric::clipPlanesChangedSlot);
+		this->meshChangedSlot();
+		this->transformChangedSlot();
 		this->clipPlanesChangedSlot();
-    }
+	}
 }
 
 //Copied from ImageMapperMonitor (used by VolumetricRep)
-void GeometricRep::clipPlanesChangedSlot()
+void GraphicalGeometric::clipPlanesChangedSlot()
 {
 	this->clearClipping();
 
@@ -116,7 +99,7 @@ void GeometricRep::clipPlanesChangedSlot()
 	}
 }
 
-void GeometricRep::clearClipping()
+void GraphicalGeometric::clearClipping()
 {
 	if (!mMesh)
 		return;
@@ -124,33 +107,41 @@ void GeometricRep::clearClipping()
 	mGraphicalPolyDataPtr->getMapper()->RemoveAllClippingPlanes();
 }
 
-MeshPtr GeometricRep::getMesh()
+MeshPtr GraphicalGeometric::getMesh()
 {
-    return mMesh;
-}
-bool GeometricRep::hasMesh(MeshPtr mesh) const
-{
-    return (mMesh == mesh);
+	return mMesh;
 }
 
-void GeometricRep::meshChangedSlot()
+void GraphicalGeometric::setRenderer(vtkRendererPtr renderer)
 {
-    mGraphicalGlyph3DDataPtr->setVisibility(mMesh->showGlyph());
-    if(mMesh->showGlyph())
-    {
-        mGraphicalGlyph3DDataPtr->setData(mMesh->getVtkPolyData());
-        mGraphicalGlyph3DDataPtr->setOrientationArray(mMesh->getOrientationArray());
-        mGraphicalGlyph3DDataPtr->setColorArray(mMesh->getColorArray());
-        mGraphicalGlyph3DDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-        mGraphicalGlyph3DDataPtr->setLUT(mMesh->getGlyphLUT());
-        mGraphicalGlyph3DDataPtr->setScaleFactor(mMesh->getVisSize());
-    }
+	mGraphicalPolyDataPtr->setRenderer(renderer);
+	mGraphicalGlyph3DDataPtr->setRenderer(renderer);
+}
 
-    mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
-    mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
+void GraphicalGeometric::setTransformOffset(Transform3D dMu)
+{
+	m_dMu = dMu;
+	this->transformChangedSlot();
+}
+
+void GraphicalGeometric::meshChangedSlot()
+{
+	mGraphicalGlyph3DDataPtr->setVisibility(mMesh->showGlyph());
+	if(mMesh->showGlyph())
+	{
+		mGraphicalGlyph3DDataPtr->setData(mMesh->getVtkPolyData());
+		mGraphicalGlyph3DDataPtr->setOrientationArray(mMesh->getOrientationArray());
+		mGraphicalGlyph3DDataPtr->setColorArray(mMesh->getColorArray());
+		mGraphicalGlyph3DDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+		mGraphicalGlyph3DDataPtr->setLUT(mMesh->getGlyphLUT());
+		mGraphicalGlyph3DDataPtr->setScaleFactor(mMesh->getVisSize());
+	}
+
+	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
+	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
 	//Set mesh color, opacity
-    mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-    mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+	mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+	mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 	//Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
 	const MeshPropertyData& src = mMesh->getProperties();
@@ -169,17 +160,62 @@ void GeometricRep::meshChangedSlot()
 
 /**called when transform is changed
  * reset it in the prop.*/
-void GeometricRep::transformChangedSlot()
+void GraphicalGeometric::transformChangedSlot()
 {
-    if (!mMesh)
-    {
-        return;
-    }
-    mGraphicalPolyDataPtr->setUserMatrix(mMesh->get_rMd().getVtkMatrix());
-    mGraphicalGlyph3DDataPtr->setUserMatrix(mMesh->get_rMd().getVtkMatrix());
+	if (!mMesh)
+	{
+		return;
+	}
+
+	Transform3D rMd = mMesh->get_rMd();
+	Transform3D rMu = rMd * m_dMu;
+
+	mGraphicalPolyDataPtr->setUserMatrix(rMu.getVtkMatrix());
+	mGraphicalGlyph3DDataPtr->setUserMatrix(rMu.getVtkMatrix());
 }
 
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+GeometricRep::GeometricRep() :
+    RepImpl()
+{
+	mGraphics.reset(new GraphicalGeometric());
+}
+GeometricRep::~GeometricRep()
+{
+}
+GeometricRepPtr GeometricRep::New(const QString& uid)
+{
+    return wrap_new(new GeometricRep(), uid);
+}
+
+void GeometricRep::addRepActorsToViewRenderer(ViewPtr view)
+{
+	mGraphics->setRenderer(view->getRenderer());
+}
+
+void GeometricRep::removeRepActorsFromViewRenderer(ViewPtr view)
+{
+	mGraphics->setRenderer(NULL);
+}
+
+void GeometricRep::setMesh(MeshPtr mesh)
+{
+	mGraphics->setMesh(mesh);
+}
+
+MeshPtr GeometricRep::getMesh()
+{
+	return mGraphics->getMesh();
+}
+bool GeometricRep::hasMesh(MeshPtr mesh) const
+{
+	return mGraphics->getMesh() == mesh;
+}
 
 //---------------------------------------------------------
 }
