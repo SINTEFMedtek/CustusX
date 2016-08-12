@@ -65,10 +65,10 @@ void BronchoscopyTool::onToolTransformAndTimestamp(Transform3D prMt, double time
 {
 	double maxDistanceToCenterline = mProjectionCenterline->getMaxDistanceToCenterlineOption()->getValue();
 
-	if (mProjectionCenterline->isAdvancedCenterlineProjectionSelected())
-		m_prMt = mProjectionCenterline->findProjectedPoint(prMt, maxDistanceToCenterline);
-	else
-		m_prMt = mProjectionCenterline->findClosestPointInBranches(prMt,maxDistanceToCenterline);
+    if (mProjectionCenterline->isAdvancedCenterlineProjectionSelected())
+        m_prMt = mProjectionCenterline->findProjectedPoint(prMt, maxDistanceToCenterline);
+    else
+        m_prMt = mProjectionCenterline->findClosestPointInBranches(prMt,maxDistanceToCenterline);
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
