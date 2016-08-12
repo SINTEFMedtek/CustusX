@@ -62,7 +62,7 @@ QWidget* ToolMetricWrapper::createWidget()
 {
 	this->initializeProperties();
 
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("tool_metric");
 
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	topLayout->setMargin(0);
