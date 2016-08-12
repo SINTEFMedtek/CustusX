@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 NetworkDataTransferWidget::NetworkDataTransferWidget(NetworkDataTransferPtr backend, QWidget *parent) :
-	BaseWidget(parent, "NetworkDataTransferWidget", "Network Data Transfer"),
+	BaseWidget(parent, "network_data_transfer_widget", "Network Data Transfer"),
 	mDataTransfer(backend)
 {
 

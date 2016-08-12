@@ -125,7 +125,7 @@ namespace
 void testBaseWidgetChild(cx::BaseWidget* widget)
 {
 	REQUIRE(widget);
-	CHECK_THAT(widget->objectName().toStdString(), EndsWith("Widget"));
+	CHECK_THAT(widget->objectName().toStdString(), EndsWith("widget"));
 	CHECK_FALSE(widget->windowTitle().isEmpty());
 }
 

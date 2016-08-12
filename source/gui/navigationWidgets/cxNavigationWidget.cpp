@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 NavigationWidget::NavigationWidget(QWidget* parent) :
-    BaseWidget(parent, "NavigationWidget", "Navigation Properties"),
+	BaseWidget(parent, "navigation_widget", "Navigation Properties"),
     mVerticalLayout(new QVBoxLayout(this)),
     mCameraGroupBox(new QGroupBox(tr("Camera Style"), this)),
     mCameraGroupLayout(new QVBoxLayout())

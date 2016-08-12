@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 ImagePreviewWidget::ImagePreviewWidget(QWidget* parent) :
-		FileWatcherWidget(parent, "ImagePreviewWidget", "Image Preview"),
+		FileWatcherWidget(parent, "image_preview_widget", "Image Preview"),
 		mDisplayLabel(new QLabel())
 {
 	this->setToolTip("Preview of an image file");

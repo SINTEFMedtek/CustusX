@@ -43,7 +43,7 @@ namespace cx
 {
 
 ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "ToolManualCalibrationWidget", "Tool Manual Calibrate"),
+	BaseWidget(parent, "tool_manual_calibration_widget", "Tool Manual Calibrate"),
 	mServices(services)
 {
   //layout

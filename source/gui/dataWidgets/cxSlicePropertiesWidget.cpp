@@ -45,7 +45,7 @@ namespace cx
 {
 
 SlicePropertiesWidget::SlicePropertiesWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-	TabbedWidget(parent, "SlicePropertiesWidget", "Slice Properties")
+	TabbedWidget(parent, "slice_properties_widget", "Slice Properties")
 {
 	this->setToolTip("2D Image properties");
 	StringPropertyActiveDataPtr activeDataProperty = StringPropertyActiveData::New(patientModelService, "image|trackedStream");

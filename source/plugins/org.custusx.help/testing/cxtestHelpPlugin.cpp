@@ -61,7 +61,7 @@ void TestHelpFixture::setupHelpBrowserInsideMainWindow()
 	mw = dynamic_cast<cx::MainWindowApplicationComponent<cx::MainWindow>*>(mainwindow.get())->mMainWindow;
 	REQUIRE(mw!=NULL);
 
-	helpWidget = mw->findChild<cx::HelpWidget*>("HelpWidget");
+	helpWidget = mw->findChild<cx::HelpWidget*>("help_widget");
 	REQUIRE(helpWidget!=NULL);
 	helpWidget->forcePrePaint(); // explicitly populate helpWidget
 

@@ -40,11 +40,11 @@ namespace cx
 {
 
 ActiveToolWidget::ActiveToolWidget(TrackingServicePtr trackingService, QWidget* parent) :
-    BaseWidget(parent, "ActiveToolWidget", "Active Tool")
+	BaseWidget(parent, "active_tool_widget", "Active Tool")
 {
 	this->setToolTip("Select the active tool");
   QVBoxLayout* layout = new QVBoxLayout(this);
-  this->setObjectName("ActiveToolWidget");
+  this->setObjectName("active_tool_widget");
   layout->setMargin(0);
 
   mSelector = StringPropertyActiveTool::New(trackingService);

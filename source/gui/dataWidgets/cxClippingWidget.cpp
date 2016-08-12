@@ -52,7 +52,7 @@ namespace cx
 {
 
 ClippingWidget::ClippingWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "ClippingWidget", "Clip"),
+	BaseWidget(parent, "clipping_widget", "Clip"),
 	mServices(services)
 {
 	connect(mServices->view().get(), &ViewService::activeLayoutChanged, this, &ClippingWidget::setupUI);
