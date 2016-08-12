@@ -266,18 +266,16 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 
 Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMt, double maxDistance)
 {
-	Transform3D rMt = m_rMpr * prMt;
     double maxSearchDistance = 25; //mm
-	Transform3D new_rMt;
+    Transform3D new_prMt;
 	if (isPreviousProjectedPointSet)
 	{
 		findSearchPositions(maxSearchDistance);
-		new_rMt = findClosestPointInSearchPositions(rMt, maxDistance);
+        new_prMt = findClosestPointInSearchPositions(prMt, maxDistance);
 	}
 	else
-		new_rMt = findClosestPointInBranches(rMt, maxDistance);
+        new_prMt = findClosestPointInBranches(prMt, maxDistance);
 
-	Transform3D new_prMt = m_rMpr.inverse() * new_rMt;
 	return new_prMt;
 }
 
