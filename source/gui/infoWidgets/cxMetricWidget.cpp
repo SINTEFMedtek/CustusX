@@ -299,14 +299,6 @@ void MetricWidget::updateTableContents()
 	// update contents:
 	QTime timer;
 	timer.start();
-	for (unsigned i = 0; i < mMetrics.size(); ++i)
-	{
-		MetricBasePtr current = mMetrics[i];
-		QString name = current->getData()->getName();
-		QString value = current->getValue();
-		QString arguments = current->getArguments();
-		QString type = current->getType();
-	}
 
 	for (unsigned i = 0; i < mMetrics.size(); ++i)
 	{

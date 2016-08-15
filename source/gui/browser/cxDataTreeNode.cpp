@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxDataMetric.h"
+#include "cxMetricUtilities.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -205,6 +207,15 @@ QWidget* DataTreeNode::createPropertiesWidget() const
 			wrepo->add(widget);
 		}
 		return widget;
+	}
+	if(boost::dynamic_pointer_cast<DataMetric>(mData))
+	{
+		MetricUtilities utilities(this->getServices()->view(), this->getServices()->patient());
+		QWidget* widget = utilities.createMetricWidget(mData);
+		if(widget)
+		{
+			return widget;
+		}
 	}
 	return new QLabel(QString("Data widget %1 ").arg(mData->getName()));
 }

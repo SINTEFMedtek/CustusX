@@ -63,16 +63,50 @@ MetricBasePtr MetricUtilities::createMetricWrapper(DataPtr data)
  */
 std::vector<MetricBasePtr> MetricUtilities::createMetricWrappers()
 {
-    std::vector<MetricBasePtr> retval;
-  std::map<QString, DataPtr> all = mPatientModelService->getData();
-  for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
-  {
-	MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
-    if (wrapper)
-    {
-        retval.push_back(wrapper);
-    }
-  }
-  return retval;
+	std::vector<MetricBasePtr> retval;
+	std::map<QString, DataPtr> all = mPatientModelService->getData();
+	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+	{
+		MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
+		if (wrapper)
+		{
+			retval.push_back(wrapper);
+		}
+	}
+	return retval;
 }
+
+QWidget* MetricUtilities::createMetricWidget(DataPtr data)
+{
+	MetricBasePtr wrapper = this->createMetricWrapper(data);
+	QWidget* widget = wrapper->createWidget();
+	wrapper->update();
+
+	QString name = wrapper->getData()->getName();
+//	QString value = wrapper->getValue();
+//	QString arguments = wrapper->getArguments();
+	QString type = wrapper->getType();
+
+	QWidget* topWidget = new QWidget();
+
+	QHBoxLayout* topLayout = new QHBoxLayout(topWidget);
+	QHBoxLayout* headerLayout = new QHBoxLayout(topWidget);
+
+	headerLayout->addWidget(new QLabel("Name: "));
+	headerLayout->addWidget(new QLabel(name));
+
+	QGroupBox* groupBox = new QGroupBox("Metric type: "+ type, topWidget);
+	groupBox->setFlat(true);
+	QVBoxLayout* verticalLayout = new QVBoxLayout(groupBox);
+	verticalLayout->setMargin(4);
+
+	verticalLayout->addLayout(headerLayout);
+	verticalLayout->addWidget(widget, 1);
+	topLayout->addWidget(groupBox);
+
+	topWidget->setLayout(topLayout);
+
+	return topWidget;
+}
+
 }//cx

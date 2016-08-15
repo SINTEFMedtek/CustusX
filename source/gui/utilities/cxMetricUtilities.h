@@ -15,6 +15,7 @@ public:
 
 	MetricBasePtr createMetricWrapper(DataPtr data);
 	std::vector<MetricBasePtr> createMetricWrappers();
+	QWidget *createMetricWidget(DataPtr data);
 
 private:
 	PatientModelServicePtr mPatientModelService;
