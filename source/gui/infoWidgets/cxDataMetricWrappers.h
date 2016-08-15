@@ -88,6 +88,7 @@ private slots:
 protected:
   ColorPropertyPtr mColorSelector;
   void addColorWidget(QVBoxLayout* layout);
+  QWidget* newWidget(QString objectName);
   ViewServicePtr mViewService;
   PatientModelServicePtr mPatientModelService;
 };
