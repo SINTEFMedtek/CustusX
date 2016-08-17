@@ -29,56 +29,68 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXMESHPROPERTIESWIDGET_H
+#define CXMESHPROPERTIESWIDGET_H
 
-#ifndef GRAPHICALOBJECTWITHDIRECTION_H
-#define GRAPHICALOBJECTWITHDIRECTION_H
+#include "cxGuiExport.h"
 
-#include "cxResourceVisualizationExport.h"
-#include "vtkForwardDeclarations.h"
-#include "cxForwardDeclarations.h"
-#include "cxVector3D.h"
+#include <vector>
+//#include <QtWidgets>
 
-typedef vtkSmartPointer<class vtkSuperquadricSource> vtkSuperquadricSourcePtr;
+#include "cxMesh.h"
+#include "cxDataInterface.h"
+#include "cxBaseWidget.h"
+
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+class ReplacableContentWidget;
 
-/** \brief Base helper class for rendering objects with a specific direction in 3D
+/**
+ * \class MeshPropertiesWidget
  *
- * \ingroup cx_resource_view
- * \date 25.05.2016-05-25
- * \author jone
+ * \brief Widget for displaying glyps information about meshes.
+ *
+ * \ingroup cx_gui
+ *
+ * split from class MeshInfoWidget
  */
-class cxResourceVisualization_EXPORT GraphicalObjectWithDirection
+class cxGui_EXPORT MeshPropertiesWidget : public BaseWidget
 {
-public:
-    GraphicalObjectWithDirection(vtkRendererPtr renderer = vtkRendererPtr());
-    virtual ~GraphicalObjectWithDirection();
+  Q_OBJECT
 
-    vtkActorPtr getActor() const;
-    vtkPolyDataPtr getPolyData() const;
-    vtkPolyDataMapperPtr getMapper() const;
-    void setPosition(Vector3D point);
-    void setDirection(Vector3D direction);
-    void setVectorUp(const Vector3D &up);
-	void setScale(Vector3D scale);
-	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+public:
+	MeshPropertiesWidget(SelectDataStringPropertyBasePtr meshSelector,
+				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+				   QWidget* parent);
+  virtual ~MeshPropertiesWidget();
+
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
 
 protected:
-    void updateOrientation();
+  void setupUI();
+  virtual void prePaintEvent();
 
-    vtkSuperquadricSourcePtr mSource;
-    vtkPolyDataMapperPtr mMapper;
-    vtkActorPtr mActor;
-    vtkRendererPtr mRenderer;
+private:
+  void updateFrontend();
 
-    Vector3D mPoint;
-    Vector3D mDirection;
-    Vector3D mVectorUp;
-	Vector3D mScale;
+protected slots:
+  void meshSelectedSlot();
+
+private:
+  MeshPtr mMesh;
+  SelectDataStringPropertyBasePtr mMeshSelector;
+
+  ReplacableContentWidget* mPropertiesWidget;
+
+  PatientModelServicePtr mPatientModelService;
+  ViewServicePtr mViewService;
+
+  MeshPropertiesWidget();
+  void clearUI();
 };
-typedef boost::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
 
-} // namespace cx
+}//end namespace cx
 
-#endif // GRAPHICALOBJECTWITHDIRECTION_H
+#endif // CXMESHPROPERTIESWIDGET_H

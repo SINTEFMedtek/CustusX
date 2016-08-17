@@ -73,6 +73,7 @@ private:
 
   BoolPropertyPtr mCameraFollowTool;
   BoolPropertyPtr mFocusFollowTool;
+  BoolPropertyPtr mCameraOnTooltip;
   BoolPropertyPtr mTableLock;
   BoolPropertyPtr mUniCam;
   DoublePropertyPtr mElevation;

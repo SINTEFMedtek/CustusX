@@ -51,7 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkSTLReader.h"
 #include <vtkPolyDataNormals.h>
 #include "cxLogger.h"
-
+#include "cxBoundingBox3D.h"
+#include "cxGeometricRep.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -68,7 +70,7 @@ CustomMetricRep::CustomMetricRep()
 void CustomMetricRep::clear()
 {
 	DataMetricRep::clear();
-    mSTLModel.reset();
+	mGeometry.reset();
 }
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
@@ -87,48 +89,54 @@ void CustomMetricRep::onModifiedStartRender()
 
 void CustomMetricRep::updateSTLModel()
 {
-    if (!mMetric)
-        return;
+	CustomMetricPtr custom = this->getCustomMetric();
 
-    CustomMetricPtr custom = this->getCustomMetric();
+	if (!this->getView() || !custom)
+	   return;
 
-    if (!mSTLModel && this->getView() && mMetric)
-    {
-        mSTLModel.reset(new GraphicalObjectWithDirection());
-        mSTLModel->setRenderer(this->getRenderer());
-    }
+	if (!mGeometry)
+	{
+		mGeometry.reset(new GraphicalGeometric);
+		mGeometry->setRenderer(this->getRenderer());
+	}
 
-    if(!mSTLModel)
-        return;
+	mGeometry->setMesh(custom->getMesh());
 
-    QString filename = custom.get()->getSTLFile();
+	Vector3D pos = custom->getPosition();
+	Vector3D dir = custom->getDirection();
+	Vector3D vup = custom->getVectorUp();
+	Vector3D scale = custom->getScale();
 
-    if (filename.isEmpty() || !QFileInfo(filename).exists() || QFileInfo(filename).isDir())
-    {
-        reportWarning("File not found: " + filename + ", failed to update the STL model.");
-        return;
-    }
+	Transform3D M = this->calculateOrientation(pos, dir, vup, scale);
+	mGeometry->setTransformOffset(M);
+}
 
-    vtkSTLReaderPtr STLReader = vtkSTLReaderPtr::New();
-    STLReader->SetFileName(cstring_cast(filename));
+/**
+ * Based on a position+direction, view up and scale,
+ * calculate an orientation matrix combining these.
+ */
+Transform3D CustomMetricRep::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale)
+{
+	Transform3D R;
+	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
 
-    vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-    normals->SetInputConnection(STLReader->GetOutputPort());
-    normals->Update();
+	if (directionAlongUp)
+	{
+		R = Transform3D::Identity();
+	}
+	else
+	{
+		Vector3D jvec = dir.normal();
+		Vector3D kvec = cross(vup, dir).normal();
+		Vector3D ivec = cross(jvec, kvec).normal();
+		Vector3D center = Vector3D::Zero();
+		R = createTransformIJC(ivec, jvec, center);
+	}
 
-    vtkMapperPtr polyDataMapper = mSTLModel->getMapper();
-    polyDataMapper->SetInputConnection(normals->GetOutputPort()); //read a 3D model file of the tool
-    polyDataMapper->Update();
-
-    vtkActorPtr actor = mSTLModel->getActor();
-    actor->SetMapper(polyDataMapper);
-    actor->GetProperty()->SetColor(0.5, 1, 1);
-    actor->GetProperty()->SetSpecularPower(15);
-    actor->GetProperty()->SetSpecular(0.3);
-
-    mSTLModel->setPosition(custom->getPosition());
-    mSTLModel->setDirection(custom->getDirection());
-    mSTLModel->setVectorUp(custom->getVectorUp());
+	Transform3D S = createTransformScale(scale);
+	Transform3D T = createTransformTranslate(pos);
+	Transform3D M = T*R*S;
+	return M;
 }
 
 }

@@ -29,56 +29,55 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXMESHPROPERTYDATA_H
+#define CXMESHPROPERTYDATA_H
 
-#ifndef GRAPHICALOBJECTWITHDIRECTION_H
-#define GRAPHICALOBJECTWITHDIRECTION_H
+#include "cxResourceExport.h"
+#include "cxPrecompiledHeader.h"
+#include "cxColorProperty.h"
+#include "cxBoolProperty.h"
+#include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
 
-#include "cxResourceVisualizationExport.h"
-#include "vtkForwardDeclarations.h"
-#include "cxForwardDeclarations.h"
-#include "cxVector3D.h"
-
-typedef vtkSmartPointer<class vtkSuperquadricSource> vtkSuperquadricSourcePtr;
+class QDomNode;
 
 namespace cx
 {
 
-/** \brief Base helper class for rendering objects with a specific direction in 3D
- *
- * \ingroup cx_resource_view
- * \date 25.05.2016-05-25
- * \author jone
+/**
+ * Mesh data used in a vtkProperty
  */
-class cxResourceVisualization_EXPORT GraphicalObjectWithDirection
+class cxResource_EXPORT MeshPropertyData : public QObject
 {
+	Q_OBJECT
 public:
-    GraphicalObjectWithDirection(vtkRendererPtr renderer = vtkRendererPtr());
-    virtual ~GraphicalObjectWithDirection();
+	MeshPropertyData();
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode dataNode);
 
-    vtkActorPtr getActor() const;
-    vtkPolyDataPtr getPolyData() const;
-    vtkPolyDataMapperPtr getMapper() const;
-    void setPosition(Vector3D point);
-    void setDirection(Vector3D direction);
-    void setVectorUp(const Vector3D &up);
-	void setScale(Vector3D scale);
-	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+	std::vector<PropertyPtr> mProperties;
 
-protected:
-    void updateOrientation();
+	ColorPropertyPtr mColor;
+	DoublePropertyPtr mVisSize;
+	BoolPropertyPtr mBackfaceCulling;
+	BoolPropertyPtr mFrontfaceCulling;
+	StringPropertyPtr mRepresentation;
 
-    vtkSuperquadricSourcePtr mSource;
-    vtkPolyDataMapperPtr mMapper;
-    vtkActorPtr mActor;
-    vtkRendererPtr mRenderer;
+	BoolPropertyPtr mEdgeVisibility;
+	ColorPropertyPtr mEdgeColor;
 
-    Vector3D mPoint;
-    Vector3D mDirection;
-    Vector3D mVectorUp;
-	Vector3D mScale;
+	DoublePropertyPtr mAmbient;
+	DoublePropertyPtr mDiffuse;
+	DoublePropertyPtr mSpecular;
+	DoublePropertyPtr mSpecularPower;
+
+signals:
+	void changed();
+private:
+	void addProperty(PropertyPtr property);
+	void initialize();
 };
-typedef boost::shared_ptr<GraphicalObjectWithDirection> GraphicalObjectWithDirectionPtr;
 
 } // namespace cx
 
-#endif // GRAPHICALOBJECTWITHDIRECTION_H
+#endif // CXMESHPROPERTYDATA_H

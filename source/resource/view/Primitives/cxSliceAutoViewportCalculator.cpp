@@ -172,7 +172,7 @@ SliceAutoViewportCalculator::ReturnType SliceAutoViewportCalculator::calculateZo
 	// find zoom needed to see entire box
 	// emit zoom
 	double zoom = this->findZoomRequiredToIncludeRoi(mBB_s, roi_s);
-	CX_LOG_CHANNEL_DEBUG("CA") << "autozoom zoom only " << zoom;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "autozoom zoom only " << zoom;
 	retval.zoom = 1.0/zoom; //???? check inversion
 
 	return retval;

@@ -614,7 +614,6 @@ void ViewWrapper2D::mouseWheelSlot(int x, int y, int delta, int orientation, Qt:
 	val += delta / 120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
 	double newZoom = pow(10.0, val);
 
-	CX_LOG_CHANNEL_DEBUG("CA") << "mouse zoom " << newZoom;
 	mZoom2D->setFactor(newZoom);
 
 	Navigation(mServices).centerToTooltip(); // side effect: center on tool

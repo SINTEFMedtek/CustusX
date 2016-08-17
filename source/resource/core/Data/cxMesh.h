@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 
 #include "vtkForwardDeclarations.h"
+#include "cxMeshPropertyData.h"
 
 #include <QColor>
 #include "cxData.h"
@@ -50,6 +51,7 @@ class QDomDocument;
 
 namespace cx
 {
+
 
 /** \brief A mesh data set.
  *
@@ -63,8 +65,8 @@ class cxResource_EXPORT Mesh: public Data
 Q_OBJECT
 public:
 	static MeshPtr create(const QString& uid, const QString& name = "");
-	Mesh(const QString& uid, const QString& name = "");
-	Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData);
+//	Mesh(const QString& uid, const QString& name =vtkPolyDataPtr "");
+	Mesh(const QString& uid, const QString& name="", vtkPolyDataPtr polyData=vtkPolyDataPtr());
 	virtual ~Mesh();
 
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
@@ -101,6 +103,8 @@ public:
     const char * getGlyphLUT();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
+//	void setProperties(const MeshPropertyData& data);
+	const MeshPropertyData& getProperties() const;
 
 	virtual void save(const QString &basePath);
 signals:
@@ -115,19 +119,15 @@ public slots:
     void setGlyphLUT(const char * glyphLUT);
 private:
 	vtkPolyDataPtr mVtkPolyData;
-	QColor mColor;
-	bool mWireframe;
-	bool mBackfaceCulling; ///< If backface culling is on, polygons facing outwards are not drawn.
-	bool mFrontfaceCulling; ///< If frontface culling is on, polygons facing inwards are not drawn.
-    bool mHasGlyph;
-    double mVisSize;
-    bool mShowGlyph;
+	bool mHasGlyph;
+	bool mShowGlyph;
     bool shouldGlyphBeEnableByDefault();
     std::string mOrientationArray;
     std::string mColorArray;
     std::string mGlyphLUT;
     QStringList mOrientationArrayList;
     QStringList mColorArrayList;
+	MeshPropertyData mProperties;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

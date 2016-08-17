@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProperty.h"
 #include "cxFilePathProperty.h"
 #include "cxStringListProperty.h"
+#include "cxSelectDataStringProperty.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -262,14 +263,17 @@ private slots:
 
 private:
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
-  FilePathPropertyPtr createSTLFileSelector() const;
+  DoublePropertyPtr createOffsetFromP0() const;
+  BoolPropertyPtr createScaletoP1() const;
+  StringPropertySelectMeshPtr createMeshSelector() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
-  FilePathPropertyPtr mSTLFile;
+  BoolPropertyPtr mScaleToP1;
+  DoublePropertyPtr mOffsetFromP0;
+  StringPropertySelectMeshPtr mMesh;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
-
 };
 
 class cxGui_EXPORT SphereMetricWrapper : public MetricBase

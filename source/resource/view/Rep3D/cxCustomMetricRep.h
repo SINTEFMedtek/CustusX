@@ -39,12 +39,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxGraphicalObjectWithDirection.h"
+#include "cxTransform3D.h"
 
 
 namespace cx
 {
 typedef boost::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
 typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
+typedef boost::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
+
 
 /**Rep for visualizing a CustomMetric.
  *
@@ -71,8 +74,9 @@ private:
     CustomMetricRep();
     CustomMetricPtr getCustomMetric();
     void updateSTLModel();
+	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale);
 
-    GraphicalObjectWithDirectionPtr mSTLModel;
+	GraphicalGeometricPtr mGeometry;
 };
 
 }

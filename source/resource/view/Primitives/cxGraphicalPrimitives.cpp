@@ -108,11 +108,6 @@ void GraphicalGeometricBase::setFrontfaceCulling(bool val)
     mActor->GetProperty()->SetFrontfaceCulling(val);
 }
 
-void GraphicalGeometricBase::setRepresentation()
-{
-    mActor->GetProperty()->SetRepresentationToSurface();
-}
-
 void GraphicalGeometricBase::setColor(double red, double green, double blue)
 {
     mActor->GetProperty()->SetColor(red, green, blue);
@@ -140,19 +135,14 @@ void GraphicalGeometricBase::setUserMatrix(vtkMatrix4x4 *matrix)
 
 void GraphicalGeometricBase::setPointSize(int pointSize)
 {
-    if(pointSize<=0) return;
+	if(pointSize<=0)
+		return;
     mProperty->SetPointSize(pointSize);
 }
 
 void GraphicalGeometricBase::setScalarVisibility(bool show)
 {
-    if(show)
-    {
-        getMapper()->ScalarVisibilityOn();
-    }else
-    {
-        getMapper()->ScalarVisibilityOff();
-    }
+	getMapper()->SetScalarVisibility(show);
 }
 
 Vector3D GraphicalGeometricBase::getPosition() const
@@ -162,7 +152,12 @@ Vector3D GraphicalGeometricBase::getPosition() const
 
 vtkActorPtr GraphicalGeometricBase::getActor()
 {
-    return mActor;
+	return mActor;
+}
+
+vtkPropertyPtr GraphicalGeometricBase::getProperty()
+{
+	return mProperty;
 }
 
 vtkPolyDataPtr GraphicalGeometricBase::getPolyData()
@@ -186,7 +181,6 @@ GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRend
     GraphicalGeometricBase(source,renderer)
 {
     mMapper =  vtkPolyDataMapperPtr::New();
-    mIsWireFrame = false;
 
     mActor->SetMapper(mMapper);
     setSource(source);
@@ -195,15 +189,7 @@ GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRend
 
 void GraphicalPolyData3D::setIsWireFrame(bool val)
 {
-    mIsWireFrame = val;
-}
-
-void GraphicalPolyData3D::setRepresentation()
-{
-    if (mIsWireFrame)
-        mActor->GetProperty()->SetRepresentationToWireframe();
-    else
-        mActor->GetProperty()->SetRepresentationToSurface();
+	mActor->GetProperty()->SetRepresentationToWireframe();
 }
 
 void GraphicalPolyData3D::setData(vtkPolyDataPtr data)

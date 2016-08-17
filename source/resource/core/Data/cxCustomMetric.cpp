@@ -36,6 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
+#include "cxSpaceProvider.h"
+#include "cxSpaceListener.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -47,7 +50,13 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
     mDefineVectorUpMethod = mDefineVectorUpMethods.table;
-    mSTLFile = "";
+	mMeshUid = "";
+	mScaleToP1 = false;
+	mOffsetFromP0 = 0.0;
+
+//	mToolListener = spaceProvider->createListener();
+//	mToolListener->setSpace(CoordinateSystem(csTOOL, "active"));
+//	connect(mToolListener.get(), &SpaceListener::changed, this, &CustomMetric::transformChanged);
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -69,8 +78,13 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	DataMetric::addXml(dataNode);
 
 	mArguments->addXml(dataNode);
-    dataNode.toElement().setAttribute("definevectorup", mDefineVectorUpMethod);
-    dataNode.toElement().setAttribute("STLFile", mSTLFile);
+
+	QDomElement elem = dataNode.toElement();
+	elem.setAttribute("definevectorup", mDefineVectorUpMethod);
+	elem.setAttribute("meshUid", mMeshUid);
+
+	elem.setAttribute("scaleToP1", mScaleToP1);
+	elem.setAttribute("offsetFromP0", mOffsetFromP0);
 }
 
 void CustomMetric::parseXml(QDomNode& dataNode)
@@ -78,8 +92,12 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	DataMetric::parseXml(dataNode);
 
 	mArguments->parseXml(dataNode, mDataManager->getData());
-    mDefineVectorUpMethod = dataNode.toElement().attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
-    mSTLFile = dataNode.toElement().attribute("STLFile", qstring_cast(mSTLFile));
+
+	QDomElement elem = dataNode.toElement();
+	mDefineVectorUpMethod = elem.attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
+	mMeshUid = elem.attribute("meshUid", qstring_cast(mMeshUid));
+	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
+	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 }
 
 bool CustomMetric::isValid() const
@@ -102,7 +120,12 @@ Vector3D CustomMetric::getPosition() const
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	if (coords.empty())
 		return Vector3D::Zero();
-	return coords[0];
+
+	Vector3D p = coords[0];
+	Vector3D dir = getDirection();
+
+	double positionOffset = 10; // the object is moved this distance from p0 towards p1
+	return p + dir*mOffsetFromP0; // the object is moved mOffsetFromP0 from p0 towards p1
 }
 
 Vector3D CustomMetric::getDirection() const
@@ -130,9 +153,44 @@ Vector3D CustomMetric::getVectorUp() const
         return upVector;
     }
     else
-        return mDataManager->getOperatingTable().getVectorUp();
+		return mDataManager->getOperatingTable().getVectorUp();
 }
 
+Vector3D CustomMetric::getScale() const
+{
+//	bounds.range();
+
+	if (!mScaleToP1)
+		return Vector3D::Ones();
+
+	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();
+
+//	Vector3D p_to = mSpaceProvider->getActiveToolTipPoint(CoordinateSystem::reference(), true);
+
+	std::vector<Vector3D> coords = mArguments->getRefCoords();
+	double height = (coords[1] - coords[0]).length();
+
+	Vector3D pos = this->getPosition();
+	Vector3D dir = this->getDirection();
+
+//	Vector3D dir = (coords[1]-coords[0]).normal();
+	double p0 = dot(pos, dir);
+	double p1 = dot(coords[1], dir);
+//	double p2 = dot(p_to, dir);
+	height = p1 - p0;
+	// experiment: use tool to reduce size of object
+	// - in order to make the Multiguide shrink the funnel depth as it advances towards target.
+//	height = std::min(p1, p2) - p0;
+//	height/=3; // emphasis
+//	std::cout << ""
+
+	double diameter = 10; // scale max diameter of object
+//	Vector3D scale(diameter, height, diameter);
+	Vector3D scale(diameter/bounds.range()[0],
+			height/bounds.range()[1],
+			diameter/bounds.range()[2]);
+	return scale;
+}
 
 QString CustomMetric::getAsSingleLineString() const
 {
@@ -151,15 +209,46 @@ void CustomMetric::setDefineVectorUpMethod(QString defineVectorUpMethod)
     mDefineVectorUpMethod = defineVectorUpMethod;
 }
 
-void CustomMetric::setSTLFile(QString val)
+void CustomMetric::setMeshUid(QString val)
 {
-    mSTLFile = val;
+	mMeshUid = val;
     emit propertiesChanged();
 }
 
-QString CustomMetric::getSTLFile() const
+QString CustomMetric::getMeshUid() const
 {
-    return mSTLFile;
+	return mMeshUid;
+}
+
+MeshPtr CustomMetric::getMesh() const
+{
+	return mDataManager->getData<Mesh>(mMeshUid);
+}
+
+void CustomMetric::setScaleToP1(bool val)
+{
+	if (mScaleToP1 == val)
+		return;
+	mScaleToP1 = val;
+	emit propertiesChanged();
+}
+
+bool CustomMetric::getScaleToP1() const
+{
+	return mScaleToP1;
+}
+
+void CustomMetric::setOffsetFromP0(double val)
+{
+	if (mOffsetFromP0 == val)
+		return;
+	mOffsetFromP0 = val;
+	emit propertiesChanged();
+}
+
+double CustomMetric::getOffsetFromP0() const
+{
+	return mOffsetFromP0;
 }
 
 QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethods() const

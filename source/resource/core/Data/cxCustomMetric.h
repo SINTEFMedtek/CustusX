@@ -71,12 +71,20 @@ public:
 
     QString getDefineVectorUpMethod() const;
     void setDefineVectorUpMethod(QString defineVectorUpMethod);
-    void setSTLFile(QString val);
-    QString getSTLFile() const;
+	void setMeshUid(QString val);
+	QString getMeshUid() const;
+	MeshPtr getMesh() const;
+
+	void setScaleToP1(bool val);
+	bool getScaleToP1() const;
+	void setOffsetFromP0(double val);
+	double getOffsetFromP0() const;
+
 
     Vector3D getPosition() const;
     Vector3D getDirection() const;
     Vector3D getVectorUp() const;
+	Vector3D getScale() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -111,11 +119,16 @@ private:
     CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
     QString mDefineVectorUpMethod;
-    QString mSTLFile;
+	QString mMeshUid;
     DefineVectorUpMethods mDefineVectorUpMethods;
+	bool mScaleToP1;
+	double mOffsetFromP0;
+
+//	SpaceListenerPtr mToolListener;
+
 
 public:
-    CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
+	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 };
 
 /**
