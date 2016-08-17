@@ -210,12 +210,15 @@ QWidget* DataTreeNode::createPropertiesWidget() const
 	}
 	if(boost::dynamic_pointer_cast<DataMetric>(mData))
 	{
-		MetricUtilities utilities(this->getServices()->view(), this->getServices()->patient());
-		QWidget* widget = utilities.createMetricWidget(mData);
-		if(widget)
+		QWidget* widget = wrepo->findMetricWidget(mData);
+		if(!widget)
 		{
-			return widget;
+			MetricUtilities utilities(this->getServices()->view(), this->getServices()->patient());
+			widget = utilities.createMetricWidget(mData);
+			wrepo->add(widget);
 		}
+		return widget;
+
 	}
 	return new QLabel(QString("Data widget %1 ").arg(mData->getName()));
 }

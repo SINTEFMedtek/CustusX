@@ -53,6 +53,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+QWidget *WidgetTypeRepository::findMetricWidget(DataPtr data)
+{
+	for (unsigned i=0; i<mWidgets.size(); ++i)
+	{
+		SingleMetricWidget* w = dynamic_cast<SingleMetricWidget*>(mWidgets[i].data());
+		if (w && w->getData() && data && w->getData()->getUid() == data->getUid())
+			return w;
+	}
+	return NULL;
+}
+
 void WidgetTypeRepository::add(QWidget *widget)
 {
 	mWidgets.push_back(widget);

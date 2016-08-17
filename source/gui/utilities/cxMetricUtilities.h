@@ -4,11 +4,27 @@
 #include "cxViewService.h"
 #include "cxPatientModelService.h"
 #include "cxDataMetricWrappers.h"
+#include "cxBaseWidget.h"
 
 namespace cx
 {
 
-class MetricUtilities
+class SingleMetricWidget: public BaseWidget
+{
+	Q_OBJECT
+public:
+	SingleMetricWidget(QWidget* parent, MetricBasePtr wrapper, QLabel *valueLabel);
+	virtual ~SingleMetricWidget() {}
+
+	DataPtr getData();
+protected:
+
+	virtual void prePaintEvent();
+	MetricBasePtr mWrapper;
+	QLabel* mValueLabel;
+};
+
+class MetricUtilities: public QObject
 {
 public:
 	MetricUtilities(ViewServicePtr viewService, PatientModelServicePtr patientModelService);

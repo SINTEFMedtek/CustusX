@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxXmlOptionItem.h"
+#include "cxMetricUtilities.h"
 
 namespace cx
 {
@@ -67,6 +68,9 @@ public:
 		}
 		return NULL;
 	}
+
+	QWidget *findMetricWidget(DataPtr data);
+
 	void add(QWidget* widget);
 
 private:

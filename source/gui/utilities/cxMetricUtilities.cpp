@@ -2,15 +2,9 @@
 
 #include "cxFrameMetricWrapper.h"
 #include "cxToolMetricWrapper.h"
-
-namespace cx {
-
-MetricUtilities::MetricUtilities(ViewServicePtr viewService, PatientModelServicePtr patientModelService) :
-    mPatientModelService(patientModelService),
-    mViewService(viewService)
-{
-
-}
+#include "cxDataInterface.h"
+#include "cxLabeledLineEditWidget.h"
+#include "cxLogger.h"
 
 namespace
 {
@@ -30,6 +24,35 @@ boost::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::ViewServicePtr viewServ
 {
 	return boost::shared_ptr<WRAPPER>(new WRAPPER(viewService, patientModelService, castTo<METRIC>(data)));
 }
+}
+
+namespace cx {
+
+SingleMetricWidget::SingleMetricWidget(QWidget *parent, MetricBasePtr wrapper, QLabel* valueLabel) :
+	BaseWidget(parent, wrapper->getType()+"_single_metric_widget", wrapper->getType()+" Metric Widget"),
+	mWrapper(wrapper),
+	mValueLabel(valueLabel)
+{
+}
+
+DataPtr SingleMetricWidget::getData()
+{
+	return mWrapper->getData();
+}
+
+void SingleMetricWidget::prePaintEvent()
+{
+	mWrapper->update();
+	QString value = mWrapper->getValue();
+	mValueLabel->setText(value);
+}
+
+
+MetricUtilities::MetricUtilities(ViewServicePtr viewService, PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService),
+    mViewService(viewService)
+{
+
 }
 
 MetricBasePtr MetricUtilities::createMetricWrapper(DataPtr data)
@@ -82,29 +105,32 @@ QWidget* MetricUtilities::createMetricWidget(DataPtr data)
 	QWidget* widget = wrapper->createWidget();
 	wrapper->update();
 
-	QString name = wrapper->getData()->getName();
-//	QString value = wrapper->getValue();
-//	QString arguments = wrapper->getArguments();
+	QString value = wrapper->getValue();
 	QString type = wrapper->getType();
 
-	QWidget* topWidget = new QWidget();
+	QLabel* valueLabel = new QLabel(value);
 
-	QHBoxLayout* topLayout = new QHBoxLayout(topWidget);
-	QHBoxLayout* headerLayout = new QHBoxLayout(topWidget);
+	StringPropertyDataNameEditablePtr nameAdapter = StringPropertyDataNameEditable::New();
+	nameAdapter->setData(data);
 
-	headerLayout->addWidget(new QLabel("Name: "));
-	headerLayout->addWidget(new QLabel(name));
+	SingleMetricWidget* topWidget = new SingleMetricWidget(NULL, wrapper, valueLabel);
+	connect(data.get(), &Data::transformChanged, topWidget, &BaseWidget::setModified);
 
 	QGroupBox* groupBox = new QGroupBox("Metric type: "+ type, topWidget);
 	groupBox->setFlat(true);
 	QVBoxLayout* verticalLayout = new QVBoxLayout(groupBox);
 	verticalLayout->setMargin(4);
 
-	verticalLayout->addLayout(headerLayout);
-	verticalLayout->addWidget(widget, 1);
-	topLayout->addWidget(groupBox);
+	QHBoxLayout* valueLayout = new QHBoxLayout();
+	valueLayout->addWidget(new QLabel("Value: "));
+	valueLayout->addWidget(valueLabel);
 
-	topWidget->setLayout(topLayout);
+	verticalLayout->addWidget(new LabeledLineEditWidget(topWidget, nameAdapter));
+	verticalLayout->addLayout(valueLayout);
+	verticalLayout->addWidget(widget, 1);
+
+	QHBoxLayout* topLayout = new QHBoxLayout(topWidget);
+	topLayout->addWidget(groupBox);
 
 	return topWidget;
 }
