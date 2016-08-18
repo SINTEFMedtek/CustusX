@@ -14,7 +14,9 @@ class SingleMetricWidget: public BaseWidget
 	Q_OBJECT
 public:
 	SingleMetricWidget(QWidget* parent, MetricBasePtr wrapper, QLabel *valueLabel);
-	virtual ~SingleMetricWidget() {}
+	virtual ~SingleMetricWidget()
+	{
+	}
 
 	DataPtr getData();
 protected:

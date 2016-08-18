@@ -102,6 +102,7 @@ std::vector<MetricBasePtr> MetricUtilities::createMetricWrappers()
 QWidget* MetricUtilities::createMetricWidget(DataPtr data)
 {
 	MetricBasePtr wrapper = this->createMetricWrapper(data);
+
 	QWidget* widget = wrapper->createWidget();
 	wrapper->update();
 

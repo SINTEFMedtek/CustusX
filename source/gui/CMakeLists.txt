@@ -19,7 +19,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	browser/cxViewServicePropertiesWidget
 	browser/cxViewGroupPropertiesWidget
 		filterWidgets/cxFilterSetupWidget
-        filterWidgets/cxFiltersWidget
+		filterWidgets/cxFiltersWidget
 	#----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces

@@ -57,25 +57,29 @@ typedef boost::shared_ptr<class WidgetTypeRepository> WidgetTypeRepositoryPtr;
 class WidgetTypeRepository
 {
 public:
+	~WidgetTypeRepository()
+	{
+	}
+
 	template<class WIDGET>
-	WIDGET* find()
+	boost::shared_ptr<WIDGET> find()
 	{
 		for (unsigned i=0; i<mWidgets.size(); ++i)
 		{
-			WIDGET* w = dynamic_cast<WIDGET*>(mWidgets[i].data());
+			WIDGET* w = dynamic_cast<WIDGET*>(mWidgets[i].get());
 			if (w)
-				return w;
+				return boost::shared_ptr<WIDGET>(w);
 		}
-		return NULL;
+		return boost::shared_ptr<WIDGET>();
 	}
 
-	QWidget *findMetricWidget(DataPtr data);
+	boost::shared_ptr<QWidget> findMetricWidget(DataPtr data);
 
-	void add(QWidget* widget);
+	void add(boost::shared_ptr<QWidget> widget);
 
 private:
 	typedef QPointer<QWidget> QWidgetPtr;
-	std::vector<QWidgetPtr> mWidgets;
+	std::vector<boost::shared_ptr<QWidget> > mWidgets;
 };
 
 class TreeRepository : public QObject
