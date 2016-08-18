@@ -132,11 +132,8 @@ std::vector<PluginFrameworkManager::PluginLoadInfo> PluginFrameworkManager::getP
 
 void PluginFrameworkManager::loadState()
 {
-    CX_LOG_DEBUG() << "mSettingsSearchPaths: " << mSettingsSearchPaths;
 	QStringList paths = settings()->value(mSettingsSearchPaths, QStringList()).toStringList();
 	this->setSearchPaths(paths);
-    CX_LOG_DEBUG() << "mSettingsSearchPaths: " << mSettingsSearchPaths;
-    CX_LOG_DEBUG() << "paths: " << paths.join(", ");
 
 	QStringList names = this->getPluginSymbolicNames();
 	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
@@ -147,12 +144,10 @@ void PluginFrameworkManager::loadState()
 	{
 		if (info[i].targetState != ctkPlugin::UNINSTALLED)
         {
-            CX_LOG_DEBUG() << "plugin skal installeres";
 			this->install(info[i].symbolicName);
         }
 	}
 
-    CX_LOG_DEBUG() << "start all plugins";
 	// start all plugins
 	for (unsigned i=0; i< info.size(); ++i)
 	{
@@ -244,10 +239,8 @@ void PluginFrameworkManager::initializeFramework()
 {
 	if (this->frameworkInitialized())
     {
-        CX_LOG_DEBUG() << "framework er allerede initialisert, return";
 		return;
     }
-    CX_LOG_DEBUG() << "initializeFramework()";
 
 	QSharedPointer<ctkPluginFramework> framework = mFrameworkFactory->getFramework();
 
@@ -291,7 +284,6 @@ void PluginFrameworkManager::startFramework()
 
 void PluginFrameworkManager::install(const QString& symbolicName)
 {
-    CX_LOG_DEBUG() << "PluginFrameworkManager::install: " << symbolicName;
 	this->initializeFramework();
 	if (!this->frameworkInitialized())
 		return;
@@ -302,9 +294,7 @@ void PluginFrameworkManager::install(const QString& symbolicName)
 
 	try
 	{
-        CX_LOG_DEBUG() << "PluginFrameworkManager::install: 1, before \n" ;
 		ctkPluginContext* pc = this->getPluginContext();
-        CX_LOG_DEBUG() << "PluginFrameworkManager::install: 2, after \n" ;
 		pc->installPlugin(QUrl::fromLocalFile(pluginPath))->getPluginId();
 	}
 	catch (const ctkPluginException& exc)
@@ -480,19 +470,16 @@ QString PluginFrameworkManager::getPluginPath(const QString& symbolicName)
 	pluginFileName.replace(".", "_");
 	foreach(QString searchPath, mPluginSearchPaths)
 	{
-        CX_LOG_DEBUG() << "searchPath: " << searchPath;
 		QDirIterator dirIter(searchPath, mPluginLibFilter, QDir::Files, QDirIterator::Subdirectories);
 		while(dirIter.hasNext())
 		{
 			dirIter.next();
 			QFileInfo fileInfo = dirIter.fileInfo();
 			QString fileBaseName = fileInfo.baseName();
-            //CX_LOG_DEBUG() << "fileBaseName: " << fileBaseName;
 			if (fileBaseName.startsWith("lib")) fileBaseName = fileBaseName.mid(3);
 
 			if (fileBaseName == pluginFileName)
 			{
-                CX_LOG_DEBUG() << "return pluginpath, fileInfo.canonicalFilePath(): " << fileInfo.canonicalFilePath();
 				return fileInfo.canonicalFilePath();
 			}
 		}
