@@ -52,7 +52,7 @@ namespace cx
 
 //------------------------------------------------------------------------------
 ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent) :
-    BaseWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
+	BaseWidget(parent, "tool_tip_calibrate_widget", "ToolTip Calibrate"),
 	mServices(services),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),

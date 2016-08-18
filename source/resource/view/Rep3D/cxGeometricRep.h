@@ -45,7 +45,41 @@ namespace cx
 {
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
+typedef boost::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
 
+/** \brief Display one Mesh in 3D.
+ *
+ * Use this to render geometric polydata (vtkPolyData) in a 3D scene.
+ *
+ * Used by CustusX.
+ *
+ * \ingroup cx_resource_view
+ * \ingroup cx_resource_view_rep3D
+ */
+class cxResourceVisualization_EXPORT GraphicalGeometric : public QObject
+{
+	Q_OBJECT
+public:
+	GraphicalGeometric();
+	virtual ~GraphicalGeometric();
+
+	void setMesh(MeshPtr mesh); ///< sets this reps mesh
+	MeshPtr getMesh(); ///< gives this reps mesh
+	void setRenderer(vtkRendererPtr renderer);
+
+	void setTransformOffset(Transform3D dMu);
+
+protected:
+	GraphicalPolyData3DPtr mGraphicalPolyDataPtr;
+	GraphicalGlyph3DDataPtr mGraphicalGlyph3DDataPtr;
+	MeshPtr mMesh;
+	Transform3D m_dMu;
+	void clearClipping();
+private:
+	void meshChangedSlot();
+	void transformChangedSlot();
+	void clipPlanesChangedSlot();
+};
 
 
 
@@ -75,16 +109,8 @@ protected:
     virtual void addRepActorsToViewRenderer(ViewPtr view);
     virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
-    GraphicalPolyData3DPtr mGraphicalPolyDataPtr;
-    GraphicalGlyph3DDataPtr mGraphicalGlyph3DDataPtr;
-
-    MeshPtr mMesh;
-
-	void clearClipping();
 private:
-    void meshChangedSlot();
-    void transformChangedSlot();
-	void clipPlanesChangedSlot();
+	GraphicalGeometricPtr mGraphics;
 };
 
 

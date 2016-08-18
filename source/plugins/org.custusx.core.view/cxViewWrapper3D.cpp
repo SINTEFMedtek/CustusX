@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmarkRep.h"
 #include "cxPointMetricRep.h"
 #include "cxDistanceMetricRep.h"
+#include "cxRegionOfInterestMetricRep.h"
 #include "cxAngleMetricRep.h"
 #include "cxPlaneMetricRep.h"
 #include "cxFrameMetricRep.h"
@@ -92,8 +93,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetric.h"
 #include "cxSphereMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxSphereMetricRep.h"
 #include "cxDonutMetricRep.h"
+#include "cxCustomMetricRep.h"
 
 #include "cxDepthPeeling.h"
 #include "cxAxisConnector.h"
@@ -119,7 +122,7 @@ namespace cx
 ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr services):
 	ViewWrapper(services)
 {
-	view->getRenderer()->GetActiveCamera()->SetClippingRange(1, 2000);
+	view->getRenderer()->GetActiveCamera()->SetClippingRange(0.1, 2000);
 	if (!view->getRenderWindow()->GetStereoCapableWindow())
 		view->getRenderWindow()->StereoCapableWindowOn(); // Just set all 3D views 3D capable
 
@@ -131,7 +134,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	mView->setBackgroundColor(background);
 
 	view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
-	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+//	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
 	this->initializeMultiVolume3DRepProducer();
 
@@ -149,15 +152,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	connect(mServices->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
 	this->activeToolChangedSlot();
 
-	// plane type text rep
-	mPlaneTypeText = DisplayTextRep::New();
-	mPlaneTypeText->addText(QColor(Qt::green), "3D", Vector3D(0.98, 0.02, 0.0));
-	mView->addRep(mPlaneTypeText);
-
-	//data name text rep
-	mDataNameText = DisplayTextRep::New();
-	mDataNameText->addText(QColor(Qt::green), "not initialized", Vector3D(0.02, 0.02, 0.0));
-	mView->addRep(mDataNameText);
+	this->ViewWrapper::addReps();
 
 	//data name text rep
 	this->updateMetricNamesRep();
@@ -173,7 +168,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 
 //Stereo
 //  mView->getRenderWindow()->StereoCapableWindowOn(); // Moved to cxView3D
-	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+//	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	//Init 3D stereo from settings
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
@@ -212,6 +207,16 @@ void ViewWrapper3D::initializeMultiVolume3DRepProducer()
 
 void ViewWrapper3D::settingsChangedSlot(QString key)
 {
+	this->ViewWrapper::settingsChangedSlot(key);
+
+	if (key == "View3D/stereoType")
+	{
+		this->setStereoType(settings()->value("View3D/stereoType").toInt());
+	}
+	if (key == "View3D/eyeAngle")
+	{
+		this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
+	}
 	if (key == "backgroundColor")
 	{
 		QColor background = settings()->value("backgroundColor").value<QColor>();
@@ -221,7 +226,8 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 		this->initializeMultiVolume3DRepProducer();
 	}
-	if (key == "View/showDataText")
+	if ((key == "View/showDataText")
+			|| (key == "View/showOrientationAnnotation"))
 	{
 		this->updateView();
 	}
@@ -383,6 +389,7 @@ void ViewWrapper3D::createSlicesActions(QWidget* parent)
 	this->createSlicesAction(PlaneTypeCollection(ptANYPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptRADIALPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSIDEPLANE), parent);
+    this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);
 }
 
 QAction* ViewWrapper3D::createSlicesAction(PlaneTypeCollection planes, QWidget* parent)
@@ -690,8 +697,12 @@ DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
 		rep = PlaneMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
 		rep = DonutMetricRep::New();
+    else if (boost::dynamic_pointer_cast<CustomMetric>(data))
+        rep = CustomMetricRep::New();
 	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
 		rep = SphereMetricRep::New();
+	else if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(data))
+		rep = RegionOfInterestMetricRep::New();
 
     if (rep)
     {
@@ -716,17 +727,22 @@ void ViewWrapper3D::readDataRepSettings(RepPtr rep)
 	val->setShowAnnotation(!settings()->value("View/showMetricNamesInCorner").toBool());
 }
 
+QString ViewWrapper3D::getDataDescription()
+{
+	return this->getAllDataNames(DataViewProperties::create3D()).join("\n");
+}
+
+QString ViewWrapper3D::getViewDescription()
+{
+	return "3D";
+}
+
 void ViewWrapper3D::updateView()
 {
-	QString text;
-	bool show = settings()->value("View/showDataText").value<bool>();
+	this->ViewWrapper::updateView();
 
-	if (show)
-	{
-		text = this->getAllDataNames(DataViewProperties::create3D()).join("\n");
-	}
-	mDataNameText->setText(0, text);
-	mDataNameText->setFontSize(std::max(12, 22 - 2 * text.size()));
+	if (!this->getView())
+		return;
 
 	this->updateMetricNamesRep();
 
@@ -916,18 +932,6 @@ void ViewWrapper3D::setStereoType(int /*STEREOTYPE*/type)
 	case stRED_BLUE:
 		mView->getRenderWindow()->SetStereoTypeToRedBlue();
 		break;
-	}
-}
-
-void ViewWrapper3D::globalConfigurationFileChangedSlot(QString key)
-{
-	if (key == "View3D/stereoType")
-	{
-		this->setStereoType(settings()->value("View3D/stereoType").toInt());
-	}
-	else if (key == "View3D/eyeAngle")
-	{
-		this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 	}
 }
 

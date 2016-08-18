@@ -53,6 +53,7 @@ if(BUILD_TESTING)
         cxResourceVisualization
         cxGrabber
         cxtestUtilities
+        cxtestResource
         ${OPENCL_LIBRARIES}
         cxLogicManager
         cxResourceWidgets

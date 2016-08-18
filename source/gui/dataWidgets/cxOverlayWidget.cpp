@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 OverlayWidget::OverlayWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-		BaseWidget(parent, "OverlayWidget", "Overlay")
+		BaseWidget(parent, "overlay_widget", "Overlay")
 {
 	this->setToolTip("Manage multiple overlayed 2D slices");
 	QVBoxLayout* layout = new QVBoxLayout(this);

@@ -61,7 +61,7 @@ namespace cx
 
 
 ActiveToolPropertiesWidget::ActiveToolPropertiesWidget(TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, QWidget* parent) :
-	BaseWidget(parent, "ToolPropertiesWidget", "Tool Properties")
+	BaseWidget(parent, "tool_properties_widget", "Tool Properties")
 {
 
 	QVBoxLayout* layout = new QVBoxLayout(this);

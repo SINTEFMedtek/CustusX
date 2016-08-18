@@ -62,6 +62,12 @@ std::map<QString, DataPtr> PatientModelServiceNull::getData() const
 	return retval;
 }
 
+std::map<QString, DataPtr> PatientModelServiceNull::getAllData() const
+{
+	printWarning();
+	std::map<QString, DataPtr> retval;
+	return retval;
+}
 
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
@@ -90,6 +96,11 @@ bool PatientModelServiceNull::isNull()
 {
 	printWarning();
 	return true;
+}
+
+void PatientModelServiceNull::makeAvailable(const QString &uid, bool available)
+{
+	printWarning();
 }
 
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
@@ -140,6 +151,16 @@ void PatientModelServiceNull::setCenter(const Vector3D &center)
 Vector3D PatientModelServiceNull::getCenter() const
 {
 	return Vector3D::Zero();
+}
+
+void PatientModelServiceNull::setOperatingTable(const OperatingTable &ot)
+{
+    printWarning();
+}
+
+OperatingTable PatientModelServiceNull::getOperatingTable() const
+{
+    return OperatingTable(Transform3D::Identity());
 }
 
 QString PatientModelServiceNull::addLandmark()

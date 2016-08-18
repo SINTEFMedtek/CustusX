@@ -78,9 +78,9 @@ class org_custusx_core_view_EXPORT CameraStyle: public QObject
 {
 Q_OBJECT
 public:
-	explicit CameraStyle(CoreServicesPtr backend);
-	void setCameraStyle(CAMERA_STYLE_TYPE style); ///< Select tool style. This replaces the vtkInteractor Style.
-	CAMERA_STYLE_TYPE getCameraStyle() const;
+	explicit CameraStyle(CoreServicesPtr backend, ViewGroupDataPtr viewGroupData);
+	void setCameraStyle(CameraStyleData style); ///< Select tool style. This replaces the vtkInteractor Style.
+	CameraStyleData getCameraStyle() const;
 
 	void addView(ViewPtr view);
 	void clearViews();
@@ -88,40 +88,12 @@ public:
 signals:
 	void cameraStyleChanged();
 private:
-	CAMERA_STYLE_TYPE mCameraStyle; ///< the current camerastyle
+	CameraStyleData mCameraStyle; ///< the current camerastyle
 	std::vector<CameraStyleForViewPtr> mViews;
 	CoreServicesPtr mBackend;
+	ViewGroupDataPtr mViewGroupData;
 };
 
-/** GUI interaction for the CameraStyle.
- *
- * Connect to one CameraStyle instance, then
- * connect the internal actions to that instance.
- * The actions can be used by calling createInteractorStyleActionGroup.
- *
- * \date Dec 9, 2008
- * \author Janne Beate Bakeng, SINTEF
- * \author Christian Askeland, SINTEF
- */
-class org_custusx_core_view_EXPORT CameraStyleInteractor: public QObject
-{
-Q_OBJECT
-public:
-	explicit CameraStyleInteractor();
-	QActionGroup* getInteractorStyleActionGroup();
-	void connectCameraStyle(CameraStylePtr style);
-
-private slots:
-	void setInteractionStyleActionSlot();
-	void updateActionGroup();
-private:
-	void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon,
-					QString helptext);
-	QPointer<QActionGroup> mCameraStyleGroup;
-	CameraStylePtr mStyle;
-	CoreServicesPtr mBackend;
-};
-typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
 /**
  * @}

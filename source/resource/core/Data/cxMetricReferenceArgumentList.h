@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <map>
 #include "cxVector3D.h"
+#include "cxTransform3D.h"
 class QDomNode;
 
 namespace cx
@@ -66,6 +67,7 @@ public:
 	bool validArgument(DataPtr p) const;
 	std::vector<Vector3D> getRefCoords() const;
 	QString getDescription(int index) const;
+    std::vector<Transform3D> getRefFrames() const;
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode, const std::map<QString, DataPtr>& data);
 signals:

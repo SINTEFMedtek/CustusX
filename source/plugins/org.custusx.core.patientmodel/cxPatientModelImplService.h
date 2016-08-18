@@ -63,6 +63,7 @@ public:
 	virtual void insertData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name);
 	virtual std::map<QString, DataPtr> getData() const;
+	virtual std::map<QString, DataPtr> getAllData() const;
 	virtual DataPtr getData(const QString& uid) const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
@@ -90,11 +91,15 @@ public:
 
 	virtual void setCenter(const Vector3D& center);
 	virtual Vector3D getCenter() const;
+    void setOperatingTable(const OperatingTable &ot);
+    OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
 
 	virtual void autoSave();
 	virtual bool isNull();
+
+	virtual void makeAvailable(const QString& uid, bool available);
 
 private slots:
 	void probesChanged();
@@ -121,6 +126,8 @@ private:
 	std::map<QString, ToolPtr> mProbeTools;
 
 	ActiveDataPtr mActiveData;
+
+	std::vector<QString> mUnavailableData;
 
 	void disconnectProbes();
 	void connectProbes();

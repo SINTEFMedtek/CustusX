@@ -56,6 +56,106 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+CameraStyleData::CameraStyleData()
+{
+	this->clear();
+}
+
+CameraStyleData::CameraStyleData(CAMERA_STYLE_TYPE style)
+{
+	this->setCameraStyle(style);
+}
+
+void CameraStyleData::setCameraStyle(CAMERA_STYLE_TYPE style)
+{
+	this->clear();
+
+	if (style==cstDEFAULT_STYLE)
+	{
+	}
+	if (style==cstTOOL_STYLE)
+	{
+		mCameraFollowTool = true;
+		mFocusFollowTool = true;
+	}
+	if (style==cstANGLED_TOOL_STYLE)
+	{
+		mCameraFollowTool = true;
+		mFocusFollowTool = true;
+		mElevation = 20.0/180.0*M_PI;
+	}
+	if (style==cstUNICAM_STYLE)
+	{
+		mUniCam = true;
+	}
+}
+
+CAMERA_STYLE_TYPE CameraStyleData::getStyle()
+{
+	for (unsigned int i=0; i<cstCOUNT; ++i)
+	{
+		CAMERA_STYLE_TYPE current = static_cast<CAMERA_STYLE_TYPE>(i);
+		if (CameraStyleData(current)==*this)
+			return current;
+	}
+	return cstCOUNT;
+}
+
+
+void CameraStyleData::clear()
+{
+	mCameraFollowTool = false;
+	mFocusFollowTool = false;
+	mCameraOnTooltip = false;
+	mTableLock = false;
+	mElevation = 0;
+	mUniCam = false;
+	mAutoZoomROI = "";
+	mFocusROI = "";
+}
+
+void CameraStyleData::addXml(QDomNode &dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+	elem.setAttribute("cameraFollowTool", mCameraFollowTool);
+	elem.setAttribute("focusFollowTool", mFocusFollowTool);
+	elem.setAttribute("cameraOnTooltip", mCameraOnTooltip);
+	elem.setAttribute("tableLock", mTableLock);
+	elem.setAttribute("elevation", mElevation);
+	elem.setAttribute("uniCam", mUniCam);
+	elem.setAttribute("autoZoomROI", mAutoZoomROI);
+	elem.setAttribute("focusROI", mFocusROI);
+}
+
+void CameraStyleData::parseXml(QDomNode dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+	mCameraFollowTool = elem.attribute("cameraFollowTool", QString::number(mCameraFollowTool)).toInt();
+	mFocusFollowTool = elem.attribute("focusFollowTool", QString::number(mFocusFollowTool)).toInt();
+	mCameraOnTooltip = elem.attribute("cameraOnTooltip", QString::number(mCameraOnTooltip)).toInt();
+	mTableLock = elem.attribute("tableLock", QString::number(mTableLock)).toInt();
+	mElevation = elem.attribute("elevation", QString::number(mElevation)).toDouble();
+	mUniCam = elem.attribute("uniCam", QString::number(mUniCam)).toInt();
+	mAutoZoomROI = elem.attribute("autoZoomROI", mAutoZoomROI);
+	mFocusROI = elem.attribute("focusROI", mFocusROI);
+}
+
+bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs)
+{
+	return ((lhs.mCameraFollowTool==rhs.mCameraFollowTool) &&
+			(lhs.mFocusFollowTool==rhs.mFocusFollowTool) &&
+			(lhs.mCameraOnTooltip==rhs.mCameraOnTooltip) &&
+			(lhs.mTableLock==rhs.mTableLock) &&
+			similar(lhs.mElevation, rhs.mElevation) &&
+			(lhs.mUniCam==rhs.mUniCam) &&
+			(lhs.mAutoZoomROI==rhs.mAutoZoomROI) &&
+			(lhs.mFocusROI==rhs.mFocusROI)
+			);
+}
+
+
+
+
 DataViewProperties DataViewProperties::createDefault()
 {
 	DataViewProperties retval;
@@ -215,9 +315,10 @@ ViewGroupData::Options::Options() :
 {
 }
 
-ViewGroupData::ViewGroupData(CoreServicesPtr services) :
+ViewGroupData::ViewGroupData(CoreServicesPtr services, QString uid) :
 	mServices(services),
-	mCamera3D(CameraData::create())
+	mCamera3D(CameraData::create()),
+	mUid(uid)
 {
 	if(mServices)
 		connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
@@ -501,6 +602,9 @@ void ViewGroupData::addXml(QDomNode& dataNode)
 
 	base.addObjectToElement("camera3D", this->getCamera3D());
 	base.addTextToElement("slicesPlanes3D", this->getSliceDefinitions().toString());
+
+	Options options = this->getOptions();
+	base.addObjectToElement("cameraStyle", &options.mCameraStyle);
 }
 
 void ViewGroupData::parseXml(QDomNode dataNode)
@@ -523,6 +627,10 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	}
 
 	base.parseObjectFromElement("camera3D", this->getCamera3D());
+
+	Options options = this->getOptions();
+	base.parseObjectFromElement("cameraStyle", &options.mCameraStyle);
+	this->setOptions(options);
 }
 
 void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)

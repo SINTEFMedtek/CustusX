@@ -2,7 +2,7 @@ OpenIGTLink Plugin {#org_custusx_core_openigtlink}
 ===================
 
 
-\addindex org_custusx_core_openigtlink_datatransfer_widget
+\addindex network_data_transfer_widget
 Data Transfer Widget {#org_custusx_core_openigtlink_datatransfer_widget}
 ===========================================================
 

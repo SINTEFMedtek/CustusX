@@ -44,12 +44,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAngleMetric.h"
 #include "cxPlaneMetric.h"
 #include "cxSphereMetric.h"
+#include "cxRegionOfInterestMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxStringProperty.h"
 #include "cxVector3DProperty.h"
 #include "cxColorProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxSpaceProperty.h"
+#include "cxFilePathProperty.h"
+#include "cxStringListProperty.h"
+#include "cxSelectDataStringProperty.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -84,6 +89,7 @@ private slots:
 protected:
   ColorPropertyPtr mColorSelector;
   void addColorWidget(QVBoxLayout* layout);
+  QWidget* newWidget(QString objectName);
   ViewServicePtr mViewService;
   PatientModelServicePtr mPatientModelService;
 };
@@ -236,7 +242,38 @@ private:
   BoolPropertyPtr mFlat;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
+};
 
+class cxGui_EXPORT CustomMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data);
+  virtual ~CustomMetricWrapper() {}
+  virtual QWidget* createWidget();
+//  virtual QString getValue() const;
+  virtual DataMetricPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+    virtual void update();
+
+private slots:
+  void dataChangedSlot();
+  void guiChanged();
+
+private:
+  StringPropertyPtr createDefineVectorUpMethodSelector() const;
+  DoublePropertyPtr createOffsetFromP0() const;
+  BoolPropertyPtr createScaletoP1() const;
+  StringPropertySelectMeshPtr createMeshSelector() const;
+
+  CustomMetricPtr mData;
+  StringPropertyPtr mDefineVectorUpMethod;
+  BoolPropertyPtr mScaleToP1;
+  DoublePropertyPtr mOffsetFromP0;
+  StringPropertySelectMeshPtr mMesh;
+  bool mInternalUpdate;
+  MetricReferenceArgumentListGui mArguments;
 };
 
 class cxGui_EXPORT SphereMetricWrapper : public MetricBase
@@ -264,6 +301,39 @@ private:
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 };
+
+class cxGui_EXPORT RegionOfInterestMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit RegionOfInterestMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, RegionOfInterestMetricPtr data);
+  virtual ~RegionOfInterestMetricWrapper() {}
+  virtual QWidget* createWidget();
+  virtual DataMetricPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+	virtual void update();
+
+private slots:
+  void dataChangedSlot();
+  void guiChanged();
+
+private:
+  StringListPropertyPtr mDataListProperty;
+  BoolPropertyPtr mUseActiveTooltipProperty;
+  StringPropertyPtr mMaxBoundsDataProperty;
+  DoublePropertyPtr mMarginProperty;
+
+  RegionOfInterestMetricPtr mData;
+  bool mInternalUpdate;
+
+  DoublePropertyPtr createMarginSelector() const;
+  StringListPropertyPtr createDataListProperty();
+  BoolPropertyPtr createUseActiveTooltipSelector() const;
+  StringPropertyPtr createMaxBoundsDataSelector();
+};
+
+
 
 /**
  * @}

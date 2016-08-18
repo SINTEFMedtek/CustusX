@@ -38,10 +38,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxEnumConverter.h"
 #include "cxViewService.h"
+#include "cxViewGroupData.h"
+#include "cxRegionOfInterestMetric.h"
+#include "cxDoubleRange.h"
 class QIcon;
 class QWidget;
 class QMenu;
 class QActionGroup;
+class vtkInteractorStyle;
 
 namespace cx
 {
@@ -57,6 +61,24 @@ using cx::Transform3D;
  * @{
  */
 
+/**
+ * Reduce jitter during zooming.
+ *
+ * Input a suggested zoom value, output the smoothed value.
+ *  - Maintain a interval where the value can move inside without
+ *    changing the smoothed value.
+ *  - If the value moves outside interval, the interval will move
+ *    along, and the smoothed value will be set to the input value.
+ */
+class JitterFilter
+{
+public:
+	JitterFilter();
+	double newValue(double value);
+private:
+	DoubleRange range;
+	double currentValue;
+};
 
 /**
  * \class CameraStyleForView
@@ -78,8 +100,8 @@ public:
 
 	/** Select tool style. This replaces the vtkInteractor Style.
 	  */
-	void setCameraStyle(CAMERA_STYLE_TYPE style);
-	CAMERA_STYLE_TYPE getCameraStyle();
+	void setCameraStyle(CameraStyleData style);
+	CameraStyleData getCameraStyle();
 
 private slots:
 	void setModified();
@@ -90,23 +112,29 @@ private:
 	vtkRendererPtr getRenderer() const;
 	vtkCameraPtr getCamera() const;
 	ToolRep3DPtr getToolRep() const;
-	bool isToolFollowingStyle(CAMERA_STYLE_TYPE style) const;
+	bool isToolFollowingStyle() const;
 	void onPreRender();
-	void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
+	void applyCameraStyle(); ///< receives transforms from the tool which the camera should follow
 
 	void connectTool();
 	void disconnectTool();
 	void viewportChangedSlot();
-	void updateCamera();
+	RegionOfInterest getROI(QString uid);
+	void setInteractor(vtkSmartPointer<vtkInteractorStyle> style);
 
-	CAMERA_STYLE_TYPE mCameraStyleForView; ///< the current CameraStyleForView
+	CameraStyleData mStyle; ///< the current CameraStyleForView
 	ToolPtr mFollowingTool; ///< the tool the camera is following
 	ViewportListenerPtr mViewportListener;
 	ViewportPreRenderListenerPtr mPreRenderListener;
 	bool mBlockCameraUpdate; ///< for breaking a camera update loop
-
 	ViewPtr mView;
 	CoreServicesPtr mBackend;
+
+//	Vector3D mPreviousZoomCameraPos;
+	JitterFilter mZoomJitterFilter;
+
+	Vector3D smoothZoomedCameraPosition(Vector3D pos);
+	void handleLights();
 };
 
 /**

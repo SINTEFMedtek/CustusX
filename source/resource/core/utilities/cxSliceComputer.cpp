@@ -69,8 +69,7 @@ SliceComputer::SliceComputer() :
 	mGravityDirection(Vector3D(0,0,-1)) ,
 	mUseViewOffset(false),
 	mViewportHeight(1),
-	mViewOffset(0.5),
-	mUseConstrainedViewOffset(false)
+	mViewOffset(0.5)
 {
 }
 
@@ -80,7 +79,7 @@ SliceComputer::~SliceComputer()
 
 /**Group the typical plane definition uses together.
  */
-void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application, bool useConstrainedViewOffset)
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_VIEW application)
 {
 	setPlaneType(plane);
 	mClinicalApplication = application;
@@ -90,14 +89,20 @@ void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const
 		setOrientationType(otORTHOGONAL);
 		setFollowType(ftFIXED_CENTER);
 	}
-	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+    else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
 	{
 		setOrientationType(otOBLIQUE);
 		setFollowType(ftFOLLOW_TOOL);
 
 		setGravity(useGravity, gravityDir);
-		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset, useConstrainedViewOffset); // TODO finish this one
+		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
 	}
+    else if (plane==ptTOOLSIDEPLANE)
+    {
+        setOrientationType(otOBLIQUE);
+        setFollowType(ftFIXED_CENTER);
+        setGravity(useGravity, gravityDir);
+    }
 }
 
 void SliceComputer::setClinicalApplication(CLINICAL_VIEW application)
@@ -113,6 +118,11 @@ ORIENTATION_TYPE SliceComputer::getOrientationType() const
 PLANE_TYPE SliceComputer::getPlaneType() const
 {
 	return mPlaneType;
+}
+
+FOLLOW_TYPE SliceComputer::getFollowType() const
+{
+    return mFollowType;
 }
 
 Transform3D SliceComputer::getToolPosition() const
@@ -180,12 +190,11 @@ void SliceComputer::setToolOffset(double val)
  * top of a viewport. This is handled by setting the plane center accordingly.
  * Overrides FollowType.
  */
-void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset, bool useConstrainedViewOffset) 
+void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double viewOffset)
 {
 	mUseViewOffset = use; 
 	mViewportHeight = viewportHeight; 
 	mViewOffset = viewOffset;
-	mUseConstrainedViewOffset = useConstrainedViewOffset;
 }
 
 /**see setToolViewOffset()
@@ -214,8 +223,14 @@ SlicePlane SliceComputer::getPlane()  const
 		plane.j = m_rMt.vector(plane.j);
 	}
 
-	// orient planes so that gravity is down
-	plane = orientToGravity(plane);
+    if (mPlaneType == ptTOOLSIDEPLANE)
+    {
+        plane = this->orientToGravityAroundToolZAxisAndAlongTheOperatingTable(plane);
+    }
+    else
+    {
+        plane = orientToGravity(plane);
+    }
 
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo
@@ -229,14 +244,12 @@ SlicePlane SliceComputer::getPlane()  const
 
 /**Apply the view offset which is defined as follows:
  * 
- * Position the tool tip in the viewport such that it is
- * a given distance from the top. The distance is given by
- * viewport height times a ratio: the viewOffset.
- * 
- * For p=tooltip, H=viewportHeight, V=viewOffset:
- * q = p - H(1/2-V)*j
- * where we are interested in only the j-component:
- * c_new = c + j*(q-c)*j
+ *
+ * Position the (p_tooltip,p_tooloffset) points in the slice so that both
+ * are within a limit, prioritizing showing the p_tooloffset.
+ *
+ * The limit is given as H=viewportHeight, V=viewOffset:
+ *   limit = H(1/2-V)
  */
 SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 {
@@ -248,25 +261,21 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	double centerOffset = this->getViewOffsetAbsoluteFromCenter();
 
 	SlicePlane retval = base;
-	if (mUseConstrainedViewOffset)
-	{
-		Vector3D toolOffsetCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-		Vector3D newCenter = toolOffsetCenter + centerOffset * base.j;
-		double toolOffsetDistance = dot(newCenter - base.c, base.j);
 
-		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
-		newCenter = toolCenter - centerOffset * base.j;
-		double toolDistance = dot(newCenter - base.c, base.j);
-		double usedDistance = std::min(toolOffsetDistance, toolDistance);
-		retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
-	}
-	else
-	{
-		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
-		Vector3D newCenter = toolCenter - centerOffset * base.j;
-		double distance = dot(newCenter - base.c, base.j);
-		retval.c = base.c + distance * base.j; // extract j-component of newCenter
-	}
+	// limit by tooloffset
+	Vector3D toolOffsetCenter = m_rMt.coord(Vector3D(0,0,mToolOffset));
+	Vector3D newCenter = toolOffsetCenter + centerOffset * base.j;
+	double toolOffsetDistance = dot(newCenter - base.c, base.j);
+
+	// limit by tooltip
+	Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
+	newCenter = toolCenter - centerOffset * base.j;
+	double toolDistance = dot(newCenter - base.c, base.j);
+
+	// select a dist and apply
+	double usedDistance = std::min(toolOffsetDistance, toolDistance);
+	retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
+
 	return retval;
 }
 
@@ -312,6 +321,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() cons
 	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
 	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
 	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+    case ptTOOLSIDEPLANE: return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1)); //SIDE
 	default:
 		throw std::exception();
 	}
@@ -333,11 +343,11 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() cons
 	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
 	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
 	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+    case ptTOOLSIDEPLANE: return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1)); //SIDE
 	default:
 		throw std::exception();
 	}
 }
-
 
 /**Generate a viewdata containing a slice that always keeps the center 
  * of the observed image at center, but the z-component varies according 
@@ -391,8 +401,7 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	w_n = w_n*w_n; // square to keep stability near normal use.
 
 	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
-	Vector3D i_n = base.i; // |i_n|==1
-
+    Vector3D i_n = base.i; // |i_n|==1 //It seems to me that i_n might need a change to e.g. i_n = -base.j, to be good in the singularity situation. Look into that if using this method later. jone, 20160712
 
 	// set i vector to a weighted mean of the two definitions
 	// can also experiment with a tanh function or simply a linear interpolation
@@ -404,7 +413,77 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	retval.i = retval.i.normal(); // |i|==1 
 	retval.j = cross(k, retval.i);
 
-	return retval;
+    return retval;
+}
+
+/**
+ * @brief SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTable
+ * @param base
+ * @return There are two steps to orient a plane fully to gravity. First one
+ * can rotate the plane around the tool Z axis. Secondly one can tilt the plane
+ * so that the side edges are parallel to the gravity direction. This method
+ * combines these steps.
+ *
+ * We use the vector along the tool axis and find a vector, i_perpendicular,
+ * which is perpendicular to the tool and the up vector. We use this and the up
+ * vector to find the tool vector's projection, i', down on the plane which is
+ * perpendicular to the up vector. Since the plane should be oriented to
+ * gravity, we can use the up vector for j'.
+ *
+ * i_perpendicular = up x toolvector
+ * i' = i_perpendicular x up
+ * j' = up
+ *
+ * As the tool vector gets parallel to the up vector the orientation of the plane will be undefined.
+ * Therefore we use the negative plane normal, k_neg, as i_perpendicular in this case. This is done through a
+ * weighting of i_perpendicular and k depending of the angle between the tool vector and up.
+ *
+ */
+SlicePlane SliceComputer::orientToGravityAroundToolZAxisAndAlongTheOperatingTable(const SlicePlane &base) const
+{
+    if (!mUseGravity)
+    {
+        return base;
+    }
+
+    SlicePlane retval = base;
+    Vector3D up = -mGravityDirection;
+
+    Vector3D k_neg = -cross(base.i, base.j);
+    Vector3D toolVector = m_rMt.vector(Vector3D(0, 0, 1));
+    Vector3D i_perpendicular = cross(up, toolVector).normal();
+
+	double w_n = this->getWeightForAngularDifference(up, toolVector);
+
+	i_perpendicular = i_perpendicular*(1.0-w_n) + k_neg*w_n;
+
+    Vector3D i_mark = cross(i_perpendicular, up).normal();
+    Vector3D j_mark = up;
+
+    retval.i = i_mark;
+    retval.j = j_mark;
+
+    return retval;
+}
+
+/**
+ * Find a weight describing the angular difference between two vectors.
+ * A large difference gives weight=0,
+ * small difference (0 or 180) gives weight=1
+ */
+double SliceComputer::getWeightForAngularDifference(Vector3D a, Vector3D b) const
+{
+	double w_n = dot(a, b);
+	w_n = fabs(w_n);
+	// w_n = 0 : normal case
+	// w_n = 1 : singularity
+
+	double cutoff = sqrt(3.0)/2.0; // cutoff at 30*, i.e. use only toolvector up to that angle between up and tool
+	if (w_n<cutoff)
+		w_n = 0;
+	else
+		w_n = (w_n-cutoff)/(1.0-cutoff);
+	return w_n;
 }
 
 

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 RegistrationHistoryWidget::RegistrationHistoryWidget(RegServicesPtr servicesPtr, QWidget* parent, bool compact) :
-	BaseWidget(parent, "RegistrationHistoryWidget", "Registration History"),
+	BaseWidget(parent, "registration_history_widget", "Registration History"),
 	mServices(servicesPtr)
 {
 	this->setWhatsThis(this->defaultWhatsThis());

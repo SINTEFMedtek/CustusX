@@ -11,6 +11,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxNavigatedVideoImage
     Data/cxRegistrationTransform
     Data/cxMesh
+	Data/cxMeshPropertyData
     Data/cxPresets
     Data/cxTransferFunctions3DPresets
     Data/cxPointMetric
@@ -22,8 +23,10 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxToolMetric
     Data/cxFrameMetricBase
     Data/cxShapedMetric
+    Data/cxCustomMetric
     Data/cxSphereMetric
-    Data/cxMetricReferenceArgumentList
+	Data/cxRegionOfInterestMetric
+	Data/cxMetricReferenceArgumentList
     Data/cxLandmark
     Data/cxActiveImageProxy
     Data/cxTrackedStream
@@ -336,7 +339,9 @@ target_link_libraries(cxResource
 )
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
+cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/Data/doc")
 cx_add_non_source_file("usReconstructionTypes/doc/org.custusx.resource.core.usacquisitionfileformat.md")
+cx_add_non_source_file("Data/doc/org.custusx.resource.core.metrics.md")
 
 add_subdirectory(testing)
 add_subdirectory(usReconstructionTypes/testing)

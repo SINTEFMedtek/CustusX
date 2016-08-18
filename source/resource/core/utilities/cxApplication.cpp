@@ -127,18 +127,34 @@ void bringWindowToFront(QWidget* window)
 	window->raise();
 }
 
+QWidget* getMainWindow()
+{
+	QWidget *mainwindow = Q_NULLPTR;
+	foreach(mainwindow, QApplication::topLevelWidgets()) {
+	  if(mainwindow->objectName() == "main_window")
+		break;
+	}
+	return mainwindow;
+}
+
+template<typename T>
+T findMainWindowChildWithObjectName(QString objectName)
+{
+	QWidget *mainwindow = getMainWindow();
+	T object = mainwindow->findChild<T>(objectName);
+	return object;
+}
+
 void triggerMainWindowActionWithObjectName(QString actionName)
 {
-    QWidget *mainwindow = Q_NULLPTR;
-    foreach(mainwindow, QApplication::topLevelWidgets()) {
-      if(mainwindow->objectName() == "MainWindow")
-        break;
-    }
-    QAction* action = mainwindow->findChild<QAction*>(actionName);
+	QAction* action = findMainWindowChildWithObjectName<QAction*>(actionName);
     if(action)
     {
         action->trigger();
     }
 }
+
+template
+cxResource_EXPORT QWidget* findMainWindowChildWithObjectName(QString objectName);
 
 } // namespace cx

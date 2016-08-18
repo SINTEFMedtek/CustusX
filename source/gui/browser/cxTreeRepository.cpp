@@ -133,7 +133,7 @@ void TreeRepository::startListen()
 	connect(this->getServices()->patient().get(), &PatientModelService::patientChanged, this, &TreeRepository::loaded);
 	connect(this->getServices()->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &TreeRepository::invalidate);
 	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::loaded);
-	connect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+	connect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::onChanged);
 }
 
 void TreeRepository::stopListen()
@@ -141,7 +141,7 @@ void TreeRepository::stopListen()
 	disconnect(this->getServices()->patient().get(), &PatientModelService::patientChanged, this, &TreeRepository::loaded);
 	disconnect(this->getServices()->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &TreeRepository::invalidate);
 	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::loaded);
-	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::onChanged);
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()
@@ -204,10 +204,10 @@ void TreeRepository::insertTopNode()
 
 void TreeRepository::rebuild()
 {
-	mNodes.clear();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  reuild tree...";
 	for (unsigned i=0; i<mNodes.size(); ++i)
-		disconnect(mNodes[i].get(), &TreeNode::changed, this, &TreeRepository::changed);
-
+		disconnect(mNodes[i].get(), &TreeNode::changed, this, &TreeRepository::onChanged);
+	mNodes.clear();
 
 	this->insertTopNode();
 
@@ -290,17 +290,20 @@ void TreeRepository::appendNode(TreeNode* rawNode)
 
 	if (!this->getNode(node->getUid()))
 	{
-		connect(node.get(), &TreeNode::changed, this, &TreeRepository::changed);
-		connect(node.get(), &TreeNode::changed, this, &TreeRepository::invalidated);
-//		connect(node.get(), &TreeNode::changed, this, &TreeRepository::onChanged);
+		// TODO need a more detailed change policy: invalidate only when parent/childe
+		// structure is changed.
+//		connect(node.get(), &TreeNode::changed, this, &TreeRepository::invalidated);
+		connect(node.get(), &TreeNode::changed, this, &TreeRepository::onChanged);
 		mNodes.push_back(node);
 	}
 }
 
-//void TreeRepository::onChanged()
-//{
-//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeRepository::onChanged()";
-//}
+void TreeRepository::onChanged()
+{
+	TreeNode* node = dynamic_cast<TreeNode*>(sender());
+//	CX_LOG_CHANNEL_DEBUG("CA") << "   TreeRepository::onChanged() node=" << ((node)?node->getName():"-");
+	emit changed(node);
+}
 
 void TreeRepository::insertSpaceNode(CoordinateSystem space)
 {

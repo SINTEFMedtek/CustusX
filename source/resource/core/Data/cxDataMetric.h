@@ -72,6 +72,7 @@ public:
     virtual QString getSpace();
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
+    virtual Transform3D getRefFrame() const { return createTransformTranslate(this->getRefCoord()); }
 	virtual bool isValid() const { return true; }
 	virtual QString getValueAsString() const = 0;
 	virtual bool showValueInGraphics() const { return false; }

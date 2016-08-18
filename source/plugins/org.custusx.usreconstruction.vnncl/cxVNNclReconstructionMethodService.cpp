@@ -67,7 +67,7 @@ double VNNclReconstructionMethodService::getKernelExecutionTime()
 
 QString VNNclReconstructionMethodService::getName() const
 {
-    return "VNNcl";
+	return "vnn_cl";
 }
 
 std::vector<PropertyPtr> VNNclReconstructionMethodService::getSettings(QDomElement root)

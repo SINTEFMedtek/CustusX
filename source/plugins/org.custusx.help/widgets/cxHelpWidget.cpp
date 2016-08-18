@@ -54,7 +54,7 @@ namespace cx
 {
 
 HelpWidget::HelpWidget(HelpEnginePtr engine, QWidget* parent) :
-	BaseWidget(parent, "HelpWidget", "Help"),
+	BaseWidget(parent, "help_widget", "Help"),
 	mVerticalLayout(NULL),
 	mTabWidget(NULL),
 	mEngine(engine)
@@ -78,6 +78,7 @@ void HelpWidget::setup()
 	mSplitter = splitter;
 
 	HelpBrowser *browser = new HelpBrowser(this, mEngine);
+	browser->listenToEngineKeywordActivated();
 	connect(this, &HelpWidget::requestShowLink,
 			browser, &HelpBrowser::setSource);
 	mBrowser = browser;

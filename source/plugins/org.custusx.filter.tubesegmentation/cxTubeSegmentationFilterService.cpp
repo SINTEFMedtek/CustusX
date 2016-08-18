@@ -73,7 +73,7 @@ QString TubeSegmentationFilter::getName() const
 
 QString TubeSegmentationFilter::getType() const
 {
-	return "TubeSegmentationFilter";
+	return "tube_segmentation_filter";
 }
 
 QString TubeSegmentationFilter::getHelp() const

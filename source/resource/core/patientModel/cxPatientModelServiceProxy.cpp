@@ -75,6 +75,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 	mPatientModelService.reset(service, null_deleter());
 
 	connect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
+    connect(service, &PatientModelService::operatingTableChanged, this, &PatientModelService::operatingTableChanged);
 	connect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	connect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	connect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -96,6 +97,7 @@ void PatientModelServiceProxy::onServiceAdded(PatientModelService* service)
 void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 {
 	disconnect(service, &PatientModelService::centerChanged, this, &PatientModelService::centerChanged);
+    disconnect(service, &PatientModelService::operatingTableChanged, this, &PatientModelService::operatingTableChanged);
 	disconnect(service, &PatientModelService::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
 	disconnect(service, &PatientModelService::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 	disconnect(service, &PatientModelService::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
@@ -128,6 +130,11 @@ std::map<QString, DataPtr> PatientModelServiceProxy::getData() const
 	return mPatientModelService->getData();
 }
 
+std::map<QString, DataPtr> PatientModelServiceProxy::getAllData() const
+{
+	return mPatientModelService->getAllData();
+}
+
 DataPtr PatientModelServiceProxy::getData(const QString& uid) const
 {
 	return mPatientModelService->getData(uid);
@@ -156,6 +163,11 @@ void PatientModelServiceProxy::autoSave()
 bool PatientModelServiceProxy::isNull()
 {
 	return mPatientModelService->isNull();
+}
+
+void PatientModelServiceProxy::makeAvailable(const QString &uid, bool available)
+{
+	mPatientModelService->makeAvailable(uid, available);
 }
 
 std::map<QString, VideoSourcePtr> PatientModelServiceProxy::getStreams() const
@@ -200,7 +212,17 @@ void PatientModelServiceProxy::setCenter(const Vector3D &center)
 
 Vector3D PatientModelServiceProxy::getCenter() const
 {
-	return mPatientModelService->getCenter();
+    return mPatientModelService->getCenter();
+}
+
+void PatientModelServiceProxy::setOperatingTable(const OperatingTable &ot)
+{
+    mPatientModelService->setOperatingTable(ot);
+}
+
+OperatingTable PatientModelServiceProxy::getOperatingTable() const
+{
+    return mPatientModelService->getOperatingTable();
 }
 
 QString PatientModelServiceProxy::addLandmark()

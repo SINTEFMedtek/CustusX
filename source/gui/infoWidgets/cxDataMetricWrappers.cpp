@@ -53,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
 #include "cxSpaceProperty.h"
-
+#include "cxStringListProperty.h"
+#include "cxStringListSelectWidget.h"
 //TODO :remove
 #include "cxLegacySingletons.h"
 
@@ -92,6 +93,13 @@ void MetricBase::addColorWidget(QVBoxLayout* layout)
 	connect(mColorSelector.get(), SIGNAL(valueWasSet()), this, SLOT(colorSelected()));
 }
 
+QWidget *cx::MetricBase::newWidget(QString objectName)
+{
+	QWidget* widget = new QWidget;
+	widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
+	widget->setObjectName(objectName);
+	return widget;
+}
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -213,7 +221,7 @@ PointMetricWrapper::~PointMetricWrapper()
 
 QWidget* PointMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("point_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -353,7 +361,7 @@ PlaneMetricWrapper::~PlaneMetricWrapper()
 
 QWidget* PlaneMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("plane_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -411,7 +419,7 @@ DistanceMetricWrapper::DistanceMetricWrapper(ViewServicePtr viewService, Patient
 
 QWidget* DistanceMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("distance_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -474,7 +482,7 @@ AngleMetricWrapper::~AngleMetricWrapper()
 
 QWidget* AngleMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("angle_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -552,7 +560,7 @@ DonutMetricWrapper::DonutMetricWrapper(ViewServicePtr viewService, PatientModelS
 
 QWidget* DonutMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("donut_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -686,6 +694,140 @@ BoolPropertyPtr DonutMetricWrapper::createFlatSelector() const
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+CustomMetricWrapper::CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data) :
+    MetricBase(viewService, patientModelService),
+    mData(data)
+{
+    mArguments.setArguments(data->getArguments());
+    mInternalUpdate = false;
+    connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+}
+
+QWidget* CustomMetricWrapper::createWidget()
+{
+	QWidget* widget = this->newWidget("custom_metric");
+    QVBoxLayout* topLayout = new QVBoxLayout(widget);
+    QHBoxLayout* hLayout = new QHBoxLayout;
+    hLayout->setMargin(0);
+    topLayout->setMargin(0);
+    topLayout->addLayout(hLayout);
+
+    mArguments.addWidgets(hLayout);
+
+    mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
+    topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
+	mMesh = this->createMeshSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMesh));
+
+	mOffsetFromP0 = this->createOffsetFromP0();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
+	mScaleToP1 = this->createScaletoP1();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1));
+
+    this->addColorWidget(topLayout);
+    topLayout->addStretch();
+
+    this->dataChangedSlot();
+    return widget;
+}
+
+DataMetricPtr CustomMetricWrapper::getData() const
+{
+    return mData;
+}
+QString CustomMetricWrapper::getType() const
+{
+    return "Custom";
+}
+
+QString CustomMetricWrapper::getArguments() const
+{
+    return mArguments.getAsString();
+}
+
+void CustomMetricWrapper::update()
+{
+    mArguments.update();
+
+    if (mInternalUpdate)
+        return;
+    mInternalUpdate = true;
+    mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
+	mMesh->setValue(mData->getMeshUid());
+    mInternalUpdate = false;
+}
+
+void CustomMetricWrapper::dataChangedSlot()
+{
+//	if (mInternalUpdate)
+//		return;
+//	mInternalUpdate = true;
+//	mRadius->setValue(mData->getRadius());
+//	mThickness->setValue(mData->getThickness());
+//	mFlat->setValue(mData->getFlat());
+//	mInternalUpdate = false;
+}
+
+void CustomMetricWrapper::guiChanged()
+{
+    if (mInternalUpdate)
+        return;
+    mInternalUpdate = true;
+    mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
+	mData->setMeshUid(mMesh->getValue());
+	mData->setOffsetFromP0(mOffsetFromP0->getValue());
+	mData->setScaleToP1(mScaleToP1->getValue());
+
+	mInternalUpdate = false;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createScaletoP1() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Scale to P1", "",
+										  "Scale model so that it fits between P0 and P1",
+										  mData->getScaleToP1());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Offset from P1", "",
+											"Position model an offset from P0 towards P1",
+											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const
+{
+    StringPropertyPtr retval;
+    retval = StringProperty::initialize("selectDefineVectorUp",
+                                              "Use to define the vector up",
+                                              "The vector up of the metric will be connected to the static up vector of the operating table or to a frame in p1, which might well be connected to a tool giving a dynamic up vector.",
+                                              mData->getDefineVectorUpMethod(),
+                                              mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethods(),
+                                              QDomNode());
+    retval->setDisplayNames(mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethodsDisplayNames());
+
+
+    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+    return retval;
+}
+
+StringPropertySelectMeshPtr CustomMetricWrapper::createMeshSelector() const
+{
+	StringPropertySelectMeshPtr retval;
+	retval = StringPropertySelectMesh::New(mPatientModelService);
+	connect(retval.get(), &StringPropertySelectMesh::changed, this, &CustomMetricWrapper::guiChanged);
+    return retval;
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -702,7 +844,7 @@ SphereMetricWrapper::SphereMetricWrapper(ViewServicePtr viewService, PatientMode
 
 QWidget* SphereMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("sphere_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -770,6 +912,154 @@ DoublePropertyPtr SphereMetricWrapper::createRadiusSelector() const
 	return retval;
 }
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
+RegionOfInterestMetricWrapper::RegionOfInterestMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, RegionOfInterestMetricPtr data) :
+	MetricBase(viewService, patientModelService),
+	mData(data)
+{
+	mInternalUpdate = false;
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+}
+
+QWidget* RegionOfInterestMetricWrapper::createWidget()
+{
+	QWidget* widget = this->newWidget("region_of_interest_metric");
+	QVBoxLayout* topLayout = new QVBoxLayout(widget);
+	QHBoxLayout* hLayout = new QHBoxLayout;
+	hLayout->setMargin(0);
+	topLayout->setMargin(0);
+	topLayout->addLayout(hLayout);
+
+	mDataListProperty = this->createDataListProperty();
+	StringListSelectWidget* datalistwidget = new StringListSelectWidget(widget, mDataListProperty);
+	topLayout->addWidget(datalistwidget);
+
+	mUseActiveTooltipProperty = this->createUseActiveTooltipSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mUseActiveTooltipProperty));
+
+	mMaxBoundsDataProperty = this->createMaxBoundsDataSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMaxBoundsDataProperty));
+
+	mMarginProperty = this->createMarginSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMarginProperty));
+
+	this->addColorWidget(topLayout);
+	topLayout->addStretch();
+
+	this->dataChangedSlot();
+	return widget;
+}
+
+DataMetricPtr RegionOfInterestMetricWrapper::getData() const
+{
+	return mData;
+}
+QString RegionOfInterestMetricWrapper::getType() const
+{
+	return "roi";
+}
+
+QString RegionOfInterestMetricWrapper::getArguments() const
+{
+	return "";
+}
+
+void RegionOfInterestMetricWrapper::dataChangedSlot()
+{
+
+}
+
+StringListPropertyPtr RegionOfInterestMetricWrapper::createDataListProperty()
+{
+	StringListPropertyPtr retval = StringListProperty::initialize("data_list",
+														"Data",
+														"Select data to define ROI",
+														QStringList(),
+														QStringList());
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+StringPropertyPtr RegionOfInterestMetricWrapper::createMaxBoundsDataSelector()
+{
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("max_bounds_data",
+										"Max Bounds",
+										"Select data to define maximal extent of ROI",
+										"",
+										QStringList(),
+										QDomNode());
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+DoublePropertyPtr RegionOfInterestMetricWrapper::createMarginSelector() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("margin",
+										"Margin",
+										"Margin added outside the data",
+										0,
+										DoubleRange(0, 100, 1),
+										1,
+										QDomNode());
+
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr RegionOfInterestMetricWrapper::createUseActiveTooltipSelector() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Use Tool Tip", "",
+											  "Include tool tip in the roi",
+											  false);
+
+	connect(retval.get(), &Property::changed, this, &RegionOfInterestMetricWrapper::guiChanged);
+	return retval;
+}
+
+
+void RegionOfInterestMetricWrapper::update()
+{
+	mInternalUpdate = true;
+
+	QStringList data;
+	std::map<QString, QString> names;
+	std::map<QString, DataPtr> alldata = mPatientModelService->getData();
+	for (std::map<QString, DataPtr>::iterator i=alldata.begin(); i!=alldata.end(); ++i)
+	{
+		if (i->first == mData->getUid())
+			continue;
+		data << i->first;
+		names[i->first] = i->second->getName();
+	}
+
+	mDataListProperty->setValue(mData->getDataList());
+	mDataListProperty->setValueRange(data);
+	mDataListProperty->setDisplayNames(names);
+
+	mMaxBoundsDataProperty->setValue(mData->getMaxBoundsData());
+	mMaxBoundsDataProperty->setValueRange(data);
+	mMaxBoundsDataProperty->setDisplayNames(names);
+
+	mMarginProperty->setValue(mData->getMargin());
+	mUseActiveTooltipProperty->setValue(mData->getUseActiveTooltip());
+
+	mInternalUpdate = false;
+}
+
+void RegionOfInterestMetricWrapper::guiChanged()
+{
+	if (mInternalUpdate)
+		return;
+	mData->setDataList(mDataListProperty->getValue());
+	mData->setUseActiveTooltip(mUseActiveTooltipProperty->getValue());
+	mData->setMargin(mMarginProperty->getValue());
+	mData->setMaxBoundsData(mMaxBoundsDataProperty->getValue());
+}
 
 }

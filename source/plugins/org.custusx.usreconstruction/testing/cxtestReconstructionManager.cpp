@@ -64,7 +64,7 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 
 	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");
+	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
@@ -108,7 +108,7 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
 	reconstructer->selectData(inputData);
-	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");//default
+	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");//default
 	reconstructer->getParam("Angio data")->setValueFromVariant(true);
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 	// set an algorithm-specific parameter
@@ -142,7 +142,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 
 	reconstructer->selectData(realData.getSourceFilename());
 
-	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");//default
+	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");//default
 	reconstructer->getParam("Angio data")->setValueFromVariant(true);
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 	// set an algorithm-specific parameter
@@ -163,7 +163,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 
 	reconstructer->selectData(realData.getSourceFilename());
 
-	reconstructer->getParam("Algorithm")->setValueFromVariant("PNN");//default
+	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");//default
 	reconstructer->getParam("Angio data")->setValueFromVariant(true);
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(true);
 

@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewFollower.h"
 
+#include <QTimer>
 #include "cxSliceProxy.h"
 #include "cxSettings.h"
 #include "cxSliceComputer.h"
@@ -40,7 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 
 #include "cxPatientModelService.h"
-
+#include "cxLogger.h"
+#include "cxRegionOfInterestMetric.h"
+#include "cxSliceAutoViewportCalculator.h"
 
 namespace cx
 {
@@ -53,70 +56,95 @@ ViewFollowerPtr ViewFollower::create(PatientModelServicePtr dataManager)
 ViewFollower::ViewFollower(PatientModelServicePtr dataManager) :
 	mDataManager(dataManager)
 {
+//	mROI_s = DoubleBoundingBox3D::zero();
+	mCalculator.reset(new SliceAutoViewportCalculator);
+}
+
+ViewFollower::~ViewFollower()
+{
 
 }
 
-
 void ViewFollower::setSliceProxy(SliceProxyPtr sliceProxy)
 {
-	if (mSliceProxy)
-	{
-		disconnect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
-	}
+//	if (mSliceProxy)
+//	{
+//		disconnect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
+//	}
 
 	mSliceProxy = sliceProxy;
 
-	if (mSliceProxy)
-	{
-		connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(ensureCenterWithinView()));
-	}
+//	if (mSliceProxy)
+//	{
+//		connect(mSliceProxy.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(updateView()));
+//	}
 }
 
 void ViewFollower::setView(DoubleBoundingBox3D bb_s)
 {
 	mBB_s = bb_s;
-	this->ensureCenterWithinView();
+//	this->updateView();
 }
 
-void ViewFollower::ensureCenterWithinView()
+void ViewFollower::setAutoZoomROI(QString uid)
+{
+	mRoi = uid;
+//	if (mRoi)
+//		disconnect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
+
+//	DataPtr data = mDataManager->getData(uid);
+//	mRoi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+
+//	if (mRoi)
+//		connect(mRoi.get(), &Data::transformChanged, this, &ViewFollower::updateView);
+
+//	this->updateView();
+}
+
+SliceAutoViewportCalculator::ReturnType ViewFollower::calculate()
 {
 	if (!mSliceProxy)
-		return;
+		return SliceAutoViewportCalculator::ReturnType();
 	if (!mSliceProxy->getTool())
-		return;
+		return SliceAutoViewportCalculator::ReturnType();
 
-	bool followTooltip = settings()->value("Navigation/followTooltip").value<bool>();
-	if (!followTooltip)
-		return;
+	mCalculator->mFollowTooltip = settings()->value("Navigation/followTooltip").value<bool>();
+	mCalculator->mFollowTooltipBoundary = settings()->value("Navigation/followTooltipBoundary").toDouble();
+	mCalculator->mBB_s = mBB_s;
+	mCalculator->mTooltip_s = this->findVirtualTooltip_s();
+	mCalculator->mFollowType = mSliceProxy->getComputer().getFollowType();
+	mCalculator->mROI_s = this->getROI_BB_s();
 
-	// this applies only to orthogonal views: oblique follows tool anyway
-	if (mSliceProxy->getComputer().getOrientationType()!=otORTHOGONAL)
-		return;
+	SliceAutoViewportCalculator::ReturnType result = mCalculator->calculate();
+	return result;
 
-	Vector3D shift_s = this->findCenterShift_s();
-	this->applyShiftToCenter(shift_s);
+//	if (!similar(result.zoom, 1.0))
+//	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom " << result.zoom;
+//		emit newZoom(1.0/result.zoom);
+//	}
+//	if (!similar(result.center_shift_s, Vector3D::Zero()))
+//	{
+//		Vector3D newcenter_r = this->findCenter_r_fromShift_s(result.center_shift_s);
+//		CX_LOG_CHANNEL_DEBUG("CA") << this << "autozoom shift " << result.center_shift_s;
+//		mDataManager->setCenter(newcenter_r);
+//	}
 }
 
-Vector3D ViewFollower::findCenterShift_s()
+DoubleBoundingBox3D ViewFollower::getROI_BB_s()
 {
-	Vector3D shift = Vector3D::Zero();
+	DataPtr data = mDataManager->getData(mRoi);
+	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
 
-	Vector3D pt_s = this->findVirtualTooltip_s();
-	DoubleBoundingBox3D BB_s = this->findStaticBox();
-	shift = this->findShiftFromBoxToTool_s(BB_s, pt_s);
+	if (!roi)
+	{
+		return DoubleBoundingBox3D::zero();
+	}
 
-//	if (!similar(shift, Vector3D::Zero()))
-//	{
-//		std::cout << "type: " << enum2string(mSliceProxy->getComputer().getPlaneType()) << std::endl;
-//		std::cout << "mBB_s: " << mBB_s << std::endl;
-//		std::cout << "BB_s: " << BB_s << std::endl;
-//		std::cout << "pt_s: " << pt_s << std::endl;
-//		Vector3D pt_r = rMpr * prMt.coord(Vector3D(0,0,tool->getTooltipOffset()));
-//		std::cout << "pt_r: " << pt_r << std::endl;
-//		std::cout << "shift: " << shift << std::endl;
-//	}
-
-	return shift;
+//	CX_LOG_CHANNEL_DEBUG("CA") << "generate bb_roi_s";
+	Transform3D sMr = mSliceProxy->get_sMr();
+	DoubleBoundingBox3D bb_s = roi->getROI().getBox(sMr);
+	return bb_s;
 }
 
 Vector3D ViewFollower::findVirtualTooltip_s()
@@ -130,38 +158,15 @@ Vector3D ViewFollower::findVirtualTooltip_s()
 	return pt_s;
 }
 
-DoubleBoundingBox3D ViewFollower::findStaticBox()
-{
-	double followTooltipBoundary = settings()->value("Navigation/followTooltipBoundary").toDouble();
-	followTooltipBoundary = constrainValue(followTooltipBoundary, 0.0, 0.5);
-	Transform3D S = createTransformScale(Vector3D::Ones()*(1.0-2.0*followTooltipBoundary));
-	Transform3D T = createTransformTranslate(mBB_s.center());
-	DoubleBoundingBox3D BB_s = transform(T*S*T.inv(), mBB_s);
-	return BB_s;
-}
-
-Vector3D ViewFollower::findShiftFromBoxToTool_s(DoubleBoundingBox3D BB_s, Vector3D pt_s)
-{
-	Vector3D shift = Vector3D::Zero();
-
-	for (unsigned i=0; i<2; ++i) // loop over two first dimensions, check if pt outside of bb
-	{
-		if (pt_s[i] < BB_s[2*i])
-			shift[i] += pt_s[i] - BB_s[2*i];
-		if (pt_s[i] > BB_s[2*i+1])
-			shift[i] += pt_s[i] - BB_s[2*i+1];
-	}
-
-	return shift;
-}
-
-void ViewFollower::applyShiftToCenter(Vector3D shift_s)
+Vector3D ViewFollower::findCenter_r_fromShift_s(Vector3D shift_s)
 {
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Vector3D c_s = sMr.coord(mDataManager->getCenter());
+
 	Vector3D newcenter_s = c_s + shift_s;
+
 	Vector3D newcenter_r = sMr.inv().coord(newcenter_s);
-	mDataManager->setCenter(newcenter_r);
+	return newcenter_r;
 }
 
 } // namespace cx

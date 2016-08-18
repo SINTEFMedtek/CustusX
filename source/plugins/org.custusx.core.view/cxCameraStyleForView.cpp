@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
+#include <vtkLightCollection.h>
+#include <vtkLight.h>
 
 #include "cxTrackingService.h"
 #include "cxToolRep3D.h"
@@ -50,21 +52,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxRepContainer.h"
 #include "cxLogger.h"
-
-SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, CAMERA_STYLE_TYPE, cstCOUNT)
-{
-	"DEFAULT_STYLE",
-	"TOOL_STYLE",
-	"ANGLED_TOOL_STYLE",
-	"UNICAM_STYLE"
-}
-SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, CAMERA_STYLE_TYPE, cstCOUNT)
+#include "cxRegionOfInterestMetric.h"
+#include "cxNavigationAlgorithms.h"
+#include "cxDoubleRange.h"
 
 namespace cx
 {
 
 CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
-	mCameraStyleForView(cstDEFAULT_STYLE),
 	mBlockCameraUpdate(false),
 	mBackend(backend)
 {
@@ -74,14 +69,21 @@ CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 	mPreRenderListener.reset(new ViewportPreRenderListener);
 	mPreRenderListener->setCallback(boost::bind(&CameraStyleForView::onPreRender, this));
 
-	connect(mBackend->tracking().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(activeToolChangedSlot()));
+	connect(mBackend->tracking().get(), &TrackingService::activeToolChanged,
+			this, &CameraStyleForView::activeToolChangedSlot);
 }
 
 void CameraStyleForView::setView(ViewPtr widget)
 {
+	mViewportListener->stopListen();
+	mPreRenderListener->stopListen();
+
 	this->disconnectTool();
 	mView = widget;
 	this->connectTool();
+
+	mViewportListener->startListen(this->getRenderer());
+	mPreRenderListener->startListen(this->getRenderer());
 }
 
 
@@ -94,13 +96,12 @@ void CameraStyleForView::viewportChangedSlot()
 {
 	if (mBlockCameraUpdate)
 		return;
-	this->updateCamera();
+	this->setModified();
 }
 
 void CameraStyleForView::onPreRender()
 {
-	if (mFollowingTool)
-		this->moveCameraToolStyleSlot(mFollowingTool->get_prMt(), mFollowingTool->getTimestamp());
+	this->applyCameraStyle();
 }
 
 ToolRep3DPtr CameraStyleForView::getToolRep() const
@@ -131,63 +132,183 @@ void CameraStyleForView::setModified()
 	mPreRenderListener->setModified();
 }
 
-void CameraStyleForView::updateCamera()
-{
-	this->setModified();
-}
-
-void CameraStyleForView::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
-{
-	if (mCameraStyleForView == cstDEFAULT_STYLE)
-		return;
-	if (!mFollowingTool)
-		return;
-
-
+void CameraStyleForView::applyCameraStyle()
+{	        
 	vtkCameraPtr camera = this->getCamera();
 	if (!camera)
 		return;
 
-	Transform3D rMpr = mBackend->patient()->get_rMpr();
-
-	Transform3D rMt = rMpr * prMt;
-
-	double offset = mFollowingTool->getTooltipOffset();
-
 	double cameraOffset = camera->GetDistance();
-
-//	std::cout << "cameraOffset pre " << cameraOffset << std::endl;
-//	std::cout << "rMt\n" << rMt << std::endl;
-	Vector3D camera_r = rMt.coord(Vector3D(0, 0, offset - cameraOffset));
-	Vector3D focus_r = rMt.coord(Vector3D(0, 0, offset));
-//	std::cout << "cameraOffset ppost " << (focus_r-camera_r).length() << std::endl;
-	Vector3D vup_r = rMt.vector(Vector3D(-1, 0, 0));
-	if (mCameraStyleForView == cstANGLED_TOOL_STYLE)
-	{
-		// elevate 20*, but keep distance
-		double height = cameraOffset * tan(20 / 180.0 * M_PI);
-		camera_r += vup_r * height;
-		Vector3D elevated = camera_r + vup_r * height;
-		Vector3D n_foc2eye = (elevated - focus_r).normalized();
-		camera_r = focus_r + cameraOffset * n_foc2eye;
-	}
-
 	Vector3D pos_old(camera->GetPosition());
 	Vector3D focus_old(camera->GetFocalPoint());
 	Vector3D vup_old(camera->GetViewUp());
 
-    if (similar(pos_old, camera_r, 0.1) && similar(focus_old, focus_r, 0.1) && similar(vup_old, vup_r,0.1 ))
+	Vector3D camera_r = pos_old;
+	Vector3D focus_r = focus_old;
+	Vector3D vup_r = vup_old;
+
+	if (!mStyle.mFocusROI.isEmpty())
+	{
+		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mFocusROI).getBox();
+		if (roi_r != DoubleBoundingBox3D::zero())
+			focus_r = roi_r.center();
+	}
+
+	if (mFollowingTool)
+	{
+		Transform3D rMpr = mBackend->patient()->get_rMpr();
+		Transform3D prMt = mFollowingTool->get_prMt();
+		Transform3D rMt = rMpr * prMt;
+		double offset = mFollowingTool->getTooltipOffset();
+
+		// view up is relative to tool
+		vup_r = rMt.vector(Vector3D(-1, 0, 0));
+
+		if (mStyle.mFocusFollowTool)
+		{
+			// set focus to tool offset point
+			focus_r = rMt.coord(Vector3D(0, 0, offset));
+		}
+
+		if (mStyle.mCameraFollowTool)
+		{
+			// set camera on the tool line, at a distance 'cameraOffset' from the focus.
+			Vector3D tooloffset = rMt.coord(Vector3D(0, 0, offset));
+			Vector3D e_tool = rMt.vector(Vector3D(0, 0, 1));
+			camera_r = NavigationAlgorithms::findCameraPosOnLineFixedDistanceFromFocus(tooloffset,
+																					   e_tool,
+																					   cameraOffset,
+																					   focus_r);
+		}
+	}
+
+	if (mStyle.mTableLock)
+	{
+		Vector3D table_up = mBackend->patient()->getOperatingTable().getVectorUp();
+		vup_r = table_up;
+	}
+
+	if (mStyle.mCameraFollowTool)
+		camera_r = NavigationAlgorithms::elevateCamera(mStyle.mElevation, camera_r, focus_r, vup_r);
+
+	// reset vup based on vpn (do not change vpn after this point)
+	if (!similar(vup_r, vup_old))
+	{
+		Vector3D vpn_r = (camera_r-focus_r).normal();
+		vup_r = NavigationAlgorithms::orthogonalize_vup(vup_r, vpn_r, vup_old);
+	}
+
+	if (!mStyle.mAutoZoomROI.isEmpty())
+	{
+		RegionOfInterest roi_r = this->getROI(mStyle.mAutoZoomROI);
+		if (roi_r.isValid())
+		{
+			double viewAngle = camera->GetViewAngle()/180.0*M_PI;
+			Vector3D vpn = (camera_r-focus_r).normal();
+
+			this->getRenderer()->ComputeAspect();
+			double aspect[2];
+			this->getRenderer()->GetAspect(aspect);
+
+			double viewAngle_vertical = viewAngle;
+			double viewAngle_horizontal = viewAngle*aspect[0];
+
+			// move all calculations into a space (x,y,c)=(left,vup,focus)
+			// the space is oriented towards the camera,
+			// and can be used to define a ROI bounding box aligned to the viewport.
+			Vector3D left = cross(vup_r,vpn);
+			Transform3D M_proj = createTransformIJC(left, vup_r, focus_r).inv();
+			Vector3D proj_focus(0,0,0);
+			Vector3D proj_vup(0,1,0);
+			Vector3D proj_vpn(0,0,1);
+			DoubleBoundingBox3D proj_bb = roi_r.getBox(M_proj);
+			Vector3D camera_r_t = NavigationAlgorithms::findCameraPosByZoomingToROI(viewAngle_vertical,
+																					viewAngle_horizontal,
+																					proj_focus,
+																					proj_vup,
+																					proj_vpn,
+																					proj_bb);
+			camera_r_t = this->smoothZoomedCameraPosition(camera_r_t);
+			camera_r_t = M_proj.inv().coord(camera_r_t);
+			camera_r = camera_r_t;
+		}
+	}
+
+	if (mStyle.mCameraOnTooltip && mFollowingTool)
+	{
+		// Move the camera onto the tool tip, keeping the distance vector constant.
+		// This gives the effect of _sitting on the tool tip_ while moving.
+		// Alternative: Dont change focal point, change view angle instead.
+
+		Transform3D rMpr = mBackend->patient()->get_rMpr();
+		Transform3D prMt = mFollowingTool->get_prMt();
+		Transform3D rMt = rMpr * prMt;
+		double offset = mFollowingTool->getTooltipOffset();
+		Vector3D tool_r = rMt.coord(Vector3D(0, 0, offset));
+
+		Vector3D delta = tool_r - camera_r;
+
+		camera_r += delta;
+		focus_r += delta;
+	}
+
+	if (similar(pos_old, camera_r, 0.1) && similar(focus_old, focus_r, 0.1) && similar(vup_old, vup_r,0.1 ))
 		return; // break update loop: this event is triggered by camera change.
 
-//	std::cout << "pos " << pos_old << " to " << camera_r << std::endl;
-//	std::cout << "foc " << focus_old << " to " << focus_r << std::endl;
+//	this->handleLights();
 
 	mBlockCameraUpdate = true;
 	camera->SetPosition(camera_r.begin());
 	camera->SetFocalPoint(focus_r.begin());
 	camera->SetViewUp(vup_r.begin());
-	camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 1.5));
+	camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 10));
+	if (mStyle.mCameraFollowTool && mFollowingTool)
+		camera->SetClippingRange(1, std::max<double>(1000, cameraOffset * 1.5));
+//	CX_LOG_CHANNEL_DEBUG("CA") << (camera_r-focus_r).length() <<  " |||  camera_r " << camera_r << ", focus_r " << focus_r;
 	mBlockCameraUpdate = false;
+}
+
+void CameraStyleForView::handleLights()
+{
+	vtkRendererPtr renderer = this->getRenderer();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "#lights: " << renderer->GetLights()->GetNumberOfItems();
+	renderer->GetLights()->InitTraversal();
+	vtkLight* light = renderer->GetLights()->GetNextItem();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "light ";
+//	light->PrintSelf(std::cout, vtkIndent(2));
+
+	// experiment: set a light to the left of the camera, pointing at focus
+	light->SetConeAngle(160);
+	light->SetLightTypeToCameraLight();
+	light->SetPosition(-0.5,0,1);
+}
+
+/**
+ * Remove jitter on the camera position: find the previous position, then stick to it
+ * until a threshold is exceeded.
+ */
+Vector3D CameraStyleForView::smoothZoomedCameraPosition(Vector3D pos)
+{
+	Vector3D filteredPos = pos;
+	filteredPos[2] = mZoomJitterFilter.newValue(pos[2]);
+//	if (similar(pos[2], filteredPos[2]))
+//	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "---CHANGED " << filteredPos[2];
+//	}
+//	else
+//	{
+//		CX_LOG_CHANNEL_DEBUG("CA") << "---filtered " << pos[2] << ", --> " << filteredPos[2];
+//	}
+	return filteredPos;
+}
+
+RegionOfInterest CameraStyleForView::getROI(QString uid)
+{
+	DataPtr data = mBackend->patient()->getData(uid);
+	RegionOfInterestMetricPtr roi = boost::dynamic_pointer_cast<RegionOfInterestMetric>(data);
+	if (roi)
+		return roi->getROI();
+	return RegionOfInterest();
 }
 
 void CameraStyleForView::activeToolChangedSlot()
@@ -200,14 +321,14 @@ void CameraStyleForView::activeToolChangedSlot()
 	this->connectTool();
 }
 
-bool CameraStyleForView::isToolFollowingStyle(CAMERA_STYLE_TYPE style) const
+bool CameraStyleForView::isToolFollowingStyle() const
 {
-	return ( style==cstTOOL_STYLE )||( style==cstANGLED_TOOL_STYLE);
+	return (mStyle.mCameraFollowTool || mStyle.mFocusFollowTool);
 }
 
 void CameraStyleForView::connectTool()
 {
-	if (!this->isToolFollowingStyle(mCameraStyleForView))
+	if (!this->isToolFollowingStyle())
 		return;
 
 	mFollowingTool = mBackend->tracking()->getActiveTool();
@@ -224,27 +345,18 @@ void CameraStyleForView::connectTool()
 	ToolRep3DPtr rep = this->getToolRep();
 	if (rep)
 	{
-		rep->setOffsetPointVisibleAtZeroOffset(true);
-		if (mCameraStyleForView == cstTOOL_STYLE)
+		rep->setOffsetPointVisibleAtZeroOffset(false);
+		if (mStyle.mCameraFollowTool && fabs(mStyle.mElevation) < 0.01)
 			rep->setStayHiddenAfterVisible(true);
 	}
 
-	mViewportListener->startListen(this->getRenderer());
-	mPreRenderListener->startListen(this->getRenderer());
-
-	this->updateCamera();
+	this->setModified();
 
 	report("Camera is following " + mFollowingTool->getName());
 }
 
 void CameraStyleForView::disconnectTool()
 {
-	if (mCameraStyleForView == cstDEFAULT_STYLE)
-		return;
-
-	mViewportListener->stopListen();
-	mPreRenderListener->stopListen();
-
 	if (mFollowingTool)
 	{
 		disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this,
@@ -252,45 +364,72 @@ void CameraStyleForView::disconnectTool()
 
 		ToolRep3DPtr rep = this->getToolRep();
 		if (rep)
+		{
+			rep->setOffsetPointVisibleAtZeroOffset(true);
 			rep->setStayHiddenAfterVisible(false);
-	}
+		}
 
-	mFollowingTool.reset();
+		mFollowingTool.reset();
+	}
 }
 
-void CameraStyleForView::setCameraStyle(CAMERA_STYLE_TYPE style)
+void CameraStyleForView::setCameraStyle(CameraStyleData style)
 {
-	if (mCameraStyleForView == style)
+	if (mStyle == style)
 		return;
 
 	this->disconnectTool();
 
-	ViewPtr view = this->getView();
-	if (!view)
-		return;
-	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
+	if (style.mUniCam)
+		this->setInteractor(vtkInteractorStyleUnicamPtr::New());
+	else
+		this->setInteractor(vtkInteractorStyleTrackballCameraPtr::New());
 
-	switch (style)
-	{
-	case cstDEFAULT_STYLE:
-	case cstTOOL_STYLE:
-	case cstANGLED_TOOL_STYLE:
-		interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
-		break;
-	case cstUNICAM_STYLE:
-		interactor->SetInteractorStyle(vtkInteractorStyleUnicamPtr::New());
-	default:
-		break;
-	};
-
-	mCameraStyleForView = style;
+	mStyle = style;
 
 	this->connectTool();
 }
 
-CAMERA_STYLE_TYPE CameraStyleForView::getCameraStyle()
+void CameraStyleForView::setInteractor(vtkSmartPointer<vtkInteractorStyle> style)
 {
-	return mCameraStyleForView;
+	ViewPtr view = this->getView();
+	if (!view)
+		return;
+	vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
+	interactor->SetInteractorStyle(style);
+}
+
+CameraStyleData CameraStyleForView::getCameraStyle()
+{
+	return mStyle;
+}
+
+JitterFilter::JitterFilter()
+{
+	currentValue = 0;
+	range = DoubleRange(0,0,0.1);
+}
+
+double JitterFilter::newValue(double value)
+{
+	// If outside range:
+	// reset interval and return value.
+	if (( value<=range.min() )||( value>=range.max() ))
+	{
+		double minimumInterval = 5.0;
+		double interval = std::min(minimumInterval, value/20);
+		double level = 0;
+
+		if (value<range.min())
+			level = value + interval/2;
+		else if (value>range.max())
+			level = value - interval/2;
+
+		range = DoubleRange(level-interval/2, level+interval/2, interval/10);
+
+		currentValue = value;
+	}
+	return currentValue;
 }
 
 }//namespace cx

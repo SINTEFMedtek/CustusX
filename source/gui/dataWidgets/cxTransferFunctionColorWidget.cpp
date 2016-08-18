@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 TransferFunctionColorWidget::TransferFunctionColorWidget(ActiveDataPtr activeData, QWidget* parent) :
-  BaseWidget(parent, "TransferFunctionColorWidget", "Color Transfer Function"),
+  BaseWidget(parent, "transfer_function_color_widget", "Color Transfer Function"),
 	mCurrentClickPos(INT_MIN,INT_MIN),
   mBorder(5)
 {

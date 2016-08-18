@@ -92,6 +92,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoDeleteDICOMDatabase", true);
 
 	this->fillDefault("TrackingPositionFilter/enabled", false);
+	this->fillDefault("TrackingPositionFilter/cutoffFrequency", 3.0);
 
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor(30,60,70)); // a dark, grey-blue hue
@@ -113,6 +114,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
 	this->fillDefault("View/showMetricNamesInCorner", false);
+	this->fillDefault("View/toolCrosshair", true);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);

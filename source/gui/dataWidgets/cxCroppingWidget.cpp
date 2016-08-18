@@ -58,7 +58,7 @@ namespace cx
 {
 
 CroppingWidget::CroppingWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-		BaseWidget(parent, "CroppingWidget", "Crop"),
+		BaseWidget(parent, "cropping_widget", "Crop"),
 		mPatientModelService(patientModelService),
 		mViewService(viewService)
 {

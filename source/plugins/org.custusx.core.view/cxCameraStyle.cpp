@@ -41,9 +41,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-CameraStyle::CameraStyle(CoreServicesPtr backend) :
+CameraStyle::CameraStyle(CoreServicesPtr backend, ViewGroupDataPtr viewGroupData) :
 	mCameraStyle(cstDEFAULT_STYLE),
-	mBackend(backend)
+	mBackend(backend),
+	mViewGroupData(viewGroupData)
 {
 }
 
@@ -54,7 +55,7 @@ void CameraStyle::addView(ViewPtr view)
 
 	CameraStyleForViewPtr style(new CameraStyleForView(mBackend));
 	style->setView(view);
-	style->setCameraStyle(mCameraStyle);
+	style->setCameraStyle(CameraStyleData(mCameraStyle));
 	mViews.push_back(style);
 }
 
@@ -63,12 +64,12 @@ void CameraStyle::clearViews()
 	mViews.clear();
 }
 
-CAMERA_STYLE_TYPE CameraStyle::getCameraStyle() const
+CameraStyleData CameraStyle::getCameraStyle() const
 {
 	return mCameraStyle;
 }
 
-void CameraStyle::setCameraStyle(CAMERA_STYLE_TYPE style)
+void CameraStyle::setCameraStyle(CameraStyleData style)
 {
 	if (mCameraStyle == style)
 		return;
@@ -78,99 +79,6 @@ void CameraStyle::setCameraStyle(CAMERA_STYLE_TYPE style)
 	mCameraStyle = style;
 
 	emit cameraStyleChanged();
-	report(QString("Activated camera style %1.").arg(enum2string(style)));
-}
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-CameraStyleInteractor::CameraStyleInteractor() :
-	mCameraStyleGroup(NULL)
-{
-}
-
-void CameraStyleInteractor::connectCameraStyle(CameraStylePtr style)
-{
-	if (mStyle)
-		disconnect(mStyle.get(), SIGNAL(cameraStyleChanged()), this, SLOT(updateActionGroup()));
-	mStyle = style;
-	if (mStyle)
-		connect(mStyle.get(), SIGNAL(cameraStyleChanged()), this, SLOT(updateActionGroup()));
-	this->updateActionGroup();
-}
-
-QActionGroup* CameraStyleInteractor::getInteractorStyleActionGroup()
-{
-	if (mCameraStyleGroup)
-		return mCameraStyleGroup;
-
-	mCameraStyleGroup = new QActionGroup(this);
-	mCameraStyleGroup->setExclusive(true);
-
-	this->addInteractorStyleAction("Normal Camera", mCameraStyleGroup,
-	                               enum2string(cstDEFAULT_STYLE),
-	                               QIcon(":/icons/camera-n.png"),
-	                               "Set 3D interaction to the normal camera-oriented style.");
-	this->addInteractorStyleAction("Tool", mCameraStyleGroup,
-	                               enum2string(cstTOOL_STYLE),
-	                               QIcon(":/icons/camera-t.png"),
-	                               "Camera following tool.");
-	this->addInteractorStyleAction("Angled Tool", mCameraStyleGroup,
-	                               enum2string(cstANGLED_TOOL_STYLE),
-	                               QIcon(":/icons/camera-at.png"),
-	                               "Camera following tool (Placed at an angle of 20 degrees).");
-	this->addInteractorStyleAction("Unicam", mCameraStyleGroup,
-	                               enum2string(cstUNICAM_STYLE),
-	                               QIcon(":/icons/camera-u.png"),
-	                               "Set 3D interaction to a single-button style, useful for touch screens.");
-	return mCameraStyleGroup;
-}
-
-void CameraStyleInteractor::addInteractorStyleAction(QString caption, QActionGroup* group, QString uid, QIcon icon,
-				QString helptext)
-{
-	QAction* action = new QAction(caption, group);
-	action->setIcon(icon);
-	action->setCheckable(true);
-	action->setData(uid);
-	action->setToolTip(helptext);
-	action->setWhatsThis(helptext);
-	connect(action, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
-}
-
-void CameraStyleInteractor::updateActionGroup()
-{
-	QString currentStyle;
-	if (mStyle)
-		currentStyle = enum2string(mStyle->getCameraStyle());
-
-	if(mCameraStyleGroup)
-	{
-		QList<QAction*> actions = mCameraStyleGroup->actions();
-		for (int i=0; i<actions.size(); ++i)
-		{
-			actions[i]->setEnabled(mStyle!=0);
-			bool check = actions[i]->data().toString() == currentStyle;
-			if(actions[i]->isChecked() != check)
-				actions[i]->setChecked(check);
-		}
-	}
-}
-
-void CameraStyleInteractor::setInteractionStyleActionSlot()
-{
-	QAction* theAction = static_cast<QAction*>(sender());
-	if(!theAction)
-		return;
-
-	QString uid = theAction->data().toString();
-	CAMERA_STYLE_TYPE newStyle = string2enum<cx::CAMERA_STYLE_TYPE>(uid);
-	if (newStyle==cstCOUNT)
-		return;
-
-	if (mStyle)
-		mStyle->setCameraStyle(newStyle);
 }
 
 

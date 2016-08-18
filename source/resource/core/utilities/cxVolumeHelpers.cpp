@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageShiftScale.h>
 #include <vtkImageAccumulate.h>
 #include <vtkImageLuminance.h>
+#include <vtkImageExtractComponents.h>
+#include <vtkImageAppendComponents.h>
 
 #include "cxImage.h"
 
@@ -366,13 +368,35 @@ DoubleBoundingBox3D findEnclosingBoundingBox(std::vector<ImagePtr> images, Trans
 vtkImageDataPtr convertImageDataToGrayScale(vtkImageDataPtr image)
 {
 	vtkImageDataPtr retval = image;
-	if (image->GetNumberOfScalarComponents() > 2)
+
+	//vtkImageLuminance demands 3 components
+	vtkImageDataPtr input = convertFrom4To3Components(image);
+
+	if (input->GetNumberOfScalarComponents() > 2)
 	{
 		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		luminance->SetInputData(image);
+		luminance->SetInputData(input);
 		luminance->Update();
 		retval = luminance->GetOutput();
 //		retval->Update();
+	}
+	return retval;
+}
+
+vtkImageDataPtr convertFrom4To3Components(vtkImageDataPtr image)
+{
+	vtkImageDataPtr retval = image;
+
+	if (image->GetNumberOfScalarComponents() >= 4)
+	{
+		vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+		vtkImageExtractComponentsPtr splitterRGBA = vtkImageExtractComponentsPtr::New();
+		splitterRGBA->SetInputData(image);
+		splitterRGBA->SetComponents(0, 1, 2);
+		merger->AddInputConnection(splitterRGBA->GetOutputPort());
+
+		merger->Update();
+		retval = merger->GetOutput();
 	}
 	return retval;
 }

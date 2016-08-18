@@ -47,7 +47,7 @@ class ToolTreeNode : public TreeNodeImpl
   Q_OBJECT
 public:
 	ToolTreeNode(TreeRepositoryWeakPtr repo, ToolPtr tool);
-	virtual ~ToolTreeNode() {}
+	virtual ~ToolTreeNode();
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual QString getType() const;

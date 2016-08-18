@@ -85,7 +85,7 @@ MainWindow::MainWindow() :
 	mDockWidgets(new DynamicMainWindowWidgets(this)),
 	mActions(NULL)
 {
-	this->setObjectName("MainWindow");
+	this->setObjectName("main_window");
 
 	mServices = VisServices::create(logicManager()->getPluginContext());
 	mLayoutInteractor.reset(new LayoutInteractor());
@@ -120,8 +120,8 @@ MainWindow::MainWindow() :
 	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
 	this->addAsDockWidget(new ActiveToolPropertiesWidget(mServices->tracking(), mServices->spaceProvider(), this), "Properties");
 	this->addAsDockWidget(new NavigationWidget(this), "Properties");
-	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget", "Console"), "Utility");
-	this->addAsDockWidget(new ConsoleWidget(this, "ConsoleWidget2", "Extra Console"), "Utility");
+	this->addAsDockWidget(new ConsoleWidget(this, "console_widget", "Console"), "Utility");
+	this->addAsDockWidget(new ConsoleWidget(this, "console_widget_2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
 	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
@@ -191,7 +191,10 @@ void MainWindow::onGUIExtenderServiceAdded(GUIExtenderService* service)
 	std::vector<GUIExtenderService::CategorizedWidget> widgets = service->createWidgets();
 	for (unsigned j = 0; j < widgets.size(); ++j)
 	{
-		mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+		if(!widgets[j].mPlaceInSeparateWindow)
+			mDockWidgets->addAsDockWidget(widgets[j].mWidget, widgets[j].mCategory, service);
+		else
+			this->createActionForWidgetInSeparateWindow(widgets[j].mWidget);
 	}
 
 	std::vector<QToolBar*> toolBars = service->createToolBars();
@@ -404,10 +407,30 @@ void MainWindow::toggleFullScreenSlot()
 	settings()->setValue("gui/fullscreen", (this->windowState() & Qt::WindowFullScreen)!=0);
 }
 
+void MainWindow::createActionForWidgetInSeparateWindow(QWidget* widget)
+{
+	QString uid = widget->objectName();
+	if(mSecondaryMainWindows.find(uid) == mSecondaryMainWindows.end())
+	{
+		SecondaryMainWindow* secondaryMainWindow = new SecondaryMainWindow(this, widget);
+		QAction* action = new QAction(widget->windowTitle(), this);
+
+		mSecondaryMainWindows[uid] = secondaryMainWindow;
+		mSecondaryMainWindowsActions[uid] = action;
+
+		connect(action, &QAction::triggered, secondaryMainWindow, &QWidget::show);
+
+		mFileMenu->addAction(action);
+	}
+}
+
 void MainWindow::showControlPanelActionSlot()
 {
 	if (!mControlPanel)
-		mControlPanel = new SecondaryMainWindow(this);
+	{
+		TrackPadWidget* trackPadWidget = new TrackPadWidget(this);
+		mControlPanel = new SecondaryMainWindow(this, trackPadWidget);
+	}
 	mControlPanel->show();
 }
 

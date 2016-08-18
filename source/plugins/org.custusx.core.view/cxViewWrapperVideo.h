@@ -65,7 +65,6 @@ public:
 	virtual ~ViewWrapperVideo();
 	virtual ViewPtr getView();
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) {}
-	virtual void updateView() {}
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 private slots:
@@ -75,22 +74,19 @@ private slots:
 	void streamActionSlot();
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid) {}
-//	virtual void dataAdded(DataPtr data) {}
-//	virtual void dataRemoved(const QString& uid) {}
 	virtual void videoSourceChangedSlot(QString uid);
 
+	virtual QString getDataDescription();
+	virtual QString getViewDescription();
 private:
 	VideoSourcePtr getSourceFromService(QString uid);
 	void addStreamAction(QString uid, QMenu* contextMenu);
 	void loadStream();
 	virtual void appendToContextMenu(QMenu& contextMenu);
-	void addReps();
 	void setupRep(VideoSourcePtr source, ToolPtr tool);
 
 	VideoFixedPlaneRepPtr mStreamRep;
 	VideoSourcePtr mSource;
-	DisplayTextRepPtr mPlaneTypeText;
-	DisplayTextRepPtr mDataNameText;
 	ViewPtr mView;
 	ToolPtr mTool;
 };

@@ -66,7 +66,7 @@ public:
     void setBackfaceCulling(bool val);
     void setVisibility(bool visible);
     void setFrontfaceCulling(bool val);
-    void setRepresentation();
+//    void setRepresentation();
     void setColor(double red, double green, double blue);
     void setColor(Vector3D color);
     void setPosition(Vector3D point);
@@ -78,7 +78,8 @@ public:
     void setScalarVisibility(bool show);
 
     vtkActorPtr getActor();
-    vtkPolyDataPtr getPolyData();
+	vtkPropertyPtr getProperty();
+	vtkPolyDataPtr getPolyData();
     Vector3D getPosition() const;
     vtkPolyDataAlgorithmPtr getSource();
 
@@ -105,21 +106,15 @@ public:
     GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source = vtkPolyDataAlgorithmPtr(),
                       vtkRendererPtr renderer = vtkRendererPtr());
     void setIsWireFrame(bool val);
-    void setRepresentation();
+//    void setRepresentation();
     void setData(vtkPolyDataPtr data);
     vtkMapperPtr getMapper();
 
 private:
     vtkPolyDataMapperPtr mMapper;
-    bool mIsWireFrame;
 };
 typedef boost::shared_ptr<GraphicalPolyData3D> GraphicalPolyData3DPtr;
 
-
-/**
- * \addtogroup cx_resource_view
- * @{
- */
 
 /** \brief Helper for rendering a a glyph in 3D
  */
@@ -139,10 +134,6 @@ private:
     vtkGlyph3DMapperPtr mMapper;
 };
 typedef boost::shared_ptr<GraphicalGlyph3DData> GraphicalGlyph3DDataPtr;
-
-
-
-
 
 
 /** \brief Helper for rendering a point in 3D
