@@ -143,9 +143,10 @@ void PluginFrameworkManager::loadState()
 	for (unsigned i=0; i< info.size(); ++i)
 	{
 		if (info[i].targetState != ctkPlugin::UNINSTALLED)
+        {
 			this->install(info[i].symbolicName);
+        }
 	}
-
 
 	// start all plugins
 	for (unsigned i=0; i< info.size(); ++i)
@@ -237,7 +238,9 @@ QSharedPointer<ctkPluginFramework> PluginFrameworkManager::getPluginFramework()
 void PluginFrameworkManager::initializeFramework()
 {
 	if (this->frameworkInitialized())
+    {
 		return;
+    }
 
 	QSharedPointer<ctkPluginFramework> framework = mFrameworkFactory->getFramework();
 
@@ -281,7 +284,6 @@ void PluginFrameworkManager::startFramework()
 
 void PluginFrameworkManager::install(const QString& symbolicName)
 {
-
 	this->initializeFramework();
 	if (!this->frameworkInitialized())
 		return;
