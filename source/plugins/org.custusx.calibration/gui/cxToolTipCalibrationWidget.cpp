@@ -125,8 +125,21 @@ void ToolTipCalibrateWidget::calibrateSlot()
 
   if(ret == QMessageBox::Ok)
   {
-    tool->setCalibration_sMt(calibration);
-    mCalibrationLabel->setText("Calibration:\n"+qstring_cast(calibration));
+      try
+      {
+          tool->setCalibration_sMt(calibration);
+      }
+      catch(std::exception& e)
+      {
+          QMessageBox msgBox2;
+          msgBox2.setText("Error: could not calibrate the tool.");
+          msgBox2.setInformativeText(QString(e.what()));
+          msgBox2.setStandardButtons(QMessageBox::Ok/* | QMessageBox::Cancel*/);
+          msgBox2.setDefaultButton(QMessageBox::Ok);
+          int ret2 = msgBox2.exec();
+          return;
+      }
+      mCalibrationLabel->setText("Calibration:\n"+qstring_cast(calibration));
   }
 }
 
