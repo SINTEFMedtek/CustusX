@@ -50,6 +50,7 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource 
 	this->mNumberOfExpectedStreams = 1;
 	this->initialize();
 	this->getOption("runlocalserver")->setValueFromVariant(true);
+	this->getOption("secondary")->setValueFromVariant(false);
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();
 	this->verify();
@@ -63,6 +64,7 @@ TEST_CASE_METHOD(cxtest::AcquisitionFixture, "Acquisition: Stream one MDHSource 
 	this->mNumberOfExpectedStreams = 1;
 	this->initialize();
 	this->getOption("runlocalserver")->setValueFromVariant(false);
+	this->getOption("secondary")->setValueFromVariant(false);
 
 	QTimer::singleShot(20*1000,   qApp, SLOT(quit()) );
 	qApp->exec();

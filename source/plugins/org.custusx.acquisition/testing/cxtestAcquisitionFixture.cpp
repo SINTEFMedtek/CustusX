@@ -134,7 +134,7 @@ void AcquisitionFixture::initialize()
 	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_256x192.mhd";
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
-	cx::sessionStorageService()->load(cx::DataLocations::getPersistentWritablePath() + "/Acquisition/");
+	cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
