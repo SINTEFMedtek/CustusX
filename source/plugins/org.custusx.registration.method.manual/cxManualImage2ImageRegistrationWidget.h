@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxManualRegistrationWidget.h"
 
+class QLabel;
+
 namespace cx
 {
 
@@ -55,7 +57,15 @@ public:
 	virtual Transform3D getMatrixFromBackend();
 	virtual void setMatrixFromWidget(Transform3D M);
 
-	bool isValid() const;
+    bool    isValid() const;
+
+private:
+    QLabel* mAvarageAccuracyLabel;
+
+    void    updateAverageAccuracyLabel();
+    double  getAverageAccuracy(int& numActiveLandmarks);
+    double  getAccuracy(QString uid);
+    bool    isAverageAccuracyValid();
 
 };
 

@@ -30,15 +30,25 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+#include <map>
 #include "cxManualImage2ImageRegistrationWidget.h"
 #include "cxRegistrationService.h"
 #include "cxData.h"
+#include "cxImage.h"
 #include "cxRegistrationProperties.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxRegistrationService.h"
+#include "cxPatientModelService.h"
+#include "cxRegistrationTransform.h"
+#include "cxLandmark.h"
+
+#include "vtkMatrix4x4.h"
+#include "vtkMath.h"
 
 namespace cx
 {
+
+//typedef std::map<QString, class Landmark> LandmarkMap;
 
 ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServicesPtr services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
@@ -49,8 +59,11 @@ ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServ
 	LabeledComboBoxWidget* fixed = new LabeledComboBoxWidget(this, fixedImage);
 	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
 
+    mAvarageAccuracyLabel = new QLabel(QString(" "), this);
+
 	mVerticalLayout->insertWidget(0, fixed);
 	mVerticalLayout->insertWidget(1, moving);
+    mVerticalLayout->insertWidget(2, mAvarageAccuracyLabel);
 }
 
 QString ManualImage2ImageRegistrationWidget::getDescription()
@@ -74,7 +87,30 @@ Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
 	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
 	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
 	Transform3D fMm = rMf.inv() * rMm;
-	return fMm;
+
+    RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
+    Transform3D init_rMd = history->getData().front().mValue;
+    Transform3D current_rMd = history->getCurrentRegistration().mValue;
+
+    fMm = current_rMd * init_rMd.inv();
+//    std::vector<RegistrationTransform> transformVector = history->getData();
+//    std::vector<RegistrationTransform>::const_iterator it = history->getData().begin();
+//    QString type = it->mType;
+//    Transform3D init_rMd = it->mValue;
+//    std::cout << " **************** " << std::endl;
+//    std::cout << "Moving Image transform vector size : " << history->getData().size() << std::endl;
+//    std::cout << "Moving Image transform type : " << type.toStdString().c_str() << std::endl;
+//    std::cout << "Moving Image initial rMd : " << std::endl;
+//    std::cout << " **************** " << std::endl;
+//    init_rMd.getVtkMatrix()->Print(std::cout);
+
+//    std::cout << "Fixed Image rMd : " << std::endl;
+//    rMf.getVtkMatrix()->Print(std::cout);
+//    std::cout << "Moving Image rMd : " << std::endl;
+//    rMm.getVtkMatrix()->Print(std::cout);
+//    std::cout << "Resulting matrix fMm : " << std::endl;
+//    fMm.getVtkMatrix()->Print(std::cout);
+    return fMm;
 }
 
 void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
@@ -92,6 +128,117 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	//                fQm = fMr * delta * rMm
 	Transform3D delta = rMf * fQm * rMm.inv();
 
-	mServices->registration()->applyImage2ImageRegistration(delta, "Manual Image");
+    // New code
+    RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
+    Transform3D init_rMd = history->getData().front().mValue;
+    Transform3D new_rMd = M * init_rMd;
+    Transform3D delta2 = new_rMd * rMm.inv();
+
+    mServices->registration()->applyImage2ImageRegistration(delta2, "Manual Image");
+    this->updateAverageAccuracyLabel();
+
+
+
+    ImagePtr fixed = boost::dynamic_pointer_cast<Image>(mServices->registration()->getFixedData());
+    ImagePtr moving = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
+    if(fixed)
+        LandmarkMap fixedLandmarks = fixed->getLandmarks()->getLandmarks();
+    if(moving)
+        LandmarkMap movingLandmarks = moving->getLandmarks()->getLandmarks();
 }
+
+double ManualImage2ImageRegistrationWidget::getAverageAccuracy(int& numActiveLandmarks)
+{
+    std::map<QString, LandmarkProperty> props = mServices->patient()->getLandmarkProperties();
+
+    double sum = 0;
+    numActiveLandmarks = 0;
+    std::map<QString, LandmarkProperty>::iterator it = props.begin();
+    for (; it != props.end(); ++it)
+    {
+        if (!it->second.getActive()) //we don't want to take into account not active landmarks
+            continue;
+        QString uid = it->first;
+        double val = this->getAccuracy(uid);
+        if (!similar(val, 1000.0))
+        {
+            sum = sum + val;
+            numActiveLandmarks++;
+        }
+    }
+    if (numActiveLandmarks == 0)
+        return 1000;
+    return (sqrt(sum / (double)numActiveLandmarks));
+}
+
+double ManualImage2ImageRegistrationWidget::getAccuracy(QString uid)
+{
+    DataPtr fixedData = mServices->registration()->getFixedData();
+    if (!fixedData)
+        return 1000.0;
+    DataPtr movingData = mServices->registration()->getMovingData();
+    if (!movingData)
+        return 1000;
+
+    Landmark masterLandmark = fixedData->getLandmarks()->getLandmarks()[uid];
+    Landmark targetLandmark = movingData->getLandmarks()->getLandmarks()[uid];
+    if (masterLandmark.getUid().isEmpty() || targetLandmark.getUid().isEmpty())
+        return 1000.0;
+
+    Vector3D p_master_master = masterLandmark.getCoord();
+    Vector3D p_target_target = targetLandmark.getCoord();
+    Transform3D rMmaster = fixedData->get_rMd();
+    Transform3D rMtarget = movingData->get_rMd();
+
+    Vector3D p_target_r = rMtarget.coord(p_target_target);
+    Vector3D p_master_r = rMmaster.coord(p_master_master);
+    double  targetPoint[3];
+    double  masterPoint[3];
+    targetPoint[0] = p_target_r[0];
+    targetPoint[1] = p_target_r[1];
+    targetPoint[2] = p_target_r[2];
+    masterPoint[0] = p_master_r[0];
+    masterPoint[1] = p_master_r[1];
+    masterPoint[2] = p_master_r[2];
+
+//    return (p_target_r - p_master_r).length();
+    return (vtkMath::Distance2BetweenPoints(targetPoint, masterPoint));
+}
+
+void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
+{
+    QString fixedName;
+    QString movingName;
+    DataPtr fixedData = boost::dynamic_pointer_cast<Data>(mServices->registration()->getFixedData());
+    DataPtr movingData = boost::dynamic_pointer_cast<Data>(mServices->registration()->getMovingData());
+    if (fixedData)
+        fixedName = fixedData->getName();
+    if (movingData)
+        movingName = movingData->getName();
+
+    int numberOfActiveLandmarks;
+    if(this->isAverageAccuracyValid())
+    {
+        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy %1 mm").
+                                       arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2));
+        mAvarageAccuracyLabel->setToolTip(QString("Root Mean Square landmark accuracy from target [%1] to fixed [%2].").
+                                          arg(movingName).arg(fixedName));
+    }
+    else
+    {
+        mAvarageAccuracyLabel->setText(" ");
+        mAvarageAccuracyLabel->setToolTip("");
+    }
+}
+
+bool    ManualImage2ImageRegistrationWidget::isAverageAccuracyValid()
+{
+    int numActiveLandmarks = 0;
+    this->getAverageAccuracy(numActiveLandmarks);
+    if(numActiveLandmarks < 3)
+        return false;
+    return true;
+}
+
+
 } // cx
