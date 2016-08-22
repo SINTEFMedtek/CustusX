@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCoordinateSystemHelpers.h"
 #include "cxXmlOptionItem.h"
 #include "cxMetricUtilities.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -66,9 +67,9 @@ public:
 	{
 		for (unsigned i=0; i<mWidgets.size(); ++i)
 		{
-			WIDGET* w = dynamic_cast<WIDGET*>(mWidgets[i].get());
+			boost::shared_ptr<WIDGET> w = boost::dynamic_pointer_cast<WIDGET>(mWidgets[i]);
 			if (w)
-				return boost::shared_ptr<WIDGET>(w);
+				return w;
 		}
 		return boost::shared_ptr<WIDGET>();
 	}
