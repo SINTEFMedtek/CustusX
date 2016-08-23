@@ -239,7 +239,7 @@ QStringList StringPropertyParentFrame::getValueRange() const
   QStringList retval;
   retval << "";
 
-  std::map<QString, DataPtr> allData = mPatientModelService->getData();
+  std::map<QString, DataPtr> allData = mPatientModelService->getDatas();
   for (std::map<QString, DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
   {
     if (mData && (mData->getUid() == iter->first))

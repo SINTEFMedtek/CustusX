@@ -275,7 +275,7 @@ MetricBasePtr MetricWidget::createMetricWrapper(cx::ViewServicePtr viewService, 
 std::vector<MetricBasePtr> MetricWidget::createMetricWrappers(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService)
 {
 	std::vector<MetricBasePtr> retval;
-  std::map<QString, DataPtr> all = patientService()->getData();
+  std::map<QString, DataPtr> all = patientService()->getDatas();
   for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
 	MetricBasePtr wrapper = this->createMetricWrapper(viewService, patientModelService, iter->second);

@@ -56,6 +56,7 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 
 namespace cx
 {
+
 class RegistrationTransform;
 class LandmarkProperty;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
@@ -107,10 +108,15 @@ class cxResource_EXPORT PatientModelService : public QObject
 public:
 	virtual ~PatientModelService() {}
 
+	enum DataFilter
+	{
+		HideUnavailable,
+		AllData
+	};
+
 	// core Data interface
 	virtual void insertData(DataPtr data) = 0;
-	virtual std::map<QString, DataPtr> getData() const = 0;
-	virtual std::map<QString, DataPtr> getAllData() const = 0;
+	virtual std::map<QString, DataPtr> getDatas(DataFilter filter = HideUnavailable) const = 0;
 	/** Create Data object of given type.
 	 *
 	 *  uid must be unique, or contain the string %1 that will be replaced with a running
@@ -175,7 +181,7 @@ public:
 
 	static PatientModelServicePtr getNullObject();
 
-	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getData()
+	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getDatas()
 
 signals:
     void operatingTableChanged();
@@ -193,7 +199,7 @@ signals:
 template <class DATA>
 std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType() const
 {
-	std::map<QString, DataPtr> data = this->getData();
+	std::map<QString, DataPtr> data = this->getDatas();
 	std::map<QString, boost::shared_ptr<DATA> > retval;
 	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
 	{

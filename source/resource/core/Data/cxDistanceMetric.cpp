@@ -81,7 +81,7 @@ void DistanceMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 
-	mArguments->parseXml(dataNode, mDataManager->getData());
+	mArguments->parseXml(dataNode, mDataManager->getDatas());
 	this->resetCachedValues();
 }
 

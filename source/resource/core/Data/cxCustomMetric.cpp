@@ -91,7 +91,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 
-	mArguments->parseXml(dataNode, mDataManager->getData());
+	mArguments->parseXml(dataNode, mDataManager->getDatas());
 
 	QDomElement elem = dataNode.toElement();
 	mDefineVectorUpMethod = elem.attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));

@@ -139,7 +139,7 @@ void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 
 void MetricReferenceArgumentListGui::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
-	std::map<QString, DataPtr> data = patientService()->getData();
+	std::map<QString, DataPtr> data = patientService()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		if (mArguments->validArgument(iter->second))
@@ -1029,7 +1029,7 @@ void RegionOfInterestMetricWrapper::update()
 
 	QStringList data;
 	std::map<QString, QString> names;
-	std::map<QString, DataPtr> alldata = mPatientModelService->getData();
+	std::map<QString, DataPtr> alldata = mPatientModelService->getDatas();
 	for (std::map<QString, DataPtr>::iterator i=alldata.begin(); i!=alldata.end(); ++i)
 	{
 		if (i->first == mData->getUid())

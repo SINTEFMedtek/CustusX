@@ -63,7 +63,7 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr servic
 void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
 {
 	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getData());
+	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getDatas());
 	mLastDataActionUid = "________________________";
 	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
 	{

@@ -56,12 +56,12 @@ TEST_CASE("PatientModelPlugin: makeAvailable works", "[unit][plugins][org.custus
 
 	patientModelService->makeAvailable(imageUid, false);
 	CHECK(patientModelService->getData(imageUid));//Setting available to false should only remove data from the list, not when asking for a specific uid
-	CHECK_FALSE(patientModelService->getData().count(imageUid));
-	CHECK(patientModelService->getAllData().count(imageUid));
+	CHECK_FALSE(patientModelService->getDatas().count(imageUid));
+	CHECK(patientModelService->getDatas(cx::PatientModelService::AllData).count(imageUid));
 
 
 	patientModelService->makeAvailable(imageUid, true);
-	CHECK(patientModelService->getData().count(imageUid));
+	CHECK(patientModelService->getDatas().count(imageUid));
 
 	cx::LogicManager::shutdown();
 }

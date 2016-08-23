@@ -53,10 +53,11 @@ PatientModelServicePtr PatientModelService::getNullObject()
 
 DataPtr PatientModelService::getData(const QString& uid) const
 {
+	CX_LOG_DEBUG() << "PatientModelService::getData";
 	if (uid=="active")
 		return this->getActiveData()->getActive();
 
-	std::map<QString, DataPtr> all = this->getAllData();
+	std::map<QString, DataPtr> all = this->getDatas(AllData);
 	std::map<QString, DataPtr>::const_iterator iter = all.find(uid);
 	if (iter == all.end())
 		return DataPtr();

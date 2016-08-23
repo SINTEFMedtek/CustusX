@@ -143,27 +143,28 @@ DataPtr PatientModelImplService::createData(QString type, QString uid, QString n
 	return dataService()->getDataFactory()->create(type, uid, name);
 }
 
-std::map<QString, DataPtr> PatientModelImplService::getAllData() const
+std::map<QString, DataPtr> PatientModelImplService::getDatas(DataFilter filter) const
 {
-	return dataService()->getData();
-}
+	std::map<QString, DataPtr> retval = dataService()->getData();
 
-std::map<QString, DataPtr> PatientModelImplService::getData() const
-{
-	std::map<QString, DataPtr> retval = this->getAllData();
-
-	for(int i = 0; i < mUnavailableData.size(); ++i)
+	if (filter == HideUnavailable)
 	{
-		if (retval.count(mUnavailableData[i]))
-			retval.erase(mUnavailableData[i]);
+		CX_LOG_DEBUG() << "HideUnavailable";
+		for(int i = 0; i < mUnavailableData.size(); ++i)
+		{
+			if (retval.count(mUnavailableData[i]))
+				retval.erase(mUnavailableData[i]);
+		}
 	}
+	else
+		CX_LOG_DEBUG() << "AllData";
 
 	return retval;
 }
 
 DataPtr PatientModelImplService::getData(const QString& uid) const
 {
-	std::map<QString, DataPtr> dataMap = this->getAllData();
+	std::map<QString, DataPtr> dataMap = this->getDatas(AllData);
 	std::map<QString, DataPtr>::const_iterator iter = dataMap.find(uid);
 	if (iter == dataMap.end())
 		return DataPtr();

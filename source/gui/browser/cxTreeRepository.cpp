@@ -217,7 +217,7 @@ void TreeRepository::rebuild()
 
 	this->insertSpaceNode(CoordinateSystem(csREF));
 
-	std::map<QString, DataPtr> source = this->getServices()->patient()->getData();
+	std::map<QString, DataPtr> source = this->getServices()->patient()->getDatas();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		this->insertDataNode(iter->second);

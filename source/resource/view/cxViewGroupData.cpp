@@ -443,6 +443,7 @@ void ViewGroupData::clearData()
 
 DataPtr ViewGroupData::getData(QString uid) const
 {
+	CX_LOG_DEBUG() << "ViewGroupData::getData";
 	DataPtr data = mServices->patient()->getData(uid);
 	if (!data)
 	{

@@ -76,7 +76,7 @@ DataMetricPtr MetricManager::getMetric(QString uid)
 std::vector<DataMetricPtr> MetricManager::getAllMetrics()
 {
 	std::vector<DataMetricPtr> retval;
-	std::map<QString, DataPtr> all = patientService()->getData();
+	std::map<QString, DataPtr> all = patientService()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
 	{
 		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
@@ -379,7 +379,7 @@ void MetricManager::exportMetricsToFile(QString filename)
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 
-	std::map<QString, DataPtr> dataMap = patientService()->getData();
+	std::map<QString, DataPtr> dataMap = patientService()->getDatas();
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{

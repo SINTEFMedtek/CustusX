@@ -62,8 +62,7 @@ public:
 
 	virtual void insertData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name);
-	virtual std::map<QString, DataPtr> getData() const;
-	virtual std::map<QString, DataPtr> getAllData() const;
+	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
 	virtual DataPtr getData(const QString& uid) const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
