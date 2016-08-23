@@ -132,9 +132,9 @@ void ToolTipCalibrateWidget::calibrateSlot()
       catch(std::exception& e)
       {
           QMessageBox msgBox2;
-          msgBox2.setText("Error: could not calibrate the tool.");
+          msgBox2.setText("Unknown error, could not calibrate the tool: "+tool->getName()+".");
           msgBox2.setInformativeText(QString(e.what()));
-          msgBox2.setStandardButtons(QMessageBox::Ok/* | QMessageBox::Cancel*/);
+          msgBox2.setStandardButtons(QMessageBox::Ok);
           msgBox2.setDefaultButton(QMessageBox::Ok);
           int ret2 = msgBox2.exec();
           return;

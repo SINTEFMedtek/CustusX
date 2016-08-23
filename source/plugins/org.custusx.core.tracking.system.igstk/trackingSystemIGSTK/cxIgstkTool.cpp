@@ -48,12 +48,7 @@ namespace cx
 igstk::Transform IgstkTool::toIgstkTransform(Transform3D transform)
 {
     igstk::Transform retval;
-//    try
-//    {
     retval.ImportTransform(*transform.getVtkMatrix());
-//    }
-//    catch(...)
-//    {}
     return retval;
 }
 
@@ -69,7 +64,7 @@ Transform3D IgstkTool::toTransform3D(igstk::Transform transform)
 void IgstkTool::updateCalibration(const Transform3D& cal)
 {
 	//apply the calibration
-   // mInternalStructure.mCalibration = cal;
+    mInternalStructure.mCalibration = cal;
     this->setCalibrationTransform(mInternalStructure.mCalibration);
 
 	Transform3D sMt = mInternalStructure.getCalibrationAsSSC();
@@ -399,9 +394,8 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 
 void IgstkTool::setCalibrationTransform(Transform3D calibration)
 {
+	mInternalStructure.mCalibration = calibration;
     igstk::Transform transform = toIgstkTransform(mInternalStructure.mCalibration);
-
-    mInternalStructure.mCalibration = calibration;
     mTool->SetCalibrationTransform(transform);
 }
 
