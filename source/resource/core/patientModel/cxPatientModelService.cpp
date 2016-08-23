@@ -53,7 +53,6 @@ PatientModelServicePtr PatientModelService::getNullObject()
 
 DataPtr PatientModelService::getData(const QString& uid) const
 {
-	CX_LOG_DEBUG() << "PatientModelService::getData";
 	if (uid=="active")
 		return this->getActiveData()->getActive();
 

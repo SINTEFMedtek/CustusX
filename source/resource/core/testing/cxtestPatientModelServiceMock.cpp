@@ -71,12 +71,7 @@ cx::DataPtr PatientModelServiceMock::createData(QString type, QString uid, QStri
 	return data;
 }
 
-std::map<QString, cx::DataPtr> PatientModelServiceMock::getData() const
-{
-	return mData;
-}
-
-std::map<QString, cx::DataPtr> PatientModelServiceMock::getAllData() const
+std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filter) const
 {
 	return mData;
 }

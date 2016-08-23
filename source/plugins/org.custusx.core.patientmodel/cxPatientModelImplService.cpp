@@ -149,15 +149,12 @@ std::map<QString, DataPtr> PatientModelImplService::getDatas(DataFilter filter) 
 
 	if (filter == HideUnavailable)
 	{
-		CX_LOG_DEBUG() << "HideUnavailable";
 		for(int i = 0; i < mUnavailableData.size(); ++i)
 		{
 			if (retval.count(mUnavailableData[i]))
 				retval.erase(mUnavailableData[i]);
 		}
 	}
-	else
-		CX_LOG_DEBUG() << "AllData";
 
 	return retval;
 }
