@@ -342,7 +342,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
 	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
-	mShow3DSlicesInteractor->addDataActions(show3DSlicesMenu);
+	mShow3DSlicesInteractor->addDataActionsOfType<Image>(show3DSlicesMenu);
 
 	QMenu* showSlicesMenu = new QMenu("Slice Type", &contextMenu);
 	this->createSlicesActions(showSlicesMenu);
