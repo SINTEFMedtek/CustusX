@@ -140,9 +140,7 @@ void LapFrameToolCalibrationWidget::calibrateSlot()
   {
     try
     {
-        std::cout << calibration << std::endl;
         tool->setCalibration_sMt(calibration);
-
     }
     catch(std::exception& e)
     {
