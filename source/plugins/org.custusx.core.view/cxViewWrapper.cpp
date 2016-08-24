@@ -35,16 +35,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include "vtkCamera.h"
 
-#include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxTypeConversions.h"
-#include "cxImageAlgorithms.h"
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
-#include "cxVisServices.h"
 #include "cxNavigation.h"
 #include "cxActiveData.h"
 #include "cxSettings.h"
@@ -58,17 +55,6 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr servic
 	mGroupData(groupData)
 {
 	mProperties = DataViewProperties::createDefault();
-}
-
-void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
-{
-	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getDatas());
-	mLastDataActionUid = "________________________";
-	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
-	{
-		this->addDataAction((*iter)->getUid(), parent);
-	}
 }
 
 void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties properties)
@@ -180,7 +166,7 @@ void ViewWrapper::settingsChangedSlot(QString key)
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
 	QMenu contextMenu;
-	mDataViewPropertiesInteractor->addDataActions(&contextMenu);
+	mDataViewPropertiesInteractor->addDataActionsOfType<Data>(&contextMenu);
 	//append specific info from derived classes
 	this->appendToContextMenu(contextMenu);
 	contextMenu.exec(point);
