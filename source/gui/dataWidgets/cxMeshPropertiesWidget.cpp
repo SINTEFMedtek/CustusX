@@ -85,7 +85,7 @@ void MeshPropertiesWidget::meshSelectedSlot()
 
 void MeshPropertiesWidget::clearUI()
 {
-	mPropertiesWidget->setWidget(new QLabel("no\nmesh\nselected"));
+	mPropertiesWidget->setWidgetDeleteOld(new QLabel("no\nmesh\nselected"));
 	this->setModified();
 }
 
@@ -97,7 +97,7 @@ void MeshPropertiesWidget::setupUI()
 	QWidget* widget = new QWidget;
 	QGridLayout* layout = new QGridLayout(widget);
 	layout->setMargin(0);
-	mPropertiesWidget->setWidget(widget);
+	mPropertiesWidget->setWidgetDeleteOld(widget);
 
 	std::vector<PropertyPtr> properties = mMesh->getProperties().mProperties;
 	for (unsigned i=0; i<properties.size(); ++i)

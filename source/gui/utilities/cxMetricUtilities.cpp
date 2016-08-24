@@ -87,7 +87,7 @@ MetricBasePtr MetricUtilities::createMetricWrapper(DataPtr data)
 std::vector<MetricBasePtr> MetricUtilities::createMetricWrappers()
 {
 	std::vector<MetricBasePtr> retval;
-	std::map<QString, DataPtr> all = mPatientModelService->getData();
+	std::map<QString, DataPtr> all = mPatientModelService->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
 	{
 		MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
