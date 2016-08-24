@@ -18,6 +18,7 @@ Calibration Widget {#algorithm_widgets_calibration}
 Tooltip Calibration Widget {#org_custusx_calibration_widgets_tooltip}
 -----------------------------------------------------------
 Calibrates a tool by sampling it when pointing at a known point on another frame.
+This calibration changes only the translational part of the calibration matrix.
 
 > By using the test button you can test your calibration by pointing at a known reference point.
 
@@ -25,7 +26,8 @@ Calibrates a tool by sampling it when pointing at a known point on another frame
 \addindex lap_frame_tool_calibration_widget
 Lapframe Calibration Widget {#org_custusx_calibration_widgets_lapframe}
 -----------------------------------------------------------
-Calibrates a tool by sampling it when it is inserted into the slot of the custom-made calibration frame.
+Calibrates a tool by sampling it when it is inserted into the slot of the custom-made Utrecht-SNF-Calibration-tool_POLARIS frame.
+This calibration changes both the rotational and translational part of the calibration matrix.
 
 The tool to be calibrated will have its calibration set in such a way that the calibrating and calibrated tools
 are in the same position.
