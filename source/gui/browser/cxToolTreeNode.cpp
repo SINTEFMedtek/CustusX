@@ -127,14 +127,14 @@ QVariant ToolTreeNode::getFont() const
 	return QVariant();
 }
 
-QWidget* ToolTreeNode::createPropertiesWidget() const
+boost::shared_ptr<QWidget> ToolTreeNode::createPropertiesWidget() const
 {
 	StringPropertySelectToolPtr selector = StringPropertySelectTool::New(this->getServices()->tracking());
 	selector->setValue(mTool->getUid());
-	return new ToolPropertiesWidget(selector,
-							  this->getServices()->tracking(),
-							  this->getServices()->spaceProvider(),
-							  NULL);
+	return boost::shared_ptr<QWidget>(new ToolPropertiesWidget(selector,
+															   this->getServices()->tracking(),
+															   this->getServices()->spaceProvider(),
+															   NULL));
 
 //	return new ToolPropertiesWidget(NULL);
 //	return new QLabel(QString("Tool widget %1 ").arg(mTool->getName()));

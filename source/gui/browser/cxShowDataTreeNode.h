@@ -58,7 +58,7 @@ public:
 	virtual QIcon getIcon() const;
 	virtual QVariant getViewGroupVisibility(int index) const;
 	virtual void setViewGroupVisibility(int index, bool value);
-	QWidget* createPropertiesWidget() const;
+	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual QVariant getFont() const;
 
