@@ -176,7 +176,9 @@ class ITK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         builder.configureCMake()
     def repository(self):
-        return 'git://itk.org/ITK.git'
+#        return 'git://itk.org/ITK.git'
+#        return 'ssh://git@git.code.sintef.no/mt/itk.git'
+        return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
