@@ -195,7 +195,7 @@ void TrainingWidget::transitionToStep(int step)
 
 QString TrainingWidget::getFirstUSVolume()
 {
-	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	std::map<QString, DataPtr> datas = mServices->patient()->getDatas();
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 
 	for(; iter != datas.end(); ++iter)
@@ -224,14 +224,14 @@ MeshPtr TrainingWidget::getMesh(QString uidPart)
 
 void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailable)
 {
-	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	std::map<QString, DataPtr> datas = mServices->patient()->getDatas();
 	this->setAvailability(datas, false, uidPart, makeModalityUnavailable);
 }
 
 
 void TrainingWidget::makeAvailable(QString uidPart, bool makeModalityUnavailable)
 {
-	std::map<QString, DataPtr> datas = mServices->patient()->getAllData();
+	std::map<QString, DataPtr> datas = mServices->patient()->getDatas(PatientModelService::AllData);
 	this->setAvailability(datas, true, uidPart, makeModalityUnavailable);
 }
 

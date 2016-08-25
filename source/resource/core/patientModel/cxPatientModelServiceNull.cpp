@@ -55,14 +55,7 @@ DataPtr PatientModelServiceNull::createData(QString type, QString uid, QString n
 	return DataPtr();
 }
 
-std::map<QString, DataPtr> PatientModelServiceNull::getData() const
-{
-	printWarning();
-	std::map<QString, DataPtr> retval;
-	return retval;
-}
-
-std::map<QString, DataPtr> PatientModelServiceNull::getAllData() const
+std::map<QString, DataPtr> PatientModelServiceNull::getDatas(DataFilter filter) const
 {
 	printWarning();
 	std::map<QString, DataPtr> retval;

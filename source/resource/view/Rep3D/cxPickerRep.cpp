@@ -182,7 +182,7 @@ void PickerRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr rende
 	vtkDataSetPtr data = picker->GetDataSet();
 	if (data)
 	{
-		std::map<QString, DataPtr> allData = mDataManager->getData();
+		std::map<QString, DataPtr> allData = mDataManager->getDatas();
 		for (std::map<QString, DataPtr>::iterator iter = allData.begin(); iter != allData.end(); ++iter)
 		{
 			MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(iter->second);

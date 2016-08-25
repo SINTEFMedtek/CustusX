@@ -65,7 +65,7 @@ void FrameTreeWidget::dataLoadedSlot()
 	disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(setModified()));
   }
 
-  mConnectedData = mPatientService->getData();
+  mConnectedData = mPatientService->getDatas();
 
   for (std::map<QString, DataPtr>::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
   {
@@ -84,7 +84,7 @@ void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
 
-  FrameForest forest(mPatientService->getData());
+  FrameForest forest(mPatientService->getDatas());
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);

@@ -220,7 +220,7 @@ RegionOfInterest RegionOfInterestMetric::getROI() const
 		retval.mPoints.push_back(this->getToolTip_r());
 	}
 
-	std::map<QString, DataPtr> alldata = mDataManager->getData();
+	std::map<QString, DataPtr> alldata = mDataManager->getDatas();
 	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
 	{
 		if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(i->second))
