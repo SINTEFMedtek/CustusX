@@ -176,9 +176,10 @@ class ITK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         builder.configureCMake()
     def repository(self):
-#        return 'git://itk.org/ITK.git'
-#        return 'ssh://git@git.code.sintef.no/mt/itk.git'
-        return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
+        if self.controlData.gitrepo_main_site_base == self.controlData.gitrepo_open_site_base:
+            return 'git://itk.org/ITK.git'
+        else:
+            return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -259,8 +260,10 @@ class OpenCV(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-#        return 'https://github.com/Itseez/opencv.git'
-        return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
+        if self.controlData.gitrepo_main_site_base == self.controlData.gitrepo_open_site_base:
+           return 'https://github.com/Itseez/opencv.git'
+        else:
+            return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('2.4.11')
