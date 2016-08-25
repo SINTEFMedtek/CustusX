@@ -259,7 +259,8 @@ class OpenCV(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'https://github.com/Itseez/opencv.git'
+#        return 'https://github.com/Itseez/opencv.git'
+        return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('2.4.11')
