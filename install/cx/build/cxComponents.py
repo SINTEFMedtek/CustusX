@@ -181,7 +181,7 @@ class ITK(CppComponent):
         if self.useExternalRepositories():
             return 'git://itk.org/ITK.git'
         else:
-            return '%s/ITK.git' % self.controlData.gitrepo_internal_site_base
+            return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -265,7 +265,7 @@ class OpenCV(CppComponent):
         if self.useExternalRepositories():
            return 'https://github.com/Itseez/opencv.git'
         else:
-            return '%s/OpenCV.git' % self.controlData.gitrepo_internal_site_base
+            return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('2.4.11')
