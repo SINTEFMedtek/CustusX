@@ -115,6 +115,11 @@ void ViewServiceNull::addDefaultLayout(LayoutData layoutData)
 	printWarning();
 }
 
+void ViewServiceNull::enableContextMenuForViews(bool enable)
+{
+	printWarning();
+}
+
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {
 	return ClippersPtr();

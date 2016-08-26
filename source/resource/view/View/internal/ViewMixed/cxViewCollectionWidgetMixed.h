@@ -66,7 +66,7 @@ class LayoutWidgetUsingViewWidgets;
  * \author Christian Askeland
  * \ingroup cx_resource_view_internal
  */
-class ViewCollectionWidgetMixed : public ViewCollectionWidget
+class	ViewCollectionWidgetMixed : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
@@ -83,6 +83,10 @@ public:
     virtual int getGridMargin() const;
     virtual std::vector<ViewPtr> getViews();
     virtual QPoint getPosition(ViewPtr view);
+	virtual void enableContextMenuForViews(bool enable);
+
+protected:
+	ViewCollectionWidget* mBaseLayout;
 
 private:
 	void addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region);
@@ -90,7 +94,6 @@ private:
 	LayoutRegion mBaseRegion;
 	LayoutRegion mTotalRegion;
 	QGridLayout* mLayout;
-    ViewCollectionWidget* mBaseLayout;
 	std::vector<ViewWidget*> mOverlays;
 
 	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheOverlay;

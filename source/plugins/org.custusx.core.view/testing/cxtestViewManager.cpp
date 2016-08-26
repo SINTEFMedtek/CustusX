@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 typedef boost::shared_ptr<class ViewManagerFixture> ViewManagerFixturePtr;
+
 class ViewManagerFixture : public cx::ViewManager
 {
 public:
