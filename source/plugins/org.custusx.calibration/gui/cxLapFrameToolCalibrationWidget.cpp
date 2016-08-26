@@ -138,9 +138,20 @@ void LapFrameToolCalibrationWidget::calibrateSlot()
 
   if(ret == QMessageBox::Ok)
   {
-    tool->setCalibration_sMt(calibration);
-//    std::stringstream ss;
-//    ss << calibration.matrix().format(Eigen::IOFormat()) << std::endl;
+    try
+    {
+        tool->setCalibration_sMt(calibration);
+    }
+    catch(std::exception& e)
+    {
+        QMessageBox msgBox2;
+        msgBox2.setText("Unknown error, could not calibrate the tool: "+tool->getName()+".");
+        msgBox2.setInformativeText(QString(e.what()));
+        msgBox2.setStandardButtons(QMessageBox::Ok);
+        msgBox2.setDefaultButton(QMessageBox::Ok);
+        int ret2 = msgBox2.exec();
+        return;
+    }
     mCalibrationLabel->setText(QString("Calibration matrix for %1:\n%2").arg(tool->getName(), qstring_cast(calibration)));
   }
 }
