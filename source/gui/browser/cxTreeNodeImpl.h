@@ -59,7 +59,7 @@ public:
 	virtual QVariant getColor() const { return QVariant(); }
 	virtual bool  useColoredName() const { return false; }
 	virtual QVariant getFont() const { return QVariant(); }
-	virtual QWidget* createPropertiesWidget() const { return NULL; }
+	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const { return boost::shared_ptr<QWidget>(); }
 	virtual bool isDefaultExpanded() const { return true; }
 
 	virtual bool isRemovable() const { return false; }

@@ -100,7 +100,7 @@ void SelectDataStringPropertyBase::setUidRegexp(QString regexp)
 
 QStringList SelectDataStringPropertyBase::getValueRange() const
 {
-	std::map<QString, DataPtr> data = mPatientModelService->getData();
+	std::map<QString, DataPtr> data = mPatientModelService->getDatas();
 	data = SelectDataStringPropertyBase::filterOnType(data, mTypeRegexp);
 	data = this->filterOnUid(data, mUidRegexp);
 	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(data);

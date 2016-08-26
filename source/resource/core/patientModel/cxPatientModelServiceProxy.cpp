@@ -125,14 +125,9 @@ DataPtr PatientModelServiceProxy::createData(QString type, QString uid, QString 
 	return mPatientModelService->createData(type, uid, name);
 }
 
-std::map<QString, DataPtr> PatientModelServiceProxy::getData() const
+std::map<QString, DataPtr> PatientModelServiceProxy::getDatas(DataFilter filter) const
 {
-	return mPatientModelService->getData();
-}
-
-std::map<QString, DataPtr> PatientModelServiceProxy::getAllData() const
-{
-	return mPatientModelService->getAllData();
+	return mPatientModelService->getDatas(filter);
 }
 
 DataPtr PatientModelServiceProxy::getData(const QString& uid) const

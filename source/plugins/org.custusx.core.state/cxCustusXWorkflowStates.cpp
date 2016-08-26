@@ -98,7 +98,7 @@ PreOpPlanningWorkflowState::PreOpPlanningWorkflowState(QState* parent, CoreServi
 
 bool PreOpPlanningWorkflowState::canEnter() const
 {
-	return !mServices->patient()->getData().empty();
+	return !mServices->patient()->getDatas().empty();
 }
 
 // --------------------------------------------------------
@@ -138,7 +138,7 @@ PostOpControllWorkflowState::PostOpControllWorkflowState(QState* parent, CoreSer
 
 bool PostOpControllWorkflowState::canEnter() const
 {
-	return !mServices->patient()->getData().empty();
+	return !mServices->patient()->getDatas().empty();
 }
 
 }

@@ -339,7 +339,9 @@ target_link_libraries(cxResource
 )
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
+cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/Data/doc")
 cx_add_non_source_file("usReconstructionTypes/doc/org.custusx.resource.core.usacquisitionfileformat.md")
+cx_add_non_source_file("Data/doc/org.custusx.resource.core.metrics.md")
 
 add_subdirectory(testing)
 add_subdirectory(usReconstructionTypes/testing)

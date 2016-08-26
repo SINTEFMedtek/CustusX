@@ -93,6 +93,13 @@ void MetricBase::addColorWidget(QVBoxLayout* layout)
 	connect(mColorSelector.get(), SIGNAL(valueWasSet()), this, SLOT(colorSelected()));
 }
 
+QWidget *cx::MetricBase::newWidget(QString objectName)
+{
+	QWidget* widget = new QWidget;
+	widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
+	widget->setObjectName(objectName);
+	return widget;
+}
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -132,7 +139,7 @@ void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 
 void MetricReferenceArgumentListGui::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
-	std::map<QString, DataPtr> data = patientService()->getData();
+	std::map<QString, DataPtr> data = patientService()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		if (mArguments->validArgument(iter->second))
@@ -214,7 +221,7 @@ PointMetricWrapper::~PointMetricWrapper()
 
 QWidget* PointMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("point_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -354,7 +361,7 @@ PlaneMetricWrapper::~PlaneMetricWrapper()
 
 QWidget* PlaneMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("plane_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -412,7 +419,7 @@ DistanceMetricWrapper::DistanceMetricWrapper(ViewServicePtr viewService, Patient
 
 QWidget* DistanceMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("distance_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -475,7 +482,7 @@ AngleMetricWrapper::~AngleMetricWrapper()
 
 QWidget* AngleMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("angle_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -553,7 +560,7 @@ DonutMetricWrapper::DonutMetricWrapper(ViewServicePtr viewService, PatientModelS
 
 QWidget* DonutMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("donut_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -702,7 +709,7 @@ CustomMetricWrapper::CustomMetricWrapper(ViewServicePtr viewService, PatientMode
 
 QWidget* CustomMetricWrapper::createWidget()
 {
-    QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("custom_metric");
     QVBoxLayout* topLayout = new QVBoxLayout(widget);
     QHBoxLayout* hLayout = new QHBoxLayout;
     hLayout->setMargin(0);
@@ -837,7 +844,7 @@ SphereMetricWrapper::SphereMetricWrapper(ViewServicePtr viewService, PatientMode
 
 QWidget* SphereMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("sphere_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -919,7 +926,7 @@ RegionOfInterestMetricWrapper::RegionOfInterestMetricWrapper(ViewServicePtr view
 
 QWidget* RegionOfInterestMetricWrapper::createWidget()
 {
-	QWidget* widget = new QWidget;
+	QWidget* widget = this->newWidget("region_of_interest_metric");
 	QVBoxLayout* topLayout = new QVBoxLayout(widget);
 	QHBoxLayout* hLayout = new QHBoxLayout;
 	hLayout->setMargin(0);
@@ -1022,7 +1029,7 @@ void RegionOfInterestMetricWrapper::update()
 
 	QStringList data;
 	std::map<QString, QString> names;
-	std::map<QString, DataPtr> alldata = mPatientModelService->getData();
+	std::map<QString, DataPtr> alldata = mPatientModelService->getDatas();
 	for (std::map<QString, DataPtr>::iterator i=alldata.begin(); i!=alldata.end(); ++i)
 	{
 		if (i->first == mData->getUid())
@@ -1054,8 +1061,5 @@ void RegionOfInterestMetricWrapper::guiChanged()
 	mData->setMargin(mMarginProperty->getValue());
 	mData->setMaxBoundsData(mMaxBoundsDataProperty->getValue());
 }
-
-
-
 
 }

@@ -638,7 +638,7 @@ void DebugTab::init()
 
 void DebugTab::runDebugToolSlot()
 {
-	if (!patientService()->getData().size())
+	if (!patientService()->getDatas().size())
 		return;
 
 	cx::ImagePtr image = patientService()->getDataOfType<Image>().begin()->second;

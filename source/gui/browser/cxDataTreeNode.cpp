@@ -48,6 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxDataMetric.h"
+#include "cxMetricUtilities.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -177,20 +179,20 @@ void DataTreeNode::setViewGroupVisibility(int index, bool value)
 		this->getServices()->view()->getGroup(index)->setProperties(mData->getUid(), DataViewProperties());
 }
 
-QWidget* DataTreeNode::createPropertiesWidget() const
+boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 {
 	WidgetTypeRepositoryPtr wrepo = this->repo()->getWidgetTypeRepository();
 
 	if (boost::dynamic_pointer_cast<Mesh>(mData))
 	{
-		MeshInfoWidget* widget = wrepo->find<MeshInfoWidget>();
+		boost::shared_ptr<MeshInfoWidget> widget = wrepo->find<MeshInfoWidget>();
 		if (!widget)
 		{
 			StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(this->getServices()->patient());
-			widget = new MeshInfoWidget(meshSelector,
-										this->getServices()->patient(),
-										this->getServices()->view(),
-										NULL);
+			widget.reset( new MeshInfoWidget(meshSelector,
+											 this->getServices()->patient(),
+											 this->getServices()->view(),
+											 NULL));
 			wrepo->add(widget);
 		}
 		widget->getSelector()->setValue(mData->getUid());
@@ -198,15 +200,27 @@ QWidget* DataTreeNode::createPropertiesWidget() const
 	}
 	if (boost::dynamic_pointer_cast<Image>(mData))
 	{
-		ImagePropertiesWidget* widget = wrepo->find<ImagePropertiesWidget>();
+		boost::shared_ptr<ImagePropertiesWidget> widget = wrepo->find<ImagePropertiesWidget>();
 		if (!widget)
 		{
-			widget = new ImagePropertiesWidget(this->getServices(), NULL);
+			widget.reset (new ImagePropertiesWidget(this->getServices(), NULL));
 			wrepo->add(widget);
 		}
 		return widget;
 	}
-	return new QLabel(QString("Data widget %1 ").arg(mData->getName()));
+	if(boost::dynamic_pointer_cast<DataMetric>(mData))
+	{
+		boost::shared_ptr<QWidget> widget = wrepo->findMetricWidget(mData);
+		if(!widget)
+		{
+			MetricUtilities utilities(this->getServices()->view(), this->getServices()->patient());
+			widget.reset(utilities.createMetricWidget(mData));
+			wrepo->add(widget);
+		}
+		return widget;
+
+	}
+	return boost::shared_ptr<QWidget>(new QLabel(QString("Data widget %1 ").arg(mData->getName())));
 }
 
 

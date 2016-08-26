@@ -467,7 +467,7 @@ void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, Q
  */
 void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, bool continuous)
 {
-	RegistrationApplicator applicator(mPatientModelService->getData());
+	RegistrationApplicator applicator(mPatientModelService->getDatas());
 	applicator.updateRegistration(oldTime, deltaTransform, data, continuous);
 	if(!continuous)
 		mPatientModelService->autoSave();
@@ -508,7 +508,7 @@ void RegistrationImplService::applyPatientOrientation(const Transform3D& tMtm, c
 	// use the same registration time as generated in the applyPatientRegistration() above:
 	RegistrationTransform regTrans(delta_pre_rMd, this->getLastRegistrationTime(), description);
 
-	std::map<QString,DataPtr> data = mPatientModelService->getData();
+	std::map<QString,DataPtr> data = mPatientModelService->getDatas();
 	// update the transform on all target data:
 	for (std::map<QString,DataPtr>::iterator iter = data.begin(); iter!=data.end(); ++iter)
 	{

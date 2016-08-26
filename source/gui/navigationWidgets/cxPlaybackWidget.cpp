@@ -264,7 +264,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 		}
 	}
 
-	std::map<QString, DataPtr> data = patientService()->getData();
+	std::map<QString, DataPtr> data = patientService()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		QString desc("loaded " + iter->second->getName());

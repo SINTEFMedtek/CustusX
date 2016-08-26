@@ -53,7 +53,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-void WidgetTypeRepository::add(QWidget *widget)
+boost::shared_ptr<QWidget> WidgetTypeRepository::findMetricWidget(DataPtr data)
+{
+	for (unsigned i=0; i<mWidgets.size(); ++i)
+	{
+		boost::shared_ptr<SingleMetricWidget> w = boost::dynamic_pointer_cast<SingleMetricWidget>(mWidgets[i]);
+		if(w && w->getData() && data && w->getData()->getUid() == data->getUid())
+			return w;
+	}
+	return boost::shared_ptr<QWidget>();
+}
+
+void WidgetTypeRepository::add(boost::shared_ptr<QWidget> widget)
 {
 	mWidgets.push_back(widget);
 }
@@ -217,7 +228,7 @@ void TreeRepository::rebuild()
 
 	this->insertSpaceNode(CoordinateSystem(csREF));
 
-	std::map<QString, DataPtr> source = this->getServices()->patient()->getData();
+	std::map<QString, DataPtr> source = this->getServices()->patient()->getDatas();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		this->insertDataNode(iter->second);

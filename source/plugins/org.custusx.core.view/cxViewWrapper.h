@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxViewGroupData.h"
 #include "cxSyncedValue.h"
+#include "cxVisServices.h"
+#include "cxPatientModelService.h"
+#include "cxImageAlgorithms.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -69,8 +72,10 @@ class org_custusx_core_view_EXPORT DataViewPropertiesInteractor : public QObject
 	Q_OBJECT
 public:
 	DataViewPropertiesInteractor(VisServicesPtr services, ViewGroupDataPtr groupData);
-	void addDataActions(QWidget* parent);
 	void setDataViewProperties(DataViewProperties properties);
+
+	template <class DATA>
+	void addDataActionsOfType(QWidget* parent);
 
 private slots:
 	void dataActionSlot();
@@ -82,6 +87,19 @@ private:
 
 	QString mLastDataActionUid;
 };
+
+template <class DATA>
+void DataViewPropertiesInteractor::addDataActionsOfType(QWidget* parent)
+{
+	//add actions to the actiongroups and the contextmenu
+	std::vector< boost::shared_ptr<DATA> > sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getDataOfType<DATA>());
+	mLastDataActionUid = "________________________";
+	for (typename std::vector< boost::shared_ptr<DATA> >::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+	{
+		this->addDataAction((*iter)->getUid(), parent);
+	}
+}
+
 
 /**
  * \brief Superclass for ViewWrappers.

@@ -19,7 +19,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	browser/cxViewServicePropertiesWidget
 	browser/cxViewGroupPropertiesWidget
 		filterWidgets/cxFilterSetupWidget
-        filterWidgets/cxFiltersWidget
+		filterWidgets/cxFiltersWidget
 	#----------------------
 	properties/cxDataInterface
 	properties/cxShadingParamsInterfaces
@@ -84,8 +84,9 @@ cx_add_class_qt_moc(cxGui_SRCS
     #----------------------
     utilities/cxAudioImpl
     utilities/cxToolImagePreviewWidget
-	utilities/cxDynamicMainWindowWidgets
-	utilities/cxClippers
+    utilities/cxDynamicMainWindowWidgets
+    utilities/cxClippers
+    utilities/cxMetricUtilities
 	#----------------------
     pluginFrameworkWidgets/cxPluginBrowser
     pluginFrameworkWidgets/cxPluginTableModel
