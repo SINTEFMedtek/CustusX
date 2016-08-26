@@ -123,7 +123,6 @@ void HttpRequestHandler::handle_complete_request(QHttpRequest *req, QHttpRespons
 
 void HttpRequestHandler::handle_layout(QHttpRequest *req, QHttpResponse *resp)
 {
-    std::cout << "handle_layout" << std::endl;
     CX_ASSERT(req->path().startsWith("/layout"));
 
     if (req->path() == "/layout")
@@ -147,8 +146,6 @@ void HttpRequestHandler::handle_layout(QHttpRequest *req, QHttpResponse *resp)
 void HttpRequestHandler::process_layout(QHttpRequest *req, QHttpResponse *resp)
 {
     CX_ASSERT(req->path()=="/layout");
-    std::cout << "process_layout" << std::endl;
-//    GET    /layout/                                       : return list of all layouts
 
     if (req->method()==QHttpRequest::HTTP_GET)
     {
@@ -163,9 +160,6 @@ void HttpRequestHandler::process_layout(QHttpRequest *req, QHttpResponse *resp)
 void HttpRequestHandler::process_stream(QHttpRequest *req, QHttpResponse *resp)
 {
     CX_ASSERT(req->path()=="/layout/display/stream");
-    std::cout << "process_stream" << std::endl;
-//    PUT    /layout/display/stream?port=8086                 : start streamer on port
-//    DELETE /layout/display/stream                           : stop streamer on port
 
     if (req->method()==QHttpRequest::HTTP_PUT)
     {
@@ -184,11 +178,6 @@ void HttpRequestHandler::process_stream(QHttpRequest *req, QHttpResponse *resp)
 void HttpRequestHandler::process_display(QHttpRequest *req, QHttpResponse *resp)
 {
     CX_ASSERT(req->path()=="/layout/display");
-	std::cout << "process_display, success=" << req->successful() << std::endl;
-
-//    PUT    /layout/display?width=536,height=320,layout=mg_def  : create layout display of given size and layout
-//    GET    /layout/display                                  : get image of layout
-//    DELETE /layout/display                                  : delete display
 
     if (req->method()==QHttpRequest::HTTP_GET)
     {
@@ -279,12 +268,12 @@ QByteArray HttpRequestHandler::generatePNGEncoding(QImage image)
 
 void HttpRequestHandler::create_stream(QHttpRequest *req, QHttpResponse *resp)
 {
-    this->reply_notfound(resp); // TODO: create streamer
+	this->reply_notfound(resp); // implement in subclass
 }
 
 void HttpRequestHandler::delete_stream(QHttpResponse *resp)
 {
-    this->reply_notfound(resp); // TODO: delete streamer
+	this->reply_notfound(resp); // implement in subclass
 }
 
 void HttpRequestHandler::process_mainpage(QHttpRequest *req, QHttpResponse *resp)
@@ -343,7 +332,6 @@ void HttpRequestHandler::reply_mainpage(QHttpResponse *resp)
 
 void HttpRequestHandler::handle_screen(QHttpRequest *req, QHttpResponse *resp)
 {
-    std::cout << "handle_screen" << std::endl;
     CX_ASSERT(req->path().startsWith("/screen"));
 
     if (req->path() == "/screen")
