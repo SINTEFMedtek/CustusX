@@ -12,12 +12,10 @@ ViewServiceMock::ViewServiceMock(ctkPluginContext *context) :
 	cx::VisServicesPtr services = cx::VisServices::create(context);
 	mBaseMock = ViewManagerMock::create(services);
 	mBase = mBaseMock;
-	cx::reportDebug("Constructing ViewServiceMock, mBase is now ViewManagerMock");
 }
 
 ViewServiceMock::~ViewServiceMock()
 {
-	cx::reportDebug("Destructing ViewServiceMock");
 }
 
 QWidget *ViewServiceMock::createLayoutWidget(QWidget *parent, int index)

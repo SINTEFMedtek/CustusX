@@ -102,7 +102,6 @@ bool ViewImplService::isNull()
 
 void ViewImplService::aboutToStop()
 {
-    CX_LOG_DEBUG() << "About to destruct the visualizationservice and viewmanager, making sure timers are stopped.";
     viewManager()->enableRender(false);
 }
 
