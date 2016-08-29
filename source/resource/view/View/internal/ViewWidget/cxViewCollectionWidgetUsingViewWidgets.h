@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_
 #define CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
@@ -52,7 +54,7 @@ namespace cx
  * \date 2013-11-05
  * \author Christian Askeland
  */
-class LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
+class cxResourceVisualization_EXPORT LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:

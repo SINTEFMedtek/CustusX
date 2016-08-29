@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCOLLECTIONWIDGETMIXED_H_
 #define CXVIEWCOLLECTIONWIDGETMIXED_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
@@ -66,7 +68,7 @@ class LayoutWidgetUsingViewWidgets;
  * \author Christian Askeland
  * \ingroup cx_resource_view_internal
  */
-class	ViewCollectionWidgetMixed : public ViewCollectionWidget
+class	cxResourceVisualization_EXPORT ViewCollectionWidgetMixed : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
