@@ -22,7 +22,7 @@ ViewServiceMock::~ViewServiceMock()
 
 QWidget *ViewServiceMock::createLayoutWidget(QWidget *parent, int index)
 {
-	mBaseMock->createLayoutWidget(parent, index);
+	return mBaseMock->createLayoutWidget(parent, index);
 }
 
 std::vector<QPointer<cx::ViewCollectionWidget> > ViewServiceMock::getViewCollectionWidgets() const
