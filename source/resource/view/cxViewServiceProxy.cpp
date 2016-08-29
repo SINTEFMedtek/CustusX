@@ -205,6 +205,11 @@ void ViewServiceProxy::addDefaultLayout(LayoutData layoutData)
 	mViewService->addDefaultLayout(layoutData);
 }
 
+void ViewServiceProxy::enableContextMenuForViews(bool enable)
+{
+	mViewService->enableContextMenuForViews(enable);
+}
+
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {
 	return mViewService->getClippers();

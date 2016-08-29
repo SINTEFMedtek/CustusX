@@ -130,7 +130,16 @@ QPoint LayoutWidgetUsingViewWidgets::getPosition(ViewPtr view)
 
     QPoint p = widget->mapToGlobal(QPoint(0,0));
     p = this->mapFromGlobal(p);
-    return p;
+	return p;
+}
+
+void LayoutWidgetUsingViewWidgets::enableContextMenuForViews(bool enable)
+{
+	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
+	for (unsigned i=0; i<mViews.size(); ++i)
+	{
+		mViews[i]->setContextMenuPolicy(policy);
+	}
 }
 
 ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)

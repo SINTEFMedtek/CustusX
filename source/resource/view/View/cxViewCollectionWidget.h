@@ -74,6 +74,7 @@ public:
 	virtual void setGridMargin(int val) = 0;
     virtual int getGridSpacing() const = 0;
     virtual int getGridMargin() const = 0;
+	virtual void enableContextMenuForViews(bool enable) = 0;
 
 	virtual std::vector<ViewPtr> getViews() = 0;
 	/**

@@ -3,6 +3,10 @@ if(BUILD_TESTING)
 
   set(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES
     cxtestVisualizationHelper.h
+    cxtestViewServiceMock.h
+    cxtestViewManagerMock.h
+    cxtestViewCollectionWidgetMixedMock.h
+    cxtestLayoutWidgetUsingViewWidgetsMock.h
     )
   set(CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES
     cxtestViewPlugin.cpp
@@ -17,10 +21,15 @@ if(BUILD_TESTING)
     cxtestVisualizationHelper.cpp
     cxtestViewGroup.cpp
     cxtestViewManager.cpp
-	cxtestNavigationAlgorithms.cpp
+    cxtestNavigationAlgorithms.cpp
+    cxtestViewService.cpp
+    cxtestViewServiceMock.cpp
+    cxtestViewManagerMock.cpp
+    cxtestViewCollectionWidgetMixedMock.cpp
+    cxtestLayoutWidgetUsingViewWidgetsMock.cpp
 	)
   qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
-  add_library(cxtest_org_custusx_core_view ${CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_visualization_MOC_SOURCE_FILES})
+  add_library(cxtest_org_custusx_core_view ${CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
   include(GenerateExportHeader)
   generate_export_header(cxtest_org_custusx_core_view)
   target_include_directories(cxtest_org_custusx_core_view

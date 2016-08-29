@@ -102,7 +102,6 @@ bool ViewImplService::isNull()
 
 void ViewImplService::aboutToStop()
 {
-    CX_LOG_DEBUG() << "About to destruct the visualizationservice and viewmanager, making sure timers are stopped.";
     viewManager()->enableRender(false);
 }
 
@@ -169,6 +168,11 @@ void ViewImplService::centerToImageCenterInActiveViewGroup()
 void ViewImplService::addDefaultLayout(LayoutData layoutData)
 {
 	viewManager()->addDefaultLayout(layoutData);
+}
+
+void ViewImplService::enableContextMenuForViews(bool enable)
+{
+	viewManager()->enableContextMenuForViews(enable);
 }
 
 LayoutRepositoryPtr ViewImplService::getLayoutRepository()
