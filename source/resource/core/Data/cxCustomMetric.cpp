@@ -160,7 +160,7 @@ Vector3D CustomMetric::getScale() const
 {
 //	bounds.range();
 
-	if (!mScaleToP1)
+    if (!mScaleToP1 || !this->getMesh())
 		return Vector3D::Ones();
 
 	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();
