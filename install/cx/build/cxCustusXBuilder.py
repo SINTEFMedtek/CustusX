@@ -113,7 +113,8 @@ class CustusXBuilder:
         #else:
         #    shell.run('make package')
 
-        self._movePackageToStandardLocation()        
+        self._movePackageToStandardLocation()
+        self._moveDocsToStandardLocation()
 
     def _movePackageToStandardLocation(self):
         installer = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
@@ -122,6 +123,13 @@ class CustusXBuilder:
         dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
         PrintFormatter.printInfo('Copying package files from [%s] to [%s]'%(source,dest))
         shell.cp(source, dest)
+
+    def _moveDocsToStandardLocation(self):
+        installer_path=self._getInitialInstallerPackagePath()
+        source = '%s/%s' % (installer_path, "doc/html_pure")
+        dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
+        PrintFormatter.printInfo('Copying doc files from [%s] to [%s]'%(source,dest))
+        shutil.copytree(source, dest)
 
     def createInstallerObject(self, installer_path=None):    
         if installer_path==None:
@@ -171,27 +179,27 @@ class CustusXBuilder:
         else:
             return custusx.buildPath()
 
-    def publishDocumentation(self, targetFolder):
+    def publishDocumentation(self, sourceFolder, targetFolder):
         '''
         Publish both user and developer documentation to remote server.
         targetFolder is relative to the default path
         '''
-        self.publishUserDocs(targetFolder)
-        self.publishDeveloperDocs(targetFolder)
+        self.publishUserDocs(sourceFolder, targetFolder)
+        self.publishDeveloperDocs(sourceFolder, targetFolder)
         
-    def publishDeveloperDocs(self, targetFolder):
+    def publishDeveloperDocs(self, sourceFolder, targetFolder):
         PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
+        source = '%s/html_dev' %  sourceFolder
         target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        source = '%s/doc/html_dev' %  custusx.buildPath()
         target_path = '%s/%s' % (target.path, targetFolder)        
         self.publish(source, target.server, target.user, target_path)
 
-    def publishUserDocs(self, targetFolder):
+    def publishUserDocs(self, sourceFolder, targetFolder):
         PrintFormatter.printHeader('Publish User Docs to server', level=2)
+        source = '%s/html_pure' %  sourceFolder
         target = self.assembly.controlData.publish_user_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        source = '%s/doc/html_pure' %  custusx.buildPath()
         target_path = '%s/%s' % (target.path, targetFolder)        
         self.publish(source, target.server, target.user, target_path)
 
