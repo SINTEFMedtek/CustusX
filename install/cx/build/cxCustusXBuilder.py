@@ -114,7 +114,8 @@ class CustusXBuilder:
         #    shell.run('make package')
 
         self._movePackageToStandardLocation()
-        self._moveDocsToStandardLocation()
+        self._moveUserDocsToStandardLocation()
+        self._moveDevDocsToStandardLocation()
 
     def _movePackageToStandardLocation(self):
         installer = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
@@ -124,11 +125,18 @@ class CustusXBuilder:
         PrintFormatter.printInfo('Copying package files from [%s] to [%s]'%(source,dest))
         shell.cp(source, dest)
 
-    def _moveDocsToStandardLocation(self):
+    def _moveUserDocsToStandardLocation(self):
         installer_path=self._getInitialInstallerPackagePath()
         source = '%s/%s' % (installer_path, "doc/html_pure")
         dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
-        PrintFormatter.printInfo('Copying doc files from [%s] to [%s]'%(source,dest))
+        PrintFormatter.printInfo('Copying user doc files from [%s] to [%s]'%(source,dest))
+        shutil.copytree(source, dest)
+
+    def _moveDevDocsToStandardLocation(self):
+        installer_path=self._getInitialInstallerPackagePath()
+        source = '%s/%s' % (installer_path, "doc/html_dev")
+        dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
+        PrintFormatter.printInfo('Copying dev doc files from [%s] to [%s]'%(source,dest))
         shutil.copytree(source, dest)
 
     def createInstallerObject(self, installer_path=None):    
