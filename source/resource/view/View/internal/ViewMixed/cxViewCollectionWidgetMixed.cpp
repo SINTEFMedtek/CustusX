@@ -186,7 +186,17 @@ QPoint ViewCollectionWidgetMixed::getPosition(ViewPtr view)
     QPoint p = mBaseLayout->getPosition(view);
     p = mBaseLayout->mapToGlobal(p);
     p = this->mapFromGlobal(p);
-    return p;
+	return p;
+}
+
+void ViewCollectionWidgetMixed::enableContextMenuForViews(bool enable)
+{
+	mBaseLayout->enableContextMenuForViews(enable);
+	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
+	for (unsigned i=0; i<mOverlays.size(); ++i)
+	{
+		mOverlays[i]->setContextMenuPolicy(policy);
+	}
 }
 
 } /* namespace cx */

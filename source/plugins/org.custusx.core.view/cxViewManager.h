@@ -154,7 +154,7 @@ public:
 	  * Return the top widget, it should be added to the calling gui.
 	  */
 //	void initialize();
-    QWidget* createLayoutWidget(QWidget* parent, int index);
+	QWidget* createLayoutWidget(QWidget* parent, int index);
     QWidget* getLayoutWidget(int index);
 
 	void enableRender(bool val);
@@ -178,6 +178,8 @@ public:
 	void centerToImageCenterInViewGroup(unsigned groupNr);
 	void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 	void addDefaultLayout(LayoutData layoutData);
+
+	void enableContextMenuForViews(bool enable=true);
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
@@ -186,6 +188,7 @@ signals:
 	void pointSampled(Vector3D p_r);
 	void renderFinished();
 
+
 protected slots:
 	void settingsChangedSlot(QString key);
 	void onLayoutRepositoryChanged(QString uid);
@@ -193,6 +196,7 @@ protected slots:
 	void updateViews();
 	void updateCameraStyleActions();
 	void setActiveView(QString viewUid);
+	void layoutWidgetDestroyed(QObject *object);
 
 protected:
 	ViewManager(VisServicesPtr backend);
@@ -212,7 +216,6 @@ protected:
 	void rebuildLayouts();
 	void initializeGlobal2DZoom();
 	void initializeActiveView();
-	void layoutWidgetDestroyed(QObject *object);
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;

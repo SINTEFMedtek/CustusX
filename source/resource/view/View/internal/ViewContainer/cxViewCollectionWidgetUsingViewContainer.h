@@ -70,6 +70,7 @@ public:
     virtual int getGridMargin() const;
     virtual std::vector<ViewPtr> getViews();
     virtual QPoint getPosition(ViewPtr view);
+	virtual void enableContextMenuForViews(bool enable);
 
 private:
 	std::vector<ViewPtr> mViews;

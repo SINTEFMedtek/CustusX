@@ -72,6 +72,7 @@ public:
 	virtual void centerToImageCenterInActiveViewGroup();
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 	virtual void addDefaultLayout(LayoutData layoutData);
+	virtual void enableContextMenuForViews(bool enable=true);
 
 	bool isNull();
 

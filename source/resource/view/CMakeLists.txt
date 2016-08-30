@@ -152,7 +152,6 @@ target_include_directories(cxResourceVisualization
     ./Primitives
     ${CMAKE_CURRENT_BINARY_DIR}
 
-    PRIVATE
     ./View/internal
     ./View/internal/ViewContainer
     ./View/internal/ViewMixed
