@@ -47,12 +47,23 @@ namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-class cxGui_EXPORT ActiveMeshPropertiesWidget : public TabbedWidget
+class cxGui_EXPORT ActiveMeshPropertiesWidget : public BaseWidget
 {
   Q_OBJECT
 public:
 	ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget* parent);
   virtual ~ActiveMeshPropertiesWidget() {}
+};
+
+class cxGui_EXPORT AllMeshPropertiesWidget : public TabbedWidget
+{
+  Q_OBJECT
+public:
+	AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr mesh, VisServicesPtr services, QWidget* parent);
+  virtual ~AllMeshPropertiesWidget() {}
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+private:
+	SelectDataStringPropertyBasePtr mMeshSelector;
 };
 
 /// -------------------------------------------------------
@@ -84,6 +95,7 @@ protected slots:
   void meshSelectedSlot();
   void importTransformSlot();
   void meshChangedSlot();
+  void generateNormalsSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
