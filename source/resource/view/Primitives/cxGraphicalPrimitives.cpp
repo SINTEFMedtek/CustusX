@@ -194,7 +194,7 @@ void GraphicalPolyData3D::setIsWireFrame(bool val)
 
 void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
 {
-    mSource = vtkPolyDataAlgorithmPtr();
+    mSource = vtkPolyDataAlgorithmPtr::New();
     mData = data;
 
 	mMapper->SetInputData(mData);
