@@ -161,12 +161,10 @@ class Controller(cxBuildScript.BuildScript):
         self.cxInstaller.publishReleaseFolder(source, remoteTargetFolder, target)  
 
     def publishTaggedDocumentation(self):
-#        source = '%s/html_pure' %  (self.cxInstaller.installer_path)
         source = self.cxInstaller.installer_path
         self.cxBuilder.publishDocumentation(source, targetFolder = self.cxInstaller.getTaggedFolderName())
 
     def publishNightlyDocumentation(self):
-#        source = '%s/html_pure' %  (self.cxInstaller.installer_path)
         source = self.cxInstaller.installer_path
         self.cxBuilder.publishDocumentation(source, targetFolder = "nightly")
     

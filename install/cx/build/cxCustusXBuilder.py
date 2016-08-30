@@ -187,25 +187,25 @@ class CustusXBuilder:
         else:
             return custusx.buildPath()
 
-    def publishDocumentation(self, sourceFolder, targetFolder):
+    def publishDocumentation(self, artefactFolder, targetFolder):
         '''
         Publish both user and developer documentation to remote server.
         targetFolder is relative to the default path
         '''
-        self.publishUserDocs(sourceFolder, targetFolder)
-        self.publishDeveloperDocs(sourceFolder, targetFolder)
+        self.publishUserDocs(artefactFolder, targetFolder)
+        self.publishDeveloperDocs(artefactFolder, targetFolder)
         
-    def publishDeveloperDocs(self, sourceFolder, targetFolder):
+    def publishDeveloperDocs(self, artefactFolder, targetFolder):
         PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
-        source = '%s/html_dev' %  sourceFolder
+        source = '%s/html_dev' %  artefactFolder
         target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
         target_path = '%s/%s' % (target.path, targetFolder)        
         self.publish(source, target.server, target.user, target_path)
 
-    def publishUserDocs(self, sourceFolder, targetFolder):
+    def publishUserDocs(self, artefactFolder, targetFolder):
         PrintFormatter.printHeader('Publish User Docs to server', level=2)
-        source = '%s/html_pure' %  sourceFolder
+        source = '%s/html_pure' %  artefactFolder
         target = self.assembly.controlData.publish_user_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
         target_path = '%s/%s' % (target.path, targetFolder)        
