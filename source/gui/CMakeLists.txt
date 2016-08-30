@@ -38,6 +38,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxMeshGlyphsWidget
 	dataWidgets/cxMeshPropertiesWidget
 	dataWidgets/cxImportDataDialog
+    dataWidgets/cxMeshTextureWidget
     dataWidgets/cxExportDataDialog
     dataWidgets/cxDataViewSelectionWidget
     dataWidgets/cxTransferFunctionWidget

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectClippersForDataWidget.h"
 #include "cxMeshGlyphsWidget.h"
 #include "cxMeshPropertiesWidget.h"
+#include "cxMeshTextureWidget.h"
 
 namespace cx
 {
@@ -71,6 +72,7 @@ ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, 
 	this->addTab(new MeshPropertiesWidget(activeMeshProperty, services->patient(), services->view(), this), "Properties");
 	this->addTab(new MeshGlyphsWidget(activeMeshProperty, services->patient(), services->view(), this), "Glyph");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
+    this->addTab(new MeshTextureWidget(/*activeMeshProperty, services->patient(), services->view(), */this), "Texture");
 }
 
 //---------------------------------------------------------
