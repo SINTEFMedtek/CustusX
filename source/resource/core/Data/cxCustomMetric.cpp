@@ -53,10 +53,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mMeshUid = "";
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
-
-//	mToolListener = spaceProvider->createListener();
-//	mToolListener->setSpace(CoordinateSystem(csTOOL, "active"));
-//	connect(mToolListener.get(), &SpaceListener::changed, this, &CustomMetric::transformChanged);
+	mRepeatDistance = 0.0;
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -85,6 +82,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
+	elem.setAttribute("repeatDistance", mRepeatDistance);
 }
 
 void CustomMetric::parseXml(QDomNode& dataNode)
@@ -98,6 +96,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mMeshUid = elem.attribute("meshUid", qstring_cast(mMeshUid));
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
+	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
 }
 
 bool CustomMetric::isValid() const
@@ -115,18 +114,48 @@ DoubleBoundingBox3D CustomMetric::boundingBox() const
 	return DoubleBoundingBox3D::fromCloud(mArguments->getRefCoords());
 }
 
-Vector3D CustomMetric::getPosition() const
+std::vector<Vector3D> CustomMetric::getPositions() const
+{
+	std::vector<Vector3D> retval;
+	std::vector<Vector3D> coords = mArguments->getRefCoords();
+	if (coords.size() < 2)
+		return retval;
+
+	Vector3D p0 = coords[0];
+	Vector3D p1 = coords[1];
+	Vector3D dir = getDirection();
+	double fullDist = dot(dir, p1-p0);
+
+	int reps = this->getRepeatCount();
+	for (int i=0; i<reps; ++i)
+	{
+		double dist = mOffsetFromP0 + mRepeatDistance*i;
+		Vector3D p = p0 + dir*dist;
+		retval.push_back(p);
+	}
+
+	return retval;
+}
+
+int CustomMetric::getRepeatCount() const
 {
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
-	if (coords.empty())
-		return Vector3D::Zero();
+	if (coords.size() < 2)
+		return 0;
 
-	Vector3D p = coords[0];
+	Vector3D p0 = coords[0];
+	Vector3D p1 = coords[1];
 	Vector3D dir = getDirection();
 
-	double positionOffset = 10; // the object is moved this distance from p0 towards p1
-	return p + dir*mOffsetFromP0; // the object is moved mOffsetFromP0 from p0 towards p1
+	int reps = 1;
+	if (!similar(mRepeatDistance, 0.0))
+		reps = (dot(p1-p0, dir)-mOffsetFromP0)/mRepeatDistance + 1;
+	reps = std::min(100, reps);
+	reps = std::max(reps, 1);
+
+	return reps;
 }
+
 
 Vector3D CustomMetric::getDirection() const
 {
@@ -158,37 +187,23 @@ Vector3D CustomMetric::getVectorUp() const
 
 Vector3D CustomMetric::getScale() const
 {
-//	bounds.range();
-
 	if (!mScaleToP1)
 		return Vector3D::Ones();
 
 	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();
 
-//	Vector3D p_to = mSpaceProvider->getActiveToolTipPoint(CoordinateSystem::reference(), true);
-
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	double height = (coords[1] - coords[0]).length();
 
-	Vector3D pos = this->getPosition();
 	Vector3D dir = this->getDirection();
-
-//	Vector3D dir = (coords[1]-coords[0]).normal();
-	double p0 = dot(pos, dir);
+	double p0 = dot(coords[0], dir);
 	double p1 = dot(coords[1], dir);
-//	double p2 = dot(p_to, dir);
-	height = p1 - p0;
-	// experiment: use tool to reduce size of object
-	// - in order to make the Multiguide shrink the funnel depth as it advances towards target.
-//	height = std::min(p1, p2) - p0;
-//	height/=3; // emphasis
-//	std::cout << ""
 
-	double diameter = 10; // scale max diameter of object
-//	Vector3D scale(diameter, height, diameter);
-	Vector3D scale(diameter/bounds.range()[0],
-			height/bounds.range()[1],
-			diameter/bounds.range()[2]);
+	height = p1 - p0;
+
+	Vector3D scale(1,
+				   height/bounds.range()[1],
+			1);
 	return scale;
 }
 
@@ -249,6 +264,19 @@ void CustomMetric::setOffsetFromP0(double val)
 double CustomMetric::getOffsetFromP0() const
 {
 	return mOffsetFromP0;
+}
+
+void CustomMetric::setRepeatDistance(double val)
+{
+	if (mRepeatDistance == val)
+		return;
+	mRepeatDistance = val;
+	emit propertiesChanged();
+}
+
+double CustomMetric::getRepeatDistance() const
+{
+	return mRepeatDistance;
 }
 
 QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethods() const

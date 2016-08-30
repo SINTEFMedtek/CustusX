@@ -76,7 +76,7 @@ private:
     void updateSTLModel();
 	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale);
 
-	GraphicalGeometricPtr mGeometry;
+	std::vector<GraphicalGeometricPtr> mGeometry;
 };
 
 }

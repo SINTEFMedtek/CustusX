@@ -264,6 +264,7 @@ private slots:
 private:
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
   DoublePropertyPtr createOffsetFromP0() const;
+  DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
   StringPropertySelectMeshPtr createMeshSelector() const;
 
@@ -271,6 +272,7 @@ private:
   StringPropertyPtr mDefineVectorUpMethod;
   BoolPropertyPtr mScaleToP1;
   DoublePropertyPtr mOffsetFromP0;
+  DoublePropertyPtr mRepeatDistance;
   StringPropertySelectMeshPtr mMesh;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
