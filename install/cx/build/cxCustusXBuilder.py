@@ -201,7 +201,7 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
         source = '%s/html_dev' %  artefactFolder
         if not os.path.exists(source):
-            PrintFormatter("Warning folder don't exist: [%s]" % source)
+            PrintFormatter.printInfo("Warning folder don't exist: [%s]" % source)
         target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
         target_path = '%s/%s' % (target.path, targetFolder)        
@@ -211,7 +211,7 @@ class CustusXBuilder:
         PrintFormatter.printHeader('Publish User Docs to server', level=2)
         source = '%s/html_pure' %  artefactFolder
         if not os.path.exists(source):
-            PrintFormatter("Warning folder don't exist: [%s]" % source)
+            PrintFormatter.printInfo("Warning folder don't exist: [%s]" % source)
         target = self.assembly.controlData.publish_user_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
         target_path = '%s/%s' % (target.path, targetFolder)        
