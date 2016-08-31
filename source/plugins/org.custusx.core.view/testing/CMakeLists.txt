@@ -3,12 +3,12 @@ if(BUILD_TESTING)
 
   set(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES
     cxtestVisualizationHelper.h
-    cxtestViewServiceMock.h
-    cxtestViewManagerMock.h
     cxtestViewCollectionWidgetMixedMock.h
     cxtestLayoutWidgetUsingViewWidgetsMock.h
     )
   set(CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES
+    cxtestViewServiceMock.h
+    cxtestViewManagerMock.h
     cxtestViewPlugin.cpp
     cxtestCatchMultiVolume3DRepProducer.cpp
     cxtestMultiVolume3DRepProducerFixture.h
