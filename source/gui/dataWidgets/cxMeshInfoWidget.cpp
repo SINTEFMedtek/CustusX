@@ -160,6 +160,8 @@ void MeshInfoWidget::generateNormalsSlot()
 	normals->Update();
 	mMesh->setVtkPolyData(normals->GetOutput());
 
+	QString outputBasePath = mPatientModelService->getActivePatientFolder();
+	mMesh->save(outputBasePath);
 }
 
 void MeshInfoWidget::meshChangedSlot()

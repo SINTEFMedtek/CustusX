@@ -191,6 +191,7 @@ Vector3D CustomMetric::getScale() const
 		return Vector3D::Ones();
 
 	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();
+	bounds = transform(this->getMesh()->get_rMd(), bounds);
 
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	double height = (coords[1] - coords[0]).length();
@@ -200,6 +201,7 @@ Vector3D CustomMetric::getScale() const
 	double p1 = dot(coords[1], dir);
 
 	height = p1 - p0;
+	height -= mOffsetFromP0;
 
 	Vector3D scale(1,
 				   height/bounds.range()[1],
