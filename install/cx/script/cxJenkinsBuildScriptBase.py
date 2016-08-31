@@ -162,11 +162,11 @@ class Controller(cxBuildScript.BuildScript):
 
     def publishTaggedDocumentation(self):
         source = self.cxInstaller.installer_path
-        self.cxBuilder.publishDocumentation(source, targetFolder = self.cxInstaller.getTaggedFolderName())
+        self.cxBuilder.publishDocumentation(artefactFolder = source, targetFolder = self.cxInstaller.getTaggedFolderName())
 
     def publishNightlyDocumentation(self):
         source = self.cxInstaller.installer_path
-        self.cxBuilder.publishDocumentation(source, targetFolder = "nightly")
+        self.cxBuilder.publishDocumentation(artefactFolder = source, targetFolder = "nightly")
     
     def checkoutCustusXAndData(self):
         'checkout only CustusX and data. Required if the first build step was not run, f.ex. during integration tests'
