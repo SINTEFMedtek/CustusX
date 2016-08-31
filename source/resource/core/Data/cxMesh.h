@@ -101,6 +101,7 @@ public:
     const char * getOrientationArray();
     const char * getColorArray();
     const char * getGlyphLUT();
+    const char * getTextureType();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
 //	void setProperties(const MeshPropertyData& data);
@@ -117,6 +118,7 @@ public slots:
     void setOrientationArray(const char * orientationArray);
     void setColorArray(const char * colorArray);
     void setGlyphLUT(const char * glyphLUT);
+    void setTextureType(const char * textureType);
 private:
 	vtkPolyDataPtr mVtkPolyData;
 	bool mHasGlyph;
@@ -125,6 +127,7 @@ private:
     std::string mOrientationArray;
     std::string mColorArray;
     std::string mGlyphLUT;
+    std::string mTextureType;
     QStringList mOrientationArrayList;
     QStringList mColorArrayList;
 	MeshPropertyData mProperties;

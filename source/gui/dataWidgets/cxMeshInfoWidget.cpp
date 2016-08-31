@@ -72,7 +72,7 @@ ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, 
 	this->addTab(new MeshPropertiesWidget(activeMeshProperty, services->patient(), services->view(), this), "Properties");
 	this->addTab(new MeshGlyphsWidget(activeMeshProperty, services->patient(), services->view(), this), "Glyph");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
-    this->addTab(new MeshTextureWidget(/*activeMeshProperty, services->patient(), services->view(), */this), "Texture");
+    this->addTab(new MeshTextureWidget(activeMeshProperty, services->patient(), services->view(), this), "Texture");
 }
 
 //---------------------------------------------------------

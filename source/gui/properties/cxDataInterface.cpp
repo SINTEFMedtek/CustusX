@@ -680,5 +680,70 @@ QStringList StringPropertyGlyphLUT::getValueRange() const
     return retval;
 }
 
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+StringPropertyTextureType::StringPropertyTextureType(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+StringPropertyTextureType::~StringPropertyTextureType()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void StringPropertyTextureType::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString StringPropertyTextureType::getDisplayName() const
+{
+    return "Set the type of texture coordinates";
+}
+
+bool StringPropertyTextureType::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setTextureType(value.toStdString().c_str());
+    return true;
+}
+
+QString StringPropertyTextureType::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getTextureType();
+}
+
+QString StringPropertyTextureType::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select the type of texture coordinates which most closely resembles your mesh.";
+}
+
+QStringList StringPropertyTextureType::getValueRange() const
+{
+    QStringList retval;
+
+    retval <<
+    "Cylinder"<<
+    "Plane"<<
+    "Sphere";
+
+    return retval;
+}
+
 } // namespace cx
 

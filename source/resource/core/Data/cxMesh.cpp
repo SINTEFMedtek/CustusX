@@ -63,7 +63,7 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 }
 
 Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData) :
-	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray("")
+    Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray(""), mTextureType("")
 {
 	if (!mVtkPolyData)
 		mVtkPolyData = vtkPolyDataPtr::New();
@@ -284,9 +284,20 @@ const char * Mesh::getGlyphLUT()
     return mGlyphLUT.c_str();
 }
 
+const char *Mesh::getTextureType()
+{
+    return mTextureType.c_str();
+}
+
 void Mesh::setGlyphLUT(const char * glyphLUT)
 {
     mGlyphLUT = glyphLUT;
+    emit meshChanged();
+}
+
+void Mesh::setTextureType(const char *textureType)
+{
+    mTextureType = textureType;
     emit meshChanged();
 }
 

@@ -29,16 +29,66 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+
 #include "cxMeshTextureWidget.h"
+#include "cxMesh.h"
+#include <cxLabeledComboBoxWidget.h>
+#include "cxSelectDataStringProperty.h"
 
 
 namespace cx
 {
 
-MeshTextureWidget::MeshTextureWidget(QWidget* parent)
-    : BaseWidget(parent, "mesh_texture_widget", "Texture")
+MeshTextureWidget::MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector, PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent)
+    : BaseWidget(parent, "mesh_texture_widget", "Texture"),
+      mPatientModelService(patientModelService),
+      mViewService(viewService),
+      mMeshSelector(meshSelector)
 {
+    connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
+    this->addWidgets();
+    this->meshSelectedSlot();
+}
 
+void MeshTextureWidget::meshSelectedSlot()
+{
+    if (mMesh == mMeshSelector->getData())
+        return;
+
+    if(mMesh)
+    {
+        disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+    }
+
+    mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+
+    if (!mMesh)
+    {
+        return;
+    }
+    mTextureTypeAdapter->setData(mMesh);
+
+    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+}
+
+void MeshTextureWidget::meshChangedSlot()
+{
+    if(!mMesh)
+        return;
+}
+
+void MeshTextureWidget::addWidgets()
+{
+    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+    QGridLayout* gridLayout = new QGridLayout;
+    gridLayout->setMargin(0);
+    toptopLayout->addLayout(gridLayout);
+
+    mTextureTypeAdapter = StringPropertyTextureType::New(mPatientModelService);
+
+    int row = 1;
+    new LabeledComboBoxWidget(this, mTextureTypeAdapter, gridLayout, row++);
+    toptopLayout->addStretch();
 }
 
 }//end namespace cx

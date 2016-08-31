@@ -402,6 +402,35 @@ protected:
 };
 
 
+typedef boost::shared_ptr<class StringPropertyTextureType> StringPropertyTextureTypePtr;
+
+/**
+ * \brief Adapter that selects the type of texture coordinates to be used.
+ */
+class cxGui_EXPORT StringPropertyTextureType : public StringPropertyBase
+{
+  Q_OBJECT
+public:
+  static StringPropertyTextureTypePtr New(PatientModelServicePtr patientModelService) { return StringPropertyTextureTypePtr(new StringPropertyTextureType(patientModelService)); }
+  StringPropertyTextureType(PatientModelServicePtr patientModelService);
+  virtual ~StringPropertyTextureType();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
+
+
 } // namespace cx
 
 

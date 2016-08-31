@@ -32,19 +32,42 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MESHTEXTUREWIDGET_H
 #define MESHTEXTUREWIDGET_H
 
+#include "cxGuiExport.h"
 #include "cxBaseWidget.h"
+#include "cxDataInterface.h"
 
 
 namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-class MeshTextureWidget : public BaseWidget
+class cxGui_EXPORT MeshTextureWidget : public BaseWidget
 {
+    Q_OBJECT
+
 public:
-    MeshTextureWidget(/*SelectDataStringPropertyBasePtr meshSelector,
-                      PatientModelServicePtr patientModelService, ViewServicePtr viewService,*/
+    MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector,
+                      PatientModelServicePtr patientModelService, ViewServicePtr viewService,
                       QWidget *parent);
+
+    SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+
+protected slots:
+    void meshSelectedSlot();
+    void meshChangedSlot();
+
+private:
+    void addWidgets();
+
+    MeshPtr mMesh;
+    SelectDataStringPropertyBasePtr mMeshSelector;
+    StringPropertyTextureTypePtr mTextureTypeAdapter;
+
+    PatientModelServicePtr mPatientModelService;
+    ViewServicePtr mViewService;
+
+    MeshTextureWidget();
+
 };
 
 }//end namespace cx
