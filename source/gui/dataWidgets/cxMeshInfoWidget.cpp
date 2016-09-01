@@ -87,7 +87,7 @@ AllMeshPropertiesWidget::AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr
 	this->addTab(new MeshPropertiesWidget(mesh, services->patient(), services->view(), this), "Properties");
 	this->addTab(new MeshGlyphsWidget(mesh, services->patient(), services->view(), this), "Glyph");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
-    this->addTab(new MeshTextureWidget(activeMeshProperty, services->patient(), services->view(), this), "Texture");
+    this->addTab(new MeshTextureWidget(mesh, services->patient(), services->view(), this), "Texture");
 }
 
 //---------------------------------------------------------
