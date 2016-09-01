@@ -79,10 +79,11 @@ public:
 	bool getScaleToP1() const;
 	void setOffsetFromP0(double val);
 	double getOffsetFromP0() const;
+	void setRepeatDistance(double val);
+	double getRepeatDistance() const;
 
-
-    Vector3D getPosition() const;
-    Vector3D getDirection() const;
+	std::vector<Vector3D> getPositions() const;
+	Vector3D getDirection() const;
     Vector3D getVectorUp() const;
 	Vector3D getScale() const;
 
@@ -123,12 +124,11 @@ private:
     DefineVectorUpMethods mDefineVectorUpMethods;
 	bool mScaleToP1;
 	double mOffsetFromP0;
-
-//	SpaceListenerPtr mToolListener;
-
+	double mRepeatDistance;
 
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
+	int getRepeatCount() const;
 };
 
 /**

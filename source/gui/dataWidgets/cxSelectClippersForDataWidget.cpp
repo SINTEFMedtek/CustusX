@@ -53,6 +53,7 @@ SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr servic
 	StringPropertyActiveImagePtr activeImageProperty = StringPropertyActiveImage::New(services->patient());
 
 	QVBoxLayout *mLayout = new QVBoxLayout(this);
+	mLayout->setMargin(0);
 
 	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
 	selectClippersWidget->setActiveDataProperty(activeImageProperty);
@@ -68,6 +69,7 @@ SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services
 	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
 
 	QVBoxLayout *mLayout = new QVBoxLayout(this);
+	mLayout->setMargin(0);
 
 	SelectClippersForDataWidget *selectClippersWidget = new SelectClippersForDataWidget(services, this);
 	selectClippersWidget->setActiveDataProperty(activeMeshProperty);
@@ -103,6 +105,7 @@ void SelectClippersForDataWidget::initUI()
 	mHeading = new QLabel("Active clippers");
 
 	mLayout = new QVBoxLayout(this);
+	mLayout->setMargin(0);
 	mLayout->addWidget(mHeading);
 	mLayout->addWidget(mClipperTableWidget);
 

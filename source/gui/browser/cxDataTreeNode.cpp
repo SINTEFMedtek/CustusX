@@ -185,13 +185,12 @@ boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 
 	if (boost::dynamic_pointer_cast<Mesh>(mData))
 	{
-		boost::shared_ptr<MeshInfoWidget> widget = wrepo->find<MeshInfoWidget>();
+		boost::shared_ptr<AllMeshPropertiesWidget> widget = wrepo->find<AllMeshPropertiesWidget>();
 		if (!widget)
 		{
 			StringPropertySelectMeshPtr meshSelector = StringPropertySelectMesh::New(this->getServices()->patient());
-			widget.reset( new MeshInfoWidget(meshSelector,
-											 this->getServices()->patient(),
-											 this->getServices()->view(),
+			widget.reset( new AllMeshPropertiesWidget(meshSelector,
+											 this->getServices(),
 											 NULL));
 			wrepo->add(widget);
 		}
