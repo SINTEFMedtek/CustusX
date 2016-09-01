@@ -70,7 +70,7 @@ CustomMetricRep::CustomMetricRep()
 void CustomMetricRep::clear()
 {
 	DataMetricRep::clear();
-	mGeometry.reset();
+	mGeometry.clear();
 }
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
@@ -94,21 +94,25 @@ void CustomMetricRep::updateSTLModel()
 	if (!this->getView() || !custom)
 	   return;
 
-	if (!mGeometry)
-	{
-		mGeometry.reset(new GraphicalGeometric);
-		mGeometry->setRenderer(this->getRenderer());
-	}
-
-	mGeometry->setMesh(custom->getMesh());
-
-	Vector3D pos = custom->getPosition();
+	std::vector<Vector3D> pos = custom->getPositions();
 	Vector3D dir = custom->getDirection();
 	Vector3D vup = custom->getVectorUp();
 	Vector3D scale = custom->getScale();
 
-	Transform3D M = this->calculateOrientation(pos, dir, vup, scale);
-	mGeometry->setTransformOffset(M);
+	mGeometry.resize(pos.size());
+
+	for (unsigned i=0; i<pos.size(); ++i)
+	{
+		if (!mGeometry[i])
+		{
+			mGeometry[i].reset(new GraphicalGeometric);
+			mGeometry[i]->setRenderer(this->getRenderer());
+		}
+		mGeometry[i]->setMesh(custom->getMesh());
+
+		Transform3D M = this->calculateOrientation(pos[i], dir, vup, scale);
+		mGeometry[i]->setTransformOffset(M);
+	}
 }
 
 /**

@@ -67,13 +67,17 @@ public:
 	MeshPtr getMesh(); ///< gives this reps mesh
 	void setRenderer(vtkRendererPtr renderer);
 
-	void setTransformOffset(Transform3D dMu);
+	/**
+	 * insert a transform between r and the mesh,
+	 * such that M = rMrr*rMd
+	 */
+	void setTransformOffset(Transform3D rMrr);
 
 protected:
 	GraphicalPolyData3DPtr mGraphicalPolyDataPtr;
 	GraphicalGlyph3DDataPtr mGraphicalGlyph3DDataPtr;
 	MeshPtr mMesh;
-	Transform3D m_dMu;
+	Transform3D m_rMrr;
 	void clearClipping();
 private:
 	void meshChangedSlot();

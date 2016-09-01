@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
+#include "vtkPolyDataNormals.h"
 
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
@@ -58,18 +59,32 @@ namespace cx
 {
 
 ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
-		TabbedWidget(parent, "mesh_info_widget", "Mesh Properties")
+		BaseWidget(parent, "mesh_info_widget", "Mesh Properties")
 {
 	this->setToolTip("Mesh properties");
 
 	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
 	activeMeshProperty->setValueName("Active Mesh");
 
-	this->insertWidgetAtTop(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
+	QVBoxLayout* layout = new QVBoxLayout(this);
+//	layout->setMargin(0);
+//	layout->setSpacing(0);
+	layout->addWidget(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
+	layout->addWidget(new AllMeshPropertiesWidget(activeMeshProperty, services, this));
+}
 
-	this->addTab(new MeshInfoWidget(activeMeshProperty, services->patient(), services->view(), this), "Info");
-	this->addTab(new MeshPropertiesWidget(activeMeshProperty, services->patient(), services->view(), this), "Properties");
-	this->addTab(new MeshGlyphsWidget(activeMeshProperty, services->patient(), services->view(), this), "Glyph");
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+AllMeshPropertiesWidget::AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr mesh, VisServicesPtr services, QWidget *parent) :
+		TabbedWidget(parent, "all_mesh_info_widget", "Mesh Properties"),
+		mMeshSelector(mesh)
+{
+	this->setToolTip("Mesh properties");
+
+	this->addTab(new MeshInfoWidget(mesh, services->patient(), services->view(), this), "Info");
+	this->addTab(new MeshPropertiesWidget(mesh, services->patient(), services->view(), this), "Properties");
+	this->addTab(new MeshGlyphsWidget(mesh, services->patient(), services->view(), this), "Glyph");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
 }
 
@@ -135,6 +150,20 @@ void MeshInfoWidget::importTransformSlot()
   report("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
 }
   
+void MeshInfoWidget::generateNormalsSlot()
+{
+	if(!mMesh)
+	  return;
+
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	normals->SetInputData(mMesh->getVtkPolyData());
+	normals->Update();
+	mMesh->setVtkPolyData(normals->GetOutput());
+
+	QString outputBasePath = mPatientModelService->getActivePatientFolder();
+	mMesh->save(outputBasePath);
+}
+
 void MeshInfoWidget::meshChangedSlot()
 {
 	if(!mMesh)
@@ -159,6 +188,10 @@ void MeshInfoWidget::addWidgets()
 	importTransformButton->setToolTip("Replace data transform with that of the parent data.");
 	connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
 
+	QPushButton* addNormalsButton = new QPushButton("Generate Normals", this);
+	addNormalsButton->setToolTip("Generate surface normals and add to model.\nThis usually gives a smoother appearance.");
+	connect(addNormalsButton, SIGNAL(clicked()), this, SLOT(generateNormalsSlot()));
+
 	mUidAdapter = StringPropertyDataUidEditable::New();
 	mNameAdapter = StringPropertyDataNameEditable::New();
     mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
@@ -170,6 +203,7 @@ void MeshInfoWidget::addWidgets()
 	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, row++);
 	gridLayout->addWidget(mTableWidget, row++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, row++, 0, 1, 2);
+	gridLayout->addWidget(addNormalsButton, row++, 0, 1, 2);
 
 	this->addStretch();
 }

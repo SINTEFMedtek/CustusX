@@ -53,7 +53,7 @@ namespace cx
 
 GraphicalGeometric::GraphicalGeometric()
 {
-	m_dMu = Transform3D::Identity();
+	m_rMrr = Transform3D::Identity();
 	mGraphicalPolyDataPtr.reset(new GraphicalPolyData3D());
 	mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
 }
@@ -118,9 +118,9 @@ void GraphicalGeometric::setRenderer(vtkRendererPtr renderer)
 	mGraphicalGlyph3DDataPtr->setRenderer(renderer);
 }
 
-void GraphicalGeometric::setTransformOffset(Transform3D dMu)
+void GraphicalGeometric::setTransformOffset(Transform3D rMrr)
 {
-	m_dMu = dMu;
+	m_rMrr = rMrr;
 	this->transformChangedSlot();
 }
 
@@ -167,11 +167,11 @@ void GraphicalGeometric::transformChangedSlot()
 		return;
 	}
 
-	Transform3D rMd = mMesh->get_rMd();
-	Transform3D rMu = rMd * m_dMu;
+	Transform3D rrMd = mMesh->get_rMd();
+	Transform3D rMd = m_rMrr * rrMd;
 
-	mGraphicalPolyDataPtr->setUserMatrix(rMu.getVtkMatrix());
-	mGraphicalGlyph3DDataPtr->setUserMatrix(rMu.getVtkMatrix());
+	mGraphicalPolyDataPtr->setUserMatrix(rMd.getVtkMatrix());
+	mGraphicalGlyph3DDataPtr->setUserMatrix(rMd.getVtkMatrix());
 }
 
 
