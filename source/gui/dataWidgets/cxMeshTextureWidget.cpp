@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMeshTextureWidget.h"
 #include "cxMesh.h"
-#include "cxFileNameWidget.h"
+#include <cxFileNameWidget.h>
 #include <cxLabeledComboBoxWidget.h>
 #include "cxSelectDataStringProperty.h"
 
