@@ -197,7 +197,12 @@ void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
     mSource = vtkPolyDataAlgorithmPtr();
     mData = data;
 
-	mMapper->SetInputData(mData);
+    mMapper->SetInputData(mData);
+}
+
+void GraphicalPolyData3D::setTexture(vtkTexturePtr texture)
+{
+    mActor->SetTexture(texture);
 }
 
 

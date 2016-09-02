@@ -72,6 +72,7 @@ public:
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
 
 	virtual vtkPolyDataPtr getVtkPolyData() const;
+    virtual vtkTexturePtr getVtkTexture() const;
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -102,6 +103,7 @@ public:
     const char * getColorArray();
     const char * getGlyphLUT();
     const char * getTextureType();
+    const char * getTextureFile();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
 //	void setProperties(const MeshPropertyData& data);
@@ -119,8 +121,11 @@ public slots:
     void setColorArray(const char * colorArray);
     void setGlyphLUT(const char * glyphLUT);
     void setTextureType(const char * textureType);
+    void setTextureFile(const char * textureFile);
+    void updateVtkPolyDataWithTexture();
 private:
 	vtkPolyDataPtr mVtkPolyData;
+    vtkTexturePtr mVtkTexture;
 	bool mHasGlyph;
 	bool mShowGlyph;
     bool shouldGlyphBeEnableByDefault();
@@ -128,6 +133,7 @@ private:
     std::string mColorArray;
     std::string mGlyphLUT;
     std::string mTextureType;
+    std::string mTextureFile;
     QStringList mOrientationArrayList;
     QStringList mColorArrayList;
 	MeshPropertyData mProperties;

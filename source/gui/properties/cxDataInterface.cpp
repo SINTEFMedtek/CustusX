@@ -708,7 +708,7 @@ void StringPropertyTextureType::setData(MeshPtr data)
 
 QString StringPropertyTextureType::getDisplayName() const
 {
-    return "Set the type of texture coordinates";
+    return "Type of texture coordinates";
 }
 
 bool StringPropertyTextureType::setValue(const QString& value)
@@ -744,6 +744,71 @@ QStringList StringPropertyTextureType::getValueRange() const
 
     return retval;
 }
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+FilePathPropertyTextureFile::FilePathPropertyTextureFile(PatientModelServicePtr patientModelService) :
+    mPatientModelService(patientModelService)
+{
+    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+FilePathPropertyTextureFile::~FilePathPropertyTextureFile()
+{
+    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+}
+
+void FilePathPropertyTextureFile::setData(MeshPtr data)
+{
+    if (mData)
+        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    mData = data;
+    if (mData)
+        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+    emit changed();
+}
+
+QString FilePathPropertyTextureFile::getDisplayName() const
+{
+    return "Texture file";
+}
+
+bool FilePathPropertyTextureFile::setValue(const QString& value)
+{
+    if (!mData)
+        return false;
+    mData->setTextureFile(value.toStdString().c_str());
+    return true;
+}
+
+QString FilePathPropertyTextureFile::getValue() const
+{
+    if (!mData)
+        return "";
+    return mData->getTextureFile();
+}
+
+QString FilePathPropertyTextureFile::getHelp() const
+{
+    if (!mData)
+        return "";
+    return "Select the image file to use for the texture.";
+}
+
+//QStringList FilePathPropertyTextureFile::getValueRange() const
+//{
+//    QStringList retval;
+
+//    retval <<
+//    "Cylinder"<<
+//    "Plane"<<
+//    "Sphere";
+
+//    return retval;
+//}
 
 } // namespace cx
 

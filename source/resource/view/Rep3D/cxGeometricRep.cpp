@@ -138,6 +138,7 @@ void GraphicalGeometric::meshChangedSlot()
 	}
 
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
+    mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
 	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
 	//Set mesh color, opacity
 	mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());

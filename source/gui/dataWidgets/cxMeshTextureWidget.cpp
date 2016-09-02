@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMeshTextureWidget.h"
 #include "cxMesh.h"
+#include "cxFileNameWidget.h"
 #include <cxLabeledComboBoxWidget.h>
 #include "cxSelectDataStringProperty.h"
 
@@ -48,6 +49,7 @@ MeshTextureWidget::MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelecto
     connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
     this->addWidgets();
     this->meshSelectedSlot();
+    //connect(mTextureTypeAdapter.get(), &Property::changed, mMesh.get(), &Mesh::updateVtkPolyDataWithTexture);
 }
 
 void MeshTextureWidget::meshSelectedSlot()
@@ -67,6 +69,7 @@ void MeshTextureWidget::meshSelectedSlot()
         return;
     }
     mTextureTypeAdapter->setData(mMesh);
+    mTextureFile->setData(mMesh);
 
     connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 }
@@ -77,6 +80,13 @@ void MeshTextureWidget::meshChangedSlot()
         return;
 }
 
+//void MeshTextureWidget::updateVtkPolyDataWithTexture()
+//{
+//    std::cout << "CALLED void MeshTextureWidget::updateVtkPolyDataWithTexture() \n";
+//    if(mMesh)
+//        mMesh->updateVtkPolyDataWithTexture();
+//}
+
 void MeshTextureWidget::addWidgets()
 {
     QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -85,8 +95,13 @@ void MeshTextureWidget::addWidgets()
     toptopLayout->addLayout(gridLayout);
 
     mTextureTypeAdapter = StringPropertyTextureType::New(mPatientModelService);
+    mTextureFile = FilePathPropertyTextureFile::New(mPatientModelService);
+
+    //connect(mTextureTypeAdapter.get(), &Property::changed, mMesh.get(), &Mesh::updateVtkPolyDataWithTexture);
+//    connect(mTextureTypeAdapter.get(), &Property::changed, this, &MeshTextureWidget::updateVtkPolyDataWithTexture);
 
     int row = 1;
+    new FilenameWidget(this, mTextureFile, gridLayout, row++);
     new LabeledComboBoxWidget(this, mTextureTypeAdapter, gridLayout, row++);
     toptopLayout->addStretch();
 }

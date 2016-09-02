@@ -108,6 +108,7 @@ public:
     void setIsWireFrame(bool val);
 //    void setRepresentation();
     void setData(vtkPolyDataPtr data);
+    void setTexture(vtkTexturePtr texture);
     vtkMapperPtr getMapper();
 
 private:

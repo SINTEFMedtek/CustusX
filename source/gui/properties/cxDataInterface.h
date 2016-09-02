@@ -36,8 +36,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDoublePropertyBase.h"
 #include "cxStringPropertyBase.h"
+#include "cxFilePathProperty.h"
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
+
 
 /**
  * \file
@@ -430,6 +432,34 @@ protected:
   PatientModelServicePtr mPatientModelService;
 };
 
+
+typedef boost::shared_ptr<class FilePathPropertyTextureFile> FilePathPropertyTextureFilePtr;
+
+/**
+ * \brief Adapter that selects the type of texture coordinates to be used.
+ */
+class cxGui_EXPORT FilePathPropertyTextureFile : public FilePathProperty
+{
+  Q_OBJECT
+public:
+  static FilePathPropertyTextureFilePtr New(PatientModelServicePtr patientModelService) { return FilePathPropertyTextureFilePtr(new FilePathPropertyTextureFile(patientModelService)); }
+  FilePathPropertyTextureFile(PatientModelServicePtr patientModelService);
+  virtual ~FilePathPropertyTextureFile();
+  void setData(MeshPtr data);
+
+public: // basic methods
+  virtual QString getDisplayName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+//  virtual QStringList getValueRange() const;
+
+protected:
+  MeshPtr mData;
+  PatientModelServicePtr mPatientModelService;
+};
 
 } // namespace cx
 

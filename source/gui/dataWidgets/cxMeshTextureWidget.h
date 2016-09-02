@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 class cxGui_EXPORT MeshTextureWidget : public BaseWidget
 {
@@ -55,6 +56,7 @@ public:
 protected slots:
     void meshSelectedSlot();
     void meshChangedSlot();
+    //void updateVtkPolyDataWithTexture();
 
 private:
     void addWidgets();
@@ -62,6 +64,7 @@ private:
     MeshPtr mMesh;
     SelectDataStringPropertyBasePtr mMeshSelector;
     StringPropertyTextureTypePtr mTextureTypeAdapter;
+    FilePathPropertyTextureFilePtr mTextureFile;
 
     PatientModelServicePtr mPatientModelService;
     ViewServicePtr mViewService;
