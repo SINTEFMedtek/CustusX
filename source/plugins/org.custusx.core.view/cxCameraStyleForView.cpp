@@ -252,7 +252,10 @@ void CameraStyleForView::applyCameraStyle()
 		focus_r += delta;
 	}
 
-	if (similar(pos_old, camera_r, 0.1) && similar(focus_old, focus_r, 0.1) && similar(vup_old, vup_r,0.1 ))
+	// When viewing a scene of 10mm size, errors of 0.01mm are noticeable.
+	// Keep tolerance well below this level:
+	double tol = 0.001;
+	if (similar(pos_old, camera_r, tol) && similar(focus_old, focus_r, tol) && similar(vup_old, vup_r,tol ))
 		return; // break update loop: this event is triggered by camera change.
 
 //	this->handleLights();
