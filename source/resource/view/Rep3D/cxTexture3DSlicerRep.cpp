@@ -118,10 +118,10 @@ void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ViewPtr view)
 	disconnect(view.get(), SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 }
 
-void Texture3DSlicerRep::update()
-{
-	mProxy->update();
-}
+//void Texture3DSlicerRep::update()
+//{
+//	mProxy->update();
+//}
 
 void Texture3DSlicerRep::printSelf(std::ostream & os, Indent indent)
 {

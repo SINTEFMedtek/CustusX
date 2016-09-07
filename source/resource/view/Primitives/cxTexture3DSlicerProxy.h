@@ -138,6 +138,7 @@ private:
 
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
+	std::vector<ImagePtr> mRawImages;
 	SliceProxyPtr mSliceProxy;
 	bool mTargetSpaceIsR;
 
@@ -149,6 +150,7 @@ private:
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
 
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
+	bool isNewInputImages(std::vector<ImagePtr> images_raw);
 };
 
 //#endif // WIN32

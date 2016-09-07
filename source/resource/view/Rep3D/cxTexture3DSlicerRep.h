@@ -109,7 +109,7 @@ public:
 	void setImages(std::vector<ImagePtr> images);
 	std::vector<ImagePtr> getImages();
 	void setSliceProxy(SliceProxyPtr slicer);
-	void update();
+//	void update();
 	void setTargetSpaceToR();
 	static bool isSupported(vtkRenderWindowPtr window);
 

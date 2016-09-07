@@ -229,8 +229,19 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 	}
 }
 
+bool Texture3DSlicerProxyImpl::isNewInputImages(std::vector<ImagePtr> images_raw)
+{
+	if (mRawImages==images_raw)
+		return false;
+	mRawImages = images_raw;
+	return true;
+}
+
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
+	if (!this->isNewInputImages(images_raw))
+		return;
+
 	std::vector<ImagePtr> images = processImages(images_raw);
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
