@@ -96,6 +96,15 @@ public:
 		std::copy(mUsed.begin(), mUsed.end(), back_inserter(mCached));
 		mUsed.clear();
 	}
+	/**
+	 * Clear all cached values
+	 */
+	void clearCache()
+	{
+		mCached.clear();
+		mUsed.clear();
+	}
+
 private:
 	QWidget* mCentralWidget;
 	int mNameGenerator;
