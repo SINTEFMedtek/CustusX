@@ -258,6 +258,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 	}
 	this->updateColorAttributeSlot();
 
+	mPainterPolyDatamapper->RemoveAllVertexAttributeMappings();
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2 * i,
