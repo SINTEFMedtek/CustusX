@@ -49,7 +49,10 @@ ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
 	this->setLayout(mLayout);
 	mViewCacheOverlay.reset(new ViewCache<ViewWidget>(this, "Overlay"));
 
+	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->initBaseLayout();
+	this->setGridMargin(4);
+	this->setGridSpacing(2);
 }
 
 ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
@@ -58,13 +61,9 @@ ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
 
 void ViewCollectionWidgetMixed::initBaseLayout()
 {
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
 	mBaseRegion = LayoutRegion(-1,-1);
 	mTotalRegion = LayoutRegion(-1,-1);
-
-	this->setGridMargin(4);
-	this->setGridSpacing(2);
 }
 
 ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
@@ -74,6 +73,8 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 
 	if (type==View::VIEW_3D)
 	{
+		//Using cached 3D view don't work if mBaseRegion covers the 3D view region (In some cases.) CX-63
+		this->mViewCacheOverlay->clearCache();
 		ViewWidget* overlay = this->mViewCacheOverlay->retrieveView();
 		overlay->getView()->setType(type);
 		overlay->show();
@@ -83,8 +84,9 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	}
 	else
 	{
-        mBaseRegion = merge(region, mBaseRegion);
+		mBaseRegion = merge(region, mBaseRegion);
 		view = mBaseLayout->addView(type, region);
+
 		// re-add the base widget with updated position in grid
 		this->addWidgetToLayout(mLayout, mBaseLayout, mBaseRegion);
 	}
@@ -116,9 +118,7 @@ void ViewCollectionWidgetMixed::clearViews()
 
 	// rebuild to default state:
 	view_utils::setStretchFactors(mLayout, mTotalRegion, 0);
-	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
-	mBaseRegion = LayoutRegion(-1,-1);
-	mTotalRegion = LayoutRegion(-1,-1);
+	this->initBaseLayout();
 }
 
 void ViewCollectionWidgetMixed::setModified()

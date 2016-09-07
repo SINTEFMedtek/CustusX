@@ -80,6 +80,7 @@ ViewWidget* LayoutWidgetUsingViewWidgets::retrieveView(View::Type type)
 		return this->mViewCache3D->retrieveView();
 	else if (type == View::VIEW_REAL_TIME)
 		return this->mViewCacheRT->retrieveView();
+	CX_LOG_WARNING("Unknown View type");
 	return this->mViewCache->retrieveView();
 }
 
@@ -88,6 +89,7 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 	mViewCache2D->clearUsedViews();
 	mViewCache3D->clearUsedViews();
 	mViewCacheRT->clearUsedViews();
+	mViewCache->clearUsedViews();
 
 	for (unsigned i=0; i<mViews.size(); ++i)
 	{
