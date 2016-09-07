@@ -470,14 +470,18 @@ std::vector<DataPtr> ViewGroupData::getData(DataViewProperties properties) const
 	return this->getDataOfType<Data>(properties);
 }
 
+
 template<class DATA_TYPE>
 std::vector<boost::shared_ptr<DATA_TYPE> > ViewGroupData::getDataOfType(DataViewProperties requiredProperties) const
 {
+	// optimization: call getdatas instead of getdata in inner loop
+	std::map<QString, DataPtr> alldata = mServices->patient()->getDatas();
+
 	typedef boost::shared_ptr<DATA_TYPE> DATA_PTR;
 	std::vector<DATA_PTR> retval;
 	for (unsigned i = 0; i < mData.size(); ++i)
 	{
-		DATA_PTR data = boost::dynamic_pointer_cast<DATA_TYPE>(this->getData(mData[i].first));
+		DATA_PTR data = boost::dynamic_pointer_cast<DATA_TYPE>(alldata[mData[i].first]);
 		if (!data)
 			continue;
 		DataViewProperties properties = mData[i].second;
