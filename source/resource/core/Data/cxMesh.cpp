@@ -377,7 +377,7 @@ void Mesh::updateVtkPolyDataWithTexture()
     vtkSmartPointer<vtkTransformTextureCoords> transformTexture = vtkSmartPointer<vtkTransformTextureCoords>::New();
     transformTexture->SetInputConnection(tMapper->GetOutputPort());
     transformTexture->SetPosition(translate);
-    transformTexture->SetScale(2,2,1);
+    transformTexture->SetScale(10,10,1);
     transformTexture->Update();
 
     //mVtkPolyData = transformTexture->GetOutputPort();

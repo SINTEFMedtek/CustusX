@@ -68,8 +68,10 @@ void MeshTextureWidget::meshSelectedSlot()
     {
         return;
     }
-    mTextureTypeAdapter->setData(mMesh);
-    mTextureFile->setData(mMesh);
+    //mTextureTypeAdapter->setData(mMesh);
+    mTextureTypeAdapter->setValue(mMesh->getTextureType());
+    //mTextureFile->setData(mMesh);
+    mTextureFile->setValue(mMesh->getTextureFile());
 
     connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 }
@@ -78,6 +80,22 @@ void MeshTextureWidget::meshChangedSlot()
 {
     if(!mMesh)
         return;
+}
+
+void MeshTextureWidget::textureTypeChangedSlot()
+{
+    if(!mMesh)
+        return;
+
+    mMesh->setTextureType(mTextureTypeAdapter->getValue().toStdString().c_str());
+}
+
+void MeshTextureWidget::textureFileChangedSlot()
+{
+    if(!mMesh)
+        return;
+
+    mMesh->setTextureFile(mTextureFile->getValue().toStdString().c_str());
 }
 
 //void MeshTextureWidget::updateVtkPolyDataWithTexture()
@@ -94,16 +112,38 @@ void MeshTextureWidget::addWidgets()
     gridLayout->setMargin(0);
     toptopLayout->addLayout(gridLayout);
 
-    mTextureTypeAdapter = StringPropertyTextureType::New(mPatientModelService);
-    mTextureFile = FilePathPropertyTextureFile::New(mPatientModelService);
+    //mTextureTypeAdapter = StringPropertyTextureType::New(mPatientModelService);
+    mTextureTypeAdapter = StringProperty::initialize("texture_coordinates", "Texture coordinates",
+                                                 "Try to match the mesh to this type of texture coordinates.",
+                                                 "Cylinder",
+                                                 QStringList()
+                                                 << "Cylinder"
+                                                 << "Plane"
+                                                 << "Sphere");
 
-    //connect(mTextureTypeAdapter.get(), &Property::changed, mMesh.get(), &Mesh::updateVtkPolyDataWithTexture);
-//    connect(mTextureTypeAdapter.get(), &Property::changed, this, &MeshTextureWidget::updateVtkPolyDataWithTexture);
+    //mTextureFile = FilePathPropertyTextureFile::New(mPatientModelService);
+    mTextureFile = FilePathProperty::initialize("texture_file", "Texture file", "Picture file with the texture", "", QStringList() << "");
 
-    int row = 1;
-    new FilenameWidget(this, mTextureFile, gridLayout, row++);
-    new LabeledComboBoxWidget(this, mTextureTypeAdapter, gridLayout, row++);
+
+    
+    //int row = 1;
+    //new FilenameWidget(this, mTextureFile, gridLayout, row++);
+    //new LabeledComboBoxWidget(this, mTextureTypeAdapter, gridLayout, row++);
+
+    connect(mTextureTypeAdapter.get(), &Property::changed, this, &MeshTextureWidget::textureTypeChangedSlot);
+    connect(mTextureFile.get(), &Property::changed, this, &MeshTextureWidget::textureFileChangedSlot);
+
+    mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
+    toptopLayout->addWidget(mOptionsWidget);
+
+    std::vector<PropertyPtr> options;
+    options.push_back(mTextureFile);
+    options.push_back(mTextureTypeAdapter);
+
+    mOptionsWidget->setOptions("mesh_texture_options_widget", options, true);
+
     toptopLayout->addStretch();
+
 }
 
 }//end namespace cx

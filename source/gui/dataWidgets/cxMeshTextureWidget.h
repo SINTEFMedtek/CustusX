@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBaseWidget.h"
 #include "cxDataInterface.h"
 
+#include "cxOptionsWidget.h"
+
 
 namespace cx
 {
@@ -56,6 +58,8 @@ public:
 protected slots:
     void meshSelectedSlot();
     void meshChangedSlot();
+    void textureTypeChangedSlot();
+    void textureFileChangedSlot();
     //void updateVtkPolyDataWithTexture();
 
 private:
@@ -63,13 +67,18 @@ private:
 
     MeshPtr mMesh;
     SelectDataStringPropertyBasePtr mMeshSelector;
-    StringPropertyTextureTypePtr mTextureTypeAdapter;
-    FilePathPropertyTextureFilePtr mTextureFile;
+    //StringPropertyTextureTypePtr mTextureTypeAdapter;
+    StringPropertyPtr mTextureTypeAdapter;
+    //FilePathPropertyTextureFilePtr mTextureFile;
+    FilePathPropertyPtr mTextureFile;
 
     PatientModelServicePtr mPatientModelService;
     ViewServicePtr mViewService;
 
     MeshTextureWidget();
+
+    //
+    OptionsWidget* mOptionsWidget;
 
 };
 
