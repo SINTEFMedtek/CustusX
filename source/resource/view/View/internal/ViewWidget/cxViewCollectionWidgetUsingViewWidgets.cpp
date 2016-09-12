@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGLHelpers.h"
 #include "cxViewUtilities.h"
 #include "cxLogger.h"
+#include "vtkRenderWindow.h"
+
 
 namespace cx
 {
@@ -41,17 +43,15 @@ namespace cx
 LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
+	mViewCache = MultiViewCache::create();
+	mOffScreenRendering = true;
+
 	mLayout = new QGridLayout;
 
 	mLayout->setSpacing(2);
 	mLayout->setMargin(4);
 
 	this->setLayout(mLayout);
-
-	mViewCache2D.reset(new ViewCache<ViewWidget>(this,	"View2D"));
-	mViewCache3D.reset(new ViewCache<ViewWidget>(this, "View3D"));
-	mViewCacheRT.reset(new ViewCache<ViewWidget>(this, "ViewRT"));
-	mViewCache.reset(new ViewCache<ViewWidget>(this, "View"));
 }
 
 LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
@@ -60,7 +60,7 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-	ViewWidget* view = this->retrieveView(type);
+	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
 
 	view->getView()->setType(type);
 
@@ -72,24 +72,20 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
 	return view->getView();
 }
 
-ViewWidget* LayoutWidgetUsingViewWidgets::retrieveView(View::Type type)
+void LayoutWidgetUsingViewWidgets::setOffScreenRenderingAndClear(bool on)
 {
-	if (type == View::VIEW_2D)
-		return this->mViewCache2D->retrieveView();
-	else if (type == View::VIEW_3D)
-		return this->mViewCache3D->retrieveView();
-	else if (type == View::VIEW_REAL_TIME)
-		return this->mViewCacheRT->retrieveView();
-	CX_LOG_WARNING("Unknown View type");
-	return this->mViewCache->retrieveView();
+	this->clearViews();
+	mOffScreenRendering = on;
+}
+
+bool LayoutWidgetUsingViewWidgets::getOffScreenRendering() const
+{
+	return mOffScreenRendering;
 }
 
 void LayoutWidgetUsingViewWidgets::clearViews()
 {
-	mViewCache2D->clearUsedViews();
-	mViewCache3D->clearUsedViews();
-	mViewCacheRT->clearUsedViews();
-	mViewCache->clearUsedViews();
+	mViewCache->clearViews();
 
 	for (unsigned i=0; i<mViews.size(); ++i)
 	{

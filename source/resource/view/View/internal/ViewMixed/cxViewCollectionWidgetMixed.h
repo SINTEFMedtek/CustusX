@@ -41,10 +41,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
 
+
 class QGridLayout;
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 class ViewCollectionWidgetUsingViewContainer;
 class LayoutWidgetUsingViewWidgets;
 
@@ -76,7 +79,9 @@ public:
     virtual ~ViewCollectionWidgetMixed();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
-	void clearViews();
+	virtual void setOffScreenRenderingAndClear(bool on);
+	virtual bool getOffScreenRendering() const;
+	virtual void clearViews();
 	virtual void setModified();
 	virtual void render();
 	virtual void setGridSpacing(int val);
@@ -98,7 +103,7 @@ private:
 	QGridLayout* mLayout;
 	std::vector<ViewWidget*> mOverlays;
 
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheOverlay;
+	MultiViewCachePtr mViewCache;
 };
 
 

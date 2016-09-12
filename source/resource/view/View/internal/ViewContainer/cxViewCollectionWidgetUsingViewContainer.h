@@ -61,6 +61,8 @@ public:
     virtual ~ViewCollectionWidgetUsingViewContainer();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual void setOffScreenRenderingAndClear(bool on);
+	virtual bool getOffScreenRendering() const;
 	void clearViews();
 	virtual void setModified();
 	virtual void render();

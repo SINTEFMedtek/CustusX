@@ -472,6 +472,8 @@ void ViewManager::activateViews(ViewCollectionWidget *widget, LayoutData next)
 	if (!widget)
 		return;
 
+	widget->setOffScreenRenderingAndClear(next.getOffScreenRendering());
+
 	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
 		this->activateView(widget, *iter);
 }

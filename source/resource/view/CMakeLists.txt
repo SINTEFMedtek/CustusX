@@ -90,7 +90,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     View/cxLayoutData
 	View/cxViewCollectionVideoSource
     View/internal/cxViewUtilities
-    View/internal/ViewWidget/cxViewCache.h
+	View/internal/ViewWidget/cxViewCache
     View/internal/ViewWidget/cxViewLinkingViewWidget
     View/internal/ViewContainer/cxViewLinkingViewContainerItem
 	View/cxViewCollectionImageWriter

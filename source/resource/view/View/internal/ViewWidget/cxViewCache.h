@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxTypeConversions.h"
 #include "cxOSXHelper.h"
+#include "cxViewWidget.h"
 
 namespace cx
 {
@@ -111,6 +112,24 @@ private:
 	QString mTypeText;
 	std::vector<VIEW_TYPE*> mCached;
 	std::vector<VIEW_TYPE*> mUsed;
+};
+
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
+class MultiViewCache
+{
+public:
+	static MultiViewCachePtr create() { return MultiViewCachePtr(new MultiViewCache()); }
+	MultiViewCache();
+
+	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
+	void clearViews();
+	void clearCache();
+
+private:
+	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
+	std::map<QString, ViewCachePtr> mViewCache;
+	vtkRenderWindowPtr mStaticRenderWindow;
 };
 
 /**

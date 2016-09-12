@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScreen>
 #include <QVBoxLayout>
 #include "cxViewService.h"
-//#include "cxSecondaryViewLayoutWindow.h"
 #include "cxViewCollectionWidget.h"
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
@@ -50,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include <QPainter>
 #include "cxViewCollectionImageWriter.h"
+#include <QScrollArea>
 
 namespace cx
 {
@@ -118,10 +118,22 @@ QPixmap ScreenVideoProvider::grabScreen(unsigned screenid)
 \
 void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 {
-//	std::cout << "show window" << std::endl;
-	if (!mSecondaryViewLayoutWindow)
+	if (!mTopWindow)
+	{
+		mTopWindow = new QWidget;
+		mTopWindow->setLayout(new QVBoxLayout);
+		mTopWindow->layout()->setMargin(0);
+
+		QScrollArea* scrollArea = new QScrollArea;
+		scrollArea->setBackgroundRole(QPalette::Dark);
+		mTopWindow->layout()->addWidget(scrollArea);
+
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->view());
-	mSecondaryViewLayoutWindow->show();
+		scrollArea->setWidget(mSecondaryViewLayoutWindow);
+		scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	}
+	mTopWindow->show();
 
 	this->setWidgetToNiceSizeInLowerRightCorner(size);
 
@@ -134,7 +146,7 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
-	QWidget* screen = desktop->screen(desktop->screenNumber(mSecondaryViewLayoutWindow));
+	QWidget* screen = desktop->screen(desktop->screenNumber(mTopWindow));
 	QRect geo = screen->geometry();
 
 	if (size.width()==0 || size.height()==0)
@@ -142,10 +154,19 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 		size = QSize(geo.width()/3, geo.height()/3);
 	}
 
-	QRect rect = QRect(QPoint(geo.width()-size.width(),geo.height()-size.height()), size);
-	mSecondaryViewLayoutWindow->setGeometry(rect);
-	rect = mSecondaryViewLayoutWindow->frameGeometry();
-	mSecondaryViewLayoutWindow->move(geo.width()-rect.width(),geo.height()-rect.height());
+
+	QSize topsize(std::min<int>(size.width(), geo.width()*0.75),
+				  std::min<int>(size.height(), geo.height()*0.75));
+
+	QRect rect_t = QRect(QPoint(geo.width()-topsize.width(),geo.height()-topsize.height()),
+						 topsize);
+	mTopWindow->setGeometry(rect_t);
+	rect_t = mTopWindow->frameGeometry();
+	mTopWindow->move(geo.width()-rect_t.width(),geo.height()-rect_t.height());
+
+	QRect rect_l = QRect(QPoint(0,0), size);
+	mSecondaryViewLayoutWindow->setGeometry(rect_l);
+
 }
 
 void ScreenVideoProvider::closeSecondaryLayout()
