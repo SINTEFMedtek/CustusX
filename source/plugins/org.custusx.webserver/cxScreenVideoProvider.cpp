@@ -139,6 +139,10 @@ void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 
     if (!layout.isEmpty())
         mServices->view()->setActiveLayout(layout, mSecondaryViewLayoutWindow->mSecondaryLayoutId);
+
+	ViewCollectionWidget* layoutWidget = this->getSecondaryLayoutWidget();
+	layoutWidget->setGridMargin(0);
+	layoutWidget->setGridSpacing(0);
 }
 
 void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
@@ -147,26 +151,26 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	QList<QScreen*> screens = qApp->screens();
 
 	QWidget* screen = desktop->screen(desktop->screenNumber(mTopWindow));
-	QRect geo = screen->geometry();
+	QRect rect_s = screen->geometry();
 
+	// default to 33% of the screen
 	if (size.width()==0 || size.height()==0)
 	{
-		size = QSize(geo.width()/3, geo.height()/3);
+		size = QSize(rect_s.width()/3, rect_s.height()/3);
 	}
 
+	// constrain widget to a max of 75% of the screen
+	size = QSize(std::min<int>(size.width(), rect_s.width()*0.75),
+				 std::min<int>(size.height(), rect_s.height()*0.75));
+	mTopWindow->setGeometry(QRect(QPoint(0,0), size));
 
-	QSize topsize(std::min<int>(size.width(), geo.width()*0.75),
-				  std::min<int>(size.height(), geo.height()*0.75));
+	// reposition window to lower right corner:
+	QRect rect_t = mTopWindow->frameGeometry();
+	mTopWindow->move(rect_s.width()-rect_t.width(),rect_s.height()-rect_t.height());
 
-	QRect rect_t = QRect(QPoint(geo.width()-topsize.width(),geo.height()-topsize.height()),
-						 topsize);
-	mTopWindow->setGeometry(rect_t);
-	rect_t = mTopWindow->frameGeometry();
-	mTopWindow->move(geo.width()-rect_t.width(),geo.height()-rect_t.height());
-
+	// set size of canvas inside widget where stuff is rendered:
 	QRect rect_l = QRect(QPoint(0,0), size);
 	mSecondaryViewLayoutWindow->setGeometry(rect_l);
-
 }
 
 void ScreenVideoProvider::closeSecondaryLayout()

@@ -29,68 +29,59 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXSCREENVIDEOPROVIDER_H
-#define CXSCREENVIDEOPROVIDER_H
 
-#include <QObject>
-#include <QPointer>
-#include <QMainWindow>
-#include "vtkSmartPointer.h"
-#include "cxVisServices.h"
-#include "cxForwardDeclarations.h"
-#include "cxScreenShotImageWriter.h"
+#ifndef CXMULTIVIEWCACHE_H
+#define CXMULTIVIEWCACHE_H
 
-typedef vtkSmartPointer<class vtkWindowToImageFilter> vtkWindowToImageFilterPtr;
-typedef vtkSmartPointer<class vtkPNGWriter> vtkPNGWriterPtr;
-typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
+#include "cxResourceVisualizationExport.h"
+
+#include <QWidget>
+#include <QLayout>
+#include <vector>
+#include "cxTypeConversions.h"
+#include "cxOSXHelper.h"
+#include "cxViewWidget.h"
+#include "cxViewCache.h"
 
 namespace cx
 {
+/**
+ * \file
+ * \ingroup cx_resource_view_internal
+ * @{
+ */
 
-class SecondaryViewLayoutWindow: public QWidget
+/**
+ * Cache for reuse of Views.
+ *
+ * Separate caches exist for each type of view. Offscreen rendering also uses separate
+ * caches. The cache also stores a separate first renderwindow in order to handle
+ * the shared gl context used by cx.
+ *
+ * \ingroup cx_resource_view_internal
+ */
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
+class MultiViewCache
 {
-Q_OBJECT
-
 public:
-	SecondaryViewLayoutWindow(QWidget* parent, ViewServicePtr viewService);
-	~SecondaryViewLayoutWindow() {}
+	static MultiViewCachePtr create() { return MultiViewCachePtr(new MultiViewCache()); }
+	MultiViewCache();
 
-	void tryShowOnSecondaryScreen();
-    int mSecondaryLayoutId;
+	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
+	void clearViews();
+	void clearCache();
 
-protected:
-	virtual void showEvent(QShowEvent* event);
-	virtual void hideEvent(QCloseEvent* event);
-	virtual void closeEvent(QCloseEvent *event);
 private:
-	QString toString(QRect r) const;
-	int findSmallestSecondaryScreen();
-
-	ViewServicePtr mViewService;
+	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
+	std::map<QString, ViewCachePtr> mViewCache;
+	vtkRenderWindowPtr mStaticRenderWindow;
 };
 
-class ScreenVideoProvider : public QObject
-{
-	Q_OBJECT
-public:
-	ScreenVideoProvider(VisServicesPtr services);
-
-    class ViewCollectionWidget* getSecondaryLayoutWidget();
-    void saveScreenShot(QImage image, QString id);
-	QByteArray generatePNGEncoding(QImage image);
-	QPixmap grabScreen(unsigned screenid);
-    void showSecondaryLayout(QSize size, QString layout);
-	QImage grabSecondaryLayout();
-    void closeSecondaryLayout();
-private:
-	VisServicesPtr mServices;
-	SecondaryViewLayoutWindow* mSecondaryViewLayoutWindow;
-	QPointer<class QWidget> mTopWindow;
-	ScreenShotImageWriter mWriter;
-	void setWidgetToNiceSizeInLowerRightCorner(QSize size);
-};
-
+/**
+ * @}
+ */
 } // namespace cx
 
 
-#endif // CXSCREENVIDEOPROVIDER_H
+#endif // CXMULTIVIEWCACHE_H

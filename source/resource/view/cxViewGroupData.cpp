@@ -474,7 +474,7 @@ std::vector<DataPtr> ViewGroupData::getData(DataViewProperties properties) const
 template<class DATA_TYPE>
 std::vector<boost::shared_ptr<DATA_TYPE> > ViewGroupData::getDataOfType(DataViewProperties requiredProperties) const
 {
-	// optimization: call getdatas instead of getdata in inner loop
+	// speed optimization: call getdatas() instead of getdata() in for loop
 	std::map<QString, DataPtr> alldata = mServices->patient()->getDatas();
 
 	typedef boost::shared_ptr<DATA_TYPE> DATA_PTR;

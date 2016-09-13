@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewUtilities.h"
 #include "cxLogger.h"
 #include "vtkRenderWindow.h"
-
+#include "cxMultiViewCache.h"
 
 namespace cx
 {

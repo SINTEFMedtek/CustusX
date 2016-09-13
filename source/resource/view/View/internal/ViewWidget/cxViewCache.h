@@ -114,23 +114,6 @@ private:
 	std::vector<VIEW_TYPE*> mUsed;
 };
 
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
-
-class MultiViewCache
-{
-public:
-	static MultiViewCachePtr create() { return MultiViewCachePtr(new MultiViewCache()); }
-	MultiViewCache();
-
-	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
-	void clearViews();
-	void clearCache();
-
-private:
-	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
-	std::map<QString, ViewCachePtr> mViewCache;
-	vtkRenderWindowPtr mStaticRenderWindow;
-};
 
 /**
  * @}
