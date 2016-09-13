@@ -162,7 +162,10 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	// constrain widget to a max of 75% of the screen
 	size = QSize(std::min<int>(size.width(), rect_s.width()*0.75),
 				 std::min<int>(size.height(), rect_s.height()*0.75));
-	mTopWindow->setGeometry(QRect(QPoint(0,0), size));
+	// make sure all of scroll area is visible:
+	int margin = 2;
+	mTopWindow->setGeometry(QRect(QPoint(0,0),
+								  QSize(size.width()+margin, size.height()+margin)));
 
 	// reposition window to lower right corner:
 	QRect rect_t = mTopWindow->frameGeometry();
@@ -171,6 +174,9 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	// set size of canvas inside widget where stuff is rendered:
 	QRect rect_l = QRect(QPoint(0,0), size);
 	mSecondaryViewLayoutWindow->setGeometry(rect_l);
+
+	qDebug() << "layout t: " << mTopWindow->geometry();
+	qDebug() << "layout l: " << mSecondaryViewLayoutWindow->geometry();
 }
 
 void ScreenVideoProvider::closeSecondaryLayout()
