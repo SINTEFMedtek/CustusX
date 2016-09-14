@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
+#include "cxMultiViewCache.h"
 
 namespace cx
 {
@@ -47,7 +48,7 @@ ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
-	mViewCacheOverlay.reset(new ViewCache<ViewWidget>(this, "Overlay"));
+	mViewCache = MultiViewCache::create();
 
 	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->initBaseLayout();
@@ -74,8 +75,8 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	if (type==View::VIEW_3D)
 	{
 		//Using cached 3D view don't work if mBaseRegion covers the 3D view region (In some cases.) CX-63
-		this->mViewCacheOverlay->clearCache();
-		ViewWidget* overlay = this->mViewCacheOverlay->retrieveView();
+		this->mViewCache->clearCache();
+		ViewWidget* overlay = this->mViewCache->retrieveView(this, View::VIEW_3D, mBaseLayout->getOffScreenRendering());
 		overlay->getView()->setType(type);
 		overlay->show();
 		mOverlays.push_back(overlay);
@@ -95,6 +96,17 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	return view;
 }
 
+void ViewCollectionWidgetMixed::setOffScreenRenderingAndClear(bool on)
+{
+	this->clearViews();
+	mBaseLayout->setOffScreenRenderingAndClear(on);
+}
+
+bool ViewCollectionWidgetMixed::getOffScreenRendering() const
+{
+	return mBaseLayout->getOffScreenRendering();
+}
+
 void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region)
 {
 	layout->addWidget(widget,
@@ -104,7 +116,7 @@ void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* 
 
 void ViewCollectionWidgetMixed::clearViews()
 {
-	mViewCacheOverlay->clearUsedViews();
+	mViewCache->clearViews();
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 	{

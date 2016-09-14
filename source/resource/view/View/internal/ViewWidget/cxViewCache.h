@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxTypeConversions.h"
 #include "cxOSXHelper.h"
+#include "cxViewWidget.h"
 
 namespace cx
 {
@@ -112,6 +113,7 @@ private:
 	std::vector<VIEW_TYPE*> mCached;
 	std::vector<VIEW_TYPE*> mUsed;
 };
+
 
 /**
  * @}

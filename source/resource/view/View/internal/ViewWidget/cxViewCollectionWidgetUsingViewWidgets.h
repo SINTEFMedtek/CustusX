@@ -46,6 +46,8 @@ class QGridLayout;
 namespace cx
 {
 
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
 /**
  * Widget for displaying Views, Containing a QGridLayout of QVTKWidgets,
  * one for each view.
@@ -62,6 +64,8 @@ public:
     virtual ~LayoutWidgetUsingViewWidgets();
 
 	virtual ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual void setOffScreenRenderingAndClear(bool on);
+	virtual bool getOffScreenRendering() const;
 	virtual void clearViews();
 	virtual void setModified();
 	virtual void render();
@@ -77,16 +81,12 @@ protected:
 	std::vector<ViewWidget*> mViews;
 
 private:
-	ViewWidget* retrieveView(View::Type type);
     ViewWidget* WidgetFromView(ViewPtr view);
 
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache;
+	MultiViewCachePtr mViewCache;
 	QGridLayout* mLayout; ///< the layout
+	bool mOffScreenRendering;
 };
-
 
 } // namespace cx
 
