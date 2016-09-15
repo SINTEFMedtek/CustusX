@@ -72,7 +72,7 @@ void ManualPatientRegistrationWidget::showEvent(QShowEvent* event)
 void ManualPatientRegistrationWidget::matrixWidgetChanged()
 {
 	Transform3D rMpr = mMatrixWidget->getMatrix();
-	mServices->registration()->applyPatientRegistration(rMpr, "Manual Patient");
+	mServices->registration()->addPatientRegistration(rMpr, "Manual Patient");
 }
 
 ///** Called when the valid patient registration matrix in the system has changed.

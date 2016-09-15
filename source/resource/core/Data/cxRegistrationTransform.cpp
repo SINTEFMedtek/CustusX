@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomElement>
 #include "cxTime.h"
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -63,7 +64,7 @@ public:
 	virtual void setRegistration(const Transform3D& transform)
 	{
 	}
-	virtual void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+	virtual void addRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 	{
 	}
 
@@ -120,15 +121,16 @@ public:
 //---------------------------------------------------------
 
 RegistrationTransform::RegistrationTransform() :
-	mValue(Transform3D::Identity())
+	mValue(Transform3D::Identity()), mTemp(false)
 {
 }
 
-RegistrationTransform::RegistrationTransform(const Transform3D& value, const QDateTime& timestamp, const QString& type)
+RegistrationTransform::RegistrationTransform(const Transform3D& value, const QDateTime& timestamp, const QString& type, bool tempTransform)
 {
 	mValue = value;
 	mTimestamp = timestamp;
 	mType = type;
+	mTemp = tempTransform;
 }
 
 void RegistrationTransform::addXml(QDomNode& parentNode) const ///< write internal state to node
@@ -291,34 +293,44 @@ void RegistrationHistory::clear()
 	mTransformCache = RegistrationTransform();
 }
 
-/**Add one registration transform to the history.
+/**
+ * Add one registration transform to the history.
+ * Will not emit changed signals if transform is temporary.
  */
-void RegistrationHistory::addRegistration(const RegistrationTransform& transform)
+void RegistrationHistory::addRegistrationInternal(const RegistrationTransform& transform)
 {
 	if (std::count(mData.begin(), mData.end(), transform)) // ignore if already present
 		return;
 
 	mData.push_back(transform);
 	std::sort(mData.begin(), mData.end());
+
+	bool silent = transform.mTemp;
+	this->blockSignals(silent);
 	setActiveTime(QDateTime()); // reset to last registration when reregistering.
+	this->blockSignals(false);
 }
 
-/**Replace the registration performed at oldTime with the new one.
- *
+/**
+ * Add one registration transform to the history.
+ * Replace the registration performed at oldTime with the new one, if the old is marked as temporary.
  */
-void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+void RegistrationHistory::addRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 {
-	for (std::vector<RegistrationTransform>::iterator iter = mData.begin(); iter != mData.end(); ++iter)
+	if(newTransform.mTemp)
 	{
-		if ((iter->mTimestamp == oldTime)
-			&& oldTime.isValid()
-			&& (iter->mType == newTransform.mType))
+		for (std::vector<RegistrationTransform>::iterator iter = mData.begin(); iter != mData.end(); ++iter)
 		{
-			mData.erase(iter);
-			break;
+			if ((iter->mTimestamp == oldTime)
+					&& oldTime.isValid()
+					&& iter->mTemp)
+			{
+				mData.erase(iter);
+				break;
+			}
 		}
 	}
-	this->addRegistration(newTransform);
+	this->addRegistrationInternal(newTransform);
 }
 
 /**Set a registration transform, overwriting all history.
@@ -332,7 +344,7 @@ void RegistrationHistory::setRegistration(const Transform3D& transform)
 		changed = false;
 	}
 	mData.clear();
-	this->addRegistration(RegistrationTransform(transform));
+	this->addRegistrationInternal(RegistrationTransform(transform));
 	if (changed)
 	{
 		emit currentChanged();

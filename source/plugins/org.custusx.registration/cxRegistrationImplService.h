@@ -77,10 +77,10 @@ public:
 	virtual void doFastRegistration_Translation();
 	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt);
 	virtual void doImageRegistration(bool translationOnly);
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description);
-	virtual void applyContinuousPatientRegistration(Transform3D rMpr_new, QString description);
+	virtual void addImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
+	virtual void updateImage2ImageRegistration(Transform3D delta_pre_rMd, QString description);
+	virtual void addPatientRegistration(Transform3D rMpr_new, QString description);
+	virtual void updatePatientRegistration(Transform3D rMpr_new, QString description);
 	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt);
 
 	virtual QDateTime getLastRegistrationTime();
@@ -95,7 +95,7 @@ private slots:
 	void parseXml(QDomNode &dataNode);
 	void clearSlot();
 private:
-	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, bool continuous = false);
+	virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
 //	PatientModelService* getPatientModelService();
 	void writePreLandmarkRegistration(QString name, LandmarkMap landmarks);
 	vtkPointsPtr convertTovtkPoints(const std::vector<QString> &uids, const LandmarkMap &data, Transform3D M);
@@ -114,8 +114,8 @@ private:
 	ctkPluginContext* mContext;
 	PatientModelServicePtr mPatientModelService;
 	SessionStorageServicePtr mSession;
-	void performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool continuous = false);
-	void performPatientRegistration(Transform3D rMpr_new, QString description, bool continuous = false);
+	void performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool temporaryRegistration = false);
+	void performPatientRegistration(Transform3D rMpr_new, QString description, bool temporaryRegistration = false);
 };
 
 typedef boost::shared_ptr<RegistrationImplService> RegistrationImplServicePtr;

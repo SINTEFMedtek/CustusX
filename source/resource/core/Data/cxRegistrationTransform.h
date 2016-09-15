@@ -66,10 +66,11 @@ public:
 
 	QString mFixed;
 	QString mMoving;
+	bool mTemp;
 
 	RegistrationTransform();
 	explicit RegistrationTransform(const Transform3D& value, const QDateTime& timestamp = QDateTime(),
-		const QString& type = "");
+		const QString& type = "", bool tempTransform = false);
 	void addXml(QDomNode& parentNode) const; ///< write internal state to node
 	void parseXml(QDomNode& dataNode);///< read internal state from node
 };
@@ -120,9 +121,8 @@ public:
 	virtual void addXml(QDomNode& parentNode) const; ///< write internal state to node
 	virtual void parseXml(QDomNode& dataNode);///< read internal state from node
 
-	virtual void addRegistration(const RegistrationTransform& transform);
 	virtual void setRegistration(const Transform3D& transform);
-	virtual void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual void addRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
 	virtual void setParentSpace(const QString& newParent);
 	virtual void addParentSpace(const QString& newParent);
@@ -147,6 +147,7 @@ public:
 signals:
 	void currentChanged();
 private:
+	virtual void addRegistrationInternal(const RegistrationTransform& transform);
 	void setCache(const RegistrationTransform& val, const ParentSpace& parent, const QDateTime& timestamp);
 	static RegistrationHistoryPtr mNull;
 	std::vector<RegistrationTransform> mData; ///< time-sorted list of all registration events.

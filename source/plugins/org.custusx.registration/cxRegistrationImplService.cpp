@@ -200,7 +200,7 @@ void RegistrationImplService::doPatientRegistration()
 		return;
 	}
 
-	this->applyPatientRegistration(rMpr, "Patient Landmark");
+	this->addPatientRegistration(rMpr, "Patient Landmark");
 }
 
 void RegistrationImplService::doFastRegistration_Translation()
@@ -238,7 +238,7 @@ void RegistrationImplService::doFastRegistration_Translation()
 		return;
 	}
 
-	this->applyPatientRegistration(rMpr_old*pr_oldMpr_new, "Fast Translation");
+	this->addPatientRegistration(rMpr_old*pr_oldMpr_new, "Fast Translation");
 }
 
 /**Perform a fast orientation by setting the patient registration equal to the current active
@@ -257,7 +257,7 @@ void RegistrationImplService::doFastRegistration_Orientation(const Transform3D& 
 
 	Transform3D tmMpr = tMtm * tMpr;
 
-	this->applyPatientRegistration(tmMpr, "Fast Orientation");
+	this->addPatientRegistration(tmMpr, "Fast Orientation");
 
 	// also apply the fast translation registration if any (this frees us form doing stuff in a well-defined order.)
 	this->doFastRegistration_Translation();
@@ -368,7 +368,7 @@ void RegistrationImplService::doImageRegistration(bool translationOnly)
 		return;
 	}
 
-	this->applyImage2ImageRegistration(delta, idString);
+	this->addImage2ImageRegistration(delta, idString);
 }
 
 std::vector<Vector3D> RegistrationImplService::convertVtkPointsToPoints(vtkPointsPtr base)
@@ -415,48 +415,48 @@ Transform3D RegistrationImplService::performLandmarkRegistration(vtkPointsPtr so
 	return tar_M_src;
 }
 
-void RegistrationImplService::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationImplService::addImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	this->performImage2ImageRegistration(delta_pre_rMd, description);
 }
 
-void RegistrationImplService::applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationImplService::updateImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	this->performImage2ImageRegistration(delta_pre_rMd, description, true);
 }
 
-void RegistrationImplService::performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool continuous)
+void RegistrationImplService::performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool temporaryRegistration)
 {
-	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description);
+	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description, temporaryRegistration);
 	regTrans.mFixed = mFixedData;
 	regTrans.mMoving = mMovingData;
 
-	this->updateRegistration(mLastRegistrationTime, regTrans, this->getMovingData(), continuous);
+	this->updateRegistration(mLastRegistrationTime, regTrans, this->getMovingData());
 
 	mLastRegistrationTime = regTrans.mTimestamp;
-	if(!continuous)
+	if(!temporaryRegistration)
 		reportSuccess(QString("Image registration [%1] has been performed on %2").arg(description).arg(regTrans.mMoving) );
 }
 
-void RegistrationImplService::applyPatientRegistration(Transform3D rMpr_new, QString description)
+void RegistrationImplService::addPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	this->performPatientRegistration(rMpr_new, description);
 }
 
-void RegistrationImplService::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+void RegistrationImplService::updatePatientRegistration(Transform3D rMpr_new, QString description)
 {
 	this->performPatientRegistration(rMpr_new, description, true);
 }
 
-void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, QString description, bool continuous)
+void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, QString description, bool temporaryRegistration)
 {
-	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description);
+	RegistrationTransform regTrans(rMpr_new, QDateTime::currentDateTime(), description, temporaryRegistration);
 	regTrans.mFixed = mFixedData;
 
-	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans, continuous);
+	mPatientModelService->updateRegistration_rMpr(mLastRegistrationTime, regTrans);
 
 	mLastRegistrationTime = regTrans.mTimestamp;
-	if(!continuous)
+	if(!temporaryRegistration)
 		reportSuccess(QString("Patient registration [%1] has been performed.").arg(description));
 }
 
@@ -465,11 +465,13 @@ void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, Q
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data, bool continuous)
+void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data)
 {
 	RegistrationApplicator applicator(mPatientModelService->getDatas());
-	applicator.updateRegistration(oldTime, deltaTransform, data, continuous);
-	if(!continuous)
+	applicator.updateRegistration(oldTime, deltaTransform, data);
+
+	bool silent = deltaTransform.mTemp;
+	if(!silent)
 		mPatientModelService->autoSave();
 }
 
@@ -498,7 +500,7 @@ void RegistrationImplService::applyPatientOrientation(const Transform3D& tMtm, c
 	QString description("Patient Orientation");
 
 	QDateTime oldTime = this->getLastRegistrationTime(); // time of previous reg
-	this->applyPatientRegistration(tmMpr, description);
+	this->addPatientRegistration(tmMpr, description);
 
 	// now apply the inverse of F to all data,
 	// thus ensuring the total path from pr to d_i is unchanged:
@@ -515,7 +517,7 @@ void RegistrationImplService::applyPatientOrientation(const Transform3D& tMtm, c
 		DataPtr current = iter->second;
 		RegistrationTransform newTransform = regTrans;
 		newTransform.mValue = regTrans.mValue * current->get_rMd();
-		current->get_rMd_History()->updateRegistration(oldTime, newTransform);
+		current->get_rMd_History()->addRegistration(oldTime, newTransform);
 
 		report("Updated registration of data " + current->getName());
 		std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
