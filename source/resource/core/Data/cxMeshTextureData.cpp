@@ -1,7 +1,7 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
-Copyright (c) 2008-2016, SINTEF Department of Medical Technology
+Copyright (c) 2008-2014, SINTEF Department of Medical Technology
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,62 +29,47 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef MESHTEXTUREWIDGET_H
-#define MESHTEXTUREWIDGET_H
 
-#include "cxGuiExport.h"
-#include "cxBaseWidget.h"
-#include "cxDataInterface.h"
 
-#include "cxOptionsWidget.h"
-
+#include "cxMeshTextureData.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
-
-class cxGui_EXPORT MeshTextureWidget : public BaseWidget
+MeshTextureData::MeshTextureData()
 {
-    Q_OBJECT
+    this->initialize();
+}
 
-public:
-    MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector,
-                      PatientModelServicePtr patientModelService, ViewServicePtr viewService,
-                      QWidget *parent);
+void MeshTextureData::addXml(QDomNode &dataNode)
+{
 
-    virtual ~MeshTextureWidget();
-    SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+}
 
-protected slots:
-    void setupUI();
-    virtual void prePaintEvent();
-    void meshSelectedSlot();
+void MeshTextureData::parseXml(QDomNode &dataNode)
+{
 
-//    void meshChangedSlot();
-//    void textureTypeChangedSlot();
-//    void textureFileChangedSlot();
-    //void updateVtkPolyDataWithTexture();
+}
 
-private:
-//    void addWidgets();
+void MeshTextureData::addProperty(PropertyPtr property)
+{
+    mProperties.push_back(property);
+    connect(property.get(), &Property::changed, this, &MeshTextureData::changed);
+}
 
-    MeshPtr mMesh;
-    SelectDataStringPropertyBasePtr mMeshSelector;
+void MeshTextureData::initialize()
+{
+    mTextureType = StringProperty::initialize("texture_coordinates", "Texture coordinates",
+                                                 "Try to match the mesh to this type of texture coordinates.",
+                                                 "None",
+                                                 QStringList()
+                                                 << "None"
+                                                 << "Cylinder"
+                                                 << "Plane"
+                                                 << "Sphere");
+    this->addProperty(mTextureType);
 
-    OptionsWidget* mOptionsWidget;
+    mTextureFile = FilePathProperty::initialize("texture_file", "Texture file", "Picture file with the texture", "", QStringList() << "");
+    this->addProperty(mTextureFile);
+}
 
-    //StringPropertyPtr mTextureType;
-    //FilePathPropertyPtr mTextureFile;
-
-    PatientModelServicePtr mPatientModelService;
-    ViewServicePtr mViewService;
-
-    MeshTextureWidget();
-
-    void clearUI();
-};
-
-}//end namespace cx
-
-#endif // MESHTEXTUREWIDGET_H
+} // namespace cx

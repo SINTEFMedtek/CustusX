@@ -70,12 +70,12 @@ MeshPtr Mesh::create(const QString& uid, const QString& name)
 }
 
 Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData) :
-    Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray(""), mTextureType(""), mTextureFile("")
+    Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray("")
 {
 	if (!mVtkPolyData)
 		mVtkPolyData = vtkPolyDataPtr::New();
-    //vtktexture
 	connect(&mProperties, &MeshPropertyData::changed, this, &Mesh::meshChanged);
+    connect(&mTextureData, &MeshTextureData::changed, this, &Mesh::meshChanged);
 	mShowGlyph = shouldGlyphBeEnableByDefault();
     mGlyphLUT ="Citrus";
     this->setAcquisitionTime(QDateTime::currentDateTime());
@@ -166,6 +166,7 @@ void Mesh::addXml(QDomNode& dataNode)
 	QDomNode meshNode = dataNode;
 
 	mProperties.addXml(dataNode);
+    mTextureData.addXml(dataNode);
 
     QDomElement glyphNode = doc.createElement("glyph");
     QDomElement elemGlyph = glyphNode.toElement();
@@ -188,6 +189,7 @@ void Mesh::parseXml(QDomNode& dataNode)
 		return;
 
 	mProperties.parseXml(dataNode);
+    mTextureData.parseXml(dataNode);
 
     QDomNode glyphNode = dataNode.namedItem("glyph");
     if (!glyphNode.isNull())
@@ -298,14 +300,14 @@ const char * Mesh::getGlyphLUT()
     return mGlyphLUT.c_str();
 }
 
-const char *Mesh::getTextureType()
+QString Mesh::getTextureType()
 {
-    return mTextureType.c_str();
+    return mTextureData.mTextureType->getValue();
 }
 
-const char *Mesh::getTextureFile()
+QString Mesh::getTextureFile()
 {
-    return mTextureFile.c_str();
+    return mTextureData.mTextureFile->getValue();
 }
 
 void Mesh::setGlyphLUT(const char * glyphLUT)
@@ -316,44 +318,53 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
 
 void Mesh::setTextureType(const char *textureType)
 {
-    mTextureType = textureType;
+    mTextureData.mTextureType->setValue(textureType);
     this->updateVtkPolyDataWithTexture();
     emit meshChanged();
 }
 
 void Mesh::setTextureFile(const char *textureFile)
 {
-    mTextureFile = textureFile;
+    mTextureData.mTextureFile->setValue(textureFile);
     this->updateVtkPolyDataWithTexture();
     emit meshChanged();
 }
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-    if(mTextureFile.empty() || mTextureType.empty())
+    if(mTextureData.mTextureFile.get()->getValue().isEmpty() || mTextureData.mTextureType.get()->getValue().isEmpty())
         return;
+
+    QString textureType = this->getTextureType();
 
     //create texture coordinates
     vtkSmartPointer<vtkDataSetAlgorithm> tMapper;
-    if (mTextureType == "Cylinder")
+//    if(mVtkTexture)
+//        mVtkTexture = vtkSmartPointer<vtkTexture>::New();
+    if (textureType == "None")
+    {
+        if(mVtkTexture)
+            mVtkTexture = vtkSmartPointer<vtkTexture>::New();
+        //mVtkTexture = vtkSmartPointer<vtkTexture>::New();
+        return;
+    }
+    else if (textureType == "Cylinder")
     {
         tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
-        //vtkSmartPointer<vtkTextureMapToCylinder> tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
+        dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
     }
-    if (mTextureType == "Plane")
+    else if (textureType == "Plane")
     {
         tMapper = vtkSmartPointer<vtkTextureMapToPlane>::New();
-        //vtkSmartPointer<vtkTextureMapToCylinder> tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
     }
-    if (mTextureType == "Sphere")
+    else if (textureType == "Sphere")
     {
         tMapper = vtkSmartPointer<vtkTextureMapToSphere>::New();
-        //vtkSmartPointer<vtkTextureMapToCylinder> tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
     }
     else
     {
+        return;
         tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
-        //vtkSmartPointer<vtkTextureMapToCylinder> tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
     }
     //tMapper->SetInputConnection(mVtkPolyData->);
     tMapper->SetInputData(mVtkPolyData);
@@ -361,8 +372,8 @@ void Mesh::updateVtkPolyDataWithTexture()
 
     //read texture file
     vtkSmartPointer<vtkImageReader2Factory> readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
-    vtkImageReader2 *imageReader = readerFactory->CreateImageReader2(mTextureFile.c_str());
-    imageReader->SetFileName(mTextureFile.c_str());
+    vtkImageReader2 *imageReader = readerFactory->CreateImageReader2(this->getTextureFile().toStdString().c_str());
+    imageReader->SetFileName(this->getTextureFile().toStdString().c_str());
 
     //create texture
     //vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
@@ -377,7 +388,8 @@ void Mesh::updateVtkPolyDataWithTexture()
     vtkSmartPointer<vtkTransformTextureCoords> transformTexture = vtkSmartPointer<vtkTransformTextureCoords>::New();
     transformTexture->SetInputConnection(tMapper->GetOutputPort());
     transformTexture->SetPosition(translate);
-    transformTexture->SetScale(10,10,1);
+    //transformTexture->SetScale(10,10,1);
+    transformTexture->SetScale(2,2,1);
     transformTexture->Update();
 
     //mVtkPolyData = transformTexture->GetOutputPort();
@@ -399,7 +411,12 @@ QStringList Mesh::getColorArrayList()
 
 const MeshPropertyData& Mesh::getProperties() const
 {
-	return mProperties;
+    return mProperties;
+}
+
+const MeshTextureData &Mesh::getTextureData() const
+{
+    return mTextureData;
 }
 
 DoubleBoundingBox3D Mesh::boundingBox() const

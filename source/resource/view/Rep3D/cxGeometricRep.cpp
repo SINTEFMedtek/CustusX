@@ -137,6 +137,9 @@ void GraphicalGeometric::meshChangedSlot()
 		mGraphicalGlyph3DDataPtr->setScaleFactor(mMesh->getVisSize());
 	}
 
+    //NB rekkefølge!Må kalle denne før de to set under.
+    mMesh->updateVtkPolyDataWithTexture();
+
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
     mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
 	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData

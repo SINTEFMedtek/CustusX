@@ -46,10 +46,33 @@ MeshTextureWidget::MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelecto
       mViewService(viewService),
       mMeshSelector(meshSelector)
 {
+    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+    QGridLayout* gridLayout = new QGridLayout;
+    gridLayout->setMargin(0);
+    toptopLayout->addLayout(gridLayout);
+    mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
+    toptopLayout->addWidget(mOptionsWidget);
+    toptopLayout->addStretch();
+
+    this->clearUI();
     connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
-    this->addWidgets();
-    this->meshSelectedSlot();
+    this->setModified();
+
+    //this->addWidgets();
+    //this->meshSelectedSlot();
+
+
     //connect(mTextureTypeAdapter.get(), &Property::changed, mMesh.get(), &Mesh::updateVtkPolyDataWithTexture);
+}
+
+MeshTextureWidget::~MeshTextureWidget()
+{
+
+}
+
+void MeshTextureWidget::prePaintEvent()
+{
+    this->setupUI();
 }
 
 void MeshTextureWidget::meshSelectedSlot()
@@ -59,44 +82,44 @@ void MeshTextureWidget::meshSelectedSlot()
 
     if(mMesh)
     {
-        disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+        //disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
     }
 
     mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+
+    this->clearUI();
 
     if (!mMesh)
     {
         return;
     }
-    //mTextureTypeAdapter->setData(mMesh);
-    mTextureTypeAdapter->setValue(mMesh->getTextureType());
-    //mTextureFile->setData(mMesh);
-    mTextureFile->setValue(mMesh->getTextureFile());
+    //mTextureType->setValue(mMesh->getTextureType());
+    //mTextureFile->setValue(mMesh->getTextureFile());
 
-    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+    //connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 }
 
-void MeshTextureWidget::meshChangedSlot()
-{
-    if(!mMesh)
-        return;
-}
+//void MeshTextureWidget::meshChangedSlot()
+//{
+//    if(!mMesh)
+//        return;
+//}
 
-void MeshTextureWidget::textureTypeChangedSlot()
-{
-    if(!mMesh)
-        return;
+//void MeshTextureWidget::textureTypeChangedSlot()
+//{
+//    if(!mMesh)
+//        return;
 
-    mMesh->setTextureType(mTextureTypeAdapter->getValue().toStdString().c_str());
-}
+//    mMesh->setTextureType(mTextureType->getValue().toStdString().c_str());
+//}
 
-void MeshTextureWidget::textureFileChangedSlot()
-{
-    if(!mMesh)
-        return;
+//void MeshTextureWidget::textureFileChangedSlot()
+//{
+//    if(!mMesh)
+//        return;
 
-    mMesh->setTextureFile(mTextureFile->getValue().toStdString().c_str());
-}
+//    mMesh->setTextureFile(mTextureFile->getValue().toStdString().c_str());
+//}
 
 //void MeshTextureWidget::updateVtkPolyDataWithTexture()
 //{
@@ -105,45 +128,53 @@ void MeshTextureWidget::textureFileChangedSlot()
 //        mMesh->updateVtkPolyDataWithTexture();
 //}
 
-void MeshTextureWidget::addWidgets()
+//void MeshTextureWidget::addWidgets()
+//{
+//    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+//    QGridLayout* gridLayout = new QGridLayout;
+//    gridLayout->setMargin(0);
+//    toptopLayout->addLayout(gridLayout);
+
+
+//    connect(mTextureType.get(), &Property::changed, this, &MeshTextureWidget::textureTypeChangedSlot);
+//    connect(mTextureFile.get(), &Property::changed, this, &MeshTextureWidget::textureFileChangedSlot);
+
+//    mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
+//    toptopLayout->addWidget(mOptionsWidget);
+
+//    std::vector<PropertyPtr> options;
+//    options.push_back(mTextureFile);
+//    options.push_back(mTextureType);
+
+//    mOptionsWidget->setOptions("mesh_texture_options_widget", options, true);
+
+//    toptopLayout->addStretch();
+
+//}
+
+void MeshTextureWidget::clearUI()
 {
-    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-    QGridLayout* gridLayout = new QGridLayout;
-    gridLayout->setMargin(0);
-    toptopLayout->addLayout(gridLayout);
+    //mOptionsWidget->setWidgetDeleteOld(new QLabel("no\nmesh\nselected"));
+    this->setModified();
+}
 
-    //mTextureTypeAdapter = StringPropertyTextureType::New(mPatientModelService);
-    mTextureTypeAdapter = StringProperty::initialize("texture_coordinates", "Texture coordinates",
-                                                 "Try to match the mesh to this type of texture coordinates.",
-                                                 "Cylinder",
-                                                 QStringList()
-                                                 << "Cylinder"
-                                                 << "Plane"
-                                                 << "Sphere");
+void MeshTextureWidget::setupUI()
+{
+    if (!mMesh)
+        return;
 
-    //mTextureFile = FilePathPropertyTextureFile::New(mPatientModelService);
-    mTextureFile = FilePathProperty::initialize("texture_file", "Texture file", "Picture file with the texture", "", QStringList() << "");
+//    QWidget* widget = new QWidget;
+//    QGridLayout* layout = new QGridLayout(widget);
+//    layout->setMargin(0);
+//    mPropertiesWidget->setWidgetDeleteOld(widget);
 
+    std::vector<PropertyPtr> properties = mMesh->getTextureData().mProperties;
+    mOptionsWidget->setOptions("lol_jon", properties, true);
 
-    
-    //int row = 1;
-    //new FilenameWidget(this, mTextureFile, gridLayout, row++);
-    //new LabeledComboBoxWidget(this, mTextureTypeAdapter, gridLayout, row++);
-
-    connect(mTextureTypeAdapter.get(), &Property::changed, this, &MeshTextureWidget::textureTypeChangedSlot);
-    connect(mTextureFile.get(), &Property::changed, this, &MeshTextureWidget::textureFileChangedSlot);
-
-    mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
-    toptopLayout->addWidget(mOptionsWidget);
-
-    std::vector<PropertyPtr> options;
-    options.push_back(mTextureFile);
-    options.push_back(mTextureTypeAdapter);
-
-    mOptionsWidget->setOptions("mesh_texture_options_widget", options, true);
-
-    toptopLayout->addStretch();
-
+//    for (unsigned i=0; i<properties.size(); ++i)
+//    {
+//        createDataWidget(mViewService, mPatientModelService, this, properties[i], layout, i);
+//    }
 }
 
 }//end namespace cx

@@ -1,7 +1,7 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
-Copyright (c) 2008-2016, SINTEF Department of Medical Technology
+Copyright (c) 2008-2014, SINTEF Department of Medical Technology
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,62 +29,43 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef MESHTEXTUREWIDGET_H
-#define MESHTEXTUREWIDGET_H
 
-#include "cxGuiExport.h"
-#include "cxBaseWidget.h"
-#include "cxDataInterface.h"
+#ifndef MESHTEXTUREDATA_H
+#define MESHTEXTUREDATA_H
 
-#include "cxOptionsWidget.h"
+#include "cxResourceExport.h"
+#include "cxStringProperty.h"
+#include "cxFilePathProperty.h"
 
+
+class QDomNode;
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
-class cxGui_EXPORT MeshTextureWidget : public BaseWidget
+/**
+ * Mesh texture data used in a vtkProperty
+ */
+class cxResource_EXPORT MeshTextureData : public QObject
 {
     Q_OBJECT
-
 public:
-    MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector,
-                      PatientModelServicePtr patientModelService, ViewServicePtr viewService,
-                      QWidget *parent);
+    MeshTextureData();
+    void addXml(QDomNode& dataNode);
+    void parseXml(QDomNode &dataNode);
 
-    virtual ~MeshTextureWidget();
-    SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+    std::vector<PropertyPtr> mProperties;
 
-protected slots:
-    void setupUI();
-    virtual void prePaintEvent();
-    void meshSelectedSlot();
+    StringPropertyPtr mTextureType;
+    FilePathPropertyPtr mTextureFile;
 
-//    void meshChangedSlot();
-//    void textureTypeChangedSlot();
-//    void textureFileChangedSlot();
-    //void updateVtkPolyDataWithTexture();
-
+signals:
+    void changed();
 private:
-//    void addWidgets();
-
-    MeshPtr mMesh;
-    SelectDataStringPropertyBasePtr mMeshSelector;
-
-    OptionsWidget* mOptionsWidget;
-
-    //StringPropertyPtr mTextureType;
-    //FilePathPropertyPtr mTextureFile;
-
-    PatientModelServicePtr mPatientModelService;
-    ViewServicePtr mViewService;
-
-    MeshTextureWidget();
-
-    void clearUI();
+    void addProperty(PropertyPtr property);
+    void initialize();
 };
 
-}//end namespace cx
+} // namespace cx
 
-#endif // MESHTEXTUREWIDGET_H
+#endif // MESHTEXTUREDATA_H

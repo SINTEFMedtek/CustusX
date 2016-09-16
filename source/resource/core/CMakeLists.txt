@@ -12,6 +12,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxRegistrationTransform
     Data/cxMesh
 	Data/cxMeshPropertyData
+    Data/cxMeshTextureData
     Data/cxPresets
     Data/cxTransferFunctions3DPresets
     Data/cxPointMetric

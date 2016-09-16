@@ -85,8 +85,6 @@ public:
      */
     static FilePathPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
         QStringList paths, QDomNode root = QDomNode());
-    //Jon, is it ok to make the constructor public?? Needed to compile.
-    FilePathProperty();
 public:
     // inherited interface
     virtual QString getDisplayName() const;///< name of data entity. Used for display to user.
@@ -106,7 +104,7 @@ signals:
     void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
-    //FilePathProperty();
+    FilePathProperty();
     QString mName;
     QString mUid;
     QString mHelp;

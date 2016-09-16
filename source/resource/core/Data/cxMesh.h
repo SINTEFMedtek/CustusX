@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 #include "cxPrecompiledHeader.h"
+#include "cxMeshTextureData.h"
 
 #include <set>
 #include <boost/shared_ptr.hpp>
@@ -102,12 +103,13 @@ public:
     const char * getOrientationArray();
     const char * getColorArray();
     const char * getGlyphLUT();
-    const char * getTextureType();
-    const char * getTextureFile();
+    QString getTextureType();
+    QString getTextureFile();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
 //	void setProperties(const MeshPropertyData& data);
 	const MeshPropertyData& getProperties() const;
+    const MeshTextureData& getTextureData() const;
 
 	virtual void save(const QString &basePath);
 signals:
@@ -132,11 +134,10 @@ private:
     std::string mOrientationArray;
     std::string mColorArray;
     std::string mGlyphLUT;
-    std::string mTextureType;
-    std::string mTextureFile;
     QStringList mOrientationArrayList;
     QStringList mColorArrayList;
 	MeshPropertyData mProperties;
+    MeshTextureData mTextureData;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

@@ -404,63 +404,6 @@ protected:
 };
 
 
-typedef boost::shared_ptr<class StringPropertyTextureType> StringPropertyTextureTypePtr;
-
-/**
- * \brief Adapter that selects the type of texture coordinates to be used.
- */
-class cxGui_EXPORT StringPropertyTextureType : public StringPropertyBase
-{
-  Q_OBJECT
-public:
-  static StringPropertyTextureTypePtr New(PatientModelServicePtr patientModelService) { return StringPropertyTextureTypePtr(new StringPropertyTextureType(patientModelService)); }
-  StringPropertyTextureType(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertyTextureType();
-  void setData(MeshPtr data);
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-
-protected:
-  MeshPtr mData;
-  PatientModelServicePtr mPatientModelService;
-};
-
-
-typedef boost::shared_ptr<class FilePathPropertyTextureFile> FilePathPropertyTextureFilePtr;
-
-/**
- * \brief Adapter that selects the type of texture coordinates to be used.
- */
-class cxGui_EXPORT FilePathPropertyTextureFile : public FilePathProperty
-{
-  Q_OBJECT
-public:
-  static FilePathPropertyTextureFilePtr New(PatientModelServicePtr patientModelService) { return FilePathPropertyTextureFilePtr(new FilePathPropertyTextureFile(patientModelService)); }
-  FilePathPropertyTextureFile(PatientModelServicePtr patientModelService);
-  virtual ~FilePathPropertyTextureFile();
-  void setData(MeshPtr data);
-
-public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-//  virtual QStringList getValueRange() const;
-
-protected:
-  MeshPtr mData;
-  PatientModelServicePtr mPatientModelService;
-};
-
 } // namespace cx
 
 
