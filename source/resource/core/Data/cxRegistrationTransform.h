@@ -90,7 +90,7 @@ cxResource_EXPORT bool operator==(const RegistrationTransform& lhs, const Regist
 class cxResource_EXPORT ParentSpace
 {
 public:
-	QString mValue;///< parent frame uid
+	QString mUid;///< parent frame uid
 	QDateTime mTimestamp; ///< time the transform was registrated.
 	QString mType; ///< description of the kind if registration (manual, patient, landmark, coregistration etc)
 
@@ -122,11 +122,10 @@ public:
 	virtual void parseXml(QDomNode& dataNode);///< read internal state from node
 
 	virtual void setRegistration(const Transform3D& transform);
-	virtual void addRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
+	virtual void addOrUpdateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
 	virtual void setParentSpace(const QString& newParent);
 	virtual void addParentSpace(const QString& newParent);
-	virtual void addParentSpace(const ParentSpace& newParent);
 	virtual void updateParentSpace(const QDateTime& oldTime, const ParentSpace& newParent);
 
 	virtual std::vector<RegistrationTransform> getData() const;
@@ -147,6 +146,7 @@ public:
 signals:
 	void currentChanged();
 private:
+	virtual void addParentSpace(const ParentSpace& newParent);
 	virtual void addRegistrationInternal(const RegistrationTransform& transform);
 	void setCache(const RegistrationTransform& val, const ParentSpace& parent, const QDateTime& timestamp);
 	static RegistrationHistoryPtr mNull;

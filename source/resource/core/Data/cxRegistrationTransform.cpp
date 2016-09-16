@@ -58,13 +58,13 @@ public:
 	{
 	}
 
-	virtual void addRegistration(const RegistrationTransform& transform)
+	virtual void addOrUpdateRegistration(const RegistrationTransform& transform)
 	{
 	}
 	virtual void setRegistration(const Transform3D& transform)
 	{
 	}
-	virtual void addRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+	virtual void addOrUpdateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 	{
 	}
 
@@ -185,7 +185,7 @@ ParentSpace::ParentSpace()
 
 ParentSpace::ParentSpace(const QString& uid, const QDateTime& timestamp, const QString& type)
 {
-	mValue = uid;
+	mUid = uid;
 	mTimestamp = timestamp;
 	mType = type;
 }
@@ -196,7 +196,7 @@ void ParentSpace::addXml(QDomNode& parentNode) const ///< write internal state t
 	QDomElement base = doc.createElement("parentFrame");
 	parentNode.appendChild(base);
 
-	base.setAttribute("value", mValue);
+	base.setAttribute("value", mUid);
 	base.setAttribute("timestamp", mTimestamp.toString(timestampSecondsFormat()));
 	base.setAttribute("type", mType);
 }
@@ -210,7 +210,7 @@ void ParentSpace::parseXml(QDomNode& dataNode)///< read internal state from node
 
 	mTimestamp = QDateTime::fromString(base.attribute("timestamp"), timestampSecondsFormat());
 	mType = base.attribute("type");
-	mValue = base.attribute("value");
+	mUid = base.attribute("value");
 }
 
 bool operator<(const ParentSpace& lhs, const ParentSpace& rhs)
@@ -220,7 +220,7 @@ bool operator<(const ParentSpace& lhs, const ParentSpace& rhs)
 
 bool operator==(const ParentSpace& lhs, const ParentSpace& rhs)
 {
-	return (lhs.mValue == rhs.mValue) && (lhs.mTimestamp == rhs.mTimestamp) && (lhs.mType == rhs.mType);
+	return (lhs.mUid == rhs.mUid) && (lhs.mTimestamp == rhs.mTimestamp) && (lhs.mType == rhs.mType);
 }
 
 //---------------------------------------------------------
@@ -314,20 +314,19 @@ void RegistrationHistory::addRegistrationInternal(const RegistrationTransform& t
 /**
  * Add one registration transform to the history.
  * Replace the registration performed at oldTime with the new one, if the old is marked as temporary.
+ * Add = push
+ * Update = pop + push
  */
-void RegistrationHistory::addRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
+void RegistrationHistory::addOrUpdateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 {
-	if(newTransform.mTemp)
+	for (std::vector<RegistrationTransform>::iterator iter = mData.begin(); iter != mData.end(); ++iter)
 	{
-		for (std::vector<RegistrationTransform>::iterator iter = mData.begin(); iter != mData.end(); ++iter)
+		if ((iter->mTimestamp == oldTime)
+				&& oldTime.isValid()
+				&& iter->mTemp)
 		{
-			if ((iter->mTimestamp == oldTime)
-					&& oldTime.isValid()
-					&& iter->mTemp)
-			{
-				mData.erase(iter);
-				break;
-			}
+			mData.erase(iter);
+			break;
 		}
 	}
 	this->addRegistrationInternal(newTransform);
@@ -367,8 +366,11 @@ void RegistrationHistory::addParentSpace(const QString& newParent)
 
 void RegistrationHistory::addParentSpace(const ParentSpace& newParent)
 {
-	if (std::count(mParentSpaces.begin(), mParentSpaces.end(), newParent)) // ignore if already present
-		return;
+	for (int i = 0; i < mParentSpaces.size(); ++i)
+	{
+		if(mParentSpaces[i].mUid == newParent.mUid)
+			return;// ignore if already present
+	}
 
 	mParentSpaces.push_back(newParent);
 	std::sort(mParentSpaces.begin(), mParentSpaces.end());
@@ -421,6 +423,18 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
 			++iter;
 		}
 	}
+
+//	for (int i = 0; i < mParentSpaces.size(); ++i)
+//	{
+//		if(mParentSpaces[i].mTimestamp >= timestamp)
+//		{
+//			std::cout << "RegistrationHistory::removeNewerThan(" << timestamp.toString(timestampSecondsFormatNice())
+//					  << "): removed parent frame [" << mParentSpaces[i].mTimestamp.toString(timestampSecondsFormatNice()) << ", "
+//					  << mParentSpaces[i].mType << "]" << std::endl;
+//			mParentSpaces.erase(mParentSpaces.at(i));
+//		}
+//	}
+
 
 	for (std::vector<ParentSpace>::iterator iter = mParentSpaces.begin(); iter != mParentSpaces.end();)
 	{

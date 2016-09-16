@@ -357,7 +357,6 @@ void RegistrationImplService::doImageRegistration(bool translationOnly)
 	}
 	else
 	{
-		Transform3D rMd;
 		delta = this->performLandmarkRegistration(p_moving_r, p_fixed_r, &ok);
 		idString = QString("Image to Image Landmark");
 	}
@@ -415,23 +414,23 @@ Transform3D RegistrationImplService::performLandmarkRegistration(vtkPointsPtr so
 	return tar_M_src;
 }
 
-void RegistrationImplService::addImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationImplService::addImage2ImageRegistration(Transform3D dMd, QString description)
 {
-	this->performImage2ImageRegistration(delta_pre_rMd, description);
+	this->performImage2ImageRegistration(dMd, description, true);
 }
 
-void RegistrationImplService::updateImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationImplService::updateImage2ImageRegistration(Transform3D dMd, QString description)
 {
-	this->performImage2ImageRegistration(delta_pre_rMd, description, true);
+	this->performImage2ImageRegistration(dMd, description, true);
 }
 
-void RegistrationImplService::performImage2ImageRegistration(Transform3D delta_pre_rMd, QString description, bool temporaryRegistration)
+void RegistrationImplService::performImage2ImageRegistration(Transform3D dMd, QString description, bool temporaryRegistration)
 {
-	RegistrationTransform regTrans(delta_pre_rMd, QDateTime::currentDateTime(), description, temporaryRegistration);
+	RegistrationTransform regTrans(dMd, QDateTime::currentDateTime(), description, temporaryRegistration);
 	regTrans.mFixed = mFixedData;
 	regTrans.mMoving = mMovingData;
 
-	this->updateRegistration(mLastRegistrationTime, regTrans, this->getMovingData());
+	this->updateRegistration_rMd(mLastRegistrationTime, regTrans, this->getMovingData());
 
 	mLastRegistrationTime = regTrans.mTimestamp;
 	if(!temporaryRegistration)
@@ -465,12 +464,13 @@ void RegistrationImplService::performPatientRegistration(Transform3D rMpr_new, Q
  * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
  *
  */
-void RegistrationImplService::updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data)
+void RegistrationImplService::updateRegistration_rMd(QDateTime oldTime, RegistrationTransform dMd, DataPtr data)
 {
 	RegistrationApplicator applicator(mPatientModelService->getDatas());
-	applicator.updateRegistration(oldTime, deltaTransform, data);
+	dMd.mMoving = data->getUid();
+	applicator.updateRegistration(oldTime, dMd);
 
-	bool silent = deltaTransform.mTemp;
+	bool silent = dMd.mTemp;
 	if(!silent)
 		mPatientModelService->autoSave();
 }
@@ -517,7 +517,7 @@ void RegistrationImplService::applyPatientOrientation(const Transform3D& tMtm, c
 		DataPtr current = iter->second;
 		RegistrationTransform newTransform = regTrans;
 		newTransform.mValue = regTrans.mValue * current->get_rMd();
-		current->get_rMd_History()->addRegistration(oldTime, newTransform);
+		current->get_rMd_History()->addOrUpdateRegistration(oldTime, newTransform);
 
 		report("Updated registration of data " + current->getName());
 		std::cout << "rMd_new\n" << newTransform.mValue << std::endl;

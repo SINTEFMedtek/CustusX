@@ -70,7 +70,7 @@ Transform3D PatientModelService::get_rMpr() const
 
 void PatientModelService::updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform)
 {
-	this->get_rMpr_History()->addRegistration(oldTime, newTransform);
+	this->get_rMpr_History()->addOrUpdateRegistration(oldTime, newTransform);
 
 	if(!newTransform.mTemp)
 		this->autoSave();

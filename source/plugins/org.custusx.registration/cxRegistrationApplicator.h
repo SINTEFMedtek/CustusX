@@ -57,7 +57,7 @@ public:
   RegistrationApplicator(const std::map<QString, DataPtr>& source);
   ~RegistrationApplicator();
 
-  virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform, DataPtr data);
+  virtual void updateRegistration(QDateTime oldTime, RegistrationTransform deltaTransform);
 
 private:
   std::map<QString, DataPtr> mSource;

@@ -120,7 +120,7 @@ QString Data::getSpace()
 
 QString Data::getParentSpace()
 {
-	return m_rMd_History->getCurrentParentSpace().mValue;
+	return m_rMd_History->getCurrentParentSpace().mUid;
 }
 
 void Data::addXml(QDomNode& dataNode)
