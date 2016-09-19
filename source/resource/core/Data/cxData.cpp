@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLandmark.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxLogger.h"
+#include "cxBoundingBox3D.h"
 
 namespace cx
 {
@@ -121,6 +122,23 @@ QString Data::getSpace()
 QString Data::getParentSpace()
 {
 	return m_rMd_History->getCurrentParentSpace().mValue;
+}
+
+std::vector<Vector3D> Data::getPointCloud() const
+{
+	DoubleBoundingBox3D bb = this->boundingBox();
+	std::vector<Vector3D> retval;
+
+	for (unsigned x=0; x<2; ++x)
+		for (unsigned y=0; y<2; ++y)
+			for (unsigned z=0; z<2; ++z)
+				retval.push_back(bb.corner(x,y,z));
+
+//	Transform3D rMd = this->get_rMd();
+//	for (unsigned i=0; i<retval.size(); ++i)
+//		retval[i] = rMd.coord(retval[i]);
+
+	return retval;
 }
 
 void Data::addXml(QDomNode& dataNode)

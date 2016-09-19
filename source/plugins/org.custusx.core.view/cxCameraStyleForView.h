@@ -153,6 +153,7 @@ private:
 	CameraInfo viewEntireAutoZoomROI(CameraInfo info);
 	void updateCamera(CameraInfo info);
 	Vector3D getToolTip_r();
+	Transform3D get_rMto();
 };
 
 /**

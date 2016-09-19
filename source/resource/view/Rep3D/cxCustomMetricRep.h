@@ -74,7 +74,7 @@ private:
     CustomMetricRep();
     CustomMetricPtr getCustomMetric();
     void updateSTLModel();
-	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale);
+//	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale);
 
 	std::vector<GraphicalGeometricPtr> mGeometry;
 };

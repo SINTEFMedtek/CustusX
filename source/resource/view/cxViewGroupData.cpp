@@ -106,7 +106,9 @@ void CameraStyleData::clear()
 {
 	mCameraFollowTool = false;
 	mFocusFollowTool = false;
-	mCameraOnTooltip = false;
+	mCameraLockToTooltip = false;
+	mCameraTooltipOffset = 0;
+	mCameraNotBehindROI = false;
 	mTableLock = false;
 	mElevation = 0;
 	mUniCam = false;
@@ -119,7 +121,9 @@ void CameraStyleData::addXml(QDomNode &dataNode)
 	QDomElement elem = dataNode.toElement();
 	elem.setAttribute("cameraFollowTool", mCameraFollowTool);
 	elem.setAttribute("focusFollowTool", mFocusFollowTool);
-	elem.setAttribute("cameraOnTooltip", mCameraOnTooltip);
+	elem.setAttribute("cameraOnTooltip", mCameraLockToTooltip);
+	elem.setAttribute("cameraTooltipOffset", mCameraTooltipOffset);
+	elem.setAttribute("cameraNotBehindROI", mCameraNotBehindROI);
 	elem.setAttribute("tableLock", mTableLock);
 	elem.setAttribute("elevation", mElevation);
 	elem.setAttribute("uniCam", mUniCam);
@@ -132,7 +136,9 @@ void CameraStyleData::parseXml(QDomNode dataNode)
 	QDomElement elem = dataNode.toElement();
 	mCameraFollowTool = elem.attribute("cameraFollowTool", QString::number(mCameraFollowTool)).toInt();
 	mFocusFollowTool = elem.attribute("focusFollowTool", QString::number(mFocusFollowTool)).toInt();
-	mCameraOnTooltip = elem.attribute("cameraOnTooltip", QString::number(mCameraOnTooltip)).toInt();
+	mCameraLockToTooltip = elem.attribute("cameraOnTooltip", QString::number(mCameraLockToTooltip)).toInt();
+	mCameraTooltipOffset = elem.attribute("cameraTooltipOffset", QString::number(mCameraTooltipOffset)).toDouble();
+	mCameraNotBehindROI = elem.attribute("cameraNotBehindROI", QString::number(mCameraNotBehindROI)).toInt();
 	mTableLock = elem.attribute("tableLock", QString::number(mTableLock)).toInt();
 	mElevation = elem.attribute("elevation", QString::number(mElevation)).toDouble();
 	mUniCam = elem.attribute("uniCam", QString::number(mUniCam)).toInt();
@@ -144,7 +150,9 @@ bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs)
 {
 	return ((lhs.mCameraFollowTool==rhs.mCameraFollowTool) &&
 			(lhs.mFocusFollowTool==rhs.mFocusFollowTool) &&
-			(lhs.mCameraOnTooltip==rhs.mCameraOnTooltip) &&
+			(lhs.mCameraLockToTooltip==rhs.mCameraLockToTooltip) &&
+			(lhs.mCameraTooltipOffset==rhs.mCameraTooltipOffset) &&
+			(lhs.mCameraNotBehindROI==rhs.mCameraNotBehindROI) &&
 			(lhs.mTableLock==rhs.mTableLock) &&
 			similar(lhs.mElevation, rhs.mElevation) &&
 			(lhs.mUniCam==rhs.mUniCam) &&

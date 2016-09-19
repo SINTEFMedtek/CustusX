@@ -150,25 +150,22 @@ void CameraStyleForView::applyCameraStyle()
 
 	if (mFollowingTool)
 	{
-		Transform3D rMpr = mBackend->patient()->get_rMpr();
-		Transform3D prMt = mFollowingTool->get_prMt();
-		Transform3D rMt = rMpr * prMt;
-		double offset = mFollowingTool->getTooltipOffset();
+		Transform3D rMto = this->get_rMto();
 
 		// view up is relative to tool
-		cam_new.vup = rMt.vector(Vector3D(-1, 0, 0));
+		cam_new.vup = rMto.vector(Vector3D(-1, 0, 0));
 
 		if (mStyle.mFocusFollowTool)
 		{
 			// set focus to tool offset point
-			cam_new.focus = rMt.coord(Vector3D(0, 0, offset));
+			cam_new.focus = rMto.coord(Vector3D::Zero());
 		}
 
 		if (mStyle.mCameraFollowTool)
 		{
 			// set camera on the tool line, keeping the previous distance from the focus.
-			Vector3D tooloffset = rMt.coord(Vector3D(0, 0, offset));
-			Vector3D e_tool = rMt.vector(Vector3D(0, 0, 1));
+			Vector3D tooloffset = rMto.coord(Vector3D::Zero());
+			Vector3D e_tool = rMto.vector(Vector3D(0, 0, 1));
 			cam_new.pos = NavigationAlgorithms::findCameraPosOnLineFixedDistanceFromFocus(tooloffset,
 																					   e_tool,
 																					   cam_old.distance(),
@@ -180,11 +177,6 @@ void CameraStyleForView::applyCameraStyle()
 	{
 		Vector3D table_up = mBackend->patient()->getOperatingTable().getVectorUp();
 		cam_new.vup = table_up;
-	}
-
-	if (mStyle.mCameraFollowTool)
-	{
-		cam_new.pos = NavigationAlgorithms::elevateCamera(mStyle.mElevation, cam_new.pos, cam_new.focus, cam_new.vup);
 	}
 
 	// reset vup based on vpn (do not change vpn after this point)
@@ -208,17 +200,28 @@ void CameraStyleForView::applyCameraStyle()
 //		cam_new.focus += delta;
 //	}
 
+	if (mStyle.mCameraFollowTool)
+	{
+		cam_new.pos = NavigationAlgorithms::elevateCamera(mStyle.mElevation, cam_new.pos, cam_new.focus, cam_new.vup);
+	}
+
 	this->updateCamera(cam_new);
+}
+
+Transform3D CameraStyleForView::get_rMto()
+{
+	Transform3D rMpr = mBackend->patient()->get_rMpr();
+	Transform3D prMt = mFollowingTool->get_prMt();
+	double offset = mFollowingTool->getTooltipOffset();
+	Transform3D tMto = createTransformTranslate(Vector3D(0, 0, offset));
+	Transform3D rMto = rMpr * prMt * tMto;
+	return rMto;
 }
 
 Vector3D CameraStyleForView::getToolTip_r()
 {
-	Transform3D rMpr = mBackend->patient()->get_rMpr();
-	Transform3D prMt = mFollowingTool->get_prMt();
-	Transform3D rMt = rMpr * prMt;
-	double offset = mFollowingTool->getTooltipOffset();
-	Vector3D tool_r = rMt.coord(Vector3D(0, 0, offset));
-	return tool_r;
+	Transform3D rMto = this->get_rMto();
+	return rMto.coord(Vector3D::Zero());
 }
 
 void debugPrint(CameraInfo info)
@@ -282,27 +285,29 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 	// IF in front of bb: do nothing.
 	// IF in bbx2: interpolate between the two
 	// IF behind bb: keep pos inside bb
-	if (mStyle.mCameraOnTooltip && mFollowingTool)
+	if (mStyle.mCameraLockToTooltip && mFollowingTool)
 	{
-		CX_LOG_CHANNEL_DEBUG("CA") << "";
-		Vector3D proj_tool = pMr.coord(this->getToolTip_r());
+//		CX_LOG_CHANNEL_DEBUG("CA") << "";
+		Transform3D rMto = this->get_rMto();
+		Vector3D proj_tool = (pMr*rMto).coord(Vector3D(0,0,mStyle.mCameraTooltipOffset));
+//		Vector3D proj_tool = pMr.coord(this->getToolTip_r());
 		Vector3D e_z(0,0,1);
+		double bb_extension = 50; // distance from bb where we want to interpolate between on-tool and off-tool
 		double tool_z = dot(proj_tool, e_z);
 		double bb_min_z = proj_bb[4];
 		double bb_max_z = proj_bb[5];
-		double bb_ext_z = proj_bb[5] + 50;
-		double bb_extension = 50; // distance from bb where we want to interpolate between on-tool and off-tool
-		CX_LOG_CHANNEL_DEBUG("CA") << "  tool_z="<<tool_z
-								   <<", bb_min_z="<<bb_min_z
-								   <<", bb_max_z="<<bb_max_z
-								   <<", bb_ext_z="<<bb_ext_z;
+		double bb_ext_z = proj_bb[5] + bb_extension;
+//		CX_LOG_CHANNEL_DEBUG("CA") << "  tool_z="<<tool_z
+//								   <<", bb_min_z="<<bb_min_z
+//								   <<", bb_max_z="<<bb_max_z
+//								   <<", bb_ext_z="<<bb_ext_z;
 
 		Vector3D new_pos;
-		if (tool_z < bb_min_z)
+		if (mStyle.mCameraNotBehindROI && (tool_z < bb_min_z))
 		{
 			// behind roi: lock camera pos to closest pos inside bb
 			new_pos = proj_tool + (bb_min_z-tool_z)*e_z;
-			CX_LOG_CHANNEL_DEBUG("CA") << "  **  behind roi";
+//			CX_LOG_CHANNEL_DEBUG("CA") << "  **  behind roi";
 		}
 		else
 		{
@@ -310,7 +315,7 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 			s = std::min(1.0, s);
 			s = std::max(0.0, s);
 			new_pos = (1.0-s)*proj_tool + (s)*cam_proj.pos;
-			CX_LOG_CHANNEL_DEBUG("CA") << "  **  roi pos= s=" << s;
+//			CX_LOG_CHANNEL_DEBUG("CA") << "  **  roi pos= s=" << s;
 		}
 
 		// Move the camera onto the tool tip, keeping the distance vector constant.
