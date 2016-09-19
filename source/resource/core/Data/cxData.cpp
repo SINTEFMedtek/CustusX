@@ -121,7 +121,7 @@ QString Data::getSpace()
 
 QString Data::getParentSpace()
 {
-	return m_rMd_History->getCurrentParentSpace().mValue;
+	return m_rMd_History->getCurrentParentSpace().mUid;
 }
 
 std::vector<Vector3D> Data::getPointCloud() const

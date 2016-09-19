@@ -92,6 +92,6 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	//                fQm = fMr * delta * rMm
 	Transform3D delta = rMf * fQm * rMm.inv();
 
-	mServices->registration()->applyImage2ImageRegistration(delta, "Manual Image");
+	mServices->registration()->addImage2ImageRegistration(delta, "Manual Image");
 }
 } // cx

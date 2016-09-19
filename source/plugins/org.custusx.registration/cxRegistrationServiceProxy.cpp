@@ -121,24 +121,24 @@ void RegistrationServiceProxy::doImageRegistration(bool translationOnly)
 	return mRegistrationService->doImageRegistration(translationOnly);
 }
 
-void RegistrationServiceProxy::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationServiceProxy::addImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
-	mRegistrationService->applyImage2ImageRegistration(delta_pre_rMd, description);
+	mRegistrationService->addImage2ImageRegistration(delta_pre_rMd, description);
 }
 
-void RegistrationServiceProxy::applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationServiceProxy::updateImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
-	mRegistrationService->applyContinuousImage2ImageRegistration(delta_pre_rMd, description);
+	mRegistrationService->updateImage2ImageRegistration(delta_pre_rMd, description);
 }
 
-void RegistrationServiceProxy::applyPatientRegistration(Transform3D rMpr_new, QString description)
+void RegistrationServiceProxy::addPatientRegistration(Transform3D rMpr_new, QString description)
 {
-	mRegistrationService->applyPatientRegistration( rMpr_new, description);
+	mRegistrationService->addPatientRegistration( rMpr_new, description);
 }
 
-void RegistrationServiceProxy::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+void RegistrationServiceProxy::updatePatientRegistration(Transform3D rMpr_new, QString description)
 {
-	mRegistrationService->applyContinuousPatientRegistration( rMpr_new, description);
+	mRegistrationService->updatePatientRegistration( rMpr_new, description);
 }
 
 void RegistrationServiceProxy::applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt)

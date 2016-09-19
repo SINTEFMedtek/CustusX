@@ -78,10 +78,10 @@ public:
 	virtual void doFastRegistration_Translation() = 0; ///< use the landmarks in master image and patient to perform a translation-only landmark registration
 	virtual void doFastRegistration_Orientation(const Transform3D& tMtm, const Transform3D &prMt) = 0;
 	virtual void doImageRegistration(bool translationOnly) = 0;
-	virtual void applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
-	virtual void applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
-	virtual void applyPatientRegistration(Transform3D rMpr_new, QString description) = 0;
-	virtual void applyContinuousPatientRegistration(Transform3D rMpr_new, QString description) = 0;
+	virtual void addImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
+	virtual void updateImage2ImageRegistration(Transform3D delta_pre_rMd, QString description) = 0;
+	virtual void addPatientRegistration(Transform3D rMpr_new, QString description) = 0;
+	virtual void updatePatientRegistration(Transform3D rMpr_new, QString description) = 0;
 	virtual void applyPatientOrientation(const Transform3D &tMtm, const Transform3D &prMt) = 0;
 
 	virtual QDateTime getLastRegistrationTime() = 0;
