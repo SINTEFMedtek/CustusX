@@ -217,19 +217,14 @@ RegistrationHistoryWidget::TimeMapIterators RegistrationHistoryWidget::findActiv
 		return retval;
 	}
 
-	bool found = false;
 	for (TimeMap::iterator iter = times.begin(); iter != times.end(); ++iter)
 	{
-		if(found && iter->first == retval[0]->first)
-		{
+		if(!retval.empty() && iter->first == retval[0]->first)
+			retval.push_back(iter);//Return all registrations at the same point in time
+		else if (retval.empty() && iter->first >= activeTime)
 			retval.push_back(iter);
-		}
-		else if (!found && iter->first >= activeTime)
-		{
-			found = true;
-			retval.push_back(iter);
-		}
 	}
+
 	if(retval.empty())
 		retval.push_back(times.end());
 	return retval;
