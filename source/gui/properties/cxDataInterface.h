@@ -33,10 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXDATAINTERFACE_H_
 
 #include "cxGuiExport.h"
-
 #include "cxDoublePropertyBase.h"
 #include "cxStringPropertyBase.h"
-#include "cxFilePathProperty.h"
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 

@@ -42,12 +42,21 @@ MeshTextureData::MeshTextureData()
 
 void MeshTextureData::addXml(QDomNode &dataNode)
 {
-
+    for (unsigned i=0; i<mProperties.size(); ++i)
+    {
+            XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
+            item.writeVariant(mProperties[i]->getValueAsVariant());
+    }
 }
 
 void MeshTextureData::parseXml(QDomNode &dataNode)
 {
-
+    for (unsigned i=0; i<mProperties.size(); ++i)
+    {
+            XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
+            QVariant orgval = mProperties[i]->getValueAsVariant();
+            mProperties[i]->setValueFromVariant(item.readVariant(orgval));
+    }
 }
 
 void MeshTextureData::addProperty(PropertyPtr property)
