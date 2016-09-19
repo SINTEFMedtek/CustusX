@@ -175,7 +175,7 @@ void RMPCFromPointerWidget::applyRegistration(Transform3D delta)
 	Transform3D new_rMpr = delta*rMpr;//output
 	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
 	QString text = QString("Contour from %1").arg(tool->getName());
-	mServices->registration()->applyPatientRegistration(new_rMpr, text);
+	mServices->registration()->addPatientRegistration(new_rMpr, text);
 }
 
 void RMPCFromPointerWidget::onShown()

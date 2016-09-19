@@ -71,7 +71,7 @@ public:
 		regTrans.mMoving = moving->getUid();
 
 		cx::RegistrationApplicator applicator(mData);
-		applicator.updateRegistration(oldTime, regTrans, moving);
+		applicator.updateRegistration(oldTime, regTrans);
 	}
 
 	void check(QString frame, QString parentFrame_expected, cx::Transform3D rMd_expected)
