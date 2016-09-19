@@ -424,18 +424,6 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
 		}
 	}
 
-//	for (int i = 0; i < mParentSpaces.size(); ++i)
-//	{
-//		if(mParentSpaces[i].mTimestamp >= timestamp)
-//		{
-//			std::cout << "RegistrationHistory::removeNewerThan(" << timestamp.toString(timestampSecondsFormatNice())
-//					  << "): removed parent frame [" << mParentSpaces[i].mTimestamp.toString(timestampSecondsFormatNice()) << ", "
-//					  << mParentSpaces[i].mType << "]" << std::endl;
-//			mParentSpaces.erase(mParentSpaces.at(i));
-//		}
-//	}
-
-
 	for (std::vector<ParentSpace>::iterator iter = mParentSpaces.begin(); iter != mParentSpaces.end();)
 	{
 		if (iter->mTimestamp > timestamp)

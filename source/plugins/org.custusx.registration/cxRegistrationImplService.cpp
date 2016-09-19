@@ -416,7 +416,7 @@ Transform3D RegistrationImplService::performLandmarkRegistration(vtkPointsPtr so
 
 void RegistrationImplService::addImage2ImageRegistration(Transform3D dMd, QString description)
 {
-	this->performImage2ImageRegistration(dMd, description, true);
+	this->performImage2ImageRegistration(dMd, description);
 }
 
 void RegistrationImplService::updateImage2ImageRegistration(Transform3D dMd, QString description)

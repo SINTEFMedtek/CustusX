@@ -192,21 +192,6 @@ RegistrationHistoryWidget::TimeMap RegistrationHistoryWidget::generateRegistrati
 	return retval;
 }
 
-//RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentActiveIter(TimeMap& times)
-//{
-//	QDateTime active = this->getActiveTime();
-
-//	if (!active.isValid())
-//		return times.end();
-
-//	for (TimeMap::iterator iter = times.begin(); iter != times.end(); ++iter)
-//	{
-//		if (iter->first >= active)
-//			return iter;
-//	}
-//	return times.end();
-//}
-
 RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findActiveRegistration(TimeMap& times)
 {
 	QDateTime activeTime = this->getActiveTime();
@@ -237,19 +222,16 @@ RegistrationHistoryWidget::TimeMapIterators RegistrationHistoryWidget::findActiv
 	{
 		if(found && iter->first == retval[0]->first)
 		{
-			CX_LOG_DEBUG() << "next";
 			retval.push_back(iter);
 		}
 		else if (!found && iter->first >= activeTime)
 		{
-			CX_LOG_DEBUG() << "found";
 			found = true;
 			retval.push_back(iter);
 		}
 	}
 	if(retval.empty())
 		retval.push_back(times.end());
-	CX_LOG_DEBUG() << "vector: " << retval.size();
 	return retval;
 }
 
@@ -452,17 +434,10 @@ void RegistrationHistoryWidget::fastForwardSlot()
 
 void RegistrationHistoryWidget::prePaintEvent()
 {
-	//Not used?
-//	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//	std::vector<RegistrationTransform> history = mergeHistory(raw);
-
 	TimeMap times = this->generateRegistrationTimes();
-//	std::map<QDateTime, QString>::iterator current = this->findActiveRegistrations(times).front();//TODO
 	std::map<QDateTime, QString>::iterator current = this->findActiveRegistration(times);
 	size_t behind = std::min<int>(distance(times.begin(), current), times.size() - 1);
 	size_t infront = times.size() - 1 - behind;
-	if(current != times.end())
-		CX_LOG_DEBUG() << "active reg: " << current->first.toString(timestampSecondsFormatNice()) << " " << current->second;
 
 	mRewindAction->setText("Rewind (" + qstring_cast(behind) + ")");
 	mForwardAction->setText("Forward (" + qstring_cast(infront) + ")");
