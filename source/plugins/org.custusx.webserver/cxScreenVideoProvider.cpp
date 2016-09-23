@@ -159,6 +159,8 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 		size = QSize(rect_s.width()/3, rect_s.height()/3);
 	}
 
+	QRect rect_full = QRect(QPoint(0,0), size);
+
 	// constrain widget to a max of 75% of the screen
 	size = QSize(std::min<int>(size.width(), rect_s.width()*0.75),
 				 std::min<int>(size.height(), rect_s.height()*0.75));
@@ -172,11 +174,10 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	mTopWindow->move(rect_s.width()-rect_t.width(),rect_s.height()-rect_t.height());
 
 	// set size of canvas inside widget where stuff is rendered:
-	QRect rect_l = QRect(QPoint(0,0), size);
-	mSecondaryViewLayoutWindow->setGeometry(rect_l);
+	mSecondaryViewLayoutWindow->setGeometry(rect_full);
 
-	qDebug() << "layout t: " << mTopWindow->geometry();
-	qDebug() << "layout l: " << mSecondaryViewLayoutWindow->geometry();
+	qDebug() << "layout onscreen: " << mTopWindow->geometry();
+	qDebug() << "layout internal: " << mSecondaryViewLayoutWindow->geometry();
 }
 
 void ScreenVideoProvider::closeSecondaryLayout()
