@@ -94,10 +94,12 @@ void CustomMetricRep::updateSTLModel()
 	if (!this->getView() || !custom)
 	   return;
 
-	std::vector<Vector3D> pos = custom->getPositions();
-	Vector3D dir = custom->getDirection();
-	Vector3D vup = custom->getVectorUp();
-	Vector3D scale = custom->getScale();
+	std::vector<Transform3D> pos = custom->calculateOrientations();
+
+//	std::vector<Vector3D> pos = custom->getPositions();
+//	Vector3D dir = custom->getDirection();
+//	Vector3D vup = custom->getVectorUp();
+//	Vector3D scale = custom->getScale();
 
 	mGeometry.resize(pos.size());
 
@@ -110,37 +112,37 @@ void CustomMetricRep::updateSTLModel()
 		}
 		mGeometry[i]->setMesh(custom->getMesh());
 
-		Transform3D M = this->calculateOrientation(pos[i], dir, vup, scale);
-		mGeometry[i]->setTransformOffset(M);
+//		Transform3D M = this->calculateOrientation(pos[i], dir, vup, scale);
+		mGeometry[i]->setTransformOffset(pos[i]);
 	}
 }
 
-/**
- * Based on a position+direction, view up and scale,
- * calculate an orientation matrix combining these.
- */
-Transform3D CustomMetricRep::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale)
-{
-	Transform3D R;
-	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
+///**
+// * Based on a position+direction, view up and scale,
+// * calculate an orientation matrix combining these.
+// */
+//Transform3D CustomMetricRep::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale)
+//{
+//	Transform3D R;
+//	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
 
-	if (directionAlongUp)
-	{
-		R = Transform3D::Identity();
-	}
-	else
-	{
-		Vector3D jvec = dir.normal();
-		Vector3D kvec = cross(vup, dir).normal();
-		Vector3D ivec = cross(jvec, kvec).normal();
-		Vector3D center = Vector3D::Zero();
-		R = createTransformIJC(ivec, jvec, center);
-	}
+//	if (directionAlongUp)
+//	{
+//		R = Transform3D::Identity();
+//	}
+//	else
+//	{
+//		Vector3D jvec = dir.normal();
+//		Vector3D kvec = cross(vup, dir).normal();
+//		Vector3D ivec = cross(jvec, kvec).normal();
+//		Vector3D center = Vector3D::Zero();
+//		R = createTransformIJC(ivec, jvec, center);
+//	}
 
-	Transform3D S = createTransformScale(scale);
-	Transform3D T = createTransformTranslate(pos);
-	Transform3D M = T*R*S;
-	return M;
-}
+//	Transform3D S = createTransformScale(scale);
+//	Transform3D T = createTransformTranslate(pos);
+//	Transform3D M = T*R*S;
+//	return M;
+//}
 
 }
