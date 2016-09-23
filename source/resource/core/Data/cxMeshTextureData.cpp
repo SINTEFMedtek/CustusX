@@ -35,7 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-MeshTextureData::MeshTextureData()
+MeshTextureData::MeshTextureData(PatientModelServicePtr patientModelService)
+    : mPatientModelService(patientModelService)
 {
     this->initialize();
 }
@@ -77,8 +78,11 @@ void MeshTextureData::initialize()
                                                  << "Sphere");
     this->addProperty(mTextureType);
 
-    mTextureFile = FilePathProperty::initialize("texture_file", "Texture file", "Picture file with the texture", "", QStringList() << "");
-    this->addProperty(mTextureFile);
+    //mTextureFile = FilePathCopyProperty::initialize("texture_file", "Texture file", "Picture file with the texture", "", QStringList() << "", "Images/Texture");
+    //this->addProperty(mTextureFile);
+
+    mTextureImage = StringPropertySelectImage::New(mPatientModelService);
+    this->addProperty(mTextureImage);
 }
 
 } // namespace cx

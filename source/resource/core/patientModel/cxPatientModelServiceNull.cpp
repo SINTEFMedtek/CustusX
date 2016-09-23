@@ -169,6 +169,8 @@ void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)
 
 void PatientModelServiceNull::printWarning() const
 {
+    //This warning is disabled as the null object is in normal use several places.
+    //You can enable it e.g. when debugging.
 //	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
 }
 

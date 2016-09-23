@@ -64,7 +64,7 @@ DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr sp
 	if (typeName==TYPE::getTypeName()) \
 		return TYPE::create(uid, ""); \
 }
-#define CREATE_METRIC_IF_MATCH(typeName, TYPE) \
+#define CREATE_WITH_SERVICES_IF_MATCH(typeName, TYPE) \
 { \
 	if (typeName==TYPE::getTypeName()) \
 		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
@@ -73,18 +73,18 @@ DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr sp
 DataPtr DataFactory::createRaw(QString type, QString uid)
 {
 	CREATE_IF_MATCH(type, Image);
-	CREATE_IF_MATCH(type, Mesh);
 	CREATE_IF_MATCH(type, TrackedStream);
-	CREATE_METRIC_IF_MATCH(type, PointMetric);
-	CREATE_METRIC_IF_MATCH(type, PlaneMetric);
-	CREATE_METRIC_IF_MATCH(type, DistanceMetric);
-	CREATE_METRIC_IF_MATCH(type, AngleMetric);
-	CREATE_METRIC_IF_MATCH(type, FrameMetric);
-	CREATE_METRIC_IF_MATCH(type, ToolMetric);
-	CREATE_METRIC_IF_MATCH(type, DonutMetric);
-    CREATE_METRIC_IF_MATCH(type, CustomMetric);
-	CREATE_METRIC_IF_MATCH(type, SphereMetric);
-	CREATE_METRIC_IF_MATCH(type, RegionOfInterestMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, Mesh);
+    CREATE_WITH_SERVICES_IF_MATCH(type, PointMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, PlaneMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, DistanceMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, AngleMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, FrameMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, ToolMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, DonutMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, CustomMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, SphereMetric);
+    CREATE_WITH_SERVICES_IF_MATCH(type, RegionOfInterestMetric);
 	return DataPtr ();
 }
 

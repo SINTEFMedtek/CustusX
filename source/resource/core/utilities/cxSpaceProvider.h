@@ -73,6 +73,8 @@ public:
 	virtual CoordinateSystem getR() = 0; ///<data references coordinate system
 	virtual CoordinateSystem convertToSpecific(CoordinateSystem space) = 0; ///< convert "active" references to specific tool/data instances
 
+    static SpaceProviderPtr getNullObject();
+
 signals:
 	void spaceAddedOrRemoved();
 };

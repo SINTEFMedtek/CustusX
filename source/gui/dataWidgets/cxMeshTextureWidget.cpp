@@ -162,18 +162,15 @@ void MeshTextureWidget::setupUI()
     if (!mMesh)
         return;
 
-//    QWidget* widget = new QWidget;
-//    QGridLayout* layout = new QGridLayout(widget);
-//    layout->setMargin(0);
-//    mPropertiesWidget->setWidgetDeleteOld(widget);
+
+//    StringPropertySelectImagePtr imageSelector = StringPropertySelectImage::New(mPatientModelService);
+//    mMesh->getTextureData().mTextureImage = imageSelector;
+//    mMesh->getTextureData().addProperty(imageSelector);
 
     std::vector<PropertyPtr> properties = mMesh->getTextureData().mProperties;
-    mOptionsWidget->setOptions("lol_jon", properties, true);
 
-//    for (unsigned i=0; i<properties.size(); ++i)
-//    {
-//        createDataWidget(mViewService, mPatientModelService, this, properties[i], layout, i);
-//    }
+    mOptionsWidget->setOptions("mesh_texture_properties", properties, true);
+
 }
 
 }//end namespace cx

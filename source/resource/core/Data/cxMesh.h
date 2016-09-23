@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <set>
 #include <boost/shared_ptr.hpp>
+#include "cxPatientModelService.h"
+#include "cxSpaceProvider.h"
 
 #include "vtkForwardDeclarations.h"
 #include "cxMeshPropertyData.h"
@@ -65,9 +67,10 @@ class cxResource_EXPORT Mesh: public Data
 {
 Q_OBJECT
 public:
-	static MeshPtr create(const QString& uid, const QString& name = "");
-//	Mesh(const QString& uid, const QString& name =vtkPolyDataPtr "");
-	Mesh(const QString& uid, const QString& name="", vtkPolyDataPtr polyData=vtkPolyDataPtr());
+    static MeshPtr create(const QString& uid, const QString& name = "", PatientModelServicePtr patientModelService = PatientModelService::getNullObject(),
+                        SpaceProviderPtr spaceProvider = SpaceProvider::getNullObject());
+    Mesh(const QString& uid, const QString& name="", vtkPolyDataPtr polyData=vtkPolyDataPtr(), PatientModelServicePtr patientModelService = PatientModelService::getNullObject(),
+                        SpaceProviderPtr spaceProvider = SpaceProvider::getNullObject());
 	virtual ~Mesh();
 
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
@@ -104,12 +107,12 @@ public:
     const char * getColorArray();
     const char * getGlyphLUT();
     QString getTextureType();
-    QString getTextureFile();
+    //QString getTextureFile();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
 //	void setProperties(const MeshPropertyData& data);
 	const MeshPropertyData& getProperties() const;
-    const MeshTextureData& getTextureData() const;
+    /*const */MeshTextureData& getTextureData(); //const;
 
 	virtual void save(const QString &basePath);
 signals:
@@ -123,9 +126,11 @@ public slots:
     void setColorArray(const char * colorArray);
     void setGlyphLUT(const char * glyphLUT);
     void setTextureType(const char * textureType);
-    void setTextureFile(const char * textureFile);
+    //void setTextureFile(const char * textureFile);
     void updateVtkPolyDataWithTexture();
 private:
+    PatientModelServicePtr mPatientModelService;
+    SpaceProviderPtr mSpaceProvider;
 	vtkPolyDataPtr mVtkPolyData;
     vtkTexturePtr mVtkTexture;
 	bool mHasGlyph;

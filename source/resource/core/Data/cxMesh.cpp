@@ -64,13 +64,14 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-MeshPtr Mesh::create(const QString& uid, const QString& name)
+MeshPtr Mesh::create(const QString& uid, const QString& name, PatientModelServicePtr patientModelService, SpaceProviderPtr spaceProvider)
 {
-	return MeshPtr(new Mesh(uid, name));
+    return MeshPtr(new Mesh(uid, name, vtkPolyDataPtr(), patientModelService, spaceProvider));
 }
 
-Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData) :
-    Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray("")
+Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData, PatientModelServicePtr patientModelService, SpaceProviderPtr spaceProvider) :
+    Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray(""), mPatientModelService(patientModelService),
+    mSpaceProvider(spaceProvider), mTextureData(patientModelService)
 {
 	if (!mVtkPolyData)
 		mVtkPolyData = vtkPolyDataPtr::New();
@@ -305,10 +306,10 @@ QString Mesh::getTextureType()
     return mTextureData.mTextureType->getValue();
 }
 
-QString Mesh::getTextureFile()
-{
-    return mTextureData.mTextureFile->getValue();
-}
+//QString Mesh::getTextureFile()
+//{
+//    return mTextureData.mTextureFile->getAbsoluteValue();
+//}
 
 void Mesh::setGlyphLUT(const char * glyphLUT)
 {
@@ -323,16 +324,16 @@ void Mesh::setTextureType(const char *textureType)
     emit meshChanged();
 }
 
-void Mesh::setTextureFile(const char *textureFile)
-{
-    mTextureData.mTextureFile->setValue(textureFile);
-    this->updateVtkPolyDataWithTexture();
-    emit meshChanged();
-}
+//void Mesh::setTextureFile(const char *textureFile)
+//{
+//    mTextureData.mTextureFile->setValue(textureFile);
+//    this->updateVtkPolyDataWithTexture();
+//    emit meshChanged();
+//}
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-    if(mTextureData.mTextureFile.get()->getValue().isEmpty() || mTextureData.mTextureType.get()->getValue().isEmpty())
+    if(/*mTextureData.mTextureFile.get()->getValue().isEmpty() ||*/ mTextureData.mTextureType.get()->getValue().isEmpty())
         return;
 
     QString textureType = this->getTextureType();
@@ -372,8 +373,10 @@ void Mesh::updateVtkPolyDataWithTexture()
 
     //read texture file
     vtkSmartPointer<vtkImageReader2Factory> readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
-    vtkImageReader2 *imageReader = readerFactory->CreateImageReader2(this->getTextureFile().toStdString().c_str());
-    imageReader->SetFileName(this->getTextureFile().toStdString().c_str());
+    vtkImageReader2 *imageReader = readerFactory->CreateImageReader2("dummy");//(this->getTextureFile().toStdString().c_str());
+    if(!imageReader)
+        return;
+    imageReader->SetFileName("dummy");//(this->getTextureFile().toStdString().c_str());
 
     //create texture
     //vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
@@ -414,7 +417,7 @@ const MeshPropertyData& Mesh::getProperties() const
     return mProperties;
 }
 
-const MeshTextureData &Mesh::getTextureData() const
+/*const */MeshTextureData &Mesh::getTextureData()// const
 {
     return mTextureData;
 }

@@ -31,9 +31,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxSpaceProvider.h"
+#include "cxSpaceProviderNull.h"
 
 namespace cx
 {
+
+SpaceProviderPtr SpaceProvider::getNullObject()
+{
+    static SpaceProviderPtr mNull;
+    if (!mNull)
+        mNull.reset(new SpaceProviderNull);
+    return mNull;
+}
 
 
 } // namespace cx

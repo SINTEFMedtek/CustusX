@@ -29,47 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef SPACEPROVIDERNULL_H
+#define SPACEPROVIDERNULL_H
 
-#ifndef MESHTEXTUREDATA_H
-#define MESHTEXTUREDATA_H
-
-#include "cxResourceExport.h"
-#include "cxStringProperty.h"
-#include "cxFilePathProperty.h"
-#include "cxSelectDataStringProperty.h"
-
-
-class QDomNode;
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-/**
- * Mesh texture data used in a vtkProperty
- */
-class cxResource_EXPORT MeshTextureData : public QObject
+class cxResource_EXPORT SpaceProviderNull : public SpaceProvider
 {
-    Q_OBJECT
 public:
-    MeshTextureData(PatientModelServicePtr patientModelService);
-    void addXml(QDomNode& dataNode);
-    void parseXml(QDomNode &dataNode);
-
-    std::vector<PropertyPtr> mProperties;
-
-    StringPropertyPtr mTextureType;
-//    FilePathCopyPropertyPtr mTextureFile;
-
-    StringPropertySelectImagePtr mTextureImage;
-
-signals:
-    void changed();
-private:
-    void addProperty(PropertyPtr property);
-    void initialize();
-    PatientModelServicePtr mPatientModelService;
+    SpaceProviderNull();
+    Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to);
+    std::vector<CoordinateSystem> getSpacesToPresentInGUI();
+    std::map<QString, QString> getDisplayNamesForCoordRefObjects();
+    SpaceListenerPtr createListener();
+    Vector3D getActiveToolTipPoint(CoordinateSystem to, bool useOffset);
+    Transform3D getActiveToolTipTransform(CoordinateSystem to, bool useOffset);
+    Transform3D get_rMpr();
+    CoordinateSystem getS(ToolPtr tool);
+    CoordinateSystem getT(ToolPtr tool);
+    CoordinateSystem getTO(ToolPtr tool);
+    CoordinateSystem getD(DataPtr data);
+    CoordinateSystem getPr();
+    CoordinateSystem getR();
+    CoordinateSystem convertToSpecific(CoordinateSystem space);
 };
 
 } // namespace cx
 
-#endif // MESHTEXTUREDATA_H
+#endif // SPACEPROVIDERNULL_H

@@ -30,46 +30,85 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef MESHTEXTUREDATA_H
-#define MESHTEXTUREDATA_H
+#include "cxSpaceProviderNull.h"
 
-#include "cxResourceExport.h"
-#include "cxStringProperty.h"
-#include "cxFilePathProperty.h"
-#include "cxSelectDataStringProperty.h"
-
-
-class QDomNode;
 
 namespace cx
 {
 
-/**
- * Mesh texture data used in a vtkProperty
- */
-class cxResource_EXPORT MeshTextureData : public QObject
+SpaceProviderNull::SpaceProviderNull()
 {
-    Q_OBJECT
-public:
-    MeshTextureData(PatientModelServicePtr patientModelService);
-    void addXml(QDomNode& dataNode);
-    void parseXml(QDomNode &dataNode);
 
-    std::vector<PropertyPtr> mProperties;
+}
 
-    StringPropertyPtr mTextureType;
-//    FilePathCopyPropertyPtr mTextureFile;
+Transform3D SpaceProviderNull::get_toMfrom(CoordinateSystem from, CoordinateSystem to)
+{
+    return Transform3D::Identity();
+}
 
-    StringPropertySelectImagePtr mTextureImage;
+std::vector<CoordinateSystem> SpaceProviderNull::getSpacesToPresentInGUI()
+{
+    return std::vector<CoordinateSystem>();
+}
 
-signals:
-    void changed();
-private:
-    void addProperty(PropertyPtr property);
-    void initialize();
-    PatientModelServicePtr mPatientModelService;
-};
+std::map<QString, QString> SpaceProviderNull::getDisplayNamesForCoordRefObjects()
+{
+    return std::map<QString, QString>();
+}
+
+SpaceListenerPtr SpaceProviderNull::createListener()
+{
+    return SpaceListenerPtr();
+}
+
+Vector3D SpaceProviderNull::getActiveToolTipPoint(CoordinateSystem to, bool useOffset)
+{
+    return Vector3D();
+}
+
+Transform3D SpaceProviderNull::getActiveToolTipTransform(CoordinateSystem to, bool useOffset)
+{
+    return Transform3D::Identity();
+}
+
+Transform3D SpaceProviderNull::get_rMpr()
+{
+    return Transform3D::Identity();
+}
+
+CoordinateSystem SpaceProviderNull::getS(ToolPtr tool)
+{
+    return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getT(ToolPtr tool)
+{
+    return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getTO(ToolPtr tool)
+{
+    return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getD(DataPtr data)
+{
+    return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getPr()
+{
+    return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getR()
+{
+    return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::convertToSpecific(CoordinateSystem space)
+{
+    return CoordinateSystem();
+}
 
 } // namespace cx
-
-#endif // MESHTEXTUREDATA_H
