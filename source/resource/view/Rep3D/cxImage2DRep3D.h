@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRepImpl.h"
 #include "cxForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -76,6 +77,7 @@ public:
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkImageActorPtr getActor();
 
+	void setTransformOffset(Transform3D rMrr);
 protected:
 	Image2DProxy();
 
@@ -87,6 +89,7 @@ private:
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
 	ImagePtr mImage;
 	vtkImageActorPtr mActor;
+	Transform3D m_rMrr;
 };
 
 

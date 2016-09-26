@@ -71,9 +71,9 @@ public:
 
     QString getDefineVectorUpMethod() const;
     void setDefineVectorUpMethod(QString defineVectorUpMethod);
-	void setMeshUid(QString val);
-	QString getMeshUid() const;
-	MeshPtr getMesh() const;
+	void setModelUid(QString val);
+	QString getModelUid() const;
+	DataPtr getModel() const;
 
 	void setScaleToP1(bool val);
 	bool getScaleToP1() const;
@@ -120,12 +120,11 @@ private:
     CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
     QString mDefineVectorUpMethod;
-	QString mMeshUid;
+	QString mModelUid;
     DefineVectorUpMethods mDefineVectorUpMethods;
 	bool mScaleToP1;
 	double mOffsetFromP0;
 	double mRepeatDistance;
-
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 	int getRepeatCount() const;

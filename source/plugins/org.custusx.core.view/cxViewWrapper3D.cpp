@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPickerRep.h"
 #include "cxGeometricRep.h"
 #include "cxToolRep3D.h"
-#include "cxVolumetricRep.h"
 #include "cxTypeConversions.h"
 #include "cxVideoSource.h"
 #include "cxVideoRep.h"

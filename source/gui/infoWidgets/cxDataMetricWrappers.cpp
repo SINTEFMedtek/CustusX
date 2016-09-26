@@ -700,11 +700,12 @@ BoolPropertyPtr DonutMetricWrapper::createFlatSelector() const
 
 CustomMetricWrapper::CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data) :
     MetricBase(viewService, patientModelService),
-    mData(data)
+	mData(data),
+	mScaleToP1Widget(NULL)
 {
     mArguments.setArguments(data->getArguments());
     mInternalUpdate = false;
-    connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* CustomMetricWrapper::createWidget()
@@ -720,20 +721,21 @@ QWidget* CustomMetricWrapper::createWidget()
 
     mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
-	mMesh = this->createMeshSelector();
-	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMesh));
+	mModel = this->createModelSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mModel));
 
 	mOffsetFromP0 = this->createOffsetFromP0();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
 	mRepeatDistance = this->createRepeatDistance();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRepeatDistance));
 	mScaleToP1 = this->createScaletoP1();
-	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1));
+	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
+	topLayout->addWidget(mScaleToP1Widget);
 
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
-    this->dataChangedSlot();
+	this->dataChangedSlot();
     return widget;
 }
 
@@ -759,8 +761,9 @@ void CustomMetricWrapper::update()
         return;
     mInternalUpdate = true;
     mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
-	mMesh->setValue(mData->getMeshUid());
+	mModel->setValue(mData->getModelUid());
     mInternalUpdate = false;
+	guiChanged();
 }
 
 void CustomMetricWrapper::dataChangedSlot()
@@ -778,9 +781,15 @@ void CustomMetricWrapper::guiChanged()
 {
     if (mInternalUpdate)
         return;
+
+	if(mModel->getData() && mModel->getData()->getType() == "image")
+		mScaleToP1Widget->setEnabled(false);
+	else
+		mScaleToP1Widget->setEnabled(true);
+
     mInternalUpdate = true;
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
-	mData->setMeshUid(mMesh->getValue());
+	mData->setModelUid(mModel->getValue());
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
 	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
@@ -834,12 +843,15 @@ StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() cons
     return retval;
 }
 
-StringPropertySelectMeshPtr CustomMetricWrapper::createMeshSelector() const
+StringPropertySelectDataPtr CustomMetricWrapper::createModelSelector() const
 {
-	StringPropertySelectMeshPtr retval;
-	retval = StringPropertySelectMesh::New(mPatientModelService);
-	connect(retval.get(), &StringPropertySelectMesh::changed, this, &CustomMetricWrapper::guiChanged);
-    return retval;
+	StringPropertySelectDataPtr retval;
+	retval = StringPropertySelectData::New(mPatientModelService, "image|mesh");
+	retval->setOnly2DImagesFilter(true);
+	retval->setValueName("Model");
+	retval->setHelp("Model can be mesh or 2D image");
+	connect(retval.get(), &StringPropertySelectData::changed, this, &CustomMetricWrapper::guiChanged);
+	return retval;
 }
 
 //---------------------------------------------------------

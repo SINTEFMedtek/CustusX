@@ -50,7 +50,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
     mDefineVectorUpMethod = mDefineVectorUpMethods.table;
-	mMeshUid = "";
+	mModelUid = "";
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
 	mRepeatDistance = 0.0;
@@ -78,7 +78,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 
 	QDomElement elem = dataNode.toElement();
 	elem.setAttribute("definevectorup", mDefineVectorUpMethod);
-	elem.setAttribute("meshUid", mMeshUid);
+	elem.setAttribute("modelUid", mModelUid);
 
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
@@ -93,7 +93,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 
 	QDomElement elem = dataNode.toElement();
 	mDefineVectorUpMethod = elem.attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
-	mMeshUid = elem.attribute("meshUid", qstring_cast(mMeshUid));
+	mModelUid = elem.attribute("modelUid", qstring_cast(mModelUid));
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
@@ -187,11 +187,11 @@ Vector3D CustomMetric::getVectorUp() const
 
 Vector3D CustomMetric::getScale() const
 {
-	if (!mScaleToP1)
+	if (!mScaleToP1 || !this->getModel() || this->getModel()->getType() == "image")
 		return Vector3D::Ones();
 
-	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();
-	bounds = transform(this->getMesh()->get_rMd(), bounds);
+	DoubleBoundingBox3D bounds = this->getModel()->boundingBox();
+	bounds = transform(this->getModel()->get_rMd(), bounds);
 
 	std::vector<Vector3D> coords = mArguments->getRefCoords();
 	double height = (coords[1] - coords[0]).length();
@@ -226,20 +226,20 @@ void CustomMetric::setDefineVectorUpMethod(QString defineVectorUpMethod)
     mDefineVectorUpMethod = defineVectorUpMethod;
 }
 
-void CustomMetric::setMeshUid(QString val)
+void CustomMetric::setModelUid(QString val)
 {
-	mMeshUid = val;
+	mModelUid = val;
     emit propertiesChanged();
 }
 
-QString CustomMetric::getMeshUid() const
+QString CustomMetric::getModelUid() const
 {
-	return mMeshUid;
+	return mModelUid;
 }
 
-MeshPtr CustomMetric::getMesh() const
+DataPtr CustomMetric::getModel() const
 {
-	return mDataManager->getData<Mesh>(mMeshUid);
+	return mDataManager->getData(mModelUid);
 }
 
 void CustomMetric::setScaleToP1(bool val)
