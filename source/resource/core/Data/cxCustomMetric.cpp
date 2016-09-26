@@ -54,6 +54,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
 	mRepeatDistance = 0.0;
+	mTranslationOnly = false;
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -335,7 +336,19 @@ std::vector<Transform3D> CustomMetric::calculateOrientations() const
 
 	std::vector<Transform3D> retval(pos.size());
 	for (unsigned i=0; i<retval.size(); ++i)
-		retval[i] = this->calculateOrientation(pos[i], dir, vup, scale);
+	{
+//		if (true)
+		bool tonly = (mMeshUid.contains("head-")); // HACK alert - for demo 2016-09-26 only.
+		if (tonly)
+//		if (mTranslationOnly)
+		{
+			retval[i] = createTransformTranslate(pos[i]);
+		}
+		else
+		{
+			retval[i] = this->calculateOrientation(pos[i], dir, vup, scale);
+		}
+	}
 
 	return retval;
 }
