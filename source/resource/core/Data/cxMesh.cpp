@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxMesh.h"
-
 #include <vtkCellArray.h>
 #include <vtkColorSeries.h>
 #include <vtkPolyData.h>
@@ -41,9 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomDocument>
 #include <QColor>
 #include <QDir>
-//#include <vtkImageReader2Factory.h>
 #include <vtkTransformTextureCoords.h>
-//#include <vtkImageReader2.h>
 #include <vtkTexture.h>
 #include <vtkTextureMapToCylinder.h>
 #include <vtkTextureMapToPlane.h>
@@ -54,12 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataReaderWriter.h"
 #include "vtkProperty.h"
 #include "vtkImageData.h"
-//#include "vtkSimpleImageToImageFilter.h"
+
 
 namespace cx
 {
-
-
 
 
 //---------------------------------------------------------
@@ -308,30 +303,11 @@ QString Mesh::getTextureType()
     return mTextureData.mTextureType->getValue();
 }
 
-//QString Mesh::getTextureFile()
-//{
-//    return mTextureData.mTextureFile->getAbsoluteValue();
-//}
-
 void Mesh::setGlyphLUT(const char * glyphLUT)
 {
     mGlyphLUT = glyphLUT;
     emit meshChanged();
 }
-
-void Mesh::setTextureType(const char *textureType)
-{
-    mTextureData.mTextureType->setValue(textureType);
-    this->updateVtkPolyDataWithTexture();
-    emit meshChanged();
-}
-
-//void Mesh::setTextureFile(const char *textureFile)
-//{
-//    mTextureData.mTextureFile->setValue(textureFile);
-//    this->updateVtkPolyDataWithTexture();
-//    emit meshChanged();
-//}
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
@@ -340,15 +316,12 @@ void Mesh::updateVtkPolyDataWithTexture()
 
     QString textureType = this->getTextureType();
 
-    //create texture coordinates
+    //create the texture mapper
     vtkSmartPointer<vtkDataSetAlgorithm> tMapper;
-//    if(mVtkTexture)
-//        mVtkTexture = vtkSmartPointer<vtkTexture>::New();
     if (textureType == "None")
     {
         if(mVtkTexture)
             mVtkTexture = vtkSmartPointer<vtkTexture>::New();
-        //mVtkTexture = vtkSmartPointer<vtkTexture>::New();
         return;
     }
     else if (textureType == "Cylinder")
@@ -370,39 +343,15 @@ void Mesh::updateVtkPolyDataWithTexture()
         return;
         tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
     }
-    //tMapper->SetInputConnection(mVtkPolyData->);
     tMapper->SetInputData(mVtkPolyData);
-    //tMapper->PreventSeamOn();
 
-
-    //************************
-
-    //read texture file
-    //vtkSmartPointer<vtkImageReader2Factory> readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
-    //vtkImageReader2 *imageReader = readerFactory->CreateImageReader2("dummy");//(this->getTextureFile().toStdString().c_str());
-    //if(!imageReader)
-    //    return;
-    //imageReader->SetFileName("dummy");//(this->getTextureFile().toStdString().c_str());
-
+    //Get the image data
     ImagePtr textureImage = mTextureData.mTextureImage->getImage();
-    vtkImageDataPtr vtkd = textureImage->getBaseVtkImageData();
+    vtkImageDataPtr vtkImageData = textureImage->getBaseVtkImageData();
 
-//    vtkSmartPointer<vtkImageAlgorithm> imageFilter = vtkSmartPointer<vtkImageAlgorithm>::New();
-//    imageFilter->SetInputData(vtkd);
-//    imageFilter->Update();
-
-//    vtkSmartPointer<vtkSimpleImageToImageFilter> filter = vtkSmartPointer<vtkSimpleImageToImageFilter>::New();
-
-    //**********************
-
-
-
-    //create texture
+    //Create the texture
     mVtkTexture = vtkSmartPointer<vtkTexture>::New();
-    //mVtkTexture->SetInputConnection(imageReader->GetOutputPort());
-//    mVtkTexture->SetInputConnection(vtkd/*->GetOutputPort()*/);
-    //mVtkTexture->SetInputConnection(imageFilter->GetOutputPort());
-    mVtkTexture->SetInputData(vtkd/*->GetOutputPort()*/);
+    mVtkTexture->SetInputData(vtkImageData);
 
 
     //transform texture coordinates
@@ -413,15 +362,11 @@ void Mesh::updateVtkPolyDataWithTexture()
     vtkSmartPointer<vtkTransformTextureCoords> transformTexture = vtkSmartPointer<vtkTransformTextureCoords>::New();
     transformTexture->SetInputConnection(tMapper->GetOutputPort());
     transformTexture->SetPosition(translate);
-    //transformTexture->SetScale(10,10,1);
     transformTexture->SetScale(2,2,1);
     transformTexture->Update();
 
-    //mVtkPolyData = transformTexture->GetOutputPort();
+    //Update the poly data
     mVtkPolyData = transformTexture->GetPolyDataOutput();
-    //this->setVtkPolyData();
-
-    //imageReader->Delete();
 }
 
 QStringList Mesh::getOrientationArrayList()
@@ -439,7 +384,7 @@ const MeshPropertyData& Mesh::getProperties() const
     return mProperties;
 }
 
-/*const */MeshTextureData &Mesh::getTextureData()// const
+const MeshTextureData &Mesh::getTextureData()
 {
     return mTextureData;
 }

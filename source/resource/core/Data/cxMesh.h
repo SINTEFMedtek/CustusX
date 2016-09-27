@@ -107,12 +107,10 @@ public:
     const char * getColorArray();
     const char * getGlyphLUT();
     QString getTextureType();
-    //QString getTextureFile();
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
-//	void setProperties(const MeshPropertyData& data);
 	const MeshPropertyData& getProperties() const;
-    /*const */MeshTextureData& getTextureData(); //const;
+    const MeshTextureData& getTextureData();
 
 	virtual void save(const QString &basePath);
 signals:
@@ -125,8 +123,6 @@ public slots:
     void setOrientationArray(const char * orientationArray);
     void setColorArray(const char * colorArray);
     void setGlyphLUT(const char * glyphLUT);
-    void setTextureType(const char * textureType);
-    //void setTextureFile(const char * textureFile);
     void updateVtkPolyDataWithTexture();
 private:
     PatientModelServicePtr mPatientModelService;

@@ -215,7 +215,7 @@ Vector3D CustomMetric::getVectorUp() const
 
 Vector3D CustomMetric::getScale() const
 {
-    if (!mScaleToP1 || !this->getMesh())
+	if (!mScaleToP1)
 		return Vector3D::Ones();
 
 	DoubleBoundingBox3D bounds = this->getMesh()->boundingBox();

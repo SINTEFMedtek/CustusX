@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceExport.h"
 #include "cxStringProperty.h"
-#include "cxFilePathProperty.h"
 #include "cxSelectDataStringProperty.h"
 
 
@@ -58,8 +57,6 @@ public:
     std::vector<PropertyPtr> mProperties;
 
     StringPropertyPtr mTextureType;
-//    FilePathCopyPropertyPtr mTextureFile;
-
     StringPropertySelectImagePtr mTextureImage;
 
 signals:

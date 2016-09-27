@@ -78,9 +78,6 @@ void MeshTextureData::initialize()
                                                  << "Sphere");
     this->addProperty(mTextureType);
 
-    //mTextureFile = FilePathCopyProperty::initialize("texture_file", "Texture file", "Picture file with the texture", "", QStringList() << "", "Images/Texture");
-    //this->addProperty(mTextureFile);
-
     mTextureImage = StringPropertySelectImage::New(mPatientModelService);
     this->addProperty(mTextureImage);
 }
