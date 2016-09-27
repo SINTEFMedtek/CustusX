@@ -62,7 +62,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mControlsEnabled(false),
 	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
-	this->setObjectName("Virtual Bronchoscopy Widget");
+	this->setObjectName("virtual_bronchoscopy_widget");
 	this->setWindowTitle("Virtual Bronchoscopy");
 	this->setWhatsThis(this->defaultWhatsThis());
 
