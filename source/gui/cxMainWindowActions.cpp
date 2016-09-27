@@ -281,7 +281,7 @@ void MainWindowActions::loadPatientFileSlot()
 
 void MainWindowActions::loadPatientFileCopySlot()
 {
-	QString patientDatafolder = this->getExistingSessionFolder();
+	QString patientDatafolder = profile()->getPatientTemplatePath();
 
 	// Open file dialog
 	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);

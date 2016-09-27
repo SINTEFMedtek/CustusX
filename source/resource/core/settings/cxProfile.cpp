@@ -132,6 +132,11 @@ QString Profile::getSettingsPath()
 	return this->getPath() + "/settings";
 }
 
+QString Profile::getPatientTemplatePath()
+{
+	return DataLocations::getRootConfigPath() + "/patient_templates";
+}
+
 QStringList Profile::getAllRootConfigPaths()
 {
 	QStringList retval = DataLocations::getRootConfigPaths();
