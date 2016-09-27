@@ -80,6 +80,21 @@ private:
 	double currentValue;
 };
 
+struct CameraInfo
+{
+	CameraInfo() {}
+	explicit CameraInfo(vtkCameraPtr camera);
+	double distance() const { return (pos-focus).length(); }
+	Vector3D vpn() const { return (pos-focus).normal(); }
+
+	Vector3D pos;
+	Vector3D focus;
+	Vector3D vup;
+	double viewAngle;
+};
+
+bool similar(const CameraInfo& lhs, const CameraInfo& rhs, double tol=1.0E-6);
+
 /**
  * \class CameraStyleForView
  *
@@ -119,7 +134,7 @@ private:
 	void connectTool();
 	void disconnectTool();
 	void viewportChangedSlot();
-	RegionOfInterest getROI(QString uid);
+	RegionOfInterest getROI(QString uid) const;
 	void setInteractor(vtkSmartPointer<vtkInteractorStyle> style);
 
 	CameraStyleData mStyle; ///< the current CameraStyleForView
@@ -135,6 +150,10 @@ private:
 
 	Vector3D smoothZoomedCameraPosition(Vector3D pos);
 	void handleLights();
+	CameraInfo viewEntireAutoZoomROI(CameraInfo info);
+	void updateCamera(CameraInfo info);
+	Vector3D getToolTip_r();
+	Transform3D get_rMto();
 };
 
 /**

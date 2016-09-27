@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCustomMetric.h"
 
+#include <vtkImageData.h>
 #include "cxBoundingBox3D.h"
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
@@ -39,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
 #include "cxMesh.h"
+#include "cxImage.h"
 
 namespace cx
 {
@@ -58,8 +60,9 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
 {
-    return mDefineVectorUpMethods;
+	return mDefineVectorUpMethods;
 }
+
 
 CustomMetricPtr CustomMetric::create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider)
 {
@@ -112,6 +115,33 @@ Vector3D CustomMetric::getRefCoord() const
 DoubleBoundingBox3D CustomMetric::boundingBox() const
 {
 	return DoubleBoundingBox3D::fromCloud(mArguments->getRefCoords());
+}
+
+std::vector<Vector3D> CustomMetric::getPointCloud() const
+{
+	std::vector<Vector3D> retval;
+
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(this->getModel());
+	if(!mesh)
+		return retval;
+
+	std::vector<Vector3D> cloud = mesh->getPointCloud();
+
+	std::vector<Transform3D> pos = this->calculateOrientations();
+
+	for (unsigned i=0; i<pos.size(); ++i)
+	{
+		Transform3D rrMd = mesh->get_rMd();
+		Transform3D rMd = pos[i] * rrMd;
+
+		for (unsigned j=0; j<cloud.size(); ++j)
+		{
+			Vector3D p_r = rMd.coord(cloud[j]);
+			retval.push_back(p_r);
+		}
+	}
+
+	return retval;
 }
 
 std::vector<Vector3D> CustomMetric::getPositions() const
@@ -295,6 +325,83 @@ std::map<QString, QString> CustomMetric::DefineVectorUpMethods::getAvailableDefi
     names[table] = "The operating table";
     names[connectedFrameInP1] = "The connected frame in p1";
     return names;
+}
+
+
+std::vector<Transform3D> CustomMetric::calculateOrientations() const
+{
+	std::vector<Vector3D> pos = this->getPositions();
+	Vector3D dir = this->getDirection();
+	Vector3D vup = this->getVectorUp();
+	Vector3D scale = this->getScale();
+
+	std::vector<Transform3D> retval(pos.size());
+	for (unsigned i=0; i<retval.size(); ++i)
+		retval[i] = this->calculateOrientation(pos[i], dir, vup, scale);
+
+	return retval;
+}
+
+/**
+ * Based on a position+direction, view up and scale,
+ * calculate an orientation matrix combining these.
+ */
+Transform3D CustomMetric::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const
+{
+	Transform3D R = this->calculateRotation(dir, vup);
+
+	Transform3D center2DImage = this->calculateTransformTo2DImageCenter();
+
+	Transform3D S = createTransformScale(scale);
+	Transform3D T = createTransformTranslate(pos);
+	Transform3D M = T*R*S*center2DImage;
+	return M;
+}
+
+Transform3D CustomMetric::calculateTransformTo2DImageCenter() const
+{
+	Transform3D position2DImage = Transform3D::Identity();
+	if(this->modelIsImage())
+	{
+		DataPtr model = this->getModel();
+		ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
+		vtkImageDataPtr vtkImage = imageModel->getBaseVtkImageData();
+		Eigen::Array3i dimensions(vtkImage->GetDimensions());
+
+		position2DImage = createTransformTranslate(Vector3D(-dimensions[0]/2, -dimensions[1]/2, 0));
+	}
+	return position2DImage;
+}
+
+bool CustomMetric::modelIsImage() const
+{
+	DataPtr model = this->getModel();
+
+	return (model && model->getType() == "image");
+}
+
+Transform3D CustomMetric::calculateRotation(Vector3D dir, Vector3D vup) const
+{
+	Transform3D R = Transform3D::Identity();
+	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
+	if (!directionAlongUp)
+	{
+		Vector3D jvec = dir.normal();
+		Vector3D kvec = cross(vup, dir).normal();
+		Vector3D ivec = cross(jvec, kvec).normal();
+		Vector3D center = Vector3D::Zero();
+		R = createTransformIJC(ivec, jvec, center);
+
+		Transform3D rotateY = cx::createTransformRotateY(M_PI_2);
+		R = R*rotateY;//Let the models X-axis align with patient X-axis
+
+		if(this->modelIsImage())
+		{
+			Transform3D rotateX = cx::createTransformRotateX(M_PI_2);
+			R = R*rotateX;
+		}
+	}
+	return R;
 }
 
 }

@@ -91,21 +91,20 @@ Vector3D NavigationAlgorithms::elevateCamera(double angle, Vector3D camera, Vect
 	if (similar(angle, 0.0))
 		return camera;
 
+	// clean up input in order to have two orthogonal unit vectors
+	Vector3D i = (camera-focus).normal();
+	Vector3D j = vup;
+	Vector3D k = cross(i, j).normal();
+	j = cross(k, i).normal();
+
 	// define a new space spanned by (x=vpn,y=vup), centered in focus
 	// rotate the angle in this space
-	Transform3D M = createTransformIJC((camera-focus).normal(), vup, focus);
+	// input space is A, focus-centered space is B
+	Transform3D aMb = createTransformIJC(i, j, focus);
+	Transform3D bMa = aMb.inv();
 	Transform3D R = createTransformRotateZ(angle);
-	camera = (M.inv()*R*M).coord(camera);
+	camera = (aMb*R*bMa).coord(camera);
 
-// old faulty code:
-//	double cameraOffset = (camera-focus).length();
-//	// elevate, but keep distance
-//	double height = cameraOffset * tan(angle);
-//	camera += vup * height;
-//	Vector3D elevated = camera + vup * height;
-//	Vector3D n_foc2eye = (elevated - focus).normalized();
-//	camera = focus + cameraOffset * n_foc2eye;
-//	std::cout << "cameraOffset " <<  cameraOffset << std::endl;
 	return camera;
 }
 

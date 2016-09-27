@@ -103,7 +103,9 @@ void ViewGroupPropertiesWidget::updateFrontend()
 
 	mCameraFollowTool->setValue(data.mCameraFollowTool);
 	mFocusFollowTool->setValue(data.mFocusFollowTool);
-	mCameraOnTooltip->setValue(data.mCameraOnTooltip);
+	mCameraOnTooltip->setValue(data.mCameraLockToTooltip);
+	mCameraTooltipOffset->setValue(data.mCameraTooltipOffset);
+	mCameraNotBehindROI->setValue(data.mCameraNotBehindROI);
 	mTableLock->setValue(data.mTableLock);
 	mUniCam->setValue(data.mUniCam);
 	mElevation->setValue(data.mElevation);
@@ -140,6 +142,16 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 												"Camera position is located exactly on the tool tip",
 												true);
 	mCameraStyleProperties.push_back(mCameraOnTooltip);
+
+	mCameraTooltipOffset = DoubleProperty::initialize("Camera Tooltip Offset", "",
+											"Camera offset from tooltip, used if Camera on Tooltip is set.",
+											0, DoubleRange(-100, 100, 1), 0);
+	mCameraStyleProperties.push_back(mCameraTooltipOffset);
+
+	mCameraNotBehindROI = BoolProperty::initialize("Camera not behind ROI", "",
+												"Camera cannot move behind ROI",
+												false);
+	mCameraStyleProperties.push_back(mCameraNotBehindROI);
 
 	mTableLock = BoolProperty::initialize("Table lock", "",
 										  "Table is always set down in the scene.",
@@ -205,7 +217,9 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 
 	data.mCameraFollowTool = mCameraFollowTool->getValue();
 	data.mFocusFollowTool = mFocusFollowTool->getValue();
-	data.mCameraOnTooltip = mCameraOnTooltip->getValue();
+	data.mCameraLockToTooltip = mCameraOnTooltip->getValue();
+	data.mCameraTooltipOffset = mCameraTooltipOffset->getValue();
+	data.mCameraNotBehindROI = mCameraNotBehindROI->getValue();
 	data.mTableLock = mTableLock->getValue();
 	data.mUniCam = mUniCam->getValue();
 	data.mElevation = mElevation->getValue();

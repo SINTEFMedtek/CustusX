@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCustomMetricRep.h"
 
-#include "cxView.h"
-
 #include <boost/shared_ptr.hpp>
 #include <vtkVectorText.h>
 #include <vtkFollower.h>
@@ -44,12 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindow.h>
 #include <vtkImageActor.h>
 #include <vtkTextActor.h>
-#include <vtkImageData.h>
 #include <QFileInfo>
 #include "cxTypeConversions.h"
-#include "cxGraphicalPrimitives.h"
 #include "cxCustomMetric.h"
-#include "cxGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
 #include "vtkSTLReader.h"
 #include <vtkPolyDataNormals.h>
@@ -107,18 +102,10 @@ void CustomMetricRep::updateModel()
 
 	DataPtr model = custom->getModel();
 
-	if(this->modelIsImage())
+	if(custom->modelIsImage())
 		this->updateImageModel(model);
 	else
 		this->updateMeshModel(model);
-}
-
-bool CustomMetricRep::modelIsImage()
-{
-	CustomMetricPtr custom = this->getCustomMetric();
-	DataPtr model = custom->getModel();
-
-	return (model && model->getType() == "image");
 }
 
 void CustomMetricRep::updateImageModel(DataPtr model)
@@ -129,7 +116,7 @@ void CustomMetricRep::updateImageModel(DataPtr model)
 		return;
 
 	CustomMetricPtr custom = this->getCustomMetric();
-	std::vector<Vector3D> pos = custom->getPositions();
+	std::vector<Transform3D> pos = custom->calculateOrientations();
 
 	mImageGeometryProxy.resize(pos.size());
 
@@ -141,8 +128,7 @@ void CustomMetricRep::updateImageModel(DataPtr model)
 		mImageGeometryProxy[i]->setImage(imageModel);
 		this->getRenderer()->AddActor(mImageGeometryProxy[i]->getActor());
 
-		Transform3D M = this->calculateOrientation(pos[i]);
-		mImageGeometryProxy[i]->setTransformOffset(M);
+		mImageGeometryProxy[i]->setTransformOffset(pos[i]);
 	}
 }
 
@@ -151,11 +137,11 @@ void CustomMetricRep::updateMeshModel(DataPtr model)
 	MeshPtr meshModel = boost::dynamic_pointer_cast<Mesh>(model);
 
 	CustomMetricPtr custom = this->getCustomMetric();
-	std::vector<Vector3D> pos = custom->getPositions();
+	std::vector<Transform3D> pos = custom->calculateOrientations();
 
 	mMeshGeometry.resize(pos.size());
 
-	for (unsigned i=0; i<pos.size(); ++i)
+	for (unsigned i=0; i<mMeshGeometry.size(); ++i)
 	{
 		if (!mMeshGeometry[i])
 		{
@@ -164,75 +150,8 @@ void CustomMetricRep::updateMeshModel(DataPtr model)
 		}
 		mMeshGeometry[i]->setMesh(meshModel);
 
-		Transform3D M = this->calculateOrientation(pos[i]);
-		mMeshGeometry[i]->setTransformOffset(M);
+		mMeshGeometry[i]->setTransformOffset(pos[i]);
 	}
-}
-
-Transform3D CustomMetricRep::calculateOrientation(Vector3D pos)
-{
-	CustomMetricPtr custom = this->getCustomMetric();
-	Vector3D dir = custom->getDirection();
-	Vector3D vup = custom->getVectorUp();
-	Vector3D scale = custom->getScale();
-	Transform3D M = this->calculateOrientation(pos, dir, vup, scale);
-	return M;
-}
-
-/**
- * Based on a position+direction, view up and scale,
- * calculate an orientation matrix combining these.
- */
-Transform3D CustomMetricRep::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale)
-{
-	Transform3D R = this->calculateRotation(dir, vup);
-
-	Transform3D center2DImage = this->calculateTransformTo2DImageCenter();
-
-	Transform3D S = createTransformScale(scale);
-	Transform3D T = createTransformTranslate(pos);
-	Transform3D M = T*R*S*center2DImage;
-	return M;
-}
-
-Transform3D CustomMetricRep::calculateTransformTo2DImageCenter()
-{
-	Transform3D position2DImage = Transform3D::Identity();
-	if(this->modelIsImage())
-	{
-		CustomMetricPtr custom = this->getCustomMetric();
-		DataPtr model = custom->getModel();
-		ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
-		vtkImageDataPtr vtkImage = imageModel->getBaseVtkImageData();
-		Eigen::Array3i dimensions(vtkImage->GetDimensions());
-
-		position2DImage = createTransformTranslate(Vector3D(-dimensions[0]/2, -dimensions[1]/2, 0));
-	}
-	return position2DImage;
-}
-
-Transform3D CustomMetricRep::calculateRotation(Vector3D dir, Vector3D vup)
-{
-	Transform3D R = Transform3D::Identity();
-	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
-	if (!directionAlongUp)
-	{
-		Vector3D jvec = dir.normal();
-		Vector3D kvec = cross(vup, dir).normal();
-		Vector3D ivec = cross(jvec, kvec).normal();
-		Vector3D center = Vector3D::Zero();
-		R = createTransformIJC(ivec, jvec, center);
-
-		Transform3D rotateY = cx::createTransformRotateY(M_PI_2);
-		R = R*rotateY;//Let the models X-axis align with patient X-axis
-
-		if(this->modelIsImage())
-		{
-			Transform3D rotateX = cx::createTransformRotateX(M_PI_2);
-			R = R*rotateX;
-		}
-	}
-	return R;
 }
 
 }

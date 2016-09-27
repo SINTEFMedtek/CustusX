@@ -132,7 +132,6 @@ private:
 	double mMargin;
 
 	std::vector<SpaceListenerPtr> mListeners;
-	std::vector<Vector3D> getCorners_r(DataPtr data) const;
 	void listenTo(CoordinateSystem space);
 	void onContentTransformsChanged();
 	void onContentChanged();
