@@ -34,15 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxGuiExport.h"
 #include "cxBaseWidget.h"
-#include "cxDataInterface.h"
-
 #include "cxOptionsWidget.h"
 
 
 namespace cx
 {
-typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
-typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 
 class cxGui_EXPORT MeshTextureWidget : public BaseWidget
 {
@@ -61,27 +57,13 @@ protected slots:
     virtual void prePaintEvent();
     void meshSelectedSlot();
 
-//    void meshChangedSlot();
-//    void textureTypeChangedSlot();
-//    void textureFileChangedSlot();
-    //void updateVtkPolyDataWithTexture();
-
 private:
-//    void addWidgets();
-
+    MeshTextureWidget();
     MeshPtr mMesh;
     SelectDataStringPropertyBasePtr mMeshSelector;
-
     OptionsWidget* mOptionsWidget;
-
-    //StringPropertyPtr mTextureType;
-    //FilePathPropertyPtr mTextureFile;
-
     PatientModelServicePtr mPatientModelService;
     ViewServicePtr mViewService;
-
-    MeshTextureWidget();
-
     void clearUI();
 };
 

@@ -32,8 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMeshTextureWidget.h"
 #include "cxMesh.h"
-#include "cxLabeledComboBoxWidget.h"
-#include "cxSelectDataStringProperty.h"
 
 
 namespace cx
@@ -56,12 +54,6 @@ MeshTextureWidget::MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelecto
     this->clearUI();
     connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
     this->setModified();
-
-    //this->addWidgets();
-    //this->meshSelectedSlot();
-
-
-    //connect(mTextureTypeAdapter.get(), &Property::changed, mMesh.get(), &Mesh::updateVtkPolyDataWithTexture);
 }
 
 MeshTextureWidget::~MeshTextureWidget()
@@ -79,81 +71,12 @@ void MeshTextureWidget::meshSelectedSlot()
     if (mMesh == mMeshSelector->getData())
         return;
 
-    if(mMesh)
-    {
-        //disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    }
-
     mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
-
     this->clearUI();
-
-    if (!mMesh)
-    {
-        return;
-    }
-    //mTextureType->setValue(mMesh->getTextureType());
-    //mTextureFile->setValue(mMesh->getTextureFile());
-
-    //connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 }
-
-//void MeshTextureWidget::meshChangedSlot()
-//{
-//    if(!mMesh)
-//        return;
-//}
-
-//void MeshTextureWidget::textureTypeChangedSlot()
-//{
-//    if(!mMesh)
-//        return;
-
-//    mMesh->setTextureType(mTextureType->getValue().toStdString().c_str());
-//}
-
-//void MeshTextureWidget::textureFileChangedSlot()
-//{
-//    if(!mMesh)
-//        return;
-
-//    mMesh->setTextureFile(mTextureFile->getValue().toStdString().c_str());
-//}
-
-//void MeshTextureWidget::updateVtkPolyDataWithTexture()
-//{
-//    std::cout << "CALLED void MeshTextureWidget::updateVtkPolyDataWithTexture() \n";
-//    if(mMesh)
-//        mMesh->updateVtkPolyDataWithTexture();
-//}
-
-//void MeshTextureWidget::addWidgets()
-//{
-//    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-//    QGridLayout* gridLayout = new QGridLayout;
-//    gridLayout->setMargin(0);
-//    toptopLayout->addLayout(gridLayout);
-
-
-//    connect(mTextureType.get(), &Property::changed, this, &MeshTextureWidget::textureTypeChangedSlot);
-//    connect(mTextureFile.get(), &Property::changed, this, &MeshTextureWidget::textureFileChangedSlot);
-
-//    mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
-//    toptopLayout->addWidget(mOptionsWidget);
-
-//    std::vector<PropertyPtr> options;
-//    options.push_back(mTextureFile);
-//    options.push_back(mTextureType);
-
-//    mOptionsWidget->setOptions("mesh_texture_options_widget", options, true);
-
-//    toptopLayout->addStretch();
-
-//}
 
 void MeshTextureWidget::clearUI()
 {
-    //mOptionsWidget->setWidgetDeleteOld(new QLabel("no\nmesh\nselected"));
     this->setModified();
 }
 
@@ -162,13 +85,7 @@ void MeshTextureWidget::setupUI()
     if (!mMesh)
         return;
 
-
-//    StringPropertySelectImagePtr imageSelector = StringPropertySelectImage::New(mPatientModelService);
-//    mMesh->getTextureData().mTextureImage = imageSelector;
-//    mMesh->getTextureData().addProperty(imageSelector);
-
     std::vector<PropertyPtr> properties = mMesh->getTextureData().mProperties;
-
     mOptionsWidget->setOptions("mesh_texture_properties", properties, true);
 
 }
