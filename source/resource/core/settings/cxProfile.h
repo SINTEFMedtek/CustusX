@@ -121,6 +121,7 @@ public:
 	QString getSessionRootFolder() const;
 	void setSessionRootFolder(QString path);
 
+	QString getPatientTemplatePath();
 private:
 	QString mPath;
 	SettingsPtr mSettings;
