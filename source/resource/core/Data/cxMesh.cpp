@@ -41,9 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDomDocument>
 #include <QColor>
 #include <QDir>
-#include <vtkImageReader2Factory.h>
+//#include <vtkImageReader2Factory.h>
 #include <vtkTransformTextureCoords.h>
-#include <vtkImageReader2.h>
+//#include <vtkImageReader2.h>
 #include <vtkTexture.h>
 #include <vtkTextureMapToCylinder.h>
 #include <vtkTextureMapToPlane.h>
@@ -53,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxDataReaderWriter.h"
 #include "vtkProperty.h"
+#include "vtkImageData.h"
+//#include "vtkSimpleImageToImageFilter.h"
 
 namespace cx
 {
@@ -333,7 +335,7 @@ void Mesh::setTextureType(const char *textureType)
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-    if(/*mTextureData.mTextureFile.get()->getValue().isEmpty() ||*/ mTextureData.mTextureType.get()->getValue().isEmpty())
+    if(mTextureData.mTextureImage.get()->getValue().isEmpty() || mTextureData.mTextureType.get()->getValue().isEmpty())
         return;
 
     QString textureType = this->getTextureType();
@@ -364,6 +366,7 @@ void Mesh::updateVtkPolyDataWithTexture()
     }
     else
     {
+        ////
         return;
         tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
     }
@@ -371,17 +374,36 @@ void Mesh::updateVtkPolyDataWithTexture()
     tMapper->SetInputData(mVtkPolyData);
     //tMapper->PreventSeamOn();
 
+
+    //************************
+
     //read texture file
-    vtkSmartPointer<vtkImageReader2Factory> readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
-    vtkImageReader2 *imageReader = readerFactory->CreateImageReader2("dummy");//(this->getTextureFile().toStdString().c_str());
-    if(!imageReader)
-        return;
-    imageReader->SetFileName("dummy");//(this->getTextureFile().toStdString().c_str());
+    //vtkSmartPointer<vtkImageReader2Factory> readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
+    //vtkImageReader2 *imageReader = readerFactory->CreateImageReader2("dummy");//(this->getTextureFile().toStdString().c_str());
+    //if(!imageReader)
+    //    return;
+    //imageReader->SetFileName("dummy");//(this->getTextureFile().toStdString().c_str());
+
+    ImagePtr textureImage = mTextureData.mTextureImage->getImage();
+    vtkImageDataPtr vtkd = textureImage->getBaseVtkImageData();
+
+//    vtkSmartPointer<vtkImageAlgorithm> imageFilter = vtkSmartPointer<vtkImageAlgorithm>::New();
+//    imageFilter->SetInputData(vtkd);
+//    imageFilter->Update();
+
+//    vtkSmartPointer<vtkSimpleImageToImageFilter> filter = vtkSmartPointer<vtkSimpleImageToImageFilter>::New();
+
+    //**********************
+
+
 
     //create texture
-    //vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
     mVtkTexture = vtkSmartPointer<vtkTexture>::New();
-    mVtkTexture->SetInputConnection(imageReader->GetOutputPort());
+    //mVtkTexture->SetInputConnection(imageReader->GetOutputPort());
+//    mVtkTexture->SetInputConnection(vtkd/*->GetOutputPort()*/);
+    //mVtkTexture->SetInputConnection(imageFilter->GetOutputPort());
+    mVtkTexture->SetInputData(vtkd/*->GetOutputPort()*/);
+
 
     //transform texture coordinates
     double translate[3];
@@ -399,7 +421,7 @@ void Mesh::updateVtkPolyDataWithTexture()
     mVtkPolyData = transformTexture->GetPolyDataOutput();
     //this->setVtkPolyData();
 
-    imageReader->Delete();
+    //imageReader->Delete();
 }
 
 QStringList Mesh::getOrientationArrayList()

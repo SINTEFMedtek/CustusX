@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
+//#include "cxPatientModelService.h"
+
 
 namespace cx
 {
@@ -140,21 +142,36 @@ FilePathProperty::FilePathProperty()
 
 }
 
+void FilePathProperty::setInitializeValues(const QString &uid, QString name, QString help, QString value, QStringList paths, QDomNode root)
+{
+    this->mUid = uid;
+    this->mName = name.isEmpty() ? uid : name;
+    this->mHelp = help;
+    this->mFilePath.setFilepath(value);
+    foreach (QString path, paths)
+        this->mFilePath.appendRootPath(path);
+    this->mStore = XmlOptionItem(uid, root.toElement());
+    this->mFilePath.setFilepath(this->mStore.readValue(value));
+}
+
+
 /** Make sure one given option exists witin root.
  * If not present, fill inn the input defaults.
  */
 FilePathPropertyPtr FilePathProperty::initialize(const QString& uid, QString name, QString help, QString value, QStringList paths, QDomNode root)
 {
     FilePathPropertyPtr retval(new FilePathProperty());
-    retval->mUid = uid;
-    retval->mName = name.isEmpty() ? uid : name;
-    retval->mHelp = help;
-    retval->mFilePath.setFilepath(value);
-    foreach (QString path, paths)
-        retval->mFilePath.appendRootPath(path);
-    retval->mStore = XmlOptionItem(uid, root.toElement());
-    retval->mFilePath.setFilepath(retval->mStore.readValue(value));
+    retval->setInitializeValues(uid, name, help, value, paths, root);
     return retval;
+//    retval->mUid = uid;
+//    retval->mName = name.isEmpty() ? uid : name;
+//    retval->mHelp = help;
+//    retval->mFilePath.setFilepath(value);
+//    foreach (QString path, paths)
+//        retval->mFilePath.appendRootPath(path);
+//    retval->mStore = XmlOptionItem(uid, root.toElement());
+//    retval->mFilePath.setFilepath(retval->mStore.readValue(value));
+//    return retval;
 }
 
 QString FilePathProperty::getDisplayName() const
@@ -187,6 +204,11 @@ QString FilePathProperty::getValue() const
     return mFilePath.getRelativeFilepath();
 }
 
+QString FilePathProperty::getAbsoluteValue() const
+{
+    return mFilePath.getAbsoluteFilepath();
+}
+
 bool FilePathProperty::setValue(const QString& val)
 {
     if (val == this->getValue())
@@ -213,5 +235,70 @@ void FilePathProperty::setValueFromVariant(QVariant val)
 {
     this->setValue(val.toString());
 }
+
+} // namespace cx
+
+
+//namespace cx
+//{
+
+//FilePathCopyPropertyPtr FilePathCopyProperty::initialize(const QString &uid, QString name, QString help, QString value, QStringList paths, QString patientFolderLocation, QDomNode root)
+//{
+//    FilePathCopyPropertyPtr retval(new FilePathCopyProperty());
+//    retval->setInitializeValues(uid, name, help, value, paths, root);
+//    retval->mLocationInPatientFolder = patientFolderLocation;
+//    return retval;
+
+////    retval->mUid = uid;
+////    retval->mName = name.isEmpty() ? uid : name;
+////    retval->mHelp = help;
+////    retval->mFilePath.setFilepath(value);
+////    foreach (QString path, paths)
+////        retval->mFilePath.appendRootPath(path);
+////    retval->mStore = XmlOptionItem(uid, root.toElement());
+////    retval->mFilePath.setFilepath(retval->mStore.readValue(value));
+////    return retval;
+//}
+
+//bool FilePathCopyProperty::setValue(const QString &value)
+//{
+//    if(!mPatientModelService)
+//        return FilePathProperty::setValue(value);
+
+//    QString imageName = value.split("/").last();
+//    QString patientFolder = mPatientModelService->getActivePatientFolder();
+//    QString copyToFolder = patientFolder + "/" + mLocationInPatientFolder;
+//    QString copyToFullPath = copyToFolder + "/" + imageName;
+
+//    QStringList roots = mFilePath.getRootPaths();
+//    if(!roots.contains(patientFolder, Qt::CaseInsensitive))
+//        mFilePath.appendRootPath(patientFolder);
+
+//    if(value == copyToFullPath)
+//    {
+//        return FilePathProperty::setValue(value);
+//    }
+//    else
+//    {
+//        if(!QDir(copyToFolder).exists())
+//        {
+//            QDir(patientFolder).mkdir(mLocationInPatientFolder);
+//        }
+
+//        if(QFile::exists(copyToFullPath))
+//        {
+//            QFile::remove(copyToFullPath);
+//        }
+
+//        QFile imageFile(value);
+//        imageFile.copy(copyToFullPath);
+//        return FilePathProperty::setValue(copyToFullPath);
+//    }
+//}
+
+//void FilePathCopyProperty::setPatientModelService(const PatientModelServicePtr &patientModelService)
+//{
+//    mPatientModelService = patientModelService;
+//}
 
 } // namespace cx

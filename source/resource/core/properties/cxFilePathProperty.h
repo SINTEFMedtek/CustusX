@@ -94,7 +94,8 @@ public:
     virtual void setValueFromVariant(QVariant val);
 
     virtual bool setValue(const QString& value); ///< set the data value.
-    virtual QString getValue() const; ///< get the data value.
+    virtual QString getValue() const; ///< get the data value, relative path
+    virtual QString getAbsoluteValue() const; ///< get the data value, absolute path
     virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
     virtual void setHelp(QString val);
 
@@ -103,6 +104,9 @@ public:
 signals:
     void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
+protected:
+    void setInitializeValues(const QString& uid, QString name, QString help, QString value,
+                        QStringList paths, QDomNode root);
 private:
     FilePathProperty();
     QString mName;
@@ -111,6 +115,37 @@ private:
     EmbeddedFilepath mFilePath;
     XmlOptionItem mStore;
 };
+
+
+//typedef boost::shared_ptr<class FilePathCopyProperty> FilePathCopyPropertyPtr;
+
+///**
+// * \ingroup cx_resource_core_properties
+// * Property which copies the selected file to a given loacation in the patient folder
+// * and takes the new location as the new path.
+// */
+//class cxResource_EXPORT FilePathCopyProperty: public FilePathProperty
+//{
+//Q_OBJECT
+//public:
+//    /** Make sure one given option exists witin root.
+//     * If not present, fill inn the input defaults.
+//     */
+//    static FilePathCopyPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
+//        QStringList paths, QString patientFolderLocation, QDomNode root = QDomNode());
+
+//    virtual bool setValue(const QString& value);
+
+
+//    void setPatientModelService(const PatientModelServicePtr &patientModelService);
+
+//private:
+//    PatientModelServicePtr mPatientModelService;
+//    QString mLocationInPatientFolder;
+
+//};
+
+
 
 
 } // namespace cx
