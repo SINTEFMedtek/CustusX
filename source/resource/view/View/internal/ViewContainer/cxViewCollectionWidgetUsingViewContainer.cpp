@@ -77,6 +77,17 @@ ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutR
 	return view;
 }
 
+void ViewCollectionWidgetUsingViewContainer::setOffScreenRenderingAndClear(bool on)
+{
+	this->clearViews();
+	mViewContainer->setOffScreenRenderingAndClear(on);
+}
+
+bool ViewCollectionWidgetUsingViewContainer::getOffScreenRendering() const
+{
+	return mViewContainer->getOffScreenRendering();
+}
+
 void ViewCollectionWidgetUsingViewContainer::clearViews()
 {
 	mViews.clear();

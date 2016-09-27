@@ -247,7 +247,7 @@ void WirePhantomWidget::registration()
     Transform3D delta = linearTransform.inv();
 //		mRegistrationService->restart();
 	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());//Instead of restart
-	mServices->registration()->applyImage2ImageRegistration(delta, "Wire Phantom Measurement");
+	mServices->registration()->addImage2ImageRegistration(delta, "Wire Phantom Measurement");
 
 
     Vector3D t_delta = linearTransform.matrix().block<3, 1>(0, 3);

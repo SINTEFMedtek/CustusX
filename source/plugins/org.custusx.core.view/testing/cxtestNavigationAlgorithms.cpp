@@ -72,6 +72,25 @@ TEST_CASE("NavigationAlgorithms: elevateCamera", "[unit]")
 	CHECK(cx::similar(camera_el, cx::Vector3D(100.0-d, 0, d)));
 }
 
+TEST_CASE("NavigationAlgorithms: elevateCamera complex", "[unit]")
+{
+	// move 45deg up, elevating 100/sqr(2) up from plane and from focus
+	double angle = 45.0/180*M_PI;
+	cx::Vector3D camera(20,10,50);
+	cx::Vector3D focus(120,10,50);
+	cx::Vector3D vup = cx::Vector3D(0,1,1).normal();
+
+	cx::Vector3D camera_el = cx::NavigationAlgorithms::elevateCamera(angle, camera, focus, vup);
+	double d = 100.0/sqrt(2);
+	double angle_el = acos(cx::dot(camera_el-focus,camera-focus)/(camera_el-focus).length()/(camera-focus).length());
+	INFO("camera_el " + string_cast(camera_el));
+	INFO("angle_el " + string_cast(angle_el/M_PI*180));
+
+//	CHECK(cx::similar(angle_el, angle));
+	CHECK(cx::similar((camera_el-focus).length(), (camera-focus).length()));
+//	CHECK(cx::similar(camera_el, cx::Vector3D(100.0-d, 0, d)));
+}
+
 TEST_CASE("NavigationAlgorithms: orthogonalize_vup", "[unit]")
 {
 	double angle = 45.0/180*M_PI;

@@ -65,12 +65,11 @@ ViewCollectionImageWriter::ViewCollectionImageWriter(ViewCollectionWidget* widge
 vtkImageDataPtr ViewCollectionImageWriter::grab()
 {
     std::vector<ViewPtr> views = mWidget->getViews();
-    Eigen::Array3i target_size(mWidget->width(), mWidget->height(), 1);
-    vtkImageDataPtr target = generateVtkImageData(target_size, Vector3D(1,1,1), 150, 3);
+	Eigen::Array3i target_size(mWidget->width(), mWidget->height(), 1);
+	vtkImageDataPtr target = generateVtkImageData(target_size, Vector3D(1,1,1), 150, 3);
 
 	for (unsigned i=0; i<views.size(); ++i)
 	{
-//        CX_LOG_CHANNEL_DEBUG("CA") << "chec pos for view " << i;
         vtkImageDataPtr vtkImage = this->view2vtkImageData(views[i]);
         QPoint vtkpos = this->getVtkPositionOfView(views[i]);
         this->drawImageAtPos(target, vtkImage, vtkpos);

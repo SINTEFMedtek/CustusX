@@ -429,15 +429,17 @@ void TextDisplay::setPosition( float x, float y  )
 
 void TextDisplay::updateText( const QString& text)
 {
-    //VTK has a bug which leaves a white square where the text was, if the text is replaced with no text.
-    //E.g. the volume name when removing the last visible voulume. So we add a space instead of an empty text.
-    //Jon, 2016-02-10
-    if(text.isEmpty())
-        mapper->SetInput( " " );
-    else
-        mapper->SetInput( cstring_cast(text) );
+	QString input = text;
+	//VTK has a bug which leaves a white square where the text was, if the text is replaced with no text.
+	//E.g. the volume name when removing the last visible voulume. So we add a space instead of an empty text.
+	if(input.isEmpty())
+		input = " ";
 
-    actor->Modified();
+	if (input == QString(mapper->GetInput()))
+		return;
+
+	mapper->SetInput( cstring_cast(input) );
+	actor->Modified();
 }
 
 vtkTextProperty* TextDisplay::textProperty()

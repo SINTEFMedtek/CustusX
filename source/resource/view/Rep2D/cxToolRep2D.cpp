@@ -98,6 +98,9 @@ double ToolRep2D::getOffset()
  */
 void ToolRep2D::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
 {
+	if (similar(m_vpMs, vpMs) && similar(mBB_vp, vp))
+		return;
+
 	m_vpMs = vpMs;
 	mBB_vp = vp;
 
@@ -127,6 +130,8 @@ void ToolRep2D::setSliceProxy(SliceProxyPtr slicer)
  */
 void ToolRep2D::setUseOffset(bool on)
 {
+	if (mUseOffset==on)
+		return;
 	mUseOffset = on;
 	setVisibility();
 }
@@ -135,6 +140,8 @@ void ToolRep2D::setUseOffset(bool on)
  */
 void ToolRep2D::setUseCrosshair(bool on)
 {
+	if (mUseCrosshair==on)
+		return;
 	mUseCrosshair = on;
 	setVisibility();
 }
@@ -143,6 +150,8 @@ void ToolRep2D::setUseCrosshair(bool on)
  */
 void ToolRep2D::setUseToolLine(bool on)
 {
+	if (mUseToolLine==on)
+		return;
 	mUseToolLine = on;
 	setVisibility();
 }
@@ -151,6 +160,8 @@ void ToolRep2D::setUseToolLine(bool on)
  */
 void ToolRep2D::setUseOffsetText(bool on)
 {
+	if (mUseOffsetText==on)
+		return;
 	mUseOffsetText = on;
 	setVisibility();
 }
@@ -161,6 +172,8 @@ void ToolRep2D::setUseOffsetText(bool on)
  */
 void ToolRep2D::setMergeOffsetAndToolLine(bool on)
 {
+	if (mMergeOffsetAndToolLine==on)
+		return;
 	mMergeOffsetAndToolLine = on;
 	setVisibility();
 }

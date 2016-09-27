@@ -126,9 +126,12 @@ private:
 	double mOffsetFromP0;
 	double mRepeatDistance;
 
+	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const;
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
+	std::vector<Transform3D> calculateOrientations() const;
 	int getRepeatCount() const;
+	std::vector<Vector3D> getPointCloud() const;
 };
 
 /**

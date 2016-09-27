@@ -210,7 +210,7 @@ void BronchoscopyRegistrationWidget::registerSlot()
     }
 
     new_rMpr = new_rMpr*old_rMpr;//output
-	mServices->registration()->applyPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
+	mServices->registration()->addPatientRegistration(new_rMpr, "Bronchoscopy centerline to tracking data");
 
     Eigen::Matrix4d display_rMpr = Eigen::Matrix4d::Identity();
             display_rMpr = new_rMpr*display_rMpr;

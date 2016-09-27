@@ -109,6 +109,7 @@ private:
   QSpinBox* mRowsEdit;
   QSpinBox* mColsEdit;
   QLineEdit* mNameEdit;
+  BoolPropertyPtr mOffScreenRendering;
 
   std::vector<std::vector<GridElement> > mViewDataCache; ///< 10x10 grid of all available views
   LayoutData mViewData; ///< RxC grid of currently used views.
@@ -129,6 +130,7 @@ private:
 
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
+  void onOffScreenRenderingChanged();
 };
 
 

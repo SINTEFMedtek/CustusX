@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include "cxTypeConversions.h"
 #include "cxOSXHelper.h"
+#include "cxViewWidget.h"
 
 namespace cx
 {
@@ -96,6 +97,15 @@ public:
 		std::copy(mUsed.begin(), mUsed.end(), back_inserter(mCached));
 		mUsed.clear();
 	}
+	/**
+	 * Clear all cached values
+	 */
+	void clearCache()
+	{
+		mCached.clear();
+		mUsed.clear();
+	}
+
 private:
 	QWidget* mCentralWidget;
 	int mNameGenerator;
@@ -103,6 +113,7 @@ private:
 	std::vector<VIEW_TYPE*> mCached;
 	std::vector<VIEW_TYPE*> mUsed;
 };
+
 
 /**
  * @}

@@ -50,12 +50,16 @@ class CXTESTUTILITIES_EXPORT DirectSignalListener : public QObject
 	Q_OBJECT
 public:
 	DirectSignalListener(QObject* object, const char* signal);
-	~DirectSignalListener(){}
-	bool isReceived();
+	~DirectSignalListener();
+
+	bool isReceived() const;
+	unsigned int getNumberOfRecievedSignals() const;
+
 private slots:
-	void slot();
+	void receive();
+
 private:
-	bool mReceived;
+	unsigned int mNumberOfSignalsReceived;
 };
 
 } /* namespace cxtest */

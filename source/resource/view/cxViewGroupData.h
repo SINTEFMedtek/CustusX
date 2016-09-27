@@ -71,7 +71,9 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 
 	bool mCameraFollowTool;
 	bool mFocusFollowTool;
-	bool mCameraOnTooltip;
+	bool mCameraLockToTooltip;
+	double mCameraTooltipOffset;
+	bool mCameraNotBehindROI;
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;

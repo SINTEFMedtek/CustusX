@@ -138,8 +138,8 @@ void ElastixManager::executionFinishedSlot()
 //	std::cout << "ElastixManager::executionFinishedSlot(), delta_pre_rMd: \n" << delta_pre_rMd << std::endl;
 //	std::cout << "ElastixManager::executionFinishedSlot(), expected new rMdm: \n" << mServices->registration()->getFixedData()->get_rMd() * mMf.inv() << std::endl;
 
-//	mServices->registration()->applyImage2ImageRegistration(mMf.inv(), desc);
-	mServices->registration()->applyImage2ImageRegistration(delta_pre_rMd, desc);
+//	mServices->registration()->addImage2ImageRegistration(mMf.inv(), desc);
+	mServices->registration()->addImage2ImageRegistration(delta_pre_rMd, desc);
 
 	// add nonlinear data AFTER registering - we dont want these data to be double-registered!
 	this->addNonlinearData();

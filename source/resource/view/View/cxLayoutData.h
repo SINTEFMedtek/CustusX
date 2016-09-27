@@ -107,6 +107,8 @@ public:
 	LayoutData();
 	QString getUid() const { return mUid; }
 	QString getName() const { return mName; }
+	bool getOffScreenRendering() const { return mOffScreenRendering; }
+	void setOffScreenRendering(bool val) { mOffScreenRendering = val; }
 	void setName(const QString& name) { mName = name; }
 	void resetUid(const QString& uid);
 	void setView(int group, PLANE_TYPE type, LayoutRegion region);
@@ -133,6 +135,7 @@ private:
 	QString mName;
 	LayoutPosition mSize;
 	std::vector<LayoutViewData> mView;
+	bool mOffScreenRendering;
 };
 
 /**

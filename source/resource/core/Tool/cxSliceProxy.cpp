@@ -266,6 +266,10 @@ Transform3D SliceProxy::get_sMr()
 
 void SliceProxy::changed()
 {
+	SlicePlane plane = mCutplane->getPlane();
+	if (similar(plane, mLastEmittedSlicePlane))
+		return;
+	mLastEmittedSlicePlane = plane;
 	emit transformChanged(get_sMr());
 }
 
