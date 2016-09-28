@@ -165,7 +165,7 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	size = QSize(std::min<int>(size.width(), rect_s.width()*0.75),
 				 std::min<int>(size.height(), rect_s.height()*0.75));
 	// make sure all of scroll area is visible:
-	int margin = 2;
+    int margin = 20;
 	mTopWindow->setGeometry(QRect(QPoint(0,0),
 								  QSize(size.width()+margin, size.height()+margin)));
 
