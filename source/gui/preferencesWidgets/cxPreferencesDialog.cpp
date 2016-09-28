@@ -79,7 +79,7 @@ void VisualizationTab::init()
 
   SelectColorSettingButton* backgroundColorButton =
 		  new SelectColorSettingButton("Background Color",
-									   "View/backgroundColor",
+									   "backgroundColor",
 									   "Set 3D view background color");
 
   SelectColorSettingButton* tool2DColor =
