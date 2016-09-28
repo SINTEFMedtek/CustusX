@@ -34,13 +34,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxData.h"
 #include "cxImageAlgorithms.h"
+#include "cxImage.h"
 
 namespace cx
 {
 
 SelectDataStringPropertyBase::SelectDataStringPropertyBase(PatientModelServicePtr patientModelService, QString typeRegexp) :
 	mTypeRegexp(typeRegexp),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mOnly2D(false)
 {
 	mValueName = "Select data";
 	mUidRegexp = "";
@@ -92,6 +94,29 @@ std::map<QString, DataPtr> SelectDataStringPropertyBase::filterOnUid(std::map<QS
 	return input;
 }
 
+std::map<QString, DataPtr> SelectDataStringPropertyBase::filterImagesOn2D(std::map<QString, DataPtr> input, bool only2D) const
+{
+	if(!only2D)
+		return input;
+
+	std::map<QString, DataPtr>::iterator iter, current;
+	for (iter=input.begin(); iter!=input.end(); )
+	{
+		current = iter++; // increment iterator before erasing!
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(current->second);
+		if(image && !image->is2D())
+			input.erase(current);
+	}
+
+	return input;
+}
+
+void SelectDataStringPropertyBase::setOnly2DImagesFilter(bool only2D)
+{
+	mOnly2D = only2D;
+	emit changed();
+}
+
 void SelectDataStringPropertyBase::setUidRegexp(QString regexp)
 {
 	mUidRegexp = regexp;
@@ -103,6 +128,7 @@ QStringList SelectDataStringPropertyBase::getValueRange() const
 	std::map<QString, DataPtr> data = mPatientModelService->getDatas();
 	data = SelectDataStringPropertyBase::filterOnType(data, mTypeRegexp);
 	data = this->filterOnUid(data, mUidRegexp);
+	data = this->filterImagesOn2D(data, mOnly2D);
 	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(data);
 	QStringList retval;
 	retval << "";

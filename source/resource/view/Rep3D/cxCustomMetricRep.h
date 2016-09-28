@@ -47,6 +47,7 @@ namespace cx
 typedef boost::shared_ptr<class CustomMetricRep> CustomMetricRepPtr;
 typedef boost::shared_ptr<class CustomMetric> CustomMetricPtr;
 typedef boost::shared_ptr<class GraphicalGeometric> GraphicalGeometricPtr;
+typedef boost::shared_ptr<class Image2DProxy> Image2DProxyPtr;
 
 
 /**Rep for visualizing a CustomMetric.
@@ -73,10 +74,12 @@ protected:
 private:
     CustomMetricRep();
     CustomMetricPtr getCustomMetric();
-    void updateSTLModel();
-//	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale);
+	void updateModel();
 
-	std::vector<GraphicalGeometricPtr> mGeometry;
+	std::vector<GraphicalGeometricPtr> mMeshGeometry;
+	std::vector<Image2DProxyPtr> mImageGeometryProxy;
+	void updateMeshModel(DataPtr model);
+	void updateImageModel(DataPtr model);
 };
 
 }

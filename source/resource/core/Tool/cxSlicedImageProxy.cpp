@@ -80,19 +80,21 @@ void ApplyLUTToImage2DProxy::setInput(vtkImageAlgorithmPtr input, vtkLookupTable
 
 	if (input->GetOutput())
 	{
-		if (input->GetOutput()->GetNumberOfScalarComponents() == 3) // color
+		int numScalarComponents = input->GetOutput()->GetNumberOfScalarComponents();
+		if ( numScalarComponents >= 3) // color
 		{
 			// split the image into the components, apply the lut, then merge.
 
 			vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
 
-			for (int i = 0; i < 3; ++i)
+			for (int i = 0; i < numScalarComponents; ++i)
 			{
 				vtkImageMapToColorsPtr compWindowLevel = vtkImageMapToColorsPtr::New();
 				compWindowLevel->SetInputConnection(input->GetOutputPort());
 				compWindowLevel->SetActiveComponent(i);
 				compWindowLevel->SetLookupTable(lut);
-				if (i==2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
+
+				if (i==2 && numScalarComponents==3)
 				{
 					compWindowLevel->SetOutputFormatToLuminanceAlpha();
 				}
