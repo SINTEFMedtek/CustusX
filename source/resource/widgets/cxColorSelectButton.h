@@ -66,7 +66,7 @@ private slots:
 /**
  * Helper class for setting a color in settings()
  */
-class SelectColorSettingButton : public ColorSelectButton
+class cxResourceWidgets_EXPORT SelectColorSettingButton : public ColorSelectButton
 {
 	Q_OBJECT
 
