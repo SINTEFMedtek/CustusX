@@ -59,6 +59,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+void debugPrint(CameraInfo info)
+{
+	CX_LOG_CHANNEL_DEBUG("CA") << "  info.focus="<<info.focus;
+	CX_LOG_CHANNEL_DEBUG("CA") << "  info.pos="<<info.pos;
+	CX_LOG_CHANNEL_DEBUG("CA") << "  info.vup="<<info.vup;
+	CX_LOG_CHANNEL_DEBUG("CA") << "  info.vpn() ="<<info.vpn();
+	CX_LOG_CHANNEL_DEBUG("CA") << "  info.distance() ="<<info.distance();
+}
+
+
+
 CameraStyleForView::CameraStyleForView(CoreServicesPtr backend) :
 	mBlockCameraUpdate(false),
 	mBackend(backend)
@@ -190,16 +201,6 @@ void CameraStyleForView::applyCameraStyle()
 		cam_new = this->viewEntireAutoZoomROI(cam_new);
 	}
 
-//	if (mStyle.mCameraOnTooltip && mFollowingTool)
-//	{
-//		// Move the camera onto the tool tip, keeping the distance vector constant.
-//		// This gives the effect of _sitting on the tool tip_ while moving.
-//		// Alternative: Dont change focal point, change view angle instead.
-//		Vector3D delta = this->getToolTip_r() - cam_new.pos;
-//		cam_new.pos += delta;
-//		cam_new.focus += delta;
-//	}
-
 	if (mStyle.mCameraFollowTool)
 	{
 		cam_new.pos = NavigationAlgorithms::elevateCamera(mStyle.mElevation, cam_new.pos, cam_new.focus, cam_new.vup);
@@ -223,16 +224,6 @@ Vector3D CameraStyleForView::getToolTip_r()
 	Transform3D rMto = this->get_rMto();
 	return rMto.coord(Vector3D::Zero());
 }
-
-void debugPrint(CameraInfo info)
-{
-	CX_LOG_CHANNEL_DEBUG("CA") << "  info.focus="<<info.focus;
-	CX_LOG_CHANNEL_DEBUG("CA") << "  info.pos="<<info.pos;
-	CX_LOG_CHANNEL_DEBUG("CA") << "  info.vup="<<info.vup;
-	CX_LOG_CHANNEL_DEBUG("CA") << "  info.vpn() ="<<info.vpn();
-	CX_LOG_CHANNEL_DEBUG("CA") << "  info.distance() ="<<info.distance();
-}
-
 
 
 CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
@@ -265,7 +256,7 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 
 	DoubleBoundingBox3D proj_bb = roi_r.getBox(pMr);
 
-	Vector3D dist = cam_proj.focus - cam_proj.pos;
+	Vector3D viewdirection = (cam_proj.focus - cam_proj.pos).normal();
 	cam_proj.pos = NavigationAlgorithms::findCameraPosByZoomingToROI(viewAngle_vertical,
 																	 viewAngle_horizontal,
 																	 cam_proj.focus,
@@ -273,7 +264,7 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 																	 cam_proj.vpn(),
 																	 proj_bb);
 	// keep focus at a const distance in front of the camera (if we dont do this, vpn might swap)
-	cam_proj.focus = (cam_proj.pos + dist).normal() * 100;
+	cam_proj.focus = cam_proj.pos + viewdirection * 100;
 
 	cam_proj.pos = this->smoothZoomedCameraPosition(cam_proj.pos);
 
@@ -287,20 +278,16 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 	// IF behind bb: keep pos inside bb
 	if (mStyle.mCameraLockToTooltip && mFollowingTool)
 	{
-//		CX_LOG_CHANNEL_DEBUG("CA") << "";
 		Transform3D rMto = this->get_rMto();
 		Vector3D proj_tool = (pMr*rMto).coord(Vector3D(0,0,mStyle.mCameraTooltipOffset));
 //		Vector3D proj_tool = pMr.coord(this->getToolTip_r());
 		Vector3D e_z(0,0,1);
-		double bb_extension = 50; // distance from bb where we want to interpolate between on-tool and off-tool
+		double bb_extension = 50; // distance from bb where we want to use only on-tool
+		double bb_extension_interpolate_interval = 50; // distance from bb where we want to interpolate between on-tool and off-tool
 		double tool_z = dot(proj_tool, e_z);
 		double bb_min_z = proj_bb[4];
 		double bb_max_z = proj_bb[5];
 		double bb_ext_z = proj_bb[5] + bb_extension;
-//		CX_LOG_CHANNEL_DEBUG("CA") << "  tool_z="<<tool_z
-//								   <<", bb_min_z="<<bb_min_z
-//								   <<", bb_max_z="<<bb_max_z
-//								   <<", bb_ext_z="<<bb_ext_z;
 
 		Vector3D new_pos;
 		if (mStyle.mCameraNotBehindROI && (tool_z < bb_min_z))
@@ -311,7 +298,7 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 		}
 		else
 		{
-			double s = (tool_z-bb_max_z)/bb_extension;
+			double s = (tool_z-bb_extension-bb_max_z)/bb_extension_interpolate_interval;
 			s = std::min(1.0, s);
 			s = std::max(0.0, s);
 			new_pos = (1.0-s)*proj_tool + (s)*cam_proj.pos;

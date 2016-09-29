@@ -56,6 +56,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
 	mRepeatDistance = 0.0;
+	mTranslationOnly = false;
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -81,7 +82,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 
 	QDomElement elem = dataNode.toElement();
 	elem.setAttribute("definevectorup", mDefineVectorUpMethod);
-	elem.setAttribute("modelUid", mModelUid);
+	elem.setAttribute("meshUid", mModelUid);
 
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
@@ -97,7 +98,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 
 	QDomElement elem = dataNode.toElement();
 	mDefineVectorUpMethod = elem.attribute("definevectorup", qstring_cast(mDefineVectorUpMethod));
-	mModelUid = elem.attribute("modelUid", qstring_cast(mModelUid));
+	mModelUid = elem.attribute("meshUid", qstring_cast(mModelUid));
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
@@ -369,7 +370,19 @@ std::vector<Transform3D> CustomMetric::calculateOrientations() const
 
 	std::vector<Transform3D> retval(pos.size());
 	for (unsigned i=0; i<retval.size(); ++i)
-		retval[i] = this->calculateOrientation(pos[i], dir, vup, scale);
+	{
+//		if (true)
+		bool tonly = (mModelUid.contains("head-")); // HACK alert - for demo 2016-09-26 only.
+		if (tonly)
+//		if (mTranslationOnly)
+		{
+			retval[i] = createTransformTranslate(pos[i]);
+		}
+		else
+		{
+			retval[i] = this->calculateOrientation(pos[i], dir, vup, scale);
+		}
+	}
 
 	return retval;
 }

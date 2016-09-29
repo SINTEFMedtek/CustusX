@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxColorSelectButton.h"
 #include <iostream>
 #include <QtWidgets>
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -61,6 +62,26 @@ void ColorSelectButton::clickedSlot()
 		return;
 	this->setColor(result);
 	emit (colorChanged(mColor));
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectColorSettingButton::SelectColorSettingButton(QString caption, QString id, QString help) :
+	ColorSelectButton(caption),
+	mId(id)
+{
+	this->setColor(settings()->value(mId).value<QColor>());
+	this->setStatusTip(help);
+	this->setToolTip(help);
+	connect(this, &SelectColorSettingButton::colorChanged,
+			this, &SelectColorSettingButton::storeColor);
+}
+
+void SelectColorSettingButton::storeColor(QColor color)
+{
+	settings()->setValue(mId, color);
 }
 
 }
