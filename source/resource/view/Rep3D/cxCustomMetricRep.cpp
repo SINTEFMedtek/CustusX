@@ -161,7 +161,7 @@ void CustomMetricRep::createDistanceMarkers()
 {
 	mDistanceText.clear();
 	CustomMetricPtr custom = this->getCustomMetric();
-	if(!custom->getShowDistanceMarkers())
+	if(!custom->getModel() || !custom->getShowDistanceMarkers())
 		return;
 	std::vector<Transform3D> pos = custom->calculateOrientations();
 
