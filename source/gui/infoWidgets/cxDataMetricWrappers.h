@@ -266,6 +266,7 @@ private:
   DoublePropertyPtr createOffsetFromP0() const;
   DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
+  BoolPropertyPtr createShowDistanceMarkers() const;
   StringPropertySelectDataPtr createModelSelector() const;
   BoolPropertyPtr createTranslationOnly() const;
 
@@ -273,6 +274,7 @@ private:
   StringPropertyPtr mDefineVectorUpMethod;
   BoolPropertyPtr mScaleToP1;
   QWidget* mScaleToP1Widget;
+  BoolPropertyPtr mShowDistanceMarkers;
   BoolPropertyPtr mTranslationOnly;
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;

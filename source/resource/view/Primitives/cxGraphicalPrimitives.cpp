@@ -707,6 +707,12 @@ CaptionText3D::CaptionText3D( vtkRendererPtr renderer)
 	this->setRenderer(renderer);
 }
 
+void CaptionText3D::placeBelowCenter()
+{
+	mText->SetPosition(-15, -30);
+	mText->SetPosition2(15, -10);
+}
+
 void CaptionText3D::setRenderer(vtkRendererPtr renderer)
 {
 	if (mRenderer)

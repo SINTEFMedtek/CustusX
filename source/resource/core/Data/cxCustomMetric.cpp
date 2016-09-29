@@ -47,7 +47,7 @@ namespace cx
 {
 
 CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
-				DataMetric(uid, name, dataManager, spaceProvider)
+				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
@@ -88,6 +88,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
 	elem.setAttribute("repeatDistance", mRepeatDistance);
+	elem.setAttribute("showDistance", mShowDistanceMarkers);
 	elem.setAttribute("translationOnly", mTranslationOnly);
 }
 
@@ -103,6 +104,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
+	mShowDistanceMarkers = elem.attribute("showDistance", QString::number(mShowDistanceMarkers)).toInt();
 	mTranslationOnly = elem.attribute("translationOnly", QString::number(mTranslationOnly)).toInt();
 }
 
@@ -154,6 +156,23 @@ std::vector<Vector3D> CustomMetric::getPointCloud() const
 	}
 
 	return retval;
+}
+
+Vector3D CustomMetric::getZeroPosition() const
+{
+	Vector3D zeroPos;
+	std::vector<Vector3D> coords = mArguments->getRefCoords();
+	if (coords.empty())
+		return zeroPos;
+	Vector3D p0 = coords[0];
+
+	Vector3D dir = this->getDirection();
+	Vector3D vup = this->getVectorUp();
+	Vector3D scale = this->getScale();
+
+	zeroPos = this->calculateOrientation(p0, dir, vup, scale).coord(Vector3D(0,0,0));
+
+	return zeroPos;
 }
 
 std::vector<Vector3D> CustomMetric::getPositions() const
@@ -323,7 +342,19 @@ double CustomMetric::getRepeatDistance() const
 	return mRepeatDistance;
 }
 
-void CustomMetric::setTranslationOnly(bool val)
+void CustomMetric::setShowDistanceMarkers(bool show)
+{
+	if(mShowDistanceMarkers == show)
+		return;
+	mShowDistanceMarkers = show;
+	emit propertiesChanged();
+}
+
+bool CustomMetric::getShowDistanceMarkers() const
+{
+	return mShowDistanceMarkers;
+}
+	void CustomMetric::setTranslationOnly(bool val)
 {
 	if (mTranslationOnly == val)
 		return;
