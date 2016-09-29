@@ -81,6 +81,8 @@ public:
 	double getOffsetFromP0() const;
 	void setRepeatDistance(double val);
 	double getRepeatDistance() const;
+	void setTranslationOnly(bool val);
+	bool getTranslationOnly() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels

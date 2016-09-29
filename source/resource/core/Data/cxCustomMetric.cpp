@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
+#include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
 
@@ -87,6 +88,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
 	elem.setAttribute("repeatDistance", mRepeatDistance);
+	elem.setAttribute("translationOnly", mTranslationOnly);
 }
 
 void CustomMetric::parseXml(QDomNode& dataNode)
@@ -101,6 +103,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
+	mTranslationOnly = elem.attribute("translationOnly", QString::number(mTranslationOnly)).toInt();
 }
 
 bool CustomMetric::isValid() const
@@ -122,17 +125,25 @@ std::vector<Vector3D> CustomMetric::getPointCloud() const
 {
 	std::vector<Vector3D> retval;
 
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(this->getModel());
-	if(!mesh)
-		return retval;
-
-	std::vector<Vector3D> cloud = mesh->getPointCloud();
+	DataPtr model = this->getModel();
 
 	std::vector<Transform3D> pos = this->calculateOrientations();
+	std::vector<Vector3D> cloud;
+	Transform3D rrMd;
+
+	if (model)
+	{
+		rrMd = model->get_rMd();
+		cloud = model->getPointCloud();
+	}
+	else
+	{
+		cloud.push_back(Vector3D::Zero());
+		rrMd = Transform3D::Identity();
+	}
 
 	for (unsigned i=0; i<pos.size(); ++i)
 	{
-		Transform3D rrMd = mesh->get_rMd();
 		Transform3D rMd = pos[i] * rrMd;
 
 		for (unsigned j=0; j<cloud.size(); ++j)
@@ -312,6 +323,19 @@ double CustomMetric::getRepeatDistance() const
 	return mRepeatDistance;
 }
 
+void CustomMetric::setTranslationOnly(bool val)
+{
+	if (mTranslationOnly == val)
+		return;
+	mTranslationOnly = val;
+	emit propertiesChanged();
+}
+
+bool CustomMetric::getTranslationOnly() const
+{
+	return mTranslationOnly;
+}
+
 QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethods() const
 {
     QStringList retval;
@@ -339,10 +363,7 @@ std::vector<Transform3D> CustomMetric::calculateOrientations() const
 	std::vector<Transform3D> retval(pos.size());
 	for (unsigned i=0; i<retval.size(); ++i)
 	{
-//		if (true)
-		bool tonly = (mModelUid.contains("head-")); // HACK alert - for demo 2016-09-26 only.
-		if (tonly)
-//		if (mTranslationOnly)
+		if (mTranslationOnly)
 		{
 			retval[i] = createTransformTranslate(pos[i]);
 		}

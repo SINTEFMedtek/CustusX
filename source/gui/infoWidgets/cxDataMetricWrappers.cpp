@@ -732,6 +732,9 @@ QWidget* CustomMetricWrapper::createWidget()
 	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
 	topLayout->addWidget(mScaleToP1Widget);
 
+	mTranslationOnly= this->createTranslationOnly();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
+
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
@@ -793,6 +796,7 @@ void CustomMetricWrapper::guiChanged()
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
 	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
+	mData->setTranslationOnly(mTranslationOnly->getValue());
 
 	mInternalUpdate = false;
 }
@@ -803,6 +807,16 @@ BoolPropertyPtr CustomMetricWrapper::createScaletoP1() const
 	retval = BoolProperty::initialize("Scale to P1", "",
 										  "Scale model so that it fits between P0 and P1",
 										  mData->getScaleToP1());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Translation Only", "",
+										  "Ignore scale and rotate",
+										  mData->getTranslationOnly());
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }

@@ -73,10 +73,11 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 	bool mFocusFollowTool;
 	bool mCameraLockToTooltip;
 	double mCameraTooltipOffset;
-	bool mCameraNotBehindROI;
+//	bool mCameraNotBehindROI;
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;
+	QString mCameraNotBehindROI; // never move camera behind this roi
 	QString mFocusROI; // name of ROI to set focus in.
 	QString mAutoZoomROI; // name of ROI to zoom to.
 };

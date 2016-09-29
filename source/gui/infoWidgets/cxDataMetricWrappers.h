@@ -267,11 +267,13 @@ private:
   DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
   StringPropertySelectDataPtr createModelSelector() const;
+  BoolPropertyPtr createTranslationOnly() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
   BoolPropertyPtr mScaleToP1;
   QWidget* mScaleToP1Widget;
+  BoolPropertyPtr mTranslationOnly;
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;
   StringPropertySelectDataPtr mModel;
