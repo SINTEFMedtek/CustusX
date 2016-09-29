@@ -268,12 +268,14 @@ private:
   BoolPropertyPtr createScaletoP1() const;
   BoolPropertyPtr createShowDistanceMarkers() const;
   StringPropertySelectDataPtr createModelSelector() const;
+  BoolPropertyPtr createTranslationOnly() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
   BoolPropertyPtr mScaleToP1;
   QWidget* mScaleToP1Widget;
   BoolPropertyPtr mShowDistanceMarkers;
+  BoolPropertyPtr mTranslationOnly;
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;
   StringPropertySelectDataPtr mModel;

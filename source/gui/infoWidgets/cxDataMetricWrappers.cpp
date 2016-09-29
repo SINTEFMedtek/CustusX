@@ -736,6 +736,9 @@ QWidget* CustomMetricWrapper::createWidget()
 	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
 	topLayout->addWidget(mScaleToP1Widget);
 
+	mTranslationOnly= this->createTranslationOnly();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
+
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
@@ -798,6 +801,7 @@ void CustomMetricWrapper::guiChanged()
 	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
 	mData->setShowDistanceMarkers(mShowDistanceMarkers->getValue());
+	mData->setTranslationOnly(mTranslationOnly->getValue());
 
 	mInternalUpdate = false;
 }
@@ -818,6 +822,16 @@ BoolPropertyPtr CustomMetricWrapper::createShowDistanceMarkers() const
 	retval = BoolProperty::initialize("Show distance markers", "",
 										  "Show distance to P0 for each repeated model",
 										  mData->getShowDistanceMarkers());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Translation Only", "",
+										  "Ignore scale and rotate",
+										  mData->getTranslationOnly());
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }

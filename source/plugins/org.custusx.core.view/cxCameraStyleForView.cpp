@@ -279,21 +279,28 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 	if (mStyle.mCameraLockToTooltip && mFollowingTool)
 	{
 		Transform3D rMto = this->get_rMto();
-		Vector3D proj_tool = (pMr*rMto).coord(Vector3D(0,0,mStyle.mCameraTooltipOffset));
-//		Vector3D proj_tool = pMr.coord(this->getToolTip_r());
+		Vector3D proj_tool = (pMr*rMto).coord(Vector3D(0,0,0));
 		Vector3D e_z(0,0,1);
 		double bb_extension = 50; // distance from bb where we want to use only on-tool
 		double bb_extension_interpolate_interval = 50; // distance from bb where we want to interpolate between on-tool and off-tool
+
+		bb_extension = 0; // distance from bb where we want to use only on-tool
+		bb_extension_interpolate_interval = 50; // distance from bb where we want to interpolate between on-tool and off-tool
+
 		double tool_z = dot(proj_tool, e_z);
-		double bb_min_z = proj_bb[4];
 		double bb_max_z = proj_bb[5];
 		double bb_ext_z = proj_bb[5] + bb_extension;
 
+		RegionOfInterest notbehind_r = this->getROI(mStyle.mCameraNotBehindROI);
+		DoubleBoundingBox3D notbehind_proj = notbehind_r.getBox((pMr));
+		double notbehind = notbehind_proj[4];
+
 		Vector3D new_pos;
-		if (mStyle.mCameraNotBehindROI && (tool_z < bb_min_z))
+
+		if (notbehind_r.isValid() && (tool_z < notbehind))
 		{
 			// behind roi: lock camera pos to closest pos inside bb
-			new_pos = proj_tool + (bb_min_z-tool_z)*e_z;
+			new_pos = proj_tool + (notbehind-tool_z)*e_z;
 //			CX_LOG_CHANNEL_DEBUG("CA") << "  **  behind roi";
 		}
 		else
@@ -304,6 +311,8 @@ CameraInfo CameraStyleForView::viewEntireAutoZoomROI(CameraInfo info)
 			new_pos = (1.0-s)*proj_tool + (s)*cam_proj.pos;
 //			CX_LOG_CHANNEL_DEBUG("CA") << "  **  roi pos= s=" << s;
 		}
+
+		new_pos -= mStyle.mCameraTooltipOffset*e_z;
 
 		// Move the camera onto the tool tip, keeping the distance vector constant.
 		// This gives the effect of _sitting on the tool tip_ while moving.

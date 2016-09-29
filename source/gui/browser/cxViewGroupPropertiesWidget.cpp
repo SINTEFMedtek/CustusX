@@ -148,10 +148,12 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 											0, DoubleRange(-100, 100, 1), 0);
 	mCameraStyleProperties.push_back(mCameraTooltipOffset);
 
-	mCameraNotBehindROI = BoolProperty::initialize("Camera not behind ROI", "",
-												"Camera cannot move behind ROI",
-												false);
-	mCameraStyleProperties.push_back(mCameraNotBehindROI);
+	StringPropertySelectDataPtr notbehind = StringPropertySelectData::New(mServices->patient());
+	notbehind->setValueName("Camera not behind ROI");
+	notbehind->setHelp("Camera cannot move behind ROI");
+	notbehind->setTypeRegexp("roi");
+	mCameraNotBehindROI = notbehind;
+	mCameraStyleProperties.push_back(notbehind);
 
 	mTableLock = BoolProperty::initialize("Table lock", "",
 										  "Table is always set down in the scene.",

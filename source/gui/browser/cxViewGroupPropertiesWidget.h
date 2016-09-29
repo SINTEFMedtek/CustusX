@@ -76,7 +76,7 @@ private:
   BoolPropertyPtr mCameraOnTooltip;
 
   DoublePropertyPtr mCameraTooltipOffset;
-  BoolPropertyPtr mCameraNotBehindROI;
+  StringPropertyBasePtr mCameraNotBehindROI;
   BoolPropertyPtr mTableLock;
   BoolPropertyPtr mUniCam;
   DoublePropertyPtr mElevation;
