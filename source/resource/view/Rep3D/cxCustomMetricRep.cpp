@@ -159,16 +159,14 @@ void CustomMetricRep::updateMeshModel(DataPtr model)
 
 void CustomMetricRep::createDistanceMarkers()
 {
+	mDistanceText.clear();
 	CustomMetricPtr custom = this->getCustomMetric();
 	if(!custom->getShowDistanceMarkers())
 		return;
 	std::vector<Transform3D> pos = custom->calculateOrientations();
 
 	if(pos.size() < 2)
-	{
-		mDistanceText.clear();
 		return;
-	}
 
 	DoubleBoundingBox3D bounds = custom->getModel()->boundingBox();
 
