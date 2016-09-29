@@ -108,7 +108,7 @@ void CameraStyleData::clear()
 	mFocusFollowTool = false;
 	mCameraLockToTooltip = false;
 	mCameraTooltipOffset = 0;
-	mCameraNotBehindROI = false;
+	mCameraNotBehindROI = "";
 	mTableLock = false;
 	mElevation = 0;
 	mUniCam = false;
@@ -138,7 +138,7 @@ void CameraStyleData::parseXml(QDomNode dataNode)
 	mFocusFollowTool = elem.attribute("focusFollowTool", QString::number(mFocusFollowTool)).toInt();
 	mCameraLockToTooltip = elem.attribute("cameraOnTooltip", QString::number(mCameraLockToTooltip)).toInt();
 	mCameraTooltipOffset = elem.attribute("cameraTooltipOffset", QString::number(mCameraTooltipOffset)).toDouble();
-	mCameraNotBehindROI = elem.attribute("cameraNotBehindROI", QString::number(mCameraNotBehindROI)).toInt();
+	mCameraNotBehindROI = elem.attribute("cameraNotBehindROI", mCameraNotBehindROI);
 	mTableLock = elem.attribute("tableLock", QString::number(mTableLock)).toInt();
 	mElevation = elem.attribute("elevation", QString::number(mElevation)).toDouble();
 	mUniCam = elem.attribute("uniCam", QString::number(mUniCam)).toInt();

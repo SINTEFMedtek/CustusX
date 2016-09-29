@@ -732,6 +732,9 @@ QWidget* CustomMetricWrapper::createWidget()
 	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
 	topLayout->addWidget(mScaleToP1Widget);
 
+	mTranslationOnly= this->createTranslationOnly();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
+
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
@@ -793,6 +796,7 @@ void CustomMetricWrapper::guiChanged()
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
 	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
+	mData->setTranslationOnly(mTranslationOnly->getValue());
 
 	mInternalUpdate = false;
 }
@@ -807,10 +811,20 @@ BoolPropertyPtr CustomMetricWrapper::createScaletoP1() const
 	return retval;
 }
 
+BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Translation Only", "",
+										  "Ignore scale and rotate",
+										  mData->getTranslationOnly());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
 DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
 {
 	DoublePropertyPtr retval;
-	retval = DoubleProperty::initialize("Offset from P1", "",
+	retval = DoubleProperty::initialize("Offset from P0", "",
 											"Position model an offset from P0 towards P1",
 											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));

@@ -81,11 +81,8 @@ public:
 	double getOffsetFromP0() const;
 	void setRepeatDistance(double val);
 	double getRepeatDistance() const;
-
-	std::vector<Vector3D> getPositions() const;
-	Vector3D getDirection() const;
-    Vector3D getVectorUp() const;
-	Vector3D getScale() const;
+	void setTranslationOnly(bool val);
+	bool getTranslationOnly() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -104,7 +101,12 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-    struct cxResource_EXPORT DefineVectorUpMethods
+	std::vector<Vector3D> getPositions() const;
+	Vector3D getDirection() const;
+	Vector3D getVectorUp() const;
+	Vector3D getScale() const;
+
+	struct cxResource_EXPORT DefineVectorUpMethods
     {
         DefineVectorUpMethods()
         {
@@ -125,6 +127,8 @@ private:
 	bool mScaleToP1;
 	double mOffsetFromP0;
 	double mRepeatDistance;
+	bool mTranslationOnly;
+
 	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const;
 	Transform3D calculateRotation(Vector3D dir, Vector3D vup) const;
 	Transform3D calculateTransformTo2DImageCenter() const;

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolTracer.h"
 #include "cxTool.h"
 #include "cxSpaceProvider.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -58,11 +59,12 @@ ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider) :
 	RepImpl(),
 	mSpaceProvider(spaceProvider),
 	mSphereRadiusInNormalizedViewport(false),
-	mTooltipPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
-	mOffsetPointColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
-	mOffsetLineColor(QColor::fromRgbF(1.0, 0.8, 0.0)),
 	mStipplePattern(0xFFFF)
 {
+	mTooltipPointColor = settings()->value("View/toolTipPointColor").value<QColor>();
+	mOffsetPointColor = settings()->value("View/toolOffsetPointColor").value<QColor>();
+	mOffsetLineColor = settings()->value("View/toolOffsetLineColor").value<QColor>();
+
 	mSphereRadius = 2;
 	mStayHiddenAfterVisible = false;
 	mStayVisibleAfterHide = false;
