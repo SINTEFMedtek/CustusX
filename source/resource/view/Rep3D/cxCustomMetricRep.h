@@ -78,8 +78,11 @@ private:
 
 	std::vector<GraphicalGeometricPtr> mMeshGeometry;
 	std::vector<Image2DProxyPtr> mImageGeometryProxy;
+	std::vector<CaptionText3DPtr> mDistanceText;
 	void updateMeshModel(DataPtr model);
 	void updateImageModel(DataPtr model);
+	CaptionText3DPtr createDistanceText(Vector3D pos, double distance);
+	void createDistanceMarkers();
 };
 
 }

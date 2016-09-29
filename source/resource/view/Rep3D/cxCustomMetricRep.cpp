@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxImage2DRep3D.h"
+#include "cxGraphicalPrimitives.h"
 
 namespace cx
 {
@@ -106,6 +107,7 @@ void CustomMetricRep::updateModel()
 		this->updateImageModel(model);
 	else
 		this->updateMeshModel(model);
+	this->createDistanceMarkers();
 }
 
 void CustomMetricRep::updateImageModel(DataPtr model)
@@ -148,10 +150,50 @@ void CustomMetricRep::updateMeshModel(DataPtr model)
 			mMeshGeometry[i].reset(new GraphicalGeometric);
 			mMeshGeometry[i]->setRenderer(this->getRenderer());
 		}
+
 		mMeshGeometry[i]->setMesh(meshModel);
 
 		mMeshGeometry[i]->setTransformOffset(pos[i]);
 	}
+}
+
+void CustomMetricRep::createDistanceMarkers()
+{
+	CustomMetricPtr custom = this->getCustomMetric();
+	if(!custom->getShowDistanceMarkers())
+		return;
+	std::vector<Transform3D> pos = custom->calculateOrientations();
+
+	if(pos.size() < 2)
+	{
+		mDistanceText.clear();
+		return;
+	}
+
+	DoubleBoundingBox3D bounds = custom->getModel()->boundingBox();
+
+	mDistanceText.resize(pos.size());
+	Vector3D pos_0 = custom->getZeroPosition();
+	for(unsigned i = 0; i < mDistanceText.size(); ++i)
+	{
+		Vector3D pos_i = pos[i].coord(Vector3D(0,0,0));
+		double distance = (pos_i - pos_0).length();
+		Vector3D textpos = bounds.center();
+		textpos[0] = bounds.topRight()[0];
+		mDistanceText[i] = this->createDistanceText(pos[i].coord(textpos), distance);
+	}
+}
+
+CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distance)
+{
+	CaptionText3DPtr text = CaptionText3DPtr(new CaptionText3D(this->getRenderer()));
+	text->setColor(mMetric->getColor());
+	text->setText(QString("%1").arg(distance));
+
+	text->setPosition(pos);
+	text->placeBelowCenter();
+	text->setSize(mLabelSize / 100);
+	return text;
 }
 
 }

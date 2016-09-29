@@ -125,6 +125,7 @@ private:
 	bool mScaleToP1;
 	double mOffsetFromP0;
 	double mRepeatDistance;
+	bool mShowDistanceMarkers;
 	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const;
 	Transform3D calculateRotation(Vector3D dir, Vector3D vup) const;
 	Transform3D calculateTransformTo2DImageCenter() const;
@@ -134,6 +135,9 @@ public:
 	int getRepeatCount() const;
 	std::vector<Vector3D> getPointCloud() const;
 	bool modelIsImage() const;
+	void setShowDistanceMarkers(bool show);
+	bool getShowDistanceMarkers() const;
+	Vector3D getZeroPosition() const;
 };
 
 /**
