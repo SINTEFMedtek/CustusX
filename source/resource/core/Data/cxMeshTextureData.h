@@ -56,7 +56,7 @@ public:
 
     std::vector<PropertyPtr> mProperties;
 
-    StringPropertyPtr mTextureType;
+    StringPropertyPtr mTextureShape;
     StringPropertySelectImagePtr mTextureImage;
 
 signals:

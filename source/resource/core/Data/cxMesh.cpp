@@ -298,9 +298,9 @@ const char * Mesh::getGlyphLUT()
     return mGlyphLUT.c_str();
 }
 
-QString Mesh::getTextureType()
+QString Mesh::getTextureShape()
 {
-    return mTextureData.mTextureType->getValue();
+    return mTextureData.mTextureShape->getValue();
 }
 
 void Mesh::setGlyphLUT(const char * glyphLUT)
@@ -311,10 +311,8 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-    //NB: må antakelig håndtere alle tilfeller av satt/ikke satt verdier i komboboksene her så det ikke blir nullpekere eller noe.
-
-    QString textureType = this->getTextureType();
-    if (textureType == "None")
+    QString textureShape = this->getTextureShape();
+    if (mTextureData.mTextureImage->getValue().isEmpty())
     {
         mVtkTexture = vtkTexturePtr::New();
         return;
@@ -350,18 +348,18 @@ void Mesh::updateVtkPolyDataWithTexture()
 
 bool Mesh::createTextureMapper(vtkDataSetAlgorithmPtr &tMapper)
 {
-    QString textureType = this->getTextureType();
+    QString textureShape = this->getTextureShape();
 
-    if (textureType == "Cylinder")
+    if (textureShape == "Cylinder")
     {
         tMapper = vtkTextureMapToCylinderPtr::New();
         dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
     }
-    else if (textureType == "Plane")
+    else if (textureShape == "Plane")
     {
         tMapper = vtkTextureMapToPlanePtr::New();
     }
-    else if (textureType == "Sphere")
+    else if (textureShape == "Sphere")
     {
         tMapper = vtkTextureMapToSpherePtr::New();
     }

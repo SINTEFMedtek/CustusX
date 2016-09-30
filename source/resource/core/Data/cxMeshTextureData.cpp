@@ -68,18 +68,21 @@ void MeshTextureData::addProperty(PropertyPtr property)
 
 void MeshTextureData::initialize()
 {
-    mTextureType = StringProperty::initialize("texture_coordinates", "Texture coordinates",
-                                                 "Try to match the mesh to this type of texture coordinates.",
-                                                 "None",
+    mTextureImage = StringPropertySelectImage::New(mPatientModelService);
+    mTextureImage->setValueName("Texture image");
+    mTextureImage->setHelp("Select an imported PNG image to use as texture.");
+    mTextureImage->setOnly2DImagesFilter(true);
+    this->addProperty(mTextureImage);
+
+    mTextureShape = StringProperty::initialize("texture_type", "Texture shape",
+                                                 "The texture comes in predefined geometric shapes. Select the one which gives the best fit to your mesh.",
+                                                 "Cylinder",
                                                  QStringList()
-                                                 << "None"
                                                  << "Cylinder"
                                                  << "Plane"
                                                  << "Sphere");
-    this->addProperty(mTextureType);
+    this->addProperty(mTextureShape);
 
-    mTextureImage = StringPropertySelectImage::New(mPatientModelService);
-    this->addProperty(mTextureImage);
 }
 
 } // namespace cx
