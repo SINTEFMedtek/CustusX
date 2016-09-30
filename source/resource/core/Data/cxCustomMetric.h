@@ -71,9 +71,9 @@ public:
 
     QString getDefineVectorUpMethod() const;
     void setDefineVectorUpMethod(QString defineVectorUpMethod);
-	void setMeshUid(QString val);
-	QString getMeshUid() const;
-	MeshPtr getMesh() const;
+	void setModelUid(QString val);
+	QString getModelUid() const;
+	DataPtr getModel() const;
 
 	void setScaleToP1(bool val);
 	bool getScaleToP1() const;
@@ -81,11 +81,8 @@ public:
 	double getOffsetFromP0() const;
 	void setRepeatDistance(double val);
 	double getRepeatDistance() const;
-
-	std::vector<Vector3D> getPositions() const;
-	Vector3D getDirection() const;
-    Vector3D getVectorUp() const;
-	Vector3D getScale() const;
+	void setTranslationOnly(bool val);
+	bool getTranslationOnly() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -104,7 +101,12 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 private:
-    struct cxResource_EXPORT DefineVectorUpMethods
+	std::vector<Vector3D> getPositions() const;
+	Vector3D getDirection() const;
+	Vector3D getVectorUp() const;
+	Vector3D getScale() const;
+
+	struct cxResource_EXPORT DefineVectorUpMethods
     {
         DefineVectorUpMethods()
         {
@@ -120,18 +122,26 @@ private:
     CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	MetricReferenceArgumentListPtr mArguments;
     QString mDefineVectorUpMethod;
-	QString mMeshUid;
+	QString mModelUid;
     DefineVectorUpMethods mDefineVectorUpMethods;
 	bool mScaleToP1;
 	double mOffsetFromP0;
 	double mRepeatDistance;
+	bool mShowDistanceMarkers;
+	bool mTranslationOnly;
 
 	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const;
+	Transform3D calculateRotation(Vector3D dir, Vector3D vup) const;
+	Transform3D calculateTransformTo2DImageCenter() const;
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 	std::vector<Transform3D> calculateOrientations() const;
 	int getRepeatCount() const;
 	std::vector<Vector3D> getPointCloud() const;
+	bool modelIsImage() const;
+	void setShowDistanceMarkers(bool show);
+	bool getShowDistanceMarkers() const;
+	Vector3D getZeroPosition() const;
 };
 
 /**

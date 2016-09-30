@@ -512,6 +512,11 @@ int Image::getVTKMaxValue()
 	return 0;
 }
 
+bool Image::is2D()
+{
+	return this->getBaseVtkImageData()->GetDimensions()[2]==1;
+}
+
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);

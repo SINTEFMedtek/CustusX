@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxProbeSector.h"
 #include "cxSpaceProvider.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -58,10 +59,16 @@ ToolRep2D::ToolRep2D(SpaceProviderPtr spaceProvider) :
 	mBB_vp(0, 1, 0, 1, 0, 1),
 	mTooltipPointColor(0.96, 0.87, 0.17),
 	mOffsetPointColor(0.96, 0.87, 0.17),
+//	mTooltipLineColor(1, 0, 0),
 	mTooltipLineColor(0.25, 0.87, 0.16),
 	mOffsetLineColor(1.0, 0.8, 0.0),
 	mStipplePattern(0xffff)
 {
+	mTooltipLineColor = settings()->value("View/tool2DColor").value<QColor>();
+	mTooltipPointColor = settings()->value("View/toolTipPointColor").value<QColor>();
+	mOffsetPointColor = settings()->value("View/toolOffsetPointColor").value<QColor>();
+	mOffsetLineColor = settings()->value("View/toolOffsetLineColor").value<QColor>();
+
 	mUseOffset = true;
 	mUseCrosshair = false;
 	mUseToolLine = true;
@@ -315,7 +322,10 @@ void ToolRep2D::crossHairResized()
 	if (cursor)
 	{
 		double bordarOffset = 30.0;
-		RGBColor color(1.0, 0.8, 0.0);
+		QColor col =  settings()->value("View/toolCrossHairColor").value<QColor>();
+//		RGBColor color(1.0, 0.8, 0.0);
+		RGBColor color(col.redF(), col.greenF(), col.blueF());
+//		RGBColor color(1.0, 0.2, 0.0);
 		Vector3D focalPoint(0.0,0.0,0.0);
 		//Logger::log("tool.log", "("+string_cast(__FUNCTION__)+")"+" mCross"+string_cast(cross));
 		//cursor->setValue( focalPoint, mBB_vp.range()[0], mBB_vp.range()[1], bordarOffset, color  );

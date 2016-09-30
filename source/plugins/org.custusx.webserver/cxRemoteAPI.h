@@ -60,6 +60,8 @@ public:
     QImage grabLayout();
     QImage grabScreen();
 
+	VisServicesPtr getServices() { return mServices; }
+
 private:
 	VisServicesPtr mServices;
     ScreenVideoProvider* mScreenVideo;

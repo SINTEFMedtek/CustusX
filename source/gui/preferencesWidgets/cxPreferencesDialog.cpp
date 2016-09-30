@@ -68,6 +68,7 @@ VisualizationTab::VisualizationTab(PatientModelServicePtr patientModelService, Q
 	mStereoTypeActionGroup = NULL;
 }
 
+
 void VisualizationTab::init()
 {
   double sphereRadius = settings()->value("View3D/sphereRadius").toDouble();
@@ -76,10 +77,31 @@ void VisualizationTab::init()
   double labelSize = settings()->value("View3D/labelSize").toDouble();
   mLabelSize = DoubleProperty::initialize("LabelSize", "Label Size", "Size of text labels in the 3D scene.", labelSize, DoubleRange(0.1,100,0.1), 1, QDomNode());
 
-  ColorSelectButton* backgroundColorButton = new ColorSelectButton("Background Color");
-  backgroundColorButton->setColor(settings()->value("backgroundColor").value<QColor>());
+  SelectColorSettingButton* backgroundColorButton =
+		  new SelectColorSettingButton("Background Color",
+									   "backgroundColor",
+									   "Set 3D view background color");
 
-  connect(backgroundColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setBackgroundColorSlot(QColor)));
+  SelectColorSettingButton* tool2DColor =
+		  new SelectColorSettingButton("Tool 2D Color",
+									   "View/tool2DColor",
+									   "Set color of tool in 2D");
+  SelectColorSettingButton* toolTipPointColor =
+		  new SelectColorSettingButton("Tool Tip",
+									   "View/toolTipPointColor",
+									   "Set color of tool tip");
+  SelectColorSettingButton* toolOffsetPointColor =
+		  new SelectColorSettingButton("Offset Point",
+									   "View/toolOffsetPointColor",
+									   "Set color of tool offset point");
+  SelectColorSettingButton* toolOffsetLineColor =
+		  new SelectColorSettingButton("Offset Line",
+									   "View/toolOffsetLineColor",
+									   "Set color of tool offset line");
+  SelectColorSettingButton* toolCrossHairColor =
+		  new SelectColorSettingButton("Cross hair",
+									   "View/toolCrossHairColor",
+									   "Set color of tool cross hair");
 
   bool showDataText = settings()->value("View/showDataText").value<bool>();
   mShowDataText = BoolProperty::initialize("Show Data Text", "",
@@ -157,23 +179,32 @@ void VisualizationTab::init()
   stereoLayout->addWidget(new SpinBoxAndSliderGroupWidget(this, mEyeAngleAdapter));
   stereoGroupBox->setLayout(stereoLayout);
 
+  QHBoxLayout* toolcolors = new QHBoxLayout;
+  toolcolors->addWidget(tool2DColor);
+  toolcolors->addWidget(toolTipPointColor);
+  toolcolors->addWidget(toolOffsetPointColor);
+  toolcolors->addWidget(toolOffsetLineColor);
+  toolcolors->addWidget(toolCrossHairColor);
+
   //Layout
   mMainLayout = new QGridLayout;
-  mMainLayout->addWidget(backgroundColorButton, 0, 0);
-  mMainLayout->addWidget(sscCreateDataWidget(this, mClinicalView));
-  mMainLayout->addWidget(new SpinBoxGroupWidget(this, mSphereRadius));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mShowDataText));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mShowLabels));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mToolCrosshair));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mShowMetricNamesInCorner));
-  mMainLayout->addWidget(new SpinBoxGroupWidget(this, mLabelSize));
-  mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mAnnotationModel));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mAnyplaneViewOffset));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mFollowTooltip));
-  mMainLayout->addWidget(sscCreateDataWidget(this, mFollowTooltipBoundary));
+  int counter = 0;
+  mMainLayout->addWidget(backgroundColorButton, counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mClinicalView), counter++, 0);
+  mMainLayout->addWidget(new SpinBoxGroupWidget(this, mSphereRadius), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mShowDataText), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mShowLabels), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mToolCrosshair), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mShowMetricNamesInCorner), counter++, 0);
+  mMainLayout->addWidget(new SpinBoxGroupWidget(this, mLabelSize), counter++, 0);
+  mMainLayout->addWidget(new SpinBoxGroupWidget(this, mAnnotationModelSize), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mAnnotationModel), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mAnyplaneViewOffset), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mFollowTooltip), counter++, 0);
+  mMainLayout->addWidget(sscCreateDataWidget(this, mFollowTooltipBoundary), counter++, 0);
 
-  mMainLayout->addWidget(stereoGroupBox);
+  mMainLayout->addLayout(toolcolors, counter++, 0);
+  mMainLayout->addWidget(stereoGroupBox, counter++, 0);
 
   QHBoxLayout* toptopLayout = new QHBoxLayout;
   toptopLayout->addLayout(mMainLayout);
@@ -256,11 +287,6 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("Navigation/anyplaneViewOffset", mAnyplaneViewOffset->getValue());
   settings()->setValue("Navigation/followTooltip", mFollowTooltip->getValue());
   settings()->setValue("Navigation/followTooltipBoundary", mFollowTooltipBoundary->getValue());
-}
-
-void VisualizationTab::setBackgroundColorSlot(QColor color)
-{
-  settings()->setValue("backgroundColor", color);
 }
 
 //==============================================================================

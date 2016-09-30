@@ -94,6 +94,7 @@ private:
 	QAction* createAction(QString uid, QString text, QIcon icon,
 											 QKeySequence shortcut, QString help,
 						  T triggerSlot);
+	QString selectNewPatientFolder();
 };
 
 } // namespace cx

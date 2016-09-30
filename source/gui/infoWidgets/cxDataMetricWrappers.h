@@ -266,14 +266,19 @@ private:
   DoublePropertyPtr createOffsetFromP0() const;
   DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
-  StringPropertySelectMeshPtr createMeshSelector() const;
+  BoolPropertyPtr createShowDistanceMarkers() const;
+  StringPropertySelectDataPtr createModelSelector() const;
+  BoolPropertyPtr createTranslationOnly() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
   BoolPropertyPtr mScaleToP1;
+  QWidget* mScaleToP1Widget;
+  BoolPropertyPtr mShowDistanceMarkers;
+  BoolPropertyPtr mTranslationOnly;
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;
-  StringPropertySelectMeshPtr mMesh;
+  StringPropertySelectDataPtr mModel;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 };

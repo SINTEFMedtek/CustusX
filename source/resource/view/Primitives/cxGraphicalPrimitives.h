@@ -292,6 +292,7 @@ public:
 
 	//    void scaleText(); ///< internal method
 
+	void placeBelowCenter();
 private:
 	vtkCaptionActor2DPtr mText;
 	//    vtkFollowerPtr mFollower;

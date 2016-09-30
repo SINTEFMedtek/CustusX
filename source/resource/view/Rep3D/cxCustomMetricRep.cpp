@@ -32,8 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxCustomMetricRep.h"
 
-#include "cxView.h"
-
+#include <boost/shared_ptr.hpp>
 #include <vtkVectorText.h>
 #include <vtkFollower.h>
 #include <vtkPolyDataMapper.h>
@@ -41,12 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
+#include <vtkImageActor.h>
+#include <vtkTextActor.h>
 #include <QFileInfo>
 #include "cxTypeConversions.h"
-#include "vtkTextActor.h"
-#include "cxGraphicalPrimitives.h"
 #include "cxCustomMetric.h"
-#include "cxGraphicalPrimitives.h"
 #include "vtkMatrix4x4.h"
 #include "vtkSTLReader.h"
 #include <vtkPolyDataNormals.h>
@@ -54,6 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxGeometricRep.h"
 #include "cxMesh.h"
+#include "cxImage.h"
+#include "cxImage2DRep3D.h"
+#include "cxGraphicalPrimitives.h"
 
 namespace cx
 {
@@ -70,7 +71,12 @@ CustomMetricRep::CustomMetricRep()
 void CustomMetricRep::clear()
 {
 	DataMetricRep::clear();
-	mGeometry.clear();
+	mMeshGeometry.clear();
+	for(int i = 0; i < mImageGeometryProxy.size(); ++i)
+	{
+		this->getRenderer()->RemoveActor(mImageGeometryProxy[i]->getActor());
+	}
+	mImageGeometryProxy.clear();
 }
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
@@ -83,66 +89,109 @@ void CustomMetricRep::onModifiedStartRender()
 	if (!mMetric)
 		return;
 
-    this->updateSTLModel();
+	this->updateModel();
 	this->drawText();
 }
 
-void CustomMetricRep::updateSTLModel()
+void CustomMetricRep::updateModel()
 {
+	this->clear();
 	CustomMetricPtr custom = this->getCustomMetric();
 
 	if (!this->getView() || !custom)
 	   return;
 
+	DataPtr model = custom->getModel();
+
+	if(custom->modelIsImage())
+		this->updateImageModel(model);
+	else
+		this->updateMeshModel(model);
+	this->createDistanceMarkers();
+}
+
+void CustomMetricRep::updateImageModel(DataPtr model)
+{
+	ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
+
+	if(!imageModel && !imageModel->is2D())
+		return;
+
+	CustomMetricPtr custom = this->getCustomMetric();
 	std::vector<Transform3D> pos = custom->calculateOrientations();
 
-//	std::vector<Vector3D> pos = custom->getPositions();
-//	Vector3D dir = custom->getDirection();
-//	Vector3D vup = custom->getVectorUp();
-//	Vector3D scale = custom->getScale();
+	mImageGeometryProxy.resize(pos.size());
 
-	mGeometry.resize(pos.size());
-
-	for (unsigned i=0; i<pos.size(); ++i)
+	for(unsigned i = 0; i < mImageGeometryProxy.size(); ++i)
 	{
-		if (!mGeometry[i])
-		{
-			mGeometry[i].reset(new GraphicalGeometric);
-			mGeometry[i]->setRenderer(this->getRenderer());
-		}
-		mGeometry[i]->setMesh(custom->getMesh());
+		if(!mImageGeometryProxy[i])
+			mImageGeometryProxy[i] = cx::Image2DProxy::New();
 
-//		Transform3D M = this->calculateOrientation(pos[i], dir, vup, scale);
-		mGeometry[i]->setTransformOffset(pos[i]);
+		mImageGeometryProxy[i]->setImage(imageModel);
+		this->getRenderer()->AddActor(mImageGeometryProxy[i]->getActor());
+
+		mImageGeometryProxy[i]->setTransformOffset(pos[i]);
 	}
 }
 
-///**
-// * Based on a position+direction, view up and scale,
-// * calculate an orientation matrix combining these.
-// */
-//Transform3D CustomMetricRep::calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale)
-//{
-//	Transform3D R;
-//	bool directionAlongUp = similar(dot(vup, dir.normal()), 1.0);
+void CustomMetricRep::updateMeshModel(DataPtr model)
+{
+	MeshPtr meshModel = boost::dynamic_pointer_cast<Mesh>(model);
 
-//	if (directionAlongUp)
-//	{
-//		R = Transform3D::Identity();
-//	}
-//	else
-//	{
-//		Vector3D jvec = dir.normal();
-//		Vector3D kvec = cross(vup, dir).normal();
-//		Vector3D ivec = cross(jvec, kvec).normal();
-//		Vector3D center = Vector3D::Zero();
-//		R = createTransformIJC(ivec, jvec, center);
-//	}
+	CustomMetricPtr custom = this->getCustomMetric();
+	std::vector<Transform3D> pos = custom->calculateOrientations();
 
-//	Transform3D S = createTransformScale(scale);
-//	Transform3D T = createTransformTranslate(pos);
-//	Transform3D M = T*R*S;
-//	return M;
-//}
+	mMeshGeometry.resize(pos.size());
+
+	for (unsigned i=0; i<mMeshGeometry.size(); ++i)
+	{
+		if (!mMeshGeometry[i])
+		{
+			mMeshGeometry[i].reset(new GraphicalGeometric);
+			mMeshGeometry[i]->setRenderer(this->getRenderer());
+		}
+
+		mMeshGeometry[i]->setMesh(meshModel);
+
+		mMeshGeometry[i]->setTransformOffset(pos[i]);
+	}
+}
+
+void CustomMetricRep::createDistanceMarkers()
+{
+	mDistanceText.clear();
+	CustomMetricPtr custom = this->getCustomMetric();
+	if(!custom->getModel() || !custom->getShowDistanceMarkers())
+		return;
+	std::vector<Transform3D> pos = custom->calculateOrientations();
+
+	if(pos.size() < 2)
+		return;
+
+	DoubleBoundingBox3D bounds = custom->getModel()->boundingBox();
+
+	mDistanceText.resize(pos.size());
+	Vector3D pos_0 = custom->getZeroPosition();
+	for(unsigned i = 0; i < mDistanceText.size(); ++i)
+	{
+		Vector3D pos_i = pos[i].coord(Vector3D(0,0,0));
+		double distance = (pos_i - pos_0).length();
+		Vector3D textpos = bounds.center();
+		textpos[0] = bounds.topRight()[0];
+		mDistanceText[i] = this->createDistanceText(pos[i].coord(textpos), distance);
+	}
+}
+
+CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distance)
+{
+	CaptionText3DPtr text = CaptionText3DPtr(new CaptionText3D(this->getRenderer()));
+	text->setColor(mMetric->getColor());
+	text->setText(QString("%1").arg(distance));
+
+	text->setPosition(pos);
+	text->placeBelowCenter();
+	text->setSize(mLabelSize / 100);
+	return text;
+}
 
 }
