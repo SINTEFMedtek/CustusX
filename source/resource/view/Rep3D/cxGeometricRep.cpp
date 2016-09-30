@@ -139,14 +139,22 @@ void GraphicalGeometric::meshChangedSlot()
 
     //NB rekkefølge!Må kalle denne før de to set under.
     mMesh->updateVtkPolyDataWithTexture();
-
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
     mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
 	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
-	//Set mesh color, opacity
-	mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-	mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
-	//Set other properties
+
+    //Set mesh color, opacity
+    if(mMesh->getTextureType() == "None")
+    {
+        mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+        mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+    }
+    else
+    {
+        mGraphicalPolyDataPtr->setColor(255, 255, 255);
+    }
+
+    //Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
 	const MeshPropertyData& src = mMesh->getProperties();
 

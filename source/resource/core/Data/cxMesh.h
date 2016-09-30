@@ -129,6 +129,7 @@ private:
     SpaceProviderPtr mSpaceProvider;
 	vtkPolyDataPtr mVtkPolyData;
     vtkTexturePtr mVtkTexture;
+    bool createTextureMapper(vtkDataSetAlgorithmPtr &tMapper);
 	bool mHasGlyph;
 	bool mShowGlyph;
     bool shouldGlyphBeEnableByDefault();

@@ -311,55 +311,34 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-    if(mTextureData.mTextureImage.get()->getValue().isEmpty() || mTextureData.mTextureType.get()->getValue().isEmpty())
-        return;
+    //NB: må antakelig håndtere alle tilfeller av satt/ikke satt verdier i komboboksene her så det ikke blir nullpekere eller noe.
 
     QString textureType = this->getTextureType();
-
-    //create the texture mapper
-    vtkSmartPointer<vtkDataSetAlgorithm> tMapper;
     if (textureType == "None")
     {
-        if(mVtkTexture)
-            mVtkTexture = vtkSmartPointer<vtkTexture>::New();
+        mVtkTexture = vtkTexturePtr::New();
         return;
     }
-    else if (textureType == "Cylinder")
-    {
-        tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
-        dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
-    }
-    else if (textureType == "Plane")
-    {
-        tMapper = vtkSmartPointer<vtkTextureMapToPlane>::New();
-    }
-    else if (textureType == "Sphere")
-    {
-        tMapper = vtkSmartPointer<vtkTextureMapToSphere>::New();
-    }
-    else
-    {
-        ////
+
+    //create the texture mapper
+    vtkDataSetAlgorithmPtr tMapper;
+    if(!this->createTextureMapper(tMapper))
         return;
-        tMapper = vtkSmartPointer<vtkTextureMapToCylinder>::New();
-    }
-    tMapper->SetInputData(mVtkPolyData);
 
     //Get the image data
     ImagePtr textureImage = mTextureData.mTextureImage->getImage();
     vtkImageDataPtr vtkImageData = textureImage->getBaseVtkImageData();
 
     //Create the texture
-    mVtkTexture = vtkSmartPointer<vtkTexture>::New();
+    mVtkTexture = vtkTexturePtr::New();
     mVtkTexture->SetInputData(vtkImageData);
-
 
     //transform texture coordinates
     double translate[3];
     translate[0] = 0.0;
     translate[1] = 0.0;
     translate[2] = 0.0;
-    vtkSmartPointer<vtkTransformTextureCoords> transformTexture = vtkSmartPointer<vtkTransformTextureCoords>::New();
+    vtkTransformTextureCoordsPtr transformTexture = vtkTransformTextureCoordsPtr::New();
     transformTexture->SetInputConnection(tMapper->GetOutputPort());
     transformTexture->SetPosition(translate);
     transformTexture->SetScale(2,2,1);
@@ -367,6 +346,32 @@ void Mesh::updateVtkPolyDataWithTexture()
 
     //Update the poly data
     mVtkPolyData = transformTexture->GetPolyDataOutput();
+}
+
+bool Mesh::createTextureMapper(vtkDataSetAlgorithmPtr &tMapper)
+{
+    QString textureType = this->getTextureType();
+
+    if (textureType == "Cylinder")
+    {
+        tMapper = vtkTextureMapToCylinderPtr::New();
+        dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
+    }
+    else if (textureType == "Plane")
+    {
+        tMapper = vtkTextureMapToPlanePtr::New();
+    }
+    else if (textureType == "Sphere")
+    {
+        tMapper = vtkTextureMapToSpherePtr::New();
+    }
+    else
+    {
+        return false;
+    }
+
+    tMapper->SetInputData(mVtkPolyData);
+    return true;
 }
 
 QStringList Mesh::getOrientationArrayList()
