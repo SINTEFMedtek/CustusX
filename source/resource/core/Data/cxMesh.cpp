@@ -300,7 +300,7 @@ const char * Mesh::getGlyphLUT()
 
 QString Mesh::getTextureShape()
 {
-    return mTextureData.mTextureShape->getValue();
+    return mTextureData.getTextureShape()->getValue();
 }
 
 void Mesh::setGlyphLUT(const char * glyphLUT)
@@ -312,7 +312,7 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
 void Mesh::updateVtkPolyDataWithTexture()
 {
     QString textureShape = this->getTextureShape();
-    if (mTextureData.mTextureImage->getValue().isEmpty())
+    if (mTextureData.getTextureImage()->getValue().isEmpty())
     {
         mVtkTexture = vtkTexturePtr::New();
         return;
@@ -324,7 +324,7 @@ void Mesh::updateVtkPolyDataWithTexture()
         return;
 
     //Get the image data
-    ImagePtr textureImage = mTextureData.mTextureImage->getImage();
+    ImagePtr textureImage = mTextureData.getTextureImage()->getImage();
     vtkImageDataPtr vtkImageData = textureImage->getBaseVtkImageData();
 
     //Create the texture
@@ -332,14 +332,14 @@ void Mesh::updateVtkPolyDataWithTexture()
     mVtkTexture->SetInputData(vtkImageData);
 
     //transform texture coordinates
-    double translate[3];
-    translate[0] = 0.0;
-    translate[1] = 0.0;
-    translate[2] = 0.0;
     vtkTransformTextureCoordsPtr transformTexture = vtkTransformTextureCoordsPtr::New();
     transformTexture->SetInputConnection(tMapper->GetOutputPort());
-    transformTexture->SetPosition(translate);
-    transformTexture->SetScale(2,2,1);
+    double posR = this->getTextureData().getPositionX()->getValue();
+    double posS = this->getTextureData().getPositionY()->getValue();
+    transformTexture->SetPosition(posR, posS, 0);
+    double scaleR = this->getTextureData().getScaleX()->getValue();
+    double scaleS = this->getTextureData().getScaleY()->getValue();
+    transformTexture->SetScale(scaleR, scaleS, 1);
     transformTexture->Update();
 
     //Update the poly data
@@ -387,7 +387,7 @@ const MeshPropertyData& Mesh::getProperties() const
     return mProperties;
 }
 
-const MeshTextureData &Mesh::getTextureData()
+const MeshTextureData &Mesh::getTextureData() const
 {
     return mTextureData;
 }

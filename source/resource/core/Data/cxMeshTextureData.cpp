@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxMeshTextureData.h"
+#include "cxDoubleProperty.h"
 
 namespace cx
 {
@@ -83,6 +84,52 @@ void MeshTextureData::initialize()
                                                  << "Sphere");
     this->addProperty(mTextureShape);
 
+    mScaleX = DoubleProperty::initialize("texture_scale_X", "Scale X", "How many times to draw the image along the X axis.", 1, DoubleRange(1,100000,1), 0);
+    this->addProperty(mScaleX);
+
+    mScaleY = DoubleProperty::initialize("texture_scale_Y", "Scale Y", "How many times to draw the image along the Y axis.", 1, DoubleRange(1,100000,1), 0);
+    this->addProperty(mScaleY);
+
+    mPositionX = DoubleProperty::initialize("texture_position_X", "Position X", "Where to start drawing the image along the X axis.", 0, DoubleRange(-100000,100000,0.01), 2);
+    this->addProperty(mPositionX);
+
+    mPositionY = DoubleProperty::initialize("texture_position_Y", "Position Y", "Where to start drawing the image along the Y axis.", 0, DoubleRange(-100000,100000,0.01), 2);
+    this->addProperty(mPositionY);
+}
+
+DoublePropertyPtr MeshTextureData::getPositionY() const
+{
+    return mPositionY;
+}
+
+DoublePropertyPtr MeshTextureData::getPositionX() const
+{
+    return mPositionX;
+}
+
+std::vector<PropertyPtr> MeshTextureData::getProperties() const
+{
+    return mProperties;
+}
+
+DoublePropertyPtr MeshTextureData::getScaleY() const
+{
+    return mScaleY;
+}
+
+DoublePropertyPtr MeshTextureData::getScaleX() const
+{
+    return mScaleX;
+}
+
+StringPropertySelectImagePtr MeshTextureData::getTextureImage() const
+{
+    return mTextureImage;
+}
+
+StringPropertyPtr MeshTextureData::getTextureShape() const
+{
+    return mTextureShape;
 }
 
 } // namespace cx

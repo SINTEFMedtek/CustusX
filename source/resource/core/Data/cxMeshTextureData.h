@@ -54,16 +54,26 @@ public:
     void addXml(QDomNode& dataNode);
     void parseXml(QDomNode &dataNode);
 
-    std::vector<PropertyPtr> mProperties;
-
-    StringPropertyPtr mTextureShape;
-    StringPropertySelectImagePtr mTextureImage;
+    StringPropertyPtr getTextureShape() const;
+    StringPropertySelectImagePtr getTextureImage() const;
+    DoublePropertyPtr getScaleX() const;
+    DoublePropertyPtr getScaleY() const;
+    std::vector<PropertyPtr> getProperties() const;
+    DoublePropertyPtr getPositionX() const;
+    DoublePropertyPtr getPositionY() const;
 
 signals:
     void changed();
 private:
     void addProperty(PropertyPtr property);
     void initialize();
+    std::vector<PropertyPtr> mProperties;
+    StringPropertyPtr mTextureShape;
+    StringPropertySelectImagePtr mTextureImage;
+    DoublePropertyPtr mScaleX;
+    DoublePropertyPtr mScaleY;
+    DoublePropertyPtr mPositionX;
+    DoublePropertyPtr mPositionY;
     PatientModelServicePtr mPatientModelService;
 };
 

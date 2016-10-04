@@ -85,7 +85,7 @@ void MeshTextureWidget::setupUI()
     if (!mMesh)
         return;
 
-    std::vector<PropertyPtr> properties = mMesh->getTextureData().mProperties;
+    std::vector<PropertyPtr> properties = mMesh->getTextureData().getProperties();
     mOptionsWidget->setOptions("mesh_texture_properties", properties, true);
 
 }

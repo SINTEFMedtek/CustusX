@@ -110,7 +110,7 @@ public:
     QStringList getOrientationArrayList();
     QStringList getColorArrayList();
 	const MeshPropertyData& getProperties() const;
-    const MeshTextureData& getTextureData();
+    const MeshTextureData& getTextureData() const;
 
 	virtual void save(const QString &basePath);
 signals:
