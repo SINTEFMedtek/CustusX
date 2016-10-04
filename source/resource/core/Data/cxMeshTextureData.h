@@ -62,6 +62,10 @@ public:
     DoublePropertyPtr getPositionX() const;
     DoublePropertyPtr getPositionY() const;
 
+    QString getCylinderText() const;
+    QString getPlaneText() const;
+    QString getSphereText() const;
+
 signals:
     void changed();
 private:
@@ -75,6 +79,9 @@ private:
     DoublePropertyPtr mPositionX;
     DoublePropertyPtr mPositionY;
     PatientModelServicePtr mPatientModelService;
+    QString mCylinderText;
+    QString mPlaneText;
+    QString mSphereText;
 };
 
 } // namespace cx

@@ -312,7 +312,7 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
 void Mesh::updateVtkPolyDataWithTexture()
 {
     QString textureShape = this->getTextureShape();
-    if (mTextureData.getTextureImage()->getValue().isEmpty())
+    if (mTextureData.getTextureImage()->getValue().isEmpty() || mTextureData.getTextureImage()->getImage() == NULL)
     {
         mVtkTexture = vtkTexturePtr::New();
         return;
@@ -332,11 +332,13 @@ void Mesh::updateVtkPolyDataWithTexture()
     mVtkTexture->SetInputData(vtkImageData);
 
     //transform texture coordinates
+    //VTK uses r, s and t coordinates. t is only used for 3D texturing which is not supported by VTK yet.
+    //We map r and s to match the CustusX X and Y directions.
     vtkTransformTextureCoordsPtr transformTexture = vtkTransformTextureCoordsPtr::New();
     transformTexture->SetInputConnection(tMapper->GetOutputPort());
     double posR = this->getTextureData().getPositionX()->getValue();
     double posS = this->getTextureData().getPositionY()->getValue();
-    transformTexture->SetPosition(posR, posS, 0);
+    transformTexture->SetPosition(-posR, -posS, 0);
     double scaleR = this->getTextureData().getScaleX()->getValue();
     double scaleS = this->getTextureData().getScaleY()->getValue();
     transformTexture->SetScale(scaleR, scaleS, 1);
@@ -350,16 +352,16 @@ bool Mesh::createTextureMapper(vtkDataSetAlgorithmPtr &tMapper)
 {
     QString textureShape = this->getTextureShape();
 
-    if (textureShape == "Cylinder")
+    if (textureShape == mTextureData.getCylinderText())
     {
         tMapper = vtkTextureMapToCylinderPtr::New();
         dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
     }
-    else if (textureShape == "Plane")
+    else if (textureShape == mTextureData.getPlaneText())
     {
         tMapper = vtkTextureMapToPlanePtr::New();
     }
-    else if (textureShape == "Sphere")
+    else if (textureShape == mTextureData.getSphereText())
     {
         tMapper = vtkTextureMapToSpherePtr::New();
     }

@@ -72,7 +72,9 @@ void MeshTextureWidget::meshSelectedSlot()
         return;
 
     mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
-    this->clearUI();
+
+    this->setupUI();
+    mOptionsWidget->rebuild();
 }
 
 void MeshTextureWidget::clearUI()
@@ -86,7 +88,7 @@ void MeshTextureWidget::setupUI()
         return;
 
     std::vector<PropertyPtr> properties = mMesh->getTextureData().getProperties();
-    mOptionsWidget->setOptions("mesh_texture_properties", properties, true);
+    mOptionsWidget->setOptions(mMesh->getUid(), properties, true);
 
 }
 

@@ -115,7 +115,7 @@ MeshInfoWidget::~MeshInfoWidget()
 void MeshInfoWidget::meshSelectedSlot()
 {
 	if (mMesh == mMeshSelector->getData())
-	return;
+        return;
 
 	if(mMesh)
 	{

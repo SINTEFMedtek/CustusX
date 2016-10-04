@@ -38,6 +38,9 @@ namespace cx
 {
 MeshTextureData::MeshTextureData(PatientModelServicePtr patientModelService)
     : mPatientModelService(patientModelService)
+    , mCylinderText("Cylinder")
+    , mPlaneText("Plane")
+    , mSphereText("Sphere")
 {
     this->initialize();
 }
@@ -76,12 +79,12 @@ void MeshTextureData::initialize()
     this->addProperty(mTextureImage);
 
     mTextureShape = StringProperty::initialize("texture_type", "Texture shape",
-                                                 "The texture comes in predefined geometric shapes. Select the one which gives the best fit to your mesh.",
+                                                 "The texture is applied in predefined geometric shapes. Select the shape which gives the best fit to your mesh.",
                                                  "Cylinder",
                                                  QStringList()
-                                                 << "Cylinder"
-                                                 << "Plane"
-                                                 << "Sphere");
+                                                 << this->getCylinderText()
+                                                 << this->getPlaneText()
+                                                 << this->getSphereText());
     this->addProperty(mTextureShape);
 
     mScaleX = DoubleProperty::initialize("texture_scale_X", "Scale X", "How many times to draw the image along the X axis.", 1, DoubleRange(1,100000,1), 0);
@@ -95,6 +98,21 @@ void MeshTextureData::initialize()
 
     mPositionY = DoubleProperty::initialize("texture_position_Y", "Position Y", "Where to start drawing the image along the Y axis.", 0, DoubleRange(-100000,100000,0.01), 2);
     this->addProperty(mPositionY);
+}
+
+QString MeshTextureData::getSphereText() const
+{
+    return mSphereText;
+}
+
+QString MeshTextureData::getPlaneText() const
+{
+    return mPlaneText;
+}
+
+QString MeshTextureData::getCylinderText() const
+{
+    return mCylinderText;
 }
 
 DoublePropertyPtr MeshTextureData::getPositionY() const
