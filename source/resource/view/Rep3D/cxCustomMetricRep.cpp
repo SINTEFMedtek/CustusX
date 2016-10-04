@@ -56,6 +56,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage2DRep3D.h"
 #include "cxGraphicalPrimitives.h"
 
+#include <vtkSelectVisiblePoints.h>
+#include <vtkIdFilter.h>
+#include <vtkLabeledDataMapper.h>
+
 namespace cx
 {
 
@@ -91,6 +95,11 @@ void CustomMetricRep::onModifiedStartRender()
 
 	this->updateModel();
 	this->drawText();
+}
+
+void CustomMetricRep::onEveryRender()
+{
+	this->hideDistanceMetricsOutsideTheViewPort();
 }
 
 void CustomMetricRep::updateModel()
@@ -170,6 +179,11 @@ void CustomMetricRep::createDistanceMarkers()
 
 	DoubleBoundingBox3D bounds = custom->getModel()->boundingBox();
 
+
+	//Used by createDistanceMarkersPipeline(). To be removed
+	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+	points->SetNumberOfPoints(pos.size());
+
 	mDistanceText.resize(pos.size());
 	Vector3D pos_0 = custom->getZeroPosition();
 	for(unsigned i = 0; i < mDistanceText.size(); ++i)
@@ -179,7 +193,45 @@ void CustomMetricRep::createDistanceMarkers()
 		Vector3D textpos = bounds.center();
 		textpos[0] = bounds.topRight()[0];
 		mDistanceText[i] = this->createDistanceText(pos[i].coord(textpos), distance);
+
+		Vector3D point = pos[i].coord(textpos);
+		vtkIdType pointId = i;
+		points->SetPoint(pointId, point.data());
 	}
+
+	this->createDistanceMarkersPipeline(points);
+}
+
+//To be removed if it won't work
+//Example: http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/Annotation/Cxx/LabeledMesh/LabeledMesh.cxx
+void CustomMetricRep::createDistanceMarkersPipeline(vtkSmartPointer<vtkPoints> points)
+{
+	vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
+	vtkSmartPointer<vtkIdFilter> ids = vtkSmartPointer<vtkIdFilter>::New();
+
+	polyData->SetPoints(points);
+	ids->SetInputData(polyData);
+	ids->PointIdsOn();
+	ids->CellIdsOn();
+	ids->FieldDataOn();
+
+	// Create labels for points
+	vtkSmartPointer<vtkSelectVisiblePoints> visPts;
+	visPts = vtkSmartPointer<vtkSelectVisiblePoints>::New();
+	visPts->SetInputConnection( ids->GetOutputPort() );
+	visPts->SetRenderer( this->getRenderer() );
+
+
+	// Create the mapper to display the point ids.  Specify the
+	// format to use for the labels.  Also create the associated actor.
+	vtkSmartPointer<vtkLabeledDataMapper> ldm = vtkSmartPointer<vtkLabeledDataMapper>::New();
+	ldm->SetInputConnection( visPts->GetOutputPort() );
+	ldm->SetLabelModeToLabelFieldData();
+
+	vtkSmartPointer<vtkActor2D> pointLabels = vtkSmartPointer<vtkActor2D>::New();
+	pointLabels->SetMapper( ldm );
+
+	this->getRenderer()->AddActor2D( pointLabels );
 }
 
 CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distance)
@@ -191,7 +243,25 @@ CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distan
 	text->setPosition(pos);
 	text->placeBelowCenter();
 	text->setSize(mLabelSize / 100);
+
 	return text;
+}
+
+void CustomMetricRep::hideDistanceMetricsOutsideTheViewPort()
+{
+	if(mDistanceText.empty())
+		return;
+	static vtkSmartPointer<vtkSelectVisiblePoints> visPts = vtkSmartPointer<vtkSelectVisiblePoints>::New();
+	visPts->SetRenderer(this->getRenderer());
+	float * zbuffer = visPts->Initialize(true);
+
+	for(unsigned i = 0; i < mDistanceText.size(); ++i)
+	{
+		Vector3D pos = mDistanceText[i]->getPosition();
+		bool visible = visPts->IsPointOccluded(pos.data(), zbuffer);
+		mDistanceText[i]->setVisibility(visible);
+	}
+	delete zbuffer;
 }
 
 }
