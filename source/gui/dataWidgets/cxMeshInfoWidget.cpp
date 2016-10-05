@@ -60,7 +60,7 @@ namespace cx
 {
 
 ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
-		BaseWidget(parent, "mesh_info_widget", "Mesh Properties")
+        BaseWidget(parent, "active_mesh_widget", "Mesh Properties")
 {
 	this->setToolTip("Mesh properties");
 
@@ -78,7 +78,7 @@ ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, 
 //---------------------------------------------------------
 
 AllMeshPropertiesWidget::AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr mesh, VisServicesPtr services, QWidget *parent) :
-		TabbedWidget(parent, "all_mesh_info_widget", "Mesh Properties"),
+        TabbedWidget(parent, "all_mesh_tabs_widget", "Mesh Properties"),
 		mMeshSelector(mesh)
 {
 	this->setToolTip("Mesh properties");
@@ -98,7 +98,7 @@ MeshInfoWidget::MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
 							   PatientModelServicePtr patientModelService,
 							   ViewServicePtr viewService,
 							   QWidget* parent) :
-	InfoWidget(parent, "MeshCoreInfoWidget", "Mesh Properties"),
+    InfoWidget(parent, "mesh_info_widget", "Mesh Properties"),
 	mPatientModelService(patientModelService),
 	mViewService(viewService),
 	mMeshSelector(meshSelector)

@@ -77,7 +77,7 @@ ApplicationsParser::ApplicationsParser()
 	QStringList toolbars;
 	toolbars << standardToolbars << "Data" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("mesh_info_widget", Qt::LeftDockWidgetArea, true);
+    desktop.addPreset("active_mesh_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("volume_properties_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("slice_properties_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("dicom_widget", Qt::LeftDockWidgetArea, true);
@@ -102,7 +102,7 @@ ApplicationsParser::ApplicationsParser()
 	toolbars.clear();
 	toolbars << standardToolbars << "Camera3DViews" << "Sampler" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("mesh_info_widget", Qt::LeftDockWidgetArea, true);
+    desktop.addPreset("active_mesh_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("volume_properties_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("slice_properties_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("console_widget", Qt::LeftDockWidgetArea, false);
@@ -133,7 +133,7 @@ ApplicationsParser::ApplicationsParser()
 	toolbars.clear();
 	toolbars << standardToolbars << "Sampler" << "Help";
 	this->addToolbarsToDesktop(desktop, toolbars);
-	desktop.addPreset("mesh_info_widget", Qt::LeftDockWidgetArea, true);
+    desktop.addPreset("active_mesh_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("volume_properties_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("slice_properties_widget", Qt::LeftDockWidgetArea, true);
 	desktop.addPreset("metric_widget", Qt::LeftDockWidgetArea, true);

@@ -74,7 +74,7 @@ void MeshTextureData::initialize()
 {
     mTextureImage = StringPropertySelectImage::New(mPatientModelService);
     mTextureImage->setValueName("Texture image");
-    mTextureImage->setHelp("Select an imported PNG image to use as texture.");
+    mTextureImage->setHelp("Select an imported 2D image to use as texture.");
     mTextureImage->setOnly2DImagesFilter(true);
     this->addProperty(mTextureImage);
 
