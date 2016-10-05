@@ -99,7 +99,7 @@ void CustomMetricRep::onModifiedStartRender()
 
 void CustomMetricRep::onEveryRender()
 {
-	this->hideDistanceMetricsOutsideTheViewPort();
+	this->hideDistanceMetrics();
 }
 
 void CustomMetricRep::updateModel()
@@ -191,47 +191,13 @@ void CustomMetricRep::createDistanceMarkers()
 		Vector3D pos_i = pos[i].coord(Vector3D(0,0,0));
 		double distance = (pos_i - pos_0).length();
 		Vector3D textpos = bounds.center();
-		textpos[0] = bounds.topRight()[0];
+		textpos[2] = bounds.bottomLeft()[2];
 		mDistanceText[i] = this->createDistanceText(pos[i].coord(textpos), distance);
 
 		Vector3D point = pos[i].coord(textpos);
 		vtkIdType pointId = i;
 		points->SetPoint(pointId, point.data());
 	}
-
-	this->createDistanceMarkersPipeline(points);
-}
-
-//To be removed if it won't work
-//Example: http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/Annotation/Cxx/LabeledMesh/LabeledMesh.cxx
-void CustomMetricRep::createDistanceMarkersPipeline(vtkSmartPointer<vtkPoints> points)
-{
-	vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
-	vtkSmartPointer<vtkIdFilter> ids = vtkSmartPointer<vtkIdFilter>::New();
-
-	polyData->SetPoints(points);
-	ids->SetInputData(polyData);
-	ids->PointIdsOn();
-	ids->CellIdsOn();
-	ids->FieldDataOn();
-
-	// Create labels for points
-	vtkSmartPointer<vtkSelectVisiblePoints> visPts;
-	visPts = vtkSmartPointer<vtkSelectVisiblePoints>::New();
-	visPts->SetInputConnection( ids->GetOutputPort() );
-	visPts->SetRenderer( this->getRenderer() );
-
-
-	// Create the mapper to display the point ids.  Specify the
-	// format to use for the labels.  Also create the associated actor.
-	vtkSmartPointer<vtkLabeledDataMapper> ldm = vtkSmartPointer<vtkLabeledDataMapper>::New();
-	ldm->SetInputConnection( visPts->GetOutputPort() );
-	ldm->SetLabelModeToLabelFieldData();
-
-	vtkSmartPointer<vtkActor2D> pointLabels = vtkSmartPointer<vtkActor2D>::New();
-	pointLabels->SetMapper( ldm );
-
-	this->getRenderer()->AddActor2D( pointLabels );
 }
 
 CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distance)
@@ -241,13 +207,14 @@ CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distan
 	text->setText(QString("%1").arg(distance));
 
 	text->setPosition(pos);
-	text->placeBelowCenter();
+	text->placeBelowCenter();//Test
 	text->setSize(mLabelSize / 100);
 
 	return text;
 }
 
-void CustomMetricRep::hideDistanceMetricsOutsideTheViewPort()
+//Hide the distance metrics if outside the view port, obscured by other structures, or of too far from the camera
+void CustomMetricRep::hideDistanceMetrics()
 {
 	if(mDistanceText.empty())
 		return;
@@ -259,9 +226,20 @@ void CustomMetricRep::hideDistanceMetricsOutsideTheViewPort()
 	{
 		Vector3D pos = mDistanceText[i]->getPosition();
 		bool visible = visPts->IsPointOccluded(pos.data(), zbuffer);
-		mDistanceText[i]->setVisibility(visible);
+		bool closeToCamera = this->isCloserToCameraThan(pos, 25);
+		mDistanceText[i]->setVisibility(visible && closeToCamera);
 	}
 	delete zbuffer;
+}
+
+bool CustomMetricRep::isCloserToCameraThan(Vector3D pos, double distanceThreshold)
+{
+	Vector3D cameraPos(this->getRenderer()->GetActiveCamera()->GetPosition());
+	Vector3D diff = cameraPos - pos;
+	double distance = diff.norm();
+	if(distance < distanceThreshold)
+		return true;
+	return false;
 }
 
 }

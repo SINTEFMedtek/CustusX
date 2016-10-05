@@ -84,8 +84,8 @@ private:
 	void updateImageModel(DataPtr model);
 	CaptionText3DPtr createDistanceText(Vector3D pos, double distance);
 	void createDistanceMarkers();
-	void hideDistanceMetricsOutsideTheViewPort();
-	void createDistanceMarkersPipeline(vtkSmartPointer<vtkPoints> points);
+	void hideDistanceMetrics();
+	bool isCloserToCameraThan(Vector3D pos, double distanceThreshold);
 };
 
 }
