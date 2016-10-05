@@ -43,72 +43,72 @@ SpaceProviderNull::SpaceProviderNull()
 
 Transform3D SpaceProviderNull::get_toMfrom(CoordinateSystem from, CoordinateSystem to)
 {
-    return Transform3D::Identity();
+	return Transform3D::Identity();
 }
 
 std::vector<CoordinateSystem> SpaceProviderNull::getSpacesToPresentInGUI()
 {
-    return std::vector<CoordinateSystem>();
+	return std::vector<CoordinateSystem>();
 }
 
 std::map<QString, QString> SpaceProviderNull::getDisplayNamesForCoordRefObjects()
 {
-    return std::map<QString, QString>();
+	return std::map<QString, QString>();
 }
 
 SpaceListenerPtr SpaceProviderNull::createListener()
 {
-    return SpaceListenerPtr();
+	return SpaceListenerPtr();
 }
 
 Vector3D SpaceProviderNull::getActiveToolTipPoint(CoordinateSystem to, bool useOffset)
 {
-    return Vector3D();
+	return Vector3D();
 }
 
 Transform3D SpaceProviderNull::getActiveToolTipTransform(CoordinateSystem to, bool useOffset)
 {
-    return Transform3D::Identity();
+	return Transform3D::Identity();
 }
 
 Transform3D SpaceProviderNull::get_rMpr()
 {
-    return Transform3D::Identity();
+	return Transform3D::Identity();
 }
 
 CoordinateSystem SpaceProviderNull::getS(ToolPtr tool)
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 CoordinateSystem SpaceProviderNull::getT(ToolPtr tool)
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 CoordinateSystem SpaceProviderNull::getTO(ToolPtr tool)
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 CoordinateSystem SpaceProviderNull::getD(DataPtr data)
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 CoordinateSystem SpaceProviderNull::getPr()
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 CoordinateSystem SpaceProviderNull::getR()
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 CoordinateSystem SpaceProviderNull::convertToSpecific(CoordinateSystem space)
 {
-    return CoordinateSystem();
+	return CoordinateSystem();
 }
 
 } // namespace cx

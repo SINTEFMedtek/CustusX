@@ -38,22 +38,22 @@ namespace cx
 {
 
 MeshTextureWidget::MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector, PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent)
-    : BaseWidget(parent, "mesh_texture_widget", "Texture"),
-      mPatientModelService(patientModelService),
-      mViewService(viewService),
-      mMeshSelector(meshSelector)
+	: BaseWidget(parent, "mesh_texture_widget", "Texture"),
+	  mPatientModelService(patientModelService),
+	  mViewService(viewService),
+	  mMeshSelector(meshSelector)
 {
-    QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-    QGridLayout* gridLayout = new QGridLayout;
-    gridLayout->setMargin(0);
-    toptopLayout->addLayout(gridLayout);
-    mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
-    toptopLayout->addWidget(mOptionsWidget);
-    toptopLayout->addStretch();
+	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+	QGridLayout* gridLayout = new QGridLayout;
+	gridLayout->setMargin(0);
+	toptopLayout->addLayout(gridLayout);
+	mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
+	toptopLayout->addWidget(mOptionsWidget);
+	toptopLayout->addStretch();
 
-    this->clearUI();
-    connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
-    this->setModified();
+	this->clearUI();
+	connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
+	this->setModified();
 }
 
 MeshTextureWidget::~MeshTextureWidget()
@@ -63,32 +63,32 @@ MeshTextureWidget::~MeshTextureWidget()
 
 void MeshTextureWidget::prePaintEvent()
 {
-    this->setupUI();
+	this->setupUI();
 }
 
 void MeshTextureWidget::meshSelectedSlot()
 {
-    if (mMesh == mMeshSelector->getData())
-        return;
+	if (mMesh == mMeshSelector->getData())
+		return;
 
-    mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
-    this->setupUI();
-    mOptionsWidget->rebuild();
+	this->setupUI();
+	mOptionsWidget->rebuild();
 }
 
 void MeshTextureWidget::clearUI()
 {
-    this->setModified();
+	this->setModified();
 }
 
 void MeshTextureWidget::setupUI()
 {
-    if (!mMesh)
-        return;
+	if (!mMesh)
+		return;
 
-    std::vector<PropertyPtr> properties = mMesh->getTextureData().getProperties();
-    mOptionsWidget->setOptions(mMesh->getUid(), properties, true);
+	std::vector<PropertyPtr> properties = mMesh->getTextureData().getProperties();
+	mOptionsWidget->setOptions(mMesh->getUid(), properties, true);
 
 }
 

@@ -137,24 +137,23 @@ void GraphicalGeometric::meshChangedSlot()
 		mGraphicalGlyph3DDataPtr->setScaleFactor(mMesh->getVisSize());
 	}
 
-    //NB rekkefølge!Må kalle denne før de to set under.
-    mMesh->updateVtkPolyDataWithTexture();
+	mMesh->updateVtkPolyDataWithTexture();
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
-    mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
+	mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
 	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
 
-    //Set mesh color, opacity
-    if(mMesh->getTextureData().getTextureImage()->getValue().isEmpty() || mMesh->getTextureData().getTextureImage()->getImage() == NULL)
-    {
-        mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-        mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
-    }
-    else
-    {
-        mGraphicalPolyDataPtr->setColor(255, 255, 255);
-    }
+	//Set mesh color, opacity
+	if(mMesh->getTextureData().getTextureImage()->getValue().isEmpty() || mMesh->getTextureData().getTextureImage()->getImage() == NULL)
+	{
+		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+	}
+	else
+	{
+		mGraphicalPolyDataPtr->setColor(255, 255, 255);
+	}
 
-    //Set other properties
+	//Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
 	const MeshPropertyData& src = mMesh->getProperties();
 
@@ -193,7 +192,7 @@ void GraphicalGeometric::transformChangedSlot()
 
 
 GeometricRep::GeometricRep() :
-    RepImpl()
+	RepImpl()
 {
 	mGraphics.reset(new GraphicalGeometric());
 }
@@ -202,7 +201,7 @@ GeometricRep::~GeometricRep()
 }
 GeometricRepPtr GeometricRep::New(const QString& uid)
 {
-    return wrap_new(new GeometricRep(), uid);
+	return wrap_new(new GeometricRep(), uid);
 }
 
 void GeometricRep::addRepActorsToViewRenderer(ViewPtr view)

@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -63,20 +63,20 @@ namespace cx
 
 MeshPtr Mesh::create(const QString& uid, const QString& name, PatientModelServicePtr patientModelService, SpaceProviderPtr spaceProvider)
 {
-    return MeshPtr(new Mesh(uid, name, vtkPolyDataPtr(), patientModelService, spaceProvider));
+	return MeshPtr(new Mesh(uid, name, vtkPolyDataPtr(), patientModelService, spaceProvider));
 }
 
 Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData, PatientModelServicePtr patientModelService, SpaceProviderPtr spaceProvider) :
-    Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray(""), mPatientModelService(patientModelService),
-    mSpaceProvider(spaceProvider), mTextureData(patientModelService)
+	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray(""), mPatientModelService(patientModelService),
+	mSpaceProvider(spaceProvider), mTextureData(patientModelService)
 {
 	if (!mVtkPolyData)
 		mVtkPolyData = vtkPolyDataPtr::New();
 	connect(&mProperties, &MeshPropertyData::changed, this, &Mesh::meshChanged);
-    connect(&mTextureData, &MeshTextureData::changed, this, &Mesh::meshChanged);
+	connect(&mTextureData, &MeshTextureData::changed, this, &Mesh::meshChanged);
 	mShowGlyph = shouldGlyphBeEnableByDefault();
-    mGlyphLUT ="Citrus";
-    this->setAcquisitionTime(QDateTime::currentDateTime());
+	mGlyphLUT ="Citrus";
+	this->setAcquisitionTime(QDateTime::currentDateTime());
 }
 
 Mesh::~Mesh()
@@ -153,7 +153,7 @@ vtkPolyDataPtr Mesh::getVtkPolyData() const
 
 vtkTexturePtr Mesh::getVtkTexture() const
 {
-    return mVtkTexture;
+	return mVtkTexture;
 }
 
 void Mesh::addXml(QDomNode& dataNode)
@@ -164,15 +164,15 @@ void Mesh::addXml(QDomNode& dataNode)
 	QDomNode meshNode = dataNode;
 
 	mProperties.addXml(dataNode);
-    mTextureData.addXml(dataNode);
+	mTextureData.addXml(dataNode);
 
-    QDomElement glyphNode = doc.createElement("glyph");
-    QDomElement elemGlyph = glyphNode.toElement();
-    elemGlyph.setAttribute("showGlyph", mShowGlyph);
-    elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
-    elemGlyph.setAttribute("colorArray", mColorArray.c_str());
-    elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
-    meshNode.appendChild(elemGlyph);
+	QDomElement glyphNode = doc.createElement("glyph");
+	QDomElement elemGlyph = glyphNode.toElement();
+	elemGlyph.setAttribute("showGlyph", mShowGlyph);
+	elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
+	elemGlyph.setAttribute("colorArray", mColorArray.c_str());
+	elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
+	meshNode.appendChild(elemGlyph);
 
 }
 
@@ -187,16 +187,16 @@ void Mesh::parseXml(QDomNode& dataNode)
 		return;
 
 	mProperties.parseXml(dataNode);
-    mTextureData.parseXml(dataNode);
+	mTextureData.parseXml(dataNode);
 
-    QDomNode glyphNode = dataNode.namedItem("glyph");
-    if (!glyphNode.isNull())
-    {
-        mShowGlyph = glyphNode.toElement().attribute("showGlyph").toInt();
-        mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
-        mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
-        mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
-    }
+	QDomNode glyphNode = dataNode.namedItem("glyph");
+	if (!glyphNode.isNull())
+	{
+		mShowGlyph = glyphNode.toElement().attribute("showGlyph").toInt();
+		mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
+		mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
+		mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
+	}
 
 	emit meshChanged();
 }
@@ -234,42 +234,42 @@ bool Mesh::getFrontfaceCulling()
 
 void Mesh::setShowGlyph(bool val)
 {
-    mShowGlyph = val;
-    emit meshChanged();
+	mShowGlyph = val;
+	emit meshChanged();
 }
 
 bool Mesh::hasGlyph()
 {
-    return mHasGlyph;
+	return mHasGlyph;
 }
 
 bool Mesh::showGlyph()
 {
-    return mShowGlyph;
+	return mShowGlyph;
 }
 
 bool Mesh::shouldGlyphBeEnableByDefault()
 {
-    if(! mHasGlyph) return false;
+	if(! mHasGlyph) return false;
 	if(!mVtkPolyData) return false;
 	if(mVtkPolyData->GetNumberOfVerts() > 0) return false;
-    if(mVtkPolyData->GetNumberOfLines() > 0) return false;
-    if(mVtkPolyData->GetNumberOfPolys() > 0) return false;
-    if(mVtkPolyData->GetNumberOfStrips() > 0) return false;
+	if(mVtkPolyData->GetNumberOfLines() > 0) return false;
+	if(mVtkPolyData->GetNumberOfPolys() > 0) return false;
+	if(mVtkPolyData->GetNumberOfStrips() > 0) return false;
 
-    return true;
+	return true;
 }
 
 
 const char * Mesh::getOrientationArray()
 {
-    return mOrientationArray.c_str();
+	return mOrientationArray.c_str();
 }
 
 void Mesh::setOrientationArray(const char * orientationArray)
 {
-    mOrientationArray = orientationArray;
-    emit meshChanged();
+	mOrientationArray = orientationArray;
+	emit meshChanged();
 }
 
 double Mesh::getVisSize()
@@ -284,99 +284,99 @@ void Mesh::setVisSize(double size)
 
 const char * Mesh::getColorArray()
 {
-    return mColorArray.c_str();
+	return mColorArray.c_str();
 }
 
 void Mesh::setColorArray(const char * colorArray)
 {
-    mColorArray = colorArray;
-    emit meshChanged();
+	mColorArray = colorArray;
+	emit meshChanged();
 }
 
 const char * Mesh::getGlyphLUT()
 {
-    return mGlyphLUT.c_str();
+	return mGlyphLUT.c_str();
 }
 
 QString Mesh::getTextureShape()
 {
-    return mTextureData.getTextureShape()->getValue();
+	return mTextureData.getTextureShape()->getValue();
 }
 
 void Mesh::setGlyphLUT(const char * glyphLUT)
 {
-    mGlyphLUT = glyphLUT;
-    emit meshChanged();
+	mGlyphLUT = glyphLUT;
+	emit meshChanged();
 }
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-    QString textureShape = this->getTextureShape();
-    if (mTextureData.getTextureImage()->getValue().isEmpty() || mTextureData.getTextureImage()->getImage() == NULL)
-    {
-        mVtkTexture = vtkTexturePtr::New();
-        return;
-    }
+	QString textureShape = this->getTextureShape();
+	if (mTextureData.getTextureImage()->getValue().isEmpty() || mTextureData.getTextureImage()->getImage() == NULL)
+	{
+		mVtkTexture = vtkTexturePtr::New();
+		return;
+	}
 
-    //create the texture mapper
-    vtkDataSetAlgorithmPtr tMapper;
-    if(!this->createTextureMapper(tMapper))
-        return;
+	//create the texture mapper
+	vtkDataSetAlgorithmPtr tMapper;
+	if(!this->createTextureMapper(tMapper))
+		return;
 
-    //Get the image data
-    ImagePtr textureImage = mTextureData.getTextureImage()->getImage();
-    vtkImageDataPtr vtkImageData = textureImage->getBaseVtkImageData();
+	//Get the image data
+	ImagePtr textureImage = mTextureData.getTextureImage()->getImage();
+	vtkImageDataPtr vtkImageData = textureImage->getBaseVtkImageData();
 
-    //Create the texture
-    mVtkTexture = vtkTexturePtr::New();
-    mVtkTexture->SetInputData(vtkImageData);
+	//Create the texture
+	mVtkTexture = vtkTexturePtr::New();
+	mVtkTexture->SetInputData(vtkImageData);
 
-    //transform texture coordinates
-    //VTK uses r, s and t coordinates. t is only used for 3D texturing which is not supported by VTK yet.
-    //We map r and s to match the CustusX X and Y directions.
-    vtkTransformTextureCoordsPtr transformTexture = vtkTransformTextureCoordsPtr::New();
-    transformTexture->SetInputConnection(tMapper->GetOutputPort());
-    double posR = this->getTextureData().getPositionX()->getValue();
-    double posS = this->getTextureData().getPositionY()->getValue();
-    transformTexture->SetPosition(-posR, -posS, 0);
-    double scaleR = this->getTextureData().getScaleX()->getValue();
-    double scaleS = this->getTextureData().getScaleY()->getValue();
-    transformTexture->SetScale(scaleR, scaleS, 1);
-    transformTexture->Update();
+	//transform texture coordinates
+	//VTK uses r, s and t coordinates. t is only used for 3D texturing which is not supported by VTK yet.
+	//We map r and s to match the CustusX X and Y directions.
+	vtkTransformTextureCoordsPtr transformTexture = vtkTransformTextureCoordsPtr::New();
+	transformTexture->SetInputConnection(tMapper->GetOutputPort());
+	double posR = this->getTextureData().getPositionX()->getValue();
+	double posS = this->getTextureData().getPositionY()->getValue();
+	transformTexture->SetPosition(-posR, -posS, 0);
+	double scaleR = this->getTextureData().getScaleX()->getValue();
+	double scaleS = this->getTextureData().getScaleY()->getValue();
+	transformTexture->SetScale(scaleR, scaleS, 1);
+	transformTexture->Update();
 
-    //Update the poly data
-    mVtkPolyData = transformTexture->GetPolyDataOutput();
+	//Update the poly data
+	mVtkPolyData = transformTexture->GetPolyDataOutput();
 }
 
 bool Mesh::createTextureMapper(vtkDataSetAlgorithmPtr &tMapper)
 {
-    QString textureShape = this->getTextureShape();
+	QString textureShape = this->getTextureShape();
 
-    if (textureShape == mTextureData.getCylinderText())
-    {
-        tMapper = vtkTextureMapToCylinderPtr::New();
-        dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
-    }
-    else if (textureShape == mTextureData.getPlaneText())
-    {
-        tMapper = vtkTextureMapToPlanePtr::New();
-    }
-    else if (textureShape == mTextureData.getSphereText())
-    {
-        tMapper = vtkTextureMapToSpherePtr::New();
-    }
-    else
-    {
-        return false;
-    }
+	if (textureShape == mTextureData.getCylinderText())
+	{
+		tMapper = vtkTextureMapToCylinderPtr::New();
+		dynamic_cast<vtkTextureMapToCylinder*>(tMapper.Get())->PreventSeamOn();
+	}
+	else if (textureShape == mTextureData.getPlaneText())
+	{
+		tMapper = vtkTextureMapToPlanePtr::New();
+	}
+	else if (textureShape == mTextureData.getSphereText())
+	{
+		tMapper = vtkTextureMapToSpherePtr::New();
+	}
+	else
+	{
+		return false;
+	}
 
-    tMapper->SetInputData(mVtkPolyData);
-    return true;
+	tMapper->SetInputData(mVtkPolyData);
+	return true;
 }
 
 QStringList Mesh::getOrientationArrayList()
 {
-    return mOrientationArrayList;
+	return mOrientationArrayList;
 }
 
 QStringList Mesh::getColorArrayList()
@@ -386,17 +386,17 @@ QStringList Mesh::getColorArrayList()
 
 const MeshPropertyData& Mesh::getProperties() const
 {
-    return mProperties;
+	return mProperties;
 }
 
 const MeshTextureData &Mesh::getTextureData() const
 {
-    return mTextureData;
+	return mTextureData;
 }
 
 DoubleBoundingBox3D Mesh::boundingBox() const
 {
-//	getVtkPolyData()->Update();
+	//	getVtkPolyData()->Update();
 	DoubleBoundingBox3D bounds(getVtkPolyData()->GetBounds());
 	return bounds;
 }
@@ -407,7 +407,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	if (similar(transform, Transform3D::Identity()))
 		return getVtkPolyData();
 
-//	getVtkPolyData()->Update();
+	//	getVtkPolyData()->Update();
 	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
@@ -423,7 +423,7 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	}
 	poly->SetPoints(floatPoints.GetPointer());
 	poly->Modified();
-//	poly->Update();
+	//	poly->Update();
 
 	return poly;
 }

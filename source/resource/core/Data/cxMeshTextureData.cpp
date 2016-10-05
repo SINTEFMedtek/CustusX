@@ -37,117 +37,117 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 MeshTextureData::MeshTextureData(PatientModelServicePtr patientModelService)
-    : mPatientModelService(patientModelService)
-    , mCylinderText("Cylinder")
-    , mPlaneText("Plane")
-    , mSphereText("Sphere")
+	: mPatientModelService(patientModelService)
+	, mCylinderText("Cylinder")
+	, mPlaneText("Plane")
+	, mSphereText("Sphere")
 {
-    this->initialize();
+	this->initialize();
 }
 
 void MeshTextureData::addXml(QDomNode &dataNode)
 {
-    for (unsigned i=0; i<mProperties.size(); ++i)
-    {
-            XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
-            item.writeVariant(mProperties[i]->getValueAsVariant());
-    }
+	for (unsigned i=0; i<mProperties.size(); ++i)
+	{
+		XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
+		item.writeVariant(mProperties[i]->getValueAsVariant());
+	}
 }
 
 void MeshTextureData::parseXml(QDomNode &dataNode)
 {
-    for (unsigned i=0; i<mProperties.size(); ++i)
-    {
-            XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
-            QVariant orgval = mProperties[i]->getValueAsVariant();
-            mProperties[i]->setValueFromVariant(item.readVariant(orgval));
-    }
+	for (unsigned i=0; i<mProperties.size(); ++i)
+	{
+		XmlOptionItem item(mProperties[i]->getUid(), dataNode.toElement());
+		QVariant orgval = mProperties[i]->getValueAsVariant();
+		mProperties[i]->setValueFromVariant(item.readVariant(orgval));
+	}
 }
 
 void MeshTextureData::addProperty(PropertyPtr property)
 {
-    mProperties.push_back(property);
-    connect(property.get(), &Property::changed, this, &MeshTextureData::changed);
+	mProperties.push_back(property);
+	connect(property.get(), &Property::changed, this, &MeshTextureData::changed);
 }
 
 void MeshTextureData::initialize()
 {
-    mTextureImage = StringPropertySelectImage::New(mPatientModelService);
-    mTextureImage->setValueName("Texture image");
-    mTextureImage->setHelp("Select an imported 2D image to use as texture.");
-    mTextureImage->setOnly2DImagesFilter(true);
-    this->addProperty(mTextureImage);
+	mTextureImage = StringPropertySelectImage::New(mPatientModelService);
+	mTextureImage->setValueName("Texture image");
+	mTextureImage->setHelp("Select an imported 2D image to use as texture.");
+	mTextureImage->setOnly2DImagesFilter(true);
+	this->addProperty(mTextureImage);
 
-    mTextureShape = StringProperty::initialize("texture_type", "Texture shape",
-                                                 "The texture is applied in predefined geometric shapes. Select the shape which gives the best fit to your mesh.",
-                                                 "Cylinder",
-                                                 QStringList()
-                                                 << this->getCylinderText()
-                                                 << this->getPlaneText()
-                                                 << this->getSphereText());
-    this->addProperty(mTextureShape);
+	mTextureShape = StringProperty::initialize("texture_type", "Texture shape",
+											   "The texture is applied in predefined geometric shapes. Select the shape which gives the best fit to your mesh.",
+											   "Cylinder",
+											   QStringList()
+											   << this->getCylinderText()
+											   << this->getPlaneText()
+											   << this->getSphereText());
+	this->addProperty(mTextureShape);
 
-    mScaleX = DoubleProperty::initialize("texture_scale_X", "Scale X", "How many times to draw the image along the X axis.", 1, DoubleRange(1,100000,1), 0);
-    this->addProperty(mScaleX);
+	mScaleX = DoubleProperty::initialize("texture_scale_X", "Scale X", "How many times to draw the image along the X axis.", 1, DoubleRange(1,100000,1), 0);
+	this->addProperty(mScaleX);
 
-    mScaleY = DoubleProperty::initialize("texture_scale_Y", "Scale Y", "How many times to draw the image along the Y axis.", 1, DoubleRange(1,100000,1), 0);
-    this->addProperty(mScaleY);
+	mScaleY = DoubleProperty::initialize("texture_scale_Y", "Scale Y", "How many times to draw the image along the Y axis.", 1, DoubleRange(1,100000,1), 0);
+	this->addProperty(mScaleY);
 
-    mPositionX = DoubleProperty::initialize("texture_position_X", "Position X", "Where to start drawing the image along the X axis.", 0, DoubleRange(-100000,100000,0.01), 2);
-    this->addProperty(mPositionX);
+	mPositionX = DoubleProperty::initialize("texture_position_X", "Position X", "Where to start drawing the image along the X axis.", 0, DoubleRange(-100000,100000,0.01), 2);
+	this->addProperty(mPositionX);
 
-    mPositionY = DoubleProperty::initialize("texture_position_Y", "Position Y", "Where to start drawing the image along the Y axis.", 0, DoubleRange(-100000,100000,0.01), 2);
-    this->addProperty(mPositionY);
+	mPositionY = DoubleProperty::initialize("texture_position_Y", "Position Y", "Where to start drawing the image along the Y axis.", 0, DoubleRange(-100000,100000,0.01), 2);
+	this->addProperty(mPositionY);
 }
 
 QString MeshTextureData::getSphereText() const
 {
-    return mSphereText;
+	return mSphereText;
 }
 
 QString MeshTextureData::getPlaneText() const
 {
-    return mPlaneText;
+	return mPlaneText;
 }
 
 QString MeshTextureData::getCylinderText() const
 {
-    return mCylinderText;
+	return mCylinderText;
 }
 
 DoublePropertyPtr MeshTextureData::getPositionY() const
 {
-    return mPositionY;
+	return mPositionY;
 }
 
 DoublePropertyPtr MeshTextureData::getPositionX() const
 {
-    return mPositionX;
+	return mPositionX;
 }
 
 std::vector<PropertyPtr> MeshTextureData::getProperties() const
 {
-    return mProperties;
+	return mProperties;
 }
 
 DoublePropertyPtr MeshTextureData::getScaleY() const
 {
-    return mScaleY;
+	return mScaleY;
 }
 
 DoublePropertyPtr MeshTextureData::getScaleX() const
 {
-    return mScaleX;
+	return mScaleX;
 }
 
 StringPropertySelectImagePtr MeshTextureData::getTextureImage() const
 {
-    return mTextureImage;
+	return mTextureImage;
 }
 
 StringPropertyPtr MeshTextureData::getTextureShape() const
 {
-    return mTextureShape;
+	return mTextureShape;
 }
 
 } // namespace cx

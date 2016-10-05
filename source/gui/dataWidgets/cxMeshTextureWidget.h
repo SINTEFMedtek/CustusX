@@ -42,29 +42,29 @@ namespace cx
 
 class cxGui_EXPORT MeshTextureWidget : public BaseWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector,
-                      PatientModelServicePtr patientModelService, ViewServicePtr viewService,
-                      QWidget *parent);
+	MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector,
+					  PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+					  QWidget *parent);
 
-    virtual ~MeshTextureWidget();
-    SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+	virtual ~MeshTextureWidget();
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
 
 protected slots:
-    void setupUI();
-    virtual void prePaintEvent();
-    void meshSelectedSlot();
+	void setupUI();
+	virtual void prePaintEvent();
+	void meshSelectedSlot();
 
 private:
-    MeshTextureWidget();
-    MeshPtr mMesh;
-    SelectDataStringPropertyBasePtr mMeshSelector;
-    OptionsWidget* mOptionsWidget;
-    PatientModelServicePtr mPatientModelService;
-    ViewServicePtr mViewService;
-    void clearUI();
+	MeshTextureWidget();
+	MeshPtr mMesh;
+	SelectDataStringPropertyBasePtr mMeshSelector;
+	OptionsWidget* mOptionsWidget;
+	PatientModelServicePtr mPatientModelService;
+	ViewServicePtr mViewService;
+	void clearUI();
 };
 
 }//end namespace cx

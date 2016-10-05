@@ -48,40 +48,40 @@ namespace cx
  */
 class cxResource_EXPORT MeshTextureData : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    MeshTextureData(PatientModelServicePtr patientModelService);
-    void addXml(QDomNode& dataNode);
-    void parseXml(QDomNode &dataNode);
+	MeshTextureData(PatientModelServicePtr patientModelService);
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode &dataNode);
 
-    StringPropertyPtr getTextureShape() const;
-    StringPropertySelectImagePtr getTextureImage() const;
-    DoublePropertyPtr getScaleX() const;
-    DoublePropertyPtr getScaleY() const;
-    std::vector<PropertyPtr> getProperties() const;
-    DoublePropertyPtr getPositionX() const;
-    DoublePropertyPtr getPositionY() const;
+	StringPropertyPtr getTextureShape() const;
+	StringPropertySelectImagePtr getTextureImage() const;
+	DoublePropertyPtr getScaleX() const;
+	DoublePropertyPtr getScaleY() const;
+	std::vector<PropertyPtr> getProperties() const;
+	DoublePropertyPtr getPositionX() const;
+	DoublePropertyPtr getPositionY() const;
 
-    QString getCylinderText() const;
-    QString getPlaneText() const;
-    QString getSphereText() const;
+	QString getCylinderText() const;
+	QString getPlaneText() const;
+	QString getSphereText() const;
 
 signals:
-    void changed();
+	void changed();
 private:
-    void addProperty(PropertyPtr property);
-    void initialize();
-    std::vector<PropertyPtr> mProperties;
-    StringPropertyPtr mTextureShape;
-    StringPropertySelectImagePtr mTextureImage;
-    DoublePropertyPtr mScaleX;
-    DoublePropertyPtr mScaleY;
-    DoublePropertyPtr mPositionX;
-    DoublePropertyPtr mPositionY;
-    PatientModelServicePtr mPatientModelService;
-    QString mCylinderText;
-    QString mPlaneText;
-    QString mSphereText;
+	void addProperty(PropertyPtr property);
+	void initialize();
+	std::vector<PropertyPtr> mProperties;
+	StringPropertyPtr mTextureShape;
+	StringPropertySelectImagePtr mTextureImage;
+	DoublePropertyPtr mScaleX;
+	DoublePropertyPtr mScaleY;
+	DoublePropertyPtr mPositionX;
+	DoublePropertyPtr mPositionY;
+	PatientModelServicePtr mPatientModelService;
+	QString mCylinderText;
+	QString mPlaneText;
+	QString mSphereText;
 };
 
 } // namespace cx
