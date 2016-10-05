@@ -226,14 +226,15 @@ void CustomMetricRep::hideDistanceMetrics()
 	{
 		Vector3D pos = mDistanceText[i]->getPosition();
 		bool visible = visPts->IsPointOccluded(pos.data(), zbuffer);
-		bool closeToCamera = this->isCloserToCameraThan(pos, 25);
+		bool closeToCamera = this->isCloseToCamera(pos);
 		mDistanceText[i]->setVisibility(visible && closeToCamera);
 	}
 	delete zbuffer;
 }
 
-bool CustomMetricRep::isCloserToCameraThan(Vector3D pos, double distanceThreshold)
+bool CustomMetricRep::isCloseToCamera(Vector3D pos)
 {
+	double distanceThreshold = this->getCustomMetric()->getDistanceMarkerVisibility();
 	Vector3D cameraPos(this->getRenderer()->GetActiveCamera()->GetPosition());
 	Vector3D diff = cameraPos - pos;
 	double distance = diff.norm();

@@ -85,7 +85,7 @@ private:
 	CaptionText3DPtr createDistanceText(Vector3D pos, double distance);
 	void createDistanceMarkers();
 	void hideDistanceMetrics();
-	bool isCloserToCameraThan(Vector3D pos, double distanceThreshold);
+	bool isCloseToCamera(Vector3D pos);
 };
 
 }

@@ -47,7 +47,7 @@ namespace cx
 {
 
 CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
-				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false)
+				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false), mDistanceMarkerVisibility(50)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
@@ -360,6 +360,19 @@ bool CustomMetric::getShowDistanceMarkers() const
 		return;
 	mTranslationOnly = val;
 	emit propertiesChanged();
+}
+
+void CustomMetric::setDistanceMarkerVisibility(double val)
+{
+	if (mDistanceMarkerVisibility == val)
+		return;
+	mDistanceMarkerVisibility = val;
+	emit propertiesChanged();
+}
+
+double CustomMetric::getDistanceMarkerVisibility() const
+{
+	return mDistanceMarkerVisibility;
 }
 
 bool CustomMetric::getTranslationOnly() const
