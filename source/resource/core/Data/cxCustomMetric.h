@@ -128,6 +128,7 @@ private:
 	double mOffsetFromP0;
 	double mRepeatDistance;
 	bool mShowDistanceMarkers;
+	double mDistanceMarkerVisibility;
 	bool mTranslationOnly;
 
 	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const;
@@ -142,6 +143,8 @@ public:
 	void setShowDistanceMarkers(bool show);
 	bool getShowDistanceMarkers() const;
 	Vector3D getZeroPosition() const;
+	void setDistanceMarkerVisibility(double val);
+	double getDistanceMarkerVisibility() const;
 };
 
 /**

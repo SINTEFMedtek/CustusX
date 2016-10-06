@@ -33,21 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustomMetricRep.h"
 
 #include <boost/shared_ptr.hpp>
-#include <vtkVectorText.h>
-#include <vtkFollower.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include <vtkRenderWindow.h>
 #include <vtkImageActor.h>
-#include <vtkTextActor.h>
-#include <QFileInfo>
+#include <vtkSelectVisiblePoints.h>
 #include "cxTypeConversions.h"
 #include "cxCustomMetric.h"
-#include "vtkMatrix4x4.h"
-#include "vtkSTLReader.h"
-#include <vtkPolyDataNormals.h>
 #include "cxLogger.h"
 #include "cxBoundingBox3D.h"
 #include "cxGeometricRep.h"
@@ -55,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxImage2DRep3D.h"
 #include "cxGraphicalPrimitives.h"
+
 
 namespace cx
 {
@@ -91,6 +83,11 @@ void CustomMetricRep::onModifiedStartRender()
 
 	this->updateModel();
 	this->drawText();
+}
+
+void CustomMetricRep::onEveryRender()
+{
+	this->hideDistanceMetrics();
 }
 
 void CustomMetricRep::updateModel()
@@ -170,6 +167,10 @@ void CustomMetricRep::createDistanceMarkers()
 
 	DoubleBoundingBox3D bounds = custom->getModel()->boundingBox();
 
+
+	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+	points->SetNumberOfPoints(pos.size());
+
 	mDistanceText.resize(pos.size());
 	Vector3D pos_0 = custom->getZeroPosition();
 	for(unsigned i = 0; i < mDistanceText.size(); ++i)
@@ -177,8 +178,12 @@ void CustomMetricRep::createDistanceMarkers()
 		Vector3D pos_i = pos[i].coord(Vector3D(0,0,0));
 		double distance = (pos_i - pos_0).length();
 		Vector3D textpos = bounds.center();
-		textpos[0] = bounds.topRight()[0];
+		textpos[2] = bounds.bottomLeft()[2];
 		mDistanceText[i] = this->createDistanceText(pos[i].coord(textpos), distance);
+
+		Vector3D point = pos[i].coord(textpos);
+		vtkIdType pointId = i;
+		points->SetPoint(pointId, point.data());
 	}
 }
 
@@ -191,7 +196,38 @@ CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distan
 	text->setPosition(pos);
 	text->placeBelowCenter();
 	text->setSize(mLabelSize / 100);
+
 	return text;
+}
+
+//Hide the distance metrics if outside the view port, obscured by other structures, or of too far from the camera
+void CustomMetricRep::hideDistanceMetrics()
+{
+	if(mDistanceText.empty())
+		return;
+	static vtkSmartPointer<vtkSelectVisiblePoints> visPts = vtkSmartPointer<vtkSelectVisiblePoints>::New();
+	visPts->SetRenderer(this->getRenderer());
+	float * zbuffer = visPts->Initialize(true);
+
+	for(unsigned i = 0; i < mDistanceText.size(); ++i)
+	{
+		Vector3D pos = mDistanceText[i]->getPosition();
+		bool visible = visPts->IsPointOccluded(pos.data(), zbuffer);
+		bool closeToCamera = this->isCloseToCamera(pos);
+		mDistanceText[i]->setVisibility(visible && closeToCamera);
+	}
+	delete zbuffer;
+}
+
+bool CustomMetricRep::isCloseToCamera(Vector3D pos)
+{
+	double distanceThreshold = this->getCustomMetric()->getDistanceMarkerVisibility();
+	Vector3D cameraPos(this->getRenderer()->GetActiveCamera()->GetPosition());
+	Vector3D diff = cameraPos - pos;
+	double distance = diff.norm();
+	if(distance < distanceThreshold)
+		return true;
+	return false;
 }
 
 }

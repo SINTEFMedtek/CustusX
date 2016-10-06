@@ -293,10 +293,13 @@ public:
 	//    void scaleText(); ///< internal method
 
 	void placeBelowCenter();
+	void setVisibility(bool visible);
+	Vector3D getPosition() const;
 private:
 	vtkCaptionActor2DPtr mText;
 	//    vtkFollowerPtr mFollower;
 	vtkRendererPtr mRenderer;
+	Vector3D mPos;
 
 	//    ViewportListenerPtr mViewportListener;
 };

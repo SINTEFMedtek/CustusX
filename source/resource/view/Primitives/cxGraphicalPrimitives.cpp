@@ -718,6 +718,11 @@ void CaptionText3D::placeBelowCenter()
 	mText->SetPosition2(15, -10);
 }
 
+void CaptionText3D::setVisibility(bool visible)
+{
+	mText->SetVisibility(visible);
+}
+
 void CaptionText3D::setRenderer(vtkRendererPtr renderer)
 {
 	if (mRenderer)
@@ -756,7 +761,13 @@ void CaptionText3D::setText(QString text)
 
 void CaptionText3D::setPosition(Vector3D pos)
 {
+	mPos = pos;
 	mText->SetAttachmentPoint(pos.begin());
+}
+
+Vector3D CaptionText3D::getPosition() const
+{
+	return mPos;
 }
 
 vtkCaptionActor2DPtr CaptionText3D::getActor()

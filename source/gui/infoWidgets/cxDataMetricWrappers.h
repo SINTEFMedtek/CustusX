@@ -267,6 +267,7 @@ private:
   DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
   BoolPropertyPtr createShowDistanceMarkers() const;
+  DoublePropertyPtr createDistanceMarkerVisibility() const;
   StringPropertySelectDataPtr createModelSelector() const;
   BoolPropertyPtr createTranslationOnly() const;
 
@@ -278,6 +279,7 @@ private:
   BoolPropertyPtr mTranslationOnly;
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;
+  DoublePropertyPtr mDistanceMarkerVisibility;
   StringPropertySelectDataPtr mModel;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
