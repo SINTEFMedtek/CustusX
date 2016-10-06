@@ -293,7 +293,7 @@ public:
 
 	void placeBelowCenter();
 	void setVisibility(bool visible);
-	Vector3D getPosition();
+	Vector3D getPosition() const;
 private:
 	vtkCaptionActor2DPtr mText;
 	//    vtkFollowerPtr mFollower;

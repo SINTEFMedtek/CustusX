@@ -760,7 +760,7 @@ void CaptionText3D::setPosition(Vector3D pos)
 	mText->SetAttachmentPoint(pos.begin());
 }
 
-Vector3D CaptionText3D::getPosition()
+Vector3D CaptionText3D::getPosition() const
 {
 	return mPos;
 }

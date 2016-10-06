@@ -863,7 +863,7 @@ DoublePropertyPtr CustomMetricWrapper::createDistanceMarkerVisibility() const
 {
 	DoublePropertyPtr retval;
 	retval = DoubleProperty::initialize("Distance marker visibility threshold", "",
-											"Hide distance if the distance to the camera exceed this threshold",
+											"Hide the marker if the distance to the camera exceeds this threshold",
 											mData->getDistanceMarkerVisibility(), DoubleRange(0, 1000, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
