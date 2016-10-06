@@ -33,21 +33,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCustomMetricRep.h"
 
 #include <boost/shared_ptr.hpp>
-#include <vtkVectorText.h>
-#include <vtkFollower.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkProperty.h>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include <vtkRenderWindow.h>
 #include <vtkImageActor.h>
-#include <vtkTextActor.h>
-#include <QFileInfo>
+#include <vtkSelectVisiblePoints.h>
 #include "cxTypeConversions.h"
 #include "cxCustomMetric.h"
-#include "vtkMatrix4x4.h"
-#include "vtkSTLReader.h"
-#include <vtkPolyDataNormals.h>
 #include "cxLogger.h"
 #include "cxBoundingBox3D.h"
 #include "cxGeometricRep.h"
@@ -56,9 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage2DRep3D.h"
 #include "cxGraphicalPrimitives.h"
 
-#include <vtkSelectVisiblePoints.h>
-#include <vtkIdFilter.h>
-#include <vtkLabeledDataMapper.h>
 
 namespace cx
 {
@@ -180,7 +168,6 @@ void CustomMetricRep::createDistanceMarkers()
 	DoubleBoundingBox3D bounds = custom->getModel()->boundingBox();
 
 
-	//Used by createDistanceMarkersPipeline(). To be removed
 	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 	points->SetNumberOfPoints(pos.size());
 
@@ -207,7 +194,7 @@ CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distan
 	text->setText(QString("%1").arg(distance));
 
 	text->setPosition(pos);
-	text->placeBelowCenter();//Test
+	text->placeBelowCenter();
 	text->setSize(mLabelSize / 100);
 
 	return text;
