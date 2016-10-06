@@ -29,41 +29,34 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXAPPLICATIONSPARSER_H
-#define CXAPPLICATIONSPARSER_H
+#ifndef SPACEPROVIDERNULL_H
+#define SPACEPROVIDERNULL_H
 
-#include "org_custusx_core_state_Export.h"
-#include "cxXmlOptionItem.h"
-#include "cxStateService.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
 
-/**
- * \ingroup org_custusx_core_state
- * \date 2010-08-04
- * \author Christian Askeland, SINTEF
- *
- */
-class org_custusx_core_state_EXPORT ApplicationsParser
+class cxResource_EXPORT SpaceProviderNull : public SpaceProvider
 {
 public:
-	ApplicationsParser();
-	~ApplicationsParser() {}
-
-	Desktop getDefaultDesktop(QString workflowName);
-	Desktop getDesktop(QString workflowName);
-	void setDesktop(QString workflowName, Desktop desktop);
-	void resetDesktop(QString workflowName);
-
-private:
-	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
-	XmlOptionFile getSettings();
-	//	XmlOptionFile mXmlFile;
-	std::map<QString, Desktop> mWorkflowDefaultDesktops;
-	void addToolbarsToDesktop(Desktop& desktop, QStringList toolbars);
+	SpaceProviderNull();
+	Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to);
+	std::vector<CoordinateSystem> getSpacesToPresentInGUI();
+	std::map<QString, QString> getDisplayNamesForCoordRefObjects();
+	SpaceListenerPtr createListener();
+	Vector3D getActiveToolTipPoint(CoordinateSystem to, bool useOffset);
+	Transform3D getActiveToolTipTransform(CoordinateSystem to, bool useOffset);
+	Transform3D get_rMpr();
+	CoordinateSystem getS(ToolPtr tool);
+	CoordinateSystem getT(ToolPtr tool);
+	CoordinateSystem getTO(ToolPtr tool);
+	CoordinateSystem getD(DataPtr data);
+	CoordinateSystem getPr();
+	CoordinateSystem getR();
+	CoordinateSystem convertToSpecific(CoordinateSystem space);
 };
 
-}
+} // namespace cx
 
-#endif // CXAPPLICATIONSPARSER_H
+#endif // SPACEPROVIDERNULL_H

@@ -98,20 +98,20 @@ private:
  */
 class cxResourceVisualization_EXPORT GeometricRep : public RepImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    virtual ~GeometricRep();
-    static GeometricRepPtr New(const QString& uid="");
+	virtual ~GeometricRep();
+	static GeometricRepPtr New(const QString& uid="");
 
-    virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
-    void setMesh(MeshPtr mesh); ///< sets this reps mesh
-    MeshPtr getMesh(); ///< gives this reps mesh
-    bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
+	virtual QString getType() const { return "GeometricRep"; } ///< gives this reps type
+	void setMesh(MeshPtr mesh); ///< sets this reps mesh
+	MeshPtr getMesh(); ///< gives this reps mesh
+	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
 
 protected:
-    GeometricRep();
-    virtual void addRepActorsToViewRenderer(ViewPtr view);
-    virtual void removeRepActorsFromViewRenderer(ViewPtr view);
+	GeometricRep();
+	virtual void addRepActorsToViewRenderer(ViewPtr view);
+	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
 	GraphicalGeometricPtr mGraphics;
