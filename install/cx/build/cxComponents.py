@@ -223,7 +223,7 @@ class VTK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
-        add('VTK_RENDERING_BACKEND:STRING', "OpenGL")
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
         builder.configureCMake()
 # ---------------------------------------------------------
 
