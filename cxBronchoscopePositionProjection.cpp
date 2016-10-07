@@ -5,6 +5,8 @@
 #include "cxDoubleProperty.h"
 #include "cxBranchList.h"
 #include "cxBranch.h"
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
+
 
 namespace cx
 {
@@ -44,8 +46,34 @@ void BronchoscopePositionProjection::createMaxDistanceToCenterlineOption(QDomEle
 
 DoublePropertyPtr BronchoscopePositionProjection::getMaxDistanceToCenterlineOption()
 {
-
 	return mMaxDistanceToCenterline;
+}
+
+void BronchoscopePositionProjection::createMaxSearchDistanceOption(QDomElement root)
+{
+    mMaxSearchDistance = DoubleProperty::initialize("Max search distance along centerline (mm)", "",
+    "Set max search distance along centerline in mm", 20, DoubleRange(1, 100, 1), 0,
+                    root);
+    mMaxSearchDistance->setGuiRepresentation(DoubleProperty::grSLIDER);
+}
+
+DoublePropertyPtr BronchoscopePositionProjection::getMaxSearchDistanceOption()
+{
+
+    return mMaxSearchDistance;
+}
+
+void BronchoscopePositionProjection::createAlphaOption(QDomElement root)
+{
+    mAlpha = DoubleProperty::initialize("Alpha ", "",
+    "Weighting of position and orientation in projection (high alpha is giving orientations high weight).", 1.0, DoubleRange(0, 10, 0.1), 1, root);
+    mAlpha->setGuiRepresentation(DoubleProperty::grSLIDER);
+}
+
+DoublePropertyPtr BronchoscopePositionProjection::getAlphaOption()
+{
+
+    return mAlpha;
 }
 
 Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd)
@@ -112,7 +140,7 @@ Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMt, d
 Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform3D prMt, double maxDistance)
 {
 	Transform3D rMt = m_rMpr * prMt;
-	Eigen::VectorXd toolPos  = rMt.matrix().topRightCorner(3 , 1);
+    Eigen::VectorXd toolPos  = rMt.matrix().topRightCorner(3 , 1);
 	Transform3D new_rMt = rMt;
 
 	double minDistance = 100000;
@@ -156,6 +184,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 {
 	Transform3D rMt = m_rMpr * prMt;
 	Eigen::VectorXd toolPos  = rMt.matrix().topRightCorner(3 , 1);
+    Eigen::VectorXd toolOrientation  = rMt.matrix().block(0 , 2 , 3 , 1);
 	Transform3D new_rMt = rMt;
 
 	double minDistance = 100000;
@@ -164,8 +193,11 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 	for (int i = 0; i < mSearchBranchPtrVector.size(); i++)
 	{
 		Eigen::MatrixXd positions = mSearchBranchPtrVector[i]->getPositions();
+        Eigen::MatrixXd orientations = mSearchBranchPtrVector[i]->getOrientations();
 
-        double D = findDistance(positions.col(mSearchIndexVector[i]), toolPos);
+        //double D = findDistance(positions.col(mSearchIndexVector[i]), toolPos);
+        double alpha = getAlphaOption()->getValue();
+        double D = findDistanceWithOrientation(positions.col(mSearchIndexVector[i]), toolPos, orientations.col(mSearchIndexVector[i]), toolOrientation, alpha);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -264,9 +296,9 @@ void BronchoscopePositionProjection::searchBranchDown(BranchPtr searchBranchPtr,
 		searchBranchDown(childBranches[i], 0,currentSearchDistance,maxSearchDistance);
 }
 
-Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMt, double maxDistance)
+Transform3D BronchoscopePositionProjection::findProjectedPoint(Transform3D prMt, double maxDistance, double maxSearchDistance)
 {
-    double maxSearchDistance = 25; //mm
+    //double maxSearchDistance = 25; //mm
     Transform3D new_prMt;
 	if (isPreviousProjectedPointSet)
 	{
@@ -293,6 +325,29 @@ double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 	double D = sqrt( d0*d0 + d1*d1 + d2*d2 );
 
 	return D;
+}
+
+double findDistanceWithOrientation(Eigen::VectorXd position1, Eigen::VectorXd position2, Eigen::VectorXd orientation1, Eigen::VectorXd orientation2, double alpha)
+{
+    double d0 = position1(0) - position2(0);
+    double d1 = position1(1) - position2(1);
+    double d2 = position1(2) - position2(2);
+    double o0 = fmod( orientation2(0) - orientation1(0) , 2 );
+    double o1 = fmod( orientation2(1) - orientation1(1) , 2 );
+    double o2 = fmod( orientation2(2) - orientation1(2) , 2 );
+
+    double P = sqrt( d0*d0 + d1*d1 + d2*d2 );
+    double O = sqrt( o0*o0 + o1*o1 + o2*o2 );
+
+    if (boost::math::isnan( O ) )
+        O = 4;
+
+    if ( (o0>2) || (o1>2) || (o2>2) )
+        std::cout << "Warning in bronchoscopyRegistration.cpp: Error on oriantation calculation in dsearch2n. Orientation > 2." << std::endl;
+
+    double D = P + alpha * O;
+
+    return D;
 }
 
 Transform3D BronchoscopePositionProjection::updateProjectedCameraOrientation(Transform3D prMt, BranchPtr branch, int index)
