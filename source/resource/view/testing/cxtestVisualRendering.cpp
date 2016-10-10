@@ -381,7 +381,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+		  "[unit][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
