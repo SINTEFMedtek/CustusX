@@ -133,7 +133,12 @@ void SessionStorageServiceImpl::save()
 		return;
 
 	//Gather all the information that needs to be saved
-	QDomDocument doc;
+
+	// set a fixed hash seed in order to fix the ordering of xml attributes
+	// http://stackoverflow.com/questions/21535707/qtxml-incorrect-order-of-attributes
+	// needed primarily because we store the session in git and would like to diff.
+	qSetGlobalQHashSeed(42);
+	QDomDocument doc = QDomDocument();
 	this->generateSaveDoc(doc);
 
 	QDomElement element = doc.documentElement();
@@ -141,6 +146,7 @@ void SessionStorageServiceImpl::save()
 
 	QString filename = QDir(mActivePatientFolder).absoluteFilePath(this->getXmlFileName());
 	this->writeXmlFile(doc, filename);
+	qSetGlobalQHashSeed(-1); // reset hash seed with new random value.
 
 	report("Saved patient " + mActivePatientFolder);
 }
