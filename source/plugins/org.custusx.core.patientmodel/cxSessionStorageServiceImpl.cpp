@@ -127,27 +127,50 @@ QString SessionStorageServiceImpl::getXmlFileName() const
 	return "custusdoc.xml";
 }
 
+/** A QDomDocument that stores attributes in the same order each time.
+ *
+ * Set a fixed hash seed in order to fix the ordering of xml attributes
+ * http://stackoverflow.com/questions/21535707/qtxml-incorrect-order-of-attributes
+ * needed primarily because we store the session in git and would like to diff.
+ */
+class OrderedQDomDocument
+{
+public:
+	OrderedQDomDocument()
+	{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+		// set fixed hash seed
+		qSetGlobalQHashSeed(42);
+#endif
+		mDoc = QDomDocument();
+	}
+	~OrderedQDomDocument()
+	{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+		// reset hash seed with new random value.
+		qSetGlobalQHashSeed(-1);
+#endif
+	}
+
+	QDomDocument& doc() {return mDoc; }
+private:
+	QDomDocument mDoc;
+};
+
 void SessionStorageServiceImpl::save()
 {
 	if (!this->isValid())
 		return;
 
 	//Gather all the information that needs to be saved
+	OrderedQDomDocument doc;
+	this->generateSaveDoc(doc.doc());
 
-	// set a fixed hash seed in order to fix the ordering of xml attributes
-	// http://stackoverflow.com/questions/21535707/qtxml-incorrect-order-of-attributes
-	// needed primarily because we store the session in git and would like to diff.
-	qSetGlobalQHashSeed(42);
-	QDomDocument doc = QDomDocument();
-	this->generateSaveDoc(doc);
-
-	QDomElement element = doc.documentElement();
+	QDomElement element = doc.doc().documentElement();
 	emit isSaving(element); // give all listeners a chance to add to the document
 
 	QString filename = QDir(mActivePatientFolder).absoluteFilePath(this->getXmlFileName());
-	this->writeXmlFile(doc, filename);
-	qSetGlobalQHashSeed(-1); // reset hash seed with new random value.
-
+	this->writeXmlFile(doc.doc(), filename);
 	report("Saved patient " + mActivePatientFolder);
 }
 
