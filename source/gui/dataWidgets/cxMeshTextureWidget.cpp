@@ -1,7 +1,7 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+Copyright (c) 2008-2016, SINTEF Department of Medical Technology
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,41 +29,67 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXAPPLICATIONSPARSER_H
-#define CXAPPLICATIONSPARSER_H
 
-#include "org_custusx_core_state_Export.h"
-#include "cxXmlOptionItem.h"
-#include "cxStateService.h"
+#include "cxMeshTextureWidget.h"
+#include "cxMesh.h"
+
 
 namespace cx
 {
 
-/**
- * \ingroup org_custusx_core_state
- * \date 2010-08-04
- * \author Christian Askeland, SINTEF
- *
- */
-class org_custusx_core_state_EXPORT ApplicationsParser
+MeshTextureWidget::MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector, PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent)
+	: BaseWidget(parent, "mesh_texture_widget", "Texture"),
+	  mPatientModelService(patientModelService),
+	  mViewService(viewService),
+	  mMeshSelector(meshSelector)
 {
-public:
-	ApplicationsParser();
-	~ApplicationsParser() {}
+	QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+	QGridLayout* gridLayout = new QGridLayout;
+	gridLayout->setMargin(0);
+	toptopLayout->addLayout(gridLayout);
+	mOptionsWidget = new OptionsWidget(mViewService, mPatientModelService,this);
+	toptopLayout->addWidget(mOptionsWidget);
+	toptopLayout->addStretch();
 
-	Desktop getDefaultDesktop(QString workflowName);
-	Desktop getDesktop(QString workflowName);
-	void setDesktop(QString workflowName, Desktop desktop);
-	void resetDesktop(QString workflowName);
+	this->clearUI();
+	connect(mMeshSelector.get(), &Property::changed, this, &MeshTextureWidget::meshSelectedSlot);
+	this->setModified();
+}
 
-private:
-	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
-	XmlOptionFile getSettings();
-	//	XmlOptionFile mXmlFile;
-	std::map<QString, Desktop> mWorkflowDefaultDesktops;
-	void addToolbarsToDesktop(Desktop& desktop, QStringList toolbars);
-};
+MeshTextureWidget::~MeshTextureWidget()
+{
 
 }
 
-#endif // CXAPPLICATIONSPARSER_H
+void MeshTextureWidget::prePaintEvent()
+{
+	this->setupUI();
+}
+
+void MeshTextureWidget::meshSelectedSlot()
+{
+	if (mMesh == mMeshSelector->getData())
+		return;
+
+	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
+
+	this->setupUI();
+	mOptionsWidget->rebuild();
+}
+
+void MeshTextureWidget::clearUI()
+{
+	this->setModified();
+}
+
+void MeshTextureWidget::setupUI()
+{
+	if (!mMesh)
+		return;
+
+	std::vector<PropertyPtr> properties = mMesh->getTextureData().getProperties();
+	mOptionsWidget->setOptions(mMesh->getUid(), properties, true);
+
+}
+
+}//end namespace cx

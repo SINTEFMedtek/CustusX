@@ -1,7 +1,7 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+Copyright (c) 2008-2016, SINTEF Department of Medical Technology
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,41 +29,44 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXAPPLICATIONSPARSER_H
-#define CXAPPLICATIONSPARSER_H
+#ifndef MESHTEXTUREWIDGET_H
+#define MESHTEXTUREWIDGET_H
 
-#include "org_custusx_core_state_Export.h"
-#include "cxXmlOptionItem.h"
-#include "cxStateService.h"
+#include "cxGuiExport.h"
+#include "cxBaseWidget.h"
+#include "cxOptionsWidget.h"
+
 
 namespace cx
 {
 
-/**
- * \ingroup org_custusx_core_state
- * \date 2010-08-04
- * \author Christian Askeland, SINTEF
- *
- */
-class org_custusx_core_state_EXPORT ApplicationsParser
+class cxGui_EXPORT MeshTextureWidget : public BaseWidget
 {
-public:
-	ApplicationsParser();
-	~ApplicationsParser() {}
+	Q_OBJECT
 
-	Desktop getDefaultDesktop(QString workflowName);
-	Desktop getDesktop(QString workflowName);
-	void setDesktop(QString workflowName, Desktop desktop);
-	void resetDesktop(QString workflowName);
+public:
+	MeshTextureWidget(SelectDataStringPropertyBasePtr meshSelector,
+					  PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+					  QWidget *parent);
+
+	virtual ~MeshTextureWidget();
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+
+protected slots:
+	void setupUI();
+	virtual void prePaintEvent();
+	void meshSelectedSlot();
 
 private:
-	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
-	XmlOptionFile getSettings();
-	//	XmlOptionFile mXmlFile;
-	std::map<QString, Desktop> mWorkflowDefaultDesktops;
-	void addToolbarsToDesktop(Desktop& desktop, QStringList toolbars);
+	MeshTextureWidget();
+	MeshPtr mMesh;
+	SelectDataStringPropertyBasePtr mMeshSelector;
+	OptionsWidget* mOptionsWidget;
+	PatientModelServicePtr mPatientModelService;
+	ViewServicePtr mViewService;
+	void clearUI();
 };
 
-}
+}//end namespace cx
 
-#endif // CXAPPLICATIONSPARSER_H
+#endif // MESHTEXTUREWIDGET_H

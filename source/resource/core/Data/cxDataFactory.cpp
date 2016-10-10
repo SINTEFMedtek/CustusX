@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -62,36 +62,36 @@ DataFactory::DataFactory(PatientModelServicePtr dataManager, SpaceProviderPtr sp
 #define CREATE_IF_MATCH(typeName, TYPE) \
 { \
 	if (typeName==TYPE::getTypeName()) \
-		return TYPE::create(uid, ""); \
+	return TYPE::create(uid, ""); \
 }
-#define CREATE_METRIC_IF_MATCH(typeName, TYPE) \
+#define CREATE_WITH_SERVICES_IF_MATCH(typeName, TYPE) \
 { \
 	if (typeName==TYPE::getTypeName()) \
-		return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
+	return TYPE::create(uid, "", mDataManager, mSpaceProvider); \
 }
 
 DataPtr DataFactory::createRaw(QString type, QString uid)
 {
 	CREATE_IF_MATCH(type, Image);
-	CREATE_IF_MATCH(type, Mesh);
 	CREATE_IF_MATCH(type, TrackedStream);
-	CREATE_METRIC_IF_MATCH(type, PointMetric);
-	CREATE_METRIC_IF_MATCH(type, PlaneMetric);
-	CREATE_METRIC_IF_MATCH(type, DistanceMetric);
-	CREATE_METRIC_IF_MATCH(type, AngleMetric);
-	CREATE_METRIC_IF_MATCH(type, FrameMetric);
-	CREATE_METRIC_IF_MATCH(type, ToolMetric);
-	CREATE_METRIC_IF_MATCH(type, DonutMetric);
-    CREATE_METRIC_IF_MATCH(type, CustomMetric);
-	CREATE_METRIC_IF_MATCH(type, SphereMetric);
-	CREATE_METRIC_IF_MATCH(type, RegionOfInterestMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, Mesh);
+	CREATE_WITH_SERVICES_IF_MATCH(type, PointMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, PlaneMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, DistanceMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, AngleMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, FrameMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, ToolMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, DonutMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, CustomMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, SphereMetric);
+	CREATE_WITH_SERVICES_IF_MATCH(type, RegionOfInterestMetric);
 	return DataPtr ();
 }
 
 DataPtr DataFactory::create(QString type, QString uid, QString name)
 {
-//	if (mDataManager)
-//		mDataManager->generateUidAndName(&uid, &name);
+	//	if (mDataManager)
+	//		mDataManager->generateUidAndName(&uid, &name);
 
 	DataPtr retval = this->createRaw(type, uid);
 	if (name.isEmpty())

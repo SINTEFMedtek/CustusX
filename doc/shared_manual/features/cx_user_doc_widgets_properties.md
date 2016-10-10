@@ -114,10 +114,10 @@ ToolManager debugging utilities.
 Lets you test different aspects of the toolmanager.
 
 
-\addindex mesh_info_widget
 Mesh Properties {#property_widgets_mesh}
 ===========================================================
-Displays Information.
+\subpage mesh_properties
+
 
 \addindex eraser_widget
 Eraser {#property_widgets_eraser}

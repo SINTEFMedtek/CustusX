@@ -47,7 +47,7 @@ namespace cx
 {
 
 CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider) :
-				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false)
+				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false), mDistanceMarkerVisibility(50)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
@@ -362,6 +362,19 @@ bool CustomMetric::getShowDistanceMarkers() const
 	emit propertiesChanged();
 }
 
+void CustomMetric::setDistanceMarkerVisibility(double val)
+{
+	if (mDistanceMarkerVisibility == val)
+		return;
+	mDistanceMarkerVisibility = val;
+	emit propertiesChanged();
+}
+
+double CustomMetric::getDistanceMarkerVisibility() const
+{
+	return mDistanceMarkerVisibility;
+}
+
 bool CustomMetric::getTranslationOnly() const
 {
 	return mTranslationOnly;
@@ -431,9 +444,11 @@ Transform3D CustomMetric::calculateTransformTo2DImageCenter() const
 		DataPtr model = this->getModel();
 		ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
 		vtkImageDataPtr vtkImage = imageModel->getBaseVtkImageData();
-		Eigen::Array3i dimensions(vtkImage->GetDimensions());
+		int xSize = vtkImage->GetExtent()[1] - vtkImage->GetExtent()[0];
+		int ySize = vtkImage->GetExtent()[3] - vtkImage->GetExtent()[2];
+		Eigen::Array3d spacing(vtkImage->GetSpacing());
 
-		position2DImage = createTransformTranslate(Vector3D(-dimensions[0]/2, -dimensions[1]/2, 0));
+		position2DImage = createTransformTranslate(Vector3D(-xSize*spacing[0]/2.0, -ySize*spacing[1]/2.0, 0));
 	}
 	return position2DImage;
 }

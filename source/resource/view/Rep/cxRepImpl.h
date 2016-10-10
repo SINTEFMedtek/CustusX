@@ -103,6 +103,7 @@ protected:
 	virtual void onModifiedStartRender() {}
 	virtual void addRepActorsToViewRenderer(ViewPtr view) = 0;
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view) = 0;
+	virtual void onEveryRender() {}
 
 private:
 //	RepImpl(); ///< not implemented

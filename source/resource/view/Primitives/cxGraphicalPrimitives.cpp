@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -60,84 +60,84 @@ namespace cx
 
 GraphicalGeometricBase::GraphicalGeometricBase(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer)
 {
-    mProperty = vtkPropertyPtr::New();
-    mActor = vtkActorPtr::New();
-    mActor->SetProperty(mProperty);
+	mProperty = vtkPropertyPtr::New();
+	mActor = vtkActorPtr::New();
+	mActor->SetProperty(mProperty);
 }
 
 GraphicalGeometricBase::~GraphicalGeometricBase()
 {
-    this->setRenderer(NULL);
+	this->setRenderer(NULL);
 }
 
 void GraphicalGeometricBase::setSource(vtkPolyDataAlgorithmPtr source)
 {
-    mData = vtkPolyDataPtr();
-    mSource = source;
+	mData = vtkPolyDataPtr();
+	mSource = source;
 
-    if (mSource)
-        getMapper()->SetInputConnection(mSource->GetOutputPort());
-    else
-        getMapper()->SetInputConnection(NULL);
+	if (mSource)
+		getMapper()->SetInputConnection(mSource->GetOutputPort());
+	else
+		getMapper()->SetInputConnection(NULL);
 }
 
 void GraphicalGeometricBase::setRenderer(vtkRendererPtr renderer)
 {
-    if (mRenderer)
-        mRenderer->RemoveActor(mActor);
+	if (mRenderer)
+		mRenderer->RemoveActor(mActor);
 
-    mRenderer = renderer;
+	mRenderer = renderer;
 
-    if (mRenderer)
-        mRenderer->AddActor(mActor);
+	if (mRenderer)
+		mRenderer->AddActor(mActor);
 }
 
 void GraphicalGeometricBase::setVisibility(bool visible)
 {
-    mActor->SetVisibility(visible);
+	mActor->SetVisibility(visible);
 }
 
 
 void GraphicalGeometricBase::setBackfaceCulling(bool val)
 {
-    mActor->GetProperty()->SetBackfaceCulling(val);
+	mActor->GetProperty()->SetBackfaceCulling(val);
 }
 
 void GraphicalGeometricBase::setFrontfaceCulling(bool val)
 {
-    mActor->GetProperty()->SetFrontfaceCulling(val);
+	mActor->GetProperty()->SetFrontfaceCulling(val);
 }
 
 void GraphicalGeometricBase::setColor(double red, double green, double blue)
 {
-    mActor->GetProperty()->SetColor(red, green, blue);
+	mActor->GetProperty()->SetColor(red, green, blue);
 }
 
 void GraphicalGeometricBase::setColor(Vector3D color)
 {
-    mActor->GetProperty()->SetColor(color.begin());
+	mActor->GetProperty()->SetColor(color.begin());
 }
 
 void GraphicalGeometricBase::setPosition(Vector3D point)
 {
-    mActor->SetPosition(point.begin());
+	mActor->SetPosition(point.begin());
 }
 
 void GraphicalGeometricBase::setOpacity(double val)
 {
-    mActor->GetProperty()->SetOpacity(val);
+	mActor->GetProperty()->SetOpacity(val);
 }
 
 void GraphicalGeometricBase::setUserMatrix(vtkMatrix4x4 *matrix)
 {
-    mActor->SetUserMatrix(matrix);
+	mActor->SetUserMatrix(matrix);
 }
 
 void GraphicalGeometricBase::setPointSize(int pointSize)
 {
 	if(pointSize<=0)
 		return;
-    mProperty->SetPointSize(pointSize);
+	mProperty->SetPointSize(pointSize);
 }
 
 void GraphicalGeometricBase::setScalarVisibility(bool show)
@@ -147,7 +147,7 @@ void GraphicalGeometricBase::setScalarVisibility(bool show)
 
 Vector3D GraphicalGeometricBase::getPosition() const
 {
-    return Vector3D(mActor->GetPosition());
+	return Vector3D(mActor->GetPosition());
 }
 
 vtkActorPtr GraphicalGeometricBase::getActor()
@@ -162,15 +162,15 @@ vtkPropertyPtr GraphicalGeometricBase::getProperty()
 
 vtkPolyDataPtr GraphicalGeometricBase::getPolyData()
 {
-    if (mSource)
-        return mSource->GetOutput();
-    else
-        return mData;
+	if (mSource)
+		return mSource->GetOutput();
+	else
+		return mData;
 }
 
 vtkPolyDataAlgorithmPtr GraphicalGeometricBase::getSource()
 {
-    return mSource;
+	return mSource;
 }
 
 //--------------------------------------------------------
@@ -178,13 +178,13 @@ vtkPolyDataAlgorithmPtr GraphicalGeometricBase::getSource()
 //-------------------------------------------------------
 
 GraphicalPolyData3D::GraphicalPolyData3D(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer) :
-    GraphicalGeometricBase(source,renderer)
+	GraphicalGeometricBase(source,renderer)
 {
-    mMapper =  vtkPolyDataMapperPtr::New();
+	mMapper =  vtkPolyDataMapperPtr::New();
 
-    mActor->SetMapper(mMapper);
-    setSource(source);
-    setRenderer(renderer);
+	mActor->SetMapper(mMapper);
+	setSource(source);
+	setRenderer(renderer);
 }
 
 void GraphicalPolyData3D::setIsWireFrame(bool val)
@@ -194,16 +194,21 @@ void GraphicalPolyData3D::setIsWireFrame(bool val)
 
 void GraphicalPolyData3D::setData(vtkPolyDataPtr data)
 {
-    mSource = vtkPolyDataAlgorithmPtr();
-    mData = data;
+	mSource = vtkPolyDataAlgorithmPtr();
+	mData = data;
 
 	mMapper->SetInputData(mData);
+}
+
+void GraphicalPolyData3D::setTexture(vtkTexturePtr texture)
+{
+	mActor->SetTexture(texture);
 }
 
 
 vtkMapperPtr GraphicalPolyData3D::getMapper()
 {
-    return mMapper;
+	return mMapper;
 }
 
 //--------------------------------------------------------
@@ -211,64 +216,64 @@ vtkMapperPtr GraphicalPolyData3D::getMapper()
 //-------------------------------------------------------
 
 GraphicalGlyph3DData::GraphicalGlyph3DData(vtkPolyDataAlgorithmPtr source, vtkRendererPtr renderer) :
-    GraphicalGeometricBase(source,renderer)
+	GraphicalGeometricBase(source,renderer)
 {
-    mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
-    vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
-    mMapper->SetSourceConnection(arrowSource->GetOutputPort());
-    mMapper->ScalarVisibilityOn();
-    mMapper->SetUseLookupTableScalarRange(1);
-    mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
-    mActor->SetMapper(mMapper);
-    setSource(source);
-    setRenderer(renderer);
+	mMapper = vtkSmartPointer<vtkGlyph3DMapper>::New();
+	vtkSmartPointer<vtkArrowSource> arrowSource = vtkSmartPointer<vtkArrowSource>::New();
+	mMapper->SetSourceConnection(arrowSource->GetOutputPort());
+	mMapper->ScalarVisibilityOn();
+	mMapper->SetUseLookupTableScalarRange(1);
+	mMapper->SetScalarMode(VTK_SCALAR_MODE_USE_POINT_FIELD_DATA);
+	mActor->SetMapper(mMapper);
+	setSource(source);
+	setRenderer(renderer);
 }
 
 
 void GraphicalGlyph3DData::setData(vtkPolyDataPtr data)
 {
-    mData = data;
-    if (data)
-        mMapper->SetInputData(mData);
+	mData = data;
+	if (data)
+		mMapper->SetInputData(mData);
 }
 
 void GraphicalGlyph3DData::setOrientationArray(const char* orientationArray)
 {
-    mMapper->SetOrientationArray(orientationArray);
+	mMapper->SetOrientationArray(orientationArray);
 }
 
 void GraphicalGlyph3DData::setColorArray(const char* colorArray)
 {
-    if(strlen(colorArray)>0)
-    {
-        setScalarVisibility(true);
-    }else
-    {
-        setScalarVisibility(false);
-    }
-    mMapper->SelectColorArray(colorArray);
+	if(strlen(colorArray)>0)
+	{
+		setScalarVisibility(true);
+	}else
+	{
+		setScalarVisibility(false);
+	}
+	mMapper->SelectColorArray(colorArray);
 }
 
 
 void GraphicalGlyph3DData::setLUT(const char* lut)
 {
-    vtkSmartPointer<vtkColorSeries> colorSeries = vtkSmartPointer<vtkColorSeries>::New();
-    vtkSmartPointer<vtkLookupTable> table = vtkLookupTable::New();
-    colorSeries->SetColorSchemeByName(lut);
-    colorSeries->BuildLookupTable(table , vtkColorSeries::ORDINAL);
-    mMapper->SetLookupTable(table);
+	vtkSmartPointer<vtkColorSeries> colorSeries = vtkSmartPointer<vtkColorSeries>::New();
+	vtkSmartPointer<vtkLookupTable> table = vtkLookupTable::New();
+	colorSeries->SetColorSchemeByName(lut);
+	colorSeries->BuildLookupTable(table , vtkColorSeries::ORDINAL);
+	mMapper->SetLookupTable(table);
 }
 
 
 void GraphicalGlyph3DData::setScaleFactor(double scaleFactor)
 {
-    if(scaleFactor<=0) return;
-    mMapper->SetScaleFactor(scaleFactor);
+	if(scaleFactor<=0) return;
+	mMapper->SetScaleFactor(scaleFactor);
 }
 
 vtkMapperPtr GraphicalGlyph3DData::getMapper()
 {
-    return mMapper;
+	return mMapper;
 }
 
 //--------------------------------------------------------
@@ -277,12 +282,12 @@ vtkMapperPtr GraphicalGlyph3DData::getMapper()
 
 GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 {
-//	mRenderer = renderer;
+	//	mRenderer = renderer;
 	source = vtkSphereSourcePtr::New();
 	source->SetRadius(4);
-//  default:
-//  source->SetThetaResolution(8);
-//  source->SetPhiResolution(8);
+	//  default:
+	//  source->SetThetaResolution(8);
+	//  source->SetPhiResolution(8);
 	// 24*16 = 384, 8*8=64, 16*12=192
 	source->SetThetaResolution(16);
 	source->SetPhiResolution(12);
@@ -493,13 +498,13 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 	k = k.normalized();
 	Transform3D M = createTransformIJC(normal, k, base);
 
-//	std::cout << "GraphicalArrow3D::setValue  " << base << " - " << normal << std::endl;
+	//	std::cout << "GraphicalArrow3D::setValue  " << base << " - " << normal << std::endl;
 	Transform3D S = createTransformScale(Vector3D(length,1,1));
 	M = M * S;
 	// let arrow shape increase slowly with length:
-//	source->SetTipLength(0.35/sqrt(length));
-//	source->SetTipRadius(0.1*sqrt(length));
-//	source->SetShaftRadius(0.03*sqrt(length));
+	//	source->SetTipLength(0.35/sqrt(length));
+	//	source->SetTipRadius(0.1*sqrt(length));
+	//	source->SetShaftRadius(0.03*sqrt(length));
 	source->SetTipLength(0.35);
 	source->SetTipRadius(0.1*(length));
 	source->SetShaftRadius(0.03*(length));
@@ -682,7 +687,7 @@ void FollowerText3D::scaleText()
 	double size = mViewportListener->getVpnZoom();
 
 	double scale = mSize/size;
-//  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
+	//  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
 	Vector3D mTextScale(scale,scale,scale);
 	if (mFollower)
 		mFollower->SetScale(mTextScale.begin());
@@ -711,6 +716,11 @@ void CaptionText3D::placeBelowCenter()
 {
 	mText->SetPosition(-15, -30);
 	mText->SetPosition2(15, -10);
+}
+
+void CaptionText3D::setVisibility(bool visible)
+{
+	mText->SetVisibility(visible);
 }
 
 void CaptionText3D::setRenderer(vtkRendererPtr renderer)
@@ -751,7 +761,13 @@ void CaptionText3D::setText(QString text)
 
 void CaptionText3D::setPosition(Vector3D pos)
 {
+	mPos = pos;
 	mText->SetAttachmentPoint(pos.begin());
+}
+
+Vector3D CaptionText3D::getPosition() const
+{
+	return mPos;
 }
 
 vtkCaptionActor2DPtr CaptionText3D::getActor()
