@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxConfig.h"
-#include "cxSingleVolumePainterHelper.h"
+#include "cxShaderCallback.h"
 
 //#include <vtkNew.h>
 
