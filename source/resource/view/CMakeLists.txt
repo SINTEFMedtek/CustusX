@@ -114,7 +114,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalDisk
     Primitives/cxGraphicalObjectWithDirection
 	Primitives/cxSliceAutoViewportCalculator
-	Primitives/cxSingleVolumePainterHelper
+	Primitives/cxShaderCallback
 	cxRepContainer
 )
 
