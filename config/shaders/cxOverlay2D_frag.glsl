@@ -1,4 +1,4 @@
-#version 120
+#version 150
 
 // Note:
 //  All content using the ${VAR} syntax is converted to valid glsl statements by the 
@@ -18,7 +18,11 @@ uniform float alpha[layers];
 
 const vec3 bounds_lo = vec3(0.0,0.0,0.0);
 const vec3 bounds_hi = vec3(1.0,1.0,1.0);
-varying vec4 gl_TexCoord[2*layers];
+in vec4 gl_TexCoord[2*layers];
+
+//Why we use 2*layers
+//GL have 8 texture units
+//Here even numbers are used for volumes and odd numbers are used for lut
 
 bool clampMe(int index)
 {

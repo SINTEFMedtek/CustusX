@@ -44,14 +44,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxConfig.h"
+#include "cxSingleVolumePainterHelper.h"
+
+//#include <vtkNew.h>
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
+typedef vtkSmartPointer<class vtkOpenGLPolyDataMapper> vtkOpenGLPolyDataMapperPtr;
+//class vtkOpenGLPolyDataMapper;
+
 //---------------------------------------------------------
 namespace cx
 {
 
 typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
+typedef vtkSmartPointer<class ShaderCallback> ShaderCallbackPtr;
 
 /**
  * \brief Helper class for GPU-based slicing.
@@ -88,7 +95,7 @@ public:
 //#ifndef CX_VTK_OPENGL2
 //#ifndef WIN32
 
-#if !defined(CX_VTK_OPENGL2) && !defined(WIN32)
+//#if !defined(CX_VTK_OPENGL2) && !defined(WIN32)
 
 /**
  * \brief Slice volumes using a SliceProxy.
@@ -142,29 +149,40 @@ private:
 	SliceProxyPtr mSliceProxy;
 	bool mTargetSpaceIsR;
 
-	TextureSlicePainterPtr mPainter;
+//	TextureSlicePainterPtr mPainter;
 	vtkActorPtr mActor;
 	vtkPolyDataPtr mPolyData;
 	vtkPlaneSourcePtr mPlaneSource;
-	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
+//	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
+	vtkOpenGLPolyDataMapperPtr mOpenGLPolyDataMapper;
+//	vtkNew<vtkOpenGLPolyDataMapper> mOpenGLPolyDataMapper;
+	vtkTexturePtr mTexture;
 
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);
+	QString loadShaderFile();
+	QString replaceShaderSourceMacros(QString shaderSource);
+
+
+	std::vector<ShaderCallbackPtr> mElement;
+	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
+	ShaderCallbackPtr safeIndex(int index);
+	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 };
 
 //#endif // WIN32
-#else
-//Dummy code to make file compile with Qt moc. This is needed because Qt moc ignores ifdef.
-class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
-{
-	Q_OBJECT
-protected slots:
-	void transformChangedSlot() {}
-	void updateColorAttributeSlot() {}
-	void imageChanged() {}
-};
-#endif //CX_VTK_OPENGL2
+//#else
+////Dummy code to make file compile with Qt moc. This is needed because Qt moc ignores ifdef.
+//class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
+//{
+//	Q_OBJECT
+//protected slots:
+//	void transformChangedSlot() {}
+//	void updateColorAttributeSlot() {}
+//	void imageChanged() {}
+//};
+//#endif //CX_VTK_OPENGL2
 
 
 //---------------------------------------------------------

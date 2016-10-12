@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkLookupTable.h>
 #include <vtkOpenGLRenderWindow.h>
 
+#include <vtkOpenGLPolyDataMapper.h>
+
 #include "cxImage.h"
 #include "cxView.h"
 #include "cxImageLUT2D.h"
@@ -59,11 +61,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxReporter.h"
 #include "cxConfig.h"
 
+#include "cxDataLocations.h"
+#include <qtextstream.h>
 
-#include "cxTextureSlicePainter.h"
-#ifndef CX_VTK_OPENGL2
-#include <vtkPainterPolyDataMapper.h>
-#endif
+
+//#include "cxTextureSlicePainter.h"
+//#ifndef CX_VTK_OPENGL2
+//#include <vtkPainterPolyDataMapper.h>
+//#endif
 
 //---------------------------------------------------------
 namespace cx
@@ -72,25 +77,26 @@ namespace cx
 
 //#ifdef WIN32
 //#ifdef CX_VTK_OPENGL2
-#if defined(CX_VTK_OPENGL2) || defined(WIN32)
+//#if defined(CX_VTK_OPENGL2) || defined(WIN32)
 
-Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
-{
-	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxy());
-}
+//Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
+//{
+//	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxy());
+//}
+
+//bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
+//{
+//	return false;
+//}
+
+//#else
 
 bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
 {
-	return false;
-}
-
-#else
-
-bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
-{
-	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(window);
-	bool success =  context && TextureSlicePainter::LoadRequiredExtensions(context->GetExtensionManager());
-	return success;
+	return true;
+//	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(window);
+//	bool success =  context && TextureSlicePainter::LoadRequiredExtensions(context->GetExtensionManager());
+//	return success;
 }
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
@@ -108,8 +114,9 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 {
 	mTargetSpaceIsR = false;
 	mActor = vtkActorPtr::New();
-	mPainter = TextureSlicePainterPtr::New();
-	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
+//	mPainter = TextureSlicePainterPtr::New();
+//	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
+	mOpenGLPolyDataMapper = vtkOpenGLPolyDataMapperPtr::New();
 
 	mPlaneSource = vtkPlaneSourcePtr::New();
 
@@ -125,10 +132,82 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 	mPolyData = mPolyDataAlgorithm->GetOutput();
 	mPolyData->GetPointData()->SetNormals(NULL);
 
-	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
-	mPainterPolyDatamapper->SetPainter(mPainter);
-	mPainterPolyDatamapper->SetInputData(mPolyData);
-	mActor->SetMapper(mPainterPolyDatamapper);
+//	mTexture = vtkTexturePtr::New();
+
+//	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
+//	mPainterPolyDatamapper->SetPainter(mPainter);
+//	mPainterPolyDatamapper->SetInputData(mPolyData);
+//	mActor->SetMapper(mPainterPolyDatamapper);
+
+	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
+	mOpenGLPolyDataMapper->SetInputData(mPolyData);
+	mOpenGLPolyDataMapper->SetFragmentShaderCode(
+	  "//VTK::System::Dec\n"  // always start with this line
+	  "//VTK::Output::Dec\n"  // always have this line in your FS
+	  "//const int layers = 1;\n"
+	  "//uniform sampler3D testTexture[layers];\n"
+	  "//varying vec4 gl_TexCoord[2*layers];\n"
+	  "//varying vec3 normalVCVSOutput;\n"
+	  "//uniform vec3 diffuseColorUniform;\n"
+	  "uniform int test[4];\n"
+	  "void main () {\n"
+	  "//  float df = max(0.0, normalVCVSOutput.z);\n"
+	  "//  float sf = pow(df, 20.0);\n"
+	  "//  vec3 diffuse = df * diffuseColorUniform;\n"
+	  "//  vec3 specular = sf * vec3(0.4,0.4,0.4);\n"
+	  "  if(test[0] == 1)\n"
+	  "    gl_FragData[0] = vec4(0.0, 0.0, 1.0, 1.0);\n"
+	  "  else\n"
+	  "    gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);\n"
+	  "//  gl_FragData[0] = texture3D(testTexture[0], gl_TexCoord[2*0].xyz);\n"
+	  "}\n"
+	  );
+
+	//TODO: What vertex shader is old CX code using?
+
+//	QString shaderSource = this->loadShaderFile();
+//	shaderSource = this->replaceShaderSourceMacros(shaderSource);
+//	mOpenGLPolyDataMapper->SetFragmentShaderCode(cstring_cast(shaderSource));
+
+	mActor->SetMapper(mOpenGLPolyDataMapper.Get());
+//	mActor->SetTexture(mTexture);
+}
+
+//copied from TextureSlicePainter
+QString Texture3DSlicerProxyImpl::loadShaderFile()
+{
+	QString mShaderPath = DataLocations::findConfigFolder("/shaders");
+	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
+	QFile fp(filepath);
+	if (fp.exists())
+	{
+		fp.open(QFile::ReadOnly);
+		QTextStream shaderfile(&fp);
+		return shaderfile.readAll();
+	}
+	else
+	{
+		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
+	}
+	return "";
+}
+
+//copied from TextureSlicePainter
+QString Texture3DSlicerProxyImpl::replaceShaderSourceMacros(QString shaderSource)
+{
+	// set constant layers
+//	int layers = this->mElement.size();
+	int layers = 1;//temp hack
+	shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
+
+	// fill function vec4 sampleLut(in int index, in float idx)
+	QString element = "\tif (index==%1) return texture1D(lut[%1], idx);\n";
+	QString sampleLutContent;
+	for (unsigned i=0; i<layers; ++i)
+		sampleLutContent += element.arg(i);
+	shaderSource = shaderSource.replace("${SAMPLE_LUT_CONTENT}", sampleLutContent);
+
+	return shaderSource;
 }
 
 Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
@@ -148,7 +227,7 @@ vtkActorPtr Texture3DSlicerProxyImpl::getActor()
 
 void Texture3DSlicerProxyImpl::setShaderPath(QString shaderFile)
 {
-	mPainter->setShaderPath(shaderFile);
+//	mPainter->setShaderPath(shaderFile);
 }
 
 //void Texture3DSlicerProxyImpl::viewChanged()
@@ -243,6 +322,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		return;
 
 	std::vector<ImagePtr> images = processImages(images_raw);
+//	mTexture->SetInputData(0, images[0]->getBaseVtkImageData());
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -260,7 +340,8 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
-		mPainter->SetVolumeBuffer(i, dataBuffer);
+//		mPainter->SetVolumeBuffer(i, dataBuffer);
+		this->SetVolumeBuffer(i, dataBuffer);
 
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
@@ -269,14 +350,37 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 	}
 	this->updateColorAttributeSlot();
 
-	mPainterPolyDatamapper->RemoveAllVertexAttributeMappings();
+//	mPainterPolyDatamapper->RemoveAllVertexAttributeMappings();
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
-		mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2 * i,
-			cstring_cast(this->getTCoordName(i)),
-			vtkDataObject::FIELD_ASSOCIATION_POINTS);
+//		mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2 * i,
+//			cstring_cast(this->getTCoordName(i)),
+//			vtkDataObject::FIELD_ASSOCIATION_POINTS);
 	}
 }
+void Texture3DSlicerProxyImpl::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
+{
+	this->safeIndex(index)->SetBuffer(buffer);
+}
+
+ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
+{
+	if ((int)mElement.size() <= index)
+	{
+		mElement.resize(index+1);
+		vtkSmartPointer<ShaderCallback> shaderCallback = vtkSmartPointer<ShaderCallback>::New();
+		shaderCallback->mIndex = index;
+//		mElement[index] = ShaderCallback(index);
+		mElement[index] = shaderCallback;
+
+		// Setup a callback to change some uniforms
+//		VTK_CREATE(ShaderCallback, mElement[index]);
+//	    mElement[index]->Renderer = renderer.Get();
+		mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent,shaderCallback);
+	}
+	return mElement[index];
+}
+
 
 std::vector<ImagePtr> Texture3DSlicerProxyImpl::processImages(std::vector<ImagePtr> images_raw)
 {
@@ -390,7 +494,8 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)
 		{
-			mPainter->SetLutBuffer(i, lutBuffer);
+//			mPainter->SetLutBuffer(i, lutBuffer);
+			this->SetLutBuffer(i, lutBuffer);
 		}
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
@@ -402,9 +507,14 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		float level = (float) imin/scalarTypeMax + window/2;
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
 
-		mPainter->SetColorAttribute(i, window, level, llr, alpha);
+//		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();
+}
+
+void Texture3DSlicerProxyImpl::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
+{
+	this->safeIndex(index)->SetBuffer(buffer);
 }
 
 void Texture3DSlicerProxyImpl::transformChangedSlot()
@@ -425,7 +535,7 @@ void Texture3DSlicerProxyImpl::imageChanged()
 		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
-		mPainter->SetVolumeBuffer(i, dataBuffer);
+//		mPainter->SetVolumeBuffer(i, dataBuffer);
 	}
 }
 
@@ -438,7 +548,7 @@ void Texture3DSlicerProxyImpl::update()
 }
 
 //#endif // WIN32
-#endif //CX_VTK_OPENGL2
+//#endif //CX_VTK_OPENGL2
 
 
 //---------------------------------------------------------

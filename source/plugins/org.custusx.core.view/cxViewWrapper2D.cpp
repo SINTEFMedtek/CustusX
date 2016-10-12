@@ -88,9 +88,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
 
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
 #include "cxTexture3DSlicerRep.h"
-#endif
+//#endif
 
 namespace cx
 {
@@ -246,18 +246,18 @@ void ViewWrapper2D::removeAndResetSliceRep()
 
 void ViewWrapper2D::removeAndResetMultiSliceRep()
 {
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 	{
 		mView->removeRep(mMultiSliceRep);
 		mMultiSliceRep.reset();
 	}
-#endif
+//#endif
 }
 
 void ViewWrapper2D::createAndAddMultiSliceRep()
 {
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 		return;
 	mMultiSliceRep = Texture3DSlicerRep::New();
@@ -265,7 +265,7 @@ void ViewWrapper2D::createAndAddMultiSliceRep()
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 
 	mView->addRep(mMultiSliceRep);
-#endif
+//#endif
 }
 
 /**Hack: gpu slicer recreate and fill with images every time,
@@ -285,12 +285,12 @@ void ViewWrapper2D::recreateMultiSlicer()
 
     this->createAndAddMultiSliceRep();
 
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
 	if (mGroupData)
 		mMultiSliceRep->setImages(this->getImagesToView());
 	else
 		mMultiSliceRep->setImages(std::vector<ImagePtr>());
-#endif
+//#endif
 
     this->viewportChanged();
 }
@@ -428,9 +428,9 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 
 bool ViewWrapper2D::useGPU2DRendering()
 {
-#ifdef CX_VTK_OPENGL2
-	return false;
-#endif //CX_VTK_OPENGL2
+//#ifdef CX_VTK_OPENGL2
+//	return false;
+//#endif //CX_VTK_OPENGL2
 
     return settings()->value("useGPU2DRendering").toBool();
 }

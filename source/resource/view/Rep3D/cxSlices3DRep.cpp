@@ -57,9 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
 
-#ifndef CX_VTK_OPENGL2
-#include <vtkPainterPolyDataMapper.h>
-#endif
+//#ifndef CX_VTK_OPENGL2
+//#include <vtkPainterPolyDataMapper.h>
+//#endif
 
 
 

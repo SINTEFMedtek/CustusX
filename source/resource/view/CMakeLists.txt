@@ -103,7 +103,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxDepthPeeling
     Primitives/cxGraphicalTorus3D
     Primitives/cxVtkHelperClasses
-    Primitives/cxTextureSlicePainter
+#    Primitives/cxTextureSlicePainter
     Primitives/cxUltrasoundSectorSource
     Rep3D/cxAxesRep
     Rep/cxDisplayTextRep
@@ -114,6 +114,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalDisk
     Primitives/cxGraphicalObjectWithDirection
 	Primitives/cxSliceAutoViewportCalculator
+	Primitives/cxSingleVolumePainterHelper
 	cxRepContainer
 )
 
