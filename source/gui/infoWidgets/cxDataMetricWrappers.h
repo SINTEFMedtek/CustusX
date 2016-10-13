@@ -280,6 +280,7 @@ private:
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;
   DoublePropertyPtr mDistanceMarkerVisibility;
+  QWidget* mDistanceMarkerVisibilityWidget;
   StringPropertySelectDataPtr mModel;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;

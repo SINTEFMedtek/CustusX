@@ -732,7 +732,8 @@ QWidget* CustomMetricWrapper::createWidget()
 	mShowDistanceMarkers = this->createShowDistanceMarkers();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mShowDistanceMarkers));
 	mDistanceMarkerVisibility = this->createDistanceMarkerVisibility();
-	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDistanceMarkerVisibility));
+	mDistanceMarkerVisibilityWidget = createDataWidget(mViewService, mPatientModelService, widget, mDistanceMarkerVisibility);
+	topLayout->addWidget(mDistanceMarkerVisibilityWidget);
 
 	mScaleToP1 = this->createScaletoP1();
 	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
@@ -795,6 +796,11 @@ void CustomMetricWrapper::guiChanged()
 		mScaleToP1Widget->setEnabled(false);
 	else
 		mScaleToP1Widget->setEnabled(true);
+
+	if(mShowDistanceMarkers->getValue())
+		mDistanceMarkerVisibilityWidget->setEnabled(true);
+	else
+		mDistanceMarkerVisibilityWidget->setEnabled(false);
 
     mInternalUpdate = true;
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
@@ -862,8 +868,8 @@ DoublePropertyPtr CustomMetricWrapper::createRepeatDistance() const
 DoublePropertyPtr CustomMetricWrapper::createDistanceMarkerVisibility() const
 {
 	DoublePropertyPtr retval;
-	retval = DoubleProperty::initialize("Distance marker visibility threshold", "",
-											"Hide the marker if the distance to the camera exceeds this threshold",
+	retval = DoubleProperty::initialize("Distance markers visibility threshold", "",
+											"Hide the markers if the distance to the camera exceeds this threshold",
 											mData->getDistanceMarkerVisibility(), DoubleRange(0, 1000, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;

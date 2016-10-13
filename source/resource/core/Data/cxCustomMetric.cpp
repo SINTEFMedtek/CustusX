@@ -89,6 +89,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
 	elem.setAttribute("repeatDistance", mRepeatDistance);
 	elem.setAttribute("showDistance", mShowDistanceMarkers);
+	elem.setAttribute("distanceMarkerVisibility", mDistanceMarkerVisibility);
 	elem.setAttribute("translationOnly", mTranslationOnly);
 }
 
@@ -105,6 +106,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
 	mShowDistanceMarkers = elem.attribute("showDistance", QString::number(mShowDistanceMarkers)).toInt();
+	mDistanceMarkerVisibility = elem.attribute("distanceMarkerVisibility", QString::number(mDistanceMarkerVisibility)).toDouble();
 	mTranslationOnly = elem.attribute("translationOnly", QString::number(mTranslationOnly)).toInt();
 }
 
