@@ -13,21 +13,21 @@ CustusX supports the NDI Polaris and Aurora tracking systems though IGSTK, <http
 
 Platform-specific issues {#cx_tracking_setup_platform_issues}
 -----------------------------------------------------------
-### Linux
-Run the following shell lines after installing the Track application:
+### Mac and Linux
 
 Setup connection between CustusX and IGSTK:
+
+The folder
+
+	/Library/CustusX/igstk.links
+
+is required to exist and be writable.
+
+You can run the shell commands below after installing the Track application, or create it and set permissions in the Finder.
 
 	sudo mkdir -p /Library/CustusX/igstk.links
 	sudo chmod a+rwx /Library/CustusX/igstk.links
 
-### Mac
-
-The folder 
-
-	/Library/CustusX/igstk.links
-
-is required to exist and be writable, but is created by the installer.
 
 ### Windows
 CustusX assumes that NDI connects through `COM-port` 9. If this is not the case, change manually.
