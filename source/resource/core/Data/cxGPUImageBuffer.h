@@ -65,7 +65,7 @@ public:
 	 *
 	 *  Call this from inside a PrepareForRendering() method in vtk.
 	 */
-	virtual void allocate() = 0;
+	virtual void allocate(int textureUnitIndex) = 0;
 //	/** Assuming imageData is changed,
 //	  * send vtkImageData to GPU.
 //	  */

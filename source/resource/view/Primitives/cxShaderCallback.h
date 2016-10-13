@@ -52,7 +52,7 @@ class cxResourceVisualization_EXPORT ShaderCallback : public vtkCommand
 public:
     static ShaderCallback *New()
       { return new ShaderCallback; }
-    virtual void Execute(vtkObject *, unsigned long, void*cbo);
+    virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
     ShaderCallback(int index);
     ShaderCallback();

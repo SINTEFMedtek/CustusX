@@ -141,25 +141,41 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 
 	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
 	mOpenGLPolyDataMapper->SetInputData(mPolyData);
+
+
+	mOpenGLPolyDataMapper->AddShaderReplacement(
+				vtkShader::Vertex,
+				"//VTK::PositionVC::Dec", // replace the normal block
+				true, // before the standard replacements
+				"//VTK::PositionVC::Dec\n" // we still want the default
+				"//attribute vec4  AttrMultiTexCoord0;\n"
+				"//varying vec4 VaryingTexCoord0;\n"
+				"uniform mat4 tcMatric;\n"
+				"uniform vec2 tcoordMC;\n"
+				"varying vec3 cx_tcoordVCVSOutput;\n",
+				false // only do it once
+				);
+	mOpenGLPolyDataMapper->AddShaderReplacement(
+				vtkShader::Vertex,
+				"//VTK::Light::Impl", // replace the normal block
+				true, // before the standard replacements
+				"//VaryingTexCoord0 = AttrMultiTexCoord0;\n"
+				"vec4 cx_tcoordTemp = tcMatric*vec4(tcoordMC, 0.5, 1.0);\n"
+				"cx_tcoordVCVSOutput = cx_tcoordTemp.xyz/cx_tcoordTemp.w;\n"
+				"//VTK::Light::Impl\n", // we still want the default
+				false // only do it once
+				);
+
 	mOpenGLPolyDataMapper->SetFragmentShaderCode(
 	  "//VTK::System::Dec\n"  // always start with this line
 	  "//VTK::Output::Dec\n"  // always have this line in your FS
-	  "//const int layers = 1;\n"
-	  "//uniform sampler3D testTexture[layers];\n"
-	  "//varying vec4 gl_TexCoord[2*layers];\n"
 	  "//varying vec3 normalVCVSOutput;\n"
-	  "//uniform vec3 diffuseColorUniform;\n"
-	  "uniform int test[4];\n"
+	  "uniform sampler3D cxTextureSamplers[4];\n"
+	  "varying vec3 cx_tcoordVCVSOutput;\n"
 	  "void main () {\n"
-	  "//  float df = max(0.0, normalVCVSOutput.z);\n"
-	  "//  float sf = pow(df, 20.0);\n"
-	  "//  vec3 diffuse = df * diffuseColorUniform;\n"
-	  "//  vec3 specular = sf * vec3(0.4,0.4,0.4);\n"
-	  "  if(test[0] == 1)\n"
-	  "    gl_FragData[0] = vec4(0.0, 0.0, 1.0, 1.0);\n"
-	  "  else\n"
-	  "    gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);\n"
-	  "//  gl_FragData[0] = texture3D(testTexture[0], gl_TexCoord[2*0].xyz);\n"
+	  "//  gl_FragData[0] = texture3D(cxTextureSamplers[0], cx_tcoordVCVSOutput.xyz);\n"
+	  "//  gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);\n"
+	  "  gl_FragData[0] = texture3D(cxTextureSamplers[0], vec3(0.5, 0.5, 0.5));\n"
 	  "}\n"
 	  );
 
@@ -376,7 +392,11 @@ ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
 		// Setup a callback to change some uniforms
 //		VTK_CREATE(ShaderCallback, mElement[index]);
 //	    mElement[index]->Renderer = renderer.Get();
-		mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent,shaderCallback);
+
+
+		//TODO: Need vtkRenderer?
+		mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, shaderCallback);
+		mOpenGLPolyDataMapper->AddObserver(vtkCommand::EndEvent, shaderCallback);
 	}
 	return mElement[index];
 }
@@ -536,6 +556,7 @@ void Texture3DSlicerProxyImpl::imageChanged()
 			inputImage);
 
 //		mPainter->SetVolumeBuffer(i, dataBuffer);
+		this->SetVolumeBuffer(i, dataBuffer);
 	}
 }
 

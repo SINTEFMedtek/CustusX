@@ -35,10 +35,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
+#include "cxLogger.h"
 
 #include <vtkShaderProgram.h>
 #include <vtkOpenGLHelper.h>
 
+
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+//#include <OpenGL/gl.h>
+#include "X11/Xlib.h"
+//#include "/usr/include/X11/Xlib.h"
+#else
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glu.h>
+#include <GL/glext.h>
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+#include <GL/glext.h>
+#endif
 
 
 namespace cx
@@ -92,7 +109,7 @@ void ShaderCallback::SetColorAttribute(float window, float level, float llr,floa
 void ShaderCallback::initializeRendering()
 {
 	if (mVolumeBuffer)
-		mVolumeBuffer->allocate();
+		mVolumeBuffer->allocate(mIndex);
 	if (mLutBuffer)
 		mLutBuffer->allocate();
 }
@@ -117,7 +134,7 @@ void ShaderCallback::eachRenderInternal(vtkOpenGLHelper *cellBO)
 	if (!mVolumeBuffer)
 		return;
 
-//	mVolumeBuffer->bind(mIndex);
+	mVolumeBuffer->bind(mIndex);
 
 	int texture = 2*mIndex; //texture unit 1
 	int lut = 2*mIndex+1; //texture unit 1
@@ -131,7 +148,8 @@ void ShaderCallback::eachRenderInternal(vtkOpenGLHelper *cellBO)
 
 	this->setUniformiArray(cellBO, "test", 1);
 
-//	this->setUniformiArray(cellBO, "texture", texture);
+	this->setUniformiArray(cellBO, "cx_texture", texture);
+	this->setUniformiArray(cellBO, "cxTextureSamplers", texture);
 //	this->setUniformiArray(cellBO, "lut", lut);
 //	this->setUniformiArray(cellBO, "lutsize", lutsize);
 //	this->setUniformfArray(cellBO, "llr", mLLR);
@@ -142,7 +160,7 @@ void ShaderCallback::eachRenderInternal(vtkOpenGLHelper *cellBO)
 	report_gl_error();
 }
 
-void ShaderCallback::Execute(vtkObject *, unsigned long, void *cbo)
+void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 {
 	vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
 
@@ -153,7 +171,32 @@ void ShaderCallback::Execute(vtkObject *, unsigned long, void *cbo)
 //    diffuseColor[1] = 0.7;
 //    diffuseColor[2] = 0.6;
 //    cellBO->Program->SetUniform3f("diffuseColorUniform", diffuseColor);
-	this->eachRenderInternal(cellBO);
+
+	if(eventId == vtkCommand::UpdateShaderEvent)
+	{
+		if(mVolumeBuffer)
+		{
+			mVolumeBuffer->allocate(mIndex);
+		}
+		this->eachRenderInternal(cellBO);
+	}
+	else if(eventId == vtkCommand::EndEvent) //pre render
+	{
+//		GLint oldTextureUnit;
+//		glGetIntegerv(GL_ACTIVE_TEXTURE, &oldTextureUnit);
+//		CX_LOG_DEBUG() << "oldTextureUnit: " << oldTextureUnit;
+
+		if(mVolumeBuffer)
+		{
+			mVolumeBuffer->allocate(mIndex);
+		}
+//		if (mLutBuffer)
+//		{
+//			mLutBuffer->allocate();
+//		}
+
+//		glActiveTexture(oldTextureUnit);
+	}
 }
 
 }//cx

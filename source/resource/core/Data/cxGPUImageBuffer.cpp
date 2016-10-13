@@ -110,7 +110,7 @@ public:
 	 *
 	 * Call this from inside a PrepareForRendering() methods in vtk.
 	 */
-	virtual void allocate()
+	virtual void allocate(int textureUnitIndex)
 	{
 		if (mAllocated) // do this only once.
 		{
@@ -122,11 +122,19 @@ public:
 			return;
 		}
 
-		glActiveTexture(GL_TEXTURE7);
+//		glActiveTexture(GL_TEXTURE7);
+//		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(getGLTextureForVolume(textureUnitIndex));
+		report_gl_error();
 
-		glEnable(GL_TEXTURE_3D);
+//		glEnable(GL_TEXTURE_3D);
+		report_gl_error();
 		glGenTextures(1, &textureId);
-		glDisable(GL_TEXTURE_3D);
+		report_gl_error();
+//		glDisable(GL_TEXTURE_3D);
+
+		report_gl_error();
+		CX_LOG_DEBUG() << "textureId: " << textureId;
 
 		updateTexture();
 		mAllocated = true;
@@ -145,26 +153,29 @@ public:
 		boost::uint32_t dimz = mTexture ->GetDimensions( )[2];
 		mMemorySize = dimx * dimy * dimz;
 
-		glEnable( GL_TEXTURE_3D );
+
+		//Example: https://open.gl/textures
+
+//		glEnable( GL_TEXTURE_3D );
 		glBindTexture(GL_TEXTURE_3D, textureId);
-		report_gl_error();
-		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP );
-		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP );
-		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP );
+		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );//GL_CLAMP is no longer allowed. Try with GL_CLAMP_TO_EDGE
+		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+//		glGenerateMipmap(GL_TEXTURE_3D);
 		switch (mTexture->GetScalarType())
 		{
 		case VTK_UNSIGNED_CHAR:
 		{
 			size = GL_UNSIGNED_BYTE;
-			internalType = GL_LUMINANCE;
+			internalType = GL_RED;// GL_LUMINANCE is no longer used
 		}
 			break; //8UI_EXT; break;
 		case VTK_UNSIGNED_SHORT:
 		{
 			size = GL_UNSIGNED_SHORT;
-			internalType = GL_LUMINANCE16;
+			internalType = GL_RED; //GL_LUMINANCE16 is deprecated
 			mMemorySize *= 2;
 		}
 			break; //16UI_EXT; break;
@@ -177,10 +188,11 @@ public:
 			break;
 		}
 
+		report_gl_error();
 		if (mTexture->GetNumberOfScalarComponents()==1)
 		{
 			void* data = mTexture->GetPointData()->GetScalars()->GetVoidPointer(0);
-			glTexImage3D(GL_TEXTURE_3D, 0, internalType, dimx, dimy, dimz, 0, GL_LUMINANCE, size, data);
+			glTexImage3D(GL_TEXTURE_3D, 0, internalType, dimx, dimy, dimz, 0, GL_RED, size, data);
 		}
 		else if (mTexture->GetNumberOfScalarComponents()==3)
 		{
@@ -194,7 +206,7 @@ public:
 			std::cout << "unsupported number of image components" << std::endl;
 		}
 
-		glDisable(GL_TEXTURE_3D);
+//		glDisable(GL_TEXTURE_3D);
 
 		report_gl_error();
 	}
@@ -205,13 +217,13 @@ public:
 	 */
 	virtual void bind(int textureUnitIndex)
 	{
+		glActiveTexture(getGLTextureForVolume(textureUnitIndex));
 		this->updateTexture();
 		if (!mAllocated)
 		{
 			std::cout << "error: called bind() on unallocated volume buffer" << std::endl;
 			return;
 		}
-		glActiveTexture(getGLTextureForVolume(textureUnitIndex));
 		glBindTexture(GL_TEXTURE_3D, textureId);
 		report_gl_error();
 	}
