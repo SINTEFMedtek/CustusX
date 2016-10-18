@@ -142,16 +142,18 @@ void GraphicalGeometric::meshChangedSlot()
 	mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
 	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
 
-	//Set mesh color, opacity
-	if(mMesh->getTextureData().getTextureImage()->getValue().isEmpty() || mMesh->getTextureData().getTextureImage()->getImage() == NULL)
-	{
-		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
-	}
-	else
-	{
-		mGraphicalPolyDataPtr->setColor(255, 255, 255);
-	}
+	mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+	mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+//	//Set mesh color, opacity
+//	if(mMesh->getTextureData().getTextureImage()->getValue().isEmpty() || mMesh->getTextureData().getTextureImage()->getImage() == NULL)
+//	{
+//		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+//		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+//	}
+//	else
+//	{
+//		mGraphicalPolyDataPtr->setColor(255, 255, 255);
+//	}
 
 	//Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
