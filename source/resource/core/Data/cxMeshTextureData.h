@@ -61,6 +61,8 @@ public:
 	std::vector<PropertyPtr> getProperties() const;
 	DoublePropertyPtr getPositionX() const;
 	DoublePropertyPtr getPositionY() const;
+	BoolPropertyPtr getRepeat() const;
+	BoolPropertyPtr getEdgeClamp() const;
 
 	QString getCylinderText() const;
 	QString getPlaneText() const;
@@ -78,6 +80,8 @@ private:
 	DoublePropertyPtr mScaleY;
 	DoublePropertyPtr mPositionX;
 	DoublePropertyPtr mPositionY;
+	BoolPropertyPtr mRepeat;
+	BoolPropertyPtr mEdgeClamp;
 	PatientModelServicePtr mPatientModelService;
 	QString mCylinderText;
 	QString mPlaneText;

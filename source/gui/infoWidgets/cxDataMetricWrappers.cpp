@@ -742,6 +742,9 @@ QWidget* CustomMetricWrapper::createWidget()
 	mTranslationOnly= this->createTranslationOnly();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
 
+	mTextureFollowTool= this->createTextureFollowTool();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTextureFollowTool));
+
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
@@ -811,6 +814,7 @@ void CustomMetricWrapper::guiChanged()
 	mData->setShowDistanceMarkers(mShowDistanceMarkers->getValue());
 	mData->setDistanceMarkerVisibility(mDistanceMarkerVisibility->getValue());
 	mData->setTranslationOnly(mTranslationOnly->getValue());
+	mData->setTextureFollowTool(mTextureFollowTool->getValue());
 
 	mInternalUpdate = false;
 }
@@ -841,6 +845,16 @@ BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
 	retval = BoolProperty::initialize("Translation Only", "",
 										  "Ignore scale and rotate",
 										  mData->getTranslationOnly());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createTextureFollowTool() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Texture Follow Tool", "",
+										  "Any texture on the model will move with the tool",
+										  mData->getTextureFollowTool());
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }

@@ -329,6 +329,8 @@ void Mesh::updateVtkPolyDataWithTexture()
 
 	//Create the texture
 	mVtkTexture = vtkTexturePtr::New();
+	mVtkTexture->SetRepeat(mTextureData.getRepeat()->getValue());
+	mVtkTexture->SetEdgeClamp(mTextureData.getEdgeClamp()->getValue());
 	mVtkTexture->SetInputData(vtkImageData);
 
 	//transform texture coordinates

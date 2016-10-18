@@ -270,6 +270,7 @@ private:
   DoublePropertyPtr createDistanceMarkerVisibility() const;
   StringPropertySelectDataPtr createModelSelector() const;
   BoolPropertyPtr createTranslationOnly() const;
+  BoolPropertyPtr createTextureFollowTool() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
@@ -277,6 +278,7 @@ private:
   QWidget* mScaleToP1Widget;
   BoolPropertyPtr mShowDistanceMarkers;
   BoolPropertyPtr mTranslationOnly;
+  BoolPropertyPtr mTextureFollowTool;
   DoublePropertyPtr mOffsetFromP0;
   DoublePropertyPtr mRepeatDistance;
   DoublePropertyPtr mDistanceMarkerVisibility;
