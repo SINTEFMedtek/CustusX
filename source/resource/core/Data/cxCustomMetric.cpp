@@ -280,6 +280,9 @@ void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
 	if (!this->getTextureFollowTool())
 		return;
 
+	if (!model)
+		return;
+
 	// special case:
 	// Project tool position down to the model, then set that position as
 	// the texture x pos.
@@ -305,12 +308,7 @@ void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
 	if (similar(range, 0.0))
 		range = 1.0E-6;
 	double s = (t_x-bbmin_x)/range;
-	s = std::min(1.0, s);
-	s = std::max(0.0, s);
-
-	s -= 0.01; // offset for border pixels which color are drawn outside of the texture.
-	CX_LOG_CHANNEL_DEBUG("CA") << "s = " << s;
-	model->getTextureData().getPositionX()->setValue(s);
+	model->getTextureData().getPositionY()->setValue(s);
 }
 
 Vector3D CustomMetric::getScale() const

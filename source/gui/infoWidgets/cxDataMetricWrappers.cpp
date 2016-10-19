@@ -864,7 +864,7 @@ DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
 	DoublePropertyPtr retval;
 	retval = DoubleProperty::initialize("Offset from P0", "",
 											"Position model an offset from P0 towards P1",
-											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
+											mData->getOffsetFromP0(), DoubleRange(-100, 100, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
