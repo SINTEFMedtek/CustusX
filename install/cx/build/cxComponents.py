@@ -197,7 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-		tag = 'VTK-7-0-0.cx_patch_2'
+        tag = 'VTK-7-0-0.cx_patch_2'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         builder = self._getBuilder()
