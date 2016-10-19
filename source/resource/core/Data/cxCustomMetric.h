@@ -83,6 +83,8 @@ public:
 	double getRepeatDistance() const;
 	void setTranslationOnly(bool val);
 	bool getTranslationOnly() const;
+	void setTextureFollowTool(bool val);
+	bool getTextureFollowTool() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
@@ -130,10 +132,13 @@ private:
 	bool mShowDistanceMarkers;
 	double mDistanceMarkerVisibility;
 	bool mTranslationOnly;
+	bool mTextureFollowTool;
+	SpaceListenerPtr mToolListener;
 
 	Transform3D calculateOrientation(Vector3D pos, Vector3D dir, Vector3D vup, Vector3D scale) const;
 	Transform3D calculateRotation(Vector3D dir, Vector3D vup) const;
 	Transform3D calculateTransformTo2DImageCenter() const;
+	void onPropertiesChanged();
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 	std::vector<Transform3D> calculateOrientations() const;
@@ -145,6 +150,7 @@ public:
 	Vector3D getZeroPosition() const;
 	void setDistanceMarkerVisibility(double val);
 	double getDistanceMarkerVisibility() const;
+	void updateTexture(MeshPtr model, Transform3D rMrr);
 };
 
 /**

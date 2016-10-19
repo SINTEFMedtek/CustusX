@@ -151,7 +151,10 @@ void CustomMetricRep::updateMeshModel(DataPtr model)
 		mMeshGeometry[i]->setMesh(meshModel);
 
 		mMeshGeometry[i]->setTransformOffset(pos[i]);
+
+		custom->updateTexture(meshModel, pos[i]);
 	}
+
 }
 
 void CustomMetricRep::createDistanceMarkers()

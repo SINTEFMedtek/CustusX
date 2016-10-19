@@ -329,6 +329,8 @@ void Mesh::updateVtkPolyDataWithTexture()
 
 	//Create the texture
 	mVtkTexture = vtkTexturePtr::New();
+	mVtkTexture->SetRepeat(mTextureData.getRepeat()->getValue());
+	mVtkTexture->SetEdgeClamp(mTextureData.getEdgeClamp()->getValue());
 	mVtkTexture->SetInputData(vtkImageData);
 
 	//transform texture coordinates
@@ -359,7 +361,15 @@ bool Mesh::createTextureMapper(vtkDataSetAlgorithmPtr &tMapper)
 	}
 	else if (textureShape == mTextureData.getPlaneText())
 	{
-		tMapper = vtkTextureMapToPlanePtr::New();
+		vtkTextureMapToPlanePtr mapper = vtkTextureMapToPlanePtr::New();
+		DoubleBoundingBox3D bb = this->boundingBox();
+		// Explicitly state the plane as the upper xy-plane of the bounding box
+		// The automatic plane generation is not deterministic for  square cases.
+		mapper->SetOrigin(bb.corner(0,0,1).data());
+		mapper->SetPoint1(bb.corner(1,0,1).data());
+		mapper->SetPoint2(bb.corner(0,1,1).data());
+
+		tMapper = mapper;
 	}
 	else if (textureShape == mTextureData.getSphereText())
 	{

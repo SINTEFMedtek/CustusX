@@ -742,6 +742,9 @@ QWidget* CustomMetricWrapper::createWidget()
 	mTranslationOnly= this->createTranslationOnly();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
 
+	mTextureFollowTool= this->createTextureFollowTool();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTextureFollowTool));
+
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
@@ -811,6 +814,7 @@ void CustomMetricWrapper::guiChanged()
 	mData->setShowDistanceMarkers(mShowDistanceMarkers->getValue());
 	mData->setDistanceMarkerVisibility(mDistanceMarkerVisibility->getValue());
 	mData->setTranslationOnly(mTranslationOnly->getValue());
+	mData->setTextureFollowTool(mTextureFollowTool->getValue());
 
 	mInternalUpdate = false;
 }
@@ -845,12 +849,22 @@ BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
 	return retval;
 }
 
+BoolPropertyPtr CustomMetricWrapper::createTextureFollowTool() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Texture Follow Tool", "",
+										  "Any texture on the model will move with the tool",
+										  mData->getTextureFollowTool());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
 DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
 {
 	DoublePropertyPtr retval;
 	retval = DoubleProperty::initialize("Offset from P0", "",
 											"Position model an offset from P0 towards P1",
-											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
+											mData->getOffsetFromP0(), DoubleRange(-100, 100, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
