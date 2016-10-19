@@ -76,7 +76,7 @@ void ViewContainer::clear()
 		ViewItem* viewItem = dynamic_cast<ViewItem*>(item);
 		delete viewItem;
 	}
-	view_utils::setStretchFactors(this->getGridLayout(), LayoutRegion(0, 0, 10, 10), 0);
+	view_utils::setStretchFactors(this->getGridLayout(), LayoutRegion(0, 0, LayoutData::MaxGridSize, LayoutData::MaxGridSize), 0);
 	this->setModified();
 	mMouseEventTarget = NULL;
 }

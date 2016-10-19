@@ -94,7 +94,7 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 	}
 	mViews.clear();
 
-	view_utils::setStretchFactors(mLayout, LayoutRegion(0, 0, 10, 10), 0);
+	view_utils::setStretchFactors(mLayout, LayoutRegion(0, 0, LayoutData::MaxGridSize, LayoutData::MaxGridSize), 0);
 }
 
 void LayoutWidgetUsingViewWidgets::setModified()

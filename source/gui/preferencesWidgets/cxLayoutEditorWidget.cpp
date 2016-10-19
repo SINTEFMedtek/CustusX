@@ -65,9 +65,9 @@ LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
 
   // create the row/column bar
   mRowsEdit = new QSpinBox;
-  mRowsEdit->setRange(1,10);
+  mRowsEdit->setRange(1,LayoutData::MaxGridSize);
   mColsEdit = new QSpinBox;
-  mColsEdit->setRange(1,10);
+  mColsEdit->setRange(1,LayoutData::MaxGridSize);
   connect(mRowsEdit, SIGNAL(valueChanged(int)), this, SLOT(rowsColumnsChangedSlot()));
   connect(mColsEdit, SIGNAL(valueChanged(int)), this, SLOT(rowsColumnsChangedSlot()));
   mRCLayout->addWidget(new QLabel("Rows"));
@@ -431,8 +431,8 @@ void LayoutEditorWidget::clearDisplay()
 
 void LayoutEditorWidget::initCache()
 {
-  int maxRows = 10;
-  int maxCols = 10;
+  int maxRows = LayoutData::MaxGridSize;
+  int maxCols = LayoutData::MaxGridSize;
   mViewDataCache.resize(maxRows);
 
   for (int r = 0; r < maxRows; ++r)
