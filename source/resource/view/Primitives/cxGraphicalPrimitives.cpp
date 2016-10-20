@@ -718,6 +718,11 @@ void CaptionText3D::placeBelowCenter()
 	mText->SetPosition2(15, -10);
 }
 
+void CaptionText3D::placeAboveCenter()
+{
+	mText->SetPosition(-15, 2);
+}
+
 void CaptionText3D::setVisibility(bool visible)
 {
 	mText->SetVisibility(visible);

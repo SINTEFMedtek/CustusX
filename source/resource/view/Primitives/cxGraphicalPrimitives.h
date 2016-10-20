@@ -293,6 +293,7 @@ public:
 	//    void scaleText(); ///< internal method
 
 	void placeBelowCenter();
+	void placeAboveCenter();
 	void setVisibility(bool visible);
 	Vector3D getPosition() const;
 private:
