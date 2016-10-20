@@ -12,7 +12,7 @@ public:
 
 	void createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *argv[]);
 
-	static void upload3dTextures();
+	static void opengl_upload3dTextures();
 
 private:
 	//VTK
@@ -22,9 +22,10 @@ private:
 	void startRender(vtkSmartPointer<class vtkActor> actor);
 
 	//OpenGL
-	std::string getCustomFragmentShader();
-	void printActiveFragmentShader(vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper);
+	void printActiveVertexAndFragmentShader(vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper);
 	void setUniforms();
+	void printOpenGLVersion();
+	void printVtkOpenGLRenderWindowInfo(vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
 };
 
 #endif // VTKFIXTURE_H
