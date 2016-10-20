@@ -58,6 +58,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mModelUid = "";
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
+	mOffsetFromP1 = 0.0;
 	mRepeatDistance = 0.0;
 	mTranslationOnly = false;
 	mTextureFollowTool = false;
@@ -109,6 +110,7 @@ void CustomMetric::addXml(QDomNode& dataNode)
 
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
+	elem.setAttribute("offsetFromP1", mOffsetFromP1);
 	elem.setAttribute("repeatDistance", mRepeatDistance);
 	elem.setAttribute("showDistance", mShowDistanceMarkers);
 	elem.setAttribute("distanceMarkerVisibility", mDistanceMarkerVisibility);
@@ -127,6 +129,7 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mModelUid = elem.attribute("meshUid", qstring_cast(mModelUid));
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
+	mOffsetFromP1 = elem.attribute("offsetFromP1", QString::number(mOffsetFromP1)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
 	mShowDistanceMarkers = elem.attribute("showDistance", QString::number(mShowDistanceMarkers)).toInt();
 	mDistanceMarkerVisibility = elem.attribute("distanceMarkerVisibility", QString::number(mDistanceMarkerVisibility)).toDouble();
@@ -238,7 +241,7 @@ int CustomMetric::getRepeatCount() const
 
 	int reps = 1;
 	if (!similar(mRepeatDistance, 0.0))
-		reps = (dot(p1-p0, dir)-mOffsetFromP0)/mRepeatDistance + 1;
+		reps = (dot(p1-p0, dir)-mOffsetFromP0-mOffsetFromP1)/mRepeatDistance + 1;
 	reps = std::min(100, reps);
 	reps = std::max(reps, 1);
 
@@ -327,7 +330,7 @@ Vector3D CustomMetric::getScale() const
 	double p1 = dot(coords[1], dir);
 
 	height = p1 - p0;
-	height -= mOffsetFromP0;
+	height -= (mOffsetFromP0 + mOffsetFromP1);
 
 	Vector3D scale(1,
 				   height/bounds.range()[1],
@@ -392,6 +395,19 @@ void CustomMetric::setOffsetFromP0(double val)
 double CustomMetric::getOffsetFromP0() const
 {
 	return mOffsetFromP0;
+}
+
+void CustomMetric::setOffsetFromP1(double val)
+{
+	if (mOffsetFromP1 == val)
+		return;
+	mOffsetFromP1 = val;
+	emit propertiesChanged();
+}
+
+double CustomMetric::getOffsetFromP1() const
+{
+	return mOffsetFromP1;
 }
 
 void CustomMetric::setRepeatDistance(double val)

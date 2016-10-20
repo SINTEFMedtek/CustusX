@@ -79,6 +79,8 @@ public:
 	bool getScaleToP1() const;
 	void setOffsetFromP0(double val);
 	double getOffsetFromP0() const;
+	void setOffsetFromP1(double val);
+	double getOffsetFromP1() const;
 	void setRepeatDistance(double val);
 	double getRepeatDistance() const;
 	void setTranslationOnly(bool val);
@@ -128,6 +130,7 @@ private:
     DefineVectorUpMethods mDefineVectorUpMethods;
 	bool mScaleToP1;
 	double mOffsetFromP0;
+	double mOffsetFromP1;
 	double mRepeatDistance;
 	bool mShowDistanceMarkers;
 	double mDistanceMarkerVisibility;
