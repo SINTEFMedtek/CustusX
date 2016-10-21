@@ -197,7 +197,7 @@ CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distan
 	text->setText(QString("%1").arg(distance));
 
 	text->setPosition(pos);
-	text->placeBelowCenter();
+	text->placeAboveCenter();
 	text->setSize(mLabelSize / 100);
 
 	return text;

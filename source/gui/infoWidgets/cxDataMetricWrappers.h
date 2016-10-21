@@ -264,6 +264,7 @@ private slots:
 private:
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
   DoublePropertyPtr createOffsetFromP0() const;
+  DoublePropertyPtr createOffsetFromP1() const;
   DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
   BoolPropertyPtr createShowDistanceMarkers() const;
@@ -280,6 +281,7 @@ private:
   BoolPropertyPtr mTranslationOnly;
   BoolPropertyPtr mTextureFollowTool;
   DoublePropertyPtr mOffsetFromP0;
+  DoublePropertyPtr mOffsetFromP1;
   DoublePropertyPtr mRepeatDistance;
   DoublePropertyPtr mDistanceMarkerVisibility;
   QWidget* mDistanceMarkerVisibilityWidget;

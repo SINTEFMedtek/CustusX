@@ -100,7 +100,7 @@ void MeshTextureData::initialize()
 	mPositionY = DoubleProperty::initialize("texture_position_Y", "Position Y", "Where to start drawing the image along the Y axis.", 0, DoubleRange(-100000,100000,0.01), 2);
 	this->addProperty(mPositionY);
 
-	mRepeat = BoolProperty::initialize("repeat", "Repeat", "Repeat texture over surface", false);
+	mRepeat = BoolProperty::initialize("repeat", "Repeat", "Repeat texture over surface", true);
 	this->addProperty(mRepeat);
 	mEdgeClamp = BoolProperty::initialize("edge_clamp", "Edge Clamp", "Clamp texture at edges when repeat is off", false);
 	this->addProperty(mEdgeClamp);

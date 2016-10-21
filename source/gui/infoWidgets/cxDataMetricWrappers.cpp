@@ -726,6 +726,8 @@ QWidget* CustomMetricWrapper::createWidget()
 
 	mOffsetFromP0 = this->createOffsetFromP0();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
+	mOffsetFromP1 = this->createOffsetFromP1();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP1));
 	mRepeatDistance = this->createRepeatDistance();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRepeatDistance));
 
@@ -809,6 +811,7 @@ void CustomMetricWrapper::guiChanged()
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
 	mData->setModelUid(mModel->getValue());
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
+	mData->setOffsetFromP1(mOffsetFromP1->getValue());
 	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
 	mData->setShowDistanceMarkers(mShowDistanceMarkers->getValue());
@@ -865,6 +868,16 @@ DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
 	retval = DoubleProperty::initialize("Offset from P0", "",
 											"Position model an offset from P0 towards P1",
 											mData->getOffsetFromP0(), DoubleRange(-100, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createOffsetFromP1() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Offset from P1", "",
+											"When scaling to P1, scale to a point offset from P1 towards P0",
+											mData->getOffsetFromP1(), DoubleRange(-100, 100, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
