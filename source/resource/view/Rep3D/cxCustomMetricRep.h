@@ -71,6 +71,7 @@ protected:
 	virtual void clear();
 	virtual void onModifiedStartRender();
 
+	virtual void onEveryRender();
 private:
     CustomMetricRep();
     CustomMetricPtr getCustomMetric();
@@ -83,6 +84,8 @@ private:
 	void updateImageModel(DataPtr model);
 	CaptionText3DPtr createDistanceText(Vector3D pos, double distance);
 	void createDistanceMarkers();
+	void hideDistanceMetrics();
+	bool isCloseToCamera(Vector3D pos);
 };
 
 }

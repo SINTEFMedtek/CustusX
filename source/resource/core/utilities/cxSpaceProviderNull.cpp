@@ -29,41 +29,86 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXAPPLICATIONSPARSER_H
-#define CXAPPLICATIONSPARSER_H
 
-#include "org_custusx_core_state_Export.h"
-#include "cxXmlOptionItem.h"
-#include "cxStateService.h"
+#include "cxSpaceProviderNull.h"
+
 
 namespace cx
 {
 
-/**
- * \ingroup org_custusx_core_state
- * \date 2010-08-04
- * \author Christian Askeland, SINTEF
- *
- */
-class org_custusx_core_state_EXPORT ApplicationsParser
+SpaceProviderNull::SpaceProviderNull()
 {
-public:
-	ApplicationsParser();
-	~ApplicationsParser() {}
-
-	Desktop getDefaultDesktop(QString workflowName);
-	Desktop getDesktop(QString workflowName);
-	void setDesktop(QString workflowName, Desktop desktop);
-	void resetDesktop(QString workflowName);
-
-private:
-	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
-	XmlOptionFile getSettings();
-	//	XmlOptionFile mXmlFile;
-	std::map<QString, Desktop> mWorkflowDefaultDesktops;
-	void addToolbarsToDesktop(Desktop& desktop, QStringList toolbars);
-};
 
 }
 
-#endif // CXAPPLICATIONSPARSER_H
+Transform3D SpaceProviderNull::get_toMfrom(CoordinateSystem from, CoordinateSystem to)
+{
+	return Transform3D::Identity();
+}
+
+std::vector<CoordinateSystem> SpaceProviderNull::getSpacesToPresentInGUI()
+{
+	return std::vector<CoordinateSystem>();
+}
+
+std::map<QString, QString> SpaceProviderNull::getDisplayNamesForCoordRefObjects()
+{
+	return std::map<QString, QString>();
+}
+
+SpaceListenerPtr SpaceProviderNull::createListener()
+{
+	return SpaceListenerPtr();
+}
+
+Vector3D SpaceProviderNull::getActiveToolTipPoint(CoordinateSystem to, bool useOffset)
+{
+	return Vector3D();
+}
+
+Transform3D SpaceProviderNull::getActiveToolTipTransform(CoordinateSystem to, bool useOffset)
+{
+	return Transform3D::Identity();
+}
+
+Transform3D SpaceProviderNull::get_rMpr()
+{
+	return Transform3D::Identity();
+}
+
+CoordinateSystem SpaceProviderNull::getS(ToolPtr tool)
+{
+	return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getT(ToolPtr tool)
+{
+	return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getTO(ToolPtr tool)
+{
+	return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getD(DataPtr data)
+{
+	return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getPr()
+{
+	return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::getR()
+{
+	return CoordinateSystem();
+}
+
+CoordinateSystem SpaceProviderNull::convertToSpecific(CoordinateSystem space)
+{
+	return CoordinateSystem();
+}
+
+} // namespace cx

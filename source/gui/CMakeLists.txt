@@ -38,6 +38,7 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxMeshGlyphsWidget
 	dataWidgets/cxMeshPropertiesWidget
 	dataWidgets/cxImportDataDialog
+    dataWidgets/cxMeshTextureWidget
     dataWidgets/cxExportDataDialog
     dataWidgets/cxDataViewSelectionWidget
     dataWidgets/cxTransferFunctionWidget
@@ -148,6 +149,7 @@ target_link_libraries(cxGui
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/preferences.md")
+cx_add_non_source_file("doc/cx_user_doc_widgets_mesh_properties.md")
 
 add_subdirectory(testing)
 

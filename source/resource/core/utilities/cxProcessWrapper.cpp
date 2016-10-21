@@ -55,7 +55,8 @@ ProcessWrapper::ProcessWrapper(QString name, QObject* parent) :
 
 ProcessWrapper::~ProcessWrapper()
 {
-	mProcess->close();
+	mProcess->terminate();//terminate gives the process a chance to shutdown
+	this->waitForFinished();
 }
 
 QProcess* ProcessWrapper::getProcess()

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "SelectClippersForImageWidget", "Select Clippers")
+	BaseWidget(parent, "select_clippers_for_image_widget", "Select Clippers")
 {
 	StringPropertyActiveImagePtr activeImageProperty = StringPropertyActiveImage::New(services->patient());
 
@@ -64,7 +64,7 @@ SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr servic
 /// -------------------------------------------------------
 
 SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "SelectClippersForMeshWidget", "Select Clippers")
+	BaseWidget(parent, "select_clippers_for_mesh_widget", "Select Clippers")
 {
 	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
 
@@ -80,7 +80,7 @@ SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services
 /// -------------------------------------------------------
 
 SelectClippersForDataWidget::SelectClippersForDataWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "SelectClippersForDataWidget", "Select Clippers"),
+	BaseWidget(parent, "select_clippers_for_data_widget", "Select Clippers"),
 	mServices(services),
 	mActiveDataProperty(StringPropertyActiveData::New(services->patient()))
 {

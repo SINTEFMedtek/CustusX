@@ -29,41 +29,65 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXAPPLICATIONSPARSER_H
-#define CXAPPLICATIONSPARSER_H
 
-#include "org_custusx_core_state_Export.h"
-#include "cxXmlOptionItem.h"
-#include "cxStateService.h"
+#ifndef MESHTEXTUREDATA_H
+#define MESHTEXTUREDATA_H
+
+#include "cxResourceExport.h"
+#include "cxStringProperty.h"
+#include "cxSelectDataStringProperty.h"
+
+
+class QDomNode;
 
 namespace cx
 {
 
 /**
- * \ingroup org_custusx_core_state
- * \date 2010-08-04
- * \author Christian Askeland, SINTEF
- *
+ * Mesh texture data used in a vtkProperty
  */
-class org_custusx_core_state_EXPORT ApplicationsParser
+class cxResource_EXPORT MeshTextureData : public QObject
 {
+	Q_OBJECT
 public:
-	ApplicationsParser();
-	~ApplicationsParser() {}
+	MeshTextureData(PatientModelServicePtr patientModelService);
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode &dataNode);
 
-	Desktop getDefaultDesktop(QString workflowName);
-	Desktop getDesktop(QString workflowName);
-	void setDesktop(QString workflowName, Desktop desktop);
-	void resetDesktop(QString workflowName);
+	StringPropertyPtr getTextureShape() const;
+	StringPropertySelectImagePtr getTextureImage() const;
+	DoublePropertyPtr getScaleX() const;
+	DoublePropertyPtr getScaleY() const;
+	std::vector<PropertyPtr> getProperties() const;
+	DoublePropertyPtr getPositionX() const;
+	DoublePropertyPtr getPositionY() const;
+	BoolPropertyPtr getRepeat() const;
+	BoolPropertyPtr getEdgeClamp() const;
 
+	QString getCylinderText() const;
+	QString getPlaneText() const;
+	QString getSphereText() const;
+
+signals:
+	void changed();
 private:
-	void addDefaultDesktops(QString workflowStateUid, QString layoutUid, QString mainwindowstate);
-	XmlOptionFile getSettings();
-	//	XmlOptionFile mXmlFile;
-	std::map<QString, Desktop> mWorkflowDefaultDesktops;
-	void addToolbarsToDesktop(Desktop& desktop, QStringList toolbars);
+	void addProperty(PropertyPtr property);
+	void initialize();
+	std::vector<PropertyPtr> mProperties;
+	StringPropertyPtr mTextureShape;
+	StringPropertySelectImagePtr mTextureImage;
+	DoublePropertyPtr mScaleX;
+	DoublePropertyPtr mScaleY;
+	DoublePropertyPtr mPositionX;
+	DoublePropertyPtr mPositionY;
+	BoolPropertyPtr mRepeat;
+	BoolPropertyPtr mEdgeClamp;
+	PatientModelServicePtr mPatientModelService;
+	QString mCylinderText;
+	QString mPlaneText;
+	QString mSphereText;
 };
 
-}
+} // namespace cx
 
-#endif // CXAPPLICATIONSPARSER_H
+#endif // MESHTEXTUREDATA_H

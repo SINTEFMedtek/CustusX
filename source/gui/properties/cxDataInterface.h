@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -33,11 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXDATAINTERFACE_H_
 
 #include "cxGuiExport.h"
-
 #include "cxDoublePropertyBase.h"
 #include "cxStringPropertyBase.h"
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
+
 
 /**
  * \file
@@ -55,27 +55,27 @@ typedef boost::shared_ptr<class ActiveToolProxy> ActiveToolProxyPtr;
  */
 class cxGui_EXPORT DoublePropertyActiveToolOffset : public DoublePropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	static boost::shared_ptr<DoublePropertyActiveToolOffset> create(ActiveToolProxyPtr activeTool)
 	{
 		return boost::shared_ptr<DoublePropertyActiveToolOffset>(new DoublePropertyActiveToolOffset(activeTool));
 	}
 
-  DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool);
-  virtual ~DoublePropertyActiveToolOffset() {}
-  virtual QString getDisplayName() const { return "Offset"; }
-  virtual QString getHelp() const
-  {
-	  return "Tool tip virtual offset, in mm.";
-  }
-  virtual double getValue() const;
-  virtual bool setValue(double val);
-  virtual void connectValueSignals(bool on) {}
-  DoubleRange getValueRange() const;
+	DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool);
+	virtual ~DoublePropertyActiveToolOffset() {}
+	virtual QString getDisplayName() const { return "Offset"; }
+	virtual QString getHelp() const
+	{
+		return "Tool tip virtual offset, in mm.";
+	}
+	virtual double getValue() const;
+	virtual bool setValue(double val);
+	virtual void connectValueSignals(bool on) {}
+	DoubleRange getValueRange() const;
 
 protected:
-  ActiveToolProxyPtr mActiveTool;
+	ActiveToolProxyPtr mActiveTool;
 };
 
 /**
@@ -83,29 +83,29 @@ protected:
  */
 class cxGui_EXPORT DoublePropertyToolOffset : public DoublePropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
 	static boost::shared_ptr<DoublePropertyToolOffset> create(ToolPtr tool)
 	{
 		return boost::shared_ptr<DoublePropertyToolOffset>(new DoublePropertyToolOffset(tool));
 	}
 
-  DoublePropertyToolOffset(ToolPtr tool);
-  virtual ~DoublePropertyToolOffset() {}
-  virtual QString getDisplayName() const { return "Offset"; }
-  virtual QString getHelp() const
-  {
-	  return "Tool tip virtual offset, in mm.";
-  }
-  virtual double getValue() const;
-  virtual bool setValue(double val);
-  virtual void connectValueSignals(bool on) {}
-  DoubleRange getValueRange() const;
+	DoublePropertyToolOffset(ToolPtr tool);
+	virtual ~DoublePropertyToolOffset() {}
+	virtual QString getDisplayName() const { return "Offset"; }
+	virtual QString getHelp() const
+	{
+		return "Tool tip virtual offset, in mm.";
+	}
+	virtual double getValue() const;
+	virtual bool setValue(double val);
+	virtual void connectValueSignals(bool on) {}
+	DoubleRange getValueRange() const;
 
-  void setTool(ToolPtr tool);
+	void setTool(ToolPtr tool);
 
 protected:
-  ToolPtr mTool;
+	ToolPtr mTool;
 };
 
 /**
@@ -113,22 +113,22 @@ protected:
  */
 class cxGui_EXPORT DoublePropertyActiveImageBase : public DoublePropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  DoublePropertyActiveImageBase(ActiveDataPtr activeData);
-  virtual ~DoublePropertyActiveImageBase() {}
-  virtual double getValue() const;
-  virtual bool setValue(double val);
-  virtual void connectValueSignals(bool on) {}
+	DoublePropertyActiveImageBase(ActiveDataPtr activeData);
+	virtual ~DoublePropertyActiveImageBase() {}
+	virtual double getValue() const;
+	virtual bool setValue(double val);
+	virtual void connectValueSignals(bool on) {}
 private slots:
-  void activeImageChanged();
+	void activeImageChanged();
 protected:
-  virtual double getValueInternal() const = 0;
-  virtual void setValueInternal(double val) = 0;
+	virtual double getValueInternal() const = 0;
+	virtual void setValueInternal(double val) = 0;
 
-  ImagePtr mImage;
-  ActiveImageProxyPtr mActiveImageProxy;
-  ActiveDataPtr mActiveData;
+	ImagePtr mImage;
+	ActiveImageProxyPtr mActiveImageProxy;
+	ActiveDataPtr mActiveData;
 };
 
 /**
@@ -137,11 +137,11 @@ protected:
 class cxGui_EXPORT DoubleProperty2DWindow : public DoublePropertyActiveImageBase
 {
 public:
-  virtual ~DoubleProperty2DWindow() {}
-  virtual QString getDisplayName() const { return "Window"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoubleProperty2DWindow() {}
+	virtual QString getDisplayName() const { return "Window"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 };
 
 /**
@@ -149,13 +149,13 @@ public:
  */
 class cxGui_EXPORT DoubleProperty2DLevel : public DoublePropertyActiveImageBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  virtual ~DoubleProperty2DLevel() {}
-  virtual QString getDisplayName() const { return "Level"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoubleProperty2DLevel() {}
+	virtual QString getDisplayName() const { return "Level"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 };
 
 typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentFramePtr;
@@ -165,26 +165,26 @@ typedef boost::shared_ptr<class StringPropertyParentFrame> StringPropertyParentF
  */
 class cxGui_EXPORT StringPropertyParentFrame : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyParentFramePtr New(PatientModelServicePtr patientModelService) { return StringPropertyParentFramePtr(new StringPropertyParentFrame(patientModelService)); }
-  StringPropertyParentFrame(PatientModelServicePtr patientModelService);
-  void setData(DataPtr data);
-  virtual ~StringPropertyParentFrame();
+	static StringPropertyParentFramePtr New(PatientModelServicePtr patientModelService) { return StringPropertyParentFramePtr(new StringPropertyParentFrame(patientModelService)); }
+	StringPropertyParentFrame(PatientModelServicePtr patientModelService);
+	void setData(DataPtr data);
+	virtual ~StringPropertyParentFrame();
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
+	virtual QString convertInternal2Display(QString internal);
 
 protected:
-  DataPtr mData;
-  PatientModelServicePtr mPatientModelService;
+	DataPtr mData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<class StringPropertySetParentFrame> StringPropertySetParentFramePtr;
@@ -195,13 +195,13 @@ typedef boost::shared_ptr<class StringPropertySetParentFrame> StringPropertySetP
  */
 class cxGui_EXPORT StringPropertySetParentFrame : public StringPropertyParentFrame
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertySetParentFramePtr New(PatientModelServicePtr patientModelService) { return StringPropertySetParentFramePtr(new StringPropertySetParentFrame(patientModelService)); }
-  StringPropertySetParentFrame(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertySetParentFrame() {}
+	static StringPropertySetParentFramePtr New(PatientModelServicePtr patientModelService) { return StringPropertySetParentFramePtr(new StringPropertySetParentFrame(patientModelService)); }
+	StringPropertySetParentFrame(PatientModelServicePtr patientModelService);
+	virtual ~StringPropertySetParentFrame() {}
 public: // basic methods
-  virtual bool setValue(const QString& value);
+	virtual bool setValue(const QString& value);
 };
 
 
@@ -212,24 +212,24 @@ typedef boost::shared_ptr<class StringPropertyDataNameEditable> StringPropertyDa
  */
 class cxGui_EXPORT StringPropertyDataNameEditable : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyDataNameEditablePtr New() { return StringPropertyDataNameEditablePtr(new StringPropertyDataNameEditable()); }
-  StringPropertyDataNameEditable();
-  virtual void setData(DataPtr data);
-  virtual ~StringPropertyDataNameEditable() {}
+	static StringPropertyDataNameEditablePtr New() { return StringPropertyDataNameEditablePtr(new StringPropertyDataNameEditable()); }
+	StringPropertyDataNameEditable();
+	virtual void setData(DataPtr data);
+	virtual ~StringPropertyDataNameEditable() {}
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 	virtual bool isReadOnly() const { return false; }
 	virtual bool getAllowOnlyValuesInRange() const { return false; }
 
 
 private:
-  DataPtr mData;
+	DataPtr mData;
 };
 
 typedef boost::shared_ptr<class StringPropertyDataUidEditable> StringPropertyDataUidEditablePtr;
@@ -239,23 +239,23 @@ typedef boost::shared_ptr<class StringPropertyDataUidEditable> StringPropertyDat
  */
 class cxGui_EXPORT StringPropertyDataUidEditable : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyDataUidEditablePtr New() { return StringPropertyDataUidEditablePtr(new StringPropertyDataUidEditable()); }
-  StringPropertyDataUidEditable();
-  virtual void setData(DataPtr data);
-  virtual ~StringPropertyDataUidEditable() {}
+	static StringPropertyDataUidEditablePtr New() { return StringPropertyDataUidEditablePtr(new StringPropertyDataUidEditable()); }
+	StringPropertyDataUidEditable();
+	virtual void setData(DataPtr data);
+	virtual ~StringPropertyDataUidEditable() {}
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 	virtual bool isReadOnly() const { return true; }
 	virtual bool getAllowOnlyValuesInRange() const { return false; }
 
 private:
-  DataPtr mData;
+	DataPtr mData;
 };
 typedef boost::shared_ptr<class StringPropertyDataModality> StringPropertyDataModalityPtr;
 
@@ -264,25 +264,25 @@ typedef boost::shared_ptr<class StringPropertyDataModality> StringPropertyDataMo
  */
 class cxGui_EXPORT StringPropertyDataModality : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyDataModalityPtr New(PatientModelServicePtr patientModelService) { return StringPropertyDataModalityPtr(new StringPropertyDataModality(patientModelService)); }
-  StringPropertyDataModality(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertyDataModality();
-  void setData(ImagePtr data);
+	static StringPropertyDataModalityPtr New(PatientModelServicePtr patientModelService) { return StringPropertyDataModalityPtr(new StringPropertyDataModality(patientModelService)); }
+	StringPropertyDataModality(PatientModelServicePtr patientModelService);
+	virtual ~StringPropertyDataModality();
+	void setData(ImagePtr data);
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
 
 protected:
-  ImagePtr mData;
-  PatientModelServicePtr mPatientModelService;
+	ImagePtr mData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 typedef boost::shared_ptr<class StringPropertyImageType> StringPropertyImageTypePtr;
@@ -292,25 +292,25 @@ typedef boost::shared_ptr<class StringPropertyImageType> StringPropertyImageType
  */
 class cxGui_EXPORT StringPropertyImageType : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyImageTypePtr New(PatientModelServicePtr patientModelService) { return StringPropertyImageTypePtr(new StringPropertyImageType(patientModelService)); }
-  StringPropertyImageType(PatientModelServicePtr patientModelService);
-  void setData(ImagePtr data);
-  virtual ~StringPropertyImageType();
+	static StringPropertyImageTypePtr New(PatientModelServicePtr patientModelService) { return StringPropertyImageTypePtr(new StringPropertyImageType(patientModelService)); }
+	StringPropertyImageType(PatientModelServicePtr patientModelService);
+	void setData(ImagePtr data);
+	virtual ~StringPropertyImageType();
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
 
 protected:
-  ImagePtr mData;
-  PatientModelServicePtr mPatientModelService;
+	ImagePtr mData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 
@@ -321,25 +321,25 @@ typedef boost::shared_ptr<class StringPropertyGlyphOrientationArray> StringPrope
  */
 class cxGui_EXPORT StringPropertyGlyphOrientationArray : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyGlyphOrientationArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphOrientationArrayPtr(new StringPropertyGlyphOrientationArray(patientModelService)); }
-  StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertyGlyphOrientationArray();
-  void setData(MeshPtr data);
+	static StringPropertyGlyphOrientationArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphOrientationArrayPtr(new StringPropertyGlyphOrientationArray(patientModelService)); }
+	StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService);
+	virtual ~StringPropertyGlyphOrientationArray();
+	void setData(MeshPtr data);
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
 
 protected:
-  MeshPtr mData;
-  PatientModelServicePtr mPatientModelService;
+	MeshPtr mData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 
@@ -350,25 +350,25 @@ typedef boost::shared_ptr<class StringPropertyGlyphColorArray> StringPropertyGly
  */
 class cxGui_EXPORT StringPropertyGlyphColorArray : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyGlyphColorArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphColorArrayPtr(new StringPropertyGlyphColorArray(patientModelService)); }
-  StringPropertyGlyphColorArray(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertyGlyphColorArray();
-  void setData(MeshPtr data);
+	static StringPropertyGlyphColorArrayPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphColorArrayPtr(new StringPropertyGlyphColorArray(patientModelService)); }
+	StringPropertyGlyphColorArray(PatientModelServicePtr patientModelService);
+	virtual ~StringPropertyGlyphColorArray();
+	void setData(MeshPtr data);
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
 
 protected:
-  MeshPtr mData;
-  PatientModelServicePtr mPatientModelService;
+	MeshPtr mData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 
@@ -380,25 +380,25 @@ typedef boost::shared_ptr<class StringPropertyGlyphLUT> StringPropertyGlyphLUTPt
  */
 class cxGui_EXPORT StringPropertyGlyphLUT : public StringPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  static StringPropertyGlyphLUTPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphLUTPtr(new StringPropertyGlyphLUT(patientModelService)); }
-  StringPropertyGlyphLUT(PatientModelServicePtr patientModelService);
-  virtual ~StringPropertyGlyphLUT();
-  void setData(MeshPtr data);
+	static StringPropertyGlyphLUTPtr New(PatientModelServicePtr patientModelService) { return StringPropertyGlyphLUTPtr(new StringPropertyGlyphLUT(patientModelService)); }
+	StringPropertyGlyphLUT(PatientModelServicePtr patientModelService);
+	virtual ~StringPropertyGlyphLUT();
+	void setData(MeshPtr data);
 
 public: // basic methods
-  virtual QString getDisplayName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
+	virtual QString getDisplayName() const;
+	virtual bool setValue(const QString& value);
+	virtual QString getValue() const;
 
 public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
+	virtual QString getHelp() const;
+	virtual QStringList getValueRange() const;
 
 protected:
-  MeshPtr mData;
-  PatientModelServicePtr mPatientModelService;
+	MeshPtr mData;
+	PatientModelServicePtr mPatientModelService;
 };
 
 
