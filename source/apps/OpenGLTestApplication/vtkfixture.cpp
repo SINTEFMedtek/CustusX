@@ -16,6 +16,9 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkNew.h>
 #include <vtkTextureObject.h>
+#include <vtkOpenGLVertexArrayObject.h>
+#include <vtkOpenGLProperty.h>
+#include <vtkOpenGLBufferObject.h>
 
 #include "cxGLHelpers.h"
 
@@ -200,8 +203,10 @@ void vtkfixture::printVtkOpenGLRenderWindowInfo(vtkSmartPointer<vtkOpenGLRenderW
 
 void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *argv[])
 {
+
 	vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
 	//cube->SetBounds(0,1,0,1,0,1);
+
 
 	vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper = createOpenGLPolyDataMapper();
 	mapper->SetInputConnection(cube->GetOutputPort());
@@ -213,10 +218,9 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		"//VTK::PositionVC::Dec", // replace the normal block
 		true, // before the standard replacements
 		"//VTK::PositionVC::Dec\n" // we still want the default
-		"in vec3 COLOR;\n"
-		"in vec3 VERTICES;\n"
-		"//attribute vec3 TexCoords;\n"
-		"out vec3 COLOR_OUT;\n",
+		"attribute vec3 COLOR_VSIN;\n"
+		"//in vec3 VERTICES;\n"
+		"varying vec3 COLOR_VSOUT;\n",
 		false // only do it once
 	);
 
@@ -225,8 +229,18 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		"//VTK::PositionVC::Impl", // replace the normal block
 		true, // before the standard replacements
 		"//VTK::PositionVC::Impl\n" // we still want the default
-		"COLOR_OUT = COLOR;\n"
-		"//COLOR_OUT = vec4(1.0, 0.0, 0.0, 1.0);\n", //this works
+		"COLOR_VSOUT = vec3(0.0,1.0,0.0);\n" //green
+		"if(COLOR_VSIN.x > 1.0)\n"
+		"	COLOR_VSOUT = vec3(1.0,1.0,1.0);\n" //white
+		"if(COLOR_VSIN.x < 1.0)\n"
+		"	COLOR_VSOUT = vec3(1.0,0.0,0.0);\n" //red
+		"if(COLOR_VSIN.x < 0.5)\n"
+		"	COLOR_VSOUT = vec3(0.0,0.0,1.0);\n" //blue
+		"if(COLOR_VSIN.x == 0.0)\n"
+		"	COLOR_VSOUT = vec3(0.2,0.2,0.2);\n" //dark grey
+		"if(COLOR_VSIN.x < 0.0)\n"
+		"	COLOR_VSOUT = vec3(0.8,0.8,0.8);\n" //light grey
+		"COLOR_VSOUT = COLOR_VSIN;\n",
 		false // only do it once
 	);
 
@@ -235,19 +249,22 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		"//VTK::System::Dec\n"  // always start with this line
 		"//VTK::Output::Dec\n"  // always have this line in your FS
 		"//uniform sampler3D my_texture[2];\n"
-		"in vec3 COLOR_OUT;\n"
-		"out vec3 color;\n"
+		"in vec3 COLOR_VSOUT;\n"
+		"out vec4 color;\n"
 		"void main () {\n"
-		"//gl_FragData[0] = texture3D(my_texture[0], vec3(0.5,0.5,0.5));\n"
-		"//gl_FragData[0] = vec4(0.8f,0.8f,0.8f,1);\n"
-		"//gl_FragData[0] = vec4(COLOR_OUT, 1.0f);\n"
-		"color = COLOR_OUT;\n"
-		"//color = vec3(1.0,0.0,0.0);\n"
+		"//gl_FragData[0] = vec4(COLOR_VSOUT, 1.0);\n"
+		"color = vec4(COLOR_VSOUT, 1.0);\n"
 		"}\n";
 	mapper->SetFragmentShaderCode(fragment_shader.c_str());
-	printActiveVertexAndFragmentShader(mapper);
+	//printActiveVertexAndFragmentShader(mapper);
 
 	vtkSmartPointer<vtkActor> actor = createActor(mapper);
+
+	/*
+	vtkSmartPointer<vtkOpenGLProperty> openGLproperty = static_cast<vtkOpenGLProperty*>(actor->GetProperty());
+	//openGLproperty->SetPropProgram(pgm);
+	openGLproperty->ShadingOn();
+	*/
 
 	// The renderer generates the image
 	// which is then displayed on the render window.
@@ -270,10 +287,41 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	// be needed by the texture object
 	//http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Rendering/OpenGL2/Testing/Cxx/TestCubeMap.cxx
 	renderWindow->Render();
+
+	//Init GLEW
+	//glutInit(&argc, argv);
+	//glutCreateWindow("GLEW Test");
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+	{
+	  // Problem: glewInit failed, something is seriously wrong.
+	  fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+	}
+	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 	report_gl_error();
 
-	//Clear graphics resources
-	//renderer->ReleaseGraphicsResources(renderWindow);
+
+	std::cout << "ALLOCATING" << std::endl;
+	vtkNew<vtkOpenGLBufferObject> tvbo;
+	tvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
+	if(!tvbo->Bind())
+		std::cout << "tvbo not bind" << std::endl;
+	report_gl_error();
+
+	std::cout << "UPLOADING" << std::endl;
+	if(!tvbo->Upload(
+				g_color_buffer_data,
+				3,
+				vtkOpenGLBufferObject::ArrayBuffer
+				))
+	{
+		vtkGenericWarningMacro(<< "Error uploading 'g_color_buffer_data'.");
+	}
+	report_gl_error();
+
+
+	vtkSmartPointer<vtkOpenGLVertexArrayObject> vao = vtkSmartPointer<vtkOpenGLVertexArrayObject>::New();
+	vao->Bind();
 
 	printOpenGLVersion();
 
@@ -306,6 +354,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	vtkSmartPointer<ShaderCallback> callback = vtkSmartPointer<ShaderCallback>::New();
 	callback->mRenderWindow = opengl_renderwindow;
 	callback->mCube = cube;
+	callback->mTvbo = tvbo.Get();
 	//mapper->AddObserver(vtkCommand::EndEvent,callback);
 
 	mapper->AddObserver(vtkCommand::UpdateShaderEvent,callback);
@@ -325,6 +374,9 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 
 	// This starts the event loop and as a side effect causes an initial render.
 	renderWindowInteractor->Start();
+
+	vao->Release();
+	renderer->ReleaseGraphicsResources(renderWindow);
 
 }
 
