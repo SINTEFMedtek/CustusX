@@ -8,7 +8,7 @@
 #include <vtkOpenGLIndexBufferObject.h>
 #include <vtkShader.h>
 #include <vtkOpenGLRenderWindow.h>
-#include <vtkCubeSource.h>
+//#include <vtkCubeSource.h>
 
 #include "vtkfixture.h"
 
@@ -116,84 +116,45 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 
 		if(cellBO && cellBO->VAO)
 		{
-
 			report_gl_error();
 
 			vtkShaderProgram *program = cellBO->Program;
-			//program->SetDebug(true);
 			vtkOpenGLVertexArrayObject *vao = cellBO->VAO;
 
 			std::cout << "Program is compiled? " << program->GetCompiled() << std::endl;
 			std::cout << "Program is bound? " << program->isBound() << std::endl;
-
 			std::cout << "IBO index count " << cellBO->IBO->IndexCount << std::endl;
-
-			//VAO
-			//vao->Bind();
 			report_gl_error();
 
 
-			/*
 			GLint color_frag_out_index = glGetFragDataLocation(cellBO->Program->GetHandle(), "color");
 			std::cout << "color index " << color_frag_out_index << std::endl;
 			glBindFragDataLocation(cellBO->Program->GetHandle(), color_frag_out_index, "color");
-			*/
 
 
-			//Buffer
-			//static bool allocated = false;
-			//if(!allocated)
-			//{
-				/*
-				std::cout << "ALLOCATING" << std::endl;
-				vtkNew<vtkOpenGLBufferObject> tvbo;
-				tvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
-				if(!tvbo->Bind())
-					std::cout << "tvbo not bind" << std::endl;
-				report_gl_error();
+			std::cout << "ADDING ATTRIBUTE ARRAY" << std::endl;
+			/*
+			vao->Bind();
+			if (!vao->AddAttributeArray(program, vbo.Get(), "vertexMC", 0, sizeof(float)*3, VTK_FLOAT, 3, false))
+			{
+				vtkGenericWarningMacro(<< "Error setting 'vertexMC' in shader VAO.");
+			}
+			 */
+			vao->Bind();
+			if (!vao->AddAttributeArray(
+						program,		//vtkShaderProgram
+						mTvbo.Get(),	//vtkOpenGLBufferObject
+						"COLOR_VSIN",	//std::string
+						0,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
+						sizeof(float)*3,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
+						VTK_FLOAT,		//int (elementType)			Specifies the data type of each component in the array
+						3,				//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
+						false			//bool (normalize)
+						))
+			{
+				vtkGenericWarningMacro(<< "Error setting 'COLOR' in shader VAO.");
+			}
 
-				std::cout << "UPLOADING" << std::endl;
-				if(!tvbo->Upload(
-							g_color_buffer_data,
-							3,
-							vtkOpenGLBufferObject::ArrayBuffer
-							))
-				{
-					vtkGenericWarningMacro(<< "Error uploading 'g_color_buffer_data'.");
-				}
-				*/
-
-				std::cout << "ADDING ATTRIBUTE ARRAY" << std::endl;
-				if (!vao->AddAttributeArray(
-							program,		//vtkShaderProgram
-							mTvbo.Get(),	//vtkOpenGLBufferObject
-							"COLOR_VSIN",	//std::string
-							0,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
-							0,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
-							VTK_FLOAT,		//int (elementType)			Specifies the data type of each component in the array
-							3,				//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
-							false			//bool (normalize)
-							))
-				{
-					vtkGenericWarningMacro(<< "Error setting 'COLOR' in shader VAO.");
-				}
-
-				report_gl_error();
-
-				//tvbo->Release();
-				report_gl_error();
-				//allocated = true;
-			//}
-
-				/*
-			cellBO->AttributeUpdateTime.Modified();
-			cellBO->VAO->Modified();
-			cellBO->IBO->Modified();
-			cellBO->Program->Modified();
-			cellBO->ShaderSourceTime.Modified();
-			*/
-
-			//vao->Release();
 			report_gl_error();
 			std::cout << "--- END UpdateShaderEvent" << std::endl;
 
@@ -210,8 +171,8 @@ void ShaderCallback::Execute(vtkObject *, unsigned long event, void *cbo)
 		std::cout << "NO CONTEXT!!!" << std::endl;
 	mRenderWindow->MakeCurrent();
 
-	//test2(event, cbo); //this works
-	test(event, cbo); //this does not work
+	//test2(event, cbo)
+	test(event, cbo); //WORKS!
 
 }
 /*

@@ -203,10 +203,12 @@ void vtkfixture::printVtkOpenGLRenderWindowInfo(vtkSmartPointer<vtkOpenGLRenderW
 
 void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *argv[])
 {
+	//TODO
+	// 1: upload vertexMC to VAO
+	// 2: modify vertex shader to pass on vertexMC
+	// 3: read vertexMC in fragment shader
 
 	vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
-	//cube->SetBounds(0,1,0,1,0,1);
-
 
 	vtkSmartPointer<vtkOpenGLPolyDataMapper> mapper = createOpenGLPolyDataMapper();
 	mapper->SetInputConnection(cube->GetOutputPort());
@@ -260,12 +262,6 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 
 	vtkSmartPointer<vtkActor> actor = createActor(mapper);
 
-	/*
-	vtkSmartPointer<vtkOpenGLProperty> openGLproperty = static_cast<vtkOpenGLProperty*>(actor->GetProperty());
-	//openGLproperty->SetPropProgram(pgm);
-	openGLproperty->ShadingOn();
-	*/
-
 	// The renderer generates the image
 	// which is then displayed on the render window.
 	// It can be thought of as a scene to which the actor is added
@@ -301,6 +297,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	report_gl_error();
 
 
+	//Only need to allocate and upload once
 	std::cout << "ALLOCATING" << std::endl;
 	vtkNew<vtkOpenGLBufferObject> tvbo;
 	tvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
@@ -309,19 +306,17 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	report_gl_error();
 
 	std::cout << "UPLOADING" << std::endl;
+	//vbo->Upload(verts, numVerts*3, vtkOpenGLBufferObject::ArrayBuffer);
+	int numberOfColorLinesInBuffer = 81; // see buffer declared in shadercallback.h
 	if(!tvbo->Upload(
 				g_color_buffer_data,
-				3,
+				numberOfColorLinesInBuffer*3,  //how many floats to upload! (aka number of floats in the vector)
 				vtkOpenGLBufferObject::ArrayBuffer
 				))
 	{
 		vtkGenericWarningMacro(<< "Error uploading 'g_color_buffer_data'.");
 	}
 	report_gl_error();
-
-
-	vtkSmartPointer<vtkOpenGLVertexArrayObject> vao = vtkSmartPointer<vtkOpenGLVertexArrayObject>::New();
-	vao->Bind();
 
 	printOpenGLVersion();
 
@@ -334,7 +329,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		//opengl_upload3dTextures();
 		//vtk_upload3dTextures();
 	}
-	opengl_renderwindow->MakeCurrent();
+	opengl_renderwindow->MakeCurrent(); //set current context
 
 	/*
 	// Create a texture object from our set of cube map images
@@ -352,18 +347,11 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 
 	// Setup a callback to change some uniforms
 	vtkSmartPointer<ShaderCallback> callback = vtkSmartPointer<ShaderCallback>::New();
-	callback->mRenderWindow = opengl_renderwindow;
-	callback->mCube = cube;
-	callback->mTvbo = tvbo.Get();
-	//mapper->AddObserver(vtkCommand::EndEvent,callback);
+	callback->mRenderWindow = opengl_renderwindow; //used to set current context
+	//callback->mCube = cube; // not used
+	callback->mTvbo = tvbo.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
 
 	mapper->AddObserver(vtkCommand::UpdateShaderEvent,callback);
-
-	//TODO
-	// 1: upload vertexMC to VAO
-	// 2: modify vertex shader to pass on vertexMC
-	// 3: read vertexMC in fragment shader
-
 
 	// The render window interactor captures mouse events
 	// and will perform appropriate camera or actor manipulation
@@ -375,8 +363,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	// This starts the event loop and as a side effect causes an initial render.
 	renderWindowInteractor->Start();
 
-	vao->Release();
-	renderer->ReleaseGraphicsResources(renderWindow);
+	//renderer->ReleaseGraphicsResources(renderWindow);
 
 }
 

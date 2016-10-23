@@ -22,7 +22,7 @@ public:
   ShaderCallback();
 
   vtkSmartPointer<class vtkOpenGLRenderWindow> mRenderWindow;
-  vtkSmartPointer<class vtkCubeSource> mCube;
+  //vtkSmartPointer<class vtkCubeSource> mCube;
   vtkSmartPointer<class vtkOpenGLBufferObject> mTvbo;
 
   void test2(unsigned long event, void *cbo);
