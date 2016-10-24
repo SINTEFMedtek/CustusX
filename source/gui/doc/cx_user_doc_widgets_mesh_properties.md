@@ -41,7 +41,9 @@ Set texture on the mesh by selecting a previously imported 2D image (File -> Imp
 Texture shape controls the geometric shape of the texture.
 This can only be selected from predefined shapes.
 
-The scale controls how many times to draw the image and the position controls where to draw it.
+The texture is defined on a sheet ranging from 0 to 1 in two dimensions (x and y). Use *Position*
+to position the texture on this sheet. *Scale* >1 shrinks the texture to be smaller than the sheet.
+Use *Repeat* to paint only one texture or to repeat it over the available sheet.
 
 Experimentation is needed to fit a texture to a mesh and it might not be possible to get a good fit for all meshes.
 
