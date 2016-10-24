@@ -4,6 +4,12 @@
 #include <string.h>
 #include <iostream>
 
+#define MAX_WIDTH 100
+#define MAX_HEIGTH 100
+#define MAX_DEPTH 100
+#define NUM_COMPONENTS 4
+static unsigned char texture_data[MAX_WIDTH][MAX_HEIGTH][MAX_DEPTH][NUM_COMPONENTS];
+
 template <typename IN, typename OUT>
 void print(IN *data, unsigned int data_size)
 {
@@ -14,11 +20,25 @@ void print(IN *data, unsigned int data_size)
 	std::cout << std::endl;
 }
 
-unsigned char *generateTexture(unsigned int x, unsigned int y, unsigned int z, float color)
+unsigned char *checkerboard(unsigned int width, unsigned int height, unsigned int depth)
 {
-	unsigned int data_size = x*y*z;
-	unsigned char *data = new unsigned char[data_size];
-	memset(data, color, data_size);
+	//TODO her må det være noe feil...
+	int i,j,k,c;
 
-	//print<unsigned char, float>(data, data_size);
+	for(i=0; i<height; ++i)
+	{
+		for(j=0; j<width; ++j)
+		{
+			for(k=0; k<depth; ++k)
+			{
+				c=((((i&0x8)==0)^((j&0x8))==0))*255;
+				texture_data[i][j][k][0] = (unsigned char) c;
+				texture_data[i][j][k][1] = (unsigned char) c;
+				texture_data[i][j][k][2] = (unsigned char) c;
+				texture_data[i][j][k][3] = (unsigned char) 255;
+			}
+		}
+	}
+
+	return &texture_data[0][0][0][0];
 }

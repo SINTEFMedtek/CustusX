@@ -24,11 +24,14 @@ public:
   vtkSmartPointer<class vtkOpenGLRenderWindow> mRenderWindow;
   //vtkSmartPointer<class vtkCubeSource> mCube;
   vtkSmartPointer<class vtkOpenGLBufferObject> mTvbo;
+  vtkSmartPointer<class vtkTextureObject> mTexObject;
 
   void test2(unsigned long event, void *cbo);
   void test(unsigned long event, void *cbo);
 };
 
+
+//81 lines with 3 values each == 243 values
 static const GLfloat g_color_buffer_data[] = {
 	1.0f,  0.0f,  0.0f,
 	0.0f,  1.0f,  0.0f,

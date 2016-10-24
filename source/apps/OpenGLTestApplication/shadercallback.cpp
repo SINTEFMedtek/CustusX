@@ -8,6 +8,7 @@
 #include <vtkOpenGLIndexBufferObject.h>
 #include <vtkShader.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkTextureObject.h>
 //#include <vtkCubeSource.h>
 
 #include "vtkfixture.h"
@@ -129,7 +130,7 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 
 			GLint color_frag_out_index = glGetFragDataLocation(cellBO->Program->GetHandle(), "color");
 			std::cout << "color index " << color_frag_out_index << std::endl;
-			glBindFragDataLocation(cellBO->Program->GetHandle(), color_frag_out_index, "color");
+			glBindFragDataLocation(cellBO->Program->GetHandle(), color_frag_out_index, "color"); //setting output of fragment shader
 
 
 			std::cout << "ADDING ATTRIBUTE ARRAY" << std::endl;
@@ -154,6 +155,10 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 			{
 				vtkGenericWarningMacro(<< "Error setting 'COLOR' in shader VAO.");
 			}
+
+			//Setting texture sampler id
+			if(!program->SetUniformi("my_texture", mTexObject->GetTextureUnit())) //not the handle
+				std::cout << "my_texture -------------------------------------> ERROR!!!" << std::endl;
 
 			report_gl_error();
 			std::cout << "--- END UpdateShaderEvent" << std::endl;

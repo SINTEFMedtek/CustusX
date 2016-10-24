@@ -130,8 +130,8 @@ void vtkfixture::opengl_upload3dTextures()
 
 	std::cout << "4" << std::endl;
 	int width, height, depth = 30;
-	unsigned char* image1 = generateTexture(width, height, depth, 0.2f);
-	unsigned char* image2 = generateTexture(width, height, depth, 0.8f);
+	float* image1 = generateTexture(width, height, depth, 0.2f);
+	float* image2 = generateTexture(width, height, depth, 0.8f);
 
 	//----- TEXTURE1 -----
 	std::cout << "5" << std::endl;
@@ -203,10 +203,6 @@ void vtkfixture::printVtkOpenGLRenderWindowInfo(vtkSmartPointer<vtkOpenGLRenderW
 
 void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *argv[])
 {
-	//TODO
-	// 1: upload vertexMC to VAO
-	// 2: modify vertex shader to pass on vertexMC
-	// 3: read vertexMC in fragment shader
 
 	vtkSmartPointer<vtkCubeSource> cube = vtkSmartPointer<vtkCubeSource>::New();
 
@@ -250,15 +246,22 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	std::string fragment_shader =
 		"//VTK::System::Dec\n"  // always start with this line
 		"//VTK::Output::Dec\n"  // always have this line in your FS
-		"//uniform sampler3D my_texture[2];\n"
 		"in vec3 COLOR_VSOUT;\n"
 		"out vec4 color;\n"
+		"uniform sampler3D my_texture;\n"
 		"void main () {\n"
 		"//gl_FragData[0] = vec4(COLOR_VSOUT, 1.0);\n"
-		"color = vec4(COLOR_VSOUT, 1.0);\n"
+		"//color = vec4(COLOR_VSOUT, 1.0);\n" //works
+		"color = texture(my_texture, vec3(0.0, 0.0, 0.0));\n"
+		"if(color.x == 1.0f)\n"
+		"	color = vec4(0.0,1.0,0.0, 1.0);\n" //green
+		"else\n"
+		"	color = vec4(1.0,0.0,0.0, 1.0);\n" //red
+		"color = texture(my_texture, vec3(0.5, 0.5, 0.5));\n"
 		"}\n";
 	mapper->SetFragmentShaderCode(fragment_shader.c_str());
 	//printActiveVertexAndFragmentShader(mapper);
+
 
 	vtkSmartPointer<vtkActor> actor = createActor(mapper);
 
@@ -284,6 +287,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	//http://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Rendering/OpenGL2/Testing/Cxx/TestCubeMap.cxx
 	renderWindow->Render();
 
+	// --------------------------------------------------------------------------------
+
 	//Init GLEW
 	//glutInit(&argc, argv);
 	//glutCreateWindow("GLEW Test");
@@ -296,16 +301,18 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 	report_gl_error();
 
+	printOpenGLVersion();
+
 
 	//Only need to allocate and upload once
-	std::cout << "ALLOCATING" << std::endl;
+	std::cout << "ALLOCATING BUFFER FOR COLOR" << std::endl;
 	vtkNew<vtkOpenGLBufferObject> tvbo;
 	tvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
 	if(!tvbo->Bind())
 		std::cout << "tvbo not bind" << std::endl;
 	report_gl_error();
 
-	std::cout << "UPLOADING" << std::endl;
+	std::cout << "UPLOADING COLOR DATA" << std::endl;
 	//vbo->Upload(verts, numVerts*3, vtkOpenGLBufferObject::ArrayBuffer);
 	int numberOfColorLinesInBuffer = 81; // see buffer declared in shadercallback.h
 	if(!tvbo->Upload(
@@ -318,7 +325,6 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	}
 	report_gl_error();
 
-	printOpenGLVersion();
 
 	vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow.Get());
 	if(!opengl_renderwindow)
@@ -326,32 +332,61 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	else
 	{
 		printVtkOpenGLRenderWindowInfo(opengl_renderwindow);
-		//opengl_upload3dTextures();
-		//vtk_upload3dTextures();
 	}
-	opengl_renderwindow->MakeCurrent(); //set current context
+	//opengl_renderwindow->MakeCurrent(); //set current context
 
-	/*
-	// Create a texture object from our set of cube map images
+	// Create a 3D texture object
+	std::cout << "ALLOCATING AND UPLOADING TEXTURE OBJECT" << std::endl;
 	vtkNew<vtkTextureObject> texObject;
 	texObject->SetContext(opengl_renderwindow);
-	//texObject->CreateCubeFromRaw(dims[0], dims[1], 3, imgs[0]->GetScalarType(), images);
-	unsigned int width = 3;
-	unsigned int height = 3;
-	unsigned int depth = 3;
-	int numComps = 1;
+	unsigned int width = 4;
+	unsigned int height = 4;
+	unsigned int depth = 4;
+	int numComps = 3;
 	int dataType = VTK_FLOAT;
-	void *data = generateTexture(width, height, depth, 0.2f);
-	texObject->Create3DFromRaw(width, height, depth, numComps, dataType, data);
-	*/
+	//void *data = generateTexture<float>(width, height, depth, 0.0f);  //numComps=1, dataType=VTK_FLOAT (does not work???)
+	void *data = (void*)g_color_buffer_data; //numComps=3, dataType = VTK_FLOAT 	//4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
+	//void *data = (void*)checkerboard(width, height, depth); //numComps=4, dataType=VTK_UNSIGNED_CHAR (does not work???)
+	if(!texObject->Create3DFromRaw(width, height, depth, numComps, dataType, data))
+		std::cout << "---------------------------------------- > Error creating 3D texture" << std::endl;
 
-	// Setup a callback to change some uniforms
+	//6403 == GL_RED 0x1903
+	//6407 == GL_RGB 0x1907
+	//6408 == GL_RGBA 0x1908
+	std::cout << texObject->GetFormat(dataType, numComps, true) << std::endl;
+
+	texObject->Activate();
+
+	texObject->SetWrapS(vtkTextureObject::ClampToEdge);
+	texObject->SetWrapT(vtkTextureObject::ClampToEdge);
+	texObject->SetWrapR(vtkTextureObject::ClampToEdge);
+	texObject->SetMagnificationFilter(vtkTextureObject::Linear);
+	texObject->SetMinificationFilter(vtkTextureObject::Linear);
+	texObject->SendParameters();
+
+
+	std::cout << "Texture unit: " << texObject->GetTextureUnit() << std::endl;
+	texObject->PrintSelf(std::cout, vtkIndent(4));
+
+	report_gl_error();
+
+	//TODO
+	// 1: upload vertexMC to VAO
+	// 2: modify vertex shader to pass on vertexMC
+	// 3: read vertexMC in fragment shader
+
+	// --------------------------------------------------------------------------------
+
+	// Setup a callback to change some uniforms and attributes
 	vtkSmartPointer<ShaderCallback> callback = vtkSmartPointer<ShaderCallback>::New();
 	callback->mRenderWindow = opengl_renderwindow; //used to set current context
 	//callback->mCube = cube; // not used
 	callback->mTvbo = tvbo.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
+	callback->mTexObject = texObject.Get();
 
 	mapper->AddObserver(vtkCommand::UpdateShaderEvent,callback);
+
+	// --------------------------------------------------------------------------------
 
 	// The render window interactor captures mouse events
 	// and will perform appropriate camera or actor manipulation
@@ -363,7 +398,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	// This starts the event loop and as a side effect causes an initial render.
 	renderWindowInteractor->Start();
 
-	//renderer->ReleaseGraphicsResources(renderWindow);
+	renderer->ReleaseGraphicsResources(renderWindow);
 
 }
 
