@@ -102,8 +102,6 @@ void MeshTextureData::initialize()
 
 	mRepeat = BoolProperty::initialize("repeat", "Repeat", "Repeat texture over surface", true);
 	this->addProperty(mRepeat);
-	mEdgeClamp = BoolProperty::initialize("edge_clamp", "Edge Clamp", "Clamp texture at edges when repeat is off", false);
-	this->addProperty(mEdgeClamp);
 }
 
 QString MeshTextureData::getSphereText() const
@@ -134,10 +132,6 @@ DoublePropertyPtr MeshTextureData::getPositionX() const
 BoolPropertyPtr MeshTextureData::getRepeat() const
 {
 	return mRepeat;
-}
-BoolPropertyPtr MeshTextureData::getEdgeClamp() const
-{
-	return mEdgeClamp;
 }
 
 std::vector<PropertyPtr> MeshTextureData::getProperties() const
