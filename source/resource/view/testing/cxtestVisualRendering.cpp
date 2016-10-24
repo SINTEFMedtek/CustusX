@@ -352,6 +352,26 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 	CHECK(fixture.getFractionOfBrightPixelsInView(0,20,2) > 0.02);
 }
 
+// Experimental opengl test based on "Visual rendering: Show Axial GPU slice, 1 volume"
+TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
+		  "[opengl][resource][visualization]")
+{
+	cxtest::ViewsFixture fixture;
+
+	std::vector<cx::ImagePtr> images(1);
+
+	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(10, 255);
+	images[0] = cx::ImagePtr(new cx::Image("dummyImageUid1", dummyImageData, "dummyImageName1"));
+
+	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
+
+	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+	REQUIRE(fixture.quickRunWidget());
+
+	CHECK(fixture.getFractionOfBrightPixelsInView(0,20,2) > 0.02);
+}
+
 //Tagged as unstable as it sometimes fail in Linux
 TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
