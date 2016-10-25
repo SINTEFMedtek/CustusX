@@ -12,8 +12,8 @@
 //------------------------------------------------------------------------------------
 
 #define MAX_TEXTURE_SIZE 1000
-//static unsigned char generated_texture[MAX_TEXTURE_SIZE];
-static float generated_texture[MAX_TEXTURE_SIZE];
+static unsigned char generated_texture[MAX_TEXTURE_SIZE];
+//static float generated_texture[MAX_TEXTURE_SIZE];
 
 template <typename TYPE>
 TYPE *generateTexture(unsigned int x, unsigned int y, unsigned int z,

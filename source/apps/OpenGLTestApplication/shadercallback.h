@@ -23,8 +23,8 @@ public:
 
   vtkSmartPointer<class vtkOpenGLRenderWindow> mRenderWindow; //containing the opengl context
   //vtkSmartPointer<class vtkCubeSource> mCube;
-  vtkSmartPointer<class vtkOpenGLBufferObject> mTvbo; //color data
-  vtkSmartPointer<class vtkOpenGLBufferObject> mTexvbo; //texture coordinate data
+  vtkSmartPointer<class vtkOpenGLBufferObject> mColorBufferObject; //color data
+  vtkSmartPointer<class vtkOpenGLBufferObject> mTextureBufferObject; //texture coordinate data
   vtkSmartPointer<class vtkTextureObject> mTextureObject1; //texture object -> glsl: sampler
   vtkSmartPointer<class vtkTextureObject> mTextureObject2; //texture object -> glsl: sampler
 

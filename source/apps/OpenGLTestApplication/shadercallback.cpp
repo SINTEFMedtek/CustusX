@@ -145,7 +145,7 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 			int vec_size = 3;
 			if (!vao->AddAttributeArray(
 						program,		//vtkShaderProgram
-						mTvbo.Get(),	//vtkOpenGLBufferObject
+						mColorBufferObject.Get(),	//vtkOpenGLBufferObject
 						"COLOR_VSIN",	//std::string
 						0,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
 						sizeof(float)*3,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
@@ -161,7 +161,7 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 			vec_size = 3;
 			if (!vao->AddAttributeArray(
 						program,		//vtkShaderProgram
-						mTexvbo.Get(),	//vtkOpenGLBufferObject
+						mTextureBufferObject.Get(),	//vtkOpenGLBufferObject
 						"TEXTURE_COORDINATE_VSIN",	//std::string
 						0,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
 						sizeof(float)*3,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
@@ -193,7 +193,7 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 void ShaderCallback::Execute(vtkObject *, unsigned long event, void *cbo)
 {
 	if(!mRenderWindow)
-		std::cout << "NO CONTEXT!!!" << std::endl;
+		std::cout << "ERROR NO CONTEXT!!!" << std::endl;
 	mRenderWindow->MakeCurrent();
 
 	//test2(event, cbo)

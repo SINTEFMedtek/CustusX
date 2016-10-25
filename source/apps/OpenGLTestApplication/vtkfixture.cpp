@@ -233,14 +233,14 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	//===========
 	//Only need to allocate and upload once
 	std::cout << "ALLOCATING BUFFER FOR COLOR" << std::endl;
-	vtkNew<vtkOpenGLBufferObject> tvbo;
-	tvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
-	if(!tvbo->Bind())
+	vtkNew<vtkOpenGLBufferObject> color_buffer_object;
+	color_buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
+	if(!color_buffer_object->Bind())
 		std::cout << "tvbo not bind" << std::endl;
 	report_gl_error();
 
 	std::cout << "UPLOADING COLOR DATA" << std::endl;
-	if(!tvbo->Upload(
+	if(!color_buffer_object->Upload(
 				color_data,
 				numberOfColors*numberOfComponentsPerColor,  //how many floats to upload! (aka number of floats in the vector)
 				vtkOpenGLBufferObject::ArrayBuffer
@@ -257,15 +257,15 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	//===========
 	//Only need to allocate and upload once
 	std::cout << "ALLOCATING BUFFER FOR TEXTURE COORDINATES" << std::endl;
-	vtkNew<vtkOpenGLBufferObject> texvbo;
-	texvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
-	if(!texvbo->Bind())
+	vtkNew<vtkOpenGLBufferObject> texture_buffer_object;
+	texture_buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
+	if(!texture_buffer_object->Bind())
 		std::cout << "texvbo not bind" << std::endl;
 	report_gl_error();
 
 	std::cout << "UPLOADING TEXTURE DATA" << std::endl;
 	numberOfComponentsPerTexture = 3;
-	if(!texvbo->Upload(
+	if(!texture_buffer_object->Upload(
 				texture_data,
 				numberOfTextureCoordinates*numberOfComponentsPerTexture,  //how many floats to upload! (aka number of floats in the vector)
 				vtkOpenGLBufferObject::ArrayBuffer
@@ -298,15 +298,16 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	unsigned int width = 4;
 	unsigned int height = 4;
 	unsigned int depth = 4;
-	int dataType = VTK_FLOAT;
-	//void *data = generateTexture<unsigned char>(width, height, depth, 200, 140, 0, 200);  //numComps=4, dataType=VTK_UNSIGNED_CHAR (WORKS!!!)
 
 	int numComps = 3;
+	int dataType = VTK_FLOAT;
 	void *data1 = (void*)color_data; //numComps=3, dataType = VTK_FLOAT  //4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
 	vtkSmartPointer<vtkTextureObject> texture_object_1 = createTextureObject(depth, width, dataType, numComps, height, opengl_renderwindow, data1);
 
 	numComps = 4;
-	void *data2 = generateTexture<float>(width, height, depth, 0.5f, 0.1f, 0.2f, 1.0f);  //numComps=4, dataType=VTK_FLOAT (WORKS!!!)
+	dataType = VTK_UNSIGNED_CHAR;
+	void *data2 = generateTexture<unsigned char>(width, height, depth, 200, 140, 0, 200);  //numComps=4, dataType=VTK_UNSIGNED_CHAR (WORKS!!!)
+	//void *data2 = generateTexture<float>(width, height, depth, 0.5f, 0.1f, 0.2f, 1.0f);  //numComps=4, dataType=VTK_FLOAT (WORKS!!!)
 	vtkSmartPointer<vtkTextureObject> texture_object_2 = createTextureObject(depth, width, dataType, numComps, height, opengl_renderwindow, data2);
 
 	// --------------------------------------------------------------------------------
@@ -317,8 +318,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	vtkSmartPointer<ShaderCallback> callback = vtkSmartPointer<ShaderCallback>::New();
 	callback->mRenderWindow = opengl_renderwindow; //used to set current context
 	//callback->mCube = cube; // not used
-	callback->mTvbo = texvbo.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
-	callback->mTexvbo = texvbo.Get(); //used to set in/attribute TEXTURE_COORDINATE_VSIN in vertex shader
+	callback->mColorBufferObject = color_buffer_object.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
+	callback->mTextureBufferObject = texture_buffer_object.Get(); //used to set in/attribute TEXTURE_COORDINATE_VSIN in vertex shader
 	callback->mTextureObject1 = texture_object_1.Get(); //used to set sampler in frament shader
 	callback->mTextureObject2 = texture_object_2.Get(); //used to set sampler in frament shader
 
