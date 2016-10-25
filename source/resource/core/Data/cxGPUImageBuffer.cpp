@@ -158,7 +158,7 @@ public:
 
 //		glEnable( GL_TEXTURE_3D );
 		glBindTexture(GL_TEXTURE_3D, textureId);
-		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );//GL_CLAMP is no longer allowed. Try with GL_CLAMP_TO_EDGE
+		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );//GL_CLAMP is no longer allowed. Try with GL_CLAMP_TO_BORDER
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER );
 		glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );

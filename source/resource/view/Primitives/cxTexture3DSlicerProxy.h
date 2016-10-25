@@ -157,12 +157,12 @@ private:
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
 	vtkOpenGLPolyDataMapperPtr mOpenGLPolyDataMapper;
 //	vtkNew<vtkOpenGLPolyDataMapper> mOpenGLPolyDataMapper;
-	vtkTexturePtr mTexture;
+//	vtkTexturePtr mTexture;
 
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);
-	QString loadShaderFile();
-	QString replaceShaderSourceMacros(QString shaderSource);
+//	QString loadShaderFile();
+//	QString replaceShaderSourceMacros(QString shaderSource);
 
 
 	std::vector<ShaderCallbackPtr> mElement;

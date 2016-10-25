@@ -142,89 +142,89 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
 	mOpenGLPolyDataMapper->SetInputData(mPolyData);
 
-
+	//===========
+	// Modify vertex shader declarations
+	//===========
 	mOpenGLPolyDataMapper->AddShaderReplacement(
 				vtkShader::Vertex,
 				"//VTK::PositionVC::Dec", // replace the normal block
 				true, // before the standard replacements
 				"//VTK::PositionVC::Dec\n" // we still want the default
-				"//attribute vec4  AttrMultiTexCoord0;\n"
-				"//varying vec4 VaryingTexCoord0;\n"
-				"uniform mat4 tcMatric;\n"
-				"uniform vec2 tcoordMC;\n"
-				"varying vec3 cx_tcoordVCVSOutput;\n",
+				"attribute vec3 COLOR_VSIN;\n"
+				"attribute vec3 TEXTURE_COORDINATE_VSIN;\n"
+				"varying vec3 COLOR_VSOUT;\n"
+				"varying vec3 TEXTURE_COORDINATE_VSOUT;\n",
 				false // only do it once
 				);
+
+	//===========
+	// Modify vertex shader implementations
+	//===========
 	mOpenGLPolyDataMapper->AddShaderReplacement(
 				vtkShader::Vertex,
-				"//VTK::Light::Impl", // replace the normal block
+				"//VTK::PositionVC::Impl", // replace the normal block
 				true, // before the standard replacements
-				"//VaryingTexCoord0 = AttrMultiTexCoord0;\n"
-				"vec4 cx_tcoordTemp = tcMatric*vec4(tcoordMC, 0.5, 1.0);\n"
-				"cx_tcoordVCVSOutput = cx_tcoordTemp.xyz/cx_tcoordTemp.w;\n"
-				"//VTK::Light::Impl\n", // we still want the default
+				"//VTK::PositionVC::Impl\n" // we still want the default
+				"COLOR_VSOUT = COLOR_VSIN;\n"
+				"TEXTURE_COORDINATE_VSOUT = TEXTURE_COORDINATE_VSIN;\n",
 				false // only do it once
 				);
 
-	mOpenGLPolyDataMapper->SetFragmentShaderCode(
-	  "//VTK::System::Dec\n"  // always start with this line
-	  "//VTK::Output::Dec\n"  // always have this line in your FS
-	  "//varying vec3 normalVCVSOutput;\n"
-	  "uniform sampler3D cxTextureSamplers[4];\n"
-	  "varying vec3 cx_tcoordVCVSOutput;\n"
-	  "void main () {\n"
-	  "//  gl_FragData[0] = texture3D(cxTextureSamplers[0], cx_tcoordVCVSOutput.xyz);\n"
-	  "//  gl_FragData[0] = vec4(1.0, 0.0, 0.0, 1.0);\n"
-	  "  gl_FragData[0] = texture3D(cxTextureSamplers[0], vec3(0.5, 0.5, 0.5));\n"
-	  "}\n"
-	  );
-
-	//TODO: What vertex shader is old CX code using?
-
-//	QString shaderSource = this->loadShaderFile();
-//	shaderSource = this->replaceShaderSourceMacros(shaderSource);
-//	mOpenGLPolyDataMapper->SetFragmentShaderCode(cstring_cast(shaderSource));
+	//===========
+	// Replace the fragment shader
+	//===========
+	std::string fragment_shader =
+		"//VTK::System::Dec\n"  // always start with this line
+		"//VTK::Output::Dec\n"  // always have this line in your FS
+		"in vec3 COLOR_VSOUT;\n"
+		"in vec3 TEXTURE_COORDINATE_VSOUT;\n"
+		"uniform sampler3D my_texture;\n"
+		"out vec4 color;\n"
+		"void main () {\n"
+		"	color = texture(my_texture, TEXTURE_COORDINATE_VSOUT);\n"
+		"}\n";
+	mOpenGLPolyDataMapper->SetFragmentShaderCode(fragment_shader.c_str());
 
 	mActor->SetMapper(mOpenGLPolyDataMapper.Get());
 //	mActor->SetTexture(mTexture);
 }
 
-//copied from TextureSlicePainter
-QString Texture3DSlicerProxyImpl::loadShaderFile()
-{
-	QString mShaderPath = DataLocations::findConfigFolder("/shaders");
-	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
-	QFile fp(filepath);
-	if (fp.exists())
-	{
-		fp.open(QFile::ReadOnly);
-		QTextStream shaderfile(&fp);
-		return shaderfile.readAll();
-	}
-	else
-	{
-		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
-	}
-	return "";
-}
+////copied from TextureSlicePainter
+//QString Texture3DSlicerProxyImpl::loadShaderFile()
+//{
+//	QString mShaderPath = DataLocations::findConfigFolder("/shaders");
+//	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
+//	QFile fp(filepath);
+//	if (fp.exists())
+//	{
+//		fp.open(QFile::ReadOnly);
+//		QTextStream shaderfile(&fp);
+//		return shaderfile.readAll();
+//	}
+//	else
+//	{
+//		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
+//	}
+//	return "";
+//}
 
-//copied from TextureSlicePainter
-QString Texture3DSlicerProxyImpl::replaceShaderSourceMacros(QString shaderSource)
-{
-	// set constant layers
-//	int layers = this->mElement.size();
-	int layers = 1;//temp hack
-	shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
+////copied from TextureSlicePainter
+//QString Texture3DSlicerProxyImpl::replaceShaderSourceMacros(QString shaderSource)
+//{
+//	// set constant layers
+////	int layers = this->mElement.size();
+//	int layers = 1;//temp hack
+//	shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
 
-	// fill function vec4 sampleLut(in int index, in float idx)
-	QString element = "\tif (index==%1) return texture1D(lut[%1], idx);\n";
-	QString sampleLutContent;
-	for (unsigned i=0; i<layers; ++i)
-		sampleLutContent += element.arg(i);
-	shaderSource = shaderSource.replace("${SAMPLE_LUT_CONTENT}", sampleLutContent);
+//	// fill function vec4 sampleLut(in int index, in float idx)
+//	QString element = "\tif (index==%1) return texture1D(lut[%1], idx);\n";
+//	QString sampleLutContent;
+//	for (unsigned i=0; i<layers; ++i)
+//		sampleLutContent += element.arg(i);
+//	shaderSource = shaderSource.replace("${SAMPLE_LUT_CONTENT}", sampleLutContent);
 
-	return shaderSource;
-}
+//	return shaderSource;
+//}
 
 Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
 {
@@ -496,9 +496,11 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	for (unsigned i = 0; i < plane.size(); ++i)
 	{
 		TCoords->SetTuple3(i, plane[i][0], plane[i][1], plane[i][2]);
+//		CX_LOG_DEBUG() << "coord: " << i << ", " << plane[i][0] << ", " << plane[i][1] << ", " << plane[i][2];
 	}
 
 	mPolyData->Modified();
+
 }
 
 void Texture3DSlicerProxyImpl::updateColorAttributeSlot()

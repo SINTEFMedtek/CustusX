@@ -81,6 +81,7 @@ public:
 	void eachRenderInternal(vtkOpenGLHelper *cellBO);
 private:
 	void init(int index);
+//	void uploadTextureCoordinate(vtkOpenGLHelper *cellBO);
 };
 
 }//cx
