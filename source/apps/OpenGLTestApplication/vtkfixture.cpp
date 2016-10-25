@@ -269,9 +269,9 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	unsigned int depth = 4;
 	int numComps = 3;
 	int dataType = VTK_FLOAT;
-	void *data = (void*)color_data; //numComps=3, dataType = VTK_FLOAT 	//4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
-	//void *data = generateTexture<float>(width, height, depth, 0.0f);  //numComps=1, dataType=VTK_FLOAT (does not work???)
-	//void *data = (void*)checkerboard(width, height, depth); //numComps=4, dataType=VTK_UNSIGNED_CHAR (does not work???)
+	void *data = (void*)color_data; //numComps=3, dataType = VTK_FLOAT  //4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
+	//void *data = generateTexture<float>(width, height, depth, 0.5f, 0.1f, 0.2f, 1.0f);  //numComps=4, dataType=VTK_FLOAT (WORKS!!!)
+	//void *data = generateTexture<unsigned char>(width, height, depth, 200, 140, 0, 200);  //numComps=4, dataType=VTK_UNSIGNED_CHAR (WORKS!!!)
 	if(!texObject->Create3DFromRaw(width, height, depth, numComps, dataType, data))
 		std::cout << "---------------------------------------- > Error creating 3D texture" << std::endl;
 

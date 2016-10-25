@@ -1,18 +1,54 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include <stdio.h>
+#include <string.h>
+#include <iostream>
+
+//OpenGL
+#include <GL/glew.h>
+#include <GL/glut.h> //Framework on Mac
+
+//------------------------------------------------------------------------------------
+
+#define MAX_TEXTURE_SIZE 1000
+//static unsigned char generated_texture[MAX_TEXTURE_SIZE];
+static float generated_texture[MAX_TEXTURE_SIZE];
+
 template <typename TYPE>
-TYPE *generateTexture(unsigned int x, unsigned int y, unsigned int z, TYPE color)
+TYPE *generateTexture(unsigned int x, unsigned int y, unsigned int z,
+					  TYPE red, TYPE green, TYPE blue, TYPE alpha,
+					  bool debug=false)
 {
 	int numberOfColorComponents = 4;
-	unsigned int data_size = x*y*z;
-	TYPE *data = new TYPE[data_size];
-	memset(data, color, data_size);
+	unsigned int data_size = x*y*z*numberOfColorComponents;
 
-	//print<unsigned char, float>(data, data_size);
+	if(data_size > MAX_TEXTURE_SIZE)
+		std::cout << "-----------------------> Error: trying to create texture bigger than the max size" << std::endl;
+
+	for(int i=0; i<data_size; )
+	{
+		generated_texture[i++] = (TYPE)red;
+		generated_texture[i++] = (TYPE)green;
+		generated_texture[i++] = (TYPE)blue;
+		generated_texture[i++] = (TYPE)alpha;
+
+	}
+
+	if(debug)
+	{
+		std::cout.precision(3);
+		for(int i=0; i<data_size; ++i)
+		{
+			std::cout << ' ' << (TYPE) generated_texture[i];
+		}
+		std::cout << std::endl;
+	}
+
+	return generated_texture;
 };
 
-//TODO not working...
-unsigned char *checkerboard(unsigned int width, unsigned int height, unsigned int depth);
+
+//------------------------------------------------------------------------------------
 
 #endif // TEXTURE_H
