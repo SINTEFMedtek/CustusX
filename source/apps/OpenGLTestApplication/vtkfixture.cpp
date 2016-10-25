@@ -1,9 +1,5 @@
 #include "vtkfixture.h"
 
-//OpenGL
-#include <GL/glew.h>
-#include <GL/glut.h> //Framework on Mac
-
 //VTK
 #include <vtkCubeSource.h>
 #include <vtkOpenGLPolyDataMapper.h>
@@ -88,6 +84,29 @@ vtkSmartPointer<vtkTextureObject> vtkfixture::createTextureObject(unsigned int d
 	report_gl_error();
 
 	return texture_object.Get();
+}
+
+vtkSmartPointer<vtkOpenGLBufferObject> vtkfixture::allocateAndUploadArrayBuffer(int numberOfLines, int numberOfComponentsLine, const GLfloat *data)
+{
+	vtkNew<vtkOpenGLBufferObject> buffer_object;
+	std::cout << "ALLOCATING BUFFER" << std::endl;
+	buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
+	if(!buffer_object->Bind())
+		std::cout << "buffer object not bind" << std::endl;
+	report_gl_error();
+
+	std::cout << "UPLOADING" << std::endl;
+	if(!buffer_object->Upload(
+				data,
+				numberOfLines*numberOfComponentsLine,  //how many floats to upload! (aka number of floats in the vector)
+				vtkOpenGLBufferObject::ArrayBuffer
+				))
+	{
+		vtkGenericWarningMacro(<< "Error uploading buffer object data.");
+	}
+	report_gl_error();
+
+	return buffer_object.Get();
 }
 
 void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
@@ -232,23 +251,10 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	// Allocate buffer and upload color data to opengl
 	//===========
 	//Only need to allocate and upload once
-	std::cout << "ALLOCATING BUFFER FOR COLOR" << std::endl;
-	vtkNew<vtkOpenGLBufferObject> color_buffer_object;
-	color_buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
-	if(!color_buffer_object->Bind())
-		std::cout << "tvbo not bind" << std::endl;
-	report_gl_error();
-
-	std::cout << "UPLOADING COLOR DATA" << std::endl;
-	if(!color_buffer_object->Upload(
-				color_data,
-				numberOfColors*numberOfComponentsPerColor,  //how many floats to upload! (aka number of floats in the vector)
-				vtkOpenGLBufferObject::ArrayBuffer
-				))
-	{
-		vtkGenericWarningMacro(<< "Error uploading 'g_color_buffer_data'.");
-	}
-	report_gl_error();
+	int my_numberOfColors = numberOfColors;
+	int my_numberOfComponentsPerColor = numberOfComponentsPerColor;
+	const GLfloat *my_color_data = color_data;
+	vtkSmartPointer<vtkOpenGLBufferObject> color_buffer_object = allocateAndUploadArrayBuffer(my_numberOfColors, my_numberOfComponentsPerColor, my_color_data);
 
 	// --------------------------------------------------------------------------------
 
@@ -256,24 +262,10 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	// Allocate buffer and upload texture coordinate data to opengl
 	//===========
 	//Only need to allocate and upload once
-	std::cout << "ALLOCATING BUFFER FOR TEXTURE COORDINATES" << std::endl;
-	vtkNew<vtkOpenGLBufferObject> texture_buffer_object;
-	texture_buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
-	if(!texture_buffer_object->Bind())
-		std::cout << "texvbo not bind" << std::endl;
-	report_gl_error();
-
-	std::cout << "UPLOADING TEXTURE DATA" << std::endl;
-	numberOfComponentsPerTexture = 3;
-	if(!texture_buffer_object->Upload(
-				texture_data,
-				numberOfTextureCoordinates*numberOfComponentsPerTexture,  //how many floats to upload! (aka number of floats in the vector)
-				vtkOpenGLBufferObject::ArrayBuffer
-				))
-	{
-		vtkGenericWarningMacro(<< "Error uploading 'texture_data'.");
-	}
-	report_gl_error();
+	int my_numberOfTextureCoordinates = numberOfTextureCoordinates;
+	int my_numberOfComponentsPerTexture = numberOfComponentsPerTexture;
+	const GLfloat *my_texture_data = texture_data;
+	vtkSmartPointer<vtkOpenGLBufferObject> texture_buffer_object = allocateAndUploadArrayBuffer(my_numberOfTextureCoordinates, my_numberOfComponentsPerTexture, my_texture_data);
 
 	// --------------------------------------------------------------------------------
 
@@ -318,10 +310,10 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	vtkSmartPointer<ShaderCallback> callback = vtkSmartPointer<ShaderCallback>::New();
 	callback->mRenderWindow = opengl_renderwindow; //used to set current context
 	//callback->mCube = cube; // not used
-	callback->mColorBufferObject = color_buffer_object.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
-	callback->mTextureBufferObject = texture_buffer_object.Get(); //used to set in/attribute TEXTURE_COORDINATE_VSIN in vertex shader
-	callback->mTextureObject1 = texture_object_1.Get(); //used to set sampler in frament shader
-	callback->mTextureObject2 = texture_object_2.Get(); //used to set sampler in frament shader
+	callback->mColorBufferObject = color_buffer_object; //used to set in/attribute COLOR_VSIN in vertex shader
+	callback->mTextureBufferObject = texture_buffer_object; //used to set in/attribute TEXTURE_COORDINATE_VSIN in vertex shader
+	callback->mTextureObject1 = texture_object_1; //used to set sampler in frament shader
+	callback->mTextureObject2 = texture_object_2; //used to set sampler in frament shader
 
 	mapper->AddObserver(vtkCommand::UpdateShaderEvent,callback);
 
@@ -354,7 +346,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	//TODO:
 	//delete texture coordinate buffer
 	//delete color buffer
-	//delete texture object
+	//delete texture object1
+	//delete texture object2
 
 	// --------------------------------------------------------------------------------
 }
