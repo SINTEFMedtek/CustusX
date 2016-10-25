@@ -24,15 +24,73 @@ public:
   vtkSmartPointer<class vtkOpenGLRenderWindow> mRenderWindow;
   //vtkSmartPointer<class vtkCubeSource> mCube;
   vtkSmartPointer<class vtkOpenGLBufferObject> mTvbo;
+  vtkSmartPointer<class vtkOpenGLBufferObject> mTexvbo;
   vtkSmartPointer<class vtkTextureObject> mTexObject;
 
   void test2(unsigned long event, void *cbo);
   void test(unsigned long event, void *cbo);
 };
 
+//Need one texture coordinate per vertex in the model
+//40 lines with 3 values each = 120
+static int numberOfTextureCoordinates = 40;
+static int numberOfComponentsPerTexture = 3;
+static const GLfloat texture_data[] = {
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  1.0f,
+	0.0f,  1.0f,  1.0f,
+	0.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  1.0f,
+	0.0f,  1.0f,  1.0f,
+	0.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  1.0f,
+	0.0f,  1.0f,  1.0f,
+	0.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  1.0f,
+	0.0f,  1.0f,  1.0f,
+	0.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  1.0f,
+	0.0f,  1.0f,  1.0f,
+	0.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  1.0f,
+	1.0f,  1.0f,  1.0f,
+	1.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  0.0f,
+	0.0f,  0.0f,  1.0f,
+	0.0f,  1.0f,  1.0f,
+	0.0f,  1.0f,  0.0f,
+	1.0f,  0.0f,  1.0f
+};
+
 
 //81 lines with 3 values each == 243 values
-static const GLfloat g_color_buffer_data[] = {
+static int numberOfColors = 81;
+static int numberOfComponentsPerColor = 3;
+static const GLfloat color_data[] = {
 	1.0f,  0.0f,  0.0f,
 	0.0f,  1.0f,  0.0f,
 	0.0f,  0.0f,  1.0f,

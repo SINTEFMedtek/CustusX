@@ -217,8 +217,9 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		true, // before the standard replacements
 		"//VTK::PositionVC::Dec\n" // we still want the default
 		"attribute vec3 COLOR_VSIN;\n"
-		"//in vec3 VERTICES;\n"
-		"varying vec3 COLOR_VSOUT;\n",
+		"attribute vec3 TEXTURE_COORDINATE_VSIN;\n"
+		"varying vec3 COLOR_VSOUT;\n"
+		"varying vec3 TEXTURE_COORDINATE_VSOUT;\n",
 		false // only do it once
 	);
 
@@ -238,7 +239,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		"	COLOR_VSOUT = vec3(0.2,0.2,0.2);\n" //dark grey
 		"if(COLOR_VSIN.x < 0.0)\n"
 		"	COLOR_VSOUT = vec3(0.8,0.8,0.8);\n" //light grey
-		"COLOR_VSOUT = COLOR_VSIN;\n",
+		"COLOR_VSOUT = COLOR_VSIN;\n"
+		"TEXTURE_COORDINATE_VSOUT = TEXTURE_COORDINATE_VSIN;\n",
 		false // only do it once
 	);
 
@@ -247,6 +249,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		"//VTK::System::Dec\n"  // always start with this line
 		"//VTK::Output::Dec\n"  // always have this line in your FS
 		"in vec3 COLOR_VSOUT;\n"
+		"in vec3 TEXTURE_COORDINATE_VSOUT;\n"
 		"out vec4 color;\n"
 		"uniform sampler3D my_texture;\n"
 		"void main () {\n"
@@ -257,7 +260,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 		"	color = vec4(0.0,1.0,0.0, 1.0);\n" //green
 		"else\n"
 		"	color = vec4(1.0,0.0,0.0, 1.0);\n" //red
-		"color = texture(my_texture, vec3(0.5, 0.5, 0.5));\n"
+		"color = texture(my_texture, TEXTURE_COORDINATE_VSOUT);\n"
 		"}\n";
 	mapper->SetFragmentShaderCode(fragment_shader.c_str());
 	//printActiveVertexAndFragmentShader(mapper);
@@ -304,6 +307,7 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	printOpenGLVersion();
 
 
+	//--------
 	//Only need to allocate and upload once
 	std::cout << "ALLOCATING BUFFER FOR COLOR" << std::endl;
 	vtkNew<vtkOpenGLBufferObject> tvbo;
@@ -313,17 +317,38 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	report_gl_error();
 
 	std::cout << "UPLOADING COLOR DATA" << std::endl;
-	//vbo->Upload(verts, numVerts*3, vtkOpenGLBufferObject::ArrayBuffer);
-	int numberOfColorLinesInBuffer = 81; // see buffer declared in shadercallback.h
 	if(!tvbo->Upload(
-				g_color_buffer_data,
-				numberOfColorLinesInBuffer*3,  //how many floats to upload! (aka number of floats in the vector)
+				color_data,
+				numberOfColors*numberOfComponentsPerColor,  //how many floats to upload! (aka number of floats in the vector)
 				vtkOpenGLBufferObject::ArrayBuffer
 				))
 	{
 		vtkGenericWarningMacro(<< "Error uploading 'g_color_buffer_data'.");
 	}
 	report_gl_error();
+	//--------
+
+	//--------
+	//Only need to allocate and upload once
+	std::cout << "ALLOCATING BUFFER FOR TEXTURE COORDINATES" << std::endl;
+	vtkNew<vtkOpenGLBufferObject> texvbo;
+	texvbo->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
+	if(!texvbo->Bind())
+		std::cout << "texvbo not bind" << std::endl;
+	report_gl_error();
+
+	std::cout << "UPLOADING TEXTURE DATA" << std::endl;
+	numberOfComponentsPerTexture = 3;
+	if(!texvbo->Upload(
+				texture_data,
+				numberOfTextureCoordinates*numberOfComponentsPerTexture,  //how many floats to upload! (aka number of floats in the vector)
+				vtkOpenGLBufferObject::ArrayBuffer
+				))
+	{
+		vtkGenericWarningMacro(<< "Error uploading 'texture_data'.");
+	}
+	report_gl_error();
+	//--------
 
 
 	vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow.Get());
@@ -344,8 +369,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	unsigned int depth = 4;
 	int numComps = 3;
 	int dataType = VTK_FLOAT;
+	void *data = (void*)color_data; //numComps=3, dataType = VTK_FLOAT 	//4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
 	//void *data = generateTexture<float>(width, height, depth, 0.0f);  //numComps=1, dataType=VTK_FLOAT (does not work???)
-	void *data = (void*)g_color_buffer_data; //numComps=3, dataType = VTK_FLOAT 	//4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
 	//void *data = (void*)checkerboard(width, height, depth); //numComps=4, dataType=VTK_UNSIGNED_CHAR (does not work???)
 	if(!texObject->Create3DFromRaw(width, height, depth, numComps, dataType, data))
 		std::cout << "---------------------------------------- > Error creating 3D texture" << std::endl;
@@ -381,7 +406,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture(int argc, char *
 	vtkSmartPointer<ShaderCallback> callback = vtkSmartPointer<ShaderCallback>::New();
 	callback->mRenderWindow = opengl_renderwindow; //used to set current context
 	//callback->mCube = cube; // not used
-	callback->mTvbo = tvbo.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
+	callback->mTvbo = texvbo.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
+	callback->mTexvbo = texvbo.Get();
 	callback->mTexObject = texObject.Get();
 
 	mapper->AddObserver(vtkCommand::UpdateShaderEvent,callback);

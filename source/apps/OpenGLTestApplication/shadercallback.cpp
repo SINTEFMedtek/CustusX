@@ -67,7 +67,7 @@ void ShaderCallback::test2(unsigned long event, void *cbo)
 			std::cout << "--- 5" << std::endl;
 
 			// Give our color to OpenGL.
-			glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(color_data), color_data, GL_STATIC_DRAW);
 			report_gl_error();
 			std::cout << "--- 6" << std::endl;
 
@@ -142,6 +142,8 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 			}
 			 */
 			vao->Bind();
+			//Input color
+			int vec_size = 3;
 			if (!vao->AddAttributeArray(
 						program,		//vtkShaderProgram
 						mTvbo.Get(),	//vtkOpenGLBufferObject
@@ -149,14 +151,30 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 						0,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
 						sizeof(float)*3,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
 						VTK_FLOAT,		//int (elementType)			Specifies the data type of each component in the array
-						3,				//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
+						vec_size,				//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
 						false			//bool (normalize)
 						))
 			{
 				vtkGenericWarningMacro(<< "Error setting 'COLOR' in shader VAO.");
 			}
 
-			//Setting texture sampler id
+			//Input texture coordinates
+			vec_size = 3;
+			if (!vao->AddAttributeArray(
+						program,		//vtkShaderProgram
+						mTexvbo.Get(),	//vtkOpenGLBufferObject
+						"TEXTURE_COORDINATE_VSIN",	//std::string
+						0,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
+						sizeof(float)*3,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
+						VTK_FLOAT,		//int (elementType)			Specifies the data type of each component in the array
+						vec_size,				//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
+						false			//bool (normalize)
+						))
+			{
+				vtkGenericWarningMacro(<< "Error setting 'COLOR' in shader VAO.");
+			}
+
+			//Uniform texture sampler id
 			if(!program->SetUniformi("my_texture", mTexObject->GetTextureUnit())) //not the handle
 				std::cout << "my_texture -------------------------------------> ERROR!!!" << std::endl;
 
