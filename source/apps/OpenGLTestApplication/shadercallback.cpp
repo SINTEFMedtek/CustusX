@@ -19,6 +19,7 @@
 ShaderCallback *ShaderCallback::New()
 { return new ShaderCallback; }
 
+/*
 void ShaderCallback::test2(unsigned long event, void *cbo)
 {
 	std::cout << "START TEST 2" << std::endl;
@@ -47,11 +48,9 @@ void ShaderCallback::test2(unsigned long event, void *cbo)
 			// One color for each vertex. They were generated randomly.
 			std::cout << "--- 3" << std::endl;
 
-			/*
-			GLuint VertexArrayID;
-			glGenVertexArrays(1, &VertexArrayID);
-			glBindVertexArray(cellBO->IBO->GetHandle());
-			*/
+			//GLuint VertexArrayID;
+			//glGenVertexArrays(1, &VertexArrayID);
+			//glBindVertexArray(cellBO->IBO->GetHandle());
 
 			cellBO->IBO->Bind();
 
@@ -104,7 +103,7 @@ void ShaderCallback::test2(unsigned long event, void *cbo)
 	}
 	std::cout << " END TEST 2" << std::endl;
 }
-
+*/
 
 void ShaderCallback::test( unsigned long event, void *cbo)
 {
@@ -189,7 +188,6 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 
 void ShaderCallback::Execute(vtkObject *, unsigned long event, void *cbo)
 {
-
 	if(!mRenderWindow)
 		std::cout << "NO CONTEXT!!!" << std::endl;
 	mRenderWindow->MakeCurrent();
@@ -198,13 +196,6 @@ void ShaderCallback::Execute(vtkObject *, unsigned long event, void *cbo)
 	test(event, cbo); //WORKS!
 
 }
-/*
- *   bool AddAttributeArray(vtkShaderProgram *program,
-						 vtkOpenGLBufferObject *buffer,
-						 const std::string &name,
-						 int offset, size_t stride,
-						 int elementType, int elementTupleSize, bool normalize)
-*/
 
 ShaderCallback::ShaderCallback()
 {

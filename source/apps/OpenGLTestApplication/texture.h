@@ -12,7 +12,7 @@ TYPE *generateTexture(unsigned int x, unsigned int y, unsigned int z, TYPE color
 	//print<unsigned char, float>(data, data_size);
 };
 
-
+//TODO not working...
 unsigned char *checkerboard(unsigned int width, unsigned int height, unsigned int depth);
 
 #endif // TEXTURE_H

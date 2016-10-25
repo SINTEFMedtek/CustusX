@@ -21,13 +21,13 @@ public:
 
   ShaderCallback();
 
-  vtkSmartPointer<class vtkOpenGLRenderWindow> mRenderWindow;
+  vtkSmartPointer<class vtkOpenGLRenderWindow> mRenderWindow; //containing the opengl context
   //vtkSmartPointer<class vtkCubeSource> mCube;
-  vtkSmartPointer<class vtkOpenGLBufferObject> mTvbo;
-  vtkSmartPointer<class vtkOpenGLBufferObject> mTexvbo;
-  vtkSmartPointer<class vtkTextureObject> mTexObject;
+  vtkSmartPointer<class vtkOpenGLBufferObject> mTvbo; //color data
+  vtkSmartPointer<class vtkOpenGLBufferObject> mTexvbo; //texture coordinate data
+  vtkSmartPointer<class vtkTextureObject> mTexObject; //texture object -> glsl: sampler
 
-  void test2(unsigned long event, void *cbo);
+  //void test2(unsigned long event, void *cbo);
   void test(unsigned long event, void *cbo);
 };
 

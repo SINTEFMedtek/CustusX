@@ -12,8 +12,6 @@ if(BUILD_TESTING)
     set(SOURCE_FILES
         texture.h
         texture.cpp
-        openglfixture.h
-        openglfixture.cpp
         vtkfixture.h
         vtkfixture.cpp
         shadercallback.h
