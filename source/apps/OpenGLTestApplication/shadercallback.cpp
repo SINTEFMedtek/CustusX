@@ -174,8 +174,12 @@ void ShaderCallback::test( unsigned long event, void *cbo)
 			}
 
 			//Uniform texture sampler id
-			if(!program->SetUniformi("my_texture", mTexObject->GetTextureUnit())) //not the handle
-				std::cout << "my_texture -------------------------------------> ERROR!!!" << std::endl;
+			if(!program->SetUniformi("my_texture_1", mTextureObject1->GetTextureUnit())) //not the handle
+				std::cout << "my_texture_1 -------------------------------------> ERROR!!!" << std::endl;
+
+			//Uniform texture sampler id
+			if(!program->SetUniformi("my_texture_2", mTextureObject2->GetTextureUnit())) //not the handle
+				std::cout << "my_texture_2 -------------------------------------> ERROR!!!" << std::endl;
 
 			report_gl_error();
 			std::cout << "--- END UpdateShaderEvent" << std::endl;

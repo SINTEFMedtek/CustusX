@@ -60,6 +60,36 @@ void vtkfixture::printVtkOpenGLRenderWindowInfo(vtkSmartPointer<vtkOpenGLRenderW
 	report_gl_error();
 }
 
+vtkSmartPointer<vtkTextureObject> vtkfixture::createTextureObject(unsigned int depth, unsigned int width, int dataType, int numComps, unsigned int height, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow, void *data)
+{
+	vtkNew<vtkTextureObject> texture_object;
+	texture_object->SetContext(opengl_renderwindow);
+
+	if(!texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
+		std::cout << "---------------------------------------- > Error creating 3D texture" << std::endl;
+
+	//6403 == GL_RED 0x1903
+	//6407 == GL_RGB 0x1907
+	//6408 == GL_RGBA 0x1908
+	std::cout << texture_object->GetFormat(dataType, numComps, true) << std::endl;
+
+	texture_object->Activate();
+
+	texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
+	texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
+	texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
+	texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
+	texture_object->SetMinificationFilter(vtkTextureObject::Linear);
+	texture_object->SendParameters();
+
+	std::cout << "Texture unit: " << texture_object->GetTextureUnit() << std::endl;
+	texture_object->PrintSelf(std::cout, vtkIndent(4));
+
+	report_gl_error();
+
+	return texture_object.Get();
+}
+
 void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 {
 	// --------------------------------------------------------------------------------
@@ -119,10 +149,13 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 		"//VTK::Output::Dec\n"  // always have this line in your FS
 		"in vec3 COLOR_VSOUT;\n"
 		"in vec3 TEXTURE_COORDINATE_VSOUT;\n"
-		"uniform sampler3D my_texture;\n"
+		"uniform sampler3D my_texture_1;\n"
+		"uniform sampler3D my_texture_2;\n"
 		"out vec4 color;\n"
 		"void main () {\n"
-		"	color = texture(my_texture, TEXTURE_COORDINATE_VSOUT);\n"
+		"	vec4 color_1 = texture(my_texture_1, TEXTURE_COORDINATE_VSOUT);\n"
+		"	vec4 color_2 = texture(my_texture_2, TEXTURE_COORDINATE_VSOUT);\n"
+		"	color = vec4(color_1.xy, color_2.zw);\n"
 		"}\n";
 	mapper->SetFragmentShaderCode(fragment_shader.c_str());
 	//printActiveVertexAndFragmentShader(mapper);
@@ -259,40 +292,22 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	// --------------------------------------------------------------------------------
 
 	//===========
-	// Create a 3D texture object
+	// Create 3D texture objects
 	//===========
 	std::cout << "ALLOCATING AND UPLOADING TEXTURE OBJECT" << std::endl;
-	vtkNew<vtkTextureObject> texObject;
-	texObject->SetContext(opengl_renderwindow);
 	unsigned int width = 4;
 	unsigned int height = 4;
 	unsigned int depth = 4;
-	int numComps = 3;
 	int dataType = VTK_FLOAT;
-	void *data = (void*)color_data; //numComps=3, dataType = VTK_FLOAT  //4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
-	//void *data = generateTexture<float>(width, height, depth, 0.5f, 0.1f, 0.2f, 1.0f);  //numComps=4, dataType=VTK_FLOAT (WORKS!!!)
 	//void *data = generateTexture<unsigned char>(width, height, depth, 200, 140, 0, 200);  //numComps=4, dataType=VTK_UNSIGNED_CHAR (WORKS!!!)
-	if(!texObject->Create3DFromRaw(width, height, depth, numComps, dataType, data))
-		std::cout << "---------------------------------------- > Error creating 3D texture" << std::endl;
 
-	//6403 == GL_RED 0x1903
-	//6407 == GL_RGB 0x1907
-	//6408 == GL_RGBA 0x1908
-	std::cout << texObject->GetFormat(dataType, numComps, true) << std::endl;
+	int numComps = 3;
+	void *data1 = (void*)color_data; //numComps=3, dataType = VTK_FLOAT  //4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
+	vtkSmartPointer<vtkTextureObject> texture_object_1 = createTextureObject(depth, width, dataType, numComps, height, opengl_renderwindow, data1);
 
-	texObject->Activate();
-
-	texObject->SetWrapS(vtkTextureObject::ClampToEdge);
-	texObject->SetWrapT(vtkTextureObject::ClampToEdge);
-	texObject->SetWrapR(vtkTextureObject::ClampToEdge);
-	texObject->SetMagnificationFilter(vtkTextureObject::Linear);
-	texObject->SetMinificationFilter(vtkTextureObject::Linear);
-	texObject->SendParameters();
-
-	std::cout << "Texture unit: " << texObject->GetTextureUnit() << std::endl;
-	texObject->PrintSelf(std::cout, vtkIndent(4));
-
-	report_gl_error();
+	numComps = 4;
+	void *data2 = generateTexture<float>(width, height, depth, 0.5f, 0.1f, 0.2f, 1.0f);  //numComps=4, dataType=VTK_FLOAT (WORKS!!!)
+	vtkSmartPointer<vtkTextureObject> texture_object_2 = createTextureObject(depth, width, dataType, numComps, height, opengl_renderwindow, data2);
 
 	// --------------------------------------------------------------------------------
 
@@ -304,7 +319,8 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	//callback->mCube = cube; // not used
 	callback->mTvbo = texvbo.Get(); //used to set in/attribute COLOR_VSIN in vertex shader
 	callback->mTexvbo = texvbo.Get(); //used to set in/attribute TEXTURE_COORDINATE_VSIN in vertex shader
-	callback->mTexObject = texObject.Get(); //used to set sampler in frament shader
+	callback->mTextureObject1 = texture_object_1.Get(); //used to set sampler in frament shader
+	callback->mTextureObject2 = texture_object_2.Get(); //used to set sampler in frament shader
 
 	mapper->AddObserver(vtkCommand::UpdateShaderEvent,callback);
 
