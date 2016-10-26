@@ -99,7 +99,7 @@ void SphereMetricRep2D::onModifiedStartRender()
 
 	mDisk->setColor(mMetric->getColor());
 	mDisk->setOutlineColor(mMetric->getColor());
-	mDisk->setOutlineWidth(0.1);
+	mDisk->setOutlineWidth(0.31);
 	mDisk->setFillVisible(false);
 
 	mDisk->setRadiusBySlicingSphere(metric->getRadius(), position[2]);

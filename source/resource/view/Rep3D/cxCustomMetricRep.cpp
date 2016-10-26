@@ -151,7 +151,10 @@ void CustomMetricRep::updateMeshModel(DataPtr model)
 		mMeshGeometry[i]->setMesh(meshModel);
 
 		mMeshGeometry[i]->setTransformOffset(pos[i]);
+
+		custom->updateTexture(meshModel, pos[i]);
 	}
+
 }
 
 void CustomMetricRep::createDistanceMarkers()
@@ -194,7 +197,7 @@ CaptionText3DPtr CustomMetricRep::createDistanceText(Vector3D pos, double distan
 	text->setText(QString("%1").arg(distance));
 
 	text->setPosition(pos);
-	text->placeBelowCenter();
+	text->placeAboveCenter();
 	text->setSize(mLabelSize / 100);
 
 	return text;

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -52,12 +53,34 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
     mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
-    mDefineVectorUpMethod = mDefineVectorUpMethods.table;
+	connect(this, &CustomMetric::propertiesChanged, this, &CustomMetric::onPropertiesChanged);
+	mDefineVectorUpMethod = mDefineVectorUpMethods.table;
 	mModelUid = "";
 	mScaleToP1 = false;
 	mOffsetFromP0 = 0.0;
+	mOffsetFromP1 = 0.0;
 	mRepeatDistance = 0.0;
 	mTranslationOnly = false;
+	mTextureFollowTool = false;
+}
+
+void CustomMetric::onPropertiesChanged()
+{
+
+	if (mTextureFollowTool != (mToolListener.get()!=NULL))
+	{
+		if (mTextureFollowTool)
+		{
+			mToolListener = mSpaceProvider->createListener();
+			mToolListener->setSpace(CoordinateSystem(csTOOL_OFFSET, "active"));
+			connect(mToolListener.get(), &SpaceListener::changed, this, &CustomMetric::transformChanged);
+		}
+		else
+		{
+			disconnect(mToolListener.get(), &SpaceListener::changed, this, &CustomMetric::transformChanged);
+			mToolListener.reset();
+		}
+	}
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -87,9 +110,12 @@ void CustomMetric::addXml(QDomNode& dataNode)
 
 	elem.setAttribute("scaleToP1", mScaleToP1);
 	elem.setAttribute("offsetFromP0", mOffsetFromP0);
+	elem.setAttribute("offsetFromP1", mOffsetFromP1);
 	elem.setAttribute("repeatDistance", mRepeatDistance);
 	elem.setAttribute("showDistance", mShowDistanceMarkers);
+	elem.setAttribute("distanceMarkerVisibility", mDistanceMarkerVisibility);
 	elem.setAttribute("translationOnly", mTranslationOnly);
+	elem.setAttribute("textureFollowTool", mTextureFollowTool);
 }
 
 void CustomMetric::parseXml(QDomNode& dataNode)
@@ -103,9 +129,14 @@ void CustomMetric::parseXml(QDomNode& dataNode)
 	mModelUid = elem.attribute("meshUid", qstring_cast(mModelUid));
 	mScaleToP1 = elem.attribute("scaleToP1", QString::number(mScaleToP1)).toInt();
 	mOffsetFromP0 = elem.attribute("offsetFromP0", QString::number(mOffsetFromP0)).toDouble();
+	mOffsetFromP1 = elem.attribute("offsetFromP1", QString::number(mOffsetFromP1)).toDouble();
 	mRepeatDistance = elem.attribute("repeatDistance", QString::number(mRepeatDistance)).toDouble();
 	mShowDistanceMarkers = elem.attribute("showDistance", QString::number(mShowDistanceMarkers)).toInt();
+	mDistanceMarkerVisibility = elem.attribute("distanceMarkerVisibility", QString::number(mDistanceMarkerVisibility)).toDouble();
 	mTranslationOnly = elem.attribute("translationOnly", QString::number(mTranslationOnly)).toInt();
+	mTextureFollowTool = elem.attribute("textureFollowTool", QString::number(mTextureFollowTool)).toInt();
+
+	this->onPropertiesChanged();
 }
 
 bool CustomMetric::isValid() const
@@ -210,7 +241,7 @@ int CustomMetric::getRepeatCount() const
 
 	int reps = 1;
 	if (!similar(mRepeatDistance, 0.0))
-		reps = (dot(p1-p0, dir)-mOffsetFromP0)/mRepeatDistance + 1;
+		reps = (dot(p1-p0, dir)-mOffsetFromP0-mOffsetFromP1)/mRepeatDistance + 1;
 	reps = std::min(100, reps);
 	reps = std::max(reps, 1);
 
@@ -246,6 +277,43 @@ Vector3D CustomMetric::getVectorUp() const
 		return mDataManager->getOperatingTable().getVectorUp();
 }
 
+
+void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
+{
+	if (!this->getTextureFollowTool())
+		return;
+
+	if (!model)
+		return;
+
+	// special case:
+	// Project tool position down to the model, then set that position as
+	// the texture x pos.
+
+	Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(CoordinateSystem::reference());
+	Transform3D rMd = rMrr * model->get_rMd();
+	Vector3D t_r = rMt.coord(Vector3D::Zero());
+	Vector3D td_r = rMt.vector(Vector3D::UnitZ());
+
+	DoubleBoundingBox3D bb_d = model->boundingBox();
+	Vector3D bl = bb_d.bottomLeft();
+	Vector3D tr = bb_d.topRight();
+	Vector3D c = (bl+tr)/2;
+	Vector3D x_min_r(c[0], bl[1], c[2]);
+	Vector3D x_max_r(c[0], tr[1], c[2]);
+	x_min_r = rMd.coord(x_min_r);
+	x_max_r = rMd.coord(x_max_r);
+
+	double t_x = dot(t_r, td_r);
+	double bbmin_x = dot(x_min_r, td_r);
+	double bbmax_x = dot(x_max_r, td_r);
+	double range = bbmax_x-bbmin_x;
+	if (similar(range, 0.0))
+		range = 1.0E-6;
+	double s = (t_x-bbmin_x)/range;
+	model->getTextureData().getPositionY()->setValue(s);
+}
+
 Vector3D CustomMetric::getScale() const
 {
 	if (!mScaleToP1 || !this->getModel() || this->getModel()->getType() == "image")
@@ -262,7 +330,7 @@ Vector3D CustomMetric::getScale() const
 	double p1 = dot(coords[1], dir);
 
 	height = p1 - p0;
-	height -= mOffsetFromP0;
+	height -= (mOffsetFromP0 + mOffsetFromP1);
 
 	Vector3D scale(1,
 				   height/bounds.range()[1],
@@ -329,6 +397,19 @@ double CustomMetric::getOffsetFromP0() const
 	return mOffsetFromP0;
 }
 
+void CustomMetric::setOffsetFromP1(double val)
+{
+	if (mOffsetFromP1 == val)
+		return;
+	mOffsetFromP1 = val;
+	emit propertiesChanged();
+}
+
+double CustomMetric::getOffsetFromP1() const
+{
+	return mOffsetFromP1;
+}
+
 void CustomMetric::setRepeatDistance(double val)
 {
 	if (mRepeatDistance == val)
@@ -378,6 +459,19 @@ double CustomMetric::getDistanceMarkerVisibility() const
 bool CustomMetric::getTranslationOnly() const
 {
 	return mTranslationOnly;
+}
+
+void CustomMetric::setTextureFollowTool(bool val)
+{
+	if (mTextureFollowTool == val)
+		return;
+	mTextureFollowTool = val;
+	emit propertiesChanged();
+}
+
+bool CustomMetric::getTextureFollowTool() const
+{
+	return mTextureFollowTool;
 }
 
 QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMethods() const

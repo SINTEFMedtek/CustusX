@@ -726,13 +726,16 @@ QWidget* CustomMetricWrapper::createWidget()
 
 	mOffsetFromP0 = this->createOffsetFromP0();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
+	mOffsetFromP1 = this->createOffsetFromP1();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP1));
 	mRepeatDistance = this->createRepeatDistance();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRepeatDistance));
 
 	mShowDistanceMarkers = this->createShowDistanceMarkers();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mShowDistanceMarkers));
 	mDistanceMarkerVisibility = this->createDistanceMarkerVisibility();
-	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDistanceMarkerVisibility));
+	mDistanceMarkerVisibilityWidget = createDataWidget(mViewService, mPatientModelService, widget, mDistanceMarkerVisibility);
+	topLayout->addWidget(mDistanceMarkerVisibilityWidget);
 
 	mScaleToP1 = this->createScaletoP1();
 	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
@@ -740,6 +743,9 @@ QWidget* CustomMetricWrapper::createWidget()
 
 	mTranslationOnly= this->createTranslationOnly();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
+
+	mTextureFollowTool= this->createTextureFollowTool();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTextureFollowTool));
 
     this->addColorWidget(topLayout);
     topLayout->addStretch();
@@ -796,15 +802,22 @@ void CustomMetricWrapper::guiChanged()
 	else
 		mScaleToP1Widget->setEnabled(true);
 
+	if(mShowDistanceMarkers->getValue())
+		mDistanceMarkerVisibilityWidget->setEnabled(true);
+	else
+		mDistanceMarkerVisibilityWidget->setEnabled(false);
+
     mInternalUpdate = true;
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
 	mData->setModelUid(mModel->getValue());
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
+	mData->setOffsetFromP1(mOffsetFromP1->getValue());
 	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
 	mData->setShowDistanceMarkers(mShowDistanceMarkers->getValue());
 	mData->setDistanceMarkerVisibility(mDistanceMarkerVisibility->getValue());
 	mData->setTranslationOnly(mTranslationOnly->getValue());
+	mData->setTextureFollowTool(mTextureFollowTool->getValue());
 
 	mInternalUpdate = false;
 }
@@ -839,12 +852,32 @@ BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
 	return retval;
 }
 
+BoolPropertyPtr CustomMetricWrapper::createTextureFollowTool() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Texture Follow Tool", "",
+										  "Any texture on the model will move with the tool",
+										  mData->getTextureFollowTool());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
 DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
 {
 	DoublePropertyPtr retval;
 	retval = DoubleProperty::initialize("Offset from P0", "",
 											"Position model an offset from P0 towards P1",
-											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
+											mData->getOffsetFromP0(), DoubleRange(-100, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createOffsetFromP1() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Offset from P1", "",
+											"When scaling to P1, scale to a point offset from P1 towards P0",
+											mData->getOffsetFromP1(), DoubleRange(-100, 100, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
@@ -862,8 +895,8 @@ DoublePropertyPtr CustomMetricWrapper::createRepeatDistance() const
 DoublePropertyPtr CustomMetricWrapper::createDistanceMarkerVisibility() const
 {
 	DoublePropertyPtr retval;
-	retval = DoubleProperty::initialize("Distance marker visibility threshold", "",
-											"Hide the marker if the distance to the camera exceeds this threshold",
+	retval = DoubleProperty::initialize("Distance markers visibility threshold", "",
+											"Hide the markers if the distance to the camera exceeds this threshold",
 											mData->getDistanceMarkerVisibility(), DoubleRange(0, 1000, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;

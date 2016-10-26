@@ -100,6 +100,7 @@ public:
 	typedef std::vector<LayoutViewData> ViewDataContainer;
 	typedef ViewDataContainer::iterator iterator;
 	typedef ViewDataContainer::const_iterator const_iterator;
+	static const int MaxGridSize = 20;
 
 public:
 	static LayoutData createHeader(QString uid, QString name);

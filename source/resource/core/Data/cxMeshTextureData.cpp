@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMeshTextureData.h"
 #include "cxDoubleProperty.h"
+#include "cxBoolProperty.h"
 
 namespace cx
 {
@@ -98,6 +99,9 @@ void MeshTextureData::initialize()
 
 	mPositionY = DoubleProperty::initialize("texture_position_Y", "Position Y", "Where to start drawing the image along the Y axis.", 0, DoubleRange(-100000,100000,0.01), 2);
 	this->addProperty(mPositionY);
+
+	mRepeat = BoolProperty::initialize("repeat", "Repeat", "Repeat texture over surface", true);
+	this->addProperty(mRepeat);
 }
 
 QString MeshTextureData::getSphereText() const
@@ -123,6 +127,11 @@ DoublePropertyPtr MeshTextureData::getPositionY() const
 DoublePropertyPtr MeshTextureData::getPositionX() const
 {
 	return mPositionX;
+}
+
+BoolPropertyPtr MeshTextureData::getRepeat() const
+{
+	return mRepeat;
 }
 
 std::vector<PropertyPtr> MeshTextureData::getProperties() const
