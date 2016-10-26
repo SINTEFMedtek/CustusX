@@ -152,6 +152,8 @@ void CameraStyleForView::applyCameraStyle()
 	CameraInfo cam_old(camera);
 	CameraInfo cam_new = cam_old;
 
+	cam_new.viewAngle = mStyle.mCameraViewAngle/M_PI*180;
+
 	if (!mStyle.mFocusROI.isEmpty())
 	{
 		DoubleBoundingBox3D roi_r = this->getROI(mStyle.mFocusROI).getBox();
@@ -472,6 +474,7 @@ void CameraStyleForView::updateCamera(CameraInfo info)
 	camera->SetPosition(info.pos.begin());
 	camera->SetFocalPoint(info.focus.begin());
 	camera->SetViewUp(info.vup.begin());
+	camera->SetViewAngle(info.viewAngle);
 	// use 2m, as the camera sometimes can move far from the object during zoom
 	camera->SetClippingRange(1, std::max<double>(2000, info.distance() * 10));
 	mBlockCameraUpdate = false;

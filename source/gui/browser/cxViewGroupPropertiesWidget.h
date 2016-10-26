@@ -71,6 +71,7 @@ private:
   VisServicesPtr mServices;
   QVBoxLayout* mLayout;
 
+  DoublePropertyPtr mCameraViewAngle;
   BoolPropertyPtr mCameraFollowTool;
   BoolPropertyPtr mFocusFollowTool;
   BoolPropertyPtr mCameraOnTooltip;
