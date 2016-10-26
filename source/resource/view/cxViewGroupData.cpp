@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxDefinitionStrings.h"
 #include "cxStringListProperty.h"
+#include "cxSharedOpenGLContext.h"
 
 namespace cx
 {
@@ -379,19 +380,32 @@ void ViewGroupData::addDataSorted(QString uid)
 		return;
 
 	DataViewProperties properties = DataViewProperties::createDefault();
-	DataAndViewProperties item(uid, properties);
+	DataAndViewPropertiesPair item(uid, properties);
 
 	for (int i=int(mData.size())-1; i>=0; --i)
 	{
 		if (!dataTypeSort(this->getData(uid), this->getData(mData[i].first)))
 		{
-			mData.insert(mData.begin()+i+1, item);
+			this->insertData(mData.begin()+i+1, item);
 			break;
 		}
 	}
 	if (!this->contains(uid))
-		mData.insert(mData.begin(), item);
+		this->insertData(mData.begin(), item);
 	emit dataViewPropertiesChanged(uid);
+}
+
+void ViewGroupData::insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item)
+{
+	this->uploadIfImageToSharedContext(item.first);
+	this->mData.insert(iter, item);
+}
+
+void ViewGroupData::uploadIfImageToSharedContext(QString uid)
+{
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
+	if(image)
+		mSharedOpenGLContext->upload(image);
 }
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
@@ -414,8 +428,9 @@ void ViewGroupData::setProperties(QString uid, DataViewProperties properties)
 
 	if (!this->contains(uid))
 	{
-		DataAndViewProperties item(uid, properties);
-		mData.push_back(item);
+		DataAndViewPropertiesPair item(uid, properties);
+//		mData.push_back(item);
+		this->insertData(mData.end(), item);
 	}
 	else
 	{
@@ -643,6 +658,11 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	Options options = this->getOptions();
 	base.parseObjectFromElement("cameraStyle", &options.mCameraStyle);
 	this->setOptions(options);
+}
+
+void ViewGroupData::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+{
+	mSharedOpenGLContext = sharedOpenGLContext;
 }
 
 void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)

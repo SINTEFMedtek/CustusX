@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewManager.h"
 
+#include "boost/bind.hpp"
 #include <QGridLayout>
 #include <QWidget>
 #include <QTime>
@@ -41,11 +42,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkImageData.h>
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
-#include "cxLayoutData.h"
-#include "boost/bind.hpp"
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkOpenGLRenderWindow.h>
 
+#include "cxLayoutData.h"
 #include "cxVolumetricRep.h"
 #include "cxLogger.h"
 #include "cxXmlOptionItem.h"
@@ -75,6 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigation.h"
 #include "cxPatientModelService.h"
 #include "cxCameraStyleInteractor.h"
+#include "cxSharedOpenGLContext.h"
 
 namespace cx
 {
@@ -489,6 +491,19 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 		return;
 
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
+
+	if(!this->mSharedOpenGLContext)
+	{
+		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(view->getRenderWindow().Get());
+		if(opengl_renderwindow)
+		{
+			this->mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
+			for(unsigned i = 0; i < mViewGroups.size(); ++i)
+				mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
+		}
+		else
+			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This menas we don't have an OpenGL shared context";
+	}
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
 	//Turn off rendering in vtkRenderWindowInteractor

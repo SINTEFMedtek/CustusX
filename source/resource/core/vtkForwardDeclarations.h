@@ -117,6 +117,7 @@ typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
 typedef vtkSmartPointer<class vtkMetaImageWriter> vtkMetaImageWriterPtr;
 typedef vtkSmartPointer<class vtkMINCImageReader> vtkMINCImageReaderPtr;
 typedef vtkSmartPointer<class vtkOpenGLHardwareSupport > vtkOpenGLHardwareSupportPtr;
+typedef vtkSmartPointer<class vtkOpenGLRenderWindow> vtkOpenGLRenderWindowPtr;
 typedef vtkSmartPointer<class vtkPainterPolyDataMapper> vtkPainterPolyDataMapperPtr;
 typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;

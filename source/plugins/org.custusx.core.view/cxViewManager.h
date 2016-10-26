@@ -233,6 +233,7 @@ protected:
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisServicesPtr mBackend;
+	SharedOpenGLContextPtr mSharedOpenGLContext;
 
 private:
 	ViewManager(ViewManager const&);

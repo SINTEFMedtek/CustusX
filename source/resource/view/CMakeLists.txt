@@ -71,6 +71,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveCropper
     cxCameraControl
 	cxCameraStyleInteractor
+	cxSharedOpenGLContext
 )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)

@@ -164,6 +164,11 @@ void ViewGroup::initializeActiveView(SyncedValuePtr val)
 	mActiveView = val;
 }
 
+void ViewGroup::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+{
+	mViewGroupData->setSharedOpenGLContext(sharedOpenGLContext);
+}
+
 void ViewGroup::addXml(QDomNode& dataNode)
 {
 	mViewGroupData->addXml(dataNode);
