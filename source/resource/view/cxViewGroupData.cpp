@@ -405,7 +405,12 @@ void ViewGroupData::uploadIfImageToSharedContext(QString uid)
 {
 	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(image)
-		mSharedOpenGLContext->upload3DTexture(image);
+	{
+		if(mSharedOpenGLContext)
+			mSharedOpenGLContext->upload3DTexture(image);
+		else
+			CX_LOG_ERROR() << "ViewGroupData::uploadIfImageToSharedContext: Got no shared OpenGL context";
+	}
 }
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
