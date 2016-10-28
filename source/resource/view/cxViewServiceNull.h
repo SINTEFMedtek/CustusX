@@ -70,6 +70,8 @@ public:
 	virtual void addDefaultLayout(LayoutData layoutData);
 	virtual void enableContextMenuForViews(bool enable=true);
 
+	virtual SharedOpenGLContextPtr getSharedOpenGLContext();
+
 	virtual bool isNull();
 
 public slots:

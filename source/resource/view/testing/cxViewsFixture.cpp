@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewsWindow.h"
 #include <QApplication>
 #include "cxPatientModelService.h"
+#include <vtkOpenGLRenderWindow.h>
+#include "cxSharedOpenGLContext.h"
 
 #include "catch.hpp"
 
@@ -114,7 +116,9 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::Imag
 	cx::ViewPtr view = mWindow->add2DView(r, c);
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
+	vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(view->getRenderWindow().Get());
+	cx::SharedOpenGLContextPtr sharedOpenGLContext = cx::SharedOpenGLContextPtr(new cx::SharedOpenGLContext(opengl_renderwindow));
+	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
 	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
 	rep->setImages(images);

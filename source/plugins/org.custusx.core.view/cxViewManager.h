@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxDefinitions.h"
 #include "cxForwardDeclarations.h"
-//#include "cxLayoutData.h"
 #include "cxViewService.h"
 
 class QActionGroup;
@@ -75,7 +74,6 @@ typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
  * \addtogroup org_custusx_core_view
  * @{
  */
-
 
 
 /**
@@ -129,6 +127,7 @@ typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 class org_custusx_core_view_EXPORT ViewManager: public QObject
 {
 Q_OBJECT
+
 public:
 	static ViewManagerPtr create(VisServicesPtr backend);
 	virtual ~ViewManager();
@@ -136,13 +135,7 @@ public:
 	ViewPtr get3DView(int group = 0, int index = 0);
 
 	virtual ViewGroupDataPtr getViewGroup(int groupIdx) const;
-	unsigned viewGroupCount() const
-	{
-		int count = 0;
-		while(this->getViewGroup(count))
-			++count;
-		return count;
-	}
+	unsigned viewGroupCount() const;
 	virtual int getActiveViewGroup() const;
 
 	LayoutRepositoryPtr getLayoutRepository();
@@ -150,10 +143,6 @@ public:
 	QActionGroup* getInteractorStyleActionGroup();
 	NavigationPtr getNavigation(int group = 0);
 
-	/** Initialize the widget and fill with the default view layout.
-	  * Return the top widget, it should be added to the calling gui.
-	  */
-//	void initialize();
 	QWidget* createLayoutWidget(QWidget* parent, int index);
     QWidget* getLayoutWidget(int index);
 
@@ -169,8 +158,9 @@ public:
 
 	void deactivateCurrentLayout();///< deactivate the current layout, leaving an empty layout
 	void autoShowData(DataPtr data);
-	CameraControlPtr getCameraControl() { return mCameraControl; }
+	CameraControlPtr getCameraControl();
 	void clear();
+
 	//Interface for saving/loading
 	void addXml(QDomNode& parentNode);
 	void parseXml(QDomNode viewmanagerNode);
@@ -180,6 +170,9 @@ public:
 	void addDefaultLayout(LayoutData layoutData);
 
 	void enableContextMenuForViews(bool enable=true);
+
+	SharedOpenGLContextPtr getSharedOpenGLContext();
+
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
@@ -200,7 +193,7 @@ protected slots:
 
 protected:
 	ViewManager(VisServicesPtr backend);
-	std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
+	std::vector<ViewGroupPtr> getViewGroups();
 
 	void activateView(ViewCollectionWidget* widget, LayoutViewData viewData);
 	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData);
@@ -216,6 +209,11 @@ protected:
 	void rebuildLayouts();
 	void initializeGlobal2DZoom();
 	void initializeActiveView();
+
+	void autoShowInViewGroups(DataPtr data);
+	void autoResetCameraToSuperiorView();
+	void autoCenterToImageCenter();
+	QList<unsigned> getViewGroupsToAutoShowIn();
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
@@ -238,11 +236,7 @@ protected:
 private:
 	ViewManager(ViewManager const&);
 	ViewManager& operator=(ViewManager const&);
-protected:
-	void autoShowInViewGroups(DataPtr data);
-	void autoResetCameraToSuperiorView();
-	void autoCenterToImageCenter();
-	QList<unsigned> getViewGroupsToAutoShowIn();
+
 };
 
 /**

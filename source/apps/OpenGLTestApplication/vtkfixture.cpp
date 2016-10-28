@@ -56,7 +56,7 @@ void vtkfixture::printVtkOpenGLRenderWindowInfo(vtkSmartPointer<vtkOpenGLRenderW
 	report_gl_error();
 }
 
-vtkSmartPointer<vtkTextureObject> vtkfixture::createTextureObject(unsigned int depth, unsigned int width, int dataType, int numComps, unsigned int height, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow, void *data)
+vtkSmartPointer<vtkTextureObject> vtkfixture::createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow)
 {
 	vtkNew<vtkTextureObject> texture_object;
 	texture_object->SetContext(opengl_renderwindow);
@@ -294,13 +294,13 @@ void vtkfixture::createVTKWindowWithCylinderSourceWith3DTexture()
 	int numComps = 3;
 	int dataType = VTK_FLOAT;
 	void *data1 = (void*)color_data; //numComps=3, dataType = VTK_FLOAT  //4*4*4*3 = 192 < 243 (see shadercallback.h) (WORKS!!!)
-	vtkSmartPointer<vtkTextureObject> texture_object_1 = createTextureObject(depth, width, dataType, numComps, height, opengl_renderwindow, data1);
+	vtkSmartPointer<vtkTextureObject> texture_object_1 = createTextureObject(width, height, depth, dataType, numComps, data1, opengl_renderwindow);
 
 	numComps = 4;
 	dataType = VTK_UNSIGNED_CHAR;
 	void *data2 = generateTexture<unsigned char>(width, height, depth, 200, 140, 0, 200);  //numComps=4, dataType=VTK_UNSIGNED_CHAR (WORKS!!!)
 	//void *data2 = generateTexture<float>(width, height, depth, 0.5f, 0.1f, 0.2f, 1.0f);  //numComps=4, dataType=VTK_FLOAT (WORKS!!!)
-	vtkSmartPointer<vtkTextureObject> texture_object_2 = createTextureObject(depth, width, dataType, numComps, height, opengl_renderwindow, data2);
+	vtkSmartPointer<vtkTextureObject> texture_object_2 = createTextureObject(width, height, depth, dataType, numComps, data2, opengl_renderwindow);
 
 	// --------------------------------------------------------------------------------
 

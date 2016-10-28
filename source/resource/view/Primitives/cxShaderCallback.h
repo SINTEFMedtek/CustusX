@@ -33,30 +33,64 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSINGLEVOLUMEPAINTERHELPER_H
 #define CXSINGLEVOLUMEPAINTERHELPER_H
 
-
 #include "cxResourceVisualizationExport.h"
 #include "cxForwardDeclarations.h"
 #include <vtkCommand.h>
 
-class vtkUniformVariables;
+
 class vtkOpenGLHelper;
-class vtkRenderer;
+class vtkShaderProgram;
+class vtkOpenGLVertexArrayObject;
+
+typedef vtkSmartPointer<class vtkTextureObject> vtkTextureObjectPtr;
+typedef vtkSmartPointer<class vtkOpenGLBufferObject> vtkOpenGLBufferObjectPtr;
 
 namespace cx
 {
 
-//class cxResourceVisualization_EXPORT SingleVolumePainterHelper
 class cxResourceVisualization_EXPORT ShaderCallback : public vtkCommand
-
 {
-public:
-    static ShaderCallback *New()
-      { return new ShaderCallback; }
-    virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
-    ShaderCallback(int index);
-    ShaderCallback();
-    virtual ~ShaderCallback();
+public:
+	//VS = Vertextshader
+	//FS = Fragmentshader
+	//In = attribute (in VS)
+	//Out = varying (from VS)
+	static const std::string VS_In_Vec3_TextureCoordinate;
+	static const std::string VS_Out_Vec3_TextureCoordinate;
+	static const std::string FS_In_Vec3_TextureCoordinate;
+	static const std::string FS_Uniform_3DTexture;
+	static const std::string FS_Out_Vec4_Color;
+
+	struct ShaderItem
+	{
+		QString mImageUid;
+		vtkTextureObjectPtr mTexture;
+		vtkOpenGLBufferObjectPtr mTextureCoordinates;
+	};
+
+	static ShaderCallback *New();
+	ShaderCallback();
+
+	virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
+
+	SharedOpenGLContextPtr mContext;
+	std::vector<ShaderItem> mShaderItems;
+
+private:
+	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, int index_of_vector);
+	void addUniform(vtkShaderProgram *program, std::string name, int value);
+	void bindFSOutputVariable(vtkShaderProgram *program);
+
+	std::string generateVSAttributeTextureCoordinateVectorName(int index_of_vector) const;
+	std::string generateFSUniformTextureVectorName(int index_of_vector) const;
+	std::string getVectorNameFromName(std::string name, int index_of_vector) const;
+
+
+	//----- DELETE???-------
+public:
+	ShaderCallback(int index);
+	virtual ~ShaderCallback();
 
 	GPUImageDataBufferPtr mVolumeBuffer;
 	GPUImageLutBufferPtr mLutBuffer;
@@ -65,23 +99,25 @@ public:
 	float mLevel;
 	float mLLR;
 	float mAlpha;
-//	vtkRenderer *Renderer;
+	//	vtkRenderer *Renderer;
 
 public:
-//	explicit SingleVolumePainterHelper(int index);
-//	SingleVolumePainterHelper();
-//	~SingleVolumePainterHelper();
+	//	explicit SingleVolumePainterHelper(int index);
+	//	SingleVolumePainterHelper();
+	//	~SingleVolumePainterHelper();
 	void SetBuffer(GPUImageDataBufferPtr buffer);
 	void SetBuffer(GPUImageLutBufferPtr buffer);
 	void SetColorAttribute(float window, float level, float llr,float alpha);
 	void initializeRendering();
 	void setUniformiArray(vtkOpenGLHelper *cellBO, QString name, int val);
 	void setUniformfArray(vtkOpenGLHelper *cellBO, QString name, float val);
-//	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader);
-	void eachRenderInternal(vtkOpenGLHelper *cellBO);
+	//	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader);
+	//void eachRenderInternal(vtkOpenGLHelper *cellBO);
+
 private:
 	void init(int index);
-//	void uploadTextureCoordinate(vtkOpenGLHelper *cellBO);
+	//	void uploadTextureCoordinate(vtkOpenGLHelper *cellBO);
+	//----- DELETE???-------
 };
 
 }//cx

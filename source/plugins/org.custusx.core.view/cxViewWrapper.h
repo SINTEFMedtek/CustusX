@@ -100,7 +100,6 @@ void DataViewPropertiesInteractor::addDataActionsOfType(QWidget* parent)
 	}
 }
 
-
 /**
  * \brief Superclass for ViewWrappers.
  *
@@ -137,13 +136,13 @@ protected:
 	virtual QString getViewDescription() = 0;
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
+	virtual void addReps();
 
 	ViewGroupDataPtr mGroupData;
 	VisServicesPtr mServices;
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 
-	virtual void addReps();
 private:
 	DisplayTextRepPtr mPlaneTypeText;
 	DisplayTextRepPtr mDataNameText;
