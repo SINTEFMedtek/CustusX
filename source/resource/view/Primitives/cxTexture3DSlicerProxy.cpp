@@ -185,7 +185,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	//shaderCallback->mIndex = index;
 	mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, mShaderCallback);
 	//mOpenGLPolyDataMapper->AddObserver(vtkCommand::EndEvent, shaderCallback);
-	mSharedOpenGLContext->render();
+//	mSharedOpenGLContext->render();
 }
 
 ////copied from TextureSlicePainter
