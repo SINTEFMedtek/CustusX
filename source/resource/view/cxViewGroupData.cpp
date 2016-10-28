@@ -405,7 +405,7 @@ void ViewGroupData::uploadIfImageToSharedContext(QString uid)
 {
 	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(image)
-		mSharedOpenGLContext->upload(image);
+		mSharedOpenGLContext->upload3DTexture(image);
 }
 
 DataViewProperties ViewGroupData::getProperties(QString uid)

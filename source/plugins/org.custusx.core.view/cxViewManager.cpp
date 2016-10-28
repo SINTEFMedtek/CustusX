@@ -495,14 +495,15 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 	if(!this->mSharedOpenGLContext)
 	{
 		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(view->getRenderWindow().Get());
-		if(opengl_renderwindow)
+
+		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
 		{
 			this->mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
 			for(unsigned i = 0; i < mViewGroups.size(); ++i)
 				mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
 		}
 		else
-			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This menas we don't have an OpenGL shared context";
+			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
 	}
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();

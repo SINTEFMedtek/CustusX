@@ -50,6 +50,8 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class SharedOpenGLContext> SharedOpenGLContextPtr;
+typedef vtkSmartPointer<vtkTextureObject> vtkTextureObjectPtr;
+typedef vtkSmartPointer<vtkOpenGLBufferObject> vtkOpenGLBufferObjectPtr;
 
 /**
  * @brief Shared OpenGL context
@@ -65,14 +67,20 @@ typedef boost::shared_ptr<class SharedOpenGLContext> SharedOpenGLContextPtr;
 class cxResourceVisualization_EXPORT SharedOpenGLContext
 {
 public:
-	SharedOpenGLContext(vtkOpenGLRenderWindowPtr openGLRenderWindow);
+	static bool isValid(vtkOpenGLRenderWindowPtr opengl_renderwindow, bool print=false);
 
-	void upload(ImagePtr image);
+	SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext);
+
+	bool upload3DTexture(ImagePtr image);
+
 private:
-	vtkSmartPointer<vtkTextureObject> createTextureObject(unsigned int depth, unsigned int width, int dataType, int numComps, unsigned int height, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow, void *data);
-	vtkSmartPointer<vtkOpenGLBufferObject> allocateAndUploadArrayBuffer(int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const GLfloat *texture_data);
+	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
+	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const GLfloat *texture_data);
 
 	vtkOpenGLRenderWindowPtr mContext;
+
+	std::vector<vtkTextureObjectPtr > mTextureObjects;
+	std::vector<vtkTextureObjectPtr > mBufferObjects;
 };
 
 }//cx

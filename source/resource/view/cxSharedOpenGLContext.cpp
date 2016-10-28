@@ -42,50 +42,87 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
 #include "cxImage.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
 
-SharedOpenGLContext::SharedOpenGLContext(vtkOpenGLRenderWindowPtr openGLRenderWindow) :
-	mContext(openGLRenderWindow)
+bool SharedOpenGLContext::isValid(vtkOpenGLRenderWindowPtr opengl_renderwindow, bool print)
 {
-	vtkObject::GlobalWarningDisplayOn();
+	bool valid = true;
+
+	if(!opengl_renderwindow)
+		valid=false;
+	if(!opengl_renderwindow->SupportsOpenGL())
+		valid=false;
+	//if(!opengl_renderwindow->IsDrawable())
+	//	valid=false;
+	//TODO add check to see if OpenGL context is initialized
+
+	if(print)
+	{
+		CX_LOG_DEBUG() <<  "\n==== START SharedContext ====";
+		CX_LOG_DEBUG() <<  "SupportsOpenGL: " << opengl_renderwindow->SupportsOpenGL();
+		CX_LOG_DEBUG() <<  "IsDrawable: " << opengl_renderwindow->IsDrawable();
+		CX_LOG_DEBUG() <<  "Context support for open gl core 3.2: " << (vtkOpenGLRenderWindow::GetContextSupportsOpenGL32() ? "true" : "false");
+		CX_LOG_DEBUG() <<  "Context was created at: " << opengl_renderwindow->GetContextCreationTime();
+		const char *renderlib = vtkRenderWindow::GetRenderLibrary();
+		CX_LOG_DEBUG() <<  "GetRenderLibrary: " << ((renderlib!=0) ? std::string(renderlib) : "NOT FOUND");
+		CX_LOG_DEBUG() <<  "vtkOpenGLRenderWindow:";
+		opengl_renderwindow->PrintSelf(std::cout, vtkIndent(5));
+		CX_LOG_DEBUG() <<  "==== END SharedContext ====\n";
+	}
+	report_gl_error();
+
+	return valid;
 }
 
-void SharedOpenGLContext::upload(ImagePtr image)
+SharedOpenGLContext::SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext) :
+	mContext(sharedContext)
 {
+}
+
+bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
+{
+	bool success = false;
 	if(!image)
 	{
 		CX_LOG_ERROR() << "SharedOpenGLContext::upload: Not an image";
-		return;
+		return success;
 	}
 
 	vtkImageDataPtr vtkImageData = image->getBaseVtkImageData();
 	int* dims = vtkImageData->GetDimensions();
 	int dataType = vtkImageData->GetScalarType();
 	int numComps = vtkImageData->GetNumberOfScalarComponents();
+
 	CX_LOG_DEBUG() << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << " dataType: " << vtkImageData->GetScalarTypeAsString() << " numComps: " << numComps;
-//	mContext->Render();
-	mContext->OpenGLInitContext();
-	mContext->MakeCurrent();
 	report_gl_error();
-	this->createTextureObject(dims[2], dims[0], dataType, numComps, dims[1], mContext, vtkImageData->GetScalarPointer());
+
+	vtkSmartPointer<vtkTextureObject> texture_object = this->createTextureObject(dims[0], dims[1], dims[1], dataType, numComps, vtkImageData->GetScalarPointer(), mContext);
+	if(texture_object)
+	{
+		mTextureObjects.push_back(texture_object);
+		success = true;
+	}
+	return success;
 }
 
-vtkSmartPointer<vtkTextureObject> SharedOpenGLContext::createTextureObject(unsigned int depth, unsigned int width, int dataType, int numComps, unsigned int height, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow, void *data)
+vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width, unsigned int height,  unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow)
 {
-	vtkNew<vtkTextureObject> texture_object;
-//	texture_object.Get()->DebugOn();
+	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
+	texture_object->DebugOn();
+
 	texture_object->SetContext(opengl_renderwindow);
 
 	if(!texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
-		std::cout << "---------------------------------------- > Error creating 3D texture" << std::endl;
+		CX_LOG_ERROR() << "---------------------------------------- > Error creating 3D texture";
 
 	report_gl_error();
 	//6403 == GL_RED 0x1903
 	//6407 == GL_RGB 0x1907
 	//6408 == GL_RGBA 0x1908
-	std::cout << texture_object->GetFormat(dataType, numComps, true) << std::endl;
+	CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
 
 	texture_object->Activate();
 	report_gl_error();
@@ -97,35 +134,35 @@ vtkSmartPointer<vtkTextureObject> SharedOpenGLContext::createTextureObject(unsig
 	texture_object->SetMinificationFilter(vtkTextureObject::Linear);
 	texture_object->SendParameters();
 
-	std::cout << "Texture unit: " << texture_object->GetTextureUnit() << std::endl;
+	CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
 	texture_object->PrintSelf(std::cout, vtkIndent(4));
 
 	report_gl_error();
 
-	return texture_object.Get();
+	return texture_object;
 }
 
-vtkSmartPointer<vtkOpenGLBufferObject> SharedOpenGLContext::allocateAndUploadArrayBuffer(int numberOfLines, int numberOfComponentsLine, const GLfloat *data)
+vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(int numberOfLines, int numberOfComponentsLine, const GLfloat *data)
 {
-	vtkNew<vtkOpenGLBufferObject> buffer_object;
-	std::cout << "ALLOCATING BUFFER" << std::endl;
+	vtkOpenGLBufferObjectPtr buffer_object = vtkOpenGLBufferObjectPtr::New();
+	CX_LOG_DEBUG() << "ALLOCATING BUFFER";
 	buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
 	if(!buffer_object->Bind())
-		std::cout << "buffer object not bind" << std::endl;
+		CX_LOG_DEBUG() << "Buffer object not bind";
 	report_gl_error();
 
-	std::cout << "UPLOADING" << std::endl;
+	CX_LOG_DEBUG() <<  "UPLOADING";
 	if(!buffer_object->Upload(
 				data,
 				numberOfLines*numberOfComponentsLine,  //how many floats to upload! (aka number of floats in the vector)
 				vtkOpenGLBufferObject::ArrayBuffer
 				))
 	{
-		vtkGenericWarningMacro(<< "Error uploading buffer object data.");
+		CX_LOG_ERROR() << "Error uploading buffer object data.";
 	}
 	report_gl_error();
 
-	return buffer_object.Get();
+	return buffer_object;
 }
 
 
