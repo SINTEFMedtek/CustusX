@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxTrackedStream.h"
 #include "cxActiveData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -166,6 +167,7 @@ void ViewGroup::initializeActiveView(SyncedValuePtr val)
 
 void ViewGroup::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
 {
+	CX_LOG_WARNING() << "ViewGroup::setSharedOpenGLContext(..) need to make sure all new viewgroupdata and viewwrappers get the sharedcontext";
 	mViewGroupData->setSharedOpenGLContext(sharedOpenGLContext);
 }
 

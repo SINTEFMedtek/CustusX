@@ -30,14 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscSlices3DRep.cpp
- *
- *  Created on: Oct 13, 2011
- *      Author: christiana
- */
-
 #include "cxSlices3DRep.h"
 
 #include <vtkRenderer.h>
@@ -57,19 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
 
-//#ifndef CX_VTK_OPENGL2
-//#include <vtkPainterPolyDataMapper.h>
-//#endif
-
-
 
 //---------------------------------------------------------
 namespace cx
 {
 //---------------------------------------------------------
 
-Slices3DRep::Slices3DRep() :
-	RepImpl()
+Slices3DRep::Slices3DRep(SharedOpenGLContextPtr context) :
+	RepImpl(),
+	mSharedOpenGLContext(context)
 {
 }
 
@@ -77,9 +65,9 @@ Slices3DRep::~Slices3DRep()
 {
 }
 
-Slices3DRepPtr Slices3DRep::New(const QString& uid)
+Slices3DRepPtr Slices3DRep::New(SharedOpenGLContextPtr context, const QString& uid)
 {
-	return wrap_new(new Slices3DRep(), uid);
+	return wrap_new(new Slices3DRep(context), uid);
 }
 
 void Slices3DRep::setShaderPath(QString path)
@@ -108,7 +96,7 @@ void Slices3DRep::addPlane(PLANE_TYPE plane, PatientModelServicePtr dataManager)
 	sliceProxy->initializeFromPlane(plane, false, true, 150, 0.25);
 	sliceProxy->setAlwaysUseDefaultCenter(true);
 
-	Texture3DSlicerProxyPtr current = Texture3DSlicerProxy::New();
+	Texture3DSlicerProxyPtr current = Texture3DSlicerProxy::New(mSharedOpenGLContext);
 	current->setSliceProxy(sliceProxy);
 	current->setTargetSpaceToR();
 

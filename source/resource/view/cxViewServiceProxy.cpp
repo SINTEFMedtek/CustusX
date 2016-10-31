@@ -210,6 +210,11 @@ void ViewServiceProxy::enableContextMenuForViews(bool enable)
 	mViewService->enableContextMenuForViews(enable);
 }
 
+SharedOpenGLContextPtr ViewServiceProxy::getSharedOpenGLContext()
+{
+	return mViewService->getSharedOpenGLContext();
+}
+
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {
 	return mViewService->getClippers();

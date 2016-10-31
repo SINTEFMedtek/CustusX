@@ -87,7 +87,6 @@ public:
 
 	virtual void updateView();
 
-
     ImagePtr getImageToDisplay();
 
 signals:
@@ -143,9 +142,7 @@ private:
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
 
-//#ifndef CX_VTK_OPENGL2
 	Texture3DSlicerRepPtr mMultiSliceRep;
-//#endif
 
 	DataRepContainerPtr mDataRepContainer;
 

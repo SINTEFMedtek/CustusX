@@ -175,6 +175,11 @@ void ViewImplService::enableContextMenuForViews(bool enable)
 	viewManager()->enableContextMenuForViews(enable);
 }
 
+SharedOpenGLContextPtr ViewImplService::getSharedOpenGLContext()
+{
+	return viewManager()->getSharedOpenGLContext();
+}
+
 LayoutRepositoryPtr ViewImplService::getLayoutRepository()
 {
 	return viewManager()->getLayoutRepository();

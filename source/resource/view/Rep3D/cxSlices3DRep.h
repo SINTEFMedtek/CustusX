@@ -30,14 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscSlices3DRep.h
- *
- *  Created on: Oct 13, 2011
- *      Author: christiana
- */
-
 #ifndef CXSLICES3DREP_H_
 #define CXSLICES3DREP_H_
 
@@ -77,7 +69,7 @@ class cxResourceVisualization_EXPORT Slices3DRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static Slices3DRepPtr New(const QString& uid);
+	static Slices3DRepPtr New(SharedOpenGLContextPtr context, const QString& uid);
 	virtual ~Slices3DRep();
 	virtual QString getType() const { return "Slices3DRep"; }
 
@@ -87,12 +79,13 @@ public:
 	void setTool(ToolPtr tool);
 
 protected:
-	Slices3DRep();
+	Slices3DRep(SharedOpenGLContextPtr context);
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private:
 	std::vector<Texture3DSlicerProxyPtr> mProxy;
+	SharedOpenGLContextPtr mSharedOpenGLContext;
 };
 //---------------------------------------------------------
 }//end namespace

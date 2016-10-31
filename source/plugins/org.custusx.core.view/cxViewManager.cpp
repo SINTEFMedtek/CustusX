@@ -135,6 +135,11 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	this->enableRender(true);
 }
 
+std::vector<ViewGroupPtr> ViewManager::getViewGroups()
+{
+	return mViewGroups;
+}
+
 ViewManager::~ViewManager()
 {
 }
@@ -410,6 +415,14 @@ ViewGroupDataPtr ViewManager::getViewGroup(int groupIdx) const
 	return ViewGroupDataPtr();
 }
 
+unsigned ViewManager::viewGroupCount() const
+{
+	int count = 0;
+	while(this->getViewGroup(count))
+		++count;
+	return count;
+}
+
 /**Change layout from current to layout.
  */
 void ViewManager::setActiveLayout(const QString& layout, int widgetIndex)
@@ -492,6 +505,11 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
 
+	//------------------------------
+	//TODO Create centralized storage/factory for creating renderwindows
+
+	// SharedOpenGLContext should be created with a pointer to the first renderwindow created in CustusX
+	// because that renderwindow is special, it contain THE shared opengl context
 	if(!this->mSharedOpenGLContext)
 	{
 		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(view->getRenderWindow().Get());
@@ -505,6 +523,7 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 		else
 			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
 	}
+	//------------------------------
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
 	//Turn off rendering in vtkRenderWindowInteractor
@@ -516,10 +535,8 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 	// The real challenge is updating while the tracking is active, and this uses the still update rate.
 	interactor->SetDesiredUpdateRate(rate);
 
-//	mRenderLoop->addView(view);
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
 	mViewGroups[viewData.mGroup]->addView(wrapper);
-//	widget->showViews();
 }
 
 ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewData)
@@ -602,7 +619,6 @@ void ViewManager::updateCameraStyleActions()
 		mCameraStyleInteractor->connectCameraStyle(group->getData());
 		mCameraControl->setView(this->get3DView(index, 0));
 	}
-
 }
 
 /**Look for the index'th 3DView in given group.
@@ -628,6 +644,8 @@ void ViewManager::autoShowData(DataPtr data)
 		this->autoCenterToImageCenter();
 	}
 }
+
+CameraControlPtr ViewManager::getCameraControl() { return mCameraControl; }
 
 void ViewManager::autoShowInViewGroups(DataPtr data)
 {
@@ -713,6 +731,11 @@ void ViewManager::enableContextMenuForViews(bool enable)
 		if(widget)
 			widget->enableContextMenuForViews(enable);
 	}
+}
+
+SharedOpenGLContextPtr ViewManager::getSharedOpenGLContext()
+{
+	return mSharedOpenGLContext;
 }
 
 } //namespace cx

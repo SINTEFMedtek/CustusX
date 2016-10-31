@@ -397,11 +397,11 @@ void ViewGroupData::addDataSorted(QString uid)
 
 void ViewGroupData::insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item)
 {
-	this->uploadIfImageToSharedContext(item.first);
+	this->upload3DTextureIfImageToSharedContext(item.first);
 	this->mData.insert(iter, item);
 }
 
-void ViewGroupData::uploadIfImageToSharedContext(QString uid)
+void ViewGroupData::upload3DTextureIfImageToSharedContext(QString uid)
 {
 	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(image)

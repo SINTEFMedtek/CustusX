@@ -46,11 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxConfig.h"
 #include "cxShaderCallback.h"
 
-//#include <vtkNew.h>
-
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 typedef vtkSmartPointer<class vtkOpenGLPolyDataMapper> vtkOpenGLPolyDataMapperPtr;
-//class vtkOpenGLPolyDataMapper;
 
 //---------------------------------------------------------
 namespace cx
@@ -75,7 +72,7 @@ class cxResourceVisualization_EXPORT Texture3DSlicerProxy: public QObject
 {
 Q_OBJECT
 public:
-	static Texture3DSlicerProxyPtr New();
+	static Texture3DSlicerProxyPtr New(SharedOpenGLContextPtr context);
 
 	virtual ~Texture3DSlicerProxy() {}
 	virtual void setShaderPath(QString shaderFile) {}
@@ -92,10 +89,7 @@ public:
 
 };
 
-//#ifndef CX_VTK_OPENGL2
-//#ifndef WIN32
-
-//#if !defined(CX_VTK_OPENGL2) && !defined(WIN32)
+//--------------------------------------------------------------------
 
 /**
  * \brief Slice volumes using a SliceProxy.
@@ -104,37 +98,38 @@ public:
  * is performed by loading the image into the GPU as a 3D texture and
  * slicing it there, using the GPU.
  *
- * Used by Sonowand and Sintef.
  *
- *  Created on: Oct 13, 2011
- *      Author: christiana
  *
  * \ingroup cx_resource_view
  */
+//TODO split out in own file
 class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {
 	Q_OBJECT
+
 public:
-	static Texture3DSlicerProxyPtr New();
+	static Texture3DSlicerProxyPtr New(SharedOpenGLContextPtr context);
+
 	virtual ~Texture3DSlicerProxyImpl();
+
 	void setShaderPath(QString shaderFile);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ImagePtr> images);
 	void setSliceProxy(SliceProxyPtr slicer);
-	SliceProxyPtr getSliceProxy() { return mSliceProxy; }
+	SliceProxyPtr getSliceProxy();
 	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
-	std::vector<ImagePtr> getImages() { return mImages; }
-
-protected:
-	Texture3DSlicerProxyImpl();
-	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
+	std::vector<ImagePtr> getImages();
 
 protected slots:
 	void transformChangedSlot();
 	void updateColorAttributeSlot();
 	void imageChanged();
+
+protected:
+	Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context);
+	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
 private:
 	void resetGeometryPlane();
@@ -143,13 +138,26 @@ private:
 	void setColorAttributes(int i);
 	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
 
+	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
+	ShaderCallbackPtr safeIndex(int index);
+	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
+	bool isNewInputImages(std::vector<ImagePtr> images_raw);
+
+	const std::string getVSReplacement_dec() const;
+	const std::string getVSReplacement_impl() const;
+	const std::string getFS() const;
+
+	SharedOpenGLContextPtr mSharedOpenGLContext;
+	ShaderCallbackPtr mShaderCallback;
+
+	std::vector<ShaderCallbackPtr> mElement;
+
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
 	std::vector<ImagePtr> mRawImages;
 	SliceProxyPtr mSliceProxy;
 	bool mTargetSpaceIsR;
 
-//	TextureSlicePainterPtr mPainter;
 	vtkActorPtr mActor;
 	vtkPolyDataPtr mPolyData;
 	vtkPlaneSourcePtr mPlaneSource;
@@ -160,32 +168,12 @@ private:
 //	vtkTexturePtr mTexture;
 
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
-	bool isNewInputImages(std::vector<ImagePtr> images_raw);
 //	QString loadShaderFile();
 //	QString replaceShaderSourceMacros(QString shaderSource);
 
-
-	std::vector<ShaderCallbackPtr> mElement;
-	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
-	ShaderCallbackPtr safeIndex(int index);
-	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 };
+//--------------------------------------------------------------------
 
-//#endif // WIN32
-//#else
-////Dummy code to make file compile with Qt moc. This is needed because Qt moc ignores ifdef.
-//class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
-//{
-//	Q_OBJECT
-//protected slots:
-//	void transformChangedSlot() {}
-//	void updateColorAttributeSlot() {}
-//	void imageChanged() {}
-//};
-//#endif //CX_VTK_OPENGL2
+}//namespace cx
 
-
-//---------------------------------------------------------
-}//end namespace
-//---------------------------------------------------------
 #endif /* CXTEXTURE3DSLICERPROXY_H_ */

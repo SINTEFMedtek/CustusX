@@ -88,9 +88,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
 
-//#ifndef CX_VTK_OPENGL2
 #include "cxTexture3DSlicerRep.h"
-//#endif
 
 namespace cx
 {
@@ -260,7 +258,7 @@ void ViewWrapper2D::createAndAddMultiSliceRep()
 //#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 		return;
-	mMultiSliceRep = Texture3DSlicerRep::New();
+	mMultiSliceRep = Texture3DSlicerRep::New(mServices->view()->getSharedOpenGLContext());
 	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 

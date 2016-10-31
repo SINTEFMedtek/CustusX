@@ -82,12 +82,34 @@ SharedOpenGLContext::SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext)
 {
 }
 
+bool SharedOpenGLContext::hasUploadedTexture(QString uid) const
+{
+	return mTextureObjects.count(uid);
+}
+
+vtkTextureObjectPtr SharedOpenGLContext::getTexture(QString uid) const
+{
+	vtkTextureObjectPtr retval;
+	if(hasUploadedTexture(uid))
+		retval = mTextureObjects.at(uid);
+	return retval;
+}
+
+bool SharedOpenGLContext::makeCurrent() const
+{
+	if(!mContext->IsCurrent())
+		mContext->MakeCurrent();
+	if(!mContext->IsCurrent())
+		CX_LOG_ERROR() << "OpenGL context is not current.";
+	return mContext->IsCurrent();
+}
+
 bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 {
 	bool success = false;
 	if(!image)
 	{
-		CX_LOG_ERROR() << "SharedOpenGLContext::upload: Not an image";
+		CX_LOG_ERROR() << "Cannot upload en empty image as a 3D texture";
 		return success;
 	}
 
@@ -99,10 +121,13 @@ bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 	CX_LOG_DEBUG() << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << " dataType: " << vtkImageData->GetScalarTypeAsString() << " numComps: " << numComps;
 	report_gl_error();
 
-	vtkSmartPointer<vtkTextureObject> texture_object = this->createTextureObject(dims[0], dims[1], dims[1], dataType, numComps, vtkImageData->GetScalarPointer(), mContext);
+	vtkTextureObjectPtr texture_object;
+	if(!mTextureObjects.count(image->getUid()))
+		texture_object = this->createTextureObject(dims[0], dims[1], dims[1], dataType, numComps, vtkImageData->GetScalarPointer(), mContext);
+
 	if(texture_object)
 	{
-		mTextureObjects.push_back(texture_object);
+		mTextureObjects[image->getUid()] = texture_object;
 		success = true;
 	}
 	return success;
@@ -113,31 +138,37 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
 	texture_object->DebugOn();
 
+	if(!this->makeCurrent())
+		return texture_object;
+
 	texture_object->SetContext(opengl_renderwindow);
 
-	if(!texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
-		CX_LOG_ERROR() << "---------------------------------------- > Error creating 3D texture";
+	if(texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
+	{
+		report_gl_error();
 
-	report_gl_error();
-	//6403 == GL_RED 0x1903
-	//6407 == GL_RGB 0x1907
-	//6408 == GL_RGBA 0x1908
-	CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
+		//6403 == GL_RED 0x1903
+		//6407 == GL_RGB 0x1907
+		//6408 == GL_RGBA 0x1908
+		CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
 
-	texture_object->Activate();
-	report_gl_error();
+		texture_object->Activate();
+		report_gl_error();
 
-	texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
-	texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
-	texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
-	texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
-	texture_object->SetMinificationFilter(vtkTextureObject::Linear);
-	texture_object->SendParameters();
+		texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
+		texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
+		texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
+		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
+		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
+		texture_object->SendParameters();
 
-	CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
-	texture_object->PrintSelf(std::cout, vtkIndent(4));
+		CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
+		texture_object->PrintSelf(std::cout, vtkIndent(4));
 
-	report_gl_error();
+		report_gl_error();
+	}
+	else
+		CX_LOG_ERROR() << "Error creating 3D texture";
 
 	return texture_object;
 }
@@ -145,21 +176,29 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(int numberOfLines, int numberOfComponentsLine, const GLfloat *data)
 {
 	vtkOpenGLBufferObjectPtr buffer_object = vtkOpenGLBufferObjectPtr::New();
+	buffer_object->DebugOn();
+
+	if(!this->makeCurrent())
+		return buffer_object;
+
 	CX_LOG_DEBUG() << "ALLOCATING BUFFER";
 	buffer_object->GenerateBuffer(vtkOpenGLBufferObject::ArrayBuffer);
-	if(!buffer_object->Bind())
-		CX_LOG_DEBUG() << "Buffer object not bind";
-	report_gl_error();
-
-	CX_LOG_DEBUG() <<  "UPLOADING";
-	if(!buffer_object->Upload(
-				data,
-				numberOfLines*numberOfComponentsLine,  //how many floats to upload! (aka number of floats in the vector)
-				vtkOpenGLBufferObject::ArrayBuffer
-				))
+	if(buffer_object->Bind())
 	{
-		CX_LOG_ERROR() << "Error uploading buffer object data.";
+		CX_LOG_DEBUG() <<  "UPLOADING BUFFER";
+		if(!buffer_object->Upload(
+					data,
+					numberOfLines*numberOfComponentsLine,  //how many floats to upload! (aka number of floats in the vector)
+					vtkOpenGLBufferObject::ArrayBuffer
+					))
+		{
+			CX_LOG_ERROR() << "Error uploading buffer object data.";
+		}
+		report_gl_error();
+
 	}
+	else
+		CX_LOG_DEBUG() << "Buffer object could not bind";
 	report_gl_error();
 
 	return buffer_object;

@@ -41,13 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxLayoutData.h"
 #include "cxEnumConverter.h"
-class QActionGroup;
+#include "cxForwardDeclarations.h"
 
 #define ViewService_iid "cx::ViewService"
+
+class QActionGroup;
 
 namespace cx
 {
 
+//TODO move to cxForwardDeclarations
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
 
@@ -109,6 +112,8 @@ public:
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx) = 0;
 	virtual void addDefaultLayout(LayoutData layoutData) = 0;
 	virtual void enableContextMenuForViews(bool enable=true) = 0;
+
+	virtual SharedOpenGLContextPtr getSharedOpenGLContext() = 0;
 
 	virtual bool isNull() = 0;
 	static ViewServicePtr getNullObject();

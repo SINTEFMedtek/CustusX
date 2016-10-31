@@ -58,7 +58,7 @@ typedef vtkSmartPointer<vtkOpenGLBufferObject> vtkOpenGLBufferObjectPtr;
  *
  * CX use a shared OpenGL context for all render windows.
  * This is a hack added to our branch of VTK.
- * See vtkXOpenGLRenderWindow, vtkCocoaRenderWindow, and vtkWindows???
+ * See vtkXOpenGLRenderWindow (Linux), vtkCocoaRenderWindow (Mac), and "vtkSomething" (Windows)
  *
  * There exist only one shared OpenGL context, and this is set to be the id of the first context created by vtkRenderWindow.
  * All vtkRenderWindows created gets this shared context.
@@ -71,6 +71,11 @@ public:
 
 	SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext);
 
+	bool hasUploadedTexture(QString uid) const;
+	vtkTextureObjectPtr getTexture(QString uid) const;
+
+	bool makeCurrent() const;
+
 	bool upload3DTexture(ImagePtr image);
 
 private:
@@ -79,8 +84,10 @@ private:
 
 	vtkOpenGLRenderWindowPtr mContext;
 
-	std::vector<vtkTextureObjectPtr > mTextureObjects;
-	std::vector<vtkTextureObjectPtr > mBufferObjects;
+	std::map<QString, vtkTextureObjectPtr > mTextureObjects;
+	std::map<QString, vtkOpenGLBufferObjectPtr > mTextureCoordinateBuffers;
+
+	SharedOpenGLContext(); //not implemented
 };
 
 }//cx

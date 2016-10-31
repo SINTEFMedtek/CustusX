@@ -30,14 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-
-/*
- * sscTexture3DSlicerProxyImpl.cpp
- *
- *  Created on: Oct 13, 2011
- *      Author: christiana
- */
-
 #include "cxTexture3DSlicerProxy.h"
 
 #include <vtkRenderer.h>
@@ -64,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include <qtextstream.h>
 
+#include "cxSharedOpenGLContext.h"
 
 //#include "cxTextureSlicePainter.h"
 //#ifndef CX_VTK_OPENGL2
@@ -99,9 +92,9 @@ bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
 //	return success;
 }
 
-Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
+Texture3DSlicerProxyPtr Texture3DSlicerProxy::New(SharedOpenGLContextPtr context)
 {
-	return Texture3DSlicerProxyImpl::New();
+	return Texture3DSlicerProxyImpl::New(context);
 }
 
 
@@ -110,8 +103,9 @@ void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 	mTargetSpaceIsR = true;
 }
 
-Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
+Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context)
 {
+	mSharedOpenGLContext = context;
 	mTargetSpaceIsR = false;
 	mActor = vtkActorPtr::New();
 //	mPainter = TextureSlicePainterPtr::New();
@@ -149,11 +143,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 				vtkShader::Vertex,
 				"//VTK::PositionVC::Dec", // replace the normal block
 				true, // before the standard replacements
-				"//VTK::PositionVC::Dec\n" // we still want the default
-				"attribute vec3 COLOR_VSIN;\n"
-				"attribute vec3 TEXTURE_COORDINATE_VSIN;\n"
-				"varying vec3 COLOR_VSOUT;\n"
-				"varying vec3 TEXTURE_COORDINATE_VSOUT;\n",
+				this->getVSReplacement_dec(),
 				false // only do it once
 				);
 
@@ -164,29 +154,38 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl()
 				vtkShader::Vertex,
 				"//VTK::PositionVC::Impl", // replace the normal block
 				true, // before the standard replacements
-				"//VTK::PositionVC::Impl\n" // we still want the default
-				"COLOR_VSOUT = COLOR_VSIN;\n"
-				"TEXTURE_COORDINATE_VSOUT = TEXTURE_COORDINATE_VSIN;\n",
+				this->getVSReplacement_impl(),
 				false // only do it once
 				);
 
 	//===========
 	// Replace the fragment shader
 	//===========
-	std::string fragment_shader =
-		"//VTK::System::Dec\n"  // always start with this line
-		"//VTK::Output::Dec\n"  // always have this line in your FS
-		"in vec3 COLOR_VSOUT;\n"
-		"in vec3 TEXTURE_COORDINATE_VSOUT;\n"
-		"uniform sampler3D my_texture;\n"
-		"out vec4 color;\n"
-		"void main () {\n"
-		"	color = texture(my_texture, TEXTURE_COORDINATE_VSOUT);\n"
-		"}\n";
-	mOpenGLPolyDataMapper->SetFragmentShaderCode(fragment_shader.c_str());
+	mOpenGLPolyDataMapper->SetFragmentShaderCode(this->getFS().c_str());
 
-	mActor->SetMapper(mOpenGLPolyDataMapper.Get());
+	char *vertexShader = 	mOpenGLPolyDataMapper->GetVertexShaderCode();
+	if(vertexShader)
+	{
+		std::cout << "VERTEX SHADER:" << std::endl;
+		std::cout << vertexShader << std::endl;
+	}
+
+	char *fragmentShader = mOpenGLPolyDataMapper->GetFragmentShaderCode();
+	if(fragmentShader)
+	{
+		std::cout << "FRAGMENT SHADER:" << std::endl;
+		std::cout << fragmentShader << std::endl;
+	}
+
+	mActor->SetMapper(mOpenGLPolyDataMapper);
 //	mActor->SetTexture(mTexture);
+
+	mShaderCallback = ShaderCallbackPtr::New();
+	mShaderCallback->mContext = mSharedOpenGLContext;
+	//shaderCallback->mIndex = index;
+	mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, mShaderCallback);
+	//mOpenGLPolyDataMapper->AddObserver(vtkCommand::EndEvent, shaderCallback);
+//	mSharedOpenGLContext->render();
 }
 
 ////copied from TextureSlicePainter
@@ -231,9 +230,9 @@ Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
 	mImages.clear();
 }
 
-Texture3DSlicerProxyPtr Texture3DSlicerProxyImpl::New()
+Texture3DSlicerProxyPtr Texture3DSlicerProxyImpl::New(SharedOpenGLContextPtr context)
 {
-	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxyImpl());
+	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxyImpl(context));
 }
 
 vtkActorPtr Texture3DSlicerProxyImpl::getActor()
@@ -241,9 +240,14 @@ vtkActorPtr Texture3DSlicerProxyImpl::getActor()
 	return mActor;
 }
 
+std::vector<ImagePtr> Texture3DSlicerProxyImpl::getImages()
+{
+	return mImages;
+}
+
 void Texture3DSlicerProxyImpl::setShaderPath(QString shaderFile)
 {
-//	mPainter->setShaderPath(shaderFile);
+	//	mPainter->setShaderPath(shaderFile);
 }
 
 //void Texture3DSlicerProxyImpl::viewChanged()
@@ -332,6 +336,54 @@ bool Texture3DSlicerProxyImpl::isNewInputImages(std::vector<ImagePtr> images_raw
 	return true;
 }
 
+const std::string Texture3DSlicerProxyImpl::getVSReplacement_dec() const
+{
+	QString temp = QString(
+		"//VTK::PositionVC::Dec\n"
+		"attribute vec3 %1;\n"
+		"varying vec3 %2;\n"
+		)
+		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str())
+		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str());
+	const std::string retval = temp.toStdString();
+	std::cout << "getVSReplacement_dec: " <<  retval << std::endl;
+	return retval;
+}
+
+const std::string Texture3DSlicerProxyImpl::getVSReplacement_impl() const
+{
+	QString temp = QString(
+		"//VTK::PositionVC::Impl\n"
+		"%1 = %2;\n"
+		)
+		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
+		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str());
+	const std::string retval = temp.toStdString();
+	std::cout << "getVSReplacement_impl: " <<  retval << std::endl;
+	return retval;
+}
+
+const std::string Texture3DSlicerProxyImpl::getFS() const
+{
+	QString temp = QString(
+		"//VTK::System::Dec\n"
+		"//VTK::Output::Dec\n"
+		"in vec3 %1;\n"
+		"uniform sampler3D %2;\n"
+		"out vec4 %3;\n"
+		"void main () {\n"
+		"//	%3 = texture(%2, %1);\n"
+		"	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
+		"}\n"
+		)
+		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
+		.arg(ShaderCallback::FS_Uniform_3DTexture.c_str())
+		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str());
+	const std::string retval = temp.toStdString();
+	std::cout << "getFS: " <<  retval << std::endl;
+	return retval;
+}
+
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
 	if (!this->isNewInputImages(images_raw))
@@ -351,6 +403,17 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
+		if(mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
+		{
+			QString uid = mImages[i]->getUid();
+			ShaderCallback::ShaderItem shaderitem;
+			shaderitem.mImageUid = uid;
+			shaderitem.mTexture = mSharedOpenGLContext->getTexture(uid);
+			mShaderCallback->mShaderItems.push_back(shaderitem);
+		}
+		else
+			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL.";
+
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();
 
 		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
@@ -384,19 +447,7 @@ ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
 	if ((int)mElement.size() <= index)
 	{
 		mElement.resize(index+1);
-		vtkSmartPointer<ShaderCallback> shaderCallback = vtkSmartPointer<ShaderCallback>::New();
-		shaderCallback->mIndex = index;
-//		mElement[index] = ShaderCallback(index);
-		mElement[index] = shaderCallback;
-
-		// Setup a callback to change some uniforms
-//		VTK_CREATE(ShaderCallback, mElement[index]);
-//	    mElement[index]->Renderer = renderer.Get();
-
-
-		//TODO: Need vtkRenderer?
-		mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, shaderCallback);
-		mOpenGLPolyDataMapper->AddObserver(vtkCommand::EndEvent, shaderCallback);
+		mElement[index] = mShaderCallback;
 	}
 	return mElement[index];
 }
@@ -432,6 +483,11 @@ void Texture3DSlicerProxyImpl::setSliceProxy(SliceProxyPtr slicer)
 			updateCoordinates(i);
 		}
 	}
+}
+
+SliceProxyPtr Texture3DSlicerProxyImpl::getSliceProxy()
+{
+	return mSliceProxy;
 }
 
 QString Texture3DSlicerProxyImpl::getTCoordName(int index)
