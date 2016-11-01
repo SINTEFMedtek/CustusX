@@ -34,8 +34,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXSHAREDOPENGLCONTEXT_H
 
 //OpenGL
+#ifdef __APPLE__
 #include <GL/glew.h>
 #include <GL/glut.h> //Framework on Mac
+
+#else
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glu.h>
+#include <GL/glext.h>
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+#include <GL/glext.h>
+#endif
+
 
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
