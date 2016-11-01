@@ -61,10 +61,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <GL/glu.h>
 #endif
 
-#ifdef WIN32
-#include <windows.h>
-#include <GL/glext.h>
-#endif
+//#ifdef WIN32
+//#include <windows.h>
+//#include <GL/glext.h>
+//#endif
 
 
 #include <boost/shared_ptr.hpp>
