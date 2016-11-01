@@ -45,26 +45,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <GL/glext.h>
 //#endif
 
-//#ifdef WIN32
-//#include <windows.h>
-//#include <GL/glext.h>
-//#endif
-
-#ifndef WIN32
-#define GL_GLEXT_PROTOTYPES
-#else
+#ifdef WIN32
 #include <windows.h>
-#endif //WIN32
+#include <GL/glext.h>
+#endif
 
-
-#include <GL/glew.h>
-
-//#ifdef __APPLE__
-////#include <OpenGL/gl.h>
-//#include <GL/glew.h>
+//#ifndef WIN32
+//#define GL_GLEXT_PROTOTYPES
 //#else
-//#include <GL/glew.h>
-//#endif
+//#include <windows.h>
+//#endif //WIN32
+
+#ifdef __APPLE__
+//#include <OpenGL/gl.h>
+#include <GL/glew.h>
+#else
+#include <GL/gl.h>
+#endif
 
 //#ifdef WIN32
 //#include <windows.h>
