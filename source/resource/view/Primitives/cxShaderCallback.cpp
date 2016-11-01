@@ -46,26 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGPUImageBuffer.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
-
-//#ifdef __APPLE__
-//#include <GL/glew.h>
-//#include <GL/glut.h> //Framework on Mac
-
-////#include <OpenGL/glu.h>
-////#include <OpenGL/gl.h>
-////#include "X11/Xlib.h"
-////#include "/usr/include/X11/Xlib.h"
-
-//#else
-//#define GL_GLEXT_PROTOTYPES
-//#include <GL/glu.h>
-//#include <GL/glext.h>
-//#endif
-
-//#ifdef WIN32
-//#include <windows.h>
-//#include <GL/glext.h>
-//#endif
 //-----DELETE?-----
 
 namespace cx
@@ -381,10 +361,10 @@ void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int
 
 void ShaderCallback::bindFSOutputVariable(vtkShaderProgram *program)
 {
-	GLint color_frag_out_index = glGetFragDataLocation(program->GetHandle(), FS_Out_Vec4_Color.c_str());
+	GLint color_frag_out_index = glGetFragDataLocationEXT(program->GetHandle(), FS_Out_Vec4_Color.c_str());
 	if(color_frag_out_index != -1)
 	{
-		glBindFragDataLocation(program->GetHandle(), color_frag_out_index, FS_Out_Vec4_Color.c_str()); //setting output of fragment shader
+		glBindFragDataLocationEXT(program->GetHandle(), color_frag_out_index, FS_Out_Vec4_Color.c_str()); //setting output of fragment shader
 		CX_LOG_DEBUG() << "Binding fragmentshader output to " << FS_Out_Vec4_Color << " at index "<< color_frag_out_index;
 	} else
 		CX_LOG_ERROR() << "Could not find glGetFragDataLocation for " << FS_Out_Vec4_Color;

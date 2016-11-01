@@ -52,11 +52,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
+#else
+#include <windows.h>
 #endif //WIN32
 
 #ifdef __APPLE__
-//#include <OpenGL/glu.h>
-#include <GL/glew.h>
+#include <OpenGL/gl.h>
+//#include <GL/glew.h>
 #else
 #include <GL/gl.h>
 #endif
