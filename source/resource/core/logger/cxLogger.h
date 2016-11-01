@@ -101,6 +101,12 @@ cxResource_EXPORT void reportVolatile(QString msg);
 	cx::MessageLogger(__FILE__, __LINE__, Q_FUNC_INFO, channel, severity)
 
 
+/** Macro for creating debug marks in the code.
+  *	Usage:
+  *		CX_LOG_DEBUG_CHECKPOINT();
+  *		CX_LOG_DEBUG_CHECKPOINT() << "Message " << "to output";
+  */
+#define CX_LOG_DEBUG_CHECKPOINT() CX_LOG_CHANNEL_SEVERITY_INTERNAL("checkpoints", cx::mlDEBUG).logger() << "CHECKPOINT: " << __FILE__ << " at " << __LINE__ << " in " << Q_FUNC_INFO << " : "
 
 /** Log to the default channel
  * Usage: One of the following:
