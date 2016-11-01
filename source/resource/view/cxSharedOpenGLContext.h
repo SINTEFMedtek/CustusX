@@ -57,8 +57,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif //WIN32
 
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
-//#include <GL/glew.h>
+//#include <OpenGL/gl.h>
+#include <GL/glew.h>
 #else
 #include <GL/gl.h>
 #endif

@@ -361,10 +361,10 @@ void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int
 
 void ShaderCallback::bindFSOutputVariable(vtkShaderProgram *program)
 {
-	GLint color_frag_out_index = glGetFragDataLocationEXT(program->GetHandle(), FS_Out_Vec4_Color.c_str());
+	GLint color_frag_out_index = glGetFragDataLocation(program->GetHandle(), FS_Out_Vec4_Color.c_str());
 	if(color_frag_out_index != -1)
 	{
-		glBindFragDataLocationEXT(program->GetHandle(), color_frag_out_index, FS_Out_Vec4_Color.c_str()); //setting output of fragment shader
+		glBindFragDataLocation(program->GetHandle(), color_frag_out_index, FS_Out_Vec4_Color.c_str()); //setting output of fragment shader
 		CX_LOG_DEBUG() << "Binding fragmentshader output to " << FS_Out_Vec4_Color << " at index "<< color_frag_out_index;
 	} else
 		CX_LOG_ERROR() << "Could not find glGetFragDataLocation for " << FS_Out_Vec4_Color;
