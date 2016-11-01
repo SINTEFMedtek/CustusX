@@ -56,12 +56,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <windows.h>
 #endif //WIN32
 
-#ifdef __APPLE__
-//#include <OpenGL/gl.h>
+
 #include <GL/glew.h>
-#else
-#include <GL/gl.h>
-#endif
+
+//#ifdef __APPLE__
+////#include <OpenGL/gl.h>
+//#include <GL/glew.h>
+//#else
+//#include <GL/glew.h>
+//#endif
 
 //#ifdef WIN32
 //#include <windows.h>
