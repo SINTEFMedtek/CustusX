@@ -84,8 +84,8 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
 	REQUIRE(sharedOpenGLContext->upload3DTexture(image1));
 
-//	for (unsigned i = 0; i < 10; ++i)
-//		renderWindow->Render();
+	REQUIRE(sharedOpenGLContext->hasUploadedTexture(image0->getUid()));
+	REQUIRE(sharedOpenGLContext->hasUploadedTexture(image1->getUid()));
 }
 
 }//cxtest

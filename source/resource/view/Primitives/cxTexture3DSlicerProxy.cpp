@@ -317,7 +317,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
-		if(mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
+		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))//crash
 		{
 			QString uid = mImages[i]->getUid();
 			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
