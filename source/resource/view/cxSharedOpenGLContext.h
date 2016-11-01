@@ -58,12 +58,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <OpenGL/glu.h>
 #include <GL/glew.h>
 #else
-#include <GL/glu.h>
+#include <GL/gl.h>
 #endif
 
 //#ifdef WIN32
 //#include <windows.h>
 //#include <GL/glext.h>
+//#endif
+
+//From vtkOpenGL.h
+// To prevent gl.h to include glext.h provided by the system
+//#define GL_GLEXT_LEGACY
+//#if defined(__APPLE__) && defined(VTK_USE_COCOA)
+//# include <OpenGL/gl.h> // Include OpenGL API.
+//#else
+//# include "vtkWindows.h" // Needed to include OpenGL header on Windows.
+//# include <GL/gl.h> // Include OpenGL API.
 //#endif
 
 
