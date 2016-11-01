@@ -47,25 +47,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
 
-#ifdef __APPLE__
-#include <GL/glew.h>
-#include <GL/glut.h> //Framework on Mac
+//#ifdef __APPLE__
+//#include <GL/glew.h>
+//#include <GL/glut.h> //Framework on Mac
 
-//#include <OpenGL/glu.h>
-//#include <OpenGL/gl.h>
-//#include "X11/Xlib.h"
-//#include "/usr/include/X11/Xlib.h"
+////#include <OpenGL/glu.h>
+////#include <OpenGL/gl.h>
+////#include "X11/Xlib.h"
+////#include "/usr/include/X11/Xlib.h"
 
-#else
-#define GL_GLEXT_PROTOTYPES
-#include <GL/glu.h>
-#include <GL/glext.h>
-#endif
+//#else
+//#define GL_GLEXT_PROTOTYPES
+//#include <GL/glu.h>
+//#include <GL/glext.h>
+//#endif
 
-#ifdef WIN32
-#include <windows.h>
-#include <GL/glext.h>
-#endif
+//#ifdef WIN32
+//#include <windows.h>
+//#include <GL/glext.h>
+//#endif
 //-----DELETE?-----
 
 namespace cx

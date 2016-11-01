@@ -34,14 +34,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXSHAREDOPENGLCONTEXT_H
 
 //OpenGL
-#ifdef __APPLE__
-#include <GL/glew.h>
-#include <GL/glut.h> //Framework on Mac
+//#ifdef __APPLE__
+//#include <OpenGL/glu.h>
+//#include <GL/glew.h>
+//#include <GL/glut.h> //Framework on Mac
 
-#else
+//#else
+//#define GL_GLEXT_PROTOTYPES
+//#include <GL/glu.h>
+//#include <GL/glext.h>
+//#endif
+
+//#ifdef WIN32
+//#include <windows.h>
+//#include <GL/glext.h>
+//#endif
+
+#ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
+#endif //WIN32
+
+#ifdef __APPLE__
+//#include <OpenGL/glu.h>
+#include <GL/glew.h>
+#else
 #include <GL/glu.h>
-#include <GL/glext.h>
 #endif
 
 #ifdef WIN32
