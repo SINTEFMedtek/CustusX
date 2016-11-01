@@ -197,7 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        tag = 'VTK-6-3-0.cx_patch_5'
+        tag = 'VTK-7-0-0.cx_patch_2'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         builder = self._getBuilder()
@@ -223,6 +223,7 @@ class VTK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL")
         builder.configureCMake()
 # ---------------------------------------------------------
 
