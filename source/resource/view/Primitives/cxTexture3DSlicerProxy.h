@@ -85,8 +85,10 @@ public:
 	virtual void setTargetSpaceToR(){}
 	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
 
-	static bool isSupported(vtkRenderWindowPtr window);
+	static bool isSupported(vtkRenderWindowPtr window){return true;};
 
+protected:
+	Texture3DSlicerProxy(){};
 };
 
 //--------------------------------------------------------------------
@@ -112,7 +114,7 @@ public:
 
 	virtual ~Texture3DSlicerProxyImpl();
 
-	void setShaderPath(QString shaderFile);
+	//void setShaderPath(QString shaderFile);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ImagePtr> images);
 	void setSliceProxy(SliceProxyPtr slicer);
@@ -139,7 +141,7 @@ private:
 	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
 
 	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
-	ShaderCallbackPtr safeIndex(int index);
+	//ShaderCallbackPtr safeIndex(int index);
 	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);
 
@@ -150,7 +152,7 @@ private:
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	ShaderCallbackPtr mShaderCallback;
 
-	std::vector<ShaderCallbackPtr> mElement;
+	//std::vector<ShaderCallbackPtr> mElement;
 
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
@@ -161,13 +163,12 @@ private:
 	vtkActorPtr mActor;
 	vtkPolyDataPtr mPolyData;
 	vtkPlaneSourcePtr mPlaneSource;
-//	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
 	vtkOpenGLPolyDataMapperPtr mOpenGLPolyDataMapper;
-//	vtkNew<vtkOpenGLPolyDataMapper> mOpenGLPolyDataMapper;
-//	vtkTexturePtr mTexture;
 
+	vtkFloatArrayPtr TCoords;
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
+
 //	QString loadShaderFile();
 //	QString replaceShaderSourceMacros(QString shaderSource);
 

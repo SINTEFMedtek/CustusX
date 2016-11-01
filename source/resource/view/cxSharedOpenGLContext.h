@@ -33,18 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHAREDOPENGLCONTEXT_H
 #define CXSHAREDOPENGLCONTEXT_H
 
-//OpenGL
-//#ifdef __APPLE__
-//#include <OpenGL/glu.h>
-//#include <GL/glew.h>
-//#include <GL/glut.h> //Framework on Mac
-
-//#else
-//#define GL_GLEXT_PROTOTYPES
-//#include <GL/glu.h>
-//#include <GL/glext.h>
-//#endif
-
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -52,35 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <GL/glew.h>
-
-//#ifndef WIN32
-//#define GL_GLEXT_PROTOTYPES
-//#else
-//#include <windows.h>
-//#endif //WIN32
-
-//#ifdef __APPLE__
-////#include <OpenGL/gl.h>
-//#include <GL/glew.h>
-//#else
-//#include <GL/gl.h>
-//#endif
-
-//#ifdef WIN32
-//#include <windows.h>
-//#include <GL/glext.h>
-//#endif
-
-//From vtkOpenGL.h
-// To prevent gl.h to include glext.h provided by the system
-//#define GL_GLEXT_LEGACY
-//#if defined(__APPLE__) && defined(VTK_USE_COCOA)
-//# include <OpenGL/gl.h> // Include OpenGL API.
-//#else
-//# include "vtkWindows.h" // Needed to include OpenGL header on Windows.
-//# include <GL/gl.h> // Include OpenGL API.
-//#endif
-
 
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
@@ -115,17 +74,21 @@ public:
 	static bool isValid(vtkOpenGLRenderWindowPtr opengl_renderwindow, bool print=false);
 
 	SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext);
-
-	bool hasUploadedTexture(QString uid) const;
-	vtkTextureObjectPtr getTexture(QString uid) const;
+	~SharedOpenGLContext();
 
 	bool makeCurrent() const;
 
 	bool upload3DTexture(ImagePtr image);
+	bool hasUploadedTexture(QString image_uid) const;
+	vtkTextureObjectPtr getTexture(QString image_uid) const;
+
+	bool upload3DTextureCoordinates(QString image_uid, vtkFloatArrayPtr texture_coordinates);
+	bool hasUploadedTextureCoordinates(QString image_uid) const;
+	vtkOpenGLBufferObjectPtr getTextureCoordinates(QString image_uid) const;
 
 private:
 	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
-	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const GLfloat *texture_data);
+	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString image_uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
 
 	vtkOpenGLRenderWindowPtr mContext;
 

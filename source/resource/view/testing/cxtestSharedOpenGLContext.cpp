@@ -45,8 +45,6 @@ cx::SharedOpenGLContextPtr initSharedOpenGLContext(vtkRenderWindowPtr renderWind
 	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow.Get());
 	REQUIRE(opengl_renderwindow);
 	REQUIRE(cx::SharedOpenGLContext::isValid(opengl_renderwindow));
-//	opengl_renderwindow.Get()->DebugOn();
-	opengl_renderwindow->DebugOn();
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = cx::SharedOpenGLContextPtr(new cx::SharedOpenGLContext(opengl_renderwindow));
 	return sharedOpenGLContext;
 }

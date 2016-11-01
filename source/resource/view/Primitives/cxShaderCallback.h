@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include <vtkCommand.h>
 
+#include "cxLogger.h"
+
 
 class vtkOpenGLHelper;
 class vtkShaderProgram;
@@ -61,6 +63,7 @@ public:
 	static const std::string FS_In_Vec3_TextureCoordinate;
 	static const std::string FS_Uniform_3DTexture;
 	static const std::string FS_Out_Vec4_Color;
+	static const int Const_Int_NumberOfTextures;
 
 	struct ShaderItem
 	{
@@ -68,6 +71,7 @@ public:
 		vtkTextureObjectPtr mTexture;
 		vtkOpenGLBufferObjectPtr mTextureCoordinates;
 	};
+	typedef boost::shared_ptr<ShaderItem> ShaderItemPtr;
 
 	static ShaderCallback *New();
 	ShaderCallback();
@@ -75,7 +79,7 @@ public:
 	virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
 	SharedOpenGLContextPtr mContext;
-	std::vector<ShaderItem> mShaderItems;
+	std::vector<ShaderItemPtr> mShaderItems;
 
 private:
 	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, int index_of_vector);
@@ -86,6 +90,7 @@ private:
 	std::string generateFSUniformTextureVectorName(int index_of_vector) const;
 	std::string getVectorNameFromName(std::string name, int index_of_vector) const;
 
+	void printDebugInfo(vtkOpenGLHelper *OpenGLHelper);
 
 	//----- DELETE???-------
 public:
