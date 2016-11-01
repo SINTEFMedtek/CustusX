@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxShaderCallback.h"
 
 #include <vtkShaderProgram.h>
+#include <vtkShader.h>
 #include <vtkOpenGLHelper.h>
 #include <vtkOpenGLVertexArrayObject.h>
 #include <vtkOpenGLBufferObject.h>
@@ -76,6 +77,7 @@ const std::string ShaderCallback::VS_Out_Vec3_TextureCoordinate = "cx_vs_out_tex
 const std::string ShaderCallback::FS_In_Vec3_TextureCoordinate = "cx_fs_in_texture_coordinates";
 const std::string ShaderCallback::FS_Uniform_3DTexture = "cx_fs_uniform_3Dtexture";
 const std::string ShaderCallback::FS_Out_Vec4_Color = "cx_fs_out_color";
+const int ShaderCallback::Const_Int_NumberOfTextures = 4; //TODO - hva skal det stå her?	static const int FS_Const_Int_NumberOfTextures;
 
 /*ShaderCallback::ShaderCallback(int index)
 {
@@ -101,7 +103,6 @@ void ShaderCallback::init(int index)
 
 ShaderCallback::~ShaderCallback()
 {
-
 }
 
 void ShaderCallback::SetBuffer(GPUImageDataBufferPtr buffer)
@@ -132,19 +133,19 @@ void ShaderCallback::SetColorAttribute(float window, float level, float llr,floa
 		*/
 //}
 
-void ShaderCallback::setUniformiArray(vtkOpenGLHelper *cellBO, QString name, int val)
-{
-	QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-	//	uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
-	cellBO->Program->SetUniform1iv(cstring_cast(fullName), 1, &val);
-}
+//void ShaderCallback::setUniformiArray(vtkOpenGLHelper *cellBO, QString name, int val)
+//{
+//	QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
+//	//	uniforms->SetUniformi(cstring_cast(fullName), 1, &val);
+//	cellBO->Program->SetUniform1iv(cstring_cast(fullName), 1, &val);
+//}
 
-void ShaderCallback::setUniformfArray(vtkOpenGLHelper *cellBO, QString name, float val)
-{
-	QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
-	//	uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
-	cellBO->Program->SetUniform1fv(cstring_cast(fullName), 1, &val);
-}
+//void ShaderCallback::setUniformfArray(vtkOpenGLHelper *cellBO, QString name, float val)
+//{
+//	QString fullName = QString("%1[%2]").arg(name).arg(mIndex);
+//	//	uniforms->SetUniformf(cstring_cast(fullName), 1, &val);
+//	cellBO->Program->SetUniform1fv(cstring_cast(fullName), 1, &val);
+//}
 
 
 //void SingleVolumePainterHelper::eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader)
@@ -190,154 +191,77 @@ void ShaderCallback::setUniformfArray(vtkOpenGLHelper *cellBO, QString name, flo
 //	report_gl_error();
 //}
 
-//void ShaderCallback::uploadTextureCoordinate(vtkOpenGLHelper *cellBO)
-//{
-//	return;//test
-//	if(!cellBO)
-//		return;
-//	if (!mVolumeBuffer)
-//		return;
-
-//	mVolumeBuffer->bind(mIndex);
-
-////	float val[3] = {0, 0, 0};//TODO: set texture coordinate. Look in Texture3DSlicerProxyImpl::updateCoordinates
-
-////	cellBO->Program->SetUniform3fv("cx_tcoordMC", 1, &val);
-
-////	cellBO->Program->SetUniform1fv("cx_tcoordMC[]", 1, &val);
-////	float values[9] = {0, 0, 0,
-////					   0, 0, 1,
-////					   0, 1, 0};
-////	cellBO->Program->SetUniformMatrix3x3("cx_tcoordMC", values);
-//	report_gl_error();
-
-//	//Can't get this to work
-////	//Upload texture coordinate index
-////	//See http://stackoverflow.com/questions/10630823/how-to-get-texture-coordinate-to-glsl-in-version-150
-////	GLint texcoord_index = glGetAttribLocation(cellBO->Program->GetHandle(), "cx_tcoordMC");
-////	report_gl_error();
-////	CX_LOG_DEBUG() << "cellBO->Program->GetHandle(): " << cellBO->Program->GetHandle();
-////	CX_LOG_DEBUG() << "texcoord_index: " << texcoord_index;
-
-//////	glBegin(GL_QUADS);
-////	report_gl_error();
-////	glVertexAttrib3f(texcoord_index, 0, 0, 0);
-////	report_gl_error();
-////	glVertexAttrib3f(texcoord_index, 1, 0, 0);
-////	report_gl_error();
-////	glVertexAttrib3f(texcoord_index, 0, 1, 0);
-////	glVertexAttrib3f(texcoord_index, 0, 0, 1);
-////	glVertexAttrib3f(texcoord_index, 0, 1, 1);
-////	glVertexAttrib3f(texcoord_index, 1, 1, 0);
-////	glVertexAttrib3f(texcoord_index, 1, 0, 1);
-////	glVertexAttrib3f(texcoord_index, 1, 1, 1);
-////	report_gl_error();
-//////	glEnd();
-
-
-//	//Alternative
-//	//	glEnableVertexAttribArray(texcoord_index);
-////	glVertexAttribPointer(texcoord_index, attribs.Size, attribs.Type,
-////						  attribs.Normalize, attribs.Stride,
-////						  BUFFER_OFFSET(attribs.Offset));
-
-//	// An array of 3 vectors which represents 3 vertices
-//	static const GLfloat g_vertex_buffer_data[] = {
-////	   -1.0f, -1.0f, 0.0f,
-////	   1.0f, -1.0f, 0.0f,
-////	   0.0f,  1.0f, 0.0f,
-////		18.0906, 11.2849, 0.05,
-////		-17.9906, 11.2849, 0.05,
-////		18.0906, -11.1849, 0.05,
-////		-17.9906, -11.1849, 0.05,
-//		0.5f, 0.5f, 0.5f,
-//		1.0f, -1.0f, 0.0f,
-//		0.0f,  1.0f, 0.0f,
-//		1.0f,  1.0f, 1.0f,
-//	};
-
-//	// This will identify our vertex buffer
-//	GLuint vertexbuffer;
-//	// Generate 1 buffer, put the resulting identifier in vertexbuffer
-//	glGenBuffers(1, &vertexbuffer);
-//	// The following commands will talk about our 'vertexbuffer' buffer
-//	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-//	// Give our vertices to OpenGL.
-//	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-//	GLint texcoord_index = glGetAttribLocation(cellBO->Program->GetHandle(), "cx_tcoordMC");
-//	CX_LOG_DEBUG() << "texcoord_index: " << texcoord_index;
-//	glEnableVertexAttribArray(texcoord_index);
-//	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-//	glVertexAttribPointer(
-//	   texcoord_index,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-//	   3,                  // size
-//	   GL_FLOAT,           // type
-//	   GL_FALSE,           // normalized?
-//	   0,                  // stride
-//	   (void*)0            // array buffer offset
-//	);
-//	glDrawArrays(GL_TRIANGLES, 0, 3);ß
-//	glDisableVertexAttribArray(texcoord_index);
-//	report_gl_error();
-//}
 
 ShaderCallback *ShaderCallback::New()
 {
 	return new ShaderCallback;
 }
 
-void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
+void ShaderCallback::printDebugInfo(vtkOpenGLHelper *OpenGLHelper)
 {
-	CX_LOG_DEBUG() << "START ShaderCallback::Execute";
-	vtkOpenGLHelper *cellBO = reinterpret_cast<vtkOpenGLHelper*>(cbo);
-	if(!cellBO || !cellBO->VAO || !cellBO->Program)
+	if(!OpenGLHelper)
 		return;
-
-	vtkShaderProgram *program = cellBO->Program;
-	vtkOpenGLVertexArrayObject *vao = cellBO->VAO;
-
+	vtkShaderProgram *program = OpenGLHelper->Program;
 	std::cout << "Program is compiled? " << program->GetCompiled() << std::endl;
 	std::cout << "Program is bound? " << program->isBound() << std::endl;
-	std::cout << "IBO index count " << cellBO->IBO->IndexCount << std::endl;
+	std::cout << "IBO index count " << OpenGLHelper->IBO->IndexCount << std::endl;
+	std::string vertexshader = program->GetVertexShader()->GetSource();
+	std::cout << "Vertexshader:\n " << vertexshader << std::endl;
+	std::string fragmentshader = program->GetFragmentShader()->GetSource();
+	std::cout << "Fragmentshader:\n " << fragmentshader << std::endl;
 	report_gl_error();
+}
+
+void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
+{
+	//CX_LOG_DEBUG_CHECKPOINT() << "START";
+	vtkOpenGLHelper *OpenGLHelper = reinterpret_cast<vtkOpenGLHelper*>(cbo);
+	if(!OpenGLHelper || !OpenGLHelper->VAO || !OpenGLHelper->Program)
+		return;
+
+	vtkShaderProgram *program = OpenGLHelper->Program;
+	vtkOpenGLVertexArrayObject *vao = OpenGLHelper->VAO;
+
+	this->printDebugInfo(OpenGLHelper);
 
 	if(eventId == vtkCommand::UpdateShaderEvent)
 	{
+		/* THIS DID NOT WORK!!!
 		if(!mContext)
 			return;
 		mContext->makeCurrent();
 		report_gl_error();
+		*/
 
 		//Bind fragmentshader output variable
 		// (glsl: vec4)
-		this->bindFSOutputVariable(cellBO->Program);
+		this->bindFSOutputVariable(OpenGLHelper->Program);
 		report_gl_error();
 
 		//Bind VAO (Vertext Array Object - aka saved input to the vertex shader)
-		cellBO->VAO->Bind();
+		OpenGLHelper->VAO->Bind();
 		report_gl_error();
 
 		for(int i=0; i< mShaderItems.size(); ++i)
 		{
 			//Upload attribute arrays
 			//	texture coordinates (glsl: vec3)
-			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems[i].mTextureCoordinates;
+			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems[i]->mTextureCoordinates;
 			if(texture_coordinates)
-				this->addToAttributeArray(cellBO->VAO, cellBO->Program, texture_coordinates, i);
+				this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, i);
 			report_gl_error();
 
 			//Upload uniforms
 			//Note: Texture is already uploaded by SharedOpenGLContext
 			//	texture pointer (glsl: sampler3D)
-			vtkTextureObjectPtr texture = mShaderItems[i].mTexture;
+			vtkTextureObjectPtr texture = mShaderItems[i]->mTexture;
 			if(texture)
-				this->addUniform(cellBO->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
+				this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
 			report_gl_error();
 		}
 	}
 	report_gl_error();
-	CX_LOG_DEBUG() << "END ShaderCallback::Execute";
+	//CX_LOG_DEBUG_CHECKPOINT() << "END";
 }
 
 void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, int index_of_vector)
@@ -350,7 +274,7 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 	int elementType = VTK_FLOAT;
 	bool normalize = false;
 	std::string name = generateVSAttributeTextureCoordinateVectorName(index_of_vector);
-	CX_LOG_DEBUG() << "Adding attribute called: " << name;
+	//CX_LOG_DEBUG() << "Adding attribute called: " << name;
 	//--------
 
 	if (!vao->AddAttributeArray(
@@ -371,9 +295,7 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 
 void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int value)
 {
-	//TODO this is new: SetUniform1iv (is count=1 correct?)
-
-	CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
+	//CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
 	if(!program->SetUniform1iv(name.c_str(), 1, &value))
 		CX_LOG_ERROR() << "Could not set uniform named \'" << name << "\'.";
 	report_gl_error();
@@ -385,7 +307,7 @@ void ShaderCallback::bindFSOutputVariable(vtkShaderProgram *program)
 	if(color_frag_out_index != -1)
 	{
 		glBindFragDataLocation(program->GetHandle(), color_frag_out_index, FS_Out_Vec4_Color.c_str()); //setting output of fragment shader
-		CX_LOG_DEBUG() << "Binding fragmentshader output to " << FS_Out_Vec4_Color << " at index "<< color_frag_out_index;
+		//CX_LOG_DEBUG() << "Binding fragmentshader output to " << FS_Out_Vec4_Color << " at index "<< color_frag_out_index;
 	} else
 		CX_LOG_ERROR() << "Could not find glGetFragDataLocation for " << FS_Out_Vec4_Color;
 }

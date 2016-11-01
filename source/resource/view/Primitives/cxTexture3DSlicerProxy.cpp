@@ -58,44 +58,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSharedOpenGLContext.h"
 
-//#include "cxTextureSlicePainter.h"
-//#ifndef CX_VTK_OPENGL2
-//#include <vtkPainterPolyDataMapper.h>
-//#endif
-
-//---------------------------------------------------------
 namespace cx
 {
+
 //---------------------------------------------------------
-
-//#ifdef WIN32
-//#ifdef CX_VTK_OPENGL2
-//#if defined(CX_VTK_OPENGL2) || defined(WIN32)
-
-//Texture3DSlicerProxyPtr Texture3DSlicerProxy::New()
-//{
-//	return Texture3DSlicerProxyPtr(new Texture3DSlicerProxy());
-//}
-
-//bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
-//{
-//	return false;
-//}
-
-//#else
-
-bool Texture3DSlicerProxy::isSupported(vtkRenderWindowPtr window)
-{
-	return true;
-//	vtkOpenGLRenderWindow *context = vtkOpenGLRenderWindow::SafeDownCast(window);
-//	bool success =  context && TextureSlicePainter::LoadRequiredExtensions(context->GetExtensionManager());
-//	return success;
-}
 
 Texture3DSlicerProxyPtr Texture3DSlicerProxy::New(SharedOpenGLContextPtr context)
 {
 	return Texture3DSlicerProxyImpl::New(context);
 }
+//---------------------------------------------------------
 
 
 void Texture3DSlicerProxyImpl::setTargetSpaceToR()
@@ -108,30 +80,30 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	mSharedOpenGLContext = context;
 	mTargetSpaceIsR = false;
 	mActor = vtkActorPtr::New();
-//	mPainter = TextureSlicePainterPtr::New();
-//	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
+	//mActor->DebugOn();
+
 	mOpenGLPolyDataMapper = vtkOpenGLPolyDataMapperPtr::New();
+	//mOpenGLPolyDataMapper->DebugOn();
 
 	mPlaneSource = vtkPlaneSourcePtr::New();
+	//mPlaneSource->DebugOn();
 
 	vtkTriangleFilterPtr triangleFilter = vtkTriangleFilterPtr::New(); //create triangle polygons from input polygons
+	//triangleFilter->DebugOn();
 	triangleFilter->SetInputConnection(mPlaneSource->GetOutputPort()); //in this case a Planesource
 
 	vtkStripperPtr stripper = vtkStripperPtr::New();
+	//stripper->DebugOn();
 	stripper->SetInputConnection(triangleFilter->GetOutputPort());
-//	stripper->Update();
+	//stripper->Update();
+
 	mPolyDataAlgorithm = stripper;
 	mPolyDataAlgorithm->Update();
 
 	mPolyData = mPolyDataAlgorithm->GetOutput();
+	//mPolyData->DebugOn();
 	mPolyData->GetPointData()->SetNormals(NULL);
 
-//	mTexture = vtkTexturePtr::New();
-
-//	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
-//	mPainterPolyDatamapper->SetPainter(mPainter);
-//	mPainterPolyDatamapper->SetInputData(mPolyData);
-//	mActor->SetMapper(mPainterPolyDatamapper);
 
 	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
 	mOpenGLPolyDataMapper->SetInputData(mPolyData);
@@ -163,67 +135,13 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	//===========
 	mOpenGLPolyDataMapper->SetFragmentShaderCode(this->getFS().c_str());
 
-	char *vertexShader = 	mOpenGLPolyDataMapper->GetVertexShaderCode();
-	if(vertexShader)
-	{
-		std::cout << "VERTEX SHADER:" << std::endl;
-		std::cout << vertexShader << std::endl;
-	}
-
-	char *fragmentShader = mOpenGLPolyDataMapper->GetFragmentShaderCode();
-	if(fragmentShader)
-	{
-		std::cout << "FRAGMENT SHADER:" << std::endl;
-		std::cout << fragmentShader << std::endl;
-	}
-
 	mActor->SetMapper(mOpenGLPolyDataMapper);
-//	mActor->SetTexture(mTexture);
 
 	mShaderCallback = ShaderCallbackPtr::New();
 	mShaderCallback->mContext = mSharedOpenGLContext;
-	//shaderCallback->mIndex = index;
 	mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, mShaderCallback);
-	//mOpenGLPolyDataMapper->AddObserver(vtkCommand::EndEvent, shaderCallback);
-//	mSharedOpenGLContext->render();
 }
 
-////copied from TextureSlicePainter
-//QString Texture3DSlicerProxyImpl::loadShaderFile()
-//{
-//	QString mShaderPath = DataLocations::findConfigFolder("/shaders");
-//	QString filepath = mShaderPath + "/cxOverlay2D_frag.glsl";
-//	QFile fp(filepath);
-//	if (fp.exists())
-//	{
-//		fp.open(QFile::ReadOnly);
-//		QTextStream shaderfile(&fp);
-//		return shaderfile.readAll();
-//	}
-//	else
-//	{
-//		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
-//	}
-//	return "";
-//}
-
-////copied from TextureSlicePainter
-//QString Texture3DSlicerProxyImpl::replaceShaderSourceMacros(QString shaderSource)
-//{
-//	// set constant layers
-////	int layers = this->mElement.size();
-//	int layers = 1;//temp hack
-//	shaderSource = shaderSource.replace("${LAYERS}", QString("%1").arg(layers));
-
-//	// fill function vec4 sampleLut(in int index, in float idx)
-//	QString element = "\tif (index==%1) return texture1D(lut[%1], idx);\n";
-//	QString sampleLutContent;
-//	for (unsigned i=0; i<layers; ++i)
-//		sampleLutContent += element.arg(i);
-//	shaderSource = shaderSource.replace("${SAMPLE_LUT_CONTENT}", sampleLutContent);
-
-//	return shaderSource;
-//}
 
 Texture3DSlicerProxyImpl::~Texture3DSlicerProxyImpl()
 {
@@ -245,19 +163,13 @@ std::vector<ImagePtr> Texture3DSlicerProxyImpl::getImages()
 	return mImages;
 }
 
+/*
 void Texture3DSlicerProxyImpl::setShaderPath(QString shaderFile)
 {
 	//	mPainter->setShaderPath(shaderFile);
 }
+*/
 
-//void Texture3DSlicerProxyImpl::viewChanged()
-//{
-//	if (!mView)
-//		return;
-//	if (!mView->getZoomFactor() < 0)
-//		return; // ignore if zoom is invalid
-//	this->setViewportData(mView->get_vpMs(), mView->getViewport());
-//}
 
 void Texture3DSlicerProxyImpl::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
 {
@@ -265,7 +177,6 @@ void Texture3DSlicerProxyImpl::setViewportData(const Transform3D& vpMs, const Do
 	{
 		mBB_s = transform(vpMs.inv(), vp);
 	}
-
 	this->resetGeometryPlane();
 }
 
@@ -289,11 +200,9 @@ void Texture3DSlicerProxyImpl::resetGeometryPlane()
 //		double extent = 100;
 //		mBB_s = DoubleBoundingBox3D(-extent, extent, -extent, extent, 0, 0);
 	}
-
 	Vector3D origin(mBB_s[0], mBB_s[2], 0);
 	Vector3D p1(mBB_s[1], mBB_s[2], 0);
 	Vector3D p2(mBB_s[0], mBB_s[3], 0);
-
 	if (mTargetSpaceIsR)
 	{
 		Transform3D rMs = mSliceProxy->get_sMr().inv();
@@ -304,10 +213,9 @@ void Texture3DSlicerProxyImpl::resetGeometryPlane()
 
 	if (similar(mBB_s.range()[0] * mBB_s.range()[1], 0.0))
 	{
-//		std::cout << "zero-size bounding box in texture slicer- ignoring" << std::endl;
+		std::cout << "zero-size bounding box in texture slicer- ignoring" << std::endl;
 		return;
 	}
-
 	createGeometryPlane(p1, p2, origin);
 }
 
@@ -319,7 +227,7 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 	mPlaneSource->SetOrigin( origin_s.begin() );
 //  std::cout << "createGeometryPlane update begin" << std::endl;
 	mPolyDataAlgorithm->Update();
-//	mPolyData->Update();
+
 //  std::cout << "createGeometryPlane update end" << std::endl;
 	// each stripper->update() resets the contents of polydata, thus we must reinsert the data here.
 	for (unsigned i=0; i<mImages.size(); ++i)
@@ -340,13 +248,16 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_dec() const
 {
 	QString temp = QString(
 		"//VTK::PositionVC::Dec\n"
-		"attribute vec3 %1;\n"
-		"varying vec3 %2;\n"
+		"\n"
+		"//CX: adding input and output variables for texture coordinates\n"
+		"const int number_of_textures = %3;\n"
+		"attribute vec3 %1[number_of_textures];\n"
+		"varying vec3 %2[number_of_textures];\n"
 		)
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str())
-		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str());
+		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
+		.arg(ShaderCallback::Const_Int_NumberOfTextures);
 	const std::string retval = temp.toStdString();
-	std::cout << "getVSReplacement_dec: " <<  retval << std::endl;
 	return retval;
 }
 
@@ -359,7 +270,6 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_impl() const
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str());
 	const std::string retval = temp.toStdString();
-	std::cout << "getVSReplacement_impl: " <<  retval << std::endl;
 	return retval;
 }
 
@@ -368,19 +278,23 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 	QString temp = QString(
 		"//VTK::System::Dec\n"
 		"//VTK::Output::Dec\n"
-		"in vec3 %1;\n"
-		"uniform sampler3D %2;\n"
+		"\n"
+		"//CX: adding custom fragment shader\n"
+		"const int number_of_textures = %4;\n"
+		"in vec3 %1[number_of_textures];\n"
+		"uniform sampler3D %2[number_of_textures];\n"
 		"out vec4 %3;\n"
 		"void main () {\n"
-		"//	%3 = texture(%2, %1);\n"
-		"	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
+		"	%3 = texture(%2[0], %1[0]);\n"
+		"//	%3 = texture(%2[0], vec3(1.0f, 0.9867f, 0.378f));\n"
+		"//	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
 		"}\n"
 		)
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::FS_Uniform_3DTexture.c_str())
-		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str());
+		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str())
+		.arg(ShaderCallback::Const_Int_NumberOfTextures);
 	const std::string retval = temp.toStdString();
-	std::cout << "getFS: " <<  retval << std::endl;
 	return retval;
 }
 
@@ -401,26 +315,27 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	mImages = images;
 
-	for (unsigned i = 0; i < mImages .size(); ++i)
+	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		if(mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
 		{
 			QString uid = mImages[i]->getUid();
-			ShaderCallback::ShaderItem shaderitem;
-			shaderitem.mImageUid = uid;
-			shaderitem.mTexture = mSharedOpenGLContext->getTexture(uid);
+			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
+			shaderitem->mImageUid = uid;
+			shaderitem->mTexture = mSharedOpenGLContext->getTexture(uid);
+			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(mImages[i]->getUid()))
+				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(uid);;
 			mShaderCallback->mShaderItems.push_back(shaderitem);
 		}
 		else
 			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL.";
 
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();
-
 		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 			inputImage);
 
 //		mPainter->SetVolumeBuffer(i, dataBuffer);
-		this->SetVolumeBuffer(i, dataBuffer);
+		//this->SetVolumeBuffer(i, dataBuffer);
 
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
@@ -430,18 +345,19 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 	this->updateColorAttributeSlot();
 
 //	mPainterPolyDatamapper->RemoveAllVertexAttributeMappings();
-	for (unsigned i = 0; i < mImages.size(); ++i)
-	{
+	//for (unsigned i = 0; i < mImages.size(); ++i)
+	//{
 //		mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2 * i,
 //			cstring_cast(this->getTCoordName(i)),
 //			vtkDataObject::FIELD_ASSOCIATION_POINTS);
-	}
+	//}
 }
 void Texture3DSlicerProxyImpl::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
 {
-	this->safeIndex(index)->SetBuffer(buffer);
+	//this->safeIndex(index)->SetBuffer(buffer);
 }
 
+/*
 ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
 {
 	if ((int)mElement.size() <= index)
@@ -451,6 +367,7 @@ ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
 	}
 	return mElement[index];
 }
+*/
 
 
 std::vector<ImagePtr> Texture3DSlicerProxyImpl::processImages(std::vector<ImagePtr> images_raw)
@@ -461,10 +378,11 @@ std::vector<ImagePtr> Texture3DSlicerProxyImpl::processImages(std::vector<ImageP
 		reportError(errorText);
 		images_raw.resize(mMaxImages);
 	}
-
 	std::vector<ImagePtr> images(images_raw.size());
 	for (unsigned i=0; i<images.size(); ++i)
+	{
 		images[i] = images_raw[i]->getUnsigned(images_raw[i]);
+	}
 
 	return images;
 }
@@ -500,7 +418,8 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	if (!mPolyData || !mSliceProxy)
 		return;
 
-	vtkImageDataPtr volume = mImages[index]->getBaseVtkImageData();
+	ImagePtr image = mImages[index];
+	vtkImageDataPtr volume = image->getBaseVtkImageData();
 	// create a bb describing the volume in physical (raw data) space
 	Vector3D origin(volume->GetOrigin());
 	Vector3D spacing(volume->GetSpacing());
@@ -517,10 +436,13 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 	// create transform from slice space to raw data space
 	Transform3D iMs = mImages[index]->get_rMd().inv() * mSliceProxy->get_sMr().inv();
+
 	// create transform from image space to texture normalized space
 	Transform3D nMi = createTransformNormalize(imageSize, textureSpace);
+
 	// total transform from slice space to texture space
 	Transform3D nMs = nMi * iMs;
+
 	// transform the viewport to texture coordinates (must use coords since bb3D doesnt handle non-axis-aligned transforms)
 	std::vector<Vector3D> plane(4);
 	plane[0] = mBB_s.corner(0, 0, 0);
@@ -533,11 +455,14 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 		plane[i] = nMs.coord(plane[i]);
 	}
 
-	vtkFloatArrayPtr TCoords = vtkFloatArray::SafeDownCast(mPolyData->GetPointData()->GetArray(
-		cstring_cast(getTCoordName(index))));
+
+	//vtkFloatArrayPtr TCoords = vtkFloatArray::SafeDownCast(mPolyData->GetPointData()->GetArray(cstring_cast(getTCoordName(index))));
+
+	//vtkFloatArrayPtr TCoords;
 
 	if (!TCoords) // create the TCoords
 	{
+		////CX_LOG_DEBUG_CHECKPOINT();
 		TCoords = vtkFloatArrayPtr::New();
 		TCoords->SetNumberOfComponents(3);
 		TCoords->Allocate(4 * 3);
@@ -552,17 +477,24 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	for (unsigned i = 0; i < plane.size(); ++i)
 	{
 		TCoords->SetTuple3(i, plane[i][0], plane[i][1], plane[i][2]);
-//		CX_LOG_DEBUG() << "coord: " << i << ", " << plane[i][0] << ", " << plane[i][1] << ", " << plane[i][2];
+		CX_LOG_DEBUG() << "coord: " << i << ", " << plane[i][0] << ", " << plane[i][1] << ", " << plane[i][2];
 	}
-
 	mPolyData->Modified();
+
+	if(mSharedOpenGLContext && TCoords)
+	{
+		mSharedOpenGLContext->upload3DTextureCoordinates(image->getUid(), TCoords);
+	}
 
 }
 
 void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 {
+	/*
+	////CX_LOG_DEBUG_CHECKPOINT() << "START";
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
+		////CX_LOG_DEBUG_CHECKPOINT();
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
 
 		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getOutputLookupTable();
@@ -573,7 +505,7 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		if (inputImage->GetNumberOfScalarComponents()==1)
 		{
 //			mPainter->SetLutBuffer(i, lutBuffer);
-			this->SetLutBuffer(i, lutBuffer);
+			//this->SetLutBuffer(i, lutBuffer);
 		}
 
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
@@ -584,15 +516,17 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
 		float level = (float) imin/scalarTypeMax + window/2;
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
-
+		////CX_LOG_DEBUG_CHECKPOINT();
 //		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();
+	////CX_LOG_DEBUG_CHECKPOINT() << "END";
+	*/
 }
 
 void Texture3DSlicerProxyImpl::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
 {
-	this->safeIndex(index)->SetBuffer(buffer);
+//	this->safeIndex(index)->SetBuffer(buffer);
 }
 
 void Texture3DSlicerProxyImpl::transformChangedSlot()
@@ -614,7 +548,7 @@ void Texture3DSlicerProxyImpl::imageChanged()
 			inputImage);
 
 //		mPainter->SetVolumeBuffer(i, dataBuffer);
-		this->SetVolumeBuffer(i, dataBuffer);
+//		this->SetVolumeBuffer(i, dataBuffer);
 	}
 }
 

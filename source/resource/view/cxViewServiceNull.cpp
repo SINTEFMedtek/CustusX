@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QActionGroup>
 #include <QDomNode>
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -71,7 +72,7 @@ bool ViewServiceNull::isNull()
 
 void ViewServiceNull::printWarning() const
 {
-//	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.view) disabled?");
+	CX_LOG_WARNING() <<"Trying to use VideoServiceNull. Is VideoService (org.custusx.core.view) disabled?";
 }
 
 void ViewServiceNull::autoShowData(cx::DataPtr data)

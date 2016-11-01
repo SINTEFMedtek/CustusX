@@ -33,9 +33,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHAREDOPENGLCONTEXT_H
 #define CXSHAREDOPENGLCONTEXT_H
 
+/*
 //OpenGL
 #include <GL/glew.h>
 #include <GL/glut.h> //Framework on Mac
+*/
 
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
@@ -70,17 +72,21 @@ public:
 	static bool isValid(vtkOpenGLRenderWindowPtr opengl_renderwindow, bool print=false);
 
 	SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext);
-
-	bool hasUploadedTexture(QString uid) const;
-	vtkTextureObjectPtr getTexture(QString uid) const;
+	~SharedOpenGLContext();
 
 	bool makeCurrent() const;
 
 	bool upload3DTexture(ImagePtr image);
+	bool hasUploadedTexture(QString image_uid) const;
+	vtkTextureObjectPtr getTexture(QString image_uid) const;
+
+	bool upload3DTextureCoordinates(QString image_uid, vtkFloatArrayPtr texture_coordinates);
+	bool hasUploadedTextureCoordinates(QString image_uid) const;
+	vtkOpenGLBufferObjectPtr getTextureCoordinates(QString image_uid) const;
 
 private:
 	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
-	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const GLfloat *texture_data);
+	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString image_uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
 
 	vtkOpenGLRenderWindowPtr mContext;
 
