@@ -2,6 +2,8 @@
 ##               Resource Visualization Library
 ###########################################################
 
+find_package(GLEW REQUIRED)
+
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
     View/cxViewCollectionWidget
@@ -159,6 +161,7 @@ target_include_directories(cxResourceVisualization
     ./View/internal/ViewContainer
     ./View/internal/ViewMixed
     ./View/internal/ViewWidget
+    ${GLEW_LIBRARY}
 )
 target_link_libraries(cxResourceVisualization
     PRIVATE
