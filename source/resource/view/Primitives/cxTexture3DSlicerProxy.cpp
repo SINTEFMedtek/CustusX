@@ -317,7 +317,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
-		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))//crash
+		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
 		{
 			QString uid = mImages[i]->getUid();
 			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
@@ -331,8 +331,8 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL.";
 
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();
-		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
-			inputImage);
+//		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
+//			inputImage);
 
 //		mPainter->SetVolumeBuffer(i, dataBuffer);
 		//this->SetVolumeBuffer(i, dataBuffer);
