@@ -161,7 +161,7 @@ target_include_directories(cxResourceVisualization
     ./View/internal/ViewContainer
     ./View/internal/ViewMixed
     ./View/internal/ViewWidget
-    ${GLEW_LIBRARY}
+    ${GLEW_INCLUDE_DIRS}
 )
 target_link_libraries(cxResourceVisualization
     PRIVATE
