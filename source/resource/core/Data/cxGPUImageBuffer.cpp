@@ -570,6 +570,11 @@ void GPUImageBufferRepository::clear()
 	mInternal = new GPUImageBufferRepositoryInternal();
 }
 
+void GPUImageBufferRepository::init()
+{
+	GPUImageBufferRepository::getInstance();
+}
+
 GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 {
 	if (!mInstance)

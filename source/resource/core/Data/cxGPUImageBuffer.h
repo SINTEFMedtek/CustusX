@@ -149,6 +149,7 @@ private:
 	class GPUImageBufferRepositoryInternal* mInternal;
 	static GPUImageBufferRepository* mInstance;
 	void tearDown();
+	void init();
 };
 
 /**

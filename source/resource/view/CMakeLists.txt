@@ -149,7 +149,6 @@ add_library(cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
 target_include_directories(cxResourceVisualization
     PUBLIC
     .
-    cxResource
     ./View
     ./Rep
     ./Rep2D
