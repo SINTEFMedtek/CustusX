@@ -330,7 +330,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		else
 			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL.";
 
-		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();
+//		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();
 //		GPUImageDataBufferPtr dataBuffer = GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(
 //			inputImage);
 
