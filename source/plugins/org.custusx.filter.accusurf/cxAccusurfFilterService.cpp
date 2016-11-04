@@ -187,7 +187,7 @@ bool AccusurfFilter::postProcess()
 DoublePropertyPtr AccusurfFilter::getAccusurfThicknessUp(QDomElement root)
 {
     DoublePropertyPtr retval = DoubleProperty::initialize("ACCuSurf thickness anterior/up (voxels)", "",
-    "Set slice thickness up in voxels", 5, DoubleRange(0, 50, 1), 0,
+    "Set slice thickness up in voxels", 0, DoubleRange(0, 50, 1), 0,
                     root);
     retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
     return retval;
@@ -196,7 +196,7 @@ DoublePropertyPtr AccusurfFilter::getAccusurfThicknessUp(QDomElement root)
 DoublePropertyPtr AccusurfFilter::getAccusurfThicknessDown(QDomElement root)
 {
     DoublePropertyPtr retval = DoubleProperty::initialize("ACCuSurf thickness posterior/down (voxels)", "",
-    "Set slice thickness down in voxels", 5, DoubleRange(0, 50, 1), 0,
+    "Set slice thickness down in voxels", 15, DoubleRange(0, 50, 1), 0,
                     root);
     retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
     return retval;

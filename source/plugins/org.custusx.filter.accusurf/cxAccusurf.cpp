@@ -201,7 +201,7 @@ void Accusurf::smoothPositions()
 vtkImageDataPtr Accusurf::crop(vtkImageDataPtr image, int ymin, int ymax){
 
     int* dim = image->GetDimensions();
-    IntBoundingBox3D cropbox(0, dim[0], std::max(0, ymin-mThicknessUp-1) , std::min(dim[1]-1, ymax+mThicknessDown+1) , 0, dim[2]);
+    IntBoundingBox3D cropbox(0, dim[0], std::max(0, ymin-mThicknessUp-2) , std::min(dim[1]-1, ymax+mThicknessDown+2) , 0, dim[2]);
     vtkImageDataPtr cropedImage = cropImage(image, cropbox);
     return cropedImage;
 }
