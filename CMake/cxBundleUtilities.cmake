@@ -95,6 +95,23 @@
 #=============================================================================
 
 include(CMakeParseArguments)
+
+# Inject feature into GetPrerequisites: 
+#   Tag GStreamer framework as SYSTEM, thus keeping it out of the bundle,
+#   and requiring the user to install GStreamer on his Mac.
+#
+# This is a workaround for not being able to install the whole of GStreamer
+# into the bundle - gst plugins dont load properly.
+# 
+function(gp_resolved_file_type_override resolved_file type)
+    if(APPLE)
+      if(resolved_file MATCHES "^(/Library/Frameworks/GStreamer.framework/)")
+        message(STATUS " and got a hit for " ${resolved_file})
+        set(${type} "system" PARENT_SCOPE)
+      endif()
+    endif()
+endfunction()
+
 include(BundleUtilities)
 
 ###############################################################################
@@ -251,9 +268,9 @@ function(cx_get_bundle_keys app libs dirs keys_var)
       list (FIND targets ${binary} _index)
       if (${_index} GREATER -1)
         set(copyflag 0)
-        message(STATUS "Existing : " ${binary_filename} )
+        message(STATUS "In bundle: " ${binary_filename} )
       else()
-        message(STATUS "In bundle: " ${binary} )
+        message(STATUS "Required : " ${binary} )
       endif()
 
       set(prereqs "")
