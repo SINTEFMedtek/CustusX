@@ -15,5 +15,3 @@ List of Definitions {#definitions}
 | Slice                   | A 2D slice through a 3D volume. Custus uses several definitions for its slicing, primarily ACS (Axial, Coronal, Sagittal), but also Anyplanes, which are attached to the Tool. Customize using layouts.
 | IGT                     | Image Guided Therapy
 | Navigation Pointer      | A Tool used for pointing.
-
-[The link text](#my_special_anchor) 
