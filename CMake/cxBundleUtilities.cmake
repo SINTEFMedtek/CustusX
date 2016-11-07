@@ -1,39 +1,55 @@
+# =========================================================================
+# This file is part of CustusX, an Image Guided Therapy Application.
+#
+# Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# =========================================================================
+
+
 #.rst:
-# BundleUtilities
+# cxBundleUtilities
 # ---------------
 #
 # Functions to help assemble a standalone bundle application.
 #
-# A collection of CMake utility functions useful for dealing with .app
-# bundles on the Mac and bundle-like directories on any OS.
+# Depends upon and is an enhancement of the vanilla BundleUtilities.cmake,
+#
 #
 # The following functions are provided by this module:
 #
 # ::
 #
-#    fixup_bundle
-#    copy_and_fixup_bundle
-#    verify_app
-#    get_bundle_main_executable
-#    get_dotapp_dir
-#    get_bundle_and_executable
-#    get_bundle_all_executables
-#    get_item_key
-#    clear_bundle_keys
-#    set_bundle_key_values
-#    get_bundle_keys
-#    copy_resolved_item_into_bundle
-#    copy_resolved_framework_into_bundle
-#    fixup_bundle_item
-#    verify_bundle_prerequisites
-#    verify_bundle_symlinks
-#
-# Requires CMake 2.6 or greater because it uses function, break and
-# PARENT_SCOPE.  Also depends on GetPrerequisites.cmake.
+#    cx_fixup_bundle
+#    cx_get_bundle_keys
 #
 # ::
 #
-#   FIXUP_BUNDLE(<app> <libs> <dirs>)
+#   CX_FIXUP_BUNDLE(<app> <libs> <dirs>)
 #
 # Fix up a bundle in-place and make it standalone, such that it can be
 # drag-n-drop copied to another machine and run on that machine as long
@@ -51,87 +67,12 @@
 # Then clear all the keys and call verify_app on the final bundle to
 # ensure that it is truly standalone.
 #
-# ::
-#
-#   COPY_AND_FIXUP_BUNDLE(<src> <dst> <libs> <dirs>)
-#
-# Makes a copy of the bundle <src> at location <dst> and then fixes up
-# the new copied bundle in-place at <dst>...
+# As an optional parameter (IGNORE_ITEM) a list of file names can be passed,
+# which are then ignored (e.g. IGNORE_ITEM "vcredist_x86.exe;vcredist_x64.exe")
 #
 # ::
 #
-#   VERIFY_APP(<app>)
-#
-# Verifies that an application <app> appears valid based on running
-# analysis tools on it.  Calls "message(FATAL_ERROR" if the application
-# is not verified.
-#
-# ::
-#
-#   GET_BUNDLE_MAIN_EXECUTABLE(<bundle> <result_var>)
-#
-# The result will be the full path name of the bundle's main executable
-# file or an "error:" prefixed string if it could not be determined.
-#
-# ::
-#
-#   GET_DOTAPP_DIR(<exe> <dotapp_dir_var>)
-#
-# Returns the nearest parent dir whose name ends with ".app" given the
-# full path to an executable.  If there is no such parent dir, then
-# simply return the dir containing the executable.
-#
-# The returned directory may or may not exist.
-#
-# ::
-#
-#   GET_BUNDLE_AND_EXECUTABLE(<app> <bundle_var> <executable_var> <valid_var>)
-#
-# Takes either a ".app" directory name or the name of an executable
-# nested inside a ".app" directory and returns the path to the ".app"
-# directory in <bundle_var> and the path to its main executable in
-# <executable_var>
-#
-# ::
-#
-#   GET_BUNDLE_ALL_EXECUTABLES(<bundle> <exes_var>)
-#
-# Scans the given bundle recursively for all executable files and
-# accumulates them into a variable.
-#
-# ::
-#
-#   GET_ITEM_KEY(<item> <key_var>)
-#
-# Given a file (item) name, generate a key that should be unique
-# considering the set of libraries that need copying or fixing up to
-# make a bundle standalone.  This is essentially the file name including
-# extension with "." replaced by "_"
-#
-# This key is used as a prefix for CMake variables so that we can
-# associate a set of variables with a given item based on its key.
-#
-# ::
-#
-#   CLEAR_BUNDLE_KEYS(<keys_var>)
-#
-# Loop over the list of keys, clearing all the variables associated with
-# each key.  After the loop, clear the list of keys itself.
-#
-# Caller of get_bundle_keys should call clear_bundle_keys when done with
-# list of keys.
-#
-# ::
-#
-#   SET_BUNDLE_KEY_VALUES(<keys_var> <context> <item> <exepath> <dirs>
-#                         <copyflag>)
-#
-# Add a key to the list (if necessary) for the given item.  If added,
-# also set all the variables associated with that key.
-#
-# ::
-#
-#   GET_BUNDLE_KEYS(<app> <libs> <dirs> <keys_var>)
+#   CX_GET_BUNDLE_KEYS(<app> <libs> <dirs> <keys_var>)
 #
 # Loop over all the executable and library files within the bundle (and
 # given as extra <libs>) and accumulate a list of keys representing
@@ -139,69 +80,8 @@
 # all of them and copy prerequisite libs into the bundle and then do
 # appropriate install_name_tool fixups.
 #
-# ::
-#
-#   COPY_RESOLVED_ITEM_INTO_BUNDLE(<resolved_item> <resolved_embedded_item>)
-#
-# Copy a resolved item into the bundle if necessary.  Copy is not
-# necessary if the resolved_item is "the same as" the
-# resolved_embedded_item.
-#
-# ::
-#
-#   COPY_RESOLVED_FRAMEWORK_INTO_BUNDLE(<resolved_item> <resolved_embedded_item>)
-#
-# Copy a resolved framework into the bundle if necessary.  Copy is not
-# necessary if the resolved_item is "the same as" the
-# resolved_embedded_item.
-#
-# By default, BU_COPY_FULL_FRAMEWORK_CONTENTS is not set.  If you want
-# full frameworks embedded in your bundles, set
-# BU_COPY_FULL_FRAMEWORK_CONTENTS to ON before calling fixup_bundle.  By
-# default, COPY_RESOLVED_FRAMEWORK_INTO_BUNDLE copies the framework
-# dylib itself plus the framework Resources directory.
-#
-# ::
-#
-#   FIXUP_BUNDLE_ITEM(<resolved_embedded_item> <exepath> <dirs>)
-#
-# Get the direct/non-system prerequisites of the resolved embedded item.
-# For each prerequisite, change the way it is referenced to the value of
-# the _EMBEDDED_ITEM keyed variable for that prerequisite.  (Most likely
-# changing to an "@executable_path" style reference.)
-#
-# This function requires that the resolved_embedded_item be "inside" the
-# bundle already.  In other words, if you pass plugins to fixup_bundle
-# as the libs parameter, you should install them or copy them into the
-# bundle before calling fixup_bundle.  The "libs" parameter is a list of
-# libraries that must be fixed up, but that cannot be determined by
-# otool output analysis.  (i.e., plugins)
-#
-# Also, change the id of the item being fixed up to its own
-# _EMBEDDED_ITEM value.
-#
-# Accumulate changes in a local variable and make *one* call to
-# install_name_tool at the end of the function with all the changes at
-# once.
-#
-# If the BU_CHMOD_BUNDLE_ITEMS variable is set then bundle items will be
-# marked writable before install_name_tool tries to change them.
-#
-# ::
-#
-#   VERIFY_BUNDLE_PREREQUISITES(<bundle> <result_var> <info_var>)
-#
-# Verifies that the sum of all prerequisites of all files inside the
-# bundle are contained within the bundle or are "system" libraries,
-# presumed to exist everywhere.
-#
-# ::
-#
-#   VERIFY_BUNDLE_SYMLINKS(<bundle> <result_var> <info_var>)
-#
-# Verifies that any symlinks found in the bundle point to other files
-# that are already also in the bundle...  Anything that points to an
-# external file causes this function to fail the verification.
+# As an optional parameter (IGNORE_ITEM) a list of file names can be passed,
+# which are then ignored (e.g. IGNORE_ITEM "vcredist_x86.exe;vcredist_x64.exe")
 
 #=============================================================================
 # Copyright 2008-2009 Kitware, Inc.
@@ -213,14 +93,9 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # See the License for more information.
 #=============================================================================
-# (To distribute this file outside of CMake, substitute the full
-#  License text for the above reference.)
 
-# The functions defined in this file depend on the get_prerequisites function
-# (and possibly others) found in:
-#
-get_filename_component(BundleUtilities_cmake_dir "${CMAKE_CURRENT_LIST_FILE}" PATH)
-include(GetPrerequisites)
+include(CMakeParseArguments)
+include(BundleUtilities)
 
 ###############################################################################
 # Clean /./ - like structures from a path list
@@ -241,263 +116,6 @@ function(cx_clean_path INPUT_PATH RESULT_PATH)
     set(${RESULT_PATH} ${_TEMP_RETVAL} PARENT_SCOPE)
 endfunction()
 
-
-function(get_bundle_main_executable bundle result_var)
-  set(result "error: '${bundle}/Contents/Info.plist' file does not exist")
-
-  if(EXISTS "${bundle}/Contents/Info.plist")
-    set(result "error: no CFBundleExecutable in '${bundle}/Contents/Info.plist' file")
-    set(line_is_main_executable 0)
-    set(bundle_executable "")
-
-    # Read Info.plist as a list of lines:
-    #
-    set(eol_char "E")
-    file(READ "${bundle}/Contents/Info.plist" info_plist)
-    string(REGEX REPLACE ";" "\\\\;" info_plist "${info_plist}")
-    string(REGEX REPLACE "\n" "${eol_char};" info_plist "${info_plist}")
-    string(REGEX REPLACE "\r" "${eol_char};" info_plist "${info_plist}")
-
-    # Scan the lines for "<key>CFBundleExecutable</key>" - the line after that
-    # is the name of the main executable.
-    #
-    foreach(line ${info_plist})
-      if(line_is_main_executable)
-        string(REGEX REPLACE "^.*<string>(.*)</string>.*$" "\\1" bundle_executable "${line}")
-        break()
-      endif()
-
-      if(line MATCHES "^.*<key>CFBundleExecutable</key>.*$")
-        set(line_is_main_executable 1)
-      endif()
-    endforeach()
-
-    if(NOT "${bundle_executable}" STREQUAL "")
-      if(EXISTS "${bundle}/Contents/MacOS/${bundle_executable}")
-        set(result "${bundle}/Contents/MacOS/${bundle_executable}")
-      else()
-
-        # Ultimate goal:
-        # If not in "Contents/MacOS" then scan the bundle for matching files. If
-        # there is only one executable file that matches, then use it, otherwise
-        # it's an error...
-        #
-        #file(GLOB_RECURSE file_list "${bundle}/${bundle_executable}")
-
-        # But for now, pragmatically, it's an error. Expect the main executable
-        # for the bundle to be in Contents/MacOS, it's an error if it's not:
-        #
-        set(result "error: '${bundle}/Contents/MacOS/${bundle_executable}' does not exist")
-      endif()
-    endif()
-  else()
-    #
-    # More inclusive technique... (This one would work on Windows and Linux
-    # too, if a developer followed the typical Mac bundle naming convention...)
-    #
-    # If there is no Info.plist file, try to find an executable with the same
-    # base name as the .app directory:
-    #
-  endif()
-
-  set(${result_var} "${result}" PARENT_SCOPE)
-endfunction()
-
-
-function(get_dotapp_dir exe dotapp_dir_var)
-  set(s "${exe}")
-
-  if(s MATCHES "^.*/.*\\.app/.*$")
-    # If there is a ".app" parent directory,
-    # ascend until we hit it:
-    #   (typical of a Mac bundle executable)
-    #
-    set(done 0)
-    while(NOT ${done})
-      get_filename_component(snamewe "${s}" NAME_WE)
-      get_filename_component(sname "${s}" NAME)
-      get_filename_component(sdir "${s}" PATH)
-      set(s "${sdir}")
-      if(sname MATCHES "\\.app$")
-        set(done 1)
-        set(dotapp_dir "${sdir}/${sname}")
-      endif()
-    endwhile()
-  else()
-    # Otherwise use a directory containing the exe
-    #   (typical of a non-bundle executable on Mac, Windows or Linux)
-    #
-    is_file_executable("${s}" is_executable)
-    if(is_executable)
-      get_filename_component(sdir "${s}" PATH)
-      set(dotapp_dir "${sdir}")
-    else()
-      set(dotapp_dir "${s}")
-    endif()
-  endif()
-
-
-  set(${dotapp_dir_var} "${dotapp_dir}" PARENT_SCOPE)
-endfunction()
-
-
-function(get_bundle_and_executable app bundle_var executable_var valid_var)
-  set(valid 0)
-
-#  message(STATUS "app: " "${app}")
-#  if(EXISTS "${app}")
-#	message(STATUS "FOUND app: " "${app}")
-#  else()
-#	message(STATUS "NOT FOUND app: " "${app}")
-#  endif()
-
-#  message(FATAL_ERROR "exiting..")
-
-  if(EXISTS "${app}")
-    # Is it a directory ending in .app?
-    if(IS_DIRECTORY "${app}")
-      if(app MATCHES "\\.app$")
-        get_bundle_main_executable("${app}" executable)
-        if(EXISTS "${app}" AND EXISTS "${executable}")
-          set(${bundle_var} "${app}" PARENT_SCOPE)
-          set(${executable_var} "${executable}" PARENT_SCOPE)
-          set(valid 1)
-          #message(STATUS "info: handled .app directory case...")
-        else()
-          message(STATUS "warning: *NOT* handled - .app directory case...")
-        endif()
-      else()
-        message(STATUS "warning: *NOT* handled - directory but not .app case...")
-      endif()
-    else()
-      # Is it an executable file?
-      is_file_executable("${app}" is_executable)
-      if(is_executable)
-        get_dotapp_dir("${app}" dotapp_dir)
-        if(EXISTS "${dotapp_dir}")
-          set(${bundle_var} "${dotapp_dir}" PARENT_SCOPE)
-          set(${executable_var} "${app}" PARENT_SCOPE)
-          set(valid 1)
-          #message(STATUS "info: handled executable file in .app dir case...")
-        else()
-          get_filename_component(app_dir "${app}" PATH)
-          set(${bundle_var} "${app_dir}" PARENT_SCOPE)
-          set(${executable_var} "${app}" PARENT_SCOPE)
-          set(valid 1)
-          #message(STATUS "info: handled executable file in any dir case...")
-        endif()
-      else()
-        message(STATUS "warning: *NOT* handled - not .app dir, not executable file...")
-      endif()
-    endif()
-  else()
-	message(STATUS "warning: *NOT* handled - directory/file does not exist: " "${app}")
-  endif()
-
-  if(NOT valid)
-    set(${bundle_var} "error: not a bundle" PARENT_SCOPE)
-    set(${executable_var} "error: not a bundle" PARENT_SCOPE)
-  endif()
-
-  set(${valid_var} ${valid} PARENT_SCOPE)
-endfunction()
-
-
-function(get_bundle_all_executables bundle exes_var)
-  set(exes "")
-
-  file(GLOB_RECURSE file_list "${bundle}/*")
-  foreach(f ${file_list})
-    is_file_executable("${f}" is_executable)
-    if(is_executable)
-      set(exes ${exes} "${f}")
-    endif()
-  endforeach()
-
-  set(${exes_var} "${exes}" PARENT_SCOPE)
-endfunction()
-
-
-function(get_item_key item key_var)
-  get_filename_component(item_name "${item}" NAME)
-  if(WIN32)
-    string(TOLOWER "${item_name}" item_name)
-  endif()
-  string(REGEX REPLACE "\\." "_" ${key_var} "${item_name}")
-  set(${key_var} ${${key_var}} PARENT_SCOPE)
-endfunction()
-
-
-function(clear_bundle_keys keys_var)
-  foreach(key ${${keys_var}})
-    set(${key}_ITEM PARENT_SCOPE)
-    set(${key}_RESOLVED_ITEM PARENT_SCOPE)
-    set(${key}_DEFAULT_EMBEDDED_PATH PARENT_SCOPE)
-    set(${key}_EMBEDDED_ITEM PARENT_SCOPE)
-    set(${key}_RESOLVED_EMBEDDED_ITEM PARENT_SCOPE)
-    set(${key}_COPYFLAG PARENT_SCOPE)
-  endforeach()
-  set(${keys_var} PARENT_SCOPE)
-endfunction()
-
-
-function(set_bundle_key_values keys_var context item exepath dirs copyflag)
-  get_filename_component(item_name "${item}" NAME)
-
-  get_item_key("${item}" key)
-#message(STATUS "key for item:" ${key} "//" ${item})
-
-  list(LENGTH ${keys_var} length_before)
-  gp_append_unique(${keys_var} "${key}")
-  list(LENGTH ${keys_var} length_after)
-
-  if(NOT length_before EQUAL length_after)
-    gp_resolve_item("${context}" "${item}" "${exepath}" "${dirs}" resolved_item)
-
-    gp_item_default_embedded_path("${item}" default_embedded_path)
-
-    if((item NOT MATCHES "\\.dylib$") AND (item MATCHES "[^/]+\\.framework/"))    
-    #if(default_embedded_path MATCHES "/Frameworks") 
-    #if(item MATCHES "[^/]+\\.framework/")
-      # For frameworks, construct the name under the embedded path from the
-      # opening "${item_name}.framework/" to the closing "/${item_name}":
-      #
-      string(REGEX REPLACE "^.*(${item_name}.framework/.*/?${item_name}).*$" "${default_embedded_path}/\\1" embedded_item "${item}")
-    else()
-      # For other items, just use the same name as the original, but in the
-      # embedded path:
-      #
-      set(embedded_item "${default_embedded_path}/${item_name}")
-    endif()
-
-    # Replace @executable_path and resolve ".." references:
-    #
-    string(REPLACE "@executable_path" "${exepath}" resolved_embedded_item "${embedded_item}")
-    get_filename_component(resolved_embedded_item "${resolved_embedded_item}" ABSOLUTE)
-
-    # *But* -- if we are not copying, then force resolved_embedded_item to be
-    # the same as resolved_item. In the case of multiple executables in the
-    # original bundle, using the default_embedded_path results in looking for
-    # the resolved executable next to the main bundle executable. This is here
-    # so that exes in the other sibling directories (like "bin") get fixed up
-    # properly...
-    #
-    if(NOT copyflag)
-      set(resolved_embedded_item "${resolved_item}")
-    endif()
-
-    set(${keys_var} ${${keys_var}} PARENT_SCOPE)
-    set(${key}_ITEM "${item}" PARENT_SCOPE)
-    set(${key}_RESOLVED_ITEM "${resolved_item}" PARENT_SCOPE)
-    set(${key}_DEFAULT_EMBEDDED_PATH "${default_embedded_path}" PARENT_SCOPE)
-    set(${key}_EMBEDDED_ITEM "${embedded_item}" PARENT_SCOPE)
-    set(${key}_RESOLVED_EMBEDDED_ITEM "${resolved_embedded_item}" PARENT_SCOPE)
-    set(${key}_COPYFLAG "${copyflag}" PARENT_SCOPE)
-  else()
-    #message("warning: item key '${key}' already in the list, subsequent references assumed identical to first")
-  endif()
-endfunction()
-
 #######################################################################
 #
 # get_new_prerequisites()
@@ -508,152 +126,155 @@ endfunction()
 # Ignore binaries that are already present in found_binaries
 #
 #######################################################################
-function(get_new_prerequisites context target exepath dirs found_binaries found_binaries_retval)
+function(cx_get_new_prerequisites context target exepath dirs found_binaries found_binaries_retval msg_indent rpaths)
     get_item_key("${target}" target_key) # debug
+    set(MY_MESSAGE_INDENT ".${msg_indent}")
 
     gp_resolve_item("${context}" "${target}" "${exepath}" "${dirs}" resolved_target)
 
     # look for target in found_binaries. 
     # If already present: return
-    list (FIND found_binaries ${target} _index)
+    list (FIND found_binaries ${resolved_target} _index)
     if (${_index} GREATER -1)
 #      message(STATUS "    get_new_prerequisites: target found in list, returning... "${target_key})
       return()
     endif()
 
-#    message(STATUS "    B get_new_prerequisites, append+investigate: " ${target_key})
+    set(show_status 0)
+    if(show_status)
+      message(STATUS ${MY_MESSAGE_INDENT} "get_new_prerequisites: append+investigate: " ${target_key})
+      message(STATUS ${MY_MESSAGE_INDENT} "  ${target}")
+    endif()
 
-    list(APPEND found_binaries ${target})
+    list(APPEND found_binaries ${resolved_target})
 
     set(prereqs "")
-    get_prerequisites("${resolved_target}" prereqs 1 0 "${exepath}" "${dirs}")
+    get_prerequisites("${resolved_target}" prereqs 1 0 "${exepath}" "${dirs}" "${rpaths}")
+
+    list(LENGTH prereqs prereqs_length)
+    if(show_status)
+      message(STATUS ${MY_MESSAGE_INDENT} "  Investigating " ${prereqs_length}  " prereqs {")
+    endif()
 
     foreach(pr ${prereqs})
       list (FIND found_binaries ${pr} _index)
       if (${_index} EQUAL -1)
-        get_new_prerequisites("${context}" "${pr}" "${exepath}" "${dirs}" "${found_binaries}" found_binaries)
+        cx_get_new_prerequisites("${resolved_target}" "${pr}" "${exepath}" "${dirs}" 
+                                 "${found_binaries}" found_binaries "${MY_MESSAGE_INDENT}" "${rpaths}")
+#        cx_get_new_prerequisites("${context}" "${pr}" "${exepath}" "${dirs}" 
+#                                 "${found_binaries}" found_binaries "${MY_MESSAGE_INDENT}" "${rpaths}")
       endif()
     endforeach()
 
     # Propagate values to caller's scope:
     set(${found_binaries_retval} ${found_binaries} PARENT_SCOPE)
 
-    # debug output:
-    set(found_binaries_length 0)
-    list(LENGTH found_binaries found_binaries_length)
-#    message(STATUS "    found binaries so far: " ${found_binaries_length})
-    #foreach(key ${${found_binaries}})
-    #  message(STATUS "        binary: " ${key} )
-    #endforeach()
-#    message(STATUS "    E get_new_prerequisites: " ${target_key})
+    if(show_status)
+      set(found_binaries_length 0)
+      list(LENGTH found_binaries found_binaries_length)
+      message(STATUS ${MY_MESSAGE_INDENT} "} found binaries so far: " ${found_binaries_length})
+      foreach(key ${${found_binaries}})
+        message(STATUS ${MY_MESSAGE_INDENT} "  binary: " ${key} )
+      endforeach()
+    endif()
 
 endfunction()
 
-#######################################################################
+# Modified version of the vanilla get_bundle_keys,
+# - Uses cx_get_new_prerequisites() to find prereqs,
+# - Treats all binaries (libs and exes) similarly, thus assuming
+#   that the RPATH settings are the same for all. This assumption is 
+#   used because all binaries are copied into the same folder, thus
+#   possibly overwriting each other, thus should be the same.
 #
-# Optimized version of get_bundle_keys(). 
-# 
-# Breaks recursion by keeping a
-# list of previously examined binaries.
-#
-#######################################################################
-function(get_bundle_keys app libs dirs keys_var)
-      message(STATUS "get_bundle_keys: " )
+function(cx_get_bundle_keys app libs dirs keys_var)
   set(${keys_var} PARENT_SCOPE)
-  get_bundle_and_executable("${app}" bundle executable valid)
 
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs IGNORE_ITEM)
+  cmake_parse_arguments(CFG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  get_bundle_and_executable("${app}" bundle executable valid)
   if(valid)
     # Always use the exepath of the main bundle executable for @executable_path
     # replacements:
+    #
     get_filename_component(exepath "${executable}" PATH)
- 
+
     # But do fixups on all executables in the bundle:
+    #
     get_bundle_all_executables("${bundle}" exes)
 
-    set(targets ${libs} ${exes})
+    # Set keys for main executable first:
+    #
+    set_bundle_key_values(${keys_var} "${executable}" "${executable}" "${exepath}" "${dirs}" 0)
 
+    # Get rpaths specified by main executable:
+    #
+    get_item_key("${executable}" executable_key)
+    set(main_rpaths "${${executable_key}_RPATHS}")
+
+    # --begin optimize code
     # Loop over all libs and exes, assemble list of 
     # prerequisites in found_binaries
+    set(targets ${libs} ${exes})
     set(found_binaries "")
     foreach(target ${targets})
-      message(STATUS "Examining prerequisites for target: " ${target} )
-      get_new_prerequisites("${target}" "${target}" "${exepath}" "${dirs}" "${found_binaries}" found_binaries)
+    
+      set(ignoreFile FALSE)
+      get_filename_component(binary_filename ${target} NAME)
+      if(NOT "${CFG_IGNORE_ITEM}" STREQUAL "" )
+        foreach(item ${CFG_IGNORE_ITEM})
+            if("${item}" STREQUAL "${binary_filename}")
+              set(ignoreFile TRUE)
+            endif()
+        endforeach()
+      endif()
+      
+      
+      if(NOT ignoreFile)
+        message(STATUS "Examining prerequisites for target: " ${target} )
+        cx_get_new_prerequisites("${target}" "${target}" "${exepath}" "${dirs}" 
+                                 "${found_binaries}" found_binaries "." "${main_rpaths}")
 #      list(LENGTH found_binaries found_binaries_length)
 #      message(STATUS "    completed, found preqs: " ${found_binaries_length})
+      else()
+        message(STATUS "Ignoring file: ${target}")
+      endif()
     endforeach()
-
+    
     # Set key values for all found binaries
     foreach(binary ${found_binaries})       
       set(copyflag 1)
+      get_filename_component(binary_filename ${binary} NAME)
       list (FIND targets ${binary} _index)
       if (${_index} GREATER -1)
         set(copyflag 0)
+        message(STATUS "Existing : " ${binary_filename} )
       else()
-        message(STATUS "    required binary: " ${binary} )
+        message(STATUS "In bundle: " ${binary} )
       endif()
 
-      set_bundle_key_values(${keys_var} "${executable}" "${binary}" "${exepath}" "${dirs}" ${copyflag})
-    endforeach()
-
-    # Propagate values to caller's scope:
-    set(${keys_var} ${${keys_var}} PARENT_SCOPE)
-    foreach(key ${${keys_var}})
-      set(${key}_ITEM "${${key}_ITEM}" PARENT_SCOPE)
-      set(${key}_RESOLVED_ITEM "${${key}_RESOLVED_ITEM}" PARENT_SCOPE)
-      set(${key}_DEFAULT_EMBEDDED_PATH "${${key}_DEFAULT_EMBEDDED_PATH}" PARENT_SCOPE)
-      set(${key}_EMBEDDED_ITEM "${${key}_EMBEDDED_ITEM}" PARENT_SCOPE)
-      set(${key}_RESOLVED_EMBEDDED_ITEM "${${key}_RESOLVED_EMBEDDED_ITEM}" PARENT_SCOPE)
-      set(${key}_COPYFLAG "${${key}_COPYFLAG}" PARENT_SCOPE)
-    endforeach()
-  endif()
-endfunction()
-
-function(get_bundle_keys_original app libs dirs keys_var)
-  set(${keys_var} PARENT_SCOPE)
-
-  get_bundle_and_executable("${app}" bundle executable valid)
-  if(valid)
-    # Always use the exepath of the main bundle executable for @executable_path
-    # replacements:
-    #
-    get_filename_component(exepath "${executable}" PATH)
-
-    # But do fixups on all executables in the bundle:
-    #
-    get_bundle_all_executables("${bundle}" exes)
-
-    # For each extra lib, accumulate a key as well and then also accumulate
-    # any of its prerequisites. (Extra libs are typically dynamically loaded
-    # plugins: libraries that are prerequisites for full runtime functionality
-    # but that do not show up in otool -L output...)
-    #
-    foreach(lib ${libs})
-      set_bundle_key_values(${keys_var} "${lib}" "${lib}" "${exepath}" "${dirs}" 0)
-
       set(prereqs "")
-      get_prerequisites("${lib}" prereqs 1 1 "${exepath}" "${dirs}")
-      foreach(pr ${prereqs})
-        set_bundle_key_values(${keys_var} "${lib}" "${pr}" "${exepath}" "${dirs}" 1)
-      endforeach()
-    endforeach()
+      set(ignoreFile FALSE)
+      if(NOT "${CFG_IGNORE_ITEM}" STREQUAL "" )
+        foreach(item ${CFG_IGNORE_ITEM})
+            if("${item}" STREQUAL "${binary_filename}")
+              set(ignoreFile TRUE)
+            endif()
+        endforeach()
+      endif()
 
-    # For each executable found in the bundle, accumulate keys as we go.
-    # The list of keys should be complete when all prerequisites of all
-    # binaries in the bundle have been analyzed.
-    #
-    foreach(exe ${exes})
-      # Add the exe itself to the keys:
-      #
-      set_bundle_key_values(${keys_var} "${exe}" "${exe}" "${exepath}" "${dirs}" 0)
-
-      # Add each prerequisite to the keys:
-      #
-      set(prereqs "")
-      get_prerequisites("${exe}" prereqs 1 1 "${exepath}" "${dirs}")
-      foreach(pr ${prereqs})
-        set_bundle_key_values(${keys_var} "${exe}" "${pr}" "${exepath}" "${dirs}" 1)
-      endforeach()
+      if(NOT ignoreFile)
+        set_bundle_key_values(${keys_var} "${executable}" "${binary}" "${exepath}" "${dirs}" "${copyflag}" "${main_rpaths}")
+      else()
+        message(STATUS "Ignoring file: ${binary}")
+      endif()
     endforeach()
+    
+    # --end optimize code
+
 
     # Propagate values to caller's scope:
     #
@@ -665,172 +286,39 @@ function(get_bundle_keys_original app libs dirs keys_var)
       set(${key}_EMBEDDED_ITEM "${${key}_EMBEDDED_ITEM}" PARENT_SCOPE)
       set(${key}_RESOLVED_EMBEDDED_ITEM "${${key}_RESOLVED_EMBEDDED_ITEM}" PARENT_SCOPE)
       set(${key}_COPYFLAG "${${key}_COPYFLAG}" PARENT_SCOPE)
+      set(${key}_RPATHS "${${key}_RPATHS}" PARENT_SCOPE)
+      set(${key}_RDEP_RPATHS "${${key}_RDEP_RPATHS}" PARENT_SCOPE)
     endforeach()
   endif()
 endfunction()
 
-
-function(copy_resolved_item_into_bundle resolved_item resolved_embedded_item)
-  if(WIN32)
-    # ignore case on Windows
-    string(TOLOWER "${resolved_item}" resolved_item_compare)
-    string(TOLOWER "${resolved_embedded_item}" resolved_embedded_item_compare)
-  else()
-    set(resolved_item_compare "${resolved_item}")
-    set(resolved_embedded_item_compare "${resolved_embedded_item}")
-  endif()
-
-  if("${resolved_item_compare}" STREQUAL "${resolved_embedded_item_compare}")
-    message(STATUS "warning: resolved_item == resolved_embedded_item - not copying...")
-  else()
-    #message(STATUS "copying COMMAND ${CMAKE_COMMAND} -E copy ${resolved_item} ${resolved_embedded_item}")
-    execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${resolved_item}" "${resolved_embedded_item}")
-    if(UNIX AND NOT APPLE)
-      file(RPATH_REMOVE FILE "${resolved_embedded_item}")
-    endif()
-  endif()
-
-endfunction()
-
-
-function(copy_resolved_framework_into_bundle resolved_item resolved_embedded_item)
-  if(WIN32)
-    # ignore case on Windows
-    string(TOLOWER "${resolved_item}" resolved_item_compare)
-    string(TOLOWER "${resolved_embedded_item}" resolved_embedded_item_compare)
-  else()
-    set(resolved_item_compare "${resolved_item}")
-    set(resolved_embedded_item_compare "${resolved_embedded_item}")
-  endif()
-
-  if("${resolved_item_compare}" STREQUAL "${resolved_embedded_item_compare}")
-    message(STATUS "warning: resolved_item == resolved_embedded_item - not copying...")
-  else()
-    if(BU_COPY_FULL_FRAMEWORK_CONTENTS)
-      # Full Framework (everything):
-      get_filename_component(resolved_dir "${resolved_item}" PATH)
-      get_filename_component(resolved_dir "${resolved_dir}/../.." ABSOLUTE)
-      get_filename_component(resolved_embedded_dir "${resolved_embedded_item}" PATH)
-      get_filename_component(resolved_embedded_dir "${resolved_embedded_dir}/../.." ABSOLUTE)
-      #message(STATUS "copying COMMAND ${CMAKE_COMMAND} -E copy_directory '${resolved_dir}' '${resolved_embedded_dir}'")
-      execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "${resolved_dir}" "${resolved_embedded_dir}")
-    else()
-      # Framework lib itself:
-      #message(STATUS "copying COMMAND ${CMAKE_COMMAND} -E copy ${resolved_item} ${resolved_embedded_item}")
-      execute_process(COMMAND ${CMAKE_COMMAND} -E copy "${resolved_item}" "${resolved_embedded_item}")
-
-      # Plus Resources, if they exist:
-      string(REGEX REPLACE "^(.*)/[^/]+/[^/]+/[^/]+$" "\\1/Resources" resolved_resources "${resolved_item}")
-      string(REGEX REPLACE "^(.*)/[^/]+/[^/]+/[^/]+$" "\\1/Resources" resolved_embedded_resources "${resolved_embedded_item}")
-      if(EXISTS "${resolved_resources}")
-        #message(STATUS "copying COMMAND ${CMAKE_COMMAND} -E copy_directory '${resolved_resources}' '${resolved_embedded_resources}'")
-        execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "${resolved_resources}" "${resolved_embedded_resources}")
-      endif()
-    endif()
-    if(UNIX AND NOT APPLE)
-      file(RPATH_REMOVE FILE "${resolved_embedded_item}")
-    endif()
-  endif()
-
-endfunction()
-
-
-function(fixup_bundle_item resolved_embedded_item exepath dirs)
-  # This item's key is "ikey":
-  #
-  get_item_key("${resolved_embedded_item}" ikey)
-
-  # Ensure the item is "inside the .app bundle" -- it should not be fixed up if
-  # it is not in the .app bundle... Otherwise, we'll modify files in the build
-  # tree, or in other varied locations around the file system, with our call to
-  # install_name_tool. Make sure that doesn't happen here:
-  #
-  get_dotapp_dir("${exepath}" exe_dotapp_dir)
-  string(LENGTH "${exe_dotapp_dir}/" exe_dotapp_dir_length)
-  string(LENGTH "${resolved_embedded_item}" resolved_embedded_item_length)
-  set(path_too_short 0)
-  set(is_embedded 0)
-  if(${resolved_embedded_item_length} LESS ${exe_dotapp_dir_length})
-    set(path_too_short 1)
-  endif()
-  if(NOT path_too_short)
-    string(SUBSTRING "${resolved_embedded_item}" 0 ${exe_dotapp_dir_length} item_substring)
-    if("${exe_dotapp_dir}/" STREQUAL "${item_substring}")
-      set(is_embedded 1)
-    endif()
-  endif()
-  if(NOT is_embedded)
-    message("  exe_dotapp_dir/='${exe_dotapp_dir}/'")
-    message("  item_substring='${item_substring}'")
-    message("  resolved_embedded_item='${resolved_embedded_item}'")
-    message("")
-    message("Install or copy the item into the bundle before calling fixup_bundle.")
-    message("Or maybe there's a typo or incorrect path in one of the args to fixup_bundle?")
-    message("")
-    message(FATAL_ERROR "cannot fixup an item that is not in the bundle...")
-  endif()
-
-  set(prereqs "")
-  get_prerequisites("${resolved_embedded_item}" prereqs 1 0 "${exepath}" "${dirs}")
-
-  set(changes "")
-
-  foreach(pr ${prereqs})
-    # Each referenced item's key is "rkey" in the loop:
-    #
-    get_item_key("${pr}" rkey)
-
-    if(NOT "${${rkey}_EMBEDDED_ITEM}" STREQUAL "")
-      set(changes ${changes} "-change" "${pr}" "${${rkey}_EMBEDDED_ITEM}")
-    else()
-      message("warning: unexpected reference to '${pr}'")
-    endif()
-  endforeach()
-
-  if(BU_CHMOD_BUNDLE_ITEMS)
-    execute_process(COMMAND chmod u+w "${resolved_embedded_item}")
-  endif()
-
-  # Change this item's id and all of its references in one call
-  # to install_name_tool:
-  #
-  execute_process(COMMAND install_name_tool
-    ${changes} -id "${${ikey}_EMBEDDED_ITEM}" "${resolved_embedded_item}"
-  )
-endfunction()
-
-function(fixup_bundle app libs dirs)
-
-cx_clean_path("${app}" app)
-cx_clean_path("${libs}" libs)
-cx_clean_path("${dirs}" dirs)
-
-
-  message(STATUS "-----------------------------")
+# Based on the vanilla version (3.6.2),
+# EXCEPT: - cx_get_bundle_keys() is called instead of get_bundle_keys()
+#         - binaries are chmoded to writable prior to fixup (BU_CHMOD_BUNDLE_ITEMS=ON)
+#
+function(cx_fixup_bundle app libs dirs)
   message(STATUS "fixup_bundle")
-  message(STATUS "-----------------------------")
-  message(STATUS "  apps=")
-foreach(_var ${app})
-  message(STATUS "    " ${_var})
-endforeach()
-  message(STATUS "-----------------------------")
-  message(STATUS "  libs=")
-foreach(_var ${libs})
-  message(STATUS "    " ${_var})
-endforeach()
-  message(STATUS "-----------------------------")
-  message(STATUS "  dirs=")
-foreach(_var ${dirs})
-  message(STATUS "    " ${_var})
-endforeach()
-  message(STATUS "-----------------------------")
+  message(STATUS "  app='${app}'")
+  message(STATUS "  libs='${libs}'")
+  message(STATUS "  dirs='${dirs}'")
+
+  cx_clean_path("${app}" app)
+  cx_clean_path("${libs}" libs)
+  cx_clean_path("${dirs}" dirs)
+
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs IGNORE_ITEM)
+  cmake_parse_arguments(CFG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+
+  message(STATUS "  ignoreItems='${CFG_IGNORE_ITEM}'")
 
   get_bundle_and_executable("${app}" bundle executable valid)
   if(valid)
     get_filename_component(exepath "${executable}" PATH)
 
     message(STATUS "fixup_bundle: preparing...")
-    get_bundle_keys("${app}" "${libs}" "${dirs}" keys)
+    cx_get_bundle_keys("${app}" "${libs}" "${dirs}" keys IGNORE_ITEM "${CFG_IGNORE_ITEM}")
 
     message(STATUS "fixup_bundle: copying...")
     list(LENGTH keys n)
@@ -845,7 +333,7 @@ endforeach()
         message(STATUS "${i}/${n}: *NOT* copying '${${key}_RESOLVED_ITEM}'")
       endif()
 
-      set(show_status 1)
+      set(show_status 0)
       if(show_status)
         message(STATUS "key='${key}'")
         message(STATUS "item='${${key}_ITEM}'")
@@ -854,6 +342,8 @@ endforeach()
         message(STATUS "embedded_item='${${key}_EMBEDDED_ITEM}'")
         message(STATUS "resolved_embedded_item='${${key}_RESOLVED_EMBEDDED_ITEM}'")
         message(STATUS "copyflag='${${key}_COPYFLAG}'")
+        message(STATUS "rpaths='${${key}_RPATHS}'")
+        message(STATUS "rdep_rpaths='${${key}_RDEP_RPATHS}'")
         message(STATUS "")
       endif()
 
@@ -863,6 +353,9 @@ endforeach()
           copy_resolved_framework_into_bundle("${${key}_RESOLVED_ITEM}"
             "${${key}_RESOLVED_EMBEDDED_ITEM}")
         else()
+          if(UNIX)
+            set (BU_CHMOD_BUNDLE_ITEMS ON)
+          endif()
           copy_resolved_item_into_bundle("${${key}_RESOLVED_ITEM}"
             "${${key}_RESOLVED_EMBEDDED_ITEM}")
         endif()
@@ -884,7 +377,7 @@ endforeach()
     clear_bundle_keys(keys)
 
     message(STATUS "fixup_bundle: verifying...")
-    verify_app("${app}")
+    verify_app("${app}" IGNORE_ITEM "${CFG_IGNORE_ITEM}")
   else()
     message(SEND_ERROR "error: fixup_bundle: not a valid bundle")
   endif()
@@ -893,115 +386,5 @@ endforeach()
 endfunction()
 
 
-function(copy_and_fixup_bundle src dst libs dirs)
-  execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory "${src}" "${dst}")
-  fixup_bundle("${dst}" "${libs}" "${dirs}")
-endfunction()
 
 
-function(verify_bundle_prerequisites bundle result_var info_var)
-  set(result 1)
-  set(info "")
-  set(count 0)
-
-  get_bundle_main_executable("${bundle}" main_bundle_exe)
-
-  file(GLOB_RECURSE file_list "${bundle}/*")
-  foreach(f ${file_list})
-    is_file_executable("${f}" is_executable)
-    if(is_executable)
-      get_filename_component(exepath "${f}" PATH)
-      math(EXPR count "${count} + 1")
-
-      message(STATUS "executable file ${count}: ${f}")
-
-      set(prereqs "")
-      get_prerequisites("${f}" prereqs 1 1 "${exepath}" "")
-
-      # On the Mac,
-      # "embedded" and "system" prerequisites are fine... anything else means
-      # the bundle's prerequisites are not verified (i.e., the bundle is not
-      # really "standalone")
-      #
-      # On Windows (and others? Linux/Unix/...?)
-      # "local" and "system" prereqs are fine...
-      #
-      set(external_prereqs "")
-
-      foreach(p ${prereqs})
-        set(p_type "")
-        gp_file_type("${f}" "${p}" p_type)
-
-        if(APPLE)
-          if(NOT "${p_type}" STREQUAL "embedded" AND NOT "${p_type}" STREQUAL "system")
-            set(external_prereqs ${external_prereqs} "${p}")
-          endif()
-        else()
-          if(NOT "${p_type}" STREQUAL "local" AND NOT "${p_type}" STREQUAL "system")
-            set(external_prereqs ${external_prereqs} "${p}")
-          endif()
-        endif()
-      endforeach()
-
-      if(external_prereqs)
-        # Found non-system/somehow-unacceptable prerequisites:
-        set(result 0)
-        set(info ${info} "external prerequisites found:\nf='${f}'\nexternal_prereqs='${external_prereqs}'\n")
-      endif()
-    endif()
-  endforeach()
-
-  if(result)
-    set(info "Verified ${count} executable files in '${bundle}'")
-  endif()
-
-  set(${result_var} "${result}" PARENT_SCOPE)
-  set(${info_var} "${info}" PARENT_SCOPE)
-endfunction()
-
-
-function(verify_bundle_symlinks bundle result_var info_var)
-  set(result 1)
-  set(info "")
-  set(count 0)
-
-  # TODO: implement this function for real...
-  # Right now, it is just a stub that verifies unconditionally...
-
-  set(${result_var} "${result}" PARENT_SCOPE)
-  set(${info_var} "${info}" PARENT_SCOPE)
-endfunction()
-
-
-function(verify_app app)
-  set(verified 0)
-  set(info "")
-
-  get_bundle_and_executable("${app}" bundle executable valid)
-
-  message(STATUS "===========================================================================")
-  message(STATUS "Analyzing app='${app}'")
-  message(STATUS "bundle='${bundle}'")
-  message(STATUS "executable='${executable}'")
-  message(STATUS "valid='${valid}'")
-
-  # Verify that the bundle does not have any "external" prerequisites:
-  #
-  verify_bundle_prerequisites("${bundle}" verified info)
-  message(STATUS "verified='${verified}'")
-  message(STATUS "info='${info}'")
-  message(STATUS "")
-
-  if(verified)
-    # Verify that the bundle does not have any symlinks to external files:
-    #
-    verify_bundle_symlinks("${bundle}" verified info)
-    message(STATUS "verified='${verified}'")
-    message(STATUS "info='${info}'")
-    message(STATUS "")
-  endif()
-
-  if(NOT verified)
-    message(FATAL_ERROR "error: verify_app failed")
-  endif()
-endfunction()
