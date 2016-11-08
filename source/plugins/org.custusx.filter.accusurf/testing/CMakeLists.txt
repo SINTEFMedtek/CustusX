@@ -35,7 +35,7 @@ if(BUILD_TESTING)
     target_link_libraries(cxtest_org_custusx_filter_accusurf
         PRIVATE
         org_custusx_filter_accusurf
-		cxLogicManager
+        cxLogicManager
         cxtestUtilities
         cxCatch
     )

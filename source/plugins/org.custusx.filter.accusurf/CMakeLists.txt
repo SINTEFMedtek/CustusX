@@ -60,12 +60,12 @@ ctkMacroBuildPlugin(
   ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
-add_subdirectory(testing)
-
 target_include_directories(org_custusx_filter_accusurf
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+add_subdirectory(testing)
 
 
