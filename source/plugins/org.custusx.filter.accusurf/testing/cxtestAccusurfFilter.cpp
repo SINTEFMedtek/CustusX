@@ -33,29 +33,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include "cxData.h"
 #include "cxImage.h"
-#include "cxtestUtilities.h"
-//#include "cxPatientData.h"
 #include "cxDataLocations.h"
-#include "cxSelectDataStringProperty.h"
 #include "cxLogicManager.h"
-#include "cxProperty.h"
-#include "cxDoublePropertyBase.h"
-#include "cxDoubleProperty.h"
 #include "cxPatientModelService.h"
 #include "cxAccusurf.h"
 #include <vtkImageData.h>
+#include "cxtest_org_custusx_filter_accusurf_export.h"
 
 typedef boost::shared_ptr<class cx::Accusurf> AccusurfPtr;
 
 namespace cxtest {
 
+class CXTEST_ORG_CUSTUSX_FILTER_ACCUSURF_EXPORT AccusurfTest{}; //Needed for Windows linking
 
 
 TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")
 {
     cx::LogicManager::initialize();
-	//setup filter
 
+    //setup filter
     AccusurfPtr accusurf = AccusurfPtr(new cx::Accusurf());
     REQUIRE(accusurf);
 
@@ -67,7 +63,7 @@ TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")
 	QString info;
     cx::DataPtr dataVolume = cx::patientService()->importData(filenameVolume, info);
     cx::DataPtr dataCenterline = cx::patientService()->importData(filenameCenterline, info);
-    //data->get_rMd_History()->setRegistration(cx::Transform3D::Identity());
+
     REQUIRE(dataVolume);
     REQUIRE(dataCenterline);
 

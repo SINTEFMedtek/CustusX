@@ -38,6 +38,7 @@ if(BUILD_TESTING)
         cxLogicManager
         cxtestUtilities
         cxCatch
+        cxResource
     )
     cx_add_tests_to_catch(cxtest_org_custusx_filter_accusurf)
 
