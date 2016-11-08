@@ -23,6 +23,10 @@ public:
 	void setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection);
 	void createMaxDistanceToCenterlineOption(QDomElement root);
     DoublePropertyPtr getMaxDistanceToCenterlineOption();
+    void createMaxSearchDistanceOption(QDomElement root);
+    DoublePropertyPtr getMaxSearchDistanceOption();
+    void createAlphaOption(QDomElement root);
+    DoublePropertyPtr getAlphaOption();
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd);
 	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, Transform3D rMpr);
 	Transform3D findClosestPoint(Transform3D prMt, double maxDistance);
@@ -31,7 +35,7 @@ public:
 	void findSearchPositions(double maxSearchDistance);
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
 	void searchBranchDown(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
-	Transform3D findProjectedPoint(Transform3D prMt, double maxDistance);
+    Transform3D findProjectedPoint(Transform3D prMt, double maxDistance, double maxSearchDistance);
 	bool isAdvancedCenterlineProjectionSelected();
 	Transform3D updateProjectedCameraOrientation(Transform3D prMt, BranchPtr branch, int index);
 
@@ -39,6 +43,8 @@ private:
 	bool isPreviousProjectedPointSet;
 	Eigen::MatrixXd mCLpoints;
     DoublePropertyPtr mMaxDistanceToCenterline;
+    DoublePropertyPtr mMaxSearchDistance;
+    DoublePropertyPtr mAlpha;
 	BranchListPtr mBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;
@@ -48,8 +54,8 @@ private:
 	Vector3D mProjectedViewDirection;
 	Transform3D m_rMpr;
 };
-
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
+double findDistanceWithOrientation(Eigen::VectorXd p1, Eigen::VectorXd p2, Eigen::VectorXd o1, Eigen::VectorXd o2, double alpha);
 
 } /* namespace cx */
 

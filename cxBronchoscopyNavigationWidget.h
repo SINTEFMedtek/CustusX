@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectDataStringProperty.h"
 #include "cxMesh.h"
 #include "cxXmlOptionItem.h"
+#include "cxCheckBoxWidget.h"
 
 class QVBoxLayout;
 
@@ -72,17 +73,21 @@ private slots:
 	void processCenterlineSlot();
 	void enableSlot();
 	void disableSlot();
+    void showAdvancedOptionsSlot();
 
 private:
 	QString defaultWhatsThis() const;
-	void useAdvancedCenterlineProjection(QDomElement root);
 	QVBoxLayout*  mVerticalLayout;
+
     BoolPropertyPtr mUseAdvancedCenterlineProjection;
 
     StringPropertySelectMeshPtr mSelectMeshWidget;
 	QPushButton* mProcessCenterlineButton;
+    QWidget* mMaxSearchDistanceWidget;
+    QWidget* mAlphaWidget;
 	QPushButton* mEnableButton;
 	QPushButton* mDisableButton;
+    QCheckBox* mAdvancedOption;
 	ToolPtr mTool;
 	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
 	BronchoscopePositionProjectionPtr mProjectionCenterlinePtr;
