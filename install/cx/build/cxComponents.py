@@ -282,6 +282,7 @@ class OpenCV(CppComponent):
         add('BUILD_JASPER:BOOL', False)
         add('WITH_JASPER:BOOL', False)
         add('WITH_FFMPEG:BOOL', False)
+		add('WITH_GSTREAMER:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
