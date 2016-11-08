@@ -3,6 +3,7 @@
 
 #include "cxMesh.h"
 #include <QDomElement>
+#include "org_custusx_filter_accusurf_Export.h"
 
 
 namespace cx
@@ -10,7 +11,7 @@ namespace cx
 
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
 
-class Accusurf
+class org_custusx_filter_accusurf_EXPORT Accusurf
 {
 public:
     Accusurf();
