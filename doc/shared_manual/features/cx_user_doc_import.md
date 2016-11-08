@@ -11,7 +11,7 @@ Image / volume data:
 | Input datatype          | Allowed variants                            | Description                                        |
 | ----------------------- | -----------------------------------------   | -------------------------------------------------- |
 | DICOM                   | 8, 16, or 32 bit (signed or unsigned)       | http://dicom.nema.org/standard.html                |
-| .mhd                    | VTK mhd format (with some CX additions)     | https://itk.org/Wiki/ITK/MetaIO/Documentation      |
+| .mhd                    | VTK mhd reader (with some CX additions)     | https://itk.org/Wiki/ITK/MetaIO/Documentation      |
 | .png                    | VTK png reader                              | 2D pictures                                        |
 
 
@@ -19,4 +19,4 @@ Polydata / Surface models :
 | Input datatype          | Allowed variants                            | Description                                        |
 | ----------------------- | -----------------------------               | -------------------------------------------------- |
 | .stl                    | VTK stl reader                              |                                                    |
-| .vtk                    | VTK mhd format                              | https://itk.org/Wiki/ITK/MetaIO/Documentation      |
+| .vtk                    | VTK vtk format                              | www.vtk.org/VTK/img/file-formats.pdf               |
