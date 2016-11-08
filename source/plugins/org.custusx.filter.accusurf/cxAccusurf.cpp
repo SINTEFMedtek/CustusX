@@ -12,6 +12,7 @@
 #include "cxReporter.h"
 #include "cxBoundingBox3D.h"
 #include "cxImageAlgorithms.h"
+#include "cxImage.h"
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -42,11 +43,11 @@ void Accusurf::setRoutePositions(vtkPolyDataPtr route)
     smoothPositions();
 }
 
-void Accusurf::setInputImage(vtkImageDataPtr inputImage, int minVoxelValue)
-{
-    mInputImage = inputImage;
+void Accusurf::setInputImage(ImagePtr inputImage)
+{ 
+    mInputImage = inputImage->getBaseVtkImageData();
     mVtkScalarType = mInputImage->GetScalarType();
-    mMinVoxelValue = minVoxelValue;
+    mMinVoxelValue = inputImage->getMin();
 }
 
 void Accusurf::setThickness(int thicknessUp, int thicknessDown)

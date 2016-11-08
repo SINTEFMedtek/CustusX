@@ -16,7 +16,7 @@ public:
     Accusurf();
     virtual ~Accusurf();
     void setRoutePositions(vtkPolyDataPtr route);
-    void setInputImage(vtkImageDataPtr inputImage, int minVoxelValue);
+    void setInputImage(ImagePtr inputImage);
     void setThickness(int thicknessUp, int thicknessDown);
     vtkImageDataPtr createAccusurfImage();
 

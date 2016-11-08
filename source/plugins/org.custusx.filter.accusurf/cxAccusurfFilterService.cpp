@@ -130,26 +130,13 @@ bool AccusurfFilter::execute()
 
     vtkPolyDataPtr route_d_image = mesh->getTransformedPolyData((inputImage->get_rMd().inverse())*mesh->get_rMd());
     mAccusurf->setRoutePositions(route_d_image);
-    mAccusurf->setInputImage(inputImage->getBaseVtkImageData(), inputImage->getMin());
+    mAccusurf->setInputImage(inputImage);
 
     DoublePropertyPtr thicknessUp =this->getAccusurfThicknessUp(mOptions);
     DoublePropertyPtr thicknessDown =this->getAccusurfThicknessDown(mOptions);
     mAccusurf->setThickness(thicknessUp->getValue(), thicknessDown->getValue());
 
     mAccusurfImage = mAccusurf->createAccusurfImage();
-
-
-    //itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(inputImage);
-
-
-    //PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
-
-    //Vector3D targetCoordinate_r = targetPoint->getCoordinate();
-
-    //mAccusurf->processVolume(route_r,itkImage);
-
-    //note: mOutput is in reference space
-    //mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate_r);
 
 	return true;
 }
