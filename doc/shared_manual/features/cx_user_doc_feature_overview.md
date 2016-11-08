@@ -92,4 +92,5 @@ Other core features
 -----------------------------------------------------------
 - \subpage org_custusx_resource_filter
 - \subpage import_overview
+- \subpage export_overview
 
