@@ -101,6 +101,7 @@ void ViewGroupPropertiesWidget::updateFrontend()
 	ViewGroupData::Options options = group->getOptions();
 	CameraStyleData data = options.mCameraStyle;
 
+	mCameraViewAngle->setValue(data.mCameraViewAngle);
 	mCameraFollowTool->setValue(data.mCameraFollowTool);
 	mFocusFollowTool->setValue(data.mFocusFollowTool);
 	mCameraOnTooltip->setValue(data.mCameraLockToTooltip);
@@ -126,6 +127,12 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 	focusroi->setTypeRegexp("roi");
 	mFocusROI = focusroi;
 	mCameraStyleProperties.push_back(mFocusROI);
+
+	mCameraViewAngle = DoubleProperty::initialize("Angle of View", "",
+											"Camera View Angle, of Field of View",
+											30.0/180*M_PI, DoubleRange(10.0/180*M_PI, 150.0/180*M_PI, 1/180.0*M_PI), 0);
+	mCameraStyleProperties.push_back(mCameraViewAngle);
+	mCameraViewAngle->setInternal2Display(180.0/M_PI);
 
 	mCameraFollowTool = BoolProperty::initialize("Camera Follow Tool", "",
 												 "Camera position is fixed to the tool and moving along with it.\n"
@@ -217,6 +224,7 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 	ViewGroupData::Options options = group->getOptions();
 	CameraStyleData data = options.mCameraStyle;
 
+	data.mCameraViewAngle = mCameraViewAngle->getValue();
 	data.mCameraFollowTool = mCameraFollowTool->getValue();
 	data.mFocusFollowTool = mFocusFollowTool->getValue();
 	data.mCameraLockToTooltip = mCameraOnTooltip->getValue();
