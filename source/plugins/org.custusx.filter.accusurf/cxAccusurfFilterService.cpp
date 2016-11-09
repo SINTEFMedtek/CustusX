@@ -70,7 +70,7 @@ QString AccusurfFilter::getName() const
 
 QString AccusurfFilter::getType() const
 {
-	return "AccusurfFilter";
+	return "accusurf_filter";
 }
 
 QString AccusurfFilter::getHelp() const
