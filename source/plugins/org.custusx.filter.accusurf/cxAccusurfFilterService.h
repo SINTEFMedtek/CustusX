@@ -29,69 +29,68 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
+#ifndef CXACCUSURFFILTER_H
+#define CXACCUSURFFILTER_H
 
-#ifndef CXVIEWGROUPPROPERTIESWIDGET_H
-#define CXVIEWGROUPPROPERTIESWIDGET_H
+#include "org_custusx_filter_accusurf_Export.h"
 
-#include "cxGuiExport.h"
+#include "cxPatientModelService.h"
+#include "cxFilterImpl.h"
 
-#include "cxBaseWidget.h"
-
-#include <vector>
-#include "cxForwardDeclarations.h"
-#include "cxDoubleProperty.h"
+class ctkPluginContext;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
-/**
+/** Filter to generate an ACCuSurf volume to be usen in navigated bronchoscopy.
+ * The ACCuSurf is generated based on the standard thorax CT and a route-to-target centerline.
+ * </p>
+ * \ingroup cx_module_algorithm
+ * \date Oct 26, 2016
+ * \author Erlend Fagertun Hofstad
  */
-class cxGui_EXPORT ViewGroupPropertiesWidget : public BaseWidget
+
+
+typedef boost::shared_ptr<class Accusurf> AccusurfPtr;
+
+class org_custusx_filter_accusurf_EXPORT AccusurfFilter : public FilterImpl
 {
-  Q_OBJECT
+	Q_OBJECT
+	Q_INTERFACES(cx::Filter)
 
 public:
-	ViewGroupPropertiesWidget(int groupIndex, VisServicesPtr services, QWidget* parent);
-  virtual ~ViewGroupPropertiesWidget();
+	AccusurfFilter(VisServicesPtr services);
+	virtual ~AccusurfFilter() {}
 
-signals:
+	virtual QString getType() const;
+	virtual QString getName() const;
+	virtual QString getHelp() const;
+
+	virtual bool execute();
+    virtual bool postProcess();
+
+    // extensions:
+    DoublePropertyPtr getAccusurfThicknessUp(QDomElement root);
+    DoublePropertyPtr getAccusurfThicknessDown(QDomElement root);
 
 
 protected:
-  void setupUI();
-  virtual void prePaintEvent();
+	virtual void createOptions();
+	virtual void createInputTypes();
+	virtual void createOutputTypes();
+
+private slots:
 
 private:
-  void updateFrontend();
-
-//  DoublePropertyBasePtr mSelector;
-  int mGroupIndex;
-  ViewGroupDataPtr getViewGroup();
-  VisServicesPtr mServices;
-  QVBoxLayout* mLayout;
-
-  DoublePropertyPtr mCameraViewAngle;
-  BoolPropertyPtr mCameraFollowTool;
-  BoolPropertyPtr mFocusFollowTool;
-  BoolPropertyPtr mCameraOnTooltip;
-
-  DoublePropertyPtr mCameraTooltipOffset;
-  StringPropertyBasePtr mCameraNotBehindROI;
-  BoolPropertyPtr mTableLock;
-  BoolPropertyPtr mUniCam;
-  DoublePropertyPtr mElevation;
-  StringPropertyBasePtr mAutoZoomROI;
-  StringPropertyBasePtr mFocusROI;
-  std::vector<PropertyPtr> mCameraStyleProperties;
-  CameraStyleInteractorPtr mCameraStyleInteractor;
-
-  void createCameraStyleProperties();
-  void onCameraStyleChanged();
-  void createCameraStyleWidget();
+	AccusurfPtr mAccusurf;
+	vtkPolyDataPtr mOutput;
+    vtkImageDataPtr mAccusurfImage;
 };
+typedef boost::shared_ptr<class AccusurfFilter> AccusurfFilterPtr;
 
-}//end namespace cx
+
+} // namespace cx
 
 
-#endif // CXVIEWGROUPPROPERTIESWIDGET_H
+
+#endif // CXACCUSURFFILTER_H

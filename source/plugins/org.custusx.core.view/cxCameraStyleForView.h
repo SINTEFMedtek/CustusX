@@ -90,7 +90,7 @@ struct CameraInfo
 	Vector3D pos;
 	Vector3D focus;
 	Vector3D vup;
-	double viewAngle;
+	double viewAngle; // vtk View angle in DEGREES
 };
 
 bool similar(const CameraInfo& lhs, const CameraInfo& rhs, double tol=1.0E-6);
