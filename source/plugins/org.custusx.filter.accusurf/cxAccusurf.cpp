@@ -61,45 +61,40 @@ vtkImageDataPtr Accusurf::createNewEmptyImage()
     vtkImageDataPtr newImage = vtkImageDataPtr::New();
     newImage->DeepCopy(mInputImage);
 
-    if (mVtkScalarType==VTK_CHAR)
+    switch (mVtkScalarType)
     {
-        newImage->AllocateScalars(VTK_CHAR, 1);
-        this->insertValuesAtInitialization(static_cast<char*> (newImage->GetScalarPointer()), newImage);
-    }
-    else if (mVtkScalarType==VTK_UNSIGNED_CHAR)
-    {
-        newImage->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-        this->insertValuesAtInitialization(static_cast<unsigned char*> (newImage->GetScalarPointer()), newImage);
-    }
-    if (mVtkScalarType==VTK_SIGNED_CHAR)
-    {
-        newImage->AllocateScalars(VTK_SIGNED_CHAR, 1);
-        this->insertValuesAtInitialization(static_cast<signed char*> (newImage->GetScalarPointer()), newImage);
-    }
-    if (mVtkScalarType==VTK_UNSIGNED_SHORT)
-    {
-        newImage->AllocateScalars(VTK_UNSIGNED_SHORT, 1);
-        this->insertValuesAtInitialization(static_cast<unsigned short*> (newImage->GetScalarPointer()), newImage);
-    }
-    if (mVtkScalarType==VTK_SHORT)
-    {
-        newImage->AllocateScalars(VTK_SHORT, 1);
-        this->insertValuesAtInitialization(static_cast<short*> (newImage->GetScalarPointer()), newImage);
-    }
-    if (mVtkScalarType==VTK_UNSIGNED_INT)
-    {
-        newImage->AllocateScalars(VTK_UNSIGNED_INT, 1);
-        this->insertValuesAtInitialization(static_cast<unsigned int*> (newImage->GetScalarPointer()), newImage);
-    }
-    if (mVtkScalarType==VTK_INT)
-    {
-        newImage->AllocateScalars(VTK_INT, 1);
-        this->insertValuesAtInitialization(static_cast<int*> (newImage->GetScalarPointer()), newImage);
-    }
-    else
-    {
-        reportError(QString("Unknown VTK ScalarType: %1").arg(mVtkScalarType));
-        return newImage;
+        case VTK_CHAR:
+            newImage->AllocateScalars(VTK_CHAR, 1);
+            this->insertValuesAtInitialization(static_cast<char*> (newImage->GetScalarPointer()), newImage);
+            break;
+        case VTK_UNSIGNED_CHAR:
+            newImage->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+            this->insertValuesAtInitialization(static_cast<unsigned char*> (newImage->GetScalarPointer()), newImage);
+            break;
+        case VTK_SIGNED_CHAR:
+            newImage->AllocateScalars(VTK_SIGNED_CHAR, 1);
+            this->insertValuesAtInitialization(static_cast<signed char*> (newImage->GetScalarPointer()), newImage);
+            break;
+        case VTK_UNSIGNED_SHORT:
+            newImage->AllocateScalars(VTK_UNSIGNED_SHORT, 1);
+            this->insertValuesAtInitialization(static_cast<unsigned short*> (newImage->GetScalarPointer()), newImage);
+            break;
+        case VTK_SHORT:
+            newImage->AllocateScalars(VTK_SHORT, 1);
+            this->insertValuesAtInitialization(static_cast<short*> (newImage->GetScalarPointer()), newImage);
+            break;
+        case VTK_UNSIGNED_INT:
+            newImage->AllocateScalars(VTK_UNSIGNED_INT, 1);
+            this->insertValuesAtInitialization(static_cast<unsigned int*> (newImage->GetScalarPointer()), newImage);
+            break;
+        case VTK_INT:
+            newImage->AllocateScalars(VTK_INT, 1);
+            this->insertValuesAtInitialization(static_cast<int*> (newImage->GetScalarPointer()), newImage);
+            break;
+        default:
+            reportError(QString("Unknown VTK ScalarType: %1").arg(mVtkScalarType));
+            return newImage;
+            break;
     }
 
     setDeepModified(newImage);
@@ -134,22 +129,33 @@ vtkImageDataPtr Accusurf::createAccusurfImage()
     }
 
 
-    if (mVtkScalarType==VTK_CHAR)
-        insertValuesFromOriginalImage<char*>(accusurfImage, dim, yIndexes);
-    else if (mVtkScalarType==VTK_UNSIGNED_CHAR)
-        insertValuesFromOriginalImage<unsigned char*>(accusurfImage, dim, yIndexes);
-    if (mVtkScalarType==VTK_SIGNED_CHAR)
-        insertValuesFromOriginalImage<signed char*>(accusurfImage, dim, yIndexes);
-    if (mVtkScalarType==VTK_UNSIGNED_SHORT)
-        insertValuesFromOriginalImage<unsigned short*>(accusurfImage, dim, yIndexes);
-    if (mVtkScalarType==VTK_SHORT)
-        insertValuesFromOriginalImage<short*>(accusurfImage, dim, yIndexes);
-    if (mVtkScalarType==VTK_UNSIGNED_INT)
-        insertValuesFromOriginalImage<unsigned int*>(accusurfImage, dim, yIndexes);
-    if (mVtkScalarType==VTK_INT)
-        insertValuesFromOriginalImage<int*>(accusurfImage, dim, yIndexes);
-    else
-        reportError(QString("Unknown VTK ScalarType: %1").arg(mVtkScalarType));
+    switch (mVtkScalarType)
+    {
+        case VTK_CHAR:
+            insertValuesFromOriginalImage<char*>(accusurfImage, dim, yIndexes);
+            break;
+        case VTK_UNSIGNED_CHAR:
+            insertValuesFromOriginalImage<unsigned char*>(accusurfImage, dim, yIndexes);
+            break;
+        case VTK_SIGNED_CHAR:
+            insertValuesFromOriginalImage<signed char*>(accusurfImage, dim, yIndexes);
+            break;
+        case VTK_UNSIGNED_SHORT:
+            insertValuesFromOriginalImage<unsigned short*>(accusurfImage, dim, yIndexes);
+            break;
+        case VTK_SHORT:
+            insertValuesFromOriginalImage<short*>(accusurfImage, dim, yIndexes);
+            break;
+        case VTK_UNSIGNED_INT:
+            insertValuesFromOriginalImage<unsigned int*>(accusurfImage, dim, yIndexes);
+            break;
+        case VTK_INT:
+            insertValuesFromOriginalImage<int*>(accusurfImage, dim, yIndexes);
+            break;
+        default:
+            reportError(QString("Unknown VTK ScalarType: %1").arg(mVtkScalarType));
+            break;
+    }
 
     int yMin = *std::min_element(yIndexes.begin(), yIndexes.end());
     int yMax = *std::max_element(yIndexes.begin(), yIndexes.end());
