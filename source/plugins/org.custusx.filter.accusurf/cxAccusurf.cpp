@@ -132,25 +132,25 @@ vtkImageDataPtr Accusurf::createAccusurfImage()
     switch (mVtkScalarType)
     {
         case VTK_CHAR:
-            insertValuesFromOriginalImage<char*>(accusurfImage, dim, yIndexes);
+            this->insertValuesFromOriginalImage<char>(accusurfImage, dim, yIndexes);
             break;
         case VTK_UNSIGNED_CHAR:
-            insertValuesFromOriginalImage<unsigned char*>(accusurfImage, dim, yIndexes);
+            this->insertValuesFromOriginalImage<unsigned char>(accusurfImage, dim, yIndexes);
             break;
         case VTK_SIGNED_CHAR:
-            insertValuesFromOriginalImage<signed char*>(accusurfImage, dim, yIndexes);
+            this->insertValuesFromOriginalImage<signed char>(accusurfImage, dim, yIndexes);
             break;
         case VTK_UNSIGNED_SHORT:
-            insertValuesFromOriginalImage<unsigned short*>(accusurfImage, dim, yIndexes);
+            insertValuesFromOriginalImage<unsigned short>(accusurfImage, dim, yIndexes);
             break;
         case VTK_SHORT:
-            insertValuesFromOriginalImage<short*>(accusurfImage, dim, yIndexes);
+            this->insertValuesFromOriginalImage<short>(accusurfImage, dim, yIndexes);
             break;
         case VTK_UNSIGNED_INT:
-            insertValuesFromOriginalImage<unsigned int*>(accusurfImage, dim, yIndexes);
+            this->insertValuesFromOriginalImage<unsigned int>(accusurfImage, dim, yIndexes);
             break;
         case VTK_INT:
-            insertValuesFromOriginalImage<int*>(accusurfImage, dim, yIndexes);
+            this->insertValuesFromOriginalImage<int>(accusurfImage, dim, yIndexes);
             break;
         default:
             reportError(QString("Unknown VTK ScalarType: %1").arg(mVtkScalarType));
