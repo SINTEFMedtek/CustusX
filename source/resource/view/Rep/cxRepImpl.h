@@ -84,7 +84,7 @@ public:
 	{
 		boost::shared_ptr<REP> retval(object);
 		if (uid.isEmpty())
-			uid = retval->getType() + "_" + reinterpret_cast<long>(retval.get());
+			uid = retval->getType() + "_" + reinterpret_cast<long long>(retval.get());
 		retval->mUid = uid;
 		retval->mName = uid;
 		retval->mSelf = retval;
