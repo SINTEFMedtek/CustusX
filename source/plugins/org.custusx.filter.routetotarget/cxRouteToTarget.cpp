@@ -118,20 +118,41 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 
 	smoothPositions();
 
-	vtkPolyDataPtr retval = addVTKPoints();
+    vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
 	return retval;
 }
 
-vtkPolyDataPtr RouteToTarget::addVTKPoints()
+vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
+{
+    float extentionPointIncrement = 0.5; //mm
+    mExtendedRoutePositions.clear();
+    mExtendedRoutePositions = mRoutePositions;
+    double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
+    Eigen::Vector3d extentionVector = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+    int numberOfextentionPoints = (int) extentionDistance * extentionPointIncrement;
+    Eigen::Vector3d extentionPointIncrementVector = extentionVector / extentionPointIncrement;
+
+    for (int i = 1; i<= numberOfextentionPoints; i++)
+    {
+        mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
+        std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
+    }
+
+    vtkPolyDataPtr retval = addVTKPoints(mExtendedRoutePositions);
+
+    return retval;
+}
+
+vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> positions)
 {
 	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
 	vtkPointsPtr points = vtkPointsPtr::New();
 	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
-	int numberOfPositions = mRoutePositions.size();
+    int numberOfPositions = positions.size();
 	for (int j = numberOfPositions - 1; j >= 0; j--)
 	{
-		points->InsertNextPoint(mRoutePositions[j](0),mRoutePositions[j](1),mRoutePositions[j](2));
+        points->InsertNextPoint(positions[j](0),positions[j](1),positions[j](2));
 	}
 	for (int j = 0; j < numberOfPositions-1; j++)
 	{
