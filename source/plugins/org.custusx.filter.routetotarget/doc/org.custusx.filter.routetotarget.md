@@ -6,7 +6,7 @@ Route-to-Target Filter {#org_custusx_filter_routetotarget}
 Route-to-Target is used in bronchoscopy navigation. It generates a centerline from  the top of trachea to a target position.
 
 Input:
-- Target position generated in the Metrics/3D ruler widget.
+- Target position generated as point metric with \ref utility_widgets_metrics .
 - Airway centerline tree generated in the \ref org_custusx_filter_airways or \ref org_custusx_filter_tubesegmentation widget.
 
 Output:
