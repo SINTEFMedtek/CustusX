@@ -570,11 +570,6 @@ void GPUImageBufferRepository::clear()
 	mInternal = new GPUImageBufferRepositoryInternal();
 }
 
-void GPUImageBufferRepository::init()
-{
-	GPUImageBufferRepository::getInstance();
-}
-
 GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 {
 	if (!mInstance)
@@ -615,7 +610,11 @@ GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsignedC
 	return mInternal->mLutBuffer.get(lut);
 }
 
+GPUImageBufferRepository* getGPUImageBufferRepository()
+{
+	return GPUImageBufferRepository::getInstance();
 }
+}//cx
 
 #else
 
@@ -626,8 +625,3 @@ void GPUImageBufferRepository::tearDown() {;}
 }//namespace cx
 
 #endif //WIN32
-
-namespace cx
-{
-
-}
