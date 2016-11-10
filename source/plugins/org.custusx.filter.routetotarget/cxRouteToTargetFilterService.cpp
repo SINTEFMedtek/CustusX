@@ -69,7 +69,7 @@ QString RouteToTargetFilter::getName() const
 
 QString RouteToTargetFilter::getType() const
 {
-	return "RouteToTargetFilter";
+	return "routetotarget_filter";
 }
 
 QString RouteToTargetFilter::getHelp() const
