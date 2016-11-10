@@ -156,6 +156,7 @@ target_include_directories(cxResourceVisualization
     ./RepVideo
     ./Primitives
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
 
     ./View/internal
     ./View/internal/ViewContainer
