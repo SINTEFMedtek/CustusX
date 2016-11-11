@@ -247,9 +247,9 @@ void PluginFrameworkManager::initializeFramework()
 	try
 	{
 		framework->init();
-	} catch (const ctkPluginException& exc)
+	} catch (const ctkException& exc)
 	{
-		qCritical() << "Failed to initialize the plug-in framework:" << exc;
+		this->handlePluginException("Failed to initialize the plug-in framework", exc);
 	}
 	mFramework = framework;
 }
@@ -276,9 +276,9 @@ void PluginFrameworkManager::startFramework()
 	{
 		mFramework->start();
 	}
-	catch (const ctkPluginException& exc)
+	catch (const ctkException& exc)
 	{
-		qCritical() << "Failed to start the plug-in framework:" << exc;
+		this->handlePluginException("Failed to start the plug-in framework", exc);
 	}
 }
 
@@ -297,16 +297,9 @@ void PluginFrameworkManager::install(const QString& symbolicName)
 		ctkPluginContext* pc = this->getPluginContext();
 		pc->installPlugin(QUrl::fromLocalFile(pluginPath))->getPluginId();
 	}
-	catch (const ctkPluginException& exc)
+	catch (const ctkException& exc)
 	{
-		CX_LOG_CHANNEL_ERROR("plugin") << "Failed to install plugin:" << symbolicName << ", " << exc.what();
-	}
-	catch (const ctkRuntimeException& exc)
-	{
-		CX_LOG_CHANNEL_ERROR("plugin")
-				<< QString("Failed to install plugin (runtime error): %1, %2")
-				   .arg(symbolicName)
-				   .arg(exc.what());
+		this->handlePluginException(QString("Failed to install plugin %1").arg(symbolicName), exc);
 	}
 }
 
@@ -352,9 +345,9 @@ bool PluginFrameworkManager::stop()
 			return false;
 		}
 	}
-	catch (const ctkRuntimeException& e)
+	catch (const ctkException& exc)
 	{
-		CX_LOG_CHANNEL_WARNING("plugin") << QString("Stopping the plugin framework failed: %1").arg(e.what());
+		this->handlePluginException("Failed to stop the plug-in framework", exc);
 		return false;
 	}
     return !this->frameworkStarted();
@@ -371,9 +364,9 @@ void PluginFrameworkManager::uninstall(const QString& symbolicName)
 		ctkPluginContext* pc = this->getPluginContext();
 		pc->installPlugin(QUrl::fromLocalFile(pluginPath))->uninstall();
 	}
-	catch (const ctkPluginException& exc)
+	catch (const ctkException& exc)
 	{
-		CX_LOG_CHANNEL_WARNING("plugin") << QString("Failed to uninstall plugin: %1, %2").arg(symbolicName).arg(exc.what());
+		this->handlePluginException(QString("Failed to uninstall plugin %1.").arg(symbolicName), exc);
 		return;
 	}
 
@@ -394,20 +387,27 @@ bool PluginFrameworkManager::start(const QString& symbolicName, ctkPlugin::Start
 	try
 	{
 		ctkPluginContext* pc = this->getPluginContext();
-		pc->installPlugin(QUrl::fromLocalFile(pluginPath))->start(options);
+		QSharedPointer<ctkPlugin> plugin = pc->installPlugin(QUrl::fromLocalFile(pluginPath));
+		plugin->start(options);
 	}
-	catch (const ctkPluginException& exc)
+	catch (ctkException& exc)
 	{
-		CX_LOG_CHANNEL_ERROR("plugin") << QString("Failed to start plugin (plugin error): %1, %2").arg(symbolicName).arg(exc.what());
-		return false;
-	}
-	catch (const ctkRuntimeException& exc)
-	{
-		CX_LOG_CHANNEL_ERROR("plugin") << QString("Failed to start plugin (runtime error): %1, %2").arg(symbolicName).arg(exc.what());
+		this->handlePluginException(QString("Failed to stop plugin %1.").arg(symbolicName), exc);
 		return false;
 	}
 
 	return true;
+}
+
+void PluginFrameworkManager::handlePluginException(const QString& message, const ctkException& exc)
+{
+	CX_LOG_CHANNEL_ERROR("plugin") << message;
+	const ctkException* nest = &exc;
+	while (nest)
+	{
+		CX_LOG_CHANNEL_ERROR("plugin") << QString(" cause: %2").arg(nest->what());
+		nest = nest->cause();
+	}
 }
 
 bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOptions options)
@@ -430,9 +430,9 @@ bool PluginFrameworkManager::stop(const QString& symbolicName, ctkPlugin::StopOp
 	{
 		plugin->stop(options);
 	}
-	catch (const ctkPluginException& exc)
+	catch (const ctkException& exc)
 	{
-		CX_LOG_CHANNEL_WARNING("plugin") << QString("Failed to stop plugin %1: ").arg(symbolicName).arg(exc.what());
+		this->handlePluginException(QString("Failed to stop plugin %1").arg(symbolicName), exc);
 		return false;
 	}
 
