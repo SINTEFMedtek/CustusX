@@ -610,7 +610,11 @@ GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsignedC
 	return mInternal->mLutBuffer.get(lut);
 }
 
+GPUImageBufferRepository* getGPUImageBufferRepository()
+{
+	return GPUImageBufferRepository::getInstance();
 }
+}//cx
 
 #else
 
@@ -621,8 +625,3 @@ void GPUImageBufferRepository::tearDown() {;}
 }//namespace cx
 
 #endif //WIN32
-
-namespace cx
-{
-
-}

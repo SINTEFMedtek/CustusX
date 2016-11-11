@@ -2,6 +2,8 @@
 ##               Resource Visualization Library
 ###########################################################
 
+find_package(GLEW REQUIRED)
+
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
     View/cxViewCollectionWidget
@@ -154,15 +156,18 @@ target_include_directories(cxResourceVisualization
     ./RepVideo
     ./Primitives
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
 
     ./View/internal
     ./View/internal/ViewContainer
     ./View/internal/ViewMixed
     ./View/internal/ViewWidget
+    ${GLEW_INCLUDE_DIRS}
 )
 target_link_libraries(cxResourceVisualization
     PRIVATE
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
+    ${GLEW_LIBRARY}
 )
 
 add_subdirectory(testing)

@@ -151,6 +151,10 @@ private:
 	void tearDown();
 };
 
+// Not allowed to export static functions from dll on Windows,
+// so we have to use this funciton instead of GPUImageBufferRepository::getInstance
+cxResource_EXPORT GPUImageBufferRepository* getGPUImageBufferRepository();
+
 /**
  * \}
  */
