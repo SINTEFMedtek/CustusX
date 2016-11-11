@@ -583,8 +583,8 @@ void Texture3DSlicerProxyImpl::imageChanged()
 	{
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData();//
 
-		GPUImageDataBufferPtr dataBuffer = getGPUImageBufferRepository()->getGPUImageDataBuffer(
-			inputImage);
+//		GPUImageDataBufferPtr dataBuffer = getGPUImageBufferRepository()->getGPUImageDataBuffer(
+//			inputImage);
 
 //		mPainter->SetVolumeBuffer(i, dataBuffer);
 //		this->SetVolumeBuffer(i, dataBuffer);
