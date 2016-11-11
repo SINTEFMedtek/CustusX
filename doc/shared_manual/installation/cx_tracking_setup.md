@@ -30,7 +30,8 @@ You can run the shell commands below after installing the Track application, or 
 
 
 ### Windows
-CustusX assumes that NDI connects through `COM-port` 9. If this is not the case, change manually.
+CustusX assumes that NDI connects through `COM-port` 9. If this is not the case, change the port manually. Go to the device manager in the control panel and
+find the NDI USB port under COM Ports. Change the port number in the advanced settings.
 
 
 Tool File setup {#cx_tool_file}

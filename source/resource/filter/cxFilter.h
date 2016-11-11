@@ -89,7 +89,7 @@ public:
 	  */
 	virtual void initialize(QDomElement root, QString uid = "") = 0;
 	/**
-	  *  Return the type of this algorithm.
+	  *  Return the type of this algorithm. Need to match id string in user documentation
 	  */
 	virtual QString getType() const  = 0;
 	/**

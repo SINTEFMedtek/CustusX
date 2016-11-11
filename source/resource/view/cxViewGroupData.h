@@ -69,11 +69,11 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
 
+	double mCameraViewAngle;
 	bool mCameraFollowTool;
 	bool mFocusFollowTool;
 	bool mCameraLockToTooltip;
 	double mCameraTooltipOffset;
-//	bool mCameraNotBehindROI;
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;

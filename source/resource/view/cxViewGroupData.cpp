@@ -105,6 +105,7 @@ CAMERA_STYLE_TYPE CameraStyleData::getStyle()
 
 void CameraStyleData::clear()
 {
+	mCameraViewAngle = 30.0/180*M_PI;
 	mCameraFollowTool = false;
 	mFocusFollowTool = false;
 	mCameraLockToTooltip = false;
@@ -120,6 +121,7 @@ void CameraStyleData::clear()
 void CameraStyleData::addXml(QDomNode &dataNode)
 {
 	QDomElement elem = dataNode.toElement();
+	elem.setAttribute("cameraViewAngle", mCameraViewAngle);
 	elem.setAttribute("cameraFollowTool", mCameraFollowTool);
 	elem.setAttribute("focusFollowTool", mFocusFollowTool);
 	elem.setAttribute("cameraOnTooltip", mCameraLockToTooltip);
@@ -135,6 +137,7 @@ void CameraStyleData::addXml(QDomNode &dataNode)
 void CameraStyleData::parseXml(QDomNode dataNode)
 {
 	QDomElement elem = dataNode.toElement();
+	mCameraViewAngle = elem.attribute("cameraViewAngle", QString::number(mCameraViewAngle)).toDouble();
 	mCameraFollowTool = elem.attribute("cameraFollowTool", QString::number(mCameraFollowTool)).toInt();
 	mFocusFollowTool = elem.attribute("focusFollowTool", QString::number(mFocusFollowTool)).toInt();
 	mCameraLockToTooltip = elem.attribute("cameraOnTooltip", QString::number(mCameraLockToTooltip)).toInt();
@@ -149,7 +152,8 @@ void CameraStyleData::parseXml(QDomNode dataNode)
 
 bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs)
 {
-	return ((lhs.mCameraFollowTool==rhs.mCameraFollowTool) &&
+	return ((lhs.mCameraViewAngle==rhs.mCameraViewAngle) &&
+			(lhs.mCameraFollowTool==rhs.mCameraFollowTool) &&
 			(lhs.mFocusFollowTool==rhs.mFocusFollowTool) &&
 			(lhs.mCameraLockToTooltip==rhs.mCameraLockToTooltip) &&
 			(lhs.mCameraTooltipOffset==rhs.mCameraTooltipOffset) &&
