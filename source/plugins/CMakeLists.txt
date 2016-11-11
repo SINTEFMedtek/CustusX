@@ -32,6 +32,7 @@ set(CX_PLUGINS
   org.custusx.calibration:ON
   org.custusx.help:ON
   org.custusx.training:ON
+  org.custusx.filter.accusurf:ON
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.

@@ -29,10 +29,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXROUTETOTARGETFILTER_H
-#define CXROUTETOTARGETFILTER_H
+#ifndef CXACCUSURFFILTER_H
+#define CXACCUSURFFILTER_H
 
-#include "org_custusx_filter_routetotarget_Export.h"
+#include "org_custusx_filter_accusurf_Export.h"
 
 #include "cxPatientModelService.h"
 #include "cxFilterImpl.h"
@@ -42,32 +42,36 @@ class ctkPluginContext;
 namespace cx
 {
 
-/** Filter to calculates the route to a selected target in navigated bronchocopy.
- * The rout starts at the top of trachea and ends at the most adjacent airway centerline
- *  from the target.</p>
+/** Filter to generate an ACCuSurf volume to be usen in navigated bronchoscopy.
+ * The ACCuSurf is generated based on the standard thorax CT and a route-to-target centerline.
+ * </p>
  * \ingroup cx_module_algorithm
- * \date Jan 29, 2015
+ * \date Oct 26, 2016
  * \author Erlend Fagertun Hofstad
  */
 
 
-typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef boost::shared_ptr<class Accusurf> AccusurfPtr;
 
-class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public FilterImpl
+class org_custusx_filter_accusurf_EXPORT AccusurfFilter : public FilterImpl
 {
 	Q_OBJECT
 	Q_INTERFACES(cx::Filter)
 
 public:
-	RouteToTargetFilter(VisServicesPtr services);
-	virtual ~RouteToTargetFilter() {}
+	AccusurfFilter(VisServicesPtr services);
+	virtual ~AccusurfFilter() {}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 
 	virtual bool execute();
-	virtual bool postProcess();
+    virtual bool postProcess();
+
+    // extensions:
+    DoublePropertyPtr getAccusurfThicknessUp(QDomElement root);
+    DoublePropertyPtr getAccusurfThicknessDown(QDomElement root);
 
 
 protected:
@@ -78,15 +82,15 @@ protected:
 private slots:
 
 private:
-	RouteToTargetPtr mRouteToTarget;
+	AccusurfPtr mAccusurf;
 	vtkPolyDataPtr mOutput;
-    vtkPolyDataPtr mExtendedRoute;
+    vtkImageDataPtr mAccusurfImage;
 };
-typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
+typedef boost::shared_ptr<class AccusurfFilter> AccusurfFilterPtr;
 
 
 } // namespace cx
 
 
 
-#endif // CXROUTETOTARGETFILTER_H
+#endif // CXACCUSURFFILTER_H

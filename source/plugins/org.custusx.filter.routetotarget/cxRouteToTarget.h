@@ -26,7 +26,8 @@ public:
 	void findRoutePositions();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
     vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
-	vtkPolyDataPtr addVTKPoints();
+    vtkPolyDataPtr findExtendedRoute(Vector3D targetCoordinate_r);
+    vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 
 private:
 	Eigen::MatrixXd mCLpoints;
@@ -34,6 +35,7 @@ private:
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;
 	std::vector< Eigen::Vector3d > mRoutePositions;
+    std::vector< Eigen::Vector3d > mExtendedRoutePositions;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	void smoothPositions();

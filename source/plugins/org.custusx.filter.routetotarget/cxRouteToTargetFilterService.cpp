@@ -69,7 +69,7 @@ QString RouteToTargetFilter::getName() const
 
 QString RouteToTargetFilter::getType() const
 {
-	return "RouteToTargetFilter";
+	return "routetotarget_filter";
 }
 
 QString RouteToTargetFilter::getHelp() const
@@ -133,6 +133,7 @@ bool RouteToTargetFilter::execute()
 
     //note: mOutput is in reference space
     mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate_r);
+    mExtendedRoute = mRouteToTarget->findExtendedRoute(targetCoordinate_r);
 
 	return true;
 }
@@ -144,19 +145,26 @@ bool RouteToTargetFilter::postProcess()
 
 	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1";
 	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1";
+    MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
+    patientService()->insertData(outputCenterline);
 
-	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
+    QString uidCenterlineExt = outputCenterline->getUid() + "_ext";
+    QString nameCenterlineExt = outputCenterline->getName()+"_ext";
+    MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
+    patientService()->insertData(outputCenterlineExt);
 
     //note: mOutput and outputCenterline is in reference(r) space
     outputCenterline->setVtkPolyData(mOutput);
+    outputCenterlineExt->setVtkPolyData(mExtendedRoute);
+    outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
 
 	if (!outputCenterline)
 		return false;
 
     //Meshes are expected to be in data(d) space
     outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
+    outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
-	patientService()->insertData(outputCenterline);
 	mServices->view()->autoShowData(outputCenterline);
 
 	mOutputTypes[0]->setValue(outputCenterline->getUid());
