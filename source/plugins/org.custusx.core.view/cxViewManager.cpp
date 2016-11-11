@@ -75,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigation.h"
 #include "cxPatientModelService.h"
 #include "cxCameraStyleInteractor.h"
+#include "cxCameraStyleForView.h"
 
 namespace cx
 {
