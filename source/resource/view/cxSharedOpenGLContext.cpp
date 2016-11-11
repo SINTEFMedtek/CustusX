@@ -115,6 +115,7 @@ bool SharedOpenGLContext::makeCurrent() const
 
 bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 {
+
 	bool success = false;
 	if(!image)
 	{
@@ -126,14 +127,25 @@ bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 	int* dims = vtkImageData->GetDimensions();
 	int dataType = vtkImageData->GetScalarType();
 	int numComps = vtkImageData->GetNumberOfScalarComponents();
+	int coordinate[3] = {dims[0]/2, dims[1]/2, dims[2]/2};
 
-	CX_LOG_DEBUG() << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << " dataType: " << vtkImageData->GetScalarTypeAsString() << " numComps: " << numComps;
+	CX_LOG_DEBUG() << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << " scalarType: " << vtkImageData->GetScalarTypeAsString() << " numComps: " << numComps;
+	CX_LOG_DEBUG() << "data in the middle 1 " << vtkImageData->GetScalarComponentAsFloat(dims[0]/2, dims[1]/2, dims[2]/2, 0);
+	CX_LOG_DEBUG() << "data in the middle 2 " << (int)((unsigned char*)vtkImageData->GetScalarPointer(coordinate))[0];
 	report_gl_error();
 
 	vtkTextureObjectPtr texture_object;
 	if(!mTextureObjects.count(image->getUid()))
 	{
-		texture_object = this->createTextureObject(dims[0], dims[1], dims[1], dataType, numComps, vtkImageData->GetScalarPointer(), mContext);
+		void* data = vtkImageData->GetScalarPointer();
+		/*
+		int size = dims[0]*dims[1]*dims[2]*numComps;
+		CX_LOG_DEBUG() << "data in the middle 3 " << (int)((reinterpret_cast<unsigned char*>(data)[size/2+1]));
+		for(int i=0; i<size; i=i+150)
+			std::cout << (int)((reinterpret_cast<unsigned char*>(data)[i]));
+		std::cout << std::endl;
+		*/
+		texture_object = this->createTextureObject(dims[0], dims[1], dims[2], dataType, numComps, data, mContext);
 		mTextureObjects[image->getUid()] = texture_object;
 		success = true;
 	}
@@ -188,10 +200,22 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::getTextureCoordinates(QString imag
 
 vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width, unsigned int height,  unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow)
 {
+	/*
+	int size = width*height*depth*numComps;
+	CX_LOG_DEBUG() << "data in the middle 3 " << (int)((reinterpret_cast<unsigned char*>(data)[size/2+1]));
+	for(int i=(size/2)-100; i<(size/2)+100; ++i)
+		std::cout << (int)((reinterpret_cast<unsigned char*>(data)[i]));
+	std::cout << std::endl;
+	*/
+
+
 	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
 	//texture_object->DebugOn();
 
-	//if(!this->makeCurrent())
+	if(!this->makeCurrent())
+	{
+		CX_LOG_DEBUG_CHECKPOINT();
+	}
 	//	return texture_object;
 
 	texture_object->SetContext(opengl_renderwindow);
@@ -203,14 +227,23 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		//6403 == GL_RED 0x1903
 		//6407 == GL_RGB 0x1907
 		//6408 == GL_RGBA 0x1908
-		//CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
+		CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
 
 		texture_object->Activate();
 		report_gl_error();
 
+		/*
 		texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
 		texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
 		texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
+		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
+		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
+		texture_object->SendParameters();
+		*/
+
+		texture_object->SetWrapS(vtkTextureObject::Repeat);
+		texture_object->SetWrapT(vtkTextureObject::Repeat);
+		texture_object->SetWrapR(vtkTextureObject::Repeat);
 		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
 		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
 		texture_object->SendParameters();
@@ -219,6 +252,7 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		texture_object->PrintSelf(std::cout, vtkIndent(4));
 
 		report_gl_error();
+		texture_object->Deactivate();
 	}
 	else
 		CX_LOG_ERROR() << "Error creating 3D texture";

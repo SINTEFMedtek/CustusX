@@ -82,7 +82,7 @@ public:
 	std::vector<ShaderItemPtr> mShaderItems;
 
 private:
-	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, int index_of_vector);
+	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::__1::string name);
 	void addUniform(vtkShaderProgram *program, std::string name, int value);
 	void bindFSOutputVariable(vtkShaderProgram *program);
 

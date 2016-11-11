@@ -202,7 +202,7 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 	vtkShaderProgram *program = OpenGLHelper->Program;
 	vtkOpenGLVertexArrayObject *vao = OpenGLHelper->VAO;
 
-	this->printDebugInfo(OpenGLHelper);
+	//this->printDebugInfo(OpenGLHelper);
 
 	if(eventId == vtkCommand::UpdateShaderEvent)
 	{
@@ -222,21 +222,29 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		OpenGLHelper->VAO->Bind();
 		report_gl_error();
 
-		for(int i=0; i< mShaderItems.size(); ++i)
+		int number_to_add = 1; //mShaderItems.size()
+		for(int i=0; i< number_to_add; ++i)
 		{
+			std::string name = VS_In_Vec3_TextureCoordinate+"_0";//generateVSAttributeTextureCoordinateVectorName(i);
+
 			//Upload attribute arrays
 			//	texture coordinates (glsl: vec3)
 			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems[i]->mTextureCoordinates;
 			if(texture_coordinates)
-				this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, i);
+				this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, name);
 			report_gl_error();
+
 
 			//Upload uniforms
 			//Note: Texture is already uploaded by SharedOpenGLContext
 			//	texture pointer (glsl: sampler3D)
 			vtkTextureObjectPtr texture = mShaderItems[i]->mTexture;
 			if(texture)
-				this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
+			{
+				//texture->Activate(); //failed ???
+				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
+				//this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
+			}
 			report_gl_error();
 		}
 	}
@@ -244,8 +252,10 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 	//CX_LOG_DEBUG_CHECKPOINT() << "END";
 }
 
-void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, int index_of_vector)
+//TODO move to SharedOpenGLContext?
+void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name)
 {
+	vao->DebugOn();
 	//--------
 	//TODO extract to struct?
 	int offset = 0;
@@ -253,18 +263,18 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 	size_t stride = sizeof(float)*vec_size; //is this correct? was *3;
 	int elementType = VTK_FLOAT;
 	bool normalize = false;
-	std::string name = generateVSAttributeTextureCoordinateVectorName(index_of_vector);
+
 	//CX_LOG_DEBUG() << "Adding attribute called: " << name;
 	//--------
 
 	if (!vao->AddAttributeArray(
-				program,		//vtkShaderProgram
-				buffer.Get(),	//vtkOpenGLBufferObject
-				name,	//std::string
+				program,			//vtkShaderProgram
+				buffer.Get(),		//vtkOpenGLBufferObject
+				name,				//std::string
 				offset,				//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
 				stride,				//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
 				elementType,		//int (elementType)			Specifies the data type of each component in the array
-				vec_size,				//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
+				vec_size,			//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
 				normalize			//bool (normalize)
 				))
 	{
@@ -273,14 +283,16 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 	report_gl_error();
 }
 
+//TODO move to SharedOpenGLContext?
 void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int value)
 {
 	//CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
-	if(!program->SetUniform1iv(name.c_str(), 1, &value))
+	if(!program->SetUniformi(name.c_str(), value))
 		CX_LOG_ERROR() << "Could not set uniform named \'" << name << "\'.";
 	report_gl_error();
 }
 
+//TODO move to SharedOpenGLContext?
 void ShaderCallback::bindFSOutputVariable(vtkShaderProgram *program)
 {
 	GLint color_frag_out_index = glGetFragDataLocation(program->GetHandle(), FS_Out_Vec4_Color.c_str());

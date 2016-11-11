@@ -251,7 +251,7 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_dec() const
 		"\n"
 		"//CX: adding input and output variables for texture coordinates\n"
 		"const int number_of_textures = %3;\n"
-		"attribute vec3 %1[number_of_textures];\n"
+		"attribute vec3 %1_0;\n"
 		"varying vec3 %2[number_of_textures];\n"
 		)
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str())
@@ -265,7 +265,10 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_impl() const
 {
 	QString temp = QString(
 		"//VTK::PositionVC::Impl\n"
-		"%1 = %2;\n"
+		"%1[0] = %2_0;\n"
+		"%1[1] = %2_0;\n"
+		"%1[2] = %2_0;\n"
+		"%1[3] = %2_0;\n"
 		)
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str());
@@ -282,11 +285,47 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"//CX: adding custom fragment shader\n"
 		"const int number_of_textures = %4;\n"
 		"in vec3 %1[number_of_textures];\n"
-		"uniform sampler3D %2[number_of_textures];\n"
+		"//uniform sampler3D %2[number_of_textures];\n"
+		"uniform sampler3D %2;\n"
 		"out vec4 %3;\n"
+		""
+		"vec4 testValue(float value);\n"
+		"vec4 testValue(float value)\n"
+		"{\n"
+		"	vec4 retval = vec4(0.2,0.2,0.2,1.0);\n" //dark grey
+		"	if(value > 1.0)\n"
+		"		retval = vec4(1.0,1.0,1.0,1.0);\n" //white
+		"	if(value < 1.0)\n"
+		"		retval = vec4(0.0,1.0,0.0,1.0);\n" //green
+		"	if(value < 0.5)\n"
+		"		retval = vec4(0.0,0.0,1.0,1.0);\n" //blue
+		"	if(value == 0.0)\n"
+		"		retval = vec4(1.0,0.0,0.0,1.0);\n" //red
+		"	if(value < 0.0)\n"
+		"		retval = vec4(0.8,0.8,0.8,1.0);\n" //light grey
+		"	return retval;\n"
+		"}\n"
+		""
+		""
+		"vec4 testSampler(sampler3D sampler);\n"
+		"vec4 testSampler(sampler3D sampler)\n"
+		"{"
+		"	vec4 retval = vec4(1.0,0.0,0.0,1.0);\n" //red
+		"	"
+		"	vec4 color = texture(sampler, vec3(0.5, 0.5, 0.5));\n"
+		"	retval = testValue(color.x);\n"
+		"	return retval;\n"
+		"}"
 		"void main () {\n"
-		"	%3 = texture(%2[0], %1[0]);\n"
-		"//	%3 = texture(%2[0], vec3(1.0f, 0.9867f, 0.378f));\n"
+		"//%3 = testSampler(%2);\n"
+		""
+		"float value = texture(%2, %1[0]).r;\n"
+		"%3 = testValue(value);\n"
+		"//value.w = 1.0;\n"
+		"//%3 = value;\n"
+		""
+		"//%3 = texture(%2, %1[0]);\n"
+		"//	%3 = texture(%2[0], vec3(0.68218f, 0.572872f, 0.258443f));\n"
 		"//	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
 		"}\n"
 		)

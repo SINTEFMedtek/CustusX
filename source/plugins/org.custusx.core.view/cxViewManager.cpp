@@ -92,6 +92,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
+
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewManager::updateViews);
 	connect(mRenderLoop.get(), &RenderLoop::fps, this, &ViewManager::fps);
