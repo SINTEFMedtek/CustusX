@@ -156,7 +156,7 @@ QString enum2string(const ENUM& val);
  *  Use this in an header file following the enum declarations. (outside the namespace).
  *  This macro allows setting the correct declspec when getting a 5217 link error on Windows.
  */
-#define SNW_DECLARE_ENUM_STRING_CONVERTERS2(EXPORT, NS, ENUM_NAME)   \
+#define SNW_DECLARE_ENUM_STRING_CONVERTERS(EXPORT, NS, ENUM_NAME)   \
 namespace NS                                                         \
 {                                                                    \
     EXPORT std::ostream& operator<<(std::ostream& s, const ENUM_NAME& val); \
@@ -166,19 +166,6 @@ EXPORT QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val); \
 template<>                                                           \
 EXPORT NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val); \
 
-
-/** Helper macro for declaring the enum2string template specializations.
- *  Use this in an header file following the enum declarations. (outside the namespace).
- */
-#define SNW_DECLARE_ENUM_STRING_CONVERTERS(NS, ENUM_NAME)            \
-namespace NS                                                         \
-{                                                                    \
-	cxResource_EXPORT std::ostream& operator<<(std::ostream& s, const ENUM_NAME& val); \
-}                                                                    \
-template<>                                                           \
-cxResource_EXPORT QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val);    \
-template<>                                                           \
-cxResource_EXPORT NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val);    \
 //-----------------------------------------------------------------
 
 /**Use these macros to generate string<-->enum converter functions 
