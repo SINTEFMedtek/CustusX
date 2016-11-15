@@ -16,7 +16,7 @@ class QActionGroup;
 
 namespace cx
 {
-class Desktop;
+struct Desktop;
 
 /**
  * \class DockWidgets

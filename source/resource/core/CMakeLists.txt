@@ -198,6 +198,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxNullDeleter.h
     utilities/cxSpaceProviderImpl
     utilities/cxStreamedTimestampSynchronizer
+    utilities/cxEnumConverter.h
 
 
 	logger/cxAudio.h

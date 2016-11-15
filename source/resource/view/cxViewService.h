@@ -67,6 +67,8 @@ enum cxResourceVisualization_EXPORT CAMERA_STYLE_TYPE
 
 } //cx
 
+SNW_DECLARE_ENUM_STRING_CONVERTERS2(cxResourceVisualization_EXPORT, cx, CAMERA_STYLE_TYPE);
+
 namespace cx
 {
 
