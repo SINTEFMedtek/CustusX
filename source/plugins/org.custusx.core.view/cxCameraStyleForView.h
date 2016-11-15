@@ -161,7 +161,4 @@ private:
  */
 } //namespace cx
 
-//SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CAMERA_STYLE_TYPE);
-//SNW_DECLARE_ENUM_STRING_CONVERTERS2(cxResourceVisualization_EXPORT, cx, CAMERA_STYLE_TYPE);
-
 #endif // CXCameraStyleForViewFORVIEW_H
