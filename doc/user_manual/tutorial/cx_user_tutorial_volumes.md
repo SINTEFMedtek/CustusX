@@ -5,7 +5,7 @@ Viewing a volume
 -----------------------------------------------------------
 Learn how to load a volume and view it in 2D and 3D.
 1. Get a data set in metaheader (mhd) format. You can use the Kaisa data set for a start. 
-   (available along with the installation, or in DropBox).
+   (available along with the installation, or at http://custusx.org/uploads/testdata/). See also \ref import_overview
 2. Start CustusX
 3. Create a new Patient: `File->New Patient` or `<Ctrl+N>`
 4. Import a data set into the Patient: `File->Import Data` or `<Ctrl+I>`. Browse to your .mhd file and press Open. 
