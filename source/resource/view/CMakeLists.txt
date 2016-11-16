@@ -167,7 +167,7 @@ target_include_directories(cxResourceVisualization
 target_link_libraries(cxResourceVisualization
     PRIVATE
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
-    ${GLEW_LIBRARY}
+#    ${GLEW_LIBRARY}
 )
 
 add_subdirectory(testing)
