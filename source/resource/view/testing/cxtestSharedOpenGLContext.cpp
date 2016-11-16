@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkRenderWindow.h>
-#include "cxSharedOpenGLContext.h"
+#include <cxSharedOpenGLContext.h>
+#include <vtkImageData.h>
 #include "vtkForwardDeclarations.h"
 #include "cxImage.h"
 
@@ -86,6 +87,33 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 
 	REQUIRE(sharedOpenGLContext->hasUploadedTexture(image0->getUid()));
 	REQUIRE(sharedOpenGLContext->hasUploadedTexture(image1->getUid()));
+}
+
+TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualization][unit]")
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	cx::SharedOpenGLContextPtr sharedOpenGLContext = initSharedOpenGLContext(renderWindow);
+
+	cx::ImagePtr image0 = createDummyImage(0);
+
+	renderWindow->Render();//Call render to create the openGL context
+	//Crash in vtkOpenGLRenderWindow::OpenGLInitContext() on glewInit(), if we haven't called render
+	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
+
+	REQUIRE(sharedOpenGLContext->hasUploadedTexture(image0->getUid()));
+
+
+	vtkImageDataPtr imageData = sharedOpenGLContext->downloadImageFromTextureBuffer(image0->getUid());
+	REQUIRE(imageData);
+
+	//imageData should now be equal to image0;
+//	Eigen::Array3i dims(imageData->GetDimensions());
+//	int size = dims[0]*dims[1]*dims[2];
+//	for (int i = 0; i < size; ++i)
+//	{
+
+//	}
+
 }
 
 }//cxtest

@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkSetGet.h>
 #include <vtkFloatArray.h>
+#include <vtkPixelBufferObject.h>
 
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
@@ -100,6 +101,37 @@ vtkTextureObjectPtr SharedOpenGLContext::getTexture(QString image_uid) const
 	else
 		CX_LOG_ERROR() << "getTexture failed";
 	return retval;
+}
+
+vtkImageDataPtr SharedOpenGLContext::downloadImageFromTextureBuffer(QString image_uid)
+{
+	vtkPixelBufferObjectPtr pixelBuffer;
+	vtkImageDataPtr imageData = vtkImageDataPtr::New();
+	vtkTextureObjectPtr texture = this->getTexture(image_uid);
+	if(texture)
+	{
+		pixelBuffer = texture->Download();
+		int dataType = texture->GetVTKDataType();
+		unsigned width = texture->GetWidth();
+		unsigned height = texture->GetHeight();
+		unsigned depth = texture->GetDepth();
+		unsigned dims[3] = {width, height, depth};
+		int numComps = texture->GetComponents();
+		vtkIdType increments[3] = {0 , 0, 0};
+
+		imageData->SetExtent(0, width-1, 0, height-1, 0, depth-1);
+//		imageData->SetSpacing(1, 1, 1);
+		imageData->AllocateScalars(dataType, numComps);
+		void* data = imageData->GetScalarPointer();
+
+		pixelBuffer->Download3D(dataType, data, dims, numComps, increments);
+//		vtkPixelBufferObject* pixelBuffer = texture->Download();
+//		retval.TakeReference(pixelBuffer);//Experimental
+	}
+	else
+		CX_LOG_ERROR() << "downloadTextureBuffer failed";
+
+	return imageData;
 }
 
 bool SharedOpenGLContext::makeCurrent() const
