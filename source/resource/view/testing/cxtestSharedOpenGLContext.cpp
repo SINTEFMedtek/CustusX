@@ -106,13 +106,22 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 	vtkImageDataPtr imageData = sharedOpenGLContext->downloadImageFromTextureBuffer(image0->getUid());
 	REQUIRE(imageData);
 
-	//imageData should now be equal to image0;
-//	Eigen::Array3i dims(imageData->GetDimensions());
-//	int size = dims[0]*dims[1]*dims[2];
-//	for (int i = 0; i < size; ++i)
-//	{
+	vtkImageDataPtr imageData0 = image0->getBaseVtkImageData();
 
-//	}
+	char* imagePtr = static_cast<char*>(imageData->GetScalarPointer());
+	char* imagePtr0 = static_cast<char*>(imageData0->GetScalarPointer());
+
+	//imageData should now be equal to image0;
+	Eigen::Array3i dims(imageData->GetDimensions());
+	int size = dims[0]*dims[1]*dims[2];
+	for (int i = 0; i < size; ++i)
+	{
+		std::cout << static_cast<int>(imagePtr[i]) << " ";
+//		std::cout << (unsigned)(imagePtr[i]) << " ";
+		INFO(i);
+		REQUIRE(imagePtr[i] == imagePtr0[i]);
+	}
+	std::cout << std::endl;
 
 }
 
