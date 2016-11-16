@@ -405,7 +405,7 @@ void PluginFrameworkManager::handlePluginException(const QString& message, const
 	const ctkException* nest = &exc;
 	while (nest)
 	{
-		CX_LOG_CHANNEL_ERROR("plugin") << QString(" cause: %2").arg(nest->what());
+		CX_LOG_CHANNEL_ERROR("plugin") << QString("  cause: %1").arg(nest->what());
 		nest = nest->cause();
 	}
 }
