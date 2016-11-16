@@ -116,18 +116,24 @@ void TrackingImplService::onSystemStateChanged()
  */
 void TrackingImplService::setPlaybackMode(PlaybackTimePtr controller)
 {
+	// playback off, reinstall old tracking systems
 	if (mPlaybackSystem)
 	{
 		mPlaybackSystem->setState(Tool::tsNONE);
 		this->unInstallTrackingSystem(mPlaybackSystem);
-		this->installTrackingSystem(mPlaybackSystem->getBase());
+		std::vector<TrackingSystemServicePtr> old = mPlaybackSystem->getBase();
+		for (unsigned i=0; i<old.size(); ++i)
+			this->installTrackingSystem(old[i]);
 		mPlaybackSystem.reset();
 	}
 
+	// uninstall tracking systems, playback on
 	if (controller)
 	{
-		mPlaybackSystem.reset(new TrackingSystemPlaybackService(controller, mTrackingSystems.back(), mManualTool));
-		this->unInstallTrackingSystem(mPlaybackSystem->getBase());
+		mPlaybackSystem.reset(new TrackingSystemPlaybackService(controller, mTrackingSystems, mManualTool));
+		std::vector<TrackingSystemServicePtr> old = mPlaybackSystem->getBase();
+		for (unsigned i=0; i<old.size(); ++i)
+			this->unInstallTrackingSystem(old[i]);
 		this->installTrackingSystem(mPlaybackSystem);
 		mPlaybackSystem->setState(Tool::tsTRACKING);
 	}
@@ -151,12 +157,14 @@ void TrackingImplService::runDummyTool(DummyToolPtr tool)
 void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 {
 	mTrackingSystems.push_back(system);
+	report("Installing tracking system: " + system->getUid());
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
 	this->onSystemStateChanged();
 }
 
 void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr system)
 {
+	report("Uninstalling tracking system: " + system->getUid());
 	disconnect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
 
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
