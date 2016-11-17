@@ -52,7 +52,7 @@ cx::SharedOpenGLContextPtr initSharedOpenGLContext(vtkRenderWindowPtr renderWind
 
 cx::ImagePtr createDummyImage(int number = 0)
 {
-	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(100, 255);
+	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(10, 255);
 	QString uid = QString("dummyImageUid%1").arg(number);
 	QString name = QString("dummyImageName%1").arg(number);
 	cx::ImagePtr image = cx::ImagePtr(new cx::Image(uid, dummyImageData, name));
@@ -65,13 +65,6 @@ TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][unit]")
 	REQUIRE(initSharedOpenGLContext(renderWindow));
 }
 
-//TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]")
-//{
-//	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
-//	REQUIRE(initSharedOpenGLContext(renderWindow));
-//	renderWindow->Render();
-//}
-
 TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualization][unit]")
 {
 	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
@@ -81,7 +74,6 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 	cx::ImagePtr image1 = createDummyImage(1);
 
 	renderWindow->Render();//Call render to create the openGL context
-	//Crash in vtkOpenGLRenderWindow::OpenGLInitContext() on glewInit(), if we haven't called render
 	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
 	REQUIRE(sharedOpenGLContext->upload3DTexture(image1));
 
@@ -93,13 +85,9 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 {
 	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = initSharedOpenGLContext(renderWindow);
-
 	cx::ImagePtr image0 = createDummyImage(0);
-
 	renderWindow->Render();//Call render to create the openGL context
-	//Crash in vtkOpenGLRenderWindow::OpenGLInitContext() on glewInit(), if we haven't called render
 	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
-
 	REQUIRE(sharedOpenGLContext->hasUploadedTexture(image0->getUid()));
 
 
@@ -110,19 +98,13 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 
 	char* imagePtr = static_cast<char*>(imageData->GetScalarPointer());
 	char* imagePtr0 = static_cast<char*>(imageData0->GetScalarPointer());
-
-	//imageData should now be equal to image0;
 	Eigen::Array3i dims(imageData->GetDimensions());
 	int size = dims[0]*dims[1]*dims[2];
 	for (int i = 0; i < size; ++i)
 	{
-		std::cout << static_cast<int>(imagePtr[i]) << " ";
-//		std::cout << (unsigned)(imagePtr[i]) << " ";
 		INFO(i);
 		REQUIRE(imagePtr[i] == imagePtr0[i]);
 	}
-	std::cout << std::endl;
-
 }
 
 }//cxtest
