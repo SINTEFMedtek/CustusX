@@ -125,11 +125,9 @@ vtkImageDataPtr SharedOpenGLContext::downloadImageFromTextureBuffer(QString imag
 		void* data = imageData->GetScalarPointer();
 
 		pixelBuffer->Download3D(dataType, data, dims, numComps, increments);
-//		vtkPixelBufferObject* pixelBuffer = texture->Download();
-//		retval.TakeReference(pixelBuffer);//Experimental
 	}
 	else
-		CX_LOG_ERROR() << "downloadTextureBuffer failed";
+		CX_LOG_ERROR() << "SharedOpenGLContext::downloadImageFromTextureBuffer failed";
 
 	return imageData;
 }

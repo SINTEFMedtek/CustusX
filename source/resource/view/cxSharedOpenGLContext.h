@@ -85,7 +85,7 @@ public:
 	bool hasUploadedTextureCoordinates(QString image_uid) const;
 	vtkOpenGLBufferObjectPtr getTextureCoordinates(QString image_uid) const;
 
-	vtkImageDataPtr downloadImageFromTextureBuffer(QString image_uid);//For testing. TODO: move this to a test class inheriting SharedOpenGLContext
+	vtkImageDataPtr downloadImageFromTextureBuffer(QString image_uid);//For testing
 private:
 	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
 	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString image_uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
