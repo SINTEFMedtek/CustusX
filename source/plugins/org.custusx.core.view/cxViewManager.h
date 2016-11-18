@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxViewService.h"
 
+#include "vtkCommand.h"
+
 class QActionGroup;
 class QAction;
 class QGridLayout;
@@ -66,8 +68,23 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
 
 typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
+
+
+class cxResourceVisualization_EXPORT SharedContextCreatedCallback : public vtkCommand
+{
+
+public:
+	static SharedContextCreatedCallback *New();
+	SharedContextCreatedCallback();
+
+	virtual void Execute(vtkObject *view, unsigned long eventId, void*cbo);
+
+	ViewManager *mViewManager;
+
+};
 
 /**
  * \file
@@ -171,6 +188,7 @@ public:
 
 	void enableContextMenuForViews(bool enable=true);
 
+	void setSharedOpenGLContext(SharedOpenGLContextPtr context);
 	SharedOpenGLContextPtr getSharedOpenGLContext();
 
 signals:
@@ -232,6 +250,7 @@ protected:
 	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisServicesPtr mBackend;
 	SharedOpenGLContextPtr mSharedOpenGLContext;
+	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 
 private:
 	ViewManager(ViewManager const&);

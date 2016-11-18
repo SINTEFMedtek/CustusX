@@ -36,7 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef WIN32
 #include <windows.h>
 #else
-#define GL_GLEXT_PROTOTYPES
+//#define GL_GLEXT_PROTOTYPES
 #endif
 
 #include <GL/glew.h>
@@ -86,11 +86,12 @@ public:
 	vtkOpenGLBufferObjectPtr getTextureCoordinates(QString image_uid) const;
 
 	vtkImageDataPtr downloadImageFromTextureBuffer(QString image_uid);//For testing. TODO: move this to a test class inheriting SharedOpenGLContext
+	vtkOpenGLRenderWindowPtr mContext;
+
 private:
 	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
 	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString image_uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
 
-	vtkOpenGLRenderWindowPtr mContext;
 
 	std::map<QString, vtkTextureObjectPtr > mTextureObjects;
 	std::map<QString, vtkOpenGLBufferObjectPtr > mTextureCoordinateBuffers;

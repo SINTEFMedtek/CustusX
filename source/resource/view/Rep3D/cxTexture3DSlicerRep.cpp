@@ -139,6 +139,11 @@ bool Texture3DSlicerRep::isSupported(vtkRenderWindowPtr window)
 	return Texture3DSlicerProxy::isSupported(window);
 }
 
+void Texture3DSlicerRep::setRenderWindow(vtkRenderWindowPtr window)
+{
+	mProxy->setRenderWindow(window);
+}
+
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------

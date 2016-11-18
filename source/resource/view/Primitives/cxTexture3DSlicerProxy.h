@@ -84,6 +84,7 @@ public:
 	virtual void update() {}
 	virtual void setTargetSpaceToR(){}
 	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
+	virtual void setRenderWindow(vtkRenderWindowPtr window){};
 
 	static bool isSupported(vtkRenderWindowPtr window){return true;};
 
@@ -123,6 +124,7 @@ public:
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
 	std::vector<ImagePtr> getImages();
+	virtual void setRenderWindow(vtkRenderWindowPtr window);
 
 protected slots:
 	void transformChangedSlot();
@@ -165,6 +167,7 @@ private:
 	vtkPlaneSourcePtr mPlaneSource;
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
 	vtkOpenGLPolyDataMapperPtr mOpenGLPolyDataMapper;
+	vtkRenderWindowPtr mCurrentRenderWindow;
 
 	vtkFloatArrayPtr TCoords;
 	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images

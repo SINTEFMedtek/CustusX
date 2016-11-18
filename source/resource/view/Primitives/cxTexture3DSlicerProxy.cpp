@@ -75,9 +75,9 @@ void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 	mTargetSpaceIsR = true;
 }
 
-Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context)
+Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context) :
+	mSharedOpenGLContext(context)
 {
-	mSharedOpenGLContext = context;
 	mTargetSpaceIsR = false;
 	mActor = vtkActorPtr::New();
 	//mActor->DebugOn();
@@ -138,7 +138,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	mActor->SetMapper(mOpenGLPolyDataMapper);
 
 	mShaderCallback = ShaderCallbackPtr::New();
-	mShaderCallback->mContext = mSharedOpenGLContext;
+	mShaderCallback->mSharedOpenGLContext = mSharedOpenGLContext;
 	mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, mShaderCallback);
 }
 
@@ -161,6 +161,12 @@ vtkActorPtr Texture3DSlicerProxyImpl::getActor()
 std::vector<ImagePtr> Texture3DSlicerProxyImpl::getImages()
 {
 	return mImages;
+}
+
+void Texture3DSlicerProxyImpl::setRenderWindow(vtkRenderWindowPtr window)
+{
+	mCurrentRenderWindow = window;
+	mShaderCallback->mCurrentContext = mCurrentRenderWindow;
 }
 
 /*
@@ -319,13 +325,11 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"void main () {\n"
 		"//%3 = testSampler(%2);\n"
 		""
-		"float value = texture(%2, %1[0]).r;\n"
-		"%3 = testValue(value);\n"
-		"//value.w = 1.0;\n"
-		"//%3 = value;\n"
+		"//vec4 value = texture(%2, %1[0]);\n"
+		"//%3 = testValue(%1[0].y);\n"
 		""
-		"//%3 = texture(%2, %1[0]);\n"
-		"//	%3 = texture(%2[0], vec3(0.68218f, 0.572872f, 0.258443f));\n"
+		"%3 = texture(%2, %1[0]);\n"
+		"//%3 = texture(%2, vec3(0.68218f, 0.572872f, 0.258443f));\n"
 		"//	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
 		"}\n"
 		)
@@ -524,6 +528,32 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	{
 		mSharedOpenGLContext->upload3DTextureCoordinates(image->getUid(), TCoords);
 	}
+
+	//DEBUGGING
+	CX_LOG_DEBUG() << "-------------- 1 TESTING DOWNLOAD!!! --------------";
+	vtkImageDataPtr imageData = mSharedOpenGLContext->downloadImageFromTextureBuffer(image->getUid());
+	//REQUIRE(imageData);
+
+	vtkImageDataPtr imageData0 = image->getBaseVtkImageData();
+
+	char* imagePtr = static_cast<char*>(imageData->GetScalarPointer());
+	char* imagePtr0 = static_cast<char*>(imageData0->GetScalarPointer());
+
+	//imageData should now be equal to image0;
+	Eigen::Array3i dims(imageData->GetDimensions());
+	int size = dims[0]*dims[1]*dims[2];
+	for (int i = 0; i < size; ++i)
+	{
+//		std::cout << static_cast<int>(imagePtr[i]) << " ";
+//		std::cout << (unsigned)(imagePtr[i]) << " ";
+//		INFO(i);
+//		REQUIRE(imagePtr[i] == imagePtr0[i]);
+		if(imagePtr[i] != imagePtr0[i])
+			CX_LOG_DEBUG_CHECKPOINT() << i;
+	}
+	std::cout << std::endl;
+	CX_LOG_DEBUG() << "-------------- 2 TESTING DOWNLOAD!!! --------------";
+	//DEBUGGING
 
 }
 
