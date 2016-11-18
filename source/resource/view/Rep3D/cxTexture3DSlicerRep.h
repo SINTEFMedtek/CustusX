@@ -110,6 +110,7 @@ public:
 	void setSliceProxy(SliceProxyPtr slicer);
 	void setTargetSpaceToR();
 	static bool isSupported(vtkRenderWindowPtr window);
+	void setRenderWindow(vtkRenderWindowPtr window);
 
 protected:
 	Texture3DSlicerRep(SharedOpenGLContextPtr context);

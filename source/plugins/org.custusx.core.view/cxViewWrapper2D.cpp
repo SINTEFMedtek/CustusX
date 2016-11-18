@@ -261,6 +261,7 @@ void ViewWrapper2D::createAndAddMultiSliceRep()
 	mMultiSliceRep = Texture3DSlicerRep::New(mServices->view()->getSharedOpenGLContext());
 	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
+	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
 
 	mView->addRep(mMultiSliceRep);
 //#endif

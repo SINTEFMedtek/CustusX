@@ -506,25 +506,10 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
 
-	//------------------------------
-	//TODO Create centralized storage/factory for creating renderwindows
+	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();
+	mSharedContextCreatedCallback->mViewManager = this;
+	view->getRenderWindow()->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
 
-	// SharedOpenGLContext should be created with a pointer to the first renderwindow created in CustusX
-	// because that renderwindow is special, it contain THE shared opengl context
-	if(!this->mSharedOpenGLContext)
-	{
-		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(view->getRenderWindow().Get());
-
-		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
-		{
-			this->mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
-			for(unsigned i = 0; i < mViewGroups.size(); ++i)
-				mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
-		}
-		else
-			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
-	}
-	//------------------------------
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
 	//Turn off rendering in vtkRenderWindowInteractor
@@ -734,9 +719,66 @@ void ViewManager::enableContextMenuForViews(bool enable)
 	}
 }
 
+void ViewManager::setSharedOpenGLContext(SharedOpenGLContextPtr context)
+{
+	mSharedOpenGLContext = context;
+	for(unsigned i = 0; i < mViewGroups.size(); ++i)
+		mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
+}
+
 SharedOpenGLContextPtr ViewManager::getSharedOpenGLContext()
 {
 	return mSharedOpenGLContext;
+}
+
+//-------------------------------------------------------------------------------------------
+
+SharedContextCreatedCallback *SharedContextCreatedCallback::New()
+{
+	return new SharedContextCreatedCallback();
+}
+
+SharedContextCreatedCallback::SharedContextCreatedCallback() :
+	mViewManager(NULL)
+{
+}
+
+void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned long eventId, void *cbo)
+{
+	CX_LOG_DEBUG() << "START SharedContextCreatedCallback";
+	if(mViewManager == NULL)
+	{
+		CX_LOG_ERROR() << "CRASH AND BURN";
+		return;
+	}
+	if(eventId == vtkCommand::CXSharedContextCreatedEvent)
+	{
+		CX_LOG_DEBUG() << "1 SharedContextCreatedCallback";
+	//------------------------------
+	//TODO Create centralized storage/factory for creating renderwindows
+
+	// SharedOpenGLContext should be created with a pointer to the first renderwindow created in CustusX
+	// because that renderwindow is special, it contain THE shared opengl context
+	//if(!this->mSharedOpenGLContext)
+	//{
+		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
+
+		CX_LOG_DEBUG() << "2 SharedContextCreatedCallback";
+		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
+		{
+			CX_LOG_DEBUG() << "3 SharedContextCreatedCallback";
+			SharedOpenGLContextPtr sharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
+			mViewManager->setSharedOpenGLContext(sharedOpenGLContext);
+		}
+		else
+			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
+	//}
+	//------------------------------
+	}
+	else
+		CX_LOG_WARNING() << "BLEH";
+
+	CX_LOG_DEBUG() << "END SharedContextCreatedCallback";
 }
 
 } //namespace cx

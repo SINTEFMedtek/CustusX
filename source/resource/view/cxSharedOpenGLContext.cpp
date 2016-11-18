@@ -134,12 +134,18 @@ vtkImageDataPtr SharedOpenGLContext::downloadImageFromTextureBuffer(QString imag
 
 bool SharedOpenGLContext::makeCurrent() const
 {
+	CX_LOG_DEBUG() << "1 Context is current: " << mContext->IsCurrent();
+	mContext->MakeCurrent();
+	CX_LOG_DEBUG() << "2 Context is current: " << mContext->IsCurrent();
+
+	/*
 	if(!mContext)
 		return false;
 	if(!mContext->IsCurrent())
 		mContext->MakeCurrent();
 	if(!mContext->IsCurrent())
 		CX_LOG_ERROR() << "OpenGL context is not current.";
+		*/
 	return mContext->IsCurrent();
 }
 
@@ -230,28 +236,19 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::getTextureCoordinates(QString imag
 
 vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width, unsigned int height,  unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow)
 {
-	/*
-	int size = width*height*depth*numComps;
-	CX_LOG_DEBUG() << "data in the middle 3 " << (int)((reinterpret_cast<unsigned char*>(data)[size/2+1]));
-	for(int i=(size/2)-100; i<(size/2)+100; ++i)
-		std::cout << (int)((reinterpret_cast<unsigned char*>(data)[i]));
-	std::cout << std::endl;
-	*/
-
-
 	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
 	//texture_object->DebugOn();
 
-	if(!this->makeCurrent())
-	{
-		CX_LOG_DEBUG_CHECKPOINT();
-	}
-	//	return texture_object;
+	/*if(!this->makeCurrent())
+		return texture_object;
+		*/
 
 	texture_object->SetContext(opengl_renderwindow);
 
 	if(texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
 	{
+		glFinish();
+
 		report_gl_error();
 
 		//6403 == GL_RED 0x1903
@@ -262,30 +259,25 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		texture_object->Activate();
 		report_gl_error();
 
-		/*
 		texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
 		texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
 		texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
 		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
 		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
 		texture_object->SendParameters();
-		*/
 
-		texture_object->SetWrapS(vtkTextureObject::Repeat);
-		texture_object->SetWrapT(vtkTextureObject::Repeat);
-		texture_object->SetWrapR(vtkTextureObject::Repeat);
-		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
-		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
-		texture_object->SendParameters();
+		texture_object->Deactivate();
 
 		CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
 		texture_object->PrintSelf(std::cout, vtkIndent(4));
 
 		report_gl_error();
-		texture_object->Deactivate();
 	}
 	else
 		CX_LOG_ERROR() << "Error creating 3D texture";
+
+	CX_LOG_DEBUG() << "Created. Handle: " << texture_object->GetHandle() << " target: " << texture_object->GetTarget() << " context: ";
+	texture_object->GetContext()->PrintSelf(std::cout, vtkIndent(9));
 
 	return texture_object;
 }

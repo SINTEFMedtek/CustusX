@@ -78,7 +78,8 @@ public:
 
 	virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
-	SharedOpenGLContextPtr mContext;
+	SharedOpenGLContextPtr mSharedOpenGLContext;
+	vtkRenderWindowPtr mCurrentContext;
 	std::vector<ShaderItemPtr> mShaderItems;
 
 private:

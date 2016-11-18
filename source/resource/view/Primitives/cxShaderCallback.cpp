@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkOpenGLBufferObject.h>
 #include <vtkTextureObject.h>
 #include <vtkOpenGLIndexBufferObject.h>
+#include <vtkOpenGLRenderWindow.h>
 
 #include "cxLogger.h"
 #include "cxSharedOpenGLContext.h"
@@ -206,7 +207,8 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 
 	if(eventId == vtkCommand::UpdateShaderEvent)
 	{
-		/* THIS DID NOT WORK!!!
+		// THIS DID NOT WORK!!!
+		/*
 		if(!mContext)
 			return;
 		mContext->makeCurrent();
@@ -222,6 +224,19 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		OpenGLHelper->VAO->Bind();
 		report_gl_error();
 
+		/*
+		for(int i=0; i<mShaderItems.size(); ++i)
+		{
+			std::cout << "i: " << i << std::endl;
+			std::cout << "uid: " << mShaderItems.at(i)->mImageUid << std::endl;
+			mShaderItems.at(i)->mTexture->Activate();
+			std::cout << "texture unit: " << mShaderItems.at(i)->mTexture->GetTextureUnit() << std::endl;
+			mShaderItems.at(i)->mTexture->PrintSelf(std::cout, vtkIndent(7));
+			if(mShaderItems.at(i)->mTextureCoordinates)
+				std::cout << "texture coordinate handle: " << mShaderItems.at(i)->mTextureCoordinates->GetHandle() << std::endl;
+		}
+		*/
+
 		int number_to_add = 1; //mShaderItems.size()
 		for(int i=0; i< number_to_add; ++i)
 		{
@@ -229,27 +244,63 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 
 			//Upload attribute arrays
 			//	texture coordinates (glsl: vec3)
-			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems[i]->mTextureCoordinates;
+			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems.at(i)->mTextureCoordinates;
 			if(texture_coordinates)
+			{
+				//texture_coordinates->Bind();
 				this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, name);
+			}
 			report_gl_error();
-
 
 			//Upload uniforms
 			//Note: Texture is already uploaded by SharedOpenGLContext
 			//	texture pointer (glsl: sampler3D)
-			vtkTextureObjectPtr texture = mShaderItems[i]->mTexture;
+			vtkTextureObjectPtr texture = mShaderItems.at(i)->mTexture;
 			if(texture)
 			{
-				//texture->Activate(); //failed ???
-				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
+				/*
+				texture->SetContext(opengl_renderwindow);
+				texture->Activate();
+				*/
+
+				//GLuint tex;
+				//glGenTextures(1, &tex);
+				//glActiveTexture(texture->GetTextureUnit());
+
+				//CX_LOG_DEBUG() << "1. Handle: " << texture->GetHandle() << " target: " << texture->GetTarget() << " context: " << texture->GetContext();
+
+				//texture->Activate();
+				//CX_LOG_DEBUG() << "2. Handle: " << texture->GetHandle() << " target: " << texture->GetTarget() << " context: " << texture->GetContext();
+				//mCurrentContext->MakeCurrent();
+				//glBindTexture(GL_TEXTURE_3D, texture->GetTextureUnit());
+
+				//target:
+				//GL_TEXTURE_3D 0x806F = 32879
+				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, opengl_renderwindow->GetTextureUnitForTexture(texture.Get()));
+				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, mSharedOpenGLContext->mContext->GetTextureUnitForTexture(texture.Get()));
 				//this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
+
+				/*
+				mSharedOpenGLContext->makeCurrent();
+				texture->Activate();
+				glActiveTexture(texture->GetTextureUnit());
+				mCurrentContext->MakeCurrent();
+				glActiveTexture(texture->GetTextureUnit());
+				glBindTexture(texture->GetTarget(), texture->GetHandle());
+				*/
+				//texture->Activate();
+
+				vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mCurrentContext.Get());
+				opengl_renderwindow->ActivateTexture(texture.Get());
+				mSharedOpenGLContext->mContext->ActivateTexture(texture.Get());
+				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
 			}
 			report_gl_error();
 		}
 	}
 	report_gl_error();
 	//CX_LOG_DEBUG_CHECKPOINT() << "END";
+	//mCurrentContext->Modified();
 }
 
 //TODO move to SharedOpenGLContext?
