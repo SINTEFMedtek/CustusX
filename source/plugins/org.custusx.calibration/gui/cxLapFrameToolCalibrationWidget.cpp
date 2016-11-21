@@ -235,7 +235,10 @@ Vector3D LapFrameToolCalibrationCalculator::get_delta_ref()
 
 Transform3D LapFrameToolCalibrationCalculator::get_calibration_sMt()
 {
-	return m_sMpr * m_qMpr.inv() * createTransformRotateY(mCameraAngle);
+	Transform3D calibration = m_sMpr * m_qMpr.inv() * createTransformRotateY(mCameraAngle);
+	Transform3D::LinearMatrixType rotationalPart = calibration.rotation();
+	calibration.linear() = rotationalPart;
+	return calibration;
 }
 
 
