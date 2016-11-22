@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #ifndef WIN32
-//#define GL_GLEXT_PROTOTYPES
+#define GL_GLEXT_PROTOTYPES //Needed to compile on Linux?
 //#include <vtkgl.h>
 
 #ifdef __APPLE__
