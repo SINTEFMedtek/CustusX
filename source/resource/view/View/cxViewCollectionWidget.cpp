@@ -46,17 +46,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(QWidget *parent)
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(ViewServicePtr viewService, QWidget *parent)
 {
 //	return new LayoutWidgetUsingViewCollection(); // testing
-	return new LayoutWidgetUsingViewWidgets(parent);
+	return new LayoutWidgetUsingViewWidgets(viewService, parent);
 //	return new ViewCollectionWidgetMixed(); //testing
 }
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(QWidget *parent)
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(ViewServicePtr viewService, QWidget *parent)
 {
 //	return new ViewCollectionWidgetUsingViewContainer();
-	return new ViewCollectionWidgetMixed(parent);
+	return new ViewCollectionWidgetMixed(viewService, parent);
 }
 
 } // namespace cx

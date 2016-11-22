@@ -77,6 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxCameraStyleInteractor.h"
 #include "cxSharedOpenGLContext.h"
+#include "cxSharedContextCreatedCallback.h"
 
 namespace cx
 {
@@ -203,11 +204,11 @@ QWidget *ViewManager::createLayoutWidget(QWidget* parent, int index)
 
 		if (optimizedViews)
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout();
+			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mBackend->view());
 		}
 		else
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
+			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mBackend->view());
 		}
 
 		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewManager::layoutWidgetDestroyed);
@@ -507,7 +508,7 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
 
 	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();
-	mSharedContextCreatedCallback->mViewManager = this;
+	mSharedContextCreatedCallback->setViewService(mBackend->view());
 	view->getRenderWindow()->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
 
 
@@ -729,56 +730,6 @@ void ViewManager::setSharedOpenGLContext(SharedOpenGLContextPtr context)
 SharedOpenGLContextPtr ViewManager::getSharedOpenGLContext()
 {
 	return mSharedOpenGLContext;
-}
-
-//-------------------------------------------------------------------------------------------
-
-SharedContextCreatedCallback *SharedContextCreatedCallback::New()
-{
-	return new SharedContextCreatedCallback();
-}
-
-SharedContextCreatedCallback::SharedContextCreatedCallback() :
-	mViewManager(NULL)
-{
-}
-
-void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned long eventId, void *cbo)
-{
-	CX_LOG_DEBUG() << "START SharedContextCreatedCallback";
-	if(mViewManager == NULL)
-	{
-		CX_LOG_ERROR() << "CRASH AND BURN";
-		return;
-	}
-	if(eventId == vtkCommand::CXSharedContextCreatedEvent)
-	{
-		CX_LOG_DEBUG() << "1 SharedContextCreatedCallback";
-	//------------------------------
-	//TODO Create centralized storage/factory for creating renderwindows
-
-	// SharedOpenGLContext should be created with a pointer to the first renderwindow created in CustusX
-	// because that renderwindow is special, it contain THE shared opengl context
-	//if(!this->mSharedOpenGLContext)
-	//{
-		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
-
-		CX_LOG_DEBUG() << "2 SharedContextCreatedCallback";
-		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
-		{
-			CX_LOG_DEBUG() << "3 SharedContextCreatedCallback";
-			SharedOpenGLContextPtr sharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
-			mViewManager->setSharedOpenGLContext(sharedOpenGLContext);
-		}
-		else
-			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
-	//}
-	//------------------------------
-	}
-	else
-		CX_LOG_WARNING() << "BLEH";
-
-	CX_LOG_DEBUG() << "END SharedContextCreatedCallback";
 }
 
 } //namespace cx

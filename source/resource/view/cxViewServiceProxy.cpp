@@ -215,9 +215,24 @@ SharedOpenGLContextPtr ViewServiceProxy::getSharedOpenGLContext()
 	return mViewService->getSharedOpenGLContext();
 }
 
+void ViewServiceProxy::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+{
+	return mViewService->setSharedOpenGLContext(sharedOpenGLContext);
+}
+
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {
 	return mViewService->getClippers();
+}
+
+vtkRenderWindowPtr ViewServiceProxy::getRenderWindow(QString uid, bool offScreenRendering)
+{
+	return mViewService->getRenderWindow(uid, offScreenRendering);
+}
+
+vtkRenderWindowPtr ViewServiceProxy::getSharedRenderWindow() const
+{
+	return mViewService->getSharedRenderWindow();
 }
 
 } //cx

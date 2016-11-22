@@ -30,59 +30,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMULTIVIEWCACHE_H
-#define CXMULTIVIEWCACHE_H
+#ifndef CXSHAREDCONTEXTCREATEDCALLBACK_H
+#define CXSHAREDCONTEXTCREATEDCALLBACK_H
 
-#include "cxResourceVisualizationExport.h"
 
-#include <QWidget>
-#include <QLayout>
-#include <vector>
-#include "cxTypeConversions.h"
-#include "cxOSXHelper.h"
-#include "cxViewWidget.h"
-#include "cxViewCache.h"
+#include "org_custusx_core_view_Export.h"
+
+#include <vtkSmartPointer.h>
+#include <vtkCommand.h>
+#include "cxViewService.h"
 
 namespace cx
 {
-/**
- * \file
- * \ingroup cx_resource_view_internal
- * @{
- */
+typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
 
-/**
- * Cache for reuse of Views.
- *
- * Separate caches exist for each type of view. Offscreen rendering also uses separate
- * caches. The cache also stores a separate first renderwindow in order to handle
- * the shared gl context used by cx.
- *
- * \ingroup cx_resource_view_internal
- */
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
-
-class MultiViewCache
+class org_custusx_core_view_EXPORT SharedContextCreatedCallback : public vtkCommand
 {
-public:
-	static MultiViewCachePtr create(ViewServicePtr viewService) { return MultiViewCachePtr(new MultiViewCache(viewService)); }
-	MultiViewCache(ViewServicePtr viewService);
 
-	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
-	void clearViews();
-	void clearCache();
+public:
+	static SharedContextCreatedCallback *New();
+	SharedContextCreatedCallback();
+	void setViewService(ViewServicePtr viewService);
+
+	virtual void Execute(vtkObject *view, unsigned long eventId, void*cbo);
 
 private:
-	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
-	std::map<QString, ViewCachePtr> mViewCache;
-	vtkRenderWindowPtr mStaticRenderWindow;
 	ViewServicePtr mViewService;
+
 };
 
-/**
- * @}
- */
-} // namespace cx
-
-
-#endif // CXMULTIVIEWCACHE_H
+}//cx
+#endif // CXSHAREDCONTEXTCREATEDCALLBACK_H

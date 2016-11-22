@@ -127,9 +127,26 @@ SharedOpenGLContextPtr ViewServiceNull::getSharedOpenGLContext()
 	return SharedOpenGLContextPtr();
 }
 
+void ViewServiceNull::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+{
+	printWarning();
+}
+
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {
 	return ClippersPtr();
+}
+
+vtkRenderWindowPtr cx::ViewServiceNull::getRenderWindow(QString uid, bool offScreenRendering)
+{
+	printWarning();
+	return vtkRenderWindowPtr();
+}
+
+vtkRenderWindowPtr ViewServiceNull::getSharedRenderWindow() const
+{
+	printWarning();
+	return vtkRenderWindowPtr();
 }
 
 } //cx

@@ -407,6 +407,7 @@ void ViewGroupData::insertData(std::vector<DataAndViewPropertiesPair>::iterator 
 
 void ViewGroupData::upload3DTextureIfImageToSharedContext(QString uid)
 {
+	CX_LOG_DEBUG() << "upload3DTextureIfImageToSharedContext: " << uid;
 	ImagePtr image = mServices->patient()->getData<Image>(uid);
 	if(image)
 	{

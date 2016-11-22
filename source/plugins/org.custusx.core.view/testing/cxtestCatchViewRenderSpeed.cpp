@@ -39,7 +39,7 @@ namespace cxtest
 
 TEST_CASE("Speed: Render 10 empty viewWidgets", "[speed][gui][integration]")
 {
-    TestRenderSpeed helper;
+	TestRenderSpeed helper;
     helper.testSeveralViews();
 
     REQUIRE(helper.getRenderFPS() > 10);

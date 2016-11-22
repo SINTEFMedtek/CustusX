@@ -30,59 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMULTIVIEWCACHE_H
-#define CXMULTIVIEWCACHE_H
+#include "cxRenderWindowFactory.h"
 
-#include "cxResourceVisualizationExport.h"
-
-#include <QWidget>
-#include <QLayout>
-#include <vector>
-#include "cxTypeConversions.h"
-#include "cxOSXHelper.h"
-#include "cxViewWidget.h"
-#include "cxViewCache.h"
+#include <QString>
+#include "vtkRenderWindow.h"
 
 namespace cx
 {
-/**
- * \file
- * \ingroup cx_resource_view_internal
- * @{
- */
 
-/**
- * Cache for reuse of Views.
- *
- * Separate caches exist for each type of view. Offscreen rendering also uses separate
- * caches. The cache also stores a separate first renderwindow in order to handle
- * the shared gl context used by cx.
- *
- * \ingroup cx_resource_view_internal
- */
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
-class MultiViewCache
+RenderWindowFactory::RenderWindowFactory()
 {
-public:
-	static MultiViewCachePtr create(ViewServicePtr viewService) { return MultiViewCachePtr(new MultiViewCache(viewService)); }
-	MultiViewCache(ViewServicePtr viewService);
+    mSharedRenderWindow = createRenderWindow(false);//Setting offScreenRendering to true gives crash in render
+    mSharedRenderWindow->Render();//Crash
+}
 
-	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
-	void clearViews();
-	void clearCache();
+vtkRenderWindowPtr RenderWindowFactory::getRenderWindow(QString uid, bool offScreenRendering)
+{
+    if (mRenderWindows.count(uid))
+        return mRenderWindows[uid];
 
-private:
-	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
-	std::map<QString, ViewCachePtr> mViewCache;
-	vtkRenderWindowPtr mStaticRenderWindow;
-	ViewServicePtr mViewService;
-};
+    vtkRenderWindowPtr renderWindow = this->createRenderWindow(offScreenRendering);
+//    std::map<QString, vtkRenderWindowPtr> iter = mRenderWindows.begin();
+    mRenderWindows[uid] = renderWindow;
+    return renderWindow;
+}
 
-/**
- * @}
- */
-} // namespace cx
+vtkRenderWindowPtr RenderWindowFactory::getSharedRenderWindow() const
+{
+//    mSharedRenderWindow->Render();//Crash?
+    return mSharedRenderWindow;
+}
 
+vtkRenderWindowPtr RenderWindowFactory::createRenderWindow(bool offScreenRendering)
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	renderWindow->SetOffScreenRendering(offScreenRendering);
+	return renderWindow;
+}
 
-#endif // CXMULTIVIEWCACHE_H
+}//cx

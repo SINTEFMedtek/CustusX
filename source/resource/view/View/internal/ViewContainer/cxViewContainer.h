@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "QVTKWidget.h"
 #include "cxLayoutData.h"
+#include "cxViewService.h"
 
 class QGridLayout;
 
@@ -62,7 +63,7 @@ class cxResourceVisualization_EXPORT ViewContainer : public QVTKWidget
 	typedef QVTKWidget inherited_widget;
 
 public:
-	ViewContainer(QWidget *parent = NULL, Qt::WindowFlags f = 0);
+	ViewContainer(ViewServicePtr viewService, QWidget *parent = NULL, Qt::WindowFlags f = 0);
 	virtual ~ViewContainer();
 
 	ViewItem *addView(QString uid, LayoutRegion region, QString name = "");
@@ -104,6 +105,7 @@ private:
 
 	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
 	bool mOffScreenRendering;
+	ViewServicePtr mViewService;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

@@ -3,8 +3,8 @@
 namespace cxtest
 {
 
-ViewCollectionWidgetMixedMock::ViewCollectionWidgetMixedMock(QWidget *parent) :
-	cx::ViewCollectionWidgetMixed(parent)
+ViewCollectionWidgetMixedMock::ViewCollectionWidgetMixedMock(cx::ViewServicePtr viewService, QWidget *parent) :
+	cx::ViewCollectionWidgetMixed(viewService, parent)
 {
 
 }

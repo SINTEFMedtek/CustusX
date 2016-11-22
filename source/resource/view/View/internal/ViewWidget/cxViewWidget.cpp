@@ -45,13 +45,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
+ViewWidget::ViewWidget(ViewServicePtr viewService, const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
 	inherited(parent, f)
 {
 	mMTimeHash = 0;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	mZoomFactor = -1.0;
-	vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+	vtkRenderWindowPtr rw = viewService->getRenderWindow(uid);
 	mView = ViewLinkingViewWidget::create(this, rw);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	this->SetRenderWindow(mView->getRenderWindow());
@@ -203,6 +203,14 @@ double ViewWidget::mmPerPix() const
 	double r_w = (double) screen->widthMM() / (double) screen->geometry().width();
 	double retval = (r_h + r_w) / 2.0;
 	return retval;
+}
+
+void ViewWidget::setSharedOpenGLContext(SharedOpenGLContextPtr context)
+{
+	mSharedOpenGLContext = context;
+	//TODO: Update SharedOpenGLContext in viewGroups
+//	for(unsigned i = 0; i < mViewGroups.size(); ++i)
+//		mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
 }
 
 } // namespace cx

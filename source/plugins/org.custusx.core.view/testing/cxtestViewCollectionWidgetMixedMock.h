@@ -7,7 +7,7 @@ class ViewCollectionWidgetMixedMock : public cx::ViewCollectionWidgetMixed
 {
 	Q_OBJECT
 public:
-	ViewCollectionWidgetMixedMock(QWidget *parent);
+	ViewCollectionWidgetMixedMock(cx::ViewServicePtr viewService, QWidget *parent);
 	virtual ~ViewCollectionWidgetMixedMock();
 
 	cx::ViewCollectionWidget *getViewCollectionWidget();

@@ -50,13 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-ViewsWindow::ViewsWindow()
+ViewsWindow::ViewsWindow(cx::ViewServicePtr viewService)
 {
 	mZoomFactor = 1;
 
 	this->setNiceSize();
 
-    mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout();
+	mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(viewService);
 //	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout();
 	this->setCentralWidget(mLayoutWidget);
 

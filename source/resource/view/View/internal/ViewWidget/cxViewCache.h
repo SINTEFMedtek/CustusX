@@ -66,8 +66,11 @@ template<class VIEW_TYPE>
 class cxResourceVisualization_EXPORT ViewCache
 {
 public:
-	ViewCache(QWidget* widget, QString typeText) :
-					mCentralWidget(widget), mNameGenerator(0), mTypeText(typeText)
+	ViewCache(ViewServicePtr viewService, QWidget* widget, QString typeText) :
+		mViewService(viewService),
+		mCentralWidget(widget),
+		mNameGenerator(0),
+		mTypeText(typeText)
 	{
 	}
 	/**Retrieve a view that is unique since the last call to clearUsedViews()
@@ -80,7 +83,7 @@ public:
 					.arg(mTypeText)
 					.arg(mNameGenerator++)
 					.arg(reinterpret_cast<long>(this));
-			VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
+			VIEW_TYPE* view = new VIEW_TYPE(mViewService, uid, uid, mCentralWidget);
 			mCached.push_back(view);
 		}
 
@@ -112,6 +115,7 @@ private:
 	QString mTypeText;
 	std::vector<VIEW_TYPE*> mCached;
 	std::vector<VIEW_TYPE*> mUsed;
+	ViewServicePtr mViewService;
 };
 
 

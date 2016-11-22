@@ -23,6 +23,8 @@ set(PLUGIN_SRCS
     cxDataRepContainer.cpp
 	cxNavigationAlgorithms.cpp
 	cxNavigationAlgorithms.h
+	cxSharedContextCreatedCallback.h
+	cxSharedContextCreatedCallback.cpp
 )
 
 # Files which should be processed by Qts moc

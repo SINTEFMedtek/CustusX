@@ -76,7 +76,7 @@ ViewsFixture::ViewsFixture(QString displayText)
 	// Initialize dummy toolmanager.
 	mServices->tracking()->setState(cx::Tool::tsTRACKING);
 
-	mWindow.reset(new ViewsWindow());
+	mWindow.reset(new ViewsWindow(mServices->view()));//TODO: Create moc viewService with RenderWindowFactory?
 	mWindow->setDescription(displayText);
 }
 

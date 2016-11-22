@@ -43,14 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
+ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(ViewServicePtr viewService, QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
-	mViewCache = MultiViewCache::create();
+	mViewCache = MultiViewCache::create(viewService);
 
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
+	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(viewService, this);
 	this->initBaseLayout();
 	this->setGridMargin(4);
 	this->setGridSpacing(2);

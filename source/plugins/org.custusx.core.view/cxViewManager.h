@@ -44,8 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxViewService.h"
 
-#include "vtkCommand.h"
-
 class QActionGroup;
 class QAction;
 class QGridLayout;
@@ -72,19 +70,6 @@ typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreated
 
 typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 
-
-class cxResourceVisualization_EXPORT SharedContextCreatedCallback : public vtkCommand
-{
-
-public:
-	static SharedContextCreatedCallback *New();
-	SharedContextCreatedCallback();
-
-	virtual void Execute(vtkObject *view, unsigned long eventId, void*cbo);
-
-	ViewManager *mViewManager;
-
-};
 
 /**
  * \file

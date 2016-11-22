@@ -32,18 +32,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxMultiViewCache.h"
 #include "vtkRenderWindow.h"
+#include "cxViewService.h"
 
 namespace cx
 {
 
-MultiViewCache::MultiViewCache()
+MultiViewCache::MultiViewCache(ViewServicePtr viewService) :
+	mViewService(viewService)
 {
 	// add a hidden window in order to handle the shared context (ref hack in vtkRenderWindow descendants
 	// that add support for shared gl contexts)
 	if (!mStaticRenderWindow.GetPointer())
 	{
-		mStaticRenderWindow = vtkRenderWindowPtr::New();
-		mStaticRenderWindow->SetOffScreenRendering(true);
+		mStaticRenderWindow = mViewService->getSharedRenderWindow();
 		mStaticRenderWindow->Render();
 	}
 }
@@ -54,7 +55,7 @@ ViewWidget* MultiViewCache::retrieveView(QWidget* widget, View::Type type, bool 
 	// and also separates on/offscreen rendering, which doesn't mix well.
 	QString cache_uid = QString("View_%1_%2").arg(type).arg(offScreenRendering);
 	if (!mViewCache.count(cache_uid))
-		mViewCache[cache_uid].reset(new ViewCache<ViewWidget>(widget, cache_uid));
+		mViewCache[cache_uid].reset(new ViewCache<ViewWidget>(mViewService, widget, cache_uid));
 	ViewCachePtr cache = mViewCache[cache_uid];
 
 	ViewWidget* vw = cache->retrieveView();

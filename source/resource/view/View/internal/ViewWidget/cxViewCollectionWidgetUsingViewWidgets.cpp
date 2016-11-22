@@ -40,10 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
+LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(ViewServicePtr viewService, QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
-	mViewCache = MultiViewCache::create();
+	mViewCache = MultiViewCache::create(viewService);
 	mOffScreenRendering = true;
 
 	mLayout = new QGridLayout;

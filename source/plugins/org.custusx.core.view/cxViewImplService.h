@@ -42,6 +42,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
 
 /**
  * Implementation of ViewService.
@@ -84,10 +85,14 @@ public:
 	virtual void enableContextMenuForViews(bool enable=true);
 
 	virtual SharedOpenGLContextPtr getSharedOpenGLContext();
+	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 
 	virtual bool isNull();
 
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
+
+	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
+	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
 public slots:
     virtual void aboutToStop();
 
@@ -105,6 +110,7 @@ private:
 	ctkPluginContext *mContext;
 	SessionStorageServicePtr mSession;
 	ClippersPtr mClippers;
+	RenderWindowFactoryPtr mRenderWindowFactory;
 
 };
 typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;

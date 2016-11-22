@@ -47,7 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
+ViewContainer::ViewContainer(ViewServicePtr viewService, QWidget *parent, Qt::WindowFlags f) :
+	mViewService(viewService),
 	QVTKWidget(parent, f),
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
@@ -151,9 +152,9 @@ void ViewContainer::initializeRenderWindow()
 
 	if (!mCachedRenderWindows.count(uid))
 	{
-		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+//		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+		vtkRenderWindowPtr rw = mViewService->getRenderWindow(uid, mOffScreenRendering);
 		this->addBackgroundRenderer(rw);
-		rw->SetOffScreenRendering(mOffScreenRendering);
 		mCachedRenderWindows[uid] = rw;
 	}
 

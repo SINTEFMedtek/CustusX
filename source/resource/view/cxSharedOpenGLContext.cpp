@@ -248,7 +248,6 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 	if(texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
 	{
 		glFinish();
-
 		report_gl_error();
 
 		//6403 == GL_RED 0x1903
@@ -267,6 +266,8 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		texture_object->SendParameters();
 
 		texture_object->Deactivate();
+
+		glFinish();
 
 		CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
 		texture_object->PrintSelf(std::cout, vtkIndent(4));

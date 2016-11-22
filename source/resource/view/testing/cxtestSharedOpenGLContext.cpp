@@ -34,9 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include <vtkOpenGLRenderWindow.h>
 #include <vtkRenderWindow.h>
-#include <cxSharedOpenGLContext.h>
 #include <vtkImageData.h>
+
 #include "vtkForwardDeclarations.h"
+#include "cxSharedOpenGLContext.h"
 #include "cxImage.h"
 
 namespace cxtest {
@@ -63,6 +64,13 @@ TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][unit]")
 {
 	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
 	REQUIRE(initSharedOpenGLContext(renderWindow));
+}
+
+TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]")
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	REQUIRE(initSharedOpenGLContext(renderWindow));
+	renderWindow->Render();
 }
 
 TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualization][unit]")

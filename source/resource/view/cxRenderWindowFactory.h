@@ -30,59 +30,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXMULTIVIEWCACHE_H
-#define CXMULTIVIEWCACHE_H
+#ifndef CXRENDERWINDOWFACTORY_H
+#define CXRENDERWINDOWFACTORY_H
 
-#include "cxResourceVisualizationExport.h"
 
-#include <QWidget>
-#include <QLayout>
-#include <vector>
-#include "cxTypeConversions.h"
-#include "cxOSXHelper.h"
-#include "cxViewWidget.h"
-#include "cxViewCache.h"
+//#include "cxResourceVisualizationExport.h"
+
+#include <map>
+#include <QString>
+#include <boost/smart_ptr.hpp>
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
-/**
- * \file
- * \ingroup cx_resource_view_internal
- * @{
- */
+typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
 
-/**
- * Cache for reuse of Views.
+/** \brief Use to create all vtkRenderWindows, and store a single shared render window.
  *
- * Separate caches exist for each type of view. Offscreen rendering also uses separate
- * caches. The cache also stores a separate first renderwindow in order to handle
- * the shared gl context used by cx.
+ * Only used directly by ViewService
  *
- * \ingroup cx_resource_view_internal
+ *  \ingroup cx_resource_view
+ *  \date 2016-11-21
+ *  \author Ole Vegard Solberg, SINTEF
  */
-typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
-
-class MultiViewCache
+//class cxResourceVisualization_EXPORT RenderWindowFactory
+class RenderWindowFactory
 {
 public:
-	static MultiViewCachePtr create(ViewServicePtr viewService) { return MultiViewCachePtr(new MultiViewCache(viewService)); }
-	MultiViewCache(ViewServicePtr viewService);
-
-	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
-	void clearViews();
-	void clearCache();
+    RenderWindowFactory();
+    vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
+    vtkRenderWindowPtr getSharedRenderWindow() const;
 
 private:
-	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
-	std::map<QString, ViewCachePtr> mViewCache;
-	vtkRenderWindowPtr mStaticRenderWindow;
-	ViewServicePtr mViewService;
+    vtkRenderWindowPtr createRenderWindow(bool offScreenRendering = true);
+
+    vtkRenderWindowPtr mSharedRenderWindow;
+    std::map<QString, vtkRenderWindowPtr> mRenderWindows;
 };
+}//cx
 
-/**
- * @}
- */
-} // namespace cx
-
-
-#endif // CXMULTIVIEWCACHE_H
+#endif // CXRENDERWINDOWFACTORY_H

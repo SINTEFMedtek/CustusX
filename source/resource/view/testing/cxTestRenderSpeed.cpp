@@ -43,9 +43,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
+#include "cxRenderWindowFactory.h"
 
 namespace cxtest
 {
+
+
+ViewServiceMocWithRenderWindowFactory::ViewServiceMocWithRenderWindowFactory()
+{
+	mRenderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
+}
+
+vtkRenderWindowPtr ViewServiceMocWithRenderWindowFactory::getRenderWindow(QString uid, bool offScreenRendering)
+{
+	return mRenderWindowFactory->getRenderWindow(uid, offScreenRendering);
+}
+
+vtkRenderWindowPtr ViewServiceMocWithRenderWindowFactory::getSharedRenderWindow() const
+{
+	return mRenderWindowFactory->getSharedRenderWindow();
+}
+
+///--------------------------------------------------------
 
 RenderSpeedCounter::RenderSpeedCounter() :
 	mNumViews(0),
@@ -109,9 +128,11 @@ int RenderSpeedCounter::getRenderFPS()
 
 TestRenderSpeed::TestRenderSpeed()
 {
+//	ViewServiceMocWithRenderWindowFactoryPtr viewService = ViewServiceMocWithRenderWindowFactoryPtr(new ViewServiceMocWithRenderWindowFactory());
+	cx::ViewServicePtr viewService = cx::ViewServicePtr(new ViewServiceMocWithRenderWindowFactory());
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
-	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout().data());
+	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService).data());
 //	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
 }
 

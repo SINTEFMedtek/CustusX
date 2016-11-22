@@ -195,6 +195,7 @@ void ShaderCallback::printDebugInfo(vtkOpenGLHelper *OpenGLHelper)
 
 void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 {
+	report_gl_error();
 	//CX_LOG_DEBUG_CHECKPOINT() << "START";
 	vtkOpenGLHelper *OpenGLHelper = reinterpret_cast<vtkOpenGLHelper*>(cbo);
 	if(!OpenGLHelper || !OpenGLHelper->VAO || !OpenGLHelper->Program)
@@ -224,20 +225,7 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		OpenGLHelper->VAO->Bind();
 		report_gl_error();
 
-		/*
-		for(int i=0; i<mShaderItems.size(); ++i)
-		{
-			std::cout << "i: " << i << std::endl;
-			std::cout << "uid: " << mShaderItems.at(i)->mImageUid << std::endl;
-			mShaderItems.at(i)->mTexture->Activate();
-			std::cout << "texture unit: " << mShaderItems.at(i)->mTexture->GetTextureUnit() << std::endl;
-			mShaderItems.at(i)->mTexture->PrintSelf(std::cout, vtkIndent(7));
-			if(mShaderItems.at(i)->mTextureCoordinates)
-				std::cout << "texture coordinate handle: " << mShaderItems.at(i)->mTextureCoordinates->GetHandle() << std::endl;
-		}
-		*/
-
-		int number_to_add = 1; //mShaderItems.size()
+		int number_to_add = mShaderItems.size();
 		for(int i=0; i< number_to_add; ++i)
 		{
 			std::string name = VS_In_Vec3_TextureCoordinate+"_0";//generateVSAttributeTextureCoordinateVectorName(i);
@@ -278,6 +266,12 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 				//GL_TEXTURE_3D 0x806F = 32879
 				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, opengl_renderwindow->GetTextureUnitForTexture(texture.Get()));
 				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, mSharedOpenGLContext->mContext->GetTextureUnitForTexture(texture.Get()));
+
+				report_gl_error();
+				texture->Activate(); //failed ???
+				report_gl_error();
+				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
+
 				//this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
 
 				/*
@@ -337,6 +331,7 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 //TODO move to SharedOpenGLContext?
 void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int value)
 {
+	report_gl_error();
 	//CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
 	if(!program->SetUniformi(name.c_str(), value))
 		CX_LOG_ERROR() << "Could not set uniform named \'" << name << "\'.";
