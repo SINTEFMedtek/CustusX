@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXRENDERWINDOWFACTORY_H
 
 
-//#include "cxResourceVisualizationExport.h"
+#include "cxResourceVisualizationExport.h"
 
 #include <map>
 #include <QString>
@@ -53,8 +53,7 @@ typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
  *  \date 2016-11-21
  *  \author Ole Vegard Solberg, SINTEF
  */
-//class cxResourceVisualization_EXPORT RenderWindowFactory
-class RenderWindowFactory
+class cxResourceVisualization_EXPORT RenderWindowFactory
 {
 public:
     RenderWindowFactory();
