@@ -71,8 +71,6 @@ public:
 	virtual void setModified() { mView->setModified(); }
 	void render();
 
-	void setSharedOpenGLContext(SharedOpenGLContextPtr context);
-
 signals:
 	void resized(QSize size);
 	void mouseMove(int x, int y, Qt::MouseButtons buttons);

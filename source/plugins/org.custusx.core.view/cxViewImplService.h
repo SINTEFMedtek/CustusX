@@ -111,6 +111,7 @@ private:
 	SessionStorageServicePtr mSession;
 	ClippersPtr mClippers;
 	RenderWindowFactoryPtr mRenderWindowFactory;
+	SharedOpenGLContextPtr mSharedOpenGLContext;
 
 };
 typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;

@@ -130,6 +130,7 @@ signals:
 	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
 	void pointSampled(Vector3D p_r);
 	void renderFinished();
+	void sharedOpenGLContextChanged();
 
 public slots:
     virtual void aboutToStop() = 0;

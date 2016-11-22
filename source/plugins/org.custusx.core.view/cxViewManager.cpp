@@ -722,14 +722,14 @@ void ViewManager::enableContextMenuForViews(bool enable)
 
 void ViewManager::setSharedOpenGLContext(SharedOpenGLContextPtr context)
 {
-	mSharedOpenGLContext = context;
+//	mSharedOpenGLContext = context;
 	for(unsigned i = 0; i < mViewGroups.size(); ++i)
-		mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
+		mViewGroups[i]->setSharedOpenGLContext(context);
 }
 
-SharedOpenGLContextPtr ViewManager::getSharedOpenGLContext()
-{
-	return mSharedOpenGLContext;
-}
+//SharedOpenGLContextPtr ViewManager::getSharedOpenGLContext()
+//{
+//	return mSharedOpenGLContext;
+//}
 
 } //namespace cx

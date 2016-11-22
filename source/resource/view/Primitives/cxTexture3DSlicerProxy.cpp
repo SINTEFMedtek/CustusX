@@ -527,7 +527,6 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	if(mSharedOpenGLContext && TCoords)
 	{
 		mSharedOpenGLContext->upload3DTextureCoordinates(image->getUid(), TCoords);
-	}
 
 	//DEBUGGING
 	CX_LOG_DEBUG() << "-------------- 1 TESTING DOWNLOAD!!! --------------";
@@ -554,6 +553,9 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	std::cout << std::endl;
 	CX_LOG_DEBUG() << "-------------- 2 TESTING DOWNLOAD!!! --------------";
 	//DEBUGGING
+	}
+	else
+		CX_LOG_DEBUG() << "No mSharedOpenGLContext";
 
 }
 

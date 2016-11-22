@@ -174,7 +174,7 @@ public:
 	void enableContextMenuForViews(bool enable=true);
 
 	void setSharedOpenGLContext(SharedOpenGLContextPtr context);
-	SharedOpenGLContextPtr getSharedOpenGLContext();
+//	SharedOpenGLContextPtr getSharedOpenGLContext();
 
 signals:
 	void fps(int number); ///< Emits number of frames per second
@@ -234,7 +234,7 @@ protected:
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisServicesPtr mBackend;
-	SharedOpenGLContextPtr mSharedOpenGLContext;
+//	SharedOpenGLContextPtr mSharedOpenGLContext;
 	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 
 private:

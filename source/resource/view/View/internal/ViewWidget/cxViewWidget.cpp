@@ -205,12 +205,4 @@ double ViewWidget::mmPerPix() const
 	return retval;
 }
 
-void ViewWidget::setSharedOpenGLContext(SharedOpenGLContextPtr context)
-{
-	mSharedOpenGLContext = context;
-	//TODO: Update SharedOpenGLContext in viewGroups
-//	for(unsigned i = 0; i < mViewGroups.size(); ++i)
-//		mViewGroups[i]->setSharedOpenGLContext(mSharedOpenGLContext);
-}
-
 } // namespace cx
