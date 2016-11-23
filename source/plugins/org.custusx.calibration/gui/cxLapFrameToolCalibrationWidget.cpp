@@ -236,10 +236,24 @@ Vector3D LapFrameToolCalibrationCalculator::get_delta_ref()
 Transform3D LapFrameToolCalibrationCalculator::get_calibration_sMt()
 {
 	Transform3D calibration = m_sMpr * m_qMpr.inv() * createTransformRotateY(mCameraAngle);
-	Transform3D::LinearMatrixType rotationalPart = calibration.rotation();
-	calibration.linear() = rotationalPart;
+	this->useOnlyRotationalPart(calibration);
 	return calibration;
 }
 
+/**
+* @brief LapFrameToolCalibrationCalculator::useOnlyRotationalPart
+* @param transform
+*
+* This function washes a matrix so that only the rotational component
+* is kept in the linear (upper left 3x3) part of the matrix.
+* The use for it here is particulary because of possible errors in the calibration
+* since we read calibration files which might not have the needed precission and so on.
+* The noise might show up as shear or scale operations which we don't want.
+*/
+void LapFrameToolCalibrationCalculator::useOnlyRotationalPart(Transform3D& transform)
+{
+	Transform3D::LinearMatrixType rotationalPart = transform.rotation();
+	transform.linear() = rotationalPart;
+}
 
 }
