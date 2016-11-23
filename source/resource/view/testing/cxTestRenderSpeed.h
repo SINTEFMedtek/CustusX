@@ -62,6 +62,7 @@ public:
 	ViewServiceMocWithRenderWindowFactory();
 	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
 	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
+	cx::RenderWindowFactoryPtr getRenderWindowFactory() const;
 private:
 	cx::RenderWindowFactoryPtr mRenderWindowFactory;
 };

@@ -119,6 +119,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/cxShaderCallback
 	cxRepContainer
 	cxSharedOpenGLContext
+	cxSharedContextCreatedCallback
 	cxRenderWindowFactory
 )
 

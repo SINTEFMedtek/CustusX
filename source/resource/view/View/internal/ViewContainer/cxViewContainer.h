@@ -63,7 +63,7 @@ class cxResourceVisualization_EXPORT ViewContainer : public QVTKWidget
 	typedef QVTKWidget inherited_widget;
 
 public:
-	ViewContainer(ViewServicePtr viewService, QWidget *parent = NULL, Qt::WindowFlags f = 0);
+	ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent = NULL, Qt::WindowFlags f = 0);
 	virtual ~ViewContainer();
 
 	ViewItem *addView(QString uid, LayoutRegion region, QString name = "");
@@ -105,7 +105,7 @@ private:
 
 	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
 	bool mOffScreenRendering;
-	ViewServicePtr mViewService;
+	RenderWindowFactoryPtr mRenderWindowFactory;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

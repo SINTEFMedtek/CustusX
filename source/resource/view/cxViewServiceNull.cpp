@@ -137,6 +137,7 @@ cx::ClippersPtr cx::ViewServiceNull::getClippers()
 	return ClippersPtr();
 }
 
+/*
 vtkRenderWindowPtr cx::ViewServiceNull::getRenderWindow(QString uid, bool offScreenRendering)
 {
 	printWarning();
@@ -148,5 +149,6 @@ vtkRenderWindowPtr ViewServiceNull::getSharedRenderWindow() const
 	printWarning();
 	return vtkRenderWindowPtr();
 }
+*/
 
 } //cx

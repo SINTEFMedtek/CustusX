@@ -41,17 +41,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
 #include "cxOSXHelper.h"
+#include "cxRenderWindowFactory.h"
 
 namespace cx
 {
 
-ViewWidget::ViewWidget(ViewServicePtr viewService, const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
+ViewWidget::ViewWidget(RenderWindowFactoryPtr factory, const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
 	inherited(parent, f)
 {
 	mMTimeHash = 0;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	mZoomFactor = -1.0;
-	vtkRenderWindowPtr rw = viewService->getRenderWindow(uid);
+	vtkRenderWindowPtr rw = factory->getRenderWindow(uid);
 	mView = ViewLinkingViewWidget::create(this, rw);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	this->SetRenderWindow(mView->getRenderWindow());

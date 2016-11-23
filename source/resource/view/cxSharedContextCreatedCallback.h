@@ -33,29 +33,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXSHAREDCONTEXTCREATEDCALLBACK_H
 #define CXSHAREDCONTEXTCREATEDCALLBACK_H
 
-
-#include "org_custusx_core_view_Export.h"
+#include "cxResourceVisualizationExport.h"
 
 #include <vtkSmartPointer.h>
 #include <vtkCommand.h>
 #include "cxViewService.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
 typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
 
-class org_custusx_core_view_EXPORT SharedContextCreatedCallback : public vtkCommand
+class cxResourceVisualization_EXPORT SharedContextCreatedCallback : public vtkCommand
 {
 
 public:
 	static SharedContextCreatedCallback *New();
 	SharedContextCreatedCallback();
-	void setViewService(ViewServicePtr viewService);
+	//void setViewService(ViewServicePtr viewService);
+	void setRenderWindowFactory(RenderWindowFactory *factory);
 
 	virtual void Execute(vtkObject *view, unsigned long eventId, void*cbo);
 
 private:
-	ViewServicePtr mViewService;
+	RenderWindowFactory *mRenderWindowFactory;
 
 };
 

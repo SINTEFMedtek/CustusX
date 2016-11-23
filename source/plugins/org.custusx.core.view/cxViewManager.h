@@ -66,7 +66,6 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
 
 typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 
@@ -234,8 +233,9 @@ protected:
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisServicesPtr mBackend;
+	RenderWindowFactoryPtr mRenderWindowFactory;
 //	SharedOpenGLContextPtr mSharedOpenGLContext;
-	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
+	//SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 
 private:
 	ViewManager(ViewManager const&);

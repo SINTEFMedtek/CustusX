@@ -64,6 +64,11 @@ vtkRenderWindowPtr ViewServiceMocWithRenderWindowFactory::getSharedRenderWindow(
 	return mRenderWindowFactory->getSharedRenderWindow();
 }
 
+cx::RenderWindowFactoryPtr ViewServiceMocWithRenderWindowFactory::getRenderWindowFactory() const
+{
+	return mRenderWindowFactory;
+}
+
 ///--------------------------------------------------------
 
 RenderSpeedCounter::RenderSpeedCounter() :
@@ -128,11 +133,10 @@ int RenderSpeedCounter::getRenderFPS()
 
 TestRenderSpeed::TestRenderSpeed()
 {
-//	ViewServiceMocWithRenderWindowFactoryPtr viewService = ViewServiceMocWithRenderWindowFactoryPtr(new ViewServiceMocWithRenderWindowFactory());
-	cx::ViewServicePtr viewService = cx::ViewServicePtr(new ViewServiceMocWithRenderWindowFactory());
+	ViewServiceMocWithRenderWindowFactoryPtr viewService = ViewServiceMocWithRenderWindowFactoryPtr(new ViewServiceMocWithRenderWindowFactory());
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
-	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService).data());
+	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory()).data());
 //	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
 }
 

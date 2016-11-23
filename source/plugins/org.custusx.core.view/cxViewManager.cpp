@@ -77,7 +77,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxCameraStyleInteractor.h"
 #include "cxSharedOpenGLContext.h"
-#include "cxSharedContextCreatedCallback.h"
+//#include "cxSharedContextCreatedCallback.h"
+#include "cxRenderWindowFactory.h"
+
 
 namespace cx
 {
@@ -93,6 +95,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 				mGlobalObliqueOrientation(false)
 {
 	mBackend = backend;
+	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
 
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewManager::updateViews);
@@ -204,11 +207,11 @@ QWidget *ViewManager::createLayoutWidget(QWidget* parent, int index)
 
 		if (optimizedViews)
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mBackend->view());
+			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mRenderWindowFactory);
 		}
 		else
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mBackend->view());
+			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mRenderWindowFactory);
 		}
 
 		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewManager::layoutWidgetDestroyed);
@@ -507,9 +510,11 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
 
+	/*
 	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();
 	mSharedContextCreatedCallback->setViewService(mBackend->view());
 	view->getRenderWindow()->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
+	*/
 
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();

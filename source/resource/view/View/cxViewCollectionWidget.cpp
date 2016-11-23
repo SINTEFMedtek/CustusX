@@ -42,21 +42,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewCollectionWidgetMixed.h"
 
 #include "cxViewContainer.h"
+#include "cxRenderWindowFactory.h"
 
 namespace cx
 {
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(ViewServicePtr viewService, QWidget *parent)
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(RenderWindowFactoryPtr factory, QWidget *parent)
 {
 //	return new LayoutWidgetUsingViewCollection(); // testing
-	return new LayoutWidgetUsingViewWidgets(viewService, parent);
+	return new LayoutWidgetUsingViewWidgets(factory, parent);
 //	return new ViewCollectionWidgetMixed(); //testing
 }
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(ViewServicePtr viewService, QWidget *parent)
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(RenderWindowFactoryPtr factory, QWidget *parent)
 {
 //	return new ViewCollectionWidgetUsingViewContainer();
-	return new ViewCollectionWidgetMixed(viewService, parent);
+	return new ViewCollectionWidgetMixed(factory, parent);
 }
 
 } // namespace cx

@@ -42,7 +42,6 @@ namespace cx
 {
 typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
 
 /**
  * Implementation of ViewService.
@@ -91,8 +90,8 @@ public:
 
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 
-	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
-	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
+	//virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
+	//virtual vtkRenderWindowPtr getSharedRenderWindow() const;
 public slots:
     virtual void aboutToStop();
 
@@ -110,7 +109,6 @@ private:
 	ctkPluginContext *mContext;
 	SessionStorageServicePtr mSession;
 	ClippersPtr mClippers;
-	RenderWindowFactoryPtr mRenderWindowFactory;
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 
 };

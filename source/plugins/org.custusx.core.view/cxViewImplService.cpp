@@ -42,8 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxViewGroupData.h"
 #include "cxClippers.h"
-#include "cxRenderWindowFactory.h"
-
 namespace cx
 {
 
@@ -54,7 +52,6 @@ ViewImplService::ViewImplService(ctkPluginContext *context) :
 	mSession = SessionStorageServiceProxy::create(mContext);
 	mBase = ViewManager::create(services);
 	mClippers = ClippersPtr(new Clippers(services));
-	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
 
 	if(!viewManager())
 		std::cout << "ViewImplService got no viewManager" << std::endl;
@@ -239,14 +236,18 @@ void ViewImplService::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	viewManager()->setCameraStyle(style, groupIdx);
 }
 
+/*
 vtkRenderWindowPtr ViewImplService::getRenderWindow(QString uid, bool offScreenRendering)
 {
 	return mRenderWindowFactory->getRenderWindow(uid, offScreenRendering);
 }
+*/
 
+/*
 vtkRenderWindowPtr ViewImplService::getSharedRenderWindow() const
 {
 	return mRenderWindowFactory->getSharedRenderWindow();
 }
+*/
 
 } /* namespace cx */

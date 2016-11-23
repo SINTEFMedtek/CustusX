@@ -33,7 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRenderWindowFactory.h"
 
 #include <QString>
-#include "vtkRenderWindow.h"
+#include <vtkRenderWindow.h>
+#include <vtkOpenGLRenderWindow.h>
+#include "cxSharedOpenGLContext.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -41,8 +44,8 @@ namespace cx
 
 RenderWindowFactory::RenderWindowFactory()
 {
-    mSharedRenderWindow = createRenderWindow(false);//Setting offScreenRendering to true gives crash in render
-    mSharedRenderWindow->Render();//Crash
+	vtkRenderWindowPtr renderWindow = createRenderWindow("cx_shared_context", false);//Setting offScreenRendering to true gives crash in render
+	renderWindow->Render();//Crash
 }
 
 vtkRenderWindowPtr RenderWindowFactory::getRenderWindow(QString uid, bool offScreenRendering)
@@ -50,22 +53,47 @@ vtkRenderWindowPtr RenderWindowFactory::getRenderWindow(QString uid, bool offScr
     if (mRenderWindows.count(uid))
         return mRenderWindows[uid];
 
-    vtkRenderWindowPtr renderWindow = this->createRenderWindow(offScreenRendering);
-//    std::map<QString, vtkRenderWindowPtr> iter = mRenderWindows.begin();
-    mRenderWindows[uid] = renderWindow;
+	vtkRenderWindowPtr renderWindow = this->createRenderWindow(uid, offScreenRendering);
     return renderWindow;
 }
 
 vtkRenderWindowPtr RenderWindowFactory::getSharedRenderWindow() const
 {
 //    mSharedRenderWindow->Render();//Crash?
-    return mSharedRenderWindow;
+	if(!mSharedRenderWindow)
+		CX_LOG_WARNING() << "No shared opengl renderwindow available.";
+	return mSharedRenderWindow;
 }
 
-vtkRenderWindowPtr RenderWindowFactory::createRenderWindow(bool offScreenRendering)
+void RenderWindowFactory::setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow)
+{
+	if(mSharedRenderWindow == sharedRenderWindow)
+		return;
+	mSharedRenderWindow = sharedRenderWindow;
+	CX_LOG_DEBUG() << "RenderWindowFactory::setSharedRenderWindow(...)\n";
+	mSharedRenderWindow->PrintSelf(std::cout, vtkIndent(10));
+
+	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mSharedRenderWindow);
+	mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
+	//TODO send to ppl
+}
+
+vtkRenderWindowPtr RenderWindowFactory::createRenderWindow(QString uid, bool offScreenRendering)
 {
 	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
 	renderWindow->SetOffScreenRendering(offScreenRendering);
+
+	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();
+	//mSharedContextCreatedCallback->setViewService(mBackend->view());
+	mSharedContextCreatedCallback->setRenderWindowFactory(this);
+
+	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
+	if(!opengl_renderwindow)
+		CX_LOG_ERROR() << "UPS.....";
+	opengl_renderwindow->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
+
+	mRenderWindows[uid] = renderWindow;
+
 	return renderWindow;
 }
 

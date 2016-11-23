@@ -2,8 +2,8 @@
 
 namespace cxtest {
 
-LayoutWidgetUsingViewWidgetsMock::LayoutWidgetUsingViewWidgetsMock(cx::ViewServicePtr viewService, QWidget *parent) :
-	cx::LayoutWidgetUsingViewWidgets(viewService, parent)
+LayoutWidgetUsingViewWidgetsMock::LayoutWidgetUsingViewWidgetsMock(cx::RenderWindowFactoryPtr factory, QWidget *parent) :
+	cx::LayoutWidgetUsingViewWidgets(factory, parent)
 {}
 
 LayoutWidgetUsingViewWidgetsMock::~LayoutWidgetUsingViewWidgetsMock()

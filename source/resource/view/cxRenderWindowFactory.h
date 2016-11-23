@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <boost/smart_ptr.hpp>
 #include "vtkForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
+#include "cxSharedContextCreatedCallback.h"
 
 namespace cx
 {
@@ -57,14 +59,19 @@ class cxResourceVisualization_EXPORT RenderWindowFactory
 {
 public:
     RenderWindowFactory();
-    vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
+	vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
     vtkRenderWindowPtr getSharedRenderWindow() const;
 
 private:
-    vtkRenderWindowPtr createRenderWindow(bool offScreenRendering = true);
+	void setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow);
+	vtkRenderWindowPtr createRenderWindow(QString uid, bool offScreenRendering);
 
-    vtkRenderWindowPtr mSharedRenderWindow;
-    std::map<QString, vtkRenderWindowPtr> mRenderWindows;
+	vtkRenderWindowPtr mSharedRenderWindow;
+	std::map<QString, vtkRenderWindowPtr> mRenderWindows;
+	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
+	SharedOpenGLContextPtr mSharedOpenGLContext;
+
+	friend void SharedContextCreatedCallback::Execute(vtkObject *view, unsigned long eventId, void*cbo);
 };
 }//cx
 

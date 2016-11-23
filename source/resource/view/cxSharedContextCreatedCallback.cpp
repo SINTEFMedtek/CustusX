@@ -49,21 +49,37 @@ SharedContextCreatedCallback *SharedContextCreatedCallback::New()
 	return new SharedContextCreatedCallback();
 }
 
-SharedContextCreatedCallback::SharedContextCreatedCallback()
+SharedContextCreatedCallback::SharedContextCreatedCallback() :
+	mRenderWindowFactory(NULL)
 {
 }
 
+void SharedContextCreatedCallback::setRenderWindowFactory(RenderWindowFactory *factory)
+{
+	mRenderWindowFactory = factory;
+}
+
+/*
 void SharedContextCreatedCallback::setViewService(ViewServicePtr viewService)
 {
 	mViewService = viewService;
 }
+*/
 
 void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned long eventId, void *cbo)
 {
 	CX_LOG_DEBUG() << "START SharedContextCreatedCallback";
+	/*
 	if(!mViewService)
 	{
 		CX_LOG_ERROR() << "SharedContextCreatedCallback::Execute: ViewService missing";
+		return;
+	}
+	*/
+	//RenderWindowFactoryPtr factory = boost::dynamic_pointer_cast<RenderWindowFactor>(cbo);
+	if(!mRenderWindowFactory)
+	{
+		CX_LOG_ERROR() << "SharedContextCreatedCallback::Execute: RenderWindowFactoryPtr missing";
 		return;
 	}
 	if(eventId == vtkCommand::CXSharedContextCreatedEvent)
@@ -76,15 +92,14 @@ void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned lon
 	// because that renderwindow is special, it contain THE shared opengl context
 	//if(!this->mSharedOpenGLContext)
 	//{
-//		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
-		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mViewService->getSharedRenderWindow());
+		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
+//		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mViewService->getSharedRenderWindow());
 
 		CX_LOG_DEBUG() << "2 SharedContextCreatedCallback";
 		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
 		{
 			CX_LOG_DEBUG() << "3 SharedContextCreatedCallback";
-			SharedOpenGLContextPtr sharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
-			mViewService->setSharedOpenGLContext(sharedOpenGLContext);
+			mRenderWindowFactory->setSharedRenderWindow(opengl_renderwindow);
 		}
 		else
 			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";

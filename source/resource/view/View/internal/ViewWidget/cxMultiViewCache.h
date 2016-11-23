@@ -65,8 +65,8 @@ typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 class MultiViewCache
 {
 public:
-	static MultiViewCachePtr create(ViewServicePtr viewService) { return MultiViewCachePtr(new MultiViewCache(viewService)); }
-	MultiViewCache(ViewServicePtr viewService);
+	static MultiViewCachePtr create(RenderWindowFactoryPtr factory) { return MultiViewCachePtr(new MultiViewCache(factory)); }
+	MultiViewCache(RenderWindowFactoryPtr factory);
 
 	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
 	void clearViews();
@@ -76,7 +76,7 @@ private:
 	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
 	std::map<QString, ViewCachePtr> mViewCache;
 	vtkRenderWindowPtr mStaticRenderWindow;
-	ViewServicePtr mViewService;
+	RenderWindowFactoryPtr mRenderWindowFactory;
 };
 
 /**

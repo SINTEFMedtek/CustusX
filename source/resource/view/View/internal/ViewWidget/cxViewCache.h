@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxOSXHelper.h"
 #include "cxViewWidget.h"
+#include "cxRenderWindowFactory.h"
 
 namespace cx
 {
@@ -66,8 +67,8 @@ template<class VIEW_TYPE>
 class cxResourceVisualization_EXPORT ViewCache
 {
 public:
-	ViewCache(ViewServicePtr viewService, QWidget* widget, QString typeText) :
-		mViewService(viewService),
+	ViewCache(RenderWindowFactoryPtr factory, QWidget* widget, QString typeText) :
+		mRenderWindowFactory(factory),
 		mCentralWidget(widget),
 		mNameGenerator(0),
 		mTypeText(typeText)
@@ -83,7 +84,7 @@ public:
 					.arg(mTypeText)
 					.arg(mNameGenerator++)
 					.arg(reinterpret_cast<long>(this));
-			VIEW_TYPE* view = new VIEW_TYPE(mViewService, uid, uid, mCentralWidget);
+			VIEW_TYPE* view = new VIEW_TYPE(mRenderWindowFactory, uid, uid, mCentralWidget);
 			mCached.push_back(view);
 		}
 
@@ -115,7 +116,7 @@ private:
 	QString mTypeText;
 	std::vector<VIEW_TYPE*> mCached;
 	std::vector<VIEW_TYPE*> mUsed;
-	ViewServicePtr mViewService;
+	RenderWindowFactoryPtr mRenderWindowFactory;
 };
 
 

@@ -47,8 +47,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include <vtkOpenGLRenderWindow.h>
 #include "cxSharedOpenGLContext.h"
+#include "cxRenderWindowFactory.h"
 
 #include "catch.hpp"
+
 
 namespace cxtest
 {
@@ -76,7 +78,9 @@ ViewsFixture::ViewsFixture(QString displayText)
 	// Initialize dummy toolmanager.
 	mServices->tracking()->setState(cx::Tool::tsTRACKING);
 
-	mWindow.reset(new ViewsWindow(mServices->view()));//TODO: Create moc viewService with RenderWindowFactory?
+	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
+
+	mWindow.reset(new ViewsWindow(factory));//TODO: Create moc viewService with RenderWindowFactory?
 	mWindow->setDescription(displayText);
 }
 

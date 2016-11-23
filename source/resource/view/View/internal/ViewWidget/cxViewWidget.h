@@ -55,7 +55,7 @@ Q_OBJECT
 public:
 	ViewRepCollectionPtr getView();
 
-	ViewWidget(ViewServicePtr viewService, const QString& uid="", const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
+	ViewWidget(RenderWindowFactoryPtr factory, const QString& uid="", const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
 	virtual ~ViewWidget();
 
 	virtual vtkRenderWindowPtr getRenderWindow() { return this->getView()->getRenderWindow(); } ///< Get the vtkRenderWindow used by this \a View.

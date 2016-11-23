@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(ViewServicePtr viewService, QWidget* parent) :
+ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(RenderWindowFactoryPtr factory, QWidget* parent) :
 	ViewCollectionWidget(parent),
 	mViewContainer(NULL)
 {
@@ -51,7 +51,7 @@ ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(V
 	this->setLayout(layout);
 	layout->setSpacing(0);
 	layout->setMargin(0);
-	mViewContainer = new ViewContainer(viewService, this);
+	mViewContainer = new ViewContainer(factory, this);
 	mViewContainer->getGridLayout()->setSpacing(2);
 	mViewContainer->getGridLayout()->setMargin(4);
 	layout->addWidget(mViewContainer);
