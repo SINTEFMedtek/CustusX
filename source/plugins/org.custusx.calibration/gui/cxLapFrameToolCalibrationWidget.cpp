@@ -236,7 +236,7 @@ Vector3D LapFrameToolCalibrationCalculator::get_delta_ref()
 Transform3D LapFrameToolCalibrationCalculator::get_calibration_sMt()
 {
 	Transform3D calibration = m_sMpr * m_qMpr.inv() * createTransformRotateY(mCameraAngle);
-	this->useOnlyRotationalPart(calibration);
+	this->useOnlyRotationalPart(&calibration);
 	return calibration;
 }
 
@@ -250,10 +250,10 @@ Transform3D LapFrameToolCalibrationCalculator::get_calibration_sMt()
 * since we read calibration files which might not have the needed precission and so on.
 * The noise might show up as shear or scale operations which we don't want.
 */
-void LapFrameToolCalibrationCalculator::useOnlyRotationalPart(Transform3D& transform)
+void LapFrameToolCalibrationCalculator::useOnlyRotationalPart(Transform3D* transform)
 {
-	Transform3D::LinearMatrixType rotationalPart = transform.rotation();
-	transform.linear() = rotationalPart;
+	Transform3D::LinearMatrixType rotationalPart = transform->rotation();
+	transform->linear() = rotationalPart;
 }
 
 }
