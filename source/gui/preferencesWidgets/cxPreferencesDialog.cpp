@@ -54,6 +54,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxImage.h"
 #include "cxProfile.h"
+#include "cxTableWidget.h"
+#include "cxLogicManager.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -546,6 +549,7 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
   mTabWidget = new QStackedWidget;
 
   mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
+  VisServicesPtr services = VisServices::create(logicManager()->getPluginContext());
 
   this->addTab(new GeneralTab(viewService, patientModelService), tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
@@ -553,6 +557,7 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
   this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
+  this->addTab(new TableTab(services), tr("Table"));
   this->addTab(new DebugTab, tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);

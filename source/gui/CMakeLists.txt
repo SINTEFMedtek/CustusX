@@ -77,6 +77,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     preferencesWidgets/cxLayoutEditorWidget
     preferencesWidgets/cxGeneralTab
     preferencesWidgets/cxPreferenceTab
+	preferencesWidgets/cxTableWidget
     #----------------------
     streamingWidgets/cxVideoConnectionWidget
     #----------------------
