@@ -273,8 +273,16 @@ Vector3D CustomMetric::getVectorUp() const
 
         return upVector;
     }
-    else
+	else if (mDefineVectorUpMethod == mDefineVectorUpMethods.tool)
+	{
+		Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(CoordinateSystem::reference(), true);
+		Vector3D toolUp = -Vector3D::UnitX();
+		return rMt.vector(toolUp);
+	}
+	else
+	{
 		return mDataManager->getOperatingTable().getVectorUp();
+	}
 }
 
 
@@ -479,6 +487,7 @@ QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMetho
     QStringList retval;
     retval << table;
     retval << connectedFrameInP1;
+	retval << tool;
     return retval;
 }
 
@@ -487,7 +496,8 @@ std::map<QString, QString> CustomMetric::DefineVectorUpMethods::getAvailableDefi
     std::map<QString, QString> names;
     names[table] = "The operating table";
     names[connectedFrameInP1] = "The connected frame in p1";
-    return names;
+	names[tool] = "The active tool";
+	return names;
 }
 
 
