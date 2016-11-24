@@ -210,6 +210,47 @@ Transform3D createTransformRotateZ(const double angle)
 	return retval;
 }
 
+Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to)
+{
+	Vector3D k = cross(from, to);
+
+
+	// handle special cases
+	if (similar(k.length(), 0.0))
+	{
+		// dot==1 -> point in the same direction
+		if (similar(dot(from, to), 1.0))
+		{
+			return Transform3D::Identity();
+		}
+
+		// dot==-1 ->point in opposite directions, cross product will fail.
+		// Find an arbitrary vector perpendicular to from, rotate 180 around that one.
+		if (similar(dot(from, to), -1.0))
+		{
+			Vector3D e_x = Vector3D::UnitX();
+			Vector3D kk = cross(from, e_x);
+			if (similar(kk.length(), 0.0))
+			{
+				Vector3D e_y = Vector3D::UnitY();
+				kk = cross(from, e_y);
+			}
+
+			Transform3D retval = Transform3D::Identity();
+			retval.rotate(Eigen::AngleAxisd(M_PI, kk));
+			return retval;
+		}
+	}
+
+	double dotnormal = dot(from, to)/from.length()/to.length();
+	double angle = acos(dotnormal);
+
+	Transform3D retval = Transform3D::Identity();
+	retval.rotate(Eigen::AngleAxisd(angle, k));
+	return retval;
+}
+
+
 Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out)
 {
 	// translate input bottomleft to origin, scale, translate back to output bottomleft.
