@@ -96,6 +96,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 {
 	mBackend = backend;
 	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
+//	connect(mRenderWindowFactory.get(), &RenderWindowFactory::sharedOpenGLContextCreated, this, &ViewManager::setSharedOpenGLContext);
 
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewManager::updateViews);
@@ -117,6 +118,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 		ViewGroupPtr group(new ViewGroup(mBackend, QString::number(i)));
 		mViewGroups.push_back(group);
 	}
+//	this->setSharedOpenGLContextInViewGroups(this->mRenderWindowFactory->getSharedOpenGLContext());
 
 	// moved here from initialize() ... ensures object is fully callable after construction
 	mCameraStyleInteractor.reset(new CameraStyleInteractor);
@@ -528,7 +530,9 @@ void ViewManager::activateView(ViewCollectionWidget* widget, LayoutViewData view
 	interactor->SetDesiredUpdateRate(rate);
 
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
-	mViewGroups[viewData.mGroup]->addView(wrapper);
+	if(!mRenderWindowFactory->getSharedOpenGLContext())
+		CX_LOG_WARNING() << "ViewManager::activateView: got not shared OpenGL context";
+	mViewGroups[viewData.mGroup]->addView(wrapper, mRenderWindowFactory->getSharedOpenGLContext());
 }
 
 ViewWrapperPtr ViewManager::createViewWrapper(ViewPtr view, LayoutViewData viewData)
@@ -725,12 +729,18 @@ void ViewManager::enableContextMenuForViews(bool enable)
 	}
 }
 
-void ViewManager::setSharedOpenGLContext(SharedOpenGLContextPtr context)
-{
-//	mSharedOpenGLContext = context;
-	for(unsigned i = 0; i < mViewGroups.size(); ++i)
-		mViewGroups[i]->setSharedOpenGLContext(context);
-}
+//void ViewManager::setSharedOpenGLContextInViewGroups(SharedOpenGLContextPtr context)
+//{
+//	CX_LOG_DEBUG() << "ViewManager::setSharedOpenGLContextInViewGroups size:" << mViewGroups.size();
+//	for(unsigned i = 0; i < mViewGroups.size(); ++i)
+//		mViewGroups[i]->setSharedOpenGLContext(context);
+//}
+
+//void ViewManager::setSharedOpenGLContext(SharedOpenGLContextPtr context)
+//{
+//	CX_LOG_DEBUG() << "ViewManager::setSharedOpenGLContext";
+//	this->setSharedOpenGLContextInViewGroups(context);
+//}
 
 //SharedOpenGLContextPtr ViewManager::getSharedOpenGLContext()
 //{

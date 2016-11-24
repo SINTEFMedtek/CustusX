@@ -216,6 +216,7 @@ protected:
 	void autoResetCameraToSuperiorView();
 	void autoCenterToImageCenter();
 	QList<unsigned> getViewGroupsToAutoShowIn();
+	void setSharedOpenGLContextInViewGroups(SharedOpenGLContextPtr context);
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;

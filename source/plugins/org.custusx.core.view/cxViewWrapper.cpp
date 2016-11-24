@@ -242,4 +242,9 @@ void ViewWrapper::addReps()
 	this->getView()->addRep(mDataNameText);
 }
 
+void ViewWrapper::setSharedOpenGLContext(cx::SharedOpenGLContextPtr sharedOpenGLContext)
+{
+	mSharedOpenGLContext = sharedOpenGLContext;
+}
+
 } //namespace cx

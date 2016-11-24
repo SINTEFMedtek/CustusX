@@ -237,17 +237,17 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::getTextureCoordinates(QString imag
 vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width, unsigned int height,  unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow)
 {
 	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
-	//texture_object->DebugOn();
+//	texture_object->DebugOn();
 
-	/*if(!this->makeCurrent())
+	if(!this->makeCurrent())
 		return texture_object;
-		*/
+
 
 	texture_object->SetContext(opengl_renderwindow);
 
 	if(texture_object->Create3DFromRaw(width, height, depth, numComps, dataType, data))
 	{
-		glFinish();
+//		glFinish();
 		report_gl_error();
 
 		//6403 == GL_RED 0x1903
@@ -265,12 +265,13 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
 		texture_object->SendParameters();
 
-		texture_object->Deactivate();
 
-		glFinish();
+//		glFinish();
 
 		CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
 		texture_object->PrintSelf(std::cout, vtkIndent(4));
+
+		texture_object->Deactivate();
 
 		report_gl_error();
 	}

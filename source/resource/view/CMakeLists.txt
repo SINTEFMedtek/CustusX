@@ -73,6 +73,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveCropper
     cxCameraControl
     cxCameraStyleInteractor
+    cxRenderWindowFactory
 )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -120,7 +121,6 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	cxRepContainer
 	cxSharedOpenGLContext
 	cxSharedContextCreatedCallback
-	cxRenderWindowFactory
 )
 
 configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)

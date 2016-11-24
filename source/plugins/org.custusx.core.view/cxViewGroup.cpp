@@ -67,6 +67,7 @@ namespace cx
 
 ViewGroup::ViewGroup(CoreServicesPtr backend, QString uid)
 {
+	CX_LOG_DEBUG() << "ViewGroup constr";
 	mBackend = backend;
 	mViewGroupData.reset(new ViewGroupData(backend, uid));
 	mCameraStyle.reset(new CameraStyle(mBackend, mViewGroupData));
@@ -86,8 +87,10 @@ void ViewGroup::optionChangedSlot()
 
 /**Add one view wrapper and setup the necessary connections.
  */
-void ViewGroup::addView(ViewWrapperPtr wrapper)
+void ViewGroup::addView(ViewWrapperPtr wrapper, SharedOpenGLContextPtr sharedOpenGLContext)
 {
+	mViewGroupData->setSharedOpenGLContext(sharedOpenGLContext);
+	wrapper->setSharedOpenGLContext(sharedOpenGLContext);
 	mViews.push_back(wrapper->getView());
 	mViewWrappers.push_back(wrapper);
 
@@ -165,11 +168,18 @@ void ViewGroup::initializeActiveView(SyncedValuePtr val)
 	mActiveView = val;
 }
 
-void ViewGroup::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
-{
-	CX_LOG_WARNING() << "ViewGroup::setSharedOpenGLContext(..) need to make sure all new viewgroupdata and viewwrappers get the sharedcontext";
-	mViewGroupData->setSharedOpenGLContext(sharedOpenGLContext);
-}
+//void ViewGroup::setSharedOpenGLContextInViewWrappers(SharedOpenGLContextPtr sharedOpenGLContext)
+//{
+//	for (unsigned i = 0; i < mViewWrappers.size(); ++i)
+//		mViewWrappers[i]->setSharedOpenGLContext(sharedOpenGLContext);
+//}
+
+//void ViewGroup::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+//{
+//	CX_LOG_WARNING() << "ViewGroup::setSharedOpenGLContext(..) need to make sure all new viewgroupdata and viewwrappers get the sharedcontext";
+//	mViewGroupData->setSharedOpenGLContext(sharedOpenGLContext);
+//	this->setSharedOpenGLContextInViewWrappers(sharedOpenGLContext);
+//}
 
 void ViewGroup::addXml(QDomNode& dataNode)
 {

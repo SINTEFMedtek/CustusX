@@ -113,8 +113,8 @@ public:
 	virtual void addDefaultLayout(LayoutData layoutData) = 0;
 	virtual void enableContextMenuForViews(bool enable=true) = 0;
 
-	virtual SharedOpenGLContextPtr getSharedOpenGLContext() = 0;
-	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext) = 0;
+//	virtual SharedOpenGLContextPtr getSharedOpenGLContext() = 0;
+//	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext) = 0;
 	//virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true) = 0;
 	//virtual vtkRenderWindowPtr getSharedRenderWindow() const = 0;
 
@@ -130,7 +130,6 @@ signals:
 	void renderingEnabledChanged(); ///< emitted then rendering is enabled/disabled
 	void pointSampled(Vector3D p_r);
 	void renderFinished();
-	void sharedOpenGLContextChanged();
 
 public slots:
     virtual void aboutToStop() = 0;

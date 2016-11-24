@@ -73,7 +73,7 @@ public:
 	explicit ViewGroup(CoreServicesPtr backend, QString uid);
 	virtual ~ViewGroup();
 
-	void addView(ViewWrapperPtr wrapper);
+	void addView(ViewWrapperPtr wrapper, SharedOpenGLContextPtr sharedOpenGLContext);
 	void removeViews();
 	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
 	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
@@ -86,8 +86,9 @@ public:
 
 	bool contains3DView() const;
 	void initializeActiveView(SyncedValuePtr val);
-	void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
+//	void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 
+//	void setSharedOpenGLContextInViewWrappers(SharedOpenGLContextPtr sharedOpenGLContext);
 protected slots:
 //	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();

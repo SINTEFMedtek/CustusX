@@ -55,12 +55,17 @@ typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
  *  \date 2016-11-21
  *  \author Ole Vegard Solberg, SINTEF
  */
-class cxResourceVisualization_EXPORT RenderWindowFactory
+class cxResourceVisualization_EXPORT RenderWindowFactory : public QObject
 {
+    Q_OBJECT
 public:
     RenderWindowFactory();
 	vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
     vtkRenderWindowPtr getSharedRenderWindow() const;
+
+    SharedOpenGLContextPtr getSharedOpenGLContext() const;
+signals:
+    void sharedOpenGLContextCreated(SharedOpenGLContextPtr);
 
 private:
 	void setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow);

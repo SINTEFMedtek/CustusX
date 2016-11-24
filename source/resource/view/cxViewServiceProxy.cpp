@@ -210,15 +210,15 @@ void ViewServiceProxy::enableContextMenuForViews(bool enable)
 	mViewService->enableContextMenuForViews(enable);
 }
 
-SharedOpenGLContextPtr ViewServiceProxy::getSharedOpenGLContext()
-{
-	return mViewService->getSharedOpenGLContext();
-}
+//SharedOpenGLContextPtr ViewServiceProxy::getSharedOpenGLContext()
+//{
+//	return mViewService->getSharedOpenGLContext();
+//}
 
-void ViewServiceProxy::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
-{
-	return mViewService->setSharedOpenGLContext(sharedOpenGLContext);
-}
+//void ViewServiceProxy::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+//{
+//	return mViewService->setSharedOpenGLContext(sharedOpenGLContext);
+//}
 
 cx::ClippersPtr ViewServiceProxy::getClippers()
 {

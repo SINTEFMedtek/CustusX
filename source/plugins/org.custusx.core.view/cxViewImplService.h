@@ -83,8 +83,8 @@ public:
 	virtual void addDefaultLayout(LayoutData layoutData);
 	virtual void enableContextMenuForViews(bool enable=true);
 
-	virtual SharedOpenGLContextPtr getSharedOpenGLContext();
-	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
+//	virtual SharedOpenGLContextPtr getSharedOpenGLContext();
+//	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 
 	virtual bool isNull();
 
@@ -109,7 +109,7 @@ private:
 	ctkPluginContext *mContext;
 	SessionStorageServicePtr mSession;
 	ClippersPtr mClippers;
-	SharedOpenGLContextPtr mSharedOpenGLContext;
+//	SharedOpenGLContextPtr mSharedOpenGLContext;
 
 };
 typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;

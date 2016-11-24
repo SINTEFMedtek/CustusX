@@ -97,6 +97,7 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view.get()))
 {
+	CX_LOG_DEBUG_CHECKPOINT();
 	qRegisterMetaType<Vector3D>("Vector3D");
 	mView = view;
 	this->connectContextMenu(mView);
@@ -255,10 +256,15 @@ void ViewWrapper2D::removeAndResetMultiSliceRep()
 
 void ViewWrapper2D::createAndAddMultiSliceRep()
 {
+	if(!mSharedOpenGLContext)
+	{
+		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
+		return;
+	}
 //#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 		return;
-	mMultiSliceRep = Texture3DSlicerRep::New(mServices->view()->getSharedOpenGLContext());
+	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
 	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());

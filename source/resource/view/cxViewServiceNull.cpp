@@ -121,16 +121,16 @@ void ViewServiceNull::enableContextMenuForViews(bool enable)
 	printWarning();
 }
 
-SharedOpenGLContextPtr ViewServiceNull::getSharedOpenGLContext()
-{
-	printWarning();
-	return SharedOpenGLContextPtr();
-}
+//SharedOpenGLContextPtr ViewServiceNull::getSharedOpenGLContext()
+//{
+//	printWarning();
+//	return SharedOpenGLContextPtr();
+//}
 
-void ViewServiceNull::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
-{
-	printWarning();
-}
+//void ViewServiceNull::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
+//{
+//	printWarning();
+//}
 
 cx::ClippersPtr cx::ViewServiceNull::getClippers()
 {
