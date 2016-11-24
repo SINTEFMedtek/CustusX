@@ -116,10 +116,12 @@ private:
         {
             table = "tableDefinesUp";
             connectedFrameInP1 = "connectedFrameDefinesUp";
+			tool = "toolDefinesUp";
         }
         QString table;
         QString connectedFrameInP1;
-        QStringList getAvailableDefineVectorUpMethods() const;
+		QString tool;
+		QStringList getAvailableDefineVectorUpMethods() const;
         std::map<QString, QString> getAvailableDefineVectorUpMethodsDisplayNames() const;
     };
 
