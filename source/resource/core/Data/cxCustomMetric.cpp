@@ -280,10 +280,10 @@ Vector3D CustomMetric::getVectorUp() const
 
 void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
 {
-	if (!this->getTextureFollowTool())
+	if (!model)
 		return;
 
-	if (!model)
+	if (!this->getTextureFollowTool() || !model->hasTexture())
 		return;
 
 	// special case:

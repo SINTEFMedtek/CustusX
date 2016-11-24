@@ -309,10 +309,18 @@ void Mesh::setGlyphLUT(const char * glyphLUT)
 	emit meshChanged();
 }
 
+bool Mesh::hasTexture() const
+{
+	if(mTextureData.getTextureImage()->getValue().isEmpty() || mTextureData.getTextureImage()->getImage() == NULL)
+		return false;
+	else
+		return true;
+}
+
 void Mesh::updateVtkPolyDataWithTexture()
 {
 	QString textureShape = this->getTextureShape();
-	if (mTextureData.getTextureImage()->getValue().isEmpty() || mTextureData.getTextureImage()->getImage() == NULL)
+	if (!this->hasTexture())
 	{
 		mVtkTexture = vtkTexturePtr::New();
 		return;
