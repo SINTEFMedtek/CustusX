@@ -200,6 +200,7 @@ QWidget *ViewManager::getLayoutWidget(int index)
 
 QWidget *ViewManager::createLayoutWidget(QWidget* parent, int index)
 {
+	CX_LOG_DEBUG_CHECKPOINT();
 	if (index >= mLayoutWidgets.size())
 		return NULL;
 

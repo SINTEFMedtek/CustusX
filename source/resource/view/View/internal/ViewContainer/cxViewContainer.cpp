@@ -150,22 +150,32 @@ void ViewContainer::initializeRenderWindow()
 
 	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
 
-	if (!mCachedRenderWindows.count(uid))
-	{
-//		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
-		vtkRenderWindowPtr rw = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
-		this->addBackgroundRenderer(rw);
-		mCachedRenderWindows[uid] = rw;
-	}
+	bool renderWindowExists = mRenderWindowFactory->renderWindowExists(uid);
 
-	// replace the previous renderwindow with one from the cache.
-	// the old renderwindow is not hidden explicitly: is this a problem??
-	if (mRenderWindow != mCachedRenderWindows[uid])
-	{
-		mRenderWindow = mCachedRenderWindows[uid];
-		this->SetRenderWindow(mRenderWindow);
-		mRenderWindow->GetInteractor()->EnableRenderOff();
-	}
+	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
+	if(!renderWindowExists)
+		this->addBackgroundRenderer(mRenderWindow);
+	this->SetRenderWindow(mRenderWindow);
+	mRenderWindow->GetInteractor()->EnableRenderOff();
+
+
+
+//	if (!mCachedRenderWindows.count(uid))
+//	{
+////		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+//		vtkRenderWindowPtr rw = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
+//		this->addBackgroundRenderer(rw);
+//		mCachedRenderWindows[uid] = rw;
+//	}
+
+//	// replace the previous renderwindow with one from the cache.
+//	// the old renderwindow is not hidden explicitly: is this a problem??
+////	if (mRenderWindow != mCachedRenderWindows[uid])
+////	{
+//		mRenderWindow = mCachedRenderWindows[uid];
+//		this->SetRenderWindow(mRenderWindow);
+//		mRenderWindow->GetInteractor()->EnableRenderOff();
+////	}
 }
 
 void ViewContainer::addBackgroundRenderer(vtkRenderWindowPtr rw)
@@ -295,6 +305,8 @@ void ViewContainer::renderAll()
 
 void ViewContainer::doRender()
 {
+	if (mRenderWindow)
+		return;
 	this->getRenderWindow()->Render();
 }
 

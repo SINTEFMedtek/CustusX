@@ -97,7 +97,7 @@ private:
 	boost::shared_ptr<class ViewRepCollection> mView;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 
-	SharedOpenGLContextPtr mSharedOpenGLContext;
+//	SharedOpenGLContextPtr mSharedOpenGLContext;
 };
 
 } // namespace cx

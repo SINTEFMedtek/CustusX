@@ -57,15 +57,16 @@ typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
  */
 class cxResourceVisualization_EXPORT RenderWindowFactory : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
     RenderWindowFactory();
 	vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
     vtkRenderWindowPtr getSharedRenderWindow() const;
 
-    SharedOpenGLContextPtr getSharedOpenGLContext() const;
+	SharedOpenGLContextPtr getSharedOpenGLContext() const;
+	bool renderWindowExists(QString uid);
 signals:
-    void sharedOpenGLContextCreated(SharedOpenGLContextPtr);
+	void sharedOpenGLContextCreated(SharedOpenGLContextPtr);
 
 private:
 	void setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow);

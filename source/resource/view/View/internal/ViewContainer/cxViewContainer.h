@@ -103,7 +103,7 @@ private:
 	QPoint convertToItemSpace(const QPoint &pos, ViewItem* item) const;
 	ViewItem* findViewItem(const QPoint &pos);
 
-	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
+//	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
 	bool mOffScreenRendering;
 	RenderWindowFactoryPtr mRenderWindowFactory;
 };

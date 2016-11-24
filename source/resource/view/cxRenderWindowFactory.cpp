@@ -50,11 +50,16 @@ RenderWindowFactory::RenderWindowFactory()
 
 vtkRenderWindowPtr RenderWindowFactory::getRenderWindow(QString uid, bool offScreenRendering)
 {
-    if (mRenderWindows.count(uid))
+	if(this->renderWindowExists(uid))
         return mRenderWindows[uid];
 
 	vtkRenderWindowPtr renderWindow = this->createRenderWindow(uid, offScreenRendering);
     return renderWindow;
+}
+
+bool RenderWindowFactory::renderWindowExists(QString uid)
+{
+	return (mRenderWindows.count(uid) > 0);
 }
 
 vtkRenderWindowPtr RenderWindowFactory::getSharedRenderWindow() const
@@ -72,7 +77,7 @@ void RenderWindowFactory::setSharedRenderWindow(vtkRenderWindowPtr sharedRenderW
 		return;
 	mSharedRenderWindow = sharedRenderWindow;
 	CX_LOG_DEBUG() << "RenderWindowFactory::setSharedRenderWindow(...)\n";
-	mSharedRenderWindow->PrintSelf(std::cout, vtkIndent(10));
+//	mSharedRenderWindow->PrintSelf(std::cout, vtkIndent(10));
 
 	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mSharedRenderWindow);
 	if(opengl_renderwindow)
