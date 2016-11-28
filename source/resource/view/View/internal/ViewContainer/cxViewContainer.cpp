@@ -146,7 +146,7 @@ bool ViewContainer::getOffScreenRendering() const
 void ViewContainer::initializeRenderWindow()
 {
 	if (mRenderWindow)
-		return;	
+		return;
 
 	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
 
@@ -305,7 +305,7 @@ void ViewContainer::renderAll()
 
 void ViewContainer::doRender()
 {
-	if (mRenderWindow)
+	if (!mRenderWindow)
 		return;
 	this->getRenderWindow()->Render();
 }
