@@ -261,9 +261,9 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		texture_object->Activate();
 		report_gl_error();
 
-		texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
-		texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
-		texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
+		texture_object->SetWrapS(vtkTextureObject::ClampToBorder);
+		texture_object->SetWrapT(vtkTextureObject::ClampToBorder);
+		texture_object->SetWrapR(vtkTextureObject::ClampToBorder);
 		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
 		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
 		texture_object->SendParameters();
