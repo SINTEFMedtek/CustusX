@@ -135,9 +135,9 @@ vtkImageDataPtr SharedOpenGLContext::downloadImageFromTextureBuffer(QString imag
 
 bool SharedOpenGLContext::makeCurrent() const
 {
-	CX_LOG_DEBUG() << "1 Context is current: " << mContext->IsCurrent();
+	//CX_LOG_DEBUG() << "1 Context is current: " << mContext->IsCurrent();
 	mContext->MakeCurrent();
-	CX_LOG_DEBUG() << "2 Context is current: " << mContext->IsCurrent();
+	//CX_LOG_DEBUG() << "2 Context is current: " << mContext->IsCurrent();
 
 	/*
 	if(!mContext)
@@ -166,9 +166,9 @@ bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 	int numComps = vtkImageData->GetNumberOfScalarComponents();
 	int coordinate[3] = {dims[0]/2, dims[1]/2, dims[2]/2};
 
-	CX_LOG_DEBUG() << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << " scalarType: " << vtkImageData->GetScalarTypeAsString() << " numComps: " << numComps;
-	CX_LOG_DEBUG() << "data in the middle 1 " << vtkImageData->GetScalarComponentAsFloat(dims[0]/2, dims[1]/2, dims[2]/2, 0);
-	CX_LOG_DEBUG() << "data in the middle 2 " << (int)((unsigned char*)vtkImageData->GetScalarPointer(coordinate))[0];
+	//CX_LOG_DEBUG() << "dims: " << dims[0] << " " << dims[1] << " " << dims[2] << " " << " scalarType: " << vtkImageData->GetScalarTypeAsString() << " numComps: " << numComps;
+	//CX_LOG_DEBUG() << "data in the middle 1 " << vtkImageData->GetScalarComponentAsFloat(dims[0]/2, dims[1]/2, dims[2]/2, 0);
+	//CX_LOG_DEBUG() << "data in the middle 2 " << (int)((unsigned char*)vtkImageData->GetScalarPointer(coordinate))[0];
 	report_gl_error();
 
 	vtkTextureObjectPtr texture_object;
@@ -189,10 +189,10 @@ bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 	return success;
 }
 
-bool SharedOpenGLContext::upload3DTextureCoordinates(QString image_uid, vtkFloatArrayPtr texture_coordinates)
+bool SharedOpenGLContext::upload3DTextureCoordinates(QString uid, vtkFloatArrayPtr texture_coordinates)
 {
 	bool success = false;
-	if(image_uid.isEmpty())
+	if(uid.isEmpty())
 		return success;
 
 	if(!texture_coordinates)
@@ -205,31 +205,33 @@ bool SharedOpenGLContext::upload3DTextureCoordinates(QString image_uid, vtkFloat
 	}
 	int numberOfLines = texture_coordinates->GetNumberOfTuples();
 	int numberOfComponentsLine = texture_coordinates->GetNumberOfComponents();
+	/*
 	CX_LOG_DEBUG() << "GetSize: " << texture_coordinates->GetSize()
 				   << "\n GetNumberOfTuples: " << numberOfLines
 				   << "\n GetNumberOfComponents: " << numberOfComponentsLine
 				   << "\n GetNumberOfTuples*GetNumberOfComponents: " << (numberOfLines*numberOfComponentsLine);
+				   */
 
-	vtkOpenGLBufferObjectPtr buffer = allocateAndUploadArrayBuffer(image_uid, numberOfLines, numberOfComponentsLine, texture_coordinates->GetPointer(0));
+	vtkOpenGLBufferObjectPtr buffer = allocateAndUploadArrayBuffer(uid, numberOfLines, numberOfComponentsLine, texture_coordinates->GetPointer(0));
 
 	if(buffer)
 	{
-		mTextureCoordinateBuffers[image_uid] = buffer;
+		mTextureCoordinateBuffers[uid] = buffer;
 		success = true;
 	}
 	return success;
 }
 
-bool SharedOpenGLContext::hasUploadedTextureCoordinates(QString image_uid) const
+bool SharedOpenGLContext::hasUploadedTextureCoordinates(QString uid) const
 {
-	return mTextureCoordinateBuffers.count(image_uid);
+	return mTextureCoordinateBuffers.count(uid);
 }
 
-vtkOpenGLBufferObjectPtr SharedOpenGLContext::getTextureCoordinates(QString image_uid) const
+vtkOpenGLBufferObjectPtr SharedOpenGLContext::getTextureCoordinates(QString uid) const
 {
 	vtkOpenGLBufferObjectPtr retval;
-	if(hasUploadedTextureCoordinates(image_uid))
-		retval = mTextureCoordinateBuffers.at(image_uid);
+	if(hasUploadedTextureCoordinates(uid))
+		retval = mTextureCoordinateBuffers.at(uid);
 	else
 		CX_LOG_ERROR() << "getTextureCoordinates failed";
 	return retval;
@@ -254,14 +256,14 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		//6403 == GL_RED 0x1903
 		//6407 == GL_RGB 0x1907
 		//6408 == GL_RGBA 0x1908
-		CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
+		//CX_LOG_DEBUG() << texture_object->GetFormat(dataType, numComps, true);
 
 		texture_object->Activate();
 		report_gl_error();
 
-		texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
-		texture_object->SetWrapT(vtkTextureObject::ClampToEdge);
-		texture_object->SetWrapR(vtkTextureObject::ClampToEdge);
+		texture_object->SetWrapS(vtkTextureObject::ClampToBorder);
+		texture_object->SetWrapT(vtkTextureObject::ClampToBorder);
+		texture_object->SetWrapR(vtkTextureObject::ClampToBorder);
 		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
 		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
 		texture_object->SendParameters();
@@ -269,7 +271,7 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 
 //		glFinish();
 
-		CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
+		//CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
 		texture_object->PrintSelf(std::cout, vtkIndent(4));
 
 		texture_object->Deactivate();
@@ -279,13 +281,13 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 	else
 		CX_LOG_ERROR() << "Error creating 3D texture";
 
-	CX_LOG_DEBUG() << "Created. Handle: " << texture_object->GetHandle() << " target: " << texture_object->GetTarget() << " context: ";
+	//CX_LOG_DEBUG() << "Created. Handle: " << texture_object->GetHandle() << " target: " << texture_object->GetTarget() << " context: ";
 	texture_object->GetContext()->PrintSelf(std::cout, vtkIndent(9));
 
 	return texture_object;
 }
 
-vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QString image_uid, int numberOfLines, int numberOfComponentsLine, const float *data)
+vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QString uid, int numberOfLines, int numberOfComponentsLine, const float *data)
 {
 	if(!data)
 	{
@@ -298,9 +300,9 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QStri
 	if(!this->makeCurrent())
 		return buffer_object;
 
-	CX_LOG_DEBUG() << "ALLOCATING BUFFER";
-	if(hasUploadedTextureCoordinates(image_uid))
-		buffer_object = getTextureCoordinates(image_uid);
+	//CX_LOG_DEBUG() << "ALLOCATING BUFFER";
+	if(hasUploadedTextureCoordinates(uid))
+		buffer_object = getTextureCoordinates(uid);
 	else
 		buffer_object = vtkOpenGLBufferObjectPtr::New();
 
@@ -308,7 +310,7 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QStri
 
 	if(buffer_object->Bind())
 	{
-		CX_LOG_DEBUG() <<  "UPLOADING BUFFER: " << buffer_object->GetHandle();
+		//CX_LOG_DEBUG() <<  "UPLOADING BUFFER: uid:" << uid << " handle: " << buffer_object->GetHandle();
 		if(!buffer_object->Upload(
 					data,
 					numberOfLines*numberOfComponentsLine,  //how many floats to upload! (aka number of floats in the vector)
@@ -321,7 +323,7 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QStri
 
 	}
 	else
-		CX_LOG_DEBUG() << "Buffer object could not bind";
+		CX_LOG_ERROR() << "Buffer object could not bind";
 	report_gl_error();
 
 	return buffer_object;

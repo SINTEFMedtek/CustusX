@@ -201,9 +201,6 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 	if(!OpenGLHelper || !OpenGLHelper->VAO || !OpenGLHelper->Program)
 		return;
 
-	vtkShaderProgram *program = OpenGLHelper->Program;
-	vtkOpenGLVertexArrayObject *vao = OpenGLHelper->VAO;
-
 	//this->printDebugInfo(OpenGLHelper);
 
 	if(eventId == vtkCommand::UpdateShaderEvent)
@@ -232,11 +229,18 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 
 			//Upload attribute arrays
 			//	texture coordinates (glsl: vec3)
-			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems.at(i)->mTextureCoordinates;
+			vtkOpenGLBufferObjectPtr texture_coordinates = mTextureCoordinates;
 			if(texture_coordinates)
 			{
-				//texture_coordinates->Bind();
+				//CX_LOG_DEBUG() << "1 Using texture coordinates with handle: " << mTextureCoordinates->GetHandle();
+				if(!texture_coordinates->Bind())
+					CX_LOG_WARNING() << "Could not bind texture coordinates";
+				//CX_LOG_DEBUG() << "2 Using texture coordinates with handle: " << mTextureCoordinates->GetHandle();
 				this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, name);
+			}
+			else
+			{
+				CX_LOG_WARNING() << "NO TEXTURE COORDINATES!";
 			}
 			report_gl_error();
 
@@ -267,9 +271,9 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, opengl_renderwindow->GetTextureUnitForTexture(texture.Get()));
 				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, mSharedOpenGLContext->mContext->GetTextureUnitForTexture(texture.Get()));
 
-				report_gl_error();
+				//report_gl_error();
 				texture->Activate(); //failed ???
-				report_gl_error();
+				//report_gl_error();
 				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
 
 				//this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
@@ -300,7 +304,7 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 //TODO move to SharedOpenGLContext?
 void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name)
 {
-	vao->DebugOn();
+	//vao->DebugOn();
 	//--------
 	//TODO extract to struct?
 	int offset = 0;

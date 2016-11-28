@@ -78,6 +78,12 @@ void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context) :
 	mSharedOpenGLContext(context)
 {
+
+	//TODO is this unique enough? used for texture coordinates
+	QString unique_string = qstring_cast(reinterpret_cast<long>(this));
+	mUid = QString("Texture3DSlicerProxyImpl_%1").arg(unique_string);
+	//CX_LOG_DEBUG_CHECKPOINT() << mUid;
+
 	mTargetSpaceIsR = false;
 	mActor = vtkActorPtr::New();
 	//mActor->DebugOn();
@@ -362,12 +368,13 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 	{
 		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
 		{
-			QString uid = mImages[i]->getUid();
+			QString imageUid = mImages[i]->getUid();
 			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
-			shaderitem->mImageUid = uid;
-			shaderitem->mTexture = mSharedOpenGLContext->getTexture(uid);
-			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(mImages[i]->getUid()))
-				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(uid);;
+			shaderitem->mImageUid = imageUid;
+			shaderitem->mTexture = mSharedOpenGLContext->getTexture(imageUid);
+			QString textureCoordinateUid = mUid; //TODO
+			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinateUid))
+				mShaderCallback->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinateUid);
 			mShaderCallback->mShaderItems.push_back(shaderitem);
 		}
 		else
@@ -505,7 +512,7 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 	if (!TCoords) // create the TCoords
 	{
-		////CX_LOG_DEBUG_CHECKPOINT();
+		//CX_LOG_DEBUG_CHECKPOINT();
 		TCoords = vtkFloatArrayPtr::New();
 		TCoords->SetNumberOfComponents(3);
 		TCoords->Allocate(4 * 3);
@@ -520,14 +527,17 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	for (unsigned i = 0; i < plane.size(); ++i)
 	{
 		TCoords->SetTuple3(i, plane[i][0], plane[i][1], plane[i][2]);
-		CX_LOG_DEBUG() << "coord: " << i << ", " << plane[i][0] << ", " << plane[i][1] << ", " << plane[i][2];
+		//CX_LOG_DEBUG() << "coord: " << i << ", " << plane[i][0] << ", " << plane[i][1] << ", " << plane[i][2];
 	}
 	mPolyData->Modified();
 
 	if(mSharedOpenGLContext && TCoords)
 	{
-		mSharedOpenGLContext->upload3DTextureCoordinates(image->getUid(), TCoords);
+		mSharedOpenGLContext->upload3DTextureCoordinates(mUid, TCoords);
+		if(mSharedOpenGLContext->hasUploadedTextureCoordinates(mUid))
+			mShaderCallback->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(mUid);
 
+		/*
 	//DEBUGGING
 	CX_LOG_DEBUG() << "-------------- 1 TESTING DOWNLOAD!!! --------------";
 	vtkImageDataPtr imageData = mSharedOpenGLContext->downloadImageFromTextureBuffer(image->getUid());
@@ -553,9 +563,10 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	std::cout << std::endl;
 	CX_LOG_DEBUG() << "-------------- 2 TESTING DOWNLOAD!!! --------------";
 	//DEBUGGING
+	*/
 	}
 	else
-		CX_LOG_DEBUG() << "No mSharedOpenGLContext";
+		CX_LOG_WARNING() << "No mSharedOpenGLContext";
 
 }
 
