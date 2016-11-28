@@ -77,21 +77,23 @@ public:
 
 	bool makeCurrent() const;
 
+	//Textures are per image
 	bool upload3DTexture(ImagePtr image);
 	bool hasUploadedTexture(QString image_uid) const;
 	vtkTextureObjectPtr getTexture(QString image_uid) const;
 
-	bool upload3DTextureCoordinates(QString image_uid, vtkFloatArrayPtr texture_coordinates);
-	bool hasUploadedTextureCoordinates(QString image_uid) const;
-	vtkOpenGLBufferObjectPtr getTextureCoordinates(QString image_uid) const;
-
+	//Texture coordinates are per view
+	bool upload3DTextureCoordinates(QString uid, vtkFloatArrayPtr texture_coordinates);
+	bool hasUploadedTextureCoordinates(QString uid) const;
+	vtkOpenGLBufferObjectPtr getTextureCoordinates(QString uid) const;
 	vtkImageDataPtr downloadImageFromTextureBuffer(QString image_uid);//For testing
+
+	//TODO make private
 	vtkOpenGLRenderWindowPtr mContext;
 
 private:
 	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
-	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString image_uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
-
+	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
 
 	std::map<QString, vtkTextureObjectPtr > mTextureObjects;
 	std::map<QString, vtkOpenGLBufferObjectPtr > mTextureCoordinateBuffers;

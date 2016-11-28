@@ -155,6 +155,7 @@ private:
 	ShaderCallbackPtr mShaderCallback;
 
 	//std::vector<ShaderCallbackPtr> mElement;
+	QString mUid;
 
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;

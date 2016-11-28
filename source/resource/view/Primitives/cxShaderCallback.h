@@ -69,7 +69,6 @@ public:
 	{
 		QString mImageUid;
 		vtkTextureObjectPtr mTexture;
-		vtkOpenGLBufferObjectPtr mTextureCoordinates;
 	};
 	typedef boost::shared_ptr<ShaderItem> ShaderItemPtr;
 
@@ -81,6 +80,7 @@ public:
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	vtkRenderWindowPtr mCurrentContext;
 	std::vector<ShaderItemPtr> mShaderItems;
+	vtkOpenGLBufferObjectPtr mTextureCoordinates;
 
 private:
 	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name);
