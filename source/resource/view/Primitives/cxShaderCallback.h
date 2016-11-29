@@ -64,14 +64,21 @@ public:
 	static const std::string FS_In_Vec3_TextureCoordinate;
 	static const std::string FS_Uniform_3DTexture;
 	static const std::string FS_Out_Vec4_Color;
-	static const int Const_Int_NumberOfTextures;
+	static const int Const_Int_NumberOfTextures; //TODO remove, use getShaderItemSize
 
 	struct ShaderItem
 	{
-		QString mImageUid;
+		QString mImageUid; //mTextureUid
 		vtkTextureObjectPtr mTexture;
-		QString mTexture_coordinate_name_per_image_per_view;
+		QString mTexture_coordinate_name_per_image_per_view; //mTextureCoordinatesUid
 		vtkOpenGLBufferObjectPtr mTextureCoordinates;
+		//TODO implement setting and usage of these
+		//vtkTextureObjectPtr mLUT;
+		//int mLutSize; //basically: used to check if lut should be applied, also a check if it is RED or RGB(A)
+		//float mWindow;
+		//float mLevel;
+		//float mLLR; //low level reject
+		//float mAlpha;
 	};
 	typedef boost::shared_ptr<ShaderItem> ShaderItemPtr;
 
@@ -81,9 +88,10 @@ public:
 	virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
 	ShaderItemPtr getShaderItem(QString image_uid) const;
+	int getNumberOfUploadedTextures() const;
 
 	SharedOpenGLContextPtr mSharedOpenGLContext;
-	vtkRenderWindowPtr mCurrentContext;
+	//vtkRenderWindowPtr mCurrentContext;
 	std::vector<ShaderItemPtr> mShaderItems;
 
 private:
