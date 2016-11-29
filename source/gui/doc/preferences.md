@@ -55,6 +55,16 @@ Tool Configuration {#preferences_tool_config_widget}
 Setup tool configuration for tracking
 
 
+\addindex preferences_operating_table_widget
+Operating table {#preferences_operating_table_widget}
+===
+Here you can define the up vector of the operating table and the how the pasient is displayed in the 3D scene.
+This setting should be used together with *Table lock* in the active view group's camera settings, which are available from the *Browser* widget.
+
+You can either use the predefined Anterior, Posterior and Superior buttons, or start the tracking and point in the direction towards the earth with the active tool.
+Press the *Tool dir is down* button and the software will set the up vector related to the angle of the patient.
+
+
 \addindex preferences_debug_widget
 Debug {#preferences_debug_widget}
 ===
