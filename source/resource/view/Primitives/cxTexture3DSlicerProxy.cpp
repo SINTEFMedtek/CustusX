@@ -263,8 +263,10 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_dec() const
 		"\n"
 		"//CX: adding input and output variables for texture coordinates\n"
 		"const int number_of_textures = %3;\n"
-		"attribute vec3 %1_0;\n"
-		"varying vec3 %2[number_of_textures];\n"
+		"//attribute vec3 %1;\n"
+		"in vec3 %1[number_of_textures];\n"
+		"out vec3 %2[number_of_textures];\n"
+		"//varying vec3 %2;\n"
 		)
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
@@ -277,10 +279,12 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_impl() const
 {
 	QString temp = QString(
 		"//VTK::PositionVC::Impl\n"
-		"%1[0] = %2_0;\n"
-		"%1[1] = %2_0;\n"
-		"%1[2] = %2_0;\n"
-		"%1[3] = %2_0;\n"
+		"%1 = %2;\n"
+		"//%1[0] = %2[0];\n"
+		"//%1[1] = %2[1];\n"
+		"//vec3 test = vec3(%1[0].xy, %1[1].z);\n"
+		"//%1[2] = %2_0;\n"
+		"//%1[3] = %2_0;\n"
 		)
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str());
@@ -297,8 +301,9 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"//CX: adding custom fragment shader\n"
 		"const int number_of_textures = %4;\n"
 		"in vec3 %1[number_of_textures];\n"
-		"//uniform sampler3D %2[number_of_textures];\n"
-		"uniform sampler3D %2;\n"
+		"//in vec3 %1;\n"
+		"uniform sampler3D %2[number_of_textures];\n"
+		"//uniform sampler3D %2;\n"
 		"out vec4 %3;\n"
 		""
 		"vec4 testValue(float value);\n"
@@ -334,7 +339,10 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"//vec4 value = texture(%2, %1[0]);\n"
 		"//%3 = testValue(%1[0].y);\n"
 		""
-		"%3 = texture(%2, %1[0]);\n"
+		"vec4 test1 = texture(%2[0], %1[0]);\n"
+		"vec4 test2 = texture(%2[1], %1[1]);\n"
+		"%3 = (test1+test2)/2;\n"
+		"//%3 = texture(%2[1], %1[1]);\n"
 		"//%3 = texture(%2, vec3(0.68218f, 0.572872f, 0.258443f));\n"
 		"//	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
 		"}\n"
@@ -349,6 +357,7 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
+
 	if (!this->isNewInputImages(images_raw))
 		return;
 
@@ -364,17 +373,31 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	mImages = images;
 
+	//Clear all shaderitems before re-adding them.
+	mShaderCallback->mShaderItems.clear();
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
+		//TODO maybe we should upload the textures here instead???
+		//we have a problem with Kaisa, because it is converted and thus not added to the viewgroup which causes it not to be uploaded
+		//New Kaisa gets new uid with *_u
+		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
+		{
+			mSharedOpenGLContext->upload3DTexture(mImages[i]);
+		}
+
 		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
 		{
 			QString imageUid = mImages[i]->getUid();
 			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
 			shaderitem->mImageUid = imageUid;
 			shaderitem->mTexture = mSharedOpenGLContext->getTexture(imageUid);
-			QString textureCoordinateUid = mUid; //TODO
-			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinateUid))
-				mShaderCallback->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinateUid);
+			//QString textureCoordinateUid = mUid; //TODO
+			QString texture_coordinate_name_per_image_per_view = QString(mUid+"_%1").arg(imageUid);
+			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(texture_coordinate_name_per_image_per_view))
+			{
+				shaderitem->mTexture_coordinate_name_per_image_per_view = texture_coordinate_name_per_image_per_view;
+				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(texture_coordinate_name_per_image_per_view);
+			}
 			mShaderCallback->mShaderItems.push_back(shaderitem);
 		}
 		else
@@ -402,10 +425,11 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 //			vtkDataObject::FIELD_ASSOCIATION_POINTS);
 	//}
 }
-void Texture3DSlicerProxyImpl::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
-{
+
+//void Texture3DSlicerProxyImpl::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
+//{
 	//this->safeIndex(index)->SetBuffer(buffer);
-}
+//}
 
 /*
 ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
@@ -533,9 +557,17 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 	if(mSharedOpenGLContext && TCoords)
 	{
-		mSharedOpenGLContext->upload3DTextureCoordinates(mUid, TCoords);
-		if(mSharedOpenGLContext->hasUploadedTextureCoordinates(mUid))
-			mShaderCallback->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(mUid);
+		QString texture_coordinate_name_per_image_per_view = QString(mUid+"_%1").arg(image->getUid());
+		mSharedOpenGLContext->upload3DTextureCoordinates(texture_coordinate_name_per_image_per_view, TCoords);
+		if(mSharedOpenGLContext->hasUploadedTextureCoordinates(texture_coordinate_name_per_image_per_view))
+		{
+			ShaderCallback::ShaderItemPtr item = mShaderCallback->getShaderItem(image->getUid());
+			if(item)
+			{
+				item->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(texture_coordinate_name_per_image_per_view);
+				item->mTexture_coordinate_name_per_image_per_view = texture_coordinate_name_per_image_per_view;
+			}
+		}
 
 		/*
 	//DEBUGGING

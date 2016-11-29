@@ -222,27 +222,34 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		OpenGLHelper->VAO->Bind();
 		report_gl_error();
 
+
+		//TEXTURES - START
 		int number_to_add = mShaderItems.size();
 		for(int i=0; i< number_to_add; ++i)
 		{
-			std::string name = VS_In_Vec3_TextureCoordinate+"_0";//generateVSAttributeTextureCoordinateVectorName(i);
+
+			//TEXTURE COORDIANTES - START
+			//std::string name = generateVSAttributeTextureCoordinateVectorName(i);
+			std::string name = VS_In_Vec3_TextureCoordinate;//generateVSAttributeTextureCoordinateVectorName(i);
 
 			//Upload attribute arrays
 			//	texture coordinates (glsl: vec3)
-			vtkOpenGLBufferObjectPtr texture_coordinates = mTextureCoordinates;
+			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems.at(i)->mTextureCoordinates;
 			if(texture_coordinates)
 			{
 				//CX_LOG_DEBUG() << "1 Using texture coordinates with handle: " << mTextureCoordinates->GetHandle();
 				if(!texture_coordinates->Bind())
 					CX_LOG_WARNING() << "Could not bind texture coordinates";
 				//CX_LOG_DEBUG() << "2 Using texture coordinates with handle: " << mTextureCoordinates->GetHandle();
-				this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, name);
+				//this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, name);
+				this->addArrayToAttributeArray(OpenGLHelper->Program, texture_coordinates, name, i);
 			}
 			else
 			{
 				CX_LOG_WARNING() << "NO TEXTURE COORDINATES!";
 			}
 			report_gl_error();
+			//TEXTURE COORDIANTES - END
 
 			//Upload uniforms
 			//Note: Texture is already uploaded by SharedOpenGLContext
@@ -271,12 +278,9 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, opengl_renderwindow->GetTextureUnitForTexture(texture.Get()));
 				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, mSharedOpenGLContext->mContext->GetTextureUnitForTexture(texture.Get()));
 
-				//report_gl_error();
 				texture->Activate(); //failed ???
-				//report_gl_error();
-				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
-
-				//this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
+				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
+				this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
 
 				/*
 				mSharedOpenGLContext->makeCurrent();
@@ -288,19 +292,80 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 				*/
 				//texture->Activate();
 
-				vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mCurrentContext.Get());
-				opengl_renderwindow->ActivateTexture(texture.Get());
-				mSharedOpenGLContext->mContext->ActivateTexture(texture.Get());
-				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
+				//vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mCurrentContext.Get());
+				//opengl_renderwindow->ActivateTexture(texture.Get());
+				//mSharedOpenGLContext->mContext->ActivateTexture(texture.Get());
+				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
 			}
 			report_gl_error();
 		}
+		//TEXTURES - END
 	}
 	report_gl_error();
 	//CX_LOG_DEBUG_CHECKPOINT() << "END";
 	//mCurrentContext->Modified();
 }
 
+ShaderCallback::ShaderItemPtr ShaderCallback::getShaderItem(QString image_uid) const
+{
+	ShaderItemPtr item;
+	for(int i=0; i<mShaderItems.size(); ++i)
+	{
+		item = mShaderItems.at(i);
+		if(item->mImageUid == image_uid)
+			return item;
+	}
+	CX_LOG_ERROR() << "COULD NOT FIND THE SHADERITEM";
+	return item;
+}
+
+//TODO move to SharedOpenGLContext?
+void ShaderCallback::addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index)
+{
+	//vao->DebugOn();
+	//--------
+	//TODO extract to struct?
+	int offset = 0;
+	int vec_size = 3;
+	size_t stride = sizeof(float)*vec_size; //is this correct? was *3;
+	int elementType = GL_FLOAT; //VTK_FLOAT
+	bool normalize = false;
+
+	//CX_LOG_DEBUG() << "Adding attribute called: " << name << " to vector_index: " << vector_index;
+	//--------
+
+
+	const GLchar *namePtr = static_cast<const GLchar *>(name.c_str());
+	GLint start_of_vector_index = glGetAttribLocation(program->GetHandle(), namePtr);
+	report_gl_error();
+
+	//CX_LOG_DEBUG() << "start_of_vector_index: " << start_of_vector_index;
+
+	if(start_of_vector_index != -1)
+	{
+		GLint position_in_vector_index = start_of_vector_index + vector_index;
+		//CX_LOG_DEBUG() << "position_in_vector_index: " << position_in_vector_index;
+		buffer->Bind();
+		//report_gl_error();
+
+		glEnableVertexAttribArray(position_in_vector_index);
+		//report_gl_error();
+
+		glVertexAttribPointer(position_in_vector_index,
+		  vec_size,
+		  elementType,
+		  normalize,
+		  static_cast<GLsizei>(stride),
+		  ((char *)NULL + (offset))
+		);
+		report_gl_error();
+	}
+	else
+		CX_LOG_ERROR() << "Error setting attribute " << name << " with vector_index " << vector_index;
+
+}
+
+//TODO Remove? Does not work with in variables in glsl that are vectors.
 //TODO move to SharedOpenGLContext?
 void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name)
 {
@@ -313,7 +378,7 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 	int elementType = VTK_FLOAT;
 	bool normalize = false;
 
-	//CX_LOG_DEBUG() << "Adding attribute called: " << name;
+	CX_LOG_DEBUG() << "Adding attribute called: " << name;
 	//--------
 
 	if (!vao->AddAttributeArray(
@@ -327,7 +392,7 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 				normalize			//bool (normalize)
 				))
 	{
-		CX_LOG_ERROR() << "Error setting attribute \'" << name <<"\' in shader VAO.";
+		CX_LOG_ERROR() << "Error setting attribute " << name <<" in shader VAO.";
 	}
 	report_gl_error();
 }
@@ -335,10 +400,12 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 //TODO move to SharedOpenGLContext?
 void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int value)
 {
+	//Note: Set uniform will fail if the uniform is not present OR active (used inside the program).
 	report_gl_error();
 	//CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
-	if(!program->SetUniformi(name.c_str(), value))
-		CX_LOG_ERROR() << "Could not set uniform named \'" << name << "\'.";
+	//if(!program->SetUniformi(name.c_str(), value))
+	if(!program->SetUniform1iv(name.c_str(), 1, &value))
+		CX_LOG_ERROR() << "Could not set uniform named " << name;
 	report_gl_error();
 }
 
