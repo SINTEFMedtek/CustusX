@@ -144,6 +144,9 @@ private:
 	Transform3D calculateRotation(Vector3D dir, Vector3D vup) const;
 	Transform3D calculateTransformTo2DImageCenter() const;
 	void onPropertiesChanged();
+	bool needForToolListenerHasChanged() const;
+	void createOrDestroyToolListener();
+
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 	std::vector<Transform3D> calculateOrientations() const;

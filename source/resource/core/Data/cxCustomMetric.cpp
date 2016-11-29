@@ -64,12 +64,24 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mTextureFollowTool = false;
 }
 
-void CustomMetric::onPropertiesChanged()
+bool CustomMetric::needForToolListenerHasChanged() const
 {
+	bool toolDefinesUp = mDefineVectorUpMethod == mDefineVectorUpMethods.tool;
+	bool toolListenerDefined = mToolListener.get()!=NULL;
 
-	if (mTextureFollowTool != (mToolListener.get()!=NULL))
+	if (mTextureFollowTool != toolListenerDefined || toolDefinesUp != toolListenerDefined)
+		return true;
+	else
+		return false;
+}
+
+
+void CustomMetric::createOrDestroyToolListener()
+{
+	if (this->needForToolListenerHasChanged())
 	{
-		if (mTextureFollowTool)
+		bool toolDefinesUp = mDefineVectorUpMethod == mDefineVectorUpMethods.tool;
+		if (mTextureFollowTool || toolDefinesUp)
 		{
 			mToolListener = mSpaceProvider->createListener();
 			mToolListener->setSpace(CoordinateSystem(csTOOL_OFFSET, "active"));
@@ -81,6 +93,11 @@ void CustomMetric::onPropertiesChanged()
 			mToolListener.reset();
 		}
 	}
+}
+
+void CustomMetric::onPropertiesChanged()
+{
+	this->createOrDestroyToolListener();
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
