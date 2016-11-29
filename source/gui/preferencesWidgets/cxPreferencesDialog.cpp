@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxImage.h"
 #include "cxProfile.h"
-#include "cxTableWidget.h"
+#include "cxOperatingTableWidget.h"
 #include "cxLogicManager.h"
 #include "cxVisServices.h"
 
@@ -557,7 +557,7 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
   this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
-  this->addTab(new TableTab(services), tr("Table"));
+  this->addTab(new OperatingTableTab(services), tr("Table"));
   this->addTab(new DebugTab, tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);

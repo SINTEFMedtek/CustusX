@@ -1,5 +1,5 @@
-#ifndef CXTABLEWIDGET_H
-#define CXTABLEWIDGET_H
+#ifndef CXOPERATINGTABLEWIDGET_H
+#define CXOPERATINGTABLEWIDGET_H
 
 #include "cxPreferenceTab.h"
 #include "cxCoreServices.h"
@@ -14,12 +14,12 @@ typedef boost::shared_ptr<class Vector3DProperty> Vector3DPropertyPtr;
 /**
  * Widget for viewing and setting the OperatingTable from PatientModelService.
  */
-class cxGui_EXPORT TableWidget : public QWidget
+class cxGui_EXPORT OperatingTableWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	TableWidget(CoreServicesPtr services, QWidget* parent=NULL);
-	virtual ~TableWidget() {}
+	OperatingTableWidget(CoreServicesPtr services, QWidget* parent=NULL);
+	virtual ~OperatingTableWidget() {}
 
 	void showEvent(QShowEvent *event);
 
@@ -43,12 +43,12 @@ private:
 
 /** Wrap TableWidget in a PreferenceTab
  */
-class cxGui_EXPORT TableTab : public PreferenceTab
+class cxGui_EXPORT OperatingTableTab : public PreferenceTab
 {
 	Q_OBJECT
 
 public:
-	TableTab(CoreServicesPtr services, QWidget *parent = 0);
+	OperatingTableTab(CoreServicesPtr services, QWidget *parent = 0);
 	void init();
 
 public slots:
@@ -63,4 +63,4 @@ private slots:
 } /* namespace cx */
 
 
-#endif // CXTABLEWIDGET_H
+#endif // CXOPERATINGTABLEWIDGET_H

@@ -1,4 +1,4 @@
-#include "cxTableWidget.h"
+#include "cxOperatingTableWidget.h"
 #include <QLayout>
 #include <QLabel>
 #include "cxPatientModelService.h"
@@ -12,7 +12,7 @@
 namespace cx
 {
 
-TableWidget::TableWidget(CoreServicesPtr services, QWidget* parent) :
+OperatingTableWidget::OperatingTableWidget(CoreServicesPtr services, QWidget* parent) :
 	QWidget(parent),
 	mServices(services)
 {
@@ -20,32 +20,32 @@ TableWidget::TableWidget(CoreServicesPtr services, QWidget* parent) :
 
 	mVerticalLayout->setMargin(0);
 
-	mVerticalLayout->addWidget(new QLabel("Define table up:"));
+	mVerticalLayout->addWidget(new QLabel("Define the operating table up:"));
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	mVerticalLayout->addLayout(buttonLayout);
 
 	QPushButton* toolDefineGravityButton = new QPushButton("Tool dir is down");
-	connect(toolDefineGravityButton, &QPushButton::clicked, this, &TableWidget::onDefineDownWithTool);
+	connect(toolDefineGravityButton, &QPushButton::clicked, this, &OperatingTableWidget::onDefineDownWithTool);
 	buttonLayout->addWidget(toolDefineGravityButton);
 
 	QPushButton* definePatientAnteriorUpButton = new QPushButton("Patient Anterior Up");
-	connect(definePatientAnteriorUpButton, &QPushButton::clicked, this, &TableWidget::onDefinePatientAnteriorUp);
+	connect(definePatientAnteriorUpButton, &QPushButton::clicked, this, &OperatingTableWidget::onDefinePatientAnteriorUp);
 	buttonLayout->addWidget(definePatientAnteriorUpButton);
 
 	QPushButton* definePatientPosteriorUpButton = new QPushButton("Patient Posterior Up");
-	connect(definePatientPosteriorUpButton, &QPushButton::clicked, this, &TableWidget::onDefinePatientPosteriorUp);
+	connect(definePatientPosteriorUpButton, &QPushButton::clicked, this, &OperatingTableWidget::onDefinePatientPosteriorUp);
 	buttonLayout->addWidget(definePatientPosteriorUpButton);
 
 	QPushButton* definePatientSuperiorUpButton = new QPushButton("Patient Superior Up");
-	connect(definePatientSuperiorUpButton, &QPushButton::clicked, this, &TableWidget::onDefinePatientSuperiorUp);
+	connect(definePatientSuperiorUpButton, &QPushButton::clicked, this, &OperatingTableWidget::onDefinePatientSuperiorUp);
 	buttonLayout->addWidget(definePatientSuperiorUpButton);
 
 	mLabel = new QLabel("Table matrix");
 	mVerticalLayout->addWidget(mLabel);
 	mMatrixWidget = new Transform3DWidget(this);
 	mVerticalLayout->addWidget(mMatrixWidget);
-	connect(mMatrixWidget, &Transform3DWidget::changed, this, &TableWidget::matrixWidgetChanged);
+	connect(mMatrixWidget, &Transform3DWidget::changed, this, &OperatingTableWidget::matrixWidgetChanged);
 
 	mTableUp = Vector3DProperty::initialize("tableUp", "Up direction",
 											"The up direction",
@@ -56,10 +56,10 @@ TableWidget::TableWidget(CoreServicesPtr services, QWidget* parent) :
 	mVerticalLayout->addStretch();
 
 	connect(mServices->patient().get(), &PatientModelService::operatingTableChanged,
-			this, &TableWidget::backendChanged);
+			this, &OperatingTableWidget::backendChanged);
 }
 
-void TableWidget::showEvent(QShowEvent* event)
+void OperatingTableWidget::showEvent(QShowEvent* event)
 {
 	this->backendChanged();
 }
@@ -67,7 +67,7 @@ void TableWidget::showEvent(QShowEvent* event)
 /** Called when the moving data in the RegistrationManager has changed.
  *  Update connections.
  */
-void TableWidget::backendChanged()
+void OperatingTableWidget::backendChanged()
 {
 	mMatrixWidget->blockSignals(true);
 
@@ -83,34 +83,34 @@ void TableWidget::backendChanged()
  *  Perform registration.
  *
  */
-void TableWidget::matrixWidgetChanged()
+void OperatingTableWidget::matrixWidgetChanged()
 {
 	OperatingTable table = mServices->patient()->getOperatingTable();
 	table.rMtb = mMatrixWidget->getMatrix();
 	mServices->patient()->setOperatingTable(table);
 }
 
-void TableWidget::onDefineDownWithTool()
+void OperatingTableWidget::onDefineDownWithTool()
 {
 	Transform3D rMt = mServices->spaceProvider()->getActiveToolTipTransform(CoordinateSystem::reference(), true);
 	Vector3D toolUp = -Vector3D::UnitZ();
 	Vector3D newUp = rMt.vector(toolUp);
 	this->setNewUp(newUp);
 }
-void TableWidget::onDefinePatientAnteriorUp()
+void OperatingTableWidget::onDefinePatientAnteriorUp()
 {
 	this->setNewUp(-Vector3D::UnitY());
 }
-void TableWidget::onDefinePatientPosteriorUp()
+void OperatingTableWidget::onDefinePatientPosteriorUp()
 {
 	this->setNewUp(Vector3D::UnitY());
 }
-void TableWidget::onDefinePatientSuperiorUp()
+void OperatingTableWidget::onDefinePatientSuperiorUp()
 {
 	this->setNewUp(Vector3D::UnitZ());
 }
 
-void TableWidget::setNewUp(Vector3D newUp)
+void OperatingTableWidget::setNewUp(Vector3D newUp)
 {
 	OperatingTable table = mServices->patient()->getOperatingTable();
 
@@ -124,16 +124,16 @@ void TableWidget::setNewUp(Vector3D newUp)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-TableTab::TableTab(CoreServicesPtr services, QWidget *parent) :
+OperatingTableTab::OperatingTableTab(CoreServicesPtr services, QWidget *parent) :
 	PreferenceTab(parent),
 	mServices(services)
 {
 
 }
 
-void TableTab::init()
+void OperatingTableTab::init()
 {
-	TableWidget* tw = new TableWidget(mServices);
+	OperatingTableWidget* tw = new OperatingTableWidget(mServices);
 	mTopLayout->addWidget(tw);
 }
 
