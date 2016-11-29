@@ -86,9 +86,7 @@ public:
 
 	bool contains3DView() const;
 	void initializeActiveView(SyncedValuePtr val);
-//	void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 
-//	void setSharedOpenGLContextInViewWrappers(SharedOpenGLContextPtr sharedOpenGLContext);
 protected slots:
 //	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();

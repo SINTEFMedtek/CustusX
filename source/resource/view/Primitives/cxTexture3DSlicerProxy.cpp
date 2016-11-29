@@ -89,7 +89,8 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	//mActor->DebugOn();
 
 	mOpenGLPolyDataMapper = vtkOpenGLPolyDataMapperPtr::New();
-	//mOpenGLPolyDataMapper->DebugOn();
+//	mOpenGLPolyDataMapper->DebugOn();
+//	mOpenGLPolyDataMapper->PrintSelf(std::cout, vtkIndent(3));
 
 	mPlaneSource = vtkPlaneSourcePtr::New();
 	//mPlaneSource->DebugOn();

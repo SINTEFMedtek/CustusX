@@ -168,19 +168,6 @@ void ViewGroup::initializeActiveView(SyncedValuePtr val)
 	mActiveView = val;
 }
 
-//void ViewGroup::setSharedOpenGLContextInViewWrappers(SharedOpenGLContextPtr sharedOpenGLContext)
-//{
-//	for (unsigned i = 0; i < mViewWrappers.size(); ++i)
-//		mViewWrappers[i]->setSharedOpenGLContext(sharedOpenGLContext);
-//}
-
-//void ViewGroup::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
-//{
-//	CX_LOG_WARNING() << "ViewGroup::setSharedOpenGLContext(..) need to make sure all new viewgroupdata and viewwrappers get the sharedcontext";
-//	mViewGroupData->setSharedOpenGLContext(sharedOpenGLContext);
-//	this->setSharedOpenGLContextInViewWrappers(sharedOpenGLContext);
-//}
-
 void ViewGroup::addXml(QDomNode& dataNode)
 {
 	mViewGroupData->addXml(dataNode);

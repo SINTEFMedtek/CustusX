@@ -30,53 +30,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXRENDERWINDOWFACTORY_H
-#define CXRENDERWINDOWFACTORY_H
+#ifndef CXTESTVIEWSERVICEMOCKWITHRENDERWINDOWFACTORY_H
+#define CXTESTVIEWSERVICEMOCKWITHRENDERWINDOWFACTORY_H
 
 
-#include "cxResourceVisualizationExport.h"
+#include "cxtestresourcevisualization_export.h"
+#include "cxViewServiceNull.h"
 
-#include <map>
-#include <QString>
-#include <boost/smart_ptr.hpp>
-#include "vtkForwardDeclarations.h"
-#include "cxForwardDeclarations.h"
-#include "cxSharedContextCreatedCallback.h"
-
-namespace cx
+namespace cxtest
 {
-typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
+typedef boost::shared_ptr<class ViewServiceMockWithRenderWindowFactory> ViewServiceMocWithRenderWindowFactoryPtr;
 
-/** \brief Use to create all vtkRenderWindows, and store a single shared render window.
- *
- * Only used directly by ViewService
- *
- *  \ingroup cx_resource_view
- *  \date 2016-11-21
- *  \author Ole Vegard Solberg, SINTEF
- */
-class cxResourceVisualization_EXPORT RenderWindowFactory : public QObject
+class CXTESTRESOURCEVISUALIZATION_EXPORT ViewServiceMockWithRenderWindowFactory : public cx::ViewServiceNull
 {
-	Q_OBJECT
 public:
-    RenderWindowFactory();
-	vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
-    vtkRenderWindowPtr getSharedRenderWindow() const;
-
-	SharedOpenGLContextPtr getSharedOpenGLContext() const;
-	bool renderWindowExists(QString uid);
-
+	ViewServiceMockWithRenderWindowFactory();
+	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
+	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
+	cx::RenderWindowFactoryPtr getRenderWindowFactory() const;
 private:
-	void setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow);
-	vtkRenderWindowPtr createRenderWindow(QString uid, bool offScreenRendering);
-
-	vtkRenderWindowPtr mSharedRenderWindow;
-	std::map<QString, vtkRenderWindowPtr> mRenderWindows;
-	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
-	SharedOpenGLContextPtr mSharedOpenGLContext;
-
-	friend void SharedContextCreatedCallback::Execute(vtkObject *view, unsigned long eventId, void*cbo);
+	cx::RenderWindowFactoryPtr mRenderWindowFactory;
 };
-}//cx
+}//cxtest
 
-#endif // CXRENDERWINDOWFACTORY_H
+#endif // CXTESTVIEWSERVICEMOCKWITHRENDERWINDOWFACTORY_H

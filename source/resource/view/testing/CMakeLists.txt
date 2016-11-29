@@ -20,6 +20,8 @@ if(BUILD_TESTING)
         cxtestStream2DRep3D.cpp
         cxtestSharedOpenGLContext.cpp
         cxtestRenderWindowFactory.cpp
+        cxtestViewServiceMockWithRenderWindowFactory.h
+        cxtestViewServiceMockWithRenderWindowFactory.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

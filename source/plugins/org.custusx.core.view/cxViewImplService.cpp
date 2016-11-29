@@ -174,22 +174,6 @@ void ViewImplService::enableContextMenuForViews(bool enable)
 	viewManager()->enableContextMenuForViews(enable);
 }
 
-//void ViewImplService::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
-//{
-//	mSharedOpenGLContext = sharedOpenGLContext;
-//	viewManager()->setSharedOpenGLContext(sharedOpenGLContext);
-//	emit sharedOpenGLContextChanged();
-//}
-
-//SharedOpenGLContextPtr ViewImplService::getSharedOpenGLContext()
-//{
-//	if(!mSharedOpenGLContext)
-//		CX_LOG_WARNING() << "ViewImplService::getSharedOpenGLContext(): Got no SharedOpenGLContext yet.";
-//	else
-//		CX_LOG_DEBUG() << "ViewImplService::getSharedOpenGLContext(): Got SharedOpenGLContext";
-//	return mSharedOpenGLContext;
-//}
-
 LayoutRepositoryPtr ViewImplService::getLayoutRepository()
 {
 	return viewManager()->getLayoutRepository();
@@ -235,19 +219,5 @@ void ViewImplService::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 {
 	viewManager()->setCameraStyle(style, groupIdx);
 }
-
-/*
-vtkRenderWindowPtr ViewImplService::getRenderWindow(QString uid, bool offScreenRendering)
-{
-	return mRenderWindowFactory->getRenderWindow(uid, offScreenRendering);
-}
-*/
-
-/*
-vtkRenderWindowPtr ViewImplService::getSharedRenderWindow() const
-{
-	return mRenderWindowFactory->getSharedRenderWindow();
-}
-*/
 
 } /* namespace cx */

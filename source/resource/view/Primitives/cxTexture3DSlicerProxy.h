@@ -55,7 +55,6 @@ namespace cx
 
 typedef vtkSmartPointer<class TextureSlicePainter> TextureSlicePainterPtr;
 typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
-typedef vtkSmartPointer<class ShaderCallback> ShaderCallbackPtr;
 
 /**
  * \brief Helper class for GPU-based slicing.

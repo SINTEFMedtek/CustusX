@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxView.h"
 #include <QTime>
 #include "cxViewCollectionWidget.h"
-#include "cxViewServiceNull.h"
 
 class QGridLayout;
 class QLayout;
@@ -54,19 +53,6 @@ typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class ViewServiceMocWithRenderWindowFactory> ViewServiceMocWithRenderWindowFactoryPtr;
-
-class CXTESTRESOURCEVISUALIZATION_EXPORT ViewServiceMocWithRenderWindowFactory : public cx::ViewServiceNull
-{
-public:
-	ViewServiceMocWithRenderWindowFactory();
-	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
-	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
-	cx::RenderWindowFactoryPtr getRenderWindowFactory() const;
-private:
-	cx::RenderWindowFactoryPtr mRenderWindowFactory;
-};
-
 
 class CXTESTRESOURCEVISUALIZATION_EXPORT RenderSpeedCounter
 {

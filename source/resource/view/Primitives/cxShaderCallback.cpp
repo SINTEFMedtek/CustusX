@@ -288,10 +288,6 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 				*/
 				//texture->Activate();
 
-				vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mCurrentContext.Get());
-				opengl_renderwindow->ActivateTexture(texture.Get());
-				mSharedOpenGLContext->mContext->ActivateTexture(texture.Get());
-				this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
 			}
 			report_gl_error();
 		}

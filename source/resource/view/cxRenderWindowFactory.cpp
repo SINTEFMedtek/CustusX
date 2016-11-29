@@ -84,11 +84,9 @@ void RenderWindowFactory::setSharedRenderWindow(vtkRenderWindowPtr sharedRenderW
 	{
 		mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
 		CX_LOG_DEBUG_CHECKPOINT();
-		emit sharedOpenGLContextCreated(mSharedOpenGLContext);
 	}
 	else
 		CX_LOG_WARNING() << "RenderWindowFactory::setSharedRenderWindow(): got no opengl render window.";
-	//TODO send to ppl
 }
 
 SharedOpenGLContextPtr RenderWindowFactory::getSharedOpenGLContext() const

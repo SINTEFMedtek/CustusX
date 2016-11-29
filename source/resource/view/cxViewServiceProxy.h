@@ -74,11 +74,6 @@ public:
 	virtual void addDefaultLayout(LayoutData layoutData);
 	virtual void enableContextMenuForViews(bool enable=true);
 
-//	virtual SharedOpenGLContextPtr getSharedOpenGLContext();
-//	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
-	//virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
-	//virtual vtkRenderWindowPtr getSharedRenderWindow() const;
-
 	bool isNull();
 
 public slots:

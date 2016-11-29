@@ -49,6 +49,7 @@ typedef vtkSmartPointer<class vtkOpenGLBufferObject> vtkOpenGLBufferObjectPtr;
 
 namespace cx
 {
+typedef vtkSmartPointer<class ShaderCallback> ShaderCallbackPtr;
 
 class cxResourceVisualization_EXPORT ShaderCallback : public vtkCommand
 {

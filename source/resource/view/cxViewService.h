@@ -113,11 +113,6 @@ public:
 	virtual void addDefaultLayout(LayoutData layoutData) = 0;
 	virtual void enableContextMenuForViews(bool enable=true) = 0;
 
-//	virtual SharedOpenGLContextPtr getSharedOpenGLContext() = 0;
-//	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext) = 0;
-	//virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true) = 0;
-	//virtual vtkRenderWindowPtr getSharedRenderWindow() const = 0;
-
 	virtual bool isNull() = 0;
 	static ViewServicePtr getNullObject();
 

@@ -172,9 +172,6 @@ public:
 
 	void enableContextMenuForViews(bool enable=true);
 
-	void setSharedOpenGLContext(SharedOpenGLContextPtr context);
-//	SharedOpenGLContextPtr getSharedOpenGLContext();
-
 signals:
 	void fps(int number); ///< Emits number of frames per second
 	void activeLayoutChanged(); ///< emitted when the active layout changes
@@ -216,7 +213,6 @@ protected:
 	void autoResetCameraToSuperiorView();
 	void autoCenterToImageCenter();
 	QList<unsigned> getViewGroupsToAutoShowIn();
-	void setSharedOpenGLContextInViewGroups(SharedOpenGLContextPtr context);
 
 	LayoutRepositoryPtr mLayoutRepository;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
@@ -235,8 +231,6 @@ protected:
 	CameraStyleInteractorPtr mCameraStyleInteractor;
 	VisServicesPtr mBackend;
 	RenderWindowFactoryPtr mRenderWindowFactory;
-//	SharedOpenGLContextPtr mSharedOpenGLContext;
-	//SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 
 private:
 	ViewManager(ViewManager const&);
