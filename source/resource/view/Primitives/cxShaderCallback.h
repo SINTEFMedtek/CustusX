@@ -70,6 +70,8 @@ public:
 	{
 		QString mImageUid;
 		vtkTextureObjectPtr mTexture;
+		QString mTexture_coordinate_name_per_image_per_view;
+		vtkOpenGLBufferObjectPtr mTextureCoordinates;
 	};
 	typedef boost::shared_ptr<ShaderItem> ShaderItemPtr;
 
@@ -78,12 +80,14 @@ public:
 
 	virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
+	ShaderItemPtr getShaderItem(QString image_uid) const;
+
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	vtkRenderWindowPtr mCurrentContext;
 	std::vector<ShaderItemPtr> mShaderItems;
-	vtkOpenGLBufferObjectPtr mTextureCoordinates;
 
 private:
+	void addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index);
 	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name);
 	void addUniform(vtkShaderProgram *program, std::string name, int value);
 	void bindFSOutputVariable(vtkShaderProgram *program);

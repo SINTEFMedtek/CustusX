@@ -114,7 +114,6 @@ public:
 
 	virtual ~Texture3DSlicerProxyImpl();
 
-	//void setShaderPath(QString shaderFile);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ImagePtr> images);
 	void setSliceProxy(SliceProxyPtr slicer);
@@ -141,7 +140,7 @@ private:
 	void setColorAttributes(int i);
 	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
 
-	void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
+	//void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
 	//ShaderCallbackPtr safeIndex(int index);
 	void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);

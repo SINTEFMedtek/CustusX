@@ -176,7 +176,7 @@ public:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
 
-	void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
+	//void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 
 private slots:
 	void purgeDataNotExistingInPatientModelService();
@@ -205,7 +205,7 @@ private:
 	bool contains(QString uid) const;
 	void createSliceDefinitionProperty();
 	void insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item);
-	void upload3DTextureIfImageToSharedContext(QString uid);
+	//setSharedOpenGLContextvoid upload3DTextureIfImageToSharedContext(QString uid);
 
 	QString mUid;
 	CoreServicesPtr mServices;
@@ -217,7 +217,7 @@ private:
 	SyncedValuePtr mGlobal2DZoom;
 	StringListPropertyPtr mSliceDefinitionProperty;
 	DataPtr getData(QString uid) const;
-	SharedOpenGLContextPtr mSharedOpenGLContext;
+	//SharedOpenGLContextPtr mSharedOpenGLContext;
 
 };
 

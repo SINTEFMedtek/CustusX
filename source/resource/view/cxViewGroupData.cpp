@@ -401,10 +401,12 @@ void ViewGroupData::addDataSorted(QString uid)
 
 void ViewGroupData::insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item)
 {
-	this->upload3DTextureIfImageToSharedContext(item.first);
+	//this->upload3DTextureIfImageToSharedContext(item.first);
 	this->mData.insert(iter, item);
 }
 
+/*
+//TODO remove? maybe it is better to do this in the proxy?
 void ViewGroupData::upload3DTextureIfImageToSharedContext(QString uid)
 {
 	CX_LOG_DEBUG() << "upload3DTextureIfImageToSharedContext: " << uid;
@@ -417,6 +419,7 @@ void ViewGroupData::upload3DTextureIfImageToSharedContext(QString uid)
 			CX_LOG_ERROR() << "ViewGroupData::uploadIfImageToSharedContext: Got no shared OpenGL context";
 	}
 }
+*/
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
 {
@@ -670,10 +673,13 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	this->setOptions(options);
 }
 
+//TODO remove - not needed anymore
+/*
 void ViewGroupData::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
 {
 	mSharedOpenGLContext = sharedOpenGLContext;
 }
+*/
 
 void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)
 {

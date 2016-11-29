@@ -272,7 +272,7 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 //		glFinish();
 
 		//CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
-		texture_object->PrintSelf(std::cout, vtkIndent(4));
+		//texture_object->PrintSelf(std::cout, vtkIndent(4));
 
 		texture_object->Deactivate();
 
@@ -282,7 +282,7 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 		CX_LOG_ERROR() << "Error creating 3D texture";
 
 	//CX_LOG_DEBUG() << "Created. Handle: " << texture_object->GetHandle() << " target: " << texture_object->GetTarget() << " context: ";
-	texture_object->GetContext()->PrintSelf(std::cout, vtkIndent(9));
+	//texture_object->GetContext()->PrintSelf(std::cout, vtkIndent(9));
 
 	return texture_object;
 }
