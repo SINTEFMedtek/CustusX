@@ -246,7 +246,7 @@ Transform3D createTransformRotationBetweenVectors(Vector3D from, Vector3D to)
 	double angle = acos(dotnormal);
 
 	Transform3D retval = Transform3D::Identity();
-	retval.rotate(Eigen::AngleAxisd(angle, k));
+	retval.rotate(Eigen::AngleAxisd(angle, k.normal()));
 	return retval;
 }
 
