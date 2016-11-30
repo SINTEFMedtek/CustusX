@@ -315,6 +315,12 @@ ShaderCallback::ShaderItemPtr ShaderCallback::getShaderItem(QString image_uid) c
 	return item;
 }
 
+int ShaderCallback::getNumberOfUploadedTextures() const
+{
+	CX_LOG_DEBUG() << "Number of shaderitems" << mShaderItems.size();
+	return mShaderItems.size();
+}
+
 //TODO move to SharedOpenGLContext?
 void ShaderCallback::addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index)
 {

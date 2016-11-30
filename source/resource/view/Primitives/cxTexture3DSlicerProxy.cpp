@@ -78,6 +78,8 @@ void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context) :
 	mSharedOpenGLContext(context)
 {
+	mShaderCallback = ShaderCallbackPtr::New();
+	mShaderCallback->mSharedOpenGLContext = mSharedOpenGLContext;
 
 	//TODO is this unique enough? used for texture coordinates
 	QString unique_string = qstring_cast(reinterpret_cast<long>(this));
@@ -89,6 +91,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	//mActor->DebugOn();
 
 	mOpenGLPolyDataMapper = vtkOpenGLPolyDataMapperPtr::New();
+	mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, mShaderCallback);
 //	mOpenGLPolyDataMapper->DebugOn();
 //	mOpenGLPolyDataMapper->PrintSelf(std::cout, vtkIndent(3));
 
@@ -143,10 +146,6 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	mOpenGLPolyDataMapper->SetFragmentShaderCode(this->getFS().c_str());
 
 	mActor->SetMapper(mOpenGLPolyDataMapper);
-
-	mShaderCallback = ShaderCallbackPtr::New();
-	mShaderCallback->mSharedOpenGLContext = mSharedOpenGLContext;
-	mOpenGLPolyDataMapper->AddObserver(vtkCommand::UpdateShaderEvent, mShaderCallback);
 }
 
 
@@ -173,7 +172,7 @@ std::vector<ImagePtr> Texture3DSlicerProxyImpl::getImages()
 void Texture3DSlicerProxyImpl::setRenderWindow(vtkRenderWindowPtr window)
 {
 	mCurrentRenderWindow = window;
-	mShaderCallback->mCurrentContext = mCurrentRenderWindow;
+//	mShaderCallback->mCurrentContext = mCurrentRenderWindow;
 }
 
 /*
@@ -272,6 +271,7 @@ const std::string Texture3DSlicerProxyImpl::getVSReplacement_dec() const
 		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::Const_Int_NumberOfTextures);
+		//.arg(mShaderCallback->getNumberOfShaderItems());
 	const std::string retval = temp.toStdString();
 	return retval;
 }
@@ -340,9 +340,18 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"//vec4 value = texture(%2, %1[0]);\n"
 		"//%3 = testValue(%1[0].y);\n"
 		""
-		"vec4 test1 = texture(%2[0], %1[0]);\n"
-		"vec4 test2 = texture(%2[1], %1[1]);\n"
-		"%3 = (test1+test2)/2;\n"
+		"//vec4 test1 = texture(%2[0], %1[0]);\n"
+		"//vec4 test2 = texture(%2[1], %1[1]);\n"
+		"//%3 = (test1+test2)/2;\n"
+		""
+		"vec4 temp = vec4(0,0,0,1);\n"
+		"for(int i=0; i<number_of_textures; ++i)\n"
+		"{"
+		"	vec4 sample = texture(%2[i], %1[i]);\n"
+		"	temp = temp+sample;\n"
+		"}"
+		"%3 = temp / number_of_textures;\n"
+		""
 		"//%3 = texture(%2[1], %1[1]);\n"
 		"//%3 = texture(%2, vec3(0.68218f, 0.572872f, 0.258443f));\n"
 		"//	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
@@ -352,6 +361,7 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		.arg(ShaderCallback::FS_Uniform_3DTexture.c_str())
 		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str())
 		.arg(ShaderCallback::Const_Int_NumberOfTextures);
+		//.arg(mShaderCallback->getNumberOfShaderItems());
 	const std::string retval = temp.toStdString();
 	return retval;
 }
