@@ -66,6 +66,7 @@ TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]
 	vtkRenderWindowPtr renderWindow  = renderWindowFactory->getRenderWindow("TestWindowUid");
 	REQUIRE(renderWindow);
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 
 	renderWindow->Render();
 }

@@ -38,20 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkOpenGLRenderWindow.h>
 #include <QString>
 
-
-namespace
-{
-
-cx::SharedOpenGLContextPtr initSharedOpenGLContext(vtkRenderWindowPtr renderWindow)
-{
-	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow.Get());
-	REQUIRE(opengl_renderwindow);
-	REQUIRE(cx::SharedOpenGLContext::isValid(opengl_renderwindow));
-	cx::SharedOpenGLContextPtr sharedOpenGLContext = cx::SharedOpenGLContextPtr(new cx::SharedOpenGLContext(opengl_renderwindow));
-	return sharedOpenGLContext;
-}
-}//
-
 namespace cxtest {
 
 TEST_CASE("RenderWindowFactory init", "[opengl][resource][visualization][unit]")
@@ -64,8 +50,8 @@ TEST_CASE("RenderWindowFactory init shared render window", "[opengl][resource][v
 {
     cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
     vtkRenderWindowPtr renderWindow = renderWindowFactory->getSharedRenderWindow();
-    REQUIRE(initSharedOpenGLContext(renderWindow));
     REQUIRE(renderWindow);
+	REQUIRE(renderWindowFactory->getSharedOpenGLContext());
 }
 
 TEST_CASE("RenderWindowFactory get render window", "[opengl][resource][visualization][unit]")
@@ -80,20 +66,20 @@ TEST_CASE("RenderWindowFactory get render window", "[opengl][resource][visualiza
     REQUIRE (renderWindow1 == renderWindow1Copy);
 }
 
-//TEST_CASE("RenderWindowFactory render", "[opengl][resource][visualization][unit]")
-//{
-//	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
-//	REQUIRE(renderWindow);
-//	renderWindow->Render();
-//}
+TEST_CASE("RenderWindowFactory render", "[opengl][resource][visualization][unit]")
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	REQUIRE(renderWindow);
+	renderWindow->Render();
+}
 
 TEST_CASE("RenderWindowFactory render in render window", "[opengl][resource][visualization][unit]")
 {
     cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
     QString uid = "TestWindowUid1";
-    vtkRenderWindowPtr renderWindow1 = renderWindowFactory->getRenderWindow(uid, false);
-    REQUIRE(renderWindow1);
-    renderWindow1->Render();
+	vtkRenderWindowPtr renderWindow = renderWindowFactory->getRenderWindow(uid, false);
+	REQUIRE(renderWindow);
+	renderWindow->Render();
 }
 
 //This test requires only one OpenGL context, so it have to run by itself (run as integration)
@@ -103,14 +89,11 @@ TEST_CASE("RenderWindowFactory render a single renderWindow", "[opengl][resource
 	QString uid("cx_shared_context");
 	REQUIRE(renderWindowFactory->renderWindowExists(uid));
 	vtkRenderWindowPtr renderWindow = renderWindowFactory->getRenderWindow(uid);
-//    REQUIRE(initSharedOpenGLContext(renderWindow));
 	REQUIRE(renderWindow);
-	renderWindow->Render();
 
 	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow.Get());
 	REQUIRE(opengl_renderwindow);
 	REQUIRE(cx::SharedOpenGLContext::isValid(opengl_renderwindow));
-
 
 	vtkRenderWindowPtr sharedRenderWindow = renderWindowFactory->getSharedRenderWindow();
 	REQUIRE(sharedRenderWindow == renderWindow);
@@ -130,7 +113,6 @@ TEST_CASE("RenderWindowFactory render a single renderWindow", "[opengl][resource
 		renderWindow2->Render();
 		sharedRenderWindow->Render();
 	}
-
 }
 
 }//cxtest
