@@ -87,16 +87,16 @@ TEST_CASE("RenderWindowFactory render a single renderWindow", "[opengl][resource
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	QString uid("cx_shared_context");
 	REQUIRE(renderWindowFactory->renderWindowExists(uid));
-	vtkRenderWindowPtr renderWindow = renderWindowFactory->getRenderWindow(uid);
-	REQUIRE(renderWindow);
+	vtkRenderWindowPtr sharedRenderWindow1 = renderWindowFactory->getRenderWindow(uid);
+	REQUIRE(sharedRenderWindow1);
 
-	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow.Get());
+	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(sharedRenderWindow1.Get());
 	REQUIRE(opengl_renderwindow);
 	REQUIRE(cx::SharedOpenGLContext::isValid(opengl_renderwindow));
 
-	vtkRenderWindowPtr sharedRenderWindow = renderWindowFactory->getSharedRenderWindow();
-	CHECK(sharedRenderWindow);
-	REQUIRE(sharedRenderWindow == renderWindow);
+	vtkRenderWindowPtr sharedRenderWindow2 = renderWindowFactory->getSharedRenderWindow();
+	CHECK(sharedRenderWindow2);
+	REQUIRE(sharedRenderWindow2 == sharedRenderWindow1);
 
 	QString testUid("testUid");
 	REQUIRE_FALSE(renderWindowFactory->renderWindowExists(testUid));
@@ -111,7 +111,7 @@ TEST_CASE("RenderWindowFactory render a single renderWindow", "[opengl][resource
 	for(int i = 0; i < 10; ++i)
 	{
 		renderWindow2->Render();
-		sharedRenderWindow->Render();
+		sharedRenderWindow2->Render();
 	}
 }
 
