@@ -56,8 +56,9 @@ cx::ImagePtr createDummyImage(int number = 0)
 TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][unit]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-	REQUIRE(renderWindowFactory->getRenderWindow("TestWindowUid"));
-	REQUIRE(renderWindowFactory->getSharedOpenGLContext());
+	CHECK(renderWindowFactory->getRenderWindow("TestWindowUid"));
+	CHECK(renderWindowFactory->getSharedRenderWindow());
+	CHECK(renderWindowFactory->getSharedOpenGLContext());
 }
 
 TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]")
@@ -66,6 +67,7 @@ TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]
 	vtkRenderWindowPtr renderWindow  = renderWindowFactory->getRenderWindow("TestWindowUid");
 	REQUIRE(renderWindow);
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 
 	renderWindow->Render();
 }
