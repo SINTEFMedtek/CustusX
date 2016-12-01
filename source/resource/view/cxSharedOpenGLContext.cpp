@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkSetGet.h>
 #include <vtkFloatArray.h>
 #include <vtkPixelBufferObject.h>
+#include <vtkUnsignedCharArray.h>
 
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
@@ -89,18 +90,18 @@ SharedOpenGLContext::~SharedOpenGLContext()
 {
 }
 
-bool SharedOpenGLContext::hasUploadedTexture(QString image_uid) const
+bool SharedOpenGLContext::hasUploaded3DTexture(QString image_uid) const
 {
-	return mTextureObjects.count(image_uid);
+	return m3DTextureObjects.count(image_uid);
 }
 
-vtkTextureObjectPtr SharedOpenGLContext::getTexture(QString image_uid) const
+vtkTextureObjectPtr SharedOpenGLContext::get3DTexture(QString image_uid) const
 {
 	vtkTextureObjectPtr retval;
-	if(hasUploadedTexture(image_uid))
-		retval = mTextureObjects.at(image_uid);
+	if(hasUploaded3DTexture(image_uid))
+		retval = m3DTextureObjects.at(image_uid);
 	else
-		CX_LOG_ERROR() << "getTexture failed";
+		CX_LOG_ERROR() << "get3DTexture failed";
 	return retval;
 }
 
@@ -108,7 +109,7 @@ vtkImageDataPtr SharedOpenGLContext::downloadImageFromTextureBuffer(QString imag
 {
 	vtkPixelBufferObjectPtr pixelBuffer;
 	vtkImageDataPtr imageData = vtkImageDataPtr::New();
-	vtkTextureObjectPtr texture = this->getTexture(image_uid);
+	vtkTextureObjectPtr texture = this->get3DTexture(image_uid);
 	if(texture)
 	{
 		pixelBuffer = texture->Download();
@@ -131,6 +132,68 @@ vtkImageDataPtr SharedOpenGLContext::downloadImageFromTextureBuffer(QString imag
 		CX_LOG_ERROR() << "SharedOpenGLContext::downloadImageFromTextureBuffer failed";
 
 	return imageData;
+}
+
+vtkTextureObjectPtr SharedOpenGLContext::create1DTextureObject(unsigned int width, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const
+{
+
+	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
+//	texture_object->DebugOn();
+
+	/*
+	if(!this->makeCurrent())
+	{
+		return texture_object;
+	}
+	else
+		CX_LOG_ERROR() << "Could not make current for 1D texture";
+		*/
+
+	texture_object->SetContext(opengl_renderwindow);
+
+	if(texture_object->Create1DFromRaw(width, numComps, dataType, data))
+	{
+//		glFinish();
+		report_gl_error();
+
+		//6403 == GL_RED 0x1903
+		//6407 == GL_RGB 0x1907
+		//6408 == GL_RGBA 0x1908
+		CX_LOG_DEBUG() << "Creating 1D texture with format: "<< texture_object->GetFormat(dataType, numComps, true);
+
+		texture_object->Activate();
+		report_gl_error();
+
+		/*
+		glBindTexture(GL_TEXTURE_1D, textureId);
+		glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		report_gl_error();
+		 */
+
+		texture_object->SetWrapS(vtkTextureObject::ClampToEdge);
+		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
+		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
+		texture_object->SendParameters();
+
+
+//		glFinish();
+
+		//CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
+		//texture_object->PrintSelf(std::cout, vtkIndent(4));
+
+		texture_object->Deactivate();
+
+		report_gl_error();
+	}
+	else
+		CX_LOG_ERROR() << "Error creating 1D texture";
+
+	//CX_LOG_DEBUG() << "Created. Handle: " << texture_object->GetHandle() << " target: " << texture_object->GetTarget() << " context: ";
+	//texture_object->GetContext()->PrintSelf(std::cout, vtkIndent(9));
+
+	return texture_object;
 }
 
 bool SharedOpenGLContext::makeCurrent() const
@@ -172,7 +235,7 @@ bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 	report_gl_error();
 
 	vtkTextureObjectPtr texture_object;
-	if(!mTextureObjects.count(image->getUid()))
+	if(!m3DTextureObjects.count(image->getUid()))
 	{
 		void* data = vtkImageData->GetScalarPointer();
 		/*
@@ -182,11 +245,81 @@ bool SharedOpenGLContext::upload3DTexture(ImagePtr image)
 			std::cout << (int)((reinterpret_cast<unsigned char*>(data)[i]));
 		std::cout << std::endl;
 		*/
-		texture_object = this->createTextureObject(dims[0], dims[1], dims[2], dataType, numComps, data, mContext);
-		mTextureObjects[image->getUid()] = texture_object;
+		texture_object = this->create3DTextureObject(dims[0], dims[1], dims[2], dataType, numComps, data, mContext);
+		m3DTextureObjects[image->getUid()] = texture_object;
 		success = true;
 	}
+	else
+	{
+		CX_LOG_WARNING() << "Image already exists as a texture, it is not uploaded again. This might be an error if you have changed the images data since first upload.";
+	}
 	return success;
+}
+
+bool SharedOpenGLContext::upload1DTexture(QString imageUid, vtkUnsignedCharArrayPtr lutTable)
+{
+	bool success = false;
+	if(lutTable->GetSize() == 0)
+	{
+		CX_LOG_ERROR() << "Cannot upload en empty LUT table as a 1D texture";
+		return success;
+	}
+
+	vtkTextureObjectPtr texture_object;
+	if(!m1DTextureObjects.count(imageUid))
+	{
+		/*
+		 * 	glTexImage1D(GL_TEXTURE_1D, 0, GL_RGBA,
+				 lutSize, 0,
+				 GL_RGBA, GL_FLOAT, &(*lut.begin()));
+			report_gl_error();
+		*/
+
+		int lutSize = lutTable->GetNumberOfTuples();
+		int lutDataSize = lutSize * lutTable->GetNumberOfComponents();
+
+		//LUT table contains values between 0-255
+		//we need normalized values between 0-1
+		std::vector<float> normalizeLUT;
+		normalizeLUT.resize(lutDataSize);
+		unsigned char* ptr = lutTable->GetPointer(0);
+		for (int i = 0; i < normalizeLUT.size(); ++i)
+		{
+			normalizeLUT[i] = ((float) *ptr) / 255.0;
+			//std::cout << normalizeLUT[i] <<  " = " << ((float) *ptr)  << ", ";
+			++ptr;
+		}
+		//std::cout << std::endl;
+
+		unsigned int width = lutSize;
+		int dataType = VTK_FLOAT;
+		int numComps = lutTable->GetNumberOfComponents();
+		void *data = &(*normalizeLUT.begin());
+		CX_LOG_DEBUG() << "width: " << width << " numComps: " << numComps;
+		texture_object = this->create1DTextureObject(width, dataType, numComps, data, mContext);
+		m1DTextureObjects[imageUid] = texture_object;
+		success = true;
+	}
+	else
+	{
+		CX_LOG_WARNING() << "LUT table already exists as a texture, it is not uploaded again. This might be an error if you have changed the LUT data since first upload.";
+	}
+	return success;
+}
+
+bool SharedOpenGLContext::hasUploaded1DTexture(QString image_uid) const
+{
+	return m1DTextureObjects.count(image_uid);
+}
+
+vtkTextureObjectPtr SharedOpenGLContext::get1DTexture(QString image_uid) const
+{
+	vtkTextureObjectPtr retval;
+	if(hasUploaded1DTexture(image_uid))
+		retval = m1DTextureObjects.at(image_uid);
+	else
+		CX_LOG_ERROR() << "get1DTexture failed";
+	return retval;
 }
 
 bool SharedOpenGLContext::upload3DTextureCoordinates(QString uid, vtkFloatArrayPtr texture_coordinates)
@@ -237,7 +370,7 @@ vtkOpenGLBufferObjectPtr SharedOpenGLContext::getTextureCoordinates(QString uid)
 	return retval;
 }
 
-vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width, unsigned int height,  unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow)
+vtkTextureObjectPtr SharedOpenGLContext::create3DTextureObject(unsigned int width, unsigned int height,  unsigned int depth, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const
 {
 	vtkTextureObjectPtr texture_object = vtkTextureObjectPtr::New();
 //	texture_object->DebugOn();
@@ -287,7 +420,7 @@ vtkTextureObjectPtr SharedOpenGLContext::createTextureObject(unsigned int width,
 	return texture_object;
 }
 
-vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QString uid, int numberOfLines, int numberOfComponentsLine, const float *data)
+vtkOpenGLBufferObjectPtr SharedOpenGLContext::allocateAndUploadArrayBuffer(QString uid, int numberOfLines, int numberOfComponentsLine, const float *data) const
 {
 	if(!data)
 	{

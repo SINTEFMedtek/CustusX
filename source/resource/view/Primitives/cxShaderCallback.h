@@ -51,39 +51,63 @@ namespace cx
 {
 typedef vtkSmartPointer<class ShaderCallback> ShaderCallbackPtr;
 
+/**
+ * @brief The ShaderCallback class is used to update information sent to our
+ * custom OpenGL shaders.
+ *
+ * Definitions:
+ * VS = Vertextshader
+ * FS = Fragmentshader
+ * In = attribute (in to the VS or FS)
+ * Out = varying (out from the VS or FS)
+ * Uniform = global value across all fragments or vertices
+ * Shader - refering to our custom OpenGL vertex and fragment shaders, there is one set of shaders per renderwindow (view)
+ * Texture - there is one texture per image
+ * TextureCoordinates - there is one texture coordinate per view per image
+ * LUT - look up table, there is one LUT per image (?)
+ */
 class cxResourceVisualization_EXPORT ShaderCallback : public vtkCommand
 {
 
 public:
-	//VS = Vertextshader
-	//FS = Fragmentshader
-	//In = attribute (in VS)
-	//Out = varying (from VS)
 	static const std::string VS_In_Vec3_TextureCoordinate;
 	static const std::string VS_Out_Vec3_TextureCoordinate;
 	static const std::string FS_In_Vec3_TextureCoordinate;
 	static const std::string FS_Uniform_3DTexture;
+	static const std::string FS_Uniform_1DTexture;
+	static const std::string FS_Uniform_Window;
+	static const std::string FS_Uniform_Level;
+	static const std::string FS_Uniform_LLR;
+	static const std::string FS_Uniform_Alpha;
 	static const std::string FS_Out_Vec4_Color;
+
 	static const int Const_Int_NumberOfTextures; //TODO remove, use getShaderItemSize
 
+	/**
+	 * Conventient structure that groups relevant information for our custom OpenGL shaders on a per view basis.
+	 */
 	struct ShaderItem
 	{
-		QString mImageUid; //mTextureUid
+		QString mTextureUid;
 		vtkTextureObjectPtr mTexture;
-		QString mTexture_coordinate_name_per_image_per_view; //mTextureCoordinatesUid
+
+		QString mTextureCoordinatesUid;
 		vtkOpenGLBufferObjectPtr mTextureCoordinates;
-		//TODO implement setting and usage of these
-		//vtkTextureObjectPtr mLUT;
-		//int mLutSize; //basically: used to check if lut should be applied, also a check if it is RED or RGB(A)
-		//float mWindow;
-		//float mLevel;
-		//float mLLR; //low level reject
-		//float mAlpha;
+
+		QString mLUTUid;
+		vtkTextureObjectPtr mLUT;
+
+		int mLutSize; //basically: used to check if lut should be applied, also a check if it is RED or RGB(A)
+		float mWindow;
+		float mLevel;
+		float mLLR; //low level reject
+		float mAlpha;
 	};
 	typedef boost::shared_ptr<ShaderItem> ShaderItemPtr;
 
 	static ShaderCallback *New();
 	ShaderCallback();
+	virtual ~ShaderCallback();
 
 	virtual void Execute(vtkObject *, unsigned long eventId, void*cbo);
 
@@ -101,40 +125,40 @@ private:
 	void bindFSOutputVariable(vtkShaderProgram *program);
 
 	std::string generateVSAttributeTextureCoordinateVectorName(int index_of_vector) const;
-	std::string generateFSUniformTextureVectorName(int index_of_vector) const;
+	std::string generateFSUniform3DTextureVectorName(int index_of_vector) const;
+	std::string generateFSUniform1DTextureVectorName(int index_of_vector) const;
 	std::string getVectorNameFromName(std::string name, int index_of_vector) const;
 
 	void printDebugInfo(vtkOpenGLHelper *OpenGLHelper);
 
 	//----- DELETE???-------
 public:
-	ShaderCallback(int index);
-	virtual ~ShaderCallback();
+	//ShaderCallback(int index);
 
-	GPUImageDataBufferPtr mVolumeBuffer;
-	GPUImageLutBufferPtr mLutBuffer;
-	int mIndex;
-	float mWindow;
-	float mLevel;
-	float mLLR;
-	float mAlpha;
+	//GPUImageDataBufferPtr mVolumeBuffer;
+	//GPUImageLutBufferPtr mLutBuffer;
+	//int mIndex;
+	//float mWindow;
+	//float mLevel;
+	//float mLLR;
+	//float mAlpha;
 	//	vtkRenderer *Renderer;
 
 public:
 	//	explicit SingleVolumePainterHelper(int index);
 	//	SingleVolumePainterHelper();
 	//	~SingleVolumePainterHelper();
-	void SetBuffer(GPUImageDataBufferPtr buffer);
-	void SetBuffer(GPUImageLutBufferPtr buffer);
-	void SetColorAttribute(float window, float level, float llr,float alpha);
-	void initializeRendering();
-	void setUniformiArray(vtkOpenGLHelper *cellBO, QString name, int val);
-	void setUniformfArray(vtkOpenGLHelper *cellBO, QString name, float val);
+	//void SetBuffer(GPUImageDataBufferPtr buffer);
+	//void SetBuffer(GPUImageLutBufferPtr buffer);
+	//void SetColorAttribute(float window, float level, float llr,float alpha);
+	//void initializeRendering();
+	//void setUniformiArray(vtkOpenGLHelper *cellBO, QString name, int val);
+	//void setUniformfArray(vtkOpenGLHelper *cellBO, QString name, float val);
 	//	void eachRenderInternal(vtkSmartPointer<vtkShaderProgram2> shader);
 	//void eachRenderInternal(vtkOpenGLHelper *cellBO);
 
 private:
-	void init(int index);
+	//void init(int index);
 	//	void uploadTextureCoordinate(vtkOpenGLHelper *cellBO);
 	//----- DELETE???-------
 };

@@ -304,6 +304,7 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"in vec3 %1[number_of_textures];\n"
 		"//in vec3 %1;\n"
 		"uniform sampler3D %2[number_of_textures];\n"
+		"uniform sampler1D %5[number_of_textures];\n"
 		"//uniform sampler3D %2;\n"
 		"out vec4 %3;\n"
 		""
@@ -348,9 +349,11 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"for(int i=0; i<number_of_textures; ++i)\n"
 		"{"
 		"	vec4 sample = texture(%2[i], %1[i]);\n"
-		"	temp = temp+sample;\n"
+		"	vec4 lut = texture(%5[i], sample.r);\n"
+		"	temp = temp+lut;\n"
 		"}"
 		"%3 = temp / number_of_textures;\n"
+		""
 		""
 		"//%3 = texture(%2[1], %1[1]);\n"
 		"//%3 = texture(%2, vec3(0.68218f, 0.572872f, 0.258443f));\n"
@@ -360,8 +363,8 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
 		.arg(ShaderCallback::FS_Uniform_3DTexture.c_str())
 		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str())
-		.arg(ShaderCallback::Const_Int_NumberOfTextures);
-		//.arg(mShaderCallback->getNumberOfShaderItems());
+		.arg(ShaderCallback::Const_Int_NumberOfTextures) //.arg(mShaderCallback->getNumberOfShaderItems());
+		.arg(ShaderCallback::FS_Uniform_1DTexture.c_str());
 	const std::string retval = temp.toStdString();
 	return retval;
 }
@@ -391,23 +394,23 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		//TODO maybe we should upload the textures here instead???
 		//we have a problem with Kaisa, because it is converted and thus not added to the viewgroup which causes it not to be uploaded
 		//New Kaisa gets new uid with *_u
-		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
+		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploaded3DTexture(mImages[i]->getUid()))
 		{
 			mSharedOpenGLContext->upload3DTexture(mImages[i]);
 		}
 
-		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploadedTexture(mImages[i]->getUid()))
+		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploaded3DTexture(mImages[i]->getUid()))
 		{
 			QString imageUid = mImages[i]->getUid();
 			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
-			shaderitem->mImageUid = imageUid;
-			shaderitem->mTexture = mSharedOpenGLContext->getTexture(imageUid);
-			//QString textureCoordinateUid = mUid; //TODO
-			QString texture_coordinate_name_per_image_per_view = QString(mUid+"_%1").arg(imageUid);
-			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(texture_coordinate_name_per_image_per_view))
+			shaderitem->mTextureUid = imageUid;
+			shaderitem->mTexture = mSharedOpenGLContext->get3DTexture(imageUid);
+
+			QString textureCoordinatesUid = this->generateTextureCoordinateName(imageUid);
+			if(mSharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinatesUid))
 			{
-				shaderitem->mTexture_coordinate_name_per_image_per_view = texture_coordinate_name_per_image_per_view;
-				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(texture_coordinate_name_per_image_per_view);
+				shaderitem->mTextureCoordinatesUid = textureCoordinatesUid;
+				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
 			}
 			mShaderCallback->mShaderItems.push_back(shaderitem);
 		}
@@ -498,6 +501,13 @@ QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 	return  "texture"+qstring_cast(index);
 }
 
+QString Texture3DSlicerProxyImpl::generateTextureCoordinateName(QString imageUid)
+{
+	QString textureCoordinatesUid = QString(mUid+"_%1").arg(imageUid);
+
+	return textureCoordinatesUid;
+}
+
 void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 {
 	if (!mPolyData || !mSliceProxy)
@@ -568,15 +578,15 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 	if(mSharedOpenGLContext && TCoords)
 	{
-		QString texture_coordinate_name_per_image_per_view = QString(mUid+"_%1").arg(image->getUid());
-		mSharedOpenGLContext->upload3DTextureCoordinates(texture_coordinate_name_per_image_per_view, TCoords);
-		if(mSharedOpenGLContext->hasUploadedTextureCoordinates(texture_coordinate_name_per_image_per_view))
+		QString textureCoordinatesUid = this->generateTextureCoordinateName(image->getUid());
+		mSharedOpenGLContext->upload3DTextureCoordinates(textureCoordinatesUid, TCoords);
+		if(mSharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinatesUid))
 		{
 			ShaderCallback::ShaderItemPtr item = mShaderCallback->getShaderItem(image->getUid());
 			if(item)
 			{
-				item->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(texture_coordinate_name_per_image_per_view);
-				item->mTexture_coordinate_name_per_image_per_view = texture_coordinate_name_per_image_per_view;
+				item->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
+				item->mTextureCoordinatesUid = textureCoordinatesUid;
 			}
 		}
 
@@ -615,16 +625,33 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 {
-	/*
-	////CX_LOG_DEBUG_CHECKPOINT() << "START";
+	CX_LOG_DEBUG_CHECKPOINT() << "START";
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
-		////CX_LOG_DEBUG_CHECKPOINT();
-		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
+		ImagePtr image = mImages[i];
+		QString imageUid = image->getUid();
 
-		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getOutputLookupTable();
+		ShaderCallback::ShaderItemPtr shaderItem = mShaderCallback->getShaderItem(imageUid);
+
+		////CX_LOG_DEBUG_CHECKPOINT();
+		vtkImageDataPtr inputImage = image->getBaseVtkImageData() ;
+
+		vtkLookupTablePtr lut = image->getLookupTable2D()->getOutputLookupTable();
 		lut->GetTable()->Modified();
-		GPUImageLutBufferPtr lutBuffer = GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+		//GPUImageLutBufferPtr lutBuffer = GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
+
+		//TODO what to do if image data or lut data changes?
+		QString lutUid = imageUid; //TODO or is it per view???
+		mSharedOpenGLContext->upload1DTexture(lutUid, lut->GetTable());
+		if(mSharedOpenGLContext->hasUploaded1DTexture(lutUid))
+		{
+			if(shaderItem)
+			{
+				shaderItem->mLUT = mSharedOpenGLContext->get1DTexture(lutUid);
+				shaderItem->mLUTUid = lutUid;
+			}
+		}
+
 
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)
@@ -633,6 +660,7 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 			//this->SetLutBuffer(i, lutBuffer);
 		}
 
+		//Generate window, level, llr, alpha
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
 		double imin = lut->GetRange()[0];
 		double imax = lut->GetRange()[1];
@@ -641,18 +669,23 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
 		float level = (float) imin/scalarTypeMax + window/2;
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
+
+		shaderItem->mWindow = window;
+		shaderItem->mLLR = llr;
+		shaderItem->mLevel = level;
+		shaderItem->mAlpha = alpha;
+
 		////CX_LOG_DEBUG_CHECKPOINT();
 //		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();
-	////CX_LOG_DEBUG_CHECKPOINT() << "END";
-	*/
+	CX_LOG_DEBUG_CHECKPOINT() << "END";
 }
 
-void Texture3DSlicerProxyImpl::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
-{
+//void Texture3DSlicerProxyImpl::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)
+//{
 //	this->safeIndex(index)->SetBuffer(buffer);
-}
+//}
 
 void Texture3DSlicerProxyImpl::transformChangedSlot()
 {

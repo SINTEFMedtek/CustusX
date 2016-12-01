@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 typedef vtkSmartPointer<class vtkTextureObject> vtkTextureObjectPtr;
 typedef vtkSmartPointer<class vtkOpenGLBufferObject> vtkOpenGLBufferObjectPtr;
 typedef vtkSmartPointer<class vtkPixelBufferObject> vtkPixelBufferObjectPtr;
+typedef vtkSmartPointer<class vtkOpenGLRenderWindow> vtkOpenGLRenderWindowPtr;
 
 namespace cx
 {
@@ -78,9 +79,13 @@ public:
 	bool makeCurrent() const;
 
 	//Textures are per image
-	bool upload3DTexture(ImagePtr image);
-	bool hasUploadedTexture(QString image_uid) const;
-	vtkTextureObjectPtr getTexture(QString image_uid) const;
+	bool upload3DTexture(ImagePtr image); //TODO upload image as 3D texture
+	bool hasUploaded3DTexture(QString image_uid) const;
+	vtkTextureObjectPtr get3DTexture(QString image_uid) const;
+
+	bool upload1DTexture(QString imageUid, vtkUnsignedCharArrayPtr lutTable); //TODO upload lut as 1D texture
+	bool hasUploaded1DTexture(QString image_uid) const;
+	vtkTextureObjectPtr get1DTexture(QString image_uid) const;
 
 	//Texture coordinates are per view
 	bool upload3DTextureCoordinates(QString uid, vtkFloatArrayPtr texture_coordinates);
@@ -92,10 +97,12 @@ public:
 	vtkOpenGLRenderWindowPtr mContext;
 
 private:
-	vtkTextureObjectPtr createTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkSmartPointer<class vtkOpenGLRenderWindow> opengl_renderwindow);
-	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data);
+	vtkTextureObjectPtr create1DTextureObject(unsigned int width, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
+	vtkTextureObjectPtr create3DTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
+	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data) const;
 
-	std::map<QString, vtkTextureObjectPtr > mTextureObjects;
+	std::map<QString, vtkTextureObjectPtr > m1DTextureObjects;
+	std::map<QString, vtkTextureObjectPtr > m3DTextureObjects;
 	std::map<QString, vtkOpenGLBufferObjectPtr > mTextureCoordinateBuffers;
 
 	SharedOpenGLContext(); //not implemented

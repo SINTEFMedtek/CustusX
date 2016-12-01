@@ -57,8 +57,14 @@ const std::string ShaderCallback::VS_In_Vec3_TextureCoordinate = "cx_vs_in_textu
 const std::string ShaderCallback::VS_Out_Vec3_TextureCoordinate = "cx_vs_out_texture_coordinates";
 const std::string ShaderCallback::FS_In_Vec3_TextureCoordinate = "cx_fs_in_texture_coordinates";
 const std::string ShaderCallback::FS_Uniform_3DTexture = "cx_fs_uniform_3Dtexture";
+const std::string ShaderCallback::FS_Uniform_1DTexture = "cx_fs_uniform_1Dtexture";
+const std::string ShaderCallback::FS_Uniform_Window = "cx_fs_uniform_window";
+const std::string ShaderCallback::FS_Uniform_Level = "cx_fs_uniform_level";
+const std::string ShaderCallback::FS_Uniform_LLR = "cx_fs_uniform_llr";
+const std::string ShaderCallback::FS_Uniform_Alpha = "cx_fs_uniform_alpha";
 const std::string ShaderCallback::FS_Out_Vec4_Color = "cx_fs_out_color";
-const int ShaderCallback::Const_Int_NumberOfTextures = 4; //TODO - hva skal det stå her?	static const int FS_Const_Int_NumberOfTextures;
+
+const int ShaderCallback::Const_Int_NumberOfTextures = 1; //TODO - hva skal det stå her?	static const int FS_Const_Int_NumberOfTextures;
 
 /*ShaderCallback::ShaderCallback(int index)
 {
@@ -86,23 +92,23 @@ ShaderCallback::~ShaderCallback()
 {
 }
 
-void ShaderCallback::SetBuffer(GPUImageDataBufferPtr buffer)
-{
-	mVolumeBuffer = buffer;
-}
+//void ShaderCallback::SetBuffer(GPUImageDataBufferPtr buffer)
+//{
+//	mVolumeBuffer = buffer;
+//}
 
-void ShaderCallback::SetBuffer(GPUImageLutBufferPtr buffer)
-{
-	mLutBuffer = buffer;
-}
+//void ShaderCallback::SetBuffer(GPUImageLutBufferPtr buffer)
+//{
+//	mLutBuffer = buffer;
+//}
 
-void ShaderCallback::SetColorAttribute(float window, float level, float llr,float alpha)
-{
-	mWindow = window;
-	mLevel = level;
-	mLLR = llr;
-	mAlpha = alpha;
-}
+//void ShaderCallback::SetColorAttribute(float window, float level, float llr,float alpha)
+//{
+//	mWindow = window;
+//	mLevel = level;
+//	mLLR = llr;
+//	mAlpha = alpha;
+//}
 
 //void ShaderCallback::initializeRendering()
 //{
@@ -223,83 +229,55 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		report_gl_error();
 
 
-		//TEXTURES - START
 		int number_to_add = mShaderItems.size();
 		for(int i=0; i< number_to_add; ++i)
 		{
 
-			//TEXTURE COORDIANTES - START
-			//std::string name = generateVSAttributeTextureCoordinateVectorName(i);
-			std::string name = VS_In_Vec3_TextureCoordinate;//generateVSAttributeTextureCoordinateVectorName(i);
-
-			//Upload attribute arrays
 			//	texture coordinates (glsl: vec3)
 			vtkOpenGLBufferObjectPtr texture_coordinates = mShaderItems.at(i)->mTextureCoordinates;
 			if(texture_coordinates)
 			{
-				//CX_LOG_DEBUG() << "1 Using texture coordinates with handle: " << mTextureCoordinates->GetHandle();
 				if(!texture_coordinates->Bind())
 					CX_LOG_WARNING() << "Could not bind texture coordinates";
-				//CX_LOG_DEBUG() << "2 Using texture coordinates with handle: " << mTextureCoordinates->GetHandle();
-				//this->addToAttributeArray(OpenGLHelper->VAO, OpenGLHelper->Program, texture_coordinates, name);
-				this->addArrayToAttributeArray(OpenGLHelper->Program, texture_coordinates, name, i);
+				this->addArrayToAttributeArray(OpenGLHelper->Program, texture_coordinates, VS_In_Vec3_TextureCoordinate, i);
 			}
 			else
 			{
 				CX_LOG_WARNING() << "NO TEXTURE COORDINATES!";
 			}
 			report_gl_error();
-			//TEXTURE COORDIANTES - END
 
-			//Upload uniforms
-			//Note: Texture is already uploaded by SharedOpenGLContext
-			//	texture pointer (glsl: sampler3D)
+			//	3D texture pointer (glsl: sampler3D)
 			vtkTextureObjectPtr texture = mShaderItems.at(i)->mTexture;
 			if(texture)
 			{
-				/*
-				texture->SetContext(opengl_renderwindow);
 				texture->Activate();
-				*/
+				this->addUniform(OpenGLHelper->Program, generateFSUniform3DTextureVectorName(i), texture->GetTextureUnit());
 
-				//GLuint tex;
-				//glGenTextures(1, &tex);
-				//glActiveTexture(texture->GetTextureUnit());
+			}
+			else
+			{
+				CX_LOG_WARNING() << "NO 3D TEXTURE!";
+			}
+			report_gl_error();
 
-				//CX_LOG_DEBUG() << "1. Handle: " << texture->GetHandle() << " target: " << texture->GetTarget() << " context: " << texture->GetContext();
+			//	1D texture pointer (glsl: sampler1D)
+			vtkTextureObjectPtr lut = mShaderItems.at(i)->mLUT;
+			if(lut)
+			{
+				lut->Activate();
+				this->addUniform(OpenGLHelper->Program, generateFSUniform1DTextureVectorName(i), lut->GetTextureUnit());
 
-				//texture->Activate();
-				//CX_LOG_DEBUG() << "2. Handle: " << texture->GetHandle() << " target: " << texture->GetTarget() << " context: " << texture->GetContext();
-				//mCurrentContext->MakeCurrent();
-				//glBindTexture(GL_TEXTURE_3D, texture->GetTextureUnit());
-
-				//target:
-				//GL_TEXTURE_3D 0x806F = 32879
-				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, opengl_renderwindow->GetTextureUnitForTexture(texture.Get()));
-				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, mSharedOpenGLContext->mContext->GetTextureUnitForTexture(texture.Get()));
-
-				texture->Activate(); //failed ???
-				//this->addUniform(OpenGLHelper->Program, FS_Uniform_3DTexture, texture->GetTextureUnit());
-				this->addUniform(OpenGLHelper->Program, generateFSUniformTextureVectorName(i), texture->GetTextureUnit());
-
-				/*
-				mSharedOpenGLContext->makeCurrent();
-				texture->Activate();
-				glActiveTexture(texture->GetTextureUnit());
-				mCurrentContext->MakeCurrent();
-				glActiveTexture(texture->GetTextureUnit());
-				glBindTexture(texture->GetTarget(), texture->GetHandle());
-				*/
-				//texture->Activate();
-
+			}
+			else
+			{
+				CX_LOG_WARNING() << "NO 1D TEXTURE!";
 			}
 			report_gl_error();
 		}
-		//TEXTURES - END
 	}
 	report_gl_error();
-	//CX_LOG_DEBUG_CHECKPOINT() << "END";
-	//mCurrentContext->Modified();
+
 }
 
 ShaderCallback::ShaderItemPtr ShaderCallback::getShaderItem(QString image_uid) const
@@ -308,7 +286,7 @@ ShaderCallback::ShaderItemPtr ShaderCallback::getShaderItem(QString image_uid) c
 	for(int i=0; i<mShaderItems.size(); ++i)
 	{
 		item = mShaderItems.at(i);
-		if(item->mImageUid == image_uid)
+		if(item->mTextureUid == image_uid)
 			return item;
 	}
 	CX_LOG_ERROR() << "COULD NOT FIND THE SHADERITEM";
@@ -404,7 +382,7 @@ void ShaderCallback::addUniform(vtkShaderProgram *program, std::string name, int
 {
 	//Note: Set uniform will fail if the uniform is not present OR active (used inside the program).
 	report_gl_error();
-	//CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
+	CX_LOG_DEBUG() << "Adding uniform called: " << name << " with value " << value;
 	//if(!program->SetUniformi(name.c_str(), value))
 	if(!program->SetUniform1iv(name.c_str(), 1, &value))
 		CX_LOG_ERROR() << "Could not set uniform named " << name;
@@ -428,9 +406,14 @@ std::string ShaderCallback::generateVSAttributeTextureCoordinateVectorName(int i
 	return getVectorNameFromName(VS_In_Vec3_TextureCoordinate, index_of_vector);
 }
 
-std::string ShaderCallback::generateFSUniformTextureVectorName(int index_of_vector) const
+std::string ShaderCallback::generateFSUniform3DTextureVectorName(int index_of_vector) const
 {
 	return getVectorNameFromName(FS_Uniform_3DTexture, index_of_vector);
+}
+
+std::string ShaderCallback::generateFSUniform1DTextureVectorName(int index_of_vector) const
+{
+	return getVectorNameFromName(FS_Uniform_1DTexture, index_of_vector);
 }
 
 std::string ShaderCallback::getVectorNameFromName(std::string name, int index_of_vector) const
