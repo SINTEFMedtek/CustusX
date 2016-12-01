@@ -25,7 +25,7 @@ OperatingTableWidget::OperatingTableWidget(CoreServicesPtr services, QWidget* pa
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	mVerticalLayout->addLayout(buttonLayout);
 
-	QPushButton* toolDefineGravityButton = new QPushButton("Tool dir is down");
+	QPushButton* toolDefineGravityButton = new QPushButton("Tool direction is down");
 	connect(toolDefineGravityButton, &QPushButton::clicked, this, &OperatingTableWidget::onDefineDownWithTool);
 	buttonLayout->addWidget(toolDefineGravityButton);
 
@@ -118,23 +118,6 @@ void OperatingTableWidget::setNewUp(Vector3D newUp)
 	table.rMtb = R * table.rMtb;
 
 	mServices->patient()->setOperatingTable(table);
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-OperatingTableTab::OperatingTableTab(CoreServicesPtr services, QWidget *parent) :
-	PreferenceTab(parent),
-	mServices(services)
-{
-
-}
-
-void OperatingTableTab::init()
-{
-	OperatingTableWidget* tw = new OperatingTableWidget(mServices);
-	mTopLayout->addWidget(tw);
 }
 
 

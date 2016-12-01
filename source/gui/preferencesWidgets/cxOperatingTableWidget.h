@@ -41,25 +41,6 @@ private:
 };
 
 
-/** Wrap TableWidget in a PreferenceTab
- */
-class cxGui_EXPORT OperatingTableTab : public PreferenceTab
-{
-	Q_OBJECT
-
-public:
-	OperatingTableTab(CoreServicesPtr services, QWidget *parent = 0);
-	void init();
-
-public slots:
-	void saveParametersSlot() {}
-
-protected:
-	CoreServicesPtr mServices;
-
-private slots:
-};
-
 } /* namespace cx */
 
 

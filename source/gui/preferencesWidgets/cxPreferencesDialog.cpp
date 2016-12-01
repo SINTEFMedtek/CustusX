@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDummyTool.h"
 #include "cxImage.h"
 #include "cxProfile.h"
-#include "cxOperatingTableWidget.h"
+#include "cxOperatingTableTab.h"
 #include "cxLogicManager.h"
 #include "cxVisServices.h"
 
