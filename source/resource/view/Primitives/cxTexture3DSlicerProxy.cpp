@@ -305,6 +305,10 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"//in vec3 %1;\n"
 		"uniform sampler3D %2[number_of_textures];\n"
 		"uniform sampler1D %5[number_of_textures];\n"
+		"uniform float %6[number_of_textures];\n"
+		"uniform float %7[number_of_textures];\n"
+		"uniform float %8[number_of_textures];\n"
+		"uniform float %9[number_of_textures];\n"
 		"//uniform sampler3D %2;\n"
 		"out vec4 %3;\n"
 		""
@@ -351,9 +355,9 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		"	vec4 sample = texture(%2[i], %1[i]);\n"
 		"	vec4 lut = texture(%5[i], sample.r);\n"
 		"	temp = temp+lut;\n"
+		"	float making_active = %6[i]+%7[i]+%8[i]+%9[i];"
 		"}"
 		"%3 = temp / number_of_textures;\n"
-		""
 		""
 		"//%3 = texture(%2[1], %1[1]);\n"
 		"//%3 = texture(%2, vec3(0.68218f, 0.572872f, 0.258443f));\n"
@@ -364,7 +368,11 @@ const std::string Texture3DSlicerProxyImpl::getFS() const
 		.arg(ShaderCallback::FS_Uniform_3DTexture.c_str())
 		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str())
 		.arg(ShaderCallback::Const_Int_NumberOfTextures) //.arg(mShaderCallback->getNumberOfShaderItems());
-		.arg(ShaderCallback::FS_Uniform_1DTexture.c_str());
+		.arg(ShaderCallback::FS_Uniform_1DTexture.c_str())
+		.arg(ShaderCallback::FS_Uniform_Window.c_str())
+		.arg(ShaderCallback::FS_Uniform_Level.c_str())
+		.arg(ShaderCallback::FS_Uniform_LLR.c_str())
+		.arg(ShaderCallback::FS_Uniform_Alpha.c_str());
 	const std::string retval = temp.toStdString();
 	return retval;
 }
@@ -625,7 +633,7 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 
 void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 {
-	CX_LOG_DEBUG_CHECKPOINT() << "START";
+	//CX_LOG_DEBUG_CHECKPOINT() << "START";
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		ImagePtr image = mImages[i];
@@ -651,7 +659,6 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 				shaderItem->mLUTUid = lutUid;
 			}
 		}
-
 
 		// no lut indicates to the fragment shader that RGBA should be used
 		if (inputImage->GetNumberOfScalarComponents()==1)
@@ -679,7 +686,7 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 //		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
 	mActor->Modified();
-	CX_LOG_DEBUG_CHECKPOINT() << "END";
+	//CX_LOG_DEBUG_CHECKPOINT() << "END";
 }
 
 //void Texture3DSlicerProxyImpl::SetLutBuffer(int index, GPUImageLutBufferPtr buffer)

@@ -121,12 +121,10 @@ public:
 private:
 	void addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index);
 	void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name);
-	void addUniform(vtkShaderProgram *program, std::string name, int value);
+	void addUniformiArray(vtkShaderProgram *program, std::string name, int value);
+	void addUniformfArray(vtkShaderProgram *program, std::string name, float value);
 	void bindFSOutputVariable(vtkShaderProgram *program);
 
-	std::string generateVSAttributeTextureCoordinateVectorName(int index_of_vector) const;
-	std::string generateFSUniform3DTextureVectorName(int index_of_vector) const;
-	std::string generateFSUniform1DTextureVectorName(int index_of_vector) const;
 	std::string getVectorNameFromName(std::string name, int index_of_vector) const;
 
 	void printDebugInfo(vtkOpenGLHelper *OpenGLHelper);
