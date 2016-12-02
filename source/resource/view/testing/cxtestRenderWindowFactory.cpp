@@ -40,20 +40,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cxtest {
 
-TEST_CASE("RenderWindowFactory init", "[opengl][resource][visualization][unit]")
+TEST_CASE("RenderWindowFactory init", "[opengl][resource][visualization][integration]")
 {
     cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
     REQUIRE(renderWindowFactory);
 }
 
-TEST_CASE("RenderWindowFactory init shared render window", "[opengl][resource][visualization][unit][integration]")
+TEST_CASE("RenderWindowFactory init shared render window", "[opengl][resource][visualization][integration]")
 {
     cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	REQUIRE(renderWindowFactory->getSharedRenderWindow());
 	REQUIRE(renderWindowFactory->getSharedOpenGLContext());
 }
 
-TEST_CASE("RenderWindowFactory get render window", "[opengl][resource][visualization][unit]")
+TEST_CASE("RenderWindowFactory get render window", "[opengl][resource][visualization][integration]")
 {
     cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
     QString uid = "TestWindowUid1";
@@ -65,14 +65,14 @@ TEST_CASE("RenderWindowFactory get render window", "[opengl][resource][visualiza
 	REQUIRE (renderWindow == renderWindowCopy);
 }
 
-TEST_CASE("RenderWindowFactory render", "[opengl][resource][visualization][unit]")
+TEST_CASE("RenderWindowFactory render", "[opengl][resource][visualization][integration]")
 {
 	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
 	REQUIRE(renderWindow);
 	renderWindow->Render();
 }
 
-TEST_CASE("RenderWindowFactory render in render window", "[opengl][resource][visualization][unit]")
+TEST_CASE("RenderWindowFactory render in render window", "[opengl][resource][visualization][integration]")
 {
     cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
     QString uid = "TestWindowUid1";
