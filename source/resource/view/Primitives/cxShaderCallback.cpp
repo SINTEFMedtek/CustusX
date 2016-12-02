@@ -64,7 +64,7 @@ const std::string ShaderCallback::FS_Uniform_LLR = "cx_fs_uniform_llr";
 const std::string ShaderCallback::FS_Uniform_Alpha = "cx_fs_uniform_alpha";
 const std::string ShaderCallback::FS_Out_Vec4_Color = "cx_fs_out_color";
 
-const int ShaderCallback::Const_Int_NumberOfTextures = 1; //TODO - hva skal det stå her?	static const int FS_Const_Int_NumberOfTextures;
+//const int ShaderCallback::Const_Int_NumberOfTextures = 1; //TODO - hva skal det stå her?	static const int FS_Const_Int_NumberOfTextures;
 
 /*ShaderCallback::ShaderCallback(int index)
 {
@@ -179,6 +179,144 @@ ShaderCallback::~ShaderCallback()
 //}
 
 
+const std::string ShaderCallback::getVSReplacement_dec() const
+{
+	std::string vtk_dec = "//VTK::PositionVC::Dec\n\n";
+
+	QString temp;
+	if(this->getNumberOfUploadedTextures() != 0)
+	{
+		temp = QString(
+					"%1"
+					""
+					"//CX: adding input and output variables for texture coordinates\n"
+					"const int number_of_textures = %4;\n"
+					"in vec3 %2[number_of_textures];\n"
+					"out vec3 %3[number_of_textures];\n"
+					)
+				.arg(vtk_dec.c_str())
+				.arg(VS_In_Vec3_TextureCoordinate.c_str())
+				.arg(VS_Out_Vec3_TextureCoordinate.c_str())
+				.arg(this->getNumberOfUploadedTextures()); //.arg(ShaderCallback::Const_Int_NumberOfTextures)
+	}
+	else
+	{
+		//If there are no textures present we do not need a fragmentshader
+		temp = vtk_dec.c_str();
+	}
+	const std::string retval = temp.toStdString();
+	return retval;
+}
+
+const std::string ShaderCallback::getVSReplacement_impl() const
+{
+	std::string vtk_impl = "//VTK::PositionVC::Impl\n";
+
+	QString temp;
+	if(this->getNumberOfUploadedTextures() != 0)
+	{
+		temp = QString(
+					"%1"
+					"%2 = %3;\n"
+					)
+				.arg(vtk_impl.c_str())
+				.arg(VS_Out_Vec3_TextureCoordinate.c_str())
+				.arg(VS_In_Vec3_TextureCoordinate.c_str());
+	}
+	else
+	{
+		temp = vtk_impl.c_str();
+	}
+	const std::string retval = temp.toStdString();
+	return retval;
+}
+
+const std::string ShaderCallback::getFS() const
+{
+	std::string fs_shader_text;
+	if(this->getNumberOfUploadedTextures() != 0)
+	{
+		std::string number_of_textures = QString::number(this->getNumberOfUploadedTextures()).toStdString();
+		fs_shader_text =
+			"//VTK::System::Dec\n"
+			"//VTK::Output::Dec\n\n"
+			""
+			"//CX: adding custom fragment shader\n"
+			"const int number_of_textures = "+number_of_textures+";\n"
+			"in vec3 "+VS_Out_Vec3_TextureCoordinate+"[number_of_textures];\n"
+			"uniform sampler3D "+FS_Uniform_3DTexture+"[number_of_textures];\n"
+			"uniform sampler1D "+FS_Uniform_1DTexture+"[number_of_textures];\n"
+			"uniform float "+FS_Uniform_Window+"[number_of_textures];\n"
+			"uniform float "+FS_Uniform_Level+"[number_of_textures];\n"
+			"uniform float "+FS_Uniform_LLR+"[number_of_textures];\n"
+			"uniform float "+FS_Uniform_Alpha+"[number_of_textures];\n"
+			"out vec4 "+FS_Out_Vec4_Color+";\n"
+			""
+			"const vec3 bounds_lo = vec3(0.0,0.0,0.0);"
+			"const vec3 bounds_hi = vec3(1.0,1.0,1.0);"
+			""
+			"bool clampMe(int texture_index)\n"
+			"{"
+			"	vec3 texture_coordinate = "+VS_Out_Vec3_TextureCoordinate+"[texture_index];\n"
+			"	return any(lessThan(texture_coordinate, bounds_lo)) || any(greaterThan(texture_coordinate, bounds_hi));\n"
+			"}"
+			""
+			"float windowLevel(float x, float window_, float level_)\n"
+			"{"
+			"	return (x-level_)/window_ + 0.5;\n"
+			"}"
+			""
+			"vec4 sampleLut(in int texture_index, in float red_color)\n"
+			"{"
+			"	return texture("+FS_Uniform_1DTexture+"[texture_index], red_color);\n"
+			"}"
+			""
+			"vec4 mergeTexture_GL_RED(in vec4 base_color,in int texture_index)\n"
+			"{"
+			"	//Ignore drawing outside texture\n"
+			"	if (clampMe(2*texture_index))\n"
+			"		return base_color;\n"
+			""
+			"	//Sampling from GL_RED 3D texture \n"
+			"	float red_value = texture("+FS_Uniform_3DTexture+"[texture_index], "+VS_Out_Vec3_TextureCoordinate+"[texture_index]).r;\n"
+			""
+			"	if(red_value < "+FS_Uniform_LLR+"[texture_index])\n"
+			"		return base_color;\n"
+			""
+			"	red_value = windowLevel(red_value, "+FS_Uniform_Window+"[texture_index], "+FS_Uniform_Level+"[texture_index]);\n"
+			"	red_value = clamp(red_value, 0.0, 1.0);\n"
+			""
+			"	vec4 color = sampleLut(texture_index, red_value);\n"
+			"	color.a = "+FS_Uniform_Alpha+"[texture_index];\n"
+			"	color =  mix(base_color, color, "+FS_Uniform_Alpha+"[texture_index]);\n"
+			""
+			"	return color;"
+			"}"
+			""
+			"vec4 mergeTexture(in vec4 base_color, in int texture_index)\n"
+			"{"
+			"	return mergeTexture_GL_RED(base_color, texture_index);\n"
+			"}"
+			""
+			"void main () {\n"
+			""
+			"	vec4 color = vec4(0,0,0,1);\n"
+			"	for(int i=0; i<number_of_textures; ++i)\n"
+			"	{"
+			"		color = mergeTexture(color, i);\n"
+			"	}"
+			"	"+FS_Out_Vec4_Color+" = color;\n"
+			"}"
+			;
+	}
+	else
+	{
+		//If there are no textures present we do not need a fragmentshader
+		fs_shader_text = "";
+	}
+	return fs_shader_text;
+}
+
 ShaderCallback *ShaderCallback::New()
 {
 	return new ShaderCallback;
@@ -215,22 +353,24 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		/*
 		if(!mContext)
 			return;
-		mContext->makeCurrent();
+			*/
+		//mCurrentContext->MakeCurrent();
 		report_gl_error();
-		*/
+
+
+		int textures_to_add = this->getNumberOfUploadedTextures();
 
 		//Bind fragmentshader output variable
 		// (glsl: vec4)
-		this->bindFSOutputVariable(OpenGLHelper->Program);
+		if(textures_to_add != 0)
+			this->bindFSOutputVariable(OpenGLHelper->Program);
 		report_gl_error();
 
 		//Bind VAO (Vertext Array Object - aka saved input to the vertex shader)
 		OpenGLHelper->VAO->Bind();
 		report_gl_error();
 
-
-		int number_to_add = mShaderItems.size();
-		for(int i=0; i< number_to_add; ++i)
+		for(int i=0; i< textures_to_add; ++i)
 		{
 			ShaderItemPtr shaderItem = mShaderItems.at(i);
 			//	texture coordinates (glsl: vec3)
@@ -300,7 +440,7 @@ ShaderCallback::ShaderItemPtr ShaderCallback::getShaderItem(QString image_uid) c
 
 int ShaderCallback::getNumberOfUploadedTextures() const
 {
-	CX_LOG_DEBUG() << "Number of shaderitems" << mShaderItems.size();
+	//CX_LOG_DEBUG() << "Number of shaderitems " << mShaderItems.size();
 	return mShaderItems.size();
 }
 

@@ -145,11 +145,6 @@ private:
 	//void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);
 
-	//TODO: move these 3 to ShaderCallback!!!
-	const std::string getVSReplacement_dec() const;
-	const std::string getVSReplacement_impl() const;
-	const std::string getFS() const;
-
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	ShaderCallbackPtr mShaderCallback;
 
@@ -176,6 +171,7 @@ private:
 //	QString replaceShaderSourceMacros(QString shaderSource);
 
 	QString generateTextureCoordinateName(QString imageUid);
+	void setShaders();
 };
 //--------------------------------------------------------------------
 

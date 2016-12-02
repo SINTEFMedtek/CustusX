@@ -81,7 +81,11 @@ public:
 	static const std::string FS_Uniform_Alpha;
 	static const std::string FS_Out_Vec4_Color;
 
-	static const int Const_Int_NumberOfTextures; //TODO remove, use getShaderItemSize
+	const std::string getVSReplacement_dec() const;
+	const std::string getVSReplacement_impl() const;
+	const std::string getFS() const;
+
+	//static const int Const_Int_NumberOfTextures; //TODO remove, use getShaderItemSize
 
 	/**
 	 * Conventient structure that groups relevant information for our custom OpenGL shaders on a per view basis.

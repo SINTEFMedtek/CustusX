@@ -81,8 +81,8 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 	cx::ImagePtr image0 = createDummyImage(0);
 	cx::ImagePtr image1 = createDummyImage(1);
 
-	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
-	REQUIRE(sharedOpenGLContext->upload3DTexture(image1));
+	REQUIRE(sharedOpenGLContext->uploadImage(image0));
+	REQUIRE(sharedOpenGLContext->uploadImage(image1));
 
 	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image0->getUid()));
 	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image1->getUid()));
@@ -95,7 +95,7 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
 
 	cx::ImagePtr image0 = createDummyImage(0);
-	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
+	REQUIRE(sharedOpenGLContext->uploadImage(image0));
 	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image0->getUid()));
 
 
