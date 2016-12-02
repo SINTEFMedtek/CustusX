@@ -20,7 +20,7 @@ OperatingTableWidget::OperatingTableWidget(CoreServicesPtr services, QWidget* pa
 
 	mVerticalLayout->setMargin(0);
 
-	mVerticalLayout->addWidget(new QLabel("Define the operating table up:"));
+	mVerticalLayout->addWidget(new QLabel("Define the operating table up direction. See the preferences help page for more information."));
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	mVerticalLayout->addLayout(buttonLayout);
@@ -41,7 +41,7 @@ OperatingTableWidget::OperatingTableWidget(CoreServicesPtr services, QWidget* pa
 	connect(definePatientSuperiorUpButton, &QPushButton::clicked, this, &OperatingTableWidget::onDefinePatientSuperiorUp);
 	buttonLayout->addWidget(definePatientSuperiorUpButton);
 
-	mLabel = new QLabel("Table matrix");
+	mLabel = new QLabel("Table transformation matrix, rMot:");
 	mVerticalLayout->addWidget(mLabel);
 	mMatrixWidget = new Transform3DWidget(this);
 	mVerticalLayout->addWidget(mMatrixWidget);
@@ -72,8 +72,7 @@ void OperatingTableWidget::backendChanged()
 	mMatrixWidget->blockSignals(true);
 
 	OperatingTable table = mServices->patient()->getOperatingTable();
-//	std::cout << "table " << table.rMtb << std::endl;
-	mMatrixWidget->setMatrix(table.rMtb);
+	mMatrixWidget->setMatrix(table.rMot);
 	mTableUp->setValue(table.getVectorUp());
 
 	mMatrixWidget->blockSignals(false);
@@ -86,7 +85,7 @@ void OperatingTableWidget::backendChanged()
 void OperatingTableWidget::matrixWidgetChanged()
 {
 	OperatingTable table = mServices->patient()->getOperatingTable();
-	table.rMtb = mMatrixWidget->getMatrix();
+	table.rMot = mMatrixWidget->getMatrix();
 	mServices->patient()->setOperatingTable(table);
 }
 
@@ -115,7 +114,7 @@ void OperatingTableWidget::setNewUp(Vector3D newUp)
 	OperatingTable table = mServices->patient()->getOperatingTable();
 
 	Transform3D R = createTransformRotationBetweenVectors(table.getVectorUp(), newUp);
-	table.rMtb = R * table.rMtb;
+	table.rMot = R * table.rMot;
 
 	mServices->patient()->setOperatingTable(table);
 }

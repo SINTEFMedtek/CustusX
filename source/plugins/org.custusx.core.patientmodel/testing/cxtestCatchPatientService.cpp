@@ -140,9 +140,9 @@ TEST_CASE("Operating table set and get", "[unit][org.custusx.core.patientmodel]"
     cx::OperatingTable ot(cx::createTransformIJC(cx::Vector3D(0,1,0),
                                              cx::Vector3D(0,0,1),
                                              cx::Vector3D(3,4,5)));
-    CHECK(!cx::similar(ot.rMtb, patientModelService->getOperatingTable().rMtb));
+	CHECK(!cx::similar(ot.rMot, patientModelService->getOperatingTable().rMot));
     patientModelService->setOperatingTable(ot);
-    CHECK(cx::similar(ot.rMtb, patientModelService->getOperatingTable().rMtb));
+	CHECK(cx::similar(ot.rMot, patientModelService->getOperatingTable().rMot));
 
     CHECK(otChangedSignal.isReceived());
 }

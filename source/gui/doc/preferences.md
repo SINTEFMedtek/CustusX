@@ -58,11 +58,24 @@ Setup tool configuration for tracking
 \addindex preferences_operating_table_widget
 Operating table {#preferences_operating_table_widget}
 ===
-Here you can define the up vector of the operating table and the how the pasient is displayed in the 3D scene.
-This setting should be used together with *Table lock* in the active view group's camera settings, which are available from the *Browser* widget.
+Here you can define the up direction of the operating table. The operating table is a concept which other functionality can use to find up or down directions in the reference space.
+It should not be necessary to do any changes here unless you know you are using some of this functionality. See also \ref coordinate_systems.
 
-You can either use the predefined Anterior, Posterior and Superior buttons, or start the tracking and point in the direction towards the earth with the active tool.
-Press the *Tool dir is down* button and the software will set the up vector related to the angle of the patient.
+You can use the predefined Anterior, Posterior and Superior buttons, which will set the table up according to the Dicom coordinate system.
+You can also start the tracking and point in the direction towards the earth with the active tool.
+Press the *Tool direction is down* button and the software will set the up vector related to the angle the patient is lying in in the reference space.
+
+The table direction can be used together with *Table lock* in the active view group's camera settings, which are available from the *Browser* widget.
+The table lock setting aligns the camera's up vector with the table's up vector. This is helpful e.g. when using tool view and you don't want any rotation around the tool axis.
+The following figure shows an example of this. The coordinate system indicated is the reference system.
+The patient was lying in an angle of about 30 degrees up from a line parallel to the ground. A tool was used to point towards the ground
+and the corresponding up vector in the reference space was set as the table's up vector. Since the Table lock is on, the camera up is pointing along the table up and the table appears to be
+horizontal down in the scene.
+
+Another use for the table direction is in the *Custom* metric, which by default uses the table up direction to define its own up direction.
+
+\image html cx_operating_table.png "The operating table with the use of Tool direction is down and Table lock"
+
 
 
 \addindex preferences_debug_widget
