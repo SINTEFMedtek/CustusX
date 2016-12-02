@@ -77,6 +77,7 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	REQUIRE(renderWindowFactory->getRenderWindow("TestWindowUid"));
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 
 	cx::ImagePtr image0 = createDummyImage(0);
 	cx::ImagePtr image1 = createDummyImage(1);
@@ -93,6 +94,7 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	vtkRenderWindowPtr renderWindow1 = renderWindowFactory->getRenderWindow("TestWindowUid");
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 
 	cx::ImagePtr image0 = createDummyImage(0);
 	REQUIRE(sharedOpenGLContext->upload3DTexture(image0));
