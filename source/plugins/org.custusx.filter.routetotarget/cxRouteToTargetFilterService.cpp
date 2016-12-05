@@ -122,10 +122,14 @@ bool RouteToTargetFilter::execute()
     mRouteToTarget.reset(new RouteToTarget());
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+    if (!mesh)
+        return false;
 
     vtkPolyDataPtr centerline_r = mesh->getTransformedPolyData(mesh->get_rMd());
 
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+    if (!targetPoint)
+        return false;
 
     Vector3D targetCoordinate_r = targetPoint->getCoordinate();
 
@@ -142,24 +146,24 @@ bool RouteToTargetFilter::postProcess()
 {
 
 	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+    if (!inputMesh)
+        return false;
 
 	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1";
 	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1";
     MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
+    outputCenterline->setVtkPolyData(mOutput);
     patientService()->insertData(outputCenterline);
 
     QString uidCenterlineExt = outputCenterline->getUid() + "_ext";
     QString nameCenterlineExt = outputCenterline->getName()+"_ext";
     MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
+    outputCenterlineExt->setVtkPolyData(mExtendedRoute);
+    outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
     patientService()->insertData(outputCenterlineExt);
 
     //note: mOutput and outputCenterline is in reference(r) space
-    outputCenterline->setVtkPolyData(mOutput);
-    outputCenterlineExt->setVtkPolyData(mExtendedRoute);
-    outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
 
-	if (!outputCenterline)
-		return false;
 
     //Meshes are expected to be in data(d) space
     outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());

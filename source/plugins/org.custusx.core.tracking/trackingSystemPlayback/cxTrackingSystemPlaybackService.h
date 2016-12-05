@@ -58,7 +58,7 @@ class org_custusx_core_tracking_EXPORT TrackingSystemPlaybackService : public Tr
 Q_OBJECT
 
 public:
-	TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base, ManualToolPtr manual);
+	TrackingSystemPlaybackService(PlaybackTimePtr controller, std::vector<TrackingSystemServicePtr> base, ManualToolPtr manual);
 	virtual ~TrackingSystemPlaybackService();
 
 	virtual QString getUid() const { return "org.custusx.core.tracking.system.playback"; }
@@ -71,7 +71,7 @@ public:
 	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 	virtual TrackerConfigurationPtr getConfiguration();
 
-	TrackingSystemServicePtr getBase() { return mBase; }
+	std::vector<TrackingSystemServicePtr> getBase() { return mBases; }
 
 private slots:
 	void onToolPositionChanged(Transform3D matrix, double timestamp);
@@ -87,7 +87,7 @@ private:
 	Tool::State mState;
 	PlaybackTimePtr mController;
 	ManualToolPtr mManual;
-	TrackingSystemServicePtr mBase;
+	std::vector<TrackingSystemServicePtr> mBases;
 };
 
 

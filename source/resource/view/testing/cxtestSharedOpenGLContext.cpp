@@ -53,7 +53,7 @@ cx::ImagePtr createDummyImage(int number = 0)
 	return image;
 }
 
-TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][unit]")
+TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][integration]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	CHECK(renderWindowFactory->getRenderWindow("TestWindowUid"));
@@ -61,7 +61,7 @@ TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][unit]")
 	CHECK(renderWindowFactory->getSharedOpenGLContext());
 }
 
-TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]")
+TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][integration]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	vtkRenderWindowPtr renderWindow  = renderWindowFactory->getRenderWindow("TestWindowUid");
@@ -72,11 +72,12 @@ TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][unit]
 	renderWindow->Render();
 }
 
-TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualization][unit]")
+TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualization][integration]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	REQUIRE(renderWindowFactory->getRenderWindow("TestWindowUid"));
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 
 	cx::ImagePtr image0 = createDummyImage(0);
 	cx::ImagePtr image1 = createDummyImage(1);
@@ -88,11 +89,12 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image1->getUid()));
 }
 
-TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualization][unit]")
+TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualization][integration]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	vtkRenderWindowPtr renderWindow1 = renderWindowFactory->getRenderWindow("TestWindowUid");
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 
 	cx::ImagePtr image0 = createDummyImage(0);
 	REQUIRE(sharedOpenGLContext->uploadImage(image0));
