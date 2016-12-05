@@ -56,8 +56,8 @@ namespace cx
 const std::string ShaderCallback::VS_In_Vec3_TextureCoordinate = "cx_vs_in_texture_coordinates";
 const std::string ShaderCallback::VS_Out_Vec3_TextureCoordinate = "cx_vs_out_texture_coordinates";
 const std::string ShaderCallback::FS_In_Vec3_TextureCoordinate = "cx_fs_in_texture_coordinates";
-const std::string ShaderCallback::FS_Uniform_3DTexture = "cx_fs_uniform_3Dtexture";
-const std::string ShaderCallback::FS_Uniform_1DTexture = "cx_fs_uniform_1Dtexture";
+const std::string ShaderCallback::FS_Uniform_3DTexture_Volume = "cx_fs_uniform_3Dtexture";
+const std::string ShaderCallback::FS_Uniform_1DTexture_LUT = "cx_fs_uniform_1Dtexture";
 const std::string ShaderCallback::FS_Uniform_Window = "cx_fs_uniform_window";
 const std::string ShaderCallback::FS_Uniform_Level = "cx_fs_uniform_level";
 const std::string ShaderCallback::FS_Uniform_LLR = "cx_fs_uniform_llr";
@@ -231,6 +231,41 @@ const std::string ShaderCallback::getVSReplacement_impl() const
 	return retval;
 }
 
+/**
+ * @brief ShaderCallback::getSampleLutImplementation generates code which will sample the LUT
+ * WITHOUT using a for loop. The OpenGL specification states that for loops are allowed with the
+ * following limitations:
+ * - one loop index (this means nested loops are not required to function according to the standard!!!)
+ * - index has type int or float
+ * - for statement must have the form:
+ *     for (type_specifier identifier = constant_expression ;
+ *          loop_index op constant_expression ;
+ *          loop_expression )
+ *       statement
+ *    where op is > >= < <= == or !=, and loop_expression is of the form
+ *       loop_index++, loop_index--, loop_index += constant_expression, loop_index -= constant_expression
+ *	 https://www.khronos.org/webgl/public-mailing-list/archives/1012/msg00063.php
+ *
+ * Also there are some limitations to texture lookup using implicit derivatives, there are conditions
+ * where behaviour is undefined.
+ *	 http://gamedev.stackexchange.com/questions/32543/glsl-if-else-statement-unexpected-behaviour
+ *
+ * @return glsl code which will sample from the lut
+ */
+std::string ShaderCallback::getSampleLutImplementation() const
+{
+	std::string lut_sampler_code;
+	for(int i=0; i<this->getNumberOfUploadedTextures(); ++i)
+	{
+		std::string j = QString::number(i).toStdString();
+		std::string code = "	if(texture_index == "+j+")\n"
+						   "		rgba_lut_values["+j+"] = texture("+FS_Uniform_1DTexture_LUT+"["+j+"], red_value);\n";
+				;
+		lut_sampler_code += code;
+	}
+	return lut_sampler_code;
+}
+
 const std::string ShaderCallback::getFS() const
 {
 	std::string fs_shader_text;
@@ -244,8 +279,8 @@ const std::string ShaderCallback::getFS() const
 			"//CX: adding custom fragment shader\n"
 			"const int number_of_textures = "+number_of_textures+";\n"
 			"in vec3 "+VS_Out_Vec3_TextureCoordinate+"[number_of_textures];\n"
-			"uniform sampler3D "+FS_Uniform_3DTexture+"[number_of_textures];\n"
-			"uniform sampler1D "+FS_Uniform_1DTexture+"[number_of_textures];\n"
+			"uniform sampler3D "+FS_Uniform_3DTexture_Volume+"[number_of_textures];\n"
+			"uniform sampler1D "+FS_Uniform_1DTexture_LUT+"[number_of_textures];\n"
 			"uniform float "+FS_Uniform_Window+"[number_of_textures];\n"
 			"uniform float "+FS_Uniform_Level+"[number_of_textures];\n"
 			"uniform float "+FS_Uniform_LLR+"[number_of_textures];\n"
@@ -255,33 +290,42 @@ const std::string ShaderCallback::getFS() const
 			"const vec3 bounds_lo = vec3(0.0,0.0,0.0);"
 			"const vec3 bounds_hi = vec3(1.0,1.0,1.0);"
 			""
-			"bool clampMe(int texture_index)\n"
-			"{"
+			"bool textureCoordinateIsOutsideTexture(in int texture_index)\n"
+			"{\n"
 			"	vec3 texture_coordinate = "+VS_Out_Vec3_TextureCoordinate+"[texture_index];\n"
 			"	return any(lessThan(texture_coordinate, bounds_lo)) || any(greaterThan(texture_coordinate, bounds_hi));\n"
-			"}"
+			"}\n"
 			""
-			"float windowLevel(float x, float window_, float level_)\n"
-			"{"
+			"float windowLevel(in float x, in float window_, in float level_)\n"
+			"{\n"
 			"	return (x-level_)/window_ + 0.5;\n"
-			"}"
+			"}\n"
 			""
-			"vec4 sampleLut(in int texture_index, in float red_color)\n"
-			"{"
-			"	return texture("+FS_Uniform_1DTexture+"[texture_index], red_color);\n"
-			"}"
+			"vec4 sampleLut(in int texture_index, in float red_value)\n"
+			"{\n"
+			"	vec4 rgba_lut_values[number_of_textures];\n"
+			+this->getSampleLutImplementation()+
+			"	return rgba_lut_values[texture_index];\n"
+			"}\n"
 			""
 			"vec4 mergeTexture_GL_RED(in vec4 base_color,in int texture_index)\n"
-			"{"
+			"{\n"
 			"	//Ignore drawing outside texture\n"
-			"	if (clampMe(2*texture_index))\n"
+			"	bool outside = textureCoordinateIsOutsideTexture(texture_index);\n"
+			"	if(outside)\n"
+			"	{\n"
 			"		return base_color;\n"
+			"	}\n"
 			""
 			"	//Sampling from GL_RED 3D texture \n"
-			"	float red_value = texture("+FS_Uniform_3DTexture+"[texture_index], "+VS_Out_Vec3_TextureCoordinate+"[texture_index]).r;\n"
+			"	vec4 rgba_texture_value = texture("+FS_Uniform_3DTexture_Volume+"[texture_index], "+VS_Out_Vec3_TextureCoordinate+"[texture_index]);\n"
+			"	float red_value = rgba_texture_value.r;\n"
 			""
-			"	if(red_value < "+FS_Uniform_LLR+"[texture_index])\n"
+			"	float llr = "+FS_Uniform_LLR+"[texture_index];\n"
+			"	if(red_value < llr)\n"
+			"	{\n"
 			"		return base_color;\n"
+			"	}\n"
 			""
 			"	red_value = windowLevel(red_value, "+FS_Uniform_Window+"[texture_index], "+FS_Uniform_Level+"[texture_index]);\n"
 			"	red_value = clamp(red_value, 0.0, 1.0);\n"
@@ -290,21 +334,22 @@ const std::string ShaderCallback::getFS() const
 			"	color.a = "+FS_Uniform_Alpha+"[texture_index];\n"
 			"	color =  mix(base_color, color, "+FS_Uniform_Alpha+"[texture_index]);\n"
 			""
-			"	return color;"
-			"}"
+			"	return color;\n"
+			"}\n"
 			""
 			"vec4 mergeTexture(in vec4 base_color, in int texture_index)\n"
-			"{"
+			"{\n"
 			"	return mergeTexture_GL_RED(base_color, texture_index);\n"
-			"}"
+			"}\n"
 			""
-			"void main () {\n"
+			"void main ()\n"
+			"{\n"
 			""
-			"	vec4 color = vec4(0,0,0,1);\n"
-			"	for(int i=0; i<number_of_textures; ++i)\n"
-			"	{"
+			"	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);\n"
+			"	for(int i=0; i<number_of_textures; i++)\n"
+			"	{\n"
 			"		color = mergeTexture(color, i);\n"
-			"	}"
+			"	}\n"
 			"	"+FS_Out_Vec4_Color+" = color;\n"
 			"}"
 			;
@@ -392,8 +437,7 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 			if(texture)
 			{
 				texture->Activate();
-				this->addUniformiArray(OpenGLHelper->Program, getVectorNameFromName(FS_Uniform_3DTexture, i), texture->GetTextureUnit());
-
+				this->addUniformiArray(OpenGLHelper->Program, getVectorNameFromName(FS_Uniform_3DTexture_Volume, i), texture->GetTextureUnit());
 			}
 			else
 			{
@@ -406,8 +450,7 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 			if(lut)
 			{
 				lut->Activate();
-				this->addUniformiArray(OpenGLHelper->Program, getVectorNameFromName(FS_Uniform_1DTexture, i), lut->GetTextureUnit());
-
+				this->addUniformiArray(OpenGLHelper->Program, getVectorNameFromName(FS_Uniform_1DTexture_LUT, i), lut->GetTextureUnit());
 			}
 			else
 			{
@@ -422,6 +465,7 @@ void ShaderCallback::Execute(vtkObject *, unsigned long eventId, void *cbo)
 		}
 	}
 	report_gl_error();
+	//std::cout << OpenGLHelper->Program->GetFragmentShader()->GetSource() << std::endl;
 
 }
 
@@ -503,7 +547,7 @@ void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkSha
 	int elementType = VTK_FLOAT;
 	bool normalize = false;
 
-	CX_LOG_DEBUG() << "Adding attribute called: " << name;
+	//CX_LOG_DEBUG() << "Adding attribute called: " << name;
 	//--------
 
 	if (!vao->AddAttributeArray(

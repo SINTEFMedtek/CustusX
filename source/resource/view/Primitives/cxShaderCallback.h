@@ -73,8 +73,8 @@ public:
 	static const std::string VS_In_Vec3_TextureCoordinate;
 	static const std::string VS_Out_Vec3_TextureCoordinate;
 	static const std::string FS_In_Vec3_TextureCoordinate;
-	static const std::string FS_Uniform_3DTexture;
-	static const std::string FS_Uniform_1DTexture;
+	static const std::string FS_Uniform_3DTexture_Volume;
+	static const std::string FS_Uniform_1DTexture_LUT;
 	static const std::string FS_Uniform_Window;
 	static const std::string FS_Uniform_Level;
 	static const std::string FS_Uniform_LLR;
@@ -163,6 +163,7 @@ private:
 	//void init(int index);
 	//	void uploadTextureCoordinate(vtkOpenGLHelper *cellBO);
 	//----- DELETE???-------
+	std::string getSampleLutImplementation() const;
 };
 
 }//cx

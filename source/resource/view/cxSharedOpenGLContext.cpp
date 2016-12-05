@@ -230,7 +230,7 @@ bool SharedOpenGLContext::uploadLUT(QString imageUid, vtkUnsignedCharArrayPtr lu
 		int numComps = lutTable->GetNumberOfComponents();
 		void *data = &(*normalizeLUT.begin());
 		texture_object = this->create1DTextureObject(width, dataType, numComps, data, mContext);
-		CX_LOG_DEBUG() << "1D texture, handlet: " << texture_object->GetHandle() << " width: " << width << " numComps: " << numComps;
+		//CX_LOG_DEBUG() << "1D texture, handlet: " << texture_object->GetHandle() << " width: " << width << " numComps: " << numComps;
 		m1DTextureObjects[imageUid] = texture_object;
 		success = true;
 	}
@@ -379,7 +379,7 @@ vtkTextureObjectPtr SharedOpenGLContext::create1DTextureObject(unsigned int widt
 		//6403 == GL_RED 0x1903
 		//6407 == GL_RGB 0x1907
 		//6408 == GL_RGBA 0x1908
-		CX_LOG_DEBUG() << "Creating 1D texture with format: "<< texture_object->GetFormat(dataType, numComps, true);
+		//CX_LOG_DEBUG() << "Creating 1D texture with format: "<< texture_object->GetFormat(dataType, numComps, true);
 
 		texture_object->Activate();
 		report_gl_error();
@@ -390,7 +390,7 @@ vtkTextureObjectPtr SharedOpenGLContext::create1DTextureObject(unsigned int widt
 		texture_object->SendParameters();
 
 
-		CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
+		//CX_LOG_DEBUG() << "Texture unit: " << texture_object->GetTextureUnit();
 		texture_object->PrintSelf(std::cout, vtkIndent(4));
 
 		texture_object->Deactivate();
