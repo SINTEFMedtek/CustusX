@@ -60,7 +60,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDisplayTextRep.h"
 
 #include "cxManualTool.h"
-#include "cxViewManager.h"
 #include "cxTrackingService.h"
 #include "cxViewGroup.h"
 #include "cxDefinitionStrings.h"

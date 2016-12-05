@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctkPluginContext.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
-#include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxRepManager.h"
 #include "cxVisServices.h"
