@@ -47,6 +47,7 @@ typedef std::pair<QString,ctkPluginPtr> PluginData;
 
 class ctkPluginFramework;
 class ctkPluginFrameworkFactory;
+class ctkException;
 
 namespace cx
 {
@@ -124,6 +125,7 @@ private:
 	QString mSettingsSearchPaths;
 	QString mSettingsBase;
 
+	void handlePluginException(const QString& message, const ctkException &exc);
 };
 
 } /* namespace cx */

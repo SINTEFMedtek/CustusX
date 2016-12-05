@@ -150,8 +150,7 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
-	QWidget* screen = desktop->screen(desktop->screenNumber(mTopWindow));
-	QRect rect_s = screen->geometry();
+	QRect rect_s = desktop->availableGeometry(mTopWindow);
 
 	// default to 33% of the screen
 	if (size.width()==0 || size.height()==0)
@@ -165,13 +164,15 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	size = QSize(std::min<int>(size.width(), rect_s.width()*0.75),
 				 std::min<int>(size.height(), rect_s.height()*0.75));
 	// make sure all of scroll area is visible:
-    int margin = 20;
-	mTopWindow->setGeometry(QRect(QPoint(0,0),
-								  QSize(size.width()+margin, size.height()+margin)));
+	int margin = 20;
+	size = QSize(size.width()+margin, size.height()+margin);
+	mTopWindow->setGeometry(QRect(QPoint(0,0), size));
 
 	// reposition window to lower right corner:
 	QRect rect_t = mTopWindow->frameGeometry();
-	mTopWindow->move(rect_s.width()-rect_t.width(),rect_s.height()-rect_t.height());
+	mTopWindow->move(rect_s.topLeft()
+					 + QPoint(rect_s.width(), rect_s.height())
+					 - QPoint(rect_t.width(), rect_t.height()));
 
 	// set size of canvas inside widget where stuff is rendered:
 	mSecondaryViewLayoutWindow->setGeometry(rect_full);
