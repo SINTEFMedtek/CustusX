@@ -19,9 +19,8 @@ public:
 
 	std::vector<QPointer<cx::ViewCollectionWidget> > getViewCollectionWidgets() const;
 
+	QList<unsigned> getAutoShowViewGroupNumbers();
 private:
-	ViewManagerMockPtr mBaseMock;
-
-
+//	ViewManagerMockPtr mBaseMock;
 };
 }

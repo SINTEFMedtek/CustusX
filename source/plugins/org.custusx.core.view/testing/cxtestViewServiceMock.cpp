@@ -2,6 +2,10 @@
 
 #include "cxVisServices.h"
 #include "cxLogger.h"
+#include "cxSettings.h"
+#include "cxtestLayoutWidgetUsingViewWidgetsMock.h"
+#include "cxtestViewCollectionWidgetMixedMock.h"
+#include "cxRenderLoop.h"
 
 namespace cxtest
 {
@@ -10,22 +14,47 @@ ViewServiceMock::ViewServiceMock(ctkPluginContext *context) :
 	ViewImplService(context)
 {
 	cx::VisServicesPtr services = cx::VisServices::create(context);
-	mBaseMock = ViewManagerMock::create(services);
-	mBase = mBaseMock;
+//	mBaseMock = ViewManagerMock::create(services);
+//	mBase = mBaseMock;
 }
 
 ViewServiceMock::~ViewServiceMock()
 {
 }
 
-QWidget *ViewServiceMock::createLayoutWidget(QWidget *parent, int index)
+QWidget *ViewServiceMock::createLayoutWidget(QWidget* parent, int index)
 {
-	return mBaseMock->createLayoutWidget(parent, index);
+	if (index >= mLayoutWidgets.size())
+		return NULL;
+
+	if (!mLayoutWidgets[index])
+	{
+		bool optimizedViews = cx::settings()->value("optimizedViews").toBool();
+
+		if (optimizedViews)
+		{
+			mLayoutWidgets[index] = new LayoutWidgetUsingViewWidgetsMock(mRenderWindowFactory, parent);
+		}
+		else
+		{
+			mLayoutWidgets[index] = new ViewCollectionWidgetMixedMock(mRenderWindowFactory, parent);
+		}
+		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewServiceMock::layoutWidgetDestroyed);
+		mRenderLoop->addLayout(mLayoutWidgets[index]);
+
+		this->rebuildLayouts();
+	}
+	return mLayoutWidgets[index];
 }
 
 std::vector<QPointer<cx::ViewCollectionWidget> > ViewServiceMock::getViewCollectionWidgets() const
 {
-	return mBaseMock->getViewCollectionWidgets();
+	return mLayoutWidgets;
 }
 
+QList<unsigned> ViewServiceMock::getAutoShowViewGroupNumbers()
+{
+	return this->getViewGroupsToAutoShowIn();
 }
+
+}//cxtest

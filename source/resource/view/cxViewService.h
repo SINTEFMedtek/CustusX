@@ -104,7 +104,7 @@ public:
 	virtual ClippersPtr getClippers() = 0;
 	virtual InteractiveCropperPtr getCropper() = 0;
 	virtual CyclicActionLoggerPtr getRenderTimer() = 0;
-	virtual NavigationPtr getNavigation() = 0;
+	virtual NavigationPtr getNavigation(int group = 0) = 0;
 	virtual LayoutRepositoryPtr getLayoutRepository() = 0;
 	virtual CameraControlPtr getCameraControl() = 0;
 	virtual QActionGroup* getInteractorStyleActionGroup() = 0;
