@@ -48,15 +48,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 typedef boost::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
-class ViewServiceFixture : public cx::ViewServiceNull
+class ViewServiceFixture
 {
 public:
-	ViewServiceFixture() :
-		cx::ViewServiceNull()
+	ViewServiceFixture()
 	{
 		cx::DataLocations::setTestMode();
 		cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
-		cx::LogicManager::initialize(mainwindow);
+		std::cout << "Init LogicManager begin" << std::endl;
+		cx::LogicManager::initialize(mainwindow);//fails here - Before LogicManager init is finised. Fails when trying to use ViewService
+		std::cout << "Init LogicManager end" << std::endl;
+		std::cout << "LogicManager::getPluginContext()" << std::endl;
 		mServices = cx::VisServices::create(cx::logicManager()->getPluginContext());
 	}
 	~ViewServiceFixture()
@@ -74,8 +76,9 @@ public:
 };
 }// namespace
 
-TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.view][hide]")
+TEST_CASE("VisualizationPlugin: Check ViewServiceFixture", "[unit][plugins][org.custusx.core.view]")
 {
+	ViewServiceFixture fixture;
 	CHECK(true);
 }
 

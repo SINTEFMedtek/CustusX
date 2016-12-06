@@ -104,6 +104,7 @@ typedef boost::shared_ptr<class CameraStyleInteractor> CameraStyleInteractorPtr;
 
 class org_custusx_core_view_EXPORT ViewImplService : public ViewService
 {
+	Q_OBJECT
 	Q_INTERFACES(cx::ViewService)
 public:
 	ViewImplService(ctkPluginContext* context);

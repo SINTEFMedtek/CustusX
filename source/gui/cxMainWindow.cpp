@@ -90,7 +90,7 @@ MainWindow::MainWindow() :
 	mServices = VisServices::create(logicManager()->getPluginContext());
 	mLayoutInteractor.reset(new LayoutInteractor());
 
-    this->setCentralWidget(viewService()->createLayoutWidget(this, 0));
+	this->setCentralWidget(mServices->view()->createLayoutWidget(this, 0));
 
 	mActions = new MainWindowActions(mServices, this);
 
