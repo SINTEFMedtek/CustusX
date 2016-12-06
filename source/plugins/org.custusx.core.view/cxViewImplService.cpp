@@ -111,7 +111,6 @@ ViewImplService::~ViewImplService()
 //				mGlobalObliqueOrientation(false)
 void ViewImplService::init()
 {
-//	mBackend = backend;
 	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
 
 	mRenderLoop.reset(new RenderLoop());
@@ -203,7 +202,7 @@ void ViewImplService::initializeActiveView()
 NavigationPtr ViewImplService::getNavigation(int group)
 {
 	mCameraControl->refreshView(this->get3DView(group));
-	return NavigationPtr(new Navigation(mBackend, mCameraControl));
+	return NavigationPtr(new Navigation(mServices, mCameraControl));
 }
 
 QWidget *ViewImplService::getLayoutWidget(int index)
@@ -530,7 +529,7 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 
 	/*
 	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();
-	mSharedContextCreatedCallback->setViewService(mBackend->view());
+	mSharedContextCreatedCallback->setViewService(mServices->view());
 	view->getRenderWindow()->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
 	*/
 
@@ -555,7 +554,7 @@ ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData v
 {
 	if (viewData.mType == View::VIEW_2D)
 	{
-		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mBackend));
+		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mServices));
 		wrapper->initializePlane(viewData.mPlane);
 		connect(wrapper.get(), &ViewWrapper2D::pointSampled, this, &ViewImplService::pointSampled);
 		return wrapper;
@@ -563,14 +562,14 @@ ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData v
 	else if (viewData.mType == View::VIEW_3D)
 	{
 
-		ViewWrapper3DPtr wrapper(new ViewWrapper3D(viewData.mGroup + 1, view, mBackend));
+		ViewWrapper3DPtr wrapper(new ViewWrapper3D(viewData.mGroup + 1, view, mServices));
 		if (viewData.mGroup == 0)
 			mInteractiveCropper->setView(view);
 		return wrapper;
 	}
 	else if (viewData.mType == View::VIEW_REAL_TIME)
 	{
-		ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mBackend));
+		ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view, mServices));
 		return wrapper;
 	}
 	else

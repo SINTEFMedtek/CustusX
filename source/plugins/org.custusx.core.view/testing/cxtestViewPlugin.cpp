@@ -82,7 +82,6 @@ TEST_CASE("VisualizationPlugin: Check ViewServiceFixture", "[unit][plugins][org.
 	CHECK(true);
 }
 
-
 TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[unit][plugins][org.custusx.core.view]")
 {
 	cxtest::VisualizationHelper visHelper;

@@ -188,8 +188,6 @@ private:
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
-	VisServicesPtr mBackend;
-
 
 	void init();
 	void loadGlobalSettings();
