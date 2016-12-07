@@ -207,7 +207,7 @@ void ViewsFixture::applyParameters(cx::ImagePtr image, const ImageParameters *pa
 	image->getTransferFunctions3D()->setAlpha(parameters->alpha);
 }
 
-RenderTesterPtr ViewsFixture::getRenderTesterForView(int viewIndex)
+RenderTesterPtr ViewsFixture::getRenderTesterForRenderWindow(int viewIndex)
 {
 	cx::ViewPtr view = mWindow->getView(viewIndex);
 //	vtkRenderWindowPtr renderWindow = mWindow->getView(viewIndex)->getRenderWindow();
@@ -217,15 +217,15 @@ RenderTesterPtr ViewsFixture::getRenderTesterForView(int viewIndex)
 
 void ViewsFixture::dumpDebugViewToDisk(QString text, int viewIndex)
 {
-	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForView(viewIndex);
+	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForRenderWindow(viewIndex);
 //	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
 	vtkImageDataPtr output = renderTester->renderToImage();
 	renderTester->printFractionOfVoxelsAboveZero(text, output);
 }
 
-double ViewsFixture::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
+double ViewsFixture::getFractionOfBrightPixelsInRenderWindowForView(int viewIndex, int threshold, int component)
 {
-	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForView(viewIndex);
+	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForRenderWindow(viewIndex);
 	vtkImageDataPtr output = renderTester->renderToImage();
 //	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);
