@@ -79,11 +79,11 @@ public:
 	bool makeCurrent() const;
 
 	//Textures are per image
-	bool upload3DTexture(ImagePtr image); //TODO upload image as 3D texture
+	bool uploadImage(ImagePtr image); //TODO upload image as 3D texture
 	bool hasUploaded3DTexture(QString image_uid) const;
 	vtkTextureObjectPtr get3DTexture(QString image_uid) const;
 
-	bool upload1DTexture(QString imageUid, vtkUnsignedCharArrayPtr lutTable); //TODO upload lut as 1D texture
+	bool uploadLUT(QString imageUid, vtkUnsignedCharArrayPtr lutTable); //TODO upload lut as 1D texture
 	bool hasUploaded1DTexture(QString image_uid) const;
 	vtkTextureObjectPtr get1DTexture(QString image_uid) const;
 

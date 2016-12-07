@@ -75,6 +75,36 @@ void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 	mTargetSpaceIsR = true;
 }
 
+void Texture3DSlicerProxyImpl::setShaders()
+{
+	//===========
+	// Modify vertex shader declarations
+	//===========
+	mOpenGLPolyDataMapper->AddShaderReplacement(
+				vtkShader::Vertex,
+				"//VTK::PositionVC::Dec", // replace the normal block
+				true, // before the standard replacements
+				mShaderCallback->getVSReplacement_dec(),
+				false // only do it once
+				);
+
+	//===========
+	// Modify vertex shader implementations
+	//===========
+	mOpenGLPolyDataMapper->AddShaderReplacement(
+				vtkShader::Vertex,
+				"//VTK::PositionVC::Impl", // replace the normal block
+				true, // before the standard replacements
+				mShaderCallback->getVSReplacement_impl(),
+				false // only do it once
+				);
+
+	//===========
+	// Replace the fragment shader
+	//===========
+	mOpenGLPolyDataMapper->SetFragmentShaderCode(mShaderCallback->getFS().c_str());
+}
+
 Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context) :
 	mSharedOpenGLContext(context)
 {
@@ -118,32 +148,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
 	mOpenGLPolyDataMapper->SetInputData(mPolyData);
 
-	//===========
-	// Modify vertex shader declarations
-	//===========
-	mOpenGLPolyDataMapper->AddShaderReplacement(
-				vtkShader::Vertex,
-				"//VTK::PositionVC::Dec", // replace the normal block
-				true, // before the standard replacements
-				this->getVSReplacement_dec(),
-				false // only do it once
-				);
-
-	//===========
-	// Modify vertex shader implementations
-	//===========
-	mOpenGLPolyDataMapper->AddShaderReplacement(
-				vtkShader::Vertex,
-				"//VTK::PositionVC::Impl", // replace the normal block
-				true, // before the standard replacements
-				this->getVSReplacement_impl(),
-				false // only do it once
-				);
-
-	//===========
-	// Replace the fragment shader
-	//===========
-	mOpenGLPolyDataMapper->SetFragmentShaderCode(this->getFS().c_str());
+	this->setShaders();
 
 	mActor->SetMapper(mOpenGLPolyDataMapper);
 }
@@ -172,7 +177,7 @@ std::vector<ImagePtr> Texture3DSlicerProxyImpl::getImages()
 void Texture3DSlicerProxyImpl::setRenderWindow(vtkRenderWindowPtr window)
 {
 	mCurrentRenderWindow = window;
-//	mShaderCallback->mCurrentContext = mCurrentRenderWindow;
+	//mShaderCallback->mCurrentContext = mCurrentRenderWindow;
 }
 
 /*
@@ -256,130 +261,8 @@ bool Texture3DSlicerProxyImpl::isNewInputImages(std::vector<ImagePtr> images_raw
 	return true;
 }
 
-const std::string Texture3DSlicerProxyImpl::getVSReplacement_dec() const
-{
-	QString temp = QString(
-		"//VTK::PositionVC::Dec\n"
-		"\n"
-		"//CX: adding input and output variables for texture coordinates\n"
-		"const int number_of_textures = %3;\n"
-		"//attribute vec3 %1;\n"
-		"in vec3 %1[number_of_textures];\n"
-		"out vec3 %2[number_of_textures];\n"
-		"//varying vec3 %2;\n"
-		)
-		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str())
-		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
-		.arg(ShaderCallback::Const_Int_NumberOfTextures);
-		//.arg(mShaderCallback->getNumberOfShaderItems());
-	const std::string retval = temp.toStdString();
-	return retval;
-}
-
-const std::string Texture3DSlicerProxyImpl::getVSReplacement_impl() const
-{
-	QString temp = QString(
-		"//VTK::PositionVC::Impl\n"
-		"%1 = %2;\n"
-		"//%1[0] = %2[0];\n"
-		"//%1[1] = %2[1];\n"
-		"//vec3 test = vec3(%1[0].xy, %1[1].z);\n"
-		"//%1[2] = %2_0;\n"
-		"//%1[3] = %2_0;\n"
-		)
-		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
-		.arg(ShaderCallback::VS_In_Vec3_TextureCoordinate.c_str());
-	const std::string retval = temp.toStdString();
-	return retval;
-}
-
-const std::string Texture3DSlicerProxyImpl::getFS() const
-{
-	QString temp = QString(
-		"//VTK::System::Dec\n"
-		"//VTK::Output::Dec\n"
-		"\n"
-		"//CX: adding custom fragment shader\n"
-		"const int number_of_textures = %4;\n"
-		"in vec3 %1[number_of_textures];\n"
-		"//in vec3 %1;\n"
-		"uniform sampler3D %2[number_of_textures];\n"
-		"uniform sampler1D %5[number_of_textures];\n"
-		"uniform float %6[number_of_textures];\n"
-		"uniform float %7[number_of_textures];\n"
-		"uniform float %8[number_of_textures];\n"
-		"uniform float %9[number_of_textures];\n"
-		"//uniform sampler3D %2;\n"
-		"out vec4 %3;\n"
-		""
-		"vec4 testValue(float value);\n"
-		"vec4 testValue(float value)\n"
-		"{\n"
-		"	vec4 retval = vec4(0.2,0.2,0.2,1.0);\n" //dark grey
-		"	if(value > 1.0)\n"
-		"		retval = vec4(1.0,1.0,1.0,1.0);\n" //white
-		"	if(value < 1.0)\n"
-		"		retval = vec4(0.0,1.0,0.0,1.0);\n" //green
-		"	if(value < 0.5)\n"
-		"		retval = vec4(0.0,0.0,1.0,1.0);\n" //blue
-		"	if(value == 0.0)\n"
-		"		retval = vec4(1.0,0.0,0.0,1.0);\n" //red
-		"	if(value < 0.0)\n"
-		"		retval = vec4(0.8,0.8,0.8,1.0);\n" //light grey
-		"	return retval;\n"
-		"}\n"
-		""
-		""
-		"vec4 testSampler(sampler3D sampler);\n"
-		"vec4 testSampler(sampler3D sampler)\n"
-		"{"
-		"	vec4 retval = vec4(1.0,0.0,0.0,1.0);\n" //red
-		"	"
-		"	vec4 color = texture(sampler, vec3(0.5, 0.5, 0.5));\n"
-		"	retval = testValue(color.x);\n"
-		"	return retval;\n"
-		"}"
-		"void main () {\n"
-		"//%3 = testSampler(%2);\n"
-		""
-		"//vec4 value = texture(%2, %1[0]);\n"
-		"//%3 = testValue(%1[0].y);\n"
-		""
-		"//vec4 test1 = texture(%2[0], %1[0]);\n"
-		"//vec4 test2 = texture(%2[1], %1[1]);\n"
-		"//%3 = (test1+test2)/2;\n"
-		""
-		"vec4 temp = vec4(0,0,0,1);\n"
-		"for(int i=0; i<number_of_textures; ++i)\n"
-		"{"
-		"	vec4 sample = texture(%2[i], %1[i]);\n"
-		"	vec4 lut = texture(%5[i], sample.r);\n"
-		"	temp = temp+lut;\n"
-		"	float making_active = %6[i]+%7[i]+%8[i]+%9[i];"
-		"}"
-		"%3 = temp / number_of_textures;\n"
-		""
-		"//%3 = texture(%2[1], %1[1]);\n"
-		"//%3 = texture(%2, vec3(0.68218f, 0.572872f, 0.258443f));\n"
-		"//	%3 = vec4(0.5f,0.5f,0.5f,1.0f);\n"
-		"}\n"
-		)
-		.arg(ShaderCallback::VS_Out_Vec3_TextureCoordinate.c_str())
-		.arg(ShaderCallback::FS_Uniform_3DTexture.c_str())
-		.arg(ShaderCallback::FS_Out_Vec4_Color.c_str())
-		.arg(ShaderCallback::Const_Int_NumberOfTextures) //.arg(mShaderCallback->getNumberOfShaderItems());
-		.arg(ShaderCallback::FS_Uniform_1DTexture.c_str())
-		.arg(ShaderCallback::FS_Uniform_Window.c_str())
-		.arg(ShaderCallback::FS_Uniform_Level.c_str())
-		.arg(ShaderCallback::FS_Uniform_LLR.c_str())
-		.arg(ShaderCallback::FS_Uniform_Alpha.c_str());
-	const std::string retval = temp.toStdString();
-	return retval;
-}
-
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
-
 	if (!this->isNewInputImages(images_raw))
 		return;
 
@@ -404,7 +287,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		//New Kaisa gets new uid with *_u
 		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploaded3DTexture(mImages[i]->getUid()))
 		{
-			mSharedOpenGLContext->upload3DTexture(mImages[i]);
+			mSharedOpenGLContext->uploadImage(mImages[i]);
 		}
 
 		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploaded3DTexture(mImages[i]->getUid()))
@@ -446,6 +329,8 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 //			cstring_cast(this->getTCoordName(i)),
 //			vtkDataObject::FIELD_ASSOCIATION_POINTS);
 	//}
+
+	this->setShaders(); //when number of uploaded textures changes from 0 to 1 we need to set new shaders
 }
 
 //void Texture3DSlicerProxyImpl::SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer)
@@ -468,12 +353,14 @@ ShaderCallbackPtr Texture3DSlicerProxyImpl::safeIndex(int index)
 
 std::vector<ImagePtr> Texture3DSlicerProxyImpl::processImages(std::vector<ImagePtr> images_raw)
 {
+	/*
 	if(images_raw.size() > mMaxImages)
 	{
 		QString errorText = QString("Texture3DSlicerProxyImpl: GPU multislicer can't handle more than %1 images. Additional images are not shown.").arg(mMaxImages);
 		reportError(errorText);
 		images_raw.resize(mMaxImages);
 	}
+	*/
 	std::vector<ImagePtr> images(images_raw.size());
 	for (unsigned i=0; i<images.size(); ++i)
 	{
@@ -650,7 +537,7 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 
 		//TODO what to do if image data or lut data changes?
 		QString lutUid = imageUid; //TODO or is it per view???
-		mSharedOpenGLContext->upload1DTexture(lutUid, lut->GetTable());
+		mSharedOpenGLContext->uploadLUT(lutUid, lut->GetTable());
 		if(mSharedOpenGLContext->hasUploaded1DTexture(lutUid))
 		{
 			if(shaderItem)
