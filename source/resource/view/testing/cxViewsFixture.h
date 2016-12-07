@@ -100,6 +100,7 @@ private:
 	cxtest::TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
+	cx::RenderWindowFactoryPtr mFactory;
 };
 
 } // namespace cxtest

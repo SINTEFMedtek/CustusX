@@ -78,9 +78,9 @@ ViewsFixture::ViewsFixture(QString displayText)
 	// Initialize dummy toolmanager.
 	mServices->tracking()->setState(cx::Tool::tsTRACKING);
 
-	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
+	mFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 
-	mWindow.reset(new ViewsWindow(factory));//TODO: Create moc viewService with RenderWindowFactory?
+	mWindow.reset(new ViewsWindow(mFactory));//TODO: Create moc viewService with RenderWindowFactory?
 	mWindow->setDescription(displayText);
 }
 
@@ -120,8 +120,7 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::Imag
 	cx::ViewPtr view = mWindow->add2DView(r, c);
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	vtkSmartPointer<vtkOpenGLRenderWindow> opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(view->getRenderWindow().Get());
-	cx::SharedOpenGLContextPtr sharedOpenGLContext = cx::SharedOpenGLContextPtr(new cx::SharedOpenGLContext(opengl_renderwindow));
+	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
 	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
