@@ -1,6 +1,5 @@
 #include "cxtestViewServiceMock.h"
 
-#include "cxVisServices.h"
 #include "cxLogger.h"
 #include "cxSettings.h"
 #include "cxtestLayoutWidgetUsingViewWidgetsMock.h"
@@ -13,9 +12,6 @@ namespace cxtest
 ViewServiceMock::ViewServiceMock(ctkPluginContext *context) :
 	ViewImplService(context)
 {
-	cx::VisServicesPtr services = cx::VisServices::create(context);
-//	mBaseMock = ViewManagerMock::create(services);
-//	mBase = mBaseMock;
 }
 
 ViewServiceMock::~ViewServiceMock()

@@ -41,7 +41,6 @@ class QDomElement;
 namespace cx
 {
 class ViewCollectionWidget;
-//typedef boost::shared_ptr<class ViewManager> ViewManagerPtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class RenderLoop> RenderLoopPtr;
@@ -158,37 +157,15 @@ private slots:
 	void settingsChangedSlot(QString key);
 
 protected:
-//	ViewManagerPtr mBase;
-//	ViewManager* viewManager() const { return mBase.get(); }
+	void rebuildLayouts();
+	QList<unsigned> getViewGroupsToAutoShowIn();
+
 	VisServicesPtr mServices;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
 	RenderWindowFactoryPtr mRenderWindowFactory;
 	RenderLoopPtr mRenderLoop;
 
-	void rebuildLayouts();
-	QList<unsigned> getViewGroupsToAutoShowIn();
-
 private:
-	ctkPluginContext *mContext;
-	SessionStorageServicePtr mSession;
-	ClippersPtr mClippers;
-//	SharedOpenGLContextPtr mSharedOpenGLContext;
-
-	//From old ViewManager
-	LayoutRepositoryPtr mLayoutRepository;
-	QStringList mActiveLayout; ///< the active layout (type)
-	SyncedValuePtr mActiveView;
-	std::vector<ViewGroupPtr> mViewGroups;
-	CameraControlPtr mCameraControl;
-
-	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
-	SyncedValuePtr mGlobal2DZoomVal;
-
-	InteractiveCropperPtr mInteractiveCropper;
-	SlicePlanesProxyPtr mSlicePlanesProxy;
-
-	CameraStyleInteractorPtr mCameraStyleInteractor;
-
 	void init();
 	void loadGlobalSettings();
 	void saveGlobalSettings();
@@ -213,6 +190,26 @@ private:
 	void autoResetCameraToSuperiorView();
 	void autoCenterToImageCenter();
 	void centerToImageCenterInViewGroup(unsigned groupNr);
+
+	ctkPluginContext *mContext;
+	SessionStorageServicePtr mSession;
+	ClippersPtr mClippers;
+
+	//From old ViewManager
+	LayoutRepositoryPtr mLayoutRepository;
+	QStringList mActiveLayout; ///< the active layout (type)
+	SyncedValuePtr mActiveView;
+	std::vector<ViewGroupPtr> mViewGroups;
+	CameraControlPtr mCameraControl;
+
+	bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
+	SyncedValuePtr mGlobal2DZoomVal;
+
+	InteractiveCropperPtr mInteractiveCropper;
+	SlicePlanesProxyPtr mSlicePlanesProxy;
+
+	CameraStyleInteractorPtr mCameraStyleInteractor;
+
 };
 typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;
 

@@ -55,10 +55,7 @@ public:
 	{
 		cx::DataLocations::setTestMode();
 		cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
-		std::cout << "Init LogicManager begin" << std::endl;
-		cx::LogicManager::initialize(mainwindow);//fails here - Before LogicManager init is finised. Fails when trying to use ViewService
-		std::cout << "Init LogicManager end" << std::endl;
-		std::cout << "LogicManager::getPluginContext()" << std::endl;
+		cx::LogicManager::initialize(mainwindow);
 		mServices = cx::VisServices::create(cx::logicManager()->getPluginContext());
 	}
 	~ViewServiceFixture()
@@ -75,12 +72,6 @@ public:
 	cx::VisServicesPtr mServices;
 };
 }// namespace
-
-TEST_CASE("VisualizationPlugin: Check ViewServiceFixture", "[unit][plugins][org.custusx.core.view]")
-{
-	ViewServiceFixture fixture;
-	CHECK(true);
-}
 
 TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[unit][plugins][org.custusx.core.view]")
 {

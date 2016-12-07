@@ -13,7 +13,6 @@ set(PLUGIN_SRCS
     cxRenderLoop.cpp
     cxRepManager.cpp
     cxViewGroup.cpp
-#    cxViewManager.cpp
     cxViewWrapper.cpp
     cxViewWrapper2D.cpp
     cxViewWrapper3D.cpp
@@ -35,7 +34,6 @@ set(PLUGIN_MOC_SRCS
     cxRenderLoop.h
     cxRepManager.h
     cxViewGroup.h
-#    cxViewManager.h
     cxViewWrapper.h
     cxViewWrapper2D.h
     cxViewWrapper3D.h

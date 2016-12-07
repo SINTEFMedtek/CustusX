@@ -2,7 +2,6 @@
 
 #include "boost/shared_ptr.hpp"
 #include "cxViewCollectionWidget.h"
-#include "cxtestViewManagerMock.h"
 
 namespace cxtest
 {
@@ -20,7 +19,5 @@ public:
 	std::vector<QPointer<cx::ViewCollectionWidget> > getViewCollectionWidgets() const;
 
 	QList<unsigned> getAutoShowViewGroupNumbers();
-private:
-//	ViewManagerMockPtr mBaseMock;
 };
 }

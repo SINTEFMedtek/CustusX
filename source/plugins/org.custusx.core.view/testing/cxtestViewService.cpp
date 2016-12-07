@@ -104,8 +104,6 @@ TEST_CASE("ViewService: Auto show in view groups", "[unit][plugins][org.custusx.
 	cx::settings()->setValue("Automation/autoShowNewDataInViewGroup0", true);
 	cx::settings()->setValue("Automation/autoShowNewDataInViewGroup4", true);
 
-//    cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
-//    ViewManagerFixturePtr viewManager = ViewManagerFixturePtr(new ViewManagerFixture(dummyservices));
 	QList<unsigned> showInViewGroups = viewservice->getAutoShowViewGroupNumbers();
 	REQUIRE(showInViewGroups.size() == 2);
 	CHECK(showInViewGroups[0] == 0);

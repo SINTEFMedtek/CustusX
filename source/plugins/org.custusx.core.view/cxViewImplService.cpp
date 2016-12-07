@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxViewImplService.h"
 
-//#include <QActionGroup>
 #include <QAction>
 #include <ctkPluginContext.h>
 #include <vtkRenderWindow.h>
@@ -72,25 +71,12 @@ ViewImplService::ViewImplService(ctkPluginContext *context) :
 {
 	mServices = VisServices::create(context);
 	mSession = SessionStorageServiceProxy::create(mContext);
-//	mBase = ViewManager::create(services);
 	mClippers = ClippersPtr(new Clippers(mServices));
-
-//	if(!viewManager())
-//		std::cout << "ViewImplService got no viewManager" << std::endl;
-//	connect(viewManager(), SIGNAL(activeViewChanged()), this, SIGNAL(activeViewChanged()));
-//	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
 
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &ViewImplService::onSessionChanged);
 	connect(mSession.get(), &SessionStorageService::cleared, this, &ViewImplService::onSessionCleared);
 	connect(mSession.get(), &SessionStorageService::isLoading, this, &ViewImplService::onSessionLoad);
 	connect(mSession.get(), &SessionStorageService::isSaving, this, &ViewImplService::onSessionSave);
-
-//	connect(viewManager(), &ViewManager::activeViewChanged, this, &ViewService::activeViewChanged);
-//	connect(viewManager(), &ViewManager::fps, this, &ViewService::fps);
-//	connect(viewManager(), &ViewManager::activeLayoutChanged, this, &ViewService::activeLayoutChanged);
-//	connect(viewManager(), &ViewManager::renderingEnabledChanged, this, &ViewService::renderingEnabledChanged);
-//	connect(viewManager(), &ViewManager::pointSampled, this, &ViewService::pointSampled);
-//	connect(viewManager(), &ViewManager::renderFinished, this, &ViewService::renderFinished);
 
 	this->init();
 }
@@ -99,16 +85,6 @@ ViewImplService::~ViewImplService()
 {
 }
 
-
-//ViewManagerPtr ViewManager::create(VisServicesPtr backend)
-//{
-//	ViewManagerPtr retval;
-//	retval.reset(new ViewManager(backend));
-//	return retval;
-//}
-
-//ViewManager::ViewManager(VisServicesPtr backend)
-//				mGlobalObliqueOrientation(false)
 void ViewImplService::init()
 {
 	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
@@ -160,10 +136,6 @@ std::vector<ViewGroupPtr> ViewImplService::getViewGroups()
 {
 	return mViewGroups;
 }
-/*
-ViewManager::~ViewManager()
-{
-}*/
 
 void ViewImplService::enableRender(bool val)
 {
@@ -247,7 +219,6 @@ QWidget *ViewImplService::createLayoutWidget(QWidget* parent, int index)
  */
 void ViewImplService::layoutWidgetDestroyed(QObject* object)
 {
-//	ViewCollectionWidget* widget = dynamic_cast<ViewCollectionWidget*>(object);
 	for (unsigned i=0; i<mLayoutWidgets.size(); ++i)
 	{
 		if (mLayoutWidgets[i] == object)
@@ -527,12 +498,6 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 
 	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
 
-	/*
-	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();
-	mSharedContextCreatedCallback->setViewService(mServices->view());
-	view->getRenderWindow()->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
-	*/
-
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
 	//Turn off rendering in vtkRenderWindowInteractor
@@ -744,22 +709,6 @@ void ViewImplService::enableContextMenuForViews(bool enable)
 	}
 }
 
-
-/*
-ViewPtr ViewImplService::get3DView(int group, int index)
-{
-	return viewManager()->get3DView(group, index);
-}
-
-int ViewImplService::getActiveGroupId() const
-{
-	return viewManager()->getActiveViewGroup();
-}
-ViewGroupDataPtr ViewImplService::getGroup(int groupIdx) const
-{
-	return viewManager()->getViewGroup(groupIdx);
-}*/
-
 void ViewImplService::setRegistrationMode(REGISTRATION_STATUS mode)
 {
 	this->getGroup(0)->setRegistrationMode(mode);
@@ -774,91 +723,16 @@ void ViewImplService::aboutToStop()
 {
 	this->enableRender(false);
 }
-/*
-void ViewImplService::autoShowData(cx::DataPtr data)
-{
-	viewManager()->autoShowData(data);
-}
-
-void ViewImplService::enableRender(bool val)
-{
-	viewManager()->enableRender(val);
-}
-
-bool ViewImplService::renderingIsEnabled() const
-{
-	return viewManager()->renderingIsEnabled();
-}
-
-QWidget* ViewImplService::createLayoutWidget(QWidget* parent, int index)
-{
-    return viewManager()->createLayoutWidget(parent, index);
-}
-
-QWidget* ViewImplService::getLayoutWidget(int index)
-{
-    return viewManager()->getLayoutWidget(index);
-}
-
-QString ViewImplService::getActiveLayout(int widgetIndex) const
-{
-	return viewManager()->getActiveLayout(widgetIndex);
-}
-
-void ViewImplService::setActiveLayout(const QString& uid, int widgetIndex)
-{
-	viewManager()->setActiveLayout(uid, widgetIndex);
-}*/
 
 ClippersPtr ViewImplService::getClippers()
 {
 	return this->mClippers;
 }
-/*
-InteractiveCropperPtr ViewImplService::getCropper()
-{
-	return viewManager()->getCropper();
-}
-
-CyclicActionLoggerPtr ViewImplService::getRenderTimer()
-{
-	return viewManager()->getRenderTimer();
-}
-
-NavigationPtr ViewImplService::getNavigation()
-{
-	return viewManager()->getNavigation();
-}*/
 
 void ViewImplService::centerToImageCenterInActiveViewGroup()
 {
 	this->centerToImageCenterInViewGroup(this->getActiveGroupId());
 }
-/*
-void ViewImplService::addDefaultLayout(LayoutData layoutData)
-{
-	viewManager()->addDefaultLayout(layoutData);
-}
-
-void ViewImplService::enableContextMenuForViews(bool enable)
-{
-	viewManager()->enableContextMenuForViews(enable);
-}
-
-LayoutRepositoryPtr ViewImplService::getLayoutRepository()
-{
-	return viewManager()->getLayoutRepository();
-}
-
-CameraControlPtr ViewImplService::getCameraControl()
-{
-	return viewManager()->getCameraControl();
-}
-
-QActionGroup* ViewImplService::getInteractorStyleActionGroup()
-{
-	return viewManager()->getInteractorStyleActionGroup();
-}*/
 
 void ViewImplService::onSessionChanged()
 {
@@ -885,10 +759,5 @@ void ViewImplService::onSessionSave(QDomElement& node)
 	this->addXml(managerNode);
 	mClippers->addXml(node);
 }
-
-/*void ViewImplService::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
-{
-	viewManager()->setCameraStyle(style, groupIdx);
-}*/
 
 } /* namespace cx */

@@ -8,7 +8,6 @@ if(BUILD_TESTING)
     )
   set(CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES
     cxtestViewServiceMock.h
-#    cxtestViewManagerMock.h
     cxtestViewPlugin.cpp
     cxtestCatchMultiVolume3DRepProducer.cpp
     cxtestMultiVolume3DRepProducerFixture.h
@@ -20,11 +19,9 @@ if(BUILD_TESTING)
     cxtestRendering.cpp
     cxtestVisualizationHelper.cpp
     cxtestViewGroup.cpp
-#    cxtestViewManager.cpp
     cxtestNavigationAlgorithms.cpp
     cxtestViewService.cpp
     cxtestViewServiceMock.cpp
-#    cxtestViewManagerMock.cpp
     cxtestViewCollectionWidgetMixedMock.cpp
     cxtestLayoutWidgetUsingViewWidgetsMock.cpp
 	)

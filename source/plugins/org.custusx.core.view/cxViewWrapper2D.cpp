@@ -96,7 +96,6 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	ViewWrapper(backend),
 	mOrientationActionGroup(new QActionGroup(view.get()))
 {
-	CX_LOG_DEBUG_CHECKPOINT();
 	qRegisterMetaType<Vector3D>("Vector3D");
 	mView = view;
 	this->connectContextMenu(mView);
