@@ -199,7 +199,7 @@ class VTK(CppComponent):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #tag = 'VTK-7-0-0.cx_patch_3'
         #self._getBuilder().gitCheckout(tag)
-        self._getBuilder().gitCheckout('5d8c55e992880d0e3e2e7482bb34538c45678c4c')
+        self._getBuilder().gitCheckout('35527fdc8e1c560cbd9291ed6d5fdbb6daea9094')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
