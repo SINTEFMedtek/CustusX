@@ -80,22 +80,24 @@ void Texture3DSlicerProxyImpl::setShaders()
 	//===========
 	// Modify vertex shader declarations
 	//===========
+	std::string vtk_dec = "//VTK::PositionVC::Dec";
 	mOpenGLPolyDataMapper->AddShaderReplacement(
 				vtkShader::Vertex,
-				"//VTK::PositionVC::Dec", // replace the normal block
+				vtk_dec, // replace the normal block
 				true, // before the standard replacements
-				mShaderCallback->getVSReplacement_dec(),
+				mShaderCallback->getVSReplacement_dec(vtk_dec),
 				false // only do it once
 				);
 
 	//===========
 	// Modify vertex shader implementations
 	//===========
+	std::string vtk_impl = "//VTK::PositionVC::Impl";
 	mOpenGLPolyDataMapper->AddShaderReplacement(
 				vtkShader::Vertex,
-				"//VTK::PositionVC::Impl", // replace the normal block
+				vtk_impl, // replace the normal block
 				true, // before the standard replacements
-				mShaderCallback->getVSReplacement_impl(),
+				mShaderCallback->getVSReplacement_impl(vtk_impl),
 				false // only do it once
 				);
 
@@ -142,7 +144,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 
 	mPolyData = mPolyDataAlgorithm->GetOutput();
 	//mPolyData->DebugOn();
-	mPolyData->GetPointData()->SetNormals(NULL);
+	//mPolyData->GetPointData()->SetNormals(NULL);
 
 
 	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
@@ -263,6 +265,7 @@ bool Texture3DSlicerProxyImpl::isNewInputImages(std::vector<ImagePtr> images_raw
 
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
+	//std::cout << "A2| glGetError() " << glGetError() << std::endl;
 	if (!this->isNewInputImages(images_raw))
 		return;
 
