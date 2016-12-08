@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAccusurf.h"
 #include <vtkImageData.h>
 #include "cxtest_org_custusx_filter_accusurf_export.h"
+#include "cxLegacySingletons.h"
 
 typedef boost::shared_ptr<class cx::Accusurf> AccusurfPtr;
 

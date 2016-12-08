@@ -137,6 +137,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;

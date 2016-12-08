@@ -101,9 +101,9 @@ MainWindow::MainWindow() :
 
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
-	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
-	connect(stateService().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
-	connect(stateService().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
+	connect(mServices->state().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
+	connect(mServices->state().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
+	connect(mServices->state().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
 
 	this->updateWindowTitle();
 
@@ -131,7 +131,7 @@ MainWindow::MainWindow() :
 
 	this->addAsDockWidget(new BrowserWidget(this, mServices), "Browsing");
 
-	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
+	connect(mServices->patient().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
 
 	this->setupGUIExtenders();
@@ -258,7 +258,7 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 
 MainWindow::~MainWindow()
 {
-	viewService()->deactivateLayout();
+	mServices->view()->deactivateLayout();
 	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
 	mServiceListener.reset();
 }
@@ -270,7 +270,7 @@ QMenu* MainWindow::createPopupMenu()
 
 void MainWindow::createActions()
 {
-	CameraControlPtr cameraControl = viewService()->getCameraControl();
+	CameraControlPtr cameraControl = mServices->view()->getCameraControl();
 	if (cameraControl)
 		mStandard3DViewActions = cameraControl->createStandard3DViewActions();
 
@@ -312,7 +312,7 @@ void MainWindow::createActions()
 	mResetDesktopAction->setToolTip("Reset desktop for workflow step");
 	connect(mResetDesktopAction, &QAction::triggered, this, &MainWindow::resetDesktopSlot);
 
-	mInteractorStyleActionGroup = viewService()->getInteractorStyleActionGroup();
+	mInteractorStyleActionGroup = mServices->view()->getInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
 	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
@@ -326,10 +326,10 @@ void MainWindow::onApplicationStateChangedSlot()
 
 void MainWindow::updateWindowTitle()
 {
-	QString profileName = stateService()->getApplicationStateName();
-	QString versionName = stateService()->getVersionName();
+	QString profileName = mServices->state()->getApplicationStateName();
+	QString versionName = mServices->state()->getVersionName();
 
-	QString activePatientFolder = patientService()->getActivePatientFolder();
+	QString activePatientFolder = mServices->patient()->getActivePatientFolder();
 	if (activePatientFolder.endsWith('/'))
 		activePatientFolder.chop(1);
 	QString patientName;
@@ -351,12 +351,12 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::onWorkflowStateChangedSlot()
 {
-	Desktop desktop = stateService()->getActiveDesktop();
+	Desktop desktop = mServices->state()->getActiveDesktop();
 
 	mDockWidgets->restoreFrom(desktop);
-	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
-	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
-	patientService()->autoSave();
+	mServices->view()->setActiveLayout(desktop.mLayoutUid, 0);
+	mServices->view()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
+	mServices->patient()->autoSave();
 
 	// moved to help plugin:
 //	// set initial focus to mainwindow in order to view it in the documentation
@@ -379,9 +379,9 @@ void MainWindow::saveDesktopSlot()
 {
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
-	desktop.mLayoutUid = viewService()->getActiveLayout(0);
-	desktop.mSecondaryLayoutUid = viewService()->getActiveLayout(1);
-	stateService()->saveDesktop(desktop);
+	desktop.mLayoutUid = mServices->view()->getActiveLayout(0);
+	desktop.mSecondaryLayoutUid = mServices->view()->getActiveLayout(1);
+	mServices->state()->saveDesktop(desktop);
 
 	// save to settings file in addition
 	settings()->setValue("mainWindow/geometry", saveGeometry());
@@ -391,7 +391,7 @@ void MainWindow::saveDesktopSlot()
 
 void MainWindow::resetDesktopSlot()
 {
-	stateService()->resetDesktop();
+	mServices->state()->resetDesktop();
 	this->onWorkflowStateChangedSlot();
 }
 
@@ -488,7 +488,7 @@ void MainWindow::createMenus()
 
 	//workflow
 	this->menuBar()->addMenu(mWorkflowMenu);
-	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	QList<QAction*> actions = mServices->state()->getWorkflowActions()->actions();
 	for (int i=0; i<actions.size(); ++i)
 	{
 		mWorkflowMenu->addAction(actions[i]);
@@ -527,7 +527,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
 	mWorkflowToolBar = this->registerToolBar("Workflow");
-	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	QList<QAction*> actions = mServices->state()->getWorkflowActions()->actions();
 	for (int i=0; i<actions.size(); ++i)
 		mWorkflowToolBar->addAction(actions[i]);
 

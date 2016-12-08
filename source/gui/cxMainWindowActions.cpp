@@ -89,15 +89,15 @@ void MainWindowActions::createActions()
 												&MainWindowActions::togglePointPickerActionSlot);
 	mShowPointPickerAction->setCheckable(true);
 
-	if (viewService()->getGroup(0))
-		connect(viewService()->getGroup(0).get(), &ViewGroupData::optionsChanged, this, &MainWindowActions::updatePointPickerActionSlot);
+	if (mServices->view()->getGroup(0))
+		connect(mServices->view()->getGroup(0).get(), &ViewGroupData::optionsChanged, this, &MainWindowActions::updatePointPickerActionSlot);
 	this->updatePointPickerActionSlot();
 
 	mStartStreamingAction = this->createAction("StartStreaming", "Start Streaming",
 											   QIcon(":/icons/open_icon_library/.png"),
 											   QKeySequence("Ctrl+V"), "",
 											   &MainWindowActions::toggleStreamingSlot);
-	connect(videoService().get(), &VideoService::connected, this, &MainWindowActions::updateStreamingActionSlot);
+	connect(mServices->video().get(), &VideoService::connected, this, &MainWindowActions::updateStreamingActionSlot);
 	this->updateStreamingActionSlot();
 
 	this->createAction("CenterToImageCenter", "Center Image",
@@ -120,7 +120,7 @@ void MainWindowActions::createTrackingActions()
 					   QIcon(), QKeySequence(), "",
 					   &MainWindowActions::configureSlot);
 
-	boost::function<void()> finit = boost::bind(&TrackingService::setState, trackingService(), Tool::tsINITIALIZED);
+	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
 	this->createAction("InitializeTools", "Initialize",
 					   QIcon(), QKeySequence(), "",
 					   finit);
@@ -129,7 +129,7 @@ void MainWindowActions::createTrackingActions()
 											  QIcon(), QKeySequence("Ctrl+T"), "",
 											  &MainWindowActions::toggleTrackingSlot);
 
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
+	connect(mServices->tracking().get(), &TrackingService::stateChanged, this, &MainWindowActions::updateTrackingActionSlot);
 	this->updateTrackingActionSlot();
 }
 
@@ -257,7 +257,7 @@ void MainWindowActions::clearPatientSlot()
 
 void MainWindowActions::savePatientFileSlot()
 {
-	if (patientService()->getActivePatientFolder().isEmpty())
+	if (mServices->patient()->getActivePatientFolder().isEmpty())
 	{
 		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
@@ -360,7 +360,7 @@ void MainWindowActions::shootOneLayout(int index)
 
 void MainWindowActions::recordFullscreen()
 {
-	QString path = patientService()->generateFilePath("Screenshots", "mp4");
+	QString path = mServices->patient()->generateFilePath("Screenshots", "mp4");
 
 	if(vlc()->isRecording())
 		vlc()->stopRecording();
@@ -396,15 +396,15 @@ void MainWindowActions::onStartLogConsole()
 
 void MainWindowActions::toggleStreamingSlot()
 {
-	if (videoService()->isConnected())
-		videoService()->closeConnection();
+	if (mServices->video()->isConnected())
+		mServices->video()->closeConnection();
 	else
-		videoService()->openConnection();
+		mServices->video()->openConnection();
 }
 
 void MainWindowActions::updateStreamingActionSlot()
 {
-	if (videoService()->isConnected())
+	if (mServices->video()->isConnected())
 	{
 		mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
 		mStartStreamingAction->setText("Stop Streaming");
@@ -418,33 +418,33 @@ void MainWindowActions::updateStreamingActionSlot()
 
 void MainWindowActions::centerToImageCenterSlot()
 {
-	viewService()->centerToImageCenterInActiveViewGroup();
+	mServices->view()->centerToImageCenterInActiveViewGroup();
 }
 
 void MainWindowActions::centerToTooltipSlot()
 {
-	NavigationPtr nav = viewService()->getNavigation();
+	NavigationPtr nav = mServices->view()->getNavigation();
 	nav->centerToTooltip();
 }
 
 void MainWindowActions::togglePointPickerActionSlot()
 {
-	ViewGroupDataPtr data = viewService()->getGroup(0);
+	ViewGroupDataPtr data = mServices->view()->getGroup(0);
 	ViewGroupData::Options options = data->getOptions();
 	options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
 	data->setOptions(options);
 }
 void MainWindowActions::updatePointPickerActionSlot()
 {
-	if (!viewService()->getGroup(0))
+	if (!mServices->view()->getGroup(0))
 		return;
-	bool show = viewService()->getGroup(0)->getOptions().mShowPointPickerProbe;
+	bool show = mServices->view()->getGroup(0)->getOptions().mShowPointPickerProbe;
 	mShowPointPickerAction->setChecked(show);
 }
 
 void MainWindowActions::updateTrackingActionSlot()
 {
-	if (trackingService()->getState() >= Tool::tsTRACKING)
+	if (mServices->tracking()->getState() >= Tool::tsTRACKING)
 	{
 		mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
 		mTrackingToolsAction->setText("Stop Tracking");
@@ -458,15 +458,15 @@ void MainWindowActions::updateTrackingActionSlot()
 
 void MainWindowActions::configureSlot()
 {
-	trackingService()->setState(Tool::tsCONFIGURED);
+	mServices->tracking()->setState(Tool::tsCONFIGURED);
 }
 
 void MainWindowActions::toggleTrackingSlot()
 {
-	if (trackingService()->getState() >= Tool::tsTRACKING)
-		trackingService()->setState(Tool::tsINITIALIZED);
+	if (mServices->tracking()->getState() >= Tool::tsTRACKING)
+		mServices->tracking()->setState(Tool::tsINITIALIZED);
 	else
-		trackingService()->setState(Tool::tsTRACKING);
+		mServices->tracking()->setState(Tool::tsTRACKING);
 }
 
 void MainWindowActions::onGotoDocumentation()
