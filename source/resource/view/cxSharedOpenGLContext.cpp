@@ -30,6 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
+//needed on windows to where <windows.h> is included
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
 #include "cxSharedOpenGLContext.h"
 
 #include <vtkOpenGLRenderWindow.h>

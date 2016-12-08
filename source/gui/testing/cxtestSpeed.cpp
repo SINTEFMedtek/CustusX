@@ -110,11 +110,28 @@ TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integ
  * This test has BIG problems when run on a test box, with screen saver on etc etc. Removed from Linux because of this
  */
 //TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32][not_win64]")
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration]")
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews on", "[speed][gui][integration]")
 {
 	initTest();
 
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	cx::settings()->setValue("optimizedViews", true);
+
+	int fps = calculateFPS(false);
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
+
+	// TODO: enter this value into config file
+	double minimumFPS = 5;
+	REQUIRE(fps > minimumFPS);
+}
+
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews off", "[speed][gui][integration]")
+{
+	initTest();
+
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	cx::settings()->setValue("optimizedViews", false);
 
 	int fps = calculateFPS(false);
 	JenkinsMeasurement jenkins;
