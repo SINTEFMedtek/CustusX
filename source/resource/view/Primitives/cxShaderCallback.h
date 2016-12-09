@@ -81,8 +81,8 @@ public:
 	static const std::string FS_Uniform_Alpha;
 	static const std::string FS_Out_Vec4_Color;
 
-	const std::string getVSReplacement_dec() const;
-	const std::string getVSReplacement_impl() const;
+	const std::string getVSReplacement_dec(std::string vtk_dec) const;
+	const std::string getVSReplacement_impl(std::string vtk_impl) const;
 	const std::string getFS() const;
 
 	//static const int Const_Int_NumberOfTextures; //TODO remove, use getShaderItemSize
