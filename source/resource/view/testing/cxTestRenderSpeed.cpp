@@ -116,8 +116,12 @@ TestRenderSpeed::TestRenderSpeed()
 	ViewServiceMocWithRenderWindowFactoryPtr viewService = ViewServiceMocWithRenderWindowFactoryPtr(new ViewServiceMockWithRenderWindowFactory());
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
-	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory()).data());
-//	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
+
+	bool optimizedViews = cx::settings()->value("optimizedViews").toBool();
+	if (optimizedViews)
+		mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory()).data());
+	else
+		mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(viewService->getRenderWindowFactory()).data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()
