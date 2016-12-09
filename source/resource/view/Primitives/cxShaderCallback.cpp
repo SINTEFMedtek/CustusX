@@ -179,16 +179,14 @@ ShaderCallback::~ShaderCallback()
 //}
 
 
-const std::string ShaderCallback::getVSReplacement_dec() const
+const std::string ShaderCallback::getVSReplacement_dec(std::string vtk_dec) const
 {
-	std::string vtk_dec = "//VTK::PositionVC::Dec\n\n";
-
 	QString temp;
 	if(this->getNumberOfUploadedTextures() != 0)
 	{
 		temp = QString(
 					"%1"
-					""
+					"\n\n"
 					"//CX: adding input and output variables for texture coordinates\n"
 					"const int number_of_textures = %4;\n"
 					"in vec3 %2[number_of_textures];\n"
@@ -208,15 +206,14 @@ const std::string ShaderCallback::getVSReplacement_dec() const
 	return retval;
 }
 
-const std::string ShaderCallback::getVSReplacement_impl() const
+const std::string ShaderCallback::getVSReplacement_impl(std::string vtk_impl) const
 {
-	std::string vtk_impl = "//VTK::PositionVC::Impl\n";
-
 	QString temp;
 	if(this->getNumberOfUploadedTextures() != 0)
 	{
 		temp = QString(
 					"%1"
+					"\n"
 					"%2 = %3;\n"
 					)
 				.arg(vtk_impl.c_str())
@@ -275,6 +272,9 @@ const std::string ShaderCallback::getFS() const
 		fs_shader_text =
 			"//VTK::System::Dec\n"
 			"//VTK::Output::Dec\n\n"
+			""
+			"in vec3 normalVCVSOutput;"
+			"in vec4 vertexVCVSOutput;"
 			""
 			"//CX: adding custom fragment shader\n"
 			"const int number_of_textures = "+number_of_textures+";\n"
@@ -350,6 +350,12 @@ const std::string ShaderCallback::getFS() const
 			"	{\n"
 			"		color = mergeTexture(color, i);\n"
 			"	}\n"
+			""
+			"	// if input variable (in VS or FS) does not affect any used results it will be optimized out by some glsl compilers"
+			"	// hack to make sure normalMC (used to calculate normalVCVSOutput in VS) is not optimized out\n"
+			"	color += vec4(normalVCVSOutput, 0.0);\n "
+			"	color -= vec4(normalVCVSOutput, 0.0);\n"
+			""
 			"	"+FS_Out_Vec4_Color+" = color;\n"
 			"}"
 			;

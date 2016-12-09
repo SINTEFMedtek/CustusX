@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
 #include "cxViewService.h"
+#include "cxTestRenderSpeed.h"
 
 namespace cxtest
 {
@@ -214,5 +215,42 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	REQUIRE(true);
 }
 #endif
+
+
+TEST_CASE("Speed: Render time of vtkRenderWindow", "[speed]")
+{
+	initTest();
+	cx::settings()->setValue("optimizedViews", false);
+	TestRenderSpeed helper;
+
+	QTime clock;
+
+	int numRenders = 10;
+	int numViews = 1;
+
+//	helper.testSingleView();
+	helper.createViews(numViews);
+	helper.showViews();
+	clock.start();
+	helper.renderNumTimes(numRenders);
+	int timeMs = clock.elapsed();
+	std::cout << "render "<< numViews << " views " << numRenders << " times: " << timeMs << " ms" << std::endl;
+	std::cout << timeMs/double(numRenders*numViews) << " ms per render" << std::endl;
+
+
+	TestRenderSpeed helper2;
+	numViews = 100;
+
+//	helper.testSeveralViews();
+	helper2.createViews(numViews);
+	helper2.showViews();
+	clock.start();
+	helper2.renderNumTimes(numRenders);
+	timeMs = clock.elapsed();
+	std::cout << "render "<< numViews << " views " << numRenders << " times: " << timeMs << " ms" << std::endl;
+	std::cout << timeMs/double(numRenders*numViews) << " ms per render" << std::endl;
+
+	CHECK(true);
+}
 
 }//namespace cx
