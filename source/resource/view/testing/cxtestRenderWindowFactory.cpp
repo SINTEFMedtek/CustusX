@@ -115,4 +115,51 @@ TEST_CASE("RenderWindowFactory render a single renderWindow", "[opengl][resource
 	}
 }
 
+//Some code copied from RenderWindowFactory::createRenderWindow
+TEST_CASE("Speed: Render time of vtkOpenGLRenderWindow", "[speed]")
+{
+	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
+	REQUIRE(opengl_renderwindow);
+
+	QTime clock;
+	clock.start();
+//	opengl_renderwindow->OpenGLInit();
+	opengl_renderwindow->Render();
+	int timeMs = clock.elapsed();
+	std::cout << "Time for calling first vtkOpenGLRenderWindow::Render(): " << timeMs << " ms." << std::endl;
+//	std::cout << "Time for calling vtkOpenGLRenderWindow::OpenGLInit(): " << timeMs << " ms." << std::endl;
+
+	std::vector<vtkOpenGLRenderWindowPtr> openGLRenderWindows;
+
+	int numRenderWindows = 50;
+	for (int i = 0; i < numRenderWindows; ++i)
+	{
+		vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
+		REQUIRE(opengl_renderwindow);
+		openGLRenderWindows.push_back(opengl_renderwindow);
+	}
+
+	clock.start();
+	for (int i = 0; i < openGLRenderWindows.size(); ++i)
+	{
+		openGLRenderWindows[i]->Render();
+	}
+	timeMs = clock.elapsed();
+	std::cout << "Time for calling first vtkOpenGLRenderWindow::Render() on " << numRenderWindows << " render windows: " << timeMs << " ms." << std::endl;
+	std::cout << "Time per init+render: " << timeMs / double(numRenderWindows) << " ms." << std::endl;
+
+	clock.start();
+	for (int i = 0; i < openGLRenderWindows.size(); ++i)
+	{
+		openGLRenderWindows[i]->Render();
+	}
+	timeMs = clock.elapsed();
+	std::cout << "Time for calling second vtkOpenGLRenderWindow::Render() on " << numRenderWindows << " render windows: " << timeMs << " ms." << std::endl;
+	std::cout << "Time per render: " << timeMs / double(numRenderWindows) << " ms." << std::endl;
+
+}
+
+
 }//cxtest
