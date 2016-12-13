@@ -4,6 +4,7 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
   cxVBPluginActivator.cpp
+  cxVBService.h
   cxVBService.cpp
   cxVBWidget.cpp
   cxVBcameraPath.cpp
@@ -12,7 +13,6 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxVBPluginActivator.h
-  cxVBService.h
   cxVBWidget.h
   cxVBcameraPath.h
 )
