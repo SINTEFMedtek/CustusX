@@ -120,7 +120,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
     utilities/cxSpaceListenerImpl
     utilities/cxSyncedValue
     utilities/cxSpaceProvider
-    utilities/cxSpaceProviderNull
     utilities/cxSocket
     utilities/cxSocketConnection
 
@@ -199,6 +198,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxSpaceProviderImpl
     utilities/cxStreamedTimestampSynchronizer
     utilities/cxEnumConverter.h
+    utilities/cxSpaceProviderNull
 
 
 	logger/cxAudio.h
