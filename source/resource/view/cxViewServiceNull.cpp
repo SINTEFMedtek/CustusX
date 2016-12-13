@@ -96,7 +96,7 @@ QString ViewServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
 void ViewServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
 InteractiveCropperPtr ViewServiceNull::getCropper() { return InteractiveCropperPtr(); }
 CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
-NavigationPtr ViewServiceNull::getNavigation() { return NavigationPtr(); }
+NavigationPtr ViewServiceNull::getNavigation(int group) { return NavigationPtr(); }
 LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
 QActionGroup* ViewServiceNull::getInteractorStyleActionGroup() { return mActionGroup; }

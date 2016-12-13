@@ -48,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tsf-config.h"
 #include "SIPL/Exceptions.hpp"
 #include "cxSessionStorageService.h"
+#include "cxLegacySingletons.h"
 
 #include "catch.hpp"
 

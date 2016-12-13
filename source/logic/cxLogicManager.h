@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
 
 class ctkPluginContext;
 

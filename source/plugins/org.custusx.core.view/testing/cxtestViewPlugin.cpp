@@ -48,16 +48,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 typedef boost::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
-class ViewServiceFixture : public cx::ViewServiceNull
+class ViewServiceFixture
 {
 public:
-	ViewServiceFixture() :
-		cx::ViewServiceNull()
+	ViewServiceFixture()
 	{
 		cx::DataLocations::setTestMode();
 		cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
 		cx::LogicManager::initialize(mainwindow);
-		services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+		mServices = cx::VisServices::create(cx::logicManager()->getPluginContext());
 	}
 	~ViewServiceFixture()
 	{
@@ -70,15 +69,9 @@ public:
 		qApp->exec();
 	}
 
-	cx::VisServicesPtr services;
+	cx::VisServicesPtr mServices;
 };
-}
-
-TEST_CASE("VisualizationPlugin: Check nothing", "[unit][plugins][org.custusx.core.view][hide]")
-{
-	CHECK(true);
-}
-
+}// namespace
 
 TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[unit][plugins][org.custusx.core.view]")
 {
@@ -99,8 +92,8 @@ TEST_CASE("ViewService: Get active view group", "[integration][plugins][org.cust
 	ViewServiceFixture fixture;
 	fixture.quickRun();
 
-	CHECK(fixture.services->view()->getActiveViewGroup());
-	CHECK(fixture.services->view()->getActiveGroupId() >= 0);
+	CHECK(fixture.mServices->view()->getActiveViewGroup());
+	CHECK(fixture.mServices->view()->getActiveGroupId() >= 0);
 }
 
 TEST_CASE("ViewService: Get camera style interactor action group and actions", "[integration][plugins][org.custusx.core.view]")
@@ -108,7 +101,7 @@ TEST_CASE("ViewService: Get camera style interactor action group and actions", "
 	ViewServiceFixture fixture;
 	fixture.quickRun();
 
-	QActionGroup* actionGroup = fixture.services->view()->getInteractorStyleActionGroup();
+	QActionGroup* actionGroup = fixture.mServices->view()->getInteractorStyleActionGroup();
 	REQUIRE(actionGroup);
 
 	QList<QAction*> actions = actionGroup->actions();
@@ -120,15 +113,15 @@ TEST_CASE("ViewService: Setting camera style also marks action as selected in ca
 	ViewServiceFixture fixture;
 	fixture.quickRun();
 
-	QActionGroup* actionGroup = fixture.services->view()->getInteractorStyleActionGroup();
+	QActionGroup* actionGroup = fixture.mServices->view()->getInteractorStyleActionGroup();
 	REQUIRE(actionGroup);
 
-	fixture.services->view()->setCameraStyle(cx::cstDEFAULT_STYLE, 0);
+	fixture.mServices->view()->setCameraStyle(cx::cstDEFAULT_STYLE, 0);
 
 	QAction* selectedAction = actionGroup->checkedAction();
 	CHECK(selectedAction);
 
-	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
+	fixture.mServices->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
 
 	QAction* selectedAction2 = actionGroup->checkedAction();
 	CHECK(selectedAction != selectedAction2);
@@ -139,14 +132,14 @@ TEST_CASE("ViewService: set/get camera style", "[integration][plugins][org.custu
 	ViewServiceFixture fixture;
 	fixture.quickRun();
 
-	QActionGroup* actionGroup = fixture.services->view()->getInteractorStyleActionGroup();
+	QActionGroup* actionGroup = fixture.mServices->view()->getInteractorStyleActionGroup();
 	REQUIRE(actionGroup);
 
 	QAction* selectedAction = actionGroup->checkedAction();
 	REQUIRE(selectedAction);
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstDEFAULT_STYLE));
 
-	fixture.services->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
+	fixture.mServices->view()->setCameraStyle(cx::cstTOOL_STYLE, 0);
 	selectedAction = actionGroup->checkedAction();
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstTOOL_STYLE));
 }
@@ -160,10 +153,10 @@ TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.cus
 	cx::LayoutData layout = cx::LayoutData::create(testLayoutName, "TESTLAYOUT", 1, 1);
 	layout.setView(1, cx::ptAXIAL, cx::LayoutRegion(0, 0));
 
-	fixture.services->view()->setActiveLayout(testLayoutName);
-	CHECK_FALSE(fixture.services->view()->getActiveLayout() == testLayoutName);
+	fixture.mServices->view()->setActiveLayout(testLayoutName);
+	CHECK_FALSE(fixture.mServices->view()->getActiveLayout() == testLayoutName);
 
-	fixture.services->view()->addDefaultLayout(layout);
-	fixture.services->view()->setActiveLayout(testLayoutName);
-	REQUIRE(fixture.services->view()->getActiveLayout() == testLayoutName);
+	fixture.mServices->view()->addDefaultLayout(layout);
+	fixture.mServices->view()->setActiveLayout(testLayoutName);
+	REQUIRE(fixture.mServices->view()->getActiveLayout() == testLayoutName);
 }

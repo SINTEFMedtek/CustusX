@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxSessionStorageService.h"
 #include "cxClippers.h"
+#include "cxLegacySingletons.h"
 
 #include "catch.hpp"
 

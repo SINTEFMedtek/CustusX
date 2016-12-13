@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
-#include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
 #include "cxNavigation.h"
 #include "cxActiveData.h"

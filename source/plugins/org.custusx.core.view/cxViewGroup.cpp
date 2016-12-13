@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingService.h"
 #include "cxViewWrapper2D.h"
-#include "cxViewManager.h"
 #include "cxCameraControl.h"
 #include "cxData.h"
 #include "cxViewWrapper.h"

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionServiceProxy.h"
 #include "cxSessionStorageService.h"
 #include "cxProfile.h"
+#include "cxLegacySingletons.h"
 
 namespace cxtest
 {
