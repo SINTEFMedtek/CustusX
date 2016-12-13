@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 FiltersWidget::FiltersWidget(VisServicesPtr services, QWidget* parent, QStringList wantedFilters, QString optionfileTag) :
-    BaseWidget(parent, "algorithm_widgets_configurable_filter", "All Filters"),
+	BaseWidget(parent, "algorithm_widgets_configurable_filter", "All Filters"),
     mWantedFilters(wantedFilters)
 {
     XmlOptionFile options = profile()->getXmlSettings().descend(optionfileTag);
@@ -226,7 +226,7 @@ QHBoxLayout * FiltersWidget::addFilterSelector(QVBoxLayout* topLayout)
 {
     QHBoxLayout* filterLayout = new QHBoxLayout;
     topLayout->addLayout(filterLayout);
-    LabeledComboBoxWidget* filterSelectorWidget = new LabeledComboBoxWidget(this, mFilterSelector);
+	LabeledComboBoxWidget* filterSelectorWidget = new LabeledComboBoxWidget(this, mFilterSelector);
     filterSelectorWidget->showLabel(false);
     filterLayout->addWidget(filterSelectorWidget);
 

@@ -36,8 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGuiExport.h"
 
 #include <QListWidget>
+#include "cxForwardDeclarations.h"
 
-//#include "cxIgstkTool.h"
 class QDir;
 class QListWidgetItem;
 
@@ -59,7 +59,7 @@ class cxGui_EXPORT ToolListWidget : public QListWidget
   Q_OBJECT
 
 public:
-  ToolListWidget(QWidget* parent = NULL);
+  ToolListWidget(TrackingServicePtr trackingService, QWidget* parent = NULL);
   virtual ~ToolListWidget();
 
 signals:
@@ -70,6 +70,8 @@ signals:
 protected:
   void populate(QStringList toolsAbsoluteFilePath);
   void addTool(QString absoluteFilePath);
+
+  TrackingServicePtr mTrackingService;
 
 private slots:
   void selectionChangedSlot();
@@ -91,7 +93,7 @@ class cxGui_EXPORT FilteringToolListWidget : public ToolListWidget
   Q_OBJECT
 
 public:
-  FilteringToolListWidget(QWidget* parent = NULL);
+  FilteringToolListWidget(TrackingServicePtr trackingService, QWidget* parent = NULL);
   virtual ~FilteringToolListWidget();
 
   virtual QSize minimumSizeHint() const;
@@ -124,7 +126,7 @@ class cxGui_EXPORT ConfigToolListWidget : public ToolListWidget
   Q_OBJECT
 
 public:
-  ConfigToolListWidget(QWidget* parent = NULL);
+  ConfigToolListWidget(TrackingServicePtr trackingService, QWidget* parent = NULL);
   virtual ~ConfigToolListWidget();
 
   virtual void dropEvent(QDropEvent* event);

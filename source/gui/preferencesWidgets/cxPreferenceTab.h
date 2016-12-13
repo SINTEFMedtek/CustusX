@@ -46,6 +46,7 @@ class QVBoxLayout;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 class cxGui_EXPORT PreferenceTab : public QWidget
 {

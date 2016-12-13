@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAccusurf.h"
 #include <vtkImageData.h>
 #include "cxtest_org_custusx_filter_accusurf_export.h"
-#include "cxLegacySingletons.h"
 
 typedef boost::shared_ptr<class cx::Accusurf> AccusurfPtr;
 
@@ -62,8 +61,8 @@ TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")
 
     //create a new patient
 	QString info;
-    cx::DataPtr dataVolume = cx::patientService()->importData(filenameVolume, info);
-    cx::DataPtr dataCenterline = cx::patientService()->importData(filenameCenterline, info);
+	cx::DataPtr dataVolume = cx::logicManager()->getPatientModelService()->importData(filenameVolume, info);
+	cx::DataPtr dataCenterline = cx::logicManager()->getPatientModelService()->importData(filenameCenterline, info);
 
     REQUIRE(dataVolume);
     REQUIRE(dataCenterline);

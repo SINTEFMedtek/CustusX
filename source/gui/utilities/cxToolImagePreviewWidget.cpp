@@ -34,13 +34,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "cxTrackerConfiguration.h"
-#include "cxLegacySingletons.h"
 #include "cxTrackingService.h"
 
 namespace cx
 {
-ToolImagePreviewWidget::ToolImagePreviewWidget(QWidget* parent) :
-		ImagePreviewWidget(parent)
+ToolImagePreviewWidget::ToolImagePreviewWidget(TrackingServicePtr trackingService, QWidget* parent) :
+	ImagePreviewWidget(parent),
+	mTrackingService(trackingService)
 {
 	this->setToolTip("Preview of a Tool Image");
 	ImagePreviewWidget::setSize(200, 200);
@@ -51,7 +51,7 @@ ToolImagePreviewWidget::~ToolImagePreviewWidget()
 
 void ToolImagePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	const QString imageAbsoluteFilePath = config->getTool(absoluteFilePath).mPictureFilename;
 	ImagePreviewWidget::previewFileSlot(imageAbsoluteFilePath);
 }

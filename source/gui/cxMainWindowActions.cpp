@@ -329,7 +329,7 @@ void MainWindowActions::importDataSlot()
 
 	for (int i=0; i<fileName.size(); ++i)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mServices->patient(), fileName[i], this->parentWidget());
+		ImportDataDialog* wizard = new ImportDataDialog(mServices->patient(), mServices->view(), fileName[i], this->parentWidget());
 		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 	}
 }

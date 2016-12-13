@@ -145,7 +145,7 @@ TEST_CASE("should be able to get id of tsfpreset", "[TSF][TSFPresets][unit]"){
 TEST_CASE("should be able to read from settings file last used preset", "[TSF][TSFPresets][unit]"){
     cx::TSFPresetsPtr presets(new cx::TSFPresets());
 
-    cx::PresetWidget* widget = new cx::PresetWidget(NULL);
+	cx::PresetWidget* widget = new cx::PresetWidget(NULL);
     widget->setPresets(presets);
     QString selectedPreset = "Synthetic-Vascusynth";
     REQUIRE(widget->requestSetCurrentPreset(selectedPreset));

@@ -52,7 +52,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 #include "cxActiveToolProxy.h"
-#include "cxLogicManager.h"
 #include "cxViewService.h"
 
 #include "cxLogMessageFilter.h"
@@ -62,28 +61,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-StatusBar::StatusBar() :
+StatusBar::StatusBar(TrackingServicePtr trackingService, ViewServicePtr viewService, VideoServicePtr videoService) :
 	mRenderingFpsLabel(new QLabel(this)),
 	mGrabbingInfoLabel(new QLabel(this)),
 	mRecordFullscreenLabel(new QLabel(this)),
-	mTpsLabel(new QLabel(this))
+	mTpsLabel(new QLabel(this)),
+	mTrackingService(trackingService)
 {
 	mMessageListener = MessageListener::create();
 	mMessageListener->installFilter(MessageFilterStatusBar::create());
 	connect(mMessageListener.get(), &MessageListener::newMessage, this, &StatusBar::showMessageSlot);
 
-	connect(trackingService().get(), &TrackingService::stateChanged, this, &StatusBar::resetToolManagerConnection);
+	connect(trackingService.get(), &TrackingService::stateChanged, this, &StatusBar::resetToolManagerConnection);
 
-	cx::TrackingServicePtr ts = cx::logicManager()->getTrackingService();
-	mActiveTool = ActiveToolProxy::New(ts);
+	mActiveTool = ActiveToolProxy::New(trackingService);
 	connect(mActiveTool.get(), &ActiveToolProxy::tps, this, &StatusBar::tpsSlot);
 
-	connect(trackingService().get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolButtons()));
+	connect(trackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(updateToolButtons()));
 
-	connect(viewService().get(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
+	connect(viewService.get(), SIGNAL(fps(int)), this, SLOT(renderingFpsSlot(int)));
 
-	connect(videoService().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
-	connect(videoService().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+	connect(videoService.get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+	connect(videoService.get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
 	connect(vlc(), &VLCRecorder::stateChanged, this, &StatusBar::onRecordFullscreenChanged);
 
@@ -98,7 +97,7 @@ StatusBar::~StatusBar()
 void StatusBar::resetToolManagerConnection()
 {
 	this->disconnectFromToolSignals();
-	if (trackingService()->getState()>=Tool::tsCONFIGURED)
+	if (mTrackingService->getState()>=Tool::tsCONFIGURED)
 		this->connectToToolSignals();
 	this->updateToolButtons();
 }
@@ -110,13 +109,13 @@ void StatusBar::connectToToolSignals()
 	this->addPermanentWidget(mTpsLabel);
 	mTpsLabel->show();
 
-	TrackingService::ToolMap tools = trackingService()->getTools();
+	TrackingService::ToolMap tools = mTrackingService->getTools();
 	for (TrackingService::ToolMap::iterator it = tools.begin(); it != tools.end(); ++it)
 	{
 		ToolPtr tool = it->second;
 		if (tool->hasType(Tool::TOOL_MANUAL))
 			continue;
-		if (tool == trackingService()->getManualTool())
+		if (tool == mTrackingService->getManualTool())
 			continue;
 		connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateToolButtons()));
 
@@ -156,12 +155,12 @@ void StatusBar::disconnectFromToolSignals()
 
 void StatusBar::activateTool(QString uid)
 {
-	trackingService()->setActiveTool(uid);
+	mTrackingService->setActiveTool(uid);
 }
 
 void StatusBar::updateToolButtons()
 {
-	ToolPtr activeTool = trackingService()->getActiveTool();
+	ToolPtr activeTool = mTrackingService->getActiveTool();
 
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{

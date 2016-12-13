@@ -56,7 +56,6 @@ cx_add_class_qt_moc(cxGui_SRCS
 	dataWidgets/cxImagePropertiesWidget
     #----------------------
     infoWidgets/cxStatusBar
-    infoWidgets/cxPointSamplingWidget
     infoWidgets/cxMetricWidget
     infoWidgets/cxDataMetricWrappers
     infoWidgets/cxSamplerWidget
