@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxView.h"
 #include "cxViewService.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -72,6 +73,12 @@ TrackPadWidget::TrackPadWidget(ViewServicePtr viewService, QWidget* parent) :
 
 void TrackPadWidget::createStandard3DViewActions()
 {
+	if(!mCameraControl)
+	{
+		CX_LOG_WARNING() << "TrackPadWidget::createStandard3DViewActions: Got no mCameraControl";
+		return;
+	}
+
   QActionGroup* group = mCameraControl->createStandard3DViewActions();
 
   QToolBar* toolBar = new QToolBar(this);
