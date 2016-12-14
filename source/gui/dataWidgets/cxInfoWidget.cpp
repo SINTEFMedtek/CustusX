@@ -44,6 +44,7 @@ InfoWidget::InfoWidget(QWidget* parent, QString objectName, QString windowTitle)
 		BaseWidget(parent, objectName, windowTitle)
 {
 	toptopLayout = new QVBoxLayout(this);
+	toptopLayout->setMargin(0);
 	gridLayout = new QGridLayout;
 	gridLayout->setMargin(0);
 	toptopLayout->addLayout(gridLayout);

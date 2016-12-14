@@ -85,11 +85,13 @@ private:
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 
-  typedef std::map<QDateTime,QString> TimeMap;
-  TimeMap getRegistrationTimes();
+  typedef std::multimap<QDateTime,QString> TimeMap;
+  typedef std::pair<QDateTime,QString> TimeMapPair;
+  typedef std::vector<RegistrationHistoryWidget::TimeMap::iterator> TimeMapIterators;
+  TimeMap generateRegistrationTimes();
   QDateTime getActiveTime();
   void setActiveTime(QDateTime active);
-  TimeMap::iterator findCurrentActiveIter(TimeMap& times);
+  RegistrationHistoryWidget::TimeMapIterators findActiveRegistrations(TimeMap& times);
 
   QFrame* mGroup;
   std::vector<RegistrationHistoryPtr> mHistories;
@@ -106,6 +108,7 @@ private:
   std::vector<RegistrationTransform> mergeHistory(const std::vector<RegistrationHistoryPtr>& allHistories);
 
   RegServicesPtr mServices;
+  RegistrationHistoryWidget::TimeMap::iterator findActiveRegistration(TimeMap &times);
 };
 
 /**

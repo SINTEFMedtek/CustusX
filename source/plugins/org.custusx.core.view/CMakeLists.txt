@@ -21,6 +21,8 @@ set(PLUGIN_SRCS
     cxViewWrapperVideo.cpp
     cxDataRepContainer.h
     cxDataRepContainer.cpp
+	cxNavigationAlgorithms.cpp
+	cxNavigationAlgorithms.h
 )
 
 # Files which should be processed by Qts moc

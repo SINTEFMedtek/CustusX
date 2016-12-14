@@ -54,7 +54,7 @@ public:
 	virtual TreeNodePtr getParent() const;
 	virtual void activate();
 	virtual QIcon getIcon() const;
-	QWidget* createPropertiesWidget() const;
+	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual bool useColoredName() const { return false; }
 	virtual QVariant getFont() const;

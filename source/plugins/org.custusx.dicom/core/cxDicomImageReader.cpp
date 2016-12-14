@@ -227,8 +227,8 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 		data->AllocateScalars(VTK_UNSIGNED_SHORT, samplesPerPixel);
 		break;
 	case EPR_Uint32:
-		this->error("DICOM EPR_Uint32 not supported");
-		return vtkImageDataPtr();
+//		std::cout << "  VTK_UNSIGNED_INT" << std::endl;
+		data->AllocateScalars(VTK_UNSIGNED_INT, samplesPerPixel);
 		break;
 	case EPR_Sint8:
 //		std::cout << "  VTK_CHAR" << std::endl;
@@ -239,8 +239,8 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 		data->AllocateScalars(VTK_SHORT, samplesPerPixel);
 		break;
 	case EPR_Sint32:
-		this->error("DICOM EPR_Sint32 not supported");
-		return vtkImageDataPtr();
+//		std::cout << "  VTK_INT" << std::endl;
+		data->AllocateScalars(VTK_INT, samplesPerPixel);
 		break;
 	}
 

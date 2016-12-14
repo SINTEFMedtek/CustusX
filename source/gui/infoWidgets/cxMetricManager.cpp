@@ -45,8 +45,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolMetric.h"
 #include "cxPlaneMetric.h"
 #include "cxShapedMetric.h"
+#include "cxCustomMetric.h"
 #include "cxAngleMetric.h"
 #include "cxSphereMetric.h"
+#include "cxRegionOfInterestMetric.h"
 #include "cxDataFactory.h"
 #include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
@@ -74,7 +76,7 @@ DataMetricPtr MetricManager::getMetric(QString uid)
 std::vector<DataMetricPtr> MetricManager::getAllMetrics()
 {
 	std::vector<DataMetricPtr> retval;
-	std::map<QString, DataPtr> all = patientService()->getData();
+	std::map<QString, DataPtr> all = patientService()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
 	{
 		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
@@ -243,6 +245,13 @@ std::vector<DataPtr> MetricManager::refinePointArguments(std::vector<DataPtr> ar
   return args;
 }
 
+void MetricManager::addROIButtonClickedSlot()
+{
+	RegionOfInterestMetricPtr d0 = patientService()->createSpecificData<RegionOfInterestMetric>("roi%1");
+	d0->get_rMd_History()->setParentSpace("reference");
+	this->installNewMetric(d0);
+}
+
 void MetricManager::addDistanceButtonClickedSlot()
 {
 	DistanceMetricPtr d0 = patientService()->createSpecificData<DistanceMetric>("distance%1");
@@ -312,6 +321,17 @@ void MetricManager::addDonutButtonClickedSlot()
 	this->installNewMetric(d0);
 }
 
+void MetricManager::addCustomButtonClickedSlot()
+{
+    CustomMetricPtr d0 = patientService()->createSpecificData<CustomMetric>("Custom%1");
+    d0->get_rMd_History()->setParentSpace("reference");
+    std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+    d0->getArguments()->set(0, args[0]);
+    d0->getArguments()->set(1, args[1]);
+
+    this->installNewMetric(d0);
+}
+
 void MetricManager::installNewMetric(DataMetricPtr metric)
 {
     DataMetricPtr prevMetric = this->getMetric(mActiveLandmark);
@@ -359,7 +379,7 @@ void MetricManager::exportMetricsToFile(QString filename)
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 
-	std::map<QString, DataPtr> dataMap = patientService()->getData();
+	std::map<QString, DataPtr> dataMap = patientService()->getDatas();
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{

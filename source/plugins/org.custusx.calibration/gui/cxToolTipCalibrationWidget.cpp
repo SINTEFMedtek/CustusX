@@ -52,7 +52,7 @@ namespace cx
 
 //------------------------------------------------------------------------------
 ToolTipCalibrateWidget::ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent) :
-    BaseWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
+	BaseWidget(parent, "tool_tip_calibrate_widget", "ToolTip Calibrate"),
 	mServices(services),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
@@ -125,8 +125,21 @@ void ToolTipCalibrateWidget::calibrateSlot()
 
   if(ret == QMessageBox::Ok)
   {
-    tool->setCalibration_sMt(calibration);
-    mCalibrationLabel->setText("Calibration:\n"+qstring_cast(calibration));
+      try
+      {
+          tool->setCalibration_sMt(calibration);
+      }
+      catch(std::exception& e)
+      {
+          QMessageBox msgBox2;
+          msgBox2.setText("Unknown error, could not calibrate the tool: "+tool->getName()+".");
+          msgBox2.setInformativeText(QString(e.what()));
+          msgBox2.setStandardButtons(QMessageBox::Ok);
+          msgBox2.setDefaultButton(QMessageBox::Ok);
+          int ret2 = msgBox2.exec();
+          return;
+      }
+      mCalibrationLabel->setText("Calibration:\n"+qstring_cast(calibration));
   }
 }
 

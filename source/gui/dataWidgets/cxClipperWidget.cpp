@@ -318,7 +318,7 @@ QString ClipperWidget::getDataTypeRegExp()
 std::map<QString, DataPtr> ClipperWidget::getDatas()
 {
 	//TODO: Move SelectDataStringPropertyBase::filterOnType() to a utility file?
-	std::map<QString, DataPtr> datas = mServices->patient()->getData();
+	std::map<QString, DataPtr> datas = mServices->patient()->getDatas();
 	datas = SelectDataStringPropertyBase::filterOnType(datas, this->getDataTypeRegExp());
 	return datas;
 }

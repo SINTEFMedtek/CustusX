@@ -76,7 +76,7 @@ ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
 void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 {
 	cx::UsReconstructionServicePtr manager = this->getManager();
-	QDomElement algo = manager->getSettings().getElement("algorithms", "PNN");
+	QDomElement algo = manager->getSettings().getElement("algorithms", "pnn");
 	cx::ReconstructionMethodService* algorithm = manager->createAlgorithm();
 	REQUIRE(algorithm);
 

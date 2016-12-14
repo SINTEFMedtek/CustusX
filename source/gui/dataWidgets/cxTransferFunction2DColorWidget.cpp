@@ -39,7 +39,7 @@ namespace cx
 {
 
 TransferFunction2DColorWidget::TransferFunction2DColorWidget(ActiveDataPtr activeData, QWidget* parent) :
-  BaseWidget(parent, "TransferFunction2DColorWidget", "2D Color"),
+  BaseWidget(parent, "transfer_function_2d_color_widget", "2D Color"),
   mActiveData(activeData)
 {
 	this->setToolTip("Set a 2D color transfer function");

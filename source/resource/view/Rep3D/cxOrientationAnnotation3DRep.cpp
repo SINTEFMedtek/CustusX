@@ -114,6 +114,8 @@ bool OrientationAnnotation3DRep::getVisible() const
 
 void OrientationAnnotation3DRep::setVisible(bool on)
 {
+	if (!this->getView())
+		return;
 	mMarker->SetEnabled(on);
 }
 

@@ -41,7 +41,7 @@ namespace cx
 {
 
 ToolManagerWidget::ToolManagerWidget(QWidget* parent) :
-    BaseWidget(parent, "ToolManagerWidget", "ToolManager debugger"),
+	BaseWidget(parent, "tool_manager_widget", "ToolManager debugger"),
     mConfigureButton(new QPushButton("Configure")),
     mDeConfigureButton(new QPushButton("Deconfigure")),
     mInitializeButton(new QPushButton("Initialize")),

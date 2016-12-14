@@ -131,4 +131,20 @@ TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 	REQUIRE(activeDataProperty->getValue() == testData.image1->getUid());
 }
 
+TEST_CASE("Operating table set and get", "[unit][org.custusx.core.patientmodel]")
+{
+    SessionStorageTestFixture storageFixture;
+    cx::PatientModelServicePtr patientModelService = storageFixture.mPatientModelService;
+
+    cxtest::DirectSignalListener otChangedSignal(patientModelService.get(), SIGNAL(operatingTableChanged()));
+    cx::OperatingTable ot(cx::createTransformIJC(cx::Vector3D(0,1,0),
+                                             cx::Vector3D(0,0,1),
+                                             cx::Vector3D(3,4,5)));
+    CHECK(!cx::similar(ot.rMtb, patientModelService->getOperatingTable().rMtb));
+    patientModelService->setOperatingTable(ot);
+    CHECK(cx::similar(ot.rMtb, patientModelService->getOperatingTable().rMtb));
+
+    CHECK(otChangedSignal.isReceived());
+}
+
 } //cxtest

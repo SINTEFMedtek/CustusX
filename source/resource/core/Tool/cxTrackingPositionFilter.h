@@ -53,8 +53,9 @@ class cxResource_EXPORT TrackingPositionFilter
 {
 public:
 	TrackingPositionFilter();
+	void setCutOffFrequency(double freq);
 	void addPosition(Transform3D pos, double timestamp);
-	Transform3D getFilteredPosition();
+	Transform3D getFilteredPosition();	
 
 private:
 	std::map<double, Transform3D> mHistory;
@@ -63,6 +64,7 @@ private:
 	void clearIfTimestampIsOlderThanHead(Transform3D pos, double timestamp);
 	void clearIfJumpInTimestamps(Transform3D pos, double timestamp);
 	void interpolateAndFilterPositions(Transform3D pos, double timestamp);
+	void reset();
 	float mCutOffFrequency;
 	float mResampleFrequency;
 	static const int mFilterOrder = 2;

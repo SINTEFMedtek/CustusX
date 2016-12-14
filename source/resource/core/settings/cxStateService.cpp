@@ -92,6 +92,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Automation/autoDeleteDICOMDatabase", true);
 
 	this->fillDefault("TrackingPositionFilter/enabled", false);
+	this->fillDefault("TrackingPositionFilter/cutoffFrequency", 3.0);
 
 	this->fillDefault("renderingInterval", 33);
 	this->fillDefault("backgroundColor", QColor(30,60,70)); // a dark, grey-blue hue
@@ -106,6 +107,12 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Navigation/followTooltip", true);
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
+	this->fillDefault("View/tool2DColor", QColor::fromRgbF(0.25, 0.87, 0.16));
+	this->fillDefault("View/toolTipPointColor", QColor::fromRgbF(0.96, 0.87, 0.17));
+	this->fillDefault("View/toolOffsetPointColor", QColor::fromRgbF(0.96, 0.87, 0.17));
+	this->fillDefault("View/toolOffsetLineColor", QColor::fromRgbF(1.0, 0.8, 0.0));
+	this->fillDefault("View/toolCrossHairColor", QColor::fromRgbF(1.0, 0.8, 0.0));
+
 	this->fillDefault("showSectorInRTView", true);
 	this->fillDefault("View/showOrientationAnnotation", true);
 	this->fillDefault("View3D/stereoType", stFRAME_SEQUENTIAL);
@@ -113,6 +120,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
 	this->fillDefault("View/showMetricNamesInCorner", false);
+	this->fillDefault("View/toolCrosshair", true);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);

@@ -53,7 +53,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-void WidgetTypeRepository::add(QWidget *widget)
+boost::shared_ptr<QWidget> WidgetTypeRepository::findMetricWidget(DataPtr data)
+{
+	for (unsigned i=0; i<mWidgets.size(); ++i)
+	{
+		boost::shared_ptr<SingleMetricWidget> w = boost::dynamic_pointer_cast<SingleMetricWidget>(mWidgets[i]);
+		if(w && w->getData() && data && w->getData()->getUid() == data->getUid())
+			return w;
+	}
+	return boost::shared_ptr<QWidget>();
+}
+
+void WidgetTypeRepository::add(boost::shared_ptr<QWidget> widget)
 {
 	mWidgets.push_back(widget);
 }
@@ -133,7 +144,7 @@ void TreeRepository::startListen()
 	connect(this->getServices()->patient().get(), &PatientModelService::patientChanged, this, &TreeRepository::loaded);
 	connect(this->getServices()->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &TreeRepository::invalidate);
 	connect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::loaded);
-	connect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+	connect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::onChanged);
 }
 
 void TreeRepository::stopListen()
@@ -141,7 +152,7 @@ void TreeRepository::stopListen()
 	disconnect(this->getServices()->patient().get(), &PatientModelService::patientChanged, this, &TreeRepository::loaded);
 	disconnect(this->getServices()->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &TreeRepository::invalidate);
 	disconnect(this->getServices()->tracking().get(), &TrackingService::stateChanged, this, &TreeRepository::loaded);
-	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::changed);
+	disconnect(this->getServices()->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &TreeRepository::onChanged);
 }
 
 std::vector<TreeNodePtr> TreeRepository::getNodes()
@@ -204,10 +215,10 @@ void TreeRepository::insertTopNode()
 
 void TreeRepository::rebuild()
 {
-	mNodes.clear();
+//	CX_LOG_CHANNEL_DEBUG("CA") << "  reuild tree...";
 	for (unsigned i=0; i<mNodes.size(); ++i)
-		disconnect(mNodes[i].get(), &TreeNode::changed, this, &TreeRepository::changed);
-
+		disconnect(mNodes[i].get(), &TreeNode::changed, this, &TreeRepository::onChanged);
+	mNodes.clear();
 
 	this->insertTopNode();
 
@@ -217,7 +228,7 @@ void TreeRepository::rebuild()
 
 	this->insertSpaceNode(CoordinateSystem(csREF));
 
-	std::map<QString, DataPtr> source = this->getServices()->patient()->getData();
+	std::map<QString, DataPtr> source = this->getServices()->patient()->getDatas();
 	for (std::map<QString, DataPtr>::const_iterator iter = source.begin(); iter != source.end(); ++iter)
 	{
 		this->insertDataNode(iter->second);
@@ -290,17 +301,20 @@ void TreeRepository::appendNode(TreeNode* rawNode)
 
 	if (!this->getNode(node->getUid()))
 	{
-		connect(node.get(), &TreeNode::changed, this, &TreeRepository::changed);
-		connect(node.get(), &TreeNode::changed, this, &TreeRepository::invalidated);
-//		connect(node.get(), &TreeNode::changed, this, &TreeRepository::onChanged);
+		// TODO need a more detailed change policy: invalidate only when parent/childe
+		// structure is changed.
+//		connect(node.get(), &TreeNode::changed, this, &TreeRepository::invalidated);
+		connect(node.get(), &TreeNode::changed, this, &TreeRepository::onChanged);
 		mNodes.push_back(node);
 	}
 }
 
-//void TreeRepository::onChanged()
-//{
-//	CX_LOG_CHANNEL_DEBUG("CA") << "TreeRepository::onChanged()";
-//}
+void TreeRepository::onChanged()
+{
+	TreeNode* node = dynamic_cast<TreeNode*>(sender());
+//	CX_LOG_CHANNEL_DEBUG("CA") << "   TreeRepository::onChanged() node=" << ((node)?node->getName():"-");
+	emit changed(node);
+}
 
 void TreeRepository::insertSpaceNode(CoordinateSystem space)
 {

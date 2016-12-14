@@ -186,7 +186,7 @@ DoubleRange DoublePropertyImageTFDataAlpha::getValueRange() const
 //---------------------------------------------------------
 
 TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
-  BaseWidget(parent, "TransferFunction3DWidget", "3D"),
+  BaseWidget(parent, "transfer_function_3d_widget", "3D"),
   mLayout(new QVBoxLayout(this)),
   mActiveImageProxy(ActiveImageProxyPtr()),
   mActiveData(activeData)
@@ -237,7 +237,7 @@ void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
 //---------------------------------------------------------
 
 TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
-  BaseWidget(parent, "TransferFunction2DWidget", "2D"),
+  BaseWidget(parent, "transfer_function_2d_widget", "2D"),
   mLayout(new QVBoxLayout(this)),
   mActiveData(activeData)
 {
@@ -298,7 +298,7 @@ void TransferFunction2DWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 
 TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage) :
-  BaseWidget(parent, "TransferFunctionWidget", "Transfer Function")
+  BaseWidget(parent, "transfer_function_widget", "Transfer Function")
 {
 	this->setToolTip("Set a new or predefined transfer function on a volume");
   QVBoxLayout* mLayout = new QVBoxLayout(this);

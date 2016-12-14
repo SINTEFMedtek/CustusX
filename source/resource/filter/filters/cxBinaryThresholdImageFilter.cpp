@@ -66,7 +66,7 @@ QString BinaryThresholdImageFilter::getName() const
 
 QString BinaryThresholdImageFilter::getType() const
 {
-	return "BinaryThresholdImageFilter";
+	return "binary_threshold_image_filter";
 }
 
 QString BinaryThresholdImageFilter::getHelp() const

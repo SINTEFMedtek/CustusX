@@ -153,10 +153,10 @@ void MainWindowActions::createPatientActions()
 					   "Load patient file",
 					   &MainWindowActions::loadPatientFileSlot);
 
-	this->createAction("LoadFileCopy", "Load a copy of the Patient",
+	this->createAction("LoadFileCopy", "Load from Patient template",
 					   QIcon(":/icons/open_icon_library/document-open-7.png"),
 					   QKeySequence(),
-					   "Load a copy of the patient file",
+					   "Create a new patient based on a template",
 					   &MainWindowActions::loadPatientFileCopySlot);
 
 	this->createAction("ClearPatient", "Clear Patient",
@@ -208,6 +208,19 @@ QWidget* MainWindowActions::parentWidget()
 
 void MainWindowActions::newPatientSlot()
 {
+	QString choosenDir = this->selectNewPatientFolder();
+	if(choosenDir.isEmpty())
+		return;
+
+	// Update global patient number
+	int patientNumber = settings()->value("globalPatientNumber").toInt();
+	settings()->setValue("globalPatientNumber", ++patientNumber);
+
+	mServices->session()->load(choosenDir);
+}
+
+QString MainWindowActions::selectNewPatientFolder()
+{
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly());
@@ -223,17 +236,13 @@ void MainWindowActions::newPatientSlot()
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 	dialog.selectFile(filename);
 	if (!dialog.exec())
-		return;
+		return QString();
 	choosenDir = dialog.selectedFiles().front();
 
 	if (!choosenDir.endsWith(".cx3"))
 		choosenDir += QString(".cx3");
 
-	// Update global patient number
-	int patientNumber = settings()->value("globalPatientNumber").toInt();
-	settings()->setValue("globalPatientNumber", ++patientNumber);
-
-	mServices->session()->load(choosenDir);
+	return choosenDir;
 }
 
 QString MainWindowActions::getExistingSessionFolder()
@@ -272,14 +281,16 @@ void MainWindowActions::loadPatientFileSlot()
 
 void MainWindowActions::loadPatientFileCopySlot()
 {
-	QString patientDatafolder = this->getExistingSessionFolder();
+	QString patientDatafolder = profile()->getPatientTemplatePath();
 
 	// Open file dialog
-	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
+	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
 	if (folder.isEmpty())
 		return;
 
-	QString newFolder = folder+"_temp";
+	QString newFolder = this->selectNewPatientFolder();
+	if (newFolder.isEmpty())
+		return;
 
 	if(!copyRecursively(folder, newFolder, true))
 	{

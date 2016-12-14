@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxXmlOptionItem.h"
+#include "cxMetricUtilities.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -56,22 +58,29 @@ typedef boost::shared_ptr<class WidgetTypeRepository> WidgetTypeRepositoryPtr;
 class WidgetTypeRepository
 {
 public:
+	~WidgetTypeRepository()
+	{
+	}
+
 	template<class WIDGET>
-	WIDGET* find()
+	boost::shared_ptr<WIDGET> find()
 	{
 		for (unsigned i=0; i<mWidgets.size(); ++i)
 		{
-			WIDGET* w = dynamic_cast<WIDGET*>(mWidgets[i].data());
+			boost::shared_ptr<WIDGET> w = boost::dynamic_pointer_cast<WIDGET>(mWidgets[i]);
 			if (w)
 				return w;
 		}
-		return NULL;
+		return boost::shared_ptr<WIDGET>();
 	}
-	void add(QWidget* widget);
+
+	boost::shared_ptr<QWidget> findMetricWidget(DataPtr data);
+
+	void add(boost::shared_ptr<QWidget> widget);
 
 private:
 	typedef QPointer<QWidget> QWidgetPtr;
-	std::vector<QWidgetPtr> mWidgets;
+	std::vector<boost::shared_ptr<QWidget> > mWidgets;
 };
 
 class TreeRepository : public QObject
@@ -102,14 +111,14 @@ public slots:
 	void invalidate();
 
 signals:
-	void changed();
+	void changed(TreeNode* node=NULL);
 	void invalidated();
 	void loaded();
 
 private:
 	void createVisibilityProperty();
 	void createModeProperty();
-//	void onChanged();
+	void onChanged();
 
 	std::vector<TreeNodePtr> mNodes;
 	TreeRepositoryWeakPtr mSelf;

@@ -47,14 +47,14 @@ class ToolTreeNode : public TreeNodeImpl
   Q_OBJECT
 public:
 	ToolTreeNode(TreeRepositoryWeakPtr repo, ToolPtr tool);
-	virtual ~ToolTreeNode() {}
+	virtual ~ToolTreeNode();
 	virtual QString getUid() const;
 	virtual QString getName() const;
 	virtual QString getType() const;
 	virtual TreeNodePtr getParent() const;
 	virtual void activate();
 	virtual QIcon getIcon() const;
-	QWidget* createPropertiesWidget() const;
+	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const;
 	virtual QVariant getColor() const;
 	virtual bool useColoredName() const { return true; }
 	virtual QVariant getFont() const;

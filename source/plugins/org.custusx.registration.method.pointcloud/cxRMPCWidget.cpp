@@ -102,9 +102,9 @@ void RMPCWidget::applyRegistration(Transform3D delta)
 {
 	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D new_rMpr = delta*rMpr;//output
-	mServices->registration()->applyPatientRegistration(new_rMpr, "I2P Surface to Surface");
+	mServices->registration()->addPatientRegistration(new_rMpr, "I2P Surface to Surface");
 
-	mServices->registration()->applyImage2ImageRegistration(delta, "I2P Surface to Surface - correction");
+	mServices->registration()->addImage2ImageRegistration(delta, "I2P Surface to Surface - correction");
 
 }
 

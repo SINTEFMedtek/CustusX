@@ -125,7 +125,7 @@ void SeansVesselRegistrationWidget::inputChanged()
 
 void SeansVesselRegistrationWidget::applyRegistration(Transform3D delta)
 {
-	mServices->registration()->applyImage2ImageRegistration(delta, "Vessel based");
+	mServices->registration()->addImage2ImageRegistration(delta, "Vessel based");
 }
 
 void SeansVesselRegistrationWidget::onShown()

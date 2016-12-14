@@ -82,22 +82,22 @@ void RegistrationServiceNull::doImageRegistration(bool translationOnly)
 	printWarning();
 }
 
-void RegistrationServiceNull::applyImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationServiceNull::addImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	printWarning();
 }
 
-void RegistrationServiceNull::applyContinuousImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
+void RegistrationServiceNull::updateImage2ImageRegistration(Transform3D delta_pre_rMd, QString description)
 {
 	printWarning();
 }
 
-void RegistrationServiceNull::applyPatientRegistration(Transform3D rMpr_new, QString description)
+void RegistrationServiceNull::addPatientRegistration(Transform3D rMpr_new, QString description)
 {
 	printWarning();
 }
 
-void RegistrationServiceNull::applyContinuousPatientRegistration(Transform3D rMpr_new, QString description)
+void RegistrationServiceNull::updatePatientRegistration(Transform3D rMpr_new, QString description)
 {
 	printWarning();
 }

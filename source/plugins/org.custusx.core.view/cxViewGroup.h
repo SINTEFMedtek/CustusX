@@ -70,7 +70,7 @@ class org_custusx_core_view_EXPORT ViewGroup: public QObject
 {
 	Q_OBJECT
 public:
-	explicit ViewGroup(CoreServicesPtr backend);
+	explicit ViewGroup(CoreServicesPtr backend, QString uid);
 	virtual ~ViewGroup();
 
 	void addView(ViewWrapperPtr wrapper);
@@ -101,7 +101,8 @@ protected:
 
 private:
 	template<class T>
-    bool shouldUpdateActiveData(T activeData, std::vector<T> datas) const;
+	bool shouldUpdateActiveData(T activeData, std::vector<T> datas) const;
+	void optionChangedSlot();
 };
 
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

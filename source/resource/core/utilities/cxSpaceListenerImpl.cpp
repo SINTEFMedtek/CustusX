@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxActiveData.h"
 #include "cxLogger.h"
+#include "cxActiveToolProxy.h"
 
 namespace cx
 {
@@ -92,19 +93,22 @@ void SpaceListenerImpl::doConnect()
 
 	if (mSpace.mId == csSENSOR || mSpace.mId == csTOOL || mSpace.mId == csTOOL_OFFSET)
 	{
-		ToolPtr tool = mTrackingService->getTool(mSpace.mRefObject);
-		if (tool)
+		if (mSpace.mRefObject == "active")
 		{
-			connect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
-			connect(tool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
-
-			if (mSpace.mRefObject == "active")
-			{
-//				connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
-				connect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(reconnect()));
-			}
-			connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			mActiveTool = ActiveToolProxy::New(mTrackingService);
+			connect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
+			connect(mActiveTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
 		}
+		else
+		{
+			ToolPtr tool = mTrackingService->getTool(mSpace.mRefObject);
+			if (tool)
+			{
+				connect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
+				connect(tool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
+			}
+		}
+		connect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 
 	if (mSpace.mId == csPATIENTREF)
@@ -131,19 +135,22 @@ void SpaceListenerImpl::doDisconnect()
 
 	if (mSpace.mId == csSENSOR || mSpace.mId == csTOOL || mSpace.mId == csTOOL_OFFSET)
 	{
-		ToolPtr tool = mTrackingService->getTool(mSpace.mRefObject);
-		if (tool)
+		if (mActiveTool)
 		{
-			disconnect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
-			disconnect(tool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
-
-			if (mSpace.mRefObject == "active")
-			{
-				disconnect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SIGNAL(changed()));
-				disconnect(mTrackingService.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(reconnect()));
-			}
-			disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
+			disconnect(mActiveTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
+			disconnect(mActiveTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
+			mActiveTool.reset();
 		}
+		else
+		{
+			ToolPtr tool = mTrackingService->getTool(mSpace.mRefObject);
+			if (tool)
+			{
+				disconnect(tool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(changed()));
+				disconnect(tool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
+			}
+		}
+		disconnect(mDataManager.get(), SIGNAL(rMprChanged()), this, SIGNAL(changed()));
 	}
 
 	if (mSpace.mId == csPATIENTREF)

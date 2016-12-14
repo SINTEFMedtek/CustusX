@@ -62,6 +62,7 @@ InteractiveClipper::InteractiveClipper(CoreServicesPtr services) :
 	mSlicePlanesProxy->addSimpleSlicePlane(ptANYPLANE, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptSIDEPLANE, dm);
 	mSlicePlanesProxy->addSimpleSlicePlane(ptRADIALPLANE, dm);
+    mSlicePlanesProxy->addSimpleSlicePlane(ptTOOLSIDEPLANE, dm);
 
 	mSlicePlaneClipper = SlicePlaneClipper::New();
 

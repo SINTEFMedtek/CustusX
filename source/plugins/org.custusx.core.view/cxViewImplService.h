@@ -81,6 +81,7 @@ public:
 	virtual QActionGroup* getInteractorStyleActionGroup();
 	virtual void centerToImageCenterInActiveViewGroup();
 	virtual void addDefaultLayout(LayoutData layoutData);
+	virtual void enableContextMenuForViews(bool enable=true);
 
 	virtual bool isNull();
 
@@ -94,13 +95,15 @@ private slots:
 	void onSessionLoad(QDomElement& node);
 	void onSessionSave(QDomElement& node);
 
+protected:
+	ViewManagerPtr mBase;
+	ViewManager* viewManager() const { return mBase.get(); }
+
 private:
 	ctkPluginContext *mContext;
-	ViewManagerPtr mBase;
 	SessionStorageServicePtr mSession;
 	ClippersPtr mClippers;
 
-	ViewManager* viewManager() const { return mBase.get(); }
 };
 typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;
 

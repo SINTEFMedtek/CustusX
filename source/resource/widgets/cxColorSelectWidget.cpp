@@ -48,7 +48,10 @@ ColorSelectWidget::ColorSelectWidget(QWidget* parent, ColorPropertyBasePtr dataI
     mLabel->setText(dataInterface->getDisplayName());
 
     mColorButton = new cx::ColorSelectButton("");
-    connect(mColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(valueChanged(QColor)));
+
+	// emit as queued signal because of crash issues related to handling the signal
+	// in the modal loop of the color select dialog of cx:ColorSelectButton.
+	connect(mColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(valueChanged(QColor)), Qt::QueuedConnection);
 
     if (gridLayout) // add to input gridlayout
     {

@@ -90,7 +90,7 @@ void PlaneMetric::addXml(QDomNode& dataNode)
 void PlaneMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
-	mArguments->parseXml(dataNode, mDataManager->getData());
+	mArguments->parseXml(dataNode, mDataManager->getDatas());
 }
 
 DoubleBoundingBox3D PlaneMetric::boundingBox() const

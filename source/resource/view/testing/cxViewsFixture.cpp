@@ -143,7 +143,7 @@ cx::SliceProxyPtr ViewsFixture::createSliceProxy(cx::PLANE_TYPE plane)
 
 	cx::SliceProxyPtr proxy = cx::SliceProxy::create(mServices->patient());
 	proxy->setTool(tool);
-	proxy->initializeFromPlane(plane, false, cx::Vector3D(0,0,-1), false, 1, 0);
+	proxy->initializeFromPlane(plane, false, false, 1, 0);
 	return proxy;
 }
 

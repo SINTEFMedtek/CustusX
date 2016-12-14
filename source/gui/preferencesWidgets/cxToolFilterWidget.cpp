@@ -91,6 +91,8 @@ void ToolFilterGroupBox::setTrackingSystemSelector(StringPropertyBasePtr selecto
 
 	if (mTrackingSystemSelector)
 		connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterSlot()));
+
+	this->filterSlot();
 }
 
 void ToolFilterGroupBox::setClinicalApplicationSlot(QString val)

@@ -75,14 +75,17 @@ void NetworkPluginActivator::start(ctkPluginContext* context)
 	// let's go
     server->listen(port);
 
-	//mRegistration = RegisteredService::create<NetworkServiceImpl>(context, NetworkService_iid);
 }
 
 void NetworkPluginActivator::stop(ctkPluginContext* context)
 {
+	mRequestHandler.reset();
+	mAPI.reset();
+
+	server->close();
 	delete server;
 	server = NULL;
-//	mRegistration.reset();
+
 	Q_UNUSED(context);
 }
 

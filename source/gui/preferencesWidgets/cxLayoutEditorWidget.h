@@ -109,8 +109,9 @@ private:
   QSpinBox* mRowsEdit;
   QSpinBox* mColsEdit;
   QLineEdit* mNameEdit;
+  BoolPropertyPtr mOffScreenRendering;
 
-  std::vector<std::vector<GridElement> > mViewDataCache; ///< 10x10 grid of all available views
+  std::vector<std::vector<GridElement> > mViewDataCache; ///< LayoutData::MaxGridSize^2 grid of all available views
   LayoutData mViewData; ///< RxC grid of currently used views.
   std::map<PLANE_TYPE, QString> mPlaneNames; ///< names of planes for use in gui
   QPoint mClickPos;
@@ -129,6 +130,7 @@ private:
 
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
+  void onOffScreenRenderingChanged();
 };
 
 

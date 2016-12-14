@@ -129,11 +129,10 @@ void DisplayTextRep::setFontSize(int size)
 	for(unsigned i =0; i<mDisplayText.size(); ++i)
 	{
 		mDisplayText.at(i)->textProperty()->SetFontSize(size) ;
+		if (size != mDisplayText[i]->textProperty()->GetFontSize())
+			mDisplayText.at(i)->textProperty()->SetFontSize(size) ;
 	}
 }
-
-
-
 
 //-----------------------------------------------------------------------
 }//end namespace

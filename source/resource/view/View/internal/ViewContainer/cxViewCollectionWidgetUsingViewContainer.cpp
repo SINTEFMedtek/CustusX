@@ -77,6 +77,17 @@ ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutR
 	return view;
 }
 
+void ViewCollectionWidgetUsingViewContainer::setOffScreenRenderingAndClear(bool on)
+{
+	this->clearViews();
+	mViewContainer->setOffScreenRenderingAndClear(on);
+}
+
+bool ViewCollectionWidgetUsingViewContainer::getOffScreenRendering() const
+{
+	return mViewContainer->getOffScreenRendering();
+}
+
 void ViewCollectionWidgetUsingViewContainer::clearViews()
 {
 	mViews.clear();
@@ -131,7 +142,13 @@ QPoint ViewCollectionWidgetUsingViewContainer::getPosition(ViewPtr view)
     QPoint p(p_vc[0], p_vc[1]);
     p = mViewContainer->mapToGlobal(p);
     p = this->mapFromGlobal(p);
-    return p;
+	return p;
+}
+
+void ViewCollectionWidgetUsingViewContainer::enableContextMenuForViews(bool enable)
+{
+	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
+	mViewContainer->setContextMenuPolicy(policy);
 }
 
 

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/scoped_ptr.hpp"
 #include "cxTransform3D.h"
 #include "cxIndent.h"
+#include "cxSliceComputer.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -110,10 +111,10 @@ public:
 	void setOrientation(ORIENTATION_TYPE orientation );
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
-	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);
+	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, bool useViewOffset, double viewportHeight, double toolViewOffset);
 
 	void setGravity(bool use, const Vector3D& dir);
-	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset = false);
+	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset);
 	void setToolViewportHeight(double viewportHeight);
 	void setDefaultCenter(const Vector3D& c);
 	void setAlwaysUseDefaultCenter(bool on);
@@ -158,6 +159,7 @@ private:
 //	QString mName; ///< for debug
 	bool mUseTooltipOffset;
 	PatientModelServicePtr mDataManager;
+	SlicePlane mLastEmittedSlicePlane;
 };
 
 /**

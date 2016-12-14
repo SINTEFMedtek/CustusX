@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxPlaneTypeCollection.h"
+#include "cxViewService.h"
 class QDomNode;
 
 namespace cx
@@ -58,7 +59,29 @@ typedef boost::shared_ptr<class StringListProperty> StringListPropertyPtr;
  * \addtogroup cx_resource_view
  * @{
  */
+struct cxResourceVisualization_EXPORT CameraStyleData
+{
+	CameraStyleData();
+	explicit CameraStyleData(CAMERA_STYLE_TYPE style);
+	void setCameraStyle(CAMERA_STYLE_TYPE style);
+	CAMERA_STYLE_TYPE getStyle();
+	void clear();
+	void addXml(QDomNode& dataNode);
+	void parseXml(QDomNode dataNode);
 
+	double mCameraViewAngle;
+	bool mCameraFollowTool;
+	bool mFocusFollowTool;
+	bool mCameraLockToTooltip;
+	double mCameraTooltipOffset;
+	bool mTableLock;
+	double mElevation;
+	bool mUniCam;
+	QString mCameraNotBehindROI; // never move camera behind this roi
+	QString mFocusROI; // name of ROI to set focus in.
+	QString mAutoZoomROI; // name of ROI to zoom to.
+};
+cxResourceVisualization_EXPORT bool operator==(const CameraStyleData& lhs, const CameraStyleData& rhs);
 
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
@@ -107,8 +130,9 @@ class cxResourceVisualization_EXPORT ViewGroupData: public QObject
 {
 Q_OBJECT
 public:
-	explicit ViewGroupData(CoreServicesPtr services);
+	explicit ViewGroupData(CoreServicesPtr services, QString uid);
 	void requestInitialize();
+	QString getUid() const { return mUid; }
 //	std::vector<DataPtr> getData() const;
 	std::vector<DataPtr> getData(DataViewProperties properties=DataViewProperties::createFull()) const;
 	QString getVideoSource() const;
@@ -141,7 +165,9 @@ public:
 		Options();
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
+//		bool mLockToTable; ///< lock the 3D view orientation to have Table down.
 		MeshPtr mPickerGlyph;
+		CameraStyleData mCameraStyle;
 	};
 
 	Options getOptions() const;
@@ -162,6 +188,7 @@ signals:
 	void optionsChanged();
 
 private:
+	QString mUid;
 	CoreServicesPtr mServices;
 	QString mVideoSource;
 	typedef std::pair<QString, DataViewProperties> DataAndViewProperties;

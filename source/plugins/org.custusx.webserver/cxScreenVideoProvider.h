@@ -78,15 +78,14 @@ public:
     class ViewCollectionWidget* getSecondaryLayoutWidget();
     void saveScreenShot(QImage image, QString id);
 	QByteArray generatePNGEncoding(QImage image);
-//	void saveScreenShotThreaded(QImage pixmap, QString filename);
 	QPixmap grabScreen(unsigned screenid);
     void showSecondaryLayout(QSize size, QString layout);
 	QImage grabSecondaryLayout();
     void closeSecondaryLayout();
 private:
 	VisServicesPtr mServices;
-	QPointer<class SecondaryViewLayoutWindow> mSecondaryViewLayoutWindow;
-//	new SecondaryViewLayoutWindow(this)
+	SecondaryViewLayoutWindow* mSecondaryViewLayoutWindow;
+	QPointer<class QWidget> mTopWindow;
 	ScreenShotImageWriter mWriter;
 	void setWidgetToNiceSizeInLowerRightCorner(QSize size);
 };

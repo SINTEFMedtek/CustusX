@@ -86,12 +86,14 @@ private:
   QComboBox* mToolConfigFolderComboBox;
 
   BoolPropertyPtr mFilterToolPositions;
+  DoublePropertyPtr mFilterToolPositionsCutoff;
 
   QString mGlobalPatientDataFolder;
   QString mVLCPath;
   ViewServicePtr mViewService;
   PatientModelServicePtr mPatientModelService;
   StringPropertyPtr mSelector;
+
 };
 } /* namespace cx */
 #endif /* CXGENERALTAB_H_ */

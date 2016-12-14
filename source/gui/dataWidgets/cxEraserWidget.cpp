@@ -65,7 +65,7 @@ namespace cx
 {
 
 EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent) :
-	BaseWidget(parent, "EraserWidget", "Eraser"),
+	BaseWidget(parent, "eraser_widget", "Eraser"),
 	mPreviousCenter(0,0,0),
 	mPreviousRadius(0),
 	mActiveImageProxy(ActiveImageProxyPtr()),

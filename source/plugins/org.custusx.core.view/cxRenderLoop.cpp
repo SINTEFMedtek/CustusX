@@ -46,7 +46,6 @@ namespace cx
 RenderLoop::RenderLoop() :
 	QObject(NULL),
 	mTimer(NULL),
-	mPreRenderSignalRequested(false),
 	mSmartRender(false),
 	mLogging(false),
 	mBaseRenderInterval(40)
@@ -74,11 +73,6 @@ void RenderLoop::stop()
 bool RenderLoop::isRunning() const
 {
 	return mTimer->isActive();
-}
-
-void RenderLoop::requestPreRenderSignal()
-{
-	mPreRenderSignalRequested = true;
 }
 
 void RenderLoop::setRenderingInterval(int interval)
@@ -129,7 +123,7 @@ void RenderLoop::timeoutSlot()
 	mLastBeginRender = QDateTime::currentDateTime();
 	this->sendRenderIntervalToTimer(mBaseRenderInterval);
 
-	this->emitPreRenderIfRequested();
+	emit preRender();
 
 	this->renderViews();
 
@@ -137,16 +131,6 @@ void RenderLoop::timeoutSlot()
 
 	int timeToNext = this->calculateTimeToNextRender();
 	this->sendRenderIntervalToTimer(timeToNext);
-}
-
-void RenderLoop::emitPreRenderIfRequested()
-{
-	if(mPreRenderSignalRequested)
-	{
-		emit preRender();
-		mPreRenderSignalRequested = false;
-	}
-	//    mRenderTimer->time("prerender");
 }
 
 void RenderLoop::renderViews()

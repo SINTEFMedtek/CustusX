@@ -87,7 +87,7 @@ public:
 
 
 Transform3DWidget::Transform3DWidget(QWidget* parent) :
-    BaseWidget(parent, "Transform3DWidget", "Transform 3D")
+	BaseWidget(parent, "transform_3d_widget", "Transform 3D")
 {
 	this->setToolTip("Display and manipulate an affine (rotation+translation) matrix");
   recursive = false;

@@ -63,6 +63,21 @@ private slots:
 };
 //------------------------------------------------------------------------------
 
+/**
+ * Helper class for setting a color in settings()
+ */
+class cxResourceWidgets_EXPORT SelectColorSettingButton : public ColorSelectButton
+{
+	Q_OBJECT
+
+public:
+	SelectColorSettingButton(QString caption, QString id, QString help);
+	void storeColor(QColor color);
+
+private:
+	QString mId;
+};
+
 
 }
 

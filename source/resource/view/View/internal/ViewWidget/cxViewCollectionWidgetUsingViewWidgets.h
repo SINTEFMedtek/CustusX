@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_
 #define CXVIEWCOLLECTIONWIDGETUSINGVIEWWIDGETS_H_
 
+#include "cxResourceVisualizationExport.h"
+
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
@@ -44,6 +46,8 @@ class QGridLayout;
 namespace cx
 {
 
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
 /**
  * Widget for displaying Views, Containing a QGridLayout of QVTKWidgets,
  * one for each view.
@@ -52,7 +56,7 @@ namespace cx
  * \date 2013-11-05
  * \author Christian Askeland
  */
-class LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
+class cxResourceVisualization_EXPORT LayoutWidgetUsingViewWidgets : public ViewCollectionWidget
 {
 	Q_OBJECT
 public:
@@ -60,6 +64,8 @@ public:
     virtual ~LayoutWidgetUsingViewWidgets();
 
 	virtual ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual void setOffScreenRenderingAndClear(bool on);
+	virtual bool getOffScreenRendering() const;
 	virtual void clearViews();
 	virtual void setModified();
 	virtual void render();
@@ -69,19 +75,18 @@ public:
     virtual int getGridMargin() const;
     virtual std::vector<ViewPtr> getViews();
     virtual QPoint getPosition(ViewPtr view);
+	virtual void enableContextMenuForViews(bool enable);
+
+protected:
+	std::vector<ViewWidget*> mViews;
 
 private:
-	ViewWidget* retrieveView(View::Type type);
     ViewWidget* WidgetFromView(ViewPtr view);
 
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache2D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache3D;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCacheRT;
-	boost::shared_ptr<ViewCache<ViewWidget> > mViewCache;
+	MultiViewCachePtr mViewCache;
 	QGridLayout* mLayout; ///< the layout
-	std::vector<ViewWidget*> mViews;
+	bool mOffScreenRendering;
 };
-
 
 } // namespace cx
 

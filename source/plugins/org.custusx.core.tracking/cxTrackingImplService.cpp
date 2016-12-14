@@ -116,18 +116,24 @@ void TrackingImplService::onSystemStateChanged()
  */
 void TrackingImplService::setPlaybackMode(PlaybackTimePtr controller)
 {
+	// playback off, reinstall old tracking systems
 	if (mPlaybackSystem)
 	{
 		mPlaybackSystem->setState(Tool::tsNONE);
 		this->unInstallTrackingSystem(mPlaybackSystem);
-		this->installTrackingSystem(mPlaybackSystem->getBase());
+		std::vector<TrackingSystemServicePtr> old = mPlaybackSystem->getBase();
+		for (unsigned i=0; i<old.size(); ++i)
+			this->installTrackingSystem(old[i]);
 		mPlaybackSystem.reset();
 	}
 
+	// uninstall tracking systems, playback on
 	if (controller)
 	{
-		mPlaybackSystem.reset(new TrackingSystemPlaybackService(controller, mTrackingSystems.back(), mManualTool));
-		this->unInstallTrackingSystem(mPlaybackSystem->getBase());
+		mPlaybackSystem.reset(new TrackingSystemPlaybackService(controller, mTrackingSystems, mManualTool));
+		std::vector<TrackingSystemServicePtr> old = mPlaybackSystem->getBase();
+		for (unsigned i=0; i<old.size(); ++i)
+			this->unInstallTrackingSystem(old[i]);
 		this->installTrackingSystem(mPlaybackSystem);
 		mPlaybackSystem->setState(Tool::tsTRACKING);
 	}
@@ -151,12 +157,14 @@ void TrackingImplService::runDummyTool(DummyToolPtr tool)
 void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 {
 	mTrackingSystems.push_back(system);
+	report("Installing tracking system: " + system->getUid());
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
 	this->onSystemStateChanged();
 }
 
 void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr system)
 {
+	report("Uninstalling tracking system: " + system->getUid());
 	disconnect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
 
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
@@ -242,8 +250,10 @@ void TrackingImplService::rebuildCachedTools()
     }
     mTools[mManualTool->getUid()] = mManualTool;
     this->imbueManualToolWithRealProperties();
-    this->setActiveTool(this->getManualTool()->getUid());
     this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
+	this->resetTrackingPositionFilters();
+	this->onTooltipOffset(mToolTipOffset);
+	this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
 }
 
 void TrackingImplService::imbueManualToolWithRealProperties()
@@ -451,13 +461,18 @@ void TrackingImplService::globalConfigurationFileChangedSlot(QString key)
 
 void TrackingImplService::resetTrackingPositionFilters()
 {
-	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toInt();
+	bool enabled = settings()->value("TrackingPositionFilter/enabled", false).toBool();
+	double cutoff = settings()->value("TrackingPositionFilter/cutoffFrequency", 0).toDouble();
 
 	for (ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
 	{
 		TrackingPositionFilterPtr filter;
 		if (enabled)
+		{
 			filter.reset(new TrackingPositionFilter());
+			if (cutoff>0.01)
+				filter->setCutOffFrequency(cutoff);
+		}
 		iter->second->resetTrackingPositionFilter(filter);
 	}
 }

@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -53,7 +53,7 @@ namespace cx
 DoublePropertyActiveToolOffset::DoublePropertyActiveToolOffset(ActiveToolProxyPtr activeTool) :
 	mActiveTool(activeTool)
 {
-  connect(mActiveTool.get(), &ActiveToolProxy::tooltipOffset, this, &Property::changed);
+	connect(mActiveTool.get(), &ActiveToolProxy::tooltipOffset, this, &Property::changed);
 }
 
 double DoublePropertyActiveToolOffset::getValue() const
@@ -63,14 +63,14 @@ double DoublePropertyActiveToolOffset::getValue() const
 
 bool DoublePropertyActiveToolOffset::setValue(double val)
 {
-  mActiveTool->getTool()->setTooltipOffset(val);
-  return true;
+	mActiveTool->getTool()->setTooltipOffset(val);
+	return true;
 }
 
 DoubleRange DoublePropertyActiveToolOffset::getValueRange() const
 {
-  double range = 200;
-  return DoubleRange(0,range,1);
+	double range = 200;
+	return DoubleRange(0,range,1);
 }
 
 //---------------------------------------------------------
@@ -100,14 +100,14 @@ double DoublePropertyToolOffset::getValue() const
 
 bool DoublePropertyToolOffset::setValue(double val)
 {
-  mTool->setTooltipOffset(val);
-  return true;
+	mTool->setTooltipOffset(val);
+	return true;
 }
 
 DoubleRange DoublePropertyToolOffset::getValueRange() const
 {
-  double range = 200;
-  return DoubleRange(0,range,1);
+	double range = 200;
+	return DoubleRange(0,range,1);
 }
 
 
@@ -124,21 +124,21 @@ DoublePropertyActiveImageBase::DoublePropertyActiveImageBase(ActiveDataPtr activ
 }
 void DoublePropertyActiveImageBase::activeImageChanged()
 {
-  mImage = mActiveData->getActive<Image>();
-  emit changed();
+	mImage = mActiveData->getActive<Image>();
+	emit changed();
 }
 double DoublePropertyActiveImageBase::getValue() const
 {
-  if (!mImage)
-    return 0.0;
-  return getValueInternal();
+	if (!mImage)
+		return 0.0;
+	return getValueInternal();
 }
 bool DoublePropertyActiveImageBase::setValue(double val)
 {
-  if (!mImage)
-    return false;
-  setValueInternal(val);
-  return true;
+	if (!mImage)
+		return false;
+	setValueInternal(val);
+	return true;
 }
 
 //---------------------------------------------------------
@@ -146,18 +146,18 @@ bool DoublePropertyActiveImageBase::setValue(double val)
 
 double DoubleProperty2DWindow::getValueInternal() const
 {
-  return mImage->getLookupTable2D()->getWindow();
+	return mImage->getLookupTable2D()->getWindow();
 }
 void DoubleProperty2DWindow::setValueInternal(double val)
 {
-  mImage->getLookupTable2D()->setWindow(val);
+	mImage->getLookupTable2D()->setWindow(val);
 }
 DoubleRange DoubleProperty2DWindow::getValueRange() const
 {
-  if (!mImage)
-    return DoubleRange();
-  double range = mImage->getRange();
-  return DoubleRange(1,range,range/1000.0);
+	if (!mImage)
+		return DoubleRange();
+	double range = mImage->getRange();
+	return DoubleRange(1,range,range/1000.0);
 }
 
 //---------------------------------------------------------
@@ -165,19 +165,19 @@ DoubleRange DoubleProperty2DWindow::getValueRange() const
 
 double DoubleProperty2DLevel::getValueInternal() const
 {
-  return mImage->getLookupTable2D()->getLevel();
+	return mImage->getLookupTable2D()->getLevel();
 }
 void DoubleProperty2DLevel::setValueInternal(double val)
 {
-  mImage->getLookupTable2D()->setLevel(val);
+	mImage->getLookupTable2D()->setLevel(val);
 }
 DoubleRange DoubleProperty2DLevel::getValueRange() const
 {
-  if (!mImage)
-    return DoubleRange();
+	if (!mImage)
+		return DoubleRange();
 
-  double max = mImage->getMax();
-  return DoubleRange(1,max,max/1000.0);
+	double max = mImage->getMax();
+	return DoubleRange(1,max,max/1000.0);
 }
 
 
@@ -194,12 +194,12 @@ StringPropertyParentFrame::StringPropertyParentFrame(PatientModelServicePtr pati
 
 void StringPropertyParentFrame::setData(DataPtr data)
 {
-  if (mData)
-	  disconnect(mData.get(), &Data::transformChanged, this, &Property::changed);
-  mData = data;
-  if (mData)
-	  connect(mData.get(), &Data::transformChanged, this, &Property::changed);
-  emit changed();
+	if (mData)
+		disconnect(mData.get(), &Data::transformChanged, this, &Property::changed);
+	mData = data;
+	if (mData)
+		connect(mData.get(), &Data::transformChanged, this, &Property::changed);
+	emit changed();
 }
 
 StringPropertyParentFrame::~StringPropertyParentFrame()
@@ -209,53 +209,53 @@ StringPropertyParentFrame::~StringPropertyParentFrame()
 
 QString StringPropertyParentFrame::getDisplayName() const
 {
-  return "Parent Frame";
+	return "Parent Frame";
 }
 
 bool StringPropertyParentFrame::setValue(const QString& value)
 {
-  if (!mData)
-    return false;
-  mData->get_rMd_History()->addParentSpace(value);
-  return true;
+	if (!mData)
+		return false;
+	mData->get_rMd_History()->addParentSpace(value);
+	return true;
 }
 
 QString StringPropertyParentFrame::getValue() const
 {
-  if (!mData)
-    return "";
-  return qstring_cast(mData->getParentSpace());
+	if (!mData)
+		return "";
+	return qstring_cast(mData->getParentSpace());
 }
 
 QString StringPropertyParentFrame::getHelp() const
 {
-  if (!mData)
-    return "";
-  return "Select the parent frame for " + qstring_cast(mData->getName()) + ".";
+	if (!mData)
+		return "";
+	return "Select the parent frame for " + qstring_cast(mData->getName()) + ".";
 }
 
 QStringList StringPropertyParentFrame::getValueRange() const
 {
-  QStringList retval;
-  retval << "";
+	QStringList retval;
+	retval << "";
 
-  std::map<QString, DataPtr> allData = mPatientModelService->getData();
-  for (std::map<QString, DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
-  {
-    if (mData && (mData->getUid() == iter->first))
-      continue;
+	std::map<QString, DataPtr> allData = mPatientModelService->getDatas();
+	for (std::map<QString, DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
+	{
+		if (mData && (mData->getUid() == iter->first))
+			continue;
 
-    retval << qstring_cast(iter->first);
-  }
-  return retval;
+		retval << qstring_cast(iter->first);
+	}
+	return retval;
 }
 
 QString StringPropertyParentFrame::convertInternal2Display(QString internal)
 {
-  DataPtr data = mPatientModelService->getData(internal);
-  if (!data)
-    return "<no data>";
-  return qstring_cast(data->getName());
+	DataPtr data = mPatientModelService->getData(internal);
+	if (!data)
+		return "<no data>";
+	return qstring_cast(data->getName());
 }
 
 //---------------------------------------------------------
@@ -269,10 +269,10 @@ StringPropertySetParentFrame::StringPropertySetParentFrame(PatientModelServicePt
 
 bool StringPropertySetParentFrame::setValue(const QString& value)
 {
-  if (!mData)
-    return false;
-  mData->get_rMd_History()->setParentSpace(value);
-  return true;
+	if (!mData)
+		return false;
+	mData->get_rMd_History()->setParentSpace(value);
+	return true;
 }
 
 //---------------------------------------------------------
@@ -285,28 +285,28 @@ StringPropertyDataNameEditable::StringPropertyDataNameEditable()
 
 QString StringPropertyDataNameEditable::getDisplayName() const
 {
-  return "Name";
+	return "Name";
 }
 
 bool StringPropertyDataNameEditable::setValue(const QString& value)
 {
-  if (!mData)
-    return false;
-  mData->setName(value);
-  return true;
+	if (!mData)
+		return false;
+	mData->setName(value);
+	return true;
 }
 
 QString StringPropertyDataNameEditable::getValue() const
 {
-  if (mData)
-    return mData->getName();
-  return "";
+	if (mData)
+		return mData->getName();
+	return "";
 }
 
 void StringPropertyDataNameEditable::setData(DataPtr data)
 {
-  mData = data;
-  emit changed();
+	mData = data;
+	emit changed();
 }
 
 //---------------------------------------------------------
@@ -319,25 +319,25 @@ StringPropertyDataUidEditable::StringPropertyDataUidEditable()
 
 QString StringPropertyDataUidEditable::getDisplayName() const
 {
-  return "Uid";
+	return "Uid";
 }
 
 bool StringPropertyDataUidEditable::setValue(const QString& value)
 {
-  return false;
+	return false;
 }
 
 QString StringPropertyDataUidEditable::getValue() const
 {
-  if (mData)
-    return mData->getUid();
-  return "";
+	if (mData)
+		return mData->getUid();
+	return "";
 }
 
 void StringPropertyDataUidEditable::setData(DataPtr data)
 {
-  mData = data;
-  emit changed();
+	mData = data;
+	emit changed();
 }
 
 //---------------------------------------------------------
@@ -476,124 +476,124 @@ QStringList StringPropertyImageType::getValueRange() const
 //---------------------------------------------------------
 
 StringPropertyGlyphOrientationArray::StringPropertyGlyphOrientationArray(PatientModelServicePtr patientModelService) :
-    mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService)
 {
-    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
 StringPropertyGlyphOrientationArray::~StringPropertyGlyphOrientationArray()
 {
-    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
 void StringPropertyGlyphOrientationArray::setData(MeshPtr data)
 {
-    if (mData)
-        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
-    mData = data;
-    if (mData)
-        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
-    emit changed();
+	if (mData)
+		disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+	mData = data;
+	if (mData)
+		connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+	emit changed();
 }
 
 QString StringPropertyGlyphOrientationArray::getDisplayName() const
 {
-    return "Set glyph orientation array";
+	return "Set glyph orientation array";
 }
 
 bool StringPropertyGlyphOrientationArray::setValue(const QString& value)
 {
-    if (!mData)
-        return false;
-    mData->setOrientationArray(value.toStdString().c_str());
-    return true;
+	if (!mData)
+		return false;
+	mData->setOrientationArray(value.toStdString().c_str());
+	return true;
 }
 
 QString StringPropertyGlyphOrientationArray::getValue() const
 {
-    if (!mData)
-        return "";
-    return mData->getOrientationArray();
+	if (!mData)
+		return "";
+	return mData->getOrientationArray();
 }
 
 QString StringPropertyGlyphOrientationArray::getHelp() const
 {
-    if (!mData)
-        return "";
-    return "Select which array to use for orientation of the glyphs.";
+	if (!mData)
+		return "";
+	return "Select which array to use for orientation of the glyphs.";
 }
 
 QStringList StringPropertyGlyphOrientationArray::getValueRange() const
 {
-    if (!mData)
-    {
-        QStringList retval;
-        retval << "";
-        return retval;
-    }
-    return mData->getOrientationArrayList();
+	if (!mData)
+	{
+		QStringList retval;
+		retval << "";
+		return retval;
+	}
+	return mData->getOrientationArrayList();
 }
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 StringPropertyGlyphColorArray::StringPropertyGlyphColorArray(PatientModelServicePtr patientModelService) :
-    mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService)
 {
-    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
 StringPropertyGlyphColorArray::~StringPropertyGlyphColorArray()
 {
-    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
 void StringPropertyGlyphColorArray::setData(MeshPtr data)
 {
-    if (mData)
-        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
-    mData = data;
-    if (mData)
-        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
-    emit changed();
+	if (mData)
+		disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+	mData = data;
+	if (mData)
+		connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+	emit changed();
 }
 
 QString StringPropertyGlyphColorArray::getDisplayName() const
 {
-    return "Set glyph color array";
+	return "Set glyph color array";
 }
 
 bool StringPropertyGlyphColorArray::setValue(const QString& value)
 {
-    if (!mData)
-        return false;
-    mData->setColorArray(value.toStdString().c_str());
-    return true;
+	if (!mData)
+		return false;
+	mData->setColorArray(value.toStdString().c_str());
+	return true;
 }
 
 QString StringPropertyGlyphColorArray::getValue() const
 {
-    if (!mData)
-        return "";
-    return mData->getColorArray();
+	if (!mData)
+		return "";
+	return mData->getColorArray();
 }
 
 QString StringPropertyGlyphColorArray::getHelp() const
 {
-    if (!mData)
-        return "";
-    return "Select which array to use for coloring the glyphs.";
+	if (!mData)
+		return "";
+	return "Select which array to use for coloring the glyphs.";
 }
 
 QStringList StringPropertyGlyphColorArray::getValueRange() const
 {
-    if (!mData)
-    {
-        QStringList retval;
-        retval << "";
-        return retval;
-    }
-    return mData->getColorArrayList();
+	if (!mData)
+	{
+		QStringList retval;
+		retval << "";
+		return retval;
+	}
+	return mData->getColorArrayList();
 }
 
 //---------------------------------------------------------
@@ -601,84 +601,85 @@ QStringList StringPropertyGlyphColorArray::getValueRange() const
 //---------------------------------------------------------
 
 StringPropertyGlyphLUT::StringPropertyGlyphLUT(PatientModelServicePtr patientModelService) :
-    mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService)
 {
-    connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+	connect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
 StringPropertyGlyphLUT::~StringPropertyGlyphLUT()
 {
-    disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
+	disconnect(mPatientModelService.get(), &PatientModelService::dataAddedOrRemoved, this, &Property::changed);
 }
 
 void StringPropertyGlyphLUT::setData(MeshPtr data)
 {
-    if (mData)
-        disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
-    mData = data;
-    if (mData)
-        connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
-    emit changed();
+	if (mData)
+		disconnect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+	mData = data;
+	if (mData)
+		connect(mData.get(), &Data::propertiesChanged, this, &Property::changed);
+	emit changed();
 }
 
 QString StringPropertyGlyphLUT::getDisplayName() const
 {
-    return "Set glyph color LUT";
+	return "Set glyph color LUT";
 }
 
 bool StringPropertyGlyphLUT::setValue(const QString& value)
 {
-    if (!mData)
-        return false;
-    mData->setGlyphLUT(value.toStdString().c_str());
-    return true;
+	if (!mData)
+		return false;
+	mData->setGlyphLUT(value.toStdString().c_str());
+	return true;
 }
 
 QString StringPropertyGlyphLUT::getValue() const
 {
-    if (!mData)
-        return "";
-    return mData->getGlyphLUT();
+	if (!mData)
+		return "";
+	return mData->getGlyphLUT();
 }
 
 QString StringPropertyGlyphLUT::getHelp() const
 {
-    if (!mData)
-        return "";
-    return "Select which color LUT to use for coloring the glyphs.";
+	if (!mData)
+		return "";
+	return "Select which color LUT to use for coloring the glyphs.";
 }
 
 QStringList StringPropertyGlyphLUT::getValueRange() const
 {
-    QStringList retval;
+	QStringList retval;
 
-    retval <<
-    "Spectrum"<<
-    "Warm"<<
-    "Cool"<<
-    "Blues"<<
-    "Wild Flower"<<
-    "Citrus"<<
+	retval <<
+			  "Spectrum"<<
+			  "Warm"<<
+			  "Cool"<<
+			  "Blues"<<
+			  "Wild Flower"<<
+			  "Citrus"<<
 
-    "Brewer Diverging Purple-Orange"<<
-    "Brewer Diverging Spectral"<<
-    "Brewer Diverging Brown-Blue-Green"<<
+			  "Brewer Diverging Purple-Orange"<<
+			  "Brewer Diverging Spectral"<<
+			  "Brewer Diverging Brown-Blue-Green"<<
 
-    "Brewer Sequential Blue-Green"<<
-    "Brewer Sequential Yellow-Orange-Brown"<<
-    "Brewer Sequential Blue-Purple"<<
+			  "Brewer Sequential Blue-Green"<<
+			  "Brewer Sequential Yellow-Orange-Brown"<<
+			  "Brewer Sequential Blue-Purple"<<
 
-    "Brewer Qualitative Accent"<<
-    "Brewer Qualitative Dark2"<<
-    "Brewer Qualitative Set2"<<
-    "Brewer Qualitative Pastel2"<<
-    "Brewer Qualitative Pastel1"<<
-    "Brewer Qualitative Set1"<<
-    "Brewer Qualitative Paired"<<
-    "Brewer Qualitative Set3";
+			  "Brewer Qualitative Accent"<<
+			  "Brewer Qualitative Dark2"<<
+			  "Brewer Qualitative Set2"<<
+			  "Brewer Qualitative Pastel2"<<
+			  "Brewer Qualitative Pastel1"<<
+			  "Brewer Qualitative Set1"<<
+			  "Brewer Qualitative Paired"<<
+			  "Brewer Qualitative Set3";
 
-    return retval;
+	return retval;
 }
+
 
 } // namespace cx
 

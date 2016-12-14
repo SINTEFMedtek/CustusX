@@ -37,9 +37,11 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxImage2DRep3D
     Rep3D/cxSphereMetricRep
     Rep3D/cxDonutMetricRep
+    Rep3D/cxCustomMetricRep
     Rep3D/cxMetricNamesRep
     Rep3D/cxStreamRep3D
     Rep3D/cxStream2DRep3D
+	Rep3D/cxRegionOfInterestMetricRep
 
     Rep2D/cxOrientationAnnotationRep
     Rep2D/cxSlicerRepSW
@@ -58,6 +60,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxVolumeProperty
     Primitives/cxVideoSourceGraphics
     Primitives/cxViewFollower
+	Primitives/cxGraphicalBox
 
     RepVideo/cxVideoRep
 
@@ -67,7 +70,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveClipper
     cxInteractiveCropper
     cxCameraControl
-
+	cxCameraStyleInteractor
 )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -87,8 +90,9 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     View/cxLayoutData
 	View/cxViewCollectionVideoSource
     View/internal/cxViewUtilities
-    View/internal/ViewWidget/cxViewCache.h
-    View/internal/ViewWidget/cxViewLinkingViewWidget
+	View/internal/ViewWidget/cxViewCache
+	View/internal/ViewWidget/cxMultiViewCache
+	View/internal/ViewWidget/cxViewLinkingViewWidget
     View/internal/ViewContainer/cxViewLinkingViewContainerItem
 	View/cxViewCollectionImageWriter
 	View/cxScreenShotImageWriter
@@ -108,7 +112,9 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalAxes3D
     Primitives/cxImageEnveloper
     Primitives/cxGraphicalDisk
-    cxRepContainer
+    Primitives/cxGraphicalObjectWithDirection
+	Primitives/cxSliceAutoViewportCalculator
+	cxRepContainer
 )
 
 configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)
@@ -147,7 +153,6 @@ target_include_directories(cxResourceVisualization
     ./Primitives
     ${CMAKE_CURRENT_BINARY_DIR}
 
-    PRIVATE
     ./View/internal
     ./View/internal/ViewContainer
     ./View/internal/ViewMixed
