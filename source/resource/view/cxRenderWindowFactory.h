@@ -43,6 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxSharedContextCreatedCallback.h"
 
+class QVTKWidget;
+
 namespace cx
 {
 typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
@@ -69,11 +71,13 @@ public:
 private:
 	void setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow);
 	vtkRenderWindowPtr createRenderWindow(QString uid, bool offScreenRendering);
+	void preventSharedContextRenderWindowFromBeingShownOnScreen(vtkRenderWindowPtr renderWindow);
 
 	vtkRenderWindowPtr mSharedRenderWindow;
 	std::map<QString, vtkRenderWindowPtr> mRenderWindows;
 	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 	SharedOpenGLContextPtr mSharedOpenGLContext;
+	QVTKWidget* mQvtkWidgetForHidingSharedContextRenderWindow;
 
 	friend void SharedContextCreatedCallback::Execute(vtkObject *view, unsigned long eventId, void*cbo);
 };

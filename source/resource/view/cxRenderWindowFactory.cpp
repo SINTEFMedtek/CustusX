@@ -35,18 +35,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QString>
 #include <vtkRenderWindow.h>
 #include <vtkOpenGLRenderWindow.h>
+#include "QVTKWidget.h"
 #include "cxSharedOpenGLContext.h"
 #include "cxLogger.h"
 
 namespace cx
 {
 
-
 RenderWindowFactory::RenderWindowFactory()
 {
 	vtkRenderWindowPtr renderWindow = createRenderWindow("cx_shared_context", false);//Setting offScreenRendering to true gives crash in render
-	renderWindow->Render();//Crash
+	this->preventSharedContextRenderWindowFromBeingShownOnScreen(renderWindow);
+	renderWindow->Render();
 }
+
+void RenderWindowFactory::preventSharedContextRenderWindowFromBeingShownOnScreen(vtkRenderWindowPtr renderWindow)
+{
+	mQvtkWidgetForHidingSharedContextRenderWindow = new QVTKWidget();
+	mQvtkWidgetForHidingSharedContextRenderWindow->SetRenderWindow(renderWindow);
+}
+
 
 vtkRenderWindowPtr RenderWindowFactory::getRenderWindow(QString uid, bool offScreenRendering)
 {
