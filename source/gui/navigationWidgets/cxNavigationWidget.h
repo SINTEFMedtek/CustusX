@@ -60,7 +60,7 @@ class cxGui_EXPORT NavigationWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  NavigationWidget(QWidget* parent);
+  NavigationWidget(ViewServicePtr viewService, TrackingServicePtr trackingService, QWidget* parent);
   ~NavigationWidget();
 
 protected:

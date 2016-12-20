@@ -443,17 +443,18 @@ void VideoTab::saveParametersSlot()
 // ToolConfigTab
 //------------------------------------------------------------------------------
 
-ToolConfigTab::ToolConfigTab(QWidget* parent) :
-		PreferenceTab(parent),
-    mFilePreviewWidget(new FilePreviewWidget(this)),
-    mImagePreviewWidget(new ToolImagePreviewWidget(this))
+ToolConfigTab::ToolConfigTab(StateServicePtr stateService, TrackingServicePtr trackingService, QWidget* parent) :
+	PreferenceTab(parent),
+	mFilePreviewWidget(new FilePreviewWidget(this)),
+	mImagePreviewWidget(new ToolImagePreviewWidget(trackingService, this)),
+	mStateService(stateService)
 {
 	this->setObjectName("preferences_tool_config_widget");
-  mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
-  mToolFilterGroupBox  = new ToolFilterGroupBox(this);
+  mToolConfigureGroupBox = new ToolConfigureGroupBox(trackingService, stateService, this);
+  mToolFilterGroupBox  = new ToolFilterGroupBox(trackingService, this);
   mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
 
-  connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
+  connect(stateService.get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
 
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -521,7 +522,7 @@ void ToolConfigTab::saveParametersSlot()
 
 void ToolConfigTab::applicationChangedSlot()
 {
-  mToolFilterGroupBox->setClinicalApplicationSlot(stateService()->getApplicationStateName());
+  mToolFilterGroupBox->setClinicalApplicationSlot(mStateService->getApplicationStateName());
 }
 
 void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
@@ -536,7 +537,7 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
 // PreferencesDialog
 //------------------------------------------------------------------------------
 
-PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, StateServicePtr stateService, TrackingServicePtr trackingService, QWidget *parent) :
   QDialog(parent)
 {
   mActionGroup = new QActionGroup(this);
@@ -552,8 +553,8 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
   this->addTab(new AutomationTab, tr("Automation"));
   this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
-  this->addTab(new ToolConfigTab, tr("Tool Configuration"));
-  this->addTab(new DebugTab, tr("Debug"));
+  this->addTab(new ToolConfigTab(stateService, trackingService), tr("Tool Configuration"));
+  this->addTab(new DebugTab(patientModelService, trackingService), tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
 
@@ -623,12 +624,14 @@ void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
 //==============================================================================
 // UltrasoundTab
 //------------------------------------------------------------------------------
-DebugTab::DebugTab(QWidget *parent) :
-		PreferenceTab(parent),
-		mIGSTKDebugLoggingCheckBox(NULL),
-		mManualToolPhysicalPropertiesCheckBox(NULL),
-		mRenderSpeedLoggingCheckBox(NULL),
-		mMainLayout(NULL)
+DebugTab::DebugTab(PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, QWidget *parent) :
+	PreferenceTab(parent),
+	mIGSTKDebugLoggingCheckBox(NULL),
+	mManualToolPhysicalPropertiesCheckBox(NULL),
+	mRenderSpeedLoggingCheckBox(NULL),
+	mMainLayout(NULL),
+	mPatientModelService(patientModelService),
+	mTrackingService(trackingService)
 {
 	this->setObjectName("preferences_debug_widget");
 }
@@ -664,19 +667,19 @@ void DebugTab::init()
 
 void DebugTab::runDebugToolSlot()
 {
-	if (!patientService()->getDatas().size())
+	if (!mPatientModelService->getDatas().size())
 		return;
 
-	cx::ImagePtr image = patientService()->getDataOfType<Image>().begin()->second;
+	cx::ImagePtr image = mPatientModelService->getDataOfType<Image>().begin()->second;
 	cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-	patientService()->setCenter(bb_r.center());
+	mPatientModelService->setCenter(bb_r.center());
 
 	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setType(Tool::TOOL_POINTER);
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
 	report(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
-	trackingService()->runDummyTool(dummyTool);
+	mTrackingService->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()

@@ -212,7 +212,7 @@ boost::shared_ptr<QWidget> DataTreeNode::createPropertiesWidget() const
 		boost::shared_ptr<QWidget> widget = wrepo->findMetricWidget(mData);
 		if(!widget)
 		{
-			MetricUtilities utilities(this->getServices()->view(), this->getServices()->patient());
+			MetricUtilities utilities(this->getServices());
 			widget.reset(utilities.createMetricWidget(mData));
 			wrepo->add(widget);
 		}

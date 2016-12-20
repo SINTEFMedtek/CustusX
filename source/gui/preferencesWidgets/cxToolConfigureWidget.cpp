@@ -50,20 +50,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
+ToolConfigureGroupBox::ToolConfigureGroupBox(TrackingServicePtr trackingService, StateServicePtr stateService, QWidget* parent) :
 	QGroupBox(parent),
 	mConfigFilesComboBox(new QComboBox()),
 	mConfigFileLineEdit(new QLineEdit()),
 	mReferenceComboBox(new QComboBox()),
-	mModified(false)
+	mModified(false),
+	mTrackingService(trackingService),
+	mStateService(stateService)
 {
-	connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigureGroupBox::onApplicationStateChanged);
+	connect(stateService.get(), &StateService::applicationStateChanged, this, &ToolConfigureGroupBox::onApplicationStateChanged);
 
 	mConfigFilesComboBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
 	//mConfigFilesComboBox->setMinimumSize(200, 0);
 	//mConfigFilesComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-	mToolListWidget = new ConfigToolListWidget(NULL);
+	mToolListWidget = new ConfigToolListWidget(trackingService, NULL);
 
 	this->createTrackingSystemSelector();
 
@@ -136,7 +138,7 @@ QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
 void ToolConfigureGroupBox::createTrackingSystemSelector()
 {
 	QString defaultValue = "";
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	mTrackingSystemSelector = StringProperty::initialize("trackingsystem", "Tracking System",
 															   "Select tracking system to use",
 															   defaultValue,
@@ -158,10 +160,10 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 		return retval;
 
 	// deconfigure toolmanager in order to be able to reread config data
-	trackingService()->setState(Tool::tsNONE);
+	mTrackingService->setState(Tool::tsNONE);
 
 	TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	config->saveConfiguration(current);
 	mModified = false;
 
@@ -172,7 +174,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 
 void ToolConfigureGroupBox::onApplicationStateChanged()
 {
-	QString application = stateService()->getApplicationStateName();
+	QString application = mStateService->getApplicationStateName();
 	this->setTitle("Tool configurations for "+ application);
 	this->populateConfigurations();
 }
@@ -182,7 +184,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	QString uid = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(),
 												 Qt::ToolTipRole).toString();
 
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	TrackerConfiguration::Configuration data = config->getConfiguration(uid);
 	bool isNewConfig = 	mConfigFilesComboBox->currentText().contains("<new config>");
 
@@ -222,7 +224,7 @@ void ToolConfigureGroupBox::populateConfigurations()
 {
 	mConfigFilesComboBox->clear();
 
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	QStringList configurations = config->getConfigurationsGivenApplication();
 
 	foreach(QString filename, configurations)
@@ -249,8 +251,8 @@ int ToolConfigureGroupBox::addConfigurationToComboBox(QString displayName, QStri
 TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
 {
 	TrackerConfiguration::Configuration retval;
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
-	QString application = stateService()->getApplicationStateName();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
+	QString application = mStateService->getApplicationStateName();
 
 	QString filename = mConfigFileLineEdit->text();
 	QString filepath = config->getConfigurationApplicationsPath();
@@ -270,7 +272,7 @@ void ToolConfigureGroupBox::populateReference()
 
 	int currentIndex = -1;
 
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 
 	// populate list
 	QStringList selectedTools = mToolListWidget->getTools();

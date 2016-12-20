@@ -88,7 +88,7 @@ MainWindow::MainWindow() :
 	this->setObjectName("main_window");
 
 	mServices = VisServices::create(logicManager()->getPluginContext());
-	mLayoutInteractor.reset(new LayoutInteractor());
+	mLayoutInteractor.reset(new LayoutInteractor(mServices->view()));
 
 	this->setCentralWidget(mServices->view()->createLayoutWidget(this, 0));
 
@@ -97,7 +97,7 @@ MainWindow::MainWindow() :
 	this->createActions();
 	this->createMenus();
 	this->createToolBars();
-	this->setStatusBar(new StatusBar());
+	this->setStatusBar(new StatusBar(mServices->tracking(), mServices->view(), mServices->video()));
 
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
@@ -109,22 +109,22 @@ MainWindow::MainWindow() :
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
+	this->addAsDockWidget(new PlaybackWidget(mServices->tracking(), mServices->video(), mServices->patient(), this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(mServices->patient(), mServices->view(), this), "Properties");
-	this->addAsDockWidget(new MetricWidget(mServices->view(), mServices->patient(), this), "Utility");
+	this->addAsDockWidget(new MetricWidget(mServices, this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(mServices, this), "Properties");
 	this->addAsDockWidget(new ActiveMeshPropertiesWidget(mServices, this), "Properties");
 	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
-	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
+	this->addAsDockWidget(new TrackPadWidget(mServices->view(), this), "Utility");
 	this->addAsDockWidget(new ActiveToolPropertiesWidget(mServices->tracking(), mServices->spaceProvider(), this), "Properties");
-	this->addAsDockWidget(new NavigationWidget(this), "Properties");
+	this->addAsDockWidget(new NavigationWidget(mServices->view(), mServices->tracking(), this), "Properties");
 	this->addAsDockWidget(new ConsoleWidget(this, "console_widget", "Console"), "Utility");
 	this->addAsDockWidget(new ConsoleWidget(this, "console_widget_2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
-	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
+	this->addAsDockWidget(new ToolManagerWidget(mServices->tracking(), this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");
@@ -428,7 +428,7 @@ void MainWindow::showControlPanelActionSlot()
 {
 	if (!mControlPanel)
 	{
-		TrackPadWidget* trackPadWidget = new TrackPadWidget(this);
+		TrackPadWidget* trackPadWidget = new TrackPadWidget(mServices->view(), this);
 		mControlPanel = new SecondaryMainWindow(this, trackPadWidget);
 	}
 	mControlPanel->show();
@@ -561,7 +561,7 @@ void MainWindow::createToolBars()
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
 
 	QToolBar* samplerWidgetToolBar = this->registerToolBar("Sampler");
-	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
+	samplerWidgetToolBar->addWidget(new SamplerWidget(mServices->tracking(), mServices->patient(), mServices->spaceProvider(), this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
 	DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(mServices->tracking()));
@@ -610,7 +610,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), this);
+	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), mServices->state(), mServices->tracking(), this);
 	prefDialog.exec();
 }
 

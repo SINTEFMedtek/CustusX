@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestRenderTester.h"
-#include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
 #include "cxViewService.h"
 #include "cxTestRenderSpeed.h"
@@ -63,7 +62,7 @@ void initTest()
 
 void requireVolumeIn3DScene()
 {
-	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::viewService()->get3DView()->getRenderWindow());
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::logicManager()->getViewService()->get3DView()->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
 	double fractionNonZeroPixels = Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
 

@@ -34,25 +34,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QHBoxLayout>
 #include "cxLabeledComboBoxWidget.h"
-#include "cxLegacySingletons.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
+#include "cxVisServices.h"
 
 namespace cx {
 
-FrameMetricWrapper::FrameMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, cx::FrameMetricPtr data) :
-	MetricBase(viewService, patientModelService),
+FrameMetricWrapper::FrameMetricWrapper(VisServicesPtr services, cx::FrameMetricPtr data) :
+	MetricBase(services),
 	mData(data)
 {
 	mInternalUpdate = false;
-//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-//	connect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 FrameMetricWrapper::~FrameMetricWrapper()
 {
-//	disconnect(mPatientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* FrameMetricWrapper::createWidget()
@@ -67,7 +64,7 @@ QWidget* FrameMetricWrapper::createWidget()
 	mSpaceSelector = SpaceProperty::initialize("selectSpace",
 											  "Space",
 											  "Select coordinate system to store position in.");
-	mSpaceSelector->setSpaceProvider(spaceProvider());
+	mSpaceSelector->setSpaceProvider(mServices->spaceProvider());
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 
 	mFrameWidget = new Transform3DWidget(widget);
@@ -110,7 +107,7 @@ QString FrameMetricWrapper::getArguments() const
 void FrameMetricWrapper::moveToToolPosition()
 {
 //	CoordinateSystem ref = CoordinateSystem::reference()
-	Transform3D qMt = spaceProvider()->getActiveToolTipTransform(mData->getSpace(), true);
+	Transform3D qMt = mServices->spaceProvider()->getActiveToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
 }
 
@@ -122,10 +119,6 @@ void FrameMetricWrapper::spaceSelected()
 	if (space.isValid())
 		mData->setSpace(space);
 }
-
-//void FrameMetricWrapper::dataChangedSlot()
-//{
-//}
 
 void FrameMetricWrapper::frameWidgetChangedSlot()
 {

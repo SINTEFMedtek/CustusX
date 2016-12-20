@@ -96,6 +96,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 /**
  * \class BaseWidget
  *
@@ -110,7 +111,7 @@ class cxResourceWidgets_EXPORT BaseWidget: public OptimizedUpdateWidget
 	Q_OBJECT
 
 public:
-    BaseWidget(QWidget* parent, QString objectName, QString windowTitle);
+	BaseWidget(QWidget* parent, QString objectName, QString windowTitle);
 	virtual ~BaseWidget() {}
 
     QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname,
@@ -158,7 +159,7 @@ public slots:
     void adjustSizeSlot();
 
 protected:
-    virtual void showEvent(QShowEvent* event);
+	virtual void showEvent(QShowEvent* event);
 
 private:
     QString mObjectName;

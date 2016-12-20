@@ -57,7 +57,7 @@ class cxGui_EXPORT LayoutInteractor : public QObject
 {
 	Q_OBJECT
 public:
-	LayoutInteractor(QObject* parent = NULL);
+	LayoutInteractor(ViewServicePtr viewService, QObject* parent = NULL);
 
 	void connectToMenu(QMenu* menu);
 
@@ -75,6 +75,7 @@ private:
 	QAction* addLayoutAction(QString layout, QActionGroup* group, int widgetIndex);
 	void setActiveLayout(QString layout, int widgetIndex);
 	void deepDeleteActionGroup(QActionGroup* actionGroup);
+	LayoutRepositoryPtr getRepo();
 
 	QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
 	QAction* mNewLayoutAction; ///< create a new custom layout
@@ -83,8 +84,8 @@ private:
 	QPointer<QMenu> mMenu;
 	QPointer<QMenu> mSecondaryLayoutMenu;
 	QActionGroup* mSecondaryLayoutActionGroup;
+	ViewServicePtr mViewService;
 
-	LayoutRepositoryPtr getRepo();
 
 };
 

@@ -52,46 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSessionStorageServiceProxy.h"
 #include "cxReporter.h"
 #include "cxProfile.h"
-#include "cxLegacySingletons.h"
-
 
 namespace cx
 {
-
-TrackingServicePtr trackingService()
-{
-	return logicManager()->getTrackingService();
-}
-SpaceProviderPtr spaceProvider()
-{
-	return logicManager()->getSpaceProvider();
-}
-PatientModelServicePtr patientService()
-{
-	return logicManager()->getPatientModelService();
-}
-VideoServicePtr videoService()
-{
-	return logicManager()->getVideoService();
-}
-StateServicePtr stateService()
-{
-	return logicManager()->getStateService();
-}
-ViewServicePtr viewService()
-{
-	return logicManager()->getViewService();
-}
-SessionStorageServicePtr sessionStorageService()
-{
-	return logicManager()->getSessionStorageService();
-}
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
 // --------------------------------------------------------
 LogicManager* LogicManager::mInstance = NULL; ///< static member
 // --------------------------------------------------------

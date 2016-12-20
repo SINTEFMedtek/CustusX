@@ -44,8 +44,9 @@ namespace cx
 {
 
 
-LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
-  QWidget(parent)
+LayoutEditorWidget::LayoutEditorWidget(ViewServicePtr viewService, QWidget* parent) :
+  QWidget(parent),
+  mViewService(viewService)
 {
   mTopLayout = new QVBoxLayout(this);
   QHBoxLayout* nameLayout = new QHBoxLayout;
@@ -145,7 +146,7 @@ void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
 
   // actions for view group
 //  int viewGroupCount = static_cast<int>(viewService()->getViewGroups().size());
-  int viewGroupCount = viewService()->groupCount();
+  int viewGroupCount = mViewService->groupCount();
   QActionGroup* groupActions = new QActionGroup(this);
   for (int i=0; i<viewGroupCount; ++i)
   {

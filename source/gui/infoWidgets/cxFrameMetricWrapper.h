@@ -51,7 +51,7 @@ class cxGui_EXPORT FrameMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit FrameMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, cx::FrameMetricPtr data);
+	explicit FrameMetricWrapper(VisServicesPtr services, cx::FrameMetricPtr data);
   virtual ~FrameMetricWrapper();
   virtual QWidget* createWidget();
   virtual QString getValue() const;
@@ -63,7 +63,6 @@ public:
 private slots:
   void moveToToolPosition();
   void spaceSelected();
-//  void dataChangedSlot();
   void frameWidgetChangedSlot();
 private:
   cx::FrameMetricPtr mData;

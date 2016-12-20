@@ -71,7 +71,7 @@ void CroppingWidget::setupUI()
 	if (mInteractiveCropper)
 		return;
 
-  mInteractiveCropper = viewService()->getCropper();
+  mInteractiveCropper = mViewService->getCropper();
 
   if (!mInteractiveCropper)
 	  return;
@@ -139,7 +139,7 @@ ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 	ActiveDataPtr activeData = mPatientModelService->getActiveData();
 	ImagePtr image = activeData->getActive<Image>();
 
-	ImagePtr retval = cropImage(patientService(), image);
+	ImagePtr retval = cropImage(mPatientModelService, image);
 	mPatientModelService->insertData(retval);
 
 	this->hideOldAndShowNewVolume(image, retval);

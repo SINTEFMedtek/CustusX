@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionServiceProxy.h"
 #include "cxSessionStorageService.h"
 #include "cxProfile.h"
-#include "cxLegacySingletons.h"
 
 namespace cxtest
 {
@@ -98,7 +97,7 @@ cx::PropertyPtr AcquisitionFixture::getOption(QString uid)
 void AcquisitionFixture::initVideo()
 {
 	mConnectionMethod = "image_file_streamer";
-	cx::videoService()->setConnectionMethod(mConnectionMethod);
+	cx::logicManager()->getVideoService()->setConnectionMethod(mConnectionMethod);
 	INFO("bundle path: "+cx::DataLocations::getBundlePath());
 
 	this->getOption("filename")->setValueFromVariant(mAcqDataFilename);
@@ -108,9 +107,9 @@ void AcquisitionFixture::initVideo()
 
 void AcquisitionFixture::setupVideo()
 {
-	mVideoSource = cx::videoService()->getActiveVideoSource();
+	mVideoSource = cx::logicManager()->getVideoService()->getActiveVideoSource();
 	connect(mVideoSource.get(), &cx::VideoSource::newFrame, this, &AcquisitionFixture::newFrameSlot);
-	cx::videoService()->openConnection();
+	cx::logicManager()->getVideoService()->openConnection();
 }
 
 void AcquisitionFixture::setupProbe()
@@ -125,7 +124,7 @@ void AcquisitionFixture::setupProbe()
 	CHECK(dummyTool->getProbe()->isValid());
 	dummyTool->setVisible(true);
 	// TODO: refactor toolmanager to be runnable in dummy mode (playback might benefit from this too)
-	cx::trackingService()->runDummyTool(dummyTool);
+	cx::logicManager()->getTrackingService()->runDummyTool(dummyTool);
 	CHECK(dummyTool->getProbe()->getRTSource());
 }
 
@@ -135,7 +134,7 @@ void AcquisitionFixture::initialize()
 	mAcqDataFilename = cx::DataLocations::getTestDataPath() + "/testing/us_videos/acq_256x192.mhd";
 
 	qApp->processEvents(); // wait for stateservice to finish init of application states - needed before load patient.
-	cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
+	cx::logicManager()->getSessionStorageService()->load(cx::DataLocations::getTestDataPath() + "/temp/Acquisition/");
 
 	//Mock UsReconstructionService with null object
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
@@ -148,8 +147,8 @@ void AcquisitionFixture::initialize()
 
 	// run setup of video, probe and start acquisition in series, each depending on the success of the previous:
 	QTimer::singleShot(0, this, SLOT(setupVideo()));
-	connect(cx::videoService().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
-	connect(cx::trackingService().get(), &cx::TrackingService::stateChanged, this, &AcquisitionFixture::start);
+	connect(cx::logicManager()->getVideoService().get(), SIGNAL(connected(bool)), this, SLOT(videoConnectedSlot()));
+	connect(cx::logicManager()->getTrackingService().get(), &cx::TrackingService::stateChanged, this, &AcquisitionFixture::start);
 
 	this->initVideo();
 }
@@ -157,7 +156,7 @@ void AcquisitionFixture::initialize()
 void AcquisitionFixture::videoConnectedSlot()
 {
 	// make sure all sources have started streaming before running probe setup (there might be several sources)
-	if (cx::videoService()->getVideoSources().size() < mNumberOfExpectedStreams)
+	if (cx::logicManager()->getVideoService()->getVideoSources().size() < mNumberOfExpectedStreams)
 	{
 		// loop back to this handler
 		QTimer::singleShot(50, this, SLOT(videoConnectedSlot()));
@@ -168,7 +167,7 @@ void AcquisitionFixture::videoConnectedSlot()
 
 void AcquisitionFixture::start()
 {
-	if (cx::trackingService()->getState() < cx::Tool::tsTRACKING)
+	if (cx::logicManager()->getTrackingService()->getState() < cx::Tool::tsTRACKING)
 		return;
 
 	mAcquisitionService->startRecord(this->getContext(), "test");

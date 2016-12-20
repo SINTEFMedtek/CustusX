@@ -71,7 +71,7 @@ class cxGui_EXPORT TrackPadWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TrackPadWidget(QWidget* parent);
+  TrackPadWidget(ViewServicePtr viewService, QWidget* parent);
   virtual ~TrackPadWidget();
 
 signals:
@@ -91,6 +91,7 @@ private:
   QVBoxLayout* mTopLayout;
   QSize mMinPadSize;
   QSize mMinBarSize;
+  ViewServicePtr mViewService;
 
   vtkCameraPtr getCamera() const;
   void defineRotateLayout();

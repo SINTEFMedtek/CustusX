@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
 #include "cxStringProperty.h"
-#include "cxLegacySingletons.h"
+#include "cxForwardDeclarations.h"
 
 class QTabWidget;
 class QToolBox;
@@ -212,7 +212,7 @@ class cxGui_EXPORT ToolConfigTab : public PreferenceTab
   Q_OBJECT
 
 public:
-  ToolConfigTab(QWidget* parent = 0);
+  ToolConfigTab(StateServicePtr stateService, TrackingServicePtr trackingService, QWidget* parent = 0);
   virtual ~ToolConfigTab();
 
   virtual void init();
@@ -229,6 +229,7 @@ private:
   ToolImagePreviewWidget*  mImagePreviewWidget;
   ToolConfigureGroupBox* mToolConfigureGroupBox;
   ToolFilterGroupBox*    mToolFilterGroupBox;
+  StateServicePtr mStateService;
 };
 
 /**
@@ -244,7 +245,7 @@ class cxGui_EXPORT PreferencesDialog : public QDialog
     Q_OBJECT
 
 public:
-	PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent = 0);
+	PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, StateServicePtr stateService, TrackingServicePtr trackingService, QWidget *parent = 0);
 	virtual ~PreferencesDialog();
 
 signals:
@@ -274,7 +275,7 @@ class cxGui_EXPORT DebugTab : public PreferenceTab
   Q_OBJECT
 
 public:
-  DebugTab(QWidget *parent = 0);
+  DebugTab(PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, QWidget *parent = 0);
   void init();
 
 public slots:
@@ -286,6 +287,8 @@ protected:
   QCheckBox* mManualToolPhysicalPropertiesCheckBox;
   QCheckBox* mRenderSpeedLoggingCheckBox;
   QGridLayout *mMainLayout;
+  PatientModelServicePtr mPatientModelService;
+  TrackingServicePtr mTrackingService;
 };
 
 
