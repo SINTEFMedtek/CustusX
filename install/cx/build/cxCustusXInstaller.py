@@ -69,7 +69,7 @@ class CustusXInstaller:
 
 	def set_release_notes_path(main_repo_folder, release_notes_relative_path):
         'location of release notes'
-		self.release_notes_path = main_repo_folder + release_notes_relative_path
+        self.release_notes_path = main_repo_folder + release_notes_relative_path
 
     def removePreviousJob(self):
         'remove all stuff from previous run of the installer'
