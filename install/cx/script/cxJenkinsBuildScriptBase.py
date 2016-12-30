@@ -145,7 +145,7 @@ class Controller(cxBuildScript.BuildScript):
         '''
         '''
         targetFolder = self.cxInstaller.getTaggedFolderName()
-        self._publishRelease(remoteTargetFolder=targetFolder, publishReleaseNotes=true)
+		self._publishRelease(remoteTargetFolder=targetFolder, publishReleaseNotes=True)
 
     def publishNightlyRelease(self):
         '''
