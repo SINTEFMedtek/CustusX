@@ -67,7 +67,7 @@ class CustusXInstaller:
         'location of source code root'
         self.source_custusx_path = source_custusx_path
 
-    def set_release_notes_path(main_repo_folder, release_notes_relative_path):
+    def set_release_notes_path(self, main_repo_folder, release_notes_relative_path):
         'location of release notes'
         self.release_notes_path = main_repo_folder + release_notes_relative_path
 
