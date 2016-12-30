@@ -145,17 +145,17 @@ class Controller(cxBuildScript.BuildScript):
         '''
         '''
         targetFolder = self.cxInstaller.getTaggedFolderName()
-        self._publishRelease(remoteTargetFolder=targetFolder)
+        self._publishRelease(remoteTargetFolder=targetFolder, publishReleaseNotes=true)
 
     def publishNightlyRelease(self):
         '''
         '''
-        self._publishRelease(remoteTargetFolder="nightly")
+        self._publishRelease(remoteTargetFolder="nightly", publishReleaseNotes=false)
 
-    def _publishRelease(self, remoteTargetFolder):
+    def _publishRelease(self, remoteTargetFolder, publishReleaseNotes):
         '''
         '''
-        source = self.cxInstaller.createReleaseFolder() # get path to folder containing releasable files
+        source = self.cxInstaller.createReleaseFolder(publishReleaseNotes) # get path to folder containing releasable files
         target = self.controlData().publish_release_target
         # install files in source to <release_server>/<targetFolder>/<platform>
         self.cxInstaller.publishReleaseFolder(source, remoteTargetFolder, target)  
