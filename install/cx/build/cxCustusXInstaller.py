@@ -251,7 +251,7 @@ class CustusXInstaller:
         '''
         Find the full name of the release notes.
         '''
-        file = searchForFileWithPattern(self.release_notes_path)
+        file = self.searchForFileWithPattern(self.release_notes_path)
         return file
 
     def _installFile(self, filename):
