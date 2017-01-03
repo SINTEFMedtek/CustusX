@@ -150,7 +150,7 @@ class Controller(cxBuildScript.BuildScript):
     def publishNightlyRelease(self):
         '''
         '''
-        self._publishRelease(remoteTargetFolder="nightly", publishReleaseNotes=false)
+        self._publishRelease(remoteTargetFolder="nightly", publishReleaseNotes=False)
 
     def _publishRelease(self, remoteTargetFolder, publishReleaseNotes):
         '''
