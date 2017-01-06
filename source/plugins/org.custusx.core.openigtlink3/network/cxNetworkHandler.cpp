@@ -78,6 +78,24 @@ vtkIGTLIOSessionPointer NetworkHandler::requestConnectToServer(std::string serve
 	return mSession;
 }
 
+void NetworkHandler::hackEmitProbeDefintionForPlusTestSetup(QString deviceName)
+{
+	ProbeDefinitionPtr probeDefinition(new ProbeDefinition(ProbeDefinition::tLINEAR));
+	probeDefinition->setUid("Image_Reference");
+	Vector3D origin_p(100, 0, 0);
+	probeDefinition->setOrigin_p(origin_p);
+	Vector3D spacing(1, 1, 1);
+	probeDefinition->setSpacing(spacing);
+	DoubleBoundingBox3D clipRect_p(0, 199, 0, 149);
+	probeDefinition->setClipRect_p(clipRect_p);
+	probeDefinition->setSector(0, 149, 200);
+	QSize size(200, 150);
+	probeDefinition->setSize(size);
+	probeDefinition->setUseDigitalVideo(true);
+
+	emit probedefinition(deviceName, probeDefinition);
+}
+
 void NetworkHandler::onDeviceModified(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
 	vtkSmartPointer<vtkIGTLIODevice> receivedDevice(reinterpret_cast<vtkIGTLIODevice*>(caller_device));
@@ -111,6 +129,10 @@ void NetworkHandler::onDeviceModified(vtkObject* caller_device, void* unknown, u
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
 		double timestamp = header.timestamp;
 		emit transform(deviceName, cxtransform, timestamp);
+
+		//HACK - START probe definition is not received
+		this->hackEmitProbeDefintionForPlusTestSetup(deviceName);
+		//HACK - END
 	}
 	else if(device_type == igtl::CommandConverter::GetIGTLTypeName())
 	{

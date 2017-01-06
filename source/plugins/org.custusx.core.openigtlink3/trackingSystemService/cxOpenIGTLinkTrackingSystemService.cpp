@@ -61,7 +61,7 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	connect(mNetworkHandler.get(), &NetworkHandler::disconnected, this, &OpenIGTLinkTrackingSystemService::serverIsDisconnected);
 	connect(mNetworkHandler.get(), &NetworkHandler::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
 	//connect(mNetworkHandler.get(), &NetworkHandler::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
-	//connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
+	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -181,26 +181,35 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
-	CX_LOG_DEBUG() << "transform";
+	CX_LOG_DEBUG() << "receiveTransform";
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	tool->toolTransformAndTimestampSlot(transform, timestamp);
 }
 
 void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Transform3D calibration)
 {
+	CX_LOG_DEBUG() << "receiveCalibration";
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	tool->setCalibration_sMt(calibration);
 }
 
 void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
 {
+	CX_LOG_DEBUG() << "receiveProbedefinition";
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
-	ProbePtr probe = tool->getProbe();
-	ProbeDefinition old_def = probe->getProbeDefinition();
-	definition->setUid(old_def.getUid());
-	definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
+	if(tool)
+	{
+		ProbePtr probe = tool->getProbe();
+		if(probe)
+		{
+			ProbeDefinition old_def = probe->getProbeDefinition();
+			definition->setUid(old_def.getUid());
+			definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
 
-	probe->setProbeDefinition(*(definition.get()));
+			probe->setProbeDefinition(*(definition.get()));
+			emit stateChanged();
+		}
+	}
 }
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)

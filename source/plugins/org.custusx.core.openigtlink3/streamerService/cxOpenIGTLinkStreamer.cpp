@@ -78,6 +78,7 @@ void OpenIGTLinkStreamer::receivedError()
 
 void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
 {
+	//CX_LOG_DEBUG() << "receivedImage";
     PackagePtr package(new Package());
     package->mImage = image;
     if(mSender)
@@ -86,6 +87,7 @@ void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
 
 void OpenIGTLinkStreamer::receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef)
 {
+	//CX_LOG_DEBUG() << "receivedProbedefinition";
     PackagePtr package(new Package());
     package->mProbe = probedef;
     if(mSender)

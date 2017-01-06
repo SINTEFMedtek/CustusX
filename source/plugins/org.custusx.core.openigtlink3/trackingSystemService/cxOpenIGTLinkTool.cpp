@@ -51,9 +51,12 @@ OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     mTypes = this->determineTypesBasedOnUid(Tool::mUid);
     if (this->isProbe())
     {
-        mProbe = ProbeImpl::New("DigitalProbe", "Digital");
+		// See ProbeCalibsConfigs.xml
+		// PlusDeviceSet_OpenIGTLinkCommandsTest - needs to be the same as <USScanner><Name>
+		// ProbeToReference - needs to be the same as <USProbe><Name>
+		mProbe = ProbeImpl::New("ProbeToReference", "PlusDeviceSet_OpenIGTLinkCommandsTest");
         connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
-    }
+	}
 
     this->createPolyData();
     this->toolVisibleSlot(true);
@@ -123,10 +126,10 @@ std::set<Tool::Type> OpenIGTLinkTool::determineTypesBasedOnUid(const QString uid
 {
     std::set<Type> retval;
     retval.insert(TOOL_POINTER);
-	if(uid.contains("usprobe", Qt::CaseInsensitive))
+	if(uid.contains("usprobe", Qt::CaseInsensitive) || uid.contains("probe", Qt::CaseInsensitive))
     {
         retval.insert(TOOL_US_PROBE);
-    }
+	}
     return retval;
 }
 

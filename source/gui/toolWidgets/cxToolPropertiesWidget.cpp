@@ -203,10 +203,14 @@ void ToolPropertiesWidget::toolPositionChanged()
 
 QString ToolPropertiesWidget::createDescriptionForTool(ToolPtr current)
 {
+	bool hasProbe = false;
+	if(current->getProbe())
+		hasProbe=true;
 	QString meta = current->getMetadata().toString();
-	return QString("Tool=%1: visible=%2\n%3\n")
+	return QString("Tool=%1: visible=%2 has_probe=%3\n%4\n")
 			.arg(current->getName())
 			.arg(current->getVisible())
+			.arg(hasProbe)
 			.arg(meta);
 }
 

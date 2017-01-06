@@ -68,7 +68,7 @@ signals:
 	void image(ImagePtr image);
 	void commandRespons(QString devicename, QString xml);
 	//void mesh(MeshPtr image);
-	//void probedefinition(QString devicename, ProbeDefinitionPtr definition);
+	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 	//void calibration(QString devicename, Transform3D calibration);
 
 private slots:
@@ -84,6 +84,7 @@ private:
 	vtkIGTLIOLogicPointer mLogic;
 	vtkIGTLIOSessionPointer mSession;
 	QTimer *mTimer;
+	void hackEmitProbeDefintionForPlusTestSetup(QString deviceName);
 };
 
 } // namespace cx
