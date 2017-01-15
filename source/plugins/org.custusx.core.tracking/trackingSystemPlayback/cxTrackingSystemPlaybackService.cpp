@@ -44,9 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-TrackingSystemPlaybackService::TrackingSystemPlaybackService(PlaybackTimePtr controller, TrackingSystemServicePtr base, ManualToolPtr manual)
+TrackingSystemPlaybackService::TrackingSystemPlaybackService(PlaybackTimePtr controller, std::vector<TrackingSystemServicePtr> base, ManualToolPtr manual)
 {
-	mBase = base;
+	mBases = base;
 	mState = Tool::tsNONE;
 	mController = controller;
 	mManual = manual;
@@ -65,7 +65,12 @@ void TrackingSystemPlaybackService::start()
 		return;
 	}
 
-	std::vector<ToolPtr> original = mBase->getTools();
+	std::vector<ToolPtr> original;
+	for (unsigned i=0; i<mBases.size(); ++i)
+	{
+		std::vector<ToolPtr> original_one = mBases[i]->getTools();
+		std::copy(original_one.begin(), original_one.end(), std::back_inserter(original));
+	}
 
 	std::pair<double,double> timeRange(getMilliSecondsSinceEpoch(), 0);
 
@@ -100,15 +105,23 @@ void TrackingSystemPlaybackService::stop()
 
 bool TrackingSystemPlaybackService::forceBaseToConfiguredState()
 {
-	// attempt to configure tracker if not configured,
-	// or deinit/stop tracking if on.
-	if (mBase->getState() != Tool::tsCONFIGURED)
+	bool atLeastOneConfigured = false;
+
+	for (unsigned i=0; i<mBases.size(); ++i)
 	{
-		mBase->setState(Tool::tsCONFIGURED);
-		this->waitForState(mBase, Tool::tsCONFIGURED, 200);
+		// attempt to configure tracker if not configured,
+		// or deinit/stop tracking if on.
+		if (mBases[i]->getState() != Tool::tsCONFIGURED)
+		{
+			mBases[i]->setState(Tool::tsCONFIGURED);
+			this->waitForState(mBases[i], Tool::tsCONFIGURED, 200);
+		}
+
+		bool configured = (mBases[i]->getState() >= Tool::tsCONFIGURED);
+		atLeastOneConfigured = atLeastOneConfigured || configured;
 	}
 
-	return (mBase->getState() >= Tool::tsCONFIGURED);
+	return atLeastOneConfigured;
 }
 
 /**

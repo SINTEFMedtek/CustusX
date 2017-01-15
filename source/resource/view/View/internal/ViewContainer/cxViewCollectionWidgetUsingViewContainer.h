@@ -61,6 +61,8 @@ public:
     virtual ~ViewCollectionWidgetUsingViewContainer();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual void setOffScreenRenderingAndClear(bool on);
+	virtual bool getOffScreenRendering() const;
 	void clearViews();
 	virtual void setModified();
 	virtual void render();
@@ -70,6 +72,7 @@ public:
     virtual int getGridMargin() const;
     virtual std::vector<ViewPtr> getViews();
     virtual QPoint getPosition(ViewPtr view);
+	virtual void enableContextMenuForViews(bool enable);
 
 private:
 	std::vector<ViewPtr> mViews;

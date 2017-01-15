@@ -65,6 +65,7 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
 	connect(this->dataService().get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
+    connect(this->dataService().get(), &DataManager::operatingTableChanged, this, &PatientModelService::operatingTableChanged);
 	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
@@ -142,19 +143,17 @@ DataPtr PatientModelImplService::createData(QString type, QString uid, QString n
 	return dataService()->getDataFactory()->create(type, uid, name);
 }
 
-std::map<QString, DataPtr> PatientModelImplService::getAllData() const
+std::map<QString, DataPtr> PatientModelImplService::getDatas(DataFilter filter) const
 {
-	return dataService()->getData();
-}
+	std::map<QString, DataPtr> retval = dataService()->getData();
 
-std::map<QString, DataPtr> PatientModelImplService::getData() const
-{
-	std::map<QString, DataPtr> retval = this->getAllData();
-
-	for(int i = 0; i < mUnavailableData.size(); ++i)
+	if (filter == HideUnavailable)
 	{
-		if (retval.count(mUnavailableData[i]))
-			retval.erase(mUnavailableData[i]);
+		for(int i = 0; i < mUnavailableData.size(); ++i)
+		{
+			if (retval.count(mUnavailableData[i]))
+				retval.erase(mUnavailableData[i]);
+		}
 	}
 
 	return retval;
@@ -162,7 +161,7 @@ std::map<QString, DataPtr> PatientModelImplService::getData() const
 
 DataPtr PatientModelImplService::getData(const QString& uid) const
 {
-	std::map<QString, DataPtr> dataMap = this->getAllData();
+	std::map<QString, DataPtr> dataMap = this->getDatas(AllData);
 	std::map<QString, DataPtr>::const_iterator iter = dataMap.find(uid);
 	if (iter == dataMap.end())
 		return DataPtr();
@@ -271,6 +270,15 @@ Vector3D PatientModelImplService::getCenter() const
 	return this->dataService()->getCenter();
 }
 
+void PatientModelImplService::setOperatingTable(const OperatingTable &ot)
+{
+    this->dataService()->setOperatingTable(ot);
+}
+
+OperatingTable PatientModelImplService::getOperatingTable() const
+{
+    return this->dataService()->getOperatingTable();
+}
 
 QString PatientModelImplService::addLandmark()
 {

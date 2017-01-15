@@ -53,7 +53,7 @@ namespace cx
 {
 
 ToolTipSampleWidget::ToolTipSampleWidget(VisServicesPtr services, QWidget* parent) :
-    BaseWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
+	BaseWidget(parent, "tool_tip_sample_widget", "ToolTip Sample"),
 	mServices(services),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),

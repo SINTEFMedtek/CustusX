@@ -105,7 +105,7 @@ void Slices3DRep::setImages(std::vector<ImagePtr> images)
 void Slices3DRep::addPlane(PLANE_TYPE plane, PatientModelServicePtr dataManager)
 {
 	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager);
-	sliceProxy->initializeFromPlane(plane, false, Vector3D(0,0,1), true, 150, 0.25);
+	sliceProxy->initializeFromPlane(plane, false, true, 150, 0.25);
 	sliceProxy->setAlwaysUseDefaultCenter(true);
 
 	Texture3DSlicerProxyPtr current = Texture3DSlicerProxy::New();

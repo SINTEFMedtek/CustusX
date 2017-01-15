@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 RegistrationHistoryWidget::RegistrationHistoryWidget(RegServicesPtr servicesPtr, QWidget* parent, bool compact) :
-	BaseWidget(parent, "RegistrationHistoryWidget", "Registration History"),
+	BaseWidget(parent, "registration_history_widget", "Registration History"),
 	mServices(servicesPtr)
 {
 	this->setWhatsThis(this->defaultWhatsThis());
@@ -163,26 +163,27 @@ void RegistrationHistoryWidget::reconnectSlot()
 /** get a map of all registration times and their corresponding descriptions.
  * Near-simultaneous times are filtered out, keeping only the newest in the group.
  */
-std::map<QDateTime, QString> RegistrationHistoryWidget::getRegistrationTimes()
+RegistrationHistoryWidget::TimeMap RegistrationHistoryWidget::generateRegistrationTimes()
 {
 	TimeMap retval;
 
 	std::vector<RegistrationHistoryPtr> allHistories = this->getAllRegistrationHistories();
 
-	retval[QDateTime(QDate(2000, 1, 1))] = "initial";
+	retval.insert(TimeMapPair(QDateTime(QDate(2000, 1, 1)),"initial"));
 
 	for (unsigned i = 0; i < allHistories.size(); ++i)
 	{
 		std::vector<RegistrationTransform> current = allHistories[i]->getData();
 		for (unsigned j = 0; j < current.size(); ++j)
 		{
-			retval[current[j].mTimestamp] = QString("%1 [f=%2, m=%3]").arg(current[j].mType).arg(current[j].mFixed).arg(
-					current[j].mMoving);
+			retval.insert(TimeMapPair(current[j].mTimestamp, QString("%1 [fixed=%2, moving=%3]").arg(current[j].mType).arg(current[j].mFixed).arg(
+					current[j].mMoving)));
 		}
 		std::vector<ParentSpace> frames = allHistories[i]->getParentSpaces();
 		for (unsigned j = 0; j < frames.size(); ++j)
 		{
-			retval[frames[j].mTimestamp] = QString("%1 [val=%2]").arg(frames[j].mType).arg(frames[j].mValue);
+			if(retval.find(frames[j].mTimestamp) == retval.end())//Only print each frame one time
+				retval.insert(TimeMapPair(frames[j].mTimestamp, QString("%1 [spaceUid=%2]").arg(frames[j].mType).arg(frames[j].mUid)));
 		}
 	}
 
@@ -191,19 +192,42 @@ std::map<QDateTime, QString> RegistrationHistoryWidget::getRegistrationTimes()
 	return retval;
 }
 
-RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentActiveIter(TimeMap& times)
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findActiveRegistration(TimeMap& times)
 {
-	QDateTime active = this->getActiveTime();
+	QDateTime activeTime = this->getActiveTime();
 
-	if (!active.isValid())
+	if (!activeTime.isValid())
 		return times.end();
+
+	RegistrationHistoryWidget::TimeMapIterators activeRegistrations = findActiveRegistrations(times);
+	if (!activeRegistrations.empty())
+		return activeRegistrations.back();
+	return times.end();
+}
+
+RegistrationHistoryWidget::TimeMapIterators RegistrationHistoryWidget::findActiveRegistrations(TimeMap& times)
+{
+	RegistrationHistoryWidget::TimeMapIterators retval;
+
+	QDateTime activeTime = this->getActiveTime();
+
+	if (!activeTime.isValid())
+	{
+		retval.push_back(times.end());
+		return retval;
+	}
 
 	for (TimeMap::iterator iter = times.begin(); iter != times.end(); ++iter)
 	{
-		if (iter->first >= active)
-			return iter;
+		if(!retval.empty() && iter->first == retval[0]->first)
+			retval.push_back(iter);//Return all registrations at the same point in time
+		else if (retval.empty() && iter->first >= activeTime)
+			retval.push_back(iter);
 	}
-	return times.end();
+
+	if(retval.empty())
+		retval.push_back(times.end());
+	return retval;
 }
 
 QDateTime RegistrationHistoryWidget::getActiveTime()
@@ -237,7 +261,7 @@ std::vector<RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistratio
 	std::vector<RegistrationHistoryPtr> retval;
 	retval.push_back(mServices->patient()->get_rMpr_History());
 
-	std::map<QString, DataPtr> data = mServices->patient()->getData();
+	std::map<QString, DataPtr> data = mServices->patient()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter = data.begin(); iter != data.end(); ++iter)
 	{
 		retval.push_back(iter->second->get_rMd_History());
@@ -287,30 +311,34 @@ std::vector<RegistrationTransform> RegistrationHistoryWidget::mergeHistory(const
 void RegistrationHistoryWidget::rewindSlot()
 {
 
-	TimeMap times = this->getRegistrationTimes();
+	TimeMap registrationTimes = this->generateRegistrationTimes();
 
-	if (times.size() <= 1)
+	if (registrationTimes.size() <= 1)
 		return;
 
 	// current points to the timestamp currently in use. end() is current time.
-	std::map<QDateTime, QString>::iterator current = this->findCurrentActiveIter(times);
+//	std::map<QDateTime, QString>::iterator current = this->findActiveRegistrations(times);
+	TimeMapIterators activeRegistrations = this->findActiveRegistrations(registrationTimes);
+	TimeMap::iterator activeRegistration = registrationTimes.end();
+	if (!activeRegistrations.empty())
+		activeRegistration = activeRegistrations.front();
 
-	if (current == times.begin())
+	if (activeRegistration == registrationTimes.begin())
 		return;
 
-	if (current == times.end())
-		--current; // ignore the last entry
+	if (activeRegistration == registrationTimes.end())
+		--activeRegistration; // ignore the last entry
 
-	--current;
+	--activeRegistration;
 	report(
-			"Rewind: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", ["
-					+ current->second + "]");
-	this->setActiveTime(current->first);
+			"Rewind: Setting registration time to " + activeRegistration->first.toString(timestampSecondsFormatNice()) + ", ["
+					+ activeRegistration->second + "]");
+	this->setActiveTime(activeRegistration->first);
 }
 
 QString RegistrationHistoryWidget::debugDump()
 {
-	TimeMap times = this->getRegistrationTimes();
+	TimeMap times = this->generateRegistrationTimes();
 	bool addedBreak = false;
 	std::stringstream ss;
 	ss << "<html>";
@@ -358,27 +386,30 @@ QAction* RegistrationHistoryWidget::createAction(QLayout* layout, QString iconNa
  */
 void RegistrationHistoryWidget::forwardSlot()
 {
-	std::map<QDateTime, QString> times = this->getRegistrationTimes();
+	TimeMap registrationTimes = this->generateRegistrationTimes();
 
-	if (times.empty())
+	if (registrationTimes.empty())
 		return;
 
 	// current points to the timestamp currently in use. end() is current time.
-	TimeMap::iterator current = this->findCurrentActiveIter(times);
+	TimeMapIterators activeRegistrations = this->findActiveRegistrations(registrationTimes);
+	TimeMap::iterator activeRegistration = registrationTimes.end();
+	if (!activeRegistrations.empty())
+		activeRegistration = activeRegistrations.back();
 
-	if (current == times.end()) // already at end, ignore
+	if (activeRegistration == registrationTimes.end()) // already at end, ignore
 		return;
-	++current;
+	++activeRegistration;
 
-	if (current == times.end() || times.rbegin()->first == current->first) // if at end or at the last position, interpret as end
+	if (activeRegistration == registrationTimes.end() || registrationTimes.rbegin()->first == activeRegistration->first) // if at end or at the last position, interpret as end
 	{
-		report("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
+		report("Forward: Setting registration time to current, [" + registrationTimes.rbegin()->second + "]");
 		this->setActiveTime(QDateTime());
 	}
 	else
 	{
-		report("Forward: Setting registration time to " + current->first.toString(timestampSecondsFormatNice()) + ", ["+ current->second + "]");
-		this->setActiveTime(current->first);
+		report("Forward: Setting registration time to " + activeRegistration->first.toString(timestampSecondsFormatNice()) + ", ["+ activeRegistration->second + "]");
+		this->setActiveTime(activeRegistration->first);
 	}
 }
 
@@ -398,12 +429,8 @@ void RegistrationHistoryWidget::fastForwardSlot()
 
 void RegistrationHistoryWidget::prePaintEvent()
 {
-	//Not used?
-//	std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//	std::vector<RegistrationTransform> history = mergeHistory(raw);
-
-	TimeMap times = this->getRegistrationTimes();
-	std::map<QDateTime, QString>::iterator current = this->findCurrentActiveIter(times);
+	TimeMap times = this->generateRegistrationTimes();
+	std::map<QDateTime, QString>::iterator current = this->findActiveRegistration(times);
 	size_t behind = std::min<int>(distance(times.begin(), current), times.size() - 1);
 	size_t infront = times.size() - 1 - behind;
 
@@ -413,7 +440,6 @@ void RegistrationHistoryWidget::prePaintEvent()
 	mBehindLabel->setText("(" + qstring_cast(behind) + ")");
 	mInFrontLabel->setText("(" + qstring_cast(infront) + ")");
 
-	mRewindAction->setEnabled(behind > 0);
 	mRewindAction->setEnabled(behind > 0);
 	mRemoveAction->setEnabled(infront != 0);
 	mForwardAction->setEnabled(infront != 0);

@@ -65,7 +65,7 @@ namespace cx
 {
 
 VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "IGTLinkWidget", "Video Connection"),
+	BaseWidget(parent, "igt_link_widget", "Video Connection"),
 	mServices(services)
 {
 	this->setToolTip("Connect to a video source");
@@ -337,7 +337,7 @@ void VideoConnectionWidget::saveAndImportSnapshot(vtkImageDataPtr input, QString
 	copiedImage->DeepCopy(input);
 
 	ImagePtr output = mServices->patient()->createSpecificData<Image>(filename);
-	output->setVtkImageData(input);
+	output->setVtkImageData(copiedImage);
 	output->get_rMd_History()->setRegistration(rMd);
 	mServices->patient()->insertData(output);
 

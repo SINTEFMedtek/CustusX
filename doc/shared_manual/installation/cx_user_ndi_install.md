@@ -6,7 +6,12 @@ CustusX requires that you first install the NDI ToolBox
 and follow the install instructions. This will install the Track application, which can be used with 
 the NDI systems independently of CustusX. *Note: A user account is required to download.*
 
-Windows install should work out of the box.
+Windows
+-----------------------------------------------------------
+Windows install should work out of the box, but you might need to manually install the drivers.
+Follow the instructions in the ReadMe file which is in the installation folder of the toolbox,
+e.g. C:\\Program files (x86)\\Northern Digital inc\\toolbox\\readme.htm
+
 
 Mac
 -----------------------------------------------------------

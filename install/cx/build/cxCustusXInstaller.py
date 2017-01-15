@@ -65,9 +65,12 @@ class CustusXInstaller:
         
     def setSourcePath(self, source_custusx_path):
         'location of source code root'
-        self.source_custusx_path = source_custusx_path      
-#        self.source_custusxsetup_path = source_custusxsetup_path      
-        
+        self.source_custusx_path = source_custusx_path
+
+    def set_release_notes_path(self, main_repo_folder, release_notes_relative_path):
+        'location of release notes'
+        self.release_notes_path = main_repo_folder + release_notes_relative_path
+
     def removePreviousJob(self):
         'remove all stuff from previous run of the installer'
         PrintFormatter.printHeader('Removing files from previous install', 3)
@@ -76,7 +79,7 @@ class CustusXInstaller:
         shell.removeTree('%s/temp/Install' % self.root_dir)
         shell.removeTree('%s/%s' % (self.install_root, self.system_base_name))
                          
-    def createReleaseFolder(self):
+    def createReleaseFolder(self, publishReleaseNotes):
         '''
         Create a folder containing all the files required for a Release.
         Ready to be moved to a distribution server.
@@ -88,7 +91,9 @@ class CustusXInstaller:
         shell.makeDirs(targetPath)
         installerFile = self.findInstallerFile()
         self._copyFile(installerFile, targetPath)
-#        self.copyReleaseFiles(targetPath)                        
+        if publishReleaseNotes:
+            releaseNotes = self.findReleaseNotes()
+            self._copyFile(releaseNotes, targetPath)
         return targetPath
 
     def _removeLocalTags(self):    
@@ -221,18 +226,32 @@ class CustusXInstaller:
         file = self.findInstallerFile()
         PrintFormatter.printInfo('Installing file %s' % file)
         self._installFile(file)
-        
-    def findInstallerFile(self):
+    
+    def searchForFileWithPattern(self, pattern):
         '''
-        Find the full name of the installer file.
+        find the file matching the pattern
         '''
-        pattern = self._getInstallerPackagePattern()
         PrintFormatter.printInfo('Looking for installers with pattern: %s' % pattern)
         files = glob.glob(pattern)
         cx.utils.cxUtilities.assertTrue(len(files) == 1,
                         'Found %i install files, requiring 1: \n pattern: %s\n Found:\n %s' % 
                         (len(files), pattern, ' \n'.join(files)))
         file = files[0]
+        return file
+    
+    def findInstallerFile(self):
+        '''
+        Find the full name of the installer file.
+        '''
+        pattern = self._getInstallerPackagePattern()
+        file = self.searchForFileWithPattern(pattern)
+        return file
+
+    def findReleaseNotes(self):
+        '''
+        Find the full name of the release notes.
+        '''
+        file = self.searchForFileWithPattern(self.release_notes_path)
         return file
 
     def _installFile(self, filename):

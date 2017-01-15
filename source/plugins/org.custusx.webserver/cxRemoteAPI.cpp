@@ -36,6 +36,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include "cxScreenVideoProvider.h"
 #include "cxLayoutVideoSource.h"
+#include "cxViewCollectionWidget.h"
+#include "vtkRenderWindow.h"
 
 namespace cx
 {
@@ -64,8 +66,8 @@ void RemoteAPI::closeLayoutWidget()
 
 LayoutVideoSourcePtr RemoteAPI::startStreaming()
 {
-    LayoutVideoSourcePtr source(new LayoutVideoSource(mScreenVideo->getSecondaryLayoutWidget()));
-//    source->start();
+	ViewCollectionWidget* vcw = mScreenVideo->getSecondaryLayoutWidget();
+	LayoutVideoSourcePtr source(new LayoutVideoSource(vcw));
     return source;
 }
 

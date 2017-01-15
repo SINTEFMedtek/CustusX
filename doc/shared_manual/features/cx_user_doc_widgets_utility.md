@@ -3,17 +3,6 @@ Utility Widgets {#utility_widgets}
 
 [TOC]
 
-
-\addindex metric_widget
-Metrics Widget {#utility_widgets_metrics}
-===========================================================
-
-3D measurement tools.
-
-Define points, distances and angles.
-
-
-
 \addindex igt_link_widget
 Video Connection Widget {#utility_widgets_video_connection}
 ===========================================================

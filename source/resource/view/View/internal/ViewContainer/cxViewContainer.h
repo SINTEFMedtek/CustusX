@@ -46,6 +46,7 @@ class QGridLayout;
 namespace cx
 {
 class ViewItem;
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
 /**
  * More advanced N:1 combination of SSC Views and Qt Widgets
@@ -67,6 +68,9 @@ public:
 	ViewItem *addView(QString uid, LayoutRegion region, QString name = "");
 	virtual void clear();
 	void renderAll(); ///< Use this function to render all views at once. Do not call render on each view.
+
+	virtual void setOffScreenRenderingAndClear(bool on);
+	virtual bool getOffScreenRendering() const;
 
 	vtkRenderWindowPtr getRenderWindow() { return mRenderWindow; }
 	virtual void setModified();
@@ -94,9 +98,12 @@ protected:
 private:
 	virtual void resizeEvent( QResizeEvent *event);
 	void initializeRenderWindow();
-	void addBackgroundRenderer();
+	void addBackgroundRenderer(vtkRenderWindowPtr rw);
 	QPoint convertToItemSpace(const QPoint &pos, ViewItem* item) const;
 	ViewItem* findViewItem(const QPoint &pos);
+
+	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
+	bool mOffScreenRendering;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

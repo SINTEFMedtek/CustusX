@@ -188,29 +188,21 @@ void SliceProxy::clinicalApplicationChangedSlot()
 
 /**Group the typical plane definition uses together.
  */
-void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
+void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
-	mCutplane->initializeFromPlane(plane,
-								   useGravity, gravityDir,
+	Vector3D gravityDir = -mDataManager->getOperatingTable().getVectorUp();
+
+	if (plane==ptTOOLSIDEPLANE)
+    {
+        useGravity = true;
+    }
+
+    mCutplane->initializeFromPlane(plane,
+                                   useGravity, gravityDir,
 								   useViewOffset, viewportHeight, toolViewOffset,
-								   mDataManager->getClinicalApplication(),
-								   useConstrainedViewOffset);
+								   mDataManager->getClinicalApplication());
+
 	changed();
-//	setPlane(plane);
-//	//Logger::log("vm.log"," set plane to proxy ");
-//	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
-//	{
-//		setOrientation(otORTHOGONAL);
-//		setFollowType(ftFIXED_CENTER);
-//	}
-//	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
-//	{
-//		setOrientation(otOBLIQUE);
-//		setFollowType(ftFOLLOW_TOOL);
-//
-//		setGravity(useGravity, gravityDir);
-//		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
-//	}
 }
 
 SliceComputer SliceProxy::getComputer() const
@@ -247,9 +239,9 @@ void SliceProxy::setGravity(bool use, const Vector3D& dir)
 	mCutplane->setGravity(use, dir);
 	this->changed();
 }
-void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset, bool useConstrainedViewOffset)
+void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset)
 {
-	mCutplane->setToolViewOffset(use, viewportHeight, toolViewOffset, useConstrainedViewOffset);
+	mCutplane->setToolViewOffset(use, viewportHeight, toolViewOffset);
 	this->changed();
 }
  
@@ -274,6 +266,10 @@ Transform3D SliceProxy::get_sMr()
 
 void SliceProxy::changed()
 {
+	SlicePlane plane = mCutplane->getPlane();
+	if (similar(plane, mLastEmittedSlicePlane))
+		return;
+	mLastEmittedSlicePlane = plane;
 	emit transformChanged(get_sMr());
 }
 

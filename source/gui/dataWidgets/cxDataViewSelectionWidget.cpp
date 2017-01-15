@@ -176,7 +176,7 @@ void AllDataListWidget::populateAllDataList()
   this->clear();
 
   //add actions to the actiongroups and the contextmenu
-  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mPatientModelService->getData());
+  std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mPatientModelService->getDatas());
   QString lastDataActionUid = "________________________";
   for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {

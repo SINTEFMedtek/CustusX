@@ -55,7 +55,7 @@ namespace cx
 
 //------------------------------------------------------------------------------
 LapFrameToolCalibrationWidget::LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent) :
-    BaseWidget(parent, "LapFrameToolCalibrationWidget", "LapFrame Calibrate"),
+	BaseWidget(parent, "lap_frame_tool_calibration_widget", "LapFrame Calibrate"),
 	mServices(services),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
@@ -138,9 +138,20 @@ void LapFrameToolCalibrationWidget::calibrateSlot()
 
   if(ret == QMessageBox::Ok)
   {
-    tool->setCalibration_sMt(calibration);
-//    std::stringstream ss;
-//    ss << calibration.matrix().format(Eigen::IOFormat()) << std::endl;
+    try
+    {
+        tool->setCalibration_sMt(calibration);
+    }
+    catch(std::exception& e)
+    {
+        QMessageBox msgBox2;
+        msgBox2.setText("Unknown error, could not calibrate the tool: "+tool->getName()+".");
+        msgBox2.setInformativeText(QString(e.what()));
+        msgBox2.setStandardButtons(QMessageBox::Ok);
+        msgBox2.setDefaultButton(QMessageBox::Ok);
+        int ret2 = msgBox2.exec();
+        return;
+    }
     mCalibrationLabel->setText(QString("Calibration matrix for %1:\n%2").arg(tool->getName(), qstring_cast(calibration)));
   }
 }
@@ -224,8 +235,25 @@ Vector3D LapFrameToolCalibrationCalculator::get_delta_ref()
 
 Transform3D LapFrameToolCalibrationCalculator::get_calibration_sMt()
 {
-	return m_sMpr * m_qMpr.inv() * createTransformRotateY(mCameraAngle);
+	Transform3D calibration = m_sMpr * m_qMpr.inv() * createTransformRotateY(mCameraAngle);
+	this->useOnlyRotationalPart(&calibration);
+	return calibration;
 }
 
+/**
+* @brief LapFrameToolCalibrationCalculator::useOnlyRotationalPart
+* @param transform
+*
+* This function washes a matrix so that only the rotational component
+* is kept in the linear (upper left 3x3) part of the matrix.
+* The use for it here is particulary because of possible errors in the calibration
+* since we read calibration files which might not have the needed precission and so on.
+* The noise might show up as shear or scale operations which we don't want.
+*/
+void LapFrameToolCalibrationCalculator::useOnlyRotationalPart(Transform3D* transform)
+{
+	Transform3D::LinearMatrixType rotationalPart = transform->rotation();
+	transform->linear() = rotationalPart;
+}
 
 }

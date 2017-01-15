@@ -50,7 +50,7 @@ enum CX_SOCKETCONNECTION_STATE
 };
 } // namespace cx
 
-SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CX_SOCKETCONNECTION_STATE);
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cxResource_EXPORT, cx, CX_SOCKETCONNECTION_STATE);
 
 /** Insert into every method that is only allowed to be called inside
   * the object's own thread.

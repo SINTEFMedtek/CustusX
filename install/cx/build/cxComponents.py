@@ -109,6 +109,8 @@ class Component(object):
     def repository(self):
         'url of repository'
         return ""
+    def useExternalRepositories(self):
+        return self.controlData.gitrepo_main_site_base == self.controlData.gitrepo_open_site_base
 
         
 # ---------------------------------------------------------
@@ -176,7 +178,10 @@ class ITK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         builder.configureCMake()
     def repository(self):
-        return 'git://itk.org/ITK.git'
+        if self.useExternalRepositories():
+            return 'git://itk.org/ITK.git'
+        else:
+            return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -192,7 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        tag = 'VTK-6-3-0.cx_patch_4'
+        tag = 'VTK-7-0-0.cx_patch_2'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         builder = self._getBuilder()
@@ -218,6 +223,7 @@ class VTK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL")
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -257,7 +263,10 @@ class OpenCV(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'https://github.com/Itseez/opencv.git'
+        if self.useExternalRepositories():
+           return 'https://github.com/Itseez/opencv.git'
+        else:
+            return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('2.4.11')
@@ -273,6 +282,7 @@ class OpenCV(CppComponent):
         add('BUILD_JASPER:BOOL', False)
         add('WITH_JASPER:BOOL', False)
         add('WITH_FFMPEG:BOOL', False)
+        add('WITH_GSTREAMER:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 

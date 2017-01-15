@@ -100,6 +100,7 @@ public:
 	typedef std::vector<LayoutViewData> ViewDataContainer;
 	typedef ViewDataContainer::iterator iterator;
 	typedef ViewDataContainer::const_iterator const_iterator;
+	static const int MaxGridSize = 20;
 
 public:
 	static LayoutData createHeader(QString uid, QString name);
@@ -107,6 +108,8 @@ public:
 	LayoutData();
 	QString getUid() const { return mUid; }
 	QString getName() const { return mName; }
+	bool getOffScreenRendering() const { return mOffScreenRendering; }
+	void setOffScreenRendering(bool val) { mOffScreenRendering = val; }
 	void setName(const QString& name) { mName = name; }
 	void resetUid(const QString& uid);
 	void setView(int group, PLANE_TYPE type, LayoutRegion region);
@@ -133,6 +136,7 @@ private:
 	QString mName;
 	LayoutPosition mSize;
 	std::vector<LayoutViewData> mView;
+	bool mOffScreenRendering;
 };
 
 /**

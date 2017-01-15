@@ -131,7 +131,7 @@ QWidget* getMainWindow()
 {
 	QWidget *mainwindow = Q_NULLPTR;
 	foreach(mainwindow, QApplication::topLevelWidgets()) {
-	  if(mainwindow->objectName() == "MainWindow")
+	  if(mainwindow->objectName() == "main_window")
 		break;
 	}
 	return mainwindow;

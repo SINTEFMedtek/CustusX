@@ -50,7 +50,7 @@ VNNclFixture::VNNclFixture() :
 	cx::UsReconstructionServicePtr reconstructer = mFixture.getManager();
 
 	reconstructer->selectData(mRealData.getSourceFilename());
-	reconstructer->getParam("Algorithm")->setValueFromVariant("VNNcl");
+	reconstructer->getParam("Algorithm")->setValueFromVariant("vnn_cl");
 	reconstructer->getParam("Angio data")->setValueFromVariant(false);
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
 
@@ -59,7 +59,7 @@ VNNclFixture::VNNclFixture() :
 	mAlgorithm = dynamic_cast<cx::VNNclReconstructionMethodService*>(algorithmService);
 	REQUIRE(mAlgorithm);// Check if we got the algorithm
 
-	mAlgo = reconstructer->getSettings().getElement("algorithms", "VNNcl");
+	mAlgo = reconstructer->getSettings().getElement("algorithms", "vnn_cl");
 	mAlgorithm->getRadiusOption(mAlgo)->setValue(1.0);
 
 	this->initVNN();
@@ -140,7 +140,7 @@ VNNclSyntheticFixture::VNNclSyntheticFixture() :
 
 	mAlgorithm->enableProfiling();
 
-	mSettings = mDomdoc.createElement("VNNcl");
+	mSettings = mDomdoc.createElement("vnn_cl");
 
 	this->initVNN();
 }

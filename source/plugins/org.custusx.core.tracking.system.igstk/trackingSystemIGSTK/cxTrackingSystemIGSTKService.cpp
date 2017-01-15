@@ -317,7 +317,7 @@ bool TrackingSystemIGSTKService::createSymlink()
 	if (!linkDir.exists())
 	{
 		reportError(
-                        QString("Folder %1 does not exist. It is required to exist and be writable in order to connecto to IGSTK.").arg(linkDir.path()));
+						QString("Folder %1 does not exist. It is required to exist and be writable in order to connect to IGSTK. Create it and set the correct permission.").arg(linkDir.path()));
 		return false;
 	}
 

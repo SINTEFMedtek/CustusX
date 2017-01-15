@@ -57,7 +57,7 @@ namespace cx
 ///--------------------------------------------------------
 
 TrackPadWidget::TrackPadWidget(QWidget* parent) :
-    BaseWidget(parent, "TrackPadWidget", "Camera Control")
+	BaseWidget(parent, "track_pad_widget", "Camera Control")
 {
 	this->setToolTip("Track pad camera control");
   mCameraControl = viewService()->getCameraControl();

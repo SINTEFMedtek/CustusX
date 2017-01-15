@@ -52,7 +52,7 @@ std::vector<GUIExtenderService::CategorizedWidget> CalibrationGUIExtenderService
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new CalibrationMethodsWidget(services, acquisitionService, NULL, "CalibrationMethodsWidget", "Calibration Methods"),
+			new CalibrationMethodsWidget(services, acquisitionService, NULL, "calibration_methods_widget", "Calibration Methods"),
 			"Algorithms"));
 
 	return retval;

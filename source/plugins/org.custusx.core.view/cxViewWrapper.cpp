@@ -35,18 +35,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMenu>
 #include "vtkCamera.h"
 
-#include "cxPatientModelService.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "cxTypeConversions.h"
-#include "cxImageAlgorithms.h"
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
 #include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
-#include "cxVisServices.h"
 #include "cxNavigation.h"
 #include "cxActiveData.h"
+#include "cxSettings.h"
+#include "cxDisplayTextRep.h"
 
 namespace cx
 {
@@ -56,17 +55,6 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr servic
 	mGroupData(groupData)
 {
 	mProperties = DataViewProperties::createDefault();
-}
-
-void DataViewPropertiesInteractor::addDataActions(QWidget* parent)
-{
-	//add actions to the actiongroups and the contextmenu
-	std::vector<DataPtr> sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getData());
-	mLastDataActionUid = "________________________";
-	for (std::vector<DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
-	{
-		this->addDataAction((*iter)->getUid(), parent);
-	}
 }
 
 void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties properties)
@@ -163,12 +151,22 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 	mShow3DSlicesInteractor.reset(new DataViewPropertiesInteractor(mServices, mGroupData));
 	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
+
+	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
+}
+
+void ViewWrapper::settingsChangedSlot(QString key)
+{
+	if (key.startsWith("View"))
+	{
+		this->updateView();
+	}
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
 	QMenu contextMenu;
-	mDataViewPropertiesInteractor->addDataActions(&contextMenu);
+	mDataViewPropertiesInteractor->addDataActionsOfType<Data>(&contextMenu);
 	//append specific info from derived classes
 	this->appendToContextMenu(contextMenu);
 	contextMenu.exec(point);
@@ -207,6 +205,41 @@ QStringList ViewWrapper::getAllDataNames(DataViewProperties properties) const
 	}
 	std::reverse(text.begin(), text.end());
 	return text;
+}
+
+void ViewWrapper::updateView()
+{
+	// view description
+	QString annotationText;
+	if (settings()->value("View/showOrientationAnnotation").value<bool>())
+	{
+		annotationText = QString("%1-%2")
+				.arg(this->getViewDescription())
+				.arg(mGroupData ? mGroupData->getUid() : "");
+	}
+	mPlaneTypeText->setText(0, annotationText);
+
+	// data description
+	QString showDataText;
+	if (settings()->value("View/showDataText").value<bool>())
+	{
+		showDataText = this->getDataDescription();
+	}
+	mDataNameText->setText(0, showDataText);
+	mDataNameText->setFontSize(std::max(12, 22 - 2 * showDataText.size()));
+}
+
+void ViewWrapper::addReps()
+{
+	// plane type text rep
+	mPlaneTypeText = DisplayTextRep::New();
+	mPlaneTypeText->addText(QColor(Qt::green), "--", Vector3D(0.98, 0.02, 0.0));
+	this->getView()->addRep(mPlaneTypeText);
+
+	//data name text rep
+	mDataNameText = DisplayTextRep::New();
+	mDataNameText->addText(QColor(Qt::green), "--", Vector3D(0.02, 0.02, 0.0));
+	this->getView()->addRep(mDataNameText);
 }
 
 } //namespace cx

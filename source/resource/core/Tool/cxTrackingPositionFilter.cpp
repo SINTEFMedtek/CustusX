@@ -39,22 +39,22 @@ TrackingPositionFilter::TrackingPositionFilter()
 {
 	mCutOffFrequency = 3;
 	mResampleFrequency = 100;
+	this->reset();
+}
 
-	fx.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);  // Lag perker isteden
-	fx.reset ();
-	fy.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
-	fy.reset ();
-	fz.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
-	fz.reset ();
+void TrackingPositionFilter::setCutOffFrequency(double freq)
+{
+	mCutOffFrequency = freq;
+	this->reset();
 }
 
 void TrackingPositionFilter::addPosition(Transform3D pos, double timestamp)
 {
-
 	this->clearIfTimestampIsOlderThanHead(pos, timestamp);
 	this->clearIfJumpInTimestamps(pos, timestamp);
 
-	if (mResampled.empty()){
+	if (mResampled.empty())
+	{
 		mResampled[timestamp] = pos;
 		mHistory[timestamp] = pos;
 		return;
@@ -79,19 +79,11 @@ void TrackingPositionFilter::clearIfTimestampIsOlderThanHead(Transform3D pos, do
 	if (mResampled.empty())
 		return;
 
-	if (timestamp < mResampled.rbegin()->first){ // clear history if old timestamps appear
-		mHistory.clear();
-		mResampled.clear();
-		mFiltered.clear();
-
-		fx.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);  // Lag perker isteden
-		fx.reset ();
-		fy.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
-		fy.reset ();
-		fz.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
-		fz.reset ();
+	if (timestamp < mResampled.rbegin()->first)
+	{
+		// clear history if old timestamps appear
+		this->reset();
 	}
-
 }
 
 void TrackingPositionFilter::clearIfJumpInTimestamps(Transform3D pos, double timestamp)
@@ -100,17 +92,10 @@ void TrackingPositionFilter::clearIfJumpInTimestamps(Transform3D pos, double tim
 		return;
 
 	double timeStep = timestamp - mResampled.rbegin()->first;
-	if ( timeStep > 1000){ // clear history of resampled and filtered data if jump in timestamps of more than 1 second
-		mHistory.clear();
-		mResampled.clear();
-		mFiltered.clear();
-
-		fx.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);  // Lag perker isteden
-		fx.reset ();
-		fy.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
-		fy.reset ();
-		fz.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
-		fz.reset ();
+	if ( timeStep > 1000)
+	{
+		// clear history of resampled and filtered data if jump in timestamps of more than 1 second
+		this->reset();
 	}
 }
 
@@ -135,8 +120,22 @@ void TrackingPositionFilter::interpolateAndFilterPositions(Transform3D pos, doub
 		filteredPosition(2,3) = fz.filter(interpolatedPosition(2,3));
 		mFiltered[resampledTimestamp] = filteredPosition;
 	}
-
 }
+
+void TrackingPositionFilter::reset()
+{
+	mHistory.clear();
+	mResampled.clear();
+	mFiltered.clear();
+
+	fx.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);  // Lag perker isteden
+	fx.reset ();
+	fy.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
+	fy.reset ();
+	fz.setup (mFilterOrder, mResampleFrequency, mCutOffFrequency);
+	fz.reset ();
+}
+
 
 } // namespace cx
 

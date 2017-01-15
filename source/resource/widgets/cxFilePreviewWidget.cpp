@@ -49,7 +49,7 @@ namespace cx
 {
 
 FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
-		FileWatcherWidget(parent, "FilePreviewWidget", "File Preview"),
+		FileWatcherWidget(parent, "file_preview_widget", "File Preview"),
 	mTextDocument(new QTextDocument(this)),
 	mTextEdit(new QTextEdit(this)),
 	mSaveButton(new QPushButton("Save", this))

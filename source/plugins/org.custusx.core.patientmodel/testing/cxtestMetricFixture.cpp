@@ -192,6 +192,7 @@ bool MetricFixture::inputEqualsMetric(DistanceMetricWithInput data)
 	if (data.mMetric->getArguments()->get(1))
 		INFO(streamXml2String(*data.mMetric->getArguments()->get(1)));
 
+	CHECK(cx::similar(data.mDistance, data.mMetric->getDistance()));
 	return (cx::similar(data.mDistance, data.mMetric->getDistance()));
 }
 

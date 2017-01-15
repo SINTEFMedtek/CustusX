@@ -68,7 +68,6 @@ DistanceMetricPtr DistanceMetricRep::getDistanceMetric()
 
 void DistanceMetricRep::onModifiedStartRender()
 {
-//	std::cout << "  changedslot" << this << std::endl;
 	DistanceMetricPtr distanceMetric = this->getDistanceMetric();
 	if (!distanceMetric)
 		return;

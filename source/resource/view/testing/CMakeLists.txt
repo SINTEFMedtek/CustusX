@@ -7,17 +7,17 @@ if(BUILD_TESTING)
     )
 
     set(CXTEST_SOURCES
-            cxtestRenderTester.h
-            cxtestRenderTester.cpp
-            cxTestRenderSpeed.h
-            cxTestRenderSpeed.cpp
-            cxViewsFixture.cpp
-            cxViewsWindow.cpp
-            cxtestVideoGraphicsFixture.cpp
-            cxtestVideoGraphics.cpp
-            cxtestVisualRendering.cpp
-            cxtestImageEnveloper.cpp
-            cxtestStream2DRep3D.cpp
+        cxtestRenderTester.h
+        cxtestRenderTester.cpp
+        cxTestRenderSpeed.h
+        cxTestRenderSpeed.cpp
+        cxViewsFixture.cpp
+        cxViewsWindow.cpp
+        cxtestVideoGraphicsFixture.cpp
+        cxtestVideoGraphics.cpp
+        cxtestVisualRendering.cpp
+        cxtestImageEnveloper.cpp
+        cxtestStream2DRep3D.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

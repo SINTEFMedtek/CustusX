@@ -67,7 +67,7 @@ public:
 	virtual QIcon getIcon() const = 0;
 	virtual QVariant getViewGroupVisibility(int index) const = 0;
 	virtual void setViewGroupVisibility(int index, bool value) = 0;
-	virtual QWidget* createPropertiesWidget() const = 0;
+	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const = 0;
 	virtual QVariant getColor() const = 0;
 	virtual bool  useColoredName() const = 0;
 	virtual QVariant getFont() const = 0;
@@ -104,7 +104,7 @@ public:
 	virtual QIcon getIcon() const { return mBase->getIcon(); }
 	virtual QVariant getViewGroupVisibility(int index) const { return mBase->getViewGroupVisibility(index); }
 	virtual void setViewGroupVisibility(int index, bool value) { mBase->setViewGroupVisibility(index, value); }
-	virtual QWidget* createPropertiesWidget() const { return mBase->createPropertiesWidget(); }
+	virtual boost::shared_ptr<QWidget> createPropertiesWidget() const { return mBase->createPropertiesWidget(); }
 	virtual QVariant getColor() const { return mBase->getColor(); }
 	virtual bool  useColoredName() const { return mBase->useColoredName(); }
 	virtual QVariant getFont() const { return mBase->getFont(); }
@@ -119,7 +119,8 @@ public:
 private:
 	mutable QString mUid;
 	mutable QString mType;
-//	mutable std::vector<TreeNodeWeakPtr> mVisibleChildren;
+	mutable std::vector<TreeNodeWeakPtr> mVisibleChildren;
+	mutable bool mVisibleChildrenSet;
 	mutable TreeNodeWeakPtr mVisibleParent;
 	void clearCache();
 

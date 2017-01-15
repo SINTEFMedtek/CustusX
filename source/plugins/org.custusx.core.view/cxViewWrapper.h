@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxViewGroupData.h"
 #include "cxSyncedValue.h"
+#include "cxVisServices.h"
+#include "cxPatientModelService.h"
+#include "cxImageAlgorithms.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 class QMenu;
@@ -69,8 +72,10 @@ class org_custusx_core_view_EXPORT DataViewPropertiesInteractor : public QObject
 	Q_OBJECT
 public:
 	DataViewPropertiesInteractor(VisServicesPtr services, ViewGroupDataPtr groupData);
-	void addDataActions(QWidget* parent);
 	void setDataViewProperties(DataViewProperties properties);
+
+	template <class DATA>
+	void addDataActionsOfType(QWidget* parent);
 
 private slots:
 	void dataActionSlot();
@@ -82,6 +87,19 @@ private:
 
 	QString mLastDataActionUid;
 };
+
+template <class DATA>
+void DataViewPropertiesInteractor::addDataActionsOfType(QWidget* parent)
+{
+	//add actions to the actiongroups and the contextmenu
+	std::vector< boost::shared_ptr<DATA> > sorted = sortOnGroupsAndAcquisitionTime(mServices->patient()->getDataOfType<DATA>());
+	mLastDataActionUid = "________________________";
+	for (typename std::vector< boost::shared_ptr<DATA> >::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+	{
+		this->addDataAction((*iter)->getUid(), parent);
+	}
+}
+
 
 /**
  * \brief Superclass for ViewWrappers.
@@ -99,13 +117,14 @@ public:
 	virtual ViewPtr getView() = 0;
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
-	virtual void updateView() = 0;
+	virtual void updateView();
 
 signals:
 	void orientationChanged(ORIENTATION_TYPE type);
 
 protected slots:
 	void contextMenuSlot(const QPoint& point);
+	void settingsChangedSlot(QString key);
 
 	virtual void dataViewPropertiesChangedSlot(QString uid) = 0;
 	virtual void videoSourceChangedSlot(QString uid) {}
@@ -114,6 +133,8 @@ protected:
 	ViewWrapper(VisServicesPtr backend);
 
 	void connectContextMenu(ViewPtr view);
+	virtual QString getDataDescription() = 0;
+	virtual QString getViewDescription() = 0;
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
 
@@ -122,7 +143,10 @@ protected:
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
 
-
+	virtual void addReps();
+private:
+	DisplayTextRepPtr mPlaneTypeText;
+	DisplayTextRepPtr mDataNameText;
 };
 
 /**

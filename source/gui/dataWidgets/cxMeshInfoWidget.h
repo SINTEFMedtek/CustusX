@@ -47,7 +47,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 
-class cxGui_EXPORT ActiveMeshPropertiesWidget : public TabbedWidget
+class cxGui_EXPORT ActiveMeshPropertiesWidget : public BaseWidget
 {
   Q_OBJECT
 public:
@@ -55,16 +55,18 @@ public:
   virtual ~ActiveMeshPropertiesWidget() {}
 };
 
+class cxGui_EXPORT AllMeshPropertiesWidget : public TabbedWidget
+{
+  Q_OBJECT
+public:
+	AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr mesh, VisServicesPtr services, QWidget* parent);
+  virtual ~AllMeshPropertiesWidget() {}
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+private:
+	SelectDataStringPropertyBasePtr mMeshSelector;
+};
+
 /// -------------------------------------------------------
-
-//class cxGui_EXPORT SelectedMeshInfoWidget : public BaseWidget
-//{
-//  Q_OBJECT
-
-//public:
-//	SelectedMeshInfoWidget(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QWidget* parent);
-//  virtual ~SelectedMeshInfoWidget();
-//};
 
 /**
  * \class MeshInfoWidget
@@ -90,11 +92,10 @@ public:
 	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
 
 protected slots:
-  void setColorSlot();
-  void setColorSlotDelayed();
   void meshSelectedSlot();
   void importTransformSlot();
   void meshChangedSlot();
+  void generateNormalsSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -108,15 +109,6 @@ private:
   StringPropertyDataNameEditablePtr mNameAdapter;
   StringPropertyDataUidEditablePtr mUidAdapter;
   SelectDataStringPropertyBasePtr mMeshSelector;
-  ColorPropertyPtr mColorAdapter;
-  QCheckBox* mBackfaceCullingCheckBox;
-  QCheckBox* mFrontfaceCullingCheckBox;
-  DoublePropertyPtr mVisSizeWidget;
-  QCheckBox* mGlyphVisualizationCheckBox;
-  StringPropertyGlyphOrientationArrayPtr mGlyphOrientationArrayAdapter;
-  StringPropertyGlyphColorArrayPtr mGlyphColorArrayAdapter;
-  StringPropertyGlyphLUTPtr mGlyphColorLUTAdapter;
-
 
   PatientModelServicePtr mPatientModelService;
   ViewServicePtr mViewService;

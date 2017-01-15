@@ -170,7 +170,7 @@ void ImportDataDialog::importDataSlot()
 
   this->setInitialGuessForParentFrame();
   mParentFrameAdapter->setData(mData);
-  mParentFrameCombo->setEnabled(mPatientModelService->getData().size()>1);
+  mParentFrameCombo->setEnabled(mPatientModelService->getDatas().size()>1);
 
   // enable nifti imiport only for meshes. (as this is the only case we have seen)
   mNiftiFormatCheckBox->setEnabled(mPatientModelService->getData<Mesh>(mData->getUid())!=0);
@@ -196,7 +196,7 @@ void ImportDataDialog::setInitialGuessForParentFrame()
 
   QString base = qstring_cast(mData->getName()).split(".")[0];
 
-  std::map<QString, DataPtr> all = mPatientModelService->getData();
+  std::map<QString, DataPtr> all = mPatientModelService->getDatas();
   for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
     if (iter->second==mData)

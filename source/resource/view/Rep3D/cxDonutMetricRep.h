@@ -38,9 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetricRep.h"
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
-class QColor;
 
-typedef vtkSmartPointer<class vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {

@@ -84,7 +84,7 @@ public:
 	{
 		boost::shared_ptr<REP> retval(object);
 		if (uid.isEmpty())
-			uid = retval->getType() + "_" + reinterpret_cast<long>(retval.get());
+			uid = retval->getType() + "_" + reinterpret_cast<long long>(retval.get());
 		retval->mUid = uid;
 		retval->mName = uid;
 		retval->mSelf = retval;
@@ -103,6 +103,7 @@ protected:
 	virtual void onModifiedStartRender() {}
 	virtual void addRepActorsToViewRenderer(ViewPtr view) = 0;
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view) = 0;
+	virtual void onEveryRender() {}
 
 private:
 //	RepImpl(); ///< not implemented

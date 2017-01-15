@@ -77,9 +77,11 @@ TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance
 																	  plane_origin.mMetric,
 																	  plane_dir.mMetric);
 
-	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance, p0.mMetric, p1.mMetric);
+	// from point to plane: negative distance
+	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(-distance, p0.mMetric, p1.mMetric);
 	CHECK(fixture.inputEqualsMetric(testData));
 
+	// from plane to point: positive distance
 	testData = fixture.getDistanceMetricWithInput(distance, p1.mMetric, p0.mMetric);
 	CHECK(fixture.inputEqualsMetric(testData));
 }

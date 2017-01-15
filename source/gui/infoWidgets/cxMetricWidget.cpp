@@ -52,10 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "cxTimeKeeper.h"
-#include "cxFrameMetricWrapper.h"
-#include "cxToolMetricWrapper.h"
 #include "cxTime.h"
 #include "cxMetricManager.h"
+#include "cxMetricUtilities.h"
 
 #include "cxPatientModelService.h"
 
@@ -69,7 +68,7 @@ namespace cx
 //---------------------------------------------------------
 
 MetricWidget::MetricWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent) :
-  BaseWidget(parent, "MetricWidget", "Metrics/3D ruler"),
+  BaseWidget(parent, "metric_widget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
   mPatientModelService(patientModelService),
@@ -150,8 +149,10 @@ void MetricWidget::createActions(QActionGroup* group)
 	this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
-	this->createAction(group, ":/icons/metric_sphere.png", "Sphere", "Create a new SphereMetric",   SLOT(addSphereButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric_sphere.png", "Sphere", "Create a new Sphere Metric",   SLOT(addSphereButtonClickedSlot()));
 	this->createAction(group, ":/icons/metric_torus.png", "Torus", "Create a new Torus Metric",   SLOT(addDonutButtonClickedSlot()));
+    this->createAction(group, ":/icons/metric_custom.png", "Custom", "Create a new Custom Metric",   SLOT(addCustomButtonClickedSlot()));
+	this->createAction(group, ":/icons/metric.png", "ROI", "Create a new Region of Interest Metric",   SLOT(addROIButtonClickedSlot()));
 
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);
 	mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
@@ -220,74 +221,15 @@ void MetricWidget::hideEvent(QHideEvent* event)
   QWidget::hideEvent(event);
 }
 
-namespace
-{
-template<class T, class SUPER>
-boost::shared_ptr<T> castTo(boost::shared_ptr<SUPER> data)
-{
-	return boost::dynamic_pointer_cast<T>(data);
-}
-
-template<class T, class SUPER>
-bool isType(boost::shared_ptr<SUPER> data)
-{
-	return (castTo<T>(data) ? true : false);
-}
-
-template<class WRAPPER, class METRIC, class SUPER>
-boost::shared_ptr<WRAPPER> createMetricWrapperOfType(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService, boost::shared_ptr<SUPER> data)
-{
-	return boost::shared_ptr<WRAPPER>(new WRAPPER(viewService, patientModelService, castTo<METRIC>(data)));
-}
-}
-
-MetricBasePtr MetricWidget::createMetricWrapper(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService, DataPtr data)
-{
-	if (isType<PointMetric>(data))
-	  return createMetricWrapperOfType<PointMetricWrapper, PointMetric>(viewService, patientModelService, data);
-	if (isType<DistanceMetric>(data))
-	  return createMetricWrapperOfType<DistanceMetricWrapper, DistanceMetric>(viewService, patientModelService, data);
-	if (isType<AngleMetric>(data))
-	  return createMetricWrapperOfType<AngleMetricWrapper, AngleMetric>(viewService, patientModelService, data);
-	if (isType<FrameMetric>(data))
-	  return createMetricWrapperOfType<FrameMetricWrapper, FrameMetric>(viewService, patientModelService, data);
-	if (isType<ToolMetric>(data))
-	  return createMetricWrapperOfType<ToolMetricWrapper, ToolMetric>(viewService, patientModelService, data);
-	if (isType<PlaneMetric>(data))
-	  return createMetricWrapperOfType<PlaneMetricWrapper, PlaneMetric>(viewService, patientModelService, data);
-	if (isType<DonutMetric>(data))
-	  return createMetricWrapperOfType<DonutMetricWrapper, DonutMetric>(viewService, patientModelService, data);
-	if (isType<SphereMetric>(data))
-	  return createMetricWrapperOfType<SphereMetricWrapper, SphereMetric>(viewService, patientModelService, data);
-
-	return MetricBasePtr();
-}
-
-/** create new metric wrappers for all metrics in PaSM
- *
- */
-std::vector<MetricBasePtr> MetricWidget::createMetricWrappers(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService)
-{
-	std::vector<MetricBasePtr> retval;
-  std::map<QString, DataPtr> all = patientService()->getData();
-  for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
-  {
-	MetricBasePtr wrapper = this->createMetricWrapper(viewService, patientModelService, iter->second);
-  	if (wrapper)
-  	{
-  		retval.push_back(wrapper);
-  	}
-  }
-  return retval;
-}
-
-
 void MetricWidget::prePaintEvent()
 {
-//	QTime timer;
-//	timer.start();
+	//	QTime timer;
+	//	timer.start();
 	mPaintCount++;
-  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers(mViewService, mPatientModelService);
+
+	MetricUtilities utilities(mViewService, mPatientModelService);
+
+	std::vector<MetricBasePtr> newMetrics = utilities.createMetricWrappers();
 
   bool rebuild = !this->checkEqual(newMetrics, mMetrics);
   if (rebuild)
@@ -357,14 +299,6 @@ void MetricWidget::updateTableContents()
 	// update contents:
 	QTime timer;
 	timer.start();
-	for (unsigned i = 0; i < mMetrics.size(); ++i)
-	{
-		MetricBasePtr current = mMetrics[i];
-		QString name = current->getData()->getName();
-		QString value = current->getValue();
-		QString arguments = current->getArguments();
-		QString type = current->getType();
-	}
 
 	for (unsigned i = 0; i < mMetrics.size(); ++i)
 	{
@@ -491,6 +425,10 @@ void MetricWidget::addDistanceButtonClickedSlot()
 {
 	mMetricManager->addDistanceButtonClickedSlot();
 }
+void MetricWidget::addROIButtonClickedSlot()
+{
+	mMetricManager->addROIButtonClickedSlot();
+}
 void MetricWidget::addSphereButtonClickedSlot()
 {
 	mMetricManager->addSphereButtonClickedSlot();
@@ -498,6 +436,10 @@ void MetricWidget::addSphereButtonClickedSlot()
 void MetricWidget::addDonutButtonClickedSlot()
 {
 	mMetricManager->addDonutButtonClickedSlot();
+}
+void MetricWidget::addCustomButtonClickedSlot()
+{
+    mMetricManager->addCustomButtonClickedSlot();
 }
 
 std::set<QString> MetricWidget::getSelectedUids()

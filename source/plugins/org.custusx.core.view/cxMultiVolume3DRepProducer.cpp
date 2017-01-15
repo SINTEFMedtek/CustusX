@@ -129,7 +129,7 @@ void MultiVolume3DRepProducer::addImage(ImagePtr image)
 	else
 		return;
 
-	if(this->is2DImage(image))
+	if(image && image->is2D())
 		m2DImages.push_back(image);
 	else
 		m3DImages.push_back(image);
@@ -249,13 +249,6 @@ void MultiVolume3DRepProducer::buildVtkOpenGLGPUMultiVolumeRayCastMapper()
 	rep->setImages(m3DImages);
 	mReps.push_back(rep);
 #endif //CX_BUILD_MEHDI_VTKMULTIVOLUME
-}
-
-bool MultiVolume3DRepProducer::is2DImage(ImagePtr image) const
-{
-	if(image)
-		return image->getBaseVtkImageData()->GetDimensions()[2]==1;
-	return false;
 }
 
 void MultiVolume3DRepProducer::buildSingleVolumeRenderer(ImagePtr image)

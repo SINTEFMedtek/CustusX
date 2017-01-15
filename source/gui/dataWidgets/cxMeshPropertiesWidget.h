@@ -29,18 +29,68 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "catch.hpp"
-#include "cxViewService.h"
-#include "cxRepContainer.h"
+#ifndef CXMESHPROPERTIESWIDGET_H
+#define CXMESHPROPERTIESWIDGET_H
 
-namespace cxtest
+#include "cxGuiExport.h"
+
+#include <vector>
+//#include <QtWidgets>
+
+#include "cxMesh.h"
+#include "cxDataInterface.h"
+#include "cxBaseWidget.h"
+
+
+namespace cx
 {
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
+class ReplacableContentWidget;
 
-TEST_CASE("VisualizationServiceNull: get3DReps() don't seg. fault", "[unit][resource][visualization]")
+/**
+ * \class MeshPropertiesWidget
+ *
+ * \brief Widget for displaying glyps information about meshes.
+ *
+ * \ingroup cx_gui
+ *
+ * split from class MeshInfoWidget
+ */
+class cxGui_EXPORT MeshPropertiesWidget : public BaseWidget
 {
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
-	cx::RepContainerPtr repContainer = visualizationService->get3DReps();
-	REQUIRE_FALSE(repContainer);
-}
+  Q_OBJECT
 
-} //cxtest
+public:
+	MeshPropertiesWidget(SelectDataStringPropertyBasePtr meshSelector,
+				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+				   QWidget* parent);
+  virtual ~MeshPropertiesWidget();
+
+	SelectDataStringPropertyBasePtr getSelector() { return mMeshSelector; }
+
+protected:
+  void setupUI();
+  virtual void prePaintEvent();
+
+private:
+  void updateFrontend();
+
+protected slots:
+  void meshSelectedSlot();
+
+private:
+  MeshPtr mMesh;
+  SelectDataStringPropertyBasePtr mMeshSelector;
+
+  ReplacableContentWidget* mPropertiesWidget;
+
+  PatientModelServicePtr mPatientModelService;
+  ViewServicePtr mViewService;
+
+  MeshPropertiesWidget();
+  void clearUI();
+};
+
+}//end namespace cx
+
+#endif // CXMESHPROPERTIESWIDGET_H

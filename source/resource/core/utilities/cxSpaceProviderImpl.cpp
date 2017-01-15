@@ -74,7 +74,7 @@ std::vector<CoordinateSystem> SpaceProviderImpl::getSpacesToPresentInGUI()
 	retval.push_back(CoordinateSystem(csSENSOR, "active"));
 	retval.push_back(CoordinateSystem(csTOOL_OFFSET, "active"));
 
-	std::map<QString, DataPtr> data = mDataManager->getData();
+	std::map<QString, DataPtr> data = mDataManager->getDatas();
 	for (std::map<QString, DataPtr>::iterator i=data.begin(); i!=data.end(); ++i)
 	{
 		retval.push_back(CoordinateSystem(csDATA, i->second->getSpace()));
@@ -98,7 +98,7 @@ std::map<QString, QString> SpaceProviderImpl::getDisplayNamesForCoordRefObjects(
 
 	retval["active"] = "active";
 
-	std::map<QString, DataPtr> data = mDataManager->getData();
+	std::map<QString, DataPtr> data = mDataManager->getDatas();
 	for (std::map<QString, DataPtr>::iterator i=data.begin(); i!=data.end(); ++i)
 	{
 		retval[i->second->getSpace()] = i->second->getName();

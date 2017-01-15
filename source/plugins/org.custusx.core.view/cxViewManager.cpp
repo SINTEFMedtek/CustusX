@@ -74,6 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCameraControl.h"
 #include "cxNavigation.h"
 #include "cxPatientModelService.h"
+#include "cxCameraStyleInteractor.h"
 
 namespace cx
 {
@@ -90,8 +91,8 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 {
 	mBackend = backend;
 	mRenderLoop.reset(new RenderLoop());
-	connect(mRenderLoop.get(), SIGNAL(preRender()), this, SLOT(updateViews()));
-	connect(mRenderLoop.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int)));
+	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewManager::updateViews);
+	connect(mRenderLoop.get(), &RenderLoop::fps, this, &ViewManager::fps);
 	connect(mRenderLoop.get(), &RenderLoop::renderFinished, this, &ViewManager::renderFinished);
 
 	mSlicePlanesProxy.reset(new SlicePlanesProxy());
@@ -106,7 +107,7 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	// initialize view groups:
 	for (unsigned i = 0; i < VIEW_GROUP_COUNT; ++i)
 	{
-		ViewGroupPtr group(new ViewGroup(mBackend));
+		ViewGroupPtr group(new ViewGroup(mBackend, QString::number(i)));
 		mViewGroups.push_back(group);
 	}
 
@@ -117,7 +118,6 @@ ViewManager::ViewManager(VisServicesPtr backend) :
 	mLayoutWidgets.resize(mActiveLayout.size(), NULL);
 
 	mInteractiveCropper.reset(new InteractiveCropper(mBackend->patient()->getActiveData()));
-	connect(mInteractiveCropper.get(), SIGNAL(changed()), mRenderLoop.get(), SLOT(requestPreRenderSignal()));
 	connect(this, SIGNAL(activeViewChanged()), this, SLOT(updateCameraStyleActions()));
 
     this->loadGlobalSettings();
@@ -179,7 +179,7 @@ NavigationPtr ViewManager::getNavigation(int group)
 
 QWidget *ViewManager::getLayoutWidget(int index)
 {
-    if (index >= mLayoutWidgets.size())
+	if (index >= mLayoutWidgets.size())
         return NULL;
    return mLayoutWidgets[index];
 }
@@ -188,19 +188,17 @@ QWidget *ViewManager::createLayoutWidget(QWidget* parent, int index)
 {
 	if (index >= mLayoutWidgets.size())
 		return NULL;
-//	CX_ASSERT(index < mLayoutWidgets.size()); // removed: must be allowed to iterate until NULL
+
 	if (!mLayoutWidgets[index])
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();
 
 		if (optimizedViews)
 		{
-//			report("creating optimized wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout();
 		}
 		else
 		{
-//			report("creating classic wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
 		}
 
@@ -474,6 +472,8 @@ void ViewManager::activateViews(ViewCollectionWidget *widget, LayoutData next)
 	if (!widget)
 		return;
 
+	widget->setOffScreenRenderingAndClear(next.getOffScreenRendering());
+
 	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
 		this->activateView(widget, *iter);
 }
@@ -578,12 +578,12 @@ void ViewManager::updateCameraStyleActions()
 
 	if (index<0)
 	{
-		mCameraStyleInteractor->connectCameraStyle(CameraStylePtr());
+		mCameraStyleInteractor->connectCameraStyle(ViewGroupDataPtr());
 	}
 	else
 	{
 		ViewGroupPtr group = this->getViewGroups()[index];
-		mCameraStyleInteractor->connectCameraStyle(group->getCameraStyle());
+		mCameraStyleInteractor->connectCameraStyle(group->getData());
 		mCameraControl->setView(this->get3DView(index, 0));
 	}
 
@@ -687,6 +687,16 @@ void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 void ViewManager::addDefaultLayout(LayoutData layoutData)
 {
 	mLayoutRepository->addDefault(layoutData);
+}
+
+void ViewManager::enableContextMenuForViews(bool enable)
+{
+	for(int i=0; i<mLayoutWidgets.size(); ++i)
+	{
+		ViewCollectionWidget* widget = mLayoutWidgets[i];
+		if(widget)
+			widget->enableContextMenuForViews(enable);
+	}
 }
 
 } //namespace cx

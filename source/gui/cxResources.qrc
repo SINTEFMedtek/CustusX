@@ -115,5 +115,6 @@
         <file>icons/space_generic.png</file>
         <file>icons/open_icon_library/arrange_horizontal.png</file>
         <file>icons/open_icon_library/arrange_vertical.png</file>
+        <file>icons/metric_custom.png</file>
     </qresource>
 </RCC>

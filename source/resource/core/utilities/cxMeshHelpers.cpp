@@ -108,7 +108,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)
 	retval["Backface culling"] = string_cast(mesh->getBackfaceCulling());
 	retval["Color"] = mesh->getColor().name().toStdString();
 	retval["Frontface culling"] = string_cast(mesh->getFrontfaceCulling());
-	retval["Is wireframe"] = string_cast(mesh->getIsWireframe());
+//	retval["Is wireframe"] = string_cast(mesh->getIsWireframe());
 	retval["Acquisition time"] = string_cast(mesh->getAcquisitionTime().toString(timestampSecondsFormatNice()));
 	retval["Fiber bundle"] = string_cast(mesh->isFiberBundle());
 

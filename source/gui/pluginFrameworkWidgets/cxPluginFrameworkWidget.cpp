@@ -39,7 +39,7 @@ namespace cx
 
 
 PluginFrameworkWidget::PluginFrameworkWidget(QWidget* parent) :
-    BaseWidget(parent, "PluginFrameworkWidget", "Plugin Framework"),
+	BaseWidget(parent, "plugin_framework_widget", "Plugin Framework"),
     mVerticalLayout(new QVBoxLayout(this))
 {
 	this->setToolTip("View available plugins");

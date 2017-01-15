@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
 #include "cxOSXHelper.h"
+#include "cxViewCache.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -50,6 +52,7 @@ ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
 {
+	mOffScreenRendering = false;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	mMTimeHash = 0;
@@ -73,7 +76,7 @@ void ViewContainer::clear()
 		ViewItem* viewItem = dynamic_cast<ViewItem*>(item);
 		delete viewItem;
 	}
-	view_utils::setStretchFactors(this->getGridLayout(), LayoutRegion(0, 0, 10, 10), 0);
+	view_utils::setStretchFactors(this->getGridLayout(), LayoutRegion(0, 0, LayoutData::MaxGridSize, LayoutData::MaxGridSize), 0);
 	this->setModified();
 	mMouseEventTarget = NULL;
 }
@@ -128,22 +131,46 @@ ViewItem *ViewContainer::addView(QString uid, LayoutRegion region, QString name)
 	return item;
 }
 
+void ViewContainer::setOffScreenRenderingAndClear(bool on)
+{
+	this->clear();
+	mOffScreenRendering = on;
+}
+
+bool ViewContainer::getOffScreenRendering() const
+{
+	return mOffScreenRendering;
+}
+
 void ViewContainer::initializeRenderWindow()
 {
 	if (mRenderWindow)
-		return;
+		return;	
 
-	mRenderWindow = vtkRenderWindowPtr::New();
-	this->SetRenderWindow(mRenderWindow);
-	mRenderWindow->GetInteractor()->EnableRenderOff();
+	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
 
-	this->addBackgroundRenderer();
+	if (!mCachedRenderWindows.count(uid))
+	{
+		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+		this->addBackgroundRenderer(rw);
+		rw->SetOffScreenRendering(mOffScreenRendering);
+		mCachedRenderWindows[uid] = rw;
+	}
+
+	// replace the previous renderwindow with one from the cache.
+	// the old renderwindow is not hidden explicitly: is this a problem??
+	if (mRenderWindow != mCachedRenderWindows[uid])
+	{
+		mRenderWindow = mCachedRenderWindows[uid];
+		this->SetRenderWindow(mRenderWindow);
+		mRenderWindow->GetInteractor()->EnableRenderOff();
+	}
 }
 
-void ViewContainer::addBackgroundRenderer()
+void ViewContainer::addBackgroundRenderer(vtkRenderWindowPtr rw)
 {
 	vtkRendererPtr renderer = vtkRendererPtr::New();
-	mRenderWindow->AddRenderer(renderer);
+	rw->AddRenderer(renderer);
 	renderer->SetViewport(0,0,1,1);
 	QColor background = palette().color(QPalette::Background);
 	renderer->SetBackground(background.redF(), background.greenF(), background.blueF());

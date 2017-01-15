@@ -81,7 +81,7 @@ void DistanceMetric::parseXml(QDomNode& dataNode)
 {
 	DataMetric::parseXml(dataNode);
 
-	mArguments->parseXml(dataNode, mDataManager->getData());
+	mArguments->parseXml(dataNode, mDataManager->getDatas());
 	this->resetCachedValues();
 }
 
@@ -92,21 +92,34 @@ void DistanceMetric::resetCachedValues()
 
 std::vector<Vector3D> DistanceMetric::getEndpoints() const
 {
-	if (!mCachedEndPoints.isValid())
-	{
-		mCachedEndPoints.set(this->getEndpointsUncached());
-	}
+	this->updateCache();
 	return mCachedEndPoints.get();
 }
 
-std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
+void DistanceMetric::updateCache() const
+{
+	if (!mCachedEndPoints.isValid())
+	{
+		std::vector<Vector3D> endpoints;
+		Vector3D direction;
+		this->getEndpointsUncached(&endpoints, &direction);
+		mCachedEndPoints.set(endpoints);
+		mCachedDirection.set(direction);
+	}
+}
+
+void DistanceMetric::getEndpointsUncached(std::vector<Vector3D> *endpoints, Vector3D* direction) const
 {
 	DataPtr a0 = mArguments->get(0);
 	DataPtr a1 = mArguments->get(1);
 
 	if (!a0 || !a1)
-		return std::vector<Vector3D>();
+	{
+		endpoints->clear();
+		return;
+	}
 	std::vector<Vector3D> retval(2);
+	Vector3D dir;
 
 	// case   I: point-point
 	// case  II: point-plane
@@ -116,6 +129,7 @@ std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
 	{
 		retval[0] = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
 		retval[1] = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
+		dir = (retval[1] - retval[0]).normal();
 	}
 	else if ((a0->getType() == "planeMetric") && (a1->getType() == "pointMetric"))
 	{
@@ -124,6 +138,7 @@ std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
 
 		retval[0] = plane.projection(p);
 		retval[1] = p;
+		dir = plane.normal();
 	}
 	else if ((a0->getType() == "pointMetric") && (a1->getType() == "planeMetric"))
 	{
@@ -132,13 +147,15 @@ std::vector<Vector3D> DistanceMetric::getEndpointsUncached() const
 
 		retval[1] = plane.projection(p);
 		retval[0] = p;
+		dir = plane.normal();
 	}
 	else
 	{
-		return std::vector<Vector3D>();
+		endpoints->clear();
 	}
 
-	return retval;
+	*endpoints = retval;
+	*direction = dir;
 }
 
 double DistanceMetric::getDistance() const
@@ -147,7 +164,15 @@ double DistanceMetric::getDistance() const
 	if (endpoints.size() != 2)
 		return -1;
 
-	return (endpoints[1] - endpoints[0]).length();
+	Vector3D dir = this->getDirection();
+
+	return dot(endpoints[1] - endpoints[0], dir);
+}
+
+Vector3D DistanceMetric::getDirection() const
+{
+	this->updateCache();
+	return mCachedDirection.get();
 }
 
 QString DistanceMetric::getValueAsString() const

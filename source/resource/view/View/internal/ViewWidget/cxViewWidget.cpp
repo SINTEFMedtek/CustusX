@@ -51,7 +51,8 @@ ViewWidget::ViewWidget(const QString& uid, const QString& name, QWidget *parent,
 	mMTimeHash = 0;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	mZoomFactor = -1.0;
-	mView = ViewLinkingViewWidget::create(this, vtkRenderWindowPtr::New());
+	vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+	mView = ViewLinkingViewWidget::create(this, rw);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	this->SetRenderWindow(mView->getRenderWindow());
 	mView->getRenderWindow()->GetInteractor()->EnableRenderOff();

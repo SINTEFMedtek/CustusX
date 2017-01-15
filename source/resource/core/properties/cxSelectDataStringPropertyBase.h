@@ -73,6 +73,7 @@ public: // interface extension
 	static std::map<QString, DataPtr> filterOnType(std::map<QString, DataPtr> input, QString regexp);
 	virtual void setTypeRegexp(QString regexp);
 
+	void setOnly2DImagesFilter(bool only2D);
 signals:
 	void dataChanged(QString);
 protected:
@@ -81,8 +82,10 @@ protected:
 		*/
 	explicit SelectDataStringPropertyBase(PatientModelServicePtr patientModelService, QString typeRegexp = ".*");
 	std::map<QString, DataPtr> filterOnUid(std::map<QString, DataPtr> input, QString regexp) const;
+	std::map<QString, DataPtr> filterImagesOn2D(std::map<QString, DataPtr> input, bool only2D) const;
 	QString mTypeRegexp;
 	QString mUidRegexp;
+	bool mOnly2D;
 	QString mValueName;
 	QString mHelp;
 

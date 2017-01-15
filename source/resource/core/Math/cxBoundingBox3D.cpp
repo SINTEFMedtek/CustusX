@@ -260,7 +260,7 @@ std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data)
 DoubleBoundingBox3D DoubleBoundingBox3D::fromCloud(std::vector<Vector3D> cloud)
 {
 	if (cloud.empty())
-		return DoubleBoundingBox3D(0, 0, 0, 0, 0, 0);
+		return DoubleBoundingBox3D::zero();
 
 	Vector3D a = cloud[0]; // min
 	Vector3D b = cloud[0]; // max
@@ -304,6 +304,25 @@ DoubleBoundingBox3D DoubleBoundingBox3D::unionWith(const DoubleBoundingBox3D& ot
 	cloud.push_back(corner(1,1,1));
 	cloud.push_back(other.corner(1,1,1));
 	return fromCloud(cloud);
+}
+
+DoubleBoundingBox3D intersection(DoubleBoundingBox3D a, DoubleBoundingBox3D b)
+{
+	DoubleBoundingBox3D bb = a;
+
+	for (int i=0; i<3; ++i)
+	{
+		bb[2*i]   = std::max(a[2*i],   b[2*i]);
+		bb[2*i+1] = std::min(a[2*i+1], b[2*i+1]);
+	}
+
+	// check for no intersection
+	Vector3D range = bb.range();
+	for (int i=0; i<3; ++i)
+		if (range[i]<0.0)
+			return DoubleBoundingBox3D::zero();
+
+	return bb;
 }
 
 // --------------------------------------------------------

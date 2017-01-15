@@ -145,26 +145,28 @@ class Controller(cxBuildScript.BuildScript):
         '''
         '''
         targetFolder = self.cxInstaller.getTaggedFolderName()
-        self._publishRelease(remoteTargetFolder=targetFolder)
+        self._publishRelease(remoteTargetFolder=targetFolder, publishReleaseNotes=True)
 
     def publishNightlyRelease(self):
         '''
         '''
-        self._publishRelease(remoteTargetFolder="nightly")
+        self._publishRelease(remoteTargetFolder="nightly", publishReleaseNotes=False)
 
-    def _publishRelease(self, remoteTargetFolder):
+    def _publishRelease(self, remoteTargetFolder, publishReleaseNotes):
         '''
         '''
-        source = self.cxInstaller.createReleaseFolder() # get path to folder containing releasable files
+        source = self.cxInstaller.createReleaseFolder(publishReleaseNotes) # get path to folder containing releasable files
         target = self.controlData().publish_release_target
         # install files in source to <release_server>/<targetFolder>/<platform>
         self.cxInstaller.publishReleaseFolder(source, remoteTargetFolder, target)  
 
     def publishTaggedDocumentation(self):
-        self.cxBuilder.publishDocumentation(targetFolder = self.cxInstaller.getTaggedFolderName())        
+        source = self.cxInstaller.installer_path
+        self.cxBuilder.publishDocumentation(artefactFolder = source, targetFolder = self.cxInstaller.getTaggedFolderName())
 
     def publishNightlyDocumentation(self):
-        self.cxBuilder.publishDocumentation(targetFolder = "nightly")        
+        source = self.cxInstaller.installer_path
+        self.cxBuilder.publishDocumentation(artefactFolder = source, targetFolder = "nightly")
     
     def checkoutCustusXAndData(self):
         'checkout only CustusX and data. Required if the first build step was not run, f.ex. during integration tests'

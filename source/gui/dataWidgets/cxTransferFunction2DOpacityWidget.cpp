@@ -39,7 +39,7 @@ namespace cx
 {
 
 TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(ActiveDataPtr activeData, QWidget* parent) :
-	BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity"),
+	BaseWidget(parent, "transfer_function_2d_opacity_widget", "2D Opacity"),
 	mActiveData(activeData)
 {
 	this->setToolTip("Set a 2D opacity transfer function");

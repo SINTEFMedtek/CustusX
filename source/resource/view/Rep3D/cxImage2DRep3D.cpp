@@ -49,6 +49,7 @@ namespace cx
 
 Image2DProxy::Image2DProxy()
 {
+	m_rMrr = Transform3D::Identity();
 	mActor = vtkImageActorPtr::New();
 	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
 }
@@ -94,7 +95,7 @@ void Image2DProxy::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		CX_ASSERT(mImage->getBaseVtkImageData()->GetDimensions()[2]==1); // class only treats 2d images.
+		CX_ASSERT(mImage->is2D()); // class only treats 2d images.
 
 		mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
 	}
@@ -120,7 +121,11 @@ void Image2DProxy::transformChangedSlot()
 	{
 		return;
 	}
-	mActor->SetUserMatrix(mImage->get_rMd().getVtkMatrix());
+
+	Transform3D rrMd = mImage->get_rMd();
+	Transform3D rMd = m_rMrr * rrMd;
+
+	mActor->SetUserMatrix(rMd.getVtkMatrix());
 }
 
 void Image2DProxy::transferFunctionsChangedSlot()
@@ -128,6 +133,11 @@ void Image2DProxy::transferFunctionsChangedSlot()
 	mImageWithLUTProxy->setInputData(mImage->getBaseVtkImageData(), mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
+void Image2DProxy::setTransformOffset(Transform3D rMrr)
+{
+	m_rMrr = rMrr;
+	this->transformChangedSlot();
+}
 
 
 
