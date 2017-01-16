@@ -64,12 +64,24 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 	mTextureFollowTool = false;
 }
 
-void CustomMetric::onPropertiesChanged()
+bool CustomMetric::needForToolListenerHasChanged() const
 {
+	bool toolDefinesUp = mDefineVectorUpMethod == mDefineVectorUpMethods.tool;
+	bool toolListenerDefined = mToolListener.get()!=NULL;
 
-	if (mTextureFollowTool != (mToolListener.get()!=NULL))
+	if (mTextureFollowTool != toolListenerDefined || toolDefinesUp != toolListenerDefined)
+		return true;
+	else
+		return false;
+}
+
+
+void CustomMetric::createOrDestroyToolListener()
+{
+	if (this->needForToolListenerHasChanged())
 	{
-		if (mTextureFollowTool)
+		bool toolDefinesUp = mDefineVectorUpMethod == mDefineVectorUpMethods.tool;
+		if (mTextureFollowTool || toolDefinesUp)
 		{
 			mToolListener = mSpaceProvider->createListener();
 			mToolListener->setSpace(CoordinateSystem(csTOOL_OFFSET, "active"));
@@ -81,6 +93,11 @@ void CustomMetric::onPropertiesChanged()
 			mToolListener.reset();
 		}
 	}
+}
+
+void CustomMetric::onPropertiesChanged()
+{
+	this->createOrDestroyToolListener();
 }
 
 CustomMetric::DefineVectorUpMethods CustomMetric::getDefineVectorUpMethods() const
@@ -273,17 +290,25 @@ Vector3D CustomMetric::getVectorUp() const
 
         return upVector;
     }
-    else
+	else if (mDefineVectorUpMethod == mDefineVectorUpMethods.tool)
+	{
+		Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(CoordinateSystem::reference(), true);
+		Vector3D toolUp = -Vector3D::UnitX();
+		return rMt.vector(toolUp);
+	}
+	else
+	{
 		return mDataManager->getOperatingTable().getVectorUp();
+	}
 }
 
 
 void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
 {
-	if (!this->getTextureFollowTool())
+	if (!model)
 		return;
 
-	if (!model)
+	if (!this->getTextureFollowTool() || !model->hasTexture())
 		return;
 
 	// special case:
@@ -479,6 +504,7 @@ QStringList CustomMetric::DefineVectorUpMethods::getAvailableDefineVectorUpMetho
     QStringList retval;
     retval << table;
     retval << connectedFrameInP1;
+	retval << tool;
     return retval;
 }
 
@@ -487,7 +513,8 @@ std::map<QString, QString> CustomMetric::DefineVectorUpMethods::getAvailableDefi
     std::map<QString, QString> names;
     names[table] = "The operating table";
     names[connectedFrameInP1] = "The connected frame in p1";
-    return names;
+	names[tool] = "The active tool";
+	return names;
 }
 
 

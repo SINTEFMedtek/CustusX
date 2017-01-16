@@ -116,10 +116,12 @@ private:
         {
             table = "tableDefinesUp";
             connectedFrameInP1 = "connectedFrameDefinesUp";
+			tool = "toolDefinesUp";
         }
         QString table;
         QString connectedFrameInP1;
-        QStringList getAvailableDefineVectorUpMethods() const;
+		QString tool;
+		QStringList getAvailableDefineVectorUpMethods() const;
         std::map<QString, QString> getAvailableDefineVectorUpMethodsDisplayNames() const;
     };
 
@@ -142,6 +144,9 @@ private:
 	Transform3D calculateRotation(Vector3D dir, Vector3D vup) const;
 	Transform3D calculateTransformTo2DImageCenter() const;
 	void onPropertiesChanged();
+	bool needForToolListenerHasChanged() const;
+	void createOrDestroyToolListener();
+
 public:
 	CustomMetric::DefineVectorUpMethods getDefineVectorUpMethods() const;
 	std::vector<Transform3D> calculateOrientations() const;
