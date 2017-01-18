@@ -67,21 +67,22 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 /**
  * @brief The OperatingTable class
  *
- * The OT class holds a transform and is a coordinate system fixed relative to the OR.
- * Can be used to find up and down vectors.
- * Definition is like Dicom given that the patient lies on the back on the table, LPS.
+ * The OperatingTable holds a transform and is a coordinate system fixed relative to the reference, R.
+ * The definition is like Dicom, given that the patient lies on the back on the table, Left - Posterior - Superior.
+ * This is like the default R.
+ * The OT up direction can be changed in the preferences, and other objects can use it to find up and down vectors as needed.
  */
 struct cxResource_EXPORT OperatingTable
 {
     explicit OperatingTable()
-        : rMtb(Transform3D::Identity())
+		: rMot(Transform3D::Identity())
     {}
     explicit OperatingTable(Transform3D tr)
-        : rMtb(tr)
+		: rMot(tr)
     {}
-    Transform3D rMtb; ///< Transform from OT to reference space.
+	Transform3D rMot; ///< Transform from OT to reference space.
 
-	Vector3D getVectorUp() const {return rMtb.vector(Vector3D(0,-1,0));}
+	Vector3D getVectorUp() const {return rMot.vector(Vector3D(0,-1,0));} ///< Returns the table's up vector in R space.
 };
 
 

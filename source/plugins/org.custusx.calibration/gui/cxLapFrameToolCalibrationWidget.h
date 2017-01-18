@@ -109,6 +109,7 @@ public:
   Transform3D get_calibration_sMt(); ///< new calibration matrix for the input tool.
 
 private:
+  void useOnlyRotationalPart(Transform3D* transform);
   ToolPtr mTool; ///< the tool the sampled point is taken from
   ToolPtr mCalibrationRef; ///< the tool that contains the reference point we are going to calibrate against
   Transform3D m_sMpr; ///< raw tracking position, patient reference to tool sensor.

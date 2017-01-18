@@ -904,18 +904,22 @@ DoublePropertyPtr CustomMetricWrapper::createDistanceMarkerVisibility() const
 
 StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const
 {
-    StringPropertyPtr retval;
-    retval = StringProperty::initialize("selectDefineVectorUp",
-                                              "Use to define the vector up",
-                                              "The vector up of the metric will be connected to the static up vector of the operating table or to a frame in p1, which might well be connected to a tool giving a dynamic up vector.",
-                                              mData->getDefineVectorUpMethod(),
-                                              mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethods(),
-                                              QDomNode());
-    retval->setDisplayNames(mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethodsDisplayNames());
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("selectDefineVectorUp",
+										"Use to define the vector up",
+										"The vector up of the metric will be connected to one of:\n"
+										"- a) The static up vector of the operating table\n"
+										"- b) To a frame in p1, which might well be connected "
+										"to a tool giving a dynamic up vector.\n"
+										"- c) The tool up (tool negative x)",
+										mData->getDefineVectorUpMethod(),
+										mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethods(),
+										QDomNode());
+	retval->setDisplayNames(mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethodsDisplayNames());
 
 
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
 }
 
 StringPropertySelectDataPtr CustomMetricWrapper::createModelSelector() const
