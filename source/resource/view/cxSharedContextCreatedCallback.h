@@ -50,7 +50,6 @@ class cxResourceVisualization_EXPORT SharedContextCreatedCallback : public vtkCo
 public:
 	static SharedContextCreatedCallback *New();
 	SharedContextCreatedCallback();
-	//void setViewService(ViewServicePtr viewService);
 	void setRenderWindowFactory(RenderWindowFactory *factory);
 
 	virtual void Execute(vtkObject *view, unsigned long eventId, void*cbo);

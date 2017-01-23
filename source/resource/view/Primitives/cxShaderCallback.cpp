@@ -41,13 +41,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkOpenGLIndexBufferObject.h>
 #include <vtkOpenGLRenderWindow.h>
 
+#include "cxGLHelpers.h"
 #include "cxLogger.h"
-#include "cxSharedOpenGLContext.h"
+//#include "cxSharedOpenGLContext.h"
+#include "GL/glew.h"
+#include "GL/glu.h"
 
 //-----DELETE?-----
-#include "cxGPUImageBuffer.h"
-#include "cxTypeConversions.h"
-#include "cxGLHelpers.h"
+//#include "cxGPUImageBuffer.h"
+//#include "cxTypeConversions.h"
 //-----DELETE?-----
 
 namespace cx

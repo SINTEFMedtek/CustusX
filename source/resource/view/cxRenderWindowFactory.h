@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXRENDERWINDOWFACTORY_H
 #define CXRENDERWINDOWFACTORY_H
 
-
 #include "cxResourceVisualizationExport.h"
 
 #include <map>
@@ -61,15 +60,18 @@ class cxResourceVisualization_EXPORT RenderWindowFactory : public QObject
 {
 	Q_OBJECT
 public:
-    RenderWindowFactory();
+	RenderWindowFactory();
 	vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
-    vtkRenderWindowPtr getSharedRenderWindow() const;
+	vtkRenderWindowPtr getSharedRenderWindow() const;
 
 	SharedOpenGLContextPtr getSharedOpenGLContext() const;
 	bool renderWindowExists(QString uid);
 
 private:
+	//Important: keep private, only the SharedContextCreatedCallback::Execute should be able to set the shared render window.
 	void setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow);
+	friend void SharedContextCreatedCallback::Execute(vtkObject *view, unsigned long eventId, void*cbo);
+
 	vtkRenderWindowPtr createRenderWindow(QString uid, bool offScreenRendering);
 	void preventSharedContextRenderWindowFromBeingShownOnScreen(vtkRenderWindowPtr renderWindow);
 
@@ -79,7 +81,6 @@ private:
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	QVTKWidget* mQvtkWidgetForHidingSharedContextRenderWindow;
 
-	friend void SharedContextCreatedCallback::Execute(vtkObject *view, unsigned long eventId, void*cbo);
 };
 }//cx
 

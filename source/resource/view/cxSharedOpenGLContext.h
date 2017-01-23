@@ -35,8 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WIN32
 #include <windows.h>
-#else
-//#define GL_GLEXT_PROTOTYPES
 #endif
 
 #include <GL/glew.h>
@@ -46,11 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxResourceVisualizationExport.h"
 #include "cxForwardDeclarations.h"
-
-typedef vtkSmartPointer<class vtkTextureObject> vtkTextureObjectPtr;
-typedef vtkSmartPointer<class vtkOpenGLBufferObject> vtkOpenGLBufferObjectPtr;
-typedef vtkSmartPointer<class vtkPixelBufferObject> vtkPixelBufferObjectPtr;
-typedef vtkSmartPointer<class vtkOpenGLRenderWindow> vtkOpenGLRenderWindowPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -78,12 +72,15 @@ public:
 
 	bool makeCurrent() const;
 
+	//TODO implement
+	//void updateTextureData() const;
+
 	//Textures are per image
-	bool uploadImage(ImagePtr image); //TODO upload image as 3D texture
+	bool uploadImage(ImagePtr image);
 	bool hasUploaded3DTexture(QString image_uid) const;
 	vtkTextureObjectPtr get3DTexture(QString image_uid) const;
 
-	bool uploadLUT(QString imageUid, vtkUnsignedCharArrayPtr lutTable); //TODO upload lut as 1D texture
+	bool uploadLUT(QString imageUid, vtkUnsignedCharArrayPtr lutTable);
 	bool hasUploaded1DTexture(QString image_uid) const;
 	vtkTextureObjectPtr get1DTexture(QString image_uid) const;
 
@@ -97,12 +94,36 @@ public:
 	vtkOpenGLRenderWindowPtr mContext;
 
 private:
-	vtkTextureObjectPtr create1DTextureObject(unsigned int width, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
+	//TODO will this struct setup work??
+	//TODO how about the struct in ShaderCallback (ShaderItem)????
+	//typedef std::pair<vtkTextureObjectPtr, unsigned long int> TextureObject_Modified;
+
+	/*
+	struct Lut
+	{
+		QString mUid;
+		TextureObject_Modified m1DTextureObject;
+	};
+
+	struct Volume
+	{
+		QString mUid;
+		TextureObject_Modified m3DTextureObject;
+		std::map<QString, Lut> mLuts; //per view???
+
+	};
+	*/
+
+	bool create1DTextureObject(vtkTextureObjectPtr texture_object, unsigned int width, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
 	vtkTextureObjectPtr create3DTextureObject(unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
 	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data) const;
 
-	std::map<QString, vtkTextureObjectPtr > m1DTextureObjects;
-	std::map<QString, vtkTextureObjectPtr > m3DTextureObjects;
+	//std::map<QString, TextureObject_Modified > m1DTextureObjects_new;
+	//std::map<QString, TextureObject_Modified > m3DTextureObjects_new;
+
+	std::map<QString, vtkTextureObjectPtr > m1DTextureObjects; //todo remove
+	std::map<QString, vtkTextureObjectPtr > m3DTextureObjects; //todo remove
+
 	std::map<QString, vtkOpenGLBufferObjectPtr > mTextureCoordinateBuffers;
 
 	SharedOpenGLContext(); //not implemented

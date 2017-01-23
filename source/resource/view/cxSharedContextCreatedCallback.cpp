@@ -39,10 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSharedOpenGLContext.h"
 #include "cxRenderWindowFactory.h"
 
-
 namespace cx
 {
-
 
 SharedContextCreatedCallback *SharedContextCreatedCallback::New()
 {
@@ -59,57 +57,31 @@ void SharedContextCreatedCallback::setRenderWindowFactory(RenderWindowFactory *f
 	mRenderWindowFactory = factory;
 }
 
-/*
-void SharedContextCreatedCallback::setViewService(ViewServicePtr viewService)
-{
-	mViewService = viewService;
-}
-*/
-
 void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned long eventId, void *cbo)
 {
-	CX_LOG_DEBUG() << "START SharedContextCreatedCallback";
-	/*
-	if(!mViewService)
-	{
-		CX_LOG_ERROR() << "SharedContextCreatedCallback::Execute: ViewService missing";
-		return;
-	}
-	*/
-	//RenderWindowFactoryPtr factory = boost::dynamic_pointer_cast<RenderWindowFactor>(cbo);
 	if(!mRenderWindowFactory)
 	{
 		CX_LOG_ERROR() << "SharedContextCreatedCallback::Execute: RenderWindowFactoryPtr missing";
 		return;
 	}
+
 	if(eventId == vtkCommand::CXSharedContextCreatedEvent)
 	{
-		CX_LOG_DEBUG() << "1 SharedContextCreatedCallback";
-	//------------------------------
-	//TODO Create centralized storage/factory for creating renderwindows
-
-	// SharedOpenGLContext should be created with a pointer to the first renderwindow created in CustusX
-	// because that renderwindow is special, it contain THE shared opengl context
-	//if(!this->mSharedOpenGLContext)
-	//{
 		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
-//		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mViewService->getSharedRenderWindow());
 
-		CX_LOG_DEBUG() << "2 SharedContextCreatedCallback";
 		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
 		{
-			CX_LOG_DEBUG() << "3 SharedContextCreatedCallback";
 			mRenderWindowFactory->setSharedRenderWindow(opengl_renderwindow);
 		}
 		else
+		{
 			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
-	//}
-	//------------------------------
+		}
 	}
 	else
-		CX_LOG_WARNING() << "BLEH";
-
-	CX_LOG_DEBUG() << "END SharedContextCreatedCallback";
+	{
+		CX_LOG_WARNING() << "SharedContextCreatedCallback::Execute(...) got unexpected event.";
+	}
 }
 
 }//cx

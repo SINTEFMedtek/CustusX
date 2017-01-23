@@ -101,7 +101,7 @@ public:
 		QString mLUTUid;
 		vtkTextureObjectPtr mLUT;
 
-		int mLutSize; //basically: used to check if lut should be applied, also a check if it is RED or RGB(A)
+		//int mLutSize; //basically: used to check if lut should be applied, also a check if it is RED or RGB(A)
 		float mWindow;
 		float mLevel;
 		float mLLR; //low level reject
@@ -118,7 +118,7 @@ public:
 	ShaderItemPtr getShaderItem(QString image_uid) const;
 	int getNumberOfUploadedTextures() const;
 
-	SharedOpenGLContextPtr mSharedOpenGLContext;
+	//SharedOpenGLContextPtr mSharedOpenGLContext;
 	//vtkRenderWindowPtr mCurrentContext;
 	std::vector<ShaderItemPtr> mShaderItems;
 
