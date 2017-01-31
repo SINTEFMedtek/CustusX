@@ -161,6 +161,7 @@ bool SharedOpenGLContext::uploadImage(ImagePtr image)
 	report_gl_error();
 	vtkTextureObjectPtr texture_object;
 
+	//TODO refactor to be similar to uploadLUT
 	if(!m3DTextureObjects.count(image->getUid()))
 	{
 		vtkImageDataPtr vtkImageData = image->getBaseVtkImageData();
@@ -251,10 +252,10 @@ vtkTextureObjectPtr SharedOpenGLContext::get1DTexture(QString image_uid) const
 	{
 		retval = m1DTextureObjects.at(image_uid);
 	}
-	else
-	{
-		CX_LOG_ERROR() << "get1DTexture failed";
-	}
+//	else
+//	{
+//		CX_LOG_WARNING() << "get1DTexture failed";
+//	}
 
 	return retval;
 }

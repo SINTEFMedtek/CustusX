@@ -78,10 +78,6 @@ void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned lon
 			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
 		}
 	}
-	else
-	{
-		CX_LOG_WARNING() << "SharedContextCreatedCallback::Execute(...) got unexpected event.";
-	}
 }
 
 }//cx
