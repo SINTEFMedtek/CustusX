@@ -90,21 +90,19 @@ public:
 	ShaderItemPtr getShaderItem(QString image_uid) const;
 	int getNumberOfUploadedTextures() const;
 
-	void pushShaderItem(ShaderItemPtr item);
+	void add(ShaderItemPtr item);
 	void clearShaderItems();
 
 private:
-	std::vector<ShaderItemPtr> mShaderItems;
-
-	void addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index);
-	//void addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name);
-	void addUniformiArray(vtkShaderProgram *program, std::string name, int value);
-	void addUniformfArray(vtkShaderProgram *program, std::string name, float value);
-	void bindFSOutputVariable(vtkShaderProgram *program);
+	static void addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index);
+	static void addUniformiArray(vtkShaderProgram *program, std::string name, int value);
+	static void addUniformfArray(vtkShaderProgram *program, std::string name, float value);
+	static void bindFSOutputVariable(vtkShaderProgram *program);
 
 	std::string getVectorNameFromName(std::string name, int index_of_vector) const;
-
 	void printDebugInfo(vtkOpenGLHelper *OpenGLHelper);
+
+	std::vector<ShaderItemPtr> mShaderItems;
 };
 
 }//cx

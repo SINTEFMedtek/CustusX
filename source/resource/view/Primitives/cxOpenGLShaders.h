@@ -10,6 +10,9 @@ namespace cx
  * Set of convenient functions and definitions that creates CustusX custom fragment and vertex shaders for OpenGL
  * which enables 2D overlay.
  *
+ * CustusX uses VTK shaders from OpenGLPolydataMapper and then modifies them to display several volumes in 2D. Textures are read from a
+ * shared context which is a hack in VTK.
+ *
  * Definitions:
  * VS = Vertextshader
  * FS = Fragmentshader

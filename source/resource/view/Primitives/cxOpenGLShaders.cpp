@@ -17,7 +17,7 @@ const std::string getVSReplacement_dec(std::string vtk_dec, int numberOfUploaded
 			 "//CX: adding input and output variables for texture coordinates\n"
 			 "const int number_of_textures = %4;\n"
 			 "in vec3 %2[number_of_textures];\n"
-			 "out ßvec3 %3[number_of_textures];\n"
+			 "out vec3 %3[number_of_textures];\n"
 			   )
 			   .arg(vtk_dec.c_str())
 			   .arg(VS_In_Vec3_TextureCoordinate.c_str())

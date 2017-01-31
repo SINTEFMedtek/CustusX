@@ -60,8 +60,6 @@ ShaderCallback::~ShaderCallback()
 {
 }
 
-
-
 ShaderCallback *ShaderCallback::New()
 {
 	return new ShaderCallback;
@@ -200,26 +198,31 @@ ShaderCallback::ShaderItemPtr ShaderCallback::getShaderItem(QString image_uid) c
 
 int ShaderCallback::getNumberOfUploadedTextures() const
 {
-	//CX_LOG_DEBUG() << "Number of shaderitems " << mShaderItems.size();
 	return mShaderItems.size();
 }
 
-void ShaderCallback::pushShaderItem(ShaderCallback::ShaderItemPtr item)
+void ShaderCallback::add(ShaderCallback::ShaderItemPtr item)
 {
 	mShaderItems.push_back(item);
 }
 
 void ShaderCallback::clearShaderItems()
 {
-	mShaderItems.clear();
+        mShaderItems.clear();
 }
 
-
+/**
+ * @brief ShaderCallback::addArrayToAttributeArray
+ * In the vertex shader there is an in array of vec3 which will contain texture coordinates per uploaded texture. This function populates this array.
+ * @param program The shader program to work with.
+ * @param buffer The buffer containing the texture coordinates.
+ * @param name The name of the array variable in the vertex shader which will point to the texture coordinates.
+ * @param vector_index The place in the
+ */
 void ShaderCallback::addArrayToAttributeArray(vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name, int vector_index)
 {
-	//vao->DebugOn();
 	//--------
-	//TODO extract to struct?
+	//This is information about how the texture coordinates are uploaded.
 	int offset = 0;
 	int vec_size = 3;
 	size_t stride = sizeof(float)*vec_size; //is this correct? was *3;
@@ -229,22 +232,17 @@ void ShaderCallback::addArrayToAttributeArray(vtkShaderProgram *program, vtkOpen
 	//CX_LOG_DEBUG() << "Adding attribute called: " << name << " to vector_index: " << vector_index;
 	//--------
 
-
 	const GLchar *namePtr = static_cast<const GLchar *>(name.c_str());
 	GLint start_of_vector_index = glGetAttribLocation(program->GetHandle(), namePtr);
 	report_gl_error();
 
-	//CX_LOG_DEBUG() << "start_of_vector_index: " << start_of_vector_index;
 
 	if(start_of_vector_index != -1)
 	{
 		GLint position_in_vector_index = start_of_vector_index + vector_index;
-		//CX_LOG_DEBUG() << "position_in_vector_index: " << position_in_vector_index;
 		buffer->Bind();
-		//report_gl_error();
 
 		glEnableVertexAttribArray(position_in_vector_index);
-		//report_gl_error();
 
 		glVertexAttribPointer(position_in_vector_index,
 				      vec_size,
@@ -262,42 +260,6 @@ void ShaderCallback::addArrayToAttributeArray(vtkShaderProgram *program, vtkOpen
 
 }
 
-//TODO Remove? Does not work with in variables in glsl that are vectors.
-//TODO move to SharedOpenGLContext?
-/*
-void ShaderCallback::addToAttributeArray(vtkOpenGLVertexArrayObject *vao, vtkShaderProgram *program, vtkOpenGLBufferObjectPtr buffer, std::string name)
-{
-	//vao->DebugOn();
-	//--------
-	//TODO extract to struct?
-	int offset = 0;
-	int vec_size = 3;
-	size_t stride = sizeof(float)*vec_size; //is this correct? was *3;
-	int elementType = VTK_FLOAT;
-	bool normalize = false;
-
-	//CX_LOG_DEBUG() << "Adding attribute called: " << name;
-	//--------
-
-	if (!vao->AddAttributeArray(
-	      program,			//vtkShaderProgram
-	      buffer.Get(),		//vtkOpenGLBufferObject
-	      name,			//std::string
-	      offset,			//int (offset)				where to start reading g_color_buffer_data, offset != 0 == discard some of the first values
-	      stride,			//size_t (stride)			If stride is 0, the generic vertex attributes are understood to be tightly packed in the array.
-	      elementType,		//int (elementType)			Specifies the data type of each component in the array
-	      vec_size,			//int (elementTupleSize)	Specifies the number of components per generic vertex attribute. Must be 1, 2, 3, 4.
-	      normalize			//bool (normalize)
-	    ))
-	{
-		CX_LOG_ERROR() << "Error setting attribute " << name <<" in shader VAO.";
-	}
-
-	report_gl_error();
-}
-*/
-
-//TODO move to SharedOpenGLContext?
 void ShaderCallback::addUniformiArray(vtkShaderProgram *program, std::string name, int value)
 {
 	//Note: Set uniform will fail if the uniform is not present OR active (used inside the program).
@@ -326,7 +288,6 @@ void ShaderCallback::addUniformfArray(vtkShaderProgram *program, std::string nam
 	report_gl_error();
 }
 
-//TODO move to SharedOpenGLContext?
 void ShaderCallback::bindFSOutputVariable(vtkShaderProgram *program)
 {
 	GLint color_frag_out_index = glGetFragDataLocation(program->GetHandle(), FS_Out_Vec4_Color.c_str());

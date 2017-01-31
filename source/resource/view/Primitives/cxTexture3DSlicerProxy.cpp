@@ -291,7 +291,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
 			}
 
-			mShaderCallback->pushShaderItem(shaderitem);
+			mShaderCallback->add(shaderitem);
 		}
 		else
 		{
