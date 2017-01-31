@@ -299,7 +299,7 @@ class Eigen(CppComponent):
         return 'git@github.com:RLovelett/eigen.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        tag = '3.3.1'
+        tag = '3.2.10'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         pass
