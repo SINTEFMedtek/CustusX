@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <qtextstream.h>
 
 #include "cxSharedOpenGLContext.h"
+#include "cxOpenGLShaders.h"
 
 namespace cx
 {
@@ -85,7 +86,7 @@ void Texture3DSlicerProxyImpl::setShaders()
 	  vtkShader::Vertex,
 	  vtk_dec, // replace the normal block
 	  true, // before the standard replacements
-	  mShaderCallback->getVSReplacement_dec(vtk_dec),
+	  getVSReplacement_dec(vtk_dec, mShaderCallback->getNumberOfUploadedTextures()),
 	  false // only do it once
 	);
 
@@ -97,14 +98,14 @@ void Texture3DSlicerProxyImpl::setShaders()
 	  vtkShader::Vertex,
 	  vtk_impl, // replace the normal block
 	  true, // before the standard replacements
-	  mShaderCallback->getVSReplacement_impl(vtk_impl),
+	  getVSReplacement_impl(vtk_impl, mShaderCallback->getNumberOfUploadedTextures()),
 	  false // only do it once
 	);
 
 	//===========
 	// Replace the fragment shader
 	//===========
-	mOpenGLPolyDataMapper->SetFragmentShaderCode(mShaderCallback->getFS().c_str());
+	mOpenGLPolyDataMapper->SetFragmentShaderCode(getFS(mShaderCallback->getNumberOfUploadedTextures()).c_str());
 }
 
 Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context) :
@@ -264,21 +265,21 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 	mImages = images;
 
 	//Clear all shaderitems before re-adding them.
-	mShaderCallback->mShaderItems.clear();
+	mShaderCallback->clearShaderItems();
 
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
 		//TODO maybe we should upload the textures here instead???
 		//we have a problem with Kaisa, because it is converted and thus not added to the viewgroup which causes it not to be uploaded
 		//New Kaisa gets new uid with *_u
-		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploaded3DTexture(mImages[i]->getUid()))
+		QString imageUid = mImages[i]->getUid();
+		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploaded3DTexture(imageUid))
 		{
 			mSharedOpenGLContext->uploadImage(mImages[i]);
 		}
 
-		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploaded3DTexture(mImages[i]->getUid()))
+		if(mSharedOpenGLContext && mSharedOpenGLContext->hasUploaded3DTexture(imageUid))
 		{
-			QString imageUid = mImages[i]->getUid();
 			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
 			shaderitem->mTextureUid = imageUid;
 			shaderitem->mTexture = mSharedOpenGLContext->get3DTexture(imageUid);
@@ -290,11 +291,11 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 				shaderitem->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
 			}
 
-			mShaderCallback->mShaderItems.push_back(shaderitem);
+			mShaderCallback->pushShaderItem(shaderitem);
 		}
 		else
 		{
-			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL: " << mImages[i]->getUid();
+			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL: " << imageUid;
 		}
 
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));

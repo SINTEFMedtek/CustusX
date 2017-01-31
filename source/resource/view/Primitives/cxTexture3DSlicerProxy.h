@@ -116,7 +116,7 @@ protected:
  *
  * \ingroup cx_resource_view
  */
-//TODO split out in own file
+
 class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {
 	Q_OBJECT
@@ -152,15 +152,10 @@ private:
 	void setColorAttributes(int i);
 	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
 
-	//void SetVolumeBuffer(int index, GPUImageDataBufferPtr buffer);
-	//ShaderCallbackPtr safeIndex(int index);
-	//void SetLutBuffer(int index, GPUImageLutBufferPtr buffer);
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);
 
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	ShaderCallbackPtr mShaderCallback;
-
-	//std::vector<ShaderCallbackPtr> mElement;
 	QString mUid;
 
 	DoubleBoundingBox3D mBB_s;
@@ -177,10 +172,6 @@ private:
 	vtkRenderWindowPtr mCurrentRenderWindow;
 
 	vtkFloatArrayPtr TCoords;
-	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
-
-//	QString loadShaderFile();
-//	QString replaceShaderSourceMacros(QString shaderSource);
 
 	QString generateTextureCoordinateName(QString imageUid);
 	void setShaders();

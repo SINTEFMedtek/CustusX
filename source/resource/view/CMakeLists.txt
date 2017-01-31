@@ -118,6 +118,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalObjectWithDirection
 	Primitives/cxSliceAutoViewportCalculator
 	Primitives/cxShaderCallback
+	Primitives/cxOpenGLShaders
 	cxRepContainer
 	cxSharedOpenGLContext
 	cxSharedContextCreatedCallback
