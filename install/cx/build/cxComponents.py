@@ -299,11 +299,8 @@ class Eigen(CppComponent):
         return 'git@github.com:RLovelett/eigen.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        #did not find a 3.2.1 release on the github fork... using a sha instead
-        #Update eigen to compile FAST on VS 2015.
-        testedSHA = 'fb666682a94f4665760e622d7ab2e573059f95f5'
-        self._getBuilder().gitCheckout(testedSHA)
-        pass
+        tag = '3.2.10'
+        self._getBuilder().gitCheckout(tag)
     def configure(self):
         pass
     def reset(self):
