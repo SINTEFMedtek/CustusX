@@ -624,7 +624,7 @@ void Texture3DSlicerProxyImpl::updateAndUploadColorAttribute()
 		//that is why we set it here on all luts
 		//this results in that all luts will be uploaded to gpu every time someone changes any transferfunction...
 		//real fix would be to mark the images lut as modified when it actually happens...
-		lut->GetTable()->Modified();
+		//lut->GetTable()->Modified();
 
 		//Generate window, level, llr, alpha
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
