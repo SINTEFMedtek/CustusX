@@ -66,7 +66,6 @@ namespace cx
 
 ViewGroup::ViewGroup(CoreServicesPtr backend, QString uid)
 {
-	CX_LOG_DEBUG() << "ViewGroup constr";
 	mBackend = backend;
 	mViewGroupData.reset(new ViewGroupData(backend, uid));
 	mCameraStyle.reset(new CameraStyle(mBackend, mViewGroupData));

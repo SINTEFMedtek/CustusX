@@ -74,7 +74,6 @@ bool RenderWindowFactory::renderWindowExists(QString uid)
 
 vtkRenderWindowPtr RenderWindowFactory::getSharedRenderWindow() const
 {
-	//mSharedRenderWindow->Render(); //Crash?
 	if(!mSharedRenderWindow)
 	{
 		CX_LOG_WARNING() << "RenderWindowFactory::getSharedRenderWindow(): No shared opengl renderwindow available.";
@@ -94,7 +93,6 @@ void RenderWindowFactory::setSharedRenderWindow(vtkRenderWindowPtr sharedRenderW
 	if(opengl_renderwindow)
 	{
 		mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
-		CX_LOG_DEBUG_CHECKPOINT();
 	}
 	else
 	{

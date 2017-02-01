@@ -42,7 +42,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRenderWindowFactory.h"
 
 
-namespace cxtest {
+namespace cxtest
+{
 
 cx::ImagePtr createDummyImage(int number = 0, int axisSize = 10)
 {
@@ -53,7 +54,7 @@ cx::ImagePtr createDummyImage(int number = 0, int axisSize = 10)
 	return image;
 }
 
-TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][integration]")
+TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][integration][jb]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	CHECK(renderWindowFactory->getRenderWindow("TestWindowUid"));
@@ -61,7 +62,7 @@ TEST_CASE("SharedOpenGLContext init", "[opengl][resource][visualization][integra
 	CHECK(renderWindowFactory->getSharedOpenGLContext());
 }
 
-TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][integration]")
+TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][integration][jb]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	vtkRenderWindowPtr renderWindow  = renderWindowFactory->getRenderWindow("TestWindowUid");
@@ -72,7 +73,7 @@ TEST_CASE("SharedOpenGLContext render", "[opengl][resource][visualization][integ
 	renderWindow->Render();
 }
 
-TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualization][integration]")
+TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualization][integration][jb]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	REQUIRE(renderWindowFactory->getRenderWindow("TestWindowUid"));
@@ -85,11 +86,11 @@ TEST_CASE("SharedOpenGLContext upload texture", "[opengl][resource][visualizatio
 	REQUIRE(sharedOpenGLContext->uploadImage(image0));
 	REQUIRE(sharedOpenGLContext->uploadImage(image1));
 
-	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image0->getUid()));
-	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image1->getUid()));
+	REQUIRE(sharedOpenGLContext->hasUploadedImage(image0->getUid()));
+	REQUIRE(sharedOpenGLContext->hasUploadedImage(image1->getUid()));
 }
 
-TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualization][integration]")
+TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualization][integration][jb]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 	vtkRenderWindowPtr renderWindow1 = renderWindowFactory->getRenderWindow("TestWindowUid");
@@ -98,7 +99,7 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 
 	cx::ImagePtr image0 = createDummyImage(0);
 	REQUIRE(sharedOpenGLContext->uploadImage(image0));
-	REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image0->getUid()));
+	REQUIRE(sharedOpenGLContext->hasUploadedImage(image0->getUid()));
 
 
 	vtkImageDataPtr imageData = sharedOpenGLContext->downloadImageFromTextureBuffer(image0->getUid());
@@ -110,6 +111,7 @@ TEST_CASE("SharedOpenGLContext download texture", "[opengl][resource][visualizat
 	char* imagePtr0 = static_cast<char*>(imageData0->GetScalarPointer());
 	Eigen::Array3i dims(imageData->GetDimensions());
 	int size = dims[0]*dims[1]*dims[2];
+
 	for (int i = 0; i < size; ++i)
 	{
 		INFO(i);
@@ -125,12 +127,13 @@ TEST_CASE("SharedOpenGLContext upload many textures", "[opengl][resource][visual
 	REQUIRE(sharedOpenGLContext);
 
 	int num = 1000;
+
 	for (int i = 0; i < num; ++i)
 	{
 		std::cout << "Upload texture: " << i << std::endl;
 		cx::ImagePtr image = createDummyImage(i);
 		REQUIRE(sharedOpenGLContext->uploadImage(image));
-		REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image->getUid()));
+		REQUIRE(sharedOpenGLContext->hasUploadedImage(image->getUid()));
 	}
 }
 
@@ -142,29 +145,31 @@ TEST_CASE("SharedOpenGLContext upload many large textures", "[opengl][resource][
 	REQUIRE(sharedOpenGLContext);
 
 	int num = 1000;
+
 	for (int i = 0; i < num; ++i)
 	{
 		std::cout << "Upload texture: " << i << std::endl;
 		cx::ImagePtr image = createDummyImage(i, 500);
 		REQUIRE(sharedOpenGLContext->uploadImage(image));
-		REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image->getUid()));
+		REQUIRE(sharedOpenGLContext->hasUploadedImage(image->getUid()));
 	}
 }
 
 TEST_CASE("SharedOpenGLContext upload and download many textures", "[opengl][resource][visualization][manual]")
 {
 	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-	vtkRenderWindowPtr renderWindow1 = renderWindowFactory->getRenderWindow("TestWindowUid");
+	//vtkRenderWindowPtr renderWindow1 = renderWindowFactory->getRenderWindow("TestWindowUid");
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
 	REQUIRE(sharedOpenGLContext);
 
 	int num = 1000;
+
 	for (int i = 0; i < num; ++i)
 	{
 		std::cout << "Upload texture: " << i << std::endl;
 		cx::ImagePtr image = createDummyImage(i);
 		REQUIRE(sharedOpenGLContext->uploadImage(image));
-		REQUIRE(sharedOpenGLContext->hasUploaded3DTexture(image->getUid()));
+		REQUIRE(sharedOpenGLContext->hasUploadedImage(image->getUid()));
 
 		vtkImageDataPtr downloadedImageData = sharedOpenGLContext->downloadImageFromTextureBuffer(image->getUid());
 		REQUIRE(downloadedImageData);
@@ -175,6 +180,7 @@ TEST_CASE("SharedOpenGLContext upload and download many textures", "[opengl][res
 		char* originalImagePtr = static_cast<char*>(originalImageData->GetScalarPointer());
 		Eigen::Array3i dims(originalImageData->GetDimensions());
 		int size = dims[0]*dims[1]*dims[2];
+
 		for (int i = 0; i < size; ++i)
 		{
 			INFO(i);
@@ -183,5 +189,24 @@ TEST_CASE("SharedOpenGLContext upload and download many textures", "[opengl][res
 	}
 }
 
+
+TEST_CASE("SharedOpenGLContext can delete uploaded resources.", "[opengl][integration][shared_context][jb]")
+{
+
+	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
+	cx::SharedOpenGLContextPtr sharedOpenGLContext = renderWindowFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
+	REQUIRE(sharedOpenGLContext->getNumberOfTexturesInUse() == 0);
+
+	cx::ImagePtr image = createDummyImage(1);
+	QString imageUid = image->getUid();
+
+	REQUIRE(sharedOpenGLContext->uploadImage(image));
+	REQUIRE(sharedOpenGLContext->hasUploadedImage(imageUid));
+	REQUIRE(sharedOpenGLContext->getNumberOfTexturesInUse() == 1);
+
+	REQUIRE(sharedOpenGLContext->delete3DTextureForImage(imageUid));
+	REQUIRE(sharedOpenGLContext->getNumberOfTexturesInUse() == 0);
+}
 
 }//cxtest

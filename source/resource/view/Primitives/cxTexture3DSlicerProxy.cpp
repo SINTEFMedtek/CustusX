@@ -73,10 +73,11 @@ Texture3DSlicerProxyPtr Texture3DSlicerProxy::New(SharedOpenGLContextPtr context
 
 void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 {
+	CX_LOG_DEBUG_CHECKPOINT();
 	mTargetSpaceIsR = true;
 }
 
-void Texture3DSlicerProxyImpl::setShaders()
+void Texture3DSlicerProxyImpl::generateAndSetShaders()
 {
 	//===========
 	// Modify vertex shader declarations
@@ -137,7 +138,7 @@ Texture3DSlicerProxyImpl::Texture3DSlicerProxyImpl(SharedOpenGLContextPtr contex
 	mOpenGLPolyDataMapper->SetInputConnection(mPolyDataAlgorithm->GetOutputPort());
 	mOpenGLPolyDataMapper->SetInputData(mPolyData);
 
-	this->setShaders();
+	this->generateAndSetShaders();
 
 	mActor->SetMapper(mOpenGLPolyDataMapper);
 }
@@ -229,10 +230,7 @@ void Texture3DSlicerProxyImpl::createGeometryPlane( Vector3D point1_s,  Vector3D
 
 	mPolyDataAlgorithm->Update();
 
-	for (unsigned i=0; i<mImages.size(); ++i)
-	{
-		updateCoordinates(i);
-	}
+	updateAndUploadCoordinates();
 }
 
 bool Texture3DSlicerProxyImpl::isNewInputImages(std::vector<ImagePtr> images_raw)
@@ -246,6 +244,7 @@ bool Texture3DSlicerProxyImpl::isNewInputImages(std::vector<ImagePtr> images_raw
 	return true;
 }
 
+/*
 void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 {
 	if (!this->isNewInputImages(images_raw))
@@ -273,6 +272,7 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 		//we have a problem with Kaisa, because it is converted and thus not added to the viewgroup which causes it not to be uploaded
 		//New Kaisa gets new uid with *_u
 		QString imageUid = mImages[i]->getUid();
+
 		if(mSharedOpenGLContext && !mSharedOpenGLContext->hasUploaded3DTexture(imageUid))
 		{
 			mSharedOpenGLContext->uploadImage(mImages[i]);
@@ -308,9 +308,116 @@ void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
 
 	this->setShaders(); //when number of uploaded textures changes from 0 to 1 we need to set new shader code
 }
+*/
 
+void Texture3DSlicerProxyImpl::uploadImagesToSharedContext(std::vector<ImagePtr> images, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const
+{
+	for (unsigned i = 0; i < images.size(); ++i)
+	{
+		//TODO:
+		//we have a problem with Kaisa, because it is converted and thus not added to the viewgroup which causes it not to be uploaded
+		//New Kaisa gets new uid with *_u
+		QString imageUid = images[i]->getUid();
 
-std::vector<ImagePtr> Texture3DSlicerProxyImpl::processImages(std::vector<ImagePtr> images_raw)
+		if(sharedOpenGLContext && !sharedOpenGLContext->hasUploadedImage(imageUid))
+		{
+			sharedOpenGLContext->uploadImage(images[i]);
+		}
+
+		if(sharedOpenGLContext && sharedOpenGLContext->hasUploadedImage(imageUid))
+		{
+			ShaderCallback::ShaderItemPtr shaderitem = ShaderCallback::ShaderItemPtr(new ShaderCallback::ShaderItem());
+			shaderitem->mTextureUid = imageUid;
+			shaderitem->mTexture = sharedOpenGLContext->get3DTextureForImage(imageUid);
+			QString textureCoordinatesUid = this->generateTextureCoordinateName(imageUid);
+
+			if(sharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinatesUid))
+			{
+				shaderitem->mTextureCoordinatesUid = textureCoordinatesUid;
+				shaderitem->mTextureCoordinates = sharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
+			}
+
+			shaderCallback->add(shaderitem);
+		}
+		else
+		{
+			CX_LOG_WARNING() << "Setting image in Texture3DSlicerProxyImpl which is not uploaded to OpenGL: " << imageUid;
+		}
+	}
+}
+
+std::vector<ImagePtr> elementsInAButNotInB(std::vector<ImagePtr> A, std::vector<ImagePtr> B)
+{
+	std::vector<ImagePtr> C;
+	for(int i=0; i<A.size(); ++i)
+	{
+		std::vector<ImagePtr>::iterator it = std::find(B.begin(), B.end(), A[i]);
+
+		if(it == B.end())
+		{
+			CX_LOG_DEBUG() << "Going to delete: " << A[i]->getUid();
+			C.push_back(A[i]);
+		}
+	}
+
+	return C;
+}
+
+void Texture3DSlicerProxyImpl::updateAndUploadImages(std::vector<ImagePtr> new_images_raw)
+{
+	//only unsigned images are supported on the gpu
+	std::vector<ImagePtr> unsigned_images = convertToUnsigned(new_images_raw);
+
+	//removing unused textures from the gpu
+	std::vector<ImagePtr> to_be_deleted = elementsInAButNotInB(mImages, unsigned_images);
+	for(int i=0; i<to_be_deleted.size(); ++i)
+	{
+		mSharedOpenGLContext->delete3DTextureForImage(to_be_deleted[i]->getUid());
+		mSharedOpenGLContext->delete1DTextureForLUT(to_be_deleted[i]->getUid());
+	}
+
+	//setup signals and slots
+	for (unsigned i = 0; i < mImages.size(); ++i)
+	{
+		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		disconnect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionChangedSlot()));
+		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+	}
+
+	mImages = unsigned_images;
+
+	for (unsigned i = 0; i < mImages.size(); ++i)
+	{
+		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionChangedSlot()));
+		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+	}
+
+	//upload any new images to the gpu
+	this->uploadImagesToSharedContext(mImages, mSharedOpenGLContext, mShaderCallback);
+}
+
+void Texture3DSlicerProxyImpl::setImages(std::vector<ImagePtr> images_raw)
+{
+	if (!this->isNewInputImages(images_raw))
+	{
+		return;
+	}
+
+	//Clear all shaderitems before re-adding them.
+	mShaderCallback->clearShaderItems();
+
+	this->updateAndUploadImages(images_raw);
+
+	this->updateAndUploadCoordinates();
+
+	this->updateAndUploadColorAttribute();
+
+	//when number of uploaded textures changes from 0 to 1 we need to set new shader code
+	this->generateAndSetShaders();
+}
+
+std::vector<ImagePtr> Texture3DSlicerProxyImpl::convertToUnsigned(std::vector<ImagePtr> images_raw)
 {
 	std::vector<ImagePtr> images(images_raw.size());
 
@@ -336,10 +443,7 @@ void Texture3DSlicerProxyImpl::setSliceProxy(SliceProxyPtr slicer)
 	{
 		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
 
-		for (unsigned i=0; i < mImages.size(); ++i)
-		{
-			updateCoordinates(i);
-		}
+		this->updateAndUploadCoordinates();
 	}
 }
 
@@ -353,89 +457,26 @@ QString Texture3DSlicerProxyImpl::getTCoordName(int index)
 	return  "texture"+qstring_cast(index);
 }
 
-QString Texture3DSlicerProxyImpl::generateTextureCoordinateName(QString imageUid)
+QString Texture3DSlicerProxyImpl::generateTextureCoordinateName(QString imageUid) const
 {
 	QString textureCoordinatesUid = QString(mUid+"_%1").arg(imageUid);
 	return textureCoordinatesUid;
 }
 
-void Texture3DSlicerProxyImpl::updateCoordinates(int index)
+void Texture3DSlicerProxyImpl::uploadTextureCoordinatesToSharedContext(QString image_uid, vtkFloatArrayPtr textureCoordinates, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const
 {
-	if (!mPolyData || !mSliceProxy)
+	if(sharedOpenGLContext && textureCoordinates)
 	{
-		return;
-	}
+		QString textureCoordinatesUid = this->generateTextureCoordinateName(image_uid);
+		sharedOpenGLContext->upload3DTextureCoordinates(textureCoordinatesUid, textureCoordinates);
 
-	ImagePtr image = mImages[index];
-	vtkImageDataPtr volume = image->getBaseVtkImageData();
-
-	// create a bb describing the volume in physical (raw data) space
-	Vector3D origin(volume->GetOrigin());
-	Vector3D spacing(volume->GetSpacing());
-	DoubleBoundingBox3D imageSize(volume->GetExtent());
-
-	for (int i = 0; i < 3; ++i)
-	{
-		imageSize[2 * i] = origin[i] + spacing[i] * (imageSize[2 * i] - 0.5);
-		imageSize[2 * i + 1] = origin[i] + spacing[i] * (imageSize[2 * i + 1] + 0.5);
-	}
-
-	// identity bb
-	DoubleBoundingBox3D textureSpace(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
-
-	// create transform from slice space to raw data space
-	Transform3D iMs = mImages[index]->get_rMd().inv() * mSliceProxy->get_sMr().inv();
-
-	// create transform from image space to texture normalized space
-	Transform3D nMi = createTransformNormalize(imageSize, textureSpace);
-
-	// total transform from slice space to texture space
-	Transform3D nMs = nMi * iMs;
-
-	// transform the viewport to texture coordinates (must use coords since bb3D doesnt handle non-axis-aligned transforms)
-	std::vector<Vector3D> plane(4);
-	plane[0] = mBB_s.corner(0, 0, 0);
-	plane[1] = mBB_s.corner(1, 0, 0);
-	plane[2] = mBB_s.corner(0, 1, 0);
-	plane[3] = mBB_s.corner(1, 1, 0);
-
-	for (unsigned i = 0; i < plane.size(); ++i)
-	{
-		plane[i] = nMs.coord(plane[i]);
-	}
-
-	if (!TCoords)
-	{
-		TCoords = vtkFloatArrayPtr::New();
-		TCoords->SetNumberOfComponents(3);
-		TCoords->Allocate(4 * 3);
-		TCoords->InsertNextTuple3(0.0, 0.0, 0.0);
-		TCoords->InsertNextTuple3(0.0, 0.0, 0.0);
-		TCoords->InsertNextTuple3(0.0, 0.0, 0.0);
-		TCoords->InsertNextTuple3(0.0, 0.0, 0.0);
-		TCoords->SetName(cstring_cast(getTCoordName(index)));
-		mPolyData->GetPointData()->AddArray(TCoords);
-	}
-
-	for (unsigned i = 0; i < plane.size(); ++i)
-	{
-		TCoords->SetTuple3(i, plane[i][0], plane[i][1], plane[i][2]);
-	}
-
-	mPolyData->Modified();
-
-	if(mSharedOpenGLContext && TCoords)
-	{
-		QString textureCoordinatesUid = this->generateTextureCoordinateName(image->getUid());
-		mSharedOpenGLContext->upload3DTextureCoordinates(textureCoordinatesUid, TCoords);
-
-		if(mSharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinatesUid))
+		if(sharedOpenGLContext->hasUploadedTextureCoordinates(textureCoordinatesUid))
 		{
-			ShaderCallback::ShaderItemPtr item = mShaderCallback->getShaderItem(image->getUid());
+			ShaderCallback::ShaderItemPtr item = shaderCallback->getShaderItem(image_uid);
 
 			if(item)
 			{
-				item->mTextureCoordinates = mSharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
+				item->mTextureCoordinates = sharedOpenGLContext->getTextureCoordinates(textureCoordinatesUid);
 				item->mTextureCoordinatesUid = textureCoordinatesUid;
 			}
 		}
@@ -461,7 +502,7 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 		//		INFO(i);
 		//		REQUIRE(imagePtr[i] == imagePtr0[i]);
 		if(imagePtr[i] != imagePtr0[i])
-			CX_LOG_DEBUG_CHECKPOINT() << i;
+		  CX_LOG_DEBUG_CHECKPOINT() << i;
 		}
 		std::cout << std::endl;
 		CX_LOG_DEBUG() << "-------------- 2 TESTING DOWNLOAD!!! --------------";
@@ -474,7 +515,101 @@ void Texture3DSlicerProxyImpl::updateCoordinates(int index)
 	}
 }
 
-void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
+void Texture3DSlicerProxyImpl::updateAndUploadCoordinates()
+{
+	if (!mPolyData || !mSliceProxy)
+	{
+		return;
+	}
+
+	for (unsigned i = 0; i < mImages.size(); ++i)
+	{
+
+		ImagePtr image = mImages[i];
+		vtkImageDataPtr volume = image->getBaseVtkImageData();
+
+		// create a bb describing the volume in physical (raw data) space
+		Vector3D origin(volume->GetOrigin());
+		Vector3D spacing(volume->GetSpacing());
+		DoubleBoundingBox3D imageSize(volume->GetExtent());
+
+		for (int i = 0; i < 3; ++i)
+		{
+			imageSize[2 * i] = origin[i] + spacing[i] * (imageSize[2 * i] - 0.5);
+			imageSize[2 * i + 1] = origin[i] + spacing[i] * (imageSize[2 * i + 1] + 0.5);
+		}
+
+		// identity bb
+		DoubleBoundingBox3D textureSpace(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
+
+		// create transform from slice space to raw data space
+		Transform3D iMs = image->get_rMd().inv() * mSliceProxy->get_sMr().inv();
+
+		// create transform from image space to texture normalized space
+		Transform3D nMi = createTransformNormalize(imageSize, textureSpace);
+
+		// total transform from slice space to texture space
+		Transform3D nMs = nMi * iMs;
+
+		// transform the viewport to texture coordinates (must use coords since bb3D doesnt handle non-axis-aligned transforms)
+		std::vector<Vector3D> plane(4);
+		plane[0] = mBB_s.corner(0, 0, 0);
+		plane[1] = mBB_s.corner(1, 0, 0);
+		plane[2] = mBB_s.corner(0, 1, 0);
+		plane[3] = mBB_s.corner(1, 1, 0);
+
+		for (unsigned i = 0; i < plane.size(); ++i)
+		{
+			plane[i] = nMs.coord(plane[i]);
+		}
+
+		if (!mTextureCoordinates)
+		{
+			mTextureCoordinates = vtkFloatArrayPtr::New();
+			mTextureCoordinates->SetNumberOfComponents(3);
+			mTextureCoordinates->Allocate(4 * 3);
+			mTextureCoordinates->InsertNextTuple3(0.0, 0.0, 0.0);
+			mTextureCoordinates->InsertNextTuple3(0.0, 0.0, 0.0);
+			mTextureCoordinates->InsertNextTuple3(0.0, 0.0, 0.0);
+			mTextureCoordinates->InsertNextTuple3(0.0, 0.0, 0.0);
+			mTextureCoordinates->SetName(cstring_cast(getTCoordName(i)));
+			mPolyData->GetPointData()->AddArray(mTextureCoordinates);
+		}
+
+		for (unsigned i = 0; i < plane.size(); ++i)
+		{
+			mTextureCoordinates->SetTuple3(i, plane[i][0], plane[i][1], plane[i][2]);
+		}
+
+		mPolyData->Modified();
+
+		this->uploadTextureCoordinatesToSharedContext(image->getUid(), mTextureCoordinates, mSharedOpenGLContext, mShaderCallback);
+	}
+}
+
+void Texture3DSlicerProxyImpl::uploadColorAttributesToSharedContext(QString imageUid, float llr, vtkLookupTablePtr lut, float window, float level, float alpha, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const
+{
+	QString lutUid = imageUid;
+	ShaderCallback::ShaderItemPtr shaderItem = shaderCallback->getShaderItem(lutUid);
+
+	sharedOpenGLContext->uploadLUT(lutUid, lut->GetTable());
+
+	if(sharedOpenGLContext->hasUploadedLUT(lutUid))
+	{
+		if(shaderItem)
+		{
+			shaderItem->mLUT = sharedOpenGLContext->get1DTextureForLUT(lutUid);
+			shaderItem->mLUTUid = lutUid;
+		}
+	}
+
+	shaderItem->mWindow = window;
+	shaderItem->mLLR = llr;
+	shaderItem->mLevel = level;
+	shaderItem->mAlpha = alpha;
+}
+
+void Texture3DSlicerProxyImpl::updateAndUploadColorAttribute()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
@@ -483,21 +618,13 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 
 		vtkImageDataPtr inputImage = image->getBaseVtkImageData() ;
 		vtkLookupTablePtr lut = image->getLookupTable2D()->getOutputLookupTable();
+
+		//TODO this is a HACK
+		//for some reason the lut of the image is not marked as modified for the images where the transferfunction is actually modified
+		//that is why we set it here on all luts
+		//this results in that all luts will be uploaded to gpu every time someone changes any transferfunction...
+		//real fix would be to mark the images lut as modified when it actually happens...
 		lut->GetTable()->Modified();
-
-		//TODO what to do if image data or lut data changes?
-		QString lutUid = imageUid; //TODO or is it per view???
-		ShaderCallback::ShaderItemPtr shaderItem = mShaderCallback->getShaderItem(lutUid);
-		mSharedOpenGLContext->uploadLUT(lutUid, lut->GetTable());
-
-		if(mSharedOpenGLContext->hasUploaded1DTexture(lutUid))
-		{
-			if(shaderItem)
-			{
-				shaderItem->mLUT = mSharedOpenGLContext->get1DTexture(lutUid);
-				shaderItem->mLUTUid = lutUid;
-			}
-		}
 
 		//Generate window, level, llr, alpha
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
@@ -507,10 +634,8 @@ void Texture3DSlicerProxyImpl::updateColorAttributeSlot()
 		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
 		float level = (float) imin/scalarTypeMax + window/2;
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
-		shaderItem->mWindow = window;
-		shaderItem->mLLR = llr;
-		shaderItem->mLevel = level;
-		shaderItem->mAlpha = alpha;
+
+		this->uploadColorAttributesToSharedContext(imageUid, llr, lut, window, level, alpha, mSharedOpenGLContext, mShaderCallback);
 	}
 
 	mActor->Modified();
@@ -523,7 +648,12 @@ void Texture3DSlicerProxyImpl::transformChangedSlot()
 		this->resetGeometryPlane();
 	}
 
-	this->update();
+	this->updateAndUploadCoordinates();
+}
+
+void Texture3DSlicerProxyImpl::transferFunctionChangedSlot()
+{
+	this->updateAndUploadColorAttribute();
 }
 
 void Texture3DSlicerProxyImpl::imageChanged()
@@ -532,13 +662,6 @@ void Texture3DSlicerProxyImpl::imageChanged()
 	//TODO???
 }
 
-void Texture3DSlicerProxyImpl::update()
-{
-	for (unsigned i=0; i<mImages.size(); ++i)
-	{
-		updateCoordinates(i);
-	}
-}
 
 } //namespace cx
 

@@ -69,7 +69,7 @@ void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned lon
 	{
 		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
 
-		if(SharedOpenGLContext::isValid(opengl_renderwindow, true))
+		if(SharedOpenGLContext::isValid(opengl_renderwindow))
 		{
 			mRenderWindowFactory->setSharedRenderWindow(opengl_renderwindow);
 		}

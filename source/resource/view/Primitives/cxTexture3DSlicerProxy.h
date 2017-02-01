@@ -86,7 +86,6 @@ public:
 	{
 		return SliceProxyPtr();
 	}
-	virtual void update() {}
 	virtual void setTargetSpaceToR() {}
 	virtual vtkActorPtr getActor()
 	{
@@ -130,7 +129,6 @@ public:
 	void setImages(std::vector<ImagePtr> images);
 	void setSliceProxy(SliceProxyPtr slicer);
 	SliceProxyPtr getSliceProxy();
-	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
 	std::vector<ImagePtr> getImages();
@@ -138,7 +136,7 @@ public:
 
 protected slots:
 	void transformChangedSlot();
-	void updateColorAttributeSlot();
+	void transferFunctionChangedSlot();
 	void imageChanged();
 
 protected:
@@ -147,12 +145,24 @@ protected:
 
 private:
 	void resetGeometryPlane();
-	void updateCoordinates(int index);
+
+	void updateAndUploadImages(std::vector<ImagePtr> new_images_raw);
+	void updateAndUploadCoordinates();
+	void updateAndUploadColorAttribute();
+
+	void uploadImagesToSharedContext(std::vector<ImagePtr> images, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const;
+	void uploadTextureCoordinatesToSharedContext(QString image_uid, vtkFloatArrayPtr textureCoordinates, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const;
+	void uploadColorAttributesToSharedContext(QString imageUid, float llr, vtkLookupTablePtr lut, float window, float level, float alpha, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const;
+
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);
-	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
+	std::vector<ImagePtr> convertToUnsigned(std::vector<ImagePtr> images_raw);
 
 	bool isNewInputImages(std::vector<ImagePtr> images_raw);
+
+	QString generateTextureCoordinateName(QString imageUid) const;
+	void generateAndSetShaders();
+
 
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	ShaderCallbackPtr mShaderCallback;
@@ -171,10 +181,8 @@ private:
 	vtkOpenGLPolyDataMapperPtr mOpenGLPolyDataMapper;
 	vtkRenderWindowPtr mCurrentRenderWindow;
 
-	vtkFloatArrayPtr TCoords;
+	vtkFloatArrayPtr mTextureCoordinates;
 
-	QString generateTextureCoordinateName(QString imageUid);
-	void setShaders();
 };
 //--------------------------------------------------------------------
 
