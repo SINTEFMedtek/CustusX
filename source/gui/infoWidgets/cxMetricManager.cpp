@@ -393,6 +393,15 @@ void MetricManager::exportMetricsToFile(QString filename)
 	file.close();
 }
 
+void MetricManager::importMetricsFromFile(QString filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
+
+
+}
+
 
 } // namespace cx
 

@@ -35,6 +35,7 @@ if(BUILD_TESTING)
         cxtestSelectClippersForDataWidget.cpp
         cxtestSessionStorageHelper.h
         cxtestSessionStorageHelper.cpp
+        cxtestMetricsWidget.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

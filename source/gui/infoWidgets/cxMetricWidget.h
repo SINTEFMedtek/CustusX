@@ -117,6 +117,7 @@ protected slots:
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
   void exportMetricsButtonClickedSlot();
+  void importMetricsButtonClickedSlot();
   void delayedUpdate();
 
 protected:
@@ -124,6 +125,7 @@ protected:
   QAction* mFrameMetricAction;
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
+  QAction* mImportFramesAction;
   PatientModelServicePtr mPatientModelService;
   ViewServicePtr mViewService;
 
