@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include <QFile>
+#include <QTextStream>
 
 #include "cxDataReaderWriter.h"
 #include "cxLogger.h"
@@ -357,7 +358,7 @@ void MetricManager::loadReferencePointsSlot()
   std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
-	reportWarning("No referenceppoints in reference tool "+refTool->getName());
+	reportWarning("No reference points in reference tool "+refTool->getName());
 	return;
   }
 
@@ -398,6 +399,16 @@ void MetricManager::importMetricsFromFile(QString filename)
 	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return;
+
+	QTextStream in(&file);
+	while(!in.atEnd())
+	{
+		QString line = in.readLine();
+
+		if(line.split(" ").at(0) == "pointMetric")
+			std::cout << "found POINTMETRIC !!! \n";
+
+	}
 
 
 }

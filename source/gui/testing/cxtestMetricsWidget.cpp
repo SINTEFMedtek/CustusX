@@ -36,29 +36,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestSpaceProviderMock.h"
 #include "cxMetricManager.h"
 
-#include "cxtestPatientModelServiceMock.h"
-#include "cxCoreServices.h"
+#include "cxPatientModelService.h"
+//#include "cxCoreServices.h" //trengs ikke antakelig
 
+#include "cxDataLocations.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
 
 TEST_CASE("Export and import metrics to and from file", "[unit][gui]")
 {
+    cx::DataLocations::setTestMode();
+    cx::LogicManager::initialize();
+
     QString uid = "Point1";
     cx::PointMetricPtr point = cx::PointMetric::create(uid, "", cx::PatientModelServicePtr(), cxtest::SpaceProviderMock::create());
+    cx::patientService()->insertData(point);
+
+    cx::MetricManager manager;
+    std::string uid_1 = manager.getMetric(uid)->getUid().toStdString();
+    CHECK(manager.getMetric(uid)->getUid().toStdString() == uid.toStdString());
 
 
-    //cx::MetricManager manager;
-    //manager.getMetric(uid);
-    //CHECK(manager.getMetric(uid));
+    QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics.txt";
+    manager.exportMetricsToFile(metricsFilePath);
+    cx::patientService()->removeData(uid);
+
+    manager.importMetricsFromFile(metricsFilePath);
+
+    CHECK(manager.getMetric(uid));
 
 
-
-    CHECK(true);
-
-
-
+    cx::LogicManager::shutdown();
 }
 
 } //namespace cxtest
