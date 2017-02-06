@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include <QFile>
-#include <QTextStream>
 
 #include "cxDataReaderWriter.h"
 #include "cxLogger.h"
@@ -57,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxLogger.h"
+#include "cxMetricFileReader.h"
+
 
 namespace cx
 {
@@ -374,7 +375,7 @@ void MetricManager::loadReferencePointsSlot()
 }
 
 
-void MetricManager::exportMetricsToFile(QString filename)
+void MetricManager::exportMetricsToFile(QString& filename)
 {
 	QFile file(filename);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -394,21 +395,18 @@ void MetricManager::exportMetricsToFile(QString filename)
 	file.close();
 }
 
-void MetricManager::importMetricsFromFile(QString filename)
+void MetricManager::importMetricsFromFile(QString& filename)
 {
 	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return;
 
-	QTextStream in(&file);
-	while(!in.atEnd())
-	{
-		QString line = in.readLine();
+	MetricFileReader reader;
+	reader.importMetrics(file);
 
-		if(line.split(" ").at(0) == "pointMetric")
-			std::cout << "found POINTMETRIC !!! \n";
 
-	}
+
+
 
 
 }

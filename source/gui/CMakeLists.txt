@@ -64,6 +64,7 @@ cx_add_class_qt_moc(cxGui_SRCS
     infoWidgets/cxToolMetricWrapper
     infoWidgets/cxMetricManager
     infoWidgets/cxBrowserWidget
+    infoWidgets/cxMetricFileReader
 
     #----------------------
     navigationWidgets/cxNavigationWidget
