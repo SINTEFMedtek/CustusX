@@ -1,6 +1,8 @@
 #ifndef METRICFILEREADER_H
 #define METRICFILEREADER_H
 
+#include "cxGuiExport.h"
+
 #include <QFile>
 
 
@@ -12,7 +14,7 @@ namespace cx
  *
  * Class which reads the exported metrics file
  */
-class MetricFileReader
+class cxGui_EXPORT MetricFileReader
 {
 public:
 	MetricFileReader();
