@@ -31,26 +31,68 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "catch.hpp"
-
 #include "cxPointMetric.h"
 #include "cxtestSpaceProviderMock.h"
 #include "cxMetricManager.h"
-
 #include "cxPatientModelService.h"
-//#include "cxCoreServices.h" //trengs ikke antakelig
-
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
+#include "cxMetricFileReader.h"
+
 
 namespace cxtest
 {
 
-TEST_CASE("Export and import metrics to and from file", "[unit][gui]")
+TEST_CASE("MetricFileReader, mergeAnyStringsInList", "[unit][gui][jon]")
+{
+    cx::MetricFileReader reader;
+
+    QStringList input_nospaces = QString("pointhigh2").split(" ");
+    QStringList correct_nospaces("pointhigh2");
+    QStringList output_nospaces = reader.mergeAnyStringsInList(input_nospaces);
+    CHECK(correct_nospaces == output_nospaces);
+
+    QStringList input_withspaces = QString("point high 2").split(" ");
+    QStringList correct_withspaces = QString("point high 2").split(" ");
+
+    QStringList output_withspaces = reader.mergeAnyStringsInList(input_withspaces);
+    CHECK(correct_withspaces == output_withspaces);
+
+    QStringList input_withquotes = QString("\"point high 2\" \"reference frame 3\"").split(" ");
+    QStringList correct_withquotes("point high 2");
+    correct_withquotes.push_back("reference frame 3");
+
+    QStringList output_withquotes = reader.mergeAnyStringsInList(input_withquotes);
+    CHECK(correct_withquotes == output_withquotes);
+
+}
+
+TEST_CASE("MetricFileReader, handleStringsInReadLine", "[unit][gui][jon]")
+{
+    cx::MetricFileReader reader;
+    QString a("pointMetric");
+    QString b("\"point 2\"");
+    QString bb("point 2");
+    QString c("\"reference space\"");
+    QString cc("reference space");
+    QString withStrings = a + " " + b + " " + c;
+    QStringList correct_list;
+    correct_list.push_back(a);
+    correct_list.push_back(bb);
+    correct_list.push_back(cc);
+
+    QStringList handledList = reader.handleStringsInReadLine(withStrings);
+
+    CHECK(correct_list == handledList);
+
+}
+
+TEST_CASE("Export and import metrics to and from file", "[unit][gui][jon]")
 {
     cx::DataLocations::setTestMode();
     cx::LogicManager::initialize();
 
-    QString uid = "Point1";
+    QString uid = "point1";
     cx::PointMetricPtr point = cx::PointMetric::create(uid, "", cx::PatientModelServicePtr(), cxtest::SpaceProviderMock::create());
     cx::patientService()->insertData(point);
 
@@ -61,11 +103,11 @@ TEST_CASE("Export and import metrics to and from file", "[unit][gui]")
 
     QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics.txt";
     manager.exportMetricsToFile(metricsFilePath);
-    cx::patientService()->removeData(uid);
+    //cx::patientService()->removeData(uid);
 
     manager.importMetricsFromFile(metricsFilePath);
 
-    CHECK(manager.getMetric(uid));
+    CHECK(manager.getMetric("point2"));
 
 
     cx::LogicManager::shutdown();

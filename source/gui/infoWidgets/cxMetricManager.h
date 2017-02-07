@@ -44,7 +44,6 @@ namespace cx
 {
 typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
 typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
-typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /** 
  *
@@ -92,7 +91,7 @@ private:
 	void installNewMetric(DataMetricPtr metric);
 	PointMetricPtr addPointInDefaultPosition();
 	std::vector<DataMetricPtr> getAllMetrics();
-//	DataFactoryPtr getDataFactory();
+	void createMetricsReadFromFile(std::vector<QStringList>& metrics) const;
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 	std::set<QString> mSelection;

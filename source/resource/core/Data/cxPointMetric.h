@@ -81,9 +81,14 @@ public:
 	{
 		return "pointMetric";
 	}
+	QString getDefaultUid() const
+	{
+		return "point";
+	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_point.png");}
 	virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
+	virtual void updateFromSingleLineString(QStringList& paramterList);
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.

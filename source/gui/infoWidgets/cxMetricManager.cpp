@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
-#include "cxLogger.h"
 #include "cxMetricFileReader.h"
 
 
@@ -402,11 +401,21 @@ void MetricManager::importMetricsFromFile(QString& filename)
 		return;
 
 	MetricFileReader reader;
-	reader.importMetrics(file);
+	std::vector<QStringList> metrics = reader.readMetricFile(file);
 
+	this->createMetricsReadFromFile(metrics);
+}
 
-
-
+void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics) const
+{
+	DataFactory factory(patientService(), spaceProvider());
+	foreach (QStringList metricList, metrics)
+	{
+		QString metricType = metricList.at(0);
+		DataPtr metric = factory.create(metricType, "dummyUid");
+		metric->updateFromSingleLineString(metricList);
+		patientService()->insertData(metric);
+	}
 
 
 }

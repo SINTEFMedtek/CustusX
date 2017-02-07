@@ -158,4 +158,10 @@ QString PointMetric::getAsSingleLineString() const
 			.arg(qstring_cast(this->getCoordinate()));
 }
 
+void PointMetric::updateFromSingleLineString(QStringList& paramterList)
+{
+	this->setUid(getDefaultUid() + "%1");
+	this->setName(paramterList.at(1));
+}
+
 }
