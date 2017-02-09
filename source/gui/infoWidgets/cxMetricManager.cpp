@@ -413,6 +413,10 @@ void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics)
 	{
 		QString metricType = metricList.at(0);
 		DataPtr metric = factory.create(metricType, "dummyUid");
+		metric->setUid(metric->getDefaultUid() + "%1");
+		metric->setName(metricList.at(1));
+
+
 		metric->updateFromSingleLineString(metricList);
 		patientService()->insertData(metric);
 	}

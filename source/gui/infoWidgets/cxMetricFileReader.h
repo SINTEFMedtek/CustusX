@@ -20,8 +20,8 @@ public:
 	MetricFileReader();
 
     std::vector<QStringList> readMetricFile(QFile &metricsFile) const;
-    QStringList handleStringsInReadLine(QString& stringWithStrings) const;
-    QStringList mergeAnyStringsInList(QStringList& list) const;
+    //QStringList handleStringsInReadLine(QString& stringWithStrings) const;
+    //QStringList mergeAnyStringsInList(QStringList& list) const;
 };
 
 } // namespace cx
