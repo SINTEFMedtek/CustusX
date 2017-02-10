@@ -160,8 +160,11 @@ QString PointMetric::getAsSingleLineString() const
 
 void PointMetric::updateFromSingleLineString(QStringList& paramterList)
 {
-	this->setUid(getDefaultUid() + "%1");
-	this->setName(paramterList.at(1));
+	int spaceIndex = 2;
+	this->setSpace(CoordinateSystem::fromString(paramterList.at(spaceIndex)));
+	this->setCoordinate(Vector3D(paramterList.at(++spaceIndex).toDouble(), paramterList.at(++spaceIndex).toDouble(), paramterList.at(++spaceIndex).toDouble()));
+//	this->setUid(getDefaultUid() + "%1");
+//	this->setName(paramterList.at(1));
 }
 
 }

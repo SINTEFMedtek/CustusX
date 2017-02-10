@@ -98,21 +98,24 @@ TEST_CASE("Export and import metrics to and from file", "[unit][gui][jon]")
     point->setSpace(cx::CoordinateSystem(cx::csTOOL));
     point->setCoordinate(cx::Vector3D(1,2,3));
     cx::patientService()->insertData(point);
+    QString p1_str = point->getAsSingleLineString();
 
     QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics.txt";
     manager.exportMetricsToFile(metricsFilePath);
-    //cx::patientService()->removeData(uid);
+//    cx::patientService()->removeData(uid);
 
     manager.importMetricsFromFile(metricsFilePath);
     CHECK(true);
 
+    //cx::DataMetricPtr p2 = manager.getMetric("point1");
     cx::DataMetricPtr p2 = manager.getMetric("point2");
-//    CHECK(p2);
-//    //std::cout << "point2 space: " << p2->getSpace().toString().toStdString() << std::endl;
-//    //std::cout << "point2 name: " << p2->getName().toStdString() << std::endl;
-//    CHECK(point->getAsSingleLineString() == p2->getAsSingleLineString());
+    CHECK(p2);
+    //std::cout << "point2 space: " << p2->getSpace().toString().toStdString() << std::endl;
+    //std::cout << "point2 name: " << p2->getName().toStdString() << std::endl;
+    CHECK(p1_str == p2->getAsSingleLineString());
 
 
+    p2.reset(); //have to reset this before shutdown, or cxSharedPointerChecker.h comes into effect.
     cx::LogicManager::shutdown();
 }
 
