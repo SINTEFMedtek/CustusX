@@ -162,7 +162,11 @@ void PointMetric::updateFromSingleLineString(QStringList& paramterList)
 {
 	int spaceIndex = 2;
 	this->setSpace(CoordinateSystem::fromString(paramterList.at(spaceIndex)));
-	this->setCoordinate(Vector3D(paramterList.at(++spaceIndex).toDouble(), paramterList.at(++spaceIndex).toDouble(), paramterList.at(++spaceIndex).toDouble()));
+	int x = ++spaceIndex;
+	int y = ++spaceIndex;
+	int z = ++spaceIndex;
+
+	this->setCoordinate(Vector3D(paramterList.at(x).toDouble(), paramterList.at(y).toDouble(), paramterList.at(z).toDouble()));
 //	this->setUid(getDefaultUid() + "%1");
 //	this->setName(paramterList.at(1));
 }
