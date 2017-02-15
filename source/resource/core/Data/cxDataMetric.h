@@ -70,8 +70,6 @@ public:
 
 	virtual QIcon getIcon() {return QIcon(":/icons/metric.png");}
 
-	// OBSOBS, Fjern! antakelig ikke bra.
-	//virtual QString getSpace();
 	virtual void setSpace(CoordinateSystem cs) {}
 	virtual CoordinateSystem getSpace() const { return cx::CoordinateSystem::reference(); } // use parentframe from Data
     virtual Vector3D getRefCoord() const = 0;
@@ -81,6 +79,21 @@ public:
 	virtual bool isValid() const { return true; }
 	virtual QString getValueAsString() const = 0;
 	virtual bool showValueInGraphics() const { return false; }
+
+	virtual QString getUidPrefix() const = 0;
+	/**
+	 * @brief getDefaultUidSuffix
+	 * @return The % sign makes the loading method find the first uniqe number to replace the 1
+	 * when the metric is inserted into the patient.
+	 */
+	static QString getDefaultUidSuffix()
+	{
+		return "%1";
+	}
+	static QString getMetricTypeSuffix()
+	{
+		return "Metric";
+	}
 
 	void setColor(const QColor& color);
 	QColor getColor();

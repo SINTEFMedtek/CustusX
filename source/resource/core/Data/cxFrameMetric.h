@@ -63,8 +63,21 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "frameMetric";
+		return getDefaultUidPrefix() + getMetricTypeSuffix();
 	}
+	virtual QString getUidPrefix() const
+	{
+		return getDefaultUidPrefix();
+	}
+	static QString getDefaultUidPrefix()
+	{
+		return "frame";
+	}
+	static QString getDefaultUid()
+	{
+		return getDefaultUidPrefix() + "%1";
+	}
+
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_frame.png");}
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.

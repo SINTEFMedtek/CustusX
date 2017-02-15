@@ -159,8 +159,8 @@ public:
 	void addInteractiveClipPlane(vtkPlanePtr plane);
 	void removeInteractiveClipPlane(vtkPlanePtr plane);
 
-	virtual void updateFromSingleLineString(QStringList& paramterList) {};
-	virtual QString getDefaultUid() const { return ""; }
+	virtual void updateFromSingleLineString(QStringList& paramterList) {}
+	//virtual QString getDefaultUid() const { return ""; }
 signals:
 	void transformChanged(); ///< emitted when transform is changed
 	void propertiesChanged(); ///< emitted when one of the metadata properties (uid, name etc) changes

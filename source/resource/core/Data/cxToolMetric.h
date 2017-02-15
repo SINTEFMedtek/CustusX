@@ -73,7 +73,15 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "ToolMetric";
+		return getDefaultUidPrefix() + getMetricTypeSuffix();
+	}
+	virtual QString getUidPrefix() const
+	{
+		return getDefaultUidPrefix();
+	}
+	static QString getDefaultUidPrefix()
+	{
+		return "tool";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_tool.png");}
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels

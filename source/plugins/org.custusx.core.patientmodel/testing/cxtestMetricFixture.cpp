@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxRegistrationTransform.h"
 
+#include "cxLogicManager.h"
+
 namespace cxtest {
 
 MetricFixture::MetricFixture()
@@ -102,7 +104,8 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
 	retval.mSpace = cx::CoordinateSystem::reference();
 
 //	retval.mMetric = cx::PointMetric::create("testMetric%1");
-	retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
+	//retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
+	retval.mMetric = mServices->patient()->createSpecificData<cx::PointMetric>();
 	retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
 	this->insertData(retval.mMetric);
@@ -233,15 +236,79 @@ void MetricFixture::setPatientRegistration()
 	mServices->patient()->get_rMpr_History()->setRegistration(testRegistration);
 }
 
+void MetricFixture::insertData(cx::DataPtr data)
+{
+	mServices->patient()->insertData(data);
+}
+
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)
 {
-    if (list.size()<2)
+	if (list.size()<2)
         return false;
     if (list[0]!=metric->getType())
         return false;
     if (list[1]!=metric->getName())
         return false;
-    return true;
+	return true;
+}
+
+void MetricFixture::testExportAndImportMetrics()
+{
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+	cx::MetricManager manager;
+
+	// create metrics
+	//cx::PointMetricPtr p = getPointMetricWithInput(cx::Vector3D(1,2,3)).mMetric;
+	//cx::patientService()->insertData(p);
+	//QString p1_str = p->getAsSingleLineString();
+
+	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
+
+
+	// export and import metrics
+	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/export_and_import_metrics_test_file.txt";
+	manager.exportMetricsToFile(metricsFilePath);
+	manager.importMetricsFromFile(metricsFilePath);
+
+
+	// get imported metrics and check that they are equal to the exported ones
+	//cx::DataMetricPtr p2 = manager.getMetric("testMetric0");
+	//CHECK(p2);
+	//CHECK(p1_str == p2->getAsSingleLineString());
+	//p2.reset();
+	this->checkImportedMetricsEqualToExported(metrics, manager);
+
+
+	cx::LogicManager::shutdown();
+}
+
+std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
+{
+	std::vector<cx::DataMetricPtr> metrics;
+	cx::Vector3D pos(1,2,3);
+
+	cx::PointMetricPtr p = getPointMetricWithInput(pos).mMetric;
+	metrics.push_back(p);
+
+	foreach (cx::DataMetricPtr metric, metrics)
+	{
+		cx::patientService()->insertData(metric);
+	}
+
+	return metrics;
+}
+
+void MetricFixture::checkImportedMetricsEqualToExported(std::vector<cx::DataMetricPtr>& origMetrics, cx::MetricManager& manager) const
+{
+	foreach (cx::DataMetricPtr metric, origMetrics)
+	{
+		//The original metric will have uid = prefix0 when inserted in the patient. the imported will have prefix1.
+		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getUidPrefix() + "1");
+		REQUIRE(importedMetric);
+		CHECK(metric != importedMetric); //don't compare the original metric to itself
+		CHECK(metric->getAsSingleLineString() == importedMetric->getAsSingleLineString());
+	}
 }
 
 } //namespace cxtest

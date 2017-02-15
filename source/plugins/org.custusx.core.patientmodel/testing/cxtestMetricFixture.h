@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
 
+#include "cxMetricManager.h"
+
+
 namespace cxtest {
 
 struct CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT PlaneMetricWithInput
@@ -158,18 +161,18 @@ public:
 
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
-	void insertData(cx::DataPtr data)
-	{
-		mServices->patient()->insertData(data);
-	}
-
+	void insertData(cx::DataPtr data);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
+
+	void testExportAndImportMetrics();
 
 private:
 	TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 
 	cx::SpaceProviderPtr getSpaceProvider();
+	std::vector<cx::DataMetricPtr> createMetricsForExport();
+	void checkImportedMetricsEqualToExported(std::vector<cx::DataMetricPtr>& origMetrics, cx::MetricManager& manager) const;
 
 };
 

@@ -79,11 +79,19 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "pointMetric";
+		return getDefaultUidPrefix() + getMetricTypeSuffix();
 	}
-	QString getDefaultUid() const
+	virtual QString getUidPrefix() const
+	{
+		return getDefaultUidPrefix();
+	}
+	static QString getDefaultUidPrefix()
 	{
 		return "point";
+	}
+	static QString getDefaultUid()
+	{
+		return getDefaultUidPrefix() + getDefaultUidSuffix();
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_point.png");}
 	virtual Vector3D getRefCoord() const;

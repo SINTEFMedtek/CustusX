@@ -90,7 +90,15 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "distanceMetric";
+		return getDefaultUidPrefix() + getMetricTypeSuffix();
+	}
+	virtual QString getUidPrefix() const
+	{
+		return getDefaultUidPrefix();
+	}
+	static QString getDefaultUidPrefix()
+	{
+		return "distance";
 	}
 
 	virtual QString getValueAsString() const;

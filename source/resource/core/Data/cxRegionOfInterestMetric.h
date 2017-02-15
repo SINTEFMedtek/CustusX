@@ -103,7 +103,15 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "roiMetric";
+		return getDefaultUidPrefix() + getMetricTypeSuffix();
+	}
+	virtual QString getUidPrefix() const
+	{
+		return getDefaultUidPrefix();
+	}
+	static QString getDefaultUidPrefix()
+	{
+		return "roi";
 	}
 
 	virtual QString getValueAsString() const;

@@ -82,7 +82,15 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "planeMetric";
+		return getDefaultUidPrefix() + getMetricTypeSuffix();
+	}
+	virtual QString getUidPrefix() const
+	{
+		return getDefaultUidPrefix();
+	}
+	static QString getDefaultUidPrefix()
+	{
+		return "plane";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_plane.png");}
 	virtual QString getAsSingleLineString() const;
