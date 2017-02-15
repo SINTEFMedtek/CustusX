@@ -34,16 +34,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestMetricFixture.h"
 
 
-#include "cxPointMetric.h"
-#include "cxtestSpaceProviderMock.h"
-#include "cxMetricManager.h"
-#include "cxPatientModelService.h"
-#include "cxDataLocations.h"
-#include "cxLogicManager.h"
-
-//#include "cxMetricFileReader.h"
-
-
 namespace cxtest
 {
 
@@ -52,28 +42,6 @@ TEST_CASE("Export and import metrics to and from file", "[unit][gui][jon]")
 {
 	MetricFixture fixture;
 	fixture.testExportAndImportMetrics();
-
-//	cx::DataLocations::setTestMode();
-//	cx::LogicManager::initialize();
-//	cx::MetricManager manager;
-
-//    QString uid = "point1";
-//    cx::PointMetricPtr point = cx::PointMetric::create(uid, "", cx::PatientModelServicePtr(), cxtest::SpaceProviderMock::create());
-//    point->setSpace(cx::CoordinateSystem(cx::csTOOL));
-//    point->setCoordinate(cx::Vector3D(1,2,3));
-//    cx::patientService()->insertData(point);
-//    QString p1_str = point->getAsSingleLineString();
-
-//	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/export_and_import_metrics_test_file.txt";
-//	manager.exportMetricsToFile(metricsFilePath);
-
-//    manager.importMetricsFromFile(metricsFilePath);
-
-//    cx::DataMetricPtr p2 = manager.getMetric("point2");
-//    CHECK(p1_str == p2->getAsSingleLineString());
-
-//	p2.reset(); //have to reset this before shutdown, or cxSharedPointerChecker.h comes into effect.
-//    cx::LogicManager::shutdown();
 }
 
 } //namespace cxtest

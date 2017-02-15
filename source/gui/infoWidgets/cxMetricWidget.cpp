@@ -160,8 +160,8 @@ void MetricWidget::createActions(QActionGroup* group)
 	mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
 	mLoadReferencePointsAction->setDisabled(true);
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);
-	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file (Some metrics might not be supported)",   SLOT(exportMetricsButtonClickedSlot()));
-	mImportFramesAction = this->createAction(group, ":/icons/open.png", "ImportFrames", "Import metrics from file (Some metrics might not be supported)",   SLOT(importMetricsButtonClickedSlot()));
+	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
+	mImportFramesAction = this->createAction(group, ":/icons/open.png", "ImportFrames", "Import metrics from file",   SLOT(importMetricsButtonClickedSlot()));
 }
 
 //template<class T>
@@ -478,7 +478,7 @@ void MetricWidget::exportMetricsButtonClickedSlot()
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,
-													"Create/select a file to export metrics to",
+													"Create/select the file to export metrics to",
 													suggestion);
 	if(!filename.isEmpty())
 		mMetricManager->exportMetricsToFile(filename);
@@ -489,7 +489,7 @@ void MetricWidget::importMetricsButtonClickedSlot()
 	QString suggestion = QString("%1/")
 			.arg(patientService()->getActivePatientFolder());
 
-	QString fileName = QFileDialog::getOpenFileName(this, "Select a file to import metrics from", suggestion);
+	QString fileName = QFileDialog::getOpenFileName(this, "Select the file to import metrics from", suggestion);
 
 	if(!fileName.isEmpty())
 		mMetricManager->importMetricsFromFile(fileName);

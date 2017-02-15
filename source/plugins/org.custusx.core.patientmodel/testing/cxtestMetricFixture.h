@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMessageListener.h"
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
-
 #include "cxMetricManager.h"
 
 
@@ -139,10 +138,7 @@ public:
 	{
 		boost::shared_ptr<METRIC_TYPE> retval;
 		retval = mServices->patient()->createSpecificData<METRIC_TYPE>(uid);
-//		mServices->mPatientModelService->insertData(retval);
 		return retval;
-
-		//return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
 	}
 
     template<class DATA>
@@ -163,7 +159,6 @@ public:
     void setPatientRegistration();
 	void insertData(cx::DataPtr data);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
-
 	void testExportAndImportMetrics();
 
 private:

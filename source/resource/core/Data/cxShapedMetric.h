@@ -102,6 +102,10 @@ public:
 	{
 		return "donut";
 	}
+	static QString getDefaultUid()
+	{
+		return getDefaultUidPrefix() + getDefaultUidSuffix();
+	}
 	virtual QString getValueAsString() const { return ""; }
 	virtual bool showValueInGraphics() const { return false; }
 

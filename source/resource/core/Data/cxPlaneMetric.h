@@ -92,6 +92,10 @@ public:
 	{
 		return "plane";
 	}
+	static QString getDefaultUid()
+	{
+		return getDefaultUidPrefix() + getDefaultUidSuffix();
+	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_plane.png");}
 	virtual QString getAsSingleLineString() const;
 

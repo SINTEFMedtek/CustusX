@@ -39,10 +39,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringHelpers.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxRegistrationTransform.h"
-
 #include "cxLogicManager.h"
 
+
 namespace cxtest {
+
 
 MetricFixture::MetricFixture()
 {
@@ -68,7 +69,7 @@ FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 	retval.m_qMt = cx::createTransformRotateZ(M_PI_2) * cx::createTransformTranslate(cx::Vector3D(1,2,3));
 	retval.mSpace = cx::CoordinateSystem::reference();
 
-	retval.mMetric = this->createTestMetric<cx::FrameMetric>("testMetric%1");
+	retval.mMetric = mServices->patient()->createSpecificData<cx::FrameMetric>();
     retval.mMetric->setFrame(retval.m_qMt);
     retval.mMetric->setSpace(retval.mSpace);
 	this->insertData(retval.mMetric);
@@ -85,8 +86,7 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	retval.mName = "TestTool";
 	retval.mOffset = 5;
 
-//	retval.mMetric = cx::ToolMetric::create("testMetric%1");
-	retval.mMetric = this->createTestMetric<cx::ToolMetric>("testMetric%1");
+	retval.mMetric = mServices->patient()->createSpecificData<cx::ToolMetric>();
 	retval.mMetric->setFrame(retval.m_qMt);
 	retval.mMetric->setSpace(retval.mSpace);
 	retval.mMetric->setToolName(retval.mName);
@@ -103,8 +103,6 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
     retval.mPoint = point;
 	retval.mSpace = cx::CoordinateSystem::reference();
 
-//	retval.mMetric = cx::PointMetric::create("testMetric%1");
-	//retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
 	retval.mMetric = mServices->patient()->createSpecificData<cx::PointMetric>();
 	retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
@@ -120,7 +118,7 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, 
 	retval.mPoint = point;
 	retval.mNormal = normal;
 
-	retval.mMetric = this->createTestMetric<cx::PlaneMetric>("testMetric%1");
+	retval.mMetric = mServices->patient()->createSpecificData<cx::PlaneMetric>();
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
 	this->insertData(retval.mMetric);
@@ -134,7 +132,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 
     retval.mDistance = distance;
 
-	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
+	retval.mMetric = mServices->patient()->createSpecificData<cx::DistanceMetric>();
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
 	this->insertData(retval.mMetric);
@@ -148,7 +146,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 
     retval.mDistance = distance;
 
-	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
+	retval.mMetric = mServices->patient()->createSpecificData<cx::DistanceMetric>();
 	retval.mMetric->getArguments()->set(0, this->getPointMetricWithInput(cx::Vector3D(0,0,0)).mMetric);
 	retval.mMetric->getArguments()->set(1, this->getPointMetricWithInput(cx::Vector3D(distance,0,0)).mMetric);
 	this->insertData(retval.mMetric);
@@ -243,13 +241,13 @@ void MetricFixture::insertData(cx::DataPtr data)
 
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)
 {
-	if (list.size()<2)
+    if (list.size()<2)
         return false;
     if (list[0]!=metric->getType())
         return false;
     if (list[1]!=metric->getName())
         return false;
-	return true;
+    return true;
 }
 
 void MetricFixture::testExportAndImportMetrics()
@@ -259,26 +257,15 @@ void MetricFixture::testExportAndImportMetrics()
 	cx::MetricManager manager;
 
 	// create metrics
-	//cx::PointMetricPtr p = getPointMetricWithInput(cx::Vector3D(1,2,3)).mMetric;
-	//cx::patientService()->insertData(p);
-	//QString p1_str = p->getAsSingleLineString();
-
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
-
 
 	// export and import metrics
 	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/export_and_import_metrics_test_file.txt";
 	manager.exportMetricsToFile(metricsFilePath);
 	manager.importMetricsFromFile(metricsFilePath);
 
-
-	// get imported metrics and check that they are equal to the exported ones
-	//cx::DataMetricPtr p2 = manager.getMetric("testMetric0");
-	//CHECK(p2);
-	//CHECK(p1_str == p2->getAsSingleLineString());
-	//p2.reset();
+	// get imported metrics from the patient and check that they are equal to the exported ones
 	this->checkImportedMetricsEqualToExported(metrics, manager);
-
 
 	cx::LogicManager::shutdown();
 }
@@ -288,6 +275,7 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 	std::vector<cx::DataMetricPtr> metrics;
 	cx::Vector3D pos(1,2,3);
 
+	//Create one of each metric to test export and import on
 	cx::PointMetricPtr p = getPointMetricWithInput(pos).mMetric;
 	metrics.push_back(p);
 

@@ -52,11 +52,6 @@ DataMetric::~DataMetric()
 {
 }
 
-//QString DataMetric::getSpace()
-//{
-//    return "";
-//}
-
 QString DataMetric::getSingleLineHeader() const
 {
 	return QString("%1 \"%2\"")

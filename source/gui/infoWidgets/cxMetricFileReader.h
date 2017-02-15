@@ -2,12 +2,12 @@
 #define METRICFILEREADER_H
 
 #include "cxGuiExport.h"
-
 #include <QFile>
 
 
 namespace cx
 {
+
 
 /**
  * @brief The MetricFileReader class
@@ -20,8 +20,6 @@ public:
 	MetricFileReader();
 
     std::vector<QStringList> readMetricFile(QFile &metricsFile) const;
-    //QStringList handleStringsInReadLine(QString& stringWithStrings) const;
-    //QStringList mergeAnyStringsInList(QStringList& list) const;
 };
 
 } // namespace cx

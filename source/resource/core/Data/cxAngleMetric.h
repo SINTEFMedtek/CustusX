@@ -101,6 +101,10 @@ public:
 	{
 		return "angle";
 	}
+	static QString getDefaultUid()
+	{
+		return getDefaultUidPrefix() + getDefaultUidSuffix();
+	}
 
 	virtual QString getValueAsString() const;
 	virtual bool showValueInGraphics() const { return true; }

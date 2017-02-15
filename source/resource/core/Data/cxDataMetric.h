@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxData.h"
 #include <QColor>
-#include <cxCoordinateSystemHelpers.h>
+
 
 namespace cx
 {
@@ -70,11 +70,8 @@ public:
 
 	virtual QIcon getIcon() {return QIcon(":/icons/metric.png");}
 
-	virtual void setSpace(CoordinateSystem cs) {}
-	virtual CoordinateSystem getSpace() const { return cx::CoordinateSystem::reference(); } // use parentframe from Data
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
-	//virtual void updateFromSingleLineString(QStringList& paramterList) {};
     virtual Transform3D getRefFrame() const { return createTransformTranslate(this->getRefCoord()); }
 	virtual bool isValid() const { return true; }
 	virtual QString getValueAsString() const = 0;
