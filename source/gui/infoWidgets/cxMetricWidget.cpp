@@ -160,8 +160,8 @@ void MetricWidget::createActions(QActionGroup* group)
 	mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
 	mLoadReferencePointsAction->setDisabled(true);
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);
-	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
-	mImportFramesAction = this->createAction(group, ":/icons/open.png", "ImportFrames", "Import metrics from file",   SLOT(importMetricsButtonClickedSlot()));
+	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to a file",   SLOT(exportMetricsButtonClickedSlot()));
+	mImportFramesAction = this->createAction(group, ":/icons/open.png", "ImportFrames", "Import metrics from a file",   SLOT(importMetricsButtonClickedSlot()));
 }
 
 //template<class T>
