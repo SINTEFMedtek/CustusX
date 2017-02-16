@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -152,7 +153,29 @@ public:
 	virtual bool canLoad(const QString& type, const QString& filename)
 	{
 		QString fileType = QFileInfo(filename).suffix();
-		return (fileType.compare("vtk", Qt::CaseInsensitive) == 0);
+		return ( fileType.compare("vtk", Qt::CaseInsensitive) == 0);
+	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(MeshPtr mesh, QString filename);
+
+	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
+	virtual QString canLoadDataType() const { return "mesh"; }
+	virtual DataPtr load(const QString& uid, const QString& filename);
+};
+
+/**\brief Reader for .vtk files.
+ *
+ */
+class cxResource_EXPORT XMLPolyDataMeshReader: public DataReader
+{
+public:
+	virtual ~XMLPolyDataMeshReader()
+	{
+	}
+	virtual bool canLoad(const QString& type, const QString& filename)
+	{
+		QString fileType = QFileInfo(filename).suffix();
+		return ( fileType.compare("vtp", Qt::CaseInsensitive) == 0);
 	}
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(MeshPtr mesh, QString filename);
