@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxData.h"
 #include <QColor>
+#include <cxCoordinateSystemHelpers.h>
 
 
 namespace cx
@@ -70,27 +71,15 @@ public:
 
 	virtual QIcon getIcon() {return QIcon(":/icons/metric.png");}
 
+    virtual QString getSpace();
+	virtual void setSpace(CoordinateSystem space) {}
+	virtual void setSpaceFromSingleLineString(QStringList& parameterList);
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
     virtual Transform3D getRefFrame() const { return createTransformTranslate(this->getRefCoord()); }
 	virtual bool isValid() const { return true; }
 	virtual QString getValueAsString() const = 0;
 	virtual bool showValueInGraphics() const { return false; }
-
-	virtual QString getUidPrefix() const = 0;
-	/**
-	 * @brief getDefaultUidSuffix
-	 * @return The % sign makes the loading method find the first uniqe number to replace the 1
-	 * when the metric is inserted into the patient.
-	 */
-	static QString getDefaultUidSuffix()
-	{
-		return "%1";
-	}
-	static QString getMetricTypeSuffix()
-	{
-		return "Metric";
-	}
 
 	void setColor(const QColor& color);
 	QColor getColor();

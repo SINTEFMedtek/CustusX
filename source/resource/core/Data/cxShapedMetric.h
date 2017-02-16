@@ -92,19 +92,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return getDefaultUidPrefix() + getMetricTypeSuffix();
-	}
-	virtual QString getUidPrefix() const
-	{
-		return getDefaultUidPrefix();
-	}
-	static QString getDefaultUidPrefix()
-	{
-		return "donut";
-	}
-	static QString getDefaultUid()
-	{
-		return getDefaultUidPrefix() + getDefaultUidSuffix();
+		return "DonutMetric";
 	}
 	virtual QString getValueAsString() const { return ""; }
 	virtual bool showValueInGraphics() const { return false; }

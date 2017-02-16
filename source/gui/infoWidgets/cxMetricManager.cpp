@@ -175,7 +175,7 @@ PointMetricPtr MetricManager::addPointInDefaultPosition()
 
 void MetricManager::addFrameButtonClickedSlot()
 {
-	FrameMetricPtr frame = patientService()->createSpecificData<FrameMetric>();
+	FrameMetricPtr frame = patientService()->createSpecificData<FrameMetric>("frame%1");
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
@@ -189,7 +189,7 @@ void MetricManager::addFrameButtonClickedSlot()
 
 void MetricManager::addToolButtonClickedSlot()
 {
-	ToolMetricPtr frame = patientService()->createSpecificData<ToolMetric>();
+	ToolMetricPtr frame = patientService()->createSpecificData<ToolMetric>("tool%1");
   frame->get_rMd_History()->setParentSpace("reference");
 
   CoordinateSystem ref = CoordinateSystem::reference();
@@ -205,7 +205,7 @@ void MetricManager::addToolButtonClickedSlot()
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-  PlaneMetricPtr p1 = patientService()->createSpecificData<PlaneMetric>();
+  PlaneMetricPtr p1 = patientService()->createSpecificData<PlaneMetric>("plane%1");
   p1->get_rMd_History()->setParentSpace("reference");
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
@@ -247,14 +247,14 @@ std::vector<DataPtr> MetricManager::refinePointArguments(std::vector<DataPtr> ar
 
 void MetricManager::addROIButtonClickedSlot()
 {
-	RegionOfInterestMetricPtr d0 = patientService()->createSpecificData<RegionOfInterestMetric>();
+	RegionOfInterestMetricPtr d0 = patientService()->createSpecificData<RegionOfInterestMetric>("roi%1");
 	d0->get_rMd_History()->setParentSpace("reference");
 	this->installNewMetric(d0);
 }
 
 void MetricManager::addDistanceButtonClickedSlot()
 {
-	DistanceMetricPtr d0 = patientService()->createSpecificData<DistanceMetric>();
+	DistanceMetricPtr d0 = patientService()->createSpecificData<DistanceMetric>("distance%1");
 //	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
@@ -267,7 +267,7 @@ void MetricManager::addDistanceButtonClickedSlot()
 
 void MetricManager::addAngleButtonClickedSlot()
 {
-	AngleMetricPtr d0 = patientService()->createSpecificData<AngleMetric>();
+	AngleMetricPtr d0 = patientService()->createSpecificData<AngleMetric>("angle%1");
 //	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
@@ -302,7 +302,7 @@ std::vector<DataPtr> MetricManager::getSpecifiedNumberOfValidArguments(MetricRef
 
 void MetricManager::addSphereButtonClickedSlot()
 {
-	SphereMetricPtr d0 = patientService()->createSpecificData<SphereMetric>();
+	SphereMetricPtr d0 = patientService()->createSpecificData<SphereMetric>("sphere%1");
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -312,7 +312,7 @@ void MetricManager::addSphereButtonClickedSlot()
 
 void MetricManager::addDonutButtonClickedSlot()
 {
-	DonutMetricPtr d0 = patientService()->createSpecificData<DonutMetric>();
+	DonutMetricPtr d0 = patientService()->createSpecificData<DonutMetric>("donut%1");
 	d0->get_rMd_History()->setParentSpace("reference");
 	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
 	d0->getArguments()->set(0, args[0]);
@@ -323,7 +323,7 @@ void MetricManager::addDonutButtonClickedSlot()
 
 void MetricManager::addCustomButtonClickedSlot()
 {
-	CustomMetricPtr d0 = patientService()->createSpecificData<CustomMetric>();
+    CustomMetricPtr d0 = patientService()->createSpecificData<CustomMetric>("Custom%1");
     d0->get_rMd_History()->setParentSpace("reference");
     std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
     d0->getArguments()->set(0, args[0]);
@@ -411,7 +411,7 @@ void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics)
 	foreach (QStringList metricList, metrics)
 	{
 		QString metricType = metricList.at(0);
-		QString defaultUid = metricType.split(DataMetric::getMetricTypeSuffix()).at(0) + DataMetric::getDefaultUidSuffix();
+		QString defaultUid = metricType.split("Metric").at(0) + "%1";
 		DataPtr metric = factory.create(metricType, defaultUid, metricList.at(1));
 		metric->updateFromSingleLineString(metricList);
 		patientService()->insertData(metric);

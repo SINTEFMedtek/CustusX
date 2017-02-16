@@ -111,10 +111,20 @@ QString ToolMetric::getAsSingleLineString() const
 {
 	return QString("%1 \"%2\" %3 \"%4\" %5")
 			.arg(this->getSingleLineHeader())
+			.arg(mSpace.toString())
 			.arg(mToolName)
 			.arg(mToolOffset)
-			.arg(mSpace.toString())
 			.arg(this->matrixAsSingleLineString());
 }
+
+void ToolMetric::updateFromSingleLineString(QStringList& parameterList)
+{
+	this->setSpaceFromSingleLineString(parameterList);
+	int i = 3;
+	this->setToolName(parameterList.at(i++));
+	this->setToolOffset(parameterList.at(i++).toDouble());
+	this->setFrame(this->getMatrixFromSingleLineString(parameterList, i));
+}
+
 
 } //namespace cx

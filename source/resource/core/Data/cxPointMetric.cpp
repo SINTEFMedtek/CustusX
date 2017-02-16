@@ -158,17 +158,15 @@ QString PointMetric::getAsSingleLineString() const
 			.arg(qstring_cast(this->getCoordinate()));
 }
 
-void PointMetric::updateFromSingleLineString(QStringList& paramterList)
+void PointMetric::updateFromSingleLineString(QStringList& parameterList)
 {
-	int spaceIndex = 2;
-	this->setSpace(CoordinateSystem::fromString(paramterList.at(spaceIndex)));
-	int x = ++spaceIndex;
-	int y = ++spaceIndex;
-	int z = ++spaceIndex;
+	this->setSpaceFromSingleLineString(parameterList);
+	int firstCoordIndex = 3;
+	int x = firstCoordIndex;
+	int y = ++firstCoordIndex;
+	int z = ++firstCoordIndex;
 
-	this->setCoordinate(Vector3D(paramterList.at(x).toDouble(), paramterList.at(y).toDouble(), paramterList.at(z).toDouble()));
-//	this->setUid(getDefaultUid() + "%1");
-//	this->setName(paramterList.at(1));
+	this->setCoordinate(Vector3D(parameterList.at(x).toDouble(), parameterList.at(y).toDouble(), parameterList.at(z).toDouble()));
 }
 
 }

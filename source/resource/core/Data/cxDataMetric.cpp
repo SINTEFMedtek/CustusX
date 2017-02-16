@@ -52,6 +52,16 @@ DataMetric::~DataMetric()
 {
 }
 
+QString DataMetric::getSpace()
+{
+	return "";
+}
+
+void DataMetric::setSpaceFromSingleLineString(QStringList& parameterList)
+{
+	this->setSpace(CoordinateSystem::fromString(parameterList.at(2)));
+}
+
 QString DataMetric::getSingleLineHeader() const
 {
 	return QString("%1 \"%2\"")

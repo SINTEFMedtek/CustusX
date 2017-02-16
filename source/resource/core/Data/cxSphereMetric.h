@@ -80,19 +80,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return getDefaultUidPrefix() + getMetricTypeSuffix();
-	}
-	virtual QString getUidPrefix() const
-	{
-		return getDefaultUidPrefix();
-	}
-	static QString getDefaultUidPrefix()
-	{
-		return "sphere";
-	}
-	static QString getDefaultUid()
-	{
-		return getDefaultUidPrefix() + getDefaultUidSuffix();
+		return "SphereMetric";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_sphere.png");}
 	virtual QString getValueAsString() const;

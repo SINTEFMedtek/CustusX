@@ -91,19 +91,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return getDefaultUidPrefix() + getMetricTypeSuffix();
-	}
-	virtual QString getUidPrefix() const
-	{
-		return getDefaultUidPrefix();
-	}
-	static QString getDefaultUidPrefix()
-	{
-		return "angle";
-	}
-	static QString getDefaultUid()
-	{
-		return getDefaultUidPrefix() + getDefaultUidSuffix();
+		return "angleMetric";
 	}
 
 	virtual QString getValueAsString() const;

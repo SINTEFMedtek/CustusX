@@ -126,4 +126,17 @@ QString FrameMetricBase::matrixAsSingleLineString() const
 	return qstring_cast(stream.str());
 }
 
+Transform3D FrameMetricBase::getMatrixFromSingleLineString(QStringList& parameterList, int indexWhereMatrixStarts)
+{
+	QString matrix;
+	for(int j = indexWhereMatrixStarts; j < parameterList.size(); ++j)
+	{
+		matrix += parameterList.at(j);
+		matrix += " ";
+	}
+
+	return Transform3D::fromString(matrix);
+}
+
+
 } //namespace cx

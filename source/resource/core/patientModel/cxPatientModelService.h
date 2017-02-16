@@ -134,8 +134,6 @@ public:
 	template <class DATA>
 	boost::shared_ptr<DATA> getData(const QString& uid) const;
 	template<class DATA>
-	boost::shared_ptr<DATA> createSpecificData();
-	template<class DATA>
 	boost::shared_ptr<DATA> createSpecificData(QString uid, QString name="");
 
 	// streams
@@ -219,12 +217,6 @@ boost::shared_ptr<DATA> PatientModelService::getData(const QString& uid) const
 	return boost::dynamic_pointer_cast<DATA>(this->getData(uid));
 }
 
-template<class DATA>
-boost::shared_ptr<DATA> PatientModelService::createSpecificData()
-{
-	boost::shared_ptr<DATA> retval = this->createSpecificData<DATA>(DATA::getDefaultUid());
-	return retval;
-}
 
 template<class DATA>
 boost::shared_ptr<DATA> PatientModelService::createSpecificData(QString uid, QString name)

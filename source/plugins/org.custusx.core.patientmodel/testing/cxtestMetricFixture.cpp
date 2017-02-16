@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cxtest {
 
-
 MetricFixture::MetricFixture()
 {
 	mMessageListener = cx::MessageListener::createWithQueue();
@@ -69,7 +68,7 @@ FrameMetricWithInput MetricFixture::getFrameMetricWithInput()
 	retval.m_qMt = cx::createTransformRotateZ(M_PI_2) * cx::createTransformTranslate(cx::Vector3D(1,2,3));
 	retval.mSpace = cx::CoordinateSystem::reference();
 
-	retval.mMetric = mServices->patient()->createSpecificData<cx::FrameMetric>();
+	retval.mMetric = this->createTestMetric<cx::FrameMetric>("testMetric%1");
     retval.mMetric->setFrame(retval.m_qMt);
     retval.mMetric->setSpace(retval.mSpace);
 	this->insertData(retval.mMetric);
@@ -86,7 +85,7 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	retval.mName = "TestTool";
 	retval.mOffset = 5;
 
-	retval.mMetric = mServices->patient()->createSpecificData<cx::ToolMetric>();
+	retval.mMetric = this->createTestMetric<cx::ToolMetric>("testMetric%1");
 	retval.mMetric->setFrame(retval.m_qMt);
 	retval.mMetric->setSpace(retval.mSpace);
 	retval.mMetric->setToolName(retval.mName);
@@ -103,7 +102,7 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
     retval.mPoint = point;
 	retval.mSpace = cx::CoordinateSystem::reference();
 
-	retval.mMetric = mServices->patient()->createSpecificData<cx::PointMetric>();
+	retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
 	retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
 	this->insertData(retval.mMetric);
@@ -118,7 +117,7 @@ PlaneMetricWithInput MetricFixture::getPlaneMetricWithInput(cx::Vector3D point, 
 	retval.mPoint = point;
 	retval.mNormal = normal;
 
-	retval.mMetric = mServices->patient()->createSpecificData<cx::PlaneMetric>();
+	retval.mMetric = this->createTestMetric<cx::PlaneMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
 	this->insertData(retval.mMetric);
@@ -132,7 +131,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 
     retval.mDistance = distance;
 
-	retval.mMetric = mServices->patient()->createSpecificData<cx::DistanceMetric>();
+	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, p0);
 	retval.mMetric->getArguments()->set(1, p1);
 	this->insertData(retval.mMetric);
@@ -146,7 +145,7 @@ DistanceMetricWithInput MetricFixture::getDistanceMetricWithInput(double distanc
 
     retval.mDistance = distance;
 
-	retval.mMetric = mServices->patient()->createSpecificData<cx::DistanceMetric>();
+	retval.mMetric = this->createTestMetric<cx::DistanceMetric>("testMetric%1");
 	retval.mMetric->getArguments()->set(0, this->getPointMetricWithInput(cx::Vector3D(0,0,0)).mMetric);
 	retval.mMetric->getArguments()->set(1, this->getPointMetricWithInput(cx::Vector3D(distance,0,0)).mMetric);
 	this->insertData(retval.mMetric);
@@ -274,10 +273,14 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 {
 	std::vector<cx::DataMetricPtr> metrics;
 	cx::Vector3D pos(1,2,3);
+	cx::CoordinateSystem cs(cx::csPATIENTREF);
 
 	//Create one of each metric to test export and import on
-	cx::PointMetricPtr p = getPointMetricWithInput(pos).mMetric;
-	metrics.push_back(p);
+	cx::PointMetricPtr point = getPointMetricWithInput(pos).mMetric;
+	point->setSpace(cs);
+	metrics.push_back(point);
+	metrics.push_back(getToolMetricWithInput().mMetric);
+	metrics.push_back(getFrameMetricWithInput().mMetric);
 
 	foreach (cx::DataMetricPtr metric, metrics)
 	{
@@ -291,8 +294,7 @@ void MetricFixture::checkImportedMetricsEqualToExported(std::vector<cx::DataMetr
 {
 	foreach (cx::DataMetricPtr metric, origMetrics)
 	{
-		//The original metric will have uid = prefix0 when inserted in the patient. the imported will have prefix1.
-		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getUidPrefix() + "1");
+		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getType().split("Metric").at(0) + "1");
 		REQUIRE(importedMetric);
 		CHECK(metric != importedMetric); //don't compare the original metric to itself
 		CHECK(metric->getAsSingleLineString() == importedMetric->getAsSingleLineString());

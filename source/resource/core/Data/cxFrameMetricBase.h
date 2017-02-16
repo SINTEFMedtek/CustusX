@@ -69,8 +69,11 @@ public:
 	virtual bool showValueInGraphics() const { return false; }
 
 	virtual QString getParentSpace();
+
 protected:
 	QString matrixAsSingleLineString() const;
+	Transform3D getMatrixFromSingleLineString(QStringList& parameterList, int indexWhereMatrixStarts);
+
 	CoordinateSystem mSpace;
 	SpaceListenerPtr mSpaceListener;
 	Transform3D mFrame; ///< frame qFt described in local space q = mSpace

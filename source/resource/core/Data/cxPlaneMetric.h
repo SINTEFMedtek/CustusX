@@ -82,19 +82,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return getDefaultUidPrefix() + getMetricTypeSuffix();
-	}
-	virtual QString getUidPrefix() const
-	{
-		return getDefaultUidPrefix();
-	}
-	static QString getDefaultUidPrefix()
-	{
-		return "plane";
-	}
-	static QString getDefaultUid()
-	{
-		return getDefaultUidPrefix() + getDefaultUidSuffix();
+		return "planeMetric";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_plane.png");}
 	virtual QString getAsSingleLineString() const;
