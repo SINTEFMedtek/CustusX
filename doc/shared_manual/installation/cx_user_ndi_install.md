@@ -10,7 +10,7 @@ Windows
 -----------------------------------------------------------
 Windows install should work out of the box, but you might need to manually install the drivers.
 Follow the instructions in the ReadMe file which is in the installation folder of the toolbox,
-e.g.:
+e.g. C:\\Program files (x86)\\Northern Digital inc\\toolbox\\readme.htm
 
 	C:\Program files (x86)\Northern Digital inc\toolbox\readme.htm
 

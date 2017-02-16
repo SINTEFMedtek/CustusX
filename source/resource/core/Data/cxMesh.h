@@ -106,6 +106,7 @@ public:
 	const char * getOrientationArray();
 	const char * getColorArray();
 	const char * getGlyphLUT();
+	bool hasTexture() const;
 	QString getTextureShape();
 	QStringList getOrientationArrayList();
 	QStringList getColorArrayList();

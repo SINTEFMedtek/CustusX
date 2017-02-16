@@ -307,11 +307,11 @@ bool SharedOpenGLContext::uploadLUT(QString imageUid, vtkUnsignedCharArrayPtr lu
 		vtkTextureObjectPtr texture_object = this->get1DTextureForLUT(imageUid);
 		if(!texture_object.GetPointer()) //not uploaded
 		{
-			CX_LOG_DEBUG() << "lut for " << imageUid << " not_uploaded";
+			//CX_LOG_DEBUG() << "lut for " << imageUid << " not_uploaded";
 			texture_object = vtkTextureObjectPtr::New();
 			//CX_LOG_DEBUG() << "create new texture_object";
 		}
-		CX_LOG_DEBUG() << "lut for " << imageUid << " uploaded_but_modified";
+		//CX_LOG_DEBUG() << "lut for " << imageUid << " uploaded_but_modified";
 		success = this->create1DTextureObject(texture_object, width, dataType, numComps, data, mContext);
 		//CX_LOG_DEBUG() << "1D texture, handlet: " << texture_object->GetHandle() << " width: " << width << " numComps: " << numComps;
 		m1DTextureObjects[imageUid] = std::make_pair(texture_object, lutTable->GetMTime());
@@ -321,7 +321,7 @@ bool SharedOpenGLContext::uploadLUT(QString imageUid, vtkUnsignedCharArrayPtr lu
 		//do nothing
 		success = true;
 		//TODO these never happens for some reason, someone is setting LUT as modified
-		CX_LOG_DEBUG() << "----------------- lut for " << imageUid << " uploade_and_not_modified";
+		//CX_LOG_DEBUG() << "----------------- lut for " << imageUid << " uploade_and_not_modified";
 	}
 	report_gl_error();
 

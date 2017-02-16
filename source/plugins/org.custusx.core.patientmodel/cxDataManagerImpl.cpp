@@ -336,7 +336,7 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	dataManagerNode.appendChild(centerNode);
 
     QDomElement otNode = doc.createElement("operatingTable");
-    otNode.appendChild(doc.createTextNode(qstring_cast(mOperatingTable.rMtb)));
+	otNode.appendChild(doc.createTextNode(qstring_cast(mOperatingTable.rMot)));
     dataManagerNode.appendChild(otNode);
 
 	for (DataMap::const_iterator iter = mData.begin(); iter != mData.end(); ++iter)
