@@ -51,6 +51,12 @@ void MeshPropertyData::initialize()
 									   "Mesh color",
 									   QColor("red"));
 	this->addProperty(mColor);
+
+	//-------------------------------------------------------------------------
+	mUseColorFromPolydataScalars = BoolProperty::initialize( "colorFromPolydataScalars", "Color from polydata scalars",
+									   "If your polydata has a scalar array with color data in you can use that to color the mesh.",
+									   false);
+	this->addProperty(mUseColorFromPolydataScalars);
 	//-------------------------------------------------------------------------
 	mVisSize = DoubleProperty::initialize("visSize", "Point size",
 										  "Visualized size of points, glyphs etc.",

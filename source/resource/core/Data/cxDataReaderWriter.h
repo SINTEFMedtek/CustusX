@@ -163,7 +163,7 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
-/**\brief Reader for .vtk files.
+/**\brief Reader for .vtp files.
  *
  */
 class cxResource_EXPORT XMLPolyDataMeshReader: public DataReader
