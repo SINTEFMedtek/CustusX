@@ -281,6 +281,7 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 	metrics.push_back(point);
 	metrics.push_back(getToolMetricWithInput().mMetric);
 	metrics.push_back(getFrameMetricWithInput().mMetric);
+	metrics.push_back(getDistanceMetricWithInput(123).mMetric);
 
 	foreach (cx::DataMetricPtr metric, metrics)
 	{
@@ -297,7 +298,8 @@ void MetricFixture::checkImportedMetricsEqualToExported(std::vector<cx::DataMetr
 		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getType().split("Metric").at(0) + "1");
 		REQUIRE(importedMetric);
 		CHECK(metric != importedMetric); //don't compare the original metric to itself
-		CHECK(metric->getAsSingleLineString() == importedMetric->getAsSingleLineString());
+		//CHECK(metric->getAsSingleLineString() == importedMetric->getAsSingleLineString());
+		CHECK(metric->isEqual(importedMetric));
 	}
 }
 

@@ -77,8 +77,9 @@ QString FrameMetric::getAsSingleLineString() const
 
 void FrameMetric::updateFromSingleLineString(QStringList& parameterList)
 {
+	DataMetric::updateFromSingleLineString(parameterList);
 	this->setSpaceFromSingleLineString(parameterList);
-	this->setFrame(this->getMatrixFromSingleLineString(parameterList, 3));
+	this->setFrame(this->getMatrixFromSingleLineString(parameterList, 4));
 }
 
 

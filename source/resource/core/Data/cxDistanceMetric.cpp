@@ -193,3 +193,9 @@ QString DistanceMetric::getAsSingleLineString() const
 }
 
 }
+
+
+bool cx::DistanceMetric::isEqual(cx::DataMetricPtr metric)
+{
+	return this->getSingleLineHeader() == metric->getSingleLineHeader();
+}

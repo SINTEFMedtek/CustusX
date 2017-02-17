@@ -119,8 +119,9 @@ QString ToolMetric::getAsSingleLineString() const
 
 void ToolMetric::updateFromSingleLineString(QStringList& parameterList)
 {
+	DataMetric::updateFromSingleLineString(parameterList);
 	this->setSpaceFromSingleLineString(parameterList);
-	int i = 3;
+	int i = 4;
 	this->setToolName(parameterList.at(i++));
 	this->setToolOffset(parameterList.at(i++).toDouble());
 	this->setFrame(this->getMatrixFromSingleLineString(parameterList, i));

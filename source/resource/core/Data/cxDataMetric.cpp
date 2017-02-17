@@ -59,14 +59,28 @@ QString DataMetric::getSpace()
 
 void DataMetric::setSpaceFromSingleLineString(QStringList& parameterList)
 {
-	this->setSpace(CoordinateSystem::fromString(parameterList.at(2)));
+	this->setSpace(CoordinateSystem::fromString(parameterList.at(3)));
+}
+
+void DataMetric::updateFromSingleLineString(QStringList& parameterList)
+{
+	int i = 1;
+	this->setName(parameterList.at(i));
+	++i;
+	this->setColor(QColor(parameterList.at(i)));
+}
+
+bool DataMetric::isEqual(DataMetricPtr metric)
+{
+	return this->getAsSingleLineString() == metric->getAsSingleLineString();
 }
 
 QString DataMetric::getSingleLineHeader() const
 {
-	return QString("%1 \"%2\"")
+	return QString("%1 \"%2\" %3")
 			.arg(this->getType())
-			.arg(mName);
+			.arg(mName)
+			.arg(mColor.name(QColor::HexArgb));
 }
 
 void DataMetric::setColor(const QColor& color)

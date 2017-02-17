@@ -47,6 +47,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class SpaceListener> SpaceListenerPtr;
+typedef boost::shared_ptr<class DataMetric> DataMetricPtr;
 
 /**
  * \file
@@ -76,6 +77,8 @@ public:
 	virtual void setSpaceFromSingleLineString(QStringList& parameterList);
     virtual Vector3D getRefCoord() const = 0;
 	virtual QString getAsSingleLineString() const = 0;
+	void updateFromSingleLineString(QStringList& parameterList);
+	virtual bool isEqual(DataMetricPtr metric);
     virtual Transform3D getRefFrame() const { return createTransformTranslate(this->getRefCoord()); }
 	virtual bool isValid() const { return true; }
 	virtual QString getValueAsString() const = 0;
@@ -93,11 +96,14 @@ protected:
 	PatientModelServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
 
-	QString getSingleLineHeader() const;
+	//QString getSingleLineHeader() const;
 	QColor mColor;
 
+public:
+	QString getSingleLineHeader() const;
+
 };
-typedef boost::shared_ptr<DataMetric> DataMetricPtr;
+//typedef boost::shared_ptr<DataMetric> DataMetricPtr;
 
 /**
  * @}

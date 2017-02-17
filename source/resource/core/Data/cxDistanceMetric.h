@@ -106,6 +106,10 @@ private:
 	mutable OptionalValue<Vector3D> mCachedDirection;
 
 	void updateCache() const;
+
+	// DataMetric interface
+public:
+	virtual bool isEqual(DataMetricPtr metric);
 };
 
 /**

@@ -160,8 +160,9 @@ QString PointMetric::getAsSingleLineString() const
 
 void PointMetric::updateFromSingleLineString(QStringList& parameterList)
 {
+	DataMetric::updateFromSingleLineString(parameterList);
 	this->setSpaceFromSingleLineString(parameterList);
-	int firstCoordIndex = 3;
+	int firstCoordIndex = 4;
 	int x = firstCoordIndex;
 	int y = ++firstCoordIndex;
 	int z = ++firstCoordIndex;
