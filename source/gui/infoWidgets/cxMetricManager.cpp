@@ -255,20 +255,18 @@ void MetricManager::addROIButtonClickedSlot()
 void MetricManager::addDistanceButtonClickedSlot()
 {
 	DistanceMetricPtr d0 = patientService()->createSpecificData<DistanceMetric>("distance%1");
-//	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
-  d0->get_rMd_History()->setParentSpace("reference");
+	d0->get_rMd_History()->setParentSpace("reference");
 
-  std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
-  for (unsigned i=0; i<args.size(); ++i)
-	d0->getArguments()->set(i, args[i]);
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+	for (unsigned i=0; i<args.size(); ++i)
+		d0->getArguments()->set(i, args[i]);
 
-  this->installNewMetric(d0);
+	this->installNewMetric(d0);
 }
 
 void MetricManager::addAngleButtonClickedSlot()
 {
 	AngleMetricPtr d0 = patientService()->createSpecificData<AngleMetric>("angle%1");
-//	AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
   d0->get_rMd_History()->setParentSpace("reference");
 
   std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments(), 3);
@@ -415,6 +413,7 @@ void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics)
 		DataPtr metric = factory.create(metricType, defaultUid, metricList.at(1));
 		metric->updateFromSingleLineString(metricList);
 		patientService()->insertData(metric);
+		viewService()->getGroup(0)->addData(metric->getUid());
 	}
 
 
