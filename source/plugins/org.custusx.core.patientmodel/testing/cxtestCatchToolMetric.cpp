@@ -60,12 +60,12 @@ TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
 	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
 	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
 
-	REQUIRE(list[2]=="reference");
-	REQUIRE(list[3]==testData.mName);
-	REQUIRE(list[4].toDouble()==Approx(testData.mOffset));
+	REQUIRE(list[3]=="reference");
+	REQUIRE(list[4]==testData.mName);
+	REQUIRE(list[5].toDouble()==Approx(testData.mOffset));
 	INFO(list.join("\n"));
 	bool transformStringOk = false;
-	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(5, 16)).join(" "), &transformStringOk);
+	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(6, 17)).join(" "), &transformStringOk);
 	REQUIRE(transformStringOk);
 	REQUIRE(cx::similar(testData.m_qMt, readTransform));
 }

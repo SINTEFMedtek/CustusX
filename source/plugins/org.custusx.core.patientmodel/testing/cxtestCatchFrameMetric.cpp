@@ -52,7 +52,7 @@ TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
 }
 
-TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
+TEST_CASE("cxFrameMetric can convert values to single line string", "[unit]")
 {
     cxtest::MetricFixture fixture;
     cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
@@ -60,10 +60,10 @@ TEST_CASE("cxFrameMetric can convert transform to single line string", "[unit]")
 	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
 	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
 
-	REQUIRE(list[2]=="reference");
+	REQUIRE(list[3]=="reference");
 	INFO(list.join("\n"));
 	bool transformStringOk = false;
-	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(3, 16)).join(" "), &transformStringOk);
+	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(4, 17)).join(" "), &transformStringOk);
     REQUIRE(transformStringOk);
 	REQUIRE(cx::similar(testData.m_qMt, readTransform));
 }

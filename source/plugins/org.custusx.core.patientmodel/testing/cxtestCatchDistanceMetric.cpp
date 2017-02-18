@@ -106,7 +106,7 @@ TEST_CASE("DistanceMetric can convert values to single line string", "[unit]")
 	CHECK(fixture.verifySingleLineHeader(list, testData.mMetric));
 	INFO(list.join("\n"));
 	REQUIRE(list.length() > 2);
-    CHECK(list[2].toDouble() == Approx(distance));
+	CHECK(list[3].toDouble() == Approx(distance));
 }
 
 TEST_CASE("DistanceMetric can get a valid reference coordinate", "[unit]")
