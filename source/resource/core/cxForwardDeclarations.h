@@ -71,13 +71,13 @@ typedef boost::shared_ptr<class TrackedStream> TrackedStreamPtr;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
 typedef boost::weak_ptr<class GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
 typedef boost::weak_ptr<class GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 typedef boost::shared_ptr<class FiberBundle> FiberBundlePtr;
+typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
 
 // reps
 typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
@@ -163,26 +163,29 @@ typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 
 // other stuff
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+typedef boost::shared_ptr<class Filter> FilterPtr;
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
+typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class Presets> PresetsPtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
-typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
-typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
-
+typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
+typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
+typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
+typedef boost::shared_ptr<class SharedOpenGLContext> SharedOpenGLContextPtr;
+typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
 typedef boost::shared_ptr<class ViewGroup2D> ViewGroup2DPtr;
 typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
-
-typedef boost::shared_ptr<class SharedOpenGLContext> SharedOpenGLContextPtr;
-typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
-typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
-
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
-typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
-
-typedef boost::shared_ptr<class Filter> FilterPtr;
 
 } // namespace cx
 

@@ -46,7 +46,6 @@ class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 
 /**
  * \file

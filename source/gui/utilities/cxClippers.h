@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QDomNode;
 
 namespace cx {
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
 
 /**\brief Clipper container. Used by ClippersWidget.
  *

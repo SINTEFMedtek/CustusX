@@ -57,7 +57,6 @@ class ConsoleWidget;
 class DynamicMainWindowWidgets;
 class MainWindowActions;
 
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class LayoutInteractor> LayoutInteractorPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;

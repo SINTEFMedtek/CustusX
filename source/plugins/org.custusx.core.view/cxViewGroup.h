@@ -51,7 +51,6 @@ typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file

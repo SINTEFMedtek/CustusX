@@ -82,8 +82,6 @@ private:
 	std::vector<QString> mDefaultLayouts;
 };
 
-typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
-
 } // namespace cx
 
 

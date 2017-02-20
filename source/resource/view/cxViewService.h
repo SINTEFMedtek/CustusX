@@ -50,16 +50,6 @@ class QActionGroup;
 namespace cx
 {
 
-//TODO move to cxForwardDeclarations
-typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
-typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
-
 enum cxResourceVisualization_EXPORT CAMERA_STYLE_TYPE
 {
 	cstDEFAULT_STYLE, cstTOOL_STYLE, cstANGLED_TOOL_STYLE, cstUNICAM_STYLE, cstCOUNT

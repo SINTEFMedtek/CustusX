@@ -50,10 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-
-
-
 /**
  * \class TrackPadWidget
  *
