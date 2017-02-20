@@ -112,6 +112,7 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+	mVtkPolyDataOriginal = mVtkPolyData;
 	mOrientationArrayList.clear();
 	mColorArrayList.clear();
 
@@ -333,6 +334,8 @@ void Mesh::updateVtkPolyDataWithTexture()
 	if (!this->hasTexture())
 	{
 		mVtkTexture = vtkTexturePtr::New();
+		if(mVtkPolyDataOriginal)
+		  mVtkPolyData = mVtkPolyDataOriginal;
 		return;
 	}
 

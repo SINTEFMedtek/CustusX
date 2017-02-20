@@ -131,6 +131,7 @@ private:
 	PatientModelServicePtr mPatientModelService;
 	SpaceProviderPtr mSpaceProvider;
 	vtkPolyDataPtr mVtkPolyData;
+	vtkPolyDataPtr mVtkPolyDataOriginal;
 	vtkTexturePtr mVtkTexture;
 	bool createTextureMapper(vtkDataSetAlgorithmPtr &tMapper);
 	bool mHasGlyph;
