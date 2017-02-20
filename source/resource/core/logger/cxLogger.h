@@ -102,7 +102,7 @@ cxResource_EXPORT void reportVolatile(QString msg);
 
 
 /** Macro for creating debug marks in the code.
-  *	Usage:
+  *	Usage: One of the following:
   *		CX_LOG_DEBUG_CHECKPOINT();
   *		CX_LOG_DEBUG_CHECKPOINT() << "Message " << "to output";
   */
