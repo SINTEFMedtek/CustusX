@@ -208,17 +208,17 @@ void Mesh::setColor(const QColor& color)
 
 QColor Mesh::getColor()
 {
-  return mProperties.mColor->getValue();
+	return mProperties.mColor->getValue();
 }
 
 void Mesh::setUseColorFromPolydataScalars(bool on)
 {
-  mProperties.mUseColorFromPolydataScalars->setValue(on);
+	mProperties.mUseColorFromPolydataScalars->setValue(on);
 }
 
 bool Mesh::getUseColorFromPolydataScalars() const
 {
-  return mProperties.mUseColorFromPolydataScalars->getValue();
+	return mProperties.mUseColorFromPolydataScalars->getValue();
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
