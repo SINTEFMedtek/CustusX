@@ -2,7 +2,6 @@
 #define CXMETRICUTILITIES_H
 
 #include "cxViewService.h"
-#include "cxPatientModelService.h"
 #include "cxDataMetricWrappers.h"
 #include "cxBaseWidget.h"
 

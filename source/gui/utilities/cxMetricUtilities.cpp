@@ -5,7 +5,8 @@
 #include "cxDataInterface.h"
 #include "cxLabeledLineEditWidget.h"
 #include "cxLogger.h"
-#include"cxVisServices.h"
+#include "cxVisServices.h"
+#include "cxPatientModelService.h"
 
 namespace
 {
