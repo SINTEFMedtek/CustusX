@@ -30,7 +30,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include <map>
 #include "cxManualImage2ImageRegistrationWidget.h"
 #include "cxRegistrationService.h"
 #include "cxData.h"
@@ -42,13 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationTransform.h"
 #include "cxLandmark.h"
 
-#include "vtkMatrix4x4.h"
 #include "vtkMath.h"
 
 namespace cx
 {
 
-//typedef std::map<QString, class Landmark> LandmarkMap;
 
 ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServicesPtr services, QWidget *parent, QString objectName) :
 	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
@@ -93,23 +90,7 @@ Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
     Transform3D current_rMd = history->getCurrentRegistration().mValue;
 
     fMm = current_rMd * init_rMd.inv();
-//    std::vector<RegistrationTransform> transformVector = history->getData();
-//    std::vector<RegistrationTransform>::const_iterator it = history->getData().begin();
-//    QString type = it->mType;
-//    Transform3D init_rMd = it->mValue;
-//    std::cout << " **************** " << std::endl;
-//    std::cout << "Moving Image transform vector size : " << history->getData().size() << std::endl;
-//    std::cout << "Moving Image transform type : " << type.toStdString().c_str() << std::endl;
-//    std::cout << "Moving Image initial rMd : " << std::endl;
-//    std::cout << " **************** " << std::endl;
-//    init_rMd.getVtkMatrix()->Print(std::cout);
 
-//    std::cout << "Fixed Image rMd : " << std::endl;
-//    rMf.getVtkMatrix()->Print(std::cout);
-//    std::cout << "Moving Image rMd : " << std::endl;
-//    rMm.getVtkMatrix()->Print(std::cout);
-//    std::cout << "Resulting matrix fMm : " << std::endl;
-//    fMm.getVtkMatrix()->Print(std::cout);
     return fMm;
 }
 
@@ -128,7 +109,6 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 	//                fQm = fMr * delta * rMm
 	Transform3D delta = rMf * fQm * rMm.inv();
 
-    // New code
     RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
     Transform3D init_rMd = history->getData().front().mValue;
     Transform3D new_rMd = M * init_rMd;
@@ -167,7 +147,7 @@ double ManualImage2ImageRegistrationWidget::getAverageAccuracy(int& numActiveLan
         }
     }
     if (numActiveLandmarks == 0)
-        return 1000;
+        return 1000.0;
     return (sqrt(sum / (double)numActiveLandmarks));
 }
 
@@ -178,7 +158,7 @@ double ManualImage2ImageRegistrationWidget::getAccuracy(QString uid)
         return 1000.0;
     DataPtr movingData = mServices->registration()->getMovingData();
     if (!movingData)
-        return 1000;
+        return 1000.0;
 
     Landmark masterLandmark = fixedData->getLandmarks()->getLandmarks()[uid];
     Landmark targetLandmark = movingData->getLandmarks()->getLandmarks()[uid];
@@ -201,7 +181,6 @@ double ManualImage2ImageRegistrationWidget::getAccuracy(QString uid)
     masterPoint[1] = p_master_r[1];
     masterPoint[2] = p_master_r[2];
 
-//    return (p_target_r - p_master_r).length();
     return (vtkMath::Distance2BetweenPoints(targetPoint, masterPoint));
 }
 
