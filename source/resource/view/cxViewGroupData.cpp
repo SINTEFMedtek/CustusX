@@ -673,14 +673,6 @@ void ViewGroupData::parseXml(QDomNode dataNode)
 	this->setOptions(options);
 }
 
-//TODO remove - not needed anymore
-/*
-void ViewGroupData::setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext)
-{
-	mSharedOpenGLContext = sharedOpenGLContext;
-}
-*/
-
 void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)
 {
 	ViewGroupData::Options options = this->getOptions();

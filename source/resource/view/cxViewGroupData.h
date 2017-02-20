@@ -176,8 +176,6 @@ public:
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
 
-	//void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
-
 private slots:
 	void purgeDataNotExistingInPatientModelService();
 
@@ -205,7 +203,6 @@ private:
 	bool contains(QString uid) const;
 	void createSliceDefinitionProperty();
 	void insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item);
-	//setSharedOpenGLContextvoid upload3DTextureIfImageToSharedContext(QString uid);
 
 	QString mUid;
 	CoreServicesPtr mServices;
