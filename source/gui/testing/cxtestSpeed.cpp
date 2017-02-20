@@ -121,7 +121,6 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews on", "[speed][
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
 
-	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -137,7 +136,6 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews off", "[speed]
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
 
-	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -156,7 +154,6 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration]"
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkGPUVolumeRayCastMapper", QString::number(fps));
 
-	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -175,7 +172,6 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
 
-	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -190,7 +186,6 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
 
-	// TODO: enter this value into config file
 //	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
@@ -208,7 +203,6 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
-	// TODO: enter this value into config file
 //	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
