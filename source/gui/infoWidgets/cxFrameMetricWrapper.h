@@ -51,7 +51,7 @@ class cxGui_EXPORT FrameMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-	explicit FrameMetricWrapper(VisServicesPtr services, cx::FrameMetricPtr data);
+	explicit FrameMetricWrapper(VisServicesPtr services, FrameMetricPtr data);
   virtual ~FrameMetricWrapper();
   virtual QWidget* createWidget();
   virtual QString getValue() const;

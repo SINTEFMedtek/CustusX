@@ -56,7 +56,7 @@ class cxGui_EXPORT ImportDataDialog : public QDialog
 {
   Q_OBJECT
 public:
-  ImportDataDialog(PatientModelServicePtr patientModelService, cx::ViewServicePtr viewService, QString filename, QWidget* parent=NULL);
+  ImportDataDialog(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QString filename, QWidget* parent=NULL);
   virtual ~ImportDataDialog();
 
 public:
