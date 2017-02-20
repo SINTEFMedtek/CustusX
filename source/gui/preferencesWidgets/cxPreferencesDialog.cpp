@@ -559,6 +559,7 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab(stateService, trackingService), tr("Tool Configuration"));
   this->addTab(new OperatingTableTab(services), tr("Table"));
+  this->addTab(new DebugTab(patientModelService, trackingService), tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
 
