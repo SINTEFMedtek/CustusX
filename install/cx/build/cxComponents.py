@@ -268,7 +268,16 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('2.4.13.1')
+        # OpenCV version 2.4.13.2 don't work on OSX 10.9.5, and verison 2.4.13.1 don't work on OSX 10.11.6
+        if (platform.system() == 'Darwin'):
+            v, _, _ = platform.mac_ver()
+            v = int(v.split('.')[1])
+            if (v < 10):
+                self._getBuilder().gitCheckout('2.4.13.1') # OSX 10.9 and lower
+            else:
+                self._getBuilder().gitCheckout('2.4.13.2') # OSX 10.10 and higher
+        else:
+            self._getBuilder().gitCheckout('2.4.13.2')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
