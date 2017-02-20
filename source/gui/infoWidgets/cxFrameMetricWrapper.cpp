@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QHBoxLayout>
 #include "cxLabeledComboBoxWidget.h"
 #include "cxSpaceProvider.h"
-#include "cxPatientModelService.h"
 #include "cxSpaceEditWidget.h"
 #include "cxVisServices.h"
 
