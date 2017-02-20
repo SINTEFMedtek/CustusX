@@ -95,7 +95,8 @@ LayoutData LayoutData::create(QString uid, QString name, int rows, int cols)
 }
 
 LayoutData::LayoutData() :
-	mName("unnamed")
+	mName("unnamed"),
+	mOffScreenRendering(false)
 {
 	mSize = LayoutPosition(0, 0);
 	this->resize(0, 0);
@@ -277,6 +278,7 @@ void LayoutData::addXml(QDomNode node) const
 
 	elem.setAttribute("uid", mUid);
 	elem.setAttribute("name", mName);
+	elem.setAttribute("offScreenRendering", mOffScreenRendering);
 
 	QDomElement size = doc.createElement("size");
 	size.setAttribute("row", mSize.row);
@@ -299,6 +301,7 @@ void LayoutData::parseXml(QDomNode node)
 	QDomElement elem = node.toElement();
 	mUid = elem.attribute("uid");
 	mName = elem.attribute("name");
+	mOffScreenRendering = elem.attribute("offScreenRendering").toInt();
 
 	QDomElement size = elem.namedItem("size").toElement();
 	mSize.row = size.attribute("row").toInt();

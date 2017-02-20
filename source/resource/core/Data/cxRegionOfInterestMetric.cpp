@@ -209,6 +209,13 @@ QString RegionOfInterestMetric::getAsSingleLineString() const
 	return "bb";
 }
 
+template<class ITER>
+void transform_coord_range(ITER begin, ITER end, Transform3D M)
+{
+	for ( ; begin!=end; ++begin)
+		*begin = M.coord(*begin);
+}
+
 RegionOfInterest RegionOfInterestMetric::getROI() const
 {
 	RegionOfInterest retval;
@@ -220,7 +227,7 @@ RegionOfInterest RegionOfInterestMetric::getROI() const
 		retval.mPoints.push_back(this->getToolTip_r());
 	}
 
-	std::map<QString, DataPtr> alldata = mDataManager->getData();
+	std::map<QString, DataPtr> alldata = mDataManager->getDatas();
 	for (std::map<QString, DataPtr>::const_iterator i=alldata.begin(); i!=alldata.end(); ++i)
 	{
 		if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(i->second))
@@ -228,13 +235,16 @@ RegionOfInterest RegionOfInterestMetric::getROI() const
 
 		if (mContainedData.contains(i->first))
 		{
-			std::vector<Vector3D> c = this->getCorners_r(i->second);
+			std::vector<Vector3D> c = i->second->getPointCloud();
+			transform_coord_range(c.begin(), c.end(), i->second->get_rMd());
 			std::copy(c.begin(), c.end(), back_inserter(retval.mPoints));
 		}
 
 		if (mMaxBoundsData == i->first)
 		{
-			retval.mMaxBoundsPoints = this->getCorners_r(i->second);
+			std::vector<Vector3D> c = i->second->getPointCloud();
+			transform_coord_range(c.begin(), c.end(), i->second->get_rMd());
+			retval.mMaxBoundsPoints = c;
 		}
 	}
 
@@ -247,22 +257,6 @@ Vector3D RegionOfInterestMetric::getToolTip_r() const
 												   CoordinateSystem::reference());
 	Vector3D tp = rMto.coord(Vector3D(0, 0, 0));
 	return tp;
-}
-
-std::vector<Vector3D> RegionOfInterestMetric::getCorners_r(DataPtr data) const
-{
-	DoubleBoundingBox3D bb = data->boundingBox();
-	std::vector<Vector3D> retval;
-
-	for (unsigned x=0; x<2; ++x)
-		for (unsigned y=0; y<2; ++y)
-			for (unsigned z=0; z<2; ++z)
-				retval.push_back(bb.corner(x,y,z));
-
-	for (unsigned i=0; i<retval.size(); ++i)
-		retval[i] = data->get_rMd().coord(retval[i]);
-
-	return retval;
 }
 
 }

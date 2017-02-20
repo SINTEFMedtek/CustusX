@@ -258,6 +258,8 @@ void ViewWrapper2D::removeAndResetMultiSliceRep()
 void ViewWrapper2D::createAndAddMultiSliceRep()
 {
 #ifndef CX_VTK_OPENGL2
+	if (mMultiSliceRep)
+		return;
 	mMultiSliceRep = Texture3DSlicerRep::New();
 	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
@@ -268,21 +270,26 @@ void ViewWrapper2D::createAndAddMultiSliceRep()
 
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
+ * Fix: now reuses slicer, seem to have fixed issue.
  *
  */
 void ViewWrapper2D::recreateMultiSlicer()
 {
 	this->removeAndResetSliceRep();
-    this->removeAndResetMultiSliceRep();
 
     if (!this->useGPU2DRendering())
+	{
+		this->removeAndResetMultiSliceRep();
 		return;
+	}
 
     this->createAndAddMultiSliceRep();
 
 #ifndef CX_VTK_OPENGL2
 	if (mGroupData)
 		mMultiSliceRep->setImages(this->getImagesToView());
+	else
+		mMultiSliceRep->setImages(std::vector<ImagePtr>());
 #endif
 
     this->viewportChanged();

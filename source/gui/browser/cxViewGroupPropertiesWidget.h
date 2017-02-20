@@ -71,9 +71,13 @@ private:
   VisServicesPtr mServices;
   QVBoxLayout* mLayout;
 
+  DoublePropertyPtr mCameraViewAngle;
   BoolPropertyPtr mCameraFollowTool;
   BoolPropertyPtr mFocusFollowTool;
   BoolPropertyPtr mCameraOnTooltip;
+
+  DoublePropertyPtr mCameraTooltipOffset;
+  StringPropertyBasePtr mCameraNotBehindROI;
   BoolPropertyPtr mTableLock;
   BoolPropertyPtr mUniCam;
   DoublePropertyPtr mElevation;

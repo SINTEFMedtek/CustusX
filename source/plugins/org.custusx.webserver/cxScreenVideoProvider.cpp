@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QScreen>
 #include <QVBoxLayout>
 #include "cxViewService.h"
-//#include "cxSecondaryViewLayoutWindow.h"
 #include "cxViewCollectionWidget.h"
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
@@ -50,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedCharArray.h"
 #include <QPainter>
 #include "cxViewCollectionImageWriter.h"
+#include <QScrollArea>
 
 namespace cx
 {
@@ -118,15 +118,31 @@ QPixmap ScreenVideoProvider::grabScreen(unsigned screenid)
 \
 void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 {
-//	std::cout << "show window" << std::endl;
-	if (!mSecondaryViewLayoutWindow)
+	if (!mTopWindow)
+	{
+		mTopWindow = new QWidget;
+		mTopWindow->setLayout(new QVBoxLayout);
+		mTopWindow->layout()->setMargin(0);
+
+		QScrollArea* scrollArea = new QScrollArea;
+		scrollArea->setBackgroundRole(QPalette::Dark);
+		mTopWindow->layout()->addWidget(scrollArea);
+
 		mSecondaryViewLayoutWindow = new SecondaryViewLayoutWindow(NULL, mServices->view());
-	mSecondaryViewLayoutWindow->show();
+		scrollArea->setWidget(mSecondaryViewLayoutWindow);
+		scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+		scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+	}
+	mTopWindow->show();
 
 	this->setWidgetToNiceSizeInLowerRightCorner(size);
 
     if (!layout.isEmpty())
         mServices->view()->setActiveLayout(layout, mSecondaryViewLayoutWindow->mSecondaryLayoutId);
+
+	ViewCollectionWidget* layoutWidget = this->getSecondaryLayoutWidget();
+	layoutWidget->setGridMargin(0);
+	layoutWidget->setGridSpacing(0);
 }
 
 void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
@@ -134,18 +150,35 @@ void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
-	QWidget* screen = desktop->screen(desktop->screenNumber(mSecondaryViewLayoutWindow));
-	QRect geo = screen->geometry();
+	QRect rect_s = desktop->availableGeometry(mTopWindow);
 
+	// default to 33% of the screen
 	if (size.width()==0 || size.height()==0)
 	{
-		size = QSize(geo.width()/3, geo.height()/3);
+		size = QSize(rect_s.width()/3, rect_s.height()/3);
 	}
 
-	QRect rect = QRect(QPoint(geo.width()-size.width(),geo.height()-size.height()), size);
-	mSecondaryViewLayoutWindow->setGeometry(rect);
-	rect = mSecondaryViewLayoutWindow->frameGeometry();
-	mSecondaryViewLayoutWindow->move(geo.width()-rect.width(),geo.height()-rect.height());
+	QRect rect_full = QRect(QPoint(0,0), size);
+
+	// constrain widget to a max of 75% of the screen
+	size = QSize(std::min<int>(size.width(), rect_s.width()*0.75),
+				 std::min<int>(size.height(), rect_s.height()*0.75));
+	// make sure all of scroll area is visible:
+	int margin = 20;
+	size = QSize(size.width()+margin, size.height()+margin);
+	mTopWindow->setGeometry(QRect(QPoint(0,0), size));
+
+	// reposition window to lower right corner:
+	QRect rect_t = mTopWindow->frameGeometry();
+	mTopWindow->move(rect_s.topLeft()
+					 + QPoint(rect_s.width(), rect_s.height())
+					 - QPoint(rect_t.width(), rect_t.height()));
+
+	// set size of canvas inside widget where stuff is rendered:
+	mSecondaryViewLayoutWindow->setGeometry(rect_full);
+
+	qDebug() << "layout onscreen: " << mTopWindow->geometry();
+	qDebug() << "layout internal: " << mSecondaryViewLayoutWindow->geometry();
 }
 
 void ScreenVideoProvider::closeSecondaryLayout()

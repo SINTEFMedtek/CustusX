@@ -134,7 +134,7 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
     Transform3D new_rMd = M * init_rMd;
     Transform3D delta2 = new_rMd * rMm.inv();
 
-    mServices->registration()->applyImage2ImageRegistration(delta2, "Manual Image");
+    mServices->registration()->addImage2ImageRegistration(delta2, "Manual Image");
     this->updateAverageAccuracyLabel();
 
 

@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
 #include "cxViewService.h"
+#include "cxBoolProperty.h"
+#include "cxHelperWidgets.h"
 
 namespace cx
 {
@@ -60,11 +62,12 @@ LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
   nameLayout->addWidget(new QLabel("Name"));
   nameLayout->addWidget(mNameEdit);
 
+
   // create the row/column bar
   mRowsEdit = new QSpinBox;
-  mRowsEdit->setRange(1,10);
+  mRowsEdit->setRange(1,LayoutData::MaxGridSize);
   mColsEdit = new QSpinBox;
-  mColsEdit->setRange(1,10);
+  mColsEdit->setRange(1,LayoutData::MaxGridSize);
   connect(mRowsEdit, SIGNAL(valueChanged(int)), this, SLOT(rowsColumnsChangedSlot()));
   connect(mColsEdit, SIGNAL(valueChanged(int)), this, SLOT(rowsColumnsChangedSlot()));
   mRCLayout->addWidget(new QLabel("Rows"));
@@ -87,6 +90,15 @@ LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
   mSelection = LayoutRegion(-1,-1);
   initCache();
 
+  mOffScreenRendering = BoolProperty::initialize("Offscreeen Render", "",
+											   "Render the layout to memory only.\n"
+											   "This will cause the displayed area to be black,\n"
+											   "but the application can access the rendering programatically.",
+											   false);
+  mTopLayout->addWidget(sscCreateDataWidget(this, mOffScreenRendering));
+  connect(mOffScreenRendering.get(), &BoolProperty::changed, this, &LayoutEditorWidget::onOffScreenRenderingChanged);
+
+
   this->updateGrid();
 }
 
@@ -99,6 +111,11 @@ void LayoutEditorWidget::setLayoutData(const LayoutData& data)
 LayoutData LayoutEditorWidget::getLayoutData() const
 {
   return mViewData;
+}
+
+void LayoutEditorWidget::onOffScreenRenderingChanged()
+{
+	mViewData.setOffScreenRendering(mOffScreenRendering->getValue());
 }
 
 void LayoutEditorWidget::nameChanged()
@@ -364,6 +381,7 @@ void LayoutEditorWidget::updateGrid()
   }
 
   mNameEdit->setText(mViewData.getName());
+  mOffScreenRendering->setValue(mViewData.getOffScreenRendering());
 //  mRowsEdit->setText(qstring_cast(mViewData.size().row));
 //  mColsEdit->setText(qstring_cast(mViewData.size().col));
 
@@ -413,8 +431,8 @@ void LayoutEditorWidget::clearDisplay()
 
 void LayoutEditorWidget::initCache()
 {
-  int maxRows = 10;
-  int maxCols = 10;
+  int maxRows = LayoutData::MaxGridSize;
+  int maxCols = LayoutData::MaxGridSize;
   mViewDataCache.resize(maxRows);
 
   for (int r = 0; r < maxRows; ++r)

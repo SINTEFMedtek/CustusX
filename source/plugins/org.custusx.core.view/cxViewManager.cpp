@@ -179,7 +179,7 @@ NavigationPtr ViewManager::getNavigation(int group)
 
 QWidget *ViewManager::getLayoutWidget(int index)
 {
-    if (index >= mLayoutWidgets.size())
+	if (index >= mLayoutWidgets.size())
         return NULL;
    return mLayoutWidgets[index];
 }
@@ -188,19 +188,17 @@ QWidget *ViewManager::createLayoutWidget(QWidget* parent, int index)
 {
 	if (index >= mLayoutWidgets.size())
 		return NULL;
-//	CX_ASSERT(index < mLayoutWidgets.size()); // removed: must be allowed to iterate until NULL
+
 	if (!mLayoutWidgets[index])
 	{
         bool optimizedViews = settings()->value("optimizedViews").toBool();
 
 		if (optimizedViews)
 		{
-//			report("creating optimized wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout();
 		}
 		else
 		{
-//			report("creating classic wiew layout");
 			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout();
 		}
 
@@ -474,6 +472,8 @@ void ViewManager::activateViews(ViewCollectionWidget *widget, LayoutData next)
 	if (!widget)
 		return;
 
+	widget->setOffScreenRenderingAndClear(next.getOffScreenRendering());
+
 	for (LayoutData::iterator iter = next.begin(); iter != next.end(); ++iter)
 		this->activateView(widget, *iter);
 }
@@ -687,6 +687,16 @@ void ViewManager::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 void ViewManager::addDefaultLayout(LayoutData layoutData)
 {
 	mLayoutRepository->addDefault(layoutData);
+}
+
+void ViewManager::enableContextMenuForViews(bool enable)
+{
+	for(int i=0; i<mLayoutWidgets.size(); ++i)
+	{
+		ViewCollectionWidget* widget = mLayoutWidgets[i];
+		if(widget)
+			widget->enableContextMenuForViews(enable);
+	}
 }
 
 } //namespace cx

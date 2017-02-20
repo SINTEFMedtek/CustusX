@@ -38,6 +38,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+namespace {
+bool isBogusQtWarning(QString msg)
+{
+	// appears a lot on mac
+	// seems to be a bug in qt:
+	// http://stackoverflow.com/questions/33545006/qt5-attempt-to-set-a-screen-on-a-child-window-many-runtime-warning-messages
+	if (msg.contains("QScreen(") &&
+			msg.contains("): Attempt to set a screen on a child window."))
+		return true;
+	return false;
+}
+}
+
 void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
 {
 	MESSAGE_LEVEL level;// = mlINFO;
@@ -52,6 +65,8 @@ void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, c
 		level = mlDEBUG;
 		break;
 	case QtWarningMsg:
+		if (isBogusQtWarning(msg))
+			return;
 		level = mlWARNING;
 		break;
 	case QtCriticalMsg:

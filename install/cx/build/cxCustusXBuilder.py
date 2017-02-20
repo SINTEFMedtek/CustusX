@@ -113,7 +113,9 @@ class CustusXBuilder:
         #else:
         #    shell.run('make package')
 
-        self._movePackageToStandardLocation()        
+        self._movePackageToStandardLocation()
+        self._moveUserDocsToStandardLocation()
+        self._moveDevDocsToStandardLocation()
 
     def _movePackageToStandardLocation(self):
         installer = self.createInstallerObject(installer_path=self._getInitialInstallerPackagePath())
@@ -122,6 +124,22 @@ class CustusXBuilder:
         dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
         PrintFormatter.printInfo('Copying package files from [%s] to [%s]'%(source,dest))
         shell.cp(source, dest)
+
+    def _moveUserDocsToStandardLocation(self):
+        installer_path=self._getInitialInstallerPackagePath()
+        source = '%s/%s' % (installer_path, "doc/html_pure")
+        if os.path.exists(source):
+            dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
+            PrintFormatter.printInfo('Copying user doc files from [%s] to [%s]'%(source,dest))
+            shutil.copytree(source, dest)
+
+    def _moveDevDocsToStandardLocation(self):
+        installer_path=self._getInitialInstallerPackagePath()
+        source = '%s/%s' % (installer_path, "doc/html_dev")
+        if os.path.exists(source):
+            dest = '%s/%s' % (self._getStandardInstallerPackagePath(), os.path.basename(source))
+            PrintFormatter.printInfo('Copying dev doc files from [%s] to [%s]'%(source,dest))
+            shutil.copytree(source, dest)
 
     def createInstallerObject(self, installer_path=None):    
         if installer_path==None:
@@ -135,9 +153,10 @@ class CustusXBuilder:
         retval.setSourcePath(custusx.sourcePath())  
         retval.setTargetPlatform(self.assembly.controlData.getTargetPlatform())  
         retval.set_system_base_name(self.assembly.controlData.system_base_name)
-        
-        return retval      
-    
+        retval.set_release_notes_path(self.assembly.controlData.main_repo_folder, self.assembly.controlData.release_notes_relative_path)
+
+        return retval
+
     def removePreviousInstaller(self):
         PrintFormatter.printHeader('Removing previous installer', 3);
 
@@ -171,27 +190,31 @@ class CustusXBuilder:
         else:
             return custusx.buildPath()
 
-    def publishDocumentation(self, targetFolder):
+    def publishDocumentation(self, artefactFolder, targetFolder):
         '''
         Publish both user and developer documentation to remote server.
         targetFolder is relative to the default path
         '''
-        self.publishUserDocs(targetFolder)
-        self.publishDeveloperDocs(targetFolder)
+        self.publishUserDocs(artefactFolder, targetFolder)
+        self.publishDeveloperDocs(artefactFolder, targetFolder)
         
-    def publishDeveloperDocs(self, targetFolder):
+    def publishDeveloperDocs(self, artefactFolder, targetFolder):
         PrintFormatter.printHeader('Publish Developer Docs to server', level=2)
+        source = '%s/html_dev' %  artefactFolder
+        if not os.path.exists(source):
+            PrintFormatter.printInfo("Warning folder don't exist: [%s]" % source)
         target = self.assembly.controlData.publish_developer_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        source = '%s/doc/html_dev' %  custusx.buildPath()
         target_path = '%s/%s' % (target.path, targetFolder)        
         self.publish(source, target.server, target.user, target_path)
 
-    def publishUserDocs(self, targetFolder):
+    def publishUserDocs(self, artefactFolder, targetFolder):
         PrintFormatter.printHeader('Publish User Docs to server', level=2)
+        source = '%s/html_pure' %  artefactFolder
+        if not os.path.exists(source):
+            PrintFormatter.printInfo("Warning folder don't exist: [%s]" % source)
         target = self.assembly.controlData.publish_user_documentation_target
         custusx = self._createComponent(cxComponents.CustusX)
-        source = '%s/doc/html_pure' %  custusx.buildPath()
         target_path = '%s/%s' % (target.path, targetFolder)        
         self.publish(source, target.server, target.user, target_path)
 

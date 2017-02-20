@@ -34,19 +34,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-DirectSignalListener::DirectSignalListener(QObject* object, const char* signal) : mReceived(false)
+DirectSignalListener::DirectSignalListener(QObject* object, const char* signal) :
+	mNumberOfSignalsReceived(0)
 {
-	connect(object, signal, this, SLOT(slot()));
+	connect(object, signal, this, SLOT(receive()));
 }
 
-void DirectSignalListener::slot()
+DirectSignalListener::~DirectSignalListener()
 {
-	mReceived = true;
 }
 
-bool DirectSignalListener::isReceived()
+void DirectSignalListener::receive()
 {
-	return mReceived;
+	mNumberOfSignalsReceived +=1;
+}
+
+bool DirectSignalListener::isReceived() const
+{
+	return  mNumberOfSignalsReceived > 0;
+}
+
+unsigned int DirectSignalListener::getNumberOfRecievedSignals() const
+{
+	return mNumberOfSignalsReceived;
 }
 
 } // namespace cxtest

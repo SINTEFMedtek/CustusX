@@ -55,14 +55,6 @@ All specific widgets are described here:
 - \subpage algorithms_widgets
 - See \ref plugins for more widgets
 
-Other core features:
-- \subpage org_custusx_resource_filter
-
-
-
-
-
-
 Workflow Steps {#feature_overview_workflow_steps}
 -----------------------------------------------------------
 
@@ -95,4 +87,10 @@ Several features can be fine-tuned in the preferences widget.
 - The *Automation Tab* determine if some actions are performed automatically when given critierions are fulfilled.
 - The *Visualization Tab* fine-tune some of the graphics.
 - The *Tool Configuration Tab* let you configure tracking tools.
+
+Other core features
+-----------------------------------------------------------
+- \subpage org_custusx_resource_filter
+- \subpage import_overview
+- \subpage export_overview
 

@@ -56,6 +56,7 @@ typedef boost::shared_ptr<class Image> ImagePtr;
 
 namespace cx
 {
+
 class RegistrationTransform;
 class LandmarkProperty;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
@@ -66,21 +67,22 @@ typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 /**
  * @brief The OperatingTable class
  *
- * The OT class holds a transform and is a coordinate system fixed relative to the OR.
- * Can be used to find up and down vectors.
- * Definition is like Dicom given that the patient lies on the back on the table, LPS.
+ * The OperatingTable holds a transform and is a coordinate system fixed relative to the reference, R.
+ * The definition is like Dicom, given that the patient lies on the back on the table, Left - Posterior - Superior.
+ * This is like the default R.
+ * The OT up direction can be changed in the preferences, and other objects can use it to find up and down vectors as needed.
  */
 struct cxResource_EXPORT OperatingTable
 {
     explicit OperatingTable()
-        : rMtb(Transform3D::Identity())
+		: rMot(Transform3D::Identity())
     {}
     explicit OperatingTable(Transform3D tr)
-        : rMtb(tr)
+		: rMot(tr)
     {}
-    Transform3D rMtb; ///< Transform from OT to reference space.
+	Transform3D rMot; ///< Transform from OT to reference space.
 
-	Vector3D getVectorUp() const {return rMtb.vector(Vector3D(0,-1,0));}
+	Vector3D getVectorUp() const {return rMot.vector(Vector3D(0,-1,0));} ///< Returns the table's up vector in R space.
 };
 
 
@@ -107,10 +109,15 @@ class cxResource_EXPORT PatientModelService : public QObject
 public:
 	virtual ~PatientModelService() {}
 
+	enum DataFilter
+	{
+		HideUnavailable,
+		AllData
+	};
+
 	// core Data interface
 	virtual void insertData(DataPtr data) = 0;
-	virtual std::map<QString, DataPtr> getData() const = 0;
-	virtual std::map<QString, DataPtr> getAllData() const = 0;
+	virtual std::map<QString, DataPtr> getDatas(DataFilter filter = HideUnavailable) const = 0;
 	/** Create Data object of given type.
 	 *
 	 *  uid must be unique, or contain the string %1 that will be replaced with a running
@@ -150,7 +157,7 @@ public:
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 	virtual QString addLandmark() = 0;
 	// utility
-	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform, bool continuous);
+	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
 	virtual QString getActivePatientFolder() const = 0;
 	QString generateFilePath(QString folderName, QString ending);
@@ -175,7 +182,7 @@ public:
 
 	static PatientModelServicePtr getNullObject();
 
-	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getData()
+	virtual void makeAvailable(const QString& uid, bool available) = 0;///<Exclude this data from getDatas()
 
 signals:
     void operatingTableChanged();
@@ -193,7 +200,7 @@ signals:
 template <class DATA>
 std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType() const
 {
-	std::map<QString, DataPtr> data = this->getData();
+	std::map<QString, DataPtr> data = this->getDatas();
 	std::map<QString, boost::shared_ptr<DATA> > retval;
 	for (std::map<QString, DataPtr>::const_iterator i=data.begin(); i!=data.end(); ++i)
 	{

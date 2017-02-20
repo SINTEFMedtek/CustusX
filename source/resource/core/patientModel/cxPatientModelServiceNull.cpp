@@ -55,14 +55,7 @@ DataPtr PatientModelServiceNull::createData(QString type, QString uid, QString n
 	return DataPtr();
 }
 
-std::map<QString, DataPtr> PatientModelServiceNull::getData() const
-{
-	printWarning();
-	std::map<QString, DataPtr> retval;
-	return retval;
-}
-
-std::map<QString, DataPtr> PatientModelServiceNull::getAllData() const
+std::map<QString, DataPtr> PatientModelServiceNull::getDatas(DataFilter filter) const
 {
 	printWarning();
 	std::map<QString, DataPtr> retval;
@@ -155,12 +148,12 @@ Vector3D PatientModelServiceNull::getCenter() const
 
 void PatientModelServiceNull::setOperatingTable(const OperatingTable &ot)
 {
-    printWarning();
+	printWarning();
 }
 
 OperatingTable PatientModelServiceNull::getOperatingTable() const
 {
-    return OperatingTable(Transform3D::Identity());
+	return OperatingTable(Transform3D::Identity());
 }
 
 QString PatientModelServiceNull::addLandmark()
@@ -176,12 +169,14 @@ void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)
 
 void PatientModelServiceNull::printWarning() const
 {
-//	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
+	//This warning is disabled as the null object is in normal use several places.
+	//You can enable it e.g. when debugging.
+	//	reportWarning("Trying to use PatientModelServiceNull. Is PatientModelService (org.custusx.patiemtmodel) disabled?");
 }
 
 RegistrationHistoryPtr PatientModelServiceNull::get_rMpr_History() const
 {
-	printWarning();	
+	printWarning();
 	return RegistrationHistory::getNullObject();
 }
 

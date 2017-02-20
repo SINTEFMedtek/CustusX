@@ -55,7 +55,7 @@ void DataLocations::setTestMode()
 {
 	mTestMode = true;
 	cx::removeNonemptyDirRecursively(getTestDataPath() + "/temp");
-    cx::removeNonemptyDirRecursively(getPersistentWritablePath() + "/temp");
+	cx::removeNonemptyDirRecursively(getPersistentWritablePath());
 }
 
 QString DataLocations::getTestDataPath()

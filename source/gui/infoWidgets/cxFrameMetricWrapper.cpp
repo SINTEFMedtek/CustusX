@@ -71,8 +71,6 @@ QWidget* FrameMetricWrapper::createWidget()
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 
 	mFrameWidget = new Transform3DWidget(widget);
-//	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
-//	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 	connect(mFrameWidget, SIGNAL(changed()), this, SLOT(frameWidgetChangedSlot()));
 	topLayout->addWidget(mFrameWidget);
 
@@ -84,8 +82,6 @@ QWidget* FrameMetricWrapper::createWidget()
 	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
 
 	this->addColorWidget(topLayout);
-
-//	this->dataChangedSlot();
 
 	return widget;
 }

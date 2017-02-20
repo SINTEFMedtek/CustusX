@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
+#include "cxMultiViewCache.h"
 
 namespace cx
 {
@@ -47,9 +48,12 @@ ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
-	mViewCacheOverlay.reset(new ViewCache<ViewWidget>(this, "Overlay"));
+	mViewCache = MultiViewCache::create();
 
+	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->initBaseLayout();
+	this->setGridMargin(4);
+	this->setGridSpacing(2);
 }
 
 ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
@@ -58,13 +62,9 @@ ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
 
 void ViewCollectionWidgetMixed::initBaseLayout()
 {
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
 	mBaseRegion = LayoutRegion(-1,-1);
 	mTotalRegion = LayoutRegion(-1,-1);
-
-	this->setGridMargin(4);
-	this->setGridSpacing(2);
 }
 
 ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
@@ -74,7 +74,9 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 
 	if (type==View::VIEW_3D)
 	{
-		ViewWidget* overlay = this->mViewCacheOverlay->retrieveView();
+		//Using cached 3D view don't work if mBaseRegion covers the 3D view region (In some cases.) CX-63
+		this->mViewCache->clearCache();
+		ViewWidget* overlay = this->mViewCache->retrieveView(this, View::VIEW_3D, mBaseLayout->getOffScreenRendering());
 		overlay->getView()->setType(type);
 		overlay->show();
 		mOverlays.push_back(overlay);
@@ -83,14 +85,26 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	}
 	else
 	{
-        mBaseRegion = merge(region, mBaseRegion);
+		mBaseRegion = merge(region, mBaseRegion);
 		view = mBaseLayout->addView(type, region);
+
 		// re-add the base widget with updated position in grid
 		this->addWidgetToLayout(mLayout, mBaseLayout, mBaseRegion);
 	}
 	view_utils::setStretchFactors(mLayout, mTotalRegion, 1);
 
 	return view;
+}
+
+void ViewCollectionWidgetMixed::setOffScreenRenderingAndClear(bool on)
+{
+	this->clearViews();
+	mBaseLayout->setOffScreenRenderingAndClear(on);
+}
+
+bool ViewCollectionWidgetMixed::getOffScreenRendering() const
+{
+	return mBaseLayout->getOffScreenRendering();
 }
 
 void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* widget, LayoutRegion region)
@@ -102,7 +116,7 @@ void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* 
 
 void ViewCollectionWidgetMixed::clearViews()
 {
-	mViewCacheOverlay->clearUsedViews();
+	mViewCache->clearViews();
 
 	for (unsigned i=0; i<mOverlays.size(); ++i)
 	{
@@ -116,9 +130,7 @@ void ViewCollectionWidgetMixed::clearViews()
 
 	// rebuild to default state:
 	view_utils::setStretchFactors(mLayout, mTotalRegion, 0);
-	this->addWidgetToLayout(mLayout, mBaseLayout, LayoutRegion(0,0));
-	mBaseRegion = LayoutRegion(-1,-1);
-	mTotalRegion = LayoutRegion(-1,-1);
+	this->initBaseLayout();
 }
 
 void ViewCollectionWidgetMixed::setModified()
@@ -186,7 +198,17 @@ QPoint ViewCollectionWidgetMixed::getPosition(ViewPtr view)
     QPoint p = mBaseLayout->getPosition(view);
     p = mBaseLayout->mapToGlobal(p);
     p = this->mapFromGlobal(p);
-    return p;
+	return p;
+}
+
+void ViewCollectionWidgetMixed::enableContextMenuForViews(bool enable)
+{
+	mBaseLayout->enableContextMenuForViews(enable);
+	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
+	for (unsigned i=0; i<mOverlays.size(); ++i)
+	{
+		mOverlays[i]->setContextMenuPolicy(policy);
+	}
 }
 
 } /* namespace cx */

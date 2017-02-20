@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataInterface.h"
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
+#include "vtkPolyDataNormals.h"
 
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
@@ -53,24 +54,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSelectClippersForDataWidget.h"
 #include "cxMeshGlyphsWidget.h"
 #include "cxMeshPropertiesWidget.h"
+#include "cxMeshTextureWidget.h"
 
 namespace cx
 {
 
 ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, QWidget *parent) :
-		TabbedWidget(parent, "mesh_info_widget", "Mesh Properties")
+	BaseWidget(parent, "active_mesh_widget", "Mesh Properties")
 {
 	this->setToolTip("Mesh properties");
 
 	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
 	activeMeshProperty->setValueName("Active Mesh");
 
-	this->insertWidgetAtTop(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	//	layout->setMargin(0);
+	//	layout->setSpacing(0);
+	layout->addWidget(new DataSelectWidget(services->view(), services->patient(), this, activeMeshProperty));
+	layout->addWidget(new AllMeshPropertiesWidget(activeMeshProperty, services, this));
+}
 
-	this->addTab(new MeshInfoWidget(activeMeshProperty, services->patient(), services->view(), this), "Info");
-	this->addTab(new MeshPropertiesWidget(activeMeshProperty, services->patient(), services->view(), this), "Properties");
-	this->addTab(new MeshGlyphsWidget(activeMeshProperty, services->patient(), services->view(), this), "Glyph");
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+AllMeshPropertiesWidget::AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr mesh, VisServicesPtr services, QWidget *parent) :
+	TabbedWidget(parent, "all_mesh_tabs_widget", "Mesh Properties"),
+	mMeshSelector(mesh)
+{
+	this->setToolTip("Mesh properties");
+
+	this->addTab(new MeshInfoWidget(mesh, services->patient(), services->view(), this), "Info");
+	this->addTab(new MeshPropertiesWidget(mesh, services->patient(), services->view(), this), "Properties");
+	this->addTab(new MeshTextureWidget(mesh, services->patient(), services->view(), this), "Texture");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
+	this->addTab(new MeshGlyphsWidget(mesh, services->patient(), services->view(), this), "Glyph");
+
 }
 
 //---------------------------------------------------------
@@ -80,7 +98,7 @@ MeshInfoWidget::MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
 							   PatientModelServicePtr patientModelService,
 							   ViewServicePtr viewService,
 							   QWidget* parent) :
-	InfoWidget(parent, "MeshCoreInfoWidget", "Mesh Properties"),
+	InfoWidget(parent, "mesh_info_widget", "Mesh Properties"),
 	mPatientModelService(patientModelService),
 	mViewService(viewService),
 	mMeshSelector(meshSelector)
@@ -97,26 +115,26 @@ MeshInfoWidget::~MeshInfoWidget()
 void MeshInfoWidget::meshSelectedSlot()
 {
 	if (mMesh == mMeshSelector->getData())
-	return;
+		return;
 
 	if(mMesh)
 	{
 		disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    }
+	}
 
 	mMesh = boost::dynamic_pointer_cast<Mesh>(mMeshSelector->getData());
 
 	if (!mMesh)
 	{
-        mParentFrameAdapter->setData(mMesh);
-        mNameAdapter->setData(mMesh);
+		mParentFrameAdapter->setData(mMesh);
+		mNameAdapter->setData(mMesh);
 		mUidAdapter->setData(mMesh);
 		return;
 	}
 
-    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+	connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
 
-    mParentFrameAdapter->setData(mMesh);
+	mParentFrameAdapter->setData(mMesh);
 	mNameAdapter->setData(mMesh);
 	mUidAdapter->setData(mMesh);
 
@@ -126,15 +144,29 @@ void MeshInfoWidget::meshSelectedSlot()
 
 void MeshInfoWidget::importTransformSlot()
 {
-  if(!mMesh)
-    return;
-  DataPtr parent = mPatientModelService->getData(mMesh->getParentSpace());
-  if (!parent)
-    return;
-  mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
-  report("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
+	if(!mMesh)
+		return;
+	DataPtr parent = mPatientModelService->getData(mMesh->getParentSpace());
+	if (!parent)
+		return;
+	mMesh->get_rMd_History()->setRegistration(parent->get_rMd());
+	report("Assigned rMd from volume [" + parent->getName() + "] to surface [" + mMesh->getName() + "]");
 }
-  
+
+void MeshInfoWidget::generateNormalsSlot()
+{
+	if(!mMesh)
+		return;
+
+	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
+	normals->SetInputData(mMesh->getVtkPolyData());
+	normals->Update();
+	mMesh->setVtkPolyData(normals->GetOutput());
+
+	QString outputBasePath = mPatientModelService->getActivePatientFolder();
+	mMesh->save(outputBasePath);
+}
+
 void MeshInfoWidget::meshChangedSlot()
 {
 	if(!mMesh)
@@ -143,12 +175,12 @@ void MeshInfoWidget::meshChangedSlot()
 
 void MeshInfoWidget::showEvent(QShowEvent* event)
 {
-  QWidget::showEvent(event);
+	QWidget::showEvent(event);
 }
 
 void MeshInfoWidget::hideEvent(QCloseEvent* event)
 {
-  QWidget::closeEvent(event);
+	QWidget::closeEvent(event);
 }
 
 void MeshInfoWidget::addWidgets()
@@ -159,9 +191,13 @@ void MeshInfoWidget::addWidgets()
 	importTransformButton->setToolTip("Replace data transform with that of the parent data.");
 	connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
 
+	QPushButton* addNormalsButton = new QPushButton("Generate Normals", this);
+	addNormalsButton->setToolTip("Generate surface normals and add to model.\nThis usually gives a smoother appearance.");
+	connect(addNormalsButton, SIGNAL(clicked()), this, SLOT(generateNormalsSlot()));
+
 	mUidAdapter = StringPropertyDataUidEditable::New();
 	mNameAdapter = StringPropertyDataNameEditable::New();
-    mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
+	mParentFrameAdapter = StringPropertyParentFrame::New(mPatientModelService);
 
 	int row = 1;
 
@@ -170,6 +206,7 @@ void MeshInfoWidget::addWidgets()
 	new LabeledComboBoxWidget(this, mParentFrameAdapter, gridLayout, row++);
 	gridLayout->addWidget(mTableWidget, row++, 0, 1, 2);
 	gridLayout->addWidget(importTransformButton, row++, 0, 1, 2);
+	gridLayout->addWidget(addNormalsButton, row++, 0, 1, 2);
 
 	this->addStretch();
 }

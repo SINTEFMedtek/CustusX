@@ -101,9 +101,12 @@ void ViewGroupPropertiesWidget::updateFrontend()
 	ViewGroupData::Options options = group->getOptions();
 	CameraStyleData data = options.mCameraStyle;
 
+	mCameraViewAngle->setValue(data.mCameraViewAngle);
 	mCameraFollowTool->setValue(data.mCameraFollowTool);
 	mFocusFollowTool->setValue(data.mFocusFollowTool);
-	mCameraOnTooltip->setValue(data.mCameraOnTooltip);
+	mCameraOnTooltip->setValue(data.mCameraLockToTooltip);
+	mCameraTooltipOffset->setValue(data.mCameraTooltipOffset);
+	mCameraNotBehindROI->setValue(data.mCameraNotBehindROI);
 	mTableLock->setValue(data.mTableLock);
 	mUniCam->setValue(data.mUniCam);
 	mElevation->setValue(data.mElevation);
@@ -125,6 +128,12 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 	mFocusROI = focusroi;
 	mCameraStyleProperties.push_back(mFocusROI);
 
+	mCameraViewAngle = DoubleProperty::initialize("Angle of View", "",
+											"Camera View Angle, of Field of View",
+											30.0/180*M_PI, DoubleRange(10.0/180*M_PI, 150.0/180*M_PI, 1/180.0*M_PI), 0);
+	mCameraStyleProperties.push_back(mCameraViewAngle);
+	mCameraViewAngle->setInternal2Display(180.0/M_PI);
+
 	mCameraFollowTool = BoolProperty::initialize("Camera Follow Tool", "",
 												 "Camera position is fixed to the tool and moving along with it.\n"
 												 "Zooming causes the position to slide along the tool axis",
@@ -141,8 +150,20 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 												true);
 	mCameraStyleProperties.push_back(mCameraOnTooltip);
 
+	mCameraTooltipOffset = DoubleProperty::initialize("Camera Tooltip Offset", "",
+											"Camera offset from tooltip, used if Camera on Tooltip is set.",
+											0, DoubleRange(-100, 100, 1), 0);
+	mCameraStyleProperties.push_back(mCameraTooltipOffset);
+
+	StringPropertySelectDataPtr notbehind = StringPropertySelectData::New(mServices->patient());
+	notbehind->setValueName("Camera not behind ROI");
+	notbehind->setHelp("Camera cannot move behind ROI");
+	notbehind->setTypeRegexp("roi");
+	mCameraNotBehindROI = notbehind;
+	mCameraStyleProperties.push_back(notbehind);
+
 	mTableLock = BoolProperty::initialize("Table lock", "",
-										  "Table is always set down in the scene.",
+										  "The camera's up vector is aligned with the operating table's up vector.",
 										  true);
 	mCameraStyleProperties.push_back(mTableLock);
 
@@ -203,9 +224,12 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 	ViewGroupData::Options options = group->getOptions();
 	CameraStyleData data = options.mCameraStyle;
 
+	data.mCameraViewAngle = mCameraViewAngle->getValue();
 	data.mCameraFollowTool = mCameraFollowTool->getValue();
 	data.mFocusFollowTool = mFocusFollowTool->getValue();
-	data.mCameraOnTooltip = mCameraOnTooltip->getValue();
+	data.mCameraLockToTooltip = mCameraOnTooltip->getValue();
+	data.mCameraTooltipOffset = mCameraTooltipOffset->getValue();
+	data.mCameraNotBehindROI = mCameraNotBehindROI->getValue();
 	data.mTableLock = mTableLock->getValue();
 	data.mUniCam = mUniCam->getValue();
 	data.mElevation = mElevation->getValue();

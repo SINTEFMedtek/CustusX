@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/scoped_ptr.hpp"
 #include "cxTransform3D.h"
 #include "cxIndent.h"
+#include "cxSliceComputer.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -158,6 +159,7 @@ private:
 //	QString mName; ///< for debug
 	bool mUseTooltipOffset;
 	PatientModelServicePtr mDataManager;
+	SlicePlane mLastEmittedSlicePlane;
 };
 
 /**

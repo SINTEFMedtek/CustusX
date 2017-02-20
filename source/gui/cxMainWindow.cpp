@@ -469,6 +469,7 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mActions->getAction("NewPatient"));
 	mFileMenu->addAction(mActions->getAction("SaveFile"));
 	mFileMenu->addAction(mActions->getAction("LoadFile"));
+	mFileMenu->addAction(mActions->getAction("LoadFileCopy"));
 	mFileMenu->addAction(mActions->getAction("ClearPatient"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mActions->getAction("ExportPatient"));

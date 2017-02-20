@@ -53,7 +53,7 @@ namespace cx
 
 GraphicalGeometric::GraphicalGeometric()
 {
-	m_dMu = Transform3D::Identity();
+	m_rMrr = Transform3D::Identity();
 	mGraphicalPolyDataPtr.reset(new GraphicalPolyData3D());
 	mGraphicalGlyph3DDataPtr.reset(new GraphicalGlyph3DData());
 }
@@ -118,9 +118,9 @@ void GraphicalGeometric::setRenderer(vtkRendererPtr renderer)
 	mGraphicalGlyph3DDataPtr->setRenderer(renderer);
 }
 
-void GraphicalGeometric::setTransformOffset(Transform3D dMu)
+void GraphicalGeometric::setTransformOffset(Transform3D rMrr)
 {
-	m_dMu = dMu;
+	m_rMrr = rMrr;
 	this->transformChangedSlot();
 }
 
@@ -137,11 +137,24 @@ void GraphicalGeometric::meshChangedSlot()
 		mGraphicalGlyph3DDataPtr->setScaleFactor(mMesh->getVisSize());
 	}
 
+	mMesh->updateVtkPolyDataWithTexture();
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
+	mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
 	mGraphicalPolyDataPtr->setScalarVisibility(false);//Don't use the LUT from the VtkPolyData
-	//Set mesh color, opacity
+
 	mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
 	mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+//	//Set mesh color, opacity
+//	if(mMesh->getTextureData().getTextureImage()->getValue().isEmpty() || mMesh->getTextureData().getTextureImage()->getImage() == NULL)
+//	{
+//		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+//		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+//	}
+//	else
+//	{
+//		mGraphicalPolyDataPtr->setColor(255, 255, 255);
+//	}
+
 	//Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
 	const MeshPropertyData& src = mMesh->getProperties();
@@ -167,11 +180,11 @@ void GraphicalGeometric::transformChangedSlot()
 		return;
 	}
 
-	Transform3D rMd = mMesh->get_rMd();
-	Transform3D rMu = rMd * m_dMu;
+	Transform3D rrMd = mMesh->get_rMd();
+	Transform3D rMd = m_rMrr * rrMd;
 
-	mGraphicalPolyDataPtr->setUserMatrix(rMu.getVtkMatrix());
-	mGraphicalGlyph3DDataPtr->setUserMatrix(rMu.getVtkMatrix());
+	mGraphicalPolyDataPtr->setUserMatrix(rMd.getVtkMatrix());
+	mGraphicalGlyph3DDataPtr->setUserMatrix(rMd.getVtkMatrix());
 }
 
 
@@ -181,7 +194,7 @@ void GraphicalGeometric::transformChangedSlot()
 
 
 GeometricRep::GeometricRep() :
-    RepImpl()
+	RepImpl()
 {
 	mGraphics.reset(new GraphicalGeometric());
 }
@@ -190,7 +203,7 @@ GeometricRep::~GeometricRep()
 }
 GeometricRepPtr GeometricRep::New(const QString& uid)
 {
-    return wrap_new(new GeometricRep(), uid);
+	return wrap_new(new GeometricRep(), uid);
 }
 
 void GeometricRep::addRepActorsToViewRenderer(ViewPtr view)

@@ -80,6 +80,7 @@ private slots:
 private:
 	RouteToTargetPtr mRouteToTarget;
 	vtkPolyDataPtr mOutput;
+    vtkPolyDataPtr mExtendedRoute;
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 

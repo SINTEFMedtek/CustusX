@@ -85,7 +85,7 @@ void BrowserWidget::createGUI()
 	mPopupWidget->setPopupVisible(this->getShowToolbarOption().readValue(QString::number(false)).toInt());
 
 	mPropertiesWidget = new ReplacableContentWidget(this);
-	mPropertiesWidget->setWidget(new QLabel("no\nproperties\nselected"));
+	mPropertiesWidget->setWidgetDeleteOld(new QLabel("no\nproperties\nselected"));
 
 	mSplitter = new ControllableSplitter(mOptions.descend("splitter"), this);
 	layout->addWidget(mSplitter, 1);
@@ -308,7 +308,7 @@ void BrowserWidget::onCurrentItemChanged()
 	{
 		mActiveNodeUid = node->getUid();
 //		CX_LOG_CHANNEL_DEBUG("CA") << "   store CurrentNode  " << mActiveNodeUid;
-		QWidget* widget = node->createPropertiesWidget();
+		boost::shared_ptr<QWidget> widget = node->createPropertiesWidget();
 		mPropertiesWidget->setWidget(widget);
 //		CX_LOG_CHANNEL_DEBUG("CA") << "mPropertiesWidget: " << mPropertiesWidget->parent();
 //		if (widget)

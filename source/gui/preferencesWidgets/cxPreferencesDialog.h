@@ -74,6 +74,8 @@ class ToolConfigureGroupBox;
  * @{
  */
 
+
+
 class cxGui_EXPORT VisualizationTab : public PreferenceTab
 {
     Q_OBJECT
@@ -109,7 +111,6 @@ protected:
   void initStereoTypeComboBox();
 
 private slots:
-  void setBackgroundColorSlot(QColor color);
   //Stereo
   void stereoTypeChangedSlot(int index);
   void stereoFrameSequentialSlot();
@@ -117,8 +118,6 @@ private slots:
   void stereoDresdenSlot();
   void stereoRedBlueSlot();
   void eyeAngleSlot();
-
-//  void setBackgroundColorSlot();
 };
 
 /**

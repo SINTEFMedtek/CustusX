@@ -69,12 +69,15 @@ struct cxResourceVisualization_EXPORT CameraStyleData
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
 
+	double mCameraViewAngle;
 	bool mCameraFollowTool;
 	bool mFocusFollowTool;
-	bool mCameraOnTooltip;
+	bool mCameraLockToTooltip;
+	double mCameraTooltipOffset;
 	bool mTableLock;
 	double mElevation;
 	bool mUniCam;
+	QString mCameraNotBehindROI; // never move camera behind this roi
 	QString mFocusROI; // name of ROI to set focus in.
 	QString mAutoZoomROI; // name of ROI to zoom to.
 };

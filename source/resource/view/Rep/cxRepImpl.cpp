@@ -119,6 +119,7 @@ void RepImpl::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, 
 {
 	RepImpl* self = reinterpret_cast<RepImpl*>(clientdata);
 	self->onStartRenderPrivate();
+	self->onEveryRender();
 }
 
 void RepImpl::onStartRenderPrivate()

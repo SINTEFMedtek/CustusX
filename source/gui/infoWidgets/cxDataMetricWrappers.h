@@ -264,14 +264,28 @@ private slots:
 private:
   StringPropertyPtr createDefineVectorUpMethodSelector() const;
   DoublePropertyPtr createOffsetFromP0() const;
+  DoublePropertyPtr createOffsetFromP1() const;
+  DoublePropertyPtr createRepeatDistance() const;
   BoolPropertyPtr createScaletoP1() const;
-  StringPropertySelectMeshPtr createMeshSelector() const;
+  BoolPropertyPtr createShowDistanceMarkers() const;
+  DoublePropertyPtr createDistanceMarkerVisibility() const;
+  StringPropertySelectDataPtr createModelSelector() const;
+  BoolPropertyPtr createTranslationOnly() const;
+  BoolPropertyPtr createTextureFollowTool() const;
 
   CustomMetricPtr mData;
   StringPropertyPtr mDefineVectorUpMethod;
   BoolPropertyPtr mScaleToP1;
+  QWidget* mScaleToP1Widget;
+  BoolPropertyPtr mShowDistanceMarkers;
+  BoolPropertyPtr mTranslationOnly;
+  BoolPropertyPtr mTextureFollowTool;
   DoublePropertyPtr mOffsetFromP0;
-  StringPropertySelectMeshPtr mMesh;
+  DoublePropertyPtr mOffsetFromP1;
+  DoublePropertyPtr mRepeatDistance;
+  DoublePropertyPtr mDistanceMarkerVisibility;
+  QWidget* mDistanceMarkerVisibilityWidget;
+  StringPropertySelectDataPtr mModel;
   bool mInternalUpdate;
   MetricReferenceArgumentListGui mArguments;
 };

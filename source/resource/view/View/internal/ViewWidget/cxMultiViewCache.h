@@ -29,18 +29,59 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#include "catch.hpp"
-#include "cxViewService.h"
-#include "cxRepContainer.h"
 
-namespace cxtest
+#ifndef CXMULTIVIEWCACHE_H
+#define CXMULTIVIEWCACHE_H
+
+#include "cxResourceVisualizationExport.h"
+
+#include <QWidget>
+#include <QLayout>
+#include <vector>
+#include "cxTypeConversions.h"
+#include "cxOSXHelper.h"
+#include "cxViewWidget.h"
+#include "cxViewCache.h"
+
+namespace cx
 {
+/**
+ * \file
+ * \ingroup cx_resource_view_internal
+ * @{
+ */
 
-TEST_CASE("VisualizationServiceNull: get3DReps() don't seg. fault", "[unit][resource][visualization]")
+/**
+ * Cache for reuse of Views.
+ *
+ * Separate caches exist for each type of view. Offscreen rendering also uses separate
+ * caches. The cache also stores a separate first renderwindow in order to handle
+ * the shared gl context used by cx.
+ *
+ * \ingroup cx_resource_view_internal
+ */
+typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
+class MultiViewCache
 {
-	cx::VisualizationServicePtr visualizationService = cx::VisualizationService::getNullObject(); //mock
-	cx::RepContainerPtr repContainer = visualizationService->get3DReps();
-	REQUIRE_FALSE(repContainer);
-}
+public:
+	static MultiViewCachePtr create() { return MultiViewCachePtr(new MultiViewCache()); }
+	MultiViewCache();
 
-} //cxtest
+	ViewWidget* retrieveView(QWidget* widget, View::Type type, bool offScreenRendering);
+	void clearViews();
+	void clearCache();
+
+private:
+	typedef boost::shared_ptr<ViewCache<ViewWidget> > ViewCachePtr;
+	std::map<QString, ViewCachePtr> mViewCache;
+	vtkRenderWindowPtr mStaticRenderWindow;
+};
+
+/**
+ * @}
+ */
+} // namespace cx
+
+
+#endif // CXMULTIVIEWCACHE_H

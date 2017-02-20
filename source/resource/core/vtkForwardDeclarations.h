@@ -11,11 +11,11 @@ modification, are permitted provided that the following conditions are met:
    this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
@@ -71,6 +71,7 @@ typedef vtkSmartPointer<class vtkCutter> vtkCutterPtr;
 typedef vtkSmartPointer<class vtkCylinderSource> vtkCylinderSourcePtr;
 typedef vtkSmartPointer<class vtkDataArray> vtkDataArrayPtr;
 typedef vtkSmartPointer<class vtkDataSetAttributes> vtkDataSetAttributesPtr;
+typedef vtkSmartPointer<class vtkDataSetAlgorithm> vtkDataSetAlgorithmPtr;
 typedef vtkSmartPointer<class vtkDecimatePro> vtkDecimateProPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
@@ -144,11 +145,14 @@ typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 typedef vtkSmartPointer<class vtkStripper> vtkStripperPtr;
 typedef vtkSmartPointer<class vtkTextActor3D> vtkTextActor3DPtr;
 typedef vtkSmartPointer<class vtkTextMapper> vtkTextMapperPtr;
+typedef vtkSmartPointer<class vtkTextureMapToCylinder> vtkTextureMapToCylinderPtr;
 typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
+typedef vtkSmartPointer<class vtkTextureMapToSphere> vtkTextureMapToSpherePtr;
 typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
 typedef vtkSmartPointer<class vtkThinPlateSplineTransform> vtkThinPlateSplineTransformPtr;
-typedef vtkSmartPointer<class vtkTransformPolyDataFilter> vtkTransformPolyDataFilterPtr ;
 typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
+typedef vtkSmartPointer<class vtkTransformPolyDataFilter> vtkTransformPolyDataFilterPtr;
+typedef vtkSmartPointer<class vtkTransformTextureCoords> vtkTransformTextureCoordsPtr;
 typedef vtkSmartPointer<class vtkTriangleFilter> vtkTriangleFilterPtr;
 typedef vtkSmartPointer<class vtkTriangleFilter> vtkTriangleFilterPtr;
 typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;

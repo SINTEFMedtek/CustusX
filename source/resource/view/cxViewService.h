@@ -64,7 +64,7 @@ enum cxResourceVisualization_EXPORT CAMERA_STYLE_TYPE
 
 } //cx
 
-SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, CAMERA_STYLE_TYPE);
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cxResourceVisualization_EXPORT, cx, CAMERA_STYLE_TYPE);
 
 namespace cx
 {
@@ -108,6 +108,7 @@ public:
 	virtual void centerToImageCenterInActiveViewGroup() = 0;
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx) = 0;
 	virtual void addDefaultLayout(LayoutData layoutData) = 0;
+	virtual void enableContextMenuForViews(bool enable=true) = 0;
 
 	virtual bool isNull() = 0;
 	static ViewServicePtr getNullObject();

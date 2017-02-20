@@ -68,7 +68,6 @@ private:
 	HttpRequestHandlerPtr mRequestHandler;
 	RemoteAPIPtr mAPI;
 	QHttpServer *server;
-//	RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

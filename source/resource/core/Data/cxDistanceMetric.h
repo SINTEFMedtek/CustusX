@@ -65,8 +65,15 @@ public:
 	static DistanceMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_distance.png");}
+	/** The distance from p0 to p1 along the direction
+	 */
 	double getDistance() const;
-    std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
+	/** Return the direction of the distance vector.
+	 * This is usually from (p1-p1).norm(), except when a plane is part of the definition.
+	 * In that case the plane normal is used, allowing for signed distances.
+	 */
+	Vector3D getDirection() const;
+	std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
     virtual Vector3D getRefCoord() const;
 	virtual QString getAsSingleLineString() const;
 
@@ -93,10 +100,12 @@ private slots:
 	void resetCachedValues();
 private:
 	DistanceMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
-	std::vector<Vector3D> getEndpointsUncached() const;
+	void getEndpointsUncached(std::vector<Vector3D>* endpoints, Vector3D *direction) const;
 	MetricReferenceArgumentListPtr mArguments;
 	mutable OptionalValue<std::vector<Vector3D> > mCachedEndPoints;
+	mutable OptionalValue<Vector3D> mCachedDirection;
 
+	void updateCache() const;
 };
 
 /**

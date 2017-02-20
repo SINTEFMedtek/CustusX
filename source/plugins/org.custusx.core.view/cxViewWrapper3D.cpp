@@ -55,7 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPickerRep.h"
 #include "cxGeometricRep.h"
 #include "cxToolRep3D.h"
-#include "cxVolumetricRep.h"
 #include "cxTypeConversions.h"
 #include "cxVideoSource.h"
 #include "cxVideoRep.h"
@@ -342,7 +341,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
 	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
-	mShow3DSlicesInteractor->addDataActions(show3DSlicesMenu);
+	mShow3DSlicesInteractor->addDataActionsOfType<Image>(show3DSlicesMenu);
 
 	QMenu* showSlicesMenu = new QMenu("Slice Type", &contextMenu);
 	this->createSlicesActions(showSlicesMenu);

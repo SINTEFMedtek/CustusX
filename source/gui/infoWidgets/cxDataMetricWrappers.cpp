@@ -139,7 +139,7 @@ void MetricReferenceArgumentListGui::addWidgets(QBoxLayout* layout)
 
 void MetricReferenceArgumentListGui::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
-	std::map<QString, DataPtr> data = patientService()->getData();
+	std::map<QString, DataPtr> data = patientService()->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		if (mArguments->validArgument(iter->second))
@@ -700,11 +700,12 @@ BoolPropertyPtr DonutMetricWrapper::createFlatSelector() const
 
 CustomMetricWrapper::CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data) :
     MetricBase(viewService, patientModelService),
-    mData(data)
+	mData(data),
+	mScaleToP1Widget(NULL)
 {
     mArguments.setArguments(data->getArguments());
     mInternalUpdate = false;
-    connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
+	connect(mData.get(), SIGNAL(propertiesChanged()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* CustomMetricWrapper::createWidget()
@@ -720,18 +721,36 @@ QWidget* CustomMetricWrapper::createWidget()
 
     mDefineVectorUpMethod =  this->createDefineVectorUpMethodSelector();
     topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mDefineVectorUpMethod));
-	mMesh = this->createMeshSelector();
-	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mMesh));
+	mModel = this->createModelSelector();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mModel));
 
 	mOffsetFromP0 = this->createOffsetFromP0();
 	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP0));
+	mOffsetFromP1 = this->createOffsetFromP1();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mOffsetFromP1));
+	mRepeatDistance = this->createRepeatDistance();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mRepeatDistance));
+
+	mShowDistanceMarkers = this->createShowDistanceMarkers();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mShowDistanceMarkers));
+	mDistanceMarkerVisibility = this->createDistanceMarkerVisibility();
+	mDistanceMarkerVisibilityWidget = createDataWidget(mViewService, mPatientModelService, widget, mDistanceMarkerVisibility);
+	topLayout->addWidget(mDistanceMarkerVisibilityWidget);
+
 	mScaleToP1 = this->createScaletoP1();
-	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1));
+	mScaleToP1Widget = createDataWidget(mViewService, mPatientModelService, widget, mScaleToP1);
+	topLayout->addWidget(mScaleToP1Widget);
+
+	mTranslationOnly= this->createTranslationOnly();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTranslationOnly));
+
+	mTextureFollowTool= this->createTextureFollowTool();
+	topLayout->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mTextureFollowTool));
 
     this->addColorWidget(topLayout);
     topLayout->addStretch();
 
-    this->dataChangedSlot();
+	this->dataChangedSlot();
     return widget;
 }
 
@@ -757,8 +776,9 @@ void CustomMetricWrapper::update()
         return;
     mInternalUpdate = true;
     mDefineVectorUpMethod->setValue(mData->getDefineVectorUpMethod());
-	mMesh->setValue(mData->getMeshUid());
+	mModel->setValue(mData->getModelUid());
     mInternalUpdate = false;
+	guiChanged();
 }
 
 void CustomMetricWrapper::dataChangedSlot()
@@ -776,11 +796,28 @@ void CustomMetricWrapper::guiChanged()
 {
     if (mInternalUpdate)
         return;
+
+	if(mModel->getData() && mModel->getData()->getType() == "image")
+		mScaleToP1Widget->setEnabled(false);
+	else
+		mScaleToP1Widget->setEnabled(true);
+
+	if(mShowDistanceMarkers->getValue())
+		mDistanceMarkerVisibilityWidget->setEnabled(true);
+	else
+		mDistanceMarkerVisibilityWidget->setEnabled(false);
+
     mInternalUpdate = true;
     mData->setDefineVectorUpMethod(mDefineVectorUpMethod->getValue());
-	mData->setMeshUid(mMesh->getValue());
+	mData->setModelUid(mModel->getValue());
 	mData->setOffsetFromP0(mOffsetFromP0->getValue());
+	mData->setOffsetFromP1(mOffsetFromP1->getValue());
+	mData->setRepeatDistance(mRepeatDistance->getValue());
 	mData->setScaleToP1(mScaleToP1->getValue());
+	mData->setShowDistanceMarkers(mShowDistanceMarkers->getValue());
+	mData->setDistanceMarkerVisibility(mDistanceMarkerVisibility->getValue());
+	mData->setTranslationOnly(mTranslationOnly->getValue());
+	mData->setTextureFollowTool(mTextureFollowTool->getValue());
 
 	mInternalUpdate = false;
 }
@@ -795,38 +832,105 @@ BoolPropertyPtr CustomMetricWrapper::createScaletoP1() const
 	return retval;
 }
 
+BoolPropertyPtr CustomMetricWrapper::createShowDistanceMarkers() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Show distance markers", "",
+										  "Show distance to P0 for each repeated model",
+										  mData->getShowDistanceMarkers());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createTranslationOnly() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Translation Only", "",
+										  "Ignore scale and rotate",
+										  mData->getTranslationOnly());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+BoolPropertyPtr CustomMetricWrapper::createTextureFollowTool() const
+{
+	BoolPropertyPtr retval;
+	retval = BoolProperty::initialize("Texture Follow Tool", "",
+										  "Any texture on the model will move with the tool",
+										  mData->getTextureFollowTool());
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
 DoublePropertyPtr CustomMetricWrapper::createOffsetFromP0() const
 {
 	DoublePropertyPtr retval;
-	retval = DoubleProperty::initialize("Offset from P1", "",
+	retval = DoubleProperty::initialize("Offset from P0", "",
 											"Position model an offset from P0 towards P1",
-											mData->getOffsetFromP0(), DoubleRange(0, 100, 1), 0);
+											mData->getOffsetFromP0(), DoubleRange(-100, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createOffsetFromP1() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Offset from P1", "",
+											"When scaling to P1, scale to a point offset from P1 towards P0",
+											mData->getOffsetFromP1(), DoubleRange(-100, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createRepeatDistance() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Repeat Distance", "",
+											"Repeat model with this distance",
+											mData->getRepeatDistance(), DoubleRange(0, 100, 1), 0);
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
+}
+
+DoublePropertyPtr CustomMetricWrapper::createDistanceMarkerVisibility() const
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("Distance markers visibility threshold", "",
+											"Hide the markers if the distance to the camera exceeds this threshold",
+											mData->getDistanceMarkerVisibility(), DoubleRange(0, 1000, 1), 0);
 	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
 	return retval;
 }
 
 StringPropertyPtr CustomMetricWrapper::createDefineVectorUpMethodSelector() const
 {
-    StringPropertyPtr retval;
-    retval = StringProperty::initialize("selectDefineVectorUp",
-                                              "Use to define the vector up",
-                                              "The vector up of the metric will be connected to the static up vector of the operating table or to a frame in p1, which might well be connected to a tool giving a dynamic up vector.",
-                                              mData->getDefineVectorUpMethod(),
-                                              mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethods(),
-                                              QDomNode());
-    retval->setDisplayNames(mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethodsDisplayNames());
+	StringPropertyPtr retval;
+	retval = StringProperty::initialize("selectDefineVectorUp",
+										"Use to define the vector up",
+										"The vector up of the metric will be connected to one of:\n"
+										"- a) The static up vector of the operating table\n"
+										"- b) To a frame in p1, which might well be connected "
+										"to a tool giving a dynamic up vector.\n"
+										"- c) The tool up (tool negative x)",
+										mData->getDefineVectorUpMethod(),
+										mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethods(),
+										QDomNode());
+	retval->setDisplayNames(mData->getDefineVectorUpMethods().getAvailableDefineVectorUpMethodsDisplayNames());
 
 
-    connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
-    return retval;
+	connect(retval.get(), SIGNAL(valueWasSet()), this, SLOT(guiChanged()));
+	return retval;
 }
 
-StringPropertySelectMeshPtr CustomMetricWrapper::createMeshSelector() const
+StringPropertySelectDataPtr CustomMetricWrapper::createModelSelector() const
 {
-	StringPropertySelectMeshPtr retval;
-	retval = StringPropertySelectMesh::New(mPatientModelService);
-	connect(retval.get(), &StringPropertySelectMesh::changed, this, &CustomMetricWrapper::guiChanged);
-    return retval;
+	StringPropertySelectDataPtr retval;
+	retval = StringPropertySelectData::New(mPatientModelService, "image|mesh");
+	retval->setOnly2DImagesFilter(true);
+	retval->setValueName("Model");
+	retval->setHelp("Model can be mesh or 2D image");
+	connect(retval.get(), &StringPropertySelectData::changed, this, &CustomMetricWrapper::guiChanged);
+	return retval;
 }
 
 //---------------------------------------------------------
@@ -1029,7 +1133,7 @@ void RegionOfInterestMetricWrapper::update()
 
 	QStringList data;
 	std::map<QString, QString> names;
-	std::map<QString, DataPtr> alldata = mPatientModelService->getData();
+	std::map<QString, DataPtr> alldata = mPatientModelService->getDatas();
 	for (std::map<QString, DataPtr>::iterator i=alldata.begin(); i!=alldata.end(); ++i)
 	{
 		if (i->first == mData->getUid())
