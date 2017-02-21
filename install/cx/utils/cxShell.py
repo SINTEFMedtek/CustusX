@@ -77,7 +77,7 @@ class Shell (object):
         if(not silent):
             self._printCommand(cmd)
         if self.DUMMY is True:
-            return ShellCommandDummy().run()
+            return cxShellCommand.ShellCommandDummy().run()
                         
         command = cxShellCommand.ShellCommandReal(cmd,
                         cwd=self.CWD, 

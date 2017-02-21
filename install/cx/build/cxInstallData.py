@@ -93,6 +93,8 @@ class Common(object):
         self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
         self.gitrepo_main_site_base = self.gitrepo_open_site_base 
 
+        self.main_repo_folder = self.getCustusXRepositoryPath()
+        self.release_notes_relative_path = "/doc/release_notes/Release_notes.pdf"
         self.system_base_name = "CustusX"
 
     def printSettings(self):

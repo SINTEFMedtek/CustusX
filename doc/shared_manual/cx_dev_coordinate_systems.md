@@ -61,6 +61,7 @@ This figure shows all the major spaces in CustusX. They are described in the tab
 | us plane j         | u_j  | See \ref cx_us_probe_spaces.
 | sensor j           | s_j  | Tools usually have a tracking sensor attached that communicates with the tracking system. The local sensor space is denoted s. The transform sMt is the Tool calibration.
 | slice k            | s_k  | During slicing (for display in a 2D View) a space s is defined. The xy-plane of this space is the slice plane. It is defined with r as the parent space. (The s identifier is used for two different spaces, slice and sensor. This is unfortunate, but the two spaces are used in different contexts)
+| operating table    | ot   | The operating table is a concept which is representing an operating table with an up direction in the reference space. The table up direction can be set in the preferences. Different functionality can be set to depend on the table direction. See the \ref preferences_operating_table_widget for more details.
 
 
 The following table describes som important transforms, i.e. relations between two spaces:
@@ -72,6 +73,7 @@ The following table describes som important transforms, i.e. relations between t
 | Tool Calibration     |  sMt  | Applied on top of the raw tracking position in order to find the position and orientation of the tool. This transform is either set from the tool producer or determined though a calibration procedure.
 | Data Position        |  rMd  | Position of Data. Used throughout the system.
 | Tool Position        |  prMt | Position of Tool. Used throughout the system.
+| Operating table      |  rMot | The orientation of the operating table in the reference space.
 
 The following figure shows an example of two tools, one pointer and one probe. Both are related to the patient reference through the sMt transform.
 

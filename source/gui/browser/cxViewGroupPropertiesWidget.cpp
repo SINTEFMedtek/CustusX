@@ -163,7 +163,7 @@ void ViewGroupPropertiesWidget::createCameraStyleProperties()
 	mCameraStyleProperties.push_back(notbehind);
 
 	mTableLock = BoolProperty::initialize("Table lock", "",
-										  "Table is always set down in the scene.",
+										  "The camera's up vector is aligned with the operating table's up vector.",
 										  true);
 	mCameraStyleProperties.push_back(mTableLock);
 

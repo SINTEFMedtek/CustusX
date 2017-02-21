@@ -70,7 +70,7 @@ Vector3D SliceAutoViewportCalculator::findVirtualTooltip_s()
 
 DoubleBoundingBox3D SliceAutoViewportCalculator::findStaticBox()
 {
-	double followTooltipBoundary = followTooltipBoundary;
+	double followTooltipBoundary = mFollowTooltipBoundary;
 	followTooltipBoundary = constrainValue(followTooltipBoundary, 0.0, 0.5);
 	Transform3D S = createTransformScale(Vector3D::Ones()*(1.0-2.0*followTooltipBoundary));
 	Transform3D T = createTransformTranslate(mBB_s.center());

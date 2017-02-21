@@ -49,7 +49,9 @@ Volume Transfer Function {#property_widgets_volume_transfer_function}
 
 \addindex transfer_function_3d_widget 
 ### 3D Transfer Function {#property_widgets_volume_transfer_function_3D}
-Lets you set a transfer function on a 3D volume.
+Lets you set a transfer function on a 3D volume. It also lets you set
+window width and level, and right click on the bar to bring up
+the color selector.
 
 \addindex transfer_function_preset_widget 
 ### Transfer Function Presets {#property_widgets_volume_transfer_function_presets}
@@ -76,7 +78,8 @@ Identical to \ref property_widgets_volume_information.
 Slice Color {#property_widgets_slice_color}
 -----------------------------------------------------------
 Allows setting 2D image properties 
-by setting colors and window with and level.
+by setting colors and window width and level.
+Right click on the bar to bring up the color selector.
 
 \addindex transfer_function_2d_widget 
 ### 2D Transfer Function {#property_widgets_slice_transfer_function_2D}

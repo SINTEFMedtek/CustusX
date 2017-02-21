@@ -153,9 +153,10 @@ class CustusXBuilder:
         retval.setSourcePath(custusx.sourcePath())  
         retval.setTargetPlatform(self.assembly.controlData.getTargetPlatform())  
         retval.set_system_base_name(self.assembly.controlData.system_base_name)
-        
-        return retval      
-    
+        retval.set_release_notes_path(self.assembly.controlData.main_repo_folder, self.assembly.controlData.release_notes_relative_path)
+
+        return retval
+
     def removePreviousInstaller(self):
         PrintFormatter.printHeader('Removing previous installer', 3);
 
