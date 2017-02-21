@@ -60,10 +60,10 @@ TEST_CASE("cxFrameMetric can convert values to single line string", "[unit]")
 	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
 	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
 
-	REQUIRE(list[3]=="reference");
+	REQUIRE(list[4]=="reference");
 	INFO(list.join("\n"));
 	bool transformStringOk = false;
-	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(4, 17)).join(" "), &transformStringOk);
+	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(5, 18)).join(" "), &transformStringOk);
     REQUIRE(transformStringOk);
 	REQUIRE(cx::similar(testData.m_qMt, readTransform));
 }
