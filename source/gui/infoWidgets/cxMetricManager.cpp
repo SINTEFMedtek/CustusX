@@ -403,7 +403,7 @@ void MetricManager::importMetricsFromFile(QString& filename)
 	this->createMetricsReadFromFile(metrics);
 }
 
-void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics) const
+void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics) /*const*/
 {
 	DataFactory factory(patientService(), spaceProvider());
 	foreach (QStringList metricList, metrics)
@@ -411,7 +411,20 @@ void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics)
 		QString metricType = metricList.at(0);
 		QString defaultUid = metricType.split("Metric").at(0) + "%1";
 		DataPtr metric = factory.create(metricType, defaultUid, metricList.at(1));
+
+
+		//if (metricType == DistanceMetric::getTypeName())
+		if (DistanceMetricPtr d_metric = boost::dynamic_pointer_cast<DistanceMetric>(metric))
+		{
+			std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d_metric->getArguments());
+			for (unsigned i=0; i<args.size(); ++i)
+				d_metric->getArguments()->set(i, args[i]);
+		}
+
 		metric->updateFromSingleLineString(metricList);
+		//
+		metric->setUid(defaultUid);
+		//
 		patientService()->insertData(metric);
 		viewService()->getGroup(0)->addData(metric->getUid());
 	}

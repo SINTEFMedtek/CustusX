@@ -91,7 +91,7 @@ private:
 	void installNewMetric(DataMetricPtr metric);
 	PointMetricPtr addPointInDefaultPosition();
 	std::vector<DataMetricPtr> getAllMetrics();
-	void createMetricsReadFromFile(std::vector<QStringList>& metrics) const;
+	void createMetricsReadFromFile(std::vector<QStringList>& metrics);
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 	std::set<QString> mSelection;

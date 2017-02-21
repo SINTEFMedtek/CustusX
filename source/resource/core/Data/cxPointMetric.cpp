@@ -162,7 +162,7 @@ void PointMetric::updateFromSingleLineString(QStringList& parameterList)
 {
 	DataMetric::updateFromSingleLineString(parameterList);
 	this->setSpaceFromSingleLineString(parameterList);
-	int firstCoordIndex = 4;
+	int firstCoordIndex = 5;
 	int x = firstCoordIndex;
 	int y = ++firstCoordIndex;
 	int z = ++firstCoordIndex;

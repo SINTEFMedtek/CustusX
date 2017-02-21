@@ -79,7 +79,7 @@ void FrameMetric::updateFromSingleLineString(QStringList& parameterList)
 {
 	DataMetric::updateFromSingleLineString(parameterList);
 	this->setSpaceFromSingleLineString(parameterList);
-	this->setFrame(this->getMatrixFromSingleLineString(parameterList, 4));
+	this->setFrame(this->getMatrixFromSingleLineString(parameterList, 5));
 }
 
 
