@@ -131,6 +131,7 @@ typedef vtkSmartPointer<class vtkPolyDataMapper2D> vtkPolyDataMapper2DPtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 typedef vtkSmartPointer<class vtkPolyDataNormals> vtkPolyDataNormalsPtr;
 typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
+typedef vtkSmartPointer<class vtkXMLPolyDataReader> vtkXMLPolyDataReaderPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkPolyDataWriter> vtkPolyDataWriterPtr;
 typedef vtkSmartPointer<class vtkProbeFilter> vtkProbeFilterPtr;

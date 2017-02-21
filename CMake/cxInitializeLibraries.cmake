@@ -203,7 +203,7 @@ macro(cx_initialize_VTK)
 		vtkRenderingQt
 		vtkInteractionStyle
 		vtkRenderingVolume
-		vtkIOGeometry vtkIOLegacy vtkIOMINC
+		vtkIOGeometry vtkIOLegacy vtkIOMINC vtkIOXML
 		vtkIOXMLParser
 		vtkFiltersModeling
 		vtkInteractionWidgets
