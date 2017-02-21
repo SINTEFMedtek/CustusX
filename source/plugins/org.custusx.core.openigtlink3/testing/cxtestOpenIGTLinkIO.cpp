@@ -33,10 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QEventLoop>
 #include "vtkTimerLog.h"
-#include "vtkIGTLIOConnector.h"
-#include "vtkIGTLIODevice.h"
-#include "vtkIGTLIOSession.h"
-#include "vtkIGTLIOCommandDevice.h"
+#include "igtlioConnector.h"
+#include "igtlioDevice.h"
+#include "igtlioSession.h"
+#include "igtlioCommandDevice.h"
 
 #include "cxNetworkHandler.h"
 #include "cxtestReceiver.h"
@@ -50,34 +50,34 @@ namespace cxtest
 {
 
 
-void checkIfConnected(vtkIGTLIOLogicPointer logic)
+void checkIfConnected(igtlio::LogicPointer logic)
 {
 	double timeout = 1;
 	double starttime = vtkTimerLog::GetUniversalTime();
 
-	vtkIGTLIOConnectorPointer connector = logic->GetConnector(0);
+	igtlio::ConnectorPointer connector = logic->GetConnector(0);
 
 	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
 	{
 		logic->PeriodicProcess();
 
-		if (connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED)
+		if (connector->GetState() == igtlio::Connector::STATE_CONNECTED)
 		{
 			REQUIRE(true);
 			break;
 		}
-		if (connector->GetState() == vtkIGTLIOConnector::STATE_OFF)
+		if (connector->GetState() == igtlio::Connector::STATE_OFF)
 		{
 			REQUIRE(false);
 		}
 	}
 
-	REQUIRE(connector->GetState() == vtkIGTLIOConnector::STATE_CONNECTED);
+	REQUIRE(connector->GetState() == igtlio::Connector::STATE_CONNECTED);
 }
 
-void tryToReceiveEvents(vtkIGTLIOLogicPointer logic, Receiver &receiver)
+void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
 {
-	vtkIGTLIOConnectorPointer connector = logic->GetConnector(0);
+	igtlio::ConnectorPointer connector = logic->GetConnector(0);
 
 	double timeout = 1;
 	double starttime = vtkTimerLog::GetUniversalTime();
@@ -87,7 +87,7 @@ void tryToReceiveEvents(vtkIGTLIOLogicPointer logic, Receiver &receiver)
 	}
 }
 
-void listenToAllDevicesToCountMessages(vtkIGTLIOLogicPointer logic, Receiver &receiver)
+void listenToAllDevicesToCountMessages(igtlio::LogicPointer logic, Receiver &receiver)
 {
 	int index = logic->GetNumberOfDevices();
 	for(int i=0; i<index; ++i)
@@ -96,18 +96,21 @@ void listenToAllDevicesToCountMessages(vtkIGTLIOLogicPointer logic, Receiver &re
 	}
 }
 
-bool isConnected(vtkIGTLIOLogicPointer logic)
+bool isConnected(igtlio::LogicPointer logic)
 {
-	return logic->GetConnector(0)->GetState() == vtkIGTLIOConnector::STATE_CONNECTED;
+	return logic->GetConnector(0)->GetState() == igtlio::Connector::STATE_CONNECTED;
 }
 
 
 TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
 {
-	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+	std::string ip = "localhost";
+	int port = -1;
+
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 
 	Receiver receiver(logic);
-	receiver.connect();
+	receiver.connect(ip, port);
 
 	tryToReceiveEvents(logic, receiver);
 

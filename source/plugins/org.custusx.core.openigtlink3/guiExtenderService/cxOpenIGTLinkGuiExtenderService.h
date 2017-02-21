@@ -38,7 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGUIExtenderService.h"
 class ctkPluginContext;
 
-#include "vtkIGTLIOLogic.h"
+#include "igtlioLogic.h"
 
 namespace cx
 {
@@ -52,7 +52,7 @@ class NetworkConnection;
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLink3GuiExtenderService : public GUIExtenderService
 {
 public:
-    OpenIGTLink3GuiExtenderService(ctkPluginContext* context, vtkIGTLIOLogicPointer logic);
+	OpenIGTLink3GuiExtenderService(ctkPluginContext* context, igtlio::LogicPointer logic);
     virtual ~OpenIGTLink3GuiExtenderService();
 
     std::vector<CategorizedWidget> createWidgets() const;
@@ -62,7 +62,7 @@ private:
 //	NetworkConnectionHandlePtr mClient;
 	ctkPluginContext* mContext;
     //NetworkDataTransferPtr mDataTransfer;
-    vtkIGTLIOLogicPointer mLogic;
+	igtlio::LogicPointer mLogic;
 };
 typedef boost::shared_ptr<OpenIGTLink3GuiExtenderService> OpenIGTLink3GuiExtenderServicePtr;
 

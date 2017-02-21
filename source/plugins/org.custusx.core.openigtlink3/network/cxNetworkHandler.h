@@ -34,8 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CX_NETWORKHANDLER_H_
 
 #include "org_custusx_core_openigtlink3_Export.h"
-#include "vtkIGTLIOLogic.h"
-#include "vtkIGTLIOSession.h"
+#include "igtlioLogic.h"
+#include "igtlioSession.h"
 
 #include "cxTransform3D.h"
 #include "cxImage.h"
@@ -55,10 +55,10 @@ class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
 	QVTK_OBJECT
 
 public:
-	NetworkHandler(vtkIGTLIOLogicPointer logic);
+	NetworkHandler(igtlio::LogicPointer logic);
 	~NetworkHandler();
 
-	vtkIGTLIOSessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
+	igtlio::SessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
 
 signals:
 	void connected();
@@ -81,8 +81,8 @@ private:
 	void connectToConnectionEvents();
 	void connectToDeviceEvents();
 
-	vtkIGTLIOLogicPointer mLogic;
-	vtkIGTLIOSessionPointer mSession;
+	igtlio::LogicPointer mLogic;
+	igtlio::SessionPointer mSession;
 	QTimer *mTimer;
 	void hackEmitProbeDefintionForPlusTestSetup(QString deviceName);
 };

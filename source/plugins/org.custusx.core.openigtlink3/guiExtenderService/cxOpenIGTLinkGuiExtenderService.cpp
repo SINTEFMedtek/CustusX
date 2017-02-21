@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-OpenIGTLink3GuiExtenderService::OpenIGTLink3GuiExtenderService(ctkPluginContext *context, vtkIGTLIOLogicPointer logic)
+OpenIGTLink3GuiExtenderService::OpenIGTLink3GuiExtenderService(ctkPluginContext *context, igtlio::LogicPointer logic)
 {
 	mContext = context;
 	mLogic = logic;

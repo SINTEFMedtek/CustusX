@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
 
-#include "vtkIGTLIOLogic.h"
+#include "igtlioLogic.h"
 
 namespace cx
 {
@@ -57,7 +57,7 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
 
-	vtkIGTLIOLogicPointer logic = vtkIGTLIOLogicPointer::New();
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 	mNetworkHandler.reset(new NetworkHandler(logic));
 	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 

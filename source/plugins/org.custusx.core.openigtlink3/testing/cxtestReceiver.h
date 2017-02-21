@@ -7,8 +7,8 @@
 
 #include <QObject>
 #include "ctkVTKObject.h"
-#include "vtkIGTLIODevice.h"
-#include "vtkIGTLIOLogic.h"
+#include "igtlioDevice.h"
+#include "igtlioLogic.h"
 
 #include "cxImage.h"
 #include "cxTransform3D.h"
@@ -24,11 +24,11 @@ class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT Receiver : public QObject
 	QVTK_OBJECT
 
 public:
-	Receiver(vtkIGTLIOLogicPointer logic);
+	Receiver(igtlio::LogicPointer logic);
 	virtual ~Receiver();
 
-	void connect();
-	void listen(vtkIGTLIODevicePointer device, bool verbose=true);
+	void connect(std::string ip="localhost", int port=-1);
+	void listen(igtlio::DevicePointer device, bool verbose=true);
 
 	void sendCommand();
 
@@ -51,7 +51,7 @@ private slots:
 
 private:
 	cx::NetworkHandler* mNetwork;
-	vtkIGTLIOSessionPointer mSession;
+	igtlio::SessionPointer mSession;
 };
 
 }//namespace cxtest

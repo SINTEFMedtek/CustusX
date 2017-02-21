@@ -33,7 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXOpenIGTLinkPluginActivator_H_
 #define CXOpenIGTLinkPluginActivator_H_
 
-#include "igtlBaseConverter.h"
+#include "igtlioBaseConverter.h"
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
