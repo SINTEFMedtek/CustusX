@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
+#include <vtkXMLPolyDataReader.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkSTLReader.h>
 #include <vtkImageChangeInformation.h>
@@ -300,6 +301,51 @@ DataPtr PolyDataMeshReader::load(const QString& uid, const QString& filename)
 	return mesh;
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+bool XMLPolyDataMeshReader::readInto(DataPtr data, QString filename)
+{
+	return this->readInto(boost::dynamic_pointer_cast<Mesh>(data), filename);
+}
+
+bool XMLPolyDataMeshReader::readInto(MeshPtr mesh, QString filename)
+{
+	if (!mesh)
+		return false;
+	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
+	if(!raw)
+		return false;
+	mesh->setVtkPolyData(raw);
+	return true;
+}
+//-----
+vtkPolyDataPtr XMLPolyDataMeshReader::loadVtkPolyData(QString fileName)
+{
+	vtkXMLPolyDataReaderPtr reader = vtkXMLPolyDataReaderPtr::New();
+	reader->SetFileName(cstring_cast(fileName));
+
+	if (!ErrorObserver::checkedRead(reader, fileName))
+		return vtkPolyDataPtr();
+
+	vtkPolyDataPtr polyData = reader->GetOutput();
+	return polyData;
+}
+
+DataPtr XMLPolyDataMeshReader::load(const QString& uid, const QString& filename)
+{
+	MeshPtr mesh(new Mesh(uid));
+	this->readInto(mesh, filename);
+	return mesh;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
 bool StlMeshReader::readInto(DataPtr data, QString filename)
 {
 	return this->readInto(boost::dynamic_pointer_cast<Mesh>(data), filename);
@@ -340,6 +386,7 @@ DataReaderWriter::DataReaderWriter()
 {
 	mDataReaders.insert(DataReaderPtr(new MetaImageReader()));
 	mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
+	mDataReaders.insert(DataReaderPtr(new XMLPolyDataMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new PNGImageReader()));
 }

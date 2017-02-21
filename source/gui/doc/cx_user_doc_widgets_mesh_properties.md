@@ -45,6 +45,9 @@ The texture is defined on a sheet ranging from 0 to 1 in two dimensions (x and y
 to position the texture on this sheet. *Scale* >1 shrinks the texture to be smaller than the sheet.
 Use *Repeat* to paint only one texture or to repeat it over the available sheet.
 
+The colours of the texture image are added on top of the colours of the mesh. The mesh colour should be
+set to white to get the exact colours of the image.
+
 Experimentation is needed to fit a texture to a mesh and it might not be possible to get a good fit for all meshes.
 
 
