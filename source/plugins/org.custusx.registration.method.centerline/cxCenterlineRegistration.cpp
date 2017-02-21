@@ -165,7 +165,7 @@ vtkPointsPtr CenterlineRegistration::smoothPositions(vtkPointsPtr centerline)
             splineX->AddPoint( indexSpline, p[0] );
             splineY->AddPoint( indexSpline, p[1] );
             splineZ->AddPoint( indexSpline, p[2] );
-            std::cout << "spline point: " << "(" << indexSpline << ") " << p[0] << " " << p[1]  << " " << p[2] << std::endl;
+            //std::cout << "spline point: " << "(" << indexSpline << ") " << p[0] << " " << p[1]  << " " << p[2] << std::endl;
         }
 
         //Always add the last point to complete spline
@@ -174,7 +174,7 @@ vtkPointsPtr CenterlineRegistration::smoothPositions(vtkPointsPtr centerline)
         splineX->AddPoint( numberOfOutputPoints-1, p[0] );
         splineY->AddPoint( numberOfOutputPoints-1, p[1] );
         splineZ->AddPoint( numberOfOutputPoints-1, p[2] );
-        std::cout << "spline point: " << "(" << numberOfOutputPoints-1 << ") " << p[0] << " " << p[1]  << " " << p[2] << std::endl;
+        //std::cout << "spline point: " << "(" << numberOfOutputPoints-1 << ") " << p[0] << " " << p[1]  << " " << p[2] << std::endl;
 
         //evaluate spline - get smoothed positions
         for(int i=0; i<numberOfOutputPoints; i++)
@@ -183,17 +183,11 @@ vtkPointsPtr CenterlineRegistration::smoothPositions(vtkPointsPtr centerline)
             newCenterline->InsertNextPoint(splineX->Evaluate(splineParameter),
                                            splineY->Evaluate(splineParameter),
                                            splineZ->Evaluate(splineParameter));
-
-            double p[3];
-            newCenterline->GetPoint(i,p);
-            std::cout << p[0] << " " << p[1]  << " " << p[2] << std::endl;
         }
     }
     else
         return centerline;
 
-    std::cout << "smoothPostitions - number of input points: " << numberOfInputPoints << std::endl;
-    std::cout << "smoothPostitions - number of output points: " << newCenterline->GetNumberOfPoints() << std::endl;
     return newCenterline;
 }
 
@@ -214,7 +208,7 @@ vtkPointsPtr CenterlineRegistration::processCenterline(vtkPolyDataPtr centerline
         processedPositions->InsertNextPoint(pos[0],pos[1],pos[2]);
         }
 
-    //sort?
+    //sort positions?
     processedPositions = smoothPositions(processedPositions);
 
     return processedPositions;
@@ -238,14 +232,10 @@ vtkPointsPtr CenterlineRegistration::ConvertTrackingDataToVTK(TimedTransformMap 
 
 void   CenterlineRegistration::SetFixedPoints(vtkPointsPtr vtkPoints)
 {
-    std::cout << "CenterlineRegistration::SetFixedPoints" << std::endl;
     mFixedPointSet->Initialize();           // Clear previous pointset
 //    PointsContainerPtr  itkPoints = mFixedPointSet->GetPoints();
     PointsContainerPtr  itkPoints = PointsContainer::New();
     PointType   point;
-
-    std::cout << "CenterlineRegistration::SetFixedPoints" << " - Number of points : "
-              << vtkPoints->GetNumberOfPoints() << std::endl;
 
     for(vtkIdType n=0;n<vtkPoints->GetNumberOfPoints();n++)
     {
@@ -255,18 +245,13 @@ void   CenterlineRegistration::SetFixedPoints(vtkPointsPtr vtkPoints)
         point[1] = temp_Point[1];
         point[2] = temp_Point[2];
         Vector3D vPoint(temp_Point[0], temp_Point[1], temp_Point[2]);
-//        std::cout << vPoint << std::endl;
         itkPoints->InsertElement(n,point);
     }
     mFixedPointSet->SetPoints(itkPoints);
-    std::cout << "CenterlineRegistration::SetFixedPoints" << " - Number of points : "
-              << itkPoints->Size() << std::endl;
-//    std::cout << itkPoints << std::endl;
 }
 
 void CenterlineRegistration::SetMovingPoints(vtkPointsPtr vtkPoints)
 {
-    std::cout << "CenterlineRegistration::SetMovingPoints()" << std::endl;
     mMovingPointSet->Initialize();
     PointsContainerPtr  itkPoints = PointsContainer::New();
     PointType   point;
@@ -276,28 +261,12 @@ void CenterlineRegistration::SetMovingPoints(vtkPointsPtr vtkPoints)
         double temp_Point[3];
         vtkPoints->GetPoint(n, temp_Point);
         Vector3D vPoint(temp_Point[0], temp_Point[1], temp_Point[2]);
-//        std::cout << vPoint << std::endl;
-//        Vector3D transformedPoint = temp_transform * vPoint;
         point[0] = temp_Point[0];
         point[1] = temp_Point[1];
         point[2] = temp_Point[2];
         itkPoints->InsertElement(n,point);
     }
     mMovingPointSet->SetPoints(itkPoints);
-    std::cout << "CenterlineRegistration::SetMovingPoints()" << " - Number of points : "
-              << itkPoints->Size() /*<< " / " << mMovingPointSet->GetNumberOfPoints()*/ << std::endl;
-
-//    for(vtkIdType n=0;n<vtkPoints->GetNumberOfPoints();n++)
-//    {
-//        double temp_Point[3];
-//        vtkPoints->GetPoint(n, temp_Point);
-//        Vector3D vPoint(temp_Point[0], temp_Point[1], temp_Point[2]);
-//        Vector3D transformedPoint = temp_transform * vPoint;
-//        point[0] = transformedPoint[0];
-//        point[1] = transformedPoint[1];
-//        point[2] = transformedPoint[2];
-//        itkPoints->InsertElement(n,point);
-//    }
 }
 
 Transform3D CenterlineRegistration::FullRegisterMoving(Transform3D init_transform)
@@ -322,92 +291,25 @@ Transform3D CenterlineRegistration::FullRegisterMoving(Transform3D init_transfor
     initTranslation[1] = init_transform(1,3);
     initTranslation[2] = init_transform(2,3);
 
-    std::cout << "Transform3D CenterlineRegistration::FullRegisterMoving()" << std::endl;
-        std::cout << "Input transform : " << std::endl;
-        std::cout << init_transform << std::endl;
-        std::cout << "Init translation part : " << initTranslation << std::endl;
-        std::cout << "Matrix : " << std::endl;
-        std::cout << initMatrix << std::endl;
-    std::cout << "Is matrix orthogonal : " << mTransform->MatrixIsOrthogonal(initMatrix,1e-5) << std::endl;
-
     mTransform->SetMatrix(initMatrix, 1e-5);
     mTransform->SetTranslation(initTranslation);
-//    mTransform->SetIdentity();
-
-    // Test keeping the rotation approx. fixed
-//    OptimizerType::ScalesType scales = mRegistration->GetOptimizer()->GetScales();
-//    const double rotationScale = 1000.0;
-//    scales[0] = 1.0 / rotationScale;
-//    scales[1] = 1.0 / rotationScale;
-//    scales[2] = 1.0 / rotationScale;
-//    mRegistration->GetOptimizer()->SetScales(scales);
-    // End test
-
-    std::cout << "Full Registration, Initial parameters : " << std::endl;
-    std::cout << mTransform->GetParameters() << std::endl;
-
-    //    return (Transform3D::Identity());
-
 
     mRegistration->SetInitialTransformParameters(mTransform->GetParameters());
-
 
     try
     {
         mRegistration->Update();
-        std::cout << "Optimizer stop condition: "
-                  << mRegistration->GetOptimizer()->GetStopConditionDescription()
-                  << std::endl;
-        std::cout << "Optimizer scales: "
-                  << mRegistration->GetOptimizer()->GetScales()
-                  << std::endl;
-    //        TransformType::MatrixType regMatrix = mRegistration->GetTransform()->GetMatrix();
-//        TransformType::MatrixType regMatrix = mTransform->GetMatrix();
-//        std::cout << "Registrationmatrix : " << std::endl;
-//        std::cout << regMatrix << std::endl;
-//        std::cout << "-------------------------------------" << std::endl;
-//        std::cout << regMatrix[0][0] << " " << regMatrix[0][1] << " "
-//                << regMatrix[0][2] << std::endl;
-
-        // Rotation transform part
-//        Eigen::MatrixX4d matrix;
-//        for(int i=0; i<3; i++)
-//            for(int j=0;j<3;j++) {
-//                double element = regMatrix[i][j];
-//                matrix(i,j) = element;
-//            }
-
-        // Translation transform part
-//        matrix(0,3) = finalParameters[3];
-//        matrix(1,3) = finalParameters[4];
-//        matrix(2,3) = finalParameters[5];
-
-//        return Transform3D(Eigen::Matrix4d::Identity());
-//        return Transform3D(Eigen::Matrix4d (matrix));
-
     }
     catch (itk::ExceptionObject &exp)
     {
-        std::cout << "AARegMethod - Exception caught ! " << std::endl;
+        std::cout << "CenterlineRegMethod - Exception caught ! " << std::endl;
         std::cout << exp << std::endl;
     }
 
     RegistrationType::ParametersType finalParameters =
             mRegistration->GetLastTransformParameters();
 
-    std::cout << "AARegMethod - Final registration parameters : "
-              << finalParameters << std::endl;
-
-//    typedef itk::Transform<double, 3,3> SuperclassTransformType;
-//    typedef itk::MatrixOffsetTransformBase<double, 3,3> BaseTransformType;
-//    typedef BaseTransformType::Pointer BaseTransformTypePtr;
-//    SuperclassTransformType::Pointer transform = mRegistration->GetTransform();
-
-//    TransformType::MatrixType regMatrix = dynamic_cast<const BaseTransformType*>(transform->GetPointer())->GetMatrix();
-
     TransformType::MatrixType regMatrix = mTransform->GetMatrix();
-//    std::cout << "Registrationmatrix : " << std::endl;
-//    std::cout << regMatrix << std::endl;
 
     for(int i=0; i<3; i++)
         for(int j=0;j<3;j++) {
@@ -415,7 +317,6 @@ Transform3D CenterlineRegistration::FullRegisterMoving(Transform3D init_transfor
             mResultTransform(i,j) = element;
         }
 
-//    mResultTransform = Transform3D::Identity();
     mResultTransform(0,3) = finalParameters(3);
     mResultTransform(1,3) = finalParameters(4);
     mResultTransform(2,3) = finalParameters(5);
@@ -428,18 +329,10 @@ Transform3D CenterlineRegistration::FullRegisterMoving(Transform3D init_transfor
 
 Transform3D CenterlineRegistration::runCenterlineRegistration(vtkPolyDataPtr centerline, Transform3D rMd, TimedTransformMap trackingData_prMt, Transform3D old_rMpr)
 {
-    std::cout << "CenterlineRegistration::runCenterlineRegistration" << std::endl;
 
     vtkPointsPtr centerlinePoints = processCenterline(centerline, rMd);
-    double p[3];
-    centerlinePoints->GetPoint(0,p);
-    std::cout << "Centerline point :" << p[0] << " " << p[1] << " " << p[2] << std::endl;
 
-    vtkPointsPtr trackingPoints = ConvertTrackingDataToVTK(trackingData_prMt, old_rMpr);
-    trackingPoints->GetPoint(0,p);
-    std::cout << "Tracking point :" << p[0] << " " << p[1] << " " << p[2] << std::endl;
-
-    SetFixedPoints( centerline->GetPoints() );
+    SetFixedPoints( centerlinePoints );
     SetMovingPoints( ConvertTrackingDataToVTK(trackingData_prMt, old_rMpr) );
 
     Transform3D rMpr = FullRegisterMoving(Transform3D::Identity());
