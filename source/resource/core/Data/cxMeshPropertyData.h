@@ -58,6 +58,7 @@ public:
 	std::vector<PropertyPtr> mProperties;
 
 	ColorPropertyPtr mColor;
+	BoolPropertyBasePtr mUseColorFromPolydataScalars;
 	DoublePropertyPtr mVisSize;
 	BoolPropertyPtr mBackfaceCulling;
 	BoolPropertyPtr mFrontfaceCulling;
