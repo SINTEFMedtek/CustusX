@@ -51,8 +51,9 @@ cx_install_add_library_dirs(
     ${QT_LIBRARY_DIRS} #remove?
     ${QT_BINARY_DIR} #remove?
     ${GEStreamer_LIBRARY_DIRS}
-    ${OpenCV_LIB_DIR}
+#    ${OpenCV_LIB_DIR} # This is empty for OpenCV 3.2
     ${OpenCV_DIR}/bin
+    ${OpenCV_DIR}/lib
     ${OPENCL_LIBRARY_DIRS}
     ${IGSTK_DIR}/bin
     ${IGSTK_DIR}/lib
