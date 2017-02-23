@@ -101,11 +101,12 @@ bool isConnected(igtlio::LogicPointer logic)
 	return logic->GetConnector(0)->GetState() == igtlio::Connector::STATE_CONNECTED;
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------
 
 TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
 {
-	std::string ip = "localhost";
-	int port = -1;
+	std::string ip = "10.218.140.124"; //localhost
+	int port = 18944; //-1
 
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 
@@ -114,15 +115,16 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 
 	tryToReceiveEvents(logic, receiver);
 
+
 	REQUIRE(isConnected(logic));
 	listenToAllDevicesToCountMessages(logic, receiver);
 	tryToReceiveEvents(logic, receiver);
 
 	REQUIRE(receiver.number_of_events_received > 0);
 	REQUIRE(receiver.image_received);
-	REQUIRE(receiver.transform_received);
+	//REQUIRE(receiver.transform_received);
 
-	receiver.sendCommand();
+	//receiver.sendCommand();
 	tryToReceiveEvents(logic, receiver);
 	/*
 	REQUIRE(receiver.command_respons_received);

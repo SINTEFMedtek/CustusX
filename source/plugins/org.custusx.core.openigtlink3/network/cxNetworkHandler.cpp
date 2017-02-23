@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlioTransformDevice.h"
 #include "igtlioCommandDevice.h"
 #include "igtlioStatusDevice.h"
+#include "igtlioStringDevice.h"
 
 #include "igtlioConnector.h"
 
@@ -46,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlioTransformConverter.h"
 #include "igtlioCommandConverter.h"
 #include "igtlioStatusConverter.h"
+#include "igtlioStringConverter.h"
 
 #include "cxLogger.h"
 
@@ -154,8 +156,21 @@ void NetworkHandler::onDeviceModified(vtkObject* caller_device, void* unknown, u
 		igtlio::StatusDevicePointer status = igtlio::StatusDevice::SafeDownCast(receivedDevice);
 
 		igtlio::StatusConverter::ContentData content = status->GetContent();
-		//TODO
 
+		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
+										<< " subcode: " << content.subcode
+										<< " errorname: " << content.errorname
+										<< " statusstring: " << content.statusstring;
+
+	}
+	else if(device_type == igtlio::StringConverter::GetIGTLTypeName())
+	{
+		igtlio::StringDevicePointer string = igtlio::StringDevice::SafeDownCast(receivedDevice);
+
+		igtlio::StringConverter::ContentData content = string->GetContent();
+
+		CX_LOG_DEBUG() << "STRING: "	<< " encoding: " << content.encoding
+										<< " string: " << content.string_msg;
 	}
 	else
 	{

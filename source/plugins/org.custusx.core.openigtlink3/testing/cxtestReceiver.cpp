@@ -8,6 +8,7 @@
 #include "igtlioCommandDevice.h"
 #include "igtlioTransformDevice.h"
 #include "igtlioStatusDevice.h"
+#include "igtlioStringDevice.h"
 
 #include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
@@ -16,15 +17,18 @@
 #include "igtlioImageConverter.h"
 #include "igtlioTransformConverter.h"
 #include "igtlioStatusConverter.h"
+#include "igtlioStringConverter.h"
 
 
-namespace cxtest {
+namespace cxtest
+{
 
 Receiver::Receiver(igtlio::LogicPointer logic) :
 	number_of_events_received(0),
 	image_received(false),
 	transform_received(false),
-	command_received(false)
+	command_received(false),
+	string_received(false)
 {
 	mNetwork = new cx::NetworkHandler(logic);
 	QObject::connect(mNetwork, &cx::NetworkHandler::image, this, &Receiver::checkImage);
@@ -57,13 +61,13 @@ void Receiver::listen(igtlio::DevicePointer device, bool verbose)
 void Receiver::sendCommand()
 {
 	vtkSmartPointer<igtlio::CommandDevice> device;
-	device = mSession->SendCommandQuery("jb_0",
-						"GetCapabilities",
-						"Jannis");
+	device = mSession->SendCommandQuery("my_device_name",
+										"Get",
+										"<command> <parameter name=\"Depth\"/> </command>");
 	CX_LOG_DEBUG() << "*** Sent message from Client to Server";
 }
 
-void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event , void*)
+void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event, void*)
 {
 	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller));
 	REQUIRE(receivedDevice);
@@ -84,8 +88,8 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 
 		igtlio::CommandConverter::ContentData content = command->GetContent();
 		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
-						<< " name: " << content.name
-						<< " content: " << content.content;
+					   << " name: " << content.name
+					   << " content: " << content.content;
 
 	}
 	else if(device_type == igtlio::StatusConverter::GetIGTLTypeName())
@@ -95,9 +99,9 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 
 		igtlio::StatusConverter::ContentData content = status->GetContent();
 		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
-						<< " subcode: " << content.subcode
-						<< " errorname: " << content.errorname //errorname is an optional field, will only be filled when there is an error
-						<< " statusstring: " << content.statusstring;
+					   << " subcode: " << content.subcode
+					   << " errorname: " << content.errorname //errorname is an optional field, will only be filled when there is an error
+					   << " statusstring: " << content.statusstring;
 
 	}
 	else if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
@@ -107,7 +111,7 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 
 		igtlio::ImageConverter::ContentData content = image->GetContent();
 		CX_LOG_DEBUG() << "IMAGE: "	<< " image class name: " << content.image->GetClassName()
-										<< " transform: " << content.transform;
+					   << " transform: " << content.transform;
 	}
 	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
 	{
@@ -116,7 +120,17 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 
 		igtlio::TransformConverter::ContentData content = transform->GetContent();
 		CX_LOG_DEBUG() << "TRANSFORM: "	<< " transform: " << content.transform
-										<< " deviceName: " << content.deviceName;
+					   << " deviceName: " << content.deviceName;
+
+	}
+	else if(device_type == igtlio::StringConverter::GetIGTLTypeName())
+	{
+		vtkSmartPointer<igtlio::StringDevice> string = igtlio::StringDevice::SafeDownCast(receivedDevice);
+		REQUIRE(string);
+
+		igtlio::StringConverter::ContentData content = string->GetContent();
+		CX_LOG_DEBUG() << "STRING: "	<< " string: " << content.string_msg
+					   << " encoding: " << content.encoding;
 
 	}
 	else
@@ -126,7 +140,7 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 	}
 }
 
-void Receiver::onDeviceModifiedCount(vtkObject* caller, void* device, unsigned long event , void*)
+void Receiver::onDeviceModifiedCount(vtkObject* caller, void* device, unsigned long event, void*)
 {
 	number_of_events_received += 1;
 	if(number_of_events_received > 10)

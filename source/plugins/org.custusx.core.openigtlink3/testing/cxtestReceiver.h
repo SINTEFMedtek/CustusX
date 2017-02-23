@@ -36,6 +36,7 @@ public:
 	bool image_received;
 	bool transform_received;
 	bool command_received;
+	bool string_received;
 
 signals:
 	void done();
