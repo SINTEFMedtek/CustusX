@@ -330,10 +330,9 @@ bool Mesh::hasTexture() const
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-	QString textureShape = this->getTextureShape();
 	if (!this->hasTexture())
 	{
-		mVtkTexture = vtkTexturePtr::New();
+		mVtkTexture = NULL;
 		if(mVtkPolyDataOriginal)
 		  mVtkPolyData = mVtkPolyDataOriginal;
 		return;
