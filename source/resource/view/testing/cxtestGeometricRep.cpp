@@ -39,54 +39,88 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxViewsFixture.h"
 #include "cxGeometricRep.h"
+#include "cxView.h"
 
 
-TEST_CASE("Visual rendering: Load and show mesh",  "[unit][resource][visualization][jon2]")
+namespace cxtest
 {
-	cx::DataLocations::setTestMode();
-	cx::LogicManager::initialize();
-	cxtest::ViewsFixture fixture;
+
+namespace
+{
+class loadMeshAndTestRenderingWithTexture
+{
+public:
+	loadMeshAndTestRenderingWithTexture(QString& meshFile)
+	{
+		//This test that the input file can be loaded, that it can be displayed and that it can be displayed with a texture without crashing or giving errors.
+		//Manual testing is still needed to verify that the mesh and texture are displayed correctly with colour and the correct image and so on.
+		cx::DataLocations::setTestMode();
+		cx::LogicManager::initialize();
+		cxtest::ViewsFixture fixture;
+
+		INFO("Import an image and a mesh.");
+		QString filenameImage = cx::DataLocations::getTestDataPath()+"/testing/videographics/testImage01.png";
+		QString filenameMesh = meshFile;
+
+		QString info;
+		cx::DataPtr dataImage = cx::logicManager()->getPatientModelService()->importData(filenameImage, info);
+		cx::DataPtr dataMesh = cx::logicManager()->getPatientModelService()->importData(filenameMesh, info);
+		REQUIRE(dataImage);
+		REQUIRE(dataMesh);
+
+		cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataImage);
+		cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataMesh);
+		REQUIRE(image);
+		REQUIRE(mesh);
+
+		INFO("Create a rep with the mesh and add it to a view.");
+		cx::GeometricRepPtr p = cx::GeometricRep::New();
+		p->setMesh(mesh);
+		cx::ViewPtr view = fixture.addView(0,0);
+		view->addRep(p);
+
+		CHECK(fixture.quickRunWidget());
+		view->removeReps();
+
+		INFO("Add the image as texture to the mesh.");
+		mesh->getTextureData().getTextureImage()->setValue(image->getUid());
+
+		view->addRep(p);
+		CHECK(fixture.quickRunWidget());
+		view->removeReps();
+
+		INFO("Remove the texture from the mesh mesh.");
+		mesh->getTextureData().getTextureImage()->setValue(NULL);
+
+		view->addRep(p);
+		CHECK(fixture.quickRunWidget());
+		view->removeReps();
+
+		cx::LogicManager::shutdown();
+	}
 
 
-	QString filenameImage = cx::DataLocations::getTestDataPath()+"/testing/videographics/testImage01.png";
-	QString filenameCenterline = cx::DataLocations::getTestDataPath()+"/testing/videographics/funnel_Y_axis.stl";
+};
 
-	//create a new patient
-	QString info;
-	cx::DataPtr dataImage = cx::logicManager()->getPatientModelService()->importData(filenameImage, info);
-	cx::DataPtr dataCenterline = cx::logicManager()->getPatientModelService()->importData(filenameCenterline, info);
-	REQUIRE(dataImage);
-	REQUIRE(dataCenterline);
-
-	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataImage);
-	cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
-	REQUIRE(image);
-	REQUIRE(mesh);
+} //namespace
 
 
-	//mesh->updateVtkPolyDataWithTexture();
-
-
-	cx::GeometricRepPtr p = cx::GeometricRep::New();
-	p->setMesh(mesh);
-	cx::ViewPtr view = fixture.addView(0,0);
-	view->addRep(p);
-
-	//CHECK(fixture.runWidget());
-	CHECK(fixture.quickRunWidget());
-	view->removeReps();
-
-	mesh->getTextureData().getTextureImage()->setValue(image->getUid());
-
-	view->addRep(p);
-	CHECK(fixture.quickRunWidget());
-	view->removeReps();
-
-	mesh->getTextureData().getTextureImage()->setValue(NULL);
-
-	view->addRep(p);
-	CHECK(fixture.quickRunWidget());
-	view->removeReps();
-
-	cx::LogicManager::shutdown();
+TEST_CASE("Visual rendering: Load and show mesh with texture, stl",  "[unit][resource][visualization][jon2]")
+{
+	QString filenameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/funnel_Y_axis.stl";
+	loadMeshAndTestRenderingWithTexture test(filenameMesh);
 }
+
+TEST_CASE("Visual rendering: Load and show mesh with texture, vtk",  "[unit][resource][visualization][jon2]")
+{
+	QString filenameMesh = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/kaisa_skin.vtk";
+	loadMeshAndTestRenderingWithTexture test(filenameMesh);
+}
+
+TEST_CASE("Visual rendering: Load and show mesh with texture, vtp",  "[unit][resource][visualization][jon2]")
+{
+	QString filenameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/out.vtp";
+	loadMeshAndTestRenderingWithTexture test(filenameMesh);
+}
+
+} //namespace cxtest
