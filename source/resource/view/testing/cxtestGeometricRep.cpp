@@ -59,12 +59,12 @@ public:
 		cxtest::ViewsFixture fixture;
 
 		INFO("Import an image and a mesh.");
-		QString filenameImage = cx::DataLocations::getTestDataPath()+"/testing/videographics/testImage01.png";
-		QString filenameMesh = meshFile;
+		QString fileNameImage = cx::DataLocations::getTestDataPath()+"/testing/videographics/testImage01.png";
+		QString fileNameMesh = meshFile;
 
 		QString info;
-		cx::DataPtr dataImage = cx::logicManager()->getPatientModelService()->importData(filenameImage, info);
-		cx::DataPtr dataMesh = cx::logicManager()->getPatientModelService()->importData(filenameMesh, info);
+		cx::DataPtr dataImage = cx::logicManager()->getPatientModelService()->importData(fileNameImage, info);
+		cx::DataPtr dataMesh = cx::logicManager()->getPatientModelService()->importData(fileNameMesh, info);
 		REQUIRE(dataImage);
 		REQUIRE(dataMesh);
 
@@ -105,22 +105,22 @@ public:
 } //namespace
 
 
-TEST_CASE("Visual rendering: Load and show mesh with texture, stl",  "[unit][resource][visualization][jon2]")
+TEST_CASE("Visual rendering: Load and show mesh with texture, stl",  "[unit][resource][visualization]")
 {
-	QString filenameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/funnel_Y_axis.stl";
-	loadMeshAndTestRenderingWithTexture test(filenameMesh);
+	QString fileNameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/funnel_Y_axis.stl";
+	loadMeshAndTestRenderingWithTexture test(fileNameMesh);
 }
 
-TEST_CASE("Visual rendering: Load and show mesh with texture, vtk",  "[unit][resource][visualization][jon2]")
+TEST_CASE("Visual rendering: Load and show mesh with texture, vtk",  "[unit][resource][visualization]")
 {
-	QString filenameMesh = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/kaisa_skin.vtk";
-	loadMeshAndTestRenderingWithTexture test(filenameMesh);
+	QString fileNameMesh = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/kaisa_skin.vtk";
+	loadMeshAndTestRenderingWithTexture test(fileNameMesh);
 }
 
-TEST_CASE("Visual rendering: Load and show mesh with texture, vtp",  "[unit][resource][visualization][jon2]")
+TEST_CASE("Visual rendering: Load and show mesh with texture, vtp",  "[unit][resource][visualization]")
 {
-	QString filenameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/out.vtp";
-	loadMeshAndTestRenderingWithTexture test(filenameMesh);
+	QString fileNameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/out.vtp";
+	loadMeshAndTestRenderingWithTexture test(fileNameMesh);
 }
 
 } //namespace cxtest
