@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
+#include "org_custusx_registration_method_centerline_Export.h"
 
 namespace cx
 {
@@ -56,7 +57,7 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
  * \date 2017-02-16
  * \author Erlend Fagertun Hofstad, SINTEF
  */
-class RegistrationMethodCenterlinePluginActivator :  public QObject, public ctkPluginActivator
+class org_custusx_registration_method_centerline_EXPORT RegistrationMethodCenterlinePluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
 	Q_INTERFACES(ctkPluginActivator)

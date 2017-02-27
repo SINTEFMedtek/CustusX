@@ -62,7 +62,7 @@ typedef vtkSmartPointer<vtkDoubleArray>             vtkDoubleArrayPtr;
 typedef vtkSmartPointer<vtkPoints>                  vtkPointsPtr;
 typedef vtkSmartPointer<vtkPolyData>                vtkPolyDataPtr;
 
-class CenterlineRegistration
+class org_custusx_registration_method_centerline_EXPORT CenterlineRegistration
 {
 
 public:
@@ -84,7 +84,7 @@ public:
                                     PointSetType>       RegistrationType;
 
     CenterlineRegistration();
-   vtkPointsPtr smoothPositions(vtkPointsPtr centerline);
+    vtkPointsPtr smoothPositions(vtkPointsPtr centerline);
     void UpdateScales(bool xRot, bool yRot, bool zRot, bool xTrans, bool yTrans, bool zTrans);
     void SetFixedPoints(vtkPointsPtr points);
     void SetMovingPoints(vtkPointsPtr points);

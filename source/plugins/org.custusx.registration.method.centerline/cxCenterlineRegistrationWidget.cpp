@@ -94,8 +94,6 @@ void CenterlineRegistrationWidget::setup()
 
     mCenterlineRegistration = CenterlineRegistrationPtr(new CenterlineRegistration());
 
-	//this->initializeTrackingService();
-
     connect(mServices->patient().get(),&PatientModelService::patientChanged,this,&CenterlineRegistrationWidget::clearDataOnNewPatient);
 
 
@@ -119,11 +117,7 @@ void CenterlineRegistrationWidget::setup()
     this->selectXrotation(mOptions.getElement());
     this->selectYrotation(mOptions.getElement());
     this->selectZrotation(mOptions.getElement());
-    //this->useLocalRegistration(mOptions.getElement());
 
-//	PropertyPtr maxLocalRegistrationDistance = mProjectionCenterlinePtr->getMaxLocalRegistrationDistanceOption();
-
-    //mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
 	mVerticalLayout->addWidget(mRecordTrackingWidget);
     mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseXtranslation));
     mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseYtranslation));
@@ -150,7 +144,6 @@ void CenterlineRegistrationWidget::initializeTrackingService()
 
 void CenterlineRegistrationWidget::registerSlot()
 {
-    //this->initializeTrackingService();
 
     if(!mSelectMeshWidget->getMesh())
     {
@@ -175,7 +168,7 @@ void CenterlineRegistrationWidget::registerSlot()
     }
 
 	Transform3D new_rMpr;
-    //CenterlineRegistrationPtr centerlineReg;
+
     new_rMpr = mCenterlineRegistration->runCenterlineRegistration(centerline, rMd, trackerRecordedData_prMt, old_rMpr);
 
     std::cout << "Running centerline registration." << std::endl;

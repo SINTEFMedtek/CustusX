@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
+#include "org_custusx_registration_method_centerline_Export.h"
 
 
 namespace cx
@@ -61,7 +62,7 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
  * \date 2017-02-17
 * \author Erlend Fagertun Hofstad, SINTEF
  */
-class CenterlineRegistrationWidget: public RegistrationBaseWidget
+class org_custusx_registration_method_centerline_EXPORT CenterlineRegistrationWidget: public RegistrationBaseWidget
 {
 	Q_OBJECT
 

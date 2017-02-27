@@ -193,7 +193,6 @@ vtkPointsPtr CenterlineRegistration::smoothPositions(vtkPointsPtr centerline)
 
 vtkPointsPtr CenterlineRegistration::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd)
 {
-    std::cout << "rMd: " << rMd << std::endl;
 
     vtkPointsPtr processedPositions = vtkPointsPtr::New();
 	int N = centerline->GetNumberOfPoints();
