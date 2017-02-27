@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxCenterlineRegistration.h"
 #include <vtkImageData.h>
-#include "cxtest_org_custusx_registration_centerline_export.h"
+#include "cxtest_org_custusx_registration_method_centerline_export.h"
 
 typedef boost::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
 
