@@ -55,7 +55,7 @@ namespace cxtest
 
 void checkIfConnected(igtlio::LogicPointer logic)
 {
-	double timeout = 1;
+	double timeout = 2;
 	double starttime = vtkTimerLog::GetUniversalTime();
 
 	igtlio::ConnectorPointer connector = logic->GetConnector(0);
@@ -111,8 +111,8 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 	//expecting server to be run with:
 	// PlusServer.exe --config-file="C:\d\PlusB-bin\PlusLibData\ConfigFiles\PlusDeviceSet_Server_BkProFocusOem.xml"
 
-	//std::string ip = "10.218.140.124"; //ovs
-	std::string ip = "10.218.140.127"; //jbake
+	std::string ip = "10.218.140.124"; //ovs
+	//std::string ip = "10.218.140.127"; //jbake
 	int port = 18944; //-1
 
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
@@ -127,12 +127,13 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 	listenToAllDevicesToCountMessages(logic, receiver);
 	tryToReceiveEvents(logic, receiver);
 
-	REQUIRE(receiver.number_of_events_received > 0);
-	REQUIRE(receiver.image_received);
+//	REQUIRE(receiver.number_of_events_received > 0);
+//	REQUIRE(receiver.image_received);
 	//REQUIRE(receiver.transform_received);
 
 	//receiver.sendString();
-	receiver.send_RequestChannelIDs();
+//	receiver.send_RequestDepthAndGain();
+	receiver.send_RequestDeviceIds();
 	tryToReceiveEvents(logic, receiver);
 	//REQUIRE(receiver.string_received);
 	REQUIRE(receiver.command_respons_received);
@@ -159,6 +160,7 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 	tryToReceiveEvents(logic, receiver);
 
 	receiver.sendCommand_Get_Parameter_Depth();
+
 	tryToReceiveEvents(logic, receiver);
 	REQUIRE(receiver.command_respons_received);
 

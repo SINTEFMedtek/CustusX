@@ -15,6 +15,8 @@ public:
 	PlusReceiver(igtlio::LogicPointer logic);
 
 	void send_RequestChannelIDs();
+	void send_RequestDeviceIds();
+	void send_RequestDepthAndGain();
 
 };
 

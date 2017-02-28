@@ -186,6 +186,7 @@ void Receiver::checkCommandRespons(QString devicename, QString xml)
 void Receiver::checkString(QString string)
 {
 	string_received = true;
+//	CX_LOG_DEBUG() << "checkCommand() devicename: " << devicename << " xml: " << xml;
 }
 
 }//namespace cxtest
