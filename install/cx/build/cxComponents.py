@@ -197,7 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('ca1f1277b463ac9250b09c54b182ac30e0829578')
+        self._getBuilder().gitCheckout('dc944e0bac219da6380e0536e3b0b762b362d7bb')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
