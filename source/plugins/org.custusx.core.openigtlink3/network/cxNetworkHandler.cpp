@@ -98,14 +98,14 @@ void NetworkHandler::hackEmitProbeDefintionForPlusTestSetup(QString deviceName)
 	emit probedefinition(deviceName, probeDefinition);
 }
 
-void NetworkHandler::onDeviceModified(vtkObject* caller_device, void* unknown, unsigned long event , void*)
+void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
 	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller_device));
 
 	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
-	CX_LOG_DEBUG() << "Incoming " << device_type << " on device: " << receivedDevice->GetDeviceName();
+	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName();
 
 	if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
 	{
@@ -145,7 +145,6 @@ void NetworkHandler::onDeviceModified(vtkObject* caller_device, void* unknown, u
 		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
 										<< " name: " << content.name
 										<< " content: " << content.content;
-		//TODO
 		QString deviceName(content.name.c_str());
 		QString xml(content.content.c_str());
 		emit commandRespons(deviceName, xml);
@@ -171,6 +170,9 @@ void NetworkHandler::onDeviceModified(vtkObject* caller_device, void* unknown, u
 
 		CX_LOG_DEBUG() << "STRING: "	<< " encoding: " << content.encoding
 										<< " string: " << content.string_msg;
+
+		QString message(content.string_msg.c_str());
+		emit string_message(message);
 	}
 	else
 	{
@@ -199,7 +201,7 @@ void NetworkHandler::onDeviceAddedOrRemoved(vtkObject* caller, void* void_device
 		if(device)
 		{
 			CX_LOG_DEBUG() << " NetworkHandler is listening to " << device->GetDeviceName();
-			qvtkReconnect(NULL, device, igtlio::Device::ModifiedEvent, this, SLOT(onDeviceModified(vtkObject*, void*, unsigned long, void*)));
+			qvtkReconnect(NULL, device, igtlio::Device::ReceiveEvent, this, SLOT(onDeviceReceived(vtkObject*, void*, unsigned long, void*)));
 		}
 	}
 	if (event==igtlio::Logic::RemovedDeviceEvent)

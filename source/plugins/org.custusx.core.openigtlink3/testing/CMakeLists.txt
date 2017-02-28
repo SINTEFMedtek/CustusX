@@ -5,10 +5,14 @@ if(BUILD_TESTING)
     )
     set(MOC_SOURCE_FILES
         cxtestReceiver.h
+        cxtestPlusReceiver.h
+        cxtestIOReceiver.h
     )
     set(SOURCE_FILES
         ${MOC_SOURCE_FILES}
         cxtestReceiver.cpp
+        cxtestPlusReceiver.cpp
+        cxtestIOReceiver.cpp
         cxtestOpenIGTLinkIO.cpp
     )
 

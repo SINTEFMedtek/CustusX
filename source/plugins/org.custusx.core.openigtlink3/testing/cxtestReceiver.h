@@ -30,25 +30,25 @@ public:
 	void connect(std::string ip="localhost", int port=-1);
 	void listen(igtlio::DevicePointer device, bool verbose=true);
 
-	void sendCommand();
+	void sendCommand(std::string device_name, std::string command_name, std::string command);
+
+	void sendString();
 
 	int number_of_events_received;
 	bool image_received;
 	bool transform_received;
-	bool command_received;
+	bool command_respons_received;
 	bool string_received;
-
-signals:
-	void done();
 
 public slots:
 	void onDeviceModifiedPrint(vtkObject *caller, void *device, unsigned long event, void *);
-	void onDeviceModifiedCount(vtkObject *caller, void *device, unsigned long event, void *);
+	void onDeviceReceivedCount(vtkObject *caller, void *device, unsigned long event, void *);
 
 private slots:
 	void checkImage(cx::ImagePtr image);
 	void checkTransform(QString devicename, cx::Transform3D transform, double timestamp);
-	void checkCommand(QString devicename, QString xml);
+	void checkCommandRespons(QString devicename, QString xml);
+	void checkString(QString string);
 
 private:
 	cx::NetworkHandler* mNetwork;

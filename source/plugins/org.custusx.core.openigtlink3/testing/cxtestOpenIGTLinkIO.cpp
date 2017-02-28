@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxtestQueuedSignalListener.h"
 
+#include "cxtestPlusReceiver.h"
+#include "cxtestIOReceiver.h"
+
 namespace cxtest
 {
 
@@ -105,18 +108,22 @@ bool isConnected(igtlio::LogicPointer logic)
 
 TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.custusx.core.openigtlink3][manual]")
 {
-	std::string ip = "10.218.140.124"; //localhost
+	//expecting server to be run with:
+	// PlusServer.exe --config-file="C:\d\PlusB-bin\PlusLibData\ConfigFiles\PlusDeviceSet_Server_BkProFocusOem.xml"
+
+	//std::string ip = "10.218.140.124"; //ovs
+	std::string ip = "10.218.140.127"; //jbake
 	int port = 18944; //-1
 
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 
-	Receiver receiver(logic);
+	PlusReceiver receiver(logic);
 	receiver.connect(ip, port);
 
 	tryToReceiveEvents(logic, receiver);
 
-
 	REQUIRE(isConnected(logic));
+	tryToReceiveEvents(logic, receiver);
 	listenToAllDevicesToCountMessages(logic, receiver);
 	tryToReceiveEvents(logic, receiver);
 
@@ -124,11 +131,36 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 	REQUIRE(receiver.image_received);
 	//REQUIRE(receiver.transform_received);
 
-	//receiver.sendCommand();
+	//receiver.sendString();
+	receiver.send_RequestChannelIDs();
 	tryToReceiveEvents(logic, receiver);
-	/*
+	//REQUIRE(receiver.string_received);
 	REQUIRE(receiver.command_respons_received);
-	*/
+
+}
+
+TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.openigtlink3][manual]")
+{
+	//expecting a igtlioQtClient to run
+
+	std::string ip = "localhost";
+	int port = 18944;
+
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+
+	IOReceiver receiver(logic);
+	receiver.connect(ip, port);
+
+	tryToReceiveEvents(logic, receiver);
+	REQUIRE(isConnected(logic));
+
+	tryToReceiveEvents(logic, receiver);
+	listenToAllDevicesToCountMessages(logic, receiver);
+	tryToReceiveEvents(logic, receiver);
+
+	receiver.sendCommand_Get_Parameter_Depth();
+	tryToReceiveEvents(logic, receiver);
+	REQUIRE(receiver.command_respons_received);
 
 }
 

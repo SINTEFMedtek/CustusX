@@ -27,13 +27,14 @@ Receiver::Receiver(igtlio::LogicPointer logic) :
 	number_of_events_received(0),
 	image_received(false),
 	transform_received(false),
-	command_received(false),
+	command_respons_received(false),
 	string_received(false)
 {
 	mNetwork = new cx::NetworkHandler(logic);
 	QObject::connect(mNetwork, &cx::NetworkHandler::image, this, &Receiver::checkImage);
 	QObject::connect(mNetwork, &cx::NetworkHandler::transform, this, &Receiver::checkTransform);
-	QObject::connect(mNetwork, &cx::NetworkHandler::commandRespons, this, &Receiver::checkCommand);
+	QObject::connect(mNetwork, &cx::NetworkHandler::commandRespons, this, &Receiver::checkCommandRespons);
+	QObject::connect(mNetwork, &cx::NetworkHandler::string_message, this, &Receiver::checkString);
 }
 
 Receiver::~Receiver()
@@ -52,32 +53,44 @@ void Receiver::listen(igtlio::DevicePointer device, bool verbose)
 	CX_LOG_DEBUG() << "Listening to a device: " << deviceName;
 	if(verbose)
 	{
-		qvtkReconnect(NULL, device, igtlio::Device::ModifiedEvent, this, SLOT(onDeviceModifiedPrint(vtkObject*, void*, unsigned long, void*)));
+		qvtkReconnect(NULL, device, igtlio::Device::ReceiveEvent, this, SLOT(onDeviceModifiedPrint(vtkObject*, void*, unsigned long, void*)));
 	}
-	qvtkReconnect(NULL, device, igtlio::Device::ModifiedEvent, this, SLOT(onDeviceModifiedCount(vtkObject*, void*, unsigned long, void*)));
+	qvtkReconnect(NULL, device, igtlio::Device::ReceiveEvent, this, SLOT(onDeviceReceivedCount(vtkObject*, void*, unsigned long, void*)));
 
 }
 
-void Receiver::sendCommand()
+void Receiver::sendCommand(std::string device_name, std::string command_name, std::string command)
 {
+
 	vtkSmartPointer<igtlio::CommandDevice> device;
+	/*
 	device = mSession->SendCommandQuery("my_device_name",
 										"Get",
 										"<command> <parameter name=\"Depth\"/> </command>");
-	CX_LOG_DEBUG() << "*** Sent message from Client to Server";
+										*/
+
+	device = mSession->SendCommandQuery(device_name, command_name, command
+										);
+	CX_LOG_DEBUG() << "*** Sent message.";
+}
+
+void Receiver::sendString()
+{
+	vtkSmartPointer<igtlio::StringDevice> device;
+	device = mSession->SendString("my_device_name", "<Command Name=\"RequestChannelIDs\" />");
 }
 
 void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event, void*)
 {
 	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller));
 	REQUIRE(receivedDevice);
-	CX_LOG_DEBUG() << "\n\n *** Received event " << event
+	CX_LOG_DEBUG() << "\n\n *** DEVICE IS MODIFIED: " << event
 				   << " from " << receivedDevice->GetDeviceName()
 				   << " which is of type " << receivedDevice->GetDeviceType()
 				   << " ***";
 
 	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
-	CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName << " timestamp: " << header.timestamp;
+	//CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName << " timestamp: " << header.timestamp;
 
 
 	std::string device_type = receivedDevice->GetDeviceType();
@@ -87,9 +100,11 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		REQUIRE(command);
 
 		igtlio::CommandConverter::ContentData content = command->GetContent();
+		/*
 		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
 					   << " name: " << content.name
 					   << " content: " << content.content;
+		*/
 
 	}
 	else if(device_type == igtlio::StatusConverter::GetIGTLTypeName())
@@ -98,10 +113,12 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		REQUIRE(status);
 
 		igtlio::StatusConverter::ContentData content = status->GetContent();
+		/*
 		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
 					   << " subcode: " << content.subcode
 					   << " errorname: " << content.errorname //errorname is an optional field, will only be filled when there is an error
 					   << " statusstring: " << content.statusstring;
+		*/
 
 	}
 	else if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
@@ -110,8 +127,10 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		REQUIRE(image);
 
 		igtlio::ImageConverter::ContentData content = image->GetContent();
+		/*
 		CX_LOG_DEBUG() << "IMAGE: "	<< " image class name: " << content.image->GetClassName()
 					   << " transform: " << content.transform;
+		*/
 	}
 	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
 	{
@@ -119,8 +138,10 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		REQUIRE(transform);
 
 		igtlio::TransformConverter::ContentData content = transform->GetContent();
+		/*
 		CX_LOG_DEBUG() << "TRANSFORM: "	<< " transform: " << content.transform
 					   << " deviceName: " << content.deviceName;
+		*/
 
 	}
 	else if(device_type == igtlio::StringConverter::GetIGTLTypeName())
@@ -129,24 +150,22 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		REQUIRE(string);
 
 		igtlio::StringConverter::ContentData content = string->GetContent();
+		/*
 		CX_LOG_DEBUG() << "STRING: "	<< " string: " << content.string_msg
 					   << " encoding: " << content.encoding;
+		*/
 
 	}
 	else
 	{
-		INFO("Receiving unknown device type.");
+		INFO("Modified device has unknown device type.");
 		REQUIRE(false);
 	}
 }
 
-void Receiver::onDeviceModifiedCount(vtkObject* caller, void* device, unsigned long event, void*)
+void Receiver::onDeviceReceivedCount(vtkObject* caller, void* device, unsigned long event, void*)
 {
 	number_of_events_received += 1;
-	if(number_of_events_received > 10)
-	{
-		emit done();
-	}
 }
 
 void Receiver::checkImage(cx::ImagePtr image)
@@ -159,9 +178,14 @@ void Receiver::checkTransform(QString devicename, cx::Transform3D transform, dou
 	transform_received = true;
 }
 
-void Receiver::checkCommand(QString devicename, QString xml)
+void Receiver::checkCommandRespons(QString devicename, QString xml)
 {
-	command_received = true;
+	command_respons_received = true;
+}
+
+void Receiver::checkString(QString string)
+{
+	string_received = true;
 }
 
 }//namespace cxtest

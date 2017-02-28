@@ -67,6 +67,7 @@ signals:
 	void transform(QString devicename, Transform3D transform, double timestamp);
 	void image(ImagePtr image);
 	void commandRespons(QString devicename, QString xml);
+	void string_message(QString message);
 	//void mesh(MeshPtr image);
 	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 	//void calibration(QString devicename, Transform3D calibration);
@@ -74,7 +75,7 @@ signals:
 private slots:
 	void onConnectionEvent(vtkObject* caller, void* connector, unsigned long event, void*);
 	void onDeviceAddedOrRemoved(vtkObject* caller, void* connector, unsigned long event, void*callData);
-	void onDeviceModified(vtkObject * caller_device, void * unknown, unsigned long event, void *);
+	void onDeviceReceived(vtkObject * caller_device, void * unknown, unsigned long event, void *);
 	void periodicProcess();
 
 private:
