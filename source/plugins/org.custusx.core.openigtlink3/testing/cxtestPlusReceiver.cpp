@@ -9,7 +9,7 @@ PlusReceiver::PlusReceiver(igtlio::LogicPointer logic) :
 
 }
 
-void PlusReceiver::send_RequestChannelIDs()
+void PlusReceiver::send_RequestChannelIds()
 {
 	/* PLUS commands
 	static const char REQUEST_CHANNEL_IDS_CMD[] = "RequestChannelIds";
@@ -22,11 +22,25 @@ void PlusReceiver::send_RequestChannelIDs()
 	//Reply should be: <Command><Result>true</Result><Message>VideoStream</Message></Command>
 }
 
+void PlusReceiver::send_RequestDeviceChannelIds()
+{
+	this->sendCommand("VideoDevice", "RequestDeviceChannelIds", "<Command Name=\"RequestDeviceChannelIds\" />");
+
+	//Fails. Got reply: <Command><Result>false</Result><Error>Device with id:  not found</Error><Message>Command failed, see error message.</Message></Command>
+}
+
 void PlusReceiver::send_RequestDeviceIds()
 {
 	this->sendCommand("", "RequestDeviceIds", "<Command Name=\"RequestDeviceIds\" />");
 
 	//Reply should be: <Command><Result>true</Result><Message>VideoDevice,CaptureDevice</Message></Command>
+}
+
+void PlusReceiver::send_RequestInputDeviceIds()
+{
+	this->sendCommand("", "RequestInputDeviceIds", "<Command Name=\"RequestInputDeviceIds\" />");
+
+	//Fails. Got reply: <Command><Result>false</Result><Error>Device with id:  not found</Error><Message>Command failed, see error message.</Message></Command>
 }
 
 void PlusReceiver::send_RequestDepthAndGain()

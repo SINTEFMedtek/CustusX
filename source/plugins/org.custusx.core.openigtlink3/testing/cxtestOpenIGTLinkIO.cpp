@@ -133,7 +133,10 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 
 	//receiver.sendString();
 //	receiver.send_RequestDepthAndGain();
-	receiver.send_RequestDeviceIds();
+//	receiver.send_RequestDeviceIds();
+//	receiver.send_RequestChannelIds();
+	receiver.send_RequestDeviceChannelIds();
+//	receiver.send_RequestInputDeviceIds();
 	tryToReceiveEvents(logic, receiver);
 	//REQUIRE(receiver.string_received);
 	REQUIRE(receiver.command_respons_received);

@@ -14,8 +14,11 @@ class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT PlusReceiver : public Receiver
 public:
 	PlusReceiver(igtlio::LogicPointer logic);
 
-	void send_RequestChannelIDs();
+	void send_RequestChannelIds();
 	void send_RequestDeviceIds();
+	void send_RequestDeviceChannelIds();
+	void send_RequestInputDeviceIds();
+
 	void send_RequestDepthAndGain();
 
 };
