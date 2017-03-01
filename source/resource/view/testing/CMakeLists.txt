@@ -22,6 +22,7 @@ if(BUILD_TESTING)
         cxtestRenderWindowFactory.cpp
         cxtestViewServiceMockWithRenderWindowFactory.h
         cxtestViewServiceMockWithRenderWindowFactory.cpp
+        cxtestGeometricRep.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -43,6 +44,7 @@ if(BUILD_TESTING)
         cxResource
         cxResourceVisualization
         cxCatch
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtestResourceVisualization)
     

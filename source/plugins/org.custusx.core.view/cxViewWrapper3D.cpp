@@ -938,34 +938,32 @@ void ViewWrapper3D::setStereoEyeAngle(double angle)
 
 void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 {
-	bool success = true;
 	if(setDepthPeeling)
 	{
+		bool isDPSupported = true;
 
 		//IsDepthPeelingSupported function don't seem to work on OSX (error messages or seg. fault)
 #ifndef __APPLE__
 		if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
 			reportWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
-			success = false;
+			isDPSupported = false;
 		}
 #endif
-		if (success && !SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
-		{
-			reportWarning("Error setting depth peeling");
-			success = false;
-		}
-		else
+
+		if (isDPSupported && SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
 			report("Set GPU depth peeling");
 		}
-		if(!success)
-		  settings()->setValue("View3D/depthPeeling", false);
-	} else
+		else
+		{
+			reportWarning("Error setting depth peeling. The GPU or operating system might not support it.");
+			settings()->setValue("View3D/depthPeeling", false);
+		}
+	}
+	else
 	{
 		TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer());
-//		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-//			report("Depth peeling turned off");
 	}
 }
 
