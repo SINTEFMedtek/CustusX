@@ -28,10 +28,14 @@ Properties {#mesh_property_properties}
 -----------------------------------------------------------
 Set visualization properties of the mesh.
 
-Backface and Frontface culling can be used for making transparent meshes work. Backface only draws outside walls, while frontface only draws inside walls.
-
 Ambient, Diffuse, Specular and Specular Power can be used to change how the mesh responds to lighting.
 
+### Transparent meshes {#mesh_property_transparent}
+Backface and Frontface culling can be used for making transparent meshes work.
+With backface culling on, only the outside walls are drawn. With frontface culling on, only the inside walls are drawn and navigation inside the mesh is possible.
+
+Some GPUs supports depth peeling which sorts mesh elements by depth on each render. This can prevent some random cases of unwanted and weird 3D effects.
+However, the render speed might be slow if the mesh contains many elements. It can be turned on in *Preferences -> Performance*.
 
 \addindex mesh_texture_widget
 Texture {#mesh_property_texture}
