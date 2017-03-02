@@ -45,7 +45,7 @@ typedef boost::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
 
 namespace cxtest {
 
-class org_custusx_registration_method_centerline_EXPORT CenterlineRegistrationTest{}; //Needed for Windows linking
+class CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_CENTERLINE_EXPORT CenterlineRegistrationTest{}; //Needed for Windows linking
 
 
 TEST_CASE("CenterlineRegistration: execute", "[unit][org.custusx.registration.method.centerline]")
