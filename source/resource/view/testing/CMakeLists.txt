@@ -18,6 +18,7 @@ if(BUILD_TESTING)
         cxtestVisualRendering.cpp
         cxtestImageEnveloper.cpp
         cxtestStream2DRep3D.cpp
+        cxtestGeometricRep.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -39,6 +40,7 @@ if(BUILD_TESTING)
         cxResource
         cxResourceVisualization
         cxCatch
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtestResourceVisualization)
     
