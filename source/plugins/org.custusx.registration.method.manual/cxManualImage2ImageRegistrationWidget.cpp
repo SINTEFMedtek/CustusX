@@ -99,21 +99,20 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 		return;
 
 	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
-	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
-	Transform3D fQm = M; // the modified fMm matrix
+//	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
 
 	// start with
 	//   new registration = new registration
 	//                fQm = fMr * rMm'
 	//                fQm = fMr * delta * rMm
-	Transform3D delta = rMf * fQm * rMm.inv();
+//	Transform3D delta = rMf * fQm * rMm.inv();
 
     RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
     Transform3D init_rMd = history->getData().front().mValue;
     Transform3D new_rMd = M * init_rMd;
-    Transform3D delta2 = new_rMd * rMm.inv();
+    Transform3D delta = new_rMd * rMm.inv();
 
-    mServices->registration()->addImage2ImageRegistration(delta2, "Manual Image");
+    mServices->registration()->addImage2ImageRegistration(delta, "Manual Image");
     this->updateAverageAccuracyLabel();
 
 }

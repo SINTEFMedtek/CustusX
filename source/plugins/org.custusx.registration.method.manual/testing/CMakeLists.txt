@@ -21,9 +21,7 @@ if(BUILD_TESTING)
     target_link_libraries(cxtest_org_custusx_registration_method_manual
         PRIVATE
         cxLogicManager
-#        cxtestUtilities
         org_custusx_registration_method_manual
-#        cxtest_org_custusx_core_patientmodel
         cxCatch
         )
     cx_add_tests_to_catch(cxtest_org_custusx_registration_method_manual)
