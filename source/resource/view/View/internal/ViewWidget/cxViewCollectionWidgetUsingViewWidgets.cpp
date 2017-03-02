@@ -44,7 +44,7 @@ LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(RenderWindowFactoryPt
 	ViewCollectionWidget(parent)
 {
 	mViewCache = MultiViewCache::create(factory);
-	mOffScreenRendering = true;
+	mOffScreenRendering = false;
 
 	mLayout = new QGridLayout;
 
