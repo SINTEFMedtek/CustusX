@@ -58,12 +58,12 @@ public:
 	virtual void setMatrixFromWidget(Transform3D M);
 
     bool    isValid() const;
+    double  getAverageAccuracy(int& numActiveLandmarks);
 
 private:
     QLabel* mAvarageAccuracyLabel;
 
     void    updateAverageAccuracyLabel();
-    double  getAverageAccuracy(int& numActiveLandmarks);
     double  getAccuracy(QString uid);
     bool    isAverageAccuracyValid();
 

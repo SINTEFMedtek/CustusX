@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxRegistrationProperties.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxRegistrationService.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationTransform.h"
 #include "cxLandmark.h"
@@ -117,14 +116,6 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
     mServices->registration()->addImage2ImageRegistration(delta2, "Manual Image");
     this->updateAverageAccuracyLabel();
 
-
-
-    ImagePtr fixed = boost::dynamic_pointer_cast<Image>(mServices->registration()->getFixedData());
-    ImagePtr moving = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
-    if(fixed)
-        LandmarkMap fixedLandmarks = fixed->getLandmarks()->getLandmarks();
-    if(moving)
-        LandmarkMap movingLandmarks = moving->getLandmarks()->getLandmarks();
 }
 
 double ManualImage2ImageRegistrationWidget::getAverageAccuracy(int& numActiveLandmarks)
@@ -172,6 +163,7 @@ double ManualImage2ImageRegistrationWidget::getAccuracy(QString uid)
 
     Vector3D p_target_r = rMtarget.coord(p_target_target);
     Vector3D p_master_r = rMmaster.coord(p_master_master);
+
     double  targetPoint[3];
     double  masterPoint[3];
     targetPoint[0] = p_target_r[0];

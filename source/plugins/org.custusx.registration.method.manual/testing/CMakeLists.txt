@@ -18,7 +18,14 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_registration_method_manual PRIVATE org_custusx_registration_method_manual cxCatch)
+    target_link_libraries(cxtest_org_custusx_registration_method_manual
+        PRIVATE
+        cxLogicManager
+#        cxtestUtilities
+        org_custusx_registration_method_manual
+#        cxtest_org_custusx_core_patientmodel
+        cxCatch
+        )
     cx_add_tests_to_catch(cxtest_org_custusx_registration_method_manual)
 
 endif(BUILD_TESTING)
