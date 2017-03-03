@@ -39,18 +39,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
 #include "cxMultiViewCache.h"
+#include "cxRenderWindowFactory.h"
 
 namespace cx
 {
 
-ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
+ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(RenderWindowFactoryPtr factory, QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
-	mViewCache = MultiViewCache::create();
+	mViewCache = MultiViewCache::create(factory);
 
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
+	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(factory, this);
 	this->initBaseLayout();
 	this->setGridMargin(4);
 	this->setGridSpacing(2);

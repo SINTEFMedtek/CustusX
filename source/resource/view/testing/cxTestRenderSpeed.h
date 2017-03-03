@@ -46,6 +46,11 @@ typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindowInteractor> vtkRenderWindowInteractorPtr;
 
+namespace cx
+{
+typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
+}
+
 namespace cxtest
 {
 

@@ -61,8 +61,8 @@ TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")
 
     //create a new patient
 	QString info;
-    cx::DataPtr dataVolume = cx::patientService()->importData(filenameVolume, info);
-    cx::DataPtr dataCenterline = cx::patientService()->importData(filenameCenterline, info);
+	cx::DataPtr dataVolume = cx::logicManager()->getPatientModelService()->importData(filenameVolume, info);
+	cx::DataPtr dataCenterline = cx::logicManager()->getPatientModelService()->importData(filenameCenterline, info);
 
     REQUIRE(dataVolume);
     REQUIRE(dataCenterline);

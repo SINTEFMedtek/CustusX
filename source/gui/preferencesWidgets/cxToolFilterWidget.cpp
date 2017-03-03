@@ -49,14 +49,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
-    QGroupBox(parent)
+ToolFilterGroupBox::ToolFilterGroupBox(TrackingServicePtr trackingService, QWidget* parent) :
+	QGroupBox(parent),
+	mTrackingService(trackingService)
 {
   this->setTitle("Available tools");
 
 	this->createAppSelector();
 
-  mToolListWidget = new FilteringToolListWidget(NULL);
+  mToolListWidget = new FilteringToolListWidget(trackingService, NULL);
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
@@ -68,7 +69,7 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
 void ToolFilterGroupBox::createAppSelector()
 {
 	QString defaultValue = "all";
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	QStringList range = config->getAllApplications();
 	range.prepend("all");
 	mAppSelector = StringProperty::initialize("applications", "Application",
@@ -97,7 +98,7 @@ void ToolFilterGroupBox::setTrackingSystemSelector(StringPropertyBasePtr selecto
 
 void ToolFilterGroupBox::setClinicalApplicationSlot(QString val)
 {
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	QStringList range = config->getAllApplications();
 	for (int i=0; i<range.size(); ++i)
 	{
@@ -111,7 +112,7 @@ void ToolFilterGroupBox::filterSlot()
   QStringList applicationFilter;
   if (mAppSelector->getValue().contains("all", Qt::CaseInsensitive))
   {
-	  TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	  TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	  applicationFilter = config->getAllApplications();
 	  applicationFilter << "all";
   }

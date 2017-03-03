@@ -75,7 +75,7 @@ class cxGui_EXPORT MetricBase : public QObject
 {
   Q_OBJECT
 public:
-	MetricBase(ViewServicePtr viewService, PatientModelServicePtr patientModelService);
+	MetricBase(VisServicesPtr services);
 	virtual ~MetricBase() {}
 	virtual QWidget* createWidget() = 0;
 	virtual QString getValue() const;
@@ -90,8 +90,8 @@ protected:
   ColorPropertyPtr mColorSelector;
   void addColorWidget(QVBoxLayout* layout);
   QWidget* newWidget(QString objectName);
-  ViewServicePtr mViewService;
-  PatientModelServicePtr mPatientModelService;
+  VisServicesPtr mServices;
+
 };
 
 /**
@@ -101,7 +101,7 @@ class cxGui_EXPORT MetricReferenceArgumentListGui : public QObject
 {
 	Q_OBJECT
 public:
-	MetricReferenceArgumentListGui();
+	MetricReferenceArgumentListGui(VisServicesPtr services);
 	void setArguments(MetricReferenceArgumentListPtr arguments);
 	void addWidgets(QBoxLayout* layout);
 	QString getAsString() const;
@@ -116,6 +116,8 @@ private:
 	std::vector<StringPropertyPtr> mPSelector;
 	bool mInternalUpdate;
 	bool mModified;
+	VisServicesPtr mServices;
+
 	void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
 };
 
@@ -123,7 +125,7 @@ class cxGui_EXPORT PointMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit PointMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, PointMetricPtr data);
+  explicit PointMetricWrapper(VisServicesPtr services, PointMetricPtr data);
   virtual ~PointMetricWrapper();
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
@@ -150,7 +152,7 @@ class cxGui_EXPORT PlaneMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit PlaneMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, PlaneMetricPtr data);
+  explicit PlaneMetricWrapper(VisServicesPtr services, PlaneMetricPtr data);
   virtual ~PlaneMetricWrapper();
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
@@ -170,7 +172,7 @@ class cxGui_EXPORT DistanceMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit DistanceMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, DistanceMetricPtr data);
+  explicit DistanceMetricWrapper(VisServicesPtr services, DistanceMetricPtr data);
   virtual ~DistanceMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
@@ -191,7 +193,7 @@ class cxGui_EXPORT AngleMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit AngleMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, AngleMetricPtr data);
+  explicit AngleMetricWrapper(VisServicesPtr services, AngleMetricPtr data);
   virtual ~AngleMetricWrapper();
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;
@@ -216,7 +218,7 @@ class cxGui_EXPORT DonutMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit DonutMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, DonutMetricPtr data);
+  explicit DonutMetricWrapper(VisServicesPtr services, DonutMetricPtr data);
   virtual ~DonutMetricWrapper() {}
   virtual QWidget* createWidget();
 //  virtual QString getValue() const;
@@ -248,7 +250,7 @@ class cxGui_EXPORT CustomMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit CustomMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, CustomMetricPtr data);
+  explicit CustomMetricWrapper(VisServicesPtr services, CustomMetricPtr data);
   virtual ~CustomMetricWrapper() {}
   virtual QWidget* createWidget();
 //  virtual QString getValue() const;
@@ -294,7 +296,7 @@ class cxGui_EXPORT SphereMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit SphereMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, SphereMetricPtr data);
+  explicit SphereMetricWrapper(VisServicesPtr services, SphereMetricPtr data);
   virtual ~SphereMetricWrapper() {}
   virtual QWidget* createWidget();
 //  virtual QString getValue() const;
@@ -320,7 +322,7 @@ class cxGui_EXPORT RegionOfInterestMetricWrapper : public MetricBase
 {
   Q_OBJECT
 public:
-  explicit RegionOfInterestMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, RegionOfInterestMetricPtr data);
+  explicit RegionOfInterestMetricWrapper(VisServicesPtr services, RegionOfInterestMetricPtr data);
   virtual ~RegionOfInterestMetricWrapper() {}
   virtual QWidget* createWidget();
   virtual DataMetricPtr getData() const;

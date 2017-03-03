@@ -45,9 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBoundingBox3D.h"
 #include "cxView.h"
 #include "cxViewService.h"
-
-//TODO: remove
-#include "cxLegacySingletons.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -56,11 +54,12 @@ namespace cx
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-TrackPadWidget::TrackPadWidget(QWidget* parent) :
-	BaseWidget(parent, "track_pad_widget", "Camera Control")
+TrackPadWidget::TrackPadWidget(ViewServicePtr viewService, QWidget* parent) :
+	BaseWidget(parent, "track_pad_widget", "Camera Control"),
+	mViewService(viewService)
 {
 	this->setToolTip("Track pad camera control");
-  mCameraControl = viewService()->getCameraControl();
+  mCameraControl = viewService->getCameraControl();
 
   mMinPadSize = QSize(50,50);
   mMinBarSize = QSize(20,50);
@@ -74,6 +73,12 @@ TrackPadWidget::TrackPadWidget(QWidget* parent) :
 
 void TrackPadWidget::createStandard3DViewActions()
 {
+	if(!mCameraControl)
+	{
+		CX_LOG_WARNING() << "TrackPadWidget::createStandard3DViewActions: Got no mCameraControl";
+		return;
+	}
+
   QActionGroup* group = mCameraControl->createStandard3DViewActions();
 
   QToolBar* toolBar = new QToolBar(this);
@@ -125,7 +130,7 @@ void TrackPadWidget::definePanLayout()
 
 vtkCameraPtr TrackPadWidget::getCamera() const
 {
-  return viewService()->get3DView()->getRenderer()->GetActiveCamera();
+  return mViewService->get3DView()->getRenderer()->GetActiveCamera();
 }
 
 void TrackPadWidget::rotateYSlot(QPointF delta)
@@ -150,7 +155,7 @@ void TrackPadWidget::dollySlot(QPointF delta)
 {
   double factor = 1 + delta.y();
   this->getCamera()->Dolly(factor);
-  viewService()->get3DView()->getRenderer()->ResetCameraClippingRange();
+  mViewService->get3DView()->getRenderer()->ResetCameraClippingRange();
 }
 
 void TrackPadWidget::panXZSlot(QPointF delta)
@@ -163,7 +168,7 @@ void TrackPadWidget::panXZSlot(QPointF delta)
   Vector3D e_x = cross(focus-position, vup).normal();
   Vector3D e_y = vup.normal();
 
-  DoubleBoundingBox3D bb(viewService()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
+  DoubleBoundingBox3D bb(mViewService->get3DView()->getRenderer()->ComputeVisiblePropBounds());
 
   double volSize = bb.range().length() / pow(3, 1.0/3.0); // mm size of volume
   double scale = volSize;///padSize;

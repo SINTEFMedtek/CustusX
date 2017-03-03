@@ -18,6 +18,10 @@ if(BUILD_TESTING)
         cxtestVisualRendering.cpp
         cxtestImageEnveloper.cpp
         cxtestStream2DRep3D.cpp
+        cxtestSharedOpenGLContext.cpp
+        cxtestRenderWindowFactory.cpp
+        cxtestViewServiceMockWithRenderWindowFactory.h
+        cxtestViewServiceMockWithRenderWindowFactory.cpp
         cxtestGeometricRep.cpp
     )
 

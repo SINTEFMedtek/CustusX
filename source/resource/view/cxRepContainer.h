@@ -46,7 +46,6 @@ typedef boost::shared_ptr<class Rep> RepPtr;
 
 typedef std::map<QString, RepPtr> RepMap;
 typedef std::map<QString, VolumetricBaseRepPtr> VolumetricRepMap;
-typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
 
 /**
  *  - Utility functions for accessing reps,

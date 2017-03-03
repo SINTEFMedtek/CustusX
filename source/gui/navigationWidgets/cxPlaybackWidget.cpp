@@ -53,8 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PlaybackWidget::PlaybackWidget(QWidget* parent) :
-				BaseWidget(parent, "playback_widget", "Playback")
+PlaybackWidget::PlaybackWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, PatientModelServicePtr patientModelService, QWidget* parent) :
+				BaseWidget(parent, "playback_widget", "Playback"),
+				mTrackingService(trackingService),
+				mVideoService(videoService),
+				mPatientModelService(patientModelService)
 {
 	mOpen = false;
 	this->setToolTip("Replay current session");
@@ -149,21 +152,21 @@ void PlaybackWidget::timeLineWidgetValueChangedSlot()
 
 void PlaybackWidget::toggleOpenSlot()
 {
-	if (trackingService()->isPlaybackMode())
+	if (mTrackingService->isPlaybackMode())
 	{
 		mTimer->stop();
-		trackingService()->setPlaybackMode(PlaybackTimePtr());
-		videoService()->setPlaybackMode(PlaybackTimePtr());
+		mTrackingService->setPlaybackMode(PlaybackTimePtr());
+		mVideoService->setPlaybackMode(PlaybackTimePtr());
 	}
 	else
 	{
-        trackingService()->setPlaybackMode(mTimer);
-		if (!trackingService()->isPlaybackMode())
+		mTrackingService->setPlaybackMode(mTimer);
+		if (!mTrackingService->isPlaybackMode())
         {
             reportError("trackingService is not in playback mode");
 			return;
         }
-        videoService()->setPlaybackMode(mTimer);
+		mVideoService->setPlaybackMode(mTimer);
 		report(QString("Started Playback with start time [%1] and end time [%2]")
 						.arg(mTimer->getStartTime().toString(timestampMilliSecondsFormatNice()))
 						.arg(mTimer->getStartTime().addMSecs(mTimer->getLength()).toString(timestampMilliSecondsFormatNice())));
@@ -254,7 +257,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 
 	// find all valid regions (i.e. time sequences with tool navigation)
 	TimelineEventVector events;
-	TrackingService::ToolMap tools = trackingService()->getTools();
+	TrackingService::ToolMap tools = mTrackingService->getTools();
 	for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
 		if(this->isInterestingTool(iter->second))
@@ -264,7 +267,7 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 		}
 	}
 
-	std::map<QString, DataPtr> data = patientService()->getDatas();
+	std::map<QString, DataPtr> data = mPatientModelService->getDatas();
 	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
 	{
 		QString desc("loaded " + iter->second->getName());
@@ -279,11 +282,11 @@ std::vector<TimelineEvent> PlaybackWidget::createEvents()
 		copy(current.begin(), current.end(), std::back_inserter(events));
 	}
 
-	RegistrationHistoryPtr reg = patientService()->get_rMpr_History();
+	RegistrationHistoryPtr reg = mPatientModelService->get_rMpr_History();
 	TimelineEventVector current = this->convertRegistrationHistoryToEvents(reg);
 	copy(current.begin(), current.end(), std::back_inserter(events));
 
-	current = videoService()->getPlaybackEvents();
+	current = mVideoService->getPlaybackEvents();
 	copy(current.begin(), current.end(), std::back_inserter(events));
 
 
@@ -324,7 +327,7 @@ std::pair<double,double> PlaybackWidget::findTimeRange(std::vector<TimelineEvent
 
 void PlaybackWidget::toolManagerInitializedSlot()
 {
-	if (trackingService()->isPlaybackMode())
+	if (mTrackingService->isPlaybackMode())
 	{
 		mOpenAction->setText("Close Playback");
 		mOpenAction->setIcon(QIcon(":/icons/open_icon_library/button-green.png"));
@@ -337,7 +340,7 @@ void PlaybackWidget::toolManagerInitializedSlot()
 		return;
 	}
 
-	if (trackingService()->getState() < Tool::tsINITIALIZED)
+	if (mTrackingService->getState() < Tool::tsINITIALIZED)
 		return;
 
 	std::vector<TimelineEvent> events = this->createEvents();

@@ -68,6 +68,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "QVTKWidget.h"
 #include "vtkRendererCollection.h"
 #include "cxtestUtilities.h"
+#include "cxDataLocations.h"
+#include "cxSettings.h"
 
 
 using cx::Vector3D;
@@ -84,6 +86,30 @@ public:
 	}
 	QStringList image;
 };
+
+namespace
+{
+
+void testACSWith3GPUVolumes()
+{
+	cxtest::ViewsFixture fixture;
+	ImageTestList imagenames;
+
+	for (unsigned i = 0; i < 3; ++i)
+	{
+		REQUIRE(fixture.defineGPUSlice("A", imagenames.image[i], cx::ptAXIAL, 0, i));
+		REQUIRE(fixture.defineGPUSlice("C", imagenames.image[i], cx::ptCORONAL, 1, i));
+		REQUIRE(fixture.defineGPUSlice("S", imagenames.image[i], cx::ptSAGITTAL, 2, i));
+	}
+	REQUIRE(fixture.quickRunWidget());
+
+	for (unsigned i = 0; i < 3*3; ++i)
+	{
+//		fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.9);
+	}
+}
+} //namespace
 
 TEST_CASE("Visual rendering: Init view",
 		  "[unit][resource][visualization]")
@@ -177,7 +203,7 @@ TEST_CASE("Visual rendering: Empty view",
 		REQUIRE(fixture.quickRunWidget());
 
 	fixture.dumpDebugViewToDisk("emptyview", 0);
-	REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
+	REQUIRE(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) == Approx(0));
 
 //	sleep(3);
 
@@ -196,7 +222,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 		REQUIRE(fixture.quickRunWidget());
 
 		fixture.dumpDebugViewToDisk("emptyview", 0);
-		REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) == Approx(0));
+		REQUIRE(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) == Approx(0));
 	}
 }
 
@@ -210,7 +236,7 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 
 	REQUIRE(fixture.quickRunWidget());
 	fixture.dumpDebugViewToDisk("3DvtkGPU", 0);
-	REQUIRE(fixture.getFractionOfBrightPixelsInView(0,0) > 0.01);
+	REQUIRE(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.01);
 }
 
 TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
@@ -231,10 +257,10 @@ TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
 	fixture.dumpDebugViewToDisk("acs3d1", 1);
 	fixture.dumpDebugViewToDisk("acs3d2", 2);
 	fixture.dumpDebugViewToDisk("acs3d3", 3);
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(2,20) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(3,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(3,20) > 0.02);
 }
 
 TEST_CASE("Visual rendering: Show layout, clear, show new layout",
@@ -270,9 +296,9 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
     REQUIRE(fixture.runWidget());
     cxtest::Utilities::sleep_sec(1);
 
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(2,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
 }
 
 TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
@@ -289,9 +315,9 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 	fixture.dumpDebugViewToDisk("anydual3d0", 0);
 	fixture.dumpDebugViewToDisk("anydual3d1", 1);
 	fixture.dumpDebugViewToDisk("anydual3d2", 2);
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(2,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
 }
 
 TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
@@ -308,13 +334,13 @@ TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
 	fixture.dumpDebugViewToDisk("anydual3d0", 0);
 	fixture.dumpDebugViewToDisk("anydual3d1", 1);
 	fixture.dumpDebugViewToDisk("anydual3d2", 2);
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,0) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(1,20) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(2,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
 }
 
-TEST_CASE("Visual rendering: Show ACS, 3 volumes, centered hidden tool",
-		  "[ca_test][unit][resource][visualization]")
+TEST_CASE("Visual rendering: Show ACS, 3 volumes",
+		  "[unit][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -329,7 +355,7 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes, centered hidden tool",
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
-		CHECK(fixture.getFractionOfBrightPixelsInView(i,20) > 0.02);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.9);
 	}
 }
 
@@ -349,7 +375,27 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
 	REQUIRE(fixture.quickRunWidget());
 
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,20,2) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+}
+
+// Experimental opengl test based on "Visual rendering: Show Axial GPU slice, 1 volume"
+TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
+		  "[opengl][resource][visualization]")
+{
+	cxtest::ViewsFixture fixture;
+
+	std::vector<cx::ImagePtr> images(1);
+
+	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(10, 255);
+	images[0] = cx::ImagePtr(new cx::Image("dummyImageUid1", dummyImageData, "dummyImageName1"));
+
+	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
+
+	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+	REQUIRE(fixture.quickRunWidget());
+
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
 }
 
 //Tagged as unstable as it sometimes fail in Linux
@@ -376,26 +422,25 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
 	REQUIRE(fixture.quickRunWidget());
 
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,20,1) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInView(0,20,2) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,1) > 0.02);
+	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
 }
 
-TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, moving tool",
-		  "[unit][resource][visualization][not_win32][not_win64]")
+TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
+		  "[unit][resource][visualization]")
 {
-	cxtest::ViewsFixture fixture;
-	ImageTestList imagenames;
+	cx::DataLocations::setTestMode();
+	cx::settings()->setValue("optimizedViews", true);
 
-	for (unsigned i = 0; i < 3; ++i)
-	{
-		REQUIRE(fixture.defineGPUSlice("A", imagenames.image[i], cx::ptAXIAL, 0, i));
-		REQUIRE(fixture.defineGPUSlice("C", imagenames.image[i], cx::ptCORONAL, 1, i));
-		REQUIRE(fixture.defineGPUSlice("S", imagenames.image[i], cx::ptSAGITTAL, 2, i));
-    }
-	REQUIRE(fixture.quickRunWidget());
-
-	for (unsigned i = 0; i < 3*3; ++i)
-	{
-		CHECK(fixture.getFractionOfBrightPixelsInView(i,20) > 0.02);
-	}
+	testACSWith3GPUVolumes();
 }
+
+TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, not optimized views",
+		  "[unit][resource][visualization]")
+{
+	cx::DataLocations::setTestMode();
+	cx::settings()->setValue("optimizedViews", false);
+
+	testACSWith3GPUVolumes();
+}
+

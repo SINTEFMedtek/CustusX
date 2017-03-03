@@ -42,15 +42,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxEnumConverter.h"
 #include "cxLogger.h"
 #include "cxTrackerConfiguration.h"
-#include "cxLegacySingletons.h"
 #include "cxTrackingService.h"
 
 namespace cx
 {
 //---------------------------------------------------------------------------------------------------------------------
 
-ToolListWidget::ToolListWidget(QWidget* parent) :
-		QListWidget(parent)
+ToolListWidget::ToolListWidget(TrackingServicePtr trackingService, QWidget* parent) :
+	QListWidget(parent),
+	mTrackingService(trackingService)
 {
 	connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChangedSlot()));
 
@@ -75,7 +75,7 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
 
 void ToolListWidget::addTool(QString absoluteFilePath)
 {
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	QString name = config->getTool(absoluteFilePath).mName;
 
 //	QFile file(absoluteFilePath);
@@ -105,8 +105,8 @@ void ToolListWidget::toolSelectedSlot(QListWidgetItem* item)
 
 //---------------------------------------------------------------------------------------------------------------------
 
-FilteringToolListWidget::FilteringToolListWidget(QWidget* parent) :
-		ToolListWidget(parent)
+FilteringToolListWidget::FilteringToolListWidget(TrackingServicePtr trackingService, QWidget* parent) :
+		ToolListWidget(trackingService, parent)
 {
 	this->setDragDropMode(QAbstractItemView::DragOnly);
 	this->setDragEnabled(true);
@@ -156,7 +156,7 @@ void FilteringToolListWidget::startDrag()
 
 void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter)
 {
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	QStringList filteredTools = config->getToolsGivenFilter(applicationsFilter,
 														  trackingsystemsFilter);
 //	filteredTools.sort(); // no good: we would like to sort on name, but the list is full paths
@@ -165,8 +165,8 @@ void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QString
 
 //---------------------------------------------------------------------------------------------------------------------
 
-ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
-		ToolListWidget(parent)
+ConfigToolListWidget::ConfigToolListWidget(TrackingServicePtr trackingService, QWidget* parent) :
+		ToolListWidget(trackingService, parent)
 {
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -233,7 +233,7 @@ void ConfigToolListWidget::configSlot(QStringList toolsAbsoluteFilePath)
 
 void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 {
-	TrackerConfigurationPtr config = trackingService()->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 
 	for (int i = 0; i < this->count(); ++i)
 	{

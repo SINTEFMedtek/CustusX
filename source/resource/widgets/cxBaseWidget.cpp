@@ -42,7 +42,7 @@ namespace cx
 {
 
 BaseWidget::BaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    OptimizedUpdateWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
+	OptimizedUpdateWidget(parent), mObjectName(objectName), mWindowTitle(windowTitle)
 {
 	this->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
     this->setObjectName(mObjectName);

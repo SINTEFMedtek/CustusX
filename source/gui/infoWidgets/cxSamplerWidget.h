@@ -56,7 +56,7 @@ class cxGui_EXPORT SamplerWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	SamplerWidget(QWidget* parent);
+	SamplerWidget(TrackingServicePtr trackingService, PatientModelServicePtr patientModelService, SpaceProviderPtr spaceProvider, QWidget* parent);
 	virtual ~SamplerWidget();
 
 private slots:
@@ -75,6 +75,8 @@ private:
 	QAction* mAdvancedAction;
 	QHBoxLayout* mAdvancedLayout;
 	QWidget* mAdvancedWidget;
+	PatientModelServicePtr mPatientModelService;
+	SpaceProviderPtr mSpaceProvider;
 };
 
 } // namespace cx

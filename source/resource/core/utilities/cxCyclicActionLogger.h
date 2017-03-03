@@ -47,8 +47,6 @@ namespace cx
 * @{
 */
 
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-
 /**Helper class for counting time spent by the rendering process or other
  * process running in a cycle.
  *

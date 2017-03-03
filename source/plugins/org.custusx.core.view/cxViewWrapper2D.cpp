@@ -60,7 +60,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDisplayTextRep.h"
 
 #include "cxManualTool.h"
-#include "cxViewManager.h"
 #include "cxTrackingService.h"
 #include "cxViewGroup.h"
 #include "cxDefinitionStrings.h"
@@ -88,9 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
 
-#ifndef CX_VTK_OPENGL2
 #include "cxTexture3DSlicerRep.h"
-#endif
 
 namespace cx
 {
@@ -246,26 +243,32 @@ void ViewWrapper2D::removeAndResetSliceRep()
 
 void ViewWrapper2D::removeAndResetMultiSliceRep()
 {
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 	{
 		mView->removeRep(mMultiSliceRep);
 		mMultiSliceRep.reset();
 	}
-#endif
+//#endif
 }
 
 void ViewWrapper2D::createAndAddMultiSliceRep()
 {
-#ifndef CX_VTK_OPENGL2
+	if(!mSharedOpenGLContext)
+	{
+		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
+		return;
+	}
+//#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 		return;
-	mMultiSliceRep = Texture3DSlicerRep::New();
+	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
 	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
+	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
 
 	mView->addRep(mMultiSliceRep);
-#endif
+//#endif
 }
 
 /**Hack: gpu slicer recreate and fill with images every time,
@@ -285,12 +288,12 @@ void ViewWrapper2D::recreateMultiSlicer()
 
     this->createAndAddMultiSliceRep();
 
-#ifndef CX_VTK_OPENGL2
+//#ifndef CX_VTK_OPENGL2
 	if (mGroupData)
 		mMultiSliceRep->setImages(this->getImagesToView());
 	else
 		mMultiSliceRep->setImages(std::vector<ImagePtr>());
-#endif
+//#endif
 
     this->viewportChanged();
 }
@@ -428,9 +431,9 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 
 bool ViewWrapper2D::useGPU2DRendering()
 {
-#ifdef CX_VTK_OPENGL2
-	return false;
-#endif //CX_VTK_OPENGL2
+//#ifdef CX_VTK_OPENGL2
+//	return false;
+//#endif //CX_VTK_OPENGL2
 
     return settings()->value("useGPU2DRendering").toBool();
 }

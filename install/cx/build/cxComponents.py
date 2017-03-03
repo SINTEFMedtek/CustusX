@@ -197,8 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        tag = 'VTK-7-0-0.cx_patch_2'
-        self._getBuilder().gitCheckout(tag)
+        self._getBuilder().gitCheckout('8b5d4214bb16ca28cea1471657871c04f874f346')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -223,7 +222,7 @@ class VTK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
-        add('VTK_RENDERING_BACKEND:STRING', "OpenGL")
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -269,7 +268,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('2.4.13.2')
+        self._getBuilder().gitCheckout('3.2.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
