@@ -112,6 +112,7 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+	mVtkPolyDataOriginal = mVtkPolyData;
 	mOrientationArrayList.clear();
 	mColorArrayList.clear();
 
@@ -209,6 +210,16 @@ void Mesh::setColor(const QColor& color)
 QColor Mesh::getColor()
 {
 	return mProperties.mColor->getValue();
+}
+
+void Mesh::setUseColorFromPolydataScalars(bool on)
+{
+	mProperties.mUseColorFromPolydataScalars->setValue(on);
+}
+
+bool Mesh::getUseColorFromPolydataScalars() const
+{
+	return mProperties.mUseColorFromPolydataScalars->getValue();
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
@@ -321,7 +332,9 @@ void Mesh::updateVtkPolyDataWithTexture()
 {
 	if (!this->hasTexture())
 	{
-		mVtkTexture = vtkTexturePtr::New();
+		mVtkTexture = NULL;
+		if(mVtkPolyDataOriginal)
+		  mVtkPolyData = mVtkPolyDataOriginal;
 		return;
 	}
 
