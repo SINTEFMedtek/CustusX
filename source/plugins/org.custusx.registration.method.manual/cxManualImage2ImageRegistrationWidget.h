@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALIMAGE2IMAGEREGISTRATIONWIDGET_H
 #define CXMANUALIMAGE2IMAGEREGISTRATIONWIDGET_H
 
+#include "org_custusx_registration_method_manual_Export.h"
 #include "cxManualRegistrationWidget.h"
 
 class QLabel;
@@ -48,8 +49,10 @@ namespace cx
  *  \date 2014-06-13
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF
+ *  \author Geir Arne Tangen, SINTEF
  */
-class ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
+
+class org_custusx_registration_method_manual_EXPORT ManualImage2ImageRegistrationWidget : public ManualImageRegistrationWidget
 {
 public:
 	ManualImage2ImageRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName);
