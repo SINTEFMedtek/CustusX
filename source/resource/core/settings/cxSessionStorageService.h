@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
+#include <qdom.h>
 #include "cxForwardDeclarations.h"
 
 class QDomElement;
@@ -78,6 +79,8 @@ public:
 
 	QString getSubFolder(QString relative); ///< return and create a folder/path relative to root. Created if necessary.
 
+	virtual void generateSaveDoc(QDomDocument& doc) { std::cout << "SessionStorageService, generateSaveDoc(QDomDocument& doc) \n"; }
+	virtual void writeXmlFile(QDomDocument doc, QString filename) {}
 signals:
 	void cleared(); ///< emitted when session is cleared, before isLoading is called
 	void sessionChanged(); ///< emitted after change to a new session (new or loaded or cleared)

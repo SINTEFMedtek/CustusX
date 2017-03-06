@@ -148,6 +148,7 @@ target_link_libraries(cxGui
     cxGUIExtenderService
     cxPluginUtilities
 	cxResourceFilter
+    org_custusx_core_patientmodel
 	)
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
