@@ -5,8 +5,6 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_SOURCE_FILES
         cxtestRegistrationMethodManual.cpp
-        cxtestDummyRegistrationManual.h
-        cxtestDummyRegistrationManual.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES})
