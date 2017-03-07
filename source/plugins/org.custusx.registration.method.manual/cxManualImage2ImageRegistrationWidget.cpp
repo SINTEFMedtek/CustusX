@@ -99,13 +99,6 @@ void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 		return;
 
 	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
-//	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
-
-	// start with
-	//   new registration = new registration
-	//                fQm = fMr * rMm'
-	//                fQm = fMr * delta * rMm
-//	Transform3D delta = rMf * fQm * rMm.inv();
 
     RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
     Transform3D init_rMd = history->getData().front().mValue;
@@ -189,7 +182,7 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
     int numberOfActiveLandmarks;
     if(this->isAverageAccuracyValid())
     {
-        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy %1 mm").
+        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm").
                                        arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2));
         mAvarageAccuracyLabel->setToolTip(QString("Root Mean Square landmark accuracy from target [%1] to fixed [%2].").
                                           arg(movingName).arg(fixedName));
