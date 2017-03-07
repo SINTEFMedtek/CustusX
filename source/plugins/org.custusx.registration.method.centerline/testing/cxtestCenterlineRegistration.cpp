@@ -63,8 +63,8 @@ TEST_CASE("CenterlineRegistration: execute", "[unit][org.custusx.registration.me
 
     //create a new patient
 	QString info;
-    cx::DataPtr dataCenterline1 = cx::patientService()->importData(filenameCenterline1, info);
-    cx::DataPtr dataCenterline2 = cx::patientService()->importData(filenameCenterline2, info);
+	cx::DataPtr dataCenterline1 = cx::logicManager()->getPatientModelService()->importData(filenameCenterline1, info);
+	cx::DataPtr dataCenterline2 = cx::logicManager()->getPatientModelService()->importData(filenameCenterline2, info);
 
     REQUIRE(dataCenterline1);
     REQUIRE(dataCenterline2);
