@@ -486,7 +486,7 @@ void MetricWidget::exportMetricsButtonClickedSlot()
 void MetricWidget::importMetricsButtonClickedSlot()
 {
 	QString suggestion = QString("%1/Logs/")
-			.arg(patientService()->getActivePatientFolder());
+			.arg(mServices->patient()->getActivePatientFolder());
 
 	QString fileName = QFileDialog::getOpenFileName(this, "Select the file to import metrics from", suggestion);
 

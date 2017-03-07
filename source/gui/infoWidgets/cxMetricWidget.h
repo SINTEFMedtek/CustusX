@@ -124,6 +124,7 @@ protected:
   QAction* mFrameMetricAction;
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
+  QAction* mImportFramesAction;
   VisServicesPtr mServices;
 
 private:

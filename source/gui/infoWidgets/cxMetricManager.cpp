@@ -431,7 +431,7 @@ void MetricManager::exportMetricsToFileXML(QString& filename)
 	//this->writeXmlFile(doc.doc(), filename);
 	//report("Saved patient " + mActivePatientFolder);
 
-	std::map<QString, DataPtr> dataMap = patientService()->getDatas();
+	std::map<QString, DataPtr> dataMap = mPatientModelService->getDatas();
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{
@@ -469,7 +469,7 @@ void MetricManager::importMetricsFromFile(QString& filename)
 
 void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics) /*const*/
 {
-	DataFactory factory(patientService(), spaceProvider());
+	DataFactory factory(mPatientModelService, mSpaceProvider);
 	foreach (QStringList metricList, metrics)
 	{
 		QString metricType = metricList.at(0);
@@ -489,8 +489,8 @@ void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics)
 		//
 		metric->setUid(defaultUid);
 		//
-		patientService()->insertData(metric);
-		viewService()->getGroup(0)->addData(metric->getUid());
+		mPatientModelService->insertData(metric);
+		mViewService->getGroup(0)->addData(metric->getUid());
 	}
 
 

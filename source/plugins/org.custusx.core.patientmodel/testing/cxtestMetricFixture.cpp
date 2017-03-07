@@ -253,7 +253,7 @@ void MetricFixture::testExportAndImportMetrics()
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
-	cx::MetricManager manager;
+	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
 
 	// create metrics
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
@@ -285,7 +285,7 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 
 	foreach (cx::DataMetricPtr metric, metrics)
 	{
-		cx::patientService()->insertData(metric);
+		mServices->patient()->insertData(metric);
 	}
 
 	return metrics;
