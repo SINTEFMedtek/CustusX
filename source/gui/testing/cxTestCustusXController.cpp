@@ -95,37 +95,37 @@ void CustusXController::stop()
 
 void CustusXController::loadPatientSlot()
 {
-  cx::sessionStorageService()->load(mPatientFolder);
-  cx::stateService()->setWorkFlowState("NavigationUid");
+  cx::logicManager()->getSessionStorageService()->load(mPatientFolder);
+  cx::logicManager()->getStateService()->setWorkFlowState("NavigationUid");
 //  mMainWindow->setGeometry( 0, 0, 2560, 1440);
   mApplicationComponent->mMainWindow->setGeometry(QRect(0, 0, 1200, 1200));
 
-  if (!cx::patientService()->getDataOfType<cx::Image>().size())
+  if (!cx::logicManager()->getPatientModelService()->getDataOfType<cx::Image>().size())
 		return;
 
-  cx::ImagePtr image = cx::patientService()->getDataOfType<cx::Image>().begin()->second;
+  cx::ImagePtr image = cx::logicManager()->getPatientModelService()->getDataOfType<cx::Image>().begin()->second;
   cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-  cx::patientService()->setCenter(bb_r.center());
+  cx::logicManager()->getPatientModelService()->setCenter(bb_r.center());
 
-  std::vector<cx::TrackingSystemServicePtr> systems = cx::trackingService()->getTrackingSystems();
+  std::vector<cx::TrackingSystemServicePtr> systems = cx::logicManager()->getTrackingService()->getTrackingSystems();
   for (unsigned i=0; i<systems.size(); ++i)
-	  cx::trackingService()->unInstallTrackingSystem(systems[i]);
+	  cx::logicManager()->getTrackingService()->unInstallTrackingSystem(systems[i]);
 
   cx::DummyToolPtr dummyTool(new cx::DummyTool());
   dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
-  cx::trackingService()->runDummyTool(dummyTool);
+  cx::logicManager()->getTrackingService()->runDummyTool(dummyTool);
 }
 
 
 void CustusXController::enableSlicingSlot()
 {
-	cx::ClippersPtr clippers = cx::viewService()->getClippers();
+	cx::ClippersPtr clippers = cx::logicManager()->getViewService()->getClippers();
 	QString clipperName("Axial");
 	REQUIRE(clippers->exists(clipperName));
 	cx::InteractiveClipperPtr interactiveClipper = clippers->getClipper(clipperName);
 
-		std::map<QString, cx::ImagePtr> imageMap = cx::patientService()->getDataOfType<cx::Image>();
+		std::map<QString, cx::ImagePtr> imageMap = cx::logicManager()->getPatientModelService()->getDataOfType<cx::Image>();
 		if(!imageMap.empty())
 		{
 			cx::ImagePtr image = imageMap.begin()->second;
@@ -139,8 +139,8 @@ void CustusXController::enableSlicingSlot()
 
 void CustusXController::initialBeginCheckRenderSlot()
 {
-  cx::viewService()->getRenderTimer()->reset(mBaseTime);
-  connect(cx::viewService().get(), &cx::ViewService::renderFinished, this, &CustusXController::initialEndCheckRenderSlot);
+  cx::logicManager()->getViewService()->getRenderTimer()->reset(mBaseTime);
+  connect(cx::logicManager()->getViewService().get(), &cx::ViewService::renderFinished, this, &CustusXController::initialEndCheckRenderSlot);
 }
 
 void CustusXController::initialEndCheckRenderSlot()
@@ -149,18 +149,18 @@ void CustusXController::initialEndCheckRenderSlot()
     if(mNumInitialRenders < 2)
         return;
 
-	disconnect(cx::viewService().get(), &cx::ViewService::renderFinished, this, &CustusXController::initialEndCheckRenderSlot);
+	disconnect(cx::logicManager()->getViewService().get(), &cx::ViewService::renderFinished, this, &CustusXController::initialEndCheckRenderSlot);
   // start next timing
-  cx::viewService()->getRenderTimer()->reset(5*mBaseTime);
+  cx::logicManager()->getViewService()->getRenderTimer()->reset(5*mBaseTime);
   QTimer::singleShot(4*mBaseTime,   this, SLOT(secondEndCheckRenderSlot()) );
 }
 
 void CustusXController::secondEndCheckRenderSlot()
 {
 
-  std::cout << cx::viewService()->getRenderTimer()->dumpStatistics() << std::endl;
-  mTestData += cx::viewService()->getRenderTimer()->dumpStatistics() + "\n";
-  mMeasuredFPS = cx::viewService()->getRenderTimer()->getFPS();
+  std::cout << cx::logicManager()->getViewService()->getRenderTimer()->dumpStatistics() << std::endl;
+  mTestData += cx::logicManager()->getViewService()->getRenderTimer()->dumpStatistics() + "\n";
+  mMeasuredFPS = cx::logicManager()->getViewService()->getRenderTimer()->getFPS();
 
   QTimer::singleShot(2*1000,   qApp, SLOT(quit()) );
 }

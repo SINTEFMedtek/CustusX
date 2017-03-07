@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGuiExport.h"
 
 #include "cxBaseWidget.h"
-#include "cxLegacySingletons.h"
 
 class QPushButton;
 
@@ -57,7 +56,7 @@ class cxGui_EXPORT ToolManagerWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ToolManagerWidget(QWidget* parent = NULL);
+  ToolManagerWidget(TrackingServicePtr trackingService, QWidget* parent = NULL);
   virtual ~ToolManagerWidget();
 
 private slots:
@@ -77,6 +76,7 @@ private:
   QPushButton* mUnInitializeButton;
   QPushButton* mStartTrackingButton;
   QPushButton* mStopTrackingButton;
+  TrackingServicePtr mTrackingService;
 };
 
 }

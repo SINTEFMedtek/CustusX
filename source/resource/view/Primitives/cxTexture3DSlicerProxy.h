@@ -4,29 +4,29 @@ This file is part of CustusX, an Image Guided Therapy Application.
 Copyright (c) 2008-2014, SINTEF Department of Medical Technology
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, 
+1. Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
@@ -44,8 +44,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxConfig.h"
+#include "cxShaderCallback.h"
 
 typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
+typedef vtkSmartPointer<class vtkOpenGLPolyDataMapper> vtkOpenGLPolyDataMapperPtr;
+
 //---------------------------------------------------------
 namespace cx
 {
@@ -66,29 +69,40 @@ typedef boost::shared_ptr<class Texture3DSlicerProxy> Texture3DSlicerProxyPtr;
  */
 class cxResourceVisualization_EXPORT Texture3DSlicerProxy: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-	static Texture3DSlicerProxyPtr New();
+	static Texture3DSlicerProxyPtr New(SharedOpenGLContextPtr context);
 
 	virtual ~Texture3DSlicerProxy() {}
 	virtual void setShaderPath(QString shaderFile) {}
 	virtual void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp) {}
 	virtual void setImages(std::vector<ImagePtr> images) {}
-	virtual std::vector<ImagePtr> getImages() { return std::vector<ImagePtr>(); }
+	virtual std::vector<ImagePtr> getImages()
+	{
+		return std::vector<ImagePtr>();
+	}
 	virtual void setSliceProxy(SliceProxyPtr slicer) {}
-	virtual SliceProxyPtr getSliceProxy() { return SliceProxyPtr(); }
-	virtual void update() {}
-	virtual void setTargetSpaceToR(){}
-	virtual vtkActorPtr getActor() { return vtkActorPtr(); }
+	virtual SliceProxyPtr getSliceProxy()
+	{
+		return SliceProxyPtr();
+	}
+	virtual void setTargetSpaceToR() {}
+	virtual vtkActorPtr getActor()
+	{
+		return vtkActorPtr();
+	}
+	virtual void setRenderWindow(vtkRenderWindowPtr window) {};
 
-	static bool isSupported(vtkRenderWindowPtr window);
+	static bool isSupported(vtkRenderWindowPtr window)
+	{
+		return true;
+	};
 
+protected:
+	Texture3DSlicerProxy() {};
 };
 
-//#ifndef CX_VTK_OPENGL2
-//#ifndef WIN32
-
-#if !defined(CX_VTK_OPENGL2) && !defined(WIN32)
+//--------------------------------------------------------------------
 
 /**
  * \brief Slice volumes using a SliceProxy.
@@ -97,44 +111,62 @@ public:
  * is performed by loading the image into the GPU as a 3D texture and
  * slicing it there, using the GPU.
  *
- * Used by Sonowand and Sintef.
  *
- *  Created on: Oct 13, 2011
- *      Author: christiana
  *
  * \ingroup cx_resource_view
  */
+
 class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
 {
 	Q_OBJECT
+
 public:
-	static Texture3DSlicerProxyPtr New();
+	static Texture3DSlicerProxyPtr New(SharedOpenGLContextPtr context);
+
 	virtual ~Texture3DSlicerProxyImpl();
-	void setShaderPath(QString shaderFile);
+
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ImagePtr> images);
 	void setSliceProxy(SliceProxyPtr slicer);
-	SliceProxyPtr getSliceProxy() { return mSliceProxy; }
-	void update();
+	SliceProxyPtr getSliceProxy();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkActorPtr getActor();
-	std::vector<ImagePtr> getImages() { return mImages; }
-
-protected:
-	Texture3DSlicerProxyImpl();
-	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
+	std::vector<ImagePtr> getImages();
+	virtual void setRenderWindow(vtkRenderWindowPtr window);
 
 protected slots:
 	void transformChangedSlot();
-	void updateColorAttributeSlot();
+	void transferFunctionChangedSlot();
 	void imageChanged();
+
+protected:
+	Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context);
+	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
 private:
 	void resetGeometryPlane();
-	void updateCoordinates(int index);
+
+	void updateAndUploadImages(std::vector<ImagePtr> new_images_raw);
+	void updateAndUploadCoordinates();
+	void updateAndUploadColorAttribute();
+
+	void uploadImagesToSharedContext(std::vector<ImagePtr> images, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const;
+	void uploadTextureCoordinatesToSharedContext(QString image_uid, vtkFloatArrayPtr textureCoordinates, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const;
+	void uploadColorAttributesToSharedContext(QString imageUid, float llr, vtkLookupTablePtr lut, float window, float level, float alpha, SharedOpenGLContextPtr sharedOpenGLContext, ShaderCallbackPtr shaderCallback) const;
+
 	QString getTCoordName(int index);
 	void setColorAttributes(int i);
-	std::vector<ImagePtr> processImages(std::vector<ImagePtr> images_raw);
+	std::vector<ImagePtr> convertToUnsigned(std::vector<ImagePtr> images_raw);
+
+	bool isNewInputImages(std::vector<ImagePtr> images_raw);
+
+	QString generateTextureCoordinateName(QString imageUid) const;
+	void generateAndSetShaders();
+
+
+	SharedOpenGLContextPtr mSharedOpenGLContext;
+	ShaderCallbackPtr mShaderCallback;
+	QString mUid;
 
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ImagePtr> mImages;
@@ -142,32 +174,18 @@ private:
 	SliceProxyPtr mSliceProxy;
 	bool mTargetSpaceIsR;
 
-	TextureSlicePainterPtr mPainter;
 	vtkActorPtr mActor;
 	vtkPolyDataPtr mPolyData;
 	vtkPlaneSourcePtr mPlaneSource;
-	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 	vtkPolyDataAlgorithmPtr mPolyDataAlgorithm;
+	vtkOpenGLPolyDataMapperPtr mOpenGLPolyDataMapper;
+	vtkRenderWindowPtr mCurrentRenderWindow;
 
-	static const int mMaxImages = 4;// This class is hardcoded for a maximum of 4 images
-	bool isNewInputImages(std::vector<ImagePtr> images_raw);
+	vtkFloatArrayPtr mTextureCoordinates;
+
 };
+//--------------------------------------------------------------------
 
-//#endif // WIN32
-#else
-//Dummy code to make file compile with Qt moc. This is needed because Qt moc ignores ifdef.
-class cxResourceVisualization_EXPORT Texture3DSlicerProxyImpl: public Texture3DSlicerProxy
-{
-	Q_OBJECT
-protected slots:
-	void transformChangedSlot() {}
-	void updateColorAttributeSlot() {}
-	void imageChanged() {}
-};
-#endif //CX_VTK_OPENGL2
+}//namespace cx
 
-
-//---------------------------------------------------------
-}//end namespace
-//---------------------------------------------------------
 #endif /* CXTEXTURE3DSLICERPROXY_H_ */

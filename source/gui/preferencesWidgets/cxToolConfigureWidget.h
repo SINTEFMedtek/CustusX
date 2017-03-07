@@ -38,10 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGroupBox>
 
 #include "cxDefinitions.h"
-//#include "cxToolConfigurationParser.h"
-#include "cxLegacySingletons.h"
 #include "cxTrackerConfiguration.h"
 #include "cxStringProperty.h"
+#include "cxForwardDeclarations.h"
 
 
 class QComboBox;
@@ -73,7 +72,7 @@ class cxGui_EXPORT ToolConfigureGroupBox : public QGroupBox
   Q_OBJECT
 
 public:
-  ToolConfigureGroupBox(QWidget* parent = NULL);
+  ToolConfigureGroupBox(TrackingServicePtr trackingService, StateServicePtr stateService, QWidget* parent = NULL);
   virtual ~ToolConfigureGroupBox();
 
   void setCurrentlySelectedCofiguration(QString configAbsoluteFilePath);
@@ -107,6 +106,8 @@ private:
   ConfigToolListWidget*     mToolListWidget;
   bool mModified; // if set: content is modified: save on exit
   StringPropertyPtr mTrackingSystemSelector;
+  TrackingServicePtr mTrackingService;
+  StateServicePtr mStateService;
 
 };
 

@@ -30,11 +30,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxLegacySingletons.h"
+#include "cxRegistrationMethodCenterlinePluginActivator.h"
+
+#include <QtPlugin>
+#include <iostream>
+
+#include "cxRegistrationMethodCenterlineService.h"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
+RegistrationMethodCenterlinePluginActivator::RegistrationMethodCenterlinePluginActivator()
+{
+//	std::cout << "Created RegistrationMethodCenterlinePluginActivator" << std::endl;
+}
+
+RegistrationMethodCenterlinePluginActivator::~RegistrationMethodCenterlinePluginActivator()
+{}
+
+void RegistrationMethodCenterlinePluginActivator::start(ctkPluginContext* context)
+{
+	RegServicesPtr services = RegServices::create(context);
+    RegistrationMethodCenterlineImageToPatientService* image2patientService = new RegistrationMethodCenterlineImageToPatientService(services);
+
+	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
+}
+
+void RegistrationMethodCenterlinePluginActivator::stop(ctkPluginContext* context)
+{
+	mRegistrationImageToPatient.reset();
+	Q_UNUSED(context);
+}
+
 } // namespace cx
-
-

@@ -55,17 +55,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxViewService.h"
 
-
-//TODO: remove
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
 
-ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, QString filename, QWidget* parent) :
+ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QString filename, QWidget* parent) :
     QDialog(parent),
 	mFilename(filename),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mViewService(viewService)
 {
   this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -225,7 +222,7 @@ void ImportDataDialog::acceptedSlot()
 	this->convertToUnsigned();
 
 	mPatientModelService->autoSave();
-	viewService()->autoShowData(mData);
+	mViewService->autoShowData(mData);
 	this->finishedSlot();
 }
 
@@ -279,7 +276,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-	ImagePtr converted = convertImageToUnsigned(patientService(), image);
+	ImagePtr converted = convertImageToUnsigned(mPatientModelService, image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 
@@ -287,7 +284,7 @@ void ImportDataDialog::convertToUnsigned()
 	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
 	image->setLookupTable2D(LUT2D);
 	image->setTransferFunctions3D(TF3D);
-	patientService()->insertData(image);
+	mPatientModelService->insertData(image);
 }
 
 

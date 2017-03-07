@@ -2,7 +2,6 @@
 #define CXMETRICUTILITIES_H
 
 #include "cxViewService.h"
-#include "cxPatientModelService.h"
 #include "cxDataMetricWrappers.h"
 #include "cxBaseWidget.h"
 
@@ -29,15 +28,14 @@ protected:
 class MetricUtilities: public QObject
 {
 public:
-	MetricUtilities(ViewServicePtr viewService, PatientModelServicePtr patientModelService);
+	MetricUtilities(VisServicesPtr services);
 
 	MetricBasePtr createMetricWrapper(DataPtr data);
 	std::vector<MetricBasePtr> createMetricWrappers();
 	QWidget *createMetricWidget(DataPtr data);
 
 private:
-	PatientModelServicePtr mPatientModelService;
-	ViewServicePtr mViewService;
+	VisServicesPtr mServices;
 };
 
 }//cx

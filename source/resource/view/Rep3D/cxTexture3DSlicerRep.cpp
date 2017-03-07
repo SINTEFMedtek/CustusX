@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkTriangleFilter.h>
 #include <vtkStripper.h>
 #include <vtkImageData.h>
-//#include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
 
 #include "cxImage.h"
@@ -50,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxGPUImageBuffer.h"
 #include "cxTexture3DSlicerProxy.h"
+
+#include "cxSharedOpenGLContext.h"
 
 //---------------------------------------------------------
 namespace cx
@@ -61,19 +62,24 @@ void Texture3DSlicerRep::setTargetSpaceToR()
 	mProxy->setTargetSpaceToR();
 }
 
-Texture3DSlicerRep::Texture3DSlicerRep() :
+Texture3DSlicerRep::Texture3DSlicerRep(SharedOpenGLContextPtr context) :
 	RepImpl()
 {
-	mProxy = Texture3DSlicerProxy::New();
+	mProxy = Texture3DSlicerProxy::New(context);
 }
 
 Texture3DSlicerRep::~Texture3DSlicerRep()
 {
 }
 
-Texture3DSlicerRepPtr Texture3DSlicerRep::New(const QString& uid)
+QString Texture3DSlicerRep::getType() const
 {
-	return wrap_new(new Texture3DSlicerRep(), uid);
+	return "Texture3DSlicerRep";
+}
+
+Texture3DSlicerRepPtr Texture3DSlicerRep::New(SharedOpenGLContextPtr context, const QString& uid)
+{
+	return wrap_new(new Texture3DSlicerRep(context), uid);
 }
 
 void Texture3DSlicerRep::setShaderPath(QString path)
@@ -131,6 +137,11 @@ void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBo
 bool Texture3DSlicerRep::isSupported(vtkRenderWindowPtr window)
 {
 	return Texture3DSlicerProxy::isSupported(window);
+}
+
+void Texture3DSlicerRep::setRenderWindow(vtkRenderWindowPtr window)
+{
+	mProxy->setRenderWindow(window);
 }
 
 //---------------------------------------------------------

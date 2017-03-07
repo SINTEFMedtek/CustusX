@@ -46,17 +46,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QLabel>
 #include <QScreen>
 
+#include "cxRenderWindowFactory.h"
+
 
 namespace cxtest
 {
 
-ViewsWindow::ViewsWindow()
+ViewsWindow::ViewsWindow(cx::RenderWindowFactoryPtr factory)
 {
 	mZoomFactor = 1;
 
 	this->setNiceSize();
 
-    mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout();
+	mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(factory);
 //	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout();
 	this->setCentralWidget(mLayoutWidget);
 

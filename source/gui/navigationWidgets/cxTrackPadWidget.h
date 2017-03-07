@@ -50,10 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-
-
-
 /**
  * \class TrackPadWidget
  *
@@ -71,7 +67,7 @@ class cxGui_EXPORT TrackPadWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  TrackPadWidget(QWidget* parent);
+  TrackPadWidget(ViewServicePtr viewService, QWidget* parent);
   virtual ~TrackPadWidget();
 
 signals:
@@ -91,6 +87,7 @@ private:
   QVBoxLayout* mTopLayout;
   QSize mMinPadSize;
   QSize mMinBarSize;
+  ViewServicePtr mViewService;
 
   vtkCameraPtr getCamera() const;
   void defineRotateLayout();

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestViewServiceMock.h"
 #include "cxtestViewCollectionWidgetMixedMock.h"
 #include "cxtestLayoutWidgetUsingViewWidgetsMock.h"
+#include "cxSettings.h"
 
 void checkContextMenuPolicy(Qt::ContextMenuPolicy policy, cxtest::ViewServiceMockPtr viewservice)
 {
@@ -88,6 +89,25 @@ TEST_CASE("Can turn custom context menu off", "[viewservice][unit]")
 
 	viewservice->enableContextMenuForViews(true);
 	checkContextMenuPolicy(Qt::CustomContextMenu, viewservice);
+
+	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("ViewService: Auto show in view groups", "[unit][plugins][org.custusx.core.view]")
+{
+	cx::DataLocations::setTestMode();
+	cx::LogicManager::initialize();
+
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cxtest::ViewServiceMockPtr viewservice = cxtest::ViewServiceMockPtr(new cxtest::ViewServiceMock(context));
+
+	cx::settings()->setValue("Automation/autoShowNewDataInViewGroup0", true);
+	cx::settings()->setValue("Automation/autoShowNewDataInViewGroup4", true);
+
+	QList<unsigned> showInViewGroups = viewservice->getAutoShowViewGroupNumbers();
+	REQUIRE(showInViewGroups.size() == 2);
+	CHECK(showInViewGroups[0] == 0);
+	CHECK(showInViewGroups[1] == 4);
 
 	cx::LogicManager::shutdown();
 }

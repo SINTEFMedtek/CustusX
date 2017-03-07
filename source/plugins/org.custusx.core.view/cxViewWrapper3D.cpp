@@ -74,7 +74,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
-#include "cxTexture3DSlicerRep.h"
 #include "cxEnumConverter.h"
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
@@ -115,8 +114,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
-
 
 ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr services):
 	ViewWrapper(services)

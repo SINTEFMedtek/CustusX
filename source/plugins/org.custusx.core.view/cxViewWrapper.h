@@ -100,7 +100,6 @@ void DataViewPropertiesInteractor::addDataActionsOfType(QWidget* parent)
 	}
 }
 
-
 /**
  * \brief Superclass for ViewWrappers.
  *
@@ -118,6 +117,7 @@ public:
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	virtual void updateView();
+	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 
 signals:
 	void orientationChanged(ORIENTATION_TYPE type);
@@ -137,13 +137,14 @@ protected:
 	virtual QString getViewDescription() = 0;
 	virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 	QStringList getAllDataNames(DataViewProperties properties) const;
+	virtual void addReps();
 
 	ViewGroupDataPtr mGroupData;
 	VisServicesPtr mServices;
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
+	SharedOpenGLContextPtr mSharedOpenGLContext;
 
-	virtual void addReps();
 private:
 	DisplayTextRepPtr mPlaneTypeText;
 	DisplayTextRepPtr mDataNameText;

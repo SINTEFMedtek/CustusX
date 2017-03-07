@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxDefinitionStrings.h"
 #include "cxStringListProperty.h"
+#include "cxSharedOpenGLContext.h"
 
 namespace cx
 {
@@ -383,20 +384,42 @@ void ViewGroupData::addDataSorted(QString uid)
 		return;
 
 	DataViewProperties properties = DataViewProperties::createDefault();
-	DataAndViewProperties item(uid, properties);
+	DataAndViewPropertiesPair item(uid, properties);
 
 	for (int i=int(mData.size())-1; i>=0; --i)
 	{
 		if (!dataTypeSort(this->getData(uid), this->getData(mData[i].first)))
 		{
-			mData.insert(mData.begin()+i+1, item);
+			this->insertData(mData.begin()+i+1, item);
 			break;
 		}
 	}
 	if (!this->contains(uid))
-		mData.insert(mData.begin(), item);
+		this->insertData(mData.begin(), item);
 	emit dataViewPropertiesChanged(uid);
 }
+
+void ViewGroupData::insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item)
+{
+	//this->upload3DTextureIfImageToSharedContext(item.first);
+	this->mData.insert(iter, item);
+}
+
+/*
+//TODO remove? maybe it is better to do this in the proxy?
+void ViewGroupData::upload3DTextureIfImageToSharedContext(QString uid)
+{
+	CX_LOG_DEBUG() << "upload3DTextureIfImageToSharedContext: " << uid;
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
+	if(image)
+	{
+		if(mSharedOpenGLContext)
+			mSharedOpenGLContext->upload3DTexture(image);
+		else
+			CX_LOG_ERROR() << "ViewGroupData::uploadIfImageToSharedContext: Got no shared OpenGL context";
+	}
+}
+*/
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
 {
@@ -418,8 +441,9 @@ void ViewGroupData::setProperties(QString uid, DataViewProperties properties)
 
 	if (!this->contains(uid))
 	{
-		DataAndViewProperties item(uid, properties);
-		mData.push_back(item);
+		DataAndViewPropertiesPair item(uid, properties);
+//		mData.push_back(item);
+		this->insertData(mData.end(), item);
 	}
 	else
 	{
@@ -581,10 +605,10 @@ void ViewGroupData::createSliceDefinitionProperty()
 	QStringList slicedefaults;
 	slicedefaults << enum2string(ptAXIAL) << enum2string(ptCORONAL) << enum2string(ptSAGITTAL);
 	mSliceDefinitionProperty = StringListProperty::initialize("slice_definition_3D",
-														"3D Slices",
-														"Select slice planes to view in 3D",
-														slicedefaults,
-														slicedefs);
+								  "3D Slices",
+								  "Select slice planes to view in 3D",
+								  slicedefaults,
+								  slicedefs);
 	connect(mSliceDefinitionProperty.get(), &Property::changed, this, &ViewGroupData::optionsChanged);
 }
 
