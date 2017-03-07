@@ -33,7 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXGLHELPERS_H_
 #define CXGLHELPERS_H_
 
-//#include <vtkgl.h>
 
 /**
  * \addtogroup cx_resource_core_utilities

@@ -51,11 +51,14 @@ class cxGui_EXPORT ToolImagePreviewWidget : public ImagePreviewWidget
 	Q_OBJECT
 
 public:
-	ToolImagePreviewWidget(QWidget* parent);
+	ToolImagePreviewWidget(TrackingServicePtr trackingService, QWidget* parent);
 	virtual ~ToolImagePreviewWidget();
 
 public slots:
 	virtual void previewFileSlot(const QString& absoluteFilePath);
+
+private:
+	TrackingServicePtr mTrackingService;
 };
 } //namespace cx
 #endif /* CXTOOLIMAGEPREVIEWWIDGET_H_ */

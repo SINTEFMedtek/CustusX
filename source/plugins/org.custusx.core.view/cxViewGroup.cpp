@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxTrackingService.h"
 #include "cxViewWrapper2D.h"
-#include "cxViewManager.h"
 #include "cxCameraControl.h"
 #include "cxData.h"
 #include "cxViewWrapper.h"
@@ -59,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxTrackedStream.h"
 #include "cxActiveData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -85,8 +85,9 @@ void ViewGroup::optionChangedSlot()
 
 /**Add one view wrapper and setup the necessary connections.
  */
-void ViewGroup::addView(ViewWrapperPtr wrapper)
+void ViewGroup::addView(ViewWrapperPtr wrapper, SharedOpenGLContextPtr sharedOpenGLContext)
 {
+	wrapper->setSharedOpenGLContext(sharedOpenGLContext);
 	mViews.push_back(wrapper->getView());
 	mViewWrappers.push_back(wrapper);
 

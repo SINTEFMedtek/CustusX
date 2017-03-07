@@ -5,7 +5,6 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 set(PLUGIN_SRCS
     cxViewPluginActivator.cpp
     cxViewImplService.cpp
-    cxViewImplService.h
     cxAxisConnector.cpp
     cx2DZoomHandler.cpp
     cxCameraStyle.cpp
@@ -14,7 +13,6 @@ set(PLUGIN_SRCS
     cxRenderLoop.cpp
     cxRepManager.cpp
     cxViewGroup.cpp
-    cxViewManager.cpp
     cxViewWrapper.cpp
     cxViewWrapper2D.cpp
     cxViewWrapper3D.cpp
@@ -36,11 +34,11 @@ set(PLUGIN_MOC_SRCS
     cxRenderLoop.h
     cxRepManager.h
     cxViewGroup.h
-    cxViewManager.h
     cxViewWrapper.h
     cxViewWrapper2D.h
     cxViewWrapper3D.h
     cxViewWrapperVideo.h
+    cxViewImplService.h
 )
 
 # Qt Designer files which should be processed by Qts uic

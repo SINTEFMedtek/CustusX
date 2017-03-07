@@ -9,7 +9,7 @@ class LayoutWidgetUsingViewWidgetsMock : public cx::LayoutWidgetUsingViewWidgets
 {
 	Q_OBJECT
 public:
-	LayoutWidgetUsingViewWidgetsMock(QWidget *parent);
+	LayoutWidgetUsingViewWidgetsMock(cx::RenderWindowFactoryPtr factory, QWidget *parent);
 	virtual ~LayoutWidgetUsingViewWidgetsMock();
 
 	std::vector<cx::ViewWidget*> getViewWidgets() const;

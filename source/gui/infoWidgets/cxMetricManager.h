@@ -56,7 +56,7 @@ class cxGui_EXPORT MetricManager : public QObject
 {
 	Q_OBJECT
 public:
-	MetricManager();
+	MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider);
 
 	DataMetricPtr getMetric(QString uid);
 	void moveToMetric(QString uid);
@@ -96,6 +96,10 @@ private:
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 	std::set<QString> mSelection;
+	PatientModelServicePtr mPatientModelService;
+	ViewServicePtr mViewService;
+	TrackingServicePtr mTrackingService;
+	SpaceProviderPtr mSpaceProvider;
 };
 
 

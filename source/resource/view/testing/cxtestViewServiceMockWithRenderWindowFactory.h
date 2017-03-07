@@ -30,44 +30,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "catch.hpp"
-#include <vtkCamera.h>
-#include <vtkRenderer.h>
-#include "cxtestVisServices.h"
-#include "cxViewManager.h"
-#include "cxDataLocations.h"
-#include "cxSettings.h"
-#include "cxViewGroup.h"
-#include "cxCameraStyle.h"
-#include "cxCameraStyleForView.h"
+#ifndef CXTESTVIEWSERVICEMOCKWITHRENDERWINDOWFACTORY_H
+#define CXTESTVIEWSERVICEMOCKWITHRENDERWINDOWFACTORY_H
+
+
+#include "cxtestresourcevisualization_export.h"
+#include "cxViewServiceNull.h"
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class ViewManagerFixture> ViewManagerFixturePtr;
+typedef boost::shared_ptr<class ViewServiceMockWithRenderWindowFactory> ViewServiceMocWithRenderWindowFactoryPtr;
 
-class ViewManagerFixture : public cx::ViewManager
+class CXTESTRESOURCEVISUALIZATION_EXPORT ViewServiceMockWithRenderWindowFactory : public cx::ViewServiceNull
 {
 public:
-	ViewManagerFixture(cx::VisServicesPtr services) :
-		cx::ViewManager(services)
-	{}
-	QList<unsigned> getAutoShowViewGroupNumbers()
-	{
-		return this->getViewGroupsToAutoShowIn();
-	}
+	ViewServiceMockWithRenderWindowFactory();
+	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = false);
+	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
+	cx::RenderWindowFactoryPtr getRenderWindowFactory() const;
+private:
+	cx::RenderWindowFactoryPtr mRenderWindowFactory;
 };
+}//cxtest
 
-TEST_CASE("ViewManager: Auto show in view groups", "[unit][plugins][org.custusx.core.view]")
-{
-    cx::DataLocations::setTestMode();
-
-    cx::settings()->setValue("Automation/autoShowNewDataInViewGroup0", true);
-    cx::settings()->setValue("Automation/autoShowNewDataInViewGroup4", true);
-    cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
-    ViewManagerFixturePtr viewManager = ViewManagerFixturePtr(new ViewManagerFixture(dummyservices));
-    QList<unsigned> showInViewGroups = viewManager->getAutoShowViewGroupNumbers();
-    REQUIRE(showInViewGroups.size() == 2);
-    CHECK(showInViewGroups[0] == 0);
-    CHECK(showInViewGroups[1] == 4);
-}
-} // cxtest
+#endif // CXTESTVIEWSERVICEMOCKWITHRENDERWINDOWFACTORY_H

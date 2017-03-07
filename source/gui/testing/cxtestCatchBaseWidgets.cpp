@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNavigationWidget.h"
 #include "cxOverlayWidget.h"
 #include "cxPlaybackWidget.h"
-#include "cxPointSamplingWidget.h"
 #include "cxProbeConfigWidget.h"
 #include "cxSamplerWidget.h"
 #include "cxShadingWidget.h"
@@ -163,17 +162,16 @@ TEST_CASE("BaseWidget's children in gui/dataWidgets correctly constructed", "[un
 //	testAndDeleteBaseWidgetChild(new cx::DataSelectWidget(testParent));//special case: Needs a SelectDataStringPropertyBasePtr moc object
 	testAndDeleteBaseWidgetChild(new cx::EraserWidget(patientModelService, viewService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::FrameTreeWidget(patientModelService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::MetricWidget(viewService, patientModelService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::MetricWidget(services, testParent));
+	testAndDeleteBaseWidgetChild(new cx::NavigationWidget(viewService, trackingService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::OverlayWidget(patientModelService, viewService, testParent));
-	testAndDeleteBaseWidgetChild(new cx::PlaybackWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::PointSamplingWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::PlaybackWidget(trackingService, services->video(), patientModelService, testParent));
 //	testAndDeleteBaseWidgetChild(new cx::ProbeConfigWidget(testParent));
-	testAndDeleteBaseWidgetChild(new cx::SamplerWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::SamplerWidget(trackingService, patientModelService, spaceProvider, testParent));
 	testAndDeleteBaseWidgetChild(new cx::ShadingWidget(patientModelService->getActiveData(), testParent));
 //	testAndDeleteBaseWidgetChild(new cx::SimulateUSWidget(testParent));
 	testAndDeleteBaseWidgetChild(new cx::ActiveToolPropertiesWidget(trackingService, spaceProvider, testParent));
-	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(testParent));
+	testAndDeleteBaseWidgetChild(new cx::TrackPadWidget(viewService, testParent));
 	testAndDeleteBaseWidgetChild(new cx::Transform3DWidget(testParent));
 
 

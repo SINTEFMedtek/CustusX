@@ -29,44 +29,17 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXLEGACYSINGLETONS_H
-#define CXLEGACYSINGLETONS_H
 
-#include "cxLogicManagerExport.h"
-
-#include "boost/shared_ptr.hpp"
+#include "cxRegistrationMethodCenterlineService.h"
+#include "cxCenterlineRegistrationWidget.h"
 
 namespace cx
 {
-class ViewManager;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-typedef boost::shared_ptr<class ViewService> ViewServicePtr;
-typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 
-/** 
- *
- *
- * \ingroup cx
- * \date 23.02.2014, 2014
- * \author christiana
- */
+QWidget *RegistrationMethodCenterlineImageToPatientService::createWidget()
+{
+    CenterlineRegistrationWidget* centerlineRegistrationWidget = new CenterlineRegistrationWidget(mServices, NULL);
+    return centerlineRegistrationWidget;
+}
 
-// quick access to core services stored in the logic manager:
-cxLogicManager_EXPORT SpaceProviderPtr spaceProvider();
-cxLogicManager_EXPORT TrackingServicePtr trackingService();
-cxLogicManager_EXPORT PatientModelServicePtr patientService();
-cxLogicManager_EXPORT VideoServicePtr videoService();
-cxLogicManager_EXPORT StateServicePtr stateService();
-cxLogicManager_EXPORT ViewServicePtr viewService();
-cxLogicManager_EXPORT AcquisitionServicePtr acquisitionService();
-cxLogicManager_EXPORT SessionStorageServicePtr sessionStorageService();
-
-} // namespace cx
-
-
-#endif // CXLEGACYSINGLETONS_H
+} /* namespace cx */

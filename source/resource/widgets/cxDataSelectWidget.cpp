@@ -106,20 +106,20 @@ ViewGroupDataPtr DataSelectWidget::getActiveViewGroupData()
 void DataSelectWidget::viewGroupChangedSlot()
 {
     ViewGroupDataPtr group = this->getActiveViewGroupData();
-    if (mCurrentViewGroup==group)
+	if (mCurrentViewGroupData==group)
         return;
 
-    if (mCurrentViewGroup)
+	if (mCurrentViewGroupData)
     {
-		disconnect(mCurrentViewGroup.get(), &ViewGroupData::dataViewPropertiesChanged,
+		disconnect(mCurrentViewGroupData.get(), &ViewGroupData::dataViewPropertiesChanged,
 				   this, &DataSelectWidget::updateDataVisibility);
     }
 
-    mCurrentViewGroup = group;
+	mCurrentViewGroupData = group;
 
-    if (mCurrentViewGroup)
+	if (mCurrentViewGroupData)
     {
-		connect(mCurrentViewGroup.get(), &ViewGroupData::dataViewPropertiesChanged,
+		connect(mCurrentViewGroupData.get(), &ViewGroupData::dataViewPropertiesChanged,
 				this, &DataSelectWidget::updateDataVisibility);
     }
 
@@ -128,16 +128,16 @@ void DataSelectWidget::viewGroupChangedSlot()
 
 void DataSelectWidget::updateDataVisibility()
 {
-    mToggleShowAction->setEnabled(mData->getData() && (mCurrentViewGroup!=0));
+	mToggleShowAction->setEnabled(mData->getData() && (mCurrentViewGroupData!=0));
 	mRemoveButton->setEnabled(mData->getData() ? true : false);
 
     bool visible = false;
     if (mData->getData())
     {
         std::vector<DataPtr> visibleData;
-        if (mCurrentViewGroup)
+		if (mCurrentViewGroupData)
         {
-			visibleData = mCurrentViewGroup->getData();
+			visibleData = mCurrentViewGroupData->getData();
         }
         visible = std::count(visibleData.begin(), visibleData.end(), mData->getData());
     }
@@ -175,11 +175,11 @@ void DataSelectWidget::toggleShowData()
 
     if (mToggleShowAction->isChecked())
     {
-		mCurrentViewGroup->addData(mData->getData()->getUid());
+		mCurrentViewGroupData->addData(mData->getData()->getUid());
     }
     else
     {
-		mCurrentViewGroup->removeData(mData->getData()->getUid());
+		mCurrentViewGroupData->removeData(mData->getData()->getUid());
     }
 }
 

@@ -10,8 +10,6 @@ set(CX_QT_MOC_HEADER_FILES
 set(cxLogicManager_SOURCE
     cxLogicManager.h
     cxLogicManager.cpp
-    cxLegacySingletons.h
-    cxLegacySingletons.cpp
     cxPluginFramework.h
     cxPluginFramework.cpp
     cxPluginFrameworkUtilities.h

@@ -4,29 +4,29 @@ This file is part of CustusX, an Image Guided Therapy Application.
 Copyright (c) 2008-2014, SINTEF Department of Medical Technology
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without 
+Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-1. Redistributions of source code must retain the above copyright notice, 
+1. Redistributions of source code must retain the above copyright notice,
    this list of conditions and the following disclaimer.
 
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
    and/or other materials provided with the distribution.
 
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
+3. Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
    without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
@@ -48,7 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * full definitions of the ssc is needed.
  */
 
-namespace cx {
+namespace cx
+{
 
 typedef boost::shared_ptr<class Property> PropertyPtr;
 
@@ -70,13 +71,13 @@ typedef boost::shared_ptr<class TrackedStream> TrackedStreamPtr;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
-typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
 typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
 typedef boost::weak_ptr<class GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
 typedef boost::weak_ptr<class GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 typedef boost::shared_ptr<class FiberBundle> FiberBundlePtr;
+typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
 
 // reps
 typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
@@ -137,6 +138,7 @@ typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
 typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
@@ -161,23 +163,29 @@ typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 
 // other stuff
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+typedef boost::shared_ptr<class Clippers> ClippersPtr;
+typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
+typedef boost::shared_ptr<class Filter> FilterPtr;
+typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
+typedef boost::shared_ptr<class InteractiveClipper> InteractiveClipperPtr;
+typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
+typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
+typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class Presets> PresetsPtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
-typedef boost::shared_ptr<class USFrameData> USFrameDataPtr;
-typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
-
+typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
+typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
+typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
+typedef boost::shared_ptr<class SharedOpenGLContext> SharedOpenGLContextPtr;
+typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
 typedef boost::shared_ptr<class ViewGroup2D> ViewGroup2DPtr;
 typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
+typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
-
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
-typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
-typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
-
-typedef boost::shared_ptr<class Filter> FilterPtr;
-
 
 } // namespace cx
 
