@@ -9,6 +9,8 @@ PlusReceiver::PlusReceiver(igtlio::LogicPointer logic) :
 
 }
 
+//Replies to these messages are sent as igtl::RTSCommandMessage
+
 void PlusReceiver::send_RequestChannelIds()
 {
 	/* PLUS commands
@@ -24,9 +26,9 @@ void PlusReceiver::send_RequestChannelIds()
 
 void PlusReceiver::send_RequestDeviceChannelIds()
 {
-	this->sendCommand("VideoDevice", "RequestDeviceChannelIds", "<Command Name=\"RequestDeviceChannelIds\" />");
+	this->sendCommand("VideoDevice", "RequestDeviceChannelIds", "<Command Name=\"RequestDeviceChannelIds\" DeviceId=\"VideoDevice\" />");
 
-	//Fails. Got reply: <Command><Result>false</Result><Error>Device with id:  not found</Error><Message>Command failed, see error message.</Message></Command>
+	//Reply should be: <Command><Result>true</Result><Message>VideoStream,</Message></Command>
 }
 
 void PlusReceiver::send_RequestDeviceIds()
@@ -38,14 +40,19 @@ void PlusReceiver::send_RequestDeviceIds()
 
 void PlusReceiver::send_RequestInputDeviceIds()
 {
-	this->sendCommand("", "RequestInputDeviceIds", "<Command Name=\"RequestInputDeviceIds\" />");
-
-	//Fails. Got reply: <Command><Result>false</Result><Error>Device with id:  not found</Error><Message>Command failed, see error message.</Message></Command>
+	this->sendCommand("VideoDevice", "RequestInputDeviceIds", "<Command Name=\"RequestInputDeviceIds\" DeviceId=\"VideoDevice\" />");
 }
 
 void PlusReceiver::send_RequestDepthAndGain()
 {
-	this->sendCommand("VideoDevice", "Get", "<Command Name=\"Get\" > <parameter name=\"Depth\"/> <parameter name=\"Gain\"/> </Command>");
+	this->sendCommand("VideoDevice", "Get", "<Command Name=\"Get\" > <Parameter Name=\"Depth\"/> <Parameter Name=\"Gain\"/> <Parameter Name=\"Unknown\"/> </Command>");
+
+	//Reply should be:
+	// <Command><Result>true</Result><Message>
+	// <Result success=true> <Parameter Name="Depth" /> </Result>
+	// <Result success=true> <Parameter Name="Gain" /> </Result>
+	// <Result success=false> <Parameter Name="Unknown" /> </Result>
+	// </Message></Command>
 }
 
 
