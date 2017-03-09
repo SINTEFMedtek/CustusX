@@ -5,8 +5,6 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_SOURCE_FILES
         cxtestRegistrationMethodManual.cpp
-        cxtestDummyRegistrationManual.h
-        cxtestDummyRegistrationManual.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES})
@@ -18,7 +16,12 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_registration_method_manual PRIVATE org_custusx_registration_method_manual cxCatch)
+    target_link_libraries(cxtest_org_custusx_registration_method_manual
+        PRIVATE
+        cxLogicManager
+        org_custusx_registration_method_manual
+        cxCatch
+        )
     cx_add_tests_to_catch(cxtest_org_custusx_registration_method_manual)
 
 endif(BUILD_TESTING)
