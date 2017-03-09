@@ -86,3 +86,7 @@ http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win-amd64-py2.7.ex
 pip install ecdsa
 pip install paramiko
 
+(Problem 6)
+Script stops after installing Ninja.
+(Solution)
+Break script and start again.

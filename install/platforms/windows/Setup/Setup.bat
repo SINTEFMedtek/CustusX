@@ -1,4 +1,4 @@
-:: ===== README =====
+﻿:: ===== README =====
 :: To get help on powershell functions 
 :: Get-Help <Command>
 :: Example:
@@ -21,7 +21,7 @@ powershell -noprofile -command "&{"^
  "pip install lxml;"^
  "pip install paramiko;"^
  "pip install numpy;"^
- "Get-PackageProvider –Name Chocolatey -ForceBootstrap;"
- "Set-PackageSource Chocolatey;"
+ "Get-PackageProvider –Name Chocolatey -ForceBootstrap;"^
+ "Set-PackageSource Chocolatey;"^
  "Install-Package doxygen.install -RequiredVersion "1.8.10";"^
  "}"
