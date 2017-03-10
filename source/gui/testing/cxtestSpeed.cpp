@@ -125,7 +125,7 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews on", "[speed][
 	REQUIRE(fps > minimumFPS);
 }
 
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews off", "[speed][gui][integration]")
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews off", "[speed][gui][integration][CustusX]")
 {
 	initTest();
 
