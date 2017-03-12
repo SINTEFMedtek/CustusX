@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMatrix4x4.h"
 
 #include "cxManualImage2ImageRegistrationWidget.h"
-#include "cxtest_org_custusx_registration_method_manual_Export.h"
+#include "cxtest_org_custusx_registration_method_manual_export.h"
 
 
 namespace cxtest
