@@ -46,7 +46,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-
+//To link the executable which runs the tests, Catch, on Windows, each test lib must contain at least one class to be exported.
+//If your test lib doesn't contain any classes, this macro can be used to create a dummy class in a uniform way across the code base.
+//Remember to include the export header file and then use this macro with the export macro.
+//Example:
+// #include "cxtest_org_custusx_registration_method_manual_export.h"
+// ...
+// CREATE_DUMMY_CLASS_FOR_WINDOWS_LINKING(CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_EXPORT)
+// ...
+#define CREATE_DUMMY_CLASS_FOR_WINDOWS_LINKING(EXPORT_MACRO) \
+{ \
+	class EXPORT_MACRO DummyTestClassForLinkingOnWindows{}; \
+}
 
 struct CXTESTUTILITIES_EXPORT TestUtilities
 {
