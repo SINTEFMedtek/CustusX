@@ -19,8 +19,7 @@ if(BUILD_TESTING)
     set(CXTEST_PLUGINALGORITHM_SOURCES
         cxtestBinaryThresholdImageFilter.cpp
         cxtestDilationFilter.cpp
-        cxtestDummyAlgorithm.h
-        cxtestDummyAlgorithm.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -39,6 +38,7 @@ if(BUILD_TESTING)
         cxResourceFilter
 		cxResourceVisualization
         cxCatch
+        cxtestUtilities
     )
     cx_add_tests_to_catch(cxtestFilter)
 
