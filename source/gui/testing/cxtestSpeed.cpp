@@ -131,6 +131,7 @@ TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews off", "[speed]
 
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
 	cx::settings()->setValue("optimizedViews", false);
+	cx::settings()->setValue("showManualTool", false); //We set this to false to make the test pass on Linux in Fraxinus. See JIRA FX-8 for more details.
 
 	int fps = calculateFPS(false);
 	JenkinsMeasurement jenkins;
