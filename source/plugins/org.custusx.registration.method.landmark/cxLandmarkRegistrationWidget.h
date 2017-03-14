@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKREGISTRATIONWIDGET_H_
 #define CXLANDMARKREGISTRATIONWIDGET_H_
 
+#include "org_custusx_registration_method_landmarkExport.h"
+
 #include <map>
 #include "cxTransform3D.h"
 #include "cxRegistrationBaseWidget.h"
@@ -60,7 +62,7 @@ typedef boost::shared_ptr<class LandmarkListener> LandmarkListenerPtr;
  * \class LandmarkRegistrationWidget
  * Superclass for Image Registration and Patient Registration
  */
-class LandmarkRegistrationWidget: public RegistrationBaseWidget
+class org_custusx_registration_method_landmark_EXPORT LandmarkRegistrationWidget: public RegistrationBaseWidget
 {
 Q_OBJECT
 
