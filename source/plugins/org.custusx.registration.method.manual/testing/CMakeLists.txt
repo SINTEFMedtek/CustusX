@@ -5,6 +5,7 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_SOURCE_FILES
         cxtestRegistrationMethodManual.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_MOC_SOURCE_FILES})
@@ -21,6 +22,7 @@ if(BUILD_TESTING)
         cxLogicManager
         org_custusx_registration_method_manual
         cxCatch
+        cxtestUtilities
         )
     cx_add_tests_to_catch(cxtest_org_custusx_registration_method_manual)
 

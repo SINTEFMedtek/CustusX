@@ -46,19 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-//To link the executable which runs the tests, Catch, on Windows, each test lib must contain at least one class to be exported.
-//If your test lib doesn't contain any classes, this macro can be used to create a dummy class in a uniform way across the code base.
-//Remember to include the export header file and then use this macro with the export macro.
-//Example:
-// #include "cxtest_org_custusx_registration_method_manual_export.h"
-// ...
-// CREATE_DUMMY_CLASS_FOR_WINDOWS_LINKING(CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_EXPORT)
-// ...
-#define CREATE_DUMMY_CLASS_FOR_WINDOWS_LINKING(EXPORT_MACRO) \
-{ \
-	class EXPORT_MACRO DummyTestClassForLinkingOnWindows{}; \
-}
-
 struct CXTESTUTILITIES_EXPORT TestUtilities
 {
 	static inline QString GetDataRoot();
@@ -100,6 +87,22 @@ public:
 	static double getFractionOfVoxelsAboveThreshold(vtkImageDataPtr image, int threshold, int component=0);
 
 	static void sleep_sec(int seconds);
+};
+
+//To link the executable (Catch) which runs the tests on Windows, each test lib must contain at least one class to be exported.
+//If your test lib doesn't contain any classes which must be exported, this macro can be used to create a dummy class in a uniform way across the code base.
+//Put this macro in a cpp file in your test folder. To make it more visible the name cxtestExportDummyClassOnWindowsForLinking.cpp has been used for such files.
+//Remember to include the export header file and then use this macro with the export macro for your lib.
+//Example:
+// #include "cxtest_org_custusx_registration_method_manual_export.h"
+//
+// namespace
+// {
+// EXPORT_DUMMY_CLASS_FOR_LINKING_ON_WINDOWS_IN_LIB_WITHOUT_EXPORTED_CLASS(CXTEST_ORG_CUSTUSX_REGISTRATION_METHOD_MANUAL_EXPORT)
+// }
+#define EXPORT_DUMMY_CLASS_FOR_LINKING_ON_WINDOWS_IN_LIB_WITHOUT_EXPORTED_CLASS(EXPORT_MACRO) \
+class EXPORT_MACRO DummyTestClassForLinkingOnWindows \
+{ \
 };
 
 } /* namespace cxtest */
