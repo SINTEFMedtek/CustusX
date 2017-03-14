@@ -56,12 +56,12 @@ namespace cx
  */
 
 /**
- * \class LandmarkImageRegistrationWidget
+ * \class CenterlinePointsWidget
  *
- * \brief Widget for adding image landmarks, used by landmark based image registration methods
+ * \brief Widget for creating a centerline.vtk file from image landmarks.
  *
- * \date Jan 27, 2009
- * \\author Janne Beate Bakeng, SINTEF
+ * \date 2017-MAR-14
+ * \\author Erlend F Hofstad, SINTEF
  */
 class org_custusx_registration_method_centerline_EXPORT CenterlinePointsWidget: public LandmarkRegistrationWidget
 {
