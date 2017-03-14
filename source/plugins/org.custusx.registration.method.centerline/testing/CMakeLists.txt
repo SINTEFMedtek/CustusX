@@ -19,6 +19,7 @@
 if(BUILD_TESTING)
     cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}
         cxtestCenterlineRegistration.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
     set(CXTEST_SOURCES_TO_MOC
     )

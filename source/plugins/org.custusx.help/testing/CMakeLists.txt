@@ -6,8 +6,7 @@ if(BUILD_TESTING)
     set(CX_TEST_CATCH_ORG_CUSTUSX_HELP_SOURCE_FILES
 		cxtestHelpPlugin.h
 		cxtestHelpPlugin.cpp
-        cxtestDummyHelp.h
-        cxtestDummyHelp.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_HELP_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_HELP_MOC_SOURCE_FILES})
@@ -23,9 +22,9 @@ if(BUILD_TESTING)
 		PRIVATE
 		org_custusx_help
 		cxGui
-#        cxResourceWidgets
 		cxLogicManager
-		cxCatch)
+        cxCatch
+        cxtestUtilities)
     cx_add_tests_to_catch(cxtest_org_custusx_help)
 
 

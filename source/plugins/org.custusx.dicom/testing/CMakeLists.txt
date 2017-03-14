@@ -4,8 +4,7 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_ORG_CUSTUSX_DICOM_SOURCE_FILES
         cxtestDicomConverter.cpp
-        cxtestDummyDICOMExport.h
-        cxtestDummyDICOMExport.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_DICOM_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_DICOM_MOC_SOURCE_FILES})
@@ -21,7 +20,8 @@ if(BUILD_TESTING)
         PRIVATE
         org_custusx_dicom
         cxLogicManager
-        cxCatch)
+        cxCatch
+        cxtestUtilities)
     cx_add_tests_to_catch(cxtest_org_custusx_dicom)
 
 endif(BUILD_TESTING)
