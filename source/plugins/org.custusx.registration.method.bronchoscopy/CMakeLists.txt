@@ -7,6 +7,7 @@ set(PLUGIN_SRCS
   cxRegistrationMethodBronchoscopyService.h
   cxRegistrationMethodBronchoscopyService.cpp
   cxBronchoscopyRegistrationWidget.cpp
+  cxBronchoscopyImage2ImageRegistrationWidget.cpp
   cxBronchoscopyRegistration.h
   cxBronchoscopyRegistration.cpp
   cxBranch.h
@@ -19,6 +20,7 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.h
   cxBronchoscopyRegistrationWidget.h
+  cxBronchoscopyImage2ImageRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
