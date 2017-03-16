@@ -32,16 +32,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include "cxtestMetricFixture.h"
-
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
 
 
-TEST_CASE("Export and import metrics to and from file", "[unit][gui][jon]")
+TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget][jon]")
 {
+	cx::LogicManager::initialize();
+
 	MetricFixture fixture;
 	fixture.testExportAndImportMetrics();
+
+	cx::LogicManager::shutdown();
 }
 
 } //namespace cxtest

@@ -40,6 +40,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include "cxCoordinateSystemHelpers.h"
 
+#include <QDomNode>
+
 namespace cx
 {
 typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
@@ -66,7 +68,8 @@ public:
 	void exportMetricsToFile(QString& filename);
 	void exportMetricsToFileXML(QString& filename);
 	void importMetricsFromFile(QString& filename);
-    PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
+	void importMetricsFromFileXML(QString& filename);
+	PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
 
 signals:
 	void activeMetricChanged();
@@ -100,6 +103,8 @@ private:
 	ViewServicePtr mViewService;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
+	DataPtr loadDataFromXMLNode(QDomElement node);
+	QDomDocument readXmlFile(QString filename);
 };
 
 

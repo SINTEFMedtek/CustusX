@@ -251,7 +251,6 @@ bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr m
 
 void MetricFixture::testExportAndImportMetrics()
 {
-	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
 	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
 
@@ -261,12 +260,16 @@ void MetricFixture::testExportAndImportMetrics()
 	// export and import metrics
 	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/export_and_import_metrics_test_file.XML";
 	manager.exportMetricsToFileXML(metricsFilePath);
-	//manager.importMetricsFromFile(metricsFilePath);
 
-	// get imported metrics from the patient and check that they are equal to the exported ones
-	//this->checkImportedMetricsEqualToExported(metrics, manager);
+	foreach (cx::DataMetricPtr metric, metrics)
+	{
+		cx::logicManager()->getPatientModelService()->removeData(metric->getUid());
+	}
 
-	cx::LogicManager::shutdown();
+	manager.importMetricsFromFileXML(metricsFilePath);
+
+	//get imported metrics from the patient and check that they are equal to the exported ones
+	this->checkImportedMetricsEqualToExported(metrics, manager);
 }
 
 std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
@@ -279,13 +282,13 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 	cx::PointMetricPtr point = getPointMetricWithInput(pos).mMetric;
 	point->setSpace(cs);
 	metrics.push_back(point);
-	metrics.push_back(getToolMetricWithInput().mMetric);
-	metrics.push_back(getFrameMetricWithInput().mMetric);
-	metrics.push_back(getDistanceMetricWithInput(123).mMetric);
+	//metrics.push_back(getToolMetricWithInput().mMetric);
+	//metrics.push_back(getFrameMetricWithInput().mMetric);
+	//metrics.push_back(getDistanceMetricWithInput(123).mMetric);
 
 	foreach (cx::DataMetricPtr metric, metrics)
 	{
-		mServices->patient()->insertData(metric);
+		cx::logicManager()->getPatientModelService()->insertData(metric);
 	}
 
 	return metrics;
@@ -295,7 +298,8 @@ void MetricFixture::checkImportedMetricsEqualToExported(std::vector<cx::DataMetr
 {
 	foreach (cx::DataMetricPtr metric, origMetrics)
 	{
-		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getType().split("Metric").at(0) + "1");
+		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getUid());
+
 		REQUIRE(importedMetric);
 		CHECK(metric != importedMetric); //don't compare the original metric to itself
 		//CHECK(metric->getAsSingleLineString() == importedMetric->getAsSingleLineString());

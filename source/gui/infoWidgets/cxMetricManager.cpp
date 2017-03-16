@@ -405,32 +405,8 @@ void MetricManager::exportMetricsToFileXML(QString& filename)
 	//Gather all the information that needs to be saved
 	OrderedQDomDocument doc1;
 	QDomDocument& doc = doc1.doc();
-	//this->generateSaveDoc(doc.doc());
-	//sessionStorageService()->generateSaveDoc(doc.doc());
-	//*******
 	doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
-
 	QDomElement patientNode = doc.createElement("patient");
-
-	// note: all nodes must be below <patient>. XML requires only one root node per file.
-	QDomElement versionName = doc.createElement("version_name");
-	//versionName.appendChild(doc.createTextNode(this->getVersionName()));
-	versionName.appendChild(doc.createTextNode("******* LOL versjonsnavn! ******"));
-	patientNode.appendChild(versionName);
-
-	//QDomElement activePatientNode = doc.createElement("active_patient");
-	//activePatientNode.appendChild(doc.createTextNode(mActivePatientFolder.toStdString().c_str()));
-	//patientNode.appendChild(activePatientNode);
-	doc.appendChild(patientNode);
-	//*******
-
-	//QDomElement element = doc1.doc().documentElement();
-	//emit isSaving(element); // give all listeners a chance to add to the document
-
-	//QString filename = QDir(mActivePatientFolder).absoluteFilePath(this->getXmlFileName());
-	//this->writeXmlFile(doc.doc(), filename);
-	//report("Saved patient " + mActivePatientFolder);
-
 	std::map<QString, DataPtr> dataMap = mPatientModelService->getDatas();
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
@@ -438,20 +414,16 @@ void MetricManager::exportMetricsToFileXML(QString& filename)
 		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
 		if(metric)
 		{
-			QDomElement dataNode = doc.createElement("metric");
-			doc.appendChild(dataNode);
+			QDomElement dataNode = doc.createElement("data");
 			metric->addXml(dataNode);
-			//file.write(metric->getAsSingleLineString().toLatin1());
-			//file.write("\n");
+			patientNode.appendChild(dataNode);
 		}
 	}
 
-
-	//sessionStorageService()->writeXmlFile(doc1.doc(), filename);
+	doc.appendChild(patientNode);
 
 	QTextStream stream(&file);
 	stream << doc.toString(4);
-
 	file.close();
 }
 
@@ -465,6 +437,33 @@ void MetricManager::importMetricsFromFile(QString& filename)
 	std::vector<QStringList> metrics = reader.readMetricFile(file);
 
 	this->createMetricsReadFromFile(metrics);
+}
+
+void MetricManager::importMetricsFromFileXML(QString& filename)
+{
+	QDomDocument xml = this->readXmlFile(filename);
+	QDomElement dataManagerNode = xml.documentElement();
+
+	// All images must be created from the DataManager, so the image nodes are parsed here
+	std::map<DataPtr, QDomNode> datanodes;
+
+	QDomNode child = dataManagerNode.firstChild();
+	for (; !child.isNull(); child = child.nextSibling())
+	{
+		if (child.nodeName() == "data")
+		{
+			DataPtr data = this->loadDataFromXMLNode(child.toElement());
+			if (data)
+				datanodes[data] = child.toElement();
+		}
+	}
+
+	// parse xml data separately: we want to first load all data
+	// because there might be interdependencies (cx::DistanceMetric)
+	for (std::map<DataPtr, QDomNode>::iterator iter = datanodes.begin(); iter != datanodes.end(); ++iter)
+	{
+		iter->first->parseXml(iter->second);
+	}
 }
 
 void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics) /*const*/
@@ -494,6 +493,53 @@ void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics)
 	}
 
 
+}
+
+DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
+{
+	QString uid = node.toElement().attribute("uid");
+	QString name = node.toElement().attribute("name");
+	QString type = node.toElement().attribute("type");
+
+
+//	if (mData.count(uid)) // dont load same image twice
+//		return mData[uid];
+
+	DataPtr data = mPatientModelService->createData(type, uid, name);
+	if (!data)
+	{
+		reportWarning(QString("Unknown type: %1 for file %2").arg(type)); //.arg(absolutePath));
+		return DataPtr();
+	}
+
+	if (!name.isEmpty())
+		data->setName(name);
+
+	mPatientModelService->insertData(data);
+
+	return data;
+}
+
+QDomDocument MetricManager::readXmlFile(QString filename)
+{
+	QDomDocument retval;
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly))
+	{
+		reportError("Could not open XML file :" + file.fileName() + ".");
+		return QDomDocument();
+	}
+
+	QString emsg;
+	int eline, ecolumn;
+	// Read the file
+	if (!retval.setContent(&file, false, &emsg, &eline, &ecolumn))
+	{
+		reportError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
+		return QDomDocument();
+	}
+
+	return retval;
 }
 
 

@@ -59,10 +59,15 @@ Torus/donut. Defined with 2 points. 1st point in center of torus. Torus is facin
 \addindex custom_metric
 Custom Metric
 -----------------------------------------------------------
-Custom metric. Load a STL model for visualizaion. Experimental.
+Custom metric. Use with meshes and images and set parameters for how they are displayed. Experimental.
 
 \addindex region_of_interest_metric
 Region Of Interest Metric
 -----------------------------------------------------------
 Used for setting ROI for Camera Style. Experimental.
 
+\addindex export_import_metric
+Export and Import metrics to and from a file
+-----------------------------------------------------------
+It is possible to export all the metrics in the model to an XML file. Such a file can also be imported, but there must be no metrics of the same type in the model at the time of the import.
+It is possible to do the import if one edits the file so that the Uids of the metrics in the file are different from the Uids of the metrics in the model.
