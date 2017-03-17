@@ -50,6 +50,11 @@ void PatientModelServiceNull::insertData(DataPtr data)
 	printWarning();
 }
 
+void PatientModelServiceNull::loadData(DataPtr data)
+{
+	printWarning();
+}
+
 DataPtr PatientModelServiceNull::createData(QString type, QString uid, QString name)
 {
 	return DataPtr();

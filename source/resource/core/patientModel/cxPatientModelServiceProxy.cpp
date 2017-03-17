@@ -120,6 +120,11 @@ void PatientModelServiceProxy::insertData(DataPtr data)
 	mPatientModelService->insertData(data);
 }
 
+void PatientModelServiceProxy::loadData(DataPtr data)
+{
+	mPatientModelService->loadData(data);
+}
+
 DataPtr PatientModelServiceProxy::createData(QString type, QString uid, QString name)
 {
 	return mPatientModelService->createData(type, uid, name);

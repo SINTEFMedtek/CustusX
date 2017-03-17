@@ -187,18 +187,10 @@ DoubleBoundingBox3D DistanceMetric::boundingBox() const
 
 QString DistanceMetric::getAsSingleLineString() const
 {
-	//return QString("%1 %2")
-	return QString("%1 %2 %3 %4")
+	return QString("%1 %2 %3")
 			.arg(this->getSingleLineHeader())
 			.arg(qstring_cast(this->getDistance()))
-			.arg(mArguments->get(0)->getUid())
-			.arg(mArguments->get(1)->getUid());
+			.arg(mArguments->getAsSingleLineString());
 }
 
-}
-
-bool cx::DistanceMetric::isEqual(cx::DataMetricPtr metric)
-{
-	//return this->getSingleLineHeader() == metric->getSingleLineHeader();
-	return true;
 }

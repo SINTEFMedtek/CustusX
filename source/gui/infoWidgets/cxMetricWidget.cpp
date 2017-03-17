@@ -477,7 +477,7 @@ void MetricWidget::exportMetricsButtonClickedSlot()
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,
-													"Create/select the file to export metrics to",
+													"Select the file to export the metrics to",
 													suggestion);
 	if(!filename.isEmpty())
 		mMetricManager->exportMetricsToFileXML(filename);
@@ -488,7 +488,7 @@ void MetricWidget::importMetricsButtonClickedSlot()
 	QString suggestion = QString("%1/Logs/")
 			.arg(mServices->patient()->getActivePatientFolder());
 
-	QString fileName = QFileDialog::getOpenFileName(this, "Select the file to import metrics from", suggestion);
+	QString fileName = QFileDialog::getOpenFileName(this, "Select the file to import metrics from (can be a patient file)", suggestion);
 
 	if(!fileName.isEmpty())
 		mMetricManager->importMetricsFromFileXML(fileName);

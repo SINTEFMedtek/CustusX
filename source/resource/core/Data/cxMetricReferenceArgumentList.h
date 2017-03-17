@@ -70,6 +70,7 @@ public:
     std::vector<Transform3D> getRefFrames() const;
 	virtual void addXml(QDomNode& dataNode);
 	virtual void parseXml(QDomNode& dataNode, const std::map<QString, DataPtr>& data);
+	QString getAsSingleLineString() const;
 signals:
 	void argumentsChanged();
 private:

@@ -235,7 +235,8 @@ void MetricFixture::setPatientRegistration()
 
 void MetricFixture::insertData(cx::DataPtr data)
 {
-	mServices->patient()->insertData(data);
+	//mServices->patient()->insertData(data);
+	cx::logicManager()->getPatientModelService()->insertData(data);
 }
 
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)
@@ -276,20 +277,23 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 {
 	std::vector<cx::DataMetricPtr> metrics;
 	cx::Vector3D pos(1,2,3);
+	cx::Vector3D pos2(3,2,3);
 	cx::CoordinateSystem cs(cx::csPATIENTREF);
 
 	//Create one of each metric to test export and import on
 	cx::PointMetricPtr point = getPointMetricWithInput(pos).mMetric;
+	cx::PointMetricPtr point2 = getPointMetricWithInput(pos2).mMetric;
 	point->setSpace(cs);
 	metrics.push_back(point);
-	//metrics.push_back(getToolMetricWithInput().mMetric);
-	//metrics.push_back(getFrameMetricWithInput().mMetric);
-	//metrics.push_back(getDistanceMetricWithInput(123).mMetric);
+	metrics.push_back(point2);
+	metrics.push_back(getToolMetricWithInput().mMetric);
+	metrics.push_back(getFrameMetricWithInput().mMetric);
+	metrics.push_back(getDistanceMetricWithInput(0, point, point2).mMetric);
 
-	foreach (cx::DataMetricPtr metric, metrics)
-	{
-		cx::logicManager()->getPatientModelService()->insertData(metric);
-	}
+//	foreach (cx::DataMetricPtr metric, metrics)
+//	{
+//		cx::logicManager()->getPatientModelService()->insertData(metric);
+//	}
 
 	return metrics;
 }

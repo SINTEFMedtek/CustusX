@@ -117,6 +117,7 @@ public:
 
 	// core Data interface
 	virtual void insertData(DataPtr data) = 0;
+	virtual void loadData(DataPtr data) = 0;
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter = HideUnavailable) const = 0;
 	/** Create Data object of given type.
 	 *

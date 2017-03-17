@@ -402,12 +402,16 @@ void MetricManager::exportMetricsToFileXML(QString& filename)
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
 		return;
 
-	//Gather all the information that needs to be saved
 	OrderedQDomDocument doc1;
 	QDomDocument& doc = doc1.doc();
 	doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 	QDomElement patientNode = doc.createElement("patient");
+	QDomElement managersNode = doc.createElement("managers");
+	patientNode.appendChild(managersNode);
+	QDomElement datamanagerNode = doc.createElement("datamanager");
+	managersNode.appendChild(datamanagerNode);
 	std::map<QString, DataPtr> dataMap = mPatientModelService->getDatas();
+
 	std::map<QString, DataPtr>::iterator iter;
 	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
 	{
@@ -416,7 +420,7 @@ void MetricManager::exportMetricsToFileXML(QString& filename)
 		{
 			QDomElement dataNode = doc.createElement("data");
 			metric->addXml(dataNode);
-			patientNode.appendChild(dataNode);
+			datamanagerNode.appendChild(dataNode);
 		}
 	}
 
@@ -442,19 +446,29 @@ void MetricManager::importMetricsFromFile(QString& filename)
 void MetricManager::importMetricsFromFileXML(QString& filename)
 {
 	QDomDocument xml = this->readXmlFile(filename);
-	QDomElement dataManagerNode = xml.documentElement();
+	QDomElement patientNode = xml.documentElement();
 
-	// All images must be created from the DataManager, so the image nodes are parsed here
 	std::map<DataPtr, QDomNode> datanodes;
 
-	QDomNode child = dataManagerNode.firstChild();
-	for (; !child.isNull(); child = child.nextSibling())
+	QDomNode managersNode = patientNode.firstChildElement("managers");
+	QDomNode datamanagerNode = managersNode.firstChildElement("datamanager");
+	QDomNode dataNode = datamanagerNode.firstChild();
+
+	for (; !dataNode.isNull(); dataNode = dataNode.nextSibling())
 	{
-		if (child.nodeName() == "data")
+		QDomNamedNodeMap attributes = dataNode.attributes();
+		QDomNode typeAttribute = attributes.namedItem("type");
+		bool isMetric = false;
+		if(typeAttribute.isAttr())
 		{
-			DataPtr data = this->loadDataFromXMLNode(child.toElement());
+			isMetric = typeAttribute.toAttr().value().contains("Metric");
+		}
+
+		if (dataNode.nodeName() == "data" && isMetric)
+		{
+			DataPtr data = this->loadDataFromXMLNode(dataNode.toElement());
 			if (data)
-				datanodes[data] = child.toElement();
+				datanodes[data] = dataNode.toElement();
 		}
 	}
 
@@ -515,7 +529,8 @@ DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 	if (!name.isEmpty())
 		data->setName(name);
 
-	mPatientModelService->insertData(data);
+	//mPatientModelService->insertData(data);
+	mPatientModelService->loadData(data);
 
 	return data;
 }

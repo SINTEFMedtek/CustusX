@@ -51,6 +51,7 @@ class cxResource_EXPORT PatientModelServiceNull : public PatientModelService
 public:
 	PatientModelServiceNull();
 	virtual void insertData(DataPtr data);
+	virtual void loadData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
 
