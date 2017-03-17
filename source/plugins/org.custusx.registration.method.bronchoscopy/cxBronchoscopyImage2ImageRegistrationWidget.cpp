@@ -120,19 +120,15 @@ void BronchoscopyImage2ImageRegistrationWidget::registerSlot()
     vtkPolyDataPtr centerlineMoving = mSelectMeshMovingWidget->getMesh()->getVtkPolyData();//input
     Transform3D rMdMoving = mSelectMeshMovingWidget->getMesh()->get_rMd();
 
-    std::cout << "rMdMoving: " << rMdMoving << std::endl;
-
-    Transform3D new_rMdMoving = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistrationImage2Image(centerlineFixed, centerlineMoving));
-    std::cout << "registration completed" << std::endl;
+    Transform3D updated_rMdMoving = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistrationImage2Image(centerlineFixed, centerlineMoving));
 
     DataPtr fixedData = mSelectMeshFixedWidget->getData();
     mServices->registration()->setFixedData(fixedData);
     DataPtr movingData = mSelectMeshMovingWidget->getData();
     mServices->registration()->setMovingData(movingData);
 
-    new_rMdMoving = new_rMdMoving * rMdMoving.inv();//output
+    Transform3D new_rMdMoving = updated_rMdMoving * rMdMoving.inv();//output
     mServices->registration()->addImage2ImageRegistration(new_rMdMoving, "Bronchoscopy: centerline to centerline");
-
 }
 
 void BronchoscopyImage2ImageRegistrationWidget::clearDataOnNewPatient()

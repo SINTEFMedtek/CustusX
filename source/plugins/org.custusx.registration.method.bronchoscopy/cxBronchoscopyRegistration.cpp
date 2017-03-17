@@ -177,9 +177,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 	  for (int j = 0; j < 4; j++)
 	  {
 		  tar_M_src(i,j) = temp->GetElement(i,j);
-          //std::cout << tar_M_src(i,j) << " ";
 	  }
-	  //std::cout << std::endl;
   }
 
 	if ( boost::math::isnan(tar_M_src.sum()) )
@@ -218,10 +216,10 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
                 P(j) = sqrt( p0*p0 + p1*p1 + p2*p2 );
                 O(j) = sqrt( o0*o0 + o1*o1 + o2*o2 );
 
-								if (boost::math::isnan( O(j) ))
+                if (boost::math::isnan( O(j) ))
                     O(j) = 4;
 
-								if ( (o0>2) || (o1>2) || (o2>2) )
+                if ( (o0>2) || (o1>2) || (o2>2) )
                     std::cout << "Warning in bronchoscopyRegistration.cpp: Error on oriantation calculation in dsearch2n. Orientation > 2." << std::endl;
 
                 R(j) = P(j) / O(j);
@@ -233,7 +231,6 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 
             D = P + alpha * O;
             D.minCoeff(&index);
-            //std::cout << "index: " << index << std::endl;
             indexVector.push_back(index);
         }
         return indexVector;
@@ -344,13 +341,9 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	//Adjusting points for centeroids
     Eigen::MatrixXd::Index maxIndex;
     trackingPositions.row(2).maxCoeff( &maxIndex );
-    //std::cout << "maxIndex: " << maxIndex << std::endl;
     //Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
-    //std::cout << "CTPositions.col(0): " << CTPositions.col(0) << std::endl;
     Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
-    //Eigen::Matrix3d rotation;
     //trackingPositions = trackingPositions.colwise() + translation;
-    //std::cout << "trackingPositions.col(maxIndex): " << trackingPositions.col(maxIndex) << std::endl;
 
 
     registrationMatrix << 1, 0, 0, translation(0),
@@ -362,8 +355,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
     {
         Tnavigation[i] = registrationMatrix * Tnavigation[i];
     }
-    //std::cout << "Tracking data 1 after initial translation: " << Tnavigation[0] << std::endl;
-    //std::cout << "Tracking data maxIndex after initial translation: " << Tnavigation[maxIndex] << std::endl;
 
     int iterationNumber = 0;
     int maxIterations = 50;
@@ -407,8 +398,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
         translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
 
         std::cout << "Iteration nr " << iterationNumber << " translation: " << translation.array().abs().sum() << std::endl;
-        //for (int i = 0; i < 4; i++)
-        //    std::cout << tempMatrix.row(i) << std::endl;
 	}
 
     if (translation.array().abs().sum() > 1)
@@ -456,9 +445,6 @@ Eigen::Matrix4d registrationAlgorithmImage2Image(BranchListPtr branchesFixed, Br
         CTPositionsMoving.swap(CTPositionsMovingNew);
         CTOrientationsMoving.swap(CTOrientationsMovingNew);
     }
-
-    std::cout << "Positions in centerline fixed:" << CTPositionsFixed.cols() << std::endl;
-    std::cout << "Positions in centerline moving:" << CTPositionsMoving.cols() << std::endl;
 
     if (CTPositionsFixed.cols() < 10 || CTPositionsMoving.cols() < 10)
     {
@@ -523,8 +509,6 @@ Eigen::Matrix4d registrationAlgorithmImage2Image(BranchListPtr branchesFixed, Br
         translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
 
         std::cout << "Iteration nr " << iterationNumber << " translation: " << translation.array().abs().sum() << std::endl;
-        //for (int i = 0; i < 4; i++)
-        //    std::cout << tempMatrix.row(i) << std::endl;
     }
 
     if (translation.array().abs().sum() > 1)
@@ -629,8 +613,6 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 	{
 		Tnavigation.push_back(iter->second.	matrix());
 	}
-
-    //vtkPointsPtr points = centerline->GetPoints();
 
 	Tnavigation = excludeClosePositions(Tnavigation);
 
