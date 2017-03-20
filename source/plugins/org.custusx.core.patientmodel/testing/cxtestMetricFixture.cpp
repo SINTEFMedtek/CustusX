@@ -235,8 +235,8 @@ void MetricFixture::setPatientRegistration()
 
 void MetricFixture::insertData(cx::DataPtr data)
 {
-	//mServices->patient()->insertData(data);
-	cx::logicManager()->getPatientModelService()->insertData(data);
+	mServices->patient()->insertData(data);
+	//cx::logicManager()->getPatientModelService()->insertData(data);
 }
 
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)
@@ -255,21 +255,23 @@ void MetricFixture::testExportAndImportMetrics()
 	cx::DataLocations::setTestMode();
 	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
 
-	// create metrics
+	// create metrics and insert them into the patientmodel
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
 
-	// export and import metrics
+	// export metrics
 	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/export_and_import_metrics_test_file.XML";
 	manager.exportMetricsToFileXML(metricsFilePath);
 
+	// remove the metrics from the patientmodel
 	foreach (cx::DataMetricPtr metric, metrics)
 	{
 		cx::logicManager()->getPatientModelService()->removeData(metric->getUid());
 	}
 
+	// import the exported metrics into the patientmodel
 	manager.importMetricsFromFileXML(metricsFilePath);
 
-	//get imported metrics from the patient and check that they are equal to the exported ones
+	//get imported metrics from the patient and check that they are equal to the ones which was exported
 	this->checkImportedMetricsEqualToExported(metrics, manager);
 }
 
@@ -290,10 +292,12 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 	metrics.push_back(getFrameMetricWithInput().mMetric);
 	metrics.push_back(getDistanceMetricWithInput(0, point, point2).mMetric);
 
-//	foreach (cx::DataMetricPtr metric, metrics)
-//	{
-//		cx::logicManager()->getPatientModelService()->insertData(metric);
-//	}
+	//Must explicitly insert the metrics in the patient model, since the metricfixture might only have a dummy patientmodelservice.
+	//The logicManager must have been initialised outside first.
+	foreach (cx::DataMetricPtr metric, metrics)
+	{
+		cx::logicManager()->getPatientModelService()->insertData(metric);
+	}
 
 	return metrics;
 }
