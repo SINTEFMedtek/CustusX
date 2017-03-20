@@ -259,7 +259,7 @@ void MetricFixture::testExportAndImportMetrics()
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
 
 	// export metrics
-	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/export_and_import_metrics_test_file.XML";
+	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics_export_import/export_and_import_metrics_test_file.xml";
 	manager.exportMetricsToFileXML(metricsFilePath);
 
 	// remove the metrics from the patientmodel

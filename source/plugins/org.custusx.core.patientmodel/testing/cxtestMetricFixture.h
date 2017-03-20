@@ -160,14 +160,14 @@ public:
 	void insertData(cx::DataPtr data);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
 	void testExportAndImportMetrics();
+	std::vector<cx::DataMetricPtr> createMetricsForExport();
+	void checkImportedMetricsEqualToExported(std::vector<cx::DataMetricPtr>& origMetrics, cx::MetricManager& manager) const;
 
 private:
 	TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 
 	cx::SpaceProviderPtr getSpaceProvider();
-	std::vector<cx::DataMetricPtr> createMetricsForExport();
-	void checkImportedMetricsEqualToExported(std::vector<cx::DataMetricPtr>& origMetrics, cx::MetricManager& manager) const;
 
 };
 

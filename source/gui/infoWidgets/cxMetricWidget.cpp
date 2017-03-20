@@ -472,7 +472,7 @@ void MetricWidget::removeButtonClickedSlot()
 
 void MetricWidget::exportMetricsButtonClickedSlot()
 {
-	QString suggestion = QString("%1/Logs/metrics_%2.XML")
+	QString suggestion = QString("%1/Logs/metrics_%2.xml")
 			.arg(mServices->patient()->getActivePatientFolder())
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 

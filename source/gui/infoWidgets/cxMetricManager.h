@@ -61,6 +61,7 @@ public:
 	MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider);
 
 	DataMetricPtr getMetric(QString uid);
+	int getNumberOfMetrics() const;
 	void moveToMetric(QString uid);
 	void setSelection(std::set<QString> selection);
 	void setActiveUid(QString uid);

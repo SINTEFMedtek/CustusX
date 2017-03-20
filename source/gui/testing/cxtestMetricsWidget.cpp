@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include "cxtestMetricFixture.h"
 #include "cxLogicManager.h"
+#include "cxDataLocations.h"
+#include "cxSessionStorageService.h"
 
 namespace cxtest
 {
@@ -47,5 +49,62 @@ TEST_CASE("Export and import metrics to and from file", "[integration][metrics][
 
 	cx::LogicManager::shutdown();
 }
+
+TEST_CASE("Save the patient and import metrics from the patient XML file", "[integration][metrics][widget][jon]")
+{
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+
+	//scope here to delete the metric manager before shutting down the logic manager.
+	{
+		QString dataPath = cx::DataLocations::getTestDataPath();
+		QString mSession1 = "/temp/TestPatient1.cx3";
+		cx::logicManager()->getSessionStorageService()->load(dataPath + mSession1);
+		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
+
+		MetricFixture fixture;
+		std::vector<cx::DataMetricPtr> metrics = fixture.createMetricsForExport();
+
+		cx::logicManager()->getSessionStorageService()->save();
+
+		foreach (cx::DataMetricPtr metric, metrics)
+		{
+			cx::logicManager()->getPatientModelService()->removeData(metric->getUid());
+		}
+
+		QString patientXMLPath = dataPath + mSession1 + "/custusdoc.xml";
+		manager.importMetricsFromFileXML(patientXMLPath);
+
+		fixture.checkImportedMetricsEqualToExported(metrics, manager);
+	}
+
+	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widget][jon]")
+{
+	//This test is a regression test of the format of the patient XML file and import of metrics.
+	//If the format of the patient file changes, i.e. tag names and tag relations, it might break
+	//the metric import.
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+
+	//scope here to delete the metric manager before shutting down the logic manager.
+	{
+		QString dataPath = cx::DataLocations::getTestDataPath();
+		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
+
+		MetricFixture fixture;
+
+		QString patientXMLPath = dataPath + "/testing/metrics_export_import/patient_file_with_metrics.xml";
+		manager.importMetricsFromFileXML(patientXMLPath);
+
+		CHECK(manager.getNumberOfMetrics() > 0);
+	}
+
+	cx::LogicManager::shutdown();
+}
+
+
 
 } //namespace cxtest

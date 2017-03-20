@@ -79,7 +79,12 @@ DataMetricPtr MetricManager::getMetric(QString uid)
 	return metric;
 }
 
-std::vector<DataMetricPtr> MetricManager::getAllMetrics()
+int MetricManager::getNumberOfMetrics() const
+{
+	return this->getAllMetrics().size();
+}
+
+std::vector<DataMetricPtr> MetricManager::getAllMetrics() const
 {
 	std::vector<DataMetricPtr> retval;
 	std::map<QString, DataPtr> all = mPatientModelService->getDatas();
@@ -452,7 +457,7 @@ void MetricManager::importMetricsFromFileXML(QString& filename)
 
 	QDomNode managersNode = patientNode.firstChildElement("managers");
 	QDomNode datamanagerNode = managersNode.firstChildElement("datamanager");
-	QDomNode dataNode = datamanagerNode.firstChild();
+	QDomNode dataNode = datamanagerNode.firstChildElement("data");
 
 	for (; !dataNode.isNull(); dataNode = dataNode.nextSibling())
 	{
@@ -466,6 +471,14 @@ void MetricManager::importMetricsFromFileXML(QString& filename)
 
 		if (dataNode.nodeName() == "data" && isMetric)
 		{
+			QString uid = dataNode.toElement().attribute("uid");
+			if(mPatientModelService->getData(uid))
+			{
+				QString name = dataNode.toElement().attribute("name");
+				reportWarning("Metric: " + name + ", is already in the model with Uid: " + uid + ". Import skipped.");
+				continue;
+			}
+
 			DataPtr data = this->loadDataFromXMLNode(dataNode.toElement());
 			if (data)
 				datanodes[data] = dataNode.toElement();
