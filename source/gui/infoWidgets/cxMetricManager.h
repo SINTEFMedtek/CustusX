@@ -95,7 +95,7 @@ private:
 	std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
 	void installNewMetric(DataMetricPtr metric);
 	PointMetricPtr addPointInDefaultPosition();
-	std::vector<DataMetricPtr> getAllMetrics();
+	std::vector<DataMetricPtr> getAllMetrics() const;
 	void createMetricsReadFromFile(std::vector<QStringList>& metrics);
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
