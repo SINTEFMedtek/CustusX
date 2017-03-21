@@ -259,7 +259,10 @@ void MetricFixture::testExportAndImportMetrics()
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
 
 	// export metrics
-	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics_export_import/export_and_import_metrics_test_file.xml";
+	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics_export_import/exported_and_imported_metrics_file.xml";
+	if(QFile::exists(metricsFilePath))
+		QFile::remove(metricsFilePath);
+
 	manager.exportMetricsToFileXML(metricsFilePath);
 
 	// remove the metrics from the patientmodel
@@ -278,8 +281,8 @@ void MetricFixture::testExportAndImportMetrics()
 std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 {
 	std::vector<cx::DataMetricPtr> metrics;
-	cx::Vector3D pos(1,2,3);
-	cx::Vector3D pos2(3,2,3);
+	cx::Vector3D pos(0,0,0);
+	cx::Vector3D pos2(1,0,0);
 	cx::CoordinateSystem cs(cx::csPATIENTREF);
 
 	//Create one of each metric to test export and import on
@@ -291,6 +294,15 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 	metrics.push_back(getToolMetricWithInput().mMetric);
 	metrics.push_back(getFrameMetricWithInput().mMetric);
 	metrics.push_back(getDistanceMetricWithInput(0, point, point2).mMetric);
+
+	//angle
+	//plane
+	metrics.push_back(getPlaneMetricWithInput(pos, pos, point, point2).mMetric);
+	//sphere
+	//donut
+	//custom
+	//roi
+
 
 	//Must explicitly insert the metrics in the patient model, since the metricfixture might only have a dummy patientmodelservice.
 	//The logicManager must have been initialised outside first.

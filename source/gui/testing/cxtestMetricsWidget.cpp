@@ -96,7 +96,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 
 		MetricFixture fixture;
 
-		QString patientXMLPath = dataPath + "/testing/metrics_export_import/patient_file_with_metrics.xml";
+		QString patientXMLPath = dataPath + "/testing/metrics_export_import/baseline_patient_file_with_metrics.xml";
 		manager.importMetricsFromFileXML(patientXMLPath);
 
 		CHECK(manager.getNumberOfMetrics() > 0);
