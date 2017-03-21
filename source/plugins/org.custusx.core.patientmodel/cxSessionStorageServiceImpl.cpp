@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include "cxLogger.h"
 #include "cxProfile.h"
+#include "cxOrderedQDomDocument.h"
 
 namespace cx
 {
@@ -126,36 +127,6 @@ QString SessionStorageServiceImpl::getXmlFileName() const
 {
 	return "custusdoc.xml";
 }
-
-/** A QDomDocument that stores attributes in the same order each time.
- *
- * Set a fixed hash seed in order to fix the ordering of xml attributes
- * http://stackoverflow.com/questions/21535707/qtxml-incorrect-order-of-attributes
- * needed primarily because we store the session in git and would like to diff.
- */
-class OrderedQDomDocument
-{
-public:
-	OrderedQDomDocument()
-	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-		// set fixed hash seed
-		qSetGlobalQHashSeed(42);
-#endif
-		mDoc = QDomDocument();
-	}
-	~OrderedQDomDocument()
-	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-		// reset hash seed with new random value.
-		qSetGlobalQHashSeed(-1);
-#endif
-	}
-
-	QDomDocument& doc() {return mDoc; }
-private:
-	QDomDocument mDoc;
-};
 
 void SessionStorageServiceImpl::save()
 {

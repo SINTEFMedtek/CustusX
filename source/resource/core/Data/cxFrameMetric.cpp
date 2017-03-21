@@ -75,12 +75,5 @@ QString FrameMetric::getAsSingleLineString() const
 			.arg(this->matrixAsSingleLineString());
 }
 
-void FrameMetric::updateFromSingleLineString(QStringList& parameterList)
-{
-	DataMetric::updateFromSingleLineString(parameterList);
-	this->setSpaceFromSingleLineString(parameterList);
-	this->setFrame(this->getMatrixFromSingleLineString(parameterList, 5));
-}
-
 
 } //namespace cx

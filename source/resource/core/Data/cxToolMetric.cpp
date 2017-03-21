@@ -117,15 +117,5 @@ QString ToolMetric::getAsSingleLineString() const
 			.arg(this->matrixAsSingleLineString());
 }
 
-void ToolMetric::updateFromSingleLineString(QStringList& parameterList)
-{
-	DataMetric::updateFromSingleLineString(parameterList);
-	this->setSpaceFromSingleLineString(parameterList);
-	int i = 5;
-	this->setToolName(parameterList.at(i++));
-	this->setToolOffset(parameterList.at(i++).toDouble());
-	this->setFrame(this->getMatrixFromSingleLineString(parameterList, i));
-}
-
 
 } //namespace cx

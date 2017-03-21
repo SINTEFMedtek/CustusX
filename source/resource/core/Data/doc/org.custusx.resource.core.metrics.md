@@ -69,5 +69,9 @@ Used for setting ROI for Camera Style. Experimental.
 \addindex export_import_metric
 Export and Import metrics to and from a file
 -----------------------------------------------------------
-It is possible to export all the metrics in the model to an XML file. Such a file can also be imported, but there must be no metrics of the same type in the model at the time of the import.
-It is possible to do the import if one edits the file so that the Uids of the metrics in the file are different from the Uids of the metrics in the model.
+It is possible to export all the metrics in the model to an XML file. Metrics can also be imported from such a file or a regular patient XML file.
+
+However, at the time of import, it is best to not have any metrics in the model of the same types as in the file.
+The metrics in the file might have the same Uid as some in the model, and those will not be imported. Furthermore, if you have a metric "A" in the file which depends on other metrics "B", "C",
+if any of those have the same Uid as any in your model, "b", "c", you might get an unexpected coupling as your "A" will now be imported and connected to "b" and "c".
+You can edit the file and give the metrics unique Uids before import to avoid this.

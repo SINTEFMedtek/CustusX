@@ -84,9 +84,7 @@ private:
 	bool isActivePatient(QString patient) const;
 	void loadPatientSilent(QString choosenDir);
 	void writeRecentPatientData();
-public:
 	void generateSaveDoc(QDomDocument& doc);
-private:
 	void clearPatientSilent();
 	QString getNoPatientFolder() const;
 	void createPatientFolders(QString dir);

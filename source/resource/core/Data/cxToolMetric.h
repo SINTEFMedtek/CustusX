@@ -60,7 +60,6 @@ class cxResource_EXPORT ToolMetric: public cx::FrameMetricBase
 Q_OBJECT
 public:
 	virtual ~ToolMetric();
-//	static ToolMetricPtr create(QDomNode node);
 	static ToolMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getToolOffset() const;
@@ -79,7 +78,6 @@ public:
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 	virtual QString getAsSingleLineString() const;
-	virtual void updateFromSingleLineString(QStringList& parameterList);
 
 private:
 	ToolMetric(const QString& uid, const QString& name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);

@@ -62,7 +62,6 @@ cx_add_class_qt_moc(cxGui_SRCS
     infoWidgets/cxToolMetricWrapper
     infoWidgets/cxMetricManager
     infoWidgets/cxBrowserWidget
-    infoWidgets/cxMetricFileReader
 
     #----------------------
     navigationWidgets/cxNavigationWidget
@@ -146,8 +145,7 @@ target_link_libraries(cxGui
     cxResourceVisualization
     cxGUIExtenderService
     cxPluginUtilities
-	cxResourceFilter
-    org_custusx_core_patientmodel
+    cxResourceFilter
 	)
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")

@@ -72,7 +72,6 @@ public:
 
 protected:
 	QString matrixAsSingleLineString() const;
-	Transform3D getMatrixFromSingleLineString(QStringList& parameterList, int indexWhereMatrixStarts);
 
 	CoordinateSystem mSpace;
 	SpaceListenerPtr mSpaceListener;

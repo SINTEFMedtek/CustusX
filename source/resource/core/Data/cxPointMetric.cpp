@@ -158,16 +158,5 @@ QString PointMetric::getAsSingleLineString() const
 			.arg(qstring_cast(this->getCoordinate()));
 }
 
-void PointMetric::updateFromSingleLineString(QStringList& parameterList)
-{
-	DataMetric::updateFromSingleLineString(parameterList);
-	this->setSpaceFromSingleLineString(parameterList);
-	int firstCoordIndex = 5;
-	int x = firstCoordIndex;
-	int y = ++firstCoordIndex;
-	int z = ++firstCoordIndex;
-
-	this->setCoordinate(Vector3D(parameterList.at(x).toDouble(), parameterList.at(y).toDouble(), parameterList.at(z).toDouble()));
-}
 
 }

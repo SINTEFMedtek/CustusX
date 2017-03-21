@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewGroupData.h"
 #include "cxTrackingService.h"
 #include <QFile>
+#include <QTextStream>
 
 #include "cxDataReaderWriter.h"
 #include "cxLogger.h"
@@ -54,8 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
-#include "cxMetricFileReader.h"
-#include "cxSessionStorageServiceImpl.cpp"
+#include "cxOrderedQDomDocument.h"
 
 
 namespace cx
@@ -149,7 +149,6 @@ PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, Q
 
 	return p1;
 }
-
 
 void MetricManager::addPointButtonClickedSlot()
 {
@@ -380,28 +379,7 @@ void MetricManager::loadReferencePointsSlot()
   }
 }
 
-
-void MetricManager::exportMetricsToFile(QString& filename)
-{
-	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return;
-
-	std::map<QString, DataPtr> dataMap = mPatientModelService->getDatas();
-	std::map<QString, DataPtr>::iterator iter;
-	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
-	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
-		if(metric)
-		{
-			file.write(metric->getAsSingleLineString().toLatin1());
-			file.write("\n");
-		}
-	}
-	file.close();
-}
-
-void MetricManager::exportMetricsToFileXML(QString& filename)
+void MetricManager::exportMetricsToXMLFile(QString& filename)
 {
 	QFile file(filename);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -436,19 +414,7 @@ void MetricManager::exportMetricsToFileXML(QString& filename)
 	file.close();
 }
 
-void MetricManager::importMetricsFromFile(QString& filename)
-{
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return;
-
-	MetricFileReader reader;
-	std::vector<QStringList> metrics = reader.readMetricFile(file);
-
-	this->createMetricsReadFromFile(metrics);
-}
-
-void MetricManager::importMetricsFromFileXML(QString& filename)
+void MetricManager::importMetricsFromXMLFile(QString& filename)
 {
 	QDomDocument xml = this->readXmlFile(filename);
 	QDomElement patientNode = xml.documentElement();
@@ -491,35 +457,6 @@ void MetricManager::importMetricsFromFileXML(QString& filename)
 	{
 		iter->first->parseXml(iter->second);
 	}
-}
-
-void MetricManager::createMetricsReadFromFile(std::vector<QStringList>& metrics) /*const*/
-{
-	DataFactory factory(mPatientModelService, mSpaceProvider);
-	foreach (QStringList metricList, metrics)
-	{
-		QString metricType = metricList.at(0);
-		QString defaultUid = metricType.split("Metric").at(0) + "%1";
-		DataPtr metric = factory.create(metricType, defaultUid, metricList.at(1));
-
-
-		//if (metricType == DistanceMetric::getTypeName())
-		if (DistanceMetricPtr d_metric = boost::dynamic_pointer_cast<DistanceMetric>(metric))
-		{
-			std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d_metric->getArguments());
-			for (unsigned i=0; i<args.size(); ++i)
-				d_metric->getArguments()->set(i, args[i]);
-		}
-
-		metric->updateFromSingleLineString(metricList);
-		//
-		metric->setUid(defaultUid);
-		//
-		mPatientModelService->insertData(metric);
-		mViewService->getGroup(0)->addData(metric->getUid());
-	}
-
-
 }
 
 DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)

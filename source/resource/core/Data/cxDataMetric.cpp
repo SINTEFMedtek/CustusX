@@ -57,46 +57,8 @@ QString DataMetric::getSpace()
 	return "";
 }
 
-void DataMetric::setSpaceFromSingleLineString(QStringList& parameterList)
-{
-	this->setSpace(CoordinateSystem::fromString(parameterList.at(4)));
-}
-
-void DataMetric::updateFromSingleLineString(QStringList& parameterList)
-{
-	int i = 1;
-	this->setName(parameterList.at(i));
-	++i;
-	this->setColor(QColor(parameterList.at(i)));
-	++i;
-	this->setUid(parameterList.at(i));
-}
-
-bool DataMetric::isEqual(DataMetricPtr metric)
-{
-	return streamXml2String(*this) == streamXml2String(*(metric.get()));
-
-
-
-
-
-
-//	//return this->getAsSingleLineString() == metric->getAsSingleLineString();
-//	QStringList a = (this->getAsSingleLineString().split(" "));
-//	a.removeAt(3);
-//	QString aa = a.join(" ");
-//	QStringList b = (metric->getAsSingleLineString().split(" "));
-//	b.removeAt(3);
-//	QString bb = b.join(" ");
-
-//	std::cout << aa << "\n" << bb << "\n";
-
-//	return aa == bb;
-}
-
 QString DataMetric::getSingleLineHeader() const
 {
-	//return QString("%1 \"%2\" %3")
 	return QString("%1 \"%2\" %3 %4")
 			.arg(this->getType())
 			.arg(mName)
