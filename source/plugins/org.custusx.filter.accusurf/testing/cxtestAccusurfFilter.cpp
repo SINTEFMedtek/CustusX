@@ -38,13 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxAccusurf.h"
 #include <vtkImageData.h>
-#include "cxtest_org_custusx_filter_accusurf_export.h"
 
 typedef boost::shared_ptr<class cx::Accusurf> AccusurfPtr;
 
 namespace cxtest {
-
-class CXTEST_ORG_CUSTUSX_FILTER_ACCUSURF_EXPORT AccusurfTest{}; //Needed for Windows linking
 
 
 TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")

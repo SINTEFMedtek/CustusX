@@ -4,8 +4,7 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_SOURCE_FILES
         cxtestPNNPlugin.cpp
-        cxtestDummyPNNReconstruction.h
-        cxtestDummyPNNReconstruction.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_PNNRECONSTRUCTION_MOC_SOURCE_FILES})
