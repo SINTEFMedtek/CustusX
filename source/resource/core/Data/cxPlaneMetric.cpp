@@ -101,10 +101,11 @@ DoubleBoundingBox3D PlaneMetric::boundingBox() const
 
 QString PlaneMetric::getAsSingleLineString() const
 {
-	return QString("%1 %2 %3")
+	return QString("%1 %2 %3 %4")
 			.arg(this->getSingleLineHeader())
 			.arg(qstring_cast(this->getRefCoord()))
-			.arg(qstring_cast(this->getRefNormal()));
+			.arg(qstring_cast(this->getRefNormal()))
+			.arg(mArguments->getAsSingleLineString());
 }
 
 

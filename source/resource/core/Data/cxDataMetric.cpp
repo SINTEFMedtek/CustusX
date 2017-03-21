@@ -74,17 +74,24 @@ void DataMetric::updateFromSingleLineString(QStringList& parameterList)
 
 bool DataMetric::isEqual(DataMetricPtr metric)
 {
-	//return this->getAsSingleLineString() == metric->getAsSingleLineString();
-	QStringList a = (this->getAsSingleLineString().split(" "));
-	a.removeAt(3);
-	QString aa = a.join(" ");
-	QStringList b = (metric->getAsSingleLineString().split(" "));
-	b.removeAt(3);
-	QString bb = b.join(" ");
+	return streamXml2String(*this) == streamXml2String(*(metric.get()));
 
-	std::cout << aa << "\n" << bb << "\n";
 
-	return aa == bb;
+
+
+
+
+//	//return this->getAsSingleLineString() == metric->getAsSingleLineString();
+//	QStringList a = (this->getAsSingleLineString().split(" "));
+//	a.removeAt(3);
+//	QString aa = a.join(" ");
+//	QStringList b = (metric->getAsSingleLineString().split(" "));
+//	b.removeAt(3);
+//	QString bb = b.join(" ");
+
+//	std::cout << aa << "\n" << bb << "\n";
+
+//	return aa == bb;
 }
 
 QString DataMetric::getSingleLineHeader() const

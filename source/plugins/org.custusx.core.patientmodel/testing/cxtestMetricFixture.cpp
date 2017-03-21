@@ -294,18 +294,17 @@ std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
 	metrics.push_back(getToolMetricWithInput().mMetric);
 	metrics.push_back(getFrameMetricWithInput().mMetric);
 	metrics.push_back(getDistanceMetricWithInput(0, point, point2).mMetric);
-
-	//angle
-	//plane
 	metrics.push_back(getPlaneMetricWithInput(pos, pos, point, point2).mMetric);
+	//The following metrics are not tested here as they had no implementation in this test fixture at the time.
+	//They should ideally be tested elsewhere and this functionality should be tested ok already.
+	//angle
 	//sphere
 	//donut
 	//custom
 	//roi
 
-
 	//Must explicitly insert the metrics in the patient model, since the metricfixture might only have a dummy patientmodelservice.
-	//The logicManager must have been initialised outside first.
+	//The logicManager must have been initialised first.
 	foreach (cx::DataMetricPtr metric, metrics)
 	{
 		cx::logicManager()->getPatientModelService()->insertData(metric);
