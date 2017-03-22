@@ -21,6 +21,9 @@ public:
 
 	void send_RequestDepthAndGain();
 
+	void send_RequestDepth();
+	void send_RequestGain();
+
 };
 
 } //namespace cxtest

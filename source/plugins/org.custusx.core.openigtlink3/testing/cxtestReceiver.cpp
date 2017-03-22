@@ -69,7 +69,7 @@ void Receiver::sendCommand(std::string device_name, std::string command_name, st
 										"<command> <parameter name=\"Depth\"/> </command>");
 										*/
 
-	device = mSession->SendCommandQuery(device_name, command_name, command
+	device = mSession->SendCommand(device_name, command_name, command
 										);
 	CX_LOG_DEBUG() << "*** Sent message.";
 }
@@ -94,17 +94,17 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 
 
 	std::string device_type = receivedDevice->GetDeviceType();
-	if(device_type == igtlio::CommandConverter::GetIGTLTypeName())
+	if(device_type == igtlio::CommandConverter::GetIGTLResponseName())
 	{
 		igtlio::CommandDevicePointer command = igtlio::CommandDevice::SafeDownCast(receivedDevice);
 		REQUIRE(command);
 
 		igtlio::CommandConverter::ContentData content = command->GetContent();
-		/*
+
 		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
 					   << " name: " << content.name
 					   << " content: " << content.content;
-		*/
+
 
 	}
 	else if(device_type == igtlio::StatusConverter::GetIGTLTypeName())
@@ -150,10 +150,10 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		REQUIRE(string);
 
 		igtlio::StringConverter::ContentData content = string->GetContent();
-		/*
+
 		CX_LOG_DEBUG() << "STRING: "	<< " string: " << content.string_msg
 					   << " encoding: " << content.encoding;
-		*/
+
 
 	}
 	else

@@ -45,7 +45,7 @@ void PlusReceiver::send_RequestInputDeviceIds()
 
 void PlusReceiver::send_RequestDepthAndGain()
 {
-	this->sendCommand("VideoDevice", "Get", "<Command Name=\"Get\" > <Parameter Name=\"Depth\"/> <Parameter Name=\"Gain\"/> <Parameter Name=\"Unknown\"/> </Command>");
+	this->sendCommand("", "Get", "<Command Name=\"Get\" DeviceId=\"VideoDevice\" > <Parameter Name=\"Depth\"/> <Parameter Name=\"Gain\"/> <Parameter Name=\"Unknown\"/> </Command>");
 
 	//Reply should be:
 	// <Command><Result>true</Result><Message>
@@ -53,6 +53,15 @@ void PlusReceiver::send_RequestDepthAndGain()
 	// <Result success=true> <Parameter Name="Gain" /> </Result>
 	// <Result success=false> <Parameter Name="Unknown" /> </Result>
 	// </Message></Command>
+}
+
+void PlusReceiver::send_RequestDepth()
+{
+	this->sendCommand("", "Get", "<Command Name=\"Get\" DeviceId=\"VideoDevice\" > <Parameter Name=\"Depth\"/> </Command>");
+}
+void PlusReceiver::send_RequestGain()
+{
+	this->sendCommand("", "Get", "<Command Name=\"Get\" DeviceId=\"VideoDevice\" > <Parameter Name=\"Gain\"/> </Command>");
 }
 
 
