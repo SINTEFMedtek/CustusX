@@ -379,6 +379,26 @@ void MetricManager::loadReferencePointsSlot()
   }
 }
 
+void MetricManager::exportMetricsToFile(QString& filename)
+{
+	QFile file(filename);
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+		return;
+
+	std::map<QString, DataPtr> dataMap = mPatientModelService->getDatas();
+	std::map<QString, DataPtr>::iterator iter;
+	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
+	{
+		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
+		if(metric)
+		{
+			file.write(metric->getAsSingleLineString().toLatin1());
+			file.write("\n");
+		}
+	}
+	file.close();
+}
+
 void MetricManager::exportMetricsToXMLFile(QString& filename)
 {
 	QFile file(filename);
@@ -465,21 +485,16 @@ DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 	QString name = node.toElement().attribute("name");
 	QString type = node.toElement().attribute("type");
 
-
-//	if (mData.count(uid)) // dont load same image twice
-//		return mData[uid];
-
 	DataPtr data = mPatientModelService->createData(type, uid, name);
 	if (!data)
 	{
-		reportWarning(QString("Unknown type: %1 for file %2").arg(type)); //.arg(absolutePath));
+		reportWarning(QString("Unknown type: %1 for file %2").arg(type));
 		return DataPtr();
 	}
 
 	if (!name.isEmpty())
 		data->setName(name);
 
-	//mPatientModelService->insertData(data);
 	mPatientModelService->loadData(data);
 
 	return data;

@@ -158,5 +158,4 @@ QString PointMetric::getAsSingleLineString() const
 			.arg(qstring_cast(this->getCoordinate()));
 }
 
-
 }

@@ -117,5 +117,4 @@ QString ToolMetric::getAsSingleLineString() const
 			.arg(this->matrixAsSingleLineString());
 }
 
-
 } //namespace cx

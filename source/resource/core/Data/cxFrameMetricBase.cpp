@@ -126,5 +126,4 @@ QString FrameMetricBase::matrixAsSingleLineString() const
 	return qstring_cast(stream.str());
 }
 
-
 } //namespace cx

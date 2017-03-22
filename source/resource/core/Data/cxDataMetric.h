@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include <QColor>
 
-
 namespace cx
 {
 typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
@@ -90,10 +89,8 @@ protected:
 	PatientModelServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
 
-	QColor mColor;
-
-public:
 	QString getSingleLineHeader() const;
+	QColor mColor;
 
 };
 typedef boost::shared_ptr<DataMetric> DataMetricPtr;

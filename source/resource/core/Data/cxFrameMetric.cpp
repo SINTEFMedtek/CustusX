@@ -75,5 +75,4 @@ QString FrameMetric::getAsSingleLineString() const
 			.arg(this->matrixAsSingleLineString());
 }
 
-
 } //namespace cx
