@@ -40,7 +40,7 @@ namespace cxtest
 {
 
 
-TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget][jon]")
+TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget]")
 {
 	cx::LogicManager::initialize();
 
@@ -50,7 +50,7 @@ TEST_CASE("Export and import metrics to and from file", "[integration][metrics][
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("Save the patient and import metrics from the patient XML file", "[integration][metrics][widget][jon]")
+TEST_CASE("Save the patient and import metrics from the patient XML file", "[integration][metrics][widget]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -81,7 +81,7 @@ TEST_CASE("Save the patient and import metrics from the patient XML file", "[int
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widget][jon]")
+TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widget]")
 {
 	//This test is a regression test of the format of the patient XML file and import of metrics.
 	//If the format of the patient file changes, i.e. tag names and tag relations, it might break

@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 #include "cxOrderedQDomDocument.h"
+#include "cxXmlFileHandler.h"
 
 
 namespace cx
@@ -106,7 +107,6 @@ void MetricManager::setActiveUid(QString uid)
 {
 	mActiveLandmark = uid;
 	emit activeMetricChanged();
-//    this->setModified();
 }
 
 void MetricManager::moveToMetric(QString uid)
@@ -381,12 +381,8 @@ void MetricManager::loadReferencePointsSlot()
 
 void MetricManager::exportMetricsToXMLFile(QString& filename)
 {
-	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return;
-
-	OrderedQDomDocument doc1;
-	QDomDocument& doc = doc1.doc();
+	OrderedQDomDocument orderedDoc;
+	QDomDocument& doc = orderedDoc.doc();
 	doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 	QDomElement patientNode = doc.createElement("patient");
 	QDomElement managersNode = doc.createElement("managers");
@@ -408,15 +404,12 @@ void MetricManager::exportMetricsToXMLFile(QString& filename)
 	}
 
 	doc.appendChild(patientNode);
-
-	QTextStream stream(&file);
-	stream << doc.toString(4);
-	file.close();
+	XmlFileHandler::writeXmlFile(doc, filename);
 }
 
 void MetricManager::importMetricsFromXMLFile(QString& filename)
 {
-	QDomDocument xml = this->readXmlFile(filename);
+	QDomDocument xml = XmlFileHandler::readXmlFile(filename);
 	QDomElement patientNode = xml.documentElement();
 
 	std::map<DataPtr, QDomNode> datanodes;
@@ -478,28 +471,6 @@ DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 	mPatientModelService->insertData(data);
 
 	return data;
-}
-
-QDomDocument MetricManager::readXmlFile(QString filename)
-{
-	QDomDocument retval;
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly))
-	{
-		reportError("Could not open XML file :" + file.fileName() + ".");
-		return QDomDocument();
-	}
-
-	QString emsg;
-	int eline, ecolumn;
-	// Read the file
-	if (!retval.setContent(&file, false, &emsg, &eline, &ecolumn))
-	{
-		reportError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
-		return QDomDocument();
-	}
-
-	return retval;
 }
 
 

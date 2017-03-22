@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxProfile.h"
 #include "cxOrderedQDomDocument.h"
+#include "cxXmlFileHandler.h"
+
 
 namespace cx
 {
@@ -141,23 +143,8 @@ void SessionStorageServiceImpl::save()
 	emit isSaving(element); // give all listeners a chance to add to the document
 
 	QString filename = QDir(mActivePatientFolder).absoluteFilePath(this->getXmlFileName());
-	this->writeXmlFile(doc.doc(), filename);
+	XmlFileHandler::writeXmlFile(doc.doc(), filename);
 	report("Saved patient " + mActivePatientFolder);
-}
-
-void SessionStorageServiceImpl::writeXmlFile(QDomDocument doc, QString filename)
-{
-	QFile file(filename);
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-	{
-		QTextStream stream(&file);
-		stream << doc.toString(4);
-		file.close();
-	}
-	else
-	{
-		reportError("Could not open " + file.fileName() + " Error: " + file.errorString());
-	}
 }
 
 void SessionStorageServiceImpl::clear()
@@ -218,8 +205,7 @@ void SessionStorageServiceImpl::loadPatientSilent(QString choosenDir)
 		return; // On cancel
 
 	QString filename = QDir(choosenDir).absoluteFilePath(this->getXmlFileName());
-	QDomDocument doc = this->readXmlFile(filename);
-
+	QDomDocument doc = XmlFileHandler::readXmlFile(filename);
 	mActivePatientFolder = choosenDir; // must set path before emitting isLoading()
 
 	if (!doc.isNull())
@@ -231,28 +217,6 @@ void SessionStorageServiceImpl::loadPatientSilent(QString choosenDir)
 	}
 
 	emit sessionChanged();
-}
-
-QDomDocument SessionStorageServiceImpl::readXmlFile(QString filename)
-{
-	QDomDocument retval;
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly))
-	{
-		reportError("Could not open XML file :" + file.fileName() + ".");
-		return QDomDocument();
-	}
-
-	QString emsg;
-	int eline, ecolumn;
-	// Read the file
-	if (!retval.setContent(&file, false, &emsg, &eline, &ecolumn))
-	{
-		reportError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
-		return QDomDocument();
-	}
-
-	return retval;
 }
 
 /** Writes settings info describing the patient name and current time.

@@ -200,6 +200,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxEnumConverter.h
     utilities/cxSpaceProviderNull
     utilities/cxOrderedQDomDocument.h
+    utilities/cxXmlFileHandler
 
 
 	logger/cxAudio.h

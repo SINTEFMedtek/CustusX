@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include "cxCoordinateSystemHelpers.h"
 
-#include <QDomNode>
+class QDomElement;
 
 namespace cx
 {
@@ -94,6 +94,7 @@ private:
 	void installNewMetric(DataMetricPtr metric);
 	PointMetricPtr addPointInDefaultPosition();
 	std::vector<DataMetricPtr> getAllMetrics() const;
+	DataPtr loadDataFromXMLNode(QDomElement node);
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 	std::set<QString> mSelection;
@@ -101,8 +102,6 @@ private:
 	ViewServicePtr mViewService;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
-	DataPtr loadDataFromXMLNode(QDomElement node);
-	QDomDocument readXmlFile(QString filename);
 };
 
 
