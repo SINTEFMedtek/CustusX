@@ -150,12 +150,5 @@ QString PointMetric::getValueAsString() const
 	return prettyFormat(this->getRefCoord(), 1, 3);
 }
 
-QString PointMetric::getAsSingleLineString() const
-{
-	return QString("%1 \"%2\" %3")
-			.arg(this->getSingleLineHeader())
-			.arg(mSpace.toString())
-			.arg(qstring_cast(this->getCoordinate()));
-}
 
 }

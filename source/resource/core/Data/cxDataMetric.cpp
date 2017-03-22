@@ -57,15 +57,6 @@ QString DataMetric::getSpace()
     return "";
 }
 
-QString DataMetric::getSingleLineHeader() const
-{
-	return QString("%1 \"%2\" %3 %4")
-			.arg(this->getType())
-			.arg(mName)
-			.arg(mColor.name(QColor::HexArgb))
-			.arg(mUid);
-}
-
 void DataMetric::setColor(const QColor& color)
 {
 	mColor = color;

@@ -185,12 +185,5 @@ DoubleBoundingBox3D DistanceMetric::boundingBox() const
 	return DoubleBoundingBox3D::fromCloud(this->getEndpoints());
 }
 
-QString DistanceMetric::getAsSingleLineString() const
-{
-	return QString("%1 %2 %3")
-			.arg(this->getSingleLineHeader())
-			.arg(qstring_cast(this->getDistance()))
-			.arg(mArguments->getAsSingleLineString());
-}
 
 }

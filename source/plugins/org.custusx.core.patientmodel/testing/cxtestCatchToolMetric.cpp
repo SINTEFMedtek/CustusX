@@ -52,24 +52,6 @@ TEST_CASE("ToolMetric can save/load XML", "[unit]")
 	CHECK(fixture.saveLoadXmlGivesEqualTransform(data));
 }
 
-TEST_CASE("ToolMetric can convert values to single line string", "[unit]")
-{
-	cxtest::MetricFixture fixture;
-	cxtest::ToolMetricWithInput testData = fixture.getToolMetricWithInput();
-
-	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
-	REQUIRE(fixture.verifySingleLineHeader(list, testData.mMetric));
-
-	REQUIRE(list[4]=="reference");
-	REQUIRE(list[5]==testData.mName);
-	REQUIRE(list[6].toDouble()==Approx(testData.mOffset));
-	INFO(list.join("\n"));
-	bool transformStringOk = false;
-	cx::Transform3D readTransform = cx::Transform3D::fromString(QStringList(list.mid(7, 18)).join(" "), &transformStringOk);
-	REQUIRE(transformStringOk);
-	REQUIRE(cx::similar(testData.m_qMt, readTransform));
-}
-
 TEST_CASE("ToolMetric can set space correctly", "[unit]")
 {
 	cxtest::MetricFixture fixture;

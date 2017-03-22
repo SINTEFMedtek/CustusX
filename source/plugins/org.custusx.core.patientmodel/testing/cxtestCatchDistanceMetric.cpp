@@ -96,20 +96,3 @@ TEST_CASE("DistanceMetric can save/load XML", "[unit]")
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
 }
 
-TEST_CASE("DistanceMetric can convert values to single line string", "[unit]")
-{
-    cxtest::MetricFixture fixture;
-    double distance = 2;
-	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
-
-	QStringList list = fixture.getSingleLineDataList(testData.mMetric);
-	CHECK(fixture.verifySingleLineHeader(list, testData.mMetric));
-	INFO(list.join("\n"));
-	REQUIRE(list.length() > 2);
-	CHECK(list[4].toDouble() == Approx(distance));
-}
-
-TEST_CASE("DistanceMetric can get a valid reference coordinate", "[unit]")
-{
-}
-

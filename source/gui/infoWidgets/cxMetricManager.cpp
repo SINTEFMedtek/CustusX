@@ -379,26 +379,6 @@ void MetricManager::loadReferencePointsSlot()
   }
 }
 
-void MetricManager::exportMetricsToFile(QString& filename)
-{
-	QFile file(filename);
-	if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-		return;
-
-	std::map<QString, DataPtr> dataMap = mPatientModelService->getDatas();
-	std::map<QString, DataPtr>::iterator iter;
-	for (iter = dataMap.begin(); iter != dataMap.end(); ++iter)
-	{
-		DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(iter->second);
-		if(metric)
-		{
-			file.write(metric->getAsSingleLineString().toLatin1());
-			file.write("\n");
-		}
-	}
-	file.close();
-}
-
 void MetricManager::exportMetricsToXMLFile(QString& filename)
 {
 	QFile file(filename);

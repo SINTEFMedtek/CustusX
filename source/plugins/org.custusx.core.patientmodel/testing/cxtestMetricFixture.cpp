@@ -208,17 +208,6 @@ bool MetricFixture::inputEqualsMetric(PlaneMetricWithInput data)
 			&& (cx::similar(data.mNormal, data.mMetric->getRefNormal()));
 }
 
-QStringList MetricFixture::getSingleLineDataList(cx::DataMetricPtr metric)
-{
-	QString singleLine = metric->getAsSingleLineString();
-	CHECK(!singleLine.isEmpty());
-	INFO("line: " + singleLine);
-	QStringList list = cx::splitStringContaingQuotes(singleLine);
-	INFO("list: " + list.join("\n"));
-	CHECK(!list.empty());
-	return list;
-}
-
 QDomNode MetricFixture::createDummyXmlNode()
 {
 	QDomDocument document;
@@ -236,7 +225,6 @@ void MetricFixture::setPatientRegistration()
 void MetricFixture::insertData(cx::DataPtr data)
 {
 	mServices->patient()->insertData(data);
-	//cx::logicManager()->getPatientModelService()->insertData(data);
 }
 
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)
@@ -321,7 +309,6 @@ void MetricFixture::checkImportedMetricsEqualToExported(std::vector<cx::DataMetr
 
 		REQUIRE(importedMetric);
 		CHECK(metric != importedMetric); //don't compare the original metric to itself
-		//CHECK(metric->getAsSingleLineString() == importedMetric->getAsSingleLineString());
 		CHECK(metric->isEqual(importedMetric));
 	}
 }

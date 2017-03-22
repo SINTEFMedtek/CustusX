@@ -125,7 +125,6 @@ public:
 	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
-	QStringList getSingleLineDataList(cx::DataMetricPtr metric);
 
 	bool inputEqualsMetric(FrameMetricWithInput data);
 	bool inputEqualsMetric(DistanceMetricWithInput data);

@@ -199,7 +199,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxStreamedTimestampSynchronizer
     utilities/cxEnumConverter.h
     utilities/cxSpaceProviderNull
-    utilities/cxOrderedQDomDocument
+    utilities/cxOrderedQDomDocument.h
 
 
 	logger/cxAudio.h
