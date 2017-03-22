@@ -263,7 +263,7 @@ void MetricFixture::testExportAndImportMetrics()
 	if(QFile::exists(metricsFilePath))
 		QFile::remove(metricsFilePath);
 
-	manager.exportMetricsToFileXML(metricsFilePath);
+	manager.exportMetricsToXMLFile(metricsFilePath);
 
 	// remove the metrics from the patientmodel
 	foreach (cx::DataMetricPtr metric, metrics)
@@ -272,7 +272,7 @@ void MetricFixture::testExportAndImportMetrics()
 	}
 
 	// import the exported metrics into the patientmodel
-	manager.importMetricsFromFileXML(metricsFilePath);
+	manager.importMetricsFromXMLFile(metricsFilePath);
 
 	//get imported metrics from the patient and check that they are equal to the ones which was exported
 	this->checkImportedMetricsEqualToExported(metrics, manager);

@@ -73,7 +73,7 @@ TEST_CASE("Save the patient and import metrics from the patient XML file", "[int
 		}
 
 		QString patientXMLPath = dataPath + mSession1 + "/custusdoc.xml";
-		manager.importMetricsFromFileXML(patientXMLPath);
+		manager.importMetricsFromXMLFile(patientXMLPath);
 
 		fixture.checkImportedMetricsEqualToExported(metrics, manager);
 	}
@@ -97,7 +97,7 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 		MetricFixture fixture;
 
 		QString patientXMLPath = dataPath + "/testing/metrics_export_import/baseline_patient_file_with_metrics.xml";
-		manager.importMetricsFromFileXML(patientXMLPath);
+		manager.importMetricsFromXMLFile(patientXMLPath);
 
 		CHECK(manager.getNumberOfMetrics() > 0);
 	}
