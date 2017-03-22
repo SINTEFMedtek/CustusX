@@ -62,7 +62,6 @@ public:
 	virtual ~PatientModelServiceProxy();
 
 	virtual void insertData(DataPtr data);
-	virtual void loadData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
 	virtual DataPtr getData(const QString& uid) const;

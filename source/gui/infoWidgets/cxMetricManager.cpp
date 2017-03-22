@@ -475,7 +475,7 @@ DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 	if (!name.isEmpty())
 		data->setName(name);
 
-	mPatientModelService->loadData(data);
+	mPatientModelService->insertData(data);
 
 	return data;
 }
