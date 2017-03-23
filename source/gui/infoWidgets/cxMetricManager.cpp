@@ -385,6 +385,7 @@ void MetricManager::exportMetricsToXMLFile(QString& filename)
 	QDomDocument& doc = orderedDoc.doc();
 	doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 	QDomElement patientNode = doc.createElement("patient");
+	doc.appendChild(patientNode);
 	QDomElement managersNode = doc.createElement("managers");
 	patientNode.appendChild(managersNode);
 	QDomElement datamanagerNode = doc.createElement("datamanager");
@@ -403,7 +404,6 @@ void MetricManager::exportMetricsToXMLFile(QString& filename)
 		}
 	}
 
-	doc.appendChild(patientNode);
 	XmlFileHandler::writeXmlFile(doc, filename);
 }
 
@@ -461,7 +461,7 @@ DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 	DataPtr data = mPatientModelService->createData(type, uid, name);
 	if (!data)
 	{
-		reportWarning(QString("Unknown type: %1 for file %2").arg(type));
+		reportError(QString("Not able to create metric with name: %1, uid: %2, type: %3").arg(name).arg(uid).arg(type));
 		return DataPtr();
 	}
 
