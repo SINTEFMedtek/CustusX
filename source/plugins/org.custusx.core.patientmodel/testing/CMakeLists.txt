@@ -30,6 +30,7 @@ if(BUILD_TESTING)
         cxLogicManager
         cxtestResource
         cxtestUtilities
+        cxGui
         cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_core_patientmodel)
 

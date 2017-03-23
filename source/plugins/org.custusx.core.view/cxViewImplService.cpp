@@ -186,7 +186,6 @@ QWidget *ViewImplService::getLayoutWidget(int index)
 
 QWidget *ViewImplService::createLayoutWidget(QWidget* parent, int index)
 {
-	CX_LOG_DEBUG_CHECKPOINT();
 	if (index >= mLayoutWidgets.size())
 		return NULL;
 

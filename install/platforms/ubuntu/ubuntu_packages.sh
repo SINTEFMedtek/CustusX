@@ -23,7 +23,7 @@ sudo apt-get -y upgrade
 # developer stuff
 sudo apt-get install -y build-essential opencl-headers libssl-dev 
 sudo apt-get install -y qt4-dev-tools qt4-designer libboost-all-dev libcppunit-dev libglew-dev
-sudo apt-get install -y qttools5-dev qttools5-dev-tools qttools5-doc qt5-doc libqt5webkit5-dev libqt5xmlpatterns5-dev qtmultimedia5-dev
+sudo apt-get install -y qttools5-dev qttools5-dev-tools qttools5-doc qt5-doc libqt5webkit5-dev libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev
 sudo apt-get install -y ninja-build
 # developer IDE's and apps
 sudo apt-get install -y eclipse-cdt cmake-qt-gui qtcreator

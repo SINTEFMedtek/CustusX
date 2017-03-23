@@ -75,7 +75,6 @@ public:
 	Vector3D getDirection() const;
 	std::vector<Vector3D> getEndpoints() const; ///< return the two endpoints in reference space. None if invalid.
     virtual Vector3D getRefCoord() const;
-	virtual QString getAsSingleLineString() const;
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 
