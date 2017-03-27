@@ -68,7 +68,7 @@ Q_OBJECT
 
 public:
 	LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName,
-		QString windowTitle);
+        QString windowTitle, bool showAccuracy = true);
 	virtual ~LandmarkRegistrationWidget();
 
 protected slots:
@@ -95,6 +95,7 @@ protected:
 	QString getLandmarkName(QString uid);
 	double getAccuracy(QString uid);
 	double getAverageAccuracy();
+    void displayAccuracy(bool show);
 
 	//gui
 	QVBoxLayout* mVerticalLayout; ///< vertical layout is used
@@ -110,6 +111,8 @@ private:
 	LandmarkRegistrationWidget(); ///< not implemented
 	bool isAverageAccuracyValid();
 	double getAverageAccuracy(int &numActiveLandmarks);
+    bool mShowAccuracy;
+
 };
 
 /**

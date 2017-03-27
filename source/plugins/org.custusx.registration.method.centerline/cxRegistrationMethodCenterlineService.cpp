@@ -43,13 +43,12 @@ QWidget *RegistrationMethodCenterlineImageToPatientService::createWidget()
     TabbedWidget* tabWidget = new TabbedWidget(NULL, this->getWidgetName(), "Centerline Registration");
 
     CenterlineRegistrationWidget* centerlineRegistrationWidget = new CenterlineRegistrationWidget(mServices, NULL);
-    //return centerlineRegistrationWidget;
 
     CenterlinePointsWidget* centerlinePointsWidget = new CenterlinePointsWidget(mServices, tabWidget, "org_custusx_registration_method_centerline_landmarks_widget", "Image Registration");
-    //LandmarkImage2ImageRegistrationWidget* image2imageRegistrationWidget = new LandmarkImage2ImageRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_landmark_image_to_image_register_widget", "Image2Image Registration");
 
-    tabWidget->addTab(centerlinePointsWidget, "Centerline points");
+    tabWidget->addTab(centerlinePointsWidget, "Prepare");
     tabWidget->addTab(centerlineRegistrationWidget, "Register");
+    tabWidget->setDefaultWidget(centerlineRegistrationWidget);
 
     return tabWidget;
 }

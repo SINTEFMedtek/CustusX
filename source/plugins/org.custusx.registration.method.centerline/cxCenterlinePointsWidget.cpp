@@ -96,7 +96,7 @@ CenterlinePointsWidget::CenterlinePointsWidget(RegServicesPtr services, QWidget*
     connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
     mCreateCenterlineButton = new QPushButton("Create centerline", this);
-    mCreateCenterlineButton->setToolTip("Create centerline from landmark");
+    mCreateCenterlineButton->setToolTip("Create centerline from landmarks");
     mCreateCenterlineButton->setDisabled(true);
     connect(mCreateCenterlineButton, SIGNAL(clicked()), this, SLOT(createCenterlineButtonClickedSlot()));
 
@@ -286,6 +286,7 @@ void CenterlinePointsWidget::hideEvent(QHideEvent* event)
 
 void CenterlinePointsWidget::prePaintEvent()
 {
+    LandmarkRegistrationWidget::displayAccuracy(false);
     LandmarkRegistrationWidget::prePaintEvent();
 
 	std::vector<Landmark> landmarks = this->getAllLandmarks();
