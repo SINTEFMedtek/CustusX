@@ -90,9 +90,6 @@ DataPtr DataFactory::createRaw(QString type, QString uid)
 
 DataPtr DataFactory::create(QString type, QString uid, QString name)
 {
-	//	if (mDataManager)
-	//		mDataManager->generateUidAndName(&uid, &name);
-
 	DataPtr retval = this->createRaw(type, uid);
 	if (name.isEmpty())
 		name = uid;

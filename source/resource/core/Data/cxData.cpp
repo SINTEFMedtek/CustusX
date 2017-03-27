@@ -207,6 +207,11 @@ TimeInfo Data::getAdvancedTimeInfo() const
 	return mTimeInfo;
 }
 
+bool Data::isEqual(DataPtr metric)
+{
+	return streamXml2String(*this) == streamXml2String(*(metric.get()));
+}
+
 void Data::setAcquisitionTime(QDateTime time)
 {
 	mTimeInfo.mAcquisitionTime = time;

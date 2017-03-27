@@ -78,7 +78,6 @@ public:
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
-	virtual void loadData(DataPtr data);//Not used?
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;
