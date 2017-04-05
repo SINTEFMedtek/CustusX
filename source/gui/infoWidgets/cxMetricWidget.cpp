@@ -159,7 +159,8 @@ void MetricWidget::createActions(QActionGroup* group)
 	mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
 	mLoadReferencePointsAction->setDisabled(true);
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);
-	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
+	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export the metrics to a file",   SLOT(exportMetricsButtonClickedSlot()));
+	mImportFramesAction = this->createAction(group, ":/icons/open.png", "ImportFrames", "Import metrics from a file (can be a patient file)",   SLOT(importMetricsButtonClickedSlot()));
 }
 
 //template<class T>
@@ -471,15 +472,29 @@ void MetricWidget::removeButtonClickedSlot()
 
 void MetricWidget::exportMetricsButtonClickedSlot()
 {
-	QString suggestion = QString("%1/Logs/metrics_%2.txt")
+	QString suggestion = QString("%1/Logs/metrics_%2.xml")
 			.arg(mServices->patient()->getActivePatientFolder())
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,
-													"Create/select file to export metrics to",
+													"Select the file to export the metrics to",
 													suggestion);
 	if(!filename.isEmpty())
-		mMetricManager->exportMetricsToFile(filename);
+		mMetricManager->exportMetricsToXMLFile(filename);
+}
+
+void MetricWidget::importMetricsButtonClickedSlot()
+{
+	QString suggestion = QString("%1/Logs/")
+			.arg(mServices->patient()->getActivePatientFolder());
+
+	QString fileName = QFileDialog::getOpenFileName(this,
+													"Select the file to import metrics from (can be a patient file)",
+													suggestion,
+													"XML file (*.xml)");
+
+	if(!fileName.isEmpty())
+		mMetricManager->importMetricsFromXMLFile(fileName);
 }
 
 

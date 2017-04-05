@@ -40,11 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDefinitions.h"
 #include "cxCoordinateSystemHelpers.h"
 
+class QDomElement;
+
 namespace cx
 {
 typedef boost::shared_ptr<class MetricReferenceArgumentList> MetricReferenceArgumentListPtr;
 typedef boost::shared_ptr<class MetricManager> MetricManagerPtr;
-typedef boost::shared_ptr<class DataFactory> DataFactoryPtr;
 
 /** 
  *
@@ -60,12 +61,14 @@ public:
 	MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider);
 
 	DataMetricPtr getMetric(QString uid);
+	int getNumberOfMetrics() const;
 	void moveToMetric(QString uid);
 	void setSelection(std::set<QString> selection);
 	void setActiveUid(QString uid);
 	QString getActiveUid() const { return mActiveLandmark; }
-	void exportMetricsToFile(QString filename);
-    PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
+	void exportMetricsToXMLFile(QString& filename);
+	void importMetricsFromXMLFile(QString& filename);
+	PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
 
 signals:
 	void activeMetricChanged();
@@ -90,8 +93,8 @@ private:
 	std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
 	void installNewMetric(DataMetricPtr metric);
 	PointMetricPtr addPointInDefaultPosition();
-	std::vector<DataMetricPtr> getAllMetrics();
-//	DataFactoryPtr getDataFactory();
+	std::vector<DataMetricPtr> getAllMetrics() const;
+	DataPtr loadDataFromXMLNode(QDomElement node);
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 	std::set<QString> mSelection;

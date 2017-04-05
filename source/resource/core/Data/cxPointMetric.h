@@ -65,7 +65,6 @@ class cxResource_EXPORT PointMetric: public DataMetric
 Q_OBJECT
 public:
 	virtual ~PointMetric();
-//    static PointMetricPtr create(QDomNode node);
 	static PointMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 	virtual QString getParentSpace();
 
@@ -83,7 +82,6 @@ public:
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_point.png");}
 	virtual Vector3D getRefCoord() const;
-	virtual QString getAsSingleLineString() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.

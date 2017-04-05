@@ -86,13 +86,6 @@ DoubleBoundingBox3D SphereMetric::boundingBox() const
 	return DoubleBoundingBox3D::fromCloud(mArguments->getRefCoords());
 }
 
-QString SphereMetric::getAsSingleLineString() const
-{
-	return QString("%1 %2")
-			.arg(this->getSingleLineHeader())
-			.arg(this->getRadius(), 0, 'f', 1);
-}
-
 void SphereMetric::setRadius(double val)
 {
 	mRadius = val;

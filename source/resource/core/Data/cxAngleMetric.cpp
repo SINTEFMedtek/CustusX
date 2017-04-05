@@ -57,13 +57,6 @@ AngleMetricPtr AngleMetric::create(QString uid, QString name, PatientModelServic
 	return AngleMetricPtr(new AngleMetric(uid, name, dataManager, spaceProvider));
 }
 
-//AngleMetricPtr AngleMetric::create(QDomNode node)
-//{
-//    AngleMetricPtr retval = AngleMetric::create("");
-//    retval->parseXml(node);
-//    return retval;
-//}
-
 AngleMetric::~AngleMetric()
 {
 }
@@ -131,13 +124,6 @@ QString AngleMetric::getValueAsString() const
 DoubleBoundingBox3D AngleMetric::boundingBox() const
 {
 	return DoubleBoundingBox3D::fromCloud(this->getEndpoints());
-}
-
-QString AngleMetric::getAsSingleLineString() const
-{
-	return QString("%1 %2")
-			.arg(this->getSingleLineHeader())
-			.arg(qstring_cast(this->getAngle()));
 }
 
 bool AngleMetric::getUseSimpleVisualization() const
