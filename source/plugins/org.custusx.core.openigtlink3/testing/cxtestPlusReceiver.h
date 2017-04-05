@@ -23,6 +23,7 @@ public:
 
 	void send_RequestDepth();
 	void send_RequestGain();
+	void send_RequestUsSectorParameters();
 
 };
 

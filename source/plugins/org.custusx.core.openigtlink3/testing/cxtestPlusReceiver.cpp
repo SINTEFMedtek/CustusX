@@ -63,6 +63,17 @@ void PlusReceiver::send_RequestGain()
 {
 	this->sendCommand("", "Get", "<Command Name=\"Get\" DeviceId=\"VideoDevice\" > <Parameter Name=\"Gain\"/> </Command>");
 }
+void PlusReceiver::send_RequestUsSectorParameters()
+{
+	QString command;
+	command += "<Command Name=\"Get\" DeviceId=\"VideoDevice\" >";
+	command += "<Parameter Name=\"Gain\"/>";
+	command += "<Parameter Name=\"ProbeType\"/>";
+	command += "<Parameter Name=\"StartDepth\"/>";
+	command += "<Parameter Name=\"StopDepth\"/>";
+	command += "</Command>";
+	this->sendCommand("", "Get", command.toStdString());
+}
 
 
 } //namespace cxtest
