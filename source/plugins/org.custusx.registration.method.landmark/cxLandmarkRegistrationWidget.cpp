@@ -310,7 +310,7 @@ void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
 	if (fixedData)
 		fixedName = fixedData->getName();
 
-	if(this->isAverageAccuracyValid())
+    if(this->isAverageAccuracyValid() && mShowAccuracy)
 	{
 		mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAverageAccuracy(), 0, 'f', 2));
 		mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));
@@ -381,11 +381,6 @@ double LandmarkRegistrationWidget::getAccuracy(QString uid)
 	Vector3D p_master_r = rMmaster.coord(p_master_master);
 
 	return (p_target_r - p_master_r).length();
-}
-
-void LandmarkRegistrationWidget::displayAccuracy(bool show)
-{
-    mShowAccuracy = show;
 }
 
 }//namespace cx

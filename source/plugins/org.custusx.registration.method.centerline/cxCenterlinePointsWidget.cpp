@@ -64,7 +64,7 @@ namespace cx
 {
 CenterlinePointsWidget::CenterlinePointsWidget(RegServicesPtr services, QWidget* parent,
 	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
-	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
+    LandmarkRegistrationWidget(services, parent, objectName, windowTitle, false),
 	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage)
 {
 	if(mUseRegistrationFixedPropertyInsteadOfActiveImage)
@@ -286,7 +286,6 @@ void CenterlinePointsWidget::hideEvent(QHideEvent* event)
 
 void CenterlinePointsWidget::prePaintEvent()
 {
-    LandmarkRegistrationWidget::displayAccuracy(false);
     LandmarkRegistrationWidget::prePaintEvent();
 
 	std::vector<Landmark> landmarks = this->getAllLandmarks();

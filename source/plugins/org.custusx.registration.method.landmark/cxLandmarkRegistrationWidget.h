@@ -95,7 +95,6 @@ protected:
 	QString getLandmarkName(QString uid);
 	double getAccuracy(QString uid);
 	double getAverageAccuracy();
-    void displayAccuracy(bool show);
 
 	//gui
 	QVBoxLayout* mVerticalLayout; ///< vertical layout is used
@@ -104,14 +103,13 @@ protected:
 
 	//data
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
-
 	LandmarkListenerPtr mLandmarkListener;
+    bool mShowAccuracy;
 
 private:
 	LandmarkRegistrationWidget(); ///< not implemented
 	bool isAverageAccuracyValid();
 	double getAverageAccuracy(int &numActiveLandmarks);
-    bool mShowAccuracy;
 
 };
 
