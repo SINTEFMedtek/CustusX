@@ -102,8 +102,8 @@ void VisualizationTab::init()
 									   "View/toolOffsetLineColor",
 									   "Set color of tool offset line");
   SelectColorSettingButton* toolCrossHairColor =
-		  new SelectColorSettingButton("Cross hair",
-									   "View/toolCrossHairColor",
+		  new SelectColorSettingButton("Crosshair 2D",
+									   "View2D/toolCrossHairColor",
 									   "Set color of tool cross hair");
 
   bool showDataText = settings()->value("View/showDataText").value<bool>();

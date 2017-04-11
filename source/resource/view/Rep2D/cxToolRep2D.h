@@ -85,6 +85,7 @@ class cxResourceVisualization_EXPORT ToolRep2D : public RepImpl
 		void setTooltipLineColor(QColor c) { mTooltipLineColor = c; }
 		void setOffsetLineColor(QColor c) { mOffsetLineColor = c; }
 		void setOffsetStipplePattern(int pattern) { mStipplePattern = pattern; }
+		void setCrosshairColor(const QColor& color);
 
 	private slots:
 		void sliceTransformChangedSlot(Transform3D sMr); 

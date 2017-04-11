@@ -64,6 +64,12 @@ void setColorAndOpacity(vtkPropertyPtr property, QColor color)
 	property->SetOpacity(color.alphaF());
 }
 
+void setColorAndOpacity(vtkProperty2DPtr property, QColor color)
+{
+	property->SetColor(color.redF(), color.greenF(), color.blueF());
+	property->SetOpacity(color.alphaF());
+}
+
 Vector3D getColorAsVector3D(QColor color)
 {
 	Vector3D retval(color.redF(), color.greenF(), color.blueF());

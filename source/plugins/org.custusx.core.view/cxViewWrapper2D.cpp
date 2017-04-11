@@ -545,6 +545,7 @@ void ViewWrapper2D::updateView()
 		bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
 		bool useCrosshair = settings()->value("View/toolCrosshair", true).toBool();
 		mToolRep2D->setUseCrosshair(!isOblique && useCrosshair);
+		mToolRep2D->setCrosshairColor(settings()->value("View2D/toolCrossHairColor").value<QColor>());
 	}
 
 	this->applyViewFollower();

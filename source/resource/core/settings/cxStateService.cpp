@@ -111,7 +111,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/toolTipPointColor", QColor::fromRgbF(0.96, 0.87, 0.17));
 	this->fillDefault("View/toolOffsetPointColor", QColor::fromRgbF(0.96, 0.87, 0.17));
 	this->fillDefault("View/toolOffsetLineColor", QColor::fromRgbF(1.0, 0.8, 0.0));
-	this->fillDefault("View/toolCrossHairColor", QColor::fromRgbF(1.0, 0.8, 0.0));
+	this->fillDefault("View2D/toolCrossHairColor", QColor::fromRgbF(1.0, 0.8, 0.0));
 	this->fillDefault("View/toolCrosshair", true);
 	this->fillDefault("View3D/showManualTool", false);
 	this->fillDefault("View2D/showManualTool", true);

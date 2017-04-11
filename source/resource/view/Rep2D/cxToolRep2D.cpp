@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyData.h>
 #include <vtkMatrix4x4.h>
+#include <vtkProperty2D.h>
 #include "cxSliceProxy.h"
 #include "cxTool.h"
 #include "cxView.h"
@@ -185,6 +186,11 @@ void ToolRep2D::setMergeOffsetAndToolLine(bool on)
 	setVisibility();
 }
 
+void ToolRep2D::setCrosshairColor(const QColor& color)
+{
+	cx::setColorAndOpacity(cursor->getActor()->GetProperty(), color);
+}
+
 void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	createToolLine(view->getRenderer(), Vector3D(0,0,0));
@@ -322,13 +328,10 @@ void ToolRep2D::crossHairResized()
 	if (cursor)
 	{
 		double bordarOffset = 30.0;
-		QColor col =  settings()->value("View/toolCrossHairColor").value<QColor>();
-//		RGBColor color(1.0, 0.8, 0.0);
+		QColor col =  settings()->value("View2D/toolCrossHairColor").value<QColor>();
 		RGBColor color(col.redF(), col.greenF(), col.blueF());
-//		RGBColor color(1.0, 0.2, 0.0);
 		Vector3D focalPoint(0.0,0.0,0.0);
 		//Logger::log("tool.log", "("+string_cast(__FUNCTION__)+")"+" mCross"+string_cast(cross));
-		//cursor->setValue( focalPoint, mBB_vp.range()[0], mBB_vp.range()[1], bordarOffset, color  );
 		cursor->setValue( focalPoint, int(mBB_vp.range()[0]), int(mBB_vp.range()[1]), bordarOffset, color  );
 	}
 }
