@@ -13,7 +13,7 @@ cx_initialize_VTK()
 cx_initialize_ITK()
 
 cx_initialize_OpenIGTLink()
-cx_initialize_OpenIGTLinkIO()
+#cx_initialize_OpenIGTLinkIO()
 cx_initialize_CTK()
 
 cx_initialize_TSF()
