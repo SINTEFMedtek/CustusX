@@ -233,7 +233,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		mAnnotationMarker->setMarkerFilename(DataLocations::findConfigFilePath(annotationFile, "/models"));
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
-	if (key == "showManualTool")
+	if (key == "View3D/showManualTool")
 	{
 		this->toolsAvailableSlot();
 	}
@@ -322,9 +322,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showAxesAction->setChecked(mShowAxes);
 	connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
 
-	QAction* showManualTool = new QAction("Show Manual Tool", &contextMenu);
+	QAction* showManualTool = new QAction("Show Manual Tool 3D", &contextMenu);
 	showManualTool->setCheckable(true);
-	showManualTool->setChecked(settings()->value("showManualTool").toBool());
+	showManualTool->setChecked(settings()->value("View3D/showManualTool").toBool());
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
 	QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
@@ -522,7 +522,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
-	settings()->setValue("showManualTool", visible);
+	settings()->setValue("View3D/showManualTool", visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
@@ -839,13 +839,12 @@ void ViewWrapper3D::toolsAvailableSlot()
 		if (oldRep!=reps.end())
 			reps.erase(oldRep);
 
-		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
+		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("View3D/showManualTool").toBool())
 		{
 			if (toolRep)
 				mView->removeRep(toolRep);
 			continue;
 		}
-		//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
 
 		if (!toolRep)
 		{
