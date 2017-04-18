@@ -48,12 +48,15 @@ namespace cx
 {
 // --------------------------------------------------------
 
-/** Set the RGB and alpha components of QColor into a vtkProperty
+/** Set the RGB and alpha components of QColor into a vtkPropertyPtr
+ * or vtkProperty2DPtr
   */
-void setColorAndOpacity(vtkPropertyPtr property, QColor color);
-/** Set the RGB and alpha components of QColor into a vtkProperty2D
-  */
-void setColorAndOpacity(vtkProperty2DPtr property, QColor color);
+template <typename vtkPropertyOrProperty2DPtr>
+void setColorAndOpacity(vtkPropertyOrProperty2DPtr property, QColor color)
+{
+	property->SetColor(color.redF(), color.greenF(), color.blueF());
+	property->SetOpacity(color.alphaF());
+}
 
 /** Convert a QColor to Vector3D using 0..1 scale, ignoring alpha.
   */
