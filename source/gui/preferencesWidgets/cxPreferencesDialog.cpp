@@ -87,8 +87,8 @@ void VisualizationTab::init()
 
   SelectColorSettingButton* tool2DColor =
 		  new SelectColorSettingButton("Tool 2D Color",
-									   "View/tool2DColor",
-									   "Set color of tool in 2D");
+									   "View2D/toolColor",
+									   "Set the color of the tool in 2D");
   SelectColorSettingButton* toolTipPointColor =
 		  new SelectColorSettingButton("Tool Tip",
 									   "View/toolTipPointColor",
@@ -104,7 +104,7 @@ void VisualizationTab::init()
   SelectColorSettingButton* toolCrossHairColor =
 		  new SelectColorSettingButton("Crosshair 2D",
 									   "View2D/toolCrossHairColor",
-									   "Set color of tool cross hair");
+									   "Set the color of the tool 2D crosshair");
 
   bool showDataText = settings()->value("View/showDataText").value<bool>();
   mShowDataText = BoolProperty::initialize("Show Data Text", "",
@@ -116,8 +116,8 @@ void VisualizationTab::init()
                                                  showLabels);
 
   bool toolCrosshair = settings()->value("View/toolCrosshair").value<bool>();
-  mToolCrosshair = BoolProperty::initialize("Tool crosshair", "",
-										 "Show a crosshair centered on tool for orthogonal (ACS) views.",
+  mToolCrosshair = BoolProperty::initialize("Tool 2D Crosshair", "",
+										 "Show a crosshair centered on the tool in the orthogonal (ACS) views.",
 										 toolCrosshair);
 
 

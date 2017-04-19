@@ -65,7 +65,7 @@ ToolRep2D::ToolRep2D(SpaceProviderPtr spaceProvider) :
 	mOffsetLineColor(1.0, 0.8, 0.0),
 	mStipplePattern(0xffff)
 {
-	mTooltipLineColor = settings()->value("View/tool2DColor").value<QColor>();
+	mTooltipLineColor = settings()->value("View2D/toolColor").value<QColor>();
 	mTooltipPointColor = settings()->value("View/toolTipPointColor").value<QColor>();
 	mOffsetPointColor = settings()->value("View/toolOffsetPointColor").value<QColor>();
 	mOffsetLineColor = settings()->value("View/toolOffsetLineColor").value<QColor>();
@@ -134,16 +134,6 @@ void ToolRep2D::setSliceProxy(SliceProxyPtr slicer)
 	connect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 }
 
-/**Set display of the line from tool tip to the cross pos (this is the offset line).
- */
-void ToolRep2D::setUseOffset(bool on)
-{
-	if (mUseOffset==on)
-		return;
-	mUseOffset = on;
-	setVisibility();
-}
-
 /**Set display of a yellow crosshair centered on the cross pos.
  */
 void ToolRep2D::setUseCrosshair(bool on)
@@ -154,41 +144,16 @@ void ToolRep2D::setUseCrosshair(bool on)
 	setVisibility();
 }
 
-/**Set display of the line from back infinity to the tool tip.
- */
-void ToolRep2D::setUseToolLine(bool on)
-{
-	if (mUseToolLine==on)
-		return;
-	mUseToolLine = on;
-	setVisibility();
-}
-
-/**Set display of the amount of offset, in the upper right corner.
- */
-void ToolRep2D::setUseOffsetText(bool on)
-{
-	if (mUseOffsetText==on)
-		return;
-	mUseOffsetText = on;
-	setVisibility();
-}
-
-/**Set to merge the rep of the tool and the tool offset into one line, thus making the
- * location of the physical tool tip invisible.
- *
- */
-void ToolRep2D::setMergeOffsetAndToolLine(bool on)
-{
-	if (mMergeOffsetAndToolLine==on)
-		return;
-	mMergeOffsetAndToolLine = on;
-	setVisibility();
-}
-
 void ToolRep2D::setCrosshairColor(const QColor& color)
 {
-	cx::setColorAndOpacity(cursor->getActor()->GetProperty(), color);
+	if(cursor)
+		cx::setColorAndOpacity(cursor->getActor()->GetProperty(), color);
+}
+
+void ToolRep2D::setTooltipLineColor(const QColor& color)
+{
+	if(tool2Back)
+		tool2Back->setColor(color);
 }
 
 void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)

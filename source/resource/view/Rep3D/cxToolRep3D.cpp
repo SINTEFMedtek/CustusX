@@ -183,26 +183,6 @@ void ToolRep3D::setSphereRadius(double radius)
 		mTooltipPoint->setRadius(mSphereRadius);
 }
 
-void ToolRep3D::setTooltipPointColor(QColor c)
-{
-	mTooltipPointColor = c;
-}
-
-void ToolRep3D::setOffsetPointColor(QColor c)
-{
-	mOffsetPointColor = c;
-}
-
-void ToolRep3D::setOffsetLineColor(QColor c)
-{
-	mOffsetLineColor = c;
-}
-
-void ToolRep3D::setOffsetStipplePattern(int pattern)
-{
-	mStipplePattern = pattern;
-}
-
 void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 {
 	if (mSphereRadiusInNormalizedViewport == on)

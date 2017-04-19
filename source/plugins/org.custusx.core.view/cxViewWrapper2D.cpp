@@ -546,6 +546,7 @@ void ViewWrapper2D::updateView()
 		bool useCrosshair = settings()->value("View/toolCrosshair", true).toBool();
 		mToolRep2D->setUseCrosshair(!isOblique && useCrosshair);
 		mToolRep2D->setCrosshairColor(settings()->value("View2D/toolCrossHairColor").value<QColor>());
+		mToolRep2D->setTooltipLineColor(settings()->value("View2D/toolColor").value<QColor>());
 	}
 
 	this->applyViewFollower();
