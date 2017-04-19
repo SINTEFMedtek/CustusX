@@ -158,8 +158,8 @@ void ToolRep2D::setTooltipLineColor(const QColor& color)
 
 void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
-	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
+	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createOffsetText(view->getRenderer(), Vector3D(0,0,0));
 	view->getRenderer()->AddActor(mProbeSectorActor);
 	setVisibility();
