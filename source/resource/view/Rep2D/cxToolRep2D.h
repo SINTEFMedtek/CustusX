@@ -78,6 +78,7 @@ class cxResourceVisualization_EXPORT ToolRep2D : public RepImpl
 		void setUseCrosshair(bool on);
 		void setCrosshairColor(const QColor& color);
 		void setTooltipLineColor(const QColor& color);
+		void setTooltipPointColor(const QColor& color);
 
 	private slots:
 		void sliceTransformChangedSlot(Transform3D sMr); 

@@ -147,13 +147,19 @@ void ToolRep2D::setUseCrosshair(bool on)
 void ToolRep2D::setCrosshairColor(const QColor& color)
 {
 	if(cursor)
-		cx::setColorAndOpacity(cursor->getActor()->GetProperty(), color);
+		setColorAndOpacity(cursor->getActor()->GetProperty(), color);
 }
 
 void ToolRep2D::setTooltipLineColor(const QColor& color)
 {
 	if(tool2Back)
-		tool2Back->setColor(color);
+		setColorAndOpacity(tool2Back->getActor()->GetProperty(), color);
+}
+
+void ToolRep2D::setTooltipPointColor(const QColor& color)
+{
+	if(toolPoint)
+		setColorAndOpacity(toolPoint->getActor()->GetProperty(), color);
 }
 
 void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)

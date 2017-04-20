@@ -201,6 +201,19 @@ void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 	}
 }
 
+/**
+ * @brief ToolRep3D::setTooltipPointColor
+ * @param color
+ * Sets the color of the crosshair and the sphere.
+ */
+void ToolRep3D::setTooltipPointColor(const QColor& color)
+{
+	if(mToolActor)
+		setColorAndOpacity(mToolActor->GetProperty(), color);
+	if(mTooltipPoint)
+		mTooltipPoint->setColor(color);
+}
+
 void ToolRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mTracer->getActor());

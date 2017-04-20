@@ -87,6 +87,7 @@ public:
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 	void setSphereRadiusInNormalizedViewport(bool on);
+	void setTooltipPointColor(const QColor& color);
 
 protected:
 	ToolRep3D(SpaceProviderPtr spaceProvider);

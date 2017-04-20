@@ -743,6 +743,10 @@ void ViewWrapper3D::updateView()
 	this->updateMetricNamesRep();
 
 	mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
+
+	ToolRep3DPtr manualToolRep = RepContainer(mView->getReps()).findManualToolRep<ToolRep3D>();
+	if (manualToolRep)
+		manualToolRep->setTooltipPointColor(settings()->value("View/toolTipPointColor").value<QColor>());
 }
 
 void ViewWrapper3D::activeImageChangedSlot(QString uid)
