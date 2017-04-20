@@ -86,21 +86,21 @@ void VisualizationTab::init()
 									   "Set 3D view background color");
 
   SelectColorSettingButton* tool2DColor =
-		  new SelectColorSettingButton("Tool 2D Color",
+		  new SelectColorSettingButton("Tool Color 2D",
 									   "View2D/toolColor",
 									   "Set the color of the tool in 2D");
   SelectColorSettingButton* toolTipPointColor =
-		  new SelectColorSettingButton("Tool 2D/3D Tip",
+		  new SelectColorSettingButton("Tool Tip 2D/3D",
 									   "View/toolTipPointColor",
-									   "Set the color of the tool 2D/3D tip");
+									   "Set the color of the tool tip in 2D/3D");
   SelectColorSettingButton* toolOffsetPointColor =
-		  new SelectColorSettingButton("Offset 2D/3D Point",
+		  new SelectColorSettingButton("Offset Point 2D/3D",
 									   "View/toolOffsetPointColor",
-									   "Set the color of the tool 2D/3D offset point");
+									   "Set the color of the tool offset point in 2D/3D");
   SelectColorSettingButton* toolOffsetLineColor =
-		  new SelectColorSettingButton("Offset Line",
+		  new SelectColorSettingButton("Offset Line 2D/3D",
 									   "View/toolOffsetLineColor",
-									   "Set color of tool offset line");
+									   "Set the color of the tool offset line in 2D/3D");
   SelectColorSettingButton* toolCrossHairColor =
 		  new SelectColorSettingButton("Crosshair 2D",
 									   "View2D/toolCrossHairColor",

@@ -549,6 +549,7 @@ void ViewWrapper2D::updateView()
 		mToolRep2D->setTooltipLineColor(settings()->value("View2D/toolColor").value<QColor>());
 		mToolRep2D->setTooltipPointColor(settings()->value("View/toolTipPointColor").value<QColor>());
 		mToolRep2D->setToolOffsetPointColor(settings()->value("View/toolOffsetPointColor").value<QColor>());
+		mToolRep2D->setToolOffsetLineColor(settings()->value("View/toolOffsetLineColor").value<QColor>());
 	}
 
 	this->applyViewFollower();

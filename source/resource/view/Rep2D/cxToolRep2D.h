@@ -80,6 +80,7 @@ class cxResourceVisualization_EXPORT ToolRep2D : public RepImpl
 		void setTooltipLineColor(const QColor& color);
 		void setTooltipPointColor(const QColor& color);
 		void setToolOffsetPointColor(const QColor& color);
+		void setToolOffsetLineColor(const QColor& color);
 
 	private slots:
 		void sliceTransformChangedSlot(Transform3D sMr); 

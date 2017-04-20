@@ -749,6 +749,7 @@ void ViewWrapper3D::updateView()
 	{
 		manualToolRep->setTooltipPointColor(settings()->value("View/toolTipPointColor").value<QColor>());
 		manualToolRep->setToolOffsetPointColor(settings()->value("View/toolOffsetPointColor").value<QColor>());
+		manualToolRep->setToolOffsetLineColor(settings()->value("View/toolOffsetLineColor").value<QColor>());
 	}
 }
 

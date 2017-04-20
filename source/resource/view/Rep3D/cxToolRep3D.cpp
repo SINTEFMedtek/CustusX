@@ -220,6 +220,12 @@ void ToolRep3D::setToolOffsetPointColor(const QColor& color)
 		mOffsetPoint->setColor(color);
 }
 
+void ToolRep3D::setToolOffsetLineColor(const QColor& color)
+{
+	if(mOffsetLine)
+		mOffsetLine->setColor(color);
+}
+
 void ToolRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mTracer->getActor());

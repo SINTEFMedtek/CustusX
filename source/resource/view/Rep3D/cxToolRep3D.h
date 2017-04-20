@@ -89,6 +89,7 @@ public:
 	void setSphereRadiusInNormalizedViewport(bool on);
 	void setTooltipPointColor(const QColor& color);
 	void setToolOffsetPointColor(const QColor& color);
+	void setToolOffsetLineColor(const QColor& color);
 
 protected:
 	ToolRep3D(SpaceProviderPtr spaceProvider);
