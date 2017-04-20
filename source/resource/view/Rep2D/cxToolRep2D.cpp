@@ -162,6 +162,12 @@ void ToolRep2D::setTooltipPointColor(const QColor& color)
 		setColorAndOpacity(toolPoint->getActor()->GetProperty(), color);
 }
 
+void ToolRep2D::setToolOffsetPointColor(const QColor& color)
+{
+	if(centerPoint)
+		setColorAndOpacity(centerPoint->getActor()->GetProperty(), color);
+}
+
 void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	createCrossHair(view->getRenderer() );

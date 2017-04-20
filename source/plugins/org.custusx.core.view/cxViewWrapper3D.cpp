@@ -746,7 +746,10 @@ void ViewWrapper3D::updateView()
 
 	ToolRep3DPtr manualToolRep = RepContainer(mView->getReps()).findManualToolRep<ToolRep3D>();
 	if (manualToolRep)
+	{
 		manualToolRep->setTooltipPointColor(settings()->value("View/toolTipPointColor").value<QColor>());
+		manualToolRep->setToolOffsetPointColor(settings()->value("View/toolOffsetPointColor").value<QColor>());
+	}
 }
 
 void ViewWrapper3D::activeImageChangedSlot(QString uid)

@@ -94,9 +94,9 @@ void VisualizationTab::init()
 									   "View/toolTipPointColor",
 									   "Set the color of the tool 2D/3D tip");
   SelectColorSettingButton* toolOffsetPointColor =
-		  new SelectColorSettingButton("Offset Point",
+		  new SelectColorSettingButton("Offset 2D/3D Point",
 									   "View/toolOffsetPointColor",
-									   "Set color of tool offset point");
+									   "Set the color of the tool 2D/3D offset point");
   SelectColorSettingButton* toolOffsetLineColor =
 		  new SelectColorSettingButton("Offset Line",
 									   "View/toolOffsetLineColor",

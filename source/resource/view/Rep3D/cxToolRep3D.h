@@ -88,6 +88,7 @@ public:
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 	void setSphereRadiusInNormalizedViewport(bool on);
 	void setTooltipPointColor(const QColor& color);
+	void setToolOffsetPointColor(const QColor& color);
 
 protected:
 	ToolRep3D(SpaceProviderPtr spaceProvider);

@@ -214,6 +214,12 @@ void ToolRep3D::setTooltipPointColor(const QColor& color)
 		mTooltipPoint->setColor(color);
 }
 
+void ToolRep3D::setToolOffsetPointColor(const QColor& color)
+{
+	if(mOffsetPoint)
+		mOffsetPoint->setColor(color);
+}
+
 void ToolRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	view->getRenderer()->AddActor(mTracer->getActor());
