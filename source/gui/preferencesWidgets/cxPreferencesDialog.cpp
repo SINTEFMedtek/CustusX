@@ -115,7 +115,7 @@ void VisualizationTab::init()
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
 
-  bool toolCrosshair = settings()->value("View/toolCrosshair").value<bool>();
+  bool toolCrosshair = settings()->value("View2D/showToolCrosshair").value<bool>();
   mToolCrosshair = BoolProperty::initialize("Tool 2D Crosshair", "",
 										 "Show a crosshair centered on the tool in the orthogonal (ACS) views.",
 										 toolCrosshair);
@@ -282,7 +282,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
-  settings()->setValue("View/toolCrosshair", mToolCrosshair->getValue());
+  settings()->setValue("View2D/showToolCrosshair", mToolCrosshair->getValue());
   settings()->setValue("View/showMetricNamesInCorner", mShowMetricNamesInCorner->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
