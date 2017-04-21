@@ -109,6 +109,8 @@ private slots:
 	void mouseMoveSlot(int x, int y, Qt::MouseButtons buttons);
 	void mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
 	void optionChangedSlot();
+	void showManualToolSlot(bool visible);
+	void toggleShowManualTool();
 
 protected slots:
 	void samplePoint(Vector3D click_vp);
