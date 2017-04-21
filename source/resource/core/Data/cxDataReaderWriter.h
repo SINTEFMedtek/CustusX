@@ -113,12 +113,36 @@ public:
 		return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
 	}
 	virtual QString canLoadDataType() const { return "image"; }
-	virtual bool readInto(DataPtr data, QString path);
-	bool readInto(ImagePtr image, QString filename);
+	virtual bool readInto(DataPtr data, QString filename);
+	bool readInto(ImagePtr image, QString path);
 	virtual DataPtr load(const QString& uid, const QString& filename);
-//	vtkImageDataPtr load(const QString& filename) { return this->loadVtkImageData(filename); }
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 	void saveImage(ImagePtr image, const QString& filename);
+};
+
+/**\brief Reader for NIfTI files.
+ *
+ */
+class cxResource_EXPORT NIfTIReader: public DataReader
+{
+public:
+	NIfTIReader();
+	virtual ~NIfTIReader()
+	{
+	}
+	virtual bool canLoad(const QString& type, const QString& filename)
+	{
+		QString fileType = QFileInfo(filename).suffix();
+		return (fileType.compare("nii", Qt::CaseInsensitive) == 0);
+	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(ImagePtr image, QString filename);
+	virtual QString canLoadDataType() const { return "image"; }
+	virtual DataPtr load(const QString& uid, const QString& filename);
+	virtual vtkImageDataPtr loadVtkImageData(QString filename);
+
+private:
+	vtkMatrix4x4Ptr sform_matrix;
 };
 
 /**\brief Reader for portable network graphics .png files.
@@ -206,10 +230,9 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
-/** Read or write vtk or ssc data objects from/to file.
+
+/**\brief Read or write vtk or ssc data objects from/to file.
  *
- * \date May 2, 2013
- * \author christiana
  */
 class cxResource_EXPORT DataReaderWriter
 {
