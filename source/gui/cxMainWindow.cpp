@@ -88,50 +88,50 @@ MainWindow::MainWindow() :
 	this->setObjectName("main_window");
 
 	mServices = VisServices::create(logicManager()->getPluginContext());
-	mLayoutInteractor.reset(new LayoutInteractor());
+	mLayoutInteractor.reset(new LayoutInteractor(mServices->view()));
 
-    this->setCentralWidget(viewService()->createLayoutWidget(this, 0));
+	this->setCentralWidget(mServices->view()->createLayoutWidget(this, 0));
 
 	mActions = new MainWindowActions(mServices, this);
 
 	this->createActions();
 	this->createMenus();
 	this->createToolBars();
-	this->setStatusBar(new StatusBar());
+	this->setStatusBar(new StatusBar(mServices->tracking(), mServices->view(), mServices->video()));
 
 	reporter()->setAudioSource(AudioPtr(new AudioImpl()));
 
-	connect(stateService().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
-	connect(stateService().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
-	connect(stateService().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
+	connect(mServices->state().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
+	connect(mServices->state().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
+	connect(mServices->state().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
 
 	this->updateWindowTitle();
 
 	this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-	this->addAsDockWidget(new PlaybackWidget(this), "Browsing");
+	this->addAsDockWidget(new PlaybackWidget(mServices->tracking(), mServices->video(), mServices->patient(), this), "Browsing");
 	this->addAsDockWidget(new VideoConnectionWidget(mServices, this), "Utility");
 	this->addAsDockWidget(new EraserWidget(mServices->patient(), mServices->view(), this), "Properties");
-	this->addAsDockWidget(new MetricWidget(mServices->view(), mServices->patient(), this), "Utility");
+	this->addAsDockWidget(new MetricWidget(mServices, this), "Utility");
 	this->addAsDockWidget(new SlicePropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
 	this->addAsDockWidget(new VolumePropertiesWidget(mServices, this), "Properties");
 	this->addAsDockWidget(new ActiveMeshPropertiesWidget(mServices, this), "Properties");
 	this->addAsDockWidget(new StreamPropertiesWidget(mServices->patient(), mServices->view(), this), "Properties");
-	this->addAsDockWidget(new TrackPadWidget(this), "Utility");
+	this->addAsDockWidget(new TrackPadWidget(mServices->view(), this), "Utility");
 	this->addAsDockWidget(new ActiveToolPropertiesWidget(mServices->tracking(), mServices->spaceProvider(), this), "Properties");
-	this->addAsDockWidget(new NavigationWidget(this), "Properties");
+	this->addAsDockWidget(new NavigationWidget(mServices->view(), mServices->tracking(), this), "Properties");
 	this->addAsDockWidget(new ConsoleWidget(this, "console_widget", "Console"), "Utility");
 	this->addAsDockWidget(new ConsoleWidget(this, "console_widget_2", "Extra Console"), "Utility");
 //	this->addAsDockWidget(new ConsoleWidgetCollection(this, "ConsoleWidgets", "Consoles"), "Utility");
 	this->addAsDockWidget(new FrameTreeWidget(mServices->patient(), this), "Browsing");
-	this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
+	this->addAsDockWidget(new ToolManagerWidget(mServices->tracking(), this), "Debugging");
 	this->addAsDockWidget(new PluginFrameworkWidget(this), "Browsing");
     this->addAsDockWidget(new FiltersWidget(VisServices::create(logicManager()->getPluginContext()), this), "Algorithms");
 	this->addAsDockWidget(new ClippingPropertiesWidget(mServices, this), "Properties");
 
 	this->addAsDockWidget(new BrowserWidget(this, mServices), "Browsing");
 
-	connect(patientService().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
+	connect(mServices->patient().get(), &PatientModelService::patientChanged, this, &MainWindow::patientChangedSlot);
 	connect(qApp, &QApplication::focusChanged, this, &MainWindow::focusChanged);
 
 	this->setupGUIExtenders();
@@ -258,7 +258,7 @@ void MainWindow::focusInsideDockWidget(QObject *dockWidget)
 
 MainWindow::~MainWindow()
 {
-	viewService()->deactivateLayout();
+	mServices->view()->deactivateLayout();
 	reporter()->setAudioSource(AudioPtr()); // important! QSound::play fires a thread, causes segfault during shutdown
 	mServiceListener.reset();
 }
@@ -270,7 +270,7 @@ QMenu* MainWindow::createPopupMenu()
 
 void MainWindow::createActions()
 {
-	CameraControlPtr cameraControl = viewService()->getCameraControl();
+	CameraControlPtr cameraControl = mServices->view()->getCameraControl();
 	if (cameraControl)
 		mStandard3DViewActions = cameraControl->createStandard3DViewActions();
 
@@ -312,7 +312,7 @@ void MainWindow::createActions()
 	mResetDesktopAction->setToolTip("Reset desktop for workflow step");
 	connect(mResetDesktopAction, &QAction::triggered, this, &MainWindow::resetDesktopSlot);
 
-	mInteractorStyleActionGroup = viewService()->getInteractorStyleActionGroup();
+	mInteractorStyleActionGroup = mServices->view()->getInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
 	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
@@ -326,10 +326,10 @@ void MainWindow::onApplicationStateChangedSlot()
 
 void MainWindow::updateWindowTitle()
 {
-	QString profileName = stateService()->getApplicationStateName();
-	QString versionName = stateService()->getVersionName();
+	QString profileName = mServices->state()->getApplicationStateName();
+	QString versionName = mServices->state()->getVersionName();
 
-	QString activePatientFolder = patientService()->getActivePatientFolder();
+	QString activePatientFolder = mServices->patient()->getActivePatientFolder();
 	if (activePatientFolder.endsWith('/'))
 		activePatientFolder.chop(1);
 	QString patientName;
@@ -351,12 +351,12 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::onWorkflowStateChangedSlot()
 {
-	Desktop desktop = stateService()->getActiveDesktop();
+	Desktop desktop = mServices->state()->getActiveDesktop();
 
 	mDockWidgets->restoreFrom(desktop);
-	viewService()->setActiveLayout(desktop.mLayoutUid, 0);
-	viewService()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
-	patientService()->autoSave();
+	mServices->view()->setActiveLayout(desktop.mLayoutUid, 0);
+	mServices->view()->setActiveLayout(desktop.mSecondaryLayoutUid, 1);
+	mServices->patient()->autoSave();
 
 	// moved to help plugin:
 //	// set initial focus to mainwindow in order to view it in the documentation
@@ -379,9 +379,9 @@ void MainWindow::saveDesktopSlot()
 {
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
-	desktop.mLayoutUid = viewService()->getActiveLayout(0);
-	desktop.mSecondaryLayoutUid = viewService()->getActiveLayout(1);
-	stateService()->saveDesktop(desktop);
+	desktop.mLayoutUid = mServices->view()->getActiveLayout(0);
+	desktop.mSecondaryLayoutUid = mServices->view()->getActiveLayout(1);
+	mServices->state()->saveDesktop(desktop);
 
 	// save to settings file in addition
 	settings()->setValue("mainWindow/geometry", saveGeometry());
@@ -391,7 +391,7 @@ void MainWindow::saveDesktopSlot()
 
 void MainWindow::resetDesktopSlot()
 {
-	stateService()->resetDesktop();
+	mServices->state()->resetDesktop();
 	this->onWorkflowStateChangedSlot();
 }
 
@@ -428,7 +428,7 @@ void MainWindow::showControlPanelActionSlot()
 {
 	if (!mControlPanel)
 	{
-		TrackPadWidget* trackPadWidget = new TrackPadWidget(this);
+		TrackPadWidget* trackPadWidget = new TrackPadWidget(mServices->view(), this);
 		mControlPanel = new SecondaryMainWindow(this, trackPadWidget);
 	}
 	mControlPanel->show();
@@ -488,7 +488,7 @@ void MainWindow::createMenus()
 
 	//workflow
 	this->menuBar()->addMenu(mWorkflowMenu);
-	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	QList<QAction*> actions = mServices->state()->getWorkflowActions()->actions();
 	for (int i=0; i<actions.size(); ++i)
 	{
 		mWorkflowMenu->addAction(actions[i]);
@@ -527,7 +527,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
 	mWorkflowToolBar = this->registerToolBar("Workflow");
-	QList<QAction*> actions = stateService()->getWorkflowActions()->actions();
+	QList<QAction*> actions = mServices->state()->getWorkflowActions()->actions();
 	for (int i=0; i<actions.size(); ++i)
 		mWorkflowToolBar->addAction(actions[i]);
 
@@ -561,7 +561,7 @@ void MainWindow::createToolBars()
 	camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
 
 	QToolBar* samplerWidgetToolBar = this->registerToolBar("Sampler");
-	samplerWidgetToolBar->addWidget(new SamplerWidget(this));
+	samplerWidgetToolBar->addWidget(new SamplerWidget(mServices->tracking(), mServices->patient(), mServices->spaceProvider(), this));
 
 	QToolBar* toolOffsetToolBar = this->registerToolBar("Tool Offset");
 	DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(mServices->tracking()));
@@ -610,7 +610,7 @@ void MainWindow::aboutSlot()
 
 void MainWindow::preferencesSlot()
 {
-	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), this);
+	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), mServices->state(), mServices->tracking(), this);
 	prefDialog.exec();
 }
 

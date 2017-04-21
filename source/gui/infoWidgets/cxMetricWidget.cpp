@@ -55,8 +55,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxMetricManager.h"
 #include "cxMetricUtilities.h"
-
 #include "cxPatientModelService.h"
+#include "cxVisServices.h"
 
 
 namespace cx
@@ -67,12 +67,11 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-MetricWidget::MetricWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent) :
+MetricWidget::MetricWidget(VisServicesPtr services, QWidget* parent) :
   BaseWidget(parent, "metric_widget", "Metrics/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
-  mPatientModelService(patientModelService),
-  mViewService(viewService)
+  mServices(services)
 {
 	// the delayed timer lowers the update rate of this widget,
 	// as is is seen to strangle the render speed when many metrics are present.
@@ -85,7 +84,7 @@ MetricWidget::MetricWidget(ViewServicePtr viewService, PatientModelServicePtr pa
 
 	mModifiedCount = 0;
 	mPaintCount = 0;
-	mMetricManager.reset(new MetricManager());
+	mMetricManager.reset(new MetricManager(services->view(), services->patient(), services->tracking(), services->spaceProvider()));
 	connect(mMetricManager.get(), SIGNAL(activeMetricChanged()), this, SLOT(setModified()));
 	connect(mMetricManager.get(), SIGNAL(metricsChanged()), this, SLOT(setModified()));
 
@@ -160,7 +159,8 @@ void MetricWidget::createActions(QActionGroup* group)
 	mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
 	mLoadReferencePointsAction->setDisabled(true);
 	this->createAction(group, "", "", "", NULL)->setSeparator(true);
-	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export metrics to file",   SLOT(exportMetricsButtonClickedSlot()));
+	mExportFramesAction = this->createAction(group, ":/icons/save.png", "ExportFrames", "Export the metrics to a file",   SLOT(exportMetricsButtonClickedSlot()));
+	mImportFramesAction = this->createAction(group, ":/icons/open.png", "ImportFrames", "Import metrics from a file (can be a patient file)",   SLOT(importMetricsButtonClickedSlot()));
 }
 
 //template<class T>
@@ -181,7 +181,7 @@ void MetricWidget::cellChangedSlot(int row, int col)
   if (col==0) // data name changed
   {
     QTableWidgetItem* item = mTable->item(row,col);
-	DataPtr data = patientService()->getData(item->data(Qt::UserRole).toString());
+	DataPtr data = mServices->patient()->getData(item->data(Qt::UserRole).toString());
     if (data)
       data->setName(item->text());
   }
@@ -227,7 +227,7 @@ void MetricWidget::prePaintEvent()
 	//	timer.start();
 	mPaintCount++;
 
-	MetricUtilities utilities(mViewService, mPatientModelService);
+	MetricUtilities utilities(mServices);
 
 	std::vector<MetricBasePtr> newMetrics = utilities.createMetricWrappers();
 
@@ -394,7 +394,7 @@ bool MetricWidget::checkEqual(const std::vector<MetricBasePtr>& a, const std::ve
 void MetricWidget::enablebuttons()
 {
 	mRemoveAction->setEnabled(!mMetricManager->getActiveUid().isEmpty());
-  mLoadReferencePointsAction->setEnabled(trackingService()->getReferenceTool() ? true : false);
+  mLoadReferencePointsAction->setEnabled(mServices->tracking()->getReferenceTool() ? true : false);
 }
 
 void MetricWidget::loadReferencePointsSlot()
@@ -464,7 +464,7 @@ void MetricWidget::removeButtonClickedSlot()
 		nextUid = nextItem->data(Qt::UserRole).toString();
 	}
 
-	mPatientModelService->removeData(mMetricManager->getActiveUid());
+	mServices->patient()->removeData(mMetricManager->getActiveUid());
 
 	if (!nextUid.isEmpty())
 		mMetricManager->setActiveUid(nextUid);
@@ -472,15 +472,29 @@ void MetricWidget::removeButtonClickedSlot()
 
 void MetricWidget::exportMetricsButtonClickedSlot()
 {
-	QString suggestion = QString("%1/Logs/metrics_%2.txt")
-			.arg(patientService()->getActivePatientFolder())
+	QString suggestion = QString("%1/Logs/metrics_%2.xml")
+			.arg(mServices->patient()->getActivePatientFolder())
 			.arg(QDateTime::currentDateTime().toString(timestampSecondsFormat()));
 
 	QString filename = QFileDialog::getSaveFileName(this,
-													"Create/select file to export metrics to",
+													"Select the file to export the metrics to",
 													suggestion);
 	if(!filename.isEmpty())
-		mMetricManager->exportMetricsToFile(filename);
+		mMetricManager->exportMetricsToXMLFile(filename);
+}
+
+void MetricWidget::importMetricsButtonClickedSlot()
+{
+	QString suggestion = QString("%1/Logs/")
+			.arg(mServices->patient()->getActivePatientFolder());
+
+	QString fileName = QFileDialog::getOpenFileName(this,
+													"Select the file to import metrics from (can be a patient file)",
+													suggestion,
+													"XML file (*.xml)");
+
+	if(!fileName.isEmpty())
+		mMetricManager->importMetricsFromXMLFile(fileName);
 }
 
 

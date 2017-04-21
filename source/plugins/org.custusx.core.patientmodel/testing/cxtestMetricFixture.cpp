@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStringHelpers.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxRegistrationTransform.h"
+#include "cxLogicManager.h"
+
 
 namespace cxtest {
 
@@ -83,7 +85,6 @@ ToolMetricWithInput MetricFixture::getToolMetricWithInput()
 	retval.mName = "TestTool";
 	retval.mOffset = 5;
 
-//	retval.mMetric = cx::ToolMetric::create("testMetric%1");
 	retval.mMetric = this->createTestMetric<cx::ToolMetric>("testMetric%1");
 	retval.mMetric->setFrame(retval.m_qMt);
 	retval.mMetric->setSpace(retval.mSpace);
@@ -101,7 +102,6 @@ PointMetricWithInput MetricFixture::getPointMetricWithInput(cx::Vector3D point)
     retval.mPoint = point;
 	retval.mSpace = cx::CoordinateSystem::reference();
 
-//	retval.mMetric = cx::PointMetric::create("testMetric%1");
 	retval.mMetric = this->createTestMetric<cx::PointMetric>("testMetric%1");
 	retval.mMetric->setCoordinate(point);
     retval.mMetric->setSpace(retval.mSpace);
@@ -208,17 +208,6 @@ bool MetricFixture::inputEqualsMetric(PlaneMetricWithInput data)
 			&& (cx::similar(data.mNormal, data.mMetric->getRefNormal()));
 }
 
-QStringList MetricFixture::getSingleLineDataList(cx::DataMetricPtr metric)
-{
-	QString singleLine = metric->getAsSingleLineString();
-	CHECK(!singleLine.isEmpty());
-	INFO("line: " + singleLine);
-	QStringList list = cx::splitStringContaingQuotes(singleLine);
-	INFO("list: " + list.join("\n"));
-	CHECK(!list.empty());
-	return list;
-}
-
 QDomNode MetricFixture::createDummyXmlNode()
 {
 	QDomDocument document;
@@ -233,6 +222,11 @@ void MetricFixture::setPatientRegistration()
 	mServices->patient()->get_rMpr_History()->setRegistration(testRegistration);
 }
 
+void MetricFixture::insertData(cx::DataPtr data)
+{
+	mServices->patient()->insertData(data);
+}
+
 bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric)
 {
     if (list.size()<2)
@@ -242,6 +236,81 @@ bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr m
     if (list[1]!=metric->getName())
         return false;
     return true;
+}
+
+void MetricFixture::testExportAndImportMetrics()
+{
+	cx::DataLocations::setTestMode();
+	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
+
+	// create metrics and insert them into the patientmodel
+	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
+
+	// export metrics
+	QString metricsFilePath = cx::DataLocations::getTestDataPath() + "/testing/metrics_export_import/exported_and_imported_metrics_file.xml";
+	if(QFile::exists(metricsFilePath))
+		QFile::remove(metricsFilePath);
+
+	manager.exportMetricsToXMLFile(metricsFilePath);
+
+	// remove the metrics from the patientmodel
+	foreach (cx::DataMetricPtr metric, metrics)
+	{
+		cx::logicManager()->getPatientModelService()->removeData(metric->getUid());
+	}
+
+	// import the exported metrics into the patientmodel
+	manager.importMetricsFromXMLFile(metricsFilePath);
+
+	//get imported metrics from the patient and check that they are equal to the ones which was exported
+	this->checkImportedMetricsEqualToExported(metrics, manager);
+}
+
+std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()
+{
+	std::vector<cx::DataMetricPtr> metrics;
+	cx::Vector3D pos(0,0,0);
+	cx::Vector3D pos2(1,0,0);
+	cx::CoordinateSystem cs(cx::csPATIENTREF);
+
+	//Create one of each metric to test export and import on
+	cx::PointMetricPtr point = getPointMetricWithInput(pos).mMetric;
+	cx::PointMetricPtr point2 = getPointMetricWithInput(pos2).mMetric;
+	point->setSpace(cs);
+	metrics.push_back(point);
+	metrics.push_back(point2);
+	metrics.push_back(getToolMetricWithInput().mMetric);
+	metrics.push_back(getFrameMetricWithInput().mMetric);
+	metrics.push_back(getDistanceMetricWithInput(0, point, point2).mMetric);
+	metrics.push_back(getPlaneMetricWithInput(pos, pos, point, point2).mMetric);
+	//The following metrics are not tested here as they had no implementation in this test fixture at the time.
+	//They should ideally be tested elsewhere and this functionality should be tested ok already.
+	//angle
+	//sphere
+	//donut
+	//custom
+	//roi
+
+	//Must explicitly insert the metrics in the patient model, since the metricfixture might only have a dummy patientmodelservice.
+	//The logicManager must have been initialised first.
+	foreach (cx::DataMetricPtr metric, metrics)
+	{
+		cx::logicManager()->getPatientModelService()->insertData(metric);
+	}
+
+	return metrics;
+}
+
+void MetricFixture::checkImportedMetricsEqualToExported(std::vector<cx::DataMetricPtr>& origMetrics, cx::MetricManager& manager) const
+{
+	foreach (cx::DataMetricPtr metric, origMetrics)
+	{
+		cx::DataMetricPtr importedMetric = manager.getMetric(metric->getUid());
+
+		REQUIRE(importedMetric);
+		CHECK(metric != importedMetric); //don't compare the original metric to itself
+		CHECK(metric->isEqual(importedMetric));
+	}
 }
 
 } //namespace cxtest

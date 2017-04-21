@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "QVTKWidget.h"
 #include "cxLayoutData.h"
+#include "cxViewService.h"
 
 class QGridLayout;
 
@@ -62,7 +63,7 @@ class cxResourceVisualization_EXPORT ViewContainer : public QVTKWidget
 	typedef QVTKWidget inherited_widget;
 
 public:
-	ViewContainer(QWidget *parent = NULL, Qt::WindowFlags f = 0);
+	ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent = NULL, Qt::WindowFlags f = 0);
 	virtual ~ViewContainer();
 
 	ViewItem *addView(QString uid, LayoutRegion region, QString name = "");
@@ -102,8 +103,9 @@ private:
 	QPoint convertToItemSpace(const QPoint &pos, ViewItem* item) const;
 	ViewItem* findViewItem(const QPoint &pos);
 
-	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
+//	std::map<QString, vtkRenderWindowPtr> mCachedRenderWindows; // swap between off/onscreen rw's, but dont delete them.
 	bool mOffScreenRendering;
+	RenderWindowFactoryPtr mRenderWindowFactory;
 };
 typedef boost::shared_ptr<ViewContainer> ViewContainerPtr;
 

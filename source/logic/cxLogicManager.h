@@ -36,13 +36,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/shared_ptr.hpp>
 #include <QObject>
-#include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
 
 class ctkPluginContext;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
+typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
+typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
+typedef boost::shared_ptr<class VideoService> VideoServicePtr;
+typedef boost::shared_ptr<class StateService> StateServicePtr;
+typedef boost::shared_ptr<class ViewService> ViewServicePtr;
+typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
+typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+
 /**
 * \file
 * \addtogroup cx_logic

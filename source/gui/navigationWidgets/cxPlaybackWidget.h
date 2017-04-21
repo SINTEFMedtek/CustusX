@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3D.h"
 #include "cxRegistrationTransform.h"
 #include "cxPlaybackTime.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -60,7 +59,7 @@ class cxGui_EXPORT PlaybackWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	PlaybackWidget(QWidget* parent);
+	PlaybackWidget(TrackingServicePtr trackingService, VideoServicePtr videoService, PatientModelServicePtr patientModelService, QWidget* parent);
 	virtual ~PlaybackWidget();
 
 private slots:
@@ -97,6 +96,9 @@ private:
 	QAction* mOpenAction;
 	DoublePropertyPtr mSpeedAdapter;
 	TimelineWidget* mToolTimelineWidget;
+	TrackingServicePtr mTrackingService;
+	VideoServicePtr mVideoService;
+	PatientModelServicePtr mPatientModelService;
 };
 
 

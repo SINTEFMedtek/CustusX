@@ -47,7 +47,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
+ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt::WindowFlags f) :
+	mRenderWindowFactory(factory),
 	QVTKWidget(parent, f),
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
@@ -145,26 +146,36 @@ bool ViewContainer::getOffScreenRendering() const
 void ViewContainer::initializeRenderWindow()
 {
 	if (mRenderWindow)
-		return;	
+		return;
 
 	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
 
-	if (!mCachedRenderWindows.count(uid))
-	{
-		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
-		this->addBackgroundRenderer(rw);
-		rw->SetOffScreenRendering(mOffScreenRendering);
-		mCachedRenderWindows[uid] = rw;
-	}
+	bool renderWindowExists = mRenderWindowFactory->renderWindowExists(uid);
 
-	// replace the previous renderwindow with one from the cache.
-	// the old renderwindow is not hidden explicitly: is this a problem??
-	if (mRenderWindow != mCachedRenderWindows[uid])
-	{
-		mRenderWindow = mCachedRenderWindows[uid];
-		this->SetRenderWindow(mRenderWindow);
-		mRenderWindow->GetInteractor()->EnableRenderOff();
-	}
+	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
+	if(!renderWindowExists)
+		this->addBackgroundRenderer(mRenderWindow);
+	this->SetRenderWindow(mRenderWindow);
+	mRenderWindow->GetInteractor()->EnableRenderOff();
+
+
+
+//	if (!mCachedRenderWindows.count(uid))
+//	{
+////		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
+//		vtkRenderWindowPtr rw = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
+//		this->addBackgroundRenderer(rw);
+//		mCachedRenderWindows[uid] = rw;
+//	}
+
+//	// replace the previous renderwindow with one from the cache.
+//	// the old renderwindow is not hidden explicitly: is this a problem??
+////	if (mRenderWindow != mCachedRenderWindows[uid])
+////	{
+//		mRenderWindow = mCachedRenderWindows[uid];
+//		this->SetRenderWindow(mRenderWindow);
+//		mRenderWindow->GetInteractor()->EnableRenderOff();
+////	}
 }
 
 void ViewContainer::addBackgroundRenderer(vtkRenderWindowPtr rw)
@@ -294,6 +305,8 @@ void ViewContainer::renderAll()
 
 void ViewContainer::doRender()
 {
+	if (!mRenderWindow)
+		return;
 	this->getRenderWindow()->Render();
 }
 

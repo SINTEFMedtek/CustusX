@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataMetric.h"
 #include "cxView.h"
 #include "cxImage.h"
-#include "cxViewManager.h"
 #include "cxInteractiveClipper.h"
 #include "cxNavigation.h"
 #include "cxActiveData.h"
@@ -240,6 +239,11 @@ void ViewWrapper::addReps()
 	mDataNameText = DisplayTextRep::New();
 	mDataNameText->addText(QColor(Qt::green), "--", Vector3D(0.02, 0.02, 0.0));
 	this->getView()->addRep(mDataNameText);
+}
+
+void ViewWrapper::setSharedOpenGLContext(cx::SharedOpenGLContextPtr sharedOpenGLContext)
+{
+	mSharedOpenGLContext = sharedOpenGLContext;
 }
 
 } //namespace cx

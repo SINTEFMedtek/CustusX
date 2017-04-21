@@ -33,21 +33,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 #include "cxTestRenderSpeed.h"
 #include "cxtestJenkinsMeasurement.h"
+#include "cxDataLocations.h"
+#include "cxSettings.h"
 
 namespace cxtest
 {
 
-TEST_CASE("Speed: Render 10 empty viewWidgets", "[speed][gui][integration]")
+TEST_CASE("Speed: Render 10 empty viewWidgets, optimizedViews on", "[speed][gui][integration]")
 {
-    TestRenderSpeed helper;
+	cx::DataLocations::setTestMode();
+	cx::settings()->setValue("optimizedViews", true);
+	TestRenderSpeed helper;
     helper.testSeveralViews();
 
     REQUIRE(helper.getRenderFPS() > 10);
 
 	JenkinsMeasurement jenkins;
     jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
-//    helper.printResult();
 }
 
+TEST_CASE("Speed: Render 10 empty viewWidgets, optimizedViews off", "[speed][gui][integration]")
+{
+	cx::DataLocations::setTestMode();
+	cx::settings()->setValue("optimizedViews", false);
+	TestRenderSpeed helper;
+	helper.testSeveralViews();
+
+	REQUIRE(helper.getRenderFPS() > 1);
+
+	JenkinsMeasurement jenkins;
+	jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
+}
 
 } //namespace cxtest

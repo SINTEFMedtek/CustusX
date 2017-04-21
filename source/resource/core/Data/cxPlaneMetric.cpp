@@ -99,13 +99,5 @@ DoubleBoundingBox3D PlaneMetric::boundingBox() const
 	return DoubleBoundingBox3D(p0_r, p0_r);
 }
 
-QString PlaneMetric::getAsSingleLineString() const
-{
-	return QString("%1 %2 %3")
-			.arg(this->getSingleLineHeader())
-			.arg(qstring_cast(this->getRefCoord()))
-			.arg(qstring_cast(this->getRefNormal()));
-}
-
 
 }

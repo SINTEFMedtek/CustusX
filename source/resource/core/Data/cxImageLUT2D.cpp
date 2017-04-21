@@ -191,6 +191,7 @@ void ImageLUT2D::refreshOutputLUT()
 	}
 
 	lut->Modified();
+	lut->GetTable()->Modified();
 
 	// HACK WARNING!!!!!
 	// Setting vtkLookupTable::SetNumberOfTableValues > 256 causes

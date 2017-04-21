@@ -86,25 +86,25 @@ void VisualizationTab::init()
 									   "Set 3D view background color");
 
   SelectColorSettingButton* tool2DColor =
-		  new SelectColorSettingButton("Tool 2D Color",
-									   "View/tool2DColor",
-									   "Set color of tool in 2D");
+		  new SelectColorSettingButton("Tool Color 2D",
+									   "View2D/toolColor",
+									   "Set the color of the tool in 2D");
   SelectColorSettingButton* toolTipPointColor =
-		  new SelectColorSettingButton("Tool Tip",
+		  new SelectColorSettingButton("Tool Tip 2D/3D",
 									   "View/toolTipPointColor",
-									   "Set color of tool tip");
+									   "Set the color of the tool tip in 2D/3D");
   SelectColorSettingButton* toolOffsetPointColor =
-		  new SelectColorSettingButton("Offset Point",
+		  new SelectColorSettingButton("Offset Point 2D/3D",
 									   "View/toolOffsetPointColor",
-									   "Set color of tool offset point");
+									   "Set the color of the tool offset point in 2D/3D");
   SelectColorSettingButton* toolOffsetLineColor =
-		  new SelectColorSettingButton("Offset Line",
+		  new SelectColorSettingButton("Offset Line 2D/3D",
 									   "View/toolOffsetLineColor",
-									   "Set color of tool offset line");
+									   "Set the color of the tool offset line in 2D/3D");
   SelectColorSettingButton* toolCrossHairColor =
-		  new SelectColorSettingButton("Cross hair",
-									   "View/toolCrossHairColor",
-									   "Set color of tool cross hair");
+		  new SelectColorSettingButton("Crosshair 2D",
+									   "View2D/toolCrossHairColor",
+									   "Set the color of the tool 2D crosshair");
 
   bool showDataText = settings()->value("View/showDataText").value<bool>();
   mShowDataText = BoolProperty::initialize("Show Data Text", "",
@@ -115,9 +115,9 @@ void VisualizationTab::init()
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
 
-  bool toolCrosshair = settings()->value("View/toolCrosshair").value<bool>();
-  mToolCrosshair = BoolProperty::initialize("Tool crosshair", "",
-										 "Show a crosshair centered on tool for orthogonal (ACS) views.",
+  bool toolCrosshair = settings()->value("View2D/showToolCrosshair").value<bool>();
+  mToolCrosshair = BoolProperty::initialize("Tool 2D Crosshair", "",
+										 "Show a crosshair centered on the tool in the orthogonal (ACS) views.",
 										 toolCrosshair);
 
 
@@ -282,7 +282,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
-  settings()->setValue("View/toolCrosshair", mToolCrosshair->getValue());
+  settings()->setValue("View2D/showToolCrosshair", mToolCrosshair->getValue());
   settings()->setValue("View/showMetricNamesInCorner", mShowMetricNamesInCorner->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());
@@ -446,17 +446,18 @@ void VideoTab::saveParametersSlot()
 // ToolConfigTab
 //------------------------------------------------------------------------------
 
-ToolConfigTab::ToolConfigTab(QWidget* parent) :
-		PreferenceTab(parent),
-    mFilePreviewWidget(new FilePreviewWidget(this)),
-    mImagePreviewWidget(new ToolImagePreviewWidget(this))
+ToolConfigTab::ToolConfigTab(StateServicePtr stateService, TrackingServicePtr trackingService, QWidget* parent) :
+	PreferenceTab(parent),
+	mFilePreviewWidget(new FilePreviewWidget(this)),
+	mImagePreviewWidget(new ToolImagePreviewWidget(trackingService, this)),
+	mStateService(stateService)
 {
 	this->setObjectName("preferences_tool_config_widget");
-  mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
-  mToolFilterGroupBox  = new ToolFilterGroupBox(this);
+  mToolConfigureGroupBox = new ToolConfigureGroupBox(trackingService, stateService, this);
+  mToolFilterGroupBox  = new ToolFilterGroupBox(trackingService, this);
   mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
 
-  connect(stateService().get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
+  connect(stateService.get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
 
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -524,7 +525,7 @@ void ToolConfigTab::saveParametersSlot()
 
 void ToolConfigTab::applicationChangedSlot()
 {
-  mToolFilterGroupBox->setClinicalApplicationSlot(stateService()->getApplicationStateName());
+  mToolFilterGroupBox->setClinicalApplicationSlot(mStateService->getApplicationStateName());
 }
 
 void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
@@ -539,7 +540,7 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
 // PreferencesDialog
 //------------------------------------------------------------------------------
 
-PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, StateServicePtr stateService, TrackingServicePtr trackingService, QWidget *parent) :
   QDialog(parent)
 {
   mActionGroup = new QActionGroup(this);
@@ -556,9 +557,9 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
   this->addTab(new AutomationTab, tr("Automation"));
   this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
-  this->addTab(new ToolConfigTab, tr("Tool Configuration"));
+  this->addTab(new ToolConfigTab(stateService, trackingService), tr("Tool Configuration"));
   this->addTab(new OperatingTableTab(services), tr("Table"));
-  this->addTab(new DebugTab, tr("Debug"));
+  this->addTab(new DebugTab(patientModelService, trackingService), tr("Debug"));
 
   QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
 
@@ -628,12 +629,14 @@ void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
 //==============================================================================
 // UltrasoundTab
 //------------------------------------------------------------------------------
-DebugTab::DebugTab(QWidget *parent) :
-		PreferenceTab(parent),
-		mIGSTKDebugLoggingCheckBox(NULL),
-		mManualToolPhysicalPropertiesCheckBox(NULL),
-		mRenderSpeedLoggingCheckBox(NULL),
-		mMainLayout(NULL)
+DebugTab::DebugTab(PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, QWidget *parent) :
+	PreferenceTab(parent),
+	mIGSTKDebugLoggingCheckBox(NULL),
+	mManualToolPhysicalPropertiesCheckBox(NULL),
+	mRenderSpeedLoggingCheckBox(NULL),
+	mMainLayout(NULL),
+	mPatientModelService(patientModelService),
+	mTrackingService(trackingService)
 {
 	this->setObjectName("preferences_debug_widget");
 }
@@ -669,19 +672,19 @@ void DebugTab::init()
 
 void DebugTab::runDebugToolSlot()
 {
-	if (!patientService()->getDatas().size())
+	if (!mPatientModelService->getDatas().size())
 		return;
 
-	cx::ImagePtr image = patientService()->getDataOfType<Image>().begin()->second;
+	cx::ImagePtr image = mPatientModelService->getDataOfType<Image>().begin()->second;
 	cx::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-	patientService()->setCenter(bb_r.center());
+	mPatientModelService->setCenter(bb_r.center());
 
 	cx::DummyToolPtr dummyTool(new cx::DummyTool());
 	dummyTool->setType(Tool::TOOL_POINTER);
 	dummyTool->setToolPositionMovement(dummyTool->createToolPositionMovementTranslationOnly(bb_r));
 	report(QString("Running debug tool inside box %1").arg(qstring_cast(bb_r)));
-	trackingService()->runDummyTool(dummyTool);
+	mTrackingService->runDummyTool(dummyTool);
 }
 
 void DebugTab::saveParametersSlot()

@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxtestUtilities.h"
-//#include "cxPatientData.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxLogicManager.h"
@@ -54,9 +53,8 @@ namespace cxtest {
 
 void setSeedPoint(cx::Vector3D point)
 {
-	cx::ToolPtr tool = cx::trackingService()->getManualTool();
+	cx::ToolPtr tool = cx::logicManager()->getTrackingService()->getManualTool();
     tool->set_prMt(cx::createTransformTranslate(point));
-
 }
 
 TEST_CASE("LevelSetFilter: getSeedPointFromTool", "[unit][modules][Algorithm][LevelSetFilter]")
@@ -102,9 +100,9 @@ TEST_CASE("LevelSetFilter: execute", "[integration][modules][Algorithm][LevelSet
 
     //create a new patient
 	QString filename = cx::DataLocations::getTestDataPath()+ "/testing/TubeSegmentationFramework/Default.mhd";
-	cx::sessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/LevelSetFilter/");
+	cx::logicManager()->getSessionStorageService()->load(cx::DataLocations::getTestDataPath()+ "/temp/LevelSetFilter/");
 	QString info;
-	cx::DataPtr data = cx::patientService()->importData(filename, info);
+	cx::DataPtr data = cx::logicManager()->getPatientModelService()->importData(filename, info);
 	data->get_rMd_History()->setRegistration(cx::Transform3D::Identity());
 	REQUIRE(data);
 

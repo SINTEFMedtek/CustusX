@@ -24,6 +24,7 @@ if(BUILD_TESTING)
         cxtestResource
         cxResource
         cxResourceWidgets
+        cxResourceVisualization
         cxCatch
     )
     cx_add_tests_to_catch(cxtestResourceWidgets)
