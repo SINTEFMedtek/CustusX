@@ -244,8 +244,6 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
-        add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
-        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
