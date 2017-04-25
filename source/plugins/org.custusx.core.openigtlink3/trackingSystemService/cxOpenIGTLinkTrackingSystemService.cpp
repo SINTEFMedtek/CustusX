@@ -179,35 +179,40 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 	this->internalSetState(Tool::tsINITIALIZED);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
+void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp)
 {
-	CX_LOG_DEBUG() << "receiveTransform";
-	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
+	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
 	tool->toolTransformAndTimestampSlot(transform, timestamp);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Transform3D calibration)
+void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D calibration)
 {
-	CX_LOG_DEBUG() << "receiveCalibration";
-	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	CX_LOG_DEBUG() << "receiveCalibration for: " << devicename;
+	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
 	tool->setCalibration_sMt(calibration);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
+void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition)
 {
-	CX_LOG_DEBUG() << "receiveProbedefinition";
-	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	CX_LOG_DEBUG() << "receiveProbedefinition for: " << devicename << "equipmentType: " << equipmentType;
+	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
 	if(tool)
 	{
 		ProbePtr probe = tool->getProbe();
 		if(probe)
 		{
+			CX_LOG_DEBUG() << "receiveProbedefinition. Tool is probe: " << devicename;
 			ProbeDefinition old_def = probe->getProbeDefinition();
 			definition->setUid(old_def.getUid());
 			definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
 
 			probe->setProbeDefinition(*(definition.get()));
 			emit stateChanged();
+		}
+		else
+		{
+			CX_LOG_DEBUG() << "receiveProbedefinition. Tool is not probe: " << devicename;
 		}
 	}
 }
@@ -218,13 +223,15 @@ void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)
 	emit stateChanged();
 }
 
-OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
+OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType)
 {
+	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool: " << devicename;
 	OpenIGTLinkToolPtr retval;
 	std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.find(devicename);
 	if(it == mTools.end())
 	{
-		retval = OpenIGTLinkToolPtr(new OpenIGTLinkTool(devicename));
+		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool. Create new tool: " << devicename;
+		retval = OpenIGTLinkToolPtr(new OpenIGTLinkTool(devicename, equipmentType));
 		mTools[devicename] = retval;
 		//todo: will this work?
 		emit stateChanged();

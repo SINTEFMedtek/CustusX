@@ -88,13 +88,13 @@ private slots:
     void serverIsConnected();
     void serverIsDisconnected();
 
-    void receiveTransform(QString devicename, Transform3D transform, double timestamp);
-    void receiveCalibration(QString devicename, Transform3D calibration);
-    void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
+	void receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp);
+	void receiveCalibration(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D calibration);
+	void receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition);
 
 private:
     void internalSetState(Tool::State state);
-    OpenIGTLinkToolPtr getTool(QString devicename);
+	OpenIGTLinkToolPtr getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType);
 
     Tool::State mState;
     std::map<QString, OpenIGTLinkToolPtr> mTools;

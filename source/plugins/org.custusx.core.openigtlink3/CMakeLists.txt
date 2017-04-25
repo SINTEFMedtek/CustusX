@@ -12,6 +12,8 @@ set(PLUGIN_SRCS
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
 
     network/cxNetworkHandler.cpp
+    network/cxProbeDefinitionFromStringMessages.h
+    network/cxProbeDefinitionFromStringMessages.cpp
 
     streamerService/cxOpenIGTLinkStreamer.cpp
     streamerService/cxOpenIGTLinkStreamerService.h

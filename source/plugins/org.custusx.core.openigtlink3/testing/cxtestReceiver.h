@@ -46,7 +46,7 @@ public slots:
 
 private slots:
 	void checkImage(cx::ImagePtr image);
-	void checkTransform(QString devicename, cx::Transform3D transform, double timestamp);
+	void checkTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, cx::Transform3D transform, double timestamp);
 	void checkCommandRespons(QString devicename, QString xml);
 	void checkString(QString string);
 

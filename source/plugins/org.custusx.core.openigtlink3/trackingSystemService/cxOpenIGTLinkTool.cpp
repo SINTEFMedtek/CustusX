@@ -40,15 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
+OpenIGTLinkTool::OpenIGTLinkTool(QString uid, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) :
     ToolImpl(uid, uid),
     mPolyData(NULL),
     mTimestamp(0),
     m_sMt_calibration(Transform3D::Identity())
 {
+	CX_LOG_DEBUG() << "OpenIGTLinkTool equipmentType: " << equipmentType;
     connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-    mTypes = this->determineTypesBasedOnUid(Tool::mUid);
+	mTypes = this->determineType(equipmentType);
     if (this->isProbe())
     {
 		// See ProbeCalibsConfigs.xml
@@ -122,15 +123,14 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
     ToolImpl::setTooltipOffset(val);
 }
 
-std::set<Tool::Type> OpenIGTLinkTool::determineTypesBasedOnUid(const QString uid) const
+std::set<Tool::Type> OpenIGTLinkTool::determineType(const  igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const
 {
-    std::set<Type> retval;
-    retval.insert(TOOL_POINTER);
-	if(uid.contains("usprobe", Qt::CaseInsensitive) || uid.contains("probe", Qt::CaseInsensitive))
-    {
-        retval.insert(TOOL_US_PROBE);
-	}
-    return retval;
+	std::set<Type> retval;
+	retval.insert(TOOL_POINTER);
+	if (equipmentType == igtlio::BaseConverter::US_PROBE || equipmentType == igtlio::BaseConverter::TRACKED_US_PROBE)
+		retval.insert(TOOL_US_PROBE);
+
+	return retval;
 }
 
 bool OpenIGTLinkTool::isProbe() const

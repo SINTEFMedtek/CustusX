@@ -39,6 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QTimer>
 #include <boost/shared_ptr.hpp>
+
+#include "igtlioBaseConverter.h"
+
 #include "cxTransform3D.h"
 
 class QStringList;
@@ -72,7 +75,7 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTool: public ToolImpl
     Q_OBJECT
 
 public:
-    OpenIGTLinkTool(QString uid);
+	OpenIGTLinkTool(QString uid, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType);
     virtual ~OpenIGTLinkTool();
 
     virtual std::set<Type> getTypes() const;
@@ -100,7 +103,7 @@ private slots:
     void toolVisibleSlot(bool);
 
 private:
-    std::set<Type> determineTypesBasedOnUid(const QString uid) const;
+	std::set<Tool::Type> determineType(const igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const;
     bool isProbe() const;
     void createPolyData();
 

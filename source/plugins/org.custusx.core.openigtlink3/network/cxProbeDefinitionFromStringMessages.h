@@ -30,64 +30,87 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CX_NETWORKHANDLER_H_
-#define CX_NETWORKHANDLER_H_
+#ifndef CXPROBEDEFINITIONFROMSTRINGMESSAGES_H
+#define CXPROBEDEFINITIONFROMSTRINGMESSAGES_H
 
-#include "org_custusx_core_openigtlink3_Export.h"
 #include "igtlioLogic.h"
-#include "igtlioSession.h"
-
-#include "cxTransform3D.h"
+#include <boost/shared_ptr.hpp>
+#include "cxProbeDefinition.h"
 #include "cxImage.h"
-#include "cxMesh.h"
-#include "cxProbeDefinitionFromStringMessages.h"
-
-#include "ctkVTKObject.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
-
-class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
+struct SectorInfo
 {
-	Q_OBJECT
-	QVTK_OBJECT
+	int mProbeType; //0 = sector, 1 = Linear, 2 = unknown
+	double mStartDepth;
+	double mStopDepth;
+	double mStartLineX;
+	double mStartLineY;
+	double mStopLineX;
+	double mStopLineY;
+	double mStartLineAngle;
+	double mStopLineAngle;
+	ImagePtr mImage;
 
-public:
-	NetworkHandler(igtlio::LogicPointer logic);
-	~NetworkHandler();
+	SectorInfo()
+	{
+		reset();
+	}
+	void reset()
+	{
+		mProbeType = 3;
+		mStartDepth = 0;
+		mStopDepth = 0;
+		mStartLineX = 0;
+		mStartLineY = 0;
+		mStopLineX = 0;
+		mStopLineY = 0;
+		mStartLineAngle = 0;
+		mStopLineAngle = 0;
+		mImage = ImagePtr();
+	}
+	bool isValid()
+	{
+		bool retval = true;
+		retval = retval && (mProbeType < 2);
+		retval = retval && !similar(mStartDepth, 0);
+		retval = retval && !similar(mStopDepth, 0);
+		retval = retval && !similar(mStopDepth, 0);
+		retval = retval && !similar(mStartLineX, 0);
+		retval = retval && !similar(mStartLineY, 0);
+		retval = retval && !similar(mStopLineX, 0);
+		if(mProbeType == 0)//sector
+		{
+			retval = retval && !similar(mStartLineAngle, 0);
+			retval = retval && !similar(mStopLineAngle, 0);
+		}
+		retval = retval && mImage;
 
-	igtlio::SessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
-
-signals:
-	void connected();
-	void disconnected();
-
-	void transform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp);
-	void image(ImagePtr image);
-	void commandRespons(QString devicename, QString xml);
-	void string_message(QString message);
-	//void mesh(MeshPtr image);
-	void probedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition);
-	//void calibration(QString devicename, Transform3D calibration);
-
-private slots:
-	void onConnectionEvent(vtkObject* caller, void* connector, unsigned long event, void*);
-	void onDeviceAddedOrRemoved(vtkObject* caller, void* connector, unsigned long event, void*callData);
-	void onDeviceReceived(vtkObject * caller_device, void * unknown, unsigned long event, void *);
-	void periodicProcess();
-
-private:
-	void connectToConnectionEvents();
-	void connectToDeviceEvents();
-
-	igtlio::LogicPointer mLogic;
-	igtlio::SessionPointer mSession;
-	QTimer *mTimer;
-	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
+		return retval;
+	}
 };
 
-} // namespace cx
+typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
 
-#endif /* CX_NETWORKHANDLER_H_ */
+class ProbeDefinitionFromStringMessages
+{
+public:
+	ProbeDefinitionFromStringMessages();
+	void parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message);
+	void setImage(ImagePtr image);
+	bool haveValidValues();
+	ProbeDefinitionPtr createProbeDefintion(QString uid);
+
+protected:
+	ProbeDefinitionPtr mProbeDefinition;
+	SectorInfo mSectorInfo;
+	bool mTestMode;
+
+};
+
+}//cx
+
+#endif // CXPROBEDEFINITIONFROMSTRINGMESSAGES_H
