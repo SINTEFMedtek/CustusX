@@ -506,7 +506,7 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 	return data_uid;
 }
 
-void MetricManager::importMetricsFromMNITagFile(QString &filename)
+void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode)
 {
 	//--- HACK to be able to read *.tag files with missing newline before eof
 	forceNewlineBeforeEof(filename);
@@ -522,7 +522,11 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename)
 	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
 	int number_of_volumes = reader->GetNumberOfVolumes();
 	QString description(reader->GetComments());
-	std::vector<QString> data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+	std::vector<QString> data_uid;
+	data_uid.push_back("");
+	data_uid.push_back("");
+	if(!testmode)
+		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
 
 	//--- Create the point metrics
 	QString type = "pointMetric";
@@ -544,7 +548,7 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename)
 			{
 				vtkStdString label = labels->GetValue(j);
 				name = QString(*label);
-				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(j);
+				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
 
 				double *point = points->GetPoint(j);
 				DataPtr data = this->createData(type, uid, name);

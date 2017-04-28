@@ -68,7 +68,7 @@ public:
 	QString getActiveUid() const { return mActiveLandmark; }
 	void exportMetricsToXMLFile(QString& filename);
 	void importMetricsFromXMLFile(QString& filename);
-	void importMetricsFromMNITagFile(QString& filename);
+	void importMetricsFromMNITagFile(QString& filename, bool testmode=false); ///< Note: testmode is available to skip dialog popup for running automatic tests
 	PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
 
 signals:
