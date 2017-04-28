@@ -36,7 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include <QFile>
 #include <QTextStream>
-
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <vtkMNITagPointReader.h>
+#include <vtkStringArray.h>
+#include "vtkForwardDeclarations.h"
 #include "cxDataReaderWriter.h"
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
@@ -57,6 +63,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxOrderedQDomDocument.h"
 #include "cxXmlFileHandler.h"
+#include "cxTime.h"
+#include "cxErrorObserver.h"
+#include "cxHelperWidgets.h"
+#include "cxFileHelpers.h"
 
 
 namespace cx
@@ -452,12 +462,123 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 	}
 }
 
+QColor MetricManager::getRandomColor()
+{
+	QStringList colorNames = QColor::colorNames();
+	int random_int = rand() % colorNames.size();
+	QColor color(colorNames[random_int]);
+	if(color == QColor("black"))
+		color = getRandomColor();
+
+	return color;
+}
+
+std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description)
+{
+	std::vector<QString> data_uid;
+
+	QDialog selectVolumeDialog;
+	selectVolumeDialog.setWindowTitle("Select volume(s) related to points in MNI Tag Point file.");
+
+	QVBoxLayout *layout = new QVBoxLayout();
+	QLabel *description_label = new QLabel(description);
+	layout->addWidget(description_label);
+
+	std::map<int, StringPropertySelectImagePtr> selectedImageProperties;
+	for(int i=0; i < number_of_volumes; ++i)
+	{
+		StringPropertySelectImagePtr image_property = StringPropertySelectImage::New(mPatientModelService);
+		QWidget *widget = createDataWidget(mViewService, mPatientModelService, NULL, image_property);
+		layout->addWidget(widget);
+		selectedImageProperties[i] = image_property;
+	}
+
+	QPushButton *okButton = new QPushButton(tr("Ok"));
+	layout->addWidget(okButton);
+	connect(okButton, &QAbstractButton::clicked, &selectVolumeDialog, &QWidget::close);
+	selectVolumeDialog.setLayout(layout);
+	selectVolumeDialog.exec();
+	for(int i=0; i < number_of_volumes; ++i)
+	{
+		StringPropertySelectImagePtr image_property = selectedImageProperties[i];
+		data_uid.push_back(image_property->getValue());
+	}
+	return data_uid;
+}
+
+void MetricManager::importMetricsFromMNITagFile(QString &filename)
+{
+	//--- HACK to be able to read *.tag files with missing newline before eof
+	forceNewlineBeforeEof(filename);
+
+	//--- Reader for MNI Tag Point files
+	vtkMNITagPointReaderPtr reader = vtkMNITagPointReader::New();
+	reader->SetFileName(filename.toStdString().c_str());
+	reader->Update();
+	if (!ErrorObserver::checkedRead(reader, filename))
+		CX_LOG_ERROR() << "Error reading MNI Tag Point file.";
+
+
+	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
+	int number_of_volumes = reader->GetNumberOfVolumes();
+	QString description(reader->GetComments());
+	std::vector<QString> data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+
+	//--- Create the point metrics
+	QString type = "pointMetric";
+	QString uid = "";
+	QString name = "";
+	vtkStringArray *labels = reader->GetLabelText();
+
+	for(int i=0; i< number_of_volumes; ++i)
+	{
+		QColor color = getRandomColor();
+
+		vtkPoints *points = reader->GetPoints(i);
+		if(points != NULL)
+		{
+			unsigned int number_of_points = points->GetNumberOfPoints();
+			//CX_LOG_DEBUG() << "Number of points: " << number_of_points;
+
+			for(int j=0; j < number_of_points; ++j)
+			{
+				vtkStdString label = labels->GetValue(j);
+				name = QString(*label);
+				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(j);
+
+				double *point = points->GetPoint(j);
+				DataPtr data = this->createData(type, uid, name);
+				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
+
+				CoordinateSystem space(COORDINATE_SYSTEM::csDATA, data_uid[i]);
+				Vector3D vector_ras(point[0], point[1], point[2]);
+				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
+
+				//Convert from RAS (MINC) to LPS (CX)
+				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+				Vector3D vector_lps = sMr.inv() * vector_ras;
+
+				point_metric->setCoordinate(vector_lps);
+				point_metric->setSpace(space);
+				point_metric->setColor(color);
+			}
+		}
+
+	}
+}
+
 DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 {
 	QString uid = node.toElement().attribute("uid");
 	QString name = node.toElement().attribute("name");
 	QString type = node.toElement().attribute("type");
 
+	return this->createData(type, uid, name);
+
+}
+
+DataPtr MetricManager::createData(QString type, QString uid, QString name)
+{
 	DataPtr data = mPatientModelService->createData(type, uid, name);
 	if (!data)
 	{
@@ -471,6 +592,7 @@ DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 	mPatientModelService->insertData(data);
 
 	return data;
+
 }
 
 

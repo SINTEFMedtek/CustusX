@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 #include <vtkPNGReader.h>
 #include <vtkNIFTIImageReader.h>
+#include <vtkNIFTIImageHeader.h>
 
 #include <QtCore>
 #include <QDomDocument>
@@ -69,73 +70,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
+#include "cxErrorObserver.h"
 
 
 typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 
 namespace cx
 {
-
-//---------------------------------------------------------
-StaticMutexVtkLocker::StaticMutexVtkLocker()
-{
-/*	if (!mMutex)
-		mMutex.reset(new QMutex(QMutex::Recursive));
-
-	mMutex->lock();*/
-}
-StaticMutexVtkLocker::~StaticMutexVtkLocker()
-{
-//	mMutex->unlock();
-}
-boost::shared_ptr<QMutex> StaticMutexVtkLocker::mMutex;
-//---------------------------------------------------------
-
-/** Wrapper for vtkAlgorithm::Update(),
-  * prints error message upon error,
-  * also wraps the call inside a global mutex (see below for why).
-  *
-  * \ingroup sscData
-  * \date jan 1, 2010
-  * \date april 17, 2013
-  * \author christiana
-  */
-class ErrorObserver: public vtkCommand
-{
-public:
-	ErrorObserver()
-	{
-	}
-	static ErrorObserver* New()
-	{
-		return new ErrorObserver;
-	}
-	virtual void Execute(vtkObject* caller, unsigned long, void* text)
-	{
-		mMessage = QString(reinterpret_cast<char*> (text));
-	}
-	QString mMessage;
-
-	static bool checkedRead(vtkSmartPointer<vtkAlgorithm> reader, QString filename)
-	{
-		vtkSmartPointer<ErrorObserver> errorObserver = vtkSmartPointer<ErrorObserver>::New();
-		reader->AddObserver("ErrorEvent", errorObserver);
-
-		{
-			StaticMutexVtkLocker lock;
-			reader->Update();
-		}
-//		ErrorObserver::threadSafeUpdate(reader);
-
-		if (!errorObserver->mMessage.isEmpty())
-		{
-			reportError("Load of data [" + filename + "] failed with message:\n"
-				+ errorObserver->mMessage);
-			return false;
-		}
-		return true;
-	}
-};
 
 //-----
 vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)

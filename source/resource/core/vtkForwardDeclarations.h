@@ -113,6 +113,7 @@ typedef vtkSmartPointer<class vtkMaskPoints> vtkMaskPointsPtr;
 typedef vtkSmartPointer<class vtkMath> vtkMathPtr;
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<class vtkMatrixToLinearTransform> vtkMatrixToLinearTransformPtr;
+typedef vtkSmartPointer<class vtkMNITagPointReader> vtkMNITagPointReaderPtr;
 typedef vtkSmartPointer<class vtkNIFTIImageReader> vtkNIFTIImageReaderPtr;
 typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
 typedef vtkSmartPointer<class vtkMetaImageWriter> vtkMetaImageWriterPtr;

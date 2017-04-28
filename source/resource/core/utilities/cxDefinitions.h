@@ -117,8 +117,8 @@ namespace cx
 	 */
 	enum cxResource_EXPORT PATIENT_COORDINATE_SYSTEM
 	{
-		pcsLPS, ///< Left-Posterior-Superior, used internally by CustusX, also DICOM, ITK.
-		pcsRAS, ///< Right-Anterior-Superior, used by Slicer3D, ITK-Snap, nifti.
+		pcsLPS, ///< Left-Posterior-Superior, used internally by CustusX, also DICOM, ITK
+		pcsRAS, ///< Right-Anterior-Superior, used by Slicer3D, ITK-Snap, nifti, MINC
 		pcsCOUNT
 	};
 

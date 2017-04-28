@@ -57,27 +57,6 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * @{
  */
 
-/** Locks a static mutex in the constructor and unlocks it in the desctructor,
-  * similar to a QMutexLocker.
-  *
-  * Use this as a global access restriction for thread-unsafe VTK objects.
-  *
-  * Testing has shown that the following methods need to be mutexed:
-  *   - vtkMetaImageReader::Update()
-  *   - vtkMetaImageWrite::Write()
-  * There are probably some global stuff inside vtkmetaio.
-  *
-  * Note: Googling indicates that VTK in general is threadUNsafe.
-  */
-class cxResource_EXPORT StaticMutexVtkLocker
-{
-public:
-	StaticMutexVtkLocker();
-	~StaticMutexVtkLocker();
-private:
-	static boost::shared_ptr<QMutex> mMutex;
-};
-
 
 /**\brief Interface for Data file readers.
  *
@@ -142,7 +121,7 @@ public:
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 
 private:
-	vtkMatrix4x4Ptr sform_matrix;
+	vtkMatrix4x4Ptr sform_matrix; ///< the sform stores a general affine transformation which can map the image coordinates into a standard coordinate system, like Talairach or MNI
 };
 
 /**\brief Reader for portable network graphics .png files.

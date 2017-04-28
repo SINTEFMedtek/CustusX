@@ -63,6 +63,10 @@ cxResource_EXPORT QFileInfoList getDirs(QString path);
 cxResource_EXPORT QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool includeSubDirs = false);
 cxResource_EXPORT QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs = false);
 
+/** Open file, check if it ends with a newline, write newline if it doesn´t
+ */
+cxResource_EXPORT void forceNewlineBeforeEof(QString path);
+
 /**
  * @\}
  */
