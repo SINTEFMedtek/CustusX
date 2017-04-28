@@ -9,6 +9,7 @@
 #include <vtkAlgorithm.h>
 #include <QString>
 #include "cxLogger.h"
+#include <QMutex>
 
 namespace cx {
 
