@@ -43,7 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace
 {
 
-cx::ImagePtr readTestImage(QString uid, QString filename)
+cx::ImagePtr readNIfTITestImage(QString uid, QString filename)
+{
+	cx::ImagePtr image = cx::Image::create(uid,uid);
+	cx::NIfTIReader().readInto(image, filename);
+	return image;
+}
+
+cx::ImagePtr readMhdTestImage(QString uid, QString filename)
 {
 	//Copied from loadImageFromFile() in cxtestDicomConverter.cpp
 	cx::ImagePtr image = cx::Image::create(uid,uid);
@@ -51,18 +58,25 @@ cx::ImagePtr readTestImage(QString uid, QString filename)
 	return image;
 }
 
-cx::ImagePtr readTestImage()
+cx::ImagePtr readNIfTITestImage()
+{
+	QString uid = "testImage";
+	QString filename = cx::DataLocations::getTestDataPath()+"/testing/NIfTI/Case1-T1.nii";
+	return readNIfTITestImage(uid, filename);
+}
+
+cx::ImagePtr readMhdTestImage()
 {
 	QString uid = "testImage";
 	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
-	return readTestImage(uid, filename);
+	return readMhdTestImage(uid, filename);
 }
 
 cx::ImagePtr readKaisaTestImage()
 {
 	QString uid = "kaisaTestImage";
 	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
-	return readTestImage(uid, filename);
+	return readMhdTestImage(uid, filename);
 }
 
 class TransferFunctionPresetsHelper
@@ -121,17 +135,28 @@ public:
 
 namespace cxtest
 {
+TEST_CASE("Can load NIfTi files as images", "[unit][nifti][core][resource]")
+{
+	cx::ImagePtr image = readNIfTITestImage();
+	REQUIRE(((int)image->getBaseVtkImageData()->GetActualMemorySize()) > 0);
+}
+
+TEST_CASE("Can load Mhd files as images", "[unit][mhd][core][resource]")
+{
+	cx::ImagePtr image = readMhdTestImage();
+	REQUIRE(((int)image->getBaseVtkImageData()->GetActualMemorySize()) > 0);
+}
 
 TEST_CASE("Image copy: id copied", "[unit][resource][core]")
 {
-	cx::ImagePtr image = readTestImage();
+	cx::ImagePtr image = readMhdTestImage();
 	cx::ImagePtr imageCopy = image->copy();
 	REQUIRE(image->getUid() == imageCopy->getUid());
 }
 
 TEST_CASE("Image copy: vtkImage copied", "[unit][resource][core]")
 {
-	cx::ImagePtr image = readTestImage();
+	cx::ImagePtr image = readMhdTestImage();
 	cx::ImagePtr imageCopy = image->copy();
 	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
 	vtkImageDataPtr vtkImageCopy = imageCopy->getBaseVtkImageData();
@@ -147,7 +172,7 @@ TEST_CASE("Image copy: vtkImage copied", "[unit][resource][core]")
 
 TEST_CASE("Image copy: Voxels equal", "[unit][resource][core]")
 {
-	cx::ImagePtr image = readTestImage();
+	cx::ImagePtr image = readMhdTestImage();
 	cx::ImagePtr imageCopy = image->copy();
 	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
 	vtkImageDataPtr vtkImageCopy = imageCopy->getBaseVtkImageData();
