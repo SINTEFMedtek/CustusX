@@ -554,7 +554,7 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 				DataPtr data = this->createData(type, uid, name);
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
 
-				CoordinateSystem space(COORDINATE_SYSTEM::csDATA, data_uid[i]);
+				CoordinateSystem space(csDATA, data_uid[i]);
 				Vector3D vector_ras(point[0], point[1], point[2]);
 				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
 
