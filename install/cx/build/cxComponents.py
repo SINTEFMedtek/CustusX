@@ -233,7 +233,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224')
+        self._getBuilder().gitCheckout('a63253f5b0b01016e6780df9489cf6e170cd0fd3')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -244,6 +244,9 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        add('BUILD_TESTING:BOOL', 'OFF')
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
