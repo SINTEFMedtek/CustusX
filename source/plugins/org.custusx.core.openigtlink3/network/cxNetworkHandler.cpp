@@ -55,7 +55,8 @@ namespace cx
 {
 
 NetworkHandler::NetworkHandler(igtlio::LogicPointer logic) :
-	mTimer(new QTimer(this))
+	mTimer(new QTimer(this)),
+	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages))
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -80,24 +81,6 @@ igtlio::SessionPointer NetworkHandler::requestConnectToServer(std::string server
 	return mSession;
 }
 
-void NetworkHandler::hackEmitProbeDefintionForPlusTestSetup(QString deviceName)
-{
-	ProbeDefinitionPtr probeDefinition(new ProbeDefinition(ProbeDefinition::tLINEAR));
-	probeDefinition->setUid("Image_Reference");
-	Vector3D origin_p(100, 0, 0);
-	probeDefinition->setOrigin_p(origin_p);
-	Vector3D spacing(1, 1, 1);
-	probeDefinition->setSpacing(spacing);
-	DoubleBoundingBox3D clipRect_p(0, 199, 0, 149);
-	probeDefinition->setClipRect_p(clipRect_p);
-	probeDefinition->setSector(0, 149, 200);
-	QSize size(200, 150);
-	probeDefinition->setSize(size);
-	probeDefinition->setUseDigitalVideo(true);
-
-	emit probedefinition(deviceName, probeDefinition);
-}
-
 void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
 	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller_device));
@@ -105,7 +88,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
-	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName();
+	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
 	if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
 	{
@@ -113,13 +96,15 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		igtlio::ImageConverter::ContentData content = imageDevice->GetContent();
 
-		QString deviceName(header.deviceName.c_str());
+//		QString deviceName(header.deviceName.c_str());
+		QString deviceName(header.equipmentId.c_str());//Use equipmentId
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
 		// get timestamp from igtl second-format:;
 		double timestampMS = header.timestamp * 1000;
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(timestampMS));
 		//this->decode_rMd(msg, retval);
 
+		mProbeDefinitionFromStringMessages->setImage(cximage);
 		emit image(cximage);
 	}
 	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
@@ -127,14 +112,21 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlio::TransformDevicePointer transformDevice = igtlio::TransformDevice::SafeDownCast(receivedDevice);
 		igtlio::TransformConverter::ContentData content = transformDevice->GetContent();
 
-		QString deviceName(content.deviceName.c_str());
+//		QString deviceName(content.deviceName.c_str());
+		QString deviceName(header.equipmentId.c_str());//Use equipmentId
+		//QString streamIdTo(content.streamIdTo.c_str());
+		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
-		double timestamp = header.timestamp;
-		emit transform(deviceName, cxtransform, timestamp);
 
-		//HACK - START probe definition is not received
-		this->hackEmitProbeDefintionForPlusTestSetup(deviceName);
-		//HACK - END
+		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
+										<< " streamIdTo: " << content.streamIdTo
+										<< " streamIdFrom: " << content.streamIdFrom
+										<< " transform: " << cxtransform;
+
+		double timestamp = header.timestamp;
+//		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
+		//test: Set all messages as type TRACKED_US_PROBE for now
+		emit transform(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
 	}
 	else if(device_type == igtlio::CommandConverter::GetIGTLTypeName())
 	{
@@ -168,10 +160,20 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		igtlio::StringConverter::ContentData content = string->GetContent();
 
-		CX_LOG_DEBUG() << "STRING: "	<< " encoding: " << content.encoding
+		CX_LOG_DEBUG() << "STRING: "	<< " equipmentId: " << header.equipmentId
+										<< " encoding: " << content.encoding
 										<< " string: " << content.string_msg;
 
 		QString message(content.string_msg.c_str());
+		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
+		if (mProbeDefinitionFromStringMessages->haveValidValues())
+		{
+//			QString deviceName(header.deviceName.c_str());
+			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
+//			emit probedefinition(deviceName, header.equipmentType, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
+			//test: Set all messages as type TRACKED_US_PROBE for now
+			emit probedefinition(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
+		}
 		emit string_message(message);
 	}
 	else
