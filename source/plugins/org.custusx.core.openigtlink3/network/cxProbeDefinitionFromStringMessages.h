@@ -42,9 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+typedef boost::shared_ptr<struct SectorInfo> SectorInfoPtr;
+
+const int tooLarge = 100000;
+
 struct SectorInfo
 {
-	int mProbeType; //0 = sector, 1 = Linear, 2 = unknown
+	int mProbeType; //0 = unknown, 1 = sector, 2 = linear
 	double mStartDepth;
 	double mStopDepth;
 	double mStartLineX;
@@ -53,6 +57,16 @@ struct SectorInfo
 	double mStopLineY;
 	double mStartLineAngle;
 	double mStopLineAngle;
+	double mSpacingX;
+	double mSpacingY;
+	int mSectorLeftPixels;
+	int mSectorRightPixels;
+	int mSectorTopPixels;
+	int mSectorBottomPixels;
+	double mSectorLeftMm;
+	double mSectorRightMm;
+	double mSectorTopMm;
+	double mSectorBottomMm;
 	ImagePtr mImage;
 
 	SectorInfo()
@@ -61,33 +75,71 @@ struct SectorInfo
 	}
 	void reset()
 	{
-		mProbeType = 3;
-		mStartDepth = 0;
-		mStopDepth = 0;
-		mStartLineX = 0;
-		mStartLineY = 0;
-		mStopLineX = 0;
-		mStopLineY = 0;
-		mStartLineAngle = 0;
-		mStopLineAngle = 0;
+		mProbeType = tooLarge;
+		mStartDepth = tooLarge;
+		mStopDepth = tooLarge;
+		mStartLineX = tooLarge;
+		mStartLineY = tooLarge;
+		mStopLineX = tooLarge;
+		mStopLineY = tooLarge;
+		mStartLineAngle = tooLarge;
+		mStopLineAngle = tooLarge;
+		mSpacingX = tooLarge;
+		mSpacingY = tooLarge;
+		mSectorLeftPixels = tooLarge;
+		mSectorRightPixels = tooLarge;
+		mSectorTopPixels = tooLarge;
+		mSectorBottomPixels = tooLarge;
+		mSectorLeftMm = tooLarge;
+		mSectorRightMm = tooLarge;
+		mSectorTopMm = tooLarge;
+		mSectorBottomMm = tooLarge;
 		mImage = ImagePtr();
 	}
 	bool isValid()
 	{
 		bool retval = true;
-		retval = retval && (mProbeType < 2);
-		retval = retval && !similar(mStartDepth, 0);
-		retval = retval && !similar(mStopDepth, 0);
-		retval = retval && !similar(mStopDepth, 0);
-		retval = retval && !similar(mStartLineX, 0);
-		retval = retval && !similar(mStartLineY, 0);
-		retval = retval && !similar(mStopLineX, 0);
-		if(mProbeType == 0)//sector
-		{
-			retval = retval && !similar(mStartLineAngle, 0);
-			retval = retval && !similar(mStopLineAngle, 0);
-		}
 		retval = retval && mImage;
+//		return retval;//test
+		retval = retval && ((mProbeType == 1) || (mProbeType == 2));
+		retval = retval && (mStopDepth < tooLarge);
+		retval = retval && (mStartDepth < tooLarge);
+		retval = retval && !similar(mStopDepth - mStartDepth, 0);
+
+		retval = retval && (mStartLineX < tooLarge);
+		retval = retval && (mStopLineX < tooLarge);
+		retval = retval && (mStartLineY < tooLarge);
+		retval = retval && (mStopLineY < tooLarge);
+		retval = retval && !similar(fabs(mStartLineX - mStopLineX), 0);
+
+		retval = retval && (mStartLineAngle < tooLarge);
+		retval = retval && (mStopLineAngle < tooLarge);
+		retval = retval && !similar(fabs(mStopLineAngle - mStartLineAngle), 0);
+
+		retval = retval && (mSpacingX < tooLarge);
+		retval = retval && (mSpacingY < tooLarge);
+		retval = retval && !similar(mSpacingX, 0);
+		retval = retval && !similar(mSpacingY, 0);
+
+		retval = retval && (mSectorRightPixels < tooLarge);
+		retval = retval && (mSectorLeftPixels < tooLarge);
+		retval = retval && (mSectorTopPixels < tooLarge);
+		retval = retval && (mSectorBottomPixels < tooLarge);
+		retval = retval && (mSectorRightPixels - mSectorLeftPixels != 0);
+		retval = retval && (mSectorTopPixels - mSectorBottomPixels != 0);
+
+		retval = retval && (mSectorRightMm < tooLarge);
+		retval = retval && (mSectorLeftMm < tooLarge);
+		retval = retval && (mSectorTopMm < tooLarge);
+		retval = retval && (mSectorBottomMm < tooLarge);
+		retval = retval && !similar(mSectorRightMm - mSectorLeftMm, 0);
+		retval = retval && !similar(mSectorTopMm - mSectorBottomMm, 0);
+		/*if(mProbeType == 0)//sector
+		{
+			retval = retval && (mStopLineAngle < tooLarge);
+			retval = retval && (mStartLineAngle < tooLarge);
+			retval = retval && !similar(fabs(mStopLineAngle - mStartLineAngle), 0);
+		}*/
 
 		return retval;
 	}
@@ -95,6 +147,12 @@ struct SectorInfo
 
 typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
 
+/**
+ * Create a ProbeDefinition based on BK String messages from PLUS.
+ *
+ * \date May 03, 2017
+ * \author Ole Vegard Solberg, SINTEF
+ */
 class ProbeDefinitionFromStringMessages
 {
 public:
@@ -104,9 +162,11 @@ public:
 	bool haveValidValues();
 	ProbeDefinitionPtr createProbeDefintion(QString uid);
 
+	void parseValue(QString name, QString value);
+
 protected:
 	ProbeDefinitionPtr mProbeDefinition;
-	SectorInfo mSectorInfo;
+	SectorInfoPtr mSectorInfo;
 	bool mTestMode;
 
 };

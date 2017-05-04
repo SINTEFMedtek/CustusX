@@ -75,7 +75,7 @@ void checkIfConnected(igtlio::LogicPointer logic)
 		}
 	}
 
-	REQUIRE(connector->GetState() == igtlio::Connector::STATE_CONNECTED);
+	REQUIRE(connector->GetState() == static_cast<int>(igtlio::Connector::STATE_CONNECTED));
 }
 
 void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)

@@ -14,6 +14,7 @@ if(BUILD_TESTING)
         cxtestPlusReceiver.cpp
         cxtestIOReceiver.cpp
         cxtestOpenIGTLinkIO.cpp
+        cxtestProbeDefinitionFromStringMessages.cpp
     )
 
     qt5_wrap_cpp(MOC_SOURCE_FILES ${MOC_SOURCE_FILES})
