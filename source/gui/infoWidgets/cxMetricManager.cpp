@@ -67,7 +67,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxErrorObserver.h"
 #include "cxHelperWidgets.h"
 #include "cxFileHelpers.h"
-
+#include "cxSpaceProperty.h"
+#include "cxSpaceEditWidget.h"
 
 namespace cx
 {
@@ -417,6 +418,49 @@ void MetricManager::exportMetricsToXMLFile(QString& filename)
 	XmlFileHandler::writeXmlFile(doc, filename);
 }
 
+void MetricManager::resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data)
+{
+	QString uid = data->getUid();
+	PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
+	if(!point_metric)
+		return;
+
+	QString string_space = dataNode.toElement().attribute("space");
+	CoordinateSystem parentSpace = CoordinateSystem::fromString(string_space);
+	bool need_parent = parentSpace.isValid() && (parentSpace.mId == csDATA);
+	bool parent_found = mPatientModelService->getData(parentSpace.mRefObject) != DataPtr();
+	if(need_parent && !parent_found)
+	{
+		if(mapping_of_unknown_to_known_spaces.find(string_space) == mapping_of_unknown_to_known_spaces.end())
+		{
+			SpacePropertyPtr space_property;
+			space_property = SpaceProperty::initialize("selectSpace",
+													  "Space",
+													  "Select parent coordinate system of metric with uid: "+uid);
+			space_property->setSpaceProvider(mSpaceProvider);
+			QWidget* widget = new QWidget;
+			widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
+			QVBoxLayout *layout = new QVBoxLayout();
+			layout->addWidget(new QLabel("Select parent space for Point metric: "+uid+"."));
+			layout->addWidget(new SpaceEditWidget(widget, space_property));
+			QDialog dialog;
+			dialog.setWindowTitle("Space "+string_space+" does not exist.");
+			dialog.setLayout(layout);
+			QPushButton *okButton = new QPushButton(tr("Ok"));
+			layout->addWidget(okButton);
+			connect(okButton, &QAbstractButton::clicked, &dialog, &QWidget::close);
+			dialog.exec();
+			CX_LOG_DEBUG() << "New space is now: " << space_property->getValue().mId << " " << space_property->getValue().mRefObject;
+			CoordinateSystem new_parentspace = space_property->getValue();
+			mapping_of_unknown_to_known_spaces[string_space] = new_parentspace.toString();
+		}
+		parentSpace = CoordinateSystem::fromString(mapping_of_unknown_to_known_spaces[string_space]);
+		point_metric->setSpace(parentSpace);
+		point_metric->setCoordinate(Vector3D::fromString(dataNode.toElement().attribute("coord")));
+		dataNode.toElement().setAttribute("space", parentSpace.toString());
+	}
+}
+
 void MetricManager::importMetricsFromXMLFile(QString& filename)
 {
 	QDomDocument xml = XmlFileHandler::readXmlFile(filename);
@@ -427,6 +471,9 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 	QDomNode managersNode = patientNode.firstChildElement("managers");
 	QDomNode datamanagerNode = managersNode.firstChildElement("datamanager");
 	QDomNode dataNode = datamanagerNode.firstChildElement("data");
+
+
+	std::map<QString, QString> mapping_of_unknown_to_known_spaces;
 
 	for (; !dataNode.isNull(); dataNode = dataNode.nextSibling())
 	{
@@ -440,6 +487,7 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 
 		if (dataNode.nodeName() == "data" && isMetric)
 		{
+
 			QString uid = dataNode.toElement().attribute("uid");
 			if(mPatientModelService->getData(uid))
 			{
@@ -451,8 +499,11 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 			DataPtr data = this->loadDataFromXMLNode(dataNode.toElement());
 			if (data)
 				datanodes[data] = dataNode.toElement();
+
+			//If point metrics space is uknown to the system, user needs to select a new parent -> POPUP DIALOG
+			this->resolveUnknownParentSpacesForPointMetrics(dataNode, mapping_of_unknown_to_known_spaces, data);
 		}
-	}
+	}	
 
 	// parse xml data separately: we want to first load all data
 	// because there might be interdependencies (cx::DistanceMetric)

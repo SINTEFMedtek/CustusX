@@ -106,6 +106,7 @@ private:
 	SpaceProviderPtr mSpaceProvider;
 	QColor getRandomColor();
 	std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
+	void resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data);
 };
 
 
