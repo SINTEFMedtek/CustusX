@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <vector>
 #include "cxForwardDeclarations.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -74,19 +75,6 @@ public:
 		}
 		return boost::shared_ptr<REP>();
 	}
-//	template<class REP>
-//	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, ToolPtr tool)
-//	{
-//		for (unsigned i = 0; i < reps.size(); ++i)
-//		{
-//			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-//			if (rep && rep->hasTool(tool))
-//			{
-//				return rep;
-//			}
-//		}
-//		return boost::shared_ptr<REP>();
-//	}
 
 	template<class REP>
 	boost::shared_ptr<REP> findFirst(DataPtr data)
@@ -99,17 +87,6 @@ public:
 		}
 		return boost::shared_ptr<REP>();
 	}
-//	template<class REP>
-//	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps, DataPtr data)
-//	{
-//		for (unsigned i = 0; i < reps.size(); ++i)
-//		{
-//			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-//			if (rep && rep->hasData(data))
-//				return rep;
-//		}
-//		return boost::shared_ptr<REP>();
-//	}
 
 	template<class REP>
 	boost::shared_ptr<REP> findFirst()
@@ -122,17 +99,6 @@ public:
 		}
 		return boost::shared_ptr<REP>();
 	}
-//	template<class REP>
-//	static boost::shared_ptr<REP> findFirstRep(std::vector<RepPtr> reps)
-//	{
-//		for (unsigned i = 0; i < reps.size(); ++i)
-//		{
-//			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(reps[i]);
-//			if (rep)
-//				return rep;
-//		}
-//		return boost::shared_ptr<REP>();
-//	}
 
 	template<class REP>
 	static std::vector<boost::shared_ptr<REP> > findReps(std::vector<RepPtr> reps)
@@ -145,6 +111,20 @@ public:
 				retval.push_back(rep);
 		}
 		return retval;
+	}
+
+	template<class REP>
+	boost::shared_ptr<REP> findManualToolRep()
+	{
+		for (unsigned i = 0; i < mReps.size(); ++i)
+		{
+			boost::shared_ptr<REP> rep = boost::dynamic_pointer_cast<REP>(mReps[i]);
+			if (rep && rep->getTool()->hasType(Tool::TOOL_MANUAL))
+			{
+				return rep;
+			}
+		}
+		return boost::shared_ptr<REP>();
 	}
 
 private:
