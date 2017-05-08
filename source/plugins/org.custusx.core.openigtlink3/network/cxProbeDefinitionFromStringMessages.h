@@ -33,6 +33,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPROBEDEFINITIONFROMSTRINGMESSAGES_H
 #define CXPROBEDEFINITIONFROMSTRINGMESSAGES_H
 
+#include "org_custusx_core_openigtlink3_Export.h"
 #include "igtlioLogic.h"
 #include <boost/shared_ptr.hpp>
 #include "cxProbeDefinition.h"
@@ -153,7 +154,7 @@ typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefiniti
  * \date May 03, 2017
  * \author Ole Vegard Solberg, SINTEF
  */
-class ProbeDefinitionFromStringMessages
+class org_custusx_core_openigtlink3_EXPORT ProbeDefinitionFromStringMessages
 {
 public:
 	ProbeDefinitionFromStringMessages();
