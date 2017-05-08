@@ -99,8 +99,9 @@ target_include_directories(org_custusx_dicom
     ./core
     ./widgets
     ${CMAKE_CURRENT_BINARY_DIR}
-    ${CTK_DIR}/DCMTK/dcmdata/include/dcmtk/dcmdata
-    ${CTK_DIR}/DCMTK/dcmimgle/include/dcmtk/dcmimgle
+# These two lines might be needed when we update CTK. See cha: 50a0e60f708f3bf4b0913d073b25ef3d90c81bf1
+#    ${CTK_DIR}/DCMTK/dcmdata/include/dcmtk/dcmdata
+#    ${CTK_DIR}/DCMTK/dcmimgle/include/dcmtk/dcmimgle
 )
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
