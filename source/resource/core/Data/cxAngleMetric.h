@@ -69,17 +69,13 @@ class cxResource_EXPORT AngleMetric : public DataMetric
 Q_OBJECT
 public:
 	virtual ~AngleMetric();
-//    static AngleMetricPtr create(QDomNode node);
 	static AngleMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	double getAngle() const;
 	std::vector<Vector3D> getEndpoints() const;
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_angle.png");}
-
-
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
     virtual bool isValid() const;
-	virtual QString getAsSingleLineString() const;
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
 	virtual void parseXml(QDomNode& dataNode); ///< Use a XML node to load data. \param dataNode A XML data representation of this object.

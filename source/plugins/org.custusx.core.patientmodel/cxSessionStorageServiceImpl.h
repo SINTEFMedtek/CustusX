@@ -36,19 +36,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_core_patientmodel_Export.h"
 
 #include "cxSessionStorageService.h"
-#include <QDomDocument>
 class QDomDocument;
 class ctkPluginContext;
 
 namespace cx
 {
 
-///**given a root node, use the /-separated path to descend
-// * into the root children recursively. Create elements if
-// * necessary.
-// *
-// */
-//cxResource_EXPORT QDomElement getElementForced(QDomNode root, QString path);
 
 /**
  *
@@ -89,8 +82,6 @@ private:
 	QString getNoPatientFolder() const;
 	void createPatientFolders(QString dir);
 	static QString getVersionName();
-	QDomDocument readXmlFile(QString filename);
-	void writeXmlFile(QDomDocument doc, QString filename);
 	QString convertToValidFolderName(QString dir) const;
 	void clearCache(); ///< Clear the global cache used by the entire application (cx::DataLocations::getCachePath()).
 	QString getCommandLineStartupPatient();

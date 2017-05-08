@@ -195,8 +195,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        tag = 'VTK-7-0-0.cx_patch_2'
-        self._getBuilder().gitCheckout(tag)
+        self._getBuilder().gitCheckout('8b5d4214bb16ca28cea1471657871c04f874f346')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -218,8 +217,8 @@ class VTK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
-        add('Module_vtkTestingRendering:BOOL', 'ON')
-        add('VTK_RENDERING_BACKEND:STRING', "OpenGL")
+#        add('Module_vtkTestingRendering:BOOL', 'ON') Dont think this is needed anymore. It was on the CX-114 branch, but not on develop, when merging develop into the branch.
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -234,7 +233,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224')
+        self._getBuilder().gitCheckout('319097ed78b44af0ebf7a33cc498995a3c132976')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -247,6 +246,7 @@ class CTK(CppComponent):
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        add('BUILD_TESTING:BOOL', 'OFF')
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
@@ -602,7 +602,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('1726a9b5c0c489ee75498c5c86c5666dedc19f17')
+        self._getBuilder().gitCheckout('cd17744e2657c7ca15859ef2cef7560b4057ebfa')
     def configure(self):
         pass
     def build(self):

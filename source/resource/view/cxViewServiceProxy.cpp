@@ -170,7 +170,7 @@ CyclicActionLoggerPtr ViewServiceProxy::getRenderTimer()
 	return mViewService->getRenderTimer();
 }
 
-NavigationPtr ViewServiceProxy::getNavigation()
+NavigationPtr ViewServiceProxy::getNavigation(int group)
 {
 	return mViewService->getNavigation();
 }

@@ -60,12 +60,10 @@ class cxResource_EXPORT SphereMetric: public DataMetric
 Q_OBJECT
 public:
 	virtual ~SphereMetric();
-//	static SphereMetricPtr create(QDomNode node);
 	static SphereMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 	virtual bool isValid() const;
-	virtual QString getAsSingleLineString() const;
 
 	void setRadius(double val);
 	double getRadius() const;

@@ -37,7 +37,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QStringList>
 #include "cxForwardDeclarations.h"
 #include "cxVisServices.h"
+#include "cxViewServiceNull.h"
 class ctkPluginContext;
+
+/*
+
+namespace
+{
+
+//WARNING COPY PASTE
+typedef boost::shared_ptr<class ViewServiceMocWithRenderWindowFactory> ViewServiceMocWithRenderWindowFactoryPtr;
+
+class CXTESTRESOURCE_EXPORT ViewServiceMocWithRenderWindowFactory : public cx::ViewServiceNull
+{
+public:
+	ViewServiceMocWithRenderWindowFactory();
+	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
+	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
+	cx::RenderWindowFactoryPtr getRenderWindowFactory() const;
+private:
+	cx::RenderWindowFactoryPtr mRenderWindowFactory;
+};
+//WARNING COPY PASTE
+}
+*/
+
 
 namespace cxtest
 {

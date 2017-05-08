@@ -142,4 +142,17 @@ void MetricReferenceArgumentList::parseXml(QDomNode& dataNode, const std::map<QS
 	}
 }
 
+QString MetricReferenceArgumentList::getAsSingleLineString() const
+{
+	QString retval;
+	for (unsigned i = 0; i < mArgument.size(); ++i)
+	{
+		retval += mArgument[i]->getUid();
+		retval += " ";
+	}
+
+	retval.chop(1);
+	return retval;
+}
+
 } // namespace cx

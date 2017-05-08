@@ -45,7 +45,6 @@ class QBoxLayout;
 class QGridLayout;
 class QLineEdit;
 #include "cxLayoutData.h"
-#include "cxLegacySingletons.h"
 
 namespace cx
 {
@@ -80,7 +79,7 @@ public:
     QLabel* mLabel;
   };
 
-  LayoutEditorWidget(QWidget* parent);
+  LayoutEditorWidget(cx::ViewServicePtr viewService, QWidget* parent);
   void setLayoutData(const LayoutData& data);
   LayoutData getLayoutData() const;
 
@@ -102,6 +101,10 @@ private:
   std::set<LayoutData::iterator> getSelectedViews();
   void updateSelection(QPoint pos);
   void setSaneGroupIDs();
+  QString getViewName(LayoutViewData data) const;
+  virtual void mouseMoveEvent(QMouseEvent* event);
+  virtual void mousePressEvent(QMouseEvent* event);
+  void onOffScreenRenderingChanged();
 
   QBoxLayout* mTopLayout;
   QBoxLayout* mRCLayout;
@@ -116,6 +119,7 @@ private:
   std::map<PLANE_TYPE, QString> mPlaneNames; ///< names of planes for use in gui
   QPoint mClickPos;
   LayoutRegion mSelection;
+  ViewServicePtr mViewService;
 
   struct ViewNamesType
   {
@@ -126,11 +130,7 @@ private:
     QString mName;
   };
   std::vector<ViewNamesType> mViewNames;
-  QString getViewName(LayoutViewData data) const;
 
-  virtual void mouseMoveEvent(QMouseEvent* event);
-  virtual void mousePressEvent(QMouseEvent* event);
-  void onOffScreenRenderingChanged();
 };
 
 

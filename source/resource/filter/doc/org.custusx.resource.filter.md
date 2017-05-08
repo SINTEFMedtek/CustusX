@@ -18,11 +18,14 @@ The dilation is performed using a ball structuring element.
 Contour Filter {#org_custusx_resource_filter_contour}
 ===========================================================
 Find the surface of a binary volume using marching cubes.
+When you adjust the treshold, you will see a preview of the
+filter on the selected input volume.
 
 - Optional factor 2 reduction
 - Marching Cubes contouring
 - Optional Windowed Sinc smoothing
 - Decimation of triangles
+- Optional preserve mesh topology
 
 
 

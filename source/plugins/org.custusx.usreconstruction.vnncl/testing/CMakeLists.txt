@@ -5,8 +5,6 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_ORG_CUSTUSX_VNNCLRECONSTRUCTION_SOURCE_FILES
         cxtestVNNclReconstructionService.cpp
-        cxtestDummyVNNclReconstruction.h
-        cxtestDummyVNNclReconstruction.cpp
         cxtestVNNclFixture.h
         cxtestVNNclFixture.cpp
     )

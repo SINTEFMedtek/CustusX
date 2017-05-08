@@ -7,8 +7,7 @@ if(BUILD_TESTING)
 
     set(CX_TEST_SOURCE_FILES
         cxtestSonixProbeFileReader.cpp
-        cxtestGrabberDummy.h
-        cxtestGrabberDummy.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -21,7 +20,7 @@ if(BUILD_TESTING)
         ..
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtestGrabber PRIVATE cxGrabber cxCatch)
+    target_link_libraries(cxtestGrabber PRIVATE cxGrabber cxCatch cxtestUtilities)
     cx_add_tests_to_catch(cxtestGrabber)
 
 endif(BUILD_TESTING)

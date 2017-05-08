@@ -39,7 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 FileWatcherWidget::FileWatcherWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    BaseWidget(parent, objectName, windowTitle),
+	BaseWidget(parent, objectName, windowTitle),
     mFileSystemWatcher(new QFileSystemWatcher())
 {
   connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));

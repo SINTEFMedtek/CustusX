@@ -116,14 +116,6 @@ Vector3D DonutMetric::getDirection()
 	return diff.normal();
 }
 
-
-QString DonutMetric::getAsSingleLineString() const
-{
-	return QString("%1 %2")
-			.arg(this->getSingleLineHeader())
-			.arg(qstring_cast(""));
-}
-
 void DonutMetric::setRadius(double val)
 {
 	mRadius = val;

@@ -68,13 +68,13 @@ void MeshPropertyData::initialize()
 									   "Set backface culling on. This makes transparent meshes work, "
 									   "but only draws outside mesh walls "
 									   "(eg. navigating inside meshes will not work).",
-									   true);
+									   false);
 	this->addProperty(mBackfaceCulling);
 	//-------------------------------------------------------------------------
 	mFrontfaceCulling = BoolProperty::initialize("frontfaceCulling", "Frontface culling",
 									   "Set frontface culling on. Can be used to make transparent "
 									   "meshes work from inside the meshes.",
-									   true);
+									   false);
 	this->addProperty(mFrontfaceCulling);
 	//-------------------------------------------------------------------------
 	mRepresentation = StringProperty::initialize("representation", "Representation",

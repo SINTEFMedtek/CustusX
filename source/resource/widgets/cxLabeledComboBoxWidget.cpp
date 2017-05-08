@@ -45,7 +45,7 @@ namespace cx
 
 LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, StringPropertyBasePtr dataInterface,
     QGridLayout* gridLayout, int row) :
-    BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
+	BaseWidget(parent, "LabeledComboBoxWidget", "LabeledComboBoxWidget")
 {
 	CX_ASSERT(dataInterface->getAllowOnlyValuesInRange()==true);
 

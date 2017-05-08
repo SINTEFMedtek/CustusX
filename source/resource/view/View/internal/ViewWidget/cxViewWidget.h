@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTransform3D.h"
 #include "cxView.h"
 #include "cxViewRepCollection.h"
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -54,7 +55,7 @@ Q_OBJECT
 public:
 	ViewRepCollectionPtr getView();
 
-	ViewWidget(const QString& uid="", const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
+	ViewWidget(RenderWindowFactoryPtr factory, const QString& uid="", const QString& name = "", QWidget *parent = NULL, Qt::WindowFlags f = 0); ///< constructor
 	virtual ~ViewWidget();
 
 	virtual vtkRenderWindowPtr getRenderWindow() { return this->getView()->getRenderWindow(); } ///< Get the vtkRenderWindow used by this \a View.
@@ -95,6 +96,8 @@ private:
 	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
 	boost::shared_ptr<class ViewRepCollection> mView;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
+
+//	SharedOpenGLContextPtr mSharedOpenGLContext;
 };
 
 } // namespace cx

@@ -43,6 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QTimer>
 #include "cxLogger.h"
 #include "cxProfile.h"
+#include "cxOrderedQDomDocument.h"
+#include "cxXmlFileHandler.h"
+
 
 namespace cx
 {
@@ -127,36 +130,6 @@ QString SessionStorageServiceImpl::getXmlFileName() const
 	return "custusdoc.xml";
 }
 
-/** A QDomDocument that stores attributes in the same order each time.
- *
- * Set a fixed hash seed in order to fix the ordering of xml attributes
- * http://stackoverflow.com/questions/21535707/qtxml-incorrect-order-of-attributes
- * needed primarily because we store the session in git and would like to diff.
- */
-class OrderedQDomDocument
-{
-public:
-	OrderedQDomDocument()
-	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-		// set fixed hash seed
-		qSetGlobalQHashSeed(42);
-#endif
-		mDoc = QDomDocument();
-	}
-	~OrderedQDomDocument()
-	{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-		// reset hash seed with new random value.
-		qSetGlobalQHashSeed(-1);
-#endif
-	}
-
-	QDomDocument& doc() {return mDoc; }
-private:
-	QDomDocument mDoc;
-};
-
 void SessionStorageServiceImpl::save()
 {
 	if (!this->isValid())
@@ -170,23 +143,8 @@ void SessionStorageServiceImpl::save()
 	emit isSaving(element); // give all listeners a chance to add to the document
 
 	QString filename = QDir(mActivePatientFolder).absoluteFilePath(this->getXmlFileName());
-	this->writeXmlFile(doc.doc(), filename);
+	XmlFileHandler::writeXmlFile(doc.doc(), filename);
 	report("Saved patient " + mActivePatientFolder);
-}
-
-void SessionStorageServiceImpl::writeXmlFile(QDomDocument doc, QString filename)
-{
-	QFile file(filename);
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-	{
-		QTextStream stream(&file);
-		stream << doc.toString(4);
-		file.close();
-	}
-	else
-	{
-		reportError("Could not open " + file.fileName() + " Error: " + file.errorString());
-	}
 }
 
 void SessionStorageServiceImpl::clear()
@@ -247,8 +205,7 @@ void SessionStorageServiceImpl::loadPatientSilent(QString choosenDir)
 		return; // On cancel
 
 	QString filename = QDir(choosenDir).absoluteFilePath(this->getXmlFileName());
-	QDomDocument doc = this->readXmlFile(filename);
-
+	QDomDocument doc = XmlFileHandler::readXmlFile(filename);
 	mActivePatientFolder = choosenDir; // must set path before emitting isLoading()
 
 	if (!doc.isNull())
@@ -260,28 +217,6 @@ void SessionStorageServiceImpl::loadPatientSilent(QString choosenDir)
 	}
 
 	emit sessionChanged();
-}
-
-QDomDocument SessionStorageServiceImpl::readXmlFile(QString filename)
-{
-	QDomDocument retval;
-	QFile file(filename);
-	if (!file.open(QIODevice::ReadOnly))
-	{
-		reportError("Could not open XML file :" + file.fileName() + ".");
-		return QDomDocument();
-	}
-
-	QString emsg;
-	int eline, ecolumn;
-	// Read the file
-	if (!retval.setContent(&file, false, &emsg, &eline, &ecolumn))
-	{
-		reportError("Could not parse XML file :" + file.fileName() + " because: " + emsg + "");
-		return QDomDocument();
-	}
-
-	return retval;
 }
 
 /** Writes settings info describing the patient name and current time.

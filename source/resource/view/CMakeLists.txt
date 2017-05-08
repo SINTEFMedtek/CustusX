@@ -2,6 +2,8 @@
 ##               Resource Visualization Library
 ###########################################################
 
+find_package(GLEW REQUIRED)
+
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
     View/cxViewCollectionWidget
@@ -70,7 +72,8 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveClipper
     cxInteractiveCropper
     cxCameraControl
-	cxCameraStyleInteractor
+    cxCameraStyleInteractor
+    cxRenderWindowFactory
 )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -103,7 +106,7 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxDepthPeeling
     Primitives/cxGraphicalTorus3D
     Primitives/cxVtkHelperClasses
-    Primitives/cxTextureSlicePainter
+#    Primitives/cxTextureSlicePainter
     Primitives/cxUltrasoundSectorSource
     Rep3D/cxAxesRep
     Rep/cxDisplayTextRep
@@ -114,7 +117,11 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxGraphicalDisk
     Primitives/cxGraphicalObjectWithDirection
 	Primitives/cxSliceAutoViewportCalculator
+	Primitives/cxShaderCallback
+	Primitives/cxOpenGLShaders
 	cxRepContainer
+	cxSharedOpenGLContext
+	cxSharedContextCreatedCallback
 )
 
 configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)
@@ -152,15 +159,18 @@ target_include_directories(cxResourceVisualization
     ./RepVideo
     ./Primitives
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${CX_RESOURCE_INCLUDE_DIRECTORIES}
 
     ./View/internal
     ./View/internal/ViewContainer
     ./View/internal/ViewMixed
     ./View/internal/ViewWidget
+    ${GLEW_INCLUDE_DIRS}
 )
 target_link_libraries(cxResourceVisualization
     PRIVATE
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
+#    ${GLEW_LIBRARY}
 )
 
 add_subdirectory(testing)

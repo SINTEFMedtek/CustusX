@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "X11/Xlib.h"
 //#include "/usr/include/X11/Xlib.h"
 #else
-#define GL_GLEXT_PROTOTYPES
+//#define GL_GLEXT_PROTOTYPES
 #include <GL/glu.h>
 #include <GL/glext.h>
 #endif

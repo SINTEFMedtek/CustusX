@@ -37,14 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxSpaceProvider.h"
 #include "cxPatientModelService.h"
-
-//TODO: remove
-#include "cxLegacySingletons.h"
+#include "cxVisServices.h"
 
 namespace cx {
 
-ToolMetricWrapper::ToolMetricWrapper(ViewServicePtr viewService, PatientModelServicePtr patientModelService, cx::ToolMetricPtr data) :
-	MetricBase(viewService, patientModelService),
+ToolMetricWrapper::ToolMetricWrapper(VisServicesPtr services, cx::ToolMetricPtr data) :
+	MetricBase(services),
 	mData(data)
 {
 	mInternalUpdate = false;
@@ -75,8 +73,8 @@ QWidget* ToolMetricWrapper::createWidget()
 	hLayout->setMargin(0);
 	topLayout->addLayout(hLayout);
 
-	hLayout2->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mToolNameSelector));
-	hLayout2->addWidget(createDataWidget(mViewService, mPatientModelService, widget, mToolOffsetSelector));
+	hLayout2->addWidget(createDataWidget(mServices->view(), mServices->patient(), widget, mToolNameSelector));
+	hLayout2->addWidget(createDataWidget(mServices->view(), mServices->patient(), widget, mToolOffsetSelector));
 
 	hLayout->addWidget(new SpaceEditWidget(widget, mSpaceSelector));
 
@@ -102,7 +100,7 @@ void ToolMetricWrapper::initializeProperties()
 											  "Space",
 											  "Select coordinate system to store position in.");
 
-	mSpaceSelector->setSpaceProvider(spaceProvider());
+	mSpaceSelector->setSpaceProvider(mServices->spaceProvider());
 	connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
 	mToolNameSelector = StringProperty::initialize("selectToolName",
@@ -145,10 +143,10 @@ QString ToolMetricWrapper::getArguments() const
 void ToolMetricWrapper::resampleMetric()
 {
 //	CoordinateSystem ref = CoordinateSystemHelpers::getR();
-	Transform3D qMt = spaceProvider()->getActiveToolTipTransform(mData->getSpace(), true);
+	Transform3D qMt = mServices->spaceProvider()->getActiveToolTipTransform(mData->getSpace(), true);
 	mData->setFrame(qMt);
-	mData->setToolName(trackingService()->getActiveTool()->getName());
-	mData->setToolOffset(trackingService()->getActiveTool()->getTooltipOffset());
+	mData->setToolName(mServices->tracking()->getActiveTool()->getName());
+	mData->setToolOffset(mServices->tracking()->getActiveTool()->getTooltipOffset());
 }
 
 
