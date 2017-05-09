@@ -130,6 +130,11 @@ std::map<QString, DataPtr> PatientModelServiceProxy::getDatas(DataFilter filter)
 	return mPatientModelService->getDatas(filter);
 }
 
+std::map<QString, DataPtr> PatientModelServiceProxy::getChildren(QString parent_uid, QString of_type) const
+{
+	return mPatientModelService->getChildren(parent_uid, of_type);
+}
+
 DataPtr PatientModelServiceProxy::getData(const QString& uid) const
 {
 	return mPatientModelService->getData(uid);

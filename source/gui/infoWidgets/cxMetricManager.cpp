@@ -598,11 +598,11 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 			for(int j=0; j < number_of_points; ++j)
 			{
 				vtkStdString label = labels->GetValue(j);
-				name = QString(*label);
+				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
 				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
 
 				double *point = points->GetPoint(j);
-				DataPtr data = this->createData(type, uid, name);
+				DataPtr data = this->createData(type, uid, QString::number(j+1));
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
 
 				CoordinateSystem space(csDATA, data_uid[i]);
