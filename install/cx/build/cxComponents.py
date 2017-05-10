@@ -350,7 +350,7 @@ class OpenIGTLinkIO(CppComponent):
 	def update(self):
 		self._getBuilder().gitSetRemoteURL(self.repository())
 #		self._getBuilder().gitCheckout('71a6ea090e24371a8948d3bdb291f5f0c73e620d')
-		self._getBuilder().gitCheckoutBranch('bugfix/CX-239-identify-crash-in-cx-114-branch')#TODO: Switch to a sha before merging the branch back to develop
+		self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
 	def configure(self):
 		builder = self._getBuilder()
 		add = builder.addCMakeOption
