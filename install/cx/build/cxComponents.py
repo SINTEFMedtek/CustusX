@@ -532,7 +532,7 @@ class FAST(CppComponent):
 		return 'git@github.com:jbake/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('60247acddd2708bc6a0a4b6bfd051ba477e6af71')
+        self._getBuilder().gitCheckout('75627f9c63891584d9a8028568294f4c831a87df')
 #        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
