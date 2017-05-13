@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "FAST/Algorithms/CenterlineExtraction/CenterlineExtraction.hpp"
 #include "FAST/Importers/ImageFileImporter.hpp"
 #include "FAST/Exporters/VTKImageExporter.hpp"
-#include "FAST/Exporters/VTKLineSetExporter.hpp"
+#include "FAST/Exporters/VTKMeshExporter.hpp"
 #include "FAST/Data/Segmentation.hpp"
 #include "FAST/SceneGraph.hpp"
 
@@ -111,10 +111,10 @@ bool AirwaysFilter::execute()
 
     std::string filename = q_filename.toStdString();
 	try {
-        QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
-        fast::DeviceManager::getInstance().setKernelRootPath(kernelDir.toStdString());
+		fast::Config::getTestDataPath(); // needed for initialization
         QString cacheDir = cx::DataLocations::getCachePath();
-        fast::DeviceManager::getInstance().setWritableCachePath(cacheDir.toStdString());
+        fast::Config::setKernelBinaryPath(cacheDir.toStdString());
+		fast::Config::setKernelSourcePath(std::string(FAST_SOURCE_DIR));
 
         // Import image data from disk
 		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
@@ -147,7 +147,7 @@ bool AirwaysFilter::execute()
         centerline->setInputConnection(segmentation->getOutputPort());
 
         // Get centerline
-	    vtkSmartPointer<fast::VTKLineSetExporter> vtkCenterlineExporter = fast::VTKLineSetExporter::New();
+	    vtkSmartPointer<fast::VTKMeshExporter> vtkCenterlineExporter = fast::VTKMeshExporter::New();
 	    vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
 	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();
 	    vtkCenterlineExporter->Update();
