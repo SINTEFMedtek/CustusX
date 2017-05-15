@@ -93,13 +93,85 @@ QString AirwaysFilter::getHelp() const
 	        "</html>";
 }
 
+
+Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
+{
+	// Retrieve position of tooltip and use it as seed point
+	Vector3D point = spaceProvider->getActiveToolTipPoint(
+			spaceProvider->getD(data));
+
+	// Have to multiply by the inverse of the spacing to get the voxel position
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	double spacingX, spacingY, spacingZ;
+	image->getBaseVtkImageData()->GetSpacing(spacingX, spacingY, spacingZ);
+	point(0) = point(0) * (1.0 / spacingX);
+	point(1) = point(1) * (1.0 / spacingY);
+	point(2) = point(2) * (1.0 / spacingZ);
+
+	std::cout << "the selected seed point is: " << point(0) << " " << point(1)
+			<< " " << point(2) << "\n";
+
+	return point;
+}
+
+int * getImageSize(DataPtr inputImage)
+{
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(inputImage);
+	return image->getBaseVtkImageData()->GetDimensions();
+}
+
+bool AirwaysFilter::isSeedPointInsideImage(Vector3D seedPoint, DataPtr image)
+{
+	int * size = getImageSize(image);
+	std::cout << "size of image is: " << size[0] << " " << size[1] << " "
+			<< size[2] << "\n";
+	int x = (int) seedPoint(0);
+	int y = (int) seedPoint(1);
+	int z = (int) seedPoint(2);
+	bool result = x >= 0 && y >= 0 && z >= 0 && x < size[0] && y < size[1]
+			&& z < size[2];
+	return result;
+}
+
+bool AirwaysFilter::preProcess()
+{
+    DataPtr inputImage = mInputTypes[0].get()->getData();
+	if (!inputImage)
+	{
+		CX_LOG_ERROR() << "No input data selected";
+		return false;
+	}
+
+	if (inputImage->getType() != "image")
+	{
+		CX_LOG_ERROR() << "Input data has to be an image";
+		return false;
+	}
+
+	std::string filename = (patientService()->getActivePatientFolder()
+			+ "/" + inputImage->getFilename()).toStdString();
+
+    // only check seed point inside image if use seed point is checked
+	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	if(useManualSeedPoint)
+	{
+		seedPoint = getSeedPointFromTool(mServices->spaceProvider(), inputImage);
+		if(!isSeedPointInsideImage(seedPoint, inputImage)) {
+			CX_LOG_ERROR() << "Seed point is not inside image. Use cursor to set seed point inside trachea in the CT image.";
+			return false;
+		}
+	}
+	mInputImage = patientService()->getData<Image>(inputImage->getUid());
+
+	return true;
+}
+
 bool AirwaysFilter::execute()
 {
     CX_LOG_INFO() << "EXECUTING AIRWAYS FILTER";
-    ImagePtr input = this->getCopiedInputImage();
-	if (!input)
+	// Check if pre process went ok:
+    if(!mInputImage)
 		return false;
-	mInputImage = input;
 
     QString q_filename = "";
     QString activePatienFolder = patientService()->getActivePatientFolder();
@@ -126,7 +198,22 @@ bool AirwaysFilter::execute()
 
         // Do segmentation
         fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
+		bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+        if(useManualSeedPoint)
+		{
+			CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
+			segmentation->setSeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
+		}
 	    segmentation->setInputConnection(importer->getOutputPort());
+        try {
+			segmentation->update();
+		} catch(fast::Exception &e) {
+
+			CX_LOG_ERROR() << "The airways filter failed.";
+			if(!useManualSeedPoint)
+                CX_LOG_ERROR() << "Try to set the seed point manually.";
+			return false;
+		}
 
 	    // Convert fast segmentation data to VTK data which CX can use
         vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
@@ -205,7 +292,6 @@ bool AirwaysFilter::postProcess()
 	// Set output
 	mOutputTypes[1]->setValue(contour->getUid());
 
-	// TODO get centerline somehow
 	QString uid = mInputImage->getUid() + "_centerline%1";
 	QString name = mInputImage->getName() + " centerline%1";
 	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
@@ -220,6 +306,7 @@ bool AirwaysFilter::postProcess()
 
 void AirwaysFilter::createOptions()
 {
+	mOptionsAdapters.push_back(this->getManualSeedPointOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -247,6 +334,20 @@ void AirwaysFilter::createOutputTypes()
 	tempMeshStringAdapter->setValueName("Segmentation");
 	tempMeshStringAdapter->setHelp("Generated surface of the segmented volume.");
 	mOutputTypes.push_back(tempMeshStringAdapter);
+
+}
+
+
+BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
+{
+	BoolPropertyPtr retval =
+			BoolProperty::initialize("Use manual seed point",
+					"",
+					"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
+                    "inside trachea of the patient. "
+                    "Then tick this checkbox to use the manual seed point in the airways filter.",
+					false, root);
+	return retval;
 
 }
 
