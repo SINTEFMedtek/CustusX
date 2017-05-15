@@ -15,7 +15,6 @@ They are listed here:
 | OpenCV            | <http://opencv.org>
 | IGSTK             | <http://igstk.org>
 | OpenIGTLink       | <http://openigtlink.org>
-| OpenCLUtilities   | <http://github.com/smistad/OpenCLUtilities>
 | FAST              | <http://github.com/smistad/FAST>
 | Qxt               | <http://dev.libqxt.org/libqxt/wiki/Home> 
 | Boost             | <http://www.boost.org>
