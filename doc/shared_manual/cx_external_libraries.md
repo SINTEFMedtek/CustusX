@@ -15,9 +15,8 @@ They are listed here:
 | OpenCV            | <http://opencv.org>
 | IGSTK             | <http://igstk.org>
 | OpenIGTLink       | <http://openigtlink.org>
-| TSF               | <http://github.com/smistad/Tube-Segmentation-Framework>
 | OpenCLUtilities   | <http://github.com/smistad/OpenCLUtilities>
-| LSS               | <http://github.com/smistad/Level-Set-Segmentation>
+| FAST              | <http://github.com/smistad/FAST>
 | Qxt               | <http://dev.libqxt.org/libqxt/wiki/Home> 
 | Boost             | <http://www.boost.org>
 | Catch             | <http://github.com/philsquared/Catch>
