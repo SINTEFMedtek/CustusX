@@ -6,7 +6,8 @@ macro(cx_initialize_FAST)
     find_package(FAST REQUIRED)
     include_directories("${FAST_DIR}/../FAST/source/")
     link_directories("${FAST_DIR}/lib/")
-    add_definitions("-DFAST_SOURCE_DIR=\"${FAST_DIR}/../FAST/source/FAST/\"")
+    set(FAST_SOURCE_DIR ${FAST_DIR}/../FAST/source/FAST/)
+    add_definitions("-DFAST_SOURCE_DIR=\"${FAST_SOURCE_DIR}/\"")
     message("===========================")
     message("Initializing FAST in Airways plugin")
     message("-- ${FAST_DIR}/../FAST/source/")
@@ -55,16 +56,11 @@ set(PLUGIN_resources
 )
 
 # Make sure OpenCL kernel files are copied to the installer
-install(FILES
-		${FAST_SOURCE_DIR}/Algorithms/AirwaySegmentation/AirwaySegmentation.cl
-		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/AirwaySegmentation/)
-install(FILES
-		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter2D.cl
-		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter3D.cl
-		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/GaussianSmoothingFilter/)
-install(FILES
-		${FAST_SOURCE_DIR}/Algorithms/CenterlineExtraction/CenterlineExtraction.cl
-		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/CenterlineExtraction/)
+# Install OpenCL kernels
+install(DIRECTORY ${FAST_SOURCE_DIR}
+        DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/
+        FILES_MATCHING PATTERN "*.cl"
+)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
