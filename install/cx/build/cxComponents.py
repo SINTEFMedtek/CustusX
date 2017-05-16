@@ -531,7 +531,7 @@ class FAST(CppComponent):
 		return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('c2522765d3bb369142ad53dd20dfb6d54c8e95ac')
+        self._getBuilder().gitCheckout('ab6386042cd3d2417a8e0ce5d3871242ab4913ab')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
