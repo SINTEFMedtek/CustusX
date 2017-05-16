@@ -1,21 +1,19 @@
 project(org_custusx_filter_airways)
 
-add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED)
-
 include(cxInstallUtilities)
 
 macro(cx_initialize_FAST)
-    find_package( FAST REQUIRED)
-    include(${FAST_USE_FILE})
+    find_package(FAST REQUIRED)
+    include_directories("${FAST_DIR}/../FAST/source/")
+    link_directories("${FAST_DIR}/lib/")
+    add_definitions("-DFAST_SOURCE_DIR=\"${FAST_DIR}/../FAST/source/FAST/\"")
     message("===========================")
     message("Initializing FAST in Airways plugin")
-    message("-- ${FAST_LIBRARY_DIRS}")
+    message("-- ${FAST_DIR}/../FAST/source/")
     message("===========================")
-    cx_install_add_library_dirs(${FAST_LIBRARY_DIRS})
+    cx_install_add_library_dirs(${FAST_DIR}/lib/)
 endmacro()
 
-find_package(GLEW REQUIRED)
-find_package(OpenCL REQUIRED)
 cx_initialize_FAST()
 
 #### Enable C++11
@@ -75,11 +73,9 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
 
     PRIVATE
-    OpenCLUtilityLibrary
     FAST
     Qt5::OpenGL
     ${OPENCL_LIBRARIES}
-    ${GLEW_LIBRARY}
     cxResource
     cxResourceFilter
     cxResourceVisualization

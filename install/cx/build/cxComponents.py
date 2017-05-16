@@ -526,14 +526,12 @@ class FAST(CppComponent):
 #    def path(self):
 #        return self.controlData.getWorkingPath() + "/FAST"
     def sourcePath(self):
-        return self.controlData.getWorkingPath() + "/FAST/FAST/source"
+        return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-		#return 'git@github.com:smistad/FAST'
-		return 'git@github.com:jbake/FAST'
+		return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('75627f9c63891584d9a8028568294f4c831a87df')
-#        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
+        self._getBuilder().gitCheckout('c2522765d3bb369142ad53dd20dfb6d54c8e95ac')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -544,9 +542,14 @@ class FAST(CppComponent):
         add = builder.addCMakeOption
         append = builder.appendCMakeOption
         add('FAST_MODULE_OpenIGTLink:BOOL', False)
+        add('FAST_MODULE_Visualization:BOOL', False)
+        add('FAST_MODULE_Python:BOOL', False)
+        add('FAST_MODULE_NeuralNetwork:BOOL', False)
+        add('FAST_MODULE_VTK:BOOL', True)
+        add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
+        add('FAST_BUILD_TOOLS:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
-        add('FAST_VTK_INTEROP:BOOL', True)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
