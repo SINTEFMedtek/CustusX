@@ -69,9 +69,7 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
 
     PRIVATE
-    FAST
-    Qt5::OpenGL
-    ${OPENCL_LIBRARIES}
+    ${FAST_LIBRARIES}
     cxResource
     cxResourceFilter
     cxResourceVisualization
