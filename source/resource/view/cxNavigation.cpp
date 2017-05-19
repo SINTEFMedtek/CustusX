@@ -52,6 +52,7 @@ Navigation::Navigation(VisServicesPtr services, CameraControlPtr camera3D) :
 
 }
 
+//?
 void Navigation::centerToPosition(Vector3D p_r, QFlags<VIEW_TYPE> viewType)
 {
 	this->moveManualToolToPosition(p_r);
@@ -112,13 +113,15 @@ void Navigation::centerToDataInViewGroup(ViewGroupDataPtr group, DataViewPropert
 		this->centerToData(visibleData);
 }
 
+//? Vet ikke med dette
 /**Place the global center at the current position of the
  * tooltip of the active tool.
  */
 void Navigation::centerToTooltip()
 {
 	ToolPtr tool = mServices->tracking()->getActiveTool();
-	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
+	//Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, tool->getTooltipOffset()));
+	Vector3D p_pr = tool->get_prMt().coord(Vector3D(0, 0, 0));
 	Vector3D p_r = mServices->patient()->get_rMpr().coord(p_pr);
 
 	this->centerToPosition(p_r);
@@ -135,13 +138,15 @@ Vector3D Navigation::findDataCenter(const std::vector<DataPtr>& data)
 	return bb_sigma.center();
 }
 
+// Denne kontrollerer om tool eller offset havner der du picker.
 void Navigation::moveManualToolToPosition(Vector3D& p_r)
 {
 	// move the manual tool to the same position. (this is a side effect... do we want it?)
 	ToolPtr manual = mServices->tracking()->getManualTool();
 	Vector3D p_pr = mServices->patient()->get_rMpr().inv().coord(p_r);
 	Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
-	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
+	//Vector3D t_pr = prM0t.coord(Vector3D(0, 0, manual->getTooltipOffset()));
+	Vector3D t_pr = prM0t.coord(Vector3D(0, 0, 0));
 	Transform3D prM1t = createTransformTranslate(p_pr - t_pr) * prM0t;
 
 	if (!similar(prM1t, prM0t))
