@@ -94,6 +94,7 @@ public:
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) { return vtkPolyDataPtr(); }
 	virtual QString canLoadDataType() const =0;
 	virtual bool readInto(DataPtr data, QString path) = 0;
+	virtual void saveImage(ImagePtr image, const QString& filename){}
 
 };
 typedef boost::shared_ptr<DataReader> DataReaderPtr;
@@ -116,7 +117,6 @@ public:
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(ImagePtr image, QString filename);
 	virtual DataPtr load(const QString& uid, const QString& filename);
-//	vtkImageDataPtr load(const QString& filename) { return this->loadVtkImageData(filename); }
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 	void saveImage(ImagePtr image, const QString& filename);
 };
@@ -216,15 +216,20 @@ class cxResource_EXPORT DataReaderWriter
 public:
 	explicit DataReaderWriter();
 
+	bool canLoad(const QString& type, const QString& filename);
+	DataPtr load(const QString& uid, const QString& filename);
 	vtkImageDataPtr loadVtkImageData(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
 	QString findDataTypeFromFile(QString filename);
 	void readInto(DataPtr data, QString path);
+	void saveImage(ImagePtr image, const QString& filename);
 
 private:
 	DataReaderPtr findReader(const QString& path, const QString& type="unknown");
 	typedef std::set<DataReaderPtr> DataReadersType;
 	DataReadersType mDataReaders;
+
+
 };
 
 /**

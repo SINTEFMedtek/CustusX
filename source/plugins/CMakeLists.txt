@@ -14,6 +14,7 @@ set(CX_PLUGINS
   org.custusx.core.openigtlink:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
+  org.custusx.core.port:ON
   org.custusx.dicom:ON
   org.custusx.usreconstruction.vnncl:ON
   org.custusx.usreconstruction.pnn:ON

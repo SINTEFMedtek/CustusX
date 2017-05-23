@@ -32,6 +32,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxActiveImageProxy
     Data/cxTrackedStream
     Data/cxActiveData
+    Data/cxPortService
+    Data/cxPortServiceProxy
+    Data/cxPortServiceNull
 
     Video/cxVideoSource.h
     Video/cxVideoRecorder

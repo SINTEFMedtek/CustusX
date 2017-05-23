@@ -44,7 +44,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTool.h"
 #include "cxTypeConversions.h"
 #include "cxPipelineWidget.h"
-#include "cxDataReaderWriter.h"
 #include "cxSmoothingImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxBinaryThresholdImageFilter.h"

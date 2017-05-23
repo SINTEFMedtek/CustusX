@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDicomConverter.h"
 #include "cxReporter.h"
-#include "cxDataReaderWriter.h"
 #include "cxImage.h"
 #include "cxTypeConversions.h"
 #include "vtkImageMathematics.h"
@@ -51,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_dicom_Export.h"
 #include "cxDicomWidget.h"
 #include "cxLogicManager.h"
+#include "cxDataReaderWriter.h"
 
 
 
@@ -115,7 +115,7 @@ public:
 	cx::ImagePtr loadImageFromFile(QString filename, QString uid)
 	{
 		cx::ImagePtr image = cx::Image::create(uid,uid);
-		cx::MetaImageReader().readInto(image, filename);
+		cx::DataReaderWriter().readInto(image, filename);
 		return image;
 	}
 
@@ -257,7 +257,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 		{
 			std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
 			convertedImage->getBaseVtkImageData()->Print(std::cout);
-			cx::MetaImageReader().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
+			cx::DataReaderWriter().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
 		}
 	}
 

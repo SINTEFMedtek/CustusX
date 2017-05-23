@@ -29,62 +29,36 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXCORESERVICES_H
-#define CXCORESERVICES_H
 
-#include "cxResourceExport.h"
-#include <boost/shared_ptr.hpp>
-class ctkPluginContext;
+#ifndef CXPORTSERVICEPLUGINACTIVATOR_H
+#define CXPORTSERVICEPLUGINACTIVATOR_H
+#include <ctkPluginActivator.h>
+#include "boost/shared_ptr.hpp"
+#include "cxRegisteredService.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-typedef boost::shared_ptr<class PortService> PortServicePtr;
-
 /**
- * Convenience class combining all services in resource/core.
+ * Activator for the port plugin
  *
- * \ingroup cx_resource_core
- *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
+ * \ingroup org_custusx_core_port
  */
-class cxResource_EXPORT CoreServices
+class PortServicePluginActivator :  public QObject, public ctkPluginActivator
 {
+	Q_OBJECT
+	Q_INTERFACES(ctkPluginActivator)
+	Q_PLUGIN_METADATA(IID "org_custusx_core_port")
 public:
-	static CoreServicesPtr create(ctkPluginContext* context);
-	CoreServices(ctkPluginContext* context);
-	static CoreServicesPtr getNullObjects();
+	PortServicePluginActivator();
+	~PortServicePluginActivator();
 
-	PatientModelServicePtr patient() { return mPatientModelService; }
-	TrackingServicePtr tracking() { return mTrackingService; }
-	VideoServicePtr video() { return mVideoService; }
-	SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	SessionStorageServicePtr session() { return mSessionStorageService; }
-	StateServicePtr state() { return mStateService; }
-	PortServicePtr port() {return mPortService;}
+	void start(ctkPluginContext* context);
+	void stop(ctkPluginContext* context);
 
-protected:
-	PatientModelServicePtr mPatientModelService;
-	TrackingServicePtr mTrackingService;
-	VideoServicePtr mVideoService;
-	SpaceProviderPtr mSpaceProvider;
-	SessionStorageServicePtr mSessionStorageService;
-	StateServicePtr mStateService;
-	PortServicePtr mPortService;
-
-protected:
-	CoreServices();
+private:
+	RegisteredServicePtr mRegisteredPortService;
 };
 
-}
-
-
-#endif // CXCORESERVICES_H
+} // cx
+#endif // CXPORTSERVICEPLUGINACTIVATOR_H

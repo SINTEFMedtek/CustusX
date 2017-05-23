@@ -1,0 +1,121 @@
+#include "cxMetaImageReader.h"
+
+#include <QDir>
+#include "cxTypeConversions.h"
+#include <vtkMetaImageReader.h>
+#include <vtkMetaImageWriter.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkImageData.h>
+#include "cxErrorObserver.h"
+#include "cxCustomMetaImage.h"
+#include "cxImage.h"
+#include "cxRegistrationTransform.h"
+
+namespace cx {
+
+vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
+{
+	//load the image from file
+	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+	reader->SetFileName(cstring_cast(filename));
+	reader->ReleaseDataFlagOn();
+
+	if (!ErrorObserver::checkedRead(reader, filename))
+		return vtkImageDataPtr();
+
+	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+	zeroer->SetInputConnection(reader->GetOutputPort());
+	zeroer->SetOutputOrigin(0, 0, 0);
+	zeroer->Update();
+	return zeroer->GetOutput();
+}
+
+MetaImageReader::MetaImageReader(ctkPluginContext *context)
+{
+	this->setObjectName("MetaImageReader");
+}
+
+bool MetaImageReader::isNull()
+{
+	return false;
+}
+
+bool MetaImageReader::canLoad(const QString &type, const QString &filename)
+{
+	QString fileType = QFileInfo(filename).suffix();
+	return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
+}
+
+bool MetaImageReader::readInto(DataPtr data, QString filename)
+{
+	return this->readInto(boost::dynamic_pointer_cast<Image>(data), filename);
+}
+bool MetaImageReader::readInto(ImagePtr image, QString filename)
+{
+	if (!image)
+		return false;
+
+	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+	Transform3D rMd = customReader->readTransform();
+
+	vtkImageDataPtr raw = this->loadVtkImageData(filename);
+	if(!raw)
+		return false;
+
+	image->setVtkImageData(raw);
+//	ImagePtr image(new Image(uid, raw));
+
+	//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
+	//  image->get_rMd_History()->addRegistration(regTrans);
+	image->get_rMd_History()->setRegistration(rMd);
+	image->setModality(customReader->readModality());
+	image->setImageType(customReader->readImageType());
+
+	bool ok1 = true;
+	bool ok2 = true;
+	double level = customReader->readKey("WindowLevel").toDouble(&ok1);
+	double window = customReader->readKey("WindowWidth").toDouble(&ok2);
+
+	if (ok1 && ok2)
+	{
+		image->setInitialWindowLevel(window, level);
+		image->resetTransferFunctions();
+	}
+
+	return true;
+}
+
+//-----
+DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
+{
+	ImagePtr image(new Image(uid, vtkImageDataPtr()));
+	this->readInto(image, filename);
+	return image;
+}
+
+void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
+{
+	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+	writer->SetInputData(image->getBaseVtkImageData());
+	writer->SetFileDimensionality(3);
+	writer->SetFileName(cstring_cast(filename));
+	QDir().mkpath(QFileInfo(filename).path());
+
+//	std::cout << "SAVING MHD COMPRESSED " << filename << std::endl;
+//	writer->SetCompression(true);
+	writer->SetCompression(false);
+//	writer->Update(); // caused writing of (null).0 files - not necessary
+	writer->Write();
+
+	writer = 0;
+
+	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+	customReader->setTransform(image->get_rMd());
+	customReader->setModality(image->getModality());
+	customReader->setImageType(image->getImageType());
+	customReader->setKey("WindowLevel", qstring_cast(image->getInitialWindowLevel()));
+	customReader->setKey("WindowWidth", qstring_cast(image->getInitialWindowWidth()));
+	customReader->setKey("Creator", QString("CustusX_%1").arg(CustusX_VERSION_STRING));
+}
+
+}

@@ -29,62 +29,43 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXCORESERVICES_H
-#define CXCORESERVICES_H
 
-#include "cxResourceExport.h"
-#include <boost/shared_ptr.hpp>
-class ctkPluginContext;
+#include "cxPortServicePluginActivator.h"
+
+#include <QtPlugin>
+
+#include "cxPortImplService.h"
+#include "cxMetaImageReader.h"
+#include "cxPNGImageReader.h"
+#include "cxPolyDataMeshReader.h"
+#include "cxXMLPolyDataMeshReader.h"
+#include "cxStlMeshReader.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-typedef boost::shared_ptr<class PortService> PortServicePtr;
-
-/**
- * Convenience class combining all services in resource/core.
- *
- * \ingroup cx_resource_core
- *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
- */
-class cxResource_EXPORT CoreServices
+PortServicePluginActivator::PortServicePluginActivator()
 {
-public:
-	static CoreServicesPtr create(ctkPluginContext* context);
-	CoreServices(ctkPluginContext* context);
-	static CoreServicesPtr getNullObjects();
-
-	PatientModelServicePtr patient() { return mPatientModelService; }
-	TrackingServicePtr tracking() { return mTrackingService; }
-	VideoServicePtr video() { return mVideoService; }
-	SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	SessionStorageServicePtr session() { return mSessionStorageService; }
-	StateServicePtr state() { return mStateService; }
-	PortServicePtr port() {return mPortService;}
-
-protected:
-	PatientModelServicePtr mPatientModelService;
-	TrackingServicePtr mTrackingService;
-	VideoServicePtr mVideoService;
-	SpaceProviderPtr mSpaceProvider;
-	SessionStorageServicePtr mSessionStorageService;
-	StateServicePtr mStateService;
-	PortServicePtr mPortService;
-
-protected:
-	CoreServices();
-};
-
 }
 
+PortServicePluginActivator::~PortServicePluginActivator()
+{
+}
 
-#endif // CXCORESERVICES_H
+void PortServicePluginActivator::start(ctkPluginContext* context)
+{
+	std::cout << "PortServicePluginActivator::start" << std::endl;
+	mRegisteredPortService = RegisteredService::create<MetaImageReader>(context, PortService_iid);
+	mRegisteredPortService = RegisteredService::create<PNGImageReader>(context, PortService_iid);
+	mRegisteredPortService = RegisteredService::create<PolyDataMeshReader>(context, PortService_iid);
+	mRegisteredPortService = RegisteredService::create<XMLPolyDataMeshReader>(context, PortService_iid);
+	mRegisteredPortService = RegisteredService::create<StlMeshReader>(context, PortService_iid);
+}
+
+void PortServicePluginActivator::stop(ctkPluginContext* context)
+{
+	mRegisteredPortService.reset();
+	Q_UNUSED(context);
+}
+
+} // cx

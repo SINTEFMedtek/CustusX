@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxStateServiceProxy.h"
+#include "cxPortServiceProxy.h"
 
 namespace cx {
 
@@ -54,6 +55,8 @@ CoreServices::CoreServices(ctkPluginContext* context)
 	mSpaceProvider.reset(new SpaceProviderImpl(mTrackingService, mPatientModelService));
 	mSessionStorageService	= SessionStorageServiceProxy::create(context);
 	mStateService			= StateServiceProxy::create(context);
+	mPortService			= PortServiceProxy::create(context);
+
 }
 
 CoreServicesPtr CoreServices::getNullObjects()
@@ -69,5 +72,6 @@ CoreServices::CoreServices()
 	mSpaceProvider.reset(new SpaceProviderImpl(mTrackingService, mPatientModelService));
 	mSessionStorageService	= SessionStorageService::getNullObject();
 	mStateService			= StateService::getNullObject();
+	mPortService			= PortService::getNullObject();
 }
 } // cx

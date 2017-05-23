@@ -36,7 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 #include "catch.hpp"
-#include "cxDataReaderWriter.h"
 #include "vtkImageData.h"
 #include <QDomElement>
 #include "cxImage.h"

@@ -381,6 +381,7 @@ DataPtr StlMeshReader::load(const QString& uid, const QString& filename)
 	this->readInto(mesh, filename);
 	return mesh;
 }
+//-------
 
 DataReaderWriter::DataReaderWriter()
 {
@@ -389,6 +390,25 @@ DataReaderWriter::DataReaderWriter()
 	mDataReaders.insert(DataReaderPtr(new XMLPolyDataMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
 	mDataReaders.insert(DataReaderPtr(new PNGImageReader()));
+
+}
+
+bool DataReaderWriter::canLoad(const QString &type, const QString &filename)
+{
+	DataReaderPtr reader = this->findReader(filename);
+	if (reader)
+		return reader->canLoad(type, filename);
+	else
+		return false;
+}
+
+DataPtr DataReaderWriter::load(const QString &uid, const QString &filename)
+{
+	DataReaderPtr reader = this->findReader(filename);
+	if (reader)
+		return reader->load(uid, filename);
+	else
+		return DataPtr();
 }
 
 DataReaderPtr DataReaderWriter::findReader(const QString& path, const QString& type)
@@ -438,6 +458,13 @@ void DataReaderWriter::readInto(DataPtr data, QString path)
 		data->setFilename(path); // need path even when not set explicitly: nice for testing
 	}
 
+}
+
+void DataReaderWriter::saveImage(ImagePtr image, const QString &filename)
+{
+	DataReaderPtr reader = this->findReader(filename);
+	if (reader)
+		return reader->saveImage(image, filename);
 }
 
 } // namespace cx

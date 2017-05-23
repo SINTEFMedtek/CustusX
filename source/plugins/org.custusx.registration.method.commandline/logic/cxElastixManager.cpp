@@ -158,7 +158,7 @@ void ElastixManager::addNonlinearData()
 		return;
 
 	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
-	ImagePtr raw = boost::dynamic_pointer_cast<Image>(MetaImageReader().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
+	ImagePtr raw = boost::dynamic_pointer_cast<Image>(DataReaderWriter().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	if (!raw)
 	{

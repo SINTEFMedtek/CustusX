@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
-#include "cxDataReaderWriter.h"
 #include "cxRegistrationTransform.h"
 #include "cxDoubleProperty.h"
 #include "cxContourFilter.h"
@@ -56,6 +55,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkForwardDeclarations.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
+#include "cxImage.h"
+#include "cxMesh.h"
+#include "cxDataReaderWriter.h"
 
 namespace cx {
 
@@ -585,7 +587,7 @@ vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size
 }
 
 MeshPtr TubeSegmentationFilter::loadVtkFile(QString pathToFile, QString newDatasUid){
-	PolyDataMeshReader reader;
+	DataReaderWriter reader;
 	DataPtr data;
 	if(reader.canLoad("vtk", pathToFile))
 		data = reader.load(newDatasUid, pathToFile);

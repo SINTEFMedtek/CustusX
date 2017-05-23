@@ -160,7 +160,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 
 	if (QFileInfo(mhdSingleFile).exists())
 	{
-		vtkImageDataPtr image = MetaImageReader().loadVtkImageData(mhdSingleFile);
+		vtkImageDataPtr image = DataReaderWriter().loadVtkImageData(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
 		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();

@@ -29,62 +29,41 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXCORESERVICES_H
-#define CXCORESERVICES_H
 
-#include "cxResourceExport.h"
-#include <boost/shared_ptr.hpp>
-class ctkPluginContext;
+#include "cxPortServiceNull.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
-typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
-typedef boost::shared_ptr<class VideoService> VideoServicePtr;
-typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
-typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
-typedef boost::shared_ptr<class StateService> StateServicePtr;
-typedef boost::shared_ptr<class PortService> PortServicePtr;
-
-/**
- * Convenience class combining all services in resource/core.
- *
- * \ingroup cx_resource_core
- *
- * \date Nov 14 2014
- * \author Ole Vegard Solberg, SINTEF
- */
-class cxResource_EXPORT CoreServices
+PortServiceNull::PortServiceNull() : PortService()
 {
-public:
-	static CoreServicesPtr create(ctkPluginContext* context);
-	CoreServices(ctkPluginContext* context);
-	static CoreServicesPtr getNullObjects();
+}
 
-	PatientModelServicePtr patient() { return mPatientModelService; }
-	TrackingServicePtr tracking() { return mTrackingService; }
-	VideoServicePtr video() { return mVideoService; }
-	SpaceProviderPtr spaceProvider() { return mSpaceProvider; }
-	SessionStorageServicePtr session() { return mSessionStorageService; }
-	StateServicePtr state() { return mStateService; }
-	PortServicePtr port() {return mPortService;}
+bool PortServiceNull::isNull()
+{
+	return true;
+}
 
-protected:
-	PatientModelServicePtr mPatientModelService;
-	TrackingServicePtr mTrackingService;
-	VideoServicePtr mVideoService;
-	SpaceProviderPtr mSpaceProvider;
-	SessionStorageServicePtr mSessionStorageService;
-	StateServicePtr mStateService;
-	PortServicePtr mPortService;
+bool PortServiceNull::canLoad(const QString &type, const QString &filename)
+{
+	return false;
+}
 
-protected:
-	CoreServices();
-};
+DataPtr PortServiceNull::load(const QString &uid, const QString &filename)
+{
+	return DataPtr();
+}
 
+QString PortServiceNull::canLoadDataType() const
+{
+	return "";
+}
+
+bool PortServiceNull::readInto(DataPtr data, QString path)
+{
+	return false;
 }
 
 
-#endif // CXCORESERVICES_H
+} // cx
