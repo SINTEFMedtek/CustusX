@@ -86,25 +86,25 @@ void VisualizationTab::init()
 									   "Set 3D view background color");
 
   SelectColorSettingButton* tool2DColor =
-		  new SelectColorSettingButton("Tool 2D Color",
-									   "View/tool2DColor",
-									   "Set color of tool in 2D");
+		  new SelectColorSettingButton("Tool Color 2D",
+									   "View2D/toolColor",
+									   "Set the color of the tool in 2D");
   SelectColorSettingButton* toolTipPointColor =
-		  new SelectColorSettingButton("Tool Tip",
+		  new SelectColorSettingButton("Tool Tip 2D/3D",
 									   "View/toolTipPointColor",
-									   "Set color of tool tip");
+									   "Set the color of the tool tip in 2D/3D");
   SelectColorSettingButton* toolOffsetPointColor =
-		  new SelectColorSettingButton("Offset Point",
+		  new SelectColorSettingButton("Offset Point 2D/3D",
 									   "View/toolOffsetPointColor",
-									   "Set color of tool offset point");
+									   "Set the color of the tool offset point in 2D/3D");
   SelectColorSettingButton* toolOffsetLineColor =
-		  new SelectColorSettingButton("Offset Line",
+		  new SelectColorSettingButton("Offset Line 2D/3D",
 									   "View/toolOffsetLineColor",
-									   "Set color of tool offset line");
+									   "Set the color of the tool offset line in 2D/3D");
   SelectColorSettingButton* toolCrossHairColor =
-		  new SelectColorSettingButton("Cross hair",
-									   "View/toolCrossHairColor",
-									   "Set color of tool cross hair");
+		  new SelectColorSettingButton("Crosshair 2D",
+									   "View2D/toolCrossHairColor",
+									   "Set the color of the tool 2D crosshair");
 
   bool showDataText = settings()->value("View/showDataText").value<bool>();
   mShowDataText = BoolProperty::initialize("Show Data Text", "",
@@ -115,9 +115,9 @@ void VisualizationTab::init()
                                                  "Attach name labels to entities in the views.",
                                                  showLabels);
 
-  bool toolCrosshair = settings()->value("View/toolCrosshair").value<bool>();
-  mToolCrosshair = BoolProperty::initialize("Tool crosshair", "",
-										 "Show a crosshair centered on tool for orthogonal (ACS) views.",
+  bool toolCrosshair = settings()->value("View2D/showToolCrosshair").value<bool>();
+  mToolCrosshair = BoolProperty::initialize("Tool 2D Crosshair", "",
+										 "Show a crosshair centered on the tool in the orthogonal (ACS) views.",
 										 toolCrosshair);
 
 
@@ -282,7 +282,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
-  settings()->setValue("View/toolCrosshair", mToolCrosshair->getValue());
+  settings()->setValue("View2D/showToolCrosshair", mToolCrosshair->getValue());
   settings()->setValue("View/showMetricNamesInCorner", mShowMetricNamesInCorner->getValue());
   settings()->setValue("View3D/labelSize", mLabelSize->getValue());
   settings()->setValue("View3D/annotationModelSize", mAnnotationModelSize->getValue());

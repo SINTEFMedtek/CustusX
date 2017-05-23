@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyData.h>
 #include <vtkMatrix4x4.h>
+#include <vtkProperty2D.h>
 #include "cxSliceProxy.h"
 #include "cxTool.h"
 #include "cxView.h"
@@ -64,7 +65,7 @@ ToolRep2D::ToolRep2D(SpaceProviderPtr spaceProvider) :
 	mOffsetLineColor(1.0, 0.8, 0.0),
 	mStipplePattern(0xffff)
 {
-	mTooltipLineColor = settings()->value("View/tool2DColor").value<QColor>();
+	mTooltipLineColor = settings()->value("View2D/toolColor").value<QColor>();
 	mTooltipPointColor = settings()->value("View/toolTipPointColor").value<QColor>();
 	mOffsetPointColor = settings()->value("View/toolOffsetPointColor").value<QColor>();
 	mOffsetLineColor = settings()->value("View/toolOffsetLineColor").value<QColor>();
@@ -133,16 +134,6 @@ void ToolRep2D::setSliceProxy(SliceProxyPtr slicer)
 	connect(mSlicer.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 }
 
-/**Set display of the line from tool tip to the cross pos (this is the offset line).
- */
-void ToolRep2D::setUseOffset(bool on)
-{
-	if (mUseOffset==on)
-		return;
-	mUseOffset = on;
-	setVisibility();
-}
-
 /**Set display of a yellow crosshair centered on the cross pos.
  */
 void ToolRep2D::setUseCrosshair(bool on)
@@ -153,42 +144,40 @@ void ToolRep2D::setUseCrosshair(bool on)
 	setVisibility();
 }
 
-/**Set display of the line from back infinity to the tool tip.
- */
-void ToolRep2D::setUseToolLine(bool on)
+void ToolRep2D::setCrosshairColor(const QColor& color)
 {
-	if (mUseToolLine==on)
-		return;
-	mUseToolLine = on;
-	setVisibility();
+	if(cursor)
+		setColorAndOpacity(cursor->getActor()->GetProperty(), color);
 }
 
-/**Set display of the amount of offset, in the upper right corner.
- */
-void ToolRep2D::setUseOffsetText(bool on)
+void ToolRep2D::setTooltipLineColor(const QColor& color)
 {
-	if (mUseOffsetText==on)
-		return;
-	mUseOffsetText = on;
-	setVisibility();
+	if(tool2Back)
+		setColorAndOpacity(tool2Back->getActor()->GetProperty(), color);
 }
 
-/**Set to merge the rep of the tool and the tool offset into one line, thus making the
- * location of the physical tool tip invisible.
- *
- */
-void ToolRep2D::setMergeOffsetAndToolLine(bool on)
+void ToolRep2D::setTooltipPointColor(const QColor& color)
 {
-	if (mMergeOffsetAndToolLine==on)
-		return;
-	mMergeOffsetAndToolLine = on;
-	setVisibility();
+	if(toolPoint)
+		setColorAndOpacity(toolPoint->getActor()->GetProperty(), color);
+}
+
+void ToolRep2D::setToolOffsetPointColor(const QColor& color)
+{
+	if(centerPoint)
+		setColorAndOpacity(centerPoint->getActor()->GetProperty(), color);
+}
+
+void ToolRep2D::setToolOffsetLineColor(const QColor& color)
+{
+	if(center2Tool)
+		setColorAndOpacity(center2Tool->getActor()->GetProperty(), color);
 }
 
 void ToolRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
-	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
+	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createOffsetText(view->getRenderer(), Vector3D(0,0,0));
 	view->getRenderer()->AddActor(mProbeSectorActor);
 	setVisibility();
@@ -322,13 +311,10 @@ void ToolRep2D::crossHairResized()
 	if (cursor)
 	{
 		double bordarOffset = 30.0;
-		QColor col =  settings()->value("View/toolCrossHairColor").value<QColor>();
-//		RGBColor color(1.0, 0.8, 0.0);
+		QColor col =  settings()->value("View2D/toolCrossHairColor").value<QColor>();
 		RGBColor color(col.redF(), col.greenF(), col.blueF());
-//		RGBColor color(1.0, 0.2, 0.0);
 		Vector3D focalPoint(0.0,0.0,0.0);
 		//Logger::log("tool.log", "("+string_cast(__FUNCTION__)+")"+" mCross"+string_cast(cross));
-		//cursor->setValue( focalPoint, mBB_vp.range()[0], mBB_vp.range()[1], bordarOffset, color  );
 		cursor->setValue( focalPoint, int(mBB_vp.range()[0]), int(mBB_vp.range()[1]), bordarOffset, color  );
 	}
 }
