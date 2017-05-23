@@ -173,6 +173,13 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 {
     contextMenu.addSeparator();
 	mZoom2D->addActionsToMenu(&contextMenu);
+
+	contextMenu.addSeparator();
+	QAction* showManualTool = new QAction("Show Manual Tool 2D", &contextMenu);
+	showManualTool->setCheckable(true);
+	showManualTool->setChecked(settings()->value("View2D/showManualTool").toBool());
+	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
+	contextMenu.addAction(showManualTool);
 }
 
 void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
@@ -206,8 +213,7 @@ void ViewWrapper2D::addReps()
 	mToolRep2D = ToolRep2D::New(mServices->spaceProvider(), "Tool2D_" + mView->getName());
 	mToolRep2D->setSliceProxy(mSliceProxy);
 	mToolRep2D->setUseCrosshair(true);
-//  mToolRep2D->setUseToolLine(false);
-	mView->addRep(mToolRep2D);
+	this->toggleShowManualTool();
 
 	mPickerGlyphRep = GeometricRep2D::New("PickerGlyphRep_" + mView->getName());
 	mPickerGlyphRep->setSliceProxy(mSliceProxy);
@@ -230,6 +236,18 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->updateView();
 	}
+	if (key == "View2D/showManualTool")
+	{
+		this->toggleShowManualTool();
+	}
+}
+
+void ViewWrapper2D::toggleShowManualTool()
+{
+	if (settings()->value("View2D/showManualTool").toBool())
+		mView->addRep(mToolRep2D);
+	else
+		mView->removeRep(mToolRep2D);
 }
 
 void ViewWrapper2D::removeAndResetSliceRep()
@@ -525,8 +543,13 @@ void ViewWrapper2D::updateView()
 	if (mToolRep2D)
 	{
 		bool isOblique = mSliceProxy->getComputer().getOrientationType() == otOBLIQUE;
-		bool useCrosshair = settings()->value("View/toolCrosshair", true).toBool();
+		bool useCrosshair = settings()->value("View2D/showToolCrosshair", true).toBool();
 		mToolRep2D->setUseCrosshair(!isOblique && useCrosshair);
+		mToolRep2D->setCrosshairColor(settings()->value("View2D/toolCrossHairColor").value<QColor>());
+		mToolRep2D->setTooltipLineColor(settings()->value("View2D/toolColor").value<QColor>());
+		mToolRep2D->setTooltipPointColor(settings()->value("View/toolTipPointColor").value<QColor>());
+		mToolRep2D->setToolOffsetPointColor(settings()->value("View/toolOffsetPointColor").value<QColor>());
+		mToolRep2D->setToolOffsetLineColor(settings()->value("View/toolOffsetLineColor").value<QColor>());
 	}
 
 	this->applyViewFollower();
@@ -709,6 +732,11 @@ void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 void ViewWrapper2D::videoSourcesChangedSlot()
 {
 	this->updateView();
+}
+
+void ViewWrapper2D::showManualToolSlot(bool visible)
+{
+	settings()->setValue("View2D/showManualTool", visible);
 }
 
 //------------------------------------------------------------------------------

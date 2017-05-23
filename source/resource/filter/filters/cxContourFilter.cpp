@@ -197,12 +197,14 @@ void ContourFilter::imageChangedSlot(QString uid)
 
 void ContourFilter::thresholdSlot()
 {
-//	this->stopPreview();
 	if (mActive)
 	{
 		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		Eigen::Vector2d threshold = Eigen::Vector2d(mSurfaceThresholdOption->getValue(),  mPreviewImage->getMax());
-		mPreviewImage->startThresholdPreview(threshold);
+		if(mPreviewImage)
+		{
+			Eigen::Vector2d threshold = Eigen::Vector2d(mSurfaceThresholdOption->getValue(),  mPreviewImage->getMax());
+			mPreviewImage->startThresholdPreview(threshold);
+		}
 	}
 }
 

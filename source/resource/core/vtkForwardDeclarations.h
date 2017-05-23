@@ -137,6 +137,7 @@ typedef vtkSmartPointer<class vtkPolyDataWriter> vtkPolyDataWriterPtr;
 typedef vtkSmartPointer<class vtkProbeFilter> vtkProbeFilterPtr;
 typedef vtkSmartPointer<class vtkProp3D> vtkProp3DPtr;
 typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
+typedef vtkSmartPointer<class vtkProperty2D> vtkProperty2DPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindowInteractor> vtkRenderWindowInteractorPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
