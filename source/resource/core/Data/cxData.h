@@ -131,6 +131,7 @@ public:
         return "data";
 	}
 	virtual QIcon getIcon() {return QIcon();}
+	virtual bool isEqual(DataPtr metric);
 
 	virtual QString getFilename() const;
 	virtual void setFilename(QString val);

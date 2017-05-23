@@ -38,7 +38,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxForwardDeclarations.h"
 #include "cxStringPropertyBase.h"
 #include "cxBaseWidget.h"
-#include "cxLegacySingletons.h"
 
 #include "cxBoundingBoxWidget.h"
 
@@ -47,7 +46,6 @@ class QLabel;
 
 namespace cx
 {
-typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 
 /**
  * \file

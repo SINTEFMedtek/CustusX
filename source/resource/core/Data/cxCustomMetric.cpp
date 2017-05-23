@@ -363,13 +363,6 @@ Vector3D CustomMetric::getScale() const
 	return scale;
 }
 
-QString CustomMetric::getAsSingleLineString() const
-{
-	return QString("%1 %2")
-			.arg(this->getSingleLineHeader())
-			.arg(qstring_cast(""));
-}
-
 QString CustomMetric::getDefineVectorUpMethod() const
 {
     return mDefineVectorUpMethod;

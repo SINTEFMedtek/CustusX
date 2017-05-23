@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 
 #include "cxForwardDeclarations.h"
-#include "cxLegacySingletons.h"
 #include "cxReporter.h"
 #include "cxLogMessageFilter.h"
 
@@ -94,7 +93,7 @@ class cxGui_EXPORT StatusBar: public QStatusBar
   Q_OBJECT
 
 public:
-  StatusBar(); ///< connects signals and slots
+  StatusBar(TrackingServicePtr trackingService, ViewServicePtr viewService, VideoServicePtr videoService); ///< connects signals and slots
   virtual ~StatusBar(); ///< empty
 
 private slots:
@@ -121,6 +120,7 @@ private:
   QToolButton* mMessageLevelLabel;
   ActiveToolProxyPtr mActiveTool;
   MessageListenerPtr mMessageListener;
+  TrackingServicePtr mTrackingService;
 
   struct ToolData
   {

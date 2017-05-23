@@ -64,7 +64,6 @@ typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
 typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
 typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;

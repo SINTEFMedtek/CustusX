@@ -75,16 +75,12 @@ class cxResourceVisualization_EXPORT ToolRep2D : public RepImpl
 		void setSliceProxy(SliceProxyPtr slicer);
 		void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp);
 
-		void setUseOffset(bool on);
 		void setUseCrosshair(bool on);
-		void setUseToolLine(bool on);
-		void setUseOffsetText(bool on);
-		void setMergeOffsetAndToolLine(bool on);
-		void setTooltipPointColor(QColor c) { mTooltipPointColor = c; }
-		void setOffsetPointColor(QColor c) { mOffsetPointColor = c; }
-		void setTooltipLineColor(QColor c) { mTooltipLineColor = c; }
-		void setOffsetLineColor(QColor c) { mOffsetLineColor = c; }
-		void setOffsetStipplePattern(int pattern) { mStipplePattern = pattern; }
+		void setCrosshairColor(const QColor& color);
+		void setTooltipLineColor(const QColor& color);
+		void setTooltipPointColor(const QColor& color);
+		void setToolOffsetPointColor(const QColor& color);
+		void setToolOffsetLineColor(const QColor& color);
 
 	private slots:
 		void sliceTransformChangedSlot(Transform3D sMr); 

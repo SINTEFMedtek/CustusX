@@ -220,11 +220,6 @@ void PatientModelImplService::setClinicalApplication(CLINICAL_VIEW application)
 	dataService()->setClinicalApplication(application);
 }
 
-void PatientModelImplService::loadData(DataPtr data)
-{
-	dataService()->loadData(data);
-}
-
 std::map<QString, VideoSourcePtr> PatientModelImplService::getStreams() const
 {
 	return dataService()->getStreams();

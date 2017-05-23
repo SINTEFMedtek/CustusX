@@ -41,21 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxData.h"
 #include "cxLayoutData.h"
 #include "cxEnumConverter.h"
-class QActionGroup;
+#include "cxForwardDeclarations.h"
 
 #define ViewService_iid "cx::ViewService"
 
+class QActionGroup;
+
 namespace cx
 {
-
-typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
-typedef boost::shared_ptr<class Clippers> ClippersPtr;
-
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
-typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
-typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
 
 enum cxResourceVisualization_EXPORT CAMERA_STYLE_TYPE
 {
@@ -101,7 +94,7 @@ public:
 	virtual ClippersPtr getClippers() = 0;
 	virtual InteractiveCropperPtr getCropper() = 0;
 	virtual CyclicActionLoggerPtr getRenderTimer() = 0;
-	virtual NavigationPtr getNavigation() = 0;
+	virtual NavigationPtr getNavigation(int group = 0) = 0;
 	virtual LayoutRepositoryPtr getLayoutRepository() = 0;
 	virtual CameraControlPtr getCameraControl() = 0;
 	virtual QActionGroup* getInteractorStyleActionGroup() = 0;

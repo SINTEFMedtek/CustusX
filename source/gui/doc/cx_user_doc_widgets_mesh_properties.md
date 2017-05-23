@@ -28,10 +28,14 @@ Properties {#mesh_property_properties}
 -----------------------------------------------------------
 Set visualization properties of the mesh.
 
-Backface and Frontface culling can be used for making transparent meshes work. Backface only draws outside walls, while frontface only draws inside walls.
-
 Ambient, Diffuse, Specular and Specular Power can be used to change how the mesh responds to lighting.
 
+### Transparent meshes {#mesh_property_transparent}
+Backface and Frontface culling can be used for making transparent meshes work.
+With backface culling on, only the outside walls are drawn. With frontface culling on, only the inside walls are drawn and navigation inside the mesh is possible.
+
+Some GPUs supports depth peeling which sorts mesh elements by depth on each render. This can prevent some random cases of unwanted and weird 3D effects.
+However, the render speed might be slow if the mesh contains many elements. It can be turned on in *Preferences -> Performance*.
 
 \addindex mesh_texture_widget
 Texture {#mesh_property_texture}
@@ -44,6 +48,9 @@ This can only be selected from predefined shapes.
 The texture is defined on a sheet ranging from 0 to 1 in two dimensions (x and y). Use *Position*
 to position the texture on this sheet. *Scale* >1 shrinks the texture to be smaller than the sheet.
 Use *Repeat* to paint only one texture or to repeat it over the available sheet.
+
+The colours of the texture image are added on top of the colours of the mesh. The mesh colour should be
+set to white to get the exact colours of the image.
 
 Experimentation is needed to fit a texture to a mesh and it might not be possible to get a good fit for all meshes.
 

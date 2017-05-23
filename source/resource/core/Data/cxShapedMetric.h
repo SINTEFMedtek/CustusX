@@ -66,7 +66,6 @@ public:
 	static DonutMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
-	virtual QString getAsSingleLineString() const;
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_torus.png");}
 
 	void setRadius(double val);

@@ -65,7 +65,7 @@ public:
 	 *
 	 *  Call this from inside a PrepareForRendering() method in vtk.
 	 */
-	virtual void allocate() = 0;
+	virtual void allocate(int textureUnitIndex) = 0;
 //	/** Assuming imageData is changed,
 //	  * send vtkImageData to GPU.
 //	  */
@@ -150,6 +150,10 @@ private:
 	static GPUImageBufferRepository* mInstance;
 	void tearDown();
 };
+
+// Not allowed to export static functions from dll on Windows,
+// so we have to use this funciton instead of GPUImageBufferRepository::getInstance
+cxResource_EXPORT GPUImageBufferRepository* getGPUImageBufferRepository();
 
 /**
  * \}

@@ -84,7 +84,7 @@ public:
 	bool runWidget();
 	void clear();
 
-	double getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component=0);
+	double getFractionOfBrightPixelsInRenderWindowForView(int viewIndex, int threshold, int component=0);
 	void dumpDebugViewToDisk(QString text, int viewIndex);
 
 	cx::ImagePtr loadImage(const QString& imageFilename);
@@ -94,12 +94,13 @@ private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
 	void fixToolToCenter();
 	cx::SliceProxyPtr createSliceProxy(cx::PLANE_TYPE plane);
-	RenderTesterPtr getRenderTesterForView(int viewIndex);
+	RenderTesterPtr getRenderTesterForRenderWindow(int viewIndex);
 
 	QString mShaderFolder;
 	cxtest::TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
+	cx::RenderWindowFactoryPtr mFactory;
 };
 
 } // namespace cxtest

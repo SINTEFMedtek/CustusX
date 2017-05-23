@@ -72,7 +72,7 @@ private:
     void setShowIcon();
     ViewGroupDataPtr getActiveViewGroupData();
 	SelectDataStringPropertyBasePtr mData;
-    ViewGroupDataPtr mCurrentViewGroup;
+	ViewGroupDataPtr mCurrentViewGroupData;
     QAction* mToggleShowAction;
 	EraseDataToolButton* mRemoveButton;
 	ViewServicePtr mViewService;

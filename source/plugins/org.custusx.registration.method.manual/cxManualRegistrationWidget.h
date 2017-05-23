@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXMANUALREGISTRATIONWIDGET_H_
 #define CXMANUALREGISTRATIONWIDGET_H_
 
+#include "org_custusx_registration_method_manual_Export.h"
+
 #include "cxBaseWidget.h"
 #include "cxTransform3D.h"
 #include "cxRegistrationMethodService.h"
@@ -59,7 +61,7 @@ typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
  *  \author Christian Askeland, SINTEF
  *  \author Ole Vegard Solberg, SINTEF
  */
-class ManualImageRegistrationWidget: public BaseWidget
+class org_custusx_registration_method_manual_EXPORT ManualImageRegistrationWidget: public BaseWidget
 {
 Q_OBJECT
 public:

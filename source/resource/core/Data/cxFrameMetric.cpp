@@ -67,12 +67,5 @@ void FrameMetric::parseXml(QDomNode& dataNode)
 	this->setFrame(Transform3D::fromString(dataNode.toElement().attribute("frame", qstring_cast(mFrame))));
 }
 
-QString FrameMetric::getAsSingleLineString() const
-{
-	return QString("%1 \"%2\" %3")
-			.arg(this->getSingleLineHeader())
-			.arg(mSpace.toString())
-			.arg(this->matrixAsSingleLineString());
-}
 
 } //namespace cx

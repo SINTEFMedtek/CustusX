@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 /** Functions for navigating in the visualization scene(s).
@@ -67,8 +66,6 @@ private:
 	VisServicesPtr mServices;
 	CameraControlPtr mCamera3D;
 };
-
-typedef boost::shared_ptr<Navigation> NavigationPtr;
 
 
 } // namespace cx
