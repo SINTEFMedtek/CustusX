@@ -5,6 +5,7 @@ include(cxInstallUtilities)
 macro(cx_initialize_FAST)
     find_package(FAST REQUIRED)
     include_directories("${FAST_DIR}/../FAST/source/")
+    include_directories("${FAST_DIR}/")
     link_directories("${FAST_DIR}/lib/")
     set(FAST_SOURCE_DIR ${FAST_DIR}/../FAST/source/FAST/)
     add_definitions("-DFAST_SOURCE_DIR=\"${FAST_SOURCE_DIR}/\"")
@@ -64,12 +65,22 @@ install(DIRECTORY ${FAST_SOURCE_DIR}
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
+# Z lib comes with many names, needed for FAST atm
+if(WIN32)
+    set(ZLIB zlib.lib)
+elseif(APPLE)
+    set(ZLIB libz.dylib)
+else()
+    set(ZLIB libz.so)
+endif()
 set(PLUGIN_target_libraries
     PUBLIC
     ${PLUGIN_target_libraries}
+    FAST
 
     PRIVATE
-    ${FAST_LIBRARIES}
+    ${OPENCL_LIBRARIES}
+    ${ZLIB}
     cxResource
     cxResourceFilter
     cxResourceVisualization
