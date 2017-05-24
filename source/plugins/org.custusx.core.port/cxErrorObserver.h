@@ -4,6 +4,7 @@
 #include "org_custusx_core_port_Export.h"
 #include "boost/shared_ptr.hpp"
 #include <QString>
+#include <QMutex>
 #include <vtkSmartPointer.h>
 #include <vtkAlgorithm.h>
 #include <vtkCommand.h>

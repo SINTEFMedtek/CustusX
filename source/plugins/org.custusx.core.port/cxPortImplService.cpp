@@ -106,9 +106,10 @@ QString PortImplService::findDataTypeFromFile(QString filename)
 
 bool PortImplService::readInto(DataPtr data, QString path)
 {
+	bool success = false;
 	PortServicePtr reader = this->findReader(path, data->getType());
 	if (reader)
-		reader->readInto(data, path);
+		success = reader->readInto(data, path);
 
 	if(data)
 	{
@@ -116,6 +117,7 @@ bool PortImplService::readInto(DataPtr data, QString path)
 		data->setName(changeExtension(fileInfo.fileName(), ""));
 		data->setFilename(path); // need path even when not set explicitly: nice for testing
 	}
+	return success;
 
 }
 
