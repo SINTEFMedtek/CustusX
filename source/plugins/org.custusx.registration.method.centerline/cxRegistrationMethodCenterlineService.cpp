@@ -32,14 +32,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegistrationMethodCenterlineService.h"
 #include "cxCenterlineRegistrationWidget.h"
+#include "cxTabbedWidget.h"
+#include "cxCenterlinePointsWidget.h"
 
 namespace cx
 {
 
 QWidget *RegistrationMethodCenterlineImageToPatientService::createWidget()
 {
+    TabbedWidget* tabWidget = new TabbedWidget(NULL, this->getWidgetName(), "Centerline Registration");
+
     CenterlineRegistrationWidget* centerlineRegistrationWidget = new CenterlineRegistrationWidget(mServices, NULL);
-    return centerlineRegistrationWidget;
+
+    CenterlinePointsWidget* centerlinePointsWidget = new CenterlinePointsWidget(mServices, tabWidget, "org_custusx_registration_method_centerline_landmarks_widget", "Image Registration");
+
+    tabWidget->addTab(centerlinePointsWidget, "Prepare");
+    tabWidget->addTab(centerlineRegistrationWidget, "Register");
+    tabWidget->setDefaultWidget(centerlineRegistrationWidget);
+
+    return tabWidget;
 }
 
 } /* namespace cx */
