@@ -61,7 +61,7 @@ DicomWidget::DicomWidget(ctkPluginContext *context, QWidget *parent) :
 	mVerticalLayout(new QVBoxLayout(this)),
 	mBrowser(NULL),
 	mContext(context),
-	mDicomSettingsString("Dicom/ShowAdvanced")
+	mDicomShowAdvancedSettingsString("Dicom/ShowAdvanced")
 {
 	this->setModified();
 
@@ -116,18 +116,19 @@ void DicomWidget::createUI()
 
 void DicomWidget::toggleDetailsSlot()
 {
-	settings()->setValue(mDicomSettingsString, !settings()->value(mDicomSettingsString, "true").toBool());
+	bool newShowAdvancedValue = !settings()->value(mDicomShowAdvancedSettingsString, "true").toBool();
+	settings()->setValue(mDicomShowAdvancedSettingsString, newShowAdvancedValue);
 	this->showOrHideDetails();
 }
 
 void DicomWidget::showOrHideDetails()
 {
-	bool showOrHide = settings()->value(mDicomSettingsString).toBool();
+	bool showAdvanced = settings()->value(mDicomShowAdvancedSettingsString).toBool();
 
-	mViewHeaderAction->setVisible(showOrHide);
+	mViewHeaderAction->setVisible(showAdvanced);
 	foreach (QAction* action, mBrowser->getAdvancedActions())
 	{
-		action->setVisible(showOrHide);
+		action->setVisible(showAdvanced);
 	}
 }
 

@@ -82,7 +82,7 @@ private:
 	QAction* mViewHeaderAction;
 	QAction* mImportIntoCustusXAction;
 	QAction* mDetailsAction;
-	QString mDicomSettingsString;
+	QString mDicomShowAdvancedSettingsString;
 	void createUI();
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
