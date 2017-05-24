@@ -509,7 +509,7 @@ class OpenCLUtilityLibrary(CppComponent):
         return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
+        self._getBuilder().gitCheckout('7a4258fab2ce30ca0c9fac347efd903124f39d09')
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
@@ -531,7 +531,7 @@ class FAST(CppComponent):
 		return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('ab6386042cd3d2417a8e0ce5d3871242ab4913ab')
+        self._getBuilder().gitCheckout('f81836597db0529f2b8e23d5ee9236cef7377b48')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
