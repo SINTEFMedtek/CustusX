@@ -9,12 +9,15 @@ set(PLUGIN_SRCS
   cxCenterlineRegistration.cpp
   cxCenterlineRegistration.h
   cxCenterlineRegistrationWidget.cpp
+  cxCenterlinePointsWidget.h
+  cxCenterlinePointsWidget.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodCenterlinePluginActivator.h
   cxCenterlineRegistrationWidget.h
+  cxCenterlinePointsWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -33,6 +36,7 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxResourceVisualization
     org_custusx_registration
+    org_custusx_registration_method_landmark
     org_custusx_acquisition
 )
 
