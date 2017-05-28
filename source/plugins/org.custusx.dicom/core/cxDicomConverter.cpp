@@ -83,7 +83,8 @@ QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 QString DicomConverter::convertToValidFilename(QString text) const
 {
 	QStringList illegal;
-	illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*" << "\\^" << ",";
+    illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*"
+            << "\\^" << "," << "\\%";
 	QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
 	text = text.replace(regexp, "_");
 	return text	;
@@ -92,8 +93,14 @@ QString DicomConverter::convertToValidFilename(QString text) const
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
 	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
-	QString name = QString("%1").arg(seriesDescription);
-	return name;
+    QStringList illegal;
+    illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*"
+            << "\\^" << "," << "\\%";
+    QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
+    seriesDescription = seriesDescription.replace(regexp,"_");
+//	QString name = QString("%1").arg(seriesDescription);
+//	return name;
+    return seriesDescription;
 }
 
 ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
