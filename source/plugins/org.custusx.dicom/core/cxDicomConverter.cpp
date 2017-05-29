@@ -98,8 +98,6 @@ QString DicomConverter::generateName(DicomImageReaderPtr reader)
             << "\\^" << "," << "\\%";
     QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
     seriesDescription = seriesDescription.replace(regexp,"_");
-//	QString name = QString("%1").arg(seriesDescription);
-//	return name;
     return seriesDescription;
 }
 

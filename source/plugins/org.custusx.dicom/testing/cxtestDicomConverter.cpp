@@ -265,6 +265,32 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	fixture.checkImagesEqual(convertedImage, referenceImage);
 }
 
+TEST_CASE("DicomConverter: Convert DICOM dataset from Radiology department", "[unit][plugins][org.custusx.dicom]")
+{
+    cx::Reporter::initialize();
+    bool verbose = true;
+    DicomConverterTestFixture fixture;
+
+    QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/testing/Dicom_series_import";
+
+    ctkDICOMDatabasePtr db = fixture.loadDirectory(inputDicomDataDirectory);
+
+    QString patient = fixture.getOneFromList(db->patients());
+    QString study = fixture.getOneFromList(db->studiesForPatient(patient));
+    QString series = fixture.getOneFromList(db->seriesForStudy(study));
+    QStringList files = db->filesForSeries(series);
+
+
+    cx::DicomConverter converter;
+    converter.setDicomDatabase(db.data());
+    cx::ImagePtr convertedImage = converter.convertToImage(series);
+    QString fileName = convertedImage->getName() + ".mhd";
+    if(verbose)
+    {
+        std::cout << "Filename : " << fileName << std::endl;
+    }
+    cx::MetaImageReader().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/"+fileName);
+}
 
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration][plugins][org.custusx.dicom]")
