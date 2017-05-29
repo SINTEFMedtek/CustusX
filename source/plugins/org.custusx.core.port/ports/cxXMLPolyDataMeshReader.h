@@ -11,12 +11,12 @@ namespace cx
 /**\brief Reader for .vtp files.
  *
  */
-class XMLPolyDataMeshReader: public PortService
+class XMLPolyDataMeshReader: public FileReaderWriterService
 {
 public:
-	Q_INTERFACES(cx::PortService)
+	Q_INTERFACES(cx::FileReaderWriterService)
 
-	XMLPolyDataMeshReader(ctkPluginContext *context);
+	XMLPolyDataMeshReader();
 	virtual ~XMLPolyDataMeshReader(){}
 	virtual bool canLoad(const QString& type, const QString& filename);
 	virtual bool readInto(DataPtr data, QString path);

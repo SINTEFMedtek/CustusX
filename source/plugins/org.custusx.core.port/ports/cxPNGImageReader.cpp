@@ -10,7 +10,7 @@ typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 namespace cx
 {
 
-PNGImageReader::PNGImageReader(ctkPluginContext *context)
+PNGImageReader::PNGImageReader()
 {
 	this->setObjectName("PNGImageReader");
 }

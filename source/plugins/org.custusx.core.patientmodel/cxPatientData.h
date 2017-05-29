@@ -68,7 +68,7 @@ class org_custusx_core_patientmodel_EXPORT PatientData: public QObject
 {
 Q_OBJECT
 public:
-	explicit PatientData(DataServicePtr dataManager, SessionStorageServicePtr session);
+	explicit PatientData(DataServicePtr dataManager, SessionStorageServicePtr session, FileManagerServicePtr fileManager);
 	virtual ~PatientData();
 
 	QString getActivePatientFolder() const;
@@ -95,6 +95,7 @@ private slots:
 private:
 	DataServicePtr mDataManager;
 	SessionStorageServicePtr mSession;
+	FileManagerServicePtr mFileManagerService;
 };
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;

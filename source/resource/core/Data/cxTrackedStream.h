@@ -65,8 +65,8 @@ public:
 	virtual void parseXml(QDomNode& dataNode);
 
 	virtual DoubleBoundingBox3D boundingBox() const;
-	virtual bool load(QString path) { return true;} ///< Not used
-	virtual void save(const QString& basePath) {} ///< Not used
+	virtual bool load(QString path, FileManagerServicePtr filemanager) { return true;} ///< Not used
+	virtual void save(const QString& basePath, FileManagerServicePtr filemanager) {} ///< Not used
 
 	virtual QString getType() const;
 	static QString getTypeName();

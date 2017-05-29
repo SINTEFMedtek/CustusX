@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxElastixExecuter.h"
 #include "cxSettings.h"
-#include "cxDataReaderWriter.h"
 #include "cxRegistrationService.h"
 #include "cxRegistrationTransform.h"
 #include "cxPatientModelService.h"
@@ -47,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 #include "cxLogger.h"
 #include "cxFilePathProperty.h"
+#include "cxImage.h"
+#include "cxFileManagerService.h"
 
 namespace cx
 {
@@ -158,7 +159,7 @@ void ElastixManager::addNonlinearData()
 		return;
 
 	ImagePtr movingImage = boost::dynamic_pointer_cast<Image>(mServices->registration()->getMovingData());
-	ImagePtr raw = boost::dynamic_pointer_cast<Image>(DataReaderWriter().load(nonlinearVolumeFilename, nonlinearVolumeFilename));
+	ImagePtr raw = boost::dynamic_pointer_cast<Image>(mServices->file()->load(nonlinearVolumeFilename, nonlinearVolumeFilename));
 
 	if (!raw)
 	{

@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegistrationServiceProxy.h"
 #include "cxViewServiceProxy.h"
 #include "cxAcquisitionServiceProxy.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cx {
 
@@ -48,6 +49,7 @@ RegServices::RegServices(ctkPluginContext* context) :
 {
 	registrationService	 = RegistrationServicePtr(new RegistrationServiceProxy(context));
 	acquisitionService	 = AcquisitionServicePtr(new AcquisitionServiceProxy(context));
+	filemanagerService = FileManagerServicePtr(new FileManagerServiceProxy(context));
 }
 
 RegServicesPtr RegServices::getNullObjects()

@@ -11,9 +11,9 @@
 namespace cx
 {
 
-StlMeshReader::StlMeshReader(ctkPluginContext *context)
+StlMeshReader::StlMeshReader()
 {
-
+	this->setObjectName("StlMeshReader");
 }
 
 bool StlMeshReader::canLoad(const QString &type, const QString &filename)

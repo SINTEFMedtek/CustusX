@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include "cxMesh.h"
-#include "cxDataReaderWriter.h"
+#include "cxXMLPolyDataMeshReader.h"
 
 namespace cxtest
 {

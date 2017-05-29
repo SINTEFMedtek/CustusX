@@ -30,31 +30,38 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXTESTTESTTOOLMESH_H_
-#define CXTESTTESTTOOLMESH_H_
+#include "cxtestTestToolMesh.h"
 
-#include "cxtest_org_custusx_core_tracking_export.h"
-
-#include "cxMesh.h"
-#include <QString>
+#include "cxDataLocations.h"
+#include "cxPortImplService.h"
 
 namespace cxtest {
 
-/*
- * TestToolMesh
- * \brief Helper class for testing tool mesh file
- * \date Aug 8, 2013
- * \author Ole Vegard Solberg, SINTEF
- */
-class CXTEST_ORG_CUSTUSX_CORE_TRACKING_EXPORT  TestToolMesh {
-public:
-	TestToolMesh();
-	void setToolPath(QString path);
-	bool canLoadMesh(QString filename);
-private:
-	QString mToolToolPath;
-	QString mCurrentToolPath;
-};
+TestToolMesh::TestToolMesh()
+{
+}
+
+void TestToolMesh::setToolPath(QString path)
+{
+	mCurrentToolPath = cx::DataLocations::findConfigFolder("/tool/Tools/"+path);
+}
+
+bool TestToolMesh::canLoadMesh(QString filename)
+{
+	cx::FileManagerServicePtr filemanager;
+
+	bool success = true;
+
+	QString fullFileName = mCurrentToolPath + filename;
+
+	QString type = filemanager->findDataTypeFromFile(fullFileName);
+	success = success && (type==cx::Mesh::getTypeName());
+
+	cx::MeshPtr mesh = cx::Mesh::create("test");
+	success = success && mesh->load(fullFileName,filemanager);
+
+	return success;
+}
+
 
 } /* namespace cxtest */
-#endif /* CXTESTTESTTOOLMESH_H_ */

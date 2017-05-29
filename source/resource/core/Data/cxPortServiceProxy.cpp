@@ -4,66 +4,68 @@
 
 namespace cx {
 
-PortServicePtr PortServiceProxy::create(ctkPluginContext *context)
+FileReaderWriterServicePtr FileReaderWriterServiceProxy::create(ctkPluginContext *context)
 {
-	return PortServicePtr(new PortServiceProxy(context));
+	return FileReaderWriterServicePtr(new FileReaderWriterServiceProxy(context));
 }
 
-PortServiceProxy::PortServiceProxy(ctkPluginContext *context) :
+FileReaderWriterServiceProxy::FileReaderWriterServiceProxy(ctkPluginContext *context) :
 	mPluginContext(context),
-	mService(PortService::getNullObject())
+	mService(FileReaderWriterService::getNullObject())
 {
-	this->initServiceListener();
+	//this->initServiceListener();
 }
 
-bool PortServiceProxy::isNull()
+bool FileReaderWriterServiceProxy::isNull()
 {
-	return false;
+	return mService->isNull();
 }
 
-bool PortServiceProxy::canLoad(const QString &type, const QString &filename)
+bool FileReaderWriterServiceProxy::canLoad(const QString &type, const QString &filename)
 {
 	return mService->canLoad(type, filename);
 }
 
-DataPtr PortServiceProxy::load(const QString &uid, const QString &filename)
+DataPtr FileReaderWriterServiceProxy::load(const QString &uid, const QString &filename)
 {
 	return mService->load(uid, filename);
 }
 
-QString PortServiceProxy::canLoadDataType() const
+QString FileReaderWriterServiceProxy::canLoadDataType() const
 {
 	return mService->canLoadDataType();
 }
 
-bool PortServiceProxy::readInto(DataPtr data, QString path)
+bool FileReaderWriterServiceProxy::readInto(DataPtr data, QString path)
 {
 	return mService->readInto(data, path);
 }
+/*
 
-void PortServiceProxy::initServiceListener()
+void FileReaderWriterServiceProxy::initServiceListener()
 {
-	mServiceListener.reset(new ServiceTrackerListener<PortService>(
+	mServiceListener.reset(new ServiceTrackerListener<FileReaderWriterService>(
 								 mPluginContext,
-								 boost::bind(&PortServiceProxy::onServiceAdded, this, _1),
-								 boost::function<void (PortService*)>(),
-								 boost::bind(&PortServiceProxy::onServiceRemoved, this, _1)
+								 boost::bind(&FileReaderWriterServiceProxy::onServiceAdded, this, _1),
+								 boost::function<void (FileReaderWriterService*)>(),
+								 boost::bind(&FileReaderWriterServiceProxy::onServiceRemoved, this, _1)
 								 ));
 	mServiceListener->open();
 }
 
-void PortServiceProxy::onServiceAdded(PortService *service)
+void FileReaderWriterServiceProxy::onServiceAdded(FileReaderWriterService *service)
 {
 	std::cout << "Port Service added: " << service->objectName().toStdString() << std::endl;
-	mService.reset(service, null_deleter());
-	mService->addPort(service);
+	//mService.reset(service, null_deleter());
+	//mService->addPort(service);
 }
 
-void PortServiceProxy::onServiceRemoved(PortService *service)
+void FileReaderWriterServiceProxy::onServiceRemoved(FileReaderWriterService *service)
 {
 	std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
-	mService = PortService::getNullObject();
-	mService->removePort(service);
+	//mService = FileReaderWriterService::getNullObject();
+	//mService->removePort(service);
 }
+*/
 
 }

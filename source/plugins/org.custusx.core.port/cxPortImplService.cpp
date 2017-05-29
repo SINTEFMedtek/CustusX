@@ -35,79 +35,89 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxNullDeleter.h"
+#include "boost/bind.hpp"
 
 namespace cx
 {
 
-PortImplService::PortImplService(ctkPluginContext *context)
+FileManagerImpService::FileManagerImpService(ctkPluginContext *context) :
+	mPluginContext(context),
+	mService(FileManagerService::getNullObject())
+{
+	this->initServiceListener();
+}
+
+FileManagerImpService::~FileManagerImpService()
 {
 }
 
-PortImplService::~PortImplService()
-{
-}
-
-bool PortImplService::isNull()
+bool FileManagerImpService::isNull()
 {
 	return false;
 }
 
-bool PortImplService::canLoad(const QString &type, const QString &filename)
+QString FileManagerImpService::canLoadDataType() const
 {
-	PortServicePtr reader = this->findReader(filename);
+	std::cout << "[TODO] error FileManagerImpService::canLoadDataType not implemented yet." << std::endl;
+	return QString("TODO");
+}
+
+bool FileManagerImpService::canLoad(const QString &type, const QString &filename)
+{
+	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->canLoad(type, filename);
 	else
 		return false;
 }
 
-DataPtr PortImplService::load(const QString &uid, const QString &filename)
+DataPtr FileManagerImpService::load(const QString &uid, const QString &filename)
 {
-	PortServicePtr reader = this->findReader(filename);
+	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->load(uid, filename);
 	else
 		return DataPtr();
 }
 
-PortServicePtr PortImplService::findReader(const QString& path, const QString& type)
+FileReaderWriterServicePtr FileManagerImpService::findReader(const QString& path, const QString& type)
 {
-	for (std::set<PortServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
+	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
 	{
 		if ((*iter)->canLoad(type, path))
 			return *iter;
 	}
-	return PortServicePtr();
+	return FileReaderWriterServicePtr();
 }
 
-vtkImageDataPtr PortImplService::loadVtkImageData(QString filename)
+vtkImageDataPtr FileManagerImpService::loadVtkImageData(QString filename)
 {
-	PortServicePtr reader = this->findReader(filename);
+	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->loadVtkImageData(filename);
 	return vtkImageDataPtr();
 }
 
-vtkPolyDataPtr PortImplService::loadVtkPolyData(QString filename)
+vtkPolyDataPtr FileManagerImpService::loadVtkPolyData(QString filename)
 {
-	PortServicePtr reader = this->findReader(filename);
+	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->loadVtkPolyData(filename);
 	return vtkPolyDataPtr();
 }
 
-QString PortImplService::findDataTypeFromFile(QString filename)
+QString FileManagerImpService::findDataTypeFromFile(QString filename)
 {
-	PortServicePtr reader = this->findReader(filename);
+	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->canLoadDataType();
 	return "";
 }
 
-bool PortImplService::readInto(DataPtr data, QString path)
+bool FileManagerImpService::readInto(DataPtr data, QString path)
 {
 	bool success = false;
-	PortServicePtr reader = this->findReader(path, data->getType());
+	FileReaderWriterServicePtr reader = this->findReader(path, data->getType());
 	if (reader)
 		success = reader->readInto(data, path);
 
@@ -121,25 +131,50 @@ bool PortImplService::readInto(DataPtr data, QString path)
 
 }
 
-void PortImplService::saveImage(ImagePtr image, const QString &filename)
+void FileManagerImpService::saveImage(ImagePtr image, const QString &filename)
 {
-	PortServicePtr reader = this->findReader(filename);
+	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->saveImage(image, filename);
 }
 
-void PortImplService::addPort(PortService *service)
+void FileManagerImpService::addPort(FileReaderWriterService *service)
 {
 	//TODO
 	// adding a service inside a smartpointer... not so smart, think it is fixed with null_deleter
-	mDataReaders.insert(PortServicePtr(service, null_deleter()));
+	mDataReaders.insert(FileReaderWriterServicePtr(service, null_deleter()));
 }
 
-void PortImplService::removePort(PortService *service)
+void FileManagerImpService::removePort(FileReaderWriterService *service)
 {
 	//TODO
-	std::cout << "ERROR: unable to remove PortService" << std::endl;
+	std::cout << "[TODO] ERROR: unable to remove PortService" << std::endl;
 
+}
+
+void FileManagerImpService::initServiceListener()
+{
+	mServiceListener.reset(new ServiceTrackerListener<FileReaderWriterService>(
+								 mPluginContext,
+								 boost::bind(&FileManagerImpService::onServiceAdded, this, _1),
+								 boost::function<void (FileReaderWriterService*)>(),
+								 boost::bind(&FileManagerImpService::onServiceRemoved, this, _1)
+								 ));
+	mServiceListener->open();
+}
+
+void FileManagerImpService::onServiceAdded(FileReaderWriterService *service)
+{
+	std::cout << "Port Service added: " << service->objectName().toStdString() << std::endl;
+	//mService.reset(service, null_deleter());
+	mService->addPort(service);
+}
+
+void FileManagerImpService::onServiceRemoved(FileReaderWriterService *service)
+{
+	std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
+	//mService = FileReaderWriterService::getNullObject();
+	mService->removePort(service);
 }
 
 } // cx

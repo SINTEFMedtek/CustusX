@@ -1,21 +1,21 @@
-#ifndef CXPORTSERVICEPROXY_H
-#define CXPORTSERVICEPROXY_H
+#ifndef CXFILEMANAGERSERVICEPROXY_H
+#define CXFILEMANAGERSERVICEPROXY_H
 
 #include "cxResourceExport.h"
-#include "cxPortService.h"
-class ctkPluginContext;
+#include "cxFileManagerService.h"
+#include "cxServiceTrackerListener.h"
 
 namespace cx
 {
 
-class cxResource_EXPORT FileReaderWriterServiceProxy : public FileReaderWriterService
+class cxResource_EXPORT FileManagerServiceProxy : public FileManagerService
 {
 	Q_OBJECT
 public:
-	static FileReaderWriterServicePtr create(ctkPluginContext *context);
+	static FileManagerServicePtr create(ctkPluginContext *context);
 
-	FileReaderWriterServiceProxy(ctkPluginContext *context);
-	virtual ~FileReaderWriterServiceProxy() {}
+	FileManagerServiceProxy(ctkPluginContext *context);
+	virtual ~FileManagerServiceProxy();
 
 	virtual bool isNull();
 
@@ -23,6 +23,7 @@ public:
 	DataPtr load(const QString &uid, const QString &filename);
 	QString canLoadDataType() const;
 	bool readInto(DataPtr data, QString path);
+	QString findDataTypeFromFile(QString filename);
 
 	/*
 private:
@@ -33,9 +34,9 @@ private:
 	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
 */
 	ctkPluginContext *mPluginContext;
-	FileReaderWriterServicePtr mService;
+	FileManagerServicePtr mService;
 
 };
 }
 
-#endif // CXPORTSERVICEPROXY_H
+#endif // CXFILEMANAGERSERVICEPROXY_H

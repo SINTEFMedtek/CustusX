@@ -44,7 +44,7 @@ DataPtr XMLPolyDataMeshReader::load(const QString& uid, const QString& filename)
 	return mesh;
 }
 
-XMLPolyDataMeshReader::XMLPolyDataMeshReader(ctkPluginContext *context)
+XMLPolyDataMeshReader::XMLPolyDataMeshReader()
 {
 	this->setObjectName("XMLPolyDataMeshReader");
 }

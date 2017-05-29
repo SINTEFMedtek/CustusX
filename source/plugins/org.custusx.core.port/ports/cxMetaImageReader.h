@@ -9,12 +9,12 @@ class ctkPluginContext;
 namespace cx
 {
 
-class MetaImageReader : public PortService
+class MetaImageReader : public FileReaderWriterService
 {
 public:
-	Q_INTERFACES(cx::PortService)
+	Q_INTERFACES(cx::FileReaderWriterService)
 
-	MetaImageReader(ctkPluginContext *context);
+	MetaImageReader();
 	virtual ~MetaImageReader(){}
 	bool isNull();
 

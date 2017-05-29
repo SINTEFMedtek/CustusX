@@ -34,10 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
-#include "cxDataReaderWriter.h"
+#include "cxFileManagerService.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
+#include "cxBoundingBox3D.h"
 
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
@@ -56,11 +57,12 @@ CachedImageData::~CachedImageData()
 
 
 
-vtkImageDataPtr CachedImageData::getImage()
+vtkImageDataPtr CachedImageData::getImage(FileManagerServicePtr filemanager)
 {
 	if (!mImageData)
 	{
-		mImageData = MetaImageReader().loadVtkImageData(mFilename);
+		//mImageData = MetaImageReader().loadVtkImageData(mFilename);
+		mImageData = filemanager->loadVtkImageData(mFilename);
 	}
 	return mImageData;
 }
@@ -117,8 +119,9 @@ CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int siz
 	}
 }
 
-CachedImageDataContainer::CachedImageDataContainer() :
-    mDeleteFilesOnRelease(false)
+CachedImageDataContainer::CachedImageDataContainer(FileManagerServicePtr filemanagerservice) :
+	mDeleteFilesOnRelease(false),
+	mFileManagerService(filemanagerservice)
 {
 }
 
@@ -158,7 +161,7 @@ vtkImageDataPtr CachedImageDataContainer::get(unsigned index)
 	}
 //	int* a = NULL;
 //	*a = 5;
-	vtkImageDataPtr retval = mImages[index]->getImage();
+	vtkImageDataPtr retval = mImages[index]->getImage(mFileManagerService);
 	mImages[index]->purge();
 	return retval;
 }

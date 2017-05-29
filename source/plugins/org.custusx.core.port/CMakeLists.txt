@@ -16,9 +16,6 @@ set(PLUGIN_SRCS
     cxPortImplService.cpp
     cxPortServicePluginActivator.cpp
 
-    cxErrorObserver.h
-    cxErrorObserver.cpp
-
     ports/cxMetaImageReader.h
     ports/cxMetaImageReader.cpp
     ports/cxPNGImageReader.h
@@ -80,4 +77,4 @@ target_include_directories( org_custusx_core_port
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/org.custusx.core.port.md")
 
-#add_subdirectory(testing)
+add_subdirectory(testing)

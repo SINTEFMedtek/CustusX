@@ -45,12 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxXmlOptionItem.h"
 #include "cxTimeKeeper.h"
-#include "cxDataReaderWriter.h"
 #include "cxUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxCustomMetaImage.h"
+#include "cxErrorObserver.h"
 
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;

@@ -9,12 +9,12 @@ namespace cx
 /**\brief Reader for STL files.
  *
  */
-class StlMeshReader: public PortService
+class StlMeshReader: public FileReaderWriterService
 {
 public:
-	Q_INTERFACES(cx::PortService)
+	Q_INTERFACES(cx::FileReaderWriterService)
 
-	StlMeshReader(ctkPluginContext *context);
+	StlMeshReader();
 	virtual ~StlMeshReader(){}
 	virtual bool canLoad(const QString& type, const QString& filename);
 	virtual bool readInto(DataPtr data, QString path);

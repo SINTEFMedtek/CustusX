@@ -196,11 +196,11 @@ void VideoRecorderSaveThread::run()
 //---------------------------------------------------------
 
 
-SavingVideoRecorder::SavingVideoRecorder(VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor) :
+SavingVideoRecorder::SavingVideoRecorder(VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor, FileManagerServicePtr filemanagerservice) :
 //	mLastPurgedImageIndex(-1),
 	mSource(source)
 {
-	mImages.reset(new cx::CachedImageDataContainer());
+	mImages.reset(new cx::CachedImageDataContainer(filemanagerservice));
 	mImages->setDeleteFilesOnRelease(true);
 
 	mPrefix = prefix;

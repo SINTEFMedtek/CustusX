@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
-#include "cxDataReaderWriter.h"
 #include "cxNullDeleter.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxTrackingService.h"
@@ -78,11 +77,16 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 
 cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText)
 {
-	QString type = cx::DataReaderWriter().findDataTypeFromFile(fileName);
+	/*
+	QString type = mFileManagerService->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);
-	data->load(fileName);
+	data->load(fileName, mFileManagerService);
 	this->insertData(data);
 	return data;
+	*/
+
+	std::cout << "[WARNING/ERROR] this function does not actually load anything...." << std::endl;
+	return cx::DataPtr();
 }
 
 cx::RegistrationHistoryPtr PatientModelServiceMock::get_rMpr_History() const

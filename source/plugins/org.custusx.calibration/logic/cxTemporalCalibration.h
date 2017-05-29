@@ -89,7 +89,7 @@ private:
   QString mFilename;
   mutable std::stringstream mDebugStream;
   bool mAddRawToDebug;
-	vtkImageDataPtr mMask;
+  vtkImageDataPtr mMask;
 
 };
 

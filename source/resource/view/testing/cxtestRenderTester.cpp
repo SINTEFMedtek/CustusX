@@ -47,21 +47,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageAppendComponents.h>
 #include <vtkRendererCollection.h>
 #include <vtkImageImport.h>
-
-#include "cxBoundingBox3D.h"
-#include "cxView.h"
-#include "cxTypeConversions.h"
-#include "cxDataReaderWriter.h"
-#include "cxtestUtilities.h"
-#include "cxReporter.h"
-
-#include "cxUtilHelpers.h"
-
-
 #include "vtkTextMapper.h"
 #include "vtkActor2D.h"
 #include "vtkTextProperty.h"
 #include "vtkRendererCollection.h"
+
+#include "ctkPluginContext.h"
+
+#include "cxBoundingBox3D.h"
+#include "cxView.h"
+#include "cxTypeConversions.h"
+#include "cxtestUtilities.h"
+#include "cxReporter.h"
+#include "cxLogicManager.h"
+#include "cxUtilHelpers.h"
+#include "cxFileManagerServiceProxy.h"
+
+
 
 
 typedef vtkSmartPointer<class vtkProp> vtkPropPtr;
@@ -261,7 +263,9 @@ void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 
 vtkImageDataPtr RenderTester::readFromFile(QString filename)
 {
-	return cx::DataReaderWriter().loadVtkImageData(filename);
+	ctkPluginContext* context = cx::logicManager()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+	return filemanager->loadVtkImageData(filename);
 }
 
 vtkImageDataPtr RenderTester::readFromPNG(QString filename)

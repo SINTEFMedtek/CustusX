@@ -5,11 +5,11 @@
 namespace cx
 {
 
-PortServicePtr PortService::getNullObject()
+FileReaderWriterServicePtr FileReaderWriterService::getNullObject()
 {
-	static PortServicePtr mNull;
+	static FileReaderWriterServicePtr mNull;
 	if (!mNull)
-		mNull.reset(new PortServiceNull, null_deleter());
+		mNull.reset(new FileReaderWriterServiceNull, null_deleter());
 	return mNull;
 }
 }

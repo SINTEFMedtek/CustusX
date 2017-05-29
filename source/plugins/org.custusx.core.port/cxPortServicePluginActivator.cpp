@@ -44,27 +44,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PortServicePluginActivator::PortServicePluginActivator()
+FileManagerServicePluginActivator::FileManagerServicePluginActivator()
 {
 }
 
-PortServicePluginActivator::~PortServicePluginActivator()
+FileManagerServicePluginActivator::~FileManagerServicePluginActivator()
 {
 }
 
-void PortServicePluginActivator::start(ctkPluginContext* context)
+void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "PortServicePluginActivator::start" << std::endl;
-	mRegisteredPortService = RegisteredService::create<MetaImageReader>(context, PortService_iid);
-	mRegisteredPortService = RegisteredService::create<PNGImageReader>(context, PortService_iid);
-	mRegisteredPortService = RegisteredService::create<PolyDataMeshReader>(context, PortService_iid);
-	mRegisteredPortService = RegisteredService::create<XMLPolyDataMeshReader>(context, PortService_iid);
-	mRegisteredPortService = RegisteredService::create<StlMeshReader>(context, PortService_iid);
+	std::cout << "FileManagerServicePluginActivator::start" << std::endl;
+
+	//TODO add filemanagerservice
+	mRegisteredFileManagerService = RegisteredService::create<FileManagerImpService>(context, new FileManagerImpService(context), FileManagerService_iid);
+
+
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PNGImageReader>(context, new PNGImageReader(), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PolyDataMeshReader>(context, new PolyDataMeshReader(), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(), FileReaderWriterService_iid));
 }
 
-void PortServicePluginActivator::stop(ctkPluginContext* context)
+void FileManagerServicePluginActivator::stop(ctkPluginContext* context)
 {
-	mRegisteredPortService.reset();
+	mRegisteredFileManagerService.reset();
+	for(int i=0; i<mRegisteredFileReaderWriterServices.size(); ++i)
+		mRegisteredFileReaderWriterServices[i].reset();
 	Q_UNUSED(context);
 }
 

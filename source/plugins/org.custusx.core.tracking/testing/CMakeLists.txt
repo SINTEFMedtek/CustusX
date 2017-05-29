@@ -5,9 +5,6 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_org_custusx_core_tracking_SOURCE_FILES
         cxtestTrackingPlugin.cpp
-        cxtestToolFiles.cpp
-        cxtestTestToolMesh.h
-        cxtestTestToolMesh.cpp
         cxtestCatchTrackingService.cpp
         cxtestCatchProbe.cpp
         )

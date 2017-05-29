@@ -51,6 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxTime.h"
 #include <vtkImageMask.h>
+#include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 typedef vtkSmartPointer<vtkImageMask> vtkImageMaskPtr;
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
@@ -133,7 +135,8 @@ void TemporalCalibration::selectData(QString filename)
   if (!QFileInfo(filename).exists())
     return;
 
-  UsReconstructionFileReader fileReader;
+  FileManagerServicePtr filemanager = FileManagerServiceProxy::create(logicManager()->getPluginContext());
+  UsReconstructionFileReader fileReader(filemanager);
   mFileData = fileReader.readAllFiles(filename);
 
   if (!mFileData.mUsRaw)

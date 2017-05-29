@@ -39,7 +39,6 @@ if(BUILD_TESTING)
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp
-        cxtestDataReaderWriter.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

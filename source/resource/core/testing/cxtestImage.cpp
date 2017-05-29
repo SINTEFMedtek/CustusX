@@ -34,9 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxDataLocations.h"
-#include "cxDataReaderWriter.h"
 #include "cxImageTF3D.h"
 #include "cxTransferFunctions3DPresets.h"
+#include "cxVolumeHelpers.h"
 
 #include "cxProfile.h"
 
@@ -47,21 +47,26 @@ cx::ImagePtr readTestImage(QString uid, QString filename)
 {
 	//Copied from loadImageFromFile() in cxtestDicomConverter.cpp
 	cx::ImagePtr image = cx::Image::create(uid,uid);
-	cx::MetaImageReader().readInto(image, filename);
+	//cx::MetaImageReader().readInto(image, filename);
+	vtkImageDataPtr vtk_image = cx::generateVtkImageData(Eigen::Array3i(3,3,3), Eigen::Vector3d(1, 1, 1), 100);
+	image->setVtkImageData(vtk_image);
+
 	return image;
 }
 
 cx::ImagePtr readTestImage()
 {
 	QString uid = "testImage";
-	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
+	//QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
+	QString filename = "";
 	return readTestImage(uid, filename);
 }
 
 cx::ImagePtr readKaisaTestImage()
 {
 	QString uid = "kaisaTestImage";
-	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
+	//QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
+	QString filename = "";
 	return readTestImage(uid, filename);
 }
 

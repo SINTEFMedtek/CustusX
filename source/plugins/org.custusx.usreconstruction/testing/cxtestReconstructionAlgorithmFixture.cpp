@@ -169,14 +169,14 @@ void ReconstructionAlgorithmFixture::checkMassDifferenceBelow(double val)
 	this->getComparer()->checkMassDifferenceBelow(val);
 }
 
-void ReconstructionAlgorithmFixture::saveNominalOutputToFile(QString filename)
+void ReconstructionAlgorithmFixture::saveNominalOutputToFile(QString filename, cx::FileManagerServicePtr filemanager)
 {
-	this->getComparer()->saveNominalOutputToFile(filename);
+	this->getComparer()->saveNominalOutputToFile(filename, filemanager);
 }
 
-void ReconstructionAlgorithmFixture::saveOutputToFile(QString filename)
+void ReconstructionAlgorithmFixture::saveOutputToFile(QString filename, cx::FileManagerServicePtr filemanager)
 {
-	this->getComparer()->saveOutputToFile(filename);
+	this->getComparer()->saveOutputToFile(filename, filemanager);
 }
 
 } // namespace cxtest

@@ -59,9 +59,10 @@ namespace cx
 {
 
 
-UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, XmlOptionFile settings) :
+UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, FileManagerServicePtr filemanagerservice, XmlOptionFile settings) :
 	mPatientModelService(patientModelService),
-	mViewService(viewService)
+	mViewService(viewService),
+	mFileManagerService(filemanagerservice)
 {
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -221,7 +222,7 @@ void UsReconstructionImplService::selectData(QString filename, QString calFilesP
 		return;
 	}
 
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(mFileManagerService));
 	USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
 	fileData.mFilename = filename;
 	this->selectData(fileData);

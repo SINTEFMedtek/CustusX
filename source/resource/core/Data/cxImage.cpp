@@ -52,13 +52,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
 #include "cxLandmark.h"
-
+#include "cxFileManagerService.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxVolumeHelpers.h"
 #include "cxImageDefaultTFGenerator.h"
-#include "cxDataReaderWriter.h"
 #include "cxNullDeleter.h"
 #include "cxSettings.h"
 
@@ -584,10 +583,10 @@ double Image::loadAttribute(QDomNode dataNode, QString name, double defVal)
 	return defVal;
 }
 
-bool Image::load(QString path)
+bool Image::load(QString path, FileManagerServicePtr filemanager)
 {
 	ImagePtr self = ImagePtr(this, null_deleter());
-	DataReaderWriter().readInto(self, path);
+	filemanager->readInto(self, path);
 	return this->getBaseVtkImageData()!=0;
 }
 
@@ -932,13 +931,13 @@ double Image::computeResampleFactor(long maxVoxels)
 	return 1.0;
 }
 
-void Image::save(const QString& basePath)
+void Image::save(const QString& basePath, FileManagerServicePtr filemanager)
 {
 	QString filename = basePath + "/Images/" + this->getUid() + ".mhd";
 	this->setFilename(QDir(basePath).relativeFilePath(filename));
 
 	ImagePtr self = ImagePtr(this, null_deleter());
-	MetaImageReader().saveImage(self, filename);
+	filemanager->saveImage(self, filename);
 }
 
 void Image::startThresholdPreview(const Eigen::Vector2d &threshold)

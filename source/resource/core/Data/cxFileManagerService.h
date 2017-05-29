@@ -1,28 +1,27 @@
-#ifndef CXPORTSERVICE_H
-#define CXPORTSERVICE_H
+#ifndef CXFILEMANAGERSERVICE_H
+#define CXFILEMANAGERSERVICE_H
 
 #include <QObject>
 #include "cxResourceExport.h"
 #include "boost/shared_ptr.hpp"
 #include "cxData.h"
 
-#define FileReaderWriterService_iid "cx::FileReaderWriterService"
+#define FileManagerService_iid "cx::FileManagerService"
 
 namespace cx
 {
 
-typedef boost::shared_ptr<class FileReaderWriterService> FileReaderWriterServicePtr;
+typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
 
-//Same as old DataReader class
 
-class cxResource_EXPORT FileReaderWriterService : public QObject
+class cxResource_EXPORT FileManagerService : public QObject
 {
 	Q_OBJECT
 public:
-	virtual ~FileReaderWriterService() {}
+	virtual ~FileManagerService() {}
 
 	virtual bool isNull() = 0;
-	static FileReaderWriterServicePtr getNullObject();
+	static FileManagerServicePtr getNullObject();
 
 	virtual bool canLoad(const QString& type, const QString& filename) = 0;
 	virtual DataPtr load(const QString& uid, const QString& filename) = 0;
@@ -30,13 +29,18 @@ public:
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) { return vtkPolyDataPtr(); }
 	virtual QString canLoadDataType() const =0;
 	virtual bool readInto(DataPtr data, QString path) = 0;
+	virtual QString findDataTypeFromFile(QString filename) = 0;
 
 	//TODO Convert from Image to Data?
 	virtual void saveImage(ImagePtr image, const QString& filename){}
+
+
+	virtual void addPort(FileReaderWriterService *service) {}
+	virtual void removePort(FileReaderWriterService *service) {}
+
 };
 
 }
 
-Q_DECLARE_INTERFACE(cx::FileReaderWriterService, FileReaderWriterService_iid)
-
-#endif // CXPORTSERVICE_H
+Q_DECLARE_INTERFACE(cx::FileManagerService, FileManagerService_iid)
+#endif // CXFILEMANAGERSERVICE_H

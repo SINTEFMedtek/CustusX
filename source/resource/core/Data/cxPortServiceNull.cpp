@@ -36,31 +36,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-PortServiceNull::PortServiceNull() : PortService()
+FileReaderWriterServiceNull::FileReaderWriterServiceNull() : FileReaderWriterService()
 {
 }
 
-bool PortServiceNull::isNull()
+bool FileReaderWriterServiceNull::isNull()
 {
 	return true;
 }
 
-bool PortServiceNull::canLoad(const QString &type, const QString &filename)
+bool FileReaderWriterServiceNull::canLoad(const QString &type, const QString &filename)
 {
 	return false;
 }
 
-DataPtr PortServiceNull::load(const QString &uid, const QString &filename)
+DataPtr FileReaderWriterServiceNull::load(const QString &uid, const QString &filename)
 {
 	return DataPtr();
 }
 
-QString PortServiceNull::canLoadDataType() const
+QString FileReaderWriterServiceNull::canLoadDataType() const
 {
 	return "";
 }
 
-bool PortServiceNull::readInto(DataPtr data, QString path)
+bool FileReaderWriterServiceNull::readInto(DataPtr data, QString path)
 {
 	return false;
 }

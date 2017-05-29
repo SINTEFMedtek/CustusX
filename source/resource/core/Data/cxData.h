@@ -145,8 +145,8 @@ public:
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 	//Consider removing this, as these are only implemented in Mesh and Image
-	virtual bool load(QString path) = 0;
-	virtual void save(const QString& basePath) = 0;
+	virtual bool load(QString path, FileManagerServicePtr port) = 0;
+	virtual void save(const QString& basePath, FileManagerServicePtr port) = 0;
 
 	virtual CoordinateSystem getCoordinateSystem();
 

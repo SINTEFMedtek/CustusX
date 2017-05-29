@@ -48,9 +48,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
 #include "cxBoundingBox3D.h"
-#include "cxDataReaderWriter.h"
 #include "vtkProperty.h"
 #include "vtkImageData.h"
+#include "cxImage.h"
+#include "cxFileManagerService.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -96,10 +98,10 @@ bool Mesh::getIsWireframe() const
 	return mProperties.mRepresentation->getValue().toInt() == VTK_WIREFRAME;
 }
 
-bool Mesh::load(QString path)
+bool Mesh::load(QString path, FileManagerServicePtr filemanager)
 {
 	vtkPolyDataPtr raw;
-	raw = DataReaderWriter().loadVtkPolyData(path);
+	raw = filemanager->loadVtkPolyData(path);
 	if(raw)
 	{
 		this->setVtkPolyData(raw);
@@ -463,8 +465,11 @@ bool Mesh::isFiberBundle() const
 	return poly->GetLines()->GetNumberOfCells() > 0 && poly->GetPolys()->GetNumberOfCells() == 0 && poly->GetStrips()->GetNumberOfCells() == 0;
 }
 
-void Mesh::save(const QString& basePath)
+void Mesh::save(const QString& basePath, FileManagerServicePtr fileManager)
 {
+	//TODO use writer in port?
+	//fileManager->save(....)?
+	reportWarning("Mesh::save does not use the filemanager to save...");
 	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
 	writer->SetInputData(this->getVtkPolyData());
 	QString filename = basePath + "/Images/" + this->getUid() + ".vtk";

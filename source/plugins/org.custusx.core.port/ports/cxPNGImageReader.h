@@ -9,12 +9,12 @@ namespace cx {
 /**\brief Reader for portable network graphics .png files.
  *
  */
-class PNGImageReader: public PortService
+class PNGImageReader: public FileReaderWriterService
 {
 public:
-	Q_INTERFACES(cx::PortService)
+	Q_INTERFACES(cx::FileReaderWriterService)
 
-	PNGImageReader(ctkPluginContext *context);
+	PNGImageReader();
 	virtual ~PNGImageReader() {}
 	virtual bool canLoad(const QString& type, const QString& filename);
 	virtual bool readInto(DataPtr data, QString path);

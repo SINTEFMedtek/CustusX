@@ -33,22 +33,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXPORTIMPLSERVICE_H
 #define CXPORTIMPLSERVICE_H
 
+#include "cxFileManagerService.h"
 #include "cxPortService.h"
 #include "org_custusx_core_port_Export.h"
+#include "cxServiceTrackerListener.h"
 class ctkPluginContext;
 
 namespace cx
 {
 
-class org_custusx_core_port_EXPORT PortImplService : public PortService
+class org_custusx_core_port_EXPORT FileManagerImpService : public FileManagerService
 {
 public:
-	Q_INTERFACES(cx::PortService)
+	Q_INTERFACES(cx::FileManagerService)
 
-	PortImplService(ctkPluginContext *context);
-	virtual ~PortImplService();
+	FileManagerImpService(ctkPluginContext *context);
+	virtual ~FileManagerImpService();
 	virtual bool isNull();
 
+	QString canLoadDataType() const;
 	bool canLoad(const QString& type, const QString& filename);
 	DataPtr load(const QString& uid, const QString& filename);
 	vtkImageDataPtr loadVtkImageData(QString filename);
@@ -57,15 +60,25 @@ public:
 	bool readInto(DataPtr data, QString path);
 	void saveImage(ImagePtr image, const QString& filename);
 
-	void addPort(PortService *service);
-	void removePort(PortService *service);
+	void addPort(FileReaderWriterService *service);
+	void removePort(FileReaderWriterService *service);
 
 private:
-	PortServicePtr findReader(const QString& path, const QString& type="unknown");
-	std::set<PortServicePtr> mDataReaders;
+	void initServiceListener();
+	void onServiceAdded(FileReaderWriterService *service);
+	void onServiceRemoved(FileReaderWriterService *service);
+
+	ctkPluginContext *mPluginContext;
+	FileManagerServicePtr mService;
+	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
+
+private:
+	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
+	std::set<FileReaderWriterServicePtr> mDataReaders;
+
 };
 
-typedef boost::shared_ptr<PortImplService> PortImplServicePtr;
+typedef boost::shared_ptr<FileManagerImpService> PortImplServicePtr;
 
 } //cx
 

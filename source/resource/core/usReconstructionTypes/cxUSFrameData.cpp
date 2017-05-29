@@ -40,12 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkMetaImageWriter.h>
 #include <vtkImageImport.h>
 #include "cxTypeConversions.h"
-#include "cxDataReaderWriter.h"
 #include <QFileInfo>
 #include "cxTimeKeeper.h"
 #include "cxImageDataContainer.h"
 #include "cxVolumeHelpers.h"
 #include "cxLogger.h"
+#include "cxFileManagerService.h"
+#include "cxImage.h"
 
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
@@ -151,7 +152,7 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
   * files and try to load all mhdFile + i + ".mhd".
   * forall i.
   */
-USFrameDataPtr USFrameData::create(QString inputFilename)
+USFrameDataPtr USFrameData::create(QString inputFilename, FileManagerServicePtr fileManager)
 {
 	QFileInfo info(inputFilename);
 
@@ -160,7 +161,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 
 	if (QFileInfo(mhdSingleFile).exists())
 	{
-		vtkImageDataPtr image = DataReaderWriter().loadVtkImageData(mhdSingleFile);
+		vtkImageDataPtr image = fileManager->loadVtkImageData(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
 		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();

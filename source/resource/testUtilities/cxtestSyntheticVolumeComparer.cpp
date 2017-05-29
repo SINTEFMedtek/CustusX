@@ -37,10 +37,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxtestUtilities.h"
 #include <vtkImageData.h>
 #include "cxRegistrationTransform.h"
-#include "cxDataReaderWriter.h"
 #include <QDir>
 #include <QString>
 #include "cxTypeConversions.h"
+#include "cxFileManagerService.h"
 
 namespace cxtest
 {
@@ -154,14 +154,14 @@ double SyntheticVolumeComparer::getValue(cx::ImagePtr image, cx::Vector3D p_r)
 	return val;
 }
 
-void SyntheticVolumeComparer::saveNominalOutputToFile(QString filename)
+void SyntheticVolumeComparer::saveNominalOutputToFile(QString filename, cx::FileManagerServicePtr port)
 {
-	cx::MetaImageReader().saveImage(this->getNominalOutputImage(), this->addFullPath(filename));
+	port->saveImage(this->getNominalOutputImage(), this->addFullPath(filename));
 }
 
-void SyntheticVolumeComparer::saveOutputToFile(QString filename)
+void SyntheticVolumeComparer::saveOutputToFile(QString filename, cx::FileManagerServicePtr port)
 {
-	cx::MetaImageReader().saveImage(mTestImage, this->addFullPath(filename));
+	port->saveImage(mTestImage, this->addFullPath(filename));
 }
 
 QString SyntheticVolumeComparer::addFullPath(QString filename)

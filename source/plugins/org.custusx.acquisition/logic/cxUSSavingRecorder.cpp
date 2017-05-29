@@ -46,7 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxRecordSession.h"
 #include "cxUsReconstructionFileMaker.h"
-
+#include "cxFileManagerServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -78,6 +79,7 @@ void USSavingRecorder::set_rMpr(Transform3D rMpr)
 
 void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video)
 {
+	FileManagerServicePtr filemanager = FileManagerServiceProxy::create(logicManager()->getPluginContext());
 	this->clearRecording(); // clear previous data if any
 
 	mRecordingTool = tool;
@@ -95,7 +97,9 @@ void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolP
 								 cacheFolder,
 								 QString("%1_%2").arg(session->getDescription()).arg(video[i]->getUid()),
 								 false, // no compression when saving to cache
-								 mDoWriteColor));
+								 mDoWriteColor,
+								filemanager
+								));
 		videoRecorder->startRecord();
 		mVideoRecorder.push_back(videoRecorder);
 	}

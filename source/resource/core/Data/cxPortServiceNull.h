@@ -38,17 +38,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-class cxResource_EXPORT PortServiceNull : public PortService
+class cxResource_EXPORT FileReaderWriterServiceNull : public FileReaderWriterService
 {
 	Q_OBJECT
 public:
-	PortServiceNull();
-	~PortServiceNull() {}
+	FileReaderWriterServiceNull();
+	~FileReaderWriterServiceNull() {}
 
 	virtual bool isNull();
 
-	// PortService interface
-public:
 	bool canLoad(const QString &type, const QString &filename);
 	DataPtr load(const QString &uid, const QString &filename);
 	QString canLoadDataType() const;

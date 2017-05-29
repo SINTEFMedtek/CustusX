@@ -50,9 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "org_custusx_dicom_Export.h"
 #include "cxDicomWidget.h"
 #include "cxLogicManager.h"
-#include "cxDataReaderWriter.h"
-
-
+#include "cxFileManagerServiceProxy.h"
 
 typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
@@ -115,7 +113,10 @@ public:
 	cx::ImagePtr loadImageFromFile(QString filename, QString uid)
 	{
 		cx::ImagePtr image = cx::Image::create(uid,uid);
-		cx::DataReaderWriter().readInto(image, filename);
+		cx::LogicManager::initialize();
+		cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+		filemanager->readInto(image, filename);
+		//cx::DataReaderWriter().readInto(image, filename);
 		return image;
 	}
 
@@ -216,6 +217,10 @@ TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
 
 TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.dicom]")
 {
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+
 	cx::Reporter::initialize();
 	bool verbose = true;
 	DicomConverterTestFixture fixture;
@@ -257,7 +262,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 		{
 			std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
 			convertedImage->getBaseVtkImageData()->Print(std::cout);
-			cx::DataReaderWriter().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
+			filemanager->saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
 		}
 	}
 

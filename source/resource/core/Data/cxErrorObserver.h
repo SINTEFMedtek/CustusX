@@ -1,7 +1,7 @@
 #ifndef CXERROROBSERVER_H
 #define CXERROROBSERVER_H
 
-#include "org_custusx_core_port_Export.h"
+#include "cxResourceExport.h"
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QMutex>
@@ -23,7 +23,7 @@ namespace cx {
   *
   * Note: Googling indicates that VTK in general is threadUNsafe.
   */
-class org_custusx_core_port_EXPORT StaticMutexVtkLocker
+class cxResource_EXPORT StaticMutexVtkLocker
 {
 public:
 	StaticMutexVtkLocker();
@@ -42,7 +42,7 @@ private:
   * \date april 17, 2013
   * \author christiana
   */
-class ErrorObserver: public vtkCommand
+class cxResource_EXPORT ErrorObserver: public vtkCommand
 {
 public:
 	ErrorObserver() {}

@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QTextStream>
 
-#include "cxDataReaderWriter.h"
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 #include "cxPointMetric.h"

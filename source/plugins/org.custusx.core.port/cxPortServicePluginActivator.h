@@ -44,20 +44,21 @@ namespace cx
  *
  * \ingroup org_custusx_core_port
  */
-class PortServicePluginActivator :  public QObject, public ctkPluginActivator
+class FileManagerServicePluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
 	Q_INTERFACES(ctkPluginActivator)
 	Q_PLUGIN_METADATA(IID "org_custusx_core_port")
 public:
-	PortServicePluginActivator();
-	~PortServicePluginActivator();
+	FileManagerServicePluginActivator();
+	~FileManagerServicePluginActivator();
 
 	void start(ctkPluginContext* context);
 	void stop(ctkPluginContext* context);
 
 private:
-	RegisteredServicePtr mRegisteredPortService;
+	RegisteredServicePtr mRegisteredFileManagerService;
+	std::vector<RegisteredServicePtr> mRegisteredFileReaderWriterServices;
 };
 
 } // cx

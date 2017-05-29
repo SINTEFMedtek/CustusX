@@ -30,7 +30,7 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 	return zeroer->GetOutput();
 }
 
-MetaImageReader::MetaImageReader(ctkPluginContext *context)
+MetaImageReader::MetaImageReader()
 {
 	this->setObjectName("MetaImageReader");
 }

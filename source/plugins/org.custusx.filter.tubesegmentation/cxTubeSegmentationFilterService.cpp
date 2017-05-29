@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 #include "cxImage.h"
 #include "cxMesh.h"
-#include "cxDataReaderWriter.h"
+#include "cxFileManagerService.h"
 
 namespace cx {
 
@@ -587,10 +587,10 @@ vtkImageDataPtr TubeSegmentationFilter::importRawImageData(void * data, int size
 }
 
 MeshPtr TubeSegmentationFilter::loadVtkFile(QString pathToFile, QString newDatasUid){
-	DataReaderWriter reader;
+	FileManagerServicePtr reader = mServices->file();
 	DataPtr data;
-	if(reader.canLoad("vtk", pathToFile))
-		data = reader.load(newDatasUid, pathToFile);
+	if(reader->canLoad("vtk", pathToFile))
+		data = reader->load(newDatasUid, pathToFile);
 
 	MeshPtr retval = boost::dynamic_pointer_cast<Mesh>(data);
 

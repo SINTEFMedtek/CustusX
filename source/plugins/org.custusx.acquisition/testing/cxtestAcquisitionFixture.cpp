@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxAcquisitionServiceProxy.h"
 #include "cxSessionStorageService.h"
 #include "cxProfile.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cxtest
 {
@@ -211,7 +212,9 @@ void AcquisitionFixture::saveDataCompletedSlot(QString path)
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// read file and print info - this is the result of the file pathway
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	mFileOutputData.push_back(fileReader->readAllFiles(path, ""));
 }
 

@@ -43,7 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTime.h"
 #include "catch.hpp"
 #include "cxFileHelpers.h"
-
+#include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 #ifdef CX_WINDOWS
 #include <windows.h>
@@ -190,7 +191,9 @@ void USSavingRecorderFixture::verifySaveData()
 
 void USSavingRecorderFixture::verifySaveData(QString filename)
 {
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 
 	CHECK( hasBeenRead.mFilename == filename );
