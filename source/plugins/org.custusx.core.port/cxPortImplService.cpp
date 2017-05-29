@@ -35,14 +35,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
 #include "cxNullDeleter.h"
+#include "cxLogger.h"
 #include "boost/bind.hpp"
 
 namespace cx
 {
 
 FileManagerImpService::FileManagerImpService(ctkPluginContext *context) :
-	mPluginContext(context),
-	mService(FileManagerService::getNullObject())
+	mPluginContext(context)
 {
 	this->initServiceListener();
 }
@@ -167,14 +167,14 @@ void FileManagerImpService::onServiceAdded(FileReaderWriterService *service)
 {
 	std::cout << "Port Service added: " << service->objectName().toStdString() << std::endl;
 	//mService.reset(service, null_deleter());
-	mService->addPort(service);
+	this->addPort(service);
 }
 
 void FileManagerImpService::onServiceRemoved(FileReaderWriterService *service)
 {
 	std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
 	//mService = FileReaderWriterService::getNullObject();
-	mService->removePort(service);
+	this->removePort(service);
 }
 
 } // cx

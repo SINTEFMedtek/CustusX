@@ -69,7 +69,6 @@ private:
 	void onServiceRemoved(FileReaderWriterService *service);
 
 	ctkPluginContext *mPluginContext;
-	FileManagerServicePtr mService;
 	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
 
 private:

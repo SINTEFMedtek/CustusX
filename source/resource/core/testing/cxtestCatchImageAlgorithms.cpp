@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace cx;
 
-TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
+TEST_CASE("ImageAlgorithms: resample() works", "[integration][resource][core]")
 {
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();

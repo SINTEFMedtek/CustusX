@@ -25,14 +25,13 @@ public:
 	bool readInto(DataPtr data, QString path);
 	QString findDataTypeFromFile(QString filename);
 
-	/*
 private:
 	void initServiceListener();
-	void onServiceAdded(FileReaderWriterService *service);
-	void onServiceRemoved(FileReaderWriterService *service);
+	void onServiceAdded(FileManagerService *service);
+	void onServiceRemoved(FileManagerService *service);
 
-	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
-*/
+	boost::shared_ptr<ServiceTrackerListener<FileManagerService> > mServiceListener;
+
 	ctkPluginContext *mPluginContext;
 	FileManagerServicePtr mService;
 

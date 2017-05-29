@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProviderImpl.h"
 #include "cxTrackingService.h"
 #include "cxRegistrationTransform.h"
+#include "cxFileManagerServiceProxy.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -77,16 +79,13 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 
 cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText)
 {
-	/*
-	QString type = mFileManagerService->findDataTypeFromFile(fileName);
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	QString type = filemanager->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);
-	data->load(fileName, mFileManagerService);
+	data->load(fileName, filemanager);
 	this->insertData(data);
 	return data;
-	*/
-
-	std::cout << "[WARNING/ERROR] this function does not actually load anything...." << std::endl;
-	return cx::DataPtr();
 }
 
 cx::RegistrationHistoryPtr PatientModelServiceMock::get_rMpr_History() const

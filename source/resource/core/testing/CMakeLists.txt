@@ -78,6 +78,8 @@ if(BUILD_TESTING)
         PRIVATE
         ${CX_TESTRESOURCE_LINK_LIBS}
         cxCatch
+        org_custusx_core_port
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtestResource)
     
