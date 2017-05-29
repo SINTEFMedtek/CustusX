@@ -407,8 +407,6 @@ class CustusX(CppComponent):
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
-        add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
-        add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)            
@@ -434,67 +432,6 @@ class CustusX(CppComponent):
     def useInIntegrationTesting(self):
         'use during integration test'
         return True
-        
-# ---------------------------------------------------------
-
-
-class TubeSegmentationFramework(CppComponent):
-    def name(self):
-        return "Tube-Segmentation-Framework"
-    def help(self):
-        return 'Tube-Segmentation-Framework'
-#    def path(self):
-#        return self.controlData.getWorkingPath() + "/Tube-Segmentation-Framework"
-    def repository(self):
-        base = self.controlData.gitrepo_open_site_base
-        return '%s/Tube-Segmentation-Framework.git' % base
-    def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('9faceef98c6ee943a1301b0d57f9db0deb7e59e9')
-        self._getBuilder()._gitSubmoduleUpdate()
-    def configure(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
-        add('USE_C++11:BOOL', False)
-        add('SIPL_USE_GTK:BOOL', False)
-        add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
-        add('TSF_USE_EXTRNAL_OUL:BOOL', 'ON')
-        add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
-        if(platform.system() == 'Windows'):
-            add('BUILD_SHARED_LIBS:BOOL', 'OFF') #On windows we build TSF as static, because TSF and SIPL does not export symbols
-        builder.configureCMake()
-    def addConfigurationToDownstreamLib(self, builder):
-        add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', 'ON');
-
- # ---------------------------------------------------------
-
-class LevelSetSegmentation(CppComponent):
-    def name(self):
-        return "Level-Set-Segmentation"
-    def help(self):
-        return 'Level-Set-Segmentation'
-#    def path(self):
-#        return self.controlData.getWorkingPath() + "/" + self.name()
-    def repository(self):
-        return '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
-    def update(self):
-        # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
-        #repo = '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
-        #self._getBuilder().gitSetRemoteURL(repo, branch="master")
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('e49217188925845be9b336adcb2b9e81c26ea784')
-        self._getBuilder()._gitSubmoduleUpdate()
-    def configure(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
-        add('sipl_use_gtk:BOOL', 'OFF')
-        add('LS_USE_EXTRNAL_OUL:BOOL', 'ON')
-        add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
-        builder.configureCMake()
-    def addConfigurationToDownstreamLib(self, builder):
-        add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
         
 # ---------------------------------------------------------
 

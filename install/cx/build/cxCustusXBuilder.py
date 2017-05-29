@@ -295,9 +295,7 @@ class CustusXBuilder:
                       "/include/c++/*",
                       "/include/qt4/*",
                       "/usr/*",
-                      "/working/Tube-Segmentation-Framework/*", 
-                      "/working/ISB_DataStreaming/*", 
-                      "/working/Level-Set-Segmentation/*", 
+                      "/working/ISB_DataStreaming/*",
                       "/moc*.cxx",
                       "/CustusX/build_*",
                       "/Examples/*"]
