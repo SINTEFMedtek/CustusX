@@ -2,6 +2,7 @@
 #define CXMETAIMAGEREADER_H
 
 #include "cxPortService.h"
+#include "org_custusx_core_port_Export.h"
 #include <QFileInfo>
 
 class ctkPluginContext;
@@ -9,7 +10,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-class MetaImageReader : public FileReaderWriterService
+class org_custusx_core_port_EXPORT MetaImageReader : public FileReaderWriterService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)

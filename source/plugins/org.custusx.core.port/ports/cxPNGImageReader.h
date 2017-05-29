@@ -2,14 +2,14 @@
 #define CXPNGIMAGEREADER_H
 
 #include "cxPortService.h"
-class ctkPluginContext;
+#include "org_custusx_core_port_Export.h"
 
 namespace cx {
 
 /**\brief Reader for portable network graphics .png files.
  *
  */
-class PNGImageReader: public FileReaderWriterService
+class org_custusx_core_port_EXPORT PNGImageReader: public FileReaderWriterService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)

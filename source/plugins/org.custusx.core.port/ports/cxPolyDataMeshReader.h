@@ -2,6 +2,7 @@
 #define CXPOLYDATAMESHREADER_H
 
 #include "cxPortService.h"
+#include "org_custusx_core_port_Export.h"
 
 class ctkPluginContext;
 
@@ -10,7 +11,7 @@ namespace cx {
 /**\brief Reader for .vtk files.
  *
  */
-class PolyDataMeshReader: public FileReaderWriterService
+class org_custusx_core_port_EXPORT PolyDataMeshReader: public FileReaderWriterService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
