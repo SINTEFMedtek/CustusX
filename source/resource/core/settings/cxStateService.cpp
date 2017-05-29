@@ -152,6 +152,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("USsimulation/type", "Original data");
 	this->fillDefault("USsimulation/volume", "");
 	this->fillDefault("USsimulation/gain", 0.70);
+
+	this->fillDefault("Dicom/ShowAdvanced", false);
 }
 
 
