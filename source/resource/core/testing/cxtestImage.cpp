@@ -39,17 +39,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVolumeHelpers.h"
 
 #include "cxProfile.h"
+#include "cxLogicManager.h"
+#include "cxFileManagerService.h"
 
 namespace
 {
 
 cx::ImagePtr readTestImage(QString uid, QString filename)
 {
-	//Copied from loadImageFromFile() in cxtestDicomConverter.cpp
+	cx::LogicManager::initialize();
 	cx::ImagePtr image = cx::Image::create(uid,uid);
-	//cx::MetaImageReader().readInto(image, filename);
-	vtkImageDataPtr vtk_image = cx::generateVtkImageData(Eigen::Array3i(3,3,3), Eigen::Vector3d(1, 1, 1), 100);
-	image->setVtkImageData(vtk_image);
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	filemanager->readInto(image, filename);
+	//vtkImageDataPtr vtk_image = cx::generateVtkImageData(Eigen::Array3i(3,3,3), Eigen::Vector3d(1, 1, 1), 100);
+	//image->setVtkImageData(image);
 
 	return image;
 }
@@ -57,16 +60,14 @@ cx::ImagePtr readTestImage(QString uid, QString filename)
 cx::ImagePtr readTestImage()
 {
 	QString uid = "testImage";
-	//QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
-	QString filename = "";
+	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/BoatPhantom/MetaImage/baatFantom.mhd";
 	return readTestImage(uid, filename);
 }
 
 cx::ImagePtr readKaisaTestImage()
 {
 	QString uid = "kaisaTestImage";
-	//QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
-	QString filename = "";
+	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
 	return readTestImage(uid, filename);
 }
 
@@ -167,7 +168,6 @@ TEST_CASE("Image copy: Voxels equal", "[unit][resource][core]")
 			++voxelsAboveZero;
 		REQUIRE(*(voxel+i+offset) == *(voxelCopy+i+offset));
 	}
-//	std::cout << "Voxels larger than zero: " << voxelsAboveZero << std::endl;
 	REQUIRE(voxelsAboveZero > 1000);
 }
 

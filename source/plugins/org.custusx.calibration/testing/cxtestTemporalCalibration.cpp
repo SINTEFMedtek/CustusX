@@ -34,9 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataLocations.h"
 #include "cxTemporalCalibration.h"
+#include "cxLogicManager.h"
 
 TEST_CASE("TemporalCalibration reproduces old results on a test data set", "[unit][modules][calibration]")
 {
+  cx::LogicManager::initialize();
   cx::TemporalCalibration calibrator;
   QString filename = cx::DataLocations::getTestDataPath() + "/testing/20110511T092103_temporal_calib_mac.cx3/US_Acq/US-Acq_01_20110511T092317/US-Acq_01_20110511T092317.mhd";
   calibrator.selectData(filename);

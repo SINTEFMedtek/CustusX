@@ -156,12 +156,12 @@ double SyntheticVolumeComparer::getValue(cx::ImagePtr image, cx::Vector3D p_r)
 
 void SyntheticVolumeComparer::saveNominalOutputToFile(QString filename, cx::FileManagerServicePtr port)
 {
-	port->saveImage(this->getNominalOutputImage(), this->addFullPath(filename));
+	port->save(this->getNominalOutputImage(), this->addFullPath(filename));
 }
 
 void SyntheticVolumeComparer::saveOutputToFile(QString filename, cx::FileManagerServicePtr port)
 {
-	port->saveImage(mTestImage, this->addFullPath(filename));
+	port->save(mTestImage, this->addFullPath(filename));
 }
 
 QString SyntheticVolumeComparer::addFullPath(QString filename)

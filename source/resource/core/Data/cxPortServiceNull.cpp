@@ -65,5 +65,10 @@ bool FileReaderWriterServiceNull::readInto(DataPtr data, QString path)
 	return false;
 }
 
+void FileReaderWriterServiceNull::save(DataPtr data, const QString &filename)
+{
+
+}
+
 
 } // cx

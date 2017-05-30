@@ -27,6 +27,10 @@ public:
 	vtkImageDataPtr loadVtkImageData(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
 
+	void save(DataPtr data, const QString &filename);
+	void addPort(FileReaderWriterService *service);
+	void removePort(FileReaderWriterService *service);
+
 private:
 	void initServiceListener();
 	void onServiceAdded(FileManagerService *service);
@@ -36,6 +40,7 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	FileManagerServicePtr mService;
+
 };
 }
 

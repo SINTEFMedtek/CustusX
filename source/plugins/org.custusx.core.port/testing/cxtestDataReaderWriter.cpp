@@ -106,7 +106,7 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
    REQUIRE(expected_color_of_mesh.compare(mesh->getColor().name()) == 0);
 
    //REQUIRE(std::string(mesh->getColorArray()) != "");
-   std::cout << "color array: " << mesh->getColorArray() << std::endl;
+   //std::cout << "color array: " << mesh->getColorArray() << std::endl;
 
    delete reader;
 }

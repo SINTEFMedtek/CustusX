@@ -9,6 +9,7 @@
 #include "cxErrorObserver.h"
 #include "cxCustomMetaImage.h"
 #include "cxImage.h"
+#include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 
 namespace cx {
@@ -93,8 +94,11 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 	return image;
 }
 
-void MetaImageReader::saveImage(ImagePtr image, const QString& filename)
+void MetaImageReader::save(DataPtr data, const QString& filename)
 {
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	if(!image)
+		reportError("Could not cast data to image");
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 	writer->SetInputData(image->getBaseVtkImageData());
 	writer->SetFileDimensionality(3);

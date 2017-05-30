@@ -66,13 +66,13 @@ void FileManagerServiceProxy::initServiceListener()
 void FileManagerServiceProxy::onServiceAdded(FileManagerService *service)
 {
 	mService.reset(service, null_deleter());
-	std::cout << "FileManagerServiceProxy added: " << service->objectName().toStdString() << " this (filemanagerservice): " << service << std::endl;
+	//std::cout << "FileManagerServiceProxy added: " << service->objectName().toStdString() << " this (filemanagerservice): " << service << std::endl;
 }
 
 void FileManagerServiceProxy::onServiceRemoved(FileManagerService *service)
 {
 	mService = FileManagerService::getNullObject();
-	std::cout << "FileManagerServiceProxy removed" << std::endl;
+	//std::cout << "FileManagerServiceProxy removed" << std::endl;
 }
 
 vtkImageDataPtr FileManagerServiceProxy::loadVtkImageData(QString filename)
@@ -83,6 +83,21 @@ vtkImageDataPtr FileManagerServiceProxy::loadVtkImageData(QString filename)
 vtkPolyDataPtr FileManagerServiceProxy::loadVtkPolyData(QString filename)
 {
 	return mService->loadVtkPolyData(filename);
+}
+
+void FileManagerServiceProxy::save(DataPtr data, const QString &filename)
+{
+	mService->save(data, filename);
+}
+
+void FileManagerServiceProxy::addPort(FileReaderWriterService *service)
+{
+	mService->addPort(service);
+}
+
+void FileManagerServiceProxy::removePort(FileReaderWriterService *service)
+{
+	mService->removePort(service);
 }
 
 

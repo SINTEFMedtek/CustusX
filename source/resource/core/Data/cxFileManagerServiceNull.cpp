@@ -50,4 +50,19 @@ vtkImageDataPtr FileManagerServiceNull::loadVtkImageData(QString filename)
 	return vtkImageDataPtr();
 }
 
+void FileManagerServiceNull::save(DataPtr data, const QString &filename)
+{
+
+}
+
+void FileManagerServiceNull::addPort(FileReaderWriterService *service)
+{
+
+}
+
+void FileManagerServiceNull::removePort(FileReaderWriterService *service)
+{
+
+}
+
 }

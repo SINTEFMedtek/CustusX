@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkCellArray.h>
 #include <vtkColorSeries.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataWriter.h>
 #include <vtkPointData.h>
 #include <QDomDocument>
 #include <QColor>
@@ -53,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxFileManagerService.h"
 #include "cxLogger.h"
-
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -454,7 +453,6 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	}
 	poly->SetPoints(floatPoints.GetPointer());
 	poly->Modified();
-	//	poly->Update();
 
 	return poly;
 }
@@ -467,17 +465,10 @@ bool Mesh::isFiberBundle() const
 
 void Mesh::save(const QString& basePath, FileManagerServicePtr fileManager)
 {
-	//TODO use writer in port?
-	//fileManager->save(....)?
-	reportWarning("Mesh::save does not use the filemanager to save...");
-	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
-	writer->SetInputData(this->getVtkPolyData());
 	QString filename = basePath + "/Images/" + this->getUid() + ".vtk";
-	this->setFilename(QDir(basePath).relativeFilePath(filename));
-	writer->SetFileName(cstring_cast(filename));
+	MeshPtr self = MeshPtr(this, null_deleter());
+	fileManager->save(self, filename);
 
-	writer->Update();
-	writer->Write();
 }
 
 } // namespace cx

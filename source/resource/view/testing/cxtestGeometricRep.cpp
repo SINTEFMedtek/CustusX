@@ -61,13 +61,13 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 
 	QString info;
 	cx::DataPtr dataImage = cx::logicManager()->getPatientModelService()->importData(fileNameImage, info);
-	cx::DataPtr dataMesh = cx::logicManager()->getPatientModelService()->importData(meshFile, info);
 	REQUIRE(dataImage);
+	cx::DataPtr dataMesh = cx::logicManager()->getPatientModelService()->importData(meshFile, info);
 	REQUIRE(dataMesh);
 
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataImage);
-	cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataMesh);
 	REQUIRE(image);
+	cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataMesh);
 	REQUIRE(mesh);
 
 	INFO("Create a rep with the mesh and add it to a view.");

@@ -13,7 +13,6 @@ FileReaderWriterServiceProxy::FileReaderWriterServiceProxy(ctkPluginContext *con
 	mPluginContext(context),
 	mService(FileReaderWriterService::getNullObject())
 {
-	//this->initServiceListener();
 }
 
 bool FileReaderWriterServiceProxy::isNull()
@@ -40,32 +39,11 @@ bool FileReaderWriterServiceProxy::readInto(DataPtr data, QString path)
 {
 	return mService->readInto(data, path);
 }
-/*
 
-void FileReaderWriterServiceProxy::initServiceListener()
+void FileReaderWriterServiceProxy::save(DataPtr data, const QString &filename)
 {
-	mServiceListener.reset(new ServiceTrackerListener<FileReaderWriterService>(
-								 mPluginContext,
-								 boost::bind(&FileReaderWriterServiceProxy::onServiceAdded, this, _1),
-								 boost::function<void (FileReaderWriterService*)>(),
-								 boost::bind(&FileReaderWriterServiceProxy::onServiceRemoved, this, _1)
-								 ));
-	mServiceListener->open();
+	mService->save(data, filename);
 }
 
-void FileReaderWriterServiceProxy::onServiceAdded(FileReaderWriterService *service)
-{
-	std::cout << "Port Service added: " << service->objectName().toStdString() << std::endl;
-	//mService.reset(service, null_deleter());
-	//mService->addPort(service);
-}
-
-void FileReaderWriterServiceProxy::onServiceRemoved(FileReaderWriterService *service)
-{
-	std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
-	//mService = FileReaderWriterService::getNullObject();
-	//mService->removePort(service);
-}
-*/
 
 }

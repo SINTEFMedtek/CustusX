@@ -937,7 +937,7 @@ void Image::save(const QString& basePath, FileManagerServicePtr filemanager)
 	this->setFilename(QDir(basePath).relativeFilePath(filename));
 
 	ImagePtr self = ImagePtr(this, null_deleter());
-	filemanager->saveImage(self, filename);
+	filemanager->save(self, filename);
 }
 
 void Image::startThresholdPreview(const Eigen::Vector2d &threshold)

@@ -26,6 +26,8 @@ public:
 	virtual QString canLoadDataType() const { return "mesh"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 
+	virtual void save(DataPtr data, const QString& filename);
+
 	bool isNull(){ return false; }
 };
 

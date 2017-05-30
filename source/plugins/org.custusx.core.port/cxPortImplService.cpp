@@ -132,11 +132,11 @@ bool FileManagerImpService::readInto(DataPtr data, QString path)
 
 }
 
-void FileManagerImpService::saveImage(ImagePtr image, const QString &filename)
+void FileManagerImpService::save(DataPtr data, const QString &filename)
 {
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
-		return reader->saveImage(image, filename);
+		return reader->save(data, filename);
 }
 
 void FileManagerImpService::addPort(FileReaderWriterService *service)
@@ -167,13 +167,13 @@ void FileManagerImpService::initServiceListener()
 
 void FileManagerImpService::onServiceAdded(FileReaderWriterService *service)
 {
-	std::cout << "Port Service added: " << service->objectName().toStdString() << " to FileManagerImpService: " << this << std::endl;
+	//std::cout << "Port Service added: " << service->objectName().toStdString() << " to FileManagerImpService: " << this << std::endl;
 	this->addPort(service);
 }
 
 void FileManagerImpService::onServiceRemoved(FileReaderWriterService *service)
 {
-	std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
+	//std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
 	this->removePort(service);
 }
 

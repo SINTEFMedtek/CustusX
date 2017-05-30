@@ -32,11 +32,11 @@ public:
 	virtual QString findDataTypeFromFile(QString filename) = 0;
 
 	//TODO Convert from Image to Data?
-	virtual void saveImage(ImagePtr image, const QString& filename){}
+	virtual void save(DataPtr data, const QString& filename) = 0;
 
 
-	virtual void addPort(FileReaderWriterService *service) {}
-	virtual void removePort(FileReaderWriterService *service) {}
+	virtual void addPort(FileReaderWriterService *service) = 0;
+	virtual void removePort(FileReaderWriterService *service) = 0;
 
 };
 

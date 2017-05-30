@@ -25,6 +25,7 @@ if(BUILD_TESTING)
         cxtestUtilities
         org_custusx_core_port
         cxResource
+        cxLogicManager
         cxCatch
     )
     cx_add_tests_to_catch(cxtest_org_custusx_core_port)

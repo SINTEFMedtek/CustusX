@@ -51,6 +51,7 @@ public:
 	DataPtr load(const QString &uid, const QString &filename);
 	QString canLoadDataType() const;
 	bool readInto(DataPtr data, QString path);
+	void save(DataPtr data, const QString &filename);
 };
 
 }//cx

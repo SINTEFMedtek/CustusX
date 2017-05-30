@@ -22,6 +22,7 @@ public:
 	virtual QString canLoadDataType() const { return "image"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
+	void save(DataPtr data, const QString &filename) {};
 
 	bool isNull(){return false;}
 };

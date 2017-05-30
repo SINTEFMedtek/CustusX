@@ -262,7 +262,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 		{
 			std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
 			convertedImage->getBaseVtkImageData()->Print(std::cout);
-			filemanager->saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
+			filemanager->save(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
 		}
 	}
 

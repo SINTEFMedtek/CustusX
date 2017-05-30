@@ -22,6 +22,10 @@ public:
 	QString findDataTypeFromFile(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
 	vtkImageDataPtr loadVtkImageData(QString filename);
+
+	void save(DataPtr data, const QString &filename);
+	void addPort(FileReaderWriterService *service);
+	void removePort(FileReaderWriterService *service);
 };
 
 }

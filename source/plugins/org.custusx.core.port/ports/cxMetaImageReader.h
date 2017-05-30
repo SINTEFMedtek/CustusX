@@ -25,7 +25,7 @@ public:
 	virtual bool readInto(ImagePtr image, QString filename);
 	virtual DataPtr load(const QString& uid, const QString& filename);
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
-	virtual void saveImage(ImagePtr image, const QString& filename);
+	virtual void save(DataPtr data, const QString& filename);
 
 };
 

@@ -7,6 +7,8 @@
 #include "cxMesh.h"
 #include "cxErrorObserver.h"
 #include <ctkPluginContext.h>
+#include <vtkSTLWriter.h>
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -56,6 +58,19 @@ DataPtr StlMeshReader::load(const QString& uid, const QString& filename)
 	MeshPtr mesh(new Mesh(uid));
 	this->readInto(mesh, filename);
 	return mesh;
+}
+
+void StlMeshReader::save(DataPtr data, const QString &filename)
+{
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	if(!mesh)
+		reportError("Could not cast data to mesh");
+	vtkSTLWriterPtr writer = vtkSTLWriterPtr::New();
+	writer->SetInputData(mesh->getVtkPolyData());
+	writer->SetFileName(cstring_cast(filename));
+
+	writer->Update();
+	writer->Write();
 }
 
 }

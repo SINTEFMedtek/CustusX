@@ -54,12 +54,11 @@ FileManagerServicePluginActivator::~FileManagerServicePluginActivator()
 
 void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 {
-	std::cout << "FileManagerServicePluginActivator::start" << std::endl;
+	//std::cout << "FileManagerServicePluginActivator::start" << std::endl;
 
 	//TODO add filemanagerservice
 	FileManagerImpService *filemanager = new FileManagerImpService(context);
 	mRegisteredFileManagerService = RegisteredService::create<FileManagerImpService>(context, filemanager, FileManagerService_iid);
-
 
 
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(), FileReaderWriterService_iid));
@@ -68,7 +67,7 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(), FileReaderWriterService_iid));
 
-	std::cout << "FileManagerServicePluginActivator::end" << std::endl;
+	//std::cout << "FileManagerServicePluginActivator::end" << std::endl;
 }
 
 void FileManagerServicePluginActivator::stop(ctkPluginContext* context)

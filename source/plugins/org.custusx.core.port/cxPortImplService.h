@@ -58,7 +58,7 @@ public:
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
 	QString findDataTypeFromFile(QString filename);
 	bool readInto(DataPtr data, QString path);
-	void saveImage(ImagePtr image, const QString& filename);
+	void save(DataPtr data, const QString& filename);
 
 	void addPort(FileReaderWriterService *service);
 	void removePort(FileReaderWriterService *service);

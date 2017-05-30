@@ -30,9 +30,7 @@ public:
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) { return vtkPolyDataPtr(); }
 	virtual QString canLoadDataType() const =0;
 	virtual bool readInto(DataPtr data, QString path) = 0;
-
-	//TODO Convert from Image to Data?
-	virtual void saveImage(ImagePtr image, const QString& filename){}
+	virtual void save(DataPtr data, const QString& filename) = 0;
 };
 
 }

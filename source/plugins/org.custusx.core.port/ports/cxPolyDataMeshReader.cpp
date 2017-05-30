@@ -2,11 +2,13 @@
 
 #include <QFileInfo>
 #include <vtkPolyDataReader.h>
+#include <vtkPolyDataWriter.h>
 #include <vtkPolyData.h>
 #include <ctkPluginContext.h>
 #include "cxMesh.h"
 #include "cxErrorObserver.h"
 #include "cxTypeConversions.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -44,6 +46,19 @@ DataPtr PolyDataMeshReader::load(const QString& uid, const QString& filename)
 	MeshPtr mesh(new Mesh(uid));
 	this->readInto(mesh, filename);
 	return mesh;
+}
+
+void PolyDataMeshReader::save(DataPtr data, const QString &filename)
+{
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	if(!mesh)
+		reportError("Could not cast data to mesh");
+	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
+	writer->SetInputData(mesh->getVtkPolyData());
+	writer->SetFileName(cstring_cast(filename));
+
+	writer->Update();
+	writer->Write();
 }
 
 PolyDataMeshReader::PolyDataMeshReader()

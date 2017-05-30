@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxDataLocations.h"
 #include "cxPortImplService.h"
+#include "cxLogicManager.h"
 
 namespace cxtest {
 
@@ -48,7 +49,8 @@ void TestToolMesh::setToolPath(QString path)
 
 bool TestToolMesh::canLoadMesh(QString filename)
 {
-	cx::FileManagerServicePtr filemanager;
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 
 	bool success = true;
 

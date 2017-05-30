@@ -148,6 +148,7 @@ typedef vtkSmartPointer<class vtkShaderProgram2 > vtkShaderProgram2Ptr;
 typedef vtkSmartPointer<class vtkSortDataArray> vtkSortDataArrayPtr;
 typedef vtkSmartPointer<class vtkSphereSource> vtkSphereSourcePtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
+typedef vtkSmartPointer<class vtkSTLWriter> vtkSTLWriterPtr;
 typedef vtkSmartPointer<class vtkStripper> vtkStripperPtr;
 typedef vtkSmartPointer<class vtkTextActor3D> vtkTextActor3DPtr;
 typedef vtkSmartPointer<class vtkTextMapper> vtkTextMapperPtr;

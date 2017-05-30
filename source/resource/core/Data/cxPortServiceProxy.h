@@ -23,15 +23,8 @@ public:
 	DataPtr load(const QString &uid, const QString &filename);
 	QString canLoadDataType() const;
 	bool readInto(DataPtr data, QString path);
+	void save(DataPtr data, const QString &filename);
 
-	/*
-private:
-	void initServiceListener();
-	void onServiceAdded(FileReaderWriterService *service);
-	void onServiceRemoved(FileReaderWriterService *service);
-
-	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
-*/
 	ctkPluginContext *mPluginContext;
 	FileReaderWriterServicePtr mService;
 
