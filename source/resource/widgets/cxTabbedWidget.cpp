@@ -75,6 +75,11 @@ void TabbedWidget::tabChanged(const int &index)
 		widget->setFocus();
 }
 
+void TabbedWidget::setDefaultWidget(QWidget *widget)
+{
+    mTabWidget->setCurrentWidget(widget);
+}
+
 
 //------------------------------------------------------------------------------
 } //namespace cx

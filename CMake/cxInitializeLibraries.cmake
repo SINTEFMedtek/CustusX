@@ -84,27 +84,6 @@ macro(cx_initialize_opencl)
     endif()
 endmacro()
 
-###############################################################################
-# Initialize Level-Set-Segmentation library
-# Find the package and run the include USE file.
-###############################################################################
-macro(cx_initialize_level_set_segmentation)
-    find_package( Level-Set-Segmentation QUIET)
-    if(Level-Set-Segmentation_FOUND)
-        include(${Level-Set-Segmentation_USE_FILE})
-    endif()
-endmacro()
-
-###############################################################################
-# Initialize Tube-Segmentation-Framework library
-# Find the package and run the include USE file.
-###############################################################################
-macro(cx_initialize_TSF)
-    find_package( Tube-Segmentation-Framework QUIET)
-    if(Tube-Segmentation-Framework_FOUND)
-        include(${Tube-Segmentation-Framework_USE_FILE})
-    endif()
-endmacro()
 
 ###############################################################################
 # Initialize FAST library

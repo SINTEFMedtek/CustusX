@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef CXLANDMARKLISTENER_H
 #define CXLANDMARKLISTENER_H
 
+#include "org_custusx_registration_method_landmarkExport.h"
+
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 #include "cxRegServices.h"
@@ -45,7 +47,7 @@ typedef boost::shared_ptr<class ImageLandmarksSource> ImageLandmarksSourcePtr;
 typedef boost::shared_ptr<class Data> DataPtr;
 
 
-class LandmarkListener : public QObject
+class org_custusx_registration_method_landmark_EXPORT LandmarkListener : public QObject
 {
 Q_OBJECT
 

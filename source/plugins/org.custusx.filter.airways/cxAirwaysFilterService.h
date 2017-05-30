@@ -54,12 +54,9 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 namespace cx {
 
 /**
- * Filter for segmenting and extract the centerline of a volume.
+ * Filter for airway segmentation and centerline extraction of a CT volume.
  *
- * This filter can run either on the gpu or cpu.
- *
- * Algorithm written by Erik Smistad. For more information, see paper:
- * "GPU-Based Airway Segmentation and Centerline Extraction for Image Guided Bronchoscopy."
+ * Algorithm written by Erik Smistad.
  *
  */
 class org_custusx_filter_airways_EXPORT AirwaysFilter : public FilterImpl
@@ -75,6 +72,7 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 
+    bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
 
@@ -84,11 +82,14 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	//DoublePropertyPtr getNoiseLevelOption(QDomElement root);
+    static Vector3D getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr image);
+    static bool isSeedPointInsideImage(Vector3D, DataPtr);
+	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
 	vtkImageDataPtr mSegmentationOutput;
 	vtkPolyDataPtr mCenterlineOutput;
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
+    Vector3D seedPoint;
 
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
