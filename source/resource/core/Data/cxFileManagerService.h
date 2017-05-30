@@ -25,8 +25,8 @@ public:
 
 	virtual bool canLoad(const QString& type, const QString& filename) = 0;
 	virtual DataPtr load(const QString& uid, const QString& filename) = 0;
-	virtual vtkImageDataPtr loadVtkImageData(QString filename) { return vtkImageDataPtr(); }
-	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) { return vtkPolyDataPtr(); }
+	virtual vtkImageDataPtr loadVtkImageData(QString filename) = 0;
+	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) = 0;
 	virtual QString canLoadDataType() const =0;
 	virtual bool readInto(DataPtr data, QString path) = 0;
 	virtual QString findDataTypeFromFile(QString filename) = 0;

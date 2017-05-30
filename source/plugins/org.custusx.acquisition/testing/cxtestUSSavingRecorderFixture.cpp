@@ -192,7 +192,7 @@ void USSavingRecorderFixture::verifySaveData()
 void USSavingRecorderFixture::verifySaveData(QString filename)
 {
 	cx::LogicManager::initialize();
-	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 

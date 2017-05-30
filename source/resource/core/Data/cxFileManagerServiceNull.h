@@ -20,7 +20,8 @@ public:
 	QString canLoadDataType() const;
 	bool readInto(DataPtr data, QString path);
 	QString findDataTypeFromFile(QString filename);
-
+	vtkPolyDataPtr loadVtkPolyData(QString filename);
+	vtkImageDataPtr loadVtkImageData(QString filename);
 };
 
 }

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStateServiceProxy.h"
 #include "cxViewServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
+#include "cxFileManagerServiceProxy.h"
 #include "cxReporter.h"
 #include "cxProfile.h"
 
@@ -117,6 +118,9 @@ void LogicManager::createLegacyStoredServices()
 	// services layer
 	ctkPluginContext* pc = this->getPluginContext();
 
+	std::cout << "create filemanager" << std::endl;
+	mFileManagerService = FileManagerServiceProxy::create(pc);
+	std::cout << "logicmanagers filemanager: " << mFileManagerService << std::endl;
 	mTrackingService = TrackingServiceProxy::create(pc);
 	mPatientModelService = PatientModelServiceProxy::create(pc);
 	mVideoService = VideoServiceProxy::create(pc);
@@ -189,6 +193,7 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
 	this->shutdownService(mSessionStorageService, "SessionStorageService");
+	this->shutdownService(mFileManagerService, "FileManagerService");
 }
 
 
@@ -226,6 +231,13 @@ ViewServicePtr LogicManager::getViewService()
 SessionStorageServicePtr LogicManager::getSessionStorageService()
 {
 	return mSessionStorageService;
+}
+
+FileManagerServicePtr LogicManager::getFileManagerService()
+{
+	std::cout << "getFileManagerService: " << mFileManagerService << std::endl;
+	std::cout << "getFileManagerService: " << mFileManagerService.get() << std::endl;
+	return mFileManagerService;
 }
 PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 {

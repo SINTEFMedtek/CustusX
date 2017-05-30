@@ -44,6 +44,7 @@ namespace cx
 FileManagerImpService::FileManagerImpService(ctkPluginContext *context) :
 	mPluginContext(context)
 {
+	this->setObjectName("FileManagerImpService");
 	this->initServiceListener();
 }
 
@@ -143,6 +144,7 @@ void FileManagerImpService::addPort(FileReaderWriterService *service)
 	//TODO
 	// adding a service inside a smartpointer... not so smart, think it is fixed with null_deleter
 	mDataReaders.insert(FileReaderWriterServicePtr(service, null_deleter()));
+	CX_LOG_DEBUG() << "Adding a reader/writer: " << service->objectName() << " to: " << this;
 }
 
 void FileManagerImpService::removePort(FileReaderWriterService *service)
@@ -165,15 +167,13 @@ void FileManagerImpService::initServiceListener()
 
 void FileManagerImpService::onServiceAdded(FileReaderWriterService *service)
 {
-	std::cout << "Port Service added: " << service->objectName().toStdString() << std::endl;
-	//mService.reset(service, null_deleter());
+	std::cout << "Port Service added: " << service->objectName().toStdString() << " to FileManagerImpService: " << this << std::endl;
 	this->addPort(service);
 }
 
 void FileManagerImpService::onServiceRemoved(FileReaderWriterService *service)
 {
 	std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
-	//mService = FileReaderWriterService::getNullObject();
 	this->removePort(service);
 }
 

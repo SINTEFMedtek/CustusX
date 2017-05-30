@@ -49,7 +49,7 @@ RegServices::RegServices(ctkPluginContext* context) :
 {
 	registrationService	 = RegistrationServicePtr(new RegistrationServiceProxy(context));
 	acquisitionService	 = AcquisitionServicePtr(new AcquisitionServiceProxy(context));
-	filemanagerService = FileManagerServicePtr(new FileManagerServiceProxy(context));
+	filemanagerService = FileManagerServiceProxy::create(context);//FileManagerServicePtr(new FileManagerServiceProxy(context));
 }
 
 RegServicesPtr RegServices::getNullObjects()

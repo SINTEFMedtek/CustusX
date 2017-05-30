@@ -40,4 +40,14 @@ QString FileManagerServiceNull::findDataTypeFromFile(QString filename)
 	return "";
 }
 
+vtkPolyDataPtr FileManagerServiceNull::loadVtkPolyData(QString filename)
+{
+	return vtkPolyDataPtr();
+}
+
+vtkImageDataPtr FileManagerServiceNull::loadVtkImageData(QString filename)
+{
+	return vtkImageDataPtr();
+}
+
 }

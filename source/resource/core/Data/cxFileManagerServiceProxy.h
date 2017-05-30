@@ -24,6 +24,8 @@ public:
 	QString canLoadDataType() const;
 	bool readInto(DataPtr data, QString path);
 	QString findDataTypeFromFile(QString filename);
+	vtkImageDataPtr loadVtkImageData(QString filename);
+	vtkPolyDataPtr loadVtkPolyData(QString filename);
 
 private:
 	void initServiceListener();
@@ -34,7 +36,6 @@ private:
 
 	ctkPluginContext *mPluginContext;
 	FileManagerServicePtr mService;
-
 };
 }
 

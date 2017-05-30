@@ -80,7 +80,7 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText)
 {
 	cx::LogicManager::initialize();
-	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	QString type = filemanager->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);
 	data->load(fileName, filemanager);

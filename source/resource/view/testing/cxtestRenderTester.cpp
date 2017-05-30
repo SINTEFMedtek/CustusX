@@ -95,23 +95,11 @@ RenderTesterPtr RenderTester::create(vtkRenderWindowPtr renderWindow, vtkRendere
 	return RenderTesterPtr(new RenderTester(renderWindow, renderer));
 }
 
-//RenderTesterPtr RenderTester::create(cx::RepPtr rep, const unsigned int viewAxisSize)
-//{
-//	return RenderTesterPtr(new RenderTester(rep, viewAxisSize));
-//}
-
 RenderTester::RenderTester() :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-//	mImageErrorThreshold = 1.0;
-//	mImageErrorThreshold = 100.0;
-//	mBorderOffset = 2;
-	//		mView = new ViewWidget(NULL);
-	//		// set some defaults nice for testing:
-	//		this->getView()->setBackgroundColor(QColor::fromRgbF(0.1, 0.4, 0.2));
-	////		this->getView()->getRenderWindow()->SetSize(301,300);
-	//		this->getView()->setGeometry(QRect(0,0,120,120));
+	cx::LogicManager::initialize();
 
 	mRenderWindow = vtkRenderWindowPtr::New();
 	mRenderer = vtkRendererPtr::New();
@@ -128,7 +116,7 @@ RenderTester::RenderTester(vtkRenderWindowPtr renderWindow) :
 	mImageErrorThreshold(100.0),
 	mBorderOffset(2)
 {
-//	CX_ASSERT(renderWindow->GetRenderers()->GetNumberOfItems()==1);
+
 }
 
 RenderTester::RenderTester(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer) :
@@ -138,23 +126,6 @@ RenderTester::RenderTester(vtkRenderWindowPtr renderWindow, vtkRendererPtr rende
 	mBorderOffset(2)
 {
 }
-
-//RenderTester::RenderTester(cx::RepPtr rep, const unsigned int viewAxisSize) :
-//	mImageErrorThreshold(100.0),
-//	mBorderOffset(2)
-//{
-//	mLayoutWidget.reset(cx::LayoutWidget::createViewWidgetLayout().data());
-//	mView = mLayoutWidget->addView(cx::View::VIEW, cx::LayoutRegion(0,0));
-//	mView->addRep(rep);
-//	mLayoutWidget->resize(viewAxisSize,viewAxisSize);
-//	mLayoutWidget->show();
-
-//	mRenderWindow = mView->getRenderWindow();
-//	mRenderer = mView->getRenderer();
-
-////??	mRenderWindow->SetSize(viewAxisSize,viewAxisSize);
-
-//}
 
 void RenderTester::setImageErrorThreshold(double value)
 {
@@ -204,38 +175,6 @@ vtkImageDataPtr RenderTester::renderToImage()
 	return this->getImageFromRenderWindow();
 }
 
-/*removed for testing fails on win
-vtkImageDataPtr RenderTester::getImageFromRenderWindow()
-{
-	mRenderWindow->Render();
-	mRenderWindow->Render();
-
-	vtkImageDataPtr retval = vtkImageDataPtr::New();
-
-//	std::cout << "mapped: " << mRenderWindow->GetMapped() << std::endl;
-//	mRenderWindow->Render();
-//	std::cout << "erase: " << mRenderWindow->GetErase() << std::endl;
-//	mRenderWindow->SetErase(false);
-//	mRenderWindow->SetDoubleBuffer(false);
-	Eigen::Vector2i size(mRenderWindow->GetSize());
-	bool useFrontBuffer = true; // false gives lots of garbage in the image - at least on mac
-	void* rawPointer = mRenderWindow->GetPixelData(0, 0, size[0]-1, size[1]-1, useFrontBuffer);
-
-	vtkImageImportPtr import = vtkImageImportPtr::New();
-
-//	std::cout << "size: " << size << std::endl;
-	import->SetImportVoidPointer(rawPointer, 0);
-	import->SetDataScalarTypeToUnsignedChar();
-	import->SetDataSpacing(1, 1, 1);
-	import->SetNumberOfScalarComponents(3);
-	import->SetWholeExtent(0, size[0]-1, 0, size[1]-1, 0, 0);
-	import->SetDataExtentToWholeExtent();
-	import->Update();
-
-	return import->GetOutput();
-}
-*/
-
 vtkImageDataPtr RenderTester::getImageFromRenderWindow()
 {
 	vtkWindowToImageFilterPtr windowToImageFilter = vtkWindowToImageFilterPtr::New();
@@ -263,9 +202,10 @@ void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 
 vtkImageDataPtr RenderTester::readFromFile(QString filename)
 {
-	ctkPluginContext* context = cx::logicManager()->getPluginContext();
-	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
-	return filemanager->loadVtkImageData(filename);
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	CX_LOG_DEBUG_CHECKPOINT() << " filemanager: " << filemanager;
+	vtkImageDataPtr image_data = filemanager->loadVtkImageData(filename);
+	return image_data;
 }
 
 vtkImageDataPtr RenderTester::readFromPNG(QString filename)

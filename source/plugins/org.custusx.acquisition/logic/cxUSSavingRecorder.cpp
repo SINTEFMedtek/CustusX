@@ -79,7 +79,7 @@ void USSavingRecorder::set_rMpr(Transform3D rMpr)
 
 void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video)
 {
-	FileManagerServicePtr filemanager = FileManagerServiceProxy::create(logicManager()->getPluginContext());
+	FileManagerServicePtr filemanager = logicManager()->getFileManagerService();
 	this->clearRecording(); // clear previous data if any
 
 	mRecordingTool = tool;

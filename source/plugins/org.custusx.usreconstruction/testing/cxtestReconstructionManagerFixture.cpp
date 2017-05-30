@@ -67,7 +67,7 @@ ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
 
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
 	mPatientModelService = cx::PatientModelServiceProxy::create(pluginContext);
-	mFileManagerService = cx::FileManagerServiceProxy::create(pluginContext);
+	mFileManagerService = cx::logicManager()->getFileManagerService();
 }
 
 ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()

@@ -213,7 +213,7 @@ void AcquisitionFixture::saveDataCompletedSlot(QString path)
 
 	// read file and print info - this is the result of the file pathway
 	cx::LogicManager::initialize();
-	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	mFileOutputData.push_back(fileReader->readAllFiles(path, ""));
 }

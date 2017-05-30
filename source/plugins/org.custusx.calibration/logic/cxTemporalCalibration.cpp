@@ -135,7 +135,7 @@ void TemporalCalibration::selectData(QString filename)
   if (!QFileInfo(filename).exists())
     return;
 
-  FileManagerServicePtr filemanager = FileManagerServiceProxy::create(logicManager()->getPluginContext());
+  FileManagerServicePtr filemanager = logicManager()->getFileManagerService();
   UsReconstructionFileReader fileReader(filemanager);
   mFileData = fileReader.readAllFiles(filename);
 

@@ -17,6 +17,7 @@ FileManagerServiceProxy::FileManagerServiceProxy(ctkPluginContext *context) :
 	this->initServiceListener();
 }
 
+
 FileManagerServiceProxy::~FileManagerServiceProxy()
 {}
 
@@ -65,13 +66,23 @@ void FileManagerServiceProxy::initServiceListener()
 void FileManagerServiceProxy::onServiceAdded(FileManagerService *service)
 {
 	mService.reset(service, null_deleter());
-	std::cout << "FileManagerServiceProxy added" << std::endl;
+	std::cout << "FileManagerServiceProxy added: " << service->objectName().toStdString() << " this (filemanagerservice): " << service << std::endl;
 }
 
 void FileManagerServiceProxy::onServiceRemoved(FileManagerService *service)
 {
 	mService = FileManagerService::getNullObject();
 	std::cout << "FileManagerServiceProxy removed" << std::endl;
+}
+
+vtkImageDataPtr FileManagerServiceProxy::loadVtkImageData(QString filename)
+{
+	return mService->loadVtkImageData(filename);
+}
+
+vtkPolyDataPtr FileManagerServiceProxy::loadVtkPolyData(QString filename)
+{
+	return mService->loadVtkPolyData(filename);
 }
 
 
