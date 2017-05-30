@@ -44,7 +44,6 @@ private slots:
 private:
     void setup();
 
-    RegServicesPtr mServices;
     QVBoxLayout* mVerticalLayout;
     XmlOptionFile mOptions;
     MeshPtr mMeshFixed;

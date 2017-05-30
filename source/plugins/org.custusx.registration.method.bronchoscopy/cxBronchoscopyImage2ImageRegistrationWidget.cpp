@@ -59,8 +59,7 @@ namespace cx
 BronchoscopyImage2ImageRegistrationWidget::BronchoscopyImage2ImageRegistrationWidget(RegServicesPtr services, QWidget* parent) :
     RegistrationBaseWidget(services, parent, "org_custusx_registration_method_bronchoscopy_image2image_widget",
                            "Bronchoscopy Registration"),
-    mBronchoscopyRegistration(new BronchoscopyRegistration()),
-    mServices(services)
+    mBronchoscopyRegistration(new BronchoscopyRegistration())
 {
     mVerticalLayout = new QVBoxLayout(this);
 }
@@ -97,7 +96,7 @@ void BronchoscopyImage2ImageRegistrationWidget::setup()
 
 QString BronchoscopyImage2ImageRegistrationWidget::defaultWhatsThis() const
 {
-    return QString();
+    return QString("Registration of CT images based on airway centerlines");
 }
 
 void BronchoscopyImage2ImageRegistrationWidget::registerSlot()
