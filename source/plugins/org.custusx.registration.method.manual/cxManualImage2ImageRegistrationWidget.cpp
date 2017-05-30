@@ -8,15 +8,15 @@ Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
 1. Redistributions of source code must retain the above copyright notice,
-	 this list of conditions and the following disclaimer.
+     this list of conditions and the following disclaimer.
 
 2. Redistributions in binary form must reproduce the above copyright notice,
-	 this list of conditions and the following disclaimer in the documentation
-	 and/or other materials provided with the distribution.
+     this list of conditions and the following disclaimer in the documentation
+     and/or other materials provided with the distribution.
 
 3. Neither the name of the copyright holder nor the names of its contributors
-	 may be used to endorse or promote products derived from this software
-	 without specific prior written permission.
+     may be used to endorse or promote products derived from this software
+     without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -47,53 +47,51 @@ namespace cx
 
 
 ManualImage2ImageRegistrationWidget::ManualImage2ImageRegistrationWidget(RegServicesPtr services, QWidget *parent, QString objectName) :
-	ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
+    ManualImageRegistrationWidget(services, parent, objectName, "Manual Image to Image Registration")
 {
-	StringPropertyBasePtr fixedImage(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
-	StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services->registration(), services->patient()));
+    StringPropertyBasePtr fixedImage(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
+    StringPropertyBasePtr movingImage(new StringPropertyRegistrationMovingImage(services->registration(), services->patient()));
 
-	LabeledComboBoxWidget* fixed = new LabeledComboBoxWidget(this, fixedImage);
-	LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
+    LabeledComboBoxWidget* fixed = new LabeledComboBoxWidget(this, fixedImage);
+    LabeledComboBoxWidget* moving = new LabeledComboBoxWidget(this, movingImage);
 
     mAvarageAccuracyLabel = new QLabel(QString(" "), this);
 
-	mVerticalLayout->insertWidget(0, fixed);
-	mVerticalLayout->insertWidget(1, moving);
+    mVerticalLayout->insertWidget(0, fixed);
+    mVerticalLayout->insertWidget(1, moving);
     mVerticalLayout->insertWidget(2, mAvarageAccuracyLabel);
 }
 
 QString ManualImage2ImageRegistrationWidget::getDescription()
 {
-	if (this->isValid())
-		return QString("<b>Matrix fMm from moving to fixed image</b>");
-	else
-		return "<Invalid matrix>";
+    if (this->isValid())
+        return QString("<b>Matrix fMm from moving to fixed image</b>");
+    else
+        return "<Invalid matrix>";
 }
 
 bool ManualImage2ImageRegistrationWidget::isValid() const
 {
-	return mServices->registration()->getMovingData() && mServices->registration()->getFixedData();
+    return mServices->registration()->getMovingData() && mServices->registration()->getFixedData();
 }
 
 Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
 {
-	if (!this->isValid())
-		return Transform3D::Identity();
+    if (!this->isValid())               // Check if fixed and moving data are defined
+        return Transform3D::Identity();
 
-	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
-	Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
-	Transform3D fMm = rMf.inv() * rMm;
+    Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
+    Transform3D rMf = mServices->registration()->getFixedData()->get_rMd();
+    Transform3D fMm = rMf.inv() * rMm;
 
     RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
-    //Transform3D init_rMd = history->getData().front().mValue;
     Transform3D init_rMd;
-    if(!history->getData().empty())
+    if(!history->getData().empty())     // Is vector with RegistrationTransforms empty ?
         init_rMd = history->getData().front().mValue;
     else
         init_rMd = Transform3D::Identity();
 
     Transform3D current_rMd = history->getCurrentRegistration().mValue;
-
     fMm = current_rMd * init_rMd.inv();
 
     return fMm;
@@ -101,13 +99,20 @@ Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
 
 void ManualImage2ImageRegistrationWidget::setMatrixFromWidget(Transform3D M)
 {
-	if (!this->isValid())
-		return;
+    if (!this->isValid())               // Check if fixed and moving data are defined
+        return;
 
-	Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
+    Transform3D rMm = mServices->registration()->getMovingData()->get_rMd();
 
     RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
-    Transform3D init_rMd = history->getData().front().mValue;
+
+    Transform3D init_rMd;
+
+    if(!history->getData().empty())     // Is vector with RegistrationTransforms empty ?
+        init_rMd = history->getData().front().mValue;
+    else
+        init_rMd = Transform3D::Identity();
+
     Transform3D new_rMd = M * init_rMd;
     Transform3D delta = new_rMd * rMm.inv();
 
@@ -211,3 +216,4 @@ bool    ManualImage2ImageRegistrationWidget::isAverageAccuracyValid()
 
 
 } // cx
+
