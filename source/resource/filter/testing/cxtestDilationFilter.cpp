@@ -77,7 +77,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 		}
 		// Execute
 		{
-			INFO("Preprocessing LevelSetFilter failed.");
+            INFO("Preprocessing DilationFilter failed.");
 			REQUIRE(filter->preProcess());
 		}
 
@@ -85,7 +85,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 			REQUIRE(filter->execute());
 		}
 		{
-			INFO("Post processing data from Level Set Filter failed.");
+            INFO("Post processing data from Dilation Filter failed.");
 			REQUIRE(filter->postProcess());
 		}
 

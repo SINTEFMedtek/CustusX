@@ -72,6 +72,7 @@ private slots:
     void onViewHeader();
     void onImportIntoCustusXAction();
     void deleteDICOMDB();
+	void toggleDetailsSlot();
 
 private:
     virtual QSize sizeHint () const { return QSize(600, 100);};///< Define a recommended size
@@ -80,11 +81,14 @@ private:
 	ctkPluginContext* mContext;
 	QAction* mViewHeaderAction;
 	QAction* mImportIntoCustusXAction;
+	QAction* mDetailsAction;
+	QString mDicomShowAdvancedSettingsString;
 	void createUI();
 	void setupDatabaseDirectory();
 	void importSeries(QString seriesUid);
 	void loadIntoPatientModel(ImagePtr image, QString seriesUid);
 	QStringList currentSeriesSelection();
+	void showOrHideDetails();
 };
 
 } /* namespace cx */

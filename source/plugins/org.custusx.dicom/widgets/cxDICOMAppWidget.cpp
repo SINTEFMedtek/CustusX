@@ -100,6 +100,7 @@ public:
   QAction* ActionImport;
   QAction* ActionQuery;
   QAction* ActionRemove;
+  QList<QAction*> mAdvancedActions;
   DicomImporter Importer;
 
   ctkDICOMQueryRetrieveWidget* QueryRetrieveWidget;
@@ -159,20 +160,31 @@ void DICOMAppWidgetPrivate::setupUi(DICOMAppWidget* parent)
 	ToolBar = new QToolBar;
 	TopLayout->addWidget(ToolBar);
 
-	ActionImport = new QAction("Open", this);
-	ActionImport->setToolTip("Open and load a DICOM file or folder");
+	ActionImport = new QAction("Open file(s)", this);
+	QString helpText = "Open a DICOM file or folder and make it ready for import";
+	ActionImport->setToolTip(helpText);
+	ActionImport->setStatusTip(helpText);
+	ActionImport->setIcon(QIcon(":/icons/open_icon_library/document-open-7.png"));
 	q->connect(ActionImport, SIGNAL(triggered()), &Importer, SLOT(openImportDialog()));
 	ToolBar->addAction(ActionImport);
 
-	ActionQuery = new QAction("Query", this);
-	ActionQuery->setToolTip("Query and Retrieve DICOM studies from a DICOM node");
-	q->connect(ActionQuery, SIGNAL(triggered()), q, SLOT(openQueryDialog()));
-	ToolBar->addAction(ActionQuery);
-
 	ActionRemove = new QAction("Remove", this);
-	ActionRemove->setToolTip("Remove selection from database");
+	helpText = "Remove the selected series";
+	ActionRemove->setToolTip(helpText);
+	ActionRemove->setStatusTip(helpText);
+	ActionRemove->setIcon(QIcon(":/icons/open_icon_library/dialog-close.png"));
 	q->connect(ActionRemove, SIGNAL(triggered()), q, SLOT(onRemoveAction()));
+	mAdvancedActions.append(ActionRemove);
 	ToolBar->addAction(ActionRemove);
+
+	ActionQuery = new QAction("Query", this);
+	helpText = "Query and Retrieve DICOM studies from a DICOM database";
+	ActionQuery->setToolTip(helpText);
+	ActionQuery->setStatusTip(helpText);
+	ActionQuery->setIcon(QIcon(":/icons/message_levels/dialog-information-4.png"));
+	q->connect(ActionQuery, SIGNAL(triggered()), q, SLOT(openQueryDialog()));
+	mAdvancedActions.append(ActionQuery);
+	ToolBar->addAction(ActionQuery);
 
 	QSplitter* splitter = new QSplitter;
 	splitter->setOrientation(Qt::Vertical);
@@ -620,6 +632,11 @@ void DICOMAppWidget::addActionToToolbar(QAction* action)
 {
 	Q_D(DICOMAppWidget);
 	d->ToolBar->addAction(action);
+}
+
+QList<QAction*> DICOMAppWidget::getAdvancedActions() const
+{
+	return d_ptr->mAdvancedActions;
 }
 
 
