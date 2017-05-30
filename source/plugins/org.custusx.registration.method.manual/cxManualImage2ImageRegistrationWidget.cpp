@@ -85,7 +85,13 @@ Transform3D ManualImage2ImageRegistrationWidget::getMatrixFromBackend()
 	Transform3D fMm = rMf.inv() * rMm;
 
     RegistrationHistoryPtr history = mServices->registration()->getMovingData()->get_rMd_History();
-    Transform3D init_rMd = history->getData().front().mValue;
+    //Transform3D init_rMd = history->getData().front().mValue;
+    Transform3D init_rMd;
+    if(!history->getData().empty())
+        init_rMd = history->getData().front().mValue;
+    else
+        init_rMd = Transform3D::Identity();
+
     Transform3D current_rMd = history->getCurrentRegistration().mValue;
 
     fMm = current_rMd * init_rMd.inv();

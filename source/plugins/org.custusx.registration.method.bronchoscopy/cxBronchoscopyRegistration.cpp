@@ -448,7 +448,7 @@ Eigen::Matrix4d registrationAlgorithmImage2Image(BranchListPtr branchesFixed, Br
 
     if (CTPositionsFixed.cols() < 10 || CTPositionsMoving.cols() < 10)
     {
-        std::cout << "Warning: Too few positions in centerline to perform registration." << std::endl;
+        CX_LOG_WARNING() << "Too few positions in centerline to perform registration.";
         return Eigen::Matrix4d::Identity();
     }
 
@@ -508,11 +508,10 @@ Eigen::Matrix4d registrationAlgorithmImage2Image(BranchListPtr branchesFixed, Br
 
         translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
 
-        std::cout << "Iteration nr " << iterationNumber << " translation: " << translation.array().abs().sum() << std::endl;
     }
 
     if (translation.array().abs().sum() > 1)
-        std::cout << "Warning: Registration did not converge within " << maxIterations <<" iterations, which is max number of iterations." << std::endl;
+        CX_LOG_WARNING() << "Registration did not converge within " << maxIterations <<" iterations, which is max number of iterations.";
 
     return registrationMatrix;
 }
@@ -668,19 +667,15 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistrationImage2Image
 
     if ( boost::math::isnan(regMatrix.sum()) )
     {
-        std::cout << "Warning: Registration matrix contains 'nan' number, using identity matrix." << std::endl;
+        CX_LOG_WARNING() << "Registration matrix contains 'nan' number, using identity matrix.";
         return Eigen::Matrix4d::Identity();
     }
 
         if ( boost::math::isinf(regMatrix.sum()) )
     {
-        std::cout << "Warning: Registration matrix contains 'inf' number, using identity matrix." << std::endl;
+        CX_LOG_WARNING() << "Registration matrix contains 'inf' number, using identity matrix.";
         return Eigen::Matrix4d::Identity();
     }
-
-    std::cout << "prMt from bronchoscopyRegistration: " << std::endl;
-        for (int i = 0; i < 4; i++)
-            std::cout << regMatrix.row(i) << std::endl;
 
     return regMatrix;
 }
