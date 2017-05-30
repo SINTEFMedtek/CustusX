@@ -172,7 +172,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename, FileManagerServicePtr 
 	{
 		USFrameDataPtr retval(new USFrameData());
 		retval->mName = QFileInfo(inputFilename).completeBaseName();
-		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1));
+		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1, fileManager));
 		retval->resetRemovedFrames();
 		return retval;
 	}

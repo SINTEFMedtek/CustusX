@@ -235,8 +235,6 @@ SessionStorageServicePtr LogicManager::getSessionStorageService()
 
 FileManagerServicePtr LogicManager::getFileManagerService()
 {
-	std::cout << "getFileManagerService: " << mFileManagerService << std::endl;
-	std::cout << "getFileManagerService: " << mFileManagerService.get() << std::endl;
 	return mFileManagerService;
 }
 PluginFrameworkManagerPtr LogicManager::getPluginFramework()

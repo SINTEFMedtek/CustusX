@@ -105,8 +105,8 @@ class cxResource_EXPORT CachedImageDataContainer : public ImageDataContainer
 {
 public:
 	CachedImageDataContainer(FileManagerServicePtr filemanagerservice);
-	CachedImageDataContainer(QString baseFilename, int size);
-	CachedImageDataContainer(std::vector<QString> frames);
+	CachedImageDataContainer(QString baseFilename, int size, FileManagerServicePtr filemanagerservice);
+	CachedImageDataContainer(std::vector<QString> frames, FileManagerServicePtr filemanagerservice);
 //	CachedImageDataContainer(std::vector<CachedImageDataPtr> frames);
 	virtual ~CachedImageDataContainer();
 	virtual vtkImageDataPtr get(unsigned index);
@@ -123,6 +123,7 @@ private:
 	std::vector<CachedImageDataPtr> mImages;
 	bool mDeleteFilesOnRelease;
 	FileManagerServicePtr mFileManagerService;
+	CachedImageDataContainer(){};
 };
 typedef boost::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
 

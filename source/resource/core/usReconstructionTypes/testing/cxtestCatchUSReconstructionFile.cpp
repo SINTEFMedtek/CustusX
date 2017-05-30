@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxUSFrameData.h"
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
-#include "ctkPluginContext.h"
 #include "cxFileManagerServiceProxy.h"
 
 
@@ -91,7 +90,7 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Cre
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and load USReconstructInputData", "[integration][resource][usReconstructionTypes]")
 {
-	ctkPluginContext* context = cx::logicManager()->getPluginContext();
+	cx::LogicManager::initialize();
 	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	ReconstructionData input = this->createSampleReconstructData();
 

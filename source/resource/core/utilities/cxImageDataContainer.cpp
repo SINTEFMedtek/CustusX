@@ -94,8 +94,9 @@ void ImageDataContainer::purgeAll()
 ///--------------------------------------------------------
 
 
-CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int size) :
-    mDeleteFilesOnRelease(false)
+CachedImageDataContainer::CachedImageDataContainer(QString baseFilename, int size, FileManagerServicePtr filemanagerservice) :
+	mDeleteFilesOnRelease(false),
+	mFileManagerService(filemanagerservice)
 {
 	QFileInfo info(baseFilename);
 
@@ -125,8 +126,9 @@ CachedImageDataContainer::CachedImageDataContainer(FileManagerServicePtr fileman
 {
 }
 
-CachedImageDataContainer::CachedImageDataContainer(std::vector<QString> frames) :
-    mDeleteFilesOnRelease(false)
+CachedImageDataContainer::CachedImageDataContainer(std::vector<QString> frames, FileManagerServicePtr filemanagerservice) :
+	mDeleteFilesOnRelease(false),
+	mFileManagerService(filemanagerservice)
 {
 	for (unsigned i=0; i<frames.size(); ++i)
 		this->append(frames[i]);
