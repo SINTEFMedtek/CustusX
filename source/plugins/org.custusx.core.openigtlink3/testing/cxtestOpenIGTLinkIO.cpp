@@ -111,7 +111,7 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 	//expecting server to be run with:
 	// PlusServer.exe --config-file="C:\d\PlusB-bin\PlusLibData\ConfigFiles\PlusDeviceSet_Server_BkProFocusOem.xml"
 
-	std::string ip = "10.218.140.124"; //ovs
+	std::string ip = "10.218.140.107"; //ovs
 	//std::string ip = "10.218.140.127"; //jbake
 	int port = 18944; //-1
 

@@ -88,7 +88,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
-	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
+//	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
 	if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
 	{
@@ -118,10 +118,10 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
 
-		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
-										<< " streamIdTo: " << content.streamIdTo
-										<< " streamIdFrom: " << content.streamIdFrom
-										<< " transform: " << cxtransform;
+//		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
+//										<< " streamIdTo: " << content.streamIdTo
+//										<< " streamIdFrom: " << content.streamIdFrom
+//										<< " transform: " << cxtransform;
 
 		double timestamp = header.timestamp;
 //		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
@@ -160,12 +160,13 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		igtlio::StringConverter::ContentData content = string->GetContent();
 
-		CX_LOG_DEBUG() << "STRING: "	<< " equipmentId: " << header.equipmentId
-										<< " encoding: " << content.encoding
-										<< " string: " << content.string_msg;
+//		CX_LOG_DEBUG() << "STRING: "	<< " equipmentId: " << header.equipmentId
+//										<< " encoding: " << content.encoding
+//										<< " string: " << content.string_msg;
 
 		QString message(content.string_msg.c_str());
 		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
+		//TODO: Also create/check isChanged?
 		if (mProbeDefinitionFromStringMessages->haveValidValues())
 		{
 //			QString deviceName(header.deviceName.c_str());

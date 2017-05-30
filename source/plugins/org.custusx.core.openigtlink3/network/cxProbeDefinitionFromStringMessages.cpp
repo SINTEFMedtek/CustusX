@@ -216,40 +216,50 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 
 
 	Vector3D spacing = mSectorInfo->mImage->getSpacing();
-	CX_LOG_DEBUG() << "Original spacing: " << spacing;
+//	CX_LOG_DEBUG() << "Original spacing: " << spacing;
 	DoubleBoundingBox3D boundingBox = mSectorInfo->mImage->boundingBox();
 
 	//The mm values received from BK is not in picture coords, but relative to an origin between startLine and stopLine
 	//Need values from B_GEOMETRY_PIXEL and B_GEOMETRY_TISSUE to complete calculation.
 
-	CX_LOG_DEBUG() << "boundingBox: " << boundingBox;
-	CX_LOG_DEBUG() << "mProbeType: " << mSectorInfo->mProbeType;
-	CX_LOG_DEBUG() << "mStartDepth: " << mSectorInfo->mStartDepth << " mStopDepth: " << mSectorInfo->mStopDepth;
-	CX_LOG_DEBUG() << "mStartLineX: " << mSectorInfo->mStartLineX << " mStartLineY: " << mSectorInfo->mStartLineY;
-	CX_LOG_DEBUG() << "mStopLineX: " << mSectorInfo->mStopLineX << " mStopLineY: " << mSectorInfo->mStopLineY;
-	CX_LOG_DEBUG() << "mStartLineAngle: " << mSectorInfo->mStartLineAngle << " mStopLineAngle: " << mSectorInfo->mStopLineAngle;
-	CX_LOG_DEBUG() << "mSpacingX: " << mSectorInfo->mSpacingX << " mSpacingY: " << mSectorInfo->mSpacingY;
-	CX_LOG_DEBUG() << "mSectorLeftPixels: " << mSectorInfo->mSectorLeftPixels << " mSectorRightPixels: " << mSectorInfo->mSectorRightPixels;
-	CX_LOG_DEBUG() << "mSectorTopPixels: " << mSectorInfo->mSectorTopPixels << " mSectorBottomPixels: " << mSectorInfo->mSectorBottomPixels;
+//	CX_LOG_DEBUG() << "boundingBox: " << boundingBox;
+//	CX_LOG_DEBUG() << "mProbeType: " << mSectorInfo->mProbeType;
+//	CX_LOG_DEBUG() << "mStartDepth: " << mSectorInfo->mStartDepth << " mStopDepth: " << mSectorInfo->mStopDepth;
+//	CX_LOG_DEBUG() << "mStartLineX: " << mSectorInfo->mStartLineX << " mStartLineY: " << mSectorInfo->mStartLineY;
+//	CX_LOG_DEBUG() << "mStopLineX: " << mSectorInfo->mStopLineX << " mStopLineY: " << mSectorInfo->mStopLineY;
+//	CX_LOG_DEBUG() << "mStartLineAngle: " << mSectorInfo->mStartLineAngle << " mStopLineAngle: " << mSectorInfo->mStopLineAngle;
+//	CX_LOG_DEBUG() << "mSpacingX: " << mSectorInfo->mSpacingX << " mSpacingY: " << mSectorInfo->mSpacingY;
+	//These values gives the scanner screen coordinates that the transmitted image is sent from
+	// Image dims: 668 544
+	// left 125, right 792, diff: 667
+	// top 262, bottom 805, diff: 543
+//	CX_LOG_DEBUG() << "mSectorLeftPixels: " << mSectorInfo->mSectorLeftPixels << " mSectorRightPixels: " << mSectorInfo->mSectorRightPixels;
+//	CX_LOG_DEBUG() << "mSectorTopPixels: " << mSectorInfo->mSectorTopPixels << " mSectorBottomPixels: " << mSectorInfo->mSectorBottomPixels;
 
 	mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, 1.0);
 	spacing = mSectorInfo->mImage->getSpacing();
-	CX_LOG_DEBUG() << "New spacing: " << spacing;
+//	CX_LOG_DEBUG() << "New spacing: " << spacing;
+	Eigen::Array3i dimensions(mSectorInfo->mImage->getBaseVtkImageData()->GetDimensions());
+//	CX_LOG_DEBUG() << "Image size: " << dimensions[0] << " " << dimensions[1] << " " << dimensions[2];
 
 	double width = 0;
 	Vector3D origin_p(0, 0, 0);
 
-	int centerX_pix = (mSectorInfo->mSectorRightPixels-mSectorInfo->mSectorLeftPixels)/2 + mSectorInfo->mSectorLeftPixels;
+//	int centerX_pix = (mSectorInfo->mSectorRightPixels-mSectorInfo->mSectorLeftPixels)/2 + mSectorInfo->mSectorLeftPixels;
+	int centerX_pix = dimensions[0]/2;
 	origin_p[0] = centerX_pix;
 
 	double originHeightAboveBox_mm = 0.0;
+	double originDistanceToStartLine_mm = 0.0;
 
 	ProbeDefinitionPtr probeDefinition;
 	if(mSectorInfo->mProbeType == 2) //linear
 	{
 		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tLINEAR));
 		width = fabs(mSectorInfo->mStartLineX - mSectorInfo->mStopLineX);
-		origin_p[1] = mSectorInfo->mSectorTopPixels;
+//		origin_p[1] = mSectorInfo->mSectorTopPixels;
+		origin_p[1] = 0;
+//		CX_LOG_DEBUG() << "width: " << width;
 	}
 	else if (mSectorInfo->mProbeType == 1)//sector
 	{
@@ -257,24 +267,27 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 		width = fabs(mSectorInfo->mStartLineAngle - mSectorInfo->mStopLineAngle);
 
 		originHeightAboveBox_mm = (mSectorInfo->mStartLineX) / tan(width / 2.0);
-		origin_p[1] = mSectorInfo->mSectorTopPixels - ( originHeightAboveBox_mm / spacing[1]);//Should be correct (untested)
-		CX_LOG_DEBUG() << "origin_p[1]: " << origin_p[1] << " originHeightAboveBox_mm: " << originHeightAboveBox_mm;
+		originDistanceToStartLine_mm = (mSectorInfo->mStartLineX) / sin(width / 2.0);
+//		origin_p[1] = mSectorInfo->mSectorTopPixels - ( originHeightAboveBox_mm / spacing[1]);
+		origin_p[1] = 0 - ( originHeightAboveBox_mm / spacing[1]);//Should be correct?
+//		CX_LOG_DEBUG() << "origin_p[1]: " << origin_p[1] << " originHeightAboveBox_mm: " << originHeightAboveBox_mm << " originDistanceToStartLine_mm: " << originDistanceToStartLine_mm;
 	}
 	else
 	{
 		CX_LOG_ERROR() << "ProbeDefinitionFromStringMessages::createProbeDefintion: Incorrect probe type: " << mSectorInfo->mProbeType;
 	}
 
-	double depthStart = mSectorInfo->mStartDepth + originHeightAboveBox_mm;
-	double depthEnd = mSectorInfo->mStopDepth + originHeightAboveBox_mm;
-	Eigen::Array3i dimensions(mSectorInfo->mImage->getBaseVtkImageData()->GetDimensions());
+	double depthStart = mSectorInfo->mStartDepth + originDistanceToStartLine_mm;
+	double depthEnd = mSectorInfo->mStopDepth + originDistanceToStartLine_mm;
 	QSize size(dimensions[0], dimensions[1]);
 
 	probeDefinition->setUid(uid);
 	probeDefinition->setOrigin_p(origin_p);
 	probeDefinition->setSpacing(spacing);
-	DoubleBoundingBox3D clipRect(mSectorInfo->mSectorLeftPixels, mSectorInfo->mSectorRightPixels,
-								 mSectorInfo->mSectorTopPixels, mSectorInfo->mSectorBottomPixels);
+	//DoubleBoundingBox3D clipRect(mSectorInfo->mSectorLeftPixels, mSectorInfo->mSectorRightPixels,
+	//							 mSectorInfo->mSectorTopPixels, mSectorInfo->mSectorBottomPixels);
+	DoubleBoundingBox3D clipRect(0, dimensions[0]-1,
+								 0, dimensions[1]-1);
 	probeDefinition->setClipRect_p(clipRect);
 	probeDefinition->setSector(depthStart, depthEnd, width);
 	probeDefinition->setSize(size);

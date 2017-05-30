@@ -181,7 +181,7 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp)
 {
-	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
+//	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
 	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
 	tool->toolTransformAndTimestampSlot(transform, timestamp);
 }
@@ -195,7 +195,7 @@ void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, ig
 
 void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition)
 {
-	CX_LOG_DEBUG() << "receiveProbedefinition for: " << devicename << "equipmentType: " << equipmentType;
+//	CX_LOG_DEBUG() << "receiveProbedefinition for: " << devicename << " equipmentType: " << equipmentType;
 	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
 	if(tool)
 	{
@@ -225,12 +225,12 @@ void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)
 
 OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType)
 {
-	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool: " << devicename;
+//	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool: " << devicename;
 	OpenIGTLinkToolPtr retval;
 	std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.find(devicename);
 	if(it == mTools.end())
 	{
-		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool. Create new tool: " << devicename;
+//		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool. Create new tool: " << devicename;
 		retval = OpenIGTLinkToolPtr(new OpenIGTLinkTool(devicename, equipmentType));
 		mTools[devicename] = retval;
 		//todo: will this work?
