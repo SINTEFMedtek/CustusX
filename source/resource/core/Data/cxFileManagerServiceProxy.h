@@ -28,8 +28,8 @@ public:
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
 
 	void save(DataPtr data, const QString &filename);
-	void addPort(FileReaderWriterService *service);
-	void removePort(FileReaderWriterService *service);
+	void addFileReaderWriter(FileReaderWriterService *service);
+	void removeFileReaderWriter(FileReaderWriterService *service);
 
 private:
 	void initServiceListener();

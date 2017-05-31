@@ -30,11 +30,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxPortServicePluginActivator.h"
+#include "cxFileManagerServicePluginActivator.h"
 
 #include <QtPlugin>
 
-#include "cxPortImplService.h"
+#include "cxFileManagerImplService.h"
 #include "cxMetaImageReader.h"
 #include "cxPNGImageReader.h"
 #include "cxPolyDataMeshReader.h"

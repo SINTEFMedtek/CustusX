@@ -30,36 +30,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPORTSERVICEPLUGINACTIVATOR_H
-#define CXPORTSERVICEPLUGINACTIVATOR_H
-#include <ctkPluginActivator.h>
-#include "boost/shared_ptr.hpp"
-#include "cxRegisteredService.h"
+#ifndef CXFILEREADERWRITERNULL_H
+#define CXFILEREADERWRITERNULL_H
+
+#include "cxFileReaderWriterService.h"
 
 namespace cx
 {
 
-/**
- * Activator for the port plugin
- *
- * \ingroup org_custusx_core_port
- */
-class FileManagerServicePluginActivator :  public QObject, public ctkPluginActivator
+class cxResource_EXPORT FileReaderWriterServiceNull : public FileReaderWriterService
 {
 	Q_OBJECT
-	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_core_port")
 public:
-	FileManagerServicePluginActivator();
-	~FileManagerServicePluginActivator();
+	FileReaderWriterServiceNull();
+	~FileReaderWriterServiceNull() {}
 
-	void start(ctkPluginContext* context);
-	void stop(ctkPluginContext* context);
+	virtual bool isNull();
 
-private:
-	RegisteredServicePtr mRegisteredFileManagerService;
-	std::vector<RegisteredServicePtr> mRegisteredFileReaderWriterServices;
+	bool canLoad(const QString &type, const QString &filename);
+	DataPtr load(const QString &uid, const QString &filename);
+	QString canLoadDataType() const;
+	bool readInto(DataPtr data, QString path);
+	void save(DataPtr data, const QString &filename);
 };
 
-} // cx
-#endif // CXPORTSERVICEPLUGINACTIVATOR_H
+}//cx
+
+#endif // CXFILEREADERWRITERNULL_H

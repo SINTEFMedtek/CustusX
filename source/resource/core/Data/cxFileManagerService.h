@@ -35,8 +35,8 @@ public:
 	virtual void save(DataPtr data, const QString& filename) = 0;
 
 
-	virtual void addPort(FileReaderWriterService *service) = 0;
-	virtual void removePort(FileReaderWriterService *service) = 0;
+	virtual void addFileReaderWriter(FileReaderWriterService *service) = 0;
+	virtual void removeFileReaderWriter(FileReaderWriterService *service) = 0;
 
 };
 

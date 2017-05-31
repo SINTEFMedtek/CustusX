@@ -1,36 +1,36 @@
 ###########################################################
-##               Port Plugin
+##               FileManager Plugin
 ##
 ##               Plugin
 ##
-##  Description: Porting data in or out of CustusX
+##  Description: Managing reading and writing of files in CustusX
 ##
 ##
 ###########################################################
-project(org_custusx_core_port)
+project(org_custusx_core_filemanager)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
-    cxPortImplService.h
-    cxPortImplService.cpp
-    cxPortServicePluginActivator.cpp
+    cxFileManagerImplService.h
+    cxFileManagerImplService.cpp
+    cxFileManagerServicePluginActivator.cpp
 
-    ports/cxMetaImageReader.h
-    ports/cxMetaImageReader.cpp
-    ports/cxPNGImageReader.h
-    ports/cxPNGImageReader.cpp
-    ports/cxPolyDataMeshReader.h
-    ports/cxPolyDataMeshReader.cpp
-    ports/cxXMLPolyDataMeshReader.h
-    ports/cxXMLPolyDataMeshReader.cpp
-    ports/cxStlMeshReader.h
-    ports/cxStlMeshReader.cpp
+    filereaderwriters/cxMetaImageReader.h
+    filereaderwriters/cxMetaImageReader.cpp
+    filereaderwriters/cxPNGImageReader.h
+    filereaderwriters/cxPNGImageReader.cpp
+    filereaderwriters/cxPolyDataMeshReader.h
+    filereaderwriters/cxPolyDataMeshReader.cpp
+    filereaderwriters/cxXMLPolyDataMeshReader.h
+    filereaderwriters/cxXMLPolyDataMeshReader.cpp
+    filereaderwriters/cxStlMeshReader.h
+    filereaderwriters/cxStlMeshReader.cpp
 )
 
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
-    cxPortServicePluginActivator.h
+    cxFileManagerServicePluginActivator.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -67,14 +67,14 @@ ctkMacroBuildPlugin(
   ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
-target_include_directories( org_custusx_core_port
+target_include_directories( org_custusx_core_filemanager
     PUBLIC
     .
-    ./ports
+    ./filereaderwriters
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
-cx_add_non_source_file("doc/org.custusx.core.port.md")
+cx_add_non_source_file("doc/org.custusx.core.filemanager.md")
 
 add_subdirectory(testing)

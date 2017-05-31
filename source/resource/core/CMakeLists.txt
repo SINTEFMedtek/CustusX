@@ -32,9 +32,9 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxActiveImageProxy
     Data/cxTrackedStream
     Data/cxActiveData
-    Data/cxPortService
-    Data/cxPortServiceProxy
-    Data/cxPortServiceNull
+    Data/cxFileReaderWriterService
+    Data/cxFileReaderWriterServiceProxy
+    Data/cxFileReaderWriterServiceNull
     Data/cxFileManagerService
     Data/cxFileManagerServiceProxy
     Data/cxFileManagerServiceNull

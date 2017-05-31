@@ -1,8 +1,8 @@
-#ifndef CXPORTSERVICEPROXY_H
-#define CXPORTSERVICEPROXY_H
+#ifndef CXFILEREADERWRITERSERVICEPROXY_H
+#define CXFILEREADERWRITERSERVICEPROXY_H
 
 #include "cxResourceExport.h"
-#include "cxPortService.h"
+#include "cxFileReaderWriterService.h"
 class ctkPluginContext;
 
 namespace cx
@@ -31,4 +31,4 @@ public:
 };
 }
 
-#endif // CXPORTSERVICEPROXY_H
+#endif // CXFILEREADERWRITERSERVICEPROXY_H

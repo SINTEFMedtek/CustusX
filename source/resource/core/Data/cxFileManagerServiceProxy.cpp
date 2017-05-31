@@ -90,14 +90,14 @@ void FileManagerServiceProxy::save(DataPtr data, const QString &filename)
 	mService->save(data, filename);
 }
 
-void FileManagerServiceProxy::addPort(FileReaderWriterService *service)
+void FileManagerServiceProxy::addFileReaderWriter(FileReaderWriterService *service)
 {
-	mService->addPort(service);
+	mService->addFileReaderWriter(service);
 }
 
-void FileManagerServiceProxy::removePort(FileReaderWriterService *service)
+void FileManagerServiceProxy::removeFileReaderWriter(FileReaderWriterService *service)
 {
-	mService->removePort(service);
+	mService->removeFileReaderWriter(service);
 }
 
 

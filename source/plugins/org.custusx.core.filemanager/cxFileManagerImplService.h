@@ -30,45 +30,55 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxPortServiceNull.h"
-#include "cxLogger.h"
+#ifndef CXFILEMANAGERIMPLSERVICE_H
+#define CXFILEMANAGERIMPLSERVICE_H
+
+#include "cxFileManagerService.h"
+#include "cxFileReaderWriterService.h"
+#include "org_custusx_core_filemanager_Export.h"
+#include "cxServiceTrackerListener.h"
+class ctkPluginContext;
 
 namespace cx
 {
 
-FileReaderWriterServiceNull::FileReaderWriterServiceNull() : FileReaderWriterService()
+class org_custusx_core_filemanager_EXPORT FileManagerImpService : public FileManagerService
 {
-}
+public:
+	Q_INTERFACES(cx::FileManagerService)
 
-bool FileReaderWriterServiceNull::isNull()
-{
-	return true;
-}
+	FileManagerImpService(ctkPluginContext *context);
+	virtual ~FileManagerImpService();
+	virtual bool isNull();
 
-bool FileReaderWriterServiceNull::canLoad(const QString &type, const QString &filename)
-{
-	return false;
-}
+	QString canLoadDataType() const;
+	bool canLoad(const QString& type, const QString& filename);
+	DataPtr load(const QString& uid, const QString& filename);
+	vtkImageDataPtr loadVtkImageData(QString filename);
+	vtkPolyDataPtr loadVtkPolyData(QString filename);
+	QString findDataTypeFromFile(QString filename);
+	bool readInto(DataPtr data, QString path);
+	void save(DataPtr data, const QString& filename);
 
-DataPtr FileReaderWriterServiceNull::load(const QString &uid, const QString &filename)
-{
-	return DataPtr();
-}
+	void addFileReaderWriter(FileReaderWriterService *service);
+	void removeFileReaderWriter(FileReaderWriterService *service);
 
-QString FileReaderWriterServiceNull::canLoadDataType() const
-{
-	return "";
-}
+private:
+	void initServiceListener();
+	void onServiceAdded(FileReaderWriterService *service);
+	void onServiceRemoved(FileReaderWriterService *service);
 
-bool FileReaderWriterServiceNull::readInto(DataPtr data, QString path)
-{
-	return false;
-}
+	ctkPluginContext *mPluginContext;
+	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
 
-void FileReaderWriterServiceNull::save(DataPtr data, const QString &filename)
-{
+private:
+	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
+	std::set<FileReaderWriterServicePtr> mDataReaders;
 
-}
+};
 
+typedef boost::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;
 
-} // cx
+} //cx
+
+#endif // CXFILEMANAGERIMPLSERVICE_H

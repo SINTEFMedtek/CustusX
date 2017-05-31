@@ -30,55 +30,45 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXPORTIMPLSERVICE_H
-#define CXPORTIMPLSERVICE_H
-
-#include "cxFileManagerService.h"
-#include "cxPortService.h"
-#include "org_custusx_core_port_Export.h"
-#include "cxServiceTrackerListener.h"
-class ctkPluginContext;
+#include "cxFileReaderWriterServiceNull.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-class org_custusx_core_port_EXPORT FileManagerImpService : public FileManagerService
+FileReaderWriterServiceNull::FileReaderWriterServiceNull() : FileReaderWriterService()
 {
-public:
-	Q_INTERFACES(cx::FileManagerService)
+}
 
-	FileManagerImpService(ctkPluginContext *context);
-	virtual ~FileManagerImpService();
-	virtual bool isNull();
+bool FileReaderWriterServiceNull::isNull()
+{
+	return true;
+}
 
-	QString canLoadDataType() const;
-	bool canLoad(const QString& type, const QString& filename);
-	DataPtr load(const QString& uid, const QString& filename);
-	vtkImageDataPtr loadVtkImageData(QString filename);
-	vtkPolyDataPtr loadVtkPolyData(QString filename);
-	QString findDataTypeFromFile(QString filename);
-	bool readInto(DataPtr data, QString path);
-	void save(DataPtr data, const QString& filename);
+bool FileReaderWriterServiceNull::canLoad(const QString &type, const QString &filename)
+{
+	return false;
+}
 
-	void addPort(FileReaderWriterService *service);
-	void removePort(FileReaderWriterService *service);
+DataPtr FileReaderWriterServiceNull::load(const QString &uid, const QString &filename)
+{
+	return DataPtr();
+}
 
-private:
-	void initServiceListener();
-	void onServiceAdded(FileReaderWriterService *service);
-	void onServiceRemoved(FileReaderWriterService *service);
+QString FileReaderWriterServiceNull::canLoadDataType() const
+{
+	return "";
+}
 
-	ctkPluginContext *mPluginContext;
-	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
+bool FileReaderWriterServiceNull::readInto(DataPtr data, QString path)
+{
+	return false;
+}
 
-private:
-	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
-	std::set<FileReaderWriterServicePtr> mDataReaders;
+void FileReaderWriterServiceNull::save(DataPtr data, const QString &filename)
+{
 
-};
+}
 
-typedef boost::shared_ptr<FileManagerImpService> PortImplServicePtr;
 
-} //cx
-
-#endif // CXPORTIMPLSERVICE_H
+} // cx

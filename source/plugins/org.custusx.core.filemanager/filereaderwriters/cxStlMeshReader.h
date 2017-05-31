@@ -1,8 +1,8 @@
 #ifndef CXSTLMESHREADER_H
 #define CXSTLMESHREADER_H
 
-#include "cxPortService.h"
-#include "org_custusx_core_port_Export.h"
+#include "cxFileReaderWriterService.h"
+#include "org_custusx_core_filemanager_Export.h"
 
 class ctkPluginContext;
 namespace cx
@@ -10,7 +10,7 @@ namespace cx
 /**\brief Reader for STL files.
  *
  */
-class org_custusx_core_port_EXPORT StlMeshReader: public FileReaderWriterService
+class org_custusx_core_filemanager_EXPORT StlMeshReader: public FileReaderWriterService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)

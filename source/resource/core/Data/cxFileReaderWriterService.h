@@ -1,5 +1,5 @@
-#ifndef CXPORTSERVICE_H
-#define CXPORTSERVICE_H
+#ifndef CXFILEREADERWRITERSERVICE_H
+#define CXFILEREADERWRITERSERVICE_H
 
 #include <QObject>
 #include "cxResourceExport.h"
@@ -37,4 +37,4 @@ public:
 
 Q_DECLARE_INTERFACE(cx::FileReaderWriterService, FileReaderWriterService_iid)
 
-#endif // CXPORTSERVICE_H
+#endif // CXFILEREADERWRITERSERVICE_H

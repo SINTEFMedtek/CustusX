@@ -1,15 +1,15 @@
 #ifndef CXPNGIMAGEREADER_H
 #define CXPNGIMAGEREADER_H
 
-#include "cxPortService.h"
-#include "org_custusx_core_port_Export.h"
+#include "cxFileReaderWriterService.h"
+#include "org_custusx_core_filemanager_Export.h"
 
 namespace cx {
 
 /**\brief Reader for portable network graphics .png files.
  *
  */
-class org_custusx_core_port_EXPORT PNGImageReader: public FileReaderWriterService
+class org_custusx_core_filemanager_EXPORT PNGImageReader: public FileReaderWriterService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)

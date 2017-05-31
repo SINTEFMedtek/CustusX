@@ -30,7 +30,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#include "cxPortImplService.h"
+#include "cxFileManagerImplService.h"
 #include <QFileInfo>
 #include "cxTypeConversions.h"
 #include "cxUtilHelpers.h"
@@ -142,7 +142,7 @@ void FileManagerImpService::save(DataPtr data, const QString &filename)
 		return reader->save(data, filename);
 }
 
-void FileManagerImpService::addPort(FileReaderWriterService *service)
+void FileManagerImpService::addFileReaderWriter(FileReaderWriterService *service)
 {
 	//TODO
 	// adding a service inside a smartpointer... not so smart, think it is fixed with null_deleter
@@ -150,7 +150,7 @@ void FileManagerImpService::addPort(FileReaderWriterService *service)
 	CX_LOG_DEBUG() << "Adding a reader/writer: " << service->objectName() << " to: " << this;
 }
 
-void FileManagerImpService::removePort(FileReaderWriterService *service)
+void FileManagerImpService::removeFileReaderWriter(FileReaderWriterService *service)
 {
 	//TODO
 	std::cout << "[TODO] ERROR: unable to remove PortService" << std::endl;
@@ -171,13 +171,13 @@ void FileManagerImpService::initServiceListener()
 void FileManagerImpService::onServiceAdded(FileReaderWriterService *service)
 {
 	//std::cout << "Port Service added: " << service->objectName().toStdString() << " to FileManagerImpService: " << this << std::endl;
-	this->addPort(service);
+	this->addFileReaderWriter(service);
 }
 
 void FileManagerImpService::onServiceRemoved(FileReaderWriterService *service)
 {
 	//std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
-	this->removePort(service);
+	this->removeFileReaderWriter(service);
 }
 
 } // cx

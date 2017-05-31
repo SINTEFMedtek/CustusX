@@ -64,12 +64,12 @@ void FileManagerServiceNull::save(DataPtr data, const QString &filename)
 	printWarning();printWarning();
 }
 
-void FileManagerServiceNull::addPort(FileReaderWriterService *service)
+void FileManagerServiceNull::addFileReaderWriter(FileReaderWriterService *service)
 {
 	printWarning();
 }
 
-void FileManagerServiceNull::removePort(FileReaderWriterService *service)
+void FileManagerServiceNull::removeFileReaderWriter(FileReaderWriterService *service)
 {
 	printWarning();
 }
