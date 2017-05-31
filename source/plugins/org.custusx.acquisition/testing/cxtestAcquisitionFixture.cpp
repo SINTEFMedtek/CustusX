@@ -212,7 +212,6 @@ void AcquisitionFixture::saveDataCompletedSlot(QString path)
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// read file and print info - this is the result of the file pathway
-	cx::LogicManager::initialize();
 	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	mFileOutputData.push_back(fileReader->readAllFiles(path, ""));
@@ -262,8 +261,9 @@ void AcquisitionFixture::verifyFileData(cx::USReconstructInputData fileData)
 	CHECK(images->size() == fileData.mFrames.size());
 	for (unsigned i=0; i<images->size(); ++i)
 	{
-		CHECK(images->get(i));
-		Eigen::Array3i dim(images->get(i)->GetDimensions());
+		vtkImageDataPtr image = images->get(i);
+		REQUIRE(image);
+		Eigen::Array3i dim(image->GetDimensions());
 		CHECK(dim[0]==fileData.mProbeDefinition.mData.getSize().width());
 		CHECK(dim[1]==fileData.mProbeDefinition.mData.getSize().height());
 	}

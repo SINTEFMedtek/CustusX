@@ -26,6 +26,9 @@ public:
 	void save(DataPtr data, const QString &filename);
 	void addPort(FileReaderWriterService *service);
 	void removePort(FileReaderWriterService *service);
+
+private:
+	void printWarning() const;
 };
 
 }

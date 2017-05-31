@@ -93,10 +93,13 @@ FileReaderWriterServicePtr FileManagerImpService::findReader(const QString& path
 
 vtkImageDataPtr FileManagerImpService::loadVtkImageData(QString filename)
 {
+	vtkImageDataPtr retval = vtkImageDataPtr();
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
-		return reader->loadVtkImageData(filename);
-	return vtkImageDataPtr();
+	{
+		retval = reader->loadVtkImageData(filename);
+	}
+	return retval;
 }
 
 vtkPolyDataPtr FileManagerImpService::loadVtkPolyData(QString filename)
