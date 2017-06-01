@@ -4,6 +4,8 @@ set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
   cxCeetronPluginActivator.cpp
+  cxCgeoReaderWriter.h
+  cxCgeoReaderWriter.cpp
 )
 
 # Files which should be processed by Qts moc

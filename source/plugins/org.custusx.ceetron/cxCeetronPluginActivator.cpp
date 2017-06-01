@@ -36,13 +36,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iostream>
 
 #include "cxRegisteredService.h"
+#include "cxCgeoReaderWriter.h"
 
 namespace cx
 {
 
 CeetronPluginActivator::CeetronPluginActivator()
 {
-	std::cout << "Created CeetronPluginActivator" << std::endl;
 }
 
 CeetronPluginActivator::~CeetronPluginActivator()
@@ -50,7 +50,7 @@ CeetronPluginActivator::~CeetronPluginActivator()
 
 void CeetronPluginActivator::start(ctkPluginContext* context)
 {
-	//mRegistration = RegisteredService::create<ExampleGUIExtenderService>(context, GUIExtenderService_iid);
+	mRegistration = RegisteredService::create<CgeoReaderWriter>(context, new CgeoReaderWriter(), FileReaderWriterService_iid);
 }
 
 void CeetronPluginActivator::stop(ctkPluginContext* context)
