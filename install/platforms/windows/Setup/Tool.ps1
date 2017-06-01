@@ -133,13 +133,13 @@ Function Get-ToolList{
 			   "glewinfo.exe", 
 			   "Library needed by FAST."
 			   )
-    # git 1.7.10 (x86?)
+    # git 2.13.0
     $toollist += New-Object Tool(
 				"git", 
-			    "https://github.com/msysgit/msysgit/releases/download/Git-1.9.4-preview20140929/Git-1.9.4-preview20140929.exe", 
+			    "https://github.com/git-for-windows/git/releases/download/v2.13.0.windows.1/Git-2.13.0-64-bit.exe",
 			    "$ToolFolder\git-installer.exe", 
 			    "Inno Setup package", 
-			    "$script:CX_PROGRAM_FILES_X86\Git\cmd", 
+			    "$script:CX_PROGRAM_FILES\Git\bin",
 				"",
 			    "", 
 			    "git", 
