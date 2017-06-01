@@ -26,7 +26,7 @@ See <http://openigtlink.org> for more. (The US Probe info is a custom extension)
 
 Enter the IP adress of the remote server. The default port is 18333.
 
-Even though the connection seems successful, you might need to
+Even though the connection seems to be successful, you might need to
 create an exception for CustusX in your firewall to let the video stream through.
 
 
@@ -42,7 +42,9 @@ stream them as video.
 \addindex openigtlink_streamer
 OpenIGTLink Streamer Service {#org_custusx_core_video_streamer_openigtlink}
 ===========================================================
-ToDo.
+Connect to a remote client or server using OpenIGTLink.
+The network connection is configured using the Network Connection widget
+with org.custusx.core.openigtlink selected \ref org_custusx_core_openigtlink_network_connections_widget.
 
 
 
