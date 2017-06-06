@@ -241,7 +241,8 @@ bool AirwaysFilter::execute()
             }
         } catch(fast::Exception & e)
         {
-            CX_LOG_ERROR() << "The airways filter failed.";
+			CX_LOG_ERROR() << "The airways filter failed: \n"
+						   << e.what();
             if(!useManualSeedPoint)
                 CX_LOG_ERROR() << "Try to set the seed point manually.";
             return false;
