@@ -45,17 +45,17 @@ bool FileReaderWriterServiceNull::isNull()
 	return true;
 }
 
-bool FileReaderWriterServiceNull::canLoad(const QString &type, const QString &filename)
+bool FileReaderWriterServiceNull::canRead(const QString &type, const QString &filename)
 {
 	return false;
 }
 
-DataPtr FileReaderWriterServiceNull::load(const QString &uid, const QString &filename)
+DataPtr FileReaderWriterServiceNull::read(const QString &uid, const QString &filename)
 {
 	return DataPtr();
 }
 
-QString FileReaderWriterServiceNull::canLoadDataType() const
+QString FileReaderWriterServiceNull::canReadDataType() const
 {
 	return "";
 }
@@ -65,10 +65,42 @@ bool FileReaderWriterServiceNull::readInto(DataPtr data, QString path)
 	return false;
 }
 
-void FileReaderWriterServiceNull::save(DataPtr data, const QString &filename)
+void FileReaderWriterServiceNull::write(DataPtr data, const QString &filename)
 {
 
 }
 
 
 } // cx
+
+
+QString cx::FileReaderWriterServiceNull::canWriteDataType() const
+{
+	return "";
+}
+
+bool cx::FileReaderWriterServiceNull::canWrite(const QString &type, const QString &filename) const
+{
+	return false;
+}
+
+
+QString cx::FileReaderWriterServiceNull::getName() const
+{
+	return "FileReaderWriterServiceNull";
+}
+
+QString cx::FileReaderWriterServiceNull::getFileSuffix() const
+{
+	return "";
+}
+
+vtkImageDataPtr cx::FileReaderWriterServiceNull::loadVtkImageData(QString filename)
+{
+	return vtkImageDataPtr();
+}
+
+vtkPolyDataPtr cx::FileReaderWriterServiceNull::loadVtkPolyData(QString filename)
+{
+	return vtkPolyDataPtr();
+}

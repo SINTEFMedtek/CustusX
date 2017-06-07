@@ -59,6 +59,7 @@ public:
 private:
 	RegisteredServicePtr mRegisteredFileManagerService;
 	std::vector<RegisteredServicePtr> mRegisteredFileReaderWriterServices;
+	RegisteredServicePtr mRegisteredGuiExtenderService;
 };
 
 } // cx

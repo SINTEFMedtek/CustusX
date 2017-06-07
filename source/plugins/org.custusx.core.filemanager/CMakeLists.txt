@@ -12,9 +12,15 @@ project(org_custusx_core_filemanager)
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
 set(PLUGIN_SRCS
+    cxFileManagerServicePluginActivator.cpp
     cxFileManagerImplService.h
     cxFileManagerImplService.cpp
-    cxFileManagerServicePluginActivator.cpp
+
+    cxImportExportGuiExtenderService.h
+    cxImportExportGuiExtenderService.cpp
+
+    gui/cxExportWidget.cpp
+    gui/cxExportDataTypeWidget.cpp
 
     filereaderwriters/cxMetaImageReader.h
     filereaderwriters/cxMetaImageReader.cpp
@@ -31,6 +37,9 @@ set(PLUGIN_SRCS
 # Files which should be processed by Qts moc
 set(PLUGIN_MOC_SRCS
     cxFileManagerServicePluginActivator.h
+
+    gui/cxExportWidget.h
+    gui/cxExportDataTypeWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -46,7 +55,10 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxResource
+    cxResourceWidgets
     cxPluginUtilities
+    cxGUIExtenderService
+    cxResourceVisualization
 )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -71,6 +83,7 @@ target_include_directories( org_custusx_core_filemanager
     PUBLIC
     .
     ./filereaderwriters
+    ./gui
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

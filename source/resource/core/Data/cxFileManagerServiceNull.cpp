@@ -74,6 +74,11 @@ void FileManagerServiceNull::removeFileReaderWriter(FileReaderWriterService *ser
 	printWarning();
 }
 
+std::vector<FileReaderWriterServicePtr> FileManagerServiceNull::getExportersForDataType(QString dataType)
+{
+	return std::vector<FileReaderWriterServicePtr>();
+}
+
 void FileManagerServiceNull::printWarning() const
 {
 	reportWarning("Trying to use FileManagerServiceNull.");

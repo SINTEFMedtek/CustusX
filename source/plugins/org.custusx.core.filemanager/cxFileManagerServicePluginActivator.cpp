@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QtPlugin>
 
+#include "cxImportExportGuiExtenderService.h"
 #include "cxFileManagerImplService.h"
 #include "cxMetaImageReader.h"
 #include "cxPNGImageReader.h"
@@ -54,12 +55,8 @@ FileManagerServicePluginActivator::~FileManagerServicePluginActivator()
 
 void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 {
-	//std::cout << "FileManagerServicePluginActivator::start" << std::endl;
-
-	//TODO add filemanagerservice
 	FileManagerImpService *filemanager = new FileManagerImpService(context);
 	mRegisteredFileManagerService = RegisteredService::create<FileManagerImpService>(context, filemanager, FileManagerService_iid);
-
 
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PNGImageReader>(context, new PNGImageReader(), FileReaderWriterService_iid));
@@ -67,7 +64,7 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(), FileReaderWriterService_iid));
 
-	//std::cout << "FileManagerServicePluginActivator::end" << std::endl;
+	mRegisteredGuiExtenderService = RegisteredService::create<ImportExportGuiExtenderService>(context, new ImportExportGuiExtenderService(context), GUIExtenderService_iid);
 }
 
 void FileManagerServicePluginActivator::stop(ctkPluginContext* context)

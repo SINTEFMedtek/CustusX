@@ -100,5 +100,8 @@ void FileManagerServiceProxy::removeFileReaderWriter(FileReaderWriterService *se
 	mService->removeFileReaderWriter(service);
 }
 
-
+std::vector<cx::FileReaderWriterServicePtr> FileManagerServiceProxy::getExportersForDataType(QString dataType)
+{
+	return mService->getExportersForDataType(dataType);
+}
 }

@@ -9,9 +9,9 @@
 namespace cx
 {
 
-CgeoReaderWriter::CgeoReaderWriter()
+CgeoReaderWriter::CgeoReaderWriter() :
+	FileReaderWriterImplService("CgeoReaderWriter", "", "mesh", "cgeo")
 {
-	this->setObjectName("CgeoReaderWriter");
 }
 
 bool CgeoReaderWriter::isNull()
@@ -19,17 +19,17 @@ bool CgeoReaderWriter::isNull()
 	return false;
 }
 
-bool CgeoReaderWriter::canLoad(const QString &type, const QString &filename)
+bool CgeoReaderWriter::canRead(const QString &type, const QString &filename)
 {
 	return false;
 }
 
-DataPtr CgeoReaderWriter::load(const QString &uid, const QString &filename)
+DataPtr CgeoReaderWriter::read(const QString &uid, const QString &filename)
 {
 	return DataPtr();
 }
 
-QString CgeoReaderWriter::canLoadDataType() const
+QString CgeoReaderWriter::canReadDataType() const
 {
 	return "";
 }
@@ -39,9 +39,13 @@ bool CgeoReaderWriter::readInto(DataPtr data, QString path)
 	return false;
 }
 
-void CgeoReaderWriter::save(DataPtr data, const QString &filename)
+void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 {
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
+	if(!mesh)
+	{
+		return;
+	}
 	vtkPolyDataPtr polyData = mesh->getTransformedPolyData(mesh->get_rMd());
 	vtkCellArrayPtr polys = polyData->GetPolys();
 
@@ -90,4 +94,17 @@ void CgeoReaderWriter::save(DataPtr data, const QString &filename)
 			std::cout << "Warning in .cgeo export: Skipped polygon not containing exactly 3 points." << std::endl;
 	}
 }
+}
+
+
+QString cx::CgeoReaderWriter::canWriteDataType() const
+{
+	return "mesh";
+}
+
+bool cx::CgeoReaderWriter::canWrite(const QString &type, const QString &filename) const
+{
+	if((type == "mesh") && (filename.endsWith(".cgeo")))
+		return true;
+	return false;
 }

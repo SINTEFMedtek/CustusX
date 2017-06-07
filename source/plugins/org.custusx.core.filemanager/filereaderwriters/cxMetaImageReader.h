@@ -10,7 +10,7 @@ class ctkPluginContext;
 namespace cx
 {
 
-class org_custusx_core_filemanager_EXPORT MetaImageReader : public FileReaderWriterService
+class org_custusx_core_filemanager_EXPORT MetaImageReader : public FileReaderWriterImplService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
@@ -19,14 +19,16 @@ public:
 	virtual ~MetaImageReader(){}
 	bool isNull();
 
-	virtual bool canLoad(const QString& type, const QString& filename);
-	virtual QString canLoadDataType() const { return "image"; }
+	virtual bool canRead(const QString& type, const QString& filename);
+	virtual QString canReadDataType() const;
 	virtual bool readInto(DataPtr data, QString path);
 	virtual bool readInto(ImagePtr image, QString filename);
-	virtual DataPtr load(const QString& uid, const QString& filename);
+	virtual DataPtr read(const QString& uid, const QString& filename);
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
-	virtual void save(DataPtr data, const QString& filename);
 
+	QString canWriteDataType() const;
+	bool canWrite(const QString &type, const QString &filename) const;
+	virtual void write(DataPtr data, const QString& filename);
 };
 
 }

@@ -41,14 +41,14 @@ vtkPolyDataPtr PolyDataMeshReader::loadVtkPolyData(QString fileName)
 	return polyData;
 }
 
-DataPtr PolyDataMeshReader::load(const QString& uid, const QString& filename)
+DataPtr PolyDataMeshReader::read(const QString& uid, const QString& filename)
 {
 	MeshPtr mesh(new Mesh(uid));
 	this->readInto(mesh, filename);
 	return mesh;
 }
 
-void PolyDataMeshReader::save(DataPtr data, const QString &filename)
+void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 {
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
@@ -61,16 +61,27 @@ void PolyDataMeshReader::save(DataPtr data, const QString &filename)
 	writer->Write();
 }
 
-PolyDataMeshReader::PolyDataMeshReader()
+PolyDataMeshReader::PolyDataMeshReader() :
+	FileReaderWriterImplService("PolyDataMeshReader", "mesh", "mesh", "vtk")
 {
-	this->setObjectName("PolyDataMeshReader");
 }
 
-bool PolyDataMeshReader::canLoad(const QString &type, const QString &filename)
+bool PolyDataMeshReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
 	return ( fileType.compare("vtk", Qt::CaseInsensitive) == 0);
 }
 
 
+}
+
+
+QString cx::PolyDataMeshReader::canWriteDataType() const
+{
+	return "mesh";
+}
+
+bool cx::PolyDataMeshReader::canWrite(const QString &type, const QString &filename) const
+{
+	return this->canWriteInternal(type, filename);
 }

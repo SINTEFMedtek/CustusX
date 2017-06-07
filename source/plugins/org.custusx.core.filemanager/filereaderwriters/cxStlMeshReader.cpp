@@ -13,12 +13,12 @@
 namespace cx
 {
 
-StlMeshReader::StlMeshReader()
+StlMeshReader::StlMeshReader() :
+	FileReaderWriterImplService("StlMeshReader", "mesh", "mesh", "stl")
 {
-	this->setObjectName("StlMeshReader");
 }
 
-bool StlMeshReader::canLoad(const QString &type, const QString &filename)
+bool StlMeshReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
 	return (fileType.compare("stl", Qt::CaseInsensitive) == 0);
@@ -53,14 +53,14 @@ vtkPolyDataPtr StlMeshReader::loadVtkPolyData(QString fileName)
 	return polyData;
 }
 
-DataPtr StlMeshReader::load(const QString& uid, const QString& filename)
+DataPtr StlMeshReader::read(const QString& uid, const QString& filename)
 {
 	MeshPtr mesh(new Mesh(uid));
 	this->readInto(mesh, filename);
 	return mesh;
 }
 
-void StlMeshReader::save(DataPtr data, const QString &filename)
+void StlMeshReader::write(DataPtr data, const QString &filename)
 {
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
@@ -73,4 +73,14 @@ void StlMeshReader::save(DataPtr data, const QString &filename)
 	writer->Write();
 }
 
+}
+
+QString cx::StlMeshReader::canWriteDataType() const
+{
+	return "mesh";
+}
+
+bool cx::StlMeshReader::canWrite(const QString &type, const QString &filename) const
+{
+	this->canWriteInternal(type, filename);
 }

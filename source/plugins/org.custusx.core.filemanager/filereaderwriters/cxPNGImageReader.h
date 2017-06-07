@@ -9,22 +9,27 @@ namespace cx {
 /**\brief Reader for portable network graphics .png files.
  *
  */
-class org_custusx_core_filemanager_EXPORT PNGImageReader: public FileReaderWriterService
+class org_custusx_core_filemanager_EXPORT PNGImageReader: public FileReaderWriterImplService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
 	PNGImageReader();
 	virtual ~PNGImageReader() {}
-	virtual bool canLoad(const QString& type, const QString& filename);
-	virtual bool readInto(DataPtr data, QString path);
-	bool readInto(ImagePtr image, QString filename);
-	virtual QString canLoadDataType() const { return "image"; }
-	virtual DataPtr load(const QString& uid, const QString& filename);
-	virtual vtkImageDataPtr loadVtkImageData(QString filename);
-	void save(DataPtr data, const QString &filename) {};
 
 	bool isNull(){return false;}
+
+	virtual bool canRead(const QString& type, const QString& filename);
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(ImagePtr image, QString filename);
+	virtual QString canReadDataType() const { return "image"; }
+	virtual DataPtr read(const QString& uid, const QString& filename);
+
+	void write(DataPtr data, const QString &filename) {};
+	QString canWriteDataType() const;
+	bool canWrite(const QString &type, const QString &filename) const;
+
+	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 };
 
 }

@@ -24,7 +24,7 @@ bool XMLPolyDataMeshReader::readInto(MeshPtr mesh, QString filename)
 	mesh->setVtkPolyData(raw);
 	return true;
 }
-//-----
+
 vtkPolyDataPtr XMLPolyDataMeshReader::loadVtkPolyData(QString fileName)
 {
 	vtkXMLPolyDataReaderPtr reader = vtkXMLPolyDataReaderPtr::New();
@@ -37,22 +37,32 @@ vtkPolyDataPtr XMLPolyDataMeshReader::loadVtkPolyData(QString fileName)
 	return polyData;
 }
 
-DataPtr XMLPolyDataMeshReader::load(const QString& uid, const QString& filename)
+DataPtr XMLPolyDataMeshReader::read(const QString& uid, const QString& filename)
 {
 	MeshPtr mesh(new Mesh(uid));
 	this->readInto(mesh, filename);
 	return mesh;
 }
 
-XMLPolyDataMeshReader::XMLPolyDataMeshReader()
+XMLPolyDataMeshReader::XMLPolyDataMeshReader() :
+	FileReaderWriterImplService("XMLPolyDataMeshReader", "mesh", "", "vtp")
 {
-	this->setObjectName("XMLPolyDataMeshReader");
 }
 
-bool XMLPolyDataMeshReader::canLoad(const QString &type, const QString &filename)
+bool XMLPolyDataMeshReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
 	return ( fileType.compare("vtp", Qt::CaseInsensitive) == 0);
 }
 
+}
+
+QString cx::XMLPolyDataMeshReader::canWriteDataType() const
+{
+	return "";
+}
+
+bool cx::XMLPolyDataMeshReader::canWrite(const QString &type, const QString &filename) const
+{
+	return false;
 }

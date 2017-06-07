@@ -13,7 +13,7 @@ namespace cx
  * \author Erlend F Hofstad
  */
 
-class org_custusx_ceetron_EXPORT CgeoReaderWriter : public FileReaderWriterService
+class org_custusx_ceetron_EXPORT CgeoReaderWriter : public FileReaderWriterImplService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
@@ -21,11 +21,15 @@ public:
 	CgeoReaderWriter();
 
 	bool isNull();
-	bool canLoad(const QString &type, const QString &filename);
-	DataPtr load(const QString &uid, const QString &filename);
-	QString canLoadDataType() const;
+
+	bool canRead(const QString &type, const QString &filename);
+	DataPtr read(const QString &uid, const QString &filename);
+	QString canReadDataType() const;
 	bool readInto(DataPtr data, QString path);
-	void save(DataPtr data, const QString &filename);
+
+	QString canWriteDataType() const;
+	bool canWrite(const QString &type, const QString &filename) const;
+	void write(DataPtr data, const QString &filename);
 };
 
 }

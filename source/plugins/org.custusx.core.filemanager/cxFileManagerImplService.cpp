@@ -67,7 +67,7 @@ bool FileManagerImpService::canLoad(const QString &type, const QString &filename
 {
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
-		return reader->canLoad(type, filename);
+		return reader->canRead(type, filename);
 	else
 		return false;
 }
@@ -76,7 +76,7 @@ DataPtr FileManagerImpService::load(const QString &uid, const QString &filename)
 {
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
-		return reader->load(uid, filename);
+		return reader->read(uid, filename);
 	else
 		return DataPtr();
 }
@@ -85,7 +85,7 @@ FileReaderWriterServicePtr FileManagerImpService::findReader(const QString& path
 {
 	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
 	{
-		if ((*iter)->canLoad(type, path))
+		if ((*iter)->canRead(type, path))
 			return *iter;
 	}
 	return FileReaderWriterServicePtr();
@@ -110,11 +110,23 @@ vtkPolyDataPtr FileManagerImpService::loadVtkPolyData(QString filename)
 	return vtkPolyDataPtr();
 }
 
+std::vector<FileReaderWriterServicePtr> FileManagerImpService::getExportersForDataType(QString dataType)
+{
+	std::vector<FileReaderWriterServicePtr>  retval;
+	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
+	{
+		if (dataType.compare((*iter)->canWriteDataType()) == 0)
+			retval.push_back(*iter);
+	}
+
+	return retval;
+}
+
 QString FileManagerImpService::findDataTypeFromFile(QString filename)
 {
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
-		return reader->canLoadDataType();
+		return reader->canReadDataType();
 	return "";
 }
 
@@ -139,7 +151,7 @@ void FileManagerImpService::save(DataPtr data, const QString &filename)
 {
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
-		return reader->save(data, filename);
+		return reader->write(data, filename);
 }
 
 void FileManagerImpService::addFileReaderWriter(FileReaderWriterService *service)

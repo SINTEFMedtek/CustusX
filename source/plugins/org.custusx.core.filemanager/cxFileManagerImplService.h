@@ -51,14 +51,21 @@ public:
 	virtual ~FileManagerImpService();
 	virtual bool isNull();
 
+	//read
 	QString canLoadDataType() const;
 	bool canLoad(const QString& type, const QString& filename);
 	DataPtr load(const QString& uid, const QString& filename);
+	bool readInto(DataPtr data, QString path);
+
+	//write
+	void save(DataPtr data, const QString& filename);
+
+	//utility
 	vtkImageDataPtr loadVtkImageData(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);
+
 	QString findDataTypeFromFile(QString filename);
-	bool readInto(DataPtr data, QString path);
-	void save(DataPtr data, const QString& filename);
+	std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType);
 
 	void addFileReaderWriter(FileReaderWriterService *service);
 	void removeFileReaderWriter(FileReaderWriterService *service);

@@ -10,12 +10,13 @@ typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 namespace cx
 {
 
-PNGImageReader::PNGImageReader()
+PNGImageReader::PNGImageReader() :
+	FileReaderWriterImplService("PNGImageReader" ,"image", "", "png")
 {
-	this->setObjectName("PNGImageReader");
+
 }
 
-bool PNGImageReader::canLoad(const QString &type, const QString &filename)
+bool PNGImageReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
 	return (fileType.compare("png", Qt::CaseInsensitive) == 0);
@@ -37,7 +38,7 @@ bool PNGImageReader::readInto(ImagePtr image, QString filename)
 	return true;
 }
 
-DataPtr PNGImageReader::load(const QString& uid, const QString& filename)
+DataPtr PNGImageReader::read(const QString& uid, const QString& filename)
 {
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
@@ -52,4 +53,15 @@ vtkImageDataPtr PNGImageReader::loadVtkImageData(QString filename)
 	return pngReader->GetOutput();
 }
 
+}
+
+
+QString cx::PNGImageReader::canWriteDataType() const
+{
+	return "";
+}
+
+bool cx::PNGImageReader::canWrite(const QString &type, const QString &filename) const
+{
+	return false;
 }

@@ -31,9 +31,9 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 	return zeroer->GetOutput();
 }
 
-MetaImageReader::MetaImageReader()
+MetaImageReader::MetaImageReader() :
+	FileReaderWriterImplService("MetaImageReader", "image", "image", "mhd")
 {
-	this->setObjectName("MetaImageReader");
 }
 
 bool MetaImageReader::isNull()
@@ -41,10 +41,15 @@ bool MetaImageReader::isNull()
 	return false;
 }
 
-bool MetaImageReader::canLoad(const QString &type, const QString &filename)
+bool MetaImageReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
 	return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
+}
+
+QString MetaImageReader::canReadDataType() const
+{
+	return "image";
 }
 
 bool MetaImageReader::readInto(DataPtr data, QString filename)
@@ -86,15 +91,14 @@ bool MetaImageReader::readInto(ImagePtr image, QString filename)
 	return true;
 }
 
-//-----
-DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
+DataPtr MetaImageReader::read(const QString& uid, const QString& filename)
 {
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
 	return image;
 }
 
-void MetaImageReader::save(DataPtr data, const QString& filename)
+void MetaImageReader::write(DataPtr data, const QString& filename)
 {
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if(!image)
@@ -122,4 +126,14 @@ void MetaImageReader::save(DataPtr data, const QString& filename)
 	customReader->setKey("Creator", QString("CustusX_%1").arg(CustusX_VERSION_STRING));
 }
 
+}
+
+QString cx::MetaImageReader::canWriteDataType() const
+{
+	return "image";
+}
+
+bool cx::MetaImageReader::canWrite(const QString &type, const QString &filename) const
+{
+	return this->canReadInternal(type, filename);
 }

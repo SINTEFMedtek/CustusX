@@ -52,7 +52,7 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
    //read the file
    QString filename = "out.vtp";
    cx::XMLPolyDataMeshReader *reader =  new cx::XMLPolyDataMeshReader();
-   REQUIRE(reader->canLoad("mesh", filename));
+   REQUIRE(reader->canRead("mesh", filename));
 
 
    // ------------- VTK -------------
@@ -99,7 +99,7 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
    //mesh
    QString name = "test";
    QString expected_color_of_mesh = "#ff0000"; //red
-   cx::DataPtr data_mesh = reader->load(name, filename);
+   cx::DataPtr data_mesh = reader->read(name, filename);
    REQUIRE(data_mesh->getName() == name);
    cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(data_mesh);
    REQUIRE(mesh);

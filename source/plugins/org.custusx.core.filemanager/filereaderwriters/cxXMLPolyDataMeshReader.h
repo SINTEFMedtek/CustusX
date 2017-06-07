@@ -12,23 +12,28 @@ namespace cx
 /**\brief Reader for .vtp files.
  *
  */
-class org_custusx_core_filemanager_EXPORT XMLPolyDataMeshReader: public FileReaderWriterService
+class org_custusx_core_filemanager_EXPORT XMLPolyDataMeshReader: public FileReaderWriterImplService
 {
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
 	XMLPolyDataMeshReader();
 	virtual ~XMLPolyDataMeshReader(){}
-	virtual bool canLoad(const QString& type, const QString& filename);
+
+	bool isNull(){ return false;}
+
+	virtual bool canRead(const QString& type, const QString& filename);
+	virtual DataPtr read(const QString& uid, const QString& filename);
+	virtual QString canReadDataType() const { return "mesh"; }
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(MeshPtr mesh, QString filename);
 
-	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
-	virtual QString canLoadDataType() const { return "mesh"; }
-	virtual DataPtr load(const QString& uid, const QString& filename);
-	void save(DataPtr data, const QString &filename) {};
+	void write(DataPtr data, const QString &filename) {}
+	QString canWriteDataType() const;
+	bool canWrite(const QString &type, const QString &filename) const;
 
-	bool isNull(){ return false;}
+	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
+
 
 };
 }
