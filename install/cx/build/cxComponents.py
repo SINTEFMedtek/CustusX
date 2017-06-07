@@ -488,11 +488,9 @@ class FAST(CppComponent):
         add('FAST_BUILD_TOOLS:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
-        append('FAST_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
-        append('FAST_CMAKE_CXX_FLAGS:STRING', '-D_USE_MATH_DEFINES')
+        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
