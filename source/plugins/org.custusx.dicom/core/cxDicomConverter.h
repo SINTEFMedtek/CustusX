@@ -68,7 +68,7 @@ private:
 	// ignoreLocalizerImages is a tag to ignore special images. For now only localizer images are ignored
 	ImagePtr createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages);
 	std::vector<ImagePtr> createImages(QStringList files);
-	QString convertToValidFilename(QString text) const;
+    QString convertToValidName(QString text) const;
 
 	ctkDICOMDatabase* mDatabase;
 };
