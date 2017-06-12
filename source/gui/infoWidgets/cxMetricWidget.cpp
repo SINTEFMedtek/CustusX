@@ -491,10 +491,12 @@ void MetricWidget::importMetricsButtonClickedSlot()
 	QString fileName = QFileDialog::getOpenFileName(this,
 													"Select the file to import metrics from (can be a patient file)",
 													suggestion,
-													"XML file (*.xml)");
+													"XML or MNI Tag file (*.xml *.tag)");
 
-	if(!fileName.isEmpty())
+	if(!fileName.isEmpty() && fileName.endsWith(".xml"))
 		mMetricManager->importMetricsFromXMLFile(fileName);
+	else if(!fileName.isEmpty() && fileName.endsWith(".tag"))
+		mMetricManager->importMetricsFromMNITagFile(fileName);
 }
 
 

@@ -34,6 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QTextStream>
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -137,6 +139,21 @@ QStringList getAbsolutePathToFiles(QString path, QStringList nameFilters, bool i
 QStringList getAbsolutePathToXmlFiles(QString path, bool includeSubDirs)
 {
 	return getAbsolutePathToFiles(path, QStringList("*.xml"), includeSubDirs);
+}
+
+void forceNewlineBeforeEof(QString path)
+{
+	QFile the_file(path);
+	the_file.open(QFile::ReadWrite);
+	QByteArray all = the_file.readAll();
+	if(!all.endsWith("\n"))
+	{
+		CX_LOG_WARNING() << "File does not end with whitespace, adding newline to the file: " << path;
+		QTextStream out(&the_file);
+		out << endl;
+	}
+	the_file.close();
+
 }
 
 } // namespace cx
