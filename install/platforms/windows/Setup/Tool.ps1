@@ -133,13 +133,13 @@ Function Get-ToolList{
 			   "glewinfo.exe", 
 			   "Library needed by FAST."
 			   )
-    # git 1.7.10 (x86?)
+    # git 2.13.0
     $toollist += New-Object Tool(
 				"git", 
-			    "https://github.com/msysgit/msysgit/releases/download/Git-1.9.4-preview20140929/Git-1.9.4-preview20140929.exe", 
+			    "https://github.com/git-for-windows/git/releases/download/v2.13.0.windows.1/Git-2.13.0-64-bit.exe",
 			    "$ToolFolder\git-installer.exe", 
 			    "Inno Setup package", 
-			    "$script:CX_PROGRAM_FILES_X86\Git\cmd", 
+			    "$script:CX_PROGRAM_FILES\Git\bin",
 				"",
 			    "", 
 			    "git", 
@@ -180,14 +180,14 @@ Function Get-ToolList{
 				"NSIS", 
 				"NSIS (Nullsoft Scriptable Install System) is a professional open source system to create Windows installers."
 				)
-    # CUDA 7.0.28 (x64, win8/win7)
+    # CUDA 8.0.61 (x64, win10)
     $toollist += New-Object Tool(
 				"cuda",
-				"http://developer.download.nvidia.com/compute/cuda/7_0/Prod/local_installers/cuda_7.0.28_windows.exe",
+				"https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda_8.0.61_win10-exe",
 				"$ToolFolder\cuda_toolkit.exe", 
 				"CUDAInstaller", 
-				"$script:CX_PROGRAM_FILES\NVIDIA GPU Computing Toolkit\CUDA\v7.0\bin", 
-				"$script:CX_PROGRAM_FILES\NVIDIA GPU Computing Toolkit\CUDA\v7.0\include",
+				"$script:CX_PROGRAM_FILES\NVIDIA GPU Computing Toolkit\CUDA\v8.0\bin",
+				"$script:CX_PROGRAM_FILES\NVIDIA GPU Computing Toolkit\CUDA\v8.0\include",
 				"", 
 				"cudafe", 
 				"The NVIDIA CUDA Toolkit provides a comprehensive development environment for C and C++ developers building GPU-accelerated applications."

@@ -66,9 +66,8 @@ cx_install_add_library_dirs(
     ${CTK_DCMTK_DIR}/bin
     ${ITK_DIR}/lib
     ${ITK_DIR}/bin
-    ${Level-Set-Segmentation_LIBRARY_DIRS}
-    ${Tube-Segmentation-Framework_LIBRARY_DIRS}
     ${FAST_LIBRARY_DIRS}
+    ${FAST_DIR}/bin
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/plugins

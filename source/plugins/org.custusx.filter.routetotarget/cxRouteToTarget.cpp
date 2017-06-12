@@ -58,6 +58,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
+    mBranchListPtr->smoothBranchPositions();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -116,7 +117,7 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
     findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
 
-	smoothPositions();
+    smoothPositions();
 
     vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
@@ -136,7 +137,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
     for (int i = 1; i<= numberOfextentionPoints; i++)
     {
         mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
-        std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
+        //std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
     }
 
     vtkPolyDataPtr retval = addVTKPoints(mExtendedRoutePositions);
