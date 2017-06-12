@@ -468,7 +468,7 @@ class FAST(CppComponent):
 		return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('11041cd9a438729cf3cae099c7c515f427b3f759')
+        self._getBuilder().gitCheckout('5e3ccf7f45d23c7aef2515a43e48323395a37f68')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -515,7 +515,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('cd17744e2657c7ca15859ef2cef7560b4057ebfa')
+        self._getBuilder().gitCheckout('7cafcea2f919e8ecadf37266dd4f4cfd358ee997')
     def configure(self):
         pass
     def build(self):

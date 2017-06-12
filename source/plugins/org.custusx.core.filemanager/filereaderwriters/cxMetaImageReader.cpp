@@ -135,5 +135,5 @@ QString cx::MetaImageReader::canWriteDataType() const
 
 bool cx::MetaImageReader::canWrite(const QString &type, const QString &filename) const
 {
-	return this->canReadInternal(type, filename);
+	return this->canWriteInternal(type, filename);
 }

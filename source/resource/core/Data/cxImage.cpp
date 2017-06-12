@@ -465,7 +465,7 @@ int Image::getMaxAlphaValue()
 	return 255;
 }
 
-int Image::getVTKMinValue()
+double Image::getVTKMinValue()
 {
 	int vtkScalarType = mBaseImageData->GetScalarType();
 
@@ -483,12 +483,14 @@ int Image::getVTKMinValue()
 		return VTK_UNSIGNED_INT_MIN;
 	else if (vtkScalarType==VTK_INT)
 		return VTK_INT_MIN;
+	else if (vtkScalarType==VTK_FLOAT)
+		return VTK_FLOAT_MIN;
 	else
 		reportError(QString("Unknown VTK ScalarType: %1").arg(vtkScalarType));
 	return 0;
 }
 
-int Image::getVTKMaxValue()
+double Image::getVTKMaxValue()
 {
 	int vtkScalarType = mBaseImageData->GetScalarType();
 
@@ -506,6 +508,8 @@ int Image::getVTKMaxValue()
 		return VTK_UNSIGNED_INT_MAX;
 	else if (vtkScalarType==VTK_INT)
 		return VTK_INT_MAX;
+	else if (vtkScalarType==VTK_FLOAT)
+		return VTK_FLOAT_MAX;
 	else
 		reportError(QString("Unknown VTK ScalarType: %1").arg(vtkScalarType));
 	return 0;

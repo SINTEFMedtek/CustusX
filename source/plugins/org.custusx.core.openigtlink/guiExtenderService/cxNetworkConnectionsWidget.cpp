@@ -78,7 +78,7 @@ struct WidgetInGroupBox
 
 
 NetworkConnectionsWidget::NetworkConnectionsWidget(NetworkServiceImplPtr connections, QWidget* parent) :
-	BaseWidget(parent, "NetworkConnectionsWidget", "Network Connections"),
+	BaseWidget(parent, "network_connections_widget", "Network Connections"),
 	mConnections(connections)
 {
 	mConnectionSelector = StringProperty::initialize("Connection", "",

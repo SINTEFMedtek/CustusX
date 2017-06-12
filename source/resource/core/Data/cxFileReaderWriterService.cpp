@@ -45,7 +45,7 @@ bool FileReaderWriterImplService::canReadInternal(const QString &type, const QSt
 	QString fileType = QFileInfo(filename).suffix();
 	bool rightFileType = sameSuffix(fileType, mFileSuffix);
 	bool rightDataType = (type == mCanReadDataType);
-	return rightFileType && rightDataType;
+	return rightFileType;
 }
 
 bool FileReaderWriterImplService::canWriteInternal(const QString &type, const QString &filename) const
@@ -53,7 +53,7 @@ bool FileReaderWriterImplService::canWriteInternal(const QString &type, const QS
 	QString fileType = QFileInfo(filename).suffix();
 	bool rightFileType = sameSuffix(fileType, mFileSuffix);
 	bool rightDataType = (type == mCanWriteDataType);
-	return rightFileType && rightDataType;
+	return rightFileType;
 }
 
 }

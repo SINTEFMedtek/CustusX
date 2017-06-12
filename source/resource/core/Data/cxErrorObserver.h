@@ -37,10 +37,6 @@ private:
   * prints error message upon error,
   * also wraps the call inside a global mutex (see below for why).
   *
-  * \ingroup sscData
-  * \date jan 1, 2010
-  * \date april 17, 2013
-  * \author christiana
   */
 class cxResource_EXPORT ErrorObserver: public vtkCommand
 {
