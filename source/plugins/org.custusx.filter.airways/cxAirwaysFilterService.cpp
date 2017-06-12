@@ -186,7 +186,8 @@ bool AirwaysFilter::execute()
 		fast::Config::getTestDataPath(); // needed for initialization
         QString cacheDir = cx::DataLocations::getCachePath();
         fast::Config::setKernelBinaryPath(cacheDir.toStdString());
-		fast::Config::setKernelSourcePath(std::string(FAST_SOURCE_DIR));
+		QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
+		fast::Config::setKernelSourcePath(kernelDir.toStdString());
 
         // Import image data from disk
 		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
@@ -241,7 +242,8 @@ bool AirwaysFilter::execute()
             }
         } catch(fast::Exception & e)
         {
-            CX_LOG_ERROR() << "The airways filter failed.";
+			CX_LOG_ERROR() << "The airways filter failed: \n"
+						   << e.what();
             if(!useManualSeedPoint)
                 CX_LOG_ERROR() << "Try to set the seed point manually.";
             return false;
