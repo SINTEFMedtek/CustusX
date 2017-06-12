@@ -82,5 +82,5 @@ QString cx::StlMeshReader::canWriteDataType() const
 
 bool cx::StlMeshReader::canWrite(const QString &type, const QString &filename) const
 {
-	this->canWriteInternal(type, filename);
+	return this->canWriteInternal(type, filename);
 }
