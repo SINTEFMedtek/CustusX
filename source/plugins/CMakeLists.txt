@@ -34,6 +34,7 @@ set(CX_PLUGINS
   org.custusx.help:ON
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
+  org.custusx.filter.airways:OFF
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.
