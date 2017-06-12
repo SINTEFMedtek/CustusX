@@ -318,7 +318,7 @@ void MainWindowActions::importDataSlot()
 		folder = profile()->getSessionRootFolder();
 
 	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")),
-		folder, tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.vtp *.mnc *.png)"));
+		folder, tr("Image/Mesh (*.mhd *.mha *.nii *.stl *.vtk *.vtp *.mnc *.png)"));
 	if (fileName.empty())
 	{
 		report("Import canceled");

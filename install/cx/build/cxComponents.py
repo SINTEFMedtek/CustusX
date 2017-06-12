@@ -197,7 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('8b5d4214bb16ca28cea1471657871c04f874f346')
+        self._getBuilder().gitCheckout('d2f2c21829718c0960dff7eb868dbb243c49a6ea')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -468,7 +468,7 @@ class FAST(CppComponent):
 		return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('11041cd9a438729cf3cae099c7c515f427b3f759')
+        self._getBuilder().gitCheckout('5e3ccf7f45d23c7aef2515a43e48323395a37f68')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -488,11 +488,9 @@ class FAST(CppComponent):
         add('FAST_BUILD_TOOLS:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
-        append('FAST_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
-        append('FAST_CMAKE_CXX_FLAGS:STRING', '-D_USE_MATH_DEFINES')
+        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
@@ -515,7 +513,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('bf1759350cad0cfb601e5bc2f89a5fcebcad9d58')
+        self._getBuilder().gitCheckout('7cafcea2f919e8ecadf37266dd4f4cfd358ee997')
     def configure(self):
         pass
     def build(self):

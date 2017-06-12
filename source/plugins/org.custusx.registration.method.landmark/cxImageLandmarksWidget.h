@@ -78,6 +78,7 @@ protected slots:
 	void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
 	virtual void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
 	void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
+	void importPointMetricsToLandmarkButtonClickedSlot();
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark is selected from the table
 	void enableButtons();
 	void onCurrentImageChanged();
@@ -103,6 +104,7 @@ protected:
 	QPushButton* mAddLandmarkButton; ///< the Add Landmark button
 	QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
 	QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
+	QPushButton* mImportLandmarksFromPointMetricsButton; ///< the Import Landmarks button
 
 private:
 	ImageLandmarksWidget(); ///< not implemented
