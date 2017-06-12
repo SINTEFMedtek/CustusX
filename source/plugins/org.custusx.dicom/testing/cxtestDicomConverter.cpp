@@ -285,15 +285,21 @@ TEST_CASE("DicomConverter: Convert DICOM dataset from Radiology department - ver
     cx::DicomConverter converter;
     converter.setDicomDatabase(db.data());
     cx::ImagePtr convertedImage = converter.convertToImage(series);
-    QString fileName = convertedImage->getName() + ".mhd";
+    QString fileName = cx::DataLocations::getTestDataPath()+"/temp/"+
+            convertedImage->getName() + ".mhd";
     if(verbose)
     {
         std::cout << "Filename : " << fileName << std::endl;
     }
-    cx::MetaImageReader().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/"+fileName);
+    // If file already exists - delete it
+    QFile imageFile(fileName);
+    if(imageFile.exists())
+        imageFile.remove();
+    REQUIRE(!QFileInfo::exists(fileName));
 
+    cx::MetaImageReader().saveImage(convertedImage, fileName);
     // Verify that image file has been written
-    REQUIRE(QFileInfo::exists(cx::DataLocations::getTestDataPath()+"/temp/"+fileName));
+    REQUIRE(QFileInfo::exists(fileName));
 }
 
 #ifdef CX_CUSTUS_SINTEF
