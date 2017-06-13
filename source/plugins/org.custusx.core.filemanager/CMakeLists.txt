@@ -34,6 +34,8 @@ set(PLUGIN_SRCS
     filereaderwriters/cxStlMeshReader.cpp
     filereaderwriters/cxNIfTIReader.h
     filereaderwriters/cxNIfTIReader.cpp
+    filereaderwriters/cxMNIReaderWriter.h
+    filereaderwriters/cxMNIReaderWriter.cpp
 )
 
 # Files which should be processed by Qts moc

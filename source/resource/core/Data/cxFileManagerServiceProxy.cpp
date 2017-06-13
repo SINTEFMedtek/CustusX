@@ -104,4 +104,9 @@ std::vector<cx::FileReaderWriterServicePtr> FileManagerServiceProxy::getExporter
 {
 	return mService->getExportersForDataType(dataType);
 }
+
+std::vector<FileReaderWriterServicePtr> FileManagerServiceProxy::getImportersForDataType(QString dataType)
+{
+	return mService->getImportersForDataType(dataType);
+}
 }

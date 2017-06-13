@@ -122,6 +122,19 @@ std::vector<FileReaderWriterServicePtr> FileManagerImpService::getExportersForDa
 	return retval;
 }
 
+std::vector<FileReaderWriterServicePtr> FileManagerImpService::getImportersForDataType(QString dataType)
+{
+	std::vector<FileReaderWriterServicePtr>  retval;
+	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
+	{
+		if (dataType.compare((*iter)->canReadDataType()) == 0)
+			retval.push_back(*iter);
+	}
+
+	return retval;
+
+}
+
 QString FileManagerImpService::findDataTypeFromFile(QString filename)
 {
 	FileReaderWriterServicePtr reader = this->findReader(filename);

@@ -33,7 +33,6 @@ public:
 	//write
 	virtual void save(DataPtr data, const QString& filename) = 0;
 
-
 	virtual vtkImageDataPtr loadVtkImageData(QString filename) = 0;
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename) = 0;
 
@@ -42,6 +41,7 @@ public:
 
 	virtual QString findDataTypeFromFile(QString filename) = 0;
 	virtual std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType) = 0;
+	virtual std::vector<FileReaderWriterServicePtr> getImportersForDataType(QString dataType) = 0;
 };
 
 }

@@ -81,7 +81,7 @@ public:
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode& dataNode);
-	virtual bool load(QString path, FileManagerServicePtr filemanager) { return true; } ///< metrics don't store info in file, xml only.
+	virtual bool load(QString path, FileManagerServicePtr filemanager); ///< metrics don't store info in file, xml only.
 	virtual void save(const QString& basePath, FileManagerServicePtr filemanager) {} ///< metrics don't store info in file, xml only.
 
 protected:

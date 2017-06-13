@@ -510,6 +510,7 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 	}
 }
 
+/*
 QColor MetricManager::getRandomColor()
 {
 	QStringList colorNames = QColor::colorNames();
@@ -520,9 +521,12 @@ QColor MetricManager::getRandomColor()
 
 	return color;
 }
+*/
 
+/*
 std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description)
 {
+
 	std::vector<QString> data_uid;
 
 	QDialog selectVolumeDialog;
@@ -553,9 +557,12 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 	}
 	return data_uid;
 }
+*/
 
 void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode)
 {
+	/*
+
 	//--- HACK to be able to read *.tag files with missing newline before eof
 	forceNewlineBeforeEof(filename);
 
@@ -617,6 +624,7 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 		}
 
 	}
+	*/
 }
 
 DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)

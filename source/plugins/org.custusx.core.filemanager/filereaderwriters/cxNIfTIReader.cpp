@@ -13,7 +13,7 @@ namespace cx
 {
 
 NIfTIReader::NIfTIReader() :
-	FileReaderWriterImplService("NIfTIReader", "image", "image", "nii")
+	FileReaderWriterImplService("NIfTIReader", "image", "", "nii")
 {
 	sform_matrix = vtkMatrix4x4Ptr::New();
 }
@@ -38,6 +38,7 @@ bool NIfTIReader::readInto(ImagePtr image, QString path)
 
 	return true;
 }
+
 
 bool NIfTIReader::readInto(DataPtr data, QString filename)
 {
@@ -102,7 +103,7 @@ bool NIfTIReader::canWrite(const QString &type, const QString &filename) const
 	return this->canWriteInternal(type, filename);
 }
 
-void NIfTIReader::write(DataPtr data, const QString &filename)
+void NIfTIReader::write(cx::DataPtr data, const QString &filename)
 {
 }
 

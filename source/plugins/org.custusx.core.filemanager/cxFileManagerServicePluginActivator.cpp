@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxXMLPolyDataMeshReader.h"
 #include "cxStlMeshReader.h"
 #include "cxNIfTIReader.h"
+#include "cxMNIReaderWriter.h"
 
 namespace cx
 {
@@ -65,6 +66,7 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<NIfTIReader>(context, new NIfTIReader(), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MNIReaderWriter>(context, new MNIReaderWriter(context), FileReaderWriterService_iid));
 
 	mRegisteredGuiExtenderService = RegisteredService::create<ImportExportGuiExtenderService>(context, new ImportExportGuiExtenderService(context), GUIExtenderService_iid);
 }

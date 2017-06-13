@@ -66,6 +66,7 @@ public:
 
 	QString findDataTypeFromFile(QString filename);
 	std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType);
+	std::vector<FileReaderWriterServicePtr> getImportersForDataType(QString dataType);
 
 	void addFileReaderWriter(FileReaderWriterService *service);
 	void removeFileReaderWriter(FileReaderWriterService *service);

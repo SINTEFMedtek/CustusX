@@ -76,6 +76,13 @@ void FileManagerServiceNull::removeFileReaderWriter(FileReaderWriterService *ser
 
 std::vector<FileReaderWriterServicePtr> FileManagerServiceNull::getExportersForDataType(QString dataType)
 {
+	printWarning();
+	return std::vector<FileReaderWriterServicePtr>();
+}
+
+std::vector<FileReaderWriterServicePtr> FileManagerServiceNull::getImportersForDataType(QString dataType)
+{
+	printWarning();
 	return std::vector<FileReaderWriterServicePtr>();
 }
 

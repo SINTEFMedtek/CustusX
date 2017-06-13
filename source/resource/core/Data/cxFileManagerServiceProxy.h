@@ -32,6 +32,7 @@ public:
 	void removeFileReaderWriter(FileReaderWriterService *service);
 
 	std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType);
+	std::vector<FileReaderWriterServicePtr> getImportersForDataType(QString dataType);
 
 private:
 	void initServiceListener();
