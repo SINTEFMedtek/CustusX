@@ -76,24 +76,26 @@ QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 	// name: find something from series
 	QString currentTimestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QString uid = QString("%1_%2_%3").arg(seriesDescription).arg(seriesNumber).arg(currentTimestamp);
-	uid = this->convertToValidFilename(uid);
+    uid = this->convertToValidName(uid);
 	return uid;
 }
 
-QString DicomConverter::convertToValidFilename(QString text) const
+QString DicomConverter::convertToValidName(QString text) const
 {
 	QStringList illegal;
-	illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*" << "\\^" << ",";
+    illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*"
+            << "\\^" << "," << "\\%";
 	QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
 	text = text.replace(regexp, "_");
 	return text	;
 }
 
+
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
 	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
-	QString name = QString("%1").arg(seriesDescription);
-	return name;
+    QString name = convertToValidName(seriesDescription);
+    return name;
 }
 
 ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
