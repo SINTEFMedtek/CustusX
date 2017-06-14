@@ -97,7 +97,7 @@ DataPtr NIfTIReader::read(const QString &uid, const QString &filename)
 std::vector<DataPtr> NIfTIReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mPatientModelService->createData(Image::getTypeName() ,""));
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName(), filename));
 
 	vtkImageDataPtr raw = this->loadVtkImageData(filename);
 	if(!raw)

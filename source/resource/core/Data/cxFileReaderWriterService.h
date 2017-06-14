@@ -74,9 +74,10 @@ protected:
 	bool canReadInternal(const QString& type, const QString& filename) const;
 	bool canWriteInternal(const QString& type, const QString& filename) const;
 
-	PatientModelServicePtr mPatientModelService;
+	DataPtr createData(QString type, QString filename, QString name = "") const;
 
 private:
+	PatientModelServicePtr mPatientModelService;
 
 	QString mName;
 	QString mCanReadDataType; //TODO: convert to enum?

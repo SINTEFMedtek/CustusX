@@ -104,7 +104,7 @@ std::vector<DataPtr> MetaImageReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mPatientModelService->createData(Image::getTypeName() ,""));
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName(), filename));
 
 	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 	Transform3D rMd = customReader->readTransform();

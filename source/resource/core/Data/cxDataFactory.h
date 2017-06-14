@@ -63,9 +63,10 @@ public:
 		return boost::dynamic_pointer_cast<T>(retval);
 	}
 private:
+	DataPtr createRaw(QString type, QString uid);
+
 	PatientModelServicePtr mDataManager;
 	SpaceProviderPtr mSpaceProvider;
-	DataPtr createRaw(QString type, QString uid);
 
 };
 typedef boost::shared_ptr<DataFactory> DataFactoryPtr;

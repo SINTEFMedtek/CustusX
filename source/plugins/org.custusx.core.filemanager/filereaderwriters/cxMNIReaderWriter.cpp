@@ -29,6 +29,7 @@ MNIReaderWriter::MNIReaderWriter(ctkPluginContext *context) :
 	FileReaderWriterImplService("MNIReaderWriter", "pointMetric", "", "tag", context)
 {
 	mViewService = ViewServiceProxy::create(context);
+	mPatientModelServicePrivate = PatientModelServiceProxy::create(context);
 }
 
 bool MNIReaderWriter::isNull()
@@ -107,11 +108,11 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 				vtkStdString label = labels->GetValue(j);
 				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
 				//TODO is this still needed?
-				QString uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
+				//QString uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
 
 				double *point = points->GetPoint(j);
 				//DataPtr data = this->createData(type, uid, QString::number(j+1));
-				DataPtr data_point_metric = mPatientModelService->createData(type, uid, QString::number(j+1));
+				DataPtr data_point_metric = this->createData(type, filename, QString::number(j+1));
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data_point_metric);
 
 				CoordinateSystem space(csDATA, data_uid[i]);
@@ -189,7 +190,7 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 
 				double *point = points->GetPoint(j);
 				//DataPtr data = this->createData(type, uid, QString::number(j+1));
-				data = mPatientModelService->createData(type, uid, QString::number(j+1));
+				data = this->createData(type, path, QString::number(j+1));
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
 
 				CoordinateSystem space(csDATA, data_uid[i]);
@@ -253,8 +254,8 @@ std::vector<QString> MNIReaderWriter::dialogForSelectingVolumesForImportedMNITag
 	std::map<int, StringPropertySelectImagePtr> selectedImageProperties;
 	for(int i=0; i < number_of_volumes; ++i)
 	{
-		StringPropertySelectImagePtr image_property = StringPropertySelectImage::New(mPatientModelService);
-		QWidget *widget = createDataWidget(mViewService, mPatientModelService, NULL, image_property);
+		StringPropertySelectImagePtr image_property = StringPropertySelectImage::New(mPatientModelServicePrivate);
+		QWidget *widget = createDataWidget(mViewService, mPatientModelServicePrivate, NULL, image_property);
 		layout->addWidget(widget);
 		selectedImageProperties[i] = image_property;
 	}

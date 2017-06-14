@@ -2,7 +2,10 @@
 #include "cxFileReaderWriterServiceNull.h"
 #include "cxNullDeleter.h"
 #include <QFileInfo>
+#include <QUuid>
 #include "cxPatientModelServiceProxy.h"
+#include "cxTime.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
@@ -56,6 +59,21 @@ bool FileReaderWriterImplService::canWriteInternal(const QString &type, const QS
 	bool rightFileType = sameSuffix(fileType, mFileSuffix);
 	bool rightDataType = (type == mCanWriteDataType);
 	return rightFileType;
+}
+
+DataPtr FileReaderWriterImplService::createData(QString type, QString filename, QString name) const
+{
+	QFileInfo fileInfo(filename);
+	QString strippedFilename = changeExtension(fileInfo.fileName(), "");
+	QString unique = QUuid::createUuid().toString();
+	//std::cout << "unique: " << unique.toStdString().c_str() << std::endl;
+	QString uid = strippedFilename + "_" + unique + "_" +QDateTime::currentDateTime().toString(timestampSecondsFormat());
+	if(name.isEmpty())
+		name = strippedFilename;
+
+	DataPtr data = mPatientModelService->createData(type, uid, name);
+
+	return data;
 }
 
 

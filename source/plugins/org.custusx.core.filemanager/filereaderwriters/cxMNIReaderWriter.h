@@ -30,9 +30,8 @@ public:
 private:
 	QColor getRandomColor();
 	std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description);
-	DataPtr createData(QString type, QString uid, QString name);
 
-	PatientModelServicePtr mPatientModelService;
+	PatientModelServicePtr mPatientModelServicePrivate;
 	ViewServicePtr mViewService;
 };
 }

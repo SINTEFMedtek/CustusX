@@ -63,7 +63,7 @@ DataPtr StlMeshReader::read(const QString& uid, const QString& filename)
 std::vector<DataPtr> StlMeshReader::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
-	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mPatientModelService->createData(Mesh::getTypeName(), ""));
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(this->createData(Mesh::getTypeName(), filename));
 
 	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
 	if(!raw)
