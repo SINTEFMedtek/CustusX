@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNullDeleter.h"
 #include "cxLogger.h"
 #include "boost/bind.hpp"
+#include "cxCoreServices.h"
 
 namespace cx
 {
@@ -46,6 +47,7 @@ FileManagerImpService::FileManagerImpService(ctkPluginContext *context) :
 {
 	this->setObjectName("FileManagerImpService");
 	this->initServiceListener();
+
 }
 
 FileManagerImpService::~FileManagerImpService()
@@ -158,6 +160,15 @@ bool FileManagerImpService::readInto(DataPtr data, QString path)
 	}
 	return success;
 
+}
+
+std::vector<DataPtr> FileManagerImpService::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+	FileReaderWriterServicePtr reader = this->findReader(filename);
+	if (reader)
+		retval = reader->read(filename);
+	return retval;
 }
 
 void FileManagerImpService::save(DataPtr data, const QString &filename)

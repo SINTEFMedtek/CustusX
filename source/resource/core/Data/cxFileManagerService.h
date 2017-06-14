@@ -26,9 +26,13 @@ public:
 	//TODO harmonize with filereaderwriter (read and write...)
 	//read
 	virtual bool canLoad(const QString& type, const QString& filename) = 0;
+	virtual QString canLoadDataType() const = 0;
+	virtual std::vector<DataPtr> read(const QString &filename) = 0;
+
+	//--- TODO remove
 	virtual DataPtr load(const QString& uid, const QString& filename) = 0;
-	virtual QString canLoadDataType() const =0;
 	virtual bool readInto(DataPtr data, QString path) = 0;
+	//---
 
 	//write
 	virtual void save(DataPtr data, const QString& filename) = 0;

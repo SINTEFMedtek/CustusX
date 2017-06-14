@@ -56,6 +56,7 @@ public:
 	bool canLoad(const QString& type, const QString& filename);
 	DataPtr load(const QString& uid, const QString& filename);
 	bool readInto(DataPtr data, QString path);
+	std::vector<DataPtr> read(const QString &filename);
 
 	//write
 	void save(DataPtr data, const QString& filename);
@@ -82,7 +83,6 @@ private:
 private:
 	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
 	std::set<FileReaderWriterServicePtr> mDataReaders;
-
 };
 
 typedef boost::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;

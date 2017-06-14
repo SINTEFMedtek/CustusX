@@ -20,6 +20,7 @@ public:
 	QString canReadDataType() const;
 	bool canRead(const QString &type, const QString &filename);
 	DataPtr read(const QString &uid, const QString &filename); ///< WARNING: will produce a popup dialog
+	std::vector<DataPtr> read(const QString &filename); ///< WARNING: will produce a popup dialog
 	bool readInto(DataPtr data, QString path);
 
 	QString canWriteDataType() const;

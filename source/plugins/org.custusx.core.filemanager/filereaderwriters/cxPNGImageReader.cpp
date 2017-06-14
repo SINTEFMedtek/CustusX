@@ -5,13 +5,14 @@
 #include <vtkImageData.h>
 #include <ctkPluginContext.h>
 #include "cxImage.h"
+#include "cxPatientModelService.h"
 
 typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 namespace cx
 {
 
-PNGImageReader::PNGImageReader() :
-	FileReaderWriterImplService("PNGImageReader" ,"image", "", "png")
+PNGImageReader::PNGImageReader(ctkPluginContext *context) :
+	FileReaderWriterImplService("PNGImageReader" ,"image", "", "png", context)
 {
 
 }
@@ -43,6 +44,21 @@ DataPtr PNGImageReader::read(const QString& uid, const QString& filename)
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
 	return image;
+}
+
+std::vector<DataPtr> PNGImageReader::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mPatientModelService->createData(Image::getTypeName() ,""));
+
+	vtkImageDataPtr raw = this->loadVtkImageData(filename);
+	if(!raw)
+		return retval;
+	image->setVtkImageData(raw);
+
+	retval.push_back(image);
+	return retval;
+
 }
 
 vtkImageDataPtr PNGImageReader::loadVtkImageData(QString filename)

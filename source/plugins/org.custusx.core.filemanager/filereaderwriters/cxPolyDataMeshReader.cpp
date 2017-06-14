@@ -48,6 +48,20 @@ DataPtr PolyDataMeshReader::read(const QString& uid, const QString& filename)
 	return mesh;
 }
 
+std::vector<DataPtr> PolyDataMeshReader::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mPatientModelService->createData(Mesh::getTypeName(), ""));
+
+	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
+	if(!raw)
+		return retval;
+	mesh->setVtkPolyData(raw);
+
+	retval.push_back(mesh);
+	return retval;
+}
+
 void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 {
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
@@ -61,8 +75,8 @@ void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 	writer->Write();
 }
 
-PolyDataMeshReader::PolyDataMeshReader() :
-	FileReaderWriterImplService("PolyDataMeshReader", "mesh", "mesh", "vtk")
+PolyDataMeshReader::PolyDataMeshReader(ctkPluginContext *context) :
+	FileReaderWriterImplService("PolyDataMeshReader", "mesh", "mesh", "vtk", context)
 {
 }
 

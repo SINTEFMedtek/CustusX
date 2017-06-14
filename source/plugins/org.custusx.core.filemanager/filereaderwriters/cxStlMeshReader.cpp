@@ -13,8 +13,8 @@
 namespace cx
 {
 
-StlMeshReader::StlMeshReader() :
-	FileReaderWriterImplService("StlMeshReader", "mesh", "mesh", "stl")
+StlMeshReader::StlMeshReader(ctkPluginContext *context) :
+	FileReaderWriterImplService("StlMeshReader", "mesh", "mesh", "stl", context)
 {
 }
 
@@ -58,6 +58,20 @@ DataPtr StlMeshReader::read(const QString& uid, const QString& filename)
 	MeshPtr mesh(new Mesh(uid));
 	this->readInto(mesh, filename);
 	return mesh;
+}
+
+std::vector<DataPtr> StlMeshReader::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mPatientModelService->createData(Mesh::getTypeName(), ""));
+
+	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
+	if(!raw)
+		return retval;
+	mesh->setVtkPolyData(raw);
+
+	retval.push_back(mesh);
+	return retval;
 }
 
 void StlMeshReader::write(DataPtr data, const QString &filename)

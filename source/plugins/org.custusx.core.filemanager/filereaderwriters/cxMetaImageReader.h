@@ -15,7 +15,7 @@ class org_custusx_core_filemanager_EXPORT MetaImageReader : public FileReaderWri
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	MetaImageReader();
+	MetaImageReader(ctkPluginContext *context);
 	virtual ~MetaImageReader(){}
 	bool isNull();
 
@@ -24,6 +24,7 @@ public:
 	virtual bool readInto(DataPtr data, QString path);
 	virtual bool readInto(ImagePtr image, QString filename);
 	virtual DataPtr read(const QString& uid, const QString& filename);
+	std::vector<DataPtr> read(const QString &filename);
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 
 	QString canWriteDataType() const;

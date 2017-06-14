@@ -50,7 +50,7 @@ CeetronPluginActivator::~CeetronPluginActivator()
 
 void CeetronPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<CgeoReaderWriter>(context, new CgeoReaderWriter(), FileReaderWriterService_iid);
+	mRegistration = RegisteredService::create<CgeoReaderWriter>(context, new CgeoReaderWriter(context), FileReaderWriterService_iid);
 }
 
 void CeetronPluginActivator::stop(ctkPluginContext* context)

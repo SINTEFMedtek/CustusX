@@ -50,6 +50,11 @@ bool FileReaderWriterServiceNull::canRead(const QString &type, const QString &fi
 	return false;
 }
 
+std::vector<DataPtr> FileReaderWriterServiceNull::read(const QString &filename)
+{
+	return std::vector<DataPtr>();
+}
+
 DataPtr FileReaderWriterServiceNull::read(const QString &uid, const QString &filename)
 {
 	return DataPtr();

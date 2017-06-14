@@ -13,7 +13,7 @@ namespace cx
 class org_custusx_core_filemanager_EXPORT NIfTIReader: public FileReaderWriterImplService
 {
 public:
-	NIfTIReader();
+	NIfTIReader(ctkPluginContext *context);
 	virtual ~NIfTIReader();
 
 	bool isNull();
@@ -23,6 +23,7 @@ public:
 	virtual bool readInto(DataPtr data, QString path);
 	QString canReadDataType() const;
 	DataPtr read(const QString &uid, const QString &filename);
+	std::vector<DataPtr> read(const QString &filename);
 
 	QString canWriteDataType() const;
 	bool canWrite(const QString &type, const QString &filename) const;

@@ -60,12 +60,12 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 	FileManagerImpService *filemanager = new FileManagerImpService(context);
 	mRegisteredFileManagerService = RegisteredService::create<FileManagerImpService>(context, filemanager, FileManagerService_iid);
 
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PNGImageReader>(context, new PNGImageReader(), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PolyDataMeshReader>(context, new PolyDataMeshReader(), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<NIfTIReader>(context, new NIfTIReader(), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(context), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PNGImageReader>(context, new PNGImageReader(context), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PolyDataMeshReader>(context, new PolyDataMeshReader(context), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(context), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(context), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<NIfTIReader>(context, new NIfTIReader(context), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MNIReaderWriter>(context, new MNIReaderWriter(context), FileReaderWriterService_iid));
 
 	mRegisteredGuiExtenderService = RegisteredService::create<ImportExportGuiExtenderService>(context, new ImportExportGuiExtenderService(context), GUIExtenderService_iid);

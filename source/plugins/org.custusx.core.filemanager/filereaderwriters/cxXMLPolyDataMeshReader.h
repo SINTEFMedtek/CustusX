@@ -17,7 +17,7 @@ class org_custusx_core_filemanager_EXPORT XMLPolyDataMeshReader: public FileRead
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	XMLPolyDataMeshReader();
+	XMLPolyDataMeshReader(ctkPluginContext *context);
 	virtual ~XMLPolyDataMeshReader(){}
 
 	bool isNull(){ return false;}
@@ -27,6 +27,7 @@ public:
 	virtual QString canReadDataType() const { return "mesh"; }
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(MeshPtr mesh, QString filename);
+	std::vector<DataPtr> read(const QString &filename);
 
 	void write(DataPtr data, const QString &filename) {}
 	QString canWriteDataType() const;
@@ -36,6 +37,7 @@ public:
 
 
 };
+
 }
 
 #endif // CXXMLPOLYDATAMESHREADER_H

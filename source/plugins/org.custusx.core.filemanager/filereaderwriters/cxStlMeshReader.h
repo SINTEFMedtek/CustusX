@@ -15,7 +15,7 @@ class org_custusx_core_filemanager_EXPORT StlMeshReader: public FileReaderWriter
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	StlMeshReader();
+	StlMeshReader(ctkPluginContext *context);
 	virtual ~StlMeshReader(){}
 
 	bool isNull(){return false;}
@@ -25,6 +25,7 @@ public:
 	bool readInto(MeshPtr mesh, QString filename);
 	virtual QString canReadDataType() const { return "mesh"; }
 	virtual DataPtr read(const QString& uid, const QString& filename);
+	std::vector<DataPtr> read(const QString &filename);
 
 	void write(DataPtr data, const QString &filename);
 	QString canWriteDataType() const;

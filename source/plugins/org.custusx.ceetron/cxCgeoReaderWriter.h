@@ -18,11 +18,12 @@ class org_custusx_ceetron_EXPORT CgeoReaderWriter : public FileReaderWriterImplS
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	CgeoReaderWriter();
+	CgeoReaderWriter(ctkPluginContext *context);
 
 	bool isNull();
 
 	bool canRead(const QString &type, const QString &filename);
+	std::vector<DataPtr> read(const QString &filename);
 	DataPtr read(const QString &uid, const QString &filename);
 	QString canReadDataType() const;
 	bool readInto(DataPtr data, QString path);

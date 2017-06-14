@@ -16,7 +16,7 @@ class org_custusx_core_filemanager_EXPORT PolyDataMeshReader: public FileReaderW
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	PolyDataMeshReader();
+	PolyDataMeshReader(ctkPluginContext *context);
 	virtual ~PolyDataMeshReader(){}
 
 	bool isNull(){ return false; }
@@ -28,6 +28,7 @@ public:
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
 	virtual QString canReadDataType() const { return "mesh"; }
 	virtual DataPtr read(const QString& uid, const QString& filename);
+	std::vector<DataPtr> read(const QString &filename);
 
 	virtual void write(DataPtr data, const QString& filename);
 	QString canWriteDataType() const;

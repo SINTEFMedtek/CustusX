@@ -17,6 +17,12 @@ bool FileManagerServiceNull::isNull()
 	return true;
 }
 
+std::vector<DataPtr> FileManagerServiceNull::read(const QString &filename)
+{
+	printWarning();
+	return std::vector<DataPtr>();
+}
+
 bool FileManagerServiceNull::canLoad(const QString &type, const QString &filename)
 {
 	printWarning();

@@ -8,12 +8,13 @@
 #include "cxTypeConversions.h"
 #include "cxErrorObserver.h"
 #include "cxImage.h"
+#include "cxPatientModelService.h"
 
 namespace cx
 {
 
-NIfTIReader::NIfTIReader() :
-	FileReaderWriterImplService("NIfTIReader", "image", "", "nii")
+NIfTIReader::NIfTIReader(ctkPluginContext *context) :
+	FileReaderWriterImplService("NIfTIReader", "image", "", "nii", context)
 {
 	sform_matrix = vtkMatrix4x4Ptr::New();
 }
@@ -91,6 +92,24 @@ DataPtr NIfTIReader::read(const QString &uid, const QString &filename)
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
 	return image;
+}
+
+std::vector<DataPtr> NIfTIReader::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mPatientModelService->createData(Image::getTypeName() ,""));
+
+	vtkImageDataPtr raw = this->loadVtkImageData(filename);
+	if(!raw)
+		return retval;
+
+	Transform3D rMd(sform_matrix);
+	image->setVtkImageData(raw);
+	image->get_rMd_History()->setRegistration(rMd);
+
+
+	retval.push_back(image);
+	return retval;
 }
 
 QString NIfTIReader::canWriteDataType() const

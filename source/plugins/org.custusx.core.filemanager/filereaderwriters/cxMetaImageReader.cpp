@@ -11,6 +11,8 @@
 #include "cxImage.h"
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
+#include "cxCoreServices.h"
+#include "cxPatientModelService.h"
 
 namespace cx {
 
@@ -31,8 +33,8 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 	return zeroer->GetOutput();
 }
 
-MetaImageReader::MetaImageReader() :
-	FileReaderWriterImplService("MetaImageReader", "image", "image", "mhd")
+MetaImageReader::MetaImageReader(ctkPluginContext *context) :
+	FileReaderWriterImplService("MetaImageReader", "image", "image", "mhd", context)
 {
 }
 
@@ -96,6 +98,44 @@ DataPtr MetaImageReader::read(const QString& uid, const QString& filename)
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
 	return image;
+}
+
+std::vector<DataPtr> MetaImageReader::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mPatientModelService->createData(Image::getTypeName() ,""));
+
+	CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+	Transform3D rMd = customReader->readTransform();
+
+	vtkImageDataPtr raw = this->loadVtkImageData(filename);
+	if(!raw)
+		return retval;
+
+	image->setVtkImageData(raw);
+//	ImagePtr image(new Image(uid, raw));
+
+	//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
+	//  image->get_rMd_History()->addRegistration(regTrans);
+	image->get_rMd_History()->setRegistration(rMd);
+	image->setModality(customReader->readModality());
+	image->setImageType(customReader->readImageType());
+
+	bool ok1 = true;
+	bool ok2 = true;
+	double level = customReader->readKey("WindowLevel").toDouble(&ok1);
+	double window = customReader->readKey("WindowWidth").toDouble(&ok2);
+
+	if (ok1 && ok2)
+	{
+		image->setInitialWindowLevel(window, level);
+		image->resetTransferFunctions();
+	}
+
+	retval.push_back(image);
+	return retval;
+
 }
 
 void MetaImageReader::write(DataPtr data, const QString& filename)

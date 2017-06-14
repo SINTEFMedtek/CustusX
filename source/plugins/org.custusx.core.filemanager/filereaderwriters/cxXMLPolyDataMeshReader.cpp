@@ -25,6 +25,20 @@ bool XMLPolyDataMeshReader::readInto(MeshPtr mesh, QString filename)
 	return true;
 }
 
+std::vector<DataPtr> XMLPolyDataMeshReader::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(mPatientModelService->createData(Mesh::getTypeName(), ""));
+
+	vtkPolyDataPtr raw = this->loadVtkPolyData(filename);
+	if(!raw)
+		return retval;
+	mesh->setVtkPolyData(raw);
+
+	retval.push_back(mesh);
+	return retval;
+}
+
 vtkPolyDataPtr XMLPolyDataMeshReader::loadVtkPolyData(QString fileName)
 {
 	vtkXMLPolyDataReaderPtr reader = vtkXMLPolyDataReaderPtr::New();
@@ -44,8 +58,8 @@ DataPtr XMLPolyDataMeshReader::read(const QString& uid, const QString& filename)
 	return mesh;
 }
 
-XMLPolyDataMeshReader::XMLPolyDataMeshReader() :
-	FileReaderWriterImplService("XMLPolyDataMeshReader", "mesh", "", "vtp")
+XMLPolyDataMeshReader::XMLPolyDataMeshReader(ctkPluginContext *context) :
+	FileReaderWriterImplService("XMLPolyDataMeshReader", "mesh", "", "vtp", context)
 {
 }
 

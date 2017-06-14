@@ -41,6 +41,11 @@ QString FileManagerServiceProxy::canLoadDataType() const
 	return mService->canLoadDataType();
 }
 
+std::vector<DataPtr> FileManagerServiceProxy::read(const QString &filename)
+{
+	return mService->read(filename);
+}
+
 bool FileManagerServiceProxy::readInto(DataPtr data, QString path)
 {
 	return mService->readInto(data, path);

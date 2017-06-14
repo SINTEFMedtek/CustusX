@@ -2,6 +2,7 @@
 #include "cxFileReaderWriterServiceNull.h"
 #include "cxNullDeleter.h"
 #include <QFileInfo>
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -21,13 +22,14 @@ bool sameSuffix(QString suffix1, QString suffix2)
 	return (suffix1.compare(suffix2, Qt::CaseInsensitive) == 0 || suffix1.compare(suffix2, Qt::CaseInsensitive) == 0);
 }
 
-FileReaderWriterImplService::FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix) :
+FileReaderWriterImplService::FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix, ctkPluginContext *context) :
 	mName(name),
 	mCanReadDataType(canReadDataType),
 	mCanWriteDataType(canWriteDataType),
 	mFileSuffix(fileSuffix)
 {
 	this->setObjectName(mName);
+	mPatientModelService = PatientModelServiceProxy::create(context);
 }
 
 QString FileReaderWriterImplService::getName() const
@@ -55,5 +57,6 @@ bool FileReaderWriterImplService::canWriteInternal(const QString &type, const QS
 	bool rightDataType = (type == mCanWriteDataType);
 	return rightFileType;
 }
+
 
 }

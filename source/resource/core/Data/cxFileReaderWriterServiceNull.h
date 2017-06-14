@@ -51,6 +51,7 @@ public:
 	QString getFileSuffix() const;
 
 	bool canRead(const QString &type, const QString &filename);
+	std::vector<DataPtr> read(const QString &filename);
 	DataPtr read(const QString &uid, const QString &filename);
 	QString canReadDataType() const;
 	bool readInto(DataPtr data, QString path);

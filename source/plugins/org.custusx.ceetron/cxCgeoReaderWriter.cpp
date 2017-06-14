@@ -9,8 +9,8 @@
 namespace cx
 {
 
-CgeoReaderWriter::CgeoReaderWriter() :
-	FileReaderWriterImplService("CgeoReaderWriter", "", "mesh", "cgeo")
+CgeoReaderWriter::CgeoReaderWriter(ctkPluginContext *context) :
+	FileReaderWriterImplService("CgeoReaderWriter", "", "mesh", "cgeo", context)
 {
 }
 
@@ -22,6 +22,11 @@ bool CgeoReaderWriter::isNull()
 bool CgeoReaderWriter::canRead(const QString &type, const QString &filename)
 {
 	return false;
+}
+
+std::vector<DataPtr> CgeoReaderWriter::read(const QString &filename)
+{
+	return std::vector<DataPtr>();
 }
 
 DataPtr CgeoReaderWriter::read(const QString &uid, const QString &filename)

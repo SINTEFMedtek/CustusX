@@ -25,6 +25,11 @@ bool FileReaderWriterServiceProxy::canRead(const QString &type, const QString &f
 	return mService->canRead(type, filename);
 }
 
+std::vector<DataPtr> FileReaderWriterServiceProxy::read(const QString &filename)
+{
+	return mService->read(filename);
+}
+
 DataPtr FileReaderWriterServiceProxy::read(const QString &uid, const QString &filename)
 {
 	return mService->read(uid, filename);

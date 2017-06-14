@@ -8,6 +8,8 @@
 
 #define FileReaderWriterService_iid "cx::FileReaderWriterService"
 
+class ctkPluginContext;
+
 namespace cx
 {
 
@@ -29,8 +31,13 @@ public:
 	//reading
 	virtual QString canReadDataType() const = 0;
 	virtual bool canRead(const QString& type, const QString& filename) = 0;
+
+	virtual std::vector<DataPtr> read(const QString& filename) = 0;
+
+	//--- TODO REMOVE:
 	virtual DataPtr read(const QString& uid, const QString& filename) = 0;
 	virtual bool readInto(DataPtr data, QString path) = 0;
+	//---
 
 	//writing
 	virtual QString canWriteDataType() const = 0;
@@ -55,7 +62,7 @@ class cxResource_EXPORT FileReaderWriterImplService : public FileReaderWriterSer
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix);
+	FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix, ctkPluginContext *context);
 
 	virtual QString getName() const;
 	virtual QString getFileSuffix() const;
@@ -67,11 +74,15 @@ protected:
 	bool canReadInternal(const QString& type, const QString& filename) const;
 	bool canWriteInternal(const QString& type, const QString& filename) const;
 
+	PatientModelServicePtr mPatientModelService;
+
 private:
+
 	QString mName;
 	QString mCanReadDataType; //TODO: convert to enum?
 	QString mCanWriteDataType; //TODO: convert to enum?
 	QString mFileSuffix;
+
 
 	//cxEnumConverter.h
 	//cxDefinitions.h

@@ -18,6 +18,8 @@ public:
 	bool canLoad(const QString &type, const QString &filename);
 	DataPtr load(const QString &uid, const QString &filename);
 	QString canLoadDataType() const;
+	std::vector<DataPtr> read(const QString &filename);
+
 	bool readInto(DataPtr data, QString path);
 	QString findDataTypeFromFile(QString filename);
 	vtkPolyDataPtr loadVtkPolyData(QString filename);

@@ -14,7 +14,7 @@ class org_custusx_core_filemanager_EXPORT PNGImageReader: public FileReaderWrite
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	PNGImageReader();
+	PNGImageReader(ctkPluginContext *context);
 	virtual ~PNGImageReader() {}
 
 	bool isNull(){return false;}
@@ -24,6 +24,7 @@ public:
 	bool readInto(ImagePtr image, QString filename);
 	virtual QString canReadDataType() const { return "image"; }
 	virtual DataPtr read(const QString& uid, const QString& filename);
+	std::vector<DataPtr> read(const QString &filename);
 
 	void write(DataPtr data, const QString &filename) {};
 	QString canWriteDataType() const;

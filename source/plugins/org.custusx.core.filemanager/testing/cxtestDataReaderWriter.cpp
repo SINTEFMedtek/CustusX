@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkRenderWindowInteractor.h>
 #include "cxMesh.h"
 #include "cxXMLPolyDataMeshReader.h"
+#include "cxLogicManager.h"
 
 namespace cxtest
 {
@@ -51,7 +52,8 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
 {
    //read the file
    QString filename = "out.vtp";
-   cx::XMLPolyDataMeshReader *reader =  new cx::XMLPolyDataMeshReader();
+   cx::LogicManager::initialize();
+   cx::XMLPolyDataMeshReader *reader =  new cx::XMLPolyDataMeshReader(cx::LogicManager::getInstance()->getPluginContext());
    REQUIRE(reader->canRead("mesh", filename));
 
 

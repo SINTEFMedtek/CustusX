@@ -26,9 +26,8 @@ namespace cx
 
 
 MNIReaderWriter::MNIReaderWriter(ctkPluginContext *context) :
-	FileReaderWriterImplService("MNIReaderWriter", "pointMetric", "", "tag")
+	FileReaderWriterImplService("MNIReaderWriter", "pointMetric", "", "tag", context)
 {
-	mPatientModelService = PatientModelServiceProxy::create(context);
 	mViewService = ViewServiceProxy::create(context);
 }
 
@@ -53,6 +52,86 @@ DataPtr MNIReaderWriter::read(const QString &uid, const QString &filename)
 	PointMetricPtr pointMetric;
 	this->readInto(pointMetric, filename);
 	return pointMetric;
+}
+
+std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
+{
+	std::vector<DataPtr> retval;
+
+	//TODO this needs to be implemented properly
+	bool testmode = false;
+
+	//--- HACK to be able to read *.tag files with missing newline before eof
+	forceNewlineBeforeEof(filename);
+
+	//TODO
+	//std::vector<DataPtr> retval;
+	//DataPtr retval;
+
+
+	//--- Reader for MNI Tag Point files
+	vtkMNITagPointReaderPtr reader = vtkMNITagPointReader::New();
+	reader->SetFileName(filename.toStdString().c_str());
+	reader->Update();
+	if (!ErrorObserver::checkedRead(reader, filename))
+		CX_LOG_ERROR() << "Error reading MNI Tag Point file.";
+
+
+	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
+	int number_of_volumes = reader->GetNumberOfVolumes();
+	QString description(reader->GetComments());
+	std::vector<QString> data_uid;
+	data_uid.push_back("");
+	data_uid.push_back("");
+	if(!testmode)
+		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+
+	//--- Create the point metrics
+	QString type = "pointMetric";
+	//QString uid = "";
+	QString name = "";
+	vtkStringArray *labels = reader->GetLabelText();
+
+	for(int i=0; i< number_of_volumes; ++i)
+	{
+		QColor color = getRandomColor();
+
+		vtkPoints *points = reader->GetPoints(i);
+		if(points != NULL)
+		{
+			unsigned int number_of_points = points->GetNumberOfPoints();
+			//CX_LOG_DEBUG() << "Number of points: " << number_of_points;
+
+			for(int j=0; j < number_of_points; ++j)
+			{
+				vtkStdString label = labels->GetValue(j);
+				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
+				//TODO is this still needed?
+				QString uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
+
+				double *point = points->GetPoint(j);
+				//DataPtr data = this->createData(type, uid, QString::number(j+1));
+				DataPtr data_point_metric = mPatientModelService->createData(type, uid, QString::number(j+1));
+				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data_point_metric);
+
+				CoordinateSystem space(csDATA, data_uid[i]);
+				Vector3D vector_ras(point[0], point[1], point[2]);
+				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
+
+				//Convert from RAS (MINC) to LPS (CX)
+				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+				Vector3D vector_lps = sMr.inv() * vector_ras;
+
+				point_metric->setCoordinate(vector_lps);
+				point_metric->setSpace(space);
+				point_metric->setColor(color);
+
+				retval.push_back(data_point_metric);
+			}
+		}
+	}
+
+	return retval;
 }
 
 bool MNIReaderWriter::readInto(DataPtr data, QString path)
@@ -110,7 +189,7 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 
 				double *point = points->GetPoint(j);
 				//DataPtr data = this->createData(type, uid, QString::number(j+1));
-				data = this->createData(type, uid, QString::number(j+1));
+				data = mPatientModelService->createData(type, uid, QString::number(j+1));
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
 
 				CoordinateSystem space(csDATA, data_uid[i]);
@@ -193,23 +272,5 @@ std::vector<QString> MNIReaderWriter::dialogForSelectingVolumesForImportedMNITag
 	return data_uid;
 }
 
-DataPtr MNIReaderWriter::createData(QString type, QString uid, QString name)
-{
-	DataPtr data = mPatientModelService->createData(type, uid, name);
-	if (!data)
-	{
-		reportError(QString("Not able to create metric with name: %1, uid: %2, type: %3").arg(name).arg(uid).arg(type));
-		return DataPtr();
-	}
-
-	if (!name.isEmpty())
-		data->setName(name);
-
-	//TODO: this should be done elsewhere, in the import dialog for example
-	mPatientModelService->insertData(data);
-
-	return data;
-
-}
 
 }
