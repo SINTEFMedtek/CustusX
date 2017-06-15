@@ -69,10 +69,4 @@ void Q_OBJECTExportDataTypeWidget::exportAllButtonClicked()
 	CX_LOG_ERROR() << "Q_OBJECTExportDataTypeWidget::exportAllButtonClicked()";
 }
 
-
-
-
-
-
-
 }

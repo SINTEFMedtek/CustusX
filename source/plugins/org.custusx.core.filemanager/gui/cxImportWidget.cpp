@@ -8,6 +8,7 @@
 #include "cxLogger.h"
 #include "cxPatientModelService.h"
 #include "cxProfile.h"
+#include "cxImportDataTypeWidget.h"
 
 namespace cx
 {
@@ -17,12 +18,12 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mFileManager(filemanager),
 	mVisServices(services)
 {
-
-	QVBoxLayout * topLayout = new QVBoxLayout();
-	this->setLayout(topLayout);
+	mTopLayout = new QVBoxLayout();
+	this->setLayout(mTopLayout);
 	QPushButton *importButton = new QPushButton("Import");
 	connect(importButton, &QPushButton::clicked, this, &ImportWidget::importButtonClicked);
-	topLayout->addWidget(importButton);
+	mTopLayout->addWidget(importButton);
+	mTopLayout->addStretch();
 }
 
 void ImportWidget::importButtonClicked()
@@ -34,15 +35,17 @@ void ImportWidget::importButtonClicked()
 	QString filename;
 	foreach (filename, filenames)
 	{
-		std::vector<DataPtr> imported_data = mFileManager->read(filename);
-		for(int i=0; i<imported_data.size(); ++i)
-		{
-			//TODO ImportDataTypeWidget
-			DataPtr data = imported_data[i];
-			if(data)
-				mVisServices->patient()->insertData(data);
-		}
+		//TODO save widget, so it can be removed later?
+		ImportDataTypeWidget *widget = new ImportDataTypeWidget(NULL, mFileManager, mVisServices, filename);
+		connect(widget, &ImportDataTypeWidget::finishedImporting, this, &ImportWidget::removeWidget);
+		mTopLayout->addWidget(widget);
 	}
+}
+
+void ImportWidget::removeWidget(QWidget *widget)
+{
+	mTopLayout->removeWidget(widget);
+	widget->deleteLater();
 }
 
 QStringList ImportWidget::openFileBrowserForSelectingFiles()

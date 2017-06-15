@@ -17,6 +17,7 @@ public:
 
 private slots:
 	void importButtonClicked();
+	void removeWidget(QWidget *widget);
 
 private:
 	QStringList openFileBrowserForSelectingFiles();
@@ -26,6 +27,8 @@ private:
 
 	FileManagerServicePtr mFileManager;
 	VisServicesPtr mVisServices;
+
+	QVBoxLayout * mTopLayout;
 
 };
 

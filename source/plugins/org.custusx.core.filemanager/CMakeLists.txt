@@ -22,6 +22,7 @@ set(PLUGIN_SRCS
     gui/cxExportWidget.cpp
     gui/cxImportWidget.cpp
     gui/cxExportDataTypeWidget.cpp
+    gui/cxImportDataTypeWidget.cpp
 
     filereaderwriters/cxMetaImageReader.h
     filereaderwriters/cxMetaImageReader.cpp
@@ -46,6 +47,7 @@ set(PLUGIN_MOC_SRCS
     gui/cxExportWidget.h
     gui/cxExportDataTypeWidget.h
     gui/cxImportWidget.h
+    gui/cxImportDataTypeWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
