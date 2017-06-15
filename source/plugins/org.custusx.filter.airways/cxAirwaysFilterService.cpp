@@ -66,6 +66,7 @@ namespace cx {
 AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
 	FilterImpl(services)
 {
+	fast::Reporter::setGlobalReportMethod(fast::Reporter::COUT);
     //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
     fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
     Q_UNUSED(importer)
