@@ -204,7 +204,8 @@ void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
 
 	//Make sure we have enough landmarks
 	int number_of_landmarks = mServices->patient()->getLandmarkProperties().size();
-	for(int i=0; i<(point_metrics.size()-number_of_landmarks); ++i)
+	int number_of_metrics = point_metrics.size();
+	for(int i=number_of_landmarks; i<number_of_metrics; ++i)
 	{
 		QString uid = mServices->patient()->addLandmark();
 	}
