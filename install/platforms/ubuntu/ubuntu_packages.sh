@@ -64,6 +64,8 @@ sudo apt-get install -y compizconfig-settings-manager
 sudo apt-get install -y network-manager-vpnc-gnome
 # connect via ssh (also remember to enable firewall ufw and open port 22)
 sudo apt-get install -y openssh-server
+# Install pycrypto
+sudo pip install pycrypto
 
 
 
