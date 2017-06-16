@@ -105,8 +105,7 @@ TEST_CASE("org.custusx.help: HelpEngine loads a page", "[unit][plugins][org.cust
 	QMap<QString, QUrl> links = engine->engine()->linksForIdentifier(id);
 	REQUIRE(links.size()==1);
 
-	CHECK(QString("qthelp://org.custusx.core/doc/index.html#%1").arg(id) == links.first().toString());
-//	std::cout << "LINKS: " << links.first().toString().toStdString() << std::endl;
+	CHECK(QString(links.first().toString()).contains(id));
 }
 
 
@@ -115,7 +114,7 @@ TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plu
 	cxtest::TestHelpFixture fixture;
 	fixture.setupHelpBrowserInsideMainWindow();
 
-	CHECK("qthelp://org.custusx.core/doc/index.html#user_doc_overview" == fixture.browser->source().toString());
+	CHECK(fixture.browser->source().toString().contains("user_doc_overview"));
 	// this can be a tricky test for overriding applications: they must have this string in the main page in order to
 	// succeed.
 	CHECK(fixture.browser->toPlainText().contains("CustusX"));
