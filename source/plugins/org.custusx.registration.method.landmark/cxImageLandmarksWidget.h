@@ -74,14 +74,15 @@ public:
 	virtual ~ImageLandmarksWidget(); ///< empty
 
 protected slots:
-//	virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
 	void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
 	virtual void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
 	void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
+	void deleteLandmarksButtonClickedSlot(); ///< reacts when the Delete Landmarks button is clicked
 	void importPointMetricsToLandmarkButtonClickedSlot();
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark is selected from the table
 	void enableButtons();
 	void onCurrentImageChanged();
+	void toggleDetailsSlot();
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -104,7 +105,12 @@ protected:
 	QPushButton* mAddLandmarkButton; ///< the Add Landmark button
 	QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
 	QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
+	QPushButton* mDeleteLandmarksButton; ///< the Delete Landmarks button
 	QPushButton* mImportLandmarksFromPointMetricsButton; ///< the Import Landmarks button
+	QAction* mDetailsAction;
+	QToolButton* mDetailsButton;
+	QHBoxLayout* mLandmarkAdvancedButtonsLayout;
+
 
 private:
 	ImageLandmarksWidget(); ///< not implemented

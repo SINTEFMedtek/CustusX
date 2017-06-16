@@ -103,6 +103,7 @@ public:
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 
 	virtual QString addLandmark() = 0;
+	virtual void deleteLandmarks() = 0;
 	virtual void setLandmarkNames(std::vector<QString> names) = 0;
 	virtual void setLandmarkName(QString uid, QString name) = 0;
 	virtual void setLandmarkActive(QString uid, bool active) = 0;

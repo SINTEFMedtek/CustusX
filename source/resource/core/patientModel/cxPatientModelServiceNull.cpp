@@ -169,6 +169,11 @@ QString PatientModelServiceNull::addLandmark()
 	return QString();
 }
 
+void PatientModelServiceNull::deleteLandmarks()
+{
+	printWarning();
+}
+
 void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)
 {
 	printWarning();

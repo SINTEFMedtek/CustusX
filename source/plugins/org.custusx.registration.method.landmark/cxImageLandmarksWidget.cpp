@@ -86,18 +86,38 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
 
 	mEditLandmarkButton = new QPushButton("Resample", this);
-	mEditLandmarkButton->setToolTip("Resample existing landmark");
+	mEditLandmarkButton->setToolTip("Resample the selected landmark");
 	mEditLandmarkButton->setDisabled(true);
 	connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
 
 	mRemoveLandmarkButton = new QPushButton("Clear", this);
-	mRemoveLandmarkButton->setToolTip("Clear selected landmark");
+	mRemoveLandmarkButton->setToolTip("Clear the selected landmark");
 	mRemoveLandmarkButton->setDisabled(true);
 	connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
-	mImportLandmarksFromPointMetricsButton = new QPushButton("Import point metrics", this);
-	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics which has the selected data set as parent.");
+	mDeleteLandmarksButton = new QPushButton("Delete All", this);
+	mDeleteLandmarksButton->setToolTip("Delete all landmarks");
+	connect(mDeleteLandmarksButton, SIGNAL(clicked()), this, SLOT(deleteLandmarksButtonClickedSlot()));
+
+	mImportLandmarksFromPointMetricsButton = new QPushButton("Import Point Metrics", this);
+	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics, which has the selected data set as parent space, as landmarks.");
 	connect(mImportLandmarksFromPointMetricsButton, SIGNAL(clicked()), this, SLOT(importPointMetricsToLandmarkButtonClickedSlot()));
+
+	QAction* detailsAction = this->createAction(this,
+		  QIcon(":/icons/open_icon_library/system-run-5.png"),
+		  "Details", "Toggle Details",
+		  SLOT(toggleDetailsSlot()),
+		  NULL);
+
+	//QToolButton* detailsButton = new QToolButton();
+	mDetailsButton = new QToolButton();
+	mDetailsButton->setObjectName("DetailedButton");
+	mDetailsButton->setDefaultAction(detailsAction);
+
+//	mDetailsAction = this->createAction(this,
+//										QIcon(":/icons/open_icon_library/system-run-5.png"),
+//										"Advanced", "Toggle additional actions",
+//										SLOT(toggleDetailsSlot()));
 
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mCurrentProperty));
@@ -108,8 +128,14 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	landmarkButtonsLayout->addWidget(mAddLandmarkButton);
 	landmarkButtonsLayout->addWidget(mEditLandmarkButton);
 	landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
-	landmarkButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
+	landmarkButtonsLayout->addWidget(mDeleteLandmarksButton);
+	landmarkButtonsLayout->addWidget(mDetailsButton);
 	mVerticalLayout->addLayout(landmarkButtonsLayout);
+
+	//QHBoxLayout* landmarkAdvancedButtonsLayout = new QHBoxLayout;
+	mLandmarkAdvancedButtonsLayout = new QHBoxLayout;
+	mLandmarkAdvancedButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
+	mVerticalLayout->addLayout(mLandmarkAdvancedButtonsLayout);
 }
 
 ImageLandmarksWidget::~ImageLandmarksWidget()
@@ -127,6 +153,12 @@ void ImageLandmarksWidget::onCurrentImageChanged()
 		mServices->registration()->setFixedData(data);
 
 	this->setModified();
+}
+
+void ImageLandmarksWidget::toggleDetailsSlot()
+{
+	//mLandmarkAdvancedButtonsLayout->setEnabled(false);
+	mImportLandmarksFromPointMetricsButton->setVisible(!mImportLandmarksFromPointMetricsButton->isVisible());
 }
 
 PickerRepPtr ImageLandmarksWidget::getPickerRep()
@@ -193,6 +225,17 @@ void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
 	this->activateLandmark(next);
 }
 
+void ImageLandmarksWidget::deleteLandmarksButtonClickedSlot()
+{
+	DataPtr image = this->getCurrentData();
+	if (!image)
+		return;
+
+	image->getLandmarks()->clear();
+	this->setModified();
+	mServices->patient()->deleteLandmarks();
+}
+
 void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
 {
 	DataPtr image = this->getCurrentData();
@@ -238,7 +281,9 @@ void ImageLandmarksWidget::enableButtons()
 
 	mEditLandmarkButton->setEnabled(selected);
 	mRemoveLandmarkButton->setEnabled(selected);
+	mDeleteLandmarksButton->setEnabled(loaded);
 	mAddLandmarkButton->setEnabled(loaded);
+	mImportLandmarksFromPointMetricsButton->setEnabled(loaded);
 
 	DataPtr image = this->getCurrentData();
 	if (image)
@@ -246,7 +291,6 @@ void ImageLandmarksWidget::enableButtons()
 		mAddLandmarkButton->setToolTip(QString("Add landmark to image %1").arg(image->getName()));
 		mEditLandmarkButton->setToolTip(QString("Resample landmark in image %1").arg(image->getName()));
 	}
-//	this->setModified();
 }
 
 void ImageLandmarksWidget::showEvent(QShowEvent* event)
