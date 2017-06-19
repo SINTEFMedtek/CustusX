@@ -321,6 +321,7 @@ void ImageLandmarksWidget::prePaintEvent()
 	//update buttons
 	mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 	mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
+	this->showOrHideDetails();
 }
 
 LandmarkMap ImageLandmarksWidget::getTargetLandmarks() const
