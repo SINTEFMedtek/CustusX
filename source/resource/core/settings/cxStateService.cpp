@@ -154,6 +154,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("USsimulation/gain", 0.70);
 
 	this->fillDefault("Dicom/ShowAdvanced", false);
+	this->fillDefault("Landmarks/ShowAdvanced", false);
 }
 
 

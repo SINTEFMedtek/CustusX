@@ -108,15 +108,14 @@ protected:
 	QPushButton* mDeleteLandmarksButton; ///< the Delete Landmarks button
 	QPushButton* mImportLandmarksFromPointMetricsButton; ///< the Import Landmarks button
 	QAction* mDetailsAction;
-	QToolButton* mDetailsButton;
-	QHBoxLayout* mLandmarkAdvancedButtonsLayout;
-
 
 private:
 	ImageLandmarksWidget(); ///< not implemented
 
 	DataPtr getCurrentData() const;
+	void showOrHideDetails();
 	bool mUseRegistrationFixedPropertyInsteadOfActiveImage;
+	QString mLandmarksShowAdvancedSettingsString;
 };
 
 /**

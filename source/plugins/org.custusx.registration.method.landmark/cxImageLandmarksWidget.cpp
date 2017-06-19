@@ -65,7 +65,8 @@ namespace cx
 ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* parent,
 	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
-	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage)
+	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage),
+	mLandmarksShowAdvancedSettingsString("Landmarks/ShowAdvanced")
 {
 	if(mUseRegistrationFixedPropertyInsteadOfActiveImage)
 		mCurrentProperty.reset(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
@@ -100,24 +101,8 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	connect(mDeleteLandmarksButton, SIGNAL(clicked()), this, SLOT(deleteLandmarksButtonClickedSlot()));
 
 	mImportLandmarksFromPointMetricsButton = new QPushButton("Import Point Metrics", this);
-	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics, which has the selected data set as parent space, as landmarks.");
+	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics as landmarks. See the help pages for the details.");
 	connect(mImportLandmarksFromPointMetricsButton, SIGNAL(clicked()), this, SLOT(importPointMetricsToLandmarkButtonClickedSlot()));
-
-	QAction* detailsAction = this->createAction(this,
-		  QIcon(":/icons/open_icon_library/system-run-5.png"),
-		  "Details", "Toggle Details",
-		  SLOT(toggleDetailsSlot()),
-		  NULL);
-
-	//QToolButton* detailsButton = new QToolButton();
-	mDetailsButton = new QToolButton();
-	mDetailsButton->setObjectName("DetailedButton");
-	mDetailsButton->setDefaultAction(detailsAction);
-
-//	mDetailsAction = this->createAction(this,
-//										QIcon(":/icons/open_icon_library/system-run-5.png"),
-//										"Advanced", "Toggle additional actions",
-//										SLOT(toggleDetailsSlot()));
 
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mCurrentProperty));
@@ -129,13 +114,19 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	landmarkButtonsLayout->addWidget(mEditLandmarkButton);
 	landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
 	landmarkButtonsLayout->addWidget(mDeleteLandmarksButton);
-	landmarkButtonsLayout->addWidget(mDetailsButton);
+	mDetailsAction = this->createAction(this,
+										QIcon(":/icons/open_icon_library/system-run-5.png"),
+										"Advanced", "Toggle advanced options",
+										SLOT(toggleDetailsSlot()),
+										landmarkButtonsLayout);
 	mVerticalLayout->addLayout(landmarkButtonsLayout);
 
-	//QHBoxLayout* landmarkAdvancedButtonsLayout = new QHBoxLayout;
-	mLandmarkAdvancedButtonsLayout = new QHBoxLayout;
-	mLandmarkAdvancedButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
-	mVerticalLayout->addLayout(mLandmarkAdvancedButtonsLayout);
+	QHBoxLayout* landmarkAdvancedButtonsLayout = new QHBoxLayout;
+	landmarkAdvancedButtonsLayout = new QHBoxLayout;
+	landmarkAdvancedButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
+	mVerticalLayout->addLayout(landmarkAdvancedButtonsLayout);
+
+	this->showOrHideDetails();
 }
 
 ImageLandmarksWidget::~ImageLandmarksWidget()
@@ -157,8 +148,15 @@ void ImageLandmarksWidget::onCurrentImageChanged()
 
 void ImageLandmarksWidget::toggleDetailsSlot()
 {
-	//mLandmarkAdvancedButtonsLayout->setEnabled(false);
-	mImportLandmarksFromPointMetricsButton->setVisible(!mImportLandmarksFromPointMetricsButton->isVisible());
+	bool newShowAdvancedValue = !settings()->value(mLandmarksShowAdvancedSettingsString, "true").toBool();
+	settings()->setValue(mLandmarksShowAdvancedSettingsString, newShowAdvancedValue);
+	this->showOrHideDetails();
+}
+
+void ImageLandmarksWidget::showOrHideDetails()
+{
+	bool showAdvanced = settings()->value(mLandmarksShowAdvancedSettingsString).toBool();
+	mImportLandmarksFromPointMetricsButton->setVisible(showAdvanced);
 }
 
 PickerRepPtr ImageLandmarksWidget::getPickerRep()

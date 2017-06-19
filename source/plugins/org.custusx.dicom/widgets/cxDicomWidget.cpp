@@ -99,7 +99,7 @@ void DicomWidget::createUI()
 
 	mDetailsAction = this->createAction(this,
 										QIcon(":/icons/open_icon_library/system-run-5.png"),
-										"Advanced", "Toggle additional actions",
+										"Advanced", "Toggle advanced options",
 										SLOT(toggleDetailsSlot()));
 
 	mBrowser = new DICOMAppWidget;
