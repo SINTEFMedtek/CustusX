@@ -446,7 +446,7 @@ class OpenCLUtilityLibrary(CppComponent):
         return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('7a4258fab2ce30ca0c9fac347efd903124f39d09')
+        self._getBuilder().gitCheckout('44b7a002195fb2b6e8ea99ea4edf3102ef556cc3')
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
