@@ -16,6 +16,8 @@ Sample at least 3 landmarks in both data sets.
 
 Click the volume and either add new or resample existing landmarks.
 
+\ref org_custusx_registration_method_landmark_import_point_metrics
+
 
 \addindex org_custusx_registration_method_landmark_image_to_image_register_widget
 Register {#org_custusx_registration_method_landmark_image_to_image_register}
