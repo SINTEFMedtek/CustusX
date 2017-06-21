@@ -55,13 +55,16 @@ class BronchoscopyRegistration
 public:
 	BronchoscopyRegistration();
 	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
+    BranchListPtr processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations = 0);
 	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
+    Eigen::Matrix4d runBronchoscopyRegistrationImage2Image(vtkPolyDataPtr centerlineFixed, vtkPolyDataPtr centerlineMoving);
 	bool isCenterlineProcessed();
 	virtual ~BronchoscopyRegistration();
 };
 
 M4Vector excludeClosePositions();
 Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigation);
+Eigen::Matrix4d registrationAlgorithmImage2Image(BranchListPtr branchesFixed, BranchListPtr branchesMoving);
 std::vector<Eigen::MatrixXd::Index> dsearch2n(Eigen::MatrixXd pos1, Eigen::MatrixXd pos2, Eigen::MatrixXd ori1, Eigen::MatrixXd ori2);
 vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
 Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);

@@ -68,6 +68,7 @@ public:
 	QString getActiveUid() const { return mActiveLandmark; }
 	void exportMetricsToXMLFile(QString& filename);
 	void importMetricsFromXMLFile(QString& filename);
+	void importMetricsFromMNITagFile(QString& filename, bool testmode=false); ///< Note: testmode is available to skip dialog popup for running automatic tests
 	PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
 
 signals:
@@ -95,6 +96,7 @@ private:
 	PointMetricPtr addPointInDefaultPosition();
 	std::vector<DataMetricPtr> getAllMetrics() const;
 	DataPtr loadDataFromXMLNode(QDomElement node);
+	DataPtr createData(QString type, QString uid, QString name);
 
 	QString mActiveLandmark; ///< uid of surrently selected landmark.
 	std::set<QString> mSelection;
@@ -102,6 +104,9 @@ private:
 	ViewServicePtr mViewService;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
+	QColor getRandomColor();
+	std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
+	void resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data);
 };
 
 

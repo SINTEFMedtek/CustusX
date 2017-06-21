@@ -57,6 +57,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTrackingService.h"
 #include "cxLandmarkListener.h"
 #include "cxActiveData.h"
+#include "cxPointMetric.h"
+#include "cxSpaceProvider.h"
 
 namespace cx
 {
@@ -93,6 +95,10 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	mRemoveLandmarkButton->setDisabled(true);
 	connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
+	mImportLandmarksFromPointMetricsButton = new QPushButton("Import point metrics", this);
+	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics which has the selected data set as parent.");
+	connect(mImportLandmarksFromPointMetricsButton, SIGNAL(clicked()), this, SLOT(importPointMetricsToLandmarkButtonClickedSlot()));
+
 	//layout
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mCurrentProperty));
 	mVerticalLayout->addWidget(mLandmarkTableWidget);
@@ -102,6 +108,7 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	landmarkButtonsLayout->addWidget(mAddLandmarkButton);
 	landmarkButtonsLayout->addWidget(mEditLandmarkButton);
 	landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
+	landmarkButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
 	mVerticalLayout->addLayout(landmarkButtonsLayout);
 }
 
@@ -183,7 +190,38 @@ void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
 
     QString next = this->getNextLandmark();
 	image->getLandmarks()->removeLandmark(mActiveLandmark);
-    this->activateLandmark(next);
+	this->activateLandmark(next);
+}
+
+void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
+{
+	DataPtr image = this->getCurrentData();
+	if(!image)
+		return;
+
+	std::map<QString, DataPtr> point_metrics = mServices->patient()->getChildren(image->getUid(), "pointMetric");
+	std::map<QString, DataPtr>::iterator it = point_metrics.begin();
+
+	//Make sure we have enough landmarks
+	int number_of_landmarks = mServices->patient()->getLandmarkProperties().size();
+	for(int i=0; i<(point_metrics.size()-number_of_landmarks); ++i)
+	{
+		QString uid = mServices->patient()->addLandmark();
+	}
+
+	for(; it != point_metrics.end(); ++it)
+	{
+		PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(it->second);
+		if(!point_metric)
+			continue;
+
+		Vector3D pos_x = point_metric->getCoordinate();
+		//Transform3D d_M_x = mServices->spaceProvider()->get_toMfrom(CoordinateSystem::fromString(image->getSpace()), point_metric->getSpace());
+		//Vector3D pos_d = d_M_x.coord(pos_x);
+		QString point_metric_name = point_metric->getName();
+		image->getLandmarks()->setLandmark(Landmark(point_metric_name, pos_x));
+		this->activateLandmark(point_metric_name);
+	}
 }
 
 void ImageLandmarksWidget::cellClickedSlot(int row, int column)

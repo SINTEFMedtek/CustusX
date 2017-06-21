@@ -85,7 +85,9 @@ private:
     static Vector3D getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr image);
     static bool isSeedPointInsideImage(Vector3D, DataPtr);
 	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
-	vtkImageDataPtr mSegmentationOutput;
+    BoolPropertyPtr getLungSegmentationOption(QDomElement root);
+	vtkImageDataPtr mAirwaySegmentationOutput;
+    vtkImageDataPtr mLungSegmentationOutput;
 	vtkPolyDataPtr mCenterlineOutput;
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
