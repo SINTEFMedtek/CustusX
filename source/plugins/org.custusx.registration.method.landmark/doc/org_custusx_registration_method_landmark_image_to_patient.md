@@ -15,6 +15,8 @@ Image Landmarks
 Sample at least 3 landmarks in the data set.
 Click the volume and either add new or resample existing landmarks.
 
+\ref org_custusx_registration_method_landmark_import_point_metrics
+
 
 \addindex org_custusx_registration_method_landmark_image_to_patient_patient_landmarks_widget
 Patient Landmarks

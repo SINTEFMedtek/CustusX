@@ -96,6 +96,7 @@ public:
     virtual OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
+	virtual void deleteLandmarks();
 
 	virtual void autoSave();
 	virtual bool isNull();

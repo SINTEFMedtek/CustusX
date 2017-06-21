@@ -295,6 +295,11 @@ QString PatientModelImplService::addLandmark()
 	return dataService()->addLandmark();
 }
 
+void PatientModelImplService::deleteLandmarks()
+{
+	return dataService()->deleteLandmarks();
+}
+
 void PatientModelImplService::setLandmarkActive(QString uid, bool active)
 {
 	dataService()->setLandmarkActive(uid, active);
