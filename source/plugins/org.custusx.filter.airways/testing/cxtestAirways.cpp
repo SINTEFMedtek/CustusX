@@ -33,7 +33,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 #include "cxtestAirwaysFixture.h"
+#ifdef CX_APPLE
 #include <vtkCocoaRenderWindow.h>
+#endif
+#ifdef CX_WINDOWS
+#include <vtkWin32OpenGLRenderWindow.h>
+#endif
+
 
 namespace cxtest
 {
@@ -44,11 +50,15 @@ TEST_CASE("Airway segmentation on test data pat011 works", "[integration][airway
 	vtkCocoaRenderWindow* v = vtkCocoaRenderWindow::New();
 	v->Initialize();
 #endif
+#ifdef CX_WINDOWS
+    vtkWin32OpenGLRenderWindow* v = vtkWin32OpenGLRenderWindow::New();
+    v->Initialize();
+#endif
 
     AirwaysFixture helper;
 	helper.testLungAirwaysCT();
 
-#ifdef CX_APPLE
+#if defined (CX_APPLE) || defined (CX_WINDOWS)
 	v->Delete();
 #endif
 }
