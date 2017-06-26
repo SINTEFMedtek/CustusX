@@ -39,12 +39,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxDataLocations.h"
 #include "cxSessionStorageService.h"
-#include "cxPatientModelService.h"
-#include "cxVisServices.h"
 #include "cxAirwaysFilterService.h"
 #include "cxtestVisServices.h"
 #include "cxSelectDataStringPropertyBase.h"
-#include "cxData.h"
 
 namespace cxtest
 {
@@ -57,33 +54,23 @@ AirwaysFixture::~AirwaysFixture()
 {
 }
 
-
-void AirwaysFixture::testConstructor()
-{
-}
-
-void AirwaysFixture::testSyntheticVascusynth()
-{
-    //not working for Airways segmentation filter
-    runFilter(QString("Synthetic-Vascusynth"));
-}
-
 void AirwaysFixture::testLungAirwaysCT()
 {
-    //Should work, but only found in private repo
-    runFilter(QString("Lung-Airways-CT"));
+	runFilter(QString("pat011"));
 }
 
-void AirwaysFixture::runFilter(QString preset)
+void AirwaysFixture::runFilter(const QString& preset)
 {
+	cx::DataLocations::setTestMode();
+
     cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
 
-    QString filename = cx::DataLocations::getExistingTestData("testing/TubeSegmentationFramework", preset+".mhd");
+	QString filename = cx::DataLocations::getExistingTestData("testing/airwaysegmentation", preset+".mhd");
     {
         INFO("Using "+filename.toStdString()+" as testdata.");
         REQUIRE(QFile::exists(filename));
     }
-    dummyservices->session()->load(cx::DataLocations::getTestDataPath()+ "/temp/TubeSegmentationFramework/");
+	dummyservices->session()->load(cx::DataLocations::getTestDataPath()+ "/temp/airwaysegmentation/");
     QString info;
     cx::DataPtr input_image = dummyservices->patient()->importData(filename, info);
     {
@@ -132,7 +119,7 @@ void AirwaysFixture::runFilter(QString preset)
     std::vector < cx::SelectDataStringPropertyBasePtr > output = airways->getOutputTypes();
     {
         INFO("Number of outputs has changed.");
-        REQUIRE(output.size() == 2);
+		REQUIRE(output.size() == 3);
     }
     {
         INFO("Centerline.");
@@ -142,6 +129,9 @@ void AirwaysFixture::runFilter(QString preset)
         INFO("Segmented surface.");
         REQUIRE(output[1]->getData());
     }
+	// ToDo: test Lung sack, the new 3rd output?
+	// Erik is testing the algorithms so we only need a test that things are running, i.e. the airway seg.
+	// So maybe not needed.
 
 }
 
