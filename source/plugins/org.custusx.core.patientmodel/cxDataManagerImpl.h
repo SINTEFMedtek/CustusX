@@ -99,6 +99,7 @@ public:
     OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
+	virtual void deleteLandmarks();
 	virtual void setLandmarkNames(std::vector<QString> names);
 	virtual void setLandmarkName(QString uid, QString name);
 	virtual void setLandmarkActive(QString uid, bool active);
