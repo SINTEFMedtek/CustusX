@@ -298,7 +298,7 @@ class Eigen(CppComponent):
         return 'git@github.com:RLovelett/eigen.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        tag = '3.2.10'
+        tag = '3.3.3'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         pass
@@ -416,7 +416,7 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
-        append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
+        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         
         
         libs = self.assembly.libraries
