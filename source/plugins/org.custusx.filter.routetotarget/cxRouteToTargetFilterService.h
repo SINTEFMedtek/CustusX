@@ -68,7 +68,7 @@ public:
 
 	virtual bool execute();
 	virtual bool postProcess();
-
+	virtual void setTargetName(QString name);
 
 protected:
 	virtual void createOptions();
@@ -81,6 +81,7 @@ private:
 	RouteToTargetPtr mRouteToTarget;
 	vtkPolyDataPtr mOutput;
     vtkPolyDataPtr mExtendedRoute;
+	QString mTargetName;
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 

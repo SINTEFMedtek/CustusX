@@ -59,6 +59,7 @@ namespace cx
 
 RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services) :
 	FilterImpl(services)
+  , mTargetName("")
 {
 }
 
@@ -149,8 +150,8 @@ bool RouteToTargetFilter::postProcess()
     if (!inputMesh)
         return false;
 
-	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1";
-	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1";
+	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1" + "_" + mTargetName;
+	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1" + "_" + mTargetName;
     MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
     outputCenterline->setVtkPolyData(mOutput);
     patientService()->insertData(outputCenterline);
@@ -174,6 +175,11 @@ bool RouteToTargetFilter::postProcess()
 	mOutputTypes[0]->setValue(outputCenterline->getUid());
 
 	return true;
+}
+
+void RouteToTargetFilter::setTargetName(QString name)
+{
+	mTargetName = name;
 }
 
 
