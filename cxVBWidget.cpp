@@ -123,7 +123,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mCameraPath = new CXVBcameraPath(services->tracking(), services->patient(), services->view());
 
 	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,
-			this, &VBWidget::inputChangedSlot);
+			this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
 	connect(this, &VBWidget::cameraPathChanged, mCameraPath, &CXVBcameraPath::cameraRawPointsSlot);
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot);
 	connect(mViewSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
@@ -138,6 +138,9 @@ VBWidget::~VBWidget()
 
 void VBWidget::setRouteToTarget(QString uid)
 {
+	disconnect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged, this, &VBWidget::inputChangedSlot);
+	mRouteToTarget->setValue("");
+	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,			this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
 	mRouteToTarget->setValue(uid);
 	mPlaybackSlider->setValue(5);
 }
