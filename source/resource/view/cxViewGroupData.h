@@ -154,6 +154,7 @@ public:
 	SyncedValuePtr getGlobal2DZoom();
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
+    void zoomCamera3D(int zoomFactor);
 
 	PlaneTypeCollection getSliceDefinitions();
 	void setSliceDefinitions(PlaneTypeCollection val);
