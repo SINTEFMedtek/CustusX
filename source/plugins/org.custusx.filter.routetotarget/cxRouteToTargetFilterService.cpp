@@ -80,7 +80,17 @@ QString RouteToTargetFilter::getHelp() const
 			"<p>Calculates the route to a selected target in navigated bronchocopy."
 			"The rout starts at the top of trachea and ends at the most adjacent airway centerline"
 			"from the target.</p>"
-			"</html>";
+           "</html>";
+}
+
+QString RouteToTargetFilter::getNameSuffix()
+{
+    return "_rtt_cl";
+}
+
+QString RouteToTargetFilter::getNameSuffixExtension()
+{
+    return "_ext";
 }
 
 
@@ -150,14 +160,14 @@ bool RouteToTargetFilter::postProcess()
     if (!inputMesh)
         return false;
 
-	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1" + "_" + mTargetName;
-	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1" + "_" + mTargetName;
+    QString uidCenterline = inputMesh->getUid() + RouteToTargetFilter::getNameSuffix() + "%1" + "_" + mTargetName;
+    QString nameCenterline = inputMesh->getName()+RouteToTargetFilter::getNameSuffix() + "%1" + "_" + mTargetName;
     MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
     outputCenterline->setVtkPolyData(mOutput);
     patientService()->insertData(outputCenterline);
 
-    QString uidCenterlineExt = outputCenterline->getUid() + "_ext";
-    QString nameCenterlineExt = outputCenterline->getName()+"_ext";
+    QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
+    QString nameCenterlineExt = outputCenterline->getName()+RouteToTargetFilter::getNameSuffixExtension();
     MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
     outputCenterlineExt->setVtkPolyData(mExtendedRoute);
     outputCenterlineExt->setColor(QColor(0, 0, 255, 255));

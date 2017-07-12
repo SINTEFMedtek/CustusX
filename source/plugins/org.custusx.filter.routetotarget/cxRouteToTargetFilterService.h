@@ -65,6 +65,8 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
+    static QString getNameSuffix();
+    static QString getNameSuffixExtension();
 
 	virtual bool execute();
 	virtual bool postProcess();
