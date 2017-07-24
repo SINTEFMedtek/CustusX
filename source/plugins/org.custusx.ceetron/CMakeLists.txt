@@ -54,5 +54,5 @@ target_include_directories(org_custusx_ceetron
 )
 
 
-add_subdirectory(testing)
+#add_subdirectory(testing)
 
