@@ -7,6 +7,7 @@ if(BUILD_TESTING)
         cxtestTrackingPlugin.cpp
         cxtestCatchTrackingService.cpp
         cxtestCatchProbe.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
         )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_tracking_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_tracking_MOC_SOURCE_FILES})
