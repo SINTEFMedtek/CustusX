@@ -230,6 +230,11 @@ QString PatientModelServiceProxy::addLandmark()
 	return mPatientModelService->addLandmark();
 }
 
+void PatientModelServiceProxy::deleteLandmarks()
+{
+	return mPatientModelService->deleteLandmarks();
+}
+
 void PatientModelServiceProxy::setLandmarkActive(QString uid, bool active)
 {
 	mPatientModelService->setLandmarkActive(uid, active);

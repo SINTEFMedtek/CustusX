@@ -16,6 +16,8 @@ Select landmarks in the data set that you want to use for performing plate regis
 
 *Click the dataset and either add new or resample existing landmarks.*
 
+\ref org_custusx_registration_method_landmark_import_point_metrics
+
 
 \addindex org_custusx_registration_method_plate_reference_landmarks
 Reference landmarks {#org_custusx_registration_method_plate_reference_landmarks}

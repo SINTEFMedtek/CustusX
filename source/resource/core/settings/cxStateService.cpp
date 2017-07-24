@@ -132,13 +132,7 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("stillUpdateRate", 0.001);
 
-#ifdef __APPLE__
 	this->fillDefault("useGPU2DRendering", true);
-#elif WIN32
-	this->fillDefault("useGPU2DRendering", false);
-#else
-	this->fillDefault("useGPU2DRendering", true);
-#endif
 
 	this->fillDefault("optimizedViews", true);
 	this->fillDefault("smartRender", true);
@@ -154,6 +148,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("USsimulation/gain", 0.70);
 
 	this->fillDefault("Dicom/ShowAdvanced", false);
+	this->fillDefault("Landmarks/ShowAdvanced", false);
 }
 
 

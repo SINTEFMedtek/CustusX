@@ -205,6 +205,12 @@ QString DataManagerImpl::addLandmark()
 	return uid;
 }
 
+void DataManagerImpl::deleteLandmarks()
+{
+	mLandmarkProperties.clear();
+	emit landmarkPropertiesChanged();
+}
+
 void DataManagerImpl::setLandmarkName(QString uid, QString name)
 {
 	mLandmarkProperties[uid].setName(name);

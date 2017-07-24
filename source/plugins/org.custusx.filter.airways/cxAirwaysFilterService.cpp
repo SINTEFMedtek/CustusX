@@ -38,9 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
 #include <ctkPluginContext.h>
-#include "cxSpaceProvider.h"
-#include "cxImage.h"
-#include "cxMesh.h"
+
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
@@ -53,6 +51,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPatientModelServiceProxy.h"
 #include "cxVisServices.h"
 #include "cxUtilHelpers.h"
+#include "cxSpaceProvider.h"
+#include "cxImage.h"
+#include "cxMesh.h"
 #include "FAST/Algorithms/LungSegmentation/LungSegmentation.hpp"
 #include "FAST/Algorithms/AirwaySegmentation/AirwaySegmentation.hpp"
 #include "FAST/Algorithms/CenterlineExtraction/CenterlineExtraction.hpp"
@@ -67,6 +68,7 @@ namespace cx {
 AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
 	FilterImpl(services)
 {
+	fast::Reporter::setGlobalReportMethod(fast::Reporter::COUT);
     //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
     fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
     Q_UNUSED(importer)
@@ -187,7 +189,8 @@ bool AirwaysFilter::execute()
 		fast::Config::getTestDataPath(); // needed for initialization
         QString cacheDir = cx::DataLocations::getCachePath();
         fast::Config::setKernelBinaryPath(cacheDir.toStdString());
-		fast::Config::setKernelSourcePath(std::string(FAST_SOURCE_DIR));
+		QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
+		fast::Config::setKernelSourcePath(kernelDir.toStdString());
 
         // Import image data from disk
 		fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
@@ -242,7 +245,8 @@ bool AirwaysFilter::execute()
             }
         } catch(fast::Exception & e)
         {
-            CX_LOG_ERROR() << "The airways filter failed.";
+			CX_LOG_ERROR() << "The airways filter failed: \n"
+						   << e.what();
             if(!useManualSeedPoint)
                 CX_LOG_ERROR() << "Try to set the seed point manually.";
             return false;

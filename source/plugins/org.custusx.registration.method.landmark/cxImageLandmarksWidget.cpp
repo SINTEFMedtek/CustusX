@@ -65,7 +65,8 @@ namespace cx
 ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* parent,
 	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
-	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage)
+	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage),
+	mLandmarksShowAdvancedSettingsString("Landmarks/ShowAdvanced")
 {
 	if(mUseRegistrationFixedPropertyInsteadOfActiveImage)
 		mCurrentProperty.reset(new StringPropertyRegistrationFixedImage(services->registration(), services->patient()));
@@ -86,17 +87,21 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
 
 	mEditLandmarkButton = new QPushButton("Resample", this);
-	mEditLandmarkButton->setToolTip("Resample existing landmark");
+	mEditLandmarkButton->setToolTip("Resample the selected landmark");
 	mEditLandmarkButton->setDisabled(true);
 	connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
 
 	mRemoveLandmarkButton = new QPushButton("Clear", this);
-	mRemoveLandmarkButton->setToolTip("Clear selected landmark");
+	mRemoveLandmarkButton->setToolTip("Clear the selected landmark");
 	mRemoveLandmarkButton->setDisabled(true);
 	connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
-	mImportLandmarksFromPointMetricsButton = new QPushButton("Import point metrics", this);
-	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics which has the selected data set as parent.");
+	mDeleteLandmarksButton = new QPushButton("Delete All", this);
+	mDeleteLandmarksButton->setToolTip("Delete all landmarks");
+	connect(mDeleteLandmarksButton, SIGNAL(clicked()), this, SLOT(deleteLandmarksButtonClickedSlot()));
+
+	mImportLandmarksFromPointMetricsButton = new QPushButton("Import Point Metrics", this);
+	mImportLandmarksFromPointMetricsButton->setToolTip("Import point metrics as landmarks. See the help pages for the details.");
 	connect(mImportLandmarksFromPointMetricsButton, SIGNAL(clicked()), this, SLOT(importPointMetricsToLandmarkButtonClickedSlot()));
 
 	//layout
@@ -108,8 +113,20 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	landmarkButtonsLayout->addWidget(mAddLandmarkButton);
 	landmarkButtonsLayout->addWidget(mEditLandmarkButton);
 	landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
-	landmarkButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
+	landmarkButtonsLayout->addWidget(mDeleteLandmarksButton);
+	mDetailsAction = this->createAction(this,
+										QIcon(":/icons/open_icon_library/system-run-5.png"),
+										"Advanced", "Toggle advanced options",
+										SLOT(toggleDetailsSlot()),
+										landmarkButtonsLayout);
 	mVerticalLayout->addLayout(landmarkButtonsLayout);
+
+	QHBoxLayout* landmarkAdvancedButtonsLayout = new QHBoxLayout;
+	landmarkAdvancedButtonsLayout = new QHBoxLayout;
+	landmarkAdvancedButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
+	mVerticalLayout->addLayout(landmarkAdvancedButtonsLayout);
+
+	this->showOrHideDetails();
 }
 
 ImageLandmarksWidget::~ImageLandmarksWidget()
@@ -127,6 +144,19 @@ void ImageLandmarksWidget::onCurrentImageChanged()
 		mServices->registration()->setFixedData(data);
 
 	this->setModified();
+}
+
+void ImageLandmarksWidget::toggleDetailsSlot()
+{
+	bool newShowAdvancedValue = !settings()->value(mLandmarksShowAdvancedSettingsString, "true").toBool();
+	settings()->setValue(mLandmarksShowAdvancedSettingsString, newShowAdvancedValue);
+	this->showOrHideDetails();
+}
+
+void ImageLandmarksWidget::showOrHideDetails()
+{
+	bool showAdvanced = settings()->value(mLandmarksShowAdvancedSettingsString).toBool();
+	mImportLandmarksFromPointMetricsButton->setVisible(showAdvanced);
 }
 
 PickerRepPtr ImageLandmarksWidget::getPickerRep()
@@ -193,6 +223,17 @@ void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
 	this->activateLandmark(next);
 }
 
+void ImageLandmarksWidget::deleteLandmarksButtonClickedSlot()
+{
+	DataPtr image = this->getCurrentData();
+	if (!image)
+		return;
+
+	image->getLandmarks()->clear();
+	this->setModified();
+	mServices->patient()->deleteLandmarks();
+}
+
 void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
 {
 	DataPtr image = this->getCurrentData();
@@ -204,7 +245,8 @@ void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
 
 	//Make sure we have enough landmarks
 	int number_of_landmarks = mServices->patient()->getLandmarkProperties().size();
-	for(int i=0; i<(point_metrics.size()-number_of_landmarks); ++i)
+	int number_of_metrics = point_metrics.size();
+	for(int i=number_of_landmarks; i<number_of_metrics; ++i)
 	{
 		QString uid = mServices->patient()->addLandmark();
 	}
@@ -237,7 +279,9 @@ void ImageLandmarksWidget::enableButtons()
 
 	mEditLandmarkButton->setEnabled(selected);
 	mRemoveLandmarkButton->setEnabled(selected);
+	mDeleteLandmarksButton->setEnabled(loaded);
 	mAddLandmarkButton->setEnabled(loaded);
+	mImportLandmarksFromPointMetricsButton->setEnabled(loaded);
 
 	DataPtr image = this->getCurrentData();
 	if (image)
@@ -245,7 +289,6 @@ void ImageLandmarksWidget::enableButtons()
 		mAddLandmarkButton->setToolTip(QString("Add landmark to image %1").arg(image->getName()));
 		mEditLandmarkButton->setToolTip(QString("Resample landmark in image %1").arg(image->getName()));
 	}
-//	this->setModified();
 }
 
 void ImageLandmarksWidget::showEvent(QShowEvent* event)
@@ -278,6 +321,7 @@ void ImageLandmarksWidget::prePaintEvent()
 	//update buttons
 	mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 	mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
+	this->showOrHideDetails();
 }
 
 LandmarkMap ImageLandmarksWidget::getTargetLandmarks() const
