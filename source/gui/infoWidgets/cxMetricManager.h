@@ -58,7 +58,7 @@ class cxGui_EXPORT MetricManager : public QObject
 {
 	Q_OBJECT
 public:
-	MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider);
+	MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager);
 
 	DataMetricPtr getMetric(QString uid);
 	int getNumberOfMetrics() const;
@@ -104,6 +104,7 @@ private:
 	ViewServicePtr mViewService;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
+	FileManagerServicePtr mFileManager;
 	//QColor getRandomColor();
 	//std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
 	void resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data);

@@ -84,7 +84,7 @@ MetricWidget::MetricWidget(VisServicesPtr services, QWidget* parent) :
 
 	mModifiedCount = 0;
 	mPaintCount = 0;
-	mMetricManager.reset(new MetricManager(services->view(), services->patient(), services->tracking(), services->spaceProvider()));
+	mMetricManager.reset(new MetricManager(services->view(), services->patient(), services->tracking(), services->spaceProvider(), services->file()));
 	connect(mMetricManager.get(), SIGNAL(activeMetricChanged()), this, SLOT(setModified()));
 	connect(mMetricManager.get(), SIGNAL(metricsChanged()), this, SLOT(setModified()));
 

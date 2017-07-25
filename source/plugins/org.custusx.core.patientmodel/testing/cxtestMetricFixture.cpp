@@ -241,7 +241,7 @@ bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr m
 void MetricFixture::testExportAndImportMetrics()
 {
 	cx::DataLocations::setTestMode();
-	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
+	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), cx::logicManager()->getFileManagerService());
 
 	// create metrics and insert them into the patientmodel
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();

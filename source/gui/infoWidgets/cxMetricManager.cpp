@@ -66,16 +66,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSpaceProperty.h"
 #include "cxSpaceEditWidget.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxFileManagerService.h"
 
 namespace cx
 {
 
-MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider) :
+MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager) :
 	QObject(NULL),
 	mViewService(viewService),
 	mPatientModelService(patientModelService),
 	mTrackingService(trackingService),
-	mSpaceProvider(spaceProvider)
+	mSpaceProvider(spaceProvider),
+	mFileManager(filemanager)
 {
 	connect(trackingService.get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
 	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
@@ -561,70 +563,9 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 
 void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode)
 {
-	/*
-
-	//--- HACK to be able to read *.tag files with missing newline before eof
-	forceNewlineBeforeEof(filename);
-
-	//--- Reader for MNI Tag Point files
-	vtkMNITagPointReaderPtr reader = vtkMNITagPointReader::New();
-	reader->SetFileName(filename.toStdString().c_str());
-	reader->Update();
-	if (!ErrorObserver::checkedRead(reader, filename))
-		CX_LOG_ERROR() << "Error reading MNI Tag Point file.";
-
-
-	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
-	int number_of_volumes = reader->GetNumberOfVolumes();
-	QString description(reader->GetComments());
-	std::vector<QString> data_uid;
-	data_uid.push_back("");
-	data_uid.push_back("");
-	if(!testmode)
-		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
-
-	//--- Create the point metrics
-	QString type = "pointMetric";
-	QString uid = "";
-	QString name = "";
-	vtkStringArray *labels = reader->GetLabelText();
-
-	for(int i=0; i< number_of_volumes; ++i)
-	{
-		QColor color = getRandomColor();
-
-		vtkPoints *points = reader->GetPoints(i);
-		if(points != NULL)
-		{
-			unsigned int number_of_points = points->GetNumberOfPoints();
-			//CX_LOG_DEBUG() << "Number of points: " << number_of_points;
-
-			for(int j=0; j < number_of_points; ++j)
-			{
-				vtkStdString label = labels->GetValue(j);
-				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
-				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
-
-				double *point = points->GetPoint(j);
-				DataPtr data = this->createData(type, uid, QString::number(j+1));
-				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
-
-				CoordinateSystem space(csDATA, data_uid[i]);
-				Vector3D vector_ras(point[0], point[1], point[2]);
-				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
-
-				//Convert from RAS (MINC) to LPS (CX)
-				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-				Vector3D vector_lps = sMr.inv() * vector_ras;
-
-				point_metric->setCoordinate(vector_lps);
-				point_metric->setSpace(space);
-				point_metric->setColor(color);
-			}
-		}
-
-	}
-	*/
+	std::vector<DataPtr> data = mFileManager->read(filename);
+	for(int i=0; i<data.size(); ++i)
+		mPatientModelService->insertData(data[i]);
 }
 
 DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
