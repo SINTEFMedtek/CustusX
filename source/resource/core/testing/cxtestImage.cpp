@@ -47,6 +47,7 @@ namespace
 
 cx::ImagePtr readNIfTITestImage(QString uid, QString filename)
 {
+	cx::LogicManager::initialize();
 	cx::ImagePtr image = cx::Image::create(uid,uid);
 	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	filemanager->readInto(image, filename);
