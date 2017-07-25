@@ -180,7 +180,6 @@ void FileManagerImpService::save(DataPtr data, const QString &filename)
 
 void FileManagerImpService::addFileReaderWriter(FileReaderWriterService *service)
 {
-	//TODO
 	// adding a service inside a smartpointer... not so smart, think it is fixed with null_deleter
 	mDataReaders.insert(FileReaderWriterServicePtr(service, null_deleter()));
 	CX_LOG_DEBUG() << "Adding a reader/writer: " << service->objectName() << " to: " << this;
@@ -188,8 +187,16 @@ void FileManagerImpService::addFileReaderWriter(FileReaderWriterService *service
 
 void FileManagerImpService::removeFileReaderWriter(FileReaderWriterService *service)
 {
-	//TODO
-	std::cout << "[TODO] ERROR: unable to remove PortService" << std::endl;
+	for(auto it = mDataReaders.begin(); it != mDataReaders.end(); )
+	{
+		if (service->getName() == (*it)->getName())
+		{
+			it = mDataReaders.erase(it);
+			CX_LOG_DEBUG() << "Removing " << service->getName();
+		}
+		else
+			++it;
+	}
 
 }
 
@@ -206,13 +213,11 @@ void FileManagerImpService::initServiceListener()
 
 void FileManagerImpService::onServiceAdded(FileReaderWriterService *service)
 {
-	//std::cout << "Port Service added: " << service->objectName().toStdString() << " to FileManagerImpService: " << this << std::endl;
 	this->addFileReaderWriter(service);
 }
 
 void FileManagerImpService::onServiceRemoved(FileReaderWriterService *service)
 {
-	//std::cout << "Port Service removed: " << service->objectName().toStdString() << std::endl;
 	this->removeFileReaderWriter(service);
 }
 

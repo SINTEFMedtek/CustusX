@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStlMeshReader.h"
 #include "cxNIfTIReader.h"
 #include "cxMNIReaderWriter.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -53,6 +54,8 @@ FileManagerServicePluginActivator::FileManagerServicePluginActivator()
 
 FileManagerServicePluginActivator::~FileManagerServicePluginActivator()
 {
+	if(!mRegisteredFileReaderWriterServices.empty())
+		CX_LOG_ERROR() << "FileReaderWriterServices is not empty.";
 }
 
 void FileManagerServicePluginActivator::start(ctkPluginContext* context)
@@ -74,8 +77,15 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 void FileManagerServicePluginActivator::stop(ctkPluginContext* context)
 {
 	mRegisteredFileManagerService.reset();
-	for(int i=0; i<mRegisteredFileReaderWriterServices.size(); ++i)
-		mRegisteredFileReaderWriterServices[i].reset();
+
+	for(auto it = mRegisteredFileReaderWriterServices.begin(); it != mRegisteredFileReaderWriterServices.end(); )
+	{
+		(*it).reset();
+		it = mRegisteredFileReaderWriterServices.erase(it);
+	}
+
+	mRegisteredGuiExtenderService.reset();
+
 	Q_UNUSED(context);
 }
 
