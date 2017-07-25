@@ -187,7 +187,7 @@ void FileManagerImpService::addFileReaderWriter(FileReaderWriterService *service
 
 void FileManagerImpService::removeFileReaderWriter(FileReaderWriterService *service)
 {
-	for(auto it = mDataReaders.begin(); it != mDataReaders.end(); )
+	for(std::set<FileReaderWriterServicePtr>::iterator it = mDataReaders.begin(); it != mDataReaders.end(); )
 	{
 		if (service->getName() == (*it)->getName())
 		{

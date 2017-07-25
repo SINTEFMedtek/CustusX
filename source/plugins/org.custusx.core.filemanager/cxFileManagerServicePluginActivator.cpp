@@ -78,7 +78,7 @@ void FileManagerServicePluginActivator::stop(ctkPluginContext* context)
 {
 	mRegisteredFileManagerService.reset();
 
-	for(auto it = mRegisteredFileReaderWriterServices.begin(); it != mRegisteredFileReaderWriterServices.end(); )
+	for(std::vector<RegisteredServicePtr>::iterator it = mRegisteredFileReaderWriterServices.begin(); it != mRegisteredFileReaderWriterServices.end(); )
 	{
 		(*it).reset();
 		it = mRegisteredFileReaderWriterServices.erase(it);
