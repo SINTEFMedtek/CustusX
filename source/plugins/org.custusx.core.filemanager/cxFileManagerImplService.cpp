@@ -191,7 +191,7 @@ void FileManagerImpService::removeFileReaderWriter(FileReaderWriterService *serv
 	{
 		if (service->getName() == (*it)->getName())
 		{
-			it = mDataReaders.erase(it);
+			mDataReaders.erase(it);
 			CX_LOG_DEBUG() << "Removing " << service->getName();
 		}
 		else
