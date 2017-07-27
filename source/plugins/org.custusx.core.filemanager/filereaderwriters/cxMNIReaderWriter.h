@@ -27,12 +27,17 @@ public:
 	bool canWrite(const QString &type, const QString &filename) const;
 	void write(DataPtr data, const QString &filename);
 
+	void setVolumeUidsRelatedToPointsInMNIPointFile(std::vector<QString> volumeUids);
+
 private:
 	QColor getRandomColor();
 	std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description);
+	bool validateKnownVolumeUids(int numberOfVolumesInFile) const;
 
 	PatientModelServicePtr mPatientModelServicePrivate;
 	ViewServicePtr mViewService;
+
+	std::vector<QString> mVolumeUids;
 };
 }
 

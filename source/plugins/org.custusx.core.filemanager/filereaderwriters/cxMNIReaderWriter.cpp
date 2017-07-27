@@ -81,11 +81,11 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
 	int number_of_volumes = reader->GetNumberOfVolumes();
 	QString description(reader->GetComments());
-	std::vector<QString> data_uid;
-	data_uid.push_back("");
-	data_uid.push_back("");
-	if(!testmode)
-		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+	bool knownUidAreValid = this->validateKnownVolumeUids(number_of_volumes);
+	if(!knownUidAreValid)
+	{
+		mVolumeUids = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+	}
 
 	//--- Create the point metrics
 	QString type = "pointMetric";
@@ -115,7 +115,7 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 				DataPtr data_point_metric = this->createData(type, filename, QString::number(j+1));
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data_point_metric);
 
-				CoordinateSystem space(csDATA, data_uid[i]);
+				CoordinateSystem space(csDATA, mVolumeUids[i]);
 				Vector3D vector_ras(point[0], point[1], point[2]);
 				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
 
@@ -131,14 +131,17 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 			}
 		}
 	}
+	mVolumeUids.clear();
 
 	return retval;
 }
 
 bool MNIReaderWriter::readInto(DataPtr data, QString path)
 {
-	//TODO this needs to be implemented properly
-	bool testmode = false;
+	CX_LOG_ERROR() << "Do not use readInto...";
+	return false;
+
+	/*
 
 	//--- HACK to be able to read *.tag files with missing newline before eof
 	forceNewlineBeforeEof(path);
@@ -159,11 +162,11 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
 	int number_of_volumes = reader->GetNumberOfVolumes();
 	QString description(reader->GetComments());
-	std::vector<QString> data_uid;
-	data_uid.push_back("");
-	data_uid.push_back("");
-	if(!testmode)
-		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+	bool knownUidAreValid = this->validateKnownVolumeUids(number_of_volumes);
+	if(!knownUidAreValid)
+	{
+		mVolumeUids = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+	}
 
 	//--- Create the point metrics
 	QString type = "pointMetric";
@@ -193,7 +196,7 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 				data = this->createData(type, path, QString::number(j+1));
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
 
-				CoordinateSystem space(csDATA, data_uid[i]);
+				CoordinateSystem space(csDATA, mVolumeUids[i]);
 				Vector3D vector_ras(point[0], point[1], point[2]);
 				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
 
@@ -211,7 +214,10 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 		}
 	}
 
+	mVolumeUids.clear();
+
 	return data != DataPtr();
+	*/
 }
 
 QString MNIReaderWriter::canWriteDataType() const
@@ -227,6 +233,11 @@ bool MNIReaderWriter::canWrite(const QString &type, const QString &filename) con
 void MNIReaderWriter::write(DataPtr data, const QString &filename)
 {
 
+}
+
+void MNIReaderWriter::setVolumeUidsRelatedToPointsInMNIPointFile(std::vector<QString> volumeUids)
+{
+	mVolumeUids = volumeUids;
 }
 
 QColor MNIReaderWriter::getRandomColor()
@@ -271,6 +282,19 @@ std::vector<QString> MNIReaderWriter::dialogForSelectingVolumesForImportedMNITag
 		data_uid.push_back(image_property->getValue());
 	}
 	return data_uid;
+}
+
+bool MNIReaderWriter::validateKnownVolumeUids(int numberOfVolumesInFile) const
+{
+	bool retval = true;
+	retval &= numberOfVolumesInFile == mVolumeUids.size();
+	for(int i=0; i<mVolumeUids.size(); ++i)
+	{
+		DataPtr data = mPatientModelServicePrivate->getData(mVolumeUids[i]);
+		if(data)
+			retval &= true;
+	}
+	return retval;
 }
 
 

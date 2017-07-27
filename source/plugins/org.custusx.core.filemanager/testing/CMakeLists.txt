@@ -27,6 +27,7 @@ if(BUILD_TESTING)
         cxResource
         cxLogicManager
         cxCatch
+        cxGui #because metricmanager is inside cxgui, perhaps it should be moved
     )
     cx_add_tests_to_catch(cxtest_org_custusx_core_filemanager)
         
