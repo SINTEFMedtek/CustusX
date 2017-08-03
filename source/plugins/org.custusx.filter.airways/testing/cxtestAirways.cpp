@@ -33,25 +33,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "catch.hpp"
 
 #include "cxtestAirwaysFixture.h"
+#ifdef CX_APPLE
+#include <vtkCocoaRenderWindow.h>
+#endif
+#ifdef CX_WINDOWS
+#include <vtkWin32OpenGLRenderWindow.h>
+#endif
+
 
 namespace cxtest
 {
 
-TEST_CASE("Airways testConstructor works", "[integration][airways]")
+TEST_CASE("Airway segmentation on test data pat011 works", "[integration][airways]")
 {
-    AirwaysFixture helper;
-	helper.testConstructor();
-	REQUIRE(true);
-}
-
-#ifdef CX_CUSTUS_SINTEF
-TEST_CASE("Airways on test data Lung-Airways-CT works", "[integration][airways]")
-{
-    AirwaysFixture helper;
-    //helper.testSyntheticVascusynth(); //not working... need testdata for
-    helper.testLungAirwaysCT(); //only found in CS repo...
-}
+#ifdef CX_APPLE
+	vtkCocoaRenderWindow* v = vtkCocoaRenderWindow::New();
+	v->Initialize();
 #endif
+#ifdef CX_WINDOWS
+    vtkWin32OpenGLRenderWindow* v = vtkWin32OpenGLRenderWindow::New();
+    v->Initialize();
+#endif
+
+    AirwaysFixture helper;
+	helper.testLungAirwaysCT();
+
+#if defined (CX_APPLE) || defined (CX_WINDOWS)
+	v->Delete();
+#endif
+}
 
 } // namespace cxtest
 

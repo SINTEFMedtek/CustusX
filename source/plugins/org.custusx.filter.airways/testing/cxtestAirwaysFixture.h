@@ -46,12 +46,10 @@ public:
     AirwaysFixture();
     ~AirwaysFixture();
 
-    void testConstructor();
-    void testSyntheticVascusynth();
     void testLungAirwaysCT();
 
 private:
-    void runFilter(QString preset);
+	void runFilter(const QString& preset);
 };
 
 }
