@@ -160,8 +160,14 @@ bool RouteToTargetFilter::postProcess()
     if (!inputMesh)
         return false;
 
-    QString uidCenterline = inputMesh->getUid() + RouteToTargetFilter::getNameSuffix() + "%1" + "_" + mTargetName;
-    QString nameCenterline = inputMesh->getName()+RouteToTargetFilter::getNameSuffix() + "%1" + "_" + mTargetName;
+	QString uidCenterline = inputMesh->getUid() + RouteToTargetFilter::getNameSuffix() + "%1";
+	QString nameCenterline = inputMesh->getName()+RouteToTargetFilter::getNameSuffix() + "%1";
+	if (!mTargetName.isEmpty())
+	{
+		uidCenterline.append("_" + mTargetName);
+		nameCenterline.append("_" + mTargetName);
+	}
+
     MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
     outputCenterline->setVtkPolyData(mOutput);
     patientService()->insertData(outputCenterline);
