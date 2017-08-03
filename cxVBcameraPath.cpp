@@ -49,8 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx {
 
-CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, ViewServicePtr visualization) :
-	mTrackingService(tracker), mPatientModelService(patientModel), mViewService(visualization)
+CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, ViewServicePtr visualization)
+  :	mTrackingService(tracker)
+  , mPatientModelService(patientModel)
+  , mViewService(visualization)
+  , mLastCameraViewAngle(0)
+  , mLastCameraRotAngle(0)
 {
 	mManualTool = mTrackingService->getManualTool();
     mSpline = vtkParametricSplinePtr::New();
