@@ -80,7 +80,12 @@ QString ContourFilter::getHelp() const
 	        "<p>- Marching Cubes contouring</p>"
 	        "<p>- Optional Windowed Sinc smoothing</p>"
 	        "<p>- Decimation of triangles</p>"
-	        "</html>";
+           "</html>";
+}
+
+QString ContourFilter::getNameSuffix()
+{
+    return "_ge";
 }
 
 BoolPropertyPtr ContourFilter::getReduceResolutionOption(QDomElement root)
@@ -340,8 +345,8 @@ MeshPtr ContourFilter::postProcess(PatientModelServicePtr patient, vtkPolyDataPt
 	if (!contour || !base)
 		return MeshPtr();
 
-	QString uid = base->getUid() + "_ge%1";
-	QString name = base->getName()+" ge%1";
+    QString uid = base->getUid() + ContourFilter::getNameSuffix() + "%1";
+    QString name = base->getName()+ ContourFilter::getNameSuffix() + "%1";
 	MeshPtr output = patient->createSpecificData<Mesh>(uid, name);
 	output->setVtkPolyData(contour);
 	if (!output)
