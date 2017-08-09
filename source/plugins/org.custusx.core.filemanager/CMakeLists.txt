@@ -66,6 +66,7 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxPluginUtilities
     cxGUIExtenderService
+    cxGui
     cxResourceVisualization
 )
 

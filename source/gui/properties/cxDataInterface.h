@@ -202,6 +202,9 @@ public:
 	virtual ~StringPropertySetParentFrame() {}
 public: // basic methods
 	virtual bool setValue(const QString& value);
+
+signals:
+	void parentChanged();
 };
 
 

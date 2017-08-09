@@ -5,6 +5,9 @@
 #include "cxFileManagerService.h"
 #include "org_custusx_core_filemanager_Export.h"
 
+class QTableWidget;
+class QStackedWidget;
+
 namespace cx
 {
 
@@ -15,15 +18,35 @@ class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
 public:
 	ImportWidget(FileManagerServicePtr filemanager, VisServicesPtr services);
 
+signals:
+	void finishedImporting();
+
 private slots:
 	void importButtonClicked();
+	void cancelButtonClicked();
+	void addMoreFilesButtonClicked();
 	void removeWidget(QWidget *widget);
+
+	void tableItemSelected(int row, int column);
+	void cleanUpAfterImport();
 
 private:
 	QStringList openFileBrowserForSelectingFiles();
 	QString generateFileTypeFilter();
 
 	QString generateUid(QString filename) const;
+	std::vector<DataPtr> generateParentCandidates(std::vector<DataPtr> notLoadedData) const
+	;
+	void insertDataIntoTable(QString filename, std::vector<DataPtr> data);
+
+	QTableWidget* mTableWidget;
+	QStringList mTableHeader;
+	int mSelectedIndexInTable;
+
+	QStackedWidget *mStackedWidget;
+
+	std::vector<DataPtr> mData;
+	std::vector<DataPtr> mParentCandidates;
 
 	FileManagerServicePtr mFileManager;
 	VisServicesPtr mVisServices;

@@ -30,6 +30,11 @@ MNIReaderWriter::MNIReaderWriter(ctkPluginContext *context) :
 {
 	mViewService = ViewServiceProxy::create(context);
 	mPatientModelServicePrivate = PatientModelServiceProxy::create(context);
+
+	std::vector<QString> uids;
+	uids.push_back("dummyParent1");
+	uids.push_back("dummyParent2");
+	this->setVolumeUidsRelatedToPointsInMNIPointFile(uids);
 }
 
 bool MNIReaderWriter::isNull()
@@ -77,15 +82,17 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 	if (!ErrorObserver::checkedRead(reader, filename))
 		CX_LOG_ERROR() << "Error reading MNI Tag Point file.";
 
-
-	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
 	int number_of_volumes = reader->GetNumberOfVolumes();
 	QString description(reader->GetComments());
+	/*
+	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
 	bool knownUidAreValid = this->validateKnownVolumeUids(number_of_volumes);
 	if(!knownUidAreValid)
 	{
 		mVolumeUids = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
 	}
+	*/
+
 
 	//--- Create the point metrics
 	QString type = "pointMetric";

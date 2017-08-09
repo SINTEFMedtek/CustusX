@@ -272,6 +272,7 @@ bool StringPropertySetParentFrame::setValue(const QString& value)
 	if (!mData)
 		return false;
 	mData->get_rMd_History()->setParentSpace(value);
+	emit parentChanged();
 	return true;
 }
 

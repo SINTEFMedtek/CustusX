@@ -156,7 +156,7 @@ bool FileManagerImpService::readInto(DataPtr data, QString path)
 	{
 		QFileInfo fileInfo(qstring_cast(path));
 		data->setName(changeExtension(fileInfo.fileName(), ""));
-		data->setFilename(path); // need path even when not set explicitly: nice for testing
+		//data->setFilename(path); // need path even when not set explicitly: nice for testing
 	}
 	return success;
 
