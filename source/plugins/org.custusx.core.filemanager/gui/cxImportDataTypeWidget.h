@@ -31,7 +31,7 @@ private slots:
 	void pointMetricGroupSpaceChanged(int index);
 
 private:
-	QStringList getParentCandidateList();
+	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
 	void updateParentCandidatesComboBox();

@@ -90,9 +90,9 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 		}
 	}
 	//add point metric groups
-	std::map<QString, std::vector<DataPtr> >::iterator it = mPointMetricGroups.begin();
 	int groupnr = 0;
-	for(it; it != mPointMetricGroups.end(); ++it)
+	std::map<QString, std::vector<DataPtr> >::iterator it = mPointMetricGroups.begin();
+	for(; it != mPointMetricGroups.end(); ++it)
 	{
 		groupnr +=1;
 
@@ -124,12 +124,13 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	topLayout->addWidget(mTableWidget);
 }
 
-QStringList ImportDataTypeWidget::getParentCandidateList()
+//QStringList ImportDataTypeWidget::getParentCandidateList()
+std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
 {
-	QStringList parentCandidates;
+	std::map<QString, QString> parentCandidates;
 	for(int i=0; i<mParentCandidates.size(); ++i)
 	{
-		parentCandidates << mParentCandidates[i]->getUid();
+		parentCandidates[mParentCandidates[i]->getName()] = mParentCandidates[i]->getUid();
 	}
 
 	return parentCandidates;
@@ -139,10 +140,12 @@ QStringList ImportDataTypeWidget::getParentCandidateList()
 void ImportDataTypeWidget::updateSpaceComboBox(QComboBox *box, QString pointMetricGroupId)
 {
 	box->clear();
-	QStringList parentCandidates = this->getParentCandidateList();
-	foreach (QString parent, parentCandidates)
+	std::map<QString, QString> parentCandidates = this->getParentCandidateList();
+	std::map<QString, QString>::iterator it;
+	for(it= parentCandidates.begin(); it != parentCandidates.end(); ++it)
 	{
-		box->addItem(parent);
+		QVariant id(it->second);
+		box->addItem(it->first, id);
 	}
 	std::vector<DataPtr> pointMetricGroup = mPointMetricGroups[pointMetricGroupId];
 	QString currentSpace = pointMetricGroup[0]->getSpace();
@@ -152,8 +155,13 @@ void ImportDataTypeWidget::updateSpaceComboBox(QComboBox *box, QString pointMetr
 void ImportDataTypeWidget::updateParentCandidatesComboBox()
 {
 	mParentCandidatesCB->clear();
-	QStringList parentCandidates = getParentCandidateList();
-	mParentCandidatesCB->addItems(parentCandidates);
+	std::map<QString, QString> parentCandidates = this->getParentCandidateList();
+	std::map<QString, QString>::iterator it;
+	for(it= parentCandidates.begin(); it != parentCandidates.end(); ++it)
+	{
+		QVariant id(it->second);
+		mParentCandidatesCB->addItem(it->first, id);
+	}
 }
 
 void ImportDataTypeWidget::update()
@@ -178,7 +186,7 @@ void ImportDataTypeWidget::showEvent(QShowEvent *event)
 void ImportDataTypeWidget::pointMetricGroupSpaceChanged(int index)
 {
 	QComboBox *box = qobject_cast<QComboBox*>(QObject::sender());
-	QString newSpace = box->currentText();
+	QString newSpace = box->currentData().toString();
 
 	QString pointMetricsGroupId;
 	std::map<QString, QComboBox *>::iterator it;
