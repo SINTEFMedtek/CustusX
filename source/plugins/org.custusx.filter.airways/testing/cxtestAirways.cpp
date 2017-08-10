@@ -44,7 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TEST_CASE("Airway segmentation on test data pat011 works", "[integration][airways]")
+//Atm. this test doesn't have any test data. Therefore it is hidden.
+TEST_CASE("Airway segmentation on test data pat011 works", "[integration][airways][hide]")
 {
 #ifdef CX_APPLE
 	vtkCocoaRenderWindow* v = vtkCocoaRenderWindow::New();
