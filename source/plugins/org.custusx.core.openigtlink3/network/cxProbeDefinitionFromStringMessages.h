@@ -50,6 +50,8 @@ const int tooLarge = 100000;
 struct SectorInfo
 {
 	int mProbeType; //0 = unknown, 1 = sector, 2 = linear
+
+	//Old values - to be removed
 	double mStartDepth;
 	double mStopDepth;
 	double mStartLineX;
@@ -70,6 +72,14 @@ struct SectorInfo
 	double mSectorBottomMm;
 	ImagePtr mImage;
 
+	//new standard
+	bool mNewStandard;
+	std::vector<double> mOrigin;
+	std::vector<double> mAngles;
+	std::vector<double> mBouningBox;
+	std::vector<double> mDepths;
+	double mLinearWidth;
+
 	SectorInfo()
 	{
 		reset();
@@ -77,6 +87,15 @@ struct SectorInfo
 	void reset()
 	{
 		mProbeType = tooLarge;
+
+		//new standard
+		mNewStandard = false;
+		mOrigin.clear();
+		mAngles.clear();
+		mBouningBox.clear();
+		mDepths.clear();
+		mLinearWidth = tooLarge;
+
 		mStartDepth = tooLarge;
 		mStopDepth = tooLarge;
 		mStartLineX = tooLarge;
@@ -97,8 +116,31 @@ struct SectorInfo
 		mSectorBottomMm = tooLarge;
 		mImage = ImagePtr();
 	}
+	bool standardIsValid()
+	{
+		bool retval = true;
+		retval = retval && ((mProbeType == 1) || (mProbeType == 2));
+		retval = retval && (mOrigin.size() == 3);
+		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
+		retval = retval && ((mBouningBox.size() == 4) || (mBouningBox.size() == 6)); //2D == 4, 3D == 6
+		retval = retval && (mDepths.size() == 2);
+		if(mProbeType == 2)//linar
+			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
+
+		//Send spacing for now. Try to send it as image spacing
+		retval = retval && (mSpacingX < tooLarge);
+		retval = retval && (mSpacingY < tooLarge);
+		retval = retval && !similar(mSpacingX, 0);
+		retval = retval && !similar(mSpacingY, 0);
+
+		return retval;
+	}
+
 	bool isValid()
 	{
+		if (mNewStandard)
+			return standardIsValid();
+
 		bool retval = true;
 		retval = retval && mImage;
 //		return retval;//test
@@ -161,6 +203,7 @@ public:
 	void parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message);
 	void setImage(ImagePtr image);
 	bool haveValidValues();
+	ProbeDefinitionPtr createProbeDefintionFromStandardValues(QString uid);
 	ProbeDefinitionPtr createProbeDefintion(QString uid);
 
 	void parseValue(QString name, QString value);
@@ -170,6 +213,12 @@ protected:
 	SectorInfoPtr mSectorInfo;
 	bool mTestMode;
 
+private:
+	std::vector<double> toDoubleVector(QString values, QString separator = QString(","));
+	DoubleBoundingBox3D getBoundinBox();
+	double getWidth();
+	ProbeDefinitionPtr initProbeDefinition();
+	QSize getSize();
 };
 
 }//cx

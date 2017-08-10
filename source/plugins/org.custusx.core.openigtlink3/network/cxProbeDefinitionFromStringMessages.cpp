@@ -62,10 +62,24 @@ void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter
 	this->parseValue(name, value);
 }
 
+std::vector<double> ProbeDefinitionFromStringMessages::toDoubleVector(QString values, QString separator)
+{
+	std::vector<double> retval;
+	QStringList valueList = values.split(separator);
+	for (int i = 0; i < valueList.size(); ++i)
+	{
+		double doublevalue = valueList[i].toDouble();
+		retval.push_back(doublevalue);
+	}
+	return retval;
+}
+
 void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 {
 	int intValue = value.toInt();
 	double doubleValue = value.toDouble();
+	std::vector<double> doubleVector = toDoubleVector(value);
+
 //	CX_LOG_DEBUG() << "parseStringMessage: "	<< " name: " << name
 //				   << " intValue: " << intValue
 //				   << " doubleValue: " << doubleValue;
@@ -81,6 +95,35 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			CX_LOG_WARNING() << "ProbeDefinitionFromStringMessages only using dummy values";
 		}
 	}
+	//New standard
+	else if (name == "Origin")
+	{
+		mSectorInfo->mOrigin = doubleVector;
+		mSectorInfo->mNewStandard = true;
+	}
+	else if (name == "Angles")
+	{
+		mSectorInfo->mAngles = doubleVector;
+		mSectorInfo->mNewStandard = true;
+	}
+	else if (name == "BouningBox")
+	{
+		mSectorInfo->mBouningBox = doubleVector;
+		mSectorInfo->mNewStandard = true;
+	}
+	else if (name == "Depths")
+	{
+		mSectorInfo->mDepths = doubleVector;
+		mSectorInfo->mNewStandard = true;
+	}
+	else if (name == "LinearWidth")
+	{
+		mSectorInfo->mLinearWidth = doubleValue;
+		mSectorInfo->mNewStandard = true;
+	}
+
+	//Old values - to be removed
+
 	else if (name == "StartDepth")
 	{
 		mSectorInfo->mStartDepth = doubleValue;
@@ -209,10 +252,88 @@ bool ProbeDefinitionFromStringMessages::haveValidValues()
 	return mSectorInfo->isValid();
 }
 
+ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintionFromStandardValues(QString uid)
+{
+	if(!mSectorInfo->standardIsValid())
+		return ProbeDefinitionPtr();
+
+	//Send spacing as messages for now. Should be sent together with image.
+	mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, 1.0);
+	Vector3D spacing = mSectorInfo->mImage->getSpacing();
+	Vector3D origin_p(mSectorInfo->mOrigin[0], mSectorInfo->mOrigin[1], mSectorInfo->mOrigin[2]);
+
+	ProbeDefinitionPtr probeDefinition = this->initProbeDefinition();
+	probeDefinition->setUid(uid);
+	probeDefinition->setOrigin_p(origin_p);
+	probeDefinition->setSpacing(spacing);
+	probeDefinition->setClipRect_p(this->getBoundinBox());
+	probeDefinition->setSector(mSectorInfo->mDepths[0], mSectorInfo->mDepths[1], this->getWidth());
+	probeDefinition->setSize(this->getSize());
+	probeDefinition->setUseDigitalVideo(true);
+	return probeDefinition;
+}
+
+ProbeDefinitionPtr ProbeDefinitionFromStringMessages::initProbeDefinition()
+{
+	ProbeDefinitionPtr probeDefinition;
+	if(mSectorInfo->mProbeType == 2) //linear
+	{
+		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tLINEAR));
+	}
+	else if (mSectorInfo->mProbeType == 1)//sector
+	{
+		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tSECTOR));
+	}
+	else
+	{
+		CX_LOG_ERROR() << "ProbeDefinitionFromStringMessages::createProbeDefintionFromStandardValues: Incorrect probe type: " << mSectorInfo->mProbeType;
+	}
+	return probeDefinition;
+}
+
+double ProbeDefinitionFromStringMessages::getWidth()
+{
+	double width = 0;
+	if(mSectorInfo->mProbeType == 2) //linear
+	{
+		width = mSectorInfo->mLinearWidth;
+	}
+	else if (mSectorInfo->mProbeType == 1)//sector
+	{
+		width = mSectorInfo->mAngles[1] - mSectorInfo->mAngles[0];
+	}
+	return width;
+}
+
+QSize ProbeDefinitionFromStringMessages::getSize()
+{
+	Eigen::Array3i dimensions(mSectorInfo->mImage->getBaseVtkImageData()->GetDimensions());
+	QSize size(dimensions[0], dimensions[1]);
+	return size;
+}
+
+DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox()
+{
+	double zStart = 0;
+	double zEnd = 0;
+	if(mSectorInfo->mBouningBox.size() == 6)
+	{
+		zStart = mSectorInfo->mBouningBox[4];
+		zEnd = mSectorInfo->mBouningBox[5];
+	}
+	DoubleBoundingBox3D retval(mSectorInfo->mBouningBox[0], mSectorInfo->mBouningBox[1],
+			mSectorInfo->mBouningBox[2], mSectorInfo->mBouningBox[3],
+			zStart, zEnd);
+	return retval;
+}
+
 ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QString uid)
 {
 	if(!this->haveValidValues())
 		return ProbeDefinitionPtr();
+
+	if(mSectorInfo->mNewStandard)
+		return this->createProbeDefintionFromStandardValues(uid);
 
 
 	Vector3D spacing = mSectorInfo->mImage->getSpacing();
