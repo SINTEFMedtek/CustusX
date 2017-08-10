@@ -4,6 +4,7 @@
 
 #include <QFileDialog>
 #include <QPushButton>
+#include <QLabel>
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QApplication>
@@ -21,10 +22,6 @@ namespace cx
 {
 /*
  * TODOS:
- * * create point metric group widget, where you select parent for one data and the rest is also set
- *
- * * remove dialog for pointmetric parent selection -> set dummyParent1 and dummyParent2
- * * add header in table to show size of point metric group
  * * implement coordinate system guess
  * * implement parent guess
  * * implement auto RAS to LPS conversion
@@ -65,6 +62,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	buttonLayout->addWidget(importButton);
 	buttonLayout->addWidget(cancelButton);
 	mTopLayout->addWidget(addMoreFilesButton);
+	mTopLayout->addWidget(new QLabel("Supports: "+this->generateFileTypeFilter()));
 	mTopLayout->addWidget(mTableWidget);
 	mTopLayout->addWidget(mStackedWidget);
 	mTopLayout->addStretch();
@@ -110,7 +108,9 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 		this->insertDataIntoTable(filename, newData);
 		mParentCandidates = this->generateParentCandidates(mData);
+		emit parentCandidatesUpdated();
 		widget = new ImportDataTypeWidget(NULL, mVisServices, newData, mParentCandidates);
+		connect(this, &ImportWidget::parentCandidatesUpdated, widget, &ImportDataTypeWidget::update);
 		mStackedWidget->addWidget(widget);
 
 
@@ -143,13 +143,10 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 void ImportWidget::importButtonClicked()
 {
-	CX_LOG_DEBUG() << "IMPORTING: ";
-
 	for(int i=0; i<mData.size(); ++i)
 	{
 		if(mData[i])
 		{
-			CX_LOG_DEBUG() << mData[i]->getFilename();
 			mVisServices->patient()->insertData(mData[i]);
 		}
 	}
@@ -171,7 +168,7 @@ void ImportWidget::tableItemSelected(int row, int column)
 {
 	if(row == mSelectedIndexInTable)
 		return;
-	CX_LOG_DEBUG() << "New row selected: " << row;
+
 	mStackedWidget->setCurrentIndex(row);
 	mSelectedIndexInTable = row;
 }
@@ -190,7 +187,6 @@ void ImportWidget::cleanUpAfterImport()
 		QWidget *widgetToRemove = mStackedWidget->widget(i);
 		mStackedWidget->removeWidget(widgetToRemove);
 	}
-	CX_LOG_DEBUG() << "StackedWidget count after remove: " << mStackedWidget->count();
 }
 
 QStringList ImportWidget::openFileBrowserForSelectingFiles()
@@ -207,7 +203,7 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 
 }
 
-QString ImportWidget::generateFileTypeFilter()
+QString ImportWidget::generateFileTypeFilter() const
 {
 	QString file_type_filter;
 	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType("mesh");
@@ -228,7 +224,6 @@ QString ImportWidget::generateFileTypeFilter()
 	while(file_type_filter.endsWith( ' ' ))
 		file_type_filter.chop(1);
 	file_type_filter.append(")");
-	CX_LOG_DEBUG() << "IMPORT FILTER: " << file_type_filter;
 
 	return file_type_filter;
 }

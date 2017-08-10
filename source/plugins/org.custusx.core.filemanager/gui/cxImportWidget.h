@@ -20,6 +20,7 @@ public:
 
 signals:
 	void finishedImporting();
+	void parentCandidatesUpdated();
 
 private slots:
 	void importButtonClicked();
@@ -32,11 +33,10 @@ private slots:
 
 private:
 	QStringList openFileBrowserForSelectingFiles();
-	QString generateFileTypeFilter();
+	QString generateFileTypeFilter() const;
 
 	QString generateUid(QString filename) const;
-	std::vector<DataPtr> generateParentCandidates(std::vector<DataPtr> notLoadedData) const
-	;
+	std::vector<DataPtr> generateParentCandidates(std::vector<DataPtr> notLoadedData) const;
 	void insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 
 	QTableWidget* mTableWidget;

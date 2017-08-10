@@ -23,6 +23,9 @@ class org_custusx_core_filemanager_EXPORT ImportDataTypeWidget : public BaseWidg
 public:
 	ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates);
 
+public slots:
+	void update();
+
 private slots:
 	virtual void showEvent(QShowEvent *event);
 	void pointMetricGroupSpaceChanged(int index);
@@ -30,16 +33,18 @@ private slots:
 private:
 	QStringList getParentCandidateList();
 
-	QWidget *mPointMetricWidget;
+	void updateSpaceComboBox(QComboBox *box, QString space);
+	void updateParentCandidatesComboBox();
 
-	/** Use heuristics to guess a parent frame,
-	 *  based on similarities in name.
-	 */
+
+	//Use heuristics to guess a parent frame, based on similarities in name.
 	//void setInitialGuessForParentFrame(DataPtr data);
 
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
 	std::vector<DataPtr> &mParentCandidates;
+
+	std::map<QString, QComboBox *> mSpaceCBs;
 	std::map<QString, std::vector<DataPtr> > mPointMetricGroups;
 
 	QComboBox *mAnatomicalCoordinateSystems;
@@ -49,7 +54,6 @@ private:
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
 	int mSelectedIndexInTable;
-
 };
 
 }

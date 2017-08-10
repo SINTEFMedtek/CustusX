@@ -72,7 +72,9 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 		//create point metric groups
 		if(type == "pointMetric")
 		{
-			QString space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
+			space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
+			if(space.isEmpty())
+				CX_LOG_WARNING() << "Trying to add empty space";
 			(mPointMetricGroups[space]).push_back(mData[i]);
 			CX_LOG_DEBUG() << "Added pmg with space " << space;
 		}
@@ -98,15 +100,14 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 		std::vector<DataPtr> datas = it->second;
 		DataPtr data = datas[0];
 		if(datas.empty() || !data)
+		{
 			continue;
+		}
 
 		QComboBox *spaceCB = new QComboBox();
-		QStringList parentCandidates = this->getParentCandidateList();
-		foreach (QString parent, parentCandidates) {
-			QVariant spaceVariant(space);
-			spaceCB->addItem(parent, spaceVariant);
-		}
-		connect(spaceCB, SIGNAL(activated(int)), this, SLOT(pointMetricGroupSpaceChanged(int)));
+		mSpaceCBs[space] = spaceCB;
+		connect(spaceCB, SIGNAL(currentIndexChanged(int)), this, SLOT(pointMetricGroupSpaceChanged(int)));
+		this->updateSpaceComboBox(spaceCB, space);
 
 		type = data->getType();
 		name = "Point metric group "+QString::number(groupnr);
@@ -128,29 +129,65 @@ QStringList ImportDataTypeWidget::getParentCandidateList()
 	QStringList parentCandidates;
 	for(int i=0; i<mParentCandidates.size(); ++i)
 	{
-		//TODO add QVariant with uid
 		parentCandidates << mParentCandidates[i]->getUid();
 	}
 
 	return parentCandidates;
 }
 
-void ImportDataTypeWidget::showEvent(QShowEvent *event)
-{
-	CX_LOG_DEBUG() << "ImportDataTypeWidget is visible";
-	BaseWidget::showEvent(event);
 
+void ImportDataTypeWidget::updateSpaceComboBox(QComboBox *box, QString pointMetricGroupId)
+{
+	box->clear();
+	QStringList parentCandidates = this->getParentCandidateList();
+	foreach (QString parent, parentCandidates)
+	{
+		box->addItem(parent);
+	}
+	std::vector<DataPtr> pointMetricGroup = mPointMetricGroups[pointMetricGroupId];
+	QString currentSpace = pointMetricGroup[0]->getSpace();
+	box->setCurrentText(currentSpace);
+}
+
+void ImportDataTypeWidget::updateParentCandidatesComboBox()
+{
 	mParentCandidatesCB->clear();
 	QStringList parentCandidates = getParentCandidateList();
 	mParentCandidatesCB->addItems(parentCandidates);
 }
 
+void ImportDataTypeWidget::update()
+{
+	this->updateParentCandidatesComboBox();
+
+	std::map<QString, QComboBox *>::iterator it;
+	for(it=mSpaceCBs.begin(); it != mSpaceCBs.end(); ++it)
+	{
+		QString id = it->first;
+		QComboBox *box = it->second;
+		this->updateSpaceComboBox(box,id);
+	}
+}
+
+void ImportDataTypeWidget::showEvent(QShowEvent *event)
+{
+	BaseWidget::showEvent(event);
+	this->update();
+}
+
 void ImportDataTypeWidget::pointMetricGroupSpaceChanged(int index)
 {
-	QComboBox *spaceCB = qobject_cast<QComboBox*>(QObject::sender());
-	QString newSpace = spaceCB->itemText(index);
-	QString pointMetricsWithSpace = spaceCB->itemData(index).toString();
-	std::vector<DataPtr> pointMetricGroup = mPointMetricGroups[pointMetricsWithSpace];
+	QComboBox *box = qobject_cast<QComboBox*>(QObject::sender());
+	QString newSpace = box->currentText();
+
+	QString pointMetricsGroupId;
+	std::map<QString, QComboBox *>::iterator it;
+	for(it = mSpaceCBs.begin(); it != mSpaceCBs.end(); ++it)
+	{
+		if(it->second == box)
+			pointMetricsGroupId = it->first;
+	}
+	std::vector<DataPtr> pointMetricGroup = mPointMetricGroups[pointMetricsGroupId];
 	for(int i=0; i<pointMetricGroup.size(); ++i)
 	{
 		CoordinateSystem cs(csDATA, newSpace);
