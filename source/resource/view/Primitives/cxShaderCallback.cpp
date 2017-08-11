@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
 #include "GL/glew.h"
-#include "GL/glu.h"
+#include "glu.h"
 
 #include "cxOpenGLShaders.h"
 

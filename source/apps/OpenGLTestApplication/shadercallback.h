@@ -7,7 +7,7 @@
 
 //OpenGL
 #include <GL/glew.h>
-#include <GL/glut.h> //Framework on Mac
+#include <glut.h> //Framework on Mac
 
 // -----------------------------------------------------------------------
 // Update a uniform in the shader for each render. We do this with a
