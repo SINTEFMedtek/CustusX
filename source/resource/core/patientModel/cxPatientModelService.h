@@ -157,6 +157,7 @@ public:
 	virtual void setLandmarkName(QString uid, QString name) = 0;
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 	virtual QString addLandmark() = 0;
+	virtual void deleteLandmarks() = 0;
 	// utility
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 

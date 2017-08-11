@@ -437,6 +437,8 @@ endfunction()
 function(cx_install_windows_runtime_libs DESTINATION_FOLDER)
 	if(CX_WINDOWS)
 		set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+        #OpenMP is required by FAST
+        set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
 		include (InstallRequiredSystemLibraries)
 		if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 				install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
