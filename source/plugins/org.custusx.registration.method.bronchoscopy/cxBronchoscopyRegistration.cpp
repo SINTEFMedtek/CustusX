@@ -537,7 +537,7 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 		mBranchListPtr->selectGenerations(numberOfGenerations);
 	}
 
-	mBranchListPtr->smoothBranchPositions();
+    mBranchListPtr->smoothBranchPositions(10);
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
@@ -595,7 +595,7 @@ BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyData
         branchListPtr->selectGenerations(numberOfGenerations);
     }
 
-    branchListPtr->smoothBranchPositions();
+    branchListPtr->smoothBranchPositions(10);
     branchListPtr->calculateOrientations();
     branchListPtr->smoothOrientations();
 

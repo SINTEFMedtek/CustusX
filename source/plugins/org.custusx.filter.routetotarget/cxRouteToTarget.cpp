@@ -58,7 +58,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
-    mBranchListPtr->smoothBranchPositions();
+    mBranchListPtr->smoothBranchPositions(40);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
