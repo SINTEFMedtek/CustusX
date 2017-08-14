@@ -44,7 +44,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
 #include "GL/glew.h"
-#include "glu.h"
+
+#ifdef __APPLE__
+#include <glu.h>
+#else
+#include <GL/glu.h>
+#endif
 
 #include "cxOpenGLShaders.h"
 

@@ -193,14 +193,14 @@ class CppBuilder:
         add = self.addCMakeOption
         append = self.appendCMakeOption
         if(platform.system() != 'Windows'):
-            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-inconsistent-missing-override')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
         if('BUILD_SHARED_LIBS:BOOL' not in self.cmakeOptions):
             add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         add('CMAKE_ECLIPSE_VERSION', self.controlData.getEclipseVersion())
-        add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)            
+        add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)
     
     def _assembleOptions(self):
         return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.iteritems()])
