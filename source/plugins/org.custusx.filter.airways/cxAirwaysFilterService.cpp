@@ -93,7 +93,12 @@ QString AirwaysFilter::getHelp() const
 	return "<html>"
 	        "<h3>Airway Segmentation.</h3>"
 	        "<p><i>Extracts segmentation and centerline from a CT volume. If method fails, try to crop volume. </br>Algorithm written by Erik Smistad.</i></p>"
-	        "</html>";
+           "</html>";
+}
+
+QString AirwaysFilter::getNameSuffix()
+{
+    return "_centerline";
 }
 
 
@@ -350,8 +355,8 @@ bool AirwaysFilter::postProcess()
 	}
 
     // Centerline
-	QString uid = mInputImage->getUid() + "_centerline%1";
-	QString name = mInputImage->getName() + " centerline%1";
+    QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + "%1";
+    QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + "%1";
 	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
 	centerline->setVtkPolyData(mCenterlineOutput);
 	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());

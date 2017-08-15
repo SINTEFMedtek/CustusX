@@ -25,7 +25,6 @@ namespace cx
  * * implement coordinate system guess
  * * implement parent guess
  * * implement auto RAS to LPS conversion
- * * add not imported data into list of parents
  */
 
 ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisServicesPtr services) :
@@ -40,7 +39,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTableWidget->setColumnCount(3);
 	mTableHeader<<"Status"<<"Filename"<<"Remove?";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
-	//mTableWidget->horizontalHeader()->setStretchLastSection(true);
+	mTableWidget->horizontalHeader()->setStretchLastSection(true);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	mTableWidget->verticalHeader()->setVisible(false);
 	mTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -74,7 +73,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	connect(this, &ImportWidget::finishedImporting, this, &ImportWidget::cleanUpAfterImport);
 }
 
-void ImportWidget::insertDataIntoTable(QString filename, std::vector<DataPtr> data)
+int ImportWidget::insertDataIntoTable(QString filename, std::vector<DataPtr> data)
 {
 	int newRowIndex = mTableWidget->rowCount();
 	mTableWidget->setRowCount(newRowIndex+1);
@@ -91,9 +90,10 @@ void ImportWidget::insertDataIntoTable(QString filename, std::vector<DataPtr> da
 	filename = fileInfo.fileName();
 	mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(status));
 	mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(filename));
-	mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem("TODO"));
+	QPushButton *removeButton = new QPushButton("Remove"); //TODO replace with icon
+	mTableWidget->setCellWidget(newRowIndex, 2, removeButton);
 
-	return;
+	return newRowIndex;
 }
 
 void ImportWidget::addMoreFilesButtonClicked()
@@ -106,38 +106,12 @@ void ImportWidget::addMoreFilesButtonClicked()
 		std::vector<DataPtr> newData = mFileManager->read(filename);
 		mData.insert(mData.end(), newData.begin(), newData.end());
 
-		this->insertDataIntoTable(filename, newData);
+		int index = this->insertDataIntoTable(filename, newData);
 		mParentCandidates = this->generateParentCandidates(mData);
 		emit parentCandidatesUpdated();
 		widget = new ImportDataTypeWidget(NULL, mVisServices, newData, mParentCandidates);
 		connect(this, &ImportWidget::parentCandidatesUpdated, widget, &ImportDataTypeWidget::update);
-		mStackedWidget->addWidget(widget);
-
-
-		/*
-		std::set<QString, std::vector<DataPtr>> pointMetricSets;
-		for(int i=0; i<newData.size(); ++i)
-		{
-			DataPtr data = newData[i];
-			QString type = data->getType();
-
-
-			if(type == "pointMetric")
-			{
-				std::vector<DataPtr> parentData = pointMetricSets[data->getParentSpace()];
-
-				//widget = new ImportPointMetricsWidget(NULL, mVisServices, newData);
-
-			}
-			else
-			{
-				insertDataIntoTable(data);
-				widget = new ImportDataTypeWidget(NULL, mVisServices, data);
-				mStackedWidget->addWidget(widget);
-			}
-
-		}
-		*/
+		mStackedWidget->insertWidget(index, widget);
 	}
 }
 

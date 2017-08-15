@@ -24,11 +24,6 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	mParentCandidates(parentCandidates),
 	mSelectedIndexInTable(0)
 {
-
-	//gui
-	QVBoxLayout *topLayout = new QVBoxLayout(this);
-	this->setLayout(topLayout);
-
 	mAnatomicalCoordinateSystems = new QComboBox();
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
 	mAnatomicalCoordinateSystems->addItem("RAS");
@@ -38,15 +33,6 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	mShouldImportParentTransform->addItem("Yes");
 
 	mParentCandidatesCB = new QComboBox();
-
-	QGridLayout *gridLayout = new QGridLayout();
-	gridLayout->addWidget(new QLabel("For all data in the file: "), 0, 0, 1, 2);
-	gridLayout->addWidget(new QLabel("Specify anatomical coordinate system"), 1, 0);
-	gridLayout->addWidget(mAnatomicalCoordinateSystems, 1, 1);
-	gridLayout->addWidget(new QLabel("Import parents transform?"), 2, 0);
-	gridLayout->addWidget(mShouldImportParentTransform, 2, 1);
-	gridLayout->addWidget(new QLabel("Set parent"), 3, 0);
-	gridLayout->addWidget(mParentCandidatesCB, 3, 1);
 
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
@@ -73,10 +59,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 		if(type == "pointMetric")
 		{
 			space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
-			if(space.isEmpty())
-				CX_LOG_WARNING() << "Trying to add empty space";
 			(mPointMetricGroups[space]).push_back(mData[i]);
-			CX_LOG_DEBUG() << "Added pmg with space " << space;
 		}
 		//add image or mesh directly to the table
 		else
@@ -120,11 +103,24 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
 	}
 
+
+	//gui
+	QVBoxLayout *topLayout = new QVBoxLayout(this);
+	this->setLayout(topLayout);
+
+	QGridLayout *gridLayout = new QGridLayout();
+	gridLayout->addWidget(new QLabel("For all data in the file: "), 0, 0, 1, 2);
+	gridLayout->addWidget(new QLabel("Specify anatomical coordinate system"), 1, 0);
+	gridLayout->addWidget(mAnatomicalCoordinateSystems, 1, 1);
+	gridLayout->addWidget(new QLabel("Import parents transform?"), 2, 0);
+	gridLayout->addWidget(mShouldImportParentTransform, 2, 1);
+	gridLayout->addWidget(new QLabel("Set parent"), 3, 0);
+	gridLayout->addWidget(mParentCandidatesCB, 3, 1);
+
 	topLayout->addLayout(gridLayout);
 	topLayout->addWidget(mTableWidget);
 }
 
-//QStringList ImportDataTypeWidget::getParentCandidateList()
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
 {
 	std::map<QString, QString> parentCandidates;
@@ -135,7 +131,6 @@ std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
 
 	return parentCandidates;
 }
-
 
 void ImportDataTypeWidget::updateSpaceComboBox(QComboBox *box, QString pointMetricGroupId)
 {

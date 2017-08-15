@@ -37,7 +37,7 @@ private:
 
 	QString generateUid(QString filename) const;
 	std::vector<DataPtr> generateParentCandidates(std::vector<DataPtr> notLoadedData) const;
-	void insertDataIntoTable(QString filename, std::vector<DataPtr> data);
+	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;

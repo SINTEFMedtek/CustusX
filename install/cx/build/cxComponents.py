@@ -237,7 +237,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224')
+        self._getBuilder().gitCheckout('4af01a590b293117af49d105a44224e32e5272c9')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -298,6 +298,7 @@ class Eigen(CppComponent):
         return 'git@github.com:RLovelett/eigen.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
+        #See CX-208 about updating Eigen versions
         tag = '3.2.10'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
@@ -416,7 +417,11 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        # See CX-208 about this Eigen flag and about updating Eigen.
+        # The second one should be used when upgrading
+        # to version > 3.2, as the old one is depracated in version 3.3.
         append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
+        #append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         
         
         libs = self.assembly.libraries
@@ -513,7 +518,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('7cafcea2f919e8ecadf37266dd4f4cfd358ee997')
+        self._getBuilder().gitCheckout('56fa488c60f99e54c8550de2d585bd15453291dd')
     def configure(self):
         pass
     def build(self):

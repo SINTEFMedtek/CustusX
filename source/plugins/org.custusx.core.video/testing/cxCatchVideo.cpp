@@ -54,7 +54,7 @@ namespace {
 
 cx::DummyImageStreamerPtr createRunningDummyImageStreamer(TestSenderPtr& sender, bool secondaryStream = false, bool sendonce = false)
 {
-	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
+	QString filename = cx::DataLocations::getTestDataPath() + "/testing/default_volume/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
 	cx::DummyImageStreamerPtr imagestreamer(new cx::DummyImageStreamer());
