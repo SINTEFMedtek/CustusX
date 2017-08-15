@@ -171,6 +171,7 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
         //int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
         double branchLength = (positions.rightCols(1) - positions.leftCols(1)).norm();
         int numberOfControlPoints = std::ceil(branchLength/controlPointDistance);
+        numberOfControlPoints = std::max(numberOfControlPoints, 2); // at least two control points
 
 		vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
 		vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
