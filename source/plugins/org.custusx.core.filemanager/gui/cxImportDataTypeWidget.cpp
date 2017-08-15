@@ -152,11 +152,18 @@ void ImportDataTypeWidget::updateParentCandidatesComboBox()
 	mParentCandidatesCB->clear();
 	std::map<QString, QString> parentCandidates = this->getParentCandidateList();
 	std::map<QString, QString>::iterator it;
+	QVariant emptyId("");
+	mParentCandidatesCB->addItem("", emptyId);
 	for(it= parentCandidates.begin(); it != parentCandidates.end(); ++it)
 	{
 		QVariant id(it->second);
 		mParentCandidatesCB->addItem(it->first, id);
 	}
+
+	QString parentGuess = this->getInitialGuessForParentFrame();
+	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
+	mParentCandidatesCB->setCurrentText(parentGuess);
+
 }
 
 void ImportDataTypeWidget::update()
@@ -198,27 +205,31 @@ void ImportDataTypeWidget::pointMetricGroupSpaceChanged(int index)
 	}
 }
 
-/*
-void ImportDataTypeWidget::setInitialGuessForParentFrame(DataPtr data)
+
+QString ImportDataTypeWidget::getInitialGuessForParentFrame() const
 {
-	if(!data)
-		return;
-
-	QString base = qstring_cast(data->getName()).split(".")[0];
-
-	std::map<QString, DataPtr> all = mServices->patient()->getDatas();
-	for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+	QString parentGuessSpace = "";
+	for(int i=0; i<mData.size(); ++i)
 	{
-		if (iter->second==data)
-			continue;
-		QString current = qstring_cast(iter->second->getName()).split(".")[0];
-		if (base.indexOf(current)>=0)
+		DataPtr data = mData[i];
+		QString base = qstring_cast(data->getName()).split(".")[0];
+
+		std::map<QString, DataPtr> all = mServices->patient()->getDatas();
+		for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
 		{
-			data->get_rMd_History()->setParentSpace(iter->first);
-			break;
+			if (iter->second==data)
+				continue;
+			QString current = qstring_cast(iter->second->getName()).split(".")[0];
+			if (base.indexOf(current)>=0)
+			{
+				//data->get_rMd_History()->setParentSpace(iter->first);
+				parentGuessSpace = iter->first;
+				break;
+			}
 		}
 	}
+	return parentGuessSpace;
 }
-*/
+
 
 }

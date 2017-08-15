@@ -36,9 +36,8 @@ private:
 	void updateSpaceComboBox(QComboBox *box, QString space);
 	void updateParentCandidatesComboBox();
 
-
 	//Use heuristics to guess a parent frame, based on similarities in name.
-	//void setInitialGuessForParentFrame(DataPtr data);
+	QString getInitialGuessForParentFrame() const;
 
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
