@@ -140,8 +140,12 @@ void VBWidget::setRouteToTarget(QString uid)
 {
 	disconnect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged, this, &VBWidget::inputChangedSlot);
 	mRouteToTarget->setValue("");
-	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged,			this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
+	connect(mRouteToTarget.get(), &SelectDataStringPropertyBase::dataChanged, this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
 	mRouteToTarget->setValue(uid);
+
+	disconnect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot);
+	mPlaybackSlider->setValue(1);
+	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot, Qt::UniqueConnection);
 	mPlaybackSlider->setValue(5);
 }
 
