@@ -77,7 +77,7 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 
 void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
 {
-	vtkPolyDataPtr	polyDataInput = mesh->getTransformedPolyData(mesh->get_rMd());
+	vtkPolyDataPtr	polyDataInput = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 	vtkPoints		*vtkpoints = polyDataInput->GetPoints();
 
 	mNumberOfInputPoints = polyDataInput->GetNumberOfPoints();
