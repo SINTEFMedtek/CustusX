@@ -128,7 +128,7 @@ bool AccusurfFilter::execute()
     if (!inputImage)
         return false;
 
-    vtkPolyDataPtr route_d_image = mesh->getTransformedPolyData((inputImage->get_rMd().inverse())*mesh->get_rMd());
+	vtkPolyDataPtr route_d_image = mesh->getTransformedPolyDataCopy((inputImage->get_rMd().inverse())*mesh->get_rMd());
     mAccusurf->setRoutePositions(route_d_image);
     mAccusurf->setInputImage(inputImage);
 

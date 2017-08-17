@@ -200,6 +200,11 @@ void ViewServiceProxy::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	mViewService->setCameraStyle(style, groupIdx);
 }
 
+void ViewServiceProxy::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
+{
+	mViewService->zoomCamera3D(viewGroup3DNumber, zoomFactor);
+}
+
 void ViewServiceProxy::addDefaultLayout(LayoutData layoutData)
 {
 	mViewService->addDefaultLayout(layoutData);

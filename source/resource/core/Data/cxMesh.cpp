@@ -430,13 +430,16 @@ DoubleBoundingBox3D Mesh::boundingBox() const
 	return bounds;
 }
 
-vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
+vtkPolyDataPtr Mesh::getTransformedPolyDataCopy(Transform3D transform)
 {
 	// if transform elements exists, create a copy with entire position inside the polydata:
-	if (similar(transform, Transform3D::Identity()))
-		return getVtkPolyData();
+    if (similar(transform, Transform3D::Identity()))
+    {
+        vtkPolyDataPtr poly = vtkPolyDataPtr::New();
+        poly->DeepCopy(getVtkPolyData());
+        return poly;
+    }
 
-	//	getVtkPolyData()->Update();
 	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
@@ -452,7 +455,6 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	}
 	poly->SetPoints(floatPoints.GetPointer());
 	poly->Modified();
-	//	poly->Update();
 
 	return poly;
 }
