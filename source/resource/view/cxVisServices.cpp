@@ -32,7 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVisServices.h"
 
 #include "cxViewServiceProxy.h"
-#include "cxViewGroupData.h"
 
 namespace cx {
 
@@ -50,16 +49,6 @@ VisServices::VisServices(ctkPluginContext* context) :
 VisServicesPtr VisServices::getNullObjects()
 {
 	return VisServicesPtr(new VisServices());
-}
-
-
-void VisServices::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
-{
-    ViewGroupDataPtr viewGroup3D = this->view()->getGroup(viewGroup3DNumber);
-    if(!viewGroup3D)
-        return;
-
-    viewGroup3D->zoomCamera3D(zoomFactor);
 }
 
 VisServices::VisServices() :

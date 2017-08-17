@@ -693,6 +693,15 @@ void ViewImplService::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	}
 }
 
+void ViewImplService::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
+{
+	ViewGroupDataPtr viewGroup3D = this->getGroup(viewGroup3DNumber);
+	if(!viewGroup3D)
+		return;
+
+	viewGroup3D->zoomCamera3D(zoomFactor);
+}
+
 void ViewImplService::addDefaultLayout(LayoutData layoutData)
 {
 	mLayoutRepository->addDefault(layoutData);

@@ -58,7 +58,6 @@ public:
 	static VisServicesPtr getNullObjects();
 
 	ViewServicePtr view() { return mViewService;}
-    void zoomCamera3D(int viewGroup3DNumber, int zoomFactor);
 
 protected:
 	VisServices();
