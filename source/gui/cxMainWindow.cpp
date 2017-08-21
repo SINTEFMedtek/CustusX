@@ -140,6 +140,7 @@ MainWindow::MainWindow() :
 	QMenu* popupMenu = this->createPopupMenu();
 	popupMenu->setTitle("Window");
 	this->menuBar()->insertMenu(mHelpMenuAction, popupMenu);
+	this->menuBar()->setVisible(settings()->value("Gui/showMenuBar").toBool());
 
 	// show after window has been initialized
 	QTimer::singleShot(0, this, SLOT(delayedShow()));
