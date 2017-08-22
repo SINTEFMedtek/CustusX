@@ -130,6 +130,8 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 	this->fillDefault("View/shadingOn", true);
 
+	this->fillDefault("Gui/showMenuBar", true);
+
 	this->fillDefault("stillUpdateRate", 0.001);
 
 	this->fillDefault("useGPU2DRendering", true);

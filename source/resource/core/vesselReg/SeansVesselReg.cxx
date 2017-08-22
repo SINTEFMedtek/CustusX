@@ -522,7 +522,7 @@ vtkPolyDataPtr SeansVesselReg::convertToPolyData(DataPtr data, QString id)
 		return vtkPolyDataPtr();
 	}
 
-	vtkPolyDataPtr poly = mesh->getTransformedPolyData(mesh->get_rMd());
+	vtkPolyDataPtr poly = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
 	if (!poly || !poly->GetNumberOfPoints())
 	{

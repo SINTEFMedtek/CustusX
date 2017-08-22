@@ -136,7 +136,7 @@ bool RouteToTargetFilter::execute()
     if (!mesh)
         return false;
 
-    vtkPolyDataPtr centerline_r = mesh->getTransformedPolyData(mesh->get_rMd());
+	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
     if (!targetPoint)

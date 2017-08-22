@@ -100,6 +100,7 @@ public:
 	virtual QActionGroup* getInteractorStyleActionGroup() = 0;
 	virtual void centerToImageCenterInActiveViewGroup() = 0;
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx) = 0;
+	virtual void zoomCamera3D(int viewGroup3DNumber, int zoomFactor) = 0;
 	virtual void addDefaultLayout(LayoutData layoutData) = 0;
 	virtual void enableContextMenuForViews(bool enable=true) = 0;
 
