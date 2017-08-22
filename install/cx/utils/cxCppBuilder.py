@@ -193,7 +193,7 @@ class CppBuilder:
         add = self.addCMakeOption
         append = self.appendCMakeOption
         if(platform.system() != 'Windows'):
-            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-inconsistent-missing-override')
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
