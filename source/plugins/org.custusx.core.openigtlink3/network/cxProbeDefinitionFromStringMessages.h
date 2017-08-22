@@ -80,12 +80,15 @@ struct SectorInfo
 	std::vector<double> mDepths;
 	double mLinearWidth;
 
+	bool mHaveChanged;
+
 	SectorInfo()
 	{
 		reset();
 	}
 	void reset()
 	{
+		mHaveChanged = true;
 		mProbeType = tooLarge;
 
 		//new standard
@@ -134,6 +137,11 @@ struct SectorInfo
 		retval = retval && !similar(mSpacingY, 0);
 
 		return retval;
+	}
+
+	bool haveChanged()
+	{
+		return mHaveChanged;
 	}
 
 	bool isValid()
@@ -203,6 +211,7 @@ public:
 	void parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message);
 	void setImage(ImagePtr image);
 	bool haveValidValues();
+	bool haveChanged();
 	ProbeDefinitionPtr createProbeDefintionFromStandardValues(QString uid);
 	ProbeDefinitionPtr createProbeDefintion(QString uid);
 

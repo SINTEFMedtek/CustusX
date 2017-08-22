@@ -105,6 +105,17 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//this->decode_rMd(msg, retval);
 
 		mProbeDefinitionFromStringMessages->setImage(cximage);
+
+		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
+		{
+//			QString deviceName(header.deviceName.c_str());
+			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
+//			emit probedefinition(deviceName, header.equipmentType, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
+			//test: Set all messages as type TRACKED_US_PROBE for now
+			emit probedefinition(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
+		}
+
+
 		emit image(cximage);
 	}
 	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
@@ -166,15 +177,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		QString message(content.string_msg.c_str());
 		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
-		//TODO: Also create/check isChanged?
-		if (mProbeDefinitionFromStringMessages->haveValidValues())
-		{
-//			QString deviceName(header.deviceName.c_str());
-			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
-//			emit probedefinition(deviceName, header.equipmentType, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
-			//test: Set all messages as type TRACKED_US_PROBE for now
-			emit probedefinition(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
-		}
 		emit string_message(message);
 	}
 	else

@@ -86,40 +86,62 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 
 	if (name == "ProbeType")
 	{
-		mSectorInfo->mProbeType = intValue;
-//		mSectorInfo->mProbeType = 1;//sector
-		if(mTestMode)
+		if (mSectorInfo->mProbeType != intValue)
 		{
-			// 0 = unknown, 1 = sector, 2 = linear
-			mSectorInfo->mProbeType = 1;
-			CX_LOG_WARNING() << "ProbeDefinitionFromStringMessages only using dummy values";
+			mSectorInfo->mProbeType = intValue;
+			if(mTestMode)
+			{
+				// 0 = unknown, 1 = sector, 2 = linear
+				mSectorInfo->mProbeType = 1;
+				CX_LOG_WARNING() << "ProbeDefinitionFromStringMessages only using dummy values";
+			}
 		}
 	}
 	//New standard
 	else if (name == "Origin")
 	{
-		mSectorInfo->mOrigin = doubleVector;
-		mSectorInfo->mNewStandard = true;
+		if(mSectorInfo->mOrigin != doubleVector)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mOrigin = doubleVector;
+			mSectorInfo->mNewStandard = true;
+		}
 	}
 	else if (name == "Angles")
 	{
-		mSectorInfo->mAngles = doubleVector;
-		mSectorInfo->mNewStandard = true;
+		if(mSectorInfo->mAngles != doubleVector)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mAngles = doubleVector;
+			mSectorInfo->mNewStandard = true;
+		}
 	}
 	else if (name == "BouningBox")
 	{
-		mSectorInfo->mBouningBox = doubleVector;
-		mSectorInfo->mNewStandard = true;
+		if(mSectorInfo->mBouningBox != doubleVector)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mBouningBox = doubleVector;
+			mSectorInfo->mNewStandard = true;
+		}
 	}
 	else if (name == "Depths")
 	{
-		mSectorInfo->mDepths = doubleVector;
-		mSectorInfo->mNewStandard = true;
+		if(mSectorInfo->mDepths != doubleVector)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mDepths = doubleVector;
+			mSectorInfo->mNewStandard = true;
+		}
 	}
 	else if (name == "LinearWidth")
 	{
-		mSectorInfo->mLinearWidth = doubleValue;
-		mSectorInfo->mNewStandard = true;
+		if(mSectorInfo->mLinearWidth != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mLinearWidth = doubleValue;
+			mSectorInfo->mNewStandard = true;
+		}
 	}
 
 	//Old values - to be removed
@@ -252,8 +274,15 @@ bool ProbeDefinitionFromStringMessages::haveValidValues()
 	return mSectorInfo->isValid();
 }
 
+bool ProbeDefinitionFromStringMessages::haveChanged()
+{
+	return mSectorInfo->haveChanged();
+}
+
 ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintionFromStandardValues(QString uid)
 {
+	mSectorInfo->mHaveChanged = false;
+
 	if(!mSectorInfo->standardIsValid())
 		return ProbeDefinitionPtr();
 
@@ -270,6 +299,7 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintionFromSt
 	probeDefinition->setSector(mSectorInfo->mDepths[0], mSectorInfo->mDepths[1], this->getWidth());
 	probeDefinition->setSize(this->getSize());
 	probeDefinition->setUseDigitalVideo(true);
+
 	return probeDefinition;
 }
 
@@ -286,7 +316,7 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::initProbeDefinition()
 	}
 	else
 	{
-		CX_LOG_ERROR() << "ProbeDefinitionFromStringMessages::createProbeDefintionFromStandardValues: Incorrect probe type: " << mSectorInfo->mProbeType;
+		CX_LOG_ERROR() << "ProbeDefinitionFromStringMessages::initProbeDefinition: Incorrect probe type: " << mSectorInfo->mProbeType;
 	}
 	return probeDefinition;
 }
