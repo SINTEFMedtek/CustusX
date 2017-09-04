@@ -66,6 +66,8 @@ public:
 	void deleteChildBranches();
 	branchVector getChildBranches();
 	void setParentBranch(BranchPtr parent);
+    int findGenerationNumber();
+    double findBranchRadius();
 	BranchPtr getParentBranch();
 
 };
