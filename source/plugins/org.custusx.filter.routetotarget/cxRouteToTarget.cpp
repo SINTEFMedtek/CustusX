@@ -58,7 +58,7 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
-    mBranchListPtr->smoothBranchPositions(40);
+    //mBranchListPtr->smoothBranchPositions(40);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -100,14 +100,14 @@ void RouteToTarget::findRoutePositions()
 
 void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 {
-	Eigen::MatrixXd positions = searchBranchPtr->getPositions();
+    std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
 
-	for (int i = startIndex; i>=0; i--)
-		mRoutePositions.push_back(positions.col(i));
+    for (int i = 0; i<=startIndex; i++)
+        mRoutePositions.push_back(positions[i]);
 
-	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
-	if (parentBranchPtr)
-		searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
+    BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
+    if (parentBranchPtr)
+        searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
 }
 
 
@@ -117,7 +117,7 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
     findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
 
-    smoothPositions();
+    //smoothPositions();
 
     vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
@@ -165,35 +165,59 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> position
 	return retval;
 }
 
-void RouteToTarget::smoothPositions()
+std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition)
 {
-	int numberOfInputPoints = mRoutePositions.size();
-	int controlPointFactor = 10;
-	int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
-
-	vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
+    vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
 	vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
 	vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
 
-	if (numberOfControlPoints >= 2)
-	{
-		//add control points to spline
-		for(int j=0; j<numberOfControlPoints; j++)
-		{
-			int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
-			splineX->AddPoint(indexP,mRoutePositions[indexP](0));
-			splineY->AddPoint(indexP,mRoutePositions[indexP](1));
-			splineZ->AddPoint(indexP,mRoutePositions[indexP](2));
-		}
-		//Always add the last point to complete spline
-		splineX->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](0));
-		splineY->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](1));
-		splineZ->AddPoint(numberOfInputPoints-1,mRoutePositions[numberOfInputPoints-1](2));
+    double branchRadius = branchPtr->findBranchRadius();
+
+    //add control points to spline
+
+    //add first position
+    Eigen::MatrixXd positions = branchPtr->getPositions();
+    splineX->AddPoint(0,startPosition(0));
+    splineY->AddPoint(0,startPosition(1));
+    splineZ->AddPoint(0,startPosition(2));
 
 
-		//evaluate spline - get smoothed positions
-		std::vector< Eigen::Vector3d > smoothingResult;
-		for(int j=0; j<numberOfInputPoints; j++)
+    //add last position if no parent branch, else add parents first position
+    if(!branchPtr->getParentBranch())
+    {
+        splineX->AddPoint(startIndex,positions(0,0));
+        splineY->AddPoint(startIndex,positions(1,0));
+        splineZ->AddPoint(startIndex,positions(2,0));
+    }
+    else
+    {
+        Eigen::MatrixXd parentPositions = branchPtr->getParentBranch()->getPositions();
+        splineX->AddPoint(startIndex,parentPositions(0,parentPositions.cols()-1));
+        splineY->AddPoint(startIndex,parentPositions(1,parentPositions.cols()-1));
+        splineZ->AddPoint(startIndex,parentPositions(2,parentPositions.cols()-1));
+
+    }
+
+    //add points untill all filtered postions are within branch radius distance of original position
+    double maxDistanceToOriginalPosition = branchRadius;
+    int maxDistanceIndex = -1;
+    std::vector< Eigen::Vector3d > smoothingResult;
+
+    //add positions to spline
+    while (maxDistanceToOriginalPosition >= branchRadius && splineX->GetNumberOfPoints() < startIndex)
+    {
+        if(maxDistanceIndex > 0)
+        {
+            //add to spline the position with largest distance to original position
+            splineX->AddPoint(maxDistanceIndex,positions(0,startIndex - maxDistanceIndex));
+            splineY->AddPoint(maxDistanceIndex,positions(1,startIndex - maxDistanceIndex));
+            splineZ->AddPoint(maxDistanceIndex,positions(2,startIndex - maxDistanceIndex));
+        }
+
+		//evaluate spline - get smoothed positions      
+        maxDistanceToOriginalPosition = 0.0;
+        smoothingResult.clear();
+        for(int j=0; j<=startIndex; j++)
 		{
 			double splineParameter = j;
 			Eigen::Vector3d tempPoint;
@@ -201,12 +225,30 @@ void RouteToTarget::smoothPositions()
 			tempPoint(1) = splineY->Evaluate(splineParameter);
 			tempPoint(2) = splineZ->Evaluate(splineParameter);
 			smoothingResult.push_back(tempPoint);
-		}
-		mRoutePositions.clear();
-		mRoutePositions = smoothingResult;
-	}
+
+            //calculate distance to original (non-filtered) position
+            double distance = findDistanceToLine(tempPoint, positions);
+            //finding the index with largest distance
+            if (distance > maxDistanceToOriginalPosition)
+            {
+                maxDistanceToOriginalPosition = distance;
+                maxDistanceIndex = j;
+            }
+        }
+    }
+
+    return smoothingResult;
 }
 
+double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)
+{
+    double minDistance = findDistance(point, line.col(0));
+    for (int i=1; i<line.cols(); i++)
+        if (minDistance > findDistance(point, line.col(i)))
+            minDistance = findDistance(point, line.col(i));
+
+    return minDistance;
+}
 
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 {
