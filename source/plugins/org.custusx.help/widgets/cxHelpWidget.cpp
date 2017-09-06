@@ -112,8 +112,9 @@ HelpWidget::~HelpWidget()
 
 QSize HelpWidget::sizeHint() const
 {
-	// removing this gives a very small initial size
-	return QSize(250,30);
+	// Removing this gives a very small initial size.
+	// This also seems to be the widest possible.
+	return QSize(500,30);
 }
 
 
