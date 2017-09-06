@@ -38,9 +38,10 @@ private:
     std::vector< Eigen::Vector3d > mExtendedRoutePositions;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
-	void smoothPositions();
+    std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 };
 
+double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
 } /* namespace cx */

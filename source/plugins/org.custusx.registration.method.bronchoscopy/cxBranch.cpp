@@ -90,6 +90,38 @@ BranchPtr Branch::getParentBranch()
 	return mParentBranch;
 }
 
+int Branch::findGenerationNumber()
+{
+    int generationNumber = 1;
+
+    BranchPtr parentBranchPtr = this->getParentBranch();
+    while (parentBranchPtr)
+    {
+        generationNumber = generationNumber + 1;
+        parentBranchPtr = parentBranchPtr->getParentBranch();
+    }
+
+    return generationNumber;
+}
+
+double Branch::findBranchRadius()
+{
+    int generationNumber = this->findGenerationNumber();
+
+    if (generationNumber == 1)
+        return 6;
+    if (generationNumber == 2)
+        return 4;
+    if (generationNumber == 3)
+        return 3;
+    if (generationNumber == 4)
+        return 2.5;
+    if (generationNumber == 5)
+        return 2;
+    else
+        return 2;
+}
+
 
 Branch::~Branch()
 {
