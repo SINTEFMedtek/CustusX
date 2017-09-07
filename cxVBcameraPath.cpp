@@ -111,9 +111,9 @@ void CXVBcameraPath::cameraPathPositionSlot(int pos)
     splineParameterArray[2] = splineParameter;
 
     mSpline->Evaluate(splineParameterArray, pos_r, d_r);
-    splineParameterArray[0] = splineParameter+0.1;
-    splineParameterArray[1] = splineParameter+0.1;
-    splineParameterArray[2] = splineParameter+0.1;
+    splineParameterArray[0] = splineParameter+0.05;
+    splineParameterArray[1] = splineParameter+0.05;
+    splineParameterArray[2] = splineParameter+0.05;
     mSpline->Evaluate(splineParameterArray, focus_r, d_r);
 
     mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
