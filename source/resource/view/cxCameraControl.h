@@ -100,6 +100,7 @@ public:
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);
     void setSuperiorView() const;
+	void setAnteriorView() const;
 
 signals:
 
@@ -113,6 +114,7 @@ private:
 	void definePanLayout();
 	ViewPtr mView;
 	QAction* mSuperiorViewAction;
+	QAction* mAnteriorViewAction;
 
 	QAction* addStandard3DViewAction(QString caption, QString help, Vector3D viewDirection, QActionGroup* group);
 };
