@@ -205,6 +205,11 @@ void CameraControl::setView(ViewPtr view)
 	mView = view;
 }
 
+ViewPtr CameraControl::getView() const
+{
+	return mView;
+}
+
 vtkRendererPtr CameraControl::getRenderer() const
 {
 	if (!mView)

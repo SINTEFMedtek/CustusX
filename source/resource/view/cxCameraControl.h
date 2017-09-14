@@ -97,6 +97,7 @@ public:
 
 	void refreshView(ViewPtr view);
 	void setView(ViewPtr view);
+	ViewPtr getView() const;
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);
     void setSuperiorView() const;
