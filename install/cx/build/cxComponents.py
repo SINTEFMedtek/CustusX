@@ -170,7 +170,7 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v4.8.2')
+        self._getBuilder().gitCheckout('v4.12.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
