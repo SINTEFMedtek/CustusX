@@ -170,7 +170,7 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v4.8.2')
+        self._getBuilder().gitCheckout('v4.12.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -355,7 +355,7 @@ class IGSTK(CppComponent):
     def update(self):
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
-        self._getBuilder().gitCheckout('34f4a9f46d54d4674e0a19acdb24bbbc4dcb1ffe')
+        self._getBuilder().gitCheckout('bda6b6fa88054b474aa113af5477813610e4ac3b')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
