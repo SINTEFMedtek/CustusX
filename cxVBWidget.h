@@ -74,7 +74,7 @@ private:
 	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;
 	QDial*						mRotateDial;
-	QDial*						mViewSlider;
+	QDial*						mViewDial;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;
