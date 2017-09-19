@@ -217,7 +217,6 @@ class VTK(CppComponent):
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
-#        add('Module_vtkTestingRendering:BOOL', 'ON') Dont think this is needed anymore. It was on the CX-114 branch, but not on develop, when merging develop into the branch.
         add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
         builder.configureCMake()
 # ---------------------------------------------------------
@@ -312,7 +311,6 @@ class Eigen(CppComponent):
 # ---------------------------------------------------------
 
 
-
 class OpenIGTLink(CppComponent):
     def name(self):
         return "OpenIGTLink"
@@ -322,11 +320,10 @@ class OpenIGTLink(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
-#        return 'git@github.com:IGSIO/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        #self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
-        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
+        self._getBuilder().gitCheckout('e32f9176c571449b4321574ba1b8ffc4a082ef13')
+#        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -339,29 +336,29 @@ class OpenIGTLink(CppComponent):
 # ---------------------------------------------------------
 
 class OpenIGTLinkIO(CppComponent):
-	def name(self):
-		return "OpenIGTLinkIO"
-	def help(self):
-		return 'https://github.com/IGSIO/OpenIGTLinkIO'
-	def getBuildType(self):
-		return self.controlData.getBuildExternalsType()
-	def repository(self):
-		#return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
-		return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'#Temporary test
-	def update(self):
-		self._getBuilder().gitSetRemoteURL(self.repository())
-#		self._getBuilder().gitCheckout('71a6ea090e24371a8948d3bdb291f5f0c73e620d')
-		self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
-	def configure(self):
-		builder = self._getBuilder()
-		add = builder.addCMakeOption
-		add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-		add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
-		add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
-		builder.configureCMake()
-	def addConfigurationToDownstreamLib(self, builder):
-		add = builder.addCMakeOption
-		add('BUILD_OPEN_IGTLINK_SERVER:BOOL', 'ON');
+    def name(self):
+        return "OpenIGTLinkIO"
+    def help(self):
+        return 'https://github.com/IGSIO/OpenIGTLinkIO'
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def repository(self):
+#        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'#Temporary test, code needs to be pull requested to IGSIO
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('1c2ad4c05403b7654ed0c051ac073235ca00c84a')
+#        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
+        add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        builder.configureCMake()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', 'ON');
 # ---------------------------------------------------------
 
 
