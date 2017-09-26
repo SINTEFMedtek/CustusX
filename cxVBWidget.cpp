@@ -103,15 +103,15 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mRotateDial = new QDial;
 	mRotateDial->setMinimum(-180);
 	mRotateDial->setMaximum(180);
-	mViewSlider = new QDial;
-	mViewSlider->setMinimum(-30);
-	mViewSlider->setMaximum(30);
+	mViewDial = new QDial;
+	mViewDial->setMinimum(-30);
+	mViewDial->setMaximum(30);
 
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
-	endoscopeControlLayout->addWidget(mViewSlider,1,2);
+	endoscopeControlLayout->addWidget(mViewDial,1,2);
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
@@ -126,7 +126,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 			this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
 	connect(this, &VBWidget::cameraPathChanged, mCameraPath, &CXVBcameraPath::cameraRawPointsSlot);
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot);
-	connect(mViewSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
+	connect(mViewDial, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 
 	mVerticalLayout->addStretch();
@@ -153,7 +153,7 @@ void  VBWidget::enableControls(bool enable)
 {
 	mPlaybackSlider->setEnabled(enable);
 	mRotateDial->setEnabled(enable);
-	mViewSlider->setEnabled(enable);
+	mViewDial->setEnabled(enable);
 	mControlsEnabled = enable;
 }
 
@@ -166,7 +166,7 @@ void VBWidget::inputChangedSlot()
 void VBWidget::keyPressEvent(QKeyEvent* event)
 {
 
-	if (event->key()==Qt::Key_Up)
+	if (event->key()==Qt::Key_Up || event->key()==Qt::Key_8)
 	{
 		if(mControlsEnabled) {
 			int currentPos = mPlaybackSlider->value();
@@ -175,7 +175,7 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 		}
 	}
 
-	if (event->key()==Qt::Key_Down)
+	if (event->key()==Qt::Key_Down || event->key()==Qt::Key_2)
 	{
 		if(mControlsEnabled) {
 			int currentPos = mPlaybackSlider->value();
@@ -184,20 +184,38 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 		}
 	}
 
-	if (event->key()==Qt::Key_Right)
+	if (event->key()==Qt::Key_Right || event->key()==Qt::Key_6)
 	{
 		if(mControlsEnabled) {
-			int currentPos = mViewSlider->value();
-			mViewSlider->setValue(currentPos+1);
+			int currentPos = mRotateDial->value();
+			mRotateDial->setValue(currentPos+1);
 			return;
 		}
 	}
 
-	if (event->key()==Qt::Key_Left)
+	if (event->key()==Qt::Key_Left || event->key()==Qt::Key_4)
 	{
 		if(mControlsEnabled) {
-			int currentPos = mViewSlider->value();
-			mViewSlider->setValue(currentPos-1);
+			int currentPos = mRotateDial->value();
+			mRotateDial->setValue(currentPos-1);
+			return;
+		}
+	}
+
+	if (event->key()==Qt::Key_PageUp || event->key()==Qt::Key_9)
+	{
+		if(mControlsEnabled) {
+			int currentPos = mViewDial->value();
+			mViewDial->setValue(currentPos+1);
+			return;
+		}
+	}
+
+	if (event->key()==Qt::Key_PageDown || event->key()==Qt::Key_3)
+	{
+		if(mControlsEnabled) {
+			int currentPos = mViewDial->value();
+			mViewDial->setValue(currentPos-1);
 			return;
 		}
 	}
