@@ -122,7 +122,8 @@ void CameraData::parseXml(QDomNode dataNode)
 
 CameraControl::CameraControl(QObject* parent) :
     QObject(parent),
-    mSuperiorViewAction(NULL)
+	mSuperiorViewAction(NULL),
+	mAnteriorViewAction(NULL)
 {
 }
 
