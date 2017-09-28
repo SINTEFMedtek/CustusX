@@ -15,8 +15,9 @@ Then run the following commands:
 
 	cd \<root_dir\>
 	git clone git@github.com:SINTEFMedTek/CustusX.git CX/CX
+	cx CX/CX
 	(git checkout develop)
-	./CX/CX/install/cxInstaller.py --full --all -t Release
+	./install/cxInstaller.py --full --all -t Release
 
 Run `cxInstaller.py -h` for more options.
 
