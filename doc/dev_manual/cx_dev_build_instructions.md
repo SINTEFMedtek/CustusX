@@ -5,7 +5,7 @@ Recommended build procedure {#build_instructions2}
 ===================
 
 Make sure you:
-* Are on a \ref supported_platforms. 
+* Are on a \ref supported_platforms (For building newer operating systems it might be nessecary to change to the develop branch).
 * Fulfill the \ref prerequisites. 
 * Have a github account with [SSH authentication](https://help.github.com/articles/set-up-git/).
 
@@ -15,7 +15,9 @@ Then run the following commands:
 
 	cd \<root_dir\>
 	git clone git@github.com:SINTEFMedTek/CustusX.git CX/CX
-	./CX/CX/install/cxInstaller.py --full --all -t Release
+	cx CX/CX
+	(git checkout develop)
+	./install/cxInstaller.py --full --all -t Release
 
 Run `cxInstaller.py -h` for more options.
 
