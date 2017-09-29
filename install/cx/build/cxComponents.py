@@ -551,3 +551,31 @@ class QHttpServer(CppComponent):
         add = builder.addCMakeOption
         add('qhttpserver_DIR:PATH', self.buildPath())
 
+# ---------------------------------------------------------
+
+class org_custusx_angleCorrection(cx.build.cxComponents.CppComponent):
+
+    def name(self):
+        return "org.custusx.anglecorrection"
+    def help(self):
+        return 'Plugin for Angle correction of velocities'
+    def path(self):
+        custusx = self._createSibling(cx.build.cxComponents.CustusX)
+        return '%s/%s/source/plugins' % (custusx.path(), custusx.sourceFolder())
+    def sourceFolder(self):
+        return 'org.custusx.anglecorrection'
+#    def _rawCheckout(self):
+#        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('c8a28ad8c806e29c3cda311060389ac026405efc')
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def repository(self):
+        return 'git@github.com:SINTEFMedtek/AngleCorrection.git'
+    def makeClean(self):
+        pass
+    def pluginPath(self):
+        return '%s' % self.sourcePath()
