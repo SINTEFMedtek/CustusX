@@ -553,7 +553,7 @@ class QHttpServer(CppComponent):
 
 # ---------------------------------------------------------
 
-class org_custusx_angleCorrection(cx.build.cxComponents.CppComponent):
+class org_custusx_angleCorrection(CppComponent):
 
     def name(self):
         return "org.custusx.anglecorrection"
