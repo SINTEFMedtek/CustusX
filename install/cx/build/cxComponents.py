@@ -568,13 +568,13 @@ class org_custusx_angleCorrection(CppComponent):
 #        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('c8a28ad8c806e29c3cda311060389ac026405efc')
+        self._getBuilder().gitCheckout('0.1')
     def configure(self):
         pass
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/AngleCorrection.git'
+        return 'git@github.com:Danielhiversen/AngleCorr.git'
     def makeClean(self):
         pass
     def pluginPath(self):
