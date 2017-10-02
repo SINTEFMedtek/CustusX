@@ -137,6 +137,7 @@ public:
 	virtual bool isNull();
 
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
+	virtual void zoomCamera3D(int viewGroup3DNumber, int zoomFactor);
 
 public slots:
     virtual void aboutToStop();

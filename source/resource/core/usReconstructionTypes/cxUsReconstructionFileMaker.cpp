@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImageDataContainer.h"
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxCustomMetaImage.h"
+#include "cxErrorObserver.h"
 
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;

@@ -1,40 +1,25 @@
 project(org_custusx_filter_airways)
 
-add_definitions(-DBOOST_SYSTEM_NO_DEPRECATED)
-
 include(cxInstallUtilities)
 
 macro(cx_initialize_FAST)
-    find_package( FAST REQUIRED)
-    include(${FAST_USE_FILE})
+    find_package(FAST REQUIRED)
+    include_directories("${FAST_DIR}/../FAST/source/")
+    include_directories("${FAST_DIR}/")
+    link_directories("${FAST_DIR}/lib/")
+    set(FAST_SOURCE_DIR ${FAST_DIR}/../FAST/source/FAST/)
+    add_definitions("-DFAST_SOURCE_DIR=\"${FAST_SOURCE_DIR}/\"")
     message("===========================")
     message("Initializing FAST in Airways plugin")
-    message("-- ${FAST_LIBRARY_DIRS}")
+    message("-- ${FAST_DIR}/../FAST/source/")
     message("===========================")
-    cx_install_add_library_dirs(${FAST_LIBRARY_DIRS})
+    cx_install_add_library_dirs(${FAST_DIR}/lib/)
 endmacro()
 
-find_package(GLEW REQUIRED)
-find_package(OpenCL REQUIRED)
 cx_initialize_FAST()
 
 #### Enable C++11
-# Note that Microsoft Visual C++ compiler enables C++11 by default
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR CMAKE_COMPILER_IS_GNUCXX)
-    include(CheckCXXCompilerFlag)
-    check_cxx_compiler_flag(--std=c++11 SUPPORTS_STD_CXX11)
-    check_cxx_compiler_flag(--std=c++0x SUPPORTS_STD_CXX01)
-    if(SUPPORTS_STD_CXX11)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11")
-    elseif(SUPPORTS_STD_CXX01)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++0x")
-    else()
-        message(ERROR "Compiler does not support --std=c++11 or --std=c++0x.")
-    endif()
-    if(APPLE)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -g3 -Wall -O0")
-    endif()
-endif()
+set (CMAKE_CXX_STANDARD 11)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -57,29 +42,30 @@ set(PLUGIN_resources
 )
 
 # Make sure OpenCL kernel files are copied to the installer
-install(FILES
-		${FAST_SOURCE_DIR}/Algorithms/AirwaySegmentation/AirwaySegmentation.cl
-		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/AirwaySegmentation/)
-install(FILES
-		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter2D.cl
-		${FAST_SOURCE_DIR}/Algorithms/GaussianSmoothingFilter/GaussianSmoothingFilter3D.cl
-		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/GaussianSmoothingFilter/)
-install(FILES
-		${FAST_SOURCE_DIR}/Algorithms/CenterlineExtraction/CenterlineExtraction.cl
-		DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/Algorithms/CenterlineExtraction/)
+# Install OpenCL kernels
+install(DIRECTORY ${FAST_SOURCE_DIR}
+        DESTINATION ${CX_INSTALL_CONFIG_DIR}/FAST/
+        FILES_MATCHING PATTERN "*.cl"
+)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
+# Z lib comes with many names, needed for FAST atm
+if(WIN32)
+    set(ZLIB zlib.lib)
+elseif(APPLE)
+    set(ZLIB libz.dylib)
+else()
+    set(ZLIB libz.so)
+endif()
 set(PLUGIN_target_libraries
     PUBLIC
     ${PLUGIN_target_libraries}
+    FAST
 
     PRIVATE
-    OpenCLUtilityLibrary
-    FAST
-    Qt5::OpenGL
     ${OPENCL_LIBRARIES}
-    ${GLEW_LIBRARY}
+    ${ZLIB}
     cxResource
     cxResourceFilter
     cxResourceVisualization

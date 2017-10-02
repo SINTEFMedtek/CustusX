@@ -69,7 +69,7 @@ TEST_CASE("ActiveData: save/load in patient file", "[unit]")
 	storageFixture.createSessions();
 	storageFixture.loadSession1();
 
-	QString filename = cx::DataLocations::getExistingTestData("testing/TubeSegmentationFramework", "Default.mhd");
+	QString filename = cx::DataLocations::getExistingTestData("testing/default_volume", "Default.mhd");
 	QString info;
 	cx::DataPtr data1 = patientModelService->importData(filename, info);
 	REQUIRE(data1);

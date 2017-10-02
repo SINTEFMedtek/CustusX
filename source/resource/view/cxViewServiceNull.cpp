@@ -111,6 +111,11 @@ void ViewServiceNull::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 	printWarning();
 }
 
+void ViewServiceNull::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
+{
+	printWarning();
+}
+
 void ViewServiceNull::addDefaultLayout(LayoutData layoutData)
 {
 	printWarning();

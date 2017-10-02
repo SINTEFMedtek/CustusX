@@ -105,7 +105,7 @@ vtkPolyDataPtr IGTLinkConversionPolyData::decodeCoordinateSystem(vtkPolyDataPtr 
 	Transform3D rMs = sMr.inv();
 
 	MeshPtr mesh(new Mesh("temp", "temp", polyData));
-	vtkPolyDataPtr poly = mesh->getTransformedPolyData(rMs);
+	vtkPolyDataPtr poly = mesh->getTransformedPolyDataCopy(rMs);
 	return poly;
 }
 
@@ -115,7 +115,7 @@ vtkPolyDataPtr IGTLinkConversionPolyData::encodeCoordinateSystem(MeshPtr mesh, P
 	Transform3D sMr = createTransformFromReferenceToExternal(externalSpace);
 	Transform3D sMd = sMr * rMd;
 
-	vtkPolyDataPtr poly = mesh->getTransformedPolyData(sMd);
+	vtkPolyDataPtr poly = mesh->getTransformedPolyDataCopy(sMd);
 	return poly;
 }
 

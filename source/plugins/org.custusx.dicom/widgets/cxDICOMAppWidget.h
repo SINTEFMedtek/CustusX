@@ -86,6 +86,8 @@ public:
   int instancesAddedDuringImport();
   void addActionToToolbar(QAction* action);
 
+  QList<QAction*> getAdvancedActions() const;
+
 public Q_SLOTS:
   void setDatabaseDirectory(const QString& directory);
   void onSelectionChanged(const QItemSelection&, const QItemSelection&);

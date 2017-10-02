@@ -113,7 +113,7 @@ Eigen::Vector3i IntBoundingBox3D::topRight() const
 }
 Eigen::Vector3i IntBoundingBox3D::center() const
 {
-	return (bottomLeft() + topRight()) / 2.0;
+	return (bottomLeft() + topRight()) / 2;
 }
 Eigen::Vector3i IntBoundingBox3D::range() const
 {

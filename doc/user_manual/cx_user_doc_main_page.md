@@ -5,18 +5,27 @@ CustusX User Documentation {#mainpage}
 
 Overview {#mainpage_overview}
 ========================
-An IGT Library
-
-<http://www.custusx.org>
 
 CustusX is an application for research in image-guided therapy with a 
 focus on intraoperative use and ultrasound imaging.
+
+<http://www.custusx.org>
 
 To get started quickly, try out the 
 
 * \ref tutorial. 
 
 Also see the \ref installation.
+
+Conditions for use
+------------------------
+
+*CustusX is not certified for normal clinical use.*
+
+CustusX is intended for use by expert personnel in conjunction with clinical research.
+
+For the general limitations of the CustusX software, see the \ref safety_requirement for restrictions.
+The system must only be used on properly configured and calibrated hardware.
 
 Feature Documentation 
 ------------------------
@@ -34,4 +43,7 @@ Licensing
 CustusX is free to use for everyone and everything, see \ref license for details.
 
 
+Developed by SINTEF
+------------------------
 
+See \ref sintef_organization.

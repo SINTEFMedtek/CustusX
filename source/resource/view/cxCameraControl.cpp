@@ -122,7 +122,8 @@ void CameraData::parseXml(QDomNode dataNode)
 
 CameraControl::CameraControl(QObject* parent) :
     QObject(parent),
-    mSuperiorViewAction(NULL)
+	mSuperiorViewAction(NULL),
+	mAnteriorViewAction(NULL)
 {
 }
 
@@ -152,13 +153,19 @@ void CameraControl::translateByFocusTo(Vector3D p_r)
 void CameraControl::setSuperiorView() const
 {
     if(mSuperiorViewAction)
-        mSuperiorViewAction->trigger();
+		mSuperiorViewAction->trigger();
+}
+
+void CameraControl::setAnteriorView() const
+{
+	if(mAnteriorViewAction)
+		mAnteriorViewAction->trigger();
 }
 
 QActionGroup* CameraControl::createStandard3DViewActions()
 {
 	QActionGroup* group = new QActionGroup(this);
-	this->addStandard3DViewAction("A", "Anterior View", Vector3D(0, 1, 0), group);
+	mAnteriorViewAction = this->addStandard3DViewAction("A", "Anterior View", Vector3D(0, 1, 0), group);
 	this->addStandard3DViewAction("P", "Posterior View", Vector3D(0, -1, 0), group);
 	mSuperiorViewAction = this->addStandard3DViewAction("S", "Superior View", Vector3D(0, 0, -1), group);
 	this->addStandard3DViewAction("I", "Inferior View", Vector3D(0, 0, 1), group);
@@ -197,6 +204,11 @@ void CameraControl::refreshView(ViewPtr view)
 void CameraControl::setView(ViewPtr view)
 {
 	mView = view;
+}
+
+ViewPtr CameraControl::getView() const
+{
+	return mView;
 }
 
 vtkRendererPtr CameraControl::getRenderer() const

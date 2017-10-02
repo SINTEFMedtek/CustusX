@@ -67,7 +67,7 @@ TEST_CASE("AccusurfFilter: execute", "[unit][org.custusx.filter.accusurf]")
     cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
     cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataVolume);
 
-    vtkPolyDataPtr route_d_image = mesh->getTransformedPolyData((image->get_rMd().inverse())*mesh->get_rMd());
+	vtkPolyDataPtr route_d_image = mesh->getTransformedPolyDataCopy((image->get_rMd().inverse())*mesh->get_rMd());
     accusurf->setRoutePositions(route_d_image);
     accusurf->setInputImage(image);
     accusurf->setThickness(15, 5);

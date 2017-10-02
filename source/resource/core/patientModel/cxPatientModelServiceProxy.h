@@ -64,6 +64,7 @@ public:
 	virtual void insertData(DataPtr data);
 	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
+	virtual std::map<QString, DataPtr> getChildren(QString parent_uid, QString of_type="") const;
 	virtual DataPtr getData(const QString& uid) const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
@@ -95,6 +96,7 @@ public:
     virtual OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
+	virtual void deleteLandmarks();
 
 	virtual void autoSave();
 	virtual bool isNull();

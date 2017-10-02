@@ -69,6 +69,64 @@ ctkPluginContext* getPluginContext()
     return context;
 }
 
+TEST_CASE("RegistrationMethodManual: Verify correct operation when registration history is empty",
+           "[unit][plugins][org.custusx.registration.method.manual]")
+{
+    // Registration should be correctly set even if no previous registration exists in history
+    init();
+    ctkPluginContext* context = getPluginContext();
+    REQUIRE(context);
+    cx::RegServicesPtr regServices = cx::RegServices::create(context);
+    cx::RegistrationServicePtr registrationService = regServices->registration();
+    cx::PatientModelServicePtr patientModelService = regServices->patient();
+    REQUIRE(patientModelService);
+    REQUIRE(registrationService);
+
+    // Test image data
+    vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(4, 1);
+
+    /******************************/
+    // Fixed image volume - image1
+    /******************************/
+    cx::ImagePtr image1 = cx::ImagePtr(new cx::Image("imageUid1",
+                                                     dummyImageData, "imageName1"));
+    /******************************/
+    // Moving image volume - image2
+    /******************************/
+    cx::ImagePtr image2 = cx::ImagePtr(new cx::Image("imageUid2",
+                                                     dummyImageData, "imageName2"));
+    /******************************************/
+    // Setup the Services Plugin data
+    /******************************************/
+    patientModelService->insertData(image1);
+    patientModelService->insertData(image2);
+    registrationService->setFixedData(image1);
+    registrationService->setMovingData(image2);
+
+
+    registrationWidgetPtr regWidget = registrationWidgetPtr(
+                new cx::ManualImage2ImageRegistrationWidget(regServices, NULL,
+                                                            QString("TestregistrationWidget")));
+    REQUIRE(regWidget);
+
+    // Check that registration history is empty
+    REQUIRE(image1->get_rMd_History()->getData().empty());
+    REQUIRE(image2->get_rMd_History()->getData().empty());
+
+    // Check calculation of diff registration matrix when no previous registration exist
+    // should return identity
+    cx::Transform3D result = regWidget->getMatrixFromBackend();
+    cx::Transform3D identity = cx::Transform3D::Identity();
+    REQUIRE(cx::similar(result, identity));
+
+    // Simulate changing GUI registration matrix input
+    // Check that history is updated
+    regWidget->setMatrixFromWidget(cx::Transform3D::Identity());
+    REQUIRE(image2->get_rMd_History()->getData().size() == 1);
+
+    shutdown();
+}
+
 TEST_CASE("RegistrationMethodManual: Verify V2V registration with known Fixed and Moving image data - \
 No landmarks defined",
            "[unit][plugins][org.custusx.registration.method.manual]")
