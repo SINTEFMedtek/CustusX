@@ -268,7 +268,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('3.2.0')
+        self._getBuilder().gitCheckout('3.3.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
