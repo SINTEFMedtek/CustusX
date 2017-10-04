@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogger.h"
 #include "cxImage.h"
 #include "cxUtilHelpers.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -438,8 +439,16 @@ bool SharedOpenGLContext::create3DTextureObject(vtkTextureObjectPtr texture_obje
 		texture_object->SetWrapS(vtkTextureObject::ClampToBorder);
 		texture_object->SetWrapT(vtkTextureObject::ClampToBorder);
 		texture_object->SetWrapR(vtkTextureObject::ClampToBorder);
-		texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
-		texture_object->SetMinificationFilter(vtkTextureObject::Linear);
+		if(this->useLinearInterpolation())
+		{
+			texture_object->SetMagnificationFilter(vtkTextureObject::Linear);
+			texture_object->SetMinificationFilter(vtkTextureObject::Linear);
+		}
+		else
+		{
+			texture_object->SetMagnificationFilter(vtkTextureObject::Nearest);
+			texture_object->SetMinificationFilter(vtkTextureObject::Nearest);
+		}
 		texture_object->SendParameters();
 		texture_object->Deactivate();
 		report_gl_error();
@@ -450,6 +459,11 @@ bool SharedOpenGLContext::create3DTextureObject(vtkTextureObjectPtr texture_obje
 	}
 
 	return true;
+}
+
+bool SharedOpenGLContext::useLinearInterpolation() const
+{
+	return settings()->value("View2D/useLinearInterpolationIn2DRendering").toBool();
 }
 
 bool SharedOpenGLContext::create1DTextureObject(vtkTextureObjectPtr texture_object, unsigned int width, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const

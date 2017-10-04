@@ -228,7 +228,11 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 {
 	this->ViewWrapper::settingsChangedSlot(key);
 
-	if (key == "useGPU2DRendering")
+	if (key == "View2D/useGPU2DRendering")
+	{
+		this->updateView();
+	}
+	if (key == "View2D/useLinearInterpolationIn2DRendering")
 	{
 		this->updateView();
 	}
@@ -453,7 +457,7 @@ bool ViewWrapper2D::useGPU2DRendering()
 //	return false;
 //#endif //CX_VTK_OPENGL2
 
-    return settings()->value("useGPU2DRendering").toBool();
+		return settings()->value("View2D/useGPU2DRendering").toBool();
 }
 
 void ViewWrapper2D::createAndAddSliceRep()
