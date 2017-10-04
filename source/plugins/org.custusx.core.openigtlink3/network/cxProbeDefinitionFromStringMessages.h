@@ -223,7 +223,7 @@ protected:
 	bool mTestMode;
 
 private:
-	std::vector<double> toDoubleVector(QString values, QString separator = QString(","));
+	std::vector<double> toDoubleVector(QString values, QString separator = QString(" "));
 	DoubleBoundingBox3D getBoundinBox();
 	double getWidth();
 	ProbeDefinitionPtr initProbeDefinition();
