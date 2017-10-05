@@ -311,7 +311,7 @@ void ViewWrapper2D::recreateMultiSlicer()
     this->createAndAddMultiSliceRep();
 
 //#ifndef CX_VTK_OPENGL2
-	if (mGroupData)
+	if (mGroupData && mMultiSliceRep)
 		mMultiSliceRep->setImages(this->getImagesToView());
 	else
 		mMultiSliceRep->setImages(std::vector<ImagePtr>());
