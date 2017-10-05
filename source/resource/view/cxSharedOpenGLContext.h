@@ -110,6 +110,7 @@ private:
 	vtkOpenGLRenderWindowPtr mContext;
 
 	SharedOpenGLContext(); //not implemented
+	bool useLinearInterpolation() const;
 };
 
 }//cx
