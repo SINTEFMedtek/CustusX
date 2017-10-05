@@ -302,22 +302,25 @@ void ViewWrapper2D::recreateMultiSlicer()
 {
 	this->removeAndResetSliceRep();
 
-    if (!this->useGPU2DRendering())
+	if (!this->useGPU2DRendering())
 	{
 		this->removeAndResetMultiSliceRep();
 		return;
 	}
 
-    this->createAndAddMultiSliceRep();
+	this->createAndAddMultiSliceRep();
 
-//#ifndef CX_VTK_OPENGL2
-	if (mGroupData && mMultiSliceRep)
+	if(!mMultiSliceRep)
+		return;
+
+	//#ifndef CX_VTK_OPENGL2
+	if (mGroupData)
 		mMultiSliceRep->setImages(this->getImagesToView());
 	else
 		mMultiSliceRep->setImages(std::vector<ImagePtr>());
-//#endif
+	//#endif
 
-    this->viewportChanged();
+	this->viewportChanged();
 }
 
 std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
