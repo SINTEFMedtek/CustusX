@@ -83,7 +83,6 @@ vtkRenderWindowPtr RenderWindowFactory::getSharedRenderWindow() const
 
 void RenderWindowFactory::setSharedRenderWindow(vtkRenderWindowPtr sharedRenderWindow)
 {
-	CX_LOG_DEBUG() << "RenderWindowFactory::setSharedRenderWindow";
 	if(mSharedRenderWindow == sharedRenderWindow)
 	{
 		return;
@@ -93,7 +92,6 @@ void RenderWindowFactory::setSharedRenderWindow(vtkRenderWindowPtr sharedRenderW
 	vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(mSharedRenderWindow);
 	if(opengl_renderwindow)
 	{
-		CX_LOG_DEBUG() << "RenderWindowFactory::setSharedRenderWindow: Creating SharedOpenGLContext <---------";
 		mSharedOpenGLContext = SharedOpenGLContextPtr(new SharedOpenGLContext(opengl_renderwindow));
 	}
 	else

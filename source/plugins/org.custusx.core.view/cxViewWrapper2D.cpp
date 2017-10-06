@@ -265,32 +265,31 @@ void ViewWrapper2D::removeAndResetSliceRep()
 
 void ViewWrapper2D::removeAndResetMultiSliceRep()
 {
-//#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
 	{
 		mView->removeRep(mMultiSliceRep);
 		mMultiSliceRep.reset();
 	}
-//#endif
 }
 
-void ViewWrapper2D::createAndAddMultiSliceRep()
+bool ViewWrapper2D::createAndAddMultiSliceRep()
 {
 	if(!mSharedOpenGLContext)
 	{
 		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
-		return;
+		return false;
 	}
-//#ifndef CX_VTK_OPENGL2
 	if (mMultiSliceRep)
-		return;
+		return true;
+
 	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
 	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mMultiSliceRep->setSliceProxy(mSliceProxy);
 	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
 
 	mView->addRep(mMultiSliceRep);
-//#endif
+
+	return true;
 }
 
 /**Hack: gpu slicer recreate and fill with images every time,
@@ -308,17 +307,15 @@ void ViewWrapper2D::recreateMultiSlicer()
 		return;
 	}
 
-	this->createAndAddMultiSliceRep();
-
-	if(!mMultiSliceRep)
+	if(!this->createAndAddMultiSliceRep())
+	{
 		return;
+	}
 
-	//#ifndef CX_VTK_OPENGL2
 	if (mGroupData)
 		mMultiSliceRep->setImages(this->getImagesToView());
 	else
 		mMultiSliceRep->setImages(std::vector<ImagePtr>());
-	//#endif
 
 	this->viewportChanged();
 }
@@ -456,10 +453,6 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 
 bool ViewWrapper2D::useGPU2DRendering()
 {
-//#ifdef CX_VTK_OPENGL2
-//	return false;
-//#endif //CX_VTK_OPENGL2
-
 		return settings()->value("View2D/useGPU2DRendering").toBool();
 }
 
