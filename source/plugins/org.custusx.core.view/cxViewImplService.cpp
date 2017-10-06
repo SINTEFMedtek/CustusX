@@ -87,6 +87,7 @@ ViewImplService::~ViewImplService()
 
 void ViewImplService::init()
 {
+	CX_LOG_DEBUG() << "ViewImplService::init()";
 	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
 
 	mRenderLoop.reset(new RenderLoop());
