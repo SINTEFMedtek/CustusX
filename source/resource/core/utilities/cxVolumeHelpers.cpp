@@ -276,7 +276,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 	retval["Acquisition time"] = string_cast(image->getAcquisitionTime().toString(timestampSecondsFormatNice()));
 	retval["Voxels with min value"] = string_cast(calculateNumVoxelsWithMinValue(image));
 	retval["Voxels with max value"] = string_cast(calculateNumVoxelsWithMaxValue(image));
-	retval["rMd"] = string_cast(image->get_rMd());
+	retval["rMd"] = matrixAsSingleLineString(image->get_rMd());
 
 	std::map<std::string, std::string> volumeMap = getDisplayFriendlyInfo(image->getBaseVtkImageData());
 	retval.insert(volumeMap.begin(), volumeMap.end());
