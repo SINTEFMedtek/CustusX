@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QGridLayout>
 #include <QLabel>
 #include <QDial>
+#include <QPushButton>
 
 #include "cxVBWidget.h"
 #include "cxPatientModelServiceProxy.h"
@@ -98,20 +99,22 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	// Selectors for virtual endoscope control
 	QGroupBox	*endoscopeBox = new QGroupBox(tr("Endoscope"));
 	QGridLayout	*endoscopeControlLayout = new QGridLayout;
-	QLabel		*labelRot = new QLabel(tr("Rotate"));
-	QLabel		*labelView = new QLabel(tr("Left/right (30 deg)"));
+	QLabel		*labelRot = new QLabel(tr("Rotate (360 deg)"));
+	QLabel		*labelView = new QLabel(tr("Left/right (+/- 60 deg)"));
 	mRotateDial = new QDial;
 	mRotateDial->setMinimum(-180);
 	mRotateDial->setMaximum(180);
 	mViewDial = new QDial;
-	mViewDial->setMinimum(-30);
-	mViewDial->setMaximum(30);
+	mViewDial->setMinimum(-60);
+	mViewDial->setMaximum(60);
+	mResetEndoscopeButton = new QPushButton("Reset");
 
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
 	endoscopeControlLayout->addWidget(mViewDial,1,2);
+	endoscopeControlLayout->addWidget(mResetEndoscopeButton,2,0);
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
@@ -128,6 +131,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot);
 	connect(mViewDial, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
+	connect(mResetEndoscopeButton, &QPushButton::clicked, this, &VBWidget::resetEndoscopeSlot);
 
 	mVerticalLayout->addStretch();
 }
@@ -165,7 +169,6 @@ void VBWidget::inputChangedSlot()
 
 void VBWidget::keyPressEvent(QKeyEvent* event)
 {
-
 	if (event->key()==Qt::Key_Up || event->key()==Qt::Key_8)
 	{
 		if(mControlsEnabled) {
@@ -220,8 +223,22 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 		}
 	}
 
+	if (event->key()==Qt::Key_5)
+	{
+		if(mControlsEnabled) {
+			this->resetEndoscopeSlot();
+			return;
+		}
+	}
+
 	// Forward the keyPressevent if not processed
 	QWidget::keyPressEvent(event);
+}
+
+void VBWidget::resetEndoscopeSlot()
+{
+	mRotateDial->setValue(0);
+	mViewDial->setValue(0);
 }
 
 QString VBWidget::defaultWhatsThis() const
