@@ -301,7 +301,7 @@ std::string matrixAsSingleLineString(cx::Transform3D transform)
 {
 	Eigen::IOFormat singleLineFormatting(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "  |  ", "", "", "", "");
 	std::ostringstream stream;
-	stream << transform.matrix().format(Eigen::IOFormat(singleLineFormatting));
+	stream << transform.matrix().format(singleLineFormatting);
 
 	return stream.str();
 }
