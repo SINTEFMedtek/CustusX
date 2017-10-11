@@ -108,7 +108,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 {
     std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
 
-    for (int i = 0; i<=startIndex; i++)
+	for (int i = 0; i<=startIndex && i<positions.size(); i++)
         mRoutePositions.push_back(positions[i]);
 
     BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
@@ -135,19 +135,21 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
     float extentionPointIncrement = 0.5; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
-    double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
-    Eigen::Vector3d extentionVector = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
-    int numberOfextentionPoints = (int) extentionDistance * extentionPointIncrement;
-    Eigen::Vector3d extentionPointIncrementVector = extentionVector / extentionPointIncrement;
+	if(mRoutePositions.size() > 0)
+	{
+		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
+		Eigen::Vector3d extentionVector = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+		int numberOfextentionPoints = (int) extentionDistance * extentionPointIncrement;
+		Eigen::Vector3d extentionPointIncrementVector = extentionVector / extentionPointIncrement;
 
-    for (int i = 1; i<= numberOfextentionPoints; i++)
-    {
-        mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
-        //std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
-    }
+		for (int i = 1; i<= numberOfextentionPoints; i++)
+		{
+			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
+			//std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
+		}
+	}
 
     vtkPolyDataPtr retval = addVTKPoints(mExtendedRoutePositions);
-
     return retval;
 }
 
