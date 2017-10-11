@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class QVBoxLayout;
 class QDial;
 class QSlider;
+class QPushButton;
 
 namespace cx
 {
@@ -75,6 +76,7 @@ private:
 	QSlider*					mPlaybackSlider;
 	QDial*						mRotateDial;
 	QDial*						mViewDial;
+	QPushButton*				mResetEndoscopeButton;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;
@@ -90,6 +92,7 @@ signals:
 private slots:
 	void						inputChangedSlot();
 	virtual void				keyPressEvent(QKeyEvent* event);
+	void						resetEndoscopeSlot();
 
 };
 
