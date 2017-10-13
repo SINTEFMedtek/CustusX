@@ -196,6 +196,7 @@ void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 		for (unsigned i=0; i<ids.size(); ++i)
 			ids[i] = i;
 		mLines->InsertNextCell(ids.size(), &(*ids.begin()));
+		mLines->Modified();
 		
 		mPolyData->Modified();
 	}
