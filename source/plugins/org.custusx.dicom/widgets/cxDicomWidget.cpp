@@ -57,10 +57,11 @@ namespace cx
 {
 
 DicomWidget::DicomWidget(ctkPluginContext *context, QWidget *parent) :
-	BaseWidget(parent, "dicom_widget", "Dicom"),
+	BaseWidget(parent, "dicom_widget", "DICOM"),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mBrowser(NULL),
-	mContext(context)
+	mContext(context),
+	mDicomShowAdvancedSettingsString("Dicom/ShowAdvanced")
 {
 	this->setModified();
 
@@ -85,25 +86,52 @@ void DicomWidget::createUI()
 		return;
 
 	this->setToolTip("Import DICOM data");
-	//Add detailed button
+
 	mViewHeaderAction = this->createAction(this,
-										   QIcon(),
-										   "View", "View header info for first selected series",
+										   QIcon(":/icons/open_icon_library/eye.png.png"),
+										   "View info", "View the header info for the first selected series",
 										   SLOT(onViewHeader()));
+
 	mImportIntoCustusXAction = this->createAction(this,
-												  QIcon(),
-												  "Import", "Import selected series into application",
+												  QIcon(":/icons/open_icon_library/arrow-right-3.png"),
+												  "Import selected", "Import the selected DICOM series into the application as a volume",
 												  SLOT(onImportIntoCustusXAction()));
+
+	mDetailsAction = this->createAction(this,
+										QIcon(":/icons/open_icon_library/system-run-5.png"),
+										"Advanced", "Toggle advanced options",
+										SLOT(toggleDetailsSlot()));
 
 	mBrowser = new DICOMAppWidget;
 	mBrowser->addActionToToolbar(mViewHeaderAction);
 	mBrowser->addActionToToolbar(mImportIntoCustusXAction);
+	mBrowser->addActionToToolbar(mDetailsAction);
+	this->showOrHideDetails();
 
 	mVerticalLayout->setMargin(0);
 	mVerticalLayout->addWidget(mBrowser);
 
 	this->setupDatabaseDirectory();
 }
+
+void DicomWidget::toggleDetailsSlot()
+{
+	bool newShowAdvancedValue = !settings()->value(mDicomShowAdvancedSettingsString, "true").toBool();
+	settings()->setValue(mDicomShowAdvancedSettingsString, newShowAdvancedValue);
+	this->showOrHideDetails();
+}
+
+void DicomWidget::showOrHideDetails()
+{
+	bool showAdvanced = settings()->value(mDicomShowAdvancedSettingsString).toBool();
+
+	mViewHeaderAction->setVisible(showAdvanced);
+	foreach (QAction* action, mBrowser->getAdvancedActions())
+	{
+		action->setVisible(showAdvanced);
+	}
+}
+
 
 QString DicomWidget::getDICOMDatabaseDirectory()
 {

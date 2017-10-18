@@ -35,6 +35,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 #include "cxTypeConversions.h"
+#include "cxMathUtils.h"
+
 
 namespace cxtest
 {
@@ -79,8 +81,7 @@ void SyntheticReconstructInput::setOverallBoundsAndSpacing(double size, double s
 	// set all these rates to the input spacing:
 
 	mBounds = cx::Vector3D::Ones() * size;
-//	this->defineOutputVolume(size, spacing);
-	mProbe = cx::DummyToolTestUtilities::createProbeDefinitionLinear(size, size, Eigen::Array2i(1,1)*(size/spacing+1));
+	mProbe = cx::DummyToolTestUtilities::createProbeDefinitionLinear(size, size, Eigen::Array2i(1,1)*(int(cx::roundAwayFromZero(size/spacing))+1));
 	mProbeMovementDefinition.mRangeNormalizedTranslation = cx::Vector3D::UnitX();
 	mProbeMovementDefinition.mRangeAngle = 0;
 	mProbeMovementDefinition.mSteps = size/spacing+1;

@@ -53,12 +53,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxLog.h"
 
+#include <vtkPolyData.h>
+
 
 namespace cx
 {
 
 RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services) :
 	FilterImpl(services)
+  , mTargetName("")
 {
 }
 
@@ -79,7 +82,17 @@ QString RouteToTargetFilter::getHelp() const
 			"<p>Calculates the route to a selected target in navigated bronchocopy."
 			"The rout starts at the top of trachea and ends at the most adjacent airway centerline"
 			"from the target.</p>"
-			"</html>";
+           "</html>";
+}
+
+QString RouteToTargetFilter::getNameSuffix()
+{
+    return "_rtt_cl";
+}
+
+QString RouteToTargetFilter::getNameSuffixExtension()
+{
+    return "_ext";
 }
 
 
@@ -125,7 +138,7 @@ bool RouteToTargetFilter::execute()
     if (!mesh)
         return false;
 
-    vtkPolyDataPtr centerline_r = mesh->getTransformedPolyData(mesh->get_rMd());
+	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
     if (!targetPoint)
@@ -137,6 +150,10 @@ bool RouteToTargetFilter::execute()
 
     //note: mOutput is in reference space
     mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate_r);
+
+	if(mOutput->GetNumberOfPoints() < 1)
+		return false;
+
     mExtendedRoute = mRouteToTarget->findExtendedRoute(targetCoordinate_r);
 
 	return true;
@@ -149,14 +166,20 @@ bool RouteToTargetFilter::postProcess()
     if (!inputMesh)
         return false;
 
-	QString uidCenterline = inputMesh->getUid() + "_rtt_cl%1";
-	QString nameCenterline = inputMesh->getName()+"_rtt_cl%1";
+	QString uidCenterline = inputMesh->getUid() + RouteToTargetFilter::getNameSuffix() + "%1";
+	QString nameCenterline = inputMesh->getName()+RouteToTargetFilter::getNameSuffix() + "%1";
+	if (!mTargetName.isEmpty())
+	{
+		uidCenterline.append("_" + mTargetName);
+		nameCenterline.append("_" + mTargetName);
+	}
+
     MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
     outputCenterline->setVtkPolyData(mOutput);
     patientService()->insertData(outputCenterline);
 
-    QString uidCenterlineExt = outputCenterline->getUid() + "_ext";
-    QString nameCenterlineExt = outputCenterline->getName()+"_ext";
+    QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
+    QString nameCenterlineExt = outputCenterline->getName()+RouteToTargetFilter::getNameSuffixExtension();
     MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
     outputCenterlineExt->setVtkPolyData(mExtendedRoute);
     outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
@@ -174,6 +197,11 @@ bool RouteToTargetFilter::postProcess()
 	mOutputTypes[0]->setValue(outputCenterline->getUid());
 
 	return true;
+}
+
+void RouteToTargetFilter::setTargetName(QString name)
+{
+	mTargetName = name;
 }
 
 

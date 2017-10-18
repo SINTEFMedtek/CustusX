@@ -43,7 +43,6 @@ namespace cx
 
 RegistrationMethodBronchoscopyPluginActivator::RegistrationMethodBronchoscopyPluginActivator()
 {
-//	std::cout << "Created RegistrationMethodBronchoscopyPluginActivator" << std::endl;
 }
 
 RegistrationMethodBronchoscopyPluginActivator::~RegistrationMethodBronchoscopyPluginActivator()
@@ -53,13 +52,16 @@ void RegistrationMethodBronchoscopyPluginActivator::start(ctkPluginContext* cont
 {
 	RegServicesPtr services = RegServices::create(context);
 	RegistrationMethodBronchoscopyImageToPatientService* image2patientService = new RegistrationMethodBronchoscopyImageToPatientService(services);
+    RegistrationMethodBronchoscopyImageToImageService* image2imageService = new RegistrationMethodBronchoscopyImageToImageService(services);
 
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
+    mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));
 }
 
 void RegistrationMethodBronchoscopyPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistrationImageToPatient.reset();
+    mRegistrationImageToImage.reset();
 	Q_UNUSED(context);
 }
 

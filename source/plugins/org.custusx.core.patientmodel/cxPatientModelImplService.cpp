@@ -168,6 +168,21 @@ DataPtr PatientModelImplService::getData(const QString& uid) const
 	return iter->second;
 }
 
+std::map<QString, DataPtr> PatientModelImplService::getChildren(QString parent_uid, QString of_type) const
+{
+	std::map<QString, DataPtr> retval;
+	std::map<QString, DataPtr> dataMap = this->getDatas(AllData);
+	std::map<QString, DataPtr>::const_iterator iter = dataMap.begin();
+	for ( ; iter != dataMap.end(); ++iter)
+	{
+		if((iter->second->getParentSpace() == parent_uid))
+			if((of_type == "") || (iter->second->getType() == of_type))
+				retval[iter->first] =  iter->second;
+	}
+
+	return retval;
+}
+
 LandmarksPtr PatientModelImplService::getPatientLandmarks() const
 {
 	return dataService()->getPatientLandmarks();
@@ -278,6 +293,11 @@ OperatingTable PatientModelImplService::getOperatingTable() const
 QString PatientModelImplService::addLandmark()
 {
 	return dataService()->addLandmark();
+}
+
+void PatientModelImplService::deleteLandmarks()
+{
+	return dataService()->deleteLandmarks();
 }
 
 void PatientModelImplService::setLandmarkActive(QString uid, bool active)

@@ -62,6 +62,13 @@ std::map<QString, DataPtr> PatientModelServiceNull::getDatas(DataFilter filter) 
 	return retval;
 }
 
+std::map<QString, DataPtr> PatientModelServiceNull::getChildren(QString parent_uid, QString of_type) const
+{
+	printWarning();
+	std::map<QString, DataPtr> retval;
+	return retval;
+}
+
 LandmarksPtr PatientModelServiceNull::getPatientLandmarks() const
 {
 	printWarning();
@@ -77,7 +84,7 @@ std::map<QString, LandmarkProperty> PatientModelServiceNull::getLandmarkProperti
 
 void PatientModelServiceNull::setLandmarkName(QString uid, QString name)
 {
-	printWarning();;
+	printWarning();
 }
 
 void PatientModelServiceNull::autoSave()
@@ -160,6 +167,11 @@ QString PatientModelServiceNull::addLandmark()
 {
 	printWarning();
 	return QString();
+}
+
+void PatientModelServiceNull::deleteLandmarks()
+{
+	printWarning();
 }
 
 void PatientModelServiceNull::setLandmarkActive(QString uid, bool active)

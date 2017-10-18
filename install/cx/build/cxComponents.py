@@ -170,7 +170,7 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v4.8.2')
+        self._getBuilder().gitCheckout('v4.12.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -197,7 +197,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('8b5d4214bb16ca28cea1471657871c04f874f346')
+        self._getBuilder().gitCheckout('d2f2c21829718c0960dff7eb868dbb243c49a6ea')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -237,7 +237,7 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('9440d3c9d4cc49de79470fdab2f27218d549c224')
+        self._getBuilder().gitCheckout('4af01a590b293117af49d105a44224e32e5272c9')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -268,7 +268,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('3.2.0')
+        self._getBuilder().gitCheckout('3.3.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -298,6 +298,7 @@ class Eigen(CppComponent):
         return 'git@github.com:RLovelett/eigen.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
+        #See CX-208 about updating Eigen versions
         tag = '3.2.10'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
@@ -354,7 +355,7 @@ class IGSTK(CppComponent):
     def update(self):
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
-        self._getBuilder().gitCheckout('34f4a9f46d54d4674e0a19acdb24bbbc4dcb1ffe')
+        self._getBuilder().gitCheckout('bda6b6fa88054b474aa113af5477813610e4ac3b')
     def configure(self):        
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -407,8 +408,6 @@ class CustusX(CppComponent):
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
-        add('Tube-Segmentation-Framework_DIR:PATH', self._createSibling(TubeSegmentationFramework).configPath())
-        add('Level-Set-Segmentation_DIR:PATH', self._createSibling(LevelSetSegmentation).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)            
@@ -418,7 +417,11 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        # See CX-208 about this Eigen flag and about updating Eigen.
+        # The second one should be used when upgrading
+        # to version > 3.2, as the old one is depracated in version 3.3.
         append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
+        #append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         
         
         libs = self.assembly.libraries
@@ -437,67 +440,6 @@ class CustusX(CppComponent):
         
 # ---------------------------------------------------------
 
-
-class TubeSegmentationFramework(CppComponent):
-    def name(self):
-        return "Tube-Segmentation-Framework"
-    def help(self):
-        return 'Tube-Segmentation-Framework'
-#    def path(self):
-#        return self.controlData.getWorkingPath() + "/Tube-Segmentation-Framework"
-    def repository(self):
-        base = self.controlData.gitrepo_open_site_base
-        return '%s/Tube-Segmentation-Framework.git' % base
-    def update(self):
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('9faceef98c6ee943a1301b0d57f9db0deb7e59e9')
-        self._getBuilder()._gitSubmoduleUpdate()
-    def configure(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
-        add('USE_C++11:BOOL', False)
-        add('SIPL_USE_GTK:BOOL', False)
-        add('sipl_use_gtk:BOOL', False) #variables in cmake are case sensitive, SIPL uses this options
-        add('TSF_USE_EXTRNAL_OUL:BOOL', 'ON')
-        add('TSF_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
-        if(platform.system() == 'Windows'):
-            add('BUILD_SHARED_LIBS:BOOL', 'OFF') #On windows we build TSF as static, because TSF and SIPL does not export symbols
-        builder.configureCMake()
-    def addConfigurationToDownstreamLib(self, builder):
-        add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.tubesegmentation:BOOL', 'ON');
-
- # ---------------------------------------------------------
-
-class LevelSetSegmentation(CppComponent):
-    def name(self):
-        return "Level-Set-Segmentation"
-    def help(self):
-        return 'Level-Set-Segmentation'
-#    def path(self):
-#        return self.controlData.getWorkingPath() + "/" + self.name()
-    def repository(self):
-        return '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
-    def update(self):
-        # this fix should rebase repo from the original smistad/LSS to our own fork on GitHub.
-        #repo = '%s/Level-Set-Segmentation' % self.controlData.gitrepo_open_site_base
-        #self._getBuilder().gitSetRemoteURL(repo, branch="master")
-        self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('e49217188925845be9b336adcb2b9e81c26ea784')
-        self._getBuilder()._gitSubmoduleUpdate()
-    def configure(self):
-        builder = self._getBuilder()
-        add = builder.addCMakeOption
-        add('sipl_use_gtk:BOOL', 'OFF')
-        add('LS_USE_EXTRNAL_OUL:BOOL', 'ON')
-        add('LS_EXTERNAL_OUL_PATH:PATH', self._createSibling(OpenCLUtilityLibrary).findPackagePath())
-        builder.configureCMake()
-    def addConfigurationToDownstreamLib(self, builder):
-        add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.levelset:BOOL', platform.system() == 'Linux');
-        
-# ---------------------------------------------------------
-
 class OpenCLUtilityLibrary(CppComponent):
     def name(self):
         return "OpenCLUtilityLibrary"
@@ -509,7 +451,7 @@ class OpenCLUtilityLibrary(CppComponent):
         return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('43614718f7667dd5013af9300fcc63ae30bf244c')
+        self._getBuilder().gitCheckout('44b7a002195fb2b6e8ea99ea4edf3102ef556cc3')
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
@@ -526,14 +468,12 @@ class FAST(CppComponent):
 #    def path(self):
 #        return self.controlData.getWorkingPath() + "/FAST"
     def sourcePath(self):
-        return self.controlData.getWorkingPath() + "/FAST/FAST/source"
+        return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-		#return 'git@github.com:smistad/FAST'
-		return 'git@github.com:jbake/FAST'
+		return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('60247acddd2708bc6a0a4b6bfd051ba477e6af71')
-#        self._getBuilder().gitCheckoutBranch('set_kernel_root_dir')
+        self._getBuilder().gitCheckout('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -544,15 +484,18 @@ class FAST(CppComponent):
         add = builder.addCMakeOption
         append = builder.appendCMakeOption
         add('FAST_MODULE_OpenIGTLink:BOOL', False)
+        add('FAST_MODULE_Visualization:BOOL', False)
+        add('FAST_MODULE_Python:BOOL', False)
+        add('FAST_MODULE_NeuralNetwork:BOOL', False)
+        add('FAST_MODULE_VTK:BOOL', True)
+        add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
+        add('FAST_BUILD_TOOLS:BOOL', False)
         add('FAST_BUILD_TESTS:BOOL', False)
-        add('FAST_VTK_INTEROP:BOOL', True)
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('EIGEN3_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
-        append('FAST_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
-        append('FAST_CMAKE_CXX_FLAGS:STRING', '-D_USE_MATH_DEFINES')
+        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
@@ -575,7 +518,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('cd17744e2657c7ca15859ef2cef7560b4057ebfa')
+        self._getBuilder().gitCheckout('56fa488c60f99e54c8550de2d585bd15453291dd')
     def configure(self):
         pass
     def build(self):
@@ -608,3 +551,31 @@ class QHttpServer(CppComponent):
         add = builder.addCMakeOption
         add('qhttpserver_DIR:PATH', self.buildPath())
 
+# ---------------------------------------------------------
+
+class org_custusx_angleCorrection(CppComponent):
+
+    def name(self):
+        return "org.custusx.anglecorrection"
+    def help(self):
+        return 'Plugin for Angle correction of velocities'
+    def path(self):
+        custusx = self._createSibling(cx.build.cxComponents.CustusX)
+        return '%s/%s/source/plugins' % (custusx.path(), custusx.sourceFolder())
+    def sourceFolder(self):
+        return 'org.custusx.anglecorrection'
+#    def _rawCheckout(self):
+#        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('0.1')
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def repository(self):
+        return 'git@github.com:Danielhiversen/AngleCorr.git'
+    def makeClean(self):
+        pass
+    def pluginPath(self):
+        return '%s' % self.sourcePath()

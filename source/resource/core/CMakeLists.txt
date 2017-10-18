@@ -156,6 +156,7 @@ cx_add_class(cxResource_SOURCE
     Data/cxImageParameters
     Data/cxFrameForest
     Data/cxDataFactory
+    Data/cxErrorObserver
 
     Math/cxBoundingBox3D
     Math/cxVector3D

@@ -57,6 +57,7 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
+    static QString getNameSuffix();
 	virtual void setActive(bool on);
 
 	bool preProcess();

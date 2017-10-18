@@ -15,8 +15,6 @@ cx_initialize_ITK()
 cx_initialize_OpenIGTLink()
 cx_initialize_CTK()
 
-cx_initialize_TSF()
-cx_initialize_level_set_segmentation()
 #cx_initialize_FAST()
 cx_initialize_OpenCLUtilityLibrary()
 

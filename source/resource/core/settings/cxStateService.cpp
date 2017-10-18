@@ -130,15 +130,12 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 	this->fillDefault("View/shadingOn", true);
 
+	this->fillDefault("Gui/showMenuBar", true);
+
 	this->fillDefault("stillUpdateRate", 0.001);
 
-#ifdef __APPLE__
-	this->fillDefault("useGPU2DRendering", true);
-#elif WIN32
-	this->fillDefault("useGPU2DRendering", false);
-#else
-	this->fillDefault("useGPU2DRendering", true);
-#endif
+	this->fillDefault("View2D/useGPU2DRendering", true);
+	this->fillDefault("View2D/useLinearInterpolationIn2DRendering", true);
 
 	this->fillDefault("optimizedViews", true);
 	this->fillDefault("smartRender", true);
@@ -152,6 +149,9 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("USsimulation/type", "Original data");
 	this->fillDefault("USsimulation/volume", "");
 	this->fillDefault("USsimulation/gain", 0.70);
+
+	this->fillDefault("Dicom/ShowAdvanced", false);
+	this->fillDefault("Landmarks/ShowAdvanced", false);
 }
 
 

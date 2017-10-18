@@ -61,6 +61,7 @@ public:
 
   void addTab(BaseWidget* newTab, QString newTabName);
   void insertWidgetAtTop(QWidget* newWidget);
+  void setDefaultWidget(QWidget* widget);
 
 private slots:
   void tabChanged(const int &index);

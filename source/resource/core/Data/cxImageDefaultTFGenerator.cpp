@@ -185,12 +185,12 @@ double_pair ImageDefaultTFGenerator::guessCTRange() const
 	// choose a default from lung to bone, approximately.
 	double smin = -500;
 	double smax = 900;
-	if (0 >= mImage->getMin()) // unsigned: [0..4096]
-	{
-		int ct_signed2unsigned = 1024;
-		smin += ct_signed2unsigned;
-		smax += ct_signed2unsigned;
-	}
+//	if (0 >= mImage->getMin()) // unsigned: [0..4096]
+//	{
+//		int ct_signed2unsigned = 1024;
+//		smin += ct_signed2unsigned;
+//		smax += ct_signed2unsigned;
+//	}
 	return std::make_pair(smin, smax);
 }
 

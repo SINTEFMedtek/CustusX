@@ -60,7 +60,7 @@ public:
 	void calculateOrientations();
 	void smoothOrientations();
 	void interpolateBranchPositions(int interpolationFactor);
-	void smoothBranchPositions();
+    void smoothBranchPositions(int controlPointDistance);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 
 };

@@ -594,7 +594,20 @@ SyncedValuePtr ViewGroupData::getGroup2DZoom()
 }
 SyncedValuePtr ViewGroupData::getGlobal2DZoom()
 {
-	return mGlobal2DZoom;
+    return mGlobal2DZoom;
+}
+
+void ViewGroupData::zoomCamera3D(int zoomFactor)
+{
+    CameraDataPtr cameraData = this->getCamera3D();
+    if(!cameraData)
+        return;
+
+    vtkCameraPtr camera = cameraData->getCamera();
+    if(!camera)
+        return;
+
+    camera->Dolly(zoomFactor);
 }
 
 void ViewGroupData::createSliceDefinitionProperty()
