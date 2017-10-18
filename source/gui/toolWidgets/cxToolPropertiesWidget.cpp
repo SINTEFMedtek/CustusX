@@ -91,8 +91,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(StringPropertyBasePtr toolSelector,
   mSelector(toolSelector),
   mTrackingService(trackingService),
   mSpaceProvider(spaceProvider),
-  mManualToolWidget(NULL),
-  mChangedFrom3DWindow(true)
+  mManualToolWidget(NULL)
 {
 	mToptopLayout = new QVBoxLayout(this);
 	this->setModified();
@@ -189,21 +188,17 @@ void ToolPropertiesWidget::toolPositionChanged()
 		return;
 
 	mManualGroup->setVisible(mTool->getVisible());
+  mManualToolWidget->blockSignals(true);
 
-	if(mChangedFrom3DWindow == true)
-	{
-		mManualToolWidget->blockSignals(true);
+  Transform3D prMt = mTool->get_prMt();
+  CoordinateSystem space_q = mSpaceSelector->getValue();
+  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
+  Transform3D qMt = mSpaceProvider->get_toMfrom(space_mt, space_q);
 
-		CoordinateSystem space_q = mSpaceSelector->getValue();
-		CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
-		Transform3D qMt = mSpaceProvider->get_toMfrom(space_mt, space_q);
+  mManualToolWidget->setMatrix(qMt);
+  mManualToolWidget->blockSignals(false);
 
-		mManualToolWidget->setMatrix(qMt);
-		mManualToolWidget->blockSignals(false);
-
-		this->updateBrowser();
-	}
-	mChangedFrom3DWindow = true;
+  this->updateBrowser();
 }
 
 QString ToolPropertiesWidget::createDescriptionForTool(ToolPtr current)
@@ -243,23 +238,25 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 		return;
 
 	Transform3D qMt = mManualToolWidget->getMatrix();
-	CoordinateSystem space_q = mSpaceSelector->getValue();
-	CoordinateSystem space_pr = mSpaceProvider->getPr();
-	Transform3D qMpr = mSpaceProvider->get_toMfrom(space_pr, space_q);
-	Transform3D prMt = qMpr.inv() * qMt;
-	mTool->set_prMt(prMt);
+  CoordinateSystem space_q = mSpaceSelector->getValue();
+  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
+  CoordinateSystem space_pr = mSpaceProvider->getPr();
+  Transform3D qMpr = mSpaceProvider->get_toMfrom(space_pr, space_q);
+  Transform3D prMt = qMpr.inv() * qMt;
 
-	mChangedFrom3DWindow = false;
+  mTool->set_prMt(prMt);
 }
 
 void ToolPropertiesWidget::spacesChangedSlot()
 {
 	CoordinateSystem space = mSpaceSelector->getValue();
 
+//	mSpaceSelector->setValueRange(spaceProvider()->getSpacesToPresentInGUI());
 	mSpaceSelector->setValue(space);
 	mSpaceSelector->setHelp(QString("The space q to display tool position in,\n"
 	                                "qMt"));
 	this->setModified();
+//	this->toolPositionChanged();
 }
 
 void ToolPropertiesWidget::reconnectTools()

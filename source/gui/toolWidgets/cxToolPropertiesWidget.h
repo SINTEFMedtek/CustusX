@@ -120,8 +120,6 @@ private:
   QTextEdit* mMetadataLabel;
   void updateBrowser();
   QString createDescriptionForTool(ToolPtr current);
-
-  bool mChangedFrom3DWindow;
 };
 
 }//end namespace cx
