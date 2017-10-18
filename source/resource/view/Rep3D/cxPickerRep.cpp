@@ -251,7 +251,6 @@ void PickerRep::onModifiedStartRender()
 	this->toolHasChanged();
 }
 
-//? Dette kontrollerer den blå ballen i punkter du picker.
 void PickerRep::toolHasChanged()
 {
 	if (!mTool)
@@ -259,8 +258,7 @@ void PickerRep::toolHasChanged()
 	Transform3D prMt = mTool->get_prMt();
 	Transform3D rMpr = mDataManager->get_rMpr();
 	Transform3D rMt = rMpr * prMt;
-	//Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
-	Vector3D p_r = rMt.coord(Vector3D(0, 0, 0));
+	Vector3D p_r = rMt.coord(Vector3D(0, 0, mTool->getTooltipOffset()));
 
 	mPickedPoint = p_r;
 	if (mGraphicalPoint)
