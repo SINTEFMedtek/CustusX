@@ -104,8 +104,12 @@ Not working on Windows.
 \addindex tool_properties_widget
 Tool Properties {#property_widgets_tool}
 ===========================================================
-TBD
+Tool offset: A virtual offset along the tool's local z axis.
 
+Tool matrix: The transformation matrix between the tool tip and the selected space.
+Change the matrix to move and/or orient the tool. Tool offset is not applied to the matrix.
+
+See \ref coordinate_systems_specific_spaces for more information on coordinate systems.
 
 
 \addindex tool_manager_widget

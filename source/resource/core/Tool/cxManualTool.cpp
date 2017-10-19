@@ -97,7 +97,7 @@ std::set<Tool::Type> ManualTool::getTypes() const
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 {
-	this->update3DCrossHair(0);
+	this->update3DCrossHair(this->getTooltipOffset());
 	return mCrossHair->GetOutput();
 }
 
