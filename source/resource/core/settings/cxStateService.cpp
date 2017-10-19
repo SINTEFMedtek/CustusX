@@ -134,7 +134,8 @@ void StateService::fillDefaultSettings()
 
 	this->fillDefault("stillUpdateRate", 0.001);
 
-	this->fillDefault("useGPU2DRendering", true);
+	this->fillDefault("View2D/useGPU2DRendering", true);
+	this->fillDefault("View2D/useLinearInterpolationIn2DRendering", true);
 
 	this->fillDefault("optimizedViews", true);
 	this->fillDefault("smartRender", true);

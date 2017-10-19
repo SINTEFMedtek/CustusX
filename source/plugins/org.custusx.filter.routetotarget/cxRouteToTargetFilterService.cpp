@@ -53,6 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxLog.h"
 
+#include <vtkPolyData.h>
+
 
 namespace cx
 {
@@ -148,6 +150,10 @@ bool RouteToTargetFilter::execute()
 
     //note: mOutput is in reference space
     mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate_r);
+
+	if(mOutput->GetNumberOfPoints() < 1)
+		return false;
+
     mExtendedRoute = mRouteToTarget->findExtendedRoute(targetCoordinate_r);
 
 	return true;

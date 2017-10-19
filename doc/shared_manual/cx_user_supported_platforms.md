@@ -3,17 +3,24 @@ Supported Platforms {#supported_platforms}
 
 CustusX is built continously on the following platforms:
 
-| Name                    | Description
-| ----------------------- | -----------------------------
-| MacOSX 10.8             | iMac
-| Ubuntu 14.04            | NVidia GPU 
-| Ubuntu 14.04            | AMD Radeon GPU
-| Windows8                | AMD Radeon GPU
+| Name                      | Description
+| ------------------------- | -----------------------------
+| MacOSX 10.11 (El Capitan) | Mac Pro
+| Ubuntu 14.04              | NVidia GPU
+| Windows 10                | NVidia GPU
 
 In addition, CustusX has been known to work on
 
 | Name                    | Description
 | ----------------------- | -----------------------------
 | MacOSX 10.9             | Problems detected when using NVidia cards (GPU-3D-rendering only)
-| Fedora 21               | Reported to work without problems.
-| Windows7                | Not tested lately.
+| Fedora 21               | Not tested lately.
+| Windows 7               | Not tested lately.
+| Windows 8               | Not tested lately.
+| Windows 10              | Only the development branch<sup>1</sup>
+| MacOSX 10.12 (Sierra)   | Only the development branch<sup>1</sup>
+| Ubuntu 16.04            | Only the development branch<sup>1</sup>
+
+<sup>1</sup> Checkout the development branch before running the cxInstaller script:
+
+    git checkout develop

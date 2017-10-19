@@ -437,14 +437,14 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
 	ToolRep3DPtr activeRep3D = RepContainer(mView->getReps()).findFirst<ToolRep3D>(tool);
 	if (activeRep3D)
 	{
-		if (activeRep3D->getTracer()->isRunning())
+		if(checked)
+		{
+			activeRep3D->getTracer()->start();
+		}
+		else if(!checked)
 		{
 			activeRep3D->getTracer()->stop();
 			activeRep3D->getTracer()->clear();
-		}
-		else
-		{
-			activeRep3D->getTracer()->start();
 		}
 	}
 
