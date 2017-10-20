@@ -137,26 +137,26 @@ TEST_CASE("ProbeDefinitionFromStringMessages require valid parameters", "[plugin
 			probeDefinitionFromStringMessages->initWithValidParameters();
 			REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
 			probeDefinitionFromStringMessages->parseValue("ProbeType", "5");
-			INFO("ProbeType");
+			INFO("ProbeType: " + string_cast(probeDefinitionFromStringMessages->getSectorInfo()->mProbeType));
 			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
 		}
 		{
 			probeDefinitionFromStringMessages->initWithValidParameters();
 			REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
 			probeDefinitionFromStringMessages->parseValue("Origin", "0 0");//Should have 3 values
-			INFO("Origin");
+			INFO("Origin: " + stringFromDoubleVector(probeDefinitionFromStringMessages->getSectorInfo()->mOrigin));
 			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
 		}
 		{
 			probeDefinitionFromStringMessages->initWithValidParameters();
 			probeDefinitionFromStringMessages->parseValue("Angles", "0");//Should have 2 or 4 values
-			INFO("Angles");
+			INFO("Angles: " + stringFromDoubleVector(probeDefinitionFromStringMessages->getSectorInfo()->mAngles));
 			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
 		}
 		{
 			probeDefinitionFromStringMessages->initWithValidParameters();
 			probeDefinitionFromStringMessages->parseValue("BouningBox", "0 0");//Should have 4 or 6 values
-			INFO("BouningBox");
+			INFO("BouningBox: " + stringFromDoubleVector(probeDefinitionFromStringMessages->getSectorInfo()->mBouningBox));
 			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
 		}
 		{
