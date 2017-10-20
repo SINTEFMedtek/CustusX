@@ -77,7 +77,7 @@ QString stringFromDoubleVector(std::vector<double> vec, QString separator = " ")
 }
 
 
-TEST_CASE("ProbeDefinitionFromStringMessages init", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("ProbeDefinitionFromStringMessages init", "[plugins][org.custusx.core.openigtlink3][plus][unit]")
 {
     cx::ProbeDefinitionFromStringMessagesPtr probeDefinitionFromStringMessages;
     probeDefinitionFromStringMessages.reset(new cx::ProbeDefinitionFromStringMessages);
@@ -86,7 +86,7 @@ TEST_CASE("ProbeDefinitionFromStringMessages init", "[plugins][org.custusx.core.
     REQUIRE_FALSE(probeDefinitionFromStringMessages->createProbeDefintion("testProbeDefinition"));
 }
 
-TEST_CASE("ProbeDefinitionFromStringMessages set/get values", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("ProbeDefinitionFromStringMessages set/get values", "[plugins][org.custusx.core.openigtlink3][plus][unit]")
 {
     ProbeDefinitionFromStringMessagesTestPtr probeDefinitionFromStringMessages;
     probeDefinitionFromStringMessages.reset(new ProbeDefinitionFromStringMessagesTest);
@@ -102,7 +102,7 @@ TEST_CASE("ProbeDefinitionFromStringMessages set/get values", "[plugins][org.cus
     REQUIRE_FALSE(probeDefinitionFromStringMessages->createProbeDefintion("testProbeDefinition"));
 }
 
-TEST_CASE("ProbeDefinitionFromStringMessages create ProbeDefinition", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("ProbeDefinitionFromStringMessages create ProbeDefinition", "[plugins][org.custusx.core.openigtlink3][plus][unit]")
 {
     ProbeDefinitionFromStringMessagesTestPtr probeDefinitionFromStringMessages;
     probeDefinitionFromStringMessages.reset(new ProbeDefinitionFromStringMessagesTest);
@@ -128,7 +128,7 @@ TEST_CASE("ProbeDefinitionFromStringMessages create ProbeDefinition", "[plugins]
     REQUIRE(probeDefinitionFromStringMessages->createProbeDefintion("testProbeDefinition"));
 }
 
-TEST_CASE("ProbeDefinitionFromStringMessages require valid parameters", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("ProbeDefinitionFromStringMessages require valid parameters", "[plugins][org.custusx.core.openigtlink3][plus][unit]")
 {
 		ProbeDefinitionFromStringMessagesTestPtr probeDefinitionFromStringMessages;
 		probeDefinitionFromStringMessages.reset(new ProbeDefinitionFromStringMessagesTest);
@@ -136,7 +136,7 @@ TEST_CASE("ProbeDefinitionFromStringMessages require valid parameters", "[plugin
 		{
 			probeDefinitionFromStringMessages->initWithValidParameters();
 			REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
-			probeDefinitionFromStringMessages->parseValue("ProbeType", "5");
+			probeDefinitionFromStringMessages->parseValue("ProbeType", "5");//Should be 1 or 2
 			INFO("ProbeType: " + string_cast(probeDefinitionFromStringMessages->getSectorInfo()->mProbeType));
 			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
 		}
@@ -180,7 +180,6 @@ TEST_CASE("ProbeDefinitionFromStringMessages require valid parameters", "[plugin
 			INFO("SpacingX: " + string_cast(probeDefinitionFromStringMessages->getSectorInfo()->mSpacingX));
 			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
 		}
-
 		{
 			probeDefinitionFromStringMessages->initWithValidParameters();
 			probeDefinitionFromStringMessages->parseValue("SpacingY", "test");//Should be between 0 and SectorInfo::toolarge (100000)
