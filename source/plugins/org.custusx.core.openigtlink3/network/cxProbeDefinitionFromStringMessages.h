@@ -45,10 +45,11 @@ namespace cx
 
 typedef boost::shared_ptr<struct SectorInfo> SectorInfoPtr;
 
-const int tooLarge = 100000;
 
 struct SectorInfo
 {
+	const int tooLarge = 100000;
+
 	int mProbeType; //0 = unknown, 1 = sector, 2 = linear
 
 	ImagePtr mImage;

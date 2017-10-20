@@ -33,19 +33,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxProbeDefinitionFromStringMessages.h"
 #include "cxtestUtilities.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {
-
 typedef boost::shared_ptr<class ProbeDefinitionFromStringMessagesTest> ProbeDefinitionFromStringMessagesTestPtr;
+
 class ProbeDefinitionFromStringMessagesTest : public cx::ProbeDefinitionFromStringMessages
 {
 public:
-    cx::SectorInfoPtr getSectorInfo()
-    {
-        return mSectorInfo;
-    }
+		cx::SectorInfoPtr getSectorInfo()
+		{
+				return mSectorInfo;
+		}
+
+void initWithValidParameters()
+{
+	cx::ImagePtr image = cxtest::Utilities::create3DImage();
+	this->setImage(image);
+	this->parseValue("ProbeType", "1");
+	this->parseValue("Origin", "0.0 0.0 0.0");
+	this->parseValue("Angles", "0.0 0.0");
+	this->parseValue("BouningBox", "0 30 0 50");
+	this->parseValue("Depths", "10 30");
+	this->parseValue("LinearWidth", "30");
+	this->parseValue("SpacingX", "0.5");
+	this->parseValue("SpacingY", "0.5");
+}
+
 };
+
+QString stringFromDoubleVector(std::vector<double> vec, QString separator = " ")
+{
+	QString retval;
+
+	for(int i = 0; i < vec.size(); ++i)
+	{
+		retval += QString("%1").arg(vec[i]);
+		if(i != vec.size() - 1)
+			retval += separator;
+	}
+	return retval;
+}
+
 
 TEST_CASE("ProbeDefinitionFromStringMessages init", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
@@ -96,6 +126,67 @@ TEST_CASE("ProbeDefinitionFromStringMessages create ProbeDefinition", "[plugins]
     REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
 
     REQUIRE(probeDefinitionFromStringMessages->createProbeDefintion("testProbeDefinition"));
+}
+
+TEST_CASE("ProbeDefinitionFromStringMessages require valid parameters", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+		ProbeDefinitionFromStringMessagesTestPtr probeDefinitionFromStringMessages;
+		probeDefinitionFromStringMessages.reset(new ProbeDefinitionFromStringMessagesTest);
+
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
+			probeDefinitionFromStringMessages->parseValue("ProbeType", "5");
+			INFO("ProbeType");
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
+			probeDefinitionFromStringMessages->parseValue("Origin", "0 0");//Should have 3 values
+			INFO("Origin");
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			probeDefinitionFromStringMessages->parseValue("Angles", "0");//Should have 2 or 4 values
+			INFO("Angles");
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			probeDefinitionFromStringMessages->parseValue("BouningBox", "0 0");//Should have 4 or 6 values
+			INFO("BouningBox");
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			probeDefinitionFromStringMessages->parseValue("Depths", "0");//Should have 2 values
+			INFO("Depths: " + stringFromDoubleVector(probeDefinitionFromStringMessages->getSectorInfo()->mDepths));
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			probeDefinitionFromStringMessages->parseValue("LinearWidth", "1000000");//Only checked to linear probes (ProbeType==2), Should be less than SectorInfo::toolarge (100000)
+			INFO("LinearWidth: " + string_cast(probeDefinitionFromStringMessages->getSectorInfo()->mLinearWidth));
+			probeDefinitionFromStringMessages->parseValue("ProbeType", "1");
+			CHECK(probeDefinitionFromStringMessages->haveValidValues());
+			probeDefinitionFromStringMessages->parseValue("ProbeType", "2");
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			probeDefinitionFromStringMessages->parseValue("SpacingX", "0");//Should be between 0 and SectorInfo::toolarge (100000)
+			INFO("SpacingX: " + string_cast(probeDefinitionFromStringMessages->getSectorInfo()->mSpacingX));
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
+
+		{
+			probeDefinitionFromStringMessages->initWithValidParameters();
+			probeDefinitionFromStringMessages->parseValue("SpacingY", "test");//Should be between 0 and SectorInfo::toolarge (100000)
+			INFO("SpacingY: " + string_cast(probeDefinitionFromStringMessages->getSectorInfo()->mSpacingY));
+			CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		}
 }
 
 }//cxtest
