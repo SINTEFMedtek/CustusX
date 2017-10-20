@@ -45,10 +45,6 @@ public:
     {
         return mSectorInfo;
     }
-    bool getTestMode()
-    {
-        return mTestMode;
-    }
 };
 
 TEST_CASE("ProbeDefinitionFromStringMessages init", "[plugins][org.custusx.core.openigtlink3][unit]")
@@ -68,10 +64,10 @@ TEST_CASE("ProbeDefinitionFromStringMessages set/get values", "[plugins][org.cus
     cx::SectorInfoPtr sectorInfo = probeDefinitionFromStringMessages->getSectorInfo();
 
     probeDefinitionFromStringMessages->parseValue("ProbeType", "1");
-    probeDefinitionFromStringMessages->parseValue("StartDepth", "10");
+		probeDefinitionFromStringMessages->parseValue("LinearWidth", "10");
 
     REQUIRE(sectorInfo->mProbeType == 1);
-    REQUIRE(cx::similar(sectorInfo->mStartDepth, 10.0));
+		REQUIRE(cx::similar(sectorInfo->mLinearWidth, 10.0));
 
     REQUIRE_FALSE(probeDefinitionFromStringMessages->createProbeDefintion("testProbeDefinition"));
 }
@@ -83,39 +79,21 @@ TEST_CASE("ProbeDefinitionFromStringMessages create ProbeDefinition", "[plugins]
 
 //    cx::SectorInfoPtr sectorInfo = probeDefinitionFromStringMessages->getSectorInfo();
 
-	cx::ImagePtr image = Utilities::create3DImage();
-	probeDefinitionFromStringMessages->setImage(image);
+		cx::ImagePtr image = Utilities::create3DImage();
+		probeDefinitionFromStringMessages->setImage(image);
 
     probeDefinitionFromStringMessages->parseValue("ProbeType", "1");
-    probeDefinitionFromStringMessages->parseValue("StartDepth", "10");
-    probeDefinitionFromStringMessages->parseValue("StopDepth", "110");
-    probeDefinitionFromStringMessages->parseValue("StartLineX", "30");
-    probeDefinitionFromStringMessages->parseValue("StartLineY", "30");
-    probeDefinitionFromStringMessages->parseValue("StopLineX", "300");
-    probeDefinitionFromStringMessages->parseValue("StopLineY", "30");
-    probeDefinitionFromStringMessages->parseValue("StartLineAngle", "1.0");
-    probeDefinitionFromStringMessages->parseValue("StopLineAngle", "1.5");
+		CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		probeDefinitionFromStringMessages->parseValue("Origin", "0.0 0.0 0.0");
+		probeDefinitionFromStringMessages->parseValue("Angles", "0.0 0.0");
+		probeDefinitionFromStringMessages->parseValue("BouningBox", "0 30 0 50");
+		probeDefinitionFromStringMessages->parseValue("Depths", "10 30");
+		probeDefinitionFromStringMessages->parseValue("LinearWidth", "30");
     probeDefinitionFromStringMessages->parseValue("SpacingX", "0.5");
-    probeDefinitionFromStringMessages->parseValue("SpacingY", "0.5");
-
-    CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
-
-    probeDefinitionFromStringMessages->parseValue("SectorLeftPixels", "10");
-    probeDefinitionFromStringMessages->parseValue("SectorRightPixels", "500");
-    probeDefinitionFromStringMessages->parseValue("SectorTopPixels", "10");
-    probeDefinitionFromStringMessages->parseValue("SectorBottomPixels", "300");
-
-    CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
-
-    probeDefinitionFromStringMessages->parseValue("SectorLeftMm", "-10");
-    probeDefinitionFromStringMessages->parseValue("SectorRightMm", "10");
-    probeDefinitionFromStringMessages->parseValue("SectorTopMm", "30");
-    CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
-    probeDefinitionFromStringMessages->parseValue("SectorBottomMm", "0");
+		CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
+		probeDefinitionFromStringMessages->parseValue("SpacingY", "0.5");
 
     REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
-
-    REQUIRE_FALSE(probeDefinitionFromStringMessages->getTestMode());
 
     REQUIRE(probeDefinitionFromStringMessages->createProbeDefintion("testProbeDefinition"));
 }

@@ -51,29 +51,13 @@ struct SectorInfo
 {
 	int mProbeType; //0 = unknown, 1 = sector, 2 = linear
 
-	//Old values - to be removed
-	double mStartDepth;
-	double mStopDepth;
-	double mStartLineX;
-	double mStartLineY;
-	double mStopLineX;
-	double mStopLineY;
-	double mStartLineAngle;
-	double mStopLineAngle;
-	double mSpacingX;
-	double mSpacingY;
-	int mSectorLeftPixels;
-	int mSectorRightPixels;
-	int mSectorTopPixels;
-	int mSectorBottomPixels;
-	double mSectorLeftMm;
-	double mSectorRightMm;
-	double mSectorTopMm;
-	double mSectorBottomMm;
 	ImagePtr mImage;
 
+	//Spacing are sent as separate messages, should be sent with image in the future.
+	double mSpacingX;
+	double mSpacingY;
+
 	//new standard
-	bool mNewStandard;
 	std::vector<double> mOrigin;
 	std::vector<double> mAngles;
 	std::vector<double> mBouningBox;
@@ -92,36 +76,21 @@ struct SectorInfo
 		mProbeType = tooLarge;
 
 		//new standard
-		mNewStandard = false;
 		mOrigin.clear();
 		mAngles.clear();
 		mBouningBox.clear();
 		mDepths.clear();
 		mLinearWidth = tooLarge;
 
-		mStartDepth = tooLarge;
-		mStopDepth = tooLarge;
-		mStartLineX = tooLarge;
-		mStartLineY = tooLarge;
-		mStopLineX = tooLarge;
-		mStopLineY = tooLarge;
-		mStartLineAngle = tooLarge;
-		mStopLineAngle = tooLarge;
 		mSpacingX = tooLarge;
 		mSpacingY = tooLarge;
-		mSectorLeftPixels = tooLarge;
-		mSectorRightPixels = tooLarge;
-		mSectorTopPixels = tooLarge;
-		mSectorBottomPixels = tooLarge;
-		mSectorLeftMm = tooLarge;
-		mSectorRightMm = tooLarge;
-		mSectorTopMm = tooLarge;
-		mSectorBottomMm = tooLarge;
+
 		mImage = ImagePtr();
 	}
-	bool standardIsValid()
+	bool isValid()
 	{
 		bool retval = true;
+		retval = retval && mImage;
 		retval = retval && ((mProbeType == 1) || (mProbeType == 2));
 		retval = retval && (mOrigin.size() == 3);
 		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
@@ -144,56 +113,6 @@ struct SectorInfo
 		return mHaveChanged;
 	}
 
-	bool isValid()
-	{
-		if (mNewStandard)
-			return standardIsValid();
-
-		bool retval = true;
-		retval = retval && mImage;
-//		return retval;//test
-		retval = retval && ((mProbeType == 1) || (mProbeType == 2));
-		retval = retval && (mStopDepth < tooLarge);
-		retval = retval && (mStartDepth < tooLarge);
-		retval = retval && !similar(mStopDepth - mStartDepth, 0);
-
-		retval = retval && (mStartLineX < tooLarge);
-		retval = retval && (mStopLineX < tooLarge);
-		retval = retval && (mStartLineY < tooLarge);
-		retval = retval && (mStopLineY < tooLarge);
-		retval = retval && !similar(fabs(mStartLineX - mStopLineX), 0);
-
-		retval = retval && (mStartLineAngle < tooLarge);
-		retval = retval && (mStopLineAngle < tooLarge);
-		retval = retval && !similar(fabs(mStopLineAngle - mStartLineAngle), 0);
-
-		retval = retval && (mSpacingX < tooLarge);
-		retval = retval && (mSpacingY < tooLarge);
-		retval = retval && !similar(mSpacingX, 0);
-		retval = retval && !similar(mSpacingY, 0);
-
-		retval = retval && (mSectorRightPixels < tooLarge);
-		retval = retval && (mSectorLeftPixels < tooLarge);
-		retval = retval && (mSectorTopPixels < tooLarge);
-		retval = retval && (mSectorBottomPixels < tooLarge);
-		retval = retval && (mSectorRightPixels - mSectorLeftPixels != 0);
-		retval = retval && (mSectorTopPixels - mSectorBottomPixels != 0);
-
-		retval = retval && (mSectorRightMm < tooLarge);
-		retval = retval && (mSectorLeftMm < tooLarge);
-		retval = retval && (mSectorTopMm < tooLarge);
-		retval = retval && (mSectorBottomMm < tooLarge);
-		retval = retval && !similar(mSectorRightMm - mSectorLeftMm, 0);
-		retval = retval && !similar(mSectorTopMm - mSectorBottomMm, 0);
-		/*if(mProbeType == 0)//sector
-		{
-			retval = retval && (mStopLineAngle < tooLarge);
-			retval = retval && (mStartLineAngle < tooLarge);
-			retval = retval && !similar(fabs(mStopLineAngle - mStartLineAngle), 0);
-		}*/
-
-		return retval;
-	}
 };
 
 typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
@@ -212,7 +131,6 @@ public:
 	void setImage(ImagePtr image);
 	bool haveValidValues();
 	bool haveChanged();
-	ProbeDefinitionPtr createProbeDefintionFromStandardValues(QString uid);
 	ProbeDefinitionPtr createProbeDefintion(QString uid);
 
 	void parseValue(QString name, QString value);
@@ -220,7 +138,6 @@ public:
 protected:
 	ProbeDefinitionPtr mProbeDefinition;
 	SectorInfoPtr mSectorInfo;
-	bool mTestMode;
 
 private:
 	std::vector<double> toDoubleVector(QString values, QString separator = QString(" "));
