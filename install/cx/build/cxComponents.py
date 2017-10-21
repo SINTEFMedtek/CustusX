@@ -501,7 +501,7 @@ class FAST(CppComponent):
         return self.buildPath()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.airways:BOOL', ON);
+        add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
 # ---------------------------------------------------------
 
 class CustusXData(CppComponent):
