@@ -79,8 +79,8 @@ QString RouteToTargetFilter::getHelp() const
 {
 	return "<html>"
 			"<h3>Route to target.</h3>"
-			"<p>Calculates the route to a selected target in navigated bronchocopy."
-			"The rout starts at the top of trachea and ends at the most adjacent airway centerline"
+			"<p>Calculates the route to a selected target in navigated bronchocopy. "
+			"The route starts at the top of trachea and ends at the most adjacent airway centerline"
 			"from the target.</p>"
            "</html>";
 }
@@ -105,28 +105,31 @@ void RouteToTargetFilter::createInputTypes()
 {
 	StringPropertySelectMeshPtr centerline;
 	centerline = StringPropertySelectMesh::New(mServices->patient());
-	centerline->setValueName("Centerline");
-	centerline->setHelp("Select centerline");
+	centerline->setValueName("Airways centerline");
+	centerline->setHelp("Select airways centerline");
 	mInputTypes.push_back(centerline);
 
 	StringPropertySelectPointMetricPtr targetPoint;
 	targetPoint = StringPropertySelectPointMetric::New(mServices->patient());
 	targetPoint->setValueName("Target point");
-	targetPoint->setHelp("Select point metric input");
+	targetPoint->setHelp("Select target point metric");
 	mInputTypes.push_back(targetPoint);
 
 }
 
 void RouteToTargetFilter::createOutputTypes()
 {
+	StringPropertySelectMeshPtr tempRTTMeshStringAdapter;
+	tempRTTMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempRTTMeshStringAdapter->setValueName("Route to target mesh");
+	tempRTTMeshStringAdapter->setHelp("Generated route to target mesh (vtk-format).");
+	mOutputTypes.push_back(tempRTTMeshStringAdapter);
 
-	StringPropertySelectMeshPtr tempMeshStringAdapter;
-
-	tempMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-	tempMeshStringAdapter->setValueName("Centerline mesh");
-	tempMeshStringAdapter->setHelp("Generated route to target mesh (vtk-format).");
-	mOutputTypes.push_back(tempMeshStringAdapter);
-
+	StringPropertySelectMeshPtr tempRTTEXTMeshStringAdapter;
+	tempRTTEXTMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempRTTEXTMeshStringAdapter->setValueName("Route to target extended mesh");
+	tempRTTEXTMeshStringAdapter->setHelp("Generated route to target extended mesh (vtk-format).");
+	mOutputTypes.push_back(tempRTTEXTMeshStringAdapter);
 }
 
 
@@ -194,7 +197,11 @@ bool RouteToTargetFilter::postProcess()
 
 	mServices->view()->autoShowData(outputCenterline);
 
-	mOutputTypes[0]->setValue(outputCenterline->getUid());
+	if(mOutputTypes.size() > 0)
+		mOutputTypes[0]->setValue(outputCenterline->getUid());
+	if(mOutputTypes.size() > 1)
+		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
+
 
 	return true;
 }
