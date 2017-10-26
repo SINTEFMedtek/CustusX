@@ -173,7 +173,7 @@ void StatusBar::updateToolButtons()
 			current.mAction->setToolTip("Tool is not Initialized");
 		else if (activeTool == tool)
 			current.mAction->setToolTip("Active Tool");
-		else if (tool->getVisible())
+        else if (!tool->getVisible())
 			current.mAction->setToolTip("Tool not visible/not tracking");
 		else
 			current.mAction->setToolTip("Tool visible. Press to set as active");

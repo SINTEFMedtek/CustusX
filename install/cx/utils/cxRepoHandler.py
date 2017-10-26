@@ -12,6 +12,9 @@ import subprocess
 import pprint
 import argparse
 
+def returnCode():
+    return 0
+
 def runShell(cmd, path):
     '''
     simple shell implementation.
@@ -21,12 +24,16 @@ def runShell(cmd, path):
     if not os.path.exists(path):
         os.makedirs(path)
     print '[shell cmd] %s [%s]' % (cmd, path)
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, cwd=path)
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path)
     out, err = p.communicate("") # wait for process to complete
+    if err:
+        print err.strip()
     if out:
         print out.strip()
     if p.returncode == 0:
         return out.strip()
+    if "error: The following untracked working tree files would be overwritten" in err:
+        return returnCode()
     return None
 
 def getBranchForRepo(path, fallback=None):
@@ -114,14 +121,26 @@ class RepoHandler:
         
         for branch in branches:
             result = runShell('git checkout %s' % branch, self.repo_path)
+            self.checkSuccess(result)
             if result is not None:
-                runShell('git pull origin %s' % branch, self.repo_path)
+                result = runShell('git pull origin %s' % branch, self.repo_path)
+                self.checkSuccess(result)
                 break
-                    
-#        for branch in branches:
-#            if runShell('git pull origin %s' % branch, self.repo_path):
-#                break
-            
+
+    def checkSuccess(self, gitResult):
+        if gitResult is returnCode():
+            print '----------------------------------------------------------------------------'
+            print '|                                     ^                                    |'
+            print '| Delete the folder containing these files and the CustusX build folder.   |'
+            print '----------------------------------------------------------------------------'
+            print '===== Your local file structure of CustusX is not in synch with the file structure on the server ==='
+            print 'This is e.g. because a plugin have been moved from one repository to another on the server.'
+            print 'Take a backup first if you have been working with the files.'
+            print 'To come in sync:'
+            print '- delete the folder containing the above mentioned files and the CustusX build folder.'
+            print '- run the script again.'
+            sys.exit(1)
+
     def cleanBranchList(self, branches):
         retval = []
         for branch in branches:
