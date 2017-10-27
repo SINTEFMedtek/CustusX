@@ -491,6 +491,15 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	if(CX_LINUX)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
 		SET(INSTALL_QTCONF_DIR "${INSTALL_BINARY_DIR}")
+
+		# Install .so and versioned .so.x.y
+		get_filename_component(QT_LIB_DIR_tmp ${QT_${qtlib}_LIBRARY_RELEASE} PATH)
+		get_filename_component(QT_LIB_NAME_tmp ${QT_${qtlib}_LIBRARY_RELEASE} NAME)
+		install(DIRECTORY ${QT_LIBS_DIR}/
+			DESTINATION ${INSTALL_BINARY_DIR} COMPONENT Runtime
+			FILES_MATCHING PATTERN "*Qt5*"
+			PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
+
 	endif()
 	if(CX_WINDOWS)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
@@ -516,6 +525,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	)
 
 	message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
+	message(STATUS "QT_LIBS_DIR: " ${QT_LIBS_DIR})
 
 	# install runtime plugins
         set(CX_PLUGIN_DIR "/plugins")
