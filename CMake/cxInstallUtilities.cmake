@@ -495,8 +495,11 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
                 # Install .so and versioned .so.x.y
 		install(DIRECTORY ${QT_LIBS_DIR}/
 			DESTINATION ${INSTALL_BINARY_DIR} COMPONENT Runtime
-			FILES_MATCHING PATTERN "*Qt5*"
-			PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
+			FILES_MATCHING PATTERN "*.so*"
+			PATTERN "gbm/*" EXCLUDE
+			PATTERN "libc.so" EXCLUDE
+			PATTERN "libpthread.so" EXCLUDE
+			PATTERN "qtcreator/*" EXCLUDE)
 
 	endif()
 	if(CX_WINDOWS)
