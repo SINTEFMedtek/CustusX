@@ -501,7 +501,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
     #	PATTERN "libpthread.so" EXCLUDE
     #	PATTERN "qtcreator/*" EXCLUDE)
 
-    file(GLOB_RECURSE INSTALL_FILE_LIST
+    file(GLOB INSTALL_FILE_LIST
       LIST_DIRECTORIES false
       "${QT_LIBS_DIR}/*xcb*"
       "${QT_LIBS_DIR}/libfontconfig.*"
