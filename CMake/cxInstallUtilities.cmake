@@ -518,7 +518,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
      "${QT_LIBS_DIR}/*.a"
       )
 
-    list(REMOVE_ITEM ${REMOVE_FILE_LIST} ${INSTALL_FILE_LIST})
+    list(REMOVE_ITEM INSTALL_FILE_LIST ${REMOVE_FILE_LIST} )
 
     install(FILES
       ${INSTALL_FILE_LIST}
