@@ -492,15 +492,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
 		SET(INSTALL_QTCONF_DIR "${INSTALL_BINARY_DIR}")
 
-                # Install .so and versioned .so.x.y
-    #install(DIRECTORY ${QT_LIBS_DIR}/
-    #	DESTINATION ${INSTALL_BINARY_DIR} COMPONENT Runtime
-    #	FILES_MATCHING PATTERN "*.so*"
-    #	PATTERN "gbm/*" EXCLUDE
-    #	PATTERN "libc.so" EXCLUDE
-    #	PATTERN "libpthread.so" EXCLUDE
-    #	PATTERN "qtcreator/*" EXCLUDE)
-
+    # Install .so and versioned .so.x.y
     file(GLOB INSTALL_FILE_LIST
       LIST_DIRECTORIES false
       "${QT_LIBS_DIR}/*xcb*"
@@ -513,7 +505,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
       "${QT_LIBS_DIR}/libXrender.*"
       "${QT_LIBS_DIR}/libSM.*"
       "${QT_LIBS_DIR}/libICE.*"
-#      "${QT_LIBS_DIR}/libglib-2.0.*"
       "${QT_LIBS_DIR}/libQt*"
       "${QT_LIBS_DIR}/libicui18n.*"
       "${QT_LIBS_DIR}/libicuuc.*"
@@ -522,9 +513,16 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
       "${QT_LIBS_DIR}/*-qt5*"
     )
 
+    file(GLOB REMOVE_FILE_LIST
+      LIST_DIRECTORIES false
+     "${QT_LIBS_DIR}/*.a"
+      )
+
+    list(REMOVE_ITEM ${REMOVE_FILE_LIST} ${INSTALL_FILE_LIST})
+
     install(FILES
-        ${INSTALL_FILE_LIST}
-        DESTINATION ${INSTALL_BINARY_DIR}/)
+      ${INSTALL_FILE_LIST}
+      DESTINATION ${INSTALL_BINARY_DIR}/)
 
 	endif()
 	if(CX_WINDOWS)
