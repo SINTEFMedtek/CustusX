@@ -516,7 +516,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 #      "${QT_LIBS_DIR}/libglib-2.0.*"
       "${QT_LIBS_DIR}/libQt*"
       "${QT_LIBS_DIR}/libicui18n.*"
-      "${QT_LIBS_DIR}/libicuuc.*
+      "${QT_LIBS_DIR}/libicuuc.*"
       "${QT_LIBS_DIR}/libicudata.*"
       "${QT_LIBS_DIR}/libOpenCL.*"
       "${QT_LIBS_DIR}/*-qt5*"
