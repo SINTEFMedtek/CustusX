@@ -511,6 +511,8 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
       "${QT_LIBS_DIR}/libicudata.*"
       "${QT_LIBS_DIR}/libOpenCL.*"
       "${QT_LIBS_DIR}/*-qt5*"
+      "${QT_LIBS_DIR}/libpcre16.*"
+      "${QT_LIBS_DIR}/libstdc++.*"
     )
 
     file(GLOB REMOVE_FILE_LIST
