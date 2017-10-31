@@ -347,7 +347,7 @@ class OpenIGTLinkIO(CppComponent):
         return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'#Temporary test, code needs to be pull requested to IGSIO
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('d6542d3f6b0bb2ab48c63f5df30cc96db75b3b47')
+        self._getBuilder().gitCheckout('ed57d94dd728a562c941bca70df14e060a17b777')
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
