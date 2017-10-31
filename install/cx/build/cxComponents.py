@@ -470,7 +470,7 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-		return 'git@github.com:smistad/FAST'
+        return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckout('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
