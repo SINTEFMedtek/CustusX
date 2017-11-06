@@ -193,7 +193,7 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
     int numberOfActiveLandmarks;
     if(this->isAverageAccuracyValid(numberOfActiveLandmarks))
     {
-        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm, caclulated in %2 landmarks").
+        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm, calculated in %2 landmarks").
                                        arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2).arg(numberOfActiveLandmarks));
         mAvarageAccuracyLabel->setToolTip(QString("Root Mean Square landmark accuracy from target [%1] to fixed [%2].").
                                           arg(movingName).arg(fixedName));
