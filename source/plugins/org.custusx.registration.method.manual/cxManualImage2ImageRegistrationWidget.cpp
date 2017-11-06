@@ -191,10 +191,10 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
         movingName = movingData->getName();
 
     int numberOfActiveLandmarks;
-    if(this->isAverageAccuracyValid())
+    if(this->isAverageAccuracyValid(numberOfActiveLandmarks))
     {
-        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm").
-                                       arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2));
+        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm, caclulated in %2 landmarks").
+                                       arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2).arg(numberOfActiveLandmarks));
         mAvarageAccuracyLabel->setToolTip(QString("Root Mean Square landmark accuracy from target [%1] to fixed [%2].").
                                           arg(movingName).arg(fixedName));
     }
@@ -205,11 +205,11 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
     }
 }
 
-bool    ManualImage2ImageRegistrationWidget::isAverageAccuracyValid()
+bool    ManualImage2ImageRegistrationWidget::isAverageAccuracyValid(int& numberOfActiveLandmarks)
 {
     int numActiveLandmarks = 0;
     this->getAverageAccuracy(numActiveLandmarks);
-    if(numActiveLandmarks < 3)
+    if(numActiveLandmarks < 1)
         return false;
     return true;
 }
