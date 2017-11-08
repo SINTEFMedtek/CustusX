@@ -1,7 +1,7 @@
 
 if(BUILD_TESTING)
     cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}
-        cxTestBranchHandling.cpp
+        cxtestBranchHandling.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
     set(CXTEST_SOURCES_TO_MOC
@@ -18,11 +18,6 @@ if(BUILD_TESTING)
     )
     target_link_libraries(cxtest_org_custusx_registration_method_bronchoscopy
         PRIVATE
-#        cxtestResource
-#        cxResource
-#        cxResourceFilter
-#        cxLogicManager
-#        org_custusx_filter_airways
         cxCatch
         cxtestUtilities
         org_custusx_registration_method_bronchoscopy

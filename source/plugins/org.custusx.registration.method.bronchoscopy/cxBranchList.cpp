@@ -34,7 +34,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
-#include "vtkCardinalSpline.h"
+#include <vtkCardinalSpline.h>
+
+#include "cxLogger.h"
+
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -328,6 +331,72 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
 		branches[i]->setPositions(positions);
 		branches[i]->setOrientations(orientations);
 	}
+	return retval;
+}
+
+/**
+ * @brief BranchList::createVtkPolyDataFromBranches
+ * Return a VtkPolyData object created from the
+ * branches in this object.
+ * @param fullyConnected
+ * The original version of this code created an object
+ * where there might be gaps between the end of parent
+ * and child branches. This parameter lets you make
+ * connections between the branches to fill these gaps.
+ * @return a vtkpolydata object of your branch tree.
+ */
+vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected) const
+{
+	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+	vtkPointsPtr points = vtkPointsPtr::New();
+	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
+
+	int positionCounter = 0;
+	for (size_t i = 0; i < mBranches.size(); ++i)
+	{
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+		for (int j = 0; j < positions.cols(); ++j)
+		{
+			positionCounter ++;
+			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
+			if (j	 < positions.cols()-1)
+			{
+				vtkIdType connection[2] = {positionCounter-1, positionCounter};
+				lines->InsertNextCell(2, connection);
+			}
+		}
+	}
+	if(fullyConnected)
+	{
+		CX_LOG_DEBUG() << "mBranches.size() " << mBranches.size();
+		//foreach (BranchPtr branch, mBranches)
+		int this_branchs_first_point_in_full_polydata_point_list = 0;
+		for(int i = 0; i < mBranches.size(); ++i)
+		{
+			if(i>0)
+				this_branchs_first_point_in_full_polydata_point_list += mBranches[i-1]->getPositions().cols();
+
+			CX_LOG_DEBUG() << "this_branchs_first_point_in_full_polydata_point_list " << this_branchs_first_point_in_full_polydata_point_list;
+			int parent_index_in_branch_list = mBranches[i]->findParentIndex(mBranches);
+
+			CX_LOG_DEBUG() << "parent_index_in_branch_list " << parent_index_in_branch_list;
+			if(parent_index_in_branch_list > -1)
+			{
+				int parent_branch_last_point_in_full_polydata = 0;
+				for(int j = 0; j <= parent_index_in_branch_list; ++j)
+				{
+					parent_branch_last_point_in_full_polydata += mBranches[j]->getPositions().cols() - 1;
+				}
+				vtkIdType connection[2] = {parent_branch_last_point_in_full_polydata, this_branchs_first_point_in_full_polydata_point_list};
+				lines->InsertNextCell(2, connection);
+			}
+
+		}
+
+	}
+	retval->SetPoints(points);
+	retval->SetLines(lines);
+
 	return retval;
 }
 

@@ -90,6 +90,27 @@ BranchPtr Branch::getParentBranch()
 	return mParentBranch;
 }
 
+/**
+ * @brief Branch::findParentIndex
+ * Given a vector of branches, find this branch's parent branch in that vector.
+ * Return the index in the vector of the parent branch.
+ * @param bv
+ * A vector of branches
+ * @return
+ * The index the parent branch has in the input vector.
+ * Or -1 if the parent branch is not found in the vector.
+ */
+int Branch::findParentIndex(branchVector bv) const
+{
+	for(size_t i = 0; i < bv.size(); ++i)
+	{
+		if(bv[i] == mParentBranch)
+			return static_cast<int>(i);
+	}
+
+	return -1;
+}
+
 int Branch::findGenerationNumber()
 {
     int generationNumber = 1;
