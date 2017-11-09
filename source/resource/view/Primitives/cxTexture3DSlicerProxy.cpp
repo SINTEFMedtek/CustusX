@@ -533,10 +533,10 @@ void Texture3DSlicerProxyImpl::updateAndUploadCoordinates()
 		Vector3D spacing(volume->GetSpacing());
 		DoubleBoundingBox3D imageSize(volume->GetExtent());
 
-		for (int i = 0; i < 3; ++i)
+		for (int j = 0; j < 3; ++j)
 		{
-			imageSize[2 * i] = origin[i] + spacing[i] * (imageSize[2 * i] - 0.5);
-			imageSize[2 * i + 1] = origin[i] + spacing[i] * (imageSize[2 * i + 1] + 0.5);
+			imageSize[2 * j] = origin[j] + spacing[j] * (imageSize[2 * j] - 0.5);
+			imageSize[2 * j + 1] = origin[j] + spacing[j] * (imageSize[2 * j + 1] + 0.5);
 		}
 
 		// identity bb
@@ -558,9 +558,9 @@ void Texture3DSlicerProxyImpl::updateAndUploadCoordinates()
 		plane[2] = mBB_s.corner(0, 1, 0);
 		plane[3] = mBB_s.corner(1, 1, 0);
 
-		for (unsigned i = 0; i < plane.size(); ++i)
+		for (unsigned j = 0; j < plane.size(); ++j)
 		{
-			plane[i] = nMs.coord(plane[i]);
+			plane[j] = nMs.coord(plane[j]);
 		}
 
 		if (!mTextureCoordinates)
@@ -576,9 +576,9 @@ void Texture3DSlicerProxyImpl::updateAndUploadCoordinates()
 			mPolyData->GetPointData()->AddArray(mTextureCoordinates);
 		}
 
-		for (unsigned i = 0; i < plane.size(); ++i)
+		for (unsigned j = 0; j < plane.size(); ++j)
 		{
-			mTextureCoordinates->SetTuple3(i, plane[i][0], plane[i][1], plane[i][2]);
+			mTextureCoordinates->SetTuple3(j, plane[j][0], plane[j][1], plane[j][2]);
 		}
 
 		mPolyData->Modified();
