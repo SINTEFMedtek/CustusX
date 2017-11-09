@@ -192,7 +192,7 @@ void ToolPropertiesWidget::toolPositionChanged()
 
   Transform3D prMt = mTool->get_prMt();
   CoordinateSystem space_q = mSpaceSelector->getValue();
-  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
+	CoordinateSystem space_mt = mSpaceProvider->getT(mTool);
   Transform3D qMt = mSpaceProvider->get_toMfrom(space_mt, space_q);
 
   mManualToolWidget->setMatrix(qMt);
@@ -239,7 +239,7 @@ void ToolPropertiesWidget::manualToolWidgetChanged()
 
 	Transform3D qMt = mManualToolWidget->getMatrix();
   CoordinateSystem space_q = mSpaceSelector->getValue();
-  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
+//  CoordinateSystem space_mt = mSpaceProvider->getTO(mTool);
   CoordinateSystem space_pr = mSpaceProvider->getPr();
   Transform3D qMpr = mSpaceProvider->get_toMfrom(space_pr, space_q);
   Transform3D prMt = qMpr.inv() * qMt;

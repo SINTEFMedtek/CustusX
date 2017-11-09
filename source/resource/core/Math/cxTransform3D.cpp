@@ -297,6 +297,14 @@ cxResource_EXPORT Transform3D createTransformFromReferenceToExternal(PATIENT_COO
 		return Transform3D::Identity();
 }
 
+std::string matrixAsSingleLineString(cx::Transform3D transform)
+{
+	Eigen::IOFormat singleLineFormatting(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "  |  ", "", "", "", "");
+	std::ostringstream stream;
+	stream << transform.matrix().format(singleLineFormatting);
+
+	return stream.str();
+}
 
 
 } // namespace cx
