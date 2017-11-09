@@ -190,7 +190,7 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
     if (movingData)
         movingName = movingData->getName();
 
-    int numberOfActiveLandmarks;
+    int numberOfActiveLandmarks = 0;
     if(this->isAverageAccuracyValid(numberOfActiveLandmarks))
     {
         mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm, calculated in %2 landmarks").

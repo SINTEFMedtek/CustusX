@@ -57,8 +57,21 @@ void init()
     cx::LogicManager::initialize();
 }
 
-cx::ImagePtr initImages(cx::RegistrationServicePtr regService,  cx::PatientModelServicePtr patientModel,
-                        bool withReg)
+bool checkRegistrationHistoryEmpty(cx::RegistrationServicePtr regService,
+                                   cx::PatientModelServicePtr patientModel)
+{
+    cx::DataPtr image1 = regService->getFixedData();
+    cx::DataPtr image2 = regService->getMovingData();
+    bool image1HistoryEmpty = image1->get_rMd_History()->getData().empty();
+    bool image2HistoryEmpty = image2->get_rMd_History()->getData().empty();
+    if(image1HistoryEmpty && image2HistoryEmpty)
+        return true;
+    else
+        return false;
+}
+
+void checkAndAddDummyImagesToPatient(cx::RegistrationServicePtr regService,
+                                     cx::PatientModelServicePtr patientModel)
 {
     // Test image data
     vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(4, 1);
@@ -81,83 +94,75 @@ cx::ImagePtr initImages(cx::RegistrationServicePtr regService,  cx::PatientModel
     regService->setFixedData(image1);
     regService->setMovingData(image2);
 
-    /******************************************/
-    // Setup the Services Plugin data
-    /******************************************/
-    patientModel->insertData(image1);
-    patientModel->insertData(image2);
-    regService->setFixedData(image1);
-    regService->setMovingData(image2);
-
-    // Check that registration history is empty
-    REQUIRE(image1->get_rMd_History()->getData().empty());
-    REQUIRE(image2->get_rMd_History()->getData().empty());
-
-
-    if(withReg) {
-        // Define rMd matrix and four landmarks for both volumes
-        bool ok = false;
-        /******************************/
-        // Fixed image volume - image1
-        /******************************/
-        QString rMd_1_matrix= QString("0.999998    -1.57265e-06  0.00198575  -200.936 \
-                                      -2.16633e-07     1         0.000901065  -245.095 \
-                                      -0.00198575  -0.000901064  0.999998     -664.637 \
-                                        0            0            0            1");
-
-        cx::Transform3D rMd_1 = cx::Transform3D::fromString(rMd_1_matrix, &ok);
-        REQUIRE(ok);
-        image1->get_rMd_History()->setRegistration(rMd_1);
-        int numberOfLandmarks = image1->getLandmarks()->getLandmarks().size();
-        REQUIRE(numberOfLandmarks==0);
-        // Define landmarks
-        cx::Vector3D landmark1_img1_coord(145.676, 143.279, 52.5942);
-        cx::Landmark landmark1_img1("1", landmark1_img1_coord);
-        cx::Vector3D landmark2_img1_coord(216.527, 145.428, 42.9244);
-        cx::Landmark landmark2_img1("2", landmark2_img1_coord);
-        cx::Vector3D landmark3_img1_coord(138.119, 148.355, 69.2363);
-        cx::Landmark landmark3_img1("3", landmark3_img1_coord);
-        cx::Vector3D landmark4_img1_coord(220.452, 154.114, 59.0022);
-        cx::Landmark landmark4_img1("4", landmark4_img1_coord);
-        image1->getLandmarks()->setLandmark(landmark1_img1);
-        image1->getLandmarks()->setLandmark(landmark2_img1);
-        image1->getLandmarks()->setLandmark(landmark3_img1);
-        image1->getLandmarks()->setLandmark(landmark4_img1);
-        numberOfLandmarks = image1->getLandmarks()->getLandmarks().size();
-        REQUIRE(numberOfLandmarks==4);
-
-        /******************************/
-        // Moving image volume - image2
-        /******************************/
-        QString rMd_2_matrix = QString(" 1        0        0 -149.707 \
-                                         0        1        0 -249.707 \
-                                         0        0        1  -1172.2 \
-                                         0        0        0     1");
-
-        cx::Transform3D rMd_2 = cx::Transform3D::fromString(rMd_2_matrix, &ok);
-        REQUIRE(ok);
-        image2->get_rMd_History()->setRegistration(rMd_2);
-
-        numberOfLandmarks = image2->getLandmarks()->getLandmarks().size();
-        REQUIRE(numberOfLandmarks==0);
-        // Define landmarks
-        cx::Vector3D landmark1_img2_coord(181.778, 143.559, 274.013);
-        cx::Landmark landmark1_img2("1", landmark1_img2_coord);
-        cx::Vector3D landmark2_img2_coord(111.144, 147.007, 284.916);
-        cx::Landmark landmark2_img2("2", landmark2_img2_coord);
-        cx::Vector3D landmark3_img2_coord(189.012,  149.21, 257.282);
-        cx::Landmark landmark3_img2("3", landmark3_img2_coord);
-        cx::Vector3D landmark4_img2_coord(106.915, 155.231, 268.812);
-        cx::Landmark landmark4_img2("4", landmark4_img2_coord);
-        image2->getLandmarks()->setLandmark(landmark1_img2);
-        image2->getLandmarks()->setLandmark(landmark2_img2);
-        image2->getLandmarks()->setLandmark(landmark3_img2);
-        image2->getLandmarks()->setLandmark(landmark4_img2);
-        numberOfLandmarks = image2->getLandmarks()->getLandmarks().size();
-        REQUIRE(numberOfLandmarks==4);
-    }
-    return image2;
+    REQUIRE(checkRegistrationHistoryEmpty(regService, patientModel));
 }
+
+void define_rMd_AndFourLandmarksForFixedAndMovingImages(cx::RegistrationServicePtr regService)
+{
+    cx::DataPtr image1 = regService->getFixedData();
+    cx::DataPtr image2 = regService->getMovingData();
+
+    bool ok = false;
+    /*************************/
+    // Fixed image - image1
+    /*************************/
+    QString rMd_1_matrix= QString("0.999998    -1.57265e-06  0.00198575  -200.936 \
+                                  -2.16633e-07     1         0.000901065  -245.095 \
+                                  -0.00198575  -0.000901064  0.999998     -664.637 \
+                                    0            0            0            1");
+
+    cx::Transform3D rMd_1 = cx::Transform3D::fromString(rMd_1_matrix, &ok);
+    REQUIRE(ok);
+    image1->get_rMd_History()->setRegistration(rMd_1);
+    int numberOfLandmarks = image1->getLandmarks()->getLandmarks().size();
+    REQUIRE(numberOfLandmarks==0);
+    // Define four known landmarks
+    cx::Vector3D landmark1_img1_coord(145.676, 143.279, 52.5942);
+    cx::Landmark landmark1_img1("1", landmark1_img1_coord);
+    cx::Vector3D landmark2_img1_coord(216.527, 145.428, 42.9244);
+    cx::Landmark landmark2_img1("2", landmark2_img1_coord);
+    cx::Vector3D landmark3_img1_coord(138.119, 148.355, 69.2363);
+    cx::Landmark landmark3_img1("3", landmark3_img1_coord);
+    cx::Vector3D landmark4_img1_coord(220.452, 154.114, 59.0022);
+    cx::Landmark landmark4_img1("4", landmark4_img1_coord);
+    image1->getLandmarks()->setLandmark(landmark1_img1);
+    image1->getLandmarks()->setLandmark(landmark2_img1);
+    image1->getLandmarks()->setLandmark(landmark3_img1);
+    image1->getLandmarks()->setLandmark(landmark4_img1);
+    numberOfLandmarks = image1->getLandmarks()->getLandmarks().size();
+    REQUIRE(numberOfLandmarks==4);
+
+    /**************************/
+    // Moving image - image2
+    /**************************/
+    QString rMd_2_matrix = QString(" 1        0        0 -149.707 \
+                                     0        1        0 -249.707 \
+                                     0        0        1  -1172.2 \
+                                     0        0        0     1");
+
+    cx::Transform3D rMd_2 = cx::Transform3D::fromString(rMd_2_matrix, &ok);
+    REQUIRE(ok);
+    image2->get_rMd_History()->setRegistration(rMd_2);
+
+    numberOfLandmarks = image2->getLandmarks()->getLandmarks().size();
+    REQUIRE(numberOfLandmarks==0);
+    // Define four known landmarks
+    cx::Vector3D landmark1_img2_coord(181.778, 143.559, 274.013);
+    cx::Landmark landmark1_img2("1", landmark1_img2_coord);
+    cx::Vector3D landmark2_img2_coord(111.144, 147.007, 284.916);
+    cx::Landmark landmark2_img2("2", landmark2_img2_coord);
+    cx::Vector3D landmark3_img2_coord(189.012,  149.21, 257.282);
+    cx::Landmark landmark3_img2("3", landmark3_img2_coord);
+    cx::Vector3D landmark4_img2_coord(106.915, 155.231, 268.812);
+    cx::Landmark landmark4_img2("4", landmark4_img2_coord);
+    image2->getLandmarks()->setLandmark(landmark1_img2);
+    image2->getLandmarks()->setLandmark(landmark2_img2);
+    image2->getLandmarks()->setLandmark(landmark3_img2);
+    image2->getLandmarks()->setLandmark(landmark4_img2);
+    numberOfLandmarks = image2->getLandmarks()->getLandmarks().size();
+    REQUIRE(numberOfLandmarks==4);
+}
+
 
 void shutdown()
 {
@@ -184,14 +189,14 @@ TEST_CASE("RegistrationMethodManual: Verify correct operation when registration 
     REQUIRE(patientModelService);
     REQUIRE(registrationService);
 
-    cx::ImagePtr movingImage = initImages(registrationService, patientModelService, false);
+    checkAndAddDummyImagesToPatient(registrationService, patientModelService);
 
     registrationWidgetPtr regWidget = registrationWidgetPtr(
                 new cx::ManualImage2ImageRegistrationWidget(regServices, NULL,
                                                             QString("TestregistrationWidget")));
     REQUIRE(regWidget);
 
-    // Check calculation of diff registration matrix when no previous registration exist
+    // Check registration matrix when no previous registration exist
     // should return identity
     cx::Transform3D result = regWidget->getMatrixFromBackend();
     cx::Transform3D identity = cx::Transform3D::Identity();
@@ -199,17 +204,19 @@ TEST_CASE("RegistrationMethodManual: Verify correct operation when registration 
 
     // Simulate changing GUI registration matrix input
     // Check that history is updated
+    cx::DataPtr movingImage = registrationService->getMovingData();
+
     regWidget->setMatrixFromWidget(cx::Transform3D::Identity());
     REQUIRE(movingImage->get_rMd_History()->getData().size() == 1);
 
     shutdown();
 }
 
-TEST_CASE("RegistrationMethodManual: Verify V2V registration with known Fixed and Moving image data - \
+TEST_CASE("RegistrationMethodManual: Verify Image-to-Image registration with known Fixed and Moving image data - \
 No landmarks defined",
            "[unit][plugins][org.custusx.registration.method.manual]")
 {
-    // This test recreates a volume-to-volume registration with confirmed match where we know the
+    // This test recreates an image-to-image registration with confirmed match where we know the
     // resulting fMm matrix
 
     init();
@@ -221,10 +228,10 @@ No landmarks defined",
     REQUIRE(patientModelService);
     REQUIRE(registrationService);
 
-    cx::ImagePtr movingImage = initImages(registrationService, patientModelService, true);
+    checkAndAddDummyImagesToPatient(registrationService, patientModelService);
+    define_rMd_AndFourLandmarksForFixedAndMovingImages(registrationService);
 
     bool ok = false;
-
 
     /************************************************************************/
     // Setup the image2image registration with known transformation matrix
@@ -242,7 +249,7 @@ No landmarks defined",
                                                             QString("TestregistrationWidget")));
     REQUIRE(regWidget);
     regWidget->setMatrixFromWidget(fMm);
-    int numberOfLandmarks;
+    int numberOfLandmarks = 0;
     double accuracy = regWidget->getAverageAccuracy(numberOfLandmarks);
     REQUIRE(numberOfLandmarks == 0);
     REQUIRE(accuracy > 999);
@@ -252,11 +259,11 @@ No landmarks defined",
 }
 
 
-TEST_CASE("RegistrationMethodManual: Verify V2V registration with known Fixed and Moving image data - \
+TEST_CASE("RegistrationMethodManual: Verify Image-to-Image registration with known Fixed and Moving image data - \
 Four landmarks defined for accuracy verification",
           "[unit][plugins][org.custusx.registration.method.manual]")
 {
-    // This test recreates a volume-to-volume registration with confirmed match where we know the
+    // This test recreates an image-to-image registration with confirmed match where we know the
     // resulting fMm matrix
     // The accuracy of the match is confirmed by defining 4 known landmarks in both volumes
     // and verify the accuracy measure calculated by CustusX.
@@ -271,7 +278,8 @@ Four landmarks defined for accuracy verification",
     REQUIRE(registrationService);
     bool ok = false;
 
-    cx::ImagePtr movingImage = initImages(registrationService, patientModelService, true);
+    checkAndAddDummyImagesToPatient(registrationService, patientModelService);
+    define_rMd_AndFourLandmarksForFixedAndMovingImages(registrationService);
 
     patientModelService->setLandmarkActive("1", true);
     patientModelService->setLandmarkActive("2", true);
@@ -295,7 +303,7 @@ Four landmarks defined for accuracy verification",
                                                             QString("TestregistrationWidget")));
     REQUIRE(regWidget);
     regWidget->setMatrixFromWidget(fMm);
-    int numberOfLandmarks;
+    int numberOfLandmarks = 0;
     double accuracy = regWidget->getAverageAccuracy(numberOfLandmarks);
     REQUIRE(numberOfLandmarks == 4);
     REQUIRE(accuracy < 1.30);
@@ -304,11 +312,11 @@ Four landmarks defined for accuracy verification",
 
 }
 
-TEST_CASE("RegistrationMethodManual: Verify V2V registration with known Fixed and Moving image data - \
+TEST_CASE("RegistrationMethodManual: Verify Image-to-Image registration with known Fixed and Moving image data - \
 One landmark defined for accuracy verification",
           "[unit][plugins][org.custusx.registration.method.manual]")
 {
-    // This test recreates a volume-to-volume registration with confirmed match where we know the
+    // This test recreates an image-to-image registration with confirmed match where we know the
     // resulting fMm matrix
     // The accuracy of the match is confirmed by defining one known landmark in both volumes
     // and verify the accuracy measure calculated by CustusX.
@@ -323,7 +331,8 @@ One landmark defined for accuracy verification",
     REQUIRE(registrationService);
     bool ok = false;
 
-    cx::ImagePtr movingImage = initImages(registrationService, patientModelService, true);
+    checkAndAddDummyImagesToPatient(registrationService, patientModelService);
+    define_rMd_AndFourLandmarksForFixedAndMovingImages(registrationService);
     patientModelService->setLandmarkActive("1", true);
 
     /************************************************************************/
