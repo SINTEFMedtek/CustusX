@@ -55,7 +55,7 @@ namespace cx
  * @{
  */
 
-//TODO: Refactor this class to use ImageLandmarksWidget instead of dupliucating code
+//TODO: Refactor this class to use ImageLandmarksWidget instead of duplicating code
 /**
  * \class CenterlinePointsWidget
  *
