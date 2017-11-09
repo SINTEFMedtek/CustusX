@@ -12,7 +12,7 @@
   <manufacturer>NDI</manufacturer>
   <clinical_app>Laboratory Laparoscopy Endovascular</clinical_app>
   <geo_file>cylinder.stl</geo_file>
-  <pic_file></pic_file>
+  <pic_file>catheter_6DOF.png</pic_file>
   <doc_file></doc_file>  
 
   <!-- Instrument -->
@@ -30,7 +30,7 @@
     <id>Aurora03</id>
     <name>AuroraSensor1</name>
     <wireless>yes</wireless>
-    <DOF>5</DOF>
+    <DOF>6</DOF>
     <portnumber>3</portnumber>
     <channelnumber>0</channelnumber>
     <manufacturer>NDI</manufacturer>
