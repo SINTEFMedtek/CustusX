@@ -44,7 +44,6 @@ namespace cx
 
 SharedContextCreatedCallback *SharedContextCreatedCallback::New()
 {
-	CX_LOG_DEBUG() << "SharedContextCreatedCallback constructor";
 	return new SharedContextCreatedCallback();
 }
 
@@ -60,7 +59,6 @@ void SharedContextCreatedCallback::setRenderWindowFactory(RenderWindowFactory *f
 
 void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned long eventId, void *cbo)
 {
-	CX_LOG_DEBUG() << "SharedContextCreatedCallback::Execute";
 	if(!mRenderWindowFactory)
 	{
 		CX_LOG_ERROR() << "SharedContextCreatedCallback::Execute: RenderWindowFactoryPtr missing";
@@ -73,7 +71,6 @@ void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned lon
 
 		if(SharedOpenGLContext::isValid(opengl_renderwindow))
 		{
-			CX_LOG_DEBUG() << "SharedContextCreatedCallback::Execute: Set SharedRenderWindow <--------";
 			mRenderWindowFactory->setSharedRenderWindow(opengl_renderwindow);
 		}
 		else
