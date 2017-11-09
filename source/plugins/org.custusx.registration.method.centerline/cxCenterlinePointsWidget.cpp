@@ -145,7 +145,7 @@ void CenterlinePointsWidget::addLandmarkButtonClickedSlot()
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		reportError("Could not find a rep to add the landmark to.");
+		reportError("Need a 3D view to set landmarks.");
 		return;
 	}
 
@@ -167,7 +167,7 @@ void CenterlinePointsWidget::editLandmarkButtonClickedSlot()
 	PickerRepPtr PickerRep = this->getPickerRep();
 	if (!PickerRep)
 	{
-		reportError("Could not find a rep to edit the landmark for.");
+		reportError("Need a 3D view to edit landmarks.");
 		return;
 	}
 
