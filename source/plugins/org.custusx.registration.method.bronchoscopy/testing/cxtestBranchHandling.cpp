@@ -97,10 +97,10 @@ TEST_CASE("Test the connect branches to a single poly data object, fully connect
 	cx::BranchListPtr bl = cx::BranchListPtr(new cx::BranchList());
 	bl->findBranchesInCenterline(CLpoints);
 
-	vtkPolyDataPtr linesFromBranches = bl->createVtkPolyDataFromBranches(true);//, true);
+	vtkPolyDataPtr linesFromBranches = bl->createVtkPolyDataFromBranches(true, true);
 
-	//CHECK(linesFromBranches->GetNumberOfPoints() == 4);
-	//CHECK(linesFromBranches->GetNumberOfCells() == 3);
+	CHECK(linesFromBranches->GetNumberOfPoints() == 4);
+	CHECK(linesFromBranches->GetNumberOfCells() == 3);
 
 	CHECK(true);
 }

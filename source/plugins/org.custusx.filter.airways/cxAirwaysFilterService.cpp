@@ -38,6 +38,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
 #include <ctkPluginContext.h>
+#include <vtkImplicitModeller.h>
+#include <vtkContourFilter.h>
+#include "cxBranchList.h"
+#include "cxBronchoscopyRegistration.h"
 
 #include "cxTime.h"
 #include "cxTypeConversions.h"
@@ -99,6 +103,15 @@ QString AirwaysFilter::getNameSuffix()
     return "_centerline";
 }
 
+QString AirwaysFilter::getNameSuffixStraight()
+{
+	return "_straight";
+}
+
+QString AirwaysFilter::getNameSuffixTubes()
+{
+	return "_tubes";
+}
 
 Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
 {
@@ -362,13 +375,90 @@ bool AirwaysFilter::postProcess()
 	patientService()->insertData(centerline);
 	mOutputTypes[0]->setValue(centerline->getUid());
 
+	// Straight centerline
+	if(getStraightCLTubesOption(mOptions)->getValue())
+	{
+		this->createStraightCL();
+		this->createTubes();
+	}
+
 	return true;
+}
+
+void AirwaysFilter::createTubes()
+{
+	QString clMeshUid = mOutputTypes[3]->getValue();
+	MeshPtr cl = boost::dynamic_pointer_cast<Mesh>(patientService()->getData(clMeshUid));
+	if(!cl)
+		return;
+
+	vtkPolyDataPtr clPolyData = cl->getVtkPolyData();
+	vtkSmartPointer<vtkImplicitModeller> blobbyLogoImp =
+			vtkSmartPointer<vtkImplicitModeller>::New();
+	blobbyLogoImp->SetInputData(clPolyData);
+	//blobbyLogoImp->SetMaximumDistance(.075); //orig
+	blobbyLogoImp->SetMaximumDistance(0.1);
+	//blobbyLogoImp->SetMaximumDistance(.30); //for stort, sakte?
+	//blobbyLogoImp->SetMaximumDistance(.015);
+	//blobbyLogoImp->SetMaximumDistance(.9); //ser ingen effekt.
+	//blobbyLogoImp->SetSampleDimensions(64, 64, 64); //orig
+	//blobbyLogoImp->SetSampleDimensions(128, 128, 128); //ble bedre opppløsning og fyldigere!
+	//blobbyLogoImp->SetSampleDimensions(1024, 1024, 1024); //for stort, tok laaang tid??
+	//blobbyLogoImp->SetSampleDimensions(512, 512, 512); //Kortere tid, men vanskelig å se forskjellen.
+	blobbyLogoImp->SetSampleDimensions(256, 256, 256);
+	//blobbyLogoImp->SetAdjustDistance(0.2); //orig
+	blobbyLogoImp->SetAdjustDistance(0.1);
+	//blobbyLogoImp->SetAdjustDistance(0.3);
+	//blobbyLogoImp->SetAdjustDistance(0.01);
+	//blobbyLogoImp->SetAdjustDistance(0.9); //ble veldig hakkete
+
+	// extract an iso surface
+	vtkSmartPointer<vtkContourFilter> blobbyLogoIso =
+		vtkSmartPointer<vtkContourFilter>::New();
+	blobbyLogoIso->SetInputConnection(blobbyLogoImp->GetOutputPort());
+	blobbyLogoIso->SetValue(1, 1.5); //orig
+	//blobbyLogoIso->SetValue(0, 0.25); //nei, ble bare prikker
+	//blobbyLogoIso->SetValue(1, 1.0); //liten forskjell. litt smalere
+	blobbyLogoIso->Update();
+
+
+	// Create mesh object of the tubes
+	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
+	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
+	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
+	centerline->setVtkPolyData(blobbyLogoIso->GetOutput());
+	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
+	centerline->get_rMd_History()->setRegistration(mTransformation);
+	patientService()->insertData(centerline);
+	mOutputTypes[4]->setValue(centerline->getUid());
+
+}
+
+void AirwaysFilter::createStraightCL()
+{
+	//QString sCLstring = "_straight_";
+	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + "%1";
+	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + "%1";
+	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
+
+	BranchListPtr bl = BranchListPtr(new BranchList());
+
+	Eigen::MatrixXd CLpoints = makeTransformedMatrix(mCenterlineOutput);
+	bl->findBranchesInCenterline(CLpoints);
+	vtkPolyDataPtr retval = bl->createVtkPolyDataFromBranches(false, true);
+
+	centerline->setVtkPolyData(retval);
+	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
+	centerline->get_rMd_History()->setRegistration(mTransformation);
+	patientService()->insertData(centerline);
+	mOutputTypes[3]->setValue(centerline->getUid());
 }
 
 void AirwaysFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getManualSeedPointOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
+	mOptionsAdapters.push_back(this->getStraightCLTubesOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -384,23 +474,20 @@ void AirwaysFilter::createInputTypes()
 void AirwaysFilter::createOutputTypes()
 {
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
+	std::vector<std::pair<QString, QString>> valueHelpPairs;
+	valueHelpPairs.push_back(std::make_pair(tr("Airway Centerline"), tr("Generated centerline mesh (vtk-format).")));
+	valueHelpPairs.push_back(std::make_pair(tr("Airway Segmentation"), tr("Generated surface of the airway segmentation volume.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Lung Segmentation"), tr("Generated surface of the lung segmentation volume.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Centerline"), tr("A centerline with straight lines between the branch points.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Tubes"), tr("Tubes based on the straight centerline")));
 
-	//0
-	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
-	tempMeshStringAdapter->setValueName("Airway Centerline");
-	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
-	mOutputTypes.push_back(tempMeshStringAdapter);
-
-	//1
-	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
-	tempMeshStringAdapter->setValueName("Airway Segmentation");
-	tempMeshStringAdapter->setHelp("Generated surface of the airway segmentation volume.");
-	mOutputTypes.push_back(tempMeshStringAdapter);
-
-	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
-	tempMeshStringAdapter->setValueName("Lung Segmentation");
-	tempMeshStringAdapter->setHelp("Generated surface of the lung segmentation volume.");
-	mOutputTypes.push_back(tempMeshStringAdapter);
+	foreach(auto pair, valueHelpPairs)
+	{
+		tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
+		tempMeshStringAdapter->setValueName(pair.first);
+		tempMeshStringAdapter->setHelp(pair.second);
+		mOutputTypes.push_back(tempMeshStringAdapter);
+	}
 }
 
 
@@ -426,6 +513,18 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 					false, root);
 	return retval;
 
+}
+
+BoolPropertyPtr AirwaysFilter::getStraightCLTubesOption(QDomElement root)
+{
+	BoolPropertyPtr retval =
+			BoolProperty::initialize("Straight centerline and tubes",
+					"",
+					"Use this option to generate a centerline with straight branches between "
+					"the branch points. "
+					"You also get tubes based on this straight line.",
+					false, root);
+	return retval;
 }
 
 

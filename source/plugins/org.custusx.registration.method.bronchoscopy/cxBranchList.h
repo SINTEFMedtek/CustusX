@@ -61,7 +61,7 @@ public:
 	void interpolateBranchPositions(int interpolationFactor);
     void smoothBranchPositions(int controlPointDistance);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
-	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false) const;
+	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 };
 
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed);
