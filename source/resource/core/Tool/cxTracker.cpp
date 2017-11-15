@@ -16,6 +16,7 @@ QStringList Tracker::getSupportedTrackingSystems()
     QStringList retval;
     retval << enum2string(tsPOLARIS);
     retval << enum2string(tsAURORA);
+//		retval << enum2string(tsOPENIGTLINK);
     return retval;
 }
 } //namespace cx

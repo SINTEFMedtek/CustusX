@@ -55,6 +55,22 @@ namespace cx
 class cxResource_EXPORT ConfigurationFileParser
 {
 public:
+
+	struct cxResource_EXPORT ToolStructure
+	{
+		QString mAbsoluteToolFilePath;
+		QString mOpenIGTLinkTransformId;
+		QString mOpenIGTLinkImageId;
+		bool mReference;
+		ToolStructure() :
+			mAbsoluteToolFilePath(""),
+			mOpenIGTLinkTransformId(""),
+			mOpenIGTLinkImageId(""),
+			mReference(false)
+		{}
+	};
+
+
 	typedef std::pair<QString, bool> ToolFileAndReference;
 	typedef std::vector<ToolFileAndReference> ToolFilesAndReferenceVector;
 	typedef std::map<TRACKING_SYSTEM, ToolFilesAndReferenceVector> TrackersAndToolsMap;
@@ -62,6 +78,7 @@ public:
 	{
 		QString mFileName; ///< absolute path and filename for the new config file
 		QString mClinical_app; ///< the clinical application this config is made for
+		QString mTrackingSystem;//TODO
 		TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
 	};
 
@@ -73,10 +90,12 @@ public:
     std::vector<ToolFileParser::TrackerInternalStructure> getTrackers();
 	std::vector<QString> getAbsoluteToolFilePaths();
 	QString getAbsoluteReferenceFilePath();
+	std::vector<ConfigurationFileParser::ToolStructure> getToolListWithMetaInformation();
 
 	static QString getTemplatesAbsoluteFilePath();
 	static void saveConfiguration(Configuration& config);
 
+	QString getTrackingSystem();
 private:
 	void setConfigDocument(QString configAbsoluteFilePath);
 	bool isConfigFileValid();

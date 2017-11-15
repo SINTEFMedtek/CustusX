@@ -151,7 +151,13 @@ void TrackingSystemIGSTKService::configure()
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
-    std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
+	if(!configParser.getTrackingSystem().contains("igstk", Qt::CaseInsensitive))
+	{
+		CX_LOG_DEBUG() << "TrackingSystemIGSTKService::configure(): Not using IGSTK tracking.";
+		return;
+	}
+
+	std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 
 	if (trackers.empty())
 	{

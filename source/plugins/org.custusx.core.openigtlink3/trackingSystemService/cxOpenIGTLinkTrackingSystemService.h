@@ -88,19 +88,24 @@ private slots:
     void serverIsConnected();
     void serverIsDisconnected();
 
-	void receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp);
-	void receiveCalibration(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D calibration);
-	void receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition);
+	void receiveTransform(QString devicename, Transform3D transform, double timestamp);
+	void receiveCalibration(QString devicename, Transform3D calibration);
+	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private:
     void internalSetState(Tool::State state);
-	OpenIGTLinkToolPtr getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType);
+	OpenIGTLinkToolPtr getTool(QString devicename);
 
     Tool::State mState;
     std::map<QString, OpenIGTLinkToolPtr> mTools;
     ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
+//	std::vector<ConfigurationFileParser::ToolStructure> mToolList;
 
+	// Copied from TrackingSystemIGSTKService - move to common class?
+	QString mConfigurationFilePath; ///< path to the configuration file
+	QString mLoggingFolder; ///< path to where logging should be saved
+	void setConfigurationFile(QString configurationFile);
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 

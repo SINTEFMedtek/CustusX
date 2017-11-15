@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "igtlioBaseConverter.h"
 
 #include "cxTransform3D.h"
+#include "cxToolConfigurationParser.h"
 
 class QStringList;
 
@@ -75,7 +76,8 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTool: public ToolImpl
     Q_OBJECT
 
 public:
-	OpenIGTLinkTool(QString uid, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType);
+	OpenIGTLinkTool(QString uid);
+	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure);
     virtual ~OpenIGTLinkTool();
 
     virtual std::set<Type> getTypes() const;
@@ -97,13 +99,15 @@ public:
     //virtual void set_prMt(const Transform3D& prMt, double timestamp);
     virtual void setVisible(bool vis);
 
+	bool isThisTool(QString OpenIGTLinkId);
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp); ///< timestamp is in milliseconds
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
 
 private:
-	std::set<Tool::Type> determineType(const igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const;
+//	std::set<Tool::Type> determineType(const igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const;
+	std::set<Tool::Type> determineTypesBasedOnUid(const QString uid) const;
     bool isProbe() const;
     void createPolyData();
 
@@ -112,7 +116,11 @@ private:
     QTimer mTpsTimer;
     double mTimestamp;
     std::set<Type> mTypes;
-    Transform3D m_sMt_calibration;
+		Transform3D m_sMt_calibration;
+
+		//Store these structures directly for now
+		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
+		ToolFileParser::ToolInternalStructure mToolFileToolStructure;
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

@@ -40,16 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-OpenIGTLinkTool::OpenIGTLinkTool(QString uid, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) :
+//TODO: Remove?
+OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     ToolImpl(uid, uid),
     mPolyData(NULL),
     mTimestamp(0),
-    m_sMt_calibration(Transform3D::Identity())
+		m_sMt_calibration(Transform3D::Identity()),
+		mConfigFileToolStructure(ConfigurationFileParser::ToolStructure()),
+		mToolFileToolStructure(ToolFileParser::ToolInternalStructure())
 {
-	CX_LOG_DEBUG() << "OpenIGTLinkTool equipmentType: " << equipmentType;
+	CX_LOG_DEBUG() << "OpenIGTLinkTool uid: " << uid;
     connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-	mTypes = this->determineType(equipmentType);
+	mTypes = this->determineTypesBasedOnUid(uid);
     if (this->isProbe())
     {
 		// See ProbeCalibsConfigs.xml
@@ -61,6 +64,46 @@ OpenIGTLinkTool::OpenIGTLinkTool(QString uid, igtlio::BaseConverter::EQUIPMENT_T
 
     this->createPolyData();
     this->toolVisibleSlot(true);
+}
+
+
+//TODO:
+OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure) :
+	ToolImpl(toolFileToolStructure.mUid, toolFileToolStructure.mUid),
+	mPolyData(NULL),
+	mTimestamp(0),
+	m_sMt_calibration(Transform3D::Identity()),
+	mConfigFileToolStructure(configFileToolStructure),
+	mToolFileToolStructure(toolFileToolStructure)
+
+{
+//	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
+	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mOpenIGTLinkTransformId: " << mConfigFileToolStructure.mOpenIGTLinkTransformId << " mOpenIGTLinkImageId: " << mConfigFileToolStructure.mOpenIGTLinkImageId;
+	connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
+
+	if(toolFileToolStructure.mIsProbe)
+	{
+//		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
+		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe";
+//		mProbe = ProbeImpl::New(mConfigFileToolStructure.mOpenIGTLinkTransformId, mConfigFileToolStructure.mOpenIGTLinkImageId);
+//		mProbe = ProbeImpl::New(mToolFileToolStructure.mInstrumentId, mToolFileToolStructure.mInstrumentScannerId);
+		mProbe = ProbeImpl::New("ProbeToReference", "PlusDeviceSet_OpenIGTLinkCommandsTest");
+		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
+	}
+
+	this->createPolyData();
+	this->toolVisibleSlot(true);
+}
+
+bool OpenIGTLinkTool::isThisTool(QString OpenIGTLinkId)
+{
+	CX_LOG_DEBUG() << "OpenIGTLinkTool::isThisTool: " << OpenIGTLinkId;
+	bool retval = false;
+	if(OpenIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkTransformId, Qt::CaseInsensitive) == 0)
+		retval = true;
+	else if(OpenIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkImageId, Qt::CaseInsensitive) == 0)
+		retval = true;
+	return retval;
 }
 
 OpenIGTLinkTool::~OpenIGTLinkTool()
@@ -123,13 +166,25 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
     ToolImpl::setTooltipOffset(val);
 }
 
-std::set<Tool::Type> OpenIGTLinkTool::determineType(const  igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const
+//std::set<Tool::Type> OpenIGTLinkTool::determineType(const  igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const
+//{
+//	std::set<Type> retval;
+//	retval.insert(TOOL_POINTER);
+//	if (equipmentType == igtlio::BaseConverter::US_PROBE || equipmentType == igtlio::BaseConverter::TRACKED_US_PROBE)
+//		retval.insert(TOOL_US_PROBE);
+
+//	return retval;
+//}
+
+//TODO: Use new tool config
+std::set<Tool::Type> OpenIGTLinkTool::determineTypesBasedOnUid(const QString uid) const
 {
 	std::set<Type> retval;
 	retval.insert(TOOL_POINTER);
-	if (equipmentType == igtlio::BaseConverter::US_PROBE || equipmentType == igtlio::BaseConverter::TRACKED_US_PROBE)
+	if(uid.contains("usprobe", Qt::CaseInsensitive))
+	{
 		retval.insert(TOOL_US_PROBE);
-
+	}
 	return retval;
 }
 

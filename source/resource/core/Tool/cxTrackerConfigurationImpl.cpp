@@ -47,11 +47,12 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	ConfigurationFileParser::Configuration data;
 	data.mFileName = config.mUid;
 	data.mClinical_app = config.mClinicalApplication;
+	data.mTrackingSystem = config.mTrackingSystem;//TODO
 
 	QStringList selectedTools = config.mTools;
 	QString referencePath = config.mReferenceTool;
 
-	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTrackingSystem);
+	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTracker);
 
 	ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
 //	QFile configFile(data.mFileName);
@@ -85,7 +86,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
     std::vector<ToolFileParser::TrackerInternalStructure> trackers = parser.getTrackers();
 	for (unsigned i = 0; i < trackers.size(); ++i)
 	{
-		retval.mTrackingSystem = enum2string(trackers[i].mType);
+		retval.mTracker = enum2string(trackers[i].mType);
 		// only one trackingsystem is returned. (backed supports more than is needed.)
 	}
 
@@ -96,6 +97,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 	}
 
 	retval.mReferenceTool = parser.getAbsoluteReferenceFilePath();
+	retval.mTrackingSystem = parser.getTrackingSystem();
 
 	return retval;
 }

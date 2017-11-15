@@ -190,7 +190,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 
 	if (isNewConfig)
 	{
-		data.mTrackingSystem = enum2string(tsPOLARIS);
+		data.mTracker = enum2string(tsPOLARIS);
 		data.mName = "MyConfig";
 	}
 
@@ -198,7 +198,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	mConfigFileLineEdit->setEnabled(isNewConfig);
 	mConfigFileLineEdit->setToolTip(data.mUid);
 	mModified = true;
-	mTrackingSystemSelector->setValue(data.mTrackingSystem);
+	mTrackingSystemSelector->setValue(data.mTracker);
 	mToolListWidget->configSlot(data.mTools);
 }
 
@@ -229,6 +229,7 @@ void ToolConfigureGroupBox::populateConfigurations()
 
 	foreach(QString filename, configurations)
 	{
+		CX_LOG_DEBUG() << "filename: " << filename;
 		TrackerConfiguration::Configuration configuration = config->getConfiguration(filename);
 		this->addConfigurationToComboBox(configuration.mName, configuration.mUid);
 	}
@@ -259,9 +260,15 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 
 	retval.mUid = QString("%1/%2.xml").arg(filepath).arg(filename);
 	retval.mClinicalApplication = application;
-	retval.mTrackingSystem = mTrackingSystemSelector->getValue();
+	retval.mTracker = mTrackingSystemSelector->getValue();
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
+//	retval.mTrackingSystem = "openigtlink";//TODO
+
+	//Testcode
+	//Make getConfigFilePath()?
+	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+	retval.mTrackingSystem = config->getConfiguration(configAbsoluteFilePath).mTrackingSystem;//TODO
 
 	return retval;
 }

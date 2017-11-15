@@ -57,9 +57,10 @@ public:
 		QString mUid; ///< absolute path and filename for the new config file
 		QString mName;
 		QString mClinicalApplication;
-		QString mTrackingSystem;
+		QString mTracker;
 		QStringList mTools;
 		QString mReferenceTool;
+		QString mTrackingSystem;//TODO
 	};
 	struct Tool
 	{

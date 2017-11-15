@@ -69,6 +69,29 @@ QString ConfigurationFileParser::getApplicationapplication()
 	return retval;
 }
 
+QString ConfigurationFileParser::getTrackingSystem()
+{
+	QString retval;
+
+	QDomNodeList trackingsystemNodes = mConfigureDoc.elementsByTagName("trackingsystem");
+	for (int i = 0; i < trackingsystemNodes.count(); ++i)
+	{
+		retval = trackingsystemNodes.at(i).toElement().attribute(mTypeAttribute);
+	}
+
+	if (trackingsystemNodes.count() == 0)
+	{
+		retval = "igstk";//Revert to igstk tracking for old config files
+	}
+	else if(trackingsystemNodes.count() > 1)
+	{
+		CX_LOG_ERROR() << "ConfigurationFileParser::getTrackingSystem(): Config file: " << mConfigurationFilePath
+									 << " has more the one tracking system. Only one is currently supported.";
+	}
+
+	return retval;
+}
+
 std::vector<ToolFileParser::TrackerInternalStructure> ConfigurationFileParser::getTrackers()
 {
     std::vector<ToolFileParser::TrackerInternalStructure> retval;
@@ -139,6 +162,31 @@ QString ConfigurationFileParser::getAbsoluteReferenceFilePath()
 	return retval;
 }
 
+std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::getToolListWithMetaInformation()
+{
+	std::vector<ToolStructure> retval;
+
+	if (!this->isConfigFileValid())
+		return retval;
+
+	QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
+	for (int i = 0; i < toolFileNodes.count(); ++i)
+	{
+		ToolStructure toolStructure;
+		toolStructure.mAbsoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
+		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute("openigtlinktransformid");
+		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute("openigtlinkimageid");
+
+		QString reference = toolFileNodes.at(i).toElement().attribute(mReferenceAttribute);
+		if (reference.contains("yes", Qt::CaseInsensitive))
+			toolStructure.mReference = true;
+		else
+			toolStructure.mReference = false;
+		retval.push_back(toolStructure);
+	}
+	return retval;
+}
+
 QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
 {
 	QString retval = DataLocations::getRootConfigPath() + "/tool/TEMPLATE_configuration.xml";
@@ -175,10 +223,18 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	QDomElement configNode = doc.createElement("configuration");
 	configNode.setAttribute("clinical_app", config.mClinical_app);
 
+	QDomElement trackingsystemNode = doc.createElement("trackingsystem");
+	trackingsystemNode.setAttribute("type", config.mTrackingSystem);
+
+	configNode.appendChild(trackingsystemNode);
+
 	TrackersAndToolsMap::iterator it1 = config.mTrackersAndTools.begin();
 	for (; it1 != config.mTrackersAndTools.end(); ++it1)
 	{
 		QString trackerType = enum2string(it1->first);
+//		if(trackerType.isEmpty() && config.mTrackingSystem.contains("openigtlink", Qt::CaseInsensitive))
+		if(trackerType.isEmpty())
+			trackerType=config.mTrackingSystem;
 		QDomElement trackerTagNode = doc.createElement("tracker");
 		trackerTagNode.setAttribute("type", trackerType);
 
@@ -202,7 +258,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			toolFileNode.setAttribute("reference", (it2->second ? "yes" : "no"));
 			trackerTagNode.appendChild(toolFileNode);
 		}
-		configNode.appendChild(trackerTagNode);
+		trackingsystemNode.appendChild(trackerTagNode);
 	}
 
 	doc.appendChild(configNode);

@@ -88,7 +88,10 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
-//	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
+	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
+
+	//Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
+	QString deviceName(receivedDevice->GetDeviceName().c_str());//Use this for all message types for now
 
 	if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
 	{
@@ -97,7 +100,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlio::ImageConverter::ContentData content = imageDevice->GetContent();
 
 //		QString deviceName(header.deviceName.c_str());
-		QString deviceName(header.equipmentId.c_str());//Use equipmentId
+//		QString deviceName(header.equipmentId.c_str());//Use equipmentId
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
 		// get timestamp from igtl second-format:;
 		double timestampMS = header.timestamp * 1000;
@@ -109,14 +112,19 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 		{
 //			QString deviceName(header.deviceName.c_str());
-			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
+//			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
+
+			//Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
+//			QString deviceName(receivedDevice->GetDeviceName().c_str());
+
 //			emit probedefinition(deviceName, header.equipmentType, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 			//test: Set all messages as type TRACKED_US_PROBE for now
-			emit probedefinition(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
+//			emit probedefinition(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
+			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 		}
 
 
-		emit image(cximage);
+		emit image(cximage);//deviceName?
 	}
 	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
 	{
@@ -124,20 +132,22 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlio::TransformConverter::ContentData content = transformDevice->GetContent();
 
 //		QString deviceName(content.deviceName.c_str());
-		QString deviceName(header.equipmentId.c_str());//Use equipmentId
+//		QString deviceName(header.equipmentId.c_str());//Use equipmentId
 		//QString streamIdTo(content.streamIdTo.c_str());
 		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
 
-//		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
-//										<< " streamIdTo: " << content.streamIdTo
-//										<< " streamIdFrom: " << content.streamIdFrom
-//										<< " transform: " << cxtransform;
+		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
+										<< " streamIdTo: " << content.streamIdTo
+										<< " streamIdFrom: " << content.streamIdFrom
+										<< " deviceName: " << deviceName
+										<< " transform: " << cxtransform;
 
 		double timestamp = header.timestamp;
 //		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
 		//test: Set all messages as type TRACKED_US_PROBE for now
-		emit transform(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
+//		emit transform(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
+		emit transform(deviceName, cxtransform, timestamp);
 	}
 	else if(device_type == igtlio::CommandConverter::GetIGTLTypeName())
 	{

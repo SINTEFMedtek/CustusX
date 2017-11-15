@@ -34,6 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogger.h"
 #include "cxOpenIGTLinkTool.h"
+#include "cxProfile.h"
+
+#include "cxToolConfigurationParser.h"
 
 namespace cx
 {
@@ -50,8 +53,10 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
 }
 
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler) :
-	mState(Tool::tsNONE),
-	mNetworkHandler(networkHandler)
+	mState(Tool::tsNONE)
+	, mNetworkHandler(networkHandler)
+	, mConfigurationFilePath("")
+	, mLoggingFolder("")
 
 {
 	if(mNetworkHandler == NULL)
@@ -62,11 +67,41 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	connect(mNetworkHandler.get(), &NetworkHandler::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
 	//connect(mNetworkHandler.get(), &NetworkHandler::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
 	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
+
+	this->setConfigurationFile(profile()->getToolConfigFilePath());
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
 {
 	this->deconfigure();
+}
+
+void OpenIGTLinkTrackingSystemService::setConfigurationFile(QString configurationFile)
+{
+	if (configurationFile == mConfigurationFilePath)
+		return;
+
+/*	if (this->isConfigured())
+	{
+		connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
+		this->deconfigure();
+	}*/
+
+	mConfigurationFilePath = configurationFile;
+}
+
+void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
+{
+	if (mLoggingFolder == loggingFolder)
+		return;
+
+/*	if (this->isConfigured())
+	{
+		connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
+		this->deconfigure();
+	}*/
+
+	mLoggingFolder = loggingFolder;
 }
 
 QString OpenIGTLinkTrackingSystemService::getUid() const
@@ -81,6 +116,7 @@ Tool::State OpenIGTLinkTrackingSystemService::getState() const
 
 void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 {
+	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::setState: val: " << val;
 	if (mState==val)
 		return;
 
@@ -120,11 +156,55 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 	return mReference;
 }
 
-void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
-{}
+//void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
+//{}
 
+//TODO
 void OpenIGTLinkTrackingSystemService::configure()
 {
+	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure()";
+	//parse
+	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
+
+	if(!configParser.getTrackingSystem().contains("openigtlink", Qt::CaseInsensitive))
+	{
+		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Not using OpenIGTLink tracking.";
+		return;
+	}
+
+	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink tracking";
+
+	//TODO
+	//Copied from TrackingSystemIGSTKService::configure()
+//	ToolFileParser::ToolInternalStructure referenceToolStructure;
+//	std::vector<ToolFileParser::ToolInternalStructure> toolStructures;
+//	QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
+//	std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
+	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
+
+	//Create tools
+	for(std::vector<ConfigurationFileParser::ToolStructure>::iterator it = toolList.begin(); it != toolList.end(); ++it)
+	{
+		ToolFileParser toolParser((*it).mAbsoluteToolFilePath, mLoggingFolder);
+		ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
+
+		QString devicename = internalTool.mUid;
+		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
+		mTools[devicename] = newTool;
+	}
+
+//	for (std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
+//	{
+//		//TODO add OpenIGTLink uid names to tools
+//		ToolFileParser toolParser(*it, mLoggingFolder);
+//				ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
+//		if ((*it) == referenceToolFile)
+//			referenceToolStructure = internalTool;
+//		else
+//			toolStructures.push_back(internalTool);
+//	}
+
+
 	this->serverIsConfigured();
 }
 
@@ -138,6 +218,9 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
 void OpenIGTLinkTrackingSystemService::initialize()
 {
 	//emit connectToServer();
+
+	//TODO is(!configured());
+	this->configure();
 }
 
 void OpenIGTLinkTrackingSystemService::uninitialize()
@@ -149,6 +232,9 @@ void OpenIGTLinkTrackingSystemService::startTracking()
 {
 	//emit startListenToServer();
 	//emit connectToServer();
+
+	//TODO: is(!Initialized())
+	this->initialize();
 }
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
@@ -179,24 +265,29 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 	this->internalSetState(Tool::tsINITIALIZED);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp)
+
+//TODO: Require/trigger configure?
+void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
 //	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
-	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
-	tool->toolTransformAndTimestampSlot(transform, timestamp);
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	if(tool)
+		tool->toolTransformAndTimestampSlot(transform, timestamp);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D calibration)
+void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Transform3D calibration)
 {
 	CX_LOG_DEBUG() << "receiveCalibration for: " << devicename;
-	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
-	tool->setCalibration_sMt(calibration);
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	if(tool)
+		tool->setCalibration_sMt(calibration);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition)
+void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
 {
 //	CX_LOG_DEBUG() << "receiveProbedefinition for: " << devicename << " equipmentType: " << equipmentType;
-	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
+	CX_LOG_DEBUG() << "receiveProbedefinition for: " << devicename;
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	if(tool)
 	{
 		ProbePtr probe = tool->getProbe();
@@ -223,25 +314,21 @@ void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)
 	emit stateChanged();
 }
 
-OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType)
+OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 {
 //	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool: " << devicename;
-	OpenIGTLinkToolPtr retval;
-	std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.find(devicename);
-	if(it == mTools.end())
-	{
-//		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool. Create new tool: " << devicename;
-		retval = OpenIGTLinkToolPtr(new OpenIGTLinkTool(devicename, equipmentType));
-		mTools[devicename] = retval;
-		//todo: will this work?
-		emit stateChanged();
-	}
-	else
-	{
-		retval = it->second;
-	}
 
-	return retval;
+	std::map<QString, OpenIGTLinkToolPtr>::iterator it;
+	for (it = mTools.begin(); it != mTools.end(); ++it)
+	{
+		OpenIGTLinkToolPtr tool = it->second;
+		if (tool->isThisTool(devicename))
+		{
+//			emit stateChanged();
+			return tool;
+		}
+	}
+	return OpenIGTLinkToolPtr();
 }
 
 
