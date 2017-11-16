@@ -138,7 +138,7 @@ private:
     void removeAndResetSliceRep();
 
     bool useGPU2DRendering();
-    void createAndAddMultiSliceRep();
+		bool createAndAddMultiSliceRep();
     void removeAndResetMultiSliceRep();
 
 	std::vector<ImagePtr> getImagesToView();

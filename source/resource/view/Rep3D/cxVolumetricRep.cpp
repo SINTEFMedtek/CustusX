@@ -37,11 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkColorTransferFunction.h>
 #include <vtkVolumeProperty.h>
 
-#ifndef CX_VTK_OPENGL2
-//#include <vtkVolumeTextureMapper3D.h>
-#else
-#include <vtkSmartVolumeMapper.h>
-#endif
 #include <vtkSmartVolumeMapper.h>
 
 //#if VTK_MINOR_VERSION >= 6
