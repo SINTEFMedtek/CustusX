@@ -85,13 +85,15 @@ TEST_CASE("Test the connect branches to a single poly data object, fully connect
 
 	CHECK(linesFromBranches->GetNumberOfPoints() == n1+n2+n3);
 	CHECK(linesFromBranches->GetNumberOfCells() == n1+n2+n3 - 1);
-
-
-	//CHECK(false);
 }
 
 TEST_CASE("Test the connect branches to a single poly data object, fully connected and straight lines", "[unit][bronchoscopy][jon]")
 {
+    /**
+     * The branches are made first, hence 3 branches gives 6 points and 3 lines.
+     * Then the two child branches are connected to the parent
+     * with two additional lines, giving 5 lines in total.
+     */
 	vtkPolyDataPtr linesPolyData = makeDummyCenterLine();
 	Eigen::MatrixXd CLpoints = cx::makeTransformedMatrix(linesPolyData);
 	cx::BranchListPtr bl = cx::BranchListPtr(new cx::BranchList());
@@ -99,10 +101,8 @@ TEST_CASE("Test the connect branches to a single poly data object, fully connect
 
 	vtkPolyDataPtr linesFromBranches = bl->createVtkPolyDataFromBranches(true, true);
 
-	CHECK(linesFromBranches->GetNumberOfPoints() == 4);
-	CHECK(linesFromBranches->GetNumberOfCells() == 3);
-
-	CHECK(true);
+    CHECK(linesFromBranches->GetNumberOfPoints() == 6);
+    CHECK(linesFromBranches->GetNumberOfCells() == 5);
 }
 
 TEST_CASE("Test the findParentIndex method", "[unit][bronchoscopy][jon]")
