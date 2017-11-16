@@ -68,7 +68,7 @@ private:
 
     void    updateAverageAccuracyLabel();
     double  getAccuracy(QString uid);
-    bool    isAverageAccuracyValid();
+    bool    isAverageAccuracyValid(int& numberOfActiveLandmarks);
 
 };
 
