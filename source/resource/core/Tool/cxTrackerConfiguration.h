@@ -60,7 +60,7 @@ public:
 		QString mTracker;
 		QStringList mTools;
 		QString mReferenceTool;
-		QString mTrackingSystem;//TODO
+		QString mTrackingSystem;
 	};
 	struct Tool
 	{
@@ -71,7 +71,7 @@ public:
 		bool mIsReference;
 	};
 
-	virtual ~TrackerConfiguration() {}
+	virtual ~TrackerConfiguration();
 
 	virtual QString getConfigurationApplicationsPath() = 0;
 	virtual void saveConfiguration(const Configuration& config) = 0;

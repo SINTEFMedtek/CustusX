@@ -100,7 +100,6 @@ private:
     std::map<QString, OpenIGTLinkToolPtr> mTools;
     ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
-//	std::vector<ConfigurationFileParser::ToolStructure> mToolList;
 
 	// Copied from TrackingSystemIGSTKService - move to common class?
 	QString mConfigurationFilePath; ///< path to the configuration file

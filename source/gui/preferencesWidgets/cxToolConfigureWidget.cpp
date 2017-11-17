@@ -229,7 +229,6 @@ void ToolConfigureGroupBox::populateConfigurations()
 
 	foreach(QString filename, configurations)
 	{
-		CX_LOG_DEBUG() << "filename: " << filename;
 		TrackerConfiguration::Configuration configuration = config->getConfiguration(filename);
 		this->addConfigurationToComboBox(configuration.mName, configuration.mUid);
 	}
@@ -263,14 +262,16 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 	retval.mTracker = mTrackingSystemSelector->getValue();
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
-//	retval.mTrackingSystem = "openigtlink";//TODO
 
-	//Testcode
-	//Make getConfigFilePath()?
-	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-	retval.mTrackingSystem = config->getConfiguration(configAbsoluteFilePath).mTrackingSystem;//TODO
+	retval.mTrackingSystem = config->getConfiguration(this->getCurrentConfigFilePath()).mTrackingSystem;
 
 	return retval;
+}
+
+QString ToolConfigureGroupBox::getCurrentConfigFilePath()
+{
+	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+	return configAbsoluteFilePath;
 }
 
 void ToolConfigureGroupBox::populateReference()
@@ -290,8 +291,7 @@ void ToolConfigureGroupBox::populateReference()
 	}
 
 	// look for a selected reference
-	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-	QString reference = config->getConfiguration(configAbsoluteFilePath).mReferenceTool;
+	QString reference = config->getConfiguration(this->getCurrentConfigFilePath()).mReferenceTool;
 	currentIndex = this->addRefrenceToComboBox(reference);
 
 	// always select a reference if available:

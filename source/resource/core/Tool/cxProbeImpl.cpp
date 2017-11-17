@@ -192,7 +192,6 @@ void ProbeImpl::setSoundSpeedCompensationFactor(double factor)
 
 void ProbeImpl::setProbeDefinition(ProbeDefinition probeDefinition)
 {
-	CX_LOG_DEBUG() << "ProbeImpl::setProbeDefinition()";
 	if (probeDefinition.getUid().isEmpty())
 		probeDefinition.setUid(mActiveUid);
 

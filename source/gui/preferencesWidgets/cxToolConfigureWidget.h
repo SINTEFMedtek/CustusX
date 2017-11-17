@@ -99,6 +99,7 @@ private:
   TrackerConfiguration::Configuration getCurrentConfiguration();
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
+	QString getCurrentConfigFilePath();
 
   QComboBox*                mConfigFilesComboBox;
   QLineEdit*                mConfigFileLineEdit; ///< name of the xml file (example.xml)

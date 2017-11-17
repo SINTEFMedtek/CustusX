@@ -76,7 +76,6 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTool: public ToolImpl
     Q_OBJECT
 
 public:
-	OpenIGTLinkTool(QString uid);
 	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure);
     virtual ~OpenIGTLinkTool();
 
@@ -106,8 +105,6 @@ private slots:
     void toolVisibleSlot(bool);
 
 private:
-//	std::set<Tool::Type> determineType(const igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const;
-	std::set<Tool::Type> determineTypesBasedOnUid(const QString uid) const;
     bool isProbe() const;
     void createPolyData();
 

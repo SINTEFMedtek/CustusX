@@ -73,7 +73,7 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	ConfigurationFileParser::saveConfiguration(data);
 }
 
-TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfiguration(QString uid)
+TrackerConfiguration::Configuration TrackerConfigurationImpl::getConfiguration(QString uid)
 {
 	ConfigurationFileParser parser(uid);
 

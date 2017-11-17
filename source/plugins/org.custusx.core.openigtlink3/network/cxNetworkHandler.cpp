@@ -83,12 +83,14 @@ igtlio::SessionPointer NetworkHandler::requestConnectToServer(std::string server
 
 void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
+	Q_UNUSED(unknown);
+	Q_UNUSED(event);
 	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller_device));
 
 	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
-	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
+//	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
 	//Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
 	QString deviceName(receivedDevice->GetDeviceName().c_str());//Use this for all message types for now
@@ -104,7 +106,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
 		// get timestamp from igtl second-format:;
 		double timestampMS = header.timestamp * 1000;
-		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(timestampMS));
+		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
 		//this->decode_rMd(msg, retval);
 
 		mProbeDefinitionFromStringMessages->setImage(cximage);
@@ -114,17 +116,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //			QString deviceName(header.deviceName.c_str());
 //			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
 
-			//Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
-//			QString deviceName(receivedDevice->GetDeviceName().c_str());
-
-//			emit probedefinition(deviceName, header.equipmentType, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
-			//test: Set all messages as type TRACKED_US_PROBE for now
-//			emit probedefinition(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 		}
 
 
-		emit image(cximage);//deviceName?
+		emit image(cximage);
 	}
 	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
 	{
@@ -198,6 +194,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsigned long event , void*)
 {
+	Q_UNUSED(caller);
+	Q_UNUSED(connector);
 	if (event==igtlio::Logic::ConnectionAddedEvent)
 	{
 		emit connected();
@@ -210,6 +208,8 @@ void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsig
 
 void NetworkHandler::onDeviceAddedOrRemoved(vtkObject* caller, void* void_device, unsigned long event, void* callData)
 {
+	Q_UNUSED(caller);
+	Q_UNUSED(callData);
 	if (event==igtlio::Logic::NewDeviceEvent)
 	{
 		igtlio::DevicePointer device(reinterpret_cast<igtlio::Device*>(void_device));

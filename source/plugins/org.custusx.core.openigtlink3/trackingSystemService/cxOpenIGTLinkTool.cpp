@@ -39,35 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
-//TODO: Remove?
-OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
-    ToolImpl(uid, uid),
-    mPolyData(NULL),
-    mTimestamp(0),
-		m_sMt_calibration(Transform3D::Identity()),
-		mConfigFileToolStructure(ConfigurationFileParser::ToolStructure()),
-		mToolFileToolStructure(ToolFileParser::ToolInternalStructure())
-{
-	CX_LOG_DEBUG() << "OpenIGTLinkTool uid: " << uid;
-    connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
-
-	mTypes = this->determineTypesBasedOnUid(uid);
-    if (this->isProbe())
-    {
-		// See ProbeCalibsConfigs.xml
-		// PlusDeviceSet_OpenIGTLinkCommandsTest - needs to be the same as <USScanner><Name>
-		// ProbeToReference - needs to be the same as <USProbe><Name>
-		mProbe = ProbeImpl::New("ProbeToReference", "PlusDeviceSet_OpenIGTLinkCommandsTest");
-        connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
-	}
-
-    this->createPolyData();
-    this->toolVisibleSlot(true);
-}
-
-
-//TODO:
 OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure) :
 	ToolImpl(toolFileToolStructure.mUid, toolFileToolStructure.mUid),
 	mPolyData(NULL),
@@ -84,9 +55,12 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 	if(toolFileToolStructure.mIsProbe)
 	{
 //		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
-		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe";
+//		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe";
 //		mProbe = ProbeImpl::New(mConfigFileToolStructure.mOpenIGTLinkTransformId, mConfigFileToolStructure.mOpenIGTLinkImageId);
 //		mProbe = ProbeImpl::New(mToolFileToolStructure.mInstrumentId, mToolFileToolStructure.mInstrumentScannerId);
+		// See ProbeCalibsConfigs.xml
+		// PlusDeviceSet_OpenIGTLinkCommandsTest - needs to be the same as <USScanner><Name>
+		// ProbeToReference - needs to be the same as <USProbe><Name>
 		mProbe = ProbeImpl::New("ProbeToReference", "PlusDeviceSet_OpenIGTLinkCommandsTest");
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
@@ -97,7 +71,6 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 
 bool OpenIGTLinkTool::isThisTool(QString OpenIGTLinkId)
 {
-	CX_LOG_DEBUG() << "OpenIGTLinkTool::isThisTool: " << OpenIGTLinkId;
 	bool retval = false;
 	if(OpenIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkTransformId, Qt::CaseInsensitive) == 0)
 		retval = true;
@@ -164,28 +137,6 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
     if(this->getProbe())
         return;
     ToolImpl::setTooltipOffset(val);
-}
-
-//std::set<Tool::Type> OpenIGTLinkTool::determineType(const  igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const
-//{
-//	std::set<Type> retval;
-//	retval.insert(TOOL_POINTER);
-//	if (equipmentType == igtlio::BaseConverter::US_PROBE || equipmentType == igtlio::BaseConverter::TRACKED_US_PROBE)
-//		retval.insert(TOOL_US_PROBE);
-
-//	return retval;
-//}
-
-//TODO: Use new tool config
-std::set<Tool::Type> OpenIGTLinkTool::determineTypesBasedOnUid(const QString uid) const
-{
-	std::set<Type> retval;
-	retval.insert(TOOL_POINTER);
-	if(uid.contains("usprobe", Qt::CaseInsensitive))
-	{
-		retval.insert(TOOL_US_PROBE);
-	}
-	return retval;
 }
 
 bool OpenIGTLinkTool::isProbe() const

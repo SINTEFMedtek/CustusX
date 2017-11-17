@@ -156,9 +156,6 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 	return mReference;
 }
 
-//void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
-//{}
-
 //TODO
 void OpenIGTLinkTrackingSystemService::configure()
 {
@@ -176,10 +173,6 @@ void OpenIGTLinkTrackingSystemService::configure()
 
 	//TODO
 	//Copied from TrackingSystemIGSTKService::configure()
-//	ToolFileParser::ToolInternalStructure referenceToolStructure;
-//	std::vector<ToolFileParser::ToolInternalStructure> toolStructures;
-//	QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
-//	std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
 	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
 
 	//Create tools
@@ -192,19 +185,6 @@ void OpenIGTLinkTrackingSystemService::configure()
 		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
 		mTools[devicename] = newTool;
 	}
-
-//	for (std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
-//	{
-//		//TODO add OpenIGTLink uid names to tools
-//		ToolFileParser toolParser(*it, mLoggingFolder);
-//				ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
-//		if ((*it) == referenceToolFile)
-//			referenceToolStructure = internalTool;
-//		else
-//			toolStructures.push_back(internalTool);
-//	}
-
-
 	this->serverIsConfigured();
 }
 

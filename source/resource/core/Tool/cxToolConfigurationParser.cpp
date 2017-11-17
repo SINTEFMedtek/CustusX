@@ -232,7 +232,6 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	for (; it1 != config.mTrackersAndTools.end(); ++it1)
 	{
 		QString trackerType = enum2string(it1->first);
-//		if(trackerType.isEmpty() && config.mTrackingSystem.contains("openigtlink", Qt::CaseInsensitive))
 		if(trackerType.isEmpty())
 			trackerType=config.mTrackingSystem;
 		QDomElement trackerTagNode = doc.createElement("tracker");
