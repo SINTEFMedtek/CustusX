@@ -33,6 +33,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxOpenIGTLinkTool.h"
 
 #include <vtkConeSource.h>
+#include <vtkSTLReader.h>
+#include <QDir>
 #include "cxTrackingPositionFilter.h"
 #include "cxLogger.h"
 #include "cxProbeImpl.h"
@@ -144,9 +146,23 @@ bool OpenIGTLinkTool::isProbe() const
     return (mTypes.find(TOOL_US_PROBE) != mTypes.end()) ? true : false;
 }
 
+//Copied from ToolUsingIGSTK. Make common function?
+// replaced mTool->getInternalStructure() with mToolFileToolStructure
 void OpenIGTLinkTool::createPolyData()
 {
-    mPolyData = Tool::createDefaultPolyDataCone();
+	QDir dir;
+	if (!mToolFileToolStructure.mGraphicsFileName.isEmpty()
+					&& dir.exists(mToolFileToolStructure.mGraphicsFileName))
+	{
+		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
+		reader->SetFileName(cstring_cast(mToolFileToolStructure.mGraphicsFileName));
+		reader->Update();
+		mPolyData = reader->GetOutput();
+	}
+	else
+	{
+				mPolyData = Tool::createDefaultPolyDataCone();
+	}
 }
 
 bool OpenIGTLinkTool::isCalibrated() const

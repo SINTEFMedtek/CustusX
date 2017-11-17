@@ -47,7 +47,7 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	ConfigurationFileParser::Configuration data;
 	data.mFileName = config.mUid;
 	data.mClinical_app = config.mClinicalApplication;
-	data.mTrackingSystem = config.mTrackingSystem;//TODO
+	data.mTrackingSystem = config.mTrackingSystem;
 
 	QStringList selectedTools = config.mTools;
 	QString referencePath = config.mReferenceTool;
