@@ -91,9 +91,9 @@ signals:
 
 private slots:
 	void						inputChangedSlot();
-	virtual void				keyPressEvent(QKeyEvent* event);
 	void						resetEndoscopeSlot();
-
+protected slots:
+	virtual void				keyPressEvent(QKeyEvent* event);
 };
 
 } /* namespace cx */
