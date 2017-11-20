@@ -42,7 +42,6 @@ namespace cx
 
 OpenIGTLinkTool::OpenIGTLinkTool(QString uid) :
     ToolImpl(uid, uid),
-    mPolyData(NULL),
     mTimestamp(0),
     m_sMt_calibration(Transform3D::Identity())
 {
@@ -66,11 +65,6 @@ OpenIGTLinkTool::~OpenIGTLinkTool()
 std::set<Tool::Type> OpenIGTLinkTool::getTypes() const
 {
     return mTypes;
-}
-
-vtkPolyDataPtr OpenIGTLinkTool::getGraphicsPolyData() const
-{
-    return mPolyData;
 }
 
 ProbePtr OpenIGTLinkTool::getProbe() const

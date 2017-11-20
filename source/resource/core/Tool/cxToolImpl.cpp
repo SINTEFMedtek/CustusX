@@ -31,6 +31,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "cxToolImpl.h"
+
+#include <vtkSTLReader.h>
+#include <QDir>
+#include <vtkConeSource.h>
+
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 
@@ -41,7 +46,8 @@ ToolImpl::ToolImpl(const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
-	mTooltipOffset(0)
+	mTooltipOffset(0),
+	mPolyData(NULL)
 {
 }
 
@@ -112,6 +118,28 @@ void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
 {
     mTrackingPositionFilter = filter;
+}
+
+void ToolImpl::createToolGraphic(QString toolGraphicsFileName)
+{
+	QDir dir;
+	if (!toolGraphicsFileName.isEmpty()
+					&& dir.exists(toolGraphicsFileName))
+	{
+		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
+		reader->SetFileName(cstring_cast(toolGraphicsFileName));
+		reader->Update();
+		mPolyData = reader->GetOutput();
+	}
+	else
+	{
+				mPolyData = Tool::createDefaultPolyDataCone();
+	}
+}
+
+vtkPolyDataPtr ToolImpl::getGraphicsPolyData() const
+{
+	return mPolyData;
 }
 
 } // namespace cx

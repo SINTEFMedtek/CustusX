@@ -70,12 +70,16 @@ public:
 	virtual void addXml(QDomNode& dataNode) {}
 	virtual void parseXml(QDomNode& dataNode) {}
 
+	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	void createToolGraphic(QString toolGraphicsFileName);
+
 	TimedTransformMapPtr mPositionHistory;
 	Transform3D m_prMt; ///< the transform from the tool to the patient reference
 	TrackingPositionFilterPtr mTrackingPositionFilter;
 	std::map<double, ToolPositionMetadata> mMetadata;
+	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
 
 private:
 	double mTooltipOffset;

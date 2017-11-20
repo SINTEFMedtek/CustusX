@@ -33,10 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _USE_MATH_DEFINES
 #include "cxToolUsingIGSTK.h"
 
-#include <vtkPolyData.h>
-#include <vtkConeSource.h>
-#include <vtkSTLReader.h>
-#include <QDir>
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
@@ -52,15 +48,15 @@ namespace cx
 
 ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 	ToolImpl(""),
-				mTool(igstkTool), mPolyData(NULL),
+				mTool(igstkTool),
 				mValid(false), mConfigured(false), mTracked(false)
 {
 	mTimestamp = 0;
 	Tool::mUid = mTool->getInternalStructure().mUid;
 	Tool::mName = mTool->getInternalStructure().mName;
-    mValid = igstkTool->isValid();
+	mValid = igstkTool->isValid();
 
-	this->createPolyData();
+	this->createToolGraphic(mTool->getInternalStructure().mGraphicsFileName);
 
 	connect(mTool.get(), &IgstkTool::toolTransformAndTimestamp, this,
 					&ToolUsingIGSTK::toolTransformAndTimestampSlot);
@@ -93,11 +89,6 @@ std::set<ToolUsingIGSTK::Type> ToolUsingIGSTK::getTypes() const
 		retval.insert(ToolUsingIGSTK::TOOL_US_PROBE);
 
 	return retval;
-}
-
-vtkPolyDataPtr ToolUsingIGSTK::getGraphicsPolyData() const
-{
-	return mPolyData;
 }
 
 ProbePtr ToolUsingIGSTK::getProbe() const
@@ -142,23 +133,6 @@ void ToolUsingIGSTK::setTooltipOffset(double val)
 bool ToolUsingIGSTK::isValid() const
 {
 	return mValid;
-}
-
-void ToolUsingIGSTK::createPolyData()
-{
-	QDir dir;
-	if (!mTool->getInternalStructure().mGraphicsFileName.isEmpty()
-					&& dir.exists(mTool->getInternalStructure().mGraphicsFileName))
-	{
-		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-		reader->SetFileName(cstring_cast(mTool->getInternalStructure().mGraphicsFileName));
-		reader->Update();
-		mPolyData = reader->GetOutput();
-	}
-	else
-	{
-        mPolyData = Tool::createDefaultPolyDataCone();
-	}
 }
 
 bool ToolUsingIGSTK::isCalibrated() const

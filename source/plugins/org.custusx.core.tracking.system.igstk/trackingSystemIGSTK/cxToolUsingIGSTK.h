@@ -98,7 +98,6 @@ public:
 
 	virtual std::set<Type> getTypes() const;
 
-	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
 	virtual QString getUid() const;
@@ -136,13 +135,10 @@ private slots:
 	void toolVisibleSlot(bool);
 
 private:
-	void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
-
 	void printInternalStructure(); ///< FOR DEBUGGING
 
 	IgstkToolPtr mTool;
 
-	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
 	bool mValid; ///< whether this tool is constructed correctly or not
 	bool mConfigured; ///< whether or not the tool is properly configured
 	bool mTracked; ///< whether the tool is being tracked or not

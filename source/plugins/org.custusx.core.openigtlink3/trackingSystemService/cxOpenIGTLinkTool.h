@@ -81,7 +81,6 @@ public:
 
     virtual std::set<Type> getTypes() const;
 
-    virtual vtkPolyDataPtr getGraphicsPolyData() const;
     virtual bool getVisible() const;
     virtual bool isInitialized() const;
     virtual QString getUid() const;
@@ -106,9 +105,7 @@ private slots:
 
 private:
     bool isProbe() const;
-    void createPolyData();
 
-    vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
     ProbePtr mProbe;
     QTimer mTpsTimer;
     double mTimestamp;

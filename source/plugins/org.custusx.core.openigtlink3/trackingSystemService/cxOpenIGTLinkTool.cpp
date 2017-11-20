@@ -32,9 +32,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkTool.h"
 
-#include <vtkConeSource.h>
-#include <vtkSTLReader.h>
-#include <QDir>
 #include "cxTrackingPositionFilter.h"
 #include "cxLogger.h"
 #include "cxProbeImpl.h"
@@ -43,7 +40,6 @@ namespace cx
 {
 OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure) :
 	ToolImpl(toolFileToolStructure.mUid, toolFileToolStructure.mUid),
-	mPolyData(NULL),
 	mTimestamp(0),
 	m_sMt_calibration(Transform3D::Identity()),
 	mConfigFileToolStructure(configFileToolStructure),
@@ -67,7 +63,7 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 
-	this->createPolyData();
+	this->createToolGraphic(mToolFileToolStructure.mGraphicsFileName);
 	this->toolVisibleSlot(true);
 }
 
@@ -88,11 +84,6 @@ OpenIGTLinkTool::~OpenIGTLinkTool()
 std::set<Tool::Type> OpenIGTLinkTool::getTypes() const
 {
     return mTypes;
-}
-
-vtkPolyDataPtr OpenIGTLinkTool::getGraphicsPolyData() const
-{
-    return mPolyData;
 }
 
 ProbePtr OpenIGTLinkTool::getProbe() const
@@ -144,25 +135,6 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
 bool OpenIGTLinkTool::isProbe() const
 {
     return (mTypes.find(TOOL_US_PROBE) != mTypes.end()) ? true : false;
-}
-
-//Copied from ToolUsingIGSTK. Make common function?
-// replaced mTool->getInternalStructure() with mToolFileToolStructure
-void OpenIGTLinkTool::createPolyData()
-{
-	QDir dir;
-	if (!mToolFileToolStructure.mGraphicsFileName.isEmpty()
-					&& dir.exists(mToolFileToolStructure.mGraphicsFileName))
-	{
-		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-		reader->SetFileName(cstring_cast(mToolFileToolStructure.mGraphicsFileName));
-		reader->Update();
-		mPolyData = reader->GetOutput();
-	}
-	else
-	{
-				mPolyData = Tool::createDefaultPolyDataCone();
-	}
 }
 
 bool OpenIGTLinkTool::isCalibrated() const
