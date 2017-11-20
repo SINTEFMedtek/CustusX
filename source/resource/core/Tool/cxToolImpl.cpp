@@ -61,11 +61,11 @@ std::set<Tool::Type> ToolImpl::getTypesFromToolStructure(ToolFileParser::ToolInt
 	std::set<Type> retval;
 
 	if (toolStructure.mIsReference)
-		retval.insert(Type::TOOL_REFERENCE);
+		retval.insert(Tool::TOOL_REFERENCE);
 	if (toolStructure.mIsPointer)
-		retval.insert(Type::TOOL_POINTER);
+		retval.insert(Tool::TOOL_POINTER);
 	if (toolStructure.mIsProbe)
-		retval.insert(Type::TOOL_US_PROBE);
+		retval.insert(Tool::TOOL_US_PROBE);
 
 	return retval;
 }
