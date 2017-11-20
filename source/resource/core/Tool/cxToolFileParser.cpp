@@ -6,6 +6,7 @@
 #include "cxEnumConverter.h"
 #include "cxFrame3D.h"
 #include "cxTransformFile.h"
+#include "cxDefinitionStrings.h"//Removes warning for string2enum
 
 namespace cx {
 
@@ -264,11 +265,11 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
 
     QDomElement toolSensorPortnumberElement = toolSensorElement.firstChildElement(mToolSensorPortnumberTag);
     QString toolSensorPortnumberText = toolSensorPortnumberElement.text();
-    internalStructure.mPortNumber = toolSensorPortnumberText.toInt();
+		internalStructure.mPortNumber = toolSensorPortnumberText.toUInt();
 
     QDomElement toolSensorChannelnumberElement = toolSensorElement.firstChildElement(mToolSensorChannelnumberTag);
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
-    internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
+    internalStructure.mChannelNumber = toolSensorChannelnumberText.toUInt();
 
     QDomNodeList toolSensorReferencePointList = toolSensorElement.elementsByTagName(mToolSensorReferencePointTag);
     for (int j = 0; j < toolSensorReferencePointList.count(); j++)

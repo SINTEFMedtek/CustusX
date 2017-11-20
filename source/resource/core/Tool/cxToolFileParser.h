@@ -105,7 +105,9 @@ public:
                         mTrackerType(tsNONE), mSROMFilename(""),
                         mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
                         mReferencePoints(), mWireless(true),
-                        m5DOF(true), mCalibrationFilename(""),
+												m5DOF(true),
+												mCalibration(Transform3D::Identity()),
+												mCalibrationFilename(""),
                         mGraphicsFileName(""), mPictureFileName(""),
                         mTransformSaveFileName(""),
                         mLoggingFolderName(""), mInstrumentId(""),
@@ -115,7 +117,7 @@ public:
 
 public:
     ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");
-    ~ToolFileParser();
+		virtual ~ToolFileParser();
 
     virtual ToolInternalStructure getTool();
 

@@ -107,7 +107,6 @@ private:
     ProbePtr mProbe;
     QTimer mTpsTimer;
     double mTimestamp;
-		Transform3D m_sMt_calibration;
 
 		//Store these structures directly for now
 		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;

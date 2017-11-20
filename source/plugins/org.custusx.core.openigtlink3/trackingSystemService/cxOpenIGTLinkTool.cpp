@@ -41,7 +41,6 @@ namespace cx
 OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure) :
 	ToolImpl(toolFileToolStructure.mUid, toolFileToolStructure.mUid),
 	mTimestamp(0),
-	m_sMt_calibration(Transform3D::Identity()),
 	mConfigFileToolStructure(configFileToolStructure),
 	mToolFileToolStructure(toolFileToolStructure)
 
@@ -135,30 +134,32 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
 bool OpenIGTLinkTool::isCalibrated() const
 {
     Transform3D identity = Transform3D::Identity();
-    bool calibrated = !similar(m_sMt_calibration, identity);
-    CX_LOG_DEBUG() << "Checking if openiglink tool is calibratated: " << calibrated;
 
-    return calibrated;
+		Transform3D sMt = this->getCalibration_sMt();
+		bool calibrated = !similar(sMt, identity);
+		CX_LOG_DEBUG() << "Checking if openiglink tool is calibratated: " << calibrated;
+		return calibrated;
 }
 
 Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 {
-    return m_sMt_calibration;
+	return mToolFileToolStructure.getCalibrationAsSSC();
 }
 
 void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
 {
-    if(!similar(m_sMt_calibration, sMt))
-    {
-        m_sMt_calibration = sMt;
-        CX_LOG_INFO() << mName << " got an updated calibration";
-    }
+	CX_LOG_INFO() << mName << " got an updated calibration";
+	CX_LOG_WARNING() << "OpenIGTLinkTool::setCalibration_sMt() Receiving calibration. Should file be updated, or should it be discarded and use calibration form file instead?";
+	CX_LOG_WARNING() << "Current implementation discards this received calibration. sMt: " << sMt;
+//	mToolFileToolStructure.mCalibration = sMt;
+	//write to file
+//	mInternalStructure.saveCalibrationToFile();
 }
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
 {
     mTimestamp = timestamp;// /1000000;
-    Transform3D prMt = prMs * m_sMt_calibration;
+		Transform3D prMt = prMs * this->getCalibration_sMt();
     Transform3D prMt_filtered = prMt;
 
     if (mTrackingPositionFilter)
@@ -184,7 +185,7 @@ void OpenIGTLinkTool::calculateTpsSlot()
 
     TimedTransformMap::reverse_iterator rit = mPositionHistory->rbegin();
     double lastTransform = rit->first;
-    for (int i = 0; i < numberOfTransformsToCheck-1; ++i)
+		for (size_t i = 0; i < numberOfTransformsToCheck-1; ++i)
     {
         ++rit;
     }
@@ -192,7 +193,7 @@ void OpenIGTLinkTool::calculateTpsSlot()
     double secondsPassed = (lastTransform - firstTransform) / 1000;
 
     if (!similar(secondsPassed, 0))
-        tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
+				tpsNr = int(numberOfTransformsToCheck / secondsPassed);
     emit tps(tpsNr);
 }
 
@@ -206,6 +207,7 @@ void OpenIGTLinkTool::toolVisibleSlot(bool on)
 
 void OpenIGTLinkTool::setVisible(bool vis)
 {
+	Q_UNUSED(vis);
     CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
 }
 
