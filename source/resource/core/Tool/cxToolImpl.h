@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxResourceExport.h"
 
 #include "cxTool.h"
+#include "cxToolFileParser.h"
 
 namespace cx
 {
@@ -67,8 +68,8 @@ public:
 	virtual void resetTrackingPositionFilter(TrackingPositionFilterPtr filter);
 	virtual bool isNull() { return false; }
 
-	virtual void addXml(QDomNode& dataNode) {}
-	virtual void parseXml(QDomNode& dataNode) {}
+	virtual void addXml(QDomNode& dataNode) {Q_UNUSED(dataNode)}
+	virtual void parseXml(QDomNode& dataNode) {Q_UNUSED(dataNode)}
 
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 protected:
@@ -81,6 +82,7 @@ protected:
 	std::map<double, ToolPositionMetadata> mMetadata;
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
 
+	std::set<Tool::Type> getTypesFromToolStructure(ToolFileParser::ToolInternalStructure toolStructure) const;
 private:
 	double mTooltipOffset;
 };

@@ -46,14 +46,28 @@ ToolImpl::ToolImpl(const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
-	mTooltipOffset(0),
-	mPolyData(NULL)
+	mPolyData(NULL),
+	mTooltipOffset(0)
 {
 }
 
 ToolImpl::~ToolImpl()
 {
 
+}
+
+std::set<Tool::Type> ToolImpl::getTypesFromToolStructure(ToolFileParser::ToolInternalStructure toolStructure) const
+{
+	std::set<Type> retval;
+
+	if (toolStructure.mIsReference)
+		retval.insert(Type::TOOL_REFERENCE);
+	if (toolStructure.mIsPointer)
+		retval.insert(Type::TOOL_POINTER);
+	if (toolStructure.mIsProbe)
+		retval.insert(Type::TOOL_US_PROBE);
+
+	return retval;
 }
 
 ToolPositionMetadata ToolImpl::getMetadata() const

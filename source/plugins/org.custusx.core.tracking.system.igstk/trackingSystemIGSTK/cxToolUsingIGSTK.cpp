@@ -77,18 +77,9 @@ ToolUsingIGSTK::~ToolUsingIGSTK()
 {
 }
 
-std::set<ToolUsingIGSTK::Type> ToolUsingIGSTK::getTypes() const
+std::set<Tool::Type> ToolUsingIGSTK::getTypes() const
 {
-	std::set<Type> retval;
-
-	if (mTool->getInternalStructure().mIsReference)
-		retval.insert(ToolUsingIGSTK::TOOL_REFERENCE);
-	if (mTool->getInternalStructure().mIsPointer)
-		retval.insert(ToolUsingIGSTK::TOOL_POINTER);
-	if (mTool->getInternalStructure().mIsProbe)
-		retval.insert(ToolUsingIGSTK::TOOL_US_PROBE);
-
-	return retval;
+	return this->getTypesFromToolStructure(mTool->getInternalStructure());
 }
 
 ProbePtr ToolUsingIGSTK::getProbe() const

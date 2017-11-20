@@ -96,7 +96,7 @@ public:
 	ToolUsingIGSTK(IgstkToolPtr igstkTool);
 	virtual ~ToolUsingIGSTK();
 
-	virtual std::set<Type> getTypes() const;
+	virtual std::set<Tool::Type> getTypes() const;
 
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;

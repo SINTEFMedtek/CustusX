@@ -79,7 +79,7 @@ public:
 	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure);
     virtual ~OpenIGTLinkTool();
 
-    virtual std::set<Type> getTypes() const;
+		virtual std::set<Type> getTypes() const;
 
     virtual bool getVisible() const;
     virtual bool isInitialized() const;
@@ -104,12 +104,9 @@ private slots:
     void toolVisibleSlot(bool);
 
 private:
-    bool isProbe() const;
-
     ProbePtr mProbe;
     QTimer mTpsTimer;
     double mTimestamp;
-    std::set<Type> mTypes;
 		Transform3D m_sMt_calibration;
 
 		//Store these structures directly for now

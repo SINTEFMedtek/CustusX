@@ -83,7 +83,7 @@ OpenIGTLinkTool::~OpenIGTLinkTool()
 
 std::set<Tool::Type> OpenIGTLinkTool::getTypes() const
 {
-    return mTypes;
+	return this->getTypesFromToolStructure(mToolFileToolStructure);
 }
 
 ProbePtr OpenIGTLinkTool::getProbe() const
@@ -130,11 +130,6 @@ void OpenIGTLinkTool::setTooltipOffset(double val)
     if(this->getProbe())
         return;
     ToolImpl::setTooltipOffset(val);
-}
-
-bool OpenIGTLinkTool::isProbe() const
-{
-    return (mTypes.find(TOOL_US_PROBE) != mTypes.end()) ? true : false;
 }
 
 bool OpenIGTLinkTool::isCalibrated() const
