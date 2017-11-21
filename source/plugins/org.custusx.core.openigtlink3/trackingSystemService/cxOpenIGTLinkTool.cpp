@@ -62,7 +62,7 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 
-	this->createToolGraphic(mToolFileToolStructure->mGraphicsFileName);
+	this->createToolGraphic();
 	this->toolVisibleSlot(true);
 }
 
@@ -78,11 +78,6 @@ bool OpenIGTLinkTool::isThisTool(QString OpenIGTLinkId)
 
 OpenIGTLinkTool::~OpenIGTLinkTool()
 {
-}
-
-std::set<Tool::Type> OpenIGTLinkTool::getTypes() const
-{
-	return this->getTypesFromToolStructure(mToolFileToolStructure);
 }
 
 ProbePtr OpenIGTLinkTool::getProbe() const
@@ -211,9 +206,9 @@ void OpenIGTLinkTool::setVisible(bool vis)
     CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
 }
 
-std::map<int, Vector3D> OpenIGTLinkTool::getReferencePoints() const
+ToolFileParser::ToolInternalStructurePtr OpenIGTLinkTool::getToolFileToolStructure() const
 {
-	return mToolFileToolStructure->mReferencePoints;
+	return mToolFileToolStructure;
 }
 
 }//namespace cx

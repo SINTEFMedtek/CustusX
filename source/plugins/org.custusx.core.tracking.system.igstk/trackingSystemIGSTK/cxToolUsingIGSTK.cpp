@@ -52,11 +52,11 @@ ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 				mValid(false), mConfigured(false), mTracked(false)
 {
 	mTimestamp = 0;
-	Tool::mUid = mTool->getInternalStructure()->mUid;
-	Tool::mName = mTool->getInternalStructure()->mName;
+	Tool::mUid = getToolFileToolStructure()->mUid;
+	Tool::mName = getToolFileToolStructure()->mName;
 	mValid = igstkTool->isValid();
 
-	this->createToolGraphic(mTool->getInternalStructure()->mGraphicsFileName);
+	this->createToolGraphic();
 
 	connect(mTool.get(), &IgstkTool::toolTransformAndTimestamp, this,
 					&ToolUsingIGSTK::toolTransformAndTimestampSlot);
@@ -65,21 +65,16 @@ ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
 	connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-	if (mTool->getInternalStructure()->mIsProbe)
+	if (getToolFileToolStructure()->mIsProbe)
 	{
-		mProbe = ProbeImpl::New(mTool->getInternalStructure()->mInstrumentId,
-						mTool->getInternalStructure()->mInstrumentScannerId);
+		mProbe = ProbeImpl::New(getToolFileToolStructure()->mInstrumentId,
+						getToolFileToolStructure()->mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 }
 
 ToolUsingIGSTK::~ToolUsingIGSTK()
 {
-}
-
-std::set<Tool::Type> ToolUsingIGSTK::getTypes() const
-{
-	return this->getTypesFromToolStructure(mTool->getInternalStructure());
 }
 
 ProbePtr ToolUsingIGSTK::getProbe() const
@@ -129,13 +124,13 @@ bool ToolUsingIGSTK::isValid() const
 bool ToolUsingIGSTK::isCalibrated() const
 {
 	Transform3D identity = Transform3D::Identity();
-	Transform3D sMt = mTool->getInternalStructure()->getCalibrationAsSSC();
+	Transform3D sMt = getToolFileToolStructure()->getCalibrationAsSSC();
 	return !similar(sMt, identity);
 }
 
 Transform3D ToolUsingIGSTK::getCalibration_sMt() const
 {
-	Transform3D sMt = mTool->getInternalStructure()->getCalibrationAsSSC();
+	Transform3D sMt = getToolFileToolStructure()->getCalibrationAsSSC();
 
 	return sMt;
 }
@@ -147,12 +142,12 @@ void ToolUsingIGSTK::setCalibration_sMt(Transform3D calibration)
 
 QString ToolUsingIGSTK::getCalibrationFileName() const
 {
-	return mTool->getInternalStructure()->mCalibrationFilename;
+	return getToolFileToolStructure()->mCalibrationFilename;
 }
 
 TRACKING_SYSTEM ToolUsingIGSTK::getTrackerType()
 {
-	return mTool->getInternalStructure()->mTrackerType;
+	return getToolFileToolStructure()->mTrackerType;
 }
 
 void ToolUsingIGSTK::printInternalStructure()
@@ -160,9 +155,9 @@ void ToolUsingIGSTK::printInternalStructure()
 	mTool->printInternalStructure();
 }
 
-std::map<int, Vector3D> ToolUsingIGSTK::getReferencePoints() const
+ToolFileParser::ToolInternalStructurePtr ToolUsingIGSTK::getToolFileToolStructure() const
 {
-	return mTool->getInternalStructure()->mReferencePoints;
+	return mTool->getInternalStructure();
 }
 
 void ToolUsingIGSTK::addXml(QDomNode& dataNode)

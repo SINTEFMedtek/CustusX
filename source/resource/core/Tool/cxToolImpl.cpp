@@ -56,8 +56,9 @@ ToolImpl::~ToolImpl()
 
 }
 
-std::set<Tool::Type> ToolImpl::getTypesFromToolStructure(ToolFileParser::ToolInternalStructurePtr toolStructure) const
+std::set<Tool::Type> ToolImpl::getTypes() const
 {
+	ToolFileParser::ToolInternalStructurePtr toolStructure = this->getToolFileToolStructure();
 	std::set<Type> retval;
 
 	if (toolStructure->mIsReference)
@@ -134,8 +135,9 @@ void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
     mTrackingPositionFilter = filter;
 }
 
-void ToolImpl::createToolGraphic(QString toolGraphicsFileName)
+void ToolImpl::createToolGraphic()
 {
+	QString toolGraphicsFileName = this->getToolFileToolStructure()->mGraphicsFileName;
 	QDir dir;
 	if (!toolGraphicsFileName.isEmpty()
 					&& dir.exists(toolGraphicsFileName))
@@ -147,7 +149,7 @@ void ToolImpl::createToolGraphic(QString toolGraphicsFileName)
 	}
 	else
 	{
-				mPolyData = Tool::createDefaultPolyDataCone();
+		mPolyData = Tool::createDefaultPolyDataCone();
 	}
 }
 
@@ -160,5 +162,11 @@ bool ToolImpl::hasReferencePointWithId(int id)
 {
 	return this->getReferencePoints().count(id);
 }
+
+std::map<int, Vector3D> ToolImpl::getReferencePoints() const
+{
+	return getToolFileToolStructure()->mReferencePoints;
+}
+
 } // namespace cx
 

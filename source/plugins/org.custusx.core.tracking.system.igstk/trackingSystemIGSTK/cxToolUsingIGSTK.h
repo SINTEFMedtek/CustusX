@@ -96,8 +96,6 @@ public:
 	ToolUsingIGSTK(IgstkToolPtr igstkTool);
 	virtual ~ToolUsingIGSTK();
 
-	virtual std::set<Tool::Type> getTypes() const;
-
 	virtual bool getVisible() const;
 	virtual bool isInitialized() const;
 	virtual QString getUid() const;
@@ -115,8 +113,6 @@ public:
 
 	TRACKING_SYSTEM getTrackerType(); ///< the type of tracker this tool belongs to
 
-	virtual std::map<int, Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
-
 	bool isValid() const; ///< whether this tool is constructed correctly or not
 
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
@@ -128,6 +124,8 @@ public:
 signals:
 	void attachedToTracker(bool);
 
+protected:
+	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:
 	void toolTransformAndTimestampSlot(Transform3D matrix, double timestamp, ToolPositionMetadata metadata); ///< timestamp is in milliseconds
 	void calculateTpsSlot();

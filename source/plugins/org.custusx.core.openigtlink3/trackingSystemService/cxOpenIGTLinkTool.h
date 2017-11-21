@@ -79,8 +79,6 @@ public:
 	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructurePtr toolFileToolStructure);
     virtual ~OpenIGTLinkTool();
 
-		virtual std::set<Type> getTypes() const;
-
     virtual bool getVisible() const;
     virtual bool isInitialized() const;
     virtual QString getUid() const;
@@ -98,7 +96,8 @@ public:
     virtual void setVisible(bool vis);
 
 	bool isThisTool(QString OpenIGTLinkId);
-	virtual std::map<int, Vector3D> getReferencePoints() const;
+protected:
+	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp); ///< timestamp is in milliseconds
     void calculateTpsSlot();
