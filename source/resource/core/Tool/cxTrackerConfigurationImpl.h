@@ -69,7 +69,7 @@ public:
 private:
 	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,
 			QStringList trackingsystemsFilter);
-    ToolFileParser::ToolInternalStructure getToolInternal(QString toolAbsoluteFilePath);
+		ToolFileParser::ToolInternalStructurePtr getToolInternal(QString toolAbsoluteFilePath);
 
 };
 

@@ -76,7 +76,7 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTool: public ToolImpl
     Q_OBJECT
 
 public:
-	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure);
+	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructurePtr toolFileToolStructure);
     virtual ~OpenIGTLinkTool();
 
 		virtual std::set<Type> getTypes() const;
@@ -98,6 +98,7 @@ public:
     virtual void setVisible(bool vis);
 
 	bool isThisTool(QString OpenIGTLinkId);
+	virtual std::map<int, Vector3D> getReferencePoints() const;
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp); ///< timestamp is in milliseconds
     void calculateTpsSlot();
@@ -110,7 +111,7 @@ private:
 
 		//Store these structures directly for now
 		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
-		ToolFileParser::ToolInternalStructure mToolFileToolStructure;
+		ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

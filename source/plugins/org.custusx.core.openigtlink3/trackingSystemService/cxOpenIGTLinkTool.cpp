@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructure toolFileToolStructure) :
-	ToolImpl(toolFileToolStructure.mUid, toolFileToolStructure.mUid),
+OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructurePtr toolFileToolStructure) :
+	ToolImpl(toolFileToolStructure->mUid, toolFileToolStructure->mUid),
 	mTimestamp(0),
 	mConfigFileToolStructure(configFileToolStructure),
 	mToolFileToolStructure(toolFileToolStructure)
@@ -49,7 +49,7 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mOpenIGTLinkTransformId: " << mConfigFileToolStructure.mOpenIGTLinkTransformId << " mOpenIGTLinkImageId: " << mConfigFileToolStructure.mOpenIGTLinkImageId;
 	connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-	if(toolFileToolStructure.mIsProbe)
+	if(toolFileToolStructure->mIsProbe)
 	{
 //		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
 //		CX_LOG_DEBUG() << "OpenIGTLinkTool is probe";
@@ -62,7 +62,7 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 
-	this->createToolGraphic(mToolFileToolStructure.mGraphicsFileName);
+	this->createToolGraphic(mToolFileToolStructure->mGraphicsFileName);
 	this->toolVisibleSlot(true);
 }
 
@@ -143,7 +143,7 @@ bool OpenIGTLinkTool::isCalibrated() const
 
 Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 {
-	return mToolFileToolStructure.getCalibrationAsSSC();
+	return mToolFileToolStructure->getCalibrationAsSSC();
 }
 
 void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
@@ -209,6 +209,11 @@ void OpenIGTLinkTool::setVisible(bool vis)
 {
 	Q_UNUSED(vis);
     CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
+}
+
+std::map<int, Vector3D> OpenIGTLinkTool::getReferencePoints() const
+{
+	return mToolFileToolStructure->mReferencePoints;
 }
 
 }//namespace cx

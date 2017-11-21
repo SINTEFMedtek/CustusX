@@ -116,7 +116,6 @@ public:
 	TRACKING_SYSTEM getTrackerType(); ///< the type of tracker this tool belongs to
 
 	virtual std::map<int, Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
-	virtual bool hasReferencePointWithId(int id);
 
 	bool isValid() const; ///< whether this tool is constructed correctly or not
 

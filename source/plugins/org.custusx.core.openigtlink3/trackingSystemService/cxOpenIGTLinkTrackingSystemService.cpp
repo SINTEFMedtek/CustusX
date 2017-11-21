@@ -179,9 +179,9 @@ void OpenIGTLinkTrackingSystemService::configure()
 	for(std::vector<ConfigurationFileParser::ToolStructure>::iterator it = toolList.begin(); it != toolList.end(); ++it)
 	{
 		ToolFileParser toolParser((*it).mAbsoluteToolFilePath, mLoggingFolder);
-		ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
+		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
 
-		QString devicename = internalTool.mUid;
+		QString devicename = internalTool->mUid;
 		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
 		mTools[devicename] = newTool;
 	}

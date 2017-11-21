@@ -78,10 +78,10 @@ public:
     static igstk::Transform toIgstkTransform(Transform3D transform);
     static Transform3D toTransform3D(igstk::Transform transform);
 
-    IgstkTool(ToolFileParser::ToolInternalStructure internalStructure);
+		IgstkTool(ToolFileParser::ToolInternalStructurePtr internalStructure);
 	virtual ~IgstkTool();
 
-    ToolFileParser::ToolInternalStructure getInternalStructure();
+		ToolFileParser::ToolInternalStructurePtr getInternalStructure();
 	QString getUid();
 
 	igstk::TrackerTool::Pointer getPointer() const; ///< return a pointer to the internal tools base object
@@ -89,7 +89,7 @@ public:
 //  Tool::Type getType() const;
 	bool isReference() const
 	{
-		return mInternalStructure.mIsReference;
+		return mInternalStructure->mIsReference;
 	}
 
 	bool isValid() const; ///< Thread safe, volatile
@@ -121,7 +121,7 @@ private:
 	igstk::NDITracker::TrackingSampleInfo getSampleInfo();
 	bool validReferenceForResult(igstk::CoordinateSystemTransformToResult result);
 
-    ToolFileParser::ToolInternalStructure mInternalStructure; ///< the structure that defines the tool characteristics
+	ToolFileParser::ToolInternalStructurePtr mInternalStructure; ///< the structure that defines the tool characteristics
 	igstk::TrackerTool::Pointer mTool; ///< pointer to the base class of the igstk tool
 	IgstkToolWeakPtr mReferenceTool; ///< the tool that is used as a reference to the tracking system
 	TrackerWeakPtr mTracker; ///< the tracker this tool belongs to

@@ -165,16 +165,16 @@ void TrackingSystemIGSTKService::configure()
 		return;
 	}
 
-    ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
+	ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
-    ToolFileParser::ToolInternalStructure referenceToolStructure;
-    std::vector<ToolFileParser::ToolInternalStructure> toolStructures;
+	ToolFileParser::ToolInternalStructurePtr referenceToolStructure;
+	std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures;
 	QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
 	std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
 	for (std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
 	{
 		ToolFileParser toolParser(*it, mLoggingFolder);
-        ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
+		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
 		if ((*it) == referenceToolFile)
 			referenceToolStructure = internalTool;
 		else

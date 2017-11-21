@@ -72,8 +72,8 @@ Q_OBJECT
 
 public:
     IgstkToolManager(ToolFileParser::TrackerInternalStructure trackerStructure,
-                    std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                    ToolFileParser::ToolInternalStructure referenceToolStructure);
+										std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+										ToolFileParser::ToolInternalStructurePtr referenceToolStructure);
 	virtual ~IgstkToolManager();
 
 	std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe
@@ -96,9 +96,9 @@ private slots:
 
 private:
     void createTracker(ToolFileParser::TrackerInternalStructure trackerStructure);
-    void createTools(std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                    ToolFileParser::ToolInternalStructure referenceToolStructure);
-    IgstkToolPtr addIgstkTools(ToolFileParser::ToolInternalStructure& toolStructure);
+		void createTools(std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+										ToolFileParser::ToolInternalStructurePtr referenceToolStructure);
+		IgstkToolPtr addIgstkTools(ToolFileParser::ToolInternalStructurePtr toolStructure);
 	void setReferenceAndTrackerOnTools();
 
 	void printStatus(); ///< just for debugging
@@ -106,7 +106,7 @@ private:
 	TrackerPtr mTracker;
 	QMutex mToolMutex; ///< protects mTools
 	std::map<QString, IgstkToolPtr> mTools;
-	int mInitAnsweres; ///< keeps track of how many tools and trackers have gotten an answer from the hardware
+	size_t mInitAnsweres; ///< keeps track of how many tools and trackers have gotten an answer from the hardware
 	QMutex mReferenceMutex; ///< protects mReferenceTool
 	IgstkToolPtr mReferenceTool;
 

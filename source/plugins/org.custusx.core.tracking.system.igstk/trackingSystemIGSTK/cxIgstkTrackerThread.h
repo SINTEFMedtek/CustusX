@@ -67,9 +67,9 @@ class org_custusx_core_tracking_system_igstk_EXPORT IgstkTrackerThread: public Q
 Q_OBJECT
 
 public:
-    IgstkTrackerThread(ToolFileParser::TrackerInternalStructure trackerStructure,
-                    std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                    ToolFileParser::ToolInternalStructure referenceToolStructure);
+		IgstkTrackerThread(ToolFileParser::TrackerInternalStructure trackerStructure,
+										std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+										ToolFileParser::ToolInternalStructurePtr referenceToolStructure);
 	virtual ~IgstkTrackerThread();
 
 	void initialize(bool on); ///< connects to the hardware. Threadsafe.
@@ -92,9 +92,9 @@ private:
 	void configure();
 	void deconfigure();
 
-    ToolFileParser::TrackerInternalStructure mInitTrackerStructure;
-    std::vector<ToolFileParser::ToolInternalStructure> mInitToolStructures;
-    ToolFileParser::ToolInternalStructure mInitReferenceToolStructure;
+	ToolFileParser::TrackerInternalStructure mInitTrackerStructure;
+	std::vector<ToolFileParser::ToolInternalStructurePtr> mInitToolStructures;
+	ToolFileParser::ToolInternalStructurePtr mInitReferenceToolStructure;
 
 	IgstkToolManagerPtr mManager;
 };

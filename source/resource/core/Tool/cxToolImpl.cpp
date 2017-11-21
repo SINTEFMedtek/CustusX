@@ -56,15 +56,15 @@ ToolImpl::~ToolImpl()
 
 }
 
-std::set<Tool::Type> ToolImpl::getTypesFromToolStructure(ToolFileParser::ToolInternalStructure toolStructure) const
+std::set<Tool::Type> ToolImpl::getTypesFromToolStructure(ToolFileParser::ToolInternalStructurePtr toolStructure) const
 {
 	std::set<Type> retval;
 
-	if (toolStructure.mIsReference)
+	if (toolStructure->mIsReference)
 		retval.insert(Tool::TOOL_REFERENCE);
-	if (toolStructure.mIsPointer)
+	if (toolStructure->mIsPointer)
 		retval.insert(Tool::TOOL_POINTER);
-	if (toolStructure.mIsProbe)
+	if (toolStructure->mIsProbe)
 		retval.insert(Tool::TOOL_US_PROBE);
 
 	return retval;
@@ -156,5 +156,9 @@ vtkPolyDataPtr ToolImpl::getGraphicsPolyData() const
 	return mPolyData;
 }
 
+bool ToolImpl::hasReferencePointWithId(int id)
+{
+	return this->getReferencePoints().count(id);
+}
 } // namespace cx
 

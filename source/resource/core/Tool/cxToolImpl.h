@@ -72,6 +72,7 @@ public:
 	virtual void parseXml(QDomNode& dataNode) {Q_UNUSED(dataNode)}
 
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
+	virtual bool hasReferencePointWithId(int id);
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	void createToolGraphic(QString toolGraphicsFileName);
@@ -82,7 +83,7 @@ protected:
 	std::map<double, ToolPositionMetadata> mMetadata;
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
 
-	std::set<Tool::Type> getTypesFromToolStructure(ToolFileParser::ToolInternalStructure toolStructure) const;
+	std::set<Tool::Type> getTypesFromToolStructure(ToolFileParser::ToolInternalStructurePtr toolStructure) const;
 private:
 	double mTooltipOffset;
 };
