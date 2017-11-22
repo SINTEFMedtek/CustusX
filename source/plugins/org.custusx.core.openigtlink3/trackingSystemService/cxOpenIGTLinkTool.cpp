@@ -32,6 +32,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxOpenIGTLinkTool.h"
 
+#include <QDateTime>
+
 #include "cxTrackingPositionFilter.h"
 #include "cxLogger.h"
 #include "cxProbeImpl.h"
@@ -41,13 +43,16 @@ namespace cx
 OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructurePtr toolFileToolStructure) :
 	ToolImpl(toolFileToolStructure->mUid, toolFileToolStructure->mUid),
 	mTimestamp(0),
+	mVisible(false),
+	mLastReceivedPositionTime(0),
 	mConfigFileToolStructure(configFileToolStructure),
 	mToolFileToolStructure(toolFileToolStructure)
 
 {
 //	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
-	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mOpenIGTLinkTransformId: " << mConfigFileToolStructure.mOpenIGTLinkTransformId << " mOpenIGTLinkImageId: " << mConfigFileToolStructure.mOpenIGTLinkImageId;
-	connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
+//	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mOpenIGTLinkTransformId: " << mConfigFileToolStructure.mOpenIGTLinkTransformId << " mOpenIGTLinkImageId: " << mConfigFileToolStructure.mOpenIGTLinkImageId;
+	connect(&mTpsTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateTpsSlot);
+	connect(&mTpsTimer, &QTimer::timeout, this, &OpenIGTLinkTool::calculateVisible);//Use tps timer to calculate visibility
 
 	if(toolFileToolStructure->mIsProbe)
 	{
@@ -92,8 +97,7 @@ double OpenIGTLinkTool::getTimestamp() const
 
 bool OpenIGTLinkTool::getVisible() const
 {
-    //TODO add some logic, visible if transform arrived in the last X seconds???
-    return true;
+	return mVisible;
 }
 
 bool OpenIGTLinkTool::isInitialized() const
@@ -153,7 +157,23 @@ void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
 {
-    mTimestamp = timestamp;// /1000000;
+//    mTimestamp = timestamp;// /1000000;
+	mTimestamp = timestamp * 1000;
+	mLastReceivedPositionTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double diff = mLastReceivedPositionTime - mTimestamp;
+
+	if(diff > 1000)
+		CX_LOG_WARNING() << "Difference between system time and received tool timestamp: " << diff;
+
+	//TODO: Make sure this is the way we want to handle this
+	//Current implementation gets transform between tool frame and ref frame.
+	//Another solution is to get all transform between tool frame and tracking system.
+
+	//Reference is getting transform from reference tool to tracking system.
+	//Only use received transform to verify that reference tool is visible.
+		if(isReference())
+		return;
+
 		Transform3D prMt = prMs * this->getCalibration_sMt();
     Transform3D prMt_filtered = prMt;
 
@@ -192,6 +212,19 @@ void OpenIGTLinkTool::calculateTpsSlot()
     emit tps(tpsNr);
 }
 
+void OpenIGTLinkTool::calculateVisible()
+{
+	//Compare only timestamps from this computer, and not the received timestamps
+	//(as this computer man not be in sync with the one creating the messages)
+	qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double diff = currentTime - mLastReceivedPositionTime;
+//	CX_LOG_DEBUG() << "diff: " << diff;
+	if(diff > 500)//Set visible to false if last position is more than 500 ms old
+		setVisible(false);
+	else
+		setVisible(true);
+}
+
 void OpenIGTLinkTool::toolVisibleSlot(bool on)
 {
     if (on)
@@ -202,13 +235,19 @@ void OpenIGTLinkTool::toolVisibleSlot(bool on)
 
 void OpenIGTLinkTool::setVisible(bool vis)
 {
-	Q_UNUSED(vis);
-    CX_LOG_WARNING() << "Cannot set visible on a openigtlink tool.";
+	mVisible = vis;
+	emit toolVisible(vis);
 }
 
 ToolFileParser::ToolInternalStructurePtr OpenIGTLinkTool::getToolFileToolStructure() const
 {
 	return mToolFileToolStructure;
 }
+
+bool OpenIGTLinkTool::isReference()
+{
+	return getToolFileToolStructure()->mIsReference;
+}
+
 
 }//namespace cx

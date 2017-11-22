@@ -96,6 +96,7 @@ public:
     virtual void setVisible(bool vis);
 
 	bool isThisTool(QString OpenIGTLinkId);
+	bool isReference();
 protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:
@@ -107,10 +108,14 @@ private:
     ProbePtr mProbe;
     QTimer mTpsTimer;
     double mTimestamp;
+		bool mVisible;
+		qint64 mLastReceivedPositionTime;
 
 		//Store these structures directly for now
 		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
 		ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
+
+		void calculateVisible();
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

@@ -133,11 +133,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
 
-		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
-										<< " streamIdTo: " << content.streamIdTo
-										<< " streamIdFrom: " << content.streamIdFrom
-										<< " deviceName: " << deviceName
-										<< " transform: " << cxtransform;
+//		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
+//										<< " streamIdTo: " << content.streamIdTo
+//										<< " streamIdFrom: " << content.streamIdFrom
+//										<< " deviceName: " << deviceName
+//										<< " transform: " << cxtransform;
 
 		double timestamp = header.timestamp;
 //		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
