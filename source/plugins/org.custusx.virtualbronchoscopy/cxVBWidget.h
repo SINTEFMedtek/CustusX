@@ -70,7 +70,7 @@ public:
 	virtual ~VBWidget();
 	void setRouteToTarget(QString uid);
 
-private:
+protected:
 	QString defaultWhatsThis() const;
 	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;

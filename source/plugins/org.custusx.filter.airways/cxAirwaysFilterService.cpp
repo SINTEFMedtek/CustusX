@@ -68,7 +68,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
-	FilterImpl(services)
+	FilterImpl(services),
+	mDefaultStraightCLTubesOption(false)
 {
 	fast::Reporter::setGlobalReportMethod(fast::Reporter::COUT);
     //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
@@ -429,14 +430,20 @@ void AirwaysFilter::createTubes()
 	centerline->setVtkPolyData(blobbyLogoIso->GetOutput());
 	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
 	centerline->get_rMd_History()->setRegistration(mTransformation);
+	//The color is taken from the new Fraxinus logo. Blue is the common color for lungs/airways. Partly transparent for a nice effect in Fraxinus.
+	centerline->setColor(QColor(118, 178, 226, 200));
 	patientService()->insertData(centerline);
 	mOutputTypes[4]->setValue(centerline->getUid());
 
 }
 
+void AirwaysFilter::setDefaultStraightCLTubesOption(bool defaultStraightCLTubesOption)
+{
+	mDefaultStraightCLTubesOption = defaultStraightCLTubesOption;
+}
+
 void AirwaysFilter::createStraightCL()
 {
-	//QString sCLstring = "_straight_";
 	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + "%1";
 	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + "%1";
 	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
@@ -523,7 +530,7 @@ BoolPropertyPtr AirwaysFilter::getStraightCLTubesOption(QDomElement root)
 					"Use this option to generate a centerline with straight branches between "
 					"the branch points. "
 					"You also get tubes based on this straight line.",
-					false, root);
+					mDefaultStraightCLTubesOption, root);
 	return retval;
 }
 

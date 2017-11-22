@@ -74,6 +74,7 @@ public:
     static QString getNameSuffix();
 	static QString getNameSuffixStraight();
 	static QString getNameSuffixTubes();
+	void setDefaultStraightCLTubesOption(bool defaultStraightCLTubesOption);
 
     bool preProcess();
 	virtual bool execute();
@@ -98,6 +99,7 @@ private:
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
     Vector3D seedPoint;
+	bool mDefaultStraightCLTubesOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
 
