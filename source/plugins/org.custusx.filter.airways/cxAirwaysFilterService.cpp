@@ -376,7 +376,7 @@ bool AirwaysFilter::postProcess()
 	patientService()->insertData(centerline);
 	mOutputTypes[0]->setValue(centerline->getUid());
 
-	// Straight centerline
+	// Straight centerline and tubes
 	if(getStraightCLTubesOption(mOptions)->getValue())
 	{
 		this->createStraightCL();
@@ -386,51 +386,52 @@ bool AirwaysFilter::postProcess()
 	return true;
 }
 
+/**
+ * @brief AirwaysFilter::createTubes
+ * This method of drawing tubes is from the Hello vtk example found in the
+ * VTK books, and also from the Blobbylogo example:
+ * https://lorensen.github.io/VTKExamples/site/Cxx/Visualization/BlobbyLogo/
+ * We found that it was easiest to use implicit modelling to create the tubes around
+ * a centerline. However, we have not been able to fully control the radius
+ * of the tubes. The current parameters gives the largest radius we have
+ * seen, and also the roundest shape.
+ * SetMaximumDistance and SetAdjustDistance must be aligned to get larger radius.
+ * SetValue may give a square shape.
+ * SetSampleDimensions must be large enough to give good resolution,
+ * but not so large that the creation takes too long.
+ */
 void AirwaysFilter::createTubes()
 {
-	QString clMeshUid = mOutputTypes[3]->getValue();
-	MeshPtr cl = boost::dynamic_pointer_cast<Mesh>(patientService()->getData(clMeshUid));
-	if(!cl)
+	// Get the straight centerline to model the tubes around.
+	QString straightCLUid = mOutputTypes[3]->getValue();
+	MeshPtr straightCL = boost::dynamic_pointer_cast<Mesh>(patientService()->getData(straightCLUid));
+	if(!straightCL)
 		return;
+	vtkPolyDataPtr clPolyData = straightCL->getVtkPolyData();
 
-	vtkPolyDataPtr clPolyData = cl->getVtkPolyData();
+	// Create the implicit modeller
 	vtkSmartPointer<vtkImplicitModeller> blobbyLogoImp =
 			vtkSmartPointer<vtkImplicitModeller>::New();
 	blobbyLogoImp->SetInputData(clPolyData);
-	//blobbyLogoImp->SetMaximumDistance(.075); //orig
 	blobbyLogoImp->SetMaximumDistance(0.1);
-	//blobbyLogoImp->SetMaximumDistance(.30); //for stort, sakte?
-	//blobbyLogoImp->SetMaximumDistance(.015);
-	//blobbyLogoImp->SetMaximumDistance(.9); //ser ingen effekt.
-	//blobbyLogoImp->SetSampleDimensions(64, 64, 64); //orig
-	//blobbyLogoImp->SetSampleDimensions(128, 128, 128); //ble bedre opppløsning og fyldigere!
-	//blobbyLogoImp->SetSampleDimensions(1024, 1024, 1024); //for stort, tok laaang tid??
-	//blobbyLogoImp->SetSampleDimensions(512, 512, 512); //Kortere tid, men vanskelig å se forskjellen.
 	blobbyLogoImp->SetSampleDimensions(256, 256, 256);
-	//blobbyLogoImp->SetAdjustDistance(0.2); //orig
 	blobbyLogoImp->SetAdjustDistance(0.1);
-	//blobbyLogoImp->SetAdjustDistance(0.3);
-	//blobbyLogoImp->SetAdjustDistance(0.01);
-	//blobbyLogoImp->SetAdjustDistance(0.9); //ble veldig hakkete
 
-	// extract an iso surface
+	// Extract an iso surface, i.e. the tube shell
 	vtkSmartPointer<vtkContourFilter> blobbyLogoIso =
 		vtkSmartPointer<vtkContourFilter>::New();
 	blobbyLogoIso->SetInputConnection(blobbyLogoImp->GetOutputPort());
 	blobbyLogoIso->SetValue(1, 1.5); //orig
-	//blobbyLogoIso->SetValue(0, 0.25); //nei, ble bare prikker
-	//blobbyLogoIso->SetValue(1, 1.0); //liten forskjell. litt smalere
 	blobbyLogoIso->Update();
 
-
-	// Create mesh object of the tubes
+	// Create the mesh object from the tube shell
 	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
 	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
 	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
 	centerline->setVtkPolyData(blobbyLogoIso->GetOutput());
 	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
 	centerline->get_rMd_History()->setRegistration(mTransformation);
-	//The color is taken from the new Fraxinus logo. Blue is the common color for lungs/airways. Partly transparent for a nice effect in Fraxinus.
+	// The color is taken from the new Fraxinus logo. Blue is the common color for lungs/airways. Partly transparent for a nice effect in Fraxinus.
 	centerline->setColor(QColor(118, 178, 226, 200));
 	patientService()->insertData(centerline);
 	mOutputTypes[4]->setValue(centerline->getUid());

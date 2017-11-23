@@ -521,16 +521,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-//	int N = centerline->GetNumberOfPoints();
-//	Eigen::MatrixXd CLpoints(3,N);
-//	for(vtkIdType i = 0; i < N; i++)
-//		{
-//		double p[3];
-//		centerline->GetPoint(i,p);
-//		Eigen::Vector3d position;
-//		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-//		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
-//		}
 	Eigen::MatrixXd CLpoints = makeTransformedMatrix(centerline, rMd);
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
 	if (numberOfGenerations != 0)
@@ -542,28 +532,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
-//	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
-//	vtkPointsPtr points = vtkPointsPtr::New();
-//	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
-
-//	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
-//	int positionCounter = 0;
-//	for (int i = 0; i < branches.size(); i++)
-//	{
-//		Eigen::MatrixXd positions = branches[i]->getPositions();
-//		for (int j = 0; j < positions.cols(); j++)
-//		{
-//			positionCounter ++;
-//			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
-//			if (j	 < positions.cols()-1)
-//			{
-//				vtkIdType connection[2] = {positionCounter-1, positionCounter};
-//				lines->InsertNextCell(2, connection);
-//			}
-//		}
-//	}
-//	retval->SetPoints(points);
-//	retval->SetLines(lines);
 	vtkPolyDataPtr retval = mBranchListPtr->createVtkPolyDataFromBranches();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
@@ -578,17 +546,6 @@ BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyData
 {
     BranchListPtr branchListPtr;
     branchListPtr = BranchListPtr(new BranchList());
-
-//    int N = centerline->GetNumberOfPoints();
-//    Eigen::MatrixXd CLpoints(3,N);
-//    for(vtkIdType i = 0; i < N; i++)
-//    {
-//        double p[3];
-//        centerline->GetPoint(i,p);
-//        Eigen::Vector3d position;
-//        position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-//        CLpoints.block(0 , i , 3 , 1) = position;
-//    }
 	Eigen::MatrixXd CLpoints = makeTransformedMatrix(centerline);
 
     branchListPtr->findBranchesInCenterline(CLpoints);

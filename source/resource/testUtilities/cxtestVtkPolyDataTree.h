@@ -47,7 +47,7 @@ namespace cxtest
 /**
  * @brief makeDummyCenterLine
  * This function makes a vtkPolyDataPtr to a dummy centerline looking like a fork: -<,
- * or with three branches: - and / and \
+ * with three branches: - and / and \
  * The branches has a zig-zag pattern. The number of points in each branch is not including
  * a common branch point. - / \ with two points in each branch will thus be connected by
  * two additional lines, making it 5 cells in the vtkpolydata objec.
@@ -114,7 +114,7 @@ vtkPolyDataPtr makeDummyCenterLine(int nfork1 = 100, int nfork2 = 100, int nfork
     vtkSmartPointer<vtkCellArray> lines =
         vtkSmartPointer<vtkCellArray>::New();
 
-    //Create lines
+	//Create lines. For - and / it is easy
     for (unsigned int i = 0; i < points->GetNumberOfPoints()-n3-1; ++i)
     {
         vtkSmartPointer<vtkLine> line =
@@ -124,18 +124,19 @@ vtkPolyDataPtr makeDummyCenterLine(int nfork1 = 100, int nfork2 = 100, int nfork
         lines->InsertNextCell(line);
     }
 
+	//For \ you must attach it close to the fork point.
     if(n3 > 0)
     {
         i = n1-1;
 
-        //Create first forked line
+		//Create first line of the fork between - and \.
         vtkSmartPointer<vtkLine> line =
                 vtkSmartPointer<vtkLine>::New();
         line->GetPointIds()->SetId(0, i);
         line->GetPointIds()->SetId(1, i + n2 +1);
         lines->InsertNextCell(line);
 
-        //create rest of fork
+		//create rest of \.
         for (unsigned int i = points->GetNumberOfPoints() - n3; i < points->GetNumberOfPoints()-1; ++i)
         {
             vtkSmartPointer<vtkLine> line =
@@ -145,7 +146,6 @@ vtkPolyDataPtr makeDummyCenterLine(int nfork1 = 100, int nfork2 = 100, int nfork
             lines->InsertNextCell(line);
         }
     }
-    //CHECK(lines->GetNumberOfCells() == n1+n2+n3 -1);
 
     // Create a polydata to store everything in
     vtkSmartPointer<vtkPolyData> linesPolyData =

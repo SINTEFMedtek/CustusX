@@ -36,8 +36,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkPolyData.h>
 #include <vtkCardinalSpline.h>
 
-#include "cxLogger.h"
-
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -343,6 +341,13 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
  * where there might be gaps between the end of parent
  * and child branches. This parameter lets you make
  * connections between the branches to fill these gaps.
+ * Note however, that this option gives strange results on
+ * many of the real centerlines tried. Not sure where the problem is.
+ * It works on the dummy centerline used in the unit test.
+ * @param straightBranches
+ * By using this parameter, you will include only the first
+ * and last points from a branch. Hence you will get
+ * straight branches in your polydata.
  * @return a vtkpolydata object of your branch tree.
  */
 vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected, bool straightBranches) const

@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-TEST_CASE("Test the find number of branches in the dummy centerline", "[unit][bronchoscopy][jon]")
+TEST_CASE("Test the find number of branches in the dummy centerline", "[unit][bronchoscopy]")
 {
     vtkPolyDataPtr linesPolyData = makeDummyCenterLine();
 	Eigen::MatrixXd CLpoints = cx::makeTransformedMatrix(linesPolyData);
@@ -55,7 +55,7 @@ TEST_CASE("Test the find number of branches in the dummy centerline", "[unit][br
 	CHECK(linesPolyData->GetNumberOfCells() == 300 - 1);
 }
 
-TEST_CASE("Test the connect branches to a single poly data object, original - i.e. branches are not fully connected", "[unit][bronchoscopy][jon]")
+TEST_CASE("Test the connect branches to a single poly data object, original - i.e. branches are not fully connected", "[unit][bronchoscopy]")
 {
 	int n1 = 100;
 	int n2 = 100;
@@ -71,7 +71,7 @@ TEST_CASE("Test the connect branches to a single poly data object, original - i.
 	CHECK(linesFromBranches->GetNumberOfCells() == n1+n2+n3 - 3);
 }
 
-TEST_CASE("Test the connect branches to a single poly data object, fully connected", "[unit][bronchoscopy][jon]")
+TEST_CASE("Test the connect branches to a single poly data object, fully connected", "[unit][bronchoscopy]")
 {
 	int n1 = 100;
 	int n2 = 100;
@@ -87,7 +87,7 @@ TEST_CASE("Test the connect branches to a single poly data object, fully connect
 	CHECK(linesFromBranches->GetNumberOfCells() == n1+n2+n3 - 1);
 }
 
-TEST_CASE("Test the connect branches to a single poly data object, fully connected and straight lines", "[unit][bronchoscopy][jon]")
+TEST_CASE("Test the connect branches to a single poly data object, fully connected and straight lines", "[unit][bronchoscopy]")
 {
     /**
      * The branches are made first, hence 3 branches gives 6 points and 3 lines.
@@ -105,7 +105,7 @@ TEST_CASE("Test the connect branches to a single poly data object, fully connect
     CHECK(linesFromBranches->GetNumberOfCells() == 5);
 }
 
-TEST_CASE("Test the findParentIndex method", "[unit][bronchoscopy][jon]")
+TEST_CASE("Test the findParentIndex method", "[unit][bronchoscopy]")
 {
 	cx::BranchPtr parent = cx::BranchPtr(new cx::Branch());
 	cx::BranchPtr parent2 = cx::BranchPtr(new cx::Branch());
