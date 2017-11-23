@@ -79,44 +79,51 @@ ToolManagerWidget::~ToolManagerWidget()
 
 void ToolManagerWidget::configureClickedSlot(bool checked)
 {
+	Q_UNUSED(checked);
   mTrackingService->setState(Tool::tsCONFIGURED);
 }
 
 void ToolManagerWidget::deconfigureClickedSlot(bool checked)
 {
+	Q_UNUSED(checked);
 	mTrackingService->setState(Tool::tsNONE);
 }
 
 void ToolManagerWidget::initializeClickedSlot(bool checked)
 {
+	Q_UNUSED(checked);
 	mTrackingService->setState(Tool::tsINITIALIZED);
 }
 
 void ToolManagerWidget::uninitializeClickedSlot(bool checked)
 {
+	Q_UNUSED(checked);
 	mTrackingService->setState(Tool::tsCONFIGURED);
 }
 
 void ToolManagerWidget::startTrackingClickedSlot(bool checked)
 {
+	Q_UNUSED(checked);
 	mTrackingService->setState(Tool::tsTRACKING);
 }
 
 void ToolManagerWidget::stopTrackingClickedSlot(bool checked)
 {
+	Q_UNUSED(checked);
 	mTrackingService->setState(Tool::tsINITIALIZED);
 }
 
 void ToolManagerWidget::updateButtonStatusSlot()
 {
-	mConfigureButton->setEnabled(mTrackingService->getState() < Tool::tsCONFIGURED);
-	mDeConfigureButton->setEnabled(mTrackingService->getState() >= Tool::tsCONFIGURED);
+	Tool::State state = mTrackingService->getState();
+	mConfigureButton->setEnabled(state < Tool::tsCONFIGURED);
+	mDeConfigureButton->setEnabled(state >= Tool::tsCONFIGURED);
 
-	mInitializeButton->setEnabled(mTrackingService->getState() < Tool::tsINITIALIZED);
-	mUnInitializeButton->setEnabled(mTrackingService->getState() >= Tool::tsINITIALIZED);
+	mInitializeButton->setEnabled(state < Tool::tsINITIALIZED);
+	mUnInitializeButton->setEnabled(state >= Tool::tsINITIALIZED);
 
-	mStartTrackingButton->setEnabled(mTrackingService->getState() < Tool::tsTRACKING);
-	mStopTrackingButton->setEnabled(mTrackingService->getState() >= Tool::tsTRACKING);
+	mStartTrackingButton->setEnabled(state < Tool::tsTRACKING);
+	mStopTrackingButton->setEnabled(state >= Tool::tsTRACKING);
 
 }
 

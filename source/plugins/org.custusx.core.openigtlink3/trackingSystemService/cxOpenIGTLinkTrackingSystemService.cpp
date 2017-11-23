@@ -184,7 +184,7 @@ void OpenIGTLinkTrackingSystemService::configure()
 		return;
 	}
 
-	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink tracking";
+	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink3 tracking";
 
 	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
 
