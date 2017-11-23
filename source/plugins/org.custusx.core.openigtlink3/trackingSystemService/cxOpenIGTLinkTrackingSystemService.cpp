@@ -140,6 +140,22 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 	}
 }
 
+//TODO: Copied from TrackingSystemIGSTKService. Move to common class?
+bool OpenIGTLinkTrackingSystemService::isConfigured() const
+{
+	return mState>=Tool::tsCONFIGURED;
+}
+
+bool OpenIGTLinkTrackingSystemService::isInitialized() const
+{
+	return mState>=Tool::tsINITIALIZED;
+}
+
+bool OpenIGTLinkTrackingSystemService::isTracking() const
+{
+	return mState>=Tool::tsTRACKING;
+}
+
 std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 {
 	return toVector(mTools);
@@ -156,10 +172,9 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 	return mReference;
 }
 
-//TODO
 void OpenIGTLinkTrackingSystemService::configure()
 {
-	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure()";
+//	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure()";
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
@@ -171,8 +186,6 @@ void OpenIGTLinkTrackingSystemService::configure()
 
 	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink tracking";
 
-	//TODO
-	//Copied from TrackingSystemIGSTKService::configure()
 	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
 
 	//Create tools
@@ -194,37 +207,32 @@ void OpenIGTLinkTrackingSystemService::configure()
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
+	if (!this->isConfigured())
+		return;
 	mTools.clear();
 	mReference.reset();
 	this->serverIsDeconfigured();
+	emit stateChanged();
 }
 
 void OpenIGTLinkTrackingSystemService::initialize()
 {
-	//emit connectToServer();
-
-	//TODO is(!configured());
-	this->configure();
+	if(!isConfigured())
+		this->configure();
 }
 
 void OpenIGTLinkTrackingSystemService::uninitialize()
 {
-	emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::startTracking()
 {
-	//emit startListenToServer();
-	//emit connectToServer();
-
-	//TODO: is(!Initialized())
-	this->initialize();
+	if(!isInitialized())
+		this->initialize();
 }
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
 {
-	//emit stopListenToServer();
-	emit disconnectFromServer();
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsConfigured()
@@ -239,18 +247,16 @@ void OpenIGTLinkTrackingSystemService::serverIsDeconfigured()
 
 void OpenIGTLinkTrackingSystemService::serverIsConnected()
 {
-	this->internalSetState(Tool::tsINITIALIZED);
-	this->internalSetState(Tool::tsTRACKING);
+	this->setState(Tool::tsINITIALIZED);
+	this->setState(Tool::tsTRACKING);
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 {
-	this->internalSetState(Tool::tsCONFIGURED);
-	this->internalSetState(Tool::tsINITIALIZED);
+	this->setState(Tool::tsCONFIGURED);
+	this->setState(Tool::tsINITIALIZED);
 }
 
-
-//TODO: Require/trigger configure?
 void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
 //	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
@@ -303,7 +309,6 @@ OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 		OpenIGTLinkToolPtr tool = it->second;
 		if (tool->isThisTool(devicename))
 		{
-//			emit stateChanged();
 			return tool;
 		}
 	}

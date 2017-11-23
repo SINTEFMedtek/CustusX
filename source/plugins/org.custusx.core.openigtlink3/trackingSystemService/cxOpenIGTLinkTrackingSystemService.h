@@ -71,10 +71,6 @@ public:
 
     virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
-signals:
-    void connectToServer();
-    void disconnectFromServer();
-
 private slots:
     void configure(); ///< sets up the software
     virtual void deconfigure(); ///< deconfigures the software
@@ -101,10 +97,13 @@ private:
     ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
 
-	// Copied from TrackingSystemIGSTKService - move to common class?
+	// TODO: Copied from TrackingSystemIGSTKService - move to common class?
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
 	void setConfigurationFile(QString configurationFile);
+	bool isConfigured() const;
+	bool isInitialized() const;
+	bool isTracking() const;
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
