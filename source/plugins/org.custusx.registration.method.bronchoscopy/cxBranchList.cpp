@@ -385,8 +385,6 @@ vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected, bo
 	}
 	if(fullyConnected)
 	{
-		CX_LOG_DEBUG() << "mBranches.size() " << mBranches.size();
-		//foreach (BranchPtr branch, mBranches)
 		int this_branchs_first_point_in_full_polydata_point_list = 0;
 		for(size_t i = 0; i < mBranches.size(); ++i)
 		{
@@ -397,10 +395,8 @@ vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected, bo
 				else
 					this_branchs_first_point_in_full_polydata_point_list += 2;
 			}
-			CX_LOG_DEBUG() << "this_branchs_first_point_in_full_polydata_point_list " << this_branchs_first_point_in_full_polydata_point_list;
 			int parent_index_in_branch_list = mBranches[i]->findParentIndex(mBranches);
 
-			CX_LOG_DEBUG() << "parent_index_in_branch_list " << parent_index_in_branch_list;
 			if(parent_index_in_branch_list > -1)
 			{
 				int parent_branch_last_point_in_full_polydata = 0;
