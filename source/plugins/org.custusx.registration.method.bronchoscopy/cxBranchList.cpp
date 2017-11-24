@@ -34,7 +34,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
-#include "vtkCardinalSpline.h"
+#include <vtkCardinalSpline.h>
+
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -328,6 +329,94 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
 		branches[i]->setPositions(positions);
 		branches[i]->setOrientations(orientations);
 	}
+	return retval;
+}
+
+/**
+ * @brief BranchList::createVtkPolyDataFromBranches
+ * Return a VtkPolyData object created from the
+ * branches in this object.
+ * @param fullyConnected
+ * The original version of this code created an object
+ * where there might be gaps between the end of parent
+ * and child branches. This parameter lets you make
+ * connections between the branches to fill these gaps.
+ * Note however, that this option gives strange results on
+ * many of the real centerlines tried. Not sure where the problem is.
+ * It works on the dummy centerline used in the unit test.
+ * @param straightBranches
+ * By using this parameter, you will include only the first
+ * and last points from a branch. Hence you will get
+ * straight branches in your polydata.
+ * @return a vtkpolydata object of your branch tree.
+ */
+vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected, bool straightBranches) const
+{
+	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+	vtkPointsPtr points = vtkPointsPtr::New();
+	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
+
+	int positionCounter = 0;
+	for (size_t i = 0; i < mBranches.size(); ++i)
+	{
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+		if(straightBranches)
+		{
+			++positionCounter;
+			points->InsertNextPoint(positions(0,0),positions(1,0),positions(2,0));
+			points->InsertNextPoint(positions(0,positions.cols()-1),positions(1,positions.cols()-1),positions(2,positions.cols()-1));
+			vtkIdType connection[2] = {positionCounter-1, positionCounter};
+			lines->InsertNextCell(2, connection);
+			++positionCounter;
+		}
+		else
+		{
+			for (int j = 0; j < positions.cols(); ++j)
+			{
+				++positionCounter;
+				points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
+				if (j	 < positions.cols()-1)
+				{
+					vtkIdType connection[2] = {positionCounter-1, positionCounter};
+					lines->InsertNextCell(2, connection);
+				}
+			}
+		}
+	}
+	if(fullyConnected)
+	{
+		int this_branchs_first_point_in_full_polydata_point_list = 0;
+		for(size_t i = 0; i < mBranches.size(); ++i)
+		{
+			if(i>0)
+			{
+				if(!straightBranches)
+					this_branchs_first_point_in_full_polydata_point_list += mBranches[i-1]->getPositions().cols();
+				else
+					this_branchs_first_point_in_full_polydata_point_list += 2;
+			}
+			int parent_index_in_branch_list = mBranches[i]->findParentIndex(mBranches);
+
+			if(parent_index_in_branch_list > -1)
+			{
+				int parent_branch_last_point_in_full_polydata = 0;
+				for(int j = 0; j <= parent_index_in_branch_list; ++j)
+				{
+					if(!straightBranches)
+						parent_branch_last_point_in_full_polydata += mBranches[j]->getPositions().cols() - 1;
+					else
+						parent_branch_last_point_in_full_polydata += (1 + j*2);
+				}
+				vtkIdType connection[2] = {parent_branch_last_point_in_full_polydata, this_branchs_first_point_in_full_polydata_point_list};
+				lines->InsertNextCell(2, connection);
+			}
+
+		}
+
+	}
+	retval->SetPoints(points);
+	retval->SetLines(lines);
+
 	return retval;
 }
 
