@@ -348,7 +348,7 @@ class OpenIGTLinkIO(CppComponent):
       return 'git@github.com:leochan2009/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('ed57d94dd728a562c941bca70df14e060a17b777')
+        self._getBuilder().gitCheckout('05249622a91e3d06001977a8fbf320e448975810')
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
