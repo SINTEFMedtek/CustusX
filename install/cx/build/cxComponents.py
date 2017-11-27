@@ -343,13 +343,10 @@ class OpenIGTLinkIO(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-#        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
-#        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'#Temporary test, code needs to be pull requested to IGSIO
-      return 'git@github.com:leochan2009/OpenIGTLinkIO.git'
+        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('985bdb159b5e7550cc487ead18b9670ff86fa1c2')
-#        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
+        self._getBuilder().gitCheckout('9a8ac5211d077c799d0a00d42484aed0affb0c95')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
