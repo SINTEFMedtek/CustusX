@@ -85,6 +85,7 @@ typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
 typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
 typedef boost::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
 typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
+typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
 typedef boost::shared_ptr<class FiberBundleRep> FiberBundleRepPtr;
 typedef boost::shared_ptr<class GeometricRep2D> GeometricRep2DPtr;
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
