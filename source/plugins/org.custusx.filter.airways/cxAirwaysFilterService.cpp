@@ -389,7 +389,9 @@ bool AirwaysFilter::postProcess()
 /**
  * @brief AirwaysFilter::createTubes
  * This method of drawing tubes is from the Hello vtk example found in the
- * VTK books, and also from the Blobbylogo example:
+ * VTK books:
+ * https://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/Modelling/Python/hello.py
+ * and also from the Blobbylogo example:
  * https://lorensen.github.io/VTKExamples/site/Cxx/Visualization/BlobbyLogo/
  * We found that it was easiest to use implicit modelling to create the tubes around
  * a centerline. However, we have not been able to fully control the radius
