@@ -72,6 +72,8 @@ public:
 	void setFontSize(int size); ///< must be set before setting data
 	void setData(std::vector<DataPtr> data);
 
+private slots:
+	void callSetColoredTextListSlot();
 
 protected:
 	MetricNamesRep();
