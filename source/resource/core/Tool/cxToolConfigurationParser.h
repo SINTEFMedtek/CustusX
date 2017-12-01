@@ -108,8 +108,6 @@ private:
 	QString mLoggingFolder; ///< absolutepath to the logging folder
 
 	QDomDocument mConfigureDoc; ///< the config xml document
-	const QString mConfigTag, mConfigTrackerTag, mConfigTrackerToolFile; ///< names of necessary tags in the configuration file
-	const QString mTypeAttribute, mClinicalAppAttribute, mReferenceAttribute; ///< names of necessary attributes in the configuration file
 };
 
 
