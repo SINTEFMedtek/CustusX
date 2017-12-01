@@ -102,7 +102,7 @@ void MetricNamesRep::setData(std::vector<DataPtr> data)
 	this->callSetColoredTextListSlot();
 	// Call again with a small delay, as the view might not be ready yet. I.e. the bounding box of the corner text is not properly initialized.
 	// Need the second call to avoid some assertion.
-	QTimer::singleShot(200, this, &MetricNamesRep::callSetColoredTextListSlot);
+	QTimer::singleShot(500, this, &MetricNamesRep::callSetColoredTextListSlot);
 }
 
 void MetricNamesRep::callSetColoredTextListSlot()
