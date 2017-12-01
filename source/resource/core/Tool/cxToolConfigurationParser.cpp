@@ -217,6 +217,7 @@ QString ConfigurationFileParser::getToolPathFromRoot(QString root)
 
 void ConfigurationFileParser::saveConfiguration(Configuration& config)
 {
+	bool doSaveFile = true;
 	QDomDocument doc;
 	doc.appendChild(doc.createProcessingInstruction("xml version =", "\"1.0\""));
 
@@ -237,16 +238,21 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 		QDomElement trackerTagNode = doc.createElement("tracker");
 		trackerTagNode.setAttribute("type", trackerType);
 
-		ToolFilesAndReferenceVector::iterator it2 = it1->second.begin();
+		ToolStructureVector::iterator it2 = it1->second.begin();
 		for (; it2 != it1->second.end(); ++it2)
 		{
-			QString absoluteToolFilePath = it2->first;
+			QString absoluteToolFilePath = it2->mAbsoluteToolFilePath;
 			QString relativeToolFilePath = convertToRelativeToolFilePath(config.mFileName, absoluteToolFilePath);
 
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
 			if (!trackerType.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
 			{
+				if (config.mTrackingSystem.contains("openigtlink", Qt::CaseInsensitive))
+				{
+					doSaveFile = false;
+				}
+				else
 				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
 												+ toolTrackerType + " because tracker is set to " + trackerType);
 				continue;
@@ -254,7 +260,8 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 			QDomElement toolFileNode = doc.createElement("toolfile");
 			toolFileNode.appendChild(doc.createTextNode(relativeToolFilePath));
-			toolFileNode.setAttribute("reference", (it2->second ? "yes" : "no"));
+			toolFileNode.setAttribute("reference", (it2->mReference ? "yes" : "no"));
+			//TODO: Set attributes openigtlinktransformid and openigtlinkimageid
 			trackerTagNode.appendChild(toolFileNode);
 		}
 		trackingsystemNode.appendChild(trackerTagNode);
@@ -264,16 +271,22 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 	//write to file
 	QFile file(config.mFileName);
-	QDir().mkpath(QFileInfo(config.mFileName).absolutePath());
-
-	if (!file.open(QIODevice::WriteOnly))
+	if(doSaveFile)
 	{
-		reportWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
-		return;
+		QDir().mkpath(QFileInfo(config.mFileName).absolutePath());
+
+		if (!file.open(QIODevice::WriteOnly))
+		{
+			reportWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
+			return;
+		}
+
+		QTextStream stream(&file);
+		doc.save(stream, 4);
+		reportSuccess("Configuration file " + file.fileName() + " is written.");
 	}
-	QTextStream stream(&file);
-	doc.save(stream, 4);
-	reportSuccess("Configuration file " + file.fileName() + " is written.");
+	else
+		CX_LOG_INFO() << "Changing OpenIGTLink tool files not supported. Not overwriting config file: " << file.fileName();
 }
 
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)

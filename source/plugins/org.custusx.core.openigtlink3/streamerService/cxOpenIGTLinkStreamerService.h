@@ -41,13 +41,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
 
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
 
 public:
-	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler);
+	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService);
     ~OpenIGTLinkStreamerService();
 
     virtual QString getName();
@@ -56,8 +57,17 @@ public:
     virtual StreamerPtr createStreamer(QDomElement root);
 
 private:
-    OpenIGTLinkStreamerPtr mStreamer;
+	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
+	TrackingServicePtr mTrackingService;
+	BoolPropertyBasePtr mCombinedFunctionality;
+
+	StringPropertyBasePtr getIPOption(QDomElement root);
+	DoublePropertyBasePtr getStreamPortOption(QDomElement root);
+	BoolPropertyBasePtr getCombinedFunctionality(QDomElement root);
+	OpenIGTLinkTrackingSystemServicePtr getOpenIGTLinkTrackingSystemService();
+	void startTracking(QDomElement root);
+	void configureTracking(QDomElement root);
 };
 typedef boost::shared_ptr<OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
 } //namespace cx

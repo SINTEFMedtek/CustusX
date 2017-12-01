@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxRegisteredService.h"
 
 #include "cxOpenIGTLinkGuiExtenderService.h"
+#include "cxTrackingServiceProxy.h"
 
 #include "igtlioLogic.h"
 
@@ -57,12 +58,14 @@ OpenIGTLinkPluginActivator::~OpenIGTLinkPluginActivator()
 void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 {
 
+	TrackingServicePtr trackingService = TrackingServiceProxy::create(context);
+
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 	mNetworkHandler.reset(new NetworkHandler(logic));
 	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
-	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler);
 	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mNetworkHandler);
+	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler, trackingService);
 
 	mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);
 	mRegistrationTracking = RegisteredService::create<OpenIGTLinkTrackingSystemService>(context, tracking, TrackingSystemService_iid);

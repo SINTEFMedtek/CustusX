@@ -81,11 +81,10 @@ void OpenIGTLinkTrackingSystemService::setConfigurationFile(QString configuratio
 	if (configurationFile == mConfigurationFilePath)
 		return;
 
-/*	if (this->isConfigured())
+	if (this->isConfigured())
 	{
-		connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
 		this->deconfigure();
-	}*/
+	}
 
 	mConfigurationFilePath = configurationFile;
 }

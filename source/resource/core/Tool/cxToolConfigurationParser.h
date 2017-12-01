@@ -71,9 +71,8 @@ public:
 	};
 
 
-	typedef std::pair<QString, bool> ToolFileAndReference;
-	typedef std::vector<ToolFileAndReference> ToolFilesAndReferenceVector;
-	typedef std::map<TRACKING_SYSTEM, ToolFilesAndReferenceVector> TrackersAndToolsMap;
+	typedef std::vector<ToolStructure> ToolStructureVector;
+	typedef std::map<TRACKING_SYSTEM, ToolStructureVector> TrackersAndToolsMap;
 	struct Configuration
 	{
 		QString mFileName; ///< absolute path and filename for the new config file
