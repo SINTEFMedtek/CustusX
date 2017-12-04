@@ -91,6 +91,10 @@ void OpenIGTLinkStreamerService::startTracking(QDomElement root)
 	if(this->getCombinedFunctionality(root)->getValue())
 	{
 		this->configureTracking(root);
+		// Trying to connect will case several tests to fail,
+		// because ClientSocket::ConnectToServer in OpenIGTLink/OpenIGTLink/Source/igtlClientSocket.cxx
+		// will print error messages when it cannot connect.
+		// Default value for CombinedFunctionality are therefore set to false
 		mConnection->requestConnectToServer(this->getIPOption(root)->getValue().toStdString(),
 																				int(this->getStreamPortOption(root)->getValue()));
 	}
@@ -123,10 +127,11 @@ OpenIGTLinkTrackingSystemServicePtr OpenIGTLinkStreamerService::getOpenIGTLinkTr
 BoolPropertyBasePtr OpenIGTLinkStreamerService::getCombinedFunctionality(QDomElement root)
 {
 	BoolPropertyPtr retval;
+	// Default value need to be false to prevent tests from failing
 	retval = BoolProperty::initialize("start_tracking", "Also Start Tracking",
 																		"Combined functionality: \n"
 																		"Run both tracking and streaming over OpenIGTLink",
-																		true, root);
+																		false, root);
 	retval->setGroup("Connection");
 
 	return retval;

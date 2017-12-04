@@ -116,7 +116,10 @@ bool MessageListener::containsErrors() const
 	for (QList<Message>::const_iterator i=mMessages.begin(); i!=mMessages.end(); ++i)
 	{
 		if (this->isError(i->getMessageLevel()))
+		{
+			std::cout << "******* MessageListener::containsErrors() Found Error: " << i->getText() <<"\n";
 			return true;
+		}
 	}
 	return false;
 }
