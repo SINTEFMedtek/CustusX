@@ -90,17 +90,17 @@ TEST_CASE("StreamedTimestampSynchronizer: convergence to new value", "[unit]")
     syncer.addTimestamp(ts);
     syncer.getShift();
 
-	int offset = 1000;
-	// add lots of stable values
-	for (int i=0; i<30; ++i)
-	{
-		syncer.addTimestamp(ts.addMSecs(offset));
-	}
-
     // add lots of varying  values (note that all the ts'es are compared to currenttime())
     for (int i=0; i<30; ++i)
     {
         syncer.addTimestamp(ts.addMSecs(10*i));
+    }
+
+    int offset = 1000;
+    // add lots of stable values
+    for (int i=0; i<30; ++i)
+    {
+        syncer.addTimestamp(ts.addMSecs(offset));
     }
 
     double shift = syncer.getShift();
