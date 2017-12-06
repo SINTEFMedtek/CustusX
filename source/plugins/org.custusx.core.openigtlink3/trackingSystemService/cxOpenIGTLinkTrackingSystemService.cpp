@@ -68,6 +68,8 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	//connect(mNetworkHandler.get(), &NetworkHandler::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
 	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 
+	connect(this, &OpenIGTLinkTrackingSystemService::setInternalState, this, &OpenIGTLinkTrackingSystemService::internalSetState);
+
 	this->setConfigurationFile(profile()->getToolConfigFilePath());
 }
 
@@ -115,7 +117,11 @@ Tool::State OpenIGTLinkTrackingSystemService::getState() const
 
 void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 {
-	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::setState: val: " << val;
+	emit setInternalState(val);
+}
+
+void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
+{
 	if (mState==val)
 		return;
 
@@ -137,6 +143,8 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 		else if (val == Tool::tsNONE)
 			this->deconfigure();
 	}
+	mState = val;
+	emit stateChanged();
 }
 
 //TODO: Copied from TrackingSystemIGSTKService. Move to common class?
@@ -201,17 +209,15 @@ void OpenIGTLinkTrackingSystemService::configure()
 	}
 	if(!mReference)
 		CX_LOG_WARNING() << "OpenIGTLinkTrackingSystemService::configure() Got no reference tool";
-	this->serverIsConfigured();
 }
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
 	if (!this->isConfigured())
 		return;
+
 	mTools.clear();
 	mReference.reset();
-	this->serverIsDeconfigured();
-	emit stateChanged();
 }
 
 void OpenIGTLinkTrackingSystemService::initialize()
@@ -232,16 +238,6 @@ void OpenIGTLinkTrackingSystemService::startTracking()
 
 void OpenIGTLinkTrackingSystemService::stopTracking()
 {
-}
-
-void OpenIGTLinkTrackingSystemService::serverIsConfigured()
-{
-	this->internalSetState(Tool::tsCONFIGURED);
-}
-
-void OpenIGTLinkTrackingSystemService::serverIsDeconfigured()
-{
-	this->internalSetState(Tool::tsNONE);
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsConnected()
@@ -290,12 +286,6 @@ void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename
 			emit stateChanged();
 		}
 	}
-}
-
-void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)
-{
-	mState = state;
-	emit stateChanged();
 }
 
 OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)

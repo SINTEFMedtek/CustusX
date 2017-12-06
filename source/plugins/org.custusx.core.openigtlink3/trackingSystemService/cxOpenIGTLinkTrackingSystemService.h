@@ -81,8 +81,6 @@ private slots:
     void startTracking(); ///< starts tracking
     void stopTracking(); ///< stops tracking
 
-    void serverIsConfigured();
-    void serverIsDeconfigured();
     void serverIsConnected();
     void serverIsDisconnected();
 
@@ -105,6 +103,9 @@ private:
 	bool isConfigured() const;
 	bool isInitialized() const;
 	bool isTracking() const;
+
+signals:
+	void setInternalState(const Tool::State val);
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 

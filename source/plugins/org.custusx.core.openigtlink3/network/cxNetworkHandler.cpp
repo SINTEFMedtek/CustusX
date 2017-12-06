@@ -81,6 +81,16 @@ igtlio::SessionPointer NetworkHandler::requestConnectToServer(std::string server
 	return mSession;
 }
 
+void NetworkHandler::disconnectFromServer()
+{
+	if (mSession->GetConnector()->GetState()!=igtlio::Connector::STATE_OFF)
+	{
+		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession->GetConnector()->GetName();
+		mSession->GetConnector()->Stop();
+	}
+	mProbeDefinitionFromStringMessages->reset();
+}
+
 void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
 	Q_UNUSED(unknown);

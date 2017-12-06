@@ -52,6 +52,7 @@ void OpenIGTLinkStreamer::startStreaming(SenderPtr sender)
 void OpenIGTLinkStreamer::stopStreaming()
 {
     mSender.reset();
+		emit stoppedStreaming();
 }
 
 bool OpenIGTLinkStreamer::isStreaming()

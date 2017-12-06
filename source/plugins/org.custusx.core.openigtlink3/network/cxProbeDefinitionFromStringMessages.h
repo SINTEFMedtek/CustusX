@@ -128,6 +128,7 @@ class org_custusx_core_openigtlink3_EXPORT ProbeDefinitionFromStringMessages
 {
 public:
 	ProbeDefinitionFromStringMessages();
+	void reset();
 	void parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message);
 	void setImage(ImagePtr image);
 	bool haveValidValues();

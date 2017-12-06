@@ -59,6 +59,7 @@ public:
 	~NetworkHandler();
 
 	igtlio::SessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
+	void disconnectFromServer();
 
 signals:
 	void connected();

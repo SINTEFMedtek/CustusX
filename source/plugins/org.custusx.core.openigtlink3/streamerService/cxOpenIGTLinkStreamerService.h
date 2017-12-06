@@ -56,11 +56,14 @@ public:
     virtual std::vector<PropertyPtr> getSettings(QDomElement root);
     virtual StreamerPtr createStreamer(QDomElement root);
 
+private slots:
+	void stopTrackingAndOpenIGTLinkClient();
 private:
 	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
 	TrackingServicePtr mTrackingService;
 	BoolPropertyBasePtr mCombinedFunctionality;
+	bool mStartedTrackingAndOpenIGTLinkFromHere;
 
 	StringPropertyBasePtr getIPOption(QDomElement root);
 	DoublePropertyBasePtr getStreamPortOption(QDomElement root);

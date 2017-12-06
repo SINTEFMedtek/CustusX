@@ -45,6 +45,11 @@ ProbeDefinitionFromStringMessages::ProbeDefinitionFromStringMessages() :
 	mSectorInfo(new SectorInfo)
 {}
 
+void ProbeDefinitionFromStringMessages::reset()
+{
+	mSectorInfo->reset();
+}
+
 void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message)
 {
 	//Don't check equipmentType for now
