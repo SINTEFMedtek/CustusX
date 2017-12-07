@@ -174,7 +174,7 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 
 }
 
-TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
 	std::string ip = "localhost";
 	int port = 18944;
@@ -188,7 +188,7 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 	REQUIRE(client);
 }
 
-TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
 	std::string ip = "localhost";
 	int port = 18944;
@@ -208,6 +208,7 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 
 	connector = server->GetConnector();
 	REQUIRE(connector);
+	//Server connector is not connected?
 
 	REQUIRE(logic->RemoveConnector(client->GetConnector()));
 	REQUIRE_FALSE(logic->RemoveConnector(client->GetConnector()));
@@ -216,22 +217,23 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 	REQUIRE_FALSE(logic->RemoveConnector(server->GetConnector()));
 }
 
-TEST_CASE("Init NetworkHandler", "[plugins][org.custusx.core.openigtlink3][unit]")
+TEST_CASE("Connect/disconnect using NetworkHandler, use default network port", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
-
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 	cx::NetworkHandlerPtr networkHandler= cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
 
 	std::string ip = "localhost";
-	int port = 18944;
 
-	igtlio::SessionPointer server = logic->StartServer(port);
+	igtlio::SessionPointer server = logic->StartServer();
 
-	igtlio::SessionPointer client = networkHandler->requestConnectToServer(ip, port);
+	igtlio::SessionPointer client = networkHandler->requestConnectToServer(ip);
 	REQUIRE(client);
 	REQUIRE(client->GetConnector());
 	REQUIRE(client->GetConnector()->IsConnected());
 
+	networkHandler->disconnectFromServer();
+	REQUIRE(client->GetConnector());
+	REQUIRE_FALSE(client->GetConnector()->IsConnected());
 }
 
 } //namespace cxtest
