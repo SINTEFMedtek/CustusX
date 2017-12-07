@@ -181,7 +181,8 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 
-	igtlio::SessionPointer server = logic->StartServer(port);
+	int defaultPort = -1;
+	igtlio::SessionPointer server = logic->StartServer(defaultPort);//Verify that default port == 18944
 	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
 	REQUIRE(server);
 	REQUIRE(client);
@@ -201,13 +202,12 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 
 	igtlio::ConnectorPointer connector = client->GetConnector();
 	REQUIRE(connector);
+	REQUIRE(connector->IsConnected());
 	REQUIRE(connector->Stop());
 	REQUIRE_FALSE(connector->Stop());
 
 	connector = server->GetConnector();
 	REQUIRE(connector);
-	REQUIRE(connector->Stop());
-	REQUIRE_FALSE(connector->Stop());
 
 	REQUIRE(logic->RemoveConnector(client->GetConnector()));
 	REQUIRE_FALSE(logic->RemoveConnector(client->GetConnector()));
@@ -216,5 +216,22 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 	REQUIRE_FALSE(logic->RemoveConnector(server->GetConnector()));
 }
 
+TEST_CASE("Init NetworkHandler", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+	cx::NetworkHandlerPtr networkHandler= cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
+
+	std::string ip = "localhost";
+	int port = 18944;
+
+	igtlio::SessionPointer server = logic->StartServer(port);
+
+	igtlio::SessionPointer client = networkHandler->requestConnectToServer(ip, port);
+	REQUIRE(client);
+	REQUIRE(client->GetConnector());
+	REQUIRE(client->GetConnector()->IsConnected());
+
+}
 
 } //namespace cxtest
