@@ -174,6 +174,47 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 
 }
 
+TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	std::string ip = "localhost";
+	int port = 18944;
+
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+
+	igtlio::SessionPointer server = logic->StartServer(port);
+	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
+	REQUIRE(server);
+	REQUIRE(client);
+}
+
+TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	std::string ip = "localhost";
+	int port = 18944;
+
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+
+	igtlio::SessionPointer server = logic->StartServer(port);
+	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
+	REQUIRE(server);
+	REQUIRE(client);
+
+	igtlio::ConnectorPointer connector = client->GetConnector();
+	REQUIRE(connector);
+	REQUIRE(connector->Stop());
+	REQUIRE_FALSE(connector->Stop());
+
+	connector = server->GetConnector();
+	REQUIRE(connector);
+	REQUIRE(connector->Stop());
+	REQUIRE_FALSE(connector->Stop());
+
+	REQUIRE(logic->RemoveConnector(client->GetConnector()));
+	REQUIRE_FALSE(logic->RemoveConnector(client->GetConnector()));
+
+	REQUIRE(logic->RemoveConnector(server->GetConnector()));
+	REQUIRE_FALSE(logic->RemoveConnector(server->GetConnector()));
+}
 
 
 } //namespace cxtest
