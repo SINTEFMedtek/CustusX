@@ -93,11 +93,12 @@ void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClient()
 {
 	if(mStartedTrackingAndOpenIGTLinkFromHere)
 	{
+		mConnection->disconnectFromServer();
+
 		OpenIGTLinkTrackingSystemServicePtr trackingSystemService = this->getOpenIGTLinkTrackingSystemService();
 		if(trackingSystemService)
 			trackingSystemService->setState(Tool::tsNONE);
 
-		mConnection->disconnectFromServer();
 		mStartedTrackingAndOpenIGTLinkFromHere = false;
 	}
 }
