@@ -86,9 +86,9 @@ void NetworkHandler::disconnectFromServer()
 	if (mSession->GetConnector()->GetState()!=igtlio::Connector::STATE_OFF)
 	{
 		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession->GetConnector()->GetName();
-		igtlio::ConnectorPointer conector;
-		conector->Stop();
-		mLogic->RemoveConnector(conector);
+		igtlio::ConnectorPointer connector = mSession->GetConnector();
+		connector->Stop();
+		mLogic->RemoveConnector(connector);
 	}
 	mProbeDefinitionFromStringMessages->reset();
 }
