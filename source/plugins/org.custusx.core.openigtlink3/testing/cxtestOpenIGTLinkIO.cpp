@@ -188,6 +188,7 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 	REQUIRE(client);
 
 	REQUIRE(client->GetConnector()->Stop());
+	REQUIRE_FALSE(client->GetConnector()->IsConnected());
 }
 
 TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration]")
@@ -206,6 +207,7 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 	REQUIRE(connector);
 	REQUIRE(connector->IsConnected());
 	REQUIRE(connector->Stop());
+	REQUIRE_FALSE(connector->IsConnected());
 	REQUIRE_FALSE(connector->Stop());
 
 	connector = server->GetConnector();
