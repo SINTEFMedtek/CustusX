@@ -186,6 +186,8 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
 	REQUIRE(server);
 	REQUIRE(client);
+
+	REQUIRE(client->GetConnector()->Stop());
 }
 
 TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration]")
