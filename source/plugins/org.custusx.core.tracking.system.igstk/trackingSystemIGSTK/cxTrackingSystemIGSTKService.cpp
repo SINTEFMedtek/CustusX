@@ -66,17 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//QStringList TrackingSystemIGSTKService::getSupportedTrackingSystems()
-//{
-//	QStringList retval;
-//	retval = IgstkTracker::getSupportedTrackingSystems();
-//	return retval;
-//}
-
-TrackingSystemIGSTKService::TrackingSystemIGSTKService() :
-				mConfigurationFilePath(""),
-				mLoggingFolder(""),
-				mState(Tool::tsNONE)
+TrackingSystemIGSTKService::TrackingSystemIGSTKService()
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	// initialize config file
@@ -123,21 +113,6 @@ void TrackingSystemIGSTKService::setState(const Tool::State val)
 			this->deconfigure();
 		}
 	}
-}
-
-bool TrackingSystemIGSTKService::isConfigured() const
-{
-	return mState>=Tool::tsCONFIGURED;
-}
-
-bool TrackingSystemIGSTKService::isInitialized() const
-{
-	return mState>=Tool::tsINITIALIZED;
-}
-
-bool TrackingSystemIGSTKService::isTracking() const
-{
-	return mState>=Tool::tsTRACKING;
 }
 
 void TrackingSystemIGSTKService::configure()

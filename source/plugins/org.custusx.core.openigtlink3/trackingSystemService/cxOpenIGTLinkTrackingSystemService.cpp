@@ -53,10 +53,7 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
 }
 
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler) :
-	mState(Tool::tsNONE)
-	, mNetworkHandler(networkHandler)
-	, mConfigurationFilePath("")
-	, mLoggingFolder("")
+	mNetworkHandler(networkHandler)
 
 {
 	if(mNetworkHandler == NULL)
@@ -76,33 +73,6 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
 {
 	this->deconfigure();
-}
-
-void OpenIGTLinkTrackingSystemService::setConfigurationFile(QString configurationFile)
-{
-	if (configurationFile == mConfigurationFilePath)
-		return;
-
-	if (this->isConfigured())
-	{
-		this->deconfigure();
-	}
-
-	mConfigurationFilePath = configurationFile;
-}
-
-void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
-{
-	if (mLoggingFolder == loggingFolder)
-		return;
-
-/*	if (this->isConfigured())
-	{
-		connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
-		this->deconfigure();
-	}*/
-
-	mLoggingFolder = loggingFolder;
 }
 
 QString OpenIGTLinkTrackingSystemService::getUid() const
@@ -145,22 +115,6 @@ void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
 	}
 	mState = val;
 	emit stateChanged();
-}
-
-//TODO: Copied from TrackingSystemIGSTKService. Move to common class?
-bool OpenIGTLinkTrackingSystemService::isConfigured() const
-{
-	return mState>=Tool::tsCONFIGURED;
-}
-
-bool OpenIGTLinkTrackingSystemService::isInitialized() const
-{
-	return mState>=Tool::tsINITIALIZED;
-}
-
-bool OpenIGTLinkTrackingSystemService::isTracking() const
-{
-	return mState>=Tool::tsTRACKING;
 }
 
 std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()

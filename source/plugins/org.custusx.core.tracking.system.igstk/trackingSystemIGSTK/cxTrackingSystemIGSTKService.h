@@ -129,20 +129,11 @@ private slots:
 	void globalConfigurationFileChangedSlot(QString key);
 
 private:
-
-	bool isConfigured() const; ///< checks if the system is configured
-	bool isInitialized() const; ///< checks if the hardware is initialized
-	bool isTracking() const; ///< checks if the system is tracking
 	void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
 	void destroyTrackerThread();
 
-	QString mConfigurationFilePath; ///< path to the configuration file
-	QString mLoggingFolder; ///< path to where logging should be saved
-
 	std::vector<ToolPtr> mTools; ///< all tools
 	ToolPtr mReference; ///< the one tool selected as reference by IGSTK - defines pr space.
-
-	Tool::State mState;
 
 	IgstkTrackerThreadPtr mTrackerThread;
 

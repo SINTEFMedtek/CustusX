@@ -69,13 +69,9 @@ public:
     virtual TrackerConfigurationPtr getConfiguration();
     virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-    virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
-
-	void setConfigurationFile(QString configurationFile);
-
 private slots:
     void configure(); ///< sets up the software
-    virtual void deconfigure(); ///< deconfigures the software
+		virtual void deconfigure(); ///< deconfigures the software
     void initialize(); ///< connects to the hardware
     void uninitialize(); ///< disconnects from the hardware
     void startTracking(); ///< starts tracking
@@ -92,17 +88,9 @@ private:
     void internalSetState(Tool::State state);
 	OpenIGTLinkToolPtr getTool(QString devicename);
 
-    Tool::State mState;
     std::map<QString, OpenIGTLinkToolPtr> mTools;
     ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
-
-	// TODO: Copied from TrackingSystemIGSTKService - move to common class?
-	QString mConfigurationFilePath; ///< path to the configuration file
-	QString mLoggingFolder; ///< path to where logging should be saved
-	bool isConfigured() const;
-	bool isInitialized() const;
-	bool isTracking() const;
 
 signals:
 	void setInternalState(const Tool::State val);
