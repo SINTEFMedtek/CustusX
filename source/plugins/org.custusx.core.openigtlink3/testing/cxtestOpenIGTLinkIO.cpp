@@ -52,34 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cxtest
 {
 
-
-void checkIfConnected(igtlio::LogicPointer logic)
-{
-	double timeout = 2;
-	double starttime = vtkTimerLog::GetUniversalTime();
-
-	igtlio::ConnectorPointer connector = logic->GetConnector(0);
-
-	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
-	{
-		logic->PeriodicProcess();
-
-		if (connector->GetState() == igtlio::Connector::STATE_CONNECTED)
-		{
-			REQUIRE(true);
-			break;
-		}
-		if (connector->GetState() == igtlio::Connector::STATE_OFF)
-		{
-			REQUIRE(false);
-		}
-	}
-
-	REQUIRE(connector->GetState() == static_cast<int>(igtlio::Connector::STATE_CONNECTED));
-}
-
 void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
 {
+	Q_UNUSED(receiver);
 	igtlio::ConnectorPointer connector = logic->GetConnector(0);
 
 	double timeout = 1;
@@ -92,8 +67,8 @@ void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
 
 void listenToAllDevicesToCountMessages(igtlio::LogicPointer logic, Receiver &receiver)
 {
-	int index = logic->GetNumberOfDevices();
-	for(int i=0; i<index; ++i)
+	unsigned index = logic->GetNumberOfDevices();
+	for(unsigned i=0; i<index; ++i)
 	{
 		receiver.listen(logic->GetDevice(i), true);
 	}
@@ -205,10 +180,15 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 
 	igtlio::ConnectorPointer connector = client->GetConnector();
 	REQUIRE(connector);
+
+	REQUIRE(connector->GetState() == igtlio::Connector::STATE_CONNECTED);
+
 	REQUIRE(connector->IsConnected());
 	REQUIRE(connector->Stop());
 	REQUIRE_FALSE(connector->IsConnected());
 	REQUIRE_FALSE(connector->Stop());
+
+	REQUIRE(connector->GetState() == igtlio::Connector::STATE_OFF);
 
 	connector = server->GetConnector();
 	REQUIRE(connector);
