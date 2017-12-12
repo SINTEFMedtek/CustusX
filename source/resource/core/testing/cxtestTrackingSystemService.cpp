@@ -36,6 +36,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class TrackingSystemServiceMoc : public cx::TrackingSystemService
 {
 public:
+	TrackingSystemServiceMoc():
+		initializeCalled(false),
+		configureCalled(false)
+	{}
+
 	virtual QString getUid() const {return QString();}
 	virtual void setState(const cx::Tool::State val) { this->internalSetState(val); }
 	virtual std::vector<cx::ToolPtr> getTools() { return std::vector<cx::ToolPtr>();}
@@ -49,9 +54,24 @@ public:
 	virtual bool isInitialized() const;
 	virtual bool isTracking() const;
 
-//	virtual void startTracking() { cx::TrackingSystemService::startTracking();}
-//	virtual void initialize() {cx::TrackingSystemService::initialize();}
+	virtual void startTracking()
+	{
+		cx::TrackingSystemService::startTracking();
+	}
+	virtual void initialize()
+	{
+		cx::TrackingSystemService::initialize();
+		initializeCalled = true;
+	}
 
+	virtual void configure()
+	{
+		cx::TrackingSystemService::configure();
+		configureCalled = true;
+	}
+
+	bool initializeCalled;
+	bool configureCalled;
 };
 
 bool TrackingSystemServiceMoc::isConfigured() const
@@ -69,7 +89,6 @@ bool TrackingSystemServiceMoc::isTracking() const
 	return cx::TrackingSystemService::isTracking();
 }
 
-
 typedef boost::shared_ptr<TrackingSystemServiceMoc> TrackingSystemServiceMocPtr;
 
 namespace cxtest
@@ -86,9 +105,24 @@ TEST_CASE("TrackingSystemService: Init", "[unit]")
 	trackingSystemService->setLoggingFolder(testString);
 	CHECK(testString == trackingSystemService->getLoggingFolder());
 
-
 	trackingSystemService->setConfigurationFile(testString);
 	CHECK(testString == trackingSystemService->getConfigurationFilePath());
+}
+
+TEST_CASE("TrackingSystemService: Convenience state transitions", "[unit]")
+{
+	TrackingSystemServiceMocPtr trackingSystemService = TrackingSystemServiceMocPtr(new TrackingSystemServiceMoc());
+
+	CHECK_FALSE(trackingSystemService->configureCalled);
+	CHECK_FALSE(trackingSystemService->initializeCalled);
+
+	trackingSystemService->initialize();
+	CHECK(trackingSystemService->configureCalled);
+
+	trackingSystemService->configureCalled = false;
+	trackingSystemService->startTracking();
+	CHECK(trackingSystemService->configureCalled);
+	CHECK(trackingSystemService->initializeCalled);
 }
 
 }//cxtest
