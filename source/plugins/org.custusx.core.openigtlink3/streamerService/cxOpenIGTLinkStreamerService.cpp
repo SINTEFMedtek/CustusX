@@ -59,7 +59,7 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
 {
-
+	this->stopTrackingAndOpenIGTLinkClient();
 }
 
 QString OpenIGTLinkStreamerService::getName()
