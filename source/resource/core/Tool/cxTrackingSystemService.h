@@ -77,10 +77,10 @@ protected slots:
 	virtual void deconfigure() {} ///< deconfigures the software
 
 protected:
-
 	Tool::State mState;
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
+
 	virtual bool isConfigured() const;
 	virtual bool isInitialized() const;
 	virtual bool isTracking() const;
