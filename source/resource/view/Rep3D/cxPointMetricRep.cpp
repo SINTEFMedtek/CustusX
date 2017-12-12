@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxPointMetricRep.h"
 #include "cxView.h"
 #include "boost/bind.hpp"
-
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -102,8 +102,18 @@ void PointMetricRep::rescale()
 	if (!mGraphicalPoint)
 		return;
 
-	double size = mViewportListener->getVpnZoom();
+	//double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(mMetric->getRefCoord());
+//	if(size > 0.5)
+//		size = 0.5;
+
 	double sphereSize = mGraphicsSize / 100 / size;
+//	if(size<1)
+//		//double sphereSize = mGraphicsSize / 100 / size;
+//		sphereSize = mGraphicsSize / 100 / size;
+//	else
+//		sphereSize = mGraphicsSize / 10;// / size;
+	//CX_LOG_DEBUG() << "size " << size << " mGraphicsSize " << mGraphicsSize << " sphereSize " << sphereSize;
 	mGraphicalPoint->setRadius(sphereSize);
 }
 

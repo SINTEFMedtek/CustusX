@@ -130,6 +130,13 @@ void ViewportListenerBase::callback()
  */
 double ViewportListenerBase::getVpnZoom()
 {
+	vtkCameraPtr camera = mRenderer->GetActiveCamera();
+	Vector3D p_f(camera->GetFocalPoint());
+	return this->getVpnZoom(p_f);
+}
+
+double ViewportListenerBase::getVpnZoom(Vector3D focusPoint)
+{
 	if (!mRenderer)
 	{
 		reportError("No renderer set, using zoom=1");
@@ -140,14 +147,17 @@ double ViewportListenerBase::getVpnZoom()
 	//  The distance between then in the view plane can
 	//  be used to rescale the text.
 	vtkCameraPtr camera = mRenderer->GetActiveCamera();
-	Vector3D p_f(camera->GetFocalPoint());
+	Vector3D p_f(focusPoint);
 	Vector3D vup(camera->GetViewUp());
 	Vector3D p_fup = p_f+vup;
+	//CX_LOG_DEBUG() << "p_f: " << p_f << " vup: " << vup << " p_fup: " << p_fup;
+
 	mRenderer->WorldToView(p_f[0],p_f[1],p_f[2]);
 	mRenderer->WorldToView(p_fup[0],p_fup[1],p_fup[2]);
 	p_f[2] = 0;
 	p_fup[2] = 0;
-	double size = (p_f - p_fup).length()/2;
+	//CX_LOG_DEBUG() << "p_f: " << p_f << " vup: " << vup << " p_fup: " << p_fup;
+	double size = (p_f - p_fup).length()/2.0;
 	return size;
 }
 

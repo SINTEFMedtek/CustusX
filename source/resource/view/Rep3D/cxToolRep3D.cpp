@@ -280,7 +280,9 @@ void ToolRep3D::scaleSpheres()
 	if (!mViewportListener->isListening())
 		return;
 
-	double size = mViewportListener->getVpnZoom();
+	//double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(this->getTool()->get_prMt().translation());
+
 	double sphereSize = mSphereRadius/100/size;
 
 	if (mOffsetPoint)

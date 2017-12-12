@@ -99,7 +99,8 @@ void PickerRep::scaleSphere()
 	if (!mGraphicalPoint)
 		return;
 
-	double size = mViewportListener->getVpnZoom();
+	//double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(mPickedPoint);
 	double sphereSize = mSphereRadius / 100 / size;
 	mGraphicalPoint->setRadius(sphereSize);
 }
