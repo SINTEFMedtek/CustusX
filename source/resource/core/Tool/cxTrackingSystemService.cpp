@@ -42,6 +42,11 @@ TrackingSystemService::TrackingSystemService() :
 {
 }
 
+Tool::State TrackingSystemService::getState() const
+{
+	return mState;
+}
+
 bool TrackingSystemService::isConfigured() const
 {
 	return mState>=Tool::tsCONFIGURED;
@@ -83,4 +88,47 @@ void TrackingSystemService::setLoggingFolder(QString loggingFolder)
 	mLoggingFolder = loggingFolder;
 }
 
+void TrackingSystemService::internalSetState(Tool::State val)
+{
+	if (mState==val)
+		return;
+
+	if (val > mState) // up
+	{
+		if (val == Tool::tsTRACKING)
+			this->startTracking();
+		else if (val == Tool::tsINITIALIZED)
+			this->initialize();
+		else if (val == Tool::tsCONFIGURED)
+			this->configure();
+	}
+	else // down
+	{
+		if (val == Tool::tsINITIALIZED)
+			this->stopTracking();
+		else if (val == Tool::tsCONFIGURED)
+			this->uninitialize();
+		else if (val == Tool::tsNONE)
+			this->deconfigure();
+	}
+}
+
+void TrackingSystemService::initialize()
+{
+	if(!isConfigured())
+		this->configure();
+}
+
+void TrackingSystemService::uninitialize()
+{
+}
+void TrackingSystemService::startTracking()
+{
+	if(!isInitialized())
+		this->initialize();
+}
+
+void TrackingSystemService::stopTracking()
+{
+}
 }//cx

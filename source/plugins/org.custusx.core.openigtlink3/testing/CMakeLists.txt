@@ -15,6 +15,7 @@ if(BUILD_TESTING)
         cxtestIOReceiver.cpp
         cxtestOpenIGTLinkIO.cpp
         cxtestProbeDefinitionFromStringMessages.cpp
+        cxtestOpenIGTLinkTrackingSystemService.cpp
     )
 
     qt5_wrap_cpp(MOC_SOURCE_FILES ${MOC_SOURCE_FILES})

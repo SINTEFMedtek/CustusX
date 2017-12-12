@@ -61,7 +61,7 @@ public:
 	virtual ~TrackingSystemService() {}
 
 	virtual QString getUid() const = 0;
-	virtual Tool::State getState() const = 0;
+	virtual Tool::State getState() const;
 	virtual void setState(const Tool::State val) = 0; ///< asynchronously request a state. Wait for signal stateChanged()
 	virtual std::vector<ToolPtr> getTools() = 0;
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
@@ -75,7 +75,12 @@ signals:
 
 protected slots:
 	virtual void deconfigure() {} ///< deconfigures the software
+	virtual void configure() {} ///< sets up the software
 
+	virtual void initialize(); ///< connects to the hardware
+	virtual void uninitialize(); ///< disconnects from the hardware
+	virtual void startTracking(); ///< starts tracking
+	virtual void stopTracking(); ///< stops tracking
 protected:
 	Tool::State mState;
 	QString mConfigurationFilePath; ///< path to the configuration file
@@ -85,6 +90,7 @@ protected:
 	virtual bool isInitialized() const;
 	virtual bool isTracking() const;
 
+	void internalSetState(Tool::State val);
 };
 } //namespace cx
 Q_DECLARE_INTERFACE(cx::TrackingSystemService, TrackingSystemService_iid)

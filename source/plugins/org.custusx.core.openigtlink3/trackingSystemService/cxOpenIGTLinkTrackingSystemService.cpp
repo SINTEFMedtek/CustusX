@@ -54,7 +54,6 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
 
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler) :
 	mNetworkHandler(networkHandler)
-
 {
 	if(mNetworkHandler == NULL)
 		return;
@@ -80,11 +79,6 @@ QString OpenIGTLinkTrackingSystemService::getUid() const
 	return "org.custusx.core.openigtlink3";
 }
 
-Tool::State OpenIGTLinkTrackingSystemService::getState() const
-{
-	return mState;
-}
-
 void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 {
 	emit setInternalState(val);
@@ -92,27 +86,7 @@ void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 
 void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
 {
-	if (mState==val)
-		return;
-
-	if (val > mState) // up
-	{
-		if (val == Tool::tsTRACKING)
-			this->startTracking();
-		else if (val == Tool::tsINITIALIZED)
-			this->initialize();
-		else if (val == Tool::tsCONFIGURED)
-			this->configure();
-	}
-	else // down
-	{
-		if (val == Tool::tsINITIALIZED)
-			this->stopTracking();
-		else if (val == Tool::tsCONFIGURED)
-			this->uninitialize();
-		else if (val == Tool::tsNONE)
-			this->deconfigure();
-	}
+	TrackingSystemService::internalSetState(val);
 	mState = val;
 	emit stateChanged();
 }
@@ -135,7 +109,6 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 
 void OpenIGTLinkTrackingSystemService::configure()
 {
-//	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure()";
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
@@ -172,26 +145,6 @@ void OpenIGTLinkTrackingSystemService::deconfigure()
 
 	mTools.clear();
 	mReference.reset();
-}
-
-void OpenIGTLinkTrackingSystemService::initialize()
-{
-	if(!isConfigured())
-		this->configure();
-}
-
-void OpenIGTLinkTrackingSystemService::uninitialize()
-{
-}
-
-void OpenIGTLinkTrackingSystemService::startTracking()
-{
-	if(!isInitialized())
-		this->initialize();
-}
-
-void OpenIGTLinkTrackingSystemService::stopTracking()
-{
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsConnected()

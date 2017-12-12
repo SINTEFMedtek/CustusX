@@ -63,33 +63,30 @@ public:
     virtual ~OpenIGTLinkTrackingSystemService();
 
     virtual QString getUid() const;
-    virtual Tool::State getState() const;
     virtual void setState(const Tool::State val); ///< asynchronously request a state. Wait for signal stateChanged()
     virtual std::vector<ToolPtr> getTools();
     virtual TrackerConfigurationPtr getConfiguration();
     virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-private slots:
-    void configure(); ///< sets up the software
-		virtual void deconfigure(); ///< deconfigures the software
-    void initialize(); ///< connects to the hardware
-    void uninitialize(); ///< disconnects from the hardware
-    void startTracking(); ///< starts tracking
-    void stopTracking(); ///< stops tracking
+protected:
+	void internalSetState(Tool::State val);
 
-    void serverIsConnected();
-    void serverIsDisconnected();
+private slots:
+	virtual void configure(); ///< sets up the software
+	virtual void deconfigure(); ///< deconfigures the software
+
+	void serverIsConnected();
+	void serverIsDisconnected();
 
 	void receiveTransform(QString devicename, Transform3D transform, double timestamp);
 	void receiveCalibration(QString devicename, Transform3D calibration);
 	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private:
-    void internalSetState(Tool::State state);
 	OpenIGTLinkToolPtr getTool(QString devicename);
 
-    std::map<QString, OpenIGTLinkToolPtr> mTools;
-    ToolPtr mReference;
+	std::map<QString, OpenIGTLinkToolPtr> mTools;
+	ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
 
 signals:

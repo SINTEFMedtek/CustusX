@@ -91,7 +91,6 @@ public:
 	virtual std::vector<ToolPtr> getTools();
 	virtual ToolPtr getReference() { return mReference; }
 
-	virtual Tool::State getState() const;
 	virtual void setState(const Tool::State val);
 
 	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
@@ -109,12 +108,12 @@ signals:
 	void trackingStopped(); ///< system stops tracking
 
 private slots:
-	void configure(); ///< sets up the software like the xml file suggests
+	virtual void configure(); ///< sets up the software like the xml file suggests
 	virtual void deconfigure(); ///< deconfigures the software
-	void initialize(); ///< connects to the hardware
-	void uninitialize(); ///< disconnects from the hardware
-	void startTracking(); ///< starts tracking
-	void stopTracking(); ///< stops tracking
+	virtual void initialize(); ///< connects to the hardware
+	virtual void uninitialize(); ///< disconnects from the hardware
+	virtual void startTracking(); ///< starts tracking
+	virtual void stopTracking(); ///< stops tracking
 
 	void trackerConfiguredSlot(bool on);
 	void initializedSlot(bool);

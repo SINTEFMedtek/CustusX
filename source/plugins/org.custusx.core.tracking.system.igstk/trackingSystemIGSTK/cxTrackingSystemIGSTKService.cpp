@@ -83,36 +83,9 @@ std::vector<ToolPtr> TrackingSystemIGSTKService::getTools()
 	return mTools;
 }
 
-Tool::State TrackingSystemIGSTKService::getState() const
-{
-	return mState;
-}
-
 void TrackingSystemIGSTKService::setState(const Tool::State val)
 {
-	if (mState==val)
-		return;
-
-	if (val > mState) // up
-	{
-		if (val == Tool::tsTRACKING)
-			this->startTracking();
-		else if (val == Tool::tsINITIALIZED)
-			this->initialize();
-		else if (val == Tool::tsCONFIGURED)
-			this->configure();
-	}
-	else // down
-	{
-		if (val == Tool::tsINITIALIZED)
-			this->stopTracking();
-		else if (val == Tool::tsCONFIGURED)
-			this->uninitialize();
-		else if (val == Tool::tsNONE)
-		{
-			this->deconfigure();
-		}
-	}
+	this->internalSetState(val);
 }
 
 void TrackingSystemIGSTKService::configure()
