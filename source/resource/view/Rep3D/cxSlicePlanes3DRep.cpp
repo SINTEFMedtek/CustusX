@@ -275,7 +275,8 @@ void SlicePlanes3DRep::changedSlot()
 		{
 			if (mViewportListener)
 			{
-				double size = mViewportListener->getVpnZoom();
+				Vector3D focus = rMs.translation();
+				double size = mViewportListener->getVpnZoom(focus);
 				double planeSize = (i->second.vp_s.range()[0] + i->second.vp_s.range()[1]) / 2.0;
 				double sphereSize = std::min(0.1 / size, planeSize/5); // set to 20% of 2D plane size, but constrain upwards to 0.1/s.
 				sphereSize = sphereSize/50;

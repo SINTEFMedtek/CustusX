@@ -684,7 +684,7 @@ void FollowerText3D::scaleText()
 		return;
 	}
 
-	double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(Vector3D(mFollower->GetPosition()));
 
 	double scale = mSize/size;
 	//  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
