@@ -63,7 +63,7 @@ public:
 
 		virtual void callback();
 		double getVpnZoom();
-		double getVpnZoom(Vector3D focusPoint);
+		double getVpnZoom(Vector3D focalPoint);
 protected:
 		virtual void addObservers() = 0;
 		virtual void removeObservers() = 0;

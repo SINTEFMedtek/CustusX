@@ -116,8 +116,6 @@ void ToolMetricRep::rescale()
 	if (!mToolTip)
 		return;
 
-	//double size = mViewportListener->getVpnZoom();
-	//double size = mViewportListener->getVpnZoom(this->getToolMetric()->getRefCoord()); //ingen effekt?
 	double size = mViewportListener->getVpnZoom(this->getToolMetric()->getCoordinate());
 	double sphereSize = mGraphicsSize / 100 / size;
 	mToolTip->setRadius(sphereSize);

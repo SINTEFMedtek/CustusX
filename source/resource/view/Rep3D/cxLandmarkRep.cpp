@@ -365,8 +365,6 @@ void LandmarkRep::rescale()
 {
 	if (!mViewportListener->isListening())
 		return;
-	//double size = mViewportListener->getVpnZoom();
-	//double sphereSize = mGraphicsSize / 100 / size;
 
 	for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
 	{
