@@ -40,6 +40,7 @@ if(BUILD_TESTING)
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp
         cxtestDataReaderWriter.cpp
+        cxtestTrackingSystemService.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

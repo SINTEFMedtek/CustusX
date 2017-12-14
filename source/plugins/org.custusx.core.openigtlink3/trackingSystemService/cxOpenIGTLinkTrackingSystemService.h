@@ -63,46 +63,31 @@ public:
     virtual ~OpenIGTLinkTrackingSystemService();
 
     virtual QString getUid() const;
-    virtual Tool::State getState() const;
     virtual void setState(const Tool::State val); ///< asynchronously request a state. Wait for signal stateChanged()
     virtual std::vector<ToolPtr> getTools();
     virtual TrackerConfigurationPtr getConfiguration();
     virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-    virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
-
-	void setConfigurationFile(QString configurationFile);
+protected:
+	void internalSetState(Tool::State val);
 
 private slots:
-    void configure(); ///< sets up the software
-    virtual void deconfigure(); ///< deconfigures the software
-    void initialize(); ///< connects to the hardware
-    void uninitialize(); ///< disconnects from the hardware
-    void startTracking(); ///< starts tracking
-    void stopTracking(); ///< stops tracking
+	virtual void configure(); ///< sets up the software
+	virtual void deconfigure(); ///< deconfigures the software
 
-    void serverIsConnected();
-    void serverIsDisconnected();
+	void serverIsConnected();
+	void serverIsDisconnected();
 
 	void receiveTransform(QString devicename, Transform3D transform, double timestamp);
 	void receiveCalibration(QString devicename, Transform3D calibration);
 	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private:
-    void internalSetState(Tool::State state);
 	OpenIGTLinkToolPtr getTool(QString devicename);
 
-    Tool::State mState;
-    std::map<QString, OpenIGTLinkToolPtr> mTools;
-    ToolPtr mReference;
+	std::map<QString, OpenIGTLinkToolPtr> mTools;
+	ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
-
-	// TODO: Copied from TrackingSystemIGSTKService - move to common class?
-	QString mConfigurationFilePath; ///< path to the configuration file
-	QString mLoggingFolder; ///< path to where logging should be saved
-	bool isConfigured() const;
-	bool isInitialized() const;
-	bool isTracking() const;
 
 signals:
 	void setInternalState(const Tool::State val);
