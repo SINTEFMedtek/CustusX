@@ -78,7 +78,7 @@ class Controller(cxBuildScript.BuildScript):
         self.cxBuilder.generateCoverageReport()
         self.cxBuilder.runCppCheck()
         self.cxBuilder.runLineCounter()
-#        self.cxBuilder.publishCoverageInfo(targetFolder = "nightly")
+        self.cxBuilder.publishCoverageInfo(targetFolder = "nightly")
 
     def resetInstallerStep(self):
         self.cxBuilder.removePreviousInstaller()
