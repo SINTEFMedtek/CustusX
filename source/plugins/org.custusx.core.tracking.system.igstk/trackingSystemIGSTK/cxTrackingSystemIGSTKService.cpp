@@ -66,17 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//QStringList TrackingSystemIGSTKService::getSupportedTrackingSystems()
-//{
-//	QStringList retval;
-//	retval = IgstkTracker::getSupportedTrackingSystems();
-//	return retval;
-//}
-
-TrackingSystemIGSTKService::TrackingSystemIGSTKService() :
-				mConfigurationFilePath(""),
-				mLoggingFolder(""),
-				mState(Tool::tsNONE)
+TrackingSystemIGSTKService::TrackingSystemIGSTKService()
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	// initialize config file
@@ -93,51 +83,9 @@ std::vector<ToolPtr> TrackingSystemIGSTKService::getTools()
 	return mTools;
 }
 
-Tool::State TrackingSystemIGSTKService::getState() const
-{
-	return mState;
-}
-
 void TrackingSystemIGSTKService::setState(const Tool::State val)
 {
-	if (mState==val)
-		return;
-
-	if (val > mState) // up
-	{
-		if (val == Tool::tsTRACKING)
-			this->startTracking();
-		else if (val == Tool::tsINITIALIZED)
-			this->initialize();
-		else if (val == Tool::tsCONFIGURED)
-			this->configure();
-	}
-	else // down
-	{
-		if (val == Tool::tsINITIALIZED)
-			this->stopTracking();
-		else if (val == Tool::tsCONFIGURED)
-			this->uninitialize();
-		else if (val == Tool::tsNONE)
-		{
-			this->deconfigure();
-		}
-	}
-}
-
-bool TrackingSystemIGSTKService::isConfigured() const
-{
-	return mState>=Tool::tsCONFIGURED;
-}
-
-bool TrackingSystemIGSTKService::isInitialized() const
-{
-	return mState>=Tool::tsINITIALIZED;
-}
-
-bool TrackingSystemIGSTKService::isTracking() const
-{
-	return mState>=Tool::tsTRACKING;
+	this->internalSetState(val);
 }
 
 void TrackingSystemIGSTKService::configure()
@@ -151,7 +99,13 @@ void TrackingSystemIGSTKService::configure()
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
-    std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
+	if(!configParser.getTrackingSystem().contains("igstk", Qt::CaseInsensitive))
+	{
+		CX_LOG_DEBUG() << "TrackingSystemIGSTKService::configure(): Not using IGSTK tracking.";
+		return;
+	}
+
+	std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 
 	if (trackers.empty())
 	{
@@ -159,16 +113,16 @@ void TrackingSystemIGSTKService::configure()
 		return;
 	}
 
-    ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
+	ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
-    ToolFileParser::ToolInternalStructure referenceToolStructure;
-    std::vector<ToolFileParser::ToolInternalStructure> toolStructures;
+	ToolFileParser::ToolInternalStructurePtr referenceToolStructure;
+	std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures;
 	QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
 	std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
 	for (std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
 	{
 		ToolFileParser toolParser(*it, mLoggingFolder);
-        ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
+		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
 		if ((*it) == referenceToolFile)
 			referenceToolStructure = internalTool;
 		else
