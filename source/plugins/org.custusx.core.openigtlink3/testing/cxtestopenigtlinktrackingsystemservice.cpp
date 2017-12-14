@@ -37,21 +37,10 @@ class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystem
 {
 public:
 	OpenIGTLinkTrackingSystemServiceMoc() : cx::OpenIGTLinkTrackingSystemService(NULL) {}
-//	virtual QString getUid() const {return QString();}
-//	virtual void setState(const cx::Tool::State val) { this->internalSetState(val); }
-//	virtual std::vector<cx::ToolPtr> getTools() { return std::vector<cx::ToolPtr>();}
-//	virtual cx::TrackerConfigurationPtr getConfiguration() {return cx::TrackerConfigurationPtr();}
-//	virtual cx::ToolPtr getROpenIGTLinkTrackingSystemServiceeference() {return cx::ToolPtr();}
-
-//	QString getLoggingFolder() { return mLoggingFolder;}
-//	QString getConfigurationFilePath() { return mConfigurationFilePath;}
 
 	virtual bool isConfigured() const;
 	virtual bool isInitialized() const;
 	virtual bool isTracking() const;
-
-//	virtual void startTracking() { cx::TrackingSystemService::startTracking();}
-//	virtual void initialize() {cx::TrackingSystemService::initialize();}
 
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
 
@@ -106,11 +95,6 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[unit]")
 	CHECK(trackingSystemService->isTracking());
 
 	//Take down
-
-	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
-	CHECK(trackingSystemService->isConfigured());
-	CHECK(trackingSystemService->isInitialized());
-	CHECK_FALSE(trackingSystemService->isTracking());
 
 	trackingSystemService->internalSetState(cx::Tool::tsINITIALIZED);
 	CHECK(trackingSystemService->isConfigured());
