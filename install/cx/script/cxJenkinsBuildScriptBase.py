@@ -70,6 +70,16 @@ class Controller(cxBuildScript.BuildScript):
                 install_root=self.cxInstaller.getInstalledFolder(),
                 system_base_name=self.controlData().system_base_name)
 
+    def runAnalyze(self):
+#        self.cxBuilder.deleteCustusXBuildFolder()
+        self.cxBuilder.buildAllComponents()
+        self.cxBuilder.resetCoverage()
+        self.cxBuilder.runUnitTests()
+        self.cxBuilder.generateCoverageReport()
+        self.cxBuilder.runCppCheck()
+        self.cxBuilder.runLineCounter()
+#        self.cxBuilder.publishCoverageInfo(targetFolder = "nightly")
+
     def resetInstallerStep(self):
         self.cxBuilder.removePreviousInstaller()
         self.cxInstaller.removePreviousJob()
