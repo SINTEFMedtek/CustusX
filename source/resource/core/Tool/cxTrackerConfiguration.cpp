@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+TrackerConfiguration::~TrackerConfiguration() {}
+
 TrackerConfigurationPtr TrackerConfiguration::getNullObject()
 {
 	static TrackerConfigurationPtr mNull;

@@ -57,9 +57,10 @@ public:
 		QString mUid; ///< absolute path and filename for the new config file
 		QString mName;
 		QString mClinicalApplication;
-		QString mTrackingSystem;
+		QString mTracker;
 		QStringList mTools;
 		QString mReferenceTool;
+		QString mTrackingSystem;
 	};
 	struct Tool
 	{
@@ -70,7 +71,7 @@ public:
 		bool mIsReference;
 	};
 
-	virtual ~TrackerConfiguration() {}
+	virtual ~TrackerConfiguration();
 
 	virtual QString getConfigurationApplicationsPath() = 0;
 	virtual void saveConfiguration(const Configuration& config) = 0;

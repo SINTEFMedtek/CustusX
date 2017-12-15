@@ -47,32 +47,32 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	ConfigurationFileParser::Configuration data;
 	data.mFileName = config.mUid;
 	data.mClinical_app = config.mClinicalApplication;
+	data.mTrackingSystem = config.mTrackingSystem;
 
 	QStringList selectedTools = config.mTools;
 	QString referencePath = config.mReferenceTool;
 
-	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTrackingSystem);
+	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTracker);
 
-	ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
+	ConfigurationFileParser::ToolStructureVector toolStructureVector;
 //	QFile configFile(data.mFileName);
 //	QFileInfo info(configFile);
 //	QDir dir = info.dir();
 	foreach(QString absoluteToolPath, selectedTools)
 	{
 //	  QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
-	  ConfigurationFileParser::ToolFileAndReference tool;
-//	  tool.first = relativeToolFilePath;
-	  tool.first = absoluteToolPath;
-	  tool.second = (absoluteToolPath == referencePath);
-	  toolfilesAndRefVector.push_back(tool);
+		ConfigurationFileParser::ToolStructure tool;
+		tool.mAbsoluteToolFilePath = absoluteToolPath;
+		tool.mReference = (absoluteToolPath == referencePath);
+		toolStructureVector.push_back(tool);
 	}
 
-	data.mTrackersAndTools[selectedTracker] = toolfilesAndRefVector;
+	data.mTrackersAndTools[selectedTracker] = toolStructureVector;
 
 	ConfigurationFileParser::saveConfiguration(data);
 }
 
-TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfiguration(QString uid)
+TrackerConfiguration::Configuration TrackerConfigurationImpl::getConfiguration(QString uid)
 {
 	ConfigurationFileParser parser(uid);
 
@@ -85,7 +85,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
     std::vector<ToolFileParser::TrackerInternalStructure> trackers = parser.getTrackers();
 	for (unsigned i = 0; i < trackers.size(); ++i)
 	{
-		retval.mTrackingSystem = enum2string(trackers[i].mType);
+		retval.mTracker = enum2string(trackers[i].mType);
 		// only one trackingsystem is returned. (backed supports more than is needed.)
 	}
 
@@ -96,6 +96,7 @@ TrackerConfigurationImpl::Configuration TrackerConfigurationImpl::getConfigurati
 	}
 
 	retval.mReferenceTool = parser.getAbsoluteReferenceFilePath();
+	retval.mTrackingSystem = parser.getTrackingSystem();
 
 	return retval;
 }
@@ -119,11 +120,11 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 	retval.mName = info.dir().dirName();
 
 	ToolFileParser parser(absoluteFilePath);
-    ToolFileParser::ToolInternalStructure internal = parser.getTool();
+	ToolFileParser::ToolInternalStructurePtr internal = parser.getTool();
 
-	retval.mTrackingSystem = enum2string(internal.mTrackerType);
-	retval.mIsReference = internal.mIsReference;
-	retval.mPictureFilename = internal.mPictureFileName;
+	retval.mTrackingSystem = enum2string(internal->mTrackerType);
+	retval.mIsReference = internal->mIsReference;
+	retval.mPictureFilename = internal->mPictureFileName;
 
 	return retval;
 }
@@ -136,9 +137,9 @@ QStringList TrackerConfigurationImpl::getAllApplications()
 	foreach(QString path, allTools)
 	{
 		//get internal tool
-        ToolFileParser::ToolInternalStructure internal = this->getToolInternal(path);
-		for (unsigned i=0; i<internal.mClinicalApplications.size(); ++i)
-			retval << internal.mClinicalApplications[i];
+				ToolFileParser::ToolInternalStructurePtr internal = this->getToolInternal(path);
+		for (unsigned i=0; i<internal->mClinicalApplications.size(); ++i)
+			retval << internal->mClinicalApplications[i];
 	}
 
 	retval.removeDuplicates();
@@ -153,17 +154,17 @@ QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringL
 	foreach(QString toolFilePath, toolsToFilter)
 	{
 		//get internal tool
-        ToolFileParser::ToolInternalStructure internal = this->getToolInternal(toolFilePath);
+				ToolFileParser::ToolInternalStructurePtr internal = this->getToolInternal(toolFilePath);
 
 		//check tracking systems
-		QString trackerName = enum2string(internal.mTrackerType);
+		QString trackerName = enum2string(internal->mTrackerType);
 		if(!trackingsystemsFilter.contains(trackerName, Qt::CaseInsensitive))
 		continue;
 
 		//check applications
 		bool passedApplicationFilter = false;
-		std::vector<QString>::iterator it = internal.mClinicalApplications.begin();
-		while(it != internal.mClinicalApplications.end() && !passedApplicationFilter)
+		std::vector<QString>::iterator it = internal->mClinicalApplications.begin();
+		while(it != internal->mClinicalApplications.end() && !passedApplicationFilter)
 		{
 			QString applicationName = *it;
 			if(applicationsFilter.contains(applicationName, Qt::CaseInsensitive))
@@ -190,9 +191,9 @@ QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringL
 	return retval;
 }
 
-ToolFileParser::ToolInternalStructure TrackerConfigurationImpl::getToolInternal(QString toolAbsoluteFilePath)
+ToolFileParser::ToolInternalStructurePtr TrackerConfigurationImpl::getToolInternal(QString toolAbsoluteFilePath)
 {
-    ToolFileParser::ToolInternalStructure retval;
+	ToolFileParser::ToolInternalStructurePtr retval;
 
 	ToolFileParser parser(toolAbsoluteFilePath);
 	retval = parser.getTool();
@@ -202,8 +203,8 @@ ToolFileParser::ToolInternalStructure TrackerConfigurationImpl::getToolInternal(
 
 bool TrackerConfigurationImpl::verifyTool(QString uid)
 {
-    ToolFileParser::ToolInternalStructure internal = this->getToolInternal(uid);
-	return internal.verify();
+	ToolFileParser::ToolInternalStructurePtr internal = this->getToolInternal(uid);
+	return internal->verify();
 }
 
 QString TrackerConfigurationImpl::getConfigurationApplicationsPath()

@@ -40,8 +40,8 @@ namespace cx
 {
 
 IgstkTrackerThread::IgstkTrackerThread(ToolFileParser::TrackerInternalStructure trackerStructure,
-                std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                ToolFileParser::ToolInternalStructure referenceToolStructure)
+								std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+								ToolFileParser::ToolInternalStructurePtr referenceToolStructure)
 {
 	this->setObjectName("org.custusx.core.tracking.igstk"); // becomes the thread name
 	mInitTrackerStructure = trackerStructure;
