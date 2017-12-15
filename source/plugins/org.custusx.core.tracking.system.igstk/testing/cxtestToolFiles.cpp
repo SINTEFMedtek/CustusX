@@ -81,7 +81,7 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml][org.custus.core.trackin
 			INFO("Tool file: " + toolFileName.toStdString());
 			CHECK(file.exists());
 			if(file.exists())
-				REQUIRE(configData.mTrackingSystem == config->getTool(toolFileName).mTrackingSystem);
+				REQUIRE(configData.mTracker == config->getTool(toolFileName).mTrackingSystem);
 		}
 	}
 }
