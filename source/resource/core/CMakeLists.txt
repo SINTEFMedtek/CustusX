@@ -256,15 +256,6 @@ cx_add_class(cxResource_SOURCE
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Biquad.cpp
 )
 
-if(WIN32)
-    set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} )
-elseif(APPLE)
-    set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} crypto )
-else(WIN32)
-    set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} GLU crypto ssl)
-endif(WIN32)
-
-
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
 unset(SSC_DATA_ROOT)
 set(SSC_DATA_ROOT ${CustusX_SOURCE_DIR}/data CACHE INTERNAL "path to ssc data root")
