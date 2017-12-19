@@ -51,11 +51,14 @@ namespace cx
 #define CONFIG_TAG "configuration"
 #define CONFIG_TRACKER_TAG "tracker"
 #define CONFIG_TRACKER_TOOL_FILE "toolfile"
+#define CONFIG_TRACKINGSYSTEM_TAG "trackingsystem"
 
 // names of necessary attributes in the configuration file
 #define TYPE_ATTRIBUTE "type"
 #define CLINICAL_APP_ATTRIBUTE "clinical_app"
 #define REFERENCE_ATTRIBUTE "reference"
+#define OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE "openigtlinktransformid"
+#define OPENIGTLINK_IMAGE_ID_ATTRIBUTE "openigtlinkimageid"
 
 ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder) :
 				mConfigurationFilePath(absoluteConfigFilePath), mLoggingFolder(loggingFolder)
@@ -81,7 +84,7 @@ QString ConfigurationFileParser::getTrackingSystem()
 {
 	QString retval;
 
-	QDomNodeList trackingsystemNodes = mConfigureDoc.elementsByTagName("trackingsystem");
+	QDomNodeList trackingsystemNodes = mConfigureDoc.elementsByTagName(CONFIG_TRACKINGSYSTEM_TAG);
 	for (int i = 0; i < trackingsystemNodes.count(); ++i)
 	{
 		retval = trackingsystemNodes.at(i).toElement().attribute(TYPE_ATTRIBUTE);
@@ -182,8 +185,8 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 	{
 		ToolStructure toolStructure;
 		toolStructure.mAbsoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
-		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute("openigtlinktransformid");
-		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute("openigtlinkimageid");
+		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE);
+		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE);
 
 		QString reference = toolFileNodes.at(i).toElement().attribute(REFERENCE_ATTRIBUTE);
 		if (reference.contains("yes", Qt::CaseInsensitive))
@@ -232,7 +235,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	QDomElement configNode = doc.createElement(CONFIG_TAG);
 	configNode.setAttribute(CLINICAL_APP_ATTRIBUTE, config.mClinical_app);
 
-	QDomElement trackingsystemNode = doc.createElement("trackingsystem");
+	QDomElement trackingsystemNode = doc.createElement(CONFIG_TRACKINGSYSTEM_TAG);
 	trackingsystemNode.setAttribute(TYPE_ATTRIBUTE, config.mTrackingSystem);
 
 	configNode.appendChild(trackingsystemNode);
