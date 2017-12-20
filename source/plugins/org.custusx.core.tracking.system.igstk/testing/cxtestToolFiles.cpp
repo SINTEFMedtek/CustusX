@@ -54,7 +54,7 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 	//Verify tool uses supported tracking system
 	foreach(QString filename, config->getAllTools())
 	{
-		QString toolTrackingSystem = config->getTool(filename).mTrackingSystem;
+		QString toolTrackingSystem = config->getTool(filename).mTrackingSystemName;
 
 		INFO("Filename: " + filename.toStdString());
 		INFO("Tracking system: " + toolTrackingSystem.toStdString());
@@ -81,7 +81,7 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml][org.custus.core.trackin
 			INFO("Tool file: " + toolFileName.toStdString());
 			CHECK(file.exists());
 			if(file.exists())
-				REQUIRE(configData.mTracker == config->getTool(toolFileName).mTrackingSystem);
+				REQUIRE(configData.mTrackingSystemName == config->getTool(toolFileName).mTrackingSystemName);
 		}
 	}
 }

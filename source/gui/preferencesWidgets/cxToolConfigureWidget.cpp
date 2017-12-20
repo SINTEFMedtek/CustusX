@@ -190,7 +190,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 
 	if (isNewConfig)
 	{
-		data.mTrackingSystem = enum2string(tsPOLARIS);
+		data.mTrackingSystemName = enum2string(tsPOLARIS);
 		data.mName = "MyConfig";
 	}
 
@@ -198,7 +198,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 	mConfigFileLineEdit->setEnabled(isNewConfig);
 	mConfigFileLineEdit->setToolTip(data.mUid);
 	mModified = true;
-	mTrackingSystemSelector->setValue(data.mTrackingSystem);
+	mTrackingSystemSelector->setValue(data.mTrackingSystemName);
 	mToolListWidget->configSlot(data.mTools);
 }
 
@@ -259,7 +259,7 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 
 	retval.mUid = QString("%1/%2.xml").arg(filepath).arg(filename);
 	retval.mClinicalApplication = application;
-	retval.mTrackingSystem = mTrackingSystemSelector->getValue();
+	retval.mTrackingSystemName = mTrackingSystemSelector->getValue();
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 

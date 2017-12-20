@@ -236,18 +236,17 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	configNode.setAttribute(CLINICAL_APP_ATTRIBUTE, config.mClinical_app);
 
 	QDomElement trackingsystemNode = doc.createElement(CONFIG_TRACKINGSYSTEM_TAG);
-	trackingsystemNode.setAttribute(TYPE_ATTRIBUTE, config.mTrackingSystem);
+	trackingsystemNode.setAttribute(TYPE_ATTRIBUTE, config.mTrackingSystemName);
 
 	configNode.appendChild(trackingsystemNode);
 
 	TrackersAndToolsMap::iterator it1 = config.mTrackersAndTools.begin();
 	for (; it1 != config.mTrackersAndTools.end(); ++it1)
 	{
-		QString trackerType = enum2string(it1->first);
-		if(trackerType.isEmpty())
-			trackerType=config.mTrackingSystem;
+		TRACKING_SYSTEM trackingSystemEmun = it1->first;
+		QString trackingSystemName = enum2string(trackingSystemEmun);
 		QDomElement trackerTagNode = doc.createElement(CONFIG_TRACKER_TAG);
-		trackerTagNode.setAttribute(TYPE_ATTRIBUTE, trackerType);
+		trackerTagNode.setAttribute(TYPE_ATTRIBUTE, trackingSystemName);
 
 		ToolStructureVector::iterator it2 = it1->second.begin();
 		for (; it2 != it1->second.end(); ++it2)
@@ -257,15 +256,16 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
-			if (!trackerType.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
+			if (!trackingSystemName.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
 			{
-				if (config.mTrackingSystem.contains("openigtlink", Qt::CaseInsensitive))
+				// Currently no tool xml file git openigtlink as tracking system. These tools can be from any tracking system
+				if(trackingSystemEmun == tsOPENIGTLINK)
 				{
-					doSaveFile = false;
+					doSaveFile = false;//Don't overwrite tool config file when we use openigtlink tracking system. This is not supported yet.
 				}
 				else
 				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
-												+ toolTrackerType + " because tracker is set to " + trackerType);
+												+ toolTrackerType + " because tracker is set to " + trackingSystemName);
 				continue;
 			}
 

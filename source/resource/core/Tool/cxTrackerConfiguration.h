@@ -57,16 +57,15 @@ public:
 		QString mUid; ///< absolute path and filename for the new config file
 		QString mName;
 		QString mClinicalApplication;
-		QString mTracker;
+		QString mTrackingSystemName; //Tracking system name. Converted to and from emun. See string list in cxDefinitionStrings.cpp. Enums defined in cxDefinitions.h
 		QStringList mTools;
 		QString mReferenceTool;
-		QString mTrackingSystem;
 	};
 	struct Tool
 	{
 		QString mUid; // absolute filename
 		QString mName; // User-friendly name
-		QString mTrackingSystem;
+		QString mTrackingSystemName;
 		QString mPictureFilename;
 		bool mIsReference;
 	};

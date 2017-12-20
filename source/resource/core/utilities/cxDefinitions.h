@@ -132,6 +132,7 @@ namespace cx
 		tsPOLARIS_CLASSIC,  ///< NDIs Polaris Classic tracker
 		tsAURORA,           ///< NDIs Aurora tracker
 		tsMICRON,           ///< Claron Technologys Micron tracker
+		tsOPENIGTLINK,      ///< Tracking obtained through OpenIGTLink
 		tsCOUNT
 	};
 
