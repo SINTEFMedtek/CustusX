@@ -117,7 +117,6 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, TRACKING_SYSTEM, tsCOUNT)
 	"polaris vicra",
 	"polaris classic",
 	"aurora",
-	"openigtlink",
 	"micron"
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, TRACKING_SYSTEM, tsCOUNT)

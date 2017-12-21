@@ -77,7 +77,7 @@ public:
 	{
 		QString mFileName; ///< absolute path and filename for the new config file
 		QString mClinical_app; ///< the clinical application this config is made for
-		QString mTrackingSystemName;
+		QString mTrackingSystem;//TODO
 		TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
 	};
 
