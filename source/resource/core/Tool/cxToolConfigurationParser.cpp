@@ -258,7 +258,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
 			if (!trackingSystemName.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
 			{
-				// Currently no tool xml file use openigtlink as tracking system. These tools can be from any tracking system
+				// Currently no tool xml file git openigtlink as tracking system. These tools can be from any tracking system
 				if(trackingSystemEmun == tsOPENIGTLINK)
 				{
 					doSaveFile = false;//Don't overwrite tool config file when we use openigtlink tracking system. This is not supported yet.
