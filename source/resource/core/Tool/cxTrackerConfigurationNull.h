@@ -59,6 +59,9 @@ public:
 	virtual Tool getTool(QString uid) { return Tool(); }
 	virtual bool verifyTool(QString uid) { return false; }
 
+	virtual QString getTrackingSystemImplementation() {return QString();}
+	virtual void setTrackingSystemImplementation(QString trackingSystemSolution) {}
+
 	virtual bool isNull() { return true; }
 };
 } //cx

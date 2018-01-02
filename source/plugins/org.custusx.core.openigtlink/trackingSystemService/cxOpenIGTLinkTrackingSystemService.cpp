@@ -37,8 +37,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNetworkConnectionHandle.h"
 #include "cxOpenIGTLinkTool.h"
 
+#include "cxTrackerConfigurationImpl.h"
+
 namespace cx
 {
+
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
 
 std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
 {
@@ -56,6 +60,8 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkConnec
 	mConnection(connection)
 
 {
+//	qRegisterMetaType<Tool::State>("Tool::State");//Needed?
+
 	if(mConnection == NULL)
         return;
 
@@ -118,6 +124,8 @@ std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()
 {
     TrackerConfigurationPtr retval;
+		retval.reset(new TrackerConfigurationImpl());
+		retval->setTrackingSystemImplementation(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK);
     return retval;
 }
 
@@ -127,7 +135,9 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 }
 
 void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
-{}
+{
+	Q_UNUSED(loggingFolder);
+}
 
 void OpenIGTLinkTrackingSystemService::configure()
 {
