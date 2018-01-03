@@ -72,6 +72,9 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
     static QString getNameSuffix();
+	static QString getNameSuffixStraight();
+	static QString getNameSuffixTubes();
+	void setDefaultStraightCLTubesOption(bool defaultStraightCLTubesOption);
 
     bool preProcess();
 	virtual bool execute();
@@ -87,13 +90,16 @@ private:
     static bool isSeedPointInsideImage(Vector3D, DataPtr);
 	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
     BoolPropertyPtr getLungSegmentationOption(QDomElement root);
+	BoolPropertyPtr getStraightCLTubesOption(QDomElement root);
+	void createStraightCL();
+	void createTubes();
 	vtkImageDataPtr mAirwaySegmentationOutput;
     vtkImageDataPtr mLungSegmentationOutput;
 	vtkPolyDataPtr mCenterlineOutput;
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
     Vector3D seedPoint;
-
+	bool mDefaultStraightCLTubesOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
 

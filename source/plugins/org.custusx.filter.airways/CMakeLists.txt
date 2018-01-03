@@ -70,6 +70,7 @@ set(PLUGIN_target_libraries
     cxResourceFilter
     cxResourceVisualization
     cxPluginUtilities
+    org_custusx_registration_method_bronchoscopy
 )
 
 set(PLUGIN_OUTPUT_DIR "")

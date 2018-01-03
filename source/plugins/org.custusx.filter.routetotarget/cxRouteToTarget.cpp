@@ -106,6 +106,9 @@ void RouteToTarget::findRoutePositions()
 */
 void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 {
+	if (!searchBranchPtr)
+		return;
+
     std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)

@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkActor2D.h>
 #include <vtkTextProperty.h>
 #include <vtkTextMapper.h>
+#include <QTimer>
 
 #include "cxView.h"
 #include "cxVtkHelperClasses.h"
@@ -98,6 +99,14 @@ void MetricNamesRep::setData(std::vector<DataPtr> data)
 		connect(mMetrics[i].get(), SIGNAL(propertiesChanged()), this, SLOT(setModified()));
 	}
 
+	this->callSetColoredTextListSlot();
+	// Call again with a small delay, as the view might not be ready yet. I.e. the bounding box of the corner text is not properly initialized.
+	// Need the second call to avoid some assertion.
+	QTimer::singleShot(500, this, &MetricNamesRep::callSetColoredTextListSlot);
+}
+
+void MetricNamesRep::callSetColoredTextListSlot()
+{
 	this->setColoredTextList(this->getAllMetricTexts(), Eigen::Array2d(0.98, 0.98));
 }
 
