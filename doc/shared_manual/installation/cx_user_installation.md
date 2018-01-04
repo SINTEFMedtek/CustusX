@@ -11,4 +11,4 @@ Hardware setup:
 
 Troubleshooting:
 ---------------
-- CustusX use OpenCL. If you get errors about OpenCL, try to install latest GPU drivers. Example: Missing OpenCL.dll.
+- CustusX use OpenCL. If you get errors about OpenCL, e.g. "Missing OpenCL.dll", try installing the latest driver for your graphics card.
