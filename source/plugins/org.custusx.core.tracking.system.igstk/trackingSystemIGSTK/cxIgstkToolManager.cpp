@@ -53,8 +53,8 @@ void sampleInfo2xml(const igstk::NDITracker::TrackingSampleInfo& info, QDomEleme
 
 
 IgstkToolManager::IgstkToolManager(ToolFileParser::TrackerInternalStructure trackerStructure,
-                std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                ToolFileParser::ToolInternalStructure referenceToolStructure) :
+								std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+								ToolFileParser::ToolInternalStructurePtr referenceToolStructure) :
 				mInitAnsweres(0), mInternalInitialized(false)
 {
 	mTimer = 0;
@@ -119,14 +119,14 @@ void IgstkToolManager::createTracker(ToolFileParser::TrackerInternalStructure tr
 		reportWarning("Invalid tracker.");
 }
 
-void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                ToolFileParser::ToolInternalStructure referenceToolStructure)
+void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+								ToolFileParser::ToolInternalStructurePtr referenceToolStructure)
 {
 	for (unsigned i = 0; i < toolStructures.size(); ++i)
 	{
 		this->addIgstkTools(toolStructures[i]);
 	}
-	if (!referenceToolStructure.mUid.isEmpty())
+	if (!referenceToolStructure->mUid.isEmpty())
 	{
 		IgstkToolPtr refTool = this->addIgstkTools(referenceToolStructure);
 		if (refTool->isValid())
@@ -134,7 +134,7 @@ void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStruc
 	}
 }
 
-IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructure& toolStructure)
+IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructurePtr toolStructure)
 {
 	IgstkToolPtr igstkTool(new IgstkTool(toolStructure));
 	if (igstkTool->isValid())
@@ -145,7 +145,7 @@ IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructu
 	}
 	else
 	{
-		reportWarning(toolStructure.mUid + " is not valid.");
+		reportWarning(toolStructure->mUid + " is not valid.");
 	}
 	return igstkTool;
 }
@@ -202,7 +202,7 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 
 void IgstkToolManager::deviceInitializedSlot(bool deviceInit)
 {
-	int numberOfDevices = mTools.size() + 1; //+1 is the tracker
+	size_t numberOfDevices = mTools.size() + 1; //+1 is the tracker
 
 	if (deviceInit)
 	{

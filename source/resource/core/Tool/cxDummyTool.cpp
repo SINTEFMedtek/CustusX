@@ -140,10 +140,6 @@ void DummyTool::setType(Tool::Type type)
 	mTypes.insert(type);
 }
 
-vtkPolyDataPtr DummyTool::getGraphicsPolyData() const
-{
-	return mPolyData;
-}
 void DummyTool::setTransformSaveFile(const QString& filename)
 {
 	mTransformSaveFileName = filename;

@@ -57,20 +57,21 @@ public:
 		QString mUid; ///< absolute path and filename for the new config file
 		QString mName;
 		QString mClinicalApplication;
-		QString mTrackingSystem;
+		QString mTrackingSystemName;//Tracking system name (polaris, aurora, ...)
 		QStringList mTools;
 		QString mReferenceTool;
+		QString mTrackingSystemImplementation;//Tracking system implementation (igstk or openigtlink)
 	};
 	struct Tool
 	{
 		QString mUid; // absolute filename
 		QString mName; // User-friendly name
-		QString mTrackingSystem;
+		QString mTrackingSystemName;
 		QString mPictureFilename;
 		bool mIsReference;
 	};
 
-	virtual ~TrackerConfiguration() {}
+	virtual ~TrackerConfiguration();
 
 	virtual QString getConfigurationApplicationsPath() = 0;
 	virtual void saveConfiguration(const Configuration& config) = 0;
@@ -88,8 +89,14 @@ public:
 	virtual Tool getTool(QString uid) = 0;
 	virtual bool verifyTool(QString uid) = 0;
 
+	virtual QString getTrackingSystemImplementation() = 0;
+	virtual void setTrackingSystemImplementation(QString trackingSystemImplementation) = 0;
+
 	virtual bool isNull() = 0;
 	static TrackerConfigurationPtr getNullObject();
+
+protected:
+	QString mTrackingSystemImplementation;
 };
 
 } // namespace cx

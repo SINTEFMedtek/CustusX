@@ -29,41 +29,106 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
-#ifndef CXTRACKERCONFIGURATIONNULL_H
-#define CXTRACKERCONFIGURATIONNULL_H
 
-#include "cxResourceExport.h"
-
-#include "cxTrackerConfiguration.h"
+#include "cxTrackingSystemService.h"
 
 namespace cx
 {
-class cxResource_EXPORT TrackerConfigurationNull : public TrackerConfiguration
+
+TrackingSystemService::TrackingSystemService() :
+	mState(Tool::tsNONE),
+	mConfigurationFilePath(""),
+	mLoggingFolder("")
 {
-public:
-	TrackerConfigurationNull() {}
+}
 
-	virtual QString getConfigurationApplicationsPath() { return ""; }
-	virtual void saveConfiguration(const Configuration& config) {}
-	virtual Configuration getConfiguration(QString uid) { return Configuration(); }
+Tool::State TrackingSystemService::getState() const
+{
+	return mState;
+}
 
-	virtual QStringList getConfigurationsGivenApplication() { return QStringList(); }
-	virtual QStringList getAllConfigurations() { return QStringList(); }
+bool TrackingSystemService::isConfigured() const
+{
+	return mState>=Tool::tsCONFIGURED;
+}
 
-	virtual QStringList getSupportedTrackingSystems() { return QStringList(); }
-	virtual QStringList getToolsGivenFilter(QStringList applicationsFilter,
-											QStringList trackingsystemsFilter) { return QStringList(); }
-	virtual QStringList getAllTools() { return QStringList(); }
-    virtual QStringList getAllApplications() { return QStringList(); }
+bool TrackingSystemService::isInitialized() const
+{
+	return mState>=Tool::tsINITIALIZED;
+}
 
-	virtual Tool getTool(QString uid) { return Tool(); }
-	virtual bool verifyTool(QString uid) { return false; }
+bool TrackingSystemService::isTracking() const
+{
+	return mState>=Tool::tsTRACKING;
+}
 
-	virtual QString getTrackingSystemImplementation() {return QString();}
-	virtual void setTrackingSystemImplementation(QString trackingSystemSolution) {}
+void TrackingSystemService::setConfigurationFile(QString configurationFile)
+{
+	if (configurationFile == mConfigurationFilePath)
+		return;
 
-	virtual bool isNull() { return true; }
-};
-} //cx
+	if (this->isConfigured())
+	{
+		this->deconfigure();
+	}
 
-#endif // CXTRACKERCONFIGURATIONNULL_H
+	mConfigurationFilePath = configurationFile;
+}
+
+void TrackingSystemService::setLoggingFolder(QString loggingFolder)
+{
+	if (mLoggingFolder == loggingFolder)
+		return;
+
+	if (this->isConfigured())
+	{
+		this->deconfigure();
+	}
+
+	mLoggingFolder = loggingFolder;
+}
+
+void TrackingSystemService::internalSetState(Tool::State val)
+{
+	if (mState==val)
+		return;
+
+	if (val > mState) // up
+	{
+		if (val == Tool::tsTRACKING)
+			this->startTracking();
+		else if (val == Tool::tsINITIALIZED)
+			this->initialize();
+		else if (val == Tool::tsCONFIGURED)
+			this->configure();
+	}
+	else // down
+	{
+		if (val == Tool::tsINITIALIZED)
+			this->stopTracking();
+		else if (val == Tool::tsCONFIGURED)
+			this->uninitialize();
+		else if (val == Tool::tsNONE)
+			this->deconfigure();
+	}
+}
+
+void TrackingSystemService::initialize()
+{
+	if(!isConfigured())
+		this->configure();
+}
+
+void TrackingSystemService::uninitialize()
+{
+}
+void TrackingSystemService::startTracking()
+{
+	if(!isInitialized())
+		this->initialize();
+}
+
+void TrackingSystemService::stopTracking()
+{
+}
+}//cx

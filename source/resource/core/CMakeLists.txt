@@ -55,7 +55,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxToolImpl
     Tool/cxTrackingService
     Tool/cxActiveToolProxy
-    Tool/cxTrackingSystemService.h
+    Tool/cxTrackingSystemService
     Tool/cxTracker
     Tool/cxManualToolAdapter
     Tool/cxPlaybackTool
