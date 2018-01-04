@@ -64,6 +64,9 @@ public:
 	virtual QStringList getAllTools();
 	virtual QStringList getAllApplications();
 
+	virtual QString getTrackingSystemImplementation();
+	virtual void setTrackingSystemImplementation(QString trackingSystemImplementation);
+
 	virtual bool isNull() { return false; }
 
 private:

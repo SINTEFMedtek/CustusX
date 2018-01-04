@@ -99,7 +99,7 @@ void TrackingSystemIGSTKService::configure()
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
-	if(!configParser.getTrackingSystem().contains("igstk", Qt::CaseInsensitive))
+	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, Qt::CaseInsensitive))
 	{
 		CX_LOG_DEBUG() << "TrackingSystemIGSTKService::configure(): Not using IGSTK tracking.";
 		return;
@@ -475,6 +475,7 @@ TrackerConfigurationPtr TrackingSystemIGSTKService::getConfiguration()
 {
 	TrackerConfigurationPtr retval;
 	retval.reset(new TrackerConfigurationImpl());
+	retval->setTrackingSystemImplementation(TRACKING_SYSTEM_IMPLEMENTATION_IGSTK);
 	return retval;
 }
 

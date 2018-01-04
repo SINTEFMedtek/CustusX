@@ -38,6 +38,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFileHelpers.h"
 #include "cxProfile.h"
 #include "cxTracker.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -47,12 +48,12 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 	ConfigurationFileParser::Configuration data;
 	data.mFileName = config.mUid;
 	data.mClinical_app = config.mClinicalApplication;
-	data.mTrackingSystem = config.mTrackingSystem;
+	data.mTrackingSystemImplementation = config.mTrackingSystemImplementation;
 
 	QStringList selectedTools = config.mTools;
 	QString referencePath = config.mReferenceTool;
 
-	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTracker);
+	TRACKING_SYSTEM selectedTracker = string2enum<TRACKING_SYSTEM>(config.mTrackingSystemName);
 
 	ConfigurationFileParser::ToolStructureVector toolStructureVector;
 //	QFile configFile(data.mFileName);
@@ -85,7 +86,7 @@ TrackerConfiguration::Configuration TrackerConfigurationImpl::getConfiguration(Q
     std::vector<ToolFileParser::TrackerInternalStructure> trackers = parser.getTrackers();
 	for (unsigned i = 0; i < trackers.size(); ++i)
 	{
-		retval.mTracker = enum2string(trackers[i].mType);
+		retval.mTrackingSystemName = enum2string(trackers[i].mType);
 		// only one trackingsystem is returned. (backed supports more than is needed.)
 	}
 
@@ -96,7 +97,7 @@ TrackerConfiguration::Configuration TrackerConfigurationImpl::getConfiguration(Q
 	}
 
 	retval.mReferenceTool = parser.getAbsoluteReferenceFilePath();
-	retval.mTrackingSystem = parser.getTrackingSystem();
+	retval.mTrackingSystemImplementation = parser.getTrackingSystemImplementation();
 
 	return retval;
 }
@@ -122,7 +123,7 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 	ToolFileParser parser(absoluteFilePath);
 	ToolFileParser::ToolInternalStructurePtr internal = parser.getTool();
 
-	retval.mTrackingSystem = enum2string(internal->mTrackerType);
+	retval.mTrackingSystemName = enum2string(internal->mTrackerType);
 	retval.mIsReference = internal->mIsReference;
 	retval.mPictureFilename = internal->mPictureFileName;
 
@@ -144,6 +145,16 @@ QStringList TrackerConfigurationImpl::getAllApplications()
 
 	retval.removeDuplicates();
 	return retval;
+}
+
+QString TrackerConfigurationImpl::getTrackingSystemImplementation()
+{
+	return mTrackingSystemImplementation;
+}
+
+void TrackerConfigurationImpl::setTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+	mTrackingSystemImplementation = trackingSystemImplementation;
 }
 
 QStringList TrackerConfigurationImpl::filter(QStringList toolsToFilter, QStringList applicationsFilter,

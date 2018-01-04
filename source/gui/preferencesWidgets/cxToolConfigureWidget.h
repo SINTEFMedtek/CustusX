@@ -110,6 +110,9 @@ private:
   TrackingServicePtr mTrackingService;
   StateServicePtr mStateService;
 
+	//TODO Implement in GUI
+	QString mTrackingSystemImplementation; ///< Store tracking system implementation (igstk or openigtlink)
+
 };
 
 }

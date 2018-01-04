@@ -700,16 +700,20 @@ ToolPtr TrackingImplService::getFirstProbe()
 	return ToolPtr();
 }
 
-
+//This may not work if more than one tracking system returns a configuration?
 TrackerConfigurationPtr TrackingImplService::getConfiguration()
 {
+	TrackerConfigurationPtr config;
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 	{
-		TrackerConfigurationPtr config = mTrackingSystems[i]->getConfiguration();
-		if (config)
-			return config;
+		TrackerConfigurationPtr config2 = mTrackingSystems[i]->getConfiguration();
+		if (config2)
+		{
+			config = config2;
+//			CX_LOG_DEBUG() << "getConfiguration config TrackingSystemSolution: " << config->getTrackingSystemImplementation();
+		}
 	}
-	return TrackerConfigurationPtr();
+	return config;
 }
 
 

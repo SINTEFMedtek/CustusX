@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
 #include "cxConfig.h"
+#include "cxTrackerConfigurationImpl.h"
 
 namespace cxtest
 {
@@ -54,18 +55,17 @@ TEST_CASE("Tool xml files use tracking systems supported by ToolManagerUsingIGST
 	//Verify tool uses supported tracking system
 	foreach(QString filename, config->getAllTools())
 	{
-		QString toolTrackingSystem = config->getTool(filename).mTrackingSystem;
+		QString toolTrackingSystemName = config->getTool(filename).mTrackingSystemName;
 
 		INFO("Filename: " + filename.toStdString());
-		INFO("Tracking system: " + toolTrackingSystem.toStdString());
-		REQUIRE(trackingSystems.contains(toolTrackingSystem, Qt::CaseInsensitive));
+		INFO("Tracking system: " + toolTrackingSystemName.toStdString());
+		REQUIRE(trackingSystems.contains(toolTrackingSystemName, Qt::CaseInsensitive));
 	}
 }
 
 TEST_CASE("Tool configuration files", "[unit][tool][xml][org.custus.core.tracking.system.igstk]")
 {
 	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
-//	cx::TrackingServiceOldPtr trackingService = cx::ToolManagerUsingIGSTK::create();
 	cx::TrackerConfigurationPtr config = system->getConfiguration();
 
 	QStringList configurations = config->getAllConfigurations();
@@ -81,8 +81,33 @@ TEST_CASE("Tool configuration files", "[unit][tool][xml][org.custus.core.trackin
 			INFO("Tool file: " + toolFileName.toStdString());
 			CHECK(file.exists());
 			if(file.exists())
-				REQUIRE(configData.mTracker == config->getTool(toolFileName).mTrackingSystem);
+				REQUIRE(configData.mTrackingSystemName == config->getTool(toolFileName).mTrackingSystemName);
 		}
+	}
+}
+
+TEST_CASE("Verify that saveConfiguration do not loose information", "[unit][tool][xml]")
+{
+	cx::TrackingSystemServicePtr system(new cx::TrackingSystemIGSTKService());
+	cx::TrackerConfigurationPtr config = system->getConfiguration();
+	QStringList configurations = config->getAllConfigurations();
+
+	cx::TrackerConfigurationPtr trackerConfig = cx::TrackerConfigurationPtr(new cx::TrackerConfigurationImpl());
+
+	foreach(QString filename, configurations)
+	{
+		cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
+
+		trackerConfig->saveConfiguration(configData);
+
+		// Check that we don't lose info during save
+		cx::TrackerConfiguration::Configuration configData2 = config->getConfiguration(filename);
+		CHECK(configData.mUid == configData2.mUid);
+		CHECK(configData.mName == configData2.mName);
+		CHECK(configData.mClinicalApplication == configData2.mClinicalApplication);
+		CHECK(configData.mTrackingSystemName == configData2.mTrackingSystemName);
+		CHECK(configData.mReferenceTool == configData2.mReferenceTool);
+		CHECK(configData.mTrackingSystemImplementation == configData2.mTrackingSystemImplementation);
 	}
 }
 

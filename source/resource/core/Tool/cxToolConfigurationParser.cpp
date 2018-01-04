@@ -51,11 +51,14 @@ namespace cx
 #define CONFIG_TAG "configuration"
 #define CONFIG_TRACKER_TAG "tracker"
 #define CONFIG_TRACKER_TOOL_FILE "toolfile"
+#define CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG "trackingsystemimplementation"
 
 // names of necessary attributes in the configuration file
 #define TYPE_ATTRIBUTE "type"
 #define CLINICAL_APP_ATTRIBUTE "clinical_app"
 #define REFERENCE_ATTRIBUTE "reference"
+#define OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE "openigtlinktransformid"
+#define OPENIGTLINK_IMAGE_ID_ATTRIBUTE "openigtlinkimageid"
 
 ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder) :
 				mConfigurationFilePath(absoluteConfigFilePath), mLoggingFolder(loggingFolder)
@@ -77,24 +80,24 @@ QString ConfigurationFileParser::getApplicationapplication()
 	return retval;
 }
 
-QString ConfigurationFileParser::getTrackingSystem()
+QString ConfigurationFileParser::getTrackingSystemImplementation()
 {
 	QString retval;
 
-	QDomNodeList trackingsystemNodes = mConfigureDoc.elementsByTagName("trackingsystem");
-	for (int i = 0; i < trackingsystemNodes.count(); ++i)
+	QDomNodeList trackingsystemImplementationNodes = mConfigureDoc.elementsByTagName(CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG);
+	for (int i = 0; i < trackingsystemImplementationNodes.count(); ++i)
 	{
-		retval = trackingsystemNodes.at(i).toElement().attribute(TYPE_ATTRIBUTE);
+		retval = trackingsystemImplementationNodes.at(i).toElement().attribute(TYPE_ATTRIBUTE);
 	}
 
-	if (trackingsystemNodes.count() == 0)
+	if (trackingsystemImplementationNodes.count() == 0)
 	{
-		retval = "igstk";//Revert to igstk tracking for old config files
+		retval = TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;//Revert to igstk implementation for old config files
 	}
-	else if(trackingsystemNodes.count() > 1)
+	else if(trackingsystemImplementationNodes.count() > 1)
 	{
-		CX_LOG_ERROR() << "ConfigurationFileParser::getTrackingSystem(): Config file: " << mConfigurationFilePath
-									 << " has more the one tracking system. Only one is currently supported.";
+		CX_LOG_ERROR() << "ConfigurationFileParser::getTrackingSystemImplementation(): Config file: " << mConfigurationFilePath
+									 << " has more the one tracking system implementation. Only one is currently supported.";
 	}
 
 	return retval;
@@ -182,8 +185,8 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 	{
 		ToolStructure toolStructure;
 		toolStructure.mAbsoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
-		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute("openigtlinktransformid");
-		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute("openigtlinkimageid");
+		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE);
+		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE);
 
 		QString reference = toolFileNodes.at(i).toElement().attribute(REFERENCE_ATTRIBUTE);
 		if (reference.contains("yes", Qt::CaseInsensitive))
@@ -232,19 +235,22 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	QDomElement configNode = doc.createElement(CONFIG_TAG);
 	configNode.setAttribute(CLINICAL_APP_ATTRIBUTE, config.mClinical_app);
 
-	QDomElement trackingsystemNode = doc.createElement("trackingsystem");
-	trackingsystemNode.setAttribute(TYPE_ATTRIBUTE, config.mTrackingSystem);
+	QDomElement trackingsystemImplementationNode = doc.createElement(CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG);
+	trackingsystemImplementationNode.setAttribute(TYPE_ATTRIBUTE, config.mTrackingSystemImplementation);
 
-	configNode.appendChild(trackingsystemNode);
+	configNode.appendChild(trackingsystemImplementationNode);
 
 	TrackersAndToolsMap::iterator it1 = config.mTrackersAndTools.begin();
 	for (; it1 != config.mTrackersAndTools.end(); ++it1)
 	{
-		QString trackerType = enum2string(it1->first);
-		if(trackerType.isEmpty())
-			trackerType=config.mTrackingSystem;
+		QString trackingSystemName = enum2string(it1->first);
+		if(trackingSystemName.isEmpty())
+		{
+			CX_LOG_WARNING() << "trackingSystemName is empty.";
+			trackingSystemName="";
+		}
 		QDomElement trackerTagNode = doc.createElement(CONFIG_TRACKER_TAG);
-		trackerTagNode.setAttribute(TYPE_ATTRIBUTE, trackerType);
+		trackerTagNode.setAttribute(TYPE_ATTRIBUTE, trackingSystemName);
 
 		ToolStructureVector::iterator it2 = it1->second.begin();
 		for (; it2 != it1->second.end(); ++it2)
@@ -254,15 +260,15 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
-			if (!trackerType.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
+			if (!trackingSystemName.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
 			{
-				if (config.mTrackingSystem.contains("openigtlink", Qt::CaseInsensitive))
+				if (config.mTrackingSystemImplementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
 				{
 					doSaveFile = false;
 				}
 				else
 				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
-												+ toolTrackerType + " because tracker is set to " + trackerType);
+												+ toolTrackerType + " because trackingSystemName is set to " + trackingSystemName);
 				continue;
 			}
 
@@ -272,7 +278,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			//TODO: Set attributes openigtlinktransformid and openigtlinkimageid
 			trackerTagNode.appendChild(toolFileNode);
 		}
-		trackingsystemNode.appendChild(trackerTagNode);
+		trackingsystemImplementationNode.appendChild(trackerTagNode);
 	}
 
 	doc.appendChild(configNode);
@@ -306,9 +312,12 @@ void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
 		return;
 	}
 
-	if (!mConfigureDoc.setContent(&configFile))
+	QString errorMessage;
+	int errorInLine = 0;
+	if (!mConfigureDoc.setContent(&configFile, &errorMessage, &errorInLine))
 	{
 		reportError("Could not set the xml content of the config file " + configAbsoluteFilePath);
+		CX_LOG_ERROR() << "Qt error message: " << errorMessage << " in line: " << errorInLine;
 		return;
 	}
 }

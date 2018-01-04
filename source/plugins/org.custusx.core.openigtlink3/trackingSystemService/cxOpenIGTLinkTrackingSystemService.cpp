@@ -112,7 +112,7 @@ void OpenIGTLinkTrackingSystemService::configure()
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
-	if(!configParser.getTrackingSystem().contains("openigtlink", Qt::CaseInsensitive))
+	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
 	{
 		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Not using OpenIGTLink tracking.";
 		return;

@@ -46,6 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
+
 /**
  * \brief Class for reading the files defining a CustusX tool
  *
@@ -77,7 +80,7 @@ public:
 	{
 		QString mFileName; ///< absolute path and filename for the new config file
 		QString mClinical_app; ///< the clinical application this config is made for
-		QString mTrackingSystem;//TODO
+		QString mTrackingSystemImplementation;//Tracking system implementation (igstk or openigtlink)
 		TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
 	};
 
@@ -94,7 +97,7 @@ public:
 	static QString getTemplatesAbsoluteFilePath();
 	static void saveConfiguration(Configuration& config);
 
-	QString getTrackingSystem();
+	QString getTrackingSystemImplementation();
 private:
 	void setConfigDocument(QString configAbsoluteFilePath);
 	bool isConfigFileValid();

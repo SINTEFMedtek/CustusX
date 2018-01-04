@@ -190,7 +190,7 @@ void ToolConfigureGroupBox::configChangedSlot()
 
 	if (isNewConfig)
 	{
-		data.mTracker = enum2string(tsPOLARIS);
+		data.mTrackingSystemName = enum2string(tsPOLARIS);
 		data.mName = "MyConfig";
 	}
 
@@ -198,8 +198,9 @@ void ToolConfigureGroupBox::configChangedSlot()
 	mConfigFileLineEdit->setEnabled(isNewConfig);
 	mConfigFileLineEdit->setToolTip(data.mUid);
 	mModified = true;
-	mTrackingSystemSelector->setValue(data.mTracker);
+	mTrackingSystemSelector->setValue(data.mTrackingSystemName);
 	mToolListWidget->configSlot(data.mTools);
+	this->mTrackingSystemImplementation = data.mTrackingSystemImplementation;
 }
 
 void ToolConfigureGroupBox::configEditedSlot()
@@ -259,11 +260,12 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 
 	retval.mUid = QString("%1/%2.xml").arg(filepath).arg(filename);
 	retval.mClinicalApplication = application;
-	retval.mTracker = mTrackingSystemSelector->getValue();
+	retval.mTrackingSystemImplementation = this->mTrackingSystemImplementation;
+	retval.mTrackingSystemName = mTrackingSystemSelector->getValue();
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
-	retval.mTrackingSystem = config->getConfiguration(this->getCurrentConfigFilePath()).mTrackingSystem;
+//	retval.mTrackingSystem = config->getConfiguration(this->getCurrentConfigFilePath()).mTrackingSystem;
 
 	return retval;
 }
@@ -280,7 +282,7 @@ void ToolConfigureGroupBox::populateReference()
 
 	int currentIndex = -1;
 
-	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
+	TrackerConfigurationPtr config = mTrackingService->getConfiguration();//Get last config. No problem here?
 
 	// populate list
 	QStringList selectedTools = mToolListWidget->getTools();
