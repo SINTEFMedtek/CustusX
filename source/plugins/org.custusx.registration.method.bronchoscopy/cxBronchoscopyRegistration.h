@@ -32,11 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef BRONCHOSCOPYREGISTRATION_H_
 #define BRONCHOSCOPYREGISTRATION_H_
 
-//#include "PositionData.h"
+#include "org_custusx_registration_method_bronchoscopy_Export.h"
 #include "cxBranchList.h"
 #include <vector>
 #include "vtkForwardDeclarations.h"
-
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 
@@ -47,7 +46,7 @@ namespace cx
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
-class BronchoscopyRegistration
+class org_custusx_registration_method_bronchoscopy_EXPORT BronchoscopyRegistration
 {
 	BranchListPtr mBranchListPtr;
 	bool mCenterlineProcessed;
@@ -70,6 +69,8 @@ vtkPointsPtr convertTovtkPoints(Eigen::MatrixXd positions);
 Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok);
 std::pair<Eigen::MatrixXd , Eigen::MatrixXd> RemoveInvalidData(Eigen::MatrixXd positionData, Eigen::MatrixXd orientationData);
 M4Vector RemoveInvalidData(M4Vector T_vector);
+org_custusx_registration_method_bronchoscopy_EXPORT Eigen::MatrixXd makeTransformedMatrix(vtkPolyDataPtr linesPolyData, Transform3D rMd = Transform3D::Identity());
+
 }//namespace cx
 
 #endif /* BRONCHOSCOPYREGISTRATION_H_ */

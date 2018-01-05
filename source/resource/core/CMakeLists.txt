@@ -55,7 +55,7 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Tool/cxToolImpl
     Tool/cxTrackingService
     Tool/cxActiveToolProxy
-    Tool/cxTrackingSystemService.h
+    Tool/cxTrackingSystemService
     Tool/cxTracker
     Tool/cxManualToolAdapter
     Tool/cxPlaybackTool
@@ -255,15 +255,6 @@ cx_add_class(cxResource_SOURCE
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/PoleFilter.cpp
     ${CustusX_SOURCE_DIR}/source/ThirdParty/iir1/iir/Biquad.cpp
 )
-
-if(WIN32)
-    set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} )
-elseif(APPLE)
-    set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} crypto )
-else(WIN32)
-    set( CX_PRIVATE_RESOURCE_LIBRARIES ${CX_PRIVATE_RESOURCE_LIBRARIES} GLU crypto ssl)
-endif(WIN32)
-
 
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
 unset(SSC_DATA_ROOT)

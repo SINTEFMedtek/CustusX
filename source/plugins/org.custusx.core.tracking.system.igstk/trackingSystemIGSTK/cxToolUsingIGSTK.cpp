@@ -33,10 +33,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _USE_MATH_DEFINES
 #include "cxToolUsingIGSTK.h"
 
-#include <vtkPolyData.h>
-#include <vtkConeSource.h>
-#include <vtkSTLReader.h>
-#include <QDir>
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
@@ -52,15 +48,15 @@ namespace cx
 
 ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 	ToolImpl(""),
-				mTool(igstkTool), mPolyData(NULL),
+				mTool(igstkTool),
 				mValid(false), mConfigured(false), mTracked(false)
 {
 	mTimestamp = 0;
-	Tool::mUid = mTool->getInternalStructure().mUid;
-	Tool::mName = mTool->getInternalStructure().mName;
-    mValid = igstkTool->isValid();
+	Tool::mUid = getToolFileToolStructure()->mUid;
+	Tool::mName = getToolFileToolStructure()->mName;
+	mValid = igstkTool->isValid();
 
-	this->createPolyData();
+	this->createToolGraphic();
 
 	connect(mTool.get(), &IgstkTool::toolTransformAndTimestamp, this,
 					&ToolUsingIGSTK::toolTransformAndTimestampSlot);
@@ -69,35 +65,16 @@ ToolUsingIGSTK::ToolUsingIGSTK(IgstkToolPtr igstkTool) :
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));
 	connect(&mTpsTimer, SIGNAL(timeout()), this, SLOT(calculateTpsSlot()));
 
-	if (mTool->getInternalStructure().mIsProbe)
+	if (getToolFileToolStructure()->mIsProbe)
 	{
-		mProbe = ProbeImpl::New(mTool->getInternalStructure().mInstrumentId,
-						mTool->getInternalStructure().mInstrumentScannerId);
+		mProbe = ProbeImpl::New(getToolFileToolStructure()->mInstrumentId,
+						getToolFileToolStructure()->mInstrumentScannerId);
 		connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 	}
 }
 
 ToolUsingIGSTK::~ToolUsingIGSTK()
 {
-}
-
-std::set<ToolUsingIGSTK::Type> ToolUsingIGSTK::getTypes() const
-{
-	std::set<Type> retval;
-
-	if (mTool->getInternalStructure().mIsReference)
-		retval.insert(ToolUsingIGSTK::TOOL_REFERENCE);
-	if (mTool->getInternalStructure().mIsPointer)
-		retval.insert(ToolUsingIGSTK::TOOL_POINTER);
-	if (mTool->getInternalStructure().mIsProbe)
-		retval.insert(ToolUsingIGSTK::TOOL_US_PROBE);
-
-	return retval;
-}
-
-vtkPolyDataPtr ToolUsingIGSTK::getGraphicsPolyData() const
-{
-	return mPolyData;
 }
 
 ProbePtr ToolUsingIGSTK::getProbe() const
@@ -144,33 +121,16 @@ bool ToolUsingIGSTK::isValid() const
 	return mValid;
 }
 
-void ToolUsingIGSTK::createPolyData()
-{
-	QDir dir;
-	if (!mTool->getInternalStructure().mGraphicsFileName.isEmpty()
-					&& dir.exists(mTool->getInternalStructure().mGraphicsFileName))
-	{
-		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-		reader->SetFileName(cstring_cast(mTool->getInternalStructure().mGraphicsFileName));
-		reader->Update();
-		mPolyData = reader->GetOutput();
-	}
-	else
-	{
-        mPolyData = Tool::createDefaultPolyDataCone();
-	}
-}
-
 bool ToolUsingIGSTK::isCalibrated() const
 {
 	Transform3D identity = Transform3D::Identity();
-	Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
+	Transform3D sMt = getToolFileToolStructure()->getCalibrationAsSSC();
 	return !similar(sMt, identity);
 }
 
 Transform3D ToolUsingIGSTK::getCalibration_sMt() const
 {
-	Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
+	Transform3D sMt = getToolFileToolStructure()->getCalibrationAsSSC();
 
 	return sMt;
 }
@@ -182,12 +142,12 @@ void ToolUsingIGSTK::setCalibration_sMt(Transform3D calibration)
 
 QString ToolUsingIGSTK::getCalibrationFileName() const
 {
-	return mTool->getInternalStructure().mCalibrationFilename;
+	return getToolFileToolStructure()->mCalibrationFilename;
 }
 
 TRACKING_SYSTEM ToolUsingIGSTK::getTrackerType()
 {
-	return mTool->getInternalStructure().mTrackerType;
+	return getToolFileToolStructure()->mTrackerType;
 }
 
 void ToolUsingIGSTK::printInternalStructure()
@@ -195,14 +155,9 @@ void ToolUsingIGSTK::printInternalStructure()
 	mTool->printInternalStructure();
 }
 
-std::map<int, Vector3D> ToolUsingIGSTK::getReferencePoints() const
+ToolFileParser::ToolInternalStructurePtr ToolUsingIGSTK::getToolFileToolStructure() const
 {
-	return mTool->getInternalStructure().mReferencePoints;
-}
-
-bool ToolUsingIGSTK::hasReferencePointWithId(int id)
-{
-  return this->getReferencePoints().count(id);
+	return mTool->getInternalStructure();
 }
 
 void ToolUsingIGSTK::addXml(QDomNode& dataNode)
@@ -254,7 +209,7 @@ void ToolUsingIGSTK::calculateTpsSlot()
 {
 	int tpsNr = 0;
 
-	int numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
+	size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
 	if (	numberOfTransformsToCheck <= 1)
 	{
 		emit tps(0);
@@ -263,13 +218,13 @@ void ToolUsingIGSTK::calculateTpsSlot()
 
 	TimedTransformMap::reverse_iterator it = mPositionHistory->rbegin();
 	double lastTransform = it->first;
-	for (int i = 0; i < numberOfTransformsToCheck; ++i)
+	for (size_t i = 0; i < numberOfTransformsToCheck; ++i)
 		++it;
 	double firstTransform = it->first;
 	double secondsPassed = (lastTransform - firstTransform) / 1000;
 
 	if (!similar(secondsPassed, 0))
-		tpsNr = (int) (numberOfTransformsToCheck / secondsPassed);
+		tpsNr = int(numberOfTransformsToCheck / secondsPassed);
 
 	emit tps(tpsNr);
 }
@@ -284,12 +239,13 @@ void ToolUsingIGSTK::toolVisibleSlot(bool on)
 
 void ToolUsingIGSTK::set_prMt(const Transform3D& prMt, double timestamp)
 {
-
+	Q_UNUSED(prMt);
+	Q_UNUSED(timestamp);
 }
 
 void ToolUsingIGSTK::setVisible(bool vis)
 {
-
+	Q_UNUSED(vis);
 }
 
 

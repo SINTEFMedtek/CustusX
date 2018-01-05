@@ -105,7 +105,9 @@ public:
                         mTrackerType(tsNONE), mSROMFilename(""),
                         mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
                         mReferencePoints(), mWireless(true),
-                        m5DOF(true), mCalibrationFilename(""),
+												m5DOF(true),
+												mCalibration(Transform3D::Identity()),
+												mCalibrationFilename(""),
                         mGraphicsFileName(""), mPictureFileName(""),
                         mTransformSaveFileName(""),
                         mLoggingFolderName(""), mInstrumentId(""),
@@ -113,11 +115,13 @@ public:
         {}	///< sets up default values for all the members
     };
 
+		typedef boost::shared_ptr<ToolInternalStructure> ToolInternalStructurePtr;
+
 public:
     ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");
-    ~ToolFileParser();
+		virtual ~ToolFileParser();
 
-    virtual ToolInternalStructure getTool();
+		virtual ToolInternalStructurePtr getTool();
 
     //static QString getTemplatesAbsoluteFilePath();
 

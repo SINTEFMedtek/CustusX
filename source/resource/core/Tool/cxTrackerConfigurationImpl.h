@@ -64,12 +64,15 @@ public:
 	virtual QStringList getAllTools();
 	virtual QStringList getAllApplications();
 
+	virtual QString getTrackingSystemImplementation();
+	virtual void setTrackingSystemImplementation(QString trackingSystemImplementation);
+
 	virtual bool isNull() { return false; }
 
 private:
 	QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter,
 			QStringList trackingsystemsFilter);
-    ToolFileParser::ToolInternalStructure getToolInternal(QString toolAbsoluteFilePath);
+		ToolFileParser::ToolInternalStructurePtr getToolInternal(QString toolAbsoluteFilePath);
 
 };
 

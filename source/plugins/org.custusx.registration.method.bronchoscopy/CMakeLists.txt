@@ -71,3 +71,4 @@ cx_add_non_source_file("doc/org_custusx_registration_method_bronchoscopy.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_bronchoscopy.h")
 cx_add_non_source_file("doc/org_custusx_registration_method_bronchoscopy_image2image.md")
 
+add_subdirectory(testing)

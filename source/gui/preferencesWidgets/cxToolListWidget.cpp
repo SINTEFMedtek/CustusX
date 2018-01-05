@@ -240,10 +240,10 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 		QListWidgetItem* item = this->item(i);
 		QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
 
-		QString toolTrackingSystem = config->getTool(absoluteFilePath).mTrackingSystem;
+		QString toolTrackingSystemName = config->getTool(absoluteFilePath).mTrackingSystemName;
 
 		QBrush brush = item->foreground();
-		if (!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive) || !config->verifyTool(absoluteFilePath))
+		if (!trackingsystemFilter.contains(toolTrackingSystemName, Qt::CaseInsensitive) || !config->verifyTool(absoluteFilePath))
 			brush.setColor(Qt::red);
 		else
 			brush.setColor(Qt::black);

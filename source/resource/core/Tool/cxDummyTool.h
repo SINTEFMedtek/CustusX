@@ -176,7 +176,6 @@ public:
 	virtual std::set<Type> getTypes() const;
 	virtual void setType(Type);
 
-	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void setTransformSaveFile(const QString& filename);
 	virtual bool getVisible() const;
 	virtual QString getUid() const;
@@ -230,7 +229,6 @@ private:
 	Transform3D* getNextTransform();
 	void createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const;
 
-	vtkPolyDataPtr mPolyData;
 	bool mVisible;
 	QString mTransformSaveFileName;
 	QTimerPtr mTimer;

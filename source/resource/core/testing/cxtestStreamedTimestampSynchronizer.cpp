@@ -81,7 +81,7 @@ TEST_CASE("StreamedTimestampSynchronizer: convergence to new value", "[unit]")
 {
     cx::StreamedTimestampSynchronizer syncer;
 
-    double tol = 10;
+	double tol = 20;
     int diff = 10000;
     QDateTime ts = QDateTime::currentDateTime();
     ts = ts.addMSecs(-diff);

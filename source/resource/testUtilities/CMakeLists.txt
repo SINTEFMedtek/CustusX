@@ -48,6 +48,7 @@ if(BUILD_TESTING)
         cxSimpleSyntheticVolume.cpp
         cxtestProbeFixture.h
         cxtestProbeFixture.cpp
+        cxtestVtkPolyDataTree.h
     )
 
     qt5_wrap_cpp(CX_TESTUTILITIES_FILES_TO_MOC ${CX_TESTUTILITIES_FILES_TO_MOC})

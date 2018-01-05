@@ -161,6 +161,20 @@ PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, Q
 	return p1;
 }
 
+DistanceMetricPtr MetricManager::addDistance(QString uid)
+{
+	DistanceMetricPtr d0 = mPatientModelService->createSpecificData<DistanceMetric>(uid);
+	d0->get_rMd_History()->setParentSpace("reference");
+
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+	for (unsigned i=0; i<args.size(); ++i)
+		d0->getArguments()->set(i, args[i]);
+
+	this->installNewMetric(d0);
+
+	return d0;
+}
+
 void MetricManager::addPointButtonClickedSlot()
 {
 	this->addPointInDefaultPosition();
@@ -274,14 +288,7 @@ void MetricManager::addROIButtonClickedSlot()
 
 void MetricManager::addDistanceButtonClickedSlot()
 {
-	DistanceMetricPtr d0 = mPatientModelService->createSpecificData<DistanceMetric>("distance%1");
-	d0->get_rMd_History()->setParentSpace("reference");
-
-	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
-	for (unsigned i=0; i<args.size(); ++i)
-		d0->getArguments()->set(i, args[i]);
-
-	this->installNewMetric(d0);
+	this->addDistance();
 }
 
 void MetricManager::addAngleButtonClickedSlot()

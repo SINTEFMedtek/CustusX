@@ -70,7 +70,7 @@ public:
 	virtual ~VBWidget();
 	void setRouteToTarget(QString uid);
 
-private:
+protected:
 	QString defaultWhatsThis() const;
 	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;
@@ -91,9 +91,9 @@ signals:
 
 private slots:
 	void						inputChangedSlot();
-	virtual void				keyPressEvent(QKeyEvent* event);
 	void						resetEndoscopeSlot();
-
+protected slots:
+	virtual void				keyPressEvent(QKeyEvent* event);
 };
 
 } /* namespace cx */

@@ -44,6 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNetworkConnectionHandle.h"
 #include <boost/bind.hpp>
 
+#include "cxTrackerConfiguration.h"
+#include "cxTrackerConfigurationImpl.h"
+
 namespace cxtest
 {
 
@@ -190,6 +193,33 @@ TEST_CASE("OpenIGTLinkStreamingService: Check that the openigtlink streaming ser
     REQUIRE(service);
     CHECK(service.unique());
     service.reset();
+}
+
+TEST_CASE("OpenIGTLinkStreamingService: Verify that saveConfiguration do not loose information", "[unit][tool][xml]")
+{
+	cx::NetworkConnectionHandlePtr client_connection_handle(new cx::NetworkConnectionHandle("test", cx::XmlOptionFile()));
+	cx::OpenIGTLinkTrackingSystemServicePtr service(new cx::OpenIGTLinkTrackingSystemService(client_connection_handle));
+
+	cx::TrackerConfigurationPtr config = service->getConfiguration();
+
+	QStringList configurations = config->getAllConfigurations();
+
+	cx::TrackerConfigurationPtr trackerConfig = cx::TrackerConfigurationPtr(new cx::TrackerConfigurationImpl());
+
+	foreach(QString filename, configurations)
+	{
+		cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
+		trackerConfig->saveConfiguration(configData);
+
+		//Don't lose info during save
+		cx::TrackerConfiguration::Configuration configData2 = config->getConfiguration(filename);
+		CHECK(configData.mUid == configData2.mUid);
+		CHECK(configData.mName == configData2.mName);
+		CHECK(configData.mClinicalApplication == configData2.mClinicalApplication);
+		CHECK(configData.mTrackingSystemName == configData2.mTrackingSystemName);
+		CHECK(configData.mReferenceTool == configData2.mReferenceTool);
+		CHECK(configData.mTrackingSystemImplementation == configData2.mTrackingSystemImplementation);
+	}
 }
 
 } //namespace cxtest
