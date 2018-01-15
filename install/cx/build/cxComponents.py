@@ -579,3 +579,34 @@ class org_custusx_angleCorrection(CppComponent):
         pass
     def pluginPath(self):
         return '%s' % self.sourcePath()
+
+# ---------------------------------------------------------
+
+class org_custusx_mariana(CppComponent):
+
+    def name(self):
+        return "org.custusx.mariana"
+    def help(self):
+        return 'Plugin for the Mariana project'
+    def path(self):
+        custusx = self._createSibling(cx.build.cxComponents.CustusX)
+        return '%s/%s/source/plugins' % (custusx.path(), custusx.sourceFolder())
+    def sourceFolder(self):
+        return 'org.custusx.mariana'
+    def update(self):
+      self._getBuilder().gitSetRemoteURL(self.repository())
+#      self._getBuilder().gitCheckout('')
+      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def repository(self):
+        return 'git@github.com:SINTEFMedtek/Mariana.git'
+    def makeClean(self):
+        pass
+    def pluginPath(self):
+        return '%s' % self.sourcePath()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        add('CX_PLUGIN_org.custusx.mariana:BOOL', 'ON');
