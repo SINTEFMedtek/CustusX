@@ -52,6 +52,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 namespace cx
 {
 typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
 

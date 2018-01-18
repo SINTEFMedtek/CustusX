@@ -67,7 +67,9 @@ public:
 	StringPropertyPtr getPresetTFAdapter() { this->createParameters(); return mPresetTFAdapter; }
 	StringPropertyPtr getAlgorithmAdapter() { this->createParameters(); return mAlgorithmAdapter; }
 	StringPropertyPtr getMaskReduce() { this->createParameters(); return mMaskReduce; }
+    StringPropertyPtr getPosFilterStrength() { this->createParameters(); return mPosFilterStrength; }
 	BoolPropertyPtr getAlignTimestamps() { this->createParameters(); return mAlignTimestamps; }
+    BoolPropertyPtr getPositionThinning() { this->createParameters(); return mPositionThinning; }
 	DoublePropertyPtr getTimeCalibration() { this->createParameters(); return mTimeCalibration; }
 	DoublePropertyPtr getMaxVolumeSize() { this->createParameters(); return mMaxVolumeSize; }
 	BoolPropertyPtr getAngioAdapter() { this->createParameters(); return mAngioAdapter; }
@@ -89,7 +91,9 @@ private:
 	StringPropertyPtr mPresetTFAdapter;
 	StringPropertyPtr mAlgorithmAdapter;
 	StringPropertyPtr mMaskReduce;//Reduce mask size in % in each direction
+    StringPropertyPtr mPosFilterStrength; //position noise filter strength
 	BoolPropertyPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
+    BoolPropertyPtr mPositionThinning; ///remove outlier positions from position sequence
 	DoublePropertyPtr mTimeCalibration; ///set a offset in the frame timestamps
 	DoublePropertyPtr mMaxVolumeSize; ///< Set max size of output volume.
 	BoolPropertyPtr mAngioAdapter; ///US angio data is used as input

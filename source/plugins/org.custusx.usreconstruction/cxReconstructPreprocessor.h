@@ -73,6 +73,8 @@ private:
 	std::vector<Vector3D> generateInputRectangle();
 	void interpolatePositions();
 	double timeToPosition(unsigned i_frame, unsigned i_pos);
+    void filterPositions(); // Noise-supressing position filter, averaging filter, configurable length
+    void positionThinning(); // If enabled, try to remove "suspect" data (large jumps etc.)
     void applyTimeCalibration();
     void alignTimeSeries();
 	void calibrateTimeStamps(double offset, double scale);
