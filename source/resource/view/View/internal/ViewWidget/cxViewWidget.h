@@ -47,7 +47,7 @@ namespace cx
   *
   * \ingroup cx_resource_view_internal
   */
-class ViewWidget : public QVTKWidget
+class cxResourceVisualization_EXPORT ViewWidget : public QVTKWidget
 {
 Q_OBJECT
 	typedef QVTKWidget inherited;
