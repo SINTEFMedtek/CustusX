@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMultiViewCache.h"
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
+#include <vtkRenderWindow.h>
 
 namespace cxtest {
 
@@ -75,14 +76,14 @@ TEST_CASE("MultiViewCache retrieveView 2D", "[opengl][resource][visualization][i
 	REQUIRE(view);
 }
 
-TEST_CASE("MultiViewCache multiple 2D views", "[opengl][resource][visualization][integration]")
+TEST_CASE("MultiViewCache multiple 2D views", "[opengl][resource][visualization][experimental]")
 {
 	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
 
 	boost::shared_ptr<cx::ViewCollectionWidget> mainWidget;
 	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(factory).data());
 
-	for(int i = 0; i < 10000; ++i)
+	for(int i = 0; i < 5000; ++i)
 	{
 		mainWidget->setOffScreenRenderingAndClear(false);
 		for (int x = 0; x < 10; ++x)
@@ -94,6 +95,8 @@ TEST_CASE("MultiViewCache multiple 2D views", "[opengl][resource][visualization]
 				REQUIRE(view);
 			}
 		}
+		vtkRenderWindowPtr renderWindow = factory->getRenderWindow("test", false);
+		renderWindow->Render();
 	}
 }
 
