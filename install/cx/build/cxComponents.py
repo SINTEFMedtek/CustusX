@@ -569,7 +569,7 @@ class org_custusx_angleCorrection(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckout('0.1')
-        self._getBuilder().gitCheckout('079a002bd06214eba2e44d70479896c4a245ec1b')
+        self._getBuilder().gitCheckout('01acc6547c95e506b88c20011789784a129a16bb')
     def configure(self):
         pass
     def build(self):
