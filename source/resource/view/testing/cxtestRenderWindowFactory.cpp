@@ -74,8 +74,8 @@ TEST_CASE("RenderWindowFactory render", "[opengl][resource][visualization][integ
 
 TEST_CASE("RenderWindowFactory render in render window", "[opengl][resource][visualization][integration]")
 {
-    cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-    QString uid = "TestWindowUid1";
+	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
+	QString uid = "TestWindowUid1";
 	vtkRenderWindowPtr renderWindow = renderWindowFactory->getRenderWindow(uid, false);
 	REQUIRE(renderWindow);
 	renderWindow->Render();
