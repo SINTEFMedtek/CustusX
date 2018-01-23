@@ -76,28 +76,4 @@ TEST_CASE("MultiViewCache retrieveView 2D", "[opengl][resource][visualization][i
 	REQUIRE(view);
 }
 
-TEST_CASE("MultiViewCache multiple 2D views", "[opengl][resource][visualization][experimental]")
-{
-	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-
-	boost::shared_ptr<cx::ViewCollectionWidget> mainWidget;
-	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(factory).data());
-
-	for(int i = 0; i < 5000; ++i)
-	{
-		mainWidget->setOffScreenRenderingAndClear(false);
-		for (int x = 0; x < 10; ++x)
-		{
-			for(int y = 0; y < 10; ++y)
-			{
-				cx::LayoutRegion region = cx::LayoutRegion(x,y);
-				cx::ViewPtr view = mainWidget->addView(cx::View::VIEW_2D, region);
-				REQUIRE(view);
-			}
-		}
-		vtkRenderWindowPtr renderWindow = factory->getRenderWindow("test", false);
-		renderWindow->Render();
-	}
-}
-
 } //cxtest

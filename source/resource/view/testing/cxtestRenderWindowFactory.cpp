@@ -81,19 +81,6 @@ TEST_CASE("RenderWindowFactory render in render window", "[opengl][resource][vis
 	renderWindow->Render();
 }
 
-TEST_CASE("RenderWindowFactory render multiple times", "[opengl][resource][visualization][experimental]")
-{
-	cx::RenderWindowFactoryPtr renderWindowFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-	QString uid = "TestWindowUid1";
-
-	for(int i = 0; i < 5000; ++i)
-	{
-		vtkRenderWindowPtr renderWindow = renderWindowFactory->getRenderWindow(uid, false);
-		REQUIRE(renderWindow);
-		renderWindow->Render();
-	}
-}
-
 //This test requires only one OpenGL context, so it have to run by itself (run as integration)
 TEST_CASE("RenderWindowFactory render a single renderWindow", "[opengl][resource][visualization][integration]")
 {
