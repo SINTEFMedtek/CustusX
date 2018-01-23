@@ -97,7 +97,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mPlaybackSlider->setMaximum(100);
 
 	// Selectors for virtual endoscope control
-	QGroupBox	*endoscopeBox = new QGroupBox(tr("Endoscope"));
+	QGroupBox	*endoscopeBox = new QGroupBox(tr("Bronchoscope"));
 	QGridLayout	*endoscopeControlLayout = new QGridLayout;
 	QLabel		*labelRot = new QLabel(tr("Rotate (360 deg)"));
 	QLabel		*labelView = new QLabel(tr("Left/right (+/- 60 deg)"));
