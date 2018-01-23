@@ -608,6 +608,6 @@ class org_custusx_mariana(CppComponent):
         pass
     def pluginPath(self):
         return '%s' % self.sourcePath()
-    def addConfigurationToDownstreamLib(self, builder):
-        add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.mariana:BOOL', 'ON');
+#    def addConfigurationToDownstreamLib(self, builder):
+#        add = builder.addCMakeOption
+#        add('CX_PLUGIN_org.custusx.mariana:BOOL', 'ON');
