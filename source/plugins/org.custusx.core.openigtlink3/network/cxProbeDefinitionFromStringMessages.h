@@ -50,7 +50,7 @@ struct SectorInfo
 {
 	const int tooLarge = 100000;
 
-	int mProbeType; //0 = unknown, 1 = sector, 2 = linear
+	ProbeDefinition::TYPE mProbeType; //0 = unknown, 1 = sector, 2 = linear
 
 	ImagePtr mImage;
 
@@ -74,7 +74,7 @@ struct SectorInfo
 	void reset()
 	{
 		mHaveChanged = true;
-		mProbeType = tooLarge;
+		mProbeType = ProbeDefinition::tNONE;
 
 		//new standard
 		mOrigin.clear();
@@ -92,12 +92,12 @@ struct SectorInfo
 	{
 		bool retval = true;
 		retval = retval && mImage;
-		retval = retval && ((mProbeType == 1) || (mProbeType == 2));
+		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
 		retval = retval && (mOrigin.size() == 3);
 		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
 		retval = retval && ((mBouningBox.size() == 4) || (mBouningBox.size() == 6)); //2D == 4, 3D == 6
 		retval = retval && (mDepths.size() == 2);
-		if(mProbeType == 2)//linar
+		if(mProbeType == ProbeDefinition::tLINEAR)
 			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
 
 		//Send spacing for now. Try to send it as image spacing

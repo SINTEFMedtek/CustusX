@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXIGTLINKUSSTATUSMESSAGE_H_
 
 #include "igtlMessageBase.h"
+#include "cxProbeDefinition.h"
 
 namespace cx
 {
@@ -69,9 +70,9 @@ public:
   typedef igtl::SmartPointer<const Self>  ConstPointer;
 
   igtlTypeMacro(IGTLinkUSStatusMessage, igtl::MessageBase)
-  igtlNewMacro(IGTLinkUSStatusMessage);
+	igtlNewMacro(IGTLinkUSStatusMessage)
 
-  void SetProbeType(int probeType);
+	void SetProbeType(ProbeDefinition::TYPE probeType);
   int GetProbeType();
   void SetOrigin(double o[3]);
   void SetOrigin(double oi, double oj, double ok);
@@ -95,7 +96,7 @@ protected:
   virtual int  PackBody();
   virtual int  UnpackBody();
 
-  int mProbeType; 				///< 1 = linear, 2 = sector
+	ProbeDefinition::TYPE mProbeType; 				///< 1 = linear, 2 = sector
   double mDataOrigin[3];	///< Origin of sector in image coordinates
   double mDepthStart;			///< Start of sector in mm from origin
   double mDepthEnd;				///< End of sector in mm from origin

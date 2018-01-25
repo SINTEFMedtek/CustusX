@@ -87,7 +87,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	{
 		if (mSectorInfo->mProbeType != intValue)
 		{
-			mSectorInfo->mProbeType = intValue;
+			mSectorInfo->mProbeType = static_cast<ProbeDefinition::TYPE>(intValue);
 		}
 	}
 	//New standard
@@ -183,15 +183,9 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 ProbeDefinitionPtr ProbeDefinitionFromStringMessages::initProbeDefinition()
 {
 	ProbeDefinitionPtr probeDefinition;
-	if(mSectorInfo->mProbeType == 2) //linear
-	{
-		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tLINEAR));
-	}
-	else if (mSectorInfo->mProbeType == 1)//sector
-	{
-		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tSECTOR));
-	}
-	else
+	probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(mSectorInfo->mProbeType));
+
+	if (mSectorInfo->mProbeType == ProbeDefinition::tNONE)
 	{
 		CX_LOG_ERROR() << "ProbeDefinitionFromStringMessages::initProbeDefinition: Incorrect probe type: " << mSectorInfo->mProbeType;
 	}
@@ -201,11 +195,11 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::initProbeDefinition()
 double ProbeDefinitionFromStringMessages::getWidth()
 {
 	double width = 0;
-	if(mSectorInfo->mProbeType == 2) //linear
+	if(mSectorInfo->mProbeType == ProbeDefinition::tLINEAR)
 	{
 		width = mSectorInfo->mLinearWidth;
 	}
-	else if (mSectorInfo->mProbeType == 1)//sector
+	else if (mSectorInfo->mProbeType == ProbeDefinition::tSECTOR)
 	{
 		width = mSectorInfo->mAngles[1] - mSectorInfo->mAngles[0];
 	}
