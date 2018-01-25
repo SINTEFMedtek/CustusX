@@ -1,4 +1,4 @@
-OpenIGTLink Plugin {#org_custusx_core_openigtlink}
+OpenIGTLink Plugin {#org_custusx_core_openigtlink3}
 ===================
 
 \addindex network_connections_widget
@@ -11,6 +11,17 @@ be used to stream video \ref org_custusx_core_video_streamer_openigtlink.
 It can only handle 1 connection at a time. Select if you want this application to behave as a server or a client.
 Specify the ip and port you want to connect to and selected what kind of OpenIGTLink application you are connecting to.
 This is important as different application sends different information in the OpenIGTLink packages.
+
+The plugin supports OpenIGTLink 3.
+
+Ultrasound streaming and position tracking with PLUS / OpenIGTLinkIO
+===========================================================
+\ref org_custusx_core_video_streamer_openigtlink can be used to connect to OpenIGTLink servers.
+
+\addindex Object_OpenIGTLink_3
+OpenIGTLink3 Widget
+===========================================================
+Widget imported from OpenIGTLinkIO to test OpenIGTLink connections
 
 
 \addindex network_data_transfer_widget

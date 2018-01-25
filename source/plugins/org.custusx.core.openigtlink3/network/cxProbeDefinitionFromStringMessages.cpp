@@ -38,8 +38,97 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogger.h"
 
+//This information should be part of the new OpenIGTLinkIO standard
+//These values are also defined in vtkPlusBkProFocusOemVideoSource in PLUS (as static variables)
+#define KEY_PROBE_TYPE		"ProbeType"
+#define KEY_ORIGIN				"Origin"
+#define KEY_ANGLES				"Angles"
+#define KEY_BOUNDING_BOX	"BouningBox"
+#define KEY_DEPTHS				"Depths"
+#define KEY_LINEAR_WIDTH	"LinearWidth"
+#define KEY_SPACING_X			"SpacingX"
+#define KEY_SPACING_Y			"SpacingY"
+
 namespace cx
 {
+
+/**
+ * Internal container for holding incoming variable values.
+ *
+ * Used by ProbeDefinitionFromStringMessages as a container for holding values
+ * from string messages. When SectorInfo got a valid/complete data set
+ * a ProbeDefinition can be created form these values.
+ */
+struct SectorInfo
+{
+	const int tooLarge = 100000;
+
+	ProbeDefinition::TYPE mProbeType; //0 = unknown, 1 = sector, 2 = linear
+
+	ImagePtr mImage;
+
+	//Spacing are sent as separate messages, should be sent with image in the future.
+	double mSpacingX;
+	double mSpacingY;
+
+	//new standard
+	std::vector<double> mOrigin;
+	std::vector<double> mAngles;
+	std::vector<double> mBouningBox;
+	std::vector<double> mDepths;
+	double mLinearWidth;
+
+	bool mHaveChanged;
+
+	SectorInfo()
+	{
+		reset();
+	}
+	void reset()
+	{
+		mHaveChanged = true;
+		mProbeType = ProbeDefinition::tNONE;
+
+		//new standard
+		mOrigin.clear();
+		mAngles.clear();
+		mBouningBox.clear();
+		mDepths.clear();
+		mLinearWidth = tooLarge;
+
+		mSpacingX = tooLarge;
+		mSpacingY = tooLarge;
+
+		mImage = ImagePtr();
+	}
+	bool isValid()
+	{
+		bool retval = true;
+		retval = retval && mImage;
+		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
+		retval = retval && (mOrigin.size() == 3);
+		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
+		retval = retval && ((mBouningBox.size() == 4) || (mBouningBox.size() == 6)); //2D == 4, 3D == 6
+		retval = retval && (mDepths.size() == 2);
+		if(mProbeType == ProbeDefinition::tLINEAR)
+			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
+
+		//Send spacing for now. Try to send it as image spacing
+		retval = retval && (mSpacingX < tooLarge);
+		retval = retval && (mSpacingY < tooLarge);
+		retval = retval && !similar(mSpacingX, 0);
+		retval = retval && !similar(mSpacingY, 0);
+
+		return retval;
+	}
+
+	bool haveChanged()
+	{
+		return mHaveChanged;
+	}
+
+};
+
 
 ProbeDefinitionFromStringMessages::ProbeDefinitionFromStringMessages() :
 	mSectorInfo(new SectorInfo)
@@ -52,21 +141,22 @@ void ProbeDefinitionFromStringMessages::reset()
 
 void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message)
 {
-	//Don't check equipmentType for now
-//	if(header.equipmentType != US_PROBE && header.equipmentType != TRACKED_US_PROBE)
-//		return;
-
-//	CX_LOG_DEBUG() << "header.equipmentId: " << header.equipmentId;
-//	CX_LOG_DEBUG() << "header.deviceName: " << header.deviceName;
-//	CX_LOG_DEBUG() << "message: " << message;
-
-	//Test: Don't use XML for now
 	QString name = QString(header.deviceName.c_str());
 	QString value = message;
 	this->parseValue(name, value);
 }
 
-std::vector<double> ProbeDefinitionFromStringMessages::toDoubleVector(QString values, QString separator)
+/**
+ * @brief ProbeDefinitionFromStringMessages::toDoubleVector Converts a string with a separator to a double vector.
+ * This function is the counterpart to PlusCommon::ToString() in PLUS
+ *
+ * If needed elsewere the function can be moved to a common place an used as an utility funciton.
+ *
+ * @param values String with multiple double values
+ * @param separator The separator between the values used in the string
+ * @return Vector of doubles
+ */
+std::vector<double> ProbeDefinitionFromStringMessages::toDoubleVector(QString values, QString separator) const
 {
 	std::vector<double> retval;
 	QStringList valueList = values.split(separator);
@@ -88,15 +178,15 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 //				   << " intValue: " << intValue
 //				   << " doubleValue: " << doubleValue;
 
-	if (name == "ProbeType")
+	if (name == KEY_PROBE_TYPE)
 	{
 		if (mSectorInfo->mProbeType != intValue)
 		{
-			mSectorInfo->mProbeType = intValue;
+			mSectorInfo->mProbeType = static_cast<ProbeDefinition::TYPE>(intValue);
 		}
 	}
 	//New standard
-	else if (name == "Origin")
+	else if (name == KEY_ORIGIN)
 	{
 		if(mSectorInfo->mOrigin != doubleVector)
 		{
@@ -104,7 +194,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mOrigin = doubleVector;
 		}
 	}
-	else if (name == "Angles")
+	else if (name == KEY_ANGLES)
 	{
 		if(mSectorInfo->mAngles != doubleVector)
 		{
@@ -112,7 +202,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mAngles = doubleVector;
 		}
 	}
-	else if (name == "BouningBox")
+	else if (name == KEY_BOUNDING_BOX)
 	{
 		if(mSectorInfo->mBouningBox != doubleVector)
 		{
@@ -120,7 +210,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mBouningBox = doubleVector;
 		}
 	}
-	else if (name == "Depths")
+	else if (name == KEY_DEPTHS)
 	{
 		if(mSectorInfo->mDepths != doubleVector)
 		{
@@ -128,7 +218,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mDepths = doubleVector;
 		}
 	}
-	else if (name == "LinearWidth")
+	else if (name == KEY_LINEAR_WIDTH)
 	{
 		if(mSectorInfo->mLinearWidth != doubleValue)
 		{
@@ -136,11 +226,11 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mLinearWidth = doubleValue;
 		}
 	}
-	else if (name == "SpacingX")
+	else if (name == KEY_SPACING_X)
 	{
 		mSectorInfo->mSpacingX = doubleValue;
 	}
-	else if (name == "SpacingY")
+	else if (name == KEY_SPACING_Y)
 	{
 		mSectorInfo->mSpacingY = doubleValue;
 	}
@@ -188,15 +278,9 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 ProbeDefinitionPtr ProbeDefinitionFromStringMessages::initProbeDefinition()
 {
 	ProbeDefinitionPtr probeDefinition;
-	if(mSectorInfo->mProbeType == 2) //linear
-	{
-		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tLINEAR));
-	}
-	else if (mSectorInfo->mProbeType == 1)//sector
-	{
-		probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(ProbeDefinition::tSECTOR));
-	}
-	else
+	probeDefinition = ProbeDefinitionPtr(new ProbeDefinition(mSectorInfo->mProbeType));
+
+	if (mSectorInfo->mProbeType == ProbeDefinition::tNONE)
 	{
 		CX_LOG_ERROR() << "ProbeDefinitionFromStringMessages::initProbeDefinition: Incorrect probe type: " << mSectorInfo->mProbeType;
 	}
@@ -206,11 +290,11 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::initProbeDefinition()
 double ProbeDefinitionFromStringMessages::getWidth()
 {
 	double width = 0;
-	if(mSectorInfo->mProbeType == 2) //linear
+	if(mSectorInfo->mProbeType == ProbeDefinition::tLINEAR)
 	{
 		width = mSectorInfo->mLinearWidth;
 	}
-	else if (mSectorInfo->mProbeType == 1)//sector
+	else if (mSectorInfo->mProbeType == ProbeDefinition::tSECTOR)
 	{
 		width = mSectorInfo->mAngles[1] - mSectorInfo->mAngles[0];
 	}
@@ -224,19 +308,29 @@ QSize ProbeDefinitionFromStringMessages::getSize()
 	return size;
 }
 
-DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox()
+DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox() const
 {
-	double zStart = 0;
-	double zEnd = 0;
-	if(mSectorInfo->mBouningBox.size() == 6)
-	{
-		zStart = mSectorInfo->mBouningBox[4];
-		zEnd = mSectorInfo->mBouningBox[5];
-	}
 	DoubleBoundingBox3D retval(mSectorInfo->mBouningBox[0], mSectorInfo->mBouningBox[1],
 			mSectorInfo->mBouningBox[2], mSectorInfo->mBouningBox[3],
-			zStart, zEnd);
+			this->getBoundingBoxThirdDimensionStart(),
+			this->getBoundingBoxThirdDimensionEnd());
 	return retval;
+}
+
+double ProbeDefinitionFromStringMessages::getBoundingBoxThirdDimensionStart() const
+{
+	if(mSectorInfo->mBouningBox.size() == 6)
+		return mSectorInfo->mBouningBox[4];
+	else
+		return 0;
+}
+
+double ProbeDefinitionFromStringMessages::getBoundingBoxThirdDimensionEnd() const
+{
+	if(mSectorInfo->mBouningBox.size() == 6)
+		return mSectorInfo->mBouningBox[5];
+	else
+		return 0;
 }
 
 }//cx

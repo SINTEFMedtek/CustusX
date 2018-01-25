@@ -56,6 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxDataLocations.h"
 #include "cxSonixProbeFileReader.h"
 //#include "cxTypeConversions.h"
+//#include "cxProbeDefinition.h"
 
 namespace cx
 {
@@ -274,14 +275,14 @@ IGTLinkUSStatusMessage::Pointer ImageStreamerSonix::getFrameStatus(Frame& frame)
 
   if(reader.isProbeLinear(probeNode))
   {
-	  retval->SetProbeType(2);
+		retval->SetProbeType(ProbeDefinition::tLINEAR);
 	  retval->SetDepthStart((frame.uly-frame.mOrigin[1]) * frame.mSpacing[1]);// Start of sector in mm from origin
 	  retval->SetDepthEnd((frame.bly-frame.mOrigin[1]) * frame.mSpacing[1]);	// End of sector in mm from origin
 	  retval->SetWidth(probeWidth);
   }
   else // sector
   {
-	  retval->SetProbeType(1);
+		retval->SetProbeType(ProbeDefinition::tSECTOR);
 	  retval->SetWidth(probeWidth/radius);
 	  double depthStart = radius;
 	  double depthStartIncreaseFactor = 1.01;
