@@ -81,17 +81,6 @@ private:
 	double getBoundingBoxThirdDimensionStart() const;
 	double getBoundingBoxThirdDimensionEnd() const;
 
-public:
-	//These are made public because they are used by tests in cxtestProbeDefinitionFromStringMessages.cpp
-	static const char* KEY_PROBE_TYPE;
-	static const char* KEY_ORIGIN;
-	static const char* KEY_ANGLES;
-	static const char* KEY_BOUNDING_BOX;
-	static const char* KEY_DEPTHS;
-	static const char* KEY_LINEAR_WIDTH;
-	static const char* KEY_SPACING_X;
-	static const char* KEY_SPACING_Y;
-
 };
 
 }//cx

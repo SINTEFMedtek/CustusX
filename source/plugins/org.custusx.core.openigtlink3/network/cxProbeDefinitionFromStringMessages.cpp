@@ -38,22 +38,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxLogger.h"
 
+//This information should be part of the new OpenIGTLinkIO standard
+//These values are also defined in vtkPlusBkProFocusOemVideoSource in PLUS (as static variables)
+#define KEY_PROBE_TYPE		"ProbeType"
+#define KEY_ORIGIN				"Origin"
+#define KEY_ANGLES				"Angles"
+#define KEY_BOUNDING_BOX	"BouningBox"
+#define KEY_DEPTHS				"Depths"
+#define KEY_LINEAR_WIDTH	"LinearWidth"
+#define KEY_SPACING_X			"SpacingX"
+#define KEY_SPACING_Y			"SpacingY"
+
 namespace cx
 {
 
-//This information should be part of the new OpenIGTLinkIO standard
-//These values are also defined in vtkPlusBkProFocusOemVideoSource in PLUS
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_PROBE_TYPE		= "ProbeType";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_ORIGIN				= "Origin";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_ANGLES				= "Angles";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_BOUNDING_BOX	= "BouningBox";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_DEPTHS				= "Depths";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_LINEAR_WIDTH	= "LinearWidth";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_SPACING_X		= "SpacingX";
-org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_SPACING_Y		= "SpacingY";
-
 /**
- * Container for holding incoming variable values.
+ * Internal container for holding incoming variable values.
  *
  * Used by ProbeDefinitionFromStringMessages as a container for holding values
  * from string messages. When SectorInfo got a valid/complete data set
