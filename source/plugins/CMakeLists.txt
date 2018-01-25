@@ -11,7 +11,6 @@ set(CX_PLUGINS
   org.custusx.core.view:ON
   org.custusx.core.tracking:ON
   org.custusx.core.tracking.system.igstk:ON
-  org.custusx.core.openigtlink:OFF
   org.custusx.core.openigtlink3:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
