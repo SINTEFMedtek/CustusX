@@ -43,14 +43,14 @@ namespace cx
 
 //This information should be part of the new OpenIGTLinkIO standard
 //These values are also defined in vtkPlusBkProFocusOemVideoSource in PLUS
-const char* ProbeDefinitionFromStringMessages::KEY_PROBE_TYPE		= "ProbeType";
-const char* ProbeDefinitionFromStringMessages::KEY_ORIGIN				= "Origin";
-const char* ProbeDefinitionFromStringMessages::KEY_ANGLES				= "Angles";
-const char* ProbeDefinitionFromStringMessages::KEY_BOUNDING_BOX	= "BouningBox";
-const char* ProbeDefinitionFromStringMessages::KEY_DEPTHS				= "Depths";
-const char* ProbeDefinitionFromStringMessages::KEY_LINEAR_WIDTH	= "LinearWidth";
-const char* ProbeDefinitionFromStringMessages::KEY_SPACING_X		= "SpacingX";
-const char* ProbeDefinitionFromStringMessages::KEY_SPACING_Y		= "SpacingY";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_PROBE_TYPE		= "ProbeType";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_ORIGIN				= "Origin";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_ANGLES				= "Angles";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_BOUNDING_BOX	= "BouningBox";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_DEPTHS				= "Depths";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_LINEAR_WIDTH	= "LinearWidth";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_SPACING_X		= "SpacingX";
+org_custusx_core_openigtlink3_EXPORT const char* ProbeDefinitionFromStringMessages::KEY_SPACING_Y		= "SpacingY";
 
 /**
  * Container for holding incoming variable values.
