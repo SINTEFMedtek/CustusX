@@ -41,6 +41,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
+//This information should be part of the new OpenIGTLinkIO standard
+//These values are also defined in vtkPlusBkProFocusOemVideoSource in PLUS
+const char* ProbeDefinitionFromStringMessages::KEY_PROBE_TYPE		= "ProbeType";
+const char* ProbeDefinitionFromStringMessages::KEY_ORIGIN				= "Origin";
+const char* ProbeDefinitionFromStringMessages::KEY_ANGLES				= "Angles";
+const char* ProbeDefinitionFromStringMessages::KEY_BOUNDING_BOX	= "BouningBox";
+const char* ProbeDefinitionFromStringMessages::KEY_DEPTHS				= "Depths";
+const char* ProbeDefinitionFromStringMessages::KEY_LINEAR_WIDTH	= "LinearWidth";
+const char* ProbeDefinitionFromStringMessages::KEY_SPACING_X		= "SpacingX";
+const char* ProbeDefinitionFromStringMessages::KEY_SPACING_Y		= "SpacingY";
+
 /**
  * Container for holding incoming variable values.
  *
@@ -161,7 +172,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 //				   << " intValue: " << intValue
 //				   << " doubleValue: " << doubleValue;
 
-	if (name == "ProbeType")
+	if (name == KEY_PROBE_TYPE)
 	{
 		if (mSectorInfo->mProbeType != intValue)
 		{
@@ -169,7 +180,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 		}
 	}
 	//New standard
-	else if (name == "Origin")
+	else if (name == KEY_ORIGIN)
 	{
 		if(mSectorInfo->mOrigin != doubleVector)
 		{
@@ -177,7 +188,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mOrigin = doubleVector;
 		}
 	}
-	else if (name == "Angles")
+	else if (name == KEY_ANGLES)
 	{
 		if(mSectorInfo->mAngles != doubleVector)
 		{
@@ -185,7 +196,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mAngles = doubleVector;
 		}
 	}
-	else if (name == "BouningBox")
+	else if (name == KEY_BOUNDING_BOX)
 	{
 		if(mSectorInfo->mBouningBox != doubleVector)
 		{
@@ -193,7 +204,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mBouningBox = doubleVector;
 		}
 	}
-	else if (name == "Depths")
+	else if (name == KEY_DEPTHS)
 	{
 		if(mSectorInfo->mDepths != doubleVector)
 		{
@@ -201,7 +212,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mDepths = doubleVector;
 		}
 	}
-	else if (name == "LinearWidth")
+	else if (name == KEY_LINEAR_WIDTH)
 	{
 		if(mSectorInfo->mLinearWidth != doubleValue)
 		{
@@ -209,11 +220,11 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mLinearWidth = doubleValue;
 		}
 	}
-	else if (name == "SpacingX")
+	else if (name == KEY_SPACING_X)
 	{
 		mSectorInfo->mSpacingX = doubleValue;
 	}
-	else if (name == "SpacingY")
+	else if (name == KEY_SPACING_Y)
 	{
 		mSectorInfo->mSpacingY = doubleValue;
 	}
