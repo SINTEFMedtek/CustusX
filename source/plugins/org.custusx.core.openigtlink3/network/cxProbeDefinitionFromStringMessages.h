@@ -142,10 +142,12 @@ protected:
 
 private:
 	std::vector<double> toDoubleVector(QString values, QString separator = QString(" "));
-	DoubleBoundingBox3D getBoundinBox();
+	DoubleBoundingBox3D getBoundinBox() const;
 	double getWidth();
 	ProbeDefinitionPtr initProbeDefinition();
 	QSize getSize();
+	double getBoundingBoxThirdDimensionStart() const;
+	double getBoundingBoxThirdDimensionEnd() const;
 };
 
 }//cx

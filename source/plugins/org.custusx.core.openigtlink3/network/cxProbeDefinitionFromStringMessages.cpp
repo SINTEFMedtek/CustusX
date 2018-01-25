@@ -219,19 +219,29 @@ QSize ProbeDefinitionFromStringMessages::getSize()
 	return size;
 }
 
-DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox()
+DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox() const
 {
-	double zStart = 0;
-	double zEnd = 0;
-	if(mSectorInfo->mBouningBox.size() == 6)
-	{
-		zStart = mSectorInfo->mBouningBox[4];
-		zEnd = mSectorInfo->mBouningBox[5];
-	}
 	DoubleBoundingBox3D retval(mSectorInfo->mBouningBox[0], mSectorInfo->mBouningBox[1],
 			mSectorInfo->mBouningBox[2], mSectorInfo->mBouningBox[3],
-			zStart, zEnd);
+			this->getBoundingBoxThirdDimensionStart(),
+			this->getBoundingBoxThirdDimensionEnd());
 	return retval;
+}
+
+double ProbeDefinitionFromStringMessages::getBoundingBoxThirdDimensionStart() const
+{
+	if(mSectorInfo->mBouningBox.size() == 6)
+		return mSectorInfo->mBouningBox[4];
+	else
+		return 0;
+}
+
+double ProbeDefinitionFromStringMessages::getBoundingBoxThirdDimensionEnd() const
+{
+	if(mSectorInfo->mBouningBox.size() == 6)
+		return mSectorInfo->mBouningBox[5];
+	else
+		return 0;
 }
 
 }//cx
