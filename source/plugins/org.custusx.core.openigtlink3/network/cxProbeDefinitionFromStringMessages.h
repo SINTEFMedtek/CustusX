@@ -44,82 +44,14 @@ namespace cx
 {
 
 typedef boost::shared_ptr<struct SectorInfo> SectorInfoPtr;
-
-
-struct SectorInfo
-{
-	const int tooLarge = 100000;
-
-	ProbeDefinition::TYPE mProbeType; //0 = unknown, 1 = sector, 2 = linear
-
-	ImagePtr mImage;
-
-	//Spacing are sent as separate messages, should be sent with image in the future.
-	double mSpacingX;
-	double mSpacingY;
-
-	//new standard
-	std::vector<double> mOrigin;
-	std::vector<double> mAngles;
-	std::vector<double> mBouningBox;
-	std::vector<double> mDepths;
-	double mLinearWidth;
-
-	bool mHaveChanged;
-
-	SectorInfo()
-	{
-		reset();
-	}
-	void reset()
-	{
-		mHaveChanged = true;
-		mProbeType = ProbeDefinition::tNONE;
-
-		//new standard
-		mOrigin.clear();
-		mAngles.clear();
-		mBouningBox.clear();
-		mDepths.clear();
-		mLinearWidth = tooLarge;
-
-		mSpacingX = tooLarge;
-		mSpacingY = tooLarge;
-
-		mImage = ImagePtr();
-	}
-	bool isValid()
-	{
-		bool retval = true;
-		retval = retval && mImage;
-		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
-		retval = retval && (mOrigin.size() == 3);
-		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
-		retval = retval && ((mBouningBox.size() == 4) || (mBouningBox.size() == 6)); //2D == 4, 3D == 6
-		retval = retval && (mDepths.size() == 2);
-		if(mProbeType == ProbeDefinition::tLINEAR)
-			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
-
-		//Send spacing for now. Try to send it as image spacing
-		retval = retval && (mSpacingX < tooLarge);
-		retval = retval && (mSpacingY < tooLarge);
-		retval = retval && !similar(mSpacingX, 0);
-		retval = retval && !similar(mSpacingY, 0);
-
-		return retval;
-	}
-
-	bool haveChanged()
-	{
-		return mHaveChanged;
-	}
-
-};
-
 typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
 
 /**
  * Create a ProbeDefinition based on BK String messages from PLUS.
+ *
+ * Currently ProbeDefinitionFromStringMessages creates a ProbeDefinition from BK String messages from PLUS.
+ * Later this should be meta data sent with OpenIGTLink (version 3) messages.
+ * OpenIGTLinkIO should define this protocol.
  *
  * \date May 03, 2017
  * \author Ole Vegard Solberg, SINTEF
