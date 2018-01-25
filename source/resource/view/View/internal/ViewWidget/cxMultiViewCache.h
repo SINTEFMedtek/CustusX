@@ -62,7 +62,7 @@ namespace cx
  */
 typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
-class MultiViewCache
+class cxResourceVisualization_EXPORT MultiViewCache
 {
 public:
 	static MultiViewCachePtr create(RenderWindowFactoryPtr factory) { return MultiViewCachePtr(new MultiViewCache(factory)); }
