@@ -136,21 +136,22 @@ ProbeDefinitionFromStringMessages::ProbeDefinitionFromStringMessages() :
 
 void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message)
 {
-	//Don't check equipmentType for now
-//	if(header.equipmentType != US_PROBE && header.equipmentType != TRACKED_US_PROBE)
-//		return;
-
-//	CX_LOG_DEBUG() << "header.equipmentId: " << header.equipmentId;
-//	CX_LOG_DEBUG() << "header.deviceName: " << header.deviceName;
-//	CX_LOG_DEBUG() << "message: " << message;
-
-	//Test: Don't use XML for now
 	QString name = QString(header.deviceName.c_str());
 	QString value = message;
 	this->parseValue(name, value);
 }
 
-std::vector<double> ProbeDefinitionFromStringMessages::toDoubleVector(QString values, QString separator)
+/**
+ * @brief ProbeDefinitionFromStringMessages::toDoubleVector Converts a string with a separator to a double vector.
+ * This function is the counterpart to PlusCommon::ToString() in PLUS
+ *
+ * If needed elsewere the function can be moved to a common place an used as an utility funciton.
+ *
+ * @param values String with multiple double values
+ * @param separator The separator between the values used in the string
+ * @return Vector of doubles
+ */
+std::vector<double> ProbeDefinitionFromStringMessages::toDoubleVector(QString values, QString separator) const
 {
 	std::vector<double> retval;
 	QStringList valueList = values.split(separator);

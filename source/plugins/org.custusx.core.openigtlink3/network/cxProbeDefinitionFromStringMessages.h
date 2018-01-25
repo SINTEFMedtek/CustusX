@@ -73,7 +73,7 @@ protected:
 	SectorInfoPtr mSectorInfo;
 
 private:
-	std::vector<double> toDoubleVector(QString values, QString separator = QString(" "));
+	std::vector<double> toDoubleVector(QString values, QString separator = QString(" ")) const;
 	DoubleBoundingBox3D getBoundinBox() const;
 	double getWidth();
 	ProbeDefinitionPtr initProbeDefinition();
