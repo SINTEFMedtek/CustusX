@@ -121,7 +121,7 @@ TEST_CASE("ProbeDefinitionFromStringMessages create ProbeDefinition", "[plugins]
 		probeDefinitionFromStringMessages->parseValue(KEY_LINEAR_WIDTH, "30");
 		probeDefinitionFromStringMessages->parseValue(KEY_SPACING_X, "0.5");
 		CHECK_FALSE(probeDefinitionFromStringMessages->haveValidValues());
-		probeDefinitionFromStringMessages->parseValue(KEY_SPACING_X, "0.5");
+		probeDefinitionFromStringMessages->parseValue(KEY_SPACING_Y, "0.5");
 
     REQUIRE(probeDefinitionFromStringMessages->haveValidValues());
 
