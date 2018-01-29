@@ -133,6 +133,9 @@ void TransferFunctions3DPresets::load(QString name, ImagePtr image, bool _2D, bo
 
 void TransferFunctions3DPresets::load2D(QString name, ImagePtr image)
 {
+	if(!image)
+		return;
+
 	//Make sure transfer functions are reset in case something is missing from the preset
 	image->resetTransferFunctions(true, false);
 

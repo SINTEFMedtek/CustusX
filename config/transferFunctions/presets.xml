@@ -80,7 +80,7 @@
         <Preset name="2D CT Abdomen" modality="CT">
             <lookuptable2D>
                 <alpha>-1025=0 -1024=255</alpha>
-                <color>-1024=0/0/0 640=255/255/255</color>
+                <color>-125=0/0/0 225=255/255/255</color>
             </lookuptable2D>
         </Preset>
 	

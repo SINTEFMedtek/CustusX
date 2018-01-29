@@ -94,11 +94,13 @@ public:
 	virtual DoubleBoundingBox3D boundingBox() const;
 	void setColor(const QColor& color);///< Set the color of the mesh
 	QColor getColor();///< Get the color of the mesh (Values are range 0 - 255)
+	void setUseColorFromPolydataScalars(bool on);
+	bool getUseColorFromPolydataScalars() const;
 	bool getBackfaceCulling();///< Get backface culling
 	bool getFrontfaceCulling();///< Get frontface culling
 	void setIsWireframe(bool on);///< Set rep to wireframe, false means surface
 	bool getIsWireframe() const;///< true=wireframe, false=surface
-	vtkPolyDataPtr getTransformedPolyData(Transform3D tranform);///< Create a new transformed polydata
+	vtkPolyDataPtr getTransformedPolyDataCopy(Transform3D tranform);///< Create a new transformed polydata
 	bool isFiberBundle() const;
 	bool showGlyph();
 	bool hasGlyph();
@@ -129,6 +131,7 @@ private:
 	PatientModelServicePtr mPatientModelService;
 	SpaceProviderPtr mSpaceProvider;
 	vtkPolyDataPtr mVtkPolyData;
+	vtkPolyDataPtr mVtkPolyDataOriginal;
 	vtkTexturePtr mVtkTexture;
 	bool createTextureMapper(vtkDataSetAlgorithmPtr &tMapper);
 	bool mHasGlyph;

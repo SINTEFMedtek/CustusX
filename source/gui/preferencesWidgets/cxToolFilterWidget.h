@@ -37,7 +37,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QGroupBox>
 #include "cxDefinitions.h"
-#include "cxLegacySingletons.h"
 #include "cxStringProperty.h"
 
 class QComboBox;
@@ -47,6 +46,7 @@ namespace cx
 {
 class SelectionGroupBox;
 class FilteringToolListWidget;
+typedef boost::shared_ptr<class TrackingService> TrackingServicePtr;
 
 /**
  * ToolFilterWidget
@@ -66,7 +66,7 @@ class cxGui_EXPORT ToolFilterGroupBox : public QGroupBox
   Q_OBJECT
 
 public:
-  ToolFilterGroupBox(QWidget* parent = NULL);
+  ToolFilterGroupBox(TrackingServicePtr trackingService, QWidget* parent = NULL);
   virtual ~ToolFilterGroupBox();
 
   void setTrackingSystemSelector(StringPropertyBasePtr selector);
@@ -85,8 +85,8 @@ private:
 
   StringPropertyPtr mAppSelector;
   StringPropertyBasePtr mTrackingSystemSelector;
-
   FilteringToolListWidget*      mToolListWidget;
+  TrackingServicePtr mTrackingService;
 };
 }//namespace cx
 

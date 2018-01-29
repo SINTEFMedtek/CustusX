@@ -46,12 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewService.h"
 #include "cxActiveToolProxy.h"
 
-//TODO: remove
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
-NavigationWidget::NavigationWidget(QWidget* parent) :
+NavigationWidget::NavigationWidget(ViewServicePtr viewService, TrackingServicePtr trackingService, QWidget* parent) :
 	BaseWidget(parent, "navigation_widget", "Navigation Properties"),
     mVerticalLayout(new QVBoxLayout(this)),
     mCameraGroupBox(new QGroupBox(tr("Camera Style"), this)),
@@ -63,9 +60,9 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 
   QToolBar* toolBar = new QToolBar(this);
   mCameraGroupLayout->addWidget(toolBar);
-  toolBar->addActions(viewService()->getInteractorStyleActionGroup()->actions());
+  toolBar->addActions(viewService->getInteractorStyleActionGroup()->actions());
 
-  DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(trackingService()));
+  DoublePropertyBasePtr offset = DoublePropertyActiveToolOffset::create(ActiveToolProxy::New(trackingService));
   QWidget* toolOffsetWidget = new SliderGroupWidget(this, offset);
 
   //layout

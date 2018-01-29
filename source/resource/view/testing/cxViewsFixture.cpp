@@ -45,8 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxViewsWindow.h"
 #include <QApplication>
 #include "cxPatientModelService.h"
+#include <vtkOpenGLRenderWindow.h>
+#include "cxSharedOpenGLContext.h"
+#include "cxRenderWindowFactory.h"
 
 #include "catch.hpp"
+
 
 namespace cxtest
 {
@@ -74,7 +78,9 @@ ViewsFixture::ViewsFixture(QString displayText)
 	// Initialize dummy toolmanager.
 	mServices->tracking()->setState(cx::Tool::tsTRACKING);
 
-	mWindow.reset(new ViewsWindow());
+	mFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
+
+	mWindow.reset(new ViewsWindow(mFactory));//TODO: Create moc viewService with RenderWindowFactory?
 	mWindow->setDescription(displayText);
 }
 
@@ -114,7 +120,8 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::Imag
 	cx::ViewPtr view = mWindow->add2DView(r, c);
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(uid);
+	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
+	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
 	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
 	rep->setImages(images);
@@ -200,7 +207,7 @@ void ViewsFixture::applyParameters(cx::ImagePtr image, const ImageParameters *pa
 	image->getTransferFunctions3D()->setAlpha(parameters->alpha);
 }
 
-RenderTesterPtr ViewsFixture::getRenderTesterForView(int viewIndex)
+RenderTesterPtr ViewsFixture::getRenderTesterForRenderWindow(int viewIndex)
 {
 	cx::ViewPtr view = mWindow->getView(viewIndex);
 //	vtkRenderWindowPtr renderWindow = mWindow->getView(viewIndex)->getRenderWindow();
@@ -210,15 +217,15 @@ RenderTesterPtr ViewsFixture::getRenderTesterForView(int viewIndex)
 
 void ViewsFixture::dumpDebugViewToDisk(QString text, int viewIndex)
 {
-	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForView(viewIndex);
+	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForRenderWindow(viewIndex);
 //	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
 	vtkImageDataPtr output = renderTester->renderToImage();
 	renderTester->printFractionOfVoxelsAboveZero(text, output);
 }
 
-double ViewsFixture::getFractionOfBrightPixelsInView(int viewIndex, int threshold, int component)
+double ViewsFixture::getFractionOfBrightPixelsInRenderWindowForView(int viewIndex, int threshold, int component)
 {
-	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForView(viewIndex);
+	cxtest::RenderTesterPtr renderTester = this->getRenderTesterForRenderWindow(viewIndex);
 	vtkImageDataPtr output = renderTester->renderToImage();
 //	vtkImageDataPtr output = renderTester->getImageFromRenderWindow();
 	return cxtest::Utilities::getFractionOfVoxelsAboveThreshold(output, threshold,component);

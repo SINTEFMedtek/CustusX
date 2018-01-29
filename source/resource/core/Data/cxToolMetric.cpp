@@ -107,14 +107,5 @@ void ToolMetric::parseXml(QDomNode& dataNode)
 	this->setToolOffset(dataNode.toElement().attribute("tooloffset", qstring_cast(mToolOffset)).toDouble());
 }
 
-QString ToolMetric::getAsSingleLineString() const
-{
-	return QString("%1 \"%2\" %3 \"%4\" %5")
-			.arg(this->getSingleLineHeader())
-			.arg(mToolName)
-			.arg(mToolOffset)
-			.arg(mSpace.toString())
-			.arg(this->matrixAsSingleLineString());
-}
 
 } //namespace cx

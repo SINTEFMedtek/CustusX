@@ -57,7 +57,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxVector3DProperty.h"
 #include "cxDataMetricWrappers.h"
 #include "cxFrameMetric.h"
-#include "cxLegacySingletons.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -89,7 +88,7 @@ class cxGui_EXPORT MetricWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  MetricWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent);
+  MetricWidget(VisServicesPtr services, QWidget* parent);
   virtual ~MetricWidget();
 
 signals:
@@ -117,6 +116,7 @@ protected slots:
   void cellChangedSlot(int row, int col);
   virtual void cellClickedSlot(int row, int column);
   void exportMetricsButtonClickedSlot();
+  void importMetricsButtonClickedSlot();
   void delayedUpdate();
 
 protected:
@@ -124,8 +124,8 @@ protected:
   QAction* mFrameMetricAction;
   QAction* mToolMetricAction;
   QAction* mExportFramesAction;
-  PatientModelServicePtr mPatientModelService;
-  ViewServicePtr mViewService;
+  QAction* mImportFramesAction;
+  VisServicesPtr mServices;
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

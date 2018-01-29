@@ -20,3 +20,4 @@ Polydata / Surface models :
 | ----------------------- | -----------------------------               | -------------------------------------------------- |
 | .stl                    | VTK stl reader                              |                                                    |
 | .vtk                    | VTK vtk format                              | www.vtk.org/VTK/img/file-formats.pdf               |
+| .vtp                    | VTK vtp format                              | www.vtk.org/VTK/img/file-formats.pdf               |

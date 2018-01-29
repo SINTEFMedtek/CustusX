@@ -51,6 +51,12 @@ void MeshPropertyData::initialize()
 									   "Mesh color",
 									   QColor("red"));
 	this->addProperty(mColor);
+
+	//-------------------------------------------------------------------------
+	mUseColorFromPolydataScalars = BoolProperty::initialize( "colorFromPolydataScalars", "Color from polydata scalars",
+									   "If your polydata has a scalar array with color data in you can use that to color the mesh.",
+									   false);
+	this->addProperty(mUseColorFromPolydataScalars);
 	//-------------------------------------------------------------------------
 	mVisSize = DoubleProperty::initialize("visSize", "Point size",
 										  "Visualized size of points, glyphs etc.",
@@ -62,13 +68,13 @@ void MeshPropertyData::initialize()
 									   "Set backface culling on. This makes transparent meshes work, "
 									   "but only draws outside mesh walls "
 									   "(eg. navigating inside meshes will not work).",
-									   true);
+									   false);
 	this->addProperty(mBackfaceCulling);
 	//-------------------------------------------------------------------------
 	mFrontfaceCulling = BoolProperty::initialize("frontfaceCulling", "Frontface culling",
 									   "Set frontface culling on. Can be used to make transparent "
 									   "meshes work from inside the meshes.",
-									   true);
+									   false);
 	this->addProperty(mFrontfaceCulling);
 	//-------------------------------------------------------------------------
 	mRepresentation = StringProperty::initialize("representation", "Representation",

@@ -85,10 +85,8 @@ public:
 		return "planeMetric";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_plane.png");}
-	virtual QString getAsSingleLineString() const;
 
 	Plane3D getRefPlane() const;
-
 	MetricReferenceArgumentListPtr getArguments() { return mArguments; }
 
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels

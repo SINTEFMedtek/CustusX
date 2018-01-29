@@ -61,13 +61,15 @@ public:
 	Eigen::MatrixXd getPositions();
 	void setOrientations(Eigen::MatrixXd orient);
 	Eigen::MatrixXd getOrientations();
-	void addChildBranch(BranchPtr child);
-	void setChildBranches(branchVector children);
+	void addChildBranch(BranchPtr child); //Note that this method doesn't set this branch as parent to the child. Inconsistent?
+	void setChildBranches(branchVector children); //Note that this method doesn't set this branch as parent to the children. Inconsistent?
 	void deleteChildBranches();
 	branchVector getChildBranches();
-	void setParentBranch(BranchPtr parent);
+	void setParentBranch(BranchPtr parent); //Note that this method doesn't set this branch as a child of the parent. Inconsistent?
+    int findGenerationNumber();
+    double findBranchRadius();
 	BranchPtr getParentBranch();
-
+	int findParentIndex(branchVector bv) const;
 };
 
 

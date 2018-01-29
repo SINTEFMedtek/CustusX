@@ -57,10 +57,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent,
-	QString objectName, QString windowTitle) :
+    QString objectName, QString windowTitle, bool showAccuracy) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
-		mLandmarkListener(new LandmarkListener(services))
+        mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy)
 {
 	//table widget
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
@@ -154,9 +154,16 @@ void LandmarkRegistrationWidget::prePaintEvent()
 
 	//ready the table widget
 	mLandmarkTableWidget->setRowCount((int)landmarks.size());
-	mLandmarkTableWidget->setColumnCount(4);
-	QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates" << "Accuracy (mm)");
-	mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
+    QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates");
+    if (mShowAccuracy)
+    {
+        mLandmarkTableWidget->setColumnCount(4);
+        headerItems.append("Accuracy (mm)");
+    }
+    else
+        mLandmarkTableWidget->setColumnCount(3);
+
+    mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
 	mLandmarkTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -303,7 +310,7 @@ void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
 	if (fixedData)
 		fixedName = fixedData->getName();
 
-	if(this->isAverageAccuracyValid())
+    if(this->isAverageAccuracyValid() && mShowAccuracy)
 	{
 		mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAverageAccuracy(), 0, 'f', 2));
 		mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));

@@ -48,9 +48,7 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
         self.addComponent(cxComponents.QHttpServer())
         self.addComponent(cxComponents.FAST())
-        self.addComponent(cxComponents.TubeSegmentationFramework());
-        if (platform.system() == 'Linux'):
-            self.addComponent(cxComponents.LevelSetSegmentation());
+        self.addComponent(cxComponents.org_custusx_angleCorrection())
         self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
         

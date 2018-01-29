@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxLogicManager.h"
 #include "cxApplication.h"
 #include "cxDataLocations.h"
+#include "cxConfig.h"
 
 int main(int argc, char *argv[])
 {

@@ -66,7 +66,6 @@ public:
     static CustomMetricPtr create(QString uid, QString name, PatientModelServicePtr dataManager, SpaceProviderPtr spaceProvider);
 
 	virtual bool isValid() const;
-	virtual QString getAsSingleLineString() const;
     virtual QIcon getIcon() {return QIcon(":/icons/metric_custom.png");}
 
     QString getDefineVectorUpMethod() const;

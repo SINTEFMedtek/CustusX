@@ -83,15 +83,13 @@ public:
 	ToolTracerPtr getTracer();
 	void setSphereRadius(double radius);
 
-	void setTooltipPointColor(QColor c);
-	void setOffsetPointColor(QColor c);
-	void setOffsetLineColor(QColor c);
-	void setOffsetStipplePattern(int pattern);
-
 	void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 	void setSphereRadiusInNormalizedViewport(bool on);
+	void setTooltipPointColor(const QColor& color);
+	void setToolOffsetPointColor(const QColor& color);
+	void setToolOffsetLineColor(const QColor& color);
 
 protected:
 	ToolRep3D(SpaceProviderPtr spaceProvider);

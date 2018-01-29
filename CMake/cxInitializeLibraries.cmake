@@ -84,27 +84,6 @@ macro(cx_initialize_opencl)
     endif()
 endmacro()
 
-###############################################################################
-# Initialize Level-Set-Segmentation library
-# Find the package and run the include USE file.
-###############################################################################
-macro(cx_initialize_level_set_segmentation)
-    find_package( Level-Set-Segmentation QUIET)
-    if(Level-Set-Segmentation_FOUND)
-        include(${Level-Set-Segmentation_USE_FILE})
-    endif()
-endmacro()
-
-###############################################################################
-# Initialize Tube-Segmentation-Framework library
-# Find the package and run the include USE file.
-###############################################################################
-macro(cx_initialize_TSF)
-    find_package( Tube-Segmentation-Framework QUIET)
-    if(Tube-Segmentation-Framework_FOUND)
-        include(${Tube-Segmentation-Framework_USE_FILE})
-    endif()
-endmacro()
 
 ###############################################################################
 # Initialize FAST library
@@ -191,20 +170,6 @@ endmacro()
 macro(cx_initialize_VTK)
 	# this path add should be automatic, but fails at least on ca/macosx10.8
 	set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${VTK_DIR}/lib)
-	# Support both VTK OpenGL 1 and 2
-#	IF(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
-#		find_package(VTK COMPONENTS vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2 NO_MODULE)
-#	ELSE()
-#		find_package(VTK COMPONENTS vtkRenderingOpenGL vtkRenderingVolumeOpenGL NO_MODULE)
-#	ENDIF()
-
-#TODO: Need VTK variables for this to work
-    # Support both VTK OpenGL 1 and 2
-#    IF(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
-#        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL2 vtkRenderingVolumeOpenGL2)
-#    ELSE()
-#        SET(VTK_OPENGL_LIBS vtkRenderingOpenGL vtkRenderingVolumeOpenGL)
-#    ENDIF()
 
 	# vtk consist of (as of 6.1) 120 libs. This explicit inclusion brings is down to about half.
 	# gives about 15% compile speed increase
@@ -217,18 +182,15 @@ macro(cx_initialize_VTK)
 		vtkRenderingQt
 		vtkInteractionStyle
 		vtkRenderingVolume
-		vtkIOGeometry vtkIOLegacy vtkIOMINC
+		vtkIOGeometry vtkIOLegacy vtkIOMINC vtkIOXML
 		vtkIOXMLParser
 		vtkFiltersModeling
 		vtkInteractionWidgets
 		vtkParallelCore
 		vtkFiltersParallel
 		vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics
-#		${VTK_OPENGL_LIBS}
-#		vtkRenderingOpenGL2
-#		vtkRenderingVolumeOpenGL2
-		vtkRenderingOpenGL
-		vtkRenderingVolumeOpenGL
+		vtkRenderingOpenGL2
+		vtkRenderingVolumeOpenGL2
 		NO_MODULE)
 
 

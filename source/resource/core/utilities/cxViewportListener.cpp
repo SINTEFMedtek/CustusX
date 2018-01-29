@@ -126,9 +126,24 @@ void ViewportListenerBase::callback()
 
 /**Calculate the size of a 1mm line at the focal point projected into
  * the normalized viewport space.
- *
+ * This method uses the current default focal point of the camera
  */
 double ViewportListenerBase::getVpnZoom()
+{
+	vtkCameraPtr camera = mRenderer->GetActiveCamera();
+	Vector3D p_f(camera->GetFocalPoint());
+	return this->getVpnZoom(p_f);
+}
+
+/**
+ * @brief ViewportListenerBase::getVpnZoom
+ * Calculate the size of a 1mm line at the focal point projected into
+ * the normalized viewport space. This method uses a given point
+ * as the focal point.
+ * @param focalPoint
+ * @return size of the line
+ */
+double ViewportListenerBase::getVpnZoom(Vector3D focalPoint)
 {
 	if (!mRenderer)
 	{
@@ -140,14 +155,15 @@ double ViewportListenerBase::getVpnZoom()
 	//  The distance between then in the view plane can
 	//  be used to rescale the text.
 	vtkCameraPtr camera = mRenderer->GetActiveCamera();
-	Vector3D p_f(camera->GetFocalPoint());
+	Vector3D p_f(focalPoint);
 	Vector3D vup(camera->GetViewUp());
 	Vector3D p_fup = p_f+vup;
+
 	mRenderer->WorldToView(p_f[0],p_f[1],p_f[2]);
 	mRenderer->WorldToView(p_fup[0],p_fup[1],p_fup[2]);
 	p_f[2] = 0;
 	p_fup[2] = 0;
-	double size = (p_f - p_fup).length()/2;
+	double size = (p_f - p_fup).length()/2.0;
 	return size;
 }
 

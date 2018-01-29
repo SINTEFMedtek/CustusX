@@ -183,26 +183,6 @@ void ToolRep3D::setSphereRadius(double radius)
 		mTooltipPoint->setRadius(mSphereRadius);
 }
 
-void ToolRep3D::setTooltipPointColor(QColor c)
-{
-	mTooltipPointColor = c;
-}
-
-void ToolRep3D::setOffsetPointColor(QColor c)
-{
-	mOffsetPointColor = c;
-}
-
-void ToolRep3D::setOffsetLineColor(QColor c)
-{
-	mOffsetLineColor = c;
-}
-
-void ToolRep3D::setOffsetStipplePattern(int pattern)
-{
-	mStipplePattern = pattern;
-}
-
 void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 {
 	if (mSphereRadiusInNormalizedViewport == on)
@@ -219,6 +199,31 @@ void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
 	{
 		mViewportListener.reset();
 	}
+}
+
+/**
+ * @brief ToolRep3D::setTooltipPointColor
+ * @param color
+ * Sets the color of the crosshair and the sphere.
+ */
+void ToolRep3D::setTooltipPointColor(const QColor& color)
+{
+	if(mToolActor)
+		setColorAndOpacity(mToolActor->GetProperty(), color);
+	if(mTooltipPoint)
+		mTooltipPoint->setColor(color);
+}
+
+void ToolRep3D::setToolOffsetPointColor(const QColor& color)
+{
+	if(mOffsetPoint)
+		mOffsetPoint->setColor(color);
+}
+
+void ToolRep3D::setToolOffsetLineColor(const QColor& color)
+{
+	if(mOffsetLine)
+		mOffsetLine->setColor(color);
 }
 
 void ToolRep3D::addRepActorsToViewRenderer(ViewPtr view)
@@ -275,7 +280,7 @@ void ToolRep3D::scaleSpheres()
 	if (!mViewportListener->isListening())
 		return;
 
-	double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(this->getTool()->get_prMt().translation());
 	double sphereSize = mSphereRadius/100/size;
 
 	if (mOffsetPoint)

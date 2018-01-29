@@ -51,7 +51,6 @@ typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class CameraStyle> CameraStylePtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
-typedef boost::shared_ptr<class Navigation> NavigationPtr;
 
 /**
  * \file
@@ -73,7 +72,7 @@ public:
 	explicit ViewGroup(CoreServicesPtr backend, QString uid);
 	virtual ~ViewGroup();
 
-	void addView(ViewWrapperPtr wrapper);
+	void addView(ViewWrapperPtr wrapper, SharedOpenGLContextPtr sharedOpenGLContext);
 	void removeViews();
 	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
 	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }
@@ -86,6 +85,7 @@ public:
 
 	bool contains3DView() const;
 	void initializeActiveView(SyncedValuePtr val);
+
 protected slots:
 //	void activateManualToolSlot();
 	void mouseClickInViewGroupSlot();

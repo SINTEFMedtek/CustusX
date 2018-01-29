@@ -44,11 +44,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <QMutex>
 #include <QDateTime>
 #include "cxForwardDeclarations.h"
-//#include "cxStreamedTimestampSynchronizer.h"
 
 namespace cx
 {
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 typedef boost::shared_ptr<class Streamer> StreamerPtr;
 typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 typedef boost::shared_ptr<class DirectlyLinkedSender> DirectlyLinkedSenderPtr;

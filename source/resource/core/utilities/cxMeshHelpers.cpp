@@ -104,7 +104,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)
 	retval["Space"] = mesh->getSpace().toStdString();
 	retval["Type"] = mesh->getType().toStdString();
 	retval["Uid"] = mesh->getUid().toStdString();
-	retval["rMd"] = string_cast(mesh->get_rMd());
+	retval["rMd"] = matrixAsSingleLineString(mesh->get_rMd());
 	retval["Backface culling"] = string_cast(mesh->getBackfaceCulling());
 	retval["Color"] = mesh->getColor().name().toStdString();
 	retval["Frontface culling"] = string_cast(mesh->getFrontfaceCulling());

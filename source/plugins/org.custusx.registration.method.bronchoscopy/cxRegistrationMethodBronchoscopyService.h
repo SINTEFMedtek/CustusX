@@ -60,6 +60,27 @@ public:
 	virtual QWidget* createWidget();
 };
 
+/**
+ * Registration method: Bronchoscopy image to image service implementation
+ *
+ * \ingroup org_custusx_registration_method_bronchoscopy
+ *
+ * \date 2017-MAR-15
+ * \author Erlend F Hofstad, SINTEF
+ */
+class org_custusx_registration_method_bronchoscopy_EXPORT RegistrationMethodBronchoscopyImageToImageService : public RegistrationMethodService
+{
+    Q_INTERFACES(cx::RegistrationMethodService)
+public:
+    RegistrationMethodBronchoscopyImageToImageService(RegServicesPtr services) :
+        RegistrationMethodService(services) {}
+    virtual ~RegistrationMethodBronchoscopyImageToImageService() {}
+    virtual QString getRegistrationType() {return QString("ImageToImage");}
+    virtual QString getRegistrationMethod() {return QString("Bronchoscopy");}
+    virtual QString getWidgetName() {return QString("org_custusx_registration_method_bronchoscopy_image2image_widget");}
+    virtual QWidget* createWidget();
+};
+
 } /* namespace cx */
 
 #endif /* CXREGISTRATIONMETHODBRONCHOSCOPYSERVICE_H_ */

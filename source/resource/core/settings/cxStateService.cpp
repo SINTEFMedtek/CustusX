@@ -107,11 +107,14 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("Navigation/followTooltip", true);
 	this->fillDefault("Navigation/followTooltipBoundary", 0.1);
 
-	this->fillDefault("View/tool2DColor", QColor::fromRgbF(0.25, 0.87, 0.16));
+	this->fillDefault("View2D/toolColor", QColor::fromRgbF(0.25, 0.87, 0.16));
 	this->fillDefault("View/toolTipPointColor", QColor::fromRgbF(0.96, 0.87, 0.17));
 	this->fillDefault("View/toolOffsetPointColor", QColor::fromRgbF(0.96, 0.87, 0.17));
 	this->fillDefault("View/toolOffsetLineColor", QColor::fromRgbF(1.0, 0.8, 0.0));
-	this->fillDefault("View/toolCrossHairColor", QColor::fromRgbF(1.0, 0.8, 0.0));
+	this->fillDefault("View2D/toolCrossHairColor", QColor::fromRgbF(1.0, 0.8, 0.0));
+	this->fillDefault("View2D/showToolCrosshair", true);
+	this->fillDefault("View3D/showManualTool", false);
+	this->fillDefault("View2D/showManualTool", true);
 
 	this->fillDefault("showSectorInRTView", true);
 	this->fillDefault("View/showOrientationAnnotation", true);
@@ -120,7 +123,6 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/showDataText", true);
 	this->fillDefault("View/showLabels", true);
 	this->fillDefault("View/showMetricNamesInCorner", false);
-	this->fillDefault("View/toolCrosshair", true);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
 	this->fillDefault("View3D/depthPeeling", false);
@@ -128,15 +130,12 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 	this->fillDefault("View/shadingOn", true);
 
+	this->fillDefault("Gui/showMenuBar", true);
+
 	this->fillDefault("stillUpdateRate", 0.001);
 
-#ifdef __APPLE__
-	this->fillDefault("useGPU2DRendering", true);
-#elif WIN32
-	this->fillDefault("useGPU2DRendering", false);
-#else
-	this->fillDefault("useGPU2DRendering", true);
-#endif
+	this->fillDefault("View2D/useGPU2DRendering", true);
+	this->fillDefault("View2D/useLinearInterpolationIn2DRendering", true);
 
 	this->fillDefault("optimizedViews", true);
 	this->fillDefault("smartRender", true);
@@ -150,6 +149,9 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("USsimulation/type", "Original data");
 	this->fillDefault("USsimulation/volume", "");
 	this->fillDefault("USsimulation/gain", 0.70);
+
+	this->fillDefault("Dicom/ShowAdvanced", false);
+	this->fillDefault("Landmarks/ShowAdvanced", false);
 }
 
 

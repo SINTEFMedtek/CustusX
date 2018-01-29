@@ -129,11 +129,11 @@ private:
 class cxResourceVisualization_EXPORT ViewGroupData: public QObject
 {
 Q_OBJECT
+
 public:
 	explicit ViewGroupData(CoreServicesPtr services, QString uid);
 	void requestInitialize();
 	QString getUid() const { return mUid; }
-//	std::vector<DataPtr> getData() const;
 	std::vector<DataPtr> getData(DataViewProperties properties=DataViewProperties::createFull()) const;
 	QString getVideoSource() const;
 	void addData(QString uid);
@@ -154,6 +154,7 @@ public:
 	SyncedValuePtr getGlobal2DZoom();
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
+    void zoomCamera3D(int zoomFactor);
 
 	PlaneTypeCollection getSliceDefinitions();
 	void setSliceDefinitions(PlaneTypeCollection val);
@@ -165,7 +166,6 @@ public:
 		Options();
 		bool mShowLandmarks;
 		bool mShowPointPickerProbe;
-//		bool mLockToTable; ///< lock the 3D view orientation to have Table down.
 		MeshPtr mPickerGlyph;
 		CameraStyleData mCameraStyle;
 	};
@@ -173,7 +173,6 @@ public:
 	Options getOptions() const;
 	void setOptions(Options options);
 	void setRegistrationMode(REGISTRATION_STATUS mode);
-
 
 	void addXml(QDomNode& dataNode);
 	void parseXml(QDomNode dataNode);
@@ -188,22 +187,12 @@ signals:
 	void optionsChanged();
 
 private:
-	QString mUid;
-	CoreServicesPtr mServices;
-	QString mVideoSource;
-	typedef std::pair<QString, DataViewProperties> DataAndViewProperties;
-	std::vector<DataAndViewProperties> mData;
-	CameraDataPtr mCamera3D;
-	Options mOptions;
-	SyncedValuePtr mGroup2DZoom;
-	SyncedValuePtr mGlobal2DZoom;
-	StringListPropertyPtr mSliceDefinitionProperty;
-	DataPtr getData(QString uid) const;
+	typedef std::pair<QString, DataViewProperties> DataAndViewPropertiesPair;
 
 	struct data_equals
 	{
 		data_equals(QString uid) : mData(uid) {}
-		bool operator()(const DataAndViewProperties& right)
+		bool operator()(const DataAndViewPropertiesPair& right)
 		{
 			return mData == right.first;
 		}
@@ -214,6 +203,20 @@ private:
 	std::vector<boost::shared_ptr<DATA_TYPE> > getDataOfType(DataViewProperties requiredProperties) const;
 	bool contains(QString uid) const;
 	void createSliceDefinitionProperty();
+	void insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item);
+
+	QString mUid;
+	CoreServicesPtr mServices;
+	QString mVideoSource;
+	std::vector<DataAndViewPropertiesPair> mData;
+	CameraDataPtr mCamera3D;
+	Options mOptions;
+	SyncedValuePtr mGroup2DZoom;
+	SyncedValuePtr mGlobal2DZoom;
+	StringListPropertyPtr mSliceDefinitionProperty;
+	DataPtr getData(QString uid) const;
+	//SharedOpenGLContextPtr mSharedOpenGLContext;
+
 };
 
 

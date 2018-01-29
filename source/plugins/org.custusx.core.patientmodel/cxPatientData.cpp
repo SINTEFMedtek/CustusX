@@ -147,7 +147,7 @@ void PatientData::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 		Transform3D sMr = createTransformFromReferenceToExternal(externalSpace);
 		Transform3D sMd = sMr * rMd;
 
-		vtkPolyDataPtr poly = mesh->getTransformedPolyData(sMd);
+		vtkPolyDataPtr poly = mesh->getTransformedPolyDataCopy(sMd);
 		// create a copy with the SAME UID as the original. Do not load this one into the datamanager!
 		mesh = mDataManager->getDataFactory()->createSpecific<Mesh>(mesh->getUid(), mesh->getName());
 		mesh->setVtkPolyData(poly);

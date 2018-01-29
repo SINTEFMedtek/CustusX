@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxImage.h"
 #include "cxForwardDeclarations.h"
 #include "cxActiveImageProxy.h"
-#include "cxLegacySingletons.h"
 class QRect;
 
 namespace cx

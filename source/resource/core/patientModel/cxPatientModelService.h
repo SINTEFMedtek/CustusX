@@ -118,6 +118,7 @@ public:
 	// core Data interface
 	virtual void insertData(DataPtr data) = 0;
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter = HideUnavailable) const = 0;
+	virtual std::map<QString, DataPtr> getChildren(QString parent_uid, QString of_type="") const = 0;
 	/** Create Data object of given type.
 	 *
 	 *  uid must be unique, or contain the string %1 that will be replaced with a running
@@ -156,6 +157,7 @@ public:
 	virtual void setLandmarkName(QString uid, QString name) = 0;
 	virtual void setLandmarkActive(QString uid, bool active) = 0;
 	virtual QString addLandmark() = 0;
+	virtual void deleteLandmarks() = 0;
 	// utility
 	virtual void updateRegistration_rMpr(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 

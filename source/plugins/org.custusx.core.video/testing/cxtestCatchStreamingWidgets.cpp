@@ -68,7 +68,7 @@ TEST_CASE("VideoConnectionWidget can stream", "[gui][not_win32][widget][streamin
 	REQUIRE((services->tracking()->getState()>=cx::Tool::tsTRACKING));
 	waitForQueuedSignal(services->tracking().get(), SIGNAL(stateChanged()));
 
-	QString filename = cx::DataLocations::getTestDataPath() + "/testing/TubeSegmentationFramework/Default.mhd";
+	QString filename = cx::DataLocations::getTestDataPath() + "/testing/default_volume/Default.mhd";
 	REQUIRE(QFile::exists(filename));
 
 	TestVideoConnectionWidget* widget = new TestVideoConnectionWidget(services);

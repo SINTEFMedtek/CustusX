@@ -33,6 +33,8 @@ Sample at least one landmark in the data set (Either add a new or resample an ex
 
 The landmark(s) are used for the translation part of the registration.
 
+\ref org_custusx_registration_method_landmark_import_point_metrics
+
 
 \addindex org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks_widget
 Patient Landmark(s) {#org_custusx_registration_method_fast_landmark_image_to_patient_patient_landmarks}

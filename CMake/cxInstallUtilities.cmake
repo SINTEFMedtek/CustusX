@@ -437,6 +437,8 @@ endfunction()
 function(cx_install_windows_runtime_libs DESTINATION_FOLDER)
 	if(CX_WINDOWS)
 		set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+        #OpenMP is required by FAST
+        set(CMAKE_INSTALL_OPENMP_LIBRARIES TRUE)
 		include (InstallRequiredSystemLibraries)
 		if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 				install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
@@ -489,6 +491,41 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	if(CX_LINUX)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
 		SET(INSTALL_QTCONF_DIR "${INSTALL_BINARY_DIR}")
+
+    # Install .so and versioned .so.x.y
+    file(GLOB INSTALL_FILE_LIST
+      LIST_DIRECTORIES false
+      "${QT_LIBS_DIR}/*xcb*"
+      "${QT_LIBS_DIR}/libfontconfig.*"
+      "${QT_LIBS_DIR}/libfreetype.*"
+      "${QT_LIBS_DIR}/libX11.*"
+      "${QT_LIBS_DIR}/libXext.*"
+      "${QT_LIBS_DIR}/libXfixes.*"
+      "${QT_LIBS_DIR}/libXi.*"
+      "${QT_LIBS_DIR}/libXrender.*"
+      "${QT_LIBS_DIR}/libSM.*"
+      "${QT_LIBS_DIR}/libICE.*"
+      "${QT_LIBS_DIR}/libQt*"
+      "${QT_LIBS_DIR}/libicui18n.*"
+      "${QT_LIBS_DIR}/libicuuc.*"
+      "${QT_LIBS_DIR}/libicudata.*"
+      "${QT_LIBS_DIR}/libOpenCL.*"
+      "${QT_LIBS_DIR}/*-qt5*"
+      "${QT_LIBS_DIR}/libpcre16.*"
+      "${QT_LIBS_DIR}/libstdc++.*"
+    )
+
+    file(GLOB REMOVE_FILE_LIST
+      LIST_DIRECTORIES false
+     "${QT_LIBS_DIR}/*.a"
+      )
+
+    list(REMOVE_ITEM INSTALL_FILE_LIST ${REMOVE_FILE_LIST} )
+
+    install(FILES
+      ${INSTALL_FILE_LIST}
+      DESTINATION ${INSTALL_BINARY_DIR}/)
+
 	endif()
 	if(CX_WINDOWS)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
@@ -514,6 +551,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	)
 
 	message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
+	message(STATUS "QT_LIBS_DIR: " ${QT_LIBS_DIR})
 
 	# install runtime plugins
         set(CX_PLUGIN_DIR "/plugins")

@@ -97,12 +97,11 @@ class cxResourceVisualization_EXPORT Texture3DSlicerRep: public RepImpl
 {
 Q_OBJECT
 public:
-	static Texture3DSlicerRepPtr New(const QString& uid="");
+	static Texture3DSlicerRepPtr New(SharedOpenGLContextPtr context, const QString& uid="");
+
 	virtual ~Texture3DSlicerRep();
-	virtual QString getType() const
-	{
-		return "Texture3DSlicerRep";
-	}
+
+	virtual QString getType() const;
 	void setShaderPath(QString path);
 	virtual void printSelf(std::ostream & os, Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
@@ -111,14 +110,16 @@ public:
 	void setSliceProxy(SliceProxyPtr slicer);
 	void setTargetSpaceToR();
 	static bool isSupported(vtkRenderWindowPtr window);
+	void setRenderWindow(vtkRenderWindowPtr window);
 
 protected:
-	Texture3DSlicerRep();
+	Texture3DSlicerRep(SharedOpenGLContextPtr context);
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
 private slots:
 	void viewChanged();
+
 private:
 	Texture3DSlicerProxyPtr mProxy;
 };

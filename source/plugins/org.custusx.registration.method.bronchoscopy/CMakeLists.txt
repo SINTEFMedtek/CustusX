@@ -7,6 +7,7 @@ set(PLUGIN_SRCS
   cxRegistrationMethodBronchoscopyService.h
   cxRegistrationMethodBronchoscopyService.cpp
   cxBronchoscopyRegistrationWidget.cpp
+  cxBronchoscopyImage2ImageRegistrationWidget.cpp
   cxBronchoscopyRegistration.h
   cxBronchoscopyRegistration.cpp
   cxBranch.h
@@ -19,6 +20,7 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxRegistrationMethodBronchoscopyPluginActivator.h
   cxBronchoscopyRegistrationWidget.h
+  cxBronchoscopyImage2ImageRegistrationWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -67,4 +69,6 @@ target_include_directories(org_custusx_registration_method_bronchoscopy
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/org_custusx_registration_method_bronchoscopy.md")
 cx_add_non_source_file("doc/org_custusx_registration_method_bronchoscopy.h")
+cx_add_non_source_file("doc/org_custusx_registration_method_bronchoscopy_image2image.md")
 
+add_subdirectory(testing)

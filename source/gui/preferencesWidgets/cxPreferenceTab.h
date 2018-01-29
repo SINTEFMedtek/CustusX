@@ -46,6 +46,7 @@ class QVBoxLayout;
 
 namespace cx
 {
+typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 
 class cxGui_EXPORT PreferenceTab : public QWidget
 {
@@ -89,6 +90,7 @@ protected:
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mGPU2DRenderCheckBox;
+	QCheckBox* mLinearInterpolationIn2DCheckBox;
   QCheckBox* mOptimizedViewsCheckBox;
   QCheckBox* mGPU3DDepthPeelingCheckBox;
   QCheckBox* mShadingCheckBox;

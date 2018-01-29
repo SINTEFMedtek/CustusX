@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxBranch.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
-#include <vtkPolyData.h>
 #include "org_custusx_registration_method_bronchoscopy_Export.h"
 
 
@@ -60,9 +59,9 @@ public:
 	void calculateOrientations();
 	void smoothOrientations();
 	void interpolateBranchPositions(int interpolationFactor);
-	void smoothBranchPositions();
+    void smoothBranchPositions(int controlPointDistance);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
-
+	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 };
 
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed);

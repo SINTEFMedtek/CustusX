@@ -23,6 +23,7 @@ Parameters affecting the performance of the application.
 - Smart Render: Render only once per second if there is no changes in the scene.
 - 2D Overlay: Enable multiple volumes in 2D (GPU based multi slicer, can only handle up to 4 images).
 - Optimized views: Speedup by merging all 2D views into a single vtkRenderWindow
+- Depth peeling: Used to show transparent meshes correctly. See also \ref mesh_property_transparent.
 - Still Update Rate: Property in vtkRenderWindow. Increasing this value may improve rendering speed at the cost of quality.
 - 3D Renderer: Select method for rendering images in 3D
 

@@ -170,7 +170,7 @@ CyclicActionLoggerPtr ViewServiceProxy::getRenderTimer()
 	return mViewService->getRenderTimer();
 }
 
-NavigationPtr ViewServiceProxy::getNavigation()
+NavigationPtr ViewServiceProxy::getNavigation(int group)
 {
 	return mViewService->getNavigation();
 }
@@ -198,6 +198,11 @@ void ViewServiceProxy::centerToImageCenterInActiveViewGroup()
 void ViewServiceProxy::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
 {
 	mViewService->setCameraStyle(style, groupIdx);
+}
+
+void ViewServiceProxy::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
+{
+	mViewService->zoomCamera3D(viewGroup3DNumber, zoomFactor);
 }
 
 void ViewServiceProxy::addDefaultLayout(LayoutData layoutData)

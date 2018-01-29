@@ -45,6 +45,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMessageListener.h"
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
+#include "cxMetricManager.h"
+
 
 namespace cxtest {
 
@@ -123,7 +125,6 @@ public:
 	PlaneMetricWithInput getPlaneMetricWithInput(cx::Vector3D point, cx::Vector3D normal, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance, cx::DataMetricPtr p0, cx::DataMetricPtr p1);
 	DistanceMetricWithInput getDistanceMetricWithInput(double distance);
-	QStringList getSingleLineDataList(cx::DataMetricPtr metric);
 
 	bool inputEqualsMetric(FrameMetricWithInput data);
 	bool inputEqualsMetric(DistanceMetricWithInput data);
@@ -136,10 +137,7 @@ public:
 	{
 		boost::shared_ptr<METRIC_TYPE> retval;
 		retval = mServices->patient()->createSpecificData<METRIC_TYPE>(uid);
-//		mServices->mPatientModelService->insertData(retval);
 		return retval;
-
-		//return METRIC_TYPE::create(uid, "", this->getDataManager(), this->getSpaceProvider());
 	}
 
     template<class DATA>
@@ -158,12 +156,11 @@ public:
 
     QDomNode createDummyXmlNode();
     void setPatientRegistration();
-	void insertData(cx::DataPtr data)
-	{
-		mServices->patient()->insertData(data);
-	}
-
+	void insertData(cx::DataPtr data);
 	bool verifySingleLineHeader(QStringList list, cx::DataMetricPtr metric);
+	void testExportAndImportMetrics();
+	std::vector<cx::DataMetricPtr> createMetricsForExport();
+	void checkImportedMetricsEqualToExported(std::vector<cx::DataMetricPtr>& origMetrics, cx::MetricManager& manager) const;
 
 private:
 	TestVisServicesPtr mServices;

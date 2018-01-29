@@ -23,6 +23,7 @@ set(CX_PLUGINS
   org.custusx.registration.method.landmark:ON
   org.custusx.registration.method.pointcloud:ON
   org.custusx.registration.method.bronchoscopy:ON
+  org.custusx.registration.method.centerline:ON
   org.custusx.filter.routetotarget:ON
   org.custusx.registration.method.vessel:ON
   org.custusx.registration.method.commandline:ON
@@ -33,6 +34,7 @@ set(CX_PLUGINS
   org.custusx.help:ON
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
+  org.custusx.virtualbronchoscopy:ON
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.
@@ -60,5 +62,5 @@ if(NOT QT_QMAKE_EXECUTABLE)
 endif(NOT QT_QMAKE_EXECUTABLE)
 
 ctkMacroSetupPlugins(
-    ${CX_PLUGINS} 
-	BUILD_OPTION_PREFIX ${CX_PLUGIN_BUILD_OPTION_PREFIX})
+    ${CX_PLUGINS}
+    BUILD_OPTION_PREFIX ${CX_PLUGIN_BUILD_OPTION_PREFIX})

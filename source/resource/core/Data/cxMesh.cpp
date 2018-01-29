@@ -112,6 +112,7 @@ bool Mesh::load(QString path)
 void Mesh::setVtkPolyData(const vtkPolyDataPtr& polyData)
 {
 	mVtkPolyData = polyData;
+	mVtkPolyDataOriginal = mVtkPolyData;
 	mOrientationArrayList.clear();
 	mColorArrayList.clear();
 
@@ -209,6 +210,16 @@ void Mesh::setColor(const QColor& color)
 QColor Mesh::getColor()
 {
 	return mProperties.mColor->getValue();
+}
+
+void Mesh::setUseColorFromPolydataScalars(bool on)
+{
+	mProperties.mUseColorFromPolydataScalars->setValue(on);
+}
+
+bool Mesh::getUseColorFromPolydataScalars() const
+{
+	return mProperties.mUseColorFromPolydataScalars->getValue();
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
@@ -319,10 +330,11 @@ bool Mesh::hasTexture() const
 
 void Mesh::updateVtkPolyDataWithTexture()
 {
-	QString textureShape = this->getTextureShape();
 	if (!this->hasTexture())
 	{
-		mVtkTexture = vtkTexturePtr::New();
+		mVtkTexture = NULL;
+		if(mVtkPolyDataOriginal)
+		  mVtkPolyData = mVtkPolyDataOriginal;
 		return;
 	}
 
@@ -418,13 +430,16 @@ DoubleBoundingBox3D Mesh::boundingBox() const
 	return bounds;
 }
 
-vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
+vtkPolyDataPtr Mesh::getTransformedPolyDataCopy(Transform3D transform)
 {
 	// if transform elements exists, create a copy with entire position inside the polydata:
-	if (similar(transform, Transform3D::Identity()))
-		return getVtkPolyData();
+    if (similar(transform, Transform3D::Identity()))
+    {
+        vtkPolyDataPtr poly = vtkPolyDataPtr::New();
+        poly->DeepCopy(getVtkPolyData());
+        return poly;
+    }
 
-	//	getVtkPolyData()->Update();
 	vtkPolyDataPtr poly = vtkPolyDataPtr::New();
 	poly->DeepCopy(getVtkPolyData());
 	vtkPointsPtr points = poly->GetPoints();
@@ -440,7 +455,6 @@ vtkPolyDataPtr Mesh::getTransformedPolyData(Transform3D transform)
 	}
 	poly->SetPoints(floatPoints.GetPointer());
 	poly->Modified();
-	//	poly->Update();
 
 	return poly;
 }

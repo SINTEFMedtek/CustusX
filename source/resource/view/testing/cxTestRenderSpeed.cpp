@@ -43,9 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
+#include "cxRenderWindowFactory.h"
+#include "cxtestViewServiceMockWithRenderWindowFactory.h"
 
 namespace cxtest
 {
+
+///--------------------------------------------------------
 
 RenderSpeedCounter::RenderSpeedCounter() :
 	mNumViews(0),
@@ -109,10 +113,15 @@ int RenderSpeedCounter::getRenderFPS()
 
 TestRenderSpeed::TestRenderSpeed()
 {
+	ViewServiceMocWithRenderWindowFactoryPtr viewService = ViewServiceMocWithRenderWindowFactoryPtr(new ViewServiceMockWithRenderWindowFactory());
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
-	mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout().data());
-//	mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout().data());
+
+	bool optimizedViews = cx::settings()->value("optimizedViews").toBool();
+	if (optimizedViews)
+		mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory()).data());
+	else
+		mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(viewService->getRenderWindowFactory()).data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()

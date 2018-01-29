@@ -64,6 +64,7 @@ public:
 	virtual DataPtr createData(QString type, QString uid, QString name);
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
 	virtual DataPtr getData(const QString& uid) const;
+	virtual std::map<QString, DataPtr> getChildren(QString parent_uid, QString of_type="") const;
 
 	virtual LandmarksPtr getPatientLandmarks() const;
 	virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
@@ -78,7 +79,6 @@ public:
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);
 
-	virtual void loadData(DataPtr data);//Not used?
 	virtual std::map<QString, VideoSourcePtr> getStreams() const;
 
 	virtual QString getActivePatientFolder() const;
@@ -94,6 +94,7 @@ public:
     OperatingTable getOperatingTable() const;
 
 	virtual QString addLandmark();
+	virtual void deleteLandmarks();
 
 	virtual void autoSave();
 	virtual bool isNull();

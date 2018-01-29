@@ -74,7 +74,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxToolMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
-#include "cxTexture3DSlicerRep.h"
 #include "cxEnumConverter.h"
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
@@ -115,8 +114,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace cx
 {
-
-
 
 ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr services):
 	ViewWrapper(services)
@@ -236,7 +233,7 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 		mAnnotationMarker->setMarkerFilename(DataLocations::findConfigFilePath(annotationFile, "/models"));
 		mAnnotationMarker->setSize(settings()->value("View3D/annotationModelSize").toDouble());
 	}
-	if (key == "showManualTool")
+	if (key == "View3D/showManualTool")
 	{
 		this->toolsAvailableSlot();
 	}
@@ -325,9 +322,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 	showAxesAction->setChecked(mShowAxes);
 	connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
 
-	QAction* showManualTool = new QAction("Show Manual Tool", &contextMenu);
+	QAction* showManualTool = new QAction("Show Manual Tool 3D", &contextMenu);
 	showManualTool->setCheckable(true);
-	showManualTool->setChecked(settings()->value("showManualTool").toBool());
+	showManualTool->setChecked(settings()->value("View3D/showManualTool").toBool());
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
 	QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
@@ -440,14 +437,14 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
 	ToolRep3DPtr activeRep3D = RepContainer(mView->getReps()).findFirst<ToolRep3D>(tool);
 	if (activeRep3D)
 	{
-		if (activeRep3D->getTracer()->isRunning())
+		if(checked)
+		{
+			activeRep3D->getTracer()->start();
+		}
+		else if(!checked)
 		{
 			activeRep3D->getTracer()->stop();
 			activeRep3D->getTracer()->clear();
-		}
-		else
-		{
-			activeRep3D->getTracer()->start();
 		}
 	}
 
@@ -525,7 +522,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
-	settings()->setValue("showManualTool", visible);
+	settings()->setValue("View3D/showManualTool", visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
@@ -746,6 +743,14 @@ void ViewWrapper3D::updateView()
 	this->updateMetricNamesRep();
 
 	mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
+
+	ToolRep3DPtr manualToolRep = RepContainer(mView->getReps()).findManualToolRep<ToolRep3D>();
+	if (manualToolRep)
+	{
+		manualToolRep->setTooltipPointColor(settings()->value("View/toolTipPointColor").value<QColor>());
+		manualToolRep->setToolOffsetPointColor(settings()->value("View/toolOffsetPointColor").value<QColor>());
+		manualToolRep->setToolOffsetLineColor(settings()->value("View/toolOffsetLineColor").value<QColor>());
+	}
 }
 
 void ViewWrapper3D::activeImageChangedSlot(QString uid)
@@ -842,13 +847,12 @@ void ViewWrapper3D::toolsAvailableSlot()
 		if (oldRep!=reps.end())
 			reps.erase(oldRep);
 
-		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("showManualTool").toBool())
+		if (tool->hasType(Tool::TOOL_MANUAL) && !settings()->value("View3D/showManualTool").toBool())
 		{
 			if (toolRep)
 				mView->removeRep(toolRep);
 			continue;
 		}
-		//    mManualTool->setVisible(settings()->value("showManualTool").toBool());
 
 		if (!toolRep)
 		{
@@ -941,34 +945,32 @@ void ViewWrapper3D::setStereoEyeAngle(double angle)
 
 void ViewWrapper3D::setTranslucentRenderingToDepthPeeling(bool setDepthPeeling)
 {
-	bool success = true;
 	if(setDepthPeeling)
 	{
+		bool isDPSupported = true;
 
 		//IsDepthPeelingSupported function don't seem to work on OSX (error messages or seg. fault)
 #ifndef __APPLE__
 		if (!IsDepthPeelingSupported(mView->getRenderWindow(), mView->getRenderer(), true))
 		{
 			reportWarning("GPU do not support depth peeling. Rendering of translucent surfaces is not supported");
-			success = false;
+			isDPSupported = false;
 		}
 #endif
-		if (success && !SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
-		{
-			reportWarning("Error setting depth peeling");
-			success = false;
-		}
-		else
+
+		if (isDPSupported && SetupEnvironmentForDepthPeeling(mView->getRenderWindow(), mView->getRenderer(), 100, 0.1))
 		{
 			report("Set GPU depth peeling");
 		}
-		if(!success)
-		  settings()->setValue("View3D/depthPeeling", false);
-	} else
+		else
+		{
+			reportWarning("Error setting depth peeling. The GPU or operating system might not support it.");
+			settings()->setValue("View3D/depthPeeling", false);
+		}
+	}
+	else
 	{
 		TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer());
-//		if (TurnOffDepthPeeling(mView->getRenderWindow(), mView->getRenderer()))
-//			report("Depth peeling turned off");
 	}
 }
 

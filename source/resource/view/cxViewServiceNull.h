@@ -61,12 +61,13 @@ public:
 	virtual ClippersPtr getClippers();
 	virtual InteractiveCropperPtr getCropper();
 	virtual CyclicActionLoggerPtr getRenderTimer();
-	virtual NavigationPtr getNavigation();
+	virtual NavigationPtr getNavigation(int group = 0);
 	virtual LayoutRepositoryPtr getLayoutRepository();
 	virtual CameraControlPtr getCameraControl();
 	virtual QActionGroup* getInteractorStyleActionGroup();
 	virtual void centerToImageCenterInActiveViewGroup();
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
+	virtual void zoomCamera3D(int viewGroup3DNumber, int zoomFactor);
 	virtual void addDefaultLayout(LayoutData layoutData);
 	virtual void enableContextMenuForViews(bool enable=true);
 

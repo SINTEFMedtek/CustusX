@@ -45,9 +45,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxSettings.h"
 #include "cxtestJenkinsMeasurement.h"
 #include "cxtestRenderTester.h"
-#include "cxLegacySingletons.h"
 #include "cxMessageListener.h"
 #include "cxViewService.h"
+#include "cxTestRenderSpeed.h"
 
 namespace cxtest
 {
@@ -62,7 +62,7 @@ void initTest()
 
 void requireVolumeIn3DScene()
 {
-	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::viewService()->get3DView()->getRenderWindow());
+	RenderTesterPtr renderTester = cxtest::RenderTester::create(cx::logicManager()->getViewService()->get3DView()->getRenderWindow());
 	vtkImageDataPtr output = renderTester->renderToImage();
 	double fractionNonZeroPixels = Utilities::getFractionOfVoxelsAboveThreshold(output, 0);
 
@@ -110,17 +110,33 @@ TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integ
  * This test has BIG problems when run on a test box, with screen saver on etc etc. Removed from Linux because of this
  */
 //TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration][not_win32][not_win64]")
-TEST_CASE("Speed: vtkVolumeTextureMapper3D render", "[speed][gui][integration]")
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews on", "[speed][gui][integration]")
 {
 	initTest();
 
 	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	cx::settings()->setValue("optimizedViews", true);
 
 	int fps = calculateFPS(false);
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
 
-	// TODO: enter this value into config file
+	double minimumFPS = 5;
+	REQUIRE(fps > minimumFPS);
+}
+
+TEST_CASE("Speed: vtkVolumeTextureMapper3D render, optimizedViews off", "[speed][gui][integration]")
+{
+	initTest();
+
+	cx::settings()->setValue("View3D/ImageRender3DVisualizer", "vtkVolumeTextureMapper3D");
+	cx::settings()->setValue("optimizedViews", false);
+	cx::settings()->setValue("View3D/showManualTool", false); //We set this to false to make the test pass on Linux in Fraxinus. See JIRA FX-8 for more details.
+
+	int fps = calculateFPS(false);
+	JenkinsMeasurement jenkins;
+	jenkins.printMeasurementWithCxReporter("FPS_vtkVolumeTextureMapper3D", QString::number(fps));
+
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -139,7 +155,6 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper render", "[speed][gui][integration]"
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkGPUVolumeRayCastMapper", QString::number(fps));
 
-	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -158,7 +173,6 @@ TEST_CASE("Speed: vtkGPUVolumeRayCastMapper with slicing", "[speed][gui][integra
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkGPUVolumeRayCastMapper_Slicing", QString::number(fps));
 
-	// TODO: enter this value into config file
 	double minimumFPS = 5;
 	REQUIRE(fps > minimumFPS);
 }
@@ -173,7 +187,6 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper renderer", "[speed][gui][
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper", QString::number(fps));
 
-	// TODO: enter this value into config file
 //	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
@@ -191,11 +204,47 @@ TEST_CASE("Speed: vtkOpenGLGPUMultiVolumeRayCastMapper with slicing", "[speed][g
 	JenkinsMeasurement jenkins;
 	jenkins.printMeasurementWithCxReporter("FPS_vtkOpenGLGPUMultiVolumeRayCastMapper_Slicing", QString::number(fps));
 
-	// TODO: enter this value into config file
 //	double minimumFPS = 5;
 //	REQUIRE(fps > minimumFPS);
 	REQUIRE(true);
 }
 #endif
+
+
+TEST_CASE("Speed: Render time of vtkRenderWindow", "[speed]")
+{
+	initTest();
+	cx::settings()->setValue("optimizedViews", false);
+	TestRenderSpeed helper;
+
+	QTime clock;
+
+	int numRenders = 10;
+	int numViews = 1;
+
+//	helper.testSingleView();
+	helper.createViews(numViews);
+	helper.showViews();
+	clock.start();
+	helper.renderNumTimes(numRenders);
+	int timeMs = clock.elapsed();
+	std::cout << "render "<< numViews << " views " << numRenders << " times: " << timeMs << " ms" << std::endl;
+	std::cout << timeMs/double(numRenders*numViews) << " ms per render" << std::endl;
+
+
+	TestRenderSpeed helper2;
+	numViews = 100;
+
+//	helper.testSeveralViews();
+	helper2.createViews(numViews);
+	helper2.showViews();
+	clock.start();
+	helper2.renderNumTimes(numRenders);
+	timeMs = clock.elapsed();
+	std::cout << "render "<< numViews << " views " << numRenders << " times: " << timeMs << " ms" << std::endl;
+	std::cout << timeMs/double(numRenders*numViews) << " ms per render" << std::endl;
+
+	CHECK(true);
+}
 
 }//namespace cx

@@ -177,9 +177,7 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 	  for (int j = 0; j < 4; j++)
 	  {
 		  tar_M_src(i,j) = temp->GetElement(i,j);
-          //std::cout << tar_M_src(i,j) << " ";
 	  }
-	  //std::cout << std::endl;
   }
 
 	if ( boost::math::isnan(tar_M_src.sum()) )
@@ -218,10 +216,10 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
                 P(j) = sqrt( p0*p0 + p1*p1 + p2*p2 );
                 O(j) = sqrt( o0*o0 + o1*o1 + o2*o2 );
 
-								if (boost::math::isnan( O(j) ))
+                if (boost::math::isnan( O(j) ))
                     O(j) = 4;
 
-								if ( (o0>2) || (o1>2) || (o2>2) )
+                if ( (o0>2) || (o1>2) || (o2>2) )
                     std::cout << "Warning in bronchoscopyRegistration.cpp: Error on oriantation calculation in dsearch2n. Orientation > 2." << std::endl;
 
                 R(j) = P(j) / O(j);
@@ -233,7 +231,6 @@ Eigen::Matrix4d performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr ta
 
             D = P + alpha * O;
             D.minCoeff(&index);
-            //std::cout << "index: " << index << std::endl;
             indexVector.push_back(index);
         }
         return indexVector;
@@ -302,9 +299,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	CTPositions = branchVector[0]->getPositions();
 	CTOrientations = branchVector[0]->getOrientations();
 
-	std::cout << "Positions in centerline:" << CTPositions.cols() << std::endl;
-	std::cout << "Positions in tracking data:" << trackingPositions.cols() << std::endl;
-
 	if (trackingPositions.cols() < 10)
 	{
 		std::cout << "Warning: Too few positions in tracking data to perform registration." << std::endl;
@@ -347,13 +341,9 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	//Adjusting points for centeroids
     Eigen::MatrixXd::Index maxIndex;
     trackingPositions.row(2).maxCoeff( &maxIndex );
-    //std::cout << "maxIndex: " << maxIndex << std::endl;
     //Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
-    //std::cout << "CTPositions.col(0): " << CTPositions.col(0) << std::endl;
     Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
-    //Eigen::Matrix3d rotation;
     //trackingPositions = trackingPositions.colwise() + translation;
-    //std::cout << "trackingPositions.col(maxIndex): " << trackingPositions.col(maxIndex) << std::endl;
 
 
     registrationMatrix << 1, 0, 0, translation(0),
@@ -365,8 +355,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
     {
         Tnavigation[i] = registrationMatrix * Tnavigation[i];
     }
-    //std::cout << "Tracking data 1 after initial translation: " << Tnavigation[0] << std::endl;
-    //std::cout << "Tracking data maxIndex after initial translation: " << Tnavigation[maxIndex] << std::endl;
 
     int iterationNumber = 0;
     int maxIterations = 50;
@@ -410,8 +398,6 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
         translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
 
         std::cout << "Iteration nr " << iterationNumber << " translation: " << translation.array().abs().sum() << std::endl;
-        //for (int i = 0; i < 4; i++)
-        //    std::cout << tempMatrix.row(i) << std::endl;
 	}
 
     if (translation.array().abs().sum() > 1)
@@ -420,53 +406,133 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 	return registrationMatrix;
 }
 
+Eigen::Matrix4d registrationAlgorithmImage2Image(BranchListPtr branchesFixed, BranchListPtr branchesMoving)
+{
+    Eigen::Matrix4d registrationMatrix;
+    Eigen::MatrixXd CTPositionsFixed;
+    Eigen::MatrixXd CTOrientationsFixed;
+    Eigen::MatrixXd CTPositionsMoving;
+    Eigen::MatrixXd CTOrientationsMoving;
+
+    std::vector<BranchPtr> branchVectorFixed = branchesFixed->getBranches();
+    CTPositionsFixed = branchVectorFixed[0]->getPositions();
+    CTOrientationsFixed = branchVectorFixed[0]->getOrientations();
+
+    std::vector<BranchPtr> branchVectorMoving = branchesMoving->getBranches();
+    CTPositionsMoving = branchVectorMoving[0]->getPositions();
+    CTOrientationsMoving = branchVectorMoving[0]->getOrientations();
+
+    for (int i = 1; i < branchVectorFixed.size(); i++)
+    {
+        Eigen::MatrixXd CTPositionsFixedNew(CTPositionsFixed.rows() , CTPositionsFixed.cols() + branchVectorFixed[i]->getPositions().cols());
+        Eigen::MatrixXd CTOrientationsFixedNew(CTOrientationsFixed.rows() , CTOrientationsFixed.cols() + branchVectorFixed[i]->getOrientations().cols());
+        CTPositionsFixedNew.leftCols(CTPositionsFixed.cols()) = CTPositionsFixed;
+        CTPositionsFixedNew.rightCols(branchVectorFixed[i]->getPositions().cols()) = branchVectorFixed[i]->getPositions();
+        CTOrientationsFixedNew.leftCols(CTOrientationsFixed.cols()) = CTOrientationsFixed;
+        CTOrientationsFixedNew.rightCols(branchVectorFixed[i]->getOrientations().cols()) = branchVectorFixed[i]->getOrientations();
+        CTPositionsFixed.swap(CTPositionsFixedNew);
+        CTOrientationsFixed.swap(CTOrientationsFixedNew);
+    }
+
+    for (int i = 1; i < branchVectorMoving.size(); i++)
+    {
+        Eigen::MatrixXd CTPositionsMovingNew(CTPositionsMoving.rows() , CTPositionsMoving.cols() + branchVectorMoving[i]->getPositions().cols());
+        Eigen::MatrixXd CTOrientationsMovingNew(CTOrientationsMoving.rows() , CTOrientationsMoving.cols() + branchVectorMoving[i]->getOrientations().cols());
+        CTPositionsMovingNew.leftCols(CTPositionsMoving.cols()) = CTPositionsMoving;
+        CTPositionsMovingNew.rightCols(branchVectorMoving[i]->getPositions().cols()) = branchVectorMoving[i]->getPositions();
+        CTOrientationsMovingNew.leftCols(CTOrientationsMoving.cols()) = CTOrientationsMoving;
+        CTOrientationsMovingNew.rightCols(branchVectorMoving[i]->getOrientations().cols()) = branchVectorMoving[i]->getOrientations();
+        CTPositionsMoving.swap(CTPositionsMovingNew);
+        CTOrientationsMoving.swap(CTOrientationsMovingNew);
+    }
+
+    if (CTPositionsFixed.cols() < 10 || CTPositionsMoving.cols() < 10)
+    {
+        CX_LOG_WARNING() << "Too few positions in centerline to perform registration.";
+        return Eigen::Matrix4d::Identity();
+    }
+
+    std::pair<Eigen::MatrixXd , Eigen::MatrixXd> qualityCheckedDataFixed = RemoveInvalidData(CTPositionsFixed, CTOrientationsFixed);
+    CTPositionsFixed = qualityCheckedDataFixed.first;
+    CTOrientationsFixed = qualityCheckedDataFixed.second;
+
+    std::pair<Eigen::MatrixXd , Eigen::MatrixXd> qualityCheckedDataMoving = RemoveInvalidData(CTPositionsMoving, CTOrientationsMoving);
+    CTPositionsMoving = qualityCheckedDataMoving.first;
+    CTOrientationsMoving = qualityCheckedDataMoving.second;
+
+    //Adjusting points for centeroids
+    Eigen::Vector3d translation = findMedian(CTPositionsFixed) - findMedian(CTPositionsMoving);
+
+    registrationMatrix << 1, 0, 0, translation(0),
+                          0, 1, 0, translation(1),
+                          0, 0, 1, translation(2),
+                          0, 0, 0, 1;
+
+    for (int i = 0; i < CTPositionsMoving.cols(); i++)
+    {
+        CTPositionsMoving.col(i) = CTPositionsMoving.col(i) + translation;
+    }
+
+    int iterationNumber = 0;
+    int maxIterations = 200;
+    while ( translation.array().abs().sum() > 0.5 && iterationNumber < maxIterations)
+    {
+
+        iterationNumber++;
+        std::vector<Eigen::MatrixXd::Index> indexVector = dsearch2n( CTPositionsMoving, CTPositionsFixed, CTOrientationsMoving, CTOrientationsFixed );
+        Eigen::MatrixXd nearestCTPositions(3,indexVector.size());
+        Eigen::MatrixXd nearestCTOrientations(3,indexVector.size());
+        Eigen::VectorXd DAngle(indexVector.size());
+        for (int i = 0; i < indexVector.size(); i++)
+        {
+            nearestCTPositions.col(i) = CTPositionsFixed.col(indexVector[i]);
+            nearestCTOrientations.col(i) = CTOrientationsFixed.col(indexVector[i]);
+            float o0 = fmod( CTOrientationsMoving(0,i) - nearestCTOrientations(0,i) , 2 );
+            float o1 = fmod( CTOrientationsMoving(1,i) - nearestCTOrientations(1,i) , 2 );
+            float o2 = fmod( CTOrientationsMoving(2,i) - nearestCTOrientations(2,i) , 2 );
+            DAngle(i) = sqrt(o0*o0+o1*o1+o2*o2);
+        }
+
+        std::pair<Eigen::MatrixXd , Eigen::MatrixXd> result = findPositionsWithSmallesAngleDifference(70 , DAngle , CTPositionsMoving , nearestCTPositions);
+        vtkPointsPtr CTPositionsMoving_vtk = convertTovtkPoints(result.first);
+        vtkPointsPtr CTPositionsFixed_vtk = convertTovtkPoints(result.second);
+
+        Eigen::Matrix4d tempMatrix = performLandmarkRegistration(CTPositionsMoving_vtk, CTPositionsFixed_vtk);
+
+        registrationMatrix = tempMatrix * registrationMatrix;
+
+        for (int i = 0; i < CTPositionsMoving.cols(); i++)
+        {
+            CTPositionsMoving.col(i) = tempMatrix.topLeftCorner(3,3) * CTPositionsMoving.col(i) + tempMatrix.topRightCorner(3,1);
+        }
+
+        translation << tempMatrix(0,3), tempMatrix(1,3), tempMatrix(2,3);
+
+    }
+
+    if (translation.array().abs().sum() > 1)
+        CX_LOG_WARNING() << "Registration did not converge within " << maxIterations <<" iterations, which is max number of iterations.";
+
+    return registrationMatrix;
+}
+
 vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-	int N = centerline->GetNumberOfPoints();
-	Eigen::MatrixXd CLpoints(3,N);
-	for(vtkIdType i = 0; i < N; i++)
-		{
-		double p[3];
-		centerline->GetPoint(i,p);
-		Eigen::Vector3d position;
-		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
-		}
+	Eigen::MatrixXd CLpoints = makeTransformedMatrix(centerline, rMd);
 	mBranchListPtr->findBranchesInCenterline(CLpoints);
 	if (numberOfGenerations != 0)
 	{
 		mBranchListPtr->selectGenerations(numberOfGenerations);
 	}
 
-	mBranchListPtr->smoothBranchPositions();
+    mBranchListPtr->smoothBranchPositions(10);
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
-	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
-	vtkPointsPtr points = vtkPointsPtr::New();
-	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
-
-	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
-	int positionCounter = 0;
-	for (int i = 0; i < branches.size(); i++)
-	{
-		Eigen::MatrixXd positions = branches[i]->getPositions();
-		for (int j = 0; j < positions.cols(); j++)
-		{
-			positionCounter ++;
-			points->InsertNextPoint(positions(0,j),positions(1,j),positions(2,j));
-			if (j	 < positions.cols()-1)
-			{
-				vtkIdType connection[2] = {positionCounter-1, positionCounter};
-				lines->InsertNextCell(2, connection);
-			}
-		}
-	}
-	retval->SetPoints(points);
-	retval->SetLines(lines);
+	vtkPolyDataPtr retval = mBranchListPtr->createVtkPolyDataFromBranches();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 
@@ -476,6 +542,25 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 
 }
 
+BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations)
+{
+    BranchListPtr branchListPtr;
+    branchListPtr = BranchListPtr(new BranchList());
+	Eigen::MatrixXd CLpoints = makeTransformedMatrix(centerline);
+
+    branchListPtr->findBranchesInCenterline(CLpoints);
+
+    if (numberOfGenerations != 0)
+    {
+        branchListPtr->selectGenerations(numberOfGenerations);
+    }
+
+    branchListPtr->smoothBranchPositions(10);
+    branchListPtr->calculateOrientations();
+    branchListPtr->smoothOrientations();
+
+    return branchListPtr;
+}
 
 Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration)
 {
@@ -487,8 +572,6 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 	{
 		Tnavigation.push_back(iter->second.	matrix());
 	}
-
-    //vtkPointsPtr points = centerline->GetPoints();
 
 	Tnavigation = excludeClosePositions(Tnavigation);
 
@@ -528,6 +611,34 @@ Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistration(TimedTrans
 	return regMatrix;
 }
 
+Eigen::Matrix4d BronchoscopyRegistration::runBronchoscopyRegistrationImage2Image(vtkPolyDataPtr centerlineFixed, vtkPolyDataPtr centerlineMoving)
+{
+
+    int numberOfGenerations = 4;
+    Eigen::Matrix4d regMatrix;
+
+    BranchListPtr branchesFixed;
+    BranchListPtr branchesMoving;
+    branchesFixed = processCenterlineImage2Image(centerlineFixed, numberOfGenerations);
+    branchesMoving = processCenterlineImage2Image(centerlineMoving, numberOfGenerations);
+
+    regMatrix = registrationAlgorithmImage2Image(branchesFixed, branchesMoving);
+
+
+    if ( boost::math::isnan(regMatrix.sum()) )
+    {
+        CX_LOG_WARNING() << "Registration matrix contains 'nan' number, using identity matrix.";
+        return Eigen::Matrix4d::Identity();
+    }
+
+        if ( boost::math::isinf(regMatrix.sum()) )
+    {
+        CX_LOG_WARNING() << "Registration matrix contains 'inf' number, using identity matrix.";
+        return Eigen::Matrix4d::Identity();
+    }
+
+    return regMatrix;
+}
 
 bool BronchoscopyRegistration::isCenterlineProcessed()
 {
@@ -538,6 +649,38 @@ bool BronchoscopyRegistration::isCenterlineProcessed()
 BronchoscopyRegistration::~BronchoscopyRegistration()
 {
 
+}
+
+/**
+ * @brief makeTransformedMatrix
+ * This method takes an vtkpolydata as input,
+ * runs it through a transform and returns
+ * it on an eigen matrix format. Typically used on a
+ * centerline object to get it on the matrix format
+ * before using it as input to another method to
+ * find its branches.
+ * @param linesPolyData
+ * Typically a centerline object.
+ * @param rMd
+ * Transform from the centerline to r.
+ * @return
+ * The transformed centerline on eigen matrix format.
+ */
+Eigen::MatrixXd makeTransformedMatrix(vtkPolyDataPtr linesPolyData, Transform3D rMd)
+{
+	vtkIdType N = linesPolyData->GetNumberOfPoints();
+	Eigen::MatrixXd CLpoints(3,N);
+
+	for(vtkIdType i = 0; i < N; i++)
+	{
+		double p[3];
+		linesPolyData->GetPoint(i,p);
+		Eigen::Vector3d position;
+		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
+		CLpoints.block(0 , i , 3 , 1) = rMd.coord(position);
+	}
+
+	return CLpoints;
 }
 
 

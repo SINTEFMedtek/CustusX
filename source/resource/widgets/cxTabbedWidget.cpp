@@ -40,8 +40,8 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    BaseWidget(parent, objectName, windowTitle),
-    mTabWidget(new QTabWidget(this))
+	BaseWidget(parent, objectName, windowTitle),
+	mTabWidget(new QTabWidget(this))
 {
 	mTabWidget->setElideMode(Qt::ElideRight);
 //	mTabWidget->setFocusPolicy(Qt::StrongFocus);
@@ -73,6 +73,11 @@ void TabbedWidget::tabChanged(const int &index)
 	QWidget* widget = mTabWidget->widget(index);
 	if (widget)
 		widget->setFocus();
+}
+
+void TabbedWidget::setDefaultWidget(QWidget *widget)
+{
+    mTabWidget->setCurrentWidget(widget);
 }
 
 

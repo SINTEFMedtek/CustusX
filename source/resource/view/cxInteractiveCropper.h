@@ -110,8 +110,6 @@ private:
 	ActiveDataPtr mActiveData;
 };
 
-typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;
-
 /**
 * @}
 */

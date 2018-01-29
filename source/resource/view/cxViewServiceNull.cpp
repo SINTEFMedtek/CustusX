@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <QActionGroup>
 #include <QDomNode>
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -71,7 +72,7 @@ bool ViewServiceNull::isNull()
 
 void ViewServiceNull::printWarning() const
 {
-//	reportWarning("Trying to use VideoServiceNull. Is VideoService (org.custusx.core.view) disabled?");
+	CX_LOG_WARNING() <<"Trying to use VideoServiceNull. Is VideoService (org.custusx.core.view) disabled?";
 }
 
 void ViewServiceNull::autoShowData(cx::DataPtr data)
@@ -95,7 +96,7 @@ QString ViewServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
 void ViewServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
 InteractiveCropperPtr ViewServiceNull::getCropper() { return InteractiveCropperPtr(); }
 CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
-NavigationPtr ViewServiceNull::getNavigation() { return NavigationPtr(); }
+NavigationPtr ViewServiceNull::getNavigation(int group) { return NavigationPtr(); }
 LayoutRepositoryPtr ViewServiceNull::getLayoutRepository() { return LayoutRepositoryPtr(); }
 CameraControlPtr ViewServiceNull::getCameraControl() { return CameraControlPtr(); }
 QActionGroup* ViewServiceNull::getInteractorStyleActionGroup() { return mActionGroup; }
@@ -106,6 +107,11 @@ void ViewServiceNull::centerToImageCenterInActiveViewGroup()
 }
 
 void ViewServiceNull::setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx)
+{
+	printWarning();
+}
+
+void ViewServiceNull::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
 {
 	printWarning();
 }

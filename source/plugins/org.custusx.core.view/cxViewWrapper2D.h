@@ -87,7 +87,6 @@ public:
 
 	virtual void updateView();
 
-
     ImagePtr getImageToDisplay();
 
 signals:
@@ -110,6 +109,8 @@ private slots:
 	void mouseMoveSlot(int x, int y, Qt::MouseButtons buttons);
 	void mouseWheelSlot(int x, int y, int delta, int orientation, Qt::MouseButtons buttons);
 	void optionChangedSlot();
+	void showManualToolSlot(bool visible);
+	void toggleShowManualTool();
 
 protected slots:
 	void samplePoint(Vector3D click_vp);
@@ -137,15 +138,13 @@ private:
     void removeAndResetSliceRep();
 
     bool useGPU2DRendering();
-    void createAndAddMultiSliceRep();
+		bool createAndAddMultiSliceRep();
     void removeAndResetMultiSliceRep();
 
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
 
-#ifndef CX_VTK_OPENGL2
 	Texture3DSlicerRepPtr mMultiSliceRep;
-#endif
 
 	DataRepContainerPtr mDataRepContainer;
 

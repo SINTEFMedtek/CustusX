@@ -42,7 +42,6 @@ class QTimer;
 
 namespace cx
 {
-typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;
 class ViewCollectionWidget;
 
 /** Render a set of Views in a loop.

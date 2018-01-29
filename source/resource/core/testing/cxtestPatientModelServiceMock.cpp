@@ -60,7 +60,7 @@ cx::DataPtr PatientModelServiceMock::createData(QString type, QString uid, QStri
 	cx::PatientModelServicePtr self(cx::PatientModelServicePtr(this, cx::null_deleter()));
 	cx::SpaceProviderPtr space(new cx::SpaceProviderImpl(cx::TrackingService::getNullObject(), self));
 
-	static int count = 0;
+	static int count = 1;
 	if (uid.contains("%"))
 		uid = uid.arg(count++);
 	if (name.contains("%"))

@@ -55,17 +55,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include "cxViewService.h"
 
-
-//TODO: remove
-#include "cxLegacySingletons.h"
-
 namespace cx
 {
 
-ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, QString filename, QWidget* parent) :
+ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, ViewServicePtr viewService, QString filename, QWidget* parent) :
     QDialog(parent),
 	mFilename(filename),
-	mPatientModelService(patientModelService)
+	mPatientModelService(patientModelService),
+	mViewService(viewService)
 {
   this->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -95,7 +92,7 @@ ImportDataDialog::ImportDataDialog(PatientModelServicePtr patientModelService, Q
 	  "Use RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior), as in ITK-Snap.\n"
 	  "This is different from DICOM/CustusX, which uses LPS (left-posterior-superior).");
   mNiftiFormatCheckBox->setChecked(false);
-  mNiftiFormatCheckBox->setEnabled(false);
+  mNiftiFormatCheckBox->setEnabled(true);
   mTransformFromParentFrameCheckBox = new QCheckBox("Import transform from Parent", this);
   mTransformFromParentFrameCheckBox->setToolTip("Replace data transform with that of the parent data.");
   mTransformFromParentFrameCheckBox->setChecked(false);
@@ -172,15 +169,14 @@ void ImportDataDialog::importDataSlot()
   mParentFrameAdapter->setData(mData);
   mParentFrameCombo->setEnabled(mPatientModelService->getDatas().size()>1);
 
-  // enable nifti imiport only for meshes. (as this is the only case we have seen)
-  mNiftiFormatCheckBox->setEnabled(mPatientModelService->getData<Mesh>(mData->getUid())!=0);
+  //NIfTI files are assumed to be in the RAS (right-anterior-superior) coordinate system,
+  //CX requires LPS (left-posterior-superio)
+  if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
+	  mNiftiFormatCheckBox->setChecked(true);
 
   mConvertToUnsignedCheckBox->setEnabled(false);
   if (image && image->getBaseVtkImageData())
   {
-//	  vtkImageDataPtr img = image->getBaseVtkImageData();
-//	  std::cout << "type " << img->GetScalarTypeAsString() << " -- " << img->GetScalarType() << std::endl;
-//	  std::cout << "range " << img->GetScalarTypeMin() << " -- " << img->GetScalarTypeMax() << std::endl;
 	  mConvertToUnsignedCheckBox->setEnabled( (image!=0) && (image->getBaseVtkImageData()->GetScalarTypeMin()<0) );
   }
 }
@@ -225,7 +221,7 @@ void ImportDataDialog::acceptedSlot()
 	this->convertToUnsigned();
 
 	mPatientModelService->autoSave();
-	viewService()->autoShowData(mData);
+	mViewService->autoShowData(mData);
 	this->finishedSlot();
 }
 
@@ -279,7 +275,7 @@ void ImportDataDialog::convertToUnsigned()
 	if (!image)
 		return;
 
-	ImagePtr converted = convertImageToUnsigned(patientService(), image);
+	ImagePtr converted = convertImageToUnsigned(mPatientModelService, image);
 
 	image->setVtkImageData(converted->getBaseVtkImageData());
 
@@ -287,7 +283,7 @@ void ImportDataDialog::convertToUnsigned()
 	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
 	image->setLookupTable2D(LUT2D);
 	image->setTransferFunctions3D(TF3D);
-	patientService()->insertData(image);
+	mPatientModelService->insertData(image);
 }
 
 

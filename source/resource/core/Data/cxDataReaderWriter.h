@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxMesh.h"
 #include <QFileInfo>
 #include "boost/scoped_ptr.hpp"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -55,27 +56,6 @@ typedef boost::shared_ptr<class SpaceProvider> SpaceProviderPtr;
  * \addtogroup cx_resource_core_data
  * @{
  */
-
-/** Locks a static mutex in the constructor and unlocks it in the desctructor,
-  * similar to a QMutexLocker.
-  *
-  * Use this as a global access restriction for thread-unsafe VTK objects.
-  *
-  * Testing has shown that the following methods need to be mutexed:
-  *   - vtkMetaImageReader::Update()
-  *   - vtkMetaImageWrite::Write()
-  * There are probably some global stuff inside vtkmetaio.
-  *
-  * Note: Googling indicates that VTK in general is threadUNsafe.
-  */
-class cxResource_EXPORT StaticMutexVtkLocker
-{
-public:
-	StaticMutexVtkLocker();
-	~StaticMutexVtkLocker();
-private:
-	static boost::shared_ptr<QMutex> mMutex;
-};
 
 
 /**\brief Interface for Data file readers.
@@ -112,12 +92,36 @@ public:
 		return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
 	}
 	virtual QString canLoadDataType() const { return "image"; }
-	virtual bool readInto(DataPtr data, QString path);
-	bool readInto(ImagePtr image, QString filename);
+	virtual bool readInto(DataPtr data, QString filename);
+	bool readInto(ImagePtr image, QString path);
 	virtual DataPtr load(const QString& uid, const QString& filename);
-//	vtkImageDataPtr load(const QString& filename) { return this->loadVtkImageData(filename); }
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 	void saveImage(ImagePtr image, const QString& filename);
+};
+
+/**\brief Reader for NIfTI files.
+ *
+ */
+class cxResource_EXPORT NIfTIReader: public DataReader
+{
+public:
+	NIfTIReader();
+	virtual ~NIfTIReader()
+	{
+	}
+	virtual bool canLoad(const QString& type, const QString& filename)
+	{
+		QString fileType = QFileInfo(filename).suffix();
+		return (fileType.compare("nii", Qt::CaseInsensitive) == 0);
+	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(ImagePtr image, QString filename);
+	virtual QString canLoadDataType() const { return "image"; }
+	virtual DataPtr load(const QString& uid, const QString& filename);
+	virtual vtkImageDataPtr loadVtkImageData(QString filename);
+
+private:
+	vtkMatrix4x4Ptr sform_matrix; ///< the sform stores a general affine transformation which can map the image coordinates into a standard coordinate system, like Talairach or MNI
 };
 
 /**\brief Reader for portable network graphics .png files.
@@ -152,7 +156,29 @@ public:
 	virtual bool canLoad(const QString& type, const QString& filename)
 	{
 		QString fileType = QFileInfo(filename).suffix();
-		return (fileType.compare("vtk", Qt::CaseInsensitive) == 0);
+		return ( fileType.compare("vtk", Qt::CaseInsensitive) == 0);
+	}
+	virtual bool readInto(DataPtr data, QString path);
+	bool readInto(MeshPtr mesh, QString filename);
+
+	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
+	virtual QString canLoadDataType() const { return "mesh"; }
+	virtual DataPtr load(const QString& uid, const QString& filename);
+};
+
+/**\brief Reader for .vtp files.
+ *
+ */
+class cxResource_EXPORT XMLPolyDataMeshReader: public DataReader
+{
+public:
+	virtual ~XMLPolyDataMeshReader()
+	{
+	}
+	virtual bool canLoad(const QString& type, const QString& filename)
+	{
+		QString fileType = QFileInfo(filename).suffix();
+		return ( fileType.compare("vtp", Qt::CaseInsensitive) == 0);
 	}
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(MeshPtr mesh, QString filename);
@@ -183,10 +209,9 @@ public:
 	virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
-/** Read or write vtk or ssc data objects from/to file.
+
+/**\brief Read or write vtk or ssc data objects from/to file.
  *
- * \date May 2, 2013
- * \author christiana
  */
 class cxResource_EXPORT DataReaderWriter
 {
