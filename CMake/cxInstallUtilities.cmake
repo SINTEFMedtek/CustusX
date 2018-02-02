@@ -70,6 +70,7 @@ macro(cx_install_initialize_customizable_properties)
 	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
 	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
+    set_property(GLOBAL PROPERTY CPACK_PACKAGE_NAME "${CX_SYSTEM_BASE_NAME}")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.png")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
@@ -92,6 +93,7 @@ endmacro()
 ###############################################################################
 macro(cx_install_apply_customizable_properties)
 
+    get_property(CPACK_PACKAGE_NAME          GLOBAL PROPERTY CPACK_PACKAGE_NAME)
 	get_property(CPACK_PACKAGE_ICON          GLOBAL PROPERTY CPACK_PACKAGE_ICON)
 	get_property(CPACK_PACKAGE_VENDOR        GLOBAL PROPERTY CPACK_PACKAGE_VENDOR)
 	get_property(CPACK_RESOURCE_FILE_WELCOME GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME)
