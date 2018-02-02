@@ -116,7 +116,7 @@ void PlaneMetricRep::rescale()
 	Vector3D p0_r = planeMetric->getRefCoord();
 	Vector3D n_r = planeMetric->getRefNormal();
 
-	double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(p0_r);
 	double sphereSize = mGraphicsSize / 100 / size;
 
 	mGraphicalPoint->setValue(p0_r);
