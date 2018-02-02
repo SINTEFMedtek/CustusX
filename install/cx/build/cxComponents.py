@@ -575,7 +575,7 @@ class org_custusx_angleCorrection(CppComponent):
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:Danielhiversen/AngleCorr.git'
+        return 'git@github.com:SINTEFMedtek/AngleCorr.git'
     def makeClean(self):
         pass
     def pluginPath(self):
