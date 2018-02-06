@@ -77,7 +77,6 @@ private:
 	PointMetricRep();
 
 	GraphicalPoint3DPtr mGraphicalPoint;
-//	PointMetricPtr mMetric;
 	ViewportListenerPtr mViewportListener;
 };
 

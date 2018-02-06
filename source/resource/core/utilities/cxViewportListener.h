@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <boost/function.hpp>
 #include "vtkForwardDeclarations.h"
+#include "cxVector3D.h"
 
 namespace cx
 {
@@ -62,6 +63,7 @@ public:
 
 		virtual void callback();
 		double getVpnZoom();
+		double getVpnZoom(Vector3D focalPoint);
 protected:
 		virtual void addObservers() = 0;
 		virtual void removeObservers() = 0;

@@ -365,15 +365,23 @@ void LandmarkRep::rescale()
 {
 	if (!mViewportListener->isListening())
 		return;
-	double size = mViewportListener->getVpnZoom();
-	double sphereSize = mGraphicsSize / 100 / size;
 
 	for (LandmarkGraphicsMapType::iterator iter = mGraphics.begin(); iter != mGraphics.end(); ++iter)
 	{
-		if (iter->second.mSecondaryPoint)
-			iter->second.mSecondaryPoint->setRadius(sphereSize);
-		if (iter->second.mPrimaryPoint)
-			iter->second.mPrimaryPoint->setRadius(sphereSize);
+		GraphicalPoint3DPtr primaryPoint = iter->second.mPrimaryPoint;
+		GraphicalPoint3DPtr secondaryPoint = iter->second.mSecondaryPoint;
+		if (primaryPoint)
+		{
+			double size = mViewportListener->getVpnZoom(primaryPoint->getValue());
+			double sphereSize = mGraphicsSize / 100 / size;
+			primaryPoint->setRadius(sphereSize);
+		}
+		if (secondaryPoint)
+		{
+			double size = mViewportListener->getVpnZoom(secondaryPoint->getValue());
+			double sphereSize = mGraphicsSize / 100 / size;
+			secondaryPoint->setRadius(sphereSize);
+		}
 	}
 }
 
