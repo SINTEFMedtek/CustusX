@@ -155,7 +155,15 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
 		//test: Set all messages as type TRACKED_US_PROBE for now
 //		emit transform(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
-		emit transform(deviceName, cxtransform, timestamp);
+
+		//Experimental code to try to receive equipmentId from the Anser tracking platform
+		std::string openigtlinktransformid;
+		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
+
+		if (gotTransformId)
+			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestamp);
+		else
+			emit transform(deviceName, cxtransform, timestamp);
 	}
 	else if(device_type == igtlio::CommandConverter::GetIGTLTypeName())
 	{
