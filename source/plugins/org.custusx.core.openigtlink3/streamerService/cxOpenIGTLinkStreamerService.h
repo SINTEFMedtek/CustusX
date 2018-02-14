@@ -62,12 +62,11 @@ private:
 	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
 	TrackingServicePtr mTrackingService;
-	BoolPropertyBasePtr mCombinedFunctionality;
 	bool mStartedTrackingAndOpenIGTLinkFromHere;
 
 	StringPropertyBasePtr getIPOption(QDomElement root);
 	DoublePropertyBasePtr getStreamPortOption(QDomElement root);
-	BoolPropertyBasePtr getCombinedFunctionality(QDomElement root);
+	BoolPropertyBasePtr trackAndStream(QDomElement root);
 	OpenIGTLinkTrackingSystemServicePtr getOpenIGTLinkTrackingSystemService();
 	void startTracking(QDomElement root);
 	void configureTracking(QDomElement root);

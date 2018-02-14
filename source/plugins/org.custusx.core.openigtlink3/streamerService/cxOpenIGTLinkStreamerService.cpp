@@ -74,13 +74,12 @@ QString OpenIGTLinkStreamerService::getType() const
 
 std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
 {
-	mCombinedFunctionality = this->getCombinedFunctionality(root);
-		std::vector<PropertyPtr> retval;
-		retval.push_back(this->getIPOption(root));
-		retval.push_back(this->getStreamPortOption(root));
-		retval.push_back(mCombinedFunctionality);
+	std::vector<PropertyPtr> retval;
+	retval.push_back(this->getIPOption(root));
+	retval.push_back(this->getStreamPortOption(root));
+	retval.push_back(this->trackAndStream(root));
 
-    return retval;
+	return retval;
 }
 
 StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
@@ -105,14 +104,14 @@ void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClient()
 
 void OpenIGTLinkStreamerService::startTracking(QDomElement root)
 {
-	if(this->getCombinedFunctionality(root)->getValue())
+	if(this->trackAndStream(root)->getValue())
 	{
 		mStartedTrackingAndOpenIGTLinkFromHere = true;
 		this->configureTracking(root);
-		// Trying to connect will case several tests to fail,
+		// Trying to connect will cause several tests to fail,
 		// because ClientSocket::ConnectToServer in OpenIGTLink/OpenIGTLink/Source/igtlClientSocket.cxx
 		// will print error messages when it cannot connect.
-		// Default value for CombinedFunctionality (named start_tracking in settings xml file) are therefore set to false
+		// Default value for trackAndStream (named start_tracking in settings xml file) is therefore set to false
 		mConnection->requestConnectToServer(this->getIPOption(root)->getValue().toStdString(),
 																				int(this->getStreamPortOption(root)->getValue()));
 	}
@@ -142,7 +141,7 @@ OpenIGTLinkTrackingSystemServicePtr OpenIGTLinkStreamerService::getOpenIGTLinkTr
 	return OpenIGTLinkTrackingSystemServicePtr();
 }
 
-BoolPropertyBasePtr OpenIGTLinkStreamerService::getCombinedFunctionality(QDomElement root)
+BoolPropertyBasePtr OpenIGTLinkStreamerService::trackAndStream(QDomElement root)
 {
 	BoolPropertyPtr retval;
 	// Default value need to be false to prevent tests from failing
