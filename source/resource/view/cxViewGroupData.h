@@ -144,7 +144,6 @@ public:
 	std::vector<ImagePtr> getImages(DataViewProperties properties) const;
 	std::vector<MeshPtr> getMeshes(DataViewProperties properties) const;
 	std::vector<TrackedStreamPtr> getTrackedStreams(DataViewProperties properties) const;
-	std::vector<TrackedStreamPtr> getTracked2DStreams(DataViewProperties properties) const;
 	std::vector<ImagePtr> getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties, bool include2D = false) const;
 	DataViewProperties getProperties(QString uid);
 	void setProperties(QString uid, DataViewProperties properties);
