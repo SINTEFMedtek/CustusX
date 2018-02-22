@@ -381,7 +381,7 @@ void Texture3DSlicerProxyImpl::updateAndUploadImages(std::vector<ImagePtr> new_i
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		disconnect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionChangedSlot()));
-		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged(QString)), this, SLOT(uploadChangedImage(QString)));
 	}
 
 	mImages = unsigned_images;
@@ -390,7 +390,7 @@ void Texture3DSlicerProxyImpl::updateAndUploadImages(std::vector<ImagePtr> new_i
 	{
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionChangedSlot()));
-		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged(QString)), this, SLOT(uploadChangedImage(QString)));
 	}
 
 	//upload any new images to the gpu
@@ -656,10 +656,19 @@ void Texture3DSlicerProxyImpl::transferFunctionChangedSlot()
 	this->updateAndUploadColorAttribute();
 }
 
-void Texture3DSlicerProxyImpl::imageChanged()
+void Texture3DSlicerProxyImpl::uploadChangedImage(QString uid)
 {
 	mActor->Modified();
-	//TODO???
+
+	for (unsigned i = 0; i < mImages .size(); ++i)
+	{
+		ImagePtr image = mImages[i];
+		if(mImages[i]->getUid() == uid)
+		{
+			this->mSharedOpenGLContext->uploadImage(image);
+		}
+	}
+
 }
 
 
