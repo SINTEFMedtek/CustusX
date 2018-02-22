@@ -166,8 +166,8 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 		CX_LOG_WARNING() << "Difference between system time and received tool timestamp: " << diff;
 
 	//TODO: Make sure this is the way we want to handle this
-    //Current implementation get all transforms between tool frame and tracking system.
-    //Another solution is to get transforms between tool frame and ref frame.
+	//Current implementation is to get transforms between tool frame and ref frame
+	//Another solution is to get all transforms between tool frame and tracking system.
 
     Transform3D prMt = prMs * this->getCalibration_sMt();
     Transform3D prMt_filtered = prMt;
