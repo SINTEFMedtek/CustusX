@@ -70,7 +70,6 @@ public:
 	void parseValue(QString name, QString value);
 
 protected:
-	ProbeDefinitionPtr mProbeDefinition;
 	SectorInfoPtr mSectorInfo;
 
 private:
@@ -82,6 +81,7 @@ private:
 	double getBoundingBoxThirdDimensionStart() const;
 	double getBoundingBoxThirdDimensionEnd() const;
 
+	ProbeDefinitionPtr mProbeDefinition;
 };
 
 }//cx
