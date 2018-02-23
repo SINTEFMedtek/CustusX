@@ -104,8 +104,10 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
-	//Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
-	QString deviceName(receivedDevice->GetDeviceName().c_str());//Use this for all message types for now
+	// Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
+	// Use this for all message types for now, instead of equipmentId.
+	// Anser integration may send equipmentId, so this is checked for when we get a transform.
+	QString deviceName(receivedDevice->GetDeviceName().c_str());
 
 	if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
 	{
