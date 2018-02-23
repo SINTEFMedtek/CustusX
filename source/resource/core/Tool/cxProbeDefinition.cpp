@@ -225,6 +225,8 @@ void ProbeDefinition::updateSectorFromClipRect()
 
 void ProbeDefinition::applySoundSpeedCompensationFactor(double factor)
 {
+	if(similar(factor, 1.0))
+		return;
 	mSpacing[1] = mSpacing[1] * factor / mSoundSpeedCompensationFactor;
 	mSoundSpeedCompensationFactor = factor;
 

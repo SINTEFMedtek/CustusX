@@ -40,7 +40,7 @@ namespace cx
 
 IGTLinkUSStatusMessage::IGTLinkUSStatusMessage():
 		igtl::MessageBase(),
-		mProbeType(0)
+		mProbeType(ProbeDefinition::tNONE)
 {
 	AllocatePack();
 	m_StatusMessage = m_Body;
@@ -51,13 +51,13 @@ IGTLinkUSStatusMessage::IGTLinkUSStatusMessage():
     mDataOrigin[i] = 0.0;
   }
 
-  m_DefaultBodyType  = "CX_US_ST";
+  m_SendMessageType  = "CX_US_ST";
 }
 
 IGTLinkUSStatusMessage::~IGTLinkUSStatusMessage()
 {}
 
-void IGTLinkUSStatusMessage::SetProbeType(int probeType)
+void IGTLinkUSStatusMessage::SetProbeType(ProbeDefinition::TYPE probeType)
 {
 	mProbeType = probeType;
 }
@@ -182,7 +182,7 @@ int IGTLinkUSStatusMessage::UnpackBody()
 	this->mDepthStart     = statusMessage->depthStart;
 	this->mDepthEnd       = statusMessage->depthEnd;
 	this->mWidth          = statusMessage->width;
-	this->mProbeType      = statusMessage->probeType;
+	this->mProbeType      = static_cast<ProbeDefinition::TYPE>(statusMessage->probeType);
 	//TODO: dataformat
 
 	return 1;

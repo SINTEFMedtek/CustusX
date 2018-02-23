@@ -225,6 +225,14 @@ macro(cx_initialize_OpenIGTLink)
 endmacro()
 
 ###############################################################################
+# Initialize OpenIGTLinkIO library
+# Find the package.
+###############################################################################
+macro(cx_initialize_OpenIGTLinkIO)
+    find_package(OpenIGTLinkIO REQUIRED)
+endmacro()
+
+###############################################################################
 # Initialize IGSTK library
 # Find the package and run the include USE file.
 ###############################################################################

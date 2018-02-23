@@ -104,6 +104,16 @@ class CppBuilder:
         repo.setBranchDefault(self.controlData.main_branch)
         repo.syncToGitRef()
 
+    def gitCheckoutBranch(self, branch, submodules=False):
+        '''
+        pull latest version of branch, include submodules if asked.
+        '''
+        self._changeDirToSource()
+        runShell('git fetch')
+        runShell('git checkout %s' % branch)
+        runShell('git pull origin %s' % branch)
+
+
     def gitCheckoutTag(self, tag):
         '''
         Update git to the given tag.
@@ -183,7 +193,7 @@ class CppBuilder:
         add = self.addCMakeOption
         append = self.appendCMakeOption
         if(platform.system() != 'Windows'):
-            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-inconsistent-missing-override')
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
