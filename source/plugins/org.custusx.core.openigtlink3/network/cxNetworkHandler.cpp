@@ -83,7 +83,7 @@ igtlio::SessionPointer NetworkHandler::requestConnectToServer(std::string server
 
 void NetworkHandler::disconnectFromServer()
 {
-	if (mSession->GetConnector()->GetState()!=igtlio::Connector::STATE_OFF)
+	if (mSession->GetConnector() && mSession->GetConnector()->GetState()!=igtlio::Connector::STATE_OFF)
 	{
 		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession->GetConnector()->GetName();
 		igtlio::ConnectorPointer connector = mSession->GetConnector();
