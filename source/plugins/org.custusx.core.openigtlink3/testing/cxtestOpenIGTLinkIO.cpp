@@ -156,12 +156,14 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 
 	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
 
-	int defaultPort = -1;
-	igtlio::SessionPointer server = logic->StartServer(defaultPort);//Verify that default port == 18944
+	// Server default port should be 18944
+	// Verify this by not setting port on explicitly on server
+	igtlio::SessionPointer server = logic->StartServer();
 	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
 	REQUIRE(server);
 	REQUIRE(client);
 
+	REQUIRE(client->GetConnector()->IsConnected());
 	REQUIRE(client->GetConnector()->Stop());
 	REQUIRE_FALSE(client->GetConnector()->IsConnected());
 }
