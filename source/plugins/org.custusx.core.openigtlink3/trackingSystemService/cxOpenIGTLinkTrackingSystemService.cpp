@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 
 #include "cxToolConfigurationParser.h"
+#include "cxTrackerConfigurationImpl.h"
 
 namespace cx
 {
@@ -99,6 +100,8 @@ std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()
 {
 	TrackerConfigurationPtr retval;
+	retval.reset(new TrackerConfigurationImpl());
+	retval->setTrackingSystemImplementation(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK);
 	return retval;
 }
 
@@ -115,6 +118,7 @@ void OpenIGTLinkTrackingSystemService::configure()
 	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
 	{
 		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Not using OpenIGTLink tracking.";
+		this->setState(Tool::tsNONE);
 		return;
 	}
 
@@ -136,12 +140,16 @@ void OpenIGTLinkTrackingSystemService::configure()
 	}
 	if(!mReference)
 		CX_LOG_WARNING() << "OpenIGTLinkTrackingSystemService::configure() Got no reference tool";
+
+	mState = Tool::tsCONFIGURED;//Setting state directly. Cannot get setState() to work with test
 }
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
 	if (!this->isConfigured())
 		return;
+
+	mState = Tool::tsNONE;//Setting state directly. Cannot get setState() to work with test
 
 	mTools.clear();
 	mReference.reset();

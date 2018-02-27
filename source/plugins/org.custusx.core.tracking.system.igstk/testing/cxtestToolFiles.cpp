@@ -108,6 +108,13 @@ TEST_CASE("Verify that saveConfiguration do not loose information", "[unit][tool
 		CHECK(configData.mTrackingSystemName == configData2.mTrackingSystemName);
 		CHECK(configData.mReferenceTool == configData2.mReferenceTool);
 		CHECK(configData.mTrackingSystemImplementation == configData2.mTrackingSystemImplementation);
+
+		REQUIRE(configData.mToolList.size() == configData2.mToolList.size());
+		for(unsigned i = 0; i < configData.mToolList.size(); ++i)
+		{
+			CHECK(configData.mToolList[i].mOpenIGTLinkImageId == configData2.mToolList[i].mOpenIGTLinkImageId);
+			CHECK(configData.mToolList[i].mOpenIGTLinkTransformId == configData2.mToolList[i].mOpenIGTLinkTransformId);
+		}
 	}
 }
 

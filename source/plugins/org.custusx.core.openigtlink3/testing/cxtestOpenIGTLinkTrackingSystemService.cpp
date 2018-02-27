@@ -32,6 +32,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "catch.hpp"
 #include "cxOpenIGTLinkTrackingSystemService.h"
+#include "cxLogger.h"
+
+#include "cxTrackerConfiguration.h"
+#include <QFileInfo>
 
 class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystemService
 {
@@ -43,6 +47,10 @@ public:
 	virtual bool isTracking() const;
 
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
+
+public slots:
+	virtual void configure() {cx::OpenIGTLinkTrackingSystemService::configure();}
+	virtual void deconfigure() {cx::OpenIGTLinkTrackingSystemService::deconfigure();}
 
 };
 
@@ -61,14 +69,13 @@ bool OpenIGTLinkTrackingSystemServiceMoc::isTracking() const
 	return cx::OpenIGTLinkTrackingSystemService::isTracking();
 }
 
-
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
 
 
 namespace cxtest
 {
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[unit]")
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
 
@@ -110,6 +117,46 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[unit]")
 	CHECK_FALSE(trackingSystemService->isConfigured());
 	CHECK_FALSE(trackingSystemService->isInitialized());
 	CHECK_FALSE(trackingSystemService->isTracking());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state", "[plugins][org.custusx.core.openigtlink3][integration]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+
+	cx::TrackerConfigurationPtr config = trackingSystemService->getConfiguration();
+	REQUIRE(config);
+	QStringList configurations = config->getAllConfigurations();
+
+	REQUIRE(configurations.size() > 1);
+
+	//Use one of the tool config files with PLUS tools
+	int posOfPlusConfigToolFile = 0;
+	bool foundPlusToolConfigFile = false;
+	for(int i = 0; i < configurations.size(); ++i)
+	{
+		QFileInfo fileInfo(configurations[i]);
+		if (fileInfo.fileName().startsWith("PLUS"))
+		{
+//			CX_LOG_DEBUG() << "Found PLUS tool config file: " << configurations[i];
+			posOfPlusConfigToolFile = i;
+			foundPlusToolConfigFile = true;
+		}
+//		else
+//			CX_LOG_DEBUG() << "Tool config file (not PLUS): " << configurations[i];
+	}
+
+	REQUIRE(foundPlusToolConfigFile);
+	QString toolConfigFile = configurations[posOfPlusConfigToolFile];
+	CX_LOG_DEBUG() << "Using PLUS tool config file: " << toolConfigFile;
+	trackingSystemService->setConfigurationFile(toolConfigFile);
+
+	//Test real configure/deconfigure functions
+	trackingSystemService->configure();
+	CHECK(trackingSystemService->isConfigured());//Wait for stateChanged?
+
+	trackingSystemService->deconfigure();
+	CHECK_FALSE(trackingSystemService->isConfigured());//Wait for stateChanged?
+
 }
 
 }//cxtest

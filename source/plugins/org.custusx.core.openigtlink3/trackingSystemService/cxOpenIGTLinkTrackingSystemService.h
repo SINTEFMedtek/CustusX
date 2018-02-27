@@ -71,10 +71,11 @@ public:
 protected:
 	void internalSetState(Tool::State val);
 
-private slots:
+protected slots:
 	virtual void configure(); ///< sets up the software
 	virtual void deconfigure(); ///< deconfigures the software
 
+private slots:
 	void serverIsConnected();
 	void serverIsDisconnected();
 

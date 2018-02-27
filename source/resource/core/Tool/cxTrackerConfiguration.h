@@ -38,6 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "boost/shared_ptr.hpp"
 #include <QStringList>
 
+#include "cxToolConfigurationParser.h"
+
 namespace cx
 {
 typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
@@ -61,6 +63,7 @@ public:
 		QStringList mTools;
 		QString mReferenceTool;
 		QString mTrackingSystemImplementation;//Tracking system implementation (igstk or openigtlink)
+		std::vector<cx::ConfigurationFileParser::ToolStructure> mToolList;
 	};
 	struct Tool
 	{

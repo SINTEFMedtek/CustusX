@@ -275,7 +275,8 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			QDomElement toolFileNode = doc.createElement(CONFIG_TRACKER_TOOL_FILE);
 			toolFileNode.appendChild(doc.createTextNode(relativeToolFilePath));
 			toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (it2->mReference ? "yes" : "no"));
-			//TODO: Set attributes openigtlinktransformid and openigtlinkimageid
+			toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, it2->mOpenIGTLinkTransformId);
+			toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, it2->mOpenIGTLinkImageId);
 			trackerTagNode.appendChild(toolFileNode);
 		}
 		trackingsystemImplementationNode.appendChild(trackerTagNode);
