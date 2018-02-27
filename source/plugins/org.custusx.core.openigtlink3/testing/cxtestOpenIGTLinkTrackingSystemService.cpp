@@ -119,7 +119,8 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins]
 	CHECK_FALSE(trackingSystemService->isTracking());
 }
 
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state", "[plugins][org.custusx.core.openigtlink3][integration]")
+#ifdef CX_CUSTUS_SINTEF
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool config file for PLUS", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
 
@@ -156,7 +157,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state", "[plugins][o
 
 	trackingSystemService->deconfigure();
 	CHECK_FALSE(trackingSystemService->isConfigured());//Wait for stateChanged?
-
 }
+#endif
 
 }//cxtest
