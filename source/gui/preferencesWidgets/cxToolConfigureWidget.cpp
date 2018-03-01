@@ -265,8 +265,6 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
-//	retval.mTrackingSystem = config->getConfiguration(this->getCurrentConfigFilePath()).mTrackingSystem;
-
 	return retval;
 }
 
