@@ -265,6 +265,11 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
+	// TODO fix retval.mToolList. See TrackerConfigurationImpl::saveConfiguration()
+	// Will need to keep mOpenIGTLinkImageId and mOpenIGTLinkTransformId when creating return value
+	// For now ConfigurationFileParser::saveConfiguration() refuse to save openigtlink tracking files
+	// to prevent these from being destroyed.
+
 	return retval;
 }
 

@@ -260,13 +260,14 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
+
+			if (config.mTrackingSystemImplementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
+			{
+				doSaveFile = false;
+			}
+
 			if (!trackingSystemName.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
 			{
-				if (config.mTrackingSystemImplementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
-				{
-					doSaveFile = false;
-				}
-				else
 				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
 												+ toolTrackerType + " because trackingSystemName is set to " + trackingSystemName);
 				continue;
@@ -275,8 +276,9 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			QDomElement toolFileNode = doc.createElement(CONFIG_TRACKER_TOOL_FILE);
 			toolFileNode.appendChild(doc.createTextNode(relativeToolFilePath));
 			toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (it2->mReference ? "yes" : "no"));
-			toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, it2->mOpenIGTLinkTransformId);
-			toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, it2->mOpenIGTLinkImageId);
+			//These are not saved correctly yet. See comment in ToolConfigureGroupBox::getCurrentConfiguration()
+			toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, it2->mOpenIGTLinkTransformId);// These are not saved correctly yet.
+			toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, it2->mOpenIGTLinkImageId);// These are not saved correctly yet.
 			trackerTagNode.appendChild(toolFileNode);
 		}
 		trackingsystemImplementationNode.appendChild(trackerTagNode);
