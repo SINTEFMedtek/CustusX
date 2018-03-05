@@ -5,7 +5,7 @@ CustusX is built continously on the following platforms:
 
 | Name                          | Description
 | ----------------------------- | -----------------------------
-| MacOSX 10.13 (El High Sierra) | Mac Pro<sup>1</sup>
+| macOS 10.13 (High Sierra)     | Mac Pro<sup>1</sup>
 | Ubuntu 16.04                  | NVidia GPU<sup>2</sup>
 | Windows 10                    | NVidia GPU
 
