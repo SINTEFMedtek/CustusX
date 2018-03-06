@@ -75,8 +75,8 @@ public:
 		Message msg(buffer, mMessageLevel);
 //		msg.mChannel = qstring_cast(mMessageLevel);
 		msg.mChannel = "stdout";
-		if (isValidMessage(buffer))
-			reporter()->sendMessage(msg);
+//		if (isValidMessage(buffer))
+		reporter()->sendMessage(msg);
 	  }
 	  else
 	  {
