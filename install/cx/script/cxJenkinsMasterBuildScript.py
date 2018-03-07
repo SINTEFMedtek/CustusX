@@ -23,7 +23,7 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
     '''
     def __init__(self, assembly=None):
         ''                
-        os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.11" #Compile for macOS Maverics and above
+        os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.10" #Compile for macOS Yosemite and above
         super(Controller, self).__init__(assembly)
 
     def getDescription(self):                  
