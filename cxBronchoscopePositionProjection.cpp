@@ -169,7 +169,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform
 			mProjectedBranchPtr = minDistanceBranch;
 			mProjectedIndex = minDistancePositionIndex;
 			isPreviousProjectedPointSet = true;
-			new_rMt = updateProjectedCameraOrientation(new_rMt, mProjectedBranchPtr, mProjectedIndex);
+            //new_rMt = updateProjectedCameraOrientation(new_rMt, mProjectedBranchPtr, mProjectedIndex);
 		}
 		else
 		{
@@ -213,7 +213,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 		mProjectedBranchPtr = minDistanceBranch;
 		mProjectedIndex = minDistancePositionIndex;
 		isPreviousProjectedPointSet = true;
-		new_rMt = updateProjectedCameraOrientation(new_rMt, mProjectedBranchPtr, mProjectedIndex);
+        //new_rMt = updateProjectedCameraOrientation(new_rMt, mProjectedBranchPtr, mProjectedIndex);
 	}
 	else
 	{
