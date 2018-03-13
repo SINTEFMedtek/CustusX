@@ -17,16 +17,10 @@ In addition, CustusX has been known to work on
 | Fedora 21                    | Not tested lately.
 | Windows 7                    | Not tested lately.
 | Windows 8                    | Not tested lately.
-| Windows 10                   | Only the development branch<sup>3</sup>
-| MacOSX 10.12 (Sierra)        | Only the development branch<sup>3</sup>
-| MacOSX 10.13 (High Sierra)   | Only the development branch<sup>3</sup>
-| Ubuntu 16.04                 | Only the development branch<sup>3</sup>
+| MacOSX 10.11 (El Capitan)    |  |
+| macOS 10.12 (Sierra)         |  |
 
 <sup>1</sup> Macs with NVIDIA GeForce GT 750M seems to have issues with showing data in 2D views.
 Turning off multi volume visualization in 2D is a way to fix this problem: Preferences -> Performance -> 2D overlay
 
 <sup>2</sup> Linux NVIDIA driver 384.111 seems to cause problems. NVIDIA driver 375.82 works ok.
-
-<sup>3</sup> Checkout the development branch before running the cxInstaller script:
-
-    git checkout develop

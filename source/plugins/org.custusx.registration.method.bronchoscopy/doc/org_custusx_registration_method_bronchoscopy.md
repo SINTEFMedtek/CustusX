@@ -5,4 +5,5 @@ Registration Method Plugin: Bronchoscopy {#org_custusx_registration_method_bronc
 Bronchoscopy Registration {#org_custusx_registration_method_bronchoscopy_widget}
 ===========================================================
 
-Register the path of a tracked bronchoscope to a centerline created from the lung tree.
+Register the path of a tracked bronchoscope to a centerline created from the lung tree.<br>
+<span style="color:red">Note! This registration widget must be visible during active tracking of bronchoscope for position data to be stored.</span>
