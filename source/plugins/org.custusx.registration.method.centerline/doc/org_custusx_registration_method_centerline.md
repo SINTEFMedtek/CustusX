@@ -10,7 +10,7 @@ Translation along each axis (x,y,z) and rotation around each axis (x,y,z) is opt
 Intended use: Endoscopy in esophagus (local/updated registration during procedure).<br>
 Tips: Switch off z translation and z rotation to use the registration method for local corrections
 in navigated endoscopy in esophagus.<br>
-<span style="color:red">Note! This widget must be visible during active tracking of endoscope for position data to be stored.</span>
+<span style="color:red">Note! This widget must be visible during recording of endoscope/tool positions for data to be stored.</span>
 
 
 Prepare
