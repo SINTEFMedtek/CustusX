@@ -69,6 +69,10 @@ RecordSessionWidget::RecordSessionWidget(AcquisitionServicePtr base, QWidget* pa
 	buttonLayout->addWidget(mStartStopButton);
 	buttonLayout->addWidget(mCancelButton);
 	layout->addLayout(buttonLayout);
+    QString warningText;
+    warningText = "<font color=red>Note! This widget must be visible during active recording</font><br>";
+    QLabel* warningInfoLabel = new QLabel(warningText);
+    layout->addWidget(warningInfoLabel);
 
 	connect(mAcquisitionService.get(), &AcquisitionService::stateChanged, this, &RecordSessionWidget::recordStateChangedSlot);
 
