@@ -8,7 +8,7 @@ other open-source libraries, with their own licenses. They are listed here: \ref
 
 This is the full CustusX license:
 
-	Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+        Copyright (c) 2008-2018, SINTEF Department of Medical Technology
 	All rights reserved.
 	
 	Redistribution and use in source and binary forms, with or without 
