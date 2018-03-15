@@ -368,7 +368,8 @@ void IGTLinkClientStreamer::addToQueue(igtl::ImageMessage::Pointer msg)
             package->mProbe = cxconverter.decode(package->mProbe);
         }
 
-        mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
+				//Commenting out this line means that the last US sector information is always sent together with the image
+//				mUnsentUSStatusMessage = IGTLinkUSStatusMessage::Pointer();
 	}
 
     //Should only be needed if time stamp is set on another computer that is
