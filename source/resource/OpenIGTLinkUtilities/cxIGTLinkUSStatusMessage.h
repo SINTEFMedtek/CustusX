@@ -94,7 +94,7 @@ protected:
 
   virtual int  GetBodyPackSize();
   virtual int  PackBody();
-  virtual int  UnpackBody();
+	virtual int  UnpackContent();
 
 	ProbeDefinition::TYPE mProbeType; 				///< 1 = linear, 2 = sector
   double mDataOrigin[3];	///< Origin of sector in image coordinates

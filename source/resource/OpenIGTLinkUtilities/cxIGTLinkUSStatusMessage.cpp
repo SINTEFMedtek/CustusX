@@ -165,7 +165,7 @@ int IGTLinkUSStatusMessage::GetBodyPackSize()
 	return IGTL_US_STATUS_HEADER_SIZE;
 }
 
-int IGTLinkUSStatusMessage::UnpackBody()
+int IGTLinkUSStatusMessage::UnpackContent()
 {
 	m_StatusMessage = this->m_Body;
 
