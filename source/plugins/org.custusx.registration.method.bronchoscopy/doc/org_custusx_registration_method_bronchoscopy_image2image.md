@@ -5,6 +5,5 @@ Registration Method Plugin: Bronchoscopy image to image {#org_custusx_registrati
 Bronchoscopy Registration {#org_custusx_registration_method_bronchoscopy_image2image_widget}
 ===========================================================
 
-Image-to-image registration for thorax data. Matching airway centerlines from two images.
-
+Image-to-image registration for thorax data. Matching airway centerlines from two images.<br>
 Input: Two centerline .vtk files (from fixed and moving dataset)

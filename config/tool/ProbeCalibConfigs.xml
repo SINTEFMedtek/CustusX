@@ -2,6 +2,24 @@
 <root>
     <Version>4.10.0</Version>
     <USScanner>
+        <Name>PlusDeviceSet_OpenIGTLinkCommandsTest</Name>
+        <USProbe>
+                <Name>ProbeToReference</Name>
+                <Type>LinearArray</Type>
+                <DefaultRTSource>Digital</DefaultRTSource>
+                <Notes>Running PLUS server with PlusDeviceSet_OpenIGTLinkCommandsTest.xml</Notes>
+                <RTSource>
+                    <Name>Digital</Name>
+                    <TemporalCalibration>114</TemporalCalibration>
+                    <DefaultConfig>Digital</DefaultConfig>
+                    <Config>
+                        <ID>Digital</ID>
+                        <Name>Digital streaming</Name>
+                    </Config>
+                </RTSource>
+        </USProbe>
+    </USScanner>
+    <USScanner>
         <Name>Vivid 7 - Karkirurgen</Name>
         <USProbe>
             <Name>M12L</Name>

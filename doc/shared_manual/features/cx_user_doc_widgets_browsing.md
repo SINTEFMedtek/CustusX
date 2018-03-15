@@ -28,3 +28,4 @@ Plugin Framework Widget {#browsing_widgets_plugin_framework}
 ===========================================================
 
 Lists all plugins and gives the option to install/start/stop/investigate them.
+> Use the fast forward button to start the plugin and activate it directly.
