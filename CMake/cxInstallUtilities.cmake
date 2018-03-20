@@ -1,16 +1,13 @@
+# =========================================================================
 # This file is part of CustusX, an Image Guided Therapy Application.
 #
-# Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+# Copyright (c) SINTEF Department of Medical Technology.
+# All rights reserved.
 #
-# CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
-# code and binaries can only be used by SMT and those with explicit permission
-# from SMT. CustusX shall not be distributed to anyone else.
+# CustusX is released under a BSD 3-Clause license.
 #
-# CustusX is a research tool. It is NOT intended for use or certified for use
-# in a normal clinical setting. SMT does not take responsibility for its use
-# in any way.
-#
-# See CustusX_License.txt for more information.
+# See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
+# =========================================================================
 
 # Utitily variable for setting permissions with install(FILE) or install(DIRECTORY)
 set(CX_FULL_PERMISSIONS
@@ -70,6 +67,7 @@ macro(cx_install_initialize_customizable_properties)
 	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
 	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
+    set_property(GLOBAL PROPERTY CPACK_PACKAGE_NAME "${CX_SYSTEM_BASE_NAME}")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.png")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
@@ -92,6 +90,7 @@ endmacro()
 ###############################################################################
 macro(cx_install_apply_customizable_properties)
 
+    get_property(CPACK_PACKAGE_NAME          GLOBAL PROPERTY CPACK_PACKAGE_NAME)
 	get_property(CPACK_PACKAGE_ICON          GLOBAL PROPERTY CPACK_PACKAGE_ICON)
 	get_property(CPACK_PACKAGE_VENDOR        GLOBAL PROPERTY CPACK_PACKAGE_VENDOR)
 	get_property(CPACK_RESOURCE_FILE_WELCOME GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME)

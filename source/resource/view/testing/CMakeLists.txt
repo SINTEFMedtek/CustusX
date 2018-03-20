@@ -23,6 +23,7 @@ if(BUILD_TESTING)
         cxtestViewServiceMockWithRenderWindowFactory.h
         cxtestViewServiceMockWithRenderWindowFactory.cpp
         cxtestGeometricRep.cpp
+        cxtestMultiViewCache.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

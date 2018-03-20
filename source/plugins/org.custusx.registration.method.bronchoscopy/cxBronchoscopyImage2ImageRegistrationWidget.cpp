@@ -1,35 +1,13 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2017, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
-
 #include "cxBronchoscopyImage2ImageRegistrationWidget.h"
 #include <vtkPolyData.h>
 #include "cxTransform3D.h"
@@ -119,15 +97,15 @@ void BronchoscopyImage2ImageRegistrationWidget::registerSlot()
     vtkPolyDataPtr centerlineMoving = mSelectMeshMovingWidget->getMesh()->getVtkPolyData();//input
     Transform3D rMdMoving = mSelectMeshMovingWidget->getMesh()->get_rMd();
 
-    Transform3D updated_rMdMoving = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistrationImage2Image(centerlineFixed, centerlineMoving));
+    Transform3D d_M_d = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistrationImage2Image(centerlineFixed, centerlineMoving));
 
     DataPtr fixedData = mSelectMeshFixedWidget->getData();
     mServices->registration()->setFixedData(fixedData);
     DataPtr movingData = mSelectMeshMovingWidget->getData();
     mServices->registration()->setMovingData(movingData);
 
-    Transform3D new_rMdMoving = updated_rMdMoving * rMdMoving.inv();//output
-    mServices->registration()->addImage2ImageRegistration(new_rMdMoving, "Bronchoscopy: centerline to centerline");
+    Transform3D delta_pre_rMd = rMdFixed * d_M_d * rMdMoving.inv();//output
+    mServices->registration()->addImage2ImageRegistration(delta_pre_rMd, "Bronchoscopy: centerline to centerline");
 }
 
 void BronchoscopyImage2ImageRegistrationWidget::clearDataOnNewPatient()
