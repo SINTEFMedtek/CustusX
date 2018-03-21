@@ -51,12 +51,12 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 	this->toolVisibleSlot(true);
 }
 
-bool OpenIGTLinkTool::isThisTool(QString OpenIGTLinkId)
+bool OpenIGTLinkTool::isThisTool(QString openIGTLinkId)
 {
 	bool retval = false;
-	if(OpenIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkTransformId, Qt::CaseInsensitive) == 0)
+	if(openIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkTransformId, Qt::CaseInsensitive) == 0)
 		retval = true;
-	else if(OpenIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkImageId, Qt::CaseInsensitive) == 0)
+	else if(openIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkImageId, Qt::CaseInsensitive) == 0)
 		retval = true;
 	return retval;
 }
@@ -128,7 +128,7 @@ Transform3D OpenIGTLinkTool::getCalibration_sMt() const
 void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
 {
 	CX_LOG_INFO() << mName << " got an updated calibration";
-	CX_LOG_WARNING() << "OpenIGTLinkTool::setCalibration_sMt() Receiving calibration. Should file be updated, or should it be discarded and use calibration form file instead?";
+	CX_LOG_WARNING() << "OpenIGTLinkTool::setCalibration_sMt() Receiving calibration. Should file be updated, or should it be discarded and use calibration from file instead?";
 	CX_LOG_WARNING() << "Current implementation discards this received calibration. sMt: " << sMt;
 //	mToolFileToolStructure.mCalibration = sMt;
 	//write to file
