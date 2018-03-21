@@ -189,8 +189,6 @@ class VTK(CppComponent):
         return "VTK"
     def help(self):
         return 'vtk.org'
-#    def path(self):
-#        return self.controlData.getExternalPath() + "/VTK"
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
@@ -207,11 +205,8 @@ class VTK(CppComponent):
         
         use_qt5 = True
         if use_qt5:
-#            qt5_root = '/Users/christiana/Qt/5.3/clang_64'
             add('VTK_QT_VERSION:STRING', "5")
-#            add('QT_QMAKE_EXECUTABLE:PATH', "%s/bin/qmake"%qt5_root)
             add('VTK_Group_Qt:BOOL', "ON")
-#            add('CMAKE_PREFIX_PATH:PATH', "%s/lib/cmake"%qt5_root)
             add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
@@ -246,9 +241,11 @@ class CTK(CppComponent):
         add('CTK_ENABLE_DICOM:BOOL', 'ON')
         add('CTK_LIB_DICOM/Widgets:BOOL', 'ON')
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
-        #add('CTK_BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        add('BUILD_TESTING:BOOL', 'OFF')
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
@@ -314,7 +311,6 @@ class Eigen(CppComponent):
 # ---------------------------------------------------------
 
 
-
 class OpenIGTLink(CppComponent):
     def name(self):
         return "OpenIGTLink"
@@ -326,12 +322,38 @@ class OpenIGTLink(CppComponent):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('5a501817c2da52e81db4db3eca6dd5111f94fed9')
+        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08')
+#        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', False)
         add('BUILD_EXAMPLES:BOOL', False)
+        builder.configureCMake()
+    def addConfigurationToDownstreamLib(self, builder):
+        add = builder.addCMakeOption
+        add('BUILD_OPEN_IGTLINK_SERVER:BOOL', 'ON');
+# ---------------------------------------------------------
+
+class OpenIGTLinkIO(CppComponent):
+    def name(self):
+        return "OpenIGTLinkIO"
+    def help(self):
+        return 'https://github.com/IGSIO/OpenIGTLinkIO'
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def repository(self):
+        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+#        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('568eaeb7113fca9c392743aedd8f4d6bf87a8442')
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
+        add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
+        add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
@@ -405,6 +427,7 @@ class CustusX(CppComponent):
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
         add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
@@ -568,13 +591,14 @@ class org_custusx_angleCorrection(CppComponent):
 #        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('0.1')
+#        self._getBuilder().gitCheckout('0.1')
+        self._getBuilder().gitCheckout('01acc6547c95e506b88c20011789784a129a16bb')
     def configure(self):
         pass
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:Danielhiversen/AngleCorr.git'
+        return 'git@github.com:SINTEFMedtek/AngleCorr.git'
     def makeClean(self):
         pass
     def pluginPath(self):

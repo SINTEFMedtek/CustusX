@@ -16,3 +16,12 @@ Other Plugins {#plugins_undocumented}
 The following plugins are available, but have no user documentation:
 
 @UNDOCUMENTED_PLUGINS_TEXT@
+
+Plugin troubleshooting
+========================
+If, for some reason, some plugins fail, the settings.ini file for the user profile
+(e.g. ~/CustusX_settings/profiles/Laboratory/settings/settings.ini)
+will mark these plugins as uninstalled.
+
+This can be fixed by either deleting the CustusX_settings folder, or edit or delete the settings.ini file.
+Another option is to open the \ref browsing_widgets_plugin_framework in CustusX. Here it is possible to start/install/uninstall plugins.
