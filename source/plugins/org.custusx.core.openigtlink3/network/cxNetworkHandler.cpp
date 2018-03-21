@@ -137,7 +137,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//test: Set all messages as type TRACKED_US_PROBE for now
 //		emit transform(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
 
-		//Experimental code to try to receive equipmentId from the Anser tracking platform
+		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
+		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
+		// and added to the messages from PLUS.
 		std::string openigtlinktransformid;
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
 
