@@ -89,12 +89,15 @@ private:
     double mTimestamp;
 		bool mVisible;
 		qint64 mLastReceivedPositionTime;
+		bool mPrintedWarningAboutTimeStampMismatch;
 
 		//Store these structures directly for now
 		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
 		ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
 
 		void calculateVisible();
+		void checkTimestampMismatch();
+		void printWarningAboutTimestampMismatch(double diff);
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

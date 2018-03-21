@@ -25,7 +25,8 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 	mVisible(false),
 	mLastReceivedPositionTime(0),
 	mConfigFileToolStructure(configFileToolStructure),
-	mToolFileToolStructure(toolFileToolStructure)
+	mToolFileToolStructure(toolFileToolStructure),
+	mPrintedWarningAboutTimeStampMismatch(false)
 
 {
 //	CX_LOG_DEBUG() << "OpenIGTLinkTool constr mInstrumentId: " << mToolFileToolStructure.mInstrumentId << " mInstrumentScannerId: " << mToolFileToolStructure.mInstrumentScannerId;
@@ -136,13 +137,8 @@ void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
 
 void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
 {
-//    mTimestamp = timestamp;// /1000000;
 	mTimestamp = timestamp * 1000;
-	mLastReceivedPositionTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	double diff = mLastReceivedPositionTime - mTimestamp;
-
-	if(diff > 1000)
-		CX_LOG_WARNING() << "Difference between system time and received tool timestamp: " << diff;
+	this->checkTimestampMismatch();
 
 	//TODO: Make sure this is the way we want to handle this
 	//Current implementation is to get transforms between tool frame and ref frame
@@ -160,6 +156,30 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
     (*mPositionHistory)[mTimestamp] = prMt; // store original in history
     m_prMt = prMt_filtered;
     emit toolTransformAndTimestamp(m_prMt, mTimestamp);
+}
+
+void OpenIGTLinkTool::checkTimestampMismatch()
+{
+	mLastReceivedPositionTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double diff = mLastReceivedPositionTime - mTimestamp;
+
+	//Use system time if time difference is more than a second
+	if(fabs(diff) > 1000)
+	{
+		this->printWarningAboutTimestampMismatch(diff);
+		mTimestamp = mLastReceivedPositionTime;
+	}
+}
+
+void OpenIGTLinkTool::printWarningAboutTimestampMismatch(double diff)
+{
+	if (mPrintedWarningAboutTimeStampMismatch) // Only print warning once to avoid spamming output
+		return;
+
+	CX_LOG_WARNING() << "Difference between system time and received tool timestamp: " << diff
+									 << " The reason for this may be incompatible timestamps. "
+									 << " System time will be used instead of received timestamp.";
+	mPrintedWarningAboutTimeStampMismatch = true;
 }
 
 void OpenIGTLinkTool::calculateTpsSlot()
