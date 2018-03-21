@@ -22,6 +22,9 @@ namespace cx
  * @{
  */
 
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
+
 	/** orientation type
 	 */
 	enum cxResource_EXPORT ORIENTATION_TYPE

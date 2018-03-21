@@ -25,9 +25,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
-
 /**
  * \brief Class for reading the files defining a CustusX tool
  *
