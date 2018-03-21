@@ -68,7 +68,7 @@ The following software can be installed on Mac as well through a package manager
  * **Cppunit.** For the tests.
  * **Glew**
  * **Doxygen.** To build the user/developer documentation.
- * **Ninja.** Increases build speed. The build script will detect that ninja is installed automatically.
+ * **[Ninja](https://ninja-build.org).** Increases build speed. The build script will detect that ninja is installed automatically.
 
 **Python and Git**: Make sure that you have *Python* and *Git* installed and that you can run them from the command line.
 To run the tests you need some additional python packages. You can use *pip* to install them:
