@@ -173,7 +173,7 @@ void Receiver::checkImage(cx::ImagePtr image)
 	image_received = true;
 }
 
-void Receiver::checkTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, cx::Transform3D transform, double timestamp)
+void Receiver::checkTransform(QString devicename, cx::Transform3D transform, double timestamp)
 {
 	transform_received = true;
 }

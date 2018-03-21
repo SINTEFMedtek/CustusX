@@ -22,6 +22,9 @@ namespace cx
  * @{
  */
 
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
+#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
+
 	/** orientation type
 	 */
 	enum cxResource_EXPORT ORIENTATION_TYPE
@@ -111,6 +114,7 @@ namespace cx
 		tsPOLARIS_CLASSIC,  ///< NDIs Polaris Classic tracker
 		tsAURORA,           ///< NDIs Aurora tracker
 		tsMICRON,           ///< Claron Technologys Micron tracker
+//		tsOPENIGTLINK,      ///< Tracking through OpenIGTLink
 		tsCOUNT
 	};
 

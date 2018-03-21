@@ -28,37 +28,38 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestPlusReceiver.h"
 #include "cxtestIOReceiver.h"
 
+namespace
+{
+class igtlioServerClientFixture
+{
+public:
+	igtlio::LogicPointer logic;
+	igtlio::SessionPointer server;
+	igtlio::SessionPointer client;
+
+	void startServerAndClientAndConnect()
+	{
+		std::string ip = "localhost";
+		int port = 18944;
+
+		logic = igtlio::LogicPointer::New();
+
+		// Server default port should be 18944
+		// Verify this by not setting port on explicitly on server
+		server = logic->StartServer();
+		client = logic->ConnectToServer(ip, port);
+		REQUIRE(server);
+		REQUIRE(client);
+	}
+};
+}
+
 namespace cxtest
 {
 
-
-void checkIfConnected(igtlio::LogicPointer logic)
-{
-	double timeout = 2;
-	double starttime = vtkTimerLog::GetUniversalTime();
-
-	igtlio::ConnectorPointer connector = logic->GetConnector(0);
-
-	while (vtkTimerLog::GetUniversalTime() - starttime < timeout)
-	{
-		logic->PeriodicProcess();
-
-		if (connector->GetState() == igtlio::Connector::STATE_CONNECTED)
-		{
-			REQUIRE(true);
-			break;
-		}
-		if (connector->GetState() == igtlio::Connector::STATE_OFF)
-		{
-			REQUIRE(false);
-		}
-	}
-
-	REQUIRE(connector->GetState() == static_cast<int>(igtlio::Connector::STATE_CONNECTED));
-}
-
 void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
 {
+	Q_UNUSED(receiver);
 	igtlio::ConnectorPointer connector = logic->GetConnector(0);
 
 	double timeout = 1;
@@ -71,8 +72,8 @@ void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
 
 void listenToAllDevicesToCountMessages(igtlio::LogicPointer logic, Receiver &receiver)
 {
-	int index = logic->GetNumberOfDevices();
-	for(int i=0; i<index; ++i)
+	unsigned index = logic->GetNumberOfDevices();
+	for(unsigned i=0; i<index; ++i)
 	{
 		receiver.listen(logic->GetDevice(i), true);
 	}
@@ -153,6 +154,61 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 
 }
 
+TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][integration]")
+{
+	igtlioServerClientFixture fixture;
+	fixture.startServerAndClientAndConnect();
 
+	REQUIRE(fixture.client->GetConnector()->IsConnected());
+	REQUIRE(fixture.client->GetConnector()->Stop());
+	REQUIRE_FALSE(fixture.client->GetConnector()->IsConnected());
+}
+
+TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration]")
+{
+	igtlioServerClientFixture fixture;
+	fixture.startServerAndClientAndConnect();
+
+	igtlio::ConnectorPointer connector = fixture.client->GetConnector();
+	REQUIRE(connector);
+
+	REQUIRE(connector->GetState() == igtlio::Connector::STATE_CONNECTED);
+
+	REQUIRE(connector->IsConnected());
+	REQUIRE(connector->Stop());
+	REQUIRE_FALSE(connector->IsConnected());
+	REQUIRE_FALSE(connector->Stop());
+
+	REQUIRE(connector->GetState() == igtlio::Connector::STATE_OFF);
+
+	connector = fixture.server->GetConnector();
+	REQUIRE(connector);
+	//Server connector is not connected?
+
+	REQUIRE(fixture.logic->RemoveConnector(fixture.client->GetConnector()));
+	REQUIRE_FALSE(fixture.logic->RemoveConnector(fixture.client->GetConnector()));
+
+	REQUIRE(fixture.logic->RemoveConnector(fixture.server->GetConnector()));
+	REQUIRE_FALSE(fixture.logic->RemoveConnector(fixture.server->GetConnector()));
+}
+
+TEST_CASE("Connect/disconnect using NetworkHandler, use default network port", "[plugins][org.custusx.core.openigtlink3][integration]")
+{
+	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+	cx::NetworkHandlerPtr networkHandler= cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
+
+	std::string ip = "localhost";
+
+	igtlio::SessionPointer server = logic->StartServer();
+
+	igtlio::SessionPointer client = networkHandler->requestConnectToServer(ip);
+	REQUIRE(client);
+	REQUIRE(client->GetConnector());
+	REQUIRE(client->GetConnector()->IsConnected());
+
+	networkHandler->disconnectFromServer();
+	REQUIRE(client->GetConnector());
+	REQUIRE_FALSE(client->GetConnector()->IsConnected());
+}
 
 } //namespace cxtest

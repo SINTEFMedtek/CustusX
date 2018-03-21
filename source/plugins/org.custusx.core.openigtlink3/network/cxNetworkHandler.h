@@ -38,17 +38,18 @@ public:
 	~NetworkHandler();
 
 	igtlio::SessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
+	void disconnectFromServer();
 
 signals:
 	void connected();
 	void disconnected();
 
-	void transform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp);
+	void transform(QString devicename, Transform3D transform, double timestamp);
 	void image(ImagePtr image);
 	void commandRespons(QString devicename, QString xml);
 	void string_message(QString message);
 	//void mesh(MeshPtr image);
-	void probedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition);
+	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
 	//void calibration(QString devicename, Transform3D calibration);
 
 private slots:

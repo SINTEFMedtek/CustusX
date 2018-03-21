@@ -244,7 +244,18 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
+	// TODO fix retval.mToolList. See TrackerConfigurationImpl::saveConfiguration()
+	// Will need to keep mOpenIGTLinkImageId and mOpenIGTLinkTransformId when creating return value
+	// For now ConfigurationFileParser::saveConfiguration() refuse to save openigtlink tracking files
+	// to prevent these from being destroyed.
+
 	return retval;
+}
+
+QString ToolConfigureGroupBox::getCurrentConfigFilePath()
+{
+	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+	return configAbsoluteFilePath;
 }
 
 void ToolConfigureGroupBox::populateReference()
@@ -264,8 +275,7 @@ void ToolConfigureGroupBox::populateReference()
 	}
 
 	// look for a selected reference
-	QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
-	QString reference = config->getConfiguration(configAbsoluteFilePath).mReferenceTool;
+	QString reference = config->getConfiguration(this->getCurrentConfigFilePath()).mReferenceTool;
 	currentIndex = this->addRefrenceToComboBox(reference);
 
 	// always select a reference if available:

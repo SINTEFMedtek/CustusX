@@ -42,44 +42,35 @@ public:
     virtual ~OpenIGTLinkTrackingSystemService();
 
     virtual QString getUid() const;
-    virtual Tool::State getState() const;
     virtual void setState(const Tool::State val); ///< asynchronously request a state. Wait for signal stateChanged()
     virtual std::vector<ToolPtr> getTools();
     virtual TrackerConfigurationPtr getConfiguration();
     virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-    virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
+protected:
+	void internalSetState(Tool::State val);
 
-signals:
-    void connectToServer();
-    void disconnectFromServer();
+protected slots:
+	virtual void configure(); ///< sets up the software
+	virtual void deconfigure(); ///< deconfigures the software
 
 private slots:
-    void configure(); ///< sets up the software
-    virtual void deconfigure(); ///< deconfigures the software
-    void initialize(); ///< connects to the hardware
-    void uninitialize(); ///< disconnects from the hardware
-    void startTracking(); ///< starts tracking
-    void stopTracking(); ///< stops tracking
+	void serverIsConnected();
+	void serverIsDisconnected();
 
-    void serverIsConfigured();
-    void serverIsDeconfigured();
-    void serverIsConnected();
-    void serverIsDisconnected();
-
-	void receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp);
-	void receiveCalibration(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D calibration);
-	void receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition);
+	void receiveTransform(QString devicename, Transform3D transform, double timestamp);
+	void receiveCalibration(QString devicename, Transform3D calibration);
+	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private:
-    void internalSetState(Tool::State state);
-	OpenIGTLinkToolPtr getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType);
+	OpenIGTLinkToolPtr getTool(QString devicename);
 
-    Tool::State mState;
-    std::map<QString, OpenIGTLinkToolPtr> mTools;
-    ToolPtr mReference;
+	std::map<QString, OpenIGTLinkToolPtr> mTools;
+	ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
 
+signals:
+	void setInternalState(const Tool::State val);
 };
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
