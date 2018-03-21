@@ -13,6 +13,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLogger.h"
 #include "cxOpenIGTLinkTool.h"
+#include "cxProfile.h"
+
+#include "cxToolConfigurationParser.h"
+#include "cxTrackerConfigurationImpl.h"
 
 namespace cx
 {
@@ -29,9 +33,7 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
 }
 
 OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler) :
-	mState(Tool::tsNONE),
 	mNetworkHandler(networkHandler)
-
 {
 	if(mNetworkHandler == NULL)
 		return;
@@ -41,6 +43,10 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	connect(mNetworkHandler.get(), &NetworkHandler::transform, this, &OpenIGTLinkTrackingSystemService::receiveTransform);
 	//connect(mNetworkHandler.get(), &NetworkHandler::calibration, this, &OpenIGTLinkTrackingSystemService::receiveCalibration);
 	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
+
+	connect(this, &OpenIGTLinkTrackingSystemService::setInternalState, this, &OpenIGTLinkTrackingSystemService::internalSetState);
+
+	this->setConfigurationFile(profile()->getToolConfigFilePath());
 }
 
 OpenIGTLinkTrackingSystemService::~OpenIGTLinkTrackingSystemService()
@@ -53,34 +59,16 @@ QString OpenIGTLinkTrackingSystemService::getUid() const
 	return "org.custusx.core.openigtlink3";
 }
 
-Tool::State OpenIGTLinkTrackingSystemService::getState() const
-{
-	return mState;
-}
-
 void OpenIGTLinkTrackingSystemService::setState(const Tool::State val)
 {
-	if (mState==val)
-		return;
+	emit setInternalState(val);
+}
 
-	if (val > mState) // up
-	{
-		if (val == Tool::tsTRACKING)
-			this->startTracking();
-		else if (val == Tool::tsINITIALIZED)
-			this->initialize();
-		else if (val == Tool::tsCONFIGURED)
-			this->configure();
-	}
-	else // down
-	{
-		if (val == Tool::tsINITIALIZED)
-			this->stopTracking();
-		else if (val == Tool::tsCONFIGURED)
-			this->uninitialize();
-		else if (val == Tool::tsNONE)
-			this->deconfigure();
-	}
+void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
+{
+	TrackingSystemService::internalSetState(val);
+	mState = val;
+	emit stateChanged();
 }
 
 std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
@@ -91,6 +79,8 @@ std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()
 {
 	TrackerConfigurationPtr retval;
+	retval.reset(new TrackerConfigurationImpl());
+	retval->setTrackingSystemImplementation(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK);
 	return retval;
 }
 
@@ -99,89 +89,91 @@ ToolPtr OpenIGTLinkTrackingSystemService::getReference()
 	return mReference;
 }
 
-void OpenIGTLinkTrackingSystemService::setLoggingFolder(QString loggingFolder)
-{}
-
 void OpenIGTLinkTrackingSystemService::configure()
 {
-	this->serverIsConfigured();
+	//parse
+	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
+
+	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
+	{
+		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Not using OpenIGTLink tracking.";
+		this->setState(Tool::tsNONE);
+		return;
+	}
+
+	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink3 tracking";
+
+	std::vector<ConfigurationFileParser::ToolStructure> toolList = configParser.getToolListWithMetaInformation();
+
+	//Create tools
+	for(std::vector<ConfigurationFileParser::ToolStructure>::iterator it = toolList.begin(); it != toolList.end(); ++it)
+	{
+		ToolFileParser toolParser((*it).mAbsoluteToolFilePath, mLoggingFolder);
+		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
+
+		QString devicename = internalTool->mUid;
+		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
+		if(mTools.count(devicename))
+			CX_LOG_WARNING() << "Tool configuration already contain tool: " << devicename << ". Existing tool will be overwritten";
+		mTools[devicename] = newTool;
+		if(newTool->isReference())
+			mReference = newTool;
+	}
+	if(!mReference)
+		CX_LOG_WARNING() << "OpenIGTLinkTrackingSystemService::configure() Got no reference tool";
+
+	mState = Tool::tsCONFIGURED;//Setting state directly. Cannot get setState() to work with test
 }
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
+	if (!this->isConfigured())
+		return;
+
+	mState = Tool::tsNONE;//Setting state directly. Cannot get setState() to work with test
+
 	mTools.clear();
 	mReference.reset();
-	this->serverIsDeconfigured();
-}
-
-void OpenIGTLinkTrackingSystemService::initialize()
-{
-	//emit connectToServer();
-}
-
-void OpenIGTLinkTrackingSystemService::uninitialize()
-{
-	emit disconnectFromServer();
-}
-
-void OpenIGTLinkTrackingSystemService::startTracking()
-{
-	//emit startListenToServer();
-	//emit connectToServer();
-}
-
-void OpenIGTLinkTrackingSystemService::stopTracking()
-{
-	//emit stopListenToServer();
-	emit disconnectFromServer();
-}
-
-void OpenIGTLinkTrackingSystemService::serverIsConfigured()
-{
-	this->internalSetState(Tool::tsCONFIGURED);
-}
-
-void OpenIGTLinkTrackingSystemService::serverIsDeconfigured()
-{
-	this->internalSetState(Tool::tsNONE);
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsConnected()
 {
-	this->internalSetState(Tool::tsINITIALIZED);
-	this->internalSetState(Tool::tsTRACKING);
+	this->setState(Tool::tsINITIALIZED);
+	this->setState(Tool::tsTRACKING);
 }
 
 void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 {
-	this->internalSetState(Tool::tsCONFIGURED);
-	this->internalSetState(Tool::tsINITIALIZED);
+	this->setState(Tool::tsCONFIGURED);
+	this->setState(Tool::tsINITIALIZED);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D transform, double timestamp)
+void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
 {
 //	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
-	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
-	tool->toolTransformAndTimestampSlot(transform, timestamp);
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	if(tool)
+	{
+		tool->toolTransformAndTimestampSlot(transform, timestamp);
+	}
 }
 
-void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, Transform3D calibration)
+void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Transform3D calibration)
 {
 	CX_LOG_DEBUG() << "receiveCalibration for: " << devicename;
-	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
-	tool->setCalibration_sMt(calibration);
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
+	if(tool)
+		tool->setCalibration_sMt(calibration);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType, ProbeDefinitionPtr definition)
+void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
 {
-//	CX_LOG_DEBUG() << "receiveProbedefinition for: " << devicename << " equipmentType: " << equipmentType;
-	OpenIGTLinkToolPtr tool = this->getTool(devicename, equipmentType);
+	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	if(tool)
 	{
 		ProbePtr probe = tool->getProbe();
 		if(probe)
 		{
-			CX_LOG_DEBUG() << "receiveProbedefinition. Tool is probe: " << devicename;
 			ProbeDefinition old_def = probe->getProbeDefinition();
 			definition->setUid(old_def.getUid());
 			definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
@@ -189,38 +181,23 @@ void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename
 			probe->setProbeDefinition(*(definition.get()));
 			emit stateChanged();
 		}
-		else
-		{
-			CX_LOG_DEBUG() << "receiveProbedefinition. Tool is not probe: " << devicename;
-		}
 	}
 }
 
-void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State state)
-{
-	mState = state;
-	emit stateChanged();
-}
-
-OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType)
+OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 {
 //	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool: " << devicename;
-	OpenIGTLinkToolPtr retval;
-	std::map<QString, OpenIGTLinkToolPtr>::iterator it = mTools.find(devicename);
-	if(it == mTools.end())
-	{
-//		CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::getTool. Create new tool: " << devicename;
-		retval = OpenIGTLinkToolPtr(new OpenIGTLinkTool(devicename, equipmentType));
-		mTools[devicename] = retval;
-		//todo: will this work?
-		emit stateChanged();
-	}
-	else
-	{
-		retval = it->second;
-	}
 
-	return retval;
+	std::map<QString, OpenIGTLinkToolPtr>::iterator it;
+	for (it = mTools.begin(); it != mTools.end(); ++it)
+	{
+		OpenIGTLinkToolPtr tool = it->second;
+		if (tool->doIdCorrespondToTool(devicename))
+		{
+			return tool;
+		}
+	}
+	return OpenIGTLinkToolPtr();
 }
 
 

@@ -113,6 +113,11 @@ ProbeDefinitionFromStringMessages::ProbeDefinitionFromStringMessages() :
 	mSectorInfo(new SectorInfo)
 {}
 
+void ProbeDefinitionFromStringMessages::reset()
+{
+	mSectorInfo->reset();
+}
+
 void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message)
 {
 	QString name = QString(header.deviceName.c_str());

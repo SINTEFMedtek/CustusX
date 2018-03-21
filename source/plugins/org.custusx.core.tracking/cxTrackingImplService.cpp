@@ -218,6 +218,7 @@ void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service
 
 void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)
 {
+	Q_UNUSED(service);
 }
 
 void TrackingImplService::rebuildCachedTools()

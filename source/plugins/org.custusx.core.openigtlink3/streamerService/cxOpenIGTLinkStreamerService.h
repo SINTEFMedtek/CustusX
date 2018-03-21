@@ -20,13 +20,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
 
 
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamerService : public StreamerService
 {
 
 public:
-	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler);
+	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService);
     ~OpenIGTLinkStreamerService();
 
     virtual QString getName();
@@ -34,9 +35,20 @@ public:
     virtual std::vector<PropertyPtr> getSettings(QDomElement root);
     virtual StreamerPtr createStreamer(QDomElement root);
 
+private slots:
+	void stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
 private:
-    OpenIGTLinkStreamerPtr mStreamer;
+	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
+	TrackingServicePtr mTrackingService;
+	bool mStartedTrackingAndOpenIGTLinkFromHere;
+
+	StringPropertyBasePtr getIPOption(QDomElement root);
+	DoublePropertyBasePtr getStreamPortOption(QDomElement root);
+	BoolPropertyBasePtr trackAndStream(QDomElement root);
+	OpenIGTLinkTrackingSystemServicePtr getOpenIGTLinkTrackingSystemService();
+	void startTracking(QDomElement root);
+	void configureTracking(QDomElement root);
 };
 typedef boost::shared_ptr<OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
 } //namespace cx

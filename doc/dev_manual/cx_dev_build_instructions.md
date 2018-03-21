@@ -6,10 +6,10 @@ Recommended build procedure {#build_instructions2}
 
 Make sure you:
 * Are on a \ref supported_platforms (For building on newer operating systems it might be nessecary to change to the develop branch).
-* Fulfill the \ref prerequisites. 
+* Fulfill the \ref prerequisites.
 * Have a github account with [SSH authentication](https://help.github.com/articles/set-up-git/).
 
-Choose a root folder for the project, e.g. ~/dev/cx. It will be populated as described in \ref build_instructions_folder_structure.
+Choose a root folder for the project, e.g. `~/dev/cx`. It will be populated as described in \ref build_instructions_folder_structure.
 
 Then run the following commands in your user's home folder:
 
@@ -50,14 +50,11 @@ On Linux, one can most likely use the package manager to install the required so
 regular installers for:
 
  * **Xcode.** *Mac only.* Use the *App store* to download. You need to start *Xcode* after downloading it to finish the installation.
- * **CMake.** On Mac, add cmake to the PATH in your `.profile` file and restart the machine:
-
-   *export PATH="/Applications/CMake.app/Contents/bin:$PATH"*
-
+ * **CMake.** On Mac, add cmake to the PATH in your `.profile` file and restart the machine:<br>
+`export PATH=/Applications/CMake.app/Contents/bin:$PATH`
  * **Qt open source.** We use Qt Creator as our IDE. On Mac you might need to add a path to the Qt CMake files to your `.profile` file
-   (or .bashrc or .bash_profile) and restart the machine. Edit the path below so that it is correct on your machine:
-
-   *export CMAKE_PREFIX_PATH=/Users/"Your username"/"Qt installation path"/"Qt version number"/clang_64/lib/cmake*
+   (or .bashrc or .bash_profile) and restart the machine. Edit the path below so that it is correct on your machine:<br>
+   `export CMAKE_PREFIX_PATH=/Users/"Your username"/"Qt installation path"/"Qt version number"/clang_64/lib/cmake`
 
 
 
@@ -68,7 +65,7 @@ The following software can be installed on Mac as well through a package manager
  * **Cppunit.** For the tests.
  * **Glew**
  * **Doxygen.** To build the user/developer documentation.
- * **Ninja.** Increases build speed. The build script will detect that ninja is installed automatically.
+ * **[Ninja](https://ninja-build.org).** Increases build speed. The build script will detect that ninja is installed automatically.
 
 **Python and Git**: Make sure that you have *Python* and *Git* installed and that you can run them from the command line.
 To run the tests you need some additional python packages. You can use *pip* to install them:
@@ -83,7 +80,7 @@ recommended to download and use the regular installer from the web site.
 ### Windows
 
 The Windows build environment can be a bit harder to setup. After you have generated .ssh keys and
-cloned the *CustusX* repo, you can look for the Windows setup scripts in the *CX/install/platforms* folder.
+cloned the *CustusX* repo, you can look for the Windows setup scripts in the `CX/install/platforms` folder.
 There is a readme file to follow. Basically, the most of the instructions are found there.
 You must manually install *Visual studio* and then update the paths in the main script. The script will
 download and install many applications, including the ones described above. It will also create a folder
@@ -92,7 +89,7 @@ You will use this command to run the build script:
 
     CX/install/run_python.bat win64 PATH_to_CustusX_environment "cxInstaller.py --full --all --build_type Release --user_doc"
 
-After you have run the build script, you can use the *set_run_environment.bat* script in the build folder to start
+After you have run the build script, you can use the `set_run_environment.bat` script in the build folder to start
 *Qt Creator*. You also use this script to start the executable:
 
     CX/b_Release/set_run_environment.bat PATH_to_QtCreator
@@ -144,18 +141,18 @@ Some notes about running the tests on an installed (i.e. not built) version of *
 
  * At the time, some relative paths from the build machine excists in the *Catch* executable
    This means that you need to put the *data* repo in the corresponding location.
- * The script *cxRunTests.py* only works if you have installed *CustusX* in the same folder
+ * The script `cxRunTests.py` only works if you have installed *CustusX* in the same folder
    relative to the script, as if it was a built version. Also, the script doesn't work
    on a debug installation.
 
 ## Superbuild Folder Structure {#build_instructions_folder_structure}
 
-The default CustusX folder structure differs from the standard CMake source+build 
+The default CustusX folder structure differs from the standard CMake source+build
 structure. All libraries, CustusX included, are placed within a root folder,
 with source and build folders grouped according to library.
 
 The CustusX \ref dev_superbuild defines and sets up this structure. It is fully
-possible to use a different structure, in that case you must configure cmake 
+possible to use a different structure, in that case you must configure cmake
 yourself.
 
 |        |          |                |
@@ -168,4 +165,3 @@ yourself.
 |        |          | build_Release  |
 |        | some_lib | some_lib       |
 |        |          | build_Release  |
-

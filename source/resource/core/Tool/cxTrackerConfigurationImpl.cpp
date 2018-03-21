@@ -44,6 +44,16 @@ void TrackerConfigurationImpl::saveConfiguration(const Configuration& config)
 		ConfigurationFileParser::ToolStructure tool;
 		tool.mAbsoluteToolFilePath = absoluteToolPath;
 		tool.mReference = (absoluteToolPath == referencePath);
+
+		for (unsigned i = 0; i < config.mToolList.size(); ++i)
+		{
+			if(tool.mAbsoluteToolFilePath == config.mToolList[i].mAbsoluteToolFilePath)
+			{
+				tool.mOpenIGTLinkImageId = config.mToolList[i].mOpenIGTLinkImageId;
+				tool.mOpenIGTLinkTransformId = config.mToolList[i].mOpenIGTLinkTransformId;
+			}
+		}
+
 		toolStructureVector.push_back(tool);
 	}
 
@@ -77,6 +87,7 @@ TrackerConfiguration::Configuration TrackerConfigurationImpl::getConfiguration(Q
 
 	retval.mReferenceTool = parser.getAbsoluteReferenceFilePath();
 	retval.mTrackingSystemImplementation = parser.getTrackingSystemImplementation();
+	retval.mToolList = parser.getToolListWithMetaInformation();
 
 	return retval;
 }

@@ -43,6 +43,9 @@ public:
     virtual bool isStreaming();
 	virtual QString getType();
 
+signals:
+		void stoppedStreaming();
+
 public slots:
     void receivedConnected();
     void receivedDisconnected();

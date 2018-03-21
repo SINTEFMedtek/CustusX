@@ -301,14 +301,8 @@ void ViewWrapper2D::recreateMultiSlicer()
 
 std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
 {
-	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D());
-
-	if(this->isAnyplane())
-	{
-		std::vector<TrackedStreamPtr> streams = mGroupData->getTracked2DStreams(DataViewProperties::createSlice2D());
-		for(int i = 0; i < streams.size(); ++i)
-			images.push_back(streams[i]->getChangingImage());
-	}
+	bool include2D = this->isAnyplane();
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), include2D);
 	return images;
 }
 

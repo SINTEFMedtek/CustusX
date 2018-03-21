@@ -108,7 +108,7 @@ public:
 	virtual QString getUid() const = 0; ///< \return an unique id for this instance
 	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
 
-	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
+	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking is allowed
 	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
 	virtual void setCalibration_sMt(Transform3D calibration) { Q_UNUSED(calibration); } ///< requests to use the calibration and replaces the tools calibration file
 

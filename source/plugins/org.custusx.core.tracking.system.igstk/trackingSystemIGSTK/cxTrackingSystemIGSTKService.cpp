@@ -45,8 +45,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
-
 TrackingSystemIGSTKService::TrackingSystemIGSTKService()
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));

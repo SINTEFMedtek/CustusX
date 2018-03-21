@@ -17,6 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "boost/shared_ptr.hpp"
 #include <QStringList>
 
+#include "cxToolConfigurationParser.h"
+
 namespace cx
 {
 typedef boost::shared_ptr<class TrackerConfiguration> TrackerConfigurationPtr;
@@ -40,6 +42,7 @@ public:
 		QStringList mTools;
 		QString mReferenceTool;
 		QString mTrackingSystemImplementation;//Tracking system implementation (igstk or openigtlink)
+		std::vector<cx::ConfigurationFileParser::ToolStructure> mToolList;
 	};
 	struct Tool
 	{

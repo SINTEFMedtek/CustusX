@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioBaseConverter.h"
 
 #include "cxTransform3D.h"
+#include "cxToolConfigurationParser.h"
 
 class QStringList;
 
@@ -54,12 +55,9 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTool: public ToolImpl
     Q_OBJECT
 
 public:
-	OpenIGTLinkTool(QString uid, igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType);
+	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructurePtr toolFileToolStructure);
     virtual ~OpenIGTLinkTool();
 
-    virtual std::set<Type> getTypes() const;
-
-    virtual vtkPolyDataPtr getGraphicsPolyData() const;
     virtual bool getVisible() const;
     virtual bool isInitialized() const;
     virtual QString getUid() const;
@@ -76,22 +74,30 @@ public:
     //virtual void set_prMt(const Transform3D& prMt, double timestamp);
     virtual void setVisible(bool vis);
 
+	bool doIdCorrespondToTool(QString openIGTLinkId);
+	bool isReference();
+protected:
+	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:
     void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp); ///< timestamp is in milliseconds
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
 
 private:
-	std::set<Tool::Type> determineType(const igtlio::BaseConverter::EQUIPMENT_TYPE equipmentType) const;
-    bool isProbe() const;
-    void createPolyData();
-
-    vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
     ProbePtr mProbe;
     QTimer mTpsTimer;
     double mTimestamp;
-    std::set<Type> mTypes;
-    Transform3D m_sMt_calibration;
+		bool mVisible;
+		qint64 mLastReceivedPositionTime;
+		bool mPrintedWarningAboutTimeStampMismatch;
+
+		//Store these structures directly for now
+		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
+		ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
+
+		void calculateVisible();
+		void checkTimestampMismatch();
+		void printWarningAboutTimestampMismatch(double diff);
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 
