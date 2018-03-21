@@ -113,6 +113,8 @@ void OpenIGTLinkTrackingSystemService::configure()
 
 		QString devicename = internalTool->mUid;
 		OpenIGTLinkToolPtr newTool = OpenIGTLinkToolPtr(new OpenIGTLinkTool((*it), internalTool));
+		if(mTools.count(devicename))
+			CX_LOG_WARNING() << "Tool configuration already contain tool: " << devicename << ". Existing tool will be overwritten";
 		mTools[devicename] = newTool;
 		if(newTool->isReference())
 			mReference = newTool;
