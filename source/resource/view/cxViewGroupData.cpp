@@ -308,9 +308,9 @@ ViewGroupData::Options::Options() :
 }
 
 ViewGroupData::ViewGroupData(CoreServicesPtr services, QString uid) :
+	mUid(uid),
 	mServices(services),
-	mCamera3D(CameraData::create()),
-	mUid(uid)
+	mCamera3D(CameraData::create())
 {
 	if(mServices)
 		connect(mServices->patient().get(), &PatientModelService::dataAddedOrRemoved, this, &ViewGroupData::purgeDataNotExistingInPatientModelService);
@@ -340,7 +340,7 @@ void ViewGroupData::purgeDataNotExistingInPatientModelService()
 			++i;
 	}
 	//Emit delayed signals
-	for(unsigned i = 0; i < purged.size(); ++i)
+	for(int i = 0; i < purged.size(); ++i)
 		emit dataViewPropertiesChanged(purged[i]);
 }
 
@@ -522,25 +522,12 @@ std::vector<TrackedStreamPtr> ViewGroupData::getTrackedStreams(DataViewPropertie
 	return this->getDataOfType<TrackedStream>(properties);
 }
 
-std::vector<TrackedStreamPtr> ViewGroupData::getTracked2DStreams(DataViewProperties properties) const
-{
-	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
-	std::vector<TrackedStreamPtr> retval;
-
-	for(int i = 0; i < streams.size(); ++i)
-	{
-		if(streams[i]->is2D() )
-			retval.push_back(streams[i]);
-	}
-	return retval;
-}
-
 std::vector<ImagePtr> ViewGroupData::getImagesAndChangingImagesFromTrackedStreams(DataViewProperties properties, bool include2D) const
 {
 	std::vector<ImagePtr> images = this->getImages(properties);
 	std::vector<TrackedStreamPtr> streams = this->getTrackedStreams(properties);
 
-	for(int i = 0; i < streams.size(); ++i)
+	for(unsigned i = 0; i < streams.size(); ++i)
 	{
 		ImagePtr changingImage = streams[i]->getChangingImage();
 		if(streams[i]->is3D())

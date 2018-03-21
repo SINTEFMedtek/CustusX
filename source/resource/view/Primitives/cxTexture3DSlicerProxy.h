@@ -116,7 +116,7 @@ public:
 protected slots:
 	void transformChangedSlot();
 	void transferFunctionChangedSlot();
-	void imageChanged();
+	void uploadChangedImage(QString uid);
 
 protected:
 	Texture3DSlicerProxyImpl(SharedOpenGLContextPtr context);

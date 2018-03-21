@@ -273,7 +273,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data, bool resetTransferFunct
 
 	if (resetTransferFunctions)
 		this->resetTransferFunctions();
-	emit vtkImageDataChanged();
+	emit vtkImageDataChanged(mUid);
 }
 
 vtkImageDataPtr Image::get8bitGrayScaleVtkImageData()
@@ -642,7 +642,7 @@ void Image::parseXml(QDomNode& dataNode)
 	if (!interpoationNode.isNull())
 	{
 		mInterpolationType = interpoationNode.attribute("type").toInt();
-		emit vtkImageDataChanged();
+		emit vtkImageDataChanged(mUid);
 	}
 }
 
@@ -787,7 +787,7 @@ void Image::mergevtkSettingsIntosscTransform()
 
 	this->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(origin + extentShift));
 
-	emit vtkImageDataChanged();
+	emit vtkImageDataChanged(mUid);
 	emit clipPlanesChanged();
 	emit cropBoxChanged();
 }
@@ -858,7 +858,7 @@ void Image::setInterpolationType(int val)
 	if (mThresholdPreview)
 		return;
 	mInterpolationType = val;
-	emit vtkImageDataChanged();
+	emit vtkImageDataChanged(mUid);
 }
 int Image::getInterpolationType() const
 {
