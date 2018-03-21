@@ -28,6 +28,32 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestPlusReceiver.h"
 #include "cxtestIOReceiver.h"
 
+namespace
+{
+class igtlioServerClientFixture
+{
+public:
+	igtlio::LogicPointer logic;
+	igtlio::SessionPointer server;
+	igtlio::SessionPointer client;
+
+	void startServerAndClientAndConnect()
+	{
+		std::string ip = "localhost";
+		int port = 18944;
+
+		logic = igtlio::LogicPointer::New();
+
+		// Server default port should be 18944
+		// Verify this by not setting port on explicitly on server
+		server = logic->StartServer();
+		client = logic->ConnectToServer(ip, port);
+		REQUIRE(server);
+		REQUIRE(client);
+	}
+};
+}
+
 namespace cxtest
 {
 
@@ -130,36 +156,20 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 
 TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
-	std::string ip = "localhost";
-	int port = 18944;
+	igtlioServerClientFixture fixture;
+	fixture.startServerAndClientAndConnect();
 
-	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
-
-	// Server default port should be 18944
-	// Verify this by not setting port on explicitly on server
-	igtlio::SessionPointer server = logic->StartServer();
-	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
-	REQUIRE(server);
-	REQUIRE(client);
-
-	REQUIRE(client->GetConnector()->IsConnected());
-	REQUIRE(client->GetConnector()->Stop());
-	REQUIRE_FALSE(client->GetConnector()->IsConnected());
+	REQUIRE(fixture.client->GetConnector()->IsConnected());
+	REQUIRE(fixture.client->GetConnector()->Stop());
+	REQUIRE_FALSE(fixture.client->GetConnector()->IsConnected());
 }
 
 TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
-	std::string ip = "localhost";
-	int port = 18944;
+	igtlioServerClientFixture fixture;
+	fixture.startServerAndClientAndConnect();
 
-	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
-
-	igtlio::SessionPointer server = logic->StartServer(port);
-	igtlio::SessionPointer client = logic->ConnectToServer(ip, port);
-	REQUIRE(server);
-	REQUIRE(client);
-
-	igtlio::ConnectorPointer connector = client->GetConnector();
+	igtlio::ConnectorPointer connector = fixture.client->GetConnector();
 	REQUIRE(connector);
 
 	REQUIRE(connector->GetState() == igtlio::Connector::STATE_CONNECTED);
@@ -171,15 +181,15 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 
 	REQUIRE(connector->GetState() == igtlio::Connector::STATE_OFF);
 
-	connector = server->GetConnector();
+	connector = fixture.server->GetConnector();
 	REQUIRE(connector);
 	//Server connector is not connected?
 
-	REQUIRE(logic->RemoveConnector(client->GetConnector()));
-	REQUIRE_FALSE(logic->RemoveConnector(client->GetConnector()));
+	REQUIRE(fixture.logic->RemoveConnector(fixture.client->GetConnector()));
+	REQUIRE_FALSE(fixture.logic->RemoveConnector(fixture.client->GetConnector()));
 
-	REQUIRE(logic->RemoveConnector(server->GetConnector()));
-	REQUIRE_FALSE(logic->RemoveConnector(server->GetConnector()));
+	REQUIRE(fixture.logic->RemoveConnector(fixture.server->GetConnector()));
+	REQUIRE_FALSE(fixture.logic->RemoveConnector(fixture.server->GetConnector()));
 }
 
 TEST_CASE("Connect/disconnect using NetworkHandler, use default network port", "[plugins][org.custusx.core.openigtlink3][integration]")
