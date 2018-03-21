@@ -8,7 +8,9 @@ Surface to Pointer I2P Registration {#org_custusx_registration_method_pointcloud
 ===========================================================
 
 Use a tracked pointer to indicate the skin surface, then register to a skin
-surface segmented from image data.
+surface segmented from image data.<br>
+<span style="color:red">Note! This widget must be visible during active recording for pointer tracking data to be stored.</span><br>
+
 
 Steps:
 - Make sure an initial patient registration is in place (this method is local).

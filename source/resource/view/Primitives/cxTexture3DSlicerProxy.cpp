@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxTexture3DSlicerProxy.h"
@@ -381,7 +360,7 @@ void Texture3DSlicerProxyImpl::updateAndUploadImages(std::vector<ImagePtr> new_i
 	{
 		disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		disconnect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionChangedSlot()));
-		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+		disconnect(mImages[i].get(), SIGNAL(vtkImageDataChanged(QString)), this, SLOT(uploadChangedImage(QString)));
 	}
 
 	mImages = unsigned_images;
@@ -390,7 +369,7 @@ void Texture3DSlicerProxyImpl::updateAndUploadImages(std::vector<ImagePtr> new_i
 	{
 		connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionChangedSlot()));
-		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged()), this, SLOT(imageChanged()));
+		connect(mImages[i].get(), SIGNAL(vtkImageDataChanged(QString)), this, SLOT(uploadChangedImage(QString)));
 	}
 
 	//upload any new images to the gpu
@@ -656,10 +635,19 @@ void Texture3DSlicerProxyImpl::transferFunctionChangedSlot()
 	this->updateAndUploadColorAttribute();
 }
 
-void Texture3DSlicerProxyImpl::imageChanged()
+void Texture3DSlicerProxyImpl::uploadChangedImage(QString uid)
 {
 	mActor->Modified();
-	//TODO???
+
+	for (unsigned i = 0; i < mImages .size(); ++i)
+	{
+		ImagePtr image = mImages[i];
+		if(mImages[i]->getUid() == uid)
+		{
+			this->mSharedOpenGLContext->uploadImage(image);
+		}
+	}
+
 }
 
 
