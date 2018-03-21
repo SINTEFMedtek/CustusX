@@ -33,12 +33,12 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 	connect(mConnection.get(), &NetworkHandler::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
 	connect(mConnection.get(), &NetworkHandler::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
 
-	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, this, &OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClient);
+	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, this, &OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject);
 }
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
 {
-	this->stopTrackingAndOpenIGTLinkClient();
+	this->stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
 }
 
 QString OpenIGTLinkStreamerService::getName()
@@ -67,7 +67,7 @@ StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
 	return mStreamer;
 }
 
-void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClient()
+void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject()
 {
 	if(mStartedTrackingAndOpenIGTLinkFromHere)
 	{

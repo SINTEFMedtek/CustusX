@@ -36,7 +36,7 @@ public:
     virtual StreamerPtr createStreamer(QDomElement root);
 
 private slots:
-	void stopTrackingAndOpenIGTLinkClient();
+	void stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
 private:
 	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
