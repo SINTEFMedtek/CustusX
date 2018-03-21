@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxLogIOStreamRedirecter.h"
@@ -75,8 +54,7 @@ public:
 		Message msg(buffer, mMessageLevel);
 //		msg.mChannel = qstring_cast(mMessageLevel);
 		msg.mChannel = "stdout";
-		if (isValidMessage(buffer))
-			reporter()->sendMessage(msg);
+		reporter()->sendMessage(msg);
 	  }
 	  else
 	  {
@@ -96,23 +74,6 @@ public:
   {
 	  QMutexLocker sentry(&mOrigMutex);
 	  mOrig->sputn(sequence.toLatin1(), sequence.size());
-  }
-
-  bool isValidMessage(QString message)
-  {
-	  //Some tests fail when something is written in std::err, and VKT writes warnings here.
-	  //Temporary fix of failing tests:
-	  //Remove VTK Warnings about deprecated classes vtkVolumeTextureMapper3D and vtkOpenGLVolumeTextureMapper3D
-	  //VTK writes several lines for each warning
-	  if (message.contains("vtkVolumeTextureMapper3D") || message.contains("vtkOpenGLVolumeTextureMapper3D"))
-	  {
-//		  std::cout << "Found VTK deprecated message. Removing this for now." << std::endl;
-		  return false;
-	  }
-	  else if (message.isEmpty())
-		  return false;
-
-	  return true;
   }
 
 private:
