@@ -51,7 +51,7 @@ OpenIGTLinkTool::OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFi
 	this->toolVisibleSlot(true);
 }
 
-bool OpenIGTLinkTool::isThisTool(QString openIGTLinkId)
+bool OpenIGTLinkTool::doIdCorrespondToTool(QString openIGTLinkId)
 {
 	bool retval = false;
 	if(openIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkTransformId, Qt::CaseInsensitive) == 0)

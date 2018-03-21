@@ -74,7 +74,7 @@ public:
     //virtual void set_prMt(const Transform3D& prMt, double timestamp);
     virtual void setVisible(bool vis);
 
-	bool isThisTool(QString openIGTLinkId);
+	bool doIdCorrespondToTool(QString openIGTLinkId);
 	bool isReference();
 protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;

@@ -192,7 +192,7 @@ OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 	for (it = mTools.begin(); it != mTools.end(); ++it)
 	{
 		OpenIGTLinkToolPtr tool = it->second;
-		if (tool->isThisTool(devicename))
+		if (tool->doIdCorrespondToTool(devicename))
 		{
 			return tool;
 		}
