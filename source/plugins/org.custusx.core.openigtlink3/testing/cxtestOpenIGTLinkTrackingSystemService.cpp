@@ -107,7 +107,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool con
 	REQUIRE(config);
 	QStringList configurations = config->getAllConfigurations();
 
-	REQUIRE(configurations.size() > 1);
+	REQUIRE(configurations.size() > 1); //Test require that at least one tool configuration is present. Normally there should be many
 
 	//Use one of the tool config files with PLUS tools
 	int posOfPlusConfigToolFile = 0;
@@ -125,7 +125,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool con
 //			CX_LOG_DEBUG() << "Tool config file (not PLUS): " << configurations[i];
 	}
 
-	REQUIRE(foundPlusToolConfigFile);
+	REQUIRE(foundPlusToolConfigFile);// Test require that at leat one tool configuration using PLUS is present.
 	QString toolConfigFile = configurations[posOfPlusConfigToolFile];
 	CX_LOG_DEBUG() << "Using PLUS tool config file: " << toolConfigFile;
 	trackingSystemService->setConfigurationFile(toolConfigFile);
