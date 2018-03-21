@@ -96,7 +96,7 @@ bool MessageListener::containsErrors() const
 	{
 		if (this->isError(i->getMessageLevel()))
 		{
-			std::cout << "******* MessageListener::containsErrors() Found Error: " << i->getText() <<"\n";
+			std::cout << "MessageListener::containsErrors() Found Error: " << i->getText() <<"\n";
 			return true;
 		}
 	}
