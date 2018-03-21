@@ -50,14 +50,11 @@ On Linux, one can most likely use the package manager to install the required so
 regular installers for:
 
  * **Xcode.** *Mac only.* Use the *App store* to download. You need to start *Xcode* after downloading it to finish the installation.
- * **CMake.** On Mac, add cmake to the PATH in your `.profile` file and restart the machine:
-
-   ```export PATH="/Applications/CMake.app/Contents/bin:$PATH"```
-
+ * **CMake.** On Mac, add cmake to the PATH in your `.profile` file and restart the machine:<br>
+`export PATH=/Applications/CMake.app/Contents/bin:$PATH`
  * **Qt open source.** We use Qt Creator as our IDE. On Mac you might need to add a path to the Qt CMake files to your `.profile` file
-   (or .bashrc or .bash_profile) and restart the machine. Edit the path below so that it is correct on your machine:
-
-   ```export CMAKE_PREFIX_PATH=/Users/"Your username"/"Qt installation path"/"Qt version number"/clang_64/lib/cmake```
+   (or .bashrc or .bash_profile) and restart the machine. Edit the path below so that it is correct on your machine:<br>
+   `export CMAKE_PREFIX_PATH=/Users/"Your username"/"Qt installation path"/"Qt version number"/clang_64/lib/cmake`
 
 
 
