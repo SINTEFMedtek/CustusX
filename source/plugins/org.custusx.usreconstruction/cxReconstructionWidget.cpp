@@ -149,6 +149,8 @@ QWidget* ReconstructionWidget::createOptionsWidget()
 
 	sscCreateDataWidget(this, mReconstructer->getParam("Align timestamps"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Extra Temporal Calib"), layout, line++);
+    sscCreateDataWidget(this, mReconstructer->getParam("Position Thinning"), layout, line++);
+    sscCreateDataWidget(this, mReconstructer->getParam("Position Filter Strength"), layout, line++);
 	sscCreateDataWidget(this, mReconstructer->getParam("Reduce mask (% in 1D)"), layout, line++);
 
 	return retval;

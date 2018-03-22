@@ -43,12 +43,16 @@ public:
 		InputParams() :
 			mExtraTimeCalibration(0),
 			mAlignTimestamps(false),
+            mPositionThinning(false),
+            mPosFilterStrength(0),
 			mMaskReduce(0),
 			mAngio(false),
 			mMaxOutputVolumeSize(1024*1024)
 		{}
 		double mExtraTimeCalibration;
 		bool mAlignTimestamps;
+        bool mPositionThinning;
+        double mPosFilterStrength;
 		double mMaskReduce;
 		QString mOrientation;
 

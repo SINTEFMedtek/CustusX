@@ -82,11 +82,24 @@ void ReconstructParams::createParameters()
 	connect(mMaskReduce.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
 	this->add(mMaskReduce);
 
-	mAlignTimestamps = BoolProperty::initialize("Align timestamps", "",
+    mPosFilterStrength = StringProperty::initialize("Position Filter Strength", "",
+        "Strength of position data prefiltering - 0 means off", "2",
+        QString("0 1 2 3 4 5 6 7").split(" "),
+        mSettings.getElement());
+    connect(mPosFilterStrength.get(), &StringProperty::valueWasSet, this, &ReconstructParams::changedInputSettings);
+    this->add(mPosFilterStrength);
+
+    mAlignTimestamps = BoolProperty::initialize("Align timestamps", "",
 		"Align the first of tracker and frame timestamps, ignoring lags.", false,
 		mSettings.getElement());
 	connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
 	this->add(mAlignTimestamps);
+
+    mPositionThinning = BoolProperty::initialize("Position Thinning", "",
+        "If 'on', tracking positions that deviate greatly from neighbours will be replaced with an interpolated value", false,
+        mSettings.getElement());
+    connect(mPositionThinning.get(), SIGNAL(valueWasSet()), this, SIGNAL(changedInputSettings()));
+    this->add(mPositionThinning);
 
 	mTimeCalibration = DoubleProperty::initialize("Extra Temporal Calib", "",
 		"Set an offset in the frame timestamps, in addition to the one used in acquisition", 0.0,

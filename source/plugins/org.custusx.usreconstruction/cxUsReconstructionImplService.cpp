@@ -244,6 +244,8 @@ ReconstructCore::InputParams UsReconstructionImplService::createCoreParameters()
 	par.mMaxOutputVolumeSize = mParams->getMaxVolumeSize()->getValue();
 	par.mExtraTimeCalibration = mParams->getTimeCalibration()->getValue();
 	par.mAlignTimestamps = mParams->getAlignTimestamps()->getValue();
+    par.mPositionThinning = mParams->getPositionThinning()->getValue();
+    par.mPosFilterStrength = mParams->getPosFilterStrength()->getValue().toDouble();;
 	par.mMaskReduce = mParams->getMaskReduce()->getValue().toDouble();
 	par.mOrientation = mParams->getOrientationAdapter()->getValue();
 	return par;

@@ -47,6 +47,7 @@ struct cxResource_EXPORT USReconstructInputDataAlgorithm
       * temporal distance from the frame to the two neighbouring tool positions.
       *
       */
+
     static std::vector<double> interpolateFramePositionsFromTracking(USReconstructInputData *data);
     /**
      * Interpolation between a and b
