@@ -28,15 +28,18 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkStreamerService : public S
 
 public:
 	OpenIGTLinkStreamerService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService);
-    ~OpenIGTLinkStreamerService();
+	~OpenIGTLinkStreamerService();
+	
+	virtual QString getName();
+	virtual QString getType() const;
+	virtual std::vector<PropertyPtr> getSettings(QDomElement root);
+	virtual StreamerPtr createStreamer(QDomElement root);
 
-    virtual QString getName();
-    virtual QString getType() const;
-    virtual std::vector<PropertyPtr> getSettings(QDomElement root);
-    virtual StreamerPtr createStreamer(QDomElement root);
-
-private slots:
+	BoolPropertyBasePtr trackAndStream(QDomElement root);
+	
+public slots:
 	void stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
+
 private:
 	OpenIGTLinkStreamerPtr mStreamer;
 	NetworkHandlerPtr mConnection;
@@ -45,7 +48,6 @@ private:
 
 	StringPropertyBasePtr getIPOption(QDomElement root);
 	DoublePropertyBasePtr getStreamPortOption(QDomElement root);
-	BoolPropertyBasePtr trackAndStream(QDomElement root);
 	OpenIGTLinkTrackingSystemServicePtr getOpenIGTLinkTrackingSystemService();
 	void startTracking(QDomElement root);
 	void configureTracking(QDomElement root);

@@ -13,6 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "qIGTLIOClientWidget.h"
 #include "qIGTLIOLogicController.h"
+#include "cxPlusconnectWidget.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -39,6 +41,13 @@ std::vector<GUIExtenderService::CategorizedWidget> OpenIGTLink3GuiExtenderServic
 
 	std::vector<CategorizedWidget> retval;
 	retval.push_back(GUIExtenderService::CategorizedWidget( widget, "OpenIGTLink"));
+
+
+	VisServicesPtr services = VisServices::create(mContext);
+
+	PlusConnectWidget* plusconnectWidget = new PlusConnectWidget(services, NULL);
+	retval.push_back(GUIExtenderService::CategorizedWidget(plusconnectWidget, "OpenIGTLink"));
+
 	return retval;
 }
 }//namespace cx

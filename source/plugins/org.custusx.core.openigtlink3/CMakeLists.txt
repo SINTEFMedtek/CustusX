@@ -10,6 +10,8 @@ set(PLUGIN_SRCS
 
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.h
     guiExtenderService/cxOpenIGTLinkGuiExtenderService.cpp
+    guiExtenderService/cxPlusConnectWidget.h
+    guiExtenderService/cxPlusConnectWidget.cpp
 
     network/cxNetworkHandler.cpp
     network/cxProbeDefinitionFromStringMessages.h
@@ -49,6 +51,8 @@ set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     cxGUIExtenderService
     cxResource
+    cxResourceWidgets
+    cxResourceVisualization
     cxPluginUtilities
     igtlioLogic
     igtlioDevices
