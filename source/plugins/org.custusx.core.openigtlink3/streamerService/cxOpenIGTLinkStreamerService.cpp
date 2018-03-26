@@ -27,6 +27,7 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 	mTrackingService(trackingService),
 	mStartedTrackingAndOpenIGTLinkFromHere(false)
 {
+	CX_LOG_DEBUG() << "OpenIGTLinkStreamerService constr";
     mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
 
 	connect(mConnection.get(), &NetworkHandler::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
@@ -43,12 +44,12 @@ OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
 
 QString OpenIGTLinkStreamerService::getName()
 {
-	return "OpenIGTLink streamer 3";
+	return "OpenIGTLink 3 streamer";
 }
 
 QString OpenIGTLinkStreamerService::getType() const
 {
-	return "openigtlink_streamer3";
+	return OPENIGTLINK3_STREAMER;
 }
 
 std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
@@ -67,8 +68,14 @@ StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
 	return mStreamer;
 }
 
+void OpenIGTLinkStreamerService::stop()
+{
+	this->stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
+}
+
 void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject()
 {
+	CX_LOG_DEBUG() << "stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject";
 	if(mStartedTrackingAndOpenIGTLinkFromHere)
 	{
 		mConnection->disconnectFromServer();

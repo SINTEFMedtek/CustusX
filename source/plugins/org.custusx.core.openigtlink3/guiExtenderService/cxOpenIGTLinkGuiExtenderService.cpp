@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxOpenIGTLinkGuiExtenderService.h"
 #include "qIGTLIOClientWidget.h"
 #include "qIGTLIOLogicController.h"
-#include "cxPlusconnectWidget.h"
+#include "cxPlusConnectWidget.h"
 #include "cxVisServices.h"
 
 namespace cx

@@ -32,6 +32,7 @@ public:
     virtual ~StreamerServiceProxy() {}
     virtual QString getName();
     virtual QString getType() const;
+		virtual void stop();
 
     virtual std::vector<PropertyPtr> getSettings(QDomElement root);
     virtual StreamerPtr createStreamer(QDomElement root);

@@ -12,31 +12,36 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXPLUSCONNECTWIDGET_H
 #define CXPLUSCONNECTWIDGET_H
 
-//#include <QWidget>
+#include <QProcess>
 #include "cxTabbedWidget.h"
 
 class QPushButton;
+class QDomElement;
 
 namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
+typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
 
 class PlusConnectWidget : public BaseWidget
 {
-//  Q_OBJECT
 public:
-  PlusConnectWidget(VisServicesPtr services, QWidget *parent);
+	PlusConnectWidget(VisServicesPtr services, QWidget *parent);
 private slots:
-  void connectButtonClickedSlot();
+	void connectButtonClickedSlot();
 
 private:
-  VisServicesPtr mServices;
-  QPushButton* mConnectButton;
-  bool mPlusRunning;
-  OpenIGTLinkStreamerServicePtr getOpenIGTLinkStreamerService();
-  bool startPlus();
-  bool stopPlus();
+	VisServicesPtr mServices;
+	QPushButton* mConnectButton;
+	bool mPlusRunning;
+	QProcess* mExternalProcess;
+
+	void turnOnStartTrackingInOpenIGTLinkStreamer(StreamerServicePtr streamerService);
+	StreamerServicePtr getStreamerService();
+	bool startPlus();
+	bool stopPlus();
+	QDomElement getXmlVideoElement();
 };
 
 }//namespace cx

@@ -9,7 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
-#include "cxPlusconnectWidget.h"
+#include "cxPlusConnectWidget.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -28,8 +28,10 @@ namespace cx
 PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
   BaseWidget(parent, "plus_connect_widget" ,"Connect to PLUS"),
   mServices(services),
-  mPlusRunning(false)
+	mPlusRunning(false),
+	mExternalProcess(new QProcess(this))
 {
+
   QHBoxLayout* layout = new QHBoxLayout(this);
 
 	mConnectButton = new QPushButton(START_TEXT);
@@ -69,41 +71,59 @@ void PlusConnectWidget::connectButtonClickedSlot()
 }
 bool PlusConnectWidget::stopPlus()
 {
-	OpenIGTLinkStreamerServicePtr streamerService = this->getOpenIGTLinkStreamerService();
+	StreamerServicePtr streamerService = this->getStreamerService();
 	if(!streamerService)
 		return false;
 
-	streamerService->stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
+	//TODO trigger stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject
+//	streamerService->stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
+
+//	streamerService->stop();
 
 	return true;
 }
 
 bool PlusConnectWidget::startPlus()
 {
-	OpenIGTLinkStreamerServicePtr streamerService = this->getOpenIGTLinkStreamerService();
+	StreamerServicePtr streamerService = this->getStreamerService();
 	if(!streamerService)
 		return false;
 
-	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
-	QDomElement element = xmlFile.getElement("video");
-
-	streamerService->trackAndStream(element)->setValue(true);
-	streamerService->createStreamer(element);
+	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
+	streamerService->createStreamer(this->getXmlVideoElement());
 
 	return true;
 }
 
-OpenIGTLinkStreamerServicePtr PlusConnectWidget::getOpenIGTLinkStreamerService()
+QDomElement PlusConnectWidget::getXmlVideoElement()
 {
-	StreamerServicePtr streamer = mServices->video()->getStreamerService("openigtlink_streamer3");
+	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
+	QDomElement element = xmlFile.getElement("video");
+	return element;
+}
+
+void PlusConnectWidget::turnOnStartTrackingInOpenIGTLinkStreamer(StreamerServicePtr streamerService)
+{
+	QDomElement element = this->getXmlVideoElement();
+
+	std::vector<PropertyPtr> settings = streamerService->getSettings(element);
+	for(unsigned i = 0; i < settings.size(); ++i)
+	{
+		if (settings[i]->getUid().contains("start_tracking"))
+		{
+			CX_LOG_DEBUG() << "Turning on track and stream in OpenIGTLinkStreamer";
+			settings[i]->setValueFromVariant(true);
+		}
+	}
+}
+
+StreamerServicePtr PlusConnectWidget::getStreamerService()
+{
+	StreamerServicePtr streamer = mServices->video()->getStreamerService(OPENIGTLINK3_STREAMER);
 	if(!streamer)
 		CX_LOG_WARNING() << "PlusConnectWidget::getOpenIGTLinkStreamerService(): Cannot get StreamerServicePtr";
 
-	OpenIGTLinkStreamerServicePtr openIGTLinkStreamerService = boost::dynamic_pointer_cast<OpenIGTLinkStreamerService>(streamer);
-	if(!openIGTLinkStreamerService)
-		CX_LOG_WARNING() << "PlusConnectWidget::getOpenIGTLinkStreamerService(): Cannot get OpenIGTLinkStreamerService";
-
-	return openIGTLinkStreamerService;
+	return streamer;
 }
 
 }//namespace cx
