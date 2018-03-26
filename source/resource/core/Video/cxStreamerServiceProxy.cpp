@@ -35,7 +35,7 @@ QString StreamerServiceProxy::getType() const
 
 void StreamerServiceProxy::stop()
 {
-//	return mStreamerService->stop();
+	return mStreamerService->stop();
 }
 
 std::vector<PropertyPtr> StreamerServiceProxy::getSettings(QDomElement root)

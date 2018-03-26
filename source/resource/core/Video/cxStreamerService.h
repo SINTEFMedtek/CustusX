@@ -48,7 +48,7 @@ public:
 	StreamerService() {}
 	virtual QString getName() = 0;
 	virtual QString getType() const  = 0;
-//	virtual void stop() = 0;
+//	virtual void testZZZ() {} //TODO: Check - uncommenting this cause seg fault??? Also moving stop() line (62) up here causes seg fault.
 	/**
 	 *  Fill settings for this algorithm.
 	 *  Input is the root node for this algo, filled with stored settings (if any).
@@ -59,6 +59,7 @@ public:
 	 * Return a streamer that can emit image data.
 	 */
 	virtual StreamerPtr createStreamer(QDomElement root) = 0;
+	virtual void stop() = 0;
 };
 
 /**

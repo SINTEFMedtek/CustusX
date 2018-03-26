@@ -75,10 +75,8 @@ bool PlusConnectWidget::stopPlus()
 	if(!streamerService)
 		return false;
 
-	//TODO trigger stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject
-//	streamerService->stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
-
-//	streamerService->stop();
+	//Trigger stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject
+	streamerService->stop();
 
 	return true;
 }
