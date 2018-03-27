@@ -28,6 +28,7 @@ typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
 typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 class FileSelectWidget;
+class FilePreviewWidget;
 
 class PlusConnectWidget : public BaseWidget
 {
@@ -51,6 +52,7 @@ private:
 	QString mPlusPath;
 	QString mPlusConfigFile;
 	FileSelectWidget* mPlusConfigFileWidget;
+	FilePreviewWidget* mFilePreviewWidget;
 	QComboBox* mPlusPathComboBox;
 	BoolPropertyPtr mShowPlusOutput;
 

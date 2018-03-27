@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxFileSelectWidget.h"
 #include "cxCheckBoxWidget.h"
+#include "cxFilePreviewWidget.h"
 
 #define START_TEXT "Start PLUS server and connect tracking and streaming"
 #define STOP_TEXT "Stop PLUS server and disconnect tracking and streaming"
@@ -41,6 +42,7 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
   mServices(services),
 	mPlusRunning(false),
 	mExternalProcess(new ProcessWrapper("PLUS")),
+	mFilePreviewWidget(NULL),
 	mPlusPathComboBox(NULL)
 {
 	QVBoxLayout* toplayout = new QVBoxLayout(this);
@@ -89,8 +91,15 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 	mConnectButton->setToolTip("Remove all saved clip planes from the selected volume");
 	connect(mConnectButton, &QPushButton::clicked, this, &PlusConnectWidget::connectButtonClickedSlot);
 	layout->addWidget(mConnectButton, line, 0, 1, 3);
+	++line;
 
-	toplayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+	mFilePreviewWidget = new FilePreviewWidget(this);
+	mFilePreviewWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	layout->addWidget(mFilePreviewWidget, line, 0, 1, 3);
+	++line;
+
+
+//	toplayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	connect(mExternalProcess.get(), &ProcessWrapper::stateChanged, this, &PlusConnectWidget::plusAppStateChanged);
 }
@@ -145,6 +154,8 @@ void PlusConnectWidget::configFileFileSelected(QString filename)
 
 	QFileInfo fileinfo(filename);
 	mPlusConfigFileWidget->setPath(fileinfo.absolutePath());
+
+	mFilePreviewWidget->previewFileSlot(filename);
 }
 
 

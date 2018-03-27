@@ -53,10 +53,12 @@ Widget for connecting to PLUS easily.
 
 - Make sure a path to PlusServer is selected.
   For this field to be autoselected requires PLUS to be compiled/installed on the default location: ```dev/plus-2.6/PlusB-bin/bin/PlusServer``` (See below for instructions).
-- Select a PLUS config file.
+- Select a PLUS config file. This file must correspond to the CustusX tool file.
 - Use the `Show PLUS output` checkbox to show command line output from PlusServer in the console.
 
-
+### Creating PLUS config files and matching CustusX tool config files
+- The `Transform Name` in the transform messages from PLUS (sent as deviceName in transform OpenIGTLink messages) must correspond to the `openigtlinktransformid` tag in the CustusX tool config file.
+- The deviceName in Image OpenIGTLink messages must correspond to the `openigtlinkimageid` tag in the CustusX tool config file. These are in PLUS created as a combination of `Image Name` and `EmbeddedTransformToFrame`, with an underscore `_` between.
 
 ### Build PLUS 2.6 for CustusX racks with Ubuntu 16.04
 Build PLUS on the developer user - then it will be available for all users on the rack computer.
