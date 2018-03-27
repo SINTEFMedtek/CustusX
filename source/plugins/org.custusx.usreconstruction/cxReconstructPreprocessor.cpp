@@ -34,7 +34,10 @@ ReconstructPreprocessor::ReconstructPreprocessor(PatientModelServicePtr patientM
 	mInput(ReconstructCore::InputParams()),
 	mPatientModelService(patientModelService)
 {
-	mMaxTimeDiff = 100; // TODO: Change default value for max allowed time difference between tracking and image time tags
+    mMaxTimeDiff = 250; // TODO: Change default value for max allowed time difference between tracking and image time tags
+    // TODO Legg inn andre rekonstruksjonsparametre?
+    //
+    //
 }
 
 ReconstructPreprocessor::~ReconstructPreprocessor()
@@ -182,6 +185,66 @@ struct RemoveDataType
 	int count;
 	double err;
 };
+
+void ReconstructPreprocessor::filterPositions()
+{
+    int filterStrength = mInput.mPosFilterStrength;
+
+    if (filterStrength > 0) //Position filter enabled
+    {
+        int filterLength(1+2*filterStrength);
+        int nPositions(mFileData.mPositions.size());
+        if (nPositions > filterLength) //Position sequence sufficient long
+        {
+            // Define quaternion array
+            Eigen::ArrayXXd qPosArray(7,(nPositions+(2*filterStrength))); // Add room for FIR-filtering
+            Transform3D localTx;
+            Eigen::Quaterniond qA;
+
+            unsigned int sourceIdx(0);
+            for (unsigned int i = 0; i < (nPositions+(2*filterStrength)); i++)
+            {
+
+                // Convert to quaternions
+                sourceIdx =  (i > filterStrength) ? (i-filterStrength) : 0; // Pad array with edge elements
+                sourceIdx =  (sourceIdx < nPositions) ? sourceIdx : (nPositions-1);
+
+                localTx = mFileData.mPositions[sourceIdx].mPos;
+
+                qPosArray.block<3,1>(4,i) = localTx.matrix().block<3, 1>(0,3); // Translation part
+                qA = Eigen::Quaterniond(localTx.matrix().block<3, 3>(0,0)); //Convert rot to quaternions
+                qPosArray.block<4,1>(0,i) = qA.coeffs(); //Rotation parameters
+
+            }
+
+            // Filter quaternion arrays (simple averaging filter)
+            Eigen::ArrayXXd qPosFiltered = Eigen::ArrayXXd::Zero(7,nPositions); // Fill with zeros
+            for (unsigned int i = 0; i < (1+2*filterStrength); i++)
+            {
+                qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,nPositions);
+            }
+            qPosFiltered = qPosFiltered / (1+2*filterStrength);
+
+            for (unsigned int i = 0; i < mFileData.mPositions.size(); i++)
+            {
+                // Convert back to position data
+                qA.coeffs() = qPosFiltered.block<4,1>(0,i);
+                localTx.matrix().block<3, 3>(0,0) = qA.toRotationMatrix();
+                localTx.matrix().block<3, 1>(0,3) = qPosFiltered.block<3,1>(4,i);
+                mFileData.mPositions[i].mPos = localTx;
+            }
+        }
+    }
+
+}
+
+void ReconstructPreprocessor::positionThinning()
+{
+    // If enabled, try to remove "suspect" data (large jumps etc.)
+    // Replace tracking positions that deviate greatly from neighbours with an interpolated value
+
+}
+
 
 /**
  * Find interpolated position values for each frame based on the input position
@@ -417,6 +480,11 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 	// Use the time calibration from the acquisition module
 	//this->calibrateTimeStamps(0.0, 1.0);
 	this->applyTimeCalibration();
+
+    // Smooth tracking data before further processing
+    // User preferences apply
+    //this->positionThinning(); //Do thinning before filtering if enabled
+    this->filterPositions();
 
 	cx::USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(&mFileData);
 	//mPos (in mPositions) is now prMu

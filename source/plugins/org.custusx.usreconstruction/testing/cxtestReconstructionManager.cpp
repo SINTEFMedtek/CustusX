@@ -45,6 +45,7 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 	reconstructer->selectData(inputData);
 	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
+	reconstructer->getParam("Position Filter Strength")->setValueFromVariant("0");
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
 
@@ -124,6 +125,7 @@ TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstru
 	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");//default
 	reconstructer->getParam("Angio data")->setValueFromVariant(true);
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
+	reconstructer->getParam("Position Filter Strength")->setValueFromVariant("0");
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
 
@@ -145,6 +147,7 @@ TEST_CASE("ReconstructManager: Threaded Dual Angio on real data", "[usreconstruc
 	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");//default
 	reconstructer->getParam("Angio data")->setValueFromVariant(true);
 	reconstructer->getParam("Dual Angio")->setValueFromVariant(true);
+	reconstructer->getParam("Position Filter Strength")->setValueFromVariant("0");
 
 	// set an algorithm-specific parameter
 	fixture.setPNN_InterpolationSteps(1);
