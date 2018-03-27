@@ -27,7 +27,6 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 	mTrackingService(trackingService),
 	mStartedTrackingAndOpenIGTLinkFromHere(false)
 {
-	CX_LOG_DEBUG() << "OpenIGTLinkStreamerService constr";
     mStreamer = OpenIGTLinkStreamerPtr(new OpenIGTLinkStreamer());
 
 	connect(mConnection.get(), &NetworkHandler::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
@@ -75,7 +74,6 @@ void OpenIGTLinkStreamerService::stop()
 
 void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject()
 {
-	CX_LOG_DEBUG() << "stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject";
 	if(mStartedTrackingAndOpenIGTLinkFromHere)
 	{
 		mConnection->disconnectFromServer();

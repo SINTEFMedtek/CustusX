@@ -116,11 +116,9 @@ QStringList PlusConnectWidget::getPlusConfigFilePaths()
 
 void PlusConnectWidget::searchForPlusConfigFile()
 {
-	CX_LOG_DEBUG() << "searchForPlusConfigFile";
 	// CustusX app folder config/tool
 //	QString possiblePath = QDir::homePath() + "/dev/plus-2.6/PlusB-bin/bin/PlusServer";
 	QString possiblePath = DataLocations::getRootConfigPath() + "/plus/PlusDeviceSet_Server_Bk_Polaris.xml";
-	CX_LOG_DEBUG() << "possiblePath: " << possiblePath;
 
 	if(QFile::exists(possiblePath))
 	{
@@ -131,7 +129,6 @@ void PlusConnectWidget::searchForPlusConfigFile()
 
 void PlusConnectWidget::browsePlusPathSlot()
 {
-//	CX_LOG_DEBUG() << "browsePlusPathSlot";
 	QFileInfo fileInfo(mPlusPath);
 	mPlusPath = QFileDialog::getOpenFileName(this, tr("Find PLUS executable"), fileInfo.absolutePath());
 
@@ -178,33 +175,22 @@ void PlusConnectWidget::connectButtonClickedSlot()
 }
 bool PlusConnectWidget::stopPlus()
 {
-	CX_LOG_DEBUG() << "PlusConnectWidget::stopPlus()";
 	StreamerServicePtr streamerService = this->getStreamerService();
 	if(!streamerService)
 		return false;
 
-	CX_LOG_DEBUG() << "PlusConnectWidget::stopPlus() 2";
 	//Trigger OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject
-	streamerService->stop();//Takes to long ??? (GUI freeze for 8 sec)
+	streamerService->stop();
 
-//	mExternalProcess->close();
-//	return mExternalProcess->waitForFinished(1000);
-
-
-	CX_LOG_DEBUG() << "PlusConnectWidget::stopPlus() 3";
 	if(mExternalProcess->isRunning())
 		mExternalProcess->getProcess()->close();
 
-	CX_LOG_DEBUG() << "PlusConnectWidget::stopPlus() 4";
 	//Stop output
 	disconnect(mExternalProcess->getProcess(), &QProcess::readyRead, this, &PlusConnectWidget::processReadyRead);
 
-	CX_LOG_DEBUG() << "PlusConnectWidget::stopPlus() 5";
 
 	return mExternalProcess->waitForFinished(1000);
 //	mExternalProcess.reset();
-
-//	return true;
 }
 
 bool PlusConnectWidget::startPlus()
@@ -216,7 +202,6 @@ bool PlusConnectWidget::startPlus()
 	if(!this->startExternalPlusServer())
 		 return false;
 
-	CX_LOG_DEBUG() << "Plus Running?";
 	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
 	streamerService->createStreamer(this->getXmlVideoElement());
 
@@ -225,8 +210,6 @@ bool PlusConnectWidget::startPlus()
 
 void PlusConnectWidget::plusAppStateChanged()
 {
-	CX_LOG_DEBUG() << "got plusAppStateChanged. Process state: " << mExternalProcess->getProcess()->state();
-
 	if(mExternalProcess->getProcess()->state() == QProcess::Starting)
 	{
 		mConnectButton->setText("PLUS starting...");
@@ -256,7 +239,6 @@ bool PlusConnectWidget::startExternalPlusServer()
 	QStringList arguments;
 
 	arguments << QString("--config-file=").append(mPlusConfigFile);
-//	CX_LOG_DEBUG() << "Running: " << mPlusPath << " " << arguments.join(" ");
 
 	//Show PLUS output
 	if(mShowPlusOutput->getValue())
@@ -267,9 +249,7 @@ bool PlusConnectWidget::startExternalPlusServer()
 		process->setReadChannel(QProcess::StandardOutput);
 	}
 
-	CX_LOG_DEBUG() << "Going to launch PlusServer";
 	mExternalProcess->launch(mPlusPath, arguments);
-	CX_LOG_DEBUG() << "PlusServer launched";
 	return mExternalProcess->waitForStarted(1000);
 }
 
@@ -287,7 +267,6 @@ bool PlusConnectWidget::configFileIsValid()
 
 void PlusConnectWidget::processReadyRead()
 {
-	CX_LOG_DEBUG() << "got processReadyRead";
 	report(QString(mExternalProcess->getProcess()->readAllStandardOutput()));
 }
 
