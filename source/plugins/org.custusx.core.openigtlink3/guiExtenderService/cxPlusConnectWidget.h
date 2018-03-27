@@ -17,31 +17,53 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 class QPushButton;
 class QDomElement;
+class QComboBox;
 
 namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class OpenIGTLinkStreamerService> OpenIGTLinkStreamerServicePtr;
 typedef boost::shared_ptr<class StreamerService> StreamerServicePtr;
+typedef boost::shared_ptr<class ProcessWrapper> ProcessWrapperPtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
+class FileSelectWidget;
 
 class PlusConnectWidget : public BaseWidget
 {
 public:
 	PlusConnectWidget(VisServicesPtr services, QWidget *parent);
+
 private slots:
 	void connectButtonClickedSlot();
+	void browsePlusPathSlot();
+	void plusAppStateChanged();
 
+//	void browsePlusConfigFileSlot();
+	void configFileFileSelected(QString filename);
+	void processReadyRead();
 private:
 	VisServicesPtr mServices;
 	QPushButton* mConnectButton;
 	bool mPlusRunning;
-	QProcess* mExternalProcess;
+	ProcessWrapperPtr mExternalProcess;
+
+	QString mPlusPath;
+	QString mPlusConfigFile;
+	FileSelectWidget* mPlusConfigFileWidget;
+	QComboBox* mPlusPathComboBox;
+	BoolPropertyPtr mShowPlusOutput;
 
 	void turnOnStartTrackingInOpenIGTLinkStreamer(StreamerServicePtr streamerService);
 	StreamerServicePtr getStreamerService();
 	bool startPlus();
 	bool stopPlus();
 	QDomElement getXmlVideoElement();
+	bool startExternalPlusServer();
+	void searchForPlus();
+	void searchForPlusConfigFile();
+	QStringList getPlusConfigFilePaths();
+	bool configFileIsValid();
 };
 
 }//namespace cx
