@@ -185,6 +185,9 @@ bool PlusConnectWidget::stopPlus()
 	if(mExternalProcess->isRunning())
 		mExternalProcess->getProcess()->close();
 
+	//Stop video streaming
+	mServices->video()->closeConnection();
+
 	//Stop output
 	disconnect(mExternalProcess->getProcess(), &QProcess::readyRead, this, &PlusConnectWidget::processReadyRead);
 
@@ -204,6 +207,9 @@ bool PlusConnectWidget::startPlus()
 
 	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
 	streamerService->createStreamer(this->getXmlVideoElement());
+
+	//Start video streaming
+	mServices->video()->openConnection();
 
 	return true;
 }
