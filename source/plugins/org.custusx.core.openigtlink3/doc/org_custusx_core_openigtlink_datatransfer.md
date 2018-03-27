@@ -54,7 +54,7 @@ Widget for connecting to PLUS easily.
 - Make sure a path to PlusServer is selected.
   For this field to be autoselected requires PLUS to be compiled/installed on the default location: ```dev/plus-2.6/PlusB-bin/bin/PlusServer``` (See below for instructions).
 - Select a PLUS config file.
-- Use the `Show PLUS output`checkbox to show command line output from PlusServer in the console.
+- Use the `Show PLUS output` checkbox to show command line output from PlusServer in the console.
 
 
 
