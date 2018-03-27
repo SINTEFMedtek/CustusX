@@ -68,7 +68,7 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 	layout->addWidget(browsePlusPathButton, line, 2);
 	++line;
 
-	layout->addWidget(new QLabel("Parameter File:", this), line, 0);
+	layout->addWidget(new QLabel("PLUS config File:", this), line, 0);
 	mPlusConfigFileWidget = new FileSelectWidget(this);
 	mPlusConfigFileWidget->setNameFilter(QStringList("*.xml"));
 	mPlusConfigFileWidget->setPaths(this->getPlusConfigFilePaths());
