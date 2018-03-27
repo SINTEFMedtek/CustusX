@@ -237,13 +237,13 @@ void PlusConnectWidget::plusAppStateChanged()
 	{
 		CX_LOG_DEBUG() << "plusAppStateChanged not running. Stopping...";
 		mPlusRunning = false;
-		mConnectButton->setText(STOP_TEXT);
+		mConnectButton->setText(START_TEXT);
 		this->stopPlus();
 	}
 	else
 	{
 		mPlusRunning = true;
-		mConnectButton->setText(START_TEXT);
+		mConnectButton->setText(STOP_TEXT);
 	}
 
 }
