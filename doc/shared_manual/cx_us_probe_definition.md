@@ -78,7 +78,7 @@ This table extends the one in \ref coordinate_systems with probe-specific spaces
 
 | Name              |  ID   | Description
 | ----------------- | ----- |-----------------------------
-| tool              |  t    | Space of the physical probe, relates the probe to the [rest of the system](\ref coordinate_systems_specific_spaces).
+| tool              |  t    | Space of the physical probe, relates the probe to the [rest of the system](\ref coordinate_systems_specific_spaces). Origin is defined at probe sector apex, see [Probe sector geometry](\ref cx_us_probe_geometry).
 | image lower left  |  u    | US video image. Origin lower-left corner, units mm.
 | image upper left  |  v    | US video image. Origin upper-left corner, units mm.
 | image pixel       |  p    | US video image. Origin upper-left corner, logical units (pixels).
