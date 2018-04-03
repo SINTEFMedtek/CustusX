@@ -361,6 +361,7 @@ cx_add_non_source_file("shared_manual/cx_dev_coordinate_systems.md")
 cx_add_non_source_file("shared_manual/cx_external_libraries.md")
 cx_add_non_source_file("shared_manual/cx_license.md")
 cx_add_non_source_file("shared_manual/cx_user_supported_platforms.md")
+cx_add_non_source_file("shared_manual/cx_us_probe_definition.md")
 
 cx_add_non_source_file("shared_manual/features/cx_user_definitions.md")
 cx_add_non_source_file("shared_manual/features/cx_user_doc_feature_overview.md")
