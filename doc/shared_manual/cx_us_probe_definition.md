@@ -72,7 +72,7 @@ ProbeCalibConfigs.xml:
 Probe Spaces {#cx_us_probe_spaces}
 ===========================================================
 
-\image html cx_coordinate_systems/cx_coords_us_probe.png "US probe and plane coordinate systems"
+\image html cx_coordinate_systems/cx_coords_us_probe_image.png "US probe and image coordinate systems"
 
 This table extends the one in \ref coordinate_systems with probe-specific spaces. They relate the US video image to the Tool using the \ref cx_us_probe_geometry.
 
