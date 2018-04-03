@@ -15,6 +15,7 @@ In addition, CustusX has been known to work on
 | ---------------------------- | -----------------------------
 | Windows 7                    | Not tested lately
 | Windows 8                    | Not tested lately
+| Ubuntu 14.04                 | Must be built from source
 | MacOSX 10.11 (El Capitan)    | <sup>1</sup>
 | macOS 10.12 (Sierra)         | <sup>1</sup>
 
