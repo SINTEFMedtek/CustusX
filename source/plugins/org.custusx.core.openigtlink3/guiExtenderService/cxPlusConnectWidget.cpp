@@ -219,10 +219,15 @@ bool PlusConnectWidget::startPlus()
 	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
 	streamerService->createStreamer(this->getXmlVideoElement());
 
-	//Start video streaming
-	mServices->video()->openConnection();
+	this->startOpenIGTLink3VideoStreaming();
 
 	return true;
+}
+
+void PlusConnectWidget::startOpenIGTLink3VideoStreaming()
+{
+	mServices->video()->setConnectionMethod(OPENIGTLINK3_STREAMER);
+	mServices->video()->openConnection();
 }
 
 void PlusConnectWidget::plusAppStateChanged()

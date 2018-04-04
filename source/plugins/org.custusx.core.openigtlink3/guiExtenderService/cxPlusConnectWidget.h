@@ -66,6 +66,7 @@ private:
 	void searchForPlusConfigFile();
 	QStringList getPlusConfigFilePaths();
 	bool configFileIsValid();
+	void startOpenIGTLink3VideoStreaming();
 };
 
 }//namespace cx
