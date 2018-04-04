@@ -18,6 +18,7 @@ namespace cx
 {
 
 cxResource_EXPORT double roundAwayFromZero(double val);
+cxResource_EXPORT unsigned int roundUnsigned(double val);
 
 }
 

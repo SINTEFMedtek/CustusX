@@ -72,13 +72,13 @@ ProbeCalibConfigs.xml:
 Probe Spaces {#cx_us_probe_spaces}
 ===========================================================
 
-\image html cx_coordinate_systems/cx_coords_us_probe.png "US probe and plane coordinate systems"
+\image html cx_coordinate_systems/cx_coords_us_probe_image.png "US probe and image coordinate systems"
 
 This table extends the one in \ref coordinate_systems with probe-specific spaces. They relate the US video image to the Tool using the \ref cx_us_probe_geometry.
 
 | Name              |  ID   | Description
 | ----------------- | ----- |-----------------------------
-| tool              |  t    | Space of the physical probe, relates the probe to the [rest of the system](\ref coordinate_systems_specific_spaces).
+| tool              |  t    | Space of the physical probe, relates the probe to the [rest of the system](\ref coordinate_systems_specific_spaces). Origin is defined at probe sector apex, see [Probe sector geometry](\ref cx_us_probe_geometry).
 | image lower left  |  u    | US video image. Origin lower-left corner, units mm.
 | image upper left  |  v    | US video image. Origin upper-left corner, units mm.
 | image pixel       |  p    | US video image. Origin upper-left corner, logical units (pixels).

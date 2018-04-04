@@ -19,4 +19,10 @@ double roundAwayFromZero(double val)
 		return int(val-0.5);
 }
 
+unsigned int roundUnsigned(double val)
+{
+    return int(val+0.5);
+}
+
+
 }
