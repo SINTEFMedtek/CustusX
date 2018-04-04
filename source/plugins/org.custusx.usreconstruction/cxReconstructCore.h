@@ -46,6 +46,9 @@ public:
             mPositionThinning(false),
             mPosFilterStrength(0),
 			mMaskReduce(0),
+            mClipFromTop(1.5),
+            mFrameFadeRamp(5),
+            mEdgeFadeRamp(0.3),
 			mAngio(false),
 			mMaxOutputVolumeSize(1024*1024)
 		{}
@@ -54,6 +57,9 @@ public:
         bool mPositionThinning;
         double mPosFilterStrength;
 		double mMaskReduce;
+        double mClipFromTop;
+        double mFrameFadeRamp;
+        double mEdgeFadeRamp;
 		QString mOrientation;
 
 		QString mAlgorithmUid;
