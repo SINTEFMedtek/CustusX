@@ -45,10 +45,7 @@ public:
 			mAlignTimestamps(false),
             mPositionThinning(false),
             mPosFilterStrength(0),
-			mMaskReduce(0),
-            mClipFromTop(1.5),
-            mFrameFadeRamp(5),
-            mEdgeFadeRamp(0.3),
+            mMaskReduce(0),
 			mAngio(false),
 			mMaxOutputVolumeSize(1024*1024)
 		{}
@@ -56,10 +53,7 @@ public:
 		bool mAlignTimestamps;
         bool mPositionThinning;
         double mPosFilterStrength;
-		double mMaskReduce;
-        double mClipFromTop;
-        double mFrameFadeRamp;
-        double mEdgeFadeRamp;
+        double mMaskReduce;
 		QString mOrientation;
 
 		QString mAlgorithmUid;
