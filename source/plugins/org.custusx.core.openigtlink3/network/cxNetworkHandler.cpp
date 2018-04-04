@@ -70,6 +70,10 @@ void NetworkHandler::disconnectFromServer()
 		{
 			connector->Stop();//This takes to long if connect isn't finished (because mutex is blocking)
 		}
+		else
+		{
+			connector->SetServerStopFlag(true); //Just setting stop flag should also stop the server
+		}
 		mLogic->RemoveConnector(connector);
 	}
 	mProbeDefinitionFromStringMessages->reset();
