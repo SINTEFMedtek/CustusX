@@ -279,7 +279,7 @@ function(cx_build_dev_documentation_html)
     TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
     
     SET(CX_DOXYGEN_EXCLUDE )
-    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */ThirdParty/*")   
+    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */ThirdParty/* README.md")
     SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
      
