@@ -111,8 +111,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		mProbeDefinitionFromStringMessages->setImage(cximage);
 
-//		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
-		if (mProbeDefinitionFromStringMessages->haveValidValues()) //Emit ProbeDefinition with every received image
+		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 		{
 //			QString deviceName(header.deviceName.c_str());
 //			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
