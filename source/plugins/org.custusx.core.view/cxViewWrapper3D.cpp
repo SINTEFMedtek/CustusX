@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxViewWrapper3D.h"
@@ -108,9 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxStream2DRep3D.h"
 #include "cxActiveData.h"
 
-#ifndef CX_VTK_OPENGL2
 #include "cxSlices3DRep.h"
-#endif
 
 namespace cx
 {
@@ -437,14 +414,14 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
 	ToolRep3DPtr activeRep3D = RepContainer(mView->getReps()).findFirst<ToolRep3D>(tool);
 	if (activeRep3D)
 	{
-		if (activeRep3D->getTracer()->isRunning())
+		if(checked)
+		{
+			activeRep3D->getTracer()->start();
+		}
+		else if(!checked)
 		{
 			activeRep3D->getTracer()->stop();
 			activeRep3D->getTracer()->clear();
-		}
-		else
-		{
-			activeRep3D->getTracer()->start();
 		}
 	}
 
@@ -787,10 +764,8 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
-#ifndef CX_VTK_OPENGL2
 	if (mSlices3DRep)
 		mView->removeRep(mSlices3DRep);
-#endif
 
 	if (!mGroupData)
 		return;
@@ -803,15 +778,13 @@ void ViewWrapper3D::updateSlices()
 	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
 	if (planes.empty())
 		return;
-#ifndef CX_VTK_OPENGL2
-	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
+	mSlices3DRep = Slices3DRep::New(mSharedOpenGLContext, "MultiSliceRep_" + mView->getName());
 	for (unsigned i=0; i<planes.size(); ++i)
 		mSlices3DRep->addPlane(planes[i], mServices->patient());
 	mSlices3DRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
 	mSlices3DRep->setImages(images);
 	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
 	mView->addRep(mSlices3DRep);
-#endif
 }
 
 ViewPtr ViewWrapper3D::getView()
@@ -823,10 +796,8 @@ void ViewWrapper3D::activeToolChangedSlot()
 {
 	ToolPtr activeTool = mServices->tracking()->getActiveTool();
 	mPickerRep->setTool(activeTool);
-#ifndef CX_VTK_OPENGL2
 	if (mSlices3DRep)
 		mSlices3DRep->setTool(activeTool);
-#endif
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

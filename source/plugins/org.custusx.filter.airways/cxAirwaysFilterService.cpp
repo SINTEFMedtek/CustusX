@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxAirwaysFilterService.h"
@@ -38,6 +17,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkImageData.h>
 #include <vtkImageShiftScale.h>
 #include <ctkPluginContext.h>
+#include <vtkImplicitModeller.h>
+#include <vtkContourFilter.h>
+#include "cxBranchList.h"
+#include "cxBronchoscopyRegistration.h"
 
 #include "cxTime.h"
 #include "cxTypeConversions.h"
@@ -66,7 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx {
 
 AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
-	FilterImpl(services)
+	FilterImpl(services),
+	mDefaultStraightCLTubesOption(false)
 {
 	fast::Reporter::setGlobalReportMethod(fast::Reporter::COUT);
     //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
@@ -101,6 +85,15 @@ QString AirwaysFilter::getNameSuffix()
     return "_centerline";
 }
 
+QString AirwaysFilter::getNameSuffixStraight()
+{
+	return "_straight";
+}
+
+QString AirwaysFilter::getNameSuffixTubes()
+{
+	return "_tubes";
+}
 
 Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
 {
@@ -364,13 +357,99 @@ bool AirwaysFilter::postProcess()
 	patientService()->insertData(centerline);
 	mOutputTypes[0]->setValue(centerline->getUid());
 
+	// Straight centerline and tubes
+	if(getStraightCLTubesOption(mOptions)->getValue())
+	{
+		this->createStraightCL();
+		this->createTubes();
+	}
+
 	return true;
+}
+
+/**
+ * @brief AirwaysFilter::createTubes
+ * This method of drawing tubes is from the Hello vtk example found in the
+ * VTK books:
+ * https://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/Modelling/Python/hello.py
+ * and also from the Blobbylogo example:
+ * https://lorensen.github.io/VTKExamples/site/Cxx/Visualization/BlobbyLogo/
+ * We found that it was easiest to use implicit modelling to create the tubes around
+ * a centerline. However, we have not been able to fully control the radius
+ * of the tubes. The current parameters gives the largest radius we have
+ * seen, and also the roundest shape.
+ * SetMaximumDistance and SetAdjustDistance must be aligned to get larger radius.
+ * SetValue may give a square shape.
+ * SetSampleDimensions must be large enough to give good resolution,
+ * but not so large that the creation takes too long.
+ */
+void AirwaysFilter::createTubes()
+{
+	// Get the straight centerline to model the tubes around.
+	QString straightCLUid = mOutputTypes[3]->getValue();
+	MeshPtr straightCL = boost::dynamic_pointer_cast<Mesh>(patientService()->getData(straightCLUid));
+	if(!straightCL)
+		return;
+	vtkPolyDataPtr clPolyData = straightCL->getVtkPolyData();
+
+	// Create the implicit modeller
+	vtkSmartPointer<vtkImplicitModeller> blobbyLogoImp =
+			vtkSmartPointer<vtkImplicitModeller>::New();
+	blobbyLogoImp->SetInputData(clPolyData);
+	blobbyLogoImp->SetMaximumDistance(0.1);
+	blobbyLogoImp->SetSampleDimensions(256, 256, 256);
+	blobbyLogoImp->SetAdjustDistance(0.1);
+
+	// Extract an iso surface, i.e. the tube shell
+	vtkSmartPointer<vtkContourFilter> blobbyLogoIso =
+		vtkSmartPointer<vtkContourFilter>::New();
+	blobbyLogoIso->SetInputConnection(blobbyLogoImp->GetOutputPort());
+	blobbyLogoIso->SetValue(1, 1.5); //orig
+	blobbyLogoIso->Update();
+
+	// Create the mesh object from the tube shell
+	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
+	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
+	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
+	centerline->setVtkPolyData(blobbyLogoIso->GetOutput());
+	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
+	centerline->get_rMd_History()->setRegistration(mTransformation);
+	// The color is taken from the new Fraxinus logo. Blue is the common color for lungs/airways. Partly transparent for a nice effect in Fraxinus.
+	centerline->setColor(QColor(118, 178, 226, 200));
+	patientService()->insertData(centerline);
+	mOutputTypes[4]->setValue(centerline->getUid());
+
+}
+
+void AirwaysFilter::setDefaultStraightCLTubesOption(bool defaultStraightCLTubesOption)
+{
+	mDefaultStraightCLTubesOption = defaultStraightCLTubesOption;
+}
+
+void AirwaysFilter::createStraightCL()
+{
+	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + "%1";
+	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffix() + AirwaysFilter::getNameSuffixStraight() + "%1";
+	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
+
+	BranchListPtr bl = BranchListPtr(new BranchList());
+
+	Eigen::MatrixXd CLpoints = makeTransformedMatrix(mCenterlineOutput);
+	bl->findBranchesInCenterline(CLpoints);
+	vtkPolyDataPtr retval = bl->createVtkPolyDataFromBranches(false, true);
+
+	centerline->setVtkPolyData(retval);
+	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
+	centerline->get_rMd_History()->setRegistration(mTransformation);
+	patientService()->insertData(centerline);
+	mOutputTypes[3]->setValue(centerline->getUid());
 }
 
 void AirwaysFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getManualSeedPointOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
+	mOptionsAdapters.push_back(this->getStraightCLTubesOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -386,23 +465,20 @@ void AirwaysFilter::createInputTypes()
 void AirwaysFilter::createOutputTypes()
 {
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
+	std::vector<std::pair<QString, QString>> valueHelpPairs;
+	valueHelpPairs.push_back(std::make_pair(tr("Airway Centerline"), tr("Generated centerline mesh (vtk-format).")));
+	valueHelpPairs.push_back(std::make_pair(tr("Airway Segmentation"), tr("Generated surface of the airway segmentation volume.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Lung Segmentation"), tr("Generated surface of the lung segmentation volume.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Centerline"), tr("A centerline with straight lines between the branch points.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Tubes"), tr("Tubes based on the straight centerline")));
 
-	//0
-	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
-	tempMeshStringAdapter->setValueName("Airway Centerline");
-	tempMeshStringAdapter->setHelp("Generated centerline mesh (vtk-format).");
-	mOutputTypes.push_back(tempMeshStringAdapter);
-
-	//1
-	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
-	tempMeshStringAdapter->setValueName("Airway Segmentation");
-	tempMeshStringAdapter->setHelp("Generated surface of the airway segmentation volume.");
-	mOutputTypes.push_back(tempMeshStringAdapter);
-
-	tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
-	tempMeshStringAdapter->setValueName("Lung Segmentation");
-	tempMeshStringAdapter->setHelp("Generated surface of the lung segmentation volume.");
-	mOutputTypes.push_back(tempMeshStringAdapter);
+	foreach(auto pair, valueHelpPairs)
+	{
+		tempMeshStringAdapter = StringPropertySelectMesh::New(patientService());
+		tempMeshStringAdapter->setValueName(pair.first);
+		tempMeshStringAdapter->setHelp(pair.second);
+		mOutputTypes.push_back(tempMeshStringAdapter);
+	}
 }
 
 
@@ -428,6 +504,18 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 					false, root);
 	return retval;
 
+}
+
+BoolPropertyPtr AirwaysFilter::getStraightCLTubesOption(QDomElement root)
+{
+	BoolPropertyPtr retval =
+			BoolProperty::initialize("Straight centerline and tubes",
+					"",
+					"Use this option to generate a centerline with straight branches between "
+					"the branch points. "
+					"You also get tubes based on this straight line.",
+					mDefaultStraightCLTubesOption, root);
+	return retval;
 }
 
 

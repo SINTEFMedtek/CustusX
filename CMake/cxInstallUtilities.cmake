@@ -1,16 +1,13 @@
+# =========================================================================
 # This file is part of CustusX, an Image Guided Therapy Application.
 #
-# Copyright (C) 2008- SINTEF Technology & Society, Medical Technology
+# Copyright (c) SINTEF Department of Medical Technology.
+# All rights reserved.
 #
-# CustusX is fully owned by SINTEF Medical Technology (SMT). CustusX source
-# code and binaries can only be used by SMT and those with explicit permission
-# from SMT. CustusX shall not be distributed to anyone else.
+# CustusX is released under a BSD 3-Clause license.
 #
-# CustusX is a research tool. It is NOT intended for use or certified for use
-# in a normal clinical setting. SMT does not take responsibility for its use
-# in any way.
-#
-# See CustusX_License.txt for more information.
+# See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
+# =========================================================================
 
 # Utitily variable for setting permissions with install(FILE) or install(DIRECTORY)
 set(CX_FULL_PERMISSIONS
@@ -70,6 +67,7 @@ macro(cx_install_initialize_customizable_properties)
 	set(CX_LICENSE_FILE "${CustusX_SOURCE_DIR}/License.txt")
 	set_property(GLOBAL PROPERTY CX_LICENSE_FILE "${CX_LICENSE_FILE}")
 
+    set_property(GLOBAL PROPERTY CPACK_PACKAGE_NAME "${CX_SYSTEM_BASE_NAME}")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_ICON "${PROJECT_SOURCE_DIR}/source/gui/icons/CustusX/CustusX.png")
 	set_property(GLOBAL PROPERTY CPACK_PACKAGE_VENDOR "SINTEF Medical Technology")
 	set_property(GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME "${PROJECT_SOURCE_DIR}/install/install_text/install_welcome.txt")
@@ -92,6 +90,7 @@ endmacro()
 ###############################################################################
 macro(cx_install_apply_customizable_properties)
 
+    get_property(CPACK_PACKAGE_NAME          GLOBAL PROPERTY CPACK_PACKAGE_NAME)
 	get_property(CPACK_PACKAGE_ICON          GLOBAL PROPERTY CPACK_PACKAGE_ICON)
 	get_property(CPACK_PACKAGE_VENDOR        GLOBAL PROPERTY CPACK_PACKAGE_VENDOR)
 	get_property(CPACK_RESOURCE_FILE_WELCOME GLOBAL PROPERTY CPACK_RESOURCE_FILE_WELCOME)
@@ -491,6 +490,41 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	if(CX_LINUX)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
 		SET(INSTALL_QTCONF_DIR "${INSTALL_BINARY_DIR}")
+
+    # Install .so and versioned .so.x.y
+    file(GLOB INSTALL_FILE_LIST
+      LIST_DIRECTORIES false
+      "${QT_LIBS_DIR}/*xcb*"
+      "${QT_LIBS_DIR}/libfontconfig.*"
+      "${QT_LIBS_DIR}/libfreetype.*"
+      "${QT_LIBS_DIR}/libX11.*"
+      "${QT_LIBS_DIR}/libXext.*"
+      "${QT_LIBS_DIR}/libXfixes.*"
+      "${QT_LIBS_DIR}/libXi.*"
+      "${QT_LIBS_DIR}/libXrender.*"
+      "${QT_LIBS_DIR}/libSM.*"
+      "${QT_LIBS_DIR}/libICE.*"
+      "${QT_LIBS_DIR}/libQt*"
+      "${QT_LIBS_DIR}/libicui18n.*"
+      "${QT_LIBS_DIR}/libicuuc.*"
+      "${QT_LIBS_DIR}/libicudata.*"
+      "${QT_LIBS_DIR}/libOpenCL.*"
+      "${QT_LIBS_DIR}/*-qt5*"
+      "${QT_LIBS_DIR}/libpcre16.*"
+      "${QT_LIBS_DIR}/libstdc++.*"
+    )
+
+    file(GLOB REMOVE_FILE_LIST
+      LIST_DIRECTORIES false
+     "${QT_LIBS_DIR}/*.a"
+      )
+
+    list(REMOVE_ITEM INSTALL_FILE_LIST ${REMOVE_FILE_LIST} )
+
+    install(FILES
+      ${INSTALL_FILE_LIST}
+      DESTINATION ${INSTALL_BINARY_DIR}/)
+
 	endif()
 	if(CX_WINDOWS)
 		SET(INSTALL_QTPLUGIN_DIR "${INSTALL_BINARY_DIR}/plugins")
@@ -516,6 +550,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	)
 
 	message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
+	message(STATUS "QT_LIBS_DIR: " ${QT_LIBS_DIR})
 
 	# install runtime plugins
         set(CX_PLUGIN_DIR "/plugins")

@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxIgstkToolManager.h"
@@ -53,8 +32,8 @@ void sampleInfo2xml(const igstk::NDITracker::TrackingSampleInfo& info, QDomEleme
 
 
 IgstkToolManager::IgstkToolManager(ToolFileParser::TrackerInternalStructure trackerStructure,
-                std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                ToolFileParser::ToolInternalStructure referenceToolStructure) :
+								std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+								ToolFileParser::ToolInternalStructurePtr referenceToolStructure) :
 				mInitAnsweres(0), mInternalInitialized(false)
 {
 	mTimer = 0;
@@ -119,14 +98,14 @@ void IgstkToolManager::createTracker(ToolFileParser::TrackerInternalStructure tr
 		reportWarning("Invalid tracker.");
 }
 
-void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStructure> toolStructures,
-                ToolFileParser::ToolInternalStructure referenceToolStructure)
+void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures,
+								ToolFileParser::ToolInternalStructurePtr referenceToolStructure)
 {
 	for (unsigned i = 0; i < toolStructures.size(); ++i)
 	{
 		this->addIgstkTools(toolStructures[i]);
 	}
-	if (!referenceToolStructure.mUid.isEmpty())
+	if (!referenceToolStructure->mUid.isEmpty())
 	{
 		IgstkToolPtr refTool = this->addIgstkTools(referenceToolStructure);
 		if (refTool->isValid())
@@ -134,7 +113,7 @@ void IgstkToolManager::createTools(std::vector<ToolFileParser::ToolInternalStruc
 	}
 }
 
-IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructure& toolStructure)
+IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructurePtr toolStructure)
 {
 	IgstkToolPtr igstkTool(new IgstkTool(toolStructure));
 	if (igstkTool->isValid())
@@ -145,7 +124,7 @@ IgstkToolPtr IgstkToolManager::addIgstkTools(ToolFileParser::ToolInternalStructu
 	}
 	else
 	{
-		reportWarning(toolStructure.mUid + " is not valid.");
+		reportWarning(toolStructure->mUid + " is not valid.");
 	}
 	return igstkTool;
 }
@@ -202,7 +181,7 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 
 void IgstkToolManager::deviceInitializedSlot(bool deviceInit)
 {
-	int numberOfDevices = mTools.size() + 1; //+1 is the tracker
+	size_t numberOfDevices = mTools.size() + 1; //+1 is the tracker
 
 	if (deviceInit)
 	{

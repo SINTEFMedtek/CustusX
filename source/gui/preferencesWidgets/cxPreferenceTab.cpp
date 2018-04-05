@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxPreferenceTab.h"
@@ -73,7 +52,8 @@ PerformanceTab::PerformanceTab(QWidget *parent) :
 	mRenderingRateLabel = NULL;
 	mSmartRenderCheckBox = NULL;
 	mGPU2DRenderCheckBox = NULL;
-    mOptimizedViewsCheckBox = NULL;
+	mLinearInterpolationIn2DCheckBox = NULL;
+	mOptimizedViewsCheckBox = NULL;
 	mShadingCheckBox = NULL;
 	mMainLayout = NULL;
 }
@@ -124,12 +104,19 @@ void PerformanceTab::init()
 	  QDomNode());
   m3DVisualizer->setDisplayNames(this->getAvailableVisualizerDisplayNames());
 
-  bool useGPU2DRender = settings()->value("useGPU2DRendering").toBool();
+	bool useGPU2DRender = settings()->value("View2D/useGPU2DRendering").toBool();
   mGPU2DRenderCheckBox = new QCheckBox("2D Overlay");
   mGPU2DRenderCheckBox->setChecked(useGPU2DRender);
   mGPU2DRenderCheckBox->setToolTip("<p>Use a GPU-based 2D renderer instead of "
 								   "the software-based one, if available.</p>"
 								   "<p>This enables multiple volume rendering in 2D.<p>");
+
+	bool linearInterpolationIn2D = settings()->value("View2D/useLinearInterpolationIn2DRendering").toBool();
+	mLinearInterpolationIn2DCheckBox = new QCheckBox("Linear interpolation in 2D (Requires restart)");
+	mLinearInterpolationIn2DCheckBox->setChecked(linearInterpolationIn2D);
+	mLinearInterpolationIn2DCheckBox->setToolTip("<p>Use linear interpolation in GPU 2D rendering "
+									 "instead of nearest.</p>"
+										"<p>Requires restart.<p>");
 
   bool optimizedViews = settings()->value("optimizedViews").toBool();
   mOptimizedViewsCheckBox = new QCheckBox("Optimized Views");
@@ -148,12 +135,13 @@ void PerformanceTab::init()
   new SpinBoxGroupWidget(this, mMaxRenderSize, mMainLayout, 1);
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
-  mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
-  mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
-  mMainLayout->addWidget(mOptimizedViewsCheckBox, 6, 0);
-  mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 7, 0);
-  new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 8);
-  mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 9, 0, 1, 2);
+	mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
+	mMainLayout->addWidget(mGPU2DRenderCheckBox, 5, 0);
+	mMainLayout->addWidget(mLinearInterpolationIn2DCheckBox, 6, 0);
+	mMainLayout->addWidget(mOptimizedViewsCheckBox, 7, 0);
+	mMainLayout->addWidget(mGPU3DDepthPeelingCheckBox, 8, 0);
+	new SpinBoxGroupWidget(this, mStillUpdateRate, mMainLayout, 9);
+	mMainLayout->addWidget(sscCreateDataWidget(this, m3DVisualizer), 10, 0, 1, 2);
 
   mMainLayout->setColumnStretch(0, 2);
   mMainLayout->setColumnStretch(1, 2);
@@ -193,8 +181,9 @@ std::map<QString, QString> PerformanceTab::getAvailableVisualizerDisplayNames()
 
 void PerformanceTab::saveParametersSlot()
 {
-  settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
-  settings()->setValue("useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
+	settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
+	settings()->setValue("View2D/useGPU2DRendering", mGPU2DRenderCheckBox->isChecked());
+	settings()->setValue("View2D/useLinearInterpolationIn2DRendering", mLinearInterpolationIn2DCheckBox->isChecked());
   settings()->setValue("optimizedViews", mOptimizedViewsCheckBox->isChecked());
 
   settings()->setValue("View3D/maxRenderSize",     mMaxRenderSize->getValue());

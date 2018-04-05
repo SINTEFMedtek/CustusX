@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-	 this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-	 this list of conditions and the following disclaimer in the documentation
-	 and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-	 may be used to endorse or promote products derived from this software
-	 without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxManualImage2ImageRegistrationWidget.h"
@@ -190,11 +169,11 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
     if (movingData)
         movingName = movingData->getName();
 
-    int numberOfActiveLandmarks;
-    if(this->isAverageAccuracyValid())
+    int numberOfActiveLandmarks = 0;
+    if(this->isAverageAccuracyValid(numberOfActiveLandmarks))
     {
-        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm").
-                                       arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2));
+        mAvarageAccuracyLabel->setText(tr("Root mean square accuracy (Landmarks) %1 mm, calculated in %2 landmarks").
+                                       arg(this->getAverageAccuracy(numberOfActiveLandmarks), 0, 'f', 2).arg(numberOfActiveLandmarks));
         mAvarageAccuracyLabel->setToolTip(QString("Root Mean Square landmark accuracy from target [%1] to fixed [%2].").
                                           arg(movingName).arg(fixedName));
     }
@@ -205,11 +184,11 @@ void    ManualImage2ImageRegistrationWidget::updateAverageAccuracyLabel()
     }
 }
 
-bool    ManualImage2ImageRegistrationWidget::isAverageAccuracyValid()
+bool    ManualImage2ImageRegistrationWidget::isAverageAccuracyValid(int& numberOfActiveLandmarks)
 {
     int numActiveLandmarks = 0;
     this->getAverageAccuracy(numActiveLandmarks);
-    if(numActiveLandmarks < 3)
+    if(numActiveLandmarks < 1)
         return false;
     return true;
 }

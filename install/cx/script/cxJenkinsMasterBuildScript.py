@@ -12,6 +12,7 @@
 
 import sys
 import argparse        
+import os
 
 import cxJenkinsBuildScriptBase
 
@@ -22,6 +23,7 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
     '''
     def __init__(self, assembly=None):
         ''                
+        os.environ["MACOSX_DEPLOYMENT_TARGET"] = "10.11" #Compile for macOS El Capitan and above
         super(Controller, self).__init__(assembly)
 
     def getDescription(self):                  
@@ -48,6 +50,7 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         runs.add_argument('--create_unit_tested_package', action='store_true', default=False, help='run checkout/configure/build, unit test, package')
         runs.add_argument('--integration_test_package', action='store_true', default=False, help='install package, installation tests, integration tests')
         runs.add_argument('--unstable_test_package', action='store_true', default=False, help='install package, unstable tests')
+        runs.add_argument('--analyze', action='store_true', default=False, help='Build and run tests with coverage and analyze tools')
 
         runs.add_argument('--create_tagged_release', action='store_true', default=False, help='create release folder, publish package and docs to server using git tag')
         runs.add_argument('--create_nightly_release', action='store_true', default=False, help='create release folder, publish package and docs to server using nightly tag')
@@ -70,6 +73,8 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
     def run(self):
         options = self.options        
 
+        if options.analyze:
+            self.runAnalyze()
         if options.reset_installer:
             self.resetInstallerStep()
         if options.create_unit_tested_package:

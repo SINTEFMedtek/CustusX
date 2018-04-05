@@ -5,6 +5,7 @@ if(BUILD_TESTING)
     set(CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_SOURCE_FILES
         ${CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_MOC_SOURCE_FILES}
         cxtestExamplePlugin.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
     qt5_wrap_cpp(CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_MOC_SOURCE_FILES ${CX_TEST_CATCH_ORG_CUSTUSX_EXAMPLE_MOC_SOURCE_FILES})
@@ -16,7 +17,12 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_example PRIVATE org_custusx_example cxCatch)
+    target_link_libraries(cxtest_org_custusx_example
+      PRIVATE
+      org_custusx_example
+      cxCatch
+      cxtestUtilities
+      cxResource)
     cx_add_tests_to_catch(cxtest_org_custusx_example)
 
 endif(BUILD_TESTING)

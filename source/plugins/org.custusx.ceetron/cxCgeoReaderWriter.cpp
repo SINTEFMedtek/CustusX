@@ -51,7 +51,7 @@ void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 	{
 		return;
 	}
-	vtkPolyDataPtr polyData = mesh->getTransformedPolyData(mesh->get_rMd());
+	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 	vtkCellArrayPtr polys = polyData->GetPolys();
 
 	QFile exportFile(filename);

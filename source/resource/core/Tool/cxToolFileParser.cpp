@@ -6,6 +6,7 @@
 #include "cxEnumConverter.h"
 #include "cxFrame3D.h"
 #include "cxTransformFile.h"
+#include "cxDefinitionStrings.h"//Removes warning for string2enum
 
 namespace cx {
 
@@ -155,14 +156,15 @@ ToolFileParser::~ToolFileParser()
 {
 }
 
-ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
+ToolFileParser::ToolInternalStructurePtr ToolFileParser::getTool()
 {
-    ToolInternalStructure retval;
+		ToolInternalStructurePtr retval;
 
     QFile toolFile(mToolFilePath);
     QString toolFolderAbsolutePath = QFileInfo(toolFile).dir().absolutePath() + "/";
     QDomNode toolNode = this->getToolNode(mToolFilePath);
-    ToolFileParser::ToolInternalStructure internalStructure;
+		ToolInternalStructurePtr internalStructure = ToolInternalStructurePtr(new ToolInternalStructure());
+//    ToolFileParser::ToolInternalStructure internalStructure;
     if (toolNode.isNull())
     {
         report(
@@ -174,9 +176,9 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
     QDomElement toolTypeElement = toolNode.firstChildElement(mToolTypeTag);
     QString toolTypeText = toolTypeElement.text();
 
-    internalStructure.mIsReference = toolTypeText.contains("reference", Qt::CaseInsensitive);
-    internalStructure.mIsPointer = toolTypeText.contains("pointer", Qt::CaseInsensitive);
-    internalStructure.mIsProbe = toolTypeText.contains("usprobe", Qt::CaseInsensitive);
+		internalStructure->mIsReference = toolTypeText.contains("reference", Qt::CaseInsensitive);
+		internalStructure->mIsPointer = toolTypeText.contains("pointer", Qt::CaseInsensitive);
+		internalStructure->mIsProbe = toolTypeText.contains("usprobe", Qt::CaseInsensitive);
 
 //    if (toolTypeText.contains("reference", Qt::CaseInsensitive))
 //    {
@@ -194,11 +196,11 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
 
     QDomElement toolIdElement = toolNode.firstChildElement(mToolIdTag);
     QString toolIdText = toolIdElement.text();
-    internalStructure.mUid = toolIdText;
+		internalStructure->mUid = toolIdText;
 
     QDomElement toolNameElement = toolNode.firstChildElement(mToolNameTag);
     QString toolNameText = toolNameElement.text();
-    internalStructure.mName = toolNameText;
+		internalStructure->mName = toolNameText;
 
     QDomElement toolClinicalAppElement = toolNode.firstChildElement(mToolClinicalAppTag);
     QString toolClinicalAppText = toolClinicalAppElement.text();
@@ -208,20 +210,20 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
         if (string.isEmpty())
             continue;
         string = string.toLower();
-        internalStructure.mClinicalApplications.push_back(string);
+				internalStructure->mClinicalApplications.push_back(string);
     }
 
     QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
     QString toolGeofileText = toolGeofileElement.text();
     if (!toolGeofileText.isEmpty())
         toolGeofileText = toolFolderAbsolutePath + toolGeofileText;
-    internalStructure.mGraphicsFileName = toolGeofileText;
+		internalStructure->mGraphicsFileName = toolGeofileText;
 
     QDomElement toolPicfileElement = toolNode.firstChildElement(mToolPicFileTag);
     QString toolPicfileText = toolPicfileElement.text();
     if (!toolPicfileText.isEmpty())
         toolPicfileText = toolFolderAbsolutePath + toolPicfileText;
-    internalStructure.mPictureFileName = toolPicfileText;
+		internalStructure->mPictureFileName = toolPicfileText;
 
     QDomElement toolInstrumentElement = toolNode.firstChildElement(mToolInstrumentTag);
     if (toolInstrumentElement.isNull())
@@ -232,11 +234,11 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
     }
     QDomElement toolInstrumentIdElement = toolInstrumentElement.firstChildElement(mToolInstrumentIdTag);
     QString toolInstrumentIdText = toolInstrumentIdElement.text();
-    internalStructure.mInstrumentId = toolInstrumentIdText;
+		internalStructure->mInstrumentId = toolInstrumentIdText;
 
     QDomElement toolInstrumentScannerIdElement = toolInstrumentElement.firstChildElement(mToolInstrumentScannerIdTag);
     QString toolInstrumentScannerIdText = toolInstrumentScannerIdElement.text();
-    internalStructure.mInstrumentScannerId = toolInstrumentScannerIdText;
+		internalStructure->mInstrumentScannerId = toolInstrumentScannerIdText;
 
     QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
     if (toolSensorElement.isNull())
@@ -246,29 +248,29 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
     }
     QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
     QString toolSensorTypeText = toolSensorTypeElement.text();
-    internalStructure.mTrackerType = string2enum<TRACKING_SYSTEM>(toolSensorTypeText);
+		internalStructure->mTrackerType = string2enum<TRACKING_SYSTEM>(toolSensorTypeText);
 
     QDomElement toolSensorWirelessElement = toolSensorElement.firstChildElement(mToolSensorWirelessTag);
     QString toolSensorWirelessText = toolSensorWirelessElement.text();
     if (toolSensorWirelessText.contains("yes", Qt::CaseInsensitive))
-        internalStructure.mWireless = true;
+				internalStructure->mWireless = true;
     else if (toolSensorWirelessText.contains("no", Qt::CaseInsensitive))
-        internalStructure.mWireless = false;
+				internalStructure->mWireless = false;
 
     QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(mToolSensorDOFTag);
     QString toolSensorDOFText = toolSensorDOFElement.text();
     if (toolSensorDOFText.contains("5", Qt::CaseInsensitive))
-        internalStructure.m5DOF = true;
+				internalStructure->m5DOF = true;
     else if (toolSensorDOFText.contains("6", Qt::CaseInsensitive))
-        internalStructure.m5DOF = false;
+				internalStructure->m5DOF = false;
 
     QDomElement toolSensorPortnumberElement = toolSensorElement.firstChildElement(mToolSensorPortnumberTag);
     QString toolSensorPortnumberText = toolSensorPortnumberElement.text();
-    internalStructure.mPortNumber = toolSensorPortnumberText.toInt();
+		internalStructure->mPortNumber = toolSensorPortnumberText.toUInt();
 
     QDomElement toolSensorChannelnumberElement = toolSensorElement.firstChildElement(mToolSensorChannelnumberTag);
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
-    internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
+		internalStructure->mChannelNumber = toolSensorChannelnumberText.toUInt();
 
     QDomNodeList toolSensorReferencePointList = toolSensorElement.elementsByTagName(mToolSensorReferencePointTag);
     for (int j = 0; j < toolSensorReferencePointList.count(); j++)
@@ -288,14 +290,14 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
         }
         QString toolSensorReferencePointText = node.toElement().text();
         Vector3D vector = Vector3D::fromString(toolSensorReferencePointText);
-        internalStructure.mReferencePoints[id] = vector;
+				internalStructure->mReferencePoints[id] = vector;
     }
 
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
     QString toolSensorRomFileText = toolSensorRomFileElement.text();
     if (!toolSensorRomFileText.isEmpty())
         toolSensorRomFileText = toolFolderAbsolutePath + toolSensorRomFileText;
-    internalStructure.mSROMFilename = toolSensorRomFileText;
+		internalStructure->mSROMFilename = toolSensorRomFileText;
 
     QDomElement toolCalibrationElement = toolNode.firstChildElement(mToolCalibrationTag);
     if (toolCalibrationElement.isNull())
@@ -308,12 +310,12 @@ ToolFileParser::ToolInternalStructure ToolFileParser::getTool()
     QString toolCalibrationFileText = toolCalibrationFileElement.text();
     if (!toolCalibrationFileText.isEmpty())
         toolCalibrationFileText = toolFolderAbsolutePath + toolCalibrationFileText;
-    internalStructure.mCalibrationFilename = toolCalibrationFileText;
-    internalStructure.mCalibration = this->readCalibrationFile(internalStructure.mCalibrationFilename);
+		internalStructure->mCalibrationFilename = toolCalibrationFileText;
+		internalStructure->mCalibration = this->readCalibrationFile(internalStructure->mCalibrationFilename);
 
-    internalStructure.mTransformSaveFileName = mLoggingFolder;
-    internalStructure.mLoggingFolderName = mLoggingFolder;
-    retval = internalStructure;
+		internalStructure->mTransformSaveFileName = mLoggingFolder;
+		internalStructure->mLoggingFolderName = mLoggingFolder;
+		retval = internalStructure;
 
     return retval;
 }

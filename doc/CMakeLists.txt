@@ -279,7 +279,7 @@ function(cx_build_dev_documentation_html)
     TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
     
     SET(CX_DOXYGEN_EXCLUDE )
-    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */ThirdParty/*")   
+    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */ThirdParty/* README.md")
     SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
      
@@ -361,6 +361,7 @@ cx_add_non_source_file("shared_manual/cx_dev_coordinate_systems.md")
 cx_add_non_source_file("shared_manual/cx_external_libraries.md")
 cx_add_non_source_file("shared_manual/cx_license.md")
 cx_add_non_source_file("shared_manual/cx_user_supported_platforms.md")
+cx_add_non_source_file("shared_manual/cx_us_probe_definition.md")
 
 cx_add_non_source_file("shared_manual/features/cx_user_definitions.md")
 cx_add_non_source_file("shared_manual/features/cx_user_doc_feature_overview.md")

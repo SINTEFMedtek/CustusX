@@ -49,8 +49,9 @@ Calibrate the time shift between the tracking system and the video acquisition s
                       The *first* image should be a typical image, as it is used to correlate against all the others.
 - Part 2, Calibration: Press calibrate to calculate the temporal shift for the selected acquisition.
 
-The shift is not applied in any way, this must be done manually after calibration. 
-Refer to the log folder for the calibration curves.
+<span style="color:red">Note! This widget must be visible during active acquisition for image and tracking data to be stored.</span><br>
+The shift is not applied in any way, this must be done manually after calibration.
+Refer to the log folder for the calibration curves.<br>
 
 > **NB:** Previous temporal calibration is applied to probe frames during acqusition.
 

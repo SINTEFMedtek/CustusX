@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #define _USE_MATH_DEFINES
@@ -66,17 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-//QStringList TrackingSystemIGSTKService::getSupportedTrackingSystems()
-//{
-//	QStringList retval;
-//	retval = IgstkTracker::getSupportedTrackingSystems();
-//	return retval;
-//}
-
-TrackingSystemIGSTKService::TrackingSystemIGSTKService() :
-				mConfigurationFilePath(""),
-				mLoggingFolder(""),
-				mState(Tool::tsNONE)
+TrackingSystemIGSTKService::TrackingSystemIGSTKService()
 {
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 	// initialize config file
@@ -93,51 +62,9 @@ std::vector<ToolPtr> TrackingSystemIGSTKService::getTools()
 	return mTools;
 }
 
-Tool::State TrackingSystemIGSTKService::getState() const
-{
-	return mState;
-}
-
 void TrackingSystemIGSTKService::setState(const Tool::State val)
 {
-	if (mState==val)
-		return;
-
-	if (val > mState) // up
-	{
-		if (val == Tool::tsTRACKING)
-			this->startTracking();
-		else if (val == Tool::tsINITIALIZED)
-			this->initialize();
-		else if (val == Tool::tsCONFIGURED)
-			this->configure();
-	}
-	else // down
-	{
-		if (val == Tool::tsINITIALIZED)
-			this->stopTracking();
-		else if (val == Tool::tsCONFIGURED)
-			this->uninitialize();
-		else if (val == Tool::tsNONE)
-		{
-			this->deconfigure();
-		}
-	}
-}
-
-bool TrackingSystemIGSTKService::isConfigured() const
-{
-	return mState>=Tool::tsCONFIGURED;
-}
-
-bool TrackingSystemIGSTKService::isInitialized() const
-{
-	return mState>=Tool::tsINITIALIZED;
-}
-
-bool TrackingSystemIGSTKService::isTracking() const
-{
-	return mState>=Tool::tsTRACKING;
+	this->internalSetState(val);
 }
 
 void TrackingSystemIGSTKService::configure()
@@ -151,7 +78,13 @@ void TrackingSystemIGSTKService::configure()
 	//parse
 	ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
 
-    std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
+	if(!configParser.getTrackingSystemImplementation().contains(TRACKING_SYSTEM_IMPLEMENTATION_IGSTK, Qt::CaseInsensitive))
+	{
+		CX_LOG_DEBUG() << "TrackingSystemIGSTKService::configure(): Not using IGSTK tracking.";
+		return;
+	}
+
+	std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 
 	if (trackers.empty())
 	{
@@ -159,16 +92,16 @@ void TrackingSystemIGSTKService::configure()
 		return;
 	}
 
-    ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
+	ToolFileParser::TrackerInternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
-    ToolFileParser::ToolInternalStructure referenceToolStructure;
-    std::vector<ToolFileParser::ToolInternalStructure> toolStructures;
+	ToolFileParser::ToolInternalStructurePtr referenceToolStructure;
+	std::vector<ToolFileParser::ToolInternalStructurePtr> toolStructures;
 	QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
 	std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
 	for (std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
 	{
 		ToolFileParser toolParser(*it, mLoggingFolder);
-        ToolFileParser::ToolInternalStructure internalTool = toolParser.getTool();
+		ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
 		if ((*it) == referenceToolFile)
 			referenceToolStructure = internalTool;
 		else
@@ -521,6 +454,7 @@ TrackerConfigurationPtr TrackingSystemIGSTKService::getConfiguration()
 {
 	TrackerConfigurationPtr retval;
 	retval.reset(new TrackerConfigurationImpl());
+	retval->setTrackingSystemImplementation(TRACKING_SYSTEM_IMPLEMENTATION_IGSTK);
 	return retval;
 }
 

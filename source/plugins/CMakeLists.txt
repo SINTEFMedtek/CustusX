@@ -11,7 +11,7 @@ set(CX_PLUGINS
   org.custusx.core.view:ON
   org.custusx.core.tracking:ON
   org.custusx.core.tracking.system.igstk:ON
-  org.custusx.core.openigtlink:ON
+  org.custusx.core.openigtlink3:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
   org.custusx.core.filemanager:ON
@@ -36,6 +36,7 @@ set(CX_PLUGINS
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
   org.custusx.ceetron:ON
+  org.custusx.virtualbronchoscopy:ON
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.
@@ -63,5 +64,5 @@ if(NOT QT_QMAKE_EXECUTABLE)
 endif(NOT QT_QMAKE_EXECUTABLE)
 
 ctkMacroSetupPlugins(
-    ${CX_PLUGINS} 
-	BUILD_OPTION_PREFIX ${CX_PLUGIN_BUILD_OPTION_PREFIX})
+    ${CX_PLUGINS}
+    BUILD_OPTION_PREFIX ${CX_PLUGIN_BUILD_OPTION_PREFIX})

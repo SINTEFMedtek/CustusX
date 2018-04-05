@@ -3,17 +3,23 @@ Supported Platforms {#supported_platforms}
 
 CustusX is built continously on the following platforms:
 
-| Name                    | Description
-| ----------------------- | -----------------------------
-| MacOSX 10.8             | iMac
-| Ubuntu 14.04            | NVidia GPU 
-| Ubuntu 14.04            | AMD Radeon GPU
-| Windows8                | AMD Radeon GPU
+| Name                          | Description
+| ----------------------------- | -----------------------------
+| macOS 10.13 (High Sierra)     | Mac Pro<sup>1</sup>
+| Ubuntu 16.04                  | NVidia GPU<sup>2</sup>
+| Windows 10                    | NVidia GPU
 
 In addition, CustusX has been known to work on
 
-| Name                    | Description
-| ----------------------- | -----------------------------
-| MacOSX 10.9             | Problems detected when using NVidia cards (GPU-3D-rendering only)
-| Fedora 21               | Reported to work without problems.
-| Windows7                | Not tested lately.
+| Name                         | Description
+| ---------------------------- | -----------------------------
+| Windows 7                    | Not tested lately
+| Windows 8                    | Not tested lately
+| Ubuntu 14.04                 | Must be built from source
+| MacOSX 10.11 (El Capitan)    | <sup>1</sup>
+| macOS 10.12 (Sierra)         | <sup>1</sup>
+
+<sup>1</sup> Macs with NVIDIA GeForce GT 650/750M seems to have issues with showing data in 2D views.
+Turning off multi volume visualization in 2D is a way to fix this problem: Preferences -> Performance -> 2D overlay
+
+<sup>2</sup> Linux NVIDIA driver 384.111 seems to cause problems. NVIDIA driver 375.82 works ok.

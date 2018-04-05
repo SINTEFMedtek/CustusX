@@ -1,3 +1,14 @@
+/*=========================================================================
+This file is part of CustusX, an Image Guided Therapy Application.
+                 
+Copyright (c) SINTEF Department of Medical Technology.
+All rights reserved.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
+=========================================================================*/
+
 #ifndef CXTRACKINGSYSTEMSERVICE_H
 #define CXTRACKINGSYSTEMSERVICE_H
 
@@ -25,20 +36,40 @@ class cxResource_EXPORT TrackingSystemService : public QObject
 {
 	Q_OBJECT
 public:
+	TrackingSystemService();
 	virtual ~TrackingSystemService() {}
 
 	virtual QString getUid() const = 0;
-	virtual Tool::State getState() const = 0;
+	virtual Tool::State getState() const;
 	virtual void setState(const Tool::State val) = 0; ///< asynchronously request a state. Wait for signal stateChanged()
 	virtual std::vector<ToolPtr> getTools() = 0;
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
 	virtual ToolPtr getReference() = 0; ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-	virtual void setLoggingFolder(QString loggingFolder) = 0; ///<\param loggingFolder path to the folder where logs should be saved
+	virtual void setConfigurationFile(QString configurationFile);
+	virtual void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
 signals:
 	void stateChanged();
 
+protected slots:
+	virtual void deconfigure() {} ///< deconfigures the software
+	virtual void configure() {} ///< sets up the software
+
+	virtual void initialize(); ///< connects to the hardware
+	virtual void uninitialize(); ///< disconnects from the hardware
+	virtual void startTracking(); ///< starts tracking
+	virtual void stopTracking(); ///< stops tracking
+protected:
+	Tool::State mState;
+	QString mConfigurationFilePath; ///< path to the configuration file
+	QString mLoggingFolder; ///< path to where logging should be saved
+
+	virtual bool isConfigured() const;
+	virtual bool isInitialized() const;
+	virtual bool isTracking() const;
+
+	void internalSetState(Tool::State val);
 };
 } //namespace cx
 Q_DECLARE_INTERFACE(cx::TrackingSystemService, TrackingSystemService_iid)

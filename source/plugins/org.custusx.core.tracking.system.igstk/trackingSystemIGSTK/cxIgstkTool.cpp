@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+                 
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-
-Redistribution and use in source and binary forms, with or without 
-modification, are permitted provided that the following conditions are met:
-
-1. Redistributions of source code must retain the above copyright notice, 
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, 
-   this list of conditions and the following disclaimer in the documentation 
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors 
-   may be used to endorse or promote products derived from this software 
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR 
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER 
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+                 
+CustusX is released under a BSD 3-Clause license.
+                 
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxIgstkTool.h"
@@ -64,21 +43,21 @@ Transform3D IgstkTool::toTransform3D(igstk::Transform transform)
 void IgstkTool::updateCalibration(const Transform3D& cal)
 {
 	//apply the calibration
-    mInternalStructure.mCalibration = cal;
-    this->setCalibrationTransform(mInternalStructure.mCalibration);
+		mInternalStructure->mCalibration = cal;
+		this->setCalibrationTransform(mInternalStructure->mCalibration);
 
-	Transform3D sMt = mInternalStructure.getCalibrationAsSSC();
-	report("Set " + mInternalStructure.mName + "s calibration to \n" + qstring_cast(sMt));
+	Transform3D sMt = mInternalStructure->getCalibrationAsSSC();
+	report("Set " + mInternalStructure->mName + "s calibration to \n" + qstring_cast(sMt));
 
 	//write to file
-	mInternalStructure.saveCalibrationToFile();
+	mInternalStructure->saveCalibrationToFile();
 }
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-IgstkTool::IgstkTool(ToolFileParser::ToolInternalStructure internalStructure) :
+IgstkTool::IgstkTool(ToolFileParser::ToolInternalStructurePtr internalStructure) :
 				mToolObserver(itk::ReceptorMemberCommand<IgstkTool>::New()), mValid(false), mVisible(false), mAttachedToTracker(
 								false)
 {
@@ -91,7 +70,7 @@ IgstkTool::IgstkTool(ToolFileParser::ToolInternalStructure internalStructure) :
 
 	mToolObserver->SetCallbackFunction(this, &IgstkTool::toolTransformCallback);
 
-	if (mInternalStructure.verify())
+	if (mInternalStructure->verify())
 	{
 		mTool = this->buildInternalTool();
 		this->addLogging();
@@ -99,7 +78,7 @@ IgstkTool::IgstkTool(ToolFileParser::ToolInternalStructure internalStructure) :
 	}
 	else
 	{
-		reportError(mInternalStructure.mUid + " was created with invalid internal structure.");
+		reportError(mInternalStructure->mUid + " was created with invalid internal structure.");
 		mValid = false;
 	}
 }
@@ -108,14 +87,14 @@ IgstkTool::~IgstkTool()
 {
 }
 
-ToolFileParser::ToolInternalStructure IgstkTool::getInternalStructure()
+ToolFileParser::ToolInternalStructurePtr IgstkTool::getInternalStructure()
 {
 	return mInternalStructure;
 }
 
 QString IgstkTool::getUid()
 {
-	return mInternalStructure.mUid;
+	return mInternalStructure->mUid;
 }
 
 igstk::TrackerTool::Pointer IgstkTool::getPointer() const
@@ -125,7 +104,7 @@ igstk::TrackerTool::Pointer IgstkTool::getPointer() const
 
 TRACKING_SYSTEM IgstkTool::getTrackerType()
 {
-	return mInternalStructure.mTrackerType;
+	return mInternalStructure->mTrackerType;
 }
 
 bool IgstkTool::isValid() const
@@ -245,7 +224,7 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	//Successes
 	else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))
 	{
-		report(QString("Configured [%1] with the tracking system").arg(mInternalStructure.mUid));
+		report(QString("Configured [%1] with the tracking system").arg(mInternalStructure->mUid));
 	}
 	else if (igstk::TrackerToolAttachmentToTrackerEvent().CheckEvent(&event))
 	{
@@ -266,77 +245,77 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
 	else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
 	{
 		this->internalTracked(true);
-		report(mInternalStructure.mUid + " is tracked.");
+		report(mInternalStructure->mUid + " is tracked.");
 	}
 	else if (igstk::ToolTrackingStoppedEvent().CheckEvent(&event))
 	{
 		this->internalTracked(false);
-		report(mInternalStructure.mUid + " is not tracked anymore.");
+		report(mInternalStructure->mUid + " is not tracked anymore.");
 	}
 	//Failures
 	else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
 	{
 		reportWarning(
-						mInternalStructure.mUid
+						mInternalStructure->mUid
 										+ " received an invalid request.  This means that the internal igstk trackertool did not accept the request. Do not know which request.");
 	}
 	else if (igstk::TrackerToolConfigurationErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " could not configure with the tracking system.");
+		reportError(mInternalStructure->mUid + " could not configure with the tracking system.");
 	}
 	else if (igstk::InvalidRequestToAttachTrackerToolErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " could not request to attach to tracker.");
+		reportError(mInternalStructure->mUid + " could not request to attach to tracker.");
 	}
 	else if (igstk::InvalidRequestToDetachTrackerToolErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " could not request to detach from tracker.");
+		reportError(mInternalStructure->mUid + " could not request to detach from tracker.");
 	}
 	else if (igstk::TrackerToolAttachmentToTrackerErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " could not attach to tracker.");
+		reportError(mInternalStructure->mUid + " could not attach to tracker.");
 	}
 	else if (igstk::TrackerToolDetachmentFromTrackerErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " could not detach from tracker.");
+		reportError(mInternalStructure->mUid + " could not detach from tracker.");
 	}
 	//Polaris specific failures
 	else if (igstk::InvalidPolarisPortNumberErrorEvent().CheckEvent(&event))
 	{
 		reportError(
-						mInternalStructure.mUid + " sendt invalid Polaris port number: "
-										+ qstring_cast(mInternalStructure.mPortNumber) + ".");
+						mInternalStructure->mUid + " sendt invalid Polaris port number: "
+										+ qstring_cast(mInternalStructure->mPortNumber) + ".");
 	}
 	else if (igstk::InvalidPolarisSROMFilenameErrorEvent().CheckEvent(&event))
 	{
 		reportError(
-						mInternalStructure.mUid + " sendt invalid ROM file: " + mInternalStructure.mSROMFilename);
+						mInternalStructure->mUid + " sendt invalid ROM file: " + mInternalStructure->mSROMFilename);
 	}
 	else if (igstk::InvalidPolarisPartNumberErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " has an invalid part number.");
+		reportError(mInternalStructure->mUid + " has an invalid part number.");
 	}
 	//Aurora specific failures
 	else if (igstk::InvalidAuroraPortNumberErrorEvent().CheckEvent(&event))
 	{
 		reportError(
-						mInternalStructure.mUid + " has an invalid port number: "
-										+ qstring_cast(mInternalStructure.mPortNumber) + ".");
+						mInternalStructure->mUid + " has an invalid port number: "
+										+ qstring_cast(mInternalStructure->mPortNumber) + ".");
 	}
 	else if (igstk::InvalidAuroraSROMFilenameErrorEvent().CheckEvent(&event))
 	{
 		reportError(
-						mInternalStructure.mUid + " sendt invalid ROM file: " + mInternalStructure.mSROMFilename);
+						mInternalStructure->mUid + " sendt invalid ROM file: " + mInternalStructure->mSROMFilename);
 	}
 	else if (igstk::InvalidAuroraPartNumberErrorEvent().CheckEvent(&event))
 	{
-		reportError(mInternalStructure.mUid + " has an invalid part number.");
+		reportError(mInternalStructure->mUid + " has an invalid part number.");
 	}
 	else if (igstk::InvalidAuroraChannelNumberErrorEvent().CheckEvent(&event))
 	{
 		reportError(
-						mInternalStructure.mUid + " has an invalid channel number:"
-										+ qstring_cast(mInternalStructure.mChannelNumber) + ".");
+						mInternalStructure->mUid + " has an invalid channel number:"
+										+ qstring_cast(mInternalStructure->mChannelNumber) + ".");
 	}
 }
 
@@ -347,8 +326,8 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 	igstk::PolarisTrackerTool::Pointer tempPolarisTool;
 	igstk::AuroraTrackerTool::Pointer tempAuroraTool;
 
-    igstk::Transform calibration = toIgstkTransform(mInternalStructure.mCalibration);
-	switch (mInternalStructure.mTrackerType)
+		igstk::Transform calibration = toIgstkTransform(mInternalStructure->mCalibration);
+	switch (mInternalStructure->mTrackerType)
 	{
 	case tsNONE:
 		break;
@@ -357,10 +336,10 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 	case tsPOLARIS:
 		tempPolarisTool = igstk::PolarisTrackerTool::New();
 		tempPolarisTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
-		if (!mInternalStructure.mWireless) //we only support wireless atm
+		if (!mInternalStructure->mWireless) //we only support wireless atm
 			return tool = tempPolarisTool.GetPointer();
 		tempPolarisTool->RequestSelectWirelessTrackerTool();
-		tempPolarisTool->RequestSetSROMFileName(string_cast(mInternalStructure.mSROMFilename));
+		tempPolarisTool->RequestSetSROMFileName(string_cast(mInternalStructure->mSROMFilename));
 		tempPolarisTool->RequestConfigure();
         tempPolarisTool->SetCalibrationTransform(calibration);
 		tool = tempPolarisTool;
@@ -368,16 +347,16 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 	case tsAURORA:
 		tempAuroraTool = igstk::AuroraTrackerTool::New();
 		tempAuroraTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
-		if (mInternalStructure.m5DOF)
+		if (mInternalStructure->m5DOF)
 		{
 			tempAuroraTool->RequestSelect5DOFTrackerTool();
-			tempAuroraTool->RequestSetPortNumber(mInternalStructure.mPortNumber);
-			tempAuroraTool->RequestSetChannelNumber(mInternalStructure.mChannelNumber);
+			tempAuroraTool->RequestSetPortNumber(mInternalStructure->mPortNumber);
+			tempAuroraTool->RequestSetChannelNumber(mInternalStructure->mChannelNumber);
 		}
 		else
 		{
 			tempAuroraTool->RequestSelect6DOFTrackerTool();
-			tempAuroraTool->RequestSetPortNumber(mInternalStructure.mPortNumber);
+			tempAuroraTool->RequestSetPortNumber(mInternalStructure->mPortNumber);
 		}
 		tempAuroraTool->RequestConfigure();
         tempAuroraTool->SetCalibrationTransform(calibration);
@@ -394,8 +373,8 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 
 void IgstkTool::setCalibrationTransform(Transform3D calibration)
 {
-	mInternalStructure.mCalibration = calibration;
-    igstk::Transform transform = toIgstkTransform(mInternalStructure.mCalibration);
+	mInternalStructure->mCalibration = calibration;
+		igstk::Transform transform = toIgstkTransform(mInternalStructure->mCalibration);
     mTool->SetCalibrationTransform(transform);
 }
 
@@ -405,7 +384,7 @@ void IgstkTool::internalAttachedToTracker(bool value)
 		return;
 	mAttachedToTracker = value;
 	report(
-					mInternalStructure.mUid + " is " + (value ? "at" : "de") + "tached " + (value ? "to" : "from")
+					mInternalStructure->mUid + " is " + (value ? "at" : "de") + "tached " + (value ? "to" : "from")
 									+ " the tracker.");
 	emit attachedToTracker(mAttachedToTracker);
 }
@@ -436,7 +415,7 @@ void IgstkTool::addLogging()
 	if (logging)
 	{
 		std::ofstream* loggerFile = new std::ofstream();
-		QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mInternalStructure.mName + "_Logging.txt";
+		QString logFile = mInternalStructure->mLoggingFolderName + "Tool_" + mInternalStructure->mName + "_Logging.txt";
 		loggerFile->open(cstring_cast(logFile));
 		mLogger = igstk::Logger::New();
 		mLogOutput = itk::StdStreamLogOutput::New();
@@ -451,24 +430,24 @@ void IgstkTool::addLogging()
 void IgstkTool::printInternalStructure()
 {
 	std::cout << "------------------------------------------------------------------" << std::endl;
-	std::cout << "mIsProbe: " << mInternalStructure.mIsProbe << std::endl;
-	std::cout << "mIsReference: " << mInternalStructure.mIsReference << std::endl;
-	std::cout << "mIsPointer: " << mInternalStructure.mIsPointer << std::endl;
-	std::cout << "mName: " << mInternalStructure.mName << std::endl;
-	std::cout << "mUid: " << mInternalStructure.mUid << std::endl;
-	std::cout << "mTrackerType: " << mInternalStructure.mTrackerType << std::endl;
-	std::cout << "mSROMFilename: " << mInternalStructure.mSROMFilename << std::endl;
-	std::cout << "mPortNumber: " << mInternalStructure.mPortNumber << std::endl;
-	std::cout << "mChannelNumber: " << mInternalStructure.mChannelNumber << std::endl;
-	std::cout << "mReferencePoints: " << string_cast(mInternalStructure.mReferencePoints.size()) << std::endl;
-	std::cout << "mWireless: " << mInternalStructure.mWireless << std::endl;
-	std::cout << "m5DOF: " << mInternalStructure.m5DOF << std::endl;
-    std::cout << "mCalibration: " << mInternalStructure.mCalibration << std::endl;
+	std::cout << "mIsProbe: " << mInternalStructure->mIsProbe << std::endl;
+	std::cout << "mIsReference: " << mInternalStructure->mIsReference << std::endl;
+	std::cout << "mIsPointer: " << mInternalStructure->mIsPointer << std::endl;
+	std::cout << "mName: " << mInternalStructure->mName << std::endl;
+	std::cout << "mUid: " << mInternalStructure->mUid << std::endl;
+	std::cout << "mTrackerType: " << mInternalStructure->mTrackerType << std::endl;
+	std::cout << "mSROMFilename: " << mInternalStructure->mSROMFilename << std::endl;
+	std::cout << "mPortNumber: " << mInternalStructure->mPortNumber << std::endl;
+	std::cout << "mChannelNumber: " << mInternalStructure->mChannelNumber << std::endl;
+	std::cout << "mReferencePoints: " << string_cast(mInternalStructure->mReferencePoints.size()) << std::endl;
+	std::cout << "mWireless: " << mInternalStructure->mWireless << std::endl;
+	std::cout << "m5DOF: " << mInternalStructure->m5DOF << std::endl;
+		std::cout << "mCalibration: " << mInternalStructure->mCalibration << std::endl;
     //mInternalStructure.mCalibration.Print(std::cout, itk::Indent());"
-	std::cout << "mCalibrationFilename: " << mInternalStructure.mCalibrationFilename << std::endl;
-	std::cout << "mGraphicsFileName: " << mInternalStructure.mGraphicsFileName << std::endl;
-	std::cout << "mTransformSaveFileName: " << mInternalStructure.mTransformSaveFileName << std::endl;
-	std::cout << "mLoggingFolderName: " << mInternalStructure.mLoggingFolderName << std::endl;
+	std::cout << "mCalibrationFilename: " << mInternalStructure->mCalibrationFilename << std::endl;
+	std::cout << "mGraphicsFileName: " << mInternalStructure->mGraphicsFileName << std::endl;
+	std::cout << "mTransformSaveFileName: " << mInternalStructure->mTransformSaveFileName << std::endl;
+	std::cout << "mLoggingFolderName: " << mInternalStructure->mLoggingFolderName << std::endl;
 	std::cout << "------------------------------------------------------------------" << std::endl;
 }
 
