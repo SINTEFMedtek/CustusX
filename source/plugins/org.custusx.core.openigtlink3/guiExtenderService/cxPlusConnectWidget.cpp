@@ -216,8 +216,14 @@ bool PlusConnectWidget::startPlus()
 	if(!this->startExternalPlusServer())
 		 return false;
 
+	//TODO: Need to change to OPENIGTLINK3_STREAMER before turning on startTracking?
 	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
-	streamerService->createStreamer(this->getXmlVideoElement());
+
+	//This will print several lines of:
+	//Debug: In /Users/olevs/dev/cx/OpenIGTLink/OpenIGTLink/Source/igtlClientSocket.cxx, line 67
+	//igtl::ClientSocket (0x7fa62df04120): Failed to connect to server 10.218.140.108:18944
+	//igtlio::Connector::WaitForConnection() will try to connect while (!this->ServerStopFlag)
+//	streamerService->createStreamer(this->getXmlVideoElement());//Not needed? Will startOpenIGTLink3VideoStreaming() start streaming?
 
 	this->startOpenIGTLink3VideoStreaming();
 
