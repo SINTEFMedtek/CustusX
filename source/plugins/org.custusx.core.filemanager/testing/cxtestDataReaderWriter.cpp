@@ -126,7 +126,11 @@ TEST_CASE("Import point metrics from MNI Tag Point file", "[integration][metrics
 
 	//scope here to delete the metric manager before shutting down the logic manager.
 	{
-		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), cx::logicManager()->getFileManagerService());
+		cx::MetricManager manager(cx::logicManager()->getViewService(),
+								  cx::logicManager()->getPatientModelService(),
+								  cx::logicManager()->getTrackingService(),
+								  cx::logicManager()->getSpaceProvider(),
+								  cx::logicManager()->getFileManagerService());
 
 		//MetricFixture fixture;
 
