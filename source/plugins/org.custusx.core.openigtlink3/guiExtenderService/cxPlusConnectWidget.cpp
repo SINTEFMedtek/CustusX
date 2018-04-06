@@ -87,6 +87,12 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 	layout->addWidget(new CheckBoxWidget(this, mShowPlusOutput), line, 0, 1, 3);
 	++line;
 
+	QString warningText;
+	warningText = "<font color=red>Note! The start/stop tracking button is not correctly synchronized <br> when using the plus server.</font><br>";
+	QLabel* warningInfoLabel = new QLabel(warningText);
+	layout->addWidget(warningInfoLabel, line, 0, 1, 3);
+	++line;
+
 	mConnectButton = new QPushButton(START_TEXT);
 	mConnectButton->setToolTip("Remove all saved clip planes from the selected volume");
 	connect(mConnectButton, &QPushButton::clicked, this, &PlusConnectWidget::connectButtonClickedSlot);
@@ -216,14 +222,7 @@ bool PlusConnectWidget::startPlus()
 	if(!this->startExternalPlusServer())
 		 return false;
 
-	//TODO: Need to change to OPENIGTLINK3_STREAMER before turning on startTracking?
 	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
-
-	//This will print several lines of:
-	//Debug: In /Users/olevs/dev/cx/OpenIGTLink/OpenIGTLink/Source/igtlClientSocket.cxx, line 67
-	//igtl::ClientSocket (0x7fa62df04120): Failed to connect to server 10.218.140.108:18944
-	//igtlio::Connector::WaitForConnection() will try to connect while (!this->ServerStopFlag)
-//	streamerService->createStreamer(this->getXmlVideoElement());//Not needed? Will startOpenIGTLink3VideoStreaming() start streaming?
 
 	this->startOpenIGTLink3VideoStreaming();
 
