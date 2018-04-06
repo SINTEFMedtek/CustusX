@@ -278,7 +278,7 @@ bool PlusConnectWidget::startExternalPlusServer()
 	else
 	{
 		//Turn off PLUS Warnings if PLUS output is disabled
-		arguments << QString(" --verbose=1");
+		arguments << QString("--verbose=1");
 	}
 
 	mExternalProcess->launch(mPlusPath, arguments);
