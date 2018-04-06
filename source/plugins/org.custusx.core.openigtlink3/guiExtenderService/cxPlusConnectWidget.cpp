@@ -266,7 +266,6 @@ bool PlusConnectWidget::startExternalPlusServer()
 	QStringList arguments;
 
 	arguments << QString("--config-file=").append(mPlusConfigFile);
-	arguments << QString(" --verbose=1");
 
 	//Show PLUS output
 	if(mShowPlusOutput->getValue())
@@ -275,6 +274,11 @@ bool PlusConnectWidget::startExternalPlusServer()
 		connect(process, &QProcess::readyRead, this, &PlusConnectWidget::processReadyRead);
 		process->setProcessChannelMode(QProcess::MergedChannels);
 		process->setReadChannel(QProcess::StandardOutput);
+	}
+	else
+	{
+		//Turn off PLUS Warnings if PLUS output is disabled
+		arguments << QString(" --verbose=1");
 	}
 
 	mExternalProcess->launch(mPlusPath, arguments);
