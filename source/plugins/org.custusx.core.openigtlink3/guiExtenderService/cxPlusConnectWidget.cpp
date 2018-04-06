@@ -266,6 +266,7 @@ bool PlusConnectWidget::startExternalPlusServer()
 	QStringList arguments;
 
 	arguments << QString("--config-file=").append(mPlusConfigFile);
+	arguments << QString(" --verbose=1");
 
 	//Show PLUS output
 	if(mShowPlusOutput->getValue())
