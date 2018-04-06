@@ -54,8 +54,7 @@ public:
 		Message msg(buffer, mMessageLevel);
 //		msg.mChannel = qstring_cast(mMessageLevel);
 		msg.mChannel = "stdout";
-		if (isValidMessage(buffer))
-			reporter()->sendMessage(msg);
+		reporter()->sendMessage(msg);
 	  }
 	  else
 	  {
@@ -84,20 +83,6 @@ private:
   MESSAGE_LEVEL mMessageLevel;
   QMutex mMutex;
   QMutex mOrigMutex;
-
-	bool isValidMessage(QString message)
-	{
-		//Remove PLUS warning messages that are catched by the stream redirecter
-		if (message.contains("Unspecified charactes received") )
-		{
-			std::cout << "Found PLUS message. Removing this for now." << std::endl;
-			return false;
-		}
-		else if (message.isEmpty())
-			return false;
-
-		return true;
-	}
 };
 
 
