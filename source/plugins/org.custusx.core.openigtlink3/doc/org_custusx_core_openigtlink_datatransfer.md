@@ -63,7 +63,10 @@ Creating PLUS config files and matching CustusX tool config files
 - The deviceName in Image OpenIGTLink messages must correspond to the `openigtlinkimageid` tag in the CustusX tool config file. These are in PLUS created as a combination of `Image Name` and `EmbeddedTransformToFrame`, with an underscore `_` between.
 
 
-Troubleshooting
+Known issues
 -----------------------------------------------------------
 #### Running PlusServer from CustusX
-The CustusX user interface may be unresponsive when PlusServer is starting and stopping.
+- The start/stop tracking button is not correctly synchronized when using the plus server.
+- The CustusX user interface may be unresponsive when PlusServer is starting and stopping.
+- The console may print a lot of messages while the PLUS server is starting (<i>"Failed to connect to server..."</i>).
+- If show PLUS output is turned on, a lot of warnings may be printed for the image messages (<i>"Unspecified characters received..."</i>).
