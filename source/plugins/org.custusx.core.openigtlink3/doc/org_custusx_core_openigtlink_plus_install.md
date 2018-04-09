@@ -30,6 +30,17 @@ Run CMake
     cd PlusB-bin
     ninja
 
+Let PLUS use CustusX rom files
+-----------------------------------------------------------
+<i>This section is only relevant if you got a CustusX version with PLUS tool files.</i>
+
+PLUS access the tool rom files in a path relative to the PLUS folder structure.
+Therefore you will have to copy the rom files from the CustusX installation
+to the PLUS folder structure:
+
+Copy the following folder from the CustusX installation: ```config/tool```
+into the Plus folder structure: ```plus-2.6/PlusB-bin/PlusLibData/ConfigFiles```.
+
 Troubleshooting
 -----------------------------------------------------------
 #### Compiling PLUS 2.6
