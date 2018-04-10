@@ -41,10 +41,3 @@ to the PLUS folder structure:
 Copy the following folder from the CustusX installation: ```config/tool```
 into the Plus folder structure: ```plus-2.6/PlusB-bin/PlusLibData/ConfigFiles```.
 
-Troubleshooting
------------------------------------------------------------
-#### Compiling PLUS 2.6
-
-It seems like PLUS won't compile with CMake 3.5.1 (That comes with Ubuntu 16.04) any longer, because ndicapi now requires CMake 3.6.0 or higher.<br>
-A workaround is to edit the file ```plus-2.6/PlusBuild/SuperBuild/External_ndicapi.cmake```:<br>
-Change git sha in line 35 to ```c79aec212c0793c3cb0cfb3acd6435ff2ac4cdc1```.
