@@ -6,13 +6,11 @@ Network Connections Widget {#org_custusx_core_openigtlink_network_connections_wi
 ===========================================================
 
 This widget handles network connections to OpenIGTLink servers or clients and can e.g.
-be used to stream video \ref org_custusx_core_video_streamer_openigtlink.
-
+be used to stream video \ref org_custusx_core_video_streamer_openigtlink.<br>
 It can only handle 1 connection at a time. Select if you want this application to behave as a server or a client.
 Specify the ip and port you want to connect to and selected what kind of OpenIGTLink application you are connecting to.
-This is important as different application sends different information in the OpenIGTLink packages.
-
-The plugin supports OpenIGTLink 3.
+This is important as different application sends different information in the OpenIGTLink packages.<br>
+The plugin supports OpenIGTLink version 3.
 
 Ultrasound streaming and position tracking with PLUS / OpenIGTLinkIO
 ===========================================================
@@ -29,10 +27,9 @@ Network Data Transfer Widget {#org_custusx_core_openigtlink_datatransfer_widget}
 ===========================================================
 
 Connect to a remote system using the OpenIGTLink protocol, and send/receive
-volume and model data. 
-
+volume and model data.<br>
 This widget is intended primarily for exchanging images and volumes, and has been
-tested towards Slicer3D (<https://www.slicer.org>).
+tested towards [Slicer3D](https://www.slicer.org).
 See <http://www.openigtlink.org> for details on the protocol. 
 
 Connection:
@@ -50,7 +47,6 @@ Send:
 Connect to PLUS Widget
 ===========================================================
 Widget for connecting to PLUS easily.
-
 - Make sure a path to PlusServer is selected.
   For this field to be autoselected requires PLUS to be compiled/installed on the default location: ```dev/plus-2.6/PlusB-bin/bin/PlusServer```
   (See \ref org_custusx_core_openigtlink_plus_install for instructions).
