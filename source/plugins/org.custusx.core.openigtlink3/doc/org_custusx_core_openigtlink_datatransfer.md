@@ -47,6 +47,7 @@ Send:
 Connect to PLUS Widget
 ===========================================================
 Widget for connecting to PLUS easily.
+<i>This functionality is currently under development. Some work may be required from the user to get it working.</i>
 - Make sure a path to PlusServer is selected.
   For this field to be autoselected requires PLUS to be compiled/installed on the default location: ```dev/plus-2.6/PlusB-bin/bin/PlusServer```
   (See \ref org_custusx_core_openigtlink_plus_install for instructions).

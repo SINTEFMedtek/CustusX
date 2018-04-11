@@ -1,5 +1,9 @@
 Building/installing PLUS {#org_custusx_core_openigtlink_plus_install}
 ===================
+These build instructions are intended for setting up CustusX together witk PLUS on
+our internal CustusX racks, but can also be used for building PLUS on
+machines that are going to use CustusX together with PLUS.
+
 
 Build PLUS 2.6 for CustusX racks with Ubuntu 16.04
 ===========================================================
@@ -19,16 +23,14 @@ Run CMake
 - (macOS. May need to set CMAKE_MAKE_PROGRAM to: /opt/local/bin/ninja)
 - (macOS. May need to set Qt5_DIR to e.g.: /Users/olevs/Qt/5.9.2/clang_64/lib/cmake/Qt5)
 - Check Advanced
-- (Set variable PLUSLIB_GIT_REVISION to: Plus-2.6)
-- (Set variable PLUSAPP_GIT_REVISION to: Plus-2.6)
 - Enable PLUS_USE_BKPROFOCUS_VIDEO
 - Enable PLUS_USE_NDI
 - Generate
 
 
-    cx ..
+    cd ..
     cd PlusB-bin
-    ninja
+    make
 
 Let PLUS use CustusX rom files
 -----------------------------------------------------------
