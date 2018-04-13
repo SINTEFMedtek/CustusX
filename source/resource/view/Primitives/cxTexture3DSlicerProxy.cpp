@@ -52,7 +52,6 @@ Texture3DSlicerProxyPtr Texture3DSlicerProxy::New(SharedOpenGLContextPtr context
 
 void Texture3DSlicerProxyImpl::setTargetSpaceToR()
 {
-	CX_LOG_DEBUG_CHECKPOINT();
 	mTargetSpaceIsR = true;
 }
 

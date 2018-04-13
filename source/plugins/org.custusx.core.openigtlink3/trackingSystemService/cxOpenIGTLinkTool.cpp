@@ -148,6 +148,11 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 	//Current implementation is to get transforms between tool frame and ref frame
 	//Another solution is to get all transforms between tool frame and tracking system.
 
+	//Reference is getting transform from reference tool to tracking system.
+	//Only use received transform to verify that reference tool is visible.
+	if(isReference())
+		return;
+
     Transform3D prMt = prMs * this->getCalibration_sMt();
     Transform3D prMt_filtered = prMt;
 

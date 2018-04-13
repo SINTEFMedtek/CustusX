@@ -43,12 +43,12 @@ OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
 
 QString OpenIGTLinkStreamerService::getName()
 {
-	return "OpenIGTLink streamer 3";
+	return "OpenIGTLink 3 streamer";
 }
 
 QString OpenIGTLinkStreamerService::getType() const
 {
-	return "openigtlink_streamer3";
+	return OPENIGTLINK3_STREAMER;
 }
 
 std::vector<PropertyPtr> OpenIGTLinkStreamerService::getSettings(QDomElement root)
@@ -65,6 +65,11 @@ StreamerPtr OpenIGTLinkStreamerService::createStreamer(QDomElement root)
 {
 	this->startTracking(root);
 	return mStreamer;
+}
+
+void OpenIGTLinkStreamerService::stop()
+{
+	this->stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject();
 }
 
 void OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject()

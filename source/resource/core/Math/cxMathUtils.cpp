@@ -12,11 +12,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMathUtils.h"
 
 #include "cxVector3D.h"
-#include "cxTransform3D.h"
 
 // For debugging:
 #include "cxLogger.h"
-#include <QThread>
 
 
 namespace cx {
