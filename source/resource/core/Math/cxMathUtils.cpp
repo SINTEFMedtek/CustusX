@@ -53,7 +53,7 @@ Transform3D quaternionToMatrix(Eigen::ArrayXd qArray)
     qA.coeffs() = qArray.segment<4>(0);
     Tx.matrix().block<3, 3>(0,0) = qA.toRotationMatrix();
     Tx.matrix().block<3, 1>(0,3) = qArray.segment<3>(4);
-    Tx.matrix()(4,4) = 1;
+    Tx.matrix()(3,3) = 1;
 
     return Tx;
 }
