@@ -222,8 +222,8 @@ bool PlusConnectWidget::startPlus()
 	if(!this->startExternalPlusServer())
 		 return false;
 
-	this->turnOnStartTrackingInOpenIGTLinkStreamer(streamerService);
-
+	this->changeOpenIGTLinkStreamerParameter(streamerService, QString("start_tracking"), QVariant("true"));
+	this->changeOpenIGTLinkStreamerParameter(streamerService, QString("ip_scanner_openigtlink"), QVariant("127.0.0.1"));
 	this->startOpenIGTLink3VideoStreaming();
 
 	return true;
@@ -309,17 +309,17 @@ QDomElement PlusConnectWidget::getXmlVideoElement()
 	return element;
 }
 
-void PlusConnectWidget::turnOnStartTrackingInOpenIGTLinkStreamer(StreamerServicePtr streamerService)
+void PlusConnectWidget::changeOpenIGTLinkStreamerParameter(StreamerServicePtr streamerService, QString parameterName, QVariant value)
 {
 	QDomElement element = this->getXmlVideoElement();
 
 	std::vector<PropertyPtr> settings = streamerService->getSettings(element);
 	for(unsigned i = 0; i < settings.size(); ++i)
 	{
-		if (settings[i]->getUid().contains("start_tracking"))
+		if (settings[i]->getUid().contains(parameterName))
 		{
-			CX_LOG_DEBUG() << "Turning on track and stream in OpenIGTLinkStreamer";
-			settings[i]->setValueFromVariant(true);
+			CX_LOG_DEBUG() << "Changing parameter " << parameterName << " to: " << value.toString() << " in OpenIGTLinkStreamer";
+			settings[i]->setValueFromVariant(value);
 		}
 	}
 }
