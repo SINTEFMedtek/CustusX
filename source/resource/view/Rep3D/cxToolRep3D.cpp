@@ -44,7 +44,7 @@ ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider) :
 	mOffsetPointColor = settings()->value("View/toolOffsetPointColor").value<QColor>();
 	mOffsetLineColor = settings()->value("View/toolOffsetLineColor").value<QColor>();
 
-	mSphereRadius = 2;
+	mSphereRadius = settings()->value("View3D/sphereRadius").value<double>();
 	mStayHiddenAfterVisible = false;
 	mStayVisibleAfterHide = false;
 	mOffsetPointVisibleAtZeroOffset = false;
