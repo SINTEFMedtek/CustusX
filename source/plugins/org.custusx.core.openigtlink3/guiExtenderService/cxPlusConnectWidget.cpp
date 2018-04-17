@@ -222,7 +222,7 @@ bool PlusConnectWidget::startPlus()
 	if(!this->startExternalPlusServer())
 		 return false;
 
-	this->changeOpenIGTLinkStreamerParameter(streamerService, QString("start_tracking"), QVariant("true"));
+	this->changeOpenIGTLinkStreamerParameter(streamerService, QString(OPENIGTLINK3_STREAMER_START_TRACKING), QVariant("true"));
 	this->changeOpenIGTLinkStreamerParameter(streamerService, QString(OPENIGTLINK3_STREAMER_IP), QVariant("127.0.0.1"));
 	this->startOpenIGTLink3VideoStreaming();
 

@@ -21,6 +21,7 @@ namespace cx
 {
 #define OPENIGTLINK3_STREAMER "openigtlink3_streamer"
 #define OPENIGTLINK3_STREAMER_IP "ip_scanner_openigtlink"
+#define OPENIGTLINK3_STREAMER_START_TRACKING "start_tracking"
 
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
 typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;
