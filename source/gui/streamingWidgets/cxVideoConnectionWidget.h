@@ -100,7 +100,7 @@ private:
 	void addExistingStreamerServices();
 
 	std::map<QString, QWidget*> mStreamerServiceWidgets;
-	void updateGuiForConnectionMethod();
+	bool mDontUpdateConnectionInService;
 };
 
 }//end namespace cx
