@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 #define OPENIGTLINK3_STREAMER "openigtlink3_streamer"
+#define OPENIGTLINK3_STREAMER_IP "ip_scanner_openigtlink"
 
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
 typedef boost::shared_ptr<class OpenIGTLinkTrackingSystemService> OpenIGTLinkTrackingSystemServicePtr;

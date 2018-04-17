@@ -142,7 +142,7 @@ StringPropertyBasePtr OpenIGTLinkStreamerService::getIPOption(QDomElement root)
 {
 	StringPropertyPtr retval;
 	QString defaultValue = "127.0.0.1";
-	retval = StringProperty::initialize("ip_scanner_openigtlink", "Address", "TCP/IP Address",
+	retval = StringProperty::initialize(OPENIGTLINK3_STREAMER_IP, "Address", "TCP/IP Address",
 												defaultValue, root);
 	retval->setGroup("Connection");
 	return retval;
