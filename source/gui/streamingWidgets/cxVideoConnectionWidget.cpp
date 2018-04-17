@@ -52,7 +52,7 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 
 	QString defaultConnection = mServices->video()->getConnectionMethod();
 	mConnectionSelector = StringProperty::initialize("Connection", "", "Method for connecting to Video Server", defaultConnection, QStringList(), mOptions.getElement("video"));
-	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(selectGuiForConnectionMethodSlot()));
+	connect(mConnectionSelector.get(), SIGNAL(changed()), this, SLOT(setConnectionMethodAndUpdateGuiForConnectionMethodSlot()));
 
 	connect(mServices->video().get(), &VideoService::connected, this, &VideoConnectionWidget::serverStatusChangedSlot);
 
@@ -73,10 +73,11 @@ VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* p
 
 	connect(mServices->video().get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
 	connect(mServices->video().get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+	connect(mServices->video().get(), &VideoService::connectionMethodChanged, this, &VideoConnectionWidget::connectionMethodChangedSlot);
 
 	this->addExistingStreamerServices(); //Need to add StreamerServices already existing at this point, since we will only get signals when new Services are added
 
-	this->selectGuiForConnectionMethodSlot();
+	this->setConnectionMethodAndUpdateGuiForConnectionMethodSlot();
 }
 
 VideoConnectionWidget::~VideoConnectionWidget()
@@ -85,6 +86,7 @@ VideoConnectionWidget::~VideoConnectionWidget()
 	{
 		disconnect(mServices->video().get(), SIGNAL(StreamerServiceAdded(StreamerService*)), this, SLOT(onServiceAdded(StreamerService*)));
 		disconnect(mServices->video().get(), SIGNAL(StreamerServiceRemoved(StreamerService*)), this, SLOT(onServiceRemoved(StreamerService*)));
+		disconnect(mServices->video().get(), &VideoService::connectionMethodChanged, this, &VideoConnectionWidget::connectionMethodChangedSlot);
 	}
 }
 
@@ -190,12 +192,19 @@ QWidget* VideoConnectionWidget::wrapVerticalStretch(QWidget* input)
 	return retval;
 }
 
-void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
+void VideoConnectionWidget::setConnectionMethodAndUpdateGuiForConnectionMethodSlot()
 {
 	QString name = mConnectionSelector->getValue();
 	//Need to set connection method in VideoConnectionManager before calling
 	//useDirectLink(), useLocalServer() and useRemoteServer()
 	mServices->video()->setConnectionMethod(name);
+
+	this->updateGuiForConnectionMethod();
+}
+
+void VideoConnectionWidget::updateGuiForConnectionMethod()
+{
+	QString name = mConnectionSelector->getValue();
 
 	QWidget* serviceWidget = mStreamerServiceWidgets[name];
 	if(serviceWidget)
@@ -203,6 +212,18 @@ void VideoConnectionWidget::selectGuiForConnectionMethodSlot()
 		mStackedWidget->setCurrentWidget(serviceWidget);
 		mStackedWidgetFrame->setObjectName(serviceWidget->objectName()); // for improved help
 	}
+}
+
+void VideoConnectionWidget::connectionMethodChangedSlot()
+{
+	QString changedConnectionMethod = mServices->video()->getConnectionMethod();
+
+	//Don't trigger setConnectionMethodAndUpdateGuiForConnectionMethodSlot() that calls mServices->video()->setConnectionMethod
+	mConnectionSelector->blockSignals(true);
+	mConnectionSelector->setValue(changedConnectionMethod);
+	mConnectionSelector->blockSignals(false);
+
+	this->updateGuiForConnectionMethod();
 }
 
 void VideoConnectionWidget::toggleConnectServer()

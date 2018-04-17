@@ -49,7 +49,7 @@ void VideoServiceProxy::onVideoServiceAdded(VideoService* service)
 	mVideoService.reset(service, null_deleter());
 
 	connect(service, &VideoService::connected, this, &VideoService::connected);
-//	connect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
+	connect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
 	connect(service, &VideoService::activeVideoSourceChanged, this, &VideoService::activeVideoSourceChanged);
 	connect(service, &VideoService::fps, this, &VideoService::fps);
 
@@ -59,7 +59,7 @@ void VideoServiceProxy::onVideoServiceAdded(VideoService* service)
 void VideoServiceProxy::onVideoServiceRemoved(VideoService *service)
 {
 	disconnect(service, &VideoService::connected, this, &VideoService::connected);
-//	disconnect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
+	disconnect(service, &VideoService::connectionMethodChanged, this, &VideoService::connectionMethodChanged);
 	disconnect(service, &VideoService::activeVideoSourceChanged, this, &VideoService::activeVideoSourceChanged);
 	disconnect(service, &VideoService::fps, this, &VideoService::fps);
 

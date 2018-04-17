@@ -65,7 +65,8 @@ protected slots:
 	void toggleConnectServer();
 	void serverStatusChangedSlot();
 	void importStreamImageSlot();
-	void selectGuiForConnectionMethodSlot();
+	void setConnectionMethodAndUpdateGuiForConnectionMethodSlot();
+	void connectionMethodChangedSlot();
 	void onServiceAdded(StreamerService *service);
 	void onServiceRemoved(StreamerService *service);
 
@@ -99,6 +100,7 @@ private:
 	void addExistingStreamerServices();
 
 	std::map<QString, QWidget*> mStreamerServiceWidgets;
+	void updateGuiForConnectionMethod();
 };
 
 }//end namespace cx

@@ -97,7 +97,7 @@ public:
 
 signals:
 	void connected(bool on);
-//	void connectionMethodChanged();
+	void connectionMethodChanged();
 	/** Emitted when a video source is set to active,
 	  * OR when the available set of sources are changed.
 	  */
