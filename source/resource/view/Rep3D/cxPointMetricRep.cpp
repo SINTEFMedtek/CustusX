@@ -81,8 +81,7 @@ void PointMetricRep::rescale()
 	if (!mGraphicalPoint)
 		return;
 
-//	double size = mViewportListener->getVpnZoom(mMetric->getRefCoord());
-	double size = mViewportListener->getVpnZoom();
+	double size = mViewportListener->getVpnZoom(mMetric->getRefCoord());
 	double sphereSize = mGraphicsSize / 100 / size;
 	mGraphicalPoint->setRadius(sphereSize);
 }
