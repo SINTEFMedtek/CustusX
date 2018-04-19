@@ -46,7 +46,7 @@ namespace cx
 VideoConnectionWidget::VideoConnectionWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "igt_link_widget", "Video Connection"),
 	mServices(services),
-	mDontUpdateConnectionInService(false)
+	mUpdateConnectionInService(true)
 {
 	this->setToolTip("Connect to a video source");
 	mOptions = profile()->getXmlSettings().descend("video");
@@ -198,9 +198,9 @@ void VideoConnectionWidget::setConnectionMethodAndUpdateGuiForConnectionMethodSl
 	QString name = mConnectionSelector->getValue();
 	//Need to set connection method in VideoConnectionManager before calling
 	//useDirectLink(), useLocalServer() and useRemoteServer()
-	if(!mDontUpdateConnectionInService)
+	if(mUpdateConnectionInService)
 		mServices->video()->setConnectionMethod(name);
-	mDontUpdateConnectionInService = false;
+	mUpdateConnectionInService = true;
 
 	QWidget* serviceWidget = mStreamerServiceWidgets[name];
 	if(serviceWidget)
@@ -214,7 +214,7 @@ void VideoConnectionWidget::connectionMethodChangedSlot()
 {
 	QString changedConnectionMethod = mServices->video()->getConnectionMethod();
 
-	this->mDontUpdateConnectionInService = true;//Prevent infinite signal loop
+	this->mUpdateConnectionInService = false;//Prevent infinite signal loop
 	mConnectionSelector->setValue(changedConnectionMethod);
 }
 
