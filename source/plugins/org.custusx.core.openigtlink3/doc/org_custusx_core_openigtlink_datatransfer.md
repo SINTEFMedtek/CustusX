@@ -67,3 +67,5 @@ Known issues
 - The CustusX user interface may be unresponsive when PlusServer is starting and stopping.
 - The console may print a lot of messages while the PLUS server is starting (<i>"Failed to connect to server..."</i>).
 - If show PLUS output is turned on, a lot of warnings may be printed for the image messages (<i>"Unspecified characters received..."</i>).
+- Using PLUS tracking may require restart before using other tracking methods in CustusX.
+- Pressing stop button before connecting to PLUS is finished will cause problems (OpenIGTLink client will not be closed).
