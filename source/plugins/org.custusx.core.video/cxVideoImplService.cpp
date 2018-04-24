@@ -292,7 +292,7 @@ void VideoImplService::setConnectionMethod(QString connectionMethod)
     }
 
     mConnectionMethod = connectionMethod;
-//	emit connectionMethodChanged();
+	emit connectionMethodChanged();
 }
 
 std::vector<TimelineEvent> VideoImplService::getPlaybackEvents()

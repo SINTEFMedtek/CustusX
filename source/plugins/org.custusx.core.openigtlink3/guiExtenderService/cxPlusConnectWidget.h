@@ -56,7 +56,6 @@ private:
 	QComboBox* mPlusPathComboBox;
 	BoolPropertyPtr mShowPlusOutput;
 
-	void turnOnStartTrackingInOpenIGTLinkStreamer(StreamerServicePtr streamerService);
 	StreamerServicePtr getStreamerService();
 	bool startPlus();
 	bool stopPlus();
@@ -67,6 +66,7 @@ private:
 	QStringList getPlusConfigFilePaths();
 	bool configFileIsValid();
 	void startOpenIGTLink3VideoStreaming();
+	void changeOpenIGTLinkStreamerParameter(StreamerServicePtr streamerService, QString parameterName, QVariant value);
 };
 
 }//namespace cx
