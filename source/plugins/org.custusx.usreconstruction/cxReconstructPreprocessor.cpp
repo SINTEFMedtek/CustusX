@@ -26,6 +26,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxPatientModelService.h"
+#include "cxMathUtils.h"
+
+#include <QThread>
 
 namespace cx
 {
@@ -194,44 +197,33 @@ void ReconstructPreprocessor::filterPositions()
     {
         int filterLength(1+2*filterStrength);
         int nPositions(mFileData.mPositions.size());
-        if (nPositions > filterLength) //Position sequence sufficient long
+        if (nPositions > filterLength) //Position sequence sufficient long?
         {
-            // Define quaternion array
-            Eigen::ArrayXXd qPosArray(7,(nPositions+(2*filterStrength))); // Add room for FIR-filtering
-            Transform3D localTx;
-            Eigen::Quaterniond qA;
+            // Init array to hold positions converted to quaternions:
+            int nQuaternions = nPositions+(2*filterStrength); // Add room for FIR-filtering
+            Eigen::ArrayXXd qPosArray(7,nQuaternions);
 
-            unsigned int sourceIdx(0);
-            for (unsigned int i = 0; i < (nPositions+(2*filterStrength)); i++)
+            // Convert to quaternions:
+            for (unsigned int i = 0; i < nQuaternions; i++) //For each pose (Tx), with edge padding
             {
-
-                // Convert to quaternions
-                sourceIdx =  (i > filterStrength) ? (i-filterStrength) : 0; // Pad array with edge elements
+                unsigned int sourceIdx =  (i > filterStrength) ? (i-filterStrength) : 0; // Index in Tx array, pad with edge elements
                 sourceIdx =  (sourceIdx < nPositions) ? sourceIdx : (nPositions-1);
-
-                localTx = mFileData.mPositions[sourceIdx].mPos;
-
-                qPosArray.block<3,1>(4,i) = localTx.matrix().block<3, 1>(0,3); // Translation part
-                qA = Eigen::Quaterniond(localTx.matrix().block<3, 3>(0,0)); //Convert rot to quaternions
-                qPosArray.block<4,1>(0,i) = qA.coeffs(); //Rotation parameters
-
+                qPosArray.col(i) = matrixToQuaternion(mFileData.mPositions[sourceIdx].mPos); // Convert each Tx to quaternions
             }
 
-            // Filter quaternion arrays (simple averaging filter)
+            // Filter quaternion arrays (simple averaging filter):
             Eigen::ArrayXXd qPosFiltered = Eigen::ArrayXXd::Zero(7,nPositions); // Fill with zeros
-            for (unsigned int i = 0; i < (1+2*filterStrength); i++)
+            for (unsigned int i = 0; i < filterLength; i++)
             {
                 qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,nPositions);
             }
-            qPosFiltered = qPosFiltered / (1+2*filterStrength);
+            qPosFiltered = qPosFiltered / filterLength;
 
-            for (unsigned int i = 0; i < mFileData.mPositions.size(); i++)
+            // Convert back to Tx:
+            for (unsigned int i = 0; i < mFileData.mPositions.size(); i++) //For each pose after filtering
             {
                 // Convert back to position data
-                qA.coeffs() = qPosFiltered.block<4,1>(0,i);
-                localTx.matrix().block<3, 3>(0,0) = qA.toRotationMatrix();
-                localTx.matrix().block<3, 1>(0,3) = qPosFiltered.block<3,1>(4,i);
-                mFileData.mPositions[i].mPos = localTx;
+                mFileData.mPositions[i].mPos = quaternionToMatrix(qPosFiltered.col(i));
             }
         }
     }
