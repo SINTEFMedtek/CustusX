@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxPatientModelService.h"
 #include "cxMathUtils.h"
+#include "cxPositionFilter.h"
 
 #include <QThread>
 
@@ -191,42 +192,12 @@ struct RemoveDataType
 
 void ReconstructPreprocessor::filterPositions()
 {
+
     int filterStrength = mInput.mPosFilterStrength;
+    //PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
+    PositionFilter positionFilter(filterStrength, mFileData.mPositions);
+    positionFilter.filterPositions();
 
-    if (filterStrength > 0) //Position filter enabled
-    {
-        int filterLength(1+2*filterStrength);
-        int nPositions(mFileData.mPositions.size());
-        if (nPositions > filterLength) //Position sequence sufficient long?
-        {
-            // Init array to hold positions converted to quaternions:
-            int nQuaternions = nPositions+(2*filterStrength); // Add room for FIR-filtering
-            Eigen::ArrayXXd qPosArray(7,nQuaternions);
-
-            // Convert to quaternions:
-            for (unsigned int i = 0; i < nQuaternions; i++) //For each pose (Tx), with edge padding
-            {
-                unsigned int sourceIdx =  (i > filterStrength) ? (i-filterStrength) : 0; // Index in Tx array, pad with edge elements
-                sourceIdx =  (sourceIdx < nPositions) ? sourceIdx : (nPositions-1);
-                qPosArray.col(i) = matrixToQuaternion(mFileData.mPositions[sourceIdx].mPos); // Convert each Tx to quaternions
-            }
-
-            // Filter quaternion arrays (simple averaging filter):
-            Eigen::ArrayXXd qPosFiltered = Eigen::ArrayXXd::Zero(7,nPositions); // Fill with zeros
-            for (unsigned int i = 0; i < filterLength; i++)
-            {
-                qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,nPositions);
-            }
-            qPosFiltered = qPosFiltered / filterLength;
-
-            // Convert back to Tx:
-            for (unsigned int i = 0; i < mFileData.mPositions.size(); i++) //For each pose after filtering
-            {
-                // Convert back to position data
-                mFileData.mPositions[i].mPos = quaternionToMatrix(qPosFiltered.col(i));
-            }
-        }
-    }
 
 }
 

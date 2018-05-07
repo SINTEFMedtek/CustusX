@@ -67,6 +67,9 @@ private:
     OutputVolumeParams mOutputVolumeParams;
 
 	PatientModelServicePtr mPatientModelService;
+        void convertToQuaternions(Eigen::ArrayXXd qPosArray, int nQuaternions, int nPositions, int filterStrength);
+        Eigen::ArrayXXd filterQuaternionArray(Eigen::ArrayXXd qPosArray, int nPositions, int filterLength);
+        void convertFromQuaternion(Eigen::ArrayXXd qPosFiltered);
 };
 
 } /* namespace cx */
