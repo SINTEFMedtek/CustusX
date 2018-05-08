@@ -192,20 +192,16 @@ struct RemoveDataType
 
 void ReconstructPreprocessor::filterPositions()
 {
-
     int filterStrength = mInput.mPosFilterStrength;
     //PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
     PositionFilter positionFilter(filterStrength, mFileData.mPositions);
     positionFilter.filterPositions();
-
-
 }
 
 void ReconstructPreprocessor::positionThinning()
 {
     // If enabled, try to remove "suspect" data (large jumps etc.)
     // Replace tracking positions that deviate greatly from neighbours with an interpolated value
-
 }
 
 

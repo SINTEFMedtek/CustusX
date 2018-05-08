@@ -33,9 +33,9 @@ private:
     int mFilterLength;
     int mNumberQuaternions;
 
-    void convertToQuaternions(Eigen::ArrayXXd qPosArray);
-    Eigen::ArrayXXd filterQuaternionArray(Eigen::ArrayXXd qPosArray);
-    void convertFromQuaternion(Eigen::ArrayXXd qPosFiltered);
+    void convertToQuaternions(Eigen::ArrayXXd &qPosArray);
+    void filterQuaternionArray(Eigen::ArrayXXd &qPosArray);
+    void convertFromQuaternion(Eigen::ArrayXXd &qPosFiltered);
 };
 
 }//cx

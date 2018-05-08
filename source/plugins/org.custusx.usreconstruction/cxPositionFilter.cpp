@@ -24,7 +24,7 @@ PositionFilter::PositionFilter(int filterStrength, std::vector<class TimedPositi
     mNumberQuaternions = 2*filterStrength + mNumberInputPositions;
 }
 
-void PositionFilter::convertToQuaternions(Eigen::ArrayXXd qPosArray)
+void PositionFilter::convertToQuaternions(Eigen::ArrayXXd &qPosArray)
 {
     for (unsigned int i = 0; i < mNumberQuaternions; i++) //For each pose (Tx), with edge padding
     {
@@ -34,24 +34,22 @@ void PositionFilter::convertToQuaternions(Eigen::ArrayXXd qPosArray)
     }
 }
 
-Eigen::ArrayXXd PositionFilter::filterQuaternionArray(Eigen::ArrayXXd qPosArray)
+void PositionFilter::filterQuaternionArray(Eigen::ArrayXXd &qPosArray)
 {
     Eigen::ArrayXXd qPosFiltered = Eigen::ArrayXXd::Zero(7,mNumberInputPositions); // Fill with zeros
     for (unsigned int i = 0; i < mFilterLength; i++)
     {
         qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,mNumberInputPositions);
     }
-    qPosFiltered = qPosFiltered / mFilterLength;
-
-    return qPosFiltered;
+    qPosArray = qPosFiltered / mFilterLength; // Scale and write back to qPosArray
 }
 
-void PositionFilter::convertFromQuaternion(Eigen::ArrayXXd qPosFiltered)
+void PositionFilter::convertFromQuaternion(Eigen::ArrayXXd &qPosArray)
 {
     for (unsigned int i = 0; i < mInputImagePositions.size(); i++) //For each pose after filtering
     {
         // Convert back to position data
-        mInputImagePositions.at(i).mPos = quaternionToMatrix(qPosFiltered.col(i));
+        mInputImagePositions.at(i).mPos = quaternionToMatrix(qPosArray.col(i));
     }
 }
 
@@ -60,8 +58,6 @@ void PositionFilter::filterPositions()
 
     if (mFilterStrength > 0) //Position filter enabled?
     {
-
-
         if (mNumberInputPositions > mFilterLength) //Position sequence sufficient long?
         {
             // Init array to hold positions converted to quaternions:
@@ -69,14 +65,10 @@ void PositionFilter::filterPositions()
             Eigen::ArrayXXd qPosArray(7,nQuaternions);
 
             convertToQuaternions(qPosArray);
-
-            Eigen::ArrayXXd qPosFiltered = filterQuaternionArray(qPosArray);
-
-            convertFromQuaternion(qPosFiltered);
+            filterQuaternionArray(qPosArray);
+            convertFromQuaternion(qPosArray);
         }
     }
-
 }
-
 
 } //cx
