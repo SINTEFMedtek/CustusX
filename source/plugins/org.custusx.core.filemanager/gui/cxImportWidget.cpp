@@ -110,6 +110,7 @@ void ImportWidget::addMoreFilesButtonClicked()
 		mParentCandidates = this->generateParentCandidates(mData);
 		emit parentCandidatesUpdated();
 		widget = new ImportDataTypeWidget(NULL, mVisServices, newData, mParentCandidates);
+		connect(this, &ImportWidget::readyToImport, widget, &ImportDataTypeWidget::prepareDataForImport);
 		connect(this, &ImportWidget::parentCandidatesUpdated, widget, &ImportDataTypeWidget::update);
 		mStackedWidget->insertWidget(index, widget);
 	}
@@ -117,14 +118,13 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 void ImportWidget::importButtonClicked()
 {
-	for(int i=0; i<mData.size(); ++i)
-	{
-		if(mData[i])
-		{
-			mVisServices->patient()->insertData(mData[i]);
-		}
-	}
+	emit readyToImport();
 	emit finishedImporting();
+
+	//TODO:
+	//should trigger:
+	//	autosave
+	//	autoshow
 }
 
 void ImportWidget::cancelButtonClicked()

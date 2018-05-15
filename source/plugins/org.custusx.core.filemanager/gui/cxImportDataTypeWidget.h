@@ -25,6 +25,7 @@ public:
 
 public slots:
 	void update();
+	void prepareDataForImport();
 
 private slots:
 	virtual void showEvent(QShowEvent *event);
@@ -35,6 +36,12 @@ private:
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
 	void updateParentCandidatesComboBox();
+
+	void importAllData();
+
+	void applyParentTransformImport();
+	void applyConversionLPS();
+	void applyConversionToUnsigned();
 
 	//Use heuristics to guess a parent frame, based on similarities in name.
 	QString getInitialGuessForParentFrame() const;
@@ -49,6 +56,7 @@ private:
 	QComboBox *mAnatomicalCoordinateSystems;
 	QComboBox *mShouldImportParentTransform;
 	QComboBox *mParentCandidatesCB;
+	QCheckBox *mShouldConvertDataToUnsigned;
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;

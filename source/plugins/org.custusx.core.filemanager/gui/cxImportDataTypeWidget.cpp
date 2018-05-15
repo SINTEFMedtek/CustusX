@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <QCheckBox>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
 #include "cxFileManagerService.h"
@@ -13,6 +14,9 @@
 #include "cxImage.h"
 #include "cxPointMetric.h"
 #include "cxLabeledComboBoxWidget.h"
+#include "cxVolumeHelpers.h"
+#include "cxImageTF3D.h"
+#include "cxImageLUT2D.h"
 
 namespace cx
 {
@@ -33,6 +37,9 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	mShouldImportParentTransform->addItem("Yes");
 
 	mParentCandidatesCB = new QComboBox();
+
+	mShouldConvertDataToUnsigned = new QCheckBox();
+	mShouldConvertDataToUnsigned->setCheckState(Qt::Unchecked);
 
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
@@ -116,6 +123,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	gridLayout->addWidget(mShouldImportParentTransform, 2, 1);
 	gridLayout->addWidget(new QLabel("Set parent"), 3, 0);
 	gridLayout->addWidget(mParentCandidatesCB, 3, 1);
+	gridLayout->addWidget(new QLabel("Convert data to unsigned?"), 4, 0);
+	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
 
 	topLayout->addLayout(gridLayout);
 	topLayout->addWidget(mTableWidget);
@@ -149,21 +158,157 @@ void ImportDataTypeWidget::updateSpaceComboBox(QComboBox *box, QString pointMetr
 
 void ImportDataTypeWidget::updateParentCandidatesComboBox()
 {
+	//remember selection
+	QString selectedParentId = (mParentCandidatesCB->itemData(mParentCandidatesCB->currentIndex()).toString());
+	CX_LOG_DEBUG() << "Selected parent id: " << selectedParentId;
+
 	mParentCandidatesCB->clear();
 	std::map<QString, QString> parentCandidates = this->getParentCandidateList();
 	std::map<QString, QString>::iterator it;
 	QVariant emptyId("");
 	mParentCandidatesCB->addItem("", emptyId);
+	int selectedIndex = 0;
 	for(it= parentCandidates.begin(); it != parentCandidates.end(); ++it)
 	{
-		QVariant id(it->second);
+		QString idString = it->second;
+		QVariant id(idString);
 		mParentCandidatesCB->addItem(it->first, id);
+		if(selectedParentId.compare(idString, Qt::CaseInsensitive) == 0)
+			selectedIndex = mParentCandidatesCB->count()-1;
 	}
 
+	if(selectedIndex != 0)
+		mParentCandidatesCB->setCurrentIndex(selectedIndex);
+
+	//TODO parent guess:
+	/*
 	QString parentGuess = this->getInitialGuessForParentFrame();
 	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
 	mParentCandidatesCB->setCurrentText(parentGuess);
+	*/
 
+}
+
+void ImportDataTypeWidget::importAllData()
+{
+	for(int i=0; i<mData.size(); ++i)
+	{
+		if(mData[i])
+		{
+			mServices->patient()->insertData(mData[i]);
+		}
+	}
+}
+
+void ImportDataTypeWidget::applyParentTransformImport()
+{
+	CX_LOG_DEBUG() << "applyParentTransformImport()";
+
+	QString parentId = (mParentCandidatesCB->itemData(mParentCandidatesCB->currentIndex()).toString());
+	DataPtr parent = mServices->patient()->getData(parentId);
+
+	if(!parent)
+	{
+		CX_LOG_ERROR() << "Could not find parent data with uid: " << parentId;
+		return;
+	}
+
+	std::vector<DataPtr>::iterator it = mData.begin();
+	for(;it!=mData.end(); ++it)
+	{
+		DataPtr data = (*it);
+		data->get_rMd_History()->setRegistration(parent->get_rMd());
+		report("Assigned rMd from data [" + parent->getName() + "] to data [" + data->getName() + "]");
+	}
+
+	/*
+  if (!mTransformFromParentFrameCheckBox->isChecked())
+	return;
+  if(!mData)
+	return;
+  DataPtr parent = mPatientModelService->getData(mData->getParentSpace());
+  if (!parent)
+	return;
+  mData->get_rMd_History()->setRegistration(parent->get_rMd());
+  report("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
+	*/
+}
+
+void ImportDataTypeWidget::applyConversionLPS()
+{
+	CX_LOG_DEBUG() << "applyConversionLPS()";
+
+	std::vector<DataPtr>::iterator it = mData.begin();
+	for(;it!=mData.end(); ++it)
+	{
+		DataPtr data = (*it);
+		Transform3D sMd = data->get_rMd();
+		Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+		Transform3D rMd = sMr.inv() * sMd;
+		data->get_rMd_History()->setRegistration(rMd);
+		report("Nifti import: Converted data " + data->getName() + " from LPS to RAS coordinates.");
+	}
+
+	/*
+	if (!mNiftiFormatCheckBox->isChecked())
+	  return;
+	if(!mData)
+	  return;
+	Transform3D sMd = mData->get_rMd();
+	Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+  //  rMd = createTransformRotateZ(M_PI) * rMd;
+	Transform3D rMd = sMr.inv() * sMd;
+	mData->get_rMd_History()->setRegistration(rMd);
+	report("Nifti import: Converted data " + mData->getName() + " from LPS to RAS coordinates.");
+	*/
+
+}
+
+void ImportDataTypeWidget::applyConversionToUnsigned()
+{
+	CX_LOG_DEBUG() << "applyConversionToUnsigned()";
+
+	std::vector<DataPtr>::iterator it = mData.begin();
+	for(;it!=mData.end(); ++it)
+	{
+		DataPtr data = (*it);
+
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+		if (!image)
+			return;
+
+		ImagePtr converted = convertImageToUnsigned(mServices->patient(), image);
+
+		image->setVtkImageData(converted->getBaseVtkImageData());
+
+		ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy();
+		ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
+		image->setLookupTable2D(LUT2D);
+		image->setTransferFunctions3D(TF3D);
+		//mServices->patient()->insertData(image);
+
+		DataPtr convertedData = boost::dynamic_pointer_cast<Data>(image);
+		(*it) = convertedData;
+	}
+
+	/*
+	if (!mConvertToUnsignedCheckBox->isChecked())
+		return;
+
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData);
+	if (!image)
+		return;
+
+	ImagePtr converted = convertImageToUnsigned(mPatientModelService, image);
+
+	image->setVtkImageData(converted->getBaseVtkImageData());
+
+	ImageTF3DPtr TF3D = converted->getTransferFunctions3D()->createCopy();
+	ImageLUT2DPtr LUT2D = converted->getLookupTable2D()->createCopy();
+	image->setLookupTable2D(LUT2D);
+	image->setTransferFunctions3D(TF3D);
+	mPatientModelService->insertData(image);
+	*/
 }
 
 void ImportDataTypeWidget::update()
@@ -177,6 +322,19 @@ void ImportDataTypeWidget::update()
 		QComboBox *box = it->second;
 		this->updateSpaceComboBox(box,id);
 	}
+}
+
+void ImportDataTypeWidget::prepareDataForImport()
+{
+	if(mShouldConvertDataToUnsigned->isChecked())
+		this->applyConversionToUnsigned();
+
+	this->importAllData();
+
+	if(mShouldImportParentTransform->currentText().compare("Yes") == 0)
+		this->applyParentTransformImport();
+	if(mAnatomicalCoordinateSystems->currentText().compare("LPS") != 0)
+		this->applyConversionLPS();
 }
 
 void ImportDataTypeWidget::showEvent(QShowEvent *event)

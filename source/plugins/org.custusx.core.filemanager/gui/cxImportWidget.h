@@ -19,6 +19,7 @@ public:
 	ImportWidget(FileManagerServicePtr filemanager, VisServicesPtr services);
 
 signals:
+	void readyToImport();
 	void finishedImporting();
 	void parentCandidatesUpdated();
 
@@ -52,7 +53,6 @@ private:
 	VisServicesPtr mVisServices;
 
 	QVBoxLayout * mTopLayout;
-
 };
 
 }
