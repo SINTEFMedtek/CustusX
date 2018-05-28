@@ -11,62 +11,59 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxPositionFilter.h"
 #include "cxMathUtils.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-PositionFilter::PositionFilter(int filterStrength, std::vector<class TimedPosition> positions) :
-    mFilterStrength(filterStrength),
-    mInputImagePositions(positions)
+PositionFilter::PositionFilter(int filterStrength, std::vector<class TimedPosition> &inputImagePositions) :
+    mFilterStrength(filterStrength)
 {
     mFilterLength = 1+2*filterStrength;
-    mNumberInputPositions=mInputImagePositions.size();
-    mNumberQuaternions = 2*filterStrength + mNumberInputPositions;
+    mNumberInputPositions=inputImagePositions.size();
+    mNumberQuaternions = mNumberInputPositions+mFilterLength;
+
+    qPosArray = Eigen::ArrayXXd::Zero(7,mNumberQuaternions);
+    qPosFiltered = Eigen::ArrayXXd::Zero(7,mNumberInputPositions);
 }
 
-void PositionFilter::convertToQuaternions(Eigen::ArrayXXd &qPosArray)
+void PositionFilter::convertToQuaternions(std::vector<class TimedPosition> &inputImagePositions)
 {
     for (unsigned int i = 0; i < mNumberQuaternions; i++) //For each pose (Tx), with edge padding
     {
         unsigned int sourceIdx =  (i > mFilterStrength) ? (i-mFilterStrength) : 0; // Calculate index in Tx array, pad with edge elements //Skriv om
         sourceIdx =  (sourceIdx < mNumberInputPositions) ? sourceIdx : (mNumberInputPositions-1);
-        qPosArray.col(i) = matrixToQuaternion(mInputImagePositions.at(sourceIdx).mPos); // Convert each Tx to quaternions
+        qPosArray.col(i) = matrixToQuaternion(inputImagePositions.at(sourceIdx).mPos); // Convert each Tx to quaternions
     }
 }
 
-void PositionFilter::filterQuaternionArray(Eigen::ArrayXXd &qPosArray)
+void PositionFilter::filterQuaternionArray()
 {
-    Eigen::ArrayXXd qPosFiltered = Eigen::ArrayXXd::Zero(7,mNumberInputPositions); // Fill with zeros
     for (unsigned int i = 0; i < mFilterLength; i++)
     {
         qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,mNumberInputPositions);
     }
-    qPosArray = qPosFiltered / mFilterLength; // Scale and write back to qPosArray
+    qPosFiltered = qPosFiltered / mFilterLength; // Scale and write back to qPosArray
 }
 
-void PositionFilter::convertFromQuaternion(Eigen::ArrayXXd &qPosArray)
+void PositionFilter::convertFromQuaternion(std::vector<class TimedPosition> &inputImagePositions)
 {
-    for (unsigned int i = 0; i < mInputImagePositions.size(); i++) //For each pose after filtering
+    for (unsigned int i = 0; i < inputImagePositions.size(); i++) //For each pose after filtering
     {
         // Convert back to position data
-        mInputImagePositions.at(i).mPos = quaternionToMatrix(qPosArray.col(i));
+        inputImagePositions.at(i).mPos = quaternionToMatrix(qPosFiltered.col(i));
     }
 }
 
-void PositionFilter::filterPositions()
+void PositionFilter::filterPositions(std::vector<class TimedPosition> &inputImagePositions)
 {
-
     if (mFilterStrength > 0) //Position filter enabled?
     {
         if (mNumberInputPositions > mFilterLength) //Position sequence sufficient long?
         {
-            // Init array to hold positions converted to quaternions:
-            int nQuaternions = mNumberInputPositions+(2*mFilterStrength); // Add room for FIR-filtering
-            Eigen::ArrayXXd qPosArray(7,nQuaternions);
-
-            convertToQuaternions(qPosArray);
-            filterQuaternionArray(qPosArray);
-            convertFromQuaternion(qPosArray);
+            convertToQuaternions(inputImagePositions);
+            filterQuaternionArray();
+            convertFromQuaternion(inputImagePositions);
         }
     }
 }

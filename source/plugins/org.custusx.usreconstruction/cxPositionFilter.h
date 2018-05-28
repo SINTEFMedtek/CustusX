@@ -24,18 +24,20 @@ namespace cx
 class PositionFilter
 {
 public:
-    PositionFilter(int filterStrength, std::vector<class TimedPosition> positions);
-    void filterPositions();
-private:
+    PositionFilter(int filterStrength, std::vector<TimedPosition> &inputImagePositions);
+    void filterPositions(std::vector<class TimedPosition> &inputImagePositions);
+protected:
     int mFilterStrength;
-    std::vector<TimedPosition> mInputImagePositions;
+    std::vector<TimedPosition> inputImagePositions;
     int mNumberInputPositions;
     int mFilterLength;
     int mNumberQuaternions;
+    Eigen::ArrayXXd qPosArray;
+    Eigen::ArrayXXd qPosFiltered;
 
-    void convertToQuaternions(Eigen::ArrayXXd &qPosArray);
-    void filterQuaternionArray(Eigen::ArrayXXd &qPosArray);
-    void convertFromQuaternion(Eigen::ArrayXXd &qPosFiltered);
+    void convertToQuaternions(std::vector<TimedPosition> &inputImagePositions);
+    void filterQuaternionArray();
+    void convertFromQuaternion(std::vector<TimedPosition> &inputImagePositions);
 };
 
 }//cx

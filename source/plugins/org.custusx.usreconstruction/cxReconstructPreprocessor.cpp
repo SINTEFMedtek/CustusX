@@ -193,9 +193,10 @@ struct RemoveDataType
 void ReconstructPreprocessor::filterPositions()
 {
     int filterStrength = mInput.mPosFilterStrength;
+    CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
     //PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
     PositionFilter positionFilter(filterStrength, mFileData.mPositions);
-    positionFilter.filterPositions();
+    positionFilter.filterPositions(mFileData.mPositions);
 }
 
 void ReconstructPreprocessor::positionThinning()
