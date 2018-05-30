@@ -292,7 +292,7 @@ class Eigen(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:RLovelett/eigen.git'
+        return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
