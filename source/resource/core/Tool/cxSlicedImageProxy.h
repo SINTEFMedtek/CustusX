@@ -82,6 +82,8 @@ public:
 	void setSliceProxy(SliceProxyInterfacePtr slicer);
 	void setImage(ImagePtr image);
 	ImagePtr getImage() const;
+	void setOutputSpacing(Vector3D spacing);
+	void setOutputDims(Eigen::Array3i dim);
 	void setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vector3D spacing);
 	void update();
 	vtkImageDataPtr getOutput(); ///< output 2D sliced image

@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -26,7 +26,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSliceProxy.h"
 #include "cxImageLUT2D.h"
 #include "cxTypeConversions.h"
-
 
 namespace cx
 {
@@ -138,6 +137,15 @@ SlicedImageProxy::SlicedImageProxy()
 
 SlicedImageProxy::~SlicedImageProxy()
 {
+}
+
+void SlicedImageProxy::setOutputSpacing(Vector3D spacing)
+{
+	mReslicer->SetOutputSpacing(spacing.data());
+}
+void SlicedImageProxy::setOutputDims(Eigen::Array3i dim)
+{
+	mReslicer->SetOutputExtent(0, dim[0], 0, dim[1], 0, 0);
 }
 
 void SlicedImageProxy::setOutputFormat(Vector3D origin, Eigen::Array3i dim, Vector3D spacing)
