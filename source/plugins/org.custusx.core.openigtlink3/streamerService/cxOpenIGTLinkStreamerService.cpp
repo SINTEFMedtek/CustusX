@@ -95,7 +95,8 @@ void OpenIGTLinkStreamerService::startTracking(QDomElement root)
 		// Trying to connect will cause several tests to fail,
 		// because ClientSocket::ConnectToServer in OpenIGTLink/OpenIGTLink/Source/igtlClientSocket.cxx
 		// will print error messages when it cannot connect.
-		// Default value for trackAndStream (named start_tracking in settings xml file) is therefore set to false
+		// Default value for trackAndStream (named start_tracking in settings xml file,
+		// and defined as OPENIGTLINK3_STREAMER_START_TRACKING in code) is therefore set to false.
 		mConnection->requestConnectToServer(this->getIPOption(root)->getValue().toStdString(),
 																				int(this->getStreamPortOption(root)->getValue()));
 	}
@@ -129,7 +130,7 @@ BoolPropertyBasePtr OpenIGTLinkStreamerService::trackAndStream(QDomElement root)
 {
 	BoolPropertyPtr retval;
 	// Default value need to be false to prevent tests from failing
-	retval = BoolProperty::initialize("start_tracking", "Also Start OpenIGTLink client and Tracking",
+	retval = BoolProperty::initialize(OPENIGTLINK3_STREAMER_START_TRACKING, "Also Start OpenIGTLink client and Tracking",
 																		"Combined functionality: \n"
 																		"Run both tracking and streaming over OpenIGTLink",
 																		false, root);
@@ -142,7 +143,7 @@ StringPropertyBasePtr OpenIGTLinkStreamerService::getIPOption(QDomElement root)
 {
 	StringPropertyPtr retval;
 	QString defaultValue = "127.0.0.1";
-	retval = StringProperty::initialize("ip_scanner", "Address", "TCP/IP Address",
+	retval = StringProperty::initialize(OPENIGTLINK3_STREAMER_IP, "Address", "TCP/IP Address",
 												defaultValue, root);
 	retval->setGroup("Connection");
 	return retval;

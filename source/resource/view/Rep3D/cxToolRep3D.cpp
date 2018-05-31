@@ -44,7 +44,7 @@ ToolRep3D::ToolRep3D(SpaceProviderPtr spaceProvider) :
 	mOffsetPointColor = settings()->value("View/toolOffsetPointColor").value<QColor>();
 	mOffsetLineColor = settings()->value("View/toolOffsetLineColor").value<QColor>();
 
-	mSphereRadius = 2;
+	mSphereRadius = settings()->value("View3D/sphereRadius").value<double>();
 	mStayHiddenAfterVisible = false;
 	mStayVisibleAfterHide = false;
 	mOffsetPointVisibleAtZeroOffset = false;
@@ -259,7 +259,8 @@ void ToolRep3D::scaleSpheres()
 	if (!mViewportListener->isListening())
 		return;
 
-	double size = mViewportListener->getVpnZoom(this->getTool()->get_prMt().translation());
+//	double size = mViewportListener->getVpnZoom(this->getTool()->get_prMt().translation());
+	double size = mViewportListener->getVpnZoom();
 	double sphereSize = mSphereRadius/100/size;
 
 	if (mOffsetPoint)

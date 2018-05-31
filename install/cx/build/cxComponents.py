@@ -195,7 +195,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('d2f2c21829718c0960dff7eb868dbb243c49a6ea')
+        self._getBuilder().gitCheckout('1c14943c3975fe826da1e7be1624c16c893d1c68')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -292,7 +292,7 @@ class Eigen(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:RLovelett/eigen.git'
+        return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
