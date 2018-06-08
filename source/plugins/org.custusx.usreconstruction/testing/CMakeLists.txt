@@ -11,6 +11,7 @@ if(BUILD_TESTING)
         cxtestReconstructRealData.h
         cxtestReconstructRealData.cpp
         cxtestPositionFilter.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
     
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
