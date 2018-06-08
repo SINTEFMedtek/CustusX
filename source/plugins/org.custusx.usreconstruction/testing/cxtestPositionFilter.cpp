@@ -11,9 +11,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 #include "cxLogger.h"
-#include "cxtestUtilities.h"
 #include "cxPositionFilter.h"
 #include <QDateTime>
+
 
 namespace cxtest
 {

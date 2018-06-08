@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxMathUtils.h"
+
 #include "cxVector3D.h"
 
 // For debugging:
