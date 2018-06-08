@@ -13,6 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXPOSITIONFILTER_H
 #define CXPOSITIONFILTER_H
 
+#include "org_custusx_usreconstruction_Export.h"
+
 #include <boost/shared_ptr.hpp>
 #include "cxMathBase.h"
 #include "cxUSReconstructInputData.h"
@@ -21,7 +23,7 @@ namespace cx
 {
 //typedef boost::shared_ptr<std::vector<class TimedPosition> > PositionsPtr;
 
-class PositionFilter
+class org_custusx_usreconstruction_EXPORT PositionFilter
 {
 public:
     PositionFilter(int filterStrength, std::vector<TimedPosition> &inputImagePositions);
