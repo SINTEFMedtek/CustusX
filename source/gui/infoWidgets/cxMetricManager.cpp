@@ -18,7 +18,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QCheckBox>
+#include <QGroupBox>
 #include <QLabel>
+#include <QButtonGroup>
 #include <vtkMNITagPointReader.h>
 #include <vtkStringArray.h>
 #include "vtkForwardDeclarations.h"
@@ -521,6 +524,20 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 	QLabel *description_label = new QLabel(description);
 	layout->addWidget(description_label);
 
+    QButtonGroup *coordinateSysSelector = new QButtonGroup();
+    QCheckBox *selectorLPS = new QCheckBox(tr("LPS (DICOM)"));
+    QCheckBox *selectorRAS = new QCheckBox(tr("RAS (Neuro)"));
+    selectorRAS->setChecked(true);
+    coordinateSysSelector->addButton(selectorRAS);
+    coordinateSysSelector->addButton(selectorLPS);
+    QGroupBox *coordinateSysSelectors = new QGroupBox(tr("Coordinate system format"));
+    QVBoxLayout *coordSelectLayout = new QVBoxLayout;
+    coordSelectLayout->addWidget(selectorLPS);
+    coordSelectLayout->addWidget(selectorRAS);
+    coordSelectLayout->addStretch(1);
+    coordinateSysSelectors->setLayout(coordSelectLayout);
+    layout->addWidget(coordinateSysSelectors);
+
 	std::map<int, StringPropertySelectImagePtr> selectedImageProperties;
 	for(int i=0; i < number_of_volumes; ++i)
 	{
@@ -584,14 +601,17 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 			for(int j=0; j < number_of_points; ++j)
 			{
 				vtkStdString label = labels->GetValue(j);
-				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
+                name = QString::fromStdString(label);
+                if(name.isEmpty() || (name == QString(" ")) )   // if no name label is given in .tag file, metric name is set to continous numbering
+                    name = QString::number(j+1);
+
 				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
 
 				double *point = points->GetPoint(j);
-				DataPtr data = this->createData(type, uid, QString::number(j+1));
+                DataPtr data = this->createData(type, uid, name);
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
 
-				CoordinateSystem space(csDATA, data_uid[i]);
+                CoordinateSystem space(csREF, data_uid[i]);
 				Vector3D vector_ras(point[0], point[1], point[2]);
 				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
 
@@ -599,7 +619,7 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
 				Vector3D vector_lps = sMr.inv() * vector_ras;
 
-				point_metric->setCoordinate(vector_lps);
+                point_metric->setCoordinate(vector_ras);
 				point_metric->setSpace(space);
 				point_metric->setColor(color);
 			}
