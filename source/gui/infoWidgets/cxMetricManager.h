@@ -85,7 +85,7 @@ private:
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 	QColor getRandomColor();
-	std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
+    std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description, PATIENT_COORDINATE_SYSTEM &coordinateSys);
 	void resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data);
 };
 

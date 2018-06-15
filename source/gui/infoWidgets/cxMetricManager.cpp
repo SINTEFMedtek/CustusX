@@ -513,7 +513,9 @@ QColor MetricManager::getRandomColor()
 	return color;
 }
 
-std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description)
+std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes,
+                                                                                    QString description,
+                                                                                    PATIENT_COORDINATE_SYSTEM &coordinateSys)
 {
 	std::vector<QString> data_uid;
 
@@ -525,12 +527,14 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 	layout->addWidget(description_label);
 
     QButtonGroup *coordinateSysSelector = new QButtonGroup();
-    QCheckBox *selectorLPS = new QCheckBox(tr("LPS (DICOM)"));
+    QCheckBox *selectorLPS = new QCheckBox(tr("LPS (DICOM/CX)"));
     QCheckBox *selectorRAS = new QCheckBox(tr("RAS (Neuro)"));
     selectorRAS->setChecked(true);
     coordinateSysSelector->addButton(selectorRAS);
     coordinateSysSelector->addButton(selectorLPS);
     QGroupBox *coordinateSysSelectors = new QGroupBox(tr("Coordinate system format"));
+    selectorLPS->setToolTip("LPS (X=Right->Left Y=Anterior->Posterio Z=Inferior->Superior) - DICOM, CustusX");
+    selectorRAS->setToolTip("RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior) - NIfTI, ITK-snap");
     QVBoxLayout *coordSelectLayout = new QVBoxLayout;
     coordSelectLayout->addWidget(selectorLPS);
     coordSelectLayout->addWidget(selectorRAS);
@@ -557,6 +561,12 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 		StringPropertySelectImagePtr image_property = selectedImageProperties[i];
 		data_uid.push_back(image_property->getValue());
 	}
+    // Set correct coordinate space
+    if(coordinateSysSelector->checkedId() == 1)
+        coordinateSys = pcsRAS;
+    else
+        coordinateSys = pcsLPS;
+
 	return data_uid;
 }
 
@@ -579,8 +589,11 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 	std::vector<QString> data_uid;
 	data_uid.push_back("");
 	data_uid.push_back("");
-	if(!testmode)
-		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+    PATIENT_COORDINATE_SYSTEM coordinateSys = pcsRAS;
+    if(!testmode)
+        data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes,
+                                                                  description,
+                                                                  coordinateSys);
 
 	//--- Create the point metrics
 	QString type = "pointMetric";
@@ -610,16 +623,21 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 				double *point = points->GetPoint(j);
                 DataPtr data = this->createData(type, uid, name);
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
+                Vector3D vector_ras;
+                Vector3D vector_lps;
+                CoordinateSystem space;
 
-                CoordinateSystem space(csREF, data_uid[i]);
-				Vector3D vector_ras(point[0], point[1], point[2]);
-				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
+                if(coordinateSys == pcsRAS) {
+                    space.mId = csDATA; space.mRefObject = data_uid[i];
+                    vector_ras[0] = point[0]; vector_ras[1] = point[1]; vector_ras[2] = point[2];
+                    Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+                    vector_lps = sMr.inv() * vector_ras;
+                } else {
+                    space.mId = csREF; space.mRefObject = data_uid[i];
+                    vector_lps[0] = point[0]; vector_lps[1] = point[1]; vector_lps[2] = point[2];
+                }
 
-				//Convert from RAS (MINC) to LPS (CX)
-				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-				Vector3D vector_lps = sMr.inv() * vector_ras;
-
-                point_metric->setCoordinate(vector_ras);
+                point_metric->setCoordinate(vector_lps);
 				point_metric->setSpace(space);
 				point_metric->setColor(color);
 			}
