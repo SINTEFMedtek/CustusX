@@ -35,7 +35,6 @@ set(CX_PLUGINS
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
   org.custusx.virtualbronchoscopy:ON
-  org.custusx.neuro.tumor.decision:ON
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.
