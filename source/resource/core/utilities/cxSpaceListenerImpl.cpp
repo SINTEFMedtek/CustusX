@@ -57,7 +57,7 @@ void SpaceListenerImpl::doConnect()
 	if (mSpace.mId == csDATA)
 	{
 		ActiveDataPtr activeData = mDataManager->getActiveData();
-		if (mSpace.mRefObject == "active")
+		if (!mSpace.mRefObject.isEmpty() && (mSpace.mRefObject == "active"))
 			connect(activeData.get(), &ActiveData::activeDataChanged, this, &SpaceListenerImpl::reconnect);
 
 		DataPtr data = mDataManager->getData(mSpace.mRefObject);
