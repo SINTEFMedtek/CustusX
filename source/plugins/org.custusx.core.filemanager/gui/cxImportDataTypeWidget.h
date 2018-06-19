@@ -21,7 +21,7 @@ class org_custusx_core_filemanager_EXPORT ImportDataTypeWidget : public BaseWidg
 {
 	Q_OBJECT
 public:
-	ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates);
+	ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename);
 
 public slots:
 	void update();

@@ -7,6 +7,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QCheckBox>
+#include <QGroupBox>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
 #include "cxFileManagerService.h"
@@ -21,7 +22,7 @@
 namespace cx
 {
 
-ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates) :
+ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
 	mServices(services),
 	mData(data),
@@ -44,10 +45,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
 	mTableWidget->setColumnCount(4);
-	mTableHeader<<"Type"<<"Name"<<"#"<<"Space";
+	mTableHeader<<"#"<<"Type"<<"Name"<<"Space";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setStretchLastSection(true);
-	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
 	mTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -73,9 +74,9 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 		{
 			int newRowIndex = mTableWidget->rowCount();
 			mTableWidget->setRowCount(newRowIndex+1);
-			mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(type));
+			mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem("1"));
 			mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem("1"));
+			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
 			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(space));
 		}
 	}
@@ -104,16 +105,17 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 
 		int newRowIndex = mTableWidget->rowCount();
 		mTableWidget->setRowCount(newRowIndex+1);
-		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(type));
+		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
 		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
 		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
 	}
-
 
 	//gui
 	QVBoxLayout *topLayout = new QVBoxLayout(this);
 	this->setLayout(topLayout);
+
+	QGroupBox *groupBox = new QGroupBox(filename);
 
 	QGridLayout *gridLayout = new QGridLayout();
 	gridLayout->addWidget(new QLabel("For all data in the file: "), 0, 0, 1, 2);
@@ -125,9 +127,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	gridLayout->addWidget(mParentCandidatesCB, 3, 1);
 	gridLayout->addWidget(new QLabel("Convert data to unsigned?"), 4, 0);
 	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
+	gridLayout->addWidget(mTableWidget, 5, 0, 1, 2);
 
-	topLayout->addLayout(gridLayout);
-	topLayout->addWidget(mTableWidget);
+	groupBox->setLayout(gridLayout);
+	topLayout->addWidget(groupBox);
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
@@ -160,7 +163,6 @@ void ImportDataTypeWidget::updateParentCandidatesComboBox()
 {
 	//remember selection
 	QString selectedParentId = (mParentCandidatesCB->itemData(mParentCandidatesCB->currentIndex()).toString());
-	CX_LOG_DEBUG() << "Selected parent id: " << selectedParentId;
 
 	mParentCandidatesCB->clear();
 	std::map<QString, QString> parentCandidates = this->getParentCandidateList();

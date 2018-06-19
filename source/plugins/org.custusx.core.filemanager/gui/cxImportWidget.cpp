@@ -31,16 +31,16 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	BaseWidget(NULL, "ImportWidget", "Import"),
 	mFileManager(filemanager),
 	mVisServices(services),
-	mSelectedIndexInTable(0){
-
+	mSelectedIndexInTable(0)
+{
 	//see https://wiki.qt.io/How_to_Use_QTableWidget
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
 	mTableWidget->setColumnCount(3);
-	mTableHeader<<"Status"<<"Filename"<<"Remove?";
+	mTableHeader<<""<<"Status"<<"Filename";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setStretchLastSection(true);
-	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
 	mTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -48,7 +48,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: red;}");
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
-	connect(mTableWidget, &QTableWidget::cellClicked, this, &ImportWidget::tableItemSelected);
+	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportWidget::tableItemSelected);
 
 	mStackedWidget = new QStackedWidget;
 
@@ -58,6 +58,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	QPushButton *importButton = new QPushButton("Import");
 	QPushButton *cancelButton = new QPushButton("Cancel");
+	buttonLayout->addStretch();
 	buttonLayout->addWidget(importButton);
 	buttonLayout->addWidget(cancelButton);
 	mTopLayout->addWidget(addMoreFilesButton);
@@ -73,7 +74,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	connect(this, &ImportWidget::finishedImporting, this, &ImportWidget::cleanUpAfterImport);
 }
 
-int ImportWidget::insertDataIntoTable(QString filename, std::vector<DataPtr> data)
+int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr> data)
 {
 	int newRowIndex = mTableWidget->rowCount();
 	mTableWidget->setRowCount(newRowIndex+1);
@@ -86,14 +87,46 @@ int ImportWidget::insertDataIntoTable(QString filename, std::vector<DataPtr> dat
 			allDataOk = false;
 	}
 	status = allDataOk ? "ok" : "error";
-	QFileInfo fileInfo(filename);
-	filename = fileInfo.fileName();
-	mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(status));
-	mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(filename));
-	QPushButton *removeButton = new QPushButton("Remove"); //TODO replace with icon
-	mTableWidget->setCellWidget(newRowIndex, 2, removeButton);
+	QFileInfo fileInfo(fullfilename);
+	QString filename = fileInfo.fileName();
+
+	QIcon trashcan(":/icons/open_icon_library/edit-delete-2.png");
+	QPushButton *removeButton = new QPushButton(trashcan,"");
+	connect(removeButton, &QPushButton::clicked, this, &ImportWidget::removeRowFromTableAndRemoveFilenameFromImportList);
+
+	mTableWidget->setCellWidget(newRowIndex, 0, removeButton);
+	mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(status));
+	QTableWidgetItem *filenameItem = new QTableWidgetItem(filename);
+	filenameItem->setData(Qt::ToolTipRole, fullfilename);
+	mTableWidget->setItem(newRowIndex, 2, filenameItem);
 
 	return newRowIndex;
+}
+
+int ImportWidget::findRowIndexContainingButton(QPushButton *button) const
+{
+	int retval = -1;
+	for(int i=0; i<mTableWidget->rowCount(); ++i)
+	{
+		int buttonColoumn = 0;
+		QTableWidgetItem *item = mTableWidget->item(i,buttonColoumn);
+		QWidget *cellWidget = mTableWidget->cellWidget(i,buttonColoumn);
+		if(button == cellWidget)
+			retval = i;
+	}
+	return retval;
+}
+
+void ImportWidget::readFilesAndGenerateParentCandidates()
+{
+	std::vector<DataPtr> notImportedData;
+	foreach(QString filename, mFileNames)
+	{
+		std::vector<DataPtr> newData = mFileManager->read(filename);
+		notImportedData.insert(notImportedData.end(), newData.begin(), newData.end());
+	}
+	mParentCandidates = this->generateParentCandidates(notImportedData);
+	emit parentCandidatesUpdated();
 }
 
 void ImportWidget::addMoreFilesButtonClicked()
@@ -103,13 +136,14 @@ void ImportWidget::addMoreFilesButtonClicked()
 	ImportDataTypeWidget *widget = NULL;
 	foreach (QString filename, filenames)
 	{
-		std::vector<DataPtr> newData = mFileManager->read(filename);
-		mData.insert(mData.end(), newData.begin(), newData.end());
+		mFileNames.push_back(filename);
 
+		std::vector<DataPtr> newData = mFileManager->read(filename);
 		int index = this->insertDataIntoTable(filename, newData);
-		mParentCandidates = this->generateParentCandidates(mData);
-		emit parentCandidatesUpdated();
-		widget = new ImportDataTypeWidget(NULL, mVisServices, newData, mParentCandidates);
+
+		this->readFilesAndGenerateParentCandidates();
+
+		widget = new ImportDataTypeWidget(NULL, mVisServices, newData, mParentCandidates, filename);
 		connect(this, &ImportWidget::readyToImport, widget, &ImportDataTypeWidget::prepareDataForImport);
 		connect(this, &ImportWidget::parentCandidatesUpdated, widget, &ImportDataTypeWidget::update);
 		mStackedWidget->insertWidget(index, widget);
@@ -138,19 +172,33 @@ void ImportWidget::removeWidget(QWidget *widget)
 	widget->deleteLater();
 }
 
-void ImportWidget::tableItemSelected(int row, int column)
+void ImportWidget::removeRowFromTableAndRemoveFilenameFromImportList()
 {
-	if(row == mSelectedIndexInTable)
+	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
+	int rowindex = this->findRowIndexContainingButton(button);
+	int filenamecoloumn = 2;
+	QString fullfilename = mTableWidget->item(rowindex, filenamecoloumn)->data(Qt::ToolTipRole).toString();
+	if(rowindex != -1)
+		mTableWidget->removeRow(rowindex);
+	int numberOfRemovedEntries = mFileNames.removeAll(fullfilename);
+
+}
+
+void ImportWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+	if(currentRow == mSelectedIndexInTable)
 		return;
 
-	mStackedWidget->setCurrentIndex(row);
-	mSelectedIndexInTable = row;
+	mStackedWidget->setCurrentIndex(currentRow);
+	mSelectedIndexInTable = currentRow;
 }
 
 void ImportWidget::cleanUpAfterImport()
 {
 	//clear data
-	mData.clear();
+	//mData.clear();
+	mFileNames.clear();
+
 	//reset table
 	mTableWidget->clear();
 	mTableWidget->setRowCount(0);

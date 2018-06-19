@@ -7,6 +7,7 @@
 
 class QTableWidget;
 class QStackedWidget;
+class QPushButton;
 
 namespace cx
 {
@@ -28,8 +29,9 @@ private slots:
 	void cancelButtonClicked();
 	void addMoreFilesButtonClicked();
 	void removeWidget(QWidget *widget);
+	void removeRowFromTableAndRemoveFilenameFromImportList();
 
-	void tableItemSelected(int row, int column);
+	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
 	void cleanUpAfterImport();
 
 private:
@@ -39,6 +41,8 @@ private:
 	QString generateUid(QString filename) const;
 	std::vector<DataPtr> generateParentCandidates(std::vector<DataPtr> notLoadedData) const;
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
+	int findRowIndexContainingButton(QPushButton *button) const;
+	void readFilesAndGenerateParentCandidates();
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
@@ -46,7 +50,7 @@ private:
 
 	QStackedWidget *mStackedWidget;
 
-	std::vector<DataPtr> mData;
+	QStringList mFileNames;
 	std::vector<DataPtr> mParentCandidates;
 
 	FileManagerServicePtr mFileManager;
