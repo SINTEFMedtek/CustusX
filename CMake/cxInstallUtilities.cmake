@@ -557,6 +557,7 @@ install(DIRECTORY "${QT_QML_DIR}/"
 	DESTINATION ${INSTALL_QTQML_DIR}
 	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 	FILES_MATCHING PATTERN "*"
+	OPTIONAL
 )
 
   message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
@@ -575,7 +576,7 @@ install(DIRECTORY "${QT_QML_DIR}/"
 	# explicitly tell which executables that should be fixed up.
         # why: fixup_bundle seems to fail to assemble exes in some cases.
 	foreach(TARGET ${CX_APPLE_TARGETS_TO_COPY})
-		get_filename_component(TARGET_FILENAME ${TARGET} NAME ABSOLUTE)
+		get_filename_component(TARGET_FILENAME ${TARGET} NAME)
 		set(TARGET_FILEPATH ${INSTALL_BINARY_DIR}/${TARGET_FILENAME})
                 set(LIB_PATTERN_CODE "
     ${LIB_PATTERN_CODE}
