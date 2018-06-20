@@ -552,12 +552,12 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 	)
 
 # Install Qt qml by copying all files in the qml directory
-SET(INSTALL_QTQML_DIR "${INSTALL_BINARY_DIR}")
-install(DIRECTORY "${QT_QML_DIR}/"
-	DESTINATION ${INSTALL_QTQML_DIR}
-	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
-	PATTERN "*QtWebEngine*" EXCLUDE #Exclude QtWebEngine and QtWebEngineCore, as these seems to cause problems when creating the installer. Says: (No such file or directory)
-)
+#SET(INSTALL_QTQML_DIR "${INSTALL_BINARY_DIR}")
+#install(DIRECTORY "${QT_QML_DIR}/"
+#	DESTINATION ${INSTALL_QTQML_DIR}
+#	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+#	PATTERN "*QtWebEngine*" EXCLUDE #Exclude QtWebEngine and QtWebEngineCore, as these seems to cause problems when creating the installer. Says: (No such file or directory)
+#)
 
   message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
   message(STATUS "QT_LIBS_DIR: " ${QT_LIBS_DIR})
