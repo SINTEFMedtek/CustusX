@@ -157,7 +157,7 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - RAS coordinate
 
         manager.importMetricsFromMNITagFile(tagFile, testmode);
 
-        int number_of_metrics_in_file = 7;
+        int number_of_metrics_in_file = 6;
         int number_of_metrics_after_import = manager.getNumberOfMetrics();
         CHECK(number_of_metrics_after_import == (number_of_metrics_before_import+number_of_metrics_in_file));
     }
