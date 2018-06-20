@@ -23,7 +23,7 @@
 namespace cxtest
 {
 
-Receiver::Receiver(igtlio::LogicPointer logic) :
+Receiver::Receiver(igtlioLogicPointer logic) :
 	number_of_events_received(0),
 	image_received(false),
 	transform_received(false),
@@ -44,25 +44,25 @@ Receiver::~Receiver()
 
 void Receiver::connect(std::string ip, int port)
 {
-	mSession = mNetwork->requestConnectToServer(ip, port, igtlio::BLOCKING);
+	mSession = mNetwork->requestConnectToServer(ip, port, IGTLIO_BLOCKING);
 }
 
-void Receiver::listen(igtlio::DevicePointer device, bool verbose)
+void Receiver::listen(igtlioDevicePointer device, bool verbose)
 {
 	QString deviceName(device->GetDeviceName().c_str());
 	CX_LOG_DEBUG() << "Listening to a device: " << deviceName;
 	if(verbose)
 	{
-		qvtkReconnect(NULL, device, igtlio::Device::ReceiveEvent, this, SLOT(onDeviceModifiedPrint(vtkObject*, void*, unsigned long, void*)));
+		qvtkReconnect(NULL, device, igtlioDevice::ReceiveEvent, this, SLOT(onDeviceModifiedPrint(vtkObject*, void*, unsigned long, void*)));
 	}
-	qvtkReconnect(NULL, device, igtlio::Device::ReceiveEvent, this, SLOT(onDeviceReceivedCount(vtkObject*, void*, unsigned long, void*)));
+	qvtkReconnect(NULL, device, igtlioDevice::ReceiveEvent, this, SLOT(onDeviceReceivedCount(vtkObject*, void*, unsigned long, void*)));
 
 }
 
 void Receiver::sendCommand(std::string device_name, std::string command_name, std::string command)
 {
 
-	vtkSmartPointer<igtlio::CommandDevice> device;
+	vtkSmartPointer<igtlioCommandDevice> device;
 	/*
 	device = mSession->SendCommandQuery("my_device_name",
 										"Get",
@@ -76,30 +76,30 @@ void Receiver::sendCommand(std::string device_name, std::string command_name, st
 
 void Receiver::sendString()
 {
-	vtkSmartPointer<igtlio::StringDevice> device;
+	vtkSmartPointer<igtlioStringDevice> device;
 	device = mSession->SendString("my_device_name", "<Command Name=\"RequestChannelIDs\" />");
 }
 
 void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event, void*)
 {
-	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller));
+	vtkSmartPointer<igtlioDevice> receivedDevice(reinterpret_cast<igtlioDevice*>(caller));
 	REQUIRE(receivedDevice);
 	CX_LOG_DEBUG() << "\n\n *** DEVICE IS MODIFIED: " << event
 				   << " from " << receivedDevice->GetDeviceName()
 				   << " which is of type " << receivedDevice->GetDeviceType()
 				   << " ***";
 
-	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
+	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
 	//CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName << " timestamp: " << header.timestamp;
 
 
 	std::string device_type = receivedDevice->GetDeviceType();
-	if(device_type == igtlio::CommandConverter::GetIGTLResponseName())
+	if(device_type == igtlioCommandConverter::GetIGTLResponseName())
 	{
-		igtlio::CommandDevicePointer command = igtlio::CommandDevice::SafeDownCast(receivedDevice);
+		igtlioCommandDevicePointer command = igtlioCommandDevice::SafeDownCast(receivedDevice);
 		REQUIRE(command);
 
-		igtlio::CommandConverter::ContentData content = command->GetContent();
+		igtlioCommandConverter::ContentData content = command->GetContent();
 
 		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
 					   << " name: " << content.name
@@ -107,12 +107,12 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 
 
 	}
-	else if(device_type == igtlio::StatusConverter::GetIGTLTypeName())
+	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{
-		vtkSmartPointer<igtlio::StatusDevice> status = igtlio::StatusDevice::SafeDownCast(receivedDevice);
+		vtkSmartPointer<igtlioStatusDevice> status = igtlioStatusDevice::SafeDownCast(receivedDevice);
 		REQUIRE(status);
 
-		igtlio::StatusConverter::ContentData content = status->GetContent();
+		igtlioStatusConverter::ContentData content = status->GetContent();
 		/*
 		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
 					   << " subcode: " << content.subcode
@@ -121,35 +121,35 @@ void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned l
 		*/
 
 	}
-	else if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
+	else if(device_type == igtlioImageConverter::GetIGTLTypeName())
 	{
-		vtkSmartPointer<igtlio::ImageDevice> image = igtlio::ImageDevice::SafeDownCast(receivedDevice);
+		vtkSmartPointer<igtlioImageDevice> image = igtlioImageDevice::SafeDownCast(receivedDevice);
 		REQUIRE(image);
 
-		igtlio::ImageConverter::ContentData content = image->GetContent();
+		igtlioImageConverter::ContentData content = image->GetContent();
 		/*
 		CX_LOG_DEBUG() << "IMAGE: "	<< " image class name: " << content.image->GetClassName()
 					   << " transform: " << content.transform;
 		*/
 	}
-	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
+	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
 	{
-		vtkSmartPointer<igtlio::TransformDevice> transform = igtlio::TransformDevice::SafeDownCast(receivedDevice);
+		vtkSmartPointer<igtlioTransformDevice> transform = igtlioTransformDevice::SafeDownCast(receivedDevice);
 		REQUIRE(transform);
 
-		igtlio::TransformConverter::ContentData content = transform->GetContent();
+		igtlioTransformConverter::ContentData content = transform->GetContent();
 		/*
 		CX_LOG_DEBUG() << "TRANSFORM: "	<< " transform: " << content.transform
 					   << " deviceName: " << content.deviceName;
 		*/
 
 	}
-	else if(device_type == igtlio::StringConverter::GetIGTLTypeName())
+	else if(device_type == igtlioStringConverter::GetIGTLTypeName())
 	{
-		vtkSmartPointer<igtlio::StringDevice> string = igtlio::StringDevice::SafeDownCast(receivedDevice);
+		vtkSmartPointer<igtlioStringDevice> string = igtlioStringDevice::SafeDownCast(receivedDevice);
 		REQUIRE(string);
 
-		igtlio::StringConverter::ContentData content = string->GetContent();
+		igtlioStringConverter::ContentData content = string->GetContent();
 
 		CX_LOG_DEBUG() << "STRING: "	<< " string: " << content.string_msg
 					   << " encoding: " << content.encoding;
