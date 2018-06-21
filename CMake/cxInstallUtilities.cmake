@@ -551,7 +551,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		FILES_MATCHING PATTERN "*qsqlite*"
 	)
 
- Install Qt qml by copying all files in the qml directory
+# Install Qt qml by copying all files in the qml directory
 SET(INSTALL_QTQML_DIR "${INSTALL_BINARY_DIR}")
 install(DIRECTORY "${QT_QML_DIR}/"
 	DESTINATION ${INSTALL_QTQML_DIR}
