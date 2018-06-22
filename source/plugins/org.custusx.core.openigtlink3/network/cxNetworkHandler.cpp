@@ -67,14 +67,6 @@ void NetworkHandler::disconnectFromServer()
 		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession->GetConnector()->GetName();
 		igtlioConnectorPointer connector = mSession->GetConnector();
 		connector->Stop();
-//		if(connector->GetState() != igtlioConnector::STATE_WAIT_CONNECTION) //Don't try to stop connection while in STATE_WAIT_CONNECTION.
-//		{
-//			connector->Stop();//This takes to long if connect isn't finished (because mutex is blocking)
-//		}
-//		else
-//		{
-//			connector->SetServerStopFlag(true); //Just setting stop flag should also stop the server
-//		}
 		mLogic->RemoveConnector(connector);
 	}
 	mProbeDefinitionFromStringMessages->reset();
