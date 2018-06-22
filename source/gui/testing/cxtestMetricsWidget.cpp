@@ -148,6 +148,13 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - RAS coordinate
 
         MetricFixture fixture;
 
+        QString filename = cx::DataLocations::getExistingTestData("testing/default_volume", "Default.mhd");
+        QString info = QString("TestData");
+        cx::DataPtr data1 = cx::logicManager()->getPatientModelService()->importData(filename, info);
+        std::cout << "**** Import labeled point metrics : " << info.toStdString() << std::endl;
+        REQUIRE(data1);
+
+
         int number_of_metrics_before_import = manager.getNumberOfMetrics();
         QString tagFile = dataPath + "/testing/metrics_export_import/metric_tags_with_labels.tag";
         bool testmode = true;
@@ -160,6 +167,8 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - RAS coordinate
         int number_of_metrics_in_file = 6;
         int number_of_metrics_after_import = manager.getNumberOfMetrics();
         CHECK(number_of_metrics_after_import == (number_of_metrics_before_import+number_of_metrics_in_file));
+
+
     }
 
     cx::LogicManager::shutdown();
