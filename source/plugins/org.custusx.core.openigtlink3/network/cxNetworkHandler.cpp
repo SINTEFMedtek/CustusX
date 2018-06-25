@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioLogic.h"
 #include "igtlioImageDevice.h"
 #include "igtlioTransformDevice.h"
-#include "igtlioCommandDevice.h"
+//#include "igtlioCommandDevice.h"
 #include "igtlioStatusDevice.h"
 #include "igtlioStringDevice.h"
 
@@ -148,20 +148,20 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		else
 			emit transform(deviceName, cxtransform, timestamp);
 	}
-	else if(device_type == igtlioCommandConverter::GetIGTLTypeName())
-	{
-		CX_LOG_DEBUG() << "Received command message.";
-		igtlioCommandDevicePointer command = igtlioCommandDevice::SafeDownCast(receivedDevice);
+//	else if(device_type == igtlioCommandConverter::GetIGTLTypeName())
+//	{
+//		CX_LOG_DEBUG() << "Received command message.";
+//		igtlioCommandDevicePointer command = igtlioCommandDevice::SafeDownCast(receivedDevice);
 
-		igtlioCommandConverter::ContentData content = command->GetContent();
-		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
-										<< " name: " << content.name
-										<< " content: " << content.content;
-		QString deviceName(content.name.c_str());
-		QString xml(content.content.c_str());
-		emit commandRespons(deviceName, xml);
+//		igtlioCommandConverter::ContentData content = command->GetContent();
+//		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
+//										<< " name: " << content.name
+//										<< " content: " << content.content;
+//		QString deviceName(content.name.c_str());
+//		QString xml(content.content.c_str());
+//		emit commandRespons(deviceName, xml);
 
-	}
+//	}
 	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{
 		igtlioStatusDevicePointer status = igtlioStatusDevice::SafeDownCast(receivedDevice);
