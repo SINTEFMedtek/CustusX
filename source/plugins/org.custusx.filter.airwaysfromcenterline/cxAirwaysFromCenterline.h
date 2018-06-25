@@ -4,6 +4,11 @@
 #include "cxMesh.h"
 #include <QDomElement>
 
+typedef vtkSmartPointer<class vtkImageStencil> vtkImageStencilPtr;
+typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
+typedef vtkSmartPointer<class vtkTubeFilter> vtkTubeFilterPtr;
+typedef vtkSmartPointer<class vtkCleanPolyData> vtkCleanPolyDataPtr;
+typedef vtkSmartPointer<class vtkPolyDataToImageStencil> vtkPolyDataToImageStencilPtr;
 
 namespace cx
 {
@@ -27,7 +32,6 @@ public:
 private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
-    std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 };
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);

@@ -2,21 +2,22 @@
 
 #include "cxAirwaysFromCenterline.h"
 #include <vtkPolyData.h>
-//#include "cxDoubleDataAdapterXml.h"
 #include "cxBranchList.h"
 #include "cxBranch.h"
-#include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
 #include <vtkLine.h>
-#include <vtkCellArray.h>
 #include <vtkTubeFilter.h>
 #include <vtkLineSource.h>
-#include <vtkCleanPolyData.h>
-#include <vtkAppendPolyData.h>
-#include <vtkImplicitModeller.h>
 #include <vtkContourFilter.h>
+#include <vtkPolyDataToImageStencil.h>
+#include <cxImage.h>
+#include "cxContourFilter.h"
+#include <vtkImageData.h>
+#include <vtkSphereSource.h>
+#include <vtkDataSetSurfaceFilter.h>
+#include <vtkPointData.h>
+#include <vtkImageStencil.h>
 
-typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
 namespace cx
 {
@@ -36,12 +37,12 @@ Eigen::MatrixXd AirwaysFromCenterline::getCenterlinePositions(vtkPolyDataPtr cen
 {
 
     int N = centerline_r->GetNumberOfPoints();
-	Eigen::MatrixXd CLpoints(3,N);
-	for(vtkIdType i = 0; i < N; i++)
-		{
-		double p[3];
+    Eigen::MatrixXd CLpoints(3,N);
+    for(vtkIdType i = 0; i < N; i++)
+        {
+        double p[3];
         centerline_r->GetPoint(i,p);
-		Eigen::Vector3d position;
+        Eigen::Vector3d position;
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
 		CLpoints.block(0 , i , 3 , 1) = position;
 		}
@@ -64,155 +65,158 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
 
-
-/*
-    RouteToTarget::smoothBranch is smoothing the positions of a centerline branch by using vtkCardinalSpline.
-    The degree of smoothing is dependent on the branch radius and the shape of the branch.
-    First, the method tests if a straight line from start to end of the branch is sufficient by the condition of
-    all positions along the line being within the lumen of the airway (max distance from original centerline
-    is set to branch radius).
-    If this fails, one more control point is added to the spline at the time, until the condition is fulfilled.
-    The control point added for each iteration is the position with the larges deviation from the original/unfiltered
-    centerline.
-*/
-std::vector< Eigen::Vector3d > AirwaysFromCenterline::smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition)
-{
-    vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
-	vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
-	vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
-
-    double branchRadius = branchPtr->findBranchRadius();
-
-    //add control points to spline
-
-    //add first position
-    Eigen::MatrixXd positions = branchPtr->getPositions();
-    splineX->AddPoint(0,startPosition(0));
-    splineY->AddPoint(0,startPosition(1));
-    splineZ->AddPoint(0,startPosition(2));
-
-
-    // Add last position if no parent branch, else add parents position closest to current branch.
-    // Branch positions are stored in order from head to feet (e.g. first position is top of trachea),
-    // while route-to-target is generated from target to top of trachea.
-    if(!branchPtr->getParentBranch())
-    {
-        splineX->AddPoint(startIndex,positions(0,0));
-        splineY->AddPoint(startIndex,positions(1,0));
-        splineZ->AddPoint(startIndex,positions(2,0));
-    }
-    else
-    {
-        Eigen::MatrixXd parentPositions = branchPtr->getParentBranch()->getPositions();
-        splineX->AddPoint(startIndex,parentPositions(0,parentPositions.cols()-1));
-        splineY->AddPoint(startIndex,parentPositions(1,parentPositions.cols()-1));
-        splineZ->AddPoint(startIndex,parentPositions(2,parentPositions.cols()-1));
-
-    }
-
-    //Add points until all filtered/smoothed postions are within branch radius distance of the unfiltered branch centerline posiition.
-    //This is to make sure the smoothed centerline is within the lumen of the airways.
-    double maxDistanceToOriginalPosition = branchRadius;
-    int maxDistanceIndex = -1;
-    std::vector< Eigen::Vector3d > smoothingResult;
-
-    //add positions to spline
-    while (maxDistanceToOriginalPosition >= branchRadius && splineX->GetNumberOfPoints() < startIndex)
-    {
-        if(maxDistanceIndex > 0)
-        {
-            //add to spline the position with largest distance to original position
-            splineX->AddPoint(maxDistanceIndex,positions(0,startIndex - maxDistanceIndex));
-            splineY->AddPoint(maxDistanceIndex,positions(1,startIndex - maxDistanceIndex));
-            splineZ->AddPoint(maxDistanceIndex,positions(2,startIndex - maxDistanceIndex));
-        }
-
-		//evaluate spline - get smoothed positions      
-        maxDistanceToOriginalPosition = 0.0;
-        smoothingResult.clear();
-        for(int j=0; j<=startIndex; j++)
-		{
-			double splineParameter = j;
-			Eigen::Vector3d tempPoint;
-			tempPoint(0) = splineX->Evaluate(splineParameter);
-			tempPoint(1) = splineY->Evaluate(splineParameter);
-			tempPoint(2) = splineZ->Evaluate(splineParameter);
-			smoothingResult.push_back(tempPoint);
-
-            //calculate distance to original (non-filtered) position
-            double distance = findDistanceToLine(tempPoint, positions);
-            //finding the index with largest distance
-            if (distance > maxDistanceToOriginalPosition)
-            {
-                maxDistanceToOriginalPosition = distance;
-                maxDistanceIndex = j;
-            }
-        }
-    }
-
-    return smoothingResult;
-}
-
 vtkPolyDataPtr AirwaysFromCenterline::generateTubes()
 {
-
-    vtkPolyDataPtr output  = vtkPolyDataPtr::New();
-    vtkLineSourcePtr lineSourcePtr = vtkLineSourcePtr::New();
     std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
 
+    //------- create image data ---------------
+    vtkImageDataPtr resultImage = vtkImageDataPtr::New();
+    vtkPointsPtr pointsPtr = vtkPointsPtr::New();
+
+    int numberOfPoints = 0;
+    for (int i = 0; i < branches.size(); i++)
+        numberOfPoints += branches[i]->getPositions().cols();
+
+    pointsPtr->SetNumberOfPoints(numberOfPoints);
+
+    int pointIndex = 0;
     for (int i = 0; i < branches.size(); i++)
     {
         Eigen::MatrixXd positions = branches[i]->getPositions();
-        vtkPointsPtr pointsPtr = vtkPointsPtr::New();;
-        pointsPtr->SetNumberOfPoints(positions.cols());
-
         for (int j = 0; j < positions.cols(); j++)
         {
-            pointsPtr->SetPoint(j, positions(0,j), positions(1,j), positions(2,j));
+            pointsPtr->SetPoint(pointIndex, positions(0,j), positions(1,j), positions(2,j));
+            pointIndex += 1;
         }
+    }
+
+    double bounds[6];
+    pointsPtr->GetBounds(bounds);
+
+    //Extend bounds to make room for surface model extended from centerline
+    bounds[0] -= 10;
+    bounds[1] += 10;
+    bounds[2] -= 10;
+    bounds[3] += 10;
+    bounds[4] -= 10;
+    bounds[5] -= 2; // to make top of trachea open
+
+    double spacing[3];
+    spacing[0] = 0.5;  //Smaller spacing improves resolution but increases run-time
+    spacing[1] = 0.5;
+    spacing[2] = 0.5;
+    resultImage->SetSpacing(spacing);
+
+    // compute dimensions
+    int dim[3];
+    for (int i = 0; i < 3; i++)
+        dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / spacing[i]));
+
+
+    resultImage->SetDimensions(dim);
+    resultImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+
+    double origin[3];
+    origin[0] = bounds[0] + spacing[0] / 2;
+    origin[1] = bounds[2] + spacing[1] / 2;
+    origin[2] = bounds[4] + spacing[2] / 2;
+    resultImage->SetOrigin(origin);
+
+    resultImage->AllocateScalars(VTK_UNSIGNED_CHAR,1);
+
+
+    //-----Generate tumes and spheres for each branch----------
+    vtkLineSourcePtr lineSourcePtr = vtkLineSourcePtr::New();
+    for (int i = 0; i < branches.size(); i++)
+    {
+        Eigen::MatrixXd positions = branches[i]->getPositions();
+        vtkPointsPtr pointsPtr = vtkPointsPtr::New();
+        int numberOfBranchPositions = positions.cols();
+        pointsPtr->SetNumberOfPoints(numberOfBranchPositions);
+        int displaceIndex = 0;
+
+        if (branches[i]->getParentBranch()) // Add parents last position to get connected tubes
+        {
+            displaceIndex = 1;
+            pointsPtr->SetNumberOfPoints(numberOfBranchPositions + 1);
+            Eigen::MatrixXd parentPositions = branches[i]->getParentBranch()->getPositions();
+            int numberOfParentBranchPositions = parentPositions.cols();
+            pointsPtr->SetPoint(0, parentPositions(0,numberOfParentBranchPositions-1),
+                                parentPositions(1,numberOfParentBranchPositions-1),
+                                parentPositions(2,numberOfParentBranchPositions-1));
+        }
+
+        for (int j = 0; j < numberOfBranchPositions; j++)
+            pointsPtr->SetPoint(j + displaceIndex, positions(0,j), positions(1,j), positions(2,j));
+
         lineSourcePtr->SetPoints(pointsPtr);
 
         // Create a tube (cylinder) around the line
-         vtkSmartPointer<vtkTubeFilter> tubeFilterPtr = vtkSmartPointer<vtkTubeFilter>::New();
+         vtkTubeFilterPtr tubeFilterPtr = vtkTubeFilterPtr::New();
          tubeFilterPtr->SetInputConnection(lineSourcePtr->GetOutputPort());
          tubeFilterPtr->SetRadius(branches[i]->findBranchRadius()); //default is .5
          tubeFilterPtr->SetNumberOfSides(50);
          tubeFilterPtr->Update();
 
-         //Append the new mesh
-         vtkAppendPolyDataPtr appendFilterPtr = vtkSmartPointer<vtkAppendPolyData>::New();
-         appendFilterPtr->AddInputData(output);
-         appendFilterPtr->AddInputData(tubeFilterPtr->GetOutput());
-         appendFilterPtr->Update();
+         //Add mesh from tube to image
+         vtkPolyDataToImageStencilPtr pol2stencTube = vtkPolyDataToImageStencilPtr::New();
+         pol2stencTube->SetInputData(tubeFilterPtr->GetOutput());
+         pol2stencTube->SetOutputOrigin(origin);
+         pol2stencTube->SetOutputSpacing(spacing);
+         pol2stencTube->SetOutputWholeExtent(resultImage->GetExtent());
+         pol2stencTube->Update();
 
-         // Remove any duplicate points.
-         vtkSmartPointer<vtkCleanPolyData> cleanFilterPtr = vtkSmartPointer<vtkCleanPolyData>::New();
-         cleanFilterPtr->SetInputConnection(appendFilterPtr->GetOutputPort());
-         cleanFilterPtr->Update();
+         vtkImageStencilPtr imgstencTube = vtkImageStencilPtr::New();
+         imgstencTube->SetInputData(resultImage);
+         imgstencTube->SetStencilData(pol2stencTube->GetOutput());
+         imgstencTube->ReverseStencilOn();
+         imgstencTube->Update();
 
-         output = cleanFilterPtr->GetOutput();
+         resultImage = imgstencTube->GetOutput();
+
+
+         //Add sphere at end of branch
+         vtkSphereSourcePtr spherePtr = vtkSphereSourcePtr::New();
+         spherePtr->SetCenter(positions(0,numberOfBranchPositions-1),
+                           positions(1,numberOfBranchPositions-1),
+                           positions(2,numberOfBranchPositions-1));
+         spherePtr->SetRadius(1.05 * branches[i]->findBranchRadius()); // 5% larger radius to close holes
+         spherePtr->SetThetaResolution(50);
+         spherePtr->SetPhiResolution(50);
+         spherePtr->Update();
+
+         //Add sphere to image
+         vtkPolyDataToImageStencilPtr pol2stencSphere = vtkPolyDataToImageStencilPtr::New();
+         pol2stencSphere->SetInputData(spherePtr->GetOutput());
+         pol2stencSphere->SetOutputOrigin(origin);
+         pol2stencSphere->SetOutputSpacing(spacing);
+         pol2stencSphere->SetOutputWholeExtent(resultImage->GetExtent());
+         pol2stencSphere->Update();
+
+
+         vtkImageStencilPtr imgstencSphere = vtkImageStencilPtr::New();
+         imgstencSphere->SetInputData(resultImage);
+         imgstencSphere->SetStencilData(pol2stencSphere->GetOutput());
+         imgstencSphere->ReverseStencilOn();
+         imgstencSphere->Update();
+
+         resultImage = imgstencSphere->GetOutput();
     }
 
-    // Create the implicit modeller
-    vtkSmartPointer<vtkImplicitModeller> blobbyLogoImp =vtkSmartPointer<vtkImplicitModeller>::New();
-    blobbyLogoImp->SetInputData(output);
-    blobbyLogoImp->SetMaximumDistance(0.1);
-    blobbyLogoImp->SetSampleDimensions(256, 256, 256);
-    blobbyLogoImp->SetAdjustDistance(0.1);
 
-    // Extract an iso surface, i.e. the tube shell
-    vtkContourFilterPtr blobbyLogoIso = vtkSmartPointer<vtkContourFilter>::New();
-    blobbyLogoIso->SetInputConnection(blobbyLogoImp->GetOutputPort());
-    blobbyLogoIso->SetValue(1, 1.5); //orig
-    blobbyLogoIso->Update();
+    //create contour from image
+    vtkPolyDataPtr rawContour = ContourFilter::execute(
+                resultImage,
+            1, //treshold
+            false, // reduce resolution
+            true, // smoothing
+            true, // keep topology
+            0 // target decimation
+    );
 
-    output = blobbyLogoIso->GetOutput();
+    return rawContour;
 
-    return output;
 }
-
-
-
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)
 {

@@ -57,8 +57,9 @@ protected:
 private slots:
 
 private:
-        AirwaysFromCenterlinePtr mAirwaysFromCenterline;
-	vtkPolyDataPtr mOutput;
+    AirwaysFromCenterlinePtr mAirwaysFromCenterline;
+    vtkPolyDataPtr mOutputAirwayMesh;
+    vtkPolyDataPtr mOutputSmoothedCenterline;
 };
 typedef boost::shared_ptr<class AirwaysFromCenterlineFilter> AirwaysFromCenterlineFilterPtr;
 

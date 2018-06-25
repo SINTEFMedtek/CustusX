@@ -185,7 +185,7 @@ macro(cx_initialize_VTK)
 		vtkInteractionWidgets
 		vtkParallelCore
 		vtkFiltersParallel
-		vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics
+                vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics vtkImagingStencil
 		vtkRenderingOpenGL2
 		vtkRenderingVolumeOpenGL2
 		NO_MODULE)

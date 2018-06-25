@@ -88,6 +88,12 @@ void AirwaysFromCenterlineFilter::createOutputTypes()
     tempAirwaysModelMeshStringAdapter->setValueName("Airways surface model mesh");
     tempAirwaysModelMeshStringAdapter->setHelp("Generated airways surface model mesh (vtk-format).");
     mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
+
+    StringPropertySelectMeshPtr tempSmoothedCenterlineMeshStringAdapter;
+    tempSmoothedCenterlineMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+    tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed enterline");
+    tempSmoothedCenterlineMeshStringAdapter->setHelp("Smoothed centerline (vtk-format).");
+    mOutputTypes.push_back(tempSmoothedCenterlineMeshStringAdapter);
 }
 
 
@@ -103,10 +109,10 @@ bool AirwaysFromCenterlineFilter::execute()
 
     mAirwaysFromCenterline->processCenterline(centerline_r);
 
-    //note: mOutput is in reference space
-    mOutput = mAirwaysFromCenterline->generateTubes();
+    //note: mOutputAirwayMesh is in reference space
+    mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes();
 
-    //if(mOutput->GetNumberOfPoints() < 1)
+    //if(mOutputAirwayMesh->GetNumberOfPoints() < 1)
     //    return false;
 
 	return true;
@@ -123,10 +129,10 @@ bool AirwaysFromCenterlineFilter::postProcess()
     QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
 
     MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
-    outputMesh->setVtkPolyData(mOutput);
+    outputMesh->setVtkPolyData(mOutputAirwayMesh);
     patientService()->insertData(outputMesh);
 
-    //note: mOutput and outputMesh is in reference(r) space
+    //note: mOutputAirwayMesh and outputMesh is in reference(r) space
 
 
     //Meshes are expected to be in data(d) space
