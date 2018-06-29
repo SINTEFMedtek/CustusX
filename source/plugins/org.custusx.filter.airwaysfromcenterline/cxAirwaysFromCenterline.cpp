@@ -219,7 +219,9 @@ vtkPolyDataPtr AirwaysFromCenterline::generateTubes()
             false, // reduce resolution
             true, // smoothing
             true, // keep topology
-            0 // target decimation
+            0, // target decimation
+            30, // number of iterations smoothing
+            0.10 // band pass smoothing
     );
 
     return rawContour;
