@@ -66,6 +66,11 @@ QString AirwaysFromCenterlineFilter::getNameSuffix()
     return "_AirwaysModel";
 }
 
+QString AirwaysFromCenterlineFilter::getNameSuffixCenterline()
+{
+    return "_SmoothedCenterline";
+}
+
 void AirwaysFromCenterlineFilter::createOptions()
 {
 
@@ -125,25 +130,31 @@ bool AirwaysFromCenterlineFilter::postProcess()
     if (!inputMesh)
         return false;
 
-    QString uidCenterline = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
-    QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+    QString uidSurfaceModel = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+    QString nameSurfaceModel = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
 
-    MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
+    MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
     outputMesh->setVtkPolyData(mOutputAirwayMesh);
     patientService()->insertData(outputMesh);
-
-    //note: mOutputAirwayMesh and outputMesh is in reference(r) space
-
 
     //Meshes are expected to be in data(d) space
     outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
     mServices->view()->autoShowData(outputMesh);
 
+    QString uidCenterline = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
+    QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
+
+    MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
+    outputCenterline->setVtkPolyData(mAirwaysFromCenterline->getVTKPoints());
+    patientService()->insertData(outputCenterline);
+
     if(mOutputTypes.size() > 0)
         mOutputTypes[0]->setValue(outputMesh->getUid());
+    if(mOutputTypes.size() > 1)
+        mOutputTypes[1]->setValue(outputCenterline->getUid());
 
-	return true;
+    return true;
 }
 
 } // namespace cx

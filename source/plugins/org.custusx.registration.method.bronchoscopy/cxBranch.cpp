@@ -97,8 +97,13 @@ int Branch::findGenerationNumber()
     BranchPtr parentBranchPtr = this->getParentBranch();
     while (parentBranchPtr)
     {
-        generationNumber = generationNumber + 1;
+        if (parentBranchPtr->getChildBranches().size() > 1) // Do not count generation if it is not a real division
+            generationNumber = generationNumber + 1;
+
         parentBranchPtr = parentBranchPtr->getParentBranch();
+
+        if (generationNumber > 23) //maximum possible generations - avoiding infinite loop
+            break;
     }
 
     return generationNumber;

@@ -28,14 +28,12 @@ public:
     void processCenterline(vtkPolyDataPtr centerline_r);
     vtkPolyDataPtr generateTubes();
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
+    vtkPolyDataPtr getVTKPoints();
 
 private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
 };
-
-double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
-double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
 } /* namespace cx */
 

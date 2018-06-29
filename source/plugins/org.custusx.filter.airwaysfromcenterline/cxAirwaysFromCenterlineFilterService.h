@@ -43,7 +43,8 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-        static QString getNameSuffix();
+    static QString getNameSuffix();
+    static QString getNameSuffixCenterline();
 
 
 	virtual bool execute();
