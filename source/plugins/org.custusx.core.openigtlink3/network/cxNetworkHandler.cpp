@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioCommandConverter.h"
 #include "igtlioStatusConverter.h"
 #include "igtlioStringConverter.h"
+#include "igtlioUsSectorDefinitions.h"
 
 #include "cxLogger.h"
 
@@ -102,13 +103,39 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
 		//this->decode_rMd(msg, retval);
 
+
+		//Use the igtlio meta data from the image message
+		std::string metaLabel;
+		std::string metaDataValue;
+		QStringList igtlioLabels;
+
+		igtlioLabels << IGTLIO_KEY_PROBE_TYPE;
+		igtlioLabels << IGTLIO_KEY_ORIGIN;
+		igtlioLabels << IGTLIO_KEY_ANGLES;
+		igtlioLabels << IGTLIO_KEY_BOUNDING_BOX;
+		igtlioLabels << IGTLIO_KEY_DEPTHS;
+		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
+		igtlioLabels << IGTLIO_KEY_SPACING_X;
+		igtlioLabels << IGTLIO_KEY_SPACING_Y;
+		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with PLUS
+
+
+		for (int i = 0; i < igtlioLabels.size(); ++i)
+		{
+			metaLabel = igtlioLabels[i].toStdString();
+			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
+			if(!gotMetaData)
+				CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
+			else
+				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
+		}
+
+
 		mProbeDefinitionFromStringMessages->setImage(cximage);
 
 		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 		{
-//			QString deviceName(header.deviceName.c_str());
-//			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
-
+			//TODO: Use deciveNameLong
 			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 		}
 
@@ -185,7 +212,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //										<< " string: " << content.string_msg;
 
 		QString message(content.string_msg.c_str());
-		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
+//		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);//Turning this off because we want to use meta info instead
 		emit string_message(message);
 	}
 	else
