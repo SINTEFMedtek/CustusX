@@ -75,10 +75,70 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
 */
 vtkPolyDataPtr AirwaysFromCenterline::generateTubes()
 {
+    this->createEmptyImage();
+
     std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
 
-    //------- create image data ---------------
-    vtkImageDataPtr resultImage = vtkImageDataPtr::New();
+
+    //-----Generate tubes and spheres for each branch----------
+    for (int i = 0; i < branches.size(); i++)
+    {
+        Eigen::MatrixXd positions = branches[i]->getPositions();
+        vtkPointsPtr pointsPtr = vtkPointsPtr::New();
+        vtkLineSourcePtr lineSourcePtr = vtkLineSourcePtr::New();
+        int numberOfPositionsInBranch = positions.cols();
+        pointsPtr->SetNumberOfPoints(numberOfPositionsInBranch);
+        int displaceIndex = 0;
+
+        if (branches[i]->getParentBranch()) // Add parents last position to get connected tubes
+        {
+            displaceIndex = 1;
+            pointsPtr->SetNumberOfPoints(numberOfPositionsInBranch + 1);
+            Eigen::MatrixXd parentPositions = branches[i]->getParentBranch()->getPositions();
+            int numberOfPositionsParentBranch = parentPositions.cols();
+            pointsPtr->SetPoint(0, parentPositions(0,numberOfPositionsParentBranch-1),
+                                parentPositions(1,numberOfPositionsParentBranch-1),
+                                parentPositions(2,numberOfPositionsParentBranch-1));
+        }
+
+        for (int j = 0; j < numberOfPositionsInBranch; j++)
+            pointsPtr->SetPoint(j + displaceIndex, positions(0,j), positions(1,j), positions(2,j));
+
+        lineSourcePtr->SetPoints(pointsPtr);
+
+        // Create a tube (cylinder) around the line
+        vtkTubeFilterPtr tubeFilterPtr = createTube(lineSourcePtr, branches[i]->findBranchRadius());
+        addPolyDataToImage(tubeFilterPtr);
+
+        //Add sphere at end of the branch
+        double spherePosition[3];
+        spherePosition[0] = positions(0,numberOfPositionsInBranch-1);
+        spherePosition[1] = positions(1,numberOfPositionsInBranch-1);
+        spherePosition[2] = positions(2,numberOfPositionsInBranch-1);
+        vtkSphereSourcePtr spherePtr = createSphere(spherePosition, branches[i]->findBranchRadius());
+        addPolyDataToImage(spherePtr);
+    }
+
+    //create contour from image
+    vtkPolyDataPtr rawContour = ContourFilter::execute(
+                mResultImagePtr,
+            1, //treshold
+            false, // reduce resolution
+            true, // smoothing
+            true, // keep topology
+            0, // target decimation
+            30, // number of iterations smoothing
+            0.10 // band pass smoothing
+    );
+
+    return rawContour;
+}
+
+void AirwaysFromCenterline::createEmptyImage()
+{
+    std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
+
+    mResultImagePtr = vtkImageDataPtr::New();
     vtkPointsPtr pointsPtr = vtkPointsPtr::New();
 
     int numberOfPoints = 0;
@@ -109,124 +169,70 @@ vtkPolyDataPtr AirwaysFromCenterline::generateTubes()
     bounds[4] -= 10;
     bounds[5] -= 2; // to make top of trachea open
 
-    double spacing[3];
-    spacing[0] = 0.5;  //Smaller spacing improves resolution but increases run-time
-    spacing[1] = 0.5;
-    spacing[2] = 0.5;
-    resultImage->SetSpacing(spacing);
+    mSpacing[0] = 0.5;  //Smaller spacing improves resolution but increases run-time
+    mSpacing[1] = 0.5;
+    mSpacing[2] = 0.5;
+    mResultImagePtr->SetSpacing(mSpacing);
 
     // compute dimensions
-    int dim[3];
     for (int i = 0; i < 3; i++)
-        dim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / spacing[i]));
+        mDim[i] = static_cast<int>(std::ceil((bounds[i * 2 + 1] - bounds[i * 2]) / mSpacing[i]));
 
 
-    resultImage->SetDimensions(dim);
-    resultImage->SetExtent(0, dim[0] - 1, 0, dim[1] - 1, 0, dim[2] - 1);
+    mResultImagePtr->SetDimensions(mDim);
+    mResultImagePtr->SetExtent(0, mDim[0] - 1, 0, mDim[1] - 1, 0, mDim[2] - 1);
 
-    double origin[3];
-    origin[0] = bounds[0] + spacing[0] / 2;
-    origin[1] = bounds[2] + spacing[1] / 2;
-    origin[2] = bounds[4] + spacing[2] / 2;
-    resultImage->SetOrigin(origin);
+    mOrigin[0] = bounds[0] + mSpacing[0] / 2;
+    mOrigin[1] = bounds[2] + mSpacing[1] / 2;
+    mOrigin[2] = bounds[4] + mSpacing[2] / 2;
+    mResultImagePtr->SetOrigin(mOrigin);
 
-    resultImage->AllocateScalars(VTK_UNSIGNED_CHAR,1);
-
-
-    //-----Generate tubes and spheres for each branch----------
-    vtkLineSourcePtr lineSourcePtr = vtkLineSourcePtr::New();
-    for (int i = 0; i < branches.size(); i++)
-    {
-        Eigen::MatrixXd positions = branches[i]->getPositions();
-        vtkPointsPtr pointsPtr = vtkPointsPtr::New();
-        int numberOfBranchPositions = positions.cols();
-        pointsPtr->SetNumberOfPoints(numberOfBranchPositions);
-        int displaceIndex = 0;
-
-        if (branches[i]->getParentBranch()) // Add parents last position to get connected tubes
-        {
-            displaceIndex = 1;
-            pointsPtr->SetNumberOfPoints(numberOfBranchPositions + 1);
-            Eigen::MatrixXd parentPositions = branches[i]->getParentBranch()->getPositions();
-            int numberOfParentBranchPositions = parentPositions.cols();
-            pointsPtr->SetPoint(0, parentPositions(0,numberOfParentBranchPositions-1),
-                                parentPositions(1,numberOfParentBranchPositions-1),
-                                parentPositions(2,numberOfParentBranchPositions-1));
-        }
-
-        for (int j = 0; j < numberOfBranchPositions; j++)
-            pointsPtr->SetPoint(j + displaceIndex, positions(0,j), positions(1,j), positions(2,j));
-
-        lineSourcePtr->SetPoints(pointsPtr);
-
-        // Create a tube (cylinder) around the line
-         vtkTubeFilterPtr tubeFilterPtr = vtkTubeFilterPtr::New();
-         tubeFilterPtr->SetInputConnection(lineSourcePtr->GetOutputPort());
-         tubeFilterPtr->SetRadius(branches[i]->findBranchRadius()); //default is .5
-         tubeFilterPtr->SetNumberOfSides(50);
-         tubeFilterPtr->Update();
-
-         //Add mesh from tube to image
-         vtkPolyDataToImageStencilPtr pol2stencTube = vtkPolyDataToImageStencilPtr::New();
-         pol2stencTube->SetInputData(tubeFilterPtr->GetOutput());
-         pol2stencTube->SetOutputOrigin(origin);
-         pol2stencTube->SetOutputSpacing(spacing);
-         pol2stencTube->SetOutputWholeExtent(resultImage->GetExtent());
-         pol2stencTube->Update();
-
-         vtkImageStencilPtr imgstencTube = vtkImageStencilPtr::New();
-         imgstencTube->SetInputData(resultImage);
-         imgstencTube->SetStencilData(pol2stencTube->GetOutput());
-         imgstencTube->ReverseStencilOn();
-         imgstencTube->Update();
-
-         resultImage = imgstencTube->GetOutput();
-
-
-         //Add sphere at end of branch
-         vtkSphereSourcePtr spherePtr = vtkSphereSourcePtr::New();
-         spherePtr->SetCenter(positions(0,numberOfBranchPositions-1),
-                           positions(1,numberOfBranchPositions-1),
-                           positions(2,numberOfBranchPositions-1));
-         spherePtr->SetRadius(1.05 * branches[i]->findBranchRadius()); // 5% larger radius to close holes
-         spherePtr->SetThetaResolution(50);
-         spherePtr->SetPhiResolution(50);
-         spherePtr->Update();
-
-         //Add sphere to image
-         vtkPolyDataToImageStencilPtr pol2stencSphere = vtkPolyDataToImageStencilPtr::New();
-         pol2stencSphere->SetInputData(spherePtr->GetOutput());
-         pol2stencSphere->SetOutputOrigin(origin);
-         pol2stencSphere->SetOutputSpacing(spacing);
-         pol2stencSphere->SetOutputWholeExtent(resultImage->GetExtent());
-         pol2stencSphere->Update();
-
-
-         vtkImageStencilPtr imgstencSphere = vtkImageStencilPtr::New();
-         imgstencSphere->SetInputData(resultImage);
-         imgstencSphere->SetStencilData(pol2stencSphere->GetOutput());
-         imgstencSphere->ReverseStencilOn();
-         imgstencSphere->Update();
-
-         resultImage = imgstencSphere->GetOutput();
-    }
-
-
-    //create contour from image
-    vtkPolyDataPtr rawContour = ContourFilter::execute(
-                resultImage,
-            1, //treshold
-            false, // reduce resolution
-            true, // smoothing
-            true, // keep topology
-            0, // target decimation
-            30, // number of iterations smoothing
-            0.10 // band pass smoothing
-    );
-
-    return rawContour;
-
+    mResultImagePtr->AllocateScalars(VTK_UNSIGNED_CHAR,1);
 }
+
+void AirwaysFromCenterline::addPolyDataToImage(vtkPolyDataAlgorithmPtr mesh)
+{
+    vtkPolyDataToImageStencilPtr pol2stenc = vtkPolyDataToImageStencilPtr::New();
+    pol2stenc->SetInputData(mesh->GetOutput());
+    pol2stenc->SetOutputOrigin(mOrigin);
+    pol2stenc->SetOutputSpacing(mSpacing);
+    pol2stenc->SetOutputWholeExtent(mResultImagePtr->GetExtent());
+    pol2stenc->Update();
+
+
+    vtkImageStencilPtr imgstenc = vtkImageStencilPtr::New();
+    imgstenc->SetInputData(mResultImagePtr);
+    imgstenc->SetStencilData(pol2stenc->GetOutput());
+    imgstenc->ReverseStencilOn();
+    imgstenc->Update();
+
+    mResultImagePtr = imgstenc->GetOutput();
+}
+
+
+vtkTubeFilterPtr AirwaysFromCenterline::createTube(vtkLineSourcePtr lineSourcePtr, double radius)
+{
+    vtkTubeFilterPtr tubeFilterPtr = vtkTubeFilterPtr::New();
+    tubeFilterPtr->SetInputConnection(lineSourcePtr->GetOutputPort());
+    tubeFilterPtr->SetRadius(radius); //default is .5
+    tubeFilterPtr->SetNumberOfSides(50);
+    tubeFilterPtr->Update();
+
+    return tubeFilterPtr;
+}
+
+vtkSphereSourcePtr AirwaysFromCenterline::createSphere(double position[3], double radius)
+{
+    vtkSphereSourcePtr spherePtr = vtkSphereSourcePtr::New();
+    spherePtr->SetCenter(position);
+     spherePtr->SetRadius(1.05 * radius); // 5% larger radius to close holes
+     spherePtr->SetThetaResolution(50);
+     spherePtr->SetPhiResolution(50);
+     spherePtr->Update();
+
+    return spherePtr;
+}
+
 
 vtkPolyDataPtr AirwaysFromCenterline::getVTKPoints()
 {
@@ -251,7 +257,6 @@ vtkPolyDataPtr AirwaysFromCenterline::getVTKPoints()
             points->InsertNextPoint(parentPositions(0,parentPositions.cols()-1),parentPositions(1,parentPositions.cols()-1),parentPositions(2,parentPositions.cols()-1));
             pointIndex += 1;
         }
-
 
         for (int j = 0; j < numberOfPositions; j++)
         {
