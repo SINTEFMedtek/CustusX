@@ -1,16 +1,20 @@
+/*=========================================================================
+This file is part of CustusX, an Image Guided Therapy Application.
+
+Copyright (c) SINTEF Department of Medical Technology.
+All rights reserved.
+
+CustusX is released under a BSD 3-Clause license.
+
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
+=========================================================================*/
+
 #ifndef CXAIRWAYSFROMCENTERLINE_H
 #define CXAIRWAYSFROMCENTERLINE_H
 
 #include "cxMesh.h"
 #include <QDomElement>
 #include "org_custusx_filter_airwaysfromcenterline_Export.h"
-
-typedef vtkSmartPointer<class vtkImageStencil> vtkImageStencilPtr;
-typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
-typedef vtkSmartPointer<class vtkTubeFilter> vtkTubeFilterPtr;
-typedef vtkSmartPointer<class vtkCleanPolyData> vtkCleanPolyDataPtr;
-typedef vtkSmartPointer<class vtkPolyDataToImageStencil> vtkPolyDataToImageStencilPtr;
-typedef vtkSmartPointer<class vtkPolyDataAlgorithm> vtkPolyDataAlgorithmPtr;
 
 namespace cx
 {
@@ -30,9 +34,7 @@ public:
     void processCenterline(vtkPolyDataPtr centerline_r);
     vtkPolyDataPtr generateTubes();
     void createEmptyImage();
-    void addPolyDataToImage(vtkPolyDataAlgorithmPtr mesh);
-    vtkTubeFilterPtr createTube(vtkLineSourcePtr lineSourcePtr, double radius);
-    vtkSphereSourcePtr createSphere(double position[3], double radius);
+    void addSphereToImage(double position[3], double radius);
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
     vtkPolyDataPtr getVTKPoints();
 
@@ -42,6 +44,7 @@ private:
     vtkImageDataPtr mResultImagePtr;
     double mOrigin[3];
     double mSpacing[3];
+    double mBounds[6];
     int mDim[3];
 };
 
