@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxAirwaysFromCenterline.h"
+#include <boost/math/special_functions/round.hpp>
 #include <vtkPolyData.h>
 #include "cxBranchList.h"
 #include "cxBranch.h"
@@ -171,12 +172,12 @@ void AirwaysFromCenterline::addSphereToImage(double position[3], double radius)
 
     for (int i=0; i<3; i++)
     {
-        centerIndex[i] = static_cast<int>(std::round( (position[i]-mOrigin[i]) / mSpacing[i] ));
+        centerIndex[i] = static_cast<int>(boost::math::round( (position[i]-mOrigin[i]) / mSpacing[i] ));
         sphereBoundingBoxIndex[2*i] = std::max(
-                    static_cast<int>(std::round( (position[i]-mOrigin[i] - radius) / mSpacing[i] )),
+                    static_cast<int>(boost::math::round( (position[i]-mOrigin[i] - radius) / mSpacing[i] )),
                     0);
         sphereBoundingBoxIndex[2*i+1] = std::min(
-                    static_cast<int>(std::round( (position[i]-mOrigin[i] + radius) / mSpacing[i] )),
+                    static_cast<int>(boost::math::round( (position[i]-mOrigin[i] + radius) / mSpacing[i] )),
                     mDim[i]-1);
     }
 

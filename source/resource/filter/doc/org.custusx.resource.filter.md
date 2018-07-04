@@ -26,6 +26,8 @@ filter on the selected input volume.
 - Optional Windowed Sinc smoothing
 - Decimation of triangles
 - Optional preserve mesh topology
+- Number of iterations in smoothing filter. Higher number = more smoothing
+- Band pass width in smoothing filter. Smaller number = more smoothing
 
 
 
