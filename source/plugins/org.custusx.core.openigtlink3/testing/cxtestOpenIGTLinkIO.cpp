@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioConnector.h"
 #include "igtlioDevice.h"
 #include "igtlioSession.h"
-//#include "igtlioCommandDevice.h"
 
 #include "cxNetworkHandler.h"
 #include "cxtestReceiver.h"
