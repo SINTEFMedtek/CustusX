@@ -138,8 +138,12 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 		}
 
-
 		emit image(cximage);
+
+		//Use the transform from the image message instead of the transform message
+		double timestamp = header.timestamp;
+		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
+		emit transform(deviceName, cxtransform, timestamp);
 	}
 	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
 	{
