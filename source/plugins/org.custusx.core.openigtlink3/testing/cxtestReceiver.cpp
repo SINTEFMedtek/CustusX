@@ -5,7 +5,6 @@
 #include "vtkSmartPointer.h"
 
 #include "igtlioImageDevice.h"
-//#include "igtlioCommandDevice.h"
 #include "igtlioTransformDevice.h"
 #include "igtlioStatusDevice.h"
 #include "igtlioStringDevice.h"
