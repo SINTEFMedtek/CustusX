@@ -41,7 +41,7 @@ public:
 	bool string_received;
 
 public slots:
-//	void onDeviceModifiedPrint(vtkObject *caller, void *device, unsigned long event, void *);
+	void onDeviceModifiedPrint(vtkObject *caller, void *device, unsigned long event, void *);
 	void onDeviceReceivedCount(vtkObject *caller, void *device, unsigned long event, void *);
 
 private slots:

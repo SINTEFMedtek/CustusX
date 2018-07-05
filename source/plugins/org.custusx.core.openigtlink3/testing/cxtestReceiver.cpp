@@ -81,88 +81,75 @@ void Receiver::sendString()
 	device = mSession->SendString("my_device_name", "<Command Name=\"RequestChannelIDs\" />");
 }
 
-//void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event, void*)
-//{
-//	vtkSmartPointer<igtlioDevice> receivedDevice(reinterpret_cast<igtlioDevice*>(caller));
-//	REQUIRE(receivedDevice);
-//	CX_LOG_DEBUG() << "\n\n *** DEVICE IS MODIFIED: " << event
-//				   << " from " << receivedDevice->GetDeviceName()
-//				   << " which is of type " << receivedDevice->GetDeviceType()
-//				   << " ***";
+void Receiver::onDeviceModifiedPrint(vtkObject* caller, void* device, unsigned long event, void*)
+{
+	vtkSmartPointer<igtlioDevice> receivedDevice(reinterpret_cast<igtlioDevice*>(caller));
+	REQUIRE(receivedDevice);
+	CX_LOG_DEBUG() << "\n\n *** DEVICE IS MODIFIED: " << event
+					 << " from " << receivedDevice->GetDeviceName()
+					 << " which is of type " << receivedDevice->GetDeviceType()
+					 << " ***";
 
-//	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
-//	//CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName << " timestamp: " << header.timestamp;
-
-
-//	std::string device_type = receivedDevice->GetDeviceType();
-//	if(device_type == igtlioCommandConverter::GetIGTLResponseName())
-//	{
-//		igtlioCommandDevicePointer command = igtlioCommandDevice::SafeDownCast(receivedDevice);
-//		REQUIRE(command);
-
-//		igtlioCommandConverter::ContentData content = command->GetContent();
-
-//		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
-//					   << " name: " << content.name
-//					   << " content: " << content.content;
+	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
+	//CX_LOG_DEBUG() << "HEADER: " << " devicename: " << header.deviceName << " timestamp: " << header.timestamp;
 
 
-//	}
-//	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
-//	{
-//		vtkSmartPointer<igtlioStatusDevice> status = igtlioStatusDevice::SafeDownCast(receivedDevice);
-//		REQUIRE(status);
+	std::string device_type = receivedDevice->GetDeviceType();
+	if(device_type == igtlioStatusConverter::GetIGTLTypeName())
+	{
+		vtkSmartPointer<igtlioStatusDevice> status = igtlioStatusDevice::SafeDownCast(receivedDevice);
+		REQUIRE(status);
 
-//		igtlioStatusConverter::ContentData content = status->GetContent();
-//		/*
-//		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
-//					   << " subcode: " << content.subcode
-//					   << " errorname: " << content.errorname //errorname is an optional field, will only be filled when there is an error
-//					   << " statusstring: " << content.statusstring;
-//		*/
+		igtlioStatusConverter::ContentData content = status->GetContent();
+		/*
+		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
+						 << " subcode: " << content.subcode
+						 << " errorname: " << content.errorname //errorname is an optional field, will only be filled when there is an error
+						 << " statusstring: " << content.statusstring;
+		*/
 
-//	}
-//	else if(device_type == igtlioImageConverter::GetIGTLTypeName())
-//	{
-//		vtkSmartPointer<igtlioImageDevice> image = igtlioImageDevice::SafeDownCast(receivedDevice);
-//		REQUIRE(image);
+	}
+	else if(device_type == igtlioImageConverter::GetIGTLTypeName())
+	{
+		vtkSmartPointer<igtlioImageDevice> image = igtlioImageDevice::SafeDownCast(receivedDevice);
+		REQUIRE(image);
 
-//		igtlioImageConverter::ContentData content = image->GetContent();
-//		/*
-//		CX_LOG_DEBUG() << "IMAGE: "	<< " image class name: " << content.image->GetClassName()
-//					   << " transform: " << content.transform;
-//		*/
-//	}
-//	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
-//	{
-//		vtkSmartPointer<igtlioTransformDevice> transform = igtlioTransformDevice::SafeDownCast(receivedDevice);
-//		REQUIRE(transform);
+		igtlioImageConverter::ContentData content = image->GetContent();
+		/*
+		CX_LOG_DEBUG() << "IMAGE: "	<< " image class name: " << content.image->GetClassName()
+						 << " transform: " << content.transform;
+		*/
+	}
+	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
+	{
+		vtkSmartPointer<igtlioTransformDevice> transform = igtlioTransformDevice::SafeDownCast(receivedDevice);
+		REQUIRE(transform);
 
-//		igtlioTransformConverter::ContentData content = transform->GetContent();
-//		/*
-//		CX_LOG_DEBUG() << "TRANSFORM: "	<< " transform: " << content.transform
-//					   << " deviceName: " << content.deviceName;
-//		*/
+		igtlioTransformConverter::ContentData content = transform->GetContent();
+		/*
+		CX_LOG_DEBUG() << "TRANSFORM: "	<< " transform: " << content.transform
+						 << " deviceName: " << content.deviceName;
+		*/
 
-//	}
-//	else if(device_type == igtlioStringConverter::GetIGTLTypeName())
-//	{
-//		vtkSmartPointer<igtlioStringDevice> string = igtlioStringDevice::SafeDownCast(receivedDevice);
-//		REQUIRE(string);
+	}
+	else if(device_type == igtlioStringConverter::GetIGTLTypeName())
+	{
+		vtkSmartPointer<igtlioStringDevice> string = igtlioStringDevice::SafeDownCast(receivedDevice);
+		REQUIRE(string);
 
-//		igtlioStringConverter::ContentData content = string->GetContent();
+		igtlioStringConverter::ContentData content = string->GetContent();
 
-//		CX_LOG_DEBUG() << "STRING: "	<< " string: " << content.string_msg
-//					   << " encoding: " << content.encoding;
+		CX_LOG_DEBUG() << "STRING: "	<< " string: " << content.string_msg
+						 << " encoding: " << content.encoding;
 
 
-//	}
-//	else
-//	{
-//		INFO("Modified device has unknown device type.");
-//		REQUIRE(false);
-//	}
-//}
+	}
+	else
+	{
+		INFO("Modified device has unknown device type.");
+		REQUIRE(false);
+	}
+}
 
 void Receiver::onDeviceReceivedCount(vtkObject* caller, void* device, unsigned long event, void*)
 {
