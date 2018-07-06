@@ -12,7 +12,7 @@ namespace cxtest
 class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT PlusReceiver : public Receiver
 {
 public:
-	PlusReceiver(igtlio::LogicPointer logic);
+	PlusReceiver(igtlioLogicPointer logic);
 
 	void send_RequestChannelIds();
 	void send_RequestDeviceIds();

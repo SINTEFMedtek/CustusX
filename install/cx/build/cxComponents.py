@@ -322,7 +322,8 @@ class OpenIGTLink(CppComponent):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08')
+#        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
+        self._getBuilder().gitCheckout('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
@@ -343,11 +344,11 @@ class OpenIGTLinkIO(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-#        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
-        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
+        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+#        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('7dc1ed862c3d6a8376157a212058bea87e5d74cd')
+        self._getBuilder().gitCheckout('ab439c20952efc5bac214d3486c5c2977b44b4f5')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
