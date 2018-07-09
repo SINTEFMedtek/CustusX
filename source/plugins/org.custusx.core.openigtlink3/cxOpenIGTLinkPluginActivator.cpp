@@ -39,7 +39,7 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 
 	TrackingServicePtr trackingService = TrackingServiceProxy::create(context);
 
-	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
 	mNetworkHandler.reset(new NetworkHandler(logic));
 	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
