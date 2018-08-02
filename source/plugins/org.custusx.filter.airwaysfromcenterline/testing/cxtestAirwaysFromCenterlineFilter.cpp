@@ -32,11 +32,11 @@ TEST_CASE("AirwaysFromCenterline: execute", "[unit][org.custusx.filter.airwaysfr
     AirwaysFromCenterlinePtr airwaysFromCenterline = AirwaysFromCenterlinePtr(new cx::AirwaysFromCenterline());
     REQUIRE(airwaysFromCenterline);
 
-    QString filenameCenterline = cx::DataLocations::getTestDataPath()+"/testing/Lung/Thorax_1_0__I30f_tsf_cl1.vtk";
+    QString filenameCenterline = cx::DataLocations::getTestDataPath()+"/testing/Lung/Thorax__1_0_I30f_tsf_cl1.vtk";
 
     //create a new patient
 	QString info;
-	cx::DataPtr dataCenterline = cx::logicManager()->getPatientModelService()->importData(filenameCenterline, info);
+    cx::DataPtr dataCenterline = cx::logicManager()->getPatientModelService()->importData(filenameCenterline, info);
 
     REQUIRE(dataCenterline);
 
