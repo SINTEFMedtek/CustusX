@@ -296,7 +296,7 @@ class Eigen(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
-        tag = '3.3.3'
+        tag = '3.3.5'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         pass
