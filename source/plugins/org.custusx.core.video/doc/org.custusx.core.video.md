@@ -13,8 +13,7 @@ Video Grabber OpenCV Streamer Service {#org_custusx_core_video_streamer_open_cv}
 ===========================================================
 Stream images from a video grabber.
 The video source is installed using the usual method on your operating system, 
-then it is made available to the application through the <http://opencv.org/> 
-library.
+then it is made available to the application through the [OpenCV library](http://opencv.org).
 
 
 
@@ -22,7 +21,7 @@ library.
 Remote Server Streamer Service {#org_custusx_core_video_streamer_remote_server}
 ===========================================================
 Receive a video stream and possibly US probe information over an OpenIGTLink connection. 
-See <http://openigtlink.org> for more. (The US Probe info is a custom extension).
+See <http://openigtlink.org> for more. (The US Probe info is a custom extension to the OpenIGTLink protocol).
 
 Enter the IP adress of the remote server. The default port is 18333.
 

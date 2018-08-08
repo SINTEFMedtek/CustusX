@@ -42,7 +42,7 @@ class cxGrabber_EXPORT Streamer : public QObject
 
 public:
 	Streamer();
-	virtual ~Streamer(){};
+	virtual ~Streamer(){}
 
 	virtual void startStreaming(SenderPtr sender) = 0;
 	virtual void stopStreaming() = 0;
@@ -85,8 +85,8 @@ class cxGrabber_EXPORT CommandLineStreamer : public Streamer
 	Q_OBJECT
 
 public:
-	CommandLineStreamer(){};
-	virtual ~CommandLineStreamer(){};
+	CommandLineStreamer(){}
+	virtual ~CommandLineStreamer(){}
 
 	virtual QStringList getArgumentDescription() = 0;
 	virtual QString getType() = 0;
@@ -94,7 +94,7 @@ public:
 	virtual void initialize(StringMap arguments);
 
 protected slots:
-	virtual void streamSlot() {std::cout << "THIS SHOULD NOT HAPPEN...." << std::endl;};
+	virtual void streamSlot() {std::cout << "THIS SHOULD NOT HAPPEN...." << std::endl;}
 
 
 protected:

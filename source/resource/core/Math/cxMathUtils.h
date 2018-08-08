@@ -13,12 +13,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMATHUTILS_H
 
 #include "cxResourceExport.h"
+#include "cxTransform3D.h"
+
 
 namespace cx
 {
 
 cxResource_EXPORT double roundAwayFromZero(double val);
 cxResource_EXPORT unsigned int roundUnsigned(double val);
+cxResource_EXPORT Eigen::ArrayXd matrixToQuaternion(Transform3D Tx);
+cxResource_EXPORT Transform3D quaternionToMatrix(Eigen::ArrayXd qArray);
 
 }
 

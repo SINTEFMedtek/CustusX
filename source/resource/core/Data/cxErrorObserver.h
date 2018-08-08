@@ -2,12 +2,14 @@
 #define CXERROROBSERVER_H
 
 #include "cxResourceExport.h"
+
 #include "boost/shared_ptr.hpp"
-#include <QString>
-#include <QMutex>
+#include <vtkCommand.h>
 #include <vtkSmartPointer.h>
 #include <vtkAlgorithm.h>
-#include <vtkCommand.h>
+#include <QString>
+#include "cxLogger.h"
+#include <QMutex>
 
 namespace cx {
 
@@ -33,6 +35,7 @@ private:
 };
 
 
+//---------------------------------------------------------
 /** Wrapper for vtkAlgorithm::Update(),
   * prints error message upon error,
   * also wraps the call inside a global mutex (see below for why).
@@ -41,14 +44,40 @@ private:
 class cxResource_EXPORT ErrorObserver: public vtkCommand
 {
 public:
-	ErrorObserver() {}
-	static ErrorObserver* New();
-	virtual void Execute(vtkObject* caller, unsigned long, void* text);
-
-	static bool checkedRead(vtkSmartPointer<vtkAlgorithm> reader, QString filename);
-
+	ErrorObserver()
+	{
+	}
+	static ErrorObserver* New()
+	{
+		return new ErrorObserver;
+	}
+	virtual void Execute(vtkObject* caller, unsigned long, void* text)
+	{
+		mMessage = QString(reinterpret_cast<char*> (text));
+	}
 	QString mMessage;
+
+	static bool checkedRead(vtkSmartPointer<vtkAlgorithm> reader, QString filename)
+	{
+		vtkSmartPointer<ErrorObserver> errorObserver = vtkSmartPointer<ErrorObserver>::New();
+		reader->AddObserver("ErrorEvent", errorObserver);
+
+		{
+			StaticMutexVtkLocker lock;
+			reader->Update();
+		}
+//		ErrorObserver::threadSafeUpdate(reader);
+
+		if (!errorObserver->mMessage.isEmpty())
+		{
+			reportError("Load of data [" + filename + "] failed with message:\n"
+				+ errorObserver->mMessage);
+			return false;
+		}
+		return true;
+	}
 };
 
 }
+
 #endif // CXERROROBSERVER_H
