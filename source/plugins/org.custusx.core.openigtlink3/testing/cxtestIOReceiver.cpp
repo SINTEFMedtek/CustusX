@@ -3,7 +3,7 @@
 namespace cxtest
 {
 
-IOReceiver::IOReceiver(igtlio::LogicPointer logic) :
+IOReceiver::IOReceiver(igtlioLogicPointer logic) :
 	Receiver(logic)
 {
 

@@ -31,7 +31,7 @@ class NetworkConnection;
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLink3GuiExtenderService : public GUIExtenderService
 {
 public:
-	OpenIGTLink3GuiExtenderService(ctkPluginContext* context, igtlio::LogicPointer logic);
+	OpenIGTLink3GuiExtenderService(ctkPluginContext* context, igtlioLogicPointer logic);
     virtual ~OpenIGTLink3GuiExtenderService();
 
     std::vector<CategorizedWidget> createWidgets() const;
@@ -41,7 +41,7 @@ private:
 //	NetworkConnectionHandlePtr mClient;
 	ctkPluginContext* mContext;
     //NetworkDataTransferPtr mDataTransfer;
-	igtlio::LogicPointer mLogic;
+	igtlioLogicPointer mLogic;
 };
 typedef boost::shared_ptr<OpenIGTLink3GuiExtenderService> OpenIGTLink3GuiExtenderServicePtr;
 

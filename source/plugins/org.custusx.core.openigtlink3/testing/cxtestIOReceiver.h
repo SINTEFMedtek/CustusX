@@ -13,7 +13,7 @@ namespace cxtest
 class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT IOReceiver : public Receiver
 {
 public:
-	IOReceiver(igtlio::LogicPointer logic);
+	IOReceiver(igtlioLogicPointer logic);
 
 	void sendCommand_Get_Parameter_Depth();
 
