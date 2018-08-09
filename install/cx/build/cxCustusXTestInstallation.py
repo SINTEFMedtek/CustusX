@@ -56,7 +56,7 @@ class CustusXTestInstallation:
         appPath = self._getInstalledBinaryPath()
         self._testExecutable(appPath, 'Catch', '-h')
         self._testExecutable(appPath, self.system_base_name) # defaults to CustusX
-        self._testExecutable(appPath, 'OpenIGTLinkServer')
+        self._testExecutable(appPath, 'OpenIGTLinkServer', '-h')
         self._testExecutable(appPath, 'LogConsole')
                      
     def runUnstableTests(self):
