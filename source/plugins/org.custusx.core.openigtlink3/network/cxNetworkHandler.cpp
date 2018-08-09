@@ -140,10 +140,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		emit image(cximage);
 
-		//Use the transform from the image message instead of the transform message
-		double timestamp = header.timestamp;
-		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
-		emit transform(deviceName, cxtransform, timestamp);
+		// CX-366: Currenly we don't use the transform from the image message, because there is no specification of what this transform should be.
+		// Only the transforms from the transform messages are used.
+//		double timestamp = header.timestamp;
+//		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
+//		emit transform(deviceName, cxtransform, timestamp);
 	}
 	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
 	{
