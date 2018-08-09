@@ -127,7 +127,7 @@ int main(int argc, char* argv[])
   if (!ok)
   {
 	  std::cout << "Can not start listening. Quitting..." << std::endl;
-		return 0;//Returning error code here cause testing on Linux to fail
+		return 1;//Returning error code here cause testing on Linux to fail
   }
 
   int retVal = app.exec();
