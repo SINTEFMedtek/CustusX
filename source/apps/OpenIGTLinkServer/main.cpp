@@ -124,10 +124,12 @@ int main(int argc, char* argv[])
 		return 1;
   }
   ok = server.startListen(port);
-  if (!ok)
+	if (!ok)
   {
 	  std::cout << "Can not start listening. Quitting..." << std::endl;
-		return 1;//Returning error code here cause testing on Linux to fail
+		std::cout << "This problem may be due to an existing OpenIGTLinkServer running." << std::endl;
+		std::cout << "---> Try quitting the running OpenIGTLinkServer process to fix the problem. <---" << std::endl;
+		return 1;
   }
 
   int retVal = app.exec();
