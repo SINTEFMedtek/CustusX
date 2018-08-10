@@ -64,7 +64,7 @@ double calculateFPS(bool slicing)
 
 }
 
-TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration][not_win32][not_win64]")
+TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration]")
 {
 	initTest();
 	cx::Reporter::initialize();
