@@ -55,10 +55,8 @@ cx_install_add_library_dirs(
     ${IGSTK_DIR}/bin
     ${IGSTK_DIR}/lib
     ${OpenIGTLink_LIBRARY_DIRS}
-#    ${OpenIGTLinkIO_DIR}/lib
-#    ${OpenIGTLinkIO_DIR}/bin
-${OpenIGTLinkIO_LIBRARY_DIRS}
-${OpenIGTLinkIO_LIBRARY_DIRS}../bin
+    ${OpenIGTLinkIO_DIR}/lib
+    ${OpenIGTLinkIO_DIR}/bin
     ${VTK_DIR}/lib
     ${VTK_DIR}/bin
     ${CTK_DIR}/CTK-build/bin
