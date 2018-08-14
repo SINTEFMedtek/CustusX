@@ -70,12 +70,18 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
         
         return p
  
+    def _createBuildFlagFile(self, buildFlagFile):
+      print "Creating " + buildFlagFile
+      open(buildFlagFile, 'a').close() # Create empty file
+    def _deleteBuildFlagFile(self, buildFlagFile):
+      print "Deleting " + buildFlagFile
+      os.remove(buildFlagFile)
+
     def run(self):
         options = self.options        
 
         buildFlagFile = self.controlData().getRootDir() + '/../buildFlagFile'
-        print "Creating " + buildFlagFile
-        open(buildFlagFile, 'a').close() # Create empty file
+        self._createBuildFlagFile(buildFlagFile);
 
         if options.analyze:
             self.runAnalyze()
@@ -111,9 +117,7 @@ class Controller(cxJenkinsBuildScriptBase.Controller):
                                            skip_publish_docs=options.skip_publish_docs)
                         
         self.cxBuilder.finish()
-
-        print "Deleting " + buildFlagFile
-        os.remove(buildFlagFile)
+        self._deleteBuildFlagFile(buildFlagFile)
         
 if __name__ == '__main__':
     controller = Controller()
