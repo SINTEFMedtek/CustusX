@@ -195,7 +195,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('d2f2c21829718c0960dff7eb868dbb243c49a6ea')
+        self._getBuilder().gitCheckout('1c14943c3975fe826da1e7be1624c16c893d1c68')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -292,7 +292,7 @@ class Eigen(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:RLovelett/eigen.git'
+        return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
@@ -322,7 +322,8 @@ class OpenIGTLink(CppComponent):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08')
+#        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
+        self._getBuilder().gitCheckout('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
@@ -347,7 +348,7 @@ class OpenIGTLinkIO(CppComponent):
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('568eaeb7113fca9c392743aedd8f4d6bf87a8442')
+        self._getBuilder().gitCheckout('ab439c20952efc5bac214d3486c5c2977b44b4f5')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

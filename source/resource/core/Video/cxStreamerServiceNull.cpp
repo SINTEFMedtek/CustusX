@@ -20,19 +20,24 @@ QString StreamerServiceNull::getName()
 
 QString StreamerServiceNull::getType() const
 {
-    return "Streamer_Service_Null";
+	return "Streamer_Service_Null";
 }
+
+void StreamerServiceNull::stop()
+{}
 
 std::vector<PropertyPtr> StreamerServiceNull::getSettings(QDomElement root)
 {
-    std::vector<PropertyPtr> retval;
-    return retval;
+	Q_UNUSED(root);
+	std::vector<PropertyPtr> retval;
+	return retval;
 }
 
 StreamerPtr StreamerServiceNull::createStreamer(QDomElement root)
 {
-    StreamerPtr retval;
-    return retval;
+	Q_UNUSED(root);
+	StreamerPtr retval;
+	return retval;
 }
 
 } //end namespace cx
