@@ -172,7 +172,6 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
 	this->shutdownService(mSessionStorageService, "SessionStorageService");
-	this->shutdownService(mFileManagerService, "FileManagerService");
 }
 
 

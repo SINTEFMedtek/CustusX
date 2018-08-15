@@ -208,7 +208,8 @@ void USFrameData::removeFrame(unsigned int index)
 
 Eigen::Array3i USFrameData::getDimensions() const
 {
-	Eigen::Array3i retval(mImageContainer->get(0)->GetDimensions());
+	vtkImageDataPtr image = mImageContainer->get(0);
+	Eigen::Array3i retval(image->GetDimensions());
 
 	if (mCropbox.range()[0]!=0)
 	{
@@ -513,8 +514,14 @@ bool USFrameData::is4D()
 	int numberOfFrames = mReducedToFull.size();
 
 	if (numberOfFrames > 0)
-		if(mImageContainer->get(0)->GetDataDimension() == 3)
+	{
+		vtkImageDataPtr image = mImageContainer->get(0);
+		if(image->GetDataDimension() == 3)
+		{
 			return true;
+		}
+
+	}
 	return false;
 }
 

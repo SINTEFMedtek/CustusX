@@ -196,7 +196,6 @@ void FileManagerImpService::removeFileReaderWriter(FileReaderWriterService *serv
 		else
 			++it;
 	}
-
 }
 
 void FileManagerImpService::initServiceListener()

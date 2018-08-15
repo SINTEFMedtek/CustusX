@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxServiceTrackerListener.h"
 #include "cxReconstructionExecuter.h"
 #include "cxPatientModelService.h"
+#include "cxFileManagerService.h"
 
 //Windows fix
 #ifndef M_PI
@@ -217,7 +218,7 @@ void UsReconstructionImplService::selectData(USReconstructInputData fileData)
 
 void UsReconstructionImplService::updateFromOriginalFileData()
 {
-	if (!mOriginalFileData.isValid())
+	if (mFileManagerService->isNull() || !mOriginalFileData.isValid())
 		return;
 
 	ReconstructPreprocessorPtr preprocessor(new ReconstructPreprocessor(mPatientModelService));

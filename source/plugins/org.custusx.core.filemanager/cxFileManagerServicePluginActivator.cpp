@@ -76,7 +76,6 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 
 void FileManagerServicePluginActivator::stop(ctkPluginContext* context)
 {
-	mRegisteredFileManagerService.reset();
 
 	for(std::vector<RegisteredServicePtr>::iterator it = mRegisteredFileReaderWriterServices.begin(); it != mRegisteredFileReaderWriterServices.end(); )
 	{
@@ -85,6 +84,7 @@ void FileManagerServicePluginActivator::stop(ctkPluginContext* context)
 	}
 
 	mRegisteredGuiExtenderService.reset();
+	mRegisteredFileManagerService.reset();
 
 	Q_UNUSED(context);
 }
