@@ -16,7 +16,11 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(cxtest_org_custusx_webserver PRIVATE org_custusx_webserver cxCatch)
+    target_link_libraries(cxtest_org_custusx_webserver
+      PRIVATE
+      org_custusx_webserver
+      cxtestUtilities
+      cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_webserver)
 
 endif(BUILD_TESTING)
