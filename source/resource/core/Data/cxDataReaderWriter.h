@@ -94,7 +94,7 @@ public:
 		return (fileType.compare("nii", Qt::CaseInsensitive) == 0);
 	}
 	virtual bool readInto(DataPtr data, QString path);
-	bool readInto(ImagePtr image, QString filename);
+	static bool readInto(ImagePtr image, QString filename);
 	virtual QString canLoadDataType() const { return "image"; }
 	virtual DataPtr load(const QString& uid, const QString& filename);
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);

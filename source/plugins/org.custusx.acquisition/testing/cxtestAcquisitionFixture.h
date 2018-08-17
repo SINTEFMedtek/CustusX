@@ -68,7 +68,7 @@ private:
 	QString mAcqDataFilename;
 	QString mConnectionMethod;
 
-	double mRecordDuration; ///< duration of recording in ms.
+	int mRecordDuration; ///< duration of recording in ms.
 	cx::VideoSourcePtr mVideoSource;
 	cx::UsReconstructionServicePtr mUsReconstructionService;
 	cx::AcquisitionServicePtr mAcquisitionService;

@@ -20,16 +20,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxLogicManager.h"
 #include "cxFileManagerService.h"
+#include "cxDataReaderWriter.h"
 
 namespace
 {
 
 cx::ImagePtr readNIfTITestImage(QString uid, QString filename)
 {
-	cx::LogicManager::initialize();
 	cx::ImagePtr image = cx::Image::create(uid,uid);
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
-	filemanager->readInto(image, filename);
+	cx::NIfTIReader::readInto(image, filename);
 	return image;
 }
 
@@ -39,9 +38,6 @@ cx::ImagePtr readMhdTestImage(QString uid, QString filename)
 	cx::ImagePtr image = cx::Image::create(uid,uid);
 	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
 	filemanager->readInto(image, filename);
-	//vtkImageDataPtr vtk_image = cx::generateVtkImageData(Eigen::Array3i(3,3,3), Eigen::Vector3d(1, 1, 1), 100);
-	//image->setVtkImageData(image);
-
 	return image;
 }
 

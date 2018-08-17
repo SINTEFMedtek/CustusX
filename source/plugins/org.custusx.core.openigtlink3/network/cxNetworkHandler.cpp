@@ -16,7 +16,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioLogic.h"
 #include "igtlioImageDevice.h"
 #include "igtlioTransformDevice.h"
-#include "igtlioCommandDevice.h"
 #include "igtlioStatusDevice.h"
 #include "igtlioStringDevice.h"
 
@@ -27,13 +26,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioCommandConverter.h"
 #include "igtlioStatusConverter.h"
 #include "igtlioStringConverter.h"
+#include "igtlioUsSectorDefinitions.h"
 
 #include "cxLogger.h"
 
 namespace cx
 {
 
-NetworkHandler::NetworkHandler(igtlio::LogicPointer logic) :
+NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
 	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages))
 {
@@ -54,7 +54,7 @@ NetworkHandler::~NetworkHandler()
 	mTimer->stop();
 }
 
-igtlio::SessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, igtlio::SYNCHRONIZATION_TYPE sync, double timeout_s)
+igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s)
 {
 	mSession = mLogic->ConnectToServer(serverHost, serverPort, sync, timeout_s);
 	return mSession;
@@ -62,18 +62,11 @@ igtlio::SessionPointer NetworkHandler::requestConnectToServer(std::string server
 
 void NetworkHandler::disconnectFromServer()
 {
-	if (mSession->GetConnector() && mSession->GetConnector()->GetState()!=igtlio::Connector::STATE_OFF)
+	if (mSession->GetConnector() && mSession->GetConnector()->GetState()!=igtlioConnector::STATE_OFF)
 	{
 		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession->GetConnector()->GetName();
-		igtlio::ConnectorPointer connector = mSession->GetConnector();
-		if(connector->GetState() != igtlio::Connector::STATE_WAIT_CONNECTION) //Don't try to stop connection while in STATE_WAIT_CONNECTION.
-		{
-			connector->Stop();//This takes to long if connect isn't finished (because mutex is blocking)
-		}
-		else
-		{
-			connector->SetServerStopFlag(true); //Just setting stop flag should also stop the server
-		}
+		igtlioConnectorPointer connector = mSession->GetConnector();
+		connector->Stop();
 		mLogic->RemoveConnector(connector);
 	}
 	mProbeDefinitionFromStringMessages->reset();
@@ -83,9 +76,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 {
 	Q_UNUSED(unknown);
 	Q_UNUSED(event);
-	vtkSmartPointer<igtlio::Device> receivedDevice(reinterpret_cast<igtlio::Device*>(caller_device));
+	vtkSmartPointer<igtlioDevice> receivedDevice(reinterpret_cast<igtlioDevice*>(caller_device));
 
-	igtlio::BaseConverter::HeaderData header = receivedDevice->GetHeader();
+	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
 
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
@@ -95,11 +88,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 	// Anser integration may send equipmentId, so this is checked for when we get a transform.
 	QString deviceName(receivedDevice->GetDeviceName().c_str());
 
-	if(device_type == igtlio::ImageConverter::GetIGTLTypeName())
+	if(device_type == igtlioImageConverter::GetIGTLTypeName())
 	{
-		igtlio::ImageDevicePointer imageDevice = igtlio::ImageDevice::SafeDownCast(receivedDevice);
+		igtlioImageDevicePointer imageDevice = igtlioImageDevice::SafeDownCast(receivedDevice);
 
-		igtlio::ImageConverter::ContentData content = imageDevice->GetContent();
+		igtlioImageConverter::ContentData content = imageDevice->GetContent();
 
 //		QString deviceName(header.deviceName.c_str());
 //		QString deviceName(header.equipmentId.c_str());//Use equipmentId
@@ -109,23 +102,54 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
 		//this->decode_rMd(msg, retval);
 
+
+		//Use the igtlio meta data from the image message
+		std::string metaLabel;
+		std::string metaDataValue;
+		QStringList igtlioLabels;
+
+		igtlioLabels << IGTLIO_KEY_PROBE_TYPE;
+		igtlioLabels << IGTLIO_KEY_ORIGIN;
+		igtlioLabels << IGTLIO_KEY_ANGLES;
+		igtlioLabels << IGTLIO_KEY_BOUNDING_BOX;
+		igtlioLabels << IGTLIO_KEY_DEPTHS;
+		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
+		igtlioLabels << IGTLIO_KEY_SPACING_X;
+		igtlioLabels << IGTLIO_KEY_SPACING_Y;
+		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with PLUS
+
+
+		for (int i = 0; i < igtlioLabels.size(); ++i)
+		{
+			metaLabel = igtlioLabels[i].toStdString();
+			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
+			if(!gotMetaData)
+				CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
+			else
+				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
+		}
+
+
 		mProbeDefinitionFromStringMessages->setImage(cximage);
 
 		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 		{
-//			QString deviceName(header.deviceName.c_str());
-//			QString deviceName(header.equipmentId.c_str());//Use equipmentId instead?
-
+			//TODO: Use deciveNameLong
 			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 		}
 
-
 		emit image(cximage);
+
+		// CX-366: Currenly we don't use the transform from the image message, because there is no specification of what this transform should be.
+		// Only the transforms from the transform messages are used.
+//		double timestamp = header.timestamp;
+//		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
+//		emit transform(deviceName, cxtransform, timestamp);
 	}
-	else if(device_type == igtlio::TransformConverter::GetIGTLTypeName())
+	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
 	{
-		igtlio::TransformDevicePointer transformDevice = igtlio::TransformDevice::SafeDownCast(receivedDevice);
-		igtlio::TransformConverter::ContentData content = transformDevice->GetContent();
+		igtlioTransformDevicePointer transformDevice = igtlioTransformDevice::SafeDownCast(receivedDevice);
+		igtlioTransformConverter::ContentData content = transformDevice->GetContent();
 
 //		QString deviceName(content.deviceName.c_str());
 //		QString deviceName(header.equipmentId.c_str());//Use equipmentId
@@ -142,7 +166,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		double timestamp = header.timestamp;
 //		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
 		//test: Set all messages as type TRACKED_US_PROBE for now
-//		emit transform(deviceName, igtlio::BaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
+//		emit transform(deviceName, igtlioBaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
 
 		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
 		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
@@ -155,25 +179,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		else
 			emit transform(deviceName, cxtransform, timestamp);
 	}
-	else if(device_type == igtlio::CommandConverter::GetIGTLTypeName())
+	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{
-		CX_LOG_DEBUG() << "Received command message.";
-		igtlio::CommandDevicePointer command = igtlio::CommandDevice::SafeDownCast(receivedDevice);
+		igtlioStatusDevicePointer status = igtlioStatusDevice::SafeDownCast(receivedDevice);
 
-		igtlio::CommandConverter::ContentData content = command->GetContent();
-		CX_LOG_DEBUG() << "COMMAND: "	<< " id: " << content.id
-										<< " name: " << content.name
-										<< " content: " << content.content;
-		QString deviceName(content.name.c_str());
-		QString xml(content.content.c_str());
-		emit commandRespons(deviceName, xml);
-
-	}
-	else if(device_type == igtlio::StatusConverter::GetIGTLTypeName())
-	{
-		igtlio::StatusDevicePointer status = igtlio::StatusDevice::SafeDownCast(receivedDevice);
-
-		igtlio::StatusConverter::ContentData content = status->GetContent();
+		igtlioStatusConverter::ContentData content = status->GetContent();
 
 		CX_LOG_DEBUG() << "STATUS: "	<< " code: " << content.code
 										<< " subcode: " << content.subcode
@@ -181,18 +191,18 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 										<< " statusstring: " << content.statusstring;
 
 	}
-	else if(device_type == igtlio::StringConverter::GetIGTLTypeName())
+	else if(device_type == igtlioStringConverter::GetIGTLTypeName())
 	{
-		igtlio::StringDevicePointer string = igtlio::StringDevice::SafeDownCast(receivedDevice);
+		igtlioStringDevicePointer string = igtlioStringDevice::SafeDownCast(receivedDevice);
 
-		igtlio::StringConverter::ContentData content = string->GetContent();
+		igtlioStringConverter::ContentData content = string->GetContent();
 
 //		CX_LOG_DEBUG() << "STRING: "	<< " equipmentId: " << header.equipmentId
 //										<< " encoding: " << content.encoding
 //										<< " string: " << content.string_msg;
 
 		QString message(content.string_msg.c_str());
-		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
+//		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);//Turning this off because we want to use meta info instead
 		emit string_message(message);
 	}
 	else
@@ -206,11 +216,11 @@ void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsig
 {
 	Q_UNUSED(caller);
 	Q_UNUSED(connector);
-	if (event==igtlio::Logic::ConnectionAddedEvent)
+	if (event==igtlioLogic::ConnectionAddedEvent)
 	{
 		emit connected();
 	}
-	if (event==igtlio::Logic::ConnectionAboutToBeRemovedEvent)
+	if (event==igtlioLogic::ConnectionAboutToBeRemovedEvent)
 	{
 		emit disconnected();
 	}
@@ -220,16 +230,16 @@ void NetworkHandler::onDeviceAddedOrRemoved(vtkObject* caller, void* void_device
 {
 	Q_UNUSED(caller);
 	Q_UNUSED(callData);
-	if (event==igtlio::Logic::NewDeviceEvent)
+	if (event==igtlioLogic::NewDeviceEvent)
 	{
-		igtlio::DevicePointer device(reinterpret_cast<igtlio::Device*>(void_device));
+		igtlioDevicePointer device(reinterpret_cast<igtlioDevice*>(void_device));
 		if(device)
 		{
 			CX_LOG_DEBUG() << " NetworkHandler is listening to " << device->GetDeviceName();
-			qvtkReconnect(NULL, device, igtlio::Device::ReceiveEvent, this, SLOT(onDeviceReceived(vtkObject*, void*, unsigned long, void*)));
+			qvtkReconnect(NULL, device, igtlioDevice::ReceiveEvent, this, SLOT(onDeviceReceived(vtkObject*, void*, unsigned long, void*)));
 		}
 	}
-	if (event==igtlio::Logic::RemovedDeviceEvent)
+	if (event==igtlioLogic::RemovedDeviceEvent)
 	{
 		CX_LOG_WARNING() << "TODO: on remove device event, not implemented";
 	}
@@ -243,8 +253,8 @@ void NetworkHandler::periodicProcess()
 void NetworkHandler::connectToConnectionEvents()
 {
 	foreach(int eventId, QList<int>()
-			<< igtlio::Logic::ConnectionAddedEvent
-			<< igtlio::Logic::ConnectionAboutToBeRemovedEvent
+			<< igtlioLogic::ConnectionAddedEvent
+			<< igtlioLogic::ConnectionAboutToBeRemovedEvent
 			)
 	{
 		qvtkReconnect(NULL, mLogic, eventId,
@@ -255,8 +265,8 @@ void NetworkHandler::connectToConnectionEvents()
 void NetworkHandler::connectToDeviceEvents()
 {
 	foreach(int eventId, QList<int>()
-			<< igtlio::Logic::NewDeviceEvent
-			<< igtlio::Logic::RemovedDeviceEvent
+			<< igtlioLogic::NewDeviceEvent
+			<< igtlioLogic::RemovedDeviceEvent
 			)
 	{
 		qvtkReconnect(NULL, mLogic, eventId,
