@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxLogicManager.h"
 #include "cxFileManagerService.h"
-#include "cxDataReaderWriter.h"
+#include "cxNIfTIReader.h"
 
 namespace
 {
@@ -28,7 +28,8 @@ namespace
 cx::ImagePtr readNIfTITestImage(QString uid, QString filename)
 {
 	cx::ImagePtr image = cx::Image::create(uid,uid);
-	cx::NIfTIReader::readInto(image, filename);
+	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+		filemanager->readInto(image, filename);
 	return image;
 }
 
