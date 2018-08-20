@@ -135,6 +135,7 @@ bool AirwaysFromCenterlineFilter::postProcess()
 
     MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
     outputMesh->setVtkPolyData(mOutputAirwayMesh);
+    outputMesh->setColor(QColor(253, 173, 136, 255));
     patientService()->insertData(outputMesh);
 
     //Meshes are expected to be in data(d) space
@@ -147,6 +148,7 @@ bool AirwaysFromCenterlineFilter::postProcess()
 
     MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
     outputCenterline->setVtkPolyData(mAirwaysFromCenterline->getVTKPoints());
+    outputCenterline->setColor(QColor(0, 200, 0, 255));
     patientService()->insertData(outputCenterline);
 
     if(mOutputTypes.size() > 0)

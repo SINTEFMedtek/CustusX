@@ -33,19 +33,23 @@ public:
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
     void processCenterline(vtkPolyDataPtr centerline_r);
     vtkPolyDataPtr generateTubes();
-    void createEmptyImage();
-    void addSphereToImage(double position[3], double radius);
+    vtkImageDataPtr initializeAirwaysVolume();
+    vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr);
+    vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
     vtkPolyDataPtr getVTKPoints();
 
 private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
-    vtkImageDataPtr mResultImagePtr;
     double mOrigin[3];
-    double mSpacing[3];
+    Vector3D mSpacing;
     double mBounds[6];
-    int mDim[3];
+    Eigen::Array3i mDim;
+    double mAirwaysVolumeBoundaryExtention;
+    double mAirwaysVolumeBoundaryExtentionTracheaStart;
+    double mAirwaysVolumeSpacing;
+
 };
 
 } /* namespace cx */

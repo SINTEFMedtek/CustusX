@@ -21,7 +21,7 @@ Find the surface of a binary volume using marching cubes.
 When you adjust the treshold, you will see a preview of the
 filter on the selected input volume.
 
-- Optional factor 2 reduction
+- Optional: Reduce input volume by a factor of 2 in each direction = 1/8 of original volume size
 - Marching Cubes contouring
 - Optional Windowed Sinc smoothing
 - Decimation of triangles

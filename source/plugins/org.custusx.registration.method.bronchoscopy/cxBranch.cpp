@@ -114,15 +114,15 @@ double Branch::findBranchRadius()
     int generationNumber = this->findGenerationNumber();
 
     if (generationNumber == 1)
-        return 6;
+        return 8;
     if (generationNumber == 2)
-        return 4;
+        return 6;
     if (generationNumber == 3)
-        return 3;
+        return 4;
     if (generationNumber == 4)
-        return 2.5;
+        return 3;
     if (generationNumber == 5)
-        return 2;
+        return 2.5;
     else
         return 2;
 }
