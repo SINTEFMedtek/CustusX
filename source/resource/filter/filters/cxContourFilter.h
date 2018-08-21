@@ -50,6 +50,8 @@ public:
 	DoublePropertyPtr getSurfaceThresholdOption(QDomElement root);
 	DoublePropertyPtr getDecimationOption(QDomElement root);
 	ColorPropertyPtr getColorOption(QDomElement root);
+    DoublePropertyPtr getNumberOfIterationsOption(QDomElement root);
+    DoublePropertyPtr getPassBandOption(QDomElement root);
 
 	/** This is the core algorithm, call this if you dont need all the filter stuff.
 	    Generate a contour from a vtkImageData.
@@ -59,7 +61,9 @@ public:
 	                                      bool reduceResolution=false,
 	                                      bool smoothing=true,
 	                                      bool preserveTopology=true,
-	                                      double decimation=0.2);
+                                          double decimation=0.2,
+                                          double numberOfIterations = 15,
+                                          double passBand = 0.3);
 	/** Generate a mesh from the contour using base to generate name.
 	  * Save to dataManager.
 	  */
