@@ -110,6 +110,20 @@ ColorPropertyPtr ContourFilter::getColorOption(QDomElement root)
 	                                            QColor("green"), root);
 }
 
+DoublePropertyPtr ContourFilter::getNumberOfIterationsOption(QDomElement root)
+{
+    return DoubleProperty::initialize("Number of iterations (smoothing)", "",
+                                                                                "Number of iterations in smoothing filter. Higher number = more smoothing",
+                                                                                15, DoubleRange(1, 50, 1), 0, root);
+}
+
+DoublePropertyPtr ContourFilter::getPassBandOption(QDomElement root)
+{
+    return DoubleProperty::initialize("Band pass smoothing", "",
+                                                           "Band pass width in smoothing filter. Smaller number = more smoothing",
+                                                           0.30, DoubleRange(0.05, 0.95, 0.05), 2, root);
+}
+
 void ContourFilter::createOptions()
 {
 	mReduceResolutionOption = this->getReduceResolutionOption(mOptions);
@@ -120,6 +134,8 @@ void ContourFilter::createOptions()
 	mOptionsAdapters.push_back(mSurfaceThresholdOption);
 
 	mOptionsAdapters.push_back(this->getSmoothingOption(mOptions));
+    mOptionsAdapters.push_back(this->getNumberOfIterationsOption(mOptions));
+    mOptionsAdapters.push_back(this->getPassBandOption(mOptions));
 	mOptionsAdapters.push_back(this->getDecimationOption(mOptions));
 	mOptionsAdapters.push_back(this->getPreserveTopologyOption(mOptions));
 
@@ -208,6 +224,8 @@ bool ContourFilter::execute()
 
 	BoolPropertyPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
 	BoolPropertyPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
+    DoublePropertyPtr numberOfIterationsOption = this->getNumberOfIterationsOption(mCopiedOptions);
+    DoublePropertyPtr passBandOption = this->getPassBandOption(mCopiedOptions);
 	BoolPropertyPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
 	DoublePropertyPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
 	DoublePropertyPtr decimationOption = this->getDecimationOption(mCopiedOptions);
@@ -219,7 +237,9 @@ bool ContourFilter::execute()
 	                           reduceResolutionOption->getValue(),
 	                           smoothingOption->getValue(),
 	                           preserveTopologyOption->getValue(),
-	                           decimationOption->getValue());
+                               decimationOption->getValue(),
+                               numberOfIterationsOption->getValue(),
+                               passBandOption->getValue());
 	return true;
 }
 
@@ -228,7 +248,9 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
                                       bool reduceResolution,
                                       bool smoothing,
                                       bool preserveTopology,
-                                      double decimation)
+                                      double decimation,
+                                      double numberOfIterations,
+                                      double passBand)
 {
 	if (!input)
 		return vtkPolyDataPtr();
@@ -263,12 +285,12 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	if(smoothing)
 	{
 		smoother->SetInputData(cubesPolyData);
-		smoother->SetNumberOfIterations(15);// Higher number = more smoothing
+        smoother->SetNumberOfIterations(numberOfIterations);// Higher number = more smoothing  -  default 15
 		smoother->SetBoundarySmoothing(false);
 		smoother->SetFeatureEdgeSmoothing(false);
 		smoother->SetNormalizeCoordinates(true);
 		smoother->SetFeatureAngle(120);
-		smoother->SetPassBand(0.3);//Lower number = more smoothing
+        smoother->SetPassBand(passBand);//Lower number = more smoothing  -  default 0.3
 		smoother->Update();
 		cubesPolyData = smoother->GetOutput();
 	}

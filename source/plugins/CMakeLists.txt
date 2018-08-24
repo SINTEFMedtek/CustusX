@@ -37,6 +37,7 @@ set(CX_PLUGINS
   org.custusx.filter.accusurf:ON
   org.custusx.ceetron:ON
   org.custusx.virtualbronchoscopy:ON
+  org.custusx.filter.airwaysfromcenterline:ON
 )
 
 # Add plugins defined externally, i.e defined outside CustusX core.
