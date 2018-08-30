@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioConnector.h"
 #include "igtlioDevice.h"
 #include "igtlioSession.h"
-#include "igtlioCommandDevice.h"
 
 #include "cxNetworkHandler.h"
 #include "cxtestReceiver.h"
@@ -33,16 +32,16 @@ namespace
 class igtlioServerClientFixture
 {
 public:
-	igtlio::LogicPointer logic;
-	igtlio::SessionPointer server;
-	igtlio::SessionPointer client;
+	igtlioLogicPointer logic;
+	igtlioSessionPointer server;
+	igtlioSessionPointer client;
 
 	void startServerAndClientAndConnect()
 	{
 		std::string ip = "localhost";
 		int port = 18944;
 
-		logic = igtlio::LogicPointer::New();
+		logic = igtlioLogicPointer::New();
 
 		// Server default port should be 18944
 		// Verify this by not setting port on explicitly on server
@@ -57,10 +56,10 @@ public:
 namespace cxtest
 {
 
-void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
+void tryToReceiveEvents(igtlioLogicPointer logic, Receiver &receiver)
 {
 	Q_UNUSED(receiver);
-	igtlio::ConnectorPointer connector = logic->GetConnector(0);
+	igtlioConnectorPointer connector = logic->GetConnector(0);
 
 	double timeout = 1;
 	double starttime = vtkTimerLog::GetUniversalTime();
@@ -70,7 +69,7 @@ void tryToReceiveEvents(igtlio::LogicPointer logic, Receiver &receiver)
 	}
 }
 
-void listenToAllDevicesToCountMessages(igtlio::LogicPointer logic, Receiver &receiver)
+void listenToAllDevicesToCountMessages(igtlioLogicPointer logic, Receiver &receiver)
 {
 	unsigned index = logic->GetNumberOfDevices();
 	for(unsigned i=0; i<index; ++i)
@@ -79,9 +78,9 @@ void listenToAllDevicesToCountMessages(igtlio::LogicPointer logic, Receiver &rec
 	}
 }
 
-bool isConnected(igtlio::LogicPointer logic)
+bool isConnected(igtlioLogicPointer logic)
 {
-	return logic->GetConnector(0)->GetState() == igtlio::Connector::STATE_CONNECTED;
+	return logic->GetConnector(0)->GetState() == igtlioConnector::STATE_CONNECTED;
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------
@@ -95,7 +94,7 @@ TEST_CASE("Can connect to a plus server and receive messages", "[plugins][org.cu
 	//std::string ip = "10.218.140.127"; //jbake
 	int port = 18944; //-1
 
-	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
 
 	PlusReceiver receiver(logic);
 	receiver.connect(ip, port);
@@ -135,7 +134,7 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 	std::string ip = "localhost";
 	int port = 18944;
 
-	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
 
 	IOReceiver receiver(logic);
 	receiver.connect(ip, port);
@@ -169,17 +168,17 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 	igtlioServerClientFixture fixture;
 	fixture.startServerAndClientAndConnect();
 
-	igtlio::ConnectorPointer connector = fixture.client->GetConnector();
+	igtlioConnectorPointer connector = fixture.client->GetConnector();
 	REQUIRE(connector);
 
-	REQUIRE(connector->GetState() == igtlio::Connector::STATE_CONNECTED);
+	REQUIRE(connector->GetState() == igtlioConnector::STATE_CONNECTED);
 
 	REQUIRE(connector->IsConnected());
 	REQUIRE(connector->Stop());
 	REQUIRE_FALSE(connector->IsConnected());
 	REQUIRE_FALSE(connector->Stop());
 
-	REQUIRE(connector->GetState() == igtlio::Connector::STATE_OFF);
+	REQUIRE(connector->GetState() == igtlioConnector::STATE_OFF);
 
 	connector = fixture.server->GetConnector();
 	REQUIRE(connector);
@@ -194,14 +193,14 @@ TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.c
 
 TEST_CASE("Connect/disconnect using NetworkHandler, use default network port", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
-	igtlio::LogicPointer logic = igtlio::LogicPointer::New();
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
 	cx::NetworkHandlerPtr networkHandler= cx::NetworkHandlerPtr(new cx::NetworkHandler(logic));
 
 	std::string ip = "localhost";
 
-	igtlio::SessionPointer server = logic->StartServer();
+	igtlioSessionPointer server = logic->StartServer();
 
-	igtlio::SessionPointer client = networkHandler->requestConnectToServer(ip);
+	igtlioSessionPointer client = networkHandler->requestConnectToServer(ip);
 	REQUIRE(client);
 	REQUIRE(client->GetConnector());
 	REQUIRE(client->GetConnector()->IsConnected());

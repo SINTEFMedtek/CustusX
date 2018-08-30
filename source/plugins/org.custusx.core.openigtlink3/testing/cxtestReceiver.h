@@ -24,11 +24,11 @@ class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT Receiver : public QObject
 	QVTK_OBJECT
 
 public:
-	Receiver(igtlio::LogicPointer logic);
+	Receiver(igtlioLogicPointer logic);
 	virtual ~Receiver();
 
 	void connect(std::string ip="localhost", int port=-1);
-	void listen(igtlio::DevicePointer device, bool verbose=true);
+	void listen(igtlioDevicePointer device, bool verbose=true);
 
 	void sendCommand(std::string device_name, std::string command_name, std::string command);
 
@@ -52,7 +52,7 @@ private slots:
 
 private:
 	cx::NetworkHandler* mNetwork;
-	igtlio::SessionPointer mSession;
+	igtlioSessionPointer mSession;
 };
 
 }//namespace cxtest
