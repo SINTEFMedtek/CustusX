@@ -356,70 +356,9 @@ bool AirwaysFilter::postProcess()
 	patientService()->insertData(centerline);
 	mOutputTypes[0]->setValue(centerline->getUid());
 
-
     this->createAirwaysFromCenterline();
-//    // Straight centerline and tubes
-//	if(getStraightCLTubesOption(mOptions)->getValue())
-//	{
-//		this->createStraightCL();
-//		this->createTubes();
-//	}
 
 	return true;
-}
-
-/**
- * @brief AirwaysFilter::createTubes
- * This method of drawing tubes is from the Hello vtk example found in the
- * VTK books:
- * https://www.vtk.org/gitweb?p=VTK.git;a=blob;f=Examples/Modelling/Python/hello.py
- * and also from the Blobbylogo example:
- * https://lorensen.github.io/VTKExamples/site/Cxx/Visualization/BlobbyLogo/
- * We found that it was easiest to use implicit modelling to create the tubes around
- * a centerline. However, we have not been able to fully control the radius
- * of the tubes. The current parameters gives the largest radius we have
- * seen, and also the roundest shape.
- * SetMaximumDistance and SetAdjustDistance must be aligned to get larger radius.
- * SetValue may give a square shape.
- * SetSampleDimensions must be large enough to give good resolution,
- * but not so large that the creation takes too long.
- */
-void AirwaysFilter::createTubes()
-{
-	// Get the straight centerline to model the tubes around.
-	QString straightCLUid = mOutputTypes[3]->getValue();
-	MeshPtr straightCL = boost::dynamic_pointer_cast<Mesh>(patientService()->getData(straightCLUid));
-	if(!straightCL)
-		return;
-	vtkPolyDataPtr clPolyData = straightCL->getVtkPolyData();
-
-	// Create the implicit modeller
-	vtkSmartPointer<vtkImplicitModeller> blobbyLogoImp =
-			vtkSmartPointer<vtkImplicitModeller>::New();
-	blobbyLogoImp->SetInputData(clPolyData);
-	blobbyLogoImp->SetMaximumDistance(0.1);
-	blobbyLogoImp->SetSampleDimensions(256, 256, 256);
-	blobbyLogoImp->SetAdjustDistance(0.1);
-
-	// Extract an iso surface, i.e. the tube shell
-	vtkSmartPointer<vtkContourFilter> blobbyLogoIso =
-		vtkSmartPointer<vtkContourFilter>::New();
-	blobbyLogoIso->SetInputConnection(blobbyLogoImp->GetOutputPort());
-	blobbyLogoIso->SetValue(1, 1.5); //orig
-	blobbyLogoIso->Update();
-
-	// Create the mesh object from the tube shell
-    QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffixCenterline() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
-    QString name = mInputImage->getName() + AirwaysFilter::getNameSuffixCenterline() + AirwaysFilter::getNameSuffixStraight() + AirwaysFilter::getNameSuffixTubes() + "%1";
-	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
-	centerline->setVtkPolyData(blobbyLogoIso->GetOutput());
-	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
-	centerline->get_rMd_History()->setRegistration(mTransformation);
-	// The color is taken from the new Fraxinus logo. Blue is the common color for lungs/airways. Partly transparent for a nice effect in Fraxinus.
-	centerline->setColor(QColor(118, 178, 226, 200));
-	patientService()->insertData(centerline);
-	mOutputTypes[4]->setValue(centerline->getUid());
-
 }
 
 
@@ -430,7 +369,6 @@ void AirwaysFilter::createAirwaysFromCenterline()
     AirwaysFromCenterlinePtr airwaysFromCLPtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 
     airwaysFromCLPtr->processCenterline(mCenterlineOutput);
-    //mOutputAirwaysFromCenterlineMesh = airwaysFromCLPtr->generateTubes();
 
     // Create the mesh object from the airway walls
     QString uidMesh = mInputImage->getUid() + AirwaysFilter::getNameSuffixTubes() + "%1";
@@ -460,30 +398,10 @@ void AirwaysFilter::setDefaultStraightCLTubesOption(bool defaultStraightCLTubesO
 	mDefaultStraightCLTubesOption = defaultStraightCLTubesOption;
 }
 
-void AirwaysFilter::createStraightCL()
-{
-    QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffixCenterline() + AirwaysFilter::getNameSuffixStraight() + "%1";
-    QString name = mInputImage->getName() + AirwaysFilter::getNameSuffixCenterline() + AirwaysFilter::getNameSuffixStraight() + "%1";
-	MeshPtr centerline = patientService()->createSpecificData<Mesh>(uid, name);
-
-	BranchListPtr bl = BranchListPtr(new BranchList());
-
-	Eigen::MatrixXd CLpoints = makeTransformedMatrix(mCenterlineOutput);
-	bl->findBranchesInCenterline(CLpoints);
-	vtkPolyDataPtr retval = bl->createVtkPolyDataFromBranches(false, true);
-
-	centerline->setVtkPolyData(retval);
-	centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
-	centerline->get_rMd_History()->setRegistration(mTransformation);
-	patientService()->insertData(centerline);
-	mOutputTypes[3]->setValue(centerline->getUid());
-}
-
 void AirwaysFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getManualSeedPointOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
-    //mOptionsAdapters.push_back(this->getStraightCLTubesOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -539,19 +457,6 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 	return retval;
 
 }
-
-BoolPropertyPtr AirwaysFilter::getStraightCLTubesOption(QDomElement root)
-{
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Straight centerline and tubes",
-					"",
-					"Use this option to generate a centerline with straight branches between "
-					"the branch points. "
-					"You also get tubes based on this straight line.",
-					mDefaultStraightCLTubesOption, root);
-	return retval;
-}
-
 
 } /* namespace cx */
 

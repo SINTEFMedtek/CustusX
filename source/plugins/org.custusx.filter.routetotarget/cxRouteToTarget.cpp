@@ -127,8 +127,6 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
     findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
 
-    //smoothPositions();
-
     vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
 	return retval;
@@ -149,7 +147,6 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
 		for (int i = 1; i<= numberOfextentionPoints; i++)
 		{
 			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
-			//std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
 		}
 	}
 
@@ -177,6 +174,11 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> position
 	return retval;
 }
 
+
+/*
+    RouteToTarget::getBranchPositions is used to get positions of a branch without smoothing.
+    Equivalent to RouteToTarget::smoothBranch without smoothing.
+*/
 std::vector< Eigen::Vector3d > RouteToTarget::getBranchPositions(BranchPtr branchPtr, int startIndex)
 {
     Eigen::MatrixXd branchPositions = branchPtr->getPositions();

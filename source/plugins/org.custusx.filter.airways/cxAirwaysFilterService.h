@@ -69,9 +69,6 @@ private:
     static bool isSeedPointInsideImage(Vector3D, DataPtr);
 	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
     BoolPropertyPtr getLungSegmentationOption(QDomElement root);
-	BoolPropertyPtr getStraightCLTubesOption(QDomElement root);
-	void createStraightCL();
-	void createTubes();
     void createAirwaysFromCenterline();
 	vtkImageDataPtr mAirwaySegmentationOutput;
     vtkImageDataPtr mLungSegmentationOutput;
