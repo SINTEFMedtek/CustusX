@@ -50,7 +50,7 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-    static QString getNameSuffix();
+    static QString getNameSuffixCenterline();
 	static QString getNameSuffixStraight();
 	static QString getNameSuffixTubes();
 	void setDefaultStraightCLTubesOption(bool defaultStraightCLTubesOption);
@@ -72,6 +72,7 @@ private:
 	BoolPropertyPtr getStraightCLTubesOption(QDomElement root);
 	void createStraightCL();
 	void createTubes();
+    void createAirwaysFromCenterline();
 	vtkImageDataPtr mAirwaySegmentationOutput;
     vtkImageDataPtr mLungSegmentationOutput;
 	vtkPolyDataPtr mCenterlineOutput;

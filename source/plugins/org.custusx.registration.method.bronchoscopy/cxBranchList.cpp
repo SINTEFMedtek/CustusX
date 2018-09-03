@@ -115,12 +115,22 @@ void BranchList::smoothOrientations()
 
 void BranchList::interpolateBranchPositions(int interpolationFactor){
 
-	for (int i = 0; i < mBranches.size(); i++)
-	{
+    for (int i = 0; i < mBranches.size(); i++)
+    {
 		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+
+        if (mBranches[i]->getParentBranch()) // Add parents last position to interpolate between branches
+        {
+            Eigen::MatrixXd parentPositions = mBranches[i]->getParentBranch()->getPositions();
+            Eigen::MatrixXd positionsResized(positions.rows(), positions.cols()+1);
+            positionsResized.col(0) = parentPositions.rightCols(1);
+            positionsResized.rightCols(positions.cols()) = positions;
+            positions = positionsResized;
+        }
+
 		std::vector<Eigen::Vector3d> interpolatedPositions;
 		for (int j = 0; j < positions.cols()-1; j++)
-		{
+        {
 			for (int k = 0; k < interpolationFactor; k++){
 				Eigen::Vector3d interpolationPoint;
 				interpolationPoint[0] = (positions(0,j)*(interpolationFactor-k) + positions(0,j+1)*(k) ) / interpolationFactor;
@@ -129,6 +139,12 @@ void BranchList::interpolateBranchPositions(int interpolationFactor){
 				interpolatedPositions.push_back(interpolationPoint);
 			}
 		}
+        if (mBranches[i]->getParentBranch()) // Remove parents last position after interpolation
+        {
+            Eigen::MatrixXd positionsResized(positions.rows(), positions.cols()-1);
+            positionsResized = positions.rightCols(positionsResized.cols());
+            positions = positionsResized;
+        }
 		Eigen::MatrixXd interpolationResult(3 , interpolatedPositions.size());
 		for (int j = 0; j < interpolatedPositions.size(); j++)
 		{
