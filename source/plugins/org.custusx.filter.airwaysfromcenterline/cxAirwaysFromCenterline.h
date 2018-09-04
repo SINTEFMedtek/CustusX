@@ -52,6 +52,8 @@ private:
 
 };
 
+typedef boost::shared_ptr<AirwaysFromCenterline> AirwaysFromCenterlinePtr;
+
 } /* namespace cx */
 
 #endif // CXAIRWAYSFROMCENTERLINE_H

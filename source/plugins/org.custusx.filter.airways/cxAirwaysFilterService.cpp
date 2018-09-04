@@ -364,8 +364,6 @@ bool AirwaysFilter::postProcess()
 
 void AirwaysFilter::createAirwaysFromCenterline()
 {
-    typedef boost::shared_ptr<class AirwaysFromCenterline> AirwaysFromCenterlinePtr; //shold not be defined here?
-
     AirwaysFromCenterlinePtr airwaysFromCLPtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 
     airwaysFromCLPtr->processCenterline(mCenterlineOutput);
