@@ -82,6 +82,7 @@ private:
 
 private:
 	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
+	FileReaderWriterServicePtr findWriter(const QString& path, const QString& type="unknown");
 	std::set<FileReaderWriterServicePtr> mDataReaders;
 };
 

@@ -93,6 +93,17 @@ FileReaderWriterServicePtr FileManagerImpService::findReader(const QString& path
 	return FileReaderWriterServicePtr();
 }
 
+FileReaderWriterServicePtr FileManagerImpService::findWriter(const QString& path, const QString& type)
+{
+	//TODO refactor with the findreader function..
+	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
+	{
+		if ((*iter)->canWrite(type, path))
+			return *iter;
+	}
+	return FileReaderWriterServicePtr();
+}
+
 vtkImageDataPtr FileManagerImpService::loadVtkImageData(QString filename)
 {
 	vtkImageDataPtr retval = vtkImageDataPtr();
@@ -173,9 +184,11 @@ std::vector<DataPtr> FileManagerImpService::read(const QString &filename)
 
 void FileManagerImpService::save(DataPtr data, const QString &filename)
 {
-	FileReaderWriterServicePtr reader = this->findReader(filename);
-	if (reader)
-		return reader->write(data, filename);
+	FileReaderWriterServicePtr writer = this->findWriter(filename);
+	if (writer)
+		return writer->write(data, filename);
+	else
+		CX_LOG_ERROR() << "Could not find writer.";
 }
 
 void FileManagerImpService::addFileReaderWriter(FileReaderWriterService *service)

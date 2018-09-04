@@ -5,6 +5,7 @@
 #include <vtkCellArray.h>
 #include "vtkIdList.h"
 #include "cxMesh.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -49,6 +50,7 @@ void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
 	{
+		CX_LOG_ERROR() << "Couldn't find mesh.";
 		return;
 	}
 	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
@@ -109,7 +111,5 @@ QString cx::CgeoReaderWriter::canWriteDataType() const
 
 bool cx::CgeoReaderWriter::canWrite(const QString &type, const QString &filename) const
 {
-	if((type == "mesh") && (filename.endsWith(".cgeo")))
-		return true;
-	return false;
+	return this->canWriteInternal(type, filename);
 }
