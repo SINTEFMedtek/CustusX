@@ -205,8 +205,8 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 	PatientModelServiceMock pasm;
 
 	QString dummy;
-	cx::DataPtr source = pasm.importData(filenameSource, dummy, filemanager);
-	cx::DataPtr target = pasm.importData(filenameTarget, dummy, filemanager);
+	cx::DataPtr source = pasm.importDataMock(filenameSource, dummy, filemanager);
+	cx::DataPtr target = pasm.importDataMock(filenameTarget, dummy, filemanager);
 	CHECK(source);
 	CHECK(target);
 	source->get_rMd_History()->setRegistration(perturbation);

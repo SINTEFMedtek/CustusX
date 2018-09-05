@@ -55,7 +55,7 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 	return mData;
 }
 
-cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager)
+cx::DataPtr PatientModelServiceMock::importDataMock(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager)
 {
 	QString type = filemanager->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);

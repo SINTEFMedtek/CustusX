@@ -110,9 +110,9 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 //	std::cout << "------" << kaisa_padded_fname << std::endl;
 	cxtest::PatientModelServiceMock pasm;
 	QString dummy;
-	cx::DataPtr kaisa_resliced_linear = pasm.importData(kaisa_resliced_linear_fname, dummy, filemanager);
-	cx::DataPtr kaisa_padded = pasm.importData(kaisa_padded_fname, dummy, filemanager);
-	cx::DataPtr kaisa_resliced = pasm.importData(kaisa_resliced_fname, dummy, filemanager);
+	cx::DataPtr kaisa_resliced_linear = pasm.importDataMock(kaisa_resliced_linear_fname, dummy, filemanager);
+	cx::DataPtr kaisa_padded = pasm.importDataMock(kaisa_padded_fname, dummy, filemanager);
+	cx::DataPtr kaisa_resliced = pasm.importDataMock(kaisa_resliced_fname, dummy, filemanager);
 
 	REQUIRE(kaisa_resliced_linear.get());
 	REQUIRE(kaisa_padded.get());

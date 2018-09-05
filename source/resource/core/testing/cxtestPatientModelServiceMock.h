@@ -27,9 +27,7 @@ public:
 	virtual void insertData(cx::DataPtr data);
 	virtual cx::DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, cx::DataPtr> getDatas(DataFilter filter) const;
-	//TODO: Fix all usage of PatientModelServiceMock::importData. Also remove this function here
-//	virtual cx::DataPtr importData(QString fileName, QString &infoText) {return DataPtr()};
-	virtual cx::DataPtr importData(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager);
+	virtual cx::DataPtr importDataMock(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager);
 	virtual cx::RegistrationHistoryPtr get_rMpr_History() const;
 
 private:
