@@ -32,7 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxAcquisitionServiceProxy.h"
 #include "cxSessionStorageService.h"
 #include "cxProfile.h"
-#include "cxFileManagerServiceProxy.h"
+#include "cxFileManagerService.h"
 
 namespace cxtest
 {

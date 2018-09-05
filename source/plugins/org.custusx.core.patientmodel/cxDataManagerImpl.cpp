@@ -224,6 +224,8 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 	}
 
 	bool loaded = data->load(path, mFileManagerService);
+	//TODO FIX
+	//bool loaded = mFileManagerService->load(path, data);
 
 	if (!loaded)
 	{

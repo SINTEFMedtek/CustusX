@@ -34,6 +34,7 @@ namespace cxtest
 
 void USSavingRecorderFixture::setUp()
 {
+	cx::LogicManager::initialize();
 	cx::removeNonemptyDirRecursively(this->getDataPath());
 	cx::Reporter::initialize();
 }
@@ -42,6 +43,7 @@ void USSavingRecorderFixture::tearDown()
 {
 	cx::Reporter::shutdown();
 	cx::removeNonemptyDirRecursively(this->getDataPath());
+	cx::LogicManager::shutdown();
 }
 
 USSavingRecorderFixture::USSavingRecorderFixture(QObject* parent) : QObject(parent)
@@ -170,8 +172,9 @@ void USSavingRecorderFixture::verifySaveData()
 
 void USSavingRecorderFixture::verifySaveData(QString filename)
 {
-	cx::LogicManager::initialize();
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(pluginContext);
+
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 

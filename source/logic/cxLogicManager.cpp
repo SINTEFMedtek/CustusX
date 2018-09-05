@@ -97,9 +97,7 @@ void LogicManager::createLegacyStoredServices()
 	// services layer
 	ctkPluginContext* pc = this->getPluginContext();
 
-	std::cout << "create filemanager" << std::endl;
-	mFileManagerService = FileManagerServiceProxy::create(pc);
-	std::cout << "logicmanagers filemanager: " << mFileManagerService << std::endl;
+	//mFileManagerService = FileManagerServiceProxy::create(pc);
 	mTrackingService = TrackingServiceProxy::create(pc);
 	mPatientModelService = PatientModelServiceProxy::create(pc);
 	mVideoService = VideoServiceProxy::create(pc);
@@ -211,10 +209,11 @@ SessionStorageServicePtr LogicManager::getSessionStorageService()
 	return mSessionStorageService;
 }
 
-FileManagerServicePtr LogicManager::getFileManagerService()
-{
-	return mFileManagerService;
-}
+//FileManagerServicePtr LogicManager::getFileManagerService()
+//{
+//	return mFileManagerService;
+//}
+
 PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 {
 	return mPluginFramework;

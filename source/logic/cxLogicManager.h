@@ -112,7 +112,7 @@ public:
   StateServicePtr getStateService();
   ViewServicePtr getViewService();
   SessionStorageServicePtr getSessionStorageService();
-  FileManagerServicePtr getFileManagerService();
+  //FileManagerServicePtr getFileManagerService();
 
 private slots:
   void onRestartWithNewProfile(QString uid);
@@ -154,7 +154,6 @@ private:
 	StateServicePtr mStateService;
 	ViewServicePtr mViewService;
 	SessionStorageServicePtr mSessionStorageService;
-	FileManagerServicePtr mFileManagerService;
 
 	PluginFrameworkManagerPtr mPluginFramework;
 	ApplicationComponentPtr mComponent;

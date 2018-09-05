@@ -25,8 +25,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageDataContainer.h"
 #include "cxRecordSession.h"
 #include "cxUsReconstructionFileMaker.h"
-#include "cxFileManagerServiceProxy.h"
-#include "cxLogicManager.h"
+//#include "cxFileManagerServiceProxy.h"
+//#include "cxLogicManager.h"
 
 namespace cx
 {
