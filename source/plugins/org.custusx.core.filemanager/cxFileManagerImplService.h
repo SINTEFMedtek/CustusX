@@ -42,6 +42,11 @@ class ctkPluginContext;
 namespace cx
 {
 
+/**
+ * Implementation of the FileManagerService
+ *
+ * \ingroup org_custusx_core_filemanager
+ */
 class org_custusx_core_filemanager_EXPORT FileManagerImpService : public FileManagerService
 {
 public:
