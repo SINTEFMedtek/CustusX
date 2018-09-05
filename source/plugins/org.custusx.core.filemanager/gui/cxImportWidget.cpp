@@ -260,7 +260,7 @@ std::vector<DataPtr> ImportWidget::generateParentCandidates(std::vector<DataPtr>
 	}
 	std::map<QString, DataPtr> loadedData = mVisServices->patient()->getDatas();
 	std::map<QString, DataPtr>::iterator it = loadedData.begin();
-	for(it; it!=loadedData.end(); ++it)
+	for(; it!=loadedData.end(); ++it)
 	{
 		parentCandidates.push_back(it->second);
 	}
