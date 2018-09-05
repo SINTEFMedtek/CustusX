@@ -18,8 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSpaceProviderImpl.h"
 #include "cxTrackingService.h"
 #include "cxRegistrationTransform.h"
-#include "cxFileManagerServiceProxy.h"
-#include "cxLogicManager.h"
+#include "cxFileManagerService.h"
 
 namespace cxtest
 {
@@ -56,15 +55,8 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 	return mData;
 }
 
-cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText)
+cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager)
 {
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
-	if(!filemanager)
-	{
-		cx::LogicManager::initialize();
-		filemanager = cx::logicManager()->getFileManagerService();
-	}
-
 	QString type = filemanager->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);
 	data->load(fileName, filemanager);

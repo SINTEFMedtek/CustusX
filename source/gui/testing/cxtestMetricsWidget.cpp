@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogicManager.h"
 #include "cxDataLocations.h"
 #include "cxSessionStorageService.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cxtest
 {
@@ -21,12 +22,8 @@ namespace cxtest
 
 TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget]")
 {
-	cx::LogicManager::initialize();
-
 	MetricFixture fixture;
 	fixture.testExportAndImportMetrics();
-
-	cx::LogicManager::shutdown();
 }
 
 TEST_CASE("Save the patient and import metrics from the patient XML file", "[integration][metrics][widget]")
@@ -39,7 +36,8 @@ TEST_CASE("Save the patient and import metrics from the patient XML file", "[int
 		QString dataPath = cx::DataLocations::getTestDataPath();
 		QString mSession1 = "/temp/TestPatient1.cx3";
 		cx::logicManager()->getSessionStorageService()->load(dataPath + mSession1);
-		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), cx::logicManager()->getFileManagerService());
+		cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), filemanager);
 
 		MetricFixture fixture;
 		std::vector<cx::DataMetricPtr> metrics = fixture.createMetricsForExport();
@@ -71,7 +69,8 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 	//scope here to delete the metric manager before shutting down the logic manager.
 	{
 		QString dataPath = cx::DataLocations::getTestDataPath();
-		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), cx::logicManager()->getFileManagerService());
+		cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), filemanager);
 
 		MetricFixture fixture;
 
@@ -97,7 +96,8 @@ TEST_CASE("Import point metrics from MNI Tag Point file", "[integration][metrics
 	//scope here to delete the metric manager before shutting down the logic manager.
 	{
 		QString dataPath = cx::DataLocations::getTestDataPath();
-		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), cx::logicManager()->getFileManagerService());
+		cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+		cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), filemanager);
 
 		//MetricFixture fixture;
 

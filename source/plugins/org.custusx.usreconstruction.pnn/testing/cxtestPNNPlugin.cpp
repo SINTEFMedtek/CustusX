@@ -26,7 +26,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 {
 	cx::LogicManager::initialize();
 	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(pluginContext);
 
 	ReconstructionAlgorithmFixture fixture;
 	QDomDocument domdoc;

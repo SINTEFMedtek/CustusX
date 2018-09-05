@@ -181,7 +181,7 @@ void RenderTester::writeToPNG(vtkImageDataPtr image, QString filename)
 
 vtkImageDataPtr RenderTester::readFromFile(QString filename)
 {
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 	CX_LOG_DEBUG_CHECKPOINT() << " filemanager: " << filemanager;
 	vtkImageDataPtr image_data = filemanager->loadVtkImageData(filename);
 	return image_data;

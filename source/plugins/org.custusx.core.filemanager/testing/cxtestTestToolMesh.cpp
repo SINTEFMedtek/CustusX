@@ -13,7 +13,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxDataLocations.h"
 #include "cxFileManagerImplService.h"
-#include "cxLogicManager.h"
 
 namespace cxtest {
 
@@ -26,11 +25,8 @@ void TestToolMesh::setToolPath(QString path)
 	mCurrentToolPath = cx::DataLocations::findConfigFolder("/tool/Tools/"+path);
 }
 
-bool TestToolMesh::canLoadMesh(QString filename)
+bool TestToolMesh::canLoadMesh(QString filename, cx::FileManagerServicePtr filemanager)
 {
-	cx::LogicManager::initialize();
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
-
 	bool success = true;
 
 	QString fullFileName = mCurrentToolPath + filename;

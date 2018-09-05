@@ -32,12 +32,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxElastixSingleThreadedRunner.h"
 #include "cxTypeConversions.h"
 #include "cxElastixParameters.h"
-//#include "cxLogicManager.h"
+#include "cxLogicManager.h"
 #include "cxRegServices.h"
 
 #include "cxReporter.h"
 
 #include "cxtestPatientModelServiceMock.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cxtest
 {
@@ -97,6 +98,9 @@ public:
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64]")
 {
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+
 	ElastiXFixture fixture;
 
 	QString kaisa_padded_fname = cx::DataLocations::getTestDataPath() + "/testing/elastiX/kaisa_padded.mhd";
@@ -106,9 +110,9 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 //	std::cout << "------" << kaisa_padded_fname << std::endl;
 	cxtest::PatientModelServiceMock pasm;
 	QString dummy;
-	cx::DataPtr kaisa_resliced_linear = pasm.importData(kaisa_resliced_linear_fname, dummy);
-	cx::DataPtr kaisa_padded = pasm.importData(kaisa_padded_fname, dummy);
-	cx::DataPtr kaisa_resliced = pasm.importData(kaisa_resliced_fname, dummy);
+	cx::DataPtr kaisa_resliced_linear = pasm.importData(kaisa_resliced_linear_fname, dummy, filemanager);
+	cx::DataPtr kaisa_padded = pasm.importData(kaisa_padded_fname, dummy, filemanager);
+	cx::DataPtr kaisa_resliced = pasm.importData(kaisa_resliced_fname, dummy, filemanager);
 
 	REQUIRE(kaisa_resliced_linear.get());
 	REQUIRE(kaisa_padded.get());
@@ -133,6 +137,8 @@ TEST_CASE("ElastiX should register kaisa to a translated+resampled version of sa
 	REQUIRE(runner.registerLinear(kaisa_padded, kaisa_resliced_linear, parameters, &result));
 
 	REQUIRE(fixture.compareTransforms(result, solution) == true);
+
+	cx::LogicManager::shutdown();
 }
 #endif
 

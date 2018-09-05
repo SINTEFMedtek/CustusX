@@ -14,13 +14,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxTemporalCalibration.h"
 #include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 TEST_CASE("TemporalCalibration reproduces old results on a test data set", "[unit][modules][calibration]")
 {
   cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+
   cx::TemporalCalibration calibrator;
   QString filename = cx::DataLocations::getTestDataPath() + "/testing/20110511T092103_temporal_calib_mac.cx3/US_Acq/US-Acq_01_20110511T092317/US-Acq_01_20110511T092317.mhd";
-  calibrator.selectData(filename);
+	calibrator.selectData(filename, filemanager);
   bool success = false;
   double shift = calibrator.calibrate(&success);
 
@@ -28,6 +31,7 @@ TEST_CASE("TemporalCalibration reproduces old results on a test data set", "[uni
 
   CHECK( success );
   CHECK( cx::similar(shift, testValue, 1));
+	cx::LogicManager::shutdown();
 }
 
 

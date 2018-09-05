@@ -70,11 +70,12 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Cre
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and load USReconstructInputData", "[integration][resource][usReconstructionTypes]")
 {
 	cx::LogicManager::initialize();
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 	ReconstructionData input = this->createSampleReconstructData();
 
 	QString filename = this->write(input);
 	cx::USReconstructInputData hasBeenRead = this->read(filename, filemanager);
 
 	this->assertCorrespondence(input, hasBeenRead);
+	cx::LogicManager::shutdown();
 }

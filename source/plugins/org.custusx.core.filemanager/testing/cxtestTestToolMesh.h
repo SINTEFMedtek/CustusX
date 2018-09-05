@@ -29,7 +29,7 @@ class CXTEST_ORG_CUSTUSX_CORE_FILEMANAGER_EXPORT  TestToolMesh {
 public:
 	TestToolMesh();
 	void setToolPath(QString path);
-	bool canLoadMesh(QString filename);
+	bool canLoadMesh(QString filename, cx::FileManagerServicePtr filemanager);
 private:
 	QString mToolToolPath;
 	QString mCurrentToolPath;

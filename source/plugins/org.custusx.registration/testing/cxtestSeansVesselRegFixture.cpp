@@ -189,7 +189,8 @@ std::vector<cx::Transform3D> SeansVesselRegFixture::generateTransforms()
 
 void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 		cx::Transform3D perturbation, QString filenameSource,
-		QString filenameTarget, double tol_dist, double tol_angle)
+		QString filenameTarget, double tol_dist, double tol_angle,
+		cx::FileManagerServicePtr filemanager)
 {
 	bool verbose = 0;
 
@@ -204,8 +205,8 @@ void SeansVesselRegFixture::doTestVessel2VesselRegistration(
 	PatientModelServiceMock pasm;
 
 	QString dummy;
-	cx::DataPtr source = pasm.importData(filenameSource, dummy);
-	cx::DataPtr target = pasm.importData(filenameTarget, dummy);
+	cx::DataPtr source = pasm.importData(filenameSource, dummy, filemanager);
+	cx::DataPtr target = pasm.importData(filenameTarget, dummy, filemanager);
 	CHECK(source);
 	CHECK(target);
 	source->get_rMd_History()->setRegistration(perturbation);

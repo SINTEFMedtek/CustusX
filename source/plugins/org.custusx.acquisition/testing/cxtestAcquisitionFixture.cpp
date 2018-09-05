@@ -32,7 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxAcquisitionServiceProxy.h"
 #include "cxSessionStorageService.h"
 #include "cxProfile.h"
-#include "cxFileManagerService.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cxtest
 {
@@ -191,7 +191,7 @@ void AcquisitionFixture::saveDataCompletedSlot(QString path)
 		QTimer::singleShot(100,   qApp, SLOT(quit()) );
 
 	// read file and print info - this is the result of the file pathway
-	cx::FileManagerServicePtr filemanager = cx::logicManager()->getFileManagerService();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	mFileOutputData.push_back(fileReader->readAllFiles(path, ""));
 }

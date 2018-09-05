@@ -23,11 +23,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include <QFileInfo>
 #include <QDir>
+#include "cxFileManagerServiceProxy.h"
+#include "cxLogicManager.h"
 
 
 TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic data", "[integration][modules][registration][not_win32]")
 //void TestRegistrationV2V::testV2V_synthetic_data()
 {
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+
 	QStringList files = this->generateTestData();
 
 	// accepted tolerances, lo for self-test, hi for differing source and target
@@ -44,13 +49,13 @@ TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic d
 
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
-		this->doTestVessel2VesselRegistration(pert[i], files[0], files[0], tol_dist_low, tol_ang_low);
+		this->doTestVessel2VesselRegistration(pert[i], files[0], files[0], tol_dist_low, tol_ang_low, filemanager);
 	}
 	std::cout << std::endl;
 
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
-		this->doTestVessel2VesselRegistration(pert[i], files[1], files[1], tol_dist_low, tol_ang_low);
+		this->doTestVessel2VesselRegistration(pert[i], files[1], files[1], tol_dist_low, tol_ang_low, filemanager);
 	}
 	std::cout << std::endl;
 //	for (unsigned i = 0; i < pert.size(); ++i)
@@ -70,11 +75,15 @@ TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V syntectic d
 //		this->doTestVessel2VesselRegistration(pert[i], fname0, fname1, tol_dist_hi, tol_ang_hi);
 //		this->doTestVessel2VesselRegistration(pert[i], fname1, fname0, tol_dist_hi, tol_ang_hi);
 //	}
+	cx::LogicManager::shutdown();
 }
 
 TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V registration", "[integration][modules][registration][not_win32]")
 //void TestRegistrationV2V::testVessel2VesselRegistration()
 {
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size0.vtk";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size1.vtk";
 	QString fname2 = cx::DataLocations::getTestDataPath() + "/testing/Centerline/US_aneurism_cl_size2.vtk";
@@ -132,25 +141,26 @@ TEST_CASE_METHOD(cxtest::SeansVesselRegFixture, "SeansVesselReg: V2V registratio
 
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
-		this->doTestVessel2VesselRegistration(pert[i], fname1, fname1, tol_dist_low, tol_ang_low);
+		this->doTestVessel2VesselRegistration(pert[i], fname1, fname1, tol_dist_low, tol_ang_low, filemanager);
 	}
 	std::cout << std::endl;
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
-		this->doTestVessel2VesselRegistration(pert[i], fname1, fname2, tol_dist_hi, tol_ang_hi);
-		this->doTestVessel2VesselRegistration(pert[i], fname2, fname1, tol_dist_hi, tol_ang_hi);
+		this->doTestVessel2VesselRegistration(pert[i], fname1, fname2, tol_dist_hi, tol_ang_hi, filemanager);
+		this->doTestVessel2VesselRegistration(pert[i], fname2, fname1, tol_dist_hi, tol_ang_hi, filemanager);
 	}
 	std::cout << std::endl;
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
-		this->doTestVessel2VesselRegistration(pert[i], fname1, fname3, tol_dist_hi, tol_ang_hi);
-		this->doTestVessel2VesselRegistration(pert[i], fname3, fname1, tol_dist_hi, tol_ang_hi);
+		this->doTestVessel2VesselRegistration(pert[i], fname1, fname3, tol_dist_hi, tol_ang_hi, filemanager);
+		this->doTestVessel2VesselRegistration(pert[i], fname3, fname1, tol_dist_hi, tol_ang_hi, filemanager);
 	}
 	std::cout << std::endl;
 	for (unsigned i = 0; i < pert.size(); ++i)
 	{
-		this->doTestVessel2VesselRegistration(pert[i], fname0, fname1, tol_dist_hi, tol_ang_hi);
-		this->doTestVessel2VesselRegistration(pert[i], fname1, fname0, tol_dist_hi, tol_ang_hi);
+		this->doTestVessel2VesselRegistration(pert[i], fname0, fname1, tol_dist_hi, tol_ang_hi, filemanager);
+		this->doTestVessel2VesselRegistration(pert[i], fname1, fname0, tol_dist_hi, tol_ang_hi, filemanager);
 	}
 
+	cx::LogicManager::shutdown();
 }

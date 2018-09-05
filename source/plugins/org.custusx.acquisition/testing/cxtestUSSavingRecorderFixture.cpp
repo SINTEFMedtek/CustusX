@@ -100,7 +100,8 @@ void USSavingRecorderFixture::startRecord()
 //	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
 	mSession.reset(new cx::RecordSession(0, "session"));
 	mSession->startNewInterval();
-	mRecorder->startRecord(mSession, mTool, cx::ToolPtr(), mVideo);
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	mRecorder->startRecord(mSession, mTool, cx::ToolPtr(), mVideo, filemanager);
 }
 
 void USSavingRecorderFixture::stopRecord()
