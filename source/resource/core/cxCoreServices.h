@@ -57,8 +57,6 @@ protected:
 	SpaceProviderPtr mSpaceProvider;
 	SessionStorageServicePtr mSessionStorageService;
 	StateServicePtr mStateService;
-
-	//TODO replace with FileManagerService
 	FileManagerServicePtr mFileManagerService;
 
 protected:
