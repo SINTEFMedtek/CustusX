@@ -46,7 +46,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 	mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	mTableWidget->setShowGrid(false);
-	mTableWidget->setStyleSheet("QTableView {selection-background-color: red;}");
+	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
 	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportWidget::tableItemSelected);
 
