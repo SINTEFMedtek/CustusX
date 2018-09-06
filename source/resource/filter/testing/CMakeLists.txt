@@ -31,11 +31,12 @@ if(BUILD_TESTING)
     target_link_libraries(cxtestFilter
         PRIVATE
         cxResource
-		cxtestResource
+        cxtestResource
         cxResourceFilter
-		cxResourceVisualization
+        cxResourceVisualization
         cxCatch
         cxtestUtilities
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtestFilter)
 

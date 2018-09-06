@@ -20,10 +20,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSessionStorageService.h"
 #include "cxVisServices.h"
 #include "cxtestVisServices.h"
+#include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
+#include "cxtestPatientModelServiceMock.h"
 
 TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]")
 {
+	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 
 	{
 		cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
@@ -37,7 +42,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 
 		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
 		QString info;
-		cx::DataPtr data = dummyservices->patient()->importData(filename, info);
+		cx::DataPtr data = dynamic_cast<cxtest::PatientModelServiceMock*>(dummyservices->patient().get())->importDataMock(filename, info, filemanager);
 		REQUIRE(data);
 
 		//set input
@@ -83,4 +88,5 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 			REQUIRE(output[1]->getData());
 		}
 	}
+	cx::LogicManager::shutdown();
 }
