@@ -42,7 +42,7 @@ TEST_CASE("DilationFilter: execute", "[unit][modules][Algorithm][DilationFilter]
 
 		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
 		QString info;
-		cx::DataPtr data = dynamic_cast<cxtest::PatientModelServiceMock*>(dummyservices->patient().get())->importDataMock(filename, info, filemanager);
+		cx::DataPtr data = boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(dummyservices->patient())->importDataMock(filename, info, filemanager);
 		REQUIRE(data);
 
 		//set input

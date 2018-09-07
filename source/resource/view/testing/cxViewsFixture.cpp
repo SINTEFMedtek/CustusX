@@ -27,6 +27,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkOpenGLRenderWindow.h>
 #include "cxSharedOpenGLContext.h"
 #include "cxRenderWindowFactory.h"
+#include "cxtestPatientModelServiceMock.h"
+#include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 #include "catch.hpp"
 
@@ -49,6 +52,8 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 
 ViewsFixture::ViewsFixture(QString displayText)
 {
+	cx::LogicManager::initialize();
+	mFilemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 	mServices = cxtest::TestVisServices::create();
 	mMessageListener = cx::MessageListener::createWithQueue();
 
@@ -69,6 +74,7 @@ ViewsFixture::~ViewsFixture()
 
 	mServices.reset();
 	CHECK(!mMessageListener->containsErrors());
+	cx::LogicManager::shutdown();
 }
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
@@ -137,7 +143,10 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
 	QString dummy;
-	cx::DataPtr data = mServices->patient()->importData(filename, dummy);
+	cx::DataPtr data = boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(mServices->patient())->importDataMock(filename, dummy, mFilemanager);
+	if (!data)
+		return cx::ImagePtr();
+
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
 	cx::Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);

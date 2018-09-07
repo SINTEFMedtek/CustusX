@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
 #include <vector>
+#include "cxFileManagerService.h"
 
 namespace cxtest
 {
@@ -80,6 +81,7 @@ private:
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
 	cx::RenderWindowFactoryPtr mFactory;
+	cx::FileManagerServicePtr mFilemanager;
 };
 
 } // namespace cxtest
