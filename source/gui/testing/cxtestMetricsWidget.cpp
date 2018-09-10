@@ -15,37 +15,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxSessionStorageService.h"
 #include "cxPointMetric.h"
+#include "cxtestMetricManager.h"
 #include <boost/shared_ptr.hpp>
 #include <queue>
 
 namespace cxtest
 {
-
-class TestMetricManager : public cx::MetricManager
-{
-//    Q_OBJECT
-public:
-    TestMetricManager(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService,
-                       cx::TrackingServicePtr trackingService, cx::SpaceProviderPtr spaceProvider) :
-        cx::MetricManager(viewService, patientModelService, trackingService, spaceProvider)
-    {
-    }
-    void initWithTestData()
-    {
-        mUserSettings.coordSys = cx::pcsRAS;
-        mUserSettings.imageRefs.push_back("");
-        mUserSettings.imageRefs.push_back("");
-    }
-    void addImage(QString imageRef)
-    {
-       mUserSettings.imageRefs.push_back(imageRef);
-    }
-    void setCoordSys(cx::PATIENT_COORDINATE_SYSTEM coordSys)
-    {
-        mUserSettings.coordSys = coordSys;
-    }
-
-};
 
 
 TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget]")
