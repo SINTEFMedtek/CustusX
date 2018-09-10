@@ -540,11 +540,16 @@ MetricManager::ImportMNIuserSettings
     QButtonGroup *coordinateSysSelector = new QButtonGroup();
     QCheckBox *selectorLPS = new QCheckBox(tr("LPS (DICOM/CX)"));
     QCheckBox *selectorRAS = new QCheckBox(tr("RAS (Neuro)"));
+    enum selectorID {
+        selectorRASid=1,
+        selectorLPSid
+    };
+
     selectorRAS->setChecked(true);
     coordinateSysSelector->addButton(selectorRAS);
     coordinateSysSelector->addButton(selectorLPS);
-    coordinateSysSelector->setId(selectorRAS, 1);
-    coordinateSysSelector->setId(selectorLPS, 2);
+    coordinateSysSelector->setId(selectorRAS, selectorRASid);
+    coordinateSysSelector->setId(selectorLPS, selectorLPSid);
     QGroupBox *coordinateSysSelectors = new QGroupBox(tr("Coordinate system format"));
     selectorLPS->setToolTip("LPS (X=Right->Left Y=Anterior->Posterio Z=Inferior->Superior) - DICOM, CustusX");
     selectorRAS->setToolTip("RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior) - NIfTI, ITK-snap");
@@ -575,7 +580,7 @@ MetricManager::ImportMNIuserSettings
         userSettings.imageRefs.push_back(image_property->getValue());
 	}
     // Set correct coordinate space
-    if(coordinateSysSelector->checkedId() == 1)
+    if(coordinateSysSelector->checkedId() == selectorRASid)
         userSettings.coordSys = pcsRAS;
     else
         userSettings.coordSys = pcsLPS;
