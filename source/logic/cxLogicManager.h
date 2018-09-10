@@ -157,6 +157,8 @@ private:
 
 	PluginFrameworkManagerPtr mPluginFramework;
 	ApplicationComponentPtr mComponent;
+
+	bool mShutdown;
 };
 
 cxLogicManager_EXPORT LogicManager* logicManager(); // access the singleton

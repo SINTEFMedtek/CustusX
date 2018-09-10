@@ -32,7 +32,6 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 	//This test that the input file can be loaded, that it can be displayed and that it can be displayed with a texture without crashing or giving errors.
 	//Manual testing is still needed to verify that the mesh and texture are displayed correctly with colour and the correct image and so on.
 	cx::DataLocations::setTestMode();
-	cx::LogicManager::initialize();
 	cxtest::ViewsFixture fixture;
 
 	INFO("Import an image and a mesh.");
@@ -71,8 +70,6 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 	view->addRep(p);
 	CHECK(fixture.quickRunWidget());
 	view->removeReps();
-
-	cx::LogicManager::shutdown();
 }
 
 } //namespace

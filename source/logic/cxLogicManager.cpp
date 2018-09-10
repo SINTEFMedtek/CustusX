@@ -77,6 +77,7 @@ void LogicManager::initializeServices()
 	if (mComponent)
 		mComponent->create();
 
+	mShutdown = false;
 	CX_LOG_DEBUG() << " --- End initialize services.";
 }
 
@@ -143,6 +144,12 @@ void LogicManager::restartServicesWithProfile(QString uid)
 
 void LogicManager::shutdownServices()
 {
+	if(mShutdown)
+	{
+		CX_LOG_ERROR() << "Trying to shutdown logicmanager when it already shutdown. Aborting shutdown, fix code.";
+		return;
+	}
+
 	CX_LOG_INFO() << " --- Shutting down " << qApp->applicationName() << "...";
 
 	this->getPatientModelService()->autoSave();
@@ -158,6 +165,7 @@ void LogicManager::shutdownServices()
 	Reporter::shutdown();
 	ProfileManager::shutdown();
 
+	mShutdown = true;
 	CX_LOG_DEBUG() << " --- End shutdown services";
 }
 
