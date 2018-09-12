@@ -75,8 +75,8 @@ void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 	writer->Write();
 }
 
-PolyDataMeshReader::PolyDataMeshReader(ctkPluginContext *context) :
-	FileReaderWriterImplService("PolyDataMeshReader", "mesh", "mesh", "vtk", context)
+PolyDataMeshReader::PolyDataMeshReader(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("PolyDataMeshReader", "mesh", "mesh", "vtk", patientModelService)
 {
 }
 

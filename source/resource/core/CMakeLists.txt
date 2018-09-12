@@ -38,6 +38,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxFileManagerService
     Data/cxFileManagerServiceProxy
     Data/cxFileManagerServiceNull
+    Data/cxFileManagerServiceBase.h
+    Data/cxFileManagerServiceBase.cpp
 
     Video/cxVideoSource.h
     Video/cxVideoRecorder

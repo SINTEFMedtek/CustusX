@@ -13,8 +13,8 @@
 namespace cx
 {
 
-StlMeshReader::StlMeshReader(ctkPluginContext *context) :
-	FileReaderWriterImplService("StlMeshReader", "mesh", "mesh", "stl", context)
+StlMeshReader::StlMeshReader(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("StlMeshReader", "mesh", "mesh", "stl", patientModelService)
 {
 }
 

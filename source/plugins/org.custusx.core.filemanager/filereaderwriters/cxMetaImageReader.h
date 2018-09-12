@@ -15,7 +15,7 @@ class org_custusx_core_filemanager_EXPORT MetaImageReader : public FileReaderWri
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	MetaImageReader(ctkPluginContext *context);
+	MetaImageReader(PatientModelServicePtr patientModelService);
 	virtual ~MetaImageReader(){}
 	bool isNull();
 
@@ -31,6 +31,8 @@ public:
 	bool canWrite(const QString &type, const QString &filename) const;
 	virtual void write(DataPtr data, const QString& filename);
 };
+
+typedef boost::shared_ptr<MetaImageReader> MetaImageReaderPtr;
 
 }
 #endif // CXMETAIMAGEREADER_H

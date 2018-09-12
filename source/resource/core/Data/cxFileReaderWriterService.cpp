@@ -25,14 +25,14 @@ bool sameSuffix(QString suffix1, QString suffix2)
 	return (suffix1.compare(suffix2, Qt::CaseInsensitive) == 0 || suffix1.compare(suffix2, Qt::CaseInsensitive) == 0);
 }
 
-FileReaderWriterImplService::FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix, ctkPluginContext *context) :
+FileReaderWriterImplService::FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix, PatientModelServicePtr patientModelService) :
 	mName(name),
 	mCanReadDataType(canReadDataType),
 	mCanWriteDataType(canWriteDataType),
-	mFileSuffix(fileSuffix)
+	mFileSuffix(fileSuffix),
+	mPatientModelService(patientModelService)
 {
 	this->setObjectName(mName);
-	mPatientModelService = PatientModelServiceProxy::create(context);
 }
 
 QString FileReaderWriterImplService::getName() const

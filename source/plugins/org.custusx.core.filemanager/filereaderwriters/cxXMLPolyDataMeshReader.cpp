@@ -58,8 +58,8 @@ DataPtr XMLPolyDataMeshReader::read(const QString& uid, const QString& filename)
 	return mesh;
 }
 
-XMLPolyDataMeshReader::XMLPolyDataMeshReader(ctkPluginContext *context) :
-	FileReaderWriterImplService("XMLPolyDataMeshReader", "mesh", "", "vtp", context)
+XMLPolyDataMeshReader::XMLPolyDataMeshReader(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("XMLPolyDataMeshReader", "mesh", "", "vtp", patientModelService)
 {
 }
 

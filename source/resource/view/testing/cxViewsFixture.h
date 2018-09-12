@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
 #include <vector>
-#include "cxFileManagerService.h"
+#include "cxtestFileManagerServiceMock.h"
 
 namespace cxtest
 {
@@ -70,6 +70,9 @@ public:
 	cx::ImagePtr loadImage(const QString& imageFilename);
 	cx::DummyToolPtr dummyTool();
 
+	void addFileReaderWriter(cx::FileReaderWriterService *service);
+
+	cx::PatientModelServicePtr getPatientModelService();
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
 	void fixToolToCenter();

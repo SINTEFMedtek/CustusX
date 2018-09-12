@@ -33,8 +33,8 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 	return zeroer->GetOutput();
 }
 
-MetaImageReader::MetaImageReader(ctkPluginContext *context) :
-	FileReaderWriterImplService("MetaImageReader", "image", "image", "mhd", context)
+MetaImageReader::MetaImageReader(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("MetaImageReader", "image", "image", "mhd", patientModelService)
 {
 }
 

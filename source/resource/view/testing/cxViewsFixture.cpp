@@ -28,8 +28,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSharedOpenGLContext.h"
 #include "cxRenderWindowFactory.h"
 #include "cxtestPatientModelServiceMock.h"
-#include "cxLogicManager.h"
 #include "cxFileManagerServiceProxy.h"
+#include "cxtestFileManagerServiceMock.h"
 
 #include "catch.hpp"
 
@@ -52,8 +52,8 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 
 ViewsFixture::ViewsFixture(QString displayText)
 {
-	cx::LogicManager::initialize();
-	mFilemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	mFilemanager =  cx::FileManagerServicePtr(new cxtest::FileManagerServiceMock());
+
 	mServices = cxtest::TestVisServices::create();
 	mMessageListener = cx::MessageListener::createWithQueue();
 
@@ -74,7 +74,16 @@ ViewsFixture::~ViewsFixture()
 
 	mServices.reset();
 	CHECK(!mMessageListener->containsErrors());
-	cx::LogicManager::shutdown();
+}
+
+void ViewsFixture::addFileReaderWriter(cx::FileReaderWriterService* service)
+{
+	mFilemanager->addFileReaderWriter(service);
+}
+
+cx::PatientModelServicePtr ViewsFixture::getPatientModelService()
+{
+	return mServices->patient();
 }
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
@@ -106,6 +115,7 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::Imag
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
 	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);

@@ -13,7 +13,7 @@ namespace cx
 class org_custusx_core_filemanager_EXPORT NIfTIReader: public FileReaderWriterImplService
 {
 public:
-	NIfTIReader(ctkPluginContext *context);
+	NIfTIReader(PatientModelServicePtr patientModelService);
 	virtual ~NIfTIReader();
 
 	bool isNull();

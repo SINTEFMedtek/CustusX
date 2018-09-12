@@ -16,7 +16,7 @@ class org_custusx_core_filemanager_EXPORT PolyDataMeshReader: public FileReaderW
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	PolyDataMeshReader(ctkPluginContext *context);
+	PolyDataMeshReader(PatientModelServicePtr patientModelService);
 	virtual ~PolyDataMeshReader(){}
 
 	bool isNull(){ return false; }

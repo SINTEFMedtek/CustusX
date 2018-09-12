@@ -41,6 +41,8 @@ if(BUILD_TESTING)
         cxtestDataLocations.cpp
         #cxtestDataReaderWriter.cpp
         cxtestTrackingSystemService.cpp
+        cxtestFileManagerServiceMock.h
+        cxtestFileManagerServiceMock.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

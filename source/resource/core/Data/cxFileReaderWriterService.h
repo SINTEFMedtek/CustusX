@@ -62,7 +62,7 @@ class cxResource_EXPORT FileReaderWriterImplService : public FileReaderWriterSer
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix, ctkPluginContext *context);
+	FileReaderWriterImplService(QString name, QString canReadDataType, QString canWriteDataType, QString fileSuffix, PatientModelServicePtr patientModelService);
 
 	virtual QString getName() const;
 	virtual QString getFileSuffix() const;

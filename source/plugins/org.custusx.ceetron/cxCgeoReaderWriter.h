@@ -18,7 +18,7 @@ class org_custusx_ceetron_EXPORT CgeoReaderWriter : public FileReaderWriterImplS
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	CgeoReaderWriter(ctkPluginContext *context);
+	CgeoReaderWriter(PatientModelServicePtr patientModelService);
 
 	bool isNull();
 

@@ -13,8 +13,8 @@
 namespace cx
 {
 
-NIfTIReader::NIfTIReader(ctkPluginContext *context) :
-	FileReaderWriterImplService("NIfTIReader", "image", "", "nii", context)
+NIfTIReader::NIfTIReader(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("NIfTIReader", "image", "", "nii", patientModelService)
 {
 	sform_matrix = vtkMatrix4x4Ptr::New();
 }

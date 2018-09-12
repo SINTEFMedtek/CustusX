@@ -11,8 +11,8 @@ typedef vtkSmartPointer<class vtkPNGReader> vtkPNGReaderPtr;
 namespace cx
 {
 
-PNGImageReader::PNGImageReader(ctkPluginContext *context) :
-	FileReaderWriterImplService("PNGImageReader" ,"image", "", "png", context)
+PNGImageReader::PNGImageReader(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("PNGImageReader" ,"image", "", "png", patientModelService)
 {
 
 }

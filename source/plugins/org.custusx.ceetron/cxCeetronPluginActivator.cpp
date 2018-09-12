@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxRegisteredService.h"
 #include "cxCgeoReaderWriter.h"
+#include "cxPatientModelServiceProxy.h"
 
 namespace cx
 {
@@ -50,7 +51,8 @@ CeetronPluginActivator::~CeetronPluginActivator()
 
 void CeetronPluginActivator::start(ctkPluginContext* context)
 {
-	mRegistration = RegisteredService::create<CgeoReaderWriter>(context, new CgeoReaderWriter(context), FileReaderWriterService_iid);
+	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(context);
+	mRegistration = RegisteredService::create<CgeoReaderWriter>(context, new CgeoReaderWriter(patientModelService), FileReaderWriterService_iid);
 }
 
 void CeetronPluginActivator::stop(ctkPluginContext* context)

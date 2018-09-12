@@ -14,7 +14,7 @@ class org_custusx_core_filemanager_EXPORT PNGImageReader: public FileReaderWrite
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	PNGImageReader(ctkPluginContext *context);
+	PNGImageReader(PatientModelServicePtr patientModelService);
 	virtual ~PNGImageReader() {}
 
 	bool isNull(){return false;}

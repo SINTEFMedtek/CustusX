@@ -15,7 +15,6 @@ if(BUILD_TESTING)
         cxViewsWindow.cpp
         cxtestVideoGraphicsFixture.cpp
         cxtestVideoGraphics.cpp
-        cxtestVisualRendering.cpp
         cxtestImageEnveloper.cpp
         cxtestStream2DRep3D.cpp
         cxtestSharedOpenGLContext.cpp

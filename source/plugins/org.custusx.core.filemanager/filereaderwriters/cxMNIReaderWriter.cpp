@@ -25,12 +25,11 @@ namespace cx
 {
 
 
-MNIReaderWriter::MNIReaderWriter(ctkPluginContext *context) :
-	FileReaderWriterImplService("MNIReaderWriter", "pointMetric", "", "tag", context)
+MNIReaderWriter::MNIReaderWriter(PatientModelServicePtr patientModelService, ViewServicePtr viewService) :
+	FileReaderWriterImplService("MNIReaderWriter", "pointMetric", "", "tag", patientModelService),
+	mPatientModelServicePrivate(patientModelService),
+	mViewService(viewService)
 {
-	mViewService = ViewServiceProxy::create(context);
-	mPatientModelServicePrivate = PatientModelServiceProxy::create(context);
-
 	std::vector<QString> uids;
 	uids.push_back("dummyParent1");
 	uids.push_back("dummyParent2");

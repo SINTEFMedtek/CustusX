@@ -44,6 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxNIfTIReader.h"
 #include "cxMNIReaderWriter.h"
 #include "cxLogger.h"
+#include "cxPatientModelServiceProxy.h"
+#include "cxViewServiceProxy.h"
 
 namespace cx
 {
@@ -63,13 +65,16 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 	FileManagerImpService *filemanager = new FileManagerImpService(context);
 	mRegisteredFileManagerService = RegisteredService::create<FileManagerImpService>(context, filemanager, FileManagerService_iid);
 
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(context), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PNGImageReader>(context, new PNGImageReader(context), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PolyDataMeshReader>(context, new PolyDataMeshReader(context), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(context), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(context), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<NIfTIReader>(context, new NIfTIReader(context), FileReaderWriterService_iid));
-	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MNIReaderWriter>(context, new MNIReaderWriter(context), FileReaderWriterService_iid));
+	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(context);
+	ViewServicePtr viewService = ViewServiceProxy::create(context);
+
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MetaImageReader>(context, new MetaImageReader(patientModelService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PNGImageReader>(context, new PNGImageReader(patientModelService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<PolyDataMeshReader>(context, new PolyDataMeshReader(patientModelService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<XMLPolyDataMeshReader>(context, new XMLPolyDataMeshReader(patientModelService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(patientModelService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<NIfTIReader>(context, new NIfTIReader(patientModelService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MNIReaderWriter>(context, new MNIReaderWriter(patientModelService, viewService), FileReaderWriterService_iid));
 
 	mRegisteredGuiExtenderService = RegisteredService::create<ImportExportGuiExtenderService>(context, new ImportExportGuiExtenderService(context), GUIExtenderService_iid);
 }

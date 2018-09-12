@@ -10,8 +10,8 @@
 namespace cx
 {
 
-CgeoReaderWriter::CgeoReaderWriter(ctkPluginContext *context) :
-	FileReaderWriterImplService("CgeoReaderWriter", "", "mesh", "cgeo", context)
+CgeoReaderWriter::CgeoReaderWriter(PatientModelServicePtr patientModelService) :
+	FileReaderWriterImplService("CgeoReaderWriter", "", "mesh", "cgeo", patientModelService)
 {
 }
 

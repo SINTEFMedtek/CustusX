@@ -14,7 +14,7 @@ class org_custusx_core_filemanager_EXPORT MNIReaderWriter : public FileReaderWri
 
 {
 public:
-	MNIReaderWriter(ctkPluginContext *context);
+	MNIReaderWriter(PatientModelServicePtr patientModelService, ViewServicePtr viewService);
 
 	bool isNull();
 	QString canReadDataType() const;

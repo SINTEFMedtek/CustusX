@@ -30,12 +30,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXFILEMANAGERIMPLSERVICE_H
-#define CXFILEMANAGERIMPLSERVICE_H
+#ifndef CXFILEMANAGERLSERVICEBASE_H
+#define CXFILEMANAGERLSERVICEBASE_H
 
-#include "cxFileManagerServiceBase.h"
+#include "cxFileManagerService.h"
 #include "cxFileReaderWriterService.h"
-#include "org_custusx_core_filemanager_Export.h"
+#include "cxResourceExport.h"
 #include "cxServiceTrackerListener.h"
 class ctkPluginContext;
 
@@ -47,25 +47,42 @@ namespace cx
  *
  * \ingroup org_custusx_core_filemanager
  */
-class org_custusx_core_filemanager_EXPORT FileManagerImpService : public FileManagerServiceBase
+class cxResource_EXPORT FileManagerServiceBase : public FileManagerService
 {
 public:
 	Q_INTERFACES(cx::FileManagerService)
 
-	FileManagerImpService(ctkPluginContext *context);
-	virtual ~FileManagerImpService();
+	FileManagerServiceBase();
+	virtual ~FileManagerServiceBase();
+	virtual bool isNull();
+
+	//read
+	QString canLoadDataType() const;
+	bool canLoad(const QString& type, const QString& filename);
+	DataPtr load(const QString& uid, const QString& filename);
+	bool readInto(DataPtr data, QString path);
+	std::vector<DataPtr> read(const QString &filename);
+
+	//write
+	void save(DataPtr data, const QString& filename);
+
+	//utility
+	vtkImageDataPtr loadVtkImageData(QString filename);
+	vtkPolyDataPtr loadVtkPolyData(QString filename);
+
+	QString findDataTypeFromFile(QString filename);
+	std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType);
+	std::vector<FileReaderWriterServicePtr> getImportersForDataType(QString dataType);
+
+	void addFileReaderWriter(FileReaderWriterService *service);
+	void removeFileReaderWriter(FileReaderWriterService *service);
 
 private:
-	void initServiceListener(ctkPluginContext *context);
-	void onServiceAdded(FileReaderWriterService *service);
-	void onServiceRemoved(FileReaderWriterService *service);
-
-	boost::shared_ptr<ServiceTrackerListener<FileReaderWriterService> > mServiceListener;
-
+	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
+	FileReaderWriterServicePtr findWriter(const QString& path, const QString& type="unknown");
+	std::set<FileReaderWriterServicePtr> mDataReaders;
 };
-
-typedef boost::shared_ptr<FileManagerImpService> FileManagerImplServicePtr;
 
 } //cx
 
-#endif // CXFILEMANAGERIMPLSERVICE_H
+#endif // CXFILEMANAGERLSERVICEBASE_H

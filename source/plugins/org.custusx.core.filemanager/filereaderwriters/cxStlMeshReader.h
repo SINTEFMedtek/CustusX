@@ -15,7 +15,7 @@ class org_custusx_core_filemanager_EXPORT StlMeshReader: public FileReaderWriter
 public:
 	Q_INTERFACES(cx::FileReaderWriterService)
 
-	StlMeshReader(ctkPluginContext *context);
+	StlMeshReader(PatientModelServicePtr patientModelService);
 	virtual ~StlMeshReader(){}
 
 	bool isNull(){return false;}
