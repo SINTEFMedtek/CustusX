@@ -28,6 +28,7 @@ public:
     vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
     vtkPolyDataPtr findExtendedRoute(Vector3D targetCoordinate_r);
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
+    std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 
 private:
 	Eigen::MatrixXd mCLpoints;

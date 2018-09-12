@@ -110,6 +110,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 		return;
 
     std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+    //std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
         mRoutePositions.push_back(positions[i]);
@@ -125,8 +126,6 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 
     findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
-
-    //smoothPositions();
 
     vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
@@ -148,7 +147,6 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
 		for (int i = 1; i<= numberOfextentionPoints; i++)
 		{
 			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
-			//std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
 		}
 	}
 
@@ -174,6 +172,22 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> position
 	retval->SetPoints(points);
 	retval->SetLines(lines);
 	return retval;
+}
+
+
+/*
+    RouteToTarget::getBranchPositions is used to get positions of a branch without smoothing.
+    Equivalent to RouteToTarget::smoothBranch without smoothing.
+*/
+std::vector< Eigen::Vector3d > RouteToTarget::getBranchPositions(BranchPtr branchPtr, int startIndex)
+{
+    Eigen::MatrixXd branchPositions = branchPtr->getPositions();
+    std::vector< Eigen::Vector3d > positions;
+
+    for (int i = startIndex; i >=0; i--)
+        positions.push_back(branchPositions.col(i));
+
+    return positions;
 }
 
 /*
@@ -221,14 +235,15 @@ std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, 
 
     }
 
-    //Add points until all filtered/smoothed postions are within branch radius distance of the unfiltered branch centerline posiition.
+    //Add points until all filtered/smoothed postions are minimum 1 mm inside the airway wall, (within r - 1 mm).
     //This is to make sure the smoothed centerline is within the lumen of the airways.
-    double maxDistanceToOriginalPosition = branchRadius;
+    double maxAcceptedDistanceToOriginalPosition = std::max(branchRadius - 1, 1.0);
+    double maxDistanceToOriginalPosition = maxAcceptedDistanceToOriginalPosition + 1;
     int maxDistanceIndex = -1;
     std::vector< Eigen::Vector3d > smoothingResult;
 
     //add positions to spline
-    while (maxDistanceToOriginalPosition >= branchRadius && splineX->GetNumberOfPoints() < startIndex)
+    while (maxDistanceToOriginalPosition >= maxAcceptedDistanceToOriginalPosition && splineX->GetNumberOfPoints() < startIndex)
     {
         if(maxDistanceIndex > 0)
         {
