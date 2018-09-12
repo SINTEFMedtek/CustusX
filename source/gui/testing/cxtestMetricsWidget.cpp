@@ -16,12 +16,50 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSessionStorageService.h"
 #include "cxPointMetric.h"
 #include "cxtestMetricManager.h"
+#include "cxErrorObserver.h"
 #include <boost/shared_ptr.hpp>
 #include <queue>
+#include <vtkMNITagPointReader.h>
+#include <vtkStringArray.h>
 
 namespace cxtest
 {
 
+namespace
+{
+struct TestMetricData {
+    std::queue<cx::Vector3D> coordinates_in_REF_coordinateSystem;
+    std::queue<QString> labelNames;
+};
+
+TestMetricData readTestMetricData(QString filename) {
+    vtkMNITagPointReaderPtr reader = vtkMNITagPointReader::New();
+    reader->SetFileName(filename.toStdString().c_str());
+    reader->Update();
+    REQUIRE(cx::ErrorObserver::checkedRead(reader, filename));
+    QString description(reader->GetComments());
+    vtkStringArray *labels = reader->GetLabelText();
+    vtkPoints *points = reader->GetPoints(0);
+    QString name = "";
+    TestMetricData testMetricsfromFile;
+
+    vtkIdType number_of_points = points->GetNumberOfPoints();
+    for(vtkIdType i=0; i< number_of_points; ++i)
+    {
+        vtkStdString label = labels->GetValue(i);
+        name = QString::fromStdString(label);
+        if(name.isEmpty() || (name == QString(" ")) )   // if no name label is given in .tag file, metric name is set to continous numbering
+            name = QString::number(i+1);
+        double *point = points->GetPoint(i);
+        cx::Vector3D pointVector;
+        pointVector[0] = point[0]; pointVector[1] = point[1]; pointVector[2] = point[2];
+        testMetricsfromFile.coordinates_in_REF_coordinateSystem.push(pointVector);
+        testMetricsfromFile.labelNames.push(name);
+    }
+    return testMetricsfromFile;
+}
+
+}
 
 TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget]")
 {
@@ -124,22 +162,10 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - LPS coordinate
 {
     cx::LogicManager::initialize();
     cx::DataLocations::setTestMode();
-    std::queue<cx::Vector3D> coordinates_in_REF_coordinateSystem;
-    // Identical coordinate points as specified in file /testing/metrics_export_import/metric_tags_with_labels.tag
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 25.0818, 13.7766));   // A
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 29.5982, 30.9681));   // B
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 35.0026, 50.0849));   // C
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 40.122, 69.659));     // D
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 45.3417, 89.735));    // E
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(21.7821, 7.55754, 80.7703)); // F
-    std::queue<QString> labelNames;
-    labelNames.push("A");
-    labelNames.push("B");
-    labelNames.push("C");
-    labelNames.push("D");
-    labelNames.push("E");
-    labelNames.push("F");
-
+    QString dataPath = cx::DataLocations::getTestDataPath();
+    QString fileName = QString("/testing/metrics_export_import/metric_tags_with_labels.tag");
+    QString tagFile = dataPath + fileName;
+    TestMetricData metricData = readTestMetricData(tagFile);
 
     //scope here to delete the metric manager before shutting down the logic manager.
     {
@@ -149,7 +175,7 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - LPS coordinate
                                   cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
 
         int number_of_metrics_before_import = manager.getNumberOfMetrics();
-        QString tagFile = dataPath + "/testing/metrics_export_import/metric_tags_with_labels.tag";
+        QString tagFile = dataPath + fileName;
         bool testmode = true;
         // Manual setting of user dialog settings
         manager.addImage("TestingMetrics");
@@ -158,7 +184,7 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - LPS coordinate
         manager.importMetricsFromMNITagFile(tagFile, testmode);
 
         // Check that metrics are correctly imported
-        int number_of_metrics_in_file = 6;
+        int number_of_metrics_in_file = metricData.coordinates_in_REF_coordinateSystem.size();
         int number_of_metrics_after_import = manager.getNumberOfMetrics();
         REQUIRE(number_of_metrics_after_import == (number_of_metrics_before_import+number_of_metrics_in_file));
 
@@ -172,12 +198,12 @@ TEST_CASE("Import labeled point metrics from MNI Tag Point file - LPS coordinate
         {
             PointMetricPtr  point_metric = boost::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
             cx::Vector3D importedCoordinates = point_metric->getRefCoord();
-            cx::Vector3D spesifiedCoordinates = coordinates_in_REF_coordinateSystem.front();
-            coordinates_in_REF_coordinateSystem.pop();
+            cx::Vector3D spesifiedCoordinates = metricData.coordinates_in_REF_coordinateSystem.front();
+            metricData.coordinates_in_REF_coordinateSystem.pop();
             REQUIRE(cx::similar(importedCoordinates, spesifiedCoordinates, 0.1));
             QString cxLabelName = point_metric->getName();
-            QString testLabelName = labelNames.front();
-            labelNames.pop();
+            QString testLabelName = metricData.labelNames.front();
+            metricData.labelNames.pop();
             REQUIRE(QString::compare(cxLabelName,testLabelName) == 0);
         }
     }
@@ -189,21 +215,10 @@ TEST_CASE("Import unlabeled point metrics from MNI Tag Point file - LPS coordina
 {
     cx::LogicManager::initialize();
     cx::DataLocations::setTestMode();
-    std::queue<cx::Vector3D> coordinates_in_REF_coordinateSystem;
-    // Identical coordinate points as specified in file /testing/metrics_export_import/metric_tags_without_labels.tag
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 25.0818, 13.7766));
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 29.5982, 30.9681));
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 35.0026, 50.0849));
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 40.122, 69.659));
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(25.78, 45.3417, 89.735));
-    coordinates_in_REF_coordinateSystem.push(cx::Vector3D(21.7821, 7.55754, 80.7703));
-    std::queue<QString> labelNames;
-    labelNames.push("1");
-    labelNames.push("2");
-    labelNames.push("3");
-    labelNames.push("4");
-    labelNames.push("5");
-    labelNames.push("6");
+    QString dataPath = cx::DataLocations::getTestDataPath();
+    QString fileName = QString("/testing/metrics_export_import/metric_tags_without_labels.tag");
+    QString tagFile = dataPath + fileName;
+    TestMetricData metricData = readTestMetricData(tagFile);
 
     //scope here to delete the metric manager before shutting down the logic manager.
     {
@@ -213,7 +228,7 @@ TEST_CASE("Import unlabeled point metrics from MNI Tag Point file - LPS coordina
                                   cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
 
         int number_of_metrics_before_import = manager.getNumberOfMetrics();
-        QString tagFile = dataPath + "/testing/metrics_export_import/metric_tags_without_labels.tag";
+        QString tagFile = dataPath + fileName;
         bool testmode = true;
         // Manual setting of user dialog settings
         manager.addImage("TestingMetrics");
@@ -222,7 +237,7 @@ TEST_CASE("Import unlabeled point metrics from MNI Tag Point file - LPS coordina
         manager.importMetricsFromMNITagFile(tagFile, testmode);
 
         // Check that metrics are correctly imported
-        int number_of_metrics_in_file = 6;
+        int number_of_metrics_in_file = metricData.coordinates_in_REF_coordinateSystem.size();
         int number_of_metrics_after_import = manager.getNumberOfMetrics();
         REQUIRE(number_of_metrics_after_import == (number_of_metrics_before_import+number_of_metrics_in_file));
 
@@ -236,12 +251,12 @@ TEST_CASE("Import unlabeled point metrics from MNI Tag Point file - LPS coordina
         {
             PointMetricPtr  point_metric = boost::static_pointer_cast<cx::PointMetric>(iter_metrics->second);
             cx::Vector3D importedCoordinates = point_metric->getRefCoord();
-            cx::Vector3D spesifiedCoordinates = coordinates_in_REF_coordinateSystem.front();
-            coordinates_in_REF_coordinateSystem.pop();
+            cx::Vector3D spesifiedCoordinates = metricData.coordinates_in_REF_coordinateSystem.front();
+            metricData.coordinates_in_REF_coordinateSystem.pop();
             REQUIRE(cx::similar(importedCoordinates, spesifiedCoordinates, 0.1));
             QString cxLabelName = point_metric->getName();
-            QString testLabelName = labelNames.front();
-            labelNames.pop();
+            QString testLabelName = metricData.labelNames.front();
+            metricData.labelNames.pop();
             REQUIRE(QString::compare(cxLabelName,testLabelName) == 0);
         }
     }
