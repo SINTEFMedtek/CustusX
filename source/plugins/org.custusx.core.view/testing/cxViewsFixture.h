@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXVIEWSFIXTURE_H
 #define CXVIEWSFIXTURE_H
 
-#include "cxtestresourcevisualization_export.h"
+#include "cxtest_org_custusx_core_view_export.h"
 
 #include "cxtestVisServices.h"
 #include "cxMessageListener.h"
@@ -34,7 +34,7 @@ namespace cxtest
 vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
 	double saturationRangeMin = 0, double saturationRangeMax = 1, double valueRangeMin = 1, double valueRangeMax = 1);
 
-class CXTESTRESOURCEVISUALIZATION_EXPORT ImageParameters
+class CXTEST_ORG_CUSTUSX_CORE_VIEW_EXPORT ImageParameters
 {
 public:
 	ImageParameters() : llr(.1), alpha(1) {}
@@ -47,7 +47,7 @@ typedef boost::shared_ptr<class ViewsWindow> ViewsWindowPtr;
 
 /** Test class  with convenience methods for defining views.
  */
-class CXTESTRESOURCEVISUALIZATION_EXPORT ViewsFixture : public QObject
+class CXTEST_ORG_CUSTUSX_CORE_VIEW_EXPORT ViewsFixture : public QObject
 {
 	Q_OBJECT
 
