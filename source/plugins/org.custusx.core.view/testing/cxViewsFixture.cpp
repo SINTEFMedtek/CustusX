@@ -27,9 +27,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkOpenGLRenderWindow.h>
 #include "cxSharedOpenGLContext.h"
 #include "cxRenderWindowFactory.h"
-#include "cxtestPatientModelServiceMock.h"
-#include "cxFileManagerServiceProxy.h"
-#include "cxtestFileManagerServiceMock.h"
 
 #include "catch.hpp"
 
@@ -71,19 +68,20 @@ ViewsFixture::ViewsFixture(QString displayText)
 ViewsFixture::~ViewsFixture()
 {
 	mWindow.reset();
-
 	mServices.reset();
+	mDataReaders.clear();
 	CHECK(!mMessageListener->containsErrors());
 }
 
-void ViewsFixture::addFileReaderWriter(cx::FileReaderWriterService* service)
+void ViewsFixture::addFileReaderWriter(cx::FileReaderWriterServicePtr service)
 {
-	mFilemanager->addFileReaderWriter(service);
+	mDataReaders.insert(service);
+	mFilemanager->addFileReaderWriter(service.get());
 }
 
-cx::PatientModelServicePtr ViewsFixture::getPatientModelService()
+cxtest::PatientModelServiceMockPtr ViewsFixture::getPatientModelService()
 {
-	return mServices->patient();
+	return boost::dynamic_pointer_cast<PatientModelServiceMock>(mServices->patient());
 }
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
@@ -238,6 +236,11 @@ bool ViewsFixture::runWidget()
 {
 	mWindow->show();
 	return qApp->exec();
+}
+
+cx::FileManagerServicePtr ViewsFixture::getFileManager()
+{
+	return mFilemanager;
 }
 
 

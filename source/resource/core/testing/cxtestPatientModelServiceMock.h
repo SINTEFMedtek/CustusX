@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
+typedef boost::shared_ptr<class PatientModelServiceMock> PatientModelServiceMockPtr;
 
 class CXTESTRESOURCE_EXPORT PatientModelServiceMock : public cx::PatientModelServiceNull
 {

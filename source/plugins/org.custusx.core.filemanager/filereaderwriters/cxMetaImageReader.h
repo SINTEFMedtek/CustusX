@@ -32,7 +32,5 @@ public:
 	virtual void write(DataPtr data, const QString& filename);
 };
 
-typedef boost::shared_ptr<MetaImageReader> MetaImageReaderPtr;
-
 }
 #endif // CXMETAIMAGEREADER_H

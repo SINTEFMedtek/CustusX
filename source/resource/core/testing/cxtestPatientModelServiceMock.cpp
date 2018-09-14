@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackingService.h"
 #include "cxRegistrationTransform.h"
 #include "cxFileManagerService.h"
+#include "catch.hpp"
 
 namespace cxtest
 {
@@ -59,6 +60,7 @@ cx::DataPtr PatientModelServiceMock::importDataMock(QString fileName, QString &i
 {
 	QString type = filemanager->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);
+	REQUIRE(data);
 	data->load(fileName, filemanager);
 	this->insertData(data);
 	return data;

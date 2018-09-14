@@ -33,6 +33,7 @@ public:
 
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
 };
+
 }
 
 #endif // CXSTLMESHREADER_H

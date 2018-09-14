@@ -12,13 +12,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include "cxDataLocations.h"
-#include "cxLogicManager.h"
 #include "cxPatientModelService.h"
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxViewsFixture.h"
 #include "cxGeometricRep.h"
 #include "cxView.h"
+#include "cxPNGImageReader.h"
+#include "cxStlMeshReader.h"
+#include "cxXMLPolyDataMeshReader.h"
+#include "cxPolyDataMeshReader.h"
+#include "cxtestPatientModelServiceMock.h"
 
 
 namespace cxtest
@@ -34,13 +38,23 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 	cx::DataLocations::setTestMode();
 	cxtest::ViewsFixture fixture;
 
+	cx::FileReaderWriterServicePtr pngImageReader = cx::FileReaderWriterServicePtr(new cx::PNGImageReader(fixture.getPatientModelService()));
+	cx::FileReaderWriterServicePtr stlMeshReader = cx::FileReaderWriterServicePtr(new cx::StlMeshReader(fixture.getPatientModelService()));
+	cx::FileReaderWriterServicePtr vtpMeshReader = cx::FileReaderWriterServicePtr(new cx::XMLPolyDataMeshReader(fixture.getPatientModelService()));
+	cx::FileReaderWriterServicePtr vtkMeshReader = cx::FileReaderWriterServicePtr(new cx::PolyDataMeshReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(pngImageReader);
+	fixture.addFileReaderWriter(stlMeshReader);
+	fixture.addFileReaderWriter(vtpMeshReader);
+	fixture.addFileReaderWriter(vtkMeshReader);
+
 	INFO("Import an image and a mesh.");
 	QString fileNameImage = cx::DataLocations::getTestDataPath()+"/testing/videographics/testImage01.png";
 
+
 	QString info;
-	cx::DataPtr dataImage = cx::logicManager()->getPatientModelService()->importData(fileNameImage, info);
+	cx::DataPtr dataImage = fixture.getPatientModelService()->importDataMock(fileNameImage, info, fixture.getFileManager());
 	REQUIRE(dataImage);
-	cx::DataPtr dataMesh = cx::logicManager()->getPatientModelService()->importData(meshFile, info);
+	cx::DataPtr dataMesh = fixture.getPatientModelService()->importDataMock(meshFile, info, fixture.getFileManager());
 	REQUIRE(dataMesh);
 
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(dataImage);
@@ -75,19 +89,19 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 } //namespace
 
 
-TEST_CASE("Visual rendering: Load and show mesh with texture, stl",  "[unit][resource][visualization]")
+TEST_CASE("Visual rendering: Load and show mesh with texture, stl",  "[integration][resource][visualization]")
 {
 	QString fileNameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/funnel_Y_axis.stl";
 	loadMeshAndTestRenderingWithTexture(fileNameMesh);
 }
 
-TEST_CASE("Visual rendering: Load and show mesh with texture, vtk",  "[unit][resource][visualization]")
+TEST_CASE("Visual rendering: Load and show mesh with texture, vtk",  "[integration][resource][visualization]")
 {
 	QString fileNameMesh = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/kaisa_skin.vtk";
 	loadMeshAndTestRenderingWithTexture(fileNameMesh);
 }
 
-TEST_CASE("Visual rendering: Load and show mesh with texture, vtp",  "[unit][resource][visualization]")
+TEST_CASE("Visual rendering: Load and show mesh with texture, vtp",  "[integration][resource][visualization]")
 {
 	QString fileNameMesh = cx::DataLocations::getTestDataPath()+"/testing/videographics/out.vtp";
 	loadMeshAndTestRenderingWithTexture(fileNameMesh);

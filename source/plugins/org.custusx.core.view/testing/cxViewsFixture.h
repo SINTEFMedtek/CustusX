@@ -19,10 +19,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDefinitions.h"
 #include <vector>
 #include "cxtestFileManagerServiceMock.h"
+#include "cxtestPatientModelServiceMock.h"
+#include "cxFileReaderWriterService.h"
+#include "cxtestRenderTester.h"
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
 
 /**
   * @brief Creates and returns a lut, based on range parameters.
@@ -70,9 +72,10 @@ public:
 	cx::ImagePtr loadImage(const QString& imageFilename);
 	cx::DummyToolPtr dummyTool();
 
-	void addFileReaderWriter(cx::FileReaderWriterService *service);
+	void addFileReaderWriter(cx::FileReaderWriterServicePtr service);
 
-	cx::PatientModelServicePtr getPatientModelService();
+	cxtest::PatientModelServiceMockPtr getPatientModelService();
+	cx::FileManagerServicePtr getFileManager();
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
 	void fixToolToCenter();
@@ -85,6 +88,7 @@ private:
 	ViewsWindowPtr mWindow;
 	cx::RenderWindowFactoryPtr mFactory;
 	cx::FileManagerServicePtr mFilemanager;
+	std::set<cx::FileReaderWriterServicePtr> mDataReaders;
 };
 
 } // namespace cxtest
