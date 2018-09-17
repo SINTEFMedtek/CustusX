@@ -285,6 +285,9 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
+
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 0, 2);
@@ -304,6 +307,9 @@ TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
 		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
+
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 0, 0);
