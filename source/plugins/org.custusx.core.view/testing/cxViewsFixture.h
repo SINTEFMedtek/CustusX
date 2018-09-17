@@ -46,6 +46,9 @@ public:
 typedef boost::shared_ptr<class ViewsWindow> ViewsWindowPtr;
 
 /** Test class  with convenience methods for defining views.
+ *
+ * Tests using this fixture must be integration tests.
+ * This is because there can only be one cx::RenderWindowFactory.
  */
 class CXTEST_ORG_CUSTUSX_CORE_VIEW_EXPORT ViewsFixture : public QObject
 {
