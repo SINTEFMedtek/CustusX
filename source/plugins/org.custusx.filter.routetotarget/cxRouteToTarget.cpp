@@ -300,8 +300,8 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
     out << "#Target position: \n" << mTargetPosition << "\n";
     if (mProjectedBranchPtr)
         out << "#Route to target generations: \n" << mProjectedBranchPtr->findGenerationNumber() << "\n";
-    out << "#Route to target length (mm): \n" << std::to_string(calculateRouteLength(mRoutePositions)) << "\n";
-    out << "#Extended route to target length (mm): \n" << std::to_string(calculateRouteLength(mExtendedRoutePositions));
+    out << "#Route to target length (mm): \n" << calculateRouteLength(mRoutePositions) << "\n";
+    out << "#Extended route to target length (mm): \n" << calculateRouteLength(mExtendedRoutePositions);
 
     out.close();
 }
