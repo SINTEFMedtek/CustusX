@@ -295,7 +295,7 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
     QString filePath = RTTpath + QDateTime::currentDateTime().toString(format) + "_RouteToTargetInformation.txt";
 
     ofstream out;
-    out.open (filePath.toStdString());
+    out.open(filePath.toStdString().c_str());
 
     out << "#Target position: \n" << mTargetPosition << "\n";
     if (mProjectedBranchPtr)
