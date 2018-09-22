@@ -70,7 +70,6 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 
 void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 {
-
 	double minDistance = 100000;
 	int minDistancePositionIndex;
 	BranchPtr minDistanceBranch;
