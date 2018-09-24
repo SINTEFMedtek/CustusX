@@ -546,6 +546,11 @@ param (
     [ValidateSet('7-Zip', 'cppunit', 'ninja', 'git', 'cmake', 'python', 'eclipse', 'qt', 'boost', 'MSVC2015', 'console2', 'nsis', 'firefox', 'cuda', 'ussf', 'glew')]
     [string[]]$tools
 )
+#Set security protocol to be able to download using the net.webclient 
+#--------------
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+
 #Information 
 #--------------
     $ToolFolder = $script:CX_TOOL_FOLDER
