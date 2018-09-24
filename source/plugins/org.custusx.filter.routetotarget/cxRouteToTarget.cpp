@@ -2,7 +2,6 @@
 
 #include "cxRouteToTarget.h"
 #include <vtkPolyData.h>
-//#include "cxDoubleDataAdapterXml.h"
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include <vtkCellArray.h>
@@ -10,7 +9,6 @@
 #include <QDir>
 #include "cxTime.h"
 #include "cxVisServices.h"
-#include <string>
 #include <QTextStream>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
