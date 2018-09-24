@@ -11,6 +11,7 @@
 #include "cxTime.h"
 #include "cxVisServices.h"
 #include <string>
+#include <QTextStream>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -145,7 +146,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
 	{
 		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
         Eigen::Vector3d extentionVectorNormalized = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
-        int numberOfextentionPoints = (int) extentionDistance / extentionPointIncrement;
+        int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
         Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 
 		for (int i = 1; i<= numberOfextentionPoints; i++)
@@ -293,16 +294,23 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
     QString format = timestampSecondsFormat();
     QString filePath = RTTpath + QDateTime::currentDateTime().toString(format) + "_RouteToTargetInformation.txt";
 
-    ofstream out;
-    out.open(filePath.toStdString().c_str());
+    QFile outfile(filePath);
+    if (outfile.open(QIODevice::ReadWrite))
+    {
+        QTextStream stream(&outfile);
 
-    out << "#Target position: \n" << mTargetPosition << "\n";
-    if (mProjectedBranchPtr)
-        out << "#Route to target generations: \n" << mProjectedBranchPtr->findGenerationNumber() << "\n";
-    out << "#Route to target length (mm): \n" << calculateRouteLength(mRoutePositions) << "\n";
-    out << "#Extended route to target length (mm): \n" << calculateRouteLength(mExtendedRoutePositions);
-
-    out.close();
+        stream << "#Target position:" << endl;
+        stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << endl;
+        if (mProjectedBranchPtr)
+        {
+            stream << "#Route to target generations:" << endl;
+            stream << mProjectedBranchPtr->findGenerationNumber() << endl;
+        }
+        stream << "#Route to target length (mm):" << endl;
+        stream << calculateRouteLength(mRoutePositions) << endl;
+        stream << "#Extended route to target length (mm):" << endl;
+        stream << calculateRouteLength(mExtendedRoutePositions) << endl;
+    }
 }
 
 double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
