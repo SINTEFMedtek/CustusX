@@ -38,7 +38,7 @@ class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public Filte
 	Q_INTERFACES(cx::Filter)
 
 public:
-	RouteToTargetFilter(VisServicesPtr services);
+    RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile = false);
 	virtual ~RouteToTargetFilter() {}
 
 	virtual QString getType() const;
@@ -63,6 +63,7 @@ private:
 	vtkPolyDataPtr mOutput;
     vtkPolyDataPtr mExtendedRoute;
 	QString mTargetName;
+    bool mGenerateFileWithRouteInformation;
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 
