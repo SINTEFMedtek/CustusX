@@ -2,11 +2,14 @@
 
 #include "cxRouteToTarget.h"
 #include <vtkPolyData.h>
-//#include "cxDoubleDataAdapterXml.h"
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
+#include <QDir>
+#include "cxTime.h"
+#include "cxVisServices.h"
+#include <QTextStream>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -66,7 +69,6 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 
 void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 {
-
 	double minDistance = 100000;
 	int minDistancePositionIndex;
 	BranchPtr minDistanceBranch;
@@ -123,7 +125,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 
 vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 {
-
+    mTargetPosition = targetCoordinate_r;
     findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
 
@@ -134,15 +136,16 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 
 vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
 {
-    float extentionPointIncrement = 0.5; //mm
+    mTargetPosition = targetCoordinate_r;
+    double extentionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
 	if(mRoutePositions.size() > 0)
 	{
 		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
-		Eigen::Vector3d extentionVector = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
-		int numberOfextentionPoints = (int) extentionDistance * extentionPointIncrement;
-		Eigen::Vector3d extentionPointIncrementVector = extentionVector / extentionPointIncrement;
+        Eigen::Vector3d extentionVectorNormalized = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+        int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
+        Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 
 		for (int i = 1; i<= numberOfextentionPoints; i++)
 		{
@@ -277,6 +280,50 @@ std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, 
     }
 
     return smoothingResult;
+}
+
+void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
+{
+    QString RTTpath = services->patient()->getActivePatientFolder() + "/RouteToTargetInformation/";
+    QDir RTTDirectory(RTTpath);
+    if (!RTTDirectory.exists()) // Creating RouteToTargetInformation folder if it does not exist
+        RTTDirectory.mkpath(RTTpath);
+
+    QString format = timestampSecondsFormat();
+    QString filePath = RTTpath + QDateTime::currentDateTime().toString(format) + "_RouteToTargetInformation.txt";
+
+    QFile outfile(filePath);
+    if (outfile.open(QIODevice::ReadWrite))
+    {
+        QTextStream stream(&outfile);
+
+        stream << "#Target position:" << endl;
+        stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << endl;
+        if (mProjectedBranchPtr)
+        {
+            stream << "#Route to target generations:" << endl;
+            stream << mProjectedBranchPtr->findGenerationNumber() << endl;
+        }
+        stream << "#Route to target length (mm):" << endl;
+        stream << calculateRouteLength(mRoutePositions) << endl;
+        stream << "#Extended route to target length (mm):" << endl;
+        stream << calculateRouteLength(mExtendedRoutePositions) << endl;
+    }
+}
+
+double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
+{
+    double routeLenght = 0;
+    for (int i=0; i<route.size()-1; i++)
+    {
+        double d0 = route[i+1](0) - route[i](0);
+        double d1 = route[i+1](1) - route[i](1);
+        double d2 = route[i+1](2) - route[i](2);
+
+        routeLenght += sqrt( d0*d0 +d1*d1 + d2*d2 );
+    }
+
+    return routeLenght;
 }
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)
