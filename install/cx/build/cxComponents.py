@@ -542,7 +542,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('63931ecd7243b0f503ad6e235758747b384e4748')
+        self._getBuilder().gitCheckout('35560c25a6ef29a3b0abdedfb870e38f52d19ee9')
     def configure(self):
         pass
     def build(self):

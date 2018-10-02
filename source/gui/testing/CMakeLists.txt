@@ -32,6 +32,8 @@ if(BUILD_TESTING)
         cxtestSelectClippersForDataWidget.cpp
         cxtestSessionStorageHelper.h
         cxtestSessionStorageHelper.cpp
+        cxtestMetricManager.h
+        cxtestMetricManager.cpp
         cxtestMetricsWidget.cpp
     )
 

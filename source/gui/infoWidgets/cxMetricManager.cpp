@@ -16,9 +16,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFile>
 #include <QTextStream>
 #include <QDialog>
+#include <QInputDialog>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QCheckBox>
+#include <QGroupBox>
 #include <QLabel>
+#include <QButtonGroup>
 #include <vtkMNITagPointReader.h>
 #include <vtkStringArray.h>
 #include "vtkForwardDeclarations.h"
@@ -57,10 +61,14 @@ MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr 
 	mViewService(viewService),
 	mPatientModelService(patientModelService),
 	mTrackingService(trackingService),
-	mSpaceProvider(spaceProvider)
+    mSpaceProvider(spaceProvider)
 {
 	connect(trackingService.get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
-	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
+	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));    
+
+    mUserSettings.coordSys = pcsRAS;
+    mUserSettings.imageRefs.push_back("");
+    mUserSettings.imageRefs.push_back("");
 }
 
 DataMetricPtr MetricManager::getMetric(QString uid)
@@ -510,9 +518,17 @@ QColor MetricManager::getRandomColor()
 	return color;
 }
 
-std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description)
+MetricManager::ImportMNIuserSettings
+    MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes,
+                                                                   QString description)
 {
-	std::vector<QString> data_uid;
+    ImportMNIuserSettings       userSettings;
+
+    QInputDialog selectCoordinateSystemDialog;
+    QStringList selectableItems;
+    selectableItems << "RAS coordinates (NIfTI/ITKsnap)" << "LPS coordiantes (DICOM/CustusX)";
+    selectCoordinateSystemDialog.setComboBoxItems(selectableItems);
+
 
 	QDialog selectVolumeDialog;
 	selectVolumeDialog.setWindowTitle("Select volume(s) related to points in MNI Tag Point file.");
@@ -520,6 +536,29 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 	QVBoxLayout *layout = new QVBoxLayout();
 	QLabel *description_label = new QLabel(description);
 	layout->addWidget(description_label);
+
+    QButtonGroup *coordinateSysSelector = new QButtonGroup();
+    QCheckBox *selectorLPS = new QCheckBox(tr("LPS (DICOM/CX)"));
+    QCheckBox *selectorRAS = new QCheckBox(tr("RAS (Neuro)"));
+    enum selectorID {
+        selectorRASid=1,
+        selectorLPSid
+    };
+
+    selectorRAS->setChecked(true);
+    coordinateSysSelector->addButton(selectorRAS);
+    coordinateSysSelector->addButton(selectorLPS);
+    coordinateSysSelector->setId(selectorRAS, selectorRASid);
+    coordinateSysSelector->setId(selectorLPS, selectorLPSid);
+    QGroupBox *coordinateSysSelectors = new QGroupBox(tr("Coordinate system format"));
+    selectorLPS->setToolTip("LPS (X=Right->Left Y=Anterior->Posterio Z=Inferior->Superior) - DICOM, CustusX");
+    selectorRAS->setToolTip("RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior) - NIfTI, ITK-snap");
+    QVBoxLayout *coordSelectLayout = new QVBoxLayout;
+    coordSelectLayout->addWidget(selectorLPS);
+    coordSelectLayout->addWidget(selectorRAS);
+    coordSelectLayout->addStretch(1);
+    coordinateSysSelectors->setLayout(coordSelectLayout);
+    layout->addWidget(coordinateSysSelectors);
 
 	std::map<int, StringPropertySelectImagePtr> selectedImageProperties;
 	for(int i=0; i < number_of_volumes; ++i)
@@ -538,9 +577,15 @@ std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFi
 	for(int i=0; i < number_of_volumes; ++i)
 	{
 		StringPropertySelectImagePtr image_property = selectedImageProperties[i];
-		data_uid.push_back(image_property->getValue());
+        userSettings.imageRefs.push_back(image_property->getValue());
 	}
-	return data_uid;
+    // Set correct coordinate space
+    if(coordinateSysSelector->checkedId() == selectorRASid)
+        userSettings.coordSys = pcsRAS;
+    else
+        userSettings.coordSys = pcsLPS;
+
+    return userSettings;
 }
 
 void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode)
@@ -557,13 +602,13 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 
 
 	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
+    //---  and specify coordinate system for the coordinates (LPS or RAS)
 	int number_of_volumes = reader->GetNumberOfVolumes();
 	QString description(reader->GetComments());
-	std::vector<QString> data_uid;
-	data_uid.push_back("");
-	data_uid.push_back("");
-	if(!testmode)
-		data_uid = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
+//    ImportMNIuserSettings  userSettings;
+    if(!testmode)
+        mUserSettings = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes,
+                                                                      description);
 
 	//--- Create the point metrics
 	QString type = "pointMetric";
@@ -584,22 +629,34 @@ void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode
 			for(int j=0; j < number_of_points; ++j)
 			{
 				vtkStdString label = labels->GetValue(j);
-				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
+                name = QString::fromStdString(label);
+                if(name.isEmpty() || (name == QString(" ")) )   // if no name label is given in .tag file, metric name is set to continous numbering
+                    name = QString::number(j+1);
+
 				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
 
 				double *point = points->GetPoint(j);
-				DataPtr data = this->createData(type, uid, QString::number(j+1));
+                DataPtr data = this->createData(type, uid, name);
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
+                Vector3D vector_ras;
+                Vector3D vector_lps;
+                CoordinateSystem space;
 
-				CoordinateSystem space(csDATA, data_uid[i]);
-				Vector3D vector_ras(point[0], point[1], point[2]);
-				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
+                if(mUserSettings.coordSys == pcsRAS) {
+                    // The coordinates are given in RAS format
+                    space.mId = csDATA;
+                    space.mRefObject = mUserSettings.imageRefs[i];
+                    vector_ras[0] = point[0]; vector_ras[1] = point[1]; vector_ras[2] = point[2];
+                    Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
+                    vector_lps = sMr.inv() * vector_ras;
+                } else {
+                    // The coordinates are given in LPS format
+                    space.mId = csREF;
+                    space.mRefObject = mUserSettings.imageRefs[i];
+                    vector_lps[0] = point[0]; vector_lps[1] = point[1]; vector_lps[2] = point[2];
+                }
 
-				//Convert from RAS (MINC) to LPS (CX)
-				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-				Vector3D vector_lps = sMr.inv() * vector_ras;
-
-				point_metric->setCoordinate(vector_lps);
+                point_metric->setCoordinate(vector_lps);
 				point_metric->setSpace(space);
 				point_metric->setColor(color);
 			}
