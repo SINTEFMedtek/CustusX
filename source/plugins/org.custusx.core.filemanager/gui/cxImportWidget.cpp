@@ -186,6 +186,8 @@ void ImportWidget::removeRowFromTableAndRemoveFilenameFromImportList()
 		mTableWidget->removeRow(rowindex);
 	int numberOfRemovedEntries = mFileNames.removeAll(fullfilename);
 
+	QWidget *widgetToRemove = mStackedWidget->widget(rowindex);
+	mStackedWidget->removeWidget(widgetToRemove);
 }
 
 void ImportWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
