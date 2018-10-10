@@ -28,7 +28,7 @@ namespace cx
  */
 
 ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisServicesPtr services) :
-	BaseWidget(NULL, "ImportWidget", "Import"),
+	BaseWidget(NULL, "import_widget", "Import"),
 	mFileManager(filemanager),
 	mVisServices(services),
 	mSelectedIndexInTable(0)
@@ -72,6 +72,10 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	connect(importButton, &QPushButton::clicked, this, &ImportWidget::importButtonClicked);
 	connect(cancelButton, &QPushButton::clicked, this, &ImportWidget::cancelButtonClicked);
 	connect(this, &ImportWidget::finishedImporting, this, &ImportWidget::cleanUpAfterImport);
+
+	QAction* addMoreFilesButtonClickedAction = new QAction("AddMoreFilesButtonClickedAction", this);
+	this->addAction(addMoreFilesButtonClickedAction);
+	connect(addMoreFilesButtonClickedAction, &QAction::triggered, this, &ImportWidget::addMoreFilesButtonClicked);
 }
 
 int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr> data)

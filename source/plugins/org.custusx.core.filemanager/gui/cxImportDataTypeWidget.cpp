@@ -54,7 +54,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 	mTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 	mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	mTableWidget->setShowGrid(false);
-	mTableWidget->setStyleSheet("QTableView {selection-background-color: red;}");
+	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
 
 	QString type, name;

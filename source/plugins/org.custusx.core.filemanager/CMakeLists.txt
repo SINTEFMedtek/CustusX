@@ -19,9 +19,13 @@ set(PLUGIN_SRCS
     cxImportExportGuiExtenderService.h
     cxImportExportGuiExtenderService.cpp
 
+    gui/cxExportWidget.h
     gui/cxExportWidget.cpp
+    gui/cxImportWidget.h
     gui/cxImportWidget.cpp
+    gui/cxExportDataTypeWidget.h
     gui/cxExportDataTypeWidget.cpp
+    gui/cxImportDataTypeWidget.h
     gui/cxImportDataTypeWidget.cpp
 
     filereaderwriters/cxMetaImageReader.h

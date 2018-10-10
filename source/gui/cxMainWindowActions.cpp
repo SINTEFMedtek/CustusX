@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopServices>
+#include <QDockWidget>
+#include <QAction>
 
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
@@ -37,6 +39,7 @@
 #include "cxFileHelpers.h"
 #include "cxFileManagerService.h"
 #include "cxFileReaderWriterService.h"
+#include "cxApplication.h"
 
 namespace cx
 {
@@ -315,48 +318,28 @@ void MainWindowActions::importDataSlot()
 {
 	this->savePatientFileSlot();
 
-	QString folder = mLastImportDataFolder;
-	if (folder.isEmpty())
-		folder = profile()->getSessionRootFolder();
-
-	//TODO --------------------------------------------------
-	// START - Move to function
-	std::vector<FileReaderWriterServicePtr> mesh_readers = mServices->file()->getImportersForDataType("mesh");
-	std::vector<FileReaderWriterServicePtr> image_readers = mServices->file()->getImportersForDataType("image");
-	std::vector<FileReaderWriterServicePtr> point_metric_readers = mServices->file()->getImportersForDataType("pointMetric");
-	std::vector<FileReaderWriterServicePtr> readers;
-	readers.insert( readers.end(), mesh_readers.begin(), mesh_readers.end() );
-	readers.insert( readers.end(), image_readers.begin(), image_readers.end() );
-	readers.insert( readers.end(), point_metric_readers.begin(), point_metric_readers.end() );
-
-	QString file_type_filter = "Image/Mesh/PointMetrics (";
-	for(int i=0; i<readers.size(); ++i)
+	QDockWidget* importDockWidget = findMainWindowChildWithObjectName<QDockWidget*>("import_widgetDockWidget");
+	if(!importDockWidget)
 	{
-		QString suffix = readers[i]->getFileSuffix();
-		if(!suffix.isEmpty())
-		file_type_filter.append("*."+suffix+" ");
-	}
-	while(file_type_filter.endsWith( ' ' ))
-		file_type_filter.chop(1);
-	file_type_filter.append(")");
-	CX_LOG_DEBUG() << "IMPORT FILTER: " << file_type_filter;
-	// END - Move to function
-	//TODO --------------------------------------------------
-
-	//QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")), folder, tr("Image/Mesh (*.mhd *.mha *.nii *.stl *.vtk *.vtp *.mnc *.png)"));
-	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")), folder, tr(file_type_filter.toStdString().c_str()));
-	if (fileName.empty())
-	{
-		report("Import canceled");
+		CX_LOG_ERROR() << "Cannot find DockWidget for ImportWidget";
 		return;
 	}
 
-	mLastImportDataFolder = QFileInfo(fileName[0]).absolutePath();
+	importDockWidget->show();
+	importDockWidget->raise();
 
-	for (int i=0; i<fileName.size(); ++i)
+	QWidget* widget = findMainWindowChildWithObjectName<QWidget*>("import_widget");
+	if(!widget)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mServices->patient(), mServices->view(), fileName[i], this->parentWidget());
-		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+		CX_LOG_ERROR() << "Cannot find ImportWidget";
+		return;
+	}
+
+	QList<QAction*> actions = widget->actions();
+	foreach(QAction* action, actions)
+	{
+		if(action->text().contains("AddMoreFilesButtonClickedAction"))
+			action->trigger();
 	}
 }
 

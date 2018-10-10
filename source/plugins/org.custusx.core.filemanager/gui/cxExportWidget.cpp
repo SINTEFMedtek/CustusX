@@ -14,7 +14,7 @@ namespace cx
 {
 
 ExportWidget::ExportWidget(FileManagerServicePtr filemanager, VisServicesPtr services) :
-	BaseWidget(NULL, "ExportDataWidget", "Export Data"),
+	BaseWidget(NULL, "export_data_widget", "Export Data"),
 	mFileManager(filemanager),
 	mVisServices(services)
 {	
