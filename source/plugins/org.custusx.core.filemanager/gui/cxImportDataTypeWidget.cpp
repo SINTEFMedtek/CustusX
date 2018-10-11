@@ -18,6 +18,7 @@
 #include "cxVolumeHelpers.h"
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
+#include "cxViewService.h"
 
 namespace cx
 {
@@ -193,11 +194,12 @@ void ImportDataTypeWidget::updateParentCandidatesComboBox()
 
 void ImportDataTypeWidget::importAllData()
 {
-	for(int i=0; i<mData.size(); ++i)
+	for(unsigned i=0; i<mData.size(); ++i)
 	{
 		if(mData[i])
 		{
 			mServices->patient()->insertData(mData[i]);
+			mServices->view()->autoShowData(mData[i]);
 		}
 	}
 }

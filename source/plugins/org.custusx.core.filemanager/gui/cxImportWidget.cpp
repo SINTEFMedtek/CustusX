@@ -17,6 +17,7 @@
 #include "cxPatientModelService.h"
 #include "cxProfile.h"
 #include "cxImportDataTypeWidget.h"
+#include "cxSessionStorageService.h"
 
 namespace cx
 {
@@ -159,10 +160,7 @@ void ImportWidget::importButtonClicked()
 	emit readyToImport();
 	emit finishedImporting();
 
-	//TODO:
-	//should trigger:
-	//	autosave
-	//	autoshow
+	mVisServices->session()->save();//AutoSave
 }
 
 void ImportWidget::cancelButtonClicked()
