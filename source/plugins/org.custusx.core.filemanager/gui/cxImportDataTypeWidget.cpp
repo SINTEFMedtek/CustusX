@@ -19,12 +19,14 @@
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxViewService.h"
+#include "cxImportWidget.h"
 
 namespace cx
 {
 
-ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename) :
+ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
+	mImportWidget(parent),
 	mServices(services),
 	mData(data),
 	mParentCandidates(parentCandidates),
@@ -132,6 +134,15 @@ ImportDataTypeWidget::ImportDataTypeWidget(QWidget *parent, VisServicesPtr servi
 
 	groupBox->setLayout(gridLayout);
 	topLayout->addWidget(groupBox);
+
+	connect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
+	connect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
+}
+
+ImportDataTypeWidget::~ImportDataTypeWidget()
+{
+	disconnect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
+	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()

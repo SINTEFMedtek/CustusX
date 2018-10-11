@@ -17,11 +17,14 @@ class QTableWidget;
 namespace cx
 {
 
+class ImportWidget;
+
 class org_custusx_core_filemanager_EXPORT ImportDataTypeWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	ImportDataTypeWidget(QWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename);
+	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename);
+	~ImportDataTypeWidget();
 
 public slots:
 	void update();
@@ -46,6 +49,7 @@ private:
 	//Use heuristics to guess a parent frame, based on similarities in name.
 	QString getInitialGuessForParentFrame() const;
 
+	ImportWidget* mImportWidget;
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
 	std::vector<DataPtr> &mParentCandidates;

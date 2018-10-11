@@ -148,9 +148,7 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 		this->readFilesAndGenerateParentCandidates();
 
-		widget = new ImportDataTypeWidget(NULL, mVisServices, newData, mParentCandidates, filename);
-		connect(this, &ImportWidget::readyToImport, widget, &ImportDataTypeWidget::prepareDataForImport);
-		connect(this, &ImportWidget::parentCandidatesUpdated, widget, &ImportDataTypeWidget::update);
+		widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
 		mStackedWidget->insertWidget(index, widget);
 	}
 }
@@ -212,6 +210,7 @@ void ImportWidget::cleanUpAfterImport()
 	{
 		QWidget *widgetToRemove = mStackedWidget->widget(i);
 		mStackedWidget->removeWidget(widgetToRemove);
+		delete widgetToRemove;
 	}
 }
 
