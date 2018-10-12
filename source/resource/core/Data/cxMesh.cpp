@@ -448,6 +448,7 @@ bool Mesh::isFiberBundle() const
 void Mesh::save(const QString& basePath, FileManagerServicePtr fileManager)
 {
 	QString filename = basePath + "/Images/" + this->getUid() + ".vtk";
+	this->setFilename(QDir(basePath).relativeFilePath(filename));
 	MeshPtr self = MeshPtr(this, null_deleter());
 	fileManager->save(self, filename);
 
