@@ -86,7 +86,7 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 	mTableWidget->selectRow(mSelectedIndexInTable);
 	QString status;
 	bool allDataOk = true;
-	for(int i=0; i<data.size(); ++i)
+	for(unsigned i=0; i<data.size(); ++i)
 	{
 		if(!data[i])
 			allDataOk = false;
@@ -146,11 +146,11 @@ void ImportWidget::addMoreFilesButtonClicked()
 		std::vector<DataPtr> newData = mFileManager->read(filename);
 		int index = this->insertDataIntoTable(filename, newData);
 
-		this->readFilesAndGenerateParentCandidates();
-
 		widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
 		mStackedWidget->insertWidget(index, widget);
 	}
+
+	this->readFilesAndGenerateParentCandidates();
 }
 
 void ImportWidget::importButtonClicked()
@@ -256,7 +256,7 @@ QString ImportWidget::generateFileTypeFilter() const
 std::vector<DataPtr> ImportWidget::generateParentCandidates(std::vector<DataPtr> notLoadedData) const
 {
 	std::vector<DataPtr> parentCandidates;
-	for(int i=0; i<notLoadedData.size(); ++i)
+	for(unsigned i=0; i<notLoadedData.size(); ++i)
 	{
 		if(notLoadedData[i]->getType() != "pointMetric")
 			parentCandidates.push_back(notLoadedData[i]);

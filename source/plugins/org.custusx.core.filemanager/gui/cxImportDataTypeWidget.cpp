@@ -61,7 +61,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
 
 	QString type, name;
-	for(int i=0; i<mData.size(); ++i)
+	for(unsigned i=0; i<mData.size(); ++i)
 	{
 		type = mData[i]->getType();
 		name = mData[i]->getName();
@@ -148,7 +148,7 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
 {
 	std::map<QString, QString> parentCandidates;
-	for(int i=0; i<mParentCandidates.size(); ++i)
+	for(unsigned i=0; i<mParentCandidates.size(); ++i)
 	{
 		parentCandidates[mParentCandidates[i]->getName()] = mParentCandidates[i]->getUid();
 	}
