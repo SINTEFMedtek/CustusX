@@ -9,7 +9,7 @@ Learn how to load a volume and view it in 2D and 3D.
 2. Start CustusX
 3. Create a new Patient: `File->New Patient` or `<Ctrl+N>`
 4. Import a data set into the Patient: `File->Import Data` or `<Ctrl+I>`. Browse to your .mhd file and press Open. 
-   Press OK in the Import Dialog. The data set is now available in CustusX.
+   This opens ths Import widget (\ref import_widget). Enter correct parameters and press Import. The data set is now available in CustusX.
 5. Right-click in the 3D View. On the top of the popup menu you should see your imported data set. Select it. 
    The volume will now be displayed in 3D.
 6. Press the mouse button and move inside the 3D View. The volume rotates. Pressing Shift at the same time translates it.
