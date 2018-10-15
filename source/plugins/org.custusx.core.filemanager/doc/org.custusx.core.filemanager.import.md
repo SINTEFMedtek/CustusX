@@ -1,19 +1,16 @@
-Core File Manager Plugin {#org_custusx_core_filemanager}
-===================
-
 Import Overview {#import_overview}
 ===========================================================
 
 \addindex import_widget
 Import Widget {#import_widget}
------------------------------------------------------------
+===========================================================
 Import is performed in 3 steps:
 1. Add one or multiple files that are to be imported `<Ctrl+I>`.
 2. Enter correct parameters for all files.
 3. Press import button.
 
 Import file types {#import_file_types}
------------------------------------------------------------
+===========================================================
 
 CustusX can import the following data types from file.
 
