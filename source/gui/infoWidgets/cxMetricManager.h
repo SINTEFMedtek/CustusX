@@ -47,7 +47,6 @@ public:
 	QString getActiveUid() const { return mActiveLandmark; }
 	void exportMetricsToXMLFile(QString& filename);
 	void importMetricsFromXMLFile(QString& filename);
-	void importMetricsFromMNITagFile(QString& filename, bool testmode=false); ///< Note: testmode is available to skip dialog popup for running automatic tests
 	PointMetricPtr addPoint(Vector3D point, CoordinateSystem space=CoordinateSystem(csREF), QString uid="point%1",  QColor color = QColor(240, 170, 255, 255));
 	DistanceMetricPtr addDistance(QString uid = "distance%1");
 
@@ -68,8 +67,15 @@ public slots:
     void addCustomButtonClickedSlot();
 	void addROIButtonClickedSlot();
 
+protected:
+    struct ImportMNIuserSettings {
+        std::vector<QString> imageRefs;
+        PATIENT_COORDINATE_SYSTEM coordSys;
+    };
+    ImportMNIuserSettings mUserSettings;
+
 private:
-	void setManualToolPosition(Vector3D p_r);
+    void setManualToolPosition(Vector3D p_r);
 	std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
 	std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
 	void installNewMetric(DataMetricPtr metric);
@@ -87,6 +93,8 @@ private:
 	FileManagerServicePtr mFileManager;
 	//QColor getRandomColor();
 	//std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
+	QColor getRandomColor();
+    ImportMNIuserSettings dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
 	void resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data);
 };
 

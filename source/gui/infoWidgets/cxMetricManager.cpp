@@ -59,7 +59,11 @@ MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr 
 	mFileManager(filemanager)
 {
 	connect(trackingService.get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
-	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
+	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));    
+
+    mUserSettings.coordSys = pcsRAS;
+    mUserSettings.imageRefs.push_back("");
+    mUserSettings.imageRefs.push_back("");
 }
 
 DataMetricPtr MetricManager::getMetric(QString uid)
@@ -498,61 +502,8 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 	}
 }
 
-/*
-QColor MetricManager::getRandomColor()
-{
-	QStringList colorNames = QColor::colorNames();
-	int random_int = rand() % colorNames.size();
-	QColor color(colorNames[random_int]);
-	if(color == QColor("black"))
-		color = getRandomColor();
 
-	return color;
-}
-*/
 
-/*
-std::vector<QString> MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes, QString description)
-{
-
-	std::vector<QString> data_uid;
-
-	QDialog selectVolumeDialog;
-	selectVolumeDialog.setWindowTitle("Select volume(s) related to points in MNI Tag Point file.");
-
-	QVBoxLayout *layout = new QVBoxLayout();
-	QLabel *description_label = new QLabel(description);
-	layout->addWidget(description_label);
-
-	std::map<int, StringPropertySelectImagePtr> selectedImageProperties;
-	for(int i=0; i < number_of_volumes; ++i)
-	{
-		StringPropertySelectImagePtr image_property = StringPropertySelectImage::New(mPatientModelService);
-		QWidget *widget = createDataWidget(mViewService, mPatientModelService, NULL, image_property);
-		layout->addWidget(widget);
-		selectedImageProperties[i] = image_property;
-	}
-
-	QPushButton *okButton = new QPushButton(tr("Ok"));
-	layout->addWidget(okButton);
-	connect(okButton, &QAbstractButton::clicked, &selectVolumeDialog, &QWidget::close);
-	selectVolumeDialog.setLayout(layout);
-	selectVolumeDialog.exec();
-	for(int i=0; i < number_of_volumes; ++i)
-	{
-		StringPropertySelectImagePtr image_property = selectedImageProperties[i];
-		data_uid.push_back(image_property->getValue());
-	}
-	return data_uid;
-}
-*/
-
-void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode)
-{
-	std::vector<DataPtr> data = mFileManager->read(filename);
-	for(int i=0; i<data.size(); ++i)
-		mPatientModelService->insertData(data[i]);
-}
 
 DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 {
