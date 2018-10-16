@@ -112,22 +112,18 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 			for(int j=0; j < number_of_points; ++j)
 			{
 				vtkStdString label = labels->GetValue(j);
-				name = QString(*label); //NB: name never used, using j+1 as name to be able to correlate two sets of points from MNI import
-				//TODO is this still needed?
-				//QString uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
+                name = QString::fromStdString(label);
+                if(name.isEmpty() || (name == QString(" ")) ) // if no name label is given in .tag file, metric name is set to continous numbering
+                    name = QString::number(j+1);
 
 				double *point = points->GetPoint(j);
-				//DataPtr data = this->createData(type, uid, QString::number(j+1));
-				DataPtr data_point_metric = this->createData(type, filename, QString::number(j+1));
+                DataPtr data_point_metric = this->createData(type, filename, name);
 				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data_point_metric);
 
-				CoordinateSystem space(csDATA, mVolumeUids[i]);
-				Vector3D vector_ras(point[0], point[1], point[2]);
+                // TODO: Should probably be a GUI selecter for type of coordinate system (REFERENCE/DATA...)
+                CoordinateSystem space(csREF, mVolumeUids[i]);
+                Vector3D vector_lps(point[0], point[1], point[2]);
 				//CX_LOG_DEBUG() << "POINTS: " << vector_ras;
-
-				//Convert from RAS (MINC) to LPS (CX)
-				Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-				Vector3D vector_lps = sMr.inv() * vector_ras;
 
 				point_metric->setCoordinate(vector_lps);
 				point_metric->setSpace(space);
