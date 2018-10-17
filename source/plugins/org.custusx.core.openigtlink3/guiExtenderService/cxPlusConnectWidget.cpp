@@ -32,16 +32,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxCheckBoxWidget.h"
 #include "cxFilePreviewWidget.h"
 
-#define START_TEXT "Start PLUS server and connect tracking and streaming"
-#define STOP_TEXT "Stop PLUS server and disconnect tracking and streaming"
+#define START_TEXT "Start PlusServer and connect tracking and streaming"
+#define STOP_TEXT "Stop PlusServer and disconnect tracking and streaming"
 
 namespace cx
 {
 PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
-  BaseWidget(parent, "plus_connect_widget" ,"Connect to PLUS"),
+	BaseWidget(parent, "plus_connect_widget" ,"Connect to PlusServer"),
   mServices(services),
 	mPlusRunning(false),
-	mExternalProcess(new ProcessWrapper("PLUS")),
+	mExternalProcess(new ProcessWrapper("Plus")),
 	mFilePreviewWidget(NULL),
 	mPlusPathComboBox(NULL)
 {
@@ -52,15 +52,15 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 //	layout->setMargin(0);
 	int line = 0;
 
-	// PLUS path
+	// PlusServer path
 	mPlusPath = settings()->value("plus/Path").toString();
 	if(!QFile::exists(mPlusPath))
 		this->searchForPlus();
 
-	QLabel* plusPathLabel = new QLabel(tr("PLUS path:"));
+	QLabel* plusPathLabel = new QLabel(tr("PlusServer path:"));
 	mPlusPathComboBox = new QComboBox();
 	mPlusPathComboBox->addItem(mPlusPath);
-	QAction* browsePlusPathAction = new QAction(QIcon(":/icons/open.png"), tr("Browse for PLUS..."), this);
+	QAction* browsePlusPathAction = new QAction(QIcon(":/icons/open.png"), tr("Browse for PlusServer..."), this);
 	connect(browsePlusPathAction, &QAction::triggered, this, &PlusConnectWidget::browsePlusPathSlot);
 	QToolButton* browsePlusPathButton = new QToolButton(this);
 	browsePlusPathButton->setDefaultAction(browsePlusPathAction);
@@ -70,18 +70,18 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 	layout->addWidget(browsePlusPathButton, line, 2);
 	++line;
 
-	layout->addWidget(new QLabel("PLUS config File:", this), line, 0);
+	layout->addWidget(new QLabel("Plus config File:", this), line, 0);
 	mPlusConfigFileWidget = new FileSelectWidget(this);
 	mPlusConfigFileWidget->setNameFilter(QStringList("*.xml"));
 	mPlusConfigFileWidget->setPaths(this->getPlusConfigFilePaths());
-	mPlusConfigFileWidget->setFilename("Select PLUS config file...");
+	mPlusConfigFileWidget->setFilename("Select Plus config file...");
 	connect(mPlusConfigFileWidget, &FileSelectWidget::fileSelected, this, &PlusConnectWidget::configFileFileSelected);
 	layout->addWidget(mPlusConfigFileWidget, line, 1, 1, 2);
 	++line;
 
 
 	mShowPlusOutput = BoolProperty::initialize("showPlusOutput",
-		"Show PLUS output",
+		"Show PlusServer output",
 		"Display all output from PlusServer",
 		false);
 	layout->addWidget(new CheckBoxWidget(this, mShowPlusOutput), line, 0, 1, 3);
@@ -116,7 +116,7 @@ void PlusConnectWidget::searchForPlus()
 
 	if(QFile::exists(possiblePath))
 	{
-		CX_LOG_DEBUG() << "Found PLUS in: " << possiblePath;
+		CX_LOG_DEBUG() << "Found PlusServer in: " << possiblePath;
 		mPlusPath = possiblePath;
 	}
 }
@@ -137,7 +137,7 @@ void PlusConnectWidget::searchForPlusConfigFile()
 
 	if(QFile::exists(possiblePath))
 	{
-		CX_LOG_DEBUG() << "Found PLUS config file in: " << possiblePath;
+		CX_LOG_DEBUG() << "Found Plus config file in: " << possiblePath;
 		mPlusConfigFile = possiblePath;
 	}
 }
@@ -145,7 +145,7 @@ void PlusConnectWidget::searchForPlusConfigFile()
 void PlusConnectWidget::browsePlusPathSlot()
 {
 	QFileInfo fileInfo(mPlusPath);
-	mPlusPath = QFileDialog::getOpenFileName(this, tr("Find PLUS executable"), fileInfo.absolutePath());
+	mPlusPath = QFileDialog::getOpenFileName(this, tr("Find PlusServer executable"), fileInfo.absolutePath());
 
 	if(!mPlusPath.isEmpty())
 	{
@@ -169,25 +169,25 @@ void PlusConnectWidget::connectButtonClickedSlot()
 {
 	if(mPlusRunning)
 	{
-		CX_LOG_INFO() << "Stopping PLUS server and disconnecting";
+		CX_LOG_INFO() << "Stopping PlusServer and disconnecting";
 		if(this->stopPlus())
 		{
 			mConnectButton->setText(START_TEXT);
 			mPlusRunning = false;
 		}
 		else
-			CX_LOG_WARNING() << "Failed to stop/disconnect PLUS server";
+			CX_LOG_WARNING() << "Failed to stop/disconnect PlusServer";
 	}
 	else
 	{
-		CX_LOG_INFO() << "Starting PLUS server and connecting";
+		CX_LOG_INFO() << "Starting PlusServer and connecting";
 		if(this->startPlus())
 		{
 			mConnectButton->setText(STOP_TEXT);
 			mPlusRunning = true;
 		}
 		else
-			CX_LOG_WARNING() << "Failed to start/connect PLUS server";
+			CX_LOG_WARNING() << "Failed to start/connect PlusServer";
 	}
 }
 bool PlusConnectWidget::stopPlus()
@@ -239,7 +239,7 @@ void PlusConnectWidget::plusAppStateChanged()
 {
 	if(mExternalProcess->getProcess()->state() == QProcess::Starting)
 	{
-		mConnectButton->setText("PLUS starting...");
+		mConnectButton->setText("PlusServer starting...");
 		return;
 	}
 
@@ -267,7 +267,7 @@ bool PlusConnectWidget::startExternalPlusServer()
 
 	arguments << QString("--config-file=").append(mPlusConfigFile);
 
-	//Show PLUS output
+	//Show Plus output
 	if(mShowPlusOutput->getValue())
 	{
 		QProcess *process = mExternalProcess->getProcess();
@@ -277,7 +277,7 @@ bool PlusConnectWidget::startExternalPlusServer()
 	}
 	else
 	{
-		//Turn off PLUS Warnings if PLUS output is disabled
+		//Turn off Plus Warnings if Plus output is disabled
 		arguments << QString("--verbose=1");
 	}
 
