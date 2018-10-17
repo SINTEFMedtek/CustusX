@@ -39,13 +39,11 @@ public:
 
 	RegistrationServicePtr registration() { return registrationService; }
 	AcquisitionServicePtr acquisition() { return acquisitionService; }
-	FileManagerServicePtr file() { return filemanagerService; }
 
 protected:
 	RegServices();
 	RegistrationServicePtr registrationService;
 	AcquisitionServicePtr acquisitionService;
-	FileManagerServicePtr filemanagerService;
 };
 
 }

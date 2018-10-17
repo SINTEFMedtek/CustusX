@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxRegistrationServiceProxy.h"
 #include "cxViewServiceProxy.h"
 #include "cxAcquisitionServiceProxy.h"
-#include "cxFileManagerServiceProxy.h"
 
 namespace cx {
 
@@ -28,7 +27,6 @@ RegServices::RegServices(ctkPluginContext* context) :
 {
 	registrationService	 = RegistrationServicePtr(new RegistrationServiceProxy(context));
 	acquisitionService	 = AcquisitionServicePtr(new AcquisitionServiceProxy(context));
-	filemanagerService = FileManagerServiceProxy::create(context);//FileManagerServicePtr(new FileManagerServiceProxy(context));
 }
 
 RegServicesPtr RegServices::getNullObjects()
