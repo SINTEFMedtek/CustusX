@@ -30,7 +30,7 @@ Connect to a remote system using the OpenIGTLink protocol, and send/receive
 volume and model data.<br>
 This widget is intended primarily for exchanging images and volumes, and has been
 tested towards [Slicer3D](https://www.slicer.org).
-See <http://www.openigtlink.org> for details on the protocol. 
+See <http://www.openigtlink.org> for details on the protocol.
 
 Connection:
 - Role: Choose client/server role in the connection, usually client.
@@ -54,10 +54,12 @@ Widget for connecting to PLUS easily.
 - Select a PLUS config file. This file must correspond to the CustusX tool file.
 - Use the `Show PLUS output` checkbox to show command line output from PlusServer in the console.
 
-Creating PLUS config files and matching CustusX tool config files
+Creating PLUS config files and matching CustusX tool config files {#using_plus_config_files_with_custusx}
 -----------------------------------------------------------
-- The `Transform Name` in the transform messages from PLUS (sent as deviceName in transform OpenIGTLink messages) must correspond to the `openigtlinktransformid` tag in the CustusX tool config file.
-- The deviceName in Image OpenIGTLink messages must correspond to the `openigtlinkimageid` tag in the CustusX tool config file. These are in PLUS created as a combination of `Image Name` and `EmbeddedTransformToFrame`, with an underscore `_` between.
+- The *Transform Name* in the transform messages from PLUS (sent as *deviceName* in transform OpenIGTLink messages)
+must correspond to the **openigtlinktransformid** tag in the CustusX tool config file.
+- The *deviceName* in Image OpenIGTLink messages must correspond to the **openigtlinkimageid** tag in the CustusX tool config file.
+These are in PLUS created as a combination of **Image Name** and **EmbeddedTransformToFrame**, with an underscore `_` between.
 
 
 Known issues
