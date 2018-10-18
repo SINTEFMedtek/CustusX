@@ -45,7 +45,7 @@ vtkImageDataPtr MetaImageReader::loadVtkImageData(QString filename)
 }
 
 MetaImageReader::MetaImageReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("MetaImageReader", "image", "image", "mhd", patientModelService)
+	FileReaderWriterImplService("MetaImageReader", DATATYPE_IMAGE, DATATYPE_IMAGE, "mhd", patientModelService)
 {
 }
 
@@ -62,7 +62,7 @@ bool MetaImageReader::canRead(const QString &type, const QString &filename)
 
 QString MetaImageReader::canReadDataType() const
 {
-	return "image";
+	return DATATYPE_IMAGE;
 }
 
 bool MetaImageReader::readInto(DataPtr data, QString filename)
@@ -181,7 +181,7 @@ void MetaImageReader::write(DataPtr data, const QString& filename)
 
 QString cx::MetaImageReader::canWriteDataType() const
 {
-	return "image";
+	return DATATYPE_IMAGE;
 }
 
 bool cx::MetaImageReader::canWrite(const QString &type, const QString &filename) const

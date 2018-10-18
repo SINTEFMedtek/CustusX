@@ -25,7 +25,7 @@ namespace cx
 {
 
 StlMeshReader::StlMeshReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("StlMeshReader", "mesh", "mesh", "stl", patientModelService)
+	FileReaderWriterImplService("StlMeshReader", DATATYPE_MESH, DATATYPE_MESH, "stl", patientModelService)
 {
 }
 
@@ -102,7 +102,7 @@ void StlMeshReader::write(DataPtr data, const QString &filename)
 
 QString cx::StlMeshReader::canWriteDataType() const
 {
-	return "mesh";
+	return DATATYPE_MESH;
 }
 
 bool cx::StlMeshReader::canWrite(const QString &type, const QString &filename) const

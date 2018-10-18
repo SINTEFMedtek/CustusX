@@ -78,7 +78,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		name = mData[i]->getName();
 		QString space = mData[i]->getSpace();
 		//create point metric groups
-		if(type == "pointMetric")
+		if(type == DATATYPE_POINT_METRIC)
 		{
 			space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
 			(mPointMetricGroups[space]).push_back(mData[i]);

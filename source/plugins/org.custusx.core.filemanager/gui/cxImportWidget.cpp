@@ -41,9 +41,9 @@ namespace cx
 
 ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisServicesPtr services) :
 	BaseWidget(NULL, "import_widget", "Import"),
+	mSelectedIndexInTable(0),
 	mFileManager(filemanager),
-	mVisServices(services),
-	mSelectedIndexInTable(0)
+	mVisServices(services)
 {
 	//see https://wiki.qt.io/How_to_Use_QTableWidget
 	mTableWidget = new QTableWidget();
@@ -242,16 +242,16 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 QString ImportWidget::generateFileTypeFilter() const
 {
 	QString file_type_filter;
-	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType("mesh");
-	std::vector<FileReaderWriterServicePtr> image_readers = mVisServices->file()->getImportersForDataType("image");
-	std::vector<FileReaderWriterServicePtr> point_metric_readers = mVisServices->file()->getImportersForDataType("pointMetric");
+	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType(DATATYPE_MESH);
+	std::vector<FileReaderWriterServicePtr> image_readers = mVisServices->file()->getImportersForDataType(DATATYPE_IMAGE);
+	std::vector<FileReaderWriterServicePtr> point_metric_readers = mVisServices->file()->getImportersForDataType(DATATYPE_POINT_METRIC);
 	std::vector<FileReaderWriterServicePtr> readers;
 	readers.insert( readers.end(), mesh_readers.begin(), mesh_readers.end() );
 	readers.insert( readers.end(), image_readers.begin(), image_readers.end() );
 	readers.insert( readers.end(), point_metric_readers.begin(), point_metric_readers.end() );
 
 	file_type_filter = "Image/Mesh/PointMetrics (";
-	for(int i=0; i<readers.size(); ++i)
+	for(unsigned i=0; i<readers.size(); ++i)
 	{
 		QString suffix = readers[i]->getFileSuffix();
 		if(!suffix.isEmpty())
@@ -269,7 +269,7 @@ std::vector<DataPtr> ImportWidget::generateParentCandidates(std::vector<DataPtr>
 	std::vector<DataPtr> parentCandidates;
 	for(unsigned i=0; i<notLoadedData.size(); ++i)
 	{
-		if(notLoadedData[i]->getType() != "pointMetric")
+		if(notLoadedData[i]->getType() != DATATYPE_POINT_METRIC)
 			parentCandidates.push_back(notLoadedData[i]);
 	}
 	std::map<QString, DataPtr> loadedData = mVisServices->patient()->getDatas();

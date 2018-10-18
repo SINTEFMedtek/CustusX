@@ -43,7 +43,7 @@ ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, 
 {
 	this->setToolTip("Mesh properties");
 
-	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), DATATYPE_MESH);
 	activeMeshProperty->setValueName("Active Mesh");
 
 	QVBoxLayout* layout = new QVBoxLayout(this);

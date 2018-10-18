@@ -142,7 +142,7 @@ bool AirwaysFilter::preProcess()
 		return false;
 	}
 
-	if (inputImage->getType() != "image")
+	if (inputImage->getType() != DATATYPE_IMAGE)
 	{
 		CX_LOG_ERROR() << "Input data has to be an image";
 		return false;

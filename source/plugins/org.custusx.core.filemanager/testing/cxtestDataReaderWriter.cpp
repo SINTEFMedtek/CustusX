@@ -38,7 +38,7 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
    QString filename = "out.vtp";
    cx::LogicManager::initialize();
    cx::XMLPolyDataMeshReader *reader =  new cx::XMLPolyDataMeshReader(cx::LogicManager::getInstance()->getPluginContext());
-   REQUIRE(reader->canRead("mesh", filename));
+   REQUIRE(reader->canRead(DATATYPE_MESH, filename));
 
 
    // ------------- VTK -------------
@@ -115,7 +115,7 @@ TEST_CASE("Import point metrics from MNI Tag Point file", "[integration][metrics
 
 	//to avoid the popup we need to set the volume uids before the import
 	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
-	std::vector<cx::FileReaderWriterServicePtr> importers = filemanager->getImportersForDataType("pointMetric");
+	std::vector<cx::FileReaderWriterServicePtr> importers = filemanager->getImportersForDataType(DATATYPE_POINT_METRIC);
 	boost::shared_ptr<cx::MNIReaderWriter> mniImporter;
 	for(int i=0; i<importers.size(); ++i)
 	{

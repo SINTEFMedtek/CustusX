@@ -87,7 +87,7 @@ void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 }
 
 PolyDataMeshReader::PolyDataMeshReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("PolyDataMeshReader", "mesh", "mesh", "vtk", patientModelService)
+	FileReaderWriterImplService("PolyDataMeshReader", DATATYPE_MESH, DATATYPE_MESH, "vtk", patientModelService)
 {
 }
 
@@ -103,7 +103,7 @@ bool PolyDataMeshReader::canRead(const QString &type, const QString &filename)
 
 QString cx::PolyDataMeshReader::canWriteDataType() const
 {
-	return "mesh";
+	return DATATYPE_MESH;
 }
 
 bool cx::PolyDataMeshReader::canWrite(const QString &type, const QString &filename) const

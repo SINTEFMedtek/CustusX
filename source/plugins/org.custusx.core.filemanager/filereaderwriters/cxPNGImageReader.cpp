@@ -23,7 +23,7 @@ namespace cx
 {
 
 PNGImageReader::PNGImageReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("PNGImageReader" ,"image", "", "png", patientModelService)
+	FileReaderWriterImplService("PNGImageReader" ,DATATYPE_IMAGE, "", "png", patientModelService)
 {
 
 }

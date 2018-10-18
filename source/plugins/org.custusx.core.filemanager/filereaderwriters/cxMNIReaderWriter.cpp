@@ -37,7 +37,7 @@ namespace cx
 
 
 MNIReaderWriter::MNIReaderWriter(PatientModelServicePtr patientModelService, ViewServicePtr viewService) :
-	FileReaderWriterImplService("MNIReaderWriter", "pointMetric", "", "tag", patientModelService),
+	FileReaderWriterImplService("MNIReaderWriter", DATATYPE_POINT_METRIC, "", "tag", patientModelService),
 	mPatientModelServicePrivate(patientModelService),
 	mViewService(viewService)
 {
@@ -54,7 +54,7 @@ bool MNIReaderWriter::isNull()
 
 QString MNIReaderWriter::canReadDataType() const
 {
-	return "pointMetric";
+	return DATATYPE_POINT_METRIC;
 }
 
 bool MNIReaderWriter::canRead(const QString &type, const QString &filename)
@@ -105,7 +105,7 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 
 
 	//--- Create the point metrics
-	QString type = "pointMetric";
+	QString type = DATATYPE_POINT_METRIC;
 	//QString uid = "";
 	QString name = "";
 	vtkStringArray *labels = reader->GetLabelText();
@@ -182,7 +182,7 @@ bool MNIReaderWriter::readInto(DataPtr data, QString path)
 	}
 
 	//--- Create the point metrics
-	QString type = "pointMetric";
+	QString type = DATATYPE_POINT_METRIC;
 	//QString uid = "";
 	QString name = "";
 	vtkStringArray *labels = reader->GetLabelText();

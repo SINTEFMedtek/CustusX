@@ -70,7 +70,7 @@ DataPtr XMLPolyDataMeshReader::read(const QString& uid, const QString& filename)
 }
 
 XMLPolyDataMeshReader::XMLPolyDataMeshReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("XMLPolyDataMeshReader", "mesh", "", "vtp", patientModelService)
+	FileReaderWriterImplService("XMLPolyDataMeshReader", DATATYPE_MESH, "", "vtp", patientModelService)
 {
 }
 

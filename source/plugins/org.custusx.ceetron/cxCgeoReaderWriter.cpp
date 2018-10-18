@@ -22,7 +22,7 @@ namespace cx
 {
 
 CgeoReaderWriter::CgeoReaderWriter(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("CgeoReaderWriter", "", "mesh", "cgeo", patientModelService)
+	FileReaderWriterImplService("CgeoReaderWriter", "", DATATYPE_MESH, "cgeo", patientModelService)
 {
 }
 
@@ -117,7 +117,7 @@ void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 
 QString cx::CgeoReaderWriter::canWriteDataType() const
 {
-	return "mesh";
+	return DATATYPE_MESH;
 }
 
 bool cx::CgeoReaderWriter::canWrite(const QString &type, const QString &filename) const
