@@ -28,11 +28,11 @@ VideoServiceBackendPtr VideoServiceBackend::create(PatientModelServicePtr dataMa
 VideoServiceBackend::VideoServiceBackend(PatientModelServicePtr dataManager,
 							TrackingServicePtr trackingService,
 							SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager, ctkPluginContext* context) :
+	mContext(context),
 	mDataManager(dataManager),
 	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider),
-	mFileManagerService(filemanager),
-	mContext(context)
+	mFileManagerService(filemanager)
 {
 
 }
