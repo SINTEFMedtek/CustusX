@@ -357,10 +357,10 @@ void ImportDataTypeWidget::prepareDataForImport()
 
 	this->importAllData();
 
-	if(mShouldImportParentTransform->currentText().compare("Yes") == 0)
+	if(mShouldImportParentTransform->currentText() == "Yes")
 		this->applyParentTransformImport();
-    if(mAnatomicalCoordinateSystems->currentText().compare("RAS") != 0)
-        this->applyConversionLPS();
+	if(mAnatomicalCoordinateSystems->currentText() != "LPS")
+		this->applyConversionLPS();
 }
 
 void ImportDataTypeWidget::showEvent(QShowEvent *event)
