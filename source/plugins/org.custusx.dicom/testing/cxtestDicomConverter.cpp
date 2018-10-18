@@ -245,6 +245,8 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 
 	fixture.checkImagesEqual(referenceImage, referenceImage); //
 	fixture.checkImagesEqual(convertedImage, referenceImage);
+
+	cx::LogicManager::shutdown();
 }
 
 TEST_CASE("DicomConverter: Convert DICOM dataset from Radiology department - verify .mhd file is written",
@@ -288,6 +290,8 @@ TEST_CASE("DicomConverter: Convert DICOM dataset from Radiology department - ver
 	filemanager->save(convertedImage, fileName);
     // Verify that image file has been written
     REQUIRE(QFileInfo::exists(fileName));
+
+		cx::LogicManager::shutdown();
 }
 
 #ifdef CX_CUSTUS_SINTEF
