@@ -89,11 +89,9 @@ public:
 		checkImagesEqual(input1->getBaseVtkImageData(), input2->getBaseVtkImageData());
 	}
 
-	cx::ImagePtr loadImageFromFile(QString filename, QString uid)
+	cx::ImagePtr loadImageFromFile(cx::FileManagerServicePtr filemanager, QString filename, QString uid)
 	{
 		cx::ImagePtr image = cx::Image::create(uid,uid);
-		cx::LogicManager::initialize();
-		cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 		filemanager->readInto(image, filename);
 		//cx::DataReaderWriter().readInto(image, filename);
 		return image;
@@ -230,7 +228,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	converter.setDicomDatabase(db.data());
 	cx::ImagePtr convertedImage = converter.convertToImage(series);
 
-	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
+	cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
 	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
 
 	if (verbose)
@@ -336,6 +334,10 @@ TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration]
 
 TEST_CASE("DicomConverter: US data from SW, missing position data", "[integration][plugins][org.custusx.dicom]")
 {
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+
     //Transform matrix should be identity and not zero
     DicomConverterTestFixture fixture;
 
@@ -351,10 +353,12 @@ TEST_CASE("DicomConverter: US data from SW, missing position data", "[integratio
     converter.setDicomDatabase(db.data());
 
     cx::ImagePtr convertedImage = converter.convertToImage(series);
-    cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
+		cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
 
     fixture.checkImagesEqual(referenceImage, referenceImage); //
     fixture.checkImagesEqual(convertedImage, referenceImage);
+
+		cx::LogicManager::shutdown();
 }
 #endif
 
