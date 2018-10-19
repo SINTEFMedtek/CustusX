@@ -292,11 +292,11 @@ class Eigen(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:RLovelett/eigen.git'
+        return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
-        tag = '3.2.10'
+        tag = '3.3.5'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         pass
@@ -322,7 +322,8 @@ class OpenIGTLink(CppComponent):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08')
+#        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
+        self._getBuilder().gitCheckout('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
@@ -343,11 +344,11 @@ class OpenIGTLinkIO(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-#        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
-        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
+        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+#        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('7dc1ed862c3d6a8376157a212058bea87e5d74cd')
+        self._getBuilder().gitCheckout('ab439c20952efc5bac214d3486c5c2977b44b4f5')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -541,7 +542,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('56fa488c60f99e54c8550de2d585bd15453291dd')
+        self._getBuilder().gitCheckout('35560c25a6ef29a3b0abdedfb870e38f52d19ee9')
     def configure(self):
         pass
     def build(self):

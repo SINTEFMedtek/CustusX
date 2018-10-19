@@ -68,8 +68,15 @@ public slots:
     void addCustomButtonClickedSlot();
 	void addROIButtonClickedSlot();
 
+protected:
+    struct ImportMNIuserSettings {
+        std::vector<QString> imageRefs;
+        PATIENT_COORDINATE_SYSTEM coordSys;
+    };
+    ImportMNIuserSettings mUserSettings;
+
 private:
-	void setManualToolPosition(Vector3D p_r);
+    void setManualToolPosition(Vector3D p_r);
 	std::vector<DataPtr> refinePointArguments(std::vector<DataPtr> args, unsigned argNo);
 	std::vector<DataPtr> getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments=-1);
 	void installNewMetric(DataMetricPtr metric);
@@ -85,7 +92,7 @@ private:
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
 	QColor getRandomColor();
-	std::vector<QString> dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
+    ImportMNIuserSettings dialogForSelectingVolumesForImportedMNITagFile(int number_of_volumes, QString description);
 	void resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode, std::map<QString, QString> mapping_of_unknown_to_known_spaces, DataPtr data);
 };
 

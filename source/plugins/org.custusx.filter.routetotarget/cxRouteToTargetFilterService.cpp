@@ -38,9 +38,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services) :
-	FilterImpl(services)
-  , mTargetName("")
+RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile) :
+    FilterImpl(services),
+    mTargetName(""),
+    mGenerateFileWithRouteInformation(createRouteInformationFile)
 {
 }
 
@@ -137,6 +138,9 @@ bool RouteToTargetFilter::execute()
 		return false;
 
     mExtendedRoute = mRouteToTarget->findExtendedRoute(targetCoordinate_r);
+
+    if (mGenerateFileWithRouteInformation)
+        mRouteToTarget->addRouteInformationToFile(mServices);
 
 	return true;
 }
