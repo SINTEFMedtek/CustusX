@@ -24,7 +24,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxXmlOptionItem.h"
 #include "cxTimeKeeper.h"
-#include "cxDataReaderWriter.h"
 #include "cxUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"

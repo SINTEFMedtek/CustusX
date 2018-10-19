@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QWidget>
 #include <QFile>
 #include <QAction>
+#include <QDockWidget>
 
 #include <iostream>
 
@@ -135,5 +136,8 @@ void triggerMainWindowActionWithObjectName(QString actionName)
 
 template
 cxResource_EXPORT QWidget* findMainWindowChildWithObjectName(QString objectName);
+
+template
+cxResource_EXPORT QDockWidget* findMainWindowChildWithObjectName(QString objectName);
 
 } // namespace cx

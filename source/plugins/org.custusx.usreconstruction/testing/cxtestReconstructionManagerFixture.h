@@ -43,12 +43,15 @@ public:
 	void setVerbose(bool val) { mVerbose = val; }
 	bool getVerbose() const { return mVerbose; }
 
+	cx::FileManagerServicePtr getFileManagerService();
+
 private:
 	cx::UsReconstructionServicePtr mManager;
 	std::vector<cx::ImagePtr> mOutput; // valid after (threaded)reconstruct() has been run
 	bool mVerbose;
 	cx::PatientModelServicePtr mPatientModelService;
 	cx::ViewServicePtr mViewService;
+	cx::FileManagerServicePtr mFileManagerService;
 };
 
 

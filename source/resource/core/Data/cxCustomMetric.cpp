@@ -30,7 +30,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false), mDistanceMarkerVisibility(50)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
-    mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
+		mArguments->setValidArgumentTypes(QStringList() << DATATYPE_POINT_METRIC << DATATYPE_FRAME_METRIC);
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	connect(this, &CustomMetric::propertiesChanged, this, &CustomMetric::onPropertiesChanged);
 	mDefineVectorUpMethod = mDefineVectorUpMethods.table;
@@ -320,7 +320,7 @@ void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
 
 Vector3D CustomMetric::getScale() const
 {
-	if (!mScaleToP1 || !this->getModel() || this->getModel()->getType() == "image")
+	if (!mScaleToP1 || !this->getModel() || this->getModel()->getType() == DATATYPE_IMAGE)
 		return Vector3D::Ones();
 
 	DoubleBoundingBox3D bounds = this->getModel()->boundingBox();
@@ -550,7 +550,7 @@ bool CustomMetric::modelIsImage() const
 {
 	DataPtr model = this->getModel();
 
-	return (model && model->getType() == "image");
+	return (model && model->getType() == DATATYPE_IMAGE);
 }
 
 Transform3D CustomMetric::calculateRotation(Vector3D dir, Vector3D vup) const

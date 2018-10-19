@@ -118,14 +118,14 @@ public:
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param dataNode Data node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual bool load(QString path);
+	virtual bool load(QString path, FileManagerServicePtr filemanager);
 	virtual QString getType() const
 	{
 		return getTypeName();
 	}
 	static QString getTypeName()
 	{
-		return "image";
+		return DATATYPE_IMAGE;
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/volume.png");}
 
@@ -150,7 +150,7 @@ public:
 
 	vtkImageDataPtr resample(long maxVoxels);
 
-	virtual void save(const QString &basePath);
+	virtual void save(const QString &basePath, FileManagerServicePtr filemanager);
 
 	void startThresholdPreview(const Eigen::Vector2d& threshold);
 	void stopThresholdPreview();

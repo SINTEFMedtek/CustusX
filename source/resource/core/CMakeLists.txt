@@ -32,6 +32,14 @@ cx_add_class_qt_moc(cxResource_SOURCE
     Data/cxActiveImageProxy
     Data/cxTrackedStream
     Data/cxActiveData
+    Data/cxFileReaderWriterService
+    Data/cxFileReaderWriterServiceProxy
+    Data/cxFileReaderWriterServiceNull
+    Data/cxFileManagerService
+    Data/cxFileManagerServiceProxy
+    Data/cxFileManagerServiceNull
+    Data/cxFileManagerServiceBase.h
+    Data/cxFileManagerServiceBase.cpp
 
     Video/cxVideoSource.h
     Video/cxVideoRecorder
@@ -150,7 +158,7 @@ cx_add_class(cxResource_SOURCE
     Tool/cxTrackerConfigurationImpl
 
     Data/cxDataMetric
-    Data/cxDataReaderWriter
+    Data/cxErrorObserver
     Data/cxGPUImageBuffer
     Data/cxImageDefaultTFGenerator
     Data/cxImageParameters
@@ -277,6 +285,7 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
     Qt5::Sql
     Qt5::Concurrent
 	CTKPluginFramework
+	cxPluginUtilities
 	${VTK_LIBRARIES}
 	${OPENGL_LIBRARIES}
 )
@@ -285,7 +294,6 @@ set(CX_PRIVATE_RESOURCE_LIBRARIES
     ${CX_PRIVATE_RESOURCE_LIBRARIES}
     ${Boost_LIBRARIES}
 	${ITK_LIBRARIES}
-    cxPluginUtilities
 )
 if(CX_USE_OPENCL_UTILITY)
     cx_add_class(cxResource_SOURCE

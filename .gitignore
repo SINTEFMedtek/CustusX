@@ -26,3 +26,4 @@ org.custusx.log.qdebug.txt
 org.custusx.log.stdout.txt
 config/Logs/2015-01-19/org.custusx.log.plugin.txt
 config/Logs/
+*.orig

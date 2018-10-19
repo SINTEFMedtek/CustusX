@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxTime.h"
 #include <vtkImageMask.h>
+#include "cxFileManagerServiceProxy.h"
 
 typedef vtkSmartPointer<vtkImageMask> vtkImageMaskPtr;
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
@@ -104,7 +105,7 @@ TemporalCalibration::TemporalCalibration()
 	mMask = vtkImageDataPtr();
 }
 
-void TemporalCalibration::selectData(QString filename)
+void TemporalCalibration::selectData(QString filename, FileManagerServicePtr filemanager)
 {
   mFilename = filename;
   mFileData = USReconstructInputData();
@@ -112,7 +113,7 @@ void TemporalCalibration::selectData(QString filename)
   if (!QFileInfo(filename).exists())
     return;
 
-  UsReconstructionFileReader fileReader;
+  UsReconstructionFileReader fileReader(filemanager);
   mFileData = fileReader.readAllFiles(filename);
 
   if (!mFileData.mUsRaw)

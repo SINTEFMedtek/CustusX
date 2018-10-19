@@ -18,8 +18,7 @@ namespace cxtest{
 
 VisualizationHelper::VisualizationHelper()
 {
-	cx::LogicManager::initialize();
-	services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+	services = cxtest::TestVisServices::create();
 
 	cx::ViewPtr view = viewsFixture.addView(0, 0);
 
@@ -29,7 +28,6 @@ VisualizationHelper::VisualizationHelper()
 VisualizationHelper::~VisualizationHelper()
 {
 	services.reset();
-	cx::LogicManager::shutdown();
 }
 
 ViewWrapper2DFixture::ViewWrapper2DFixture(cx::ViewPtr view, cx::VisServicesPtr services) :

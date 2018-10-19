@@ -49,6 +49,8 @@ vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueR
 
 ViewsFixture::ViewsFixture(QString displayText)
 {
+	mFilemanager =  cx::FileManagerServicePtr(new cxtest::FileManagerServiceMock());
+
 	mServices = cxtest::TestVisServices::create();
 	mMessageListener = cx::MessageListener::createWithQueue();
 
@@ -66,9 +68,20 @@ ViewsFixture::ViewsFixture(QString displayText)
 ViewsFixture::~ViewsFixture()
 {
 	mWindow.reset();
-
 	mServices.reset();
+	mDataReaders.clear();
 	CHECK(!mMessageListener->containsErrors());
+}
+
+void ViewsFixture::addFileReaderWriter(cx::FileReaderWriterServicePtr service)
+{
+	mDataReaders.insert(service);
+	mFilemanager->addFileReaderWriter(service.get());
+}
+
+cxtest::PatientModelServiceMockPtr ViewsFixture::getPatientModelService()
+{
+	return boost::dynamic_pointer_cast<PatientModelServiceMock>(mServices->patient());
 }
 
 cx::DummyToolPtr ViewsFixture::dummyTool()
@@ -100,6 +113,7 @@ bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::Imag
 
 	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
 	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
+	REQUIRE(sharedOpenGLContext);
 	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
 	rep->setShaderPath(mShaderFolder);
 	rep->setSliceProxy(proxy);
@@ -137,7 +151,10 @@ cx::ImagePtr ViewsFixture::loadImage(const QString& imageFilename)
 {
 	QString filename = cxtest::Utilities::getDataRoot(imageFilename);
 	QString dummy;
-	cx::DataPtr data = mServices->patient()->importData(filename, dummy);
+	cx::DataPtr data = boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(mServices->patient())->importDataMock(filename, dummy, mFilemanager);
+	if (!data)
+		return cx::ImagePtr();
+
 	cx::ImagePtr image = boost::dynamic_pointer_cast<cx::Image>(data);
 	cx::Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
@@ -219,6 +236,11 @@ bool ViewsFixture::runWidget()
 {
 	mWindow->show();
 	return qApp->exec();
+}
+
+cx::FileManagerServicePtr ViewsFixture::getFileManager()
+{
+	return mFilemanager;
 }
 
 

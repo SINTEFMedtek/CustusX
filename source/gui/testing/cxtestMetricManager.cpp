@@ -3,8 +3,8 @@
 namespace cxtest
 {
 TestMetricManager::TestMetricManager(cx::ViewServicePtr viewService, cx::PatientModelServicePtr patientModelService,
-                   cx::TrackingServicePtr trackingService, cx::SpaceProviderPtr spaceProvider) :
-    cx::MetricManager(viewService, patientModelService, trackingService, spaceProvider)
+                   cx::TrackingServicePtr trackingService, cx::SpaceProviderPtr spaceProvider, cx::FileManagerServicePtr filemanager) :
+    cx::MetricManager(viewService, patientModelService, trackingService, spaceProvider, filemanager)
 {
 }
 

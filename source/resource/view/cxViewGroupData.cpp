@@ -262,7 +262,7 @@ bool dataTypeSort(const DataPtr data1, const DataPtr data2)
 
 int getPriority(DataPtr data)
 {
-	if (data->getType()=="mesh")
+	if (data->getType()==DATATYPE_MESH)
 		return 6;
 	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
 	if (metric)

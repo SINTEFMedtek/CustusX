@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sstream>
 
 #include <QtWidgets>
-
+#include "QVTKWidget.h"
 
 #include <vtkImageData.h>
 #include <vtkMetaImageReader.h>
@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkRendererCollection.h"
 
 #include "cxImage.h"
 #include "cxAxesRep.h"
@@ -35,20 +36,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDummyTool.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
-
-
-
 #include "cxViewsFixture.h"
 #include "catch.hpp"
 #include "cxtestRenderTester.h"
-
 #include "cxImageLUT2D.h"
-
-#include "QVTKWidget.h"
-#include "vtkRendererCollection.h"
 #include "cxtestUtilities.h"
 #include "cxDataLocations.h"
 #include "cxSettings.h"
+#include "cxMetaImageReader.h"
 
 
 using cx::Vector3D;
@@ -72,6 +67,10 @@ namespace
 void testACSWith3GPUVolumes()
 {
 	cxtest::ViewsFixture fixture;
+
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
+
 	ImageTestList imagenames;
 
 	for (unsigned i = 0; i < 3; ++i)
@@ -91,7 +90,7 @@ void testACSWith3GPUVolumes()
 } //namespace
 
 TEST_CASE("Visual rendering: Init view",
-		  "[unit][resource][visualization]")
+			"[integration][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
 	REQUIRE(true);
@@ -206,7 +205,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 }
 
 TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
-		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
+			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -219,9 +218,11 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 }
 
 TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
-		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
+			"[integration][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 1, 1);
@@ -243,7 +244,7 @@ TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show layout, clear, show new layout",
-		  "[unit][resource][visualization][not_win32][not_win64][hide]")
+			"[integration][resource][visualization][not_win32][not_win64][hide]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -281,9 +282,12 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 }
 
 TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
-		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
+			"[integration][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
+
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 0, 2);
@@ -300,9 +304,12 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
-		  "[unit][resource][visualization][not_win32][not_win64][not_mavericks]")
+			"[integration][resource][visualization][not_win32][not_win64][not_mavericks]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
+
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 0, 0);
@@ -319,9 +326,12 @@ TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 volumes",
-		  "[unit][resource][visualization]")
+			"[integration][resource][visualization]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
+
 	ImageTestList imagenames;
 
 	for (unsigned i = 0; i < 3; ++i)
@@ -340,7 +350,7 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes",
 
 //Tagged as unstable as it sometimes fail in Linux
 TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
-		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
+			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -379,7 +389,7 @@ TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
 
 //Tagged as unstable as it sometimes fail in Linux
 TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
-		  "[unit][resource][visualization][not_win32][not_win64][unstable]")
+			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
@@ -406,7 +416,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
-		  "[unit][resource][visualization]")
+			"[integration][resource][visualization]")
 {
 	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("optimizedViews", true);
@@ -415,7 +425,7 @@ TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, not optimized views",
-		  "[unit][resource][visualization]")
+			"[integration][resource][visualization]")
 {
 	cx::DataLocations::setTestMode();
 	cx::settings()->setValue("optimizedViews", false);

@@ -28,6 +28,7 @@ typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
 
 /**
 * \file
@@ -111,6 +112,7 @@ public:
   StateServicePtr getStateService();
   ViewServicePtr getViewService();
   SessionStorageServicePtr getSessionStorageService();
+  //FileManagerServicePtr getFileManagerService();
 
 private slots:
   void onRestartWithNewProfile(QString uid);
@@ -155,6 +157,8 @@ private:
 
 	PluginFrameworkManagerPtr mPluginFramework;
 	ApplicationComponentPtr mComponent;
+
+	bool mShutdown;
 };
 
 cxLogicManager_EXPORT LogicManager* logicManager(); // access the singleton
