@@ -49,14 +49,26 @@ public:
 	void checkCentroidDifferenceBelow(double val);
 	void checkMassDifferenceBelow(double val);
 
-	void saveNominalOutputToFile(QString filename);
-	void saveOutputToFile(QString filename);
+	void saveNominalOutputToFile(QString filename, cx::FileManagerServicePtr filemanager);
+	void saveOutputToFile(QString filename, cx::FileManagerServicePtr filemanager);
 
-	void setVerbose(bool val) { mVerbose = val; }
-	bool getVerbose() const { return mVerbose; }
-	cx::cxSyntheticVolumePtr getPhantom() { return mInputGenerator->getPhantom(); }
+	void setVerbose(bool val)
+	{
+		mVerbose = val;
+	}
+	bool getVerbose() const
+	{
+		return mVerbose;
+	}
+	cx::cxSyntheticVolumePtr getPhantom()
+	{
+		return mInputGenerator->getPhantom();
+	}
 
-	SyntheticReconstructInputPtr getInputGenerator() { return mInputGenerator; }
+	SyntheticReconstructInputPtr getInputGenerator()
+	{
+		return mInputGenerator;
+	}
 
 private:
 	void generateInput();

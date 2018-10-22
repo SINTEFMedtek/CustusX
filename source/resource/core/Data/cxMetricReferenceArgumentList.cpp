@@ -23,7 +23,7 @@ MetricReferenceArgumentList::MetricReferenceArgumentList(QStringList description
 {
 	mArgument.resize(descriptions.size());
 	mDescriptions = descriptions;
-	this->setValidArgumentTypes(QStringList() << "pointMetric");
+	this->setValidArgumentTypes(QStringList() << DATATYPE_POINT_METRIC);
 }
 
 void MetricReferenceArgumentList::setValidArgumentTypes(QStringList types)

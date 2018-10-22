@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxReporter.h"
 #include "cxSharedPointerChecker.h"
 #include "cxtestPatientModelServiceMock.h"
+#include "cxFileManagerService.h"
 
 
 /*

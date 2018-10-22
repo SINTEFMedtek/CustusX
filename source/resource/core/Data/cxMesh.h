@@ -59,14 +59,14 @@ public:
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
-	virtual bool load(QString path);
+	virtual bool load(QString path, FileManagerServicePtr filemanager);
 	virtual QString getType() const
 	{
 		return getTypeName();
 	}
 	static QString getTypeName()
 	{
-		return "mesh";
+		return DATATYPE_MESH;
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/surface.png");}
 
@@ -94,7 +94,7 @@ public:
 	const MeshPropertyData& getProperties() const;
 	const MeshTextureData& getTextureData() const;
 
-	virtual void save(const QString &basePath);
+	virtual void save(const QString &basePath, FileManagerServicePtr fileManager);
 signals:
 	void meshChanged();
 public slots:

@@ -16,17 +16,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFile>
 #include <QTextStream>
 #include <QDialog>
-#include <QInputDialog>
-#include <QVBoxLayout>
 #include <QPushButton>
-#include <QCheckBox>
-#include <QGroupBox>
-#include <QLabel>
-#include <QButtonGroup>
-#include <vtkMNITagPointReader.h>
-#include <vtkStringArray.h>
-#include "vtkForwardDeclarations.h"
-#include "cxDataReaderWriter.h"
+#include "vtkMNITagPointReader.h"
+#include "vtkStringArray.h"
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
 #include "cxPointMetric.h"
@@ -52,16 +44,19 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFileHelpers.h"
 #include "cxSpaceProperty.h"
 #include "cxSpaceEditWidget.h"
+#include "cxSelectDataStringProperty.h"
+#include "cxFileManagerService.h"
 
 namespace cx
 {
 
-MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider) :
+MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager) :
 	QObject(NULL),
 	mViewService(viewService),
 	mPatientModelService(patientModelService),
 	mTrackingService(trackingService),
-    mSpaceProvider(spaceProvider)
+	mSpaceProvider(spaceProvider),
+	mFileManager(filemanager)
 {
 	connect(trackingService.get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
 	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));    
@@ -507,163 +502,8 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 	}
 }
 
-QColor MetricManager::getRandomColor()
-{
-	QStringList colorNames = QColor::colorNames();
-	int random_int = rand() % colorNames.size();
-	QColor color(colorNames[random_int]);
-	if(color == QColor("black"))
-		color = getRandomColor();
-
-	return color;
-}
-
-MetricManager::ImportMNIuserSettings
-    MetricManager::dialogForSelectingVolumesForImportedMNITagFile( int number_of_volumes,
-                                                                   QString description)
-{
-    ImportMNIuserSettings       userSettings;
-
-    QInputDialog selectCoordinateSystemDialog;
-    QStringList selectableItems;
-    selectableItems << "RAS coordinates (NIfTI/ITKsnap)" << "LPS coordiantes (DICOM/CustusX)";
-    selectCoordinateSystemDialog.setComboBoxItems(selectableItems);
 
 
-	QDialog selectVolumeDialog;
-	selectVolumeDialog.setWindowTitle("Select volume(s) related to points in MNI Tag Point file.");
-
-	QVBoxLayout *layout = new QVBoxLayout();
-	QLabel *description_label = new QLabel(description);
-	layout->addWidget(description_label);
-
-    QButtonGroup *coordinateSysSelector = new QButtonGroup();
-    QCheckBox *selectorLPS = new QCheckBox(tr("LPS (DICOM/CX)"));
-    QCheckBox *selectorRAS = new QCheckBox(tr("RAS (Neuro)"));
-    enum selectorID {
-        selectorRASid=1,
-        selectorLPSid
-    };
-
-    selectorRAS->setChecked(true);
-    coordinateSysSelector->addButton(selectorRAS);
-    coordinateSysSelector->addButton(selectorLPS);
-    coordinateSysSelector->setId(selectorRAS, selectorRASid);
-    coordinateSysSelector->setId(selectorLPS, selectorLPSid);
-    QGroupBox *coordinateSysSelectors = new QGroupBox(tr("Coordinate system format"));
-    selectorLPS->setToolTip("LPS (X=Right->Left Y=Anterior->Posterio Z=Inferior->Superior) - DICOM, CustusX");
-    selectorRAS->setToolTip("RAS (X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior) - NIfTI, ITK-snap");
-    QVBoxLayout *coordSelectLayout = new QVBoxLayout;
-    coordSelectLayout->addWidget(selectorLPS);
-    coordSelectLayout->addWidget(selectorRAS);
-    coordSelectLayout->addStretch(1);
-    coordinateSysSelectors->setLayout(coordSelectLayout);
-    layout->addWidget(coordinateSysSelectors);
-
-	std::map<int, StringPropertySelectImagePtr> selectedImageProperties;
-	for(int i=0; i < number_of_volumes; ++i)
-	{
-		StringPropertySelectImagePtr image_property = StringPropertySelectImage::New(mPatientModelService);
-		QWidget *widget = createDataWidget(mViewService, mPatientModelService, NULL, image_property);
-		layout->addWidget(widget);
-		selectedImageProperties[i] = image_property;
-	}
-
-	QPushButton *okButton = new QPushButton(tr("Ok"));
-	layout->addWidget(okButton);
-	connect(okButton, &QAbstractButton::clicked, &selectVolumeDialog, &QWidget::close);
-	selectVolumeDialog.setLayout(layout);
-	selectVolumeDialog.exec();
-	for(int i=0; i < number_of_volumes; ++i)
-	{
-		StringPropertySelectImagePtr image_property = selectedImageProperties[i];
-        userSettings.imageRefs.push_back(image_property->getValue());
-	}
-    // Set correct coordinate space
-    if(coordinateSysSelector->checkedId() == selectorRASid)
-        userSettings.coordSys = pcsRAS;
-    else
-        userSettings.coordSys = pcsLPS;
-
-    return userSettings;
-}
-
-void MetricManager::importMetricsFromMNITagFile(QString &filename, bool testmode)
-{
-	//--- HACK to be able to read *.tag files with missing newline before eof
-	forceNewlineBeforeEof(filename);
-
-	//--- Reader for MNI Tag Point files
-	vtkMNITagPointReaderPtr reader = vtkMNITagPointReader::New();
-	reader->SetFileName(filename.toStdString().c_str());
-	reader->Update();
-	if (!ErrorObserver::checkedRead(reader, filename))
-		CX_LOG_ERROR() << "Error reading MNI Tag Point file.";
-
-
-	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
-    //---  and specify coordinate system for the coordinates (LPS or RAS)
-	int number_of_volumes = reader->GetNumberOfVolumes();
-	QString description(reader->GetComments());
-//    ImportMNIuserSettings  userSettings;
-    if(!testmode)
-        mUserSettings = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes,
-                                                                      description);
-
-	//--- Create the point metrics
-	QString type = "pointMetric";
-	QString uid = "";
-	QString name = "";
-	vtkStringArray *labels = reader->GetLabelText();
-
-	for(int i=0; i< number_of_volumes; ++i)
-	{
-		QColor color = getRandomColor();
-
-		vtkPoints *points = reader->GetPoints(i);
-		if(points != NULL)
-		{
-			unsigned int number_of_points = points->GetNumberOfPoints();
-			//CX_LOG_DEBUG() << "Number of points: " << number_of_points;
-
-			for(int j=0; j < number_of_points; ++j)
-			{
-				vtkStdString label = labels->GetValue(j);
-                name = QString::fromStdString(label);
-                if(name.isEmpty() || (name == QString(" ")) )   // if no name label is given in .tag file, metric name is set to continous numbering
-                    name = QString::number(j+1);
-
-				uid = QDateTime::currentDateTime().toString(timestampMilliSecondsFormat()) + "_" + QString::number(i)+ QString::number(j);
-
-				double *point = points->GetPoint(j);
-                DataPtr data = this->createData(type, uid, name);
-				PointMetricPtr point_metric = boost::static_pointer_cast<PointMetric>(data);
-                Vector3D vector_ras;
-                Vector3D vector_lps;
-                CoordinateSystem space;
-
-                if(mUserSettings.coordSys == pcsRAS) {
-                    // The coordinates are given in RAS format
-                    space.mId = csDATA;
-                    space.mRefObject = mUserSettings.imageRefs[i];
-                    vector_ras[0] = point[0]; vector_ras[1] = point[1]; vector_ras[2] = point[2];
-                    Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-                    vector_lps = sMr.inv() * vector_ras;
-                } else {
-                    // The coordinates are given in LPS format
-                    space.mId = csREF;
-                    space.mRefObject = mUserSettings.imageRefs[i];
-                    vector_lps[0] = point[0]; vector_lps[1] = point[1]; vector_lps[2] = point[2];
-                }
-
-                point_metric->setCoordinate(vector_lps);
-				point_metric->setSpace(space);
-				point_metric->setColor(color);
-			}
-		}
-
-	}
-}
 
 DataPtr MetricManager::loadDataFromXMLNode(QDomElement node)
 {

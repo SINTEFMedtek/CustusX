@@ -5,6 +5,7 @@ if(BUILD_TESTING)
     cxtestVisualizationHelper.h
     cxtestViewCollectionWidgetMixedMock.h
     cxtestLayoutWidgetUsingViewWidgetsMock.h
+    cxViewsFixture.h
     )
   set(CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES
     cxtestViewServiceMock.h
@@ -24,6 +25,9 @@ if(BUILD_TESTING)
     cxtestViewServiceMock.cpp
     cxtestViewCollectionWidgetMixedMock.cpp
     cxtestLayoutWidgetUsingViewWidgetsMock.cpp
+    cxtestVisualRendering.cpp
+    cxtestGeometricRep.cpp
+    cxViewsFixture.cpp
 	)
   qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
   add_library(cxtest_org_custusx_core_view ${CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
@@ -44,6 +48,7 @@ if(BUILD_TESTING)
     cxCatch
     cxLogicManager
     cxGUIExtenderService
+    org_custusx_core_filemanager
     )
   cx_add_tests_to_catch(cxtest_org_custusx_core_view)
 

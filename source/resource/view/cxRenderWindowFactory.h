@@ -29,7 +29,7 @@ typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
 
 /** \brief Use to create all vtkRenderWindows, and store a single shared render window.
  *
- * Only used directly by ViewService
+ * Only used directly by ViewService. There can only be one instance of this class.
  *
  *  \ingroup cx_resource_view
  *  \date 2016-11-21
@@ -59,6 +59,8 @@ private:
 	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 	SharedOpenGLContextPtr mSharedOpenGLContext;
 	QVTKWidget* mQvtkWidgetForHidingSharedContextRenderWindow;
+
+	static bool mInstanceExisting;
 
 };
 }//cx

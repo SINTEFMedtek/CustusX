@@ -11,17 +11,20 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXVIEWSFIXTURE_H
 #define CXVIEWSFIXTURE_H
 
-#include "cxtestresourcevisualization_export.h"
+#include "cxtest_org_custusx_core_view_export.h"
 
 #include "cxtestVisServices.h"
 #include "cxMessageListener.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
 #include <vector>
+#include "cxtestFileManagerServiceMock.h"
+#include "cxtestPatientModelServiceMock.h"
+#include "cxFileReaderWriterService.h"
+#include "cxtestRenderTester.h"
 
 namespace cxtest
 {
-typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
 
 /**
   * @brief Creates and returns a lut, based on range parameters.
@@ -31,7 +34,7 @@ typedef boost::shared_ptr<class RenderTester> RenderTesterPtr;
 vtkLookupTablePtr getCreateLut(int tableRangeMin, int tableRangeMax, double hueRangeMin, double hueRangeMax,
 	double saturationRangeMin = 0, double saturationRangeMax = 1, double valueRangeMin = 1, double valueRangeMax = 1);
 
-class CXTESTRESOURCEVISUALIZATION_EXPORT ImageParameters
+class CXTEST_ORG_CUSTUSX_CORE_VIEW_EXPORT ImageParameters
 {
 public:
 	ImageParameters() : llr(.1), alpha(1) {}
@@ -43,8 +46,11 @@ public:
 typedef boost::shared_ptr<class ViewsWindow> ViewsWindowPtr;
 
 /** Test class  with convenience methods for defining views.
+ *
+ * Tests using this fixture must be integration tests.
+ * This is because there can only be one cx::RenderWindowFactory.
  */
-class CXTESTRESOURCEVISUALIZATION_EXPORT ViewsFixture : public QObject
+class CXTEST_ORG_CUSTUSX_CORE_VIEW_EXPORT ViewsFixture : public QObject
 {
 	Q_OBJECT
 
@@ -69,6 +75,10 @@ public:
 	cx::ImagePtr loadImage(const QString& imageFilename);
 	cx::DummyToolPtr dummyTool();
 
+	void addFileReaderWriter(cx::FileReaderWriterServicePtr service);
+
+	cxtest::PatientModelServiceMockPtr getPatientModelService();
+	cx::FileManagerServicePtr getFileManager();
 private:
 	void applyParameters(cx::ImagePtr image, const ImageParameters* parameters);
 	void fixToolToCenter();
@@ -80,6 +90,8 @@ private:
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;
 	cx::RenderWindowFactoryPtr mFactory;
+	cx::FileManagerServicePtr mFilemanager;
+	std::set<cx::FileReaderWriterServicePtr> mDataReaders;
 };
 
 } // namespace cxtest

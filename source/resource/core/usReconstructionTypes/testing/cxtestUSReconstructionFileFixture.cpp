@@ -66,9 +66,9 @@ QString USReconstructionFileFixture::write(ReconstructionData input)
 	return fileMaker->getReconstructData().mFilename;
 }
 
-cx::USReconstructInputData USReconstructionFileFixture::read(QString filename)
+cx::USReconstructInputData USReconstructionFileFixture::read(QString filename, cx::FileManagerServicePtr filemanagerservice)
 {
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanagerservice));
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 	return hasBeenRead;
 }

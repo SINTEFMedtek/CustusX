@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxProfile.h"
 #include "cxLogger.h"
+#include "cxFileManagerServiceProxy.h"
 
 
 namespace cx
@@ -41,9 +42,10 @@ void UsReconstructionPluginActivator::start(ctkPluginContext* context)
 {
 	PatientModelServicePtr patientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
 	ViewServicePtr viewService = ViewServicePtr(new ViewServiceProxy(context));
+	FileManagerServicePtr filemanagerservice = FileManagerServicePtr(new FileManagerServiceProxy(context));
 
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("usReconstruction");
-	UsReconstructionImplService *usReconstructionService = new UsReconstructionImplService(context, patientModelService, viewService, xmlFile);
+	UsReconstructionImplService *usReconstructionService = new UsReconstructionImplService(context, patientModelService, viewService, filemanagerservice, xmlFile);
 
 	mUsReconstruction = RegisteredServicePtr(new RegisteredService(context, usReconstructionService, UsReconstructionService_iid));
 

@@ -26,10 +26,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
-#include "cxDataReaderWriter.h"
 #include "cxRegistrationTransform.h"
 #include "cxDoubleProperty.h"
 #include "cxContourFilter.h"
+#include "cxImage.h"
 #include "cxDataLocations.h"
 #include "cxSelectDataStringProperty.h"
 #include "vtkForwardDeclarations.h"
@@ -142,7 +142,7 @@ bool AirwaysFilter::preProcess()
 		return false;
 	}
 
-	if (inputImage->getType() != "image")
+	if (inputImage->getType() != DATATYPE_IMAGE)
 	{
 		CX_LOG_ERROR() << "Input data has to be an image";
 		return false;

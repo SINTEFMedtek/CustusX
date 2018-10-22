@@ -50,7 +50,7 @@ Q_OBJECT
 public:
 	static DataManagerImplPtr create(ActiveDataPtr activeData);
 	virtual ~DataManagerImpl();
-	void setSpaceProvider(SpaceProviderPtr spaceProvider);
+	void setServices(SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager);
 	void setDataFactory(DataFactoryPtr dataFactory);
 
 	// streams
@@ -123,6 +123,7 @@ protected:
 	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 
 	SpaceProviderPtr mSpaceProvider;
+	FileManagerServicePtr mFileManagerService;
 	DataFactoryPtr mDataFactory;
 	ActiveDataPtr mActiveData;
 

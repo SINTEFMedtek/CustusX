@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxServiceTrackerListener.h"
 #include "cxReconstructionExecuter.h"
 #include "cxPatientModelService.h"
+#include "cxFileManagerService.h"
 
 //Windows fix
 #ifndef M_PI
@@ -38,9 +39,10 @@ namespace cx
 {
 
 
-UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, XmlOptionFile settings) :
+UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, FileManagerServicePtr filemanagerservice, XmlOptionFile settings) :
 	mPatientModelService(patientModelService),
-	mViewService(viewService)
+	mViewService(viewService),
+	mFileManagerService(filemanagerservice)
 {
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -200,7 +202,7 @@ void UsReconstructionImplService::selectData(QString filename, QString calFilesP
 		return;
 	}
 
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(mFileManagerService));
 	USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
 	fileData.mFilename = filename;
 	this->selectData(fileData);
@@ -216,7 +218,7 @@ void UsReconstructionImplService::selectData(USReconstructInputData fileData)
 
 void UsReconstructionImplService::updateFromOriginalFileData()
 {
-	if (!mOriginalFileData.isValid())
+	if (mFileManagerService->isNull() || !mOriginalFileData.isValid())
 		return;
 
 	ReconstructPreprocessorPtr preprocessor(new ReconstructPreprocessor(mPatientModelService));

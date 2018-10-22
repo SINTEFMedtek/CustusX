@@ -304,10 +304,17 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
             stream << "#Route to target generations:" << endl;
             stream << mProjectedBranchPtr->findGenerationNumber() << endl;
         }
-        stream << "#Route to target length (mm):" << endl;
-        stream << calculateRouteLength(mRoutePositions) << endl;
-        stream << "#Extended route to target length (mm):" << endl;
-        stream << calculateRouteLength(mExtendedRoutePositions) << endl;
+
+        stream << "#Trachea length (mm):" << endl;
+        BranchPtr trachea = mBranchListPtr->getBranches()[0];
+        int numberOfPositionsInTrachea = trachea->getPositions().cols();
+        double tracheaLength = calculateRouteLength(smoothBranch(trachea, numberOfPositionsInTrachea-1, trachea->getPositions().col(numberOfPositionsInTrachea-1)));
+        stream << tracheaLength << endl;
+
+        stream << "#Route to target length - from Carina (mm):" << endl;
+        stream << calculateRouteLength(mRoutePositions) - tracheaLength << endl;
+        stream << "#Extended route to target length - from Carina (mm):" << endl;
+        stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << endl;
     }
 }
 

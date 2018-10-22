@@ -21,7 +21,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include "cxMesh.h"
-#include "cxDataReaderWriter.h"
+#include "cxXMLPolyDataMeshReader.h"
+#include "cxLogicManager.h"
+#include "cxMetricManager.h"
+#include "cxMNIReaderWriter.h"
+#include "cxDataLocations.h"
+#include "cxFileManagerServiceProxy.h"
+#include "cxImage.h"
 
 namespace cxtest
 {
@@ -30,8 +36,9 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
 {
    //read the file
    QString filename = "out.vtp";
-   cx::XMLPolyDataMeshReader *reader =  new cx::XMLPolyDataMeshReader();
-   REQUIRE(reader->canLoad("mesh", filename));
+   cx::LogicManager::initialize();
+   cx::XMLPolyDataMeshReader *reader =  new cx::XMLPolyDataMeshReader(cx::LogicManager::getInstance()->getPluginContext());
+   REQUIRE(reader->canRead(DATATYPE_MESH, filename));
 
 
    // ------------- VTK -------------
@@ -78,16 +85,64 @@ TEST_CASE("Can read out.vtp file into a cx::mesh", "[manual]")
    //mesh
    QString name = "test";
    QString expected_color_of_mesh = "#ff0000"; //red
-   cx::DataPtr data_mesh = reader->load(name, filename);
+   cx::DataPtr data_mesh = reader->read(name, filename);
    REQUIRE(data_mesh->getName() == name);
    cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(data_mesh);
    REQUIRE(mesh);
    REQUIRE(expected_color_of_mesh.compare(mesh->getColor().name()) == 0);
 
    //REQUIRE(std::string(mesh->getColorArray()) != "");
-   std::cout << "color array: " << mesh->getColorArray() << std::endl;
+   //std::cout << "color array: " << mesh->getColorArray() << std::endl;
 
    delete reader;
+}
+
+TEST_CASE("Import point metrics from MNI Tag Point file", "[integration][metrics]")
+{
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+
+	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
+	QString volumeUid = "DummyImage1";
+	cx::ImagePtr dummyImage(new cx::Image(volumeUid, dummyImageData));
+	cx::logicManager()->getPatientModelService()->insertData(dummyImage);
+
+	QString dataPath = cx::DataLocations::getTestDataPath();
+	QString tagFile = dataPath + "/testing/metrics_export_import/Case1-MRI-beforeUS.tag";
+	std::vector<QString> uids;
+	uids.push_back(volumeUid);
+	uids.push_back(volumeUid);
+
+	//to avoid the popup we need to set the volume uids before the import
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	std::vector<cx::FileReaderWriterServicePtr> importers = filemanager->getImportersForDataType(DATATYPE_POINT_METRIC);
+	boost::shared_ptr<cx::MNIReaderWriter> mniImporter;
+	for(int i=0; i<importers.size(); ++i)
+	{
+		if(importers[i]->getName() == "MNIReaderWriter")
+			mniImporter = boost::dynamic_pointer_cast<cx::MNIReaderWriter>(importers[i]);
+	}
+	mniImporter->setVolumeUidsRelatedToPointsInMNIPointFile(uids);
+
+	//scope here to delete the metric manager before shutting down the logic manager.
+	{
+		cx::MetricManager manager(cx::logicManager()->getViewService(),
+								  cx::logicManager()->getPatientModelService(),
+								  cx::logicManager()->getTrackingService(),
+								  cx::logicManager()->getSpaceProvider(),
+								  cx::logicManager()->getFileManagerService());
+
+		//MetricFixture fixture;
+
+		int number_of_metrics_before_import = manager.getNumberOfMetrics();
+		manager.importMetricsFromMNITagFile(tagFile);
+
+		int number_of_metrics_in_file = 4;
+		int number_of_metrics_after_import = manager.getNumberOfMetrics();
+		CHECK(number_of_metrics_after_import == (number_of_metrics_before_import+number_of_metrics_in_file));
+	}
+
+	cx::LogicManager::shutdown();
 }
 
 }

@@ -17,6 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUsReconstructionFileReader.h"
 #include "cxUSFrameData.h"
 #include "cxDataLocations.h"
+#include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 
 TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Create unique folders", "[unit][resource][usReconstructionTypes]")
@@ -65,12 +67,15 @@ TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Cre
 	CHECK(output.mUsRaw->getDimensions()[2] == input.imageData->size());
 }
 
-TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and load USReconstructInputData", "[unit][resource][usReconstructionTypes]")
+TEST_CASE_METHOD(cxtest::USReconstructionFileFixture, "USReconstructionFile: Save and load USReconstructInputData", "[integration][resource][usReconstructionTypes]")
 {
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 	ReconstructionData input = this->createSampleReconstructData();
 
 	QString filename = this->write(input);
-	cx::USReconstructInputData hasBeenRead = this->read(filename);
+	cx::USReconstructInputData hasBeenRead = this->read(filename, filemanager);
 
 	this->assertCorrespondence(input, hasBeenRead);
+	cx::LogicManager::shutdown();
 }
