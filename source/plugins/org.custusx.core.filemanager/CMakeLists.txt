@@ -19,7 +19,6 @@ set(PLUGIN_SRCS
     cxImportExportGuiExtenderService.h
     cxImportExportGuiExtenderService.cpp
 
-    gui/cxExportWidget.h
     gui/cxExportWidget.cpp
     gui/cxImportWidget.h
     gui/cxImportWidget.cpp
