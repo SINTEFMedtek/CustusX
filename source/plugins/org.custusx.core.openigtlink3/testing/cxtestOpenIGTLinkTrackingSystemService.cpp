@@ -99,7 +99,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins]
 }
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool config file for PLUS", "[plugins][org.custusx.core.openigtlink3][integration]")
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool config file for Plus", "[plugins][org.custusx.core.openigtlink3][integration]")
 {
 	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
 
@@ -109,7 +109,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool con
 
 	REQUIRE(configurations.size() > 1); //Test require that at least one tool configuration is present. Normally there should be many
 
-	//Use one of the tool config files with PLUS tools
+	//Use one of the tool config files with Plus tools
 	int posOfPlusConfigToolFile = 0;
 	bool foundPlusToolConfigFile = false;
 	for(int i = 0; i < configurations.size(); ++i)
@@ -117,17 +117,17 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test configure state using tool con
 		QFileInfo fileInfo(configurations[i]);
 		if (fileInfo.fileName().startsWith("PLUS"))
 		{
-//			CX_LOG_DEBUG() << "Found PLUS tool config file: " << configurations[i];
+//			CX_LOG_DEBUG() << "Found Plus tool config file: " << configurations[i];
 			posOfPlusConfigToolFile = i;
 			foundPlusToolConfigFile = true;
 		}
 //		else
-//			CX_LOG_DEBUG() << "Tool config file (not PLUS): " << configurations[i];
+//			CX_LOG_DEBUG() << "Tool config file (not Plus): " << configurations[i];
 	}
 
-	REQUIRE(foundPlusToolConfigFile);// Test require that at leat one tool configuration using PLUS is present.
+	REQUIRE(foundPlusToolConfigFile);// Test require that at leat one tool configuration using Plus is present.
 	QString toolConfigFile = configurations[posOfPlusConfigToolFile];
-	CX_LOG_DEBUG() << "Using PLUS tool config file: " << toolConfigFile;
+	CX_LOG_DEBUG() << "Using Plus tool config file: " << toolConfigFile;
 	trackingSystemService->setConfigurationFile(toolConfigFile);
 
 	//Test real configure/deconfigure functions

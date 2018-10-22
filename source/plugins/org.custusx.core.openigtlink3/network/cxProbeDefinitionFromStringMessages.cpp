@@ -117,7 +117,7 @@ void ProbeDefinitionFromStringMessages::parseStringMessage(igtlioBaseConverter::
 
 /**
  * @brief ProbeDefinitionFromStringMessages::toDoubleVector Converts a string with a separator to a double vector.
- * This function is the counterpart to PlusCommon::ToString() in PLUS
+ * This function is the counterpart to PlusCommon::ToString() in Plus
  *
  * If needed elsewere the function can be moved to a common place an used as an utility funciton.
  *
