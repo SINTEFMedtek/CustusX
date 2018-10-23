@@ -2,7 +2,6 @@
 if(BUILD_TESTING)
 
   set(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES
-    cxtestVisualizationHelper.h
     cxtestViewCollectionWidgetMixedMock.h
     cxtestLayoutWidgetUsingViewWidgetsMock.h
     cxViewsFixture.h
@@ -18,6 +17,7 @@ if(BUILD_TESTING)
     cxtestCatchVtkOpenGLGPUMultiVolumeRayCastMapper.cpp
     cxtestDataTypeSort.cpp
     cxtestRendering.cpp
+    cxtestVisualizationHelper.h
     cxtestVisualizationHelper.cpp
     cxtestViewGroup.cpp
     cxtestNavigationAlgorithms.cpp
