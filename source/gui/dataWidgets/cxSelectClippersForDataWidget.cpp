@@ -45,7 +45,7 @@ SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr servic
 SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "select_clippers_for_mesh_widget", "Select Clippers")
 {
-	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), DATATYPE_MESH);
 
 	QVBoxLayout *mLayout = new QVBoxLayout(this);
 	mLayout->setMargin(0);

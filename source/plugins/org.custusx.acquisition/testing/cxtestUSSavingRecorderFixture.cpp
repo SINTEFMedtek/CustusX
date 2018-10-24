@@ -22,7 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTime.h"
 #include "catch.hpp"
 #include "cxFileHelpers.h"
-
+#include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 #ifdef CX_WINDOWS
 #include <windows.h>
@@ -33,6 +34,7 @@ namespace cxtest
 
 void USSavingRecorderFixture::setUp()
 {
+	cx::LogicManager::initialize();
 	cx::removeNonemptyDirRecursively(this->getDataPath());
 	cx::Reporter::initialize();
 }
@@ -41,6 +43,7 @@ void USSavingRecorderFixture::tearDown()
 {
 	cx::Reporter::shutdown();
 	cx::removeNonemptyDirRecursively(this->getDataPath());
+	cx::LogicManager::shutdown();
 }
 
 USSavingRecorderFixture::USSavingRecorderFixture(QObject* parent) : QObject(parent)
@@ -97,7 +100,8 @@ void USSavingRecorderFixture::startRecord()
 //	QString uid = QDateTime::currentDateTime().toString(cx::timestampSecondsFormat());
 	mSession.reset(new cx::RecordSession(0, "session"));
 	mSession->startNewInterval();
-	mRecorder->startRecord(mSession, mTool, cx::ToolPtr(), mVideo);
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	mRecorder->startRecord(mSession, mTool, cx::ToolPtr(), mVideo, filemanager);
 }
 
 void USSavingRecorderFixture::stopRecord()
@@ -169,7 +173,10 @@ void USSavingRecorderFixture::verifySaveData()
 
 void USSavingRecorderFixture::verifySaveData(QString filename)
 {
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(pluginContext);
+
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(filemanager));
 	cx::USReconstructInputData hasBeenRead = fileReader->readAllFiles(filename, "");
 
 	CHECK( hasBeenRead.mFilename == filename );

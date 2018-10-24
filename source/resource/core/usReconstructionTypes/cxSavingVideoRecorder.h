@@ -106,7 +106,7 @@ class cxResource_EXPORT SavingVideoRecorder : public QObject
 	Q_OBJECT
 
 public:
-	SavingVideoRecorder(VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor);
+	SavingVideoRecorder(VideoSourcePtr source, QString saveFolder, QString prefix, bool compressed, bool writeColor, FileManagerServicePtr filemanagerservice);
 	virtual ~SavingVideoRecorder();
 
 	virtual void startRecord();

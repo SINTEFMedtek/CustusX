@@ -780,7 +780,7 @@ void CustomMetricWrapper::guiChanged()
     if (mInternalUpdate)
         return;
 
-	if(mModel->getData() && mModel->getData()->getType() == "image")
+	if(mModel->getData() && mModel->getData()->getType() == DATATYPE_IMAGE)
 		mScaleToP1Widget->setEnabled(false);
 	else
 		mScaleToP1Widget->setEnabled(true);

@@ -18,20 +18,25 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxDataLocations.h"
 #include "cxtestVisServices.h"
-#include "cxPatientModelService.h"
+#include "cxtestPatientModelServiceMock.h"
+#include "cxFileManagerServiceProxy.h"
+#include "cxLogicManager.h"
 
 using namespace cx;
 
-TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
+TEST_CASE("ImageAlgorithms: resample() works", "[integration][resource][core]")
 {
+	cx::LogicManager::initialize();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+
 	cxtest::TestVisServicesPtr services = cxtest::TestVisServices::create();
 	cx::PatientModelServicePtr pasm = services->patient();
 
 	QString fname0 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/mra.mhd";
 	QString fname1 = cx::DataLocations::getTestDataPath() + "/testing/ResampleTest.cx3/Images/US_01_20110222T110117_1.mhd";
 
-	pasm->importData(fname0, fname0);
-	pasm->importData(fname1, fname1);
+	boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(pasm)->importDataMock(fname0, fname0, filemanager);
+	boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(pasm)->importDataMock(fname1, fname1, filemanager);
 	cx::ImagePtr image = pasm->getData<cx::Image>(fname0);
 	cx::ImagePtr referenceImage = pasm->getData<cx::Image>(fname1);
 	//	std::cout << "referenceImage base: " << referenceImage->getBaseVtkImageData() << std::endl;
@@ -98,6 +103,8 @@ TEST_CASE("ImageAlgorithms: resample() works", "[unit][resource][core]")
 	CHECK(cropped->getBaseVtkImageData() != resampled->getBaseVtkImageData());
 //	CHECK(resampled->getTransferFunctions3D()->getVtkImageData() == resampled->getBaseVtkImageData());
 //	CHECK(resampled->getLookupTable2D()->getVtkImageData() == resampled->getBaseVtkImageData());
+
+	cx::LogicManager::shutdown();
 
 }
 

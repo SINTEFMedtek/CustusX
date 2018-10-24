@@ -296,7 +296,7 @@ class Eigen(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
-        tag = '3.2.10'
+        tag = '3.3.5'
         self._getBuilder().gitCheckout(tag)
     def configure(self):
         pass
@@ -542,7 +542,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('56fa488c60f99e54c8550de2d585bd15453291dd')
+        self._getBuilder().gitCheckout('35560c25a6ef29a3b0abdedfb870e38f52d19ee9')
     def configure(self):
         pass
     def build(self):

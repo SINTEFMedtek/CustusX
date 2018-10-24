@@ -30,6 +30,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDefinitions.h"
 
 #include <QDateTime>
+
+#define DATATYPE_MESH "mesh"
+#define DATATYPE_IMAGE "image"
+#define DATATYPE_TRACKED_STREAM "trackedStream"
+#define DATATYPE_POINT_METRIC "pointMetric"
+#define DATATYPE_PLANE_METRIC "planeMetric"
+#define DATATYPE_FRAME_METRIC "frameMetric"
+
 class QDomNode;
 
 namespace cx
@@ -124,8 +132,8 @@ public:
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 	//Consider removing this, as these are only implemented in Mesh and Image
-	virtual bool load(QString path) = 0;
-	virtual void save(const QString& basePath) = 0;
+	virtual bool load(QString path, FileManagerServicePtr port) = 0;
+	virtual void save(const QString& basePath, FileManagerServicePtr port) = 0;
 
 	virtual CoordinateSystem getCoordinateSystem();
 

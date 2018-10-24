@@ -26,9 +26,9 @@ typedef boost::shared_ptr<struct SectorInfo> SectorInfoPtr;
 typedef boost::shared_ptr<class ProbeDefinitionFromStringMessages> ProbeDefinitionFromStringMessagesPtr;
 
 /**
- * Create a ProbeDefinition based on BK String messages from PLUS.
+ * Create a ProbeDefinition based on BK String messages from Plus.
  *
- * Currently ProbeDefinitionFromStringMessages creates a ProbeDefinition from BK String messages from PLUS.
+ * Currently ProbeDefinitionFromStringMessages creates a ProbeDefinition from BK String messages from Plus.
  * Later this should be meta data sent with OpenIGTLink (version 3) messages.
  * OpenIGTLinkIO should define this protocol.
  *

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "boost/bind.hpp"
 #include "catch.hpp"
 #include "cxDummyToolManager.h"
+#include "cxLogicManager.h"
 
 TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one VideoSource", "[integration][modules][Acquisition]")
 {
@@ -46,6 +47,7 @@ TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one Vid
 
 TEST_CASE_METHOD(cxtest::USSavingRecorderFixture, "USSavingRecorder: Use one VideoSource with Tool and save", "[integration][modules][Acquisition]")
 {
+	cx::LogicManager::initialize();
 	cx::DummyToolPtr tool = cx::DummyToolTestUtilities::createDummyTool(cx::DummyToolTestUtilities::createProbeDefinitionLinear());
 	this->setTool(tool);
 	this->addVideoSource(80, 40);

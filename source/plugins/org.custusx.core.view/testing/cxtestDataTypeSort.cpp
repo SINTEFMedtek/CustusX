@@ -65,7 +65,10 @@ TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][vi
 	// check sorting success
 	CHECK(unsorted1.size()==sorted.size());
 	for (unsigned i=0; i<sorted.size(); ++i)
+	{
+		INFO(unsorted1[i]->getUid() + " == " + sorted[i]->getUid());
 		CHECK(unsorted1[i]==sorted[i]);
+	}
 
 	cxtest::TestVisServicesPtr nullBackend = cxtest::TestVisServices::create();
 
@@ -80,6 +83,9 @@ TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][vi
 	// check sorting success
 	CHECK(sorted2.size()==sorted.size());
 	for (unsigned i=0; i<sorted.size(); ++i)
+	{
+		INFO(sorted2[i]->getUid() + " == " + sorted[i]->getUid());
 		CHECK(sorted2[i]==sorted[i]);
+	}
 }
 

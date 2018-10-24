@@ -42,8 +42,8 @@ public:
 	void checkMassDifferenceBelow(double val);
 	void checkValueWithin(cx::Vector3D p_r, int lowerLimit, int upperLimit);
 
-	void saveNominalOutputToFile(QString filename);
-	void saveOutputToFile(QString filename);
+	void saveNominalOutputToFile(QString filename, cx::FileManagerServicePtr port);
+	void saveOutputToFile(QString filename, cx::FileManagerServicePtr port);
 
 	void setVerbose(bool val) { mVerbose = val; }
 	bool getVerbose() const { return mVerbose; }

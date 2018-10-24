@@ -52,7 +52,7 @@ public:
 };
 }// namespace
 
-TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[unit][plugins][org.custusx.core.view]")
+TEST_CASE("ViewWrapper2D: Emits pointSampled signal when anyplane", "[integration][plugins][org.custusx.core.view]")
 {
 	cxtest::VisualizationHelper visHelper;
 

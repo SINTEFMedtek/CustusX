@@ -94,7 +94,7 @@ std::vector<TimelineEvent> USAcquisitionVideoPlayback::getEvents()
 	QStringList allFiles = this->getAbsolutePathToFtsFiles(mRoot);
 	for (int i=0; i<allFiles.size(); ++i)
 	{
-		UsReconstructionFileReader reader;
+		UsReconstructionFileReader reader(mBackend->file());
 		std::vector<TimedPosition> timestamps = reader.readFrameTimestamps(allFiles[i]);
 
 		if (timestamps.empty())
@@ -168,7 +168,7 @@ void USAcquisitionVideoPlayback::loadFullData(QString filename)
 	// start an asynchronous read of data
 	if (!mUSImageDataReader)
 	{
-		mUSImageDataReader.reset(new UsReconstructionFileReader());
+		mUSImageDataReader.reset(new UsReconstructionFileReader(mBackend->file()));
 		mUSImageDataFutureResult = QtConcurrent::run(boost::bind(&UsReconstructionFileReader::readAllFiles, mUSImageDataReader, filename, ""));
 		mUSImageDataFutureWatcher.setFuture(mUSImageDataFutureResult);
 	}
