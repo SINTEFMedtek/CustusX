@@ -57,7 +57,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "pointMetric";
+		return DATATYPE_POINT_METRIC;
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_point.png");}
 	virtual Vector3D getRefCoord() const;

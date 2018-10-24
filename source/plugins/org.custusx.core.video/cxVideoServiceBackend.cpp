@@ -20,20 +20,19 @@ namespace cx
 
 VideoServiceBackendPtr VideoServiceBackend::create(PatientModelServicePtr dataManager,
 							TrackingServicePtr trackingService,
-							SpaceProviderPtr spaceProvider,
-												   ctkPluginContext* context)
+							SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager, ctkPluginContext* context)
 {
-	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, trackingService, spaceProvider, context));
+	return VideoServiceBackendPtr(new VideoServiceBackend(dataManager, trackingService, spaceProvider, filemanager, context));
 }
 
 VideoServiceBackend::VideoServiceBackend(PatientModelServicePtr dataManager,
 							TrackingServicePtr trackingService,
-							SpaceProviderPtr spaceProvider,
-										 ctkPluginContext* context) :
+							SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager, ctkPluginContext* context) :
+	mContext(context),
 	mDataManager(dataManager),
 	mTrackingService(trackingService),
 	mSpaceProvider(spaceProvider),
-	mContext(context)
+	mFileManagerService(filemanager)
 {
 
 }
@@ -51,6 +50,11 @@ TrackingServicePtr VideoServiceBackend::tracking()
 SpaceProviderPtr VideoServiceBackend::getSpaceProvider()
 {
 	return mSpaceProvider;
+}
+
+FileManagerServicePtr VideoServiceBackend::file()
+{
+	return mFileManagerService;
 }
 
 } // namespace cx

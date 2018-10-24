@@ -2,11 +2,14 @@
 
 #include "cxRouteToTarget.h"
 #include <vtkPolyData.h>
-//#include "cxDoubleDataAdapterXml.h"
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
+#include <QDir>
+#include "cxTime.h"
+#include "cxVisServices.h"
+#include <QTextStream>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -66,7 +69,6 @@ void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
 
 void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 {
-
 	double minDistance = 100000;
 	int minDistancePositionIndex;
 	BranchPtr minDistanceBranch;
@@ -110,6 +112,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 		return;
 
     std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+    //std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
         mRoutePositions.push_back(positions[i]);
@@ -122,11 +125,9 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 
 vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 {
-
+    mTargetPosition = targetCoordinate_r;
     findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
-
-    //smoothPositions();
 
     vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
@@ -135,20 +136,20 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 
 vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
 {
-    float extentionPointIncrement = 0.5; //mm
+    mTargetPosition = targetCoordinate_r;
+    double extentionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
 	if(mRoutePositions.size() > 0)
 	{
 		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
-		Eigen::Vector3d extentionVector = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
-		int numberOfextentionPoints = (int) extentionDistance * extentionPointIncrement;
-		Eigen::Vector3d extentionPointIncrementVector = extentionVector / extentionPointIncrement;
+        Eigen::Vector3d extentionVectorNormalized = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+        int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
+        Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 
 		for (int i = 1; i<= numberOfextentionPoints; i++)
 		{
 			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
-			//std::cout << mRoutePositions.front() + extentionPointIncrementVector*i << std::endl;
 		}
 	}
 
@@ -174,6 +175,22 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> position
 	retval->SetPoints(points);
 	retval->SetLines(lines);
 	return retval;
+}
+
+
+/*
+    RouteToTarget::getBranchPositions is used to get positions of a branch without smoothing.
+    Equivalent to RouteToTarget::smoothBranch without smoothing.
+*/
+std::vector< Eigen::Vector3d > RouteToTarget::getBranchPositions(BranchPtr branchPtr, int startIndex)
+{
+    Eigen::MatrixXd branchPositions = branchPtr->getPositions();
+    std::vector< Eigen::Vector3d > positions;
+
+    for (int i = startIndex; i >=0; i--)
+        positions.push_back(branchPositions.col(i));
+
+    return positions;
 }
 
 /*
@@ -221,14 +238,15 @@ std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, 
 
     }
 
-    //Add points until all filtered/smoothed postions are within branch radius distance of the unfiltered branch centerline posiition.
+    //Add points until all filtered/smoothed postions are minimum 1 mm inside the airway wall, (within r - 1 mm).
     //This is to make sure the smoothed centerline is within the lumen of the airways.
-    double maxDistanceToOriginalPosition = branchRadius;
+    double maxAcceptedDistanceToOriginalPosition = std::max(branchRadius - 1, 1.0);
+    double maxDistanceToOriginalPosition = maxAcceptedDistanceToOriginalPosition + 1;
     int maxDistanceIndex = -1;
     std::vector< Eigen::Vector3d > smoothingResult;
 
     //add positions to spline
-    while (maxDistanceToOriginalPosition >= branchRadius && splineX->GetNumberOfPoints() < startIndex)
+    while (maxDistanceToOriginalPosition >= maxAcceptedDistanceToOriginalPosition && splineX->GetNumberOfPoints() < startIndex)
     {
         if(maxDistanceIndex > 0)
         {
@@ -262,6 +280,57 @@ std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, 
     }
 
     return smoothingResult;
+}
+
+void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
+{
+    QString RTTpath = services->patient()->getActivePatientFolder() + "/RouteToTargetInformation/";
+    QDir RTTDirectory(RTTpath);
+    if (!RTTDirectory.exists()) // Creating RouteToTargetInformation folder if it does not exist
+        RTTDirectory.mkpath(RTTpath);
+
+    QString format = timestampSecondsFormat();
+    QString filePath = RTTpath + QDateTime::currentDateTime().toString(format) + "_RouteToTargetInformation.txt";
+
+    QFile outfile(filePath);
+    if (outfile.open(QIODevice::ReadWrite))
+    {
+        QTextStream stream(&outfile);
+
+        stream << "#Target position:" << endl;
+        stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << endl;
+        if (mProjectedBranchPtr)
+        {
+            stream << "#Route to target generations:" << endl;
+            stream << mProjectedBranchPtr->findGenerationNumber() << endl;
+        }
+
+        stream << "#Trachea length (mm):" << endl;
+        BranchPtr trachea = mBranchListPtr->getBranches()[0];
+        int numberOfPositionsInTrachea = trachea->getPositions().cols();
+        double tracheaLength = calculateRouteLength(smoothBranch(trachea, numberOfPositionsInTrachea-1, trachea->getPositions().col(numberOfPositionsInTrachea-1)));
+        stream << tracheaLength << endl;
+
+        stream << "#Route to target length - from Carina (mm):" << endl;
+        stream << calculateRouteLength(mRoutePositions) - tracheaLength << endl;
+        stream << "#Extended route to target length - from Carina (mm):" << endl;
+        stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << endl;
+    }
+}
+
+double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
+{
+    double routeLenght = 0;
+    for (int i=0; i<route.size()-1; i++)
+    {
+        double d0 = route[i+1](0) - route[i](0);
+        double d1 = route[i+1](1) - route[i](1);
+        double d2 = route[i+1](2) - route[i](2);
+
+        routeLenght += sqrt( d0*d0 +d1*d1 + d2*d2 );
+    }
+
+    return routeLenght;
 }
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)

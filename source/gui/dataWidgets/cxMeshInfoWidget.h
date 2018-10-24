@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataInterface.h"
 #include "cxInfoWidget.h"
 #include "cxTabbedWidget.h"
+#include "cxFileManagerService.h"
 
 
 namespace cx
@@ -64,7 +65,7 @@ class cxGui_EXPORT MeshInfoWidget : public InfoWidget
 
 public:
 	MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
-				   PatientModelServicePtr patientModelService, ViewServicePtr viewService,
+				   PatientModelServicePtr patientModelService, ViewServicePtr viewService, FileManagerServicePtr fileManager,
 				   QWidget* parent);
   virtual ~MeshInfoWidget();
 
@@ -91,6 +92,7 @@ private:
 
   PatientModelServicePtr mPatientModelService;
   ViewServicePtr mViewService;
+  FileManagerServicePtr mFileManagerService;
   
   MeshInfoWidget();
 };

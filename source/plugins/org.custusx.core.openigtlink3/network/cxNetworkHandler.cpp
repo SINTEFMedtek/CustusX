@@ -83,7 +83,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
-	// Currently the only id available is the Device name defined in PLUS xml. Looking like this: Probe_sToReference_s
+	// Currently the only id available is the Device name defined in Plus xml. Looking like this: Probe_sToReference_s
 	// Use this for all message types for now, instead of equipmentId.
 	// Anser integration may send equipmentId, so this is checked for when we get a transform.
 	QString deviceName(receivedDevice->GetDeviceName().c_str());
@@ -116,7 +116,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
 		igtlioLabels << IGTLIO_KEY_SPACING_X;
 		igtlioLabels << IGTLIO_KEY_SPACING_Y;
-		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with PLUS
+		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
 
 		for (int i = 0; i < igtlioLabels.size(); ++i)
@@ -140,10 +140,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		emit image(cximage);
 
-		//Use the transform from the image message instead of the transform message
-		double timestamp = header.timestamp;
-		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
-		emit transform(deviceName, cxtransform, timestamp);
+		// CX-366: Currenly we don't use the transform from the image message, because there is no specification of what this transform should be.
+		// Only the transforms from the transform messages are used.
+//		double timestamp = header.timestamp;
+//		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
+//		emit transform(deviceName, cxtransform, timestamp);
 	}
 	else if(device_type == igtlioTransformConverter::GetIGTLTypeName())
 	{
@@ -169,7 +170,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
 		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
-		// and added to the messages from PLUS.
+		// and added to the messages from Plus.
 		std::string openigtlinktransformid;
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
 

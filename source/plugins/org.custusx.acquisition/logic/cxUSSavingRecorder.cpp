@@ -25,7 +25,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageDataContainer.h"
 #include "cxRecordSession.h"
 #include "cxUsReconstructionFileMaker.h"
-
+//#include "cxFileManagerServiceProxy.h"
+//#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -55,7 +56,7 @@ void USSavingRecorder::set_rMpr(Transform3D rMpr)
 	m_rMpr = rMpr;
 }
 
-void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video)
+void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video, FileManagerServicePtr filemanager)
 {
 	this->clearRecording(); // clear previous data if any
 
@@ -74,7 +75,9 @@ void USSavingRecorder::startRecord(RecordSessionPtr session, ToolPtr tool, ToolP
 								 cacheFolder,
 								 QString("%1_%2").arg(session->getDescription()).arg(video[i]->getUid()),
 								 false, // no compression when saving to cache
-								 mDoWriteColor));
+								 mDoWriteColor,
+								filemanager
+								));
 		videoRecorder->startRecord();
 		mVideoRecorder.push_back(videoRecorder);
 	}

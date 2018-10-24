@@ -117,7 +117,7 @@ void TemporalCalibrationWidget::patientChangedSlot()
 
 void TemporalCalibrationWidget::selectData(QString filename)
 {
-  mAlgorithm->selectData(filename);
+	mAlgorithm->selectData(filename, mServices->file());
   mFileSelectWidget->setFilename(filename);
   mResult->setText("");
 }

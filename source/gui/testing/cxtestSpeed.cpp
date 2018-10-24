@@ -64,7 +64,7 @@ double calculateFPS(bool slicing)
 
 }
 
-TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration][not_win32][not_win64]")
+TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integration]")
 {
 	initTest();
 	cx::Reporter::initialize();
@@ -83,6 +83,10 @@ TEST_CASE("CustusX full run emits no errors, correct service shutdown.", "[integ
 	// the original argument for this test was to check if LogicManager succeeds in deleting
 	// all services: Failure to do so sends an error to the Reporter.
 	CHECK(!messageListener->containsErrors());
+
+	//All plugins that isn't active will print this string. See PluginFrameworkManager::loadState()
+	bool allPluginsRunning = !messageListener->containsText("Set plugin to state");
+	CHECK(allPluginsRunning);
 }
 
 /**

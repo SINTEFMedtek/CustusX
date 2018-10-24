@@ -20,9 +20,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+bool RenderWindowFactory::mInstanceExisting = false;
+
 
 RenderWindowFactory::RenderWindowFactory()
 {
+	if(mInstanceExisting)
+		CX_LOG_ERROR() << "There can only be one instance of RenderWindowFactory <--------";
+	else
+		mInstanceExisting = true;
+
 	//Note: Setting offScreenRendering to true gives crash in render
 	vtkRenderWindowPtr renderWindow = createRenderWindow("cx_shared_context", false);
 	this->preventSharedContextRenderWindowFromBeingShownOnScreen(renderWindow);

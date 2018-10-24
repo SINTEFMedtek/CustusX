@@ -19,12 +19,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkMetaImageWriter.h>
 #include <vtkImageImport.h>
 #include "cxTypeConversions.h"
-#include "cxDataReaderWriter.h"
 #include <QFileInfo>
 #include "cxTimeKeeper.h"
 #include "cxImageDataContainer.h"
 #include "cxVolumeHelpers.h"
 #include "cxLogger.h"
+#include "cxFileManagerService.h"
+#include "cxImage.h"
 
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
@@ -130,7 +131,7 @@ USFrameDataPtr USFrameData::create(ImagePtr inputFrameData)
   * files and try to load all mhdFile + i + ".mhd".
   * forall i.
   */
-USFrameDataPtr USFrameData::create(QString inputFilename)
+USFrameDataPtr USFrameData::create(QString inputFilename, FileManagerServicePtr fileManager)
 {
 	QFileInfo info(inputFilename);
 
@@ -139,7 +140,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 
 	if (QFileInfo(mhdSingleFile).exists())
 	{
-		vtkImageDataPtr image = MetaImageReader().loadVtkImageData(mhdSingleFile);
+		vtkImageDataPtr image = fileManager->loadVtkImageData(mhdSingleFile);
 		// load from single file
 		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
 		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();
@@ -150,7 +151,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename)
 	{
 		USFrameDataPtr retval(new USFrameData());
 		retval->mName = QFileInfo(inputFilename).completeBaseName();
-		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1));
+		retval->mImageContainer.reset(new cx::CachedImageDataContainer(inputFilename, -1, fileManager));
 		retval->resetRemovedFrames();
 		return retval;
 	}
@@ -207,7 +208,8 @@ void USFrameData::removeFrame(unsigned int index)
 
 Eigen::Array3i USFrameData::getDimensions() const
 {
-	Eigen::Array3i retval(mImageContainer->get(0)->GetDimensions());
+	vtkImageDataPtr image = mImageContainer->get(0);
+	Eigen::Array3i retval(image->GetDimensions());
 
 	if (mCropbox.range()[0]!=0)
 	{
@@ -512,8 +514,14 @@ bool USFrameData::is4D()
 	int numberOfFrames = mReducedToFull.size();
 
 	if (numberOfFrames > 0)
-		if(mImageContainer->get(0)->GetDataDimension() == 3)
+	{
+		vtkImageDataPtr image = mImageContainer->get(0);
+		if(image->GetDataDimension() == 3)
+		{
 			return true;
+		}
+
+	}
 	return false;
 }
 

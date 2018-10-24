@@ -14,11 +14,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
-#include "cxDataReaderWriter.h"
 #include "cxNullDeleter.h"
 #include "cxSpaceProviderImpl.h"
 #include "cxTrackingService.h"
 #include "cxRegistrationTransform.h"
+#include "cxFileManagerService.h"
+#include "catch.hpp"
 
 namespace cxtest
 {
@@ -55,11 +56,12 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 	return mData;
 }
 
-cx::DataPtr PatientModelServiceMock::importData(QString fileName, QString &infoText)
+cx::DataPtr PatientModelServiceMock::importDataMock(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager)
 {
-	QString type = cx::DataReaderWriter().findDataTypeFromFile(fileName);
+	QString type = filemanager->findDataTypeFromFile(fileName);
 	cx::DataPtr data = this->createData(type, fileName, fileName);
-	data->load(fileName);
+	REQUIRE(data);
+	data->load(fileName, filemanager);
 	this->insertData(data);
 	return data;
 }

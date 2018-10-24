@@ -64,8 +64,8 @@ TEST_CASE("ReconstructManager: PNN on sphere","[unit][usreconstruction][syntheti
 
 	if (comparer->getVerbose())
 	{
-		comparer->saveOutputToFile("sphere_recman.mhd");
-		comparer->saveNominalOutputToFile("sphere_nomman.mhd");
+		comparer->saveOutputToFile("sphere_recman.mhd", fixture.getFileManagerService());
+		comparer->saveNominalOutputToFile("sphere_nomman.mhd", fixture.getFileManagerService());
 	}
 
 	CHECK(!messageListener->containsErrors());
@@ -109,8 +109,8 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 
 	if (comparer->getVerbose())
 	{
-		comparer->saveOutputToFile("sphere_recman.mhd");
-		comparer->saveNominalOutputToFile("sphere_nomman.mhd");
+		comparer->saveOutputToFile("sphere_recman.mhd", fixture.getFileManagerService());
+		comparer->saveNominalOutputToFile("sphere_nomman.mhd", fixture.getFileManagerService());
 	}
 }
 
