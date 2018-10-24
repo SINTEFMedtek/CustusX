@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSimpleSyntheticVolume.h"
 #include "cxtestSphereSyntheticVolume.h"
 #include "cxTypeConversions.h"
-#include "cxMathUtils.h"
 
 
 namespace cxtest
@@ -60,7 +59,7 @@ void SyntheticReconstructInput::setOverallBoundsAndSpacing(double size, double s
 	// set all these rates to the input spacing:
 
 	mBounds = cx::Vector3D::Ones() * size;
-	mProbe = cx::DummyToolTestUtilities::createProbeDefinitionLinear(size, size, Eigen::Array2i(1,1)*(int(cx::roundAwayFromZero(size/spacing))+1));
+	mProbe = cx::DummyToolTestUtilities::createProbeDefinitionLinear(size, size, Eigen::Array2i(1,1)*((std::lround(size/spacing))+1));
 	mProbeMovementDefinition.mRangeNormalizedTranslation = cx::Vector3D::UnitX();
 	mProbeMovementDefinition.mRangeAngle = 0;
 	mProbeMovementDefinition.mSteps = size/spacing+1;
