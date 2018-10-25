@@ -89,14 +89,6 @@ public:
 		checkImagesEqual(input1->getBaseVtkImageData(), input2->getBaseVtkImageData());
 	}
 
-	cx::ImagePtr loadImageFromFile(cx::FileManagerServicePtr filemanager, QString filename, QString uid)
-	{
-		cx::ImagePtr image = cx::Image::create(uid,uid);
-		filemanager->readInto(image, filename);
-		//cx::DataReaderWriter().readInto(image, filename);
-		return image;
-	}
-
 	QString getDatabaseFileName() const
 	{
 		return cx::DataLocations::getTestDataPath()+"/temp/testDatabase";
@@ -228,7 +220,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	converter.setDicomDatabase(db.data());
 	cx::ImagePtr convertedImage = converter.convertToImage(series);
 
-	cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
+	cx::ImagePtr referenceImage = boost::dynamic_pointer_cast<cx::Image>(filemanager->load("reference", referenceImageFilename));//load will be renamed read
 	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
 
 	if (verbose)
@@ -357,7 +349,7 @@ TEST_CASE("DicomConverter: US data from SW, missing position data", "[integratio
     converter.setDicomDatabase(db.data());
 
     cx::ImagePtr convertedImage = converter.convertToImage(series);
-		cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
+		cx::ImagePtr referenceImage = boost::dynamic_pointer_cast<cx::Image>(filemanager->load("reference", referenceImageFilename));//load will be renamed read
 
     fixture.checkImagesEqual(referenceImage, referenceImage); //
     fixture.checkImagesEqual(convertedImage, referenceImage);
