@@ -18,18 +18,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 namespace cx {
-double roundAwayFromZero(double val)
-{
-	if(val >= 0)
-		return int(val+0.5);
-	else
-		return int(val-0.5);
-}
-
-unsigned int roundUnsigned(double val)
-{
-    return int(val+0.5);
-}
 
 Eigen::ArrayXd matrixToQuaternion(Transform3D Tx)
 // Converts a 4x4 transformation matrix to quaternion (7 elements)

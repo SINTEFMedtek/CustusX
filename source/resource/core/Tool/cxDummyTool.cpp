@@ -22,7 +22,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkClipPolyData.h>
 
 #include "cxTimeKeeper.h"
-#include "cxMathUtils.h"
 
 namespace cx
 {
@@ -245,7 +244,7 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const
 {
 	Vector3D u = (b-a).normal();
-	unsigned N = roundAwayFromZero((b-a).length()/step);
+	unsigned N = unsigned(std::lround(((b-a).length()/step)));
 	Transform3D& T = *T_in;
 
 	for (unsigned i=0; i<N; ++i)
