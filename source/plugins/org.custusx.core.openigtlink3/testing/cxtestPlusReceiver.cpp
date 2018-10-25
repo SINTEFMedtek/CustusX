@@ -3,7 +3,7 @@
 namespace cxtest
 {
 
-PlusReceiver::PlusReceiver(igtlio::LogicPointer logic) :
+PlusReceiver::PlusReceiver(igtlioLogicPointer logic) :
 	Receiver(logic)
 {
 
@@ -13,7 +13,7 @@ PlusReceiver::PlusReceiver(igtlio::LogicPointer logic) :
 
 void PlusReceiver::send_RequestChannelIds()
 {
-	/* PLUS commands
+	/* Plus commands
 	static const char REQUEST_CHANNEL_IDS_CMD[] = "RequestChannelIds";
 	static const char REQUEST_DEVICE_CHANNEL_IDS_CMD[] = "RequestDeviceChannelIds";
 	static const char REQUEST_DEVICE_IDS_CMD[] = "RequestDeviceIds";

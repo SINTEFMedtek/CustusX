@@ -156,9 +156,10 @@ void USAcquisition::recordStarted()
 	ToolPtr tool = this->getServices()->tracking()->getFirstProbe();
 	mCore->setWriteColor(this->getWriteColor());
 	mCore->startRecord(mBase->getLatestSession(),
-					   tool,
-					   this->getServices()->tracking()->getReferenceTool(),
-					   this->getRecordingVideoSources(tool));
+										 tool,
+										 this->getServices()->tracking()->getReferenceTool(),
+										 this->getRecordingVideoSources(tool),
+										 this->getServices()->file());
 }
 
 void USAcquisition::recordStopped()

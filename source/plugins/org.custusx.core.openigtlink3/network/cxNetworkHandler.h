@@ -34,10 +34,10 @@ class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
 	QVTK_OBJECT
 
 public:
-	NetworkHandler(igtlio::LogicPointer logic);
+	NetworkHandler(igtlioLogicPointer logic);
 	~NetworkHandler();
 
-	igtlio::SessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, igtlio::SYNCHRONIZATION_TYPE sync=igtlio::BLOCKING, double timeout_s=5);
+	igtlioSessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, IGTLIO_SYNCHRONIZATION_TYPE sync=IGTLIO_BLOCKING, double timeout_s=5);
 	void disconnectFromServer();
 
 signals:
@@ -62,8 +62,8 @@ private:
 	void connectToConnectionEvents();
 	void connectToDeviceEvents();
 
-	igtlio::LogicPointer mLogic;
-	igtlio::SessionPointer mSession;
+	igtlioLogicPointer mLogic;
+	igtlioSessionPointer mSession;
 	QTimer *mTimer;
 	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
 };

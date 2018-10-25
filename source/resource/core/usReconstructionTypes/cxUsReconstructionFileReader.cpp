@@ -26,7 +26,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-UsReconstructionFileReader::UsReconstructionFileReader()
+UsReconstructionFileReader::UsReconstructionFileReader(FileManagerServicePtr fileManager) :
+	mFileManagerService(fileManager)
 {
 
 }
@@ -223,7 +224,7 @@ std::pair<QString, ProbeDefinition> UsReconstructionFileReader::readProbeDefinit
 
 USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName)
 {
-	return USFrameData::create(mhdFileName);
+	return USFrameData::create(mhdFileName, mFileManagerService);
 }
 
 std::vector<TimedPosition> UsReconstructionFileReader::readFrameTimestamps(QString fileName)

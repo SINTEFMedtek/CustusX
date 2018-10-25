@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSessionStorageService.h"
+#include "cxFileManagerServiceProxy.h"
 
 
 namespace cxtest
@@ -45,6 +46,7 @@ ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
 
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
 	mPatientModelService = cx::PatientModelServiceProxy::create(pluginContext);
+	mFileManagerService = cx::FileManagerServiceProxy::create(pluginContext);
 }
 
 ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
@@ -65,6 +67,11 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 		adapter->setValueFromVariant(value);
 	else
 		cx::reportError("Could not find adapter interpolationSteps");
+}
+
+cx::FileManagerServicePtr ReconstructionManagerTestFixture::getFileManagerService()
+{
+	return mFileManagerService;
 }
 
 void ReconstructionManagerTestFixture::reconstruct()

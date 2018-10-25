@@ -42,7 +42,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "frameMetric";
+		return DATATYPE_FRAME_METRIC;
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_frame.png");}
 	virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels

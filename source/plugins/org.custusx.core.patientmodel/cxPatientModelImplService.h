@@ -101,6 +101,7 @@ private:
 
 	TrackingServicePtr mTrackingService;
 	VideoServicePtr mVideoService;
+	FileManagerServicePtr mFileManagerService;
 
 	std::map<QString, ToolPtr> mProbeTools;
 

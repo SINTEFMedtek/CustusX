@@ -44,7 +44,7 @@ class org_custusx_calibration_EXPORT TemporalCalibration
 {
 public:
 	TemporalCalibration();
-  void selectData(QString filename);
+  void selectData(QString filename, FileManagerServicePtr filemanager);
   void setDebugFolder(QString path);
   double calibrate(bool* success);
 
@@ -68,7 +68,7 @@ private:
   QString mFilename;
   mutable std::stringstream mDebugStream;
   bool mAddRawToDebug;
-	vtkImageDataPtr mMask;
+  vtkImageDataPtr mMask;
 
 };
 

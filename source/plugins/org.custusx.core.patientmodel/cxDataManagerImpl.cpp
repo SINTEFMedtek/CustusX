@@ -30,7 +30,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
 
-#include "cxDataReaderWriter.h"
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
 
@@ -40,6 +39,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxDefinitionStrings.h"
 #include "cxActiveData.h"
+#include "cxFileManagerService.h"
 
 
 namespace cx
@@ -70,9 +70,10 @@ DataManagerImpl::~DataManagerImpl()
 {
 }
 
-void DataManagerImpl::setSpaceProvider(SpaceProviderPtr spaceProvider)
+void DataManagerImpl::setServices(SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager)
 {
 	mSpaceProvider = spaceProvider;
+	mFileManagerService = filemanager;
 }
 
 void DataManagerImpl::setDataFactory(DataFactoryPtr dataFactory)
@@ -211,7 +212,7 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 	if (mData.count(uid)) // dont load same image twice
 		return mData[uid];
 
-	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	QString type = mFileManagerService->findDataTypeFromFile(path);
 	if(!mDataFactory)
 		reportError("DataManagerImpl::loadData() Got no DataFactory");
 	DataPtr data = mDataFactory->create(type, uid);
@@ -222,7 +223,9 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 		return DataPtr();
 	}
 
-	bool loaded = data->load(path);
+	bool loaded = data->load(path, mFileManagerService);
+	//TODO FIX
+	//bool loaded = mFileManagerService->load(path, data);
 
 	if (!loaded)
 	{
@@ -426,7 +429,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 		reportWarning(QString("Unknown type: %1 for file %2").arg(type).arg(absolutePath));
 		return DataPtr();
 	}
-	bool loaded = data->load(absolutePath);
+	bool loaded = data->load(absolutePath, mFileManagerService);
 
 	if (!loaded)
 	{
@@ -445,7 +448,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	if (QDir::cleanPath(absolutePath) != QDir::cleanPath(newPath))
 	{
 		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(absolutePath).arg(newPath));
-		data->save(rootPath);
+		data->save(rootPath, mFileManagerService);
 	}
 
 	return data;

@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestReconstructionAlgorithmFixture.h"
 #include "cxtestUtilities.h"
 #include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cxtest
 {
@@ -25,6 +26,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 {
 	cx::LogicManager::initialize();
 	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(pluginContext);
 
 	ReconstructionAlgorithmFixture fixture;
 	QDomDocument domdoc;
@@ -43,8 +45,8 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere","[unit][usreconstruction][synthe
 
 	if (fixture.getVerbose())
 	{
-		fixture.saveOutputToFile("test/sphere_rec.mhd");
-		fixture.saveNominalOutputToFile("test/sphere_nom.mhd");
+		fixture.saveOutputToFile("test/sphere_rec.mhd", filemanager);
+		fixture.saveNominalOutputToFile("test/sphere_nom.mhd", filemanager);
 	}
 	cx::LogicManager::shutdown();
 }
@@ -53,6 +55,7 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 {
 	cx::LogicManager::initialize();
 	ctkPluginContext* pluginContext = cx::logicManager()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(pluginContext);
 
 	QDomDocument domdoc;
 	QDomElement settings = domdoc.createElement("pnn");
@@ -77,8 +80,8 @@ TEST_CASE("ReconstructAlgorithm: PNN on sphere, tilt","[unit][usreconstruction][
 
 	if (fixture.getVerbose())
 	{
-		fixture.saveOutputToFile("test/sphere_rec.mhd");
-		fixture.saveNominalOutputToFile("test/sphere_nom.mhd");
+		fixture.saveOutputToFile("test/sphere_rec.mhd", filemanager);
+		fixture.saveNominalOutputToFile("test/sphere_nom.mhd", filemanager);
 	}
 	cx::LogicManager::shutdown();
 }

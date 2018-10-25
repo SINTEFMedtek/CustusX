@@ -23,7 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTool.h"
 #include "cxTypeConversions.h"
 #include "cxPipelineWidget.h"
-#include "cxDataReaderWriter.h"
 #include "cxSmoothingImageFilter.h"
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxBinaryThresholdImageFilter.h"

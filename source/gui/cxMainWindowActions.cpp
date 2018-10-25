@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopServices>
+#include <QDockWidget>
+#include <QAction>
 
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
@@ -35,6 +37,9 @@
 #include "cxViewCollectionWidget.h"
 #include "cxViewCollectionImageWriter.h"
 #include "cxFileHelpers.h"
+#include "cxFileManagerService.h"
+#include "cxFileReaderWriterService.h"
+#include "cxApplication.h"
 
 namespace cx
 {
@@ -313,24 +318,28 @@ void MainWindowActions::importDataSlot()
 {
 	this->savePatientFileSlot();
 
-	QString folder = mLastImportDataFolder;
-	if (folder.isEmpty())
-		folder = profile()->getSessionRootFolder();
-
-	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")),
-		folder, tr("Image/Mesh (*.mhd *.mha *.nii *.stl *.vtk *.vtp *.mnc *.png)"));
-	if (fileName.empty())
+	QDockWidget* importDockWidget = findMainWindowChildWithObjectName<QDockWidget*>("import_widgetDockWidget");
+	if(!importDockWidget)
 	{
-		report("Import canceled");
+		CX_LOG_ERROR() << "Cannot find DockWidget for ImportWidget";
 		return;
 	}
 
-	mLastImportDataFolder = QFileInfo(fileName[0]).absolutePath();
+	importDockWidget->show();
+	importDockWidget->raise();
 
-	for (int i=0; i<fileName.size(); ++i)
+	QWidget* widget = findMainWindowChildWithObjectName<QWidget*>("import_widget");
+	if(!widget)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mServices->patient(), mServices->view(), fileName[i], this->parentWidget());
-		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+		CX_LOG_ERROR() << "Cannot find ImportWidget";
+		return;
+	}
+
+	QList<QAction*> actions = widget->actions();
+	foreach(QAction* action, actions)
+	{
+		if(action->text().contains("AddMoreFilesButtonClickedAction"))
+			action->trigger();
 	}
 }
 

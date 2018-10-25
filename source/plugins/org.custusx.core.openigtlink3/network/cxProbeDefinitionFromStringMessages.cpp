@@ -14,19 +14,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkXMLDataElement.h>
 #include <vtkXMLUtilities.h>
 #include <vtkImageData.h>
+#include <igtlioUsSectorDefinitions.h>
 
 #include "cxLogger.h"
-
-//This information should be part of the new OpenIGTLinkIO standard
-//These values are also defined in vtkPlusBkProFocusOemVideoSource in PLUS (as static variables)
-#define KEY_PROBE_TYPE		"ProbeType"
-#define KEY_ORIGIN				"Origin"
-#define KEY_ANGLES				"Angles"
-#define KEY_BOUNDING_BOX	"BouningBox"
-#define KEY_DEPTHS				"Depths"
-#define KEY_LINEAR_WIDTH	"LinearWidth"
-#define KEY_SPACING_X			"SpacingX"
-#define KEY_SPACING_Y			"SpacingY"
 
 namespace cx
 {
@@ -53,7 +43,7 @@ struct SectorInfo
 	//new standard
 	std::vector<double> mOrigin;
 	std::vector<double> mAngles;
-	std::vector<double> mBouningBox;
+	std::vector<double> mBoundingBox;
 	std::vector<double> mDepths;
 	double mLinearWidth;
 
@@ -71,7 +61,7 @@ struct SectorInfo
 		//new standard
 		mOrigin.clear();
 		mAngles.clear();
-		mBouningBox.clear();
+		mBoundingBox.clear();
 		mDepths.clear();
 		mLinearWidth = tooLarge;
 
@@ -87,7 +77,7 @@ struct SectorInfo
 		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
 		retval = retval && (mOrigin.size() == 3);
 		retval = retval && ((mAngles.size() == 2) || (mAngles.size() == 4));//2D == 2, 3D == 4
-		retval = retval && ((mBouningBox.size() == 4) || (mBouningBox.size() == 6)); //2D == 4, 3D == 6
+		retval = retval && ((mBoundingBox.size() == 4) || (mBoundingBox.size() == 6)); //2D == 4, 3D == 6
 		retval = retval && (mDepths.size() == 2);
 		if(mProbeType == ProbeDefinition::tLINEAR)
 			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
@@ -118,7 +108,7 @@ void ProbeDefinitionFromStringMessages::reset()
 	mSectorInfo->reset();
 }
 
-void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter::HeaderData header, QString message)
+void ProbeDefinitionFromStringMessages::parseStringMessage(igtlioBaseConverter::HeaderData header, QString message)
 {
 	QString name = QString(header.deviceName.c_str());
 	QString value = message;
@@ -127,7 +117,7 @@ void ProbeDefinitionFromStringMessages::parseStringMessage(igtlio::BaseConverter
 
 /**
  * @brief ProbeDefinitionFromStringMessages::toDoubleVector Converts a string with a separator to a double vector.
- * This function is the counterpart to PlusCommon::ToString() in PLUS
+ * This function is the counterpart to PlusCommon::ToString() in Plus
  *
  * If needed elsewere the function can be moved to a common place an used as an utility funciton.
  *
@@ -157,7 +147,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 //				   << " intValue: " << intValue
 //				   << " doubleValue: " << doubleValue;
 
-	if (name == KEY_PROBE_TYPE)
+	if (name == IGTLIO_KEY_PROBE_TYPE)
 	{
 		if (mSectorInfo->mProbeType != intValue)
 		{
@@ -165,7 +155,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 		}
 	}
 	//New standard
-	else if (name == KEY_ORIGIN)
+	else if (name == IGTLIO_KEY_ORIGIN)
 	{
 		if(mSectorInfo->mOrigin != doubleVector)
 		{
@@ -173,7 +163,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mOrigin = doubleVector;
 		}
 	}
-	else if (name == KEY_ANGLES)
+	else if (name == IGTLIO_KEY_ANGLES)
 	{
 		if(mSectorInfo->mAngles != doubleVector)
 		{
@@ -181,15 +171,15 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mAngles = doubleVector;
 		}
 	}
-	else if (name == KEY_BOUNDING_BOX)
+	else if (name == IGTLIO_KEY_BOUNDING_BOX)
 	{
-		if(mSectorInfo->mBouningBox != doubleVector)
+		if(mSectorInfo->mBoundingBox != doubleVector)
 		{
 			mSectorInfo->mHaveChanged  = true;
-			mSectorInfo->mBouningBox = doubleVector;
+			mSectorInfo->mBoundingBox = doubleVector;
 		}
 	}
-	else if (name == KEY_DEPTHS)
+	else if (name == IGTLIO_KEY_DEPTHS)
 	{
 		if(mSectorInfo->mDepths != doubleVector)
 		{
@@ -197,7 +187,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mDepths = doubleVector;
 		}
 	}
-	else if (name == KEY_LINEAR_WIDTH)
+	else if (name == IGTLIO_KEY_LINEAR_WIDTH)
 	{
 		if(mSectorInfo->mLinearWidth != doubleValue)
 		{
@@ -205,11 +195,11 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mLinearWidth = doubleValue;
 		}
 	}
-	else if (name == KEY_SPACING_X)
+	else if (name == IGTLIO_KEY_SPACING_X)
 	{
 		mSectorInfo->mSpacingX = doubleValue;
 	}
-	else if (name == KEY_SPACING_Y)
+	else if (name == IGTLIO_KEY_SPACING_Y)
 	{
 		mSectorInfo->mSpacingY = doubleValue;
 	}
@@ -289,8 +279,8 @@ QSize ProbeDefinitionFromStringMessages::getSize()
 
 DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox() const
 {
-	DoubleBoundingBox3D retval(mSectorInfo->mBouningBox[0], mSectorInfo->mBouningBox[1],
-			mSectorInfo->mBouningBox[2], mSectorInfo->mBouningBox[3],
+	DoubleBoundingBox3D retval(mSectorInfo->mBoundingBox[0], mSectorInfo->mBoundingBox[1],
+			mSectorInfo->mBoundingBox[2], mSectorInfo->mBoundingBox[3],
 			this->getBoundingBoxThirdDimensionStart(),
 			this->getBoundingBoxThirdDimensionEnd());
 	return retval;
@@ -298,16 +288,16 @@ DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox() const
 
 double ProbeDefinitionFromStringMessages::getBoundingBoxThirdDimensionStart() const
 {
-	if(mSectorInfo->mBouningBox.size() == 6)
-		return mSectorInfo->mBouningBox[4];
+	if(mSectorInfo->mBoundingBox.size() == 6)
+		return mSectorInfo->mBoundingBox[4];
 	else
 		return 0;
 }
 
 double ProbeDefinitionFromStringMessages::getBoundingBoxThirdDimensionEnd() const
 {
-	if(mSectorInfo->mBouningBox.size() == 6)
-		return mSectorInfo->mBouningBox[5];
+	if(mSectorInfo->mBoundingBox.size() == 6)
+		return mSectorInfo->mBoundingBox[5];
 	else
 		return 0;
 }

@@ -26,7 +26,7 @@ AngleMetric::AngleMetric(const QString& uid, const QString& name, PatientModelSe
 {
 	mUseSimpleVisualization = false;
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "point 0" << "point 1" << "point 2" << "point 3"));
-	mArguments->setValidArgumentTypes(QStringList() << "pointMetric");
+	mArguments->setValidArgumentTypes(QStringList() << DATATYPE_POINT_METRIC);
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(resetCachedValues()));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 }

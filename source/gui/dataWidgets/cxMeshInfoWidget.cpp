@@ -43,7 +43,7 @@ ActiveMeshPropertiesWidget::ActiveMeshPropertiesWidget(VisServicesPtr services, 
 {
 	this->setToolTip("Mesh properties");
 
-	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), "mesh");
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), DATATYPE_MESH);
 	activeMeshProperty->setValueName("Active Mesh");
 
 	QVBoxLayout* layout = new QVBoxLayout(this);
@@ -62,7 +62,7 @@ AllMeshPropertiesWidget::AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr
 {
 	this->setToolTip("Mesh properties");
 
-	this->addTab(new MeshInfoWidget(mesh, services->patient(), services->view(), this), "Info");
+	this->addTab(new MeshInfoWidget(mesh, services->patient(), services->view(), services->file(), this), "Info");
 	this->addTab(new MeshPropertiesWidget(mesh, services->patient(), services->view(), this), "Properties");
 	this->addTab(new MeshTextureWidget(mesh, services->patient(), services->view(), this), "Texture");
 	this->addTab(new SelectClippersForMeshWidget(services, this), "Clip");
@@ -76,10 +76,12 @@ AllMeshPropertiesWidget::AllMeshPropertiesWidget(SelectDataStringPropertyBasePtr
 MeshInfoWidget::MeshInfoWidget(SelectDataStringPropertyBasePtr meshSelector,
 							   PatientModelServicePtr patientModelService,
 							   ViewServicePtr viewService,
+							   FileManagerServicePtr fileManager,
 							   QWidget* parent) :
 	InfoWidget(parent, "mesh_info_widget", "Mesh Properties"),
 	mPatientModelService(patientModelService),
 	mViewService(viewService),
+	mFileManagerService(fileManager),
 	mMeshSelector(meshSelector)
 {
 	connect(mMeshSelector.get(), &Property::changed, this, &MeshInfoWidget::meshSelectedSlot);
@@ -143,7 +145,7 @@ void MeshInfoWidget::generateNormalsSlot()
 	mMesh->setVtkPolyData(normals->GetOutput());
 
 	QString outputBasePath = mPatientModelService->getActivePatientFolder();
-	mMesh->save(outputBasePath);
+	mMesh->save(outputBasePath, mFileManagerService);
 }
 
 void MeshInfoWidget::meshChangedSlot()

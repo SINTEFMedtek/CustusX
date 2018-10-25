@@ -61,7 +61,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return "planeMetric";
+		return DATATYPE_PLANE_METRIC;
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/metric_plane.png");}
 

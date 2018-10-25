@@ -206,9 +206,10 @@ double DicomConverter::getMeanSliceDistance(std::map<double, ImagePtr> sorted) c
 		return 0;
 
 	// use average of all slices
-	double p1 = sorted.rbegin()->first;
-	double p0 = sorted.begin()->first;
-	return (p1-p0)/sorted.size();
+	double zValueLastImage = sorted.rbegin()->first;
+	double zValueFirstImage = sorted.begin()->first;
+	unsigned long numHolesBetweenImages = sorted.size() - 1;
+	return (zValueLastImage-zValueFirstImage)/numHolesBetweenImages;
 }
 
 ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const

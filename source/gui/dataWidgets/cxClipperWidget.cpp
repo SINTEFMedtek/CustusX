@@ -282,11 +282,11 @@ QString ClipperWidget::getDataTypeRegExp()
 {
 	QStringList dataTypes;
 	if(mShowImages->isChecked())
-		dataTypes << "image";
+		dataTypes << DATATYPE_IMAGE;
 	if(mShowMeshes->isChecked())
-		dataTypes << "mesh";
+		dataTypes << DATATYPE_MESH;
 	if(mShowTrackedStreams->isChecked())
-		dataTypes << "trackedStream";
+		dataTypes << DATATYPE_TRACKED_STREAM;
 	if(mShowMetrics->isChecked())
 		dataTypes << ".*Metric$";
 	QString typeRegExp = dataTypes.join('|');

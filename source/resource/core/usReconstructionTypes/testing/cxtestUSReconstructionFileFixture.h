@@ -55,7 +55,7 @@ protected:
 	cx::USReconstructInputData createUSReconstructData(ReconstructionData input);
 
 	QString write(ReconstructionData input);
-	cx::USReconstructInputData read(QString filename);
+	cx::USReconstructInputData read(QString filename, cx::FileManagerServicePtr filemanagerservice);
 	void assertCorrespondence(ReconstructionData input, cx::USReconstructInputData output);
 };
 
