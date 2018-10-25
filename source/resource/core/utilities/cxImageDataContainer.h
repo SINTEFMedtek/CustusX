@@ -43,7 +43,7 @@ public:
 	  * Return name of file.
 	  */
 	QString getFilename() { return mFilename; }
-	vtkImageDataPtr getImage();
+	vtkImageDataPtr getImage(FileManagerServicePtr filemanager);
 	/**
 	  * Clear the image contents from memory, if possible.
 	  * Return true if purge was successful.
@@ -83,9 +83,9 @@ typedef boost::shared_ptr<ImageDataContainer> ImageDataContainerPtr;
 class cxResource_EXPORT CachedImageDataContainer : public ImageDataContainer
 {
 public:
-	CachedImageDataContainer();
-	CachedImageDataContainer(QString baseFilename, int size);
-	CachedImageDataContainer(std::vector<QString> frames);
+	CachedImageDataContainer(FileManagerServicePtr filemanagerservice);
+	CachedImageDataContainer(QString baseFilename, int size, FileManagerServicePtr filemanagerservice);
+	CachedImageDataContainer(std::vector<QString> frames, FileManagerServicePtr filemanagerservice);
 //	CachedImageDataContainer(std::vector<CachedImageDataPtr> frames);
 	virtual ~CachedImageDataContainer();
 	virtual vtkImageDataPtr get(unsigned index);
@@ -101,6 +101,8 @@ public:
 private:
 	std::vector<CachedImageDataPtr> mImages;
 	bool mDeleteFilesOnRelease;
+	FileManagerServicePtr mFileManagerService;
+	CachedImageDataContainer(){};
 };
 typedef boost::shared_ptr<CachedImageDataContainer> CachedImageDataContainerPtr;
 

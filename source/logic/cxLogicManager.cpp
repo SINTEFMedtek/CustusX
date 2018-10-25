@@ -29,6 +29,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStateServiceProxy.h"
 #include "cxViewServiceProxy.h"
 #include "cxSessionStorageServiceProxy.h"
+#include "cxFileManagerServiceProxy.h"
 #include "cxReporter.h"
 #include "cxProfile.h"
 
@@ -76,6 +77,7 @@ void LogicManager::initializeServices()
 	if (mComponent)
 		mComponent->create();
 
+	mShutdown = false;
 	CX_LOG_DEBUG() << " --- End initialize services.";
 }
 
@@ -96,6 +98,7 @@ void LogicManager::createLegacyStoredServices()
 	// services layer
 	ctkPluginContext* pc = this->getPluginContext();
 
+	//mFileManagerService = FileManagerServiceProxy::create(pc);
 	mTrackingService = TrackingServiceProxy::create(pc);
 	mPatientModelService = PatientModelServiceProxy::create(pc);
 	mVideoService = VideoServiceProxy::create(pc);
@@ -141,6 +144,12 @@ void LogicManager::restartServicesWithProfile(QString uid)
 
 void LogicManager::shutdownServices()
 {
+	if(mShutdown)
+	{
+		CX_LOG_ERROR() << "Trying to shutdown logicmanager when it already shutdown. Aborting shutdown, fix code.";
+		return;
+	}
+
 	CX_LOG_INFO() << " --- Shutting down " << qApp->applicationName() << "...";
 
 	this->getPatientModelService()->autoSave();
@@ -156,6 +165,7 @@ void LogicManager::shutdownServices()
 	Reporter::shutdown();
 	ProfileManager::shutdown();
 
+	mShutdown = true;
 	CX_LOG_DEBUG() << " --- End shutdown services";
 }
 
@@ -206,6 +216,12 @@ SessionStorageServicePtr LogicManager::getSessionStorageService()
 {
 	return mSessionStorageService;
 }
+
+//FileManagerServicePtr LogicManager::getFileManagerService()
+//{
+//	return mFileManagerService;
+//}
+
 PluginFrameworkManagerPtr LogicManager::getPluginFramework()
 {
 	return mPluginFramework;

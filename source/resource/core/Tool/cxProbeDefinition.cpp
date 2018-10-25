@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <iostream>
 #include "cxEnumConverter.h"
 #include "cxLogger.h"
+#include "cxImage.h"
 
 namespace cx
 {
@@ -59,7 +60,7 @@ void ProbeDefinition::addXml(QDomNode dataNode) const
 
 	elem.setAttribute("uid", qstring_cast(mUid));
 
-	QDomElement imageNode = dataNode.ownerDocument().createElement("image");
+	QDomElement imageNode = dataNode.ownerDocument().createElement(DATATYPE_IMAGE);
 	this->addImageXml(imageNode);
 	dataNode.appendChild(imageNode);
 }
@@ -77,7 +78,7 @@ void ProbeDefinition::parseXml(QDomNode dataNode)
 	mCenterOffset = loadAttribute(elem, "centerOffset", 0);
 	mUid = elem.attribute("uid");
 
-	QDomNode imageNode = dataNode.namedItem("image");
+	QDomNode imageNode = dataNode.namedItem(DATATYPE_IMAGE);
 	this->parseImageXml(imageNode);
 }
 

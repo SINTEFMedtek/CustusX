@@ -136,7 +136,7 @@ Function Get-ToolList{
     # git 2.13.0
     $toollist += New-Object Tool(
 				"git", 
-			    "https://github.com/git-for-windows/git/releases/download/v2.13.0.windows.1/Git-2.13.0-64-bit.exe",
+			    "https://npm.taobao.org/mirrors/git-for-windows/2.13.0.windows.1/Git-2.13.0-64-bit.exe",
 			    "$ToolFolder\git-installer.exe", 
 			    "Inno Setup package", 
 			    "$script:CX_PROGRAM_FILES\Git\bin",
@@ -155,11 +155,12 @@ Function Get-ToolList{
 				"",
 				"", 
 				"ninja", 
-				"Enables support for compiling using more than one core.")
-    # CMake 3.5.2 (x86)
+				"Enables support for compiling using more than one core."
+                )
+    # CMake 3.8.1 (x86)
     $toollist += New-Object Tool(
 				"cmake", 
-				"https://cmake.org/files/v3.5/cmake-3.5.2-win32-x86.msi", 
+				"https://cmake.org/files/v3.8/cmake-3.8.1-win32-x86.msi", 
 				"$ToolFolder\cmake-installer.msi", 
 				"MSI", 
 				"$script:CX_PROGRAM_FILES_X86\CMake\bin",
@@ -216,10 +217,10 @@ Function Get-ToolList{
 			    "eclipse", 
 			    "Editor. Kepler (4.3)"
 				)
-    # Qt 5.6 vs2015, 64 bit libs only, installer
+    # Qt 5.9.6, select mvs 2015, 64 bit
     $toollist += New-Object Tool(
 				"qt", 
-				"http://download.qt.io/archive/qt/5.6/5.6.0/qt-opensource-windows-x86-msvc2015_64-5.6.0.exe", 
+                "http://download.qt.io/archive/qt/5.9/5.9.6/qt-opensource-windows-x86-5.9.6.exe",
 			    "$ToolFolder\qt.exe", 
 			    "NSIS package", 
 			    "$script:CX_DEFAULT_DRIVE\Qt\Qt5.6.0\5.6\msvc2015_64\bin",

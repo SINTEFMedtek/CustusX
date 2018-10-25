@@ -3,7 +3,6 @@ if(BUILD_TESTING)
 
     set(CXTEST_SOURCES_TO_MOC
         cxViewsWindow.h
-        cxViewsFixture.h
     )
 
     set(CXTEST_SOURCES
@@ -11,18 +10,15 @@ if(BUILD_TESTING)
         cxtestRenderTester.cpp
         cxTestRenderSpeed.h
         cxTestRenderSpeed.cpp
-        cxViewsFixture.cpp
         cxViewsWindow.cpp
         cxtestVideoGraphicsFixture.cpp
         cxtestVideoGraphics.cpp
-        cxtestVisualRendering.cpp
         cxtestImageEnveloper.cpp
         cxtestStream2DRep3D.cpp
         cxtestSharedOpenGLContext.cpp
         cxtestRenderWindowFactory.cpp
         cxtestViewServiceMockWithRenderWindowFactory.h
         cxtestViewServiceMockWithRenderWindowFactory.cpp
-        cxtestGeometricRep.cpp
         cxtestMultiViewCache.cpp
     )
 
@@ -46,6 +42,7 @@ if(BUILD_TESTING)
         cxResourceVisualization
         cxCatch
         cxLogicManager
+        cxPluginUtilities
     )
     cx_add_tests_to_catch(cxtestResourceVisualization)
     

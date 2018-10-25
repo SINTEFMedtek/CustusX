@@ -14,6 +14,7 @@ set(CX_PLUGINS
   org.custusx.core.openigtlink3:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
+  org.custusx.core.filemanager:ON
   org.custusx.dicom:ON
   org.custusx.usreconstruction.vnncl:ON
   org.custusx.usreconstruction.pnn:ON
@@ -34,6 +35,7 @@ set(CX_PLUGINS
   org.custusx.help:ON
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
+  org.custusx.ceetron:ON
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
 )

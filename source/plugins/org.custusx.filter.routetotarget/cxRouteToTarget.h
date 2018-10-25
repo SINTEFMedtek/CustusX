@@ -28,12 +28,16 @@ public:
     vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
     vtkPolyDataPtr findExtendedRoute(Vector3D targetCoordinate_r);
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
+    std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
+    void addRouteInformationToFile(VisServicesPtr services);
+    double calculateRouteLength(std::vector< Eigen::Vector3d > route);
 
 private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;
+    Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
     std::vector< Eigen::Vector3d > mExtendedRoutePositions;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
