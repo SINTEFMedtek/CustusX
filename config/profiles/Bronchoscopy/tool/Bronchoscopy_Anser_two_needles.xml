@@ -2,8 +2,8 @@
 <configuration clinical_app="Bronchoscopy">
     <trackingsystemimplementation type="openigtlink">
     <tracker type="aurora">
-        <toolfile reference="no" openigtlinktransformid="Anser1">Shared/Anser_Pointer1/Anser.xml</toolfile>
-        <toolfile reference="no" openigtlinktransformid="Anser2">Shared/Anser_Pointer2/Anser.xml</toolfile>
+        <toolfile reference="no" openigtlinktransformid="Anser1">Shared/Anser_Needle1/Anser.xml</toolfile>
+        <toolfile reference="no" openigtlinktransformid="Anser2">Shared/Anser_Needle2/Anser.xml</toolfile>
     </tracker>
     </trackingsystemimplementation>
 </configuration>

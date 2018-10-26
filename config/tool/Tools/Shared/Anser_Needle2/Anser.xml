@@ -5,13 +5,13 @@
 
 <tool>
     <type>pointer</type>
-    <id>AnserPointer1</id>
-    <name>AnserPointer1</name>
+    <id>AnserNeedle2</id>
+    <name>AnserNeedle2</name>
     <description>EMT Pointer</description>
     <manufacturer>UCC</manufacturer>
     <clinical_app>Laboratory</clinical_app>
-    <geo_file></geo_file>
-    <pic_file>AnserPointer.jpg</pic_file>
+    <geo_file>../Anser_Needle1/Biopsy_Needle_Model.stl</geo_file>
+    <pic_file>../Anser_Needle1/AnserNeedle.png</pic_file>
     <doc_file></doc_file>
     
     <!-- Instrument -->
