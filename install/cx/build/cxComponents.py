@@ -344,11 +344,11 @@ class OpenIGTLinkIO(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-#        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
-        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
+        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+#        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('5fd74cd00300d6121ee749bdc5cba840a60f0bbe')
+        self._getBuilder().gitCheckout('f862d6bfa270332955e8050df8ce057febf48392')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
