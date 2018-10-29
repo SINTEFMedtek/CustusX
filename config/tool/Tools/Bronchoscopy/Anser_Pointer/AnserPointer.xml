@@ -6,7 +6,7 @@
 <tool>
     <type>pointer</type>
     <id>AnserPointer</id>
-    <name> AnserPointer </name>
+    <name>AnserPointer</name>
     <description>EMT Pointer</description>
     <manufacturer>UCC</manufacturer>
     <clinical_app>Bronchoscopy</clinical_app>
