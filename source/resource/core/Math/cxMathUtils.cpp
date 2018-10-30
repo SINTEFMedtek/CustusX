@@ -22,6 +22,7 @@ namespace cx {
 //Deprecated. Don't use
 double roundAwayFromZero(double val)
 {
+	CX_LOG_WARNING() << "cx::roundAwayFromZero() is deprecated, and will be removed. Use std::round() or std::lround() instead.";
 	if(val >= 0)
 		return int(val+0.5);
 	else
