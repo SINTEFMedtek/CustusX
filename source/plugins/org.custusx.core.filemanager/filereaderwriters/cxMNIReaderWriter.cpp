@@ -74,15 +74,8 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 {
 	std::vector<DataPtr> retval;
 
-	//TODO this needs to be implemented properly
-	bool testmode = false;
-
 	//--- HACK to be able to read *.tag files with missing newline before eof
 	forceNewlineBeforeEof(filename);
-
-	//TODO
-	//std::vector<DataPtr> retval;
-	//DataPtr retval;
 
 
 	//--- Reader for MNI Tag Point files
@@ -94,15 +87,6 @@ std::vector<DataPtr> MNIReaderWriter::read(const QString &filename)
 
 	int number_of_volumes = reader->GetNumberOfVolumes();
 	QString description(reader->GetComments());
-	/*
-	//--- Prompt user to select the volume(s) that is(are) related to the points in the file
-	bool knownUidAreValid = this->validateKnownVolumeUids(number_of_volumes);
-	if(!knownUidAreValid)
-	{
-		mVolumeUids = dialogForSelectingVolumesForImportedMNITagFile(number_of_volumes, description);
-	}
-	*/
-
 
 	//--- Create the point metrics
 	QString type = DATATYPE_POINT_METRIC;
