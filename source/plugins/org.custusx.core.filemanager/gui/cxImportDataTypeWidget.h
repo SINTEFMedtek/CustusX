@@ -60,6 +60,8 @@ private:
 	//Use heuristics to guess a parent frame, based on similarities in name.
 	QString getInitialGuessForParentFrame() const;
 
+    void addPointMetricGroupsToTable();
+
 	ImportWidget* mImportWidget;
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
@@ -68,10 +70,19 @@ private:
 	std::map<QString, QComboBox *> mSpaceCBs;
 	std::map<QString, std::vector<DataPtr> > mPointMetricGroups;
 
+    StringPropertyDataModalityPtr mModalityAdapter;
+    StringPropertyImageTypePtr mImageTypeAdapter;
+    QWidget* mImageTypeCombo;
+    QWidget* mModalityCombo;
+
 	QComboBox *mAnatomicalCoordinateSystems;
 	QComboBox *mShouldImportParentTransform;
 	QComboBox *mParentCandidatesCB;
 	QCheckBox *mShouldConvertDataToUnsigned;
+
+    //image specific
+    QString mType;
+    QString mModality;
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
