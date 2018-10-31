@@ -37,6 +37,8 @@ if(BUILD_TESTING)
         cxtestUtilities
         cxCatch
         cxResource
+        cxtestResource
+        cxtest_org_custusx_core_patientmodel
     )
     cx_add_tests_to_catch(cxtest_org_custusx_filter_airwaysfromcenterline)
 
