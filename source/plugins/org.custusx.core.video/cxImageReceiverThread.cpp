@@ -46,12 +46,14 @@ bool ImageReceiverThread::attemptInitialize()
 	XmlOptionFile xmlFile = profile()->getXmlSettings().descend("video");
 	QDomElement element = xmlFile.getElement("video");
 	mImageStreamer = mStreamerInterface->createStreamer(element);
-	report(QString("Starting streamer: [%1]").arg(this->hostDescription()));
 
 	if(!mImageStreamer)
 	{
 		return false;
 	}
+
+	report(QString("Starting streamer: [%1]").arg(this->hostDescription()));
+
 	mSender.reset(new DirectlyLinkedSender());
 
 	connect(mSender.get(), &DirectlyLinkedSender::newImage, this, &ImageReceiverThread::addImageToQueueSlot, Qt::DirectConnection);
