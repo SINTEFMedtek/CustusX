@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "cxImageFileStreamerService.h"
 
+#include <QFileInfo>
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
@@ -57,11 +58,11 @@ StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 	StringMap args = ImageStreamerDummyArguments().convertToCommandLineArguments(root);
 	StreamerPtr localServerStreamer;
 
-	bool validArguments = !args["--filename"].isEmpty();
+	QString filename = args["--filename"];
 
-	if(!validArguments)
+	if(!QFileInfo(filename).exists())
 	{
-		CX_LOG_WARNING() << "ImageFileStreamerService::createStreamer() Filename missing, streamer will not be started.";
+		CX_LOG_WARNING() << "ImageFileStreamerService::createStreamer() Filename missing or not valid, streamer will not be started.";
 		return StreamerPtr();
 	}
 
