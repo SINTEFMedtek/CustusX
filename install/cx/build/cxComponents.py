@@ -636,3 +636,33 @@ class org_custusx_mariana(CppComponent):
 #    def addConfigurationToDownstreamLib(self, builder):
 #        add = builder.addCMakeOption
 #        add('CX_PLUGIN_org.custusx.mariana:BOOL', 'ON');
+
+# ---------------------------------------------------------
+
+class org_custusx_bronchoscopynavigation(CppComponent):
+
+    def name(self):
+        return "org.custusx.bronchoscopynavigation"
+    def help(self):
+        return 'Plugin bronchoscopynavigation'
+    def path(self):
+        custusx = self._createSibling(cx.build.cxComponents.CustusX)
+        return '%s/%s/source/plugins' % (custusx.path(), custusx.sourceFolder())
+    def sourceFolder(self):
+        return 'org.custusx.bronchoscopynavigation'
+#    def _rawCheckout(self):
+#        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('54571ecc3bdd5c993bf615d04229bfc6d323b192')
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def repository(self):
+        base = self.controlData.gitrepo_open_site_base
+        return '%s/org.custusx.bronchoscopynavigation.git' % base
+    def makeClean(self):
+        pass
+    def pluginPath(self):
+        return '%s' % self.sourcePath()
