@@ -19,6 +19,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx {
 
+//Deprecated. Don't use
+double roundAwayFromZero(double val)
+{
+	CX_LOG_WARNING() << "cx::roundAwayFromZero() is deprecated, and will be removed. Use std::round() or std::lround() instead.";
+	if(val >= 0)
+		return int(val+0.5);
+	else
+		return int(val-0.5);
+}
+
 Eigen::ArrayXd matrixToQuaternion(Transform3D Tx)
 // Converts a 4x4 transformation matrix to quaternion (7 elements)
 {

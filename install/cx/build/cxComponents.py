@@ -606,6 +606,8 @@ class org_custusx_angleCorrection(CppComponent):
         return '%s' % self.sourcePath()
 
 # ---------------------------------------------------------
+# These are private repositories, not part of the CustusX open source build
+# ---------------------------------------------------------
 
 class org_custusx_mariana(CppComponent):
 
