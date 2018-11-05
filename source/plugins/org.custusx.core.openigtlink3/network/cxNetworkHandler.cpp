@@ -174,6 +174,10 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		std::string openigtlinktransformid;
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
 
+		CX_LOG_DEBUG() << "TRANSFORM: "	<< " deviceName: " << header.deviceName
+										<< " openigtlinktransformid: " << openigtlinktransformid
+										<< " transform: " << cxtransform;
+
 		if (gotTransformId)
 			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestamp);
 		else
