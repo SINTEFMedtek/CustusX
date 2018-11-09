@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDesktopWidget>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QFileInfo>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
 #include "cxFileManagerService.h"
@@ -129,7 +130,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	QVBoxLayout *topLayout = new QVBoxLayout(this);
 	this->setLayout(topLayout);
 
-	QGroupBox *groupBox = new QGroupBox(filename);
+	QFileInfo fileInfo(filename);
+	QString title = fileInfo.fileName();
+
+	QGroupBox *groupBox = new QGroupBox(title);
 
 	QGridLayout *gridLayout = new QGridLayout();
 	gridLayout->addWidget(new QLabel("For all data in the file: "), 0, 0, 1, 2);
@@ -248,15 +252,15 @@ void ImportDataTypeWidget::applyParentTransformImport()
 	}
 
 	/*
-  if (!mTransformFromParentFrameCheckBox->isChecked())
+	if (!mTransformFromParentFrameCheckBox->isChecked())
 	return;
-  if(!mData)
+	if(!mData)
 	return;
-  DataPtr parent = mPatientModelService->getData(mData->getParentSpace());
-  if (!parent)
+	DataPtr parent = mPatientModelService->getData(mData->getParentSpace());
+	if (!parent)
 	return;
-  mData->get_rMd_History()->setRegistration(parent->get_rMd());
-  report("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
+	mData->get_rMd_History()->setRegistration(parent->get_rMd());
+	report("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
 	*/
 }
 
@@ -277,12 +281,12 @@ void ImportDataTypeWidget::applyConversionLPS()
 
 	/*
 	if (!mNiftiFormatCheckBox->isChecked())
-	  return;
+		return;
 	if(!mData)
-	  return;
+		return;
 	Transform3D sMd = mData->get_rMd();
 	Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-  //  rMd = createTransformRotateZ(M_PI) * rMd;
+	//  rMd = createTransformRotateZ(M_PI) * rMd;
 	Transform3D rMd = sMr.inv() * sMd;
 	mData->get_rMd_History()->setRegistration(rMd);
 	report("Nifti import: Converted data " + mData->getName() + " from LPS to RAS coordinates.");
