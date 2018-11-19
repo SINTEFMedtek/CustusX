@@ -27,8 +27,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "vtkDataArray.h"
 #include "cxReporter.h"
-#include "cxMathUtils.h"
-
 
 namespace cx
 {
@@ -277,8 +275,8 @@ void TransferFunctionAlphaWidget::paintHistogram(QPainter& painter)
 	double posMult = (this->width() - mBorder*2) / double(histogramSize);
 	for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
 	{
-	  int x = ((i- mImage->getMin()) * posMult); //Offset with min value
-	  int y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(i - mImage->getMin(), 0, 0))[0]+1)) * barHeightMult;
+		int x = int(std::lround(((i- mImage->getMin()) * posMult))); //Offset with min value
+		int y = int(std::lround(log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer(i - mImage->getMin(), 0, 0))[0]+1)) * barHeightMult));
 	  if (y > 0)
 	  {
 		painter.drawLine(x + mBorder, height() - mBorder,
@@ -332,8 +330,8 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
 
   double dposition = mImage->getMin() + mImage->getRange() * double(pos.x() - mPlotArea.left()) / mPlotArea.width();
   double dvalue = mImage->getMaxAlphaValue() * double(mPlotArea.bottom() - pos.y())/mPlotArea.height();
-  point.position = roundAwayFromZero(dposition);
-  point.value = roundAwayFromZero(dvalue);
+	point.position = int(std::lround(dposition));
+	point.value = int(std::lround(dvalue));
 
   point.position = constrainValue(point.position, mImage->getMin(), mImage->getMax());
   point.value = constrainValue(point.value, 0, mImage->getMaxAlphaValue());

@@ -16,7 +16,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include <cmath>
 #include "cxLogger.h"
-#include "cxMathUtils.h"
 
 namespace cx
 {
@@ -73,7 +72,7 @@ double CyclicActionLogger::getFPS()
     return -1;
   double numberOfRenderings =  mTiming.empty() ? 0 : mTiming.front().time.size();
   double fps = 1000.0 * numberOfRenderings / mIntervalClock.elapsed();
-  return roundAwayFromZero(fps);
+	return std::round(fps);
 }
 
 bool CyclicActionLogger::intervalPassed() const

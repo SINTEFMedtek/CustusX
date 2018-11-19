@@ -28,15 +28,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
 #include "cxReporter.h"
-#include "cxMathUtils.h"
-
 
 namespace cx
 {
 TransferFunctionColorWidget::TransferFunctionColorWidget(ActiveDataPtr activeData, QWidget* parent) :
   BaseWidget(parent, "transfer_function_color_widget", "Color Transfer Function"),
-	mCurrentClickPos(INT_MIN,INT_MIN),
-  mBorder(5)
+	mBorder(5),
+	mCurrentClickPos(INT_MIN,INT_MIN)
 {
 	this->setToolTip("Set the color part of a transfer function");
   this->setFocusPolicy(Qt::StrongFocus);
@@ -171,7 +169,7 @@ int TransferFunctionColorWidget::imageIntensity2screenX(int intensity)
 int TransferFunctionColorWidget::screenX2imageIntensity(int screenX)
 {
 	double i = mImage->getMin() + mImage->getRange() * double(screenX - mPlotArea.left()) /(mPlotArea.width()-1);
-	int retval = roundAwayFromZero(i);
+	int retval = int(std::lround(i));
 	return retval;
 }
 
@@ -198,8 +196,8 @@ void TransferFunctionColorWidget::paintColorBar(QPainter& painter)
 
 	// Use vtkColorTransferFunction for interpolation
 	vtkColorTransferFunctionPtr trFunc = mImageTF->generateColorTF();
-	int imin = mImageTF->getLevel() - mImageTF->getWindow()/2;
-	int imax = mImageTF->getLevel() + mImageTF->getWindow()/2;
+	long imin = std::lround(mImageTF->getLevel() - mImageTF->getWindow()/2);
+	long imax = std::lround(mImageTF->getLevel() + mImageTF->getWindow()/2);
 
 	for (int x = this->mPlotArea.left(); x <= this->mPlotArea.right(); ++x)
 	{

@@ -42,13 +42,19 @@ TEST_CASE("StreamerService: Service available", "[streaming][service][unit]")
 
 	cx::XmlOptionFile options = cx::profile()->getXmlSettings().descend("video");
 
+	QString imageFileStreamerName = "3D Image File";
+
 	for(int i = 0; i < serviceList.size(); ++i)
 	{
 		cx::StreamerService* service = serviceList.at(i);
-		INFO("Streamer: " + service->getName().toStdString());
+		QString streamerName = service->getName();
+		INFO("Streamer: " + streamerName.toStdString());
 		QDomElement element = options.getElement("video", service->getName());
 		cx::StreamerPtr streamer = service->createStreamer(element);
-		REQUIRE(streamer);
+		if (streamerName == imageFileStreamerName)
+			REQUIRE_FALSE(streamer); //ImageFileStreamerService won't start without a filename
+		else
+			REQUIRE(streamer);
 	}
 
 	cx::LogicManager::shutdown();
