@@ -511,6 +511,9 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
+    double minPointDistance = 0.5; //mm
+    mBranchListPtr->excludeClosePositionsInCTCenterline(minPointDistance); // to increase speed in registration
+
 	vtkPolyDataPtr retval = mBranchListPtr->createVtkPolyDataFromBranches();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
@@ -518,7 +521,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	mCenterlineProcessed = true;
 
 	return retval;
-
 }
 
 BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations)

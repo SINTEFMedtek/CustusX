@@ -327,6 +327,28 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
 	return retval;
 }
 
+void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
+
+    std::vector<BranchPtr> branchVector = this->getBranches();
+    for (int i = 0; i < branchVector.size(); i++)
+    {
+        Eigen::MatrixXd positions = branchVector[i]->getPositions();
+        Eigen::MatrixXd orientations = branchVector[i]->getOrientations();
+
+        for (int i = positions.cols()-2; i > 0; i--){
+            double distance = (positions.col(i) - positions.col(i+1)).norm();
+            if ( distance < minPointDistance )
+            {
+                positions = eraseCol(i,positions);
+                orientations = eraseCol(i,orientations);
+            }
+        }
+        branchVector[i]->setPositions(positions);
+        branchVector[i]->setOrientations(orientations);
+    }
+
+}
+
 /**
  * @brief BranchList::createVtkPolyDataFromBranches
  * Return a VtkPolyData object created from the
@@ -440,7 +462,7 @@ std::pair<Eigen::MatrixXd::Index, double> dsearch(Eigen::Vector3d p, Eigen::Matr
 {
 	Eigen::MatrixXd::Index index;
 	// find nearest neighbour
-	(positions.colwise() - p).colwise().squaredNorm().minCoeff(&index);
+    (positions.colwise() - p).colwise().squaredNorm().minCoeff(&index);
 	double d = (positions.col(index) - p).norm();
 
 	return std::make_pair(index , d);
