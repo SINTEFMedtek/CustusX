@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxBranch.h"
@@ -92,39 +92,39 @@ int Branch::findParentIndex(branchVector bv) const
 
 int Branch::findGenerationNumber()
 {
-    int generationNumber = 1;
+	int generationNumber = 1;
 
-    BranchPtr parentBranchPtr = this->getParentBranch();
-    while (parentBranchPtr)
-    {
-        if (parentBranchPtr->getChildBranches().size() > 1) // Do not count generation if it is not a real division
-            generationNumber = generationNumber + 1;
+	BranchPtr parentBranchPtr = this->getParentBranch();
+	while (parentBranchPtr)
+	{
+		if (parentBranchPtr->getChildBranches().size() > 1) // Do not count generation if it is not a real division
+			generationNumber = generationNumber + 1;
 
-        parentBranchPtr = parentBranchPtr->getParentBranch();
+		parentBranchPtr = parentBranchPtr->getParentBranch();
 
-        if (generationNumber > 23) //maximum possible generations - avoiding infinite loop
-            break;
-    }
+		if (generationNumber > 23) //maximum possible generations - avoiding infinite loop
+			break;
+	}
 
-    return generationNumber;
+	return generationNumber;
 }
 
 double Branch::findBranchRadius()
 {
-    int generationNumber = this->findGenerationNumber();
+	int generationNumber = this->findGenerationNumber();
 
-    if (generationNumber == 1)
-        return 8;
-    if (generationNumber == 2)
-        return 6;
-    if (generationNumber == 3)
-        return 4;
-    if (generationNumber == 4)
-        return 3;
-    if (generationNumber == 5)
-        return 2.5;
-    else
-        return 2;
+	if (generationNumber == 1)
+		return 8;
+	if (generationNumber == 2)
+		return 6;
+	if (generationNumber == 3)
+		return 4;
+	if (generationNumber == 4)
+		return 3;
+	if (generationNumber == 5)
+		return 2.5;
+	else
+		return 2;
 }
 
 

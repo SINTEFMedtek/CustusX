@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -31,16 +31,16 @@ void RegistrationMethodBronchoscopyPluginActivator::start(ctkPluginContext* cont
 {
 	RegServicesPtr services = RegServices::create(context);
 	RegistrationMethodBronchoscopyImageToPatientService* image2patientService = new RegistrationMethodBronchoscopyImageToPatientService(services);
-    RegistrationMethodBronchoscopyImageToImageService* image2imageService = new RegistrationMethodBronchoscopyImageToImageService(services);
+	RegistrationMethodBronchoscopyImageToImageService* image2imageService = new RegistrationMethodBronchoscopyImageToImageService(services);
 
 	mRegistrationImageToPatient = RegisteredServicePtr(new RegisteredService(context, image2patientService, RegistrationMethodService_iid));
-    mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));
+	mRegistrationImageToImage = RegisteredServicePtr(new RegisteredService(context, image2imageService, RegistrationMethodService_iid));
 }
 
 void RegistrationMethodBronchoscopyPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistrationImageToPatient.reset();
-    mRegistrationImageToImage.reset();
+	mRegistrationImageToImage.reset();
 	Q_UNUSED(context);
 }
 

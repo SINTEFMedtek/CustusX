@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef BRANCH_H_
@@ -45,8 +45,8 @@ public:
 	void deleteChildBranches();
 	branchVector getChildBranches();
 	void setParentBranch(BranchPtr parent); //Note that this method doesn't set this branch as a child of the parent. Inconsistent?
-    int findGenerationNumber();
-    double findBranchRadius();
+	int findGenerationNumber();
+	double findBranchRadius();
 	BranchPtr getParentBranch();
 	int findParentIndex(branchVector bv) const;
 };

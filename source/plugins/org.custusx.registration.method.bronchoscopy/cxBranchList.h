@@ -25,23 +25,23 @@ typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
 {
-    std::vector<BranchPtr> mBranches;
+	std::vector<BranchPtr> mBranches;
 public:
-    BranchList();
-    virtual ~BranchList();
-    void addBranch(BranchPtr b);
-    void deleteBranch(BranchPtr b);
-    void deleteAllBranches();
-    std::vector<BranchPtr> getBranches();
-    void findBranchesInCenterline(Eigen::MatrixXd positions_r);
-    void selectGenerations(int maxGeneration);
-    void calculateOrientations();
-    void smoothOrientations();
-    void interpolateBranchPositions(int interpolationFactor);
-    void smoothBranchPositions(int controlPointDistance);
-    void excludeClosePositionsInCTCenterline(double minPointDistance);
-    BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
-    vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
+	BranchList();
+	virtual ~BranchList();
+	void addBranch(BranchPtr b);
+	void deleteBranch(BranchPtr b);
+	void deleteAllBranches();
+	std::vector<BranchPtr> getBranches();
+	void findBranchesInCenterline(Eigen::MatrixXd positions_r);
+	void selectGenerations(int maxGeneration);
+	void calculateOrientations();
+	void smoothOrientations();
+	void interpolateBranchPositions(int interpolationFactor);
+	void smoothBranchPositions(int controlPointDistance);
+	void excludeClosePositionsInCTCenterline(double minPointDistance);
+	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
+	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 };
 
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed);
