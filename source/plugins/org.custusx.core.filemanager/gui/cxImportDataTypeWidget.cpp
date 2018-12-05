@@ -45,7 +45,11 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 {
 	mAnatomicalCoordinateSystems = new QComboBox();
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
-	mAnatomicalCoordinateSystems->addItem("RAS");
+	mAnatomicalCoordinateSystems->addItem("RAS"); //NIfTI
+
+	//If NIfTI files always change to to RAS
+	if(filename.endsWith(".nii", Qt::CaseInsensitive))
+		mAnatomicalCoordinateSystems->setCurrentText("RAS");
 
 	mShouldImportParentTransform = new QComboBox();
 	mShouldImportParentTransform->addItem("No");
