@@ -149,6 +149,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 
 	groupBox->setLayout(gridLayout);
 	topLayout->addWidget(groupBox);
+	topLayout->addLayout(this->createDataTypeSpecificGui());
 
 	connect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
 	connect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
@@ -158,6 +159,28 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 {
 	disconnect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
 	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
+}
+
+QVBoxLayout* ImportDataTypeWidget::createDataTypeSpecificGui()
+{
+	QVBoxLayout* layout = new QVBoxLayout();
+
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[0]);
+	if(image)
+	{
+		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
+		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
+		mModalityAdapter->setData(image);
+
+		mImageTypeAdapter = StringPropertyImageType::New(mServices->patient());
+		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
+		mImageTypeAdapter->setData(image);
+
+		layout->addWidget(mModalityCombo);
+		layout->addWidget(mImageTypeCombo);
+	}
+
+	return layout;
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()

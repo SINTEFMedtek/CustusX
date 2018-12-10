@@ -46,6 +46,7 @@ private slots:
 	void pointMetricGroupSpaceChanged(int index);
 
 private:
+	QVBoxLayout* createDataTypeSpecificGui();
 	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
@@ -76,6 +77,11 @@ private:
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
 	int mSelectedIndexInTable;
+
+	StringPropertyDataModalityPtr mModalityAdapter;
+	StringPropertyImageTypePtr mImageTypeAdapter;
+	QWidget* mImageTypeCombo;
+	QWidget* mModalityCombo;
 };
 
 }
