@@ -41,7 +41,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mServices(services),
 	mData(data),
 	mParentCandidates(parentCandidates),
-	mSelectedIndexInTable(0)
+	mSelectedIndexInTable(0),
+	mImageTypeCombo(NULL),
+	mModalityCombo(NULL)
+
 {
 	mAnatomicalCoordinateSystems = new QComboBox();
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
@@ -96,22 +99,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
 			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
 			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(space));
-            if(type == DATATYPE_IMAGE)
-            {
-                ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[i]);
-                mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
-                mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
-                mModalityAdapter->setData(image);
-                mModalityCombo->setEnabled(image!=0);
-
-                mImageTypeAdapter = StringPropertyImageType::New(mServices->patient());
-                mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
-                mImageTypeAdapter->setData(image);
-                mImageTypeCombo->setEnabled(image!=0);
-            }
 		}
+		this->createDataSpecificGui(mData[i]);
 	}
-    this->addPointMetricGroupsToTable();
+	this->addPointMetricGroupsToTable();
 
 	//gui
 	QVBoxLayout *topLayout = new QVBoxLayout(this);
@@ -130,14 +121,13 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	gridLayout->addWidget(new QLabel("Convert data to unsigned?"), 4, 0);
 	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
 	gridLayout->addWidget(mTableWidget, 5, 0, 1, 2);
-    if(mModalityCombo)
-        gridLayout->addWidget(mModalityCombo);
-    if(mImageTypeCombo)
-        gridLayout->addWidget(mImageTypeCombo);
+	if(mModalityCombo)
+		gridLayout->addWidget(mModalityCombo);
+	if(mImageTypeCombo)
+		gridLayout->addWidget(mImageTypeCombo);
 
 	groupBox->setLayout(gridLayout);
 	topLayout->addWidget(groupBox);
-	topLayout->addLayout(this->createDataTypeSpecificGui());
 
 	connect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
 	connect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
@@ -149,11 +139,11 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
 }
 
-QVBoxLayout* ImportDataTypeWidget::createDataTypeSpecificGui()
-{
-	QVBoxLayout* layout = new QVBoxLayout();
 
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[0]);
+void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
+{
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+
 	if(image)
 	{
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
@@ -163,12 +153,7 @@ QVBoxLayout* ImportDataTypeWidget::createDataTypeSpecificGui()
 		mImageTypeAdapter = StringPropertyImageType::New(mServices->patient());
 		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
 		mImageTypeAdapter->setData(image);
-
-		layout->addWidget(mModalityCombo);
-		layout->addWidget(mImageTypeCombo);
 	}
-
-	return layout;
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
@@ -432,36 +417,36 @@ QString ImportDataTypeWidget::getInitialGuessForParentFrame() const
 
 void ImportDataTypeWidget::addPointMetricGroupsToTable()
 {
-    QString type, name;
-    int groupnr = 0;
-    std::map<QString, std::vector<DataPtr> >::iterator it = mPointMetricGroups.begin();
-    for(; it != mPointMetricGroups.end(); ++it)
-    {
-        groupnr +=1;
+	QString type, name;
+	int groupnr = 0;
+	std::map<QString, std::vector<DataPtr> >::iterator it = mPointMetricGroups.begin();
+	for(; it != mPointMetricGroups.end(); ++it)
+	{
+		groupnr +=1;
 
-        QString space = it->first;
-        std::vector<DataPtr> datas = it->second;
-        DataPtr data = datas[0];
-        if(datas.empty() || !data)
-        {
-            continue;
-        }
+		QString space = it->first;
+		std::vector<DataPtr> datas = it->second;
+		DataPtr data = datas[0];
+		if(datas.empty() || !data)
+		{
+			continue;
+		}
 
-        QComboBox *spaceCB = new QComboBox();
-        mSpaceCBs[space] = spaceCB;
-        connect(spaceCB, SIGNAL(currentIndexChanged(int)), this, SLOT(pointMetricGroupSpaceChanged(int)));
-        this->updateSpaceComboBox(spaceCB, space);
+		QComboBox *spaceCB = new QComboBox();
+		mSpaceCBs[space] = spaceCB;
+		connect(spaceCB, SIGNAL(currentIndexChanged(int)), this, SLOT(pointMetricGroupSpaceChanged(int)));
+		this->updateSpaceComboBox(spaceCB, space);
 
-        type = data->getType();
-        name = "Point metric group "+QString::number(groupnr);
+		type = data->getType();
+		name = "Point metric group "+QString::number(groupnr);
 
-        int newRowIndex = mTableWidget->rowCount();
-        mTableWidget->setRowCount(newRowIndex+1);
-        mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
-        mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-        mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
-        mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
-    }
+		int newRowIndex = mTableWidget->rowCount();
+		mTableWidget->setRowCount(newRowIndex+1);
+		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
+		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
+		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
+	}
 }
 
 

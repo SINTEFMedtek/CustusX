@@ -46,7 +46,7 @@ private slots:
 	void pointMetricGroupSpaceChanged(int index);
 
 private:
-	QVBoxLayout* createDataTypeSpecificGui();
+	void createDataSpecificGui(DataPtr data);
 	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
@@ -61,7 +61,7 @@ private:
 	//Use heuristics to guess a parent frame, based on similarities in name.
 	QString getInitialGuessForParentFrame() const;
 
-    void addPointMetricGroupsToTable();
+	void addPointMetricGroupsToTable();
 
 	ImportWidget* mImportWidget;
 	VisServicesPtr mServices;
@@ -71,19 +71,14 @@ private:
 	std::map<QString, QComboBox *> mSpaceCBs;
 	std::map<QString, std::vector<DataPtr> > mPointMetricGroups;
 
-    StringPropertyDataModalityPtr mModalityAdapter;
-    StringPropertyImageTypePtr mImageTypeAdapter;
-    QWidget* mImageTypeCombo;
-    QWidget* mModalityCombo;
-
 	QComboBox *mAnatomicalCoordinateSystems;
 	QComboBox *mShouldImportParentTransform;
 	QComboBox *mParentCandidatesCB;
 	QCheckBox *mShouldConvertDataToUnsigned;
 
-    //image specific
-    QString mType;
-    QString mModality;
+	//image specific
+	QString mType;
+	QString mModality;
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
