@@ -76,14 +76,11 @@ private:
 	QComboBox *mParentCandidatesCB;
 	QCheckBox *mShouldConvertDataToUnsigned;
 
-	//image specific
-	QString mType;
-	QString mModality;
-
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
 	int mSelectedIndexInTable;
 
+	//image specific
 	StringPropertyDataModalityPtr mModalityAdapter;
 	StringPropertyImageTypePtr mImageTypeAdapter;
 	QWidget* mImageTypeCombo;
