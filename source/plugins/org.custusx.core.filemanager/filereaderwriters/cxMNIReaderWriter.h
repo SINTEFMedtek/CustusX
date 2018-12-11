@@ -30,8 +30,8 @@ public:
 	bool isNull();
 	QString canReadDataType() const;
 	bool canRead(const QString &type, const QString &filename);
-	DataPtr read(const QString &uid, const QString &filename); ///< WARNING: will produce a popup dialog
-	std::vector<DataPtr> read(const QString &filename); ///< WARNING: will produce a popup dialog
+    DataPtr read(const QString &uid, const QString &filename);
+    std::vector<DataPtr> read(const QString &filename);
 	bool readInto(DataPtr data, QString path);
 
 	QString canWriteDataType() const;
