@@ -40,6 +40,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mImportWidget(parent),
 	mServices(services),
 	mData(data),
+	mFilename(filename),
 	mParentCandidates(parentCandidates),
 	mSelectedIndexInTable(0),
 	mImageTypeCombo(NULL),
@@ -50,8 +51,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
 	mAnatomicalCoordinateSystems->addItem("RAS"); //NIfTI
 
-	//If NIfTI files always change to to RAS
-	if(filename.endsWith(".nii", Qt::CaseInsensitive))
+	if(isNifti())
 		mAnatomicalCoordinateSystems->setCurrentText("RAS");
 
 	mShouldImportParentTransform = new QComboBox();
@@ -153,7 +153,21 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 		mImageTypeAdapter = StringPropertyImageType::New(mServices->patient());
 		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
 		mImageTypeAdapter->setData(image);
+
+		if(isNifti()) // NIfTI files are usually MR. Set this as the default
+		{
+			mModalityAdapter->setValue(DATATYPE_MR);
+			updateImageType();
+		}
 	}
+}
+
+void ImportDataTypeWidget::updateImageType()
+{
+	if(isT1())
+		mImageTypeAdapter->setValue(DATATYPE_T1);
+	if(isSegmentation())
+		mImageTypeAdapter->setValue(DATATYPE_SEGMENTATION);
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
@@ -447,6 +461,29 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
 		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
 	}
+}
+
+bool ImportDataTypeWidget::isNifti()
+{
+	if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
+		return true;
+	return false;
+}
+
+bool ImportDataTypeWidget::isSegmentation()
+{
+	if(mFilename.contains("label", Qt::CaseInsensitive))
+		return true;
+	if(mFilename.contains("seg", Qt::CaseInsensitive))
+		return true;
+	return false;
+}
+
+bool ImportDataTypeWidget::isT1()
+{
+	if(mFilename.contains("T1", Qt::CaseInsensitive))
+		return true;
+	return false;
 }
 
 

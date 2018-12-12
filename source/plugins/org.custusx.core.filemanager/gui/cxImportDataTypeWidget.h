@@ -44,6 +44,7 @@ public slots:
 private slots:
 	virtual void showEvent(QShowEvent *event);
 	void pointMetricGroupSpaceChanged(int index);
+	void updateImageType();
 
 private:
 	void createDataSpecificGui(DataPtr data);
@@ -63,9 +64,14 @@ private:
 
 	void addPointMetricGroupsToTable();
 
+	bool isNifti();
+	bool isSegmentation();
+	bool isT1();
+
 	ImportWidget* mImportWidget;
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
+	QString mFilename;
 	std::vector<DataPtr> &mParentCandidates;
 
 	std::map<QString, QComboBox *> mSpaceCBs;

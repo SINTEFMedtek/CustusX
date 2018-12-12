@@ -444,7 +444,7 @@ QStringList StringPropertyImageType::getValueRange() const
 		if (mData->getModality()==DATATYPE_CT)
 			retval << DATATYPE_SEGMENTATION;
 		if (mData->getModality()==DATATYPE_MR)
-			retval << "T1" << "T2" << "ANGIO" << DATATYPE_SEGMENTATION;
+			retval << DATATYPE_T1 << "T2" << "ANGIO" << DATATYPE_SEGMENTATION;
 		if (mData->getModality()==DATATYPE_US)
 			retval << "B-Mode" << "Angio" << DATATYPE_SEGMENTATION;
 	}
