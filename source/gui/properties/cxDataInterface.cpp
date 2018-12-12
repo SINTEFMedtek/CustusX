@@ -442,11 +442,11 @@ QStringList StringPropertyImageType::getValueRange() const
 	{
 		retval << mData->getImageType();
 		if (mData->getModality()=="CT")
-			retval << "";
+			retval << DATATYPE_SEGMENTATION;
 		if (mData->getModality()=="MR")
-			retval << "T1" << "T2" << "ANGIO";
+			retval << "T1" << "T2" << "ANGIO" << DATATYPE_SEGMENTATION;
 		if (mData->getModality()=="US")
-			retval << "B-Mode" << "Angio";
+			retval << "B-Mode" << "Angio" << DATATYPE_SEGMENTATION;
 	}
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }

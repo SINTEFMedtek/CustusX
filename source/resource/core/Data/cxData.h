@@ -38,6 +38,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define DATATYPE_PLANE_METRIC "planeMetric"
 #define DATATYPE_FRAME_METRIC "frameMetric"
 
+#define DATATYPE_SEGMENTATION "Segmentation"
+
 class QDomNode;
 
 namespace cx
