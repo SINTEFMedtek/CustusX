@@ -9,6 +9,19 @@ Import is performed in 3 steps:
 2. Enter correct parameters for all files.
 3. Press import button.
 
+File Parameters
+===========================================================
+Anatomical coordinate system
+* LPS - Used by CustusX and DICOM
+* RAS - Used by NIfTI and ITK Snap (Make sure this is selscted when importing NIfTI files, or data from ITK Snap)
+
+Import Parents transform
+* Copies the transform from the parent object
+
+Set parent
+* Set a parent object. This will connect the two objects, so that they move together when performing operations like registrations.
+
+
 Import file types {#import_file_types}
 ===========================================================
 
