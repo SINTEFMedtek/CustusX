@@ -46,7 +46,7 @@ void NeuroTrainingWidget::onImport()
 {
 	this->setUSSimulatorInput(this->getFirstUSVolume());
 //	this->makeUnavailable("Kaisa");
-	this->makeUnavailable("US", true);
+	this->makeUnavailable(DATATYPE_US, true);
 
 	this->changeWorkflowToImport();
 }
@@ -111,7 +111,7 @@ void NeuroTrainingWidget::on3DUSAcqStep()
 
 void NeuroTrainingWidget::onShowAllUSStep()
 {
-	this->makeAvailable("US", true);
+	this->makeAvailable(DATATYPE_US, true);
 	this->changeWorkflowToNavigation();
 }
 

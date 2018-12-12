@@ -140,7 +140,7 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 
 //	ImagePtr image = mPatientModelService->createImage(rawOutput, uid + "_%1", name + " %1", filePath);
 	image->get_rMd_History()->setRegistration(mOutputVolumeParams.get_rMd());
-	image->setModality("US");
+	image->setModality(DATATYPE_US);
 	if (mInput.mAngio)
 		image->setImageType("Angio");
 	else

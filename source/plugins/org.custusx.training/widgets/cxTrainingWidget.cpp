@@ -182,7 +182,7 @@ QString TrainingWidget::getFirstUSVolume()
 		DataPtr data = iter->second;
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 
-		if (image && image->getModality().contains("US"))
+		if (image && image->getModality().contains(DATATYPE_US))
 			return image->getUid();
 	}
 	return QString();

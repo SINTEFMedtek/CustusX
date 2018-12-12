@@ -378,7 +378,7 @@ QStringList StringPropertyDataModality::getValueRange() const
 	retval << "";
 	if (mData)
 		retval << mData->getModality();
-	retval << "CT" << "MR" << "US";
+	retval << DATATYPE_CT << DATATYPE_MR << DATATYPE_US;
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
@@ -441,11 +441,11 @@ QStringList StringPropertyImageType::getValueRange() const
 	if (mData)
 	{
 		retval << mData->getImageType();
-		if (mData->getModality()=="CT")
+		if (mData->getModality()==DATATYPE_CT)
 			retval << DATATYPE_SEGMENTATION;
-		if (mData->getModality()=="MR")
+		if (mData->getModality()==DATATYPE_MR)
 			retval << "T1" << "T2" << "ANGIO" << DATATYPE_SEGMENTATION;
-		if (mData->getModality()=="US")
+		if (mData->getModality()==DATATYPE_US)
 			retval << "B-Mode" << "Angio" << DATATYPE_SEGMENTATION;
 	}
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
