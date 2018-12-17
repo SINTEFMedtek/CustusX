@@ -254,22 +254,20 @@ QString ImportWidget::generateFileTypeFilter() const
 	return file_type_filter;
 }
 
-std::vector<DataPtr> ImportWidget::generateParentCandidates()
+void ImportWidget::generateParentCandidates()
 {
-	std::vector<DataPtr> parentCandidates;
 	for(unsigned i=0; i<mNotImportedData.size(); ++i)
 	{
 		if(mNotImportedData[i]->getType() != DATATYPE_POINT_METRIC)
-			parentCandidates.push_back(mNotImportedData[i]);
+			mParentCandidates.push_back(mNotImportedData[i]);
 	}
 	std::map<QString, DataPtr> loadedData = mVisServices->patient()->getDatas();
 	std::map<QString, DataPtr>::iterator it = loadedData.begin();
 	for(; it!=loadedData.end(); ++it)
 	{
-		parentCandidates.push_back(it->second);
+		mParentCandidates.push_back(it->second);
 	}
 	emit parentCandidatesUpdated();
-	return parentCandidates;
 }
 
 

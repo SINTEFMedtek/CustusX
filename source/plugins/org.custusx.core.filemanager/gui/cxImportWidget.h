@@ -50,7 +50,7 @@ private:
 	QString generateFileTypeFilter() const;
 
 	QString generateUid(QString filename) const;
-	std::vector<DataPtr> generateParentCandidates();
+	void generateParentCandidates();
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 	int findRowIndexContainingButton(QPushButton *button) const;
 
