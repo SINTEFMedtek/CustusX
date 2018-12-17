@@ -27,7 +27,7 @@ QString ReconstructRealTestData::getSourceFilename() const
 
 void ReconstructRealTestData::validateData(cx::ImagePtr output)
 {
-	REQUIRE(output->getModality().contains("US"));
+	REQUIRE(output->getModality().contains(DATATYPE_US));
 	REQUIRE( output->getRange() != 0);//Just check if the output volume is empty
 
 	vtkImageDataPtr volume = output->getGrayScaleVtkImageData();

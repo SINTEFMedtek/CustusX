@@ -44,6 +44,7 @@ public slots:
 private slots:
 	virtual void showEvent(QShowEvent *event);
 	void pointMetricGroupSpaceChanged(int index);
+	void updateImageType();
 
 private:
 	void createDataSpecificGui(DataPtr data);
@@ -59,13 +60,23 @@ private:
 	void applyConversionToUnsigned();
 
 	//Use heuristics to guess a parent frame, based on similarities in name.
-	QString getInitialGuessForParentFrame() const;
+	QString getInitialGuessForParentFrame();
+	int similatiryMeasure(QString current, QString candidate);
+	QStringList splitStringIntoSeparateParts(QString current);
+	int countEqualListElements(QStringList first, QStringList second);
+	bool excludeElement(QString element);
+	QString removeParenthesis(QString current);
 
 	void addPointMetricGroupsToTable();
+
+	bool isNifti();
+	bool isSegmentation(QString filename);
+	bool isT1();
 
 	ImportWidget* mImportWidget;
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
+	QString mFilename;
 	std::vector<DataPtr> &mParentCandidates;
 
 	std::map<QString, QComboBox *> mSpaceCBs;

@@ -28,7 +28,7 @@ ImageDefaultTFGenerator::ImageDefaultTFGenerator(ImagePtr image) : mImage(image)
 void ImageDefaultTFGenerator::resetShading()
 {
 	// add shading for known preoperative modalities
-	if (mImage->getModality().contains("CT") || mImage->getModality().contains("MR"))
+	if (mImage->getModality().contains(DATATYPE_CT) || mImage->getModality().contains(DATATYPE_MR))
 		mImage->setShadingOn(settings()->value("View/shadingOn").value<bool>());
 }
 
@@ -108,11 +108,11 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange() const
 				srange.second = 1;
 			}
 		}
-		if (mImage->getModality().contains("CT"))
+		if (mImage->getModality().contains(DATATYPE_CT))
 		{
 			srange = this->guessCTRange();
 		}
-		if (mImage->getModality().contains("MR"))
+		if (mImage->getModality().contains(DATATYPE_MR))
 		{
 			srange = this->guessMRRange();
 		}

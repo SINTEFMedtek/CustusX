@@ -50,10 +50,9 @@ private:
 	QString generateFileTypeFilter() const;
 
 	QString generateUid(QString filename) const;
-	std::vector<DataPtr> generateParentCandidates(std::vector<DataPtr> notLoadedData) const;
+	void generateParentCandidates();
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 	int findRowIndexContainingButton(QPushButton *button) const;
-	void readFilesAndGenerateParentCandidates();
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
@@ -63,6 +62,7 @@ private:
 
 	QStringList mFileNames;
 	std::vector<DataPtr> mParentCandidates;
+	std::vector<DataPtr> mNotImportedData;
 
 	FileManagerServicePtr mFileManager;
 	VisServicesPtr mVisServices;
