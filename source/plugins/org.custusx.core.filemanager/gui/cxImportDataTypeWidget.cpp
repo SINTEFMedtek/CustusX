@@ -166,7 +166,7 @@ void ImportDataTypeWidget::updateImageType()
 {
 	if(isT1())
 		mImageTypeAdapter->setValue(DATATYPE_T1);
-	if(isSegmentation())
+	if(isSegmentation(mFilename))
 		mImageTypeAdapter->setValue(DATATYPE_SEGMENTATION);
 }
 
@@ -220,11 +220,11 @@ void ImportDataTypeWidget::updateParentCandidatesComboBox()
 		mParentCandidatesCB->setCurrentIndex(selectedIndex);
 
 	//TODO parent guess:
-	/*
+
 	QString parentGuess = this->getInitialGuessForParentFrame();
-	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
+//	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
 	mParentCandidatesCB->setCurrentText(parentGuess);
-	*/
+
 
 }
 
@@ -234,6 +234,9 @@ void ImportDataTypeWidget::importAllData()
 	{
 		if(mData[i])
 		{
+			QString parentId = (mParentCandidatesCB->itemData(mParentCandidatesCB->currentIndex()).toString());
+			mData[i]->get_rMd_History()->setParentSpace(parentId);
+
 			mServices->patient()->insertData(mData[i]);
 			mServices->view()->autoShowData(mData[i]);
 		}
@@ -396,37 +399,104 @@ void ImportDataTypeWidget::pointMetricGroupSpaceChanged(int index)
 			pointMetricsGroupId = it->first;
 	}
 	std::vector<DataPtr> pointMetricGroup = mPointMetricGroups[pointMetricsGroupId];
-	for(int i=0; i<pointMetricGroup.size(); ++i)
+	for(unsigned i=0; i<pointMetricGroup.size(); ++i)
 	{
 		CoordinateSystem cs(csDATA, newSpace);
 		boost::dynamic_pointer_cast<PointMetric>(pointMetricGroup[i])->setSpace(cs);
 	}
 }
 
-
-QString ImportDataTypeWidget::getInitialGuessForParentFrame() const
+QString ImportDataTypeWidget::getInitialGuessForParentFrame()
 {
-	QString parentGuessSpace = "";
-	for(int i=0; i<mData.size(); ++i)
+	int candidateScore = 0;
+	QString bestCandidate;
+
+	for(unsigned i=0; i < mData.size(); ++i)
 	{
 		DataPtr data = mData[i];
-		QString base = qstring_cast(data->getName()).split(".")[0];
+		std::map<QString, QString> parentCandidates = this->getParentCandidateList();
 
-		std::map<QString, DataPtr> all = mServices->patient()->getDatas();
-		for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+		std::map<QString, QString>::iterator iter;
+		for(iter= parentCandidates.begin(); iter != parentCandidates.end(); ++iter)
 		{
-			if (iter->second==data)
-				continue;
-			QString current = qstring_cast(iter->second->getName()).split(".")[0];
-			if (base.indexOf(current)>=0)
+			int similarity = similatiryMeasure(data->getUid(), iter->second);
+			if(similarity > candidateScore && !isSegmentation(iter->second))
 			{
-				//data->get_rMd_History()->setParentSpace(iter->first);
-				parentGuessSpace = iter->first;
-				break;
+				candidateScore = similarity;
+				bestCandidate = iter->first;
 			}
 		}
 	}
-	return parentGuessSpace;
+
+	return bestCandidate;
+}
+
+int ImportDataTypeWidget::similatiryMeasure(QString current, QString candidate)
+{
+	QStringList currentList = splitStringIntoSeparateParts(current);
+	QStringList candidateList = splitStringIntoSeparateParts(candidate);
+	return countEqualListElements(currentList, candidateList);
+}
+
+QStringList ImportDataTypeWidget::splitStringIntoSeparateParts(QString current)
+{
+	current = removeParenthesis(current);
+
+	QStringList list = current.split(".", QString::SkipEmptyParts);
+	QStringList list2;
+	for (int i = 0; i < list.size(); ++i)
+	{
+		list2 << list[i].split("_", QString::SkipEmptyParts);
+	}
+	QStringList currentParts;
+	for (int i = 0; i < list2.size(); ++i)
+	{
+		currentParts << list2[i].split("-", QString::SkipEmptyParts);
+	}
+	return currentParts;
+}
+
+QString ImportDataTypeWidget::removeParenthesis(QString current)
+{
+		int startParenthesis;
+		do
+		{
+			startParenthesis = current.indexOf("{");
+			int endParenthesis = current.indexOf("}");
+			current.replace(startParenthesis, endParenthesis-startParenthesis+1, "");
+		} while (startParenthesis != -1);
+	return current;
+}
+
+int ImportDataTypeWidget::countEqualListElements(QStringList first, QStringList second)
+{
+	int retval = 0;
+	int numComparedElements = 0;
+	for (int i = 0; i < first.size(); ++i)
+	{
+		if(excludeElement(first[i]))
+			continue;
+		++numComparedElements;
+		for (int j = 0; j < second.size(); ++j)
+		{
+			if(first[i].compare(second[j]) == 0)
+			{
+				++retval;
+				break;//Don't count repeating elements
+			}
+		}
+	}
+
+	if (retval == numComparedElements)
+		return 0;//Don't match equal list
+	return retval;
+}
+
+bool ImportDataTypeWidget::excludeElement(QString element)
+{
+	if (isSegmentation(element))
+		return true;
+	return false;
 }
 
 void ImportDataTypeWidget::addPointMetricGroupsToTable()
@@ -470,11 +540,11 @@ bool ImportDataTypeWidget::isNifti()
 	return false;
 }
 
-bool ImportDataTypeWidget::isSegmentation()
+bool ImportDataTypeWidget::isSegmentation(QString filename)
 {
-	if(mFilename.contains("label", Qt::CaseInsensitive))
+	if(filename.contains("label", Qt::CaseInsensitive))
 		return true;
-	if(mFilename.contains("seg", Qt::CaseInsensitive))
+	if(filename.contains("seg", Qt::CaseInsensitive))
 		return true;
 	return false;
 }
