@@ -133,18 +133,6 @@ int ImportWidget::findRowIndexContainingButton(QPushButton *button) const
 	return retval;
 }
 
-void ImportWidget::readFilesAndGenerateParentCandidates()
-{
-	std::vector<DataPtr> notImportedData;
-	foreach(QString filename, mFileNames)
-	{
-		std::vector<DataPtr> newData = mFileManager->read(filename);
-		notImportedData.insert(notImportedData.end(), newData.begin(), newData.end());
-	}
-	mParentCandidates = this->generateParentCandidates(notImportedData);
-	emit parentCandidatesUpdated();
-}
-
 void ImportWidget::addMoreFilesButtonClicked()
 {
 	QStringList filenames = this->openFileBrowserForSelectingFiles();
@@ -159,9 +147,11 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 		widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
 		mStackedWidget->insertWidget(index, widget);
+
+		mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
 	}
 
-	this->readFilesAndGenerateParentCandidates();
+	this->generateParentCandidates();
 }
 
 void ImportWidget::importButtonClicked()
@@ -264,13 +254,13 @@ QString ImportWidget::generateFileTypeFilter() const
 	return file_type_filter;
 }
 
-std::vector<DataPtr> ImportWidget::generateParentCandidates(std::vector<DataPtr> notLoadedData) const
+std::vector<DataPtr> ImportWidget::generateParentCandidates()
 {
 	std::vector<DataPtr> parentCandidates;
-	for(unsigned i=0; i<notLoadedData.size(); ++i)
+	for(unsigned i=0; i<mNotImportedData.size(); ++i)
 	{
-		if(notLoadedData[i]->getType() != DATATYPE_POINT_METRIC)
-			parentCandidates.push_back(notLoadedData[i]);
+		if(mNotImportedData[i]->getType() != DATATYPE_POINT_METRIC)
+			parentCandidates.push_back(mNotImportedData[i]);
 	}
 	std::map<QString, DataPtr> loadedData = mVisServices->patient()->getDatas();
 	std::map<QString, DataPtr>::iterator it = loadedData.begin();
@@ -278,6 +268,7 @@ std::vector<DataPtr> ImportWidget::generateParentCandidates(std::vector<DataPtr>
 	{
 		parentCandidates.push_back(it->second);
 	}
+	emit parentCandidatesUpdated();
 	return parentCandidates;
 }
 
