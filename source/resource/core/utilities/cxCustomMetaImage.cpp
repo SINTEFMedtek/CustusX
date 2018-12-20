@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QStringList>
 #include "cxLogger.h"
+#include "cxData.h"
 
 #include "cxTypeConversions.h"
 
@@ -57,12 +58,12 @@ QString CustomMetaImage::readModality()
 {
 	QString mod = this->readKey("Modality");
 
-	if (mod.contains("CT", Qt::CaseInsensitive))
-		return "CT";
-	if (mod.contains("MR", Qt::CaseInsensitive))
-		return "MR";
-	if (mod.contains("US", Qt::CaseInsensitive))
-		return "US";
+	if (mod.contains(DATATYPE_CT, Qt::CaseInsensitive))
+		return DATATYPE_CT;
+	if (mod.contains(DATATYPE_MR, Qt::CaseInsensitive))
+		return DATATYPE_MR;
+	if (mod.contains(DATATYPE_US, Qt::CaseInsensitive))
+		return DATATYPE_US;
 	if (mod.contains("OTHER", Qt::CaseInsensitive))
 		return "OTHER";
 	mod = mod.remove("MET_MOD_");
@@ -119,7 +120,7 @@ void CustomMetaImage::setKey(QString key, QString value)
 void CustomMetaImage::setModality(QString value)
 {
     QStringList valid_values;
-    valid_values << "CT" << "MR" << "NM" << "US" << "OTHER" << "UNKNOWN";
+		valid_values << DATATYPE_CT << DATATYPE_MR << "NM" << DATATYPE_US << "OTHER" << "UNKNOWN";
     if(!valid_values.contains(value, Qt::CaseInsensitive))
         value = "UNKNOWN";
 

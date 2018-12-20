@@ -271,19 +271,19 @@ int getPriority(DataPtr data)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
-		if (image->getModality().toUpper().contains("US"))
+		if (image->getModality().toUpper().contains(DATATYPE_US))
 		{
 			if (image->getImageType().toUpper().contains("B-MODE"))
 				return 4;
 			else // angio types
 				return 5;
 		}
-		else if (image->getModality().toUpper().contains("MR"))
+		else if (image->getModality().toUpper().contains(DATATYPE_MR))
 		{
 			// MR, CT, SC, others
 			return 2;
 		}
-		else if (image->getModality().toUpper().contains("CT"))
+		else if (image->getModality().toUpper().contains(DATATYPE_CT))
 		{
 			// MR, CT, SC, others
 			return 1;

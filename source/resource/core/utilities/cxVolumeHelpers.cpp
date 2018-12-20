@@ -176,7 +176,7 @@ ImagePtr convertImageToUnsigned(PatientModelServicePtr  dataManager, ImagePtr im
 	// start by shifting up to zero
 	int shift = -input->GetScalarRange()[0];
 	// if CT: always shift by 1024 (houndsfield units definition)
-	if (image->getModality().contains("CT", Qt::CaseInsensitive))
+	if (image->getModality().contains(DATATYPE_CT, Qt::CaseInsensitive))
 		shift = 1024;
 
 	vtkImageDataPtr convertedImageData = suggestedConvertedVolume; // use input if given
