@@ -60,7 +60,7 @@ void ProbeDefinition::addXml(QDomNode dataNode) const
 
 	elem.setAttribute("uid", qstring_cast(mUid));
 
-	QDomElement imageNode = dataNode.ownerDocument().createElement(DATATYPE_IMAGE);
+	QDomElement imageNode = dataNode.ownerDocument().createElement(Image::getTypeName());
 	this->addImageXml(imageNode);
 	dataNode.appendChild(imageNode);
 }
@@ -78,7 +78,7 @@ void ProbeDefinition::parseXml(QDomNode dataNode)
 	mCenterOffset = loadAttribute(elem, "centerOffset", 0);
 	mUid = elem.attribute("uid");
 
-	QDomNode imageNode = dataNode.namedItem(DATATYPE_IMAGE);
+	QDomNode imageNode = dataNode.namedItem(Image::getTypeName());
 	this->parseImageXml(imageNode);
 }
 

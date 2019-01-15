@@ -219,7 +219,7 @@ void ImageLandmarksWidget::importPointMetricsToLandmarkButtonClickedSlot()
 	if(!image)
 		return;
 
-	std::map<QString, DataPtr> point_metrics = mServices->patient()->getChildren(image->getUid(), DATATYPE_POINT_METRIC);
+	std::map<QString, DataPtr> point_metrics = mServices->patient()->getChildren(image->getUid(), PointMetric::getTypeName());
 	std::map<QString, DataPtr>::iterator it = point_metrics.begin();
 
 	//Make sure we have enough landmarks

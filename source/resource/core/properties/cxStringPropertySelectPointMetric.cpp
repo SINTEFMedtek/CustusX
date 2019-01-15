@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx {
 
 StringPropertySelectPointMetric::StringPropertySelectPointMetric(PatientModelServicePtr patientModelService) :
-				SelectDataStringPropertyBase(patientModelService, DATATYPE_POINT_METRIC)
+				SelectDataStringPropertyBase(patientModelService, PointMetric::getTypeName())
 {
     mValueName = "Select point metric";
     mHelp = "Select a point metric";

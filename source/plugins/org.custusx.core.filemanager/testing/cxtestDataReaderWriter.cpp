@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxtestVisServices.h"
 #include "cxLogger.h"
+#include "cxPointMetric.h"
 
 namespace cxtest
 {
@@ -48,17 +49,17 @@ TEST_CASE("Import MNI Tag Point file", "[integration][metrics][mni]")
 
     std::vector<cx::DataPtr> data_with_labels = mni.read(tagFileWithLabels);
     REQUIRE(data_with_labels.size() == 6);
-    for(int i=0; i<data_with_labels.size(); ++i)
+		for(unsigned i=0; i<data_with_labels.size(); ++i)
     {
-        REQUIRE(data_with_labels[i]->getType() == DATATYPE_POINT_METRIC);
+				REQUIRE(data_with_labels[i]->getType() == cx::PointMetric::getTypeName());
         REQUIRE(data_with_labels[i]->getName().toInt() == 0);
     }
 
     std::vector<cx::DataPtr> data_without_labels = mni.read(tagFileWithoutLabels);
     REQUIRE(data_without_labels.size() == 6);
-    for(int i=0; i<data_without_labels.size(); ++i)
+		for(unsigned i=0; i<data_without_labels.size(); ++i)
     {
-        REQUIRE(data_without_labels[i]->getType() == DATATYPE_POINT_METRIC);
+				REQUIRE(data_without_labels[i]->getType() == cx::PointMetric::getTypeName());
         REQUIRE(data_without_labels[i]->getName().toInt() != 0);
     }
 }

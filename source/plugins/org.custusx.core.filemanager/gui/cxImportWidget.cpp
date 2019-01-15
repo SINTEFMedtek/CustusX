@@ -29,6 +29,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxImportDataTypeWidget.h"
 #include "cxSessionStorageService.h"
+#include "cxImage.h"
+#include "cxMesh.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {
@@ -232,9 +235,9 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 QString ImportWidget::generateFileTypeFilter() const
 {
 	QString file_type_filter;
-	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType(DATATYPE_MESH);
-	std::vector<FileReaderWriterServicePtr> image_readers = mVisServices->file()->getImportersForDataType(DATATYPE_IMAGE);
-	std::vector<FileReaderWriterServicePtr> point_metric_readers = mVisServices->file()->getImportersForDataType(DATATYPE_POINT_METRIC);
+	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType(Mesh::getTypeName());
+	std::vector<FileReaderWriterServicePtr> image_readers = mVisServices->file()->getImportersForDataType(Image::getTypeName());
+	std::vector<FileReaderWriterServicePtr> point_metric_readers = mVisServices->file()->getImportersForDataType(PointMetric::getTypeName());
 	std::vector<FileReaderWriterServicePtr> readers;
 	readers.insert( readers.end(), mesh_readers.begin(), mesh_readers.end() );
 	readers.insert( readers.end(), image_readers.begin(), image_readers.end() );
@@ -258,7 +261,7 @@ void ImportWidget::generateParentCandidates()
 {
 	for(unsigned i=0; i<mNotImportedData.size(); ++i)
 	{
-		if(mNotImportedData[i]->getType() != DATATYPE_POINT_METRIC)
+		if(mNotImportedData[i]->getType() != PointMetric::getTypeName())
 			mParentCandidates.push_back(mNotImportedData[i]);
 	}
 	std::map<QString, DataPtr> loadedData = mVisServices->patient()->getDatas();

@@ -125,7 +125,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return DATATYPE_IMAGE;
+		return "image";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/volume.png");}
 

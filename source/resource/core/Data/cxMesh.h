@@ -66,7 +66,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return DATATYPE_MESH;
+		return "mesh";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/surface.png");}
 
