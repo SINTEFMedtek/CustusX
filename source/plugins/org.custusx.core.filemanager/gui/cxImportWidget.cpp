@@ -70,9 +70,9 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	QPushButton *importButton = new QPushButton("Import");
 	QPushButton *cancelButton = new QPushButton("Cancel");
-	buttonLayout->addStretch();
 	buttonLayout->addWidget(importButton);
 	buttonLayout->addWidget(cancelButton);
+	buttonLayout->addStretch();
 	mTopLayout->addWidget(addMoreFilesButton);
 	mTopLayout->addWidget(new QLabel("Supports: "+this->generateFileTypeFilter()));
 	mTopLayout->addWidget(mTableWidget);
