@@ -176,7 +176,7 @@ QStringList TransferFunctions3DPresets::generatePresetList(IMAGE_MODALITY modali
 	{
 		QString presetName = presetNodeList.item(i).toElement().attribute("name");
 		QString presetModality = presetNodeList.item(i).toElement().attribute("modality");
-		if ( (presetModality == modality) || (modUNKNOWN == modality) || modCOUNT == modality )
+		if ( (string2enum<IMAGE_MODALITY>(presetModality) == modality) || (modUNKNOWN == modality) || modCOUNT == modality )
 			presetList << presetName;
 	}
 
