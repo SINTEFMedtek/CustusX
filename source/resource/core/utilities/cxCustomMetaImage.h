@@ -15,9 +15,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QString>
 #include "cxTransform3D.h"
+#include "cxDefinitions.h"
 
 namespace cx
 {
+
+cxResource_EXPORT IMAGE_MODALITY convertToModality(QString modalityString);
+cxResource_EXPORT IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString);
 
 typedef boost::shared_ptr<class CustomMetaImage> CustomMetaImagePtr;
 
@@ -37,10 +41,10 @@ public:
   Transform3D readTransform();
   void setTransform(const Transform3D M);
 
-  QString readModality();
-  QString readImageType();
-  void setModality(QString value);
-  void setImageType(QString value);
+	IMAGE_MODALITY readModality();
+	IMAGE_SUBTYPE readImageType();
+	void setModality(IMAGE_MODALITY value);
+	void setImageType(IMAGE_SUBTYPE value);
 
   QString readKey(QString key);
   void setKey(QString key, QString value);

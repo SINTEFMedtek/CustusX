@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <string.h>
 
 #include "cxDicomImageReader.h"
+#include "cxCustomMetaImage.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -110,8 +111,8 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	}
 	image->setVtkImageData(imageData);
 
-	QString modality = reader->item()->GetElementAsString(DCM_Modality);
-	image->setModality(modality);
+	QString modalityString = reader->item()->GetElementAsString(DCM_Modality);
+	image->setModality(convertToModality(modalityString));
 
 	DicomImageReader::WindowLevel windowLevel = reader->getWindowLevel();
 	image->setInitialWindowLevel(windowLevel.width, windowLevel.center);
@@ -139,7 +140,7 @@ std::vector<ImagePtr> DicomConverter::createImages(QStringList files)
 std::map<double, ImagePtr> DicomConverter::sortImagesAlongDirection(std::vector<ImagePtr> images, Vector3D  e_sort)
 {
 	std::map<double, ImagePtr> sorted;
-	for (int i=0; i<images.size(); ++i)
+	for (unsigned i=0; i<images.size(); ++i)
 	{
 		Vector3D pos = images[i]->get_rMd().coord(Vector3D(0,0,0));
 		double dist = dot(pos, e_sort);

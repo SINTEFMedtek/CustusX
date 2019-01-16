@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_training_Export.h"
 #include <boost/function.hpp>
 #include "cxForwardDeclarations.h"
+#include "cxDefinitions.h"
 class ctkPluginContext;
 class QPushButton;
 
@@ -51,8 +52,8 @@ protected:
     void registrateTransition( func_t transition);
 
 protected:
-	void makeUnavailable(QString uidPart, bool makeModalityUnavailable = false);
-	void makeAvailable(QString uidPart, bool makeModalityUnavailable);
+	void makeUnavailable(IMAGE_MODALITY modality, bool makeModalityUnavailable = false);
+	void makeAvailable(IMAGE_MODALITY modality, bool makeModalityUnavailable);
 	RegServicesPtr mServices;
 
 	QString getFirstUSVolume();
@@ -68,7 +69,7 @@ private:
     void onStep(int delta);
     void stepTo(int step);
     void transitionToStep(int step);
-	void setAvailability(std::map<QString, DataPtr> datas, bool available, QString uidPart, bool makeModalityUnavailable);
+	void setAvailability(std::map<QString, DataPtr> datas, bool available, IMAGE_MODALITY modality, bool makeModalityUnavailable);
 
     HelpEnginePtr mEngine;
     HelpBrowser* mBrowser;

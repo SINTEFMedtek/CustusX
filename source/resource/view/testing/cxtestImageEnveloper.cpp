@@ -42,7 +42,8 @@ cx::ImagePtr createExpectedImage(cx::ImageParameters params)
 	retval->get_rMd_History()->setRegistration(params.m_rMd);
 	retval->get_rMd_History()->setParentSpace(params.mParentVolume);
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
-	retval->setModality("SC");
+//	retval->setModality("SC");
+	retval->setModality(cx::modUNKNOWN);//"SC" no longer used?
 	return retval;
 }
 

@@ -17,9 +17,63 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxData.h"
 
 #include "cxTypeConversions.h"
+#include "cxEnumConverter.h"
 
 namespace cx
 {
+
+
+IMAGE_MODALITY convertToModality(QString modalityString)
+{
+	IMAGE_MODALITY retval = modUNKNOWN;
+
+	if(modalityString.contains(enum2string<IMAGE_MODALITY>(modCT), Qt::CaseInsensitive))
+		retval = modCT;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modMR), Qt::CaseInsensitive))
+		retval = modMR;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modUS), Qt::CaseInsensitive))
+		retval = modUS;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modPET), Qt::CaseInsensitive))
+		retval = modPET;
+	else
+		CX_LOG_WARNING() << "convertToModality - Cannot convert the string \"" << modalityString << "\" to a known image modality";
+
+	return retval;
+}
+
+
+IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
+{
+	IMAGE_SUBTYPE retval = isUNKNOWN;
+
+	if (imageTypeSubString.isEmpty())
+		retval = isEMPTY;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRT1), Qt::CaseInsensitive))
+		retval = isMRT1;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRT2), Qt::CaseInsensitive))
+		retval = isMRT2;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRFLAIR), Qt::CaseInsensitive))
+		retval = isMRFLAIR;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isANGIO), Qt::CaseInsensitive))
+		retval = isANGIO;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isUSBMODE), Qt::CaseInsensitive))
+		retval = isUSBMODE;
+	else if(imageTypeSubString.contains("bmode", Qt::CaseInsensitive))
+		retval = isUSBMODE;
+	else if(imageTypeSubString.contains("b_mode", Qt::CaseInsensitive))
+		retval = isUSBMODE;
+	else if(imageTypeSubString.contains("b mode", Qt::CaseInsensitive))
+		retval = isUSBMODE;
+	else if(imageTypeSubString.contains("seg", Qt::CaseInsensitive))
+		retval = isSEGMENTATION;
+	else if(imageTypeSubString.contains("label", Qt::CaseInsensitive))
+		retval = isSEGMENTATION;
+	else
+		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
+
+	return retval;
+}
+
 
 CustomMetaImage::CustomMetaImage(QString filename) :
     mFilename(filename)
@@ -54,25 +108,16 @@ QString CustomMetaImage::readKey(QString key)
 	return "";
 }
 
-QString CustomMetaImage::readModality()
+IMAGE_MODALITY CustomMetaImage::readModality()
 {
-	QString mod = this->readKey("Modality");
-
-	if (mod.contains(DATATYPE_CT, Qt::CaseInsensitive))
-		return DATATYPE_CT;
-	if (mod.contains(DATATYPE_MR, Qt::CaseInsensitive))
-		return DATATYPE_MR;
-	if (mod.contains(DATATYPE_US, Qt::CaseInsensitive))
-		return DATATYPE_US;
-	if (mod.contains("OTHER", Qt::CaseInsensitive))
-		return "OTHER";
-	mod = mod.remove("MET_MOD_");
-	return mod;
+	QString modalityString = this->readKey("Modality");
+	return convertToModality(modalityString);
 }
 
-QString CustomMetaImage::readImageType()
+IMAGE_SUBTYPE CustomMetaImage::readImageType()
 {
-	return this->readKey("ImageType3");
+	QString imageTypeString = this->readKey("ImageType3");
+	return convertToImageSubType(imageTypeString);
 }
 
 /** Remove all lines starting with a key from data.
@@ -117,21 +162,14 @@ void CustomMetaImage::setKey(QString key, QString value)
 	file.write(data.join("\n").toLatin1());
 }
 
-void CustomMetaImage::setModality(QString value)
+void CustomMetaImage::setModality(IMAGE_MODALITY value)
 {
-    QStringList valid_values;
-		valid_values << DATATYPE_CT << DATATYPE_MR << "NM" << DATATYPE_US << "OTHER" << "UNKNOWN";
-    if(!valid_values.contains(value, Qt::CaseInsensitive))
-        value = "UNKNOWN";
-
-	this->setKey("Modality", value);
+	this->setKey("Modality", enum2string(value));
 }
 
-void CustomMetaImage::setImageType(QString value)
+void CustomMetaImage::setImageType(IMAGE_SUBTYPE value)
 {
-	if (value.isEmpty())
-		return;
-	this->setKey("ImageType3", value);
+	this->setKey("ImageType3", enum2string(value));
 }
 
 

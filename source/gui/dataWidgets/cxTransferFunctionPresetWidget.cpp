@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxActiveData.h"
+#include "cxEnumConverter.h"
 
 namespace cx {
 
@@ -74,7 +75,7 @@ void TransferFunctionPresetWidget::updateToggles()
 void TransferFunctionPresetWidget::populatePresetListSlot()
 {
 	if (mActiveData->getActive<Image>())
-		PresetWidget::populatePresetList(mPresets->getPresetList(mActiveData->getActive<Image>()->getModality()));
+		PresetWidget::populatePresetList(mPresets->getPresetList(enum2string(mActiveData->getActive<Image>()->getModality())));
 	else
 		//No active image, show all available presets for debug/overview purposes
 		PresetWidget::populatePresetList(mPresets->getPresetList("UNKNOWN"));

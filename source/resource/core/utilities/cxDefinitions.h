@@ -144,6 +144,28 @@ namespace cx
 		ttCOUNT
 	};*/
 
+	enum cxResource_EXPORT IMAGE_MODALITY
+	{
+		modUNKNOWN,
+		modCT,
+		modMR,
+		modUS,
+		modPET,
+		modCOUNT
+	};
+	enum cxResource_EXPORT IMAGE_SUBTYPE
+	{
+		isUNKNOWN,
+		isEMPTY,
+		isMRT1,
+		isMRT2,
+		isMRFLAIR,
+		isUSBMODE,
+		isANGIO,
+		isSEGMENTATION,
+		isCOUNT
+	};
+
 /**
  * @}
  */

@@ -32,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxViewService.h"
 #include "cxImportWidget.h"
+#include "cxCustomMetaImage.h"
 
 namespace cx
 {
@@ -160,7 +161,7 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 
 		if(isNifti()) // NIfTI files are usually MR. Set this as the default
 		{
-			mModalityAdapter->setValue(DATATYPE_MR);
+			mModalityAdapter->setValue(enum2string(modMR));
 			updateImageType();
 		}
 	}
@@ -168,10 +169,9 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 
 void ImportDataTypeWidget::updateImageType()
 {
-	if(isT1())
-		mImageTypeAdapter->setValue(DATATYPE_T1);
-	if(isSegmentation(mFilename))
-		mImageTypeAdapter->setValue(DATATYPE_SEGMENTATION);
+	// Test code: Trying to use convertToImageSubType on file name to find correct subtype.
+	IMAGE_SUBTYPE imageSubType = convertToImageSubType(mFilename);
+	mImageTypeAdapter->setValue(enum2string(imageSubType));
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
@@ -552,13 +552,5 @@ bool ImportDataTypeWidget::isSegmentation(QString filename)
 		return true;
 	return false;
 }
-
-bool ImportDataTypeWidget::isT1()
-{
-	if(mFilename.contains("T1", Qt::CaseInsensitive))
-		return true;
-	return false;
-}
-
 
 }

@@ -182,7 +182,7 @@ QString TrainingWidget::getFirstUSVolume()
 		DataPtr data = iter->second;
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 
-		if (image && image->getModality().contains(DATATYPE_US))
+		if (image && image->getModality() == modUS)
 			return image->getUid();
 	}
 	return QString();
@@ -201,20 +201,20 @@ MeshPtr TrainingWidget::getMesh(QString uidPart)
 	return MeshPtr();
 }
 
-void TrainingWidget::makeUnavailable(QString uidPart, bool makeModalityUnavailable)
+void TrainingWidget::makeUnavailable(IMAGE_MODALITY modality, bool makeModalityUnavailable)
 {
 	std::map<QString, DataPtr> datas = mServices->patient()->getDatas();
-	this->setAvailability(datas, false, uidPart, makeModalityUnavailable);
+	this->setAvailability(datas, false, modality, makeModalityUnavailable);
 }
 
 
-void TrainingWidget::makeAvailable(QString uidPart, bool makeModalityUnavailable)
+void TrainingWidget::makeAvailable(IMAGE_MODALITY modality, bool makeModalityUnavailable)
 {
 	std::map<QString, DataPtr> datas = mServices->patient()->getDatas(PatientModelService::AllData);
-	this->setAvailability(datas, true, uidPart, makeModalityUnavailable);
+	this->setAvailability(datas, true, modality, makeModalityUnavailable);
 }
 
-void TrainingWidget::setAvailability(std::map<QString, DataPtr> datas, bool available, QString uidPart, bool makeModalityUnavailable)
+void TrainingWidget::setAvailability(std::map<QString, DataPtr> datas, bool available, IMAGE_MODALITY modality, bool makeModalityUnavailable)
 {
 	std::map<QString, DataPtr>::iterator iter = datas.begin();
 
@@ -223,10 +223,10 @@ void TrainingWidget::setAvailability(std::map<QString, DataPtr> datas, bool avai
 		DataPtr data = iter->second;
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 
-		if (makeModalityUnavailable && image && image->getModality().contains(uidPart))
+		if (makeModalityUnavailable && image && image->getModality() == modality)
 			mServices->patient()->makeAvailable(image->getUid(), available);
-		else if (data && data->getUid().contains(uidPart))
-			mServices->patient()->makeAvailable(data->getUid(), available);
+//		else if (data && data->getUid().contains(uidPart))
+//			mServices->patient()->makeAvailable(data->getUid(), available);
 	}
 }
 

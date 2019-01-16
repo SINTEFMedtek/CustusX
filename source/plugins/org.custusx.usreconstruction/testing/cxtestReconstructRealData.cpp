@@ -27,7 +27,7 @@ QString ReconstructRealTestData::getSourceFilename() const
 
 void ReconstructRealTestData::validateData(cx::ImagePtr output)
 {
-	REQUIRE(output->getModality().contains(DATATYPE_US));
+	REQUIRE(output->getModality() == cx::modUS);
 	REQUIRE( output->getRange() != 0);//Just check if the output volume is empty
 
 	vtkImageDataPtr volume = output->getGrayScaleVtkImageData();
@@ -39,7 +39,7 @@ void ReconstructRealTestData::validateAngioData(cx::ImagePtr angioOut)
 {
 	this->validateData(angioOut);
 
-	CHECK(angioOut->getImageType().contains("Angio"));
+	CHECK(angioOut->getImageType() == cx::isANGIO);
 
 	this->checkSamples(angioOut, getCrossVolumeSamples(), 1, true);
 	this->checkSamples(angioOut, getLightVolumeSamples(), 100);
@@ -50,7 +50,7 @@ void ReconstructRealTestData::validateBModeData(cx::ImagePtr bmodeOut)
 {
 	this->validateData(bmodeOut);
 
-	REQUIRE(bmodeOut->getImageType().contains("B-Mode"));
+	REQUIRE(bmodeOut->getImageType() == cx::isUSBMODE);
 
 	//All samples had to be moved abount -3 voxels along y and z axis after changing OutputVolumeParams.
 
