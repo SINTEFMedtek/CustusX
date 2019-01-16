@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxTool.h"
 #include "cxImageAlgorithms.h"
 #include "cxRegistrationTransform.h"
@@ -26,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxActiveToolProxy.h"
 #include "cxActiveData.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

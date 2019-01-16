@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxVector3D.h"
-#include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxProfile.h"
 #include "cxSelectDataStringProperty.h"
@@ -27,6 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxStringPropertySelectTool.h"
 #include "cxStringPropertySelectCoordinateSystem.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

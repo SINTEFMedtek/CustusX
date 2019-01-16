@@ -30,11 +30,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
 #include "cxLogger.h"
-#include "cxEnumConverter.h"
 #include "cxTime.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxPatientModelService.h"
-#include "cxEnumConverter.h"
+#include "cxEnumConversion.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 

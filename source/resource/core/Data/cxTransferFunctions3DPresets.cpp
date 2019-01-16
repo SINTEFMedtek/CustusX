@@ -23,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxImageTFData.h"
-#include "cxDefinitionStrings.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

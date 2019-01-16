@@ -29,7 +29,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSyncedValue.h"
 #include "cxCoreServices.h"
 #include "cxLogger.h"
-#include "cxDefinitionStrings.h"
 #include "cxStringListProperty.h"
 #include "cxSharedOpenGLContext.h"
 

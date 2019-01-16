@@ -40,7 +40,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxNullDeleter.h"
 #include "cxSettings.h"
 #include "cxUnsignedDerivedImage.h"
-#include "cxEnumConverter.h"
+#include "cxEnumConversion.h"
 #include "cxCustomMetaImage.h"
 
 typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;

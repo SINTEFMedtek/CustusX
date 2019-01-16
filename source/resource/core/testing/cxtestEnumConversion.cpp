@@ -10,9 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
-#include "cxEnumConverter.h"
 #include "cxDefinitions.h"
 #include "cxCustomMetaImage.h"
+#include "cxEnumConversion.h"
 
 namespace cxtest
 {

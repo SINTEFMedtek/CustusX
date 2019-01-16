@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QDir>
 #include <QLineEdit>
-#include "cxEnumConverter.h"
 #include "cxLogger.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
@@ -25,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolListWidget.h"
 #include "cxHelperWidgets.h"
 #include "cxTrackerConfiguration.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

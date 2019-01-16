@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackingService.h"
 #include "cxCoreServices.h"
 #include "cxLogger.h"
-#include "cxEnumConverter.h"
+#include "cxEnumConversion.h"
 #include "cxPatientModelService.h"
 
 namespace cx

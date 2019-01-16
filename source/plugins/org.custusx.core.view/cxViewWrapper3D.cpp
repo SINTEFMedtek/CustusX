@@ -53,7 +53,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
-#include "cxEnumConverter.h"
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
 

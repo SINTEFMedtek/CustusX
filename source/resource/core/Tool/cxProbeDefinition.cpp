@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDomNode>
 #include "cxTypeConversions.h"
 #include <iostream>
-#include "cxEnumConverter.h"
 #include "cxLogger.h"
 #include "cxImage.h"
 
