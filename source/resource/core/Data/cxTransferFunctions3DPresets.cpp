@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageTF3D.h"
 #include "cxImageLUT2D.h"
 #include "cxImageTFData.h"
+#include "cxDefinitionStrings.h"
 
 namespace cx
 {
@@ -164,7 +165,7 @@ QStringList TransferFunctions3DPresets::generatePresetList(IMAGE_MODALITY modali
 		else
 		{
 			QString sourceModality = presetNodeList.item(i).toElement().attribute("modality");
-			if ( (modality == sourceModality) || (modUNKNOWN == modality) || modCOUNT == modality )
+			if ( (modality == string2enum<IMAGE_MODALITY>(sourceModality)) || (modUNKNOWN == modality) || modCOUNT == modality )
 				presetList << presetName;
 		}
 	}
