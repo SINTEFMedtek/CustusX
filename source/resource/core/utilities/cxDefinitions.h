@@ -151,6 +151,7 @@ namespace cx
 		modMR,
 		modUS,
 		modPET,
+		modSC,
 		modCOUNT
 	};
 	enum cxResource_EXPORT IMAGE_SUBTYPE

@@ -35,6 +35,8 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 		retval = modUS;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modPET), Qt::CaseInsensitive))
 		retval = modPET;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modSC), Qt::CaseInsensitive))
+		retval = modSC;
 	else
 		CX_LOG_WARNING() << "convertToModality - Cannot convert the string \"" << modalityString << "\" to a known image modality";
 

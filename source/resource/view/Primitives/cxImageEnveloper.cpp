@@ -135,8 +135,7 @@ ImagePtr ImageEnveloper::createEnvelopeFromParameters(ImageParameters box)
 	retval->get_rMd_History()->setRegistration(box.m_rMd);
 	retval->get_rMd_History()->setParentSpace(box.mParentVolume);
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
-//	retval->setModality("SC");
-	retval->setModality(modUNKNOWN);
+	retval->setModality(modSC);
 
 	return retval;
 }
