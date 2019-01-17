@@ -11,3 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDefinitions.h"
 
 
+namespace cx
+{
+const char* TRACKING_SYSTEM_IMPLEMENTATION_IGSTK = "igstk";
+const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK = "openigtlink";
+}

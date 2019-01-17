@@ -22,8 +22,8 @@ namespace cx
  * @{
  */
 
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
+extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
+extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 
 	/** orientation type
 	 */
@@ -42,7 +42,7 @@ namespace cx
 		ptANYPLANE,   ///< a plane aligned with the tool base plane
 		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
 		ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
-        ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
+		ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
 		ptCOUNT
 	};
 	enum cxResource_EXPORT FOLLOW_TYPE

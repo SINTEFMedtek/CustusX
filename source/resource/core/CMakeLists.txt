@@ -185,7 +185,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxUtilHelpers
     utilities/cxTypeConversions
     utilities/cxSliceComputer
-    utilities/cxDefinitions.h
+    utilities/cxDefinitions
     utilities/cxDefinitionStrings
     utilities/cxCustomMetaImage
     utilities/cxIndent
