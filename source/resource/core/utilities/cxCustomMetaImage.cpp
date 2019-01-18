@@ -27,7 +27,9 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 {
 	IMAGE_MODALITY retval = modUNKNOWN;
 
-	if(modalityString.contains(enum2string<IMAGE_MODALITY>(modCT), Qt::CaseInsensitive))
+	if(modalityString.contains(enum2string<IMAGE_MODALITY>(modUNKNOWN), Qt::CaseInsensitive))
+		retval = modUNKNOWN;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modCT), Qt::CaseInsensitive))
 		retval = modCT;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modMR), Qt::CaseInsensitive))
 		retval = modMR;
@@ -48,8 +50,10 @@ IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 {
 	IMAGE_SUBTYPE retval = isUNKNOWN;
 
-	if (imageTypeSubString.isEmpty())
+	if (imageTypeSubString.isEmpty() || imageTypeSubString == " ")
 		retval = isEMPTY;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isUNKNOWN), Qt::CaseInsensitive))
+		retval = isUNKNOWN;
 	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRT1), Qt::CaseInsensitive))
 		retval = isMRT1;
 	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRT2), Qt::CaseInsensitive))
