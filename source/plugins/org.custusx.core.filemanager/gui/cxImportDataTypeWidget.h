@@ -69,7 +69,7 @@ private:
 
 	void addPointMetricGroupsToTable();
 
-	bool isNifti();
+	bool isInputFileInNiftiFormat();
 	bool isSegmentation(QString filename);
 
 	ImportWidget* mImportWidget;

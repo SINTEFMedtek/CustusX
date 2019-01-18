@@ -53,7 +53,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
 	mAnatomicalCoordinateSystems->addItem("RAS"); //NIfTI
 
-	if(isNifti())
+	if(isInputFileInNiftiFormat())
 		mAnatomicalCoordinateSystems->setCurrentText("RAS");
 
 	mShouldImportParentTransform = new QComboBox();
@@ -159,7 +159,7 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
 		mImageTypeAdapter->setData(image);
 
-		if(isNifti()) // NIfTI files are usually MR. Set this as the default
+		if(isInputFileInNiftiFormat()) // NIfTI files are usually MR. Set this as the default
 		{
 			mModalityAdapter->setValue(enum2string(imMR));
 			updateImageType();
@@ -537,7 +537,7 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 	}
 }
 
-bool ImportDataTypeWidget::isNifti()
+bool ImportDataTypeWidget::isInputFileInNiftiFormat()
 {
 	if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
 		return true;
