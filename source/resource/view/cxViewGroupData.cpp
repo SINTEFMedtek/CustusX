@@ -270,19 +270,19 @@ int getPriority(DataPtr data)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
-		if (image->getModality() == modUS)
+		if (image->getModality() == imUS)
 		{
-			if (image->getImageType() == isUSBMODE)
+			if (image->getImageType() == istUSBMODE)
 				return 4;
 			else // angio types
 				return 5;
 		}
-		else if (image->getModality() == modMR)
+		else if (image->getModality() == imMR)
 		{
 			// MR, CT, SC, others
 			return 2;
 		}
-		else if (image->getModality() == modCT)
+		else if (image->getModality() == imCT)
 		{
 			// MR, CT, SC, others
 			return 1;

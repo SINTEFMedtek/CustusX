@@ -25,20 +25,20 @@ namespace cx
 
 IMAGE_MODALITY convertToModality(QString modalityString)
 {
-	IMAGE_MODALITY retval = modUNKNOWN;
+	IMAGE_MODALITY retval = imUNKNOWN;
 
-	if(modalityString.contains(enum2string<IMAGE_MODALITY>(modUNKNOWN), Qt::CaseInsensitive))
-		retval = modUNKNOWN;
-	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modCT), Qt::CaseInsensitive))
-		retval = modCT;
-	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modMR), Qt::CaseInsensitive))
-		retval = modMR;
-	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modUS), Qt::CaseInsensitive))
-		retval = modUS;
-	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modPET), Qt::CaseInsensitive))
-		retval = modPET;
-	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(modSC), Qt::CaseInsensitive))
-		retval = modSC;
+	if(modalityString.contains(enum2string<IMAGE_MODALITY>(imUNKNOWN), Qt::CaseInsensitive))
+		retval = imUNKNOWN;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imCT), Qt::CaseInsensitive))
+		retval = imCT;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imMR), Qt::CaseInsensitive))
+		retval = imMR;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imUS), Qt::CaseInsensitive))
+		retval = imUS;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imPET), Qt::CaseInsensitive))
+		retval = imPET;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imSC), Qt::CaseInsensitive))
+		retval = imSC;
 	else
 		CX_LOG_WARNING() << "convertToModality - Cannot convert the string \"" << modalityString << "\" to a known image modality";
 
@@ -48,32 +48,32 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 
 IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 {
-	IMAGE_SUBTYPE retval = isUNKNOWN;
+	IMAGE_SUBTYPE retval = istUNKNOWN;
 
 	if (imageTypeSubString.isEmpty() || imageTypeSubString == " ")
-		retval = isEMPTY;
-	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isUNKNOWN), Qt::CaseInsensitive))
-		retval = isUNKNOWN;
-	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRT1), Qt::CaseInsensitive))
-		retval = isMRT1;
-	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRT2), Qt::CaseInsensitive))
-		retval = isMRT2;
-	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isMRFLAIR), Qt::CaseInsensitive))
-		retval = isMRFLAIR;
-	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isANGIO), Qt::CaseInsensitive))
-		retval = isANGIO;
-	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(isUSBMODE), Qt::CaseInsensitive))
-		retval = isUSBMODE;
+		retval = istEMPTY;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istUNKNOWN), Qt::CaseInsensitive))
+		retval = istUNKNOWN;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istMRT1), Qt::CaseInsensitive))
+		retval = istMRT1;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istMRT2), Qt::CaseInsensitive))
+		retval = istMRT2;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istMRFLAIR), Qt::CaseInsensitive))
+		retval = istMRFLAIR;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istANGIO), Qt::CaseInsensitive))
+		retval = istANGIO;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istUSBMODE), Qt::CaseInsensitive))
+		retval = istUSBMODE;
 	else if(imageTypeSubString.contains("bmode", Qt::CaseInsensitive))
-		retval = isUSBMODE;
+		retval = istUSBMODE;
 	else if(imageTypeSubString.contains("b_mode", Qt::CaseInsensitive))
-		retval = isUSBMODE;
+		retval = istUSBMODE;
 	else if(imageTypeSubString.contains("b mode", Qt::CaseInsensitive))
-		retval = isUSBMODE;
+		retval = istUSBMODE;
 	else if(imageTypeSubString.contains("seg", Qt::CaseInsensitive))
-		retval = isSEGMENTATION;
+		retval = istSEGMENTATION;
 	else if(imageTypeSubString.contains("label", Qt::CaseInsensitive))
-		retval = isSEGMENTATION;
+		retval = istSEGMENTATION;
 	else
 		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
 

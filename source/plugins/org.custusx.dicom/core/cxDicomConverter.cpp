@@ -114,7 +114,7 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	QString modalityString = reader->item()->GetElementAsString(DCM_Modality);
 	image->setModality(convertToModality(modalityString));
 
-	image->setImageType(isEMPTY);//Setting image subtype to empty for now. DCM_ImageType (value 3, and 4) may possibly be used. Also series name often got this kind of information.
+	image->setImageType(istEMPTY);//Setting image subtype to empty for now. DCM_ImageType (value 3, and 4) may possibly be used. Also series name often got this kind of information.
 
 	DicomImageReader::WindowLevel windowLevel = reader->getWindowLevel();
 	image->setInitialWindowLevel(windowLevel.width, windowLevel.center);

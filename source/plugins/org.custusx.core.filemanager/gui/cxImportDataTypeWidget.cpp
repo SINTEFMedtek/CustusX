@@ -161,7 +161,7 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 
 		if(isNifti()) // NIfTI files are usually MR. Set this as the default
 		{
-			mModalityAdapter->setValue(enum2string(modMR));
+			mModalityAdapter->setValue(enum2string(imMR));
 			updateImageType();
 		}
 	}

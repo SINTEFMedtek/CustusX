@@ -112,7 +112,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = this->getInitialBoundingBox();
-	mModality = modUNKNOWN;
+	mModality = imUNKNOWN;
 
 	mImageLookupTable2D.reset();
 	mImageTransferFunctions3D.reset();

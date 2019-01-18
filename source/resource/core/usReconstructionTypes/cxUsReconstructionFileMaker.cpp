@@ -351,7 +351,7 @@ void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPt
 
 		CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 		customReader->setTransform(pos[i].mPos);
-		customReader->setModality(modUS);
+		customReader->setModality(imUS);
 		customReader->setImageType(convertToImageSubType(mSessionDescription));
 	}
 }

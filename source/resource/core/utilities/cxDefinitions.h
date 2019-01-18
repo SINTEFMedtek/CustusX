@@ -146,25 +146,25 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 
 	enum cxResource_EXPORT IMAGE_MODALITY
 	{
-		modUNKNOWN,
-		modCT,
-		modMR,
-		modUS,
-		modPET,
-		modSC,
-		modCOUNT
+		imUNKNOWN,
+		imCT,
+		imMR,
+		imUS,
+		imPET,
+		imSC,
+		imCOUNT
 	};
 	enum cxResource_EXPORT IMAGE_SUBTYPE
 	{
-		isUNKNOWN,
-		isEMPTY,
-		isMRT1,
-		isMRT2,
-		isMRFLAIR,
-		isUSBMODE,
-		isANGIO,
-		isSEGMENTATION,
-		isCOUNT
+		istUNKNOWN,
+		istEMPTY,
+		istMRT1,
+		istMRT2,
+		istMRFLAIR,
+		istUSBMODE,
+		istANGIO,
+		istSEGMENTATION,
+		istCOUNT
 	};
 
 /**

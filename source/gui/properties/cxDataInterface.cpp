@@ -378,7 +378,7 @@ QStringList StringPropertyDataModality::getValueRange() const
 	retval << "";
 	if (mData)
 		retval << enum2string(mData->getModality());
-	retval << enum2string(modCT) << enum2string(modMR) << enum2string(modUS);
+	retval << enum2string(imCT) << enum2string(imMR) << enum2string(imUS);
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
@@ -441,12 +441,12 @@ QStringList StringPropertyImageType::getValueRange() const
 	if (mData)
 	{
 		retval << enum2string(mData->getImageType());
-		if (mData->getModality() == modCT)
-			retval << enum2string(isSEGMENTATION);
-		if (mData->getModality() == modMR)
-			retval << enum2string(isMRT1) << enum2string(isMRT2) << enum2string(isMRFLAIR) << enum2string(isANGIO) << enum2string(isSEGMENTATION);
-		if (mData->getModality() == modUS)
-			retval << enum2string(isUSBMODE) << enum2string(isANGIO) << enum2string(isSEGMENTATION);
+		if (mData->getModality() == imCT)
+			retval << enum2string(istSEGMENTATION);
+		if (mData->getModality() == imMR)
+			retval << enum2string(istMRT1) << enum2string(istMRT2) << enum2string(istMRFLAIR) << enum2string(istANGIO) << enum2string(istSEGMENTATION);
+		if (mData->getModality() == imUS)
+			retval << enum2string(istUSBMODE) << enum2string(istANGIO) << enum2string(istSEGMENTATION);
 	}
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }

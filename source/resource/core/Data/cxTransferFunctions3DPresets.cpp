@@ -53,7 +53,7 @@ void TransferFunctions3DPresets::save2D(QString name, ImagePtr image)
 	ImageLUT2DPtr LUT2D = image->getLookupTable2D();
 
 	// For unsigned CT: Modify transfer function values temporarily prior to save
-	if ((0 <= image->getMin()) && (modCT == image->getModality()))
+	if ((0 <= image->getMin()) && (imCT == image->getModality()))
 	{
 		LUT2D->unsignedCT(false);
 	}
@@ -61,7 +61,7 @@ void TransferFunctions3DPresets::save2D(QString name, ImagePtr image)
 	LUT2D->addXml(file.getElement("lookuptable2D"));
 
 	// Revert the transfer function values back again
-	if ((0 <= image->getMin()) && (modCT == image->getModality()))
+	if ((0 <= image->getMin()) && (imCT == image->getModality()))
 	{
 		LUT2D->unsignedCT(true);
 	}
@@ -85,7 +85,7 @@ void TransferFunctions3DPresets::save3D(QString name, ImagePtr image)
 	ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
 
 	// For unsigned CT: Modify transfer function values temporarily prior to save
-	if ((0 <= image->getMin()) && (modCT == image->getModality()))
+	if ((0 <= image->getMin()) && (imCT == image->getModality()))
 	{
 		transferFunctions->unsignedCT(false);
 	}
@@ -94,7 +94,7 @@ void TransferFunctions3DPresets::save3D(QString name, ImagePtr image)
 	image->getShading().addXml(file.getElement("shading"));
 
 	// Revert the transfer function values back again
-	if ((0 <= image->getMin()) && (modCT == image->getModality()))
+	if ((0 <= image->getMin()) && (imCT == image->getModality()))
 	{
 		transferFunctions->unsignedCT(true);
 	}
@@ -125,7 +125,7 @@ void TransferFunctions3DPresets::load2D(QString name, ImagePtr image)
 	LUT2D->parseXml(node.getElement().namedItem("lookuptable2D"));
 
 	// Transfer functions for CT data are signed, so these have to be converted if they are to be used for unsigned CT
-	if ((0 <= image->getMin()) && (modCT == image->getModality()) && (name != "Transfer function preset...") )
+	if ((0 <= image->getMin()) && (imCT == image->getModality()) && (name != "Transfer function preset...") )
 	{
 		LUT2D->unsignedCT(true);
 	}
@@ -146,7 +146,7 @@ void TransferFunctions3DPresets::load3D(QString name, ImagePtr image)
 	image->setShading(shading);
 
 	// Transfer functions for CT data are signed, so these have to be converted if they are to be used for unsigned CT
-	if ((0 <= image->getMin()) && (modCT == image->getModality()) && (name != "Transfer function preset...") )
+	if ((0 <= image->getMin()) && (imCT == image->getModality()) && (name != "Transfer function preset...") )
 	{
 		transferFunctions->unsignedCT(true);
 	}
@@ -165,7 +165,7 @@ QStringList TransferFunctions3DPresets::generatePresetList(IMAGE_MODALITY modali
 		else
 		{
 			QString sourceModality = presetNodeList.item(i).toElement().attribute("modality");
-			if ( (modality == string2enum<IMAGE_MODALITY>(sourceModality)) || (modUNKNOWN == modality) || modCOUNT == modality )
+			if ( (modality == string2enum<IMAGE_MODALITY>(sourceModality)) || (imUNKNOWN == modality) || imCOUNT == modality )
 				presetList << presetName;
 		}
 	}
@@ -176,7 +176,7 @@ QStringList TransferFunctions3DPresets::generatePresetList(IMAGE_MODALITY modali
 	{
 		QString presetName = presetNodeList.item(i).toElement().attribute("name");
 		QString presetModality = presetNodeList.item(i).toElement().attribute("modality");
-		if ( (string2enum<IMAGE_MODALITY>(presetModality) == modality) || (modUNKNOWN == modality) || modCOUNT == modality )
+		if ( (string2enum<IMAGE_MODALITY>(presetModality) == modality) || (imUNKNOWN == modality) || imCOUNT == modality )
 			presetList << presetName;
 	}
 
