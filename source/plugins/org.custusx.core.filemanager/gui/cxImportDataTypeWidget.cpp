@@ -32,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxViewService.h"
 #include "cxImportWidget.h"
+#include "cxCustomMetaImage.h"
 
 namespace cx
 {
@@ -52,7 +53,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
 	mAnatomicalCoordinateSystems->addItem("RAS"); //NIfTI
 
-	if(isNifti())
+	if(isInputFileInNiftiFormat())
 		mAnatomicalCoordinateSystems->setCurrentText("RAS");
 
 	mShouldImportParentTransform = new QComboBox();
@@ -86,7 +87,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		name = mData[i]->getName();
 		QString space = mData[i]->getSpace();
 		//create point metric groups
-		if(type == DATATYPE_POINT_METRIC)
+		if(type == PointMetric::getTypeName())
 		{
 			space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
 			(mPointMetricGroups[space]).push_back(mData[i]);
@@ -158,9 +159,9 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
 		mImageTypeAdapter->setData(image);
 
-		if(isNifti()) // NIfTI files are usually MR. Set this as the default
+		if(isInputFileInNiftiFormat()) // NIfTI files are usually MR. Set this as the default
 		{
-			mModalityAdapter->setValue(DATATYPE_MR);
+			mModalityAdapter->setValue(enum2string(imMR));
 			updateImageType();
 		}
 	}
@@ -168,10 +169,9 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 
 void ImportDataTypeWidget::updateImageType()
 {
-	if(isT1())
-		mImageTypeAdapter->setValue(DATATYPE_T1);
-	if(isSegmentation(mFilename))
-		mImageTypeAdapter->setValue(DATATYPE_SEGMENTATION);
+	// Test code: Trying to use convertToImageSubType on file name to find correct subtype.
+	IMAGE_SUBTYPE imageSubType = convertToImageSubType(mFilename);
+	mImageTypeAdapter->setValue(enum2string(imageSubType));
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
@@ -537,7 +537,7 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 	}
 }
 
-bool ImportDataTypeWidget::isNifti()
+bool ImportDataTypeWidget::isInputFileInNiftiFormat()
 {
 	if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
 		return true;
@@ -552,13 +552,5 @@ bool ImportDataTypeWidget::isSegmentation(QString filename)
 		return true;
 	return false;
 }
-
-bool ImportDataTypeWidget::isT1()
-{
-	if(mFilename.contains("T1", Qt::CaseInsensitive))
-		return true;
-	return false;
-}
-
 
 }

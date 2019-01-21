@@ -18,7 +18,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QAction>
 #include <QMenu>
 #include <QDrag>
-#include "cxEnumConverter.h"
 #include "cxLogger.h"
 #include "cxTrackerConfiguration.h"
 #include "cxTrackingService.h"

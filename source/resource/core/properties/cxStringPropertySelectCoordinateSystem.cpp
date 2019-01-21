@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringPropertySelectCoordinateSystem.h"
 
 #include "cxTrackingService.h"
-#include "cxTypeConversions.h"
 #include "cxDefinitionStrings.h"
 
 namespace cx

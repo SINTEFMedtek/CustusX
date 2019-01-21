@@ -25,7 +25,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxPositionStorageFile.h"
 #include "cxTime.h"
-#include "cxEnumConverter.h"
 #include "cxDummyTool.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTracker.h"

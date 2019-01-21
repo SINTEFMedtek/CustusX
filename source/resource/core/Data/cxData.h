@@ -31,19 +31,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QDateTime>
 
-#define DATATYPE_MESH "mesh"
-#define DATATYPE_IMAGE "image"
-#define DATATYPE_TRACKED_STREAM "trackedStream"
-#define DATATYPE_POINT_METRIC "pointMetric"
-#define DATATYPE_PLANE_METRIC "planeMetric"
-#define DATATYPE_FRAME_METRIC "frameMetric"
-
-#define DATATYPE_CT "CT"
-#define DATATYPE_MR "MR"
-#define DATATYPE_US "US"
-#define DATATYPE_SEGMENTATION "Segmentation"
-#define DATATYPE_T1 "T1"
-
 class QDomNode;
 
 namespace cx

@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
-#include "cxEnumConverter.h"
+#include "cxEnumConversion.h"
 #include "cxDataLocations.h"
 #include "cxProfile.h"
 #include "cxFrame3D.h"

@@ -26,7 +26,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMesh.h"
 #include "cxStringPropertyBase.h"
 #include "cxLabeledComboBoxWidget.h"
-#include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
 
 #include "cxRegistrationTransform.h"

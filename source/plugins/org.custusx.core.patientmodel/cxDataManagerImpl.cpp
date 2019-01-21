@@ -37,9 +37,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTransferFunctions3DPresets.h"
 #include "cxProfile.h"
 #include "cxSettings.h"
-#include "cxDefinitionStrings.h"
 #include "cxActiveData.h"
 #include "cxFileManagerService.h"
+#include "cxEnumConversion.h"
 
 
 namespace cx

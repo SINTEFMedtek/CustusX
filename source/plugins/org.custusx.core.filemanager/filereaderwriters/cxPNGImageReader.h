@@ -33,7 +33,7 @@ public:
 	virtual bool canRead(const QString& type, const QString& filename);
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(ImagePtr image, QString filename);
-	virtual QString canReadDataType() const { return DATATYPE_IMAGE; }
+	virtual QString canReadDataType() const;
 	virtual DataPtr read(const QString& uid, const QString& filename);
 	std::vector<DataPtr> read(const QString &filename);
 

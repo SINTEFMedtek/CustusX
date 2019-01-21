@@ -105,7 +105,7 @@ int UnsignedDerivedImage::findShift()
     // start by shifting up to zero
     int shift = -input->GetScalarRange()[0];
     // if CT: always shift by 1024 (houndsfield units definition)
-		if (base->getModality().contains(DATATYPE_CT, Qt::CaseInsensitive))
+		if (base->getModality() == imCT)
         shift = 1024;
     return shift;
 }

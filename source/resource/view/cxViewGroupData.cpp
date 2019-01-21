@@ -29,7 +29,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSyncedValue.h"
 #include "cxCoreServices.h"
 #include "cxLogger.h"
-#include "cxDefinitionStrings.h"
 #include "cxStringListProperty.h"
 #include "cxSharedOpenGLContext.h"
 
@@ -262,7 +261,7 @@ bool dataTypeSort(const DataPtr data1, const DataPtr data2)
 
 int getPriority(DataPtr data)
 {
-	if (data->getType()==DATATYPE_MESH)
+	if (data->getType()==Mesh::getTypeName())
 		return 6;
 	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
 	if (metric)
@@ -271,19 +270,19 @@ int getPriority(DataPtr data)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if (image)
 	{
-		if (image->getModality().toUpper().contains(DATATYPE_US))
+		if (image->getModality() == imUS)
 		{
-			if (image->getImageType().toUpper().contains("B-MODE"))
+			if (image->getImageType() == istUSBMODE)
 				return 4;
 			else // angio types
 				return 5;
 		}
-		else if (image->getModality().toUpper().contains(DATATYPE_MR))
+		else if (image->getModality() == imMR)
 		{
 			// MR, CT, SC, others
 			return 2;
 		}
-		else if (image->getModality().toUpper().contains(DATATYPE_CT))
+		else if (image->getModality() == imCT)
 		{
 			// MR, CT, SC, others
 			return 1;

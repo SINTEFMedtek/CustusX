@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QApplication>
 #include <QByteArray>
 #include <QDir>
-#include "cxEnumConverter.h"
 #include "cxXmlOptionItem.h"
 
 #include "cxDataLocations.h"
