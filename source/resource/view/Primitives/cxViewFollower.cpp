@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSliceComputer.h"
 #include "cxTool.h"
 #include "cxUtilHelpers.h"
-#include "cxDefinitionStrings.h"
 
 #include "cxPatientModelService.h"
 #include "cxLogger.h"

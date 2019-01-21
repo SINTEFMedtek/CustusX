@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 #include <QPointer>
 
-#include "cxEnumConverter.h"
 #include <iostream>
 #include "cxTypeConversions.h"
 

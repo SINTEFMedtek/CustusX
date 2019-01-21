@@ -17,15 +17,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMenu>
 #include <QScrollBar>
 #include <QContextMenuEvent>
-#include "cxTypeConversions.h"
-#include "cxEnumConverter.h"
-#include "cxDefinitionStrings.h"
 #include "cxSettings.h"
 #include "cxStringProperty.h"
 #include "cxHelperWidgets.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxMessageListener.h"
-#include "cxEnumConverter.h"
 #include "cxUtilHelpers.h"
 #include <QTimer>
 #include <QThread>
@@ -40,6 +36,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxTime.h"
 #include "cxPopupToolbarWidget.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

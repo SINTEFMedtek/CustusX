@@ -43,6 +43,7 @@ if(BUILD_TESTING)
         cxtestTrackingSystemService.cpp
         cxtestFileManagerServiceMock.h
         cxtestFileManagerServiceMock.cpp
+        cxtestEnumConversion.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS

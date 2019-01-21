@@ -52,7 +52,7 @@ QString StringPropertyActiveData::getValue() const
 }
 
 StringPropertyActiveImage::StringPropertyActiveImage(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, DATATYPE_IMAGE)
+	SelectDataStringPropertyBase(patientModelService, Image::getTypeName())
 {
 	mValueName = "Active Volume";
 	mHelp = "Select the active volume";
@@ -81,7 +81,7 @@ QString StringPropertyActiveImage::getValue() const
 //---------------------------------------------------------
 
 StringPropertySelectImage::StringPropertySelectImage(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, DATATYPE_IMAGE)
+	SelectDataStringPropertyBase(patientModelService, Image::getTypeName())
 {
 	mValueName = "Select volume";
 	mHelp = "Select a volume";
@@ -150,7 +150,7 @@ DataPtr StringPropertySelectData::getData() const
 //---------------------------------------------------------
 
 StringPropertySelectMesh::StringPropertySelectMesh(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, DATATYPE_MESH)
+	SelectDataStringPropertyBase(patientModelService, Mesh::getTypeName())
 {
 	mValueName = "Select mesh";
 	mHelp = "Select a mesh";
@@ -181,7 +181,7 @@ MeshPtr StringPropertySelectMesh::getMesh()
 //---------------------------------------------------------
 
 StringPropertySelectTrackedStream::StringPropertySelectTrackedStream(PatientModelServicePtr patientModelService) :
-	SelectDataStringPropertyBase(patientModelService, DATATYPE_TRACKED_STREAM)
+	SelectDataStringPropertyBase(patientModelService, TrackedStream::getTypeName())
 {
 	mValueName = "Select stream";
 	mHelp = "Select a tracked stream";
