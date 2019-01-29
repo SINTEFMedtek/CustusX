@@ -209,10 +209,9 @@ void LandmarkRegistrationWidget::activateLandmark(QString uid)
 QString LandmarkRegistrationWidget::getNextLandmark()
 {
 		std::vector<Landmark> lm = this->getAllLandmarks();
-		if(lm.empty())
-			return "";
 
-		for (unsigned i=0; i<lm.size()-1; ++i)
+		int size = int(lm.size());
+		for (unsigned i=0; int(i) < size-1; ++i)
     {
         if (lm[i].getUid()==mActiveLandmark)
         {
