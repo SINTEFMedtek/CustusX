@@ -39,3 +39,8 @@ void cxtest::FastPatientRegistrationWidgetFixture::pointSampled(cx::Vector3D p_r
 {
 	mPointSampled = true;
 }
+
+QString cxtest::FastPatientRegistrationWidgetFixture::getNextLandmark()
+{
+	return FastPatientRegistrationWidget::getNextLandmark();
+}

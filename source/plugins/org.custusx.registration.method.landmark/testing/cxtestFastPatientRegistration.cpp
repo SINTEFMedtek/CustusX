@@ -109,4 +109,12 @@ TEST_CASE("FastPatientRegistrationWidget: Receive pointSampled signals when samp
 	CHECK_FALSE(helper.widgetFixture->mPointSampled);
 }
 
+
+TEST_CASE("FastPatientRegistrationWidget: Test getting next landmark when landmark list is empty", "[unit][plugins][org.custusx.registration]")
+{
+	FastPatientRegistrationWidgetHelper helper;
+	QString landmark = helper.widgetFixture->getNextLandmark();
+	REQUIRE(landmark.isEmpty());
+}
+
 }//cxtest
