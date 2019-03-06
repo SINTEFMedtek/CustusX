@@ -48,6 +48,7 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.OpenIGTLinkIO())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
         self.addComponent(cxComponents.QHttpServer())
+        self.addComponent(cxComponents.civetweb())
         self.addComponent(cxComponents.FAST())
         self.addComponent(cxComponents.org_custusx_angleCorrection())
         self.addComponent(self.custusx)

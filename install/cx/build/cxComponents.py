@@ -553,7 +553,7 @@ class CustusXData(CppComponent):
         'use during integration test'
         return True
 # ---------------------------------------------------------
-
+# This repository will probably be removed, and replaced by civetweb
 class QHttpServer(CppComponent):
     def name(self):
         return "QHttpServer"
@@ -574,6 +574,30 @@ class QHttpServer(CppComponent):
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
         add('qhttpserver_DIR:PATH', self.buildPath())
+
+# ---------------------------------------------------------
+
+class civetweb(CppComponent):
+    def name(self):
+        return "civetweb"
+    def help(self):
+        return 'https://github.com/civetweb/civetweb'
+#    def path(self):
+#        return self.controlData.getExternalPath() + "/civetweb"
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def repository(self):
+        return 'https://github.com/civetweb/civetweb.git'
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('v1.11') # latest release
+#        self._getBuilder().gitCheckout('32011b734f37aaa5d51b0aa137821b590664af3a')
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('CIVETWEB_BUILD_TESTING:BOOL', 'OFF')
+        add('BUILD_TESTING:BOOL', 'OFF')
+        builder.configureCMake()
 
 # ---------------------------------------------------------
 
