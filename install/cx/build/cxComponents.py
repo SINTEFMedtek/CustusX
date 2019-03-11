@@ -519,7 +519,7 @@ class FAST(CppComponent):
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
-        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
+        append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
