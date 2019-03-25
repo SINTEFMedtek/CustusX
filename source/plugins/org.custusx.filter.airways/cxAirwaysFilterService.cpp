@@ -194,23 +194,25 @@ bool AirwaysFilter::execute()
 		importer->setFilename(filename);
 
 	    // Need to know the data type
-	    importer->update();
-	    fast::Image::pointer image = importer->getOutputData<fast::Image>();
+        importer->update(0);
+        //fast::Image::pointer image = importer->getOutputData<fast::Image>();
 
         // Do segmentation
-        fast::Segmentation::pointer segmentationData;
+       // fast::Segmentation::pointer segmentationData;
+        fast::AirwaySegmentation::pointer segmentation;
 		bool doLungSegmentation = getLungSegmentationOption(mOptions)->getValue();
 		bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
 		try {
 			if(doLungSegmentation) {
+                /*
 				fast::LungSegmentation::pointer segmentation = fast::LungSegmentation::New();
 				if(useManualSeedPoint) {
 					CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
 					segmentation->setAirwaySeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
 				}
 				segmentation->setInputConnection(importer->getOutputPort());
-				segmentation->update();
-				segmentationData = segmentation->getOutputData<fast::Segmentation>(1);
+                segmentation->update(0);
+                //segmentationData = segmentation->getOutputData<fast::Segmentation>(1);
 
                 // Convert fast segmentation data to VTK data which CX can use (Airways)
                 vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
@@ -223,16 +225,18 @@ bool AirwaysFilter::execute()
                 vtkExporter2->setInputConnection(segmentation->getOutputPort(0));
                 vtkExporter2->Update();
                 mLungSegmentationOutput = vtkExporter2->GetOutput();
+                */
 			} else {
 
-				fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
+                //fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
+                segmentation = fast::AirwaySegmentation::New();
 				if(useManualSeedPoint) {
 					CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
 					segmentation->setSeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
 				}
 				segmentation->setInputConnection(importer->getOutputPort());
-				segmentation->update();
-				segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
+                segmentation->update(0);
+                //segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
 
 				// Convert fast segmentation data to VTK data which CX can use
 				vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
@@ -253,12 +257,14 @@ bool AirwaysFilter::execute()
 
 
 	    // Get the transformation of the segmentation
-		Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
-	    mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
+        //Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
+        Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentation->getOutputPort()->getNextFrame<fast::Segmentation>());
+        mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
 
         // Extract centerline
         fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
-        centerline->setInputData(segmentationData);
+        //centerline->setInputData(segmentationData);
+        centerline->setInputConnection(segmentation->getOutputPort());
 
         // Get centerline
 	    vtkSmartPointer<fast::VTKMeshExporter> vtkCenterlineExporter = fast::VTKMeshExporter::New();
