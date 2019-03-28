@@ -44,6 +44,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "FAST/Exporters/VTKMeshExporter.hpp"
 #include "FAST/Data/Segmentation.hpp"
 #include "FAST/SceneGraph.hpp"
+#include "FAST/Exporters/VTKMeshFileExporter.hpp" //debug
 
 namespace cx {
 
@@ -168,6 +169,7 @@ bool AirwaysFilter::preProcess()
 
 bool AirwaysFilter::execute()
 {
+
     CX_LOG_INFO() << "EXECUTING AIRWAYS FILTER";
 	// Check if pre process went ok:
     if(!mInputImage)
@@ -182,6 +184,7 @@ bool AirwaysFilter::execute()
         q_filename = inputImageFileName;
 
     std::string filename = q_filename.toStdString();
+    bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
 	try {
 		fast::Config::getTestDataPath(); // needed for initialization
         QString cacheDir = cx::DataLocations::getCachePath();
@@ -194,102 +197,71 @@ bool AirwaysFilter::execute()
 		importer->setFilename(filename);
 
 	    // Need to know the data type
-        importer->update(0);
+        //importer->update(0);
         //fast::Image::pointer image = importer->getOutputData<fast::Image>();
 
         // Do segmentation
        // fast::Segmentation::pointer segmentationData;
-        fast::AirwaySegmentation::pointer segmentation;
-		bool doLungSegmentation = getLungSegmentationOption(mOptions)->getValue();
-		bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
-		try {
-			if(doLungSegmentation) {
-                /*
-				fast::LungSegmentation::pointer segmentation = fast::LungSegmentation::New();
-				if(useManualSeedPoint) {
-					CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
-					segmentation->setAirwaySeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
-				}
-				segmentation->setInputConnection(importer->getOutputPort());
-                segmentation->update(0);
-                //segmentationData = segmentation->getOutputData<fast::Segmentation>(1);
+		//bool doLungSegmentation = getLungSegmentationOption(mOptions)->getValue();
 
-                // Convert fast segmentation data to VTK data which CX can use (Airways)
-                vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
-                vtkExporter->setInputConnection(segmentation->getOutputPort(1));
-                vtkExporter->Update();
-                mAirwaySegmentationOutput = vtkExporter->GetOutput();
 
-                // Convert fast segmentation data to VTK data which CX can use (Lungs)
-                vtkSmartPointer<fast::VTKImageExporter> vtkExporter2 = fast::VTKImageExporter::New();
-                vtkExporter2->setInputConnection(segmentation->getOutputPort(0));
-                vtkExporter2->Update();
-                mLungSegmentationOutput = vtkExporter2->GetOutput();
-                */
-			} else {
+		fast::AirwaySegmentation::pointer airwaySegmentationPtr = fast::AirwaySegmentation::New();
 
-                //fast::AirwaySegmentation::pointer segmentation = fast::AirwaySegmentation::New();
-                segmentation = fast::AirwaySegmentation::New();
-				if(useManualSeedPoint) {
-					CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
-					segmentation->setSeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
-				}
-				segmentation->setInputConnection(importer->getOutputPort());
-                segmentation->update(0);
-                //segmentationData = segmentation->getOutputData<fast::Segmentation>(0);
+		airwaySegmentationPtr->setInputConnection(importer->getOutputPort());
+		airwaySegmentationPtr->setSmoothing(0.5);
+		if(useManualSeedPoint) {
+			CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
+			airwaySegmentationPtr->setSeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
+		}
+		auto segPort = airwaySegmentationPtr->getOutputPort();
 
-				// Convert fast segmentation data to VTK data which CX can use
-				vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
-				vtkExporter->setInputConnection(segmentation->getOutputPort());
-				vtkExporter->Update();
-				mAirwaySegmentationOutput = vtkExporter->GetOutput();
-            }
-        } catch(fast::Exception & e)
-        {
-			CX_LOG_ERROR() << "The airways filter failed: \n"
-						   << e.what();
-            if(!useManualSeedPoint)
-                CX_LOG_ERROR() << "Try to set the seed point manually.";
-            return false;
-        }
+		// Convert fast segmentation data to VTK data which CX can use
+		vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
+		vtkExporter->setInputConnection(airwaySegmentationPtr->getOutputPort());
+		vtkExporter->Update();
+		mAirwaySegmentationOutput = vtkExporter->GetOutput();
+
+		auto airwaySegmentationData = segPort->getNextFrame<fast::SpatialDataObject>();
 
 		CX_LOG_SUCCESS() << "FINISHED AIRWAY SEGMENTATION";
 
-
 	    // Get the transformation of the segmentation
-        //Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentationData);
-        Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(segmentation->getOutputPort()->getNextFrame<fast::Segmentation>());
+        Eigen::Affine3f T = fast::SceneGraph::getEigenAffineTransformationFromData(airwaySegmentationData);
         mTransformation.matrix() = T.matrix().cast<double>(); // cast to double
 
         // Extract centerline
         fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
-        //centerline->setInputData(segmentationData);
-        centerline->setInputConnection(segmentation->getOutputPort());
-
+        centerline->setInputData(airwaySegmentationData);
         // Get centerline
 	    vtkSmartPointer<fast::VTKMeshExporter> vtkCenterlineExporter = fast::VTKMeshExporter::New();
 	    vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
-	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();
 	    vtkCenterlineExporter->Update();
+	    mCenterlineOutput = vtkCenterlineExporter->GetOutput();
 
 	} catch(fast::Exception& e) {
 		std::string error = e.what();
 		reportError("fast::Exception: "+qstring_cast(error));
+		if(!useManualSeedPoint)
+			CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 		return false;
+
 	} catch(cl::Error& e) {
 		reportError("cl::Error:"+qstring_cast(e.what()));
 
 		return false;
+
 	} catch (std::exception& e){
 		reportError("std::exception:"+qstring_cast(e.what()));
-
+		std::cout << "DEBUG std::exception" << std::endl;  //debug
 		return false;
+
 	} catch (...){
 		reportError("Airway segmentation algorithm threw a unknown exception.");
 
 		return false;
     }
+
  	return true;
 }
 
@@ -325,32 +297,32 @@ bool AirwaysFilter::postProcess()
 	// Set output
 	mOutputTypes[1]->setValue(contour->getUid());
 
-	if(getLungSegmentationOption(mOptions)->getValue()) {
-		vtkPolyDataPtr rawContour = ContourFilter::execute(
-				mLungSegmentationOutput,
-				threshold,
-				false, // reduce resolution
-				true, // smoothing
-				true, // keep topology
-				0 // target decimation
-		);
+//	if(getLungSegmentationOption(mOptions)->getValue()) {
+//		vtkPolyDataPtr rawContour = ContourFilter::execute(
+//				mLungSegmentationOutput,
+//				threshold,
+//				false, // reduce resolution
+//				true, // smoothing
+//				true, // keep topology
+//				0 // target decimation
+//		);
 		//outputSegmentation->get_rMd_History()->setRegistration(rMd_i);
 		//patientService()->insertData(outputSegmentation);
 
 		// Add contour internally to cx
-		QColor color("red");
-		color.setAlpha(100);
-		MeshPtr contour = ContourFilter::postProcess(
-				patientService(),
-				rawContour,
-				mInputImage,
-                color
-		);
-		contour->get_rMd_History()->setRegistration(mTransformation);
-
-		// Set output
-		mOutputTypes[2]->setValue(contour->getUid());
-	}
+//		QColor color("red");
+//		color.setAlpha(100);
+//		MeshPtr contour = ContourFilter::postProcess(
+//				patientService(),
+//				rawContour,
+//				mInputImage,
+//                color
+//		);
+//		contour->get_rMd_History()->setRegistration(mTransformation);
+//
+//		// Set output
+//		mOutputTypes[2]->setValue(contour->getUid());
+//	}
 
     // Centerline
     QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffixCenterline() + "%1";
@@ -406,6 +378,7 @@ void AirwaysFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getManualSeedPointOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
+	mOptionsAdapters.push_back(this->getVesselSegmentationOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -457,6 +430,17 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 			BoolProperty::initialize("Lung segmentation",
 					"",
 					"Selecting this option will also segment the two lung sacs",
+					false, root);
+	return retval;
+
+}
+
+BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
+{
+	BoolPropertyPtr retval =
+			BoolProperty::initialize("Vessel segmentation",
+					"",
+					"Selecting this option will also segment the blood vessels in the lungs",
 					false, root);
 	return retval;
 
