@@ -597,7 +597,6 @@ class civetweb(CppComponent):
         add = builder.addCMakeOption
         add('CIVETWEB_BUILD_TESTING:BOOL', 'OFF')
         add('BUILD_TESTING:BOOL', 'OFF')
-        add('CIVETWEB_ENABLE_CXX:BOOL', 'OFF')
         builder.configureCMake()
 
 # ---------------------------------------------------------
