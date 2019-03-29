@@ -2,6 +2,8 @@ project(org_custusx_webserver)
 
 find_package(Qt5Network REQUIRED)
 find_package(qhttpserver REQUIRED)
+#find_package(civetweb REQUIRED)
+#find_package(civetweb-c-library REQUIRED)
 #message(STATUS "qhttpserver: " ${qhttpserver_DIR} ", " ${qhttpserver_FOUND})
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
@@ -40,6 +42,9 @@ set(PLUGIN_target_libraries
 	cxResource
 	cxResourceVisualization
 	qhttpserver
+	civetweb-cpp
+	civetweb-c-library
+	civetweb
     )
 
 set(PLUGIN_OUTPUT_DIR "")

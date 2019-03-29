@@ -41,6 +41,7 @@ NetworkPluginActivator::NetworkPluginActivator()
 NetworkPluginActivator::~NetworkPluginActivator()
 {}
 
+// old webserver based on Qhttpserver
 void NetworkPluginActivator::start(ctkPluginContext* context)
 {
     int port = 8085;
