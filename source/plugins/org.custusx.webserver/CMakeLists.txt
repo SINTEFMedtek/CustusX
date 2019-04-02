@@ -12,6 +12,8 @@ set(PLUGIN_SRCS
   cxHttpRequestHandler.cpp
   cxRemoteAPI.cpp
   cxLayoutVideoSource.cpp
+  cxWebServerGUIExtenderService.cpp
+  cxWebServerWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -21,6 +23,8 @@ set(PLUGIN_MOC_SRCS
   cxHttpRequestHandler.h
   cxRemoteAPI.h
   cxLayoutVideoSource.h
+  cxWebServerGUIExtenderService.h
+  cxWebServerWidget.h
 )
 
 # Qt Designer files which should be processed by Qts uic
@@ -35,7 +39,8 @@ set(PLUGIN_resources
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries 
-    ${PLUGIN_target_libraries}   
+    ${PLUGIN_target_libraries}
+    cxGUIExtenderService
     cxPluginUtilities
 	cxResource
 	cxResourceVisualization
