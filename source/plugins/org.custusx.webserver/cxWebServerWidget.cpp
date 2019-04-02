@@ -29,8 +29,6 @@ WebServerWidget::WebServerWidget(VisServicesPtr services, QWidget* parent) :
 	QWidget(parent),
 	mVisServices(services),
 	mVerticalLayout(new QVBoxLayout(this)),
-//	mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-record-3.png"), "Start"))
-//	mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/arrow-right-3.png"), "Start"))
 	mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"), "Start"))
 {
 	this->setObjectName("WebServerWidget");
@@ -46,7 +44,6 @@ WebServerWidget::WebServerWidget(VisServicesPtr services, QWidget* parent) :
 	this->initServer();
 
 	connect(mStartStopButton, &QPushButton::clicked, this, &WebServerWidget::startStopSlot);
-//	connect(mStartStopButton, &QPushButton::pressed, this, &WebServerWidget::startStopSlot);
 }
 
 WebServerWidget::~WebServerWidget()
@@ -79,7 +76,7 @@ void WebServerWidget::shutdownServer()
 
 void WebServerWidget::startStopSlot(bool checked)
 {
-	CX_LOG_DEBUG() << "WebServerWidget::startStopSlot: " << checked;
+//	CX_LOG_DEBUG() << "WebServerWidget::startStopSlot: " << checked;
 	if(checked)
 	{
 		this->startServer();
@@ -93,8 +90,6 @@ void WebServerWidget::startStopSlot(bool checked)
 		mStartStopButton->setText("Start");
 		this->shutdownServer();
 	}
-
-//	mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/process-stop-7.png"));
 }
 
 void WebServerWidget::startServer()

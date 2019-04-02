@@ -12,6 +12,7 @@ set(PLUGIN_SRCS
   cxHttpRequestHandler.cpp
   cxRemoteAPI.cpp
   cxLayoutVideoSource.cpp
+  cxWebServerGUIExtenderService.h
   cxWebServerGUIExtenderService.cpp
   cxWebServerWidget.cpp
 )
@@ -23,7 +24,6 @@ set(PLUGIN_MOC_SRCS
   cxHttpRequestHandler.h
   cxRemoteAPI.h
   cxLayoutVideoSource.h
-  cxWebServerGUIExtenderService.h
   cxWebServerWidget.h
 )
 
