@@ -14,7 +14,9 @@ set(PLUGIN_SRCS
   cxLayoutVideoSource.cpp
   cxWebServerGUIExtenderService.h
   cxWebServerGUIExtenderService.cpp
+  cxWebServerWidget.h
   cxWebServerWidget.cpp
+  cxWebServerWidgetBase.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -24,7 +26,7 @@ set(PLUGIN_MOC_SRCS
   cxHttpRequestHandler.h
   cxRemoteAPI.h
   cxLayoutVideoSource.h
-  cxWebServerWidget.h
+  cxWebServerWidgetBase.h
 )
 
 # Qt Designer files which should be processed by Qts uic

@@ -12,12 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXWEBSERVERWIDGET_H_
 #define CXWEBSERVERWIDGET_H_
 
-#include <QWidget>
-#include "boost/shared_ptr.hpp"
-#include "cxVisServices.h"
-
-class QVBoxLayout;
-class QPushButton;
+#include "cxWebServerWidgetBase.h"
 
 class QHttpServer;
 class QHttpRequest;
@@ -37,30 +32,26 @@ typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
  * \date 2019-03-29
  * \author Ole Vegard Solberg
  */
-class WebServerWidget : public QWidget
+class WebServerWidget : public WebServerWidgetBase
 {
-	Q_OBJECT
+//	Q_OBJECT
 public:
-	WebServerWidget(cx::VisServicesPtr services, QWidget* parent = 0);
+	WebServerWidget(cx::VisServicesPtr services, QWidget* parent = nullptr);
 	virtual ~WebServerWidget();
 
-private slots:
-	void startStopSlot(bool checked);
+protected:
+	virtual void startServer();
+	virtual void stopServer();
+
 private:
-	VisServicesPtr mVisServices;
 	HttpRequestHandlerPtr mRequestHandler;
 	RemoteAPIPtr mAPI;
 	QHttpServer *mServer;
 	quint16 mPort;
 
-	QString defaultWhatsThis() const;
-	QVBoxLayout*  mVerticalLayout;
-	QPushButton* mStartStopButton;
-
 	void initServer();
-	void startServer();
-	void stopServer();
 	void shutdownServer();
+	QString defaultWhatsThis() const;
 };
 
 } /* namespace cx */

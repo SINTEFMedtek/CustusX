@@ -10,9 +10,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxWebServerWidget.h"
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QPushButton>
 
 #include <qhttpserver.h>
 #include <qhttprequest.h>
@@ -26,24 +23,13 @@ namespace cx
 {
 
 WebServerWidget::WebServerWidget(VisServicesPtr services, QWidget* parent) :
-	QWidget(parent),
-	mVisServices(services),
-	mVerticalLayout(new QVBoxLayout(this)),
-	mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"), "Start"))
+	WebServerWidgetBase(services, parent)
 {
 	this->setObjectName("WebServerWidget");
 	this->setWindowTitle("Web Server");
 	this->setWhatsThis(this->defaultWhatsThis());
 
-	mStartStopButton->setCheckable(true);
-
-	mVerticalLayout->addWidget(new QLabel("Run Web Server"));
-	mVerticalLayout->addWidget(mStartStopButton);
-	mVerticalLayout->addStretch();
-
 	this->initServer();
-
-	connect(mStartStopButton, &QPushButton::clicked, this, &WebServerWidget::startStopSlot);
 }
 
 WebServerWidget::~WebServerWidget()
@@ -72,24 +58,6 @@ void WebServerWidget::shutdownServer()
 	delete mServer;
 	mServer = nullptr;
 	//Various crash at this point:  pointer being freed was not allocated, or seg. fault.
-}
-
-void WebServerWidget::startStopSlot(bool checked)
-{
-//	CX_LOG_DEBUG() << "WebServerWidget::startStopSlot: " << checked;
-	if(checked)
-	{
-		this->startServer();
-		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-stop-3.png"));
-		mStartStopButton->setText("Stop");
-	}
-	else
-	{
-		this->stopServer();
-		mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
-		mStartStopButton->setText("Start");
-		this->shutdownServer();
-	}
 }
 
 void WebServerWidget::startServer()
