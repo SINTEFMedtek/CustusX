@@ -56,7 +56,7 @@ public:
 
 	void deletePresetData(QString name, bool _2D=true, bool _3D=true); ///< Delete the preset data node
 protected:
-	QStringList generatePresetList(QString modality); ///< internally generate the preset list
+	QStringList generatePresetList(IMAGE_MODALITY modality); ///< internally generate the preset list
 
 private:
 };

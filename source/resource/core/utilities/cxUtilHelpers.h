@@ -49,6 +49,7 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 // --------------------------------------------------------
 
 cxResource_EXPORT double constrainValue(double val, double min, double max);
+cxResource_EXPORT int constrainValue(int val, int min, int max);
 cxResource_EXPORT int sign(double x);
 cxResource_EXPORT QString changeExtension(QString name, QString ext);
 cxResource_EXPORT void sleep_ms(int ms);

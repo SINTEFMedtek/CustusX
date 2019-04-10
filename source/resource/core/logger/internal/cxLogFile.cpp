@@ -15,8 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QFileInfo>
 #include "cxTime.h"
-#include "cxEnumConverter.h"
-#include "cxDefinitionStrings.h"
+#include "cxEnumConversion.h"
 
 
 namespace cx

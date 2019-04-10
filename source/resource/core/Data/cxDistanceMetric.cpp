@@ -25,7 +25,7 @@ DistanceMetric::DistanceMetric(const QString& uid, const QString& name, PatientM
 				DataMetric(uid, name, dataManager, spaceProvider)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "line endpoint 0" << "line endpoint 1"));
-	mArguments->setValidArgumentTypes(QStringList() << DATATYPE_POINT_METRIC << DATATYPE_PLANE_METRIC);
+	mArguments->setValidArgumentTypes(QStringList() << PointMetric::getTypeName() << PlaneMetric::getTypeName());
 
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SLOT(resetCachedValues()));
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
@@ -104,13 +104,13 @@ void DistanceMetric::getEndpointsUncached(std::vector<Vector3D> *endpoints, Vect
 	// case  II: point-plane
 	// case III: plane-plane (not implemented)
 
-	if ((a0->getType() == DATATYPE_POINT_METRIC) && (a1->getType() == DATATYPE_POINT_METRIC))
+	if ((a0->getType() == PointMetric::getTypeName()) && (a1->getType() == PointMetric::getTypeName()))
 	{
 		retval[0] = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();
 		retval[1] = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
 		dir = (retval[1] - retval[0]).normal();
 	}
-	else if ((a0->getType() == DATATYPE_PLANE_METRIC) && (a1->getType() == DATATYPE_POINT_METRIC))
+	else if ((a0->getType() == PlaneMetric::getTypeName()) && (a1->getType() == PointMetric::getTypeName()))
 	{
 		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(a0)->getRefPlane();
 		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(a1)->getRefCoord();
@@ -119,7 +119,7 @@ void DistanceMetric::getEndpointsUncached(std::vector<Vector3D> *endpoints, Vect
 		retval[1] = p;
 		dir = plane.normal();
 	}
-	else if ((a0->getType() == DATATYPE_POINT_METRIC) && (a1->getType() == DATATYPE_PLANE_METRIC))
+	else if ((a0->getType() == PointMetric::getTypeName()) && (a1->getType() == PlaneMetric::getTypeName()))
 	{
 		Plane3D plane = boost::dynamic_pointer_cast<PlaneMetric>(a1)->getRefPlane();
 		Vector3D p = boost::dynamic_pointer_cast<PointMetric>(a0)->getRefCoord();

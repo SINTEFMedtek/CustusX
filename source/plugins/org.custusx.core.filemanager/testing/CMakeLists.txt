@@ -7,7 +7,7 @@ if(BUILD_TESTING)
         cxtestToolFiles.cpp
         cxtestTestToolMesh.h
         cxtestTestToolMesh.cpp
-        #cxtestDataReaderWriter.cpp
+        cxtestDataReaderWriter.cpp
         )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_filemanager_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_filemanager_MOC_SOURCE_FILES})
@@ -23,11 +23,12 @@ if(BUILD_TESTING)
         cxtest_org_custusx_core_filemanager
         PRIVATE
         cxtestUtilities
+        cxtestResource
         org_custusx_core_filemanager
         cxResource
         cxLogicManager
         cxCatch
-        cxGui #because metricmanager is inside cxgui, perhaps it should be moved
+        cxGui
     )
     cx_add_tests_to_catch(cxtest_org_custusx_core_filemanager)
         

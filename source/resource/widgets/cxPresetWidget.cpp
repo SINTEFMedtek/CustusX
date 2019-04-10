@@ -102,7 +102,11 @@ void PresetWidget::setPresets(PresetsPtr presets)
 QString PresetWidget::getLastUsedPresetNameFromSettingsFile() const
 {
     QString id = mPresets->getId();
-    settings()->fillDefault(id, mPresets->getPresetList().first());
+		QString preset;
+		if (!mPresets->getPresetList().isEmpty())
+			preset = mPresets->getPresetList().first();
+
+		settings()->fillDefault(id, preset);
 
     QString lastUsedPresetName = settings()->value(id).toString();
     return lastUsedPresetName;

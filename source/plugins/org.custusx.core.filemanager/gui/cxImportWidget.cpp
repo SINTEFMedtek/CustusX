@@ -29,6 +29,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxImportDataTypeWidget.h"
 #include "cxSessionStorageService.h"
+#include "cxImage.h"
+#include "cxMesh.h"
+#include "cxPointMetric.h"
 
 namespace cx
 {
@@ -70,9 +73,9 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	QHBoxLayout *buttonLayout = new QHBoxLayout();
 	QPushButton *importButton = new QPushButton("Import");
 	QPushButton *cancelButton = new QPushButton("Cancel");
-	buttonLayout->addStretch();
 	buttonLayout->addWidget(importButton);
 	buttonLayout->addWidget(cancelButton);
+	buttonLayout->addStretch();
 	mTopLayout->addWidget(addMoreFilesButton);
 	mTopLayout->addWidget(new QLabel("Supports: "+this->generateFileTypeFilter()));
 	mTopLayout->addWidget(mTableWidget);
@@ -133,18 +136,6 @@ int ImportWidget::findRowIndexContainingButton(QPushButton *button) const
 	return retval;
 }
 
-void ImportWidget::readFilesAndGenerateParentCandidates()
-{
-	std::vector<DataPtr> notImportedData;
-	foreach(QString filename, mFileNames)
-	{
-		std::vector<DataPtr> newData = mFileManager->read(filename);
-		notImportedData.insert(notImportedData.end(), newData.begin(), newData.end());
-	}
-	mParentCandidates = this->generateParentCandidates(notImportedData);
-	emit parentCandidatesUpdated();
-}
-
 void ImportWidget::addMoreFilesButtonClicked()
 {
 	QStringList filenames = this->openFileBrowserForSelectingFiles();
@@ -159,9 +150,11 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 		widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
 		mStackedWidget->insertWidget(index, widget);
+
+		mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
 	}
 
-	this->readFilesAndGenerateParentCandidates();
+	this->generateParentCandidates();
 }
 
 void ImportWidget::importButtonClicked()
@@ -242,9 +235,9 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 QString ImportWidget::generateFileTypeFilter() const
 {
 	QString file_type_filter;
-	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType(DATATYPE_MESH);
-	std::vector<FileReaderWriterServicePtr> image_readers = mVisServices->file()->getImportersForDataType(DATATYPE_IMAGE);
-	std::vector<FileReaderWriterServicePtr> point_metric_readers = mVisServices->file()->getImportersForDataType(DATATYPE_POINT_METRIC);
+	std::vector<FileReaderWriterServicePtr> mesh_readers = mVisServices->file()->getImportersForDataType(Mesh::getTypeName());
+	std::vector<FileReaderWriterServicePtr> image_readers = mVisServices->file()->getImportersForDataType(Image::getTypeName());
+	std::vector<FileReaderWriterServicePtr> point_metric_readers = mVisServices->file()->getImportersForDataType(PointMetric::getTypeName());
 	std::vector<FileReaderWriterServicePtr> readers;
 	readers.insert( readers.end(), mesh_readers.begin(), mesh_readers.end() );
 	readers.insert( readers.end(), image_readers.begin(), image_readers.end() );
@@ -264,21 +257,20 @@ QString ImportWidget::generateFileTypeFilter() const
 	return file_type_filter;
 }
 
-std::vector<DataPtr> ImportWidget::generateParentCandidates(std::vector<DataPtr> notLoadedData) const
+void ImportWidget::generateParentCandidates()
 {
-	std::vector<DataPtr> parentCandidates;
-	for(unsigned i=0; i<notLoadedData.size(); ++i)
+	for(unsigned i=0; i<mNotImportedData.size(); ++i)
 	{
-		if(notLoadedData[i]->getType() != DATATYPE_POINT_METRIC)
-			parentCandidates.push_back(notLoadedData[i]);
+		if(mNotImportedData[i]->getType() != PointMetric::getTypeName())
+			mParentCandidates.push_back(mNotImportedData[i]);
 	}
 	std::map<QString, DataPtr> loadedData = mVisServices->patient()->getDatas();
 	std::map<QString, DataPtr>::iterator it = loadedData.begin();
 	for(; it!=loadedData.end(); ++it)
 	{
-		parentCandidates.push_back(it->second);
+		mParentCandidates.push_back(it->second);
 	}
-	return parentCandidates;
+	emit parentCandidatesUpdated();
 }
 
 

@@ -289,7 +289,7 @@ vtkPolyDataPtr ProbeSector::getOriginPolyData()
 
 	Vector3D o_u = mData.getOrigin_u();
 	double length = (mData.getDepthStart() - mData.getDepthEnd())/15;
-	length = constrainValue(length, 2, 10);
+	length = constrainValue(length, 2.0, 10.0);
 	Vector3D tip = o_u + Vector3D(0, -length, 0);
 	Vector3D left = o_u + Vector3D(-length/3, 0, 0);
 	Vector3D right = o_u + Vector3D(length/3, 0, 0);

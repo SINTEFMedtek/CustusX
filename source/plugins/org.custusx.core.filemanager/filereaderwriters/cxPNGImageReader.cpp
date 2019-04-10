@@ -23,7 +23,7 @@ namespace cx
 {
 
 PNGImageReader::PNGImageReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("PNGImageReader" ,DATATYPE_IMAGE, "", "png", patientModelService)
+	FileReaderWriterImplService("PNGImageReader" ,Image::getTypeName(), "", "png", patientModelService)
 {
 
 }
@@ -48,6 +48,11 @@ bool PNGImageReader::readInto(ImagePtr image, QString filename)
 		return false;
 	image->setVtkImageData(raw);
 	return true;
+}
+
+QString PNGImageReader::canReadDataType() const
+{
+	return Image::getTypeName();
 }
 
 DataPtr PNGImageReader::read(const QString& uid, const QString& filename)

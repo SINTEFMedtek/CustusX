@@ -39,8 +39,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageDefaultTFGenerator.h"
 #include "cxNullDeleter.h"
 #include "cxSettings.h"
-
 #include "cxUnsignedDerivedImage.h"
+#include "cxEnumConversion.h"
+#include "cxCustomMetaImage.h"
 
 typedef vtkSmartPointer<vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
@@ -111,7 +112,7 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = this->getInitialBoundingBox();
-    mModality = "UNKNOWN";
+	mModality = imUNKNOWN;
 
 	mImageLookupTable2D.reset();
 	mImageTransferFunctions3D.reset();
@@ -539,11 +540,11 @@ void Image::addXml(QDomNode& dataNode)
 	imageNode.appendChild(clipNode);
 
 	QDomElement modalityNode = doc.createElement("modality");
-	modalityNode.appendChild(doc.createTextNode(mModality));
+	modalityNode.appendChild(doc.createTextNode(enum2string(mModality)));
 	imageNode.appendChild(modalityNode);
 
 	QDomElement imageTypeNode = doc.createElement("imageType");
-	imageTypeNode.appendChild(doc.createTextNode(mImageType));
+	imageTypeNode.appendChild(doc.createTextNode(enum2string(mImageType)));
 	imageNode.appendChild(imageTypeNode);
 
 	QDomElement interpolationNode = doc.createElement("vtk_interpolation");
@@ -634,8 +635,8 @@ void Image::parseXml(QDomNode& dataNode)
 		mPersistentClipPlanes.push_back(plane);
 	}
 
-	mModality = dataNode.namedItem("modality").toElement().text();
-	mImageType = dataNode.namedItem("imageType").toElement().text();
+	mModality = convertToModality(dataNode.namedItem("modality").toElement().text());
+	mImageType = convertToImageSubType(dataNode.namedItem("imageType").toElement().text());
 
 	QDomElement interpoationNode = dataNode.namedItem("vtk_interpolation").toElement();
 	if (!interpoationNode.isNull())
@@ -791,23 +792,23 @@ void Image::mergevtkSettingsIntosscTransform()
 	emit cropBoxChanged();
 }
 
-QString Image::getModality() const
+IMAGE_MODALITY Image::getModality() const
 {
 	return mModality;
 }
 
-void Image::setModality(const QString& val)
+void Image::setModality(const IMAGE_MODALITY& val)
 {
 	mModality = val;
 	emit propertiesChanged();
 }
 
-QString Image::getImageType() const
+IMAGE_SUBTYPE Image::getImageType() const
 {
 	return mImageType;
 }
 
-void Image::setImageType(const QString& val)
+void Image::setImageType(const IMAGE_SUBTYPE& val)
 {
 	mImageType = val;
 	emit propertiesChanged();

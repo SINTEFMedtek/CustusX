@@ -185,7 +185,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxUtilHelpers
     utilities/cxTypeConversions
     utilities/cxSliceComputer
-    utilities/cxDefinitions.h
+    utilities/cxDefinitions
     utilities/cxDefinitionStrings
     utilities/cxCustomMetaImage
     utilities/cxIndent
@@ -206,6 +206,7 @@ cx_add_class(cxResource_SOURCE
     utilities/cxSpaceProviderImpl
     utilities/cxStreamedTimestampSynchronizer
     utilities/cxEnumConverter.h
+    utilities/cxEnumConversion.h
     utilities/cxSpaceProviderNull
     utilities/cxOrderedQDomDocument.h
     utilities/cxXmlFileHandler

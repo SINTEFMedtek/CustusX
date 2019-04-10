@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef BRONCHOSCOPYREGISTRATION_H_
@@ -33,9 +33,9 @@ class org_custusx_registration_method_bronchoscopy_EXPORT BronchoscopyRegistrati
 public:
 	BronchoscopyRegistration();
 	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
-    BranchListPtr processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations = 0);
+	BranchListPtr processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations = 0);
 	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
-    Eigen::Matrix4d runBronchoscopyRegistrationImage2Image(vtkPolyDataPtr centerlineFixed, vtkPolyDataPtr centerlineMoving);
+	Eigen::Matrix4d runBronchoscopyRegistrationImage2Image(vtkPolyDataPtr centerlineFixed, vtkPolyDataPtr centerlineMoving);
 	bool isCenterlineProcessed();
 	virtual ~BronchoscopyRegistration();
 };

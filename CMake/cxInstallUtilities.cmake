@@ -477,8 +477,10 @@ endfunction()
 function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS_LOCAL)
     find_qt_plugin_dir(QT_PLUGINS_DIR)
     find_qt_libs_dir(QT_LIBS_DIR)
+    find_qt_qml_dir(QT_QML_DIR)
         cx_assert_variable_exists(QT_PLUGINS_DIR)
         cx_assert_variable_exists(QT_LIBS_DIR)
+        cx_assert_variable_exists(QT_QML_DIR)
         cx_assert_variable_exists(CX_INSTALL_ROOT_DIR)
         cx_assert_variable_exists(INSTALL_BINARY_DIR)
         cx_assert_variable_exists(CX_INSTALL_PLUGIN_DIR)
@@ -549,8 +551,16 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		FILES_MATCHING PATTERN "*qsqlite*"
 	)
 
-	message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
-	message(STATUS "QT_LIBS_DIR: " ${QT_LIBS_DIR})
+# Install Qt qml by copying all files in the qml directory
+SET(INSTALL_QTQML_DIR "${INSTALL_BINARY_DIR}")
+install(DIRECTORY "${QT_QML_DIR}/"
+	DESTINATION ${INSTALL_QTQML_DIR}
+	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+)
+
+  message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})
+  message(STATUS "QT_LIBS_DIR: " ${QT_LIBS_DIR})
+  message(STATUS "QT_QML_DIR: " ${QT_QML_DIR})
 
 	# install runtime plugins
         set(CX_PLUGIN_DIR "/plugins")
@@ -579,6 +589,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 		${INSTALL_LIBRARIES_PATTERN_LOCAL}
 		${CX_INSTALL_PLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		${INSTALL_QTPLUGIN_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
+		${INSTALL_QTQML_DIR}/*${CMAKE_SHARED_LIBRARY_SUFFIX}
 		)
 
 	# install a qt.conf file

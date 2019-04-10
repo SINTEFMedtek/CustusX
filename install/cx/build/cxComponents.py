@@ -348,7 +348,7 @@ class OpenIGTLinkIO(CppComponent):
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('ab439c20952efc5bac214d3486c5c2977b44b4f5')
+        self._getBuilder().gitCheckout('f862d6bfa270332955e8050df8ce057febf48392')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -600,6 +600,70 @@ class org_custusx_angleCorrection(CppComponent):
         pass
     def repository(self):
         return 'git@github.com:SINTEFMedtek/AngleCorr.git'
+    def makeClean(self):
+        pass
+    def pluginPath(self):
+        return '%s' % self.sourcePath()
+
+# ---------------------------------------------------------
+# These are private repositories, not part of the CustusX open source build
+# ---------------------------------------------------------
+
+class org_custusx_mariana(CppComponent):
+
+    def name(self):
+        return "org.custusx.mariana"
+    def help(self):
+        return 'Plugin for the Mariana project'
+    def path(self):
+        custusx = self._createSibling(cx.build.cxComponents.CustusX)
+        return '%s/%s/source/plugins' % (custusx.path(), custusx.sourceFolder())
+    def sourceFolder(self):
+        return 'org.custusx.mariana'
+    def update(self):
+      self._getBuilder().gitSetRemoteURL(self.repository())
+#      self._getBuilder().gitCheckout('')
+#      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
+      self._getBuilder().gitCheckout('55d76dddf8750e4b2198265d97d432b0a02dcece')
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def repository(self):
+        return 'git@github.com:SINTEFMedtek/Mariana.git'
+    def makeClean(self):
+        pass
+    def pluginPath(self):
+        return '%s' % self.sourcePath()
+#    def addConfigurationToDownstreamLib(self, builder):
+#        add = builder.addCMakeOption
+#        add('CX_PLUGIN_org.custusx.mariana:BOOL', 'ON');
+
+# ---------------------------------------------------------
+
+class org_custusx_bronchoscopynavigation(CppComponent):
+
+    def name(self):
+        return "org.custusx.bronchoscopynavigation"
+    def help(self):
+        return 'Plugin bronchoscopynavigation'
+    def path(self):
+        custusx = self._createSibling(cx.build.cxComponents.CustusX)
+        return '%s/%s/source/plugins' % (custusx.path(), custusx.sourceFolder())
+    def sourceFolder(self):
+        return 'org.custusx.bronchoscopynavigation'
+#    def _rawCheckout(self):
+#        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('54571ecc3bdd5c993bf615d04229bfc6d323b192')
+    def configure(self):
+        pass
+    def build(self):
+        pass
+    def repository(self):
+        base = self.controlData.gitrepo_open_site_base
+        return '%s/org.custusx.bronchoscopynavigation.git' % base
     def makeClean(self):
         pass
     def pluginPath(self):

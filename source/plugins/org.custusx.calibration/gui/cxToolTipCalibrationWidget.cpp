@@ -19,7 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxTrackingService.h"
 #include "cxVector3D.h"
-#include "cxDefinitionStrings.h"
 #include "cxLabeledComboBoxWidget.h"
 #include "cxTool.h"
 #include "cxVisServices.h"

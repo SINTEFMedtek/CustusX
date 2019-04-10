@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "cxEnumConverter.h"
 
 namespace cx
 {

@@ -52,6 +52,11 @@ vtkPolyDataPtr PolyDataMeshReader::loadVtkPolyData(QString fileName)
 	return polyData;
 }
 
+QString PolyDataMeshReader::canReadDataType() const
+{
+	return Mesh::getTypeName();
+}
+
 DataPtr PolyDataMeshReader::read(const QString& uid, const QString& filename)
 {
 	MeshPtr mesh(new Mesh(uid));
@@ -87,7 +92,7 @@ void PolyDataMeshReader::write(DataPtr data, const QString &filename)
 }
 
 PolyDataMeshReader::PolyDataMeshReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("PolyDataMeshReader", DATATYPE_MESH, DATATYPE_MESH, "vtk", patientModelService)
+	FileReaderWriterImplService("PolyDataMeshReader", Mesh::getTypeName(), Mesh::getTypeName(), "vtk", patientModelService)
 {
 }
 
@@ -103,7 +108,7 @@ bool PolyDataMeshReader::canRead(const QString &type, const QString &filename)
 
 QString cx::PolyDataMeshReader::canWriteDataType() const
 {
-	return DATATYPE_MESH;
+	return Mesh::getTypeName();
 }
 
 bool cx::PolyDataMeshReader::canWrite(const QString &type, const QString &filename) const

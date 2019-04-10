@@ -82,10 +82,10 @@ public:
 	  */
 	virtual ImagePtr getUnsigned(ImagePtr self);
 
-	virtual QString getModality() const;
-	virtual void setModality(const QString& val);
-	virtual QString getImageType() const;
-	virtual void setImageType(const QString& val);
+	virtual IMAGE_MODALITY getModality() const;
+	virtual void setModality(const IMAGE_MODALITY &val);
+	virtual IMAGE_SUBTYPE getImageType() const;
+	virtual void setImageType(const IMAGE_SUBTYPE &val);
 
 	virtual ImageTF3DPtr getTransferFunctions3D();
 	virtual void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
@@ -125,7 +125,7 @@ public:
 	}
 	static QString getTypeName()
 	{
-		return DATATYPE_IMAGE;
+		return "image";
 	}
 	virtual QIcon getIcon() {return QIcon(":/icons/volume.png");}
 
@@ -182,8 +182,8 @@ protected:
 	bool mUseCropping; ///< image should be cropped using mCroppingBox
 	DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
 
-	QString mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
-	QString mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
+	IMAGE_MODALITY mModality; ///< modality of the image, defined as DICOM tag (0008,0060), Section 3, C.7.3.1.1.1
+	IMAGE_SUBTYPE mImageType; ///< type of the image, defined as DICOM tag (0008,0008) (mainly value 3, but might be a merge of value 4), Section 3, C.7.6.1.1.2
 	double mMaxRGBIntensity;
 	int mInterpolationType; ///< mirror the interpolationType in vtkVolumeProperty
 

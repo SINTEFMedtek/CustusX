@@ -60,8 +60,8 @@ public:
     virtual DoubleBoundingBox3D boundingBox() const  { CALL_IN_WEAK_PTR(mBase, boundingBox, DoubleBoundingBox3D()); }
 	virtual CoordinateSystem getCoordinateSystem();
 
-    virtual QString getModality() const              { CALL_IN_WEAK_PTR(mBase, getModality, QString()); }
-    virtual QString getImageType() const             { CALL_IN_WEAK_PTR(mBase, getImageType, QString()); }
+		virtual IMAGE_MODALITY getModality() const       { CALL_IN_WEAK_PTR(mBase, getModality, IMAGE_MODALITY()); }
+		virtual IMAGE_SUBTYPE getImageType() const       { CALL_IN_WEAK_PTR(mBase, getImageType, IMAGE_SUBTYPE()); }
 
 private slots:
     void unsignedTransferFunctionsChangedSlot();

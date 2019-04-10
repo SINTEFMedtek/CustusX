@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include <QStringList>
-#include "cxEnumConverter.h"
 #include "cxDefinitions.h"
 #include "cxTrackerConfiguration.h"
 #include "cxTrackingSystemIGSTKService.h"
@@ -20,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxTrackerConfigurationImpl.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {

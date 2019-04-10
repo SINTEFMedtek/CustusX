@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "cxEnumConverter.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
 #include "cxSelectionGroupBox.h"

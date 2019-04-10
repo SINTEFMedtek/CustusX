@@ -229,7 +229,7 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	cx::ImagePtr convertedImage = converter.convertToImage(series);
 
 	cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
-	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
+	referenceImage->setModality(cx::imSC); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
 
 	if (verbose)
 	{

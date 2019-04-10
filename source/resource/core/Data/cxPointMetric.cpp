@@ -74,7 +74,6 @@ void PointMetric::setSpace(CoordinateSystem space)
 	mSpace = space;
 	this->resetCachedValues();
 	mSpaceListener->setSpace(space);
-	CX_LOG_DEBUG() << "Space set to: " << mSpace.toString();
 }
 
 CoordinateSystem PointMetric::getSpace() const

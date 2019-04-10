@@ -25,7 +25,7 @@ namespace cx
 {
 
 NIfTIReader::NIfTIReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("NIfTIReader", DATATYPE_IMAGE, "", "nii", patientModelService)
+	FileReaderWriterImplService("NIfTIReader", Image::getTypeName(), "", "nii", patientModelService)
 {
 	sform_matrix = vtkMatrix4x4Ptr::New();
 }
@@ -90,7 +90,7 @@ bool NIfTIReader::isNull()
 
 QString NIfTIReader::canReadDataType() const
 {
-	return DATATYPE_IMAGE;
+	return Image::getTypeName();
 }
 
 bool NIfTIReader::canRead(const QString &type, const QString &filename)

@@ -35,7 +35,7 @@ public:
 
 	virtual bool canRead(const QString& type, const QString& filename);
 	virtual DataPtr read(const QString& uid, const QString& filename);
-	virtual QString canReadDataType() const { return DATATYPE_MESH; }
+	virtual QString canReadDataType() const;
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(MeshPtr mesh, QString filename);
 	std::vector<DataPtr> read(const QString &filename);

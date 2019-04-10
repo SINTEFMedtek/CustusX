@@ -14,11 +14,72 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include <QStringList>
 #include "cxLogger.h"
+#include "cxData.h"
 
 #include "cxTypeConversions.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
+
+
+IMAGE_MODALITY convertToModality(QString modalityString)
+{
+	IMAGE_MODALITY retval = imUNKNOWN;
+
+	if(modalityString.contains(enum2string<IMAGE_MODALITY>(imUNKNOWN), Qt::CaseInsensitive))
+		retval = imUNKNOWN;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imCT), Qt::CaseInsensitive))
+		retval = imCT;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imMR), Qt::CaseInsensitive))
+		retval = imMR;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imUS), Qt::CaseInsensitive))
+		retval = imUS;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imPET), Qt::CaseInsensitive))
+		retval = imPET;
+	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imSC), Qt::CaseInsensitive))
+		retval = imSC;
+	else
+		CX_LOG_WARNING() << "convertToModality - Cannot convert the string \"" << modalityString << "\" to a known image modality";
+
+	return retval;
+}
+
+
+IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
+{
+	IMAGE_SUBTYPE retval = istUNKNOWN;
+
+	if (imageTypeSubString.isEmpty() || imageTypeSubString == " ")
+		retval = istEMPTY;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istUNKNOWN), Qt::CaseInsensitive))
+		retval = istUNKNOWN;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istMRT1), Qt::CaseInsensitive))
+		retval = istMRT1;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istMRT2), Qt::CaseInsensitive))
+		retval = istMRT2;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istMRFLAIR), Qt::CaseInsensitive))
+		retval = istMRFLAIR;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istANGIO), Qt::CaseInsensitive))
+		retval = istANGIO;
+	else if(imageTypeSubString.contains(enum2string<IMAGE_SUBTYPE>(istUSBMODE), Qt::CaseInsensitive))
+		retval = istUSBMODE;
+	else if(imageTypeSubString.contains("bmode", Qt::CaseInsensitive))
+		retval = istUSBMODE;
+	else if(imageTypeSubString.contains("b_mode", Qt::CaseInsensitive))
+		retval = istUSBMODE;
+	else if(imageTypeSubString.contains("b mode", Qt::CaseInsensitive))
+		retval = istUSBMODE;
+	else if(imageTypeSubString.contains("seg", Qt::CaseInsensitive))
+		retval = istSEGMENTATION;
+	else if(imageTypeSubString.contains("label", Qt::CaseInsensitive))
+		retval = istSEGMENTATION;
+	else
+		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
+
+	return retval;
+}
+
 
 CustomMetaImage::CustomMetaImage(QString filename) :
     mFilename(filename)
@@ -53,25 +114,16 @@ QString CustomMetaImage::readKey(QString key)
 	return "";
 }
 
-QString CustomMetaImage::readModality()
+IMAGE_MODALITY CustomMetaImage::readModality()
 {
-	QString mod = this->readKey("Modality");
-
-	if (mod.contains("CT", Qt::CaseInsensitive))
-		return "CT";
-	if (mod.contains("MR", Qt::CaseInsensitive))
-		return "MR";
-	if (mod.contains("US", Qt::CaseInsensitive))
-		return "US";
-	if (mod.contains("OTHER", Qt::CaseInsensitive))
-		return "OTHER";
-	mod = mod.remove("MET_MOD_");
-	return mod;
+	QString modalityString = this->readKey("Modality");
+	return convertToModality(modalityString);
 }
 
-QString CustomMetaImage::readImageType()
+IMAGE_SUBTYPE CustomMetaImage::readImageType()
 {
-	return this->readKey("ImageType3");
+	QString imageTypeString = this->readKey("ImageType3");
+	return convertToImageSubType(imageTypeString);
 }
 
 /** Remove all lines starting with a key from data.
@@ -116,21 +168,14 @@ void CustomMetaImage::setKey(QString key, QString value)
 	file.write(data.join("\n").toLatin1());
 }
 
-void CustomMetaImage::setModality(QString value)
+void CustomMetaImage::setModality(IMAGE_MODALITY value)
 {
-    QStringList valid_values;
-    valid_values << "CT" << "MR" << "NM" << "US" << "OTHER" << "UNKNOWN";
-    if(!valid_values.contains(value, Qt::CaseInsensitive))
-        value = "UNKNOWN";
-
-	this->setKey("Modality", value);
+	this->setKey("Modality", enum2string(value));
 }
 
-void CustomMetaImage::setImageType(QString value)
+void CustomMetaImage::setImageType(IMAGE_SUBTYPE value)
 {
-	if (value.isEmpty())
-		return;
-	this->setKey("ImageType3", value);
+	this->setKey("ImageType3", enum2string(value));
 }
 
 

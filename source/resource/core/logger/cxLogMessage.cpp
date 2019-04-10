@@ -24,7 +24,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QThread>
 #include <QApplication>
 #include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxTime.h"
 #include "cxMessageListener.h"
 

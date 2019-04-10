@@ -140,11 +140,11 @@ ImagePtr ReconstructCore::generateOutputVolume(vtkImageDataPtr rawOutput)
 
 //	ImagePtr image = mPatientModelService->createImage(rawOutput, uid + "_%1", name + " %1", filePath);
 	image->get_rMd_History()->setRegistration(mOutputVolumeParams.get_rMd());
-	image->setModality("US");
+	image->setModality(imUS);
 	if (mInput.mAngio)
-		image->setImageType("Angio");
+		image->setImageType(istANGIO);
 	else
-		image->setImageType("B-Mode");
+		image->setImageType(istUSBMODE);
 
 	PresetTransferFunctions3DPtr presets = mPatientModelService->getPresetTransferFunctions3D();
 	presets->load(mInput.mTransferFunctionPreset, image, true, false);//Only apply to 2D, not 3D

@@ -101,7 +101,7 @@ TEST_CASE("StringPropertyActiveData works", "[unit][resource][core]")
 
 	patientModelService->insertData(testData.image1);
 
-	cx::StringPropertyActiveDataPtr activeDataProperty = cx::StringPropertyActiveData::New(patientModelService, DATATYPE_IMAGE);
+	cx::StringPropertyActiveDataPtr activeDataProperty = cx::StringPropertyActiveData::New(patientModelService, cx::Image::getTypeName());
 	REQUIRE(activeDataProperty);
 
 	CHECK_FALSE(activeData->getActive());

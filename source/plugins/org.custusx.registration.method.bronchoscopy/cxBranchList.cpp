@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxBranchList.h"
@@ -29,8 +29,8 @@ BranchList::BranchList()
 
 BranchList::~BranchList()
 {
-//	for (int i = 0; i < mBranches.size(); i++)
-//		mBranches[i]->~Branch();
+	//	for (int i = 0; i < mBranches.size(); i++)
+	//		mBranches[i]->~Branch();
 }
 
 void BranchList::addBranch(BranchPtr b)
@@ -115,22 +115,22 @@ void BranchList::smoothOrientations()
 
 void BranchList::interpolateBranchPositions(int interpolationFactor){
 
-    for (int i = 0; i < mBranches.size(); i++)
-    {
+	for (int i = 0; i < mBranches.size(); i++)
+	{
 		Eigen::MatrixXd positions = mBranches[i]->getPositions();
 
-        if (mBranches[i]->getParentBranch()) // Add parents last position to interpolate between branches
-        {
-            Eigen::MatrixXd parentPositions = mBranches[i]->getParentBranch()->getPositions();
-            Eigen::MatrixXd positionsResized(positions.rows(), positions.cols()+1);
-            positionsResized.col(0) = parentPositions.rightCols(1);
-            positionsResized.rightCols(positions.cols()) = positions;
-            positions = positionsResized;
-        }
+		if (mBranches[i]->getParentBranch()) // Add parents last position to interpolate between branches
+		{
+			Eigen::MatrixXd parentPositions = mBranches[i]->getParentBranch()->getPositions();
+			Eigen::MatrixXd positionsResized(positions.rows(), positions.cols()+1);
+			positionsResized.col(0) = parentPositions.rightCols(1);
+			positionsResized.rightCols(positions.cols()) = positions;
+			positions = positionsResized;
+		}
 
 		std::vector<Eigen::Vector3d> interpolatedPositions;
 		for (int j = 0; j < positions.cols()-1; j++)
-        {
+		{
 			for (int k = 0; k < interpolationFactor; k++){
 				Eigen::Vector3d interpolationPoint;
 				interpolationPoint[0] = (positions(0,j)*(interpolationFactor-k) + positions(0,j+1)*(k) ) / interpolationFactor;
@@ -139,12 +139,12 @@ void BranchList::interpolateBranchPositions(int interpolationFactor){
 				interpolatedPositions.push_back(interpolationPoint);
 			}
 		}
-        if (mBranches[i]->getParentBranch()) // Remove parents last position after interpolation
-        {
-            Eigen::MatrixXd positionsResized(positions.rows(), positions.cols()-1);
-            positionsResized = positions.rightCols(positionsResized.cols());
-            positions = positionsResized;
-        }
+		if (mBranches[i]->getParentBranch()) // Remove parents last position after interpolation
+		{
+			Eigen::MatrixXd positionsResized(positions.rows(), positions.cols()-1);
+			positionsResized = positions.rightCols(positionsResized.cols());
+			positions = positionsResized;
+		}
 		Eigen::MatrixXd interpolationResult(3 , interpolatedPositions.size());
 		for (int j = 0; j < interpolatedPositions.size(); j++)
 		{
@@ -163,54 +163,54 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 	{
 		Eigen::MatrixXd positions = mBranches[i]->getPositions();
 		int numberOfInputPoints = positions.cols();
-        //int controlPointFactor = 10;
-        //int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
-        double branchLength = (positions.rightCols(1) - positions.leftCols(1)).norm();
-        int numberOfControlPoints = std::ceil(branchLength/controlPointDistance);
-        numberOfControlPoints = std::max(numberOfControlPoints, 2); // at least two control points
+		//int controlPointFactor = 10;
+		//int numberOfControlPoints = numberOfInputPoints / controlPointFactor;
+		double branchLength = (positions.rightCols(1) - positions.leftCols(1)).norm();
+		int numberOfControlPoints = std::ceil(branchLength/controlPointDistance);
+		numberOfControlPoints = std::max(numberOfControlPoints, 2); // at least two control points
 
 		vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
 		vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
 		vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
 
-        //add control points to spline
-        for(int j=0; j<numberOfControlPoints; j++)
-        {
-            int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
+		//add control points to spline
+		for(int j=0; j<numberOfControlPoints; j++)
+		{
+			int indexP = (j*numberOfInputPoints)/numberOfControlPoints;
 
-            splineX->AddPoint(indexP,positions(0,indexP));
-            splineY->AddPoint(indexP,positions(1,indexP));
-            splineZ->AddPoint(indexP,positions(2,indexP));
-        }
-        //Always add the last point to complete spline
-        splineX->AddPoint(numberOfInputPoints-1,positions(0,numberOfInputPoints-1));
-        splineY->AddPoint(numberOfInputPoints-1,positions(1,numberOfInputPoints-1));
-        splineZ->AddPoint(numberOfInputPoints-1,positions(2,numberOfInputPoints-1));
+			splineX->AddPoint(indexP,positions(0,indexP));
+			splineY->AddPoint(indexP,positions(1,indexP));
+			splineZ->AddPoint(indexP,positions(2,indexP));
+		}
+		//Always add the last point to complete spline
+		splineX->AddPoint(numberOfInputPoints-1,positions(0,numberOfInputPoints-1));
+		splineY->AddPoint(numberOfInputPoints-1,positions(1,numberOfInputPoints-1));
+		splineZ->AddPoint(numberOfInputPoints-1,positions(2,numberOfInputPoints-1));
 
-        //evaluate spline - get smoothed positions
-        Eigen::MatrixXd smoothingResult(3 , numberOfInputPoints);
-        for(int j=0; j<numberOfInputPoints; j++)
-        {
-            double splineParameter = j;
-            smoothingResult(0,j) = splineX->Evaluate(splineParameter);
-            smoothingResult(1,j) = splineY->Evaluate(splineParameter);
-            smoothingResult(2,j) = splineZ->Evaluate(splineParameter);
-        }
-        mBranches[i]->setPositions(smoothingResult);
+		//evaluate spline - get smoothed positions
+		Eigen::MatrixXd smoothingResult(3 , numberOfInputPoints);
+		for(int j=0; j<numberOfInputPoints; j++)
+		{
+			double splineParameter = j;
+			smoothingResult(0,j) = splineX->Evaluate(splineParameter);
+			smoothingResult(1,j) = splineY->Evaluate(splineParameter);
+			smoothingResult(2,j) = splineZ->Evaluate(splineParameter);
+		}
+		mBranches[i]->setPositions(smoothingResult);
 	}
 }
 
 void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r)
 {
-    positions_r = sortMatrix(2,positions_r);
-    Eigen::MatrixXd positionsNotUsed_r = positions_r;
+	positions_r = sortMatrix(2,positions_r);
+	Eigen::MatrixXd positionsNotUsed_r = positions_r;
 
-//	int minIndex;
+	//	int minIndex;
 	int index;
 	int splitIndex;
 	Eigen::MatrixXd::Index startIndex;
 	BranchPtr branchToSplit;
-    while (positionsNotUsed_r.cols() > 0)
+	while (positionsNotUsed_r.cols() > 0)
 	{
 		if (!mBranches.empty())
 		{
@@ -218,7 +218,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r)
 			for (int i = 0; i < mBranches.size(); i++)
 			{
 				std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
-                distances = dsearchn(positionsNotUsed_r, mBranches[i]->getPositions());
+				distances = dsearchn(positionsNotUsed_r, mBranches[i]->getPositions());
 				double d = distances.second.minCoeff(&index);
 				if (d < minDistance)
 				{
@@ -229,15 +229,15 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r)
 						break;
 				}
 			}
-            std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
+			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
 			splitIndex = dsearchResult.first;
 		}
 		else //if this is the first branch. Select the top position (Trachea).
-            startIndex = positionsNotUsed_r.cols() - 1;
+			startIndex = positionsNotUsed_r.cols() - 1;
 
-        std::pair<Eigen::MatrixXd,Eigen::MatrixXd > connectedPointsResult = findConnectedPointsInCT(startIndex , positionsNotUsed_r);
+		std::pair<Eigen::MatrixXd,Eigen::MatrixXd > connectedPointsResult = findConnectedPointsInCT(startIndex , positionsNotUsed_r);
 		Eigen::MatrixXd branchPositions = connectedPointsResult.first;
-        positionsNotUsed_r = connectedPointsResult.second;
+		positionsNotUsed_r = connectedPointsResult.second;
 
 		if (branchPositions.cols() >= 5) //only include brances of length >= 5 points
 		{
@@ -268,9 +268,9 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r)
 					branchToSplit->addChildBranch(newBranch);
 				}
 				else if (splitIndex + 1 < 5)
-					 // If the new branch is close to the start of the existing
-					 // branch: Connect it to the same position start as the
-					 // existing branch
+					// If the new branch is close to the start of the existing
+					// branch: Connect it to the same position start as the
+					// existing branch
 				{
 					newBranch->setParentBranch(branchToSplit->getParentBranch());
 					if(branchToSplit->getParentBranch())
@@ -313,7 +313,7 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
 		std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distanceData;
 		distanceData = dsearchn(positions, trackingPositions);
 		Eigen::VectorXd distance = distanceData.second;
-        for (int j = positions.cols() - 1; j >= 0; j--)
+		for (int j = positions.cols() - 1; j >= 0; j--)
 		{
 			if (distance(j) > maxDistance)
 			{
@@ -325,6 +325,28 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
 		branches[i]->setOrientations(orientations);
 	}
 	return retval;
+}
+
+void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
+
+	std::vector<BranchPtr> branchVector = this->getBranches();
+	for (int i = 0; i < branchVector.size(); i++)
+	{
+		Eigen::MatrixXd positions = branchVector[i]->getPositions();
+		Eigen::MatrixXd orientations = branchVector[i]->getOrientations();
+
+		for (int i = positions.cols()-2; i > 0; i--){
+			double distance = (positions.col(i) - positions.col(i+1)).norm();
+			if ( distance < minPointDistance )
+			{
+				positions = eraseCol(i,positions);
+				orientations = eraseCol(i,orientations);
+			}
+		}
+		branchVector[i]->setPositions(positions);
+		branchVector[i]->setOrientations(orientations);
+	}
+
 }
 
 /**
@@ -418,13 +440,13 @@ vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected, bo
 Eigen::MatrixXd sortMatrix(int rowNumber, Eigen::MatrixXd matrix)
 {
 	for (int i = 0; i < matrix.cols() - 1; i++)  {
-	   for (int j = i + 1; j < matrix.cols(); j++) {
-		  if (matrix(rowNumber,i) > matrix(rowNumber,j)){
-			  matrix.col(i).swap(matrix.col(j));
-		  }
-	   }
+		for (int j = i + 1; j < matrix.cols(); j++) {
+			if (matrix(rowNumber,i) > matrix(rowNumber,j)){
+				matrix.col(i).swap(matrix.col(j));
+			}
+		}
 	}
-return matrix;
+	return matrix;
 }
 
 
@@ -432,7 +454,7 @@ return matrix;
 Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions)
 {
 	positions.block(0 , removeIndex , positions.rows() , positions.cols() - removeIndex - 1) = positions.rightCols(positions.cols() - removeIndex - 1);
-    positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
+	positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
 	return positions;
 }
 
@@ -463,36 +485,36 @@ std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > dsearchn(Eigen:
 
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed)
 {
-    //Eigen::MatrixXd branchPositions(positionsNotUsed.rows(), positionsNotUsed.cols());
+	//Eigen::MatrixXd branchPositions(positionsNotUsed.rows(), positionsNotUsed.cols());
 	Eigen::MatrixXd thisPosition(3,1);
-    std::vector<Eigen::MatrixXd> branchPositionsVector;
+	std::vector<Eigen::MatrixXd> branchPositionsVector;
 	thisPosition = positionsNotUsed.col(startIndex);
-    branchPositionsVector.push_back(thisPosition); //add first position to branch
+	branchPositionsVector.push_back(thisPosition); //add first position to branch
 	positionsNotUsed = eraseCol(startIndex,positionsNotUsed);; //remove first position from list of remaining points
 
-    while (positionsNotUsed.cols() > 0)
+	while (positionsNotUsed.cols() > 0)
 	{
 		std::pair<Eigen::MatrixXd::Index, double > minDistance = dsearch(thisPosition, positionsNotUsed);
 		Eigen::MatrixXd::Index index = minDistance.first;
-        double d = minDistance.second;
+		double d = minDistance.second;
 		if (d > 3) // more than 3 mm distance to closest point --> branch is compledted
 			break;
 
 		thisPosition = positionsNotUsed.col(index);
 		positionsNotUsed = eraseCol(index,positionsNotUsed);
 		//add position to branch
-        branchPositionsVector.push_back(thisPosition);
+		branchPositionsVector.push_back(thisPosition);
 
 	}
 
-    Eigen::MatrixXd branchPositions(3,branchPositionsVector.size());
+	Eigen::MatrixXd branchPositions(3,branchPositionsVector.size());
 
-    for (int j = 0; j < branchPositionsVector.size(); j++)
-    {
-        branchPositions.block(0,j,3,1) = branchPositionsVector[j];
-    }
+	for (int j = 0; j < branchPositionsVector.size(); j++)
+	{
+		branchPositions.block(0,j,3,1) = branchPositionsVector[j];
+	}
 
-    return std::make_pair(branchPositions, positionsNotUsed);
+	return std::make_pair(branchPositions, positionsNotUsed);
 }
 
 
