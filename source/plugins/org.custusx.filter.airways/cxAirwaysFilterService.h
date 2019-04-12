@@ -25,6 +25,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "cxBoolProperty.h"
 
+#include "FAST/Importers/ImageFileImporter.hpp"
+#include "FAST/Algorithms/LungSegmentation/LungSegmentation.hpp"
+
 class ctkPluginContext;
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -51,15 +54,23 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
     static QString getNameSuffixCenterline();
-	static QString getNameSuffixStraight();
+	static QString getNameSuffixAirways();
 	static QString getNameSuffixTubes();
-	void setDefaultStraightCLTubesOption(bool defaultStraightCLTubesOption);
+	static QString getNameSuffixLungs();
+	static QString getNameSuffixVessels();
 
     bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
 
 protected:
+	bool segmentAirways(fast::ImageFileImporter::pointer importerPtr);
+	void segmentLungsAndVessels(fast::ImageFileImporter::pointer importerPtr);
+	bool extractBloodVessels(fast::LungSegmentation::pointer lungSegmentationPtr);
+	bool extractLungs(fast::LungSegmentation::pointer lungSegmentationPtr);
+	bool postProcessAirways();
+	bool postProcessLungs();
+	bool postProcessVessels();
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
@@ -68,13 +79,16 @@ private:
     static Vector3D getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr image);
     static bool isSeedPointInsideImage(Vector3D, DataPtr);
 	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
+	BoolPropertyPtr getAirwaySegmentationOption(QDomElement root);
+	BoolPropertyPtr getAirwayTubesGenerationOption(QDomElement root);
     BoolPropertyPtr getLungSegmentationOption(QDomElement root);
     BoolPropertyPtr getVesselSegmentationOption(QDomElement root);
     void createAirwaysFromCenterline();
 	vtkImageDataPtr mAirwaySegmentationOutput;
+	vtkPolyDataPtr mAirwayCenterlineOutput;
     vtkImageDataPtr mLungSegmentationOutput;
-    vtkImageDataPtr mVesselSegmentationOutput;
-	vtkPolyDataPtr mCenterlineOutput;
+    vtkImageDataPtr mBloodVesselSegmentationOutput;
+	vtkPolyDataPtr mBloodVesselCenterlineOutput;
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
     Vector3D seedPoint;
