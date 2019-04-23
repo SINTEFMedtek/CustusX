@@ -47,6 +47,7 @@ cx_add_class_qt_moc(CX_RESOURCE_WIDGETS_FILES
 	cxActiveToolWidget
 	cxPopupToolbarWidget
 	cxStringListSelectWidget
+	cxWebServerWidgetBase
 	${QXT_FOLDER}/qxtspanslider_p.h
     ${QXT_FOLDER}/qxtspanslider
 )
