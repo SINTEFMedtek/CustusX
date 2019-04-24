@@ -122,7 +122,7 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	Transform3D M = reader->getImageTransformPatient();
 	image->get_rMd_History()->setRegistration(M);
 
-	reportDebug(QString("Image created from %1").arg(filename));
+//	reportDebug(QString("Image created from %1").arg(filename));
 	return image;
 }
 
