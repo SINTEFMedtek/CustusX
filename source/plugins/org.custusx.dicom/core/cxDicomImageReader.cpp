@@ -234,16 +234,16 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 
 Eigen::Array3d DicomImageReader::getSpacing() const
 {
-    Eigen::Array3d spacing;
+	Eigen::Array3d spacing;
 	spacing[0] = this->getDouble(DCM_PixelSpacing, 0, OFTrue);
 	spacing[1] = this->getDouble(DCM_PixelSpacing, 1, OFTrue);
-    spacing[2] = 0;
+	spacing[2] = 0;
 
 	if(this->isMultiFrameImage())
 	{
 		double sliceSpacing = this->getSliceSpacing();
 		if(similar(sliceSpacing, 0))
-            CX_LOG_WARNING() << "Cannot get slice spacing. Spacing set to 0. ";
+			CX_LOG_WARNING() << "Cannot get slice spacing. Spacing set to 0. ";
 		else
 			spacing[2] = sliceSpacing;
 	}
@@ -254,7 +254,7 @@ Eigen::Array3d DicomImageReader::getSpacing() const
 bool DicomImageReader::isMultiFrameImage() const
 {
 	//For now, just use number of z positions as indicator
-    QVector<double> zPos = this->getPositions(2);
+	QVector<double> zPos = this->getPositions(2);
 	if(zPos.size() < 2)
 		return false;
 	return true;
@@ -262,23 +262,23 @@ bool DicomImageReader::isMultiFrameImage() const
 
 double DicomImageReader::getSliceSpacing() const
 {
-    double retval;
+	double retval;
 
-    QVector<double> xPos = this->getPositions(0);
-    QVector<double> yPos = this->getPositions(1);
-    QVector<double> zPos = this->getPositions(2);
+	QVector<double> xPos = this->getPositions(0);
+	QVector<double> yPos = this->getPositions(1);
+	QVector<double> zPos = this->getPositions(2);
 
 	if(zPos.size() < 2)
 		return 0;
-    retval = std::sqrt( pow(xPos[1] - xPos[0],2) + pow(yPos[1] - yPos[0],2)  + pow(zPos[1] - zPos[0],2) );
+	retval = std::sqrt( pow(xPos[1] - xPos[0],2) + pow(yPos[1] - yPos[0],2)  + pow(zPos[1] - zPos[0],2) );
 
-    double tol = retval/10000;
+	double tol = retval/10000;
 
 	for(int i = 2; i < zPos.size(); ++i)
 	{
-        double dist = std::sqrt( pow(xPos[i] - xPos[i-1],2) + pow(yPos[i] - yPos[i-1],2)  + pow(zPos[i] - zPos[i-1],2) );
-        if(!similar(dist, retval,tol))
-            CX_LOG_WARNING() << "Distance between frame: " << i << " and " << i+1 << " is: " << dist << " != " << "Dist between frame 0 and 1: " << retval;
+		double dist = std::sqrt( pow(xPos[i] - xPos[i-1],2) + pow(yPos[i] - yPos[i-1],2)  + pow(zPos[i] - zPos[i-1],2) );
+		if(!similar(dist, retval,tol))
+			CX_LOG_WARNING() << "Distance between frame: " << i << " and " << i+1 << " is: " << dist << " != " << "Dist between frame 0 and 1: " << retval;
 	}
 	return retval;
 }
@@ -301,14 +301,14 @@ QVector<double> DicomImageReader::getPositions(int cIndex) const
 		{
 			stackElement = dynamic_cast<DcmElement*>(cleanStack.top());
 			double val;
-            condition = stackElement->getFloat64(val, cIndex);
+			condition = stackElement->getFloat64(val, cIndex);
 			if(condition.bad())
 			{
-                CX_LOG_WARNING() << "Cannot get pos for frame " << i;
+				CX_LOG_WARNING() << "Cannot get pos for frame " << i;
 				return retval;
 			}
 			retval << val;
-//			CX_LOG_DEBUG() << "frame " << i << " pos: " << val;
+			//			CX_LOG_DEBUG() << "frame " << i << " pos: " << val;
 		}
 	}
 	while(condition.good());
