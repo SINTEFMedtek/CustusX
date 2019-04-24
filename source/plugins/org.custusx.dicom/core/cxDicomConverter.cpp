@@ -202,16 +202,16 @@ double DicomConverter::getMeanSliceDistance(std::map<double, ImagePtr> sorted) c
 
 	// check for multislice image
 	vtkImageDataPtr first = sorted.begin()->second->getBaseVtkImageData();
-	if (first->GetDimensions()[2]>1)
-		return first->GetSpacing()[2];
+    if (first->GetDimensions()[2]>1)
+        return first->GetSpacing()[2];
 
 	if (sorted.size()<2)
 		return 0;
 
-	// use average of all slices
+    // use average of all slices
 	double zValueLastImage = sorted.rbegin()->first;
-	double zValueFirstImage = sorted.begin()->first;
-	unsigned long numHolesBetweenImages = sorted.size() - 1;
+    double zValueFirstImage = sorted.begin()->first;
+    unsigned long numHolesBetweenImages = sorted.size() - 1;
 	return (zValueLastImage-zValueFirstImage)/numHolesBetweenImages;
 }
 
@@ -244,8 +244,8 @@ ImagePtr DicomConverter::mergeSlices(std::map<double, ImagePtr> sorted) const
 	appender->Update();
 
 	vtkImageDataPtr wholeImage = appender->GetOutput();
-	Eigen::Array3d spacing(wholeImage->GetSpacing());
-	spacing[2] = this->getMeanSliceDistance(sorted);
+    Eigen::Array3d spacing(wholeImage->GetSpacing());
+    spacing[2] = this->getMeanSliceDistance(sorted);
 	wholeImage->SetSpacing(spacing.data());
 
 	retval->setVtkImageData(wholeImage);
