@@ -260,35 +260,36 @@ bool DicomImageReader::isMultiFrameImage() const
 	return true;
 }
 
-double DicomImageReader::calculateMultiFrameSpacing(int frameIndex, QVector<double> xPos, QVector<double> yPos, QVector<double> zPos) const
+double DicomImageReader::calculateMultiFrameSpacing(int frameIndex) const
 {
-	if (frameIndex < 1 || frameIndex > (xPos.length()-1))
+	static QVector<double> xPos = this->getPositions(0);
+	static QVector<double> yPos = this->getPositions(1);
+	static QVector<double> zPos = this->getPositions(2);
+
+	if (frameIndex < 1 || frameIndex > (zPos.length()-1))
 		return 0;
 
-	double dist = std::sqrt( pow(xPos[frameIndex] - xPos[frameIndex-1],2) + pow(yPos[frameIndex] - yPos[frameIndex-1],2)  + pow(zPos[frameIndex] - zPos[frameIndex-1],2) );
+	double dist = std::sqrt( pow(xPos[frameIndex] - xPos[frameIndex-1],2)
+			+ pow(yPos[frameIndex] - yPos[frameIndex-1],2)  + pow(zPos[frameIndex] - zPos[frameIndex-1],2) );
 	return dist;
 }
 
 double DicomImageReader::getSliceSpacing() const
 {
-	double retval;
-
-	QVector<double> xPos = this->getPositions(0);
-	QVector<double> yPos = this->getPositions(1);
 	QVector<double> zPos = this->getPositions(2);
-
 	if(zPos.size() < 2)
 		return 0;
 
-	retval = calculateMultiFrameSpacing(1, xPos, yPos, zPos);
+	double retval = calculateMultiFrameSpacing(1);
 
 	double tolerance = retval/10000;
 
 	for(int i = 2; i < zPos.size(); ++i)
 	{
-		double dist = calculateMultiFrameSpacing(i, xPos, yPos, zPos);
+		double dist = calculateMultiFrameSpacing(i);
 		if(!similar(dist, retval,tolerance))
-			CX_LOG_WARNING() << "Distance between frame: " << i << " and " << i+1 << " is: " << dist << " != " << "Dist between frame 0 and 1: " << retval;
+			CX_LOG_WARNING() << "Distance between frame: " << i - 1 << " and " << i << " is: "
+							<< dist << " != " << "Dist between frame 0 and 1: " << retval;
 	}
 	return retval;
 }

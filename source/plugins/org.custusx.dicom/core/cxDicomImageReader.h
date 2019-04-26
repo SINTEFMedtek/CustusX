@@ -78,7 +78,7 @@ private:
 	double getSliceSpacing() const;
 	QVector<double> getPositions(int cIndex) const;
 	bool isMultiFrameImage() const;
-	double calculateMultiFrameSpacing(int frameIndex, QVector<double> xPos, QVector<double> yPos, QVector<double> zPos) const;
+	double calculateMultiFrameSpacing(int frameIndex) const;
 };
 
 
