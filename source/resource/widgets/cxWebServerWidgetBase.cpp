@@ -20,7 +20,7 @@ namespace cx
 
 WebServerWidgetBase::WebServerWidgetBase(cx::VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
-	mVisServices(services),
+	mServices(services),
 	mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"), "Start")),
 	mVerticalLayout(new QVBoxLayout(this))
 {

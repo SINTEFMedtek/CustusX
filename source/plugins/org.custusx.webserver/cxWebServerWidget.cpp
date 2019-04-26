@@ -42,7 +42,7 @@ void WebServerWidget::initServer()
 	mPort = 8085;
 	CX_LOG_INFO() << QString("Starting REST server on port %1...").arg(mPort);
 	mServer = new QHttpServer(this);
-	mAPI.reset(new RemoteAPI(mVisServices));
+	mAPI.reset(new RemoteAPI(mServices));
 	mRequestHandler.reset(new HttpRequestHandler(mAPI));
 	connect(mServer, SIGNAL(newRequest(QHttpRequest*, QHttpResponse*)),
 					mRequestHandler.get(), SLOT(handle_request(QHttpRequest*, QHttpResponse*)));

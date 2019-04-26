@@ -39,7 +39,7 @@ protected slots:
 	virtual void startStopSlot(bool checked);
 
 protected:
-	VisServicesPtr mVisServices;
+	VisServicesPtr mServices;
 	QPushButton* mStartStopButton;
 	QVBoxLayout*  mVerticalLayout;
 
