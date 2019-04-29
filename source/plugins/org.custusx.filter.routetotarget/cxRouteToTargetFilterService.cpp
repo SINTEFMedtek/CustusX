@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxRouteToTargetFilterService.h"
 
 #include <ctkPluginContext.h>
+#include <QDir>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -149,33 +150,37 @@ bool RouteToTargetFilter::postProcess()
 {
 
 	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
-    if (!inputMesh)
-        return false;
+	if (!inputMesh)
+		return false;
 
-	QString uidCenterline = inputMesh->getUid() + RouteToTargetFilter::getNameSuffix() + "%1";
-	QString nameCenterline = inputMesh->getName()+RouteToTargetFilter::getNameSuffix() + "%1";
+	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+	if (!targetPoint)
+		return false;
+
+	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix() + "%1";
+	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix() + "%1";
 	if (!mTargetName.isEmpty())
 	{
-		uidCenterline.append("_" + mTargetName);
-		nameCenterline.append("_" + mTargetName);
+		uidOutputCenterline.append("_" + mTargetName);
+		nameOutputCenterline.append("_" + mTargetName);
 	}
 
-    MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
-    outputCenterline->setVtkPolyData(mOutput);
-    patientService()->insertData(outputCenterline);
+	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
+	outputCenterline->setVtkPolyData(mOutput);
+	patientService()->insertData(outputCenterline);
 
-    QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
-    QString nameCenterlineExt = outputCenterline->getName()+RouteToTargetFilter::getNameSuffixExtension();
-    MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
-    outputCenterlineExt->setVtkPolyData(mExtendedRoute);
-    outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
-    patientService()->insertData(outputCenterlineExt);
+	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
+	QString nameCenterlineExt = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixExtension();
+	MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
+	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
+	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
+	patientService()->insertData(outputCenterlineExt);
 
-    //note: mOutput and outputCenterline is in reference(r) space
+	//note: mOutput and outputCenterline is in reference(r) space
 
 
-    //Meshes are expected to be in data(d) space
-    outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
+	//Meshes are expected to be in data(d) space
+	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
     outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
 	mServices->view()->autoShowData(outputCenterline);
@@ -185,6 +190,14 @@ bool RouteToTargetFilter::postProcess()
 	if(mOutputTypes.size() > 1)
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
 
+	//Create Ceetron route-to-target file
+	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/Ceetron/";
+	QDir CeetronDirectory(CeetronPath);
+	if (!CeetronDirectory.exists()) // Creating Ceetron folder if it does not exist
+		CeetronDirectory.mkpath(CeetronPath);
+	QString filePathCeetron = CeetronPath + outputCenterline->getUid() + ".txt";
+	//QString filePathCeetron = CeetronPath + nameCenterline + ".txt";
+	mRouteToTarget->makeCeetronCenterline(filePathCeetron);
 
 	return true;
 }
