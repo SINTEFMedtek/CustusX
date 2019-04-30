@@ -157,8 +157,8 @@ bool RouteToTargetFilter::postProcess()
 	if (!targetPoint)
 		return false;
 
-	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix() + "%1";
-	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix() + "%1";
+	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
+	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
 	if (!mTargetName.isEmpty())
 	{
 		uidOutputCenterline.append("_" + mTargetName);
@@ -191,13 +191,13 @@ bool RouteToTargetFilter::postProcess()
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
 
 	//Create Ceetron route-to-target file
-	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/Ceetron/";
+	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/MarianaRTT/";
 	QDir CeetronDirectory(CeetronPath);
-	if (!CeetronDirectory.exists()) // Creating Ceetron folder if it does not exist
+	if (!CeetronDirectory.exists()) // Creating MarianaRTT folder if it does not exist
 		CeetronDirectory.mkpath(CeetronPath);
 	QString filePathCeetron = CeetronPath + outputCenterline->getUid() + ".txt";
 	//QString filePathCeetron = CeetronPath + nameCenterline + ".txt";
-	mRouteToTarget->makeCeetronCenterline(filePathCeetron);
+	mRouteToTarget->makeMarianaCenterlineFile(filePathCeetron);
 
 	return true;
 }

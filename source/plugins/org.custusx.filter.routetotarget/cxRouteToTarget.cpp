@@ -10,6 +10,8 @@
 #include "cxTime.h"
 #include "cxVisServices.h"
 #include <QTextStream>
+#include <QJsonObject>
+#include <QJsonArray>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -335,40 +337,97 @@ double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
     return routeLenght;
 }
 
-void RouteToTarget::makeCeetronCenterline(QString filename)
+
+void RouteToTarget::makeMarianaCenterlineFile(QString filename)
 {
-		if (mExtendedRoutePositions.empty())
-		{
-				std::cout << "mRoutePositions is empty." << std::endl;
-				return;
-		}
+	if (mExtendedRoutePositions.empty())
+	{
+			std::cout << "mExtendedRoutePositions is empty." << std::endl;
+			return;
+	}
 
-		int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
+	int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
 
-		ofstream out(filename.toStdString().c_str());
-		out << "# [xPos yPos zPos BranchingPoint (0=Normal, 1=Branching position, 2=Extended from airway to target)] ";
-		out << "Number of positions: ";
-		out << mExtendedRoutePositions.size(); // write number of positions
-		out << "\n";
+	ofstream out(filename.toStdString().c_str());
+	out << "# [xPos yPos zPos BranchingPoint (0=Normal, 1=Branching position, 2=Extended from airway to target)] ";
+	out << "Number of positions: ";
+	out << mExtendedRoutePositions.size(); // write number of positions
+	out << "\n";
 
-		 for (int i = 1; i < mExtendedRoutePositions.size(); i++)
-		 {
-				out <<  mExtendedRoutePositions[i](0) << " "; // write x coordinate
-				out <<  mExtendedRoutePositions[i](1) << " "; // write y coordinate
-				out <<  mExtendedRoutePositions[i](2) << " "; // write z coordinate
+	 for (int i = 1; i < mExtendedRoutePositions.size(); i++)
+	 {
+			out <<  mExtendedRoutePositions[i](0) << " "; // write x coordinate
+			out <<  mExtendedRoutePositions[i](1) << " "; // write y coordinate
+			out <<  mExtendedRoutePositions[i](2) << " "; // write z coordinate
 
-				if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
-						out <<  "1 ";
-				else if (i <= numberOfExtendedPositions)
-					out <<  "2 ";
-				else
-						out <<  "0 ";
+			if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
+					out <<  "1 ";
+			else if (i <= numberOfExtendedPositions)
+				out <<  "2 ";
+			else
+					out <<  "0 ";
 
-				out << "\n";
-		 }
+			out << "\n";
+	 }
 
-		 out.close();
+	 out.close();
 }
+
+QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
+{
+	QJsonArray textArray;
+	if (mRoutePositions.empty())
+	{
+			std::cout << "mRoutePositions is empty." << std::endl;
+			return textArray;
+	}
+
+	for (int i = 1; i < mRoutePositions.size(); i++)
+	{
+		QJsonObject textObject;
+		std::string out;
+			out =  std::to_string( mRoutePositions[i](0) ) + std::string(" "); // write x coordinate
+			out +=  std::to_string( mRoutePositions[i](1) ) + std::string(" "); // write y coordinate
+			out +=  std::to_string( mRoutePositions[i](2) ) + std::string(" "); // write z coordinate
+
+			if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i) != mBranchingIndex.end() )
+					out +=  "1 ";
+			else
+					out +=  "0 ";
+			textObject["content"] = QString::fromStdString(out);
+			textArray.append(textObject);
+	 }
+
+	 return textArray;
+}
+
+
+QJsonArray RouteToTarget::makeMarianaCenterlineJSON_Ext()
+{
+	QJsonArray textArray;
+	if (mExtendedRoutePositions.empty())
+	{
+			std::cout << "mExtendedRoutePositions is empty." << std::endl;
+			return textArray;
+	}
+
+	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
+	{
+		QJsonObject textObject;
+		std::string out;
+		out =  std::to_string( mExtendedRoutePositions[i](0) ) + std::string(" "); // write x coordinate
+		out +=  std::to_string( mExtendedRoutePositions[i](1) ) + std::string(" "); // write y coordinate
+		out +=  std::to_string( mExtendedRoutePositions[i](2) ) + std::string(" "); // write z coordinate
+
+		textObject["content"] = QString::fromStdString(out);
+		textArray.append(textObject);
+	 }
+
+	 return textArray;
+}
+
+
+
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)
 {

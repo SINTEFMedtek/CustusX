@@ -31,7 +31,10 @@ public:
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
 	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
-	void makeCeetronCenterline(QString filename);
+	void makeMarianaCenterlineFile(QString filename);
+	QJsonArray makeMarianaCenterlineJSON();
+	QJsonArray makeMarianaCenterlineJSON_Ext();
+
 
 private:
 	Eigen::MatrixXd mCLpoints;
