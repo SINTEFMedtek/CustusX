@@ -12,6 +12,7 @@
 #include <QTextStream>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QList>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -382,21 +383,26 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 			return textArray;
 	}
 
+	QStringList list;
 	for (int i = 1; i < mRoutePositions.size(); i++)
 	{
-		QJsonObject textObject;
-		std::string out;
-			out =  std::to_string( mRoutePositions[i](0) ) + std::string(" "); // write x coordinate
-			out +=  std::to_string( mRoutePositions[i](1) ) + std::string(" "); // write y coordinate
-			out +=  std::to_string( mRoutePositions[i](2) ) + std::string(" "); // write z coordinate
+		QString position;
+		position.append(QString::number( mRoutePositions[i](0) ));
+		position.append(" "); // write x coordinate
+		position.append(QString::number( mRoutePositions[i](1) ));
+		position.append(" "); // write y coordinate
+		position.append(QString::number( mRoutePositions[i](2) ));
+		position.append(" "); // write z coordinate
 
-			if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i) != mBranchingIndex.end() )
-					out +=  "1 ";
-			else
-					out +=  "0 ";
-			textObject["content"] = QString::fromStdString(out);
-			textArray.append(textObject);
+		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i) != mBranchingIndex.end() )
+				position.append("1 ");
+		else
+				position.append("0 ");
+
+		list.push_back(position);
 	 }
+
+	textArray = QJsonArray::fromStringList(list);
 
 	 return textArray;
 }
@@ -407,21 +413,25 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON_Ext()
 	QJsonArray textArray;
 	if (mExtendedRoutePositions.empty())
 	{
-			std::cout << "mExtendedRoutePositions is empty." << std::endl;
+			std::cout << "mRoutePositions is empty." << std::endl;
 			return textArray;
 	}
 
+	QStringList list;
 	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
 	{
-		QJsonObject textObject;
-		std::string out;
-		out =  std::to_string( mExtendedRoutePositions[i](0) ) + std::string(" "); // write x coordinate
-		out +=  std::to_string( mExtendedRoutePositions[i](1) ) + std::string(" "); // write y coordinate
-		out +=  std::to_string( mExtendedRoutePositions[i](2) ) + std::string(" "); // write z coordinate
+		QString position;
+		position.append(QString::number( mExtendedRoutePositions[i](0) ));
+		position.append(" "); // write x coordinate
+		position.append(QString::number( mExtendedRoutePositions[i](1) ));
+		position.append(" "); // write y coordinate
+		position.append(QString::number( mExtendedRoutePositions[i](2) ));
+		position.append(" "); // write z coordinate
 
-		textObject["content"] = QString::fromStdString(out);
-		textArray.append(textObject);
+		list.push_back(position);
 	 }
+
+	textArray = QJsonArray::fromStringList(list);
 
 	 return textArray;
 }
