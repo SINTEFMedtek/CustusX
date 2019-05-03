@@ -23,6 +23,7 @@ if(BUILD_TESTING)
         org_custusx_ceetron
         cxResource
         cxtestUtilities
+        cxResourceVisualization
         cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_ceetron)
 
