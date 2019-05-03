@@ -52,6 +52,7 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.org_custusx_angleCorrection())
         self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
+        self.addComponent(cxComponents.org_custusx_mariana())
         
     def addComponent(self, component):
         self.libraries.append(component)
