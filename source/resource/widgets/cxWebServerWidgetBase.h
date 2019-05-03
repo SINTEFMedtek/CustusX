@@ -12,6 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXWEBSERVERWIDGETBASE_H
 #define CXWEBSERVERWIDGETBASE_H
 
+#include "cxResourceWidgetsExport.h"
+
 #include <QWidget>
 #include "cxVisServices.h"
 
@@ -28,7 +30,7 @@ namespace cx
  * \date 2019-04-03
  * \author Ole Vegard Solberg
  */
-class WebServerWidgetBase : public QWidget
+class cxResourceWidgets_EXPORT WebServerWidgetBase : public QWidget
 {
 	Q_OBJECT
 public:
