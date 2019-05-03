@@ -10,6 +10,9 @@
 #include "cxTime.h"
 #include "cxVisServices.h"
 #include <QTextStream>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QList>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -111,15 +114,17 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	if (!searchBranchPtr)
 		return;
 
-    std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
-    //std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
+	std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+	//std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
-        mRoutePositions.push_back(positions[i]);
+		mRoutePositions.push_back(positions[i]);
 
-    BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
-    if (parentBranchPtr)
-        searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
+	mBranchingIndex.push_back(mRoutePositions.size()-1);
+
+	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
+	if (parentBranchPtr)
+		searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
 }
 
 
@@ -332,6 +337,107 @@ double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
 
     return routeLenght;
 }
+
+
+void RouteToTarget::makeMarianaCenterlineFile(QString filename)
+{
+	if (mExtendedRoutePositions.empty())
+	{
+			std::cout << "mExtendedRoutePositions is empty." << std::endl;
+			return;
+	}
+
+	int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
+
+	ofstream out(filename.toStdString().c_str());
+	out << "# [xPos yPos zPos BranchingPoint (0=Normal, 1=Branching position, 2=Extended from airway to target)] ";
+	out << "Number of positions: ";
+	out << mExtendedRoutePositions.size(); // write number of positions
+	out << "\n";
+
+	 for (int i = 1; i < mExtendedRoutePositions.size(); i++)
+	 {
+			out <<  mExtendedRoutePositions[i](0) << " "; // write x coordinate
+			out <<  mExtendedRoutePositions[i](1) << " "; // write y coordinate
+			out <<  mExtendedRoutePositions[i](2) << " "; // write z coordinate
+
+			if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
+					out <<  "1 ";
+			else if (i <= numberOfExtendedPositions)
+				out <<  "2 ";
+			else
+					out <<  "0 ";
+
+			out << "\n";
+	 }
+
+	 out.close();
+}
+
+QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
+{
+	QJsonArray textArray;
+	if (mRoutePositions.empty())
+	{
+			std::cout << "mRoutePositions is empty." << std::endl;
+			return textArray;
+	}
+
+	QStringList list;
+	for (int i = 1; i < mRoutePositions.size(); i++)
+	{
+		QString position;
+		position.append(QString::number( mRoutePositions[i](0) ));
+		position.append(" "); // write x coordinate
+		position.append(QString::number( mRoutePositions[i](1) ));
+		position.append(" "); // write y coordinate
+		position.append(QString::number( mRoutePositions[i](2) ));
+		position.append(" "); // write z coordinate
+
+		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i) != mBranchingIndex.end() )
+				position.append("1 ");
+		else
+				position.append("0 ");
+
+		list.push_back(position);
+	 }
+
+	textArray = QJsonArray::fromStringList(list);
+
+	 return textArray;
+}
+
+
+QJsonArray RouteToTarget::makeMarianaCenterlineJSON_Ext()
+{
+	QJsonArray textArray;
+	if (mExtendedRoutePositions.empty())
+	{
+			std::cout << "mRoutePositions is empty." << std::endl;
+			return textArray;
+	}
+
+	QStringList list;
+	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
+	{
+		QString position;
+		position.append(QString::number( mExtendedRoutePositions[i](0) ));
+		position.append(" "); // write x coordinate
+		position.append(QString::number( mExtendedRoutePositions[i](1) ));
+		position.append(" "); // write y coordinate
+		position.append(QString::number( mExtendedRoutePositions[i](2) ));
+		position.append(" "); // write z coordinate
+
+		list.push_back(position);
+	 }
+
+	textArray = QJsonArray::fromStringList(list);
+
+	 return textArray;
+}
+
+
+
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)
 {

@@ -19,30 +19,35 @@ class RouteToTarget
 public:
 	RouteToTarget();
 	virtual ~RouteToTarget();
-    //void setCenterline(vtkPolyDataPtr centerline);
-    Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
-    void processCenterline(vtkPolyDataPtr centerline_r);
-    void findClosestPointInBranches(Vector3D targetCoordinate_r);
+	//void setCenterline(vtkPolyDataPtr centerline);
+	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
+	void processCenterline(vtkPolyDataPtr centerline_r);
+	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findRoutePositions();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
-    vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
-    vtkPolyDataPtr findExtendedRoute(Vector3D targetCoordinate_r);
-    vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
-    std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
-    void addRouteInformationToFile(VisServicesPtr services);
-    double calculateRouteLength(std::vector< Eigen::Vector3d > route);
+	vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
+	vtkPolyDataPtr findExtendedRoute(Vector3D targetCoordinate_r);
+	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
+	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
+	void addRouteInformationToFile(VisServicesPtr services);
+	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
+	void makeMarianaCenterlineFile(QString filename);
+	QJsonArray makeMarianaCenterlineJSON();
+	QJsonArray makeMarianaCenterlineJSON_Ext();
+
 
 private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;
-    Vector3D mTargetPosition;
+	Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
-    std::vector< Eigen::Vector3d > mExtendedRoutePositions;
+	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
+	std::vector< int > mBranchingIndex;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
-    std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
+	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 };
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
