@@ -376,67 +376,34 @@ void RouteToTarget::makeMarianaCenterlineFile(QString filename)
 
 QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 {
-	QJsonArray textArray;
-	if (mRoutePositions.empty())
+	QJsonArray array;
+	if ( mRoutePositions.empty() || mExtendedRoutePositions.empty() )
 	{
 			std::cout << "mRoutePositions is empty." << std::endl;
-			return textArray;
+			return array;
 	}
 
-	QStringList list;
-	for (int i = 1; i < mRoutePositions.size(); i++)
-	{
-		QString position;
-		position.append(QString::number( mRoutePositions[i](0) ));
-		position.append(" "); // write x coordinate
-		position.append(QString::number( mRoutePositions[i](1) ));
-		position.append(" "); // write y coordinate
-		position.append(QString::number( mRoutePositions[i](2) ));
-		position.append(" "); // write z coordinate
+	int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
 
-		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i) != mBranchingIndex.end() )
-				position.append("1 ");
-		else
-				position.append("0 ");
-
-		list.push_back(position);
-	 }
-
-	textArray = QJsonArray::fromStringList(list);
-
-	 return textArray;
-}
-
-
-QJsonArray RouteToTarget::makeMarianaCenterlineJSON_Ext()
-{
-	QJsonArray textArray;
-	if (mExtendedRoutePositions.empty())
-	{
-			std::cout << "mRoutePositions is empty." << std::endl;
-			return textArray;
-	}
-
-	QStringList list;
 	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
 	{
-		QString position;
-		position.append(QString::number( mExtendedRoutePositions[i](0) ));
-		position.append(" "); // write x coordinate
-		position.append(QString::number( mExtendedRoutePositions[i](1) ));
-		position.append(" "); // write y coordinate
-		position.append(QString::number( mExtendedRoutePositions[i](2) ));
-		position.append(" "); // write z coordinate
+		QJsonObject position;
+		position.insert("x", QString::number( mRoutePositions[i](0) ));
+		position.insert("y", QString::number( mRoutePositions[i](1) ));
+		position.insert("z", QString::number( mRoutePositions[i](2) ));
 
-		list.push_back(position);
+		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
+				position.insert("Flag", 1);
+		else if (i <= numberOfExtendedPositions)
+				position.insert("Flag", 2);
+		else
+				position.insert("Flag", 0);
+
+		array.append(position);
 	 }
 
-	textArray = QJsonArray::fromStringList(list);
-
-	 return textArray;
+	 return array;
 }
-
-
 
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)

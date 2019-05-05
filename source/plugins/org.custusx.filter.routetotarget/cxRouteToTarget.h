@@ -33,7 +33,6 @@ public:
 	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
-	QJsonArray makeMarianaCenterlineJSON_Ext();
 
 
 private:
