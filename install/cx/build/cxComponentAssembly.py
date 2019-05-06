@@ -50,9 +50,9 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.QHttpServer())
         self.addComponent(cxComponents.FAST())
         self.addComponent(cxComponents.org_custusx_angleCorrection())
+        self.addComponent(cxComponents.org_custusx_mariana())
         self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
-        self.addComponent(cxComponents.org_custusx_mariana())
         
     def addComponent(self, component):
         self.libraries.append(component)
