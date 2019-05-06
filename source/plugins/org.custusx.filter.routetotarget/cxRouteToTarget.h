@@ -1,6 +1,8 @@
 #ifndef CXROUTETOTARGET_H
 #define CXROUTETOTARGET_H
 
+#include "org_custusx_filter_routetotarget_Export.h"
+
 #include "cxMesh.h"
 #include <QDomElement>
 
@@ -14,7 +16,7 @@ typedef boost::shared_ptr<class BranchList> BranchListPtr;
 typedef boost::shared_ptr<class Branch> BranchPtr;
 
 
-class RouteToTarget
+class org_custusx_filter_routetotarget_EXPORT RouteToTarget
 {
 public:
 	RouteToTarget();
