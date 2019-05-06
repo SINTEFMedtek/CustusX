@@ -4,6 +4,7 @@
 #include <vtkPolyData.h>
 #include "cxBranchList.h"
 #include "cxBranch.h"
+#include "cxPointMetric.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
 #include <QDir>
@@ -53,10 +54,12 @@ Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_
 	return CLpoints;
 }
 
-void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
+void RouteToTarget::processCenterline(MeshPtr mesh)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
+
+	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
     Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
 
@@ -128,10 +131,11 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint)
 {
-	mTargetPosition = targetCoordinate_r;
-	findClosestPointInBranches(targetCoordinate_r);
+	mTargetPosition = targetPoint->getCoordinate();
+
+	findClosestPointInBranches(mTargetPosition);
 	findRoutePositions();
 
 	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
@@ -139,16 +143,16 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 	return retval;
 }
 
-vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
+vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 {
-    mTargetPosition = targetCoordinate_r;
+		mTargetPosition = targetPoint->getCoordinate();
     double extentionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
 	if(mRoutePositions.size() > 0)
 	{
-		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
-        Eigen::Vector3d extentionVectorNormalized = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+		double extentionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
+				Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extentionDistance;
         int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
         Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 

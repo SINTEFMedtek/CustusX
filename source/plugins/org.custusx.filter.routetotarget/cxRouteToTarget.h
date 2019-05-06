@@ -23,12 +23,12 @@ public:
 	virtual ~RouteToTarget();
 	//void setCenterline(vtkPolyDataPtr centerline);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
-	void processCenterline(vtkPolyDataPtr centerline_r);
+	void processCenterline(MeshPtr mesh);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findRoutePositions();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
-	vtkPolyDataPtr findRouteToTarget(Vector3D targetCoordinate_r);
-	vtkPolyDataPtr findExtendedRoute(Vector3D targetCoordinate_r);
+	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint);
+	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);

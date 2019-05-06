@@ -116,32 +116,28 @@ void RouteToTargetFilter::createOutputTypes()
 
 bool RouteToTargetFilter::execute()
 {
-    mRouteToTarget.reset(new RouteToTarget());
+	mRouteToTarget.reset(new RouteToTarget());
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
-    if (!mesh)
-        return false;
-
-	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
+	if (!mesh)
+		return false;
 
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
-    if (!targetPoint)
-        return false;
+	if (!targetPoint)
+		return false;
 
-    Vector3D targetCoordinate_r = targetPoint->getCoordinate();
-
-    mRouteToTarget->processCenterline(centerline_r);
+	mRouteToTarget->processCenterline(mesh);
 
     //note: mOutput is in reference space
-    mOutput = mRouteToTarget->findRouteToTarget(targetCoordinate_r);
+	mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
 
 	if(mOutput->GetNumberOfPoints() < 1)
 		return false;
 
-    mExtendedRoute = mRouteToTarget->findExtendedRoute(targetCoordinate_r);
+	mExtendedRoute = mRouteToTarget->findExtendedRoute(targetPoint);
 
-    if (mGenerateFileWithRouteInformation)
-        mRouteToTarget->addRouteInformationToFile(mServices);
+	if (mGenerateFileWithRouteInformation)
+		mRouteToTarget->addRouteInformationToFile(mServices);
 
 	return true;
 }
@@ -190,14 +186,13 @@ bool RouteToTargetFilter::postProcess()
 	if(mOutputTypes.size() > 1)
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
 
-	//Create Ceetron route-to-target file
-	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/MarianaRTT/";
-	QDir CeetronDirectory(CeetronPath);
-	if (!CeetronDirectory.exists()) // Creating MarianaRTT folder if it does not exist
-		CeetronDirectory.mkpath(CeetronPath);
-	QString filePathCeetron = CeetronPath + outputCenterline->getUid() + ".txt";
-	//QString filePathCeetron = CeetronPath + nameCenterline + ".txt";
-	mRouteToTarget->makeMarianaCenterlineFile(filePathCeetron);
+//	//Create Ceetron route-to-target file
+//	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/MarianaRTT/";
+//	QDir CeetronDirectory(CeetronPath);
+//	if (!CeetronDirectory.exists()) // Creating MarianaRTT folder if it does not exist
+//		CeetronDirectory.mkpath(CeetronPath);
+//	QString filePathCeetron = CeetronPath + outputCenterline->getUid() + ".txt";
+//	mRouteToTarget->makeMarianaCenterlineFile(filePathCeetron);
 
 	return true;
 }
