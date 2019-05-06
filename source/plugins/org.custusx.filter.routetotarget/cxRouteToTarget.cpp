@@ -130,11 +130,11 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 
 vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
 {
-    mTargetPosition = targetCoordinate_r;
-    findClosestPointInBranches(targetCoordinate_r);
+	mTargetPosition = targetCoordinate_r;
+	findClosestPointInBranches(targetCoordinate_r);
 	findRoutePositions();
 
-    vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
+	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
 	return retval;
 }
@@ -388,9 +388,9 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
 	{
 		QJsonObject position;
-		position.insert("x", QString::number( mRoutePositions[i](0) ));
-		position.insert("y", QString::number( mRoutePositions[i](1) ));
-		position.insert("z", QString::number( mRoutePositions[i](2) ));
+		position.insert( "x", mRoutePositions[i](0) );
+		position.insert( "y", mRoutePositions[i](1) );
+		position.insert( "z", mRoutePositions[i](2) );
 
 		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
 				position.insert("Flag", 1);
