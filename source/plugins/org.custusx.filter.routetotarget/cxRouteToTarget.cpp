@@ -4,6 +4,7 @@
 #include <vtkPolyData.h>
 #include "cxBranchList.h"
 #include "cxBranch.h"
+#include "cxPointMetric.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
 #include <QDir>
@@ -53,10 +54,12 @@ Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_
 	return CLpoints;
 }
 
-void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
+void RouteToTarget::processCenterline(MeshPtr mesh)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
+
+	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
     Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
 
@@ -128,27 +131,28 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint)
 {
-    mTargetPosition = targetCoordinate_r;
-    findClosestPointInBranches(targetCoordinate_r);
+	mTargetPosition = targetPoint->getCoordinate();
+
+	findClosestPointInBranches(mTargetPosition);
 	findRoutePositions();
 
-    vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
+	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
 	return retval;
 }
 
-vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
+vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 {
-    mTargetPosition = targetCoordinate_r;
+		mTargetPosition = targetPoint->getCoordinate();
     double extentionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
 	if(mRoutePositions.size() > 0)
 	{
-		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
-        Eigen::Vector3d extentionVectorNormalized = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+		double extentionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
+				Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extentionDistance;
         int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
         Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 
@@ -388,9 +392,9 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
 	{
 		QJsonObject position;
-		position.insert("x", QString::number( mRoutePositions[i](0) ));
-		position.insert("y", QString::number( mRoutePositions[i](1) ));
-		position.insert("z", QString::number( mRoutePositions[i](2) ));
+		position.insert( "x", mRoutePositions[i](0) );
+		position.insert( "y", mRoutePositions[i](1) );
+		position.insert( "z", mRoutePositions[i](2) );
 
 		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
 				position.insert("Flag", 1);
