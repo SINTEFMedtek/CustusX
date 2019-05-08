@@ -392,16 +392,16 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
 	{
 		QJsonObject position;
-		position.insert( "x", mRoutePositions[i](0) );
-		position.insert( "y", mRoutePositions[i](1) );
-		position.insert( "z", mRoutePositions[i](2) );
+		position.insert( "x", mExtendedRoutePositions[i](0) );
+		position.insert( "y", mExtendedRoutePositions[i](1) );
+		position.insert( "z", mExtendedRoutePositions[i](2) );
 
 		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
-				position.insert("Flag", 1);
+			position.insert("Flag", 1);
 		else if (i <= numberOfExtendedPositions)
-				position.insert("Flag", 2);
+			position.insert("Flag", 2);
 		else
-				position.insert("Flag", 0);
+			position.insert("Flag", 0);
 
 		array.append(position);
 	 }
