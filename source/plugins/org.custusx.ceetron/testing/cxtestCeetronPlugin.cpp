@@ -16,13 +16,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxDataLocations.h"
 #include "cxLogger.h"
+#include "cxtestCgeoTestFunctions.h"
 
-TEST_CASE("Ceetron: Check nothing", "[unit][plugins][hide]")
+
+namespace cxtest
 {
-	CHECK(true);
-}
-
-
 TEST_CASE("CgeoReaderWriter: Write file", "[unit][plugins][org.custusx.ceetron]")
 {
 	cx::VisServicesPtr mocServices = cx::VisServices::getNullObjects();
@@ -43,19 +41,8 @@ TEST_CASE("CgeoReaderWriter: Write file", "[unit][plugins][org.custusx.ceetron]"
 	}
 
 	QByteArray byteArray = modelFile.readAll();
+	checkCgeoByteArray(byteArray);
 
-	qint32 cgeoFirstValue, cgeo2nd, cgeo3rd;
-	QDataStream stream(&byteArray, QIODevice::ReadOnly);
-	stream.setByteOrder(QDataStream::LittleEndian);
-//	stream.setVersion(QDataStream::Qt_5_9);
-	stream >> cgeoFirstValue;
-	stream >> cgeo2nd;
-	stream >> cgeo3rd;
-
-	//.cgeo file should start with 12072001, then 0 and 1. All 32 bit int.
-	CHECK(cgeoFirstValue == 12072001);
-	CHECK(cgeo2nd == 0);
-	CHECK(cgeo3rd == 1);
 }
 
 TEST_CASE("CgeoReaderWriter: Convert to QByteArray", "[unit][plugins][org.custusx.ceetron]")
@@ -65,17 +52,7 @@ TEST_CASE("CgeoReaderWriter: Convert to QByteArray", "[unit][plugins][org.custus
 
 	cx::MeshPtr mesh = cx::Mesh::create("meshUid1","meshName1");
 	QByteArray byteArray = readerWriter.convertToQByteArray(mesh);
-
-	qint32 cgeoFirstValue, cgeo2nd, cgeo3rd;
-	QDataStream stream(&byteArray, QIODevice::ReadOnly);
-	stream.setByteOrder(QDataStream::LittleEndian);
-	stream >> cgeoFirstValue;
-	stream >> cgeo2nd;
-	stream >> cgeo3rd;
-
-	//.cgeo file should start with 12072001, then 0 and 1. All 32 bit int.
-//	qint32 cgeoFirstValue = byteArray[0];
-	CHECK(cgeoFirstValue == 12072001);
-	CHECK(cgeo2nd == 0);
-	CHECK(cgeo3rd == 1);
+	checkCgeoByteArray(byteArray);
 }
+
+}//cxtest
