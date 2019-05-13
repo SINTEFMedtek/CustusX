@@ -28,7 +28,7 @@ WebServerWidgetBase::WebServerWidgetBase(cx::VisServicesPtr services, QWidget *p
 
 	mVerticalLayout->addWidget(new QLabel("Run Web Server"));
 	mVerticalLayout->addWidget(mStartStopButton);
-	mVerticalLayout->addStretch();
+	//mVerticalLayout->addStretch();
 
 	connect(mStartStopButton, &QPushButton::clicked, this, &WebServerWidgetBase::startStopSlot);
 }
