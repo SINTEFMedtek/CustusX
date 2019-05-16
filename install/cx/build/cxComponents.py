@@ -624,7 +624,7 @@ class org_custusx_mariana(CppComponent):
       self._getBuilder().gitSetRemoteURL(self.repository())
 #      self._getBuilder().gitCheckout('')
 #      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
-      self._getBuilder().gitCheckout('4d3004a1a5f54bdfd9aa1b7296e30a2c25da8ab4')
+      self._getBuilder().gitCheckout('d3dc6316387eb38156232257293ee6ef7c949a47')
     def configure(self):
         pass
     def build(self):
