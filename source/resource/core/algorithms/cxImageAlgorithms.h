@@ -30,7 +30,7 @@ namespace cx
 /**
 * \file
 *
-* Various image algorithms. Mostly wrappers around ITK.
+* Various image algorithms. Mostly wrappers around ITK, and conversion from vtkImageData to QImage.
 *
 * \addtogroup cx_resource_core_algorithms
 *
@@ -43,6 +43,11 @@ cxResource_EXPORT ImagePtr resampleImage(PatientModelServicePtr dataManager, Ima
 cxResource_EXPORT vtkImageDataPtr cropImage(vtkImageDataPtr input, IntBoundingBox3D cropbox);
 cxResource_EXPORT ImagePtr cropImage(PatientModelServicePtr dataManager, ImagePtr image);
 cxResource_EXPORT ImagePtr duplicateImage(PatientModelServicePtr dataManager, ImagePtr image);
+
+cxResource_EXPORT QImage vtkImageDataToQImage(vtkImageDataPtr imageData, bool overlay = false, QColor overlayColor = QColor(255, 255, 0, 70));
+cxResource_EXPORT QRgb convertToQColor(unsigned char *colorsPtr, bool overlay, QColor overlayColor);
+cxResource_EXPORT bool isDark(unsigned char *colorsPtr);
+cxResource_EXPORT QRgb modifyOverlayColor(unsigned char *colorsPtr, QColor overlayColor);
 
 /**
  */

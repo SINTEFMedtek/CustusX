@@ -156,6 +156,68 @@ QDateTime extractTimestamp(QString text)
   return QDateTime();
 }
 
+//From https://www.vtk.org/Wiki/VTK/Examples/Cxx/Qt/ImageDataToQImage
+QImage vtkImageDataToQImage(vtkImageDataPtr imageData, bool overlay, QColor overlayColor)
+{
+	if ( !imageData ) { return QImage(); }
+
+	int width = imageData->GetDimensions()[0];
+	int height = imageData->GetDimensions()[1];
+
+	QImage image( width, height, QImage::Format_ARGB32 ); //32 bit
+	QRgb *rgbPtr = reinterpret_cast<QRgb *>( image.bits() ) + width * ( height - 1 );
+	unsigned char *colorsPtr = reinterpret_cast<unsigned char *>( imageData->GetScalarPointer() );
+
+	// Loop over the vtkImageData contents.
+	for ( int row = 0; row < height; row++ )
+	{
+		for ( int col = 0; col < width; col++ )
+		{
+			// Swap the vtkImageData RGB values with an equivalent QColor
+			*( rgbPtr++ ) = convertToQColor(colorsPtr, overlay, overlayColor);
+
+			colorsPtr += imageData->GetNumberOfScalarComponents();
+		}
+
+		rgbPtr -= width * 2;
+	}
+
+	return image;
+	//TODO: Make sure image is oriented correctly according to radiological view
+//	return image.mirrored(true, false);//Flip image
+}
+
+QRgb convertToQColor(unsigned char *colorsPtr, bool overlay, QColor overlayColor)
+{
+	if(overlay)
+		return modifyOverlayColor(colorsPtr, overlayColor);
+
+	//32 bit
+	QRgb rgb;
+	rgb = QColor(colorsPtr[0], colorsPtr[1], colorsPtr[2], colorsPtr[3] ).rgba();
+	//	rgb = QColor(colorsPtr[0], colorsPtr[1], colorsPtr[2], opacity ).rgba(); //Don't use alpha for now
+
+	return rgb;
+}
+
+bool isDark(unsigned char *colorsPtr)
+{
+	unsigned char threshold = 10;
+	if (colorsPtr[0] < threshold &&
+			colorsPtr[1] < threshold &&
+			colorsPtr[2] < threshold)
+		return true;
+	return false;
+}
+
+QRgb modifyOverlayColor(unsigned char *colorsPtr, QColor overlayColor)
+{
+	if(isDark(colorsPtr))
+		overlayColor.setAlpha(0);
+
+	QRgb retval = overlayColor.rgba();
+	return retval;
+}
 
 
 
