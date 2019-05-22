@@ -238,7 +238,7 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outpu
 	imageSlicer->setImage(image);
 
 	proxy->initializeFromPlane(planeType, false, false, 1, 0);
-	proxy->setClinicalApplication(mdRADIOLOGICAL);//Always create slices in radiological view
+	proxy->setClinicalApplicationToFixedValue(mdRADIOLOGICAL);//Always create slices in radiological view
 
 	// Using these values centers image in view, but seems to lock the manual image movement in some directions.
 	double screenX = outputDimensions[0]*outputSpacing[0] / 2;

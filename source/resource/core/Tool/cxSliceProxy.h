@@ -113,7 +113,7 @@ public:
 	 * \brief Enable or disable usage of the tools tool tip offset for this slice proxy
 	 */
 	void setUseTooltipOffset(bool);
-	void setClinicalApplication(CLINICAL_VIEW application);
+	void setClinicalApplicationToFixedValue(CLINICAL_VIEW application);
 
 signals:
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
