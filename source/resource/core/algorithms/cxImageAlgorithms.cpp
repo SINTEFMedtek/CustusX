@@ -28,6 +28,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTime.h"
 #include "cxVolumeHelpers.h"
 
+#include "cxSlicedImageProxy.h"
+#include "cxSliceProxy.h"
+
 
 namespace cx
 {
@@ -219,6 +222,45 @@ QRgb modifyOverlayColor(unsigned char *colorsPtr, QColor overlayColor)
 	return retval;
 }
 
+vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outputSpacing, Eigen::Array3i outputDimensions, ToolPtr sliceTool, PatientModelServicePtr patientModel, bool applyLUT)
+{
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
 
+	if(!image || !patientModel)
+	{
+		return retval;
+	}
+
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(patientModel);
+	SlicedImageProxyPtr imageSlicer(new SlicedImageProxy);
+
+	proxy->setTool(sliceTool);
+
+	imageSlicer->setSliceProxy(proxy);
+	imageSlicer->setImage(image);
+
+	proxy->initializeFromPlane(planeType, false, false, 1, 0);
+
+	// Using these values centers image in view, but seems to lock the manual image movement in some directions.
+	double screenX = outputDimensions[0]*outputSpacing[0] / 2;
+	double screenY = outputDimensions[1]*outputSpacing[1] / 2;
+
+	imageSlicer->setOutputFormat(Vector3D(-screenX,-screenY,0), outputDimensions, outputSpacing);
+
+	imageSlicer->update();
+	if (applyLUT)
+	{
+		imageSlicer->getOutputPort()->Update();
+		retval->DeepCopy(imageSlicer->getOutput());
+	}
+	else //Don't use LUT
+	{
+		imageSlicer->getOutputPortWithoutLUT()->Update();
+		retval->DeepCopy(imageSlicer->getOutputWithoutLUT());
+
+	}
+
+	return retval;
+}
 
 } // namespace cx
