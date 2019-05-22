@@ -49,6 +49,17 @@ cxResource_EXPORT QRgb convertToQColor(unsigned char *colorsPtr, bool overlay, Q
 cxResource_EXPORT bool isDark(unsigned char *colorsPtr);
 cxResource_EXPORT QRgb modifyOverlayColor(unsigned char *colorsPtr, QColor overlayColor);
 
+/**
+ * @brief createSlice Creates a 2D slice through a 3D volume. Result slice will be oriented for radiological view.
+ * @param image Input 3D volume
+ * @param planeType Output 2D slice plane type
+ * @param outputSpacing Output slice image spacing
+ * @param outputDimensions Output slice image dimanesions
+ * @param sliceTool Slicing is performed at this tools position
+ * @param patientModel CustusX Patient Model. Needed by slicing code
+ * @param applyLUT Apply color 3D lookup table values to 2D output slice
+ * @return 2D slice as vtkImageData
+ */
 cxResource_EXPORT vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outputSpacing, Eigen::Array3i outputDimensions, ToolPtr sliceTool, PatientModelServicePtr patientModel, bool applyLUT);
 
 /**

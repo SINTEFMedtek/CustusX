@@ -165,7 +165,7 @@ void SliceProxy::clinicalApplicationChangedSlot()
 	changed();
 }
 
-void SliceProxy::setClinicalApplication(CLINICAL_VIEW application)
+void SliceProxy::setClinicalApplicationToFixedValue(CLINICAL_VIEW application)
 {
 	//Don't allow any changes to clinical application if this has been specifically set.
 	disconnect(mDataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
