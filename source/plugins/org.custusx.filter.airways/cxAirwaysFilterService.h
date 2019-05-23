@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "FAST/Importers/ImageFileImporter.hpp"
 #include "FAST/Algorithms/LungSegmentation/LungSegmentation.hpp"
+#include "FAST/Algorithms/AirwaySegmentation/AirwaySegmentation.hpp"
 
 class ctkPluginContext;
 
@@ -64,7 +65,8 @@ public:
 	virtual bool postProcess();
 
 protected:
-	bool segmentAirways(fast::ImageFileImporter::pointer importerPtr);
+	void segmentAirways(fast::ImageFileImporter::pointer importerPtr);
+	bool extractAirways(fast::AirwaySegmentation::pointer airwaySegmentationPtr);
 	void segmentLungsAndVessels(fast::ImageFileImporter::pointer importerPtr);
 	bool extractBloodVessels(fast::LungSegmentation::pointer lungSegmentationPtr);
 	bool extractLungs(fast::LungSegmentation::pointer lungSegmentationPtr);

@@ -233,48 +233,54 @@ bool AirwaysFilter::execute()
  	return true;
 }
 
-bool AirwaysFilter::segmentAirways(fast::ImageFileImporter::pointer importerPtr)
+void AirwaysFilter::segmentAirways(fast::ImageFileImporter::pointer importerPtr)
 {
 
 	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
 
-	try{
 
-    // Do segmentation
+	// Do segmentation
 	fast::AirwaySegmentation::pointer airwaySegmentationPtr = fast::AirwaySegmentation::New();
 
 	airwaySegmentationPtr->setInputConnection(importerPtr->getOutputPort());
-	//airwaySegmentationPtr->setSmoothing(0.5);
 
 	if(useManualSeedPoint) {
 		CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
 		airwaySegmentationPtr->setSeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
 	}
-	auto segPort = airwaySegmentationPtr->getOutputPort();
 
-	// Convert fast segmentation data to VTK data which CX can use
-	vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
-	vtkExporter->setInputConnection(airwaySegmentationPtr->getOutputPort());
-	vtkExporter->Update();
-	mAirwaySegmentationOutput = vtkExporter->GetOutput();
+	extractAirways(airwaySegmentationPtr);
+}
 
-	auto airwaySegmentationData = segPort->getNextFrame<fast::SpatialDataObject>();
+bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegmentationPtr)
+{
 
-	//CX_LOG_SUCCESS() << "FINISHED AIRWAY SEGMENTATION";
+	try{
+		auto segPort = airwaySegmentationPtr->getOutputPort();
 
-    // Extract centerline
-    fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
-    centerline->setInputData(airwaySegmentationData);
-    // Get centerline
-    vtkSmartPointer<fast::VTKMeshExporter> vtkCenterlineExporter = fast::VTKMeshExporter::New();
-    vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
-    vtkCenterlineExporter->Update();
-    mAirwayCenterlineOutput = vtkCenterlineExporter->GetOutput();
+		// Convert fast segmentation data to VTK data which CX can use
+		vtkSmartPointer<fast::VTKImageExporter> vtkExporter = fast::VTKImageExporter::New();
+		vtkExporter->setInputConnection(airwaySegmentationPtr->getOutputPort());
+		vtkExporter->Update();
+		mAirwaySegmentationOutput = vtkExporter->GetOutput();
+		vtkExporter->Delete();
+
+		auto airwaySegmentationData = segPort->getNextFrame<fast::SpatialDataObject>();
+
+		// Extract centerline
+		fast::CenterlineExtraction::pointer centerline = fast::CenterlineExtraction::New();
+		centerline->setInputData(airwaySegmentationData);
+		// Get centerline
+		vtkSmartPointer<fast::VTKMeshExporter> vtkCenterlineExporter = fast::VTKMeshExporter::New();
+		vtkCenterlineExporter->setInputConnection(centerline->getOutputPort());
+		vtkCenterlineExporter->Update();
+		mAirwayCenterlineOutput = vtkCenterlineExporter->GetOutput();
+		vtkCenterlineExporter->Delete();
 
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("fast::Exception: "+qstring_cast(error));
-	if(!useManualSeedPoint)
+	if(!getManualSeedPointOption(mOptions)->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -337,6 +343,7 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 		vtkBloodVesselExporter->setInputConnection(lungSegmentationPtr->getBloodVesselOutputPort());
 		vtkBloodVesselExporter->Update();
 		mBloodVesselSegmentationOutput = vtkBloodVesselExporter->GetOutput();
+		vtkBloodVesselExporter->Delete();
 
 		auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
 
@@ -349,6 +356,7 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 		vtkBloodVesselCenterlineExporter->setInputConnection(bloodVesselCenterline->getOutputPort());
 		vtkBloodVesselCenterlineExporter->Update();
 		mBloodVesselCenterlineOutput = vtkBloodVesselCenterlineExporter->GetOutput();
+		vtkBloodVesselCenterlineExporter->Delete();
 
 } catch(fast::Exception& e) {
 	std::string error = e.what();
@@ -385,6 +393,7 @@ bool AirwaysFilter::extractLungs(fast::LungSegmentation::pointer lungSegmentatio
 		vtkLungExporter->setInputConnection(lungSegmentationPtr->getOutputPort(0));
 		vtkLungExporter->Update();
 		mLungSegmentationOutput = vtkLungExporter->GetOutput();
+		vtkLungExporter->Delete();
 
 } catch(fast::Exception& e) {
 	std::string error = e.what();
@@ -421,6 +430,7 @@ bool AirwaysFilter::postProcess()
 	{
 		postProcessAirways();
 		mAirwaySegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
+		mAirwayCenterlineOutput = NULL;
 	}
 
 	if(getLungSegmentationOption(mOptions)->getValue()) {
@@ -432,6 +442,7 @@ bool AirwaysFilter::postProcess()
 	{
 		postProcessVessels();
 		mBloodVesselSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
+		mBloodVesselCenterlineOutput = NULL;
 	}
 
 	return true;
