@@ -180,7 +180,7 @@ void DICOMThumbnailListWidgetPrivate::addSeriesThumbnails(const QModelIndex &ind
 
   for (int i=0; i<thumbnails.size(); ++i)
   {
-	  std::cout << "   Thumbnail: " << thumbnails[i].toStdString() << std::endl;
+//	  std::cout << "   Thumbnail: " << thumbnails[i].toStdString() << std::endl;
 	  int humanIndex = i+1;
 	  QString caption = QString("Image %1").arg(humanIndex);
 	  this->addThumbnailWidget(thumbnails[i], caption);
