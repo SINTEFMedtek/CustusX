@@ -164,6 +164,9 @@ void EraserWidget::duplicateSlot()
 {
 	ImagePtr original = mActiveData->getActive<Image>();
 
+	if (!original)
+		return;
+
 	ImagePtr duplicate = duplicateImage(mPatientModelService, original);
 	mPatientModelService->insertData(duplicate);
 	mActiveData->setActive(duplicate);
@@ -192,7 +195,11 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	mPatientModelService->insertData(mActiveData->getActive<Image>());
+	ImagePtr image = mActiveData->getActive<Image>();
+	if (!image)
+		return;
+
+	mPatientModelService->insertData(image);
 }
 
 
@@ -210,6 +217,7 @@ void EraserWidget::eraseVolume(TYPE* volumePointer)
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
+	CX_LOG_DEBUG() << "eraseVolume: Radius: ";
 	mPreviousCenter = c;
 	mPreviousRadius = r;
 
@@ -267,8 +275,10 @@ void EraserWidget::removeSlot()
 		return;
 
 	ImagePtr image = mActiveData->getActive<Image>();
-	vtkImageDataPtr img = image->getBaseVtkImageData();
+	if (!image)
+		return;
 
+	vtkImageDataPtr img = image->getBaseVtkImageData();
 	int vtkScalarType = img->GetScalarType();
 
 	if (vtkScalarType==VTK_CHAR)
