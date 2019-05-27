@@ -96,21 +96,41 @@ void RouteToTargetFilter::createInputTypes()
 	targetPoint->setHelp("Select target point metric");
 	mInputTypes.push_back(targetPoint);
 
+	StringPropertySelectMeshPtr bloodVesselCenterline;
+	bloodVesselCenterline = StringPropertySelectMesh::New(mServices->patient());
+	bloodVesselCenterline->setValueName("Blood vessel centerline");
+	bloodVesselCenterline->setHelp("Select blood vessel centerline");
+	mInputTypes.push_back(bloodVesselCenterline);
+
+
+
 }
 
 void RouteToTargetFilter::createOutputTypes()
 {
 	StringPropertySelectMeshPtr tempRTTMeshStringAdapter;
 	tempRTTMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-	tempRTTMeshStringAdapter->setValueName("Route to target mesh");
+	tempRTTMeshStringAdapter->setValueName("Route to target (mesh)");
 	tempRTTMeshStringAdapter->setHelp("Generated route to target mesh (vtk-format).");
 	mOutputTypes.push_back(tempRTTMeshStringAdapter);
 
 	StringPropertySelectMeshPtr tempRTTEXTMeshStringAdapter;
 	tempRTTEXTMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-	tempRTTEXTMeshStringAdapter->setValueName("Route to target extended mesh");
+	tempRTTEXTMeshStringAdapter->setValueName("Route to target extended (mesh)");
 	tempRTTEXTMeshStringAdapter->setHelp("Generated route to target extended mesh (vtk-format).");
 	mOutputTypes.push_back(tempRTTEXTMeshStringAdapter);
+
+	StringPropertySelectMeshPtr tempRTTVesselMeshStringAdapter;
+	tempRTTVesselMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempRTTVesselMeshStringAdapter->setValueName("Route to target along blood vessels (mesh)");
+	tempRTTVesselMeshStringAdapter->setHelp("Generated route to target along blood vessels mesh (vtk-format).");
+	mOutputTypes.push_back(tempRTTVesselMeshStringAdapter);
+
+    StringPropertySelectMeshPtr tempAirwaysModelMeshStringAdapter;
+    tempAirwaysModelMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+    tempAirwaysModelMeshStringAdapter->setValueName("Airways along blood vessels surface model (mesh)");
+    tempAirwaysModelMeshStringAdapter->setHelp("Generated airways surface model mesh (vtk-format).");
+    mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
 }
 
 
