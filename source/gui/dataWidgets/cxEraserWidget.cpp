@@ -38,6 +38,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
 #include "cxActiveData.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -58,12 +59,13 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, ViewServi
 	mContinousEraseTimer = new QTimer(this);
 	connect(mContinousEraseTimer, SIGNAL(timeout()), this, SLOT(continousRemoveSlot())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 
+	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	layout->addLayout(buttonLayout);
 	QHBoxLayout* buttonLayout2 = new QHBoxLayout;
 	layout->addLayout(buttonLayout2);
 
-	mShowEraserCheckBox = new QCheckBox("Show");
+	mShowEraserCheckBox = new QCheckBox("Show eraser");
 	mShowEraserCheckBox->setToolTip("Show eraser sphere in the views.");
 	connect(mShowEraserCheckBox, SIGNAL(toggled(bool)), this, SLOT(toggleShowEraser(bool)));
 	buttonLayout->addWidget(mShowEraserCheckBox);
@@ -84,7 +86,7 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, ViewServi
 
 
 	double sphereRadius = 10;
-	mSphereSizeAdapter = DoubleProperty::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, DoubleRange(0,200,1), 0, QDomNode());
+	mSphereSizeAdapter = DoubleProperty::initialize("SphereSize", "Sphere Radius (mm)", "Radius of Eraser Sphere in mm", sphereRadius, DoubleRange(0,100,0.1), 1, QDomNode());
 	connect(mSphereSizeAdapter.get(), &DoubleProperty::changed, this, &EraserWidget::sphereSizeChangedSlot);
 	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);
