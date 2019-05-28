@@ -200,9 +200,11 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 	}
 }
 
-void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r)
+void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex)
 {
-	positions_r = sortMatrix(2,positions_r);
+	if (sortByZindex)
+		positions_r = sortMatrix(2,positions_r);
+
 	Eigen::MatrixXd positionsNotUsed_r = positions_r;
 
 	//	int minIndex;

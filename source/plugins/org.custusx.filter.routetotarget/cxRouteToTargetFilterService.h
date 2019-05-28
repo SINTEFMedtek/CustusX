@@ -46,6 +46,7 @@ public:
 	virtual QString getHelp() const;
 	static QString getNameSuffix();
 	static QString getNameSuffixExtension();
+	static QString getNameSuffixBloodVessel();
 
 	virtual bool execute();
 	virtual bool postProcess();
@@ -62,6 +63,7 @@ private:
 	RouteToTargetPtr mRouteToTarget;
 	vtkPolyDataPtr mOutput;
     vtkPolyDataPtr mExtendedRoute;
+    vtkPolyDataPtr 	mBloodVesselRoute;
 	QString mTargetName;
     bool mGenerateFileWithRouteInformation;
 };

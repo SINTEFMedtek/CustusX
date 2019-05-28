@@ -33,7 +33,7 @@ public:
 	void deleteBranch(BranchPtr b);
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
-	void findBranchesInCenterline(Eigen::MatrixXd positions_r);
+	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true);
 	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();

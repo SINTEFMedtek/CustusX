@@ -25,10 +25,14 @@ public:
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void processCenterline(MeshPtr mesh);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
+	void findClosestPointInBloodVesselBranches(Vector3D targetCoordinate_r);
 	void findRoutePositions();
+	void findRoutePositionsInBloodVessels();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
+	void searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int startIndex);
 	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
+	vtkPolyDataPtr findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint);
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
@@ -40,19 +44,28 @@ public:
 private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
+	BranchListPtr mBloodVesselBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
+	BranchPtr mProjectedBloodVesselBranchPtr;
 	int mProjectedIndex;
+	int mProjectedBloodVesselIndex;
 	Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
+	std::vector< Eigen::Vector3d > mBloodVesselRoutePositions;
 	std::vector< int > mBranchingIndex;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 };
 
+Eigen::MatrixXd findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
+
+std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed);
+std::pair<Eigen::MatrixXd::Index, double> dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions);
+Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions);
 
 } /* namespace cx */
 

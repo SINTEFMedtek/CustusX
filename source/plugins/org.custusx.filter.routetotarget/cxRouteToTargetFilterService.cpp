@@ -76,6 +76,11 @@ QString RouteToTargetFilter::getNameSuffixExtension()
     return "_ext";
 }
 
+QString RouteToTargetFilter::getNameSuffixBloodVessel()
+{
+    return "_vessel";
+}
+
 
 void RouteToTargetFilter::createOptions()
 {
@@ -159,6 +164,13 @@ bool RouteToTargetFilter::execute()
 	if (mGenerateFileWithRouteInformation)
 		mRouteToTarget->addRouteInformationToFile(mServices);
 
+	MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+	if (bloodVesselCenterline)
+	{
+		mBloodVesselRoute = mRouteToTarget->findRouteToTargetAlongBloodVesselCenterlines( bloodVesselCenterline, targetPoint);
+		//std::cout << "Number of points in mBloodVesselRoute: " << mBloodVesselRoute->GetNumberOfPoints() << std::endl;
+	}
+
 	return true;
 }
 
@@ -205,6 +217,21 @@ bool RouteToTargetFilter::postProcess()
 		mOutputTypes[0]->setValue(outputCenterline->getUid());
 	if(mOutputTypes.size() > 1)
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
+
+	if(mBloodVesselRoute)
+	{
+		QString uidCenterlineBV = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixBloodVessel();
+		QString nameCenterlineBV = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixBloodVessel();
+		MeshPtr outputCenterlineBV = patientService()->createSpecificData<Mesh>(uidCenterlineBV, nameCenterlineBV);
+		outputCenterlineBV->setVtkPolyData(mBloodVesselRoute);
+		outputCenterlineBV->setColor(QColor(0, 255, 0, 255));
+		patientService()->insertData(outputCenterlineBV);
+
+		outputCenterlineBV->get_rMd_History()->setParentSpace(inputMesh->getUid());
+
+		if(mOutputTypes.size() > 2)
+			mOutputTypes[2]->setValue(outputCenterlineBV->getUid());
+	}
 
 //	//Create Ceetron route-to-target file
 //	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/MarianaRTT/";

@@ -5,7 +5,13 @@ include(cxInstallUtilities)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-
+include_directories(
+	${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
+	${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration.method.bronchoscopy
+	
+	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
+	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration.method.bronchoscopy
+)
 
 set(PLUGIN_SRCS
     cxRouteToTarget.h
