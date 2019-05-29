@@ -57,6 +57,7 @@ private:
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
+	bool checkIfRouteToTargetEndsAtEndOfLastBranch();
 };
 
 Eigen::MatrixXd findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);

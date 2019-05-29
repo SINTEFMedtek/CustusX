@@ -7,6 +7,7 @@
 #include "cxPointMetric.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
+#include "cxLogger.h"
 #include <QDir>
 #include "cxTime.h"
 #include "cxVisServices.h"
@@ -179,7 +180,7 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 
 	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
 	if (parentBranchPtr)
-		searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
+		searchBloodVesselBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
 }
 
 
@@ -225,34 +226,30 @@ vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshP
 	vtkPolyDataPtr retval;
 	mBloodVesselBranchListPtr->deleteAllBranches();
 
+	if ( !checkIfRouteToTargetEndsAtEndOfLastBranch() )
+	{
+		CX_LOG_INFO() << "No improved route to target found along blood vessels";
+		return retval;
+	}
+
 	vtkPolyDataPtr BVcenterline_r = bloodVesselCenterlineMesh->getTransformedPolyDataCopy(bloodVesselCenterlineMesh->get_rMd());
 	Eigen::MatrixXd BVCLpoints_r = getCenterlinePositions(BVcenterline_r);
 
-	std::cout << "BVCLpoints_r.size(): " << BVCLpoints_r.size() << std::endl;//debug
+	Eigen::MatrixXd::Index closestBVCLIndex = dsearch(targetPoint->getCoordinate(), BVCLpoints_r).first;
+	//Eigen::MatrixXd::Index closestBVCLIndex = minDistanceToBVCenterline.first;
 
-	std::pair<Eigen::MatrixXd::Index, double > minDistanceToBVCenterline = dsearch(targetPoint->getCoordinate(), BVCLpoints_r);
-	Eigen::MatrixXd::Index closestBVCLIndex = minDistanceToBVCenterline.first;
-
-	std::cout << "closestBVCLIndex: " << closestBVCLIndex << std::endl;//debug
-
-	//Eigen::MatrixXd connectedPointsInBVCL = findConnectedPointsInCT(closestBVCLIndex , BVCLpoints_r).first;
 	Eigen::MatrixXd connectedPointsInBVCL = findLocalPointsInCT(closestBVCLIndex , BVCLpoints_r);
-
-	std::cout << "connectedPointsInBVCL.size(): " << connectedPointsInBVCL.size() << std::endl;//debug
 
 	if (mRoutePositions.empty())
 		return retval;
 
 	Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], connectedPointsInBVCL).first;
 
-	std::cout << "closestPositionToEndOfAirwayRTTIndex: " << closestPositionToEndOfAirwayRTTIndex << std::endl;//debug
-
 	//setting position closest to RTT from airways in first index, where RTT should  continue
-	connectedPointsInBVCL.col(0).swap(connectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
+	connectedPointsInBVCL.col(connectedPointsInBVCL.cols()-1).swap(connectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
 
 	mBloodVesselBranchListPtr->findBranchesInCenterline(connectedPointsInBVCL, false);
 
-	std::cout << " mBloodVesselBranchListPtr->getBranches().size(): " << mBloodVesselBranchListPtr->getBranches().size() << std::endl;//debug
 
 	findClosestPointInBloodVesselBranches(mTargetPosition);
 	findRoutePositionsInBloodVessels();
@@ -260,6 +257,22 @@ vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshP
 	retval = addVTKPoints(mBloodVesselRoutePositions);
 
 	return retval;
+}
+
+
+bool RouteToTarget::checkIfRouteToTargetEndsAtEndOfLastBranch()
+{
+	if (!mProjectedBranchPtr)
+		return false;
+
+	if (!mProjectedIndex)
+		return false;
+
+	if (mProjectedBranchPtr->getChildBranches().empty())
+		if (mProjectedBranchPtr->getPositions().cols()-1 == mProjectedIndex)
+			return true;
+
+	return false;
 }
 
 
@@ -512,15 +525,32 @@ Eigen::MatrixXd findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLposit
 	Eigen::MatrixXd positionsNotIncluded = CLpositions;
 	int startIndex = closestCLIndex;
 
-	std::pair<Eigen::MatrixXd,Eigen::MatrixXd> connectedPoints = findConnectedPointsInCT(startIndex , positionsNotIncluded);
-	positionsNotIncluded = connectedPoints.second;
-	includedPositions << includedPositions, connectedPoints.first; //Need to define new size first?
-	for (int i = 0; i < includedPositions; i++)
+	bool closePositionFound = true;
+	while (closePositionFound)
 	{
+		closePositionFound = false;
+		std::pair<Eigen::MatrixXd,Eigen::MatrixXd> connectedPoints = findConnectedPointsInCT(startIndex , positionsNotIncluded);
+		positionsNotIncluded = connectedPoints.second;
 
+		if (includedPositions.cols() > 0)
+		{
+			includedPositions.conservativeResize(Eigen::NoChange, includedPositions.cols() + connectedPoints.first.cols());
+			includedPositions.rightCols(connectedPoints.first.cols()) = connectedPoints.first;
+		}
+		else
+			includedPositions = connectedPoints.first;
 
+		for (int i = 0; i < includedPositions.cols(); i++)
+		{
+			std::pair<Eigen::MatrixXd::Index, double> closePositionSearch = dsearch(includedPositions.col(i), positionsNotIncluded);
+			if (closePositionSearch.second < 3) //Invlude positions closer than 3 mm
+			{
+				closePositionFound = true;
+				startIndex = closePositionSearch.first;
+				break;
+			}
+		}
 	}
-
 
 	return includedPositions;
 }
