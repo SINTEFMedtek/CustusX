@@ -30,10 +30,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxRegistrationTransform.h"
 #include "cxLogger.h"
-#include "cxEnumConverter.h"
 #include "cxTime.h"
 #include "cxCoordinateSystemHelpers.h"
 #include "cxPatientModelService.h"
+#include "cxEnumConversion.h"
 
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 
@@ -176,7 +176,7 @@ ImagePtr convertImageToUnsigned(PatientModelServicePtr  dataManager, ImagePtr im
 	// start by shifting up to zero
 	int shift = -input->GetScalarRange()[0];
 	// if CT: always shift by 1024 (houndsfield units definition)
-	if (image->getModality().contains("CT", Qt::CaseInsensitive))
+	if (image->getModality() == imCT)
 		shift = 1024;
 
 	vtkImageDataPtr convertedImageData = suggestedConvertedVolume; // use input if given
@@ -238,14 +238,14 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 	//image
 	retval["Filename"] = image->getFilename().toStdString();
 	retval["Coordinate system"] = image->getCoordinateSystem().toString().toStdString();
-	retval["Image type"] = image->getImageType().toStdString();
+	retval["Image type"] = enum2string(image->getImageType()).toStdString();
 	retval["Scalar minimum"] = string_cast(image->getMin());
 	retval["Scalar maximum"] = string_cast(image->getMax());
 	retval["Range (max - min)"] = string_cast(image->getRange());
 	retval["Maximum alpha value"] = string_cast(image->getMaxAlphaValue());
 	retval["VTK type min value"] = string_cast(image->getVTKMinValue());
 	retval["VTK type max value"] = string_cast(image->getVTKMaxValue());
-	retval["Modality"] = image->getModality().toStdString();
+	retval["Modality"] = enum2string(image->getModality()).toStdString();
 	retval["Name"] = image->getName().toStdString();
 	retval["Parent space"] = image->getParentSpace().toStdString();
 	retval["Shading"] = image->getShadingOn() ? "on" : "off";

@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxTool.h"
 #include "cxImageAlgorithms.h"
 #include "cxRegistrationTransform.h"
@@ -26,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxActiveToolProxy.h"
 #include "cxActiveData.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -354,7 +354,7 @@ bool StringPropertyDataModality::setValue(const QString& value)
 {
 	if (!mData)
 		return false;
-	mData->setModality(value);
+	mData->setModality(string2enum<IMAGE_MODALITY>(value));
 	return true;
 }
 
@@ -362,7 +362,7 @@ QString StringPropertyDataModality::getValue() const
 {
 	if (!mData)
 		return "";
-	return mData->getModality();
+	return enum2string(mData->getModality());
 }
 
 QString StringPropertyDataModality::getHelp() const
@@ -377,8 +377,8 @@ QStringList StringPropertyDataModality::getValueRange() const
 	QStringList retval;
 	retval << "";
 	if (mData)
-		retval << mData->getModality();
-	retval << "CT" << "MR" << "US";
+		retval << enum2string(mData->getModality());
+	retval << enum2string(imCT) << enum2string(imMR) << enum2string(imUS);
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
@@ -416,7 +416,7 @@ bool StringPropertyImageType::setValue(const QString& value)
 {
 	if (!mData)
 		return false;
-	mData->setImageType(value);
+	mData->setImageType(string2enum<IMAGE_SUBTYPE>(value));
 	return true;
 }
 
@@ -424,7 +424,7 @@ QString StringPropertyImageType::getValue() const
 {
 	if (!mData)
 		return "";
-	return mData->getImageType();
+	return enum2string(mData->getImageType());
 }
 
 QString StringPropertyImageType::getHelp() const
@@ -440,13 +440,13 @@ QStringList StringPropertyImageType::getValueRange() const
 	retval << "";
 	if (mData)
 	{
-		retval << mData->getImageType();
-		if (mData->getModality()=="CT")
-			retval << "";
-		if (mData->getModality()=="MR")
-			retval << "T1" << "T2" << "ANGIO";
-		if (mData->getModality()=="US")
-			retval << "B-Mode" << "Angio";
+		retval << enum2string(mData->getImageType());
+		if (mData->getModality() == imCT)
+			retval << enum2string(istSEGMENTATION);
+		if (mData->getModality() == imMR)
+			retval << enum2string(istMRT1) << enum2string(istMRT2) << enum2string(istMRFLAIR) << enum2string(istANGIO) << enum2string(istSEGMENTATION);
+		if (mData->getModality() == imUS)
+			retval << enum2string(istUSBMODE) << enum2string(istANGIO) << enum2string(istSEGMENTATION);
 	}
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }

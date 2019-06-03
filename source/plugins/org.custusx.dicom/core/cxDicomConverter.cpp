@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <string.h>
 
 #include "cxDicomImageReader.h"
+#include "cxCustomMetaImage.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -55,15 +56,15 @@ QString DicomConverter::generateUid(DicomImageReaderPtr reader)
 	// name: find something from series
 	QString currentTimestamp = QDateTime::currentDateTime().toString(timestampSecondsFormat());
 	QString uid = QString("%1_%2_%3").arg(seriesDescription).arg(seriesNumber).arg(currentTimestamp);
-    uid = this->convertToValidName(uid);
+	uid = this->convertToValidName(uid);
 	return uid;
 }
 
 QString DicomConverter::convertToValidName(QString text) const
 {
 	QStringList illegal;
-    illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*"
-            << "\\^" << "," << "\\%";
+	illegal << "\\s" << "\\." << ":" << ";" << "\\<" << "\\>" << "\\*"
+			<< "\\^" << "," << "\\%";
 	QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
 	text = text.replace(regexp, "_");
 	return text	;
@@ -73,8 +74,8 @@ QString DicomConverter::convertToValidName(QString text) const
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
 	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
-    QString name = convertToValidName(seriesDescription);
-    return name;
+	QString name = convertToValidName(seriesDescription);
+	return name;
 }
 
 ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
@@ -110,8 +111,10 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	}
 	image->setVtkImageData(imageData);
 
-	QString modality = reader->item()->GetElementAsString(DCM_Modality);
-	image->setModality(modality);
+	QString modalityString = reader->item()->GetElementAsString(DCM_Modality);
+	image->setModality(convertToModality(modalityString));
+
+	image->setImageType(istEMPTY);//Setting image subtype to empty for now. DCM_ImageType (value 3, and 4) may possibly be used. Also series name often got this kind of information.
 
 	DicomImageReader::WindowLevel windowLevel = reader->getWindowLevel();
 	image->setInitialWindowLevel(windowLevel.width, windowLevel.center);
@@ -119,7 +122,7 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	Transform3D M = reader->getImageTransformPatient();
 	image->get_rMd_History()->setRegistration(M);
 
-	reportDebug(QString("Image created from %1").arg(filename));
+//	reportDebug(QString("Image created from %1").arg(filename));
 	return image;
 }
 
@@ -139,7 +142,7 @@ std::vector<ImagePtr> DicomConverter::createImages(QStringList files)
 std::map<double, ImagePtr> DicomConverter::sortImagesAlongDirection(std::vector<ImagePtr> images, Vector3D  e_sort)
 {
 	std::map<double, ImagePtr> sorted;
-	for (int i=0; i<images.size(); ++i)
+	for (unsigned i=0; i<images.size(); ++i)
 	{
 		Vector3D pos = images[i]->get_rMd().coord(Vector3D(0,0,0));
 		double dist = dot(pos, e_sort);

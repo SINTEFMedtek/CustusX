@@ -15,16 +15,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <ctkPluginActivator.h>
 #include "boost/shared_ptr.hpp"
 
-class QHttpServer;
-class QHttpRequest;
-class QHttpResponse;
-
 namespace cx
 {
-//class ScreenVideoProvider;
-typedef boost::shared_ptr<class RemoteAPI> RemoteAPIPtr;
-typedef boost::shared_ptr<class HttpRequestHandler> HttpRequestHandlerPtr;
-//typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
+typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 
 /**
  */
@@ -44,9 +37,7 @@ public:
 
 
 private:
-	HttpRequestHandlerPtr mRequestHandler;
-	RemoteAPIPtr mAPI;
-	QHttpServer *server;
+	RegisteredServicePtr mRegistration;
 };
 
 } // namespace cx

@@ -69,8 +69,13 @@ DataPtr XMLPolyDataMeshReader::read(const QString& uid, const QString& filename)
 	return mesh;
 }
 
+QString XMLPolyDataMeshReader::canReadDataType() const
+{
+	return Mesh::getTypeName();
+}
+
 XMLPolyDataMeshReader::XMLPolyDataMeshReader(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("XMLPolyDataMeshReader", DATATYPE_MESH, "", "vtp", patientModelService)
+	FileReaderWriterImplService("XMLPolyDataMeshReader", Mesh::getTypeName(), "", "vtp", patientModelService)
 {
 }
 

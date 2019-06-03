@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxImage.h"
 #include "cxMesh.h"
+#include "cxTrackedStream.h"
 #include "cxLogger.h"
 #include "cxStringPropertySelectTool.h"
 #include "cxSelectDataStringPropertyBase.h"
@@ -282,11 +283,11 @@ QString ClipperWidget::getDataTypeRegExp()
 {
 	QStringList dataTypes;
 	if(mShowImages->isChecked())
-		dataTypes << DATATYPE_IMAGE;
+		dataTypes << Image::getTypeName();
 	if(mShowMeshes->isChecked())
-		dataTypes << DATATYPE_MESH;
+		dataTypes << Mesh::getTypeName();
 	if(mShowTrackedStreams->isChecked())
-		dataTypes << DATATYPE_TRACKED_STREAM;
+		dataTypes << TrackedStream::getTypeName();
 	if(mShowMetrics->isChecked())
 		dataTypes << ".*Metric$";
 	QString typeRegExp = dataTypes.join('|');

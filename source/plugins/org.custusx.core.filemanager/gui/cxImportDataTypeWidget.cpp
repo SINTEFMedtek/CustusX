@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDesktopWidget>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <QFileInfo>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
 #include "cxFileManagerService.h"
@@ -31,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxViewService.h"
 #include "cxImportWidget.h"
+#include "cxCustomMetaImage.h"
 
 namespace cx
 {
@@ -40,12 +42,19 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mImportWidget(parent),
 	mServices(services),
 	mData(data),
+	mFilename(filename),
 	mParentCandidates(parentCandidates),
-	mSelectedIndexInTable(0)
+	mSelectedIndexInTable(0),
+	mImageTypeCombo(NULL),
+	mModalityCombo(NULL)
+
 {
 	mAnatomicalCoordinateSystems = new QComboBox();
 	mAnatomicalCoordinateSystems->addItem("LPS"); //CX
-	mAnatomicalCoordinateSystems->addItem("RAS");
+	mAnatomicalCoordinateSystems->addItem("RAS"); //NIfTI
+
+	if(isInputFileInNiftiFormat())
+		mAnatomicalCoordinateSystems->setCurrentText("RAS");
 
 	mShouldImportParentTransform = new QComboBox();
 	mShouldImportParentTransform->addItem("No");
@@ -78,7 +87,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		name = mData[i]->getName();
 		QString space = mData[i]->getSpace();
 		//create point metric groups
-		if(type == DATATYPE_POINT_METRIC)
+		if(type == PointMetric::getTypeName())
 		{
 			space = boost::dynamic_pointer_cast<PointMetric>(mData[i])->getSpace().toString();
 			(mPointMetricGroups[space]).push_back(mData[i]);
@@ -93,43 +102,18 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
 			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(space));
 		}
+		this->createDataSpecificGui(mData[i]);
 	}
-	//add point metric groups
-	int groupnr = 0;
-	std::map<QString, std::vector<DataPtr> >::iterator it = mPointMetricGroups.begin();
-	for(; it != mPointMetricGroups.end(); ++it)
-	{
-		groupnr +=1;
-
-		QString space = it->first;
-		std::vector<DataPtr> datas = it->second;
-		DataPtr data = datas[0];
-		if(datas.empty() || !data)
-		{
-			continue;
-		}
-
-		QComboBox *spaceCB = new QComboBox();
-		mSpaceCBs[space] = spaceCB;
-		connect(spaceCB, SIGNAL(currentIndexChanged(int)), this, SLOT(pointMetricGroupSpaceChanged(int)));
-		this->updateSpaceComboBox(spaceCB, space);
-
-		type = data->getType();
-		name = "Point metric group "+QString::number(groupnr);
-
-		int newRowIndex = mTableWidget->rowCount();
-		mTableWidget->setRowCount(newRowIndex+1);
-		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
-		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
-		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
-	}
+	this->addPointMetricGroupsToTable();
 
 	//gui
 	QVBoxLayout *topLayout = new QVBoxLayout(this);
 	this->setLayout(topLayout);
 
-	QGroupBox *groupBox = new QGroupBox(filename);
+	QFileInfo fileInfo(filename);
+	QString title = fileInfo.fileName();
+
+	QGroupBox *groupBox = new QGroupBox(title);
 
 	QGridLayout *gridLayout = new QGridLayout();
 	gridLayout->addWidget(new QLabel("For all data in the file: "), 0, 0, 1, 2);
@@ -142,6 +126,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	gridLayout->addWidget(new QLabel("Convert data to unsigned?"), 4, 0);
 	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
 	gridLayout->addWidget(mTableWidget, 5, 0, 1, 2);
+	if(mModalityCombo)
+		gridLayout->addWidget(mModalityCombo);
+	if(mImageTypeCombo)
+		gridLayout->addWidget(mImageTypeCombo);
 
 	groupBox->setLayout(gridLayout);
 	topLayout->addWidget(groupBox);
@@ -154,6 +142,36 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 {
 	disconnect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
 	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
+}
+
+
+void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
+{
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+
+	if(image)
+	{
+		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
+		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
+		mModalityAdapter->setData(image);
+
+		mImageTypeAdapter = StringPropertyImageType::New(mServices->patient());
+		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
+		mImageTypeAdapter->setData(image);
+
+		if(isInputFileInNiftiFormat()) // NIfTI files are usually MR. Set this as the default
+		{
+			mModalityAdapter->setValue(enum2string(imMR));
+			updateImageType();
+		}
+	}
+}
+
+void ImportDataTypeWidget::updateImageType()
+{
+	// Test code: Trying to use convertToImageSubType on file name to find correct subtype.
+	IMAGE_SUBTYPE imageSubType = convertToImageSubType(mFilename);
+	mImageTypeAdapter->setValue(enum2string(imageSubType));
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()
@@ -206,11 +224,11 @@ void ImportDataTypeWidget::updateParentCandidatesComboBox()
 		mParentCandidatesCB->setCurrentIndex(selectedIndex);
 
 	//TODO parent guess:
-	/*
+
 	QString parentGuess = this->getInitialGuessForParentFrame();
-	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
+//	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
 	mParentCandidatesCB->setCurrentText(parentGuess);
-	*/
+
 
 }
 
@@ -220,6 +238,9 @@ void ImportDataTypeWidget::importAllData()
 	{
 		if(mData[i])
 		{
+			QString parentId = (mParentCandidatesCB->itemData(mParentCandidatesCB->currentIndex()).toString());
+			mData[i]->get_rMd_History()->setParentSpace(parentId);
+
 			mServices->patient()->insertData(mData[i]);
 			mServices->view()->autoShowData(mData[i]);
 		}
@@ -248,15 +269,15 @@ void ImportDataTypeWidget::applyParentTransformImport()
 	}
 
 	/*
-  if (!mTransformFromParentFrameCheckBox->isChecked())
+	if (!mTransformFromParentFrameCheckBox->isChecked())
 	return;
-  if(!mData)
+	if(!mData)
 	return;
-  DataPtr parent = mPatientModelService->getData(mData->getParentSpace());
-  if (!parent)
+	DataPtr parent = mPatientModelService->getData(mData->getParentSpace());
+	if (!parent)
 	return;
-  mData->get_rMd_History()->setRegistration(parent->get_rMd());
-  report("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
+	mData->get_rMd_History()->setRegistration(parent->get_rMd());
+	report("Assigned rMd from data [" + parent->getName() + "] to data [" + mData->getName() + "]");
 	*/
 }
 
@@ -277,12 +298,12 @@ void ImportDataTypeWidget::applyConversionLPS()
 
 	/*
 	if (!mNiftiFormatCheckBox->isChecked())
-	  return;
+		return;
 	if(!mData)
-	  return;
+		return;
 	Transform3D sMd = mData->get_rMd();
 	Transform3D sMr = createTransformFromReferenceToExternal(pcsRAS);
-  //  rMd = createTransformRotateZ(M_PI) * rMd;
+	//  rMd = createTransformRotateZ(M_PI) * rMd;
 	Transform3D rMd = sMr.inv() * sMd;
 	mData->get_rMd_History()->setRegistration(rMd);
 	report("Nifti import: Converted data " + mData->getName() + " from LPS to RAS coordinates.");
@@ -382,38 +403,154 @@ void ImportDataTypeWidget::pointMetricGroupSpaceChanged(int index)
 			pointMetricsGroupId = it->first;
 	}
 	std::vector<DataPtr> pointMetricGroup = mPointMetricGroups[pointMetricsGroupId];
-	for(int i=0; i<pointMetricGroup.size(); ++i)
+	for(unsigned i=0; i<pointMetricGroup.size(); ++i)
 	{
 		CoordinateSystem cs(csDATA, newSpace);
 		boost::dynamic_pointer_cast<PointMetric>(pointMetricGroup[i])->setSpace(cs);
 	}
 }
 
-
-QString ImportDataTypeWidget::getInitialGuessForParentFrame() const
+QString ImportDataTypeWidget::getInitialGuessForParentFrame()
 {
-	QString parentGuessSpace = "";
-	for(int i=0; i<mData.size(); ++i)
+	int candidateScore = 0;
+	QString bestCandidate;
+
+	for(unsigned i=0; i < mData.size(); ++i)
 	{
 		DataPtr data = mData[i];
-		QString base = qstring_cast(data->getName()).split(".")[0];
+		std::map<QString, QString> parentCandidates = this->getParentCandidateList();
 
-		std::map<QString, DataPtr> all = mServices->patient()->getDatas();
-		for (std::map<QString, DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+		std::map<QString, QString>::iterator iter;
+		for(iter= parentCandidates.begin(); iter != parentCandidates.end(); ++iter)
 		{
-			if (iter->second==data)
-				continue;
-			QString current = qstring_cast(iter->second->getName()).split(".")[0];
-			if (base.indexOf(current)>=0)
+			int similarity = similatiryMeasure(data->getUid(), iter->second);
+			if(similarity > candidateScore && !isSegmentation(iter->second))
 			{
-				//data->get_rMd_History()->setParentSpace(iter->first);
-				parentGuessSpace = iter->first;
-				break;
+				candidateScore = similarity;
+				bestCandidate = iter->first;
 			}
 		}
 	}
-	return parentGuessSpace;
+
+	return bestCandidate;
 }
 
+int ImportDataTypeWidget::similatiryMeasure(QString current, QString candidate)
+{
+	QStringList currentList = splitStringIntoSeparateParts(current);
+	QStringList candidateList = splitStringIntoSeparateParts(candidate);
+	return countEqualListElements(currentList, candidateList);
+}
+
+QStringList ImportDataTypeWidget::splitStringIntoSeparateParts(QString current)
+{
+	current = removeParenthesis(current);
+
+	QStringList list = current.split(".", QString::SkipEmptyParts);
+	QStringList list2;
+	for (int i = 0; i < list.size(); ++i)
+	{
+		list2 << list[i].split("_", QString::SkipEmptyParts);
+	}
+	QStringList currentParts;
+	for (int i = 0; i < list2.size(); ++i)
+	{
+		currentParts << list2[i].split("-", QString::SkipEmptyParts);
+	}
+	return currentParts;
+}
+
+QString ImportDataTypeWidget::removeParenthesis(QString current)
+{
+		int startParenthesis;
+		do
+		{
+			startParenthesis = current.indexOf("{");
+			int endParenthesis = current.indexOf("}");
+			current.replace(startParenthesis, endParenthesis-startParenthesis+1, "");
+		} while (startParenthesis != -1);
+	return current;
+}
+
+int ImportDataTypeWidget::countEqualListElements(QStringList first, QStringList second)
+{
+	int retval = 0;
+	int numComparedElements = 0;
+	for (int i = 0; i < first.size(); ++i)
+	{
+		if(excludeElement(first[i]))
+			continue;
+		++numComparedElements;
+		for (int j = 0; j < second.size(); ++j)
+		{
+			if(first[i].compare(second[j]) == 0)
+			{
+				++retval;
+				break;//Don't count repeating elements
+			}
+		}
+	}
+
+	if (retval == numComparedElements)
+		return 0;//Don't match equal list
+	return retval;
+}
+
+bool ImportDataTypeWidget::excludeElement(QString element)
+{
+	if (isSegmentation(element))
+		return true;
+	return false;
+}
+
+void ImportDataTypeWidget::addPointMetricGroupsToTable()
+{
+	QString type, name;
+	int groupnr = 0;
+	std::map<QString, std::vector<DataPtr> >::iterator it = mPointMetricGroups.begin();
+	for(; it != mPointMetricGroups.end(); ++it)
+	{
+		groupnr +=1;
+
+		QString space = it->first;
+		std::vector<DataPtr> datas = it->second;
+		DataPtr data = datas[0];
+		if(datas.empty() || !data)
+		{
+			continue;
+		}
+
+		QComboBox *spaceCB = new QComboBox();
+		mSpaceCBs[space] = spaceCB;
+		connect(spaceCB, SIGNAL(currentIndexChanged(int)), this, SLOT(pointMetricGroupSpaceChanged(int)));
+		this->updateSpaceComboBox(spaceCB, space);
+
+		type = data->getType();
+		name = "Point metric group "+QString::number(groupnr);
+
+		int newRowIndex = mTableWidget->rowCount();
+		mTableWidget->setRowCount(newRowIndex+1);
+		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
+		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
+		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
+	}
+}
+
+bool ImportDataTypeWidget::isInputFileInNiftiFormat()
+{
+	if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
+		return true;
+	return false;
+}
+
+bool ImportDataTypeWidget::isSegmentation(QString filename)
+{
+	if(filename.contains("label", Qt::CaseInsensitive))
+		return true;
+	if(filename.contains("seg", Qt::CaseInsensitive))
+		return true;
+	return false;
+}
 
 }

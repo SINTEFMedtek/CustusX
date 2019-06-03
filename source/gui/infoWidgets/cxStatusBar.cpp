@@ -29,7 +29,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include "cxManualTool.h"
 #include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxActiveToolProxy.h"
 #include "cxViewService.h"
 

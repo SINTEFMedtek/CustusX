@@ -12,12 +12,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackerConfigurationImpl.h"
 #include "cxDataLocations.h"
 
-#include "cxDefinitionStrings.h"
 #include "cxToolConfigurationParser.h"
 #include "cxFileHelpers.h"
 #include "cxProfile.h"
 #include "cxTracker.h"
 #include "cxLogger.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

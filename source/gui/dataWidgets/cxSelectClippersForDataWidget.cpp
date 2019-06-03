@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxActiveData.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxDataSelectWidget.h"
+#include "cxMesh.h"
 
 namespace cx
 {
@@ -45,7 +46,7 @@ SelectClippersForImageWidget::SelectClippersForImageWidget(VisServicesPtr servic
 SelectClippersForMeshWidget::SelectClippersForMeshWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "select_clippers_for_mesh_widget", "Select Clippers")
 {
-	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), DATATYPE_MESH);
+	StringPropertyActiveDataPtr activeMeshProperty = StringPropertyActiveData::New(services->patient(), Mesh::getTypeName());
 
 	QVBoxLayout *mLayout = new QVBoxLayout(this);
 	mLayout->setMargin(0);

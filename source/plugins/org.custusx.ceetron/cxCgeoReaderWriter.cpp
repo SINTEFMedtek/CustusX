@@ -22,7 +22,7 @@ namespace cx
 {
 
 CgeoReaderWriter::CgeoReaderWriter(PatientModelServicePtr patientModelService) :
-	FileReaderWriterImplService("CgeoReaderWriter", "", DATATYPE_MESH, "cgeo", patientModelService)
+	FileReaderWriterImplService("CgeoReaderWriter", "", Mesh::getTypeName(), "cgeo", patientModelService)
 {
 }
 
@@ -58,6 +58,23 @@ bool CgeoReaderWriter::readInto(DataPtr data, QString path)
 
 void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 {
+	QFile exportFile(filename);
+	exportFile.open(QIODevice::WriteOnly);
+	QDataStream out(&exportFile);
+	this->writeToStream(data, out);
+}
+
+QByteArray CgeoReaderWriter::convertToQByteArray(DataPtr data)
+{
+	QByteArray retval;
+	QDataStream out(&retval, QIODevice::WriteOnly);
+	this->writeToStream(data, out);
+
+	return retval;
+}
+
+void CgeoReaderWriter::writeToStream(DataPtr data, QDataStream &out)
+{
 	MeshPtr mesh = boost::dynamic_pointer_cast<Mesh>(data);
 	if(!mesh)
 	{
@@ -67,9 +84,6 @@ void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 	vtkCellArrayPtr polys = polyData->GetPolys();
 
-	QFile exportFile(filename);
-	exportFile.open(QIODevice::WriteOnly);
-	QDataStream out(&exportFile);
 	out.setByteOrder(QDataStream::LittleEndian);
 	out.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
@@ -104,23 +118,22 @@ void CgeoReaderWriter::write(DataPtr data, const QString &filename)
 		n_ids = idlist->GetNumberOfIds();
 		if (n_ids == 3)
 		{
-		   out << (qint32)  idlist->GetId(0); // First vertex of triangle
-		   out << (qint32)  idlist->GetId(1); // Second vertex of triangle
-		   out << (qint32)  idlist->GetId(2); // Third vertex of triangle
+			 out << (qint32)  idlist->GetId(0); // First vertex of triangle
+			 out << (qint32)  idlist->GetId(1); // Second vertex of triangle
+			 out << (qint32)  idlist->GetId(2); // Third vertex of triangle
 		}
 		else
 			std::cout << "Warning in .cgeo export: Skipped polygon not containing exactly 3 points." << std::endl;
 	}
 }
-}
 
-
-QString cx::CgeoReaderWriter::canWriteDataType() const
+QString CgeoReaderWriter::canWriteDataType() const
 {
-	return DATATYPE_MESH;
+	return Mesh::getTypeName();
 }
 
-bool cx::CgeoReaderWriter::canWrite(const QString &type, const QString &filename) const
+bool CgeoReaderWriter::canWrite(const QString &type, const QString &filename) const
 {
 	return this->canWriteInternal(type, filename);
 }
+}//cx

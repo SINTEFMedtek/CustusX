@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxLogger.h"
 #include "cxInteractiveClipper.h"
-#include "cxEnumConverter.h"
+#include "cxEnumConversion.h"
 #include "cxStringPropertyClipPlane.h"
 #include "cxXmlOptionItem.h"
 #include "cxProfile.h"

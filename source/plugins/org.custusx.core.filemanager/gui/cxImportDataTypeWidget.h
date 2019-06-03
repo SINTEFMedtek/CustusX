@@ -44,8 +44,10 @@ public slots:
 private slots:
 	virtual void showEvent(QShowEvent *event);
 	void pointMetricGroupSpaceChanged(int index);
+	void updateImageType();
 
 private:
+	void createDataSpecificGui(DataPtr data);
 	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
@@ -58,11 +60,22 @@ private:
 	void applyConversionToUnsigned();
 
 	//Use heuristics to guess a parent frame, based on similarities in name.
-	QString getInitialGuessForParentFrame() const;
+	QString getInitialGuessForParentFrame();
+	int similatiryMeasure(QString current, QString candidate);
+	QStringList splitStringIntoSeparateParts(QString current);
+	int countEqualListElements(QStringList first, QStringList second);
+	bool excludeElement(QString element);
+	QString removeParenthesis(QString current);
+
+	void addPointMetricGroupsToTable();
+
+	bool isInputFileInNiftiFormat();
+	bool isSegmentation(QString filename);
 
 	ImportWidget* mImportWidget;
 	VisServicesPtr mServices;
 	std::vector<DataPtr> mData;
+	QString mFilename;
 	std::vector<DataPtr> &mParentCandidates;
 
 	std::map<QString, QComboBox *> mSpaceCBs;
@@ -76,6 +89,12 @@ private:
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
 	int mSelectedIndexInTable;
+
+	//image specific
+	StringPropertyDataModalityPtr mModalityAdapter;
+	StringPropertyImageTypePtr mImageTypeAdapter;
+	QWidget* mImageTypeCombo;
+	QWidget* mModalityCombo;
 };
 
 }

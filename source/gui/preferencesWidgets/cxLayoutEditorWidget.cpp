@@ -13,7 +13,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QtWidgets>
 
 #include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxUtilHelpers.h"
 #include "cxViewService.h"
 #include "cxBoolProperty.h"

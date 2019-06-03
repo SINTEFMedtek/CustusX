@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -49,15 +49,15 @@ public:
  */
 class org_custusx_registration_method_bronchoscopy_EXPORT RegistrationMethodBronchoscopyImageToImageService : public RegistrationMethodService
 {
-    Q_INTERFACES(cx::RegistrationMethodService)
+	Q_INTERFACES(cx::RegistrationMethodService)
 public:
-    RegistrationMethodBronchoscopyImageToImageService(RegServicesPtr services) :
-        RegistrationMethodService(services) {}
-    virtual ~RegistrationMethodBronchoscopyImageToImageService() {}
-    virtual QString getRegistrationType() {return QString("ImageToImage");}
-    virtual QString getRegistrationMethod() {return QString("Bronchoscopy");}
-    virtual QString getWidgetName() {return QString("org_custusx_registration_method_bronchoscopy_image2image_widget");}
-    virtual QWidget* createWidget();
+	RegistrationMethodBronchoscopyImageToImageService(RegServicesPtr services) :
+		RegistrationMethodService(services) {}
+	virtual ~RegistrationMethodBronchoscopyImageToImageService() {}
+	virtual QString getRegistrationType() {return QString("ImageToImage");}
+	virtual QString getRegistrationMethod() {return QString("Bronchoscopy");}
+	virtual QString getWidgetName() {return QString("org_custusx_registration_method_bronchoscopy_image2image_widget");}
+	virtual QWidget* createWidget();
 };
 
 } /* namespace cx */

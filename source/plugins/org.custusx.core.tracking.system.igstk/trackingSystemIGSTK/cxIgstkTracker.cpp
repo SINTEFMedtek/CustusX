@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QStringList>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
-#include "cxEnumConverter.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTool.h"
 #include <time.h>

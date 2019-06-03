@@ -42,6 +42,9 @@ public:
 	QString canWriteDataType() const;
 	bool canWrite(const QString &type, const QString &filename) const;
 	void write(DataPtr data, const QString &filename);
+	QByteArray convertToQByteArray(DataPtr data);
+private:
+	void writeToStream(DataPtr data, QDataStream &out);
 };
 
 }

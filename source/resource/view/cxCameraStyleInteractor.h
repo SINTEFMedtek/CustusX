@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPointer>
 #include "cxTransform3D.h"
 #include "cxForwardDeclarations.h"
-#include "cxEnumConverter.h"
 class QIcon;
 class QWidget;
 class QMenu;

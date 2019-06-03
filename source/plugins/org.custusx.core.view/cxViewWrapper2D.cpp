@@ -41,9 +41,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxManualTool.h"
 #include "cxTrackingService.h"
 #include "cxViewGroup.h"
-#include "cxDefinitionStrings.h"
 #include "cxSlicePlanes3DRep.h"
-#include "cxDefinitionStrings.h"
 #include "cxSliceComputer.h"
 #include "cxGeometricRep2D.h"
 #include "cxDataLocations.h"
@@ -416,7 +414,7 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
     if (!mGroupData)
         return ImagePtr();
 
-	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), true);
+	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), this->isAnyplane());
     ImagePtr image;
     if (!images.empty())
         image = images.back();  // always show last in vector
@@ -473,7 +471,7 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 	if (!mGroupData)
 		return;
 
-    ImagePtr image = this->getImageToDisplay();
+		ImagePtr image = this->getImageToDisplay();
 
     if (image)
     {

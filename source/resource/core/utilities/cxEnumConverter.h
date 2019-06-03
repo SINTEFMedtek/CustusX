@@ -25,6 +25,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
  * @{
  */
 
+
+//###############################################################################################
+//#                                                                                             #
+//# NB: Include the file cxEnumConversion.h instead of this file to avoid IDE/compiler warnings #
+//#                                                                                             #
+//###############################################################################################
+
+
 /**\brief Class for easy conversion between an enum and a QString.
  * 
  * NOTE: Use the helper macros instead of the description below.
@@ -48,13 +56,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 	Macro in cpp file (outside namespace):
 
-		SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(vm, VIEW_ZONE_TYPE, vtCOUNT) 
+		DEFINE_ENUM_STRING_CONVERTERS_BEGIN(vm, VIEW_ZONE_TYPE, vtCOUNT)
 		{
 			"ACS_3D_LAYOUT",
 			"ANYPLANE_LAYOUT",
 			"DUALANYPLANE_LAYOUT",
 		} 
-		SNW_DEFINE_ENUM_STRING_CONVERTERS_END(vm, VIEW_ZONE_TYPE, vtCOUNT)
+		DEFINE_ENUM_STRING_CONVERTERS_END(vm, VIEW_ZONE_TYPE, vtCOUNT)
 
 	End macro example.
 
@@ -153,20 +161,20 @@ EXPORT NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val); \
  * 
  * Example:
  * 
- * SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(vm, DUALPLANE_TYPE, dpCOUNT) 
+ * DEFINE_ENUM_STRING_CONVERTERS_BEGIN(vm, DUALPLANE_TYPE, dpCOUNT)
  * {
  * 	"SIDE_VIEW",
  * 	"RADIAL_VIEW"
  * } 
- * SNW_DEFINE_ENUM_STRING_CONVERTERS_END(vm, DUALPLANE_TYPE, dpCOUNT)
+ * DEFINE_ENUM_STRING_CONVERTERS_END(vm, DUALPLANE_TYPE, dpCOUNT)
  *  
  */
-#define SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(NS, ENUM_NAME, ENUM_SIZE)                  \
+#define DEFINE_ENUM_STRING_CONVERTERS_BEGIN(NS, ENUM_NAME, ENUM_SIZE)                  \
 template<>                                                                                 \
 boost::array<QString, NS::ENUM_SIZE> EnumConverter<NS::ENUM_NAME,NS::ENUM_SIZE>::mText = \
 {                                                                                          \
 
-#define SNW_DEFINE_ENUM_STRING_CONVERTERS_END(NS, ENUM_NAME, ENUM_SIZE)     \
+#define DEFINE_ENUM_STRING_CONVERTERS_END(NS, ENUM_NAME, ENUM_SIZE)     \
 };                                                                          \
 template<> QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val) \
 {                                                                           \

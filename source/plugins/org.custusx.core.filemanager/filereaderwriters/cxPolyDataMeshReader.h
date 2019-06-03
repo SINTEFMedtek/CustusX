@@ -37,7 +37,7 @@ public:
 	bool readInto(MeshPtr mesh, QString filename);
 
 	virtual vtkPolyDataPtr loadVtkPolyData(QString filename);
-	virtual QString canReadDataType() const { return DATATYPE_MESH; }
+	virtual QString canReadDataType() const;
 	virtual DataPtr read(const QString& uid, const QString& filename);
 	std::vector<DataPtr> read(const QString &filename);
 

@@ -27,15 +27,15 @@ TEST_CASE("Sort cx::Data user-friendly using getPriority()", "[unit][service][vi
 {
 	cx::MeshPtr mesh(new cx::Mesh("mesh1     "));
 	cx::ImagePtr image_mr(new cx::Image("image1_mr ", vtkImageDataPtr()));
-	image_mr->setModality("MR");
+	image_mr->setModality(cx::imMR);
 	cx::ImagePtr image_ct(new cx::Image("image1_ct ", vtkImageDataPtr()));
-	image_ct->setModality("CT");
+	image_ct->setModality(cx::imCT);
 	cx::ImagePtr image_us(new cx::Image("image1_us ", vtkImageDataPtr()));
-	image_us->setModality("US");
-	image_us->setImageType("B-Mode");
+	image_us->setModality(cx::imUS);
+	image_us->setImageType(cx::istUSBMODE);
 	cx::ImagePtr image_usa(new cx::Image("image1_usa", vtkImageDataPtr()));
-	image_usa->setModality("US");
-	image_usa->setImageType("Angio");
+	image_usa->setModality(cx::imUS);
+	image_usa->setImageType(cx::istANGIO);
 	cx::PointMetricPtr point = cx::PointMetric::create("point1    ", "", cx::PatientModelServicePtr(), cxtest::SpaceProviderMock::create());
 
 	std::vector<cx::DataPtr> unsorted1;

@@ -3,10 +3,9 @@
 #include <QFile>
 #include <QDir>
 #include "cxLogger.h"
-#include "cxEnumConverter.h"
 #include "cxFrame3D.h"
 #include "cxTransformFile.h"
-#include "cxDefinitionStrings.h"//Removes warning for string2enum
+#include "cxEnumConversion.h"
 
 namespace cx {
 

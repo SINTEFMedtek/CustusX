@@ -332,6 +332,29 @@ endfunction()
 
 ###############################################################################
 #
+# Find the location of qts qml folder
+#
+###############################################################################
+function(find_qt_qml_dir _varResult)
+get_target_property(QT_QMAKE_EXECUTABLE ${Qt5Core_QMAKE_EXECUTABLE} IMPORTED_LOCATION)
+if(NOT QT_QMAKE_EXECUTABLE)
+    message(FATAL_ERROR "qmake is not found.")
+endif()
+# execute the command "qmake -query QT_INSTALL_QML" to get the path of qml dir.
+execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} -query QT_INSTALL_QML
+    OUTPUT_VARIABLE _QT_QML_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+if(_QT_QML_DIR)
+    message(STATUS "Qt5 qml directory:" ${_QT_QML_DIR})
+else()
+    message(FATAL_ERROR "Qt5 qml directory cannot be detected.")
+endif()
+set (${_varResult} ${_QT_QML_DIR} PARENT_SCOPE)
+endfunction()
+
+###############################################################################
+#
 #Find Qt libraries directory (Qt frameworks directory for APPLE)
 #
 ###############################################################################
