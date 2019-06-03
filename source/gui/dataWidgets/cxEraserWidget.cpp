@@ -148,7 +148,6 @@ void EraserWidget::toggleContinous(bool on)
 void EraserWidget::continousRemoveSlot()
 {
 	Transform3D rMd = mViewService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
-	//Transform3D rMd = mViewService->getViewGroupDatas().front()->getData()->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -208,48 +207,35 @@ void EraserWidget::eraseVolume(TYPE* volumePointer)
 {
 	ImagePtr image = mActiveData->getActive<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
-
-
 	Eigen::Array3i dim(img->GetDimensions());
-	Vector3D spacing(img->GetSpacing());
-
+	Eigen::Array3d spacing(img->GetSpacing());
 	Transform3D rMd = mViewService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
-	Vector3D c(mSphere->GetCenter());
+	Eigen::Array3d c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
-	CX_LOG_DEBUG() << "eraseVolume: Radius: ";
+	int replaceVal = mEraseValueAdapter->getValue();
+
 	mPreviousCenter = c;
 	mPreviousRadius = r;
 
-	DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
-
+	Eigen::Array3d scaledRadius = r*spacing.inverse();
 	Transform3D dMr = image->get_rMd().inv();
 	Transform3D rawMd = createTransformScale(spacing).inv();
 	Transform3D rawMr = rawMd * dMr;
-	Vector3D c_d = dMr.coord(c);
-	double r_d = dMr.vector(r * Vector3D::UnitX()).length();
-	c = rawMr.coord(c);
-	r = rawMr.vector(r * Vector3D::UnitX()).length();
-	DoubleBoundingBox3D bb0_raw = transform(rawMr, bb_r);
-	IntBoundingBox3D bb1_raw(0, dim[0], 0, dim[1], 0, dim[2]);
+	c = rawMr.coord(c); //Center voxel
 
-//	std::cout << "     sphere: " << bb0_raw << std::endl;
-//	std::cout << "        raw: " << bb1_raw << std::endl;
+	Eigen::Array3i lowVoxIdx = (c - scaledRadius).floor().cast<int>();
+	lowVoxIdx = lowVoxIdx.max(0);
 
-	for (int i=0; i<3; ++i)
-	{
-		bb1_raw[2*i] = std::max<double>(bb1_raw[2*i], bb0_raw[2*i]);
-		bb1_raw[2*i+1] = std::min<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
-	}
+	Eigen::Array3i highVoxIdx = (c + scaledRadius).ceil().cast<int>();
+	highVoxIdx = highVoxIdx.min(dim);
 
-	int replaceVal = mEraseValueAdapter->getValue();
-
-	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
-		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
-			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
+	for (int x = lowVoxIdx(0); x < highVoxIdx(0); ++x)
+		for (int y = lowVoxIdx(1); y < highVoxIdx(1); ++y)
+			for (int z = lowVoxIdx(2); z < highVoxIdx(2); ++z)
 			{
 				int index = x + y * dim[0] + z * dim[0] * dim[1];
-				if ((Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
+				if ((Vector3D((x-c(0))*spacing[0], (y-c(1))*spacing[1], (z-c(2))*spacing[2])).length() < r)
 					volumePointer[index] = replaceVal;
 			}
 }
