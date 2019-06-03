@@ -61,13 +61,13 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 
 	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
-    Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
+		Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
 
-    mBranchListPtr->findBranchesInCenterline(CLpoints_r);
+		mBranchListPtr->findBranchesInCenterline(CLpoints_r);
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
-    //mBranchListPtr->smoothBranchPositions(40);
+		//mBranchListPtr->smoothBranchPositions(40);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }

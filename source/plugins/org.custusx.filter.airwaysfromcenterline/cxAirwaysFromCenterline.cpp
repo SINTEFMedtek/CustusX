@@ -214,6 +214,9 @@ vtkPolyDataPtr AirwaysFromCenterline::getVTKPoints()
     if (!mBranchListPtr)
             return retval;
 
+		double minPointDistance = 0.5; //mm
+		mBranchListPtr->excludeClosePositionsInCTCenterline(minPointDistance); // to reduce number of positions in smoothed centerline
+
     std::vector<BranchPtr> branches  = mBranchListPtr->getBranches();
     int pointIndex = 0;
 
