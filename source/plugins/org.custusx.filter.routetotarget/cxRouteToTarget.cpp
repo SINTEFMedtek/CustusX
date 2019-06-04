@@ -4,6 +4,7 @@
 #include <vtkPolyData.h>
 #include "cxBranchList.h"
 #include "cxBranch.h"
+#include "cxAirwaysFromCenterline.h"
 #include "cxPointMetric.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
@@ -75,6 +76,19 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
 
+void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
+{
+	if (mBloodVesselBranchListPtr)
+		mBloodVesselBranchListPtr->deleteAllBranches();
+
+	mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
+
+	mBloodVesselBranchListPtr->calculateOrientations();
+	mBloodVesselBranchListPtr->smoothOrientations();
+	mBloodVesselBranchListPtr->smoothBranchPositions(40);
+
+	std::cout << "Number of branches in CT blood vessel centerline: " << mBloodVesselBranchListPtr->getBranches().size() << std::endl;
+}
 
 void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 {
@@ -224,7 +238,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint)
 {
 	vtkPolyDataPtr retval;
-	mBloodVesselBranchListPtr->deleteAllBranches();
+	//mBloodVesselBranchListPtr->deleteAllBranches();
 
 	if ( !checkIfRouteToTargetEndsAtEndOfLastBranch() )
 	{
@@ -238,18 +252,18 @@ vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshP
 	Eigen::MatrixXd::Index closestBVCLIndex = dsearch(targetPoint->getCoordinate(), BVCLpoints_r).first;
 	//Eigen::MatrixXd::Index closestBVCLIndex = minDistanceToBVCenterline.first;
 
-	Eigen::MatrixXd connectedPointsInBVCL = findLocalPointsInCT(closestBVCLIndex , BVCLpoints_r);
+	mConnectedPointsInBVCL = findLocalPointsInCT(closestBVCLIndex , BVCLpoints_r);
 
 	if (mRoutePositions.empty())
 		return retval;
 
-	Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], connectedPointsInBVCL).first;
+	Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], mConnectedPointsInBVCL).first;
 
 	//setting position closest to RTT from airways in first index, where RTT should  continue
-	connectedPointsInBVCL.col(connectedPointsInBVCL.cols()-1).swap(connectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
+	mConnectedPointsInBVCL.col(mConnectedPointsInBVCL.cols()-1).swap(mConnectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
 
-	mBloodVesselBranchListPtr->findBranchesInCenterline(connectedPointsInBVCL, false);
-
+	//mBloodVesselBranchListPtr->findBranchesInCenterline(mConnectedPointsInBVCL, false);
+	processBloodVesselCenterline(mConnectedPointsInBVCL);
 
 	findClosestPointInBloodVesselBranches(mTargetPosition);
 	findRoutePositionsInBloodVessels();
@@ -257,6 +271,40 @@ vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshP
 	retval = addVTKPoints(mBloodVesselRoutePositions);
 
 	return retval;
+}
+
+vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
+{
+	vtkPolyDataPtr airwayMesh;
+	if (mConnectedPointsInBVCL.cols() == 0)
+		return airwayMesh;
+
+	AirwaysFromCenterlinePtr airwaysFromBVCenterlinePtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
+	//airwaysFromBVCenterlinePtr->processCenterline(mConnectedPointsInBVCL);
+	mBloodVesselBranchListPtr->interpolateBranchPositions(5);
+	airwaysFromBVCenterlinePtr->setBranches(mBloodVesselBranchListPtr);
+
+	airwayMesh = airwaysFromBVCenterlinePtr->generateTubes(2);
+
+	return airwayMesh;
+}
+
+vtkPolyDataPtr RouteToTarget::getConnectedAirwayAndBloodVesselRoute()
+{
+	vtkPolyDataPtr mergedRoute;
+
+	if ( mRoutePositions.empty() )
+			return mergedRoute;
+
+	if ( mBloodVesselRoutePositions.empty() )
+		return addVTKPoints(mRoutePositions);
+
+	std::vector< Eigen::Vector3d > mergedPositions = mBloodVesselRoutePositions;
+	mergedPositions.insert( mergedPositions.end(), mRoutePositions.begin(), mRoutePositions.end() );
+
+	mergedRoute = addVTKPoints(mergedPositions);
+
+	return mergedRoute;
 }
 
 
@@ -574,58 +622,6 @@ double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)
 	double D = sqrt( d0*d0 + d1*d1 + d2*d2 );
 
 	return D;
-}
-
-
-std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed)
-{
-	//Eigen::MatrixXd branchPositions(positionsNotUsed.rows(), positionsNotUsed.cols());
-	Eigen::MatrixXd thisPosition(3,1);
-	std::vector<Eigen::MatrixXd> branchPositionsVector;
-	thisPosition = positionsNotUsed.col(startIndex);
-	branchPositionsVector.push_back(thisPosition); //add first position to branch
-	positionsNotUsed = eraseCol(startIndex,positionsNotUsed);; //remove first position from list of remaining points
-
-	while (positionsNotUsed.cols() > 0)
-	{
-		std::pair<Eigen::MatrixXd::Index, double > minDistance = dsearch(thisPosition, positionsNotUsed);
-		Eigen::MatrixXd::Index index = minDistance.first;
-		double d = minDistance.second;
-		if (d > 3) // more than 3 mm distance to closest point --> branch is completed
-			break;
-
-		thisPosition = positionsNotUsed.col(index);
-		positionsNotUsed = eraseCol(index,positionsNotUsed);
-		//add position to branch
-		branchPositionsVector.push_back(thisPosition);
-
-	}
-
-	Eigen::MatrixXd branchPositions(3,branchPositionsVector.size());
-
-	for (int j = 0; j < branchPositionsVector.size(); j++)
-	{
-		branchPositions.block(0,j,3,1) = branchPositionsVector[j];
-	}
-
-	return std::make_pair(branchPositions, positionsNotUsed);
-}
-
-std::pair<Eigen::MatrixXd::Index, double> dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions)
-{
-	Eigen::MatrixXd::Index index;
-	// find nearest neighbour
-	(positions.colwise() - p).colwise().squaredNorm().minCoeff(&index);
-	double d = (positions.col(index) - p).norm();
-
-	return std::make_pair(index , d);
-}
-
-Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions)
-{
-	positions.block(0 , removeIndex , positions.rows() , positions.cols() - removeIndex - 1) = positions.rightCols(positions.cols() - removeIndex - 1);
-	positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
-	return positions;
 }
 
 } /* namespace cx */

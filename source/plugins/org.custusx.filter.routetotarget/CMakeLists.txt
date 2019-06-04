@@ -5,14 +5,6 @@ include(cxInstallUtilities)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-include_directories(
-	${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration
-	${CustusX_SOURCE_DIR}/source/plugins/org.custusx.registration.method.bronchoscopy
-	
-	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration
-	${CustusX_BINARY_DIR}/source/plugins/org.custusx.registration.method.bronchoscopy
-)
-
 set(PLUGIN_SRCS
     cxRouteToTarget.h
     cxRouteToTarget.cpp
@@ -46,6 +38,7 @@ set(PLUGIN_target_libraries
     cxResourceFilter
     cxPluginUtilities
     org_custusx_registration_method_bronchoscopy
+    org_custusx_filter_airwaysfromcenterline
 )
 
 set(PLUGIN_OUTPUT_DIR "")

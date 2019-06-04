@@ -24,6 +24,7 @@ public:
 	//void setCenterline(vtkPolyDataPtr centerline);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void processCenterline(MeshPtr mesh);
+	void processBloodVesselCenterline(Eigen::MatrixXd positions);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findClosestPointInBloodVesselBranches(Vector3D targetCoordinate_r);
 	void findRoutePositions();
@@ -33,6 +34,8 @@ public:
 	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint);
+	vtkPolyDataPtr generateAirwaysFromBloodVesselCenterlines();
+	vtkPolyDataPtr getConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
@@ -56,6 +59,7 @@ private:
 	std::vector< int > mBranchingIndex;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
+	Eigen::MatrixXd mConnectedPointsInBVCL;
 	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 	bool checkIfRouteToTargetEndsAtEndOfLastBranch();
 };
@@ -63,10 +67,6 @@ private:
 Eigen::MatrixXd findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
-
-std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed);
-std::pair<Eigen::MatrixXd::Index, double> dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions);
-Eigen::MatrixXd eraseCol(int removeIndex, Eigen::MatrixXd positions);
 
 } /* namespace cx */
 
