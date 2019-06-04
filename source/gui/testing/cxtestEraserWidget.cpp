@@ -35,10 +35,19 @@ class EraserWidgetTest : public cx::EraserWidget
 		cx::EraserWidget::removeSlot();
 	}
 
+	void callDuplicateSlot()
+	{
+		cx::EraserWidget::duplicateSlot();
+	}
+
+	void callSaveSlot()
+	{
+		cx::EraserWidget::saveSlot();
+	}
+
 };
 
 }
-
 
 TEST_CASE("EraserWidget: Remove slot, test no crash for empty patient", "[unit][gui][widget]")
 {
@@ -53,7 +62,36 @@ TEST_CASE("EraserWidget: Remove slot, test no crash for empty patient", "[unit][
 	CHECK(true);
 
 	delete eraserWidget;
+}
 
+TEST_CASE("EraserWidget: Duplicate slot, test no crash for empty patient", "[unit][gui][widget]")
+{
+	QWidget* testParent = new QWidget();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
+	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
+
+	EraserWidgetTest* eraserWidget = new EraserWidgetTest(patientModelService, viewService, testParent);
+
+	eraserWidget->callDuplicateSlot();
+
+	CHECK(true);
+
+	delete eraserWidget;
+}
+
+TEST_CASE("EraserWidget: Save slot, test no crash for empty patient", "[unit][gui][widget]")
+{
+	QWidget* testParent = new QWidget();
+	cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject(); //mock PatientModelService with the null object
+	cx::ViewServicePtr viewService = cx::ViewService::getNullObject(); //mock
+
+	EraserWidgetTest* eraserWidget = new EraserWidgetTest(patientModelService, viewService, testParent);
+
+	eraserWidget->callSaveSlot();
+
+	CHECK(true);
+
+	delete eraserWidget;
 }
 
 }//namespace cxtest
