@@ -4,12 +4,16 @@
 #include <vtkPolyData.h>
 #include "cxBranchList.h"
 #include "cxBranch.h"
+#include "cxPointMetric.h"
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
 #include <QDir>
 #include "cxTime.h"
 #include "cxVisServices.h"
 #include <QTextStream>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QList>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -50,18 +54,20 @@ Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_
 	return CLpoints;
 }
 
-void RouteToTarget::processCenterline(vtkPolyDataPtr centerline_r)
+void RouteToTarget::processCenterline(MeshPtr mesh)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-    Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
+	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
-    mBranchListPtr->findBranchesInCenterline(CLpoints_r);
+		Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
+
+		mBranchListPtr->findBranchesInCenterline(CLpoints_r);
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
-    //mBranchListPtr->smoothBranchPositions(40);
+		//mBranchListPtr->smoothBranchPositions(40);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -111,39 +117,42 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	if (!searchBranchPtr)
 		return;
 
-    std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
-    //std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
+	std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+	//std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
-        mRoutePositions.push_back(positions[i]);
+		mRoutePositions.push_back(positions[i]);
 
-    BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
-    if (parentBranchPtr)
-        searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
+	mBranchingIndex.push_back(mRoutePositions.size()-1);
+
+	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
+	if (parentBranchPtr)
+		searchBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(Vector3D targetCoordinate_r)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint)
 {
-    mTargetPosition = targetCoordinate_r;
-    findClosestPointInBranches(targetCoordinate_r);
+	mTargetPosition = targetPoint->getCoordinate();
+
+	findClosestPointInBranches(mTargetPosition);
 	findRoutePositions();
 
-    vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
+	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
 	return retval;
 }
 
-vtkPolyDataPtr RouteToTarget::findExtendedRoute(Vector3D targetCoordinate_r)
+vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 {
-    mTargetPosition = targetCoordinate_r;
+		mTargetPosition = targetPoint->getCoordinate();
     double extentionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
 	if(mRoutePositions.size() > 0)
 	{
-		double extentionDistance = findDistance(mRoutePositions.front(),targetCoordinate_r);
-        Eigen::Vector3d extentionVectorNormalized = ( targetCoordinate_r - mRoutePositions.front() ) / extentionDistance;
+		double extentionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
+				Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extentionDistance;
         int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
         Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 
@@ -332,6 +341,74 @@ double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
 
     return routeLenght;
 }
+
+
+void RouteToTarget::makeMarianaCenterlineFile(QString filename)
+{
+	if (mExtendedRoutePositions.empty())
+	{
+			std::cout << "mExtendedRoutePositions is empty." << std::endl;
+			return;
+	}
+
+	int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
+
+	ofstream out(filename.toStdString().c_str());
+	out << "# [xPos yPos zPos BranchingPoint (0=Normal, 1=Branching position, 2=Extended from airway to target)] ";
+	out << "Number of positions: ";
+	out << mExtendedRoutePositions.size(); // write number of positions
+	out << "\n";
+
+	 for (int i = 1; i < mExtendedRoutePositions.size(); i++)
+	 {
+			out <<  mExtendedRoutePositions[i](0) << " "; // write x coordinate
+			out <<  mExtendedRoutePositions[i](1) << " "; // write y coordinate
+			out <<  mExtendedRoutePositions[i](2) << " "; // write z coordinate
+
+			if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
+					out <<  "1 ";
+			else if (i <= numberOfExtendedPositions)
+				out <<  "2 ";
+			else
+					out <<  "0 ";
+
+			out << "\n";
+	 }
+
+	 out.close();
+}
+
+QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
+{
+	QJsonArray array;
+	if ( mRoutePositions.empty() || mExtendedRoutePositions.empty() )
+	{
+			std::cout << "mRoutePositions is empty." << std::endl;
+			return array;
+	}
+
+	int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
+
+	for (int i = 1; i < mExtendedRoutePositions.size(); i++)
+	{
+		QJsonObject position;
+		position.insert( "x", mExtendedRoutePositions[i](0) );
+		position.insert( "y", mExtendedRoutePositions[i](1) );
+		position.insert( "z", mExtendedRoutePositions[i](2) );
+
+		if ( std::find(mBranchingIndex.begin(), mBranchingIndex.end(), i - numberOfExtendedPositions) != mBranchingIndex.end() )
+			position.insert("Flag", 1);
+		else if (i <= numberOfExtendedPositions)
+			position.insert("Flag", 2);
+		else
+			position.insert("Flag", 0);
+
+		array.append(position);
+	 }
+
+	 return array;
+}
+
 
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line)
 {

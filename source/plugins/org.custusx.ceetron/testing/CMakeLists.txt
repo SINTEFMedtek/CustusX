@@ -5,6 +5,7 @@ if(BUILD_TESTING)
     set(CX_TEST_CATCH_ORG_CUSTUSX_CEETRON_SOURCE_FILES
         ${CX_TEST_CATCH_ORG_CUSTUSX_CEETRON_MOC_SOURCE_FILES}
         cxtestCeetronPlugin.cpp
+        cxtestCgeoTestFunctions.h
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
     )
 
@@ -23,6 +24,7 @@ if(BUILD_TESTING)
         org_custusx_ceetron
         cxResource
         cxtestUtilities
+        cxResourceVisualization
         cxCatch)
     cx_add_tests_to_catch(cxtest_org_custusx_ceetron)
 

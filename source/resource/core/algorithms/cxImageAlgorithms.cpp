@@ -28,6 +28,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTime.h"
 #include "cxVolumeHelpers.h"
 
+#include "cxSlicedImageProxy.h"
+#include "cxSliceProxy.h"
+
 
 namespace cx
 {
@@ -156,7 +159,107 @@ QDateTime extractTimestamp(QString text)
   return QDateTime();
 }
 
+//From https://www.vtk.org/Wiki/VTK/Examples/Cxx/Qt/ImageDataToQImage
+QImage vtkImageDataToQImage(vtkImageDataPtr imageData, bool overlay, QColor overlayColor)
+{
+	if ( !imageData ) { return QImage(); }
 
+	int width = imageData->GetDimensions()[0];
+	int height = imageData->GetDimensions()[1];
 
+	QImage image( width, height, QImage::Format_ARGB32 ); //32 bit
+	QRgb *rgbPtr = reinterpret_cast<QRgb *>( image.bits() ) + width * ( height - 1 );
+	unsigned char *colorsPtr = reinterpret_cast<unsigned char *>( imageData->GetScalarPointer() );
+
+	// Loop over the vtkImageData contents.
+	for ( int row = 0; row < height; row++ )
+	{
+		for ( int col = 0; col < width; col++ )
+		{
+			// Swap the vtkImageData RGB values with an equivalent QColor
+			*( rgbPtr++ ) = convertToQColor(colorsPtr, overlay, overlayColor);
+
+			colorsPtr += imageData->GetNumberOfScalarComponents();
+		}
+
+		rgbPtr -= width * 2;
+	}
+
+	return image;
+}
+
+QRgb convertToQColor(unsigned char *colorsPtr, bool overlay, QColor overlayColor)
+{
+	if(overlay)
+		return modifyOverlayColor(colorsPtr, overlayColor);
+
+	//32 bit
+	QRgb rgb;
+	rgb = QColor(colorsPtr[0], colorsPtr[1], colorsPtr[2], colorsPtr[3] ).rgba();
+	//	rgb = QColor(colorsPtr[0], colorsPtr[1], colorsPtr[2], opacity ).rgba(); //Don't use alpha for now
+
+	return rgb;
+}
+
+bool isDark(unsigned char *colorsPtr)
+{
+	unsigned char threshold = 10;
+	if (colorsPtr[0] < threshold &&
+			colorsPtr[1] < threshold &&
+			colorsPtr[2] < threshold)
+		return true;
+	return false;
+}
+
+QRgb modifyOverlayColor(unsigned char *colorsPtr, QColor overlayColor)
+{
+	if(isDark(colorsPtr))
+		overlayColor.setAlpha(0);
+
+	QRgb retval = overlayColor.rgba();
+	return retval;
+}
+
+vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outputSpacing, Eigen::Array3i outputDimensions, ToolPtr sliceTool, PatientModelServicePtr patientModel, bool applyLUT)
+{
+	vtkImageDataPtr retval = vtkImageDataPtr::New();
+
+	if(!image || !patientModel)
+	{
+		return retval;
+	}
+
+	cx::SliceProxyPtr proxy = cx::SliceProxy::create(patientModel);
+	SlicedImageProxyPtr imageSlicer(new SlicedImageProxy);
+
+	proxy->setTool(sliceTool);
+
+	imageSlicer->setSliceProxy(proxy);
+	imageSlicer->setImage(image);
+
+	proxy->initializeFromPlane(planeType, false, false, 1, 0);
+	proxy->setClinicalApplicationToFixedValue(mdRADIOLOGICAL);//Always create slices in radiological view
+
+	// Using these values centers image in view, but seems to lock the manual image movement in some directions.
+	double screenX = outputDimensions[0]*outputSpacing[0] / 2;
+	double screenY = outputDimensions[1]*outputSpacing[1] / 2;
+
+	imageSlicer->setOutputFormat(Vector3D(-screenX,-screenY,0), outputDimensions, outputSpacing);
+
+	imageSlicer->update();
+	if (applyLUT)
+	{
+		imageSlicer->getOutputPort()->Update();
+		retval->DeepCopy(imageSlicer->getOutput());
+	}
+	else //Don't use LUT
+	{
+		imageSlicer->getOutputPortWithoutLUT()->Update();
+		retval->DeepCopy(imageSlicer->getOutputWithoutLUT());
+
+	}
+
+	return retval;
+}
 
 } // namespace cx

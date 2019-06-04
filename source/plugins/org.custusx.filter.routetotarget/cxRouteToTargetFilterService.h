@@ -38,14 +38,14 @@ class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public Filte
 	Q_INTERFACES(cx::Filter)
 
 public:
-    RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile = false);
+	RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile = false);
 	virtual ~RouteToTargetFilter() {}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-    static QString getNameSuffix();
-    static QString getNameSuffixExtension();
+	static QString getNameSuffix();
+	static QString getNameSuffixExtension();
 
 	virtual bool execute();
 	virtual bool postProcess();

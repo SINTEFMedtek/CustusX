@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "catch.hpp"
 
-TEST_CASE("ExamplePlugin: Check nothing", "[unit][plugins][org.custusx.example][hide]")
+TEST_CASE("WebServerPlugin: Check nothing", "[unit][plugins][org.custusx.example][hide]")
 {
 	CHECK(true);
 }
