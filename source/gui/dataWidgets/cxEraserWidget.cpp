@@ -226,7 +226,6 @@ void EraserWidget::eraseVolume(TYPE* volumePointer)
 
 	Eigen::Array3i lowVoxIdx = (c - scaledRadius).floor().cast<int>();
 	lowVoxIdx = lowVoxIdx.max(0);
-
 	Eigen::Array3i highVoxIdx = (c + scaledRadius).ceil().cast<int>();
 	highVoxIdx = highVoxIdx.min(dim);
 
