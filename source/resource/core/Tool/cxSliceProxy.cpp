@@ -165,6 +165,15 @@ void SliceProxy::clinicalApplicationChangedSlot()
 	changed();
 }
 
+void SliceProxy::setClinicalApplicationToFixedValue(CLINICAL_VIEW application)
+{
+	//Don't allow any changes to clinical application if this has been specifically set.
+	disconnect(mDataManager.get(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
+
+	mCutplane->setClinicalApplication(application);
+	changed();
+}
+
 /**Group the typical plane definition uses together.
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, bool useViewOffset, double viewportHeight, double toolViewOffset)
