@@ -35,9 +35,9 @@ public:
     void setBranches(BranchListPtr branches);
     void processCenterline(vtkPolyDataPtr centerline_r);
     void processCenterline(Eigen::MatrixXd CLpoints_r);
-    vtkPolyDataPtr generateTubes(double radius = 0);
+    vtkPolyDataPtr generateTubes(double staticRadius = 0);
     vtkImageDataPtr initializeAirwaysVolume();
-    vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double radius = 0);
+    vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double staticRadius = 0);
     vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
     vtkPolyDataPtr getVTKPoints();
