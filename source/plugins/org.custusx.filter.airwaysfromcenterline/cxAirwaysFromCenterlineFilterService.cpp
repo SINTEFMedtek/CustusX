@@ -96,7 +96,7 @@ void AirwaysFromCenterlineFilter::createOutputTypes()
 
     StringPropertySelectMeshPtr tempSmoothedCenterlineMeshStringAdapter;
     tempSmoothedCenterlineMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-    tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed enterline");
+		tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed centerline");
     tempSmoothedCenterlineMeshStringAdapter->setHelp("Smoothed centerline (vtk-format).");
     mOutputTypes.push_back(tempSmoothedCenterlineMeshStringAdapter);
 }
