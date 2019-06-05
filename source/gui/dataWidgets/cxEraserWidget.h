@@ -74,7 +74,7 @@ private:
 	ViewServicePtr mViewService;
 	ActiveDataPtr mActiveData;
 
-private slots:
+protected slots:
 	void toggleShowEraser(bool on);
 	void toggleContinous(bool on);
 	void saveSlot();
