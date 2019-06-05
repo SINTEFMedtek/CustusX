@@ -166,8 +166,8 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	if (!searchBranchPtr)
 		return;
 
-	std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
-	//std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
+	//std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+	std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 		mRoutePositions.push_back(positions[i]);
@@ -184,8 +184,8 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 	if (!searchBranchPtr)
 		return;
 
-	std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
-	//std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
+	//std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+	std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 		mBloodVesselRoutePositions.push_back(positions[i]);
@@ -280,6 +280,7 @@ vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
 		return airwayMesh;
 
 	AirwaysFromCenterlinePtr airwaysFromBVCenterlinePtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
+	airwaysFromBVCenterlinePtr->setTypeToBloodVessel(true);
 	//airwaysFromBVCenterlinePtr->processCenterline(mConnectedPointsInBVCL);
 	mBloodVesselBranchListPtr->interpolateBranchPositions(5);
 	airwaysFromBVCenterlinePtr->setBranches(mBloodVesselBranchListPtr);

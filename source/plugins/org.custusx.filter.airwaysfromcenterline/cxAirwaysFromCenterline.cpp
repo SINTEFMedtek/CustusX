@@ -37,6 +37,11 @@ AirwaysFromCenterline::~AirwaysFromCenterline()
 {
 }
 
+void AirwaysFromCenterline::setTypeToBloodVessel(bool bloodVessel)
+{
+	mBloodVessel = bloodVessel;
+}
+
 Eigen::MatrixXd AirwaysFromCenterline::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
 
@@ -142,6 +147,8 @@ vtkImageDataPtr AirwaysFromCenterline::initializeAirwaysVolume()
     mBounds[3] += mAirwaysVolumeBoundaryExtention;
     mBounds[4] -= mAirwaysVolumeBoundaryExtention;
     mBounds[5] -= mAirwaysVolumeBoundaryExtentionTracheaStart; // to make top of trachea open
+    if (mBloodVessel)
+    	mBounds[5] += mAirwaysVolumeBoundaryExtention;
 
     mSpacing[0] = mAirwaysVolumeSpacing;  //Smaller spacing improves resolution but increases run-time
     mSpacing[1] = mAirwaysVolumeSpacing;

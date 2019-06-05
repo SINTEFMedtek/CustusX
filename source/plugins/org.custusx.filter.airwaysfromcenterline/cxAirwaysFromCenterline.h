@@ -30,6 +30,7 @@ class org_custusx_filter_airwaysfromcenterline_EXPORT AirwaysFromCenterline
 public:
     AirwaysFromCenterline();
     virtual ~AirwaysFromCenterline();
+    void setTypeToBloodVessel(bool bloodVessel);
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
     void setBranches(BranchListPtr branches);
     void processCenterline(vtkPolyDataPtr centerline_r);
@@ -51,6 +52,7 @@ private:
     double mAirwaysVolumeBoundaryExtention;
     double mAirwaysVolumeBoundaryExtentionTracheaStart;
     double mAirwaysVolumeSpacing;
+    bool mBloodVessel = false;
 
 };
 
