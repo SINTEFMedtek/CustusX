@@ -220,7 +220,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 	if(mRoutePositions.size() > 0)
 	{
 		double extentionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
-				Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extentionDistance;
+		Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extentionDistance;
         int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
         Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
 
@@ -249,15 +249,16 @@ vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshP
 	vtkPolyDataPtr BVcenterline_r = bloodVesselCenterlineMesh->getTransformedPolyDataCopy(bloodVesselCenterlineMesh->get_rMd());
 	Eigen::MatrixXd BVCLpoints_r = getCenterlinePositions(BVcenterline_r);
 
-	Eigen::MatrixXd::Index closestBVCLIndex = dsearch(targetPoint->getCoordinate(), BVCLpoints_r).first;
-	//Eigen::MatrixXd::Index closestBVCLIndex = minDistanceToBVCenterline.first;
+	//Eigen::MatrixXd::Index closestBVCLIndex = dsearch(targetPoint->getCoordinate(), BVCLpoints_r).first;
+	Eigen::MatrixXd::Index closestBVCLIndex = dsearch(mRoutePositions[0], BVCLpoints_r).first;
 
 	mConnectedPointsInBVCL = findLocalPointsInCT(closestBVCLIndex , BVCLpoints_r);
 
 	if (mRoutePositions.empty())
 		return retval;
 
-	Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], mConnectedPointsInBVCL).first;
+	//Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], mConnectedPointsInBVCL).first;
+	Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], mConnectedPointsInBVCL).first;;
 
 	//setting position closest to RTT from airways in first index, where RTT should  continue
 	mConnectedPointsInBVCL.col(mConnectedPointsInBVCL.cols()-1).swap(mConnectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
@@ -300,8 +301,25 @@ vtkPolyDataPtr RouteToTarget::getConnectedAirwayAndBloodVesselRoute()
 	if ( mBloodVesselRoutePositions.empty() )
 		return addVTKPoints(mRoutePositions);
 
+	if ( findDistance(mRoutePositions.front(),mTargetPosition) < findDistance(mBloodVesselRoutePositions.front(),mTargetPosition) )
+	{
+		CX_LOG_INFO() << "No improved route to target found along blood vessels";
+		return addVTKPoints(mRoutePositions); // do not add blood vessel route if that is not leading closer to target than airway route alone
+	}
+
 	std::vector< Eigen::Vector3d > mergedPositions = mBloodVesselRoutePositions;
 	mergedPositions.insert( mergedPositions.end(), mRoutePositions.begin(), mRoutePositions.end() );
+
+	double extentionPointIncrement = 0.25; //mm
+	double extentionDistance = findDistance(mergedPositions.front(),mTargetPosition);
+	Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mergedPositions.front() ) / extentionDistance;
+	int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
+	Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
+
+	for (int i = 1; i<= numberOfextentionPoints; i++)
+	{
+		mergedPositions.insert(mergedPositions.begin(), mBloodVesselRoutePositions.front() + extentionPointIncrementVector*i);
+	}
 
 	mergedRoute = addVTKPoints(mergedPositions);
 
