@@ -35,6 +35,7 @@ public:
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint);
 	vtkPolyDataPtr generateAirwaysFromBloodVesselCenterlines();
+	bool makeConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr getConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
@@ -56,17 +57,22 @@ private:
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
 	std::vector< Eigen::Vector3d > mBloodVesselRoutePositions;
+	std::vector< Eigen::Vector3d > mMergedAirwayAndBloodVesselRoutePositions;
 	std::vector< int > mBranchingIndex;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	Eigen::MatrixXd mConnectedPointsInBVCL;
 	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 	bool checkIfRouteToTargetEndsAtEndOfLastBranch();
+	bool mPathToBloodVesselsFound = false;
 };
 
-Eigen::MatrixXd findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
-double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
+//Eigen::MatrixXd removeSmallAndPeripheralBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions);
+Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition);
+std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
+double findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
+Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
 
 } /* namespace cx */
 
