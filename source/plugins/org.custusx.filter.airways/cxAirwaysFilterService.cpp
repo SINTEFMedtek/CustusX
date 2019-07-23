@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBranchList.h"
 #include "cxBronchoscopyRegistration.h"
 #include "cxAirwaysFromCenterline.h"
+#include "cxVolumeHelpers.h"
 
 #include "cxTime.h"
 #include "cxTypeConversions.h"
@@ -101,6 +102,11 @@ QString AirwaysFilter::getNameSuffixLungs()
 QString AirwaysFilter::getNameSuffixVessels()
 {
 	return "_vessels";
+}
+
+QString AirwaysFilter::getNameSuffixVolume()
+{
+	return "_volume";
 }
 
 Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
@@ -578,6 +584,17 @@ bool AirwaysFilter::postProcessVessels()
 	patientService()->insertData(bloodVesselsCenterline);
 	mOutputTypes[5]->setValue(bloodVesselsCenterline->getUid());
 
+
+	//Create segmented volume output
+	QString uidVolume = mInputImage->getUid() + AirwaysFilter::getNameSuffixVessels() + AirwaysFilter::getNameSuffixVolume() + "%1";
+	QString nameVolume =  mInputImage->getName() + AirwaysFilter::getNameSuffixVessels() + AirwaysFilter::getNameSuffixVolume() + "%1";
+	ImagePtr outputVolume = createDerivedImage(mServices->patient(),
+	                                         uidVolume, nameVolume,
+											 mBloodVesselSegmentationOutput, mInputImage);
+	outputVolume->mergevtkSettingsIntosscTransform();
+	patientService()->insertData(outputVolume);
+	mOutputTypes[7]->setValue(outputVolume->getUid());
+
 	return true;
 }
 
@@ -635,12 +652,12 @@ void AirwaysFilter::createOutputTypes()
 	StringPropertySelectMeshPtr tempMeshStringAdapter;
 	std::vector<std::pair<QString, QString>> valueHelpPairs;
 	valueHelpPairs.push_back(std::make_pair(tr("Airway Centerline"), tr("Generated centerline mesh (vtk-format).")));
-	valueHelpPairs.push_back(std::make_pair(tr("Airway Segmentation"), tr("Generated surface of the airway segmentation volume.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Airway Segmentation Mesh"), tr("Generated surface of the airway segmentation volume.")));
 	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Centerline"), tr("Centerlines with straight lines between the branch points.")));
-	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Tubes"), tr("Tubes based on the straight centerline")));
-	valueHelpPairs.push_back(std::make_pair(tr("Lung Segmentation"), tr("Generated surface of the lung segmentation volume.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Tubes Mesh"), tr("Tubes based on the straight centerline")));
+	valueHelpPairs.push_back(std::make_pair(tr("Lung Segmentation Mesh"), tr("Generated surface of the lung segmentation volume.")));
 	valueHelpPairs.push_back(std::make_pair(tr("Blood Vessel Centerlines"), tr("Segmented blood vessel centerlines.")));
-	valueHelpPairs.push_back(std::make_pair(tr("Blood Vessels"), tr("Segmented blood vessels in the lungs.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Blood Vessels Mesh"), tr("Segmented blood vessels in the lungs.")));
 
 	foreach(auto pair, valueHelpPairs)
 	{
@@ -649,6 +666,11 @@ void AirwaysFilter::createOutputTypes()
 		tempMeshStringAdapter->setHelp(pair.second);
 		mOutputTypes.push_back(tempMeshStringAdapter);
 	}
+
+	StringPropertySelectImagePtr tempVolumeStringAdapter = StringPropertySelectImage::New(patientService());
+	tempVolumeStringAdapter->setValueName("Blood Vessels Volume");
+	tempVolumeStringAdapter->setHelp("Volume of segmented blood vessels in the lungs.");
+	mOutputTypes.push_back(tempVolumeStringAdapter);
 }
 
 

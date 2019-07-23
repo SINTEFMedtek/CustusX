@@ -59,6 +59,7 @@ public:
 	static QString getNameSuffixTubes();
 	static QString getNameSuffixLungs();
 	static QString getNameSuffixVessels();
+	static QString getNameSuffixVolume();
 
     bool preProcess();
 	virtual bool execute();
