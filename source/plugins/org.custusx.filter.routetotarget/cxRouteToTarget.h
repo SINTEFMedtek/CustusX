@@ -21,6 +21,7 @@ class org_custusx_filter_routetotarget_EXPORT RouteToTarget
 public:
 	RouteToTarget();
 	virtual ~RouteToTarget();
+	void setBloodVesselVolume(ImagePtr bloodVesselVolume);
 	//void setCenterline(vtkPolyDataPtr centerline);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void processCenterline(MeshPtr mesh);
@@ -41,6 +42,8 @@ public:
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
 	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
+	void RouteToTarget::setBloodVesselRadius();
+	double calculateBloodVesselRadius(Eigen::Vector3d position, Eigen::Vector3d orientation);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
 
@@ -53,6 +56,7 @@ private:
 	BranchPtr mProjectedBloodVesselBranchPtr;
 	int mProjectedIndex;
 	int mProjectedBloodVesselIndex;
+	ImagePtr mBloodVesselVolume;
 	Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
@@ -73,6 +77,7 @@ std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLI
 double findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
+Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B);
 
 } /* namespace cx */
 

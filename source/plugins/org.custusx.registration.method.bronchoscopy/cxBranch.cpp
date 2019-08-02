@@ -40,6 +40,16 @@ Eigen::MatrixXd Branch::getOrientations()
 	return mOrientations;
 }
 
+void Branch::setRadius(Eigen::VectorXd r)
+{
+	mRadius = r;
+}
+
+Eigen::VectorXd Branch::getRadius()
+{
+	return mRadius;
+}
+
 void Branch::addChildBranch(BranchPtr child)
 {
 	mChildBranches.push_back(child);
