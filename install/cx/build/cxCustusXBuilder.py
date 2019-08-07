@@ -11,6 +11,7 @@
 #####################################################
 
 from __future__ import absolute_import
+from builtins import object
 import logging
 import time    
 import subprocess
@@ -27,7 +28,7 @@ from . import cxTestRunner
 from . import cxCustusXInstaller
 import cx.utils.cxClean_sloccount
 
-class CustusXBuilder:
+class CustusXBuilder(object):
     '''
     Utilities for building and testing CustusX.
     '''

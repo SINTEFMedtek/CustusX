@@ -11,12 +11,15 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
 import subprocess
 import argparse
 import re
 import sys
 import os.path
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 
@@ -76,7 +79,7 @@ Available components are:
 
     def _promptToContinue(self, silent_mode):
         if not silent_mode:
-            raw_input("\nPress enter to continue or ctrl-C to quit:")
+            input("\nPress enter to continue or ctrl-C to quit:")
 
     def run(self):
         options = self.options

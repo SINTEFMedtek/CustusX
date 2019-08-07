@@ -12,12 +12,16 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import subprocess
 import optparse
 import re
 import sys
 import os.path
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 import shutil
@@ -25,7 +29,7 @@ from . import cxRepoHandler
 
 from .cxShell import *
     
-class CppBuilder:
+class CppBuilder(object):
     '''
     Contains methods for working on a cpp project
     '''
@@ -205,10 +209,10 @@ class CppBuilder:
         add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)
     
     def _assembleOptions(self):
-        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.iteritems()])
+        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.items()])
     
     def _printOptions(self):
-        options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.iteritems()])
+        options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.items()])
         print("*** CMake Options:\n", options)
 
     def _changeDirToBase(self):

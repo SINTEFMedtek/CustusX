@@ -9,9 +9,11 @@
 #################################################             
 
 from __future__ import print_function
+from builtins import range
+from builtins import object
 import time
 
-class PrintFormatterClass:                    
+class PrintFormatterClass(object):                    
     def __init__(self):
         self._startTime = time.time()
 

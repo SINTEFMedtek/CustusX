@@ -12,6 +12,7 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import object
 import logging
 import time    
 import subprocess
@@ -30,7 +31,7 @@ from . import cxInstallData
 from . import cxComponents
 from . import cxComponentAssembly
 
-class CustusXInstaller:
+class CustusXInstaller(object):
     '''
     Given a compiled CustusX package,
     Functionality for installing and publishing releases.

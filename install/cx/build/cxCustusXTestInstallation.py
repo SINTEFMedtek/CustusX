@@ -11,6 +11,8 @@
 #####################################################
 
 from __future__ import absolute_import
+from builtins import range
+from builtins import object
 import logging
 import time    
 import subprocess
@@ -29,7 +31,7 @@ from . import cxComponentAssembly
 from . import cxTestRunner
 
    
-class CustusXTestInstallation:
+class CustusXTestInstallation(object):
     '''
     Represents one installed version of CustusX,
     along with functionality for testing it.

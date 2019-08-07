@@ -7,17 +7,18 @@
 #################################################  
 
 from __future__ import print_function
+from builtins import object
 import subprocess
 import platform
 
-class ShellCommand:
-    class ReturnValue:
+class ShellCommand(object):
+    class ReturnValue(object):
         'used as return value from shell command'
         def __init__(self, stdout=None, returncode=0, process=None):
             self.stdout = stdout
             self.returncode = returncode
             self.process = process
-        def __nonzero__(self):
+        def __bool__(self):
             'makes type convertible to bool - evaluate to True when zero retcode.'
             return self.returncode == 0        
     

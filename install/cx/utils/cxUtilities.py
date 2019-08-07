@@ -11,6 +11,7 @@
 #####################################################
     
 from __future__ import print_function
+from builtins import object
 import os
 import os.path
 import platform
@@ -113,7 +114,7 @@ def getPathToModule():
     modulePath = os.path.abspath(modulePath)
     return modulePath
 
-class PlatformInfo:
+class PlatformInfo(object):
     '''
     Describes the operating system.
     Defines a unique string for the target os.

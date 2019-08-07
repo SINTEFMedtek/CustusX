@@ -6,6 +6,8 @@ from __future__ import print_function
 #
 #####################################################
 
+from builtins import input
+from builtins import object
 import os.path
 import os
 import sys
@@ -45,7 +47,7 @@ def getBranchForRepo(path, fallback=None):
     return branch
 
 
-class RepoHandler:
+class RepoHandler(object):
     '''
     Handle git repository URL, tag, branch when checking out and updating the repo
     tasks:
@@ -172,5 +174,5 @@ class RepoHandler:
     
     def _promptToContinue(self, do_it):
         if do_it:
-            raw_input("\nPress enter to continue or ctrl-C to quit:")
+            input("\nPress enter to continue or ctrl-C to quit:")
     

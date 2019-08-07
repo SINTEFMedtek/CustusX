@@ -7,6 +7,7 @@ from __future__ import absolute_import
 #
 #####################################################
 #import paramiko
+from builtins import object
 import os
 import os.path
 from . import cxUtilities
@@ -14,7 +15,7 @@ import platform
 import getpass
 import pkg_resources
 
-class RemoteServerID:
+class RemoteServerID(object):
     '''
     Information about a remote server
     '''
@@ -35,7 +36,7 @@ class RemoteServerID:
         return retval
 
 
-class RemoteFileTransfer:
+class RemoteFileTransfer(object):
     def __init__(self):
         self.paramiko = cxUtilities.try_paramiko_import()
         print('paramiko version:', pkg_resources.get_distribution("paramiko").version)

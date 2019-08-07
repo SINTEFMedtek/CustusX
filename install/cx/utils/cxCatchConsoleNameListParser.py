@@ -12,12 +12,13 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
+from builtins import object
 import sys
 import re
 import pprint
 from . import cxUtilities
 
-class CatchCustomXmlNameListParser:
+class CatchCustomXmlNameListParser(object):
     '''
     Parser providing the test names and tags from
     the "catch --list-tests --reporter xml" call.
@@ -52,7 +53,7 @@ class CatchCustomXmlNameListParser:
                 newtext+=line
         return newtext
 
-class CatchConsoleNameListParser:
+class CatchConsoleNameListParser(object):
     '''
     Parser providing the test names and tags from 
     the original "catch --list-tests" call

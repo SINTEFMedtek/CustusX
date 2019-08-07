@@ -11,6 +11,7 @@
 #################################################
 
 from __future__ import print_function
+from builtins import object
 import argparse
 import os
 import fnmatch
@@ -105,7 +106,7 @@ class GitRepository(object):
 # http://misc.flogisoft.com/bash/tip_colors_and_formatting
 #
 #################################################
-class TextColor:
+class TextColor(object):
     if(platform.system() == 'Windows'):
         INFO = ''
         CLEAN = ''
