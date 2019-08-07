@@ -10,6 +10,7 @@
 #
 #####################################################
 
+from __future__ import absolute_import
 import logging
 import time    
 import subprocess
@@ -22,10 +23,10 @@ import shlex
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
 import cx.utils.cxUtilities
-import cxInstallData
-import cxComponents
-import cxComponentAssembly
-import cxTestRunner
+from . import cxInstallData
+from . import cxComponents
+from . import cxComponentAssembly
+from . import cxTestRunner
 
    
 class CustusXTestInstallation:

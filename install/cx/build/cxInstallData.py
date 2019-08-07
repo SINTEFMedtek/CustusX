@@ -30,6 +30,7 @@
 #             
 #################################################             
 
+from __future__ import print_function
 import subprocess
 import optparse
 import re
@@ -98,20 +99,20 @@ class Common(object):
         self.system_base_name = "CustusX"
 
     def printSettings(self):
-        print ''
-        print 'Settings:'
-        print '    system_base_name:', self.system_base_name
-        print '    root path: %s ' % self.getRootDir()
-        print '    build type:', self.getBuildType()
-        print '    platform:', platform.system()
-        print '    git tag:', self.git_tag
-        print '    git branch:', self.main_branch
-        print ''
-        print '    CMakeGenerator:', self.getCMakeGenerator()
-        print '    BuildTesting:', self.mBuildTesting
-        print '    Coverage:', self.mCoverage
-        print '    Make dependency graph:', self.mGraphviz
-        print ''
+        print('')
+        print('Settings:')
+        print('    system_base_name:', self.system_base_name)
+        print('    root path: %s ' % self.getRootDir())
+        print('    build type:', self.getBuildType())
+        print('    platform:', platform.system())
+        print('    git tag:', self.git_tag)
+        print('    git branch:', self.main_branch)
+        print('')
+        print('    CMakeGenerator:', self.getCMakeGenerator())
+        print('    BuildTesting:', self.mBuildTesting)
+        print('    Coverage:', self.mCoverage)
+        print('    Make dependency graph:', self.mGraphviz)
+        print('')
 
     def getArgParser_core_build(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
@@ -158,7 +159,7 @@ class Common(object):
             return
         input = os.path.abspath(self.root_dir)
         if self.getRootDir() != input:
-            print "!!! WARNING: deprecated input root path=[%s] is different from generated value [%s]" % (input, self.getRootDir())
+            print("!!! WARNING: deprecated input root path=[%s] is different from generated value [%s]" % (input, self.getRootDir()))
 
     def getCMakeGenerator(self):
         if self.xcode:

@@ -8,6 +8,7 @@
 #
 #################################################             
 
+from __future__ import print_function
 import time
 
 class PrintFormatterClass:                    
@@ -19,23 +20,23 @@ class PrintFormatterClass:
         if level < 3:
             self.printLine()
         else:
-            print ''
+            print('')
 
         # create a line, 80 wide, containing caption and elapsed        
         part1 ='='*20
         part2 = (" %s "%caption).ljust(50, '=')
         part3 = (" %s "%elapsed).ljust(10, '=')
-        print '%s%s%s' % (part1, part2, part3)
+        print('%s%s%s' % (part1, part2, part3))
 
         #print '%s%s%s' % ('='*20, (" %s "%caption).ljust(50, '='), (" %s "%elapsed).ljust(10, '='))
         for i in range(3-level):
             self.printLine()
             
     def printLine(self):
-        print '='*80
+        print('='*80)
 
     def printInfo(self, text):
-            print "*** %s" % text
+            print("*** %s" % text)
 
     def finish(self):
         self.printHeader('Finished', level=3)

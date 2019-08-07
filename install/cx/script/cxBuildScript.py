@@ -7,6 +7,7 @@
 #
 #####################################################
 
+from __future__ import print_function
 import logging
 import time    
 import subprocess
@@ -40,7 +41,7 @@ class BuildScript(object):
         self.__notused__argumentParserArguments = self.argumentParser.parse_args() # display help etc
         arguments = self.applyArgumentParsers(sys.argv[1:])
         if len(arguments)>0:
-            print 'Unused command line arguments: ', arguments
+            print('Unused command line arguments: ', arguments)
         
         #pprint.pprint('All options: ')
         #pprint.pprint(vars(self.__notused__argumentParserArguments))

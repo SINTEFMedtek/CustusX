@@ -10,6 +10,7 @@
 #             
 #################################################
 
+from __future__ import print_function
 import argparse
 import os
 import fnmatch
@@ -24,7 +25,7 @@ import os.path
 #
 #################################################
 def findGitRepositories(path):
-    print "Looking for git repositories in \""+root_path+"\""
+    print("Looking for git repositories in \""+root_path+"\"")
     repositories = []
     for root, dirnames, filenames in os.walk(path):
         for dirname in fnmatch.filter(dirnames, '.git'):
@@ -144,7 +145,7 @@ class Reporter(object):
         a = '*'
         if('[]' in d):
             a = ''
-        print '{0:<1}  {1:<70}  {2:<30}  {3}'.format(a, p, b, d)
+        print('{0:<1}  {1:<70}  {2:<30}  {3}'.format(a, p, b, d))
     
     def __get_repo_path(self, repo):
         path = os.path.relpath(repo.path, self.root_path)        
@@ -175,13 +176,13 @@ class Reporter(object):
         return text
     
     def __print_no_repositories_found(self):
-        print TextColor.ENDC + "No repositories found..." + TextColor.ENDC
+        print(TextColor.ENDC + "No repositories found..." + TextColor.ENDC)
     
     def __print_info(self, text):
-        print TextColor.INFO + text + TextColor.ENDC
+        print(TextColor.INFO + text + TextColor.ENDC)
         
     def __print_newline(self):
-        print " "
+        print(" ")
 
 #################################################
 #
@@ -195,7 +196,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--branch', help='specify which branch you want', default='master')
     args = parser.parse_args()
     
-    print args
+    print(args)
     
     root_path = os.path.abspath(args.root_path)
     git_repositories = findGitRepositories(root_path)

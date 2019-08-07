@@ -10,6 +10,7 @@
 #             
 #################################################             
 
+from __future__ import print_function
 import subprocess
 import optparse
 import re
@@ -53,7 +54,7 @@ class Component(object):
 #        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
-            print "*** %s already exists, checkout ignored." % path
+            print("*** %s already exists, checkout ignored." % path)
             return True
         return False
     def checkout(self):

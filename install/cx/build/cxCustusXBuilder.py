@@ -10,6 +10,7 @@
 #
 #####################################################
 
+from __future__ import absolute_import
 import logging
 import time    
 import subprocess
@@ -19,11 +20,11 @@ import glob
 
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
-import cxInstallData
-import cxComponents
-import cxComponentAssembly
-import cxTestRunner
-import cxCustusXInstaller
+from . import cxInstallData
+from . import cxComponents
+from . import cxComponentAssembly
+from . import cxTestRunner
+from . import cxCustusXInstaller
 import cx.utils.cxClean_sloccount
 
 class CustusXBuilder:

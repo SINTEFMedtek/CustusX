@@ -10,6 +10,7 @@
 #
 #####################################################
 
+from __future__ import absolute_import
 import logging
 import time    
 import subprocess
@@ -22,7 +23,7 @@ import cx.build.cxInstallData
 import cx.build.cxComponents
 import cx.build.cxCustusXBuilder
 import cx.build.cxCustusXTestInstallation
-import cxBuildScript
+from . import cxBuildScript
 
 class Controller(cxBuildScript.BuildScript):
     '''

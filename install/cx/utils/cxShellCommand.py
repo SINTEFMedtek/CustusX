@@ -6,6 +6,7 @@
 #
 #################################################  
 
+from __future__ import print_function
 import subprocess
 import platform
 
@@ -114,10 +115,10 @@ class ShellCommandReal(ShellCommand):
             exit(test)
             
     def _printInfo(self, text):
-        print '[shell info] %s' % text
+        print('[shell info] %s' % text)
     def _printOutput(self, text):
         if self.redirect_output:
-            print '[shell ###] %s' % text
+            print('[shell ###] %s' % text)
         else:
-            print '%s' % text
+            print('%s' % text)
             

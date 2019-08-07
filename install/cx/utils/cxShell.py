@@ -9,6 +9,8 @@
 #
 #################################################             
 
+from __future__ import print_function
+from __future__ import absolute_import
 import subprocess
 import optparse
 import sys
@@ -19,8 +21,8 @@ import shutil
 import re
 import glob
 import argparse        
-import cxArgParse
-import cxShellCommand        
+from . import cxArgParse
+from . import cxShellCommand        
 
       
 
@@ -52,7 +54,7 @@ class Shell (object):
     def applyCommandLine(self, arguments):
         'read command line and apply the own argparser to self'
         arguments = self.getArgParser().parse_known_args(args=arguments, namespace=self)[1]
-        print 'CommandLine: ', vars(self)
+        print('CommandLine: ', vars(self))
         return arguments
     
     def setSilent(self, value):
@@ -162,11 +164,11 @@ class Shell (object):
 
     def _printInfo(self, text):
         if(not self.SILENT):
-            print '[shell info] %s' % text
+            print('[shell info] %s' % text)
             
     def _printCommand(self, text):
         if(not self.SILENT):
-                print '[shell cmd] %s' % text
+                print('[shell cmd] %s' % text)
 
     @staticmethod
     def create():

@@ -10,6 +10,7 @@
 #
 #################################################             
 
+from __future__ import absolute_import
 import subprocess
 import argparse
 import re
@@ -22,8 +23,8 @@ import time
 
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
-import cxInstallData
-import cxComponents
+from . import cxInstallData
+from . import cxComponents
 
 class LibraryAssembly(object):
     '''

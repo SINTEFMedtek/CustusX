@@ -1,3 +1,4 @@
+from __future__ import print_function
 #####################################################
 # 
 # Used by both CustusX and applications built on top of it (wrapper applications).
@@ -23,13 +24,13 @@ def runShell(cmd, path):
     '''
     if not os.path.exists(path):
         os.makedirs(path)
-    print '[shell cmd] %s [%s]' % (cmd, path)
+    print('[shell cmd] %s [%s]' % (cmd, path))
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path)
     out, err = p.communicate("") # wait for process to complete
     if err:
-        print err.strip()
+        print(err.strip())
     if out:
-        print out.strip()
+        print(out.strip())
     if p.returncode == 0:
         return out.strip()
     if "error: The following untracked working tree files would be overwritten" in err:
@@ -80,7 +81,7 @@ class RepoHandler:
         if pathfound:
             return
         
-        print '*** %s will be cloned in [%s]' % (self.getName(), self.root_path)
+        print('*** %s will be cloned in [%s]' % (self.getName(), self.root_path))
         doprompt = not (self.silent or args.silent_mode)
         self._promptToContinue(doprompt)
         
@@ -107,7 +108,7 @@ class RepoHandler:
 
         tag = self.args.git_tag
         if tag:
-            print 'Checking out %s to tag=%s' % (self.getName(), tag)
+            print('Checking out %s to tag=%s' % (self.getName(), tag))
             if runShell('git checkout %s' % tag, self.repo_path) is None:
                 exit("tag checkout failed")
             return
@@ -117,7 +118,7 @@ class RepoHandler:
                     self.fallback_branch]
         branches = self.cleanBranchList(branches)
 
-        print 'Checkout+pull %s to to the first existing branch in list [%s]' % (self.getName(), ','.join(branches))
+        print('Checkout+pull %s to to the first existing branch in list [%s]' % (self.getName(), ','.join(branches)))
         
         for branch in branches:
             result = runShell('git checkout %s' % branch, self.repo_path)
@@ -129,16 +130,16 @@ class RepoHandler:
 
     def checkSuccess(self, gitResult):
         if gitResult is returnCode():
-            print '----------------------------------------------------------------------------'
-            print '|                                     ^                                    |'
-            print '| Delete the folder containing these files and the CustusX build folder.   |'
-            print '----------------------------------------------------------------------------'
-            print '===== Your local file structure of CustusX is not in synch with the file structure on the server ==='
-            print 'This is e.g. because a plugin have been moved from one repository to another on the server.'
-            print 'Take a backup first if you have been working with the files.'
-            print 'To come in sync:'
-            print '- delete the folder containing the above mentioned files and the CustusX build folder.'
-            print '- run the script again.'
+            print('----------------------------------------------------------------------------')
+            print('|                                     ^                                    |')
+            print('| Delete the folder containing these files and the CustusX build folder.   |')
+            print('----------------------------------------------------------------------------')
+            print('===== Your local file structure of CustusX is not in synch with the file structure on the server ===')
+            print('This is e.g. because a plugin have been moved from one repository to another on the server.')
+            print('Take a backup first if you have been working with the files.')
+            print('To come in sync:')
+            print('- delete the folder containing the above mentioned files and the CustusX build folder.')
+            print('- run the script again.')
             sys.exit(1)
 
     def cleanBranchList(self, branches):

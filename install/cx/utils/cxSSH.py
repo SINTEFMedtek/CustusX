@@ -1,3 +1,5 @@
+from __future__ import print_function
+from __future__ import absolute_import
 #####################################################
 # 
 # Author: Christian Askeland, SINTEF Medical Technology
@@ -7,7 +9,7 @@
 #import paramiko
 import os
 import os.path
-import cxUtilities
+from . import cxUtilities
 import platform
 import getpass
 import pkg_resources
@@ -36,12 +38,12 @@ class RemoteServerID:
 class RemoteFileTransfer:
     def __init__(self):
         self.paramiko = cxUtilities.try_paramiko_import()
-        print 'paramiko version:', pkg_resources.get_distribution("paramiko").version
+        print('paramiko version:', pkg_resources.get_distribution("paramiko").version)
 
     def connect(self, remoteServer, user=None):
         self.host_name = remoteServer
 
-        print "connecting to %s, user=%s" % (remoteServer, user)
+        print("connecting to %s, user=%s" % (remoteServer, user))
         self.client = self.paramiko.client.SSHClient()
         self.client.set_missing_host_key_policy(self.paramiko.client.AutoAddPolicy())
         self.client.load_system_host_keys()
@@ -132,18 +134,18 @@ class RemoteFileTransfer:
                 
     def remote_put(self, source, dest):
         dest = dest.replace('\\', '/')
-        print 'remote_put %s -> %s' % (source, dest)
+        print('remote_put %s -> %s' % (source, dest))
         self.sftp.put(source, dest)
         if platform.system() == 'Windows':
-            self.sftp.chmod(dest, 0777) # default is rw for user only on win
+            self.sftp.chmod(dest, 0o777) # default is rw for user only on win
     
     def remote_mkdir(self, path):
         path = path.replace('\\', '/')
-        print 'remote_mkdir %s' % path
+        print('remote_mkdir %s' % path)
         try:
             self.sftp.mkdir(path)
         except IOError:
-            print "Failed to create %s (already exists?)"  % path
+            print("Failed to create %s (already exists?)"  % path)
             
     def remote_rmdir(self, path):
         path = path.replace('\\', '/')
@@ -157,13 +159,13 @@ class RemoteFileTransfer:
 #            print "Failed to remove %s"  % path
 
     def remote_shell_cmd(self, cmd):
-        print 'Executing remote command [%s]' % cmd
+        print('Executing remote command [%s]' % cmd)
         try:
             session = self.client.get_transport().open_channel("session")
             session.exec_command(cmd)
             session.recv_exit_status()
         except IOError:
-            print "Failed to execute command [%s]"  % cmd
+            print("Failed to execute command [%s]"  % cmd)
                 
 def copyFolderContentsToRemoteServer(remoteServer, sourcePath, destPath):
     '''

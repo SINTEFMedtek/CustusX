@@ -18,7 +18,9 @@
 #
 #################################################             
 
-import cxUtilities
+from __future__ import print_function
+from __future__ import absolute_import
+from . import cxUtilities
 import StringIO
 import sys
 
