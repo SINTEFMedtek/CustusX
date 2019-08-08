@@ -120,7 +120,7 @@ class RepoHandler(object):
                     self.fallback_branch]
         branches = self.cleanBranchList(branches)
 
-        print('Checkout+pull %s to to the first existing branch in list [%s]' % (self.getName(), ','.join(branches)))
+        print('Checkout+pull {} to to the first existing branch in list [{}]'.format(self.getName(), ','.join(branches)))
         
         for branch in branches:
             result = runShell('git checkout %s' % branch, self.repo_path)
@@ -148,6 +148,9 @@ class RepoHandler(object):
         retval = []
         for branch in branches:
             if branch and branch not in retval:
+                if type(branch) is bytes:
+                    branch = branch.decode()
+                #print("{} is TYPE: {}".format(branch, type(branch)))
                 retval.append(branch)
         return retval
         

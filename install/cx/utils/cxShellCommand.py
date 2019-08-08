@@ -95,10 +95,11 @@ class ShellCommandReal(ShellCommand):
             if(not self.silent):
                 self._printOutput(line.rstrip())
             if self.keep_output:
+                if type(line) is bytes:
+                    line = line.decode( )
                 output.append(line) 
         p.returncode = self._convertCatchReturnCode139ToSegfault(p.returncode)
         return ShellCommand.ReturnValue(stdout="".join(output), returncode=p.returncode, process=p)
-#        return p
 
     def _readFromProcess(self, process):
         'return an iterable object that reads all stdout from process until completed'
