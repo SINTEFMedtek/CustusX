@@ -33,8 +33,10 @@ def transformXML(sourceXml, xlsTransform):
     xls transform string, return result.
     '''  
     lxml = cxUtilities.try_lxml_import()
-  
-    xmldoc = lxml.etree.parse(io.StringIO(sourceXml))
+
+    bytesio = io.BytesIO(sourceXml)
+    xmldoc = lxml.etree.parse(bytesio)
+
     xslt_root = lxml.etree.XML(xlsTransform)
     transform = lxml.etree.XSLT(xslt_root)
     

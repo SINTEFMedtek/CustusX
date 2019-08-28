@@ -94,7 +94,7 @@ def writeToNewFile(filename, text):
         f.write(text)
 
 def readFile(filename):
-    with open(filename, 'r') as f:
+    with open(filename, 'rb') as f:
         content = f.read()
     return content
 
