@@ -70,6 +70,7 @@ private:
     vtkPolyDataPtr mAirwayAndBloodVesselRoute;
 	QString mTargetName;
     bool mGenerateFileWithRouteInformation;
+    BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 

@@ -95,7 +95,7 @@ QString RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT()
 
 void RouteToTargetFilter::createOptions()
 {
-
+	mOptionsAdapters.push_back(this->getBloodVesselOption(mOptions));
 }
 
 void RouteToTargetFilter::createInputTypes()
@@ -186,36 +186,22 @@ bool RouteToTargetFilter::execute()
 	if (mGenerateFileWithRouteInformation)
 		mRouteToTarget->addRouteInformationToFile(mServices);
 
-	ImagePtr bloodVesselVolume = this->getCopiedInputImage(3);
-
-	MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
-	if (bloodVesselCenterline)
+	if (getBloodVesselOption(mOptions)->getValue())
 	{
-		if (bloodVesselVolume)
+		ImagePtr bloodVesselVolume = this->getCopiedInputImage(3);
+
+		MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+		if (bloodVesselCenterline)
 		{
-			//bloodVesselVolume->setTransferFunctions3D( bloodVesselCenterline->get_rMd().inverse() * bloodVesselVolume->get_rMd() * bloodVesselVolume->getTransferFunctions3D() );
-			mRouteToTarget->setBloodVesselVolume(bloodVesselVolume); // NB! HER MÅ VOLUME TRANSFORMERES TIL KOORDINATSYSTEMET TIL BV CENTERLINJEN
-	//		vtkPolyDataPtr BVcenterline_r = bloodVesselCenterline->getTransformedPolyDataCopy((bloodVesselVolume->get_rMd().inverse())*bloodVesselCenterline->get_rMd());//debug
-	//		//vtkPolyDataPtr BVcenterline_r = bloodVesselCenterline->getTransformedPolyDataCopy(bloodVesselCenterline->get_rMd()); //debug
-	//		Eigen::MatrixXd BVCLpoints_r = mRouteToTarget->getCenterlinePositions(BVcenterline_r); //debug
-	//		Eigen::Vector3d position; //debug
-	//		for (int i=0; i<100; i++)
-	//		{
-	//			position[0] = BVCLpoints_r.col(i)[0]; //debug
-	//			position[1] = BVCLpoints_r.col(i)[1]; //debug
-	//			position[2] = BVCLpoints_r.col(i)[2]; //debug
-	//			double radius = mRouteToTarget->calculateBloodVesselRadius(position, Eigen::Vector3d::UnitZ()); //debug
-	//			std::cout << "Radius: " << radius << std::endl; //debug
-	//		}
+			if (bloodVesselVolume)
+				mRouteToTarget->setBloodVesselVolume(bloodVesselVolume);
+
+			mBloodVesselRoute = mRouteToTarget->findRouteToTargetAlongBloodVesselCenterlines( bloodVesselCenterline, targetPoint);
+			mAirwaysFromBloodVessel = mRouteToTarget->generateAirwaysFromBloodVesselCenterlines();
 		}
 
-		mBloodVesselRoute = mRouteToTarget->findRouteToTargetAlongBloodVesselCenterlines( bloodVesselCenterline, targetPoint);
-		//std::cout << "Number of points in mBloodVesselRoute: " << mBloodVesselRoute->GetNumberOfPoints() << std::endl;
-		mAirwaysFromBloodVessel = mRouteToTarget->generateAirwaysFromBloodVesselCenterlines();
+		mAirwayAndBloodVesselRoute = mRouteToTarget->getConnectedAirwayAndBloodVesselRoute();
 	}
-
-	mAirwayAndBloodVesselRoute = mRouteToTarget->getConnectedAirwayAndBloodVesselRoute();
-
 	return true;
 }
 
@@ -263,7 +249,8 @@ bool RouteToTargetFilter::postProcess()
 	if(mOutputTypes.size() > 1)
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
 
-	if(mBloodVesselRoute)
+	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+	if(mBloodVesselRoute && bloodVesselCenterlineMesh && getBloodVesselOption(mOptions)->getValue())
 	{
 		QString uidCenterlineBV = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixBloodVessel();
 		QString nameCenterlineBV = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixBloodVessel();
@@ -294,20 +281,19 @@ bool RouteToTargetFilter::postProcess()
 				mOutputTypes[4]->setValue(outputMesh->getUid());
 
 		}
+
+		QString uidMergedCenterline = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
+		QString nameMergedCenterline = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
+		MeshPtr outputMergedCenterline = patientService()->createSpecificData<Mesh>(uidMergedCenterline, nameMergedCenterline);
+		outputMergedCenterline->setVtkPolyData(mAirwayAndBloodVesselRoute);
+		outputMergedCenterline->setColor(QColor(0, 255, 0, 255));
+		patientService()->insertData(outputMergedCenterline);
+
+		outputMergedCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
+
+		if(mOutputTypes.size() >3)
+			mOutputTypes[3]->setValue(outputMergedCenterline->getUid());
 	}
-
-	QString uidMergedCenterline = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
-	QString nameMergedCenterline = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
-	MeshPtr outputMergedCenterline = patientService()->createSpecificData<Mesh>(uidMergedCenterline, nameMergedCenterline);
-	outputMergedCenterline->setVtkPolyData(mAirwayAndBloodVesselRoute);
-	outputMergedCenterline->setColor(QColor(0, 255, 0, 255));
-	patientService()->insertData(outputMergedCenterline);
-
-	outputMergedCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
-
-	if(mOutputTypes.size() >3)
-		mOutputTypes[3]->setValue(outputMergedCenterline->getUid());
-
 //	//Create Ceetron route-to-target file
 //	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/MarianaRTT/";
 //	QDir CeetronDirectory(CeetronPath);
@@ -322,6 +308,17 @@ bool RouteToTargetFilter::postProcess()
 void RouteToTargetFilter::setTargetName(QString name)
 {
 	mTargetName = name;
+}
+
+BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)
+{
+	BoolPropertyPtr retval =
+			BoolProperty::initialize("Use blood vessels to find RTT beyond airways",
+					"",
+					"Selecting this option to use blood vessels to find RTT beyond airways",
+					false, root);
+	return retval;
+
 }
 
 

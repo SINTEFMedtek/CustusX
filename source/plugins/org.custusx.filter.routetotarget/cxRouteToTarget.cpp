@@ -45,13 +45,6 @@ void RouteToTarget::setBloodVesselVolume(ImagePtr bloodVesselVolume)
 	mBloodVesselVolume = bloodVesselVolume;
 }
 
-/*
-void RouteToTarget::setCenterline(vtkPolyDataPtr centerline)
-{
-	mCLpoints = this->getCenterlinePositions(centerline);
-}
-*/
-
 Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
 
@@ -96,15 +89,11 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 	mBloodVesselBranchListPtr->calculateOrientations();
 	mBloodVesselBranchListPtr->smoothOrientations();
 	mBloodVesselBranchListPtr->smoothBranchPositions(40);
-	//std::cout << "Debug 1" << std::endl;
 	setBloodVesselRadius();
-	//std::cout << "Debug 2" << std::endl;
 	mBloodVesselBranchListPtr->smoothRadius();
-	//std::cout << "Debug 3" << std::endl;
 
 	BranchPtr branchWithLargestRadius = mBloodVesselBranchListPtr->findBranchWithLargestRadius();
 
-	//std::cout << "Debug 1" << std::endl;
 	if (branchWithLargestRadius->getParentBranch()) //If the largest branch has a parent, something is wrong. -> Reprocess with largest branch as root.
 	{
 		Eigen::MatrixXd positions = branchWithLargestRadius->getPositions();
@@ -112,13 +101,11 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 		int maxRadiusIndex;
 		radius.maxCoeff(&maxRadiusIndex);
 		positions.col(positions.cols()-1).swap(positions.col(maxRadiusIndex)); //setting largest radius position last (which is processed first)
-		//std::cout << "positions.col(0): " << positions.col(0)[0] << " " << positions.col(0)[1] << " " << positions.col(0)[2] << std::endl; //debug
 
 		std::vector<BranchPtr> allBranches = mBloodVesselBranchListPtr->getBranches();
 		for (int i = 1; i < allBranches.size(); i++)
 			if (allBranches[i] != branchWithLargestRadius) //add positions from all other branches
 			{
-				//std::cout << "Debug: Adding positions" << std::endl;
 				Eigen::MatrixXd positionsToAppend = allBranches[i]->getPositions();
 				Eigen::MatrixXd resizedPositions(positions.rows(), positions.cols() + positionsToAppend.cols());
 				resizedPositions.rightCols(positions.cols()) = positions;
@@ -135,7 +122,7 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 		setBloodVesselRadius();
 		mBloodVesselBranchListPtr->smoothRadius();
 	}
-	std::cout << "Debug 3" << std::endl;
+
 
 	std::cout << "Number of branches in CT blood vessel centerline: " << mBloodVesselBranchListPtr->getBranches().size() << std::endl;
 }
@@ -239,18 +226,12 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 	{
-		std::cout << "Radius: " << searchBranchPtr->getRadius()[i] << std::endl; //debug
 		mBloodVesselRoutePositions.push_back(positions[i]);
 	}
-
-	//mBranchingIndex.push_back(mRoutePositions.size()-1);
 
 	BranchPtr parentBranchPtr = searchBranchPtr->getParentBranch();
 	if (parentBranchPtr)
 	{
-		std::cout << "Branch radius: " << searchBranchPtr->getAverageRadius() << "    Parent branch radius: " << parentBranchPtr->getAverageRadius() <<
-				"    Branch variance: " << variance(searchBranchPtr->getRadius()) << "    Parent branch variance: " << variance(parentBranchPtr->getRadius()) << std::endl; //debug
-
 		if(parentBranchPtr->getAverageRadius() >= searchBranchPtr->getAverageRadius() && variance(parentBranchPtr->getRadius()) < 1.0 )
 		{
 			searchBloodVesselBranchUp(parentBranchPtr, parentBranchPtr->getPositions().cols()-1);
@@ -275,19 +256,19 @@ vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint)
 vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 {
 	mTargetPosition = targetPoint->getCoordinate();
-    double extentionPointIncrement = 0.25; //mm
+    double extensionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
 	if(mRoutePositions.size() > 0)
 	{
-		double extentionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
-		Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extentionDistance;
-        int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
-        Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
+		double extensionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
+		Eigen::Vector3d extensionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extensionDistance;
+        int numberOfextensionPoints = int(extensionDistance / extensionPointIncrement);
+        Eigen::Vector3d extensionPointIncrementVector = extensionVectorNormalized * extensionDistance / numberOfextensionPoints;
 
-		for (int i = 1; i<= numberOfextentionPoints; i++)
+		for (int i = 1; i<= numberOfextensionPoints; i++)
 		{
-			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extentionPointIncrementVector*i);
+			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extensionPointIncrementVector*i);
 		}
 	}
 
@@ -299,39 +280,20 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint)
 {
 	vtkPolyDataPtr retval;
-	//mBloodVesselBranchListPtr->deleteAllBranches();
-
-//	if ( !checkIfRouteToTargetEndsAtEndOfLastBranch() )
-//	{
-//		CX_LOG_INFO() << "No improved route to target found along blood vessels";
-//		return retval;
-//	}
-
 
 	vtkPolyDataPtr BVcenterline_r = bloodVesselCenterlineMesh->getTransformedPolyDataCopy(bloodVesselCenterlineMesh->get_rMd());
 	Eigen::MatrixXd BVCLpoints_r = getCenterlinePositions(BVcenterline_r);
 	mConnectedPointsInBVCL = findClosestBloodVesselSegments(BVCLpoints_r , mCLpoints, targetPoint->getCoordinate());
 
-	//Eigen::MatrixXd::Index closestBVCLIndex = dsearch(targetPoint->getCoordinate(), BVCLpointsFiltered_r).first;
-	//Eigen::MatrixXd::Index closestBVCLIndex = dsearch(mRoutePositions[0], BVCLpointsFiltered_r).first;
-
-	//mConnectedPointsInBVCL = findLocalPointsInCT(closestBVCLIndex , BVCLpointsFiltered_r).first;
-	std::cout << "Number of connected points: " << mConnectedPointsInBVCL.cols() << std::endl; //debug
-
 	if (mRoutePositions.empty())
 		return retval;
 
-	//Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], mConnectedPointsInBVCL).first;
 	Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(mRoutePositions[0], mConnectedPointsInBVCL).first;
 
 	//setting position closest to RTT from airways in first index, where RTT should  continue
 	mConnectedPointsInBVCL.col(mConnectedPointsInBVCL.cols()-1).swap(mConnectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
 
-	//mBloodVesselBranchListPtr->findBranchesInCenterline(mConnectedPointsInBVCL, false);
-	std::cout << "Before processBloodVesselCenterline" << std::endl; //debug
 	processBloodVesselCenterline(mConnectedPointsInBVCL);
-	std::cout << "After processBloodVesselCenterline" << std::endl; //debug
-
 	findClosestPointInBloodVesselBranches(mTargetPosition);
 	findRoutePositionsInBloodVessels();
 	mPathToBloodVesselsFound = makeConnectedAirwayAndBloodVesselRoute();
@@ -349,7 +311,6 @@ vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
 
 	AirwaysFromCenterlinePtr airwaysFromBVCenterlinePtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 	airwaysFromBVCenterlinePtr->setTypeToBloodVessel(true);
-	//airwaysFromBVCenterlinePtr->processCenterline(mConnectedPointsInBVCL);
 	mBloodVesselBranchListPtr->interpolateBranchPositions(5);
 	airwaysFromBVCenterlinePtr->setBranches(mBloodVesselBranchListPtr);
 
@@ -383,9 +344,9 @@ bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 	int connectionIndexBloodVesselRoute = mBloodVesselRoutePositions.size()-1;
 	bool closerAirwayFound = false;
 	Vector3D closestPosition;
-	for (int i = 0; i<branches.size(); i++) //find closest airway branch to blood vessel route
+	for (int i = 0; i<branches.size(); i++) //check for closer airway branch to blood vessel route
 	{
-		if ( branches[i]->findGenerationNumber() > 2 )//getChildBranches().empty()) //Needs to be end branch (no children)
+		if ( branches[i]->findGenerationNumber() > 2 )//Needs to be deeper branch
 		{
 			Eigen::MatrixXd branchPositinos = branches[i]->getPositions();
 			for (int j = 0; j<branchPositinos.cols(); j++)
@@ -406,65 +367,24 @@ bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 
 	if (closerAirwayFound) //calculating new route
 	{
-		//Eigen::MatrixXd::Index closestPositionToEndOfAirwayRTTIndex = dsearch(closestPosition, mConnectedPointsInBVCL).first;
-		//mConnectedPointsInBVCL.col(mConnectedPointsInBVCL.cols()-1).swap(mConnectedPointsInBVCL.col(closestPositionToEndOfAirwayRTTIndex));
-		//processBloodVesselCenterline(mConnectedPointsInBVCL);
-		//findClosestPointInBloodVesselBranches(mTargetPosition);
-		//findRoutePositionsInBloodVessels();
-
 		findClosestPointInBranches(closestPosition);
-
 		findRoutePositions();
 	}
-
-//	//Checking for wrong direction of blood vessel route compared to airway route - to get correct connection
-//	Eigen::MatrixXd directionLastRTTBranch = mProjectedBranchPtr->getOrientations().rowwise().mean();
-//	BranchListPtr BVRTTbranchList = BranchListPtr(new BranchList());
-//	BranchPtr BVRTTbranch = BranchPtr(new Branch());
-//	BVRTTbranch->setPositions(convertToEigenMatrix(mBloodVesselRoutePositions));
-//	BVRTTbranchList->addBranch(BVRTTbranch);
-//	BVRTTbranchList->calculateOrientations();
-//	BVRTTbranchList->smoothOrientations();
-//	Eigen::MatrixXd BRRTTorientations = BVRTTbranch->getOrientations();
-//	bool wrongDirectionOfBloodVesselFound = false;
-//	int indexOfWrongDirection;
-//	double maxAngle = 110;
-//	std::cout << "directionLastRTTBranch: " << directionLastRTTBranch << std::endl; //debug
-//	std::cout << "cos(maxAngle*PI/180.0): " << cos(maxAngle*PI/180.0) << std::endl; //debug
-//	for (int i = mBloodVesselRoutePositions.size()-1; i > 0; i--)
-//	{
-//		double orientationDiffNorm = (BRRTTorientations.col(i)*directionLastRTTBranch).sum() / (BRRTTorientations.col(i).norm()*directionLastRTTBranch.norm());
-//		//double orientationDiffNorm = orientationDiff.sum()
-//		if ( orientationDiffNorm < cos(maxAngle*PI/180.0) )
-//		{
-//			wrongDirectionOfBloodVesselFound = true;
-//			indexOfWrongDirection = i;
-//			std::cout << "indexOfWrongDirection: " << i << " - orientation: " << BRRTTorientations.col(i) << " - orientationDiffNorm: " << orientationDiffNorm << std::endl; //debug
-//		}
-//		else
-//			break;
-//	}
-//
-//	if (wrongDirectionOfBloodVesselFound)
-//	{
-//		mBloodVesselRoutePositions.erase(mBloodVesselRoutePositions.begin() + indexOfWrongDirection, mBloodVesselRoutePositions.end());
-//		findClosestPointInBranches(mBloodVesselRoutePositions.back());
-//		findRoutePositions();
-//	}
 
 	std::vector< Eigen::Vector3d > mergedPositions;
 	mergedPositions.insert( mergedPositions.end(), mBloodVesselRoutePositions.begin(), mBloodVesselRoutePositions.begin() + connectionIndexBloodVesselRoute );
 	mergedPositions.insert( mergedPositions.end(), mRoutePositions.begin(), mRoutePositions.end() );
 
-	double extentionPointIncrement = 0.25; //mm
-	double extentionDistance = findDistance(mergedPositions.front(),mTargetPosition);
-	Eigen::Vector3d extentionVectorNormalized = ( mTargetPosition - mergedPositions.front() ) / extentionDistance;
-	int numberOfextentionPoints = int(extentionDistance / extentionPointIncrement);
-	Eigen::Vector3d extentionPointIncrementVector = extentionVectorNormalized * extentionDistance / numberOfextentionPoints;
+	//make extension from blood vessel to target
+	double extensionPointIncrement = 0.25; //mm
+	double extensionDistance = findDistance(mergedPositions.front(),mTargetPosition);
+	Eigen::Vector3d extensionVectorNormalized = ( mTargetPosition - mergedPositions.front() ) / extensionDistance;
+	int numberOfextensionPoints = int(extensionDistance / extensionPointIncrement);
+	Eigen::Vector3d extensionPointIncrementVector = extensionVectorNormalized * extensionDistance / numberOfextensionPoints;
 
-	for (int i = 1; i<= numberOfextentionPoints; i++)
+	for (int i = 1; i<= numberOfextensionPoints; i++)
 	{
-		mergedPositions.insert(mergedPositions.begin(), mBloodVesselRoutePositions.front() + extentionPointIncrementVector*i);
+		mergedPositions.insert(mergedPositions.begin(), mBloodVesselRoutePositions.front() + extensionPointIncrementVector*i);
 	}
 
 	mMergedAirwayAndBloodVesselRoutePositions = mergedPositions;
@@ -683,7 +603,6 @@ void RouteToTarget::setBloodVesselRadius()
 			for (int j = 0; j < positions.cols(); j++)
 			{
 				radius(j) = calculateBloodVesselRadius(positions.col(j), orientations.col(j));
-				//std::cout << "Calculating radius: " << radius(j) << std::endl; //debug
 			}
 
 			branches[i]->setRadius(radius);
@@ -705,12 +624,6 @@ double RouteToTarget::calculateBloodVesselRadius(Eigen::Vector3d position, Eigen
 	int x = (int) boost::math::round( position_r[0]/spacing[0] );
 	int y = (int) boost::math::round( position_r[1]/spacing[1] );
 	int z = (int) boost::math::round( position_r[2]/spacing[2] );
-
-	//std::cout << "x position: " << position[0] << " - y position: " << position[1] << " - z position: " << position[2] << std::endl; //debug
-	//std::cout << "x position_r: " << position_r[0] << " - y position_r: " << position_r[1] << " - z position_r: " << position_r[2] << std::endl; //debug
-	//std::cout << "x index: " << x << " - y index: " << y << " - z index: " << z << std::endl; //debug
-	//std::cout << "dMr: " << dMr << std::endl; //debug
-	//std::cout << "x spacing: " << spacing[0] << " - y spacing: " << spacing[1] << " - z spacing: " << spacing[2] << std::endl; //debug
 
 	double maxValue = bloodVesselImage->GetScalarRange()[1];
 
@@ -825,54 +738,6 @@ double RouteToTarget::calculateBloodVesselRadius(Eigen::Vector3d position, Eigen
 
 	radius = maxRadius.rowwise().mean().minCoeff();
 
-//	int radiusVoxels = 1;
-//	while (radiusVoxels < 50) // Maximum radius - to avoid infinite loop
-//	{
-//		Eigen::Vector3d perpendicularX = crossproduct(orientation, Eigen::Vector3d::UnitX());
-//		if (perpendicularX.sum() != 0)
-//		{
-//			Eigen::Vector3d searchDirection =  perpendicularX.normalized() * radiusVoxels;
-//			int xIndex = std::max(std::min(x + (int) std::round(searchDirection(0)), dim[0]-1), 0);
-//			int yIndex = std::max(std::min(y + (int) std::round(searchDirection(1)), dim[1]-1), 0);
-//			int zIndex = std::max(std::min(z + (int) std::round(searchDirection(2)), dim[2]-1), 0);
-//			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-//			{
-//				radius = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-//				break;
-//			}
-//		}
-//
-//		Eigen::Vector3d perpendicularY = crossproduct(orientation, Eigen::Vector3d::UnitY());
-//		if (perpendicularY.sum() != 0)
-//		{
-//			Eigen::Vector3d searchDirection =  perpendicularY.normalized() * radiusVoxels;
-//			int xIndex = std::max(std::min(x + (int) std::round(searchDirection(0)), dim[0]-1), 0);
-//			int yIndex = std::max(std::min(y + (int) std::round(searchDirection(1)), dim[1]-1), 0);
-//			int zIndex = std::max(std::min(z + (int) std::round(searchDirection(2)), dim[2]-1), 0);
-//			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-//			{
-//				radius = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-//				break;
-//			}
-//		}
-//
-//		Eigen::Vector3d perpendicularZ = crossproduct(orientation, Eigen::Vector3d::UnitZ());
-//		if (perpendicularZ.sum() != 0)
-//		{
-//			Eigen::Vector3d searchDirection =  perpendicularZ.normalized() * radiusVoxels;
-//			int xIndex = std::max(std::min(x + (int) std::round(searchDirection(0)), dim[0]-1), 0);
-//			int yIndex = std::max(std::min(y + (int) std::round(searchDirection(1)), dim[1]-1), 0);
-//			int zIndex = std::max(std::min(z + (int) std::round(searchDirection(2)), dim[2]-1), 0);
-//			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-//			{
-//				radius = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-//				break;
-//			}
-//		}
-//
-//		radiusVoxels += 1;
-//	}
-
 	if (std::isnan(radius))
 		radius = 0;
 
@@ -954,7 +819,6 @@ Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositi
 
 	while (bloodVesselPositions.cols() > minNumberOfPositionsInSegment)
 	{
-		std::cout << "bloodVesselPositions.cols(): " << bloodVesselPositions.cols() << std::endl;//debug
 		Eigen::MatrixXd::Index closestBloodVesselPositionToTarget = dsearch(targetPosition, bloodVesselPositions).first;
 		std::pair< Eigen::MatrixXd, Eigen::MatrixXd > localPositions = findLocalPointsInCT(closestBloodVesselPositionToTarget , bloodVesselPositions);
 		bloodVesselPositions = localPositions.second;
