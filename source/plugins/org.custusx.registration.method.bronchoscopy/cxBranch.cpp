@@ -50,6 +50,11 @@ Eigen::VectorXd Branch::getRadius()
 	return mRadius;
 }
 
+double Branch::getAverageRadius()
+{
+	return mRadius.mean();
+}
+
 void Branch::addChildBranch(BranchPtr child)
 {
 	mChildBranches.push_back(child);

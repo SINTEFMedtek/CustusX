@@ -43,6 +43,7 @@ public:
 	Eigen::MatrixXd getOrientations();
 	void setRadius(Eigen::VectorXd r);
 	Eigen::VectorXd getRadius();
+	double getAverageRadius();
 	void addChildBranch(BranchPtr child); //Note that this method doesn't set this branch as parent to the child. Inconsistent?
 	void setChildBranches(branchVector children); //Note that this method doesn't set this branch as parent to the children. Inconsistent?
 	void deleteChildBranches();

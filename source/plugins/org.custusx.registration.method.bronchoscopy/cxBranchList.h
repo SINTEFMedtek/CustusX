@@ -37,6 +37,8 @@ public:
 	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
 	void smoothOrientations();
+	void smoothRadius();
+	BranchPtr findBranchWithLargestRadius();
 	void interpolateBranchPositions(int interpolationFactor);
 	void smoothBranchPositions(int controlPointDistance);
 	void excludeClosePositionsInCTCenterline(double minPointDistance);

@@ -187,26 +187,28 @@ bool RouteToTargetFilter::execute()
 		mRouteToTarget->addRouteInformationToFile(mServices);
 
 	ImagePtr bloodVesselVolume = this->getCopiedInputImage(3);
-	if (bloodVesselVolume)
-	{
-		mRouteToTarget->setBloodVesselVolume(bloodVesselVolume); // NB! HER MÅ VOLUME TRANSFORMERES TIL KOORDINATSYSTEMET TIL BV CENTERLINJEN
-//		vtkPolyDataPtr BVcenterline_r = bloodVesselCenterline->getTransformedPolyDataCopy((bloodVesselVolume->get_rMd().inverse())*bloodVesselCenterline->get_rMd());//debug
-//		//vtkPolyDataPtr BVcenterline_r = bloodVesselCenterline->getTransformedPolyDataCopy(bloodVesselCenterline->get_rMd()); //debug
-//		Eigen::MatrixXd BVCLpoints_r = mRouteToTarget->getCenterlinePositions(BVcenterline_r); //debug
-//		Eigen::Vector3d position; //debug
-//		for (int i=0; i<100; i++)
-//		{
-//			position[0] = BVCLpoints_r.col(i)[0]; //debug
-//			position[1] = BVCLpoints_r.col(i)[1]; //debug
-//			position[2] = BVCLpoints_r.col(i)[2]; //debug
-//			double radius = mRouteToTarget->calculateBloodVesselRadius(position, Eigen::Vector3d::UnitZ()); //debug
-//			std::cout << "Radius: " << radius << std::endl; //debug
-//		}
-	}
 
 	MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 	if (bloodVesselCenterline)
 	{
+		if (bloodVesselVolume)
+		{
+			//bloodVesselVolume->setTransferFunctions3D( bloodVesselCenterline->get_rMd().inverse() * bloodVesselVolume->get_rMd() * bloodVesselVolume->getTransferFunctions3D() );
+			mRouteToTarget->setBloodVesselVolume(bloodVesselVolume); // NB! HER MÅ VOLUME TRANSFORMERES TIL KOORDINATSYSTEMET TIL BV CENTERLINJEN
+	//		vtkPolyDataPtr BVcenterline_r = bloodVesselCenterline->getTransformedPolyDataCopy((bloodVesselVolume->get_rMd().inverse())*bloodVesselCenterline->get_rMd());//debug
+	//		//vtkPolyDataPtr BVcenterline_r = bloodVesselCenterline->getTransformedPolyDataCopy(bloodVesselCenterline->get_rMd()); //debug
+	//		Eigen::MatrixXd BVCLpoints_r = mRouteToTarget->getCenterlinePositions(BVcenterline_r); //debug
+	//		Eigen::Vector3d position; //debug
+	//		for (int i=0; i<100; i++)
+	//		{
+	//			position[0] = BVCLpoints_r.col(i)[0]; //debug
+	//			position[1] = BVCLpoints_r.col(i)[1]; //debug
+	//			position[2] = BVCLpoints_r.col(i)[2]; //debug
+	//			double radius = mRouteToTarget->calculateBloodVesselRadius(position, Eigen::Vector3d::UnitZ()); //debug
+	//			std::cout << "Radius: " << radius << std::endl; //debug
+	//		}
+		}
+
 		mBloodVesselRoute = mRouteToTarget->findRouteToTargetAlongBloodVesselCenterlines( bloodVesselCenterline, targetPoint);
 		//std::cout << "Number of points in mBloodVesselRoute: " << mBloodVesselRoute->GetNumberOfPoints() << std::endl;
 		mAirwaysFromBloodVessel = mRouteToTarget->generateAirwaysFromBloodVesselCenterlines();

@@ -113,7 +113,40 @@ void BranchList::smoothOrientations()
 	}
 }
 
-void BranchList::interpolateBranchPositions(int interpolationFactor){
+void BranchList::smoothRadius()
+{
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		Eigen::VectorXd radius = mBranches[i]->getRadius();
+		Eigen::VectorXd newRadius(radius.rows(),radius.cols());
+		int numberOfPoints = radius.size();
+		for (int j = 0; j < numberOfPoints; j++)
+		{
+			newRadius[j] = radius.segment(std::max(j-2,0), std::min(5,numberOfPoints-j)).mean(); //smoothing
+		}
+		mBranches[i]->setRadius(newRadius);
+	}
+}
+
+BranchPtr BranchList::findBranchWithLargestRadius()
+{
+	BranchPtr branchWithLargestRadius = mBranches[0];
+	double largestRadius = mBranches[0]->getAverageRadius();
+
+	for (int i = 1; i < mBranches.size(); i++)
+	{
+		if (mBranches[i]->getAverageRadius() > largestRadius)
+		{
+			largestRadius = mBranches[i]->getAverageRadius();
+			branchWithLargestRadius = mBranches[i];
+		}
+	}
+
+	return branchWithLargestRadius;
+}
+
+void BranchList::interpolateBranchPositions(int interpolationFactor)
+{
 
 	for (int i = 0; i < mBranches.size(); i++)
 	{

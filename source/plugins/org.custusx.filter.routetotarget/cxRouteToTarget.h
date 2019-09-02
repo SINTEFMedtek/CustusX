@@ -74,10 +74,11 @@ private:
 //Eigen::MatrixXd removeSmallAndPeripheralBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions);
 Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition);
 std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
-double findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+std::pair<int, double> findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
 Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B);
+double variance(Eigen::VectorXd X);
 
 } /* namespace cx */
 
