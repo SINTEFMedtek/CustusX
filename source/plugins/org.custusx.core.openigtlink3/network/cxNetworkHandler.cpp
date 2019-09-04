@@ -99,7 +99,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
 		// get timestamp from igtl second-format:;
 		double timestampMS = header.timestamp * 1000;
-		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
+		//cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
+		//TODO: Use incoming timestamps. Current implementation just restamp the messages at arrival to match CustusX time format.
+		cximage->setAcquisitionTime( QDateTime::currentDateTime() );
 		//this->decode_rMd(msg, retval);
 
 
@@ -124,7 +126,10 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			metaLabel = igtlioLabels[i].toStdString();
 			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
 			if(!gotMetaData)
-				CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
+			{
+				//Also allow meta data sent as string messages
+				//CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
+			}
 			else
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 		}
@@ -202,7 +207,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //										<< " string: " << content.string_msg;
 
 		QString message(content.string_msg.c_str());
-//		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);//Turning this off because we want to use meta info instead
+		//Also allow meta data sent as string messages
+		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);//Turning this off because we want to use meta info instead
 		emit string_message(message);
 	}
 	else
