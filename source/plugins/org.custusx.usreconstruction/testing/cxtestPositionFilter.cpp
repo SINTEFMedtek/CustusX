@@ -20,15 +20,15 @@ namespace cxtest
 class PositionFilterTester : public cx::PositionFilter
 {
 public:
-	PositionFilterTester(int filterStrength, std::vector<cx::TimedPosition> &inputImagePositions) :
+	PositionFilterTester(unsigned filterStrength, std::vector<cx::TimedPosition> &inputImagePositions) :
 		PositionFilter(filterStrength, inputImagePositions)
 	{
 
 	}
 
-	void testConvertToQuaternions(std::vector<cx::TimedPosition> &inputImagePositions)
+	void testConvertToQuaternions()
 	{
-		this->convertToQuaternions(inputImagePositions);
+		this->convertToQuaternions();
 	}
 
 	void testFilterQuaternionArray()
@@ -36,14 +36,14 @@ public:
 		this->filterQuaternionArray();
 	}
 
-	void testConvertFromQuaternion(std::vector<cx::TimedPosition> &inputImagePositions)
+	void testConvertFromQuaternion()
 	{
-		this->convertFromQuaternion(inputImagePositions);
+		this->convertFromQuaternion();
 	}
 
-	void testFilterPositions(std::vector<cx::TimedPosition> &inputImagePositions)
+	void testFilterPositions()
 	{
-		this->filterPositions(inputImagePositions);
+		this->filterPositions();
 	}
 
 
@@ -116,7 +116,7 @@ TEST_CASE("PositionFilter: Init","[unit][usreconstruction][synthetic]")
 	cx::TimedPosition timedPosition;
 	timedPosition.mTime = QDateTime::currentMSecsSinceEpoch();
 	timedPosition.mPos = cx::Transform3D::Identity();
-	int filterStrength = 5;
+	unsigned filterStrength = 5;
 	std::vector<cx::TimedPosition> posVector;
 	posVector.push_back(timedPosition);
 	PositionFilterTester positionFilter(filterStrength, posVector);
@@ -128,13 +128,13 @@ TEST_CASE("PositionFilter: Filter inactive","[unit][usreconstruction][synthetic]
 {
 
 
-	int filterStrength = 0; //Filter bypassed
+	unsigned filterStrength = 0; //Filter bypassed
 	int nTestElements = 20;
 
 	std::vector<cx::TimedPosition> posVector = buildTestArray(nTestElements);
 	std::vector<cx::TimedPosition> posVectorInitial = posVector;
 	PositionFilterTester positionFilter(filterStrength, posVector);
-	positionFilter.testFilterPositions(posVector);
+	positionFilter.testFilterPositions();
 
 	unsigned int bypassedFilterTestResult = comparePositionVectors(posVectorInitial, posVector);
 
@@ -146,13 +146,13 @@ TEST_CASE("PositionFilter: Filter active","[unit][usreconstruction][synthetic]")
 {
 
 
-	int filterStrength = 2; //Filter active
+	unsigned filterStrength = 2; //Filter active
 	int nTestElements = 20;
 
 	std::vector<cx::TimedPosition> posVector = buildTestArray(nTestElements);
 	std::vector<cx::TimedPosition> posVectorInitial = posVector;
 	PositionFilterTester positionFilter(filterStrength, posVector);
-	positionFilter.testFilterPositions(posVector);
+	positionFilter.testFilterPositions();
 
 	unsigned int activeFilterTestResult = comparePositionVectors(posVectorInitial, posVector);
 

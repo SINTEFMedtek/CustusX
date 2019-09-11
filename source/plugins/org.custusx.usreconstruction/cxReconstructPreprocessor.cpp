@@ -188,7 +188,7 @@ void ReconstructPreprocessor::filterPositions()
 	CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
 	//PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
 	PositionFilter positionFilter(filterStrength, mFileData.mPositions);
-	positionFilter.filterPositions(mFileData.mPositions);
+	positionFilter.filterPositions();
 }
 
 void ReconstructPreprocessor::positionThinning()

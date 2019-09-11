@@ -27,19 +27,19 @@ class org_custusx_usreconstruction_EXPORT PositionFilter
 {
 public:
 	PositionFilter(unsigned filterStrength, std::vector<TimedPosition> &inputImagePositions);
-	void filterPositions(std::vector<class TimedPosition> &inputImagePositions);
+	void filterPositions();
 protected:
 	unsigned mFilterStrength;
-	std::vector<TimedPosition> inputImagePositions;
+	std::vector<TimedPosition> mInputImagePositions;
 	unsigned long mNumberInputPositions;
 	unsigned mFilterLength;
 	unsigned long mNumberQuaternions;
-	Eigen::ArrayXXd qPosArray;
-	Eigen::ArrayXXd qPosFiltered;
+	Eigen::ArrayXXd mQPosArray;
+	Eigen::ArrayXXd mQPosFiltered;
 
-	void convertToQuaternions(std::vector<TimedPosition> &inputImagePositions);
+	void convertToQuaternions();
 	void filterQuaternionArray();
-	void convertFromQuaternion(std::vector<TimedPosition> &inputImagePositions);
+	void convertFromQuaternion();
 };
 
 }//cx

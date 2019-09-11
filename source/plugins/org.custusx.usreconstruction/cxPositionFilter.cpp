@@ -20,20 +20,21 @@ PositionFilter::PositionFilter(unsigned filterStrength, std::vector<class TimedP
 	mFilterStrength(filterStrength)
 {
 	mFilterLength = 1+2*filterStrength;
+	mInputImagePositions = inputImagePositions;
 	mNumberInputPositions=inputImagePositions.size();
 	mNumberQuaternions = mNumberInputPositions+mFilterLength;
 
-	qPosArray = Eigen::ArrayXXd::Zero(7,long(mNumberQuaternions));
-	qPosFiltered = Eigen::ArrayXXd::Zero(7,long(mNumberInputPositions));
+	mQPosArray = Eigen::ArrayXXd::Zero(7,long(mNumberQuaternions));
+	mQPosFiltered = Eigen::ArrayXXd::Zero(7,long(mNumberInputPositions));
 }
 
-void PositionFilter::convertToQuaternions(std::vector<class TimedPosition> &inputImagePositions)
+void PositionFilter::convertToQuaternions()
 {
 	for (unsigned int i = 0; i < mNumberQuaternions; i++) //For each pose (Tx), with edge padding
 	{
 		unsigned long sourceIdx =  (i > mFilterStrength) ? (i-mFilterStrength) : 0; // Calculate index in Tx array, pad with edge elements //Skriv om
 		sourceIdx =  (sourceIdx < mNumberInputPositions) ? sourceIdx : (mNumberInputPositions-1);
-		qPosArray.col(i) = matrixToQuaternion(inputImagePositions.at(sourceIdx).mPos); // Convert each Tx to quaternions
+		mQPosArray.col(i) = matrixToQuaternion(mInputImagePositions.at(sourceIdx).mPos); // Convert each Tx to quaternions
 	}
 }
 
@@ -41,29 +42,29 @@ void PositionFilter::filterQuaternionArray()
 {
 	for (unsigned int i = 0; i < mFilterLength; i++)
 	{
-		qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,long(mNumberInputPositions));
+		mQPosFiltered = mQPosFiltered + mQPosArray.block(0,i,7,long(mNumberInputPositions));
 	}
-	qPosFiltered = qPosFiltered / mFilterLength; // Scale and write back to qPosArray
+	mQPosFiltered = mQPosFiltered / mFilterLength; // Scale and write back to qPosArray
 }
 
-void PositionFilter::convertFromQuaternion(std::vector<class TimedPosition> &inputImagePositions)
+void PositionFilter::convertFromQuaternion()
 {
-	for (unsigned int i = 0; i < inputImagePositions.size(); i++) //For each pose after filtering
+	for (unsigned int i = 0; i < mInputImagePositions.size(); i++) //For each pose after filtering
 	{
 		// Convert back to position data
-		inputImagePositions.at(i).mPos = quaternionToMatrix(qPosFiltered.col(i));
+		mInputImagePositions.at(i).mPos = quaternionToMatrix(mQPosFiltered.col(i));
 	}
 }
 
-void PositionFilter::filterPositions(std::vector<class TimedPosition> &inputImagePositions)
+void PositionFilter::filterPositions()
 {
 	if (mFilterStrength > 0) //Position filter enabled?
 	{
 		if (mNumberInputPositions > mFilterLength) //Position sequence sufficient long?
 		{
-			convertToQuaternions(inputImagePositions);
+			convertToQuaternions();
 			filterQuaternionArray();
-			convertFromQuaternion(inputImagePositions);
+			convertFromQuaternion();
 		}
 	}
 }
