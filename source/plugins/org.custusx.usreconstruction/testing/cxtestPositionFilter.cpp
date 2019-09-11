@@ -57,11 +57,11 @@ std::vector<cx::TimedPosition> buildTestArray(int nTestElements)
     timedPosition.mTime = QDateTime::currentMSecsSinceEpoch(); //Start time
     timedPosition.mPos = cx::Transform3D::Identity();
     Eigen::Matrix4d mMatInitial = timedPosition.mPos.matrix(); //Initial matrix
-    for (unsigned int i = 0; i < nTestElements; i++)
+		for (int i = 0; i < nTestElements; i++)
     {
         timedPosition.mTime = timedPosition.mTime + 50; //Add 50 ms (i.e. 20 Hz frame rate)
         Eigen::Matrix4d mMat = mMatInitial;
-        if (i == std::floor(nTestElements/2))
+				if (i == int(std::floor(nTestElements/2)))
         {
             mMat(2,3) = 10; // Add position jump
         }
@@ -74,10 +74,10 @@ std::vector<cx::TimedPosition> buildTestArray(int nTestElements)
 
 unsigned int comparePositionVectors(std::vector<cx::TimedPosition> &originalImagePositions, std::vector<cx::TimedPosition> &resultImagePositions)
 {
-    int testResult = 0;
+		unsigned int testResult = 0;
 
-    int nElementsOriginal = originalImagePositions.size();
-    int nElementsResult = resultImagePositions.size();
+		unsigned long nElementsOriginal = originalImagePositions.size();
+		unsigned long nElementsResult = resultImagePositions.size();
     if (!(nElementsOriginal == nElementsResult))
     {
         //CX_LOG_DEBUG() << "Number of elements in filtered array does not match input.";
