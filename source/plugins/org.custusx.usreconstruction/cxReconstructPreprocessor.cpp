@@ -184,17 +184,17 @@ struct RemoveDataType
 
 void ReconstructPreprocessor::filterPositions()
 {
-		unsigned filterStrength = mInput.mPosFilterStrength;
-    CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
-    //PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
-    PositionFilter positionFilter(filterStrength, mFileData.mPositions);
-    positionFilter.filterPositions(mFileData.mPositions);
+	unsigned filterStrength = mInput.mPosFilterStrength;
+	CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
+	//PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
+	PositionFilter positionFilter(filterStrength, mFileData.mPositions);
+	positionFilter.filterPositions(mFileData.mPositions);
 }
 
 void ReconstructPreprocessor::positionThinning()
 {
-    // If enabled, try to remove "suspect" data (large jumps etc.)
-    // Replace tracking positions that deviate greatly from neighbours with an interpolated value
+	// If enabled, try to remove "suspect" data (large jumps etc.)
+	// Replace tracking positions that deviate greatly from neighbours with an interpolated value
 }
 
 
@@ -295,8 +295,8 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 
 	if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
 		reportError(QString("input data (%1) and mask (%2) dim mimatch")
-																.arg(qstring_cast(dims))
-																.arg(qstring_cast(maskDims)));
+								.arg(qstring_cast(dims))
+								.arg(qstring_cast(maskDims)));
 
 	int xmin = maskDims[0];
 	int xmax = 0;
@@ -432,10 +432,10 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 	//this->calibrateTimeStamps(0.0, 1.0);
 	this->applyTimeCalibration();
 
-    // Smooth tracking data before further processing
-    // User preferences apply
-    //this->positionThinning(); //Do thinning before filtering if enabled
-    this->filterPositions();
+	// Smooth tracking data before further processing
+	// User preferences apply
+	//this->positionThinning(); //Do thinning before filtering if enabled
+	this->filterPositions();
 
 	cx::USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(&mFileData);
 	//mPos (in mPositions) is now prMu

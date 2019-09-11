@@ -26,20 +26,20 @@ namespace cx
 class org_custusx_usreconstruction_EXPORT PositionFilter
 {
 public:
-		PositionFilter(unsigned filterStrength, std::vector<TimedPosition> &inputImagePositions);
-    void filterPositions(std::vector<class TimedPosition> &inputImagePositions);
+	PositionFilter(unsigned filterStrength, std::vector<TimedPosition> &inputImagePositions);
+	void filterPositions(std::vector<class TimedPosition> &inputImagePositions);
 protected:
-		unsigned mFilterStrength;
-    std::vector<TimedPosition> inputImagePositions;
-		unsigned long mNumberInputPositions;
-		unsigned mFilterLength;
-		unsigned long mNumberQuaternions;
-    Eigen::ArrayXXd qPosArray;
-    Eigen::ArrayXXd qPosFiltered;
+	unsigned mFilterStrength;
+	std::vector<TimedPosition> inputImagePositions;
+	unsigned long mNumberInputPositions;
+	unsigned mFilterLength;
+	unsigned long mNumberQuaternions;
+	Eigen::ArrayXXd qPosArray;
+	Eigen::ArrayXXd qPosFiltered;
 
-    void convertToQuaternions(std::vector<TimedPosition> &inputImagePositions);
-    void filterQuaternionArray();
-    void convertFromQuaternion(std::vector<TimedPosition> &inputImagePositions);
+	void convertToQuaternions(std::vector<TimedPosition> &inputImagePositions);
+	void filterQuaternionArray();
+	void convertFromQuaternion(std::vector<TimedPosition> &inputImagePositions);
 };
 
 }//cx
