@@ -69,14 +69,6 @@ std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInp
 	return retval;
 }
 
-namespace
-{
-bool within(int x, int min, int max)
-{
-	return (x >= min) && (x <= max);
-}
-}
-
 /**
  * Apply time calibration function y = ax + b, where
  *  y = calibrated(new) position timestamp
@@ -186,13 +178,13 @@ struct RemoveDataType
 {
 	RemoveDataType() : count(0), err(-1) {}
 	void add(double _err) { ++count; err=((err<0)?_err:std::min(_err, err)); }
-	int count;
+	unsigned count;
 	double err;
 };
 
 void ReconstructPreprocessor::filterPositions()
 {
-    int filterStrength = mInput.mPosFilterStrength;
+		unsigned filterStrength = mInput.mPosFilterStrength;
     CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
     //PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
     PositionFilter positionFilter(filterStrength, mFileData.mPositions);
@@ -215,25 +207,25 @@ void ReconstructPreprocessor::positionThinning()
 void ReconstructPreprocessor::interpolatePositions()
 {
 	mFileData.mUsRaw->resetRemovedFrames();
-	int startFrames = mFileData.mFrames.size();
+	unsigned long startFrames = mFileData.mFrames.size();
 
-	std::map<int,RemoveDataType> removedData;
+	std::map<unsigned,RemoveDataType> removedData;
 
 	for (unsigned i_frame = 0; i_frame < mFileData.mFrames.size();)
 	{
 		std::vector<TimedPosition>::iterator posIter;
 		posIter = lower_bound(mFileData.mPositions.begin(), mFileData.mPositions.end(), mFileData.mFrames[i_frame]);
 
-		unsigned i_pos = distance(mFileData.mPositions.begin(), posIter);
+		unsigned i_pos = unsigned(distance(mFileData.mPositions.begin(), posIter));
 		if (i_pos != 0)
 			i_pos--;
 
 		if (i_pos >= mFileData.mPositions.size() - 1)
-			i_pos = mFileData.mPositions.size() - 2;
+			i_pos = unsigned(mFileData.mPositions.size()) - 2;
 
 		// Remove frames too far from the positions
 		// Don't increment frame index since the index now points to the next element
-		double timeToPos1 = timeToPosition(i_frame, i_pos);
+		double timeToPos1 = timeToPosition(i_frame, unsigned(i_pos));
 		double timeToPos2 = timeToPosition(i_frame, i_pos+1);
 		if ((timeToPos1 > mMaxTimeDiff) || (timeToPos2 > mMaxTimeDiff))
 		{
@@ -254,11 +246,11 @@ void ReconstructPreprocessor::interpolatePositions()
 		}
 	}
 
-	int removeCount=0;
-	for (std::map<int,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
+	unsigned removeCount=0;
+	for (std::map<unsigned,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
 	{
-		int first = iter->first+removeCount;
-		int last = first + iter->second.count-1;
+		unsigned first = iter->first+removeCount;
+		unsigned last = first + iter->second.count-1;
 		report(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
 		removeCount += iter->second.count;
 	}
@@ -325,11 +317,10 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 			}
 		}
 
-	//Test: reduce the output volume by reducing the mask when determining
-	//      output volume size
+	//Reduce the output volume by reducing the mask when determining output volume size
 	double red = mInput.mMaskReduce;
-	int reduceX = (xmax - xmin) * (red / 100);
-	int reduceY = (ymax - ymin) * (red / 100);
+	int reduceX = int((xmax - xmin) * (red / 100));
+	int reduceY = int((ymax - ymin) * (red / 100));
 
 	xmin += reduceX;
 	xmax -= reduceX;

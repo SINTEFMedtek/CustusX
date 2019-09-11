@@ -26,14 +26,14 @@ namespace cx
 class org_custusx_usreconstruction_EXPORT PositionFilter
 {
 public:
-    PositionFilter(int filterStrength, std::vector<TimedPosition> &inputImagePositions);
+		PositionFilter(unsigned filterStrength, std::vector<TimedPosition> &inputImagePositions);
     void filterPositions(std::vector<class TimedPosition> &inputImagePositions);
 protected:
-    int mFilterStrength;
+		unsigned mFilterStrength;
     std::vector<TimedPosition> inputImagePositions;
-    int mNumberInputPositions;
-    int mFilterLength;
-    int mNumberQuaternions;
+		unsigned long mNumberInputPositions;
+		unsigned mFilterLength;
+		unsigned long mNumberQuaternions;
     Eigen::ArrayXXd qPosArray;
     Eigen::ArrayXXd qPosFiltered;
 
