@@ -197,11 +197,6 @@ bool AirwaysFilter::execute()
     else
         q_filename = inputImageFileName;
 
-    std::string volumeFilname = q_filename.toStdString();
-    // Import image data from disk
-	fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
-	importerPtr->setFilename(volumeFilname);
-
 	try {
 		fast::Config::getTestDataPath(); // needed for initialization
         QString cacheDir = cx::DataLocations::getCachePath();
@@ -228,12 +223,32 @@ bool AirwaysFilter::execute()
 
 	if (doAirwaySegmentation)
 	{
+	    std::string volumeFilname = q_filename.toStdString();
+	    // Import image data from disk
+		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
+		importerPtr->setFilename(volumeFilname);
+
 		segmentAirways(importerPtr);
 	}
 
-	if (doLungSegmentation | doVesselSegmentation)
+	if (doLungSegmentation)
 	{
-		segmentLungsAndVessels(importerPtr);
+	    std::string volumeFilname = q_filename.toStdString();
+	    // Import image data from disk
+		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
+		importerPtr->setFilename(volumeFilname);
+
+		segmentLungs(importerPtr);
+	}
+
+	if (doVesselSegmentation)
+	{
+	    std::string volumeFilname = q_filename.toStdString();
+	    // Import image data from disk
+		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
+		importerPtr->setFilename(volumeFilname);
+
+		segmentVessels(importerPtr);
 	}
 
  	return true;
@@ -311,7 +326,7 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 
 }
 
-void AirwaysFilter::segmentLungsAndVessels(fast::ImageFileImporter::pointer importerPtr)
+void AirwaysFilter::segmentLungs(fast::ImageFileImporter::pointer importerPtr)
 {
 
 	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
@@ -325,18 +340,24 @@ void AirwaysFilter::segmentLungsAndVessels(fast::ImageFileImporter::pointer impo
 		lungSegmentationPtr->setAirwaySeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
 	}
 
+	extractLungs(lungSegmentationPtr);
+}
 
-    if(getVesselSegmentationOption(mOptions)->getValue())
-    {
-    	extractBloodVessels(lungSegmentationPtr);
-    }
+void AirwaysFilter::segmentVessels(fast::ImageFileImporter::pointer importerPtr)
+{
 
+	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
 
-	if(getLungSegmentationOption(mOptions)->getValue())
-	{
-		extractLungs(lungSegmentationPtr);
+    // Do segmentation
+	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
+	lungSegmentationPtr->setInputConnection(importerPtr->getOutputPort());
+
+	if(useManualSeedPoint) {
+		CX_LOG_INFO() << "Using seed point: " << seedPoint.transpose();
+		lungSegmentationPtr->setAirwaySeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
 	}
 
+    extractBloodVessels(lungSegmentationPtr);
 }
 
 bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegmentationPtr)

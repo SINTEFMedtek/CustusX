@@ -68,7 +68,8 @@ public:
 protected:
 	void segmentAirways(fast::ImageFileImporter::pointer importerPtr);
 	bool extractAirways(fast::AirwaySegmentation::pointer airwaySegmentationPtr);
-	void segmentLungsAndVessels(fast::ImageFileImporter::pointer importerPtr);
+	void segmentLungs(fast::ImageFileImporter::pointer importerPtr);
+	void segmentVessels(fast::ImageFileImporter::pointer importerPtr);
 	bool extractBloodVessels(fast::LungSegmentation::pointer lungSegmentationPtr);
 	bool extractLungs(fast::LungSegmentation::pointer lungSegmentationPtr);
 	bool postProcessAirways();
