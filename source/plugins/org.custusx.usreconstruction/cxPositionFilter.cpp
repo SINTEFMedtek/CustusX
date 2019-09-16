@@ -20,7 +20,7 @@ PositionFilter::PositionFilter(unsigned filterStrength, std::vector<class TimedP
 	mFilterStrength(filterStrength)
 {
 	mFilterLength = 1+2*filterStrength;
-	mInputImagePositions = inputImagePositions;
+	mInputImagePositions = &inputImagePositions;
 	mNumberInputPositions=inputImagePositions.size();
 	mNumberQuaternions = mNumberInputPositions+mFilterLength;
 
@@ -34,7 +34,7 @@ void PositionFilter::convertToQuaternions()
 	{
 		unsigned long sourceIdx =  (i > mFilterStrength) ? (i-mFilterStrength) : 0; // Calculate index in Tx array, pad with edge elements //Skriv om
 		sourceIdx =  (sourceIdx < mNumberInputPositions) ? sourceIdx : (mNumberInputPositions-1);
-		mQPosArray.col(i) = matrixToQuaternion(mInputImagePositions.at(sourceIdx).mPos); // Convert each Tx to quaternions
+		mQPosArray.col(i) = matrixToQuaternion(mInputImagePositions->at(sourceIdx).mPos); // Convert each Tx to quaternions
 	}
 }
 
@@ -49,10 +49,10 @@ void PositionFilter::filterQuaternionArray()
 
 void PositionFilter::convertFromQuaternion()
 {
-	for (unsigned int i = 0; i < mInputImagePositions.size(); i++) //For each pose after filtering
+	for (unsigned int i = 0; i < mInputImagePositions->size(); i++) //For each pose after filtering
 	{
 		// Convert back to position data
-		mInputImagePositions.at(i).mPos = quaternionToMatrix(mQPosFiltered.col(i));
+		mInputImagePositions->at(i).mPos = quaternionToMatrix(mQPosFiltered.col(i));
 	}
 }
 

@@ -30,7 +30,7 @@ public:
 	void filterPositions();
 protected:
 	unsigned mFilterStrength;
-	std::vector<TimedPosition> mInputImagePositions;
+	std::vector<TimedPosition> *mInputImagePositions;
 	unsigned long mNumberInputPositions;
 	unsigned mFilterLength;
 	unsigned long mNumberQuaternions;
