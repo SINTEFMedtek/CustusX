@@ -285,6 +285,8 @@ ToolFileParser::ToolInternalStructurePtr ToolFileParser::getTool()
         if (!ok)
         {
             reportWarning("Attribute id of a reference point was not an int. Skipping.");
+						CX_LOG_ERROR() << "mToolFilePath: " << mToolFilePath;
+						CX_LOG_ERROR() << "Error with id value: " << node.toElement().attribute("id");
             continue;
         }
         QString toolSensorReferencePointText = node.toElement().text();
