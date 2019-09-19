@@ -6,17 +6,19 @@
 #
 #################################################  
 
+from __future__ import print_function
+from builtins import object
 import subprocess
 import platform
 
-class ShellCommand:
-    class ReturnValue:
+class ShellCommand(object):
+    class ReturnValue(object):
         'used as return value from shell command'
         def __init__(self, stdout=None, returncode=0, process=None):
             self.stdout = stdout
             self.returncode = returncode
             self.process = process
-        def __nonzero__(self):
+        def __bool__(self):
             'makes type convertible to bool - evaluate to True when zero retcode.'
             return self.returncode == 0        
     
@@ -93,10 +95,11 @@ class ShellCommandReal(ShellCommand):
             if(not self.silent):
                 self._printOutput(line.rstrip())
             if self.keep_output:
+                if type(line) is bytes:
+                    line = line.decode( )
                 output.append(line) 
         p.returncode = self._convertCatchReturnCode139ToSegfault(p.returncode)
         return ShellCommand.ReturnValue(stdout="".join(output), returncode=p.returncode, process=p)
-#        return p
 
     def _readFromProcess(self, process):
         'return an iterable object that reads all stdout from process until completed'
@@ -114,10 +117,10 @@ class ShellCommandReal(ShellCommand):
             exit(test)
             
     def _printInfo(self, text):
-        print '[shell info] %s' % text
+        print('[shell info] %s' % text)
     def _printOutput(self, text):
         if self.redirect_output:
-            print '[shell ###] %s' % text
+            print('[shell ###] %s' % text)
         else:
-            print '%s' % text
+            print('%s' % text)
             

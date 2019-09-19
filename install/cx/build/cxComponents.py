@@ -10,12 +10,16 @@
 #             
 #################################################             
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import subprocess
 import optparse
 import re
 import sys
 import os.path
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 
@@ -53,7 +57,7 @@ class Component(object):
 #        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
-            print "*** %s already exists, checkout ignored." % path
+            print("*** %s already exists, checkout ignored." % path)
             return True
         return False
     def checkout(self):
@@ -624,7 +628,7 @@ class org_custusx_mariana(CppComponent):
       self._getBuilder().gitSetRemoteURL(self.repository())
 #      self._getBuilder().gitCheckout('')
 #      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
-      self._getBuilder().gitCheckout('55d76dddf8750e4b2198265d97d432b0a02dcece')
+      self._getBuilder().gitCheckout('b0983699c2fca41f45633b1e06c1d9cde6259bb0')
     def configure(self):
         pass
     def build(self):
