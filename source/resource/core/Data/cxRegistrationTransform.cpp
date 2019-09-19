@@ -285,9 +285,7 @@ void RegistrationHistory::addRegistrationInternal(const RegistrationTransform& t
 	std::sort(mData.begin(), mData.end());
 
 	bool silent = transform.mTemp;
-	this->blockSignals(silent);
 	setActiveTime(QDateTime()); // reset to last registration when reregistering.
-	this->blockSignals(false);
 }
 
 /**
