@@ -72,7 +72,6 @@ public:
 
 
 private:
-	void deleteAllTextures();
 	bool create1DTextureObject(vtkTextureObjectPtr texture_object, unsigned int width, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
 	bool create3DTextureObject(vtkTextureObjectPtr texture_object, unsigned int width, unsigned int height, unsigned int depth, int dataType, int numComps, void *data, vtkOpenGLRenderWindowPtr opengl_renderwindow) const;
 	vtkOpenGLBufferObjectPtr allocateAndUploadArrayBuffer(QString uid, int my_numberOfTextureCoordinates, int numberOfComponentsPerTexture, const float *texture_data) const;
