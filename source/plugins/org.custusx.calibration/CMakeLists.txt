@@ -19,7 +19,9 @@ set(PLUGIN_SRCS
    gui/cxToolTipCalibrationWidget.h
    gui/cxToolTipCalibrationWidget.cpp
    gui/cxLapFrameToolCalibrationWidget.h
-   gui/cxLapFrameToolCalibrationWidget.cpp
+	 gui/cxLapFrameToolCalibrationWidget.cpp
+	 gui/cxEBUSCalibrationWidget.h
+	 gui/cxEBUSCalibrationWidget.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -31,6 +33,7 @@ set(PLUGIN_MOC_SRCS
    gui/cxTemporalCalibrationWidget.h
    gui/cxToolTipCalibrationWidget.h
    gui/cxLapFrameToolCalibrationWidget.h
+	 gui/cxEBUSCalibrationWidget.h
 
 )
 
