@@ -497,7 +497,8 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('b635858d27d1413db4fd40aa3ed8faafdafe974e')
+        #self._getBuilder().gitCheckout('b635858d27d1413db4fd40aa3ed8faafdafe974e')
+        self._getBuilder().gitCheckout('b9f64a788140c910cd808be7de0e1b98cc1aebc8')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -512,6 +513,9 @@ class FAST(CppComponent):
         add('FAST_MODULE_Python:BOOL', False)
         add('FAST_MODULE_NeuralNetwork:BOOL', False)
         add('FAST_MODULE_VTK:BOOL', True)
+        add('FAST_MODULE_Dicom:BOOL', False)
+        add('FAST_MODULE_Clarius:BOOL', False)
+        add('FAST_MODULE_RealSense:BOOL', False)
         add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TOOLS:BOOL', False)
