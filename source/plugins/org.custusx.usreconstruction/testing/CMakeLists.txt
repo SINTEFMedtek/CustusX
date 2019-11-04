@@ -10,6 +10,7 @@ if(BUILD_TESTING)
         cxtestReconstructionAlgorithmFixture.cpp
         cxtestReconstructRealData.h
         cxtestReconstructRealData.cpp
+        cxtestPositionFilter.cpp
     )
     
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
