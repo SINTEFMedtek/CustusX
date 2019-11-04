@@ -1,3 +1,4 @@
+from __future__ import print_function
 #####################################################
 # Author: Christian Askeland, SINTEF Medical Technology
 # Date:   2013.01.30
@@ -25,7 +26,7 @@ def clean_sloccount(infile, outfile, filters):
     Filter is whitespace-separated.
     '''
     filters = filters.split(' ')
-    print 'Removing all lines in %s containing one of:\n%s' % (infile, '\n'.join(filters))
+    print('Removing all lines in %s containing one of:\n%s' % (infile, '\n'.join(filters)))
 
     with open(infile, 'r') as f:
         read_data = f.read()

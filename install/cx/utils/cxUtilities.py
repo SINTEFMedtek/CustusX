@@ -10,6 +10,8 @@
 #
 #####################################################
     
+from __future__ import print_function
+from builtins import object
 import os
 import os.path
 import platform
@@ -31,15 +33,15 @@ def try_module_import(module):
         #import module
         return i
     except ImportError:
-        print "Error: Module %s not found." % module
+        print("Error: Module %s not found." % module)
         if platform.system() == 'Darwin':
-            print "Try to install %s using:" % module
-            print "    sudo easy_install pip"
-            print "    sudo pip install %s" % module
+            print("Try to install %s using:" % module)
+            print("    sudo easy_install pip")
+            print("    sudo pip install %s" % module)
         elif platform.system() == 'Linux':
-            print "Try to install %s using:" % module
-            print "    sudo apt-get install -y python-pip libxml2-dev libxslt-dev"
-            print "    sudo easy_install %s" % module
+            print("Try to install %s using:" % module)
+            print("    sudo apt-get install -y python-pip libxml2-dev libxslt-dev")
+            print("    sudo easy_install %s" % module)
         raise
 
 def try_lxml_import():
@@ -55,15 +57,15 @@ def try_lxml_import():
         import lxml.etree
         return lxml
     except ImportError:
-        print "Error: Module lxml not found."
+        print("Error: Module lxml not found.")
         if platform.system() == 'Darwin':
-            print "Try to install lxml using:"
-            print "    sudo easy_install pip"
-            print "    sudo pip install lxml"
+            print("Try to install lxml using:")
+            print("    sudo easy_install pip")
+            print("    sudo pip install lxml")
         elif platform.system() == 'Linux':
-			print "Try to install lxml using:"
-			print "    sudo apt-get install -y python-pip libxml2-dev libxslt-dev"
-			print "    sudo easy_install lxml"
+            print("Try to install lxml using:")
+            print("    sudo apt-get install -y python-pip libxml2-dev libxslt-dev")
+            print("    sudo easy_install lxml")
         raise
 
 def try_paramiko_import():
@@ -92,14 +94,14 @@ def writeToNewFile(filename, text):
         f.write(text)
 
 def readFile(filename):
-    with open(filename, 'r') as f:
+    with open(filename, 'rb') as f:
         content = f.read()
     return content
 
 def assertTrue(assertion, text):
     if not assertion:
         text = 'Test Failed: %s' % text
-        print text
+        print(text)
         raise Exception(text)
 
 def getPathToModule():
@@ -112,7 +114,7 @@ def getPathToModule():
     modulePath = os.path.abspath(modulePath)
     return modulePath
 
-class PlatformInfo:
+class PlatformInfo(object):
     '''
     Describes the operating system.
     Defines a unique string for the target os.
