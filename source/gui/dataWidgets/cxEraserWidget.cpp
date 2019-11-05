@@ -38,6 +38,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewGroupData.h"
 #include "cxReporter.h"
 #include "cxActiveData.h"
+#include "cxDataSelectWidget.h"
 
 namespace cx
 {
@@ -58,12 +59,13 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, ViewServi
 	mContinousEraseTimer = new QTimer(this);
 	connect(mContinousEraseTimer, SIGNAL(timeout()), this, SLOT(continousRemoveSlot())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 
+	layout->addWidget(new DataSelectWidget(viewService, patientModelService, this, StringPropertyActiveImage::New(patientModelService)));
 	QHBoxLayout* buttonLayout = new QHBoxLayout;
 	layout->addLayout(buttonLayout);
 	QHBoxLayout* buttonLayout2 = new QHBoxLayout;
 	layout->addLayout(buttonLayout2);
 
-	mShowEraserCheckBox = new QCheckBox("Show");
+	mShowEraserCheckBox = new QCheckBox("Show eraser");
 	mShowEraserCheckBox->setToolTip("Show eraser sphere in the views.");
 	connect(mShowEraserCheckBox, SIGNAL(toggled(bool)), this, SLOT(toggleShowEraser(bool)));
 	buttonLayout->addWidget(mShowEraserCheckBox);
@@ -84,7 +86,7 @@ EraserWidget::EraserWidget(PatientModelServicePtr patientModelService, ViewServi
 
 
 	double sphereRadius = 10;
-	mSphereSizeAdapter = DoubleProperty::initialize("SphereSize", "Sphere Size", "Radius of Eraser Sphere", sphereRadius, DoubleRange(0,200,1), 0, QDomNode());
+	mSphereSizeAdapter = DoubleProperty::initialize("SphereSize", "Sphere Radius (mm)", "Radius of Eraser Sphere in mm", sphereRadius, DoubleRange(0,100,0.1), 1, QDomNode());
 	connect(mSphereSizeAdapter.get(), &DoubleProperty::changed, this, &EraserWidget::sphereSizeChangedSlot);
 	mSphereSize = new SpinBoxAndSliderGroupWidget(this, mSphereSizeAdapter);
 	layout->addWidget(mSphereSize);
@@ -146,7 +148,6 @@ void EraserWidget::toggleContinous(bool on)
 void EraserWidget::continousRemoveSlot()
 {
 	Transform3D rMd = mViewService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
-	//Transform3D rMd = mViewService->getViewGroupDatas().front()->getData()->getOptions().mPickerGlyph->get_rMd();
 	Vector3D c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
@@ -161,6 +162,9 @@ void EraserWidget::continousRemoveSlot()
 void EraserWidget::duplicateSlot()
 {
 	ImagePtr original = mActiveData->getActive<Image>();
+
+	if (!original)
+		return;
 
 	ImagePtr duplicate = duplicateImage(mPatientModelService, original);
 	mPatientModelService->insertData(duplicate);
@@ -190,7 +194,11 @@ void EraserWidget::sphereSizeChangedSlot()
  */
 void EraserWidget::saveSlot()
 {
-	mPatientModelService->insertData(mActiveData->getActive<Image>());
+	ImagePtr image = mActiveData->getActive<Image>();
+	if (!image)
+		return;
+
+	mPatientModelService->insertData(image);
 }
 
 
@@ -199,47 +207,34 @@ void EraserWidget::eraseVolume(TYPE* volumePointer)
 {
 	ImagePtr image = mActiveData->getActive<Image>();
 	vtkImageDataPtr img = image->getBaseVtkImageData();
-
-
 	Eigen::Array3i dim(img->GetDimensions());
-	Vector3D spacing(img->GetSpacing());
-
+	Eigen::Array3d spacing(img->GetSpacing());
 	Transform3D rMd = mViewService->getGroup(0)->getOptions().mPickerGlyph->get_rMd();
-	Vector3D c(mSphere->GetCenter());
+	Eigen::Array3d c(mSphere->GetCenter());
 	c = rMd.coord(c);
 	double r = mSphere->GetRadius();
+	int replaceVal = mEraseValueAdapter->getValue();
+
 	mPreviousCenter = c;
 	mPreviousRadius = r;
 
-	DoubleBoundingBox3D bb_r(c[0]-r, c[0]+r, c[1]-r, c[1]+r, c[2]-r, c[2]+r);
-
+	Eigen::Array3d scaledRadius = r*spacing.inverse();
 	Transform3D dMr = image->get_rMd().inv();
 	Transform3D rawMd = createTransformScale(spacing).inv();
 	Transform3D rawMr = rawMd * dMr;
-	Vector3D c_d = dMr.coord(c);
-	double r_d = dMr.vector(r * Vector3D::UnitX()).length();
-	c = rawMr.coord(c);
-	r = rawMr.vector(r * Vector3D::UnitX()).length();
-	DoubleBoundingBox3D bb0_raw = transform(rawMr, bb_r);
-	IntBoundingBox3D bb1_raw(0, dim[0], 0, dim[1], 0, dim[2]);
+	c = rawMr.coord(c); //Center voxel
 
-//	std::cout << "     sphere: " << bb0_raw << std::endl;
-//	std::cout << "        raw: " << bb1_raw << std::endl;
+	Eigen::Array3i lowVoxIdx = (c - scaledRadius).floor().cast<int>();
+	lowVoxIdx = lowVoxIdx.max(0);
+	Eigen::Array3i highVoxIdx = (c + scaledRadius).ceil().cast<int>();
+	highVoxIdx = highVoxIdx.min(dim);
 
-	for (int i=0; i<3; ++i)
-	{
-		bb1_raw[2*i] = std::max<double>(bb1_raw[2*i], bb0_raw[2*i]);
-		bb1_raw[2*i+1] = std::min<double>(bb1_raw[2*i+1], bb0_raw[2*i+1]);
-	}
-
-	int replaceVal = mEraseValueAdapter->getValue();
-
-	for (int x = bb1_raw[0]; x < bb1_raw[1]; ++x)
-		for (int y = bb1_raw[2]; y < bb1_raw[3]; ++y)
-			for (int z = bb1_raw[4]; z < bb1_raw[5]; ++z)
+	for (int x = lowVoxIdx(0); x < highVoxIdx(0); ++x)
+		for (int y = lowVoxIdx(1); y < highVoxIdx(1); ++y)
+			for (int z = lowVoxIdx(2); z < highVoxIdx(2); ++z)
 			{
 				int index = x + y * dim[0] + z * dim[0] * dim[1];
-				if ((Vector3D(x*spacing[0], y*spacing[1], z*spacing[2]) - c_d).length() < r_d)
+				if ((Vector3D((x-c(0))*spacing[0], (y-c(1))*spacing[1], (z-c(2))*spacing[2])).length() < r)
 					volumePointer[index] = replaceVal;
 			}
 }
@@ -265,8 +260,10 @@ void EraserWidget::removeSlot()
 		return;
 
 	ImagePtr image = mActiveData->getActive<Image>();
-	vtkImageDataPtr img = image->getBaseVtkImageData();
+	if (!image)
+		return;
 
+	vtkImageDataPtr img = image->getBaseVtkImageData();
 	int vtkScalarType = img->GetScalarType();
 
 	if (vtkScalarType==VTK_CHAR)

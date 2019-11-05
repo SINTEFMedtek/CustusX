@@ -10,20 +10,26 @@
 #             
 #################################################             
 
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import subprocess
 import optparse
 import re
 import sys
 import os.path
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 import shutil
-import cxRepoHandler
+from . import cxRepoHandler
 
-from cxShell import *
+from .cxShell import *
     
-class CppBuilder:
+class CppBuilder(object):
     '''
     Contains methods for working on a cpp project
     '''
@@ -136,7 +142,7 @@ class CppBuilder:
         if not output:
             return False
         if output.stdout.strip()==tag:
-            print "Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath)
+            print("Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath))
             return True
         return False
                     
@@ -162,20 +168,20 @@ class CppBuilder:
 
     def addCMakeOption(self, key, value):
         if('CMAKE_CXX_FLAGS:STRING' == key):
-            print 'WARNING: CMAKE_CXX_FLAGS must be added by CMakeFiles, skipping: '+value
+            print('WARNING: CMAKE_CXX_FLAGS must be added by CMakeFiles, skipping: '+value)
             return
         self.cmakeOptions[key] = value
 
     def appendCMakeOption(self, key, value):
         temp = ""
-        if(self.cmakeOptions.has_key(key)):
+        if(key in self.cmakeOptions):
             temp = self.cmakeOptions[key]
-            print key+" was set to "+temp
+            print(key+" was set to "+temp)
         if(not temp):
             new = value
         else:
             new = temp+" "+value
-        print key+" is now set to "+new
+        print(key+" is now set to "+new)
         self.cmakeOptions[key] = new
 
     def configureCMake(self, options=''): 
@@ -203,11 +209,11 @@ class CppBuilder:
         add('CMAKE_ECLIPSE_GENERATE_LINKED_RESOURCES', False)
     
     def _assembleOptions(self):
-        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.iteritems()])
+        return " ".join(['-D%s="%s"'%(key,val) for key,val in self.cmakeOptions.items()])
     
     def _printOptions(self):
-        options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.iteritems()])
-        print "*** CMake Options:\n", options
+        options = "".join(["    %s = %s\n"%(key,val) for key,val in self.cmakeOptions.items()])
+        print("*** CMake Options:\n", options)
 
     def _changeDirToBase(self):
         changeDir(self.mBasePath)
