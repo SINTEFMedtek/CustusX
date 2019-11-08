@@ -146,8 +146,15 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 
 	//Reference is getting transform from reference tool to tracking system.
 	//Only use received transform to verify that reference tool is visible.
-	if(isReference())
-		return;
+//	if(isReference())
+//		return;
+
+	//-----------------------------------------------------------------------------------------------
+	// NB - Update: Now get all transforms between tool and tracking system (ts)
+	// This is necessary for systems that handle ref sensor as other tools.
+	// Ref sensor pos is applied to all tools in OpenIGTLinkTrackingSystemService::receiveTransform()
+	// TODO: fix all code that use OpenIGTLink trakcing (Plus and Anser)
+	//-----------------------------------------------------------------------------------------------
 
     Transform3D prMt = prMs * this->getCalibration_sMt();
     Transform3D prMt_filtered = prMt;
