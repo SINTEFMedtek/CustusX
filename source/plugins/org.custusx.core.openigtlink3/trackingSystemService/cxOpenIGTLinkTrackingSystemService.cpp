@@ -154,7 +154,15 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	if(tool)
 	{
-		tool->toolTransformAndTimestampSlot(transform, timestamp);
+		Transform3D tsMs = transform;
+		Transform3D prMs = tsMs;//If no reference tool ts==pr (ts = tracking system )
+		if(mReference && !tool->isReference())
+		{
+			Transform3D trMpr = mReference->get_prMt();
+			prMs = trMpr.inv() * tsMs;
+		}
+
+		tool->toolTransformAndTimestampSlot(prMs, timestamp);
 	}
 }
 
