@@ -155,11 +155,11 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 	if(tool)
 	{
 		Transform3D tsMs = transform;
-		Transform3D prMs = tsMs;//If no reference tool ts==pr (ts = tracking system )
+		Transform3D prMs = tsMs;//If no reference tool: ts==pr (ts = tracking system )
 		if(mReference && !tool->isReference())
 		{
-			Transform3D trMpr = mReference->get_prMt();
-			prMs = trMpr.inv() * tsMs;
+			Transform3D tsMpr = mReference->get_prMt();
+			prMs = tsMpr.inv() * tsMs;
 		}
 		//tool->toolTransformAndTimestampSlot(transform, timestampMS);
 		//Apply ref sensor pos to all tool positions
