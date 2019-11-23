@@ -61,7 +61,7 @@ cxResource_EXPORT QRgb modifyOverlayColor(unsigned char *colorsPtr, QColor overl
  * @return 2D slice as vtkImageData
  */
 cxResource_EXPORT vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outputSpacing, Eigen::Array3i outputDimensions, ToolPtr sliceTool, PatientModelServicePtr patientModel, bool applyLUT);
-
+cxResource_EXPORT vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D position, bool applyLUT = true);
 /**
  */
 cxResource_EXPORT QDateTime extractTimestamp(QString text);
