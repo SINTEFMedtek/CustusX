@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 #include "cxVolumeHelpers.h"
+#include "cxRouteToTarget.h"
 
 
 namespace cx
@@ -64,6 +65,11 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
 
     mBranchListPtr->smoothBranchPositions(40);
     mBranchListPtr->interpolateBranchPositions(5);
+}
+
+BranchListPtr AirwaysFromCenterline::getBranchList()
+{
+	return mBranchListPtr;
 }
 
 /*
@@ -203,6 +209,24 @@ vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysV
             }
 
     return airwaysVolumePtr;
+}
+
+void AirwaysFromCenterline::smoothAllBranchesForVB()
+{
+
+	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
+	for (int i=0; i<branches.size(); i++)
+	{
+		Eigen::MatrixXd positions = branches[i]->getPositions();
+		std::vector< Eigen::Vector3d > smoothedPositions = smoothBranch(branches[i], 0, positions.col(0));
+		for (int j=0; j<smoothedPositions.size(); j++)
+		{
+			positions(0,j) = smoothedPositions[j](0);
+			positions(1,j) = smoothedPositions[j](1);
+			positions(2,j) = smoothedPositions[j](2);
+		}
+		branches[i]->setPositions(positions);
+	}
 }
 
 vtkPolyDataPtr AirwaysFromCenterline::getVTKPoints()

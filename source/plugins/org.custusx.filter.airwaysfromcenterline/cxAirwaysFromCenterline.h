@@ -32,10 +32,12 @@ public:
     virtual ~AirwaysFromCenterline();
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
     void processCenterline(vtkPolyDataPtr centerline_r);
+		BranchListPtr getBranchList();
     vtkPolyDataPtr generateTubes();
     vtkImageDataPtr initializeAirwaysVolume();
     vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr);
     vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
+		void smoothAllBranchesForVB();
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
     vtkPolyDataPtr getVTKPoints();
 

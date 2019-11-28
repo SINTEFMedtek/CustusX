@@ -23,14 +23,15 @@ public:
 	virtual ~RouteToTarget();
 	//void setCenterline(vtkPolyDataPtr centerline);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
+	void setSmoothing(bool smoothing);
 	void processCenterline(MeshPtr mesh);
+	void setBranchList(BranchListPtr branchList);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findRoutePositions();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
 	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
-	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
 	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
 	void makeMarianaCenterlineFile(QString filename);
@@ -39,6 +40,7 @@ public:
 
 private:
 	Eigen::MatrixXd mCLpoints;
+	bool mSmoothing = true;
 	BranchListPtr mBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;
@@ -48,9 +50,10 @@ private:
 	std::vector< int > mBranchingIndex;
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
-	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 };
 
+std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
+org_custusx_filter_routetotarget_EXPORT std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
