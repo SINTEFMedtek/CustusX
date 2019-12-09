@@ -1,6 +1,7 @@
 #ifndef CXBRONCHOSCOPEPOSITIONPROJECTION_H
 #define CXBRONCHOSCOPEPOSITIONPROJECTION_H
 
+#include "org_custusx_bronchoscopynavigation_EXPORT.h"
 #include "cxMesh.h"
 #include <QDomElement>
 
@@ -14,7 +15,7 @@ typedef boost::shared_ptr<class BranchList> BranchListPtr;
 typedef boost::shared_ptr<class Branch> BranchPtr;
 
 
-class BronchoscopePositionProjection
+class org_custusx_bronchoscopynavigation_EXPORT BronchoscopePositionProjection
 {
 public:
 	BronchoscopePositionProjection();
@@ -22,29 +23,39 @@ public:
 	virtual ~BronchoscopePositionProjection();
 	void setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection);
 	void createMaxDistanceToCenterlineOption(QDomElement root);
-    DoublePropertyPtr getMaxDistanceToCenterlineOption();
-    void createMaxSearchDistanceOption(QDomElement root);
-    DoublePropertyPtr getMaxSearchDistanceOption();
-    void createAlphaOption(QDomElement root);
-    DoublePropertyPtr getAlphaOption();
+	DoublePropertyPtr getMaxDistanceToCenterlineOption();
+	double getMaxDistanceToCenterlineValue();
+	void createMaxSearchDistanceOption(QDomElement root);
+	DoublePropertyPtr getMaxSearchDistanceOption();
+	double getMaxSearchDistanceValue();
+	void createAlphaOption(QDomElement root);
+	DoublePropertyPtr getAlphaOption();
+	double getAlphaValue();
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd);
 	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, Transform3D rMpr);
+	void setBranchList(BranchListPtr branchList);
+	void setMaxDistanceToCenterline(double maxDistance);
+	void setMaxSearchDistance(double maxDistance);
+	void setAlpha(double alpha);
 	Transform3D findClosestPoint(Transform3D prMt, double maxDistance);
 	Transform3D findClosestPointInBranches(Transform3D prMt, double maxDistance);
 	Transform3D findClosestPointInSearchPositions(Transform3D prMt, double maxDistance);
 	void findSearchPositions(double maxSearchDistance);
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
 	void searchBranchDown(BranchPtr searchBranchPtr, int startIndex, double currentSearchDistance, double maxSearchDistance);
-    Transform3D findProjectedPoint(Transform3D prMt, double maxDistance, double maxSearchDistance);
+	Transform3D findProjectedPoint(Transform3D prMt, double maxDistance, double maxSearchDistance);
 	bool isAdvancedCenterlineProjectionSelected();
 	Transform3D updateProjectedCameraOrientation(Transform3D prMt, BranchPtr branch, int index);
 
 private:
 	bool isPreviousProjectedPointSet;
 	Eigen::MatrixXd mCLpoints;
-    DoublePropertyPtr mMaxDistanceToCenterline;
-    DoublePropertyPtr mMaxSearchDistance;
-    DoublePropertyPtr mAlpha;
+	DoublePropertyPtr mMaxDistanceToCenterline;
+	DoublePropertyPtr mMaxSearchDistance;
+	DoublePropertyPtr mAlpha;
+	double mMaxDistanceToCenterlineValue;
+	double mMaxSearchDistanceValue;
+	double mAlphaValue;
 	BranchListPtr mBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
 	int mProjectedIndex;

@@ -38,8 +38,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-BronchoscopyNavigationGUIExtenderService::BronchoscopyNavigationGUIExtenderService(ctkPluginContext *context) :
-  mContext(context)
+BronchoscopyNavigationGUIExtenderService::BronchoscopyNavigationGUIExtenderService(VisServicesPtr services) :
+	mServices(services)
 {
 }
 
@@ -48,7 +48,7 @@ std::vector<GUIExtenderService::CategorizedWidget> BronchoscopyNavigationGUIExte
 	std::vector<CategorizedWidget> retval;
 
 	retval.push_back(GUIExtenderService::CategorizedWidget(
-			new BronchoscopyNavigationWidget(mContext, NULL),
+			new BronchoscopyNavigationWidget(mServices, NULL),
 			"Utility"));
 
 	return retval;

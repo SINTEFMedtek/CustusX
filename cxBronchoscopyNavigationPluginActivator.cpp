@@ -37,6 +37,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "cxBronchoscopyNavigationGUIExtenderService.h"
 #include "cxRegisteredService.h"
+#include "cxTrackingSystemBronchoscopyService.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
@@ -50,13 +52,22 @@ BronchoscopyNavigationPluginActivator::~BronchoscopyNavigationPluginActivator()
 
 void BronchoscopyNavigationPluginActivator::start(ctkPluginContext* context)
 {
-	BronchoscopyNavigationGUIExtenderService *bronchoscopyNavigationService = new BronchoscopyNavigationGUIExtenderService(context);
+	VisServicesPtr services = VisServices::create(context);
+
+	BronchoscopyNavigationGUIExtenderService *bronchoscopyNavigationService = new BronchoscopyNavigationGUIExtenderService(services);
 	mRegistration = RegisteredServicePtr(new RegisteredService(context, bronchoscopyNavigationService, GUIExtenderService_iid));
+
+	BronchoscopePositionProjectionPtr projectionCenterlinePtr = BronchoscopePositionProjectionPtr(new BronchoscopePositionProjection());
+
+//	TrackingSystemBronchoscopyService* trackingSystemBronchoscopyService = new TrackingSystemBronchoscopyService(services->tracking(), projectionCenterlinePtr);
+//	mRegistrationTracking = RegisteredService::create<TrackingSystemBronchoscopyService>(context,trackingSystemBronchoscopyService, TrackingSystemService_iid);
+
 }
 
 void BronchoscopyNavigationPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.reset();
+	mRegistrationTracking.reset();
 	Q_UNUSED(context);
 }
 
