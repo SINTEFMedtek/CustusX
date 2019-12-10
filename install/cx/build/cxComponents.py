@@ -662,7 +662,7 @@ class org_custusx_bronchoscopynavigation(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckout('54571ecc3bdd5c993bf615d04229bfc6d323b192')
-        self._getBuilder().gitCheckout('d708c36ca03a926f2b39e69c1182f5054daa76a5')
+        self._getBuilder().gitCheckout('5c6a3411a33885c701ee6c6c298063b621983a64')
     def configure(self):
         pass
     def build(self):
