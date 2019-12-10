@@ -1,7 +1,7 @@
 #ifndef CXBRONCHOSCOPEPOSITIONPROJECTION_H
 #define CXBRONCHOSCOPEPOSITIONPROJECTION_H
 
-#include "org_custusx_bronchoscopynavigation_EXPORT.h"
+#include "org_custusx_bronchoscopynavigation_Export.h"
 #include "cxMesh.h"
 #include <QDomElement>
 
