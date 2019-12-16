@@ -318,6 +318,27 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 	 return array;
 }
 
+QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList)
+{
+	QJsonArray array;
+
+	std::vector<BranchPtr> branches = branchList->getBranches();
+	for (int i = 0; i < branches.size(); i++)
+	{
+		Eigen::MatrixXd positions = branches[i]->getPositions();
+		for (int j = 0; j < positions.cols(); j++)
+		{
+			QJsonObject JsonPosition;
+			JsonPosition.insert( "x", positions(0,j) );
+			JsonPosition.insert( "y", positions(1,j) );
+			JsonPosition.insert( "z", positions(2,j) );
+			array.append(JsonPosition);
+		}
+	 }
+
+	 return array;
+}
+
 /*
 		RouteToTarget::getBranchPositions is used to get positions of a branch without smoothing.
 		Equivalent to RouteToTarget::smoothBranch without smoothing.

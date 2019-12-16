@@ -52,6 +52,7 @@ private:
 	std::vector<int> mSearchIndexVector;
 };
 
+org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
 std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 org_custusx_filter_routetotarget_EXPORT std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 double findDistanceToLine(Eigen::MatrixXd point, Eigen::MatrixXd line);
