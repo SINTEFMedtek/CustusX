@@ -20,6 +20,7 @@ class org_custusx_bronchoscopynavigation_EXPORT BronchoscopePositionProjection
 public:
 	BronchoscopePositionProjection();
     BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D prMd);
+		void setRundFromWidget(bool runFromWidget);
 	virtual ~BronchoscopePositionProjection();
 	void setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection);
 	void createMaxDistanceToCenterlineOption(QDomElement root);
@@ -64,6 +65,7 @@ private:
 	bool mUseAdvancedCenterlineProjection;
 	Vector3D mProjectedViewDirection;
 	Transform3D m_rMpr;
+	bool mRunFromWidget = true;
 };
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 double findDistanceWithOrientation(Eigen::VectorXd p1, Eigen::VectorXd p2, Eigen::VectorXd o1, Eigen::VectorXd o2, double alpha);

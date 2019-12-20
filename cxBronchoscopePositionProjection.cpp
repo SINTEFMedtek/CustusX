@@ -31,6 +31,11 @@ BronchoscopePositionProjection::~BronchoscopePositionProjection()
 {
 }
 
+void BronchoscopePositionProjection::setRundFromWidget(bool runFromWidget)
+{
+	mRunFromWidget = runFromWidget;
+}
+
 void BronchoscopePositionProjection::setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection)
 {
 	mUseAdvancedCenterlineProjection = useAdvancedCenterlineProjection;
@@ -51,7 +56,7 @@ DoublePropertyPtr BronchoscopePositionProjection::getMaxDistanceToCenterlineOpti
 
 double BronchoscopePositionProjection::getMaxDistanceToCenterlineValue()
 {
-	if (mMaxDistanceToCenterline->getValue())
+	if (mRunFromWidget && mMaxDistanceToCenterline->getValue())
 		mMaxDistanceToCenterlineValue = mMaxDistanceToCenterline->getValue();
 
 	return mMaxDistanceToCenterlineValue;
@@ -72,7 +77,7 @@ DoublePropertyPtr BronchoscopePositionProjection::getMaxSearchDistanceOption()
 
 double BronchoscopePositionProjection::getMaxSearchDistanceValue()
 {
-	if (mMaxSearchDistance->getValue())
+	if (mRunFromWidget && mMaxSearchDistance->getValue())
 		mMaxSearchDistanceValue = mMaxSearchDistance->getValue();
 
 	return mMaxSearchDistanceValue;
