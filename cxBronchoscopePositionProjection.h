@@ -34,7 +34,7 @@ public:
 	double getAlphaValue();
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd);
 	void processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, Transform3D rMpr);
-	void setBranchList(BranchListPtr branchList);
+	void setBranchList(BranchListPtr branchList, Transform3D rMpr);
 	void setMaxDistanceToCenterline(double maxDistance);
 	void setMaxSearchDistance(double maxDistance);
 	void setAlpha(double alpha);

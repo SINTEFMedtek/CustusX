@@ -6,6 +6,7 @@
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include "cxLogger.h"
 
 
 namespace cx
@@ -97,7 +98,7 @@ DoublePropertyPtr BronchoscopePositionProjection::getAlphaOption()
 
 double BronchoscopePositionProjection::getAlphaValue()
 {
-	if (mAlpha->getValue())
+	if (mRunFromWidget && mAlpha->getValue())
 		mAlphaValue = mAlpha->getValue();
 
 	return mAlphaValue;
@@ -137,11 +138,12 @@ void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline
 }
 
 //Can be used instead of processCenterline(...) if you have a preprosessed branchList to be used in the registration process.
-void BronchoscopePositionProjection::setBranchList(BranchListPtr branchList)
+void BronchoscopePositionProjection::setBranchList(BranchListPtr branchList, Transform3D rMpr)
 {
 	if (!branchList)
 		return;
 
+	m_rMpr = rMpr;
 	mBranchListPtr = branchList;
 }
 
@@ -249,7 +251,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 		Eigen::MatrixXd orientations = mSearchBranchPtrVector[i]->getOrientations();
 
 		//double D = findDistance(positions.col(mSearchIndexVector[i]), toolPos);
-		double alpha = getAlphaOption()->getValue();
+		double alpha = getAlphaValue();
 		double D = findDistanceWithOrientation(positions.col(mSearchIndexVector[i]), toolPos, orientations.col(mSearchIndexVector[i]), toolOrientation, alpha);
 		if (D < minDistance)
 		{
@@ -258,7 +260,6 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 			minDistancePositionIndex = mSearchIndexVector[i];
 		}
 	}
-
 	if (minDistance < maxDistance)
 	{
 		Eigen::MatrixXd positions = minDistanceBranch->getPositions();
