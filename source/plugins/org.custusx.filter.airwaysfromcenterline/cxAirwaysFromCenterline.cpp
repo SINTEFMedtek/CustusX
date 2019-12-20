@@ -59,12 +59,15 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-    Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
+	Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
 
-    mBranchListPtr->findBranchesInCenterline(CLpoints_r);
+	mBranchListPtr->findBranchesInCenterline(CLpoints_r);
 
-    mBranchListPtr->smoothBranchPositions(40);
-    mBranchListPtr->interpolateBranchPositions(5);
+	mBranchListPtr->smoothBranchPositions(40);
+	mBranchListPtr->interpolateBranchPositions(5);
+
+	mBranchListPtr->calculateOrientations();
+	mBranchListPtr->smoothOrientations();
 }
 
 BranchListPtr AirwaysFromCenterline::getBranchList()

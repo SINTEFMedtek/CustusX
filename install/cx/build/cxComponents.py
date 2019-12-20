@@ -629,7 +629,7 @@ class org_custusx_mariana(CppComponent):
 #      self._getBuilder().gitCheckout('')
 #      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
 #      self._getBuilder().gitCheckout('186fdb8b7c9d48b91a14b4b750e0a07b29a5c819')
-      self._getBuilder().gitCheckout('2433f2135d5d72852154a927692afe5bcc61ae2f')
+      self._getBuilder().gitCheckout('52173f24cc29d131cbf16a69ded7c53f7dcfcc90')
     def configure(self):
         pass
     def build(self):
@@ -662,7 +662,7 @@ class org_custusx_bronchoscopynavigation(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckout('54571ecc3bdd5c993bf615d04229bfc6d323b192')
-        self._getBuilder().gitCheckout('5c6a3411a33885c701ee6c6c298063b621983a64')
+        self._getBuilder().gitCheckout('ff39c1f02ec014bfdbb229d8bc7731d955314bce')
     def configure(self):
         pass
     def build(self):
