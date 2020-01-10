@@ -47,7 +47,7 @@ namespace cx
 {
 
 TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline):
-	mBase(trackingService->getTrackingSystems().front()),
+	mBase(trackingService->getTrackingSystems().back()),
 	mTrackingService(trackingService),
 	mProjectionCenterline(projectionCenterline)
 {

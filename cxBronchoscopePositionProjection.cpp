@@ -32,7 +32,7 @@ BronchoscopePositionProjection::~BronchoscopePositionProjection()
 {
 }
 
-void BronchoscopePositionProjection::setRundFromWidget(bool runFromWidget)
+void BronchoscopePositionProjection::setRunFromWidget(bool runFromWidget)
 {
 	mRunFromWidget = runFromWidget;
 }
