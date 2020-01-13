@@ -59,9 +59,16 @@ TrackingSystemBronchoscopyService::~TrackingSystemBronchoscopyService()
 {
 }
 
+void TrackingSystemBronchoscopyService::setTrackingSystem(QString trackingSystem)
+{
+	std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
+	for (int i=0; i<trackingSystems.size(); i++)
+		if (trackingSystems[i]->getUid() == trackingSystem)
+			mBase = trackingSystems[i];
+}
+
 void TrackingSystemBronchoscopyService::onStateChanged()
 {
-
 	ToolPtr activeTool = mTrackingService->getActiveTool();
 	std::vector<ToolPtr> tools	 = mBase->getTools();
 	mTools.clear();
