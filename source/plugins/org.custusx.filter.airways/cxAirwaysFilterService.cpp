@@ -75,7 +75,7 @@ QString AirwaysFilter::getHelp() const
 {
 	return "<html>"
 	        "<h3>Airway Segmentation.</h3>"
-	        "<p><i>Extracts segmentation and centerline from a CT volume. If method fails, try to crop volume. </br>Algorithm written by Erik Smistad.</i></p>"
+					"<p><i>Extracts airways and blood vessels, including centerlines, and lungs from a CT volume. If method fails, try to crop volume. </br>Algorithm written by Erik Smistad.</i></p>"
            "</html>";
 }
 
@@ -184,23 +184,23 @@ bool AirwaysFilter::preProcess()
 bool AirwaysFilter::execute()
 {
 
-    CX_LOG_INFO() << "EXECUTING AIRWAYS FILTER";
+	CX_LOG_INFO() << "EXECUTING AIRWAYS FILTER";
 	// Check if pre process went ok:
-    if(!mInputImage)
+	if(!mInputImage)
 		return false;
 
-    QString q_filename = "";
-    QString activePatienFolder = patientService()->getActivePatientFolder();
-    QString inputImageFileName = mInputImage->getFilename();
-    if(!activePatienFolder.isEmpty())
-        q_filename = activePatienFolder+"/"+inputImageFileName;
-    else
-        q_filename = inputImageFileName;
+	QString q_filename = "";
+	QString activePatienFolder = patientService()->getActivePatientFolder();
+	QString inputImageFileName = mInputImage->getFilename();
+	if(!activePatienFolder.isEmpty())
+		q_filename = activePatienFolder+"/"+inputImageFileName;
+	else
+		q_filename = inputImageFileName;
 
 	try {
 		fast::Config::getTestDataPath(); // needed for initialization
-        QString cacheDir = cx::DataLocations::getCachePath();
-        fast::Config::setKernelBinaryPath(cacheDir.toStdString());
+		QString cacheDir = cx::DataLocations::getCachePath();
+		fast::Config::setKernelBinaryPath(cacheDir.toStdString());
 		QString kernelDir = cx::DataLocations::findConfigFolder("/FAST", FAST_SOURCE_DIR);
 		fast::Config::setKernelSourcePath(kernelDir.toStdString());
 
@@ -215,7 +215,7 @@ bool AirwaysFilter::execute()
 		reportError("Airway segmentation algorithm threw a unknown exception.");
 
 		return false;
-    }
+	}
 
 	bool doAirwaySegmentation = getAirwaySegmentationOption(mOptions)->getValue();
 	bool doLungSegmentation = getLungSegmentationOption(mOptions)->getValue();
@@ -223,8 +223,8 @@ bool AirwaysFilter::execute()
 
 	if (doAirwaySegmentation)
 	{
-	    std::string volumeFilname = q_filename.toStdString();
-	    // Import image data from disk
+		std::string volumeFilname = q_filename.toStdString();
+		// Import image data from disk
 		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
 		importerPtr->setFilename(volumeFilname);
 
@@ -233,8 +233,8 @@ bool AirwaysFilter::execute()
 
 	if (doLungSegmentation)
 	{
-	    std::string volumeFilname = q_filename.toStdString();
-	    // Import image data from disk
+		std::string volumeFilname = q_filename.toStdString();
+		// Import image data from disk
 		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
 		importerPtr->setFilename(volumeFilname);
 
@@ -243,15 +243,15 @@ bool AirwaysFilter::execute()
 
 	if (doVesselSegmentation)
 	{
-	    std::string volumeFilname = q_filename.toStdString();
-	    // Import image data from disk
+		std::string volumeFilname = q_filename.toStdString();
+		// Import image data from disk
 		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
 		importerPtr->setFilename(volumeFilname);
 
 		segmentVessels(importerPtr);
 	}
 
- 	return true;
+	return true;
 }
 
 void AirwaysFilter::segmentAirways(fast::ImageFileImporter::pointer importerPtr)
@@ -331,7 +331,7 @@ void AirwaysFilter::segmentLungs(fast::ImageFileImporter::pointer importerPtr)
 
 	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
 
-    // Do segmentation
+	// Do segmentation
 	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
 	lungSegmentationPtr->setInputConnection(importerPtr->getOutputPort());
 
@@ -348,7 +348,7 @@ void AirwaysFilter::segmentVessels(fast::ImageFileImporter::pointer importerPtr)
 
 	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
 
-    // Do segmentation
+	// Do segmentation
 	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
 	lungSegmentationPtr->setInputConnection(importerPtr->getOutputPort());
 
@@ -357,13 +357,13 @@ void AirwaysFilter::segmentVessels(fast::ImageFileImporter::pointer importerPtr)
 		lungSegmentationPtr->setAirwaySeedPoint(seedPoint(0), seedPoint(1), seedPoint(2));
 	}
 
-    extractBloodVessels(lungSegmentationPtr);
+	extractBloodVessels(lungSegmentationPtr);
 }
 
 bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegmentationPtr)
 {
 	try{
-    	auto segPortBloodVessels = lungSegmentationPtr->getBloodVesselOutputPort();
+		auto segPortBloodVessels = lungSegmentationPtr->getBloodVesselOutputPort();
 
 		// Convert fast segmentation data to VTK data which CX can use
 		vtkSmartPointer<fast::VTKImageExporter> vtkBloodVesselExporter = fast::VTKImageExporter::New();
@@ -526,7 +526,7 @@ bool AirwaysFilter::postProcessAirways()
 bool AirwaysFilter::postProcessLungs()
 {
 	if(!mLungSegmentationOutput)
-				return false;
+		return false;
 
 	double threshold = 1; /// because the segmented image is 0..1
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
@@ -550,7 +550,7 @@ bool AirwaysFilter::postProcessLungs()
 			patientService(),
 			rawContour,
 			outputImage,
-            color
+			color
 	);
 
 	contour->get_rMd_History()->setRegistration(mInputImage->get_rMd());
@@ -701,8 +701,8 @@ BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 			BoolProperty::initialize("Use manual seed point",
 					"",
 					"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
-                    "inside trachea of the patient. "
-                    "Then tick this checkbox to use the manual seed point in the airways filter.",
+					"inside trachea of the patient. "
+					"Then tick this checkbox to use the manual seed point in the airways filter.",
 					false, root);
 	return retval;
 

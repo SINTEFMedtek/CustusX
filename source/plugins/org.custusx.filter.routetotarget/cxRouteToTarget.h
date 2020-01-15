@@ -71,7 +71,6 @@ private:
 	bool mPathToBloodVesselsFound = false;
 };
 
-//Eigen::MatrixXd removeSmallAndPeripheralBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions);
 Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition);
 std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
 std::pair<int, double> findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);

@@ -48,12 +48,12 @@ void RouteToTarget::setBloodVesselVolume(ImagePtr bloodVesselVolume)
 Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
 
-    int N = centerline_r->GetNumberOfPoints();
+	int N = centerline_r->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
 		{
 		double p[3];
-        centerline_r->GetPoint(i,p);
+		centerline_r->GetPoint(i,p);
 		Eigen::Vector3d position;
 		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
 		CLpoints.block(0 , i , 3 , 1) = position;
@@ -70,11 +70,11 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 
 	mCLpoints = getCenterlinePositions(centerline_r);
 
-    mBranchListPtr->findBranchesInCenterline(mCLpoints);
+	mBranchListPtr->findBranchesInCenterline(mCLpoints);
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
-    //mBranchListPtr->smoothBranchPositions(40);
+	//mBranchListPtr->smoothBranchPositions(40);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -124,7 +124,7 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 	}
 
 
-	std::cout << "Number of branches in CT blood vessel centerline: " << mBloodVesselBranchListPtr->getBranches().size() << std::endl;
+	CX_LOG_INFO() << "Number of branches in CT blood vessel centerline: " << mBloodVesselBranchListPtr->getBranches().size();
 }
 
 void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
@@ -138,7 +138,7 @@ void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-            double D = findDistance(positions.col(j), targetCoordinate_r);
+			double D = findDistance(positions.col(j), targetCoordinate_r);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -163,7 +163,7 @@ void RouteToTarget::findClosestPointInBloodVesselBranches(Vector3D targetCoordin
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-            double D = findDistance(positions.col(j), targetCoordinate_r);
+			double D = findDistance(positions.col(j), targetCoordinate_r);
 			if (D < minDistance)
 			{
 				minDistance = D;
@@ -263,8 +263,8 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 	{
 		double extensionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
 		Eigen::Vector3d extensionVectorNormalized = ( mTargetPosition - mRoutePositions.front() ) / extensionDistance;
-        int numberOfextensionPoints = int(extensionDistance / extensionPointIncrement);
-        Eigen::Vector3d extensionPointIncrementVector = extensionVectorNormalized * extensionDistance / numberOfextensionPoints;
+		int numberOfextensionPoints = int(extensionDistance / extensionPointIncrement);
+		Eigen::Vector3d extensionPointIncrementVector = extensionVectorNormalized * extensionDistance / numberOfextensionPoints;
 
 		for (int i = 1; i<= numberOfextensionPoints; i++)
 		{
@@ -272,8 +272,8 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 		}
 	}
 
-    vtkPolyDataPtr retval = addVTKPoints(mExtendedRoutePositions);
-    return retval;
+	vtkPolyDataPtr retval = addVTKPoints(mExtendedRoutePositions);
+	return retval;
 }
 
 
@@ -419,10 +419,10 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> position
 	vtkPolyDataPtr retval = vtkPolyDataPtr::New();
 	vtkPointsPtr points = vtkPointsPtr::New();
 	vtkCellArrayPtr lines = vtkCellArrayPtr::New();
-    int numberOfPositions = positions.size();
+	int numberOfPositions = positions.size();
 	for (int j = numberOfPositions - 1; j >= 0; j--)
 	{
-        points->InsertNextPoint(positions[j](0),positions[j](1),positions[j](2));
+		points->InsertNextPoint(positions[j](0),positions[j](1),positions[j](2));
 	}
 	for (int j = 0; j < numberOfPositions-1; j++)
 	{
@@ -466,57 +466,56 @@ std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, 
 	vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
 	vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
 
-    double branchRadius = branchPtr->findBranchRadius();
+	double branchRadius = branchPtr->findBranchRadius();
 
-    //add control points to spline
+	//add control points to spline
 
-    //add first position
-    Eigen::MatrixXd positions = branchPtr->getPositions();
-    splineX->AddPoint(0,startPosition(0));
-    splineY->AddPoint(0,startPosition(1));
-    splineZ->AddPoint(0,startPosition(2));
+	//add first position
+	Eigen::MatrixXd positions = branchPtr->getPositions();
+	splineX->AddPoint(0,startPosition(0));
+	splineY->AddPoint(0,startPosition(1));
+	splineZ->AddPoint(0,startPosition(2));
 
 
     // Add last position if no parent branch, else add parents position closest to current branch.
     // Branch positions are stored in order from head to feet (e.g. first position is top of trachea),
     // while route-to-target is generated from target to top of trachea.
-    if(!branchPtr->getParentBranch())
-    {
-        splineX->AddPoint(startIndex,positions(0,0));
-        splineY->AddPoint(startIndex,positions(1,0));
-        splineZ->AddPoint(startIndex,positions(2,0));
-    }
-    else
-    {
-        Eigen::MatrixXd parentPositions = branchPtr->getParentBranch()->getPositions();
-        splineX->AddPoint(startIndex,parentPositions(0,parentPositions.cols()-1));
-        splineY->AddPoint(startIndex,parentPositions(1,parentPositions.cols()-1));
-        splineZ->AddPoint(startIndex,parentPositions(2,parentPositions.cols()-1));
+	if(!branchPtr->getParentBranch())
+	{
+		splineX->AddPoint(startIndex,positions(0,0));
+		splineY->AddPoint(startIndex,positions(1,0));
+		splineZ->AddPoint(startIndex,positions(2,0));
+	}
+	else
+	{
+		Eigen::MatrixXd parentPositions = branchPtr->getParentBranch()->getPositions();
+		splineX->AddPoint(startIndex,parentPositions(0,parentPositions.cols()-1));
+		splineY->AddPoint(startIndex,parentPositions(1,parentPositions.cols()-1));
+		splineZ->AddPoint(startIndex,parentPositions(2,parentPositions.cols()-1));
+	}
 
-    }
+	//Add points until all filtered/smoothed positions are minimum 1 mm inside the airway wall, (within r - 1 mm).
+	//This is to make sure the smoothed centerline is within the lumen of the airways.
+	double maxAcceptedDistanceToOriginalPosition = std::max(branchRadius - 1, 1.0);
+	double maxDistanceToOriginalPosition = maxAcceptedDistanceToOriginalPosition + 1;
+	int maxDistanceIndex = -1;
+	std::vector< Eigen::Vector3d > smoothingResult;
 
-    //Add points until all filtered/smoothed positions are minimum 1 mm inside the airway wall, (within r - 1 mm).
-    //This is to make sure the smoothed centerline is within the lumen of the airways.
-    double maxAcceptedDistanceToOriginalPosition = std::max(branchRadius - 1, 1.0);
-    double maxDistanceToOriginalPosition = maxAcceptedDistanceToOriginalPosition + 1;
-    int maxDistanceIndex = -1;
-    std::vector< Eigen::Vector3d > smoothingResult;
+	//add positions to spline
+	while (maxDistanceToOriginalPosition >= maxAcceptedDistanceToOriginalPosition && splineX->GetNumberOfPoints() < startIndex)
+	{
+		if(maxDistanceIndex > 0)
+		{
+			//add to spline the position with largest distance to original position
+			splineX->AddPoint(maxDistanceIndex,positions(0,startIndex - maxDistanceIndex));
+			splineY->AddPoint(maxDistanceIndex,positions(1,startIndex - maxDistanceIndex));
+			splineZ->AddPoint(maxDistanceIndex,positions(2,startIndex - maxDistanceIndex));
+		}
 
-    //add positions to spline
-    while (maxDistanceToOriginalPosition >= maxAcceptedDistanceToOriginalPosition && splineX->GetNumberOfPoints() < startIndex)
-    {
-        if(maxDistanceIndex > 0)
-        {
-            //add to spline the position with largest distance to original position
-            splineX->AddPoint(maxDistanceIndex,positions(0,startIndex - maxDistanceIndex));
-            splineY->AddPoint(maxDistanceIndex,positions(1,startIndex - maxDistanceIndex));
-            splineZ->AddPoint(maxDistanceIndex,positions(2,startIndex - maxDistanceIndex));
-        }
-
-		//evaluate spline - get smoothed positions      
-        maxDistanceToOriginalPosition = 0.0;
-        smoothingResult.clear();
-        for(int j=0; j<=startIndex; j++)
+		//evaluate spline - get smoothed positions
+		maxDistanceToOriginalPosition = 0.0;
+		smoothingResult.clear();
+		for(int j=0; j<=startIndex; j++)
 		{
 			double splineParameter = j;
 			Eigen::Vector3d tempPoint;
@@ -525,69 +524,69 @@ std::vector< Eigen::Vector3d > RouteToTarget::smoothBranch(BranchPtr branchPtr, 
 			tempPoint(2) = splineZ->Evaluate(splineParameter);
 			smoothingResult.push_back(tempPoint);
 
-            //calculate distance to original (non-filtered) position
-            double distance = dsearch(tempPoint, positions).second;
-            //finding the index with largest distance
-            if (distance > maxDistanceToOriginalPosition)
-            {
-                maxDistanceToOriginalPosition = distance;
-                maxDistanceIndex = j;
-            }
-        }
-    }
+			//calculate distance to original (non-filtered) position
+			double distance = dsearch(tempPoint, positions).second;
+			//finding the index with largest distance
+			if (distance > maxDistanceToOriginalPosition)
+			{
+				maxDistanceToOriginalPosition = distance;
+				maxDistanceIndex = j;
+			}
+		}
+	}
 
-    return smoothingResult;
+	return smoothingResult;
 }
 
 void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
 {
-    QString RTTpath = services->patient()->getActivePatientFolder() + "/RouteToTargetInformation/";
-    QDir RTTDirectory(RTTpath);
-    if (!RTTDirectory.exists()) // Creating RouteToTargetInformation folder if it does not exist
-        RTTDirectory.mkpath(RTTpath);
+	QString RTTpath = services->patient()->getActivePatientFolder() + "/RouteToTargetInformation/";
+	QDir RTTDirectory(RTTpath);
+	if (!RTTDirectory.exists()) // Creating RouteToTargetInformation folder if it does not exist
+		RTTDirectory.mkpath(RTTpath);
 
-    QString format = timestampSecondsFormat();
-    QString filePath = RTTpath + QDateTime::currentDateTime().toString(format) + "_RouteToTargetInformation.txt";
+	QString format = timestampSecondsFormat();
+	QString filePath = RTTpath + QDateTime::currentDateTime().toString(format) + "_RouteToTargetInformation.txt";
 
-    QFile outfile(filePath);
-    if (outfile.open(QIODevice::ReadWrite))
-    {
-        QTextStream stream(&outfile);
+	QFile outfile(filePath);
+	if (outfile.open(QIODevice::ReadWrite))
+	{
+		QTextStream stream(&outfile);
 
-        stream << "#Target position:" << endl;
-        stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << endl;
-        if (mProjectedBranchPtr)
-        {
-            stream << "#Route to target generations:" << endl;
-            stream << mProjectedBranchPtr->findGenerationNumber() << endl;
-        }
+		stream << "#Target position:" << endl;
+		stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << endl;
+		if (mProjectedBranchPtr)
+		{
+			stream << "#Route to target generations:" << endl;
+			stream << mProjectedBranchPtr->findGenerationNumber() << endl;
+		}
 
-        stream << "#Trachea length (mm):" << endl;
-        BranchPtr trachea = mBranchListPtr->getBranches()[0];
-        int numberOfPositionsInTrachea = trachea->getPositions().cols();
-        double tracheaLength = calculateRouteLength(smoothBranch(trachea, numberOfPositionsInTrachea-1, trachea->getPositions().col(numberOfPositionsInTrachea-1)));
-        stream << tracheaLength << endl;
+		stream << "#Trachea length (mm):" << endl;
+		BranchPtr trachea = mBranchListPtr->getBranches()[0];
+		int numberOfPositionsInTrachea = trachea->getPositions().cols();
+		double tracheaLength = calculateRouteLength(smoothBranch(trachea, numberOfPositionsInTrachea-1, trachea->getPositions().col(numberOfPositionsInTrachea-1)));
+		stream << tracheaLength << endl;
 
-        stream << "#Route to target length - from Carina (mm):" << endl;
-        stream << calculateRouteLength(mRoutePositions) - tracheaLength << endl;
-        stream << "#Extended route to target length - from Carina (mm):" << endl;
-        stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << endl;
-    }
+		stream << "#Route to target length - from Carina (mm):" << endl;
+		stream << calculateRouteLength(mRoutePositions) - tracheaLength << endl;
+		stream << "#Extended route to target length - from Carina (mm):" << endl;
+		stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << endl;
+	}
 }
 
 double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
 {
-    double routeLenght = 0;
-    for (int i=0; i<route.size()-1; i++)
-    {
-        double d0 = route[i+1](0) - route[i](0);
-        double d1 = route[i+1](1) - route[i](1);
-        double d2 = route[i+1](2) - route[i](2);
+	double routeLenght = 0;
+	for (int i=0; i<route.size()-1; i++)
+	{
+		double d0 = route[i+1](0) - route[i](0);
+		double d1 = route[i+1](1) - route[i](1);
+		double d2 = route[i+1](2) - route[i](2);
 
-        routeLenght += sqrt( d0*d0 +d1*d1 + d2*d2 );
-    }
+		routeLenght += sqrt( d0*d0 +d1*d1 + d2*d2 );
+	}
 
-    return routeLenght;
+	return routeLenght;
 }
 
 void RouteToTarget::setBloodVesselRadius()
@@ -873,15 +872,15 @@ std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLI
 std::pair<int, double> findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line)
 {
 	int index = 0;
-    double minDistance = findDistance(point, line[0]);
-    for (int i=1; i<line.size(); i++)
-        if (minDistance > findDistance(point, line[i]))
-        {
-            minDistance = findDistance(point, line[i]);
-            index = i;
-        }
+	double minDistance = findDistance(point, line[0]);
+	for (int i=1; i<line.size(); i++)
+		if (minDistance > findDistance(point, line[i]))
+		{
+			minDistance = findDistance(point, line[i]);
+			index = i;
+		}
 
-    return std::make_pair(index , minDistance);
+	return std::make_pair(index , minDistance);
 }
 
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2)

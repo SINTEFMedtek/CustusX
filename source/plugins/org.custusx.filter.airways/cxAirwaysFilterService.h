@@ -41,6 +41,9 @@ namespace cx {
  *
  * Algorithm written by Erik Smistad.
  *
+ * 2020-01-15: Added segmentation of blood vessels and lungs.
+ * Erlend Fagertun hofstad
+ *
  */
 class org_custusx_filter_airways_EXPORT AirwaysFilter : public FilterImpl
 {
@@ -54,7 +57,7 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-    static QString getNameSuffixCenterline();
+	static QString getNameSuffixCenterline();
 	static QString getNameSuffixAirways();
 	static QString getNameSuffixTubes();
 	static QString getNameSuffixLungs();
@@ -80,22 +83,22 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-    static Vector3D getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr image);
-    static bool isSeedPointInsideImage(Vector3D, DataPtr);
+	static Vector3D getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr image);
+	static bool isSeedPointInsideImage(Vector3D, DataPtr);
 	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
 	BoolPropertyPtr getAirwaySegmentationOption(QDomElement root);
 	BoolPropertyPtr getAirwayTubesGenerationOption(QDomElement root);
-    BoolPropertyPtr getLungSegmentationOption(QDomElement root);
-    BoolPropertyPtr getVesselSegmentationOption(QDomElement root);
-    void createAirwaysFromCenterline();
+	BoolPropertyPtr getLungSegmentationOption(QDomElement root);
+	BoolPropertyPtr getVesselSegmentationOption(QDomElement root);
+	void createAirwaysFromCenterline();
 	vtkImageDataPtr mAirwaySegmentationOutput;
 	vtkPolyDataPtr mAirwayCenterlineOutput;
-    vtkImageDataPtr mLungSegmentationOutput;
-    vtkImageDataPtr mBloodVesselSegmentationOutput;
+	vtkImageDataPtr mLungSegmentationOutput;
+	vtkImageDataPtr mBloodVesselSegmentationOutput;
 	vtkPolyDataPtr mBloodVesselCenterlineOutput;
 	Transform3D mTransformation;
 	ImagePtr mInputImage;
-    Vector3D seedPoint;
+	Vector3D seedPoint;
 	bool mDefaultStraightCLTubesOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
