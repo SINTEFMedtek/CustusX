@@ -10,6 +10,7 @@
 #
 #####################################################
 
+from builtins import object
 import logging
 import time    
 import subprocess
@@ -25,7 +26,7 @@ import cx.utils.cxCatchConsoleNameListParser
 import cx.utils.cxUtilities
 import cx.utils.cxConvertCTest2JUnit
 
-class TestRunner:
+class TestRunner(object):
     '''
     Utilities for runnit tests,
     based on the catch, cppunit and ctest frameworks.
