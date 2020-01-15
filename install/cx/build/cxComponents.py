@@ -10,12 +10,16 @@
 #             
 #################################################             
 
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import subprocess
 import optparse
 import re
 import sys
 import os.path
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 
@@ -53,7 +57,7 @@ class Component(object):
 #        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
-            print "*** %s already exists, checkout ignored." % path
+            print("*** %s already exists, checkout ignored." % path)
             return True
         return False
     def checkout(self):
