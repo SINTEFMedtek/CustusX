@@ -42,7 +42,7 @@ public:
 	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
 	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
-	void RouteToTarget::setBloodVesselRadius();
+	void setBloodVesselRadius();
 	double calculateBloodVesselRadius(Eigen::Vector3d position, Eigen::Vector3d orientation);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
