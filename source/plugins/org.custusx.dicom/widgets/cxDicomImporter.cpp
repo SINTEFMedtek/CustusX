@@ -210,7 +210,7 @@ void DicomImporter::onImportDirectory(QString directory)
 
 	// show progress dialog and perform indexing
 	showIndexerDialog();
-	DICOMIndexer->addDirectory(*DICOMDatabase,directory);
+	DICOMIndexer->addDirectory(DICOMDatabase.data(),directory);
 
 	// display summary result
 	if (DisplayImportSummary)
