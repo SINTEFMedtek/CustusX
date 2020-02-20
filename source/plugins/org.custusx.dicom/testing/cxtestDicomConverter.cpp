@@ -127,7 +127,7 @@ public:
 		this->eraseDatabase();
 		ctkDICOMDatabasePtr DICOMDatabase = this->openDatabase();
 		QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
-		DICOMIndexer->addDirectory(DICOMDatabase.data(),folder,"");
+		DICOMIndexer->addDirectory(*DICOMDatabase,folder,"");
 
 		return DICOMDatabase;
 	}
@@ -378,7 +378,7 @@ TEST_CASE("DicomConverter: Auto delete database", "[integration][plugins][org.cu
 	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
 	ctkDICOMDatabase* database = widgetFixture->getDb();
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
-	DICOMIndexer->addDirectory(database,inputDicomDataDirectory,"");
+	DICOMIndexer->addDirectory(*database,inputDicomDataDirectory,"");
 
 	QStringList patients = database->patients();
 	REQUIRE(patients.size() == 1);
