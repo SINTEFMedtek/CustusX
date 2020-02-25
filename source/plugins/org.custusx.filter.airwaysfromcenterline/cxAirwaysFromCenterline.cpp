@@ -181,7 +181,7 @@ vtkImageDataPtr AirwaysFromCenterline::addSpheresAlongCenterlines(vtkImageDataPt
         pointsPtr->SetNumberOfPoints(numberOfPositionsInBranch);
 
         double radius = staticRadius;
-        if (staticRadius == 0)
+				if (similar(staticRadius, 0))
         	radius = branches[i]->findBranchRadius();
 
         for (int j = 0; j < numberOfPositionsInBranch; j++)

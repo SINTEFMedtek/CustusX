@@ -306,7 +306,7 @@ vtkPolyDataPtr RouteToTarget::findRouteToTargetAlongBloodVesselCenterlines(MeshP
 vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
 {
 	vtkPolyDataPtr airwayMesh;
-	if (mConnectedPointsInBVCL.cols() == 0 | !mPathToBloodVesselsFound)
+	if (mConnectedPointsInBVCL.cols() == 0 || !mPathToBloodVesselsFound)
 		return airwayMesh;
 
 	AirwaysFromCenterlinePtr airwaysFromBVCenterlinePtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
