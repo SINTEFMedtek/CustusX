@@ -623,117 +623,21 @@ double RouteToTarget::calculateBloodVesselRadius(Eigen::Vector3d position, Eigen
 	int x = (int) boost::math::round( position_r[0]/spacing[0] );
 	int y = (int) boost::math::round( position_r[1]/spacing[1] );
 	int z = (int) boost::math::round( position_r[2]/spacing[2] );
-
-	double maxValue = bloodVesselImage->GetScalarRange()[1];
+	Eigen::Vector3i indexVector;
+	indexVector(0) = x;
+	indexVector(1) = y;
+	indexVector(2) = z;
 
 	Eigen::MatrixXd maxRadius(3,2);
-	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
-	{
-		Eigen::Vector3d perpendicularX = crossproduct(orientation, Eigen::Vector3d::UnitX());
-		if (perpendicularX.sum() != 0)
-		{
-			Eigen::Vector3d searchDirection =  perpendicularX.normalized() * radiusVoxels;
-			int xIndex = std::max(std::min(x + (int) std::round(searchDirection(0)), dim[0]-1), 0);
-			int yIndex = std::max(std::min(y + (int) std::round(searchDirection(1)), dim[1]-1), 0);
-			int zIndex = std::max(std::min(z + (int) std::round(searchDirection(2)), dim[2]-1), 0);
-			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-			{
-				searchDirection =  perpendicularX.normalized() * (radiusVoxels-1);
-				maxRadius(0,0) = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-				break;
-			}
-		}
-	}
-
-	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
-	{
-		Eigen::Vector3d perpendicularX = crossproduct(orientation, Eigen::Vector3d::UnitX());
-		if (perpendicularX.sum() != 0)
-		{
-			Eigen::Vector3d searchDirection =  perpendicularX.normalized() * radiusVoxels;
-			int xIndex = std::max(std::min(x - (int) std::round(searchDirection(0)), dim[0]-1), 0);
-			int yIndex = std::max(std::min(y - (int) std::round(searchDirection(1)), dim[1]-1), 0);
-			int zIndex = std::max(std::min(z - (int) std::round(searchDirection(2)), dim[2]-1), 0);
-			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-			{
-				searchDirection =  perpendicularX.normalized() * (radiusVoxels-1);
-				maxRadius(0,1) = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-				break;
-			}
-		}
-	}
-
-	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
-	{
-		Eigen::Vector3d perpendicularY = crossproduct(orientation, Eigen::Vector3d::UnitY());
-		if (perpendicularY.sum() != 0)
-		{
-			Eigen::Vector3d searchDirection =  perpendicularY.normalized() * radiusVoxels;
-			int xIndex = std::max(std::min(x + (int) std::round(searchDirection(0)), dim[0]-1), 0);
-			int yIndex = std::max(std::min(y + (int) std::round(searchDirection(1)), dim[1]-1), 0);
-			int zIndex = std::max(std::min(z + (int) std::round(searchDirection(2)), dim[2]-1), 0);
-			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-			{
-				searchDirection =  perpendicularY.normalized() * (radiusVoxels-1);
-				maxRadius(1,0) = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-				break;
-			}
-		}
-	}
-
-	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
-	{
-		Eigen::Vector3d perpendicularY = crossproduct(orientation, Eigen::Vector3d::UnitY());
-		if (perpendicularY.sum() != 0)
-		{
-			Eigen::Vector3d searchDirection =  perpendicularY.normalized() * radiusVoxels;
-			int xIndex = std::max(std::min(x - (int) std::round(searchDirection(0)), dim[0]-1), 0);
-			int yIndex = std::max(std::min(y - (int) std::round(searchDirection(1)), dim[1]-1), 0);
-			int zIndex = std::max(std::min(z - (int) std::round(searchDirection(2)), dim[2]-1), 0);
-			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-			{
-				searchDirection =  perpendicularY.normalized() * (radiusVoxels-1);
-				maxRadius(1,1) = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-				break;
-			}
-		}
-	}
-
-	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
-	{
-		Eigen::Vector3d perpendicularZ = crossproduct(orientation, Eigen::Vector3d::UnitZ());
-		if (perpendicularZ.sum() != 0)
-		{
-			Eigen::Vector3d searchDirection =  perpendicularZ.normalized() * radiusVoxels;
-			int xIndex = std::max(std::min(x + (int) std::round(searchDirection(0)), dim[0]-1), 0);
-			int yIndex = std::max(std::min(y + (int) std::round(searchDirection(1)), dim[1]-1), 0);
-			int zIndex = std::max(std::min(z + (int) std::round(searchDirection(2)), dim[2]-1), 0);
-			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-			{
-				searchDirection =  perpendicularZ.normalized() * (radiusVoxels-1);
-				maxRadius(2,0) = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-				break;
-			}
-		}
-	}
-
-	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
-	{
-		Eigen::Vector3d perpendicularZ = crossproduct(orientation, Eigen::Vector3d::UnitZ());
-		if (perpendicularZ.sum() != 0)
-		{
-			Eigen::Vector3d searchDirection =  perpendicularZ.normalized() * radiusVoxels;
-			int xIndex = std::max(std::min(x - (int) std::round(searchDirection(0)), dim[0]-1), 0);
-			int yIndex = std::max(std::min(y - (int) std::round(searchDirection(1)), dim[1]-1), 0);
-			int zIndex = std::max(std::min(z - (int) std::round(searchDirection(2)), dim[2]-1), 0);
-			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
-			{
-				searchDirection =  perpendicularZ.normalized() * (radiusVoxels-1);
-				maxRadius(2,1) = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
-				break;
-			}
-		}
-	}
+	Eigen::Vector3d perpendicularX = crossproduct(orientation, Eigen::Vector3d::UnitX());
+	maxRadius(0,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularX, dim, spacing, 1);
+	maxRadius(0,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularX, dim, spacing, -1);
+	Eigen::Vector3d perpendicularY = crossproduct(orientation, Eigen::Vector3d::UnitY());
+	maxRadius(1,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularY, dim, spacing, 1);
+	maxRadius(1,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularY, dim, spacing, -1);
+	Eigen::Vector3d perpendicularZ = crossproduct(orientation, Eigen::Vector3d::UnitZ());
+	maxRadius(2,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularZ, dim, spacing, 1);
+	maxRadius(2,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularZ, dim, spacing, -1);
 
 	radius = maxRadius.rowwise().mean().minCoeff();
 
@@ -741,6 +645,29 @@ double RouteToTarget::calculateBloodVesselRadius(Eigen::Vector3d position, Eigen
 		radius = 0;
 
 	return radius;
+}
+
+double RouteToTarget::findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction)
+{
+	double retval;
+	double maxValue = bloodVesselImage->GetScalarRange()[1];
+	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
+	{
+		if (perpendicularVector.sum() != 0)
+		{
+			Eigen::Vector3d searchDirection =  perpendicularVector.normalized() * radiusVoxels;
+			int xIndex = std::max(std::min(indexVector(0) + direction * (int) std::round(searchDirection(0)), dim[0]-1), 0);
+			int yIndex = std::max(std::min(indexVector(1) + direction * (int) std::round(searchDirection(1)), dim[1]-1), 0);
+			int zIndex = std::max(std::min(indexVector(2) + direction * (int) std::round(searchDirection(2)), dim[2]-1), 0);
+			if (bloodVesselImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
+			{
+				searchDirection =  perpendicularVector.normalized() * (radiusVoxels-1);
+				retval = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
+				break;
+			}
+		}
+	}
+	return retval;
 }
 
 void RouteToTarget::makeMarianaCenterlineFile(QString filename)
