@@ -501,7 +501,7 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
+        self._getBuilder().gitCheckout('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -516,6 +516,10 @@ class FAST(CppComponent):
         add('FAST_MODULE_Python:BOOL', False)
         add('FAST_MODULE_NeuralNetwork:BOOL', False)
         add('FAST_MODULE_VTK:BOOL', True)
+        add('FAST_MODULE_Dicom:BOOL', False)
+        add('FAST_MODULE_Clarius:BOOL', False)
+        add('FAST_MODULE_RealSense:BOOL', False)
+        add('FAST_MODULE_WholeSlideImaging:BOOL', False)
         add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TOOLS:BOOL', False)
@@ -523,7 +527,7 @@ class FAST(CppComponent):
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         if(platform.system() == 'Windows'):
             add('BUILD_SHARED_LIBS:BOOL', 'OFF')
-        append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
+        append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()

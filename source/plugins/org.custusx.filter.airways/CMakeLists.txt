@@ -13,7 +13,7 @@ macro(cx_initialize_FAST)
     message("Initializing FAST in Airways plugin")
     message("-- ${FAST_DIR}/../FAST/source/")
     message("===========================")
-    cx_install_add_library_dirs(${FAST_DIR}/lib/)
+    cx_install_add_library_dirs(${FAST_DIR}/bin/)
 endmacro()
 
 cx_initialize_FAST()
@@ -57,19 +57,18 @@ elseif(APPLE)
     set(ZLIB libz.dylib)
 else()
     set(ZLIB libz.so)
-endif()
+endif(WIN32)
+
 set(PLUGIN_target_libraries
     PUBLIC
-    ${PLUGIN_target_libraries}
+    #${PLUGIN_target_libraries}
     FAST
-
-    PRIVATE
     ${OPENCL_LIBRARIES}
-    ${ZLIB}
-    cxResource
+    #${ZLIB}
+    #cxResource
     cxResourceFilter
-    cxResourceVisualization
-    cxPluginUtilities
+    #cxResourceVisualization
+    #cxPluginUtilities
     org_custusx_registration_method_bronchoscopy
     org_custusx_filter_airwaysfromcenterline
 )
