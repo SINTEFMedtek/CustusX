@@ -52,6 +52,7 @@ public:
 
 	virtual bool execute();
 	virtual bool postProcess();
+	virtual bool postProcessBloodVessels();
 	virtual void setTargetName(QString name);
 
 protected:

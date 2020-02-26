@@ -251,49 +251,8 @@ bool RouteToTargetFilter::postProcess()
 
 	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 	if(mBloodVesselRoute && bloodVesselCenterlineMesh && getBloodVesselOption(mOptions)->getValue())
-	{
-		QString uidCenterlineBV = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixBloodVessel();
-		QString nameCenterlineBV = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixBloodVessel();
-		MeshPtr outputCenterlineBV = patientService()->createSpecificData<Mesh>(uidCenterlineBV, nameCenterlineBV);
-		outputCenterlineBV->setVtkPolyData(mBloodVesselRoute);
-		outputCenterlineBV->setColor(QColor(0, 255, 0, 255));
-		patientService()->insertData(outputCenterlineBV);
+		postProcessBloodVessels();
 
-		outputCenterlineBV->get_rMd_History()->setParentSpace(inputMesh->getUid());
-
-		if(mOutputTypes.size() > 2)
-			mOutputTypes[2]->setValue(outputCenterlineBV->getUid());
-
-		if(mAirwaysFromBloodVessel)
-		{
-			QString uidSurfaceModel = uidCenterlineBV + RouteToTargetFilter::getNameSuffixAirwayModel();
-			QString nameSurfaceModel = nameCenterlineBV + RouteToTargetFilter::getNameSuffixAirwayModel();
-
-			MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
-			outputMesh->setVtkPolyData(mAirwaysFromBloodVessel);
-			outputMesh->setColor(QColor(192, 253, 246, 255));
-			patientService()->insertData(outputMesh);
-
-			//Meshes are expected to be in data(d) space
-			outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
-
-			if(mOutputTypes.size() > 4)
-				mOutputTypes[4]->setValue(outputMesh->getUid());
-
-		}
-
-		QString uidMergedCenterline = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
-		QString nameMergedCenterline = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
-		MeshPtr outputMergedCenterline = patientService()->createSpecificData<Mesh>(uidMergedCenterline, nameMergedCenterline);
-		outputMergedCenterline->setVtkPolyData(mAirwayAndBloodVesselRoute);
-		outputMergedCenterline->setColor(QColor(0, 255, 0, 255));
-		patientService()->insertData(outputMergedCenterline);
-
-		outputMergedCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
-
-		if(mOutputTypes.size() >3)
-			mOutputTypes[3]->setValue(outputMergedCenterline->getUid());
-	}
 //	//Create Ceetron route-to-target file
 //	QString CeetronPath = mServices->patient()->getActivePatientFolder() + "/Images/MarianaRTT/";
 //	QDir CeetronDirectory(CeetronPath);
@@ -303,6 +262,62 @@ bool RouteToTargetFilter::postProcess()
 //	mRouteToTarget->makeMarianaCenterlineFile(filePathCeetron);
 
 	return true;
+}
+
+bool RouteToTargetFilter::postProcessBloodVessels()
+{
+	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
+	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
+	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
+	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
+
+	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
+
+	QString uidCenterlineBV = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixBloodVessel();
+	QString nameCenterlineBV = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixBloodVessel();
+	MeshPtr outputCenterlineBV = patientService()->createSpecificData<Mesh>(uidCenterlineBV, nameCenterlineBV);
+	outputCenterlineBV->setVtkPolyData(mBloodVesselRoute);
+	outputCenterlineBV->setColor(QColor(0, 255, 0, 255));
+	patientService()->insertData(outputCenterlineBV);
+
+	outputCenterlineBV->get_rMd_History()->setParentSpace(inputMesh->getUid());
+
+	if(mOutputTypes.size() > 2)
+		mOutputTypes[2]->setValue(outputCenterlineBV->getUid());
+
+	if(mAirwaysFromBloodVessel)
+	{
+		QString uidSurfaceModel = uidCenterlineBV + RouteToTargetFilter::getNameSuffixAirwayModel();
+		QString nameSurfaceModel = nameCenterlineBV + RouteToTargetFilter::getNameSuffixAirwayModel();
+
+		MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
+		outputMesh->setVtkPolyData(mAirwaysFromBloodVessel);
+		outputMesh->setColor(QColor(192, 253, 246, 255));
+		patientService()->insertData(outputMesh);
+
+		//Meshes are expected to be in data(d) space
+		outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
+
+		if(mOutputTypes.size() > 4)
+			mOutputTypes[4]->setValue(outputMesh->getUid());
+
+	}
+
+	QString uidMergedCenterline = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
+	QString nameMergedCenterline = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixAirwayAndVesselRTT();
+	MeshPtr outputMergedCenterline = patientService()->createSpecificData<Mesh>(uidMergedCenterline, nameMergedCenterline);
+	outputMergedCenterline->setVtkPolyData(mAirwayAndBloodVesselRoute);
+	outputMergedCenterline->setColor(QColor(0, 255, 0, 255));
+	patientService()->insertData(outputMergedCenterline);
+
+	outputMergedCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
+
+	if(mOutputTypes.size() >3)
+		mOutputTypes[3]->setValue(outputMergedCenterline->getUid());
+
+	return true;
+
 }
 
 void RouteToTargetFilter::setTargetName(QString name)
