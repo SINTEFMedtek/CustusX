@@ -326,10 +326,12 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ImagePtr cximage, int thres
 	unsigned char* maskPtr = static_cast<unsigned char*> (mUSMask->GetScalarPointer());
 	unsigned char* imagePtr = static_cast<unsigned char*> (cximage->getBaseVtkImageData()->GetScalarPointer());
 	unsigned components = cximage->getBaseVtkImageData()->GetNumberOfScalarComponents();
-	for (unsigned x = 0; x < maskDims[0]; x++)
-		for (unsigned y = 0; y < maskDims[1]; y++)
+	unsigned dimX = maskDims[0];
+	unsigned dimY = maskDims[1];
+	for (unsigned x = 0; x < dimX; x++)
+		for (unsigned y = 0; y < dimY; y++)
 		{
-			unsigned pos = x + y * maskDims[0];
+			unsigned pos = x + y * dimX;
 			unsigned imagePos = pos*components;
 			unsigned char maskVal = maskPtr[pos];
 			unsigned char imageVal = imagePtr[imagePos];
