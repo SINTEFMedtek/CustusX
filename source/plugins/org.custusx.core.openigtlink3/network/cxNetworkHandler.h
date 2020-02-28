@@ -58,14 +58,23 @@ private slots:
 	void onDeviceReceived(vtkObject * caller_device, void * unknown, unsigned long event, void *);
 	void periodicProcess();
 
-private:
+protected:
 	void connectToConnectionEvents();
 	void connectToDeviceEvents();
+	void processImageAndEmitProbeDefinition(ImagePtr cximage, QString deviceName);
+	bool emitProbeDefinitionIfChanged(QString deviceName);
+	bool convertZeroesInsideSectorToOnes(ImagePtr cximage, int threshold = 0, int newValue = 1);
+	bool createMask();
 
 	igtlioLogicPointer mLogic;
 	igtlioSessionPointer mSession;
 	QTimer *mTimer;
 	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
+
+	ProbeDefinitionPtr mProbeDefinition;
+	bool mZeroesInImage;
+	vtkImageDataPtr mUSMask;
+	int mSkippedImages;
 };
 
 } // namespace cx

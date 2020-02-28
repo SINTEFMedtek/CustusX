@@ -29,13 +29,19 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioUsSectorDefinitions.h"
 
 #include "cxLogger.h"
+#include "cxProbeSector.h"
+#include "cxProbeDefinition.h"
 
 namespace cx
 {
 
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
-	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages))
+	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages)),
+	mProbeDefinition(ProbeDefinitionPtr()),
+	mZeroesInImage(true),
+	mUSMask(nullptr),
+	mSkippedImages(0)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -134,15 +140,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 		}
 
-
 		mProbeDefinitionFromStringMessages->setImage(cximage);
-
-		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
-		{
-			//TODO: Use deciveNameLong
-			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
-		}
-
+		processImageAndEmitProbeDefinition(cximage, deviceName);//Use equipmentId?
 		emit image(cximage);
 
 		// CX-366: Currenly we don't use the transform from the image message, because there is no specification of what this transform should be.
@@ -278,6 +277,91 @@ void NetworkHandler::connectToDeviceEvents()
 		qvtkReconnect(NULL, mLogic, eventId,
 					this, SLOT(onDeviceAddedOrRemoved(vtkObject*, void*, unsigned long, void*)));
 	}
+}
+
+//TODO: Consider moving these image changing functions out of the class
+void NetworkHandler::processImageAndEmitProbeDefinition(ImagePtr cximage, QString deviceName)
+{
+	bool probeDefinitionHaveChanged = emitProbeDefinitionIfChanged(deviceName);
+
+	if (probeDefinitionHaveChanged)
+	{
+		mZeroesInImage = true;
+		mSkippedImages = 0;
+		this->createMask(); //Only create mask once for each probeDefinition
+	}
+
+	// Turn off zero conversion if we get a frame without zeroes. Recheck for zeroes every 30 images
+	if(mZeroesInImage || (mSkippedImages > 30))
+	{
+		//			CX_LOG_DEBUG() << "*** Removing zeroes from US image ***";
+		mZeroesInImage = convertZeroesInsideSectorToOnes(cximage);
+		mSkippedImages = 0;
+	}
+	else
+	{
+		++mSkippedImages;
+		//			CX_LOG_DEBUG() << "No zeroes in incoming US image";
+	}
+}
+
+bool NetworkHandler::emitProbeDefinitionIfChanged(QString deviceName)
+{
+	if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
+	{
+		mProbeDefinition = mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName);
+		emit probedefinition(deviceName, mProbeDefinition);
+		return true;
+	}
+	return false;
+}
+
+bool NetworkHandler::convertZeroesInsideSectorToOnes(ImagePtr cximage, int threshold, int newValue)
+{
+	bool retval = false;
+	if(!mUSMask)
+		return retval;
+
+	Eigen::Array3i maskDims(mUSMask->GetDimensions());
+	unsigned char* maskPtr = static_cast<unsigned char*> (mUSMask->GetScalarPointer());
+	unsigned char* imagePtr = static_cast<unsigned char*> (cximage->getBaseVtkImageData()->GetScalarPointer());
+	unsigned components = cximage->getBaseVtkImageData()->GetNumberOfScalarComponents();
+	for (unsigned x = 0; x < maskDims[0]; x++)
+		for (unsigned y = 0; y < maskDims[1]; y++)
+		{
+			unsigned pos = x + y * maskDims[0];
+			unsigned imagePos = pos*components;
+			unsigned char maskVal = maskPtr[pos];
+			unsigned char imageVal = imagePtr[imagePos];
+			if (maskVal != 0 && imageVal <= threshold)
+			{
+				for(unsigned i=0; i < components; ++i)
+					if(i < 3) //Only set RGB components, not Alpha
+					{
+						imagePtr[imagePos + i] = newValue;
+						retval = true;
+					}
+			}
+		}
+	return retval;
+}
+
+bool NetworkHandler::createMask()
+{
+	if(!mProbeDefinition)
+	{
+		CX_LOG_WARNING() << "No ProbeDefinition";
+		return false;
+	}
+	ProbeSector probeSector;
+	probeSector.setData(*mProbeDefinition.get());
+
+	if(!mUSMask)
+	{
+		mUSMask = probeSector.getMask();
+		return true;
+	}
+	return false;
 }
 
 } // namespace cx
