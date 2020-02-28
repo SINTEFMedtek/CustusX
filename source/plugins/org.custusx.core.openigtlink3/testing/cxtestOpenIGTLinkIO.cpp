@@ -279,4 +279,50 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 //	cx::sleep_ms(3000);
 }
 
+TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector zero conversion speed", "[plugins][org.custusx.core.openigtlink3][unit][visualization]")
+{
+	QString imageFilename = "US_small.mhd";
+	vtkImageDataPtr videoImage0 = this->readImageData(imageFilename, "input image");
+	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
+
+	cx::ProbeDefinition probeDefinition = this->readProbeDefinition(imageFilename);
+	cx::ProbeDefinitionPtr probeDefinitionPtr = boost::make_shared<cx::ProbeDefinition>(probeDefinition);
+	REQUIRE(probeDefinitionPtr);
+
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
+	NetworkHandlerTester networkHandler(logic);
+	networkHandler.setProbeDefinition(probeDefinitionPtr);
+
+	cx::ImagePtr image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
+	CHECK(networkHandler.testCreateMask());
+	REQUIRE(networkHandler.getMask());
+
+	QTime clock;
+	unsigned times = 100;
+	int timeMs = 0;
+	for(int i = 0; i < times; ++i)
+	{
+		image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+		clock.start();
+		networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255);
+		timeMs += clock.elapsed();
+	}
+	int averageTime = timeMs/times;
+	CX_LOG_DEBUG() << "Average image conversion time (sampled separately) for " << times << " images: " << averageTime << " ms.";
+	CHECK(averageTime < 10);
+
+	timeMs = 0;
+	clock.start();
+	for(int i = 0; i < times; ++i)
+	{
+//		image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+		networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255);
+	}
+	timeMs += clock.elapsed();
+	averageTime = timeMs/times;
+	CX_LOG_DEBUG() << "Average image conversion time (whole for loop, skipped image reload) for " << times << " images: " << averageTime << " ms.";
+	CHECK(averageTime < 10);
+}
+
 } //namespace cxtest
