@@ -67,7 +67,7 @@ void BronchoscopyNavigationPluginActivator::start(ctkPluginContext* context)
 void BronchoscopyNavigationPluginActivator::stop(ctkPluginContext* context)
 {
 	mRegistration.reset();
-	mRegistrationTracking.reset();
+//	mRegistrationTracking.reset();
 	Q_UNUSED(context);
 }
 

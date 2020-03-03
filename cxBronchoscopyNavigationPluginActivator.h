@@ -66,7 +66,7 @@ public:
 
 private:
 	RegisteredServicePtr mRegistration;
-	RegisteredServicePtr mRegistrationTracking;
+//	RegisteredServicePtr mRegistrationTracking;
 };
 
 } // namespace cx

@@ -64,7 +64,7 @@ public:
 	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline);
 	virtual ~TrackingSystemBronchoscopyService();
 
-	void setTrackingSystem(QString trackingSystem);
+	bool setTrackingSystem(QString trackingSystemName);
 
 	virtual QString getUid() const { return "org.custusx.bronchoscopynavigation"; }
 	virtual std::vector<ToolPtr> getTools();
