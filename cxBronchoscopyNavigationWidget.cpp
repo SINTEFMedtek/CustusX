@@ -48,11 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxCheckBoxWidget.h"
 #include "cxProfile.h"
 #include "cxHelperWidgets.h"
+#include "cxVisServices.h"
 
 namespace cx
 {
 
-BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *context, QWidget* parent) :
+BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(VisServicesPtr services, QWidget* parent) :
     QWidget(parent),
     mVerticalLayout(new QVBoxLayout(this))
 {
@@ -60,9 +61,9 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(ctkPluginContext *con
 
     mOptions = profile()->getXmlSettings().descend("bronchoscopynavigationwidget");
 
-	mPatientModelService = PatientModelServicePtr(new PatientModelServiceProxy(context));
-	mViewService = ViewServicePtr(new ViewServiceProxy(context));
-	mTrackingService = TrackingServiceProxy::create(context);
+	mPatientModelService = services->patient();
+	mViewService = services->view();
+	mTrackingService = services->tracking();
 
 
 	this->setObjectName("BronchoscopyNavigationWidget");
@@ -152,6 +153,13 @@ void BronchoscopyNavigationWidget::enableSlot()
     mProjectionCenterlinePtr->setAdvancedCenterlineOption(mAdvancedOption->isChecked());
 	if (!mTrackingSystem)
 	{
+//		std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
+//		for (int i=0; i<trackingSystems.size(); i++ )
+//			if(trackingSystems[i]->getUid() == "org.custusx.bronchoscopynavigation")
+//				mTrackingSystem = trackingSystems[i];
+//		if(!mTrackingService)
+//			CX_LOG_WARNING() << "Did not find bronchoscopy navigation tracking system.";
+
 		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr));
 		mTrackingService->unInstallTrackingSystem(mTrackingSystem->getBase());
 		mTrackingService->installTrackingSystem(mTrackingSystem);

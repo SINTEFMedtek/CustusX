@@ -52,13 +52,13 @@ class org_custusx_bronchoscopynavigation_EXPORT BronchoscopyNavigationGUIExtende
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:
-	BronchoscopyNavigationGUIExtenderService(ctkPluginContext *context);
+	BronchoscopyNavigationGUIExtenderService(VisServicesPtr services);
 	virtual ~BronchoscopyNavigationGUIExtenderService() {};
 
 	std::vector<CategorizedWidget> createWidgets() const;
 
 private:
-  ctkPluginContext* mContext;
+	VisServicesPtr mServices;
 };
 typedef boost::shared_ptr<BronchoscopyNavigationGUIExtenderService> BronchoscopyNavigationGUIExtenderServicePtr;
 

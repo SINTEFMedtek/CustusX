@@ -6,6 +6,7 @@
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include "cxLogger.h"
 
 
 namespace cx
@@ -31,6 +32,11 @@ BronchoscopePositionProjection::~BronchoscopePositionProjection()
 {
 }
 
+void BronchoscopePositionProjection::setRunFromWidget(bool runFromWidget)
+{
+	mRunFromWidget = runFromWidget;
+}
+
 void BronchoscopePositionProjection::setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection)
 {
 	mUseAdvancedCenterlineProjection = useAdvancedCenterlineProjection;
@@ -49,6 +55,14 @@ DoublePropertyPtr BronchoscopePositionProjection::getMaxDistanceToCenterlineOpti
 	return mMaxDistanceToCenterline;
 }
 
+double BronchoscopePositionProjection::getMaxDistanceToCenterlineValue()
+{
+	if (mRunFromWidget && mMaxDistanceToCenterline->getValue())
+		mMaxDistanceToCenterlineValue = mMaxDistanceToCenterline->getValue();
+
+	return mMaxDistanceToCenterlineValue;
+}
+
 void BronchoscopePositionProjection::createMaxSearchDistanceOption(QDomElement root)
 {
     mMaxSearchDistance = DoubleProperty::initialize("Max search distance along centerline (mm)", "",
@@ -59,8 +73,15 @@ void BronchoscopePositionProjection::createMaxSearchDistanceOption(QDomElement r
 
 DoublePropertyPtr BronchoscopePositionProjection::getMaxSearchDistanceOption()
 {
+	return mMaxSearchDistance;
+}
 
-    return mMaxSearchDistance;
+double BronchoscopePositionProjection::getMaxSearchDistanceValue()
+{
+	if (mRunFromWidget && mMaxSearchDistance->getValue())
+		mMaxSearchDistanceValue = mMaxSearchDistance->getValue();
+
+	return mMaxSearchDistanceValue;
 }
 
 void BronchoscopePositionProjection::createAlphaOption(QDomElement root)
@@ -72,8 +93,15 @@ void BronchoscopePositionProjection::createAlphaOption(QDomElement root)
 
 DoublePropertyPtr BronchoscopePositionProjection::getAlphaOption()
 {
+	return mAlpha;
+}
 
-    return mAlpha;
+double BronchoscopePositionProjection::getAlphaValue()
+{
+	if (mRunFromWidget && mAlpha->getValue())
+		mAlphaValue = mAlpha->getValue();
+
+	return mAlphaValue;
 }
 
 Eigen::MatrixXd BronchoscopePositionProjection::getCenterlinePositions(vtkPolyDataPtr centerline, Transform3D rMd)
@@ -109,6 +137,33 @@ void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
 
+//Can be used instead of processCenterline(...) if you have a preprosessed branchList to be used in the registration process.
+void BronchoscopePositionProjection::setBranchList(BranchListPtr branchList, Transform3D rMpr)
+{
+	if (!branchList)
+		return;
+
+	m_rMpr = rMpr;
+	mBranchListPtr = branchList;
+}
+
+//Used when run without widget
+void BronchoscopePositionProjection::setMaxDistanceToCenterline(double maxDistance)
+{
+	mMaxDistanceToCenterlineValue = maxDistance;
+}
+
+//Used when run without widget
+void BronchoscopePositionProjection::setMaxSearchDistance(double maxDistance)
+{
+	mMaxSearchDistanceValue = maxDistance;
+}
+
+//Used when run without widget
+void BronchoscopePositionProjection::setAlpha(double alpha)
+{
+	mAlphaValue = alpha;
+}
 
 Transform3D BronchoscopePositionProjection::findClosestPoint(Transform3D prMt, double maxDistance)
 {
@@ -193,19 +248,18 @@ Transform3D BronchoscopePositionProjection::findClosestPointInSearchPositions(Tr
 	for (int i = 0; i < mSearchBranchPtrVector.size(); i++)
 	{
 		Eigen::MatrixXd positions = mSearchBranchPtrVector[i]->getPositions();
-        Eigen::MatrixXd orientations = mSearchBranchPtrVector[i]->getOrientations();
+		Eigen::MatrixXd orientations = mSearchBranchPtrVector[i]->getOrientations();
 
-        //double D = findDistance(positions.col(mSearchIndexVector[i]), toolPos);
-        double alpha = getAlphaOption()->getValue();
-        double D = findDistanceWithOrientation(positions.col(mSearchIndexVector[i]), toolPos, orientations.col(mSearchIndexVector[i]), toolOrientation, alpha);
-			if (D < minDistance)
-			{
-				minDistance = D;
-                minDistanceBranch = mSearchBranchPtrVector[i];
-				minDistancePositionIndex = mSearchIndexVector[i];
-			}
+		//double D = findDistance(positions.col(mSearchIndexVector[i]), toolPos);
+		double alpha = getAlphaValue();
+		double D = findDistanceWithOrientation(positions.col(mSearchIndexVector[i]), toolPos, orientations.col(mSearchIndexVector[i]), toolOrientation, alpha);
+		if (D < minDistance)
+		{
+			minDistance = D;
+			minDistanceBranch = mSearchBranchPtrVector[i];
+			minDistancePositionIndex = mSearchIndexVector[i];
+		}
 	}
-
 	if (minDistance < maxDistance)
 	{
 		Eigen::MatrixXd positions = minDistanceBranch->getPositions();

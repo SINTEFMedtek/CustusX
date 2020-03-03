@@ -47,7 +47,7 @@ namespace cx
 {
 
 TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline):
-	mBase(trackingService->getTrackingSystems().front()),
+	mBase(trackingService->getTrackingSystems().back()),
 	mTrackingService(trackingService),
 	mProjectionCenterline(projectionCenterline)
 {
@@ -59,9 +59,20 @@ TrackingSystemBronchoscopyService::~TrackingSystemBronchoscopyService()
 {
 }
 
+bool TrackingSystemBronchoscopyService::setTrackingSystem(QString trackingSystemName)
+{
+	std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
+	for (int i=0; i<trackingSystems.size(); i++)
+		if (trackingSystems[i]->getUid() == trackingSystemName)
+		{
+			mBase = trackingSystems[i];
+			return true;
+		}
+	return false;
+}
+
 void TrackingSystemBronchoscopyService::onStateChanged()
 {
-
 	ToolPtr activeTool = mTrackingService->getActiveTool();
 	std::vector<ToolPtr> tools	 = mBase->getTools();
 	mTools.clear();

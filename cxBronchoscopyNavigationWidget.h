@@ -66,7 +66,7 @@ class BronchoscopyNavigationWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyNavigationWidget(ctkPluginContext *context, QWidget* parent = 0);
+	BronchoscopyNavigationWidget(VisServicesPtr services, QWidget* parent = 0);
 	virtual ~BronchoscopyNavigationWidget();
 
 private slots:

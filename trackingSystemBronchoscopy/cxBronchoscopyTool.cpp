@@ -34,6 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxTypeConversions.h"
 #include "cxBronchoscopePositionProjection.h"
 #include "cxDoubleProperty.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -63,13 +64,13 @@ std::set<Tool::Type> BronchoscopyTool::getTypes() const
 
 void BronchoscopyTool::onToolTransformAndTimestamp(Transform3D prMt, double timestamp)
 {
-	double maxDistanceToCenterline = mProjectionCenterline->getMaxDistanceToCenterlineOption()->getValue();
-    double maxSearchDistance = mProjectionCenterline->getMaxSearchDistanceOption()->getValue();
+	double maxDistanceToCenterline = mProjectionCenterline->getMaxDistanceToCenterlineValue();
+	double maxSearchDistance = mProjectionCenterline->getMaxSearchDistanceValue();
 
-    if (mProjectionCenterline->isAdvancedCenterlineProjectionSelected())
-        m_prMt = mProjectionCenterline->findProjectedPoint(prMt, maxDistanceToCenterline, maxSearchDistance);
-    else
-        m_prMt = mProjectionCenterline->findClosestPointInBranches(prMt,maxDistanceToCenterline);
+	if (mProjectionCenterline->isAdvancedCenterlineProjectionSelected())
+		m_prMt = mProjectionCenterline->findProjectedPoint(prMt, maxDistanceToCenterline, maxSearchDistance);
+	else
+		m_prMt = mProjectionCenterline->findClosestPointInBranches(prMt,maxDistanceToCenterline);
 
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
