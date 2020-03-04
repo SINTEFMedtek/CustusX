@@ -70,6 +70,26 @@ SharedOpenGLContext::SharedOpenGLContext(vtkOpenGLRenderWindowPtr sharedContext)
 
 SharedOpenGLContext::~SharedOpenGLContext()
 {
+	this->deleteVtkTektureObjects();
+}
+
+void SharedOpenGLContext::deleteVtkTektureObjects()
+{
+	std::map<QString, std::pair<vtkTextureObjectPtr, unsigned long> >::iterator it = m1DTextureObjects.begin();
+
+	if(it != m1DTextureObjects.end())
+	{
+		m1DTextureObjects.erase(it);
+		it->second.first->ReleaseGraphicsResources(mContext);
+	}
+
+	it = m3DTextureObjects.begin();
+
+	if(it != m3DTextureObjects.end())
+	{
+		m3DTextureObjects.erase(it);
+		it->second.first->ReleaseGraphicsResources(mContext);
+	}
 }
 
 bool SharedOpenGLContext::hasUploadedImage(QString image_uid) const
