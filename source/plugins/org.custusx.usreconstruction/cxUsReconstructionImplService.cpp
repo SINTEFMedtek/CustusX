@@ -205,6 +205,8 @@ void UsReconstructionImplService::selectData(QString filename, QString calFilesP
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(mFileManagerService));
 	USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
 	fileData.mFilename = filename;
+	if(!fileData.isValid())
+		CX_LOG_WARNING() << "UsReconstructionImplService::selectData: Invalid input data";
 	this->selectData(fileData);
 }
 

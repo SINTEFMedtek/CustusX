@@ -23,8 +23,13 @@ cx::TimedAlgorithmPtr ReconstructionExecuter::getThread()
 	return mPipeline;
 }
 
-void ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
+bool ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
 {
+	if (!fileData.isValid())
+	{
+		CX_LOG_WARNING() << "US reconstruction input data is invalid.";
+		return false;
+	}
 	cx::ReconstructPreprocessorPtr preprocessor = this->createPreprocessor(par, fileData);
 	mCores = this->createCores(algo, par, createBModeWhenAngio);
 
@@ -42,18 +47,22 @@ void ReconstructionExecuter::startNonThreadedReconstruction(ReconstructionMethod
 	{
 		mCores[i]->reconstruct();
 	}
+	return true;
 }
 
-void ReconstructionExecuter::startReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
+bool ReconstructionExecuter::startReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio)
 {
 	if (mPipeline)
 	{
 		reportError("Reconstruct Executer can only be run once. Ignoring start.");
-		return;
+		return false;
 	}
 
 	if (!fileData.isValid())
-		return;
+	{
+		CX_LOG_WARNING() << "US reconstruction input data is invalid.";
+		return false;
+	}
 
 	//Don't create an extra B-Mode volume if input data is 8 bit
 	if (fileData.is8bit())
@@ -65,6 +74,7 @@ void ReconstructionExecuter::startReconstruction(ReconstructionMethodService* al
 
 	cx::CompositeTimedAlgorithmPtr algorithm = this->assembleReconstructionPipeline(mCores, par, fileData);
 	this->launch(algorithm);
+	return true;
 }
 
 std::vector<cx::ImagePtr> ReconstructionExecuter::getResult()
@@ -124,7 +134,8 @@ bool ReconstructionExecuter::canCoresRunInParallel(std::vector<ReconstructCorePt
 ReconstructPreprocessorPtr ReconstructionExecuter::createPreprocessor(ReconstructCore::InputParams par, USReconstructInputData fileData)
 {
 	ReconstructPreprocessorPtr retval(new ReconstructPreprocessor(mPatientModelService));
-	retval->initialize(par, fileData);
+	if(fileData.isValid())
+		retval->initialize(par, fileData);
 
 	return retval;
 }
