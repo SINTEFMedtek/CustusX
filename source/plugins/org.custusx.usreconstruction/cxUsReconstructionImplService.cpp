@@ -111,7 +111,9 @@ void UsReconstructionImplService::startReconstruction()
 	connect(executer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 	mExecuters.push_back(executer);
 
-	executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	bool success = executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	if(!success)
+		CX_LOG_WARNING() << "US reconstruction failed. Probably an error with input data.";
 }
 
 std::set<cx::TimedAlgorithmPtr> UsReconstructionImplService::getThreadedReconstruction()
