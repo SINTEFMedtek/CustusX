@@ -46,9 +46,13 @@ public:
 	virtual QString getHelp() const;
 	static QString getNameSuffix();
 	static QString getNameSuffixExtension();
+	static QString getNameSuffixBloodVessel();
+	static QString getNameSuffixAirwayModel();
+	static QString getNameSuffixAirwayAndVesselRTT();
 
 	virtual bool execute();
 	virtual bool postProcess();
+	virtual bool postProcessBloodVessels();
 	virtual void setTargetName(QString name);
 
 protected:
@@ -62,8 +66,12 @@ private:
 	RouteToTargetPtr mRouteToTarget;
 	vtkPolyDataPtr mOutput;
     vtkPolyDataPtr mExtendedRoute;
+    vtkPolyDataPtr 	mBloodVesselRoute;
+    vtkPolyDataPtr mAirwaysFromBloodVessel;
+    vtkPolyDataPtr mAirwayAndBloodVesselRoute;
 	QString mTargetName;
     bool mGenerateFileWithRouteInformation;
+    BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 

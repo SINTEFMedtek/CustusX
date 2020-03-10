@@ -31,6 +31,7 @@ class Branch
 {
 	Eigen::MatrixXd mPositions;
 	Eigen::MatrixXd mOrientations;
+	Eigen::VectorXd mRadius;
 	branchVector mChildBranches;
 	BranchPtr mParentBranch;
 public:
@@ -40,6 +41,9 @@ public:
 	Eigen::MatrixXd getPositions();
 	void setOrientations(Eigen::MatrixXd orient);
 	Eigen::MatrixXd getOrientations();
+	void setRadius(Eigen::VectorXd r);
+	Eigen::VectorXd getRadius();
+	double getAverageRadius();
 	void addChildBranch(BranchPtr child); //Note that this method doesn't set this branch as parent to the child. Inconsistent?
 	void setChildBranches(branchVector children); //Note that this method doesn't set this branch as parent to the children. Inconsistent?
 	void deleteChildBranches();

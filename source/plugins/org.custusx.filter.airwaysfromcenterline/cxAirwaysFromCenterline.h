@@ -30,12 +30,15 @@ class org_custusx_filter_airwaysfromcenterline_EXPORT AirwaysFromCenterline
 public:
     AirwaysFromCenterline();
     virtual ~AirwaysFromCenterline();
+    void setTypeToBloodVessel(bool bloodVessel);
     Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
+    void setBranches(BranchListPtr branches);
     void processCenterline(vtkPolyDataPtr centerline_r);
+    void processCenterline(Eigen::MatrixXd CLpoints_r);
 		BranchListPtr getBranchList();
-    vtkPolyDataPtr generateTubes();
+    vtkPolyDataPtr generateTubes(double staticRadius = 0);
     vtkImageDataPtr initializeAirwaysVolume();
-    vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr);
+    vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double staticRadius = 0);
     vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
 		void smoothAllBranchesForVB();
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
@@ -51,6 +54,7 @@ private:
     double mAirwaysVolumeBoundaryExtention;
     double mAirwaysVolumeBoundaryExtentionTracheaStart;
     double mAirwaysVolumeSpacing;
+    bool mBloodVessel = false;
 
 };
 
