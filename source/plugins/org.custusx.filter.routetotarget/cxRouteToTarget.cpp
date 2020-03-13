@@ -365,7 +365,7 @@ bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 			Eigen::MatrixXd branchPositinos = branches[i]->getPositions();
 			for (int j = 0; j<branchPositinos.cols(); j++)
 			{
-				double distance = findDistanceToLine(branchPositinos.col(j), mBloodVesselRoutePositions).second;
+				double distance = findDistanceFromPointToLine(branchPositinos.col(j), mBloodVesselRoutePositions).second;
 				if (minDistance > distance)
 				{
 					minDistance = distance;
@@ -373,7 +373,7 @@ bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 					closerAirwayFound = true;
 					mProjectedBranchPtr = branches[i];
 					mProjectedIndex = j;
-					connectionIndexBloodVesselRoute = findDistanceToLine(branchPositinos.col(j), mBloodVesselRoutePositions).first;
+					connectionIndexBloodVesselRoute = findDistanceFromPointToLine(branchPositinos.col(j), mBloodVesselRoutePositions).first;
 				}
 			}
 		}
@@ -847,14 +847,14 @@ std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLI
 	return std::make_pair(includedPositions, positionsNotIncluded);
 }
 
-std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line)
+std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line)
 {
 	int index = 0;
-	double minDistance = findDistance(point, line.col(0));
-	for (int i=1; i<line.cols(); i++)
-		if (minDistance > findDistance(point, line.col(i)))
+	double minDistance = findDistance(point, line[0]);
+	for (int i=1; i<line.size(); i++)
+		if (minDistance > findDistance(point, line[i]))
 		{
-			minDistance = findDistance(point, line.col(i));
+			minDistance = findDistance(point, line[i]);
 			index = i;
 		}
 
