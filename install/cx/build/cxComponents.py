@@ -23,7 +23,7 @@ import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 
-from cx.utils.cxShell import *    
+from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
 import cx.utils.cxCppBuilder
 
@@ -75,7 +75,7 @@ class Component(object):
         'checkout the component source from external source to this computer (svn co or similar)'
         repo = self.repository()
         if repo=="":
-            raise "Not Implemented"            
+            raise "Not Implemented"
         #self.sourceFolder()
         self._getBuilder().gitClone(self.repository(), self.sourceFolder())
     def update(self):
@@ -116,7 +116,7 @@ class Component(object):
     def useExternalRepositories(self):
         return self.controlData.gitrepo_main_site_base == self.controlData.gitrepo_open_site_base
 
-        
+
 # ---------------------------------------------------------
 
 class CppComponent(Component):
@@ -206,7 +206,7 @@ class VTK(CppComponent):
         add('VTK_USE_PARALLEL:BOOL', 'ON')
         add('VTK_REQUIRED_OBJCXX_FLAGS:STRING', "")
         add('VTK_USE_RPATH:BOOL', 'ON')
-        
+
         use_qt5 = True
         if use_qt5:
             add('VTK_QT_VERSION:STRING', "5")
@@ -216,8 +216,8 @@ class VTK(CppComponent):
             add('DESIRED_QT_VERSION:STRING', 4)
             add('Module_vtkGUISupportQt:BOOL', 'ON')
             add('VTK_USE_PARALLEL:BOOL', 'ON')
-            add('VTK_USE_RPATH:BOOL', 'ON')        
-        
+            add('VTK_USE_RPATH:BOOL', 'ON')
+
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
@@ -236,7 +236,8 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckout('4af01a590b293117af49d105a44224e32e5272c9')
+#        self._getBuilder().gitCheckoutSha('4af01a590b293117af49d105a44224e32e5272c9')
+        self._getBuilder().gitCheckoutSha('56d165d8f0ad500a762a595526bf30c90dc04aaa')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -250,6 +251,7 @@ class CTK(CppComponent):
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('BUILD_TESTING:BOOL', 'OFF')
+#        add('CMAKE_CXX_STANDARD:STRING',11) # cause build to fail?
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
         self.build()
@@ -383,13 +385,13 @@ class IGSTK(CppComponent):
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
         self._getBuilder().gitCheckout('bda6b6fa88054b474aa113af5477813610e4ac3b')
-    def configure(self):        
+    def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('IGSTK_USE_SceneGraphVisualization:BOOL', False)
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('IGSTK_SERIAL_PORT_0', self._getSerialPort()) 
+        add('IGSTK_SERIAL_PORT_0', self._getSerialPort())
         add('BUILD_TESTING:BOOL', False)
         add('BUILD_EXAMPLES:BOOL', False)
         builder.configureCMake()
@@ -398,7 +400,7 @@ class IGSTK(CppComponent):
         if (platform.system() == 'Windows'):
             serialPort = "COM9"
         return serialPort
-        
+
 # ---------------------------------------------------------
 
 class CustusX(CppComponent):
@@ -408,8 +410,8 @@ class CustusX(CppComponent):
         return 'custusx.org'
     def path(self):
         loc = self.controlData.getCustusXRepositoryLocation()
-        return '%s/%s' % (loc[0], loc[1])    
-        #return '%s/%s' % (self.controlData.getWorkingPath(), self.sourceFolder())    
+        return '%s/%s' % (loc[0], loc[1])
+        #return '%s/%s' % (self.controlData.getWorkingPath(), self.sourceFolder())
     def sourceFolder(self):
         return self.controlData.getRepoFolderName()
     def repository(self):
@@ -419,10 +421,10 @@ class CustusX(CppComponent):
         #self._getBuilder().gitCloneIntoExistingDirectory(self.repository(), self.controlData.main_branch)
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        # warning: if this call checks out a different tag/branch than the current, 
+        # warning: if this call checks out a different tag/branch than the current,
         # the script and code will be inconsistent. The user should have set the correct
         # tag/branch either manually or by using a wrapper script (e.g cxCustusXFinder).
-        self._getBuilder().gitCheckoutDefaultBranch()    
+        self._getBuilder().gitCheckoutDefaultBranch()
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -438,8 +440,8 @@ class CustusX(CppComponent):
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
-        add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)            
-        add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)            
+        add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
+        add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
@@ -450,14 +452,14 @@ class CustusX(CppComponent):
         # to version > 3.2, as the old one is depracated in version 3.3.
         append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
         #append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
-        
-        
+
+
         libs = self.assembly.libraries
         for lib in libs:
             lib.addConfigurationToDownstreamLib(builder)
             if lib.pluginPath() and os.path.exists(lib.pluginPath()):
                 add('CX_EXTERNAL_PLUGIN_%s'%lib.name(), lib.pluginPath())
-        
+
         cmakeOptions = ''
         if self.controlData.mGraphviz:
             cmakeOptions = '--graphviz=graph.dot'
@@ -465,7 +467,7 @@ class CustusX(CppComponent):
     def useInIntegrationTesting(self):
         'use during integration test'
         return True
-        
+
 # ---------------------------------------------------------
 
 class OpenCLUtilityLibrary(CppComponent):
@@ -485,7 +487,7 @@ class OpenCLUtilityLibrary(CppComponent):
         builder.configureCMake()
     def findPackagePath(self):
         return self.buildPath()
-        
+
 # ---------------------------------------------------------
 
 class FAST(CppComponent):
@@ -578,7 +580,7 @@ class QHttpServer(CppComponent):
         self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
-        builder.configureCMake()    
+        builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
         add('qhttpserver_DIR:PATH', self.buildPath())
