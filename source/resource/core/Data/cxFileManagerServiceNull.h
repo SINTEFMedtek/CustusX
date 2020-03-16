@@ -42,7 +42,7 @@ public:
 
 	std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType);
 	std::vector<FileReaderWriterServicePtr> getImportersForDataType(QString dataType);
-
+	virtual QString getFileReaderName(const QString &filename);
 private:
 	void printWarning() const;
 };
