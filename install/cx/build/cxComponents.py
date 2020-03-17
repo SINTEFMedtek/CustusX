@@ -174,7 +174,7 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v4.12.0')
+        self._getBuilder().gitCheckoutSha('v4.12.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -271,7 +271,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('3.3.0')
+        self._getBuilder().gitCheckoutSha('3.3.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -303,7 +303,7 @@ class Eigen(CppComponent):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
         tag = '3.3.5'
-        self._getBuilder().gitCheckout(tag)
+        self._getBuilder().gitCheckoutSha(tag)
     def configure(self):
         pass
     def reset(self):
