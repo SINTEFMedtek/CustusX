@@ -24,7 +24,9 @@ public:
 	void setBloodVesselVolume(ImagePtr bloodVesselVolume);
 	//void setCenterline(vtkPolyDataPtr centerline);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
+	void setSmoothing(bool smoothing);
 	void processCenterline(MeshPtr mesh);
+	void setBranchList(BranchListPtr branchList);
 	void processBloodVesselCenterline(Eigen::MatrixXd positions);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findClosestPointInBloodVesselBranches(Vector3D targetCoordinate_r);
@@ -39,7 +41,6 @@ public:
 	bool makeConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr getConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
-	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
 	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
 	void setBloodVesselRadius();
@@ -51,6 +52,7 @@ public:
 
 private:
 	Eigen::MatrixXd mCLpoints;
+	bool mSmoothing = true;
 	BranchListPtr mBranchListPtr;
 	BranchListPtr mBloodVesselBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
@@ -74,11 +76,14 @@ private:
 
 Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition);
 std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
-std::pair<int, double> findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
 Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B);
 double variance(Eigen::VectorXd X);
+
+org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
 
 } /* namespace cx */
 

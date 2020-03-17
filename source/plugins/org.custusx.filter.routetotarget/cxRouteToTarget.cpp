@@ -61,6 +61,11 @@ Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_
 	return CLpoints;
 }
 
+void RouteToTarget::setSmoothing(bool smoothing)
+{
+	mSmoothing = smoothing; // default true
+}
+
 void RouteToTarget::processCenterline(MeshPtr mesh)
 {
 	if (mBranchListPtr)
@@ -77,6 +82,12 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 	//mBranchListPtr->smoothBranchPositions(40);
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
+}
+
+//Can be used instead of processCenterline if you wan to use an existing branchList.
+void RouteToTarget::setBranchList(BranchListPtr branchList)
+{
+	mBranchListPtr = branchList;
 }
 
 void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
@@ -203,8 +214,11 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	if (!searchBranchPtr)
 		return;
 
-	//std::vector< Eigen::Vector3d > positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
-	std::vector< Eigen::Vector3d > positions = getBranchPositions(searchBranchPtr, startIndex);
+	std::vector< Eigen::Vector3d > positions;
+	if (mSmoothing)
+		 positions = smoothBranch(searchBranchPtr, startIndex, searchBranchPtr->getPositions().col(startIndex));
+	else
+		positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 		mRoutePositions.push_back(positions[i]);
@@ -321,7 +335,7 @@ vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
 
 bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 {
-	vtkPolyDataPtr mergedRoute;
+	//vtkPolyDataPtr mergedRoute;
 
 	if ( mRoutePositions.empty() )
 			return false;
@@ -351,7 +365,7 @@ bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 			Eigen::MatrixXd branchPositinos = branches[i]->getPositions();
 			for (int j = 0; j<branchPositinos.cols(); j++)
 			{
-				double distance = findDistanceToLine(branchPositinos.col(j), mBloodVesselRoutePositions).second;
+				double distance = findDistanceFromPointToLine(branchPositinos.col(j), mBloodVesselRoutePositions).second;
 				if (minDistance > distance)
 				{
 					minDistance = distance;
@@ -359,7 +373,7 @@ bool RouteToTarget::makeConnectedAirwayAndBloodVesselRoute()
 					closerAirwayFound = true;
 					mProjectedBranchPtr = branches[i];
 					mProjectedIndex = j;
-					connectionIndexBloodVesselRoute = findDistanceToLine(branchPositinos.col(j), mBloodVesselRoutePositions).first;
+					connectionIndexBloodVesselRoute = findDistanceFromPointToLine(branchPositinos.col(j), mBloodVesselRoutePositions).first;
 				}
 			}
 		}
@@ -434,21 +448,20 @@ vtkPolyDataPtr RouteToTarget::addVTKPoints(std::vector<Eigen::Vector3d> position
 	return retval;
 }
 
-
 /*
     RouteToTarget::getBranchPositions is used to get positions of a branch without smoothing.
     Equivalent to RouteToTarget::smoothBranch without smoothing.
 */
-std::vector< Eigen::Vector3d > RouteToTarget::getBranchPositions(BranchPtr branchPtr, int startIndex)
-{
-    Eigen::MatrixXd branchPositions = branchPtr->getPositions();
-    std::vector< Eigen::Vector3d > positions;
+//std::vector< Eigen::Vector3d > RouteToTarget::getBranchPositions(BranchPtr branchPtr, int startIndex)
+//{
+//    Eigen::MatrixXd branchPositions = branchPtr->getPositions();
+//    std::vector< Eigen::Vector3d > positions;
 
-    for (int i = startIndex; i >=0; i--)
-        positions.push_back(branchPositions.col(i));
+//    for (int i = startIndex; i >=0; i--)
+//        positions.push_back(branchPositions.col(i));
 
-    return positions;
-}
+//    return positions;
+//}
 
 /*
     RouteToTarget::smoothBranch is smoothing the positions of a centerline branch by using vtkCardinalSpline.
@@ -736,6 +749,44 @@ QJsonArray RouteToTarget::makeMarianaCenterlineJSON()
 	 return array;
 }
 
+QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList)
+{
+	QJsonArray array;
+
+	std::vector<BranchPtr> branches = branchList->getBranches();
+	for (int i = 0; i < branches.size(); i++)
+	{
+		Eigen::MatrixXd positions = branches[i]->getPositions();
+		for (int j = 0; j < positions.cols(); j++)
+		{
+			QJsonObject JsonPosition;
+			JsonPosition.insert( "x", positions(0,j) );
+			JsonPosition.insert( "y", positions(1,j) );
+			JsonPosition.insert( "z", positions(2,j) );
+			array.append(JsonPosition);
+		}
+	 }
+
+	 return array;
+}
+
+/*
+		RouteToTarget::getBranchPositions is used to get positions of a branch without smoothing.
+		Equivalent to RouteToTarget::smoothBranch without smoothing.
+*/
+std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex)
+{
+		Eigen::MatrixXd branchPositions = branchPtr->getPositions();
+		std::vector< Eigen::Vector3d > positions;
+
+		for (int i = startIndex; i >=0; i--)
+				positions.push_back(branchPositions.col(i));
+
+		return positions;
+}
+
+
+
 Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition)
 {
 	double maxDistanceToAirway = 10; //mm
@@ -796,7 +847,7 @@ std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLI
 	return std::make_pair(includedPositions, positionsNotIncluded);
 }
 
-std::pair<int, double> findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line)
+std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line)
 {
 	int index = 0;
 	double minDistance = findDistance(point, line[0]);
