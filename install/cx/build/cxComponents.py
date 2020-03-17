@@ -199,7 +199,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('1c14943c3975fe826da1e7be1624c16c893d1c68')
+        self._getBuilder().gitCheckoutSha('1c14943c3975fe826da1e7be1624c16c893d1c68')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -328,8 +328,8 @@ class OpenIGTLink(CppComponent):
         return 'git://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-#        self._getBuilder().gitCheckout('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
-        self._getBuilder().gitCheckout('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
+#        self._getBuilder().gitCheckoutSha('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
+        self._getBuilder().gitCheckoutSha('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
     def configure(self):
         builder = self._getBuilder()
@@ -354,7 +354,7 @@ class OpenIGTLinkIO(CppComponent):
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('f862d6bfa270332955e8050df8ce057febf48392')
+        self._getBuilder().gitCheckoutSha('f862d6bfa270332955e8050df8ce057febf48392')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -384,7 +384,7 @@ class IGSTK(CppComponent):
     def update(self):
         branch = 'IGSTK-CX-modifications'
         self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
-        self._getBuilder().gitCheckout('bda6b6fa88054b474aa113af5477813610e4ac3b')
+        self._getBuilder().gitCheckoutSha('bda6b6fa88054b474aa113af5477813610e4ac3b')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -481,7 +481,7 @@ class OpenCLUtilityLibrary(CppComponent):
         return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('44b7a002195fb2b6e8ea99ea4edf3102ef556cc3')
+        self._getBuilder().gitCheckoutSha('44b7a002195fb2b6e8ea99ea4edf3102ef556cc3')
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
@@ -503,7 +503,7 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
+        self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -552,7 +552,7 @@ class CustusXData(CppComponent):
         return '%s/CustusXData.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('35560c25a6ef29a3b0abdedfb870e38f52d19ee9')
+        self._getBuilder().gitCheckoutSha('35560c25a6ef29a3b0abdedfb870e38f52d19ee9')
     def configure(self):
         pass
     def build(self):
@@ -577,7 +577,7 @@ class QHttpServer(CppComponent):
         return 'git@github.com:SINTEFMedtek/qhttpserver.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
+        self._getBuilder().gitCheckoutSha('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
         builder.configureCMake()
@@ -603,7 +603,7 @@ class org_custusx_angleCorrection(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckout('0.1')
-        self._getBuilder().gitCheckout('01acc6547c95e506b88c20011789784a129a16bb')
+        self._getBuilder().gitCheckoutSha('01acc6547c95e506b88c20011789784a129a16bb')
     def configure(self):
         pass
     def build(self):
@@ -634,7 +634,7 @@ class org_custusx_mariana(CppComponent):
       self._getBuilder().gitSetRemoteURL(self.repository())
 #      self._getBuilder().gitCheckout('')
 #      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
-      self._getBuilder().gitCheckout('b0983699c2fca41f45633b1e06c1d9cde6259bb0')
+      self._getBuilder().gitCheckoutSha('b0983699c2fca41f45633b1e06c1d9cde6259bb0')
     def configure(self):
         pass
     def build(self):
@@ -666,7 +666,7 @@ class org_custusx_bronchoscopynavigation(CppComponent):
 #        self._getBuilder().gitClone(self.gitRepository(), self.sourceFolder())
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('54571ecc3bdd5c993bf615d04229bfc6d323b192')
+        self._getBuilder().gitCheckoutSha('54571ecc3bdd5c993bf615d04229bfc6d323b192')
     def configure(self):
         pass
     def build(self):

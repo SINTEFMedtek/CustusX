@@ -143,7 +143,6 @@ void ImportWidget::addMoreFilesButtonClicked()
 	bool addedDICOM = false;
 
 	ImportDataTypeWidget *widget = NULL;
-	//foreach (QString filename, filenames)
 	for(int i = 0; i < filenames.size(); ++i)
 	{
 		QString filename = filenames[i];
