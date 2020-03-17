@@ -55,6 +55,7 @@ class LibraryAssembly(object):
         if(platform.system() != 'Darwin'):
             self.addComponent(cxComponents.FAST())
         self.addComponent(cxComponents.org_custusx_angleCorrection())
+        self.addComponent(cxComponents.org_custusx_bronchoscopynavigation())
         self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
         

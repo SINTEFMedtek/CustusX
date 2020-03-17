@@ -552,5 +552,4 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startInd
 	return std::make_pair(branchPositions, positionsNotUsed);
 }
 
-
 }//namespace cx

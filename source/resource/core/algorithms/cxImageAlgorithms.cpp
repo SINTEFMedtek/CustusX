@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vtkImageResample.h>
 #include <vtkImageClip.h>
+#include <vtkImageChangeInformation.h>
 
 #include "cxImage.h"
 #include "cxPatientModelService.h"
@@ -30,6 +31,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSlicedImageProxy.h"
 #include "cxSliceProxy.h"
+#include "cxLogger.h"
+#include "cxEnumConversion.h"
 
 
 namespace cx
@@ -261,5 +264,216 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outpu
 
 	return retval;
 }
+
+vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D position_r, bool applyLUT)
+{
+	vtkImageDataPtr slicedImage = vtkImageDataPtr::New();
+
+	vtkImageReslicePtr imageReslicer = vtkImageReslicePtr::New();
+
+	imageReslicer->SetInputData(image->getBaseVtkImageData());
+	imageReslicer->SetBackgroundLevel(image->getMin());
+
+	imageReslicer->SetInterpolationModeToLinear();
+	imageReslicer->SetOutputDimensionality(2);
+
+
+	Eigen::Array3d inputSpacing = image->getSpacing();
+	imageReslicer->SetOutputSpacing(inputSpacing.data());
+
+	//imageReslicer->SetOutputOrigin(image->getBaseVtkImageData()->GetOrigin()); // set to [0, 0, 0] ??
+//	double origin[3];
+//	image->getBaseVtkImageData()->GetOrigin(origin);
+
+//	Eigen::Array3d spacing = image->getSpacing();
+	int extent[6];
+	image->getBaseVtkImageData()->GetExtent(extent);
+
+	Transform3D rMd = image->get_rMd();
+
+	Eigen::Array3i dim(image->getBaseVtkImageData()->GetDimensions());
+
+	double center;
+	Transform3D positionTransform_d = rMd.inv() * createTransformTranslate(position_r);
+	vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
+	switch (planeType)
+	{
+	case ptAXIAL:
+		resliceAxes->SetElement(0, 0, 1);
+		resliceAxes->SetElement(0, 1, 0);
+		resliceAxes->SetElement(0, 2, 0);
+		resliceAxes->SetElement(0, 3, 0);
+		resliceAxes->SetElement(1, 0, 0);
+		resliceAxes->SetElement(1, 1, -1);
+		resliceAxes->SetElement(1, 2, 0);
+		resliceAxes->SetElement(1, 3, 0);
+		resliceAxes->SetElement(2, 0, 0);
+		resliceAxes->SetElement(2, 1, 0);
+		resliceAxes->SetElement(2, 2, 1);
+		resliceAxes->SetElement(2, 3, positionTransform_d(2,3));
+		resliceAxes->SetElement(3, 0, 0);
+		resliceAxes->SetElement(3, 1, 0);
+		resliceAxes->SetElement(3, 2, 0);
+		resliceAxes->SetElement(3, 3, 1);
+		imageReslicer->SetResliceAxes(resliceAxes);
+		imageReslicer->SetOutputExtent(0, dim[0], 0, dim[1], 0, 0);
+		break;
+	case ptCORONAL:
+		resliceAxes->SetElement(0, 0, 1);
+		resliceAxes->SetElement(0, 1, 0);
+		resliceAxes->SetElement(0, 2, 0);
+		resliceAxes->SetElement(0, 3, 0);
+		resliceAxes->SetElement(1, 0, 0);
+		resliceAxes->SetElement(1, 1, 0);
+		resliceAxes->SetElement(1, 2, 1);
+		resliceAxes->SetElement(1, 3, positionTransform_d(1,3));
+		resliceAxes->SetElement(2, 0, 0);
+		resliceAxes->SetElement(2, 1, 1);
+		resliceAxes->SetElement(2, 2, 0);
+		resliceAxes->SetElement(2, 3, 0);
+		resliceAxes->SetElement(3, 0, 0);
+		resliceAxes->SetElement(3, 1, 0);
+		resliceAxes->SetElement(3, 2, 0);
+		resliceAxes->SetElement(3, 3, 1);
+		imageReslicer->SetResliceAxes(resliceAxes);
+		imageReslicer->SetOutputExtent(0, dim[0], 0, dim[2], 0, 0);
+		break;
+	case ptSAGITTAL:
+		resliceAxes->SetElement(0, 0, 0);
+		resliceAxes->SetElement(0, 1, 0);
+		resliceAxes->SetElement(0, 2, -1);
+		resliceAxes->SetElement(0, 3, positionTransform_d(0,3));
+		resliceAxes->SetElement(1, 0, 1);
+		resliceAxes->SetElement(1, 1, 0);
+		resliceAxes->SetElement(1, 2, 0);
+		resliceAxes->SetElement(1, 3, 0);
+		resliceAxes->SetElement(2, 0, 0);
+		resliceAxes->SetElement(2, 1, 1);
+		resliceAxes->SetElement(2, 2, 0);
+		resliceAxes->SetElement(2, 3, 0);
+		resliceAxes->SetElement(3, 0, 0);
+		resliceAxes->SetElement(3, 1, 0);
+		resliceAxes->SetElement(3, 2, 0);
+		resliceAxes->SetElement(3, 3, 1);
+		imageReslicer->SetResliceAxes(resliceAxes);
+		imageReslicer->SetOutputExtent(0, dim[1], 0, dim[2], 0, 0);
+		break;
+	default:
+		CX_LOG_WARNING() << "Not a valid plane type." << enum2string(planeType);
+	}
+
+	imageReslicer->Update();
+
+	if (applyLUT)
+	{
+		ApplyLUTToImage2DProxyPtr imageWithLUTProxyPtr = ApplyLUTToImage2DProxyPtr(new ApplyLUTToImage2DProxy());
+		vtkImageChangeInformationPtr redirecterPtr = vtkImageChangeInformationPtr::New();
+		redirecterPtr->SetInputConnection(imageReslicer->GetOutputPort());
+
+		imageWithLUTProxyPtr->setInput(redirecterPtr, image->getLookupTable2D()->getOutputLookupTable());
+
+		imageWithLUTProxyPtr->getOutputPort()->Update();
+		slicedImage->DeepCopy(imageWithLUTProxyPtr->getOutput());
+	}
+	else
+			slicedImage = imageReslicer->GetOutput();
+
+	return slicedImage;
+}
+
+std::vector<int> getSliceVoxelFrom3Dposition(ImagePtr image, PLANE_TYPE planeType, Vector3D position_r)
+{
+	std::vector<int> voxel(2,0);
+
+	Transform3D rMd = image->get_rMd();
+	Eigen::Array3d spacing = image->getSpacing();
+	Transform3D positionTransform_d = rMd.inv() * createTransformTranslate(position_r);
+	int xVoxel = std::round( positionTransform_d(0,3) / spacing(0) );
+	int yVoxel = std::round( positionTransform_d(1,3) / spacing(1) );
+	int zVoxel = std::round( positionTransform_d(2,3) / spacing(2) );
+
+	switch (planeType)
+	{
+	case ptAXIAL:
+		voxel[0] = xVoxel;
+		voxel[1] = yVoxel;
+		break;
+	case ptCORONAL:
+		voxel[0] = xVoxel;
+		voxel[1] = zVoxel;
+		break;
+	case ptSAGITTAL:
+		voxel[0] = yVoxel;
+		voxel[1] = zVoxel;
+		break;
+	default:
+		CX_LOG_WARNING() << "Not a valid plane type." << enum2string(planeType);
+	}
+	return voxel;
+}
+
+int getSliceNumberFrom3Dposition(ImagePtr image, PLANE_TYPE planeType, Vector3D position_r)
+{
+	int sliceNumber;
+
+	Transform3D rMd = image->get_rMd();
+	Eigen::Array3d spacing = image->getSpacing();
+	Transform3D positionTransform_d = rMd.inv() * createTransformTranslate(position_r);
+
+	switch (planeType)
+	{
+	case ptAXIAL:
+		sliceNumber = std::round( positionTransform_d(2,3) / spacing(2) );
+		break;
+	case ptCORONAL:
+		sliceNumber = std::round( positionTransform_d(1,3) / spacing(1) );
+		break;
+	case ptSAGITTAL:
+		sliceNumber = std::round( positionTransform_d(0,3) / spacing(0) );
+		break;
+	default:
+		CX_LOG_WARNING() << "Not a valid plane type." << enum2string(planeType);
+	}
+	return sliceNumber;
+}
+
+Vector3D get3DpositionFromSliceVoxel(ImagePtr image, PLANE_TYPE planeType, std::vector<int> voxel, int sliceNumber)
+{
+	Vector3D position_r;
+
+	Transform3D rMd = image->get_rMd();
+	Eigen::Array3d spacing = image->getSpacing();
+	Vector3D position_d;
+
+	switch (planeType)
+	{
+	case ptAXIAL:
+		position_d(0) = voxel[0]*spacing(0);
+		position_d(1) = voxel[1]*spacing(1);
+		position_d(2) = sliceNumber*spacing(2);
+		break;
+	case ptCORONAL:
+		position_d(0) = voxel[0]*spacing(0);
+		position_d(1) = sliceNumber*spacing(1);
+		position_d(2) = voxel[1]*spacing(2);
+		break;
+	case ptSAGITTAL:
+		position_d(0) = sliceNumber*spacing(0);
+		position_d(1) = voxel[0]*spacing(1);
+		position_d(2) = voxel[1]*spacing(2);
+		break;
+	default:
+		CX_LOG_WARNING() << "Not a valid plane type." << enum2string(planeType);
+		return position_r;
+	}
+
+	Transform3D positionTransform_r = rMd * createTransformTranslate(position_d);
+	position_r(0) = positionTransform_r(0,3);
+	position_r(1) = positionTransform_r(1,3);
+	position_r(2) = positionTransform_r(2,3);
+
+	return position_r;
+}
+
 
 } // namespace cx
