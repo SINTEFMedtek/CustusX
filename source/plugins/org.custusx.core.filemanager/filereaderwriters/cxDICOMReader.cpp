@@ -23,7 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-//TODO: create suffix list, not only single value
 DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 	FileReaderWriterImplService("DICOMReader" ,Image::getTypeName(), "", "dcm *", patientModelService)
 {
@@ -63,26 +62,16 @@ bool DICOMReader::readInto(ImagePtr image, QString filename)
 
 DataPtr DICOMReader::read(const QString& uid, const QString& filename)
 {
-	CX_LOG_DEBUG() << "cxDICOMReader::read() uid:" << uid << " filename: "<< filename;
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
 
-	//ImagePtr image = importSeries(filename);
 	DataPtr retval = image;
 	return retval;
 }
 
 std::vector<DataPtr> DICOMReader::read(const QString &filename)
 {
-	CX_LOG_DEBUG() << "cxDICOMReader::read() filename: " << filename;
 	std::vector<DataPtr> retval;
-	//ImagePtr image = boost::dynamic_pointer_cast<Image>(this->createData(Image::getTypeName() , filename));
-
-	//vtkImageDataPtr raw = this->loadVtkImageData(filename);
-	//if(!raw)
-	//	return retval;
-	//image->setVtkImageData(raw);
-
 	ImagePtr image = importSeries(filename);
 
 	if(image)
@@ -93,12 +82,6 @@ std::vector<DataPtr> DICOMReader::read(const QString &filename)
 
 vtkImageDataPtr DICOMReader::loadVtkImageData(QString filename)
 {
-	CX_LOG_DEBUG() << "cxDICOMReader::loadVtkImageData() filename: " << filename;
-//	vtkPNGReaderPtr pngReader = vtkPNGReaderPtr::New();
-//	pngReader->SetFileName(filename.toStdString().c_str());
-//	pngReader->Update();
-//	return pngReader->GetOutput();
-	//return vtkImageDataPtr();
 	ImagePtr image = importSeries(filename);
 	return image->getBaseVtkImageData();
 }
@@ -126,14 +109,11 @@ ImagePtr DICOMReader::importSeries(QString fileName)
 
 	QFileInfo dir = QFileInfo(fileName);
 	QString folder = dir.absolutePath();
-	//CX_LOG_DEBUG() << "fileName: " << fileName;
-	//CX_LOG_DEBUG() << "folder: " << folder;
 
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
 	DICOMIndexer->addDirectory(*database,folder,"");
 
 	QString seriesUid = this->getBestDICOMSeries(database);
-	//CX_LOG_DEBUG() << "seriesUid: " << seriesUid;
 	convertedImage = converter.convertToImage(seriesUid);
 
 	if (!convertedImage)
@@ -153,7 +133,6 @@ QString DICOMReader::getBestDICOMSeries(ctkDICOMDatabasePtr database)
 	for(int pNr = 0; pNr < patients.size(); ++pNr)
 	{
 		QString patient = patients[pNr];
-		//if(patients.size() > 1)
 		CX_LOG_DEBUG() << "Got " << patients.size() << " DICOM patients.";
 		QStringList studies = database->studiesForPatient(patient);
 		CX_LOG_DEBUG() << "Got " << studies.size() << " DICOM studies for patient " << patient;
