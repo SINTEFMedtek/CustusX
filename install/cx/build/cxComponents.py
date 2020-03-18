@@ -183,7 +183,7 @@ class ITK(CppComponent):
         builder.configureCMake()
     def repository(self):
         if self.useExternalRepositories():
-            return 'git://itk.org/ITK.git'
+            return 'git@github.com:InsightSoftwareConsortium/ITK.git'
         else:
             return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
