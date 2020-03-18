@@ -86,24 +86,16 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 	cx::ImagePtr convertedImage;
 	cx::DicomConverter converter;
 
-	//ctkDICOMDatabase* database = new ctkDICOMDatabase();
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
 	database->openDatabase(":memory:");
 	converter.setDicomDatabase(database.data());
 
-
-	//QString fileName = seriesUid;//Test
-	//QDir dir = QDir(fileName);
-	//QString folder = dir.absolutePath();
-	//CX_LOG_DEBUG() << "folder: " << folder;
-
-	QString dicomInput = inputDicomDataDirectory; // File or dir? Seems like we need directory, not one of the files?
+	QString dicomInput = inputDicomDataDirectory; // Need directory, not one of the files.
 	CX_LOG_DEBUG() << "dicomInput: " << dicomInput;
 
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
 	DICOMIndexer->addDirectory(*database, dicomInput,"");
 
-	//CX_LOG_DEBUG() << "patients: " << database->patients().join(" ");
 	QStringList patients = database->patients();
 	REQUIRE(patients.size() == 1);
 	QString patient = patients[0];
@@ -124,22 +116,9 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 
 	QStringList files = database->filesForSeries(serie);
 	CHECK(files.size() > 0);
-	//QString firstFile = files[0];
-	//REQUIRE(!firstFile.isEmpty());
-	//CX_LOG_DEBUG() << "num files: " << files.size() << " firstFile: " << firstFile;
-
 
 	convertedImage = converter.convertToImage(serie);
 	REQUIRE(convertedImage);
-
-	//Can't get seriesForFile() to work with file/dir
-	//QString seriesUid = database->seriesForFile(inputDicomDataDirectory);
-	//QString seriesUid = database->seriesForFile(inputDicomDataFile);
-	//CX_LOG_DEBUG() << "seriesUid: " << seriesUid;
-	//convertedImage = converter.convertToImage(seriesUid);
-	//REQUIRE(convertedImage);
-
-
 
 	cx::LogicManager::shutdown();
 }
