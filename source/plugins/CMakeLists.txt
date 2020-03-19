@@ -40,6 +40,18 @@ set(CX_PLUGINS
   org.custusx.filter.airwaysfromcenterline:ON
 )
 
+if(CX_APPLE)
+  set(CX_PLUGINS
+    ${CX_PLUGINS}
+    org.custusx.filter.airways:OFF
+  )
+else()
+  set(CX_PLUGINS
+    ${CX_PLUGINS}
+    org.custusx.filter.airways:ON
+  )
+endif(CX_APPLE)
+
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,
 #      possibly outside current folder.
