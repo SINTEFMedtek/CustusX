@@ -176,11 +176,19 @@ void MainWindowActions::createPatientActions()
 					   "Export patient data to a folder",
 					   &MainWindowActions::exportDataSlot);
 
-	this->createAction("ImportData", "Import data",
-					   QIcon(":/icons/open_icon_library/document-import-2.png"),
-					   QKeySequence("Ctrl+I"),
-					   "Import image data",
-					   &MainWindowActions::importDataSlot);
+	//TODO: Rename action to AddFilesForImport?
+	this->createAction("ImportData", "Add files for import",
+										 QIcon(":/icons/open_icon_library/document-import-2.png"),
+										 QKeySequence("Ctrl+I"),
+										 "Add files to be imported",
+										 //&MainWindowActions::importDataSlot);
+										 [=](){this->importDataSlot("AddMoreFilesButtonClickedAction");});
+
+	this->createAction("ImportSelectedData", "Import selected data",
+										 QIcon(),
+										 QKeySequence(),
+										 "Import all selected data files",
+										 [=](){this->importDataSlot("ImportButtonClickedAction");});
 }
 
 template <class T>
@@ -314,7 +322,7 @@ void MainWindowActions::exportDataSlot()
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
-void MainWindowActions::importDataSlot()
+void MainWindowActions::importDataSlot(QString actionText)
 {
 	this->savePatientFileSlot();
 
@@ -335,12 +343,18 @@ void MainWindowActions::importDataSlot()
 		return;
 	}
 
+	bool actionFound = false;
 	QList<QAction*> actions = widget->actions();
 	foreach(QAction* action, actions)
 	{
-		if(action->text().contains("AddMoreFilesButtonClickedAction"))
+		if(action->text().contains(actionText))//"AddMoreFilesButtonClickedAction"))
+		{
+			actionFound =  true;
 			action->trigger();
+		}
 	}
+	if(!actionFound)
+		CX_LOG_WARNING() << "MainWindowActions::importDataSlot, action not found: " << actionText;
 }
 
 void MainWindowActions::shootScreen()
