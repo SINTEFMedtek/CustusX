@@ -57,6 +57,8 @@ public:
 	virtual QString findDataTypeFromFile(QString filename) = 0;
 	virtual std::vector<FileReaderWriterServicePtr> getExportersForDataType(QString dataType) = 0;
 	virtual std::vector<FileReaderWriterServicePtr> getImportersForDataType(QString dataType) = 0;
+
+	virtual QString getFileReaderName(const QString &filename) = 0;
 };
 
 }

@@ -137,6 +137,16 @@ class CppBuilder(object):
         '''
         self.gitCheckoutTag(tag)
 
+    def gitCheckoutSha(self, sha):
+        '''
+        Use this function when checking out a git sha,
+        instead of gitCheckout/gitCheckoutTag,
+        as they will output confusing warnings
+        '''
+        self._changeDirToSource()
+        runShell('git fetch')
+        runShell('git checkout %s' % sha)
+
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')
         if not output:

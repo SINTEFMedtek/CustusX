@@ -56,6 +56,7 @@ public:
 	void addFileReaderWriter(FileReaderWriterService *service);
 	void removeFileReaderWriter(FileReaderWriterService *service);
 
+	QString getFileReaderName(const QString &filename);
 private:
 	FileReaderWriterServicePtr findReader(const QString& path, const QString& type="unknown");
 	FileReaderWriterServicePtr findWriter(const QString& path, const QString& type="unknown");
