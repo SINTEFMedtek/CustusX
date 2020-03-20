@@ -144,18 +144,37 @@ void ImportWidget::addMoreFilesButtonClicked()
 {
 	QStringList filenames = this->openFileBrowserForSelectingFiles();
 
+	bool addedDICOM = false;
+
 	ImportDataTypeWidget *widget = NULL;
-	foreach (QString filename, filenames)
+	for(int i = 0; i < filenames.size(); ++i)
 	{
+		QString filename = filenames[i];
+		QString fileType = mFileManager->getFileReaderName(filename);
+		if(fileType == "DICOMReader")
+		{
+			//Only allow adding one dicom series to prevent duplicates, and long processing time
+			if(addedDICOM)
+			{
+				//If import of multiple series is something we need:
+				//All DICOM files can be added to a QStringList before sending them to the reader.
+				//Then the reader can determine which files are from the same/different series
+				CX_LOG_WARNING() << "Import of multiple DICOM series at once is not supported. Skipping series based on file: " << filename;
+				continue;
+			}
+			addedDICOM = true;
+		}
+
 		mFileNames.push_back(filename);
 
 		std::vector<DataPtr> newData = mFileManager->read(filename);
-		int index = this->insertDataIntoTable(filename, newData);
-
-		widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
-		mStackedWidget->insertWidget(index, widget);
-
-		mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
+		if(newData.size() > 0)
+		{
+			int index = this->insertDataIntoTable(filename, newData);
+			widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
+			mStackedWidget->insertWidget(index, widget);
+			mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
+		}
 	}
 
 	this->generateParentCandidates();
@@ -265,6 +284,11 @@ void ImportWidget::generateParentCandidates()
 {
 	for(unsigned i=0; i<mNotImportedData.size(); ++i)
 	{
+		if(!mNotImportedData[i])
+		{
+			CX_LOG_WARNING() << "ImportWidget::generateParentCandidates(): No data";
+			continue;
+		}
 		if(mNotImportedData[i]->getType() != PointMetric::getTypeName())
 			mParentCandidates.push_back(mNotImportedData[i]);
 	}

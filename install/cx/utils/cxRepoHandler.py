@@ -29,6 +29,8 @@ def runShell(cmd, path):
     print('[shell cmd] %s [%s]' % (cmd, path))
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=path)
     out, err = p.communicate("") # wait for process to complete
+    if type(err) is bytes:
+        err = err.decode()
     if err:
         print(err.strip())
     if out:
