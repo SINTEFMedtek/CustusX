@@ -714,7 +714,7 @@ BoolPropertyPtr AirwaysFilter::getAirwaySegmentationOption(QDomElement root)
 			BoolProperty::initialize("Airway segmentation",
 					"",
 					"Selecting this option will segment airways",
-					false, root);
+                    true, root);
 	return retval;
 
 }
@@ -725,7 +725,7 @@ BoolPropertyPtr AirwaysFilter::getAirwayTubesGenerationOption(QDomElement root)
 			BoolProperty::initialize("Airway tubes generation",
 					"",
 					"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
-					false, root);
+                    true, root);
 	return retval;
 
 }
