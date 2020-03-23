@@ -183,7 +183,7 @@ class ITK(CppComponent):
         builder.configureCMake()
     def repository(self):
         if self.useExternalRepositories():
-            return 'git://itk.org/ITK.git'
+            return 'git@github.com:InsightSoftwareConsortium/ITK.git'
         else:
             return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
@@ -502,7 +502,8 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
+#        self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
+	self._getBuilder().gitCheckout('b85d3a826ebe360f77a8ac6f625a9dfa7bb856fd')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
