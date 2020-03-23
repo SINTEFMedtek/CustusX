@@ -176,12 +176,11 @@ void MainWindowActions::createPatientActions()
 					   "Export patient data to a folder",
 					   &MainWindowActions::exportDataSlot);
 
-	//TODO: Rename action to AddFilesForImport?
-	this->createAction("ImportData", "Add files for import",
+	//Action "AddFilesForImport" was previously called "ImportData"
+	this->createAction("AddFilesForImport", "Add files for import",
 										 QIcon(":/icons/open_icon_library/document-import-2.png"),
 										 QKeySequence("Ctrl+I"),
 										 "Add files to be imported",
-										 //&MainWindowActions::importDataSlot);
 										 [=](){this->importDataSlot("AddMoreFilesButtonClickedAction");});
 
 	this->createAction("ImportSelectedData", "Import selected data",
