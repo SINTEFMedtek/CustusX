@@ -346,14 +346,14 @@ void MainWindowActions::importDataSlot(QString actionText)
 	QList<QAction*> actions = widget->actions();
 	foreach(QAction* action, actions)
 	{
-		if(action->text().contains(actionText))//"AddMoreFilesButtonClickedAction"))
+		if(action->text().contains(actionText))
 		{
 			actionFound =  true;
 			action->trigger();
 		}
 	}
 	if(!actionFound)
-		CX_LOG_WARNING() << "MainWindowActions::importDataSlot, action not found: " << actionText;
+		CX_LOG_ERROR() << "MainWindowActions::importDataSlot, action not found: " << actionText;
 }
 
 void MainWindowActions::shootScreen()

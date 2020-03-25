@@ -502,7 +502,7 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        if(platform.system() == 'Darwin'): # Test: Use old version of FAST library for macOS
+        if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
           self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
         else:
           self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
