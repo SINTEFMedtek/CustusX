@@ -28,6 +28,15 @@ public:
 
 	bool isNull(){return false;}
 
+	/**
+	 * @brief Simple check is file is a DICOM file.
+	 * DICOM files can have several different endings (. .dcm .dicom .ima),
+	 * so we instead look at the characters at position 0x80.
+	 * These characters should spell DICM.
+	 * @param type
+	 * @param filename
+	 * @return
+	 */
 	virtual bool canRead(const QString& type, const QString& filename);
 	virtual bool readInto(DataPtr data, QString path);
 	bool readInto(ImagePtr image, QString filename);
