@@ -32,11 +32,31 @@ DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 bool DICOMReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
-	//TODO: Not only check file type, but check if file/folder is DICOM.
-	return (
-				fileType.compare("dcm", Qt::CaseInsensitive) == 0
-				|| fileType.compare("dicom", Qt::CaseInsensitive) == 0
-				|| fileType.isEmpty());
+	QFile file(filename);
+	bool opened = file.open(QIODevice::ReadOnly);
+
+	// A DICOM file should have the characters "DICM" at position 0x80
+	bool success = file.seek(0x80);
+	if(!success)
+	{
+		CX_LOG_WARNING() << "DICOMReader: File isn't large enough to be DICOM: " << filename;
+		return false;
+	}
+
+	char buf[4];
+	int numReadChar = file.peek(buf, sizeof(buf));
+	if (numReadChar != sizeof(buf))
+	{
+		CX_LOG_WARNING() << "DICOMReader: Cannot read from file: " << filename;
+		return false;
+	}
+	if (buf[0] != 'D' || buf[1] != 'I' || buf[2] != 'C' || buf[3] != 'M')
+	{
+		CX_LOG_WARNING() << "DICOMReader: File isn't DICOM: " << filename;
+		return false;
+	}
+	else
+		return true;
 }
 
 QString DICOMReader::canReadDataType() const

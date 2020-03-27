@@ -183,7 +183,7 @@ class ITK(CppComponent):
         builder.configureCMake()
     def repository(self):
         if self.useExternalRepositories():
-            return 'git://itk.org/ITK.git'
+            return 'git@github.com:InsightSoftwareConsortium/ITK.git'
         else:
             return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
@@ -502,7 +502,10 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
+        if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
+          self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
+        else:
+          self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -534,7 +537,8 @@ class FAST(CppComponent):
         return self.buildPath()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
+        if(platform.system() != 'Darwin'):
+          add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
 # ---------------------------------------------------------
 
 class CustusXData(CppComponent):

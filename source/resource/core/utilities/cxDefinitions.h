@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDEFINITIONS_H_
 
 #include "cxResourceExport.h"
+#include <QString>
 
 namespace cx
 {
@@ -170,6 +171,37 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 /**
  * @}
  */
+
+
+	static QString airwaysFilterGetNameSuffixCenterline()
+	{
+		return "_centerline";
+	}
+
+	static QString airwaysFilterGetNameSuffixAirways()
+	{
+		return "_airways";
+	}
+
+	static QString airwaysFilterGetNameSuffixTubes()
+	{
+		return "_tubes";
+	}
+
+	static QString airwaysFilterGetNameSuffixLungs()
+	{
+		return "_lungs";
+	}
+
+	static QString airwaysFilterGetNameSuffixVessels()
+	{
+		return "_vessels";
+	}
+
+	static QString airwaysFilterGetNameSuffixVolume()
+	{
+		return "_volume";
+	}
 
 } //namespace end
 

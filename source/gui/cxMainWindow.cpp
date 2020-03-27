@@ -453,7 +453,7 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mActions->getAction("ClearPatient"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mActions->getAction("ExportPatient"));
-	mFileMenu->addAction(mActions->getAction("ImportData"));
+	mFileMenu->addAction(mActions->getAction("AddFilesForImport"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mFullScreenAction);
 	mFileMenu->addAction(mActions->getAction("StartLogConsole"));
@@ -515,7 +515,7 @@ void MainWindow::createToolBars()
 	mDataToolBar->addAction(mActions->getAction("NewPatient"));
 	mDataToolBar->addAction(mActions->getAction("LoadFile"));
 	mDataToolBar->addAction(mActions->getAction("SaveFile"));
-	mDataToolBar->addAction(mActions->getAction("ImportData"));
+	mDataToolBar->addAction(mActions->getAction("AddFilesForImport"));
 
 	mToolToolBar = this->registerToolBar("Tools");
 	mToolToolBar->addAction(mActions->getAction("TrackingTools"));

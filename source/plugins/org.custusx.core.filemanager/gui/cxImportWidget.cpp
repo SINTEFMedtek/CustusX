@@ -91,6 +91,10 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	QAction* addMoreFilesButtonClickedAction = new QAction("AddMoreFilesButtonClickedAction", this);
 	this->addAction(addMoreFilesButtonClickedAction);
 	connect(addMoreFilesButtonClickedAction, &QAction::triggered, this, &ImportWidget::addMoreFilesButtonClicked);
+
+	QAction* importButtonClickedAction = new QAction("ImportButtonClickedAction", this);
+	this->addAction(importButtonClickedAction);
+	connect(importButtonClickedAction, &QAction::triggered, this, &ImportWidget::importButtonClicked);
 }
 
 int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr> data)
