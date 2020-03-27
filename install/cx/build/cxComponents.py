@@ -502,8 +502,10 @@ class FAST(CppComponent):
         return 'git@github.com:smistad/FAST'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-#        self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
-	self._getBuilder().gitCheckout('b85d3a826ebe360f77a8ac6f625a9dfa7bb856fd')
+        if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
+          self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
+        else:
+          self._getBuilder().gitCheckoutSha('b85d3a826ebe360f77a8ac6f625a9dfa7bb856fd')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -535,7 +537,8 @@ class FAST(CppComponent):
         return self.buildPath()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
-        add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
+        if(platform.system() != 'Darwin'):
+          add('CX_PLUGIN_org.custusx.filter.airways:BOOL', True);
 # ---------------------------------------------------------
 
 class CustusXData(CppComponent):

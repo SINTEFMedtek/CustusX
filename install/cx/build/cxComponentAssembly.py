@@ -52,8 +52,8 @@ class LibraryAssembly(object):
         self.addComponent(cxComponents.OpenIGTLinkIO())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
         self.addComponent(cxComponents.QHttpServer())
-        if(platform.system() != 'Darwin'):
-            self.addComponent(cxComponents.FAST())
+        #if(platform.system() != 'Darwin'):
+        self.addComponent(cxComponents.FAST()) # NB: Using old version of FAST for macOS
         self.addComponent(cxComponents.org_custusx_angleCorrection())
         self.addComponent(self.custusx)
         self.addComponent(cxComponents.CustusXData())
