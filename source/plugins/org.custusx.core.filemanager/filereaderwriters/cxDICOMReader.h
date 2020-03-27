@@ -29,10 +29,11 @@ public:
 	bool isNull(){return false;}
 
 	/**
-	 * @brief Simple check is file is a DICOM file.
+	 * @brief Simple check if file is a DICOM file.
 	 * DICOM files can have several different endings (. .dcm .dicom .ima),
 	 * so we instead look at the characters at position 0x80.
-	 * These characters should spell DICM.
+	 * These characters should spell DICM, as specified by DICOM standard PS3.10
+	 * "Media Storage and File Format for Media Interchange"
 	 * @param type
 	 * @param filename
 	 * @return
