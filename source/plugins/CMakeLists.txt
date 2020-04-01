@@ -15,7 +15,7 @@ set(CX_PLUGINS
   org.custusx.core.video:ON
   org.custusx.core.state:ON
   org.custusx.core.filemanager:ON
-  org.custusx.dicom:ON
+  org.custusx.dicom:OFF
   org.custusx.usreconstruction.vnncl:ON
   org.custusx.usreconstruction.pnn:ON
   org.custusx.registration:ON
@@ -39,6 +39,18 @@ set(CX_PLUGINS
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
 )
+
+if(CX_APPLE)
+  set(CX_PLUGINS
+    ${CX_PLUGINS}
+    org.custusx.filter.airways:OFF
+  )
+else()
+  set(CX_PLUGINS
+    ${CX_PLUGINS}
+    org.custusx.filter.airways:ON
+  )
+endif(CX_APPLE)
 
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,

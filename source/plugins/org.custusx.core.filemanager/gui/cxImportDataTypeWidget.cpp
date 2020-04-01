@@ -83,6 +83,11 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	QString type, name;
 	for(unsigned i=0; i<mData.size(); ++i)
 	{
+		if(!mData[i])
+		{
+			CX_LOG_WARNING() << "ImportDataTypeWidget::ImportDataTypeWidget: No data";
+			continue;
+		}
 		type = mData[i]->getType();
 		name = mData[i]->getName();
 		QString space = mData[i]->getSpace();

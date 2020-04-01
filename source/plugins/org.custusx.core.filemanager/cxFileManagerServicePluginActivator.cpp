@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStlMeshReader.h"
 #include "cxNIfTIReader.h"
 #include "cxMNIReaderWriter.h"
+#include "cxDICOMReader.h"
 #include "cxLogger.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewServiceProxy.h"
@@ -54,6 +55,7 @@ void FileManagerServicePluginActivator::start(ctkPluginContext* context)
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<StlMeshReader>(context, new StlMeshReader(patientModelService), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<NIfTIReader>(context, new NIfTIReader(patientModelService), FileReaderWriterService_iid));
 	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<MNIReaderWriter>(context, new MNIReaderWriter(patientModelService, viewService), FileReaderWriterService_iid));
+	mRegisteredFileReaderWriterServices.push_back(RegisteredService::create<DICOMReader>(context, new DICOMReader(patientModelService), FileReaderWriterService_iid));
 
 	mRegisteredGuiExtenderService = RegisteredService::create<ImportExportGuiExtenderService>(context, new ImportExportGuiExtenderService(context), GUIExtenderService_iid);
 }

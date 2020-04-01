@@ -82,10 +82,11 @@ void ReconstructionManagerTestFixture::reconstruct()
 
 	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mViewService));
 
-	executer->startNonThreadedReconstruction(reconstructer->createAlgorithm(),
+	bool success = executer->startNonThreadedReconstruction(reconstructer->createAlgorithm(),
 			reconstructer->createCoreParameters(),
 			reconstructer->getSelectedFileData(),
 			createBModeWhenAngio);
+	REQUIRE(success);
 
 	mOutput = executer->getResult();
 }
@@ -98,10 +99,11 @@ void ReconstructionManagerTestFixture::threadedReconstruct()
 	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mViewService));
 
 	bool createBModeWhenAngio = reconstructer->getParam("Dual Angio")->getValueAsVariant().toBool();
-	executer->startReconstruction(reconstructer->createAlgorithm(),
+	bool success = executer->startReconstruction(reconstructer->createAlgorithm(),
 			reconstructer->createCoreParameters(),
 			reconstructer->getSelectedFileData(),
 			createBModeWhenAngio);
+	REQUIRE(success);
 	cx::TimedAlgorithmPtr thread = executer->getThread();
 
 	QObject::connect(thread.get(), SIGNAL(finished()), qApp, SLOT(quit()));
