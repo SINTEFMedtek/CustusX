@@ -673,7 +673,7 @@ BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 					"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
 					"inside trachea of the patient. "
 					"Then tick this checkbox to use the manual seed point in the airways filter.",
-					false, root);
+                    false);
 	return retval;
 
 }
@@ -684,7 +684,7 @@ BoolPropertyPtr AirwaysFilter::getAirwaySegmentationOption(QDomElement root)
 			BoolProperty::initialize("Airway segmentation",
 					"",
 					"Selecting this option will segment airways",
-                    true, root);
+                    true);
 	return retval;
 
 }
@@ -695,7 +695,7 @@ BoolPropertyPtr AirwaysFilter::getAirwayTubesGenerationOption(QDomElement root)
 			BoolProperty::initialize("Airway tubes generation",
 					"",
 					"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
-                    true, root);
+                    true);
 	return retval;
 
 }
@@ -706,7 +706,7 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 			BoolProperty::initialize("Lung segmentation",
 					"",
 					"Selecting this option will segment the two lung sacs",
-					false, root);
+                    false);
 	return retval;
 
 }
@@ -717,7 +717,7 @@ BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
 			BoolProperty::initialize("Vessel segmentation",
 					"",
 					"Selecting this option will segment the blood vessels in the lungs",
-					false, root);
+                    false);
 	return retval;
 
 }
