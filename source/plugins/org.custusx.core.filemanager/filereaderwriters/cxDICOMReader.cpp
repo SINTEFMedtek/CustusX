@@ -29,6 +29,8 @@ DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 
 }
 
+// This function is used for checking all readers if they can read a file,
+// so output should only be used for debug.
 bool DICOMReader::canRead(const QString &type, const QString &filename)
 {
 	QString fileType = QFileInfo(filename).suffix();
@@ -39,7 +41,7 @@ bool DICOMReader::canRead(const QString &type, const QString &filename)
 	bool success = file.seek(0x80);
 	if(!success)
 	{
-		CX_LOG_WARNING() << "DICOMReader: File isn't large enough to be DICOM: " << filename;
+		//CX_LOG_WARNING() << "DICOMReader: File isn't large enough to be DICOM: " << filename;
 		return false;
 	}
 
@@ -47,12 +49,12 @@ bool DICOMReader::canRead(const QString &type, const QString &filename)
 	int numReadChar = file.peek(buf, sizeof(buf));
 	if (numReadChar != sizeof(buf))
 	{
-		CX_LOG_WARNING() << "DICOMReader: Cannot read from file: " << filename;
+		//CX_LOG_WARNING() << "DICOMReader: Cannot read from file: " << filename;
 		return false;
 	}
 	if (buf[0] != 'D' || buf[1] != 'I' || buf[2] != 'C' || buf[3] != 'M')
 	{
-		CX_LOG_WARNING() << "DICOMReader: File isn't DICOM: " << filename;
+		//CX_LOG_WARNING() << "DICOMReader: File isn't DICOM: " << filename;
 		return false;
 	}
 	else
