@@ -342,18 +342,21 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 		mBloodVesselSegmentationOutput = vtkBloodVesselExporter->GetOutput();
 		vtkBloodVesselExporter->Delete();
 
-		auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
+        bool generateVesselCenterlines = getVesselCenterlineOption(mOptions)->getValue();
+        if (generateVesselCenterlines)
+        {
+            auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
+            // Extract centerline
+            fast::CenterlineExtraction::pointer bloodVesselCenterline = fast::CenterlineExtraction::New();
+            bloodVesselCenterline->setInputData(bloodVesselSegmentationData);
 
-		// Extract centerline
-		fast::CenterlineExtraction::pointer bloodVesselCenterline = fast::CenterlineExtraction::New();
-		bloodVesselCenterline->setInputData(bloodVesselSegmentationData);
-
-		// Get centerline
-		vtkSmartPointer<fast::VTKMeshExporter> vtkBloodVesselCenterlineExporter = fast::VTKMeshExporter::New();
-		vtkBloodVesselCenterlineExporter->setInputConnection(bloodVesselCenterline->getOutputPort());
-		vtkBloodVesselCenterlineExporter->Update();
-		mBloodVesselCenterlineOutput = vtkBloodVesselCenterlineExporter->GetOutput();
-		vtkBloodVesselCenterlineExporter->Delete();
+            // Get centerline
+            vtkSmartPointer<fast::VTKMeshExporter> vtkBloodVesselCenterlineExporter = fast::VTKMeshExporter::New();
+            vtkBloodVesselCenterlineExporter->setInputConnection(bloodVesselCenterline->getOutputPort());
+            vtkBloodVesselCenterlineExporter->Update();
+            mBloodVesselCenterlineOutput = vtkBloodVesselCenterlineExporter->GetOutput();
+            vtkBloodVesselCenterlineExporter->Delete();
+        }
 
 } catch(fast::Exception& e) {
 	std::string error = e.what();
@@ -564,6 +567,9 @@ bool AirwaysFilter::postProcessVessels()
 	// Set output
 	mOutputTypes[6]->setValue(contour->getUid());
 
+    bool generateVesselCenterlines = getVesselCenterlineOption(mOptions)->getValue();
+    if (generateVesselCenterlines)
+    {
 	// Centerline
     QString uid = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
     QString name = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
@@ -574,17 +580,21 @@ bool AirwaysFilter::postProcessVessels()
 	bloodVesselsCenterline->setColor("blue");
 	patientService()->insertData(bloodVesselsCenterline);
 	mOutputTypes[5]->setValue(bloodVesselsCenterline->getUid());
+    }
 
-
-	//Create segmented volume output
-    QString uidVolume = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
-    QString nameVolume =  mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
-	ImagePtr outputVolume = createDerivedImage(mServices->patient(),
-	                                         uidVolume, nameVolume,
-											 mBloodVesselSegmentationOutput, mInputImage);
-	outputVolume->mergevtkSettingsIntosscTransform();
-	patientService()->insertData(outputVolume);
-	mOutputTypes[7]->setValue(outputVolume->getUid());
+    bool generateVesselVolume = getVesselVolumeOption(mOptions)->getValue();
+    if (generateVesselVolume)
+    {
+        //Create segmented volume output
+        QString uidVolume = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+        QString nameVolume =  mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+        ImagePtr outputVolume = createDerivedImage(mServices->patient(),
+                                                 uidVolume, nameVolume,
+                                                 mBloodVesselSegmentationOutput, mInputImage);
+        outputVolume->mergevtkSettingsIntosscTransform();
+        patientService()->insertData(outputVolume);
+        mOutputTypes[7]->setValue(outputVolume->getUid());
+    }
 
 	return true;
 }
@@ -626,6 +636,8 @@ void AirwaysFilter::createOptions()
 	mOptionsAdapters.push_back(this->getAirwayTubesGenerationOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
 	mOptionsAdapters.push_back(this->getVesselSegmentationOption(mOptions));
+    mOptionsAdapters.push_back(this->getVesselCenterlineOption(mOptions));
+    mOptionsAdapters.push_back(this->getVesselVolumeOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -673,7 +685,7 @@ BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 					"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
 					"inside trachea of the patient. "
 					"Then tick this checkbox to use the manual seed point in the airways filter.",
-					false, root);
+                    false, root);
 	return retval;
 
 }
@@ -684,7 +696,7 @@ BoolPropertyPtr AirwaysFilter::getAirwaySegmentationOption(QDomElement root)
 			BoolProperty::initialize("Airway segmentation",
 					"",
 					"Selecting this option will segment airways",
-					false, root);
+                    true, root);
 	return retval;
 
 }
@@ -695,7 +707,7 @@ BoolPropertyPtr AirwaysFilter::getAirwayTubesGenerationOption(QDomElement root)
 			BoolProperty::initialize("Airway tubes generation",
 					"",
 					"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
-					false, root);
+                    true, root);
 	return retval;
 
 }
@@ -706,19 +718,41 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 			BoolProperty::initialize("Lung segmentation",
 					"",
 					"Selecting this option will segment the two lung sacs",
-					false, root);
+                    false, root);
 	return retval;
 
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Vessel segmentation",
-					"",
-					"Selecting this option will segment the blood vessels in the lungs",
-					false, root);
-	return retval;
+    BoolPropertyPtr retval =
+            BoolProperty::initialize("Vessel segmentation",
+                    "",
+                    "Selecting this option will segment the blood vessels in the lungs",
+                    false, root);
+    return retval;
+
+}
+
+BoolPropertyPtr AirwaysFilter::getVesselCenterlineOption(QDomElement root)
+{
+    BoolPropertyPtr retval =
+            BoolProperty::initialize("Vessel centerline",
+                    "",
+                    "Selecting this option will generate centerlines of the seegmented blood vessels",
+                    false, root);
+    return retval;
+
+}
+
+BoolPropertyPtr AirwaysFilter::getVesselVolumeOption(QDomElement root)
+{
+    BoolPropertyPtr retval =
+            BoolProperty::initialize("Vessel volume",
+                    "",
+                    "Selecting this option will generate binary volume of the seegmented blood vessels",
+                    false, root);
+    return retval;
 
 }
 

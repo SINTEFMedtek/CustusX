@@ -84,6 +84,8 @@ private:
 	BoolPropertyPtr getAirwayTubesGenerationOption(QDomElement root);
 	BoolPropertyPtr getLungSegmentationOption(QDomElement root);
 	BoolPropertyPtr getVesselSegmentationOption(QDomElement root);
+    BoolPropertyPtr getVesselCenterlineOption(QDomElement root);
+    BoolPropertyPtr getVesselVolumeOption(QDomElement root);
 	void createAirwaysFromCenterline();
 	vtkImageDataPtr mAirwaySegmentationOutput;
 	vtkPolyDataPtr mAirwayCenterlineOutput;
