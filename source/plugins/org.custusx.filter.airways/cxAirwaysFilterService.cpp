@@ -604,12 +604,13 @@ void AirwaysFilter::createAirwaysFromCenterline()
     AirwaysFromCenterlinePtr airwaysFromCLPtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 
     airwaysFromCLPtr->processCenterline(mAirwayCenterlineOutput);
+    airwaysFromCLPtr->setSegmentedVolume(mAirwaySegmentationOutput);
 
     // Create the mesh object from the airway walls
     QString uidMesh = mInputImage->getUid() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + "%1";
     QString nameMesh = mInputImage->getName() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + "%1";
     MeshPtr airwayWalls = patientService()->createSpecificData<Mesh>(uidMesh, nameMesh);
-    airwayWalls->setVtkPolyData(airwaysFromCLPtr->generateTubes());
+    airwayWalls->setVtkPolyData(airwaysFromCLPtr->generateTubes(0, true));
     airwayWalls->get_rMd_History()->setParentSpace(mInputImage->getUid());
     airwayWalls->get_rMd_History()->setRegistration(mInputImage->get_rMd());
     airwayWalls->setColor(QColor(253, 173, 136, 255));

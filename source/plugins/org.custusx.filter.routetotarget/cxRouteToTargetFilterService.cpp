@@ -173,7 +173,9 @@ bool RouteToTargetFilter::execute()
 	if (!targetPoint)
 		return false;
 
-	mRouteToTarget->processCenterline(mesh);
+    mRouteToTarget->setSmoothing(mSmoothing);
+
+    mRouteToTarget->processCenterline(mesh);
 
     //note: mOutput is in reference space
 	mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
@@ -318,6 +320,11 @@ bool RouteToTargetFilter::postProcessBloodVessels()
 
 	return true;
 
+}
+
+void RouteToTargetFilter::setSmoothing(bool smoothing)
+{
+    mSmoothing = smoothing; // default true
 }
 
 void RouteToTargetFilter::setTargetName(QString name)
