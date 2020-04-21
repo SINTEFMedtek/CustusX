@@ -18,7 +18,8 @@ cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
     filters/cxContourFilter
     filters/cxBinaryThinningImageFilter3DFilter
     filters/cxSmoothingImageFilter
-    filters/cxResampleImageFilter    
+    filters/cxResampleImageFilter
+    filters/cxGenericScriptFilter
 )
 
 cx_create_export_header("cxResourceFilter")
