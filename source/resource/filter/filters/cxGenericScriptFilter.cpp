@@ -105,7 +105,7 @@ void GenericScriptFilter::createOptions()
 
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
 	mOptionsAdapters.push_back(this->getScriptContent(mOptions));
-	mOptionsAdapters.push_back(this->setScriptOutput(mOptions));
+	// mOptionsAdapters.push_back(this->setScriptOutput(mOptions));
 
 }
 

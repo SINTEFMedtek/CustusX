@@ -35,8 +35,8 @@ target_include_directories(cxResourceFilter
 target_link_libraries(cxResourceFilter
     PRIVATE
     cxResource
-	cxResourceVisualization
-	${ITK_LIBRARIES}
+    cxResourceVisualization
+    ${ITK_LIBRARIES}
 )
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
