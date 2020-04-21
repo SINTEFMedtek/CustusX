@@ -79,7 +79,8 @@ StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 		QString filename = ImageStreamerDummyArguments().getFilenameOption(root)->getValue();
 		bool secondary = ImageStreamerDummyArguments().getSecondaryOption(root)->getValue();
 		streamer->initialize(filename, secondary);
-		return streamer;
+		localServerStreamer = streamer;//Fix for old compilers returing copy when type isn't matching function return type exactly.
+		return localServerStreamer;
 	}
 }
 
