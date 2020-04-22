@@ -57,12 +57,6 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-	static QString getNameSuffixCenterline();
-	static QString getNameSuffixAirways();
-	static QString getNameSuffixTubes();
-	static QString getNameSuffixLungs();
-	static QString getNameSuffixVessels();
-	static QString getNameSuffixVolume();
 
     bool preProcess();
 	virtual bool execute();

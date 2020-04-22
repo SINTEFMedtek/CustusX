@@ -27,6 +27,11 @@ set(PLUGIN_SRCS
     gui/cxImportDataTypeWidget.h
     gui/cxImportDataTypeWidget.cpp
 
+    dicom/cxDicomConverter.h
+    dicom/cxDicomConverter.cpp
+    dicom/cxDicomImageReader.h
+    dicom/cxDicomImageReader.cpp
+
     filereaderwriters/cxMetaImageReader.h
     filereaderwriters/cxMetaImageReader.cpp
     filereaderwriters/cxPNGImageReader.h
@@ -41,6 +46,8 @@ set(PLUGIN_SRCS
     filereaderwriters/cxNIfTIReader.cpp
     filereaderwriters/cxMNIReaderWriter.h
     filereaderwriters/cxMNIReaderWriter.cpp
+    filereaderwriters/cxDICOMReader.h
+    filereaderwriters/cxDICOMReader.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -71,6 +78,7 @@ set(PLUGIN_target_libraries
     cxGUIExtenderService
     cxGui
     cxResourceVisualization
+    CTKDICOMCore
 )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -96,6 +104,7 @@ target_include_directories( org_custusx_core_filemanager
     .
     ./filereaderwriters
     ./gui
+    ./dicom
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 

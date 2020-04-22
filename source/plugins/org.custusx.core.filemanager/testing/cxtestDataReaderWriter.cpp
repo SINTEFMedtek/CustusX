@@ -32,6 +32,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxPointMetric.h"
 
+#include <ctkDICOMDatabase.h>
+#include <ctkDICOMIndexer.h>
+#include <QDir>
+#include "cxDicomConverter.h"
+#include "cxLogicManager.h"
+
+typedef QSharedPointer<ctkDICOMDatabase> ctkDICOMDatabasePtr;
+
 namespace cxtest
 {
 
@@ -64,4 +72,54 @@ TEST_CASE("Import MNI Tag Point file", "[integration][metrics][mni]")
     }
 }
 
+// Copy some code from test "DicomConverter: Convert Kaisa",
+// and combine this with code from DICOMReader::importSeries()
+TEST_CASE("Import Kaisa from DICOM", "[integration]")
+{
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+
+	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
+	QString inputDicomDataFile = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/SW7/1";
+
+	cx::ImagePtr convertedImage;
+	cx::DicomConverter converter;
+
+	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
+	database->openDatabase(":memory:");
+	converter.setDicomDatabase(database.data());
+
+	QString dicomInput = inputDicomDataDirectory; // Need directory, not one of the files.
+	CX_LOG_DEBUG() << "dicomInput: " << dicomInput;
+
+	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
+	DICOMIndexer->addDirectory(*database, dicomInput,"");
+
+	QStringList patients = database->patients();
+	REQUIRE(patients.size() == 1);
+	QString patient = patients[0];
+	REQUIRE(!patient.isEmpty());
+	CX_LOG_DEBUG() << "num patients: " << patients.size() << " patient: " << patient;
+
+	QStringList studies = database->studiesForPatient(patient);
+	REQUIRE(studies.size() == 1);
+	QString study = studies[0];
+	REQUIRE(!study.isEmpty());
+	CX_LOG_DEBUG() << "num studies: " << studies.size() << " study: " << study;
+
+	QStringList series = database->seriesForStudy(study);
+	REQUIRE(series.size() == 1);
+	QString serie = series[0];
+	REQUIRE(!serie.isEmpty());
+	CX_LOG_DEBUG() << "num series: " << series.size() << " serie: " << serie;
+
+	QStringList files = database->filesForSeries(serie);
+	CHECK(files.size() > 0);
+
+	convertedImage = converter.convertToImage(serie);
+	REQUIRE(convertedImage);
+
+	cx::LogicManager::shutdown();
 }
+} //cxtest

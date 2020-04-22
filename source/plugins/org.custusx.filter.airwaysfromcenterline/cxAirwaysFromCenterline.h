@@ -35,10 +35,12 @@ public:
     void setBranches(BranchListPtr branches);
     void processCenterline(vtkPolyDataPtr centerline_r);
     void processCenterline(Eigen::MatrixXd CLpoints_r);
+		BranchListPtr getBranchList();
     vtkPolyDataPtr generateTubes(double staticRadius = 0);
     vtkImageDataPtr initializeAirwaysVolume();
     vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double staticRadius = 0);
     vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
+		void smoothAllBranchesForVB();
     vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
     vtkPolyDataPtr getVTKPoints();
 
@@ -55,6 +57,10 @@ private:
     bool mBloodVessel = false;
 
 };
+
+std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
+std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line);
+double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
 typedef boost::shared_ptr<AirwaysFromCenterline> AirwaysFromCenterlinePtr;
 

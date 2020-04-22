@@ -184,4 +184,13 @@ void FileManagerServiceBase::removeFileReaderWriter(FileReaderWriterService *ser
 	}
 }
 
+QString FileManagerServiceBase::getFileReaderName(const QString &filename)
+{
+	FileReaderWriterServicePtr reader = this->findReader(filename);
+	if (reader)
+		return reader->getName();
+	else
+		return QString();
+}
+
 } // cx
