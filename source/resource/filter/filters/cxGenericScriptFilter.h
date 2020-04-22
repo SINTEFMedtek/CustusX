@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
-#include "cxFilePreviewWidget.h"
+//#include "cxFilePreviewWidget.h"
 
 namespace cx
 {
