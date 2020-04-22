@@ -229,11 +229,13 @@ QString DummyImageStreamer::getType()
 
 vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 {
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage: " << filename;
 	//vtkImageDataPtr source = mFileManagerService->loadVtkImageData(filename);
 
 	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
 	reader->SetFileName(cstring_cast(filename));
 	reader->ReleaseDataFlagOn();
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. Initialized vtkMetaImageReader";
 
 	//if (!ErrorObserver::checkedRead(reader, filename))
 	//	return vtkImageDataPtr();
@@ -241,7 +243,9 @@ vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
 	zeroer->SetInputConnection(reader->GetOutputPort());
 	zeroer->SetOutputOrigin(0, 0, 0);
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. Initialized vtkImageChangeInformation";
 	zeroer->Update();
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. updated VTK pipeline";
 	vtkImageDataPtr source = zeroer->GetOutput();
 
 	if (source)
