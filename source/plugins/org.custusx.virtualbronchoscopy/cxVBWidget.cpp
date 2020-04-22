@@ -169,8 +169,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_Right || event->key()==Qt::Key_6)
 	{
 		if(mControlsEnabled) {
-			int currentPos = mRotateDial->value();
-			mRotateDial->setValue(currentPos+1);
+            int currentPos = mViewDial->value();
+            mViewDial->setValue(currentPos+1);
 			return;
 		}
 	}
@@ -178,8 +178,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_Left || event->key()==Qt::Key_4)
 	{
 		if(mControlsEnabled) {
-			int currentPos = mRotateDial->value();
-			mRotateDial->setValue(currentPos-1);
+            int currentPos = mViewDial->value();
+            mViewDial->setValue(currentPos-1);
 			return;
 		}
 	}
@@ -187,8 +187,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_PageUp || event->key()==Qt::Key_9)
 	{
 		if(mControlsEnabled) {
-			int currentPos = mViewDial->value();
-			mViewDial->setValue(currentPos+1);
+            int currentPos = mRotateDial->value();
+            mRotateDial->setValue(currentPos+1);
 			return;
 		}
 	}
@@ -196,8 +196,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_PageDown || event->key()==Qt::Key_3)
 	{
 		if(mControlsEnabled) {
-			int currentPos = mViewDial->value();
-			mViewDial->setValue(currentPos-1);
+            int currentPos = mRotateDial->value();
+            mRotateDial->setValue(currentPos-1);
 			return;
 		}
 	}
