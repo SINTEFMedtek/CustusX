@@ -41,18 +41,24 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream filename: " << filename;
 	this->show();
 	QTest::qWaitForWindowActive(this);
-
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: Window active";
 	this->setupWidgetToRunStreamer(filename);
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: setupWidgetToRunStreamer";
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //connect
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: connect";
 
 	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(connected(bool)), 1000));
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: got connected signal";
 	REQUIRE(waitForQueuedSignal(mServices->video().get(), SIGNAL(activeVideoSourceChanged()), 30000));
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: got activeVideoSourceChanged signal";
 	cx::VideoSourcePtr stream = mServices->video()->getActiveVideoSource();
 	REQUIRE(waitForQueuedSignal(stream.get(), SIGNAL(newFrame()), 1000));
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: got newFrame signal";
 	bool canStream = stream->isStreaming();
 
 	QTest::mouseClick(mConnectButton, Qt::LeftButton); //disconnect
+	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream: disconnect";
 
 	this->close();
 
