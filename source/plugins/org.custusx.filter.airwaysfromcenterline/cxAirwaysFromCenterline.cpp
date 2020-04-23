@@ -82,7 +82,7 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
 	mBranchListPtr->findBranchesInCenterline(CLpoints_r);
 
 	mBranchListPtr->smoothBranchPositions(40);
-	mBranchListPtr->interpolateBranchPositions(5);
+    mBranchListPtr->interpolateBranchPositions(0.1);
 
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
@@ -102,7 +102,7 @@ void AirwaysFromCenterline::processCenterline(Eigen::MatrixXd CLpoints_r)
     mBranchListPtr->findBranchesInCenterline(CLpoints_r);
 
     mBranchListPtr->smoothBranchPositions(40);
-    mBranchListPtr->interpolateBranchPositions(5);
+    mBranchListPtr->interpolateBranchPositions(0.1);
 }
 
 /*
@@ -242,8 +242,8 @@ vtkImageDataPtr AirwaysFromCenterline::addSpheresAlongCenterlines(vtkImageDataPt
         if (similar(staticRadius, 0))
         {
         	radius = branches[i]->findBranchRadius();
-            //if (mMergeWithOriginalAirways)
-            //    radius = radius/2;
+            if (mMergeWithOriginalAirways)
+                radius = radius/2;
         }
 
         for (int j = 0; j < numberOfPositionsInBranch; j++)
@@ -275,7 +275,6 @@ vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysV
                     mDim[i]-1);
     }
 
-
     for (int x = sphereBoundingBoxIndex[0]; x<=sphereBoundingBoxIndex[1]; x++)
         for (int y = sphereBoundingBoxIndex[2]; y<=sphereBoundingBoxIndex[3]; y++)
             for (int z = sphereBoundingBoxIndex[4]; z<=sphereBoundingBoxIndex[5]; z++)
@@ -286,11 +285,8 @@ vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysV
 
                 if (distanceFromCenter < radius)
                 {
-                    //if( x >= mBounds[0] && x <= mBounds[1] && y >= mBounds[2] && y <= mBounds[3] && z >= mBounds[4] && z <= mBounds[5])
-                    //{
                         unsigned char* dataPtrImage = static_cast<unsigned char*>(airwaysVolumePtr->GetScalarPointer(x,y,z));
                         dataPtrImage[0] = value;
-                   // }
                 }
             }
 

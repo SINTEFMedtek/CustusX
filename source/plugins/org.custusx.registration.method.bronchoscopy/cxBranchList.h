@@ -39,7 +39,7 @@ public:
 	void smoothOrientations();
 	void smoothRadius();
 	BranchPtr findBranchWithLargestRadius();
-	void interpolateBranchPositions(int interpolationFactor);
+    void interpolateBranchPositions(double resolution);
 	void smoothBranchPositions(int controlPointDistance);
 	void excludeClosePositionsInCTCenterline(double minPointDistance);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);

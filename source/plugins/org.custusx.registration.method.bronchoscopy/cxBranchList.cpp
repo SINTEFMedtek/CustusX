@@ -145,7 +145,7 @@ BranchPtr BranchList::findBranchWithLargestRadius()
 	return branchWithLargestRadius;
 }
 
-void BranchList::interpolateBranchPositions(int interpolationFactor)
+void BranchList::interpolateBranchPositions(double resolution /*mm*/)
 {
 
 	for (int i = 0; i < mBranches.size(); i++)
@@ -164,6 +164,7 @@ void BranchList::interpolateBranchPositions(int interpolationFactor)
 		std::vector<Eigen::Vector3d> interpolatedPositions;
 		for (int j = 0; j < positions.cols()-1; j++)
 		{
+            int interpolationFactor = static_cast<int>(std::ceil( ( positions.col(j+1) - positions.col(j) ).norm() / resolution ));
 			for (int k = 0; k < interpolationFactor; k++){
 				Eigen::Vector3d interpolationPoint;
 				interpolationPoint[0] = (positions(0,j)*(interpolationFactor-k) + positions(0,j+1)*(k) ) / interpolationFactor;

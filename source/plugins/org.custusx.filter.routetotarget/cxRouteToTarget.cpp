@@ -325,7 +325,7 @@ vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
 
 	AirwaysFromCenterlinePtr airwaysFromBVCenterlinePtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 	airwaysFromBVCenterlinePtr->setTypeToBloodVessel(true);
-	mBloodVesselBranchListPtr->interpolateBranchPositions(5);
+    mBloodVesselBranchListPtr->interpolateBranchPositions(0.1);
 	airwaysFromBVCenterlinePtr->setBranches(mBloodVesselBranchListPtr);
 
 	airwayMesh = airwaysFromBVCenterlinePtr->generateTubes(2);
