@@ -75,10 +75,10 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
 
 
 
-void CXVBcameraPath::cameraPathPositionSlot(int pos)
+void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 {
 
-    double splineParameter = pos / 100.0;
+		double splineParameter = positionPercentage / 100.0;
 
 //	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos : " << pos
 //			  << ", spline parameter : " << splineParameter << std::endl;

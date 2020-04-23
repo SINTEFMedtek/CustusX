@@ -240,7 +240,9 @@ vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
 	zeroer->SetInputConnection(reader->GetOutputPort());
 	zeroer->SetOutputOrigin(0, 0, 0);
-	zeroer->Update();
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. Initialized vtkImageChangeInformation";
+	zeroer->Update();//Test "VideoConnectionWidget can stream" freeze at this point on Ubuntu 16.04
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. updated VTK pipeline";
 	vtkImageDataPtr source = zeroer->GetOutput();
 
 	if (source)
