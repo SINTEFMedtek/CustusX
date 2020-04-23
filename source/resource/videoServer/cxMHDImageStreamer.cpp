@@ -218,7 +218,6 @@ DummyImageStreamer::DummyImageStreamer() :
 		 mPrimaryDataSource(),
 		 mSecondaryDataSource()
 {
-	CX_LOG_DEBUG() << "DummyImageStreamer constructor";
 	this->setSendInterval(40);
 }
 
@@ -288,7 +287,6 @@ void DummyImageStreamer::initialize(StringMap arguments)
 
 void DummyImageStreamer::initialize(QString filename, bool secondaryStream, bool sendonce)
 {
-	CX_LOG_DEBUG() << "DummyImageStreamer initialize. secondaryStream: " << secondaryStream << " sendonce: " << sendonce;
 	mUseSecondaryStream = secondaryStream;
 	mFilename = filename;
 	vtkImageDataPtr source = this->internalLoadImage(filename);
@@ -298,13 +296,9 @@ void DummyImageStreamer::initialize(QString filename, bool secondaryStream, bool
 		return;
 	}
 	this->createTestDataSource(source);
-	CX_LOG_DEBUG() << "DummyImageStreamer TestDataSource created";
 	this->setSendOnce(sendonce);
-	CX_LOG_DEBUG() << "DummyImageStreamer setSendOnce finished";
 	this->createSendTimer(sendonce);
-	CX_LOG_DEBUG() << "DummyImageStreamer createSendTimer finished";
 	this->setInitialized(true);
-	CX_LOG_DEBUG() << "DummyImageStreamer setInitialized to true";
 }
 
 void DummyImageStreamer::startStreaming(SenderPtr sender)
