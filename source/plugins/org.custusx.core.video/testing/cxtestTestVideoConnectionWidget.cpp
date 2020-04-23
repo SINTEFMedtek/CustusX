@@ -26,7 +26,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxActiveData.h"
 #include "catch.hpp"
-#include "cxLogger.h"
 
 namespace cxtest
 {
@@ -38,7 +37,6 @@ TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisServicesPtr services
 
 bool TestVideoConnectionWidget::canStream(QString filename)
 {
-	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream filename: " << filename;
 	this->show();
 	QTest::qWaitForWindowActive(this);
 
@@ -56,7 +54,6 @@ bool TestVideoConnectionWidget::canStream(QString filename)
 
 	this->close();
 
-	CX_LOG_DEBUG() << "TestVideoConnectionWidget::canStream finished. canStream: " << canStream;
 	return canStream;
 }
 

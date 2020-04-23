@@ -74,8 +74,6 @@ StreamerPtr ImageFileStreamerService::createStreamer(QDomElement root)
 	}
 	else
 	{
-		CX_LOG_DEBUG() << "ImageFileStreamerService::createStreamer: Creating DummyImageStreamer";
-		CX_LOG_DEBUG() << "filename: " << filename;
 		boost::shared_ptr<DummyImageStreamer> streamer(new DummyImageStreamer());
 
 		QString filename = ImageStreamerDummyArguments().getFilenameOption(root)->getValue();
