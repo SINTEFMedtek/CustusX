@@ -60,6 +60,7 @@ public:
 	static QString getWebsiteUserDocumentationURL();
 
     static bool isRunFromBuildFolder();
+	static bool isTestMode();
 
 private:
 	static bool mTestMode;

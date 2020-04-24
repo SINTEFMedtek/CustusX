@@ -37,6 +37,11 @@ void DataLocations::setTestMode()
 	cx::removeNonemptyDirRecursively(getPersistentWritablePath());
 }
 
+bool DataLocations::isTestMode()
+{
+	return mTestMode;
+}
+
 QString DataLocations::getTestDataPath()
 {
 	QString settingsPath = cx::DataLocations::getRootConfigPath() + "/settings";
