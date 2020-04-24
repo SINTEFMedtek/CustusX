@@ -46,7 +46,7 @@ FilterSetupWidget::FilterSetupWidget(VisServicesPtr services, QWidget* parent, X
 	mObscuredListener.reset(new WidgetObscuredListener(this));
 	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 
-	mOptions = options;
+	mOptions = options;//not used?
 
 	mInputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mOutputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);

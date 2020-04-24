@@ -41,16 +41,21 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	StringPropertyPtr getParameterFile(QDomElement root);
+	FilePathPropertyPtr getParameterFile(QDomElement root);
 	StringPropertyPtr getScriptContent(QDomElement root);
 	StringPropertyPtr setScriptOutput(QDomElement root);
+	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 
-private slots:
+	FilePathPropertyPtr mScriptFile;
+	FilePreviewPropertyPtr mScriptFilePreview;
+
+protected slots:
+	void scriptFileChanged();
 
 private:
 	vtkImageDataPtr mRawResult;

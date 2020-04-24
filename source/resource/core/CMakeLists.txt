@@ -93,6 +93,8 @@ cx_add_class_qt_moc(cxResource_SOURCE
 	properties/cxStringPropertySelectCoordinateSystem
 	properties/cxFilePathProperty
 	properties/cxStringListProperty
+	properties/cxFilePathPropertyBase
+	properties/cxFilePreviewProperty
 
     logger/cxReporter
     logger/cxMessageListener

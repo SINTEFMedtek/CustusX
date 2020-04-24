@@ -26,6 +26,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
 #include "cxVisServices.h"
+#include "cxFilePreviewProperty.h"
+#include "cxFilePathProperty.h"
+#include "cxProfile.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -55,7 +59,7 @@ QString GenericScriptFilter::getHelp() const
 	        "</html>";
 }
 
-StringPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
+FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList availableScripts;
 
@@ -66,12 +70,15 @@ StringPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 	{
 		availableScripts << "No script available";
 	}
-	return StringProperty::initialize("scriptSelector",
+	mScriptFile =  FilePathProperty::initialize("scriptSelector",
 													"Script",
 													"Select which script to use.",
-													availableScripts[0],
+													availableScripts[0],//FilePath
 													availableScripts,
 													root);
+	mScriptFile->setGroup("File");
+	connect(mScriptFile.get(), &FilePathProperty::changed, this, &GenericScriptFilter::scriptFileChanged);
+	return mScriptFile;
 }
 
 StringPropertyPtr GenericScriptFilter::getScriptContent(QDomElement root)
@@ -99,14 +106,38 @@ StringPropertyPtr GenericScriptFilter::setScriptOutput(QDomElement root)
 	// How to set multiline output?
 }
 
+FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
+{
+	QStringList paths;
+	paths << profile()->getSettingsPath();
+
+	mScriptFilePreview = FilePreviewProperty::initialize("filename", "Filename",
+											"Select a ini file for running command line script",
+											mScriptFile->getValue(),
+											paths,
+											root);
+
+	mScriptFilePreview->setGroup("File");
+	this->scriptFileChanged();//Initialize with data from mScriptFile variable
+	return mScriptFilePreview;
+}
+
 void GenericScriptFilter::createOptions()
 {
 	// Need file selector, editable text field and output (optional?).
 
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
 	mOptionsAdapters.push_back(this->getScriptContent(mOptions));
+	mOptionsAdapters.push_back(this->getIniFileOption(mOptions));
 	// mOptionsAdapters.push_back(this->setScriptOutput(mOptions));
 
+}
+
+void GenericScriptFilter::scriptFileChanged()
+{
+	CX_LOG_DEBUG() << "scriptFileChanged: " << mScriptFile->getValue();
+	//Don't work. Need to get property from options, or trigger another signal?
+	mScriptFilePreview->setValue(mScriptFile->getValue());
 }
 
 void GenericScriptFilter::createInputTypes()

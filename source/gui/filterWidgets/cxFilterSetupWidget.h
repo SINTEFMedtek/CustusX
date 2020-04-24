@@ -54,7 +54,7 @@ private:
     void setVisibilityOfOptionsAndAdvancedOptions();
 
 	VisServicesPtr mServices;
-	XmlOptionFile mOptions;
+	XmlOptionFile mOptions;//Not used?
 	FilterPtr mCurrentFilter;
 
 	OptionsWidget* mInputsWidget;

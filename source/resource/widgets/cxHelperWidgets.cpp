@@ -32,10 +32,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxFilePathProperty.h"
+#include "cxFilePreviewProperty.h"
+#include "cxFilePreviewWidget.h"
+#include "cxLogger.h"
 
 namespace cx
 {
-
 QWidget* createDataWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
 	QWidget* retval = NULL;
@@ -107,9 +109,15 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 		return new SliderRangeGroupWidget(parent, doublepair, gridLayout, row);
 	}
 
+	FilePreviewPropertyPtr filePreview = boost::dynamic_pointer_cast<FilePreviewProperty>(data);
+	if (filePreview)
+	{
+		return new FilePreviewWidget(parent, filePreview, gridLayout, row);
+	}
+
 	std::cout << "Failed to create Data Widget for " << (data ? data->getDisplayName() : "NULL") << std::endl;
 
-    return NULL;
+	return NULL;
 }
 
 QWidget* addDummyMargin(QWidget* widget)

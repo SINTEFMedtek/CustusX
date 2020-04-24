@@ -99,6 +99,7 @@ void OptionsWidget::clear()
 	}
 }
 
+//Create option widgets from propoerties (=mOptions)
 void OptionsWidget::populate(bool showAdvanced)
 {
 	// No existing found,

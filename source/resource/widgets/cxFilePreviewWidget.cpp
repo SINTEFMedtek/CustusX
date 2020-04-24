@@ -23,16 +23,24 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFileSystemWatcher>
 #include "cxLogger.h"
 #include "snwSyntaxHighlighter.h"
+#include "cxFilePreviewProperty.h"
 
 namespace cx
 {
 
-FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
+FilePreviewWidget::FilePreviewWidget(QWidget* parent, FilePreviewPropertyPtr dataInterface, QGridLayout *gridLayout, int row) :
 		FileWatcherWidget(parent, "file_preview_widget", "File Preview"),
 	mTextDocument(new QTextDocument(this)),
 	mTextEdit(new QTextEdit(this)),
 	mSaveButton(new QPushButton("Save", this))
 {
+	mData = dataInterface;
+	if(mData) //Allow widget to be used like before without a dataInterface
+	{
+		//connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+		connect(mData.get(), &Property::changed, this, &FilePreviewWidget::fileinterfaceChanged);
+	}
+
 	this->setToolTip("Preview and edit a file");
 	mSyntaxHighlighter = NULL;
   connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
@@ -43,16 +51,26 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
   buttonLayout->setMargin(0);
   buttonLayout->addWidget(mSaveButton);
 
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->setMargin(0);
-  layout->addWidget(mTextEdit);
-  layout->addLayout(buttonLayout);
-
   connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
   mTextEdit->setDocument(mTextDocument);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
   this->setSyntaxHighLighter<snw::SyntaxHighlighter>();
+
+	if (gridLayout) // add to input gridlayout
+	{
+		gridLayout->addWidget(mTextEdit, row, 0);
+		gridLayout->addLayout(buttonLayout, row+1, 0);//TODO: Current interface can't handle 2 rows, so this probably creates problems for anything added after this.
+	}
+	else // add directly to this
+	{
+		QVBoxLayout* layout = new QVBoxLayout(this);
+		layout->setMargin(0);
+		layout->addWidget(mTextEdit);
+		layout->addLayout(buttonLayout);
+	}
+	//this->setModified();//Needed?
+	this->fileinterfaceChanged();
 }
 
 FilePreviewWidget::~FilePreviewWidget()
@@ -63,6 +81,11 @@ void FilePreviewWidget::textChangedSlot()
 	mSaveButton->setEnabled(mTextDocument->isModified());
 }
 
+void FilePreviewWidget::fileinterfaceChanged()
+{
+	if(mData)
+		this->previewFileSlot(mData->getValue());
+}
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
   mSaveButton->setEnabled(false);
