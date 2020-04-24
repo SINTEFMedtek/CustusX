@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVolumeHelpers.h"
 #include "vtkCardinalSpline.h"
 #include "cxLogger.h"
+#include <vtkImageResample.h>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -207,14 +208,20 @@ vtkImageDataPtr AirwaysFromCenterline::initializeAirwaysVolumeFromOriginalSegmen
     if (!mOriginalSegmentedVolume)
         return airwaysVolumePtr;
 
-    airwaysVolumePtr = mOriginalSegmentedVolume;
+    vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+    resampler->SetInputData(mOriginalSegmentedVolume);
+    resampler->SetAxisOutputSpacing(0, mAirwaysVolumeSpacing);
+    resampler->SetAxisOutputSpacing(1, mAirwaysVolumeSpacing);
+    resampler->SetAxisOutputSpacing(2, mAirwaysVolumeSpacing);
+    resampler->Update();
+    airwaysVolumePtr = resampler->GetOutput();
 
-    Vector3D origin(mOriginalSegmentedVolume->GetOrigin());
+    Vector3D origin(airwaysVolumePtr->GetOrigin());
     mOrigin[0] = origin[0];
     mOrigin[1] = origin[1];
     mOrigin[2] = origin[2];
 
-    Vector3D spacing(mOriginalSegmentedVolume->GetSpacing());
+    Vector3D spacing(airwaysVolumePtr->GetSpacing());
     mSpacing = spacing;
 
     airwaysVolumePtr->GetBounds(mBounds);
@@ -223,7 +230,7 @@ vtkImageDataPtr AirwaysFromCenterline::initializeAirwaysVolumeFromOriginalSegmen
     for (int i = 0; i < 3; i++)
         mDim[i] = static_cast<int>(std::ceil((mBounds[i * 2 + 1] - mBounds[i * 2]) / mSpacing[i]));
 
-    return mOriginalSegmentedVolume;
+    return airwaysVolumePtr;
 }
 
 
