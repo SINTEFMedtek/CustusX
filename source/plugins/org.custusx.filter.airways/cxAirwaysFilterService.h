@@ -96,6 +96,9 @@ private:
 	ImagePtr mInputImage;
 	Vector3D seedPoint;
 	bool mDefaultStraightCLTubesOption;
+	BoolPropertyPtr mVesselCenterlineOption;
+	BoolPropertyPtr mAirwaySegmentationOption;
+	BoolPropertyPtr mLungSegmentationOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
 
