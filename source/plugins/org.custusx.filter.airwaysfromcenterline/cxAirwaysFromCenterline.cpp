@@ -208,11 +208,14 @@ vtkImageDataPtr AirwaysFromCenterline::initializeAirwaysVolumeFromOriginalSegmen
     if (!mOriginalSegmentedVolume)
         return airwaysVolumePtr;
 
+    double magnificationFactor = mOriginalSegmentedVolume->GetSpacing()[0] / mAirwaysVolumeSpacing;
+    CX_LOG_DEBUG() << "magnificationFactor: " << magnificationFactor;
     vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+    resampler->SetInterpolationModeToLinear();
+    resampler->SetAxisMagnificationFactor(0, magnificationFactor);
+    resampler->SetAxisMagnificationFactor(1, magnificationFactor);
+    resampler->SetAxisMagnificationFactor(2, magnificationFactor);
     resampler->SetInputData(mOriginalSegmentedVolume);
-    resampler->SetAxisOutputSpacing(0, mAirwaysVolumeSpacing);
-    resampler->SetAxisOutputSpacing(1, mAirwaysVolumeSpacing);
-    resampler->SetAxisOutputSpacing(2, mAirwaysVolumeSpacing);
     resampler->Update();
     airwaysVolumePtr = resampler->GetOutput();
 
