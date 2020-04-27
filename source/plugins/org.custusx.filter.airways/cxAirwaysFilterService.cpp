@@ -137,7 +137,7 @@ bool AirwaysFilter::preProcess()
 			+ "/" + inputImage->getFilename()).toStdString();
 
     // only check seed point inside image if use seed point is checked
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+  bool useManualSeedPoint = mManualSeedPointOption->getValue();
 	if(useManualSeedPoint)
 	{
 		seedPoint = getSeedPointFromTool(mServices->spaceProvider(), inputImage);
@@ -187,9 +187,9 @@ bool AirwaysFilter::execute()
 		return false;
 	}
 
-	bool doAirwaySegmentation = getAirwaySegmentationOption(mOptions)->getValue();
-	bool doLungSegmentation = getLungSegmentationOption(mOptions)->getValue();
-	bool doVesselSegmentation = getVesselSegmentationOption(mOptions)->getValue();
+	bool doAirwaySegmentation = mAirwaySegmentationOption->getValue();
+	bool doLungSegmentation = mLungSegmentationOption->getValue();
+	bool doVesselSegmentation = mVesselCenterlineOption->getValue();
 
 	if (doAirwaySegmentation)
 	{
@@ -227,7 +227,7 @@ bool AirwaysFilter::execute()
 void AirwaysFilter::segmentAirways(fast::ImageFileImporter::pointer importerPtr)
 {
 
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 
 
 	// Do segmentation
@@ -271,7 +271,7 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("fast::Exception: "+qstring_cast(error));
-	if(!getManualSeedPointOption(mOptions)->getValue())
+	if(!mManualSeedPointOption->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -299,7 +299,7 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 void AirwaysFilter::segmentLungs(fast::ImageFileImporter::pointer importerPtr)
 {
 
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 
 	// Do segmentation
 	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
@@ -316,7 +316,7 @@ void AirwaysFilter::segmentLungs(fast::ImageFileImporter::pointer importerPtr)
 void AirwaysFilter::segmentVessels(fast::ImageFileImporter::pointer importerPtr)
 {
 
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 
 	// Do segmentation
 	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
@@ -342,7 +342,7 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 		mBloodVesselSegmentationOutput = vtkBloodVesselExporter->GetOutput();
 		vtkBloodVesselExporter->Delete();
 
-        bool generateVesselCenterlines = getVesselCenterlineOption(mOptions)->getValue();
+        bool generateVesselCenterlines = mVesselCenterlineOption->getValue();
         if (generateVesselCenterlines)
         {
             auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
@@ -361,7 +361,7 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("In vessel segmentation fast::Exception: "+qstring_cast(error));
-	if(!getManualSeedPointOption(mOptions)->getValue())
+	if(!mManualSeedPointOption->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -398,7 +398,7 @@ bool AirwaysFilter::extractLungs(fast::LungSegmentation::pointer lungSegmentatio
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("In lung segmentation fast::Exception: "+qstring_cast(error));
-	if(!getManualSeedPointOption(mOptions)->getValue())
+	if(!mManualSeedPointOption->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -426,19 +426,19 @@ bool AirwaysFilter::postProcess()
 {
 	std::cout << "POST PROCESS" << std::endl;
 
-	if(getAirwaySegmentationOption(mOptions)->getValue())
+	if(mAirwaySegmentationOption->getValue())
 	{
 		postProcessAirways();
 		mAirwaySegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
 		mAirwayCenterlineOutput = NULL;
 	}
 
-	if(getLungSegmentationOption(mOptions)->getValue()) {
+	if(mLungSegmentationOption->getValue()) {
 		postProcessLungs();
 		mLungSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
 	}
 
-	if(getVesselSegmentationOption(mOptions)->getValue())
+	if(mVesselCenterlineOption->getValue())
 	{
 		postProcessVessels();
 		mBloodVesselSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
@@ -490,7 +490,7 @@ bool AirwaysFilter::postProcessAirways()
 	patientService()->insertData(airwaysCenterline);
 	mOutputTypes[0]->setValue(airwaysCenterline->getUid());
 
-	if(getAirwayTubesGenerationOption(mOptions)->getValue())
+	if(mAirwayTubesGenerationOption->getValue())
 		this->createAirwaysFromCenterline();
 
 	return true;
@@ -567,7 +567,7 @@ bool AirwaysFilter::postProcessVessels()
 	// Set output
 	mOutputTypes[6]->setValue(contour->getUid());
 
-    bool generateVesselCenterlines = getVesselCenterlineOption(mOptions)->getValue();
+    bool generateVesselCenterlines = mVesselCenterlineOption->getValue();
     if (generateVesselCenterlines)
     {
 	// Centerline
@@ -582,7 +582,7 @@ bool AirwaysFilter::postProcessVessels()
 	mOutputTypes[5]->setValue(bloodVesselsCenterline->getUid());
     }
 
-    bool generateVesselVolume = getVesselVolumeOption(mOptions)->getValue();
+    bool generateVesselVolume = mVesselVolumeOption->getValue();
     if (generateVesselVolume)
     {
         //Create segmented volume output
@@ -636,8 +636,8 @@ void AirwaysFilter::createOptions()
 	mOptionsAdapters.push_back(this->getAirwayTubesGenerationOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
 	mOptionsAdapters.push_back(this->getVesselSegmentationOption(mOptions));
-    mOptionsAdapters.push_back(this->getVesselCenterlineOption(mOptions));
-    mOptionsAdapters.push_back(this->getVesselVolumeOption(mOptions));
+	mOptionsAdapters.push_back(this->getVesselCenterlineOption(mOptions));
+	mOptionsAdapters.push_back(this->getVesselVolumeOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -679,81 +679,77 @@ void AirwaysFilter::createOutputTypes()
 
 BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Use manual seed point",
-					"",
-					"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
-					"inside trachea of the patient. "
-					"Then tick this checkbox to use the manual seed point in the airways filter.",
-                    false, root);
-	return retval;
+	mManualSeedPointOption = BoolProperty::initialize(
+				"Use manual seed point",
+				"",
+				"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
+				"inside trachea of the patient. "
+				"Then tick this checkbox to use the manual seed point in the airways filter.",
+				false, root);
+	return mManualSeedPointOption;
 
 }
 
 BoolPropertyPtr AirwaysFilter::getAirwaySegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Airway segmentation",
-					"",
-					"Selecting this option will segment airways",
-                    true, root);
-	return retval;
-
+	mAirwaySegmentationOption = BoolProperty::initialize(
+				"Airway segmentation",
+				"",
+				"Selecting this option will segment airways",
+				true, root);
+	return mAirwaySegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getAirwayTubesGenerationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Airway tubes generation",
-					"",
-					"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
-                    true, root);
-	return retval;
+	mAirwayTubesGenerationOption = BoolProperty::initialize(
+				"Airway tubes generation",
+				"",
+				"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
+				true, root);
+	return mAirwayTubesGenerationOption;
 
 }
 
 BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Lung segmentation",
-					"",
-					"Selecting this option will segment the two lung sacs",
-                    false, root);
-	return retval;
-
+	mLungSegmentationOption = BoolProperty::initialize(
+				"Lung segmentation",
+				"",
+				"Selecting this option will segment the two lung sacs",
+				false, root);
+	return mLungSegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
 {
-    BoolPropertyPtr retval =
-            BoolProperty::initialize("Vessel segmentation",
-                    "",
-                    "Selecting this option will segment the blood vessels in the lungs",
-                    false, root);
-    return retval;
-
+	BoolPropertyPtr vesselSegmentationOption = BoolProperty::initialize(
+				"Vessel segmentation",
+				"",
+				"Selecting this option will segment the blood vessels in the lungs",
+				false, root);
+	return vesselSegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselCenterlineOption(QDomElement root)
 {
-    BoolPropertyPtr retval =
-            BoolProperty::initialize("Vessel centerline",
-                    "",
-                    "Selecting this option will generate centerlines of the seegmented blood vessels",
-                    false, root);
-    return retval;
+	mVesselCenterlineOption = BoolProperty::initialize(
+				"Vessel centerline",
+				"",
+				"Selecting this option will generate centerlines of the seegmented blood vessels",
+				false, root);
+	return mVesselCenterlineOption;
 
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselVolumeOption(QDomElement root)
 {
-    BoolPropertyPtr retval =
-            BoolProperty::initialize("Vessel volume",
-                    "",
-                    "Selecting this option will generate binary volume of the seegmented blood vessels",
-                    false, root);
-    return retval;
-
+	mVesselVolumeOption = BoolProperty::initialize(
+				"Vessel volume",
+				"",
+				"Selecting this option will generate binary volume of the seegmented blood vessels",
+				false, root);
+	return mVesselVolumeOption;
 }
 
 } /* namespace cx */
