@@ -43,7 +43,8 @@ namespace cx
 RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile) :
     FilterImpl(services),
     mTargetName(""),
-    mGenerateFileWithRouteInformation(createRouteInformationFile)
+    mGenerateFileWithRouteInformation(createRouteInformationFile),
+    mSmoothing(true)
 {
 }
 
