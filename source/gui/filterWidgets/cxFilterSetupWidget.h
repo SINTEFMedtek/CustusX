@@ -39,10 +39,10 @@ class cxGui_EXPORT FilterSetupWidget : public BaseWidget
 public:
 	FilterSetupWidget(VisServicesPtr services, QWidget* parent, XmlOptionFile options, bool addFrame);
 
-    void setFilter(FilterPtr filter);
+	void setFilter(FilterPtr filter);
 	QString generateHelpText() const;
 
-    void setCompact(bool on); ///< Compact Mode: one group, hide main input/output
+	void setCompact(bool on); ///< Compact Mode: one group, hide main input/output
 	void toggleDetailed();
 
 private slots:
@@ -51,7 +51,7 @@ private slots:
 	void rebuildOptions();
 
 private:
-    void setVisibilityOfOptionsAndAdvancedOptions();
+	void setVisibilityOfOptionsAndAdvancedOptions();
 
 	VisServicesPtr mServices;
 	XmlOptionFile mOptions;//Not used?

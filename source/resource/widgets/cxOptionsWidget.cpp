@@ -18,9 +18,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx {
 
 OptionsWidget::OptionsWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent) :
-		mShowAdvanced(false),
-		mViewService(viewService),
-		mPatientModelService(patientModelService)
+	mShowAdvanced(false),
+	mViewService(viewService),
+	mPatientModelService(patientModelService)
 {
 	this->setSizePolicy(this->sizePolicy().horizontalPolicy(), QSizePolicy::Fixed);
 	mStackedLayout = new QStackedLayout(this);
@@ -65,21 +65,21 @@ void OptionsWidget::rebuild()
 
 bool OptionsWidget::hasOptions() const
 {
-    if(mOptions.size() == 0)
-        return false;
+	if(mOptions.size() == 0)
+		return false;
 
-    return true;
+	return true;
 }
 
 bool OptionsWidget::hasAdvancedOptions() const
 {
-    for(std::vector<PropertyPtr>::const_iterator it = mOptions.begin(); it != mOptions.end(); ++it)
-    {
-        if(it->get()->getAdvanced())
-            return true;
-    }
+	for(std::vector<PropertyPtr>::const_iterator it = mOptions.begin(); it != mOptions.end(); ++it)
+	{
+		if(it->get()->getAdvanced())
+			return true;
+	}
 
-    return false;
+	return false;
 }
 
 void OptionsWidget::toggleAdvanced()

@@ -16,86 +16,86 @@ namespace cx
 
 void EmbeddedFilepath::appendRootPath(QString path)
 {
-		mRoots << path;
+	mRoots << path;
 }
 
 void EmbeddedFilepath::setFilepath(QString filename)
 {
-		mFilePath = filename;
+	mFilePath = filename;
 }
 
 void EmbeddedFilepath::evaluate(QString* foundRoot, bool* found, QString* foundRelative, QString* foundAbsolute) const
 {
-		*foundRelative = mFilePath;
-		if (!mRoots.empty())
-				*foundRoot = mRoots.front();
-		*foundAbsolute = mFilePath;
-		*found = false;
+	*foundRelative = mFilePath;
+	if (!mRoots.empty())
+		*foundRoot = mRoots.front();
+	*foundAbsolute = mFilePath;
+	*found = false;
 
-		foreach (QString root, mRoots)
+	foreach (QString root, mRoots)
+	{
+		root = QDir::cleanPath(root);
+		if (!mFilePath.isEmpty() && QDir(root).exists(mFilePath))
 		{
-				root = QDir::cleanPath(root);
-				if (!mFilePath.isEmpty() && QDir(root).exists(mFilePath))
-				{
-						*foundRelative = QDir(root).relativeFilePath(mFilePath);
-						*foundRoot = root;
-						*foundAbsolute = QDir(root).absoluteFilePath(mFilePath);
-						*found = true;
+			*foundRelative = QDir(root).relativeFilePath(mFilePath);
+			*foundRoot = root;
+			*foundAbsolute = QDir(root).absoluteFilePath(mFilePath);
+			*found = true;
 
-						if (foundRelative->contains(".."))
-						{
-								// dont use relative paths outside of the roots
-								*foundRelative = *foundAbsolute;
-						}
-						else
-						{
-								// if the current hit is inside the root, accept immediately
-								return;
-						}
-				}
+			if (foundRelative->contains(".."))
+			{
+				// dont use relative paths outside of the roots
+				*foundRelative = *foundAbsolute;
+			}
+			else
+			{
+				// if the current hit is inside the root, accept immediately
+				return;
+			}
 		}
+	}
 
 }
 
 QString EmbeddedFilepath::getRelativeFilepath() const
 {
-		bool found = false;
-		QString root, relative, absolute;
-		this->evaluate(&root, &found, &relative, &absolute);
+	bool found = false;
+	QString root, relative, absolute;
+	this->evaluate(&root, &found, &relative, &absolute);
 
-		return relative;
+	return relative;
 }
 
 QString EmbeddedFilepath::getAbsoluteFilepath() const
 {
-		bool found = false;
-		QString root, relative, absolute;
-		this->evaluate(&root, &found, &relative, &absolute);
+	bool found = false;
+	QString root, relative, absolute;
+	this->evaluate(&root, &found, &relative, &absolute);
 
-		return absolute;
+	return absolute;
 }
 
 bool EmbeddedFilepath::exists() const
 {
-		bool found = false;
-		QString root, relative, absolute;
-		this->evaluate(&root, &found, &relative, &absolute);
+	bool found = false;
+	QString root, relative, absolute;
+	this->evaluate(&root, &found, &relative, &absolute);
 
-		return found;
+	return found;
 }
 
 QString EmbeddedFilepath::getRootPath() const
 {
-		bool found = false;
-		QString root, relative, absolute;
-		this->evaluate(&root, &found, &relative, &absolute);
+	bool found = false;
+	QString root, relative, absolute;
+	this->evaluate(&root, &found, &relative, &absolute);
 
-		return root;
+	return root;
 }
 
 QStringList EmbeddedFilepath::getRootPaths() const
 {
-		return mRoots;
+	return mRoots;
 }
 
 
@@ -111,24 +111,24 @@ QString FilePathPropertyBase::getDisplayName() const
 
 QString FilePathPropertyBase::getValue() const
 {
-		return mFilePath.getRelativeFilepath();
+	return mFilePath.getRelativeFilepath();
 }
 
 bool FilePathPropertyBase::setValue(const QString& val)
 {
-		if (val == this->getValue())
-				return false;
+	if (val == this->getValue())
+		return false;
 
-		mFilePath.setFilepath(val);
-		mStore.writeValue(mFilePath.getRelativeFilepath());
-		emit valueWasSet();
-		emit changed();
-		return true;
+	mFilePath.setFilepath(val);
+	mStore.writeValue(mFilePath.getRelativeFilepath());
+	emit valueWasSet();
+	emit changed();
+	return true;
 }
 
 EmbeddedFilepath FilePathPropertyBase::getEmbeddedPath()
 {
-		return mFilePath;
+	return mFilePath;
 }
 
 }//cx

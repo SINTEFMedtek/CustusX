@@ -67,8 +67,8 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 	StringPropertyBasePtr str = boost::dynamic_pointer_cast<StringPropertyBase>(data);
 	if (str)
 	{
-//		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
-//			return new FilenameWidget(parent, str, gridLayout, row);
+		//		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
+		//			return new FilenameWidget(parent, str, gridLayout, row);
 		if (str->getAllowOnlyValuesInRange())
 			return new LabeledComboBoxWidget(parent, str, gridLayout, row);
 		else
@@ -79,17 +79,17 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 	if (dbl)
 	{
 		DoublePropertyBase::GuiRepresentation gui = dbl->getGuiRepresentation();
-        switch(gui)
-        {
-        case DoublePropertyBase::grSLIDER:
-            return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
-            break;
-        case DoublePropertyBase::grSPINBOX:
-            return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
-            break;
-        case DoublePropertyBase::grDIAL:
-        	return new SpinBoxAndDialGroupWidget(parent, dbl, gridLayout, row);
-        }
+		switch(gui)
+		{
+		case DoublePropertyBase::grSLIDER:
+			return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
+			break;
+		case DoublePropertyBase::grSPINBOX:
+			return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
+			break;
+		case DoublePropertyBase::grDIAL:
+			return new SpinBoxAndDialGroupWidget(parent, dbl, gridLayout, row);
+		}
 	}
 
 	BoolPropertyBasePtr bl = boost::dynamic_pointer_cast<BoolPropertyBase>(data);
@@ -130,16 +130,16 @@ QWidget* addDummyMargin(QWidget* widget)
 
 QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second)
 {
-    QHBoxLayout* hackLayout = new QHBoxLayout;
-    hackLayout->setMargin(0);
-    hackLayout->setSpacing(0);
+	QHBoxLayout* hackLayout = new QHBoxLayout;
+	hackLayout->setMargin(0);
+	hackLayout->setSpacing(0);
 
-    if (first)
-        hackLayout->addWidget(first);
-    if (second)
-        hackLayout->addWidget(second);
+	if (first)
+		hackLayout->addWidget(first);
+	if (second)
+		hackLayout->addWidget(second);
 
-    return hackLayout;
+	return hackLayout;
 }
 
 }

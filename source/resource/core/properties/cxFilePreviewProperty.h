@@ -30,13 +30,13 @@ typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
  */
 class FilePreviewProperty: public FilePathPropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  /** Make sure one given option exists witin root.
-   * If not present, fill inn the input defaults.
-   */
-  static FilePreviewPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
-      QStringList paths, QDomNode root = QDomNode());
+	/** Make sure one given option exists witin root.
+	 * If not present, fill inn the input defaults.
+	 */
+	static FilePreviewPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
+																					 QStringList paths, QDomNode root = QDomNode());
 
 protected:
 	FilePreviewProperty();

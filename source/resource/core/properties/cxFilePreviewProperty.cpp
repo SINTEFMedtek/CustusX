@@ -19,16 +19,16 @@ namespace cx
  */
 FilePreviewPropertyPtr FilePreviewProperty::initialize(const QString &uid, QString name, QString help, QString value, QStringList paths, QDomNode root)
 {
-    FilePreviewPropertyPtr retval(new FilePreviewProperty());
-    retval->mUid = uid;
-    retval->mName = name.isEmpty() ? uid : name;
-    retval->mHelp = help;
-    retval->mFilePath.setFilepath(value);
-    foreach (QString path, paths)
-        retval->mFilePath.appendRootPath(path);
-    retval->mStore = XmlOptionItem(uid, root.toElement());
-    retval->mFilePath.setFilepath(retval->mStore.readValue(value));
-    return retval;
+	FilePreviewPropertyPtr retval(new FilePreviewProperty());
+	retval->mUid = uid;
+	retval->mName = name.isEmpty() ? uid : name;
+	retval->mHelp = help;
+	retval->mFilePath.setFilepath(value);
+	foreach (QString path, paths)
+		retval->mFilePath.appendRootPath(path);
+	retval->mStore = XmlOptionItem(uid, root.toElement());
+	retval->mFilePath.setFilepath(retval->mStore.readValue(value));
+	return retval;
 }
 
 FilePreviewProperty::FilePreviewProperty()

@@ -30,45 +30,45 @@ FilePathProperty::FilePathProperty()
  */
 FilePathPropertyPtr FilePathProperty::initialize(const QString& uid, QString name, QString help, QString value, QStringList paths, QDomNode root)
 {
-    FilePathPropertyPtr retval(new FilePathProperty());
-    retval->mUid = uid;
-    retval->mName = name.isEmpty() ? uid : name;
-    retval->mHelp = help;
-    retval->mFilePath.setFilepath(value);
-    foreach (QString path, paths)
-        retval->mFilePath.appendRootPath(path);
-    retval->mStore = XmlOptionItem(uid, root.toElement());
-    retval->mFilePath.setFilepath(retval->mStore.readValue(value));
-    return retval;
+	FilePathPropertyPtr retval(new FilePathProperty());
+	retval->mUid = uid;
+	retval->mName = name.isEmpty() ? uid : name;
+	retval->mHelp = help;
+	retval->mFilePath.setFilepath(value);
+	foreach (QString path, paths)
+		retval->mFilePath.appendRootPath(path);
+	retval->mStore = XmlOptionItem(uid, root.toElement());
+	retval->mFilePath.setFilepath(retval->mStore.readValue(value));
+	return retval;
 }
 
 QString FilePathProperty::getUid() const
 {
-    return mUid;
+	return mUid;
 }
 
 QString FilePathProperty::getHelp() const
 {
-    return mHelp;
+	return mHelp;
 }
 
 void FilePathProperty::setHelp(QString val)
 {
-    if (val == mHelp)
-        return;
+	if (val == mHelp)
+		return;
 
-    mHelp = val;
-    emit changed();
+	mHelp = val;
+	emit changed();
 }
 
 QVariant FilePathProperty::getValueAsVariant() const
 {
-    return this->getValue();
+	return this->getValue();
 }
 
 void FilePathProperty::setValueFromVariant(QVariant val)
 {
-    this->setValue(val.toString());
+	this->setValue(val.toString());
 }
 
 } // namespace cx

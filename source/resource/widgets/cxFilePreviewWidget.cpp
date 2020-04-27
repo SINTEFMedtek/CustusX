@@ -29,7 +29,7 @@ namespace cx
 {
 
 FilePreviewWidget::FilePreviewWidget(QWidget* parent, FilePreviewPropertyPtr dataInterface, QGridLayout *gridLayout, int row) :
-		FileWatcherWidget(parent, "file_preview_widget", "File Preview"),
+	FileWatcherWidget(parent, "file_preview_widget", "File Preview"),
 	mTextDocument(new QTextDocument(this)),
 	mTextEdit(new QTextEdit(this)),
 	mSaveButton(new QPushButton("Save", this))
@@ -43,19 +43,19 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent, FilePreviewPropertyPtr dat
 
 	this->setToolTip("Preview and edit a file");
 	mSyntaxHighlighter = NULL;
-  connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
-  mSaveButton->setEnabled(false);
+	connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
+	mSaveButton->setEnabled(false);
 
-  QHBoxLayout* buttonLayout = new QHBoxLayout();
-  buttonLayout->addStretch();
-  buttonLayout->setMargin(0);
-  buttonLayout->addWidget(mSaveButton);
+	QHBoxLayout* buttonLayout = new QHBoxLayout();
+	buttonLayout->addStretch();
+	buttonLayout->setMargin(0);
+	buttonLayout->addWidget(mSaveButton);
 
-  connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
-  mTextEdit->setDocument(mTextDocument);
-  mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+	connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
+	mTextEdit->setDocument(mTextDocument);
+	mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
-  this->setSyntaxHighLighter<snw::SyntaxHighlighter>();
+	this->setSyntaxHighLighter<snw::SyntaxHighlighter>();
 
 	if (gridLayout) // add to input gridlayout
 	{
@@ -88,36 +88,36 @@ void FilePreviewWidget::fileinterfaceChanged()
 }
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
-  mSaveButton->setEnabled(false);
+	mSaveButton->setEnabled(false);
 
-  if(!this->internalOpenNewFile(absoluteFilePath))
-  	return;
+	if(!this->internalOpenNewFile(absoluteFilePath))
+		return;
 
-  QTextStream stream(mCurrentFile.get());
-  QString text = stream.readAll();
-  mCurrentFile->close();
+	QTextStream stream(mCurrentFile.get());
+	QString text = stream.readAll();
+	mCurrentFile->close();
 
-  mTextDocument->setPlainText(text);
-  mTextDocument->setModified(false);
+	mTextDocument->setPlainText(text);
+	mTextDocument->setModified(false);
 
-  this->textChangedSlot();
+	this->textChangedSlot();
 }
 
 void FilePreviewWidget::saveSlot()
 {
-  if(!mCurrentFile)
-    return;
+	if(!mCurrentFile)
+		return;
 
-  if(!mCurrentFile->open(QIODevice::WriteOnly | QIODevice::Truncate))
-  {
-    reportWarning("Could not open file "+mCurrentFile->fileName());
-    return;
-  }
+	if(!mCurrentFile->open(QIODevice::WriteOnly | QIODevice::Truncate))
+	{
+		reportWarning("Could not open file "+mCurrentFile->fileName());
+		return;
+	}
 
-  mCurrentFile->write(mTextDocument->toPlainText().toLatin1());
-  mCurrentFile->close();
+	mCurrentFile->write(mTextDocument->toPlainText().toLatin1());
+	mCurrentFile->close();
 
-  mTextDocument->setModified(false);
+	mTextDocument->setModified(false);
 
 }
 

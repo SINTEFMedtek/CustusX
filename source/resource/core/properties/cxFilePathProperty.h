@@ -28,26 +28,26 @@ typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
  */
 class cxResource_EXPORT FilePathProperty: public FilePathPropertyBase
 {
-Q_OBJECT
+	Q_OBJECT
 public:
-    /** Make sure one given option exists witin root.
-     * If not present, fill inn the input defaults.
-     */
-    static FilePathPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
-        QStringList paths, QDomNode root = QDomNode());
+	/** Make sure one given option exists witin root.
+		 * If not present, fill inn the input defaults.
+		 */
+	static FilePathPropertyPtr initialize(const QString& uid, QString name, QString help, QString value,
+																				QStringList paths, QDomNode root = QDomNode());
 
 public:
-    // inherited interface
-    virtual QString getUid() const;
+	// inherited interface
+	virtual QString getUid() const;
 
-    virtual QVariant getValueAsVariant() const;
-    virtual void setValueFromVariant(QVariant val);
+	virtual QVariant getValueAsVariant() const;
+	virtual void setValueFromVariant(QVariant val);
 
-    virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
-    virtual void setHelp(QString val);
+	virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
+	virtual void setHelp(QString val);
 
 protected:
-    FilePathProperty();
+	FilePathProperty();
 
 };
 
