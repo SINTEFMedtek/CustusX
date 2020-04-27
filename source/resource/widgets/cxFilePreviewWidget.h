@@ -59,6 +59,8 @@ protected slots:
 
 private:
 	//void watchFile(bool on);
+	void createAndAddEditorLayout(QGridLayout *gridLayout, int row);
+
 	FilePreviewPropertyPtr mData;
 
 	QTextDocument* 						mTextDocument;

@@ -46,31 +46,37 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent, FilePreviewPropertyPtr dat
 	connect(mSaveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
 	mSaveButton->setEnabled(false);
 
-	QHBoxLayout* buttonLayout = new QHBoxLayout();
-	buttonLayout->addStretch();
-	buttonLayout->setMargin(0);
-	buttonLayout->addWidget(mSaveButton);
-
 	connect(mTextEdit, SIGNAL(textChanged()), this, SLOT(textChangedSlot()));
 	mTextEdit->setDocument(mTextDocument);
 	mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
 
 	this->setSyntaxHighLighter<snw::SyntaxHighlighter>();
 
-	if (gridLayout) // add to input gridlayout
-	{
-		gridLayout->addWidget(mTextEdit, row, 0);
-		gridLayout->addLayout(buttonLayout, row+1, 0);//TODO: Current interface can't handle 2 rows, so this probably creates problems for anything added after this.
-	}
-	else // add directly to this
-	{
-		QVBoxLayout* layout = new QVBoxLayout(this);
-		layout->setMargin(0);
-		layout->addWidget(mTextEdit);
-		layout->addLayout(buttonLayout);
-	}
+	this->createAndAddEditorLayout(gridLayout, row);
+
 	//this->setModified();//Needed?
 	this->fileinterfaceChanged();
+}
+
+void FilePreviewWidget::createAndAddEditorLayout(QGridLayout *gridLayout, int row)
+{
+	QHBoxLayout* buttonLayout = new QHBoxLayout();
+	buttonLayout->addStretch();
+	buttonLayout->setMargin(0);
+	buttonLayout->addWidget(mSaveButton);
+
+	QVBoxLayout* layout;
+	if (gridLayout)
+		layout = new QVBoxLayout();
+	else
+		layout = new QVBoxLayout(this);
+
+	layout->setMargin(0);
+	layout->addWidget(mTextEdit);
+	layout->addLayout(buttonLayout);
+
+	if (gridLayout) // add to input gridlayout
+		gridLayout->addLayout(layout, row, 0);
 }
 
 FilePreviewWidget::~FilePreviewWidget()
