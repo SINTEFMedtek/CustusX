@@ -342,7 +342,7 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 		mBloodVesselSegmentationOutput = vtkBloodVesselExporter->GetOutput();
 		vtkBloodVesselExporter->Delete();
 
-        bool generateVesselCenterlines = mVesselCenterlineOption->getValue();//Error: This creates a copy
+        bool generateVesselCenterlines = mVesselCenterlineOption->getValue();
         if (generateVesselCenterlines)
         {
             auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
