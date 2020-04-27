@@ -98,33 +98,33 @@ QString DataLocations::getPersistentWritablePath()
 	QString homepath = QDir::homePath() + "/" + CX_SYSTEM_BASE_NAME + "_settings";
 
 	if (mTestMode)
-        homepath = homepath + "/temp";
+		homepath = homepath + "/temp";
 
 	return homepath;
 }
 
 void DataLocations::deletePersistentWritablePath()
 {
-    QString pathToDelete = DataLocations::getPersistentWritablePath();
-    QDir dir(pathToDelete);
-    CX_LOG_INFO() << "Going to delete:" << dir.absolutePath();
-    dir.removeRecursively();
+	QString pathToDelete = DataLocations::getPersistentWritablePath();
+	QDir dir(pathToDelete);
+	CX_LOG_INFO() << "Going to delete:" << dir.absolutePath();
+	dir.removeRecursively();
 }
 
 
 QString DataLocations::getBundlePath()
 {
-    // This method is becoming problematic (2015-11-30/CA):
-    // the APPLE case returns path to folder enclosing the bundle
-    // while the LINUX/WIN case returns path to bin folder.
-    // This is not symmetric - it should be. Try to migrate away from this
-    // method, using applicationDirPath instead, and remove it.
-    //
+	// This method is becoming problematic (2015-11-30/CA):
+	// the APPLE case returns path to folder enclosing the bundle
+	// while the LINUX/WIN case returns path to bin folder.
+	// This is not symmetric - it should be. Try to migrate away from this
+	// method, using applicationDirPath instead, and remove it.
+	//
 #ifdef __APPLE__
 	QString path(qApp->applicationDirPath()+"/../../..");
 	QString bundle = QDir(qApp->applicationDirPath()+"/../..").canonicalPath();
 	if (QFileInfo(bundle).isBundle())
-        return QDir(path).canonicalPath();
+		return QDir(path).canonicalPath();
 	else
 		return qApp->applicationDirPath();
 #else
@@ -180,8 +180,8 @@ QStringList DataLocations::getRootConfigPaths()
 {
 	if(!isRunFromBuildFolder())
 	{
-         // look for installed location
-        QString path = QString("%1/%2").arg(qApp->applicationDirPath()).arg(CX_CONFIG_ROOT_RELATIVE_INSTALLED);
+		// look for installed location
+		QString path = QString("%1/%2").arg(qApp->applicationDirPath()).arg(CX_CONFIG_ROOT_RELATIVE_INSTALLED);
 		if (QDir(path).exists())
 			return QStringList() << QDir(path).canonicalPath();
 		else
@@ -206,8 +206,8 @@ QString DataLocations::getDocPath()
 {
 	if(!isRunFromBuildFolder())
 	{
-        QString path = QString("%1/%2").arg(qApp->applicationDirPath()).arg(CX_DOC_ROOT_RELATIVE_INSTALLED);
-//		QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
+		QString path = QString("%1/%2").arg(qApp->applicationDirPath()).arg(CX_DOC_ROOT_RELATIVE_INSTALLED);
+		//		QString path = getBundlePath() + "/" + CX_DOC_ROOT_RELATIVE_INSTALLED; // look for installed location
 		if (QDir(path).exists())
 			return QDir(path).canonicalPath();
 		else
@@ -246,7 +246,7 @@ QString changeExtension(QString name, QString ext)
 
 QString DataLocations::getCachePath()
 {
-    QString path(getPersistentWritablePath()+"/cache");
+	QString path(getPersistentWritablePath()+"/cache");
 	return path;
 }
 
@@ -258,7 +258,7 @@ QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QStrin
 QString DataLocations::findConfigPath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
 	QFileInfo filePath(findConfigFilePath(fileName, pathRelativeToConfigRoot, alternativeAbsolutePath));
-    return filePath.absolutePath() + "/";
+	return filePath.absolutePath() + "/";
 }
 
 QString DataLocations::findConfigFilePath(QString fileName, QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
@@ -293,14 +293,14 @@ QString DataLocations::checkExecutableExist(QString path, QString filename)
 QString DataLocations::findExecutableInStandardLocations(QString filename)
 {
 	QString result;
-//#ifdef __APPLE__
-//	// run from installed folder on mac
-//	result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
-//	if (!result.isEmpty())
-//		return result;
-//#endif
+	//#ifdef __APPLE__
+	//	// run from installed folder on mac
+	//	result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
+	//	if (!result.isEmpty())
+	//		return result;
+	//#endif
 	// run from installed or build bin folder
-    result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
+	result = DataLocations::checkExecutableExist(qApp->applicationDirPath(), filename);
 	if (!result.isEmpty())
 		return result;
 
@@ -309,17 +309,17 @@ QString DataLocations::findExecutableInStandardLocations(QString filename)
 
 void DataLocations::setWebsiteURL(QString websiteUrl)
 {
-    mWebsiteUrl = websiteUrl;
+	mWebsiteUrl = websiteUrl;
 }
 
 QString DataLocations::getWebsiteURL()
 {
-    return mWebsiteUrl;
+	return mWebsiteUrl;
 }
 
 QString DataLocations::getUploadsUrl()
 {
-    return QString("http://custusx.org/uploads");
+	return QString("http://custusx.org/uploads");
 }
 
 QString DataLocations::getWebsiteUserDocumentationURL()
@@ -327,8 +327,8 @@ QString DataLocations::getWebsiteUserDocumentationURL()
 	QString version(CustusX_VERSION_STRING);
 	if (version.contains("dev"))
 		version = "nightly";
-    QString url = QString("%1/user_doc/%2")
-            .arg(DataLocations::getUploadsUrl())
+	QString url = QString("%1/user_doc/%2")
+			.arg(DataLocations::getUploadsUrl())
 			.arg(version);
 	return url;
 }
