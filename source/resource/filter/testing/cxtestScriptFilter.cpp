@@ -23,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
-	void checkFilterInit(cx::FilterPtr filter, bool print = false)
+	void checkFilterInit(cx::FilterPtr filter, bool validInput = true, bool print = false)
 	{
 		REQUIRE(filter);
 
@@ -34,8 +34,8 @@ namespace cxtest
 		CHECK(output.size() > 0);
 		CHECK(options.size() > 0);
 
-		if(!print)
-			return;
+		//if(!print)
+		//	return;
 
 		//TODO: Check if the if(print) statements below is nessecary or can be replaced by a return
 		if(print) CX_LOG_DEBUG() << "input.size: " << input.size();
@@ -43,6 +43,14 @@ namespace cxtest
 		{
 			cx::SelectDataStringPropertyBasePtr property = input[i];
 			if(print) CX_LOG_DEBUG() << property->getDisplayName() << ", " << property->getUid() << ", " << property->getValue();
+			cx::DataPtr data = property->getData();
+			if(validInput)
+			{
+				REQUIRE(data);
+				if(print) CX_LOG_DEBUG() << data->getName();
+			}
+			else
+				CHECK_FALSE(data);
 		}
 
 		if(print) CX_LOG_DEBUG() << "output.size: " << output.size();
@@ -50,6 +58,8 @@ namespace cxtest
 		{
 			cx::SelectDataStringPropertyBasePtr property = output[i];
 			if(print) CX_LOG_DEBUG() << property->getDisplayName() << ", " << property->getUid() << ", " << property->getValue();
+			cx::DataPtr data = property->getData();
+			CHECK_FALSE(data);
 		}
 
 		if(print) CX_LOG_DEBUG() << "options.size: " << options.size();
@@ -72,12 +82,17 @@ namespace cxtest
 
 TEST_CASE("GenericScriptFilter: Create", "[unit]")
 {
-	bool debugOutput = true;
+	bool debugOutput = false;
+	bool validInput = false;
 
 	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
 
 	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(dummyservices));
-	cxtest::checkFilterInit(filter, debugOutput);
+	cxtest::checkFilterInit(filter, validInput, debugOutput);
+
+	//Filter should fail with no input
+	CHECK_FALSE(filter->execute());
+	CHECK_FALSE(filter->postProcess());
 }
 
 //Used cxtestDilationFilter as example. Maybe possible to combine some code?
@@ -89,7 +104,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
 
 	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(dummyservices));
-	cxtest::checkFilterInit(filter);
+	cxtest::checkFilterInit(filter, false);
 	cx::DataPtr data = cxtest::getTestData(dummyservices->patient(), filemanager);
 
 	//Set input
@@ -102,6 +117,8 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 		INFO("The name of the input data is not as we requested.");
 		REQUIRE(input[0]->getData()->getName() == "helix_seg");
 	}
+
+	cxtest::checkFilterInit(filter, true);
 
 	// Execute
 	{
