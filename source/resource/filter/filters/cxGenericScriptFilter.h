@@ -42,7 +42,6 @@ public:
 
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
-	StringPropertyPtr getScriptContent(QDomElement root);
 	StringPropertyPtr setScriptOutput(QDomElement root);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 

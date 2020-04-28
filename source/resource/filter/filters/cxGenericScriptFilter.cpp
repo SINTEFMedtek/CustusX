@@ -63,17 +63,18 @@ FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList availableScripts;
 
-	// Search for .ini files in folder
+	// Search for .ini files in folder, select first
 	// Scan .ini files for references to scripts
 
-	if(availableScripts.isEmpty())
-	{
-		availableScripts << "No script available";
-	}
+//	if(availableScripts.isEmpty())
+//	{
+//		availableScripts << "No script available";
+//	}
 	mScriptFile =  FilePathProperty::initialize("scriptSelector",
-													"Script",
-													"Select which script to use.",
-													availableScripts[0],//FilePath
+													"Select configuration file",
+													"Select configuration file that specifies which script and parameters to use",
+													""
+													"",//FilePath
 													availableScripts,
 													root);
 	mScriptFile->setGroup("File");
@@ -81,20 +82,9 @@ FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 	return mScriptFile;
 }
 
-StringPropertyPtr GenericScriptFilter::getScriptContent(QDomElement root)
-{
-	QString content;
-	content.append("File contents goes here.");
-	content.append("More text.");
-	return StringProperty::initialize("terminalOutput", "Content",
-												 "Used for...",
-												 content, root);
-
-	// This should be repaced with cxFilePreviewWidget ?
-}
-
 StringPropertyPtr GenericScriptFilter::setScriptOutput(QDomElement root)
 {
+	// Not currently active, intended use: Show script output
 	QString scriptOutput;
 	scriptOutput.append("File output goes here.");
 	scriptOutput.append("More text.");
@@ -127,7 +117,7 @@ void GenericScriptFilter::createOptions()
 	// Need file selector, editable text field and output (optional?).
 
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
-	mOptionsAdapters.push_back(this->getScriptContent(mOptions));
+	// mOptionsAdapters.push_back(this->getScriptContent(mOptions));
 	mOptionsAdapters.push_back(this->getIniFileOption(mOptions));
 	// mOptionsAdapters.push_back(this->setScriptOutput(mOptions));
 
