@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
 #include <vtkCardinalSpline.h>
+#include "cxLogger.h"
 
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
@@ -551,6 +552,93 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startInd
 	}
 
 	return std::make_pair(branchPositions, positionsNotUsed);
+}
+
+/*
+    smoothBranch is smoothing the positions of a centerline branch by using vtkCardinalSpline.
+    The degree of smoothing is dependent on the branch radius and the shape of the branch.
+    First, the method tests if a straight line from start to end of the branch is sufficient by the condition of
+    all positions along the line being within the lumen of the airway (max distance from original centerline
+    is set to branch radius).
+    If this fails, one more control point is added to the spline at the time, until the condition is fulfilled.
+    The control point added for each iteration is the position with the larges deviation from the original/unfiltered
+    centerline.
+*/
+std::vector< Eigen::Vector3d > smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition)
+{
+    vtkCardinalSplinePtr splineX = vtkSmartPointer<vtkCardinalSpline>::New();
+    vtkCardinalSplinePtr splineY = vtkSmartPointer<vtkCardinalSpline>::New();
+    vtkCardinalSplinePtr splineZ = vtkSmartPointer<vtkCardinalSpline>::New();
+
+    double branchRadius = branchPtr->findBranchRadius()/2;
+
+    //add control points to spline
+
+    //add first position
+    Eigen::MatrixXd positions = branchPtr->getPositions();
+    splineX->AddPoint(0,startPosition(0));
+    splineY->AddPoint(0,startPosition(1));
+    splineZ->AddPoint(0,startPosition(2));
+
+    // Add last position if no parent branch, else add parents position closest to current branch.
+    // Branch positions are stored in order from head to feet (e.g. first position is top of trachea),
+    // while route-to-target is generated from target to top of trachea.
+    if(!branchPtr->getParentBranch())
+    {
+        splineX->AddPoint(startIndex,positions(0,0));
+        splineY->AddPoint(startIndex,positions(1,0));
+        splineZ->AddPoint(startIndex,positions(2,0));
+    }
+    else
+    {
+        Eigen::MatrixXd parentPositions = branchPtr->getParentBranch()->getPositions();
+        splineX->AddPoint(startIndex,parentPositions(0,parentPositions.cols()-1));
+        splineY->AddPoint(startIndex,parentPositions(1,parentPositions.cols()-1));
+        splineZ->AddPoint(startIndex,parentPositions(2,parentPositions.cols()-1));
+    }
+
+    //Add points until all filtered/smoothed positions are minimum 1 mm inside the airway wall, (within r - 1 mm).
+    //This is to make sure the smoothed centerline is within the lumen of the airways.
+    double maxAcceptedDistanceToOriginalPosition = std::max(branchRadius - 1, 1.0);
+    double maxDistanceToOriginalPosition = maxAcceptedDistanceToOriginalPosition + 1;
+    int maxDistanceIndex = -1;
+    std::vector< Eigen::Vector3d > smoothingResult;
+
+    //add positions to spline
+    while (maxDistanceToOriginalPosition >= maxAcceptedDistanceToOriginalPosition && splineX->GetNumberOfPoints() < startIndex)
+    {
+        if(maxDistanceIndex > 0)
+        {
+            //add to spline the position with largest distance to original position
+            splineX->AddPoint(maxDistanceIndex,positions(0,startIndex - maxDistanceIndex));
+            splineY->AddPoint(maxDistanceIndex,positions(1,startIndex - maxDistanceIndex));
+            splineZ->AddPoint(maxDistanceIndex,positions(2,startIndex - maxDistanceIndex));
+        }
+
+        //evaluate spline - get smoothed positions
+        maxDistanceToOriginalPosition = 0.0;
+        smoothingResult.clear();
+        for(int j=0; j<=startIndex; j++)
+        {
+            double splineParameter = j;
+            Eigen::Vector3d tempPoint;
+            tempPoint(0) = splineX->Evaluate(splineParameter);
+            tempPoint(1) = splineY->Evaluate(splineParameter);
+            tempPoint(2) = splineZ->Evaluate(splineParameter);
+            smoothingResult.push_back(tempPoint);
+
+            //calculate distance to original (non-filtered) position
+            double distance = dsearch(tempPoint, positions).second;
+            //finding the index with largest distance
+            if (distance > maxDistanceToOriginalPosition)
+            {
+                maxDistanceToOriginalPosition = distance;
+                maxDistanceIndex = j;
+            }
+        }
+    }
+
+    return smoothingResult;
 }
 
 }//namespace cx

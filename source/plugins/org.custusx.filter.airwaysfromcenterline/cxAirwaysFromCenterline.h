@@ -35,7 +35,6 @@ public:
     void setBranches(BranchListPtr branches);
     void setSegmentedVolume(vtkImageDataPtr segmentedVolume);
     void processCenterline(vtkPolyDataPtr centerline_r);
-    void processCenterline(Eigen::MatrixXd CLpoints_r);
     BranchListPtr getBranchList();
     vtkPolyDataPtr generateTubes(double staticRadius = 0, bool mergeWithOriginalAirways = false);
     vtkImageDataPtr initializeEmptyAirwaysVolume();
@@ -62,7 +61,6 @@ private:
 
 };
 
-std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
