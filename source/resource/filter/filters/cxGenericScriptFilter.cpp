@@ -10,9 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxGenericScriptFilter.h"
+#include <itkSmoothingRecursiveGaussianImageFilter.h>
 
 #include "cxAlgorithmHelpers.h"
-#include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include "cxSelectDataStringProperty.h"
 
 #include "cxUtilHelpers.h"
@@ -37,6 +37,75 @@ namespace cx
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services)
 {
+	//Copied QProsess example from ElastixExecuter
+	mProcess = new QProcess(this);
+	connect(mProcess, &QProcess::stateChanged, this, &GenericScriptFilter::processStateChanged);
+	connect(mProcess, &QProcess::errorOccurred, this, &GenericScriptFilter::processError);
+
+	connect(mProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+					[=](int exitCode, QProcess::ExitStatus exitStatus){ this->GenericScriptFilter::processFinished(exitCode, exitStatus); });
+}
+
+GenericScriptFilter::~GenericScriptFilter()
+{
+	//disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+	mProcess->close();
+}
+
+void GenericScriptFilter::processStateChanged(QProcess::ProcessState newState)
+{
+	if (newState == QProcess::Running)
+	{
+		CX_LOG_DEBUG() << "GenericScriptFilter process running";
+		//emit started(0);
+	}
+	if (newState == QProcess::NotRunning)
+	{
+		CX_LOG_DEBUG() << "GenericScriptFilter process finished running";
+		//emit finished();
+	}
+	if (newState == QProcess::Starting)
+	{
+		CX_LOG_DEBUG() << "GenericScriptFilter process starting";
+	}
+}
+
+void GenericScriptFilter::processFinished(int code, QProcess::ExitStatus status)
+{
+	if (status == QProcess::CrashExit)
+		reportError("GenericScriptFilter process crashed");
+}
+
+void GenericScriptFilter::processError(QProcess::ProcessError error)
+{
+	QString msg;
+	msg += "GenericScriptFilter process reported an error: ";
+
+	switch (error)
+	{
+	case QProcess::FailedToStart:
+		msg += "Failed to start";
+		break;
+	case QProcess::Crashed:
+		msg += "Crashed";
+		break;
+	case QProcess::Timedout:
+		msg += "Timed out";
+		break;
+	case QProcess::WriteError:
+		msg += "Write Error";
+		break;
+	case QProcess::ReadError:
+		msg += "Read Error";
+		break;
+	case QProcess::UnknownError:
+		msg += "Unknown Error";
+		break;
+	default:
+		msg += "Invalid error";
+	}
+
+	reportError(msg);
 }
 
 QString GenericScriptFilter::getName() const
@@ -134,6 +203,8 @@ QString GenericScriptFilter::createCommandString(QString inputFile)
 void GenericScriptFilter::runCommandString(QString command)
 {
 	CX_LOG_DEBUG() << "Command to run: " << command;
+
+	mProcess->start(command);
 }
 
 void GenericScriptFilter::createInputTypes()

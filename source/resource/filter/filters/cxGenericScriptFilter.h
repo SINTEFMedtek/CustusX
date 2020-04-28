@@ -12,7 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
-//#include "cxFilePreviewWidget.h"
+#include <QProcess>
+
 
 namespace cx
 {
@@ -31,7 +32,7 @@ class cxResourceFilter_EXPORT GenericScriptFilter : public FilterImpl
 
 public:
 	GenericScriptFilter(VisServicesPtr services);
-	virtual ~GenericScriptFilter() {}
+	virtual ~GenericScriptFilter();
 
 	virtual QString getType() const;
 	virtual QString getName() const;
@@ -58,9 +59,13 @@ protected:
 
 protected slots:
 	void scriptFileChanged();
+	void processStateChanged(QProcess::ProcessState newState);
+	void processFinished(int code, QProcess::ExitStatus status);
+	void processError(QProcess::ProcessError error);
 
 private:
 	vtkImageDataPtr mRawResult;
+	QProcess* mProcess;
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
