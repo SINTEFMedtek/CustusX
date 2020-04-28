@@ -53,6 +53,9 @@ protected:
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
+	QString createCommandString(QString inputFile);
+	void runCommandString(QString command);
+
 protected slots:
 	void scriptFileChanged();
 

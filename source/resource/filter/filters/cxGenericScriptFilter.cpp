@@ -61,21 +61,15 @@ QString GenericScriptFilter::getHelp() const
 
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
-	QStringList availableScripts;
+	QStringList paths;
+	paths << profile()->getSettingsPath();
 
-	// Search for .ini files in folder, select first
-	// Scan .ini files for references to scripts
-
-//	if(availableScripts.isEmpty())
-//	{
-//		availableScripts << "No script available";
-//	}
 	mScriptFile =  FilePathProperty::initialize("scriptSelector",
 													"Select configuration file",
 													"Select configuration file that specifies which script and parameters to use",
 													""
 													"",//FilePath
-													availableScripts,
+													paths, //Catalog
 													root);
 	mScriptFile->setGroup("File");
 	connect(mScriptFile.get(), &FilePathProperty::changed, this, &GenericScriptFilter::scriptFileChanged);
@@ -114,8 +108,6 @@ FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 
 void GenericScriptFilter::createOptions()
 {
-	// Need file selector, editable text field and output (optional?).
-
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
 	// mOptionsAdapters.push_back(this->getScriptContent(mOptions));
 	mOptionsAdapters.push_back(this->getIniFileOption(mOptions));
@@ -128,6 +120,20 @@ void GenericScriptFilter::scriptFileChanged()
 	CX_LOG_DEBUG() << "scriptFileChanged: " << mScriptFile->getValue();
 	//Don't work. Need to get property from options, or trigger another signal?
 	mScriptFilePreview->setValue(mScriptFile->getValue());
+}
+
+QString GenericScriptFilter::createCommandString(QString inputFile)
+{
+	QString retval;
+	// Parse .ini file, build command
+	retval.append(" " + inputFile);
+	// Append more parameters if required
+	return retval;
+}
+
+void GenericScriptFilter::runCommandString(QString command)
+{
+	CX_LOG_DEBUG() << "Command to run: " << command;
 }
 
 void GenericScriptFilter::createInputTypes()
@@ -156,9 +162,18 @@ bool GenericScriptFilter::execute()
 	ImagePtr input = this->getCopiedInputImage();
 	if (!input)
 		return false;
+	QString inputFile = input->getName();
+	CX_LOG_DEBUG() << "inputFile name: " << inputFile;
 
-	// Start script, wait for finish?
-	// Get command line output
+	// Parse .ini file, create command string to run
+	QString command = this->createCommandString(inputFile);
+
+	// Run command string on console
+	this->runCommandString(command);
+
+	// Monitor output, automatic?
+
+
 	return true;
 }
 
@@ -169,25 +184,7 @@ bool GenericScriptFilter::postProcess()
 	if (!mRawResult)
 		return false;
 
-//	ImagePtr input = this->getCopiedInputImage();
-
-//	if (!input)
-//		return false;
-
-//	QString uid = input->getUid() + "_sm%1";
-//	QString name = input->getName()+" sm%1";
-//	ImagePtr output = createDerivedImage(mServices->patient(),
-//										 uid, name,
-//										 mRawResult, input);
-
-//	mRawResult = NULL;
-//	if (!output)
-//		return false;
-
-//	mServices->patient()->insertData(output);
-
-//	// set output
-//	mOutputTypes.front()->setValue(output->getUid());
+	// More code here
 
 	return true;
 
