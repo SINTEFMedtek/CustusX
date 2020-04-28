@@ -40,7 +40,8 @@ GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	//Copied QProsess example from ElastixExecuter
 	mProcess = new QProcess(this);
 	connect(mProcess, &QProcess::stateChanged, this, &GenericScriptFilter::processStateChanged);
-	connect(mProcess, &QProcess::errorOccurred, this, &GenericScriptFilter::processError);
+	//connect(mProcess, &QProcess::errorOccurred, this, &GenericScriptFilter::processError); //Not working with old Qt. Using below line instead
+	connect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 
 	//Ubuntu 16.04 build machine cannot use this new Qt functionality
 	//connect(mProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
