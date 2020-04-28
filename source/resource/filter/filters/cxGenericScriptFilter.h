@@ -62,6 +62,7 @@ protected slots:
 	void processStateChanged(QProcess::ProcessState newState);
 	void processFinished(int code, QProcess::ExitStatus status);
 	void processError(QProcess::ProcessError error);
+	void processReadyRead();
 
 private:
 	vtkImageDataPtr mRawResult;

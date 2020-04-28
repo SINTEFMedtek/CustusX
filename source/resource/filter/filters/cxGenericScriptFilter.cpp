@@ -42,8 +42,15 @@ GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	connect(mProcess, &QProcess::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	connect(mProcess, &QProcess::errorOccurred, this, &GenericScriptFilter::processError);
 
-	connect(mProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-					[=](int exitCode, QProcess::ExitStatus exitStatus){ this->GenericScriptFilter::processFinished(exitCode, exitStatus); });
+	//Ubuntu 16.04 build machine cannot use this new Qt functionality
+	//connect(mProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+	//				[=](int exitCode, QProcess::ExitStatus exitStatus){ this->GenericScriptFilter::processFinished(exitCode, exitStatus); });
+	//Reverting to old style
+	connect(mProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+
+	//Show output from process
+	connect(mProcess, &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+	connect(mProcess, &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyRead);
 }
 
 GenericScriptFilter::~GenericScriptFilter()
@@ -106,6 +113,15 @@ void GenericScriptFilter::processError(QProcess::ProcessError error)
 	}
 
 	reportError(msg);
+}
+
+void GenericScriptFilter::processReadyRead()
+{
+	CX_LOG_DEBUG() << "GenericScriptFilter::processReadyRead";
+	//report(QString(mProcess->readAllStandardOutput()));
+	//report(QString(mProcess->readAllStandardError()));
+	CX_LOG_INFO() << QString(mProcess->readAllStandardOutput());
+	CX_LOG_ERROR() << QString(mProcess->readAllStandardError());
 }
 
 QString GenericScriptFilter::getName() const
