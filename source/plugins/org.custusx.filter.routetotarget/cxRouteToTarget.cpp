@@ -475,9 +475,7 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
 		}
 
 		stream << "#Trachea length (mm):" << endl;
-		BranchPtr trachea = mBranchListPtr->getBranches()[0];
-		int numberOfPositionsInTrachea = trachea->getPositions().cols();
-		double tracheaLength = calculateRouteLength(smoothBranch(trachea, numberOfPositionsInTrachea-1, trachea->getPositions().col(numberOfPositionsInTrachea-1)));
+		double tracheaLength = this->getTracheaLength();
 		stream << tracheaLength << endl;
 
 		stream << "#Route to target length - from Carina (mm):" << endl;
@@ -485,6 +483,33 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
 		stream << "#Extended route to target length - from Carina (mm):" << endl;
 		stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << endl;
 	}
+}
+
+double RouteToTarget::getTracheaLength()
+{
+	BranchPtr trachea = mBranchListPtr->getBranches()[0];
+	int numberOfPositionsInTrachea = trachea->getPositions().cols();
+	double tracheaLength = calculateRouteLength(smoothBranch(trachea, numberOfPositionsInTrachea-1, trachea->getPositions().col(numberOfPositionsInTrachea-1)));
+	return tracheaLength;
+}
+
+std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions(MeshPtr route)
+{
+	vtkPolyDataPtr centerline_r = route->getTransformedPolyDataCopy(route->get_rMd());
+
+	std::vector< Eigen::Vector3d > routePositions;
+
+	//Used example from getCenterlinePositions
+	int N = centerline_r->GetNumberOfPoints();
+	for(vtkIdType i = 0; i < N; i++)
+		{
+		double p[3];
+		centerline_r->GetPoint(i,p);
+		Eigen::Vector3d position;
+		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
+		routePositions.push_back(position);
+		}
+	return routePositions;
 }
 
 double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)

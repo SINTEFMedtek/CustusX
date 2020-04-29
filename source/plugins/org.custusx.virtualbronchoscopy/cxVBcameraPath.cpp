@@ -75,10 +75,10 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
 
 
 
-void CXVBcameraPath::cameraPathPositionSlot(int pos)
+void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 {
 
-    double splineParameter = pos / 100.0;
+		double splineParameter = positionPercentage / 100.0;
 
     //Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
     //Longer focus makes smoother turns at the first divisions.
