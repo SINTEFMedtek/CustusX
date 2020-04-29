@@ -42,8 +42,6 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
-	QProcess* mProcess;
-
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
@@ -53,13 +51,17 @@ protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
+	QString createCommandString(QString inputFile);
+	void runCommandString(QString command);
+	QString getCustomPath();
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
-	QString createCommandString(QString inputFilePath);
-	QString getCustomPath();
-	void runCommandString(QString command);
+	vtkImageDataPtr mRawResult;
+	QProcess* mProcess;
+	QString mOutputChannelName;
+	QString mScriptPathAddition;
 
 protected slots:
 	void scriptFileChanged();
@@ -69,10 +71,6 @@ protected slots:
 	void processReadyRead();
 	void processReadyReadError();
 
-private:
-	vtkImageDataPtr mRawResult;
-	QString mOutputChannelName;
-	QString mScriptPathAddition;
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
