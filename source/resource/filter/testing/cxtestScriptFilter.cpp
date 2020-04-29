@@ -19,11 +19,39 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestPatientModelServiceMock.h"
 #include "cxLogicManager.h"
 #include "cxFileManagerServiceProxy.h"
+#include "cxFilePathProperty.h"
+#include "cxFilePreviewProperty.h"
 
 namespace cxtest
 {
+typedef boost::shared_ptr<class TestGenericScriptFilter> TestGenericScriptFilterPtr;
 
-	void checkFilterInit(cx::FilterPtr filter, bool validInput = true, bool print = false)
+class TestGenericScriptFilter : public cx::GenericScriptFilter
+{
+public:
+	TestGenericScriptFilter() :
+		GenericScriptFilter(cx::VisServices::getNullObjects())
+	{}
+	void testCreateOptions()
+	{
+		this->createOptions();
+	}
+	void testRunCommandString(QString command)
+	{
+		this->runCommandString(command);
+	}
+
+	std::vector<cx::PropertyPtr> getOptionsAdapters()
+	{
+		return mOptionsAdapters;
+	}
+	QProcess* getProcess()
+	{
+		return mProcess;
+	}
+};
+
+	void checkFilterInit(cx::FilterPtr filter, bool validInput = true, bool validOutput = true, bool print = false)
 	{
 		REQUIRE(filter);
 
@@ -59,7 +87,13 @@ namespace cxtest
 			cx::SelectDataStringPropertyBasePtr property = output[i];
 			if(print) CX_LOG_DEBUG() << property->getDisplayName() << ", " << property->getUid() << ", " << property->getValue();
 			cx::DataPtr data = property->getData();
-			CHECK_FALSE(data);
+			if(validOutput)
+			{
+				REQUIRE(data);
+				if(print) CX_LOG_DEBUG() << data->getName();
+			}
+			else
+				CHECK_FALSE(data);
 		}
 
 		if(print) CX_LOG_DEBUG() << "options.size: " << options.size();
@@ -84,11 +118,12 @@ TEST_CASE("GenericScriptFilter: Create", "[unit]")
 {
 	bool debugOutput = false;
 	bool validInput = false;
+	bool validOutput = false;
 
 	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
 
 	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(dummyservices));
-	cxtest::checkFilterInit(filter, validInput, debugOutput);
+	cxtest::checkFilterInit(filter, validInput, validOutput, debugOutput);
 
 	//Filter should fail with no input
 	CHECK_FALSE(filter->execute());
@@ -104,7 +139,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
 
 	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(dummyservices));
-	cxtest::checkFilterInit(filter, false);
+	cxtest::checkFilterInit(filter, false, false);
 	cx::DataPtr data = cxtest::getTestData(dummyservices->patient(), filemanager);
 
 	//Set input
@@ -118,7 +153,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 		REQUIRE(input[0]->getData()->getName() == "helix_seg");
 	}
 
-	cxtest::checkFilterInit(filter, true);
+	cxtest::checkFilterInit(filter, true, false);
 
 	// Execute
 	{
@@ -130,8 +165,45 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	}
 	{
 		INFO("Post processing data from GenericScriptFilter failed.");
-		//REQUIRE(filter->postProcess());//TODO: Uncomment and fix
+		//TODO: Uncomment when filter got valid output
+		//REQUIRE(filter->postProcess());
+		//cxtest::checkFilterInit(filter, true, false);
 	}
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	filter->testCreateOptions();
+	std::vector<cx::PropertyPtr> options = filter->getOptionsAdapters();
+	CHECK(options.size() == 2);
+	options = filter->getOptions();
+	REQUIRE(options.size() == 2);
+
+	cx::PropertyPtr option = options[0];
+	REQUIRE(option->getUid() == "scriptSelector");
+	cx::FilePathPropertyPtr scriptSelectorOption = boost::dynamic_pointer_cast<cx::FilePathProperty>(option);
+	REQUIRE(scriptSelectorOption);
+
+	option = options[1];
+	cx::FilePreviewPropertyPtr filePreviewOption = boost::dynamic_pointer_cast<cx::FilePreviewProperty>(option);
+	REQUIRE(scriptSelectorOption);
+}
+
+TEST_CASE("GenericScriptFilter: Test running of external process", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	QProcess* process = filter->getProcess();
+
+	QString invalidCommand("zzz");
+	filter->testRunCommandString(invalidCommand);
+	REQUIRE_FALSE(process->waitForFinished(3000));
+
+	QString validCommand("date");//or echo
+	filter->testRunCommandString(validCommand);
+	REQUIRE(process->waitForFinished(3000));
 }

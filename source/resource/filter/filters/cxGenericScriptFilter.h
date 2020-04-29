@@ -50,12 +50,16 @@ protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
+	QString createCommandString(QString inputFile);
+	void runCommandString(QString command);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
-	QString createCommandString(QString inputFile);
-	void runCommandString(QString command);
+	vtkImageDataPtr mRawResult;
+	QProcess* mProcess;
+	QString mOutputChannelName;
+	QString mScriptPathAddition;
 
 protected slots:
 	void scriptFileChanged();
@@ -65,11 +69,6 @@ protected slots:
 	void processReadyRead();
 	void processReadyReadError();
 
-private:
-	vtkImageDataPtr mRawResult;
-	QProcess* mProcess;
-	QString mOutputChannelName;
-	QString mScriptPathAddition;
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
