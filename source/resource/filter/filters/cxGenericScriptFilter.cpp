@@ -35,7 +35,8 @@ namespace cx
 {
 
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
-	FilterImpl(services)
+	FilterImpl(services),
+	mOutputChannelName("ExternalScript")
 {
 	//Copied QProsess example from ElastixExecuter
 	mProcess = new QProcess(this);
@@ -51,12 +52,12 @@ GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 
 	//Show output from process
 	connect(mProcess, &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-	connect(mProcess, &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyRead);
+	connect(mProcess, &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 }
 
 GenericScriptFilter::~GenericScriptFilter()
 {
-	//disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+	disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
 	mProcess->close();
 }
 
@@ -118,11 +119,12 @@ void GenericScriptFilter::processError(QProcess::ProcessError error)
 
 void GenericScriptFilter::processReadyRead()
 {
-	CX_LOG_DEBUG() << "GenericScriptFilter::processReadyRead";
-	//report(QString(mProcess->readAllStandardOutput()));
-	//report(QString(mProcess->readAllStandardError()));
-	CX_LOG_INFO() << QString(mProcess->readAllStandardOutput());
-	CX_LOG_ERROR() << QString(mProcess->readAllStandardError());
+	CX_LOG_CHANNEL_INFO(mOutputChannelName) << QString(mProcess->readAllStandardOutput());
+}
+
+void GenericScriptFilter::processReadyReadError()
+{
+	CX_LOG_CHANNEL_ERROR(mOutputChannelName) << QString(mProcess->readAllStandardError());
 }
 
 QString GenericScriptFilter::getName() const

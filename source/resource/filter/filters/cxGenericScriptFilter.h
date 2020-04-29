@@ -63,10 +63,12 @@ protected slots:
 	void processFinished(int code, QProcess::ExitStatus status);
 	void processError(QProcess::ProcessError error);
 	void processReadyRead();
+	void processReadyReadError();
 
 private:
 	vtkImageDataPtr mRawResult;
 	QProcess* mProcess;
+	QString mOutputChannelName;
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
