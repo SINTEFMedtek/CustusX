@@ -80,6 +80,12 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 
 		double splineParameter = positionPercentage / 100.0;
 
+    //Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
+    //Longer focus makes smoother turns at the first divisions.
+    double splineFocusDistance = 0.05;
+    if (splineParameter > 0.8)
+        splineFocusDistance = 0.02;
+
 //	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos : " << pos
 //			  << ", spline parameter : " << splineParameter << std::endl;
 
@@ -90,9 +96,9 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
     splineParameterArray[2] = splineParameter;
 
     mSpline->Evaluate(splineParameterArray, pos_r, d_r);
-    splineParameterArray[0] = splineParameter+0.05;
-    splineParameterArray[1] = splineParameter+0.05;
-    splineParameterArray[2] = splineParameter+0.05;
+    splineParameterArray[0] = splineParameter + splineFocusDistance;
+    splineParameterArray[1] = splineParameter + splineFocusDistance;
+    splineParameterArray[2] = splineParameter + splineFocusDistance;
     mSpline->Evaluate(splineParameterArray, focus_r, d_r);
 
     mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);

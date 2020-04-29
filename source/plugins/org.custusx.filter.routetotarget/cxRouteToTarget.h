@@ -72,7 +72,6 @@ private:
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	Eigen::MatrixXd mConnectedPointsInBVCL;
-	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 	bool checkIfRouteToTargetEndsAtEndOfLastBranch();
 	bool mPathToBloodVesselsFound = false;
 };
