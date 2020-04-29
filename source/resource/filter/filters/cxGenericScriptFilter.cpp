@@ -36,7 +36,8 @@ namespace cx
 
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services),
-	mOutputChannelName("ExternalScript")
+	mOutputChannelName("ExternalScript"),
+	mScriptPathAddition("/Filter-Scripts")
 {
 	//Copied QProsess example from ElastixExecuter
 	mProcess = new QProcess(this);
@@ -150,12 +151,11 @@ QString GenericScriptFilter::getHelp() const
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList paths;
-	paths << profile()->getSettingsPath();
+	paths << profile()->getPath()+mScriptPathAddition;
 
 	mScriptFile =  FilePathProperty::initialize("scriptSelector",
 													"Select configuration file",
 													"Select configuration file that specifies which script and parameters to use",
-													""
 													"",//FilePath
 													paths, //Catalog
 													root);
@@ -181,7 +181,7 @@ StringPropertyPtr GenericScriptFilter::setScriptOutput(QDomElement root)
 FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 {
 	QStringList paths;
-	paths << profile()->getSettingsPath();
+	paths << profile()->getPath()+mScriptPathAddition;
 
 	mScriptFilePreview = FilePreviewProperty::initialize("filename", "Filename",
 											"Select a ini file for running command line script",
@@ -205,8 +205,6 @@ void GenericScriptFilter::createOptions()
 
 void GenericScriptFilter::scriptFileChanged()
 {
-	CX_LOG_DEBUG() << "scriptFileChanged: " << mScriptFile->getValue();
-	//Don't work. Need to get property from options, or trigger another signal?
 	mScriptFilePreview->setValue(mScriptFile->getValue());
 }
 

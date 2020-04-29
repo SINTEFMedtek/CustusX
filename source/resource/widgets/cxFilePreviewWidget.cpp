@@ -90,7 +90,7 @@ void FilePreviewWidget::textChangedSlot()
 void FilePreviewWidget::fileinterfaceChanged()
 {
 	if(mData)
-		this->previewFileSlot(mData->getValue());
+		this->previewFileSlot(mData->getEmbeddedPath().getAbsoluteFilepath());
 }
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {

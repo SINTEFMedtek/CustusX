@@ -69,6 +69,7 @@ private:
 	vtkImageDataPtr mRawResult;
 	QProcess* mProcess;
 	QString mOutputChannelName;
+	QString mScriptPathAddition;
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
