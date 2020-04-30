@@ -14,6 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
+//#include "cxDataLocations.h"
+#include "cxPatientModelService.h"
 
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
@@ -164,20 +166,6 @@ FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 	return mScriptFile;
 }
 
-StringPropertyPtr GenericScriptFilter::setScriptOutput(QDomElement root)
-{
-	// Not currently active, intended use: Show script output
-	QString scriptOutput;
-	scriptOutput.append("File output goes here.");
-	scriptOutput.append("More text.");
-
-	return StringProperty::initialize("terminalOutput", "Script output",
-												 "Used for...",
-												 scriptOutput, root);
-
-	// How to set multiline output?
-}
-
 FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 {
 	QStringList paths;
@@ -208,13 +196,22 @@ void GenericScriptFilter::scriptFileChanged()
 	mScriptFilePreview->setValue(mScriptFile->getValue());
 }
 
-QString GenericScriptFilter::createCommandString(QString inputFile)
+QString GenericScriptFilter::createCommandString(QString inputFilePath)
 {
-	QString retval;
+//	QString parameterFile = mScriptFile->getValue();
+//	CX_LOG_DEBUG() << "Parameter file: " << parameterFile;
+
+	CX_LOG_DEBUG() << "Input file: " << inputFilePath;
+	QString profilePath = profile()->getPath()+mScriptPathAddition;
+	CX_LOG_DEBUG() << "Path to parameter file: " << profilePath;
+	QString dataPath = mPatientModelService->getActivePatientFolder();
+	CX_LOG_DEBUG() << "Path to Data: " << dataPath;
+
+
 	// Parse .ini file, build command
-	retval.append(" " + inputFile);
-	// Append more parameters if required
-	return retval;
+	QString commandString = "no_command_yet";
+
+	return commandString;
 }
 
 void GenericScriptFilter::runCommandString(QString command)
@@ -248,31 +245,26 @@ void GenericScriptFilter::createOutputTypes()
 bool GenericScriptFilter::execute()
 {
 	ImagePtr input = this->getCopiedInputImage();
+	QString inputFilePath = input->getFilename();
+	// get output also?
 	if (!input)
 		return false;
-	QString inputFile = input->getName();
-	CX_LOG_DEBUG() << "inputFile name: " << inputFile;
 
 	// Parse .ini file, create command string to run
-	QString command = this->createCommandString(inputFile);
+	QString command = this->createCommandString(inputFilePath);
 
 	// Run command string on console
 	this->runCommandString(command);
 
-	// Monitor output, automatic?
-
-
-	return true;
+	return true; // Check for error?
 }
 
 bool GenericScriptFilter::postProcess()
 {
-	// Check resulting file (if created)
-
 	if (!mRawResult)
 		return false;
 
-	// More code here
+	// More code here?
 
 	return true;
 

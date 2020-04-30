@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxFilterImpl.h"
 #include <QProcess>
+#include "cxSettings.h"
 
 
 namespace cx
@@ -43,8 +44,8 @@ public:
 
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
-	StringPropertyPtr setScriptOutput(QDomElement root);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
+	PatientModelServicePtr mPatientModelService;
 
 protected:
 	virtual void createOptions();
@@ -54,7 +55,8 @@ protected:
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
-	QString createCommandString(QString inputFile);
+	QString createCommandString(QString inputFilePath);
+	QString getCustomPath();
 	void runCommandString(QString command);
 
 protected slots:
