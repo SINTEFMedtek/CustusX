@@ -42,6 +42,8 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
+	QProcess* mProcess;
+
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
@@ -69,7 +71,6 @@ protected slots:
 
 private:
 	vtkImageDataPtr mRawResult;
-	QProcess* mProcess;
 	QString mOutputChannelName;
 	QString mScriptPathAddition;
 };
