@@ -204,7 +204,7 @@ QString GenericScriptFilter::createCommandString(QString inputFilePath)
 	CX_LOG_DEBUG() << "Input file: " << inputFilePath;
 	QString profilePath = profile()->getPath()+mScriptPathAddition;
 	CX_LOG_DEBUG() << "Path to parameter file: " << profilePath;
-	QString dataPath = mPatientModelService->getActivePatientFolder();
+	QString dataPath = mServices->patient()->getActivePatientFolder();
 	CX_LOG_DEBUG() << "Path to Data: " << dataPath;
 
 
@@ -245,10 +245,11 @@ void GenericScriptFilter::createOutputTypes()
 bool GenericScriptFilter::execute()
 {
 	ImagePtr input = this->getCopiedInputImage();
-	QString inputFilePath = input->getFilename();
 	// get output also?
 	if (!input)
 		return false;
+
+	QString inputFilePath = input->getFilename();
 
 	// Parse .ini file, create command string to run
 	QString command = this->createCommandString(inputFilePath);
