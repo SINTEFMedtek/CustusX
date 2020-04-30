@@ -196,20 +196,23 @@ void GenericScriptFilter::scriptFileChanged()
 	mScriptFilePreview->setValue(mScriptFile->getValue());
 }
 
-QString GenericScriptFilter::createCommandString(QString inputFilePath)
+QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
-//	QString parameterFile = mScriptFile->getValue();
-//	CX_LOG_DEBUG() << "Parameter file: " << parameterFile;
-
-	CX_LOG_DEBUG() << "Input file: " << inputFilePath;
-	QString profilePath = profile()->getPath()+mScriptPathAddition;
-	CX_LOG_DEBUG() << "Path to parameter file: " << profilePath;
+	// Get paths
+	QString parameterFile = mScriptFile->getValue();
+	QString inputFilePath = input->getFilename();
+	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
+	parameterFilePath.append("/" + parameterFile);
 	QString dataPath = mServices->patient()->getActivePatientFolder();
-	CX_LOG_DEBUG() << "Path to Data: " << dataPath;
-
+	dataPath.append("/" + inputFilePath);
 
 	// Parse .ini file, build command
-	QString commandString = "no_command_yet";
+	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	settings.beginGroup("script");
+	QString commandString = settings.value("path").toString();
+	commandString.append(" " + dataPath);
+	commandString.append(" " + settings.value("arguments").toString());
+	settings.endGroup();
 
 	return commandString;
 }
@@ -249,10 +252,8 @@ bool GenericScriptFilter::execute()
 	if (!input)
 		return false;
 
-	QString inputFilePath = input->getFilename();
-
 	// Parse .ini file, create command string to run
-	QString command = this->createCommandString(inputFilePath);
+	QString command = this->createCommandString(input);
 
 	// Run command string on console
 	this->runCommandString(command);

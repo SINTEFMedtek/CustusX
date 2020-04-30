@@ -51,7 +51,7 @@ protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
-	QString createCommandString(QString inputFile);
+	QString createCommandString(ImagePtr input);
 	void runCommandString(QString command);
 	QString getCustomPath();
 
