@@ -47,7 +47,8 @@ public:
 	}
 	QProcess* getProcess()
 	{
-		return mProcess;
+		//return mProcess;
+		return mCommandLine->getProcess();
 	}
 };
 
@@ -197,13 +198,23 @@ TEST_CASE("GenericScriptFilter: Test running of external process", "[unit]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
-	QProcess* process = filter->getProcess();
+	//QProcess* process = filter->getProcess();//Cannot use process here as it is in a separate thread?
 
 	QString invalidCommand("zzz");
 	filter->testRunCommandString(invalidCommand);
-	REQUIRE_FALSE(process->waitForFinished(3000));
+	REQUIRE_FALSE(filter->getProcess()->waitForStarted());
+	REQUIRE_FALSE(filter->getProcess()->waitForFinished());
 
 	QString validCommand("date");//or echo
 	filter->testRunCommandString(validCommand);
-	REQUIRE(process->waitForFinished(3000));
+	REQUIRE(filter->getProcess()->waitForFinished());
+}
+
+TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit]")
+{
+	QString command = QString("date");
+	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper("ScriptFilter"));
+	exe->launch(command);
+	REQUIRE(exe->waitForStarted());
+	REQUIRE(exe->waitForFinished());
 }

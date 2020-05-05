@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxGenericScriptFilter.h"
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
+#include <QTimer>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -39,33 +40,24 @@ namespace cx
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services),
 	mOutputChannelName("ExternalScript"),
-	mScriptPathAddition("/Filter-Scripts")
+	mScriptPathAddition("/Filter-Scripts"),
+	mCommandLine(NULL)
 {
-	//Copied QProsess example from ElastixExecuter
-	mProcess = new QProcess(this);
-	connect(mProcess, &QProcess::stateChanged, this, &GenericScriptFilter::processStateChanged);
-	//connect(mProcess, &QProcess::errorOccurred, this, &GenericScriptFilter::processError); //Not working with old Qt. Using below line instead
-	connect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
-
-	//Ubuntu 16.04 build machine cannot use this new Qt functionality
-	//connect(mProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-	//				[=](int exitCode, QProcess::ExitStatus exitStatus){ this->GenericScriptFilter::processFinished(exitCode, exitStatus); });
-	//Reverting to old style
-	connect(mProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
-
-	//Show output from process
-	connect(mProcess, &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-	connect(mProcess, &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 }
 
 GenericScriptFilter::~GenericScriptFilter()
 {
-	disconnect(mProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
-	mProcess->close();
 }
 
-void GenericScriptFilter::processStateChanged(QProcess::ProcessState newState)
+void GenericScriptFilter::processStateChanged()
 {
+	if(!mCommandLine || !mCommandLine->getProcess())
+	{
+		CX_LOG_ERROR() << "GenericScriptFilter::processStateChanged: Process not existing!";
+		return;
+	}
+
+	QProcess::ProcessState newState = mCommandLine->getProcess()->state();
 	if (newState == QProcess::Running)
 	{
 		CX_LOG_DEBUG() << "GenericScriptFilter process running";
@@ -122,12 +114,14 @@ void GenericScriptFilter::processError(QProcess::ProcessError error)
 
 void GenericScriptFilter::processReadyRead()
 {
-	CX_LOG_CHANNEL_INFO(mOutputChannelName) << QString(mProcess->readAllStandardOutput());
+	QProcess* process = mCommandLine->getProcess();
+	CX_LOG_CHANNEL_INFO(mOutputChannelName) << QString(process->readAllStandardOutput());
 }
 
 void GenericScriptFilter::processReadyReadError()
 {
-	CX_LOG_CHANNEL_ERROR(mOutputChannelName) << QString(mProcess->readAllStandardError());
+	QProcess* process = mCommandLine->getProcess();
+	CX_LOG_CHANNEL_ERROR(mOutputChannelName) << QString(process->readAllStandardError());
 }
 
 QString GenericScriptFilter::getName() const
@@ -221,7 +215,14 @@ void GenericScriptFilter::runCommandString(QString command)
 {
 	CX_LOG_DEBUG() << "Command to run: " << command;
 
-	mProcess->start(command);
+	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
+	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
+	createProcess();
+
+	mCommandLine->launch(command);//TODO: Split out arguments in QStringList?
+	//mCommandLine->waitForStarted();
+
+
 }
 
 void GenericScriptFilter::createInputTypes()
@@ -258,16 +259,64 @@ bool GenericScriptFilter::execute()
 	// Run command string on console
 	this->runCommandString(command);
 
+	//bool finished = mCommandLine->waitForFinished(30000);
+	//if(!finished)
+	//	CX_LOG_ERROR() << "GenericScriptFilter::execute: Running process failed";
+	this->disconnectProcess();
+	//QTimer::singleShot(3000, this, &GenericScriptFilter::deleteProcess);
+
 	return true; // Check for error?
+}
+
+
+void GenericScriptFilter::createProcess()
+{
+	mCommandLine.reset();//delete
+	CX_LOG_DEBUG() << "createProcess";
+	if(mCommandLine)
+	{
+		CX_LOG_WARNING() << "Process already created";
+		return;
+	}
+	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
+	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+	//Show output from process
+	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+}
+
+void GenericScriptFilter::deleteProcess()
+{
+	CX_LOG_DEBUG() << "deleteProcess";
+	if(mCommandLine)
+	{
+		CX_LOG_DEBUG() << "deleting";
+		mCommandLine.reset();
+	}
+}
+
+void GenericScriptFilter::disconnectProcess()
+{
+	CX_LOG_DEBUG() << "disconnectProcess";
+	if(mCommandLine)
+	{
+		CX_LOG_DEBUG() << "disconnecting";
+		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+	}
 }
 
 bool GenericScriptFilter::postProcess()
 {
+	CX_LOG_DEBUG() << "postProcess";
+	//disconnectProcess();
+	//this->deleteProcess();
+	//QTimer::singleShot(0, this, &GenericScriptFilter::deleteProcess);
 	if (!mRawResult)
 		return false;
 
 	// More code here?
-
 	return true;
 
 }

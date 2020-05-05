@@ -1,19 +1,20 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef CXGENERICSCRIPTFILTER_H
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
-#include <QProcess>
+//#include <QProcess>
 #include "cxSettings.h"
+#include "cxProcessWrapper.h"
 
 
 namespace cx
@@ -59,17 +60,21 @@ protected:
 	FilePreviewPropertyPtr mScriptFilePreview;
 
 	vtkImageDataPtr mRawResult;
-	QProcess* mProcess;
 	QString mOutputChannelName;
 	QString mScriptPathAddition;
+	//QProcess* mProcess;
+	ProcessWrapperPtr mCommandLine;
 
 protected slots:
 	void scriptFileChanged();
-	void processStateChanged(QProcess::ProcessState newState);
+	void processStateChanged();//QProcess::ProcessState newState);
 	void processFinished(int code, QProcess::ExitStatus status);
 	void processError(QProcess::ProcessError error);
 	void processReadyRead();
 	void processReadyReadError();
+	void createProcess();
+	void deleteProcess();
+	void disconnectProcess();
 
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
