@@ -53,7 +53,7 @@ protected:
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 	QString createCommandString(ImagePtr input);
-	void runCommandStringAndWait(QString command);
+	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
 
 	FilePathPropertyPtr mScriptFile;
@@ -72,9 +72,9 @@ protected slots:
 	void processError(QProcess::ProcessError error);
 	void processReadyRead();
 	void processReadyReadError();
-	void createProcess();
-	void deleteProcess();
-	void disconnectProcess();
+	bool createProcess();
+	bool deleteProcess();
+	bool disconnectProcess();
 
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;

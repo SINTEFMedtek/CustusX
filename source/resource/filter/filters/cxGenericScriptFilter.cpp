@@ -211,7 +211,7 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	return commandString;
 }
 
-void GenericScriptFilter::runCommandStringAndWait(QString command)
+bool GenericScriptFilter::runCommandStringAndWait(QString command)
 {
 	CX_LOG_DEBUG() << "Command to run: " << command;
 
@@ -219,9 +219,7 @@ void GenericScriptFilter::runCommandStringAndWait(QString command)
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
 	mCommandLine->launch(command);
-	mCommandLine->waitForFinished();
-
-
+	return mCommandLine->waitForFinished();
 }
 
 void GenericScriptFilter::createInputTypes()
@@ -259,30 +257,31 @@ bool GenericScriptFilter::execute()
 	//command = QString("date");//Test simple command
 
 	// Run command string on console
-	this->runCommandStringAndWait(command);
-	deleteProcess();
+	bool retval = this->runCommandStringAndWait(command);
+	retval = retval & deleteProcess();
 
-	return true; // Check for error?
+	return retval; // Check for error?
 }
 
 
-void GenericScriptFilter::createProcess()
+bool GenericScriptFilter::createProcess()
 {
 	mCommandLine.reset();//delete
 	CX_LOG_DEBUG() << "createProcess";
 	if(mCommandLine)
 	{
 		CX_LOG_WARNING() << "Process already created";
-		return;
+		return false;
 	}
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
 	//connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	//Show output from process
 	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
 	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+	return true;
 }
 
-void GenericScriptFilter::deleteProcess()
+bool GenericScriptFilter::deleteProcess()
 {
 	disconnectProcess();
 	CX_LOG_DEBUG() << "deleteProcess";
@@ -290,10 +289,12 @@ void GenericScriptFilter::deleteProcess()
 	{
 		CX_LOG_DEBUG() << "deleting";
 		mCommandLine.reset();
+		return true;
 	}
+	return false;
 }
 
-void GenericScriptFilter::disconnectProcess()
+bool GenericScriptFilter::disconnectProcess()
 {
 	CX_LOG_DEBUG() << "disconnectProcess";
 	if(mCommandLine)
@@ -302,7 +303,9 @@ void GenericScriptFilter::disconnectProcess()
 		//disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
 		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+		return true;
 	}
+	return false;
 }
 
 bool GenericScriptFilter::postProcess()
