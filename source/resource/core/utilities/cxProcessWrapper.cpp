@@ -78,6 +78,11 @@ bool ProcessWrapper::waitForFinished(int msecs)
 	return mProcess->waitForFinished(msecs);
 }
 
+void ProcessWrapper::turnOffReporting()
+{
+	mReporter.reset();
+}
+
 QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
 {
 	QString absolutePathToExe = exeInBundle;

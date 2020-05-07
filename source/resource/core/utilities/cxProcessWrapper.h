@@ -57,6 +57,7 @@ public:
 	qint64 write(const char * data);
 	bool waitForStarted(int msecs = 30000);
 	bool waitForFinished(int msecs = 30000);
+	void turnOffReporting();
 
 signals:
 	void stateChanged();
