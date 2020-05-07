@@ -53,7 +53,8 @@ void GenericScriptFilter::processStateChanged()
 {
 	if(!mCommandLine || !mCommandLine->getProcess())
 	{
-		CX_LOG_ERROR() << "GenericScriptFilter::processStateChanged: Process not existing!";
+		//Seems like this slot may get called after mCommandLine process is deleted
+		//CX_LOG_ERROR() << "GenericScriptFilter::processStateChanged: Process not existing!";
 		return;
 	}
 
@@ -114,12 +115,18 @@ void GenericScriptFilter::processError(QProcess::ProcessError error)
 
 void GenericScriptFilter::processReadyRead()
 {
+	if(!mCommandLine || !mCommandLine->getProcess())
+		return;
+
 	QProcess* process = mCommandLine->getProcess();
 	CX_LOG_CHANNEL_INFO(mOutputChannelName) << QString(process->readAllStandardOutput());
 }
 
 void GenericScriptFilter::processReadyReadError()
 {
+	if(!mCommandLine || !mCommandLine->getProcess())
+		return;
+
 	QProcess* process = mCommandLine->getProcess();
 	CX_LOG_CHANNEL_ERROR(mOutputChannelName) << QString(process->readAllStandardError());
 }
@@ -245,7 +252,9 @@ void GenericScriptFilter::createOutputTypes()
 
 bool GenericScriptFilter::execute()
 {
-	createProcess();
+	if (!createProcess())
+		return false;
+
 	ImagePtr input = this->getCopiedInputImage();
 	// get output also?
 	if (!input)
@@ -254,7 +263,7 @@ bool GenericScriptFilter::execute()
 	// Parse .ini file, create command string to run
 	QString command = this->createCommandString(input);
 
-	//command = QString("date");//Test simple command
+	//command = QString("echo test");//Test simple command
 
 	// Run command string on console
 	bool retval = this->runCommandStringAndWait(command);
@@ -268,16 +277,14 @@ bool GenericScriptFilter::createProcess()
 {
 	mCommandLine.reset();//delete
 	CX_LOG_DEBUG() << "createProcess";
-	if(mCommandLine)
-	{
-		CX_LOG_WARNING() << "Process already created";
-		return false;
-	}
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
-	//connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+	//mCommandLine->turnOffReporting();//Seems like it's still not working. GenericScriptFilter::processReadyRead gets called after prosess is deleted?
+
+	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	//Show output from process
-	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+	//Looks like this may not work: ProcessReporter (used from ProcessWrapper) is already printing the output
+	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 	return true;
 }
 
@@ -300,9 +307,9 @@ bool GenericScriptFilter::disconnectProcess()
 	if(mCommandLine)
 	{
 		CX_LOG_DEBUG() << "disconnecting";
-		//disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
-		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 		return true;
 	}
 	return false;

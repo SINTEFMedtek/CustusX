@@ -67,7 +67,7 @@ protected:
 
 protected slots:
 	void scriptFileChanged();
-	void processStateChanged();//QProcess::ProcessState newState);
+	void processStateChanged();
 	void processFinished(int code, QProcess::ExitStatus status);
 	void processError(QProcess::ProcessError error);
 	void processReadyRead();

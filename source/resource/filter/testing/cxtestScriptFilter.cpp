@@ -29,8 +29,10 @@ typedef boost::shared_ptr<class TestGenericScriptFilter> TestGenericScriptFilter
 class TestGenericScriptFilter : public cx::GenericScriptFilter
 {
 public:
+	bool mGotOutput;
 	TestGenericScriptFilter() :
-		GenericScriptFilter(cx::VisServices::getNullObjects())
+		GenericScriptFilter(cx::VisServices::getNullObjects()),
+		mGotOutput(false)
 	{}
 	void testCreateOptions()
 	{
@@ -52,6 +54,26 @@ public:
 	bool testDeleteProcess()
 	{
 		return deleteProcess();
+	}
+	cx::ProcessWrapperPtr getProcessWrapper()
+	{
+		return mCommandLine;
+	}
+	void connectTestSlotsAndTurnOffOtherReporting()
+	{
+		mCommandLine->turnOffReporting();
+		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &cxtest::TestGenericScriptFilter::processReadyRead);
+		connect(this->getProcessWrapper()->getProcess(), &QProcess::readyReadStandardOutput, this, &cxtest::TestGenericScriptFilter::testProcessReadyRead);
+	}
+
+public slots:
+	void testProcessReadyRead()
+	{
+		mGotOutput = true;
+		QString output = QString(this->getProcessWrapper()->getProcess()->readAllStandardOutput());
+		if(output.size() == 0)
+			mGotOutput = false;
+		CX_LOG_DEBUG() << "cxtest::ProcessReadyRead: " << output;
 	}
 };
 
@@ -219,4 +241,15 @@ TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit]")
 	exe->launch(command);
 	REQUIRE(exe->waitForStarted());
 	REQUIRE(exe->waitForFinished());
+}
+
+TEST_CASE("GenericScriptFilter: Get output from process", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+	QString validCommand("echo  test");
+	REQUIRE(filter->testCreateProcess());
+	filter->connectTestSlotsAndTurnOffOtherReporting();
+	REQUIRE(filter->testRunCommandString(validCommand));
+	CHECK(filter->mGotOutput);
+	REQUIRE(filter->testDeleteProcess());
 }
