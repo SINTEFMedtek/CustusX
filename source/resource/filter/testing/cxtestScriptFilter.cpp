@@ -38,7 +38,7 @@ public:
 	}
 	void testRunCommandString(QString command)
 	{
-		this->runCommandString(command);
+		this->runCommandStringAndWait(command);
 	}
 
 	std::vector<cx::PropertyPtr> getOptionsAdapters()
@@ -174,7 +174,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
+TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit][hide]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
@@ -194,7 +194,7 @@ TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
 	REQUIRE(scriptSelectorOption);
 }
 
-TEST_CASE("GenericScriptFilter: Test running of external process", "[unit]")
+TEST_CASE("GenericScriptFilter: Test running of external process", "[unit][hide]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 

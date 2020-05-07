@@ -53,7 +53,7 @@ protected:
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 	QString createCommandString(ImagePtr input);
-	void runCommandString(QString command);
+	void runCommandStringAndWait(QString command);
 	QString getCustomPath();
 
 	FilePathPropertyPtr mScriptFile;
