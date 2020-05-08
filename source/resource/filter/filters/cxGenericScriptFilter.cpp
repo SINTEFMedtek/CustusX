@@ -222,9 +222,10 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 {
 	CX_LOG_DEBUG() << "Command to run: " << command;
 
-	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
-	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
+	QString scriptWorkingDir = profile()->getPath()+mScriptPathAddition;
+	CX_LOG_DEBUG() << "scriptWorkingDir: " << scriptWorkingDir;
 
+	mCommandLine->getProcess()->setWorkingDirectory(scriptWorkingDir);
 	mCommandLine->launch(command);
 	return mCommandLine->waitForFinished();
 }
