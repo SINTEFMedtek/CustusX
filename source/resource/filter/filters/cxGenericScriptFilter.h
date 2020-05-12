@@ -55,6 +55,8 @@ protected:
 	QString createCommandString(ImagePtr input);
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
+	bool readGeneratedSegmentationFile();
+	QString getInputFilePath(ImagePtr input);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

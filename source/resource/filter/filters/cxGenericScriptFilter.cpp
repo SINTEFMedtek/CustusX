@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxGenericScriptFilter.h"
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <QTimer>
+#include <QFileInfo>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -27,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 
 #include "cxPatientModelService.h"
+#include "cxFileManagerService.h"
 #include "cxVolumeHelpers.h"
 #include "cxVisServices.h"
 #include "cxFilePreviewProperty.h"
@@ -201,21 +203,27 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	// Get paths
 	QString parameterFile = mScriptFile->getValue();
-	QString inputFilePath = input->getFilename();
 	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
 	parameterFilePath.append("/" + parameterFile);
-	QString dataPath = mServices->patient()->getActivePatientFolder();
-	dataPath.append("/" + inputFilePath);
+	QString inputFilePath = getInputFilePath(input);
 
 	// Parse .ini file, build command
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("script");
 	QString commandString = settings.value("path").toString();
-	commandString.append(" " + dataPath);
+	commandString.append(" " + inputFilePath);
 	commandString.append(" " + settings.value("arguments").toString());
 	settings.endGroup();
 
 	return commandString;
+}
+
+QString GenericScriptFilter::getInputFilePath(ImagePtr input)
+{
+	QString inputFileName = input->getFilename();
+	QString inputFilePath = mServices->patient()->getActivePatientFolder();
+	inputFilePath.append("/" + inputFileName);
+	return inputFilePath;
 }
 
 bool GenericScriptFilter::runCommandStringAndWait(QString command)
@@ -319,14 +327,55 @@ bool GenericScriptFilter::disconnectProcess()
 bool GenericScriptFilter::postProcess()
 {
 	CX_LOG_DEBUG() << "postProcess";
-	if (!mRawResult)
-		return false;
+
+	//if (!mRawResult)
+	//	return false;
 
 	// More code here?
-	return true;
+	return readGeneratedSegmentationFile();
 
 }
 
+bool GenericScriptFilter::readGeneratedSegmentationFile()
+{
+	//TODO: Look at ElastixManager::addNonlinearData() for reading and adding new volume
+
+	ImagePtr parentImage = this->getCopiedInputImage();
+	if(!parentImage)
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No input image";
+		return false;
+	}
+	QString uid = parentImage->getUid() + "_seg%1";
+	QString imageName = parentImage->getName()+" seg%1";
+	QString fileName = getInputFilePath(parentImage);//TODO: Replace testcode with name of new file
+	CX_LOG_DEBUG() << "Read new file: " << fileName;
+	if (!QFileInfo(fileName).exists())
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Cannot find new file: " << fileName;
+		return false;
+	}
+
+	ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, fileName));
+	if(!newImage)
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No new image file created";
+		return false;
+	}
+	if(!newImage->getBaseVtkImageData())
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: New image file has no data";
+		return false;
+	}
+	ImagePtr derivedImage = createDerivedImage(mServices->patient(),
+										 uid, imageName,
+										 newImage->getBaseVtkImageData(), parentImage);
+	derivedImage->setImageType(istSEGMENTATION);//Mark with correct type
+
+	mServices->patient()->insertData(derivedImage);
+
+	return true;
+}
 
 } // namespace cx
 

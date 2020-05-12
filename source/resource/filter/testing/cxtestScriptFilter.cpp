@@ -34,6 +34,10 @@ public:
 		GenericScriptFilter(cx::VisServices::getNullObjects()),
 		mGotOutput(false)
 	{}
+	TestGenericScriptFilter(cx::VisServicesPtr services) :
+		GenericScriptFilter(services),
+		mGotOutput(false)
+	{}
 	void testCreateOptions()
 	{
 		createOptions();
@@ -64,6 +68,10 @@ public:
 		mCommandLine->turnOffReporting();
 		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &cxtest::TestGenericScriptFilter::processReadyRead);
 		connect(this->getProcessWrapper()->getProcess(), &QProcess::readyReadStandardOutput, this, &cxtest::TestGenericScriptFilter::testProcessReadyRead);
+	}
+	bool testReadGeneratedSegmentationFile()
+	{
+		return readGeneratedSegmentationFile();
 	}
 
 public slots:
@@ -130,15 +138,15 @@ public slots:
 		}
 	}
 
-	cx::DataPtr getTestData(cx::PatientModelServicePtr patient, cx::FileManagerServicePtr filemanager)
+	cx::DataPtr getImportedTestData(cx::PatientModelServicePtr patient)
 	{
 		QString filename = cx::DataLocations::getTestDataPath()+ "/testing/DilationFilter/helix_seg.mhd";
 		QString info;
-		cx::DataPtr data = boost::dynamic_pointer_cast<cxtest::PatientModelServiceMock>(patient)->importDataMock(filename, info, filemanager);
+		cx::DataPtr data = patient->importData(filename, info);
 		REQUIRE(data);
 		return data;
 	}
-}
+} //cxtest
 
 TEST_CASE("GenericScriptFilter: Create", "[unit]")
 {
@@ -161,12 +169,11 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
-	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
-	cxtest::TestVisServicesPtr dummyservices = cxtest::TestVisServices::create();
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(dummyservices));
+	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(services));
 	cxtest::checkFilterInit(filter, false, false);
-	cx::DataPtr data = cxtest::getTestData(dummyservices->patient(), filemanager);
+	cx::DataPtr data = cxtest::getImportedTestData(services->patient());
 
 	//Set input
 	std::vector < cx::SelectDataStringPropertyBasePtr > input = filter->getInputTypes();
@@ -191,9 +198,8 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	}
 	{
 		INFO("Post processing data from GenericScriptFilter failed.");
-		//TODO: Uncomment when filter got valid output
-		//REQUIRE(filter->postProcess());
-		//cxtest::checkFilterInit(filter, true, false);
+		REQUIRE(filter->postProcess());
+		cxtest::checkFilterInit(filter, true, false);
 	}
 
 	cx::LogicManager::shutdown();
@@ -252,4 +258,30 @@ TEST_CASE("GenericScriptFilter: Get output from process", "[integration]")
 	REQUIRE(filter->testRunCommandString(validCommand));
 	CHECK(filter->mGotOutput);
 	REQUIRE(filter->testDeleteProcess());
+}
+
+TEST_CASE("GenericScriptFilter: Read generated file fails with no input", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+	REQUIRE_FALSE(filter->testReadGeneratedSegmentationFile());
+}
+
+TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
+{
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
+	cx::DataPtr data = cxtest::getImportedTestData(services->patient());
+	REQUIRE(data);
+
+	//Set input
+	std::vector < cx::SelectDataStringPropertyBasePtr > input = filter->getInputTypes();
+	REQUIRE(input[0]->setValue(data->getUid()));
+
+	REQUIRE(filter->preProcess());
+	REQUIRE(filter->testReadGeneratedSegmentationFile());
+
+	cx::LogicManager::shutdown();
 }
