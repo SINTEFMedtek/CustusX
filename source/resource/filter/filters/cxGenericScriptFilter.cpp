@@ -374,6 +374,9 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 
 	mServices->patient()->insertData(derivedImage);
 
+	// set output
+	mOutputTypes.front()->setValue(derivedImage->getUid());
+
 	return true;
 }
 
