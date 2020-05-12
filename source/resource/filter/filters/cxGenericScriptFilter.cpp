@@ -370,6 +370,11 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 	ImagePtr derivedImage = createDerivedImage(mServices->patient(),
 										 uid, imageName,
 										 newImage->getBaseVtkImageData(), parentImage);
+	if(!derivedImage)
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Problem creating derived image";
+		return false;
+	}
 	derivedImage->setImageType(istSEGMENTATION);//Mark with correct type
 
 	mServices->patient()->insertData(derivedImage);

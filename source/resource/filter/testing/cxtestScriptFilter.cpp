@@ -199,7 +199,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	{
 		INFO("Post processing data from GenericScriptFilter failed.");
 		REQUIRE(filter->postProcess());
-		cxtest::checkFilterInit(filter, true, false);
+		cxtest::checkFilterInit(filter, true, true);
 	}
 
 	cx::LogicManager::shutdown();
