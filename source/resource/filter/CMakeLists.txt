@@ -42,6 +42,7 @@ target_link_libraries(cxResourceFilter
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
 
 cx_add_non_source_file("doc/org.custusx.resource.filter.md")
+cx_add_non_source_file("doc/org.custusx.resource.filter.script.md")
 
 add_subdirectory(testing)
 
