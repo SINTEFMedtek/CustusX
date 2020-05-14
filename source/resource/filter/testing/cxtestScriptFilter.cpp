@@ -225,7 +225,7 @@ TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
 	REQUIRE(scriptSelectorOption);
 }
 
-TEST_CASE("GenericScriptFilter: Test running of external process", "[integration]")
+TEST_CASE("GenericScriptFilter: Test running of external process", "[integration][hide]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
@@ -249,7 +249,7 @@ TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit]")
 	REQUIRE(exe->waitForFinished());
 }
 
-TEST_CASE("GenericScriptFilter: Get output from process", "[integration]")
+TEST_CASE("GenericScriptFilter: Get output from process", "[integration][hide]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 	QString validCommand("echo  test");
