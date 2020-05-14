@@ -276,9 +276,16 @@ TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
 	cx::DataPtr data = cxtest::getImportedTestData(services->patient());
 	REQUIRE(data);
 
-	//Set input
+	//Set input and create input variables
 	std::vector < cx::SelectDataStringPropertyBasePtr > input = filter->getInputTypes();
 	REQUIRE(input[0]->setValue(data->getUid()));
+
+	//Create output variables
+	std::vector < cx::SelectDataStringPropertyBasePtr > output = filter->getOutputTypes();
+	REQUIRE(output.size() > 0);
+
+	//Create options variales
+	filter->getOptions();
 
 	REQUIRE(filter->preProcess());
 	REQUIRE(filter->testReadGeneratedSegmentationFile());

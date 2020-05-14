@@ -233,9 +233,16 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 	QString scriptWorkingDir = profile()->getPath()+mScriptPathAddition;
 	CX_LOG_DEBUG() << "scriptWorkingDir: " << scriptWorkingDir;
 
+	CX_ASSERT(mCommandLine);
 	mCommandLine->getProcess()->setWorkingDirectory(scriptWorkingDir);
-	mCommandLine->launch(command);
-	return mCommandLine->waitForFinished();
+	bool success = mCommandLine->launch(command);
+	if(success)
+		return mCommandLine->waitForFinished();
+	else
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
+		return false;
+	}
 }
 
 void GenericScriptFilter::createInputTypes()
@@ -380,6 +387,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 	mServices->patient()->insertData(derivedImage);
 
 	// set output
+	CX_ASSERT(mOutputTypes.size() > 0)
 	mOutputTypes.front()->setValue(derivedImage->getUid());
 
 	return true;

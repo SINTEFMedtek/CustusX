@@ -50,7 +50,7 @@ public:
 	QProcess *getProcess();
 
 	void launchWithRelativePath(QString executable, QStringList arguments = QStringList());
-	void launch(QString executable, QStringList argument = QStringList());
+	bool launch(QString executable, QStringList argument = QStringList());
 
 	bool isRunning();
 
@@ -64,7 +64,7 @@ signals:
 
 private:
 	QString getExecutableInBundlesAbsolutePath(QString exeInBundle);
-	void internalLaunch(QString executable, QStringList arguments);
+	bool internalLaunch(QString executable, QStringList arguments);
 
 	QPointer<QProcess> mProcess;
 	ProcessReporterPtr mReporter;
