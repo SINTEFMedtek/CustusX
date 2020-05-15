@@ -42,7 +42,7 @@ namespace cx
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services),
 	mOutputChannelName("ExternalScript"),
-	mScriptPathAddition("/Filter-Scripts"),
+	mScriptPathAddition("/filter_scripts"),
 	mCommandLine(NULL)
 {
 }
@@ -188,9 +188,7 @@ FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 void GenericScriptFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
-	// mOptionsAdapters.push_back(this->getScriptContent(mOptions));
 	mOptionsAdapters.push_back(this->getIniFileOption(mOptions));
-	// mOptionsAdapters.push_back(this->setScriptOutput(mOptions));
 
 }
 
@@ -206,12 +204,15 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
 	parameterFilePath.append("/" + parameterFile);
 	QString inputFilePath = getInputFilePath(input);
+	QString outputFilePath = getOutputFilePath(input);
+	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
 	// Parse .ini file, build command
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("script");
 	QString commandString = settings.value("path").toString();
 	commandString.append(" " + inputFilePath);
+	commandString.append(" " + outputFilePath);
 	commandString.append(" " + settings.value("arguments").toString());
 	settings.endGroup();
 
@@ -224,6 +225,30 @@ QString GenericScriptFilter::getInputFilePath(ImagePtr input)
 	QString inputFilePath = mServices->patient()->getActivePatientFolder();
 	inputFilePath.append("/" + inputFileName);
 	return inputFilePath;
+}
+
+QString GenericScriptFilter::getOutputFilePath(ImagePtr input)
+{
+	QFileInfo fi(input->getFilename());
+	QString outputFileName = fi.baseName();
+	QString outputFilePath = mServices->patient()->getActivePatientFolder();
+	CX_LOG_DEBUG() << "ActivePatientFolder (output): " << outputFilePath;
+	QString parameterFile = mScriptFile->getValue();
+	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
+	parameterFilePath.append("/" + parameterFile);
+
+	// Parse .ini file, get file_append
+	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	settings.beginGroup("output");
+	QString file_append = settings.value("file_append","_copy.mhd").toString();
+	settings.endGroup();
+
+	outputFileName.append(file_append);
+	outputFilePath.append("/" + fi.path());
+	outputFilePath.append("/" + outputFileName);
+	CX_LOG_DEBUG() << "outputFilePath: " << outputFilePath;
+
+	return outputFilePath;
 }
 
 bool GenericScriptFilter::runCommandStringAndWait(QString command)
@@ -335,10 +360,6 @@ bool GenericScriptFilter::postProcess()
 {
 	CX_LOG_DEBUG() << "postProcess";
 
-	//if (!mRawResult)
-	//	return false;
-
-	// More code here?
 	return readGeneratedSegmentationFile();
 
 }
@@ -355,7 +376,8 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 	}
 	QString uid = parentImage->getUid() + "_seg%1";
 	QString imageName = parentImage->getName()+" seg%1";
-	QString fileName = getInputFilePath(parentImage);//TODO: Replace testcode with name of new file
+	QString fileName = this->getOutputFilePath(parentImage);
+	//QString fileName = getInputFilePath(parentImage);//TODO: Replace testcode with name of new file
 	CX_LOG_DEBUG() << "Read new file: " << fileName;
 	if (!QFileInfo(fileName).exists())
 	{
