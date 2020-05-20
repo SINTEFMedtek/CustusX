@@ -405,10 +405,11 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 	}
 	//QString uid = parentImage->getUid() + "_seg%1";
 	//QString imageName = parentImage->getName()+" seg%1";
-	QString uid = parentImage->getUid() + mResultFileEnding;
-	QString imageName = parentImage->getName() + mResultFileEnding;
+	QString nameEnding = mResultFileEnding;
+	nameEnding.replace(".mhd", "");
+	QString uid = parentImage->getUid() + nameEnding;
+	QString imageName = parentImage->getName() + nameEnding;
 	QString fileName = this->getOutputFilePath(parentImage);
-	//QString fileName = getInputFilePath(parentImage);//TODO: Replace testcode with name of new file
 
 
 	//TODO: OVS testcode
