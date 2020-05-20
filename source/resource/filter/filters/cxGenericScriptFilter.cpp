@@ -273,7 +273,7 @@ QString GenericScriptFilter::getOutputFilePath(ImagePtr input)
 	mResultFileEnding = settings.value("file_append","_copy.mhd").toString();
 	settings.endGroup();
 
-	outputFileName.append(file_append);
+	outputFileName.append(mResultFileEnding);
 	outputFilePath.append("/" + fi.path());
 	outputFilePath.append("/" + outputFileName);
 	CX_LOG_DEBUG() << "outputFilePath: " << outputFilePath;
