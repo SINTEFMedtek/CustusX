@@ -73,6 +73,15 @@ public:
 	{
 		return readGeneratedSegmentationFile();
 	}
+	void setExampleScriptFile()
+	{
+		QString configPath = cx::DataLocations::getRootConfigPath();
+		//CX_LOG_DEBUG() << "config path: " << configPath;
+		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_example.ini";
+		CX_LOG_DEBUG() << "Using script file: " << scriptFile;
+
+		mScriptFile->setValueFromVariant(scriptFile);
+	}
 
 public slots:
 	void testProcessReadyRead()
@@ -171,7 +180,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	cx::DataLocations::setTestMode();
 	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-	cx::GenericScriptFilterPtr filter(new cx::GenericScriptFilter(services));
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
 	cxtest::checkFilterInit(filter, false, false);
 	cx::DataPtr data = cxtest::getImportedTestData(services->patient());
 
@@ -186,6 +195,8 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 		REQUIRE(input[0]->getData()->getName() == "helix_seg");
 	}
 
+	filter->setExampleScriptFile();
+
 	cxtest::checkFilterInit(filter, true, false);
 
 	// Execute
@@ -194,7 +205,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 		REQUIRE(filter->preProcess());
 	}
 	{
-		REQUIRE_FALSE(filter->execute());//TODO: Fix when we got valid data
+		REQUIRE(filter->execute());
 	}
 	{
 		INFO("Post processing data from GenericScriptFilter failed.");
@@ -287,7 +298,10 @@ TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
 	//Create options variales
 	filter->getOptions();
 
+	filter->setExampleScriptFile();//Init with example ini file
+
 	REQUIRE(filter->preProcess());
+	REQUIRE(filter->execute());
 	REQUIRE(filter->testReadGeneratedSegmentationFile());
 
 	cx::LogicManager::shutdown();
