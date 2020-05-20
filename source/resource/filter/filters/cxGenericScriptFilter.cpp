@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <QTimer>
 #include <QFileInfo>
+#include <QDir>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -200,9 +201,7 @@ void GenericScriptFilter::scriptFileChanged()
 QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	// Get paths
-	QString parameterFile = mScriptFile->getValue();
-	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
-	parameterFilePath.append("/" + parameterFile);
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 	QString inputFilePath = getInputFilePath(input);
 	QString outputFilePath = getOutputFilePath(input);
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
@@ -210,13 +209,45 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	// Parse .ini file, build command
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("script");
-	QString commandString = settings.value("path").toString();
+
+	//mResultFileEnding = settings.value("resultFileEnding").toString();
+	QString scriptFilePath = settings.value("path").toString();
+
+	QString commandString = scriptFilePath;
 	commandString.append(" " + inputFilePath);
 	commandString.append(" " + outputFilePath);
+	//TODO: OVS testcode
+	//commandString.append(" --input " + inputFilePath);
+	//if(!mResultFileEnding.isEmpty())
+	//	commandString.append(" --ending " + mResultFileEnding);
+
 	commandString.append(" " + settings.value("arguments").toString());
+
 	settings.endGroup();
 
 	return commandString;
+}
+
+QString GenericScriptFilter::getScriptPath()
+{
+	QString retval;
+
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
+
+	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	settings.beginGroup("script");
+	QString scriptFilePath = settings.value("path").toString();//input instead?
+	settings.endGroup();
+
+	scriptFilePath.replace("./","/");
+
+	retval = QFileInfo(parameterFilePath).absoluteDir().absolutePath()+QFileInfo(scriptFilePath).dir().path();
+	CX_LOG_DEBUG() << "Pyton script file path: " << retval;
+
+	retval = QFileInfo(parameterFilePath).absoluteDir().absolutePath();
+	CX_LOG_DEBUG() << "Using ini file path as script path: " << retval;
+
+	return retval;
 }
 
 QString GenericScriptFilter::getInputFilePath(ImagePtr input)
@@ -233,14 +264,13 @@ QString GenericScriptFilter::getOutputFilePath(ImagePtr input)
 	QString outputFileName = fi.baseName();
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	CX_LOG_DEBUG() << "ActivePatientFolder (output): " << outputFilePath;
-	QString parameterFile = mScriptFile->getValue();
-	QString parameterFilePath = profile()->getPath()+mScriptPathAddition;
-	parameterFilePath.append("/" + parameterFile);
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 
 	// Parse .ini file, get file_append
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("output");
-	QString file_append = settings.value("file_append","_copy.mhd").toString();
+	//QString file_append = settings.value("file_append","_copy.mhd").toString();
+	mResultFileEnding = settings.value("file_append","_copy.mhd").toString();
 	settings.endGroup();
 
 	outputFileName.append(file_append);
@@ -255,11 +285,10 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 {
 	CX_LOG_DEBUG() << "Command to run: " << command;
 
-	QString scriptWorkingDir = profile()->getPath()+mScriptPathAddition;
-	CX_LOG_DEBUG() << "scriptWorkingDir: " << scriptWorkingDir;
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 
 	CX_ASSERT(mCommandLine);
-	mCommandLine->getProcess()->setWorkingDirectory(scriptWorkingDir);
+	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
 	bool success = mCommandLine->launch(command);
 	if(success)
 		return mCommandLine->waitForFinished();
@@ -374,11 +403,19 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No input image";
 		return false;
 	}
-	QString uid = parentImage->getUid() + "_seg%1";
-	QString imageName = parentImage->getName()+" seg%1";
+	//QString uid = parentImage->getUid() + "_seg%1";
+	//QString imageName = parentImage->getName()+" seg%1";
+	QString uid = parentImage->getUid() + mResultFileEnding;
+	QString imageName = parentImage->getName() + mResultFileEnding;
 	QString fileName = this->getOutputFilePath(parentImage);
 	//QString fileName = getInputFilePath(parentImage);//TODO: Replace testcode with name of new file
-	CX_LOG_DEBUG() << "Read new file: " << fileName;
+
+
+	//TODO: OVS testcode
+	//QString fileName = mServices->patient()->getActivePatientFolder();
+	//fileName.append("/Images/" + uid + ".mhd");
+	//CX_LOG_DEBUG() << "Read new file: " << fileName;
+
 	if (!QFileInfo(fileName).exists())
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Cannot find new file: " << fileName;

@@ -56,6 +56,7 @@ protected:
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
 	bool readGeneratedSegmentationFile();
+	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);
 
@@ -67,6 +68,7 @@ protected:
 	QString mScriptPathAddition;
 	//QProcess* mProcess;
 	ProcessWrapperPtr mCommandLine;
+	QString mResultFileEnding;
 
 protected slots:
 	void scriptFileChanged();
