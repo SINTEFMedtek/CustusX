@@ -1,11 +1,12 @@
-#!/Users/torgriml/CustusS_settings/profiles/Laboratory/filter_scripts/scripts/python_example/venv/bin/python3.6
+#!/usr/bin/env python
+# Warning: In regular use, the above line should either refer to pyton2 or python3
 # Need to install a venv locally on the actual computer
 
 import sys
 import os
 import shutil
-import tkinter as tk
-from tkinter import filedialog
+#import tkinter as tk
+#from tkinter import filedialog
 from custus_utilities import custusVolume
 
 
