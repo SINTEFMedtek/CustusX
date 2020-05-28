@@ -265,7 +265,7 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D outpu
 	return retval;
 }
 
-vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D position_r, bool applyLUT)
+vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D position_r, Vector3D target_r, double offset, bool applyLUT)
 {
 	vtkImageDataPtr slicedImage = vtkImageDataPtr::New();
 
@@ -293,9 +293,16 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D posit
 
 	Eigen::Array3i dim(image->getBaseVtkImageData()->GetDimensions());
 
-	double center;
 	Transform3D positionTransform_d = rMd.inv() * createTransformTranslate(position_r);
 	vtkSmartPointer<vtkMatrix4x4> resliceAxes = vtkSmartPointer<vtkMatrix4x4>::New();
+
+	Transform3D targetTransform_d;
+	Vector3D direction;
+	Vector3D up(0, -1, 0);
+	Vector3D xAxis;
+	Vector3D yAxis;
+
+
 	switch (planeType)
 	{
 	case ptAXIAL:
@@ -310,7 +317,7 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D posit
 		resliceAxes->SetElement(2, 0, 0);
 		resliceAxes->SetElement(2, 1, 0);
 		resliceAxes->SetElement(2, 2, 1);
-		resliceAxes->SetElement(2, 3, positionTransform_d(2,3));
+		resliceAxes->SetElement(2, 3, positionTransform_d(2,3) + offset);
 		resliceAxes->SetElement(3, 0, 0);
 		resliceAxes->SetElement(3, 1, 0);
 		resliceAxes->SetElement(3, 2, 0);
@@ -326,7 +333,7 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D posit
 		resliceAxes->SetElement(1, 0, 0);
 		resliceAxes->SetElement(1, 1, 0);
 		resliceAxes->SetElement(1, 2, 1);
-		resliceAxes->SetElement(1, 3, positionTransform_d(1,3));
+		resliceAxes->SetElement(1, 3, positionTransform_d(1,3) + offset);
 		resliceAxes->SetElement(2, 0, 0);
 		resliceAxes->SetElement(2, 1, 1);
 		resliceAxes->SetElement(2, 2, 0);
@@ -351,6 +358,34 @@ vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeType, Vector3D posit
 		resliceAxes->SetElement(2, 1, 1);
 		resliceAxes->SetElement(2, 2, 0);
 		resliceAxes->SetElement(2, 3, 0);
+		resliceAxes->SetElement(3, 0, 0);
+		resliceAxes->SetElement(3, 1, 0);
+		resliceAxes->SetElement(3, 2, 0);
+		resliceAxes->SetElement(3, 3, 1);
+		imageReslicer->SetResliceAxes(resliceAxes);
+		imageReslicer->SetOutputExtent(0, dim[1], 0, dim[2], 0, 0);
+		break;
+	case ptRADIALPLANE:
+		targetTransform_d = rMd.inv() * createTransformTranslate(target_r);
+		direction(0) = targetTransform_d(0,3) - positionTransform_d(0,3);
+		direction(1) = targetTransform_d(1,3) - positionTransform_d(1,3);
+		direction(2) = targetTransform_d(2,3) - positionTransform_d(2,3);
+		direction = direction.normalized();
+		xAxis = crossproduct(up, direction).normalized();
+		yAxis = crossproduct(direction, xAxis).normalized();
+
+		resliceAxes->SetElement(0, 0, xAxis(0));
+		resliceAxes->SetElement(0, 1, yAxis(0));
+		resliceAxes->SetElement(0, 2, direction(0));
+		resliceAxes->SetElement(0, 3, positionTransform_d(0,3) + offset*direction(0));
+		resliceAxes->SetElement(1, 0, xAxis(1));
+		resliceAxes->SetElement(1, 1, yAxis(1));
+		resliceAxes->SetElement(1, 2, direction(1));
+		resliceAxes->SetElement(1, 3, positionTransform_d(1,3) + offset*direction(1));
+		resliceAxes->SetElement(2, 0, xAxis(2));
+		resliceAxes->SetElement(2, 1, yAxis(2));
+		resliceAxes->SetElement(2, 2, direction(2));
+		resliceAxes->SetElement(2, 3, positionTransform_d(2,3) + offset*direction(2));
 		resliceAxes->SetElement(3, 0, 0);
 		resliceAxes->SetElement(3, 1, 0);
 		resliceAxes->SetElement(3, 2, 0);
@@ -473,6 +508,15 @@ Vector3D get3DpositionFromSliceVoxel(ImagePtr image, PLANE_TYPE planeType, std::
 	position_r(2) = positionTransform_r(2,3);
 
 	return position_r;
+}
+
+Vector3D crossproduct(Vector3D A, Vector3D B)
+{
+	Vector3D R;
+	R(0) = A(1)*B(2)-A(2)*B(1);
+	R(1) = A(2)*B(0)-A(0)*B(2);
+	R(2) = A(0)*B(1)-A(1)*B(0);
+	return R;
 }
 
 
