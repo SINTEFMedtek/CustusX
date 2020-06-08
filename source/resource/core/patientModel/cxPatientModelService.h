@@ -95,7 +95,7 @@ public:
 	};
 
 	// core Data interface
-	virtual void insertData(DataPtr data) = 0;
+	virtual void insertData(DataPtr data, bool overWrite = false) = 0;
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter = HideUnavailable) const = 0;
 	virtual std::map<QString, DataPtr> getChildren(QString parent_uid, QString of_type="") const = 0;
 	/** Create Data object of given type.

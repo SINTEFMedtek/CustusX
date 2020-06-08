@@ -25,7 +25,7 @@ public:
 	PatientModelServiceMock();
 	virtual ~PatientModelServiceMock() {}
 
-	virtual void insertData(cx::DataPtr data);
+	virtual void insertData(cx::DataPtr data, bool overWrite = false);
 	virtual cx::DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, cx::DataPtr> getDatas(DataFilter filter) const;
 	virtual cx::DataPtr importDataMock(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager);
