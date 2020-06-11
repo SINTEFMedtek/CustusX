@@ -34,6 +34,7 @@ class Branch
 	Eigen::VectorXd mRadius;
 	branchVector mChildBranches;
 	BranchPtr mParentBranch;
+	double mBronchoscopeRotation = 0;
 public:
 	Branch();
 	virtual ~Branch();
@@ -53,6 +54,8 @@ public:
 	double findBranchRadius();
 	BranchPtr getParentBranch();
 	int findParentIndex(branchVector bv) const;
+	void setBronchoscopeRotation(double rotation);
+	double getBronchoscopeRotation();
 };
 
 

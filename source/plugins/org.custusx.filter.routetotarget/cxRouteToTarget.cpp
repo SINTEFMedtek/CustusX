@@ -567,13 +567,13 @@ double RouteToTarget::calculateBloodVesselRadius(Eigen::Vector3d position, Eigen
 	indexVector(2) = z;
 
 	Eigen::MatrixXd maxRadius(3,2);
-	Eigen::Vector3d perpendicularX = crossproduct(orientation, Eigen::Vector3d::UnitX());
+	Eigen::Vector3d perpendicularX = orientation.cross(Eigen::Vector3d::UnitX());
 	maxRadius(0,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularX, dim, spacing, 1);
 	maxRadius(0,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularX, dim, spacing, -1);
-	Eigen::Vector3d perpendicularY = crossproduct(orientation, Eigen::Vector3d::UnitY());
+	Eigen::Vector3d perpendicularY = orientation.cross(Eigen::Vector3d::UnitY());
 	maxRadius(1,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularY, dim, spacing, 1);
 	maxRadius(1,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularY, dim, spacing, -1);
-	Eigen::Vector3d perpendicularZ = crossproduct(orientation, Eigen::Vector3d::UnitZ());
+	Eigen::Vector3d perpendicularZ = orientation.cross(Eigen::Vector3d::UnitZ());
 	maxRadius(2,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularZ, dim, spacing, 1);
 	maxRadius(2,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularZ, dim, spacing, -1);
 
@@ -807,15 +807,6 @@ Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVec
 		positionsMatrix(2, i) = positionsVector[i](2);
 	}
 	return positionsMatrix;
-}
-
-Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B)
-{
-	Eigen::Vector3d R;
-	R(0) = A(1)*B(2)-A(2)*B(1);
-	R(1) = A(2)*B(0)-A(0)*B(2);
-	R(2) = A(0)*B(1)-A(1)*B(0);
-	return R;
 }
 
 double variance(Eigen::VectorXd X)

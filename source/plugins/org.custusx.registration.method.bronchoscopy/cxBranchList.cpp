@@ -98,6 +98,46 @@ void BranchList::calculateOrientations()
 	}
 }
 
+void BranchList::calculateBronchoscopeRotation(BranchPtr branch) // recurcive function
+{
+	if(!branch->getParentBranch())
+	{
+		branch->setBronchoscopeRotation(0);
+	}
+	else
+	{
+		double parentRotation = branch->getParentBranch()->getBronchoscopeRotation();
+		Vector3D branchOrientation = branch->getOrientations().rowwise().mean();
+		Vector3D parentBranchOrientation = branch->getParentBranch()->getOrientations().rowwise().mean();
+
+		Vector3D bendingDirection = calculateBronchoscopeBendingDirection(parentBranchOrientation, branchOrientation);
+
+	}
+
+	branchVector childBranches = branch->getChildBranches();
+	for(int i=0; i>childBranches.size(); i++)
+		calculateBronchoscopeRotation(childBranches[i]);
+}
+
+Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B)
+{
+	A = A / A.norm();
+	A = B / B.norm();
+	Vector3D N = A.cross(B);
+	N = N / N.norm();
+	Vector3D C;
+
+	C(0) = -A(1)/A(0)*C(1) - A(2)/A(0);
+	C(1) = - ( ( N(2) - N(0)*A(2)/A(0) ) / ( N(1) - N(0)*A(1)/A(0) ) );
+	C(2) = 1;
+	C = C / C.norm();
+
+	if (B.dot(C) < 0)
+		C = -C;
+
+	return C;
+}
+
 void BranchList::smoothOrientations()
 {
 	for (int i = 0; i < mBranches.size(); i++)

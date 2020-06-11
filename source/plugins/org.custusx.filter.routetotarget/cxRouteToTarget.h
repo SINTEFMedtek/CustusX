@@ -82,7 +82,6 @@ std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::v
 std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
-Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B);
 double variance(Eigen::VectorXd X);
 
 org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);

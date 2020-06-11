@@ -142,6 +142,16 @@ double Branch::findBranchRadius()
 		return 2;
 }
 
+void Branch::setBronchoscopeRotation(double rotation)
+{
+	mBronchoscopeRotation = rotation;
+}
+
+double Branch::getBronchoscopeRotation()
+{
+	return mBronchoscopeRotation;
+}
+
 
 Branch::~Branch()
 {
