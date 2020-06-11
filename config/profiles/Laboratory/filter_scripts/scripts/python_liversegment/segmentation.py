@@ -1,12 +1,15 @@
-#!/Users/torgriml/dev/environments/venv-offline/bin/python
+#! /Users/torgriml/CustusS_settings/profiles/Laboratory/filter_scripts/scripts/python_liversegment/venv/bin/python
 # Need to install a venv locally on the actual computer
 
 import sys
 import os
-from custus_utilities import custusVolume
+import numpy as np
+from custus_utilities import custusVolume, simpleView
 from livermask.livermask import get_model, data_pretransform, data_predict, data_posttransform, morph_postprocess
 from tensorflow.python.keras.models import load_model
-from scipy.ndimage import zoom
+
+debug = True  # Print extra info
+
 
 # Constants and input variables
 n_argin_expected = 2  # Expect input and output volume paths
@@ -15,11 +18,12 @@ img_size = 512
 input_image_path = ''
 output_image_path = ''
 
-# Print some initial info for debug
-print("Segmentation script is running. ")
-print("Python version: ", sys.version)
-print('Number of arguments:', len(sys.argv), 'arguments.')
-# print('Argument List:', str(sys.argv))
+if debug == True:
+    # Print some initial info for debug
+    print("Segmentation script is running. ")
+    print("Python version: ", sys.version)
+    print('Number of arguments:', len(sys.argv), 'arguments.')
+    # print('Argument List:', str(sys.argv))
 
 # Get input arguments
 if len(sys.argv) > n_argin_expected:  # command string is sys.argv[0]
@@ -45,7 +49,6 @@ model = load_model(model_path, compile=False)
 
 # Pre process
 data = input_volume.get_array()
-print('Data shape: ', data.shape)
 curr_shape = data.shape  # Remember original shape
 data = data_pretransform(data, img_size)
 
@@ -55,7 +58,6 @@ data = data_predict(data, model)
 # Post process
 data = data_posttransform(data, curr_shape, img_size)
 data = morph_postprocess(data)
-print('New data size: ', data.shape)
 
 # Update volume and save
 input_volume.save_volume(data, output_image_path)
