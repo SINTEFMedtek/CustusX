@@ -524,12 +524,18 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 }
 
 //Can be used instead of processCenterline(...) if you have a preprosessed branchList to be used in the registration process.
-void BronchoscopyRegistration::setBranchList(BranchListPtr branchList)
+void BronchoscopyRegistration::setBranchList(BranchListPtr branchList, int numberOfGenerations)
 {
 	if (!branchList)
 		return;
 
 	mBranchListPtr = branchList;
+
+	if (numberOfGenerations != 0)
+	{
+		mBranchListPtr->selectGenerations(numberOfGenerations);
+	}
+
 	mCenterlineProcessed = true;
 }
 
