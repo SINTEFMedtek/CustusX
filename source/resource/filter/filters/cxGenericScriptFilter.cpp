@@ -291,7 +291,7 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
 	bool success = mCommandLine->launch(command);
 	if(success)
-		return mCommandLine->waitForFinished();
+		return mCommandLine->waitForFinished(1000*60*15);//Wait at least 15 min
 	else
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
@@ -337,6 +337,8 @@ bool GenericScriptFilter::execute()
 
 	// Run command string on console
 	bool retval = this->runCommandStringAndWait(command);
+	if(!retval)
+		CX_LOG_WARNING() << "External process failed. QProcess::ProcessError: " << mCommandLine->getProcess()->error();
 	retval = retval & deleteProcess();
 
 	return retval; // Check for error?
@@ -360,7 +362,8 @@ bool GenericScriptFilter::createProcess()
 	* E.g. Use python -u
 	**************************************************************************/
 	//Show output from process
-	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+	connect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
 	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);//Not needed when we merge channels?
 	return true;
 }
@@ -385,7 +388,8 @@ bool GenericScriptFilter::disconnectProcess()
 	{
 		CX_LOG_DEBUG() << "disconnecting";
 		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
-		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
+		disconnect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
+		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
 		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 		return true;
 	}
