@@ -348,13 +348,20 @@ bool GenericScriptFilter::createProcess()
 	mCommandLine.reset();//delete
 	CX_LOG_DEBUG() << "createProcess";
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
-	//mCommandLine->turnOffReporting();//Seems like it's still not working. GenericScriptFilter::processReadyRead gets called after prosess is deleted?
+	mCommandLine->turnOffReporting();//Handle output in this class instead
+
+	// Merge channels to get all output in same channel in CustusX console
+	mCommandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
 
 	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
+
+	/**************************************************************************
+	* NB: For Python output to be written Python buffering must be turned off:
+	* E.g. Use python -u
+	**************************************************************************/
 	//Show output from process
-	//Looks like this may not work: ProcessReporter (used from ProcessWrapper) is already printing the output
 	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-	connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);//Not needed when we merge channels?
 	return true;
 }
 
@@ -379,7 +386,7 @@ bool GenericScriptFilter::disconnectProcess()
 		CX_LOG_DEBUG() << "disconnecting";
 		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
+		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 		return true;
 	}
 	return false;
