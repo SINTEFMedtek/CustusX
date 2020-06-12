@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSelectDataStringProperty.h"
 //#include "cxDataLocations.h"
 #include "cxPatientModelService.h"
+#include "cxViewService.h"
 
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
@@ -454,8 +455,10 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 		return false;
 	}
 	derivedImage->setImageType(istSEGMENTATION);//Mark with correct type
+	derivedImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
 
 	mServices->patient()->insertData(derivedImage);
+	mServices->view()->autoShowData(derivedImage);
 
 	// set output
 	CX_ASSERT(mOutputTypes.size() > 0)
