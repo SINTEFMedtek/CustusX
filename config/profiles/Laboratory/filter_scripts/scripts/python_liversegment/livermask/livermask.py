@@ -13,6 +13,7 @@ import warnings
 import matplotlib.pyplot as plt
 
 warnings.filterwarnings('ignore', '.*output shape of zoom.*')
+debug = True  # Print extra info
 
 
 class simpleView():
@@ -91,9 +92,13 @@ def data_predict(data, model):
 def morph_postprocess(data):
     # morphological post-processing
     print("morphological post-processing...")
+    if debug:
+        print('Data in: ', data.shape)
 
     # 1) first erode
     data = binary_erosion(data.astype(bool), ball(3)).astype(np.float32)
+    if debug:
+        print('Data eroded: ', data.shape)
 
     # 2) keep only largest connected component
     labels = label(data)
@@ -102,10 +107,14 @@ def morph_postprocess(data):
     for region in regions:
         area_sizes.append([region.label, region.area])
     area_sizes = np.array(area_sizes)
-    tmp = np.zeros_like(data)
-    tmp[labels == area_sizes[np.argmax(area_sizes[:, 1]), 0]] = 1
-    data = tmp.copy()
-    del tmp, labels, regions, area_sizes
+    if debug:
+        print('area_sizes: ', area_sizes)
+    if len(area_sizes > 1):
+        tmp = np.zeros_like(data)
+        tmp[labels == area_sizes[np.argmax(area_sizes[:, 1]), 0]] = 1
+        data = tmp.copy()
+        del tmp
+    del labels, regions, area_sizes
 
     # 3) dilate
     data = binary_dilation(data.astype(bool), ball(3))
@@ -136,9 +145,10 @@ def func(path, output):
     resampled_volume = resample_to_output(nib_volume, new_spacing, order=1)
     data = resampled_volume.get_data().astype('float32')
     curr_shape = data.shape
-    print('Original data shape: ', data.shape)
-    print('Min voxel value: ', data.min())
-    print('Max voxel value: ', data.max())
+    if debug:
+        print('Original data shape: ', data.shape)
+        print('Min voxel value: ', data.min())
+        print('Max voxel value: ', data.max())
 
     # resize to get (512, 512) output images
     img_size = 512
@@ -151,7 +161,8 @@ def func(path, output):
     # fix orientation
     data = np.rot90(data, k=1, axes=(0, 1))
     data = np.flip(data, axis=0)
-    print('Data for prediction, shape: ', data.shape)
+    if debug:
+        print('Data for prediction, shape: ', data.shape)
 
     print("predicting...")
     # predict on data

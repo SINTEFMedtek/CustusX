@@ -1,5 +1,5 @@
-#! /Users/torgriml/CustusS_settings/profiles/Laboratory/filter_scripts/scripts/python_liversegment/venv/bin/python
-# Need to install a venv locally on the actual computer
+#! /Users/torgriml/CustusS_settings/profiles/Laboratory/filter_scripts/scripts/python_liversegment/venv/bin/python -u
+# NB! Need to install a venv locally, and add full path to the environment in the shebang line above.
 
 import sys
 import os
