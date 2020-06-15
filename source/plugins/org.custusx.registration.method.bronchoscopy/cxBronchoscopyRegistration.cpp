@@ -317,11 +317,11 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 	}
 
-	//Adjusting points for centeroids
+	//Adjusting points to initially match top positoins in CT and tracking data
 	Eigen::MatrixXd::Index maxIndex;
 	trackingPositions.row(2).maxCoeff( &maxIndex );
-	//Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
-	Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
+	Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
+	//Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
 	//trackingPositions = trackingPositions.colwise() + translation;
 
 
