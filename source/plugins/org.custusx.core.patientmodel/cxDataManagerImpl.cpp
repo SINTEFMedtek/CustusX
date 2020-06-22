@@ -237,7 +237,7 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 	return data;
 }
 
-void DataManagerImpl::loadData(DataPtr data)
+void DataManagerImpl::loadData(DataPtr data, bool overWrite)
 {
 	if (data->getUid().contains('%'))
 	{
@@ -250,7 +250,7 @@ void DataManagerImpl::loadData(DataPtr data)
 
 	if (data)
 	{
-		if (mData.count(data->getUid()) && mData[data->getUid()]!=data)
+		if (!overWrite && mData.count(data->getUid()) && mData[data->getUid()]!=data)
 			reportError(QString("Overwriting Data with uid=%1 with new object into PasM").arg(data->getUid()));
 //		this->verifyParentFrame(data);
 		mData[data->getUid()] = data;

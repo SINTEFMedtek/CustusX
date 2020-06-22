@@ -38,6 +38,7 @@ set(CX_PLUGINS
   org.custusx.ceetron:ON
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
+  org.custusx.bronchoscopynavigation:ON
 )
 
 if(CX_APPLE)

@@ -92,7 +92,18 @@ void CgeoReaderWriter::writeToStream(DataPtr data, QDataStream &out)
 	out << (qint32) 1;  // PartCount
 
 	out << (qint32) 0; // Component ID
-	out << (qint32) 53672537; // Color
+
+	if(mesh->getColor().rgba())
+	{
+		int intRed = mesh->getColor().red();
+		int intGreen = mesh->getColor().green();
+		int intBlue = mesh->getColor().blue();
+		int intAlpha = mesh->getColor().alpha();
+		int intColor = intRed<<24 | intGreen<<16 | intBlue<<8 | intAlpha;
+		out << (qint32) intColor; // Color
+	}
+	else
+		out << (qint32) 0xFFFFFFFF;//53672537; // Color
 
 	out << (qint32) polyData->GetNumberOfPoints(); // # vertices
 	out << (qint32) 0; // always 0

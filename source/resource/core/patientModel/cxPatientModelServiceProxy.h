@@ -40,7 +40,7 @@ public:
 	PatientModelServiceProxy(ctkPluginContext *context);
 	virtual ~PatientModelServiceProxy();
 
-	virtual void insertData(DataPtr data);
+	virtual void insertData(DataPtr data, bool overWrite = false);
 	virtual DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
 	virtual std::map<QString, DataPtr> getChildren(QString parent_uid, QString of_type="") const;

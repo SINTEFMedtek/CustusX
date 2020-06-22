@@ -61,7 +61,7 @@ public:
 	// images
 	virtual std::map<QString, ImagePtr> getImages() const;
 
-	void loadData(DataPtr data);
+	void loadData(DataPtr data, bool overWrite = false);
 	DataPtr loadData(const QString& uid, const QString& path);
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
