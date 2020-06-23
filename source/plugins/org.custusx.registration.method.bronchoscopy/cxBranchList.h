@@ -36,6 +36,7 @@ public:
 	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true);
 	void selectGenerations(int maxGeneration);
 	void calculateOrientations();
+	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);
 	void smoothOrientations();
 	void smoothRadius();
@@ -53,6 +54,7 @@ Eigen::MatrixXd org_custusx_registration_method_bronchoscopy_EXPORT eraseCol(int
 std::pair<Eigen::MatrixXd::Index, double> org_custusx_registration_method_bronchoscopy_EXPORT dsearch(Eigen::Vector3d p, Eigen::MatrixXd positions);
 std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > org_custusx_registration_method_bronchoscopy_EXPORT dsearchn(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 std::vector<Eigen::Vector3d> org_custusx_registration_method_bronchoscopy_EXPORT smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
+double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation);
 Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B);
 
 }//namespace cx

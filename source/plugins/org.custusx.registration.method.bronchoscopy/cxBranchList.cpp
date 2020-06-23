@@ -41,6 +41,9 @@ void BranchList::addBranch(BranchPtr b)
 
 void BranchList::deleteBranch(BranchPtr b)
 {
+	if(b->getParentBranch())
+		b->getParentBranch()->deleteChildBranches();
+
 	for( int i = 0; i < mBranches.size(); i++ )
 	{
 		if (b == mBranches[i])
@@ -98,6 +101,13 @@ void BranchList::calculateOrientations()
 	}
 }
 
+void BranchList::findBronchoscopeRotation()
+{
+	BranchPtr trachea = this->getBranches()[0];
+	if(trachea)
+		calculateBronchoscopeRotation(trachea);
+}
+
 void BranchList::calculateBronchoscopeRotation(BranchPtr branch) // recurcive function
 {
 	if(!branch->getParentBranch())
@@ -111,26 +121,47 @@ void BranchList::calculateBronchoscopeRotation(BranchPtr branch) // recurcive fu
 		Vector3D parentBranchOrientation = branch->getParentBranch()->getOrientations().rowwise().mean();
 
 		Vector3D bendingDirection = calculateBronchoscopeBendingDirection(parentBranchOrientation, branchOrientation);
-
+		branch->setBronchoscopeRotation(bendingDirectionToBronchoscopeRotation(bendingDirection, parentBranchOrientation));
+		CX_LOG_DEBUG() << "parent orientation: " << parentBranchOrientation << " - orientation: " << branchOrientation << " - bending direction: " << bendingDirection;
 	}
 
+	CX_LOG_DEBUG() << "Bronchoscope rotation: " << branch->getBronchoscopeRotation()*180/M_PI;
+
 	branchVector childBranches = branch->getChildBranches();
-	for(int i=0; i>childBranches.size(); i++)
+	for(int i=0; i<childBranches.size(); i++)
 		calculateBronchoscopeRotation(childBranches[i]);
+}
+
+double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation)
+{
+	double bronchoscopeRotation;
+
+	Vector3D xVector = Vector3D(1,0,0);
+	Vector3D up = cross(parentBranchOrientation, xVector).normalized();
+	//CX_LOG_DEBUG() << "UP: " << up;
+	bronchoscopeRotation = acos( up.dot(bendingDirection) );
+
+	Vector3D N = cross(up, bendingDirection);
+	//CX_LOG_DEBUG() << "N: " << N;
+	//CX_LOG_DEBUG() << "xVector.dot(N): " << xVector.dot(N);
+	if( xVector.dot(N) < 0)
+		bronchoscopeRotation = -bronchoscopeRotation;
+
+	return bronchoscopeRotation;
 }
 
 Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B)
 {
-	A = A / A.norm();
-	A = B / B.norm();
+	A = A.normalized();
+	B = B.normalized();
 	Vector3D N = A.cross(B);
-	N = N / N.norm();
+	N = N.normalized();
 	Vector3D C;
 
-	C(0) = -A(1)/A(0)*C(1) - A(2)/A(0);
-	C(1) = - ( ( N(2) - N(0)*A(2)/A(0) ) / ( N(1) - N(0)*A(1)/A(0) ) );
 	C(2) = 1;
-	C = C / C.norm();
+	C(1) = - ( ( N(2) - N(0)*A(2)/A(0) ) / ( N(1) - N(0)*A(1)/A(0) ) ) * C(2);
+	C(0) = - ( A(1)*C(1) + A(2)*C(2) ) / A(0);
+	C = C.normalized();
 
 	if (B.dot(C) < 0)
 		C = -C;
