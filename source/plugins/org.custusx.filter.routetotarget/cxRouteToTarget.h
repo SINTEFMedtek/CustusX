@@ -66,6 +66,7 @@ private:
 	Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
+	std::vector< double > mCameraRotation;
 	std::vector< Eigen::Vector3d > mBloodVesselRoutePositions;
 	std::vector< Eigen::Vector3d > mMergedAirwayAndBloodVesselRoutePositions;
 	std::vector< int > mBranchingIndex;

@@ -80,6 +80,7 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 	//mBranchListPtr->smoothBranchPositions(40);
+	mBranchListPtr->findBronchoscopeRotation();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -220,8 +221,13 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	else
 		positions = getBranchPositions(searchBranchPtr, startIndex);
 
+	double cameraRotation = searchBranchPtr->getBronchoscopeRotation();
+
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
+	{
 		mRoutePositions.push_back(positions[i]);
+		mCameraRotation.push_back(cameraRotation);
+	}
 
 	mBranchingIndex.push_back(mRoutePositions.size()-1);
 
