@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# Warning: In regular use, the above line should either refer to pyton2 or python3
-# Need to install a venv locally on the actual computer
-
 import sys
 import os
 import shutil

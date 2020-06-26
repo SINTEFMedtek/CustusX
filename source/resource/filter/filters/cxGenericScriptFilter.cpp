@@ -207,24 +207,26 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	QString outputFilePath = getOutputFilePath(input);
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
-	// Parse .ini file, build command
-	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	// Parse .ini file
+	QSettings settings(parameterFilePath, QSettings::IniFormat);	
+	settings.beginGroup("environment");
+	QString envPath = settings.value("path").toString();
+	settings.endGroup();
 	settings.beginGroup("script");
-
-	//mResultFileEnding = settings.value("resultFileEnding").toString();
 	QString scriptFilePath = settings.value("path").toString();
+	QString cArguments = settings.value("arguments").toString();
+	settings.endGroup();
 
-	QString commandString = scriptFilePath;
+	// Build command
+	QString commandString = envPath;
+	commandString.append(" " + scriptFilePath);
 	commandString.append(" " + inputFilePath);
 	commandString.append(" " + outputFilePath);
 	//TODO: OVS testcode
 	//commandString.append(" --input " + inputFilePath);
 	//if(!mResultFileEnding.isEmpty())
 	//	commandString.append(" --ending " + mResultFileEnding);
-
-	commandString.append(" " + settings.value("arguments").toString());
-
-	settings.endGroup();
+	commandString.append(" " + cArguments);
 
 	return commandString;
 }

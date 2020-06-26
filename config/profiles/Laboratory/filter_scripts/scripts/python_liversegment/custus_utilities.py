@@ -59,12 +59,20 @@ class custusVolume():
             print('Min voxel value: ', image_array.min())
             print('Max voxel value: ', image_array.max())
 
-        return image_array.astype('float32')-1024.0  # Convert values to HU
+        if image_array.min() >= 0:  # TODO: make a better method to ensure CT-values in Hunsfield units
+            data_shift = 1024.0
+        else:
+            data_shift = 0.0
+
+        print('Data shift: ', data_shift)
+
+        return image_array.astype('float32')-data_shift  # Convert values to HU
 
     def save_volume(self, data, path):
         # Create new volume
         new_volume = sitk.GetImageFromArray(data.astype(np.uint8))  # NB: Only Uint8 for now
         new_volume.CopyInformation(self.volume)  # May want to replace with specific copy of selected items
+
 
         # Create path
         base_path = os.path.dirname(path)
