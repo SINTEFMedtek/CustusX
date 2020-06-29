@@ -109,6 +109,7 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange() const
 			{
 				srange.first = 0;
 				srange.second = 1;
+				return srange;
 			}
 		}
 		if (mImage->getModality() == imCT)
