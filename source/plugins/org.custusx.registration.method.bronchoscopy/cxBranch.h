@@ -56,6 +56,7 @@ public:
 	int findParentIndex(branchVector bv) const;
 	void setBronchoscopeRotation(double rotation);
 	double getBronchoscopeRotation();
+	Eigen::MatrixXd removeEqualPositions(Eigen::MatrixXd positions);
 };
 
 

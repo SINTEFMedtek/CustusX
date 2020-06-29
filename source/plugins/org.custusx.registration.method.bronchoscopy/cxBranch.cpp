@@ -22,7 +22,7 @@ Branch::Branch() :
 
 void Branch::setPositions(Eigen::MatrixXd pos)
 {
-	mPositions = pos;
+	mPositions = removeEqualPositions(pos);
 }
 
 Eigen::MatrixXd Branch::getPositions()
@@ -150,6 +150,19 @@ void Branch::setBronchoscopeRotation(double rotation)
 double Branch::getBronchoscopeRotation()
 {
 	return mBronchoscopeRotation;
+}
+
+Eigen::MatrixXd Branch::removeEqualPositions(Eigen::MatrixXd positions)
+{
+		for (int i = positions.cols() - 1; i >= 0; i--)
+	{
+		if (similar( (positions.col(i)-positions.col(i-1)).cwiseAbs().sum(), 0))
+		{
+			positions.block(0 , i , positions.rows() , positions.cols() - i - 1) = positions.rightCols(positions.cols() - i - 1);
+			positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
+		}
+	}
+	return positions;
 }
 
 

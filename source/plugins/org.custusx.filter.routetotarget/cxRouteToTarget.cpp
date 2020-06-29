@@ -222,6 +222,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 		positions = getBranchPositions(searchBranchPtr, startIndex);
 
 	double cameraRotation = searchBranchPtr->getBronchoscopeRotation();
+	CX_LOG_DEBUG() << "cameraRotation: "<< cameraRotation*180/M_PI;
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 	{
