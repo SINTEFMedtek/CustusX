@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPolyData.h>
 #include <vtkCardinalSpline.h>
 #include "cxLogger.h"
-
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -179,7 +179,7 @@ Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B)
 
 	C(2) = 1;
 	C(1) = - ( ( N(2) - N(0)*A(2)/A(0) ) / ( N(1) - N(0)*A(1)/A(0) ) ) * C(2);
-	if(isnan(C(1)) || isinf(C(1)))
+	if(boost::math::isnan(C(1)) || boost::math::isinf(C(1)))
 		C(1) = 0;
 	if( similar(A(0),0) )
 		C(0) = 0;
