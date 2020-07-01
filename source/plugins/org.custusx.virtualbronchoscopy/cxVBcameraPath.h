@@ -53,12 +53,19 @@ private:
 	double						mLastCameraViewAngle;
 	double						mLastCameraRotAngle;
 
+	std::vector< Eigen::Vector3d > mRoutePositions;
+	std::vector< double > mCameraRotations;
+
 	void		updateManualToolPosition();
 	void		generateSplineCurve(MeshPtr mesh);
+	void		generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
 
 public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
 				   ViewServicePtr visualization);
+
+	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
+	void setCameraRotations(std::vector< double > cameraRotations);
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);

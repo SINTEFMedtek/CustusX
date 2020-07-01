@@ -615,6 +615,16 @@ double RouteToTarget::findDistanceToSegmentationEdge(vtkImageDataPtr bloodVessel
 	return retval;
 }
 
+std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions()
+{
+	return mRoutePositions;
+}
+
+std::vector< double > RouteToTarget::getCameraRotation()
+{
+	return mCameraRotation;
+}
+
 void RouteToTarget::makeMarianaCenterlineFile(QString filename)
 {
 	if (mExtendedRoutePositions.empty())

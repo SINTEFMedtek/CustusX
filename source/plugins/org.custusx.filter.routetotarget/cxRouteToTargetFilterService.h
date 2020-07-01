@@ -51,6 +51,9 @@ public:
 	static QString getNameSuffixAirwayModel();
 	static QString getNameSuffixAirwayAndVesselRTT();
 
+	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< double > getCameraRotation();
+
 	virtual bool execute();
 	virtual bool postProcess();
 	virtual bool postProcessBloodVessels();

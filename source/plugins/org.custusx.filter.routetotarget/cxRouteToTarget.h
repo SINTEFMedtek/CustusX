@@ -48,6 +48,8 @@ public:
 	double findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
+	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< double > getCameraRotation();
 
 	double getTracheaLength();
 	static std::vector<Eigen::Vector3d> getRoutePositions(MeshPtr route);

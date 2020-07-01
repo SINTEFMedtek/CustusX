@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientStorage.h"
 #include "cxVisServices.h"
 #include "cxLogger.h"
+#include "cxRouteToTarget.h"
 
 
 
@@ -130,6 +131,16 @@ void VBWidget::setRouteToTarget(QString uid)
 	mPlaybackSlider->setValue(1);
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot, Qt::UniqueConnection);
 	mPlaybackSlider->setValue(5);
+}
+
+void VBWidget::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
+{
+	 mCameraPath->setRoutePositions(routePositions);
+}
+
+void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations)
+{
+	mCameraPath->setCameraRotations(cameraRotations);
 }
 
 void  VBWidget::enableControls(bool enable)

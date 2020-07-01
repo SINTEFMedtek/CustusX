@@ -511,8 +511,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
-	mBranchListPtr->findBronchoscopeRotation(); //debug
-
 	double minPointDistance = 0.5; //mm
 	mBranchListPtr->excludeClosePositionsInCTCenterline(minPointDistance); // to increase speed in registration
 

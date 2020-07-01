@@ -44,6 +44,13 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 {
 
+	if(mRoutePositions.size() > 0)
+		if(mRoutePositions.size() == mCameraRotations.size())
+		{
+			this->generateSplineCurve(mRoutePositions);
+			return;
+		}
+
 	if(!mesh)
 	{
 		std::cout << "cameraRawPointsSlot is empty !" << std::endl;
@@ -72,13 +79,29 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
     mSpline->SetPoints(vtkpoints);
 }
 
+void CXVBcameraPath::generateSplineCurve(std::vector< Eigen::Vector3d > routePositions)
+{
+	vtkPointsPtr vtkPoints = vtkPointsPtr::New();
+	for (int i = 0; i < routePositions.size(); i++)
+		vtkPoints->InsertNextPoint(routePositions[i](0),routePositions[i](1),routePositions[i](2));
 
+	// Setting the spline curve points
+	// First clean up previous stored data
+	mSpline->GetXSpline()->RemoveAllPoints();
+	mSpline->GetYSpline()->RemoveAllPoints();
+	mSpline->GetZSpline()->RemoveAllPoints();
+
+	mSpline->SetPoints(vtkPoints);
+
+}
 
 
 void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 {
 
 		double splineParameter = positionPercentage / 100.0;
+
+		//TO DO: Adjusting position to make smaller steps towards end of route
 
     //Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
     //Longer focus makes smoother turns at the first divisions.
@@ -103,6 +126,14 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 
     mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
     mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
+		//TO DO: Update last camera rotation here.
+		if(mRoutePositions.size() > 0)
+			if(mRoutePositions.size() == mCameraRotations.size())
+			{
+				int index = (int) positionPercentage/100 * (mCameraRotations.size() - 1);
+				mLastCameraRotAngle = mCameraRotations[index];
+			}
+
     this->updateManualToolPosition();
 
 }
@@ -150,6 +181,16 @@ void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 {
     mLastCameraRotAngle = static_cast<double>(angle) * (M_PI / 180.0);
 	this->updateManualToolPosition();
+}
+
+void CXVBcameraPath::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
+{
+	mRoutePositions = routePositions;
+}
+
+void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
+{
+	mCameraRotations = cameraRotations;
 }
 
 } /* namespace cx */
