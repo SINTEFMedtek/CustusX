@@ -7,7 +7,6 @@ from tensorflow.python.keras.models import load_model
 
 debug = True  # Print extra info
 
-
 # Constants and input variables
 n_argin_expected = 2  # Expect input and output volume paths
 model_path = 'data/model.h5'
@@ -47,6 +46,12 @@ model = load_model(model_path, compile=False)
 # Pre process
 data = input_volume.get_array()
 curr_shape = data.shape  # Remember original shape
+
+if data.min() >= 0:  # TODO: make a better method to ensure CT-values in Hunsfield units
+    data_shift = 1024.0
+    print('Data shift: ', data_shift)
+    data = data - data_shift
+
 data = data_pretransform(data, img_size)
 
 # Predict

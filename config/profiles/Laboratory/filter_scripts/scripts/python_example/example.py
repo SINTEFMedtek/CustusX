@@ -1,8 +1,6 @@
 import sys
-import os
-import shutil
-#import tkinter as tk
-#from tkinter import filedialog
+import tkinter as tk
+from tkinter import filedialog
 from custus_utilities import custusVolume
 
 
@@ -11,10 +9,10 @@ print("Python version: ", sys.version)
 print('Number of arguments:', len(sys.argv), 'arguments.')
 print('Argument List:', str(sys.argv))
 
-# # Input dialog example:
-# root = tk.Tk()
-# root.withdraw()
-# data_path = filedialog.askdirectory(title = "Choose data folder")
+# Input dialog example:
+root = tk.Tk()
+root.withdraw()
+data_path = filedialog.askdirectory(title = "Choose data folder")
 
 # Duplcate input volume:
 input_image_path = sys.argv[1] # First argument should always be input volume
