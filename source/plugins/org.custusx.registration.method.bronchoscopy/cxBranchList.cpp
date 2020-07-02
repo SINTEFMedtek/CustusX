@@ -163,7 +163,7 @@ double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3
 	Vector3D N = cross(up, bendingDirection).normalized();
 	CX_LOG_DEBUG() << "N: " << N;
 	CX_LOG_DEBUG() << "xVector.dot(N): " << parentBranchOrientation.dot(N);
-	if( parentBranchOrientation.dot(N) < 0)
+    if( parentBranchOrientation.dot(N) > 0)
 		bronchoscopeRotation = -bronchoscopeRotation;
 
 	return bronchoscopeRotation;

@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxViewServiceProxy.h"
 #include "cxView.h"
+#include "cxLogger.h"
 
 namespace cx {
 
@@ -95,14 +96,16 @@ void CXVBcameraPath::generateSplineCurve(std::vector< Eigen::Vector3d > routePos
 
 }
 
+double CXVBcameraPath::positionPercentageAdjusted(double positionPercentage)
+{
+    //Adjusting position to make smaller steps towards end of route
+    return 2*positionPercentage / (1 + positionPercentage/100.0);
+}
+
 
 void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 {
-
-	//Adjusting position to make smaller steps towards end of route
-	double positionPercentageAdjusted = 2*positionPercentage / (1 + positionPercentage/100.0);
-
-		double splineParameter = positionPercentageAdjusted / 100.0;
+    double splineParameter = positionPercentageAdjusted(positionPercentage) / 100.0;
 
     //Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
     //Longer focus makes smoother turns at the first divisions.
@@ -131,8 +134,15 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 		if(mRoutePositions.size() > 0)
 			if(mRoutePositions.size() == mCameraRotations.size())
 			{
-				int index = (int) positionPercentageAdjusted/100 * (mCameraRotations.size() - 1);
-				mLastCameraRotAngle = mCameraRotations[index];
+                int index = (int) (positionPercentageAdjusted(positionPercentage)/100 * (mCameraRotations.size() - 1));
+                int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + 7)/100 * (mCameraRotations.size() - 1));
+                int numberOfElements =  mCameraRotations.size();
+                std::vector< double > averageElements(mCameraRotations.begin()+index, mCameraRotations.begin()+std::min(indexAheadAverage,numberOfElements-1));
+                if(averageElements.size() > 0)
+                    mLastCameraRotAngle = std::accumulate(averageElements.begin(), averageElements.end(), 0.0) / averageElements.size();
+                else
+                    mLastCameraRotAngle = 0;
+                CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle << " - index: " << index << " of " << mCameraRotations.size() - 1;
 			}
 
     this->updateManualToolPosition();

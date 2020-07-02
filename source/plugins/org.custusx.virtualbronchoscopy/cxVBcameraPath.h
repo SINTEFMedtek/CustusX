@@ -56,6 +56,7 @@ private:
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< double > mCameraRotations;
 
+    double      positionPercentageAdjusted(double positionPercentage);
 	void		updateManualToolPosition();
 	void		generateSplineCurve(MeshPtr mesh);
 	void		generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
