@@ -49,12 +49,12 @@ def get_model(output='model.h5'):
     gdown.cached_download(url, output, md5=md5)  # , postprocess=gdown.extractall)
 
 
-def data_pretransform(data, img_size=512):
+def data_pretransform(data, img_size=512, intensity_clipping_range = [-150, 250]):
     # resize
     data = zoom(data, [1.0, img_size / data.shape[1], img_size / data.shape[2]], order=1)
 
     # intensity normalization
-    intensity_clipping_range = [-150, 250]  # HU clipping limits (Pravdaray's configs)
+    #intensity_clipping_range = [-150, 250]  # HU clipping limits (Pravdaray's configs)
     data = intensity_normalization(volume=data, intensity_clipping_range=intensity_clipping_range)
 
     # fix orientation
@@ -62,6 +62,18 @@ def data_pretransform(data, img_size=512):
     data = np.rot90(data, k=-1, axes=(0, 1))
     data = np.flip(data, axis=2)
     return data
+
+
+def data_predict(data, model, threshold = 0.5):
+    # predict on data
+    pred = np.zeros_like(data).astype(np.float32)
+    for i in range(data.shape[-1]):
+        print('Predicting slice ', i, ' of ', data.shape[-1])
+        pred[..., i] = model.predict(np.expand_dims(np.expand_dims(data[..., i], axis=0), axis=-1))[0, ..., 1]
+
+    # threshold
+    pred = (pred >= threshold).astype(int)
+    return pred
 
 
 def data_posttransform(data, curr_shape, img_size):
@@ -76,25 +88,13 @@ def data_posttransform(data, curr_shape, img_size):
     return data
 
 
-def data_predict(data, model):
-    # predict on data
-    pred = np.zeros_like(data).astype(np.float32)
-    for i in range(data.shape[-1]):
-        print('Predicting slice ', i, ' of ', data.shape[-1])
-        pred[..., i] = model.predict(np.expand_dims(np.expand_dims(np.expand_dims(data[..., i], axis=0), axis=-1),
-													axis=0))[0, ..., 1]
-
-    # threshold
-    pred = (pred >= 0.4).astype(int)
-    return pred
-
-
 def morph_postprocess(data):
     # morphological post-processing
     print("morphological post-processing...")
     if debug:
         print('Data in: ', data.shape)
 
+    ### opening
     # 1) first erode
     data = binary_erosion(data.astype(bool), ball(3)).astype(np.float32)
     if debug:
@@ -119,8 +119,11 @@ def morph_postprocess(data):
     # 3) dilate
     data = binary_dilation(data.astype(bool), ball(3))
 
-    # 4) remove small holes
+    ### closing with remove small holes
+    data = binary_dilation(data.astype(bool), ball(3))
     data = remove_small_holes(data.astype(bool), area_threshold=0.001 * np.prod(data.shape)).astype(np.float32)
+    data = binary_erosion(data.astype(bool), ball(3))
+
     return data.astype(np.uint8)
 
 
