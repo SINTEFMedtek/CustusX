@@ -57,7 +57,7 @@ data = data_pretransform(data, img_size)
 # Predict
 data = np.expand_dims(data, axis=0) # Need to change shape to use liver model
 data = data_predict(data, model)
-data = np.squeeze(data, axis=0) # Changeing shape back
+data = np.squeeze(data, axis=0) # Changing shape back
 
 # Post process
 data = data_posttransform(data, curr_shape, img_size)
