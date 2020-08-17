@@ -135,12 +135,12 @@ void VBWidget::setRouteToTarget(QString uid)
 
 void VBWidget::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
 {
-	 mCameraPath->setRoutePositions(routePositions);
+     mCameraPath->setRoutePositions(routePositions);
 }
 
 void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations)
 {
-	mCameraPath->setCameraRotations(cameraRotations);
+    mCameraPath->setCameraRotations(cameraRotations);
 }
 
 void  VBWidget::enableControls(bool enable)

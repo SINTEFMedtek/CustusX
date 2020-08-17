@@ -44,7 +44,6 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 
 void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 {
-
 	if(mRoutePositions.size() > 0)
 		if(mRoutePositions.size() == mCameraRotations.size())
 		{
@@ -59,7 +58,6 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 	}
 
     this->generateSplineCurve(mesh);
-
 }
 
 void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
