@@ -124,9 +124,9 @@ void BranchList::calculateBronchoscopeRotation(BranchPtr branch) // recurcive fu
 	{
 		double parentRotation = branch->getParentBranch()->getBronchoscopeRotation();
 		Eigen::MatrixXd branchOrientations = branch->getOrientations();
-		Vector3D branchOrientationStart = branchOrientations.leftCols(std::min(10, (int) branchOrientations.cols())).rowwise().mean();
+        Vector3D branchOrientationStart = branchOrientations.leftCols(std::min(25, (int) branchOrientations.cols())).rowwise().mean();
 		Eigen::MatrixXd parentBranchOrientations = branch->getParentBranch()->getOrientations();
-		Vector3D parentBranchOrientationEnd = parentBranchOrientations.rightCols(std::min(10, (int) parentBranchOrientations.cols())).rowwise().mean();
+        Vector3D parentBranchOrientationEnd = parentBranchOrientations.rightCols(std::min(50, (int) parentBranchOrientations.cols())).rowwise().mean();
 
 		Vector3D bendingDirection = calculateBronchoscopeBendingDirection(parentBranchOrientationEnd, branchOrientationStart);
         double bronchoscopeRotation = bendingDirectionToBronchoscopeRotation(bendingDirection, parentBranchOrientationEnd, parentRotation);

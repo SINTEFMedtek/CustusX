@@ -133,7 +133,7 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 			if(mRoutePositions.size() == mCameraRotations.size())
 			{
                 int index = (int) (positionPercentageAdjusted(positionPercentage)/100 * (mCameraRotations.size() - 1));
-                int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + 7)/100 * (mCameraRotations.size() - 1));
+                int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + (5+15*(1-positionPercentage/100)))/100 * (mCameraRotations.size() - 1));
                 int numberOfElements =  mCameraRotations.size();
                 std::vector< double > averageElements(mCameraRotations.begin()+index, mCameraRotations.begin()+std::min(indexAheadAverage,numberOfElements-1));
                 if(averageElements.size() > 0)
