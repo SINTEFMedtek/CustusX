@@ -73,11 +73,11 @@ public:
 	{
 		return readGeneratedSegmentationFile();
 	}
-	void setExampleScriptFile()
+	void setTestScriptFile()
 	{
 		QString configPath = cx::DataLocations::getRootConfigPath();
 		//CX_LOG_DEBUG() << "config path: " << configPath;
-		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_example.ini";
+		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_test.ini";
 		CX_LOG_DEBUG() << "Using script file: " << scriptFile;
 
 		mScriptFile->setValueFromVariant(scriptFile);
@@ -195,7 +195,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 		REQUIRE(input[0]->getData()->getName() == "helix_seg");
 	}
 
-	filter->setExampleScriptFile();
+	filter->setTestScriptFile();
 
 	cxtest::checkFilterInit(filter, true, false);
 
@@ -298,7 +298,7 @@ TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
 	//Create options variales
 	filter->getOptions();
 
-	filter->setExampleScriptFile();//Init with example ini file
+	filter->setTestScriptFile();//Init with test ini file
 
 	REQUIRE(filter->preProcess());
 	REQUIRE(filter->execute());
