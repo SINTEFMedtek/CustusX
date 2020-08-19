@@ -108,7 +108,7 @@ DataPtr MetaImageReader::read(const QString& uid, const QString& filename)
 {
 	ImagePtr image(new Image(uid, vtkImageDataPtr()));
 	this->readInto(image, filename);
-	return image;
+	return std::move(image);
 }
 
 std::vector<DataPtr> MetaImageReader::read(const QString &filename)
@@ -153,7 +153,15 @@ void MetaImageReader::write(DataPtr data, const QString& filename)
 {
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if(!image)
-		reportError("Could not cast data to image");
+	{
+		CX_LOG_ERROR() << "MetaImageReader::write: Could not cast data to image";
+		return;
+	}
+	if(!image->getBaseVtkImageData())
+	{
+		CX_LOG_ERROR() << "MetaImageReader::write: cxImage has no VtkImageData";
+		return;
+	}
 	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
 	writer->SetInputData(image->getBaseVtkImageData());
 	writer->SetFileDimensionality(3);

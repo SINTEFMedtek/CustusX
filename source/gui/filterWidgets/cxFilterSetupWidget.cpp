@@ -46,13 +46,13 @@ FilterSetupWidget::FilterSetupWidget(VisServicesPtr services, QWidget* parent, X
 	mObscuredListener.reset(new WidgetObscuredListener(this));
 	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
 
-	mOptions = options;
+	mOptions = options;//not used?
 
 	mInputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mOutputsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mOptionsWidget = new OptionsWidget(mServices->view(), mServices->patient(), this);
 	mPresetWidget = new FilterPresetWidget(this);
-    mAdvancedButton = new QCheckBox("Show advanced options", this);
+	mAdvancedButton = new QCheckBox("Show advanced options", this);
 	connect(mAdvancedButton, SIGNAL(stateChanged(int)), this, SLOT(showAdvancedOptions(int)));
 
 	topLayout->addWidget(this->wrapInGroupBox(mInputsWidget, "Input"));
@@ -99,16 +99,16 @@ QString FilterSetupWidget::generateHelpText() const
 		help = mCurrentFilter->getHelp();
 	}
 	return QString("<html>"
-	               "<h4>%1</h4>"
-	               "<p>%2</p>"
-	               "</html>").arg(name).arg(help);
+								 "<h4>%1</h4>"
+								 "<p>%2</p>"
+								 "</html>").arg(name).arg(help);
 }
 
 void FilterSetupWidget::setVisibilityOfOptionsAndAdvancedOptions()
 {
-    mAdvancedButton->setVisible(mOptionsWidget->hasAdvancedOptions());
-    this->showAdvancedOptions(mAdvancedButton->isChecked());
-    mOptionsGroupBox->setVisible(mOptionsWidget->hasOptions());
+	mAdvancedButton->setVisible(mOptionsWidget->hasAdvancedOptions());
+	this->showAdvancedOptions(mAdvancedButton->isChecked());
+	mOptionsGroupBox->setVisible(mOptionsWidget->hasOptions());
 }
 
 void FilterSetupWidget::setFilter(FilterPtr filter)
@@ -131,7 +131,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
 		mInputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getInputTypes(), false);
 		mOutputsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOutputTypes(), false);
-        mOptionsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOptions(), false);
+		mOptionsWidget->setOptions(mCurrentFilter->getUid(), mCurrentFilter->getOptions(), false);
 
 		//presets
 		if(mCurrentFilter->hasPresets())
@@ -146,7 +146,7 @@ void FilterSetupWidget::setFilter(FilterPtr filter)
 
 		this->setObjectName(mCurrentFilter->getType());
 
-        this->setVisibilityOfOptionsAndAdvancedOptions();
+		this->setVisibilityOfOptionsAndAdvancedOptions();
 	}
 	else
 	{
@@ -162,12 +162,12 @@ void FilterSetupWidget::toggleDetailed()
 {
 	if(mOptionsGroupBox->isHidden())
 	{
-        if(mOptionsWidget->hasOptions())
-        {
-            mOptionsGroupBox->show();
-            if(mOptionsWidget->hasAdvancedOptions())
-                mAdvancedButton->show();
-        }
+		if(mOptionsWidget->hasOptions())
+		{
+			mOptionsGroupBox->show();
+			if(mOptionsWidget->hasAdvancedOptions())
+				mAdvancedButton->show();
+		}
 		mPresetWidget->showDetailed(true);
 	}
 	else
