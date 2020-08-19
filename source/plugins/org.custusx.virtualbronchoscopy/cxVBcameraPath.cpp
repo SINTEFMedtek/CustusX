@@ -128,20 +128,20 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 
     mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
     mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
-		//TO DO: Update last camera rotation here.
-		if(mRoutePositions.size() > 0)
-			if(mRoutePositions.size() == mCameraRotations.size())
-			{
-                int index = (int) (positionPercentageAdjusted(positionPercentage)/100 * (mCameraRotations.size() - 1));
-                int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + (5+15*(1-positionPercentage/100)))/100 * (mCameraRotations.size() - 1));
-                int numberOfElements =  mCameraRotations.size();
-                std::vector< double > averageElements(mCameraRotations.begin()+index, mCameraRotations.begin()+std::min(indexAheadAverage,numberOfElements-1));
-                if(averageElements.size() > 0)
-                    mLastCameraRotAngle = std::accumulate(averageElements.begin(), averageElements.end(), 0.0) / averageElements.size();
-                else
-                    mLastCameraRotAngle = 0;
-                CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle << " - index: " << index << " of " << mCameraRotations.size() - 1;
-			}
+
+    if(mRoutePositions.size() > 0)
+        if(mRoutePositions.size() == mCameraRotations.size())
+        {
+            int index = (int) (positionPercentageAdjusted(positionPercentage)/100 * (mCameraRotations.size() - 1));
+            int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + (5+15*(1-positionPercentage/100)))/100 * (mCameraRotations.size() - 1));
+            int numberOfElements =  mCameraRotations.size();
+            std::vector< double > averageElements(mCameraRotations.begin()+index, mCameraRotations.begin()+std::min(indexAheadAverage,numberOfElements-1));
+            if(averageElements.size() > 0)
+                mLastCameraRotAngle = std::accumulate(averageElements.begin(), averageElements.end(), 0.0) / averageElements.size();
+            else
+                mLastCameraRotAngle = 0;
+            CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle << " - index: " << index << " of " << mCameraRotations.size() - 1;
+        }
 
     this->updateManualToolPosition();
 
@@ -177,6 +177,7 @@ void CXVBcameraPath::updateManualToolPosition()
 
 	mManualTool->set_prMt(prMt);
 
+    emit rotationChanged((int) (mLastCameraRotAngle * 180/M_PI));
 }
 
 

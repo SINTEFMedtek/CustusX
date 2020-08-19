@@ -112,6 +112,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	connect(mViewDial, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 	connect(mResetEndoscopeButton, &QPushButton::clicked, this, &VBWidget::resetEndoscopeSlot);
+    connect(mCameraPath, &CXVBcameraPath::rotationChanged, this, &VBWidget::updateRotationDialSlot);
 
 	mVerticalLayout->addStretch();
 }
@@ -229,6 +230,11 @@ void VBWidget::resetEndoscopeSlot()
 {
 	mRotateDial->setValue(0);
 	mViewDial->setValue(0);
+}
+
+void VBWidget::updateRotationDialSlot(int value)
+{
+    mRotateDial->setValue(value);
 }
 
 QString VBWidget::defaultWhatsThis() const

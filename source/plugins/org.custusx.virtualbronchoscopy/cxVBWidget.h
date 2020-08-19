@@ -73,6 +73,7 @@ signals:
 private slots:
 	void						inputChangedSlot();
 	void						resetEndoscopeSlot();
+    void                        updateRotationDialSlot(int value);
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
 };

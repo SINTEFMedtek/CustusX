@@ -68,6 +68,9 @@ public:
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotations(std::vector< double > cameraRotations);
 
+signals:
+    void		rotationChanged(int value);
+
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);
 	void cameraPathPositionSlot(int positionPercentage);
