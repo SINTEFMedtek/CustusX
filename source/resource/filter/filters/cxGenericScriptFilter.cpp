@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
-//#include "cxDataLocations.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
 
@@ -272,7 +271,6 @@ QString GenericScriptFilter::getOutputFilePath(ImagePtr input)
 	// Parse .ini file, get file_append
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("output");
-	//QString file_append = settings.value("file_append","_copy.mhd").toString();
 	mResultFileEnding = settings.value("file_append","_copy.mhd").toString();
 	settings.endGroup();
 
@@ -366,8 +364,6 @@ bool GenericScriptFilter::createProcess()
 	**************************************************************************/
 	//Show output from process
 	connect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
-	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-	//connect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);//Not needed when we merge channels?
 	return true;
 }
 
@@ -392,8 +388,6 @@ bool GenericScriptFilter::disconnectProcess()
 		CX_LOG_DEBUG() << "disconnecting";
 		disconnect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 		disconnect(mCommandLine->getProcess(), &QProcess::readyRead, this, &GenericScriptFilter::processReadyRead);
-		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &GenericScriptFilter::processReadyRead);
-		//disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardError, this, &GenericScriptFilter::processReadyReadError);
 		return true;
 	}
 	return false;
@@ -409,27 +403,17 @@ bool GenericScriptFilter::postProcess()
 
 bool GenericScriptFilter::readGeneratedSegmentationFile()
 {
-	//TODO: Look at ElastixManager::addNonlinearData() for reading and adding new volume
-
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No input image";
 		return false;
 	}
-	//QString uid = parentImage->getUid() + "_seg%1";
-	//QString imageName = parentImage->getName()+" seg%1";
 	QString nameEnding = mResultFileEnding;
 	nameEnding.replace(".mhd", "");
 	QString uid = parentImage->getUid() + nameEnding;
 	QString imageName = parentImage->getName() + nameEnding;
 	QString fileName = this->getOutputFilePath(parentImage);
-
-
-	//TODO: OVS testcode
-	//QString fileName = mServices->patient()->getActivePatientFolder();
-	//fileName.append("/Images/" + uid + ".mhd");
-	//CX_LOG_DEBUG() << "Read new file: " << fileName;
 
 	if (!QFileInfo(fileName).exists())
 	{

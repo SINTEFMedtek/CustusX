@@ -66,7 +66,6 @@ protected:
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
 	QString mScriptPathAddition;
-	//QProcess* mProcess;
 	ProcessWrapperPtr mCommandLine;
 	QString mResultFileEnding;
 
