@@ -505,7 +505,7 @@ class FAST(CppComponent):
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
           self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
         else:
-          self._getBuilder().gitCheckoutSha('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
+          self._getBuilder().gitCheckoutSha('b85d3a826ebe360f77a8ac6f625a9dfa7bb856fd')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -638,7 +638,7 @@ class org_custusx_mariana(CppComponent):
 #      self._getBuilder().gitCheckout('')
 #      self._getBuilder().gitCheckoutDefaultBranch()#Not using sha here because we always want to use the develop branch in the Mariana repo
 #      self._getBuilder().gitCheckout('186fdb8b7c9d48b91a14b4b750e0a07b29a5c819')
-      self._getBuilder().gitCheckout('bcf282449e4b0629af0bb8808be24ee39d32ccf5')
+      self._getBuilder().gitCheckout('b1171337d0caf7b5ab56cf9591b969eb2f100ce8')
     def configure(self):
         pass
     def build(self):
