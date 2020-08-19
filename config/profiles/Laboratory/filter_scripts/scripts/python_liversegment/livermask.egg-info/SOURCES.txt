@@ -1,8 +1,0 @@
-README.md
-setup.py
-livermask.egg-info/PKG-INFO
-livermask.egg-info/SOURCES.txt
-livermask.egg-info/dependency_links.txt
-livermask.egg-info/entry_points.txt
-livermask.egg-info/requires.txt
-livermask.egg-info/top_level.txt

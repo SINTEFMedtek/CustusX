@@ -1,8 +1,0 @@
-tensorflow==1.13.1
-numpy
-scipy
-tqdm
-nibabel
-h5py
-gdown
-scikit-image
