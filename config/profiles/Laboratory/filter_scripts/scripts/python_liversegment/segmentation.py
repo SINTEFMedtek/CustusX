@@ -9,7 +9,7 @@ debug = True  # Print extra info
 
 # Constants and input variables
 n_argin_expected = 2  # Expect input and output volume paths
-model_path = 'data/model.h5'
+model_path = 'networks/liver_model.h5'
 img_size = 512
 input_image_path = ''
 output_image_path = ''

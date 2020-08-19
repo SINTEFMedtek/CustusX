@@ -23,9 +23,8 @@ session = tf.Session(config=config)
 
 # Constants and input variables
 n_argin_expected = 2  # Expect input and output volume paths
-liver_model_path = 'liver_model.h5'
-#vessels_model_path = 'model_v6.hd5'
-vessels_model_path = 'liver_vessels_model_2D.hd5'
+liver_model_path = 'networks/liver_model.h5'
+vessels_model_path = 'networks/liver_vessels_model_2D.hd5'
 img_size = 512
 input_image_path = ''
 output_image_path = ''
