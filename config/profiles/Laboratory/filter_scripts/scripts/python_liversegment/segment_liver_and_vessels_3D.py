@@ -24,8 +24,7 @@ session = tf.Session(config=config)
 # Constants and input variables
 n_argin_expected = 2  # Expect input and output volume paths
 liver_model_path = 'liver_model.h5'
-#vessels_model_path = 'liver_vessels_model.hd5'
-vessels_model_path = 'model3D.hd5'
+vessels_model_path = 'liver_vessels_model_3D.hd5'
 #vessels_model_path = 'model3D_cropped.hd5'
 img_size = 512
 input_image_path = ''
@@ -130,7 +129,7 @@ for count in range(counts):
     print("Empty slab: ", count)
     #continue
 
-  data_slab = data_predict(data_slab, vessels_model, threshold = 0.2)
+  data_slab = data_predict(data_slab, vessels_model, threshold = 0.4)
   #print("data_slab: ", data_slab.shape)
 
 #  if count == 0:

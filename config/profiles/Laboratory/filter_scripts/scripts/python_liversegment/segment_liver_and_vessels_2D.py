@@ -25,7 +25,7 @@ session = tf.Session(config=config)
 n_argin_expected = 2  # Expect input and output volume paths
 liver_model_path = 'liver_model.h5'
 #vessels_model_path = 'model_v6.hd5'
-vessels_model_path = 'liver_vessels_model.hd5'
+vessels_model_path = 'liver_vessels_model_2D.hd5'
 img_size = 512
 input_image_path = ''
 output_image_path = ''
@@ -106,7 +106,7 @@ vessels_model = load_model(vessels_model_path, compile=False)
 
 # Predict vessels
 print("--- Segmenting liver vessels ---")
-data = data_predict(data, vessels_model, threshold = 0.2)
+data = data_predict(data, vessels_model, threshold = 0.4)
 
 # Apply liver mask on vessels as well
 data = data * liver_mask
