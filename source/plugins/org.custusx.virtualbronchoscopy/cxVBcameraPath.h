@@ -52,6 +52,7 @@ private:
     Vector3D                    mLastStoredViewVector;
 	double						mLastCameraViewAngle;
 	double						mLastCameraRotAngle;
+    bool                        mAutomaticRotation;
 
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< double > mCameraRotations;
@@ -67,6 +68,7 @@ public:
 
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotations(std::vector< double > cameraRotations);
+    void setAutomaticRotation(bool automaticRotation);
 
 signals:
     void		rotationChanged(int value);

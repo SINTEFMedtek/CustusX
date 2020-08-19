@@ -35,6 +35,7 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
   , mViewService(visualization)
   , mLastCameraViewAngle(0)
   , mLastCameraRotAngle(0)
+  , mAutomaticRotation(true)
 {
 	mManualTool = mTrackingService->getManualTool();
     mSpline = vtkParametricSplinePtr::New();
@@ -129,8 +130,8 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
     mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
     mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
 
-    if(mRoutePositions.size() > 0)
-        if(mRoutePositions.size() == mCameraRotations.size())
+    if(mAutomaticRotation)
+        if(mRoutePositions.size() > 0 && mRoutePositions.size() == mCameraRotations.size())
         {
             int index = (int) (positionPercentageAdjusted(positionPercentage)/100 * (mCameraRotations.size() - 1));
             int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + (5+15*(1-positionPercentage/100)))/100 * (mCameraRotations.size() - 1));
@@ -203,4 +204,8 @@ void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
 	mCameraRotations = cameraRotations;
 }
 
+void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)
+{
+    mAutomaticRotation = automaticRotation;
+}
 } /* namespace cx */
