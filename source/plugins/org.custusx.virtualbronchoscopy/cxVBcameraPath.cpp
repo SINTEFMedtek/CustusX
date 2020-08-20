@@ -112,9 +112,6 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
     if (splineParameter > 0.8)
         splineFocusDistance = 0.02;
 
-//	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos : " << pos
-//			  << ", spline parameter : " << splineParameter << std::endl;
-
     double pos_r[3], focus_r[3], d_r[3];
     double splineParameterArray[3];
     splineParameterArray[0] = splineParameter;
@@ -131,17 +128,11 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
     mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
 
     if(mAutomaticRotation)
-        if(mRoutePositions.size() > 0 && mRoutePositions.size() == mCameraRotations.size())
+        if(mRoutePositions.size() > 0 && mRoutePositions.size() == mCameraRotationsSmoothed.size())
         {
-            int index = (int) (positionPercentageAdjusted(positionPercentage)/100 * (mCameraRotations.size() - 1));
-            int indexAheadAverage =(int) (positionPercentageAdjusted(positionPercentage + (5+15*(1-positionPercentage/100)))/100 * (mCameraRotations.size() - 1));
-            int numberOfElements =  mCameraRotations.size();
-            std::vector< double > averageElements(mCameraRotations.begin()+index, mCameraRotations.begin()+std::min(indexAheadAverage,numberOfElements-1));
-            if(averageElements.size() > 0)
-                mLastCameraRotAngle = std::accumulate(averageElements.begin(), averageElements.end(), 0.0) / averageElements.size();
-            else
-                mLastCameraRotAngle = 0;
-            CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle << " - index: " << index << " of " << mCameraRotations.size() - 1;
+            int index = (int) (splineParameter * (mRoutePositions.size() - 1));
+            mLastCameraRotAngle = mCameraRotationsSmoothed[index];
+            CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle << " - index: " << index << " of " << mCameraRotations.size() - 1 << " - splineParameter*(mCameraRotations.size() - 1): " << splineParameter*(mCameraRotations.size() - 1);
         }
 
     this->updateManualToolPosition();
@@ -181,6 +172,41 @@ void CXVBcameraPath::updateManualToolPosition()
     emit rotationChanged((int) (mLastCameraRotAngle * 180/M_PI));
 }
 
+std::vector< double > CXVBcameraPath::smoothCameraRotations(std::vector< double > cameraRotations)
+{
+    //Camera rotation is calculated as an average of rotation in the current position and positions ahead.
+    int numberOfElements = cameraRotations.size();
+    std::vector< double > cameraRotationsSmoothed = cameraRotations;
+
+    //Checking that a second turn/bifurcation is not included in the average
+    int maxPositionsToSmooth = (int) (10 * numberOfElements/100);
+    int positionsToSmooth = maxPositionsToSmooth;
+    for(int i=0; i<numberOfElements; i++)
+    {
+        positionsToSmooth = std::min((int) (positionsToSmooth+.5*numberOfElements/100), maxPositionsToSmooth);
+        CX_LOG_DEBUG() << i <<" positionsToSmooth:" << positionsToSmooth;
+        bool firstTurnPassed = false;
+        for(int j=i+1; j<std::min(i+positionsToSmooth, numberOfElements); j++)
+            if (cameraRotations[j] != cameraRotations[j-1])
+            {
+                CX_LOG_DEBUG() <<" Turn at index:" << j;
+                if (firstTurnPassed)
+                {
+                  positionsToSmooth = j-i;
+                  break;
+                }
+                else
+                    firstTurnPassed = true;
+            }
+
+        std::vector< double > averageElements(cameraRotations.begin()+i, cameraRotations.begin()+std::min(i+positionsToSmooth,numberOfElements-1));
+        if(averageElements.size() > 0)
+            cameraRotationsSmoothed[i] = std::accumulate(averageElements.begin(), averageElements.end(), 0.0) / averageElements.size();
+
+    }
+    return cameraRotationsSmoothed;
+}
+
 
 void CXVBcameraPath::cameraViewAngleSlot(int angle)
 {
@@ -202,6 +228,7 @@ void CXVBcameraPath::setRoutePositions(std::vector< Eigen::Vector3d > routePosit
 void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
 {
 	mCameraRotations = cameraRotations;
+    mCameraRotationsSmoothed = smoothCameraRotations(mCameraRotations);
 }
 
 void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)

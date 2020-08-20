@@ -56,11 +56,13 @@ private:
 
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< double > mCameraRotations;
+    std::vector< double > mCameraRotationsSmoothed;
 
     double      positionPercentageAdjusted(double positionPercentage);
 	void		updateManualToolPosition();
 	void		generateSplineCurve(MeshPtr mesh);
 	void		generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
+    std::vector< double > smoothCameraRotations(std::vector< double > cameraRotations);
 
 public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
