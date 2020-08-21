@@ -24,8 +24,16 @@ session = tf.Session(config=config)
 # Constants and input variables
 n_argin_expected = 2  # Expect input and output volume paths
 liver_model_path = 'networks/liver_model.h5'
+
+# Probably more "robust" for different input resolutions. Finds mostly large vessels
+# Set threshold to 0.4 - 0.5
 vessels_model_path = 'networks/liver_vessels_model_3D.hd5'
-#vessels_model_path = 'model3D_cropped.hd5'
+vessels_threshold = 0.4
+# Finds more vessels. Good results with 0.5 mm slice size
+# Set threshold to 0.6 - 0.7
+#vessels_model_path = 'networks/model3D_masked_orig_spacing.hd5'
+#vessels_threshold = 0.7
+
 img_size = 512
 input_image_path = ''
 output_image_path = ''
@@ -46,12 +54,6 @@ else:
 
 input_volume = custusVolume(input_image_path)
 input_volume.load_volume()
-
-#data = data_pretransform(data, img_size)
-#predicted_output = model.predict(data)
-#data = data_posttransform(data, curr_shape, img_size)
-#data = morph_postprocess(data)
-
 
 # Pre process
 data = input_volume.get_array()
@@ -119,8 +121,13 @@ combined_data = np.zeros((img_size, img_size, data.shape[2]), dtype=np.float32)
 print("Prosessing ", counts, " slabs")
 for count in range(counts):
   print("slab: ", count)
+
+  start_z = int((count*stride))
+  stop_z = int((count + 1) * stride) + stride
+  #print("Start stop: ", start_z, stop_z)
   tmp = np.zeros((img_size, img_size, slab_size, 1), dtype=np.float32)
-  data_slab = data[:, :, int(count * stride):int((count + 1) * stride)]
+  data_slab = data[:, :, start_z:stop_z]
+  #data_slab = data[:, :, int(count * stride):int((count + 1) * stride)]
   tmp[:, :, :data_slab.shape[-1], 0] = data_slab
   data_slab = tmp.copy()
 
@@ -129,51 +136,30 @@ for count in range(counts):
     print("Empty slab: ", count)
     #continue
 
-  data_slab = data_predict(data_slab, vessels_model, threshold = 0.4)
+  data_slab = data_predict(data_slab, vessels_model, threshold = vessels_threshold)
   #print("data_slab: ", data_slab.shape)
 
-#  if count == 0:
+  # Use only data from the center of the slab.
+  start_z = int(start_z + (stride/2))
+  stop_z = int(stop_z - (stride/2))
+  start_slab_z = int(stride / 2)
 
-    #tmp = np.zeros((img_size, img_size, data.shape[2]), dtype=np.float32)
-    #print("tmp: ", tmp.shape)
-#    combined_data[:, :, 0:data_slab.shape[2]] = np.squeeze(data_slab, axis=3)
-    #print("tmp: ", tmp.shape)
-    #combined_data = tmp.copy()
+  if count == 0: # Don't leave first 4 slices empty
+    start_z = 0
+    start_slab_z = 0
 
-    #combined_data = data_slab.copy()
-#    print("combined_data: ", combined_data.shape)
-    #combined_data = np.squeeze(combined_data, axis=3) # Changing shape back
-#  else:
-    #print("skipping slab: ", count)
-
-  start_z = (count*stride)
-  stop_z = (count*stride)+data_slab.shape[2]
-  slab_z = slab_size
-  #print("copy range from slab: ", start_z, stop_z)
   if stop_z > (combined_data.shape[2]):
-    slab_z = slab_size - (stop_z - combined_data.shape[2])
     stop_z = combined_data.shape[2]
-  #print("modified: ", start_z, stop_z, slab_z)
-  combined_data[:, :, start_z:stop_z] = np.squeeze(data_slab, axis=3)[:, :, 0:slab_z]
+
+  stop_slab_z = start_slab_z + stop_z - start_z
+  #print("modified: ", start_z, stop_z, start_slab_z, stop_slab_z)
+
+  if start_z < combined_data.shape[2]:
+    combined_data[:, :, start_z:stop_z] = np.squeeze(data_slab, axis=3)[:, :, start_slab_z:stop_slab_z]
   #print("combined_data: ", combined_data.shape)
-
-#    continue
-
-#    for index in range(stride, slab_size):
-#      if(combined_data.shape[2] < data.shape[2]):
-#        data_slice = data_slab[:, :, index]
-
-#        if np.count_nonzero(data_slab) == 0:
-#          print("Empty slice: ", index)
-
-        #print("data_slice: ", data_slice.shape)
-#        combined_data = np.concatenate((combined_data, data_slice), axis = 2)
-    #print("combined_data: ", combined_data.shape)
 
 data=combined_data
 print(data.shape)
-#data = np.squeeze(data, axis=3) # Changing shape back
-#print(data.shape)
 
 
 # Apply liver mask on vessels as well
