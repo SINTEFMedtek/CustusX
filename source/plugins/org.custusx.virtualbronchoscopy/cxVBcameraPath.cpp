@@ -132,7 +132,7 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
         {
             int index = (int) (splineParameter * (mRoutePositions.size() - 1));
             mLastCameraRotAngle = mCameraRotationsSmoothed[index];
-            CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle << " - index: " << index << " of " << mCameraRotations.size() - 1 << " - splineParameter*(mCameraRotations.size() - 1): " << splineParameter*(mCameraRotations.size() - 1);
+            CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle*180/M_PI;
         }
 
     this->updateManualToolPosition();
