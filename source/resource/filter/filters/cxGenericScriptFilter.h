@@ -20,6 +20,19 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+struct cxResourceFilter_EXPORT CommandStringVariables
+{
+	QString inputFilePath;
+	QString outputFilePath;
+	QString envPath;
+	QString scriptFilePath;
+	QString cArguments;
+	QString scriptEngine;
+	QString model;
+
+	CommandStringVariables(QString parameterFilePath, ImagePtr input);
+};
+
 /** Generic filter calling external filter script.
  *
  *
@@ -59,6 +72,11 @@ protected:
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);
+
+	CommandStringVariables createCommandStringVariables(ImagePtr input);
+	QString standardCommandString(CommandStringVariables variables);
+	bool isUsingDeepSintefEngine(CommandStringVariables variables);
+	QString deepSintefCommandString(CommandStringVariables variables);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

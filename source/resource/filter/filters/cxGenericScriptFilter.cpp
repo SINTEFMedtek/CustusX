@@ -40,6 +40,22 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+CommandStringVariables::CommandStringVariables(QString parameterFilePath, ImagePtr input)
+{
+	// Parse .ini file
+	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	settings.beginGroup("environment");
+	envPath = settings.value("path").toString();
+	settings.endGroup();
+	settings.beginGroup("script");
+	scriptFilePath = settings.value("path").toString();
+	cArguments = settings.value("arguments").toString();
+	scriptEngine = settings.value("engine").toString();
+	model = settings.value("model").toString();
+	settings.endGroup();
+}
+
+
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services),
 	mOutputChannelName("ExternalScript"),
@@ -200,33 +216,59 @@ void GenericScriptFilter::scriptFileChanged()
 
 QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
-	// Get paths
+	CommandStringVariables variables = createCommandStringVariables(input);
+
+	if(isUsingDeepSintefEngine(variables))
+		return deepSintefCommandString(variables);
+
+	return standardCommandString(variables);
+}
+
+CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePtr input)
+{
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
-	QString inputFilePath = getInputFilePath(input);
-	QString outputFilePath = getOutputFilePath(input);
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
-	// Parse .ini file
-	QSettings settings(parameterFilePath, QSettings::IniFormat);	
-	settings.beginGroup("environment");
-	QString envPath = settings.value("path").toString();
-	settings.endGroup();
-	settings.beginGroup("script");
-	QString scriptFilePath = settings.value("path").toString();
-	QString cArguments = settings.value("arguments").toString();
-	settings.endGroup();
+	CommandStringVariables variables = CommandStringVariables(parameterFilePath, input);
 
-	// Build command
-	QString commandString = envPath;
-	commandString.append(" " + scriptFilePath);
-	commandString.append(" " + inputFilePath);
-	commandString.append(" " + outputFilePath);
-	//TODO: OVS testcode
-	//commandString.append(" --input " + inputFilePath);
-	//if(!mResultFileEnding.isEmpty())
-	//	commandString.append(" --ending " + mResultFileEnding);
-	commandString.append(" " + cArguments);
+	// Get paths
+	variables.inputFilePath = getInputFilePath(input);
+	variables.outputFilePath = getOutputFilePath(input);
 
+	return variables;
+}
+
+QString GenericScriptFilter::standardCommandString(CommandStringVariables variables)
+{
+	QString commandString = variables.envPath;
+	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + variables.inputFilePath);
+	commandString.append(" " + variables.outputFilePath);
+	commandString.append(" " + variables.cArguments);
+
+	return commandString;
+}
+
+bool GenericScriptFilter::isUsingDeepSintefEngine(CommandStringVariables variables)
+{
+	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
+		return true;
+	return false;
+}
+
+QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
+{
+	QString commandString = variables.envPath;
+	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" --Task database --Arguments ");
+	commandString.append("\"");
+	commandString.append("InputVolume ");
+	commandString.append(variables.inputFilePath);
+	commandString.append(",OutputLabel ");
+	commandString.append(variables.outputFilePath);
+	commandString.append(",ModelsList ");
+	commandString.append(variables.model);
+	commandString.append("\"");
 	return commandString;
 }
 
