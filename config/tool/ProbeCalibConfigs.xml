@@ -3719,7 +3719,7 @@
                 <HorizontalOffset>0</HorizontalOffset>
                 <Config>
                     <ID>WidthMaxDepth2</ID>
-                    <Name>Width: Max, Depth: 2.0 cm</Name>
+                    <Name>Width: Max, Depth: 2 cm</Name>
                <WidthDeg>69.47262</WidthDeg>
                <Depth>1129.22379348454</Depth>
                <Offset>387.467146176994</Offset>
@@ -3751,13 +3751,13 @@
                   <Bottom>1137</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.00185873525676173</Width>
-                  <Height>0.00185873525676173</Height>
+                  <Width>0.0185873525676173</Width>
+                  <Height>0.0185873525676173</Height>
                </PixelSize>
             </Config>
                 <Config>
                     <ID>WidthMaxDepth3</ID>
-                    <Name>Width: Max, Depth: 3.0 cm</Name>
+                    <Name>Width: Max, Depth: 3 cm</Name>
                <WidthDeg>67.49262</WidthDeg>
                <Depth>1153.00042281007</Depth>
                <Offset>266.789176012133</Offset>
@@ -3789,8 +3789,8 @@
                   <Bottom>1137</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.00278810408921933</Width>
-                  <Height>0.00278810408921933</Height>
+                  <Width>0.0278810408921933</Width>
+                  <Height>0.0278810408921933</Height>
                </PixelSize>
             </Config>
                 <Config>
@@ -3827,8 +3827,8 @@
                   <Bottom>1136</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.00371747211895911</Width>
-                  <Height>0.00371747211895911</Height>
+                  <Width>0.0371747211895911</Width>
+                  <Height>0.0371747211895911</Height>
                </PixelSize>
             </Config>
                 <Config>
@@ -3865,8 +3865,8 @@
                   <Bottom>1137</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.00464684014869888</Width>
-                  <Height>0.00464684014869888</Height>
+                  <Width>0.0464684014869888</Width>
+                  <Height>0.0464684014869888</Height>
                </PixelSize>
             </Config>
                 <Config>
@@ -3903,8 +3903,8 @@
                     <Bottom>1133</Bottom>
                 </CroppingEdges>
                 <PixelSize>
-                    <Width>0.00557620817843866</Width>
-                    <Height>0.00557620817843866</Height>
+                    <Width>0.0557620817843866</Width>
+                    <Height>0.0557620817843866</Height>
                 </PixelSize>
             </Config>
            </RTSource>
