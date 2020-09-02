@@ -3720,39 +3720,39 @@
                 <Config>
                     <ID>WidthMaxDepth2</ID>
                     <Name>Width: Max, Depth: 2 cm</Name>
-               <WidthDeg>69.47262</WidthDeg>
-               <Depth>1129.22379348454</Depth>
-               <Offset>387.467146176994</Offset>
+               <WidthDeg>69.74802</WidthDeg>
+               <Depth>1118.72147978337</Depth>
+               <Offset>391.198567738073</Offset>
                <Origin>
-                  <Col>1179.17551562846</Col>
-                  <Row>-230.638938889465</Row>
+                  <Col>1180.39213292923</Col>
+                  <Row>-229.801077312801</Row>
                </Origin>
                <NCorners>4</NCorners>
                <Corner>
-                  <Col>958.396570813621</Col>
-                  <Row>87.7750163527476</Row>
+                  <Col>956.715047314553</Col>
+                  <Row>91.1426572751267</Row>
                </Corner>
                <Corner>
-                  <Col>314.964372638435</Col>
-                  <Row>1015.75205385048</Row>
+                  <Col>317.059432879834</Col>
+                  <Row>1008.954426785</Row>
                </Corner>
                <Corner>
-                  <Col>2042.96437263843</Col>
-                  <Row>1016.04474872211</Row>
+                  <Col>2043.05943287983</Col>
+                  <Row>1009.41790232845</Row>
                </Corner>
                <Corner>
-                  <Col>1399.39657081362</Col>
-                  <Row>88.1611179168032</Row>
+                  <Col>1403.71504731455</Col>
+                  <Row>91.3892016664423</Row>
                </Corner>
                <CroppingEdges>
-                  <Left>619</Left>
-                  <Right>1684</Right>
-                  <Top>81</Top>
-                  <Bottom>1137</Bottom>
+                  <Left>620</Left>
+                  <Right>1689</Right>
+                  <Top>91</Top>
+                  <Bottom>1141</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.0185873525676173</Width>
-                  <Height>0.0185873525676173</Height>
+                  <Width>0.0185873605947955</Width>
+                  <Height>0.0185873605947955</Height>
                </PixelSize>
             </Config>
                 <Config>
