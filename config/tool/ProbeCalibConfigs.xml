@@ -3872,40 +3872,40 @@
                 <Config>
                 <ID>WidthMaxDepth6</ID>
                 <Name>Width: Max, Depth: 6 cm</Name>
-                <WidthDeg>66.49722</WidthDeg>
-                <Depth>1155.84930480879</Depth>
-                <Offset>136.792964432515</Offset>
-                <Origin>
-                    <Col>1178.43719633366</Col>
-                    <Row>-33.0013727818566</Row>
-                </Origin>
-                <NCorners>4</NCorners>
-                <Corner>
-                    <Col>1103.43731541718</Col>
-                    <Row>81.3985091269517</Row>
-                </Corner>
-                <Corner>
-                    <Col>469.716417725682</Col>
-                    <Row>1048.03465538678</Row>
-                </Corner>
-                <Corner>
-                    <Col>1886.71641772568</Col>
-                    <Row>1048.32400876323</Row>
-                </Corner>
-                <Corner>
-                    <Col>1252.43731541718</Col>
-                    <Row>82.0477362710168</Row>
-                </Corner>
-                <CroppingEdges>
-                    <Left>618</Left>
-                    <Right>1686</Right>
-                    <Top>63</Top>
-                    <Bottom>1133</Bottom>
-                </CroppingEdges>
-                <PixelSize>
-                    <Width>0.0557620817843866</Width>
-                    <Height>0.0557620817843866</Height>
-                </PixelSize>
+               <WidthDeg>66.44952</WidthDeg>
+               <Depth>1180.8991597439</Depth>
+               <Offset>135.920283707352</Offset>
+               <Origin>
+                  <Col>1178.62631563153</Col>
+                  <Row>-33.0325645594356</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>1104.15222481336</Col>
+                  <Row>80.6685054438574</Row>
+               </Corner>
+               <Corner>
+                  <Col>457.108318848401</Col>
+                  <Row>1068.52325652697</Row>
+               </Corner>
+               <Corner>
+                  <Col>1900.1083188484</Col>
+                  <Row>1068.54683143771</Row>
+               </Corner>
+               <Corner>
+                  <Col>1252.15222481336</Col>
+                  <Row>81.2839443186456</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>620</Left>
+                  <Right>1692</Right>
+                  <Top>79</Top>
+                  <Bottom>1137</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.055762057702852</Width>
+                  <Height>0.055762057702852</Height>
+               </PixelSize>
             </Config>
            </RTSource>
         </USProbe>
