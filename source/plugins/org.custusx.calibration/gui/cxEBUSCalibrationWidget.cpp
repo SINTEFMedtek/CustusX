@@ -85,7 +85,7 @@ void EBUSCalibrationWidget::calibrateSlot()
     reportError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
     return;
   }
-  if(!refTool->getVisible() || !tool->getVisible() || !refTool->hasReferencePointWithId(1))
+  if(!refTool->getVisible() || !tool->getVisible())
   {
     reportError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3").arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId(1)) );
     return;
@@ -179,8 +179,19 @@ Vector3D EBUSCalibrationCalculator::get_delta_ref()
 
 Transform3D EBUSCalibrationCalculator::get_calibration_sMt()
 {
-	Transform3D calibration = m_sMpr * m_qMpr.inv();
-	return calibration;
+    //Transform3D calibration = m_sMpr * m_qMpr.inv();
+    Transform3D tool_prMs = mTool->get_prMt() * mTool->getCalibration_sMt().inverse();
+    //Transform3D calibration = mTool->get_prMt() * mTool->getCalibration_sMt();
+//    CX_LOG_DEBUG() << "prMt: " <<  mTool->get_prMt();
+//    CX_LOG_DEBUG() << "prMs: " <<  tool_prMs;
+//    CX_LOG_DEBUG() << "old calibration: " <<  mTool->getCalibration_sMt();
+
+    //Legg til mulighet for at sensor på adapter ikke er referansesensor?
+    //Trolig gir det bedre nøyaktighet uten ekstern referansesensor, så best uten?
+
+    Transform3D calibration =  tool_prMs.inverse() * mTool->getCalibration_sMt();
+
+    return calibration;
 }
 
 }
