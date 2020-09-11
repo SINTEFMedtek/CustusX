@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 class QPushButton;
 class QGroupBox;
+class QComboBox;
 class QLineEdit;
 
 namespace cx
@@ -55,13 +56,18 @@ private slots:
   void calibrateSlot();
   void toolSelectedSlot();
   void trackingStartedSlot();
+	void browseAdapterCalibrationPathSlot();
 
 private:
+	Transform3D readCalibrationFile(QString absoluteFilePath);
+
   VisServicesPtr mServices;
   QPushButton* mCalibrateButton;
   QLabel* mReferencePointLabel;
   QLabel* mCalibrationLabel;
   QLabel* mDeltaLabel;
+	QString mAdapterCalibrationPath;
+	QComboBox* mAdapterCalibrationPathComboBox;
   StringPropertySelectToolPtr mCalibRefTool;
   StringPropertySelectToolPtr mCalibratingTool;
 };
@@ -81,8 +87,7 @@ public:
 	EBUSCalibrationCalculator(ToolPtr tool, ToolPtr calRef);
 	~EBUSCalibrationCalculator() {}
 
-  Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
-  Transform3D get_calibration_sMt(); ///< new calibration matrix for the input tool.
+	Transform3D get_calibration_sMt(Transform3D adapterCalibration); ///< new calibration matrix for the input tool.
 
 private:
   ToolPtr mTool; ///< the tool the sampled point is taken from

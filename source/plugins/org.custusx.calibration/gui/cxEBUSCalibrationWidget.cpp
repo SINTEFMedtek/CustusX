@@ -27,6 +27,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDoubleWidgets.h"
 #include "cxVisServices.h"
 #include "cxStringPropertySelectTool.h"
+#include "cxSettings.h"
+#include "cxTransformFile.h"
+#include "cxFrame3D.h"
 
 namespace cx
 {
@@ -35,40 +38,62 @@ namespace cx
 EBUSCalibrationWidget::EBUSCalibrationWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "ebus_calibration_widget", "EBUS Calibrate"),
 	mServices(services),
-    mCalibrateButton(new QPushButton("Calibrate")),
-    mReferencePointLabel(new QLabel("Ref. point:")),
-    mCalibrationLabel(new QLabel("Calibration: \n")),
-    mDeltaLabel(new QLabel("Delta:"))
+	mCalibrateButton(new QPushButton("Calibrate")),
+	mReferencePointLabel(new QLabel("Ref. point:")),
+	mCalibrationLabel(new QLabel("Calibration: \n")),
+	mDeltaLabel(new QLabel("Delta:"))
 {
-  QVBoxLayout* toplayout = new QVBoxLayout(this);
+	QVBoxLayout* toplayout = new QVBoxLayout(this);
 
-  mCalibRefTool = StringPropertySelectTool::New(mServices->tracking());
+	mCalibRefTool = StringPropertySelectTool::New(mServices->tracking());
 	mCalibRefTool->setValueName("Calibration Adapter");
 	mCalibRefTool->setHelp("Select Calibration Adapter sensor");
 
-  mCalibratingTool = StringPropertySelectTool::New(mServices->tracking());
-  mCalibratingTool->setValueName("Tool");
-  mCalibratingTool->setHelp("Select which Tool to calibrate");
+	mCalibratingTool = StringPropertySelectTool::New(mServices->tracking());
+	mCalibratingTool->setValueName("Tool");
+	mCalibratingTool->setHelp("Select which Tool to calibrate");
 
+	// Adapter calibration matrix path
+	mAdapterCalibrationPath = settings()->value("EBUScalibration/path").toString();
+
+	QLabel* adapterCalibrationPathLabel = new QLabel(tr("EBUS adapter calibration matrix path:"));
+	//QString adapterCalibrationPathSubstring = "...";
+	//adapterCalibrationPathSubstring.append(mAdapterCalibrationPath.right(40));
+	//QLabel* adapterCalibrationPathSubstringLabel = new QLabel(adapterCalibrationPathSubstring);
+	mAdapterCalibrationPathComboBox = new QComboBox();
+	mAdapterCalibrationPathComboBox->addItem(mAdapterCalibrationPath);
+	QAction* browseAdapterCalibrationPathAction = new QAction(QIcon(":/icons/open.png"), tr("Browse for EBUS adapter calibration matrix..."), this);
+	connect(browseAdapterCalibrationPathAction, &QAction::triggered, this, &EBUSCalibrationWidget::browseAdapterCalibrationPathSlot);
+	QToolButton* browseAdapterCalibrationPathButton = new QToolButton(this);
+	browseAdapterCalibrationPathButton->setDefaultAction(browseAdapterCalibrationPathAction);
+
+	QGridLayout* gridLayout = new QGridLayout();
+	//mVerticalLayout->addLayout(gridLayout);
+
+	gridLayout->addWidget(adapterCalibrationPathLabel, 0, 0);
+	gridLayout->addWidget(mAdapterCalibrationPathComboBox, 1, 0);
+	//gridLayout->addWidget(adapterCalibrationPathSubstringLabel, 1, 0);
+	gridLayout->addWidget(browseAdapterCalibrationPathButton, 1, 1);
 	//this->setToolTip("Calibrate tool matrix using a custom frame");
 
-  toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibRefTool));
-  toplayout->addWidget(mReferencePointLabel);
-  toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibratingTool));
-  toplayout->addWidget(mCalibrateButton);
-  toplayout->addWidget(mCalibrationLabel);
-  toplayout->addWidget(this->createHorizontalLine());
+	toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibRefTool));
+	toplayout->addWidget(mReferencePointLabel);
+	toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibratingTool));
+	toplayout->addLayout(gridLayout);
+	toplayout->addWidget(mCalibrateButton);
+	toplayout->addWidget(mCalibrationLabel);
+	toplayout->addWidget(this->createHorizontalLine());
 	//toplayout->addWidget(mDeltaLabel);
-  toplayout->addStretch();
+	toplayout->addStretch();
 
-	mReferencePointLabel->setText("<i> Use EBUS adapter for calibration </i>");
+	mReferencePointLabel->setText("<i> EBUS adapter for calibration - Use sensor on adapter as reference </i>");
 
-  connect(mCalibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
+	connect(mCalibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
 
-  connect(mCalibRefTool.get(), SIGNAL(changed()), this, SLOT(toolSelectedSlot()));
+	connect(mCalibRefTool.get(), SIGNAL(changed()), this, SLOT(toolSelectedSlot()));
 
-  //setting default state
-  this->toolSelectedSlot();
+	//setting default state
+	this->toolSelectedSlot();
 
 	connect(mServices->tracking().get(), &cx::TrackingService::stateChanged, this, &EBUSCalibrationWidget::trackingStartedSlot);
 }
@@ -78,49 +103,49 @@ EBUSCalibrationWidget::~EBUSCalibrationWidget()
 
 void EBUSCalibrationWidget::calibrateSlot()
 {
-  ToolPtr refTool = mCalibRefTool->getTool();
-  ToolPtr tool = mCalibratingTool->getTool();
-  if(!refTool || !tool)
-  {
-    reportError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
-    return;
-  }
-  if(!refTool->getVisible() || !tool->getVisible())
-  {
-    reportError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3").arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId(1)) );
-    return;
-  }
+	ToolPtr refTool = mCalibRefTool->getTool();
+	ToolPtr tool = mCalibratingTool->getTool();
+	if(!refTool || !tool)
+	{
+	reportError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
+	return;
+	}
+	if(!refTool->getVisible() || !tool->getVisible())
+	{
+		reportError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2").arg(refTool->getVisible()).arg(tool->getVisible()) );
+		return;
+	}
 
 	EBUSCalibrationCalculator calc(tool, refTool);
-  Transform3D calibration = calc.get_calibration_sMt();
+	Transform3D adapterCalibration = readCalibrationFile(mAdapterCalibrationPath);
+	Transform3D calibration = calc.get_calibration_sMt(adapterCalibration);
 
-  QMessageBox msgBox;
-  msgBox.setText("Do you want to overwrite "+tool->getName()+"'s calibration file?");
-  msgBox.setInformativeText("This cannot be undone.");
-  msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-  msgBox.setDefaultButton(QMessageBox::Ok);
-  int ret = msgBox.exec();
+	QMessageBox msgBox;
+	msgBox.setText("Do you want to overwrite "+tool->getName()+"'s calibration file?");
+	msgBox.setInformativeText("This cannot be undone.");
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	msgBox.setDefaultButton(QMessageBox::Ok);
+	int ret = msgBox.exec();
 
-  if(ret == QMessageBox::Ok)
-  {
-    try
-    {
-        tool->setCalibration_sMt(calibration);
-    }
-    catch(std::exception& e)
-    {
-        QMessageBox msgBox2;
-        msgBox2.setText("Unknown error, could not calibrate the tool: "+tool->getName()+".");
-        msgBox2.setInformativeText(QString(e.what()));
-        msgBox2.setStandardButtons(QMessageBox::Ok);
-        msgBox2.setDefaultButton(QMessageBox::Ok);
-        int ret2 = msgBox2.exec();
-        return;
-    }
-    mCalibrationLabel->setText(QString("Calibration matrix for %1:\n%2").arg(tool->getName(), qstring_cast(calibration)));
-  }
+	if(ret == QMessageBox::Ok)
+	{
+		try
+		{
+			tool->setCalibration_sMt(calibration);
+		}
+		catch(std::exception& e)
+		{
+			QMessageBox msgBox2;
+			msgBox2.setText("Unknown error, could not calibrate the tool: "+tool->getName()+".");
+			msgBox2.setInformativeText(QString(e.what()));
+			msgBox2.setStandardButtons(QMessageBox::Ok);
+			msgBox2.setDefaultButton(QMessageBox::Ok);
+			int ret2 = msgBox2.exec();
+			return;
+		}
+		mCalibrationLabel->setText(QString("Calibration matrix for %1:\n%2").arg(tool->getName(), qstring_cast(calibration)));
+	}
 }
-
 
 void EBUSCalibrationWidget::toolSelectedSlot()
 {
@@ -137,6 +162,34 @@ void EBUSCalibrationWidget::toolSelectedSlot()
 
 	//  mReferencePointLabel->setText(text);
 }
+
+void EBUSCalibrationWidget::browseAdapterCalibrationPathSlot()
+{
+	QFileInfo fileInfo(mAdapterCalibrationPath);
+	mAdapterCalibrationPath = QFileDialog::getOpenFileName(this, tr("Find adapter calibration matrix file"), fileInfo.absolutePath());
+
+	settings()->setValue("EBUScalibration/path", mAdapterCalibrationPath);
+
+	if(!mAdapterCalibrationPath.isEmpty())
+	{
+		mAdapterCalibrationPathComboBox->addItem( mAdapterCalibrationPath );
+		mAdapterCalibrationPathComboBox->setCurrentIndex( mAdapterCalibrationPathComboBox->currentIndex() + 1 );
+	}
+}
+
+Transform3D EBUSCalibrationWidget::readCalibrationFile(QString absoluteFilePath)
+{
+	bool ok = true;
+	TransformFile file(absoluteFilePath);
+	Transform3D retval = file.read(&ok);
+
+	if (ok)
+		retval = Frame3D::create(retval).transform(); // clean rotational parts, transform should now be pure rotation+translation
+
+	return retval;
+}
+
+
 //------------------------------------------------------------------------------
 
 void EBUSCalibrationWidget::trackingStartedSlot()
@@ -154,44 +207,21 @@ void EBUSCalibrationWidget::trackingStartedSlot()
 
 
 EBUSCalibrationCalculator::EBUSCalibrationCalculator(ToolPtr tool, ToolPtr calRef) :
-		mTool(tool), mCalibrationRef(calRef)
+	mTool(tool), mCalibrationRef(calRef)
 {
 	m_sMpr = mTool->getCalibration_sMt() * mTool->get_prMt().inv();
-
-//	m_qMcr = Transform3D::fromString(" 0.0,  0.0, -1.0, -71.5,"
-//		                                  " 0.0, -1.0,  0.0,  -8.0,"
-//	                                      "-1.0,  0.0,  0.0,  -8.8,"
-//	                                      " 0.0,  0.0,  0.0,   1.0");
 
 	m_qMcr = Transform3D::Identity();
 	m_qMpr = m_qMcr * mCalibrationRef->get_prMt().inv();
 }
 
-Vector3D EBUSCalibrationCalculator::get_delta_ref()
+Transform3D EBUSCalibrationCalculator::get_calibration_sMt(Transform3D adapterCalibration)
 {
-	Vector3D p(0,0,0);
-	Transform3D qMpr = m_qMcr * mCalibrationRef->get_prMt().inv();
+	Transform3D tool_prMs = mTool->get_prMt() * mTool->getCalibration_sMt().inverse();
 
-	Vector3D calibPoint_pr =  qMpr.inv().coord(p);
-	Vector3D toolPoint_pr =  mTool->get_prMt().coord(p);
-	return calibPoint_pr - toolPoint_pr;
-}
+	Transform3D calibration = tool_prMs.inverse() * adapterCalibration;
 
-Transform3D EBUSCalibrationCalculator::get_calibration_sMt()
-{
-    //Transform3D calibration = m_sMpr * m_qMpr.inv();
-    Transform3D tool_prMs = mTool->get_prMt() * mTool->getCalibration_sMt().inverse();
-    //Transform3D calibration = mTool->get_prMt() * mTool->getCalibration_sMt();
-//    CX_LOG_DEBUG() << "prMt: " <<  mTool->get_prMt();
-//    CX_LOG_DEBUG() << "prMs: " <<  tool_prMs;
-//    CX_LOG_DEBUG() << "old calibration: " <<  mTool->getCalibration_sMt();
-
-    //Legg til mulighet for at sensor på adapter ikke er referansesensor?
-    //Trolig gir det bedre nøyaktighet uten ekstern referansesensor, så best uten?
-
-    Transform3D calibration =  tool_prMs.inverse() * mTool->getCalibration_sMt();
-
-    return calibration;
+	return calibration;
 }
 
 }
