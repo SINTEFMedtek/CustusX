@@ -57,36 +57,30 @@ EBUSCalibrationWidget::EBUSCalibrationWidget(VisServicesPtr services, QWidget* p
 	mAdapterCalibrationPath = settings()->value("EBUScalibration/path").toString();
 
 	QLabel* adapterCalibrationPathLabel = new QLabel(tr("EBUS adapter calibration matrix path:"));
-	//QString adapterCalibrationPathSubstring = "...";
-	//adapterCalibrationPathSubstring.append(mAdapterCalibrationPath.right(40));
-	//QLabel* adapterCalibrationPathSubstringLabel = new QLabel(adapterCalibrationPathSubstring);
 	mAdapterCalibrationPathComboBox = new QComboBox();
 	mAdapterCalibrationPathComboBox->addItem(mAdapterCalibrationPath);
+	mAdapterCalibrationPathComboBox->setMaximumWidth(500);
 	QAction* browseAdapterCalibrationPathAction = new QAction(QIcon(":/icons/open.png"), tr("Browse for EBUS adapter calibration matrix..."), this);
 	connect(browseAdapterCalibrationPathAction, &QAction::triggered, this, &EBUSCalibrationWidget::browseAdapterCalibrationPathSlot);
 	QToolButton* browseAdapterCalibrationPathButton = new QToolButton(this);
 	browseAdapterCalibrationPathButton->setDefaultAction(browseAdapterCalibrationPathAction);
 
 	QGridLayout* gridLayout = new QGridLayout();
-	//mVerticalLayout->addLayout(gridLayout);
 
 	gridLayout->addWidget(adapterCalibrationPathLabel, 0, 0);
 	gridLayout->addWidget(mAdapterCalibrationPathComboBox, 1, 0);
-	//gridLayout->addWidget(adapterCalibrationPathSubstringLabel, 1, 0);
 	gridLayout->addWidget(browseAdapterCalibrationPathButton, 1, 1);
-	//this->setToolTip("Calibrate tool matrix using a custom frame");
 
-	toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibRefTool));
 	toplayout->addWidget(mReferencePointLabel);
+	toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibRefTool));
 	toplayout->addWidget(new LabeledComboBoxWidget(this, mCalibratingTool));
 	toplayout->addLayout(gridLayout);
 	toplayout->addWidget(mCalibrateButton);
 	toplayout->addWidget(mCalibrationLabel);
 	toplayout->addWidget(this->createHorizontalLine());
-	//toplayout->addWidget(mDeltaLabel);
 	toplayout->addStretch();
 
-	mReferencePointLabel->setText("<i> EBUS adapter for calibration - Use sensor on adapter as reference </i>");
+	mReferencePointLabel->setText("<b>EBUS calibration adapter - Use sensor on adapter as reference</b>");
 
 	connect(mCalibrateButton, SIGNAL(clicked()), this, SLOT(calibrateSlot()));
 
