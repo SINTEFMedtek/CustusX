@@ -87,20 +87,6 @@ void BranchList::selectGenerations(int maxGeneration)
         deleteBranch(mBranches[branchNumbersToBeDeleted[i]]);
 }
 
-
-void BranchList::calculateOrientations()
-{
-    for (int i = 0; i < mBranches.size(); i++)
-    {
-        Eigen::MatrixXd positions = mBranches[i]->getPositions();
-        Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
-        Eigen::MatrixXd orientations(positions.rows(),positions.cols());
-        orientations.leftCols(orientations.cols() - 1) = diff / diff.norm();
-        orientations.rightCols(1) = orientations.col(orientations.cols() - 1);
-        mBranches[i]->setOrientations(orientations);
-    }
-}
-
 void BranchList::findBronchoscopeRotation()
 {
     BranchPtr trachea = this->getBranches()[0];
@@ -434,7 +420,6 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
     }
 }
 
-
 BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance)
 {
     BranchListPtr retval = BranchListPtr(new BranchList());
@@ -443,7 +428,6 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
     {
         b = BranchPtr(new Branch());
         b->setPositions(mBranches[i]->getPositions());
-        b->setOrientations(mBranches[i]->getOrientations());
         retval->addBranch(b);
     }
 
@@ -466,7 +450,6 @@ BranchListPtr BranchList::removePositionsForLocalRegistration(Eigen::MatrixXd tr
             }
         }
         branches[i]->setPositions(positions);
-        branches[i]->setOrientations(orientations);
     }
     return retval;
 }
@@ -488,7 +471,6 @@ void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
             }
         }
         branchVector[i]->setPositions(positions);
-        branchVector[i]->setOrientations(orientations);
     }
 
 }

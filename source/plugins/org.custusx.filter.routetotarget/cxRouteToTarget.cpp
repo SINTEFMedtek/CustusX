@@ -77,8 +77,7 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 
 	mBranchListPtr->findBranchesInCenterline(mCLpoints);
 
-	mBranchListPtr->calculateOrientations();
-	mBranchListPtr->smoothOrientations();
+    mBranchListPtr->smoothOrientations();
 	//mBranchListPtr->smoothBranchPositions(40);
 	mBranchListPtr->findBronchoscopeRotation();
 
@@ -98,7 +97,6 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 
 	mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
 
-	mBloodVesselBranchListPtr->calculateOrientations();
 	mBloodVesselBranchListPtr->smoothOrientations();
 	mBloodVesselBranchListPtr->smoothBranchPositions(40);
 	setBloodVesselRadius();
@@ -128,7 +126,6 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 		mBloodVesselBranchListPtr->deleteAllBranches();
 
 		mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
-		mBloodVesselBranchListPtr->calculateOrientations();
 		mBloodVesselBranchListPtr->smoothOrientations();
 		mBloodVesselBranchListPtr->smoothBranchPositions(40);
 		setBloodVesselRadius();
@@ -221,8 +218,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	else
 		positions = getBranchPositions(searchBranchPtr, startIndex);
 
-	double cameraRotation = searchBranchPtr->getBronchoscopeRotation();
-	CX_LOG_DEBUG() << "cameraRotation: "<< cameraRotation*180/M_PI;
+    double cameraRotation = searchBranchPtr->getBronchoscopeRotation();
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 	{

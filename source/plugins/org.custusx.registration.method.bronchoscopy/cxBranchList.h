@@ -35,7 +35,6 @@ public:
 	std::vector<BranchPtr> getBranches();
 	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true);
 	void selectGenerations(int maxGeneration);
-	void calculateOrientations();
 	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);
 	void smoothOrientations();
