@@ -111,10 +111,7 @@ void BranchList::calculateBronchoscopeRotation(BranchPtr branch)
         double bronchoscopeRotation = bendingDirectionToBronchoscopeRotation(bendingDirection, parentBranchOrientationEnd, parentRotation);
 
         branch->setBronchoscopeRotation(bronchoscopeRotation);
-        //CX_LOG_DEBUG() << "parent orientation: " << parentBranchOrientationEnd << " - orientation: " << branchOrientationStart << " - bending direction: " << bendingDirection;
     }
-
-    //CX_LOG_DEBUG() << "Bronchoscope rotation: " << branch->getBronchoscopeRotation()*180/M_PI;
 
     branchVector childBranches = branch->getChildBranches();
     for(int i=0; i<childBranches.size(); i++)
@@ -146,7 +143,7 @@ double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3
     else if ( rotationDifferenceFromParent < -M_PI )
         rotationDifferenceFromParent = rotationDifferenceFromParent + 2*M_PI;
 
-    //Desciding to tilt down if needed rotation is less than maxRotationToTiltDown
+    //Tilt down if needed rotation is less than maxRotationToTiltDown
     if( rotationDifferenceFromParent < (maxRotationToTiltDown - 180)*M_PI/180 )
         bronchoscopeRotation = bronchoscopeRotation + M_PI;
     else if( rotationDifferenceFromParent > (180 - maxRotationToTiltDown)*M_PI/180 )

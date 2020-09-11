@@ -132,7 +132,7 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
         {
             int index = (int) (splineParameter * (mRoutePositions.size() - 1));
             mLastCameraRotAngle = mCameraRotationsSmoothed[index];
-            CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle*180/M_PI;
+            //CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle*180/M_PI;
         }
 
     this->updateManualToolPosition();
@@ -184,12 +184,10 @@ std::vector< double > CXVBcameraPath::smoothCameraRotations(std::vector< double 
     for(int i=0; i<numberOfElements; i++)
     {
         positionsToSmooth = std::min((int) (positionsToSmooth+.5*numberOfElements/100), maxPositionsToSmooth);
-        CX_LOG_DEBUG() << i <<" positionsToSmooth:" << positionsToSmooth;
         bool firstTurnPassed = false;
         for(int j=i+1; j<std::min(i+positionsToSmooth, numberOfElements); j++)
             if (cameraRotations[j] != cameraRotations[j-1])
             {
-                CX_LOG_DEBUG() <<" Turn at index:" << j;
                 if (firstTurnPassed)
                 {
                   positionsToSmooth = j-i;
