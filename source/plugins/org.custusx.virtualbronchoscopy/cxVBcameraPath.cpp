@@ -95,13 +95,6 @@ void CXVBcameraPath::generateSplineCurve(std::vector< Eigen::Vector3d > routePos
 
 }
 
-double CXVBcameraPath::positionPercentageAdjusted(double positionPercentage)
-{
-    //Adjusting position to make smaller steps towards end of route
-    return 2*positionPercentage / (1 + positionPercentage/100.0);
-}
-
-
 void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
 {
     double splineParameter = positionPercentageAdjusted(positionPercentage) / 100.0;
@@ -232,5 +225,11 @@ void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
 void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)
 {
     mAutomaticRotation = automaticRotation;
+}
+
+double positionPercentageAdjusted(double positionPercentage)
+{
+    //Adjusting position to make smaller steps towards end of route
+    return 2*positionPercentage / (1 + positionPercentage/100.0);
 }
 } /* namespace cx */

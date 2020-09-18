@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
 #include "cxTransform3D.h"
+#include "org_custusx_virtualbronchoscopy_Export.h"
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 typedef vtkSmartPointer<class vtkParametricSpline> vtkParametricSplinePtr;
@@ -58,7 +59,6 @@ private:
 	std::vector< double > mCameraRotations;
     std::vector< double > mCameraRotationsSmoothed;
 
-    double      positionPercentageAdjusted(double positionPercentage);
 	void		updateManualToolPosition();
 	void		generateSplineCurve(MeshPtr mesh);
 	void		generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
@@ -82,6 +82,8 @@ public slots:
 	void cameraRotateAngleSlot(int angle);
 
 };
+
+    double org_custusx_virtualbronchoscopy_EXPORT positionPercentageAdjusted(double positionPercentage);
 
 } /* namespace cx */
 
