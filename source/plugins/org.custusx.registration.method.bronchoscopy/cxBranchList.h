@@ -23,6 +23,8 @@ namespace cx
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
+#define MAX_ROTATION_TO_TILT_DOWN_DEGREES 30 //Threshold between rotation direction of scope to tilt up or down in a bifurcation.
+
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
 {
 	std::vector<BranchPtr> mBranches;

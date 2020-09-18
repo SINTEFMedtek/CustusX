@@ -134,7 +134,6 @@ double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3
     if(parentBranchOrientation.dot(N) < 0)
         bronchoscopeRotation = -bronchoscopeRotation;
 
-    double maxRotationToTiltDown = 30; //degrees
     double rotationDifferenceFromParent = bronchoscopeRotation - parentRotation;
 
     //Make sure rotation difference is between -180 and 180 deg.
@@ -144,9 +143,9 @@ double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3
         rotationDifferenceFromParent = rotationDifferenceFromParent + 2*M_PI;
 
     //Tilt down if needed rotation is less than maxRotationToTiltDown
-    if( rotationDifferenceFromParent < (maxRotationToTiltDown - 180)*M_PI/180 )
+    if( rotationDifferenceFromParent < (MAX_ROTATION_TO_TILT_DOWN_DEGREES - 180)*M_PI/180 )
         bronchoscopeRotation = bronchoscopeRotation + M_PI;
-    else if( rotationDifferenceFromParent > (180 - maxRotationToTiltDown)*M_PI/180 )
+    else if( rotationDifferenceFromParent > (180 - MAX_ROTATION_TO_TILT_DOWN_DEGREES)*M_PI/180 )
         bronchoscopeRotation = bronchoscopeRotation - M_PI;
 
     //Not allowing rotation above 180 deg
