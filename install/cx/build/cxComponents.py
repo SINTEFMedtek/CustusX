@@ -521,6 +521,7 @@ class FAST(CppComponent):
         add('FAST_MODULE_Clarius:BOOL', False)
         add('FAST_MODULE_RealSense:BOOL', False)
         add('FAST_MODULE_WholeSlideImaging:BOOL', False)
+				add('FAST_MODULE_OpenVINO:BOOL', False)
         add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TOOLS:BOOL', False)
