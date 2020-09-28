@@ -498,11 +498,10 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-        return 'git@github.com:smistad/FAST'
+        return 'git@github.com:SINTEFMedtek/FAST.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-#        self._getBuilder().gitCheckout('d0a4620306a8bc531c08bcacfd7dc727a59ebbfb')
-        self._getBuilder().gitCheckout('d0ebae2b162048041837aef1d682246201f32de2')
+        self._getBuilder().gitCheckout('faddbf2995b6eba030c0d00a5a684993bbe4ba0d')
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
