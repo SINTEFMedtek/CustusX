@@ -503,10 +503,10 @@ class FAST(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
-          self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
+          self._getBuilder().gitCheckoutSha('cdaf1a0a41f93f9d023cc2c795f8fa67d160d702')
         else:
           self._getBuilder().gitCheckoutSha('faddbf2995b6eba030c0d00a5a684993bbe4ba0d')
-          
+
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
