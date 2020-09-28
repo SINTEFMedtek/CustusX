@@ -39,7 +39,7 @@
     
     <!-- Calibration -->
     <calibration>
-        <cal_file>Identity.cal</cal_file>
+        <cal_file>AnserCatheter.cal</cal_file>
     </calibration>
 </tool>
 

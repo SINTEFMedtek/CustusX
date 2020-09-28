@@ -50,12 +50,12 @@ void ProcessWrapper::launchWithRelativePath(QString executable, QStringList argu
 	this->launch(absolutePathToExe, arguments);
 }
 
-void ProcessWrapper::launch(QString executable, QStringList arguments)
+bool ProcessWrapper::launch(QString executable, QStringList arguments)
 {
 	if (executable.isEmpty() || this->isRunning())
-		return;
+		return false;
 
-	this->internalLaunch(executable, arguments);
+	return this->internalLaunch(executable, arguments);
 }
 
 bool ProcessWrapper::isRunning()
@@ -78,6 +78,11 @@ bool ProcessWrapper::waitForFinished(int msecs)
 	return mProcess->waitForFinished(msecs);
 }
 
+void ProcessWrapper::turnOffReporting()
+{
+	mReporter.reset();
+}
+
 QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
 {
 	QString absolutePathToExe = exeInBundle;
@@ -94,10 +99,10 @@ QString ProcessWrapper::getExecutableInBundlesAbsolutePath(QString exeInBundle)
 	return absolutePathToExe;
 }
 
-void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
+bool ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 {
 	if(this->isRunning())
-		return;
+		return false;
 
 	report(QString("Launching %1: [%2 %3]").arg(mName).arg(executable).arg(arguments.join(" ")));
 
@@ -107,5 +112,6 @@ void ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 		mProcess->start(executable, arguments);
 
 	mLastExecutablePath = executable;
+	return true;
 }
 }

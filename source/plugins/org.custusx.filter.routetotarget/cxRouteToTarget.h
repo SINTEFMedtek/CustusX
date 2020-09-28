@@ -24,7 +24,9 @@ public:
 	void setBloodVesselVolume(ImagePtr bloodVesselVolume);
 	//void setCenterline(vtkPolyDataPtr centerline);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
+	void setSmoothing(bool smoothing);
 	void processCenterline(MeshPtr mesh);
+	void setBranchList(BranchListPtr branchList);
 	void processBloodVesselCenterline(Eigen::MatrixXd positions);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findClosestPointInBloodVesselBranches(Vector3D targetCoordinate_r);
@@ -39,18 +41,21 @@ public:
 	bool makeConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr getConnectedAirwayAndBloodVesselRoute();
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
-	std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 	void addRouteInformationToFile(VisServicesPtr services);
-	double calculateRouteLength(std::vector< Eigen::Vector3d > route);
+	static double calculateRouteLength(std::vector< Eigen::Vector3d > route);
 	void setBloodVesselRadius();
 	double calculateBloodVesselRadius(Eigen::Vector3d position, Eigen::Vector3d orientation);
 	double findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
 
+	double getTracheaLength();
+	static std::vector<Eigen::Vector3d> getRoutePositions(MeshPtr route);
+
 
 private:
 	Eigen::MatrixXd mCLpoints;
+	bool mSmoothing = true;
 	BranchListPtr mBranchListPtr;
 	BranchListPtr mBloodVesselBranchListPtr;
 	BranchPtr mProjectedBranchPtr;
@@ -67,18 +72,20 @@ private:
 	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	Eigen::MatrixXd mConnectedPointsInBVCL;
-	std::vector<Eigen::Vector3d> smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 	bool checkIfRouteToTargetEndsAtEndOfLastBranch();
 	bool mPathToBloodVesselsFound = false;
 };
 
 Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition);
 std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
-std::pair<int, double> findDistanceToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
 Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B);
 double variance(Eigen::VectorXd X);
+
+org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
 
 } /* namespace cx */
 

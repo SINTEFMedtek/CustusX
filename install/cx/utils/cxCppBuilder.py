@@ -137,6 +137,16 @@ class CppBuilder(object):
         '''
         self.gitCheckoutTag(tag)
 
+    def gitCheckoutSha(self, sha):
+        '''
+        Use this function when checking out a git sha,
+        instead of gitCheckout/gitCheckoutTag,
+        as they will output confusing warnings
+        '''
+        self._changeDirToSource()
+        runShell('git fetch')
+        runShell('git checkout %s' % sha)
+
     def _checkGitIsAtTag(self, tag):
         output = shell.evaluate('git describe --tags --exact-match')
         if not output:
@@ -199,7 +209,7 @@ class CppBuilder(object):
         add = self.addCMakeOption
         append = self.appendCMakeOption
         if(platform.system() != 'Windows'):
-            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override')
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override -Wno-self-assign-field')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')

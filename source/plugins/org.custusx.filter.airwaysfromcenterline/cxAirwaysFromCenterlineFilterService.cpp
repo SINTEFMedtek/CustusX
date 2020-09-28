@@ -130,31 +130,31 @@ bool AirwaysFromCenterlineFilter::postProcess()
     if (!inputMesh)
         return false;
 
-    QString uidSurfaceModel = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
-    QString nameSurfaceModel = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+		QString uidSurfaceModel = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+		QString nameSurfaceModel = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
 
-    MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
-    outputMesh->setVtkPolyData(mOutputAirwayMesh);
-    outputMesh->setColor(QColor(253, 173, 136, 255));
-    patientService()->insertData(outputMesh);
+		MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
+		outputMesh->setVtkPolyData(mOutputAirwayMesh);
+		outputMesh->setColor(QColor(253, 173, 136, 255));
+		patientService()->insertData(outputMesh);
 
-    //Meshes are expected to be in data(d) space
-    outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
+		//Meshes are expected to be in data(d) space
+		outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
-    mServices->view()->autoShowData(outputMesh);
+		mServices->view()->autoShowData(outputMesh);
 
-    QString uidCenterline = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
-    QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
+		QString uidCenterline = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
+		QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
 
-    MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
-    outputCenterline->setVtkPolyData(mAirwaysFromCenterline->getVTKPoints());
-    outputCenterline->setColor(QColor(0, 200, 0, 255));
-    patientService()->insertData(outputCenterline);
+		MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
+		outputCenterline->setVtkPolyData(mAirwaysFromCenterline->getVTKPoints());
+		outputCenterline->setColor(QColor(0, 200, 0, 255));
+		patientService()->insertData(outputCenterline);
 
-    if(mOutputTypes.size() > 0)
-        mOutputTypes[0]->setValue(outputMesh->getUid());
-    if(mOutputTypes.size() > 1)
-        mOutputTypes[1]->setValue(outputCenterline->getUid());
+		if(mOutputTypes.size() > 0)
+				mOutputTypes[0]->setValue(outputMesh->getUid());
+		if(mOutputTypes.size() > 1)
+				mOutputTypes[1]->setValue(outputCenterline->getUid());
 
     return true;
 }

@@ -17,6 +17,7 @@ if(BUILD_TESTING)
         cxtestBinaryThresholdImageFilter.cpp
         cxtestDilationFilter.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
+        cxtestScriptFilter.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

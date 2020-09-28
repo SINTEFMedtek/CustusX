@@ -79,36 +79,6 @@ QString AirwaysFilter::getHelp() const
            "</html>";
 }
 
-QString AirwaysFilter::getNameSuffixCenterline()
-{
-    return "_centerline";
-}
-
-QString AirwaysFilter::getNameSuffixAirways()
-{
-	return "_airways";
-}
-
-QString AirwaysFilter::getNameSuffixTubes()
-{
-	return "_tubes";
-}
-
-QString AirwaysFilter::getNameSuffixLungs()
-{
-	return "_lungs";
-}
-
-QString AirwaysFilter::getNameSuffixVessels()
-{
-	return "_vessels";
-}
-
-QString AirwaysFilter::getNameSuffixVolume()
-{
-	return "_volume";
-}
-
 Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
 {
 	// Retrieve position of tooltip and use it as seed point
@@ -167,7 +137,7 @@ bool AirwaysFilter::preProcess()
 			+ "/" + inputImage->getFilename()).toStdString();
 
     // only check seed point inside image if use seed point is checked
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+  bool useManualSeedPoint = mManualSeedPointOption->getValue();
 	if(useManualSeedPoint)
 	{
 		seedPoint = getSeedPointFromTool(mServices->spaceProvider(), inputImage);
@@ -217,9 +187,9 @@ bool AirwaysFilter::execute()
 		return false;
 	}
 
-	bool doAirwaySegmentation = getAirwaySegmentationOption(mOptions)->getValue();
-	bool doLungSegmentation = getLungSegmentationOption(mOptions)->getValue();
-	bool doVesselSegmentation = getVesselSegmentationOption(mOptions)->getValue();
+	bool doAirwaySegmentation = mAirwaySegmentationOption->getValue();
+	bool doLungSegmentation = mLungSegmentationOption->getValue();
+	bool doVesselSegmentation = mVesselCenterlineOption->getValue();
 
 	if (doAirwaySegmentation)
 	{
@@ -257,7 +227,7 @@ bool AirwaysFilter::execute()
 void AirwaysFilter::segmentAirways(fast::ImageFileImporter::pointer importerPtr)
 {
 
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 
 
 	// Do segmentation
@@ -301,7 +271,7 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("fast::Exception: "+qstring_cast(error));
-	if(!getManualSeedPointOption(mOptions)->getValue())
+	if(!mManualSeedPointOption->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -329,7 +299,7 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 void AirwaysFilter::segmentLungs(fast::ImageFileImporter::pointer importerPtr)
 {
 
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 
 	// Do segmentation
 	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
@@ -346,7 +316,7 @@ void AirwaysFilter::segmentLungs(fast::ImageFileImporter::pointer importerPtr)
 void AirwaysFilter::segmentVessels(fast::ImageFileImporter::pointer importerPtr)
 {
 
-	bool useManualSeedPoint = getManualSeedPointOption(mOptions)->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 
 	// Do segmentation
 	fast::LungSegmentation::pointer lungSegmentationPtr = fast::LungSegmentation::New();
@@ -372,23 +342,26 @@ bool AirwaysFilter::extractBloodVessels(fast::LungSegmentation::pointer lungSegm
 		mBloodVesselSegmentationOutput = vtkBloodVesselExporter->GetOutput();
 		vtkBloodVesselExporter->Delete();
 
-		auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
+        bool generateVesselCenterlines = mVesselCenterlineOption->getValue();
+        if (generateVesselCenterlines)
+        {
+            auto bloodVesselSegmentationData = segPortBloodVessels->getNextFrame<fast::SpatialDataObject>();
+            // Extract centerline
+            fast::CenterlineExtraction::pointer bloodVesselCenterline = fast::CenterlineExtraction::New();
+            bloodVesselCenterline->setInputData(bloodVesselSegmentationData);
 
-		// Extract centerline
-		fast::CenterlineExtraction::pointer bloodVesselCenterline = fast::CenterlineExtraction::New();
-		bloodVesselCenterline->setInputData(bloodVesselSegmentationData);
-
-		// Get centerline
-		vtkSmartPointer<fast::VTKMeshExporter> vtkBloodVesselCenterlineExporter = fast::VTKMeshExporter::New();
-		vtkBloodVesselCenterlineExporter->setInputConnection(bloodVesselCenterline->getOutputPort());
-		vtkBloodVesselCenterlineExporter->Update();
-		mBloodVesselCenterlineOutput = vtkBloodVesselCenterlineExporter->GetOutput();
-		vtkBloodVesselCenterlineExporter->Delete();
+            // Get centerline
+            vtkSmartPointer<fast::VTKMeshExporter> vtkBloodVesselCenterlineExporter = fast::VTKMeshExporter::New();
+            vtkBloodVesselCenterlineExporter->setInputConnection(bloodVesselCenterline->getOutputPort());
+            vtkBloodVesselCenterlineExporter->Update();
+            mBloodVesselCenterlineOutput = vtkBloodVesselCenterlineExporter->GetOutput();
+            vtkBloodVesselCenterlineExporter->Delete();
+        }
 
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("In vessel segmentation fast::Exception: "+qstring_cast(error));
-	if(!getManualSeedPointOption(mOptions)->getValue())
+	if(!mManualSeedPointOption->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -425,7 +398,7 @@ bool AirwaysFilter::extractLungs(fast::LungSegmentation::pointer lungSegmentatio
 } catch(fast::Exception& e) {
 	std::string error = e.what();
 	reportError("In lung segmentation fast::Exception: "+qstring_cast(error));
-	if(!getManualSeedPointOption(mOptions)->getValue())
+	if(!mManualSeedPointOption->getValue())
 		CX_LOG_ERROR() << "Try to set the seed point manually.";
 
 	return false;
@@ -453,19 +426,19 @@ bool AirwaysFilter::postProcess()
 {
 	std::cout << "POST PROCESS" << std::endl;
 
-	if(getAirwaySegmentationOption(mOptions)->getValue())
+	if(mAirwaySegmentationOption->getValue())
 	{
 		postProcessAirways();
 		mAirwaySegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
 		mAirwayCenterlineOutput = NULL;
 	}
 
-	if(getLungSegmentationOption(mOptions)->getValue()) {
+	if(mLungSegmentationOption->getValue()) {
 		postProcessLungs();
 		mLungSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
 	}
 
-	if(getVesselSegmentationOption(mOptions)->getValue())
+	if(mVesselCenterlineOption->getValue())
 	{
 		postProcessVessels();
 		mBloodVesselSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
@@ -492,8 +465,8 @@ bool AirwaysFilter::postProcessAirways()
 	);
 
 	//Create temporary ImagePtr for correct output name from contour filter
-	QString uidOutput = mInputImage->getUid() + AirwaysFilter::getNameSuffixAirways() + "%1";
-	QString nameOutput = mInputImage->getName() + AirwaysFilter::getNameSuffixAirways() + "%1";
+    QString uidOutput = mInputImage->getUid() + airwaysFilterGetNameSuffixAirways() + "%1";
+    QString nameOutput = mInputImage->getName() + airwaysFilterGetNameSuffixAirways() + "%1";
 	ImagePtr outputImage = patientService()->createSpecificData<Image>(uidOutput, nameOutput);
 	// Add contour internally to cx
 	MeshPtr contour = ContourFilter::postProcess(
@@ -508,8 +481,8 @@ bool AirwaysFilter::postProcessAirways()
 	mOutputTypes[1]->setValue(contour->getUid());
 
 	// Centerline
-	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffixAirways() + AirwaysFilter::getNameSuffixCenterline() + "%1";
-	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffixAirways() + AirwaysFilter::getNameSuffixCenterline() + "%1";
+    QString uid = mInputImage->getUid() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixCenterline() + "%1";
+    QString name = mInputImage->getName() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixCenterline() + "%1";
 	MeshPtr airwaysCenterline = patientService()->createSpecificData<Mesh>(uid, name);
 	airwaysCenterline->setVtkPolyData(mAirwayCenterlineOutput);
 	airwaysCenterline->get_rMd_History()->setParentSpace(mInputImage->getUid());
@@ -517,7 +490,7 @@ bool AirwaysFilter::postProcessAirways()
 	patientService()->insertData(airwaysCenterline);
 	mOutputTypes[0]->setValue(airwaysCenterline->getUid());
 
-	if(getAirwayTubesGenerationOption(mOptions)->getValue())
+	if(mAirwayTubesGenerationOption->getValue())
 		this->createAirwaysFromCenterline();
 
 	return true;
@@ -539,8 +512,8 @@ bool AirwaysFilter::postProcessLungs()
 	);
 
 	//Create temporary ImagePtr for correct output name from contour filter
-	QString uidOutput = mInputImage->getUid() + AirwaysFilter::getNameSuffixLungs() + "%1";
-	QString nameOutput = mInputImage->getName() + AirwaysFilter::getNameSuffixLungs() + "%1";
+    QString uidOutput = mInputImage->getUid() + airwaysFilterGetNameSuffixLungs() + "%1";
+    QString nameOutput = mInputImage->getName() + airwaysFilterGetNameSuffixLungs() + "%1";
 	ImagePtr outputImage = patientService()->createSpecificData<Image>(uidOutput, nameOutput);
 
 	 //Add contour internally to cx
@@ -578,8 +551,8 @@ bool AirwaysFilter::postProcessVessels()
 	);
 
 	//Create temporary ImagePtr for correct output name from contour filter
-	QString uidOutput = mInputImage->getUid() + AirwaysFilter::getNameSuffixVessels() + "%1";
-	QString nameOutput = mInputImage->getName() + AirwaysFilter::getNameSuffixVessels() + "%1";
+    QString uidOutput = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + "%1";
+    QString nameOutput = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + "%1";
 	ImagePtr outputImage = patientService()->createSpecificData<Image>(uidOutput, nameOutput);
 
 	// Add contour internally to cx
@@ -594,9 +567,12 @@ bool AirwaysFilter::postProcessVessels()
 	// Set output
 	mOutputTypes[6]->setValue(contour->getUid());
 
+    bool generateVesselCenterlines = mVesselCenterlineOption->getValue();
+    if (generateVesselCenterlines)
+    {
 	// Centerline
-	QString uid = mInputImage->getUid() + AirwaysFilter::getNameSuffixVessels() + AirwaysFilter::getNameSuffixCenterline() + "%1";
-	QString name = mInputImage->getName() + AirwaysFilter::getNameSuffixVessels() + AirwaysFilter::getNameSuffixCenterline() + "%1";
+    QString uid = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
+    QString name = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
 	MeshPtr bloodVesselsCenterline = patientService()->createSpecificData<Mesh>(uid, name);
 	bloodVesselsCenterline->setVtkPolyData(mBloodVesselCenterlineOutput);
 	bloodVesselsCenterline->get_rMd_History()->setParentSpace(mInputImage->getUid());
@@ -604,17 +580,21 @@ bool AirwaysFilter::postProcessVessels()
 	bloodVesselsCenterline->setColor("blue");
 	patientService()->insertData(bloodVesselsCenterline);
 	mOutputTypes[5]->setValue(bloodVesselsCenterline->getUid());
+    }
 
-
-	//Create segmented volume output
-	QString uidVolume = mInputImage->getUid() + AirwaysFilter::getNameSuffixVessels() + AirwaysFilter::getNameSuffixVolume() + "%1";
-	QString nameVolume =  mInputImage->getName() + AirwaysFilter::getNameSuffixVessels() + AirwaysFilter::getNameSuffixVolume() + "%1";
-	ImagePtr outputVolume = createDerivedImage(mServices->patient(),
-	                                         uidVolume, nameVolume,
-											 mBloodVesselSegmentationOutput, mInputImage);
-	outputVolume->mergevtkSettingsIntosscTransform();
-	patientService()->insertData(outputVolume);
-	mOutputTypes[7]->setValue(outputVolume->getUid());
+    bool generateVesselVolume = mVesselVolumeOption->getValue();
+    if (generateVesselVolume)
+    {
+        //Create segmented volume output
+        QString uidVolume = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+        QString nameVolume =  mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+        ImagePtr outputVolume = createDerivedImage(mServices->patient(),
+                                                 uidVolume, nameVolume,
+                                                 mBloodVesselSegmentationOutput, mInputImage);
+        outputVolume->mergevtkSettingsIntosscTransform();
+        patientService()->insertData(outputVolume);
+        mOutputTypes[7]->setValue(outputVolume->getUid());
+    }
 
 	return true;
 }
@@ -624,12 +604,13 @@ void AirwaysFilter::createAirwaysFromCenterline()
     AirwaysFromCenterlinePtr airwaysFromCLPtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 
     airwaysFromCLPtr->processCenterline(mAirwayCenterlineOutput);
+    airwaysFromCLPtr->setSegmentedVolume(mAirwaySegmentationOutput);
 
     // Create the mesh object from the airway walls
-    QString uidMesh = mInputImage->getUid() + AirwaysFilter::getNameSuffixAirways() + AirwaysFilter::getNameSuffixTubes() + "%1";
-    QString nameMesh = mInputImage->getName() + AirwaysFilter::getNameSuffixAirways() + AirwaysFilter::getNameSuffixTubes() + "%1";
+    QString uidMesh = mInputImage->getUid() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + "%1";
+    QString nameMesh = mInputImage->getName() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + "%1";
     MeshPtr airwayWalls = patientService()->createSpecificData<Mesh>(uidMesh, nameMesh);
-    airwayWalls->setVtkPolyData(airwaysFromCLPtr->generateTubes());
+    airwayWalls->setVtkPolyData(airwaysFromCLPtr->generateTubes(0, true));
     airwayWalls->get_rMd_History()->setParentSpace(mInputImage->getUid());
     airwayWalls->get_rMd_History()->setRegistration(mInputImage->get_rMd());
     airwayWalls->setColor(QColor(253, 173, 136, 255));
@@ -638,8 +619,8 @@ void AirwaysFilter::createAirwaysFromCenterline()
 
 
     //insert filtered centerline from airwaysFromCenterline
-    QString uidCenterline = mInputImage->getUid() + AirwaysFilter::getNameSuffixAirways() + AirwaysFilter::getNameSuffixTubes() + AirwaysFilter::getNameSuffixCenterline() + "%1";
-    QString nameCenterline = mInputImage->getName() + AirwaysFilter::getNameSuffixAirways() + AirwaysFilter::getNameSuffixTubes() + AirwaysFilter::getNameSuffixCenterline() + "%1";
+    QString uidCenterline = mInputImage->getUid() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + airwaysFilterGetNameSuffixCenterline() + "%1";
+    QString nameCenterline = mInputImage->getName() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + airwaysFilterGetNameSuffixCenterline() + "%1";
     MeshPtr centerline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
     centerline->setVtkPolyData(airwaysFromCLPtr->getVTKPoints());
     centerline->get_rMd_History()->setParentSpace(mInputImage->getUid());
@@ -656,6 +637,8 @@ void AirwaysFilter::createOptions()
 	mOptionsAdapters.push_back(this->getAirwayTubesGenerationOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
 	mOptionsAdapters.push_back(this->getVesselSegmentationOption(mOptions));
+	mOptionsAdapters.push_back(this->getVesselCenterlineOption(mOptions));
+	mOptionsAdapters.push_back(this->getVesselVolumeOption(mOptions));
 }
 
 void AirwaysFilter::createInputTypes()
@@ -697,59 +680,77 @@ void AirwaysFilter::createOutputTypes()
 
 BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Use manual seed point",
-					"",
-					"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
-					"inside trachea of the patient. "
-					"Then tick this checkbox to use the manual seed point in the airways filter.",
-					false, root);
-	return retval;
+	mManualSeedPointOption = BoolProperty::initialize(
+				"Use manual seed point",
+				"",
+				"If the automatic seed point detection algorithm fails you can use cursor to set the seed point "
+				"inside trachea of the patient. "
+				"Then tick this checkbox to use the manual seed point in the airways filter.",
+				false, root);
+	return mManualSeedPointOption;
 
 }
 
 BoolPropertyPtr AirwaysFilter::getAirwaySegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Airway segmentation",
-					"",
-					"Selecting this option will segment airways",
-					false, root);
-	return retval;
-
+	mAirwaySegmentationOption = BoolProperty::initialize(
+				"Airway segmentation",
+				"",
+				"Selecting this option will segment airways",
+				true, root);
+	return mAirwaySegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getAirwayTubesGenerationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Airway tubes generation",
-					"",
-					"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
-					false, root);
-	return retval;
+	mAirwayTubesGenerationOption = BoolProperty::initialize(
+				"Airway tubes generation",
+				"",
+				"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
+				true, root);
+	return mAirwayTubesGenerationOption;
 
 }
 
 BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Lung segmentation",
-					"",
-					"Selecting this option will segment the two lung sacs",
-					false, root);
-	return retval;
-
+	mLungSegmentationOption = BoolProperty::initialize(
+				"Lung segmentation",
+				"",
+				"Selecting this option will segment the two lung sacs",
+				false, root);
+	return mLungSegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr retval =
-			BoolProperty::initialize("Vessel segmentation",
-					"",
-					"Selecting this option will segment the blood vessels in the lungs",
-					false, root);
-	return retval;
+	BoolPropertyPtr vesselSegmentationOption = BoolProperty::initialize(
+				"Vessel segmentation",
+				"",
+				"Selecting this option will segment the blood vessels in the lungs",
+				false, root);
+	return vesselSegmentationOption;
+}
 
+BoolPropertyPtr AirwaysFilter::getVesselCenterlineOption(QDomElement root)
+{
+	mVesselCenterlineOption = BoolProperty::initialize(
+				"Vessel centerline",
+				"",
+				"Selecting this option will generate centerlines of the seegmented blood vessels",
+				false, root);
+	return mVesselCenterlineOption;
+
+}
+
+BoolPropertyPtr AirwaysFilter::getVesselVolumeOption(QDomElement root)
+{
+	mVesselVolumeOption = BoolProperty::initialize(
+				"Vessel volume",
+				"",
+				"Selecting this option will generate binary volume of the seegmented blood vessels",
+				false, root);
+	return mVesselVolumeOption;
 }
 
 } /* namespace cx */

@@ -111,11 +111,11 @@ PatientModelImplService::~PatientModelImplService()
 	this->shutdownInterconnectedDataAndSpace();
 }
 
-void PatientModelImplService::insertData(DataPtr data)
+void PatientModelImplService::insertData(DataPtr data, bool overWrite)
 {
 	QString outputBasePath = this->patientData()->getActivePatientFolder();
 
-	this->dataService()->loadData(data);
+	this->dataService()->loadData(data, overWrite);
 	data->save(outputBasePath, mFileManagerService);
 }
 

@@ -143,6 +143,8 @@ typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 // other stuff
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;

@@ -51,6 +51,9 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	colors[smax] = QColor(Qt::white);
 	tf->resetColor(colors);
 
+	if (this->looksLikeBinaryImage())
+		tf->setLLR(smin+1);//Make zero transparent for binary volumes. Why is +1 needed? Is there an issue with LLR range?
+
 	return tf;
 }
 
@@ -106,6 +109,7 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange() const
 			{
 				srange.first = 0;
 				srange.second = 1;
+				return srange;
 			}
 		}
 		if (mImage->getModality() == imCT)

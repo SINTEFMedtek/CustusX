@@ -30,7 +30,7 @@ PatientModelServiceMock::PatientModelServiceMock()
 	connect(m_rMpr.get(), &cx::RegistrationHistory::currentChanged, this, &cx::PatientModelService::rMprChanged);
 }
 
-void PatientModelServiceMock::insertData(cx::DataPtr data)
+void PatientModelServiceMock::insertData(cx::DataPtr data, bool overWrite)
 {
 	mData[data->getUid()] = data;
 }

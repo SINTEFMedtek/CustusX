@@ -62,7 +62,7 @@ public:
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);
-	void cameraPathPositionSlot(int pos);
+	void cameraPathPositionSlot(int positionPercentage);
 	void cameraViewAngleSlot(int angle);
 	void cameraRotateAngleSlot(int angle);
 

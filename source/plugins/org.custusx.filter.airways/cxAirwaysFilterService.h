@@ -57,12 +57,6 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-	static QString getNameSuffixCenterline();
-	static QString getNameSuffixAirways();
-	static QString getNameSuffixTubes();
-	static QString getNameSuffixLungs();
-	static QString getNameSuffixVessels();
-	static QString getNameSuffixVolume();
 
     bool preProcess();
 	virtual bool execute();
@@ -90,7 +84,10 @@ private:
 	BoolPropertyPtr getAirwayTubesGenerationOption(QDomElement root);
 	BoolPropertyPtr getLungSegmentationOption(QDomElement root);
 	BoolPropertyPtr getVesselSegmentationOption(QDomElement root);
+	BoolPropertyPtr getVesselCenterlineOption(QDomElement root);
+	BoolPropertyPtr getVesselVolumeOption(QDomElement root);
 	void createAirwaysFromCenterline();
+
 	vtkImageDataPtr mAirwaySegmentationOutput;
 	vtkPolyDataPtr mAirwayCenterlineOutput;
 	vtkImageDataPtr mLungSegmentationOutput;
@@ -100,6 +97,12 @@ private:
 	ImagePtr mInputImage;
 	Vector3D seedPoint;
 	bool mDefaultStraightCLTubesOption;
+	BoolPropertyPtr mManualSeedPointOption;
+	BoolPropertyPtr mAirwaySegmentationOption;
+	BoolPropertyPtr mAirwayTubesGenerationOption;
+	BoolPropertyPtr mLungSegmentationOption;
+	BoolPropertyPtr mVesselCenterlineOption;
+	BoolPropertyPtr mVesselVolumeOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
 
