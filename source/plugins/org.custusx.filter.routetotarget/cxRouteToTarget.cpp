@@ -77,9 +77,9 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 
 	mBranchListPtr->findBranchesInCenterline(mCLpoints);
 
-	mBranchListPtr->calculateOrientations();
-	mBranchListPtr->smoothOrientations();
+    mBranchListPtr->smoothOrientations();
 	//mBranchListPtr->smoothBranchPositions(40);
+	mBranchListPtr->findBronchoscopeRotation();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -97,7 +97,6 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 
 	mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
 
-	mBloodVesselBranchListPtr->calculateOrientations();
 	mBloodVesselBranchListPtr->smoothOrientations();
 	mBloodVesselBranchListPtr->smoothBranchPositions(40);
 	setBloodVesselRadius();
@@ -127,7 +126,6 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 		mBloodVesselBranchListPtr->deleteAllBranches();
 
 		mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
-		mBloodVesselBranchListPtr->calculateOrientations();
 		mBloodVesselBranchListPtr->smoothOrientations();
 		mBloodVesselBranchListPtr->smoothBranchPositions(40);
 		setBloodVesselRadius();
@@ -220,8 +218,13 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	else
 		positions = getBranchPositions(searchBranchPtr, startIndex);
 
+    double cameraRotation = searchBranchPtr->getBronchoscopeRotation();
+
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
+	{
 		mRoutePositions.push_back(positions[i]);
+		mCameraRotation.push_back(cameraRotation);
+	}
 
 	mBranchingIndex.push_back(mRoutePositions.size()-1);
 
@@ -567,13 +570,13 @@ double RouteToTarget::calculateBloodVesselRadius(Eigen::Vector3d position, Eigen
 	indexVector(2) = z;
 
 	Eigen::MatrixXd maxRadius(3,2);
-	Eigen::Vector3d perpendicularX = crossproduct(orientation, Eigen::Vector3d::UnitX());
+	Eigen::Vector3d perpendicularX = orientation.cross(Eigen::Vector3d::UnitX());
 	maxRadius(0,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularX, dim, spacing, 1);
 	maxRadius(0,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularX, dim, spacing, -1);
-	Eigen::Vector3d perpendicularY = crossproduct(orientation, Eigen::Vector3d::UnitY());
+	Eigen::Vector3d perpendicularY = orientation.cross(Eigen::Vector3d::UnitY());
 	maxRadius(1,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularY, dim, spacing, 1);
 	maxRadius(1,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularY, dim, spacing, -1);
-	Eigen::Vector3d perpendicularZ = crossproduct(orientation, Eigen::Vector3d::UnitZ());
+	Eigen::Vector3d perpendicularZ = orientation.cross(Eigen::Vector3d::UnitZ());
 	maxRadius(2,0) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularZ, dim, spacing, 1);
 	maxRadius(2,1) = findDistanceToSegmentationEdge(bloodVesselImage, indexVector, perpendicularZ, dim, spacing, -1);
 
@@ -606,6 +609,20 @@ double RouteToTarget::findDistanceToSegmentationEdge(vtkImageDataPtr bloodVessel
 		}
 	}
 	return retval;
+}
+
+std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions()
+{
+	std::vector< Eigen::Vector3d > positions = mRoutePositions;
+	std::reverse(positions.begin(), positions.end());
+	return positions;
+}
+
+std::vector< double > RouteToTarget::getCameraRotation()
+{
+	std::vector< double > rotations = mCameraRotation;
+	std::reverse(rotations.begin(), rotations.end());
+	return rotations;
 }
 
 void RouteToTarget::makeMarianaCenterlineFile(QString filename)
@@ -807,15 +824,6 @@ Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVec
 		positionsMatrix(2, i) = positionsVector[i](2);
 	}
 	return positionsMatrix;
-}
-
-Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B)
-{
-	Eigen::Vector3d R;
-	R(0) = A(1)*B(2)-A(2)*B(1);
-	R(1) = A(2)*B(0)-A(0)*B(2);
-	R(2) = A(0)*B(1)-A(1)*B(0);
-	return R;
 }
 
 double variance(Eigen::VectorXd X)

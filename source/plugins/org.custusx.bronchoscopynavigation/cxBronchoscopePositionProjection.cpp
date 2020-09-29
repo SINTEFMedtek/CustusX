@@ -131,7 +131,6 @@ void BronchoscopePositionProjection::processCenterline(vtkPolyDataPtr centerline
 	mBranchListPtr->findBranchesInCenterline(mCLpoints);
 	//mBranchListPtr->interpolateBranchPositions(10);
     //mBranchListPtr->smoothBranchPositions();
-	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;

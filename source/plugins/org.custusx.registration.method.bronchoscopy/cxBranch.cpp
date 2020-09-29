@@ -22,7 +22,9 @@ Branch::Branch() :
 
 void Branch::setPositions(Eigen::MatrixXd pos)
 {
-	mPositions = pos;
+    mPositions = pos;
+    this->removeEqualPositions();
+    this->calculateOrientations();
 }
 
 Eigen::MatrixXd Branch::getPositions()
@@ -84,6 +86,16 @@ BranchPtr Branch::getParentBranch()
 	return mParentBranch;
 }
 
+void Branch::calculateOrientations()
+{
+        Eigen::MatrixXd positions = this->getPositions();
+        Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
+        Eigen::MatrixXd orientations(positions.rows(),positions.cols());
+        orientations.leftCols(orientations.cols() - 1) = diff / diff.norm();
+        orientations.rightCols(1) = orientations.col(orientations.cols() - 1);
+        this->setOrientations(orientations);
+}
+
 /**
  * @brief Branch::findParentIndex
  * Given a vector of branches, find this branch's parent branch in that vector.
@@ -140,6 +152,40 @@ double Branch::findBranchRadius()
 		return 2.5;
 	else
 		return 2;
+}
+
+void Branch::setBronchoscopeRotation(double rotation)
+{
+	mBronchoscopeRotation = rotation;
+}
+
+double Branch::getBronchoscopeRotation()
+{
+	return mBronchoscopeRotation;
+}
+
+void Branch::removeEqualPositions()
+{
+    Eigen::MatrixXd positions = this->getPositions();
+    Eigen::MatrixXd orientations = this->getOrientations();
+    bool resizeOrientations = false;
+    if (positions.cols() == orientations.cols())
+        resizeOrientations = true;
+
+    for (int i = positions.cols() - 1; i >= 0; i--)
+	{
+		if (similar( (positions.col(i)-positions.col(i-1)).cwiseAbs().sum(), 0))
+		{
+			positions.block(0 , i , positions.rows() , positions.cols() - i - 1) = positions.rightCols(positions.cols() - i - 1);
+			positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
+            if (resizeOrientations)
+                orientations.conservativeResize(Eigen::NoChange, orientations.cols() - 1);
+		}
+    }
+
+    mPositions = positions;
+    if (resizeOrientations)
+        mOrientations = orientations;
 }
 
 
