@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
-#include "cxStringPropertyBase.h"
+#include <boost/shared_ptr.hpp>
 #include "cxOptimizedUpdateWidget.h"
 
 namespace cx

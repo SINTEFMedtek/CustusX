@@ -31,6 +31,7 @@ namespace cx
 
 
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public FilterImpl
 {
@@ -46,9 +47,14 @@ public:
 	virtual QString getHelp() const;
 	static QString getNameSuffix();
 	static QString getNameSuffixExtension();
+	static QString getNameSuffixBloodVessel();
+	static QString getNameSuffixAirwayModel();
+	static QString getNameSuffixAirwayAndVesselRTT();
 
 	virtual bool execute();
 	virtual bool postProcess();
+	virtual bool postProcessBloodVessels();
+    void setSmoothing(bool smoothing = true);
 	virtual void setTargetName(QString name);
 
 protected:
@@ -62,8 +68,14 @@ private:
 	RouteToTargetPtr mRouteToTarget;
 	vtkPolyDataPtr mOutput;
     vtkPolyDataPtr mExtendedRoute;
+    vtkPolyDataPtr 	mBloodVesselRoute;
+    vtkPolyDataPtr mAirwaysFromBloodVessel;
+    vtkPolyDataPtr mAirwayAndBloodVesselRoute;
+    BranchListPtr mBranchListPtr;
 	QString mTargetName;
     bool mGenerateFileWithRouteInformation;
+    bool mSmoothing;
+    BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 

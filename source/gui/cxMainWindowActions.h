@@ -42,7 +42,7 @@ private slots:
 	void clearPatientSlot();///< clear current patient (debug)
 	//data menu
 	void exportDataSlot();
-	void importDataSlot(); ///< loads data(images) into the datamanager
+	void importDataSlot(QString actionText = "AddMoreFilesButtonClickedAction"); ///< loads data(images) into the datamanager
 
 	void togglePointPickerActionSlot();
 	void updatePointPickerActionSlot();

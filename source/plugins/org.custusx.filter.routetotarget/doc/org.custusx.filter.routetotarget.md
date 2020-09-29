@@ -7,7 +7,7 @@ Route-to-Target is used in bronchoscopy navigation. It generates a centerline fr
 
 Input:
 - Target position generated as point metric with \ref utility_widgets_metrics .
-- Airway centerline tree generated in the \ref org_custusx_filter_airways widget.
+- Airway centerline tree generated in the airways filter (Linux verions only).
 
 Output:
 - Route-to-Target centerline from the top of trachea to the airway centerline position closest to the target.
