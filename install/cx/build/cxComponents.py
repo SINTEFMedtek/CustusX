@@ -499,13 +499,14 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-        return 'git@github.com:smistad/FAST'
+        return 'git@github.com:SINTEFMedtek/FAST.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
-          self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
+          self._getBuilder().gitCheckoutSha('cdaf1a0a41f93f9d023cc2c795f8fa67d160d702')
         else:
-          self._getBuilder().gitCheckoutSha('b85d3a826ebe360f77a8ac6f625a9dfa7bb856fd')
+          self._getBuilder().gitCheckoutSha('faddbf2995b6eba030c0d00a5a684993bbe4ba0d')
+
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -524,6 +525,7 @@ class FAST(CppComponent):
         add('FAST_MODULE_Clarius:BOOL', False)
         add('FAST_MODULE_RealSense:BOOL', False)
         add('FAST_MODULE_WholeSlideImaging:BOOL', False)
+        add('FAST_MODULE_OpenVINO:BOOL', False)
         add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TOOLS:BOOL', False)
