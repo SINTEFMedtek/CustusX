@@ -505,7 +505,7 @@ class FAST(CppComponent):
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
           self._getBuilder().gitCheckoutSha('cdaf1a0a41f93f9d023cc2c795f8fa67d160d702')
         else:
-          self._getBuilder().gitCheckoutSha('faddbf2995b6eba030c0d00a5a684993bbe4ba0d')
+          self._getBuilder().gitCheckoutSha('2bddc452230de58507fadb7a98b4284845e68987')
 
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
