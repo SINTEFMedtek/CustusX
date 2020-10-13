@@ -54,7 +54,7 @@ private:
  * \date Apr 23, 2020
  * \author Ole Vegard Solberg, SINTEF
  */
-class FilePathPropertyBase: public Property
+class cxResource_EXPORT FilePathPropertyBase: public Property
 {
 	Q_OBJECT
 public:
