@@ -28,7 +28,7 @@ typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
  * \date Apr 23, 2020
  * \author Ole Vegard Solberg, SINTEF
  */
-class FilePreviewProperty: public FilePathPropertyBase
+class cxResource_EXPORT FilePreviewProperty: public FilePathPropertyBase
 {
 	Q_OBJECT
 public:
