@@ -41,15 +41,15 @@ set(CX_PLUGINS
   org.custusx.bronchoscopynavigation:ON
 )
 
-if(CX_APPLE)
+if(CX_LINUX)
   set(CX_PLUGINS
     ${CX_PLUGINS}
-    org.custusx.filter.airways:OFF
+    org.custusx.filter.airways:ON
   )
 else()
   set(CX_PLUGINS
     ${CX_PLUGINS}
-    org.custusx.filter.airways:ON
+    org.custusx.filter.airways:OFF
   )
 endif(CX_APPLE)
 
