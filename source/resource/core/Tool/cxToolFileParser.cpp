@@ -69,7 +69,7 @@ bool ToolFileParser::ToolInternalStructure::verify()
 {
     bool retval = true;
     QString verificationError("Internal verification of tool " + mUid + " failed! REASON: ");
-    if (!mIsPointer && !mIsReference && !mIsProbe)
+    if (!mIsPointer && !mIsReference && !mIsProbe && !mIsScope)
     {
 //    reportError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mType)+"]. Valid types: [pointer, usprobe, reference]");
         reportError(
@@ -178,6 +178,7 @@ ToolFileParser::ToolInternalStructurePtr ToolFileParser::getTool()
 		internalStructure->mIsReference = toolTypeText.contains("reference", Qt::CaseInsensitive);
 		internalStructure->mIsPointer = toolTypeText.contains("pointer", Qt::CaseInsensitive);
 		internalStructure->mIsProbe = toolTypeText.contains("usprobe", Qt::CaseInsensitive);
+		internalStructure->mIsScope = toolTypeText.contains("scope", Qt::CaseInsensitive);
 
 //    if (toolTypeText.contains("reference", Qt::CaseInsensitive))
 //    {

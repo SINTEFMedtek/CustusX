@@ -57,6 +57,7 @@ public:
         bool mIsReference;
         bool mIsPointer;
         bool mIsProbe;
+        bool mIsScope;
 //    Tool::Type   mType;                  ///< the tools type
         QString mName; ///< the tools name
         QString mUid; ///< the tools unique id
@@ -78,7 +79,7 @@ public:
         QString mInstrumentId; ///< The instruments id
         QString mInstrumentScannerId; ///< The id of the ultrasound scanner if the instrument is a probe
         ToolInternalStructure() :
-                        mIsReference(false), mIsPointer(false), mIsProbe(false),
+                        mIsReference(false), mIsPointer(false), mIsProbe(false), mIsScope(false),
                         //mType(Tool::TOOL_NONE),
                         mName(""), mUid(""),
                         mTrackerType(tsNONE), mSROMFilename(""),
