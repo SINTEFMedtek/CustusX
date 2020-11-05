@@ -84,15 +84,6 @@ Transform3D TrackedStream::get_tMu()
 
 	Transform3D Rx = createTransformRotateX(M_PI / 2.0);
 	Transform3D Ry = createTransformRotateY(-M_PI / 2.0);
-
-	// Scope tool video
-	if(mProbeTool->hasType(Tool::TOOL_SCOPE))
-	{
-		Rx = createTransformRotateX(0);
-		Ry = createTransformRotateY(0);
-		origin_u[2] -= mProbeTool->getTooltipOffset();
-	}
-
 	Transform3D R = (Rx * Ry);
 	Transform3D T = createTransformTranslate(-origin_u);
 
