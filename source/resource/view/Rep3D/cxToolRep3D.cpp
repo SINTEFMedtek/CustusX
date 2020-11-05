@@ -285,7 +285,7 @@ void ToolRep3D::update()
 	Transform3D rMt = rMpr * prMt;
 	mToolActor->SetUserMatrix(rMt.getVtkMatrix());
 
-	if (this->showProbe())
+	if (this->showProbe() && !mTool->hasType(Tool::TOOL_SCOPE))
 	{
 		Transform3D tMu = mProbeSector->get_tMu();
 		mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
