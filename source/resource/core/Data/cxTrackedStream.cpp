@@ -90,7 +90,7 @@ Transform3D TrackedStream::get_tMu()
 	{
 		Rx = createTransformRotateX(0);
 		Ry = createTransformRotateY(0);
-		origin_u[2] -= tool->getTooltipOffset();
+		origin_u[2] -= mProbeTool->getTooltipOffset();
 	}
 
 	Transform3D R = (Rx * Ry);
