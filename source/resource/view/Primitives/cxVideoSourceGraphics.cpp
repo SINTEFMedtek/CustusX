@@ -139,8 +139,27 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 		return;
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
 	Transform3D tMu = mProbeDefinition.get_tMu();
+
+    if (mTool->hasType(Tool::TOOL_SCOPE))
+    {
+        Transform3D Rx = createTransformRotateX(0);
+        Transform3D Rz = createTransformRotateY(0);
+        Transform3D R = (Rx * Rz);
+        if (mData)
+        {
+            QString streamUid = mData->getUid();
+            ProbeDefinition probeDefinition = mTool->getProbe()->getProbeDefinition(streamUid);
+            Vector3D origin_p = probeDefinition.getOrigin_p();
+            Vector3D spacing = probeDefinition.getSpacing();
+            QSize size = probeDefinition.getSize();
+            Vector3D origin_u(origin_p[0]*spacing[0], (origin_p[1] + size.height()/2)*spacing[1], origin_p[2]*spacing[2]);
+            Transform3D T = createTransformTranslate(-origin_u);
+            tMu = R * T;
+        }
+    }
+
 	Transform3D rMu = rMpr * prMt * tMu;
-	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
+    mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
 }
 
 void VideoSourceGraphics::newDataSlot()
