@@ -36,7 +36,7 @@ void ColorSelectButton::setColor(QColor color)
 
 void ColorSelectButton::clickedSlot()
 {
-	QColor result = QColorDialog::getColor( mColor, this, "Select color", QColorDialog::ShowAlphaChannel );
+    QColor result = QColorDialog::getColor( mColor, this, "Select color", QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog);
 	if (!result.isValid())
 		return;
 	this->setColor(result);
