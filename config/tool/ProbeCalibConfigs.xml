@@ -4302,8 +4302,8 @@
                        <Bottom>1079</Bottom>
                    </CroppingEdges>
                    <PixelSize>
-                       <Width>0.1</Width>
-                       <Height>0.1</Height>
+                       <Width>0.03342</Width>
+                       <Height>0.03342</Height>
                    </PixelSize>
                </Config>
            </RTSource>

@@ -31,7 +31,7 @@ VideoSourceGraphics::VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool us
 	mSpaceProvider = spaceProvider;
 	mClipToSector = true;
 	mPipeline.reset(new VideoGraphics());
-	mShowInToolSpace = true;
+    mShowInToolSpace = true;
 }
 
 VideoSourceGraphics::~VideoSourceGraphics()
@@ -74,6 +74,10 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	{
 		mTool = tool;
 	}
+
+    double scopeFocusDepth = 30; //mm
+    if (tool && tool->hasType(Tool::TOOL_SCOPE))
+        mTool->setTooltipOffset(scopeFocusDepth);
 
 	// setup new
 	if (mTool )
@@ -135,6 +139,7 @@ void VideoSourceGraphics::setRealtimeStream(VideoSourcePtr data)
 
 void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
+    //TO DO: Set Bronchoscopy navigation tool if it exists
 	if (!mShowInToolSpace)
 		return;
 	Transform3D rMpr = mSpaceProvider->get_rMpr();
@@ -142,8 +147,8 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 
     if (mTool->hasType(Tool::TOOL_SCOPE))
     {
-        Transform3D Rx = createTransformRotateX(0);
-        Transform3D Rz = createTransformRotateY(0);
+        Transform3D Rx = createTransformRotateX(M_PI);
+        Transform3D Rz = createTransformRotateZ(M_PI/2.0);
         Transform3D R = (Rx * Rz);
         if (mData)
         {
@@ -152,7 +157,9 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
             Vector3D origin_p = probeDefinition.getOrigin_p();
             Vector3D spacing = probeDefinition.getSpacing();
             QSize size = probeDefinition.getSize();
-            Vector3D origin_u(origin_p[0]*spacing[0], (origin_p[1] + size.height()/2)*spacing[1], origin_p[2]*spacing[2]);
+            double scpoeFocusDepth = mTool->getTooltipOffset();
+            //TO DO: Scale spacing based on focus depth?
+            Vector3D origin_u(origin_p[0]*spacing[0], (origin_p[1] + size.height()/2)*spacing[1], origin_p[2]*spacing[2] + scpoeFocusDepth);
             Transform3D T = createTransformTranslate(-origin_u);
             tMu = R * T;
         }
