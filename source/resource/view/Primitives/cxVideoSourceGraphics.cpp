@@ -26,9 +26,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-VideoSourceGraphics::VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool useMaskFilter)
+VideoSourceGraphics::VideoSourceGraphics(CoreServicesPtr services, bool useMaskFilter)
 {
-	mSpaceProvider = spaceProvider;
+	mServices = services;
 	mClipToSector = true;
 	mPipeline.reset(new VideoGraphics());
     mShowInToolSpace = true;
@@ -142,7 +142,7 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
     //TO DO: Set Bronchoscopy navigation tool if it exists
 	if (!mShowInToolSpace)
 		return;
-	Transform3D rMpr = mSpaceProvider->get_rMpr();
+	Transform3D rMpr = mServices->spaceProvider->get_rMpr();
 	Transform3D tMu = mProbeDefinition.get_tMu();
 
     if (mTool->hasType(Tool::TOOL_SCOPE))

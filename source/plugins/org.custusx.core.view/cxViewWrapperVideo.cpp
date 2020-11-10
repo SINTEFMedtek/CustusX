@@ -197,7 +197,7 @@ void ViewWrapperVideo::setupRep(VideoSourcePtr source, ToolPtr tool)
 
 	if (!mStreamRep)
 	{
-		mStreamRep.reset(new VideoFixedPlaneRep("rtrep", "rtrep"));
+		mStreamRep.reset(new VideoFixedPlaneRep(mServices, "rtrep", "rtrep"));
 		mView->addRep(mStreamRep);
 	}
 

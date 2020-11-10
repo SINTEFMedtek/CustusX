@@ -38,7 +38,7 @@ class cxResourceVisualization_EXPORT VideoSourceGraphics : public QObject
 {
 	Q_OBJECT
 public:
-	explicit VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool useMaskFilter=false);
+	explicit VideoSourceGraphics(CoreServicesPtr services, bool useMaskFilter=false);
 	virtual ~VideoSourceGraphics();
 
 	void setRealtimeStream(VideoSourcePtr data);
@@ -64,7 +64,7 @@ private:
 	ToolPtr mTool;
 	ProbeSector mProbeDefinition;
 	VideoSourcePtr mData;
-	SpaceProviderPtr mSpaceProvider;
+	CoreServicesPtr mServices;
 };
 
 } // namespace cx

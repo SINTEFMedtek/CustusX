@@ -46,7 +46,7 @@ class cxResourceVisualization_EXPORT VideoFixedPlaneRep : public RepImpl
 {
 	Q_OBJECT
 public:
-	VideoFixedPlaneRep(const QString& uid, const QString& name="");
+	VideoFixedPlaneRep(CoreServicesPtr services, const QString& uid, const QString& name="");
 	virtual ~VideoFixedPlaneRep();
 	virtual QString getType() const { return "RealTimeStreamFixedPlaneRep"; }
 	void setRealtimeStream(VideoSourcePtr data);
@@ -64,6 +64,8 @@ protected:
 private:
 	void setCamera();
 	void updateSector();
+
+	CoreServicesPtr mServices;
 
 	VideoSourceGraphicsPtr mRTGraphics;
 	bool mShowSector;
