@@ -22,6 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVideoSource.h"
 #include "cxSpaceProvider.h"
 #include "cxLogger.h"
+#include "cxCoreServices.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -142,11 +144,12 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
     //TO DO: Set Bronchoscopy navigation tool if it exists
 	if (!mShowInToolSpace)
 		return;
-	Transform3D rMpr = mServices->spaceProvider->get_rMpr();
+	Transform3D rMpr = mServices->spaceProvider()->get_rMpr();
 	Transform3D tMu = mProbeDefinition.get_tMu();
 
     if (mTool->hasType(Tool::TOOL_SCOPE))
     {
+        this->updateBronchoscopyTool();
         Transform3D Rx = createTransformRotateX(M_PI);
         Transform3D Rz = createTransformRotateZ(M_PI/2.0);
         Transform3D R = (Rx * Rz);
@@ -167,6 +170,29 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 
 	Transform3D rMu = rMpr * prMt * tMu;
     mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
+}
+
+void VideoSourceGraphics::updateBronchoscopyTool()
+{
+    if(isBronchoscopyTool(mTool))
+        return;// Only change tool once?
+
+    std::map<QString, ToolPtr> tools = mServices->tracking()->getTools();
+    for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
+    {
+        ToolPtr bronchoscopyTool = iter->second;
+        if(isBronchoscopyTool(bronchoscopyTool))
+            if(mTool->getUid() == bronchoscopyTool->getUid()) //Assuming tool uids are equal. See cxBronchoscopyTool
+                mTool = bronchoscopyTool;
+    }
+}
+
+bool VideoSourceGraphics::isBronchoscopyTool(ToolPtr tool)
+{
+    QString toolName = tool->getName();
+    if(toolName.contains("Bronchoscopy Navigation", Qt::CaseInsensitive))
+        return true;
+    return false;
 }
 
 void VideoSourceGraphics::newDataSlot()

@@ -49,6 +49,10 @@ public:
 	void setShowInToolSpace(bool on);
 	vtkActorPtr getActor();
 
+protected:
+	void updateBronchoscopyTool();
+	bool isBronchoscopyTool(ToolPtr tool);
+
 signals:
 	void newData();
 
