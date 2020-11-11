@@ -66,9 +66,10 @@ private:
 	VideoGraphicsPtr mPipeline;
 	bool mShowInToolSpace;
 	ToolPtr mTool;
+    ToolPtr mOriginalTool;
 	ProbeSector mProbeDefinition;
 	VideoSourcePtr mData;
-	CoreServicesPtr mServices;
+    CoreServicesPtr mServices;
 };
 
 } // namespace cx
