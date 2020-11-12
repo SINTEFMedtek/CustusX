@@ -51,6 +51,7 @@ public:
 
 protected:
 	void updateBronchoscopyTool();
+    bool isToolInToolMap(std::map<QString, ToolPtr> tools, ToolPtr tool);
 	bool isBronchoscopyTool(ToolPtr tool);
 
 signals:

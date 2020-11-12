@@ -173,15 +173,17 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 
 void VideoSourceGraphics::updateBronchoscopyTool()
 {
+    std::map<QString, ToolPtr> tools = mServices->tracking()->getTools();
     if(isBronchoscopyTool(mTool))
     {
-        if(mTool->getVisible())
-            mTool = mOriginalTool; //Return to original tool if bronchoscopy tool is disabled (not visible)
-
+        if(!isToolInToolMap(tools, mTool))
+        {
+            if(mOriginalTool)
+                setTool(mOriginalTool); //Return to original tool if bronchoscopy tool is disabled
+        }
         return;
     }
 
-    std::map<QString, ToolPtr> tools = mServices->tracking()->getTools();
     for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
     {
         ToolPtr bronchoscopyTool = iter->second;
@@ -189,9 +191,19 @@ void VideoSourceGraphics::updateBronchoscopyTool()
             if(mTool->getUid() == bronchoscopyTool->getUid()) //Assuming tool uids are equal. See cxBronchoscopyTool
             {
                 mOriginalTool = mTool;
-                mTool = bronchoscopyTool;
+                setTool(bronchoscopyTool);
             }
     }
+}
+
+bool  VideoSourceGraphics::isToolInToolMap(std::map<QString, ToolPtr> tools, ToolPtr tool)
+{
+    for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
+    {
+        if (tool == iter->second)
+            return true;
+    }
+    return false;
 }
 
 bool VideoSourceGraphics::isBronchoscopyTool(ToolPtr tool)
