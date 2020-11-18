@@ -77,9 +77,9 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
         mTool = tool;
     }
 
-    double scopeFocusDepth = 30; //mm
-    if (tool && tool->hasType(Tool::TOOL_SCOPE))
-        mTool->setTooltipOffset(scopeFocusDepth);
+    //double scopeFocusDepth = 30; //mm
+    //if (tool && tool->hasType(Tool::TOOL_SCOPE))
+    //    mTool->setTooltipOffset(scopeFocusDepth);
 
     // setup new
     if (mTool )
@@ -159,9 +159,10 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
             Vector3D origin_p = probeDefinition.getOrigin_p();
             Vector3D spacing = probeDefinition.getSpacing();
             QSize size = probeDefinition.getSize();
-            double scpoeFocusDepth = mTool->getTooltipOffset();
+            //double scpoeFocusDepth = mTool->getTooltipOffset();
+            double videoFocusDepth = 30;
             //TO DO: Scale spacing based on focus depth?
-            Vector3D origin_u(origin_p[0]*spacing[0], (origin_p[1] + size.height()/2)*spacing[1], origin_p[2]*spacing[2] + scpoeFocusDepth);
+            Vector3D origin_u(origin_p[0]*spacing[0], (origin_p[1] + size.height()/2)*spacing[1], origin_p[2]*spacing[2] + videoFocusDepth);
             Transform3D T = createTransformTranslate(-origin_u);
             tMu = R * T;
         }
