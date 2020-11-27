@@ -27,6 +27,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoolProperty.h"
 #include "cxTypeConversions.h"
 #include "cxImage.h"
+#include "cxContourFilter.h"
+#include "cxMesh.h"
 
 #include "cxPatientModelService.h"
 #include "cxFileManagerService.h"
@@ -170,6 +172,17 @@ QString GenericScriptFilter::getHelp() const
 	        "</html>";
 }
 
+BoolPropertyPtr GenericScriptFilter::getMeshOutputOption(QDomElement root)
+{
+	mOutputMeshOption =
+			BoolProperty::initialize("Create surface mesh from generated volume",
+					"",
+					"Selecting this option to generate surface mesh of output volume",
+					false, root);
+	return mOutputMeshOption;
+
+}
+
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList paths;
@@ -204,6 +217,7 @@ FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 
 void GenericScriptFilter::createOptions()
 {
+	mOptionsAdapters.push_back(this->getMeshOutputOption(mOptions));
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
 	mOptionsAdapters.push_back(this->getIniFileOption(mOptions));
 
@@ -361,6 +375,12 @@ void GenericScriptFilter::createOutputTypes()
 	temp->setHelp("Output smoothed image");
 	mOutputTypes.push_back(temp);
 
+	StringPropertySelectMeshPtr tempOutputMesh;
+	tempOutputMesh = StringPropertySelectMesh::New(mServices->patient());
+	tempOutputMesh->setValueName("Output Mesh");
+	tempOutputMesh->setHelp("Output surface model");
+	mOutputTypes.push_back(tempOutputMesh);
+
 }
 
 bool GenericScriptFilter::execute()
@@ -439,8 +459,37 @@ bool GenericScriptFilter::postProcess()
 {
 	CX_LOG_DEBUG() << "postProcess";
 
-	return readGeneratedSegmentationFile();
+	if(!readGeneratedSegmentationFile())
+		return false;
 
+	if(mOutputMeshOption->getValue() && mOutputImage)
+		this->createOutputMesh();
+
+	return true;
+}
+
+void GenericScriptFilter::createOutputMesh()
+{
+		// Make contour of segmented volume
+	double threshold = 1; /// because the segmented image is 0..1
+	vtkPolyDataPtr rawContour = ContourFilter::execute(
+	mOutputImage->getBaseVtkImageData(),
+	threshold,
+	false, // reduce resolution
+	true, // smoothing
+	true, // keep topology
+	0 // target decimation
+	);
+
+	QString uidOutputMesh = mOutputImage->getUid() + "_mesh";
+	QString nameOutputMesh = mOutputImage->getName() + "_mesh";
+	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidOutputMesh, nameOutputMesh);
+	outputMesh->setVtkPolyData(rawContour);
+	outputMesh->setColor(QColor(0, 255, 0, 255));
+	patientService()->insertData(outputMesh);
+	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
+
+	mOutputTypes[1]->setValue(outputMesh->getUid());
 }
 
 bool GenericScriptFilter::readGeneratedSegmentationFile()
@@ -474,23 +523,23 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: New image file has no data";
 		return false;
 	}
-	ImagePtr derivedImage = createDerivedImage(mServices->patient(),
+	mOutputImage = createDerivedImage(mServices->patient(),
 										 uid, imageName,
 										 newImage->getBaseVtkImageData(), parentImage);
-	if(!derivedImage)
+	if(!mOutputImage)
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Problem creating derived image";
 		return false;
 	}
-	derivedImage->setImageType(istSEGMENTATION);//Mark with correct type
-	derivedImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
+	mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
+	mOutputImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
 
-	mServices->patient()->insertData(derivedImage);
-	mServices->view()->autoShowData(derivedImage);
+	mServices->patient()->insertData(mOutputImage);
+	mServices->view()->autoShowData(mOutputImage);
 
 	// set output
 	CX_ASSERT(mOutputTypes.size() > 0)
-	mOutputTypes.front()->setValue(derivedImage->getUid());
+	mOutputTypes.front()->setValue(mOutputImage->getUid());
 
 	return true;
 }
