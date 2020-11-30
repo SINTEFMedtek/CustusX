@@ -51,7 +51,7 @@ else()
     ${CX_PLUGINS}
     org.custusx.filter.airways:OFF
   )
-endif(CX_APPLE)
+endif(CX_LINUX)
 
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,
