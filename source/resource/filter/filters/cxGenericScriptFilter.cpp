@@ -172,17 +172,6 @@ QString GenericScriptFilter::getHelp() const
 	        "</html>";
 }
 
-BoolPropertyPtr GenericScriptFilter::getMeshOutputOption(QDomElement root)
-{
-	mOutputMeshOption =
-			BoolProperty::initialize("Create surface mesh from generated volume",
-					"",
-					"Selecting this option to generate surface mesh of output volume",
-					false, root);
-	return mOutputMeshOption;
-
-}
-
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList paths;
@@ -217,7 +206,6 @@ FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 
 void GenericScriptFilter::createOptions()
 {
-	mOptionsAdapters.push_back(this->getMeshOutputOption(mOptions));
 	mOptionsAdapters.push_back(this->getParameterFile(mOptions));
 	mOptionsAdapters.push_back(this->getIniFileOption(mOptions));
 
@@ -459,16 +447,33 @@ bool GenericScriptFilter::postProcess()
 {
 	CX_LOG_DEBUG() << "postProcess";
 
-	if(!readGeneratedSegmentationFile())
+	// Parse .ini file, get output options
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
+	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	settings.beginGroup("output");
+	bool createOutputVolume = settings.value("volume").toBool();
+	bool createOutputMesh = settings.value("mesh").toBool();
+	QString color = settings.value("color").toString().toLatin1();
+	QColor outputColor;
+	outputColor.setNamedColor(color);
+	if (!outputColor.isValid())
+	{
+		CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): No valid color set in ini file. Setting mesh color to red.";
+		outputColor.setNamedColor("red");
+	}
+
+	settings.endGroup();
+
+	if(!readGeneratedSegmentationFile(createOutputVolume))
 		return false;
 
-	if(mOutputMeshOption->getValue() && mOutputImage)
-		this->createOutputMesh();
+	if(createOutputMesh && mOutputImage)
+		this->createOutputMesh(outputColor);
 
 	return true;
 }
 
-void GenericScriptFilter::createOutputMesh()
+void GenericScriptFilter::createOutputMesh(QColor color)
 {
 		// Make contour of segmented volume
 	double threshold = 1; /// because the segmented image is 0..1
@@ -485,14 +490,15 @@ void GenericScriptFilter::createOutputMesh()
 	QString nameOutputMesh = mOutputImage->getName() + "_mesh";
 	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidOutputMesh, nameOutputMesh);
 	outputMesh->setVtkPolyData(rawContour);
-	outputMesh->setColor(QColor(0, 255, 0, 255));
+	outputMesh->setColor(color);
 	patientService()->insertData(outputMesh);
 	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
+	mServices->view()->autoShowData(outputMesh);
 
 	mOutputTypes[1]->setValue(outputMesh->getUid());
 }
 
-bool GenericScriptFilter::readGeneratedSegmentationFile()
+bool GenericScriptFilter::readGeneratedSegmentationFile(bool createOutputVolume)
 {
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
@@ -531,15 +537,20 @@ bool GenericScriptFilter::readGeneratedSegmentationFile()
 		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Problem creating derived image";
 		return false;
 	}
-	mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
-	mOutputImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
 
-	mServices->patient()->insertData(mOutputImage);
-	mServices->view()->autoShowData(mOutputImage);
+	if (createOutputVolume)
+	{
+		mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
+		mOutputImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
 
-	// set output
-	CX_ASSERT(mOutputTypes.size() > 0)
-	mOutputTypes.front()->setValue(mOutputImage->getUid());
+		mServices->patient()->insertData(mOutputImage);
+		mServices->view()->autoShowData(mOutputImage);
+
+		// set output
+		CX_ASSERT(mOutputTypes.size() > 0)
+		mOutputTypes.front()->setValue(mOutputImage->getUid());
+	}
+
 
 	return true;
 }

@@ -57,7 +57,6 @@ public:
 	virtual bool postProcess();
 
 	// extensions:
-	BoolPropertyPtr getMeshOutputOption(QDomElement root);
 	FilePathPropertyPtr getParameterFile(QDomElement root);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
@@ -69,8 +68,8 @@ protected:
 	QString createCommandString(ImagePtr input);
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
-	void createOutputMesh();
-	bool readGeneratedSegmentationFile();
+	void createOutputMesh(QColor color);
+	bool readGeneratedSegmentationFile(bool createOutputVolume);
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);

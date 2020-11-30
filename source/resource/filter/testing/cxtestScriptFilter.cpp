@@ -71,7 +71,7 @@ public:
 	}
 	bool testReadGeneratedSegmentationFile()
 	{
-		return readGeneratedSegmentationFile();
+		return readGeneratedSegmentationFile(true);
 	}
 	void setTestScriptFile()
 	{
