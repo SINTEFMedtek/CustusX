@@ -116,7 +116,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
 		igtlioLabels << IGTLIO_KEY_SPACING_X;
 		igtlioLabels << IGTLIO_KEY_SPACING_Y;
-                igtlioLabels << "SpacingZ"; //IGTLIO_KEY_SPACING_Z
+		igtlioLabels << QString("SpacingZ"); //IGTLIO_KEY_SPACING_Z;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
 
@@ -125,10 +125,15 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			metaLabel = igtlioLabels[i].toStdString();
 			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
 			if(!gotMetaData)
-                            if(!mProbeDefinitionFromStringMessages->haveValidValues())
-				CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
+			{
+				if(!mProbeDefinitionFromStringMessages->haveValidValues())
+					CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
+			}
 			else
+			{
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
+				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
+			}
 		}
 
 
@@ -137,7 +142,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 		{
 			//TODO: Use deciveNameLong
-                        //CX_LOG_DEBUG() << "Got valid probe definition";
+			//CX_LOG_DEBUG() << "Got valid probe definition";
 			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
 		}
 
