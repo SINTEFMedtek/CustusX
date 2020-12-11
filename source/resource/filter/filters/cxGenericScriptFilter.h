@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 //#include <QProcess>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
+#include <QColor>
 
 
 namespace cx
@@ -69,7 +70,8 @@ protected:
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
 	void createOutputMesh(QColor color);
-	bool readGeneratedSegmentationFile(bool createOutputVolume);
+	bool readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh);
+	bool readGeneratedMachineLearningSegmentationFiles(bool createOutputVolume, bool createOutputMesh);
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);
@@ -87,7 +89,9 @@ protected:
 	QString mScriptPathAddition;
 	ProcessWrapperPtr mCommandLine;
 	QString mResultFileEnding;
+	QStringList mOutoutOrgans;
 	ImagePtr mOutputImage;
+	QColor mOutputColor;
 
 	BoolPropertyPtr mOutputMeshOption;
 

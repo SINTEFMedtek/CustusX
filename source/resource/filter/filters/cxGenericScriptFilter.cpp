@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTimer>
 #include <QFileInfo>
 #include <QDir>
+#include <QDirIterator>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -220,6 +221,8 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	CommandStringVariables variables = createCommandStringVariables(input);
 
+	CX_LOG_DEBUG() << "deepSintefCommandString(variables): " << deepSintefCommandString(variables);
+
 	if(isUsingDeepSintefEngine(variables))
 		return deepSintefCommandString(variables);
 
@@ -316,6 +319,7 @@ QString GenericScriptFilter::getOutputFilePath(ImagePtr input)
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("output");
 	mResultFileEnding = settings.value("file_append","_copy.mhd").toString();
+	//mOutoutOrgans = settings.value("organs").toString().split(",");
 	settings.endGroup();
 
 	outputFileName.append(mResultFileEnding);
@@ -453,22 +457,27 @@ bool GenericScriptFilter::postProcess()
 	settings.beginGroup("output");
 	bool createOutputVolume = settings.value("volume").toBool();
 	bool createOutputMesh = settings.value("mesh").toBool();
+	bool machineLearningOutput = settings.value("machine_learning").toBool();
 	QString color = settings.value("color").toString().toLatin1();
-	QColor outputColor;
-	outputColor.setNamedColor(color);
-	if (!outputColor.isValid())
+	mOutputColor.setNamedColor(color);
+	if (!mOutputColor.isValid())
 	{
 		CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): No valid color set in ini file. Setting mesh color to red.";
-		outputColor.setNamedColor("red");
+		mOutputColor.setNamedColor("red");
 	}
 
 	settings.endGroup();
 
-	if(!readGeneratedSegmentationFile(createOutputVolume))
-		return false;
+	if(machineLearningOutput)
+	{
+		if(!readGeneratedMachineLearningSegmentationFiles(createOutputVolume, createOutputMesh))
+			return false;
+		else
+			return true;
+	}
 
-	if(createOutputMesh && mOutputImage)
-		this->createOutputMesh(outputColor);
+	if(!readGeneratedSegmentationFile(createOutputVolume, createOutputMesh))
+		return false;
 
 	return true;
 }
@@ -498,7 +507,7 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 	mOutputTypes[1]->setValue(outputMesh->getUid());
 }
 
-bool GenericScriptFilter::readGeneratedSegmentationFile(bool createOutputVolume)
+bool GenericScriptFilter::readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh)
 {
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
@@ -551,8 +560,77 @@ bool GenericScriptFilter::readGeneratedSegmentationFile(bool createOutputVolume)
 		mOutputTypes.front()->setValue(mOutputImage->getUid());
 	}
 
+	if(createOutputMesh && mOutputImage)
+		this->createOutputMesh(mOutputColor);
 
 	return true;
+}
+
+bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool createOutputVolume, bool createOutputMesh)
+{
+
+	ImagePtr parentImage = this->getCopiedInputImage();
+	if(!parentImage)
+	{
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No input image";
+		return false;
+	}
+	QString nameEnding = mResultFileEnding;
+	nameEnding.replace(".mhd", "");
+
+	QFileInfo fi(parentImage->getFilename());
+	QString outputFileName = fi.baseName();
+	QFileInfo outputFileInfo(outputFileName.append(mResultFileEnding));
+	QString outputFilePath = mServices->patient()->getActivePatientFolder();
+	QString outputDir(outputFilePath.append("/" + fi.path()));
+	QString outputFileNamesNoExtention = outputFileInfo.baseName();
+
+	QDirIterator fileIterator(outputDir, QDir::Files);
+	while (fileIterator.hasNext())
+	{
+		QString filePath = fileIterator.next();
+		if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".mhd"))
+		{
+			QFileInfo fi(filePath);
+			QString uid =	fi.fileName().replace(".mhd", "");
+			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
+			if(!newImage)
+			{
+				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles: No new image file created";
+				continue;
+			}
+
+			mOutputImage = createDerivedImage(mServices->patient(),
+												uid, uid,
+												newImage->getBaseVtkImageData(), parentImage);
+			if(!mOutputImage)
+			{
+				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles: Problem creating derived image";
+				continue;
+			}
+
+			if (createOutputVolume)
+			{
+				mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
+				mOutputImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
+
+				mServices->patient()->insertData(mOutputImage);
+				mServices->view()->autoShowData(mOutputImage);
+
+				// set output
+				CX_ASSERT(mOutputTypes.size() > 0)
+				mOutputTypes.front()->setValue(mOutputImage->getUid());
+			}
+
+				if(createOutputMesh && mOutputImage)
+					this->createOutputMesh(mOutputColor);
+
+		}
+
+	}
+
+	return true;
+
 }
 
 } // namespace cx
