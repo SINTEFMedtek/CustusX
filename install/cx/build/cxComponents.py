@@ -439,8 +439,8 @@ class CustusX(CppComponent):
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('CX_PLUGIN_org.custusx.filter.airways:BOOL', False); # Airways plugin requires FAST library
-        #if(platform.system() == 'Linux'):
-        #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
+        if(platform.system() == 'Linux'):
+          add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
         add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
