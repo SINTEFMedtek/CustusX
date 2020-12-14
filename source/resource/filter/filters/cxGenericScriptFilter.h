@@ -91,7 +91,7 @@ protected:
 	QString mResultFileEnding;
 	QStringList mOutoutOrgans;
 	ImagePtr mOutputImage;
-	QColor mOutputColor;
+	QList<QColor> mOutputColors;
 
 	BoolPropertyPtr mOutputMeshOption;
 

@@ -458,12 +458,26 @@ bool GenericScriptFilter::postProcess()
 	bool createOutputVolume = settings.value("volume").toBool();
 	bool createOutputMesh = settings.value("mesh").toBool();
 	bool machineLearningOutput = settings.value("machine_learning").toBool();
-	QString color = settings.value("color").toString().toLatin1();
-	mOutputColor.setNamedColor(color);
-	if (!mOutputColor.isValid())
+	QString color = settings.value("color").toString();
+	QStringList colors = color.split(" ");
+	mOutputColors.clear();
+	for(int i=0; i<colors.size(); i++)
+	{
+		QColor addColor;
+		addColor.setNamedColor(colors[i]);
+		mOutputColors.append(addColor);
+		if (!mOutputColors.last().isValid())
+		{
+			CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): Invalid color set in ini file. Setting mesh color to red.";
+			mOutputColors.last().setNamedColor("red");
+		}
+	}
+	if (mOutputColors.isEmpty())
 	{
 		CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): No valid color set in ini file. Setting mesh color to red.";
-		mOutputColor.setNamedColor("red");
+		QColor addColor;
+		addColor.setNamedColor("red");
+		mOutputColors.append(addColor);
 	}
 
 	settings.endGroup();
@@ -484,6 +498,9 @@ bool GenericScriptFilter::postProcess()
 
 void GenericScriptFilter::createOutputMesh(QColor color)
 {
+
+
+	CX_LOG_DEBUG() << "In GenericScriptFilter::createOutputMesh: Color: " << color.name();
 		// Make contour of segmented volume
 	double threshold = 1; /// because the segmented image is 0..1
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
@@ -561,7 +578,18 @@ bool GenericScriptFilter::readGeneratedSegmentationFile(bool createOutputVolume,
 	}
 
 	if(createOutputMesh && mOutputImage)
-		this->createOutputMesh(mOutputColor);
+	{
+	if (!mOutputColors.isEmpty())
+		this->createOutputMesh(mOutputColors.at(0));
+	else
+	{
+		CX_LOG_WARNING() << "In GenericScriptFilter::readGeneratedSegmentationFile(): No valid color set. Setting mesh color to red.";
+		QColor redColor;
+		redColor.setNamedColor("red");
+		this->createOutputMesh(redColor);
+	}
+	}
+
 
 	return true;
 }
@@ -585,12 +613,14 @@ bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool cre
 	QString outputDir(outputFilePath.append("/" + fi.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
+	int outputCounter = 0;
 	QDirIterator fileIterator(outputDir, QDir::Files);
 	while (fileIterator.hasNext())
 	{
 		QString filePath = fileIterator.next();
 		if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".mhd"))
 		{
+			outputCounter ++;
 			QFileInfo fi(filePath);
 			QString uid =	fi.fileName().replace(".mhd", "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
@@ -623,7 +653,7 @@ bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool cre
 			}
 
 				if(createOutputMesh && mOutputImage)
-					this->createOutputMesh(mOutputColor);
+					this->createOutputMesh(mOutputColors.at(std::min(outputCounter, mOutputColors.size()) - 1));
 
 		}
 
