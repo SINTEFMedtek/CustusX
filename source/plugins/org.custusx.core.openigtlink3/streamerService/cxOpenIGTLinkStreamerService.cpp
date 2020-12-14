@@ -32,6 +32,7 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 	connect(mConnection.get(), &NetworkHandler::connected, mStreamer.get(), &OpenIGTLinkStreamer::receivedConnected);
 	connect(mConnection.get(), &NetworkHandler::disconnected, mStreamer.get(), &OpenIGTLinkStreamer::receivedDisconnected);
 	connect(mConnection.get(), &NetworkHandler::image, mStreamer.get(), &OpenIGTLinkStreamer::receivedImage);
+	connect(mConnection.get(), &NetworkHandler::probedefinition, mStreamer.get(), &OpenIGTLinkStreamer::receiveProbedefinition);
 
 	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, this, &OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject);
 }

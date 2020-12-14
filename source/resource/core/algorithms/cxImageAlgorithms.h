@@ -65,7 +65,6 @@ cxResource_EXPORT vtkImageDataPtr createSlice(ImagePtr image, PLANE_TYPE planeTy
 cxResource_EXPORT std::vector<int> getSliceVoxelFrom3Dposition(ImagePtr image, PLANE_TYPE planeType, Vector3D position);
 cxResource_EXPORT int getSliceNumberFrom3Dposition(ImagePtr image, PLANE_TYPE planeType, Vector3D position);
 cxResource_EXPORT Vector3D get3DpositionFromSliceVoxel(ImagePtr image, PLANE_TYPE planeType, std::vector<int> voxel, int sliceNumber);
-Vector3D crossproduct(Vector3D A, Vector3D B);
 /**
  */
 cxResource_EXPORT QDateTime extractTimestamp(QString text);

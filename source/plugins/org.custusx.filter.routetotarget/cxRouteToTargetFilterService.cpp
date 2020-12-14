@@ -328,6 +328,16 @@ void RouteToTargetFilter::setSmoothing(bool smoothing)
     mSmoothing = smoothing; // default true
 }
 
+std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions()
+{
+	return mRouteToTarget->getRoutePositions();
+}
+
+std::vector< double > RouteToTargetFilter::getCameraRotation()
+{
+	return mRouteToTarget->getCameraRotation();
+}
+
 void RouteToTargetFilter::setTargetName(QString name)
 {
 	mTargetName = name;

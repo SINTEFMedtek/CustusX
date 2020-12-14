@@ -51,7 +51,7 @@ public slots:
     void receivedDisconnected();
     void receivedError();
     void receivedImage(ImagePtr image);
-    void receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef);
+    void receiveProbedefinition(QString not_used, ProbeDefinitionPtr probedef);
 
 protected slots:
     virtual void streamSlot();

@@ -353,7 +353,7 @@ class OpenIGTLinkIO(CppComponent):
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('f862d6bfa270332955e8050df8ce057febf48392')
+        self._getBuilder().gitCheckoutSha('854c850ed753941860168860fc19f1c807fc0595')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -438,7 +438,9 @@ class CustusX(CppComponent):
         add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
-        #add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
+        add('CX_PLUGIN_org.custusx.filter.airways:BOOL', False); # Airways plugin requires FAST library
+        if(platform.system() == 'Linux'):
+          add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
         add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
@@ -499,13 +501,14 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-        return 'git@github.com:smistad/FAST'
+        return 'git@github.com:SINTEFMedtek/FAST.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
-          self._getBuilder().gitCheckoutSha('173bb92c0c2f1c57aff9c26e06db290d80fbcf83')
+          self._getBuilder().gitCheckoutSha('cdaf1a0a41f93f9d023cc2c795f8fa67d160d702')
         else:
-          self._getBuilder().gitCheckoutSha('b85d3a826ebe360f77a8ac6f625a9dfa7bb856fd')
+          self._getBuilder().gitCheckoutSha('2bddc452230de58507fadb7a98b4284845e68987')
+
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
 #        runShell('git checkout %s' % branch, ignoreFailure=False)
@@ -524,6 +527,7 @@ class FAST(CppComponent):
         add('FAST_MODULE_Clarius:BOOL', False)
         add('FAST_MODULE_RealSense:BOOL', False)
         add('FAST_MODULE_WholeSlideImaging:BOOL', False)
+        add('FAST_MODULE_OpenVINO:BOOL', False)
         add('FAST_DOWNLOAD_TEST_DATA:BOOL', False)
         add('FAST_BUILD_EXAMPLES:BOOL', False)
         add('FAST_BUILD_TOOLS:BOOL', False)
