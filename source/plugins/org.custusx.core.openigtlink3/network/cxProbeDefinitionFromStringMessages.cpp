@@ -84,6 +84,9 @@ struct SectorInfo
 	}
 	bool isValid()
 	{
+		if(!mImage)
+			return false;
+
 		bool retval = true;
 		retval = retval && mImage;
 		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
@@ -94,15 +97,15 @@ struct SectorInfo
 		if(mProbeType == ProbeDefinition::tLINEAR)
 			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
 
-                Vector3D spacing = mImage->getSpacing();
-                if(!validSpacing(spacing))
-                {
-                    retval = retval && (mSpacingX < tooLarge);
-                    retval = retval && (mSpacingY < tooLarge);
-                    retval = retval && !similar(mSpacingX, 0);
-                    retval = retval && !similar(mSpacingY, 0);
-                    retval = retval && !similar(mSpacingZ, 0);
-                }
+		Vector3D spacing = mImage->getSpacing();
+		if(!validSpacing(spacing))
+		{
+			retval = retval && (mSpacingX < tooLarge);
+			retval = retval && (mSpacingY < tooLarge);
+			retval = retval && !similar(mSpacingX, 0);
+			retval = retval && !similar(mSpacingY, 0);
+			retval = retval && !similar(mSpacingZ, 0);
+		}
 
 		return retval;
 	}
