@@ -92,6 +92,7 @@ protected:
 	QStringList mOutoutOrgans;
 	ImagePtr mOutputImage;
 	QList<QColor> mOutputColors;
+	QStringList mOutputClasses;
 
 	BoolPropertyPtr mOutputMeshOption;
 

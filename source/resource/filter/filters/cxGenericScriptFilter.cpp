@@ -460,24 +460,48 @@ bool GenericScriptFilter::postProcess()
 	bool machineLearningOutput = settings.value("machine_learning").toBool();
 	QString color = settings.value("color").toString();
 	QStringList colors = color.split(" ");
+	QString outputClass = settings.value("classes").toString();
+	mOutputClasses = outputClass.split(" ");
 	mOutputColors.clear();
-	for(int i=0; i<colors.size(); i++)
+	for(int i=0; i<mOutputClasses.size(); i++)
 	{
 		QColor addColor;
-		addColor.setNamedColor(colors[i]);
-		mOutputColors.append(addColor);
-		if (!mOutputColors.last().isValid())
+		if (colors.size() > i)
 		{
-			CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): Invalid color set in ini file. Setting mesh color to red.";
-			mOutputColors.last().setNamedColor("red");
+			addColor.setNamedColor(colors[i]);
+			mOutputColors.append(addColor);
+			if (!mOutputColors.last().isValid())
+			{
+				CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): Invalid color set in ini file. Setting mesh color to red.";
+				mOutputColors.last().setNamedColor("red");
+			}
+		}
+		else
+		{
+			CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): No color set in ini for " << mOutputClasses[i] << " file. Setting mesh color to red.";
+			mOutputColors.append("red");
 		}
 	}
 	if (mOutputColors.isEmpty())
 	{
+		if (!colors.isEmpty())
+		{
+			QColor addColor;
+			addColor.setNamedColor(colors[0]);
+			mOutputColors.append(addColor);
+			if (!mOutputColors.last().isValid())
+			{
+				CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): Invalid color set in ini file. Setting mesh color to red.";
+				mOutputColors.last().setNamedColor("red");
+			}
+		}
+		else
+		{
 		CX_LOG_WARNING() << "In GenericScriptFilter::postProcess(): No valid color set in ini file. Setting mesh color to red.";
 		QColor addColor;
 		addColor.setNamedColor("red");
 		mOutputColors.append(addColor);
+		}
 	}
 
 	settings.endGroup();
@@ -613,14 +637,12 @@ bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool cre
 	QString outputDir(outputFilePath.append("/" + fi.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
-	int outputCounter = 0;
 	QDirIterator fileIterator(outputDir, QDir::Files);
 	while (fileIterator.hasNext())
 	{
 		QString filePath = fileIterator.next();
 		if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".mhd"))
 		{
-			outputCounter ++;
 			QFileInfo fi(filePath);
 			QString uid =	fi.fileName().replace(".mhd", "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
@@ -653,8 +675,18 @@ bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool cre
 			}
 
 				if(createOutputMesh && mOutputImage)
-					this->createOutputMesh(mOutputColors.at(std::min(outputCounter, mOutputColors.size()) - 1));
-
+				{
+					int colorNumber = 0;
+					for(int i=0; i<mOutputClasses.size(); i++)
+					{
+						if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
+						{
+							colorNumber = i;
+							break;
+						}
+					}
+					this->createOutputMesh(mOutputColors.at(std::min(colorNumber, mOutputColors.size() - 1)));
+				}
 		}
 
 	}
