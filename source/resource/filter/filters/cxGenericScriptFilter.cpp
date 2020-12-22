@@ -189,6 +189,12 @@ FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 	return mScriptFile;
 }
 
+void GenericScriptFilter::setParameterFilePath(QString path)
+{
+    mScriptFile->setValue(path);
+    this->scriptFileChanged();
+}
+
 FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 {
 	QStringList paths;

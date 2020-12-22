@@ -59,6 +59,7 @@ public:
 
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
+    void setParameterFilePath(QString path);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
 

@@ -105,6 +105,7 @@ private:
 	BoolPropertyPtr mVesselVolumeOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
+typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
 } /* namespace cx */
 #endif /* CXTUBESEGMENTATIONFILTERSERVICE_H_ */
