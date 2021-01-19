@@ -665,8 +665,7 @@ bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool cre
 			{
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles: Problem creating derived image";
 				continue;
-			}
-
+            }
 			if (createOutputVolume)
 			{
 				mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
@@ -678,27 +677,40 @@ bool GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles(bool cre
 				// set output
 				CX_ASSERT(mOutputTypes.size() > 0)
 				mOutputTypes.front()->setValue(mOutputImage->getUid());
-			}
+            }
 
-				if(createOutputMesh && mOutputImage)
-				{
-					int colorNumber = 0;
-					for(int i=0; i<mOutputClasses.size(); i++)
-					{
-						if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
-						{
-							colorNumber = i;
-							break;
-						}
-					}
-					this->createOutputMesh(mOutputColors.at(std::min(colorNumber, mOutputColors.size() - 1)));
-				}
+            if(createOutputMesh && mOutputImage)
+            {
+                int colorNumber = 0;
+                for(int i=0; i<mOutputClasses.size(); i++)
+                {
+                    if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
+                    {
+                        colorNumber = i;
+                        break;
+                    }
+                }
+                this->createOutputMesh(mOutputColors.at(std::min(colorNumber, mOutputColors.size() - 1)));
+            }
+
+            //delete files not used anymore
+            QString fileNameMhd = filePath;
+            if (QFileInfo(fileNameMhd).exists() && !createOutputVolume)
+                QFile(fileNameMhd).remove();
+
+            QString fileNameRaw = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".raw";
+            if (QFileInfo(fileNameRaw).exists() && !createOutputVolume)
+                QFile(fileNameRaw).remove();
+
+            QString fileNameNii = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".nii";
+            if (QFileInfo(fileNameNii).exists())
+                QFile(fileNameNii).remove();
+
 		}
 
 	}
 
 	return true;
-
 }
 
 } // namespace cx
