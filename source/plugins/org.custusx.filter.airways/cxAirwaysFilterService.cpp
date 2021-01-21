@@ -189,7 +189,7 @@ bool AirwaysFilter::execute()
 
 	bool doAirwaySegmentation = mAirwaySegmentationOption->getValue();
 	bool doLungSegmentation = mLungSegmentationOption->getValue();
-	bool doVesselSegmentation = mVesselCenterlineOption->getValue();
+    bool doVesselSegmentation = mVesselSegmentationOption->getValue();
 
 	if (doAirwaySegmentation)
 	{
@@ -677,6 +677,15 @@ void AirwaysFilter::createOutputTypes()
 	mOutputTypes.push_back(tempVolumeStringAdapter);
 }
 
+void AirwaysFilter::setAirwaySegmentation(bool airwaySegmentation)
+{
+    mAirwaySegmentationOption->setValue(airwaySegmentation);
+}
+
+void AirwaysFilter::setVesselSegmentation(bool vesselSegmentation)
+{
+    mVesselSegmentationOption->setValue(vesselSegmentation);
+}
 
 BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 {
@@ -724,12 +733,12 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 
 BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr vesselSegmentationOption = BoolProperty::initialize(
+    mVesselSegmentationOption = BoolProperty::initialize(
 				"Vessel segmentation",
 				"",
 				"Selecting this option will segment the blood vessels in the lungs",
 				false, root);
-	return vesselSegmentationOption;
+    return mVesselSegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselCenterlineOption(QDomElement root)
