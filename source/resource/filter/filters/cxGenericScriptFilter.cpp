@@ -464,17 +464,22 @@ bool GenericScriptFilter::postProcess()
 	bool createOutputVolume = settings.value("volume").toBool();
 	bool createOutputMesh = settings.value("mesh").toBool();
 	bool machineLearningOutput = settings.value("machine_learning").toBool();
-	QString color = settings.value("color").toString();
-	QStringList colors = color.split(" ");
+    QString allColors = settings.value("color").toString();
+    QStringList colorList = allColors.split(";");
 	QString outputClass = settings.value("classes").toString();
 	mOutputClasses = outputClass.split(" ");
 	mOutputColors.clear();
 	for(int i=0; i<mOutputClasses.size(); i++)
 	{
 		QColor addColor;
-		if (colors.size() > i)
+        if (colorList.size() > i)
 		{
-			addColor.setNamedColor(colors[i]);
+            QStringList color = colorList[i].split(",");
+            CX_LOG_DEBUG() << "allColors: " << allColors;
+            CX_LOG_DEBUG() << "ColorList: " << colorList[i];
+            CX_LOG_DEBUG() << "color.size(): " << color.size();
+            if (color.size() == 4)
+                addColor.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
 			mOutputColors.append(addColor);
 			if (!mOutputColors.last().isValid())
 			{
@@ -490,10 +495,12 @@ bool GenericScriptFilter::postProcess()
 	}
 	if (mOutputColors.isEmpty())
 	{
-		if (!colors.isEmpty())
+        if (!colorList.isEmpty())
 		{
 			QColor addColor;
-			addColor.setNamedColor(colors[0]);
+            QStringList color = colorList[0].split(",");
+            if (color.size() == 4)
+                addColor.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
 			mOutputColors.append(addColor);
 			if (!mOutputColors.last().isValid())
 			{
