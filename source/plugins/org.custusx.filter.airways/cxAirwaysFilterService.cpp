@@ -283,7 +283,6 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 
 } catch (std::exception& e){
 	reportError("std::exception:"+qstring_cast(e.what()));
-	std::cout << "DEBUG std::exception" << std::endl;  //debug
 	return false;
 
 } catch (...){
@@ -536,7 +535,6 @@ bool AirwaysFilter::postProcessLungs()
 
 bool AirwaysFilter::postProcessVessels()
 {
-    CX_LOG_DEBUG() << "In AirwaysFilter::postProcessVessels()";
     if(!mBloodVesselSegmentationOutput)
     {
         CX_LOG_WARNING() << "In AirwaysFilter::postProcessVessels(): No BloodVessel segmentation output created.";
