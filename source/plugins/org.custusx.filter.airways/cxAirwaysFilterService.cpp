@@ -438,7 +438,7 @@ bool AirwaysFilter::postProcess()
 		mLungSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
 	}
 
-	if(mVesselCenterlineOption->getValue())
+    if(mVesselSegmentationOption->getValue())
 	{
 		postProcessVessels();
 		mBloodVesselSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
@@ -450,7 +450,7 @@ bool AirwaysFilter::postProcess()
 
 bool AirwaysFilter::postProcessAirways()
 {
-	if(!mAirwaySegmentationOutput)
+    if(!mAirwaySegmentationOutput)
 		return false;
 
 	// Make contour of segmented volume
@@ -536,8 +536,12 @@ bool AirwaysFilter::postProcessLungs()
 
 bool AirwaysFilter::postProcessVessels()
 {
-	if(!mBloodVesselSegmentationOutput)
-		return false;
+    CX_LOG_DEBUG() << "In AirwaysFilter::postProcessVessels()";
+    if(!mBloodVesselSegmentationOutput)
+    {
+        CX_LOG_WARNING() << "In AirwaysFilter::postProcessVessels(): No BloodVessel segmentation output created.";
+        return false;
+    }
 
 	// Make contour of segmented volume
 	double threshold = 1; /// because the segmented image is 0..1
