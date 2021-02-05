@@ -475,9 +475,6 @@ bool GenericScriptFilter::postProcess()
         if (colorList.size() > i)
 		{
             QStringList color = colorList[i].split(",");
-            CX_LOG_DEBUG() << "allColors: " << allColors;
-            CX_LOG_DEBUG() << "ColorList: " << colorList[i];
-            CX_LOG_DEBUG() << "color.size(): " << color.size();
             if (color.size() == 4)
                 addColor.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
 			mOutputColors.append(addColor);
