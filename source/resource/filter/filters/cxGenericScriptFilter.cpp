@@ -346,7 +346,7 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
 	bool success = mCommandLine->launch(command);
 	if(success)
-		return mCommandLine->waitForFinished(1000*60*15);//Wait at least 15 min
+        return mCommandLine->waitForFinished(1000*60*30);//Wait at least 30 min
 	else
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
