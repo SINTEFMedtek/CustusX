@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxMesh.h"
 #include "cxView.h"
+#include "cxLogger.h"
 
 #include "cxTypeConversions.h"
 #include "cxVtkHelperClasses.h"
@@ -95,6 +96,15 @@ void GraphicalGeometric::setRenderer(vtkRendererPtr renderer)
 {
 	mGraphicalPolyDataPtr->setRenderer(renderer);
 	mGraphicalGlyph3DDataPtr->setRenderer(renderer);
+
+//    //temp testing
+//    CX_LOG_DEBUG() << "Line width is: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidth();
+//    CX_LOG_DEBUG() << "Max line width is: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidthMaxValue();
+//    CX_LOG_DEBUG() << "Min line width is: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidthMinValue();
+//    CX_LOG_DEBUG() << "Trying to set line width to 5.0.";
+//    mGraphicalPolyDataPtr->getActor()->GetProperty()->SetLineWidth(5.0);
+//    CX_LOG_DEBUG() << "Line width is now: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidth();
+
 }
 
 void GraphicalGeometric::setTransformOffset(Transform3D rMrr)
@@ -142,6 +152,7 @@ void GraphicalGeometric::meshChangedSlot()
 	dest->SetDiffuse(src.mDiffuse->getValue());
 	dest->SetSpecular(src.mSpecular->getValue());
 	dest->SetSpecularPower(src.mSpecularPower->getValue());
+    dest->SetLineWidth(src.mLineWidth->getValue());
 }
 
 /**called when transform is changed
@@ -156,7 +167,7 @@ void GraphicalGeometric::transformChangedSlot()
 	Transform3D rrMd = mMesh->get_rMd();
 	Transform3D rMd = m_rMrr * rrMd;
 
-	mGraphicalPolyDataPtr->setUserMatrix(rMd.getVtkMatrix());
+    mGraphicalPolyDataPtr->setUserMatrix(rMd.getVtkMatrix());
 	mGraphicalGlyph3DDataPtr->setUserMatrix(rMd.getVtkMatrix());
 }
 
