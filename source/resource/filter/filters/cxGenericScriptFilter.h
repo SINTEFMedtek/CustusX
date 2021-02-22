@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
+#include "cxSelectDataStringProperty.h"
 
 
 namespace cx
@@ -31,7 +32,18 @@ struct cxResourceFilter_EXPORT CommandStringVariables
 	QString scriptEngine;
 	QString model;
 
-	CommandStringVariables(QString parameterFilePath, ImagePtr input);
+    CommandStringVariables(QString parameterFilePath, ImagePtr input);
+};
+
+struct cxResourceFilter_EXPORT OutputVariables
+{
+    bool mCreateOutputVolume;
+    bool mCreateOutputMesh;
+    bool mMachineLearningOutput;
+    QStringList mOutputColorList;
+    QStringList mOutputClasses;
+
+    OutputVariables(QString parameterFilePath);
 };
 
 /** Generic filter calling external filter script.
@@ -70,9 +82,12 @@ protected:
 	QString createCommandString(ImagePtr input);
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
+    void setupOutputColors(QStringList colorList);
 	void createOutputMesh(QColor color);
-	bool readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh);
-	bool readGeneratedMachineLearningSegmentationFiles(bool createOutputVolume, bool createOutputMesh);
+    bool readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh, bool machineLearing);
+    bool readStandardFile(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh);
+    bool readMachineLearningFiles(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh);
+    void createOutputVolume();    void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);
@@ -95,6 +110,8 @@ protected:
 	QList<QColor> mOutputColors;
 	QStringList mOutputClasses;
 
+    SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
+    StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
 
 protected slots:
