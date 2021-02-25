@@ -516,7 +516,7 @@ void GenericScriptFilter::setupOutputColors(QStringList colorList)
             mOutputColors.append(addColor);
             if (!mOutputColors.last().isValid())
             {
-                CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): Invalid color set in ini file. Setting mesh color to red.";
+                CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): Invalid color set in ini file (2). Setting mesh color to red.";
                 mOutputColors.last().setNamedColor("red");
             }
         }

@@ -82,6 +82,18 @@ public:
 
 		mScriptFile->setValueFromVariant(scriptFile);
 	}
+	void testSetupOutputColors(QStringList colorList)
+	{
+		setupOutputColors(colorList);
+	}
+	QList<QColor> getOutputColors()
+	{
+		return mOutputColors;
+	}
+	void addOutputClass(QString outputClass)
+	{
+		mOutputClasses << outputClass;
+	}
 
 public slots:
 	void testProcessReadyRead()
@@ -305,4 +317,48 @@ TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
 	REQUIRE(filter->testReadGeneratedSegmentationFile());
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("GenericScriptFilter: Set output colors", "[unit]")
+{
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
+
+	QColor defaultRedColor;
+	defaultRedColor.setNamedColor("red");
+
+	QStringList colorListWithError("0,0,255");
+	QStringList colorListWithError2("0,0,255, 0, 0");
+	QStringList colorList("0,0,255,255");
+	QStringList colorListWithWhitespace("0	,0 ,255 ,255");
+	QStringList colorListWithTwoColors;
+	colorListWithTwoColors << colorList << "0, 255, 255, 255";
+
+	//Test without input classes
+	filter->testSetupOutputColors(colorListWithError);
+	REQUIRE(filter->getOutputColors().size() == 1);
+	CHECK_FALSE(filter->getOutputColors()[0] != defaultRedColor);
+	filter->testSetupOutputColors(colorListWithError2);
+	CHECK_FALSE(filter->getOutputColors()[0] != defaultRedColor);
+
+	filter->testSetupOutputColors(colorList);
+	CHECK(filter->getOutputColors()[0] != defaultRedColor);
+
+	filter->testSetupOutputColors(colorListWithWhitespace);
+	CHECK(filter->getOutputColors()[0] != defaultRedColor);
+
+	//Test with an input class
+	filter->addOutputClass(QString("testClass"));
+	filter->testSetupOutputColors(colorListWithError);
+	CHECK_FALSE(filter->getOutputColors()[0] != defaultRedColor);
+	filter->testSetupOutputColors(colorList);
+	CHECK(filter->getOutputColors()[0] != defaultRedColor);
+
+	filter->testSetupOutputColors(colorListWithTwoColors);
+	CHECK(filter->getOutputColors().size() == 1);
+
+	//Test with two input classes
+	filter->addOutputClass(QString("testClass2"));
+	filter->testSetupOutputColors(colorListWithTwoColors);
+	CHECK(filter->getOutputColors().size() == 2);
+
 }
