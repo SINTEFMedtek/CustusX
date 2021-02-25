@@ -94,6 +94,10 @@ public:
 	{
 		mOutputClasses << outputClass;
 	}
+	QColor testGetDefaultColor()
+	{
+		return getDefaultColor();
+	}
 
 public slots:
 	void testProcessReadyRead()
@@ -323,8 +327,7 @@ TEST_CASE("GenericScriptFilter: Set output colors", "[unit]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
-	QColor defaultRedColor;
-	defaultRedColor.setNamedColor("red");
+	QColor defaultRedColor = filter->testGetDefaultColor();
 
 	QStringList colorListWithError("0,0,255");
 	QStringList colorListWithError2("0,0,255, 0, 0");

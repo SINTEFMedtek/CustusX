@@ -484,50 +484,45 @@ bool GenericScriptFilter::postProcess()
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
 {
     mOutputColors.clear();
-    for(int i=0; i<mOutputClasses.size(); i++)
+    int i=0;
+    do
     {
-        QColor addColor;
         if (colorList.size() > i)
         {
             QStringList color = colorList[i].split(",");
-            if (color.size() == 4)
-                addColor.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
+            QColor addColor = createColor(color);
             mOutputColors.append(addColor);
-            if (!mOutputColors.last().isValid())
-            {
-                CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): Invalid color set in ini file. Setting mesh color to red.";
-                mOutputColors.last().setNamedColor("red");
-            }
         }
         else
         {
-            CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): No color set in ini for " << mOutputClasses[i] << " file. Setting mesh color to red.";
-            mOutputColors.append("red");
+            QString outputClass("");
+            if(mOutputClasses.size() >= i)
+              outputClass = mOutputClasses[i];
+            CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): No color set in ini for " << outputClass << " file. Setting mesh color to red.";
+            mOutputColors.append(getDefaultColor());
         }
     }
-    if (mOutputColors.isEmpty())
-    {
-        if (!colorList.isEmpty())
-        {
-            QColor addColor;
-            QStringList color = colorList[0].split(",");
-            if (color.size() == 4)
-                addColor.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
-            mOutputColors.append(addColor);
-            if (!mOutputColors.last().isValid())
-            {
-                CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): Invalid color set in ini file (2). Setting mesh color to red.";
-                mOutputColors.last().setNamedColor("red");
-            }
-        }
-        else
-        {
-        CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): No valid color set in ini file. Setting mesh color to red.";
-        QColor addColor;
-        addColor.setNamedColor("red");
-        mOutputColors.append(addColor);
-        }
-    }
+    while (++i < mOutputClasses.size());
+}
+
+QColor GenericScriptFilter::createColor(QStringList color)
+{
+  QColor retval;
+  if (color.size() == 4)
+      retval.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
+  if (!retval.isValid())
+  {
+      CX_LOG_WARNING() << "In GenericScriptFilter::createColor(): Invalid color set in ini file. Setting color to red.";
+      retval = getDefaultColor();
+  }
+  return retval;
+}
+
+QColor GenericScriptFilter::getDefaultColor()
+{
+  QColor retval;
+  retval.setNamedColor("red");
+  return retval;
 }
 
 void GenericScriptFilter::createOutputMesh(QColor color)
@@ -616,9 +611,7 @@ bool GenericScriptFilter::readStandardFile(ImagePtr parentImage, QString nameEnd
         else
         {
             CX_LOG_WARNING() << "In GenericScriptFilter::readGeneratedSegmentationFile(): No valid color set. Setting mesh color to red.";
-            QColor redColor;
-            redColor.setNamedColor("red");
-            this->createOutputMesh(redColor);
+            this->createOutputMesh(getDefaultColor());
         }
     }
 

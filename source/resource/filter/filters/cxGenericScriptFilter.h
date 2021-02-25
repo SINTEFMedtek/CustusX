@@ -82,7 +82,9 @@ protected:
 	QString createCommandString(ImagePtr input);
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
-    void setupOutputColors(QStringList colorList);
+	void setupOutputColors(QStringList colorList);
+	QColor createColor(QStringList color);
+	QColor getDefaultColor();
 	void createOutputMesh(QColor color);
     bool readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh, bool machineLearing);
     bool readStandardFile(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh);
