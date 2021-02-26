@@ -65,7 +65,6 @@ OutputVariables::OutputVariables(QString parameterFilePath)
     settings.beginGroup("output");
     mCreateOutputVolume = settings.value("volume").toBool();
     mCreateOutputMesh = settings.value("mesh").toBool();
-    //mMachineLearningOutput = settings.value("machine_learning").toBool(); //Not needed?
     QString allColors = settings.value("color").toString();
     mOutputColorList = allColors.split(";");
     QString outputClass = settings.value("classes").toString();
@@ -473,7 +472,6 @@ bool GenericScriptFilter::postProcess()
 
     bool createOutputVolume = outputVariables.mCreateOutputVolume;
     bool createOutputMesh = outputVariables.mCreateOutputMesh;
-    //bool machineLearning = outputVariables.mMachineLearningOutput; //Not needed?
     QStringList colorList = outputVariables.mOutputColorList;
     mOutputClasses = outputVariables.mOutputClasses;
     this->setupOutputColors(colorList);

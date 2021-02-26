@@ -39,7 +39,6 @@ struct cxResourceFilter_EXPORT OutputVariables
 {
     bool mCreateOutputVolume;
     bool mCreateOutputMesh;
-    //bool mMachineLearningOutput;//Unused
     QStringList mOutputColorList;
     QStringList mOutputClasses;
 
