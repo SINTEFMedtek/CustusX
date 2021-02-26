@@ -21,6 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFileManagerServiceProxy.h"
 #include "cxFilePathProperty.h"
 #include "cxFilePreviewProperty.h"
+#include "cxImage.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cxtest
 {
@@ -71,7 +73,7 @@ public:
 	}
 	bool testReadGeneratedSegmentationFile()
 	{
-        return readGeneratedSegmentationFile(true, true, false);
+		return readGeneratedSegmentationFiles(true, true);
 	}
 	void setTestScriptFile()
 	{
@@ -97,6 +99,15 @@ public:
 	QColor testGetDefaultColor()
 	{
 		return getDefaultColor();
+	}
+
+	cx::ImagePtr getOutputImage()
+	{
+		return mOutputImage;
+	}
+	cx::SelectDataStringPropertyBasePtr getOutputMeshSelectMeshPtr()
+	{
+		return mOutputMeshSelectMeshPtr;
 	}
 
 public slots:
@@ -318,7 +329,13 @@ TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
 
 	REQUIRE(filter->preProcess());
 	REQUIRE(filter->execute());
+
 	REQUIRE(filter->testReadGeneratedSegmentationFile());
+	REQUIRE(filter->getOutputImage());
+	//std::cout << "Image uid: " << filter->getOutputImage()->getUid() << std::endl;
+	//std::cout << "Image name: " << filter->getOutputImage()->getName() << std::endl;
+	REQUIRE(filter->getOutputMeshSelectMeshPtr());
+	//std::cout << "Mesh uid: " << filter->getOutputMeshSelectMeshPtr()->getValue() << std::endl;
 
 	cx::LogicManager::shutdown();
 }

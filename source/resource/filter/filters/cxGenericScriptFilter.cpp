@@ -65,7 +65,7 @@ OutputVariables::OutputVariables(QString parameterFilePath)
     settings.beginGroup("output");
     mCreateOutputVolume = settings.value("volume").toBool();
     mCreateOutputMesh = settings.value("mesh").toBool();
-    mMachineLearningOutput = settings.value("machine_learning").toBool();
+    //mMachineLearningOutput = settings.value("machine_learning").toBool(); //Not needed?
     QString allColors = settings.value("color").toString();
     mOutputColorList = allColors.split(";");
     QString outputClass = settings.value("classes").toString();
@@ -473,12 +473,12 @@ bool GenericScriptFilter::postProcess()
 
     bool createOutputVolume = outputVariables.mCreateOutputVolume;
     bool createOutputMesh = outputVariables.mCreateOutputMesh;
-    bool machineLearning = outputVariables.mMachineLearningOutput;
+    //bool machineLearning = outputVariables.mMachineLearningOutput; //Not needed?
     QStringList colorList = outputVariables.mOutputColorList;
     mOutputClasses = outputVariables.mOutputClasses;
     this->setupOutputColors(colorList);
 
-    return readGeneratedSegmentationFile(createOutputVolume, createOutputMesh, machineLearning);
+    return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
 }
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
@@ -552,79 +552,20 @@ void GenericScriptFilter::createOutputMesh(QColor color)
     mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
 }
 
-bool GenericScriptFilter::readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh, bool machineLearing)
+bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh)
 {
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
 	{
-		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No input image";
+		CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: No input image";
 		return false;
 	}
-	QString nameEnding = mResultFileEnding;
-	nameEnding.replace(".mhd", "");
 
-    if (machineLearing)
-        return this->readMachineLearningFiles(parentImage, nameEnding, createOutputVolume, createOutputMesh);
-    else
-        return this->readStandardFile(parentImage, nameEnding, createOutputVolume, createOutputMesh);
-}
-
-bool GenericScriptFilter::readStandardFile(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh)
-{
-    QString uid = parentImage->getUid() + nameEnding;
-    QString imageName = parentImage->getName() + nameEnding;
-    QString fileName = this->getOutputFilePath(parentImage);
-
-    if (!QFileInfo(fileName).exists())
-    {
-        CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Cannot find new file: " << fileName;
-        return false;
-    }
-
-    ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, fileName));
-    if(!newImage)
-    {
-        CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: No new image file created";
-        return false;
-    }
-    if(!newImage->getBaseVtkImageData())
-    {
-        CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: New image file has no data";
-        return false;
-    }
-    mOutputImage = createDerivedImage(mServices->patient(),
-                                         uid, imageName,
-                                         newImage->getBaseVtkImageData(), parentImage);
-    if(!mOutputImage)
-    {
-        CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFile: Problem creating derived image";
-        return false;
-    }
-
-    if (createOutputVolume)
-        this->createOutputVolume();
-
-    if(createOutputMesh && mOutputImage)
-    {
-        if (!mOutputColors.isEmpty())
-            this->createOutputMesh(mOutputColors.at(0));
-        else
-        {
-            CX_LOG_WARNING() << "In GenericScriptFilter::readGeneratedSegmentationFile(): No valid color set. Setting mesh color to red.";
-            this->createOutputMesh(getDefaultColor());
-        }
-    }
-
-    return true;
-}
-
-bool GenericScriptFilter::readMachineLearningFiles(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh)
-{
-    QFileInfo fileInfoInput(parentImage->getFilename());
-    QString outputFileName = fileInfoInput.baseName();
+	QFileInfo fileInfoInput(parentImage->getFilename());
+	QString outputFileName = fileInfoInput.baseName();
 	QFileInfo outputFileInfo(outputFileName.append(mResultFileEnding));
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
-    QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
+	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
 	QDirIterator fileIterator(outputDir, QDir::Files);
@@ -633,44 +574,61 @@ bool GenericScriptFilter::readMachineLearningFiles(ImagePtr parentImage, QString
 		QString filePath = fileIterator.next();
 		if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".mhd"))
 		{
-            QFileInfo fileInfoOutput(filePath);
-            QString uid =	fileInfoOutput.fileName().replace(".mhd", "");
+			QFileInfo fileInfoOutput(filePath);
+			QString uid =	fileInfoOutput.fileName().replace(".mhd", "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
 			{
-				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles: No new image file created";
+				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: No new image file created";
 				continue;
 			}
 
 			mOutputImage = createDerivedImage(mServices->patient(),
-												uid, uid,
+												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
 			if(!mOutputImage)
 			{
-				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedMachineLearningSegmentationFiles: Problem creating derived image";
+				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: Problem creating derived image";
 				continue;
-            }
+			}
 			if (createOutputVolume)
-                this->createOutputVolume();
+				this->createOutputVolume();
 
-            if(createOutputMesh && mOutputImage)
-            {
-                int colorNumber = 0;
-                for(int i=0; i<mOutputClasses.size(); i++)
-                {
-                    if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
-                    {
-                        colorNumber = i;
-                        break;
-                    }
-                }
-                this->createOutputMesh(mOutputColors.at(std::min(colorNumber, mOutputColors.size() - 1)));
-            }
-            this->deleteNotUsedFiles(filePath, createOutputVolume);
-        }
+			if(createOutputMesh && mOutputImage)
+			{
+				int colorNumber = 0;
+				for(int i=0; i<mOutputClasses.size(); i++)
+				{
+					if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
+					{
+						colorNumber = i;
+						break;
+					}
+				}
+				QColor outputColor = getDefaultColor();
+				if(mOutputColors.size() > colorNumber)
+					outputColor = mOutputColors.at(colorNumber);
+				this->createOutputMesh(outputColor);
+			}
+			this->deleteNotUsedFiles(filePath, createOutputVolume);
+		}
 	}
 
 	return true;
+}
+
+QString GenericScriptFilter::createImageName(QString parentName, QString filePath)
+{
+	QString retval = parentName;
+	QString nameEnding = mResultFileEnding;
+	nameEnding.replace(".mhd", "");
+	for(int i=0; i<mOutputClasses.size(); i++)
+	{
+		if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
+			retval = retval + QString("_") + mOutputClasses[i] + QString("_");
+	}
+	retval.append(nameEnding);
+	return retval;
 }
 
 void GenericScriptFilter::createOutputVolume()
