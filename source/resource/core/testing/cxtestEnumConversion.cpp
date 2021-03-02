@@ -74,4 +74,14 @@ TEST_CASE("Image sub type conversions, convertToImageSubType function", "[unit][
 	CHECK(cx::convertToImageSubType("label") == cx::istSEGMENTATION);
 }
 
+TEST_CASE("Lung structures conversions", "[unit][resource][core][enum]")
+{
+	CHECK(enum2string(cx::lsUNKNOWN) == "UNKNOWN");
+	CHECK(enum2string(cx::lsLUNG) == "Lungs");
+	CHECK(enum2string(cx::lsLESIONS) == "Lesions");
+
+	CHECK(string2enum<cx::LUNG_STRUCTURES>("Lungs") == cx::lsLUNG);
+	CHECK(string2enum<cx::LUNG_STRUCTURES>("Lesions") == cx::lsLESIONS);
+}
+
 }//cxtest
