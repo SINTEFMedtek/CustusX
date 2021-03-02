@@ -22,6 +22,8 @@ import os.path
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
+from zipfile import ZipFile
+from io import BytesIO
 
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
@@ -115,7 +117,17 @@ class Component(object):
         return ""
     def useExternalRepositories(self):
         return self.controlData.gitrepo_main_site_base == self.controlData.gitrepo_open_site_base
-
+    def download(self):
+        return urllib.request.urlretrieve(self.url_link())
+    def unzip(self):
+        if os.path.isdir(self.thoraxCTdataPath()) == False:
+            os.mkdir(self.thoraxCTdataPath())
+        if not os.listdir(self.thoraxCTdataPath()):
+            zipFilePath = self.thoraxCTdataPath() + '/' + 'temp.zip'
+            urllib.request.urlretrieve(self.url_link(), zipFilePath)
+            with ZipFile(self.thoraxCTdataPath() + '/' + 'temp.zip', 'r') as zip_ref:
+    	        zip_ref.extractall(self.thoraxCTdataPath())
+            os.remove(zipFilePath)
 
 # ---------------------------------------------------------
 
