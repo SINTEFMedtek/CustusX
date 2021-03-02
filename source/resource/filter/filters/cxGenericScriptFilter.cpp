@@ -397,7 +397,6 @@ bool GenericScriptFilter::execute()
 		return false;
 
 	ImagePtr input = this->getCopiedInputImage();
-    CX_LOG_DEBUG() <<  "Input uid: " << input->getUid();
 	// get output also?
 	if (!input)
 		return false;
@@ -428,7 +427,6 @@ bool GenericScriptFilter::createProcess()
 	mCommandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
 
 	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
-
 	/**************************************************************************
 	* NB: For Python output to be written Python buffering must be turned off:
 	* E.g. Use python -u

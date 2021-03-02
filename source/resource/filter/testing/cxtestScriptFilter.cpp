@@ -317,7 +317,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[u
     {
         INFO("Post processing data from GenericScriptFilter failed.");
         REQUIRE(filter->postProcess());
-        cxtest::checkFilterInit(filter, true, true, true);
+        cxtest::checkFilterInit(filter, true, true);
     }
 
     cx::LogicManager::shutdown();
@@ -462,7 +462,7 @@ TEST_CASE("GenericScriptFilter: Set output colors", "[unit]")
 	CHECK(filter->getOutputColors().size() == 2);
 }
 
-TEST_CASE("GenericScriptFilter: Read python_Lungs.ini file", "[unit]")
+TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -506,8 +506,8 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs.ini file", "[unit]")
 	//CX_LOG_DEBUG() << outputVariables.mOutputColorList.join(";");
 	//CX_LOG_DEBUG() << outputVariables.mOutputClasses.join(";");
 
-	//Assuming the variables in "python_Lungs.ini" won't change in the future
-	REQUIRE_FALSE(outputVariables.mCreateOutputVolume);
+    //Assuming the variables in "python_Lungs_testing.ini" won't change in the future
+    REQUIRE(outputVariables.mCreateOutputVolume);
 	REQUIRE(outputVariables.mCreateOutputMesh);
 
 	REQUIRE(outputVariables.mOutputColorList.size() > 0);
