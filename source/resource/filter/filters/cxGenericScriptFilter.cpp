@@ -397,6 +397,7 @@ bool GenericScriptFilter::execute()
 		return false;
 
 	ImagePtr input = this->getCopiedInputImage();
+    CX_LOG_DEBUG() <<  "Input uid: " << input->getUid();
 	// get output also?
 	if (!input)
 		return false;

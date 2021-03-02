@@ -98,7 +98,7 @@ protected:
 	bool isUsingDeepSintefEngine(CommandStringVariables variables);
 	QString deepSintefCommandString(CommandStringVariables variables);
 
-	FilePathPropertyPtr mScriptFile;
+    FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
 	vtkImageDataPtr mRawResult;
