@@ -39,7 +39,6 @@ struct cxResourceFilter_EXPORT OutputVariables
 {
     bool mCreateOutputVolume;
     bool mCreateOutputMesh;
-    bool mMachineLearningOutput;
     QStringList mOutputColorList;
     QStringList mOutputClasses;
 
@@ -82,12 +81,14 @@ protected:
 	QString createCommandString(ImagePtr input);
 	bool runCommandStringAndWait(QString command);
 	QString getCustomPath();
-    void setupOutputColors(QStringList colorList);
+	void setupOutputColors(QStringList colorList);
+	QColor createColor(QStringList color);
+	QColor getDefaultColor();
 	void createOutputMesh(QColor color);
-    bool readGeneratedSegmentationFile(bool createOutputVolume, bool createOutputMesh, bool machineLearing);
-    bool readStandardFile(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh);
-    bool readMachineLearningFiles(ImagePtr parentImage, QString nameEnding, bool createOutputVolume, bool createOutputMesh);
-    void createOutputVolume();    void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
+	bool readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh);
+	QString createImageName(QString parentName, QString filePath);
+	void createOutputVolume();
+	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);
 	QString getScriptPath();
 	QString getInputFilePath(ImagePtr input);
 	QString getOutputFilePath(ImagePtr input);

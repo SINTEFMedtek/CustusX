@@ -168,6 +168,27 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		istCOUNT
 	};
 
+	enum cxResource_EXPORT LUNG_STRUCTURES
+	{
+		lsUNKNOWN,
+		lsLUNG, // The following enums are used for as buttons in StructuresSelectionWidget. lsLUNG is the first button.
+		lsLESIONS,
+		lsLYMPH_NODES,
+		lsVENA_CAVA,
+		lsVENA_AZYGOS,
+		lsAORTA,
+		lsSUBCLAVIAN_ARTERY,
+		lsPULMONARY_VESSELS,
+		lsHEART,
+		lsESOPHAGUS,
+		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
+		lsAIRWAYS,
+		lsVESSELS,
+		lsCOUNT,
+		lsFIRST_STRUCTURE_BUTTON = lsLUNG,
+		lsLAST_STRUCTURE_BUTTON = lsSPINE
+	};
+
 /**
  * @}
  */
