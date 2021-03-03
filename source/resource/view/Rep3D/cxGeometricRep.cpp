@@ -96,15 +96,6 @@ void GraphicalGeometric::setRenderer(vtkRendererPtr renderer)
 {
 	mGraphicalPolyDataPtr->setRenderer(renderer);
 	mGraphicalGlyph3DDataPtr->setRenderer(renderer);
-
-//    //temp testing
-//    CX_LOG_DEBUG() << "Line width is: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidth();
-//    CX_LOG_DEBUG() << "Max line width is: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidthMaxValue();
-//    CX_LOG_DEBUG() << "Min line width is: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidthMinValue();
-//    CX_LOG_DEBUG() << "Trying to set line width to 5.0.";
-//    mGraphicalPolyDataPtr->getActor()->GetProperty()->SetLineWidth(5.0);
-//    CX_LOG_DEBUG() << "Line width is now: " << mGraphicalPolyDataPtr->getActor()->GetProperty()->GetLineWidth();
-
 }
 
 void GraphicalGeometric::setTransformOffset(Transform3D rMrr)
