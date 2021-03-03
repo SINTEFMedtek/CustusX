@@ -84,6 +84,7 @@ void loadMeshAndTestRenderingWithTexture(QString& meshFile)
 	view->addRep(p);
 	CHECK(fixture.quickRunWidget());
 	view->removeReps();
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 } //namespace
