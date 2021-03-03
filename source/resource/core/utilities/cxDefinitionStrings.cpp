@@ -135,3 +135,23 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, IMAGE_SUBTYPE, istCOUNT)
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, IMAGE_SUBTYPE, istCOUNT)
 
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
+{
+	"UNKNOWN",
+	"Lungs",
+	"Lesions",
+	"Lymph Nodes",
+	"Vena Cava",
+	"Vena Azygos",
+	"Aorta",
+	"Subclavian Artery",
+	"Pulmonary Vessels",
+	"Heart",
+	"Esophagus",
+	"Spine",
+	"Airways",
+	"Vessels",
+	"Pulmonary System"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)

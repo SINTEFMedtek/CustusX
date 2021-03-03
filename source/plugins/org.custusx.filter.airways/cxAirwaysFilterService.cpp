@@ -189,7 +189,7 @@ bool AirwaysFilter::execute()
 
 	bool doAirwaySegmentation = mAirwaySegmentationOption->getValue();
 	bool doLungSegmentation = mLungSegmentationOption->getValue();
-	bool doVesselSegmentation = mVesselCenterlineOption->getValue();
+    bool doVesselSegmentation = mVesselSegmentationOption->getValue();
 
 	if (doAirwaySegmentation)
 	{
@@ -283,7 +283,6 @@ bool AirwaysFilter::extractAirways(fast::AirwaySegmentation::pointer airwaySegme
 
 } catch (std::exception& e){
 	reportError("std::exception:"+qstring_cast(e.what()));
-	std::cout << "DEBUG std::exception" << std::endl;  //debug
 	return false;
 
 } catch (...){
@@ -438,7 +437,7 @@ bool AirwaysFilter::postProcess()
 		mLungSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
 	}
 
-	if(mVesselCenterlineOption->getValue())
+    if(mVesselSegmentationOption->getValue())
 	{
 		postProcessVessels();
 		mBloodVesselSegmentationOutput = NULL; //To avoid publishing old results if next segmentation fails
@@ -450,7 +449,7 @@ bool AirwaysFilter::postProcess()
 
 bool AirwaysFilter::postProcessAirways()
 {
-	if(!mAirwaySegmentationOutput)
+    if(!mAirwaySegmentationOutput)
 		return false;
 
 	// Make contour of segmented volume
@@ -536,8 +535,11 @@ bool AirwaysFilter::postProcessLungs()
 
 bool AirwaysFilter::postProcessVessels()
 {
-	if(!mBloodVesselSegmentationOutput)
-		return false;
+    if(!mBloodVesselSegmentationOutput)
+    {
+        CX_LOG_WARNING() << "In AirwaysFilter::postProcessVessels(): No BloodVessel segmentation output created.";
+        return false;
+    }
 
 	// Make contour of segmented volume
 	double threshold = 1; /// because the segmented image is 0..1
@@ -677,6 +679,15 @@ void AirwaysFilter::createOutputTypes()
 	mOutputTypes.push_back(tempVolumeStringAdapter);
 }
 
+void AirwaysFilter::setAirwaySegmentation(bool airwaySegmentation)
+{
+    mAirwaySegmentationOption->setValue(airwaySegmentation);
+}
+
+void AirwaysFilter::setVesselSegmentation(bool vesselSegmentation)
+{
+    mVesselSegmentationOption->setValue(vesselSegmentation);
+}
 
 BoolPropertyPtr AirwaysFilter::getManualSeedPointOption(QDomElement root)
 {
@@ -724,12 +735,12 @@ BoolPropertyPtr AirwaysFilter::getLungSegmentationOption(QDomElement root)
 
 BoolPropertyPtr AirwaysFilter::getVesselSegmentationOption(QDomElement root)
 {
-	BoolPropertyPtr vesselSegmentationOption = BoolProperty::initialize(
+    mVesselSegmentationOption = BoolProperty::initialize(
 				"Vessel segmentation",
 				"",
 				"Selecting this option will segment the blood vessels in the lungs",
 				false, root);
-	return vesselSegmentationOption;
+    return mVesselSegmentationOption;
 }
 
 BoolPropertyPtr AirwaysFilter::getVesselCenterlineOption(QDomElement root)

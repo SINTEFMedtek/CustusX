@@ -62,6 +62,9 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
+    void setAirwaySegmentation(bool airwaySegmentation);
+    void setVesselSegmentation(bool vesselSegmentation);
+
 protected:
 	void segmentAirways(fast::ImageFileImporter::pointer importerPtr);
 	bool extractAirways(fast::AirwaySegmentation::pointer airwaySegmentationPtr);
@@ -101,10 +104,12 @@ private:
 	BoolPropertyPtr mAirwaySegmentationOption;
 	BoolPropertyPtr mAirwayTubesGenerationOption;
 	BoolPropertyPtr mLungSegmentationOption;
+    BoolPropertyPtr mVesselSegmentationOption;
 	BoolPropertyPtr mVesselCenterlineOption;
 	BoolPropertyPtr mVesselVolumeOption;
 };
 typedef boost::shared_ptr<class AirwaysFilter> AirwaysFilterPtr;
+typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
 } /* namespace cx */
 #endif /* CXTUBESEGMENTATIONFILTERSERVICE_H_ */
