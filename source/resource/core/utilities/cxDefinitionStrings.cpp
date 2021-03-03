@@ -151,6 +151,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Esophagus",
 	"Spine",
 	"Airways",
-	"Vessels"
+	"Vessels",
+	"Pulmonary System"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
