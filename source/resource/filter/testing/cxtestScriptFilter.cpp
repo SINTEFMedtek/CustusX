@@ -281,7 +281,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[unit]")
+TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[unit][hide]")
 {
     cx::LogicManager::initialize();
     cx::DataLocations::setTestMode();
