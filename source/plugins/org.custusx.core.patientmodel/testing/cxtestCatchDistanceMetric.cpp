@@ -26,6 +26,7 @@ TEST_CASE("DistanceMetric composed of two points gives a correct distance", "[un
 	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
 
 	CHECK(fixture.inputEqualsMetric(testData));
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 // not supported
@@ -63,6 +64,7 @@ TEST_CASE("DistanceMetric composed of a point and plane gives a correct distance
 	// from plane to point: positive distance
 	testData = fixture.getDistanceMetricWithInput(distance, p1.mMetric, p0.mMetric);
 	CHECK(fixture.inputEqualsMetric(testData));
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("DistanceMetric can save/load XML", "[unit]")
@@ -73,5 +75,6 @@ TEST_CASE("DistanceMetric can save/load XML", "[unit]")
 	cxtest::DistanceMetricWithInput testData = fixture.getDistanceMetricWithInput(distance);
 
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
+		CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
