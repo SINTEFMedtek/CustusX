@@ -296,6 +296,14 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 	return commandString;
 }
 
+bool GenericScriptFilter::environmentExist(CommandStringVariables variables)
+{
+	QString envPath = variables.envPath;
+	QString programPath = envPath.split(" ")[0];
+	CX_LOG_DEBUG() << "programPath: " << programPath;
+	return QFileInfo(programPath).exists();
+}
+
 QString GenericScriptFilter::getScriptPath()
 {
 	QString retval;

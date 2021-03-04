@@ -97,6 +97,8 @@ protected:
 	QString standardCommandString(CommandStringVariables variables);
 	bool isUsingDeepSintefEngine(CommandStringVariables variables);
 	QString deepSintefCommandString(CommandStringVariables variables);
+	
+	bool environmentExist(CommandStringVariables variables);
 
     FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

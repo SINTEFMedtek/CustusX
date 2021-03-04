@@ -129,6 +129,11 @@ public:
 	{
 		return isUsingDeepSintefEngine(variables);
 	}
+	
+	bool testEnvironmentExist(cx::CommandStringVariables variables)
+	{
+		return environmentExist(variables);
+	}
 
 	QString getParameterFilePath()
 	{
@@ -487,7 +492,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << variables.cArguments;
 	//CX_LOG_DEBUG() << variables.scriptEngine;
 	//CX_LOG_DEBUG() << variables.model;
-
+	
 	//Assuming the variables in "python_Lungs.ini" won't change in the future
 	REQUIRE_FALSE(variables.inputFilePath.isEmpty());
 	REQUIRE_FALSE(variables.outputFilePath.isEmpty());
@@ -526,5 +531,31 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 
 	REQUIRE(filter->testIsUsingDeepSintefEngine(variables));
 
+	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("GenericScriptFilter: Test environment", "[unit]")
+{
+	
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
+
+	//Create options variables. Needed before setting script file
+	filter->getOptions();
+	filter->setTestScriptFile();//Use python_test.ini
+	//filter->setTestScriptFile(true);//Init with python_Lungs.ini file
+
+	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
+
+	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
+	CHECK(filter->testEnvironmentExist(variables));
+	
+	//filter->setTestScriptFile(true);//Init with python_Lungs.ini file
+	//variables = filter->testCreateCommandStringVariables(dummyImage);
+	//CHECK(filter->testEnvironmentExist(variables));
+	
 	cx::LogicManager::shutdown();
 }
