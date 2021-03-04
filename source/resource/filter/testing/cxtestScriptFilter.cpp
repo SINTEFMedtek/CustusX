@@ -281,6 +281,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[unit][hide]")
 {
     cx::LogicManager::initialize();
@@ -322,6 +323,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[u
 
     cx::LogicManager::shutdown();
 }
+#endif
 
 TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
 {
