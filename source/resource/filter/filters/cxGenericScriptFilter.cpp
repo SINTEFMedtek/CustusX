@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFileInfo>
 #include <QDir>
 #include <QDirIterator>
+#include <QTextStream>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -296,12 +297,51 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 	return commandString;
 }
 
-bool GenericScriptFilter::environmentExist(CommandStringVariables variables)
+bool GenericScriptFilter::environmentExist(QString path)
+{
+	return QFileInfo(path).exists();
+}
+
+QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables)
 {
 	QString envPath = variables.envPath;
 	QString programPath = envPath.split(" ")[0];
-	CX_LOG_DEBUG() << "programPath: " << programPath;
-	return QFileInfo(programPath).exists();
+	//CX_LOG_DEBUG() << "programPath: " << programPath;
+	return programPath;
+}
+
+QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
+{
+	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
+	//CX_LOG_DEBUG() << "basePath: " << basePath;
+	return basePath;
+}
+
+bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath)
+{
+	if(!this->environmentExist(environmentPath) && this->isVirtualEnvironment(environmentPath))
+	{
+		if(!this->createProcess())
+			return false;
+		QString basePath = this->getEnvironmentBasePath(environmentPath);
+		QString scriptPath = getScriptPath();
+		bool retval = runCommandStringAndWait(scriptPath+"/cxCreateVenv.sh " + basePath + " " + requirementsPath);
+		return retval;
+	}
+	return false;
+}
+
+bool GenericScriptFilter::isVirtualEnvironment(QString path)
+{
+	if(path.contains(this->getFixedEnvironmentSubdir()))
+		return true;
+	return false;
+}
+
+QString GenericScriptFilter::getFixedEnvironmentSubdir()
+{
+	QString retval("venv/bin/python");
+	return retval;
 }
 
 QString GenericScriptFilter::getScriptPath()
@@ -363,7 +403,10 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 
-	CX_ASSERT(mCommandLine);
+	CX_ASSERT(mCommandLine)
+	if(!mCommandLine)
+		return false;
+	
 	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
 	bool success = mCommandLine->launch(command);
 	if(success)

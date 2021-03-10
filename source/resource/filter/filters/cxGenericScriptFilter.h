@@ -98,7 +98,12 @@ protected:
 	bool isUsingDeepSintefEngine(CommandStringVariables variables);
 	QString deepSintefCommandString(CommandStringVariables variables);
 	
-	bool environmentExist(CommandStringVariables variables);
+	bool environmentExist(QString path);
+	QString getEnvironmentPath(CommandStringVariables variables);
+	QString getEnvironmentBasePath(QString environmentPath);
+	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath);
+	bool isVirtualEnvironment(QString path);
+	QString getFixedEnvironmentSubdir();
 
     FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
