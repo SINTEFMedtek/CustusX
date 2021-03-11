@@ -101,6 +101,7 @@ protected:
 	bool environmentExist(QString path);
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
+	QString findRequirementsFileLocation(QString path);
 	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath);
 	bool isVirtualEnvironment(QString path);
 	QString getFixedEnvironmentSubdir();

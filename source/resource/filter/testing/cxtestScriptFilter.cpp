@@ -575,6 +575,8 @@ TEST_CASE("GenericScriptFilter: Test environment", "[unit]")
 	
 	cx::LogicManager::shutdown();
 }
+
+#ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Create environment", "[integration]")
 {
 	cx::LogicManager::initialize();
@@ -602,8 +604,8 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration]")
 	requirementsPath = QFileInfo(requirementsPath).absolutePath();
 	CX_LOG_DEBUG() << "Absolute requirementsPath: " << requirementsPath;
 		
-	CHECK(QFileInfo(environmentBasePath).exists());
-	CHECK(QFileInfo(requirementsPath).exists());
+	REQUIRE(QFileInfo(environmentBasePath).exists());
+	REQUIRE(QFileInfo(requirementsPath).exists());
 	CHECK_FALSE(filter->testEnvironmentExist(environmentPath));
 
 	CHECK(filter->testCreateVirtualPythonEnvironment(environmentPath, requirementsPath));
@@ -616,3 +618,4 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration]")
 	
 	cx::LogicManager::shutdown();
 }
+#endif

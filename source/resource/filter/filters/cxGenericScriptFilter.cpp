@@ -314,7 +314,49 @@ QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
 {
 	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
 	//CX_LOG_DEBUG() << "basePath: " << basePath;
+	
+	if(!this->environmentExist(basePath))
+		basePath = this->findRequirementsFileLocation(basePath);	
+	
 	return basePath;
+}
+
+QString GenericScriptFilter::findRequirementsFileLocation(QString path)
+{
+	//CX_LOG_DEBUG() << "Search path: " << path;
+	QString cdDown = "..\\";
+	QStringList pathComponents = path.split(cdDown);
+	if(pathComponents.size() == 1)
+	{
+		cdDown = "../";
+		pathComponents = path.split(cdDown);
+	}
+	int numCdDown = 0;
+	for(int i = 0; i < pathComponents.size(); ++i)
+		if(pathComponents[i].isEmpty())
+			++numCdDown;
+	QString strippedPath;
+	for(int i = 0; i < pathComponents.size(); ++i)
+		if(!pathComponents[i].isEmpty())
+			strippedPath = pathComponents[i] + "/";
+	
+	//Try both removing all "../", and adding some more
+	QString tempPath = strippedPath + "requirements.txt";
+	QString retval = path;
+	for(int i = 0; i < 10; ++i)
+	{
+		//CX_LOG_DEBUG() << "check if path exists: " << tempPath;
+		if(environmentExist(tempPath))
+		{
+			retval = tempPath;
+			break;
+		}
+		tempPath = cdDown + tempPath;
+	}
+	//CX_LOG_DEBUG() << "tempPath: " << tempPath;
+	//CX_LOG_DEBUG() << "retval: " << retval;
+	
+	return retval;
 }
 
 bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath)
