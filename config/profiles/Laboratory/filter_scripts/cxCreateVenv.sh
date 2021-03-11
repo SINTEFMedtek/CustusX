@@ -22,6 +22,7 @@ if [ -z $reqPath ]; then
 fi
 
 cd "$venvBasePath";
+export LC_ALL="en_US.UTF-8"
 python3 -m venv venv;
 source venv/bin/activate;
 pip install --upgrade pip;
