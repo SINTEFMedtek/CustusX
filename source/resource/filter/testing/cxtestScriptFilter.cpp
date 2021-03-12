@@ -577,7 +577,7 @@ TEST_CASE("GenericScriptFilter: Test environment", "[unit]")
 }
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("GenericScriptFilter: Create environment", "[integration]")
+TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
