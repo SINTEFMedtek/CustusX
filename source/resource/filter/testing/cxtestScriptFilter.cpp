@@ -593,7 +593,7 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration]")
 	
 	QString requirementsPath = filter->testGetEnvironmentPath(variables);
 	// Create new venv in the temptorary test folder instead of using path from ini-file.
-	QString environmentPath = cx::DataLocations::getTestDataPath() + "/" + filter->testGetFixedEnvironmentSubdir() + "/";
+	QString environmentPath = cx::DataLocations::getTestDataPath() + "/" + filter->testGetFixedEnvironmentSubdir();
 	QString environmentBasePath = filter->testGetEnvironmentBasePath(environmentPath);
 	requirementsPath = filter->testGetEnvironmentBasePath(requirementsPath);
 	
