@@ -261,7 +261,7 @@ TEST_CASE("GenericScriptFilter: Create", "[unit]")
 }
 
 //Used cxtestDilationFilter as example. Maybe possible to combine some code?
-TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
+TEST_CASE("GenericScriptFilter: Set input and execute", "[unit][not_win64]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -382,7 +382,7 @@ TEST_CASE("GenericScriptFilter: Test running of external process", "[integration
 	REQUIRE(filter->testDeleteProcess());
 }
 
-TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit]")
+TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit][not_win64]")
 {
 	QString command = QString("date");
 	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper("ScriptFilter"));
@@ -408,7 +408,7 @@ TEST_CASE("GenericScriptFilter: Read generated file fails with no input", "[unit
 	REQUIRE_FALSE(filter->testReadGeneratedSegmentationFile());
 }
 
-TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
+TEST_CASE("GenericScriptFilter: Read generated file", "[unit][not_win64]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -551,7 +551,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("GenericScriptFilter: Test environment", "[unit]")
+TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
