@@ -97,6 +97,7 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	virtual void updateView();
 	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
+	ToolPtr getControllingTool();
 
 signals:
 	void orientationChanged(ORIENTATION_TYPE type);

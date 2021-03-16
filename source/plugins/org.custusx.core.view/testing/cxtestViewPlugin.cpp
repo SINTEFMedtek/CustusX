@@ -139,3 +139,11 @@ TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.cus
 	fixture.mServices->view()->setActiveLayout(testLayoutName);
 	REQUIRE(fixture.mServices->view()->getActiveLayout() == testLayoutName);
 }
+
+TEST_CASE("ViewWrapper: Controlling tool", "[unit][plugins][org.custusx.core.view]")
+{
+	cxtest::VisualizationHelper visHelper;
+	cx::ToolPtr controllingTool = visHelper.viewWrapper->getControllingTool();
+	//REQUIRE(controllingTool);
+	//CX_LOG_DEBUG() << "controllingTool: " << controllingTool->getName();
+}

@@ -793,10 +793,11 @@ ViewPtr ViewWrapper3D::getView()
 
 void ViewWrapper3D::activeToolChangedSlot()
 {
-	ToolPtr activeTool = mServices->tracking()->getActiveTool();
-	mPickerRep->setTool(activeTool);
+	ToolPtr controllingTool = this->getControllingTool();
+
+	mPickerRep->setTool(controllingTool);
 	if (mSlices3DRep)
-		mSlices3DRep->setTool(activeTool);
+		mSlices3DRep->setTool(controllingTool);
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

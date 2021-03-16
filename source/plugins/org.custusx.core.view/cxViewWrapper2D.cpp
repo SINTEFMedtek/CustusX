@@ -566,8 +566,8 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 
 void ViewWrapper2D::activeToolChangedSlot()
 {
-	ToolPtr activeTool = mServices->tracking()->getActiveTool();
-	mSliceProxy->setTool(activeTool);
+	ToolPtr controllingTool = this->getControllingTool();
+	mSliceProxy->setTool(controllingTool);
 }
 
 /**Part of the mouse interactor:

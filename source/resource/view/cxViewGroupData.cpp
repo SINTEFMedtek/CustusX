@@ -673,4 +673,13 @@ void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)
 }
 
 
+ToolPtr ViewGroupData::getControllingTool()
+{
+	return mControllingTool;
+}
+void ViewGroupData::setControllingTool(ToolPtr tool)
+{
+	mControllingTool = tool;
+}
+
 } // namespace cx

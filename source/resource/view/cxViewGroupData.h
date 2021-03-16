@@ -137,6 +137,9 @@ public:
 	PlaneTypeCollection getSliceDefinitions();
 	void setSliceDefinitions(PlaneTypeCollection val);
 	StringListPropertyPtr getSliceDefinitionProperty();
+	
+	ToolPtr getControllingTool();
+	void setControllingTool(ToolPtr tool);
 
 	// view options for this group.
 	struct Options
@@ -194,6 +197,7 @@ private:
 	StringListPropertyPtr mSliceDefinitionProperty;
 	DataPtr getData(QString uid) const;
 	//SharedOpenGLContextPtr mSharedOpenGLContext;
+	ToolPtr mControllingTool; ///< Tool controlling 2D/3D views for this view group. Using this overrides the active tool.
 
 };
 
