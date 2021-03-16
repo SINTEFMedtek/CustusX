@@ -226,11 +226,12 @@ void ViewWrapper::setSharedOpenGLContext(cx::SharedOpenGLContextPtr sharedOpenGL
 	mSharedOpenGLContext = sharedOpenGLContext;
 }
 
-
 ToolPtr ViewWrapper::getControllingTool()
 {
 	ToolPtr activeTool = mServices->tracking()->getActiveTool();
-	ToolPtr controllingTool = mGroupData->getControllingTool();
+	ToolPtr controllingTool;
+	if (mGroupData)
+		controllingTool = mGroupData->getControllingTool();
 	
 	if(!controllingTool)
 		controllingTool = activeTool;

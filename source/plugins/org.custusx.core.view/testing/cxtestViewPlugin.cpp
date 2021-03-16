@@ -24,6 +24,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxLayoutData.h"
 
+#include "cxToolImpl.h"
+#include "cxTrackingService.h"
+#include "cxDummyTool.h"
+#include "cxViewGroup.h"
+#include "cxDummyToolManager.h"
+
 namespace
 {
 typedef boost::shared_ptr<class ViewServiceFixture> ViewServiceFixturePtr;
@@ -140,10 +146,74 @@ TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.cus
 	REQUIRE(fixture.mServices->view()->getActiveLayout() == testLayoutName);
 }
 
-TEST_CASE("ViewWrapper: Controlling tool", "[unit][plugins][org.custusx.core.view]")
+TEST_CASE("ViewWrapper: Controlling tool equals active tool", "[integration][plugins][org.custusx.core.view]")
 {
 	cxtest::VisualizationHelper visHelper;
 	cx::ToolPtr controllingTool = visHelper.viewWrapper->getControllingTool();
-	//REQUIRE(controllingTool);
+	REQUIRE(controllingTool);
+	
+	cx::ToolPtr activeTool = visHelper.services->tracking()->getActiveTool();
+	CHECK(controllingTool == activeTool);
+}
+
+TEST_CASE("ViewWrapper: Changing active tool also changes controlling tool", "[integration][plugins][org.custusx.core.view]")
+{
+	cxtest::VisualizationHelper visHelper;
+	
+	cx::DummyToolPtr tool2(new cx::DummyTool("dummytool2"));
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	REQUIRE(toolManager);
+	toolManager->addTool(tool2);
+	
+	visHelper.services->tracking()->setActiveTool(tool2->getUid());
+	CHECK(visHelper.viewWrapper->getControllingTool()->getUid() == tool2->getUid());
+}
+
+TEST_CASE("ViewWrapper: Setting controlling tool overrides active tool for view", "[integration][plugins][org.custusx.core.view]")
+{
+	cxtest::VisualizationHelper visHelper;
+		
+	cx::DummyToolPtr tool2(new cx::DummyTool("dummytool2"));
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	REQUIRE(toolManager);
+	toolManager->addTool(tool2);
+	
+	cx::ViewGroupDataPtr viewGroupData  = cx::ViewGroupDataPtr(new cx::ViewGroupData(visHelper.services, "testViewGroup"));
+	
+	REQUIRE(viewGroupData);
+	visHelper.viewWrapper->setViewGroup(viewGroupData);
+	viewGroupData->setControllingTool(tool2);
+	
+	cx::ToolPtr controllingTool = visHelper.viewWrapper->getControllingTool();
+	cx::ToolPtr  activeTool = visHelper.services->tracking()->getActiveTool();
+	CHECK(controllingTool == tool2);
+	CHECK_FALSE(controllingTool == activeTool);
 	//CX_LOG_DEBUG() << "controllingTool: " << controllingTool->getName();
+	//CX_LOG_DEBUG() << "activeTool: " << activeTool->getName();
+}
+
+TEST_CASE("ViewWrapper: Resetting controlling tool reverts back to using active tool", "[integration][plugins][org.custusx.core.view]")
+{
+	cxtest::VisualizationHelper visHelper;
+		
+	cx::DummyToolPtr tool2(new cx::DummyTool("dummytool2"));
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	REQUIRE(toolManager);
+	toolManager->addTool(tool2);
+	
+	cx::ViewGroupDataPtr viewGroupData  = cx::ViewGroupDataPtr(new cx::ViewGroupData(visHelper.services, "testViewGroup"));
+	
+	REQUIRE(viewGroupData);
+	visHelper.viewWrapper->setViewGroup(viewGroupData);
+	viewGroupData->setControllingTool(tool2);
+	
+	cx::ToolPtr controllingTool = visHelper.viewWrapper->getControllingTool();
+	cx::ToolPtr activeTool = visHelper.services->tracking()->getActiveTool();
+	CHECK_FALSE(controllingTool == activeTool);
+	
+	viewGroupData->setControllingTool(cx::ToolPtr());
+	
+	controllingTool = visHelper.viewWrapper->getControllingTool();
+	activeTool = visHelper.services->tracking()->getActiveTool();
+	CHECK(controllingTool == activeTool);
 }
