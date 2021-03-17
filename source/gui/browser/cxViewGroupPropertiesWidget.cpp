@@ -23,6 +23,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxCameraStyleInteractor.h"
 #include "cxSelectDataStringProperty.h"
+#include "cxLabeledComboBoxWidget.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -39,10 +41,14 @@ ViewGroupPropertiesWidget::ViewGroupPropertiesWidget(int groupIndex,
 
 	mLayout = new QVBoxLayout(this);
 	this->setModified();
+
+	mToolSelector = StringPropertySelectTool::New(mServices->tracking());
+	connect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ViewGroupPropertiesWidget::onToolChanged);
 }
 
 ViewGroupPropertiesWidget::~ViewGroupPropertiesWidget()
 {
+	disconnect(mToolSelector.get(), &StringPropertySelectTool::changed, this, &ViewGroupPropertiesWidget::onToolChanged);
 }
 
 void ViewGroupPropertiesWidget::setupUI()
@@ -61,6 +67,7 @@ void ViewGroupPropertiesWidget::setupUI()
 
 	this->createCameraStyleProperties();
 	this->createCameraStyleWidget();
+	this->createControllingToolSelector();
 
 	mLayout->addStretch();
 }
@@ -91,6 +98,10 @@ void ViewGroupPropertiesWidget::updateFrontend()
 	mElevation->setValue(data.mElevation);
 	mAutoZoomROI->setValue(data.mAutoZoomROI);
 	mFocusROI->setValue(data.mFocusROI);
+	
+	ToolPtr tool = group->getControllingTool();
+	if(tool)
+		mToolSelector->setValue(tool->getUid());
 }
 
 ViewGroupDataPtr ViewGroupPropertiesWidget::getViewGroup()
@@ -197,6 +208,38 @@ void ViewGroupPropertiesWidget::createCameraStyleWidget()
 	}
 }
 
+void ViewGroupPropertiesWidget::createControllingToolSelector()
+{
+	mToolSelector->setValueName("Controlling Tool");
+	mToolSelector->setHelp("Select a tool for controlling the 2D/3D views in this view group. This will override the Active Tool");
+	mToolSelector->provideActiveTool(true);
+	mToolSelector->setActiveTool();
+
+	LabeledComboBoxWidget* toolSelectorWidget = new LabeledComboBoxWidget(this, mToolSelector);
+
+	QHBoxLayout *layout = new QHBoxLayout();
+	layout->addWidget(toolSelectorWidget);
+	mLayout->addLayout(layout);
+}
+
+void ViewGroupPropertiesWidget::onToolChanged()
+{
+	ToolPtr tool = mToolSelector->getTool();
+	ViewGroupDataPtr group = this->getViewGroup();
+	
+	// If active tool is selected, clear controlling tool.
+	// This is done to make sure we don't lock to a specific tool, as active tool can change.
+	if(mToolSelector->isActiveToolSelected())
+		tool.reset();
+	
+	//if(tool)
+	//	CX_LOG_DEBUG() << "Changing controlling tool: " << tool->getName();
+	//else
+	//	CX_LOG_DEBUG() << "Clear controlling tool value. Active tool will be used";
+	
+	group->setControllingTool(tool);
+}
+
 void ViewGroupPropertiesWidget::onCameraStyleChanged()
 {
 	ViewGroupDataPtr group = this->getViewGroup();
@@ -218,6 +261,5 @@ void ViewGroupPropertiesWidget::onCameraStyleChanged()
 	options.mCameraStyle = data;
 	group->setOptions(options);
 }
-
 
 } // cx

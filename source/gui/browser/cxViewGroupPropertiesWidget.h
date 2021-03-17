@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 #include "cxForwardDeclarations.h"
 #include "cxDoubleProperty.h"
+#include "cxStringPropertySelectTool.h"
 
 namespace cx
 {
@@ -36,6 +37,8 @@ public:
 
 signals:
 
+protected slots:
+  void onToolChanged();
 
 protected:
   void setupUI();
@@ -64,10 +67,12 @@ private:
   StringPropertyBasePtr mFocusROI;
   std::vector<PropertyPtr> mCameraStyleProperties;
   CameraStyleInteractorPtr mCameraStyleInteractor;
+  StringPropertySelectToolPtr mToolSelector;
 
   void createCameraStyleProperties();
   void onCameraStyleChanged();
   void createCameraStyleWidget();
+  void createControllingToolSelector();
 };
 
 }//end namespace cx
