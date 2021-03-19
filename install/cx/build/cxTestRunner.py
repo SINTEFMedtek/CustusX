@@ -166,6 +166,7 @@ class TestRunner(object):
         catchExe.replace(os.sep, posixpath.sep)
         for testname in testnames:
             line = 'ADD_TEST("%s" %s "%s")' % (testname, catchExe, testname)
+            PrintFormatter.printInfo('line: %s'%line)
             lines.append(line)
         cx.utils.cxUtilities.writeToNewFile(filename=targetFile, text='\n'.join(lines))
 
