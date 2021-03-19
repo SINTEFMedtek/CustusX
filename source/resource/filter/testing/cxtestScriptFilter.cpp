@@ -239,7 +239,7 @@ TEST_CASE("GenericScriptFilter: Create", "[unit]")
 }
 
 //Used cxtestDilationFilter as example. Maybe possible to combine some code?
-TEST_CASE("GenericScriptFilter: Set input and execute", "[unit][not_win64]")
+TEST_CASE("GenericScriptFilter: Set input and execute", "[unit]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -358,7 +358,7 @@ TEST_CASE("GenericScriptFilter: Test running of external process", "[integration
 	REQUIRE(filter->testDeleteProcess());
 }
 
-TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit][not_win64]")
+TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit]")
 {
 	QString command = QString("date");
 	cx::ProcessWrapperPtr exe(new cx::ProcessWrapper("ScriptFilter"));
@@ -384,7 +384,7 @@ TEST_CASE("GenericScriptFilter: Read generated file fails with no input", "[unit
 	REQUIRE_FALSE(filter->testReadGeneratedSegmentationFile());
 }
 
-TEST_CASE("GenericScriptFilter: Read generated file", "[unit][not_win64]")
+TEST_CASE("GenericScriptFilter: Read generated file", "[unit]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -526,72 +526,3 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 
 	cx::LogicManager::shutdown();
 }
-
-TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64]")
-{
-	cx::LogicManager::initialize();
-	cx::DataLocations::setTestMode();
-	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
-
-	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
-
-	//Create options variables. Needed before setting script file
-	filter->getOptions();
-	filter->setTestScriptFile();//Use python_test.ini
-	//filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
-
-	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
-
-	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
-	CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
-	
-	//filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
-	//variables = filter->testCreateCommandStringVariables(dummyImage);
-	//CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
-	
-	cx::LogicManager::shutdown();
-}
-
-#ifdef CX_CUSTUS_SINTEF
-TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64]")
-{
-	cx::LogicManager::initialize();
-	cx::DataLocations::setTestMode();
-	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
-
-	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
-
-	//Create options variables. Needed before setting script file
-	filter->getOptions();
-	filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
-	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
-	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
-	
-	QString requirementsPath = filter->testGetEnvironmentPath(variables);
-	// Create new venv in the temptorary test folder instead of using path from ini-file.
-	QString environmentPath = cx::DataLocations::getTestDataPath() + "/" + filter->testGetFixedEnvironmentSubdir();
-	QString environmentBasePath = filter->testGetEnvironmentBasePath(environmentPath);
-	requirementsPath = filter->testGetEnvironmentBasePath(requirementsPath);
-	
-	CX_LOG_DEBUG() << "Test environmentPath: " << environmentPath;
-	CX_LOG_DEBUG() << "requirementsPath: " << requirementsPath;
-	CX_LOG_DEBUG() << "environmentBasePath: " << environmentBasePath;
-	
-	requirementsPath = QFileInfo(requirementsPath).absolutePath();
-	CX_LOG_DEBUG() << "Absolute requirementsPath: " << requirementsPath;
-		
-	REQUIRE(QFileInfo(environmentBasePath).exists());
-	REQUIRE(QFileInfo(requirementsPath).exists());
-	CHECK_FALSE(filter->testEnvironmentExist(environmentPath));
-
-	CHECK(filter->testCreateVirtualPythonEnvironment(environmentPath, requirementsPath));
-	CHECK(filter->testEnvironmentExist(environmentPath));
-	
-	QString venvPath = environmentBasePath + "venv";
-	QDir dir(venvPath);
-	CX_LOG_DEBUG() << "Going to delete newly created venv: " << dir.absolutePath();
-	dir.removeRecursively();
-	
-	cx::LogicManager::shutdown();
-}
-#endif
