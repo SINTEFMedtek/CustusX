@@ -163,7 +163,10 @@ class TestRunner(object):
                  '# ctest setup.'
                    ]
         catchExe = self._getCatchExecutable(path)
-        catchExe.replace(os.sep, posixpath.sep)
+        catchExe.replace('\\', posixpath.sep)
+        PrintFormatter.printInfo('os.sep: %s'%os.sep)
+        PrintFormatter.printInfo('posixpath.sep: %s'%posixpath.sep)
+        PrintFormatter.printInfo('manual sep: \\')
         for testname in testnames:
             line = 'ADD_TEST("%s" %s "%s")' % (testname, catchExe, testname)
             PrintFormatter.printInfo('line: %s'%line)
