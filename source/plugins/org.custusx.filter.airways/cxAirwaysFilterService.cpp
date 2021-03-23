@@ -557,12 +557,14 @@ bool AirwaysFilter::postProcessVessels()
     QString nameOutput = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + "%1";
 	ImagePtr outputImage = patientService()->createSpecificData<Image>(uidOutput, nameOutput);
 
-	// Add contour internally to cx
+    // Add contour internally to cx(
+    QColor color = QColor("blue");
+    color.setAlpha(128);
 	MeshPtr contour = ContourFilter::postProcess(
 			patientService(),
 			rawContour,
 			outputImage,
-			QColor("blue")
+            color
 	);
 	contour->get_rMd_History()->setRegistration(mInputImage->get_rMd());
 
