@@ -44,7 +44,7 @@ endif(CX_WINDOWS)
 
 # required to compile some eigen code on at least Ubuntu
 if(CX_LINUX)
-    SET ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024")
+    SET ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftemplate-depth=1024 -no-pie")
 endif(CX_LINUX)
 
 if(SSC_PRINT_CALLER_INFO)
