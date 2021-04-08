@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxActiveData.h"
 #include "cxSettings.h"
 #include "cxDisplayTextRep.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -223,6 +224,19 @@ void ViewWrapper::addReps()
 void ViewWrapper::setSharedOpenGLContext(cx::SharedOpenGLContextPtr sharedOpenGLContext)
 {
 	mSharedOpenGLContext = sharedOpenGLContext;
+}
+
+ToolPtr ViewWrapper::getControllingTool()
+{
+	ToolPtr activeTool = mServices->tracking()->getActiveTool();
+	ToolPtr controllingTool;
+	if (mGroupData)
+		controllingTool = mGroupData->getControllingTool();
+	
+	if(!controllingTool)
+		controllingTool = activeTool;
+	
+	return controllingTool;
 }
 
 } //namespace cx
