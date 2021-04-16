@@ -51,7 +51,13 @@ bool StringPropertySelectTool::setValue(const QString& value)
 {
 	if(value == mActiveToolName)
 	{
+		mTool.reset(); //Don't remember last tool when active tool is selected
+		bool emitChange = false;
+		if(!mActiveToolSelected)
+			emitChange = true;
 		mActiveToolSelected = true;
+		if(emitChange)
+			emit changed();
 		return true;
 	}
 	else
@@ -87,6 +93,11 @@ ToolPtr StringPropertySelectTool::getTool() const
 	if(mActiveToolSelected)
 		return mTrackingService->getActiveTool();
   return mTool;
+}
+
+bool StringPropertySelectTool::isActiveToolSelected() const
+{
+	return mActiveToolSelected;
 }
 
 QStringList StringPropertySelectTool::getValueRange() const
