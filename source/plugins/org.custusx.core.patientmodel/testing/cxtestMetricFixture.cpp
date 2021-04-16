@@ -33,7 +33,12 @@ MetricFixture::MetricFixture()
 MetricFixture::~MetricFixture()
 {
 	mServices.reset();
-	CHECK(!mMessageListener->containsErrors());
+}
+
+bool MetricFixture::messageListenerContainErrors()
+{
+	//Needed to move CHECK out of destructor, as this may create a throw (not encouraged in destructors)
+	return mMessageListener->containsErrors();
 }
 
 cx::SpaceProviderPtr MetricFixture::getSpaceProvider()

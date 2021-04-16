@@ -359,6 +359,7 @@ void ViewWrapper3D::createSlicesActions(QWidget* parent)
 	this->createSlicesAction(PlaneTypeCollection(ptCORONAL), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSAGITTAL), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptANYPLANE), parent);
+    this->createSlicesAction(PlaneTypeCollection(ptINVERSEANYPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptRADIALPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSIDEPLANE), parent);
     this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);

@@ -74,13 +74,23 @@ public:
 	CameraControl(QObject* parent = NULL);
 	virtual ~CameraControl();
 
+	static Vector3D AnteriorDirection();
+	static Vector3D PosteriorDirection();
+	static Vector3D SuperiorDirection();
+	static Vector3D InferiorDirection();
+	static Vector3D LeftDirection();
+	static Vector3D RightDirection();
+	static Vector3D OrthogonalDirection();
+
 	void refreshView(ViewPtr view);
 	void setView(ViewPtr view);
 	ViewPtr getView() const;
 	QActionGroup* createStandard3DViewActions();
 	void translateByFocusTo(Vector3D p_r);
-    void setSuperiorView() const;
+	void setSuperiorView() const;
 	void setAnteriorView() const;
+
+	void setStandard3DView(Vector3D viewDirection);
 
 signals:
 

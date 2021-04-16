@@ -276,6 +276,8 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
     double extensionPointIncrement = 0.25; //mm
     mExtendedRoutePositions.clear();
     mExtendedRoutePositions = mRoutePositions;
+    mExtendedCameraRotation.clear();
+    mExtendedCameraRotation = mCameraRotation;
 	if(mRoutePositions.size() > 0)
 	{
 		double extensionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
@@ -286,6 +288,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 		for (int i = 1; i<= numberOfextensionPoints; i++)
 		{
 			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extensionPointIncrementVector*i);
+            mExtendedCameraRotation.insert(mExtendedCameraRotation.begin(), mExtendedCameraRotation.front());
 		}
 	}
 
@@ -613,14 +616,14 @@ double RouteToTarget::findDistanceToSegmentationEdge(vtkImageDataPtr bloodVessel
 
 std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions()
 {
-	std::vector< Eigen::Vector3d > positions = mRoutePositions;
+    std::vector< Eigen::Vector3d > positions = mExtendedRoutePositions;
 	std::reverse(positions.begin(), positions.end());
 	return positions;
 }
 
 std::vector< double > RouteToTarget::getCameraRotation()
 {
-	std::vector< double > rotations = mCameraRotation;
+    std::vector< double > rotations = mExtendedCameraRotation;
 	std::reverse(rotations.begin(), rotations.end());
 	return rotations;
 }

@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFileInfo>
 #include <QDir>
 #include <QDirIterator>
+#include <QTextStream>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -296,6 +297,95 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 	return commandString;
 }
 
+bool GenericScriptFilter::environmentExist(QString path)
+{
+	return QFileInfo(path).exists();
+}
+
+QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables)
+{
+	QString envPath = variables.envPath;
+	QString programPath = envPath.split(" ")[0];
+	//CX_LOG_DEBUG() << "programPath: " << programPath;
+	return programPath;
+}
+
+QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
+{
+	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
+	//CX_LOG_DEBUG() << "basePath: " << basePath;
+	
+	if(!this->environmentExist(basePath))
+		basePath = this->findRequirementsFileLocation(basePath);	
+	
+	return basePath;
+}
+
+QString GenericScriptFilter::findRequirementsFileLocation(QString path)
+{
+	//CX_LOG_DEBUG() << "Search path: " << path;
+	QString cdDown = "..\\";
+	QStringList pathComponents = path.split(cdDown);
+	if(pathComponents.size() == 1)
+	{
+		cdDown = "../";
+		pathComponents = path.split(cdDown);
+	}
+	int numCdDown = 0;
+	for(int i = 0; i < pathComponents.size(); ++i)
+		if(pathComponents[i].isEmpty())
+			++numCdDown;
+	QString strippedPath;
+	for(int i = 0; i < pathComponents.size(); ++i)
+		if(!pathComponents[i].isEmpty())
+			strippedPath = pathComponents[i] + "/";
+	
+	//Try both removing all "../", and adding some more
+	QString tempPath = strippedPath + "requirements.txt";
+	QString retval = path;
+	for(int i = 0; i < 10; ++i)
+	{
+		//CX_LOG_DEBUG() << "check if path exists: " << tempPath;
+		if(environmentExist(tempPath))
+		{
+			retval = tempPath;
+			break;
+		}
+		tempPath = cdDown + tempPath;
+	}
+	//CX_LOG_DEBUG() << "tempPath: " << tempPath;
+	//CX_LOG_DEBUG() << "retval: " << retval;
+	
+	return retval;
+}
+
+bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath)
+{
+	if(!this->environmentExist(environmentPath) && this->isVirtualEnvironment(environmentPath))
+	{
+		if(!this->createProcess())
+			return false;
+		QString basePath = this->getEnvironmentBasePath(environmentPath);
+		QString scriptPath = getScriptPath();
+		bool retval = runCommandStringAndWait(scriptPath+"/cxCreateVenv.sh " + basePath + " " + requirementsPath);
+		return retval;
+	}
+	return false;
+}
+
+bool GenericScriptFilter::isVirtualEnvironment(QString path)
+{
+	if(path.contains(this->getFixedEnvironmentSubdir()))
+		return true;
+	return false;
+}
+
+QString GenericScriptFilter::getFixedEnvironmentSubdir()
+{
+	QString retval("venv/bin/python");
+	return retval;
+}
+
 QString GenericScriptFilter::getScriptPath()
 {
 	QString retval;
@@ -355,7 +445,10 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 
-	CX_ASSERT(mCommandLine);
+	CX_ASSERT(mCommandLine)
+	if(!mCommandLine)
+		return false;
+	
 	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
 	bool success = mCommandLine->launch(command);
 	if(success)

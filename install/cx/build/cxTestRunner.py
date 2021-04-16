@@ -19,6 +19,7 @@ import argparse
 import glob
 import platform
 import os
+import posixpath
 
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
@@ -162,6 +163,7 @@ class TestRunner(object):
                  '# ctest setup.'
                    ]
         catchExe = self._getCatchExecutable(path)
+        catchExe = catchExe.replace(os.sep, posixpath.sep)
         for testname in testnames:
             line = 'ADD_TEST("%s" %s "%s")' % (testname, catchExe, testname)
             lines.append(line)

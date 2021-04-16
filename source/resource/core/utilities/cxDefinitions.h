@@ -41,6 +41,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		ptCORONAL,    ///< a slice seen from the front of the patient
 		ptAXIAL,      ///< a slice seen from the top of the patient
 		ptANYPLANE,   ///< a plane aligned with the tool base plane
+        ptINVERSEANYPLANE,   ///< a plane aligned with the tool base plane, inverse of tool direction
 		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
 		ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
 		ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
@@ -174,8 +175,8 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsLUNG, // The following enums are used for as buttons in StructuresSelectionWidget. lsLUNG is the first button.
 		lsLESIONS,
 		lsLYMPH_NODES,
+        lsVENA_AZYGOS,
 		lsVENA_CAVA,
-		lsVENA_AZYGOS,
 		lsAORTA,
 		lsSUBCLAVIAN_ARTERY,
 		lsPULMONARY_VESSELS,
@@ -185,6 +186,9 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsAIRWAYS,
 		lsVESSELS,
 		lsPULMONARY_SYSTEM,
+		lsMEDIUM_ORGANS,
+		lsSMALL_ORGANS,
+		lsNODULES,
 		lsCOUNT,
 		lsFIRST_STRUCTURE_BUTTON = lsLUNG,
 		lsLAST_STRUCTURE_BUTTON = lsSPINE
