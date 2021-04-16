@@ -3,7 +3,7 @@
 # Create python virtual environment
 # Usage:
 # cxCreateVenv venvBasePath reqPath
-# venvBasePath = Path to location where the venv souble be craeted
+# venvBasePath = Path to location where the venv should be craeted
 # reqPath = Path to requirements.txt
 
 venvBasePath=$1;
