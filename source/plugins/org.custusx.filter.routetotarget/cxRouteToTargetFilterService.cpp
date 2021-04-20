@@ -42,7 +42,6 @@ namespace cx
 
 RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile) :
     FilterImpl(services),
-    mTargetName(""),
     mGenerateFileWithRouteInformation(createRouteInformationFile),
     mSmoothing(true)
 {
@@ -221,16 +220,11 @@ bool RouteToTargetFilter::postProcess()
 
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
 	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
-	if (!mTargetName.isEmpty())
-	{
-		uidOutputCenterline.append("_" + mTargetName);
-		nameOutputCenterline.append("_" + mTargetName);
-	}
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 	outputCenterline->setVtkPolyData(mOutput);
     outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
-	patientService()->insertData(outputCenterline);
+    patientService()->insertData(outputCenterline, true);
 
 	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
 	QString nameCenterlineExt = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixExtension();
@@ -238,7 +232,7 @@ bool RouteToTargetFilter::postProcess()
 	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
 	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
     outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
-	patientService()->insertData(outputCenterlineExt);
+    patientService()->insertData(outputCenterlineExt, true);
 
 	//note: mOutput and outputCenterline is in reference(r) space
 
@@ -339,11 +333,6 @@ std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions()
 std::vector< double > RouteToTargetFilter::getCameraRotation()
 {
 	return mRouteToTarget->getCameraRotation();
-}
-
-void RouteToTargetFilter::setTargetName(QString name)
-{
-	mTargetName = name;
 }
 
 BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)
