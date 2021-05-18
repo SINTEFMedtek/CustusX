@@ -186,7 +186,12 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('v4.12.0')
+        # Using ITK v4.12.0 with a fix for gcc 9
+        self._getBuilder().gitCheckoutSha('87b43dfc5e83819fcbc036db18ac2db021e5bfc6')
+        #self._getBuilder().gitCheckoutSha('v4.12.0') # Ubuntu 20.04: Need to add defines for gcc 9.3 in Modules/ThirdParty/VNL/src/vxl/vcl/vcl_compiler.h
+        #self._getBuilder().gitCheckoutSha('v5.1.2') # IGSTK build fail
+        #self._getBuilder().gitCheckoutSha('v4.13.3') # IGSTK build fail
+        #self._getBuilder().gitCheckoutSha('v4.13.2') # gcc error still present
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -194,10 +199,7 @@ class ITK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         builder.configureCMake()
     def repository(self):
-        if self.useExternalRepositories():
-            return 'git@github.com:InsightSoftwareConsortium/ITK.git'
-        else:
-            return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
+        return '%s/ITK' % self.controlData.gitrepo_open_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
