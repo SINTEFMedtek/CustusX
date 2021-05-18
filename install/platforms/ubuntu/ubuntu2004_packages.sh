@@ -71,6 +71,9 @@ sudo apt-get install -y openssh-server
 sudo apt-get install cmake cmake-curses-gui cmake-qt-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev
 sudo apt-get install libxt-dev 
 
+#OpenCL
+sudo apt install nvidia-opencl-dev
+
 # For OpenCL (fails in OpenCLUtilityLibrary)
 # Need to install proprietary NVIDIA drivers in "Additional Drivers" in OS Settings
 # Got 2 chioces: binary driver 340.108 and driver metapackage nvidia-driver-390
