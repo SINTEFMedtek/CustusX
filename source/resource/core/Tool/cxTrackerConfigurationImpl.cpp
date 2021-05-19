@@ -116,6 +116,7 @@ TrackerConfigurationImpl::Tool TrackerConfigurationImpl::getTool(QString uid)
 	retval.mTrackingSystemName = enum2string(internal->mTrackerType);
 	retval.mIsReference = internal->mIsReference;
 	retval.mPictureFilename = internal->mPictureFileName;
+	retval.mPortNumber = internal->mPortNumber;
 
 	return retval;
 }

@@ -51,6 +51,7 @@ public:
 		QString mTrackingSystemName;
 		QString mPictureFilename;
 		bool mIsReference;
+		int mPortNumber;
 	};
 
 	virtual ~TrackerConfiguration();
