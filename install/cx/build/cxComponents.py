@@ -197,7 +197,7 @@ class ITK(CppComponent):
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
-        add('CMAKE_CXX_STANDARD:STRING',11)
+        #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
         builder.configureCMake()
     def repository(self):
         return '%s/ITK' % self.controlData.gitrepo_open_site_base
