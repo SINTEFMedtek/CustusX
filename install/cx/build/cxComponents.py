@@ -186,18 +186,18 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('v4.12.0')
+        # Using ITK v4.12.0 with a fix for gcc 9
+        # Newer ITK versions makes IGSTK compilation fail
+        self._getBuilder().gitCheckoutSha('87b43dfc5e83819fcbc036db18ac2db021e5bfc6')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+        #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
         builder.configureCMake()
     def repository(self):
-        if self.useExternalRepositories():
-            return 'git@github.com:InsightSoftwareConsortium/ITK.git'
-        else:
-            return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
+        return '%s/ITK' % self.controlData.gitrepo_open_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -211,7 +211,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('1c14943c3975fe826da1e7be1624c16c893d1c68')
+        self._getBuilder().gitCheckoutSha('f404b97624ddc745204e90ae87872f3c05cd5e4f')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
