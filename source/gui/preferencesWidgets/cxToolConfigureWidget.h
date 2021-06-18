@@ -63,6 +63,7 @@ signals:
 
 public slots:
   QString requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
+  TrackerConfiguration::Configuration getCurrentConfiguration();
 
 private slots:
   void configChangedSlot();
@@ -74,11 +75,10 @@ private slots:
 private:
   void createTrackingSystemSelector();
   void populateConfigurations(); ///< populates the combobox with all config files from the current application application
-	int addConfigurationToComboBox(QString displayName, QString absoluteFilePath); ///< adds a new configuration file item to the combobox
-  TrackerConfiguration::Configuration getCurrentConfiguration();
+  int addConfigurationToComboBox(QString displayName, QString absoluteFilePath); ///< adds a new configuration file item to the combobox
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
-	QString getCurrentConfigFilePath();
+  QString getCurrentConfigFilePath();
 
   QComboBox*                mConfigFilesComboBox;
   QLineEdit*                mConfigFileLineEdit; ///< name of the xml file (example.xml)
