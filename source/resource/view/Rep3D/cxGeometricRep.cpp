@@ -129,6 +129,7 @@ void GraphicalGeometric::meshChangedSlot()
 	}
 	else
 	{
+		mGraphicalPolyDataPtr->setScalarVisibility(false);
 		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
 		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 	}
