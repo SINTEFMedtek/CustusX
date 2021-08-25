@@ -313,11 +313,13 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 		cubesPolyData = deci->GetOutput();
 	}
 
-	normals->SetInputData(cubesPolyData);
-	normals->Update();
 
-	cubesPolyData->DeepCopy(normals->GetOutput());
-
+		normals->SetInputData(cubesPolyData);
+		normals->SetComputeCellNormals(true);
+		normals->AutoOrientNormalsOn();
+		normals->Update();
+		cubesPolyData->DeepCopy(normals->GetOutput());
+	
 	return cubesPolyData;
 }
 

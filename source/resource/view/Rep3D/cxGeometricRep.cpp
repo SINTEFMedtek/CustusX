@@ -120,13 +120,17 @@ void GraphicalGeometric::meshChangedSlot()
 	mMesh->updateVtkPolyDataWithTexture();
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
 	mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
-
+	
 	mGraphicalPolyDataPtr->setOpacity(1.0);
-	mGraphicalPolyDataPtr->setScalarVisibility(mMesh->getUseColorFromPolydataScalars());
-	if(!mMesh->getUseColorFromPolydataScalars())
+	if(mMesh->getUseColorFromPolydataScalars())
 	{
-	    mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-	    mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+		mGraphicalPolyDataPtr->setScalarVisibility(true);
+		mGraphicalPolyDataPtr->getMapper()->SetScalarModeToUseCellData();
+	}
+	else
+	{
+		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 	}
 
 	//Set other properties
