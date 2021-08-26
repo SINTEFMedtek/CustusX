@@ -125,7 +125,8 @@ void GraphicalGeometric::meshChangedSlot()
 	if(mMesh->getUseColorFromPolydataScalars())
 	{
 		mGraphicalPolyDataPtr->setScalarVisibility(true);
-		mGraphicalPolyDataPtr->getMapper()->SetScalarModeToUseCellData();
+		mGraphicalPolyDataPtr->setScalarModeToUseCellData();
+		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 	}
 	else
 	{
