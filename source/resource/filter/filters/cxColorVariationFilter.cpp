@@ -52,32 +52,25 @@ QString ColorVariationFilter::getHelp() const
 	        "with the original color as mean.";
 }
 
-StringPropertyBasePtr ColorVariationFilter::getStringOption(QDomElement root)
+
+DoublePropertyPtr ColorVariationFilter::getGlobalVarianceOption(QDomElement root)
 {
-	QStringList list;
-	list << "String0" << "String1";
-	return StringProperty::initialize("String", "", "dummy string option",
-												 list[0], list, root);
+	DoublePropertyPtr retval = DoubleProperty::initialize("Global variance", "",
+															"Select the global color variance", 10.0, DoubleRange(1.0, 100.0, 0.5), 1.0, root);
+	return retval;
 }
 
-DoublePropertyBasePtr ColorVariationFilter::getDoubleOption(QDomElement root)
+DoublePropertyPtr ColorVariationFilter::getLocalVarianceOption(QDomElement root)
 {
-	return DoubleProperty::initialize("Value", "",
-	                                             "dummy double value.", 1, DoubleRange(0.1, 10, 0.01), 2,
-												 root);
-}
-
-BoolPropertyBasePtr ColorVariationFilter::getBoolOption(QDomElement root)
-{
-	return BoolProperty::initialize("Bool0", "",
-	                                           "Dummy bool value.", false, root);
+	DoublePropertyPtr retval = DoubleProperty::initialize("Local variance", "",
+															"Select the local color variance", 1.0, DoubleRange(0.1, 10.0, 0.1), 1.0, root);
+	return retval;
 }
 
 void ColorVariationFilter::createOptions()
 {
-	mOptionsAdapters.push_back(this->getStringOption(mOptions));
-	mOptionsAdapters.push_back(this->getDoubleOption(mOptions));
-	mOptionsAdapters.push_back(this->getBoolOption(mOptions));
+	mOptionsAdapters.push_back(this->getGlobalVarianceOption(mOptions));
+	mOptionsAdapters.push_back(this->getLocalVarianceOption(mOptions));
 }
 
 void ColorVariationFilter::createInputTypes()
@@ -118,24 +111,26 @@ bool ColorVariationFilter::execute()
 	double R_mean = originalColor.red();
 	double G_mean = originalColor.green();
 	double B_mean = originalColor.blue();
-	double R_std = 10.0;
-	double G_std = 10.0;
-	double B_std = 10.0;
+	double glabalVariance = this->getGlobalVarianceOption(mOptions)->getValue();
+	double LocalVariance = this->getLocalVarianceOption(mOptions)->getValue();
+
 	std::random_device rd{};
 	std::mt19937 gen{rd()};
-	std::normal_distribution<> R_dist{R_mean, R_std};
-	std::normal_distribution<> G_dist{G_mean, G_std};
-	std::normal_distribution<> B_dist{B_mean, B_std};
+	std::normal_distribution<> R_dist{R_mean, glabalVariance};
+	std::normal_distribution<> G_dist{G_mean, glabalVariance};
+	std::normal_distribution<> B_dist{B_mean, glabalVariance
+	};
 	for(int i=0; i<numberOfPolys; i++)
 		{
-			colors->InsertTuple3(i, std::max(std::min(R_dist(gen),255.0),0.0), std::max(std::min(G_dist(gen),255.0),0.0), std::max(std::min(B_dist(gen),255.0),0.0)); //Make sure 0-255!
+			colors->InsertTuple3(i, std::max(std::min(R_dist(gen),254.999),0.0001), std::max(std::min(G_dist(gen),254.999),0.0001), std::max(std::min(B_dist(gen),254.999),0.0001)); //Make sure 0-255!
 		}
 	polyData->GetCellData()->SetScalars(colors);
 
 	mesh->setVtkPolyData(polyData);
 	mesh->setUseColorFromPolydataScalars(true);
 
-	mesh->meshChanged();
+	//mesh->meshChanged();
+	patientService()->removeData(mesh->getUid());
 	patientService()->insertData(mesh);
 	return true;
 }
