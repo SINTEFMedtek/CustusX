@@ -46,6 +46,10 @@ protected:
 private:
 	DoublePropertyPtr getGlobalVarianceOption(QDomElement root);
 	DoublePropertyPtr getLocalVarianceOption(QDomElement root);
+	void sortPolyData(vtkPolyDataPtr polyData);
+
+	std::vector<std::vector<int>> mPolyToPointsArray;
+	std::vector<std::vector<int>> mPointToPolysArray;
 };
 
 } // namespace cx

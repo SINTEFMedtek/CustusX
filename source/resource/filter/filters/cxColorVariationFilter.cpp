@@ -26,6 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxMesh.h"
 #include "vtkForwardDeclarations.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -114,6 +115,8 @@ bool ColorVariationFilter::execute()
 	double glabalVariance = this->getGlobalVarianceOption(mOptions)->getValue();
 	double LocalVariance = this->getLocalVarianceOption(mOptions)->getValue();
 
+	this->sortPolyData(polyData);
+
 	std::random_device rd{};
 	std::mt19937 gen{rd()};
 	std::normal_distribution<> R_dist{R_mean, glabalVariance};
@@ -143,6 +146,36 @@ bool ColorVariationFilter::postProcess()
 	return true;
 }
 
+void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
+{
+	int numberOfCells = polyData->GetNumberOfCells();
+//	CX_LOG_DEBUG() << "numberOfCells: " << numberOfCells;
+	std::vector<std::vector<int>> pointToPolysArray(polyData->GetNumberOfPoints());
+	for(vtkIdType i = 0; i < numberOfCells; i++)
+	{
+		vtkIdListPtr points = polyData->GetCell(i)->GetPointIds();
+		int numberOfIds = points->GetNumberOfIds();
+		//CX_LOG_DEBUG() << "numberOfIds: " << numberOfIds;
+		std::vector<int> pointsArray;
+		for(vtkIdType j = 0; j < numberOfIds; j++)
+		{
+			int p = points->GetId(j);
+			pointsArray.push_back(p);
+			pointToPolysArray[p].push_back(i);
+		}
+		mPolyToPointsArray.push_back(pointsArray);
+	}
+	mPointToPolysArray = pointToPolysArray;
+		//debug
+//	CX_LOG_DEBUG() << "pointToPolysArray.size(): " << pointToPolysArray.size();
+//	for(int i = 0; i < pointToPolysArray.size(); i++)
+//	{
+//		std::cout << i << ": ";
+//		for(int j = 0; j < pointToPolysArray[i].size(); j++)
+//			std::cout << pointToPolysArray[i][j] << " ";
+//		std::cout << " " << endl;
+//	}
 
+}
 
 } // namespace cx
