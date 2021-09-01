@@ -172,7 +172,7 @@ void Branch::removeEqualPositions()
     if (positions.cols() == orientations.cols())
         resizeOrientations = true;
 
-    for (int i = positions.cols() - 1; i >= 0; i--)
+	for (int i = positions.cols() - 1; i > 0; i--)
 	{
 		if (similar( (positions.col(i)-positions.col(i-1)).cwiseAbs().sum(), 0))
 		{
