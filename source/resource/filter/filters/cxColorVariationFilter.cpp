@@ -102,32 +102,10 @@ bool ColorVariationFilter::execute()
 	
 	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(Transform3D::Identity());
 	
-	vtkUnsignedCharArrayPtr colors = vtkUnsignedCharArrayPtr::New();
-	
-	colors->SetNumberOfComponents(3);
-	int numberOfPolys = polyData->GetNumberOfCells();
-	colors->SetNumberOfTuples(numberOfPolys);
-	QColor originalColor = mesh->getColor();
-	
-	double R_mean = originalColor.red();
-	double G_mean = originalColor.green();
-	double B_mean = originalColor.blue();
-	double glabalVariance = this->getGlobalVarianceOption(mOptions)->getValue();
-	double LocalVariance = this->getLocalVarianceOption(mOptions)->getValue();
-
 	this->sortPolyData(polyData);
+	this->colorPolyData(mesh);
 
-	std::random_device rd{};
-	std::mt19937 gen{rd()};
-	std::normal_distribution<> R_dist{R_mean, glabalVariance};
-	std::normal_distribution<> G_dist{G_mean, glabalVariance};
-	std::normal_distribution<> B_dist{B_mean, glabalVariance
-	};
-	for(int i=0; i<numberOfPolys; i++)
-		{
-			colors->InsertTuple3(i, std::max(std::min(R_dist(gen),254.999),0.0001), std::max(std::min(G_dist(gen),254.999),0.0001), std::max(std::min(B_dist(gen),254.999),0.0001)); //Make sure 0-255!
-		}
-	polyData->GetCellData()->SetScalars(colors);
+	polyData->GetCellData()->SetScalars(mColors);
 
 	mesh->setVtkPolyData(polyData);
 	mesh->setUseColorFromPolydataScalars(true);
@@ -148,6 +126,9 @@ bool ColorVariationFilter::postProcess()
 
 void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
 {
+	mPolyToPointsArray.clear();
+	mPointToPolysArray.clear();
+
 	int numberOfCells = polyData->GetNumberOfCells();
 //	CX_LOG_DEBUG() << "numberOfCells: " << numberOfCells;
 	std::vector<std::vector<int>> pointToPolysArray(polyData->GetNumberOfPoints());
@@ -167,15 +148,121 @@ void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
 	}
 	mPointToPolysArray = pointToPolysArray;
 		//debug
-//	CX_LOG_DEBUG() << "pointToPolysArray.size(): " << pointToPolysArray.size();
-//	for(int i = 0; i < pointToPolysArray.size(); i++)
-//	{
-//		std::cout << i << ": ";
-//		for(int j = 0; j < pointToPolysArray[i].size(); j++)
-//			std::cout << pointToPolysArray[i][j] << " ";
-//		std::cout << " " << endl;
-//	}
+	CX_LOG_DEBUG() << "mPointToPolysArray.size(): " << mPointToPolysArray.size();
+	for(int i = 0; i < mPointToPolysArray.size(); i++)
+	{
+		std::cout << i << ": ";
+		for(int j = 0; j < mPointToPolysArray[i].size(); j++)
+			std::cout << mPointToPolysArray[i][j] << " ";
+		std::cout << " " << endl;
+	}
+	CX_LOG_DEBUG() << "mPolyToPointsArray.size(): " << mPolyToPointsArray.size();
+	for(int i = 0; i < mPolyToPointsArray.size(); i++)
+	{
+		std::cout << i << ": ";
+		for(int j = 0; j < mPolyToPointsArray[i].size(); j++)
+			std::cout << mPolyToPointsArray[i][j] << " ";
+		std::cout << " " << endl;
+	}
 
+}
+
+vtkUnsignedCharArrayPtr ColorVariationFilter::colorPolyData(MeshPtr mesh)
+{
+	if(mPolyToPointsArray.empty() || mPointToPolysArray.empty())
+		return mColors;
+
+	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(Transform3D::Identity());
+
+	mAssignedColorValues.clear();
+	mColors = vtkUnsignedCharArrayPtr::New();
+	mColors->SetNumberOfComponents(3);
+	int numberOfPolys = polyData->GetNumberOfCells();
+	mColors->SetNumberOfTuples(numberOfPolys);
+	QColor originalColor = mesh->getColor();
+
+	mR_mean = originalColor.red();
+	mG_mean = originalColor.green();
+	mB_mean = originalColor.blue();
+	mGlobalVariance = this->getGlobalVarianceOption(mOptions)->getValue();
+	mLocalVariance = this->getLocalVarianceOption(mOptions)->getValue();
+
+	mAssignedColorValues.clear();
+	mAssignedColorValues = std::vector<bool>(numberOfPolys, false);
+
+	this->applyColorToNeighbourPolys(0, mR_mean, mG_mean, mB_mean);
+	for(int i=0; i<numberOfPolys; i++)
+		if(!mAssignedColorValues[i])
+			for(int j=0; j<mPolyToPointsArray[i].size(); j++)
+				this->applyColorToNeighbourPolys(mPolyToPointsArray[i][j], mR_mean, mG_mean, mB_mean);
+
+	return mColors;
+}
+
+void ColorVariationFilter::applyColorToNeighbourPolys(int pointIndex, double R, double G, double B)
+{
+
+	std::vector<int> neighbourPolysList = this->applyColorAndFindNeighbours(pointIndex, R, G, B);
+
+	for(int i=0; i<neighbourPolysList.size(); i++)
+	{
+		std::vector<int> neighbourPointsList = mPolyToPointsArray[neighbourPolysList[i]];
+		//CX_LOG_DEBUG() << "Polygon nr: " << neighbourPolysList[i];
+		for(int j=0; j<neighbourPointsList.size(); j++)
+		{
+			//CX_LOG_DEBUG() << "Point nr: " << neighbourPointsList[j];
+			std::vector<double> newColor = generateColor(R, G, B);
+			this->applyColorToNeighbourPolys(neighbourPointsList[j], newColor[0], newColor[1], newColor[2]);
+		}
+	}
+}
+
+std::vector<int> ColorVariationFilter::applyColorAndFindNeighbours(int pointIndex, double R, double G, double B)
+{
+	CX_LOG_DEBUG() << "Point index: " << pointIndex;
+	std::vector<int> neighbourPolysList = mPointToPolysArray[pointIndex];
+	std::vector<int> removeIndexList;
+	//CX_LOG_DEBUG() << "Color: " << std::to_string(R) << " - " << std::to_string(G) << " - " << std::to_string(B);
+	for(int i=0; i<neighbourPolysList.size(); i++)
+	{
+		if(!mAssignedColorValues[neighbourPolysList[i]]) //Check if tuple is already assigned a color
+		{
+			mColors->InsertTuple3(neighbourPolysList[i], R, G, B);
+			mAssignedColorValues[neighbourPolysList[i]] = true;
+			//CX_LOG_DEBUG() << "Assigning color to neighbour: " << neighbourPolysList[i];
+		}
+		else
+		{
+			removeIndexList.push_back(i);
+			//CX_LOG_DEBUG() << "Tuple already assigned color, removing index from list: " << neighbourPolysList[i];
+		}
+	}
+
+	//CX_LOG_DEBUG() << "neighbourPolysList.size(): " << neighbourPolysList.size();
+	int N = removeIndexList.size();
+	for(int i=N-1; i>=0; i--) //Removeing neighbour polys which is already assigned a color
+		neighbourPolysList.erase(neighbourPolysList.begin() + removeIndexList[i]);
+
+	CX_LOG_DEBUG() << "neighbourPolysList.size(): " << neighbourPolysList.size();
+
+	return neighbourPolysList;
+}
+
+std::vector<double> ColorVariationFilter::generateColor(double R, double G, double B)
+{
+	std::random_device rd{};
+	std::mt19937 gen{rd()};
+
+	std::normal_distribution<> R_dist{mR_mean, mGlobalVariance};
+	std::normal_distribution<> G_dist{mG_mean, mGlobalVariance};
+	std::normal_distribution<> B_dist{mB_mean, mGlobalVariance};
+
+	std::vector<double> color;
+	color.push_back( std::max(std::min( std::max(std::min(R_dist(gen),R+mLocalVariance),R-mLocalVariance) ,254.999),0.0001) );
+	color.push_back( std::max(std::min( std::max(std::min(G_dist(gen),G+mLocalVariance),G-mLocalVariance) ,254.999),0.0001) );
+	color.push_back( std::max(std::min( std::max(std::min(B_dist(gen),B+mLocalVariance),B-mLocalVariance) ,254.999),0.0001) );
+
+	return color;
 }
 
 } // namespace cx

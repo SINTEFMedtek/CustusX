@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXCOLORVARIATIONFILTER_H
 #define CXCOLORVARIATIONFILTER_H
 
+#include <random>
 #include "cxFilterImpl.h"
 
 namespace cx
@@ -46,10 +47,22 @@ protected:
 private:
 	DoublePropertyPtr getGlobalVarianceOption(QDomElement root);
 	DoublePropertyPtr getLocalVarianceOption(QDomElement root);
-	void sortPolyData(vtkPolyDataPtr polyData);
 
+	void sortPolyData(vtkPolyDataPtr polyData);
+	vtkUnsignedCharArrayPtr colorPolyData(MeshPtr mesh);
+	void applyColorToNeighbourPolys(int pointIndex, double R, double G, double B);
+	std::vector<int> applyColorAndFindNeighbours(int pointIndex, double R, double G, double B);
+	std::vector<double> generateColor(double R, double G, double B);
+
+	vtkUnsignedCharArrayPtr mColors;
 	std::vector<std::vector<int>> mPolyToPointsArray;
 	std::vector<std::vector<int>> mPointToPolysArray;
+	std::vector<bool> mAssignedColorValues;
+	double mGlobalVariance;
+	double mLocalVariance;
+	double mR_mean;
+	double mG_mean;
+	double mB_mean;
 };
 
 } // namespace cx
