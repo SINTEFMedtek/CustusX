@@ -52,7 +52,7 @@ private:
 	vtkUnsignedCharArrayPtr colorPolyData(MeshPtr mesh);
 	void applyColorToNeighbourPolys(int startIndex, double R, double G, double B);
 	std::vector<int> applyColorAndFindNeighbours(int pointIndex, double R, double G, double B);
-	std::vector<double> generateColor(double R, double G, double B);
+ std::pair< std::vector<double>, std::vector<double> > generateColor(std::vector<double> color, std::vector<double> coloringVector);
 
 	vtkUnsignedCharArrayPtr mColors;
 	std::vector<std::vector<int>> mPolyToPointsArray;

@@ -186,6 +186,8 @@ void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, 
 	std::vector<int> polyIndexColoringQueue = this->applyColorAndFindNeighbours(startIndex, R, G, B);
 	std::vector<double> color {R, G, B};
 	std::vector<std::vector<double>> polyColorColoringQueue(polyIndexColoringQueue.size(), color);
+	std::vector<double> colorVector {0.0, 0.0, 0.0};
+	std::vector<std::vector<double>> coloringVectors (polyIndexColoringQueue.size(), colorVector);
 
 	while(!polyIndexColoringQueue.empty())
 	{
@@ -193,13 +195,18 @@ void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, 
 
 		for(int i=0; i<neighbourPointsList.size(); i++)
 		{
-			std::vector<double> newColor = generateColor(polyColorColoringQueue[0][0], polyColorColoringQueue[0][1], polyColorColoringQueue[0][2]);
+			std::pair< std::vector<double>, std::vector<double> > colorAndVector = generateColor(polyColorColoringQueue[0], coloringVectors[0]);
+			std::vector<double> newColor = colorAndVector.first;
+			std::vector<double> newColoringVector = colorAndVector.second;
+			
 			std::vector<int> polyIndexToColor = this->applyColorAndFindNeighbours(neighbourPointsList[i], newColor[0], newColor[1], newColor[2]);
 			polyIndexColoringQueue.insert(polyIndexColoringQueue.end(), polyIndexToColor.begin(), polyIndexToColor.end());
 			fill_n(back_inserter(polyColorColoringQueue), polyIndexToColor.size(), newColor);
+			fill_n(back_inserter(coloringVectors), polyIndexToColor.size(), newColoringVector);
 		}
 		polyIndexColoringQueue.erase(polyIndexColoringQueue.begin());
 		polyColorColoringQueue.erase(polyColorColoringQueue.begin());
+		coloringVectors.erase(coloringVectors.begin());
 	}
 }
 
@@ -228,21 +235,29 @@ std::vector<int> ColorVariationFilter::applyColorAndFindNeighbours(int pointInde
 	return neighbourPolysList;
 }
 
-std::vector<double> ColorVariationFilter::generateColor(double R, double G, double B)
+std::pair< std::vector<double>, std::vector<double> > ColorVariationFilter::generateColor(std::vector<double> color, std::vector<double> coloringVector)
 {
 	std::random_device rd{};
 	std::mt19937 gen{rd()};
 
-	std::normal_distribution<> R_dist{mR_mean, mGlobalVariance};
-	std::normal_distribution<> G_dist{mG_mean, mGlobalVariance};
-	std::normal_distribution<> B_dist{mB_mean, mGlobalVariance};
+//	std::normal_distribution<> R_dist{mR_mean, mGlobalVariance};
+//	std::normal_distribution<> G_dist{mG_mean, mGlobalVariance};
+//	std::normal_distribution<> B_dist{mB_mean, mGlobalVariance};
+	std::normal_distribution<> colorDistribution{0, mGlobalVariance};
+	
+	for (int i=0; i<3; i++)
+	{
+		coloringVector[i] = std::max(std::min(colorDistribution(gen), coloringVector[i]+mLocalVariance), coloringVector[i]-mLocalVariance);
+		
+		color[i]= std::max(std::min( color[i] + coloringVector[i] ,254.999),0.0001);
+	}
+//	std::vector<double> color;
+//	color.push_back( std::max(std::min( std::max(std::min(R_dist(gen),R+mLocalVariance),R-mLocalVariance) ,254.999),0.0001) );
+//	color.push_back( std::max(std::min( std::max(std::min(G_dist(gen),G+mLocalVariance),G-mLocalVariance) ,254.999),0.0001) );
+//	color.push_back( std::max(std::min( std::max(std::min(B_dist(gen),B+mLocalVariance),B-mLocalVariance) ,254.999),0.0001) );
+			
 
-	std::vector<double> color;
-	color.push_back( std::max(std::min( std::max(std::min(R_dist(gen),R+mLocalVariance),R-mLocalVariance) ,254.999),0.0001) );
-	color.push_back( std::max(std::min( std::max(std::min(G_dist(gen),G+mLocalVariance),G-mLocalVariance) ,254.999),0.0001) );
-	color.push_back( std::max(std::min( std::max(std::min(B_dist(gen),B+mLocalVariance),B-mLocalVariance) ,254.999),0.0001) );
-
-	return color;
+	return std::make_pair(color, coloringVector);
 }
 
 } // namespace cx
