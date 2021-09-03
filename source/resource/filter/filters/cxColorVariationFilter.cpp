@@ -90,7 +90,7 @@ void ColorVariationFilter::createOutputTypes()
 
 	temp = StringPropertySelectMesh::New(mServices->patient());
 	temp->setValueName("Output");
-	temp->setHelp("Dummy output from the dummy algorithm");
+	temp->setHelp("Output mesh");
 	mOutputTypes.push_back(temp);
 }
 
@@ -130,13 +130,12 @@ void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
 	mPointToPolysArray.clear();
 
 	int numberOfCells = polyData->GetNumberOfCells();
-//	CX_LOG_DEBUG() << "numberOfCells: " << numberOfCells;
+
 	std::vector<std::vector<int>> pointToPolysArray(polyData->GetNumberOfPoints());
 	for(vtkIdType i = 0; i < numberOfCells; i++)
 	{
 		vtkIdListPtr points = polyData->GetCell(i)->GetPointIds();
 		int numberOfIds = points->GetNumberOfIds();
-		//CX_LOG_DEBUG() << "numberOfIds: " << numberOfIds;
 		std::vector<int> pointsArray;
 		for(vtkIdType j = 0; j < numberOfIds; j++)
 		{
@@ -147,23 +146,6 @@ void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
 		mPolyToPointsArray.push_back(pointsArray);
 	}
 	mPointToPolysArray = pointToPolysArray;
-		//debug
-//	CX_LOG_DEBUG() << "mPointToPolysArray.size(): " << mPointToPolysArray.size();
-//	for(int i = 0; i < mPointToPolysArray.size(); i++)
-//	{
-//		std::cout << i << ": ";
-//		for(int j = 0; j < mPointToPolysArray[i].size(); j++)
-//			std::cout << mPointToPolysArray[i][j] << " ";
-//		std::cout << " " << endl;
-//	}
-//	//CX_LOG_DEBUG() << "mPolyToPointsArray.size(): " << mPolyToPointsArray.size();
-//	for(int i = 0; i < mPolyToPointsArray.size(); i++)
-//	{
-//		std::cout << i << ": ";
-//		for(int j = 0; j < mPolyToPointsArray[i].size(); j++)
-//			std::cout << mPolyToPointsArray[i][j] << " ";
-//		std::cout << " " << endl;
-//	}
 
 }
 
@@ -190,82 +172,58 @@ vtkUnsignedCharArrayPtr ColorVariationFilter::colorPolyData(MeshPtr mesh)
 	mAssignedColorValues.clear();
 	mAssignedColorValues = std::vector<bool>(numberOfPolys, false);
 
-	this->applyColorToNeighbourPolys(mR_mean, mG_mean, mB_mean);
-//	for(int i=0; i<numberOfPolys; i++)
-//		if(!mAssignedColorValues[i])
-//			for(int j=0; j<mPolyToPointsArray[i].size(); j++)
-//				this->applyColorToNeighbourPolys(mPolyToPointsArray[i][j], mR_mean, mG_mean, mB_mean);
+	for(int i=0; i<numberOfPolys; i++) //Loop needed if multiple independent meshes in model.
+		if(!mAssignedColorValues[i])
+			for(int j=0; j<mPolyToPointsArray[i].size(); j++)
+				this->applyColorToNeighbourPolys(mPolyToPointsArray[i][j], mR_mean, mG_mean, mB_mean);
 
 	return mColors;
 }
 
-
-//Recursuve function - causes bus 10 error.
-//void ColorVariationFilter::applyColorToNeighbourPolys(int pointIndex, double R, double G, double B)
-//{
-
-//	std::vector<int> neighbourPolysList = this->applyColorAndFindNeighbours(pointIndex, R, G, B);
-
-//	for(int i=0; i<neighbourPolysList.size(); i++)
-//	{
-//		std::vector<int> neighbourPointsList = mPolyToPointsArray[neighbourPolysList[i]];
-//		//CX_LOG_DEBUG() << "Polygon nr: " << neighbourPolysList[i];
-//		for(int j=0; j<neighbourPointsList.size(); j++)
-//		{
-//			//CX_LOG_DEBUG() << "Point nr: " << neighbourPointsList[j];
-//			std::vector<double> newColor = generateColor(R, G, B);
-//			this->applyColorToNeighbourPolys(neighbourPointsList[j], newColor[0], newColor[1], newColor[2]);
-//		}
-//	}
-//}
-
-void ColorVariationFilter::applyColorToNeighbourPolys(double R, double G, double B)
+void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, double G, double B)
 {
 
-	std::vector<int> polyIndexColoringQueue = this->applyColorAndFindNeighbours(0, R, G, B);
+	std::vector<int> polyIndexColoringQueue = this->applyColorAndFindNeighbours(startIndex, R, G, B);
+	std::vector<double> color {R, G, B};
+	std::vector<std::vector<double>> polyColorColoringQueue(polyIndexColoringQueue.size(), color);
 
 	while(!polyIndexColoringQueue.empty())
 	{
-		std::vector<int> neighbourPointsList = mPolyToPointsArray[polyIndexColoringQueue[0]];
-		polyIndexColoringQueue.erase(polyIndexColoringQueue.begin());
+		std::vector<int> neighbourPointsList = mPolyToPointsArray[polyIndexColoringQueue[0]]; //Prosess first index in FIFO queue
 
 		for(int i=0; i<neighbourPointsList.size(); i++)
 		{
-			//CX_LOG_DEBUG() << "Point nr: " << neighbourPointsList[j];
-			std::vector<double> newColor = generateColor(R, G, B);
+			std::vector<double> newColor = generateColor(polyColorColoringQueue[0][0], polyColorColoringQueue[0][1], polyColorColoringQueue[0][2]);
 			std::vector<int> polyIndexToColor = this->applyColorAndFindNeighbours(neighbourPointsList[i], newColor[0], newColor[1], newColor[2]);
 			polyIndexColoringQueue.insert(polyIndexColoringQueue.end(), polyIndexToColor.begin(), polyIndexToColor.end());
+			fill_n(back_inserter(polyColorColoringQueue), polyIndexToColor.size(), newColor);
 		}
+		polyIndexColoringQueue.erase(polyIndexColoringQueue.begin());
+		polyColorColoringQueue.erase(polyColorColoringQueue.begin());
 	}
 }
 
 std::vector<int> ColorVariationFilter::applyColorAndFindNeighbours(int pointIndex, double R, double G, double B)
 {
-	//CX_LOG_DEBUG() << "Point index: " << pointIndex;
 	std::vector<int> neighbourPolysList = mPointToPolysArray[pointIndex];
 	std::vector<int> removeIndexList;
-	//CX_LOG_DEBUG() << "Color: " << std::to_string(R) << " - " << std::to_string(G) << " - " << std::to_string(B);
+
 	for(int i=0; i<neighbourPolysList.size(); i++)
 	{
 		if(!mAssignedColorValues[neighbourPolysList[i]]) //Check if tuple is already assigned a color
 		{
 			mColors->InsertTuple3(neighbourPolysList[i], R, G, B);
 			mAssignedColorValues[neighbourPolysList[i]] = true;
-			//CX_LOG_DEBUG() << "Assigning color to neighbour: " << neighbourPolysList[i];
 		}
 		else
 		{
-			removeIndexList.push_back(i);
-			//CX_LOG_DEBUG() << "Tuple already assigned color, removing index from list: " << neighbourPolysList[i];
+			removeIndexList.push_back(i); //Remove tuple if already assigned
 		}
 	}
 
-	//CX_LOG_DEBUG() << "neighbourPolysList.size(): " << neighbourPolysList.size();
 	int N = removeIndexList.size();
 	for(int i=N-1; i>=0; i--) //Removeing neighbour polys which is already assigned a color
 		neighbourPolysList.erase(neighbourPolysList.begin() + removeIndexList[i]);
-
-	//CX_LOG_DEBUG() << "neighbourPolysList.size(): " << neighbourPolysList.size();
 
 	return neighbourPolysList;
 }

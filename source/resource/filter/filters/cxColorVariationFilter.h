@@ -50,7 +50,7 @@ private:
 
 	void sortPolyData(vtkPolyDataPtr polyData);
 	vtkUnsignedCharArrayPtr colorPolyData(MeshPtr mesh);
-	void applyColorToNeighbourPolys(double R, double G, double B);
+	void applyColorToNeighbourPolys(int startIndex, double R, double G, double B);
 	std::vector<int> applyColorAndFindNeighbours(int pointIndex, double R, double G, double B);
 	std::vector<double> generateColor(double R, double G, double B);
 
