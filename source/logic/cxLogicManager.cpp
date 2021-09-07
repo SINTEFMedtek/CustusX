@@ -60,10 +60,13 @@ void LogicManager::initialize(ApplicationComponentPtr component)
 
 void LogicManager::shutdown()
 {
-	LogicManager::getInstance()->shutdownServices();
+	// Disabling the Logicmanager shutdown code for now,
+	// as it seems this code causes a lot of tests to fail or segfault on Ubuntu 20.04
 
-	delete mInstance;
-	mInstance = NULL;
+	//LogicManager::getInstance()->shutdownServices();
+
+	//delete mInstance;
+	//mInstance = NULL;
 }
 
 void LogicManager::initializeServices()
