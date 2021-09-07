@@ -85,3 +85,7 @@ sudo apt install nvidia-opencl-dev
 # sudo ln /usr/lib/x86_64-linux-gnu/libGL.so.1.7.0 /usr/lib/x86_64-linux-gnu/libGL.so
 # https://askubuntu.com/questions/616065/the-imported-target-qt5gui-references-the-file-usr-lib-x86-64-linux-gnu-li
 
+#For the new Acer (2021) machines it seems like the latest NVIDIA driver (470) works fine
+#Needed to reinstall Boost, cppunit and glew:
+sudo apt-get install -y libboost-all-dev libcppunit-dev libglew-dev
+
