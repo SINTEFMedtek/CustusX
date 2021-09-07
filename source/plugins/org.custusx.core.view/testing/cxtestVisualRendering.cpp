@@ -84,7 +84,7 @@ void testACSWith3GPUVolumes()
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
 //		fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
-		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.9);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.88);
 	}
 	
 	CHECK_FALSE(fixture.messageListenerContainErrors());
@@ -213,6 +213,8 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 0, 0);
@@ -370,6 +372,8 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	std::vector<cx::ImagePtr> images(1);
@@ -413,6 +417,8 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	std::vector<cx::ImagePtr> images(2);

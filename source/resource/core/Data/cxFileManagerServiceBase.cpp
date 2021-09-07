@@ -126,6 +126,7 @@ QString FileManagerServiceBase::findDataTypeFromFile(QString filename)
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->canReadDataType();
+	CX_LOG_WARNING() << "FileManagerServiceBase::findDataTypeFromFile: Cannot find a file reader";
 	return "";
 }
 

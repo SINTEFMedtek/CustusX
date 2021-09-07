@@ -24,8 +24,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFrameMetric.h"
 #include "cxToolMetric.h"
 #include "cxRegionOfInterestMetric.h"
-
 #include "cxPatientModelService.h"
+#include "cxLogger.h"
 
 
 namespace cx
@@ -64,6 +64,7 @@ DataPtr DataFactory::createRaw(QString type, QString uid)
 	CREATE_WITH_SERVICES_IF_MATCH(type, CustomMetric);
 	CREATE_WITH_SERVICES_IF_MATCH(type, SphereMetric);
 	CREATE_WITH_SERVICES_IF_MATCH(type, RegionOfInterestMetric);
+	CX_LOG_WARNING() << "DataFactory::createRaw - No match for type: " << type;
 	return DataPtr ();
 }
 
