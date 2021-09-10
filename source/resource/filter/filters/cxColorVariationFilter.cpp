@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -49,8 +49,8 @@ QString ColorVariationFilter::getType() const
 QString ColorVariationFilter::getHelp() const
 {
 	return "A filter to create variation of colors to a mesh.\n"
-	        "The variation is be applied as a normal distributin\n"
-	        "with the original color as mean.";
+					"The variation is be applied as a normal distributin\n"
+					"with the original color as mean.";
 }
 
 
@@ -99,9 +99,9 @@ bool ColorVariationFilter::execute()
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!mesh)
 		return false;
-	
+
 	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(Transform3D::Identity());
-	
+
 	this->sortPolyData(polyData);
 	this->colorPolyData(mesh);
 	this->smoothColorsInMesh();
