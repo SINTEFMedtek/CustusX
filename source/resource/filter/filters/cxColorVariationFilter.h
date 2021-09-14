@@ -35,6 +35,7 @@ public:
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
+	static QString getNameSuffixColorVariation();
 
 	virtual bool execute();
 	virtual bool postProcess();

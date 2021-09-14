@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMesh.h"
 #include "vtkForwardDeclarations.h"
 #include "cxLogger.h"
+#include "cxRegistrationTransform.h"
 
 namespace cx
 {
@@ -44,6 +45,11 @@ QString ColorVariationFilter::getName() const
 QString ColorVariationFilter::getType() const
 {
 	return "color_variation_filter";
+}
+
+QString ColorVariationFilter::getNameSuffixColorVariation()
+{
+	return "_Colored";
 }
 
 QString ColorVariationFilter::getHelp() const
@@ -96,31 +102,39 @@ void ColorVariationFilter::createOutputTypes()
 
 bool ColorVariationFilter::execute()
 {
-	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
-	if (!mesh)
+	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
+	if (!inputMesh)
 		return false;
 
-	vtkPolyDataPtr polyData = mesh->getTransformedPolyDataCopy(Transform3D::Identity());
+	vtkPolyDataPtr polyData = inputMesh->getTransformedPolyDataCopy(inputMesh->get_rMd());
 
 	this->sortPolyData(polyData);
-	this->colorPolyData(mesh);
+	this->colorPolyData(inputMesh);
 	this->smoothColorsInMesh();
 
 	polyData->GetCellData()->SetScalars(mColors);
+	
+	QString uidColoredModel = inputMesh->getUid() + ColorVariationFilter::getNameSuffixColorVariation();
+	QString nameColoredModel = inputMesh->getName() + ColorVariationFilter::getNameSuffixColorVariation();
 
-	mesh->setVtkPolyData(polyData);
-	mesh->setUseColorFromPolydataScalars(true);
+	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidColoredModel, nameColoredModel);
 
-	//mesh->meshChanged();
-	patientService()->removeData(mesh->getUid());
-	patientService()->insertData(mesh);
+	outputMesh->setVtkPolyData(polyData);
+	outputMesh->setColor(inputMesh->getColor());
+	outputMesh->setUseColorFromPolydataScalars(true);
+	outputMesh->get_rMd_History()->setParentSpace(inputMesh->getParentSpace());
+
+	//patientService()->removeData(mesh->getUid());
+	patientService()->insertData(outputMesh);
+	
+	mOutputTypes[0]->setValue(outputMesh->getUid());
 	return true;
 }
 
 bool ColorVariationFilter::postProcess()
 {
-	if (mInputTypes.front()->getData())
-		mOutputTypes.front()->setValue(mInputTypes.front()->getData()->getUid());
+	if (mOutputTypes.front()->getData())
+		mOutputTypes.front()->setValue(mOutputTypes.front()->getData()->getUid());
 
 	return true;
 }
