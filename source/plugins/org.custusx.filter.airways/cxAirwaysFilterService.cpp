@@ -53,8 +53,9 @@ AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
 {
 	fast::Reporter::setGlobalReportMethod(fast::Reporter::COUT);
     //Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
-    fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
-    Q_UNUSED(importer)
+	//This hack sometimes cause CTK plugin start/stop to fail - if needed it must be solved in another way
+	//fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
+	//Q_UNUSED(importer)
 }
 
 
@@ -195,7 +196,7 @@ bool AirwaysFilter::execute()
 	{
 		std::string volumeFilname = q_filename.toStdString();
 		// Import image data from disk
-		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
+		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();//TODO: This line cause an exception
 		importerPtr->setFilename(volumeFilname);
 
 		segmentAirways(importerPtr);
