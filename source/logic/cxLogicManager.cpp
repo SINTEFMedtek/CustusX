@@ -60,10 +60,11 @@ void LogicManager::initialize(ApplicationComponentPtr component)
 
 void LogicManager::shutdown()
 {
-	LogicManager::getInstance()->shutdownServices();
+	LogicManager::getInstance()->shutdownTrackingServices();
+	//LogicManager::getInstance()->shutdownServices();
 
-	delete mInstance;
-	mInstance = NULL;
+	//delete mInstance;
+	//mInstance = NULL;
 }
 
 void LogicManager::initializeServices()
@@ -180,6 +181,10 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mSessionStorageService, "SessionStorageService");
 }
 
+void LogicManager::shutdownTrackingServices()
+{
+	this->shutdownService(mTrackingService, "TrackingService");
+}
 
 template<class T>
 void LogicManager::shutdownService(boost::shared_ptr<T>& service, QString name)

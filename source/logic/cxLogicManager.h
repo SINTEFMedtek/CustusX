@@ -129,6 +129,7 @@ private:
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
   void shutdownServices();
+  void shutdownTrackingServices();
 
   void basicSetup();
   void createLegacyStoredServices();
