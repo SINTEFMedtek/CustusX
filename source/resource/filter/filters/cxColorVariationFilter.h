@@ -48,13 +48,15 @@ protected:
 private:
 	DoublePropertyPtr getGlobalVarianceOption(QDomElement root);
 	DoublePropertyPtr getLocalVarianceOption(QDomElement root);
+	DoublePropertyPtr getSmoothingOption(QDomElement root);
 
 	void sortPolyData(vtkPolyDataPtr polyData);
 	vtkUnsignedCharArrayPtr colorPolyData(MeshPtr mesh);
 	void applyColorToNeighbourPolys(int startIndex, double R, double G, double B);
 	std::vector<int> applyColorAndFindNeighbours(int pointIndex, double R, double G, double B);
+	void generateColorDistribution();
 	std::vector<double> generateColor(double R, double G, double B);
-	void smoothColorsInMesh();
+	void smoothColorsInMesh(int iterations = 1);
 
 	vtkUnsignedCharArrayPtr mColors;
 	std::vector<std::vector<int>> mPolyToPointsArray;
@@ -65,6 +67,11 @@ private:
 	double mR_mean;
 	double mG_mean;
 	double mB_mean;
+	std::normal_distribution<> mR_dist;
+	std::normal_distribution<> mG_dist;
+	std::normal_distribution<> mB_dist;
+	std::random_device m_rd{};
+	std::mt19937 m_gen{m_rd()};
 };
 
 } // namespace cx

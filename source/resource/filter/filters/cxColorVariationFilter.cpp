@@ -74,10 +74,18 @@ DoublePropertyPtr ColorVariationFilter::getLocalVarianceOption(QDomElement root)
 	return retval;
 }
 
+DoublePropertyPtr ColorVariationFilter::getSmoothingOption(QDomElement root)
+{
+	DoublePropertyPtr retval = DoubleProperty::initialize("Smoothing", "",
+															"Select the number of smoothing iterations", 3, DoubleRange(0, 10, 1), 0, root);
+	return retval;
+}
+
 void ColorVariationFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getGlobalVarianceOption(mOptions));
 	mOptionsAdapters.push_back(this->getLocalVarianceOption(mOptions));
+	mOptionsAdapters.push_back(this->getSmoothingOption(mOptions));
 }
 
 void ColorVariationFilter::createInputTypes()
@@ -109,8 +117,10 @@ bool ColorVariationFilter::execute()
 	vtkPolyDataPtr polyData = inputMesh->getTransformedPolyDataCopy(inputMesh->get_rMd());
 
 	this->sortPolyData(polyData);
+	this->generateColorDistribution();
 	this->colorPolyData(inputMesh);
-	this->smoothColorsInMesh();
+	int smoothingIteratoins = this->getSmoothingOption(mOptions)->getValue();
+	this->smoothColorsInMesh(smoothingIteratoins);
 
 	polyData->GetCellData()->SetScalars(mColors);
 	
@@ -244,73 +254,77 @@ std::vector<int> ColorVariationFilter::applyColorAndFindNeighbours(int pointInde
 	return neighbourPolysList;
 }
 
+void ColorVariationFilter::generateColorDistribution()
+{
+	mR_dist = std::normal_distribution<> {mR_mean, mGlobalVariance};
+	mG_dist = std::normal_distribution<> {mG_mean, mGlobalVariance};
+	mB_dist = std::normal_distribution<> {mB_mean, mGlobalVariance};
+}
+
 std::vector<double> ColorVariationFilter::generateColor(double R, double G, double B)
 {
-	std::random_device rd{};
-	std::mt19937 gen{rd()};
-
-	std::normal_distribution<> R_dist{mR_mean, mGlobalVariance};
-	std::normal_distribution<> G_dist{mG_mean, mGlobalVariance};
-	std::normal_distribution<> B_dist{mB_mean, mGlobalVariance};
 
 	std::vector<double> color;
-	color.push_back( std::max(std::min( std::max(std::min(R_dist(gen),R+mLocalVariance),R-mLocalVariance) ,254.999),0.0001) );
-	color.push_back( std::max(std::min( std::max(std::min(G_dist(gen),G+mLocalVariance),G-mLocalVariance) ,254.999),0.0001) );
-	color.push_back( std::max(std::min( std::max(std::min(B_dist(gen),B+mLocalVariance),B-mLocalVariance) ,254.999),0.0001) );
+	color.push_back( std::max(std::min( std::max(std::min(mR_dist(m_gen),R+mLocalVariance),R-mLocalVariance) ,254.999),0.0001) );
+	color.push_back( std::max(std::min( std::max(std::min(mG_dist(m_gen),G+mLocalVariance),G-mLocalVariance) ,254.999),0.0001) );
+	color.push_back( std::max(std::min( std::max(std::min(mB_dist(m_gen),B+mLocalVariance),B-mLocalVariance) ,254.999),0.0001) );
 
 	return color;
 }
 
-void ColorVariationFilter::smoothColorsInMesh()
+void ColorVariationFilter::smoothColorsInMesh(int iterations)
 {
-	vtkUnsignedCharArrayPtr newColors = mColors;
-	int numberofPolys = newColors->GetNumberOfTuples();
-
-	Eigen::MatrixXd allColors(numberofPolys,3);
-	for(int i=0; i<numberofPolys; i++)
+	for(int itr=0; itr<iterations; itr++)
 	{
-		double colorTuple[3];
-		mColors->GetTuple(i, colorTuple);
-		allColors(i,0) = colorTuple[0];
-		allColors(i,1) = colorTuple[1];
-		allColors(i,2) = colorTuple[2];
-	}
-
-	for(int i=0; i<numberofPolys; i++)
-	{
-		std::vector<int> connectedPoints = mPolyToPointsArray[i];
-		std::vector<int> neighbourPolys;
-		for(int j=0; j<connectedPoints.size(); j++)
+		vtkUnsignedCharArrayPtr newColors = mColors;
+		int numberofPolys = newColors->GetNumberOfTuples();
+	
+		Eigen::MatrixXd allColors(numberofPolys,3);
+		for(int i=0; i<numberofPolys; i++)
 		{
-			std::vector<int> newNeighbours = mPointToPolysArray[connectedPoints[j]];
-			neighbourPolys.insert(neighbourPolys.end(), newNeighbours.begin(), newNeighbours.end());
+			double colorTuple[3];
+			mColors->GetTuple(i, colorTuple);
+			allColors(i,0) = colorTuple[0];
+			allColors(i,1) = colorTuple[1];
+			allColors(i,2) = colorTuple[2];
 		}
-		neighbourPolys.erase( unique( neighbourPolys.begin(), neighbourPolys.end() ), neighbourPolys.end() );// remove duplicates
-		std::vector<std::vector<double>> neighbourColors;
-		Eigen::Vector3d sumNeighbourColors = Eigen::Vector3d::Zero();
-		for(int j=0; j<neighbourPolys.size(); j++)
+	
+		for(int i=0; i<numberofPolys; i++)
 		{
-			sumNeighbourColors(0) += allColors(neighbourPolys[j],0);
-			sumNeighbourColors(1) += allColors(neighbourPolys[j],1);
-			sumNeighbourColors(2) += allColors(neighbourPolys[j],2);
-
-//			double colorTuple[3];
-//			mColors->GetTuple(neighbourPolys[j], colorTuple);
-//			std::vector<double> color {colorTuple[0], colorTuple[1], colorTuple[2]};
-//			neighbourColors.push_back(color);
+			std::vector<int> connectedPoints = mPolyToPointsArray[i];
+			std::vector<int> neighbourPolys;
+			for(int j=0; j<connectedPoints.size(); j++)
+			{
+				std::vector<int> newNeighbours = mPointToPolysArray[connectedPoints[j]];
+				neighbourPolys.insert(neighbourPolys.end(), newNeighbours.begin(), newNeighbours.end());
+			}
+			neighbourPolys.erase( unique( neighbourPolys.begin(), neighbourPolys.end() ), neighbourPolys.end() );// remove duplicates
+			std::vector<std::vector<double>> neighbourColors;
+			Eigen::Vector3d sumNeighbourColors = Eigen::Vector3d::Zero();
+			for(int j=0; j<neighbourPolys.size(); j++)
+			{
+				sumNeighbourColors(0) += allColors(neighbourPolys[j],0);
+				sumNeighbourColors(1) += allColors(neighbourPolys[j],1);
+				sumNeighbourColors(2) += allColors(neighbourPolys[j],2);
+	
+	//			double colorTuple[3];
+	//			mColors->GetTuple(neighbourPolys[j], colorTuple);
+	//			std::vector<double> color {colorTuple[0], colorTuple[1], colorTuple[2]};
+	//			neighbourColors.push_back(color);
+			}
+	//		CX_LOG_DEBUG() << "sumNeighbourColors: " << sumNeighbourColors[0] << " " << sumNeighbourColors[1] << " " << sumNeighbourColors[2];
+	//		CX_LOG_DEBUG() << "allColors.col(i): " << allColors(i,0) << " " << allColors(i,1) << " " << allColors(i,2);
+	//		CX_LOG_DEBUG() << "neighbourPolys.size(): " << neighbourPolys.size();
+			Eigen::Vector3d color;
+			for(int j=0; j<3; j++)
+				color(j) = ( sumNeighbourColors(j) + allColors(i,j) ) / (neighbourPolys.size() + 1);
+	//		CX_LOG_DEBUG() << "color: " << color(0) << " " << color(1) << " " << color(2);
+			newColors->InsertTuple3(i, color[0], color[1], color[2]);
+	//		double averageNeighbourColor = accumulate( neighbourColors.begin(), neighbourColors.end(), 0.0)/neighbourColors.size();
 		}
-//		CX_LOG_DEBUG() << "sumNeighbourColors: " << sumNeighbourColors[0] << " " << sumNeighbourColors[1] << " " << sumNeighbourColors[2];
-//		CX_LOG_DEBUG() << "allColors.col(i): " << allColors(i,0) << " " << allColors(i,1) << " " << allColors(i,2);
-//		CX_LOG_DEBUG() << "neighbourPolys.size(): " << neighbourPolys.size();
-		Eigen::Vector3d color;
-		for(int j=0; j<3; j++)
-			color(j) = ( sumNeighbourColors(j) + allColors(i,j) ) / (neighbourPolys.size() + 1);
-//		CX_LOG_DEBUG() << "color: " << color(0) << " " << color(1) << " " << color(2);
-		newColors->InsertTuple3(i, color[0], color[1], color[2]);
-//		double averageNeighbourColor = accumulate( neighbourColors.begin(), neighbourColors.end(), 0.0)/neighbourColors.size();
+	
+		mColors = newColors;
 	}
-
-	mColors = newColors;
 }
 
 } // namespace cx
