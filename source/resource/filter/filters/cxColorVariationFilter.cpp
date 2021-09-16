@@ -134,7 +134,6 @@ bool ColorVariationFilter::execute()
 	outputMesh->setUseColorFromPolydataScalars(true);
 	outputMesh->get_rMd_History()->setParentSpace(inputMesh->getParentSpace());
 
-	//patientService()->removeData(mesh->getUid());
 	patientService()->insertData(outputMesh);
 	
 	mOutputTypes[0]->setValue(outputMesh->getUid());
@@ -219,7 +218,6 @@ void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, 
 		for(int i=0; i<neighbourPointsList.size(); i++)
 		{
 			std::vector<double> newColor = generateColor(polyColorColoringQueue[0][0], polyColorColoringQueue[0][1], polyColorColoringQueue[0][2]);
-			//CX_LOG_DEBUG() << "newColor: " << newColor[0] << " " << newColor[1] << " " << newColor[2];
 			std::vector<int> polyIndexToColor = this->applyColorAndFindNeighbours(neighbourPointsList[i], newColor[0], newColor[1], newColor[2]);
 			polyIndexColoringQueue.insert(polyIndexColoringQueue.end(), polyIndexToColor.begin(), polyIndexToColor.end());
 			fill_n(back_inserter(polyColorColoringQueue), polyIndexToColor.size(), newColor);
@@ -306,21 +304,13 @@ void ColorVariationFilter::smoothColorsInMesh(int iterations)
 				sumNeighbourColors(0) += allColors(neighbourPolys[j],0);
 				sumNeighbourColors(1) += allColors(neighbourPolys[j],1);
 				sumNeighbourColors(2) += allColors(neighbourPolys[j],2);
-	
-	//			double colorTuple[3];
-	//			mColors->GetTuple(neighbourPolys[j], colorTuple);
-	//			std::vector<double> color {colorTuple[0], colorTuple[1], colorTuple[2]};
-	//			neighbourColors.push_back(color);
 			}
-	//		CX_LOG_DEBUG() << "sumNeighbourColors: " << sumNeighbourColors[0] << " " << sumNeighbourColors[1] << " " << sumNeighbourColors[2];
-	//		CX_LOG_DEBUG() << "allColors.col(i): " << allColors(i,0) << " " << allColors(i,1) << " " << allColors(i,2);
-	//		CX_LOG_DEBUG() << "neighbourPolys.size(): " << neighbourPolys.size();
+			
 			Eigen::Vector3d color;
 			for(int j=0; j<3; j++)
-				color(j) = ( sumNeighbourColors(j) + allColors(i,j) ) / (neighbourPolys.size() + 1);
-	//		CX_LOG_DEBUG() << "color: " << color(0) << " " << color(1) << " " << color(2);
+				color(j) = ( sumNeighbourColors(j) + allColors(i,j) ) / (neighbourPolys.size() + 1); //Average of current color and all neighbour colors
+			
 			newColors->InsertTuple3(i, color[0], color[1], color[2]);
-	//		double averageNeighbourColor = accumulate( neighbourColors.begin(), neighbourColors.end(), 0.0)/neighbourColors.size();
 		}
 	
 		mColors = newColors;
