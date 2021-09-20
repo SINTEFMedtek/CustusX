@@ -248,7 +248,10 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckoutSha('56d165d8f0ad500a762a595526bf30c90dc04aaa')
+        #self._getBuilder().gitCheckoutSha('56d165d8f0ad500a762a595526bf30c90dc04aaa')
+        #This fixes the bug:
+        #QSqlDatabasePrivate::database: requested database does not belong to the calling thread.
+        self._getBuilder().gitCheckoutSha('7c0477fc6eeda55b0fcec1127f001a38009332ef')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
