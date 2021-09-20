@@ -60,11 +60,33 @@ void LogicManager::initialize(ApplicationComponentPtr component)
 
 void LogicManager::shutdown()
 {
-	LogicManager::getInstance()->shutdownTrackingServices();
-	//LogicManager::getInstance()->shutdownServices();
+	//The bottom 3 lines still cause tests on Ubuntu 20.04 to fail
+	//83 unit tests (many seg.faults), when running:
+	// ninja && python3 ../CX/install/cxRunTests.py --run_catch --wrap_in_ctest [unit]~[hide] -t Debug
+	//Example:
+//#0  0x00007f1fc0ee6528 in QOpenGLContext::surface() const () at /lib/x86_64-linux-gnu/libQt5Gui.so.5
+//#1  0x00007f1fc0eb6160 in QSurface::~QSurface() () at /lib/x86_64-linux-gnu/libQt5Gui.so.5
+//#2  0x00007f1fc0eb3bbf in QWindow::~QWindow() () at /lib/x86_64-linux-gnu/libQt5Gui.so.5
+//#3  0x00007f1fc255a72d in  () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
+//#4  0x00007f1fc252fa4c in QWidgetPrivate::deleteTLSysExtra() () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
+//#5  0x00007f1fc2534568 in QWidget::destroy(bool, bool) () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
+//#6  0x00007f1fc24fe207 in QApplication::~QApplication() () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
+//#7  0x00007f1fc3f1b50a in cx::Application::~Application() (this=0x7fffdb7454c0, __in_chrg=<optimized out>) at /home/olevs/dev/cx/CX/CX/source/resource/core/./utilities/cxApplication.h:36
+//#8  0x00007f1fc3f034f3 in cxtest::CatchImpl::run(int, char**) (this=0x7fffdb745520, argc=2, argv=0x7fffdb745648) at /home/olevs/dev/cx/CX/CX/source/testing/cxtestCatchImpl.cpp:30
+//#9  0x0000000000406926 in main(int, char**) (argc=2, argv=0x7fffdb745648) at /home/olevs/dev/cx/CX/CX/source/testing/cxtestCatchMain.cpp:59
 
-	//delete mInstance;
-	//mInstance = NULL;
+
+	//Running
+	//ninja && ./bin/Catch [unit]~[hide]
+	//cause only 5 tests to fail. No segfaults after the current code fixes
+
+	//Replacing the 3 lines with this seems to fix the test seg.faults on Ubuntu 20.04, but may still cause issues with the other platforms (not verified yet)
+	//LogicManager::getInstance()->shutdownLegacyStoredServices();
+
+	//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
+	LogicManager::getInstance()->shutdownServices();
+	delete mInstance;
+	mInstance = NULL;
 }
 
 void LogicManager::initializeServices()
@@ -179,11 +201,6 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");
 	this->shutdownService(mSessionStorageService, "SessionStorageService");
-}
-
-void LogicManager::shutdownTrackingServices()
-{
-	this->shutdownService(mTrackingService, "TrackingService");
 }
 
 template<class T>
