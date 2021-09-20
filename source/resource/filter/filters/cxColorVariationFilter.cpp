@@ -49,7 +49,7 @@ QString ColorVariationFilter::getType() const
 
 QString ColorVariationFilter::getNameSuffixColorVariation()
 {
-	return "_Colored";
+	return "_colored";
 }
 
 QString ColorVariationFilter::getHelp() const
@@ -113,31 +113,48 @@ bool ColorVariationFilter::execute()
 	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!inputMesh)
 		return false;
+	
+	double globaleVatiance = this->getGlobalVarianceOption(mOptions)->getValue();
+	double localeVatiance = this->getLocalVarianceOption(mOptions)->getValue();
+	double smoothingIterations = this->getSmoothingOption(mOptions)->getValue();
+	
+	mOutputMesh = this->execute(inputMesh, globaleVatiance, localeVatiance, smoothingIterations);
+
+	if(mOutputTypes.size() > 0)
+		mOutputTypes[0]->setValue(mOutputMesh->getUid());
+	return true;
+}
+
+MeshPtr ColorVariationFilter::execute(MeshPtr inputMesh, double globaleVariance, double localeVariance, int smoothingIterations)
+{
+	if (!inputMesh)
+		return MeshPtr();
 
 	vtkPolyDataPtr polyData = inputMesh->getTransformedPolyDataCopy(inputMesh->get_rMd());
-
-	this->sortPolyData(polyData);
-	this->generateColorDistribution();
-	this->colorPolyData(inputMesh);
-	int smoothingIteratoins = this->getSmoothingOption(mOptions)->getValue();
-	this->smoothColorsInMesh(smoothingIteratoins);
-
-	polyData->GetCellData()->SetScalars(mColors);
+	mGlobalVariance = globaleVariance;
+	mLocalVariance = localeVariance;
 	
+	this->sortPolyData(polyData);
+	this->colorPolyData(inputMesh);
+	this->smoothColorsInMesh(smoothingIterations);
+	polyData->GetCellData()->SetScalars(mColors);
+
 	QString uidColoredModel = inputMesh->getUid() + ColorVariationFilter::getNameSuffixColorVariation();
 	QString nameColoredModel = inputMesh->getName() + ColorVariationFilter::getNameSuffixColorVariation();
 
 	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidColoredModel, nameColoredModel);
-
 	outputMesh->setVtkPolyData(polyData);
 	outputMesh->setColor(inputMesh->getColor());
 	outputMesh->setUseColorFromPolydataScalars(true);
 	outputMesh->get_rMd_History()->setParentSpace(inputMesh->getParentSpace());
-
 	patientService()->insertData(outputMesh);
-	
-	mOutputTypes[0]->setValue(outputMesh->getUid());
-	return true;
+
+	return outputMesh;
+}
+
+MeshPtr ColorVariationFilter::getOutputMesh()
+{
+	return mOutputMesh;
 }
 
 bool ColorVariationFilter::postProcess()
@@ -190,8 +207,8 @@ vtkUnsignedCharArrayPtr ColorVariationFilter::colorPolyData(MeshPtr mesh)
 	mR_mean = originalColor.red();
 	mG_mean = originalColor.green();
 	mB_mean = originalColor.blue();
-	mGlobalVariance = this->getGlobalVarianceOption(mOptions)->getValue();
-	mLocalVariance = this->getLocalVarianceOption(mOptions)->getValue();
+	
+	this->generateColorDistribution();
 
 	mAssignedColorValues.clear();
 	mAssignedColorValues = std::vector<bool>(numberOfPolys, false);

@@ -36,8 +36,10 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 	static QString getNameSuffixColorVariation();
+	MeshPtr getOutputMesh();
 
 	virtual bool execute();
+	MeshPtr execute(MeshPtr inputMesh, double globaleVariance, double localeVariance, int smoothingIterations);
 	virtual bool postProcess();
 
 protected:
@@ -58,6 +60,7 @@ private:
 	std::vector<double> generateColor(double R, double G, double B);
 	void smoothColorsInMesh(int iterations = 1);
 
+	MeshPtr mOutputMesh;
 	vtkUnsignedCharArrayPtr mColors;
 	std::vector<std::vector<int>> mPolyToPointsArray;
 	std::vector<std::vector<int>> mPointToPolysArray;
@@ -73,6 +76,8 @@ private:
 	std::random_device m_rd{};
 	std::mt19937 m_gen{m_rd()};
 };
+
+typedef boost::shared_ptr<ColorVariationFilter> ColorVariationFilterPtr;
 
 } // namespace cx
 

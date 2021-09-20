@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBranchList.h"
 #include "cxBronchoscopyRegistration.h"
 #include "cxAirwaysFromCenterline.h"
+#include "cxColorVariationFilter.h"
 #include "cxVolumeHelpers.h"
 
 #include "cxTime.h"
@@ -620,7 +621,9 @@ void AirwaysFilter::createAirwaysFromCenterline()
     airwayWalls->setColor(QColor(253, 173, 136, 255));
     patientService()->insertData(airwayWalls);
     mOutputTypes[3]->setValue(airwayWalls->getUid());
-
+		
+		if(mColoredAirwaysOption->getValue())
+			this->createColoredAirways();
 
     //insert filtered centerline from airwaysFromCenterline
     QString uidCenterline = mInputImage->getUid() + airwaysFilterGetNameSuffixAirways() + airwaysFilterGetNameSuffixTubes() + airwaysFilterGetNameSuffixCenterline() + "%1";
@@ -633,12 +636,28 @@ void AirwaysFilter::createAirwaysFromCenterline()
     mOutputTypes[2]->setValue(centerline->getUid());
 }
 
+void AirwaysFilter::createColoredAirways()
+{
+	if(mOutputTypes[3]->getValue().isEmpty())
+		return;
+	
+	ColorVariationFilterPtr coloringFilter = ColorVariationFilterPtr(new ColorVariationFilter(mServices));
+	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mOutputTypes[3])->getMesh();
+	double globaleVariance = 50.0;
+	double localeVariance = 5.0;
+	int smoothingIterations = 5;
+	
+	MeshPtr coloredMesh = coloringFilter->execute(mesh, globaleVariance, localeVariance, smoothingIterations);
+	if(coloredMesh)
+		mOutputTypes[3]->setValue(coloredMesh->getUid());
+}
 
 void AirwaysFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getManualSeedPointOption(mOptions));
 	mOptionsAdapters.push_back(this->getAirwaySegmentationOption(mOptions));
 	mOptionsAdapters.push_back(this->getAirwayTubesGenerationOption(mOptions));
+	mOptionsAdapters.push_back(this->getColoredAirwaysOption(mOptions));
 	mOptionsAdapters.push_back(this->getLungSegmentationOption(mOptions));
 	mOptionsAdapters.push_back(this->getVesselSegmentationOption(mOptions));
 	mOptionsAdapters.push_back(this->getVesselCenterlineOption(mOptions));
@@ -661,8 +680,8 @@ void AirwaysFilter::createOutputTypes()
 	std::vector<std::pair<QString, QString>> valueHelpPairs;
 	valueHelpPairs.push_back(std::make_pair(tr("Airway Centerline"), tr("Generated centerline mesh (vtk-format).")));
 	valueHelpPairs.push_back(std::make_pair(tr("Airway Segmentation Mesh"), tr("Generated surface of the airway segmentation volume.")));
-	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Centerline"), tr("Centerlines with straight lines between the branch points.")));
-	valueHelpPairs.push_back(std::make_pair(tr("Straight Airway Tubes Mesh"), tr("Tubes based on the straight centerline")));
+	valueHelpPairs.push_back(std::make_pair(tr("Tube Airway Centerline"), tr("Smoothed centerline.")));
+	valueHelpPairs.push_back(std::make_pair(tr("Tube Airway Tubes Mesh"), tr("Tubes based on the smoothed centerline")));
 	valueHelpPairs.push_back(std::make_pair(tr("Lung Segmentation Mesh"), tr("Generated surface of the lung segmentation volume.")));
 	valueHelpPairs.push_back(std::make_pair(tr("Blood Vessel Centerlines"), tr("Segmented blood vessel centerlines.")));
 	valueHelpPairs.push_back(std::make_pair(tr("Blood Vessels Mesh"), tr("Segmented blood vessels in the lungs.")));
@@ -684,6 +703,11 @@ void AirwaysFilter::createOutputTypes()
 void AirwaysFilter::setAirwaySegmentation(bool airwaySegmentation)
 {
     mAirwaySegmentationOption->setValue(airwaySegmentation);
+}
+
+void AirwaysFilter::setColoringAirways(bool coloringAirways)
+{
+	mColoredAirwaysOption->setValue(coloringAirways);
 }
 
 void AirwaysFilter::setVesselSegmentation(bool vesselSegmentation)
@@ -722,6 +746,17 @@ BoolPropertyPtr AirwaysFilter::getAirwayTubesGenerationOption(QDomElement root)
 				"Selecting this option will generate artificial airway tubes for virtual bronchoscopy",
 				true, root);
 	return mAirwayTubesGenerationOption;
+
+}
+
+BoolPropertyPtr AirwaysFilter::getColoredAirwaysOption(QDomElement root)
+{
+	mColoredAirwaysOption = BoolProperty::initialize(
+				"Add color specter to airway tubes",
+				"",
+				"Selecting this option will add a random color specter to the airway tubes using the filter Color Variation",
+				true, root);
+	return mColoredAirwaysOption;
 
 }
 

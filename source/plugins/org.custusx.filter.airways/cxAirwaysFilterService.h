@@ -62,8 +62,9 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
-    void setAirwaySegmentation(bool airwaySegmentation);
-    void setVesselSegmentation(bool vesselSegmentation);
+	void setAirwaySegmentation(bool airwaySegmentation);
+	void setColoringAirways(bool coloringAirways);
+	void setVesselSegmentation(bool vesselSegmentation);
 
 protected:
 	void segmentAirways(fast::ImageFileImporter::pointer importerPtr);
@@ -85,11 +86,13 @@ private:
 	BoolPropertyPtr getManualSeedPointOption(QDomElement root);
 	BoolPropertyPtr getAirwaySegmentationOption(QDomElement root);
 	BoolPropertyPtr getAirwayTubesGenerationOption(QDomElement root);
+	BoolPropertyPtr getColoredAirwaysOption(QDomElement root);
 	BoolPropertyPtr getLungSegmentationOption(QDomElement root);
 	BoolPropertyPtr getVesselSegmentationOption(QDomElement root);
 	BoolPropertyPtr getVesselCenterlineOption(QDomElement root);
 	BoolPropertyPtr getVesselVolumeOption(QDomElement root);
 	void createAirwaysFromCenterline();
+	void createColoredAirways();
 
 	vtkImageDataPtr mAirwaySegmentationOutput;
 	vtkPolyDataPtr mAirwayCenterlineOutput;
@@ -103,6 +106,7 @@ private:
 	BoolPropertyPtr mManualSeedPointOption;
 	BoolPropertyPtr mAirwaySegmentationOption;
 	BoolPropertyPtr mAirwayTubesGenerationOption;
+	BoolPropertyPtr mColoredAirwaysOption;
 	BoolPropertyPtr mLungSegmentationOption;
     BoolPropertyPtr mVesselSegmentationOption;
 	BoolPropertyPtr mVesselCenterlineOption;
