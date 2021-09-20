@@ -38,7 +38,8 @@ Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
   mMuted(true),
   mChannel("console")
 {
-	this->setThreadName();
+	mThread = "NotUsed";
+	//this->setThreadName(); //Cause crash on Ubuntu 20.04, when calling QApplication::instance()->thread()
 }
 
 Message::~Message()
