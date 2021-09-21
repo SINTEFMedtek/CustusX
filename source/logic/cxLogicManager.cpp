@@ -79,14 +79,18 @@ void LogicManager::shutdown()
 	//Running
 	//ninja && ./bin/Catch [unit]~[hide]
 	//cause only 5 tests to fail. No segfaults after the current code fixes
+	//But running a single test like
+	//./bin/Catch "StreamerService: Service available"
+	//Cause the above seg. fault.
 
 	//Replacing the 3 lines with this seems to fix the test seg.faults on Ubuntu 20.04, but may still cause issues with the other platforms (not verified yet)
-	//LogicManager::getInstance()->shutdownLegacyStoredServices();
+
+	LogicManager::getInstance()->shutdownLegacyStoredServices();
 
 	//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
-	LogicManager::getInstance()->shutdownServices();
-	delete mInstance;
-	mInstance = NULL;
+	//LogicManager::getInstance()->shutdownServices();
+	//delete mInstance;
+	//mInstance = NULL;
 }
 
 void LogicManager::initializeServices()
