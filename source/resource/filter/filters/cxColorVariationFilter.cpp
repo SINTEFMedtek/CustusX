@@ -54,11 +54,11 @@ QString ColorVariationFilter::getNameSuffixColorVariation()
 
 QString ColorVariationFilter::getHelp() const
 {
-	return "A filter to create variation of colors to a mesh.\n"
-					"The variation is be applied as a normal distributin\n"
-					"with the original color as mean.";
+	return "A filter to create variation of colors to a mesh. \n"
+					"The variation is applied as a normal distributin \n"
+					"with the original color as mean. A filter \n"
+					"is applied for smooth color transitions.";
 }
-
 
 DoublePropertyPtr ColorVariationFilter::getGlobalVarianceOption(QDomElement root)
 {
