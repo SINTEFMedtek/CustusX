@@ -116,7 +116,7 @@ bool ColorVariationFilter::execute()
 	
 	double globaleVatiance = this->getGlobalVarianceOption(mOptions)->getValue();
 	double localeVatiance = this->getLocalVarianceOption(mOptions)->getValue();
-	double smoothingIterations = this->getSmoothingOption(mOptions)->getValue();
+	int smoothingIterations = int(this->getSmoothingOption(mOptions)->getValue());
 	
 	mOutputMesh = this->execute(inputMesh, globaleVatiance, localeVatiance, smoothingIterations);
 
@@ -170,17 +170,17 @@ void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
 	mPolyToPointsArray.clear();
 	mPointToPolysArray.clear();
 
-	int numberOfCells = polyData->GetNumberOfCells();
+	vtkIdType numberOfCells = polyData->GetNumberOfCells();
 
-	std::vector<std::vector<int>> pointToPolysArray(polyData->GetNumberOfPoints());
+	std::vector<std::vector<vtkIdType>> pointToPolysArray(polyData->GetNumberOfPoints());
 	for(vtkIdType i = 0; i < numberOfCells; i++)
 	{
 		vtkIdListPtr points = polyData->GetCell(i)->GetPointIds();
-		int numberOfIds = points->GetNumberOfIds();
-		std::vector<int> pointsArray;
+		vtkIdType numberOfIds = points->GetNumberOfIds();
+		std::vector<vtkIdType> pointsArray;
 		for(vtkIdType j = 0; j < numberOfIds; j++)
 		{
-			int p = points->GetId(j);
+			vtkIdType p = points->GetId(j);
 			pointsArray.push_back(p);
 			pointToPolysArray[p].push_back(i);
 		}
@@ -224,18 +224,18 @@ vtkUnsignedCharArrayPtr ColorVariationFilter::colorPolyData(MeshPtr mesh)
 void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, double G, double B)
 {
 
-	std::vector<int> polyIndexColoringQueue = this->applyColorAndFindNeighbours(startIndex, R, G, B);
+	std::vector<vtkIdType> polyIndexColoringQueue = this->applyColorAndFindNeighbours(startIndex, R, G, B);
 	std::vector<double> color {R, G, B};
 	std::vector<std::vector<double>> polyColorColoringQueue(polyIndexColoringQueue.size(), color);
 
 	while(!polyIndexColoringQueue.empty())
 	{
-		std::vector<int> neighbourPointsList = mPolyToPointsArray[polyIndexColoringQueue[0]]; //Prosess first index in FIFO queue
+		std::vector<vtkIdType> neighbourPointsList = mPolyToPointsArray[polyIndexColoringQueue[0]]; //Prosess first index in FIFO queue
 
 		for(int i=0; i<neighbourPointsList.size(); i++)
 		{
 			std::vector<double> newColor = generateColor(polyColorColoringQueue[0][0], polyColorColoringQueue[0][1], polyColorColoringQueue[0][2]);
-			std::vector<int> polyIndexToColor = this->applyColorAndFindNeighbours(neighbourPointsList[i], newColor[0], newColor[1], newColor[2]);
+			std::vector<vtkIdType> polyIndexToColor = this->applyColorAndFindNeighbours(neighbourPointsList[i], newColor[0], newColor[1], newColor[2]);
 			polyIndexColoringQueue.insert(polyIndexColoringQueue.end(), polyIndexToColor.begin(), polyIndexToColor.end());
 			fill_n(back_inserter(polyColorColoringQueue), polyIndexToColor.size(), newColor);
 		}
@@ -244,9 +244,9 @@ void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, 
 	}
 }
 
-std::vector<int> ColorVariationFilter::applyColorAndFindNeighbours(int pointIndex, double R, double G, double B)
+std::vector<vtkIdType> ColorVariationFilter::applyColorAndFindNeighbours(int pointIndex, double R, double G, double B)
 {
-	std::vector<int> neighbourPolysList = mPointToPolysArray[pointIndex];
+	std::vector<vtkIdType> neighbourPolysList = mPointToPolysArray[pointIndex];
 	std::vector<int> removeIndexList;
 
 	for(int i=0; i<neighbourPolysList.size(); i++)
@@ -306,11 +306,11 @@ void ColorVariationFilter::smoothColorsInMesh(int iterations)
 	
 		for(int i=0; i<numberofPolys; i++)
 		{
-			std::vector<int> connectedPoints = mPolyToPointsArray[i];
+			std::vector<vtkIdType> connectedPoints = mPolyToPointsArray[i];
 			std::vector<int> neighbourPolys;
 			for(int j=0; j<connectedPoints.size(); j++)
 			{
-				std::vector<int> newNeighbours = mPointToPolysArray[connectedPoints[j]];
+				std::vector<vtkIdType> newNeighbours = mPointToPolysArray[connectedPoints[j]];
 				neighbourPolys.insert(neighbourPolys.end(), newNeighbours.begin(), newNeighbours.end());
 			}
 			neighbourPolys.erase( unique( neighbourPolys.begin(), neighbourPolys.end() ), neighbourPolys.end() );// remove duplicates

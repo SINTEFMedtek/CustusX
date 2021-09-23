@@ -55,15 +55,15 @@ private:
 	void sortPolyData(vtkPolyDataPtr polyData);
 	vtkUnsignedCharArrayPtr colorPolyData(MeshPtr mesh);
 	void applyColorToNeighbourPolys(int startIndex, double R, double G, double B);
-	std::vector<int> applyColorAndFindNeighbours(int pointIndex, double R, double G, double B);
+	std::vector<vtkIdType> applyColorAndFindNeighbours(int pointIndex, double R, double G, double B);
 	void generateColorDistribution();
 	std::vector<double> generateColor(double R, double G, double B);
 	void smoothColorsInMesh(int iterations = 1);
 
 	MeshPtr mOutputMesh;
 	vtkUnsignedCharArrayPtr mColors;
-	std::vector<std::vector<int>> mPolyToPointsArray;
-	std::vector<std::vector<int>> mPointToPolysArray;
+	std::vector<std::vector<vtkIdType>> mPolyToPointsArray;
+	std::vector<std::vector<vtkIdType>> mPointToPolysArray;
 	std::vector<bool> mAssignedColorValues;
 	double mGlobalVariance;
 	double mLocalVariance;
