@@ -58,7 +58,7 @@ public:
 	virtual QString getName() const;
 	virtual QString getHelp() const;
 
-    bool preProcess();
+	bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
 
@@ -108,7 +108,7 @@ private:
 	BoolPropertyPtr mAirwayTubesGenerationOption;
 	BoolPropertyPtr mColoredAirwaysOption;
 	BoolPropertyPtr mLungSegmentationOption;
-    BoolPropertyPtr mVesselSegmentationOption;
+	BoolPropertyPtr mVesselSegmentationOption;
 	BoolPropertyPtr mVesselCenterlineOption;
 	BoolPropertyPtr mVesselVolumeOption;
 };
