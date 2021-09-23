@@ -172,19 +172,21 @@ void ColorVariationFilter::sortPolyData(vtkPolyDataPtr polyData)
 
 	vtkIdType numberOfCells = polyData->GetNumberOfCells();
 
+	mPolyToPointsArray = std::vector<std::vector<vtkIdType>>(numberOfCells);
+
 	std::vector<std::vector<vtkIdType>> pointToPolysArray(polyData->GetNumberOfPoints());
 	for(vtkIdType i = 0; i < numberOfCells; i++)
 	{
 		vtkIdListPtr points = polyData->GetCell(i)->GetPointIds();
 		vtkIdType numberOfIds = points->GetNumberOfIds();
-		std::vector<vtkIdType> pointsArray;
+		std::vector<vtkIdType> pointsArray(numberOfIds);
 		for(vtkIdType j = 0; j < numberOfIds; j++)
 		{
 			vtkIdType p = points->GetId(j);
-			pointsArray.push_back(p);
-			pointToPolysArray[p].push_back(i);
+			pointsArray[j]= p;
+			pointToPolysArray[p].resize(pointToPolysArray[p].size()+1, i);
 		}
-		mPolyToPointsArray.push_back(pointsArray);
+		mPolyToPointsArray[i] = pointsArray;
 	}
 	mPointToPolysArray = pointToPolysArray;
 
