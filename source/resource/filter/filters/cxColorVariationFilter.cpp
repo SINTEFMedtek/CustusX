@@ -239,7 +239,7 @@ void ColorVariationFilter::applyColorToNeighbourPolys(int startIndex, double R, 
 			std::vector<double> newColor = generateColor(polyColorColoringQueue[0][0], polyColorColoringQueue[0][1], polyColorColoringQueue[0][2]);
 			std::vector<vtkIdType> polyIndexToColor = this->applyColorAndFindNeighbours(neighbourPointsList[i], newColor[0], newColor[1], newColor[2]);
 			polyIndexColoringQueue.insert(polyIndexColoringQueue.end(), polyIndexToColor.begin(), polyIndexToColor.end());
-			fill_n(back_inserter(polyColorColoringQueue), polyIndexToColor.size(), newColor);
+			polyColorColoringQueue.resize(polyColorColoringQueue.size()+polyIndexToColor.size(), newColor);
 		}
 		polyIndexColoringQueue.erase(polyIndexColoringQueue.begin());
 		polyColorColoringQueue.erase(polyColorColoringQueue.begin());
