@@ -91,6 +91,21 @@ of the algorithm described in:
     Computer Vision, Graphics, and Image Processing, 56(6):462--478, 1994.
 
 
+\addindex color_variation_filter
+Color Variation Filter {#org_custusx_resource_filter_color_variation}
+===========================================================
+
+*Makes a variation in the mesh color*
+
+This filter creates a mesh where the color to each polygon is
+assigned in its .vtk file. The colors are assigned as normal
+distributions with its original color (r,g,b: 0-255) as mean.
+
+Options:
+- Global variance: The variance of the normal distribution
+- Local variance: The maximum color step between two neighbour polygons
+- Smoothing: Number of smooting iterations to remove sharp color transitions
+
 \addtogroup cx_user_doc_group_filter
 
 * \ref org_custusx_resource_filter_dilation
@@ -98,4 +113,5 @@ of the algorithm described in:
 * \ref org_custusx_resource_filter_resample_image
 * \ref org_custusx_resource_filter_smoothing_image
 * \ref org_custusx_resource_filter_binary_threshold_image
+* \ref org_custusx_resource_filter_color_variation
 
