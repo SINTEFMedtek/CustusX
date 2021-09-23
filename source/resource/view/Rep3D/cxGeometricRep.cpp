@@ -126,14 +126,13 @@ void GraphicalGeometric::meshChangedSlot()
 	{
 		mGraphicalPolyDataPtr->setScalarVisibility(true);
 		mGraphicalPolyDataPtr->setScalarModeToUseCellData();
-		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 	}
 	else
 	{
 		mGraphicalPolyDataPtr->setScalarVisibility(false);
 		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-		mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 	}
+	mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 
 	//Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
