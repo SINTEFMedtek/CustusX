@@ -75,7 +75,6 @@ void LogicManager::shutdown()
 //#8  0x00007f1fc3f034f3 in cxtest::CatchImpl::run(int, char**) (this=0x7fffdb745520, argc=2, argv=0x7fffdb745648) at /home/olevs/dev/cx/CX/CX/source/testing/cxtestCatchImpl.cpp:30
 //#9  0x0000000000406926 in main(int, char**) (argc=2, argv=0x7fffdb745648) at /home/olevs/dev/cx/CX/CX/source/testing/cxtestCatchMain.cpp:59
 
-
 	//Running
 	//ninja && ./bin/Catch [unit]~[hide]
 	//cause only 5 tests to fail. No segfaults after the current code fixes
@@ -83,14 +82,13 @@ void LogicManager::shutdown()
 	//./bin/Catch "StreamerService: Service available"
 	//Cause the above seg. fault.
 
-	//Replacing the 3 lines with this seems to fix the test seg.faults on Ubuntu 20.04, but may still cause issues with the other platforms (not verified yet)
-
-	LogicManager::getInstance()->shutdownLegacyStoredServices();
+	//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
+	//LogicManager::getInstance()->shutdownLegacyStoredServices();
 
 	//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
-	//LogicManager::getInstance()->shutdownServices();
-	//delete mInstance;
-	//mInstance = NULL;
+	LogicManager::getInstance()->shutdownServices();
+	delete mInstance;
+	mInstance = NULL;
 }
 
 void LogicManager::initializeServices()
