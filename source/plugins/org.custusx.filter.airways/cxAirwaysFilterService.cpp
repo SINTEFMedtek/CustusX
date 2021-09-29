@@ -560,7 +560,8 @@ bool AirwaysFilter::postProcessVessels()
 
 	// Add contour internally to cx(
 	QColor color = QColor("blue");
-	color.setAlpha(128);
+	color.setAlpha(255);
+
 	MeshPtr contour = ContourFilter::postProcess(
 			patientService(),
 			rawContour,
