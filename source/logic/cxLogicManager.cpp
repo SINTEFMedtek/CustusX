@@ -10,6 +10,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include <cxLogicManager.h>
 
+#include <sys/utsname.h>
+
 #include <QApplication>
 #include <ctkPluginContext.h>
 #include "cxLogger.h"
@@ -82,13 +84,30 @@ void LogicManager::shutdown()
 	//./bin/Catch "StreamerService: Service available"
 	//Cause the above seg. fault.
 
-	//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
-	//LogicManager::getInstance()->shutdownLegacyStoredServices();
+	if (isUbuntu2004())
+	{
+		//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
+		LogicManager::getInstance()->shutdownLegacyStoredServices();
+	}
+	else
+	{
+		//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
+		LogicManager::getInstance()->shutdownServices();
+		delete mInstance;
+		mInstance = NULL;
+	}
+}
 
-	//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
-	LogicManager::getInstance()->shutdownServices();
-	delete mInstance;
-	mInstance = NULL;
+bool LogicManager::isUbuntu2004()
+{
+	struct utsname uname_pointer;
+	uname(&uname_pointer);
+	QString systemVersion(uname_pointer.version);
+	//CX_LOG_DEBUG() << "System version: " << systemVersion;
+	if(systemVersion.contains("Ubuntu") && systemVersion.contains("20.04"))
+		return true;
+	else
+		return false;
 }
 
 void LogicManager::initializeServices()

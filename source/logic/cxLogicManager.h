@@ -84,6 +84,12 @@ public:
 	*/
   static void shutdown();
 
+
+  /**
+   * Detect if we are compiling on Ubuntu 20.04
+   */
+  static bool isUbuntu2004();
+
   /**
    * Set an application component, intended to encapsulate the application's
    * main window or similar. Must be called after initialize.
