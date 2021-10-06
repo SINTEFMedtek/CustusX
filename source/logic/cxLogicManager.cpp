@@ -112,7 +112,16 @@ bool LogicManager::isUbuntu2004()
 
 	QString systemVersion(uname_pointer.version);
 	//CX_LOG_DEBUG() << "System version: " << systemVersion;
-	if(systemVersion.contains("Ubuntu") && systemVersion.contains("20.04"))
+
+	if(!systemVersion.contains("Ubuntu"))
+		return false;
+
+	// 5.4 is the system kernel for Ubuntu 20.04, but for some reason later installations comes with 5.11 (the kernel for 21.04)
+	// In this case the uname_pointer.version string seems to contain 20.04
+	QString systemKernel(uname_pointer.release);
+	if(systemVersion.contains("20.04")) //For new installations of 20.04, with the "21.04 kernel"
+		return true;
+	else if (systemKernel.contains("5.4.")) //For old installations, with the original kernel
 		return true;
 	else
 		return false;
