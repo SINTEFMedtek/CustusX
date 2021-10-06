@@ -10,7 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include <cxLogicManager.h>
 
+#ifndef CX_WINDOWS
 #include <sys/utsname.h>
+#endif
 
 #include <QApplication>
 #include <ctkPluginContext.h>
@@ -87,6 +89,7 @@ void LogicManager::shutdown()
 	if (isUbuntu2004())
 	{
 		//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
+		CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
 		LogicManager::getInstance()->shutdownLegacyStoredServices();
 	}
 	else
@@ -100,14 +103,20 @@ void LogicManager::shutdown()
 
 bool LogicManager::isUbuntu2004()
 {
+#ifdef CX_WINDOWS
+	return false;
+#else
 	struct utsname uname_pointer;
 	uname(&uname_pointer);
+	CX_LOG_DEBUG() << "System info: " << uname_pointer.sysname << ", " << uname_pointer.version << ", " << uname_pointer.release;
+
 	QString systemVersion(uname_pointer.version);
 	//CX_LOG_DEBUG() << "System version: " << systemVersion;
 	if(systemVersion.contains("Ubuntu") && systemVersion.contains("20.04"))
 		return true;
 	else
 		return false;
+#endif
 }
 
 void LogicManager::initializeServices()
