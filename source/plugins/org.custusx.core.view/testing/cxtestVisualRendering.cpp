@@ -83,7 +83,7 @@ void testACSWith3GPUVolumes()
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
-		fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
+//		/fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
 		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.85);
 	}
 	
