@@ -95,3 +95,6 @@ sudo apt-get install -y libboost-all-dev libcppunit-dev libglew-dev vlc
 
 #For running tests: issue with missing lxml
 sudo apt-get install -y python3-lxml
+
+#For enabling vlc integration, and showing the H.264 encoded video from VLC
+sudo apt install -y vlc-plugin-access-extra gstreamer1.0-libav
