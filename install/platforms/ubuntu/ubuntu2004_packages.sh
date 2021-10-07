@@ -89,3 +89,5 @@ sudo apt install nvidia-opencl-dev
 #Needed to reinstall Boost, cppunit and glew:
 sudo apt-get install -y libboost-all-dev libcppunit-dev libglew-dev
 
+#For running tests. VLC, and issue with missing lxml
+sudo apt-get install -y python3-lxml vlc
