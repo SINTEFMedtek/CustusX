@@ -83,8 +83,8 @@ void testACSWith3GPUVolumes()
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
-//		fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
-		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.88);
+		fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.85);
 	}
 	
 	CHECK_FALSE(fixture.messageListenerContainErrors());
@@ -361,7 +361,7 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes",
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
-		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.9);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.88);
 	}
 	
 	CHECK_FALSE(fixture.messageListenerContainErrors());
