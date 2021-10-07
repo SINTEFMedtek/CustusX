@@ -124,6 +124,11 @@ void GraphicalGeometricBase::setScalarVisibility(bool show)
 	getMapper()->SetScalarVisibility(show);
 }
 
+void GraphicalGeometricBase::setScalarModeToUseCellData()
+{
+	getMapper()->SetScalarModeToUseCellData();
+}
+
 Vector3D GraphicalGeometricBase::getPosition() const
 {
 	return Vector3D(mActor->GetPosition());

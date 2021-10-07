@@ -213,6 +213,11 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 	{
 		return "_tubes";
 	}
+	
+	static QString airwaysFilterGetNameSuffixColored()
+	{
+		return "_colored";
+	}
 
 	static QString airwaysFilterGetNameSuffixLungs()
 	{
