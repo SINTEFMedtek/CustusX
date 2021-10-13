@@ -65,7 +65,7 @@ public:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	virtual void setVisible(bool vis);
 	
-	virtual QString getBaseToolUid();
+	virtual ToolPtr getBaseTool();
 
 	virtual bool isNull();
 

@@ -94,9 +94,9 @@ Transform3D ToolImpl::get_prMt() const
 	return m_prMt;
 }
 
-QString ToolImpl::getBaseToolUid()
+ToolPtr ToolImpl::getBaseTool()
 {
-	return this->getUid();
+	return ToolPtr();
 }
 
 void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)

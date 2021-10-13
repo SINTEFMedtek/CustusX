@@ -125,9 +125,9 @@ void ToolNull::setVisible(bool vis)
 	Q_UNUSED(vis);
 }
 
-QString ToolNull::getBaseToolUid()
+ToolPtr ToolNull::getBaseTool()
 {
-	return "";
+	return ToolPtr();
 }
 
 bool ToolNull::isNull()

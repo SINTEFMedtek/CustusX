@@ -129,7 +129,7 @@ public:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp=-1) = 0; ///< if available for this type, set pos, ts<0 means use current time
 	virtual void setVisible(bool vis) = 0; ///< if available for this type, set visibility
 
-	virtual QString getBaseToolUid() = 0;
+	virtual ToolPtr getBaseTool() = 0;
 	
 	virtual bool isNull() = 0;
 	static ToolPtr getNullObject();

@@ -59,7 +59,7 @@ void ToolManualCalibrationWidget::toolCalibrationChanged()
 	ToolPtr tool = mTool->getTool();
   if (!tool)
     return;
-	ToolPtr baseTool = this->getBaseTool(tool);
+	ToolPtr baseTool = tool->getBaseTool();
 	if (baseTool)
 		tool = baseTool;
 
@@ -73,25 +73,12 @@ void ToolManualCalibrationWidget::matrixWidgetChanged()
 	ToolPtr tool = mTool->getTool();
 	if (!tool)
       return;
-	ToolPtr baseTool = this->getBaseTool(tool);
+	ToolPtr baseTool = tool->getBaseTool();
 	if (baseTool)
 		tool = baseTool;
 
   Transform3D M = mMatrixWidget->getMatrix();
   tool->setCalibration_sMt(M);
 }
-
-ToolPtr ToolManualCalibrationWidget::getBaseTool(ToolPtr tool)
-{
-	ToolPtr baseTool;
-	QString baseToolUid = tool->getBaseToolUid();
-	baseTool = mServices->tracking()->getTool(baseToolUid);
-	if (!baseTool)
-		CX_LOG_DEBUG() << "Base tool not found.";
-	
-	return baseTool;
-}
-
-
 
 }

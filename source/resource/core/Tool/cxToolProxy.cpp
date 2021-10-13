@@ -182,9 +182,9 @@ void ToolProxy::setVisible(bool vis)
 	mTool->setVisible(vis);
 }
 
-QString ToolProxy::getBaseToolUid()
+ToolPtr ToolProxy::getBaseTool()
 {
-	return mTool->getBaseToolUid();
+	return mTool->getBaseTool();
 }
 
 

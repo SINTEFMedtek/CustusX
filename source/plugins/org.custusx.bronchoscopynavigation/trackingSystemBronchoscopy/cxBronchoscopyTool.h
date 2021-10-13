@@ -83,7 +83,7 @@ public:
 	virtual void setVisible(bool vis);
 
 	// extensions
-	QString getBaseToolUid() { return mBase->getUid(); }
+	ToolPtr getBaseTool() { return mBase; }
 
 private:
 	ToolPtr mBase;
