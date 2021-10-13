@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
 #include "cxStringPropertySelectTool.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -58,7 +59,7 @@ void ToolManualCalibrationWidget::toolCalibrationChanged()
 	ToolPtr tool = mTool->getTool();
   if (!tool)
     return;
-	ToolPtr baseTool = tool->getBaseTool();
+	ToolPtr baseTool = this->getBaseTool(tool);
 	if (baseTool)
 		tool = baseTool;
 
@@ -72,9 +73,23 @@ void ToolManualCalibrationWidget::matrixWidgetChanged()
 	ToolPtr tool = mTool->getTool();
 	if (!tool)
       return;
+	ToolPtr baseTool = this->getBaseTool(tool);
+	if (baseTool)
+		tool = baseTool;
 
   Transform3D M = mMatrixWidget->getMatrix();
   tool->setCalibration_sMt(M);
+}
+
+ToolPtr ToolManualCalibrationWidget::getBaseTool(ToolPtr tool)
+{
+	ToolPtr baseTool;
+	QString baseToolUid = tool->getBaseToolUid();
+	baseTool = mServices->tracking()->getTool(baseToolUid);
+	if (!baseTool)
+		CX_LOG_DEBUG() << "Base tool not found.";
+	
+	return baseTool;
 }
 
 

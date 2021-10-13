@@ -20,6 +20,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
 /**
  * \file
  * \addtogroup org_custusx_calibration
@@ -42,6 +43,8 @@ private slots:
   void matrixWidgetChanged();
 
 private:
+	ToolPtr getBaseTool(ToolPtr tool);
+	
   QGroupBox* mGroup;
   Transform3DWidget* mMatrixWidget;
   StringPropertySelectToolPtr mTool;
