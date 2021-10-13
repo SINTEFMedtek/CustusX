@@ -58,6 +58,9 @@ void ToolManualCalibrationWidget::toolCalibrationChanged()
 	ToolPtr tool = mTool->getTool();
   if (!tool)
     return;
+	ToolPtr baseTool = tool->getBaseTool();
+	if (baseTool)
+		tool = baseTool;
 
   mMatrixWidget->blockSignals(true);
   mMatrixWidget->setMatrix(tool->getCalibration_sMt());

@@ -94,6 +94,11 @@ Transform3D ToolImpl::get_prMt() const
 	return m_prMt;
 }
 
+ToolPtr ToolImpl::getBaseTool()
+{
+	return ToolPtr(this);
+}
+
 void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 {
 	if (mPositionHistory->count(timestamp))

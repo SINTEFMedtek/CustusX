@@ -37,6 +37,7 @@ public:
 	virtual TimedTransformMapPtr getPositionHistory();
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
 	virtual Transform3D get_prMt() const;
+	virtual ToolPtr getBaseTool();
 
 	virtual ToolPositionMetadata getMetadata() const;
 	virtual const std::map<double, ToolPositionMetadata>& getMetadataHistory();

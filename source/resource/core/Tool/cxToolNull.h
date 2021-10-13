@@ -57,6 +57,8 @@ public:
 
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	virtual void setVisible(bool vis);
+	
+	virtual ToolPtr getBaseTool();
 
 	virtual bool isNull();
 	static ToolPtr getNullObject();
