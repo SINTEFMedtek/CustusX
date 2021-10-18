@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
+#include "cxVirtualCameraRotationWidget.h"
 
 namespace cx
 {
@@ -112,7 +113,9 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(VisServicesPtr servic
 	mVerticalLayout->addWidget(mEnableButton);
 	mVerticalLayout->addWidget(mDisableButton);
 	mVerticalLayout->addStretch();
-
+	mVerticalLayout->addWidget(new VirtualCameraRotationWidget(services, this));
+	mVerticalLayout->addStretch();
+	
     mEnableButton->setEnabled(false);
     mDisableButton->setEnabled(false);
     this->showAdvancedOptionsSlot();
