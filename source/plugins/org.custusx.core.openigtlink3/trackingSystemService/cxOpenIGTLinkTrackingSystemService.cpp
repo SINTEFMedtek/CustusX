@@ -148,13 +148,13 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 	this->setState(Tool::tsINITIALIZED);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
+void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestampMS)
 {
 //	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	if(tool)
 	{
-		tool->toolTransformAndTimestampSlot(transform, timestamp);
+		tool->toolTransformAndTimestampSlot(transform, timestampMS);
 	}
 }
 

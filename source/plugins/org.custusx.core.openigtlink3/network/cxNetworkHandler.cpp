@@ -35,7 +35,8 @@ namespace cx
 
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
-	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages))
+	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages)),
+	mGotTimeOffset(false)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -72,6 +73,44 @@ void NetworkHandler::disconnectFromServer()
 	mProbeDefinitionFromStringMessages->reset();
 }
 
+void NetworkHandler::clearTimestampSynchronization()
+{
+	mGotTimeOffset = false;
+};
+
+double NetworkHandler::synchronizedTimestamp(double receivedTimestampSec)
+{
+	double receivedTimestampMS = receivedTimestampSec * 1000;
+	if(!mGotTimeOffset)
+	{
+		qint64 systemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+		mTimestampOffsetMS = systemTime - receivedTimestampMS;
+		CX_LOG_DEBUG() << "NetworkHandler: Doing timestamp synchronization - adding fixed offset of " << mTimestampOffsetMS << " ms";
+		mGotTimeOffset = true;
+	}
+	receivedTimestampMS = receivedTimestampMS + mTimestampOffsetMS;
+
+	verifyTimestamp(receivedTimestampMS);
+	return receivedTimestampMS;
+}
+
+
+bool NetworkHandler::verifyTimestamp(double &timestampMS)
+{
+	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double diff = timestampMS - latestSystemTime;
+	if(fabs(diff) > 1000)
+	{
+		CX_LOG_WARNING() << "NetworkHandler: Detected difference between system time and timestamp after synchronization. Difference: " << diff
+						 << " The reason for this may be messages with different timestamp formats. "
+						 << " System time will be used instead of received timestamp.";
+		timestampMS = latestSystemTime;
+		return false;
+	}
+
+	return true;
+}
+
 void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
 	Q_UNUSED(unknown);
@@ -80,6 +119,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
+
+	double timestampMS = synchronizedTimestamp(header.timestamp);
+
 
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
@@ -97,8 +139,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //		QString deviceName(header.deviceName.c_str());
 //		QString deviceName(header.equipmentId.c_str());//Use equipmentId
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
-		// get timestamp from igtl second-format:;
-		double timestampMS = header.timestamp * 1000;
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
 		//this->decode_rMd(msg, retval);
 
@@ -171,10 +211,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //										<< " deviceName: " << deviceName
 //										<< " transform: " << cxtransform;
 
-		double timestamp = header.timestamp;
-//		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
-		//test: Set all messages as type TRACKED_US_PROBE for now
-//		emit transform(deviceName, igtlioBaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
 
 		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
 		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
@@ -183,9 +219,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
 
 		if (gotTransformId)
-			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestamp);
+			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestampMS);
 		else
-			emit transform(deviceName, cxtransform, timestamp);
+			emit transform(deviceName, cxtransform, timestampMS);
 	}
 	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{

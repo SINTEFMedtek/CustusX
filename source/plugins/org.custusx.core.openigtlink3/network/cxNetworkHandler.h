@@ -40,6 +40,8 @@ public:
 	igtlioSessionPointer requestConnectToServer(std::string serverHost, int serverPort=-1, IGTLIO_SYNCHRONIZATION_TYPE sync=IGTLIO_BLOCKING, double timeout_s=5);
 	void disconnectFromServer();
 
+	void clearTimestampSynchronization();
+
 signals:
 	void connected();
 	void disconnected();
@@ -66,6 +68,13 @@ private:
 	igtlioSessionPointer mSession;
 	QTimer *mTimer;
 	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
+
+	bool mGotTimeOffset;
+	double mTimestampOffsetMS;
+
+protected:
+	double synchronizedTimestamp(double receivedTimestampSec);///Synchronize with system clock: Calculate a fixed offset, and apply this to all timestamps
+	bool verifyTimestamp(double &timestampMS);
 };
 
 } // namespace cx

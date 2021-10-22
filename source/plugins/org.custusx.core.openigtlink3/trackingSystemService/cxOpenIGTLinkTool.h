@@ -79,7 +79,7 @@ public:
 protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:
-    void toolTransformAndTimestampSlot(Transform3D prMs, double timestamp); ///< timestamp is in milliseconds
+	void toolTransformAndTimestampSlot(Transform3D prMs, double timestampMS);
     void calculateTpsSlot();
     void toolVisibleSlot(bool);
 

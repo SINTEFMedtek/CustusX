@@ -58,7 +58,7 @@ private slots:
 	void serverIsConnected();
 	void serverIsDisconnected();
 
-	void receiveTransform(QString devicename, Transform3D transform, double timestamp);
+	void receiveTransform(QString devicename, Transform3D transform, double timestampMS);
 	void receiveCalibration(QString devicename, Transform3D calibration);
 	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 

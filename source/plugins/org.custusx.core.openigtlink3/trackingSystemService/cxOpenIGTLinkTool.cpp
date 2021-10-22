@@ -135,13 +135,9 @@ void OpenIGTLinkTool::setCalibration_sMt(Transform3D sMt)
 //	mInternalStructure.saveCalibrationToFile();
 }
 
-void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestamp)
+void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double timestampMS)
 {
-	// TODO: Fix use of OpenIGTLink timestamp. Task CX-334
-	// OpenIGTLink timestamp should be in seconds: https://github.com/openigtlink/OpenIGTLink/blob/master/Documents/Protocol/timestamp.md
-	// The below line should be (this needs to be tested/verified):
-	//mTimestamp = timestamp / 1000
-	mTimestamp = timestamp * 1000;
+	mTimestamp = timestampMS;
 	this->checkTimestampMismatch();
 
 	//TODO: Make sure this is the way we want to handle this
