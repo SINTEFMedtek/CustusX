@@ -83,6 +83,8 @@ void CameraData::parseXml(QDomNode dataNode)
 		return;
 	if (fabs(parallelScale) > LARGE_NUMBER)
 		return;
+	if(similar(position, focalPoint))
+		return;
 
 	this->getCamera();
 
