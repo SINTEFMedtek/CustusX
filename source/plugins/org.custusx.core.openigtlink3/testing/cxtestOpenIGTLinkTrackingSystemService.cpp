@@ -68,6 +68,10 @@ public:
 	{
 		return NetworkHandler::verifyTimestamp(timestampMS);
 	}
+    double getTimestampOffset()
+    {
+        return mTimestampOffsetMS;
+    }
 };
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins][org.custusx.core.openigtlink3][unit]")
@@ -175,30 +179,33 @@ TEST_CASE("NetworkHandler: Test timestamp synchronization reset", "[plugins][org
 	TestNetworkHandler* networkHandler = new TestNetworkHandler();
 
 	double tolerance = 10;
-	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double timestampSec = 1000;
 
 	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-	double offset = 0.020;
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec + offset);
-	REQUIRE_FALSE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime + offset*1000, tolerance));
+    REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 
-	timestampSec = 3000;
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);//A time difference of more than 1 sec will set timestamp to system time
-	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-	{
-		INFO(qstring_cast(synchedTimeMs)+" == "+qstring_cast(latestSystemTime));
-		REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-	}
-	double timestamp = latestSystemTime + timestampSec*1000;
-	REQUIRE_FALSE(networkHandler->verifyTimestamp(timestamp));
 
-	networkHandler->clearTimestampSynchronization();//A timestamp synchronization reset will use the next incoming timestamp as basis for the timestamp offset
-	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
-	timestamp = latestSystemTime + timestampSec*1000;
+    double offset = latestSystemTime - timestampSec*1000;
+    {
+        INFO(qstring_cast(offset)+"=="+qstring_cast(networkHandler->getTimestampOffset()));
+        REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+    }
+
+    networkHandler->clearTimestampSynchronization();
+    REQUIRE_FALSE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+    REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+
+
+    timestampSec = 3000;
+    latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
+    REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+
+    offset = latestSystemTime - timestampSec*1000;
+    REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+
+    delete networkHandler;
 }
 
 #ifdef CX_CUSTUS_SINTEF

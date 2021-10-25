@@ -69,12 +69,13 @@ private:
 	QTimer *mTimer;
 	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
 
-	bool mGotTimeOffset;
-	double mTimestampOffsetMS;
+    bool mGotTimeOffset;
 
 protected:
 	double synchronizedTimestamp(double receivedTimestampSec);///Synchronize with system clock: Calculate a fixed offset, and apply this to all timestamps
 	bool verifyTimestamp(double &timestampMS);
+
+    double mTimestampOffsetMS;
 };
 
 } // namespace cx

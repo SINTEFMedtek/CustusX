@@ -36,7 +36,8 @@ namespace cx
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
 	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages)),
-	mGotTimeOffset(false)
+    mGotTimeOffset(false),
+    mTimestampOffsetMS(0)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -76,6 +77,7 @@ void NetworkHandler::disconnectFromServer()
 void NetworkHandler::clearTimestampSynchronization()
 {
 	mGotTimeOffset = false;
+    mTimestampOffsetMS = 0;
 };
 
 double NetworkHandler::synchronizedTimestamp(double receivedTimestampSec)
