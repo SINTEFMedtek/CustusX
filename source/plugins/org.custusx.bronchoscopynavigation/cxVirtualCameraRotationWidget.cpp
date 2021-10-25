@@ -41,16 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-VirtualCameraRotationWidget::VirtualCameraRotationWidget(VisServicesPtr services, QWidget* parent) :
+VirtualCameraRotationWidget::VirtualCameraRotationWidget(VisServicesPtr services, StringPropertySelectToolPtr toolSelector, QWidget* parent) :
 	QWidget(parent),
-	mVerticalLayout(new QVBoxLayout(this))
+	mVerticalLayout(new QVBoxLayout(this)),
+	mToolSelector(toolSelector)
 {
 	QLabel *title = new QLabel(tr("Virtual Camera Rotation"));
 	title->setStyleSheet("font-weight: bold");
 	mVerticalLayout->addWidget(title,0,Qt::AlignLeft);
 	
-	mToolSelector = StringPropertySelectTool::New(services->tracking());
-	mVerticalLayout->addWidget(sscCreateDataWidget(this, mToolSelector));
+	//mVerticalLayout->addWidget(sscCreateDataWidget(this, mToolSelector));
 	mVerticalLayout->addWidget(new QLabel("<font color=red>Caution: sMt is changed directly by this control.</font>"));
 	
 	QLabel *labelRot = new QLabel(tr("Rotate (360 deg)"));
@@ -81,8 +81,8 @@ QString VirtualCameraRotationWidget::getWidgetName()
 void VirtualCameraRotationWidget::toolCalibrationChanged()
 {
 	ToolPtr tool = mToolSelector->getTool();
-  if (!tool)
-    return;
+	if (!tool)
+		return;
 	ToolPtr baseTool = tool->getBaseTool();
 	if (baseTool)
 		tool = baseTool;
@@ -91,10 +91,8 @@ void VirtualCameraRotationWidget::toolCalibrationChanged()
 
 	mDecomposition.reset(tool->getCalibration_sMt());
 	Vector3D angles = mDecomposition.getAngles();
-	CX_LOG_DEBUG() << "Angles: " << angles;
 	int zAngle = (int) std::round(angles(2)*180/M_PI);
 	mRotateDial->setValue(zAngle);
-	CX_LOG_DEBUG() << "Angle is: " << mRotateDial->value();
 	
 	mRotateDial->blockSignals(false);
 }
@@ -103,7 +101,7 @@ void VirtualCameraRotationWidget::toolRotationChanged()
 {
 	ToolPtr tool = mToolSelector->getTool();
 	if (!tool)
-      return;
+		return;
 	ToolPtr baseTool = tool->getBaseTool();
 	if (baseTool)
 		tool = baseTool;
@@ -115,18 +113,16 @@ void VirtualCameraRotationWidget::toolRotationChanged()
 	mDecomposition.setAngles(angles);
 	M = mDecomposition.getMatrix();	
 	tool->setCalibration_sMt(M);
-	
-	CX_LOG_DEBUG() << "Updated angle: " <<  mRotateDial->value() << " deg / " << zAngleUpdated << " rad";
 }
 
 
 
 QString VirtualCameraRotationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-	  "<h3>VirtualCameraRotationWidget.</h3>"
-	  "<p>Rotates virtual camera (calibration).</p>"
-      "</html>";
+	return	"<html>"
+					"<h3>VirtualCameraRotationWidget.</h3>"
+					"<p>Rotates virtual camera (calibration).</p>"
+					"</html>";
 }
 
 

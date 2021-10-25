@@ -59,7 +59,7 @@ class VirtualCameraRotationWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	VirtualCameraRotationWidget(VisServicesPtr services, QWidget* parent = 0);
+	VirtualCameraRotationWidget(VisServicesPtr services, StringPropertySelectToolPtr toolSelector, QWidget* parent = 0);
 	virtual ~VirtualCameraRotationWidget();
 	QString getWidgetName();
 
