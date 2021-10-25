@@ -694,5 +694,12 @@ TrackerConfigurationPtr TrackingImplService::getConfiguration()
 	return config;
 }
 
+void TrackingImplService::resetTimeSynchronization()
+{
+    for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+    {
+        mTrackingSystems[i]->resetTimeSynchronization();
+    }
+}
 
 } //namespace cx

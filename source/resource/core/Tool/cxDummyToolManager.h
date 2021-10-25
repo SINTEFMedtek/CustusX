@@ -74,6 +74,7 @@ public:
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
+    virtual void resetTimeSynchronization();
 
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;

@@ -149,5 +149,8 @@ std::vector<TrackingSystemServicePtr> DummyToolManager::getTrackingSystems()
 	return std::vector<TrackingSystemServicePtr> ();
 }
 
+void DummyToolManager::resetTimeSynchronization()
+{
+    }
 
 } //namespace cx
