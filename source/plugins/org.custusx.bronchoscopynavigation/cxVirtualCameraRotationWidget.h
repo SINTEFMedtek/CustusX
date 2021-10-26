@@ -30,78 +30,52 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
-#ifndef CXBRONCHOSCOPYNAVIGATIONWIDGET_H_
-#define CXBRONCHOSCOPYNAVIGATIONWIDGET_H_
+#ifndef CXVIRTUALCAMERAROTATIONWIDGET_H_
+#define CXVIRTUALCAMERAROTATIONWIDGET_H_
 
 #include <QtWidgets>
-#include <QWidget>
-#include <QPushButton>
-#include "qdom.h"
-#include "cxRegistrationBaseWidget.h"
-#include "cxResourceWidgetsExport.h"
+#include <QDial>
 #include "cxBaseWidget.h"
-#include "cxSelectDataStringProperty.h"
-#include "cxMesh.h"
-#include "cxXmlOptionItem.h"
-#include "cxCheckBoxWidget.h"
+#include "cxVisServices.h"
+#include "cxFrame3D.h"
+#include "cxForwardDeclarations.h"
 
 class QVBoxLayout;
 
 
 namespace cx
 {
-
-typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
-typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
 typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
-
+	
 /**
- * Widget for use in the BronchoscopyNavigation
+ * Widget for calibration virtual camera rotation
  *
  * \ingroup org_custusx_bronchoscopynavigation
  *
- * \date 2014-10-30
- * \author Erlend Hofstad
+ * \date 2021-10-12
+ * \author Erlend F. Hofstad
  */
-class BronchoscopyNavigationWidget : public BaseWidget
+class VirtualCameraRotationWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
-	BronchoscopyNavigationWidget(VisServicesPtr services, QWidget* parent = 0);
-	virtual ~BronchoscopyNavigationWidget();
+	VirtualCameraRotationWidget(VisServicesPtr services, StringPropertySelectToolPtr toolSelector, QWidget* parent = 0);
+	virtual ~VirtualCameraRotationWidget();
+	QString getWidgetName();
 
 private slots:
-	void processCenterlineSlot();
-	void enableSlot();
-	void disableSlot();
-	void showAdvancedOptionsSlot();
+	void toolCalibrationChanged();
+	void toolRotationChanged();
 
 private:
+	ToolPtr getTool();
 	QString defaultWhatsThis() const;
 	QVBoxLayout*  mVerticalLayout;
-
-BoolPropertyPtr mUseAdvancedCenterlineProjection;
-
 	StringPropertySelectToolPtr mToolSelector;
-	StringPropertySelectMeshPtr mSelectMeshWidget;
-	QPushButton* mProcessCenterlineButton;
-	QWidget* mMaxSearchDistanceWidget;
-	QWidget* mAlphaWidget;
-	QPushButton* mEnableButton;
-	QPushButton* mDisableButton;
-	QCheckBox* mAdvancedOption;
-	ToolPtr mTool;
-	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
-	BronchoscopePositionProjectionPtr mProjectionCenterlinePtr;
-
-	bool mIsCenerlineProcessed;
-
-	PatientModelServicePtr mPatientModelService;
-	ViewServicePtr mViewService;
-	TrackingServicePtr mTrackingService;
-
-	XmlOptionFile mOptions;
+	QDial* mRotateDial;
+	DecomposedTransform3D mDecomposition;
+	
 };
 } /* namespace cx */
 
-#endif /* CXBRONCHOSCOPYNAVIGATIONWIDGET_H_ */
+#endif /* CXVIRTUALCAMERAROTATIONWIDGET_H_ */

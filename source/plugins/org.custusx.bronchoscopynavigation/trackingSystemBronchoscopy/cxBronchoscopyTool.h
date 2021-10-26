@@ -83,7 +83,7 @@ public:
 	virtual void setVisible(bool vis);
 
 	// extensions
-	ToolPtr getBase() { return mBase; }
+	ToolPtr getBaseTool() { return mBase; }
 
 private:
 	ToolPtr mBase;

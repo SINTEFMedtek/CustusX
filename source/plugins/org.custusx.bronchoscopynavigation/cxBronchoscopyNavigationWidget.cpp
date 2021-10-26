@@ -49,17 +49,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxProfile.h"
 #include "cxHelperWidgets.h"
 #include "cxVisServices.h"
+#include "cxVirtualCameraRotationWidget.h"
+#include "cxStringPropertySelectTool.h"
 
 namespace cx
 {
 
 BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(VisServicesPtr services, QWidget* parent) :
-    QWidget(parent),
-    mVerticalLayout(new QVBoxLayout(this))
+	BaseWidget(parent, "bronchoscopy_navigation_widget", "Bronchoscopy Navigation"),
+	mVerticalLayout(new QVBoxLayout(this))
 {
 	mIsCenerlineProcessed = false;
 
-    mOptions = profile()->getXmlSettings().descend("bronchoscopynavigationwidget");
+	mOptions = profile()->getXmlSettings().descend("bronchoscopynavigationwidget");
 
 	mPatientModelService = services->patient();
 	mViewService = services->view();
@@ -68,16 +70,17 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(VisServicesPtr servic
 
 	this->setObjectName("BronchoscopyNavigationWidget");
 	this->setWindowTitle("BronchoscopyNavigation");
-    this->setWhatsThis(this->defaultWhatsThis());
+	this->setWhatsThis(this->defaultWhatsThis());
+	
+	mToolSelector = StringPropertySelectTool::New(services->tracking());
 
-    mSelectMeshWidget = StringPropertySelectMesh::New(mPatientModelService);
+	mSelectMeshWidget = StringPropertySelectMesh::New(mPatientModelService);
 	mSelectMeshWidget->setValueName("Centerline: ");
 
-	//mSelectMaxDistanceWidget =
 	mProjectionCenterlinePtr = BronchoscopePositionProjectionPtr(new BronchoscopePositionProjection());
 	mProjectionCenterlinePtr->createMaxDistanceToCenterlineOption(mOptions.getElement());
-    mProjectionCenterlinePtr->createMaxSearchDistanceOption(mOptions.getElement());
-    mProjectionCenterlinePtr->createAlphaOption(mOptions.getElement());
+	mProjectionCenterlinePtr->createMaxSearchDistanceOption(mOptions.getElement());
+	mProjectionCenterlinePtr->createAlphaOption(mOptions.getElement());
 
 	mProcessCenterlineButton = new QPushButton("Process centerline");
 	connect(mProcessCenterlineButton, SIGNAL(clicked()), this, SLOT(processCenterlineSlot()));
@@ -91,31 +94,34 @@ BronchoscopyNavigationWidget::BronchoscopyNavigationWidget(VisServicesPtr servic
 	connect(mDisableButton, SIGNAL(clicked()), this, SLOT(disableSlot()));
 	mDisableButton->setToolTip(this->defaultWhatsThis());
 
-    mAdvancedOption = new QCheckBox("Use advanced centerline projection", this);
-    connect(mAdvancedOption, SIGNAL(clicked()), this, SLOT(showAdvancedOptionsSlot()));
+	mAdvancedOption = new QCheckBox("Use advanced centerline projection", this);
+	connect(mAdvancedOption, SIGNAL(clicked()), this, SLOT(showAdvancedOptionsSlot()));
 
 
-    PropertyPtr maxDistanceToCenterline = mProjectionCenterlinePtr->getMaxDistanceToCenterlineOption();
-    PropertyPtr maxSearchDistance = mProjectionCenterlinePtr->getMaxSearchDistanceOption();
-    PropertyPtr alpha = mProjectionCenterlinePtr->getAlphaOption();
+	PropertyPtr maxDistanceToCenterline = mProjectionCenterlinePtr->getMaxDistanceToCenterlineOption();
+	PropertyPtr maxSearchDistance = mProjectionCenterlinePtr->getMaxSearchDistanceOption();
+	PropertyPtr alpha = mProjectionCenterlinePtr->getAlphaOption();
 
-    mMaxSearchDistanceWidget = createDataWidget(mViewService, mPatientModelService, this, maxSearchDistance);
-    mAlphaWidget = createDataWidget(mViewService, mPatientModelService, this, alpha);
+	mMaxSearchDistanceWidget = createDataWidget(mViewService, mPatientModelService, this, maxSearchDistance);
+	mAlphaWidget = createDataWidget(mViewService, mPatientModelService, this, alpha);
 
+	mVerticalLayout->addWidget(sscCreateDataWidget(this, mToolSelector));
 	mVerticalLayout->addWidget(new DataSelectWidget(mViewService, mPatientModelService, this, mSelectMeshWidget));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
-    mVerticalLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, maxDistanceToCenterline));
-    mVerticalLayout->addWidget(mAdvancedOption);
+	mVerticalLayout->addWidget(createDataWidget(mViewService, mPatientModelService, this, maxDistanceToCenterline));
+	mVerticalLayout->addWidget(mAdvancedOption);
 
-    mVerticalLayout->addWidget(mMaxSearchDistanceWidget);
-    mVerticalLayout->addWidget(mAlphaWidget);
+	mVerticalLayout->addWidget(mMaxSearchDistanceWidget);
+	mVerticalLayout->addWidget(mAlphaWidget);
 	mVerticalLayout->addWidget(mEnableButton);
 	mVerticalLayout->addWidget(mDisableButton);
+	mVerticalLayout->addWidget(this->createHorizontalLine());
+	mVerticalLayout->addWidget(new VirtualCameraRotationWidget(services, mToolSelector, this));
 	mVerticalLayout->addStretch();
-
-    mEnableButton->setEnabled(false);
-    mDisableButton->setEnabled(false);
-    this->showAdvancedOptionsSlot();
+	
+	mEnableButton->setEnabled(false);
+	mDisableButton->setEnabled(false);
+	this->showAdvancedOptionsSlot();
 
 }
 
@@ -137,20 +143,25 @@ void BronchoscopyNavigationWidget::processCenterlineSlot()
 
 	mProjectionCenterlinePtr->processCenterline(centerline, rMd, rMpr);
 	mIsCenerlineProcessed = true;
-    mEnableButton->setEnabled(true);
+	mEnableButton->setEnabled(true);
 }
 
 void BronchoscopyNavigationWidget::enableSlot()
 {
-	std::cout << "BronchoscopyNavigation started. Position locked to centerline." << std::endl;
-
 	if(!mIsCenerlineProcessed)
 	{
 		reportError("Centerline not processed");
 		return;
 	}
+	
+	if(!mToolSelector->getTool())
+		{
+			reportError("Tool not selected");
+			return;
+		}
+		
 
-    mProjectionCenterlinePtr->setAdvancedCenterlineOption(mAdvancedOption->isChecked());
+	mProjectionCenterlinePtr->setAdvancedCenterlineOption(mAdvancedOption->isChecked());
 	if (!mTrackingSystem)
 	{
 //		std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
@@ -160,13 +171,14 @@ void BronchoscopyNavigationWidget::enableSlot()
 //		if(!mTrackingService)
 //			CX_LOG_WARNING() << "Did not find bronchoscopy navigation tracking system.";
 
-		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr));
+		mTrackingSystem = TrackingSystemBronchoscopyServicePtr(new TrackingSystemBronchoscopyService(mTrackingService, mProjectionCenterlinePtr, mToolSelector->getTool()));
 		mTrackingService->unInstallTrackingSystem(mTrackingSystem->getBase());
 		mTrackingService->installTrackingSystem(mTrackingSystem);
 	}
-    mEnableButton->setEnabled(false);
-    mDisableButton->setEnabled(true);
-
+	mEnableButton->setEnabled(false);
+	mDisableButton->setEnabled(true);
+	
+	std::cout << "BronchoscopyNavigation started. Position locked to centerline." << std::endl;
 }
 
 void BronchoscopyNavigationWidget::disableSlot()
@@ -179,31 +191,31 @@ void BronchoscopyNavigationWidget::disableSlot()
 	}
 
 	std::cout << "BronchoscopyNavigation stopped." << std::endl;
-    mEnableButton->setEnabled(true);
-    mDisableButton->setEnabled(false);
+	mEnableButton->setEnabled(true);
+	mDisableButton->setEnabled(false);
 
 }
 
 
 void BronchoscopyNavigationWidget::showAdvancedOptionsSlot()
 {
-    if(mAdvancedOption->isChecked())
-    {
-        mMaxSearchDistanceWidget->show();
-        mAlphaWidget->show();
-    }
-    else{
-        mMaxSearchDistanceWidget->hide();
-        mAlphaWidget->hide();
-    }
+	if(mAdvancedOption->isChecked())
+	{
+		mMaxSearchDistanceWidget->show();
+		mAlphaWidget->show();
+	}
+	else{
+		mMaxSearchDistanceWidget->hide();
+		mAlphaWidget->hide();
+	}
 }
 
 QString BronchoscopyNavigationWidget::defaultWhatsThis() const
 {
-  return "<html>"
-	  "<h3>BronchoscopyNavigation plugin.</h3>"
-	  "<p>Locks tool position to CT centerline.</p>"
-      "</html>";
+	return	"<html>"
+					"<h3>BronchoscopyNavigation plugin.</h3>"
+					"<p>Locks tool position to CT centerline.</p>"
+					"</html>";
 }
 
 

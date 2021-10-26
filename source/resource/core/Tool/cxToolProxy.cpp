@@ -182,6 +182,11 @@ void ToolProxy::setVisible(bool vis)
 	mTool->setVisible(vis);
 }
 
+ToolPtr ToolProxy::getBaseTool()
+{
+	return mTool->getBaseTool();
+}
+
 
 bool ToolProxy::isNull()
 {
