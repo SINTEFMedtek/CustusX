@@ -18,7 +18,7 @@ import subprocess
 import optparse
 import re
 import sys
-import os
+import os.path
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
@@ -138,7 +138,8 @@ class Component(object):
         # os.uname on Python 2 don't have variable names. Need to only use result as a list
         # os.uname().sysname = os.uname()[0]
         # sysname = #0, release = #2, version = #3
-        if 'Linux' not in os.uname()[0]:
+        # os.uname don't work on Windows. Using platform.uname instead
+        if 'Linux' not in platform.uname()[0]:
             return False
         else:
             print("Linux kernel detected")
@@ -158,10 +159,10 @@ class Component(object):
 
         #print(os.uname())
         #print(os.uname().version)
-        if 'Ubuntu' in os.uname()[3] and "20.04" in os.uname()[3]:
+        if 'Ubuntu' in platform.uname()[3] and "20.04" in platform.uname()[3]:
             print("Ubuntu 20.04 detected")
             return True
-        if "5.4." is os.uname()[2]:
+        if "5.4." is platform.uname()[2]:
             print("Ubuntu 20.04 kernel detected")
             return True
         return False
