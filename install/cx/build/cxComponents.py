@@ -135,7 +135,10 @@ class Component(object):
         #https://askubuntu.com/questions/517136/list-of-ubuntu-versions-with-corresponding-linux-kernel-version
         # It also seems that newer installations of Ubuntu 20.04 use the 5.11 kernel (from Ubuntu 21.04)
 
-        if 'Linux' not in os.uname().sysname:
+        # os.uname on Python 2 don't have variable names. Need to only use result as a list
+        # os.uname().sysname = os.uname()[0]
+        # sysname = #0, release = #2, version = #3
+        if 'Linux' not in os.uname()[0]:
             return False
         else:
             print("Linux kernel detected")
@@ -155,10 +158,10 @@ class Component(object):
 
         #print(os.uname())
         #print(os.uname().version)
-        if 'Ubuntu' in os.uname().version and "20.04" in os.uname().version:
+        if 'Ubuntu' in os.uname()[3] and "20.04" in os.uname()[3]:
             print("Ubuntu 20.04 detected")
             return True
-        if "5.4." is os.uname().release:
+        if "5.4." is os.uname()[2]:
             print("Ubuntu 20.04 kernel detected")
             return True
         return False
