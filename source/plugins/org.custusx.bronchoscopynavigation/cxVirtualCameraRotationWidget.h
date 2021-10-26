@@ -34,11 +34,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CXVIRTUALCAMERAROTATIONWIDGET_H_
 
 #include <QtWidgets>
-#include <QWidget>
 #include <QDial>
 #include "cxBaseWidget.h"
 #include "cxVisServices.h"
 #include "cxFrame3D.h"
+#include "cxForwardDeclarations.h"
 
 class QVBoxLayout;
 
@@ -55,7 +55,7 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
  * \date 2021-10-12
  * \author Erlend F. Hofstad
  */
-class VirtualCameraRotationWidget : public QWidget
+class VirtualCameraRotationWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
@@ -68,6 +68,7 @@ private slots:
 	void toolRotationChanged();
 
 private:
+	ToolPtr getTool();
 	QString defaultWhatsThis() const;
 	QVBoxLayout*  mVerticalLayout;
 	StringPropertySelectToolPtr mToolSelector;

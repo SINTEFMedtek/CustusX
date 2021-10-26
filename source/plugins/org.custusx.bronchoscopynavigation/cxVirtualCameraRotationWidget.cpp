@@ -42,7 +42,7 @@ namespace cx
 {
 
 VirtualCameraRotationWidget::VirtualCameraRotationWidget(VisServicesPtr services, StringPropertySelectToolPtr toolSelector, QWidget* parent) :
-	QWidget(parent),
+	BaseWidget(parent,"virtual_camera_rotation_widget", "Virtual Camera Rotation"),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mToolSelector(toolSelector)
 {
@@ -80,12 +80,9 @@ QString VirtualCameraRotationWidget::getWidgetName()
 
 void VirtualCameraRotationWidget::toolCalibrationChanged()
 {
-	ToolPtr tool = mToolSelector->getTool();
+	ToolPtr tool = this->getTool();
 	if (!tool)
 		return;
-	ToolPtr baseTool = tool->getBaseTool();
-	if (baseTool)
-		tool = baseTool;
 
 	mRotateDial->blockSignals(true);
 
@@ -99,12 +96,9 @@ void VirtualCameraRotationWidget::toolCalibrationChanged()
 
 void VirtualCameraRotationWidget::toolRotationChanged()
 {
-	ToolPtr tool = mToolSelector->getTool();
+	ToolPtr tool = this->getTool();
 	if (!tool)
 		return;
-	ToolPtr baseTool = tool->getBaseTool();
-	if (baseTool)
-		tool = baseTool;
 
 	Transform3D M = tool->getCalibration_sMt();
 	double zAngleUpdated = mRotateDial->value()*M_PI/180;
@@ -115,7 +109,17 @@ void VirtualCameraRotationWidget::toolRotationChanged()
 	tool->setCalibration_sMt(M);
 }
 
-
+ToolPtr VirtualCameraRotationWidget::getTool()
+{
+	ToolPtr tool = mToolSelector->getTool();
+	if (tool)
+	{	
+		ToolPtr baseTool = tool->getBaseTool();
+		if (baseTool)
+			tool = baseTool;
+	}
+	return tool;
+}
 
 QString VirtualCameraRotationWidget::defaultWhatsThis() const
 {

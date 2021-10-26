@@ -56,12 +56,10 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(VisServicesPtr services
 
 void ToolManualCalibrationWidget::toolCalibrationChanged()
 {
-	ToolPtr tool = mTool->getTool();
-  if (!tool)
-    return;
-	ToolPtr baseTool = tool->getBaseTool();
-	if (baseTool)
-		tool = baseTool;
+	ToolPtr tool = this->getTool();
+	if (!tool)
+		return;
+
 
   mMatrixWidget->blockSignals(true);
   mMatrixWidget->setMatrix(tool->getCalibration_sMt());
@@ -70,15 +68,25 @@ void ToolManualCalibrationWidget::toolCalibrationChanged()
 
 void ToolManualCalibrationWidget::matrixWidgetChanged()
 {
-	ToolPtr tool = mTool->getTool();
+	ToolPtr tool = this->getTool();
 	if (!tool)
-      return;
-	ToolPtr baseTool = tool->getBaseTool();
-	if (baseTool)
-		tool = baseTool;
+		return;
+
 
   Transform3D M = mMatrixWidget->getMatrix();
   tool->setCalibration_sMt(M);
+}
+
+ToolPtr ToolManualCalibrationWidget::getTool()
+{
+	ToolPtr tool = mTool->getTool();
+	if (tool)
+	{	
+		ToolPtr baseTool = tool->getBaseTool();
+		if (baseTool)
+			tool = baseTool;
+	}
+	return tool;
 }
 
 }
