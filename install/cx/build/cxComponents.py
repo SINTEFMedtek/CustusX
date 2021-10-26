@@ -162,7 +162,7 @@ class Component(object):
         if 'Ubuntu' in platform.uname()[3] and "20.04" in platform.uname()[3]:
             print("Ubuntu 20.04 detected")
             return True
-        if "5.4." is platform.uname()[2]:
+        if "5.4." in platform.uname()[2]:
             print("Ubuntu 20.04 kernel detected")
             return True
         return False
