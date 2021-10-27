@@ -177,10 +177,13 @@ TEST_CASE("NetworkHandler: Test timestamp synchronization", "[plugins][org.custu
 
 	//Adding a difference from system time above 1 sec will cause NetworkHandler::verifyTimestamp to change timestamp to system time
 	timestampSec += 1;
+	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
+	INFO(qstring_cast(synchedTimeMs)+" == "+qstring_cast(latestSystemTime));
 	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 
 	timestampSec -= 3;
+	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
 	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 }
