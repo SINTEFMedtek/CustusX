@@ -117,6 +117,9 @@ void GeometricRep2D::meshChangedSlot()
 
 	// Turn lightning off - we dont want 3D effects but a clear view of the slice
 	mActor->GetProperty()->LightingOff();
+	
+	//Set linewidth of mesh
+	mActor->GetProperty()->SetLineWidth(mMesh->getProperties().mLineWidth->getValue());
 }
 
 /**called when transform is changed
