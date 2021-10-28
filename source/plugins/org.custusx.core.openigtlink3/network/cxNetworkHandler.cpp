@@ -36,8 +36,9 @@ namespace cx
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
 	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages)),
-    mGotTimeOffset(false),
-    mTimestampOffsetMS(0)
+	mGotTimeOffset(false),
+	mTimestampOffsetMS(0),
+	mGotMoreThanOneImage(false)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -77,7 +78,7 @@ void NetworkHandler::disconnectFromServer()
 void NetworkHandler::clearTimestampSynchronization()
 {
 	mGotTimeOffset = false;
-    mTimestampOffsetMS = 0;
+	mTimestampOffsetMS = 0;
 };
 
 double NetworkHandler::synchronizedTimestamp(double receivedTimestampSec)
@@ -161,6 +162,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << QString("SpacingZ"); //IGTLIO_KEY_SPACING_Z;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
+		mProbeDefinitionFromStringMessages->setImage(cximage);
 
 		for (int i = 0; i < igtlioLabels.size(); ++i)
 		{
@@ -168,7 +170,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
 			if(!gotMetaData)
 			{
-				if(!mProbeDefinitionFromStringMessages->haveValidValues())
+				if(!mProbeDefinitionFromStringMessages->haveValidValues() && mGotMoreThanOneImage)
 					CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
 			}
 			else
@@ -177,9 +179,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
 			}
 		}
-
-
-		mProbeDefinitionFromStringMessages->setImage(cximage);
+		mGotMoreThanOneImage = true;
 
 		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 		{
@@ -249,8 +249,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		QString message(content.string_msg.c_str());
 
-                //Allow string messages to modify probe definition, as well as meta info.
-                mProbeDefinitionFromStringMessages->parseStringMessage(header, message);//Turning this off because we want to use meta info instead
+		//Allow string messages to modify probe definition, as well as meta info.
+		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
 		emit string_message(message);
 	}
 	else
