@@ -54,6 +54,8 @@ TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingSer
 {
 	connect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
 	this->onStateChanged();
+	if (!mTool)
+		mTool = mTrackingService->getActiveTool(); // Use active tool if tool is not set
 }
 
 TrackingSystemBronchoscopyService::~TrackingSystemBronchoscopyService()

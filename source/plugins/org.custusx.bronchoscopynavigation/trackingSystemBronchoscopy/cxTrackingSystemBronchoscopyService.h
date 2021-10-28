@@ -61,7 +61,7 @@ class org_custusx_bronchoscopynavigation_EXPORT TrackingSystemBronchoscopyServic
 Q_OBJECT
 
 public:
-	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, ToolPtr tool);
+	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, ToolPtr tool = NULL);
 	virtual ~TrackingSystemBronchoscopyService();
 
 	bool setTrackingSystem(QString trackingSystemName);
