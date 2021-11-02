@@ -166,6 +166,7 @@ signals:
 	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();
+	void controllingToolChanged();
 
 private:
 	typedef std::pair<QString, DataViewProperties> DataAndViewPropertiesPair;

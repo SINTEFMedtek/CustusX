@@ -120,6 +120,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 	connect(mGroupData.get(), &ViewGroupData::dataViewPropertiesChanged, this, &ViewWrapper::dataViewPropertiesChangedSlot);
 	connect(mGroupData.get(), &ViewGroupData::videoSourceChanged, this, &ViewWrapper::videoSourceChangedSlot);
+	connect(mGroupData.get(), &ViewGroupData::controllingToolChanged, this, &ViewWrapper::activeToolChangedSlot);
 
 	std::vector<DataPtr> data = mGroupData->getData();
 	for (unsigned i = 0; i < data.size(); ++i)

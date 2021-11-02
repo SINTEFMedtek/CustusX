@@ -680,6 +680,7 @@ ToolPtr ViewGroupData::getControllingTool()
 void ViewGroupData::setControllingTool(ToolPtr tool)
 {
 	mControllingTool = tool;
+	emit controllingToolChanged();
 }
 
 } // namespace cx

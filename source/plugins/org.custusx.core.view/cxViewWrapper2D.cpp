@@ -567,6 +567,7 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 void ViewWrapper2D::activeToolChangedSlot()
 {
 	ToolPtr controllingTool = this->getControllingTool();
+	//CX_LOG_DEBUG() << "ViewWrapper2D::activeToolChangedSlot - controllingTool: " << controllingTool->getName();
 	mSliceProxy->setTool(controllingTool);
 }
 

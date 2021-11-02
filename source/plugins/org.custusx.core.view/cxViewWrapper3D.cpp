@@ -795,6 +795,7 @@ ViewPtr ViewWrapper3D::getView()
 void ViewWrapper3D::activeToolChangedSlot()
 {
 	ToolPtr controllingTool = this->getControllingTool();
+	//CX_LOG_DEBUG() << "ViewWrapper3D::activeToolChangedSlot - controllingTool: " << controllingTool->getName();
 
 	mPickerRep->setTool(controllingTool);
 	if (mSlices3DRep)
