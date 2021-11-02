@@ -380,7 +380,7 @@ class OpenIGTLink(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git://github.com/openigtlink/OpenIGTLink.git'
+        return 'https://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckoutSha('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
