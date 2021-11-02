@@ -220,16 +220,19 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	}
 	else if (name == IGTLIO_KEY_SPACING_X)
 	{
+		mSectorInfo->mHaveChanged  = true;
 		mSectorInfo->mSpacingX = doubleValue;
 	}
 	else if (name == IGTLIO_KEY_SPACING_Y)
 	{
+		mSectorInfo->mHaveChanged  = true;
 		mSectorInfo->mSpacingY = doubleValue;
 	}
-        else if (name == "SpacingZ") //IGTLIO_KEY_SPACING_Z
-        {
-                mSectorInfo->mSpacingZ = doubleValue;
-        }
+	else if (name == "SpacingZ") //IGTLIO_KEY_SPACING_Z
+	{
+		mSectorInfo->mHaveChanged  = true;
+		mSectorInfo->mSpacingZ = doubleValue;
+	}
 }
 
 void ProbeDefinitionFromStringMessages::setImage(ImagePtr image)
