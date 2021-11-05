@@ -100,6 +100,7 @@ void OpenIGTLinkTrackingSystemService::configure()
 		this->setState(Tool::tsNONE);
 		return;
 	}
+	emit updateTrackingSystemImplementation(configParser.getTrackingSystemImplementation());
 
 	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink3 tracking";
 

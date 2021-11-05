@@ -42,6 +42,7 @@ public:
 		QStringList mTools;
 		QString mReferenceTool;
 		QString mTrackingSystemImplementation;//Tracking system implementation (igstk or openigtlink)
+		bool mApplyRefToTools;//Apply ref position to all tools for OpenIGTLink transforms
 		std::vector<cx::ConfigurationFileParser::ToolStructure> mToolList;
 	};
 	struct Tool

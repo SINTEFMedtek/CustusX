@@ -53,6 +53,7 @@ public:
 
 signals:
 	void stateChanged();
+	void updateTrackingSystemImplementation(QString trackingSystemImplementation);
 
 protected slots:
 	virtual void deconfigure() {} ///< deconfigures the software

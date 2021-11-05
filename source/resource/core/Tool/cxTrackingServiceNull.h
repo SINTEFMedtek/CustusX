@@ -46,7 +46,11 @@ public:
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 	virtual void runDummyTool(DummyToolPtr tool);
+	virtual std::vector<TrackerConfigurationPtr> getConfigurations();
+	//virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
 	virtual TrackerConfigurationPtr getConfiguration();
+	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);
+	virtual QString getCurrentTrackingSystemImplementation();
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);

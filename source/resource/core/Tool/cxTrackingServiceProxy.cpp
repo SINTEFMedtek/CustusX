@@ -133,11 +133,30 @@ void TrackingServiceProxy::runDummyTool(DummyToolPtr tool)
 	mTrackingService->runDummyTool(tool);
 }
 
+std::vector<TrackerConfigurationPtr> TrackingServiceProxy::getConfigurations()
+{
+	return mTrackingService->getConfigurations();
+}
+
+/*TrackerConfigurationPtr TrackingServiceProxy::getConfiguration(QString trackingSystemImplementation)
+{
+	return mTrackingService->getConfiguration(trackingSystemImplementation);
+}*/
+
 TrackerConfigurationPtr TrackingServiceProxy::getConfiguration()
 {
 	return mTrackingService->getConfiguration();
 }
 
+void TrackingServiceProxy::setCurrentTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+	mTrackingService->setCurrentTrackingSystemImplementation(trackingSystemImplementation);
+}
+
+QString TrackingServiceProxy::getCurrentTrackingSystemImplementation()
+{
+	return mTrackingService->getCurrentTrackingSystemImplementation();
+}
 
 void TrackingServiceProxy::installTrackingSystem(TrackingSystemServicePtr system)
 {

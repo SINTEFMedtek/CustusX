@@ -82,6 +82,7 @@ void TrackingSystemIGSTKService::configure()
 		CX_LOG_DEBUG() << "TrackingSystemIGSTKService::configure(): Not using IGSTK tracking.";
 		return;
 	}
+	emit updateTrackingSystemImplementation(configParser.getTrackingSystemImplementation());
 
 	std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 
