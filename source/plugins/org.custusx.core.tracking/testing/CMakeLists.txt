@@ -26,6 +26,7 @@ if(BUILD_TESTING)
         cxResource
         org_custusx_core_tracking
         cxCatch
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtest_org_custusx_core_tracking)
         
