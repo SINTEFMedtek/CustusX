@@ -86,19 +86,20 @@ void LogicManager::shutdown()
 	//./bin/Catch "StreamerService: Service available"
 	//Cause the above seg. fault.
 
-	if (isUbuntu2004())
+	//if (isUbuntu2004())
 	{
 		//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
-		CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
+		//CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
+		CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
 		LogicManager::getInstance()->shutdownLegacyStoredServices();
 	}
-	else
+	/*else
 	{
 		//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
 		LogicManager::getInstance()->shutdownServices();
 		delete mInstance;
 		mInstance = NULL;
-	}
+	}*/
 }
 
 bool LogicManager::isUbuntu2004()
