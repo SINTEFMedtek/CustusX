@@ -135,6 +135,7 @@ private:
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
   void shutdownServices();
+  void shutdownServicesLight();///< Only shut down part of the resources in an attempt to prevent crashes from CTK bugs
 
   void basicSetup();
   void createLegacyStoredServices();

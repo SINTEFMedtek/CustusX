@@ -91,7 +91,7 @@ void LogicManager::shutdown()
 		//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
 		//CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
 		CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
-		LogicManager::getInstance()->shutdownLegacyStoredServices();
+		LogicManager::getInstance()->shutdownServicesLight();
 	}
 	/*else
 	{
@@ -230,6 +230,20 @@ void LogicManager::shutdownServices()
 
 	mShutdown = true;
 	CX_LOG_DEBUG() << " --- End shutdown services";
+}
+
+void LogicManager::shutdownServicesLight()
+{
+	this->getPatientModelService()->autoSave();
+
+	if (mComponent)
+		mComponent->destroy(); // this is the GUI - delete first
+
+	this->shutdownLegacyStoredServices();
+
+	GPUImageBufferRepository::shutdown();
+	Reporter::shutdown();
+	ProfileManager::shutdown();
 }
 
 void LogicManager::shutdownLegacyStoredServices()
