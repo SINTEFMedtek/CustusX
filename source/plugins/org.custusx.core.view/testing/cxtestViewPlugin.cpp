@@ -129,7 +129,7 @@ TEST_CASE("ViewService: set/get camera style", "[integration][plugins][org.custu
 	REQUIRE(selectedAction->data().toString() == enum2string(cx::cstTOOL_STYLE));
 }
 
-TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.custusx.core.view][not_win64]")
+TEST_CASE("ViewService: Add new default layout", "[integration][plugins][org.custusx.core.view]")
 {
 	ViewServiceFixture fixture;
 
