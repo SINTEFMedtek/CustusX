@@ -160,6 +160,7 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 
 	if (!this->isConfigFileValid())
 		return retval;
+	bool applyRefToTools = this->getApplyRefToTools();
 
 	QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(CONFIG_TRACKER_TOOL_FILE);
 	for (int i = 0; i < toolFileNodes.count(); ++i)
@@ -168,6 +169,7 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 		toolStructure.mAbsoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
 		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE);
 		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE);
+		toolStructure.mApplyRefToTool = applyRefToTools;
 
 		QString reference = toolFileNodes.at(i).toElement().attribute(REFERENCE_ATTRIBUTE);
 		if (reference.contains("yes", Qt::CaseInsensitive))

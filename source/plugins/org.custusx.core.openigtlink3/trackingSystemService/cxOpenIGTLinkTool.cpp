@@ -140,20 +140,12 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 	mTimestamp = timestampMS;
 	this->checkTimestampMismatch();
 
-	//TODO: Make sure this is the way we want to handle this
-	//Current implementation is to get transforms between tool frame and ref frame
-	//Another solution is to get all transforms between tool frame and tracking system.
-
-	//Reference is getting transform from reference tool to tracking system.
-	//Only use received transform to verify that reference tool is visible.
-//	if(isReference())
-//		return;
+	//Only use reference transform if this is to be applied to the other tools
+	if(isReference() && !applyReference())
+		return;
 
 	//-----------------------------------------------------------------------------------------------
-	// NB - Update: Now get all transforms between tool and tracking system (ts)
-	// This is necessary for systems that handle ref sensor as other tools.
-	// Ref sensor pos is applied to all tools in OpenIGTLinkTrackingSystemService::receiveTransform()
-	// TODO: fix all code that use OpenIGTLink trakcing (Plus and Anser)
+	// Ref sensor pos is applied to tools in OpenIGTLinkTrackingSystemService::receiveTransform()
 	//-----------------------------------------------------------------------------------------------
 
     Transform3D prMt = prMs * this->getCalibration_sMt();
@@ -168,6 +160,11 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
     (*mPositionHistory)[mTimestamp] = prMt; // store original in history
     m_prMt = prMt_filtered;
     emit toolTransformAndTimestamp(m_prMt, mTimestamp);
+}
+
+bool OpenIGTLinkTool::applyReference()
+{
+	return mConfigFileToolStructure.mApplyRefToTool;
 }
 
 void OpenIGTLinkTool::checkTimestampMismatch()

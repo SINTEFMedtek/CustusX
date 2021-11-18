@@ -76,6 +76,7 @@ public:
 
 	bool doIdCorrespondToTool(QString openIGTLinkId);
 	bool isReference();
+	bool applyReference();
 protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:

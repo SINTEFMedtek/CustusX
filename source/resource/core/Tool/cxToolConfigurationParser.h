@@ -41,11 +41,13 @@ public:
 		QString mOpenIGTLinkTransformId;
 		QString mOpenIGTLinkImageId;
 		bool mReference;
+		bool mApplyRefToTool;
 		ToolStructure() :
 			mAbsoluteToolFilePath(""),
 			mOpenIGTLinkTransformId(""),
 			mOpenIGTLinkImageId(""),
-			mReference(false)
+			mReference(false),
+			mApplyRefToTool(false)
 		{}
 	};
 
