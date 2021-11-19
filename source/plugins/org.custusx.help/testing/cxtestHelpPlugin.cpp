@@ -87,10 +87,7 @@ TEST_CASE("org.custusx.help: HelpEngine loads a page", "[unit][plugins][org.cust
 	CHECK(QString(links.first().toString()).contains(id));
 }
 
-// This test don't work on Ubuntu 20.04. A possible fix is to use the sleep + procssEvents loop from the test below,
-// but this may cause different pages to be displayed, based on what CustusX remembers from the previous session.
-// Removing the test for now.
-TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plugins][org.custusx.help][hide]")
+TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plugins][org.custusx.help]")
 {
 	cxtest::TestHelpFixture fixture;
 	fixture.setupHelpBrowserInsideMainWindow();
