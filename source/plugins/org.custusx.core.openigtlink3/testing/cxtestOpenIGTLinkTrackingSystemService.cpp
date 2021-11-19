@@ -22,38 +22,38 @@ typedef boost::shared_ptr<class TestNetworkHandler> cxtestNetworkHandlerPtr;
 class TestNetworkHandler : public cx::NetworkHandler
 {
 public:
-    TestNetworkHandler() : cx::NetworkHandler(nullptr) {}
+	TestNetworkHandler() : cx::NetworkHandler(nullptr) {}
 
-    double synchronizedTimestamp(double receivedTimestampSec)
-    {
-        return NetworkHandler::synchronizedTimestamp(receivedTimestampSec);
-    }
-    bool verifyTimestamp(double &timestampMS)
-    {
-        return NetworkHandler::verifyTimestamp(timestampMS);
-    }
-    double getTimestampOffset()
-    {
-        return mTimestampOffsetMS;
-    }
+	double synchronizedTimestamp(double receivedTimestampSec)
+	{
+		return NetworkHandler::synchronizedTimestamp(receivedTimestampSec);
+	}
+	bool verifyTimestamp(double &timestampMS)
+	{
+		return NetworkHandler::verifyTimestamp(timestampMS);
+	}
+	double getTimestampOffset()
+	{
+		return mTimestampOffsetMS;
+	}
 };
 
 class OpenIGTLinkTrackingSystemServiceMoc : public cx::OpenIGTLinkTrackingSystemService
 {
 public:
-    cxtestNetworkHandlerPtr mTestNetworkHandler;
+	cxtestNetworkHandlerPtr mTestNetworkHandler;
 
-    OpenIGTLinkTrackingSystemServiceMoc() : cx::OpenIGTLinkTrackingSystemService(cx::NetworkHandlerPtr()) {}
-    OpenIGTLinkTrackingSystemServiceMoc(cxtestNetworkHandlerPtr testNetworkHandler) :
-        mTestNetworkHandler(testNetworkHandler),
-        cx::OpenIGTLinkTrackingSystemService(testNetworkHandler) {}
+	OpenIGTLinkTrackingSystemServiceMoc() : cx::OpenIGTLinkTrackingSystemService(cx::NetworkHandlerPtr()) {}
+	OpenIGTLinkTrackingSystemServiceMoc(cxtestNetworkHandlerPtr testNetworkHandler) :
+		mTestNetworkHandler(testNetworkHandler),
+		cx::OpenIGTLinkTrackingSystemService(testNetworkHandler) {}
 
 	virtual bool isConfigured() const;
 	virtual bool isInitialized() const;
 	virtual bool isTracking() const;
 
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
-    double getNetworkHandlerTimestampOffset();
+	double getNetworkHandlerTimestampOffset();
 
 
 public slots:
@@ -79,7 +79,7 @@ bool OpenIGTLinkTrackingSystemServiceMoc::isTracking() const
 
 double OpenIGTLinkTrackingSystemServiceMoc::getNetworkHandlerTimestampOffset()
 {
-    return mTestNetworkHandler->getTimestampOffset();
+	return mTestNetworkHandler->getTimestampOffset();
 }
 
 typedef boost::shared_ptr<OpenIGTLinkTrackingSystemServiceMoc> OpenIGTLinkTrackingSystemServiceMocPtr;
@@ -136,7 +136,7 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test state transitions", "[plugins]
 
 TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
-    cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
 
 	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double timestamp = latestSystemTime;
@@ -152,7 +152,7 @@ TEST_CASE("NetworkHandler: Test timestamp verification", "[plugins][org.custusx.
 
 TEST_CASE("NetworkHandler: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
-    cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
 
 	double tolerance = 10;
 	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
@@ -190,51 +190,51 @@ TEST_CASE("NetworkHandler: Test timestamp synchronization", "[plugins][org.custu
 
 TEST_CASE("NetworkHandler: Test timestamp synchronization reset", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
-    cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
 
 	double tolerance = 10;
-    qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
 	double timestampSec = 1000;
 
 	double synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-    REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 
 
-    double offset = latestSystemTime - timestampSec*1000;
-    {
-        INFO(qstring_cast(offset)+"=="+qstring_cast(networkHandler->getTimestampOffset()));
-        REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-    }
+	double offset = latestSystemTime - timestampSec*1000;
+	{
+		INFO(qstring_cast(offset)+"=="+qstring_cast(networkHandler->getTimestampOffset()));
+		REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+	}
 
-    networkHandler->clearTimestampSynchronization();
-    REQUIRE_FALSE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
-    REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	networkHandler->clearTimestampSynchronization();
+	REQUIRE_FALSE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
 
 
-    timestampSec = 3000;
-    latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
-    REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	timestampSec = 3000;
+	latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	synchedTimeMs = networkHandler->synchronizedTimestamp(timestampSec);
+	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 
-    offset = latestSystemTime - timestampSec*1000;
-    REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
+	offset = latestSystemTime - timestampSec*1000;
+	REQUIRE(cx::similar(offset, networkHandler->getTimestampOffset(), tolerance));
 }
 
 TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[plugins][org.custusx.core.openigtlink3][unit]")
 {
-    cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
-    OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc(networkHandler));
+	cxtestNetworkHandlerPtr networkHandler = cxtestNetworkHandlerPtr(new TestNetworkHandler());
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc(networkHandler));
 
-    double tolerance = 10;
-    qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    double timestampSec = 1000;
+	double tolerance = 10;
+	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double timestampSec = 1000;
 
-    double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec);
-    REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
+	double synchedTimeMs = trackingSystemService->mTestNetworkHandler->synchronizedTimestamp(timestampSec);
+	REQUIRE(cx::similar(synchedTimeMs, latestSystemTime, tolerance));
 
-    REQUIRE_FALSE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
-    trackingSystemService->resetTimeSynchronization();
-    REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	REQUIRE_FALSE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
+	trackingSystemService->resetTimeSynchronization();
+	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
 }
 
 #ifdef CX_CUSTUS_SINTEF

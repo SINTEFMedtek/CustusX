@@ -67,12 +67,12 @@ OpenIGTLinkTool::~OpenIGTLinkTool()
 
 ProbePtr OpenIGTLinkTool::getProbe() const
 {
-    return mProbe;
+	return mProbe;
 }
 
 double OpenIGTLinkTool::getTimestamp() const
 {
-    return mTimestamp;
+	return mTimestamp;
 }
 
 bool OpenIGTLinkTool::getVisible() const
@@ -82,37 +82,37 @@ bool OpenIGTLinkTool::getVisible() const
 
 bool OpenIGTLinkTool::isInitialized() const
 {
-    //TODO when is a tool initialized? when it is connected to the tracker?
-    return true;
+	//TODO when is a tool initialized? when it is connected to the tracker?
+	return true;
 }
 
 QString OpenIGTLinkTool::getUid() const
 {
-    return Tool::mUid;
+	return Tool::mUid;
 }
 
 QString OpenIGTLinkTool::getName() const
 {
-    return Tool::mName;
+	return Tool::mName;
 }
 
 double OpenIGTLinkTool::getTooltipOffset() const
 {
-    if(this->getProbe())
-        return this->getProbe()->getProbeDefinition().getDepthStart();
-    return ToolImpl::getTooltipOffset();
+	if(this->getProbe())
+		return this->getProbe()->getProbeDefinition().getDepthStart();
+	return ToolImpl::getTooltipOffset();
 }
 
 void OpenIGTLinkTool::setTooltipOffset(double val)
 {
-    if(this->getProbe())
-        return;
-    ToolImpl::setTooltipOffset(val);
+	if(this->getProbe())
+		return;
+	ToolImpl::setTooltipOffset(val);
 }
 
 bool OpenIGTLinkTool::isCalibrated() const
 {
-    Transform3D identity = Transform3D::Identity();
+	Transform3D identity = Transform3D::Identity();
 
 		Transform3D sMt = this->getCalibration_sMt();
 		bool calibrated = !similar(sMt, identity);
@@ -156,18 +156,18 @@ void OpenIGTLinkTool::toolTransformAndTimestampSlot(Transform3D prMs, double tim
 	// TODO: fix all code that use OpenIGTLink trakcing (Plus and Anser)
 	//-----------------------------------------------------------------------------------------------
 
-    Transform3D prMt = prMs * this->getCalibration_sMt();
-    Transform3D prMt_filtered = prMt;
+	Transform3D prMt = prMs * this->getCalibration_sMt();
+	Transform3D prMt_filtered = prMt;
 
-    if (mTrackingPositionFilter)
-    {
-        mTrackingPositionFilter->addPosition(prMt, mTimestamp);
-        prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
-    }
+	if (mTrackingPositionFilter)
+	{
+		mTrackingPositionFilter->addPosition(prMt, mTimestamp);
+		prMt_filtered = mTrackingPositionFilter->getFilteredPosition();
+	}
 
-    (*mPositionHistory)[mTimestamp] = prMt; // store original in history
-    m_prMt = prMt_filtered;
-    emit toolTransformAndTimestamp(m_prMt, mTimestamp);
+	(*mPositionHistory)[mTimestamp] = prMt; // store original in history
+	m_prMt = prMt_filtered;
+	emit toolTransformAndTimestamp(m_prMt, mTimestamp);
 }
 
 void OpenIGTLinkTool::checkTimestampMismatch()
@@ -196,26 +196,26 @@ void OpenIGTLinkTool::printWarningAboutTimestampMismatch(double diff)
 
 void OpenIGTLinkTool::calculateTpsSlot()
 {
-    int tpsNr = 0;
-    size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
-    if (numberOfTransformsToCheck <= 1)
-    {
-        emit tps(0);
-        return;
-    }
+	int tpsNr = 0;
+	size_t numberOfTransformsToCheck = ((mPositionHistory->size() >= 10) ? 10 : mPositionHistory->size());
+	if (numberOfTransformsToCheck <= 1)
+	{
+		emit tps(0);
+		return;
+	}
 
-    TimedTransformMap::reverse_iterator rit = mPositionHistory->rbegin();
-    double lastTransform = rit->first;
-		for (size_t i = 0; i < numberOfTransformsToCheck-1; ++i)
-    {
-        ++rit;
-    }
-    double firstTransform = rit->first;
-    double secondsPassed = (lastTransform - firstTransform) / 1000;
+	TimedTransformMap::reverse_iterator rit = mPositionHistory->rbegin();
+	double lastTransform = rit->first;
+	for (size_t i = 0; i < numberOfTransformsToCheck-1; ++i)
+	{
+		++rit;
+	}
+	double firstTransform = rit->first;
+	double secondsPassed = (lastTransform - firstTransform) / 1000;
 
-    if (!similar(secondsPassed, 0))
-				tpsNr = int(numberOfTransformsToCheck / secondsPassed);
-    emit tps(tpsNr);
+	if (!similar(secondsPassed, 0))
+		tpsNr = int(numberOfTransformsToCheck / secondsPassed);
+	emit tps(tpsNr);
 }
 
 void OpenIGTLinkTool::calculateVisible()
@@ -233,10 +233,10 @@ void OpenIGTLinkTool::calculateVisible()
 
 void OpenIGTLinkTool::toolVisibleSlot(bool on)
 {
-    if (on)
-        mTpsTimer.start(1000); //calculate tps every 1 seconds
-    else
-        mTpsTimer.stop();
+	if (on)
+		mTpsTimer.start(1000); //calculate tps every 1 seconds
+	else
+		mTpsTimer.stop();
 }
 
 void OpenIGTLinkTool::setVisible(bool vis)

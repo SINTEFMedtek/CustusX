@@ -212,7 +212,7 @@ OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 
 void OpenIGTLinkTrackingSystemService::resetTimeSynchronization()
 {
-    mNetworkHandler->clearTimestampSynchronization();
+	mNetworkHandler->clearTimestampSynchronization();
 }
 
 } /* namespace cx */

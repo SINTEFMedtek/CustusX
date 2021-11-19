@@ -99,7 +99,7 @@ public:
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
-    virtual void resetTimeSynchronization();
+	virtual void resetTimeSynchronization();
 
 	bool isNull();
 
@@ -115,10 +115,10 @@ private slots:
 	void onSessionSave(QDomElement& node);
 
 private:
-    void listenForTrackingSystemServices(ctkPluginContext *context);
-    void onTrackingSystemAdded(TrackingSystemService* service);
-    void onTrackingSystemRemoved(TrackingSystemService* service);
-    void onTrackingSystemModified(TrackingSystemService* service);
+	void listenForTrackingSystemServices(ctkPluginContext *context);
+	void onTrackingSystemAdded(TrackingSystemService* service);
+	void onTrackingSystemRemoved(TrackingSystemService* service);
+	void onTrackingSystemModified(TrackingSystemService* service);
 
 
 	void rebuildCachedTools();
@@ -152,7 +152,7 @@ private:
 
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
-    boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
+	boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
 };
 
 bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for sorting tools by type

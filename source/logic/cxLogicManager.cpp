@@ -169,14 +169,14 @@ void LogicManager::onRestartWithNewProfile(QString uid)
 {
 	if (profile()->getUid()==uid)
 		return;
-    this->restartServicesWithProfile(uid);
+	this->restartServicesWithProfile(uid);
 }
 
 void LogicManager::restartServicesWithProfile(QString uid)
 {
-    this->shutdownServices();
-    ProfileManager::getInstance()->setActiveProfile(uid);
-    this->initializeServices();
+	this->shutdownServices();
+	ProfileManager::getInstance()->setActiveProfile(uid);
+	this->initializeServices();
 }
 
 void LogicManager::shutdownServices()

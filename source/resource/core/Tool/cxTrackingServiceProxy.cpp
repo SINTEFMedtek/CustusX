@@ -48,8 +48,8 @@ void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
 	connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &TrackingService::activeToolChanged);
 
-    emit stateChanged();
-    emit activeToolChanged(mTrackingService->getActiveTool()->getUid());
+	emit stateChanged();
+	emit activeToolChanged(mTrackingService->getActiveTool()->getUid());
 }
 
 void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
@@ -156,7 +156,7 @@ std::vector<TrackingSystemServicePtr> TrackingServiceProxy::getTrackingSystems()
 
 void TrackingServiceProxy::resetTimeSynchronization()
 {
-    return mTrackingService->resetTimeSynchronization();
+	return mTrackingService->resetTimeSynchronization();
 }
 
 } //cx

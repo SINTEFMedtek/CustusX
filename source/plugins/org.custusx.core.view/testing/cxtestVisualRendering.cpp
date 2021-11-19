@@ -169,8 +169,8 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 //	sleep(3);
 
 	CHECK(true);
-    //sleep(3);
-    cxtest::Utilities::sleep_sec(3);
+	//sleep(3);
+	cxtest::Utilities::sleep_sec(3);
 }
 
 //Moved to unstable, as test sometimes fail
@@ -260,32 +260,32 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
 
-    fixture.define3D(imagenames.image[0], NULL, 1, 1);
+	fixture.define3D(imagenames.image[0], NULL, 1, 1);
 	fixture.defineSlice("A", imagenames.image[0], cx::ptAXIAL, 0, 0);
 	fixture.defineSlice("C", imagenames.image[0], cx::ptCORONAL, 1, 0);
 	fixture.defineSlice("S", imagenames.image[0], cx::ptSAGITTAL, 0, 1);
 	REQUIRE(fixture.quickRunWidget());
-    cxtest::Utilities::sleep_sec(1);
+	cxtest::Utilities::sleep_sec(1);
 
 
-    std::cout << "===== CLEAR START" << std::endl;
+	std::cout << "===== CLEAR START" << std::endl;
 
 	fixture.clear();
-    std::cout << "===== CLEAR STOP" << std::endl;
-    REQUIRE(fixture.quickRunWidget());
-    cxtest::Utilities::sleep_sec(1);
-//    return;
+	std::cout << "===== CLEAR STOP" << std::endl;
+	REQUIRE(fixture.quickRunWidget());
+	cxtest::Utilities::sleep_sec(1);
+	//    return;
 
-    std::cout << "===== DEFINE 2 START" << std::endl;
-    fixture.define3D(imagenames.image[0], NULL, 0, 2);
+	std::cout << "===== DEFINE 2 START" << std::endl;
+	fixture.define3D(imagenames.image[0], NULL, 0, 2);
 	fixture.defineSlice("Any", imagenames.image[0], cx::ptANYPLANE, 0, 0);
-    fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 1);
+	fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 1);
 
-    std::cout << "===== DEFINE 2 STOP" << std::endl;
-    REQUIRE(fixture.quickRunWidget());
-//    REQUIRE(fixture.quickRunWidget());
-    REQUIRE(fixture.runWidget());
-    cxtest::Utilities::sleep_sec(1);
+	std::cout << "===== DEFINE 2 STOP" << std::endl;
+	REQUIRE(fixture.quickRunWidget());
+	//    REQUIRE(fixture.quickRunWidget());
+	REQUIRE(fixture.runWidget());
+	cxtest::Utilities::sleep_sec(1);
 
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);

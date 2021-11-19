@@ -51,28 +51,28 @@ typedef boost::shared_ptr<class ProbeImpl> ProbeImplPtr;
  */
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTool: public ToolImpl
 {
-    friend class OpenIGTLinkTrackingSystemService;
-    Q_OBJECT
+	friend class OpenIGTLinkTrackingSystemService;
+	Q_OBJECT
 
 public:
 	OpenIGTLinkTool(ConfigurationFileParser::ToolStructure configFileToolStructure, ToolFileParser::ToolInternalStructurePtr toolFileToolStructure);
-    virtual ~OpenIGTLinkTool();
+	virtual ~OpenIGTLinkTool();
 
-    virtual bool getVisible() const;
-    virtual bool isInitialized() const;
-    virtual QString getUid() const;
-    virtual QString getName() const;
-    virtual ProbePtr getProbe() const;
-    virtual double getTimestamp() const;
-    virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
-    virtual void setTooltipOffset(double val); ///< set a virtual offset extending from the tool tip.
+	virtual bool getVisible() const;
+	virtual bool isInitialized() const;
+	virtual QString getUid() const;
+	virtual QString getName() const;
+	virtual ProbePtr getProbe() const;
+	virtual double getTimestamp() const;
+	virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
+	virtual void setTooltipOffset(double val); ///< set a virtual offset extending from the tool tip.
 
-    virtual bool isCalibrated() const; ///< true if calibration is different from identity
-    virtual Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-    virtual void setCalibration_sMt(Transform3D sMt); ///< requests to use the calibration and replaces the tools calibration file
+	virtual bool isCalibrated() const; ///< true if calibration is different from identity
+	virtual Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+	virtual void setCalibration_sMt(Transform3D sMt); ///< requests to use the calibration and replaces the tools calibration file
 
-    //virtual void set_prMt(const Transform3D& prMt, double timestamp);
-    virtual void setVisible(bool vis);
+	//virtual void set_prMt(const Transform3D& prMt, double timestamp);
+	virtual void setVisible(bool vis);
 
 	bool doIdCorrespondToTool(QString openIGTLinkId);
 	bool isReference();
@@ -80,24 +80,24 @@ protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
 private slots:
 	void toolTransformAndTimestampSlot(Transform3D prMs, double timestampMS);
-    void calculateTpsSlot();
-    void toolVisibleSlot(bool);
+	void calculateTpsSlot();
+	void toolVisibleSlot(bool);
 
 private:
-    ProbePtr mProbe;
-    QTimer mTpsTimer;
-    double mTimestamp;
-		bool mVisible;
-		qint64 mLastReceivedPositionTime;
-		bool mPrintedWarningAboutTimeStampMismatch;
+	ProbePtr mProbe;
+	QTimer mTpsTimer;
+	double mTimestamp;
+	bool mVisible;
+	qint64 mLastReceivedPositionTime;
+	bool mPrintedWarningAboutTimeStampMismatch;
 
-		//Store these structures directly for now
-		ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
-		ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
+	//Store these structures directly for now
+	ConfigurationFileParser::ToolStructure mConfigFileToolStructure;
+	ToolFileParser::ToolInternalStructurePtr mToolFileToolStructure;
 
-		void calculateVisible();
-		void checkTimestampMismatch();
-		void printWarningAboutTimestampMismatch(double diff);
+	void calculateVisible();
+	void checkTimestampMismatch();
+	void printWarningAboutTimestampMismatch(double diff);
 };
 typedef boost::shared_ptr<OpenIGTLinkTool> OpenIGTLinkToolPtr;
 

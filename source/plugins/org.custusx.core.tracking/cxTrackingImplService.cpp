@@ -65,7 +65,7 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
-    this->listenForTrackingSystemServices(context);
+	this->listenForTrackingSystemServices(context);
 }
 
 TrackingImplService::~TrackingImplService()
@@ -196,23 +196,23 @@ void TrackingImplService::setState(const Tool::State val)
 
 void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *context)
 {
-    mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
-                                context,
-                                boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
-                                boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
-                                boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
-                               ));
-    mServiceListener->open();
+	mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
+							   context,
+							   boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
+							   boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
+							   boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
+							   ));
+	mServiceListener->open();
 }
 
 void TrackingImplService::onTrackingSystemAdded(TrackingSystemService* service)
 {
-    this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
+	this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service)
 {
-    this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
+	this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)
@@ -222,14 +222,14 @@ void TrackingImplService::onTrackingSystemModified(TrackingSystemService* servic
 
 void TrackingImplService::rebuildCachedTools()
 {
-    mTools.clear();
-    for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-    {
-        this->addToolsFrom(mTrackingSystems[i]);
-    }
-    mTools[mManualTool->getUid()] = mManualTool;
-    this->imbueManualToolWithRealProperties();
-    this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
+	mTools.clear();
+	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+	{
+		this->addToolsFrom(mTrackingSystems[i]);
+	}
+	mTools[mManualTool->getUid()] = mManualTool;
+	this->imbueManualToolWithRealProperties();
+	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 	this->resetTrackingPositionFilters();
 	this->onTooltipOffset(mToolTipOffset);
 	this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
@@ -601,7 +601,7 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 	ToolMap::iterator toolIt = tools.begin();
 	for (; toolIt != tools.end(); ++toolIt)
 	{
-        cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
+		cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
 		if (tool)
 		{
 			toolsNode.addObjectToElement("tool", tool);
@@ -634,7 +634,7 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 		QString tool_uid = toolNode.attribute("uid");
 		if (tools.find(tool_uid) != tools.end())
 		{
-            cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
+			cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}
@@ -696,10 +696,10 @@ TrackerConfigurationPtr TrackingImplService::getConfiguration()
 
 void TrackingImplService::resetTimeSynchronization()
 {
-    for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-    {
-        mTrackingSystems[i]->resetTimeSynchronization();
-    }
+	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+	{
+		mTrackingSystems[i]->resetTimeSynchronization();
+	}
 }
 
 } //namespace cx
