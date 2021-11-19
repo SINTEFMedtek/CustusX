@@ -51,21 +51,21 @@ public:
 
 protected:
 	void internalSetState(Tool::State val);
+	OpenIGTLinkToolPtr getTool(QString devicename);
 
 protected slots:
 	virtual void configure(); ///< sets up the software
 	virtual void deconfigure(); ///< deconfigures the software
+	virtual void receiveTransform(QString devicename, Transform3D transform, double timestampMS);
 
 private slots:
 	void serverIsConnected();
 	void serverIsDisconnected();
 
-	void receiveTransform(QString devicename, Transform3D transform, double timestampMS);
 	void receiveCalibration(QString devicename, Transform3D calibration);
 	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
 
 private:
-	OpenIGTLinkToolPtr getTool(QString devicename);
 
 	std::map<QString, OpenIGTLinkToolPtr> mTools;
 	ToolPtr mReference;
