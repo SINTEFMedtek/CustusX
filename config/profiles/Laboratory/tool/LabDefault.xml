@@ -2,8 +2,8 @@
 <configuration clinical_app="Laboratory">
     <trackingsystemimplementation type="igstk">
         <tracker type="polaris">
-            <toolfile reference="no" openigtlinktransformid="" openigtlinkimageid="">Shared/NDI-Pointer-8700340_POLARIS/NDI_pnt.xml</toolfile>
-            <toolfile reference="yes" openigtlinktransformid="" openigtlinkimageid="">Shared/NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml</toolfile>
+            <toolfile openigtlinktransformid="" reference="no" openigtlinkimageid="">Shared/NDI-Pointer-8700340_POLARIS/NDI_pnt.xml</toolfile>
+            <toolfile openigtlinktransformid="" reference="yes" openigtlinkimageid="">Shared/NDI-Reference-frame_small_POLARIS/NDI_ref_small.xml</toolfile>
         </tracker>
     </trackingsystemimplementation>
 </configuration>

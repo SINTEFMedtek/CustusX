@@ -65,7 +65,7 @@ cxResourceVisualization_EXPORT bool operator==(const CameraStyleData& lhs, const
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
  */
-cxResourceVisualization_EXPORT  int getPriority(DataPtr data);
+cxResourceVisualization_EXPORT int getPriority(DataPtr data);
 
 /**Sorts DataPtr in default display ordering, using getPriority().
  */
@@ -132,7 +132,7 @@ public:
 	SyncedValuePtr getGlobal2DZoom();
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
-    void zoomCamera3D(int zoomFactor);
+	void zoomCamera3D(int zoomFactor);
 
 	PlaneTypeCollection getSliceDefinitions();
 	void setSliceDefinitions(PlaneTypeCollection val);

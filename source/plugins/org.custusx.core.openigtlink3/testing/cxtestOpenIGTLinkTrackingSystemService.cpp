@@ -57,7 +57,6 @@ public:
 	double getNetworkHandlerTimestampOffset();
 	cx::OpenIGTLinkToolPtr getTool(QString devicename) {return cx::OpenIGTLinkTrackingSystemService::getTool(devicename);}
 
-
 public slots:
 	virtual void configure() {cx::OpenIGTLinkTrackingSystemService::configure();}
 	virtual void deconfigure() {cx::OpenIGTLinkTrackingSystemService::deconfigure();}

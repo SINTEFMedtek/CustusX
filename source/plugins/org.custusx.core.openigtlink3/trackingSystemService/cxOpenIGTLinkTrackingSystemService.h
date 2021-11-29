@@ -34,20 +34,20 @@ typedef boost::shared_ptr<class OpenIGTLinkTool> OpenIGTLinkToolPtr;
  */
 class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTrackingSystemService : public TrackingSystemService
 {
-    Q_OBJECT
-    Q_INTERFACES(cx::TrackingSystemService)
+	Q_OBJECT
+	Q_INTERFACES(cx::TrackingSystemService)
 
 public:
 	OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler);
-    virtual ~OpenIGTLinkTrackingSystemService();
+	virtual ~OpenIGTLinkTrackingSystemService();
 
-    virtual QString getUid() const;
-    virtual void setState(const Tool::State val); ///< asynchronously request a state. Wait for signal stateChanged()
-    virtual std::vector<ToolPtr> getTools();
-    virtual TrackerConfigurationPtr getConfiguration();
-    virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
+	virtual QString getUid() const;
+	virtual void setState(const Tool::State val); ///< asynchronously request a state. Wait for signal stateChanged()
+	virtual std::vector<ToolPtr> getTools();
+	virtual TrackerConfigurationPtr getConfiguration();
+	virtual ToolPtr getReference(); ///< reference tool used by entire tracking service - NOTE: system fails if several TrackingSystemServices define this tool
 
-    virtual void resetTimeSynchronization();
+	virtual void resetTimeSynchronization();
 
 protected:
 	void internalSetState(Tool::State val);

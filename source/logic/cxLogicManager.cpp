@@ -64,41 +64,16 @@ void LogicManager::initialize(ApplicationComponentPtr component)
 
 void LogicManager::shutdown()
 {
-	//The bottom 3 lines still cause tests on Ubuntu 20.04 to fail
-	//83 unit tests (many seg.faults), when running:
-	// ninja && python3 ../CX/install/cxRunTests.py --run_catch --wrap_in_ctest [unit]~[hide] -t Debug
-	//Example:
-//#0  0x00007f1fc0ee6528 in QOpenGLContext::surface() const () at /lib/x86_64-linux-gnu/libQt5Gui.so.5
-//#1  0x00007f1fc0eb6160 in QSurface::~QSurface() () at /lib/x86_64-linux-gnu/libQt5Gui.so.5
-//#2  0x00007f1fc0eb3bbf in QWindow::~QWindow() () at /lib/x86_64-linux-gnu/libQt5Gui.so.5
-//#3  0x00007f1fc255a72d in  () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
-//#4  0x00007f1fc252fa4c in QWidgetPrivate::deleteTLSysExtra() () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
-//#5  0x00007f1fc2534568 in QWidget::destroy(bool, bool) () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
-//#6  0x00007f1fc24fe207 in QApplication::~QApplication() () at /lib/x86_64-linux-gnu/libQt5Widgets.so.5
-//#7  0x00007f1fc3f1b50a in cx::Application::~Application() (this=0x7fffdb7454c0, __in_chrg=<optimized out>) at /home/olevs/dev/cx/CX/CX/source/resource/core/./utilities/cxApplication.h:36
-//#8  0x00007f1fc3f034f3 in cxtest::CatchImpl::run(int, char**) (this=0x7fffdb745520, argc=2, argv=0x7fffdb745648) at /home/olevs/dev/cx/CX/CX/source/testing/cxtestCatchImpl.cpp:30
-//#9  0x0000000000406926 in main(int, char**) (argc=2, argv=0x7fffdb745648) at /home/olevs/dev/cx/CX/CX/source/testing/cxtestCatchMain.cpp:59
+	//CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
+	//CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
+	LogicManager::getInstance()->shutdownServicesLight();
 
-	//Running
-	//ninja && ./bin/Catch [unit]~[hide]
-	//cause only 5 tests to fail. No segfaults after the current code fixes
-	//But running a single test like
-	//./bin/Catch "StreamerService: Service available"
-	//Cause the above seg. fault.
-
-	if (isUbuntu2004())
-	{
-		//Replacing the 3 lines with this seems to fix the test seg. faults on Ubuntu 20.04, but will cause issues with the other platforms
-		CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
-		LogicManager::getInstance()->shutdownLegacyStoredServices();
-	}
-	else
-	{
-		//These 3 lines cause tests on Ubuntu 20.04 to fail, but are needed for the other platforms (Windows, Mac, Ubuntu 16.04)
-		LogicManager::getInstance()->shutdownServices();
-		delete mInstance;
-		mInstance = NULL;
-	}
+	//Replacing these 3 lines with the above line seems to fix the test seg. faults on Ubuntu 20.04
+	//Now the same shutdown code is running on all platforms, and not only Ubuntu 20.04
+	//Old shutdown sequence cause seg. faults with new CTK - Qt combinations
+	//LogicManager::getInstance()->shutdownServices();
+	//delete mInstance;
+	//mInstance = NULL;
 }
 
 bool LogicManager::isUbuntu2004()
@@ -194,14 +169,14 @@ void LogicManager::onRestartWithNewProfile(QString uid)
 {
 	if (profile()->getUid()==uid)
 		return;
-    this->restartServicesWithProfile(uid);
+	this->restartServicesWithProfile(uid);
 }
 
 void LogicManager::restartServicesWithProfile(QString uid)
 {
-    this->shutdownServices();
-    ProfileManager::getInstance()->setActiveProfile(uid);
-    this->initializeServices();
+	this->shutdownServices();
+	ProfileManager::getInstance()->setActiveProfile(uid);
+	this->initializeServices();
 }
 
 void LogicManager::shutdownServices()
@@ -213,6 +188,7 @@ void LogicManager::shutdownServices()
 	}
 
 	CX_LOG_INFO() << " --- Shutting down " << qApp->applicationName() << "...";
+	CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
 
 	this->getPatientModelService()->autoSave();
 
@@ -229,6 +205,31 @@ void LogicManager::shutdownServices()
 
 	mShutdown = true;
 	CX_LOG_DEBUG() << " --- End shutdown services";
+}
+
+void LogicManager::shutdownServicesLight()
+{
+	if(mShutdown)
+	{
+		CX_LOG_ERROR() << "Trying to shutdown logicmanager when it already shutdown. Aborting shutdown, fix code.";
+		return;
+	}
+
+	CX_LOG_INFO() << " --- Shutting down (Light) " << qApp->applicationName() << "...";
+
+	this->getPatientModelService()->autoSave();
+
+	if (mComponent)
+		mComponent->destroy(); // this is the GUI - delete first
+
+	this->shutdownLegacyStoredServices();
+
+	GPUImageBufferRepository::shutdown();
+	Reporter::shutdown();
+	ProfileManager::shutdown();
+
+	mShutdown = true;
+	CX_LOG_DEBUG() << " --- End (Light) shutdown services";
 }
 
 void LogicManager::shutdownLegacyStoredServices()

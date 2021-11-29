@@ -81,8 +81,8 @@ public:
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system) = 0;
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system) = 0;
-    virtual std::vector<TrackingSystemServicePtr> getTrackingSystems() = 0;
-    virtual void resetTimeSynchronization() = 0; ///< Reset time synchronization. Used for resetting time synchronization of incoming timestamps in OpenIGTLinkTrackingSystemService
+	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems() = 0;
+	virtual void resetTimeSynchronization() = 0; ///< Reset time synchronization. Used for resetting time synchronization of incoming timestamps in OpenIGTLinkTrackingSystemService
 
 	virtual bool isNull() = 0;
 	static TrackingServicePtr getNullObject();

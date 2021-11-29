@@ -31,12 +31,12 @@ namespace cx
 {
 
 Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
-  mText(text),
-  mMessageLevel(messageLevel),
-  mTimeoutTime(timeoutTime),
-  mTimeStamp(QDateTime::currentDateTime()),
-  mMuted(true),
-  mChannel("console")
+	mText(text),
+	mMessageLevel(messageLevel),
+	mTimeoutTime(timeoutTime),
+	mTimeStamp(QDateTime::currentDateTime()),
+	mMuted(true),
+	mChannel("console")
 {
 	mThread = "NotUsed";
 	//this->setThreadName(); //Cause crash on Ubuntu 20.04, when calling QApplication::instance()->thread()
@@ -83,21 +83,21 @@ QString Message::getPrintableMessage() const
 
 MESSAGE_LEVEL Message::getMessageLevel() const
 {
-  return mMessageLevel;
+	return mMessageLevel;
 }
 
 QString Message::getText() const
 {
-  return mText;
+	return mText;
 }
 
 QDateTime Message::getTimeStamp() const
 {
-  return mTimeStamp;
+	return mTimeStamp;
 }
 int Message::getTimeout() const
 {
-  return mTimeoutTime;
+	return mTimeoutTime;
 }
 QString Message::getSourceLocation() const
 {

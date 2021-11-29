@@ -359,10 +359,10 @@ void ViewWrapper3D::createSlicesActions(QWidget* parent)
 	this->createSlicesAction(PlaneTypeCollection(ptCORONAL), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSAGITTAL), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptANYPLANE), parent);
-    this->createSlicesAction(PlaneTypeCollection(ptINVERSEANYPLANE), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptINVERSEANYPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptRADIALPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSIDEPLANE), parent);
-    this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);
 }
 
 QAction* ViewWrapper3D::createSlicesAction(PlaneTypeCollection planes, QWidget* parent)
@@ -614,14 +614,14 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 		TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(data);
 		return this->createTrackedStreamRep(trackedStream);
 	}
-    else
-    {
+	else
+	{
 		DataMetricRepPtr rep = this->createDataMetricRep3D(data);
 		if (rep)
 			return rep;
-    }
+	}
 
-    return RepPtr();
+	return RepPtr();
 }
 
 RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
@@ -654,35 +654,35 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 
 DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
 {
-    DataMetricRepPtr rep;
+	DataMetricRepPtr rep;
 
-    if (boost::dynamic_pointer_cast<PointMetric>(data))
+	if (boost::dynamic_pointer_cast<PointMetric>(data))
 		rep = PointMetricRep::New();
-    else if (boost::dynamic_pointer_cast<FrameMetric>(data))
+	else if (boost::dynamic_pointer_cast<FrameMetric>(data))
 		rep = FrameMetricRep::New();
 	else if (boost::dynamic_pointer_cast<ToolMetric>(data))
 		rep = ToolMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
 		rep = DistanceMetricRep::New();
-    else if (boost::dynamic_pointer_cast<AngleMetric>(data))
+	else if (boost::dynamic_pointer_cast<AngleMetric>(data))
 		rep = AngleMetricRep::New();
-    else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
+	else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
 		rep = PlaneMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
 		rep = DonutMetricRep::New();
-    else if (boost::dynamic_pointer_cast<CustomMetric>(data))
-        rep = CustomMetricRep::New();
+	else if (boost::dynamic_pointer_cast<CustomMetric>(data))
+		rep = CustomMetricRep::New();
 	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
 		rep = SphereMetricRep::New();
 	else if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(data))
 		rep = RegionOfInterestMetricRep::New();
 
-    if (rep)
-    {
-        this->readDataRepSettings(rep);
-        rep->setDataMetric(boost::dynamic_pointer_cast<DataMetric>(data));
-    }
-    return rep;
+	if (rep)
+	{
+		this->readDataRepSettings(rep);
+		rep->setDataMetric(boost::dynamic_pointer_cast<DataMetric>(data));
+	}
+	return rep;
 }
 
 /**helper. Read settings common for all data metric reps.

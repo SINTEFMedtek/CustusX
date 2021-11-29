@@ -98,7 +98,7 @@ vtkPolyDataPtr FileManagerServiceBase::loadVtkPolyData(QString filename)
 
 std::vector<FileReaderWriterServicePtr> FileManagerServiceBase::getExportersForDataType(QString dataType)
 {
-	std::vector<FileReaderWriterServicePtr>  retval;
+	std::vector<FileReaderWriterServicePtr> retval;
 	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
 	{
 		if (dataType.compare((*iter)->canWriteDataType()) == 0)
@@ -110,7 +110,7 @@ std::vector<FileReaderWriterServicePtr> FileManagerServiceBase::getExportersForD
 
 std::vector<FileReaderWriterServicePtr> FileManagerServiceBase::getImportersForDataType(QString dataType)
 {
-	std::vector<FileReaderWriterServicePtr>  retval;
+	std::vector<FileReaderWriterServicePtr> retval;
 	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
 	{
 		if (dataType.compare((*iter)->canReadDataType()) == 0)

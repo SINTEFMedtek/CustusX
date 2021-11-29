@@ -24,11 +24,11 @@ namespace cx
 
 bool validSpacing(Vector3D spacing)
 {
-    //Assuming (1, 1, 1) is an invalid spacing
-    if((similar(spacing[0], 1.0) && similar(spacing[0], 1.0) && similar(spacing[0], 1.0)) ||
-            similar(spacing[0], 0.0) || similar(spacing[1], 0.0) || similar(spacing[2], 0.0) )
-        return false;
-    return true;
+	//Assuming (1, 1, 1) is an invalid spacing
+	if((similar(spacing[0], 1.0) && similar(spacing[0], 1.0) && similar(spacing[0], 1.0)) ||
+			similar(spacing[0], 0.0) || similar(spacing[1], 0.0) || similar(spacing[2], 0.0) )
+		return false;
+	return true;
 }
 
 /**
@@ -49,7 +49,7 @@ struct SectorInfo
 	//Spacing are sent as separate messages, should be sent with image in the future.
 	double mSpacingX;
 	double mSpacingY;
-        double mSpacingZ;
+	double mSpacingZ;
 
 	//new standard
 	std::vector<double> mOrigin;
@@ -78,7 +78,7 @@ struct SectorInfo
 
 		mSpacingX = tooLarge;
 		mSpacingY = tooLarge;
-                mSpacingZ = 1.0; //Spacing z may not be received
+		mSpacingZ = 1.0; //Spacing z may not be received
 
 		mImage = ImagePtr();
 	}
@@ -113,7 +113,7 @@ struct SectorInfo
 	bool haveChanged()
 	{
 		return mHaveChanged;
-        }
+	}
 
 };
 
@@ -162,13 +162,13 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	double doubleValue = value.toDouble();
 	std::vector<double> doubleVector = toDoubleVector(value);
 
-        //if(!doubleVector.empty())
-        //{
-        //    std::cout << "parseStringMessage name: " << name << " Vector: ";
-        //    for (int i = 0; i < doubleVector.size(); ++i)
-        //        std::cout << doubleVector[i] << " ";
-        //    std::cout << endl;
-        //}
+	//if(!doubleVector.empty())
+	//{
+	//	std::cout << "parseStringMessage name: " << name << " Vector: ";
+	//	for (int i = 0; i < doubleVector.size(); ++i)
+	//		std::cout << doubleVector[i] << " ";
+	//	std::cout << endl;
+	//}
 
 	if (name == IGTLIO_KEY_PROBE_TYPE)
 	{
@@ -257,24 +257,24 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 	if(!this->haveValidValues())
 		return ProbeDefinitionPtr();
 
-        Vector3D spacing = mSectorInfo->mImage->getSpacing();
-        //CX_LOG_DEBUG() << "Spacing from image: " << spacing;
+	Vector3D spacing = mSectorInfo->mImage->getSpacing();
+	//CX_LOG_DEBUG() << "Spacing from image: " << spacing;
 	//Send spacing as messages for now. Should be sent together with image.
-        //The default should be to use the spacing from the image,
-        //not from meta info or string messages
-        if(validSpacing(spacing))
-        {
-            //CX_LOG_DEBUG() << "Using spacing from image: " << spacing
-            //               << " instead of spacing from meta data: " << mSectorInfo->mSpacingX << " " << mSectorInfo->mSpacingY << " " << mSectorInfo->mSpacingZ;
-        }
-        else
-        {
-            //Use spacing from meta data if not correct spacing in image.
-            //NB: Current implementation of igtlioImageConverter::IGTLToVTKImageData discards incoming spacing.
-            //It is being set to (1, 1, 1)
-            mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, mSectorInfo->mSpacingZ);
-            spacing = mSectorInfo->mImage->getSpacing();
-        }
+	//The default should be to use the spacing from the image,
+	//not from meta info or string messages
+	if(validSpacing(spacing))
+	{
+		//CX_LOG_DEBUG() << "Using spacing from image: " << spacing
+		//			   << " instead of spacing from meta data: " << mSectorInfo->mSpacingX << " " << mSectorInfo->mSpacingY << " " << mSectorInfo->mSpacingZ;
+	}
+	else
+	{
+		//Use spacing from meta data if not correct spacing in image.
+		//NB: Current implementation of igtlioImageConverter::IGTLToVTKImageData discards incoming spacing.
+		//It is being set to (1, 1, 1)
+		mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, mSectorInfo->mSpacingZ);
+		spacing = mSectorInfo->mImage->getSpacing();
+	}
 	Vector3D origin_p(mSectorInfo->mOrigin[0], mSectorInfo->mOrigin[1], mSectorInfo->mOrigin[2]);
 
 	ProbeDefinitionPtr probeDefinition = this->initProbeDefinition();

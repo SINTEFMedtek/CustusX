@@ -78,17 +78,17 @@ public:
 		return readGeneratedSegmentationFiles(true, true);
 	}
 
-    void setTestScriptFile(bool useLungsFile = false)
+	void setTestScriptFile(bool useLungsFile = false)
 	{
 		QString configPath = cx::DataLocations::getRootConfigPath();
 		//CX_LOG_DEBUG() << "config path: " << configPath;
 		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_test.ini";
-        if(useLungsFile)
-            scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_Lungs_test.ini";
-        CX_LOG_DEBUG() << "Using script file: " << scriptFile;
+		if(useLungsFile)
+			scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_Lungs_test.ini";
+		CX_LOG_DEBUG() << "Using script file: " << scriptFile;
 
-        mScriptFile->setValueFromVariant(scriptFile);
-    }
+		mScriptFile->setValueFromVariant(scriptFile);
+	}
 	void testSetupOutputColors(QStringList colorList)
 	{
 		setupOutputColors(colorList);
@@ -234,14 +234,14 @@ public slots:
 		return data;
 	}
 
-    cx::DataPtr getImportedThoraxCT(cx::PatientModelServicePtr patient)
-    {
-        QString filename = cx::DataLocations::getTestDataPath()+ "/ThoraxCT/Patient_016/pat016.mhd";
-        QString info;
-        cx::DataPtr data = patient->importData(filename, info);
-        REQUIRE(data);
-        return data;
-    }
+	cx::DataPtr getImportedThoraxCT(cx::PatientModelServicePtr patient)
+	{
+		QString filename = cx::DataLocations::getTestDataPath()+ "/ThoraxCT/Patient_016/pat016.mhd";
+		QString info;
+		cx::DataPtr data = patient->importData(filename, info);
+		REQUIRE(data);
+		return data;
+	}
 } //cxtest
 
 TEST_CASE("GenericScriptFilter: Create", "[unit]")
@@ -306,44 +306,44 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit][not_win64]")
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[unit][hide]")
 {
-    cx::LogicManager::initialize();
-    cx::DataLocations::setTestMode();
-    cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
 
-    cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
-    cxtest::checkFilterInit(filter, false, false);
-    cx::DataPtr data = cxtest::getImportedThoraxCT(services->patient());
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
+	cxtest::checkFilterInit(filter, false, false);
+	cx::DataPtr data = cxtest::getImportedThoraxCT(services->patient());
 
-    //Set input
-    std::vector < cx::SelectDataStringPropertyBasePtr > input = filter->getInputTypes();
-    {
-        INFO("Could not set input to the filter.");
-        REQUIRE(input[0]->setValue(data->getUid()));
-    }
-    {
-        INFO("The name of the input data is not as we requested.");
-        REQUIRE(input[0]->getData()->getName() == "pat016");
-    }
+	//Set input
+	std::vector < cx::SelectDataStringPropertyBasePtr > input = filter->getInputTypes();
+	{
+		INFO("Could not set input to the filter.");
+		REQUIRE(input[0]->setValue(data->getUid()));
+	}
+	{
+		INFO("The name of the input data is not as we requested.");
+		REQUIRE(input[0]->getData()->getName() == "pat016");
+	}
 
-    filter->setTestScriptFile(true);
+	filter->setTestScriptFile(true);
 
-    cxtest::checkFilterInit(filter, true, false);
+	cxtest::checkFilterInit(filter, true, false);
 
-    // Execute
-    {
-        INFO("Preprocessing GenericScriptFilter failed.");
-        REQUIRE(filter->preProcess());
-    }
-    {
-        REQUIRE(filter->execute());
-    }
-    {
-        INFO("Post processing data from GenericScriptFilter failed.");
-        REQUIRE(filter->postProcess());
-        cxtest::checkFilterInit(filter, true, true);
-    }
+	// Execute
+	{
+		INFO("Preprocessing GenericScriptFilter failed.");
+		REQUIRE(filter->preProcess());
+	}
+	{
+		REQUIRE(filter->execute());
+	}
+	{
+		INFO("Post processing data from GenericScriptFilter failed.");
+		REQUIRE(filter->postProcess());
+		cxtest::checkFilterInit(filter, true, true);
+	}
 
-    cx::LogicManager::shutdown();
+	cx::LogicManager::shutdown();
 }
 #endif
 
