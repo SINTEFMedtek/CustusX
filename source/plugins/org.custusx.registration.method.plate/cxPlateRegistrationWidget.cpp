@@ -82,14 +82,14 @@ void PlateRegistrationWidget::plateRegistrationSlot()
 	reportDebug("No refTool");
     return;
   }
-  std::map<int, Vector3D> referencePoints = refTool->getReferencePoints();
+  std::map<QString, Vector3D> referencePoints = refTool->getReferencePoints();
   if(referencePoints.empty()) //cannot register without at least 1 reference point
   {
 	reportDebug("No referenceppoints in reftool "+refTool->getName());
     return;
   }
 
-  std::map<int, Vector3D>::iterator it = referencePoints.begin();
+  std::map<QString, Vector3D>::iterator it = referencePoints.begin();
   for(; it != referencePoints.end(); ++it)
   {
 	QString uid = mServices->patient()->addLandmark();

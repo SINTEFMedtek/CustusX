@@ -65,7 +65,7 @@ public:
         QString mSROMFilename; ///< path to the tools SROM file
         unsigned int mPortNumber; ///< the port number the tool is connected to
         unsigned int mChannelNumber; ///< the channel the tool is connected to
-        std::map<int, Vector3D> mReferencePoints; ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
+        std::map<QString, Vector3D> mReferencePoints; ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
         bool mWireless; ///< whether or not the tool is wireless
         bool m5DOF; ///< whether or not the tool have 5 DOF
         //TODO use Transform3D instead

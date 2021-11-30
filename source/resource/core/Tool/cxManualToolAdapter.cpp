@@ -82,7 +82,7 @@ Transform3D ManualToolAdapter::getCalibration_sMt() const
 	return mBase->getCalibration_sMt();
 }
 
-std::map<int, Vector3D> ManualToolAdapter::getReferencePoints() const
+std::map<QString, Vector3D> ManualToolAdapter::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
 }

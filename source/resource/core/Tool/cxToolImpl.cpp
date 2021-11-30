@@ -137,12 +137,12 @@ vtkPolyDataPtr ToolImpl::getGraphicsPolyData() const
 	return mPolyData;
 }
 
-bool ToolImpl::hasReferencePointWithId(int id)
+bool ToolImpl::hasReferencePointWithId(QString id)
 {
 	return this->getReferencePoints().count(id);
 }
 
-std::map<int, Vector3D> ToolImpl::getReferencePoints() const
+std::map<QString, Vector3D> ToolImpl::getReferencePoints() const
 {
 	return getToolFileToolStructure()->mReferencePoints;
 }

@@ -147,12 +147,12 @@ void ToolProxy::setTooltipOffset(double val)
 	mTool->setTooltipOffset(val);
 }
 
-std::map<int, Vector3D> ToolProxy::getReferencePoints() const
+std::map<QString, Vector3D> ToolProxy::getReferencePoints() const
 {
 	return mTool->getReferencePoints();
 }
 
-bool ToolProxy::hasReferencePointWithId(int id)
+bool ToolProxy::hasReferencePointWithId(QString id)
 {
 	return mTool->hasReferencePointWithId(id);
 }

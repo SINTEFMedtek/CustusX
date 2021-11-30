@@ -84,7 +84,7 @@ void ToolTipCalibrateWidget::calibrateSlot()
   ToolPtr refTool = mTools->getTool();
   //Todo, we only allow the reference point with id 1 to be used to calibrate
   //this could be done more dynamic.
-  if(!refTool || !refTool->hasReferencePointWithId(1))
+  if(!refTool || !refTool->hasReferencePointWithId("1"))
     return;
 
   ToolPtr tool = mServices->tracking()->getActiveTool();
@@ -124,7 +124,7 @@ void ToolTipCalibrateWidget::calibrateSlot()
 void ToolTipCalibrateWidget::testCalibrationSlot()
 {
   ToolPtr selectedTool = mTools->getTool();
-  if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
+  if(!selectedTool || !selectedTool->hasReferencePointWithId("1"))
     return;
 
   CoordinateSystem to = mServices->spaceProvider()->getT(mServices->tracking()->getActiveTool());
@@ -146,9 +146,9 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
   if(mTools->getTool())
   {
 	ToolPtr tool = mTools->getTool();
-    if(tool && tool->hasReferencePointWithId(1))
+    if(tool && tool->hasReferencePointWithId("1"))
     {
-      text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);
+      text = "Ref. point: "+qstring_cast(tool->getReferencePoints()["1"]);
       mCalibrateButton->setEnabled(true);
     }
     else
@@ -201,7 +201,7 @@ Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 
 Vector3D ToolTipCalibrationCalculator::get_referencePoint_ref()
 {
-  return mRef->getReferencePoints()[1];
+  return mRef->getReferencePoints()["1"];
 }
 
 Transform3D ToolTipCalibrationCalculator::get_sMt_new()

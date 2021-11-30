@@ -45,7 +45,7 @@ public:
 	virtual ProbePtr getProbe() const;
 
 	virtual Transform3D getCalibration_sMt() const;
-	virtual std::map<int, Vector3D> getReferencePoints() const;
+    virtual std::map<QString, Vector3D> getReferencePoints() const;
 
 	void setBase(ToolPtr base);
 

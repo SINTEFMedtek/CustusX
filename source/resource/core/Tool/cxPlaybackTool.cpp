@@ -124,7 +124,7 @@ Transform3D PlaybackTool::getCalibration_sMt() const
 	return mBase->getCalibration_sMt();
 }
 
-std::map<int, Vector3D> PlaybackTool::getReferencePoints() const
+std::map<QString, Vector3D> PlaybackTool::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
 }

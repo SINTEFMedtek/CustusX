@@ -280,18 +280,10 @@ ToolFileParser::ToolInternalStructurePtr ToolFileParser::getTool()
             reportWarning("Found reference point without id attribute. Skipping.");
             continue;
         }
-        bool ok;
-        int id = node.toElement().attribute("id").toInt(&ok);
-        if (!ok)
-        {
-            reportWarning("Attribute id of a reference point was not an int. Skipping.");
-						CX_LOG_ERROR() << "mToolFilePath: " << mToolFilePath;
-						CX_LOG_ERROR() << "Error with id value: " << node.toElement().attribute("id");
-            continue;
-        }
+        QString id = node.toElement().attribute("id");
         QString toolSensorReferencePointText = node.toElement().text();
         Vector3D vector = Vector3D::fromString(toolSensorReferencePointText);
-				internalStructure->mReferencePoints[id] = vector;
+        internalStructure->mReferencePoints[id] = vector;
     }
 
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
