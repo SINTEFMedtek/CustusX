@@ -137,6 +137,7 @@ void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 	mTrackingSystems.push_back(system);
 	report("Installing tracking system: " + system->getUid());
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
+	connect(system.get(), &TrackingSystemService::updateTrackingSystemImplementation, this, &TrackingImplService::setCurrentTrackingSystemImplementation, Qt::DirectConnection);
 	this->onSystemStateChanged();
 }
 
@@ -144,6 +145,7 @@ void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr syste
 {
 	report("Uninstalling tracking system: " + system->getUid());
 	disconnect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
+	disconnect(system.get(), &TrackingSystemService::updateTrackingSystemImplementation, this, &TrackingImplService::setCurrentTrackingSystemImplementation);
 
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 	{
@@ -678,20 +680,58 @@ ToolPtr TrackingImplService::getFirstProbe()
 	return ToolPtr();
 }
 
-//This may not work if more than one tracking system returns a configuration?
-TrackerConfigurationPtr TrackingImplService::getConfiguration()
+std::vector<TrackerConfigurationPtr> TrackingImplService::getConfigurations()
 {
-	TrackerConfigurationPtr config;
+	std::vector<TrackerConfigurationPtr> retval;
+	bool gotConfig = false;
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 	{
-		TrackerConfigurationPtr config2 = mTrackingSystems[i]->getConfiguration();
-		if (config2)
+		TrackerConfigurationPtr config = mTrackingSystems[i]->getConfiguration();
+		if (config)
 		{
-			config = config2;
-//			CX_LOG_DEBUG() << "getConfiguration config TrackingSystemSolution: " << config->getTrackingSystemImplementation();
+			retval.push_back(config);
+			//CX_LOG_DEBUG() << "getConfiguration config TrackingSystemSolution: " << config->getTrackingSystemImplementation();
+			gotConfig = true;
 		}
 	}
-	return config;
+	if(!gotConfig)
+		retval.push_back(TrackerConfigurationPtr());
+
+	return retval;
+}
+
+TrackerConfigurationPtr TrackingImplService::getConfiguration(QString trackingSystemImplementation)
+{
+	std::vector<TrackerConfigurationPtr> configs = this->getConfigurations();
+	for(unsigned  i = 0; i < configs.size(); ++i)
+	{
+		if(configs[i]->getTrackingSystemImplementation() == trackingSystemImplementation)
+			return configs[i];
+	}
+	return TrackerConfigurationPtr();
+}
+
+TrackerConfigurationPtr TrackingImplService::getConfiguration()
+{
+	TrackerConfigurationPtr retval = this->getConfiguration(mTrackingSystemImplementation);
+	if(!retval)
+	{
+		//Always try to return a tool configuration
+		std::vector<TrackerConfigurationPtr> configs = this->getConfigurations();
+		if(configs.size() > 0)
+			retval = configs.at(0);
+	}
+	return retval;
+}
+void TrackingImplService::setCurrentTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+	//CX_LOG_DEBUG() << "setCurrentTrackingSystemImplementation: " << trackingSystemImplementation;
+	mTrackingSystemImplementation = trackingSystemImplementation;
+}
+
+QString TrackingImplService::getCurrentTrackingSystemImplementation()
+{
+	return mTrackingSystemImplementation;
 }
 
 void TrackingImplService::resetTimeSynchronization()

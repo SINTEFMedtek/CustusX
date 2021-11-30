@@ -69,7 +69,11 @@ public:
 
 	void addTool(DummyToolPtr tool);
 	virtual ToolPtr getFirstProbe() { return ToolPtr(); }
-	virtual TrackerConfigurationPtr getConfiguration() { return TrackerConfigurationPtr(); }
+	virtual std::vector<TrackerConfigurationPtr> getConfigurations();
+	//virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
+	virtual TrackerConfigurationPtr getConfiguration();
+	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);
+	virtual QString getCurrentTrackingSystemImplementation();
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);

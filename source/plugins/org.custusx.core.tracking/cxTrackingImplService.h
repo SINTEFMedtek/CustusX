@@ -94,7 +94,10 @@ public:
 	virtual ToolPtr getFirstProbe();
 
 	virtual void setPlaybackMode(PlaybackTimePtr controller);
+	virtual std::vector<TrackerConfigurationPtr> getConfigurations();
+	//virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
 	virtual TrackerConfigurationPtr getConfiguration();
+	virtual QString getCurrentTrackingSystemImplementation();
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
@@ -102,6 +105,9 @@ public:
 	virtual void resetTimeSynchronization();
 
 	bool isNull();
+	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);
+
+public slots:
 
 private slots:
 	void globalConfigurationFileChangedSlot(QString key);
@@ -137,6 +143,7 @@ private:
 	virtual void loadPositionHistory();
 
 	QString getLoggingFolder();
+	virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
 
 	ToolMap mTools; ///< all tools
 	ToolPtr mActiveTool; ///< the tool with highest priority
@@ -153,6 +160,7 @@ private:
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
 	boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
+	QString mTrackingSystemImplementation;
 };
 
 bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for sorting tools by type
