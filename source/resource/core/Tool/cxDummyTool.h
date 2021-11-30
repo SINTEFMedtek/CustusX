@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -116,7 +116,7 @@ protected:
 		QTimer* timer = new QTimer;
 		timer->start(mInterval);
 		connect(timer, SIGNAL(timeout()), this, SIGNAL(ping())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-//		connect(timer, SIGNAL(timeout()), this, SLOT(pong())); // this signal will be executed in the thread of THIS, i.e. the main thread.
+		//		connect(timer, SIGNAL(timeout()), this, SLOT(pong())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 		exec();
 		delete timer;
 	}
@@ -190,11 +190,11 @@ public:
 	void set_prMt(const Transform3D& ptMt);
 	void setVisible(bool val);
 
-//	virtual double getTooltipOffset() const;
-//	virtual void setTooltipOffset(double val);
+	//	virtual double getTooltipOffset() const;
+	//	virtual void setTooltipOffset(double val);
 	virtual Transform3D getCalibration_sMt() const;
 
-    virtual std::map<QString, Vector3D> getReferencePoints() const {return std::map<QString, Vector3D>();};
+	virtual std::map<QString, Vector3D> getReferencePoints() const {return std::map<QString, Vector3D>();};
 
 	static vtkPolyDataPtr createPolyData(double h1, double h2, double r1, double r2);
 
@@ -214,7 +214,7 @@ private:
 	std::vector<Transform3D> mTransforms;
 
 	static int mTransformCount;
-//	Type mType;
+	//	Type mType;
 	std::set<Type> mTypes;
 	ProbeDefinition mProbeDefinition;
 	ProbePtr mProbe;

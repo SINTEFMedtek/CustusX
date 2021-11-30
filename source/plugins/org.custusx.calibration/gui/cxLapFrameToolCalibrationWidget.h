@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -45,28 +45,28 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
  */
 class org_custusx_calibration_EXPORT LapFrameToolCalibrationWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent);
-  virtual ~LapFrameToolCalibrationWidget();
+	LapFrameToolCalibrationWidget(VisServicesPtr services, QWidget* parent);
+	virtual ~LapFrameToolCalibrationWidget();
 
 private slots:
-  void calibrateSlot();
-  void testCalibrationSlot();
-  void toolSelectedSlot();
-  void trackingStartedSlot();
+	void calibrateSlot();
+	void testCalibrationSlot();
+	void toolSelectedSlot();
+	void trackingStartedSlot();
 
 private:
-  VisServicesPtr mServices;
-  QPushButton* mCalibrateButton;
-  QLabel* mReferencePointLabel;
-  QPushButton* mTestButton;
-  QLabel* mCalibrationLabel;
-  QLabel* mDeltaLabel;
-  StringPropertySelectToolPtr mCalibRefTool;
-  StringPropertySelectToolPtr mCalibratingTool;
-  DoublePropertyPtr mCameraAngleAdapter;
+	VisServicesPtr mServices;
+	QPushButton* mCalibrateButton;
+	QLabel* mReferencePointLabel;
+	QPushButton* mTestButton;
+	QLabel* mCalibrationLabel;
+	QLabel* mDeltaLabel;
+	StringPropertySelectToolPtr mCalibRefTool;
+	StringPropertySelectToolPtr mCalibratingTool;
+	DoublePropertyPtr mCameraAngleAdapter;
 };
 
 /**
@@ -81,20 +81,20 @@ private:
 class org_custusx_calibration_EXPORT LapFrameToolCalibrationCalculator
 {
 public:
-  LapFrameToolCalibrationCalculator(ToolPtr tool, ToolPtr calRef, double cameraAngle);
-  ~LapFrameToolCalibrationCalculator() {}
+	LapFrameToolCalibrationCalculator(ToolPtr tool, ToolPtr calRef, double cameraAngle);
+	~LapFrameToolCalibrationCalculator() {}
 
-  Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
-  Transform3D get_calibration_sMt(); ///< new calibration matrix for the input tool.
+	Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
+	Transform3D get_calibration_sMt(); ///< new calibration matrix for the input tool.
 
 private:
-  void useOnlyRotationalPart(Transform3D* transform);
-  ToolPtr mTool; ///< the tool the sampled point is taken from
-  ToolPtr mCalibrationRef; ///< the tool that contains the reference point we are going to calibrate against
-  Transform3D m_sMpr; ///< raw tracking position, patient reference to tool sensor.
-  Transform3D m_qMpr; ///< position of calibration position.
-  Transform3D m_qMcr; ///< hardcoded position of calibration point relative to calibration tool cr.
-  double mCameraAngle; ///< additional y-tilt on the tool side.
+	void useOnlyRotationalPart(Transform3D* transform);
+	ToolPtr mTool; ///< the tool the sampled point is taken from
+	ToolPtr mCalibrationRef; ///< the tool that contains the reference point we are going to calibrate against
+	Transform3D m_sMpr; ///< raw tracking position, patient reference to tool sensor.
+	Transform3D m_qMpr; ///< position of calibration position.
+	Transform3D m_qMcr; ///< hardcoded position of calibration point relative to calibration tool cr.
+	double mCameraAngle; ///< additional y-tilt on the tool side.
 };
 /**
  * @}

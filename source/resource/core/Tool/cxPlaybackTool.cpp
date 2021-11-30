@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -20,8 +20,8 @@ namespace cx
 
 PlaybackTool::PlaybackTool(ToolPtr base, PlaybackTimePtr time) :
 	ToolImpl(base->getUid(), "playback "+base->getName()), mBase(base),
-    mTime(time),
-    mVisible(false)
+	mTime(time),
+	mVisible(false)
 {
 	connect(mTime.get(), SIGNAL(changed()), this, SLOT(timeChangedSlot()));
 

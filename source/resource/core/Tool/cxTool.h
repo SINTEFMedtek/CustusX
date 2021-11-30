@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -62,7 +62,7 @@ class cxResource_EXPORT Tool: public QObject
 {
 	Q_OBJECT
 public:
-    static vtkPolyDataPtr createDefaultPolyDataCone();
+	static vtkPolyDataPtr createDefaultPolyDataCone();
 
 	Tool(const QString& uid="", const QString& name = "");
 	virtual ~Tool()	{}
@@ -118,8 +118,8 @@ public:
 
 	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
-    virtual std::map<QString, Vector3D> getReferencePoints() const { return std::map<QString, Vector3D>(); } ///< Get the optional reference points from this tool
-    virtual bool hasReferencePointWithId(QString id) { Q_UNUSED(id); return false; }
+	virtual std::map<QString, Vector3D> getReferencePoints() const { return std::map<QString, Vector3D>(); } ///< Get the optional reference points from this tool
+	virtual bool hasReferencePointWithId(QString id) { Q_UNUSED(id); return false; }
 
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime) = 0;
 	virtual Transform3D get_prMt() const = 0;

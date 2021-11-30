@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -44,27 +44,27 @@ typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectTo
  */
 class org_custusx_calibration_EXPORT ToolTipCalibrateWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent);
-  ~ToolTipCalibrateWidget();
+	ToolTipCalibrateWidget(VisServicesPtr services, QWidget* parent);
+	~ToolTipCalibrateWidget();
 
 private slots:
-  void calibrateSlot();
-  void testCalibrationSlot();
-  void toolSelectedSlot();
-  void onTrackingSystemStateChanged();
+	void calibrateSlot();
+	void testCalibrationSlot();
+	void toolSelectedSlot();
+	void onTrackingSystemStateChanged();
 
 private:
-  VisServicesPtr mServices;
-  QPushButton* mCalibrateButton;
-  LabeledComboBoxWidget* mCalibrateToolComboBox;
-  QLabel* mReferencePointLabel;
-  QPushButton* mTestButton;
-  QLabel* mCalibrationLabel;
-  QLabel* mDeltaLabel;
-  StringPropertySelectToolPtr mTools;
+	VisServicesPtr mServices;
+	QPushButton* mCalibrateButton;
+	LabeledComboBoxWidget* mCalibrateToolComboBox;
+	QLabel* mReferencePointLabel;
+	QPushButton* mTestButton;
+	QLabel* mCalibrationLabel;
+	QLabel* mDeltaLabel;
+	StringPropertySelectToolPtr mTools;
 };
 
 
@@ -74,22 +74,22 @@ private:
 class org_custusx_calibration_EXPORT ToolTipCalibrationCalculator
 {
 public:
-  ToolTipCalibrationCalculator(SpaceProviderPtr spaces, ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
-  ~ToolTipCalibrationCalculator();
+	ToolTipCalibrationCalculator(SpaceProviderPtr spaces, ToolPtr tool, ToolPtr ref, Vector3D p_t = Vector3D());
+	~ToolTipCalibrationCalculator();
 
-  Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
-  Transform3D get_calibration_sMt(); ///<
+	Vector3D get_delta_ref(); ///< how far from the reference point the sampled point is, in pr's coord
+	Transform3D get_calibration_sMt(); ///<
 
 private:
-  Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
-  Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
-  Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
-  Transform3D get_sMt_new(); ///< the new calibration
+	Vector3D get_sampledPoint_t(); ///< the tools sampled point in tool space
+	Vector3D get_sampledPoint_ref(); ///< the tools sampled point in ref space
+	Vector3D get_referencePoint_ref(); ///< the ref tools reference point in ref space
+	Transform3D get_sMt_new(); ///< the new calibration
 
-  SpaceProviderPtr mSpaces;
-  ToolPtr mTool; ///< the tool the sampled point is taken from
-  ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
-  Vector3D mP_t; ///< the sampled point we are working on
+	SpaceProviderPtr mSpaces;
+	ToolPtr mTool; ///< the tool the sampled point is taken from
+	ToolPtr mRef; ///< the tool that contains the reference point we are going to calibrate against
+	Vector3D mP_t; ///< the sampled point we are working on
 };
 
 /**

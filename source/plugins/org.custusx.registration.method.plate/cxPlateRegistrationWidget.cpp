@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -47,24 +47,24 @@ PlateRegistrationWidget::~PlateRegistrationWidget()
 
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
-  BaseWidget::showEvent(event);
-  connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
-		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
-  connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
-		  this, &PlateRegistrationWidget::landmarkUpdatedSlot);
+	BaseWidget::showEvent(event);
+	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+			this, &PlateRegistrationWidget::landmarkUpdatedSlot);
+	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+			this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
-  BaseWidget::hideEvent(event);
-  disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
-			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
-  disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
-			 this, &PlateRegistrationWidget::landmarkUpdatedSlot);
+	BaseWidget::hideEvent(event);
+	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded,
+			   this, &PlateRegistrationWidget::landmarkUpdatedSlot);
+	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved,
+			   this, &PlateRegistrationWidget::landmarkUpdatedSlot);
 
-  mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
+	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 }
 
 void PlateRegistrationWidget::landmarkUpdatedSlot()
@@ -76,59 +76,59 @@ void PlateRegistrationWidget::plateRegistrationSlot()
 {
 	mServices->patient()->getPatientLandmarks()->clear();
 
-  ToolPtr refTool = mServices->tracking()->getReferenceTool();
-  if(!refTool)//cannot register without a reference tool
-  {
-	reportDebug("No refTool");
-    return;
-  }
-  std::map<QString, Vector3D> referencePoints = refTool->getReferencePoints();
-  if(referencePoints.empty()) //cannot register without at least 1 reference point
-  {
-	reportDebug("No referenceppoints in reftool "+refTool->getName());
-    return;
-  }
+	ToolPtr refTool = mServices->tracking()->getReferenceTool();
+	if(!refTool)//cannot register without a reference tool
+	{
+		reportDebug("No refTool");
+		return;
+	}
+	std::map<QString, Vector3D> referencePoints = refTool->getReferencePoints();
+	if(referencePoints.empty()) //cannot register without at least 1 reference point
+	{
+		reportDebug("No referenceppoints in reftool "+refTool->getName());
+		return;
+	}
 
-  std::map<QString, Vector3D>::iterator it = referencePoints.begin();
-  for(; it != referencePoints.end(); ++it)
-  {
-	QString uid = mServices->patient()->addLandmark();
-	mServices->patient()->setLandmarkName(uid, qstring_cast(it->first));
-	mServices->patient()->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
-  }
+	std::map<QString, Vector3D>::iterator it = referencePoints.begin();
+	for(; it != referencePoints.end(); ++it)
+	{
+		QString uid = mServices->patient()->addLandmark();
+		mServices->patient()->setLandmarkName(uid, qstring_cast(it->first));
+		mServices->patient()->getPatientLandmarks()->setLandmark(Landmark(uid, it->second));
+	}
 
-  // set all landmarks as not active as default
-  LandmarkPropertyMap map = mServices->patient()->getLandmarkProperties();
-  LandmarkPropertyMap::iterator landmarkIt = map.begin();
-  for(; landmarkIt != map.end(); ++landmarkIt)
-  {
-	mServices->patient()->setLandmarkActive(landmarkIt->first, false);
-  }
+	// set all landmarks as not active as default
+	LandmarkPropertyMap map = mServices->patient()->getLandmarkProperties();
+	LandmarkPropertyMap::iterator landmarkIt = map.begin();
+	for(; landmarkIt != map.end(); ++landmarkIt)
+	{
+		mServices->patient()->setLandmarkActive(landmarkIt->first, false);
+	}
 
-  //we don't want the user to load the landmarks twice, it will result in alot of global landmarks...
-  mPlateRegistrationButton->setDisabled(true);
+	//we don't want the user to load the landmarks twice, it will result in alot of global landmarks...
+	mPlateRegistrationButton->setDisabled(true);
 }
 
 void PlateRegistrationWidget::internalUpdate()
 {
-  ToolPtr refTool = mServices->tracking()->getReferenceTool();
+	ToolPtr refTool = mServices->tracking()->getReferenceTool();
 
-  QString labelText = "";
-  if(!refTool || refTool->getReferencePoints().size()<1)
-  {
-    mPlateRegistrationButton->setDisabled(true);
+	QString labelText = "";
+	if(!refTool || refTool->getReferencePoints().size()<1)
+	{
+		mPlateRegistrationButton->setDisabled(true);
 
-    labelText.append("Configure the tracker to have <br>a reference frame that has at least <br>one reference point.");
-  }else
-  {
-    mPlateRegistrationButton->setEnabled(true);
+		labelText.append("Configure the tracker to have <br>a reference frame that has at least <br>one reference point.");
+	}else
+	{
+		mPlateRegistrationButton->setEnabled(true);
 
-    labelText = "<b>Reference tool selected:</b> <br>";
-    labelText.append("Tool name: <i>"+refTool->getName()+"</i><br>");
-    labelText.append("Number of defined reference points: <i>"+qstring_cast(refTool->getReferencePoints().size())+"</i>");
-  }
+		labelText = "<b>Reference tool selected:</b> <br>";
+		labelText.append("Tool name: <i>"+refTool->getName()+"</i><br>");
+		labelText.append("Number of defined reference points: <i>"+qstring_cast(refTool->getReferencePoints().size())+"</i>");
+	}
 
-  mReferenceToolInfoLabel->setText(labelText);
+	mReferenceToolInfoLabel->setText(labelText);
 }
 
 }//namespace cx

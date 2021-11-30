@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -111,7 +111,7 @@ void ToolImpl::set_prMt(const Transform3D& prMt, double timestamp)
 
 void ToolImpl::resetTrackingPositionFilter(TrackingPositionFilterPtr filter)
 {
-    mTrackingPositionFilter = filter;
+	mTrackingPositionFilter = filter;
 }
 
 void ToolImpl::createToolGraphic()
@@ -119,7 +119,7 @@ void ToolImpl::createToolGraphic()
 	QString toolGraphicsFileName = this->getToolFileToolStructure()->mGraphicsFileName;
 	QDir dir;
 	if (!toolGraphicsFileName.isEmpty()
-					&& dir.exists(toolGraphicsFileName))
+			&& dir.exists(toolGraphicsFileName))
 	{
 		vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
 		reader->SetFileName(cstring_cast(toolGraphicsFileName));

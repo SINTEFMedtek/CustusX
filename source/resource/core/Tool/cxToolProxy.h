@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef CXTOOLPROXY_H
@@ -54,8 +54,8 @@ public:
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
-    virtual std::map<QString, Vector3D> getReferencePoints() const;
-    virtual bool hasReferencePointWithId(QString id);
+	virtual std::map<QString, Vector3D> getReferencePoints() const;
+	virtual bool hasReferencePointWithId(QString id);
 
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
 	virtual Transform3D get_prMt() const;

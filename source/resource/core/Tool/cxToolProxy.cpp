@@ -22,11 +22,11 @@ ToolProxy::ToolProxy(ToolPtr base, ctkPluginContext *pluginContext)
 void ToolProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
-								 mPluginContext,
-								 boost::bind(&ToolProxy::onServiceAdded, this, _1),
-								 boost::function<void (TrackingService*)>(),
-								 boost::bind(&ToolProxy::onServiceRemoved, this, _1)
-								 ));
+							   mPluginContext,
+							   boost::bind(&ToolProxy::onServiceAdded, this, _1),
+							   boost::function<void (TrackingService*)>(),
+							   boost::bind(&ToolProxy::onServiceRemoved, this, _1)
+							   ));
 	mServiceListener->open();
 }
 
@@ -57,7 +57,7 @@ void ToolProxy::checkToolValidity()
 	{
 		std::cout << "disabling tool reference for " << mTool->getUid() << ", [currently disabled]" << std::endl;
 		// enable this when tool manager is a first-class plugin
-//		mTool = Tool::getNullObject();
+		//		mTool = Tool::getNullObject();
 		// emit changed signals
 	}
 }

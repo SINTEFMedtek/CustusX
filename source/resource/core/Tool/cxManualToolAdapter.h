@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -45,7 +45,7 @@ public:
 	virtual ProbePtr getProbe() const;
 
 	virtual Transform3D getCalibration_sMt() const;
-    virtual std::map<QString, Vector3D> getReferencePoints() const;
+	virtual std::map<QString, Vector3D> getReferencePoints() const;
 
 	void setBase(ToolPtr base);
 
@@ -56,7 +56,7 @@ public:
 private slots:
 	void emitPosition();
 private:
-  ToolPtr mBase;
+	ToolPtr mBase;
 };
 
 typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;

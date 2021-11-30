@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -59,11 +59,11 @@ MetricManager::MetricManager(ViewServicePtr viewService, PatientModelServicePtr 
 	mFileManager(filemanager)
 {
 	connect(trackingService.get(), &TrackingService::stateChanged, this, &MetricManager::metricsChanged);
-	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));    
+	connect(patientModelService.get(), SIGNAL(dataAddedOrRemoved()), this, SIGNAL(metricsChanged()));
 
-    mUserSettings.coordSys = pcsRAS;
-    mUserSettings.imageRefs.push_back("");
-    mUserSettings.imageRefs.push_back("");
+	mUserSettings.coordSys = pcsRAS;
+	mUserSettings.imageRefs.push_back("");
+	mUserSettings.imageRefs.push_back("");
 }
 
 DataMetricPtr MetricManager::getMetric(QString uid)
@@ -104,11 +104,11 @@ void MetricManager::setActiveUid(QString uid)
 
 void MetricManager::moveToMetric(QString uid)
 {
-	  DataMetricPtr metric = this->getMetric(uid);
-	  if (!metric)
-		  return;
-	  Vector3D p_r = metric->getRefCoord();;
-	  this->setManualToolPosition(p_r);
+	DataMetricPtr metric = this->getMetric(uid);
+	if (!metric)
+		return;
+	Vector3D p_r = metric->getRefCoord();;
+	this->setManualToolPosition(p_r);
 }
 
 void MetricManager::setManualToolPosition(Vector3D p_r)
@@ -134,7 +134,7 @@ PointMetricPtr MetricManager::addPoint(Vector3D point, CoordinateSystem space, Q
 	p1->get_rMd_History()->setParentSpace("reference");
 	p1->setSpace(space);
 	p1->setCoordinate(point);
-    p1->setColor(color);
+	p1->setColor(color);
 	mPatientModelService->insertData(p1);
 
 	mViewService->getGroup(0)->addData(p1->getUid());
@@ -165,70 +165,70 @@ void MetricManager::addPointButtonClickedSlot()
 PointMetricPtr MetricManager::addPointInDefaultPosition()
 {
 	CoordinateSystem ref = CoordinateSystem::reference();
-    QColor color = QColor(240, 170, 255, 255);
+	QColor color = QColor(240, 170, 255, 255);
 	Vector3D p_ref = mSpaceProvider->getActiveToolTipPoint(ref, true);
 
 	DataPtr data = mPatientModelService->getData(mActiveLandmark);
-    if(!data)
+	if(!data)
 
-        return this->addPoint(p_ref, ref,"point%1", color);
+		return this->addPoint(p_ref, ref,"point%1", color);
 
-    PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
-    if(pointMetric)
-    {
-        ref = pointMetric->getSpace();
+	PointMetricPtr pointMetric = boost::dynamic_pointer_cast<PointMetric>(data);
+	if(pointMetric)
+	{
+		ref = pointMetric->getSpace();
 		p_ref = mSpaceProvider->getActiveToolTipPoint(ref, true);
-    }
+	}
 
-    DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
-    if(metric)
-        color = metric->getColor();
+	DataMetricPtr metric = boost::dynamic_pointer_cast<DataMetric>(data);
+	if(metric)
+		color = metric->getColor();
 
 
 
-    return this->addPoint(p_ref, ref,"point%1", color);
+	return this->addPoint(p_ref, ref,"point%1", color);
 }
 
 void MetricManager::addFrameButtonClickedSlot()
 {
 	FrameMetricPtr frame = mPatientModelService->createSpecificData<FrameMetric>("frame%1");
-  frame->get_rMd_History()->setParentSpace("reference");
+	frame->get_rMd_History()->setParentSpace("reference");
 
-  CoordinateSystem ref = CoordinateSystem::reference();
-  Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(ref, true);
+	CoordinateSystem ref = CoordinateSystem::reference();
+	Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(ref, true);
 
-  frame->setSpace(ref);
-  frame->setFrame(rMt);
+	frame->setSpace(ref);
+	frame->setFrame(rMt);
 
-  this->installNewMetric(frame);
+	this->installNewMetric(frame);
 }
 
 void MetricManager::addToolButtonClickedSlot()
 {
 	ToolMetricPtr frame = mPatientModelService->createSpecificData<ToolMetric>("tool%1");
-  frame->get_rMd_History()->setParentSpace("reference");
+	frame->get_rMd_History()->setParentSpace("reference");
 
-  CoordinateSystem ref = CoordinateSystem::reference();
-  Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(ref, true);
+	CoordinateSystem ref = CoordinateSystem::reference();
+	Transform3D rMt = mSpaceProvider->getActiveToolTipTransform(ref, true);
 
-  frame->setSpace(ref);
-  frame->setFrame(rMt);
-  frame->setToolName(mTrackingService->getActiveTool()->getName());
-  frame->setToolOffset(mTrackingService->getActiveTool()->getTooltipOffset());
+	frame->setSpace(ref);
+	frame->setFrame(rMt);
+	frame->setToolName(mTrackingService->getActiveTool()->getName());
+	frame->setToolOffset(mTrackingService->getActiveTool()->getTooltipOffset());
 
-  this->installNewMetric(frame);
+	this->installNewMetric(frame);
 }
 
 void MetricManager::addPlaneButtonClickedSlot()
 {
-  PlaneMetricPtr p1 = mPatientModelService->createSpecificData<PlaneMetric>("plane%1");
-  p1->get_rMd_History()->setParentSpace("reference");
+	PlaneMetricPtr p1 = mPatientModelService->createSpecificData<PlaneMetric>("plane%1");
+	p1->get_rMd_History()->setParentSpace("reference");
 
-  std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
-  for (unsigned i=0; i<args.size(); ++i)
-	p1->getArguments()->set(i, args[i]);
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(p1->getArguments());
+	for (unsigned i=0; i<args.size(); ++i)
+		p1->getArguments()->set(i, args[i]);
 
-  this->installNewMetric(p1);
+	this->installNewMetric(p1);
 }
 
 /**Starting with a selection of allowed arguments for a new metric,
@@ -237,28 +237,28 @@ void MetricManager::addPlaneButtonClickedSlot()
  */
 std::vector<DataPtr> MetricManager::refinePointArguments(std::vector<DataPtr> args, unsigned argNo)
 {
-  // erase non-selected arguments if we have more than enough
-  //std::set<QString> selectedUids = this->getSelectedUids();
-  for (unsigned i=0; i<args.size();)
-  {
-	if (args.size() <= argNo)
-		break;
-	if (!mSelection.count(args[i]->getUid()))
-		args.erase(args.begin()+i);
-	else
-		++i;
-  }
+	// erase non-selected arguments if we have more than enough
+	//std::set<QString> selectedUids = this->getSelectedUids();
+	for (unsigned i=0; i<args.size();)
+	{
+		if (args.size() <= argNo)
+			break;
+		if (!mSelection.count(args[i]->getUid()))
+			args.erase(args.begin()+i);
+		else
+			++i;
+	}
 
-  while (args.size() > argNo)
-	args.erase(args.begin());
+	while (args.size() > argNo)
+		args.erase(args.begin());
 
-  while (args.size() < argNo)
-  {
-	  PointMetricPtr p0 = this->addPointInDefaultPosition();
-	  args.push_back(p0);
-  }
+	while (args.size() < argNo)
+	{
+		PointMetricPtr p0 = this->addPointInDefaultPosition();
+		args.push_back(p0);
+	}
 
-  return args;
+	return args;
 }
 
 void MetricManager::addROIButtonClickedSlot()
@@ -276,15 +276,15 @@ void MetricManager::addDistanceButtonClickedSlot()
 void MetricManager::addAngleButtonClickedSlot()
 {
 	AngleMetricPtr d0 = mPatientModelService->createSpecificData<AngleMetric>("angle%1");
-  d0->get_rMd_History()->setParentSpace("reference");
+	d0->get_rMd_History()->setParentSpace("reference");
 
-  std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments(), 3);
-  d0->getArguments()->set(0, args[0]);
-  d0->getArguments()->set(1, args[1]);
-  d0->getArguments()->set(2, args[1]);
-  d0->getArguments()->set(3, args[2]);
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments(), 3);
+	d0->getArguments()->set(0, args[0]);
+	d0->getArguments()->set(1, args[1]);
+	d0->getArguments()->set(2, args[1]);
+	d0->getArguments()->set(3, args[2]);
 
-  this->installNewMetric(d0);
+	this->installNewMetric(d0);
 }
 
 std::vector<DataPtr> MetricManager::getSpecifiedNumberOfValidArguments(MetricReferenceArgumentListPtr arguments, int numberOfRequiredArguments)
@@ -296,8 +296,8 @@ std::vector<DataPtr> MetricManager::getSpecifiedNumberOfValidArguments(MetricRef
 	std::vector<DataPtr> args;
 	for (unsigned i=0; i<metrics.size(); ++i)
 	{
-	  if (arguments->validArgument(metrics[i]))
-		  args.push_back(metrics[i]);
+		if (arguments->validArgument(metrics[i]))
+			args.push_back(metrics[i]);
 	}
 
 	if (numberOfRequiredArguments<0)
@@ -331,21 +331,21 @@ void MetricManager::addDonutButtonClickedSlot()
 void MetricManager::addCustomButtonClickedSlot()
 {
 	CustomMetricPtr d0 = mPatientModelService->createSpecificData<CustomMetric>("Custom%1");
-    d0->get_rMd_History()->setParentSpace("reference");
-    std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
-    d0->getArguments()->set(0, args[0]);
-    d0->getArguments()->set(1, args[1]);
+	d0->get_rMd_History()->setParentSpace("reference");
+	std::vector<DataPtr> args = this->getSpecifiedNumberOfValidArguments(d0->getArguments());
+	d0->getArguments()->set(0, args[0]);
+	d0->getArguments()->set(1, args[1]);
 
-    this->installNewMetric(d0);
+	this->installNewMetric(d0);
 }
 
 void MetricManager::installNewMetric(DataMetricPtr metric)
 {
-    DataMetricPtr prevMetric = this->getMetric(mActiveLandmark);
-    if(prevMetric)
-    {
-        metric->setColor(prevMetric->getColor());
-    }
+	DataMetricPtr prevMetric = this->getMetric(mActiveLandmark);
+	if(prevMetric)
+	{
+		metric->setColor(prevMetric->getColor());
+	}
 
 	mPatientModelService->insertData(metric);
 	this->setActiveUid(metric->getUid());
@@ -354,29 +354,29 @@ void MetricManager::installNewMetric(DataMetricPtr metric)
 
 void MetricManager::loadReferencePointsSlot()
 {
-  ToolPtr refTool = mTrackingService->getReferenceTool();
-  if(!refTool) // we only load reference points from reference tools
-  {
-	reportDebug("No reference tool, cannot load reference points into the pointsampler");
-	return;
-  }
+	ToolPtr refTool = mTrackingService->getReferenceTool();
+	if(!refTool) // we only load reference points from reference tools
+	{
+		reportDebug("No reference tool, cannot load reference points into the pointsampler");
+		return;
+	}
 
-  std::map<QString, Vector3D> referencePoints_s = refTool->getReferencePoints();
-  if(referencePoints_s.empty())
-  {
-	reportWarning("No referenceppoints in reference tool "+refTool->getName());
-	return;
-  }
+	std::map<QString, Vector3D> referencePoints_s = refTool->getReferencePoints();
+	if(referencePoints_s.empty())
+	{
+		reportWarning("No referenceppoints in reference tool "+refTool->getName());
+		return;
+	}
 
-  CoordinateSystem ref = CoordinateSystem::reference();
-  CoordinateSystem sensor = mSpaceProvider->getS(refTool);
+	CoordinateSystem ref = CoordinateSystem::reference();
+	CoordinateSystem sensor = mSpaceProvider->getS(refTool);
 
-  std::map<QString, Vector3D>::iterator it = referencePoints_s.begin();
-  for(; it != referencePoints_s.end(); ++it)
-  {
-	Vector3D P_ref = mSpaceProvider->get_toMfrom(sensor, ref).coord(it->second);
-	this->addPoint(P_ref, CoordinateSystem(csREF), "ref%1");
-  }
+	std::map<QString, Vector3D>::iterator it = referencePoints_s.begin();
+	for(; it != referencePoints_s.end(); ++it)
+	{
+		Vector3D P_ref = mSpaceProvider->get_toMfrom(sensor, ref).coord(it->second);
+		this->addPoint(P_ref, CoordinateSystem(csREF), "ref%1");
+	}
 }
 
 void MetricManager::exportMetricsToXMLFile(QString& filename)
@@ -424,8 +424,8 @@ void MetricManager::resolveUnknownParentSpacesForPointMetrics(QDomNode dataNode,
 		{
 			SpacePropertyPtr space_property;
 			space_property = SpaceProperty::initialize("selectSpace",
-													  "Space",
-													  "Select parent coordinate system of metric with uid: "+uid);
+													   "Space",
+													   "Select parent coordinate system of metric with uid: "+uid);
 			space_property->setSpaceProvider(mSpaceProvider);
 			QWidget* widget = new QWidget;
 			widget->setFocusPolicy(Qt::StrongFocus); // needed for help system: focus is used to display help text
@@ -492,7 +492,7 @@ void MetricManager::importMetricsFromXMLFile(QString& filename)
 			//If point metrics space is uknown to the system, user needs to select a new parent -> POPUP DIALOG
 			this->resolveUnknownParentSpacesForPointMetrics(dataNode, mapping_of_unknown_to_known_spaces, data);
 		}
-	}	
+	}
 
 	// parse xml data separately: we want to first load all data
 	// because there might be interdependencies (cx::DistanceMetric)
