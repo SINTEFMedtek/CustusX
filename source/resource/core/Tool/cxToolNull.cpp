@@ -88,9 +88,9 @@ void ToolNull::setTooltipOffset(double val)
 	Q_UNUSED(val);
 }
 
-std::map<int, Vector3D> ToolNull::getReferencePoints() const
+std::map<QString, Vector3D> ToolNull::getReferencePoints() const
 {
-	return std::map<int, Vector3D>();
+	return std::map<QString, Vector3D>();
 }
 
 bool ToolNull::hasReferencePointWithId(int id)

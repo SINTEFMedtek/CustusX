@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef CXTOOLIMPL_H
@@ -51,7 +51,7 @@ public:
 	virtual void parseXml(QDomNode& dataNode) {Q_UNUSED(dataNode)}
 
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
-	virtual bool hasReferencePointWithId(int id);
+	virtual bool hasReferencePointWithId(QString id);
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	void createToolGraphic();
@@ -63,7 +63,7 @@ protected:
 	vtkPolyDataPtr mPolyData; ///< the polydata used to represent the tool graphically
 
 	virtual std::set<Type> getTypes() const;
-	virtual std::map<int, Vector3D> getReferencePoints() const;
+	virtual std::map<QString, Vector3D> getReferencePoints() const;
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const { return ToolFileParser::ToolInternalStructurePtr(); }
 private:
 	double mTooltipOffset;

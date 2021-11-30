@@ -127,7 +127,7 @@ Transform3D BronchoscopyTool::getCalibration_sMt() const
 	return mBase->getCalibration_sMt();
 }
 
-std::map<int, Vector3D> BronchoscopyTool::getReferencePoints() const
+std::map<QString, Vector3D> BronchoscopyTool::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
 }
