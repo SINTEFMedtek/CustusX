@@ -98,9 +98,10 @@ void LapFrameToolCalibrationWidget::calibrateSlot()
     reportError(QString("Calibration prerequisited not met: calref:%1, tool:%2").arg(refTool!=0).arg(tool!=0) );
     return;
   }
-  if(!refTool->getVisible() || !tool->getVisible() || !refTool->hasReferencePointWithId(1))
+  if(!refTool->getVisible() || !tool->getVisible() || !refTool->hasReferencePointWithId("1"))
   {
-    reportError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3").arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId(1)) );
+    reportError(QString("Calibration prerequisited not met: calref vis:%1, tool vis :%2, refpoint:%3")
+                .arg(refTool->getVisible()).arg(tool->getVisible()).arg(refTool->hasReferencePointWithId("1")) );
     return;
   }
 
@@ -140,7 +141,7 @@ void LapFrameToolCalibrationWidget::testCalibrationSlot()
   ToolPtr tool = mCalibratingTool->getTool();
   double cameraAngle = mCameraAngleAdapter->getValue();
 
-  if(!refTool || !tool || !refTool->hasReferencePointWithId(1))
+  if(!refTool || !tool || !refTool->hasReferencePointWithId("1"))
     return;
 
   LapFrameToolCalibrationCalculator calc(tool, refTool, cameraAngle);

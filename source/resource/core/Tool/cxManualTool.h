@@ -52,7 +52,7 @@ public:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp=-1);
 
 	virtual Transform3D getCalibration_sMt() const;
-	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); }
+    virtual std::map<QString, Vector3D> getReferencePoints() const { return std::map<QString, Vector3D>(); }
 	virtual void setVisible(bool vis);
 
 private slots:

@@ -361,7 +361,7 @@ void MetricManager::loadReferencePointsSlot()
 	return;
   }
 
-  std::map<int, Vector3D> referencePoints_s = refTool->getReferencePoints();
+  std::map<QString, Vector3D> referencePoints_s = refTool->getReferencePoints();
   if(referencePoints_s.empty())
   {
 	reportWarning("No referenceppoints in reference tool "+refTool->getName());
@@ -371,7 +371,7 @@ void MetricManager::loadReferencePointsSlot()
   CoordinateSystem ref = CoordinateSystem::reference();
   CoordinateSystem sensor = mSpaceProvider->getS(refTool);
 
-  std::map<int, Vector3D>::iterator it = referencePoints_s.begin();
+  std::map<QString, Vector3D>::iterator it = referencePoints_s.begin();
   for(; it != referencePoints_s.end(); ++it)
   {
 	Vector3D P_ref = mSpaceProvider->get_toMfrom(sensor, ref).coord(it->second);

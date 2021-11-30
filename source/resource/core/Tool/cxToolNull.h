@@ -47,7 +47,7 @@ public:
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
-	virtual std::map<int, Vector3D> getReferencePoints() const;
+    virtual std::map<QString, Vector3D> getReferencePoints() const;
 	virtual bool hasReferencePointWithId(int id);
 
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime);
