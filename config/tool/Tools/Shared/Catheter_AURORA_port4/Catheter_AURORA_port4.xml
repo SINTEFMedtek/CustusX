@@ -10,7 +10,7 @@
   <name>Aurora catheter port 4</name>
   <description>Aurora catheter port 4</description>
   <manufacturer>NDI</manufacturer>
-  <clinical_app>Laboratory Laparoscopy Endovascular</clinical_app>
+  <clinical_app>Laboratory Laparoscopy Endovascular Bronchoscopy</clinical_app>
   <geo_file>cylinder.stl</geo_file>
   <pic_file>catheter_6DOF.png</pic_file>
   <doc_file></doc_file>  

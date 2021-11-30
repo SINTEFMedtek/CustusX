@@ -35,6 +35,7 @@ public:
 	void triggerHideEvent();
 	QCheckBox *getMouseClickSample();
 	bool mPointSampled;
+	QString getNextLandmark();
 protected slots:
 	virtual void pointSampled(cx::Vector3D p_r);
 };

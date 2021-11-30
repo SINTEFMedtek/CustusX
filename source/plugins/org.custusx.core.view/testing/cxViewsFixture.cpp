@@ -70,7 +70,12 @@ ViewsFixture::~ViewsFixture()
 	mWindow.reset();
 	mServices.reset();
 	mDataReaders.clear();
-	CHECK(!mMessageListener->containsErrors());
+}
+
+bool ViewsFixture::messageListenerContainErrors()
+{
+	//Needed to move CHECK out of destructor, as this may create a throw (not encouraged in destructors)
+	return mMessageListener->containsErrors();
 }
 
 void ViewsFixture::addFileReaderWriter(cx::FileReaderWriterServicePtr service)

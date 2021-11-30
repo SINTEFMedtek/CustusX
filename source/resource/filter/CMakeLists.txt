@@ -18,7 +18,9 @@ cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
     filters/cxContourFilter
     filters/cxBinaryThinningImageFilter3DFilter
     filters/cxSmoothingImageFilter
-    filters/cxResampleImageFilter    
+    filters/cxResampleImageFilter
+    filters/cxGenericScriptFilter
+    filters/cxColorVariationFilter
 )
 
 cx_create_export_header("cxResourceFilter")
@@ -34,13 +36,14 @@ target_include_directories(cxResourceFilter
 target_link_libraries(cxResourceFilter
     PRIVATE
     cxResource
-	cxResourceVisualization
-	${ITK_LIBRARIES}
+    cxResourceVisualization
+    ${ITK_LIBRARIES}
 )
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
 
 cx_add_non_source_file("doc/org.custusx.resource.filter.md")
+cx_add_non_source_file("doc/org.custusx.resource.filter.script.md")
 
 add_subdirectory(testing)
 

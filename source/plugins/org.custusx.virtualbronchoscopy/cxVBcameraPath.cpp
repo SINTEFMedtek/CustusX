@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxViewServiceProxy.h"
 #include "cxView.h"
+#include "cxLogger.h"
 
 namespace cx {
 
@@ -34,6 +35,7 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
   , mViewService(visualization)
   , mLastCameraViewAngle(0)
   , mLastCameraRotAngle(0)
+  , mAutomaticRotation(true)
 {
 	mManualTool = mTrackingService->getManualTool();
     mSpline = vtkParametricSplinePtr::New();
@@ -43,6 +45,12 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 
 void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 {
+	if(mRoutePositions.size() > 0)
+		if(mRoutePositions.size() == mCameraRotations.size())
+		{
+			this->generateSplineCurve(mRoutePositions);
+			return;
+		}
 
 	if(!mesh)
 	{
@@ -51,7 +59,6 @@ void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 	}
 
     this->generateSplineCurve(mesh);
-
 }
 
 void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
@@ -72,16 +79,31 @@ void CXVBcameraPath::generateSplineCurve(MeshPtr mesh)
     mSpline->SetPoints(vtkpoints);
 }
 
-
-
-
-void CXVBcameraPath::cameraPathPositionSlot(int pos)
+void CXVBcameraPath::generateSplineCurve(std::vector< Eigen::Vector3d > routePositions)
 {
+	vtkPointsPtr vtkPoints = vtkPointsPtr::New();
+	for (int i = 0; i < routePositions.size(); i++)
+		vtkPoints->InsertNextPoint(routePositions[i](0),routePositions[i](1),routePositions[i](2));
 
-    double splineParameter = pos / 100.0;
+	// Setting the spline curve points
+	// First clean up previous stored data
+	mSpline->GetXSpline()->RemoveAllPoints();
+	mSpline->GetYSpline()->RemoveAllPoints();
+	mSpline->GetZSpline()->RemoveAllPoints();
 
-//	std::cout << "CXVBcameraPath::cameraPathPositionSlot , pos : " << pos
-//			  << ", spline parameter : " << splineParameter << std::endl;
+	mSpline->SetPoints(vtkPoints);
+
+}
+
+void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
+{
+    double splineParameter = positionPercentageAdjusted(positionPercentage) / 100.0;
+
+    //Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
+    //Longer focus makes smoother turns at the first divisions.
+    double splineFocusDistance = 0.05;
+    if (splineParameter > 0.8)
+        splineFocusDistance = 0.02;
 
     double pos_r[3], focus_r[3], d_r[3];
     double splineParameterArray[3];
@@ -90,13 +112,22 @@ void CXVBcameraPath::cameraPathPositionSlot(int pos)
     splineParameterArray[2] = splineParameter;
 
     mSpline->Evaluate(splineParameterArray, pos_r, d_r);
-    splineParameterArray[0] = splineParameter+0.05;
-    splineParameterArray[1] = splineParameter+0.05;
-    splineParameterArray[2] = splineParameter+0.05;
+    splineParameterArray[0] = splineParameter + splineFocusDistance;
+    splineParameterArray[1] = splineParameter + splineFocusDistance;
+    splineParameterArray[2] = splineParameter + splineFocusDistance;
     mSpline->Evaluate(splineParameterArray, focus_r, d_r);
 
     mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
     mLastCameraFocus_r = Vector3D(focus_r[0], focus_r[1], focus_r[2]);
+
+    if(mAutomaticRotation)
+        if(mRoutePositions.size() > 0 && mRoutePositions.size() == mCameraRotationsSmoothed.size())
+        {
+            int index = (int) (splineParameter * (mRoutePositions.size() - 1));
+            mLastCameraRotAngle = mCameraRotationsSmoothed[index];
+            //CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle*180/M_PI;
+        }
+
     this->updateManualToolPosition();
 
 }
@@ -131,6 +162,40 @@ void CXVBcameraPath::updateManualToolPosition()
 
 	mManualTool->set_prMt(prMt);
 
+    emit rotationChanged((int) (mLastCameraRotAngle * 180/M_PI));
+}
+
+std::vector< double > CXVBcameraPath::smoothCameraRotations(std::vector< double > cameraRotations)
+{
+    //Camera rotation is calculated as an average of rotation in the current position and positions ahead.
+    int numberOfElements = cameraRotations.size();
+    std::vector< double > cameraRotationsSmoothed = cameraRotations;
+
+    //Checking that a second turn/bifurcation is not included in the average
+    int maxPositionsToSmooth = (int) (10 * numberOfElements/100);
+    int positionsToSmooth = maxPositionsToSmooth;
+    for(int i=0; i<numberOfElements; i++)
+    {
+        positionsToSmooth = std::min((int) (positionsToSmooth+.5*numberOfElements/100), maxPositionsToSmooth);
+        bool firstTurnPassed = false;
+        for(int j=i+1; j<std::min(i+positionsToSmooth, numberOfElements); j++)
+            if (cameraRotations[j] != cameraRotations[j-1])
+            {
+                if (firstTurnPassed)
+                {
+                  positionsToSmooth = j-i;
+                  break;
+                }
+                else
+                    firstTurnPassed = true;
+            }
+
+        std::vector< double > averageElements(cameraRotations.begin()+i, cameraRotations.begin()+std::min(i+positionsToSmooth,numberOfElements-1));
+        if(averageElements.size() > 0)
+            cameraRotationsSmoothed[i] = std::accumulate(averageElements.begin(), averageElements.end(), 0.0) / averageElements.size();
+
+    }
+    return cameraRotationsSmoothed;
 }
 
 
@@ -146,4 +211,25 @@ void CXVBcameraPath::cameraRotateAngleSlot(int angle)
 	this->updateManualToolPosition();
 }
 
+void CXVBcameraPath::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
+{
+	mRoutePositions = routePositions;
+}
+
+void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
+{
+	mCameraRotations = cameraRotations;
+    mCameraRotationsSmoothed = smoothCameraRotations(mCameraRotations);
+}
+
+void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)
+{
+    mAutomaticRotation = automaticRotation;
+}
+
+double positionPercentageAdjusted(double positionPercentage)
+{
+    //Adjusting position to make smaller steps towards end of route
+    return 2*positionPercentage / (1 + positionPercentage/100.0);
+}
 } /* namespace cx */

@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"
 #include "cxVisServices.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -116,6 +117,7 @@ AcquisitionService::STATE AcquisitionImplService::getState() const
 
 void AcquisitionImplService::startRecord(TYPES context, QString category, RecordSessionPtr session)
 {
+    mServices->tracking()->resetTimeSynchronization();
 	mAcquisition->startRecord(context, category, session);
 }
 

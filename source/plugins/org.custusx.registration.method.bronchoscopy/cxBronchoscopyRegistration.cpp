@@ -317,11 +317,11 @@ Eigen::Matrix4d registrationAlgorithm(BranchListPtr branches, M4Vector Tnavigati
 		trackingOrientations.block(0 , i , 3 , 1) = Tnavigation[i].block(0 , 2 , 3 , 1);
 	}
 
-	//Adjusting points for centeroids
+	//Adjusting points to initially match top positoins in CT and tracking data
 	Eigen::MatrixXd::Index maxIndex;
 	trackingPositions.row(2).maxCoeff( &maxIndex );
-	//Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
-	Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
+	Eigen::Vector3d translation = CTPositions.col(0) - trackingPositions.col(maxIndex);
+	//Eigen::Vector3d translation = findMedian(CTPositions) - findMedian(trackingPositions);
 	//trackingPositions = trackingPositions.colwise() + translation;
 
 
@@ -508,7 +508,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	}
 
 	mBranchListPtr->smoothBranchPositions(10);
-	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
 	double minPointDistance = 0.5; //mm
@@ -521,6 +520,22 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	mCenterlineProcessed = true;
 
 	return retval;
+}
+
+//Can be used instead of processCenterline(...) if you have a preprosessed branchList to be used in the registration process.
+void BronchoscopyRegistration::setBranchList(BranchListPtr branchList, int numberOfGenerations)
+{
+	if (!branchList)
+		return;
+
+	mBranchListPtr = branchList;
+
+	if (numberOfGenerations != 0)
+	{
+		mBranchListPtr->selectGenerations(numberOfGenerations);
+	}
+
+	mCenterlineProcessed = true;
 }
 
 BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations)
@@ -537,7 +552,6 @@ BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyData
 	}
 
 	branchListPtr->smoothBranchPositions(10);
-	branchListPtr->calculateOrientations();
 	branchListPtr->smoothOrientations();
 
 	return branchListPtr;

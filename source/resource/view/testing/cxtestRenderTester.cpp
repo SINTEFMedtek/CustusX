@@ -147,9 +147,8 @@ vtkImageDataPtr RenderTester::renderToImage()
 	mRenderWindow->Render();
 	// extra render, as suggested by http://read.pudn.com/downloads115/ebook/487640/VTK/Common/Testing/Cxx/vtkRegressionTestImage.h__.htm
 	// tests show that black windows appear less often with two renders.
-	mRenderWindow->Render();
-
 	cx::sleep_ms(200);
+	mRenderWindow->Render();
 
 	return this->getImageFromRenderWindow();
 }

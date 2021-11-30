@@ -20,7 +20,7 @@ Some parts of CustusX are more experimental or unfinished.
 These may not be thoroughly tested, be more cumbersome to use,
 and some documentation may be lacking.
 
-#### Tracking using PlusToolkit
+### Tracking using PlusToolkit
 
 Instead on using the integrated tracking based on IGTSK, the PlusToolkit may be used instead.
 See \ref org_custusx_core_openigtlink_plus_install for Ubuntu 16.04 installation instructions.

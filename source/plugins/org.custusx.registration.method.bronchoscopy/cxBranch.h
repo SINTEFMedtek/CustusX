@@ -31,8 +31,10 @@ class Branch
 {
 	Eigen::MatrixXd mPositions;
 	Eigen::MatrixXd mOrientations;
+	Eigen::VectorXd mRadius;
 	branchVector mChildBranches;
 	BranchPtr mParentBranch;
+	double mBronchoscopeRotation = 0;
 public:
 	Branch();
 	virtual ~Branch();
@@ -40,6 +42,9 @@ public:
 	Eigen::MatrixXd getPositions();
 	void setOrientations(Eigen::MatrixXd orient);
 	Eigen::MatrixXd getOrientations();
+	void setRadius(Eigen::VectorXd r);
+	Eigen::VectorXd getRadius();
+	double getAverageRadius();
 	void addChildBranch(BranchPtr child); //Note that this method doesn't set this branch as parent to the child. Inconsistent?
 	void setChildBranches(branchVector children); //Note that this method doesn't set this branch as parent to the children. Inconsistent?
 	void deleteChildBranches();
@@ -48,7 +53,11 @@ public:
 	int findGenerationNumber();
 	double findBranchRadius();
 	BranchPtr getParentBranch();
+	void calculateOrientations();
 	int findParentIndex(branchVector bv) const;
+	void setBronchoscopeRotation(double rotation);
+	double getBronchoscopeRotation();
+	void removeEqualPositions();
 };
 
 

@@ -55,6 +55,7 @@ public:
 	void setUserMatrix(vtkMatrix4x4 *matrix);
 	void setPointSize(int pointSize);
 	void setScalarVisibility(bool show);
+	void setScalarModeToUseCellData();
 
 	vtkActorPtr getActor();
 	vtkPropertyPtr getProperty();

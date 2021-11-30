@@ -87,7 +87,6 @@ TEST_CASE("org.custusx.help: HelpEngine loads a page", "[unit][plugins][org.cust
 	CHECK(QString(links.first().toString()).contains(id));
 }
 
-
 TEST_CASE("org.custusx.help: HelpWidget displays initial help text", "[unit][plugins][org.custusx.help]")
 {
 	cxtest::TestHelpFixture fixture;

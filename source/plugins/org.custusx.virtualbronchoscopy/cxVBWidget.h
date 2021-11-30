@@ -48,6 +48,8 @@ public:
 	VBWidget(VisServicesPtr services, QWidget *parent = 0);
 	virtual ~VBWidget();
 	void setRouteToTarget(QString uid);
+	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
+	void setCameraRotationAlongRoute(std::vector< double > cameraRotations);
 
 protected:
 	QString defaultWhatsThis() const;
@@ -56,10 +58,13 @@ protected:
 	QDial*						mRotateDial;
 	QDial*						mViewDial;
 	QPushButton*				mResetEndoscopeButton;
+    QPushButton*				mUseAutomaticRotationButton;
+    QPalette                    mAutomaticRotationButtonBackgroundColor;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;
 	bool						mControlsEnabled;
+    bool						mAutomaticRotation;
 
 	void						enableControls(bool enable);
 
@@ -71,6 +76,8 @@ signals:
 private slots:
 	void						inputChangedSlot();
 	void						resetEndoscopeSlot();
+    void                        automaticRotationSlot();
+    void                        updateRotationDialSlot(int value);
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
 };

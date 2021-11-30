@@ -9,12 +9,17 @@
 #             
 #################################################             
 
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
 import subprocess
 import argparse
 import re
 import sys
 import os.path
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
 
@@ -25,7 +30,7 @@ import cx.build.cxInstallData
 import cx.build.cxComponents
 import cx.build.cxComponentAssembly
 
-import cxBuildScript
+from . import cxBuildScript
 
 class Controller(cxBuildScript.BuildScript):
     '''
@@ -56,7 +61,7 @@ Available components are:
     def applyArgumentParsers(self, arguments):
         arguments = super(Controller, self).applyArgumentParsers(arguments)
         (self.options, arguments) = self.getArgParser().parse_known_args(arguments)
-        print 'Options: ', self.options
+        print('Options: ', self.options)
         return arguments
 
     def getArgParser(self):
@@ -74,7 +79,7 @@ Available components are:
 
     def _promptToContinue(self, silent_mode):
         if not silent_mode:
-            raw_input("\nPress enter to continue or ctrl-C to quit:")
+            input("\nPress enter to continue or ctrl-C to quit:")
 
     def run(self):
         options = self.options
@@ -95,16 +100,16 @@ Available components are:
         assembly.controlData.printSettings()
         libs = [lib for lib in assembly.libraries if lib.name() in assembly.selectedLibraryNames]
         text = ['%45s     %s' % (lib.name(), lib.repository()) for lib in libs]
-        print 'Use the following components:\n ', '\n  '.join(text)
+        print('Use the following components:\n ', '\n  '.join(text))
         
-        print ''
-        print '*********************************************************************'
-        print 'The superbuild will check out and build in [repo/../..], expanded to:'
-        print ''
-        print '    %s' % assembly.controlData.getRootDir()
-        print ''
-        print '*********************************************************************'
-        print ''
+        print('')
+        print('*********************************************************************')
+        print('The superbuild will check out and build in [repo/../..], expanded to:')
+        print('')
+        print('    %s' % assembly.controlData.getRootDir())
+        print('')
+        print('*********************************************************************')
+        print('')
         
         self._promptToContinue(options.silent_mode)
         

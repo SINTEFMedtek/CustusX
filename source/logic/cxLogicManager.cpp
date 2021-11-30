@@ -10,6 +10,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include <cxLogicManager.h>
 
+#ifndef CX_WINDOWS
+#include <sys/utsname.h>
+#endif
+
 #include <QApplication>
 #include <ctkPluginContext.h>
 #include "cxLogger.h"
@@ -60,10 +64,43 @@ void LogicManager::initialize(ApplicationComponentPtr component)
 
 void LogicManager::shutdown()
 {
-	LogicManager::getInstance()->shutdownServices();
+	//CX_LOG_DEBUG() << "Ubuntu 20.04 identifyed - skipping some shutdown procedures in LogicManager";
+	//CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
+	LogicManager::getInstance()->shutdownServicesLight();
 
-	delete mInstance;
-	mInstance = NULL;
+	//Replacing these 3 lines with the above line seems to fix the test seg. faults on Ubuntu 20.04
+	//Now the same shutdown code is running on all platforms, and not only Ubuntu 20.04
+	//Old shutdown sequence cause seg. faults with new CTK - Qt combinations
+	//LogicManager::getInstance()->shutdownServices();
+	//delete mInstance;
+	//mInstance = NULL;
+}
+
+bool LogicManager::isUbuntu2004()
+{
+#ifdef CX_WINDOWS
+	return false;
+#else
+	struct utsname uname_pointer;
+	uname(&uname_pointer);
+	CX_LOG_DEBUG() << "System info: " << uname_pointer.sysname << ", " << uname_pointer.version << ", " << uname_pointer.release;
+
+	QString systemVersion(uname_pointer.version);
+	//CX_LOG_DEBUG() << "System version: " << systemVersion;
+
+	if(!systemVersion.contains("Ubuntu"))
+		return false;
+
+	// 5.4 is the system kernel for Ubuntu 20.04, but for some reason later installations comes with 5.11 (the kernel for 21.04)
+	// In this case the uname_pointer.version string seems to contain 20.04
+	QString systemKernel(uname_pointer.release);
+	if(systemVersion.contains("20.04")) //For new installations of 20.04, with the "21.04 kernel"
+		return true;
+	else if (systemKernel.contains("5.4.")) //For old installations, with the original kernel
+		return true;
+	else
+		return false;
+#endif
 }
 
 void LogicManager::initializeServices()
@@ -132,14 +169,14 @@ void LogicManager::onRestartWithNewProfile(QString uid)
 {
 	if (profile()->getUid()==uid)
 		return;
-    this->restartServicesWithProfile(uid);
+	this->restartServicesWithProfile(uid);
 }
 
 void LogicManager::restartServicesWithProfile(QString uid)
 {
-    this->shutdownServices();
-    ProfileManager::getInstance()->setActiveProfile(uid);
-    this->initializeServices();
+	this->shutdownServices();
+	ProfileManager::getInstance()->setActiveProfile(uid);
+	this->initializeServices();
 }
 
 void LogicManager::shutdownServices()
@@ -151,6 +188,7 @@ void LogicManager::shutdownServices()
 	}
 
 	CX_LOG_INFO() << " --- Shutting down " << qApp->applicationName() << "...";
+	CX_LOG_DEBUG() << "Skipping some shutdown procedures in LogicManager, because of CTK issues";
 
 	this->getPatientModelService()->autoSave();
 
@@ -169,6 +207,31 @@ void LogicManager::shutdownServices()
 	CX_LOG_DEBUG() << " --- End shutdown services";
 }
 
+void LogicManager::shutdownServicesLight()
+{
+	if(mShutdown)
+	{
+		CX_LOG_ERROR() << "Trying to shutdown logicmanager when it already shutdown. Aborting shutdown, fix code.";
+		return;
+	}
+
+	CX_LOG_INFO() << " --- Shutting down (Light) " << qApp->applicationName() << "...";
+
+	this->getPatientModelService()->autoSave();
+
+	if (mComponent)
+		mComponent->destroy(); // this is the GUI - delete first
+
+	this->shutdownLegacyStoredServices();
+
+	GPUImageBufferRepository::shutdown();
+	Reporter::shutdown();
+	ProfileManager::shutdown();
+
+	mShutdown = true;
+	CX_LOG_DEBUG() << " --- End (Light) shutdown services";
+}
+
 void LogicManager::shutdownLegacyStoredServices()
 {
 	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
@@ -179,7 +242,6 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mVideoService, "VideoService");
 	this->shutdownService(mSessionStorageService, "SessionStorageService");
 }
-
 
 template<class T>
 void LogicManager::shutdownService(boost::shared_ptr<T>& service, QString name)

@@ -2,20 +2,6 @@ project(org_custusx_filter_airways)
 
 include(cxInstallUtilities)
 
-macro(cx_initialize_FAST)
-    find_package(FAST REQUIRED)
-    include_directories("${FAST_DIR}/../FAST/source/")
-    include_directories("${FAST_DIR}/")
-    link_directories("${FAST_DIR}/lib/")
-    set(FAST_SOURCE_DIR ${FAST_DIR}/../FAST/source/FAST/)
-    add_definitions("-DFAST_SOURCE_DIR=\"${FAST_SOURCE_DIR}/\"")
-    message("===========================")
-    message("Initializing FAST in Airways plugin")
-    message("-- ${FAST_DIR}/../FAST/source/")
-    message("===========================")
-    cx_install_add_library_dirs(${FAST_DIR}/lib/)
-endmacro()
-
 cx_initialize_FAST()
 
 #### Enable C++11
@@ -57,19 +43,18 @@ elseif(APPLE)
     set(ZLIB libz.dylib)
 else()
     set(ZLIB libz.so)
-endif()
+endif(WIN32)
+
 set(PLUGIN_target_libraries
     PUBLIC
-    ${PLUGIN_target_libraries}
+    #${PLUGIN_target_libraries}
     FAST
-
-    PRIVATE
     ${OPENCL_LIBRARIES}
-    ${ZLIB}
-    cxResource
+    #${ZLIB}
+    #cxResource
     cxResourceFilter
-    cxResourceVisualization
-    cxPluginUtilities
+    #cxResourceVisualization
+    #cxPluginUtilities
     org_custusx_registration_method_bronchoscopy
     org_custusx_filter_airwaysfromcenterline
 )

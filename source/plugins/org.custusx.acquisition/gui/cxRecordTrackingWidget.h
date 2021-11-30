@@ -56,6 +56,7 @@ public:
 	StringPropertyPtr getSessionSelector();
 	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
 	void displayToolSelector(bool on);
+    void hideMergeWithExistingSession();
 
 signals:
 	void acquisitionCompleted(); ///< aquisition complete, and widget internal state is updated accordingly
@@ -73,6 +74,7 @@ private:
 
 	RecordSessionWidget* mRecordSessionWidget;
 	QWidget* mToolSelectorWidget;
+    QWidget* mMergeWithExistingSessionWidget;
 	ToolPtr mRecordingTool;
 	SelectRecordSessionPtr mSelectRecordSession;
 	StringPropertySelectToolPtr mToolSelector;

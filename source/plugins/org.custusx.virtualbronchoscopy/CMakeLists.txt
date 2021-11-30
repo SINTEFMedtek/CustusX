@@ -39,6 +39,7 @@ set(PLUGIN_target_libraries
     cxResourceVisualization
     cxResourceWidgets
     Qt5::Widgets
+		org_custusx_filter_routetotarget
     )
 
 set(PLUGIN_OUTPUT_DIR "")

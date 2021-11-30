@@ -64,6 +64,7 @@ TEST_CASE("Export and import metrics to and from file", "[integration][metrics][
 {
 	MetricFixture fixture;
 	fixture.testExportAndImportMetrics();
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Save the patient and import metrics from the patient XML file", "[integration][metrics][widget]")
@@ -93,6 +94,8 @@ TEST_CASE("Save the patient and import metrics from the patient XML file", "[int
 		manager.importMetricsFromXMLFile(patientXMLPath);
 
 		fixture.checkImportedMetricsEqualToExported(metrics, manager);
+		
+		CHECK_FALSE(fixture.messageListenerContainErrors());
 	}
 
 	cx::LogicManager::shutdown();
@@ -123,6 +126,8 @@ TEST_CASE("Import metrics from a patient XML file", "[integration][metrics][widg
 		CHECK(number_of_metrics_after_import == (number_of_metrics_before_import+number_of_metrics_in_file));
 
 		CHECK(manager.getNumberOfMetrics() > 0);
+		
+		CHECK_FALSE(fixture.messageListenerContainErrors());
 	}
 
 	cx::LogicManager::shutdown();

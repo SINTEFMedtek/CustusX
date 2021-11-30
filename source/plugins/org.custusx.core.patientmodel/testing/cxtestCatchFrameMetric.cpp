@@ -21,6 +21,7 @@ TEST_CASE("cxFrameMetric can set/get transform", "[unit]")
     cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
 	CHECK(fixture.inputEqualsMetric(testData));
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
@@ -29,6 +30,7 @@ TEST_CASE("cxFrameMetric can save/load XML", "[unit]")
     cxtest::FrameMetricWithInput testData = fixture.getFrameMetricWithInput();
 
     CHECK(fixture.saveLoadXmlGivesEqualTransform(testData));
+		CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
@@ -45,4 +47,5 @@ TEST_CASE("cxFrameMetric can set space correctly", "[unit]")
 	CHECK(fixture.inputEqualsMetric(testData));
 
 	testData.mMetric.reset();
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }

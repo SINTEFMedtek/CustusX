@@ -54,31 +54,31 @@ namespace cx
 class cxResource_EXPORT Message
 {
 public:
-  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=-1);
-  ~Message();
+	Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=-1);
+	~Message();
 
-  QString getPrintableMessage() const; ///< Text containing  information appropriate to display
-  MESSAGE_LEVEL getMessageLevel() const; ///< The category of the message
-  QString getText() const; ///< The raw message.
-  QDateTime getTimeStamp() const; ///< The time at which the message was created.
-  int getTimeout() const; ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
-  QString getSourceLocation() const;
+	QString getPrintableMessage() const; ///< Text containing information appropriate to display
+	MESSAGE_LEVEL getMessageLevel() const; ///< The category of the message
+	QString getText() const; ///< The raw message.
+	QDateTime getTimeStamp() const; ///< The time at which the message was created.
+	int getTimeout() const; ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
+	QString getSourceLocation() const;
 
-//private:
-  QString mText;
-  MESSAGE_LEVEL mMessageLevel;
-  int mTimeoutTime;
-  QDateTime mTimeStamp;
-  bool mMuted;
-//  QString mSourceLocation; ///< file:line/function
-  QString mChannel;
-  QString mThread;
+	//private:
+	QString mText;
+	MESSAGE_LEVEL mMessageLevel;
+	int mTimeoutTime;
+	QDateTime mTimeStamp;
+	bool mMuted;
+	//	QString mSourceLocation; ///< file:line/function
+	QString mChannel;
+	QString mThread;
 
-  QString mSourceFile;
-  QString mSourceFunction;
-  int mSourceLine;
+	QString mSourceFile;
+	QString mSourceFunction;
+	int mSourceLine;
 private:
-  void setThreadName();
+	void setThreadName();
 };
 
 } //namespace cx
