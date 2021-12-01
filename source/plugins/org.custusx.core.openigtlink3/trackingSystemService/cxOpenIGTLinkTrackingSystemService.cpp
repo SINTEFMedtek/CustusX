@@ -100,6 +100,7 @@ void OpenIGTLinkTrackingSystemService::configure()
 		this->setState(Tool::tsNONE);
 		return;
 	}
+	emit updateTrackingSystemImplementation(configParser.getTrackingSystemImplementation());
 
 	CX_LOG_DEBUG() << "OpenIGTLinkTrackingSystemService::configure(): Using OpenIGTLink3 tracking";
 
@@ -148,13 +149,26 @@ void OpenIGTLinkTrackingSystemService::serverIsDisconnected()
 	this->setState(Tool::tsINITIALIZED);
 }
 
-void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestamp)
+void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Transform3D transform, double timestampMS)
 {
 //	CX_LOG_DEBUG() << "receiveTransform for: " << devicename;
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);
 	if(tool)
 	{
-		tool->toolTransformAndTimestampSlot(transform, timestamp);
+		if(tool->applyReference())
+		{
+			Transform3D tsMs = transform;
+			Transform3D prMs = tsMs;//If no reference tool: ts==pr (ts = tracking system )
+			if(mReference && !tool->isReference())
+			{
+				Transform3D tsMpr = mReference->get_prMt();
+				prMs = tsMpr.inv() * tsMs;
+			}
+			//Apply ref sensor pos to all tool positions
+			tool->toolTransformAndTimestampSlot(prMs, timestampMS);
+		}
+		else
+			tool->toolTransformAndTimestampSlot(transform, timestampMS);
 	}
 }
 
@@ -200,5 +214,10 @@ OpenIGTLinkToolPtr OpenIGTLinkTrackingSystemService::getTool(QString devicename)
 	return OpenIGTLinkToolPtr();
 }
 
+
+void OpenIGTLinkTrackingSystemService::resetTimeSynchronization()
+{
+	mNetworkHandler->clearTimestampSynchronization();
+}
 
 } /* namespace cx */

@@ -29,13 +29,22 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "igtlioUsSectorDefinitions.h"
 
 #include "cxLogger.h"
+#include "cxProbeSector.h"
+#include "cxProbeDefinition.h"
 
 namespace cx
 {
 
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
-	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages))
+	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages)),
+	mGotTimeOffset(false),
+	mTimestampOffsetMS(0),
+	mGotMoreThanOneImage(false),
+	mProbeDefinition(ProbeDefinitionPtr()),
+	mZeroesInImage(true),
+	mUSMask(nullptr),
+	mSkippedImages(0)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -72,6 +81,45 @@ void NetworkHandler::disconnectFromServer()
 	mProbeDefinitionFromStringMessages->reset();
 }
 
+void NetworkHandler::clearTimestampSynchronization()
+{
+	mGotTimeOffset = false;
+	mTimestampOffsetMS = 0;
+};
+
+double NetworkHandler::synchronizedTimestamp(double receivedTimestampSec)
+{
+	double receivedTimestampMS = receivedTimestampSec * 1000;
+	if(!mGotTimeOffset)
+	{
+		qint64 systemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+		mTimestampOffsetMS = systemTime - receivedTimestampMS;
+		CX_LOG_DEBUG() << "NetworkHandler: Doing timestamp synchronization - adding fixed offset of " << mTimestampOffsetMS << " ms";
+		mGotTimeOffset = true;
+	}
+	receivedTimestampMS = receivedTimestampMS + mTimestampOffsetMS;
+
+	verifyTimestamp(receivedTimestampMS);
+	return receivedTimestampMS;
+}
+
+
+bool NetworkHandler::verifyTimestamp(double &timestampMS)
+{
+	qint64 latestSystemTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+	double diff = timestampMS - latestSystemTime;
+	if(fabs(diff) > 1000)
+	{
+		CX_LOG_WARNING() << "NetworkHandler: Detected difference between system time and timestamp after synchronization. Difference: " << diff
+						 << " The reason for this may be messages with different timestamp formats. "
+						 << " System time will be used instead of received timestamp.";
+		timestampMS = latestSystemTime;
+		return false;
+	}
+
+	return true;
+}
+
 void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, unsigned long event , void*)
 {
 	Q_UNUSED(unknown);
@@ -80,6 +128,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 	igtlioBaseConverter::HeaderData header = receivedDevice->GetHeader();
 	std::string device_type = receivedDevice->GetDeviceType();
+
+	double timestampMS = synchronizedTimestamp(header.timestamp);
+
 
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
@@ -97,8 +148,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //		QString deviceName(header.deviceName.c_str());
 //		QString deviceName(header.equipmentId.c_str());//Use equipmentId
 		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
-		// get timestamp from igtl second-format:;
-		double timestampMS = header.timestamp * 1000;
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
 		//this->decode_rMd(msg, retval);
 
@@ -119,6 +168,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << QString("SpacingZ"); //IGTLIO_KEY_SPACING_Z;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
+		mProbeDefinitionFromStringMessages->setImage(cximage);
 
 		for (int i = 0; i < igtlioLabels.size(); ++i)
 		{
@@ -126,7 +176,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
 			if(!gotMetaData)
 			{
-				if(!mProbeDefinitionFromStringMessages->haveValidValues())
+				if(!mProbeDefinitionFromStringMessages->haveValidValues() && mGotMoreThanOneImage)
 					CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
 			}
 			else
@@ -135,17 +185,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
 			}
 		}
+		mGotMoreThanOneImage = true;
 
-
-		mProbeDefinitionFromStringMessages->setImage(cximage);
-
-		if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
-		{
-			//TODO: Use deciveNameLong
-			//CX_LOG_DEBUG() << "Got valid probe definition";
-			emit probedefinition(deviceName, mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName));
-		}
-
+		processImageAndEmitProbeDefinition(cximage, deviceName);//Use equipmentId?
 		emit image(cximage);
 
 		// CX-366: Currenly we don't use the transform from the image message, because there is no specification of what this transform should be.
@@ -171,10 +213,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //										<< " deviceName: " << deviceName
 //										<< " transform: " << cxtransform;
 
-		double timestamp = header.timestamp;
-//		emit transform(deviceName, header.equipmentType, cxtransform, timestamp);
-		//test: Set all messages as type TRACKED_US_PROBE for now
-//		emit transform(deviceName, igtlioBaseConverter::TRACKED_US_PROBE, cxtransform, timestamp);
 
 		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
 		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
@@ -183,9 +221,9 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		bool gotTransformId = receivedDevice->GetMetaDataElement("equipmentId", openigtlinktransformid);
 
 		if (gotTransformId)
-			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestamp);
+			emit transform(qstring_cast(openigtlinktransformid), cxtransform, timestampMS);
 		else
-			emit transform(deviceName, cxtransform, timestamp);
+			emit transform(deviceName, cxtransform, timestampMS);
 	}
 	else if(device_type == igtlioStatusConverter::GetIGTLTypeName())
 	{
@@ -211,8 +249,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		QString message(content.string_msg.c_str());
 
-                //Allow string messages to modify probe definition, as well as meta info.
-                mProbeDefinitionFromStringMessages->parseStringMessage(header, message);//Turning this off because we want to use meta info instead
+		//Allow string messages to modify probe definition, as well as meta info.
+		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
 		emit string_message(message);
 	}
 	else
@@ -282,6 +320,93 @@ void NetworkHandler::connectToDeviceEvents()
 		qvtkReconnect(NULL, mLogic, eventId,
 					this, SLOT(onDeviceAddedOrRemoved(vtkObject*, void*, unsigned long, void*)));
 	}
+}
+
+//TODO: Consider moving these image changing functions out of the class
+void NetworkHandler::processImageAndEmitProbeDefinition(ImagePtr cximage, QString deviceName)
+{
+	bool probeDefinitionHaveChanged = emitProbeDefinitionIfChanged(deviceName);
+
+	if (probeDefinitionHaveChanged)
+	{
+		mZeroesInImage = true;
+		mSkippedImages = 0;
+		this->createMask(); //Only create mask once for each probeDefinition
+	}
+
+	// Turn off zero conversion if we get a frame without zeroes. Recheck for zeroes every 30 images
+	if(mZeroesInImage || (mSkippedImages > 30))
+	{
+		//			CX_LOG_DEBUG() << "*** Removing zeroes from US image ***";
+		mZeroesInImage = convertZeroesInsideSectorToOnes(cximage);
+		mSkippedImages = 0;
+	}
+	else
+	{
+		++mSkippedImages;
+		//			CX_LOG_DEBUG() << "No zeroes in incoming US image";
+	}
+}
+
+bool NetworkHandler::emitProbeDefinitionIfChanged(QString deviceName)
+{
+	if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
+	{
+		mProbeDefinition = mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName);
+		emit probedefinition(deviceName, mProbeDefinition);
+		return true;
+	}
+	return false;
+}
+
+bool NetworkHandler::convertZeroesInsideSectorToOnes(ImagePtr cximage, int threshold, int newValue)
+{
+	bool retval = false;
+	if(!mUSMask)
+		return retval;
+
+	Eigen::Array3i maskDims(mUSMask->GetDimensions());
+	unsigned char* maskPtr = static_cast<unsigned char*> (mUSMask->GetScalarPointer());
+	unsigned char* imagePtr = static_cast<unsigned char*> (cximage->getBaseVtkImageData()->GetScalarPointer());
+	unsigned components = cximage->getBaseVtkImageData()->GetNumberOfScalarComponents();
+	unsigned dimX = maskDims[0];
+	unsigned dimY = maskDims[1];
+	for (unsigned x = 0; x < dimX; x++)
+		for (unsigned y = 0; y < dimY; y++)
+		{
+			unsigned pos = x + y * dimX;
+			unsigned imagePos = pos*components;
+			unsigned char maskVal = maskPtr[pos];
+			unsigned char imageVal = imagePtr[imagePos];
+			if (maskVal != 0 && imageVal <= threshold)
+			{
+				for(unsigned i=0; i < components; ++i)
+					if(i < 3) //Only set RGB components, not Alpha
+					{
+						imagePtr[imagePos + i] = newValue;
+						retval = true;
+					}
+			}
+		}
+	return retval;
+}
+
+bool NetworkHandler::createMask()
+{
+	if(!mProbeDefinition)
+	{
+		CX_LOG_WARNING() << "No ProbeDefinition";
+		return false;
+	}
+	ProbeSector probeSector;
+	probeSector.setData(*mProbeDefinition.get());
+
+	if(!mUSMask)
+	{
+		mUSMask = probeSector.getMask();
+		return true;
+	}
+	return false;
 }
 
 } // namespace cx

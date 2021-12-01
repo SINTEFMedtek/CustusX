@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include <QEventLoop>
+#include <boost/make_shared.hpp>
 #include "vtkTimerLog.h"
 #include "igtlioConnector.h"
 #include "igtlioDevice.h"
@@ -23,9 +24,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxTransform3D.h"
 #include "cxtestQueuedSignalListener.h"
+#include "cxNetworkHandler.h"
+#include "cxProbeSector.h"
+#include "cxUtilHelpers.h"
 
 #include "cxtestPlusReceiver.h"
 #include "cxtestIOReceiver.h"
+#include "cxtestVideoGraphicsFixture.h"
 
 namespace
 {
@@ -51,7 +56,33 @@ public:
 		REQUIRE(client);
 	}
 };
-}
+
+class NetworkHandlerTester : public cx::NetworkHandler
+{
+public:
+	NetworkHandlerTester(igtlioLogicPointer logic) :
+		NetworkHandler(logic)
+	{}
+
+	vtkImageDataPtr getMask()
+	{
+		return mUSMask;
+	}
+	void setProbeDefinition(cx::ProbeDefinitionPtr probeDefinition)
+	{
+		mProbeDefinition = probeDefinition;
+	}
+	bool testConvertZeroesInsideSectorToOnes(cx::ImagePtr image, int threashold, int newValue)
+	{
+		return this->convertZeroesInsideSectorToOnes(image, threashold, newValue);
+	}
+	bool testCreateMask()
+	{
+		return this->createMask();
+	}
+};
+
+} //namespace
 
 namespace cxtest
 {
@@ -208,6 +239,90 @@ TEST_CASE("Connect/disconnect using NetworkHandler, use default network port", "
 	networkHandler->disconnectFromServer();
 	REQUIRE(client->GetConnector());
 	REQUIRE_FALSE(client->GetConnector()->IsConnected());
+}
+
+// Reused code from cxtestVideoGraphics
+TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector zero conversion", "[plugins][org.custusx.core.openigtlink3][unit][visualization]")
+{
+	QString imageFilename = "US_small.mhd";
+	vtkImageDataPtr videoImage0 = this->readImageData(imageFilename, "input image");
+	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
+
+	cx::ProbeDefinition probeDefinition = this->readProbeDefinition(imageFilename);
+	cx::ProbeDefinitionPtr probeDefinitionPtr = boost::make_shared<cx::ProbeDefinition>(probeDefinition);
+	REQUIRE(probeDefinitionPtr);
+
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
+	NetworkHandlerTester networkHandler(logic);
+	networkHandler.setProbeDefinition(probeDefinitionPtr);
+
+	cx::ImagePtr image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
+	CHECK(networkHandler.testCreateMask());
+	REQUIRE(networkHandler.getMask());
+
+	unsigned char* imagePtr = static_cast<unsigned char*> (vtkImage->GetScalarPointer());
+	unsigned char* maskPtr = static_cast<unsigned char*> (networkHandler.getMask()->GetScalarPointer());
+	Eigen::Array3i dims(vtkImage->GetDimensions());
+
+	unsigned pos = 200 + 200 * dims[0]; // (x, y)
+	CHECK(maskPtr[pos] != 0);
+	CHECK(imagePtr[pos] != 0);
+	imagePtr[pos] = 0;
+	CHECK(imagePtr[pos] == 0);
+
+	CHECK(networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255));
+	CHECK(imagePtr[pos] == 255);
+
+	 //Renders and saves images for visual inspaction, but CHECK will fail
+//	this->renderImageAndCompareToExpected(image->getBaseVtkImageData(), expected);
+//	cx::sleep_ms(3000);
+}
+
+TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector zero conversion speed", "[plugins][org.custusx.core.openigtlink3][unit][visualization]")
+{
+	QString imageFilename = "US_small.mhd";
+	vtkImageDataPtr videoImage0 = this->readImageData(imageFilename, "input image");
+	vtkImageDataPtr expected = this->readImageData("US_small_sector_masked.png", "input expected");
+
+	cx::ProbeDefinition probeDefinition = this->readProbeDefinition(imageFilename);
+	cx::ProbeDefinitionPtr probeDefinitionPtr = boost::make_shared<cx::ProbeDefinition>(probeDefinition);
+	REQUIRE(probeDefinitionPtr);
+
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
+	NetworkHandlerTester networkHandler(logic);
+	networkHandler.setProbeDefinition(probeDefinitionPtr);
+
+	cx::ImagePtr image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
+	CHECK(networkHandler.testCreateMask());
+	REQUIRE(networkHandler.getMask());
+
+	QTime clock;
+	unsigned times = 100;
+	int timeMs = 0;
+	for(int i = 0; i < times; ++i)
+	{
+		image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+		clock.start();
+		networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255);
+		timeMs += clock.elapsed();
+	}
+	int averageTime = timeMs/times;
+	CX_LOG_DEBUG() << "Average image conversion time (sampled separately) for " << times << " images: " << averageTime << " ms.";
+	CHECK(averageTime < 10);
+
+	timeMs = 0;
+	clock.start();
+	for(int i = 0; i < times; ++i)
+	{
+//		image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
+		networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255);
+	}
+	timeMs += clock.elapsed();
+	averageTime = timeMs/times;
+	CX_LOG_DEBUG() << "Average image conversion time (whole for loop, skipped image reload) for " << times << " images: " << averageTime << " ms.";
+	CHECK(averageTime < 10);
 }
 
 } //namespace cxtest

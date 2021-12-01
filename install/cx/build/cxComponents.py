@@ -128,6 +128,44 @@ class Component(object):
             with ZipFile(self.thoraxCTdataPath() + '/' + 'temp.zip', 'r') as zip_ref:
     	        zip_ref.extractall(self.thoraxCTdataPath())
             os.remove(zipFilePath)
+    def isUbuntu2004(self):
+        # Ubuntu 20.04 kernel: 5.4
+        # Ubuntu 18.04 kernel: 4.15
+        # See link for kernel numbers:
+        #https://askubuntu.com/questions/517136/list-of-ubuntu-versions-with-corresponding-linux-kernel-version
+        # It also seems that newer installations of Ubuntu 20.04 use the 5.11 kernel (from Ubuntu 21.04)
+
+        # os.uname on Python 2 don't have variable names. Need to only use result as a list
+        # os.uname().sysname = os.uname()[0]
+        # sysname = #0, release = #2, version = #3
+        # os.uname don't work on Windows. Using platform.uname instead
+        if 'Linux' not in platform.uname()[0]:
+            return False
+        else:
+            print("Linux kernel detected")
+
+        # Alternative solution detecting kernel/release equal or greater than 5.4.
+        # The problem is that this may trigger on other Linux platforms
+        #osRelease = os.uname().release.split('.')
+        #if int(osRelease[0]) >= 5:
+        #    if int(osRelease[0]) == 5 and int(osRelease[1]) >= 4:
+        #        print("Detected Ubuntu 20.04 or newer")
+        #        return True
+        #    else:
+        #        return False
+        #    print("Ubuntu kernel newer than 5.4 (Ubuntu 20.04)")
+        #    return True
+        #return False
+
+        #print(os.uname())
+        #print(os.uname().version)
+        if 'Ubuntu' in platform.uname()[3] and "20.04" in platform.uname()[3]:
+            print("Ubuntu 20.04 detected")
+            return True
+        if "5.4." in platform.uname()[2]:
+            print("Ubuntu 20.04 kernel detected")
+            return True
+        return False
 
 # ---------------------------------------------------------
 
@@ -248,7 +286,9 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckoutSha('56d165d8f0ad500a762a595526bf30c90dc04aaa')
+        #This fixes the bug:
+        #QSqlDatabasePrivate::database: requested database does not belong to the calling thread.
+        self._getBuilder().gitCheckoutSha('7c0477fc6eeda55b0fcec1127f001a38009332ef')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -336,7 +376,7 @@ class OpenIGTLink(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git://github.com/openigtlink/OpenIGTLink.git'
+        return 'https://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckoutSha('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX

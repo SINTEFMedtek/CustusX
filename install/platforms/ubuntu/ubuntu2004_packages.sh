@@ -68,11 +68,11 @@ sudo apt-get install -y openssh-server
 #sudo pip install pycrypto future
 
 #Cmake and Qt
-sudo apt-get install cmake cmake-curses-gui cmake-qt-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev
-sudo apt-get install libxt-dev 
+sudo apt-get install -y cmake cmake-curses-gui cmake-qt-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev
+sudo apt-get install -y libxt-dev
 
 #OpenCL
-sudo apt install nvidia-opencl-dev
+sudo apt install -y nvidia-opencl-dev
 
 # For OpenCL (fails in OpenCLUtilityLibrary)
 # Need to install proprietary NVIDIA drivers in "Additional Drivers" in OS Settings
@@ -85,3 +85,16 @@ sudo apt install nvidia-opencl-dev
 # sudo ln /usr/lib/x86_64-linux-gnu/libGL.so.1.7.0 /usr/lib/x86_64-linux-gnu/libGL.so
 # https://askubuntu.com/questions/616065/the-imported-target-qt5gui-references-the-file-usr-lib-x86-64-linux-gnu-li
 
+#For the new Acer (2021) machines it seems like the latest NVIDIA driver (470) works fine
+
+#Needed to reinstall Boost, cppunit and glew:
+sudo apt-get install -y libboost-all-dev libcppunit-dev libglew-dev
+
+#Needed to reinstall Boost, cppunit, glew, vlc:
+sudo apt-get install -y libboost-all-dev libcppunit-dev libglew-dev vlc
+
+#For running tests: issue with missing lxml
+sudo apt-get install -y python3-lxml
+
+#For enabling vlc integration, and showing the H.264 encoded video from VLC
+sudo apt install -y vlc-plugin-access-extra gstreamer1.0-libav

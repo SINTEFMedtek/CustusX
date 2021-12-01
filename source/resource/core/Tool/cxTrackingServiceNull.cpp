@@ -98,9 +98,30 @@ void TrackingServiceNull::runDummyTool(DummyToolPtr tool)
 {
 }
 
+std::vector<TrackerConfigurationPtr> TrackingServiceNull::getConfigurations()
+{
+	std::vector<TrackerConfigurationPtr> retval;
+	retval.push_back(TrackerConfiguration::getNullObject());
+	return retval;
+}
+
+/*TrackerConfigurationPtr TrackingServiceNull::getConfiguration(QString trackingSystemImplementation)
+{
+	return TrackerConfiguration::getNullObject();
+}*/
+
 TrackerConfigurationPtr TrackingServiceNull::getConfiguration()
 {
 	return TrackerConfiguration::getNullObject();
+}
+
+void TrackingServiceNull::setCurrentTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+}
+
+QString TrackingServiceNull::getCurrentTrackingSystemImplementation()
+{
+	return QString();
 }
 
 void TrackingServiceNull::installTrackingSystem(TrackingSystemServicePtr system)
@@ -116,6 +137,11 @@ void TrackingServiceNull::unInstallTrackingSystem(TrackingSystemServicePtr syste
 std::vector<TrackingSystemServicePtr> TrackingServiceNull::getTrackingSystems()
 {
 	return std::vector<TrackingSystemServicePtr> ();
+}
+
+void TrackingServiceNull::resetTimeSynchronization()
+{
+
 }
 
 } //cx

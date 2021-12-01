@@ -41,11 +41,13 @@ public:
 		QString mOpenIGTLinkTransformId;
 		QString mOpenIGTLinkImageId;
 		bool mReference;
+		bool mApplyRefToTool;
 		ToolStructure() :
 			mAbsoluteToolFilePath(""),
 			mOpenIGTLinkTransformId(""),
 			mOpenIGTLinkImageId(""),
-			mReference(false)
+			mReference(false),
+			mApplyRefToTool(false)
 		{}
 	};
 
@@ -58,6 +60,7 @@ public:
 		QString mClinical_app; ///< the clinical application this config is made for
 		QString mTrackingSystemImplementation;//Tracking system implementation (igstk or openigtlink)
 		TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
+		bool mApplyRefToTools;
 	};
 
 public:
@@ -74,6 +77,7 @@ public:
 	static void saveConfiguration(Configuration& config);
 
 	QString getTrackingSystemImplementation();
+	bool getApplyRefToTools();
 private:
 	void setConfigDocument(QString configAbsoluteFilePath);
 	bool isConfigFileValid();

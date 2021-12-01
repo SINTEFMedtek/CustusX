@@ -108,6 +108,7 @@ protected slots:
 
 	virtual void dataViewPropertiesChangedSlot(QString uid) = 0;
 	virtual void videoSourceChangedSlot(QString uid) {}
+	virtual void activeToolChangedSlot() {};
 
 protected:
 	ViewWrapper(VisServicesPtr backend);

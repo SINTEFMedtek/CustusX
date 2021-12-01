@@ -40,7 +40,7 @@ public:
 	virtual ~Branch();
 	void setPositions(Eigen::MatrixXd pos);
 	Eigen::MatrixXd getPositions();
-    void setOrientations(Eigen::MatrixXd orient);
+	void setOrientations(Eigen::MatrixXd orient);
 	Eigen::MatrixXd getOrientations();
 	void setRadius(Eigen::VectorXd r);
 	Eigen::VectorXd getRadius();
@@ -53,11 +53,11 @@ public:
 	int findGenerationNumber();
 	double findBranchRadius();
 	BranchPtr getParentBranch();
-    void calculateOrientations();
+	void calculateOrientations();
 	int findParentIndex(branchVector bv) const;
 	void setBronchoscopeRotation(double rotation);
 	double getBronchoscopeRotation();
-    void removeEqualPositions();
+	void removeEqualPositions();
 };
 
 

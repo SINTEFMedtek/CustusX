@@ -149,5 +149,34 @@ std::vector<TrackingSystemServicePtr> DummyToolManager::getTrackingSystems()
 	return std::vector<TrackingSystemServicePtr> ();
 }
 
+void DummyToolManager::resetTimeSynchronization()
+{
+}
+
+std::vector<TrackerConfigurationPtr> DummyToolManager::getConfigurations()
+{
+	std::vector<TrackerConfigurationPtr> retval;
+	retval.push_back(TrackerConfigurationPtr());
+	return retval;
+}
+
+/*TrackerConfigurationPtr DummyToolManager::getConfiguration(QString trackingSystemImplementation)
+{
+	return TrackerConfigurationPtr();
+}*/
+
+TrackerConfigurationPtr DummyToolManager::getConfiguration()
+{
+	return TrackerConfigurationPtr();
+}
+
+void DummyToolManager::setCurrentTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+}
+
+QString DummyToolManager::getCurrentTrackingSystemImplementation()
+{
+	return QString();
+}
 
 } //namespace cx

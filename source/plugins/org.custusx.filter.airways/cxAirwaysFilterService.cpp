@@ -54,8 +54,9 @@ AirwaysFilter::AirwaysFilter(VisServicesPtr services) :
 {
 	fast::Reporter::setGlobalReportMethod(fast::Reporter::COUT);
 	//Need to create OpenGL context of fast in main thread, this is done in the constructor of DeviceManger
-	fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
-	Q_UNUSED(importer)
+	//This hack sometimes cause CTK plugin start/stop to fail - if needed it must be solved in another way
+	//fast::ImageFileImporter::pointer importer = fast::ImageFileImporter::New();
+	//Q_UNUSED(importer)
 }
 
 
@@ -75,9 +76,9 @@ QString AirwaysFilter::getType() const
 QString AirwaysFilter::getHelp() const
 {
 	return  "<html>"
-	        "<h3>Airway Segmentation.</h3>"
-					"<p><i>Extracts airways and blood vessels, including centerlines, and lungs from a CT volume. If method fails, try to crop volume. </br>Algorithm written by Erik Smistad.</i></p>"
-	        "</html>";
+			"<h3>Airway Segmentation.</h3>"
+			"<p><i>Extracts airways and blood vessels, including centerlines, and lungs from a CT volume. If method fails, try to crop volume. </br>Algorithm written by Erik Smistad.</i></p>"
+			"</html>";
 }
 
 Vector3D AirwaysFilter::getSeedPointFromTool(SpaceProviderPtr spaceProvider, DataPtr data)
@@ -121,7 +122,7 @@ bool AirwaysFilter::isSeedPointInsideImage(Vector3D seedPoint, DataPtr image)
 
 bool AirwaysFilter::preProcess()
 {
-    DataPtr inputImage = mInputTypes[0].get()->getData();
+	DataPtr inputImage = mInputTypes[0].get()->getData();
 	if (!inputImage)
 	{
 		CX_LOG_ERROR() << "No input data selected";
@@ -138,7 +139,7 @@ bool AirwaysFilter::preProcess()
 			+ "/" + inputImage->getFilename()).toStdString();
 
 	// only check seed point inside image if use seed point is checked
-  bool useManualSeedPoint = mManualSeedPointOption->getValue();
+	bool useManualSeedPoint = mManualSeedPointOption->getValue();
 	if(useManualSeedPoint)
 	{
 		seedPoint = getSeedPointFromTool(mServices->spaceProvider(), inputImage);
@@ -190,13 +191,13 @@ bool AirwaysFilter::execute()
 
 	bool doAirwaySegmentation = mAirwaySegmentationOption->getValue();
 	bool doLungSegmentation = mLungSegmentationOption->getValue();
-    bool doVesselSegmentation = mVesselSegmentationOption->getValue();
+	bool doVesselSegmentation = mVesselSegmentationOption->getValue();
 
 	if (doAirwaySegmentation)
 	{
 		std::string volumeFilname = q_filename.toStdString();
 		// Import image data from disk
-		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();
+		fast::ImageFileImporter::pointer importerPtr = fast::ImageFileImporter::New();//TODO: This line cause an exception
 		importerPtr->setFilename(volumeFilname);
 
 		segmentAirways(importerPtr);
@@ -566,7 +567,7 @@ bool AirwaysFilter::postProcessVessels()
 			patientService(),
 			rawContour,
 			outputImage,
-	    color
+				color
 	);
 	contour->get_rMd_History()->setRegistration(mInputImage->get_rMd());
 
@@ -593,10 +594,10 @@ bool AirwaysFilter::postProcessVessels()
 	{
 		//Create segmented volume output
 		QString uidVolume = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
-		QString nameVolume =  mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+		QString nameVolume = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
 		ImagePtr outputVolume = createDerivedImage( mServices->patient(),
-		                                            uidVolume, nameVolume,
-		                                            mBloodVesselSegmentationOutput, mInputImage);
+													uidVolume, nameVolume,
+													mBloodVesselSegmentationOutput, mInputImage);
 		outputVolume->mergevtkSettingsIntosscTransform();
 		patientService()->insertData(outputVolume);
 		mOutputTypes[7]->setValue(outputVolume->getUid());
@@ -607,7 +608,7 @@ bool AirwaysFilter::postProcessVessels()
 
 void AirwaysFilter::createAirwaysFromCenterline()
 {
-	  AirwaysFromCenterlinePtr airwaysFromCLPtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
+	AirwaysFromCenterlinePtr airwaysFromCLPtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 
 	airwaysFromCLPtr->processCenterline(mAirwayCenterlineOutput);
 	airwaysFromCLPtr->setSegmentedVolume(mAirwaySegmentationOutput);
