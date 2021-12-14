@@ -165,6 +165,9 @@ class Component(object):
         if "5.4." in platform.uname()[2]:
             print("Ubuntu 20.04 kernel detected")
             return True
+        if "5.15." in platform.uname()[2]:
+            print("Ubuntu 20.04 kernel detected - experimental kernel for updated driver support")
+            return True
         return False
 
 # ---------------------------------------------------------
