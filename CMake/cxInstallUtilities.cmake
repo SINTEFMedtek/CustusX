@@ -499,6 +499,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
       "${QT_LIBS_DIR}/*xcb*"
       "${QT_LIBS_DIR}/libQt*"
       "${QT_LIBS_DIR}/*-qt5*"
+      "${QT_LIBS_DIR}/libicui18n.*"
     )
 
     file(GLOB REMOVE_FILE_LIST
