@@ -61,7 +61,7 @@ class ShellCommandReal(ShellCommand):
         return p    
     
     def _get_popen_executable(self):
-        if platform.system() is not 'Windows':
+        if platform.system() != 'Windows':
             return '/bin/bash'
         else:
             return None
