@@ -9,7 +9,7 @@
 #
 #
 #####################################################
-    
+
 from __future__ import print_function
 from builtins import object
 import os
@@ -24,13 +24,13 @@ def try_module_import(module):
     Use for modules not bundled with the standard Python installation.
     This function attempts to load it, and outputs a howto
     it the load fails.
-    
-    The module is returned. Assign it to a 
+
+    The module is returned. Assign it to a
     local variable in order to use it!
     '''
     try:
         i = importlib.import_module(module)
-        #import module
+        # import module
         return i
     except ImportError:
         print("Error: Module %s not found." % module)
@@ -49,8 +49,8 @@ def try_lxml_import():
     lxml is not bundled with the standard Python installation.
     This function attempts to load it, and outputs a howto
     it the load fails.
-    
-    The lxml module is returned. Assign it to a 
+
+    The lxml module is returned. Assign it to a
     local variable lxml in order to use it!
     '''
     try:
@@ -68,20 +68,20 @@ def try_lxml_import():
             print("    sudo easy_install lxml")
         raise
 
+
 def try_paramiko_import():
     '''
     paramiko dont install out of the box on mac 10.8. install crypto using:
     http://stackoverflow.com/questions/19617686/trying-to-install-pycrypto-on-mac-osx-mavericks
         sudo port install gmp
-        sudo ln -s  /opt/local/lib/libgmp.dylib  /usr/lib/libgmp.dylib  
+        sudo ln -s  /opt/local/lib/libgmp.dylib  /usr/lib/libgmp.dylib
         ARCHFLAGS=-Wno-error CFLAGS=-I/opt/local/include sudo -E pip install pycrypto
     Then install ecdsa:
         sudo pip install ecdsa
-    
     '''
     return try_module_import('paramiko')
-    
-    
+
+
 def writeToNewFile(filename, text):
     '''
     Write text to filename, 
@@ -93,10 +93,12 @@ def writeToNewFile(filename, text):
     with open(filename, 'w') as f:
         f.write(text)
 
+
 def readFile(filename):
     with open(filename, 'rb') as f:
         content = f.read()
     return content
+
 
 def assertTrue(assertion, text):
     if not assertion:
@@ -104,31 +106,35 @@ def assertTrue(assertion, text):
         print(text)
         raise Exception(text)
 
+
 def getPathToModule():
     '''
     return path to the folder this python module resides in.
     '''
-    # alternatively use  sys.argv[0] ?? 
+    # alternatively use  sys.argv[0] ??
     moduleFile = os.path.realpath(__file__)
     modulePath = os.path.dirname(moduleFile)
     modulePath = os.path.abspath(modulePath)
     return modulePath
+
 
 class PlatformInfo(object):
     '''
     Describes the operating system.
     Defines a unique string for the target os.
     '''
+
     def __init__(self, platform_system, is32bit):
         self.platform_system = platform_system
         self.is32bit = is32bit
+
     def __str__(self):
         return self.getTargetPlatform()
-        
+
     def get_target_platform(self):
         if self.isUbuntu2004():
             return 'ubuntu2004'
-        if self.platform_system == 'Linux':
+        elif self.platform_system == 'Linux':
             return 'linux'
         elif self.platform_system == 'Darwin':
             return 'apple'
@@ -136,7 +142,7 @@ class PlatformInfo(object):
             if self.is32bit:
                 return 'win32'
             else:
-                return 'win64' 
+                return 'win64'
         else:
             return 'unknown_platform'
 
@@ -144,7 +150,7 @@ class PlatformInfo(object):
         # Ubuntu 20.04 kernel: 5.4
         # Ubuntu 18.04 kernel: 4.15
         # See link for kernel numbers:
-        #https://askubuntu.com/questions/517136/list-of-ubuntu-versions-with-corresponding-linux-kernel-version
+        # https://askubuntu.com/questions/517136/list-of-ubuntu-versions-with-corresponding-linux-kernel-version
         # It also seems that newer installations of Ubuntu 20.04 use the 5.11 kernel (from Ubuntu 21.04)
 
         # os.uname on Python 2 don't have variable names. Need to only use result as a list
