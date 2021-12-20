@@ -110,9 +110,10 @@ bool NetworkHandler::verifyTimestamp(double &timestampMS)
 	double diff = timestampMS - latestSystemTime;
 	if(fabs(diff) > 1000)
 	{
-		CX_LOG_WARNING() << "NetworkHandler: Detected difference between system time and timestamp after synchronization. Difference: " << diff
-						 << " The reason for this may be messages with different timestamp formats. "
-						 << " System time will be used instead of received timestamp.";
+		// BK stops the time whenever the image is frozen, or a parameter is changed
+		//CX_LOG_WARNING() << "NetworkHandler: Detected difference between system time and timestamp after synchronization. Difference: " << diff
+		//				 << " The reason for this may be messages with different timestamp formats. "
+		//				 << " System time will be used instead of received timestamp.";
 		timestampMS = latestSystemTime;
 		return false;
 	}
