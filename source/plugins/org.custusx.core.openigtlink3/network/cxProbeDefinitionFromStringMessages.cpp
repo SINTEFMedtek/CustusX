@@ -220,18 +220,28 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	}
 	else if (name == IGTLIO_KEY_SPACING_X)
 	{
-		mSectorInfo->mHaveChanged  = true;
-		mSectorInfo->mSpacingX = doubleValue;
+		if(mSectorInfo->mSpacingX != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mSpacingX = doubleValue;
+		}
+
 	}
 	else if (name == IGTLIO_KEY_SPACING_Y)
 	{
-		mSectorInfo->mHaveChanged  = true;
-		mSectorInfo->mSpacingY = doubleValue;
+		if(mSectorInfo->mSpacingY != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mSpacingY = doubleValue;
+		}
 	}
 	else if (name == "SpacingZ") //IGTLIO_KEY_SPACING_Z
 	{
-		mSectorInfo->mHaveChanged  = true;
-		mSectorInfo->mSpacingZ = doubleValue;
+		if(mSectorInfo->mSpacingZ != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mSpacingZ = doubleValue;
+		}
 	}
 }
 
@@ -262,12 +272,13 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 	//Send spacing as messages for now. Should be sent together with image.
 	//The default should be to use the spacing from the image,
 	//not from meta info or string messages
-	if(validSpacing(spacing))
-	{
-		//CX_LOG_DEBUG() << "Using spacing from image: " << spacing
-		//			   << " instead of spacing from meta data: " << mSectorInfo->mSpacingX << " " << mSectorInfo->mSpacingY << " " << mSectorInfo->mSpacingZ;
-	}
-	else
+	// BK don't change image spacing in image when depth is changed
+	//if(validSpacing(spacing))
+	//{
+	//    CX_LOG_DEBUG() << "Using spacing from image: " << spacing
+	//                   << " instead of spacing from meta data: " << mSectorInfo->mSpacingX << " " << mSectorInfo->mSpacingY << " " << mSectorInfo->mSpacingZ;
+	//}
+	//else
 	{
 		//Use spacing from meta data if not correct spacing in image.
 		//NB: Current implementation of igtlioImageConverter::IGTLToVTKImageData discards incoming spacing.
