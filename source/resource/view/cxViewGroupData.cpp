@@ -441,6 +441,9 @@ bool ViewGroupData::removeData(QString uid)
 	if (!this->contains(uid))
 		return false;
 	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
+	TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
+	if (trackedStream)
+		trackedStream->deleteImageToStopEmittingFrames();
 	emit dataViewPropertiesChanged(uid);
 	return true;
 }
