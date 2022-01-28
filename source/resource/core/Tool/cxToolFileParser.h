@@ -77,6 +77,8 @@ public:
 		QString mLoggingFolderName; ///< path to where log should be saved
 		QString mInstrumentId; ///< The instruments id
 		QString mInstrumentScannerId; ///< The id of the ultrasound scanner if the instrument is a probe
+		QString mOpenigtlinkImageId; ///< The image id when sent over OpenIGTLink
+		QString mOpenigtlinkTransformId; ///< The transform id when sent over OpenIGTLink
 		ToolInternalStructure() :
 			mIsReference(false), mIsPointer(false), mIsProbe(false),
 			//mType(Tool::TOOL_NONE),
@@ -119,7 +121,8 @@ protected:
 	mToolSensorTag, mToolSensorTypeTag, mToolSensorIdTag, mToolSensorNameTag, mToolSensorWirelessTag,
 	mToolSensorDOFTag, mToolSensorPortnumberTag, mToolSensorChannelnumberTag,
 	mToolSensorReferencePointTag, mToolSensorManufacturerTag, mToolSensorDescriptionTag,
-	mToolSensorRomFileTag, mToolCalibrationTag, mToolCalibrationFileTag;
+	mToolSensorRomFileTag, mToolCalibrationTag, mToolCalibrationFileTag,
+	mToolOpenigtlinkImageIdTag, mToolOpenigtlinkTransformIdTag;
 	///< names of necessary tags in the tool file
 
 };

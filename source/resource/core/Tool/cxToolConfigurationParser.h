@@ -86,6 +86,7 @@ private:
 	QString searchForExistingToolFilePath(QString relativeToolFilePath);
 	static QString convertToRelativeToolFilePath(QString configFilename, QString absoluteToolFilePath);
 	static QString getToolPathFromRoot(QString root);
+	static void createToolFileNode(ToolStructureVector::iterator iter, QDomElement &toolFileNode, ToolFileParser &toolparser);
 
 	QString mConfigurationFilePath; ///< absolute path to the configuration file
 	QString mLoggingFolder; ///< absolutepath to the logging folder
