@@ -94,7 +94,7 @@ TEST_CASE("Verify that saveConfiguration do not loose information", "[unit][tool
 			//New tool files can add OpenIGTLink id tags to tool config files
 			if(!configData.mToolList[i].mOpenIGTLinkImageId.isEmpty())
 				CHECK(configData.mToolList[i].mOpenIGTLinkImageId == configData2.mToolList[i].mOpenIGTLinkImageId);
-			if(!configData.mToolList[i].mOpenIGTLinkImageId.isEmpty())
+			if(!configData.mToolList[i].mOpenIGTLinkTransformId.isEmpty())
 				CHECK(configData.mToolList[i].mOpenIGTLinkTransformId == configData2.mToolList[i].mOpenIGTLinkTransformId);
 		}
 	}
