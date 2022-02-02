@@ -95,7 +95,7 @@ class Common(object):
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID(server, "%s/gcov"%root_folder, user) 
 
         #self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
-        self.gitrepo_open_site_base = "https://github.com:SINTEFMedtek"
+        self.gitrepo_open_site_base = "https://github.com/SINTEFMedtek"
         self.gitrepo_main_site_base = self.gitrepo_open_site_base 
 
         self.main_repo_folder = self.getCustusXRepositoryPath()

@@ -312,7 +312,7 @@ class Eigen(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com:eigenteam/eigen-git-mirror.git'
+            return 'https://github.com/eigenteam/eigen-git-mirror.git'
         else:
             return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
@@ -500,7 +500,7 @@ class OpenCLUtilityLibrary(CppComponent):
 #        return self.controlData.getWorkingPath() + "/OpenCLUtilityLibrary"
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com:smistad/OpenCLUtilityLibrary'
+            return 'https://github.com/smistad/OpenCLUtilityLibrary'
         else:
             return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
@@ -525,7 +525,7 @@ class FAST(CppComponent):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com:SINTEFMedtek/FAST.git'
+            return 'https://github.com/SINTEFMedtek/FAST.git'
         else:
             return 'git@github.com:SINTEFMedtek/FAST.git'
     def update(self):
@@ -608,7 +608,7 @@ class QHttpServer(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com:SINTEFMedtek/qhttpserver.git'
+            return 'https://github.com/SINTEFMedtek/qhttpserver.git'
         else:
             return 'git@github.com:SINTEFMedtek/qhttpserver.git'
     def update(self):
@@ -646,7 +646,7 @@ class org_custusx_angleCorrection(CppComponent):
         pass
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com:SINTEFMedtek/AngleCorr.git'
+            return 'https://github.com/SINTEFMedtek/AngleCorr.git'
         else:
             return 'git@github.com:SINTEFMedtek/AngleCorr.git'
     def makeClean(self):
@@ -681,7 +681,7 @@ class org_custusx_mariana(CppComponent):
         pass
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com:SINTEFMedtek/Mariana.git'
+            return 'https://github.com/SINTEFMedtek/Mariana.git'
         else:
             return 'git@github.com:SINTEFMedtek/Mariana.git'
     def makeClean(self):
