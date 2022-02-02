@@ -128,6 +128,8 @@ void OpenIGTLinkTrackingSystemService::configure()
 
 void OpenIGTLinkTrackingSystemService::deconfigure()
 {
+	mTransformIdWarningPrinted.clear();
+
 	if (!this->isConfigured())
 		return;
 
@@ -170,6 +172,20 @@ void OpenIGTLinkTrackingSystemService::receiveTransform(QString devicename, Tran
 		else
 			tool->toolTransformAndTimestampSlot(transform, timestampMS);
 	}
+	else
+		this->printTransformIdWarning(devicename);
+}
+
+bool OpenIGTLinkTrackingSystemService::printTransformIdWarning(QString devicename)
+{
+	if(!mTransformIdWarningPrinted.contains(devicename))
+	{
+		CX_LOG_WARNING() << "No tool with openigtlinktransformid: " << devicename;
+		CX_LOG_WARNING() << "Add the id to an openigtlinktransformid tag in one of the used tool files to fix this";
+		mTransformIdWarningPrinted << devicename;
+		return true;
+	}
+	return false;
 }
 
 void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Transform3D calibration)

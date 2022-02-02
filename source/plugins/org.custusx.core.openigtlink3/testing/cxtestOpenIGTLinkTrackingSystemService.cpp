@@ -56,6 +56,8 @@ public:
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
 	double getNetworkHandlerTimestampOffset();
 	cx::OpenIGTLinkToolPtr getTool(QString devicename) {return cx::OpenIGTLinkTrackingSystemService::getTool(devicename);}
+	QStringList getTransformIdWarningPrinted() {return mTransformIdWarningPrinted;}
+	bool testPrintTransformIdWarning(QString devicename) {return printTransformIdWarning(devicename);}
 
 public slots:
 	virtual void configure() {cx::OpenIGTLinkTrackingSystemService::configure();}
@@ -321,6 +323,30 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[
 	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
 }
 
+TEST_CASE("OpenIGTLinkTrackingSystemService: receiveTransform print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+	cx::Transform3D transform = cx::Transform3D::Identity();
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	QString deviceName = "testDevice";
+	trackingSystemService->receiveTransform(deviceName, transform, timestampMS);
+	CHECK(trackingSystemService->getTransformIdWarningPrinted().contains(deviceName));
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+
+	QString deviceName = "testDevice1";
+	QString deviceName2 = "testDevice2";
+	CHECK(trackingSystemService->testPrintTransformIdWarning(deviceName));
+	CHECK(trackingSystemService->getTransformIdWarningPrinted().contains(deviceName));
+	CHECK(trackingSystemService->testPrintTransformIdWarning(deviceName2));
+	CHECK_FALSE(trackingSystemService->testPrintTransformIdWarning(deviceName));
+
+	trackingSystemService->deconfigure();
+	CHECK(trackingSystemService->testPrintTransformIdWarning(deviceName));
+}
 
 #ifdef CX_CUSTUS_SINTEF
 
