@@ -496,8 +496,9 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id
 		//CX_LOG_DEBUG() << trackerConfig.mToolList[i].mAbsoluteToolFilePath;
 		cx::ToolFileParser toolParser(trackerConfig.mToolList[i].mAbsoluteToolFilePath);
 		cx::ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
-		CHECK(internalTool->mOpenigtlinkImageId.startsWith("BK2300-"));
-		CHECK(internalTool->mOpenigtlinkImageId == internalTool->mOpenigtlinkTransformId);
+		CHECK(internalTool->mOpenigtlinkTransformId.startsWith("BK2300-"));
+		if(toolParser.getTool()->mIsProbe)
+			CHECK(internalTool->mOpenigtlinkImageId == internalTool->mOpenigtlinkTransformId);
 	}
 
 	trackingSystemService->configure();
