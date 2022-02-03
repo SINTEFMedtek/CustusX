@@ -304,14 +304,14 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 void ConfigurationFileParser::createToolFileNode(ToolStructureVector::iterator iter, QDomElement &toolFileNode, ToolFileParser &toolparser)
 {
 	toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (iter->mReference ? "yes" : "no"));
-	//Use OpenIGTLink id values from tool files if present
-	QString transformId = toolparser.getTool()->mOpenigtlinkTransformId;
-	QString imageId = toolparser.getTool()->mOpenigtlinkImageId;
-	//Otherwise use id values from tool config file
+	//Use OpenIGTLink id values from tool config file if present
+	QString transformId = iter->mOpenIGTLinkTransformId;
+	QString imageId = iter->mOpenIGTLinkImageId;
+	//Otherwise use id values from tool  file
 	if(transformId.isEmpty())
-		transformId = iter->mOpenIGTLinkTransformId;
+		transformId = toolparser.getTool()->mOpenigtlinkTransformId;
 	if(imageId.isEmpty())
-		imageId = iter->mOpenIGTLinkImageId;
+		imageId = toolparser.getTool()->mOpenigtlinkImageId;
 	toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, transformId);
 	toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, imageId);
 }
