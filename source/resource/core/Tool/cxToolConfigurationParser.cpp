@@ -312,8 +312,10 @@ void ConfigurationFileParser::createToolFileNode(ToolStructureVector::iterator i
 		transformId = toolparser.getTool()->mOpenigtlinkTransformId;
 	if(imageId.isEmpty())
 		imageId = toolparser.getTool()->mOpenigtlinkImageId;
-	toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, transformId);
-	toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, imageId);
+	if(!transformId.isEmpty())
+		toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, transformId);
+	if(!imageId.isEmpty())
+		toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, imageId);
 }
 
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
