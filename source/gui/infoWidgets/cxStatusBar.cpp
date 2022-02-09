@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -65,12 +65,25 @@ StatusBar::StatusBar(TrackingServicePtr trackingService, ViewServicePtr viewServ
 
 	connect(vlc(), &VLCRecorder::stateChanged, this, &StatusBar::onRecordFullscreenChanged);
 
+	fixFlickeringBar();
 //	this->addPermanentWidget(mMessageLevelLabel);
 	this->addPermanentWidget(mRenderingFpsLabel);
 }
 
 StatusBar::~StatusBar()
 {
+}
+
+void StatusBar::fixFlickeringBar()
+{
+	//Add an empty label with larger font size to make room for tool buttons.
+	//Otherwise tool buttons cause status bar to flicker
+
+	QLabel* emptyLabel = new QLabel(this);
+	QFont font = emptyLabel->font();
+	font.setPointSize(font.pointSize()+5);
+	emptyLabel->setFont(font);
+	this->addPermanentWidget(emptyLabel);
 }
 
 void StatusBar::resetToolManagerConnection()
