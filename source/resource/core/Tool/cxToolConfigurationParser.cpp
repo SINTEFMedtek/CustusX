@@ -278,10 +278,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 			QDomElement toolFileNode = doc.createElement(CONFIG_TRACKER_TOOL_FILE);
 			toolFileNode.appendChild(doc.createTextNode(relativeToolFilePath));
-			toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (it2->mReference ? "yes" : "no"));
-			//These are not saved correctly yet. See comment in ToolConfigureGroupBox::getConfiguration()
-			toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, it2->mOpenIGTLinkTransformId);// These are not saved correctly yet.
-			toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, it2->mOpenIGTLinkImageId);// These are not saved correctly yet.
+			createToolFileNode(it2, toolFileNode, toolparser);
 			trackerTagNode.appendChild(toolFileNode);
 		}
 		trackingsystemImplementationNode.appendChild(trackerTagNode);
@@ -302,6 +299,23 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 	QTextStream stream(&file);
 	doc.save(stream, 4);
 	reportSuccess("Configuration file " + file.fileName() + " is written.");
+}
+
+void ConfigurationFileParser::createToolFileNode(ToolStructureVector::iterator iter, QDomElement &toolFileNode, ToolFileParser &toolparser)
+{
+	toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (iter->mReference ? "yes" : "no"));
+	//Use OpenIGTLink id values from tool config file if present
+	QString transformId = iter->mOpenIGTLinkTransformId;
+	QString imageId = iter->mOpenIGTLinkImageId;
+	//Otherwise use id values from tool  file
+	if(transformId.isEmpty())
+		transformId = toolparser.getTool()->mOpenigtlinkTransformId;
+	if(imageId.isEmpty())
+		imageId = toolparser.getTool()->mOpenigtlinkImageId;
+	if(!transformId.isEmpty())
+		toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, transformId);
+	if(!imageId.isEmpty())
+		toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, imageId);
 }
 
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)

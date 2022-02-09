@@ -136,18 +136,19 @@ bool ToolFileParser::ToolInternalStructure::verify()
 }
 
 ToolFileParser::ToolFileParser(QString absoluteToolFilePath, QString loggingFolder) :
-	mToolFilePath(absoluteToolFilePath), mLoggingFolder(loggingFolder), mToolTag("tool"), mToolTypeTag(
-																							  "type"), mToolIdTag("id"), mToolNameTag("name"), mToolDescriptionTag("description"), mToolManufacturerTag(
-																																													   "manufacturer"), mToolClinicalAppTag("clinical_app"), mToolGeoFileTag("geo_file"), mToolPicFileTag(
-																																																																			  "pic_file"), mToolDocFileTag("doc_file"), mToolInstrumentTag("instrument"), mToolInstrumentTypeTag(
-																																																																																							  "type"), mToolInstrumentIdTag("id"), mToolInstrumentNameTag("name"), mToolInstrumentManufacturerTag(
-																																																																																																									   "manufacturer"), mToolInstrumentScannerIdTag("scannerid"), mToolInstrumentDescriptionTag(
-																																																																																																																									  "description"), mToolSensorTag("sensor"), mToolSensorTypeTag("type"), mToolSensorIdTag(
-																																																																																																																																												"id"), mToolSensorNameTag("name"), mToolSensorWirelessTag("wireless"), mToolSensorDOFTag(
-																																																																																																																																																														   "DOF"), mToolSensorPortnumberTag("portnumber"), mToolSensorChannelnumberTag(
-																																																																																																																																																																											   "channelnumber"), mToolSensorReferencePointTag("reference_point"), mToolSensorManufacturerTag(
-																																																																																																																																																																																													  "manufacturer"), mToolSensorDescriptionTag("description"), mToolSensorRomFileTag(
-																																																																																																																																																																																																													 "rom_file"), mToolCalibrationTag("calibration"), mToolCalibrationFileTag("cal_file")
+	mToolFilePath(absoluteToolFilePath), mLoggingFolder(loggingFolder), mToolTag("tool"), mToolTypeTag("type"),
+	mToolIdTag("id"), mToolNameTag("name"), mToolDescriptionTag("description"), mToolManufacturerTag("manufacturer"),
+	mToolClinicalAppTag("clinical_app"), mToolGeoFileTag("geo_file"), mToolPicFileTag("pic_file"),
+	mToolDocFileTag("doc_file"), mToolInstrumentTag("instrument"), mToolInstrumentTypeTag("type"),
+	mToolInstrumentIdTag("id"), mToolInstrumentNameTag("name"), mToolInstrumentManufacturerTag("manufacturer"),
+	mToolInstrumentScannerIdTag("scannerid"), mToolInstrumentDescriptionTag("description"),
+	mToolSensorTag("sensor"), mToolSensorTypeTag("type"), mToolSensorIdTag("id"),
+	mToolSensorNameTag("name"), mToolSensorWirelessTag("wireless"), mToolSensorDOFTag("DOF"),
+	mToolSensorPortnumberTag("portnumber"), mToolSensorChannelnumberTag("channelnumber"),
+	mToolSensorReferencePointTag("reference_point"), mToolSensorManufacturerTag("manufacturer"),
+	mToolSensorDescriptionTag("description"), mToolSensorRomFileTag("rom_file"), mToolCalibrationTag("calibration"),
+	mToolCalibrationFileTag("cal_file"),
+	mToolOpenigtlinkImageIdTag("openigtlinkimageid"), mToolOpenigtlinkTransformIdTag("openigtlinktransformid")
 {
 }
 
@@ -223,6 +224,14 @@ ToolFileParser::ToolInternalStructurePtr ToolFileParser::getTool()
 	if (!toolPicfileText.isEmpty())
 		toolPicfileText = toolFolderAbsolutePath + toolPicfileText;
 	internalStructure->mPictureFileName = toolPicfileText;
+
+	QDomElement toolImageIdfileElement = toolNode.firstChildElement(mToolOpenigtlinkImageIdTag);
+	QString toolImageIdfileText = toolImageIdfileElement.text();
+	internalStructure->mOpenigtlinkImageId = toolImageIdfileText;
+
+	QDomElement toolTransformIdfileElement = toolNode.firstChildElement(mToolOpenigtlinkTransformIdTag);
+	QString toolTransformIdfileText = toolTransformIdfileElement.text();
+	internalStructure->mOpenigtlinkTransformId = toolTransformIdfileText;
 
 	QDomElement toolInstrumentElement = toolNode.firstChildElement(mToolInstrumentTag);
 	if (toolInstrumentElement.isNull())
