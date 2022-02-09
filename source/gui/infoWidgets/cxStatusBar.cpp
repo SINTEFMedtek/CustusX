@@ -35,6 +35,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogMessageFilter.h"
 #include "cxMessageListener.h"
 #include "cxVLCRecorder.h"
+#include "cxSettings.h"
 
 
 namespace cx
@@ -140,6 +141,8 @@ void StatusBar::updateToolButtons()
 {
 	ToolPtr activeTool = mTrackingService->getActiveTool();
 
+	bool autoSelectActiveTool = settings()->value("Automation/autoSelectActiveTool").toBool();
+
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{
 		ToolData current = mToolData[i];
@@ -151,10 +154,15 @@ void StatusBar::updateToolButtons()
 			current.mAction->setToolTip("Tool is not Initialized");
 		else if (activeTool == tool)
 			current.mAction->setToolTip("Active Tool");
-        else if (!tool->getVisible())
+		else if (!tool->getVisible())
 			current.mAction->setToolTip("Tool not visible/not tracking");
 		else
-			current.mAction->setToolTip("Tool visible. Press to set as active");
+		{
+			if(autoSelectActiveTool)
+				current.mAction->setToolTip("Tool visible - Other tool is auto active");
+			else
+				current.mAction->setToolTip("Tool visible - Press to set as active");
+		}
 	}
 }
 
