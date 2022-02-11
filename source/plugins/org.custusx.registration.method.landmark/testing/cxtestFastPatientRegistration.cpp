@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
+#include <QCheckBox>
+
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxRegServices.h"
 #include "cxLogicManager.h"

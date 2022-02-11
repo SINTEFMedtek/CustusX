@@ -14,9 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxPatientLandMarksWidget.h"
 #include "org_custusx_registration_method_landmark_Export.h"
-#include <QCheckBox>
-
-class QTableWidgetItem;
 
 namespace cx
 {
@@ -42,18 +39,8 @@ public:
   FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
 
-protected:
-  virtual void showEvent(QShowEvent *event);
-  virtual void hideEvent(QHideEvent *event);
-
-  QCheckBox* mMouseClickSample;
-
-protected slots:
-  void mouseClickSampleStateChanged();
-  virtual void pointSampled(Vector3D p_r);
 private:
   virtual void performRegistration();
-  QTableWidgetItem * getLandmarkTableItem();
 };
 
 /**

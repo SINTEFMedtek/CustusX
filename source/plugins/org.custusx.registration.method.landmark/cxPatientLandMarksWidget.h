@@ -15,6 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLandmarkRegistrationWidget.h"
 #include "org_custusx_registration_method_landmark_Export.h"
 
+class QTableWidgetItem;
+
 namespace cx
 {
 
@@ -44,6 +46,8 @@ protected slots:
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
 	void removeLandmarkButtonClickedSlot();
 	void updateToolSampleButton();
+	void mouseClickSampleStateChanged();
+	virtual void pointSampled(Vector3D p_r);
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -54,10 +58,12 @@ protected:
 	virtual void setTargetLandmark(QString uid, Vector3D p_target);
 	virtual QString getTargetName() const;
 	virtual void performRegistration(); // no registration in this widget - only definition of pts.
+	QTableWidgetItem * getLandmarkTableItem();
 
 	//gui
 	QPushButton* mToolSampleButton; ///< the Sample Tool button
 	QPushButton* mRemoveLandmarkButton;
+	QCheckBox* mMouseClickSample;
 
 	//data
 	ActiveToolProxyPtr mActiveToolProxy;
