@@ -402,12 +402,8 @@ bool NetworkHandler::createMask()
 	ProbeSector probeSector;
 	probeSector.setData(*mProbeDefinition.get());
 
-	if(!mUSMask)
-	{
-		mUSMask = probeSector.getMask();
-		return true;
-	}
-	return false;
+	mUSMask = probeSector.getMask();
+	return true;
 }
 
 } // namespace cx
