@@ -95,7 +95,10 @@ class Common(object):
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID(server, "%s/gcov"%root_folder, user) 
 
         #self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
-        self.gitrepo_open_site_base = "https://github.com/SINTEFMedtek"
+        if self.git_use_https:
+            self.gitrepo_open_site_base = "https://github.com/SINTEFMedtek"
+        else:
+            self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"
         self.gitrepo_main_site_base = self.gitrepo_open_site_base 
 
         self.main_repo_folder = self.getCustusXRepositoryPath()
@@ -138,7 +141,6 @@ class Common(object):
         
         p.add_argument('--gitrepo_main_site_base', default=self.gitrepo_main_site_base, dest='gitrepo_main_site_base', help='Base url for the core open repositories default=%s.' % self.gitrepo_main_site_base)
         p.add_argument('--build_folder', dest='build_folder_overrides', help='Specify build folder names for given components. The argument is a comma-separated list of <component>=<build_folder> pairs, e.g.: "--build_folder CustusX=my_build_folder,ITK=my_itk_folder,..."')
-        #p.add_argument('--git_use_https', action='store_true', default=False, help='Use https instead of ssh for git repos')
         return p
 
     def getArgParser_extended_build(self):
