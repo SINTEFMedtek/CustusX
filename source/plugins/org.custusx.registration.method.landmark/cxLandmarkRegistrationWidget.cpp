@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QHeaderView>
 #include <QLabel>
 #include <QSlider>
+#include <QCheckBox>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 
@@ -39,7 +40,8 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, 
     QString objectName, QString windowTitle, bool showAccuracy) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
-        mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy)
+		mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy),
+		mMouseClickSample(nullptr)
 {
 	//table widget
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
@@ -94,6 +96,7 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
+	mMouseClickSample->setChecked(true);
 	mLandmarkListener->showRep();
 	connect(mServices->patient().get(), &PatientModelService::landmarkPropertiesChanged,this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
@@ -110,6 +113,7 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
+	mMouseClickSample->setChecked(false);
 	disconnect(mServices->patient().get(), &PatientModelService::landmarkPropertiesChanged, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
@@ -361,6 +365,32 @@ double LandmarkRegistrationWidget::getAccuracy(QString uid)
 	Vector3D p_master_r = rMmaster.coord(p_master_master);
 
 	return (p_target_r - p_master_r).length();
+}
+
+void LandmarkRegistrationWidget::mouseClickSampleStateChanged()
+{
+	if(mMouseClickSample->isChecked())
+		connect(mServices->view().get(), &ViewService::pointSampled, this, &LandmarkRegistrationWidget::pointSampled);
+	else
+		disconnect(mServices->view().get(), &ViewService::pointSampled, this, &LandmarkRegistrationWidget::pointSampled);
+}
+
+QTableWidgetItem * LandmarkRegistrationWidget::getLandmarkTableItem()
+{
+	if(!mLandmarkTableWidget)
+		return NULL;
+
+	int row = mLandmarkTableWidget->currentRow();
+	int column = mLandmarkTableWidget->currentColumn();
+
+	if((row < 0) && (mLandmarkTableWidget->rowCount() >= 0))
+		row = 0;
+	if((column < 0) && (mLandmarkTableWidget->columnCount() >= 0))
+		column = 0;
+
+	QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
+
+	return item;
 }
 
 }//namespace cx

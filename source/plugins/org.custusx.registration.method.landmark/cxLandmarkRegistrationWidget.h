@@ -24,6 +24,7 @@ class QTableWidget;
 class QPushButton;
 class QLabel;
 class QSlider;
+class QTableWidgetItem;
 
 namespace cx
 {
@@ -56,6 +57,8 @@ protected slots:
 	void cellChangedSlot(int row, int column); ///< reacts when the user types in a (landmark) name
 	void landmarkUpdatedSlot();
 	void updateAverageAccuracyLabel();
+	void mouseClickSampleStateChanged();
+	virtual void pointSampled(Vector3D p_r){};
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -74,11 +77,14 @@ protected:
 	QString getLandmarkName(QString uid);
 	double getAccuracy(QString uid);
 	double getAverageAccuracy();
+	QTableWidgetItem * getLandmarkTableItem();
+
 
 	//gui
 	QVBoxLayout* mVerticalLayout; ///< vertical layout is used
 	QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
 	QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy
+	QCheckBox* mMouseClickSample;
 
 	//data
 	QString mActiveLandmark; ///< uid of surrently selected landmark.

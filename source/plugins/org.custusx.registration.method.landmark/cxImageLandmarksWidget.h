@@ -62,6 +62,7 @@ protected slots:
 	void enableButtons();
 	void onCurrentImageChanged();
 	void toggleDetailsSlot();
+	virtual void pointSampled(Vector3D p_r);
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -76,6 +77,7 @@ protected:
     QString getLandmarkName(QString uid);
 	virtual Transform3D getTargetTransform() const;
 	PickerRepPtr getPickerRep();
+	void addLandmark(Vector3D p_r);
 
 	//gui
 	SelectDataStringPropertyBasePtr mCurrentProperty;

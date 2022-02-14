@@ -35,8 +35,7 @@ namespace cx
 PatientLandMarksWidget::PatientLandMarksWidget(RegServicesPtr services,
 	QWidget* parent, QString objectName, QString windowTitle) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
-	mToolSampleButton(new QPushButton("Sample Tool", this)),
-	mMouseClickSample(nullptr)
+	mToolSampleButton(new QPushButton("Sample Tool", this))
 {
 	mLandmarkListener->useI2IRegistration(false);
 
@@ -122,14 +121,12 @@ void PatientLandMarksWidget::toolSampleButtonClickedSlot()
 
 void PatientLandMarksWidget::showEvent(QShowEvent* event)
 {
-	mMouseClickSample->setChecked(true);
 	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
 }
 
 void PatientLandMarksWidget::hideEvent(QHideEvent* event)
 {
-	mMouseClickSample->setChecked(false);
 	mServices->view()->setRegistrationMode(rsNOT_REGISTRATED);
 	LandmarkRegistrationWidget::hideEvent(event);
 }
@@ -197,38 +194,12 @@ QString PatientLandMarksWidget::getTargetName() const
 	return "Patient";
 }
 
-void PatientLandMarksWidget::mouseClickSampleStateChanged()
-{
-	if(mMouseClickSample->isChecked())
-		connect(mServices->view().get(), &ViewService::pointSampled, this, &PatientLandMarksWidget::pointSampled);
-	else
-		disconnect(mServices->view().get(), &ViewService::pointSampled, this, &PatientLandMarksWidget::pointSampled);
-}
-
-QTableWidgetItem * PatientLandMarksWidget::getLandmarkTableItem()
-{
-	if(!mLandmarkTableWidget)
-		return NULL;
-
-	int row = mLandmarkTableWidget->currentRow();
-	int column = mLandmarkTableWidget->currentColumn();
-
-	if((row < 0) && (mLandmarkTableWidget->rowCount() >= 0))
-		row = 0;
-	if((column < 0) && (mLandmarkTableWidget->columnCount() >= 0))
-		column = 0;
-
-	QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
-
-	return item;
-}
-
 void PatientLandMarksWidget::pointSampled(Vector3D p_r)
 {
 	QTableWidgetItem* item = getLandmarkTableItem();
 	if(!item)
 	{
-		CX_LOG_WARNING() << "FastPatientRegistrationWidget::pointSampled() Cannot get item from mLandmarkTableWidget";
+		CX_LOG_WARNING() << "PatientLandMarksWidget::pointSampled() Cannot get item from mLandmarkTableWidget";
 		return;
 	}
 	QString uid = item->data(Qt::UserRole).toString();
@@ -237,6 +208,7 @@ void PatientLandMarksWidget::pointSampled(Vector3D p_r)
 	Vector3D p_target = rMtarget.inv().coord(p_r);
 
 	this->setTargetLandmark(uid, p_target);
+	this->activateLandmark(this->getNextLandmark());
 	this->performRegistration();
 }
 } //cx
