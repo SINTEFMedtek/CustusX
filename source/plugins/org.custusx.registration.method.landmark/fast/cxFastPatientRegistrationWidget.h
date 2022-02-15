@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -36,14 +36,14 @@ class org_custusx_registration_method_landmark_EXPORT FastPatientRegistrationWid
 {
 	Q_OBJECT
 public:
-  FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent);
-  virtual ~FastPatientRegistrationWidget();
+	FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent);
+	virtual ~FastPatientRegistrationWidget();
 
 protected slots:
-  virtual void pointSampled(Vector3D p_r);
+	virtual void pointSampled(Vector3D p_r);
 
 private:
-  virtual void performRegistration();
+	virtual void performRegistration();
 };
 
 /**

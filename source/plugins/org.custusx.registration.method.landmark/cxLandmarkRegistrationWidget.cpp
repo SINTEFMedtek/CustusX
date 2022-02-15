@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -36,13 +36,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent,
-    QString objectName, QString windowTitle, bool showAccuracy) :
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle, bool showAccuracy) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
-		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
-		mActiveLandmark(""),
-		mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy),
-		mMouseClickSample(nullptr)
+	mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
+	mActiveLandmark(""),
+	mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy),
+	mMouseClickSample(nullptr)
 {
 	//table widget
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
@@ -110,7 +109,7 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 
 	connect(mServices->view().get(), &ViewService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
 
-//	mManager->restart();
+	//mManager->restart();
 	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());
 	this->setModified();
 
@@ -158,16 +157,16 @@ void LandmarkRegistrationWidget::prePaintEvent()
 
 	//ready the table widget
 	mLandmarkTableWidget->setRowCount((int)landmarks.size());
-    QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates");
-    if (mShowAccuracy)
-    {
-        mLandmarkTableWidget->setColumnCount(4);
-        headerItems.append("Accuracy (mm)");
-    }
-    else
-        mLandmarkTableWidget->setColumnCount(3);
+	QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates");
+	if (mShowAccuracy)
+	{
+		mLandmarkTableWidget->setColumnCount(4);
+		headerItems.append("Accuracy (mm)");
+	}
+	else
+		mLandmarkTableWidget->setColumnCount(3);
 
-    mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
+	mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
 	mLandmarkTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -196,7 +195,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 			int width = 5;
 			int prec = 1;
 			coordText = tr("(%1, %2, %3)").arg(coord[0], width, 'f', prec).arg(coord[1], width, 'f', prec).arg(
-				coord[2], width, 'f', prec);
+						coord[2], width, 'f', prec);
 		}
 
 		items[2] = new QTableWidgetItem(coordText);
@@ -224,8 +223,8 @@ void LandmarkRegistrationWidget::prePaintEvent()
 
 void LandmarkRegistrationWidget::activateLandmark(QString uid)
 {
-    mActiveLandmark = uid;
-    this->setModified();
+	mActiveLandmark = uid;
+	this->setModified();
 	this->selectFirstLandmarkIfUnselected();
 }
 
@@ -302,11 +301,11 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 
 void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 {
-//  - This has too many side effects when we use the landmarks for several different registrations,
-//	i.e. image2image, patient, fast... Rather register explicitly, and add it to the buttons where you
-//  want the automation, such as in the patient reg sampler. (Mantis #0000674)
-//	this->performRegistration();
-    this->setModified();
+	//- This has too many side effects when we use the landmarks for several different registrations,
+	//i.e. image2image, patient, fast... Rather register explicitly, and add it to the buttons where you
+	//want the automation, such as in the patient reg sampler. (Mantis #0000674)
+	//this->performRegistration();
+	this->setModified();
 	this->selectFirstLandmarkIfUnselected();
 }
 
@@ -317,7 +316,7 @@ void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
 	if (fixedData)
 		fixedName = fixedData->getName();
 
-    if(this->isAverageAccuracyValid() && mShowAccuracy)
+	if(this->isAverageAccuracyValid() && mShowAccuracy)
 	{
 		mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAverageAccuracy(), 0, 'f', 2));
 		mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));

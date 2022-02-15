@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -147,13 +147,13 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 
 void DataManagerImpl::setOperatingTable(const OperatingTable &ot)
 {
-    mOperatingTable = ot;
-    emit operatingTableChanged();
+	mOperatingTable = ot;
+	emit operatingTableChanged();
 }
 
 OperatingTable DataManagerImpl::getOperatingTable() const
 {
-    return mOperatingTable;
+	return mOperatingTable;
 }
 
 
@@ -252,7 +252,7 @@ void DataManagerImpl::loadData(DataPtr data, bool overWrite)
 	{
 		if (!overWrite && mData.count(data->getUid()) && mData[data->getUid()]!=data)
 			reportError(QString("Overwriting Data with uid=%1 with new object into PasM").arg(data->getUid()));
-//		this->verifyParentFrame(data);
+		//this->verifyParentFrame(data);
 		mData[data->getUid()] = data;
 		emit dataAddedOrRemoved();
 	}
@@ -323,9 +323,9 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
 	dataManagerNode.appendChild(centerNode);
 
-    QDomElement otNode = doc.createElement("operatingTable");
+	QDomElement otNode = doc.createElement("operatingTable");
 	otNode.appendChild(doc.createTextNode(qstring_cast(mOperatingTable.rMot)));
-    dataManagerNode.appendChild(otNode);
+	dataManagerNode.appendChild(otNode);
 
 	for (DataMap::const_iterator iter = mData.begin(); iter != mData.end(); ++iter)
 	{
@@ -397,16 +397,16 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 				this->setCenter(center);
 			}
 		}
-        if (child.toElement().tagName() == "operatingTable")
-        {
-            const QString ot = child.toElement().text();
-            if (!ot.isEmpty())
-            {
-                Transform3D tr = Transform3D::fromString(ot);
-                OperatingTable t(tr);
-                this->setOperatingTable(t);
-            }
-        }
+		if (child.toElement().tagName() == "operatingTable")
+		{
+			const QString ot = child.toElement().text();
+			if (!ot.isEmpty())
+			{
+				Transform3D tr = Transform3D::fromString(ot);
+				OperatingTable t(tr);
+				this->setOperatingTable(t);
+			}
+		}
 		child = child.nextSibling();
 	}
 }

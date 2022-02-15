@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -43,7 +43,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* parent,
-	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
+										   QString objectName, QString windowTitle,
+										   bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
 	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage),
 	mLandmarksShowAdvancedSettingsString("Landmarks/ShowAdvanced")
@@ -216,7 +217,7 @@ void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
 	if (!image)
 		return;
 
-    QString next = this->getNextLandmark();
+	QString next = this->getNextLandmark();
 	image->getLandmarks()->removeLandmark(mActiveLandmark);
 	this->activateLandmark(next);
 }
@@ -312,7 +313,7 @@ void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 
 void ImageLandmarksWidget::prePaintEvent()
 {
-    LandmarkRegistrationWidget::prePaintEvent();
+	LandmarkRegistrationWidget::prePaintEvent();
 
 	std::vector<Landmark> landmarks = this->getAllLandmarks();
 
