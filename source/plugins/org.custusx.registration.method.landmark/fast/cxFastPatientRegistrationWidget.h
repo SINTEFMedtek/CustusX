@@ -39,6 +39,9 @@ public:
   FastPatientRegistrationWidget(RegServicesPtr services, QWidget* parent);
   virtual ~FastPatientRegistrationWidget();
 
+protected slots:
+  virtual void pointSampled(Vector3D p_r);
+
 private:
   virtual void performRegistration();
 };

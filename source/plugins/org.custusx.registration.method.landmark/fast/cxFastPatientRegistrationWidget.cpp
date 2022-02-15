@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxFastPatientRegistrationWidget.h"
 
+#include <QTableWidgetItem>
+
 #include "cxRegistrationService.h"
 #include "cxViewService.h"
 #include "cxLogger.h"
@@ -31,6 +33,23 @@ void FastPatientRegistrationWidget::performRegistration()
 {
 	mServices->registration()->doFastRegistration_Translation();
 	this->updateAverageAccuracyLabel();
+}
+
+void FastPatientRegistrationWidget::pointSampled(Vector3D p_r)
+{
+	QTableWidgetItem* item = getLandmarkTableItem();
+	if(!item)
+	{
+		CX_LOG_WARNING() << "FastPatientRegistrationWidget::pointSampled() Cannot get item from mLandmarkTableWidget";
+		return;
+	}
+	QString uid = item->data(Qt::UserRole).toString();
+
+	Transform3D rMtarget = this->getTargetTransform();
+	Vector3D p_target = rMtarget.inv().coord(p_r);
+
+	this->setTargetLandmark(uid, p_target);
+	this->performRegistration();
 }
 
 }//namespace cx
