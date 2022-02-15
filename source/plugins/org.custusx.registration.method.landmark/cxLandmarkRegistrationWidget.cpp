@@ -40,6 +40,7 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, 
     QString objectName, QString windowTitle, bool showAccuracy) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
 		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
+		mActiveLandmark(""),
 		mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy),
 		mMouseClickSample(nullptr)
 {
@@ -99,6 +100,7 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
+	this->selectFirstLandmarkIfUnselected();
 	QWidget::showEvent(event);
 	mMouseClickSample->setChecked(false);
 	mLandmarkListener->showRep();
@@ -112,6 +114,21 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());
 	this->setModified();
 
+}
+
+void LandmarkRegistrationWidget::selectFirstLandmarkIfUnselected()
+{
+	std::vector<Landmark> landmarks = this->getAllLandmarks();
+	if(mActiveLandmark.isEmpty() || mActiveLandmark.toInt() > landmarks.size())
+	{
+		if(landmarks.size() > 0)
+		{
+			QString firstLandmarkUid = landmarks[0].getUid();
+			this->activateLandmark(firstLandmarkUid);
+		}
+	}
+	if(landmarks.empty())
+		this->activateLandmark("");
 }
 
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
@@ -289,6 +306,7 @@ void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 //  want the automation, such as in the patient reg sampler. (Mantis #0000674)
 //	this->performRegistration();
     this->setModified();
+	this->selectFirstLandmarkIfUnselected();
 }
 
 void LandmarkRegistrationWidget::updateAverageAccuracyLabel()

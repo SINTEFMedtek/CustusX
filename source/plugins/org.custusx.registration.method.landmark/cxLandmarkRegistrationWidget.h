@@ -72,6 +72,7 @@ protected:
 	void setManualToolPosition(Vector3D p_r);
     QString getNextLandmark();
     void activateLandmark(QString uid);
+	void selectFirstLandmarkIfUnselected();
 
 	std::vector<Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
 	QString getLandmarkName(QString uid);
@@ -87,7 +88,7 @@ protected:
 	QCheckBox* mMouseClickSample;
 
 	//data
-	QString mActiveLandmark; ///< uid of surrently selected landmark.
+	QString mActiveLandmark; ///< uid of currently selected landmark.
 	LandmarkListenerPtr mLandmarkListener;
     bool mShowAccuracy;
 
