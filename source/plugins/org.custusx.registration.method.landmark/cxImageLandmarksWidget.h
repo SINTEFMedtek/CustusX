@@ -78,6 +78,7 @@ protected:
 	virtual Transform3D getTargetTransform() const;
 	PickerRepPtr getPickerRep();
 	void addLandmark(Vector3D p_r);
+	void resampleLandmark(Vector3D p_r);
 
 	//gui
 	SelectDataStringPropertyBasePtr mCurrentProperty;

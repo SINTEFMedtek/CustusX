@@ -106,8 +106,7 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	landmarkAdvancedButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
 	mVerticalLayout->addLayout(landmarkAdvancedButtonsLayout);
 
-	mMouseClickSample = new QCheckBox("Sample with mouse clicks in anyplane view.", this);
-	mMouseClickSample->setToolTip("Allow mouse clicks in 2D anyplane view to sample patient landmarks.");
+	mMouseClickSample->show();
 	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &ImageLandmarksWidget::mouseClickSampleStateChanged);
 	mVerticalLayout->addWidget(mMouseClickSample);
 
@@ -157,7 +156,9 @@ DataPtr ImageLandmarksWidget::getCurrentData() const
 
 void ImageLandmarksWidget::pointSampled(Vector3D p_r)
 {
-	this->addLandmark(p_r);
+	this->resampleLandmark(p_r);
+	//Only use the anyplane sampler for resample for now
+	//this->addLandmark(p_r);
 }
 
 void ImageLandmarksWidget::addLandmarkButtonClickedSlot()
@@ -193,16 +194,20 @@ void ImageLandmarksWidget::editLandmarkButtonClickedSlot()
 		return;
 	}
 
+	Vector3D pos_r = PickerRep->getPosition();
+	this->resampleLandmark(pos_r);
+}
+
+void ImageLandmarksWidget::resampleLandmark(Vector3D p_r)
+{
 	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
-
 	QString uid = mActiveLandmark;
-	Vector3D pos_r = PickerRep->getPosition();
-	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+	Vector3D pos_d = image->get_rMd().inv().coord(p_r);
 	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
 
-    this->activateLandmark(this->getNextLandmark());
+	this->activateLandmark(this->getNextLandmark());
 }
 
 void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()

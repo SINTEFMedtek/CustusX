@@ -48,6 +48,10 @@ LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, 
 	connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
 
 	this->setLayout(mVerticalLayout);
+
+	mMouseClickSample = new QCheckBox("Resample with mouse clicks in anyplane view.", this);
+	mMouseClickSample->setToolTip("Allow mouse clicks in 2D anyplane view to sample patient landmarks.");
+	mMouseClickSample->hide();
 }
 
 LandmarkRegistrationWidget::~LandmarkRegistrationWidget()
@@ -96,7 +100,7 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
 	QWidget::showEvent(event);
-	mMouseClickSample->setChecked(true);
+	mMouseClickSample->setChecked(false);
 	mLandmarkListener->showRep();
 	connect(mServices->patient().get(), &PatientModelService::landmarkPropertiesChanged,this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);

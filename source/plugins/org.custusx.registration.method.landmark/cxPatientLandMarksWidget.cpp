@@ -62,8 +62,8 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServicesPtr services,
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 	mVerticalLayout->addWidget(mRemoveLandmarkButton);
 
-	mMouseClickSample = new QCheckBox("Sample with mouse clicks in anyplane view.", this);
-	mMouseClickSample->setToolTip("Allow mouse clicks in 2D anyplane view to sample patient landmarks.");
+	mMouseClickSample->setText("Sample with mouse clicks in anyplane view.");
+	mMouseClickSample->show();
 	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &PatientLandMarksWidget::mouseClickSampleStateChanged);
 
 	mVerticalLayout->addWidget(mMouseClickSample);
@@ -123,6 +123,7 @@ void PatientLandMarksWidget::showEvent(QShowEvent* event)
 {
 	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
+	mMouseClickSample->setChecked(true);
 }
 
 void PatientLandMarksWidget::hideEvent(QHideEvent* event)
