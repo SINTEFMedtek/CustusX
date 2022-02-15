@@ -127,7 +127,7 @@ void LandmarkRegistrationWidget::selectFirstLandmarkIfUnselected()
 			this->activateLandmark(firstLandmarkUid);
 		}
 	}
-	if(landmarks.empty())
+	if(!mActiveLandmark.isEmpty() && landmarks.empty())
 		this->activateLandmark("");
 }
 
@@ -226,6 +226,7 @@ void LandmarkRegistrationWidget::activateLandmark(QString uid)
 {
     mActiveLandmark = uid;
     this->setModified();
+	this->selectFirstLandmarkIfUnselected();
 }
 
 /** Return the next landmark in the series of available landmarks,
