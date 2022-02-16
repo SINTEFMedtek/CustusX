@@ -83,7 +83,7 @@ void StatusBar::fixFlickeringBar()
 	QFont font = emptyLabel->font();
 	font.setPointSize(font.pointSize()+5);
 	emptyLabel->setFont(font);
-	this->addPermanentWidget(emptyLabel);
+	this->addWidget(emptyLabel);
 }
 
 void StatusBar::resetToolManagerConnection()
