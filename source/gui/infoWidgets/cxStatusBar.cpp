@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -35,6 +35,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogMessageFilter.h"
 #include "cxMessageListener.h"
 #include "cxVLCRecorder.h"
+#include "cxSettings.h"
 
 
 namespace cx
@@ -64,12 +65,25 @@ StatusBar::StatusBar(TrackingServicePtr trackingService, ViewServicePtr viewServ
 
 	connect(vlc(), &VLCRecorder::stateChanged, this, &StatusBar::onRecordFullscreenChanged);
 
+	fixFlickeringBar();
 //	this->addPermanentWidget(mMessageLevelLabel);
 	this->addPermanentWidget(mRenderingFpsLabel);
 }
 
 StatusBar::~StatusBar()
 {
+}
+
+void StatusBar::fixFlickeringBar()
+{
+	//Add an empty label with larger font size to make room for tool buttons.
+	//Otherwise tool buttons cause status bar to flicker
+
+	QLabel* emptyLabel = new QLabel(this);
+	QFont font = emptyLabel->font();
+	font.setPointSize(font.pointSize()+5);
+	emptyLabel->setFont(font);
+	this->addWidget(emptyLabel);
 }
 
 void StatusBar::resetToolManagerConnection()
@@ -140,6 +154,8 @@ void StatusBar::updateToolButtons()
 {
 	ToolPtr activeTool = mTrackingService->getActiveTool();
 
+	bool autoSelectActiveTool = settings()->value("Automation/autoSelectActiveTool").toBool();
+
 	for (unsigned i = 0; i < mToolData.size(); ++i)
 	{
 		ToolData current = mToolData[i];
@@ -151,10 +167,15 @@ void StatusBar::updateToolButtons()
 			current.mAction->setToolTip("Tool is not Initialized");
 		else if (activeTool == tool)
 			current.mAction->setToolTip("Active Tool");
-        else if (!tool->getVisible())
+		else if (!tool->getVisible())
 			current.mAction->setToolTip("Tool not visible/not tracking");
 		else
-			current.mAction->setToolTip("Tool visible. Press to set as active");
+		{
+			if(autoSelectActiveTool)
+				current.mAction->setToolTip("Tool visible - Other tool is auto active");
+			else
+				current.mAction->setToolTip("Tool visible - Press to set as active");
+		}
 	}
 }
 
