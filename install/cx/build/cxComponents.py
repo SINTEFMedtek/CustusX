@@ -7,8 +7,8 @@
 #
 # Description:
 #
-#             
-#################################################             
+#
+#################################################
 
 from __future__ import print_function
 from future import standard_library
@@ -126,7 +126,7 @@ class Component(object):
             zipFilePath = self.thoraxCTdataPath() + '/' + 'temp.zip'
             urllib.request.urlretrieve(self.url_link(), zipFilePath)
             with ZipFile(self.thoraxCTdataPath() + '/' + 'temp.zip', 'r') as zip_ref:
-    	        zip_ref.extractall(self.thoraxCTdataPath())
+                zip_ref.extractall(self.thoraxCTdataPath())
             os.remove(zipFilePath)
 
 # ---------------------------------------------------------
@@ -311,7 +311,10 @@ class Eigen(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:eigenteam/eigen-git-mirror.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/eigenteam/eigen-git-mirror.git'
+        else:
+            return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
@@ -363,7 +366,10 @@ class OpenIGTLinkIO(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/IGSIO/OpenIGTLinkIO.git'
+        else:
+            return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
@@ -493,7 +499,10 @@ class OpenCLUtilityLibrary(CppComponent):
 #    def path(self):
 #        return self.controlData.getWorkingPath() + "/OpenCLUtilityLibrary"
     def repository(self):
-        return 'git@github.com:smistad/OpenCLUtilityLibrary'
+        if self.controlData.git_use_https:
+            return 'https://github.com/smistad/OpenCLUtilityLibrary'
+        else:
+            return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutSha('44b7a002195fb2b6e8ea99ea4edf3102ef556cc3')
@@ -515,7 +524,10 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/FAST.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/FAST.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/FAST.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
@@ -595,7 +607,10 @@ class QHttpServer(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/qhttpserver.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/qhttpserver.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/qhttpserver.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutSha('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
@@ -630,7 +645,10 @@ class org_custusx_angleCorrection(CppComponent):
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/AngleCorr.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/AngleCorr.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/AngleCorr.git'
     def makeClean(self):
         pass
     def pluginPath(self):
@@ -662,7 +680,10 @@ class org_custusx_mariana(CppComponent):
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/Mariana.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/Mariana.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/Mariana.git'
     def makeClean(self):
         pass
     def pluginPath(self):
