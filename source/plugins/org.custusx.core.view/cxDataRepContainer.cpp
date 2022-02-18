@@ -21,6 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPointMetricRep2D.h"
 #include "cxSphereMetricRep2D.h"
 #include "cxSphereMetric.h"
+#include "cxDistanceMetricRep2D.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -57,6 +59,10 @@ void DataRepContainer::addData(DataPtr data)
 	{
 		this->sphereMetricAdded(boost::dynamic_pointer_cast<SphereMetric>(data));
 	}
+	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
+	{
+		this->distanceMetricAdded(boost::dynamic_pointer_cast<DistanceMetric>(data));
+	}
 }
 
 void DataRepContainer::removeData(QString uid)
@@ -90,6 +96,22 @@ void DataRepContainer::pointMetricAdded(PointMetricPtr mesh)
 		return;
 
 	PointMetricRep2DPtr rep = PointMetricRep2D::New(mesh->getUid() + "_rep2D");
+	rep->setSliceProxy(mSliceProxy);
+	rep->setDataMetric(mesh);
+	rep->setDynamicSize(true);
+	mView->addRep(rep);
+	mDataReps[mesh->getUid()] = rep;
+	this->updateSettings(rep);
+}
+
+void DataRepContainer::distanceMetricAdded(DistanceMetricPtr mesh)
+{
+	if (!mesh)
+		return;
+	if (mDataReps.count(mesh->getUid()))
+		return;
+
+	DistanceMetricRep2DPtr rep = DistanceMetricRep2D::New(mesh->getUid() + "_rep2D");
 	rep->setSliceProxy(mSliceProxy);
 	rep->setDataMetric(mesh);
 	rep->setDynamicSize(true);
