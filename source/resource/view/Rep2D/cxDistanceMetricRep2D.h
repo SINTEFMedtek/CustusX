@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -34,7 +34,7 @@ typedef boost::shared_ptr<class DistanceMetricRep2D> DistanceMetricRep2DPtr;
  */
 class cxResourceVisualization_EXPORT DistanceMetricRep2D: public DataMetricRep
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	static DistanceMetricRep2DPtr New(const QString& uid=""); ///constructor
 	virtual ~DistanceMetricRep2D() {}
@@ -47,7 +47,7 @@ protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
-    virtual void clear();
+	virtual void clear();
 	virtual void onModifiedStartRender();
 
 private:
