@@ -97,29 +97,15 @@ void DistanceMetricRep2D::onModifiedStartRender()
 		CX_LOG_WARNING() << "DistanceMetricRep2D: Got no DistanceMetric";
 		return;
 	}
-	std::vector<Vector3D> points = distanceMetric->getEndpoints();
-	//CX_LOG_DEBUG()<< "points: " << points[0] << " " << points[1];
+	std::vector<Vector3D> points_r = distanceMetric->getEndpoints();
 
-	//TODO: Need to convert positions to 2D coordinates
-	Vector3D point1 = mSliceProxy->get_sMr() * points[0];
-	Vector3D point2 = mSliceProxy->get_sMr() * points[1];
-	//double offsetFromXYPlane = 0.01;
-	//point1[2] = offsetFromXYPlane;
-	//point2[2] = offsetFromXYPlane;
-
-//	static bool printed = false;
-//	if(!printed)
-//	{
-//		printed = true;
-//		CX_LOG_DEBUG() << "point1 ref coord: " << points[0];
-//		CX_LOG_DEBUG() << "point1: " << point1;
-//		CX_LOG_DEBUG() << "point2: " << point2;
-//	}
+	Transform3D vpMs = getView()->get_vpMs();
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Vector3D p1_vp = vpMs * sMr * points_r[0];
+	Vector3D p2_vp = vpMs * sMr * points_r[1];
 
 
-
-	mLine->updatePosition(point1, point2);
-	//mLine->updatePosition(Vector3D(0.0, 0.0, 0.0), Vector3D(100.0, 100.0, 0.0));
+	mLine->updatePosition(p1_vp, p2_vp);
 }
 
 void DistanceMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
