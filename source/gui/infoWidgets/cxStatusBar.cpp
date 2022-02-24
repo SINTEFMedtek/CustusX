@@ -147,7 +147,12 @@ void StatusBar::disconnectFromToolSignals()
 
 void StatusBar::activateTool(QString uid)
 {
-	mTrackingService->setActiveTool(uid);
+	ToolPtr activeTool = mTrackingService->getActiveTool();
+
+	if (!activeTool || activeTool->getUid() != uid)
+		mTrackingService->setActiveTool(uid);
+	else
+		mTrackingService->clearActiveTool();
 }
 
 void StatusBar::updateToolButtons()

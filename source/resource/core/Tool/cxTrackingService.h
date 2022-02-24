@@ -61,6 +61,7 @@ public:
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
 	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the active tool
+	virtual void clearActiveTool() = 0;///< Deselect active tool
 	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference

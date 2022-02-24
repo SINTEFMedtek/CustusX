@@ -53,7 +53,9 @@ namespace cx
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 				mLastLoadPositionHistory(0),
 				mContext(context),
-				mToolTipOffset(0)
+				mToolTipOffset(0),
+				mActiveTool(ToolPtr()),
+				mReferenceTool(ToolPtr())
 {
 	mSession = SessionStorageServiceProxy::create(mContext);
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &TrackingImplService::onSessionChanged);
@@ -345,6 +347,11 @@ void TrackingImplService::setActiveTool(const QString& uid)
 	}
 
 	emit activeToolChanged(uid);
+}
+
+void TrackingImplService::clearActiveTool()
+{
+	mActiveTool = ToolPtr();
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const

@@ -48,6 +48,7 @@ public:
 
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid);
+	virtual void clearActiveTool();
 
 	virtual Transform3D get_rMpr() const;
 	virtual void set_rMpr(const Transform3D& val);
