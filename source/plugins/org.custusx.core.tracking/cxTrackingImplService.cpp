@@ -351,7 +351,8 @@ void TrackingImplService::setActiveTool(const QString& uid)
 
 void TrackingImplService::clearActiveTool()
 {
-	mActiveTool = ToolPtr();
+	mActiveTool = mManualTool;
+	emit activeToolChanged(mActiveTool->getUid());
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const
