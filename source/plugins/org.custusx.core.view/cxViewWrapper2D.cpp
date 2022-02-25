@@ -155,6 +155,7 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	QAction* showManualTool = new QAction("Show Manual Tool 2D", &contextMenu);
 	showManualTool->setCheckable(true);
 	showManualTool->setChecked(settings()->value("View2D/showManualTool").toBool());
+	showManualTool->setToolTip("Turn on/off visualization of the vire cross in 2D");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 	contextMenu.addAction(showManualTool);
 }
