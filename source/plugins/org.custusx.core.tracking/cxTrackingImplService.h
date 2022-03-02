@@ -83,6 +83,7 @@ public:
 
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid); ///< can be set to either a connected or configured tool
+	virtual void clearActiveTool();///< Deselect active tool
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 

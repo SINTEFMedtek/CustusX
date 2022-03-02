@@ -93,6 +93,11 @@ void TrackingServiceProxy::setActiveTool(const QString& uid)
 	mTrackingService->setActiveTool(uid);
 }
 
+void TrackingServiceProxy::clearActiveTool()
+{
+	mTrackingService->clearActiveTool();
+}
+
 ToolPtr TrackingServiceProxy::getFirstProbe()
 {
 	return mTrackingService->getFirstProbe();

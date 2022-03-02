@@ -56,6 +56,11 @@ void TrackingServiceNull::setActiveTool(const QString& uid)
 	this->printWarning();
 }
 
+void TrackingServiceNull::clearActiveTool()
+{
+	this->printWarning();
+}
+
 ToolPtr TrackingServiceNull::getFirstProbe()
 {
 	this->printWarning();

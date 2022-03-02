@@ -102,6 +102,11 @@ void DummyToolManager::setActiveTool(const QString& uid)
 	emit activeToolChanged(uid);
 }
 
+void DummyToolManager::clearActiveTool()
+{
+	mActiveTool = DummyToolPtr();
+}
+
 Transform3D DummyToolManager::get_rMpr() const
 {
 	return m_rMpr;

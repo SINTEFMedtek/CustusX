@@ -36,6 +36,7 @@ public:
 	virtual ToolPtr getTool(const QString& uid);
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid);
+	virtual void clearActiveTool();
 	virtual ToolPtr getFirstProbe();
 
 	virtual ToolPtr getReferenceTool() const;
