@@ -116,6 +116,7 @@ void TrackingImplService::setPlaybackMode(PlaybackTimePtr controller)
 			this->unInstallTrackingSystem(old[i]);
 		this->installTrackingSystem(mPlaybackSystem);
 		mPlaybackSystem->setState(Tool::tsTRACKING);
+        connect(this, &TrackingImplService::activeToolChanged, mPlaybackSystem.get(), &TrackingSystemPlaybackService::onActiveToolChanged);
 	}
 }
 
