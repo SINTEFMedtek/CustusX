@@ -279,7 +279,10 @@ XmlOptionFile XmlOptionFile::descend(QString element, QString attributeName, QSt
 {
 	XmlOptionFile retval = this->tryDescend(element, attributeName, attributeValue);
 	if (!retval.getDocument().isNull())
+	{
+		CX_LOG_DEBUG() << "Element found";
 		return retval;
+	}
 
 	// create a new element if not found
 	retval = *this;
@@ -287,6 +290,7 @@ XmlOptionFile XmlOptionFile::descend(QString element, QString attributeName, QSt
 	current.setAttribute(attributeName, attributeValue);
 	retval.mCurrentElement.appendChild(current);
 	retval.mCurrentElement = current;
+	CX_LOG_DEBUG() << "Element not found. Created new";
 	return retval;
 }
 
@@ -326,9 +330,12 @@ QDomElement XmlOptionFile::safeGetElement(QDomElement parent, QString childName)
 
 	if (child.isNull())
 	{
+		CX_LOG_DEBUG() << "Create element: " << childName;
 		child = mDocument.createElement(childName);
 		parent.appendChild(child);
 	}
+	else
+		CX_LOG_DEBUG() << "Found element: " << childName;
 
 	return child;
 }

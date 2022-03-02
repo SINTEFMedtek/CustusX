@@ -75,10 +75,10 @@ void TransferFunctionPresetWidget::updateToggles()
 void TransferFunctionPresetWidget::populatePresetListSlot()
 {
 	if (mActiveData->getActive<Image>())
-		PresetWidget::populatePresetList(mPresets->getPresetList(enum2string(mActiveData->getActive<Image>()->getModality())));
+		PresetWidget::populatePresetList(mPresets->getPresetList(mActiveData->getActive<Image>()->getModality()));
 	else
 		//No active image, show all available presets for debug/overview purposes
-		PresetWidget::populatePresetList(mPresets->getPresetList("UNKNOWN"));
+		PresetWidget::populatePresetList(mPresets->getPresetList(imUNKNOWN));
 }
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
@@ -102,7 +102,7 @@ void TransferFunctionPresetWidget::saveSlot()
 	// generate a name suggestion: identical if custom, appended by index if default.
 	QString newName = PresetWidget::getCurrentPreset();
 	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
-	if (!preset->getPresetList("").contains(newName))
+	if (!preset->getPresetList(imUNKNOWN).contains(newName))
 		newName = "custom preset";
 	if (preset->isDefaultPreset(newName))
 		newName += "(2)";
