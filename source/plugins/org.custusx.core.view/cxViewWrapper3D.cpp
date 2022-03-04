@@ -275,53 +275,70 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 		slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
 		slicePlanesAction->setCheckable(true);
 		slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
+		slicePlanesAction->setToolTip("Visialize the outline of the 2D views in 3D");
 		connect(slicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(showSlicePlanesActionSlot(bool)));
 
 		fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
 		fillSlicePlanesAction->setCheckable(true);
 		fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
 		fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
+		slicePlanesAction->setToolTip("Fill the visualized 2D views with color");
 		connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
 	}
 
 	QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
+	resetCameraAction->setToolTip("Zoom out, and show all objects in the view");
 	connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
 
 	QAction* centerImageAction = new QAction("Center to image", &contextMenu);
+	centerImageAction->setToolTip("Move view to show center of active image in all views (no zoom)");
 	connect(centerImageAction, SIGNAL(triggered()), this, SLOT(centerImageActionSlot()));
 
 	QAction* centerToolAction = new QAction("Center to tool", &contextMenu);
+	centerToolAction->setToolTip("Move view to show active tool in all views (no zoom)");
 	connect(centerToolAction, SIGNAL(triggered()), this, SLOT(centerToolActionSlot()));
 
 	QAction* showAxesAction = new QAction("Show Coordinate Axes", &contextMenu);
 	showAxesAction->setCheckable(true);
 	showAxesAction->setChecked(mShowAxes);
+	showAxesAction->setToolTip("Show coordinate axes for all objects in 3D scene.\n"
+							   "Axes are placed in obejct origin.\n"
+							   "Red = X, Green = Y, Blue = Z");
 	connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
 
 	QAction* showManualTool = new QAction("Show Manual Tool 3D", &contextMenu);
 	showManualTool->setCheckable(true);
 	showManualTool->setChecked(settings()->value("View3D/showManualTool").toBool());
+	showManualTool->setToolTip("Turn on/off visualization of the 3D vire cross");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
 	QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
 	showOrientation->setCheckable(true);
 	showOrientation->setChecked(mAnnotationMarker->getVisible());
+	showOrientation->setToolTip("Turn on/off visualization of the figure in the upper left corner in 3D,\n"
+								"and the orientation letters on the sides in 2D");
 	connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
 
 	QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
 	showToolPath->setCheckable(true);
 	showToolPath->setChecked(settings()->value("showToolPath").toBool());
+	showToolPath->setToolTip("Paint a line in 3D where the tool have been, as connected dots.\n"
+							 "Turn off to reset");
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
 	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
+	show3DSlicesMenu->setToolTip("Visualize the 2D views in 3D for the selected image");
 	mShow3DSlicesInteractor->addDataActionsOfType<Image>(show3DSlicesMenu);
 
 	QMenu* showSlicesMenu = new QMenu("Slice Type", &contextMenu);
+	showSlicesMenu->setToolTip("Specify which 2D slices to show in 3D,\n"
+							   "when 3D sclices is turned on");
 	this->createSlicesActions(showSlicesMenu);
 
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
+	showRefTool->setToolTip("Visualize the tool set as reference in 3D");
 	ToolPtr refTool = mServices->tracking()->getReferenceTool();
 	if (refTool)
 	{

@@ -146,6 +146,7 @@ void ViewWrapper::settingsChangedSlot(QString key)
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
 	QMenu contextMenu;
+	contextMenu.setToolTipsVisible(true);
 	mDataViewPropertiesInteractor->addDataActionsOfType<Data>(&contextMenu);
 	//append specific info from derived classes
 	this->appendToContextMenu(contextMenu);
