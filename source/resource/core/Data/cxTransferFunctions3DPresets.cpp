@@ -66,7 +66,7 @@ void TransferFunctions3DPresets::save2D(QString name, ImagePtr image)
 		LUT2D->unsignedCT(true);
 	}
 
-	file.getElement().setAttribute("modality", image->getModality());
+	file.getElement().setAttribute("modality", enum2string(image->getModality()));
 	file.save();
 
 //	emit changed();
@@ -99,7 +99,7 @@ void TransferFunctions3DPresets::save3D(QString name, ImagePtr image)
 		transferFunctions->unsignedCT(true);
 	}
 
-	file.getElement().setAttribute("modality", image->getModality());
+	file.getElement().setAttribute("modality", enum2string(image->getModality()));
 	file.save();
 }
 
