@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QInputDialog>
 #include "cxLogger.h"
 #include "cxSettings.h"
+#include "cxEnumConversion.h"
 
 namespace cx {
 
@@ -96,20 +97,20 @@ void PresetWidget::setPresets(PresetsPtr presets)
 	connect(mPresets.get(), SIGNAL(changed()), this, SLOT(populatePresetListSlot()));
 
 	this->populatePresetListSlot();
-    this->selectLastUsedPreset();
+	this->selectLastUsedPreset();
 }
 
 QString PresetWidget::getLastUsedPresetNameFromSettingsFile() const
 {
-    QString id = mPresets->getId();
-		QString preset;
-		if (!mPresets->getPresetList().isEmpty())
-			preset = mPresets->getPresetList().first();
+	IMAGE_MODALITY id = mPresets->getId();
+	QString preset;
+	if (!mPresets->getPresetList().isEmpty())
+		preset = mPresets->getPresetList().first();
 
-		settings()->fillDefault(id, preset);
+	settings()->fillDefault(enum2string(id), preset);
 
-    QString lastUsedPresetName = settings()->value(id).toString();
-    return lastUsedPresetName;
+	QString lastUsedPresetName = settings()->value(enum2string(id)).toString();
+	return lastUsedPresetName;
 }
 
 void PresetWidget::resetSlot()
@@ -131,12 +132,12 @@ void PresetWidget::deleteSlot()
 
 void PresetWidget::populatePresetListSlot()
 {
-	this->populatePresetList(mPresets->getPresetList(""));
+	this->populatePresetList(mPresets->getPresetList(imUNKNOWN));
 }
 
 void PresetWidget::presetsBoxChangedSlot(const QString& name)
 {
-    settings()->setValue(mPresets->getId(), name);
+	settings()->setValue(enum2string(mPresets->getId()), name);
 	emit presetSelected(name);
 }
 
@@ -189,7 +190,7 @@ QString PresetWidget::getNewPresetName(bool withoutSpaces = false)
 
 	// generate a name suggestion: identical if custom, appended by index if default.
 	QString newName = PresetWidget::getCurrentPreset();
-	if (!mPresets->getPresetList("").contains(newName))
+	if (!mPresets->getPresetList(imUNKNOWN).contains(newName))
 		newName = "custom preset";
 	if (mPresets->isDefaultPreset(newName))
 		newName += "(2)";
