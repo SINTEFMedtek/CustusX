@@ -20,7 +20,7 @@ mock==4.0.1
 networkx==2.4
 nibabel==3.0.1
 numpy==1.18.4
-Pillow==7.1.2
+Pillow==9.0.1
 protobuf==3.12.2
 pyparsing==2.4.7
 PySocks==1.7.1
