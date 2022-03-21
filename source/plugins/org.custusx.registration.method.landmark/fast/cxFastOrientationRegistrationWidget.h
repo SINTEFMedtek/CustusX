@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -39,25 +39,25 @@ namespace cx
 
 class FastOrientationRegistrationWidget : public RegistrationBaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
 	FastOrientationRegistrationWidget(RegServicesPtr services, QWidget* parent);
-  ~FastOrientationRegistrationWidget();
+	~FastOrientationRegistrationWidget();
 
 protected:
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
+	virtual void showEvent(QShowEvent* event);
+	virtual void hideEvent(QHideEvent* event);
 
 private slots:
-  void setOrientationSlot();
-  void enableToolSampleButtonSlot();
-  void globalConfigurationFileChangedSlot(QString key);
+	void setOrientationSlot();
+	void enableToolSampleButtonSlot();
+	void globalConfigurationFileChangedSlot(QString key);
 private:
-  Transform3D get_tMtm() const;
-  QPushButton* mSetOrientationButton;
-  QCheckBox* mInvertButton;
-  ActiveToolProxyPtr mActiveToolProxy;
+	Transform3D get_tMtm() const;
+	QPushButton* mSetOrientationButton;
+	QCheckBox* mInvertButton;
+	ActiveToolProxyPtr mActiveToolProxy;
 };
 
 /**

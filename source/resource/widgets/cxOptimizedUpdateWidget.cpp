@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -18,7 +18,7 @@ namespace cx
 
 
 OptimizedUpdateWidget::OptimizedUpdateWidget(QWidget* parent) :
-    QWidget(parent), mModified(true)
+	QWidget(parent), mModified(true)
 {
 }
 
@@ -29,24 +29,24 @@ void OptimizedUpdateWidget::forcePrePaint()
 
 void OptimizedUpdateWidget::paintEvent(QPaintEvent* event)
 {
-    this->prePaintEventPrivate();
-    QWidget::paintEvent(event);
+	this->prePaintEventPrivate();
+	QWidget::paintEvent(event);
 }
 
 void OptimizedUpdateWidget::setModified()
 {
-    mModified = true;
-    this->update();
+	mModified = true;
+	this->update();
 }
 
 void OptimizedUpdateWidget::prePaintEventPrivate()
 {
-    if (!mModified)
-        return;
+	if (!mModified)
+		return;
 
-    this->prePaintEvent();
+	this->prePaintEvent();
 
-    mModified = false;
+	mModified = false;
 }
 
 } // namespace cx

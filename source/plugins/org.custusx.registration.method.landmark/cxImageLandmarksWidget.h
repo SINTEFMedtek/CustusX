@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -44,12 +44,12 @@ namespace cx
  */
 class org_custusx_registration_method_landmark_EXPORT ImageLandmarksWidget: public LandmarkRegistrationWidget
 {
-Q_OBJECT
+	Q_OBJECT
 
 public:
 
 	ImageLandmarksWidget(RegServicesPtr services, QWidget* parent, QString objectName,
-		QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false); ///< sets up layout and connects signals and slots
+						 QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage = false); ///< sets up layout and connects signals and slots
 	virtual ~ImageLandmarksWidget(); ///< empty
 
 protected slots:
@@ -62,6 +62,7 @@ protected slots:
 	void enableButtons();
 	void onCurrentImageChanged();
 	void toggleDetailsSlot();
+	virtual void pointSampled(Vector3D p_r);
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -72,10 +73,12 @@ protected:
 	virtual void performRegistration() // no registration in this widget - only definition of pts.
 	{
 	}
-    virtual void prePaintEvent(); ///< populates the table widget
-    QString getLandmarkName(QString uid);
+	virtual void prePaintEvent(); ///< populates the table widget
+	QString getLandmarkName(QString uid);
 	virtual Transform3D getTargetTransform() const;
 	PickerRepPtr getPickerRep();
+	void addLandmark(Vector3D p_r);
+	void resampleLandmark(Vector3D p_r);
 
 	//gui
 	SelectDataStringPropertyBasePtr mCurrentProperty;

@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -27,21 +27,21 @@ namespace cx
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(RegServicesPtr services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_fast_landmark_image_to_patient_orientation_widget", "Fast Orientation Registration"),
 	mSetOrientationButton(new QPushButton("Define Orientation")),
-    mInvertButton(new QCheckBox("Back face"))
+	mInvertButton(new QCheckBox("Back face"))
 {
-  QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->addWidget(mInvertButton);
-  layout->addWidget(mSetOrientationButton);
-  layout->addStretch();
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	layout->addWidget(mInvertButton);
+	layout->addWidget(mSetOrientationButton);
+	layout->addStretch();
 
-  mSetOrientationButton->setToolTip("Orient the data to the patient using a tracked tool.");
+	mSetOrientationButton->setToolTip("Orient the data to the patient using a tracked tool.");
 
-  connect(settings(), &Settings::valueChangedFor, this, &FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot);
+	connect(settings(), &Settings::valueChangedFor, this, &FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot);
 
-  mActiveToolProxy =  ActiveToolProxy::New(services->tracking());
-  connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
-  connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
-  this->enableToolSampleButtonSlot();
+	mActiveToolProxy =  ActiveToolProxy::New(services->tracking());
+	connect(mActiveToolProxy.get(), SIGNAL(toolVisible(bool)), this, SLOT(enableToolSampleButtonSlot()));
+	connect(mActiveToolProxy.get(), SIGNAL(activeToolChanged(const QString&)), this, SLOT(enableToolSampleButtonSlot()));
+	this->enableToolSampleButtonSlot();
 
 }
 
@@ -56,12 +56,12 @@ void FastOrientationRegistrationWidget::globalConfigurationFileChangedSlot(QStri
 
 void FastOrientationRegistrationWidget::showEvent(QShowEvent* event)
 {
-  connect(mSetOrientationButton, SIGNAL(clicked()), this, SLOT(setOrientationSlot()));
+	connect(mSetOrientationButton, SIGNAL(clicked()), this, SLOT(setOrientationSlot()));
 }
 
 void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 {
-  disconnect(mSetOrientationButton, SIGNAL(clicked()), this, SLOT(setOrientationSlot()));
+	disconnect(mSetOrientationButton, SIGNAL(clicked()), this, SLOT(setOrientationSlot()));
 }
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
@@ -88,12 +88,12 @@ Transform3D FastOrientationRegistrationWidget::get_tMtm() const
 
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
 {
-  ToolPtr tool = mServices->tracking()->getActiveTool();
-  bool enabled = tool &&
-	  tool->getVisible() &&
-	  (!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
+	ToolPtr tool = mServices->tracking()->getActiveTool();
+	bool enabled = tool &&
+			tool->getVisible() &&
+			(!tool->hasType(Tool::TOOL_MANUAL) || settings()->value("giveManualToolPhysicalProperties").toBool()); // enable only for non-manual tools.
 
-  mSetOrientationButton->setEnabled(enabled);
+	mSetOrientationButton->setEnabled(enabled);
 }
 
 }//namespace cx
