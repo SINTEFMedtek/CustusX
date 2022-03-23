@@ -129,6 +129,7 @@ Mesh Properties {#property_widgets_mesh}
 \addindex eraser_widget
 Eraser {#property_widgets_eraser}
 ===========================================================
-Functionality for erasing parts of volumes/meshes.
+Functionality for erasing parts of volumes.
 By changing the erase value it is also possible to draw.
+Using the eraser on meshes is not possible. 
 

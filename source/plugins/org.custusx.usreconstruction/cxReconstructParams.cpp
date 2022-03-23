@@ -49,7 +49,7 @@ void ReconstructParams::onPatientChanged()
 	QStringList presetList;
 	if (presets)
 	{
-		presetList = presets->getPresetList("US");
+		presetList = presets->getPresetList(imUS);
 		mPresetTFAdapter->setValueRange(presetList);
 	}
 }

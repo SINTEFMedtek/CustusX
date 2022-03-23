@@ -12,10 +12,11 @@
 
 from __future__ import absolute_import
 import logging
-import time    
+import time
 import subprocess
 import sys
-import argparse        
+import argparse
+import platform
 
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
@@ -189,3 +190,4 @@ class Controller(cxBuildScript.BuildScript):
         #assembly.selectLibraries([custusx.name(), cxdata.name()])
         assembly.selectTestLibraries()
         assembly.process(checkout=True)
+

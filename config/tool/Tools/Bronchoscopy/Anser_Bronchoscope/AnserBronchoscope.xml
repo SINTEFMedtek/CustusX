@@ -13,6 +13,7 @@
     <geo_file>Bronchoscope.stl</geo_file>
     <pic_file></pic_file>
     <doc_file></doc_file>
+    <openigtlinktransformid>AnserBronchoscope</openigtlinktransformid>
     
     <!-- Instrument -->
     <instrument>

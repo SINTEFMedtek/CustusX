@@ -53,7 +53,9 @@ namespace cx
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 				mLastLoadPositionHistory(0),
 				mContext(context),
-				mToolTipOffset(0)
+				mToolTipOffset(0),
+				mActiveTool(ToolPtr()),
+				mReferenceTool(ToolPtr())
 {
 	mSession = SessionStorageServiceProxy::create(mContext);
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &TrackingImplService::onSessionChanged);
@@ -114,6 +116,7 @@ void TrackingImplService::setPlaybackMode(PlaybackTimePtr controller)
 			this->unInstallTrackingSystem(old[i]);
 		this->installTrackingSystem(mPlaybackSystem);
 		mPlaybackSystem->setState(Tool::tsTRACKING);
+        connect(this, &TrackingImplService::activeToolChanged, mPlaybackSystem.get(), &TrackingSystemPlaybackService::onActiveToolChanged);
 	}
 }
 
@@ -345,6 +348,12 @@ void TrackingImplService::setActiveTool(const QString& uid)
 	}
 
 	emit activeToolChanged(uid);
+}
+
+void TrackingImplService::clearActiveTool()
+{
+	mActiveTool = mManualTool;
+	emit activeToolChanged(mActiveTool->getUid());
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const

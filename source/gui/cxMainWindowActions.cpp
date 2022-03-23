@@ -81,7 +81,7 @@ void MainWindowActions::createActions()
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 
-	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen",
+	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen video with VLC (needs to be at least 7 sec to work)",
 					   QIcon(),
 					   QKeySequence("F8"), "Record a video of the full screen.",
 					   &MainWindowActions::recordFullscreen);

@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 
-#include "cxPointMetricRep2D.h"
+#include "cxDistanceMetricRep2D.h"
 #include "boost/bind.hpp"
 
 #include <vtkActor.h>
@@ -22,27 +22,27 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSliceProxy.h"
 #include "cxView.h"
-#include "cxGraphicalDisk.h"
+#include "cxVtkHelperClasses.h"
+#include "cxLogger.h"
 
 
 namespace cx
 {
 
-PointMetricRep2DPtr PointMetricRep2D::New(const QString& uid)
+DistanceMetricRep2DPtr DistanceMetricRep2D::New(const QString& uid)
 {
-	return wrap_new(new PointMetricRep2D(), uid);
+	return wrap_new(new DistanceMetricRep2D(), uid);
 }
 
-PointMetricRep2D::PointMetricRep2D()
+DistanceMetricRep2D::DistanceMetricRep2D()
 {	
 }
 
-void PointMetricRep2D::setDynamicSize(bool on)
+void DistanceMetricRep2D::setDynamicSize(bool on)
 {
 	if (on)
 	{
 		mViewportListener.reset(new ViewportListener);
-		//mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
 	}
 	else
 	{
@@ -50,76 +50,65 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	}
 }
 
-void PointMetricRep2D::addRepActorsToViewRenderer(ViewPtr view)
+void DistanceMetricRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
 	if (mViewportListener)
 		mViewportListener->startListen(view->getRenderer());
 	DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
-void PointMetricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
+void DistanceMetricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	mDisk.reset();
+	mLine.reset();
 
 	if (mViewportListener)
 		mViewportListener->stopListen();
 	DataMetricRep::removeRepActorsFromViewRenderer(view);
 }
 
-void PointMetricRep2D::clear()
+void DistanceMetricRep2D::clear()
 {
 	DataMetricRep::clear();
 }
 
-void PointMetricRep2D::onModifiedStartRender()
+void DistanceMetricRep2D::onModifiedStartRender()
 {
 	if (!mMetric)
 		return;
 
-	if (!mDisk && this->getView() && mMetric && mSliceProxy)
+	if (!mLine && this->getView() && mMetric && mSliceProxy)
 	{
-		mDisk.reset(new GraphicalDisk());
-		mDisk->setRenderer(this->getRenderer());
+		mLine.reset(new LineSegment(this->getRenderer()));
+		mLine->setPoints(Vector3D(0.0, 0.0, 0.0), Vector3D(0.0, 0.0, 0.0), mMetric->getColor());
 	}
 
-	if (!mDisk)
+	if (!mLine)
 		return;
 
 	Vector3D position = mSliceProxy->get_sMr() * mMetric->getRefCoord();
 
-	mDisk->setColor(mMetric->getColor());
-	mDisk->setOutlineColor(mMetric->getColor());
-	mDisk->setOutlineWidth(0.25);
-	mDisk->setFillVisible(false);
 
-	mDisk->setRadiusBySlicingSphere(this->findSphereRadius(), position[2]);
+	mLine->setWidth(2);
 
-	Vector3D projectedPosition = position;
-	double offsetFromXYPlane = 0.01;
-	projectedPosition[2] = offsetFromXYPlane;
-	mDisk->setPosition(projectedPosition);
-
-	mDisk->update();
-}
-
-double PointMetricRep2D::findSphereRadius()
-{
-	double radius = mGraphicsSize;
-	if (mViewportListener)
+	mLine->setColor(mMetric->getColor());
+	DistanceMetricPtr distanceMetric = boost::dynamic_pointer_cast<DistanceMetric>(mMetric);
+	if(!distanceMetric)
 	{
-		double size = mViewportListener->getVpnZoom();
-		radius = mGraphicsSize / 100 / size * 2.5;
+		CX_LOG_WARNING() << "DistanceMetricRep2D: Got no DistanceMetric";
+		return;
 	}
+	std::vector<Vector3D> points_r = distanceMetric->getEndpoints();
 
-	return radius;
+	Transform3D vpMs = getView()->get_vpMs();
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Vector3D p1_vp = vpMs * sMr * points_r[0];
+	Vector3D p2_vp = vpMs * sMr * points_r[1];
+
+
+	mLine->updatePosition(p1_vp, p2_vp);
 }
 
-//void PointMetricRep2D::rescale()
-//{
-//	this->setModified();
-//}
-
-void PointMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
+void DistanceMetricRep2D::setSliceProxy(SliceProxyPtr sliceProxy)
 {
 	if (mSliceProxy)
 		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(setModified()));

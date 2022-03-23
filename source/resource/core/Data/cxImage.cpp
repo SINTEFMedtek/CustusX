@@ -855,6 +855,8 @@ vtkImageDataPtr Image::createDummyImageData(int axisSize, int maxVoxelValue)
 
 void Image::setInterpolationType(int val)
 {
+	if (mInterpolationType == val)
+		return;
 	if (mThresholdPreview)
 		return;
 	mInterpolationType = val;

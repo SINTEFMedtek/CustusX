@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "cxXmlOptionItem.h"
+#include "cxDefinitions.h"
 
 namespace cx {
 
@@ -45,14 +46,14 @@ public:
 	Presets(XmlOptionFile presetFile, XmlOptionFile customFile); //used
 	virtual ~Presets(){};
 
-    QString getId() const;
+	IMAGE_MODALITY getId() const;
 
 	void addCustomPreset(QDomElement& element); ///< adds a custom preset
 	virtual void deleteCustomPreset(QString name); ///< deletes the custom preset with the given name if it exists
 	virtual void save(); ///< saves the presets to file
 	virtual void remove(); ///< removes the presets from file
 
-	QStringList getPresetList(QString tag=""); ///< returns a list of the preset names for the given tag
+	QStringList getPresetList(IMAGE_MODALITY tag=imUNKNOWN); ///< returns a list of the preset names for the given tag
 	bool isDefaultPreset(QString presetName); ///< Check is the preset is one of the "system presets"
 	XmlOptionFile getCustomFile();
 
@@ -60,7 +61,7 @@ signals:
 	void changed(); ///<
 
 protected:
-	virtual QStringList generatePresetList(QString tag); ///< internally generate the preset list
+	virtual QStringList generatePresetList(IMAGE_MODALITY tag); ///< internally generate the preset list
 	XmlOptionFile getPresetNode(const QString& presetName); ///< Look for a preset with the given name. Create one if not found.
 	void addDefaultPreset(QDomElement& element); //used
 	void addPreset(XmlOptionFile& file, QDomElement& element); //used
@@ -74,7 +75,7 @@ protected:
 	XmlOptionFile mPresetFile; //used
 private:
 	XmlOptionFile mCustomFile; //used
-    QString mId;
+	IMAGE_MODALITY mId;
 };
 
 typedef boost::shared_ptr<class Presets> PresetsPtr;

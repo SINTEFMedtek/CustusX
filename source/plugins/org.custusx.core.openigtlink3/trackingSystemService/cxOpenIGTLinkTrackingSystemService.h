@@ -52,6 +52,9 @@ public:
 protected:
 	void internalSetState(Tool::State val);
 	OpenIGTLinkToolPtr getTool(QString devicename);
+	bool printTransformIdWarning(QString devicename);
+
+	QStringList mTransformIdWarningPrinted;
 
 protected slots:
 	virtual void configure(); ///< sets up the software

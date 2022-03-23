@@ -56,6 +56,8 @@ public:
 	void internalSetState(cx::Tool::State val) {cx::OpenIGTLinkTrackingSystemService::internalSetState(val);}
 	double getNetworkHandlerTimestampOffset();
 	cx::OpenIGTLinkToolPtr getTool(QString devicename) {return cx::OpenIGTLinkTrackingSystemService::getTool(devicename);}
+	QStringList getTransformIdWarningPrinted() {return mTransformIdWarningPrinted;}
+	bool testPrintTransformIdWarning(QString devicename) {return printTransformIdWarning(devicename);}
 
 public slots:
 	virtual void configure() {cx::OpenIGTLinkTrackingSystemService::configure();}
@@ -321,6 +323,30 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test timestamp synchronization", "[
 	REQUIRE(cx::similar(0, networkHandler->getTimestampOffset(), tolerance));
 }
 
+TEST_CASE("OpenIGTLinkTrackingSystemService: receiveTransform print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+	cx::Transform3D transform = cx::Transform3D::Identity();
+	double timestampMS(QDateTime::currentDateTime().toMSecsSinceEpoch());
+	QString deviceName = "testDevice";
+	trackingSystemService->receiveTransform(deviceName, transform, timestampMS);
+	CHECK(trackingSystemService->getTransformIdWarningPrinted().contains(deviceName));
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: print openigtlinktransformid warning", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+
+	QString deviceName = "testDevice1";
+	QString deviceName2 = "testDevice2";
+	CHECK(trackingSystemService->testPrintTransformIdWarning(deviceName));
+	CHECK(trackingSystemService->getTransformIdWarningPrinted().contains(deviceName));
+	CHECK(trackingSystemService->testPrintTransformIdWarning(deviceName2));
+	CHECK_FALSE(trackingSystemService->testPrintTransformIdWarning(deviceName));
+
+	trackingSystemService->deconfigure();
+	CHECK(trackingSystemService->testPrintTransformIdWarning(deviceName));
+}
 
 #ifdef CX_CUSTUS_SINTEF
 
@@ -438,6 +464,54 @@ TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool config files, and apply r
 
 	//When trackerConfig.mToolList[i].mApplyRefToTool is Ttrue, changing ref transform should change tool transform
 	CHECK_FALSE(cx::similar(toolTransform, toolTransform2));
+
+	trackingSystemService->deconfigure();
+	CHECK_FALSE(trackingSystemService->isConfigured());
+}
+
+TEST_CASE("OpenIGTLinkTrackingSystemService: Test tool files with OpenIGTLink id", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	OpenIGTLinkTrackingSystemServiceMocPtr trackingSystemService = OpenIGTLinkTrackingSystemServiceMocPtr(new OpenIGTLinkTrackingSystemServiceMoc());
+
+	cx::TrackerConfigurationPtr config = trackingSystemService->getConfiguration();
+	REQUIRE(config);
+	QStringList configurations = config->getAllConfigurations();
+
+	int posToolConfigFile = 0;
+	bool foundToolConfigFile = findConfigFileNumberInList(configurations, QString("BK_LabTest"), posToolConfigFile);
+	REQUIRE(foundToolConfigFile);
+	QString toolConfigFile = configurations[posToolConfigFile];
+
+	CX_LOG_DEBUG() << "Testing with tool config file: " << toolConfigFile;
+	trackingSystemService->setConfigurationFile(toolConfigFile);
+
+
+	config = trackingSystemService->getConfiguration();
+	cx::TrackerConfiguration::Configuration trackerConfig = config->getConfiguration(toolConfigFile);
+	CHECK(trackerConfig.mTrackingSystemImplementation == cx::TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK);
+
+	//Check that tool files got OpenIGTLink id tags
+	for (unsigned i = 0; i < trackerConfig.mToolList.size(); ++i)
+	{
+		//CX_LOG_DEBUG() << trackerConfig.mToolList[i].mAbsoluteToolFilePath;
+		cx::ToolFileParser toolParser(trackerConfig.mToolList[i].mAbsoluteToolFilePath);
+		cx::ToolFileParser::ToolInternalStructurePtr internalTool = toolParser.getTool();
+		CHECK(internalTool->mOpenigtlinkTransformId.startsWith("BK2300-"));
+		if(toolParser.getTool()->mIsProbe)
+			CHECK(internalTool->mOpenigtlinkImageId == internalTool->mOpenigtlinkTransformId);
+	}
+
+	trackingSystemService->configure();
+	CHECK(trackingSystemService->isConfigured());
+
+	//Check that tool config file got OpenIGTLink id tags
+	std::vector<PositionReceiverPtr> positionReceivers = setupTestTools(trackerConfig, trackingSystemService);
+	QString refToolDeviceName;
+	QString toolDeviceName;
+	PositionReceiverPtr toolPositionReceiver;
+	getDeviceNames(positionReceivers, refToolDeviceName, toolDeviceName, toolPositionReceiver);
+	CHECK(refToolDeviceName.startsWith("BK2300-1"));
+	CHECK(toolDeviceName.startsWith("BK2300-"));
 
 	trackingSystemService->deconfigure();
 	CHECK_FALSE(trackingSystemService->isConfigured());

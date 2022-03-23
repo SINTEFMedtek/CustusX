@@ -295,7 +295,7 @@ void MainWindow::createActions()
 	mInteractorStyleActionGroup = mServices->view()->getInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
-	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
+	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot, Qt::DirectConnection);
 }
 
 

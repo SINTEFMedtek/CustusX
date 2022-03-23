@@ -217,3 +217,21 @@ TEST_CASE("ViewWrapper: Resetting controlling tool reverts back to using active 
 	activeTool = visHelper.services->tracking()->getActiveTool();
 	CHECK(controllingTool == activeTool);
 }
+
+TEST_CASE("ViewWrapper: ActiveTool", "[integration][plugins][org.custusx.core.view]")
+{
+	cxtest::VisualizationHelper visHelper;
+
+	QString toolUid("dummytool2");
+	cx::DummyToolPtr tool2(new cx::DummyTool(toolUid));
+	cx::DummyToolManager::DummyToolManagerPtr toolManager = boost::dynamic_pointer_cast<cx::DummyToolManager>(visHelper.services->tracking());
+	REQUIRE(toolManager);
+	toolManager->addTool(tool2);
+	CHECK_FALSE(visHelper.services->tracking()->getActiveTool()->getUid() == toolUid);
+
+	visHelper.services->tracking()->setActiveTool(tool2->getUid());
+	CHECK(visHelper.services->tracking()->getActiveTool()->getUid() == toolUid);
+
+	visHelper.services->tracking()->clearActiveTool();
+	CHECK_FALSE(visHelper.services->tracking()->getActiveTool());
+}

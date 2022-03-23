@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QHeaderView>
 #include <QLabel>
 #include <QSlider>
+#include <QCheckBox>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxLogger.h"
@@ -42,7 +43,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* parent,
-	QString objectName, QString windowTitle, bool useRegistrationFixedPropertyInsteadOfActiveImage) :
+										   QString objectName, QString windowTitle,
+										   bool useRegistrationFixedPropertyInsteadOfActiveImage) :
 	LandmarkRegistrationWidget(services, parent, objectName, windowTitle),
 	mUseRegistrationFixedPropertyInsteadOfActiveImage(useRegistrationFixedPropertyInsteadOfActiveImage),
 	mLandmarksShowAdvancedSettingsString("Landmarks/ShowAdvanced")
@@ -105,6 +107,10 @@ ImageLandmarksWidget::ImageLandmarksWidget(RegServicesPtr services, QWidget* par
 	landmarkAdvancedButtonsLayout->addWidget(mImportLandmarksFromPointMetricsButton);
 	mVerticalLayout->addLayout(landmarkAdvancedButtonsLayout);
 
+	mMouseClickSample->show();
+	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &ImageLandmarksWidget::mouseClickSampleStateChanged);
+	mVerticalLayout->addWidget(mMouseClickSample);
+
 	this->showOrHideDetails();
 }
 
@@ -148,6 +154,14 @@ DataPtr ImageLandmarksWidget::getCurrentData() const
 	return mLandmarkListener->getLandmarkSource();
 }
 
+
+void ImageLandmarksWidget::pointSampled(Vector3D p_r)
+{
+	this->resampleLandmark(p_r);
+	//Only use the anyplane sampler for resample for now
+	//this->addLandmark(p_r);
+}
+
 void ImageLandmarksWidget::addLandmarkButtonClickedSlot()
 {
 	PickerRepPtr PickerRep = this->getPickerRep();
@@ -156,17 +170,19 @@ void ImageLandmarksWidget::addLandmarkButtonClickedSlot()
 		reportError("Need a 3D view to set landmarks.");
 		return;
 	}
+	Vector3D pos_r = PickerRep->getPosition();
+	this->addLandmark(pos_r);
+}
 
+void ImageLandmarksWidget::addLandmark(Vector3D p_r)
+{
 	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
-
 	QString uid = mServices->patient()->addLandmark();
-	Vector3D pos_r = PickerRep->getPosition();
-	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+	Vector3D pos_d = image->get_rMd().inv().coord(p_r);
 	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
-
-    this->activateLandmark(uid);
+	this->activateLandmark(uid);
 }
 
 
@@ -179,16 +195,20 @@ void ImageLandmarksWidget::editLandmarkButtonClickedSlot()
 		return;
 	}
 
+	Vector3D pos_r = PickerRep->getPosition();
+	this->resampleLandmark(pos_r);
+}
+
+void ImageLandmarksWidget::resampleLandmark(Vector3D p_r)
+{
 	DataPtr image = this->getCurrentData();
 	if (!image)
 		return;
-
 	QString uid = mActiveLandmark;
-	Vector3D pos_r = PickerRep->getPosition();
-	Vector3D pos_d = image->get_rMd().inv().coord(pos_r);
+	Vector3D pos_d = image->get_rMd().inv().coord(p_r);
 	image->getLandmarks()->setLandmark(Landmark(uid, pos_d));
 
-    this->activateLandmark(this->getNextLandmark());
+	this->activateLandmark(this->getNextLandmark());
 }
 
 void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
@@ -197,7 +217,7 @@ void ImageLandmarksWidget::removeLandmarkButtonClickedSlot()
 	if (!image)
 		return;
 
-    QString next = this->getNextLandmark();
+	QString next = this->getNextLandmark();
 	image->getLandmarks()->removeLandmark(mActiveLandmark);
 	this->activateLandmark(next);
 }
@@ -293,7 +313,7 @@ void ImageLandmarksWidget::hideEvent(QHideEvent* event)
 
 void ImageLandmarksWidget::prePaintEvent()
 {
-    LandmarkRegistrationWidget::prePaintEvent();
+	LandmarkRegistrationWidget::prePaintEvent();
 
 	std::vector<Landmark> landmarks = this->getAllLandmarks();
 

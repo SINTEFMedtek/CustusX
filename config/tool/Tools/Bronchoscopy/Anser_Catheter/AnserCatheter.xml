@@ -13,6 +13,7 @@
     <geo_file>Catheter_2mm_with_Sensor_Model.stl</geo_file>
     <pic_file></pic_file>
     <doc_file></doc_file>
+    <openigtlinktransformid>Pointer_3</openigtlinktransformid>
     
     <!-- Instrument -->
     <instrument>
