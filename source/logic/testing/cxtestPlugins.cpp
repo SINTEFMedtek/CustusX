@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 /** Test that one plugin can be sucessfully loaded, both in the unit (build folder)
   * and the integration (install folder) step.
   */
-TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integration][unit][plugins]")
+TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integration][unit][plugins][hide]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
