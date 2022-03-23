@@ -10,6 +10,9 @@
 #
 #####################################################
 
+from __future__ import absolute_import
+from builtins import range
+from builtins import object
 import logging
 import time    
 import subprocess
@@ -22,13 +25,13 @@ import shlex
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
 import cx.utils.cxUtilities
-import cxInstallData
-import cxComponents
-import cxComponentAssembly
-import cxTestRunner
+from . import cxInstallData
+from . import cxComponents
+from . import cxComponentAssembly
+from . import cxTestRunner
 
    
-class CustusXTestInstallation:
+class CustusXTestInstallation(object):
     '''
     Represents one installed version of CustusX,
     along with functionality for testing it.
@@ -56,7 +59,7 @@ class CustusXTestInstallation:
         appPath = self._getInstalledBinaryPath()
         self._testExecutable(appPath, 'Catch', '-h')
         self._testExecutable(appPath, self.system_base_name) # defaults to CustusX
-        self._testExecutable(appPath, 'OpenIGTLinkServer')
+        #self._testExecutable(appPath, 'OpenIGTLinkServer')
         self._testExecutable(appPath, 'LogConsole')
                      
     def runUnstableTests(self):

@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <iostream>
 #include <QStringList>
 #include <QTextStream>
+#include "cxEnumConversion.h"
 
 
 namespace cx {
@@ -24,7 +25,7 @@ Presets::Presets(XmlOptionFile presetFile, XmlOptionFile customFile)
 	mPresetFile = presetFile;
 	mCustomFile = customFile;
 	mLastCustomPresetAdded = "";
-    mId = mPresetFile.getFileName();
+	mId = string2enum<IMAGE_MODALITY>(mPresetFile.getFileName());
 }
 
 void Presets::deleteCustomPreset(QString name)
@@ -51,7 +52,7 @@ void Presets::remove()
 	std::cout << "TODO IMPLEMENT: void Presets::remove()" << std::endl;
 }
 
-QStringList Presets::getPresetList(QString tag)
+QStringList Presets::getPresetList(IMAGE_MODALITY tag)
 {
 	return this->generatePresetList(tag);
 }
@@ -65,7 +66,7 @@ bool Presets::isDefaultPreset(QString presetName)
 	return false;
 }
 
-QStringList Presets::generatePresetList(QString tag)
+QStringList Presets::generatePresetList(IMAGE_MODALITY tag)
 {
 	return QStringList();
 }
@@ -111,12 +112,12 @@ void Presets::print(QDomElement element)
 	QTextStream stream(stdout);
 	stream << "\n";
 	element.save(stream, 4);
-    stream << "\n";
+	stream << "\n";
 }
 
-QString Presets::getId() const
+IMAGE_MODALITY Presets::getId() const
 {
-    return mId;
+	return mId;
 }
 
 

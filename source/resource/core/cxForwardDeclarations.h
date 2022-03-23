@@ -143,6 +143,8 @@ typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 // other stuff
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
@@ -168,6 +170,7 @@ typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
 
 } // namespace cx
 

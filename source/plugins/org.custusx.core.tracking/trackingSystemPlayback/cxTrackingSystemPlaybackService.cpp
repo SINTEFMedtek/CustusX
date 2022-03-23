@@ -29,6 +29,7 @@ TrackingSystemPlaybackService::TrackingSystemPlaybackService(PlaybackTimePtr con
 	mState = Tool::tsNONE;
 	mController = controller;
 	mManual = manual;
+    mActiveToolId = QString();
 }
 
 TrackingSystemPlaybackService::~TrackingSystemPlaybackService()
@@ -165,9 +166,15 @@ void TrackingSystemPlaybackService::onToolPositionChanged(Transform3D matrix, do
 {
 	// Overwrite manual tool pos, set timestamp to 1ms previous.
 	// This makes sure manual tool is not picked as active.
-	mManual->set_prMt(matrix, timestamp-1);
+    if(mManual && (mManual->getUid() != mActiveToolId))
+        mManual->set_prMt(matrix, timestamp-1);
 //	mManual->setVisible(false);
 //	mManual->setVisible(true);
+}
+
+void TrackingSystemPlaybackService::onActiveToolChanged(const QString &uId)
+{
+    mActiveToolId = uId;
 }
 
 

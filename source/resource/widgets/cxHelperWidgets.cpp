@@ -32,10 +32,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataSelectWidget.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxFilePathProperty.h"
+#include "cxFilePreviewProperty.h"
+#include "cxFilePreviewWidget.h"
+#include "cxLogger.h"
 
 namespace cx
 {
-
 QWidget* createDataWidget(ViewServicePtr viewService, PatientModelServicePtr patientModelService, QWidget* parent, PropertyPtr data, QGridLayout* gridLayout, int row)
 {
 	QWidget* retval = NULL;
@@ -65,8 +67,8 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 	StringPropertyBasePtr str = boost::dynamic_pointer_cast<StringPropertyBase>(data);
 	if (str)
 	{
-//		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
-//			return new FilenameWidget(parent, str, gridLayout, row);
+		//		if (str->getGuiRepresentation()==StringPropertyBase::grFILENAME)
+		//			return new FilenameWidget(parent, str, gridLayout, row);
 		if (str->getAllowOnlyValuesInRange())
 			return new LabeledComboBoxWidget(parent, str, gridLayout, row);
 		else
@@ -77,17 +79,17 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 	if (dbl)
 	{
 		DoublePropertyBase::GuiRepresentation gui = dbl->getGuiRepresentation();
-        switch(gui)
-        {
-        case DoublePropertyBase::grSLIDER:
-            return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
-            break;
-        case DoublePropertyBase::grSPINBOX:
-            return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
-            break;
-        case DoublePropertyBase::grDIAL:
-        	return new SpinBoxAndDialGroupWidget(parent, dbl, gridLayout, row);
-        }
+		switch(gui)
+		{
+		case DoublePropertyBase::grSLIDER:
+			return new SpinBoxAndSliderGroupWidget(parent, dbl, gridLayout, row);
+			break;
+		case DoublePropertyBase::grSPINBOX:
+			return new SpinBoxGroupWidget(parent, dbl, gridLayout, row);
+			break;
+		case DoublePropertyBase::grDIAL:
+			return new SpinBoxAndDialGroupWidget(parent, dbl, gridLayout, row);
+		}
 	}
 
 	BoolPropertyBasePtr bl = boost::dynamic_pointer_cast<BoolPropertyBase>(data);
@@ -107,9 +109,15 @@ QWidget* sscCreateDataWidget(QWidget* parent, PropertyPtr data, QGridLayout* gri
 		return new SliderRangeGroupWidget(parent, doublepair, gridLayout, row);
 	}
 
+	FilePreviewPropertyPtr filePreview = boost::dynamic_pointer_cast<FilePreviewProperty>(data);
+	if (filePreview)
+	{
+		return new FilePreviewWidget(parent, filePreview, gridLayout, row);
+	}
+
 	std::cout << "Failed to create Data Widget for " << (data ? data->getDisplayName() : "NULL") << std::endl;
 
-    return NULL;
+	return NULL;
 }
 
 QWidget* addDummyMargin(QWidget* widget)
@@ -122,16 +130,16 @@ QWidget* addDummyMargin(QWidget* widget)
 
 QHBoxLayout* mergeWidgetsIntoHBoxLayout(QWidget* first, QWidget* second)
 {
-    QHBoxLayout* hackLayout = new QHBoxLayout;
-    hackLayout->setMargin(0);
-    hackLayout->setSpacing(0);
+	QHBoxLayout* hackLayout = new QHBoxLayout;
+	hackLayout->setMargin(0);
+	hackLayout->setSpacing(0);
 
-    if (first)
-        hackLayout->addWidget(first);
-    if (second)
-        hackLayout->addWidget(second);
+	if (first)
+		hackLayout->addWidget(first);
+	if (second)
+		hackLayout->addWidget(second);
 
-    return hackLayout;
+	return hackLayout;
 }
 
 }

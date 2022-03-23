@@ -13,6 +13,7 @@
     <geo_file>Guidewire_1_5mm_with_Sensor_Model.stl</geo_file>
     <pic_file></pic_file>
     <doc_file></doc_file>
+    <openigtlinktransformid>Pointer_1</openigtlinktransformid>
     
     <!-- Instrument -->
     <instrument>
@@ -39,7 +40,7 @@
     
     <!-- Calibration -->
     <calibration>
-        <cal_file>Identity.cal</cal_file>
+        <cal_file>AnserGuidewire.cal</cal_file>
     </calibration>
 </tool>
 

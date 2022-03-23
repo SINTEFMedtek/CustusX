@@ -53,6 +53,12 @@ void DisplayTimerWidget::stop()
 	this->printText("green");
 }
 
+void DisplayTimerWidget::failed()
+{
+    mTimer->stop();
+    this->printText("red");
+}
+
 void DisplayTimerWidget::timeoutSlot()
 {
 	this->printText("black");

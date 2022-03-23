@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUSReconstructInputDataAlgoritms.h"
 #include "cxPatientModelService.h"
 #include "cxMathUtils.h"
+#include "cxPositionFilter.h"
 
 #include <QThread>
 
@@ -66,14 +67,6 @@ std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInp
 		retval.push_back(input);
 	}
 	return retval;
-}
-
-namespace
-{
-bool within(int x, int min, int max)
-{
-	return (x >= min) && (x <= max);
-}
 }
 
 /**
@@ -185,56 +178,23 @@ struct RemoveDataType
 {
 	RemoveDataType() : count(0), err(-1) {}
 	void add(double _err) { ++count; err=((err<0)?_err:std::min(_err, err)); }
-	int count;
+	unsigned count;
 	double err;
 };
 
 void ReconstructPreprocessor::filterPositions()
 {
-    int filterStrength = mInput.mPosFilterStrength;
-
-    if (filterStrength > 0) //Position filter enabled
-    {
-        int filterLength(1+2*filterStrength);
-        int nPositions(mFileData.mPositions.size());
-        if (nPositions > filterLength) //Position sequence sufficient long?
-        {
-            // Init array to hold positions converted to quaternions:
-            int nQuaternions = nPositions+(2*filterStrength); // Add room for FIR-filtering
-            Eigen::ArrayXXd qPosArray(7,nQuaternions);
-
-            // Convert to quaternions:
-            for (unsigned int i = 0; i < nQuaternions; i++) //For each pose (Tx), with edge padding
-            {
-                unsigned int sourceIdx =  (i > filterStrength) ? (i-filterStrength) : 0; // Index in Tx array, pad with edge elements
-                sourceIdx =  (sourceIdx < nPositions) ? sourceIdx : (nPositions-1);
-                qPosArray.col(i) = matrixToQuaternion(mFileData.mPositions[sourceIdx].mPos); // Convert each Tx to quaternions
-            }
-
-            // Filter quaternion arrays (simple averaging filter):
-            Eigen::ArrayXXd qPosFiltered = Eigen::ArrayXXd::Zero(7,nPositions); // Fill with zeros
-            for (unsigned int i = 0; i < filterLength; i++)
-            {
-                qPosFiltered = qPosFiltered + qPosArray.block(0,i,7,nPositions);
-            }
-            qPosFiltered = qPosFiltered / filterLength;
-
-            // Convert back to Tx:
-            for (unsigned int i = 0; i < mFileData.mPositions.size(); i++) //For each pose after filtering
-            {
-                // Convert back to position data
-                mFileData.mPositions[i].mPos = quaternionToMatrix(qPosFiltered.col(i));
-            }
-        }
-    }
-
+	unsigned filterStrength = mInput.mPosFilterStrength;
+	CX_LOG_DEBUG() << "Filter length specified " << filterStrength;
+	//PositionsPtr positions = new PositionsPtr(mFileData.mPositions);
+	PositionFilter positionFilter(filterStrength, mFileData.mPositions);
+	positionFilter.filterPositions();
 }
 
 void ReconstructPreprocessor::positionThinning()
 {
-    // If enabled, try to remove "suspect" data (large jumps etc.)
-    // Replace tracking positions that deviate greatly from neighbours with an interpolated value
-
+	// If enabled, try to remove "suspect" data (large jumps etc.)
+	// Replace tracking positions that deviate greatly from neighbours with an interpolated value
 }
 
 
@@ -247,25 +207,25 @@ void ReconstructPreprocessor::positionThinning()
 void ReconstructPreprocessor::interpolatePositions()
 {
 	mFileData.mUsRaw->resetRemovedFrames();
-	int startFrames = mFileData.mFrames.size();
+	unsigned long startFrames = mFileData.mFrames.size();
 
-	std::map<int,RemoveDataType> removedData;
+	std::map<unsigned,RemoveDataType> removedData;
 
 	for (unsigned i_frame = 0; i_frame < mFileData.mFrames.size();)
 	{
 		std::vector<TimedPosition>::iterator posIter;
 		posIter = lower_bound(mFileData.mPositions.begin(), mFileData.mPositions.end(), mFileData.mFrames[i_frame]);
 
-		unsigned i_pos = distance(mFileData.mPositions.begin(), posIter);
+		unsigned i_pos = unsigned(distance(mFileData.mPositions.begin(), posIter));
 		if (i_pos != 0)
 			i_pos--;
 
 		if (i_pos >= mFileData.mPositions.size() - 1)
-			i_pos = mFileData.mPositions.size() - 2;
+			i_pos = unsigned(mFileData.mPositions.size()) - 2;
 
 		// Remove frames too far from the positions
 		// Don't increment frame index since the index now points to the next element
-		double timeToPos1 = timeToPosition(i_frame, i_pos);
+		double timeToPos1 = timeToPosition(i_frame, unsigned(i_pos));
 		double timeToPos2 = timeToPosition(i_frame, i_pos+1);
 		if ((timeToPos1 > mMaxTimeDiff) || (timeToPos2 > mMaxTimeDiff))
 		{
@@ -286,11 +246,11 @@ void ReconstructPreprocessor::interpolatePositions()
 		}
 	}
 
-	int removeCount=0;
-	for (std::map<int,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
+	unsigned removeCount=0;
+	for (std::map<unsigned,RemoveDataType>::iterator iter=removedData.begin(); iter!=removedData.end(); ++iter)
 	{
-		int first = iter->first+removeCount;
-		int last = first + iter->second.count-1;
+		unsigned first = iter->first+removeCount;
+		unsigned last = first + iter->second.count-1;
 		report(QString("Removed input frame [%1-%2]. Time diff=%3").arg(first).arg(last).arg(iter->second.err, 0, 'f', 1));
 		removeCount += iter->second.count;
 	}
@@ -335,8 +295,8 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 
 	if (( maskDims[0]<dims[0] )||( maskDims[1]<dims[1] ))
 		reportError(QString("input data (%1) and mask (%2) dim mimatch")
-																.arg(qstring_cast(dims))
-																.arg(qstring_cast(maskDims)));
+								.arg(qstring_cast(dims))
+								.arg(qstring_cast(maskDims)));
 
 	int xmin = maskDims[0];
 	int xmax = 0;
@@ -357,11 +317,10 @@ std::vector<Vector3D> ReconstructPreprocessor::generateInputRectangle()
 			}
 		}
 
-	//Test: reduce the output volume by reducing the mask when determining
-	//      output volume size
+	//Reduce the output volume by reducing the mask when determining output volume size
 	double red = mInput.mMaskReduce;
-	int reduceX = (xmax - xmin) * (red / 100);
-	int reduceY = (ymax - ymin) * (red / 100);
+	int reduceX = int((xmax - xmin) * (red / 100));
+	int reduceY = int((ymax - ymin) * (red / 100));
 
 	xmin += reduceX;
 	xmax -= reduceX;
@@ -473,10 +432,10 @@ void ReconstructPreprocessor::updateFromOriginalFileData()
 	//this->calibrateTimeStamps(0.0, 1.0);
 	this->applyTimeCalibration();
 
-    // Smooth tracking data before further processing
-    // User preferences apply
-    //this->positionThinning(); //Do thinning before filtering if enabled
-    this->filterPositions();
+	// Smooth tracking data before further processing
+	// User preferences apply
+	//this->positionThinning(); //Do thinning before filtering if enabled
+	this->filterPositions();
 
 	cx::USReconstructInputDataAlgorithm::transformTrackingPositionsTo_prMu(&mFileData);
 	//mPos (in mPositions) is now prMu

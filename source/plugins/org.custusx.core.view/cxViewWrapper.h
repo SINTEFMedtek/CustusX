@@ -97,6 +97,7 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	virtual void updateView();
 	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
+	ToolPtr getControllingTool();
 
 signals:
 	void orientationChanged(ORIENTATION_TYPE type);
@@ -107,6 +108,7 @@ protected slots:
 
 	virtual void dataViewPropertiesChangedSlot(QString uid) = 0;
 	virtual void videoSourceChangedSlot(QString uid) {}
+	virtual void activeToolChangedSlot() {};
 
 protected:
 	ViewWrapper(VisServicesPtr backend);

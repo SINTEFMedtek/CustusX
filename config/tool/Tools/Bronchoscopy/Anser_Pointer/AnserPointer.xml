@@ -13,6 +13,7 @@
     <geo_file></geo_file>
     <pic_file>AnserPointer.jpg</pic_file>
     <doc_file></doc_file>
+    <openigtlinktransformid>Pointer_1</openigtlinktransformid>
     
     <!-- Instrument -->
     <instrument>

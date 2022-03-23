@@ -36,6 +36,7 @@ public:
 	virtual ToolPtr getTool(const QString& uid);
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid);
+	virtual void clearActiveTool();
 	virtual ToolPtr getFirstProbe();
 
 	virtual ToolPtr getReferenceTool() const;
@@ -48,11 +49,16 @@ public:
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 	virtual void runDummyTool(DummyToolPtr tool);
+	virtual std::vector<TrackerConfigurationPtr> getConfigurations();
+	//virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
 	virtual TrackerConfigurationPtr getConfiguration();
+	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);
+	virtual QString getCurrentTrackingSystemImplementation();
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
+	virtual void resetTimeSynchronization();
 
 	bool isNull();
 

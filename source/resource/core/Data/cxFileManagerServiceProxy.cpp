@@ -125,4 +125,9 @@ std::vector<FileReaderWriterServicePtr> FileManagerServiceProxy::getImportersFor
 {
 	return mService->getImportersForDataType(dataType);
 }
+
+QString FileManagerServiceProxy::getFileReaderName(const QString &filename)
+{
+	return mService->getFileReaderName(filename);
+}
 }

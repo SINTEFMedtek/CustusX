@@ -52,6 +52,9 @@ public:
 
 	std::vector<TrackingSystemServicePtr> getBase() { return mBases; }
 
+public slots:
+    void onActiveToolChanged(const QString &uId);
+
 private slots:
 	void onToolPositionChanged(Transform3D matrix, double timestamp);
 
@@ -66,6 +69,7 @@ private:
 	Tool::State mState;
 	PlaybackTimePtr mController;
 	ManualToolPtr mManual;
+    QString mActiveToolId;
 	std::vector<TrackingSystemServicePtr> mBases;
 };
 

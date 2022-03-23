@@ -1,0 +1,9 @@
+<?xml version = "1.0"?>
+<configuration clinical_app="Bronchoscopy">
+    <trackingsystemimplementation type="openigtlink" openigtlinkApplyRefToTools="no">
+        <tracker type="aurora">
+            <toolfile reference="no" openigtlinktransformid="Pointer_1">Bronchoscopy/Anser_Guidewire/AnserGuidewire.xml</toolfile>
+            <toolfile reference="no" openigtlinktransformid="Pointer_3">Bronchoscopy/Anser_Catheter/AnserCatheter.xml</toolfile>
+        </tracker>
+    </trackingsystemimplementation>
+</configuration>

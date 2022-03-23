@@ -24,7 +24,7 @@ namespace cx
 PatientModelServiceNull::PatientModelServiceNull()
 {
 }
-void PatientModelServiceNull::insertData(DataPtr data)
+void PatientModelServiceNull::insertData(DataPtr data, bool overWrite)
 {
 	printWarning();
 }

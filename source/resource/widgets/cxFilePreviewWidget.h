@@ -22,6 +22,8 @@ class QPushButton;
 
 namespace cx
 {
+typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
+
 /**
  *
  * \brief View a xml document.
@@ -32,13 +34,12 @@ namespace cx
  * \date Mar 22, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
 class cxResourceWidgets_EXPORT FilePreviewWidget: public FileWatcherWidget
 {
 	Q_OBJECT
 
 public:
-	FilePreviewWidget(QWidget* parent);
+	FilePreviewWidget(QWidget* parent, FilePreviewPropertyPtr dataInterface = FilePreviewPropertyPtr(), QGridLayout* gridLayout = 0, int row = 0);
 	virtual ~FilePreviewWidget();
 
 	template<class SYNTAXHIGHLIGHTER>
@@ -53,8 +54,14 @@ public slots:
 	void saveSlot();
 	void textChangedSlot();
 
+protected slots:
+	void fileinterfaceChanged();
+
 private:
 	//void watchFile(bool on);
+	void createAndAddEditorLayout(QGridLayout *gridLayout, int row);
+
+	FilePreviewPropertyPtr mData;
 
 	QTextDocument* 						mTextDocument;
 	QTextEdit* 								mTextEdit;

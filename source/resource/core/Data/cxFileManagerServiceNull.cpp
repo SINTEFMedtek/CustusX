@@ -103,6 +103,12 @@ std::vector<FileReaderWriterServicePtr> FileManagerServiceNull::getImportersForD
 	return std::vector<FileReaderWriterServicePtr>();
 }
 
+QString FileManagerServiceNull::getFileReaderName(const QString &filename)
+{
+	printWarning();
+	return QString();
+}
+
 void FileManagerServiceNull::printWarning() const
 {
 	reportWarning("Trying to use FileManagerServiceNull.");

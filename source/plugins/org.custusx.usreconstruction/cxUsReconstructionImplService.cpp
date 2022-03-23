@@ -111,7 +111,9 @@ void UsReconstructionImplService::startReconstruction()
 	connect(executer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 	mExecuters.push_back(executer);
 
-	executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	bool success = executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	if(!success)
+		CX_LOG_WARNING() << "US reconstruction failed. Probably an error with input data.";
 }
 
 std::set<cx::TimedAlgorithmPtr> UsReconstructionImplService::getThreadedReconstruction()
@@ -205,6 +207,11 @@ void UsReconstructionImplService::selectData(QString filename, QString calFilesP
 	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(mFileManagerService));
 	USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
 	fileData.mFilename = filename;
+	if(!fileData.isValid())
+	{
+		CX_LOG_WARNING() << "UsReconstructionImplService::selectData: Invalid input data";
+		return;
+	}
 	this->selectData(fileData);
 }
 

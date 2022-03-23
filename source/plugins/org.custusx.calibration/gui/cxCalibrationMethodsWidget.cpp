@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolManualCalibrationWidget.h"
 #include "cxTemporalCalibrationWidget.h"
 #include "cxLapFrameToolCalibrationWidget.h"
+#include "cxEBUSCalibrationWidget.h"
 #include "cxProbeConfigWidget.h"
 
 namespace cx
@@ -26,6 +27,7 @@ CalibrationMethodsWidget::CalibrationMethodsWidget(VisServicesPtr services, Acqu
 	this->setToolTip("Collection of calibration methods");
 	this->addTab(new ToolTipCalibrateWidget(services, this), "Tool Tip");
 	this->addTab(new LapFrameToolCalibrationWidget(services, this), "Lap Frame");
+	this->addTab(new EBUSCalibrationWidget(services, this), "EBUS");
 	this->addTab(new ToolTipSampleWidget(services, this), "Sample");
 	this->addTab(new TemporalCalibrationWidget(services, acquisitionService, this), "Temporal");
 	this->addTab(new ToolManualCalibrationWidget(services, this), "Tool Manual");

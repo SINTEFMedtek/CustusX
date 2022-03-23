@@ -49,8 +49,8 @@ protected:
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
 
-    virtual void clear();
-//    virtual void rescale();
+	virtual void clear();
+//	virtual void rescale();
 	virtual void onModifiedStartRender();
 
 private:

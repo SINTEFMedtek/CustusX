@@ -30,7 +30,7 @@ PatientModelServiceMock::PatientModelServiceMock()
 	connect(m_rMpr.get(), &cx::RegistrationHistory::currentChanged, this, &cx::PatientModelService::rMprChanged);
 }
 
-void PatientModelServiceMock::insertData(cx::DataPtr data)
+void PatientModelServiceMock::insertData(cx::DataPtr data, bool overWrite)
 {
 	mData[data->getUid()] = data;
 }
@@ -59,6 +59,7 @@ std::map<QString, cx::DataPtr> PatientModelServiceMock::getDatas(DataFilter filt
 cx::DataPtr PatientModelServiceMock::importDataMock(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager)
 {
 	QString type = filemanager->findDataTypeFromFile(fileName);
+	REQUIRE_FALSE(type.isEmpty());
 	cx::DataPtr data = this->createData(type, fileName, fileName);
 	REQUIRE(data);
 	data->load(fileName, filemanager);

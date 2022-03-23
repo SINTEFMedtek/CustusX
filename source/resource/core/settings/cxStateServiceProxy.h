@@ -41,6 +41,7 @@ public:
 	virtual Desktop getActiveDesktop();
 	virtual void saveDesktop(Desktop desktop);
 	virtual void resetDesktop();
+	virtual WorkflowStateMachinePtr getWorkflow();
 
 	virtual bool isNull();
 

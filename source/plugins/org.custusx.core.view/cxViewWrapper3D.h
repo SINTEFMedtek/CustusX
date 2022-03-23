@@ -117,7 +117,7 @@ private:
 	void setOrientationAnnotation();
 
 	RepPtr createDataRep3D(DataPtr data);
-    DataMetricRepPtr createDataMetricRep3D(DataPtr data);
+	DataMetricRepPtr createDataMetricRep3D(DataPtr data);
 
 	void addVolumeDataRep(DataPtr data);
 	void removeVolumeDataRep(QString uid);

@@ -60,6 +60,7 @@ public: // optional methods
 
 public: // interface extension
   ToolPtr getTool() const;
+  bool isActiveToolSelected() const;
 
   void provideActiveTool(bool on);
   void setActiveTool();

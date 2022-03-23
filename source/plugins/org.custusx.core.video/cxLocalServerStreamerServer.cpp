@@ -51,7 +51,7 @@ BoolPropertyBasePtr LocalServerStreamerArguments::getRunLocalServerOption(QDomEl
 											defaultValue, root);
 	retval->setAdvanced(false);
 	retval->setGroup("Connection");
-	return retval;
+	return std::move(retval);//Fixed copy bug on old compilers
 }
 
 FilePathPropertyPtr LocalServerStreamerArguments::getLocalServerNameOption(QDomElement root)

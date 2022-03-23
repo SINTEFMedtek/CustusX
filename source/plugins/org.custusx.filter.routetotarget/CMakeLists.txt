@@ -5,8 +5,6 @@ include(cxInstallUtilities)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
-
-
 set(PLUGIN_SRCS
     cxRouteToTarget.h
     cxRouteToTarget.cpp
@@ -40,6 +38,7 @@ set(PLUGIN_target_libraries
     cxResourceFilter
     cxPluginUtilities
     org_custusx_registration_method_bronchoscopy
+    org_custusx_filter_airwaysfromcenterline
 )
 
 set(PLUGIN_OUTPUT_DIR "")

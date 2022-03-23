@@ -45,6 +45,7 @@ public:
 private:
 	virtual void meshAdded(MeshPtr mesh);
 	virtual void pointMetricAdded(PointMetricPtr mesh);
+	virtual void distanceMetricAdded(DistanceMetricPtr mesh);
 	void updateSettings(RepPtr rep);
 	void sphereMetricAdded(SphereMetricPtr mesh);
 

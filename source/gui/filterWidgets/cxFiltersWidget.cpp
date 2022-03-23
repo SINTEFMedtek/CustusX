@@ -22,7 +22,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBinaryThinningImageFilter3DFilter.h"
 #include "cxContourFilter.h"
 #include "cxSmoothingImageFilter.h"
+#include "cxGenericScriptFilter.h"
 #include "cxResampleImageFilter.h"
+#include "cxColorVariationFilter.h"
 #include "cxFilterPresetWidget.h"
 #include "cxDilationFilter.h"
 #include "cxPluginFramework.h"
@@ -122,7 +124,9 @@ void FiltersWidget::appendFiltersThatAreNotServices(VisServicesPtr services)
     this->appendFilterIfWanted(FilterPtr(new BinaryThresholdImageFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new BinaryThinningImageFilter3DFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new ContourFilter(services)));
-    this->appendFilterIfWanted(FilterPtr(new SmoothingImageFilter(services)));
+    this->appendFilterIfWanted(FilterPtr(new ColorVariationFilter(services)));
+	this->appendFilterIfWanted(FilterPtr(new SmoothingImageFilter(services)));
+	this->appendFilterIfWanted(FilterPtr(new GenericScriptFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new ResampleImageFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new DilationFilter(services)));
 }

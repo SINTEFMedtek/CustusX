@@ -33,6 +33,7 @@ class org_custusx_registration_method_bronchoscopy_EXPORT BronchoscopyRegistrati
 public:
 	BronchoscopyRegistration();
 	vtkPolyDataPtr processCenterline(vtkPolyDataPtr centerline, Transform3D rMd, int numberOfGenerations = 0);
+	void setBranchList(BranchListPtr branchList, int numberOfGenerations = 0);
 	BranchListPtr processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations = 0);
 	Eigen::Matrix4d runBronchoscopyRegistration(TimedTransformMap trackingData_prMt, Transform3D old_rMpr, double maxDistanceForLocalRegistration);
 	Eigen::Matrix4d runBronchoscopyRegistrationImage2Image(vtkPolyDataPtr centerlineFixed, vtkPolyDataPtr centerlineMoving);

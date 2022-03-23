@@ -81,7 +81,7 @@ void MainWindowActions::createActions()
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 
-	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen",
+	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen video with VLC (needs to be at least 7 sec to work)",
 					   QIcon(),
 					   QKeySequence("F8"), "Record a video of the full screen.",
 					   &MainWindowActions::recordFullscreen);
@@ -176,11 +176,18 @@ void MainWindowActions::createPatientActions()
 					   "Export patient data to a folder",
 					   &MainWindowActions::exportDataSlot);
 
-	this->createAction("ImportData", "Import data",
-					   QIcon(":/icons/open_icon_library/document-import-2.png"),
-					   QKeySequence("Ctrl+I"),
-					   "Import image data",
-					   &MainWindowActions::importDataSlot);
+	//Action "AddFilesForImport" was previously called "ImportData"
+	this->createAction("AddFilesForImport", "Add files for import",
+										 QIcon(":/icons/open_icon_library/document-import-2.png"),
+										 QKeySequence("Ctrl+I"),
+										 "Add files to be imported",
+										 [=](){this->importDataSlot("AddMoreFilesButtonClickedAction");});
+
+	this->createAction("ImportSelectedData", "Import selected data",
+										 QIcon(),
+										 QKeySequence(),
+										 "Import all selected data files",
+										 [=](){this->importDataSlot("ImportButtonClickedAction");});
 }
 
 template <class T>
@@ -314,7 +321,7 @@ void MainWindowActions::exportDataSlot()
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
-void MainWindowActions::importDataSlot()
+void MainWindowActions::importDataSlot(QString actionText)
 {
 	this->savePatientFileSlot();
 
@@ -335,12 +342,18 @@ void MainWindowActions::importDataSlot()
 		return;
 	}
 
+	bool actionFound = false;
 	QList<QAction*> actions = widget->actions();
 	foreach(QAction* action, actions)
 	{
-		if(action->text().contains("AddMoreFilesButtonClickedAction"))
+		if(action->text().contains(actionText))
+		{
+			actionFound =  true;
 			action->trigger();
+		}
 	}
+	if(!actionFound)
+		CX_LOG_ERROR() << "MainWindowActions::importDataSlot, action not found: " << actionText;
 }
 
 void MainWindowActions::shootScreen()

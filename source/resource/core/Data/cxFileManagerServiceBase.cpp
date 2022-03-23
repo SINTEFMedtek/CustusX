@@ -98,7 +98,7 @@ vtkPolyDataPtr FileManagerServiceBase::loadVtkPolyData(QString filename)
 
 std::vector<FileReaderWriterServicePtr> FileManagerServiceBase::getExportersForDataType(QString dataType)
 {
-	std::vector<FileReaderWriterServicePtr>  retval;
+	std::vector<FileReaderWriterServicePtr> retval;
 	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
 	{
 		if (dataType.compare((*iter)->canWriteDataType()) == 0)
@@ -110,7 +110,7 @@ std::vector<FileReaderWriterServicePtr> FileManagerServiceBase::getExportersForD
 
 std::vector<FileReaderWriterServicePtr> FileManagerServiceBase::getImportersForDataType(QString dataType)
 {
-	std::vector<FileReaderWriterServicePtr>  retval;
+	std::vector<FileReaderWriterServicePtr> retval;
 	for (std::set<FileReaderWriterServicePtr>::iterator iter = mDataReaders.begin(); iter != mDataReaders.end(); ++iter)
 	{
 		if (dataType.compare((*iter)->canReadDataType()) == 0)
@@ -126,6 +126,7 @@ QString FileManagerServiceBase::findDataTypeFromFile(QString filename)
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 		return reader->canReadDataType();
+	CX_LOG_WARNING() << "FileManagerServiceBase::findDataTypeFromFile: Cannot find a file reader";
 	return "";
 }
 
@@ -182,6 +183,15 @@ void FileManagerServiceBase::removeFileReaderWriter(FileReaderWriterService *ser
 		else
 			++it;
 	}
+}
+
+QString FileManagerServiceBase::getFileReaderName(const QString &filename)
+{
+	FileReaderWriterServicePtr reader = this->findReader(filename);
+	if (reader)
+		return reader->getName();
+	else
+		return QString();
 }
 
 } // cx

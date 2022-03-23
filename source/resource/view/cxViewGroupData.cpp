@@ -441,6 +441,9 @@ bool ViewGroupData::removeData(QString uid)
 	if (!this->contains(uid))
 		return false;
 	mData.erase(std::find_if(mData.begin(), mData.end(), data_equals(uid)));
+	TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(this->getData(uid));
+	if (trackedStream)
+		trackedStream->deleteImageToStopEmittingFrames();
 	emit dataViewPropertiesChanged(uid);
 	return true;
 }
@@ -559,20 +562,20 @@ SyncedValuePtr ViewGroupData::getGroup2DZoom()
 }
 SyncedValuePtr ViewGroupData::getGlobal2DZoom()
 {
-    return mGlobal2DZoom;
+	return mGlobal2DZoom;
 }
 
 void ViewGroupData::zoomCamera3D(int zoomFactor)
 {
-    CameraDataPtr cameraData = this->getCamera3D();
-    if(!cameraData)
-        return;
+	CameraDataPtr cameraData = this->getCamera3D();
+	if(!cameraData)
+		return;
 
-    vtkCameraPtr camera = cameraData->getCamera();
-    if(!camera)
-        return;
+	vtkCameraPtr camera = cameraData->getCamera();
+	if(!camera)
+		return;
 
-    camera->Dolly(zoomFactor);
+	camera->Dolly(zoomFactor);
 }
 
 void ViewGroupData::createSliceDefinitionProperty()
@@ -583,10 +586,10 @@ void ViewGroupData::createSliceDefinitionProperty()
 	QStringList slicedefaults;
 	slicedefaults << enum2string(ptAXIAL) << enum2string(ptCORONAL) << enum2string(ptSAGITTAL);
 	mSliceDefinitionProperty = StringListProperty::initialize("slice_definition_3D",
-								  "3D Slices",
-								  "Select slice planes to view in 3D",
-								  slicedefaults,
-								  slicedefs);
+															  "3D Slices",
+															  "Select slice planes to view in 3D",
+															  slicedefaults,
+															  slicedefs);
 	connect(mSliceDefinitionProperty.get(), &Property::changed, this, &ViewGroupData::optionsChanged);
 }
 
@@ -672,5 +675,15 @@ void ViewGroupData::setRegistrationMode(REGISTRATION_STATUS mode)
 	this->setOptions(options);
 }
 
+
+ToolPtr ViewGroupData::getControllingTool()
+{
+	return mControllingTool;
+}
+void ViewGroupData::setControllingTool(ToolPtr tool)
+{
+	mControllingTool = tool;
+	emit controllingToolChanged();
+}
 
 } // namespace cx

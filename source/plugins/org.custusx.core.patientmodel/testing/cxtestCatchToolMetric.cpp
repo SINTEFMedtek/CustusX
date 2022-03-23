@@ -21,6 +21,7 @@ TEST_CASE("ToolMetric can set/get tool data", "[unit]")
 	cxtest::ToolMetricWithInput data = fixture.getToolMetricWithInput();
 
 	CHECK(fixture.inputEqualsMetric(data));
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("ToolMetric can save/load XML", "[unit]")
@@ -29,6 +30,7 @@ TEST_CASE("ToolMetric can save/load XML", "[unit]")
 	cxtest::ToolMetricWithInput data = fixture.getToolMetricWithInput();
 
 	CHECK(fixture.saveLoadXmlGivesEqualTransform(data));
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("ToolMetric can set space correctly", "[unit]")
@@ -43,6 +45,8 @@ TEST_CASE("ToolMetric can set space correctly", "[unit]")
 
 	testData.mMetric->setSpace(testData.mSpace);
 	CHECK(fixture.inputEqualsMetric(testData));
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
@@ -67,4 +71,6 @@ TEST_CASE("ToolMetric can get a valid reference coordinate", "[unit]")
 	refCoord = testData.mMetric->getRefCoord();
 	INFO(qstring_cast(testCoord)+" == "+qstring_cast(refCoord));
 	CHECK(cx::similar(refCoord, testCoord));
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }

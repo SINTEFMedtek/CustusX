@@ -38,6 +38,7 @@ public:
 
 	ColorPropertyPtr mColor;
 	BoolPropertyBasePtr mUseColorFromPolydataScalars;
+    DoublePropertyPtr mLineWidth;
 	DoublePropertyPtr mVisSize;
 	BoolPropertyPtr mBackfaceCulling;
 	BoolPropertyPtr mFrontfaceCulling;

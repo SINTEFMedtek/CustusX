@@ -148,13 +148,14 @@ void ViewWrapper2D::samplePoint(Vector3D click_vp)
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 {
-    contextMenu.addSeparator();
+	contextMenu.addSeparator();
 	mZoom2D->addActionsToMenu(&contextMenu);
 
 	contextMenu.addSeparator();
 	QAction* showManualTool = new QAction("Show Manual Tool 2D", &contextMenu);
 	showManualTool->setCheckable(true);
 	showManualTool->setChecked(settings()->value("View2D/showManualTool").toBool());
+	showManualTool->setToolTip("Turn on/off visualization of the vire cross in 2D");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 	contextMenu.addAction(showManualTool);
 }
@@ -233,11 +234,11 @@ void ViewWrapper2D::toggleShowManualTool()
 
 void ViewWrapper2D::removeAndResetSliceRep()
 {
-    if (mSliceRep)
-    {
-        mView->removeRep(mSliceRep);
-        mSliceRep.reset();
-    }
+	if (mSliceRep)
+	{
+		mView->removeRep(mSliceRep);
+		mSliceRep.reset();
+	}
 }
 
 void ViewWrapper2D::removeAndResetMultiSliceRep()
@@ -411,30 +412,30 @@ void ViewWrapper2D::imageAdded(ImagePtr image)
 
 ImagePtr ViewWrapper2D::getImageToDisplay()
 {
-    if (!mGroupData)
-        return ImagePtr();
+	if (!mGroupData)
+		return ImagePtr();
 
 	std::vector<ImagePtr> images = mGroupData->getImagesAndChangingImagesFromTrackedStreams(DataViewProperties::createSlice2D(), this->isAnyplane());
-    ImagePtr image;
-    if (!images.empty())
-        image = images.back();  // always show last in vector
+	ImagePtr image;
+	if (!images.empty())
+		image = images.back();  // always show last in vector
 
-    return image;
+	return image;
 }
 
 bool ViewWrapper2D::useGPU2DRendering()
 {
-		return settings()->value("View2D/useGPU2DRendering").toBool();
+	return settings()->value("View2D/useGPU2DRendering").toBool();
 }
 
 void ViewWrapper2D::createAndAddSliceRep()
 {
-    if (!mSliceRep)
-    {
-        mSliceRep = SliceRepSW::New("SliceRep_" + mView->getName());
-        mSliceRep->setSliceProxy(mSliceProxy);
-        mView->addRep(mSliceRep);
-    }
+	if (!mSliceRep)
+	{
+		mSliceRep = SliceRepSW::New("SliceRep_" + mView->getName());
+		mSliceRep->setSliceProxy(mSliceProxy);
+		mView->addRep(mSliceRep);
+	}
 }
 
 QString ViewWrapper2D::getDataDescription()
@@ -471,30 +472,30 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 	if (!mGroupData)
 		return;
 
-		ImagePtr image = this->getImageToDisplay();
+	ImagePtr image = this->getImageToDisplay();
 
-    if (image)
-    {
-        Vector3D c = image->get_rMd().coord(image->boundingBox().center());
-        mSliceProxy->setDefaultCenter(c);
+	if (image)
+	{
+		Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+		mSliceProxy->setDefaultCenter(c);
 
-        if (this->useGPU2DRendering())
-        {
-            this->recreateMultiSlicer();
-        }
-        else //software rendering
-        {
-            this->removeAndResetMultiSliceRep();
-            this->createAndAddSliceRep();
+		if (this->useGPU2DRendering())
+		{
+			this->recreateMultiSlicer();
+		}
+		else //software rendering
+		{
+			this->removeAndResetMultiSliceRep();
+			this->createAndAddSliceRep();
 
-            mSliceRep->setImage(image);
-        }
-    }
-    else //no images to display in the view
-    {
-        this->removeAndResetSliceRep();
-        this->removeAndResetMultiSliceRep();
-    }
+			mSliceRep->setImage(image);
+		}
+	}
+	else //no images to display in the view
+	{
+		this->removeAndResetSliceRep();
+		this->removeAndResetMultiSliceRep();
+	}
 }
 
 void ViewWrapper2D::updateView()
@@ -505,10 +506,10 @@ void ViewWrapper2D::updateView()
 
 	this->ViewWrapper::updateView();
 
-    //UPDATE ORIENTATION ANNOTATION
+	//UPDATE ORIENTATION ANNOTATION
 	mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 
-    //UPDATE DATA METRIC ANNOTATION
+	//UPDATE DATA METRIC ANNOTATION
 	mDataRepContainer->updateSettings();
 
 	if (mToolRep2D)
@@ -566,8 +567,9 @@ void ViewWrapper2D::dataRemoved(const QString& uid)
 
 void ViewWrapper2D::activeToolChangedSlot()
 {
-	ToolPtr activeTool = mServices->tracking()->getActiveTool();
-	mSliceProxy->setTool(activeTool);
+	ToolPtr controllingTool = this->getControllingTool();
+	//CX_LOG_DEBUG() << "ViewWrapper2D::activeToolChangedSlot - controllingTool: " << controllingTool->getName();
+	mSliceProxy->setTool(controllingTool);
 }
 
 /**Part of the mouse interactor:

@@ -48,8 +48,8 @@ void TrackingServiceProxy::onServiceAdded(TrackingService* service)
 	connect(mTrackingService.get(), &TrackingService::stateChanged, this, &TrackingService::stateChanged);
 	connect(mTrackingService.get(), &TrackingService::activeToolChanged, this, &TrackingService::activeToolChanged);
 
-    emit stateChanged();
-    emit activeToolChanged(mTrackingService->getActiveTool()->getUid());
+	emit stateChanged();
+	emit activeToolChanged(mTrackingService->getActiveTool()->getUid());
 }
 
 void TrackingServiceProxy::onServiceRemoved(TrackingService *service)
@@ -93,6 +93,11 @@ void TrackingServiceProxy::setActiveTool(const QString& uid)
 	mTrackingService->setActiveTool(uid);
 }
 
+void TrackingServiceProxy::clearActiveTool()
+{
+	mTrackingService->clearActiveTool();
+}
+
 ToolPtr TrackingServiceProxy::getFirstProbe()
 {
 	return mTrackingService->getFirstProbe();
@@ -133,11 +138,30 @@ void TrackingServiceProxy::runDummyTool(DummyToolPtr tool)
 	mTrackingService->runDummyTool(tool);
 }
 
+std::vector<TrackerConfigurationPtr> TrackingServiceProxy::getConfigurations()
+{
+	return mTrackingService->getConfigurations();
+}
+
+/*TrackerConfigurationPtr TrackingServiceProxy::getConfiguration(QString trackingSystemImplementation)
+{
+	return mTrackingService->getConfiguration(trackingSystemImplementation);
+}*/
+
 TrackerConfigurationPtr TrackingServiceProxy::getConfiguration()
 {
 	return mTrackingService->getConfiguration();
 }
 
+void TrackingServiceProxy::setCurrentTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+	mTrackingService->setCurrentTrackingSystemImplementation(trackingSystemImplementation);
+}
+
+QString TrackingServiceProxy::getCurrentTrackingSystemImplementation()
+{
+	return mTrackingService->getCurrentTrackingSystemImplementation();
+}
 
 void TrackingServiceProxy::installTrackingSystem(TrackingSystemServicePtr system)
 {
@@ -154,6 +178,9 @@ std::vector<TrackingSystemServicePtr> TrackingServiceProxy::getTrackingSystems()
 	return mTrackingService->getTrackingSystems();
 }
 
-
+void TrackingServiceProxy::resetTimeSynchronization()
+{
+	return mTrackingService->resetTimeSynchronization();
+}
 
 } //cx

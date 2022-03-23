@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -16,16 +16,16 @@ namespace cx
 {
 
 ManualToolAdapter::ManualToolAdapter(QString uid) :
-				ManualTool(uid)
+	ManualTool(uid)
 {
 	ToolPtr initial(new ManualTool(uid + "base"));
 	this->setBase(initial);
-//	mBase.reset(new ManualTool(uid + "base"));
-//	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
+	//	mBase.reset(new ManualTool(uid + "base"));
+	//	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
 
 ManualToolAdapter::ManualToolAdapter(ToolPtr base) :
-				ManualTool(mBase->getUid() + "_manual"), mBase(base)
+	ManualTool(mBase->getUid() + "_manual"), mBase(base)
 {
 }
 
@@ -82,7 +82,7 @@ Transform3D ManualToolAdapter::getCalibration_sMt() const
 	return mBase->getCalibration_sMt();
 }
 
-std::map<int, Vector3D> ManualToolAdapter::getReferencePoints() const
+std::map<QString, Vector3D> ManualToolAdapter::getReferencePoints() const
 {
 	return mBase->getReferencePoints();
 }
