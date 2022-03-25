@@ -702,6 +702,22 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 			}
 			this->deleteNotUsedFiles(filePath, createOutputVolume);
 		}
+		else if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".vtk"))
+		{
+				QColor outputColor;
+				if(mOutputColors.size() > 0)
+					outputColor = mOutputColors[0];
+				else
+					outputColor = getDefaultColor();
+
+				QString info;
+				MeshPtr outputMesh = boost::dynamic_pointer_cast<Mesh>(patientService()->importData(filePath, info));
+				outputMesh->setColor(outputColor);
+				mServices->view()->autoShowData(outputMesh);
+				ImagePtr inputImage = this->getCopiedInputImage();
+				if(inputImage)
+					outputMesh->get_rMd_History()->setRegistration(inputImage->get_rMd());
+		}
 	}
 
 	return true;
