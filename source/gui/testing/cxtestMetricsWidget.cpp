@@ -60,7 +60,7 @@ TestMetricData readTestMetricData(QString filename) {
 
 }
 
-TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget]")
+TEST_CASE("Export and import metrics to and from file", "[hide][integration][metrics][widget]")
 {
 	MetricFixture fixture;
 	fixture.testExportAndImportMetrics();

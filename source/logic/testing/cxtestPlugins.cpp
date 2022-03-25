@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 /** Test that one plugin can be sucessfully loaded, both in the unit (build folder)
   * and the integration (install folder) step.
   */
-TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integration][unit][plugins][hide]")
+TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integration][unit][plugins]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
@@ -37,7 +37,7 @@ TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integrat
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("LogicManager: init and shutdown without it posting the warning: QObject::killTimer: timers cannot be stopped from another thread", "[integration][unit][plugins]")
+TEST_CASE("LogicManager: init and shutdown without it posting the warning: QObject::killTimer: timers cannot be stopped from another thread", "[hide][integration][unit][plugins]")
 {
     cx::reporter()->initialize();
     cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();

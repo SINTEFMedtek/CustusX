@@ -31,7 +31,7 @@ void initTest()
 
 }
 
-TEST_CASE("Profile change with running gui", "[gui][integration][hide]")
+TEST_CASE("Profile change with running gui", "[gui][integration]")
 {
 	initTest();
 
