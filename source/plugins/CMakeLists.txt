@@ -39,7 +39,7 @@ set(CX_PLUGINS
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
   org.custusx.bronchoscopynavigation:ON
-	org.custusx.filter.airways:OFF
+  org.custusx.filter.airways:OFF
 )
 
 #if(CX_LINUX)
