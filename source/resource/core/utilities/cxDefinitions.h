@@ -184,6 +184,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsESOPHAGUS,
 		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
 		lsAIRWAYS,
+		lsCENTERLINES,
 		lsVESSELS,
 		lsPULMONARY_SYSTEM,
 		lsMEDIUM_ORGANS,
