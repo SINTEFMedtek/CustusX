@@ -61,7 +61,7 @@ TestMetricData readTestMetricData(QString filename) {
 }
 
 //Fails on Ubuntu 20.04
-TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget][not_linux]")
+TEST_CASE("Export and import metrics to and from file", "[integration][metrics][widget][not_ubuntu2004]")
 {
 	MetricFixture fixture;
 	fixture.testExportAndImportMetrics();

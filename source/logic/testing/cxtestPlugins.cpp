@@ -38,7 +38,7 @@ TEST_CASE("LogicManager: Load one core plugin (PatientModelService)", "[integrat
 }
 
 //Fails on Ubuntu 20.04
-TEST_CASE("LogicManager: init and shutdown without it posting the warning: QObject::killTimer: timers cannot be stopped from another thread", "[integration][unit][plugins][not_linux]")
+TEST_CASE("LogicManager: init and shutdown without it posting the warning: QObject::killTimer: timers cannot be stopped from another thread", "[integration][unit][plugins][not_ubuntu2004]")
 {
     cx::reporter()->initialize();
     cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
