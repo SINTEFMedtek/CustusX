@@ -444,6 +444,7 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
+//These two tests fails on Ubuntu 16.04, but seems to work on Ubuntu 20.04
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
 			"[integration][resource][visualization][not_linux]")
 {
