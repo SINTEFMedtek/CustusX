@@ -184,7 +184,8 @@ TEST_CASE("Can connect to a igtlioQtClient server", "[plugins][org.custusx.core.
 
 }
 
-TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][integration]")
+//Hangs occasionally on Windows
+TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][integration][not_win64]")
 {
 	igtlioServerClientFixture fixture;
 	fixture.startServerAndClientAndConnect();
@@ -194,7 +195,8 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 	REQUIRE_FALSE(fixture.client->GetConnector()->IsConnected());
 }
 
-TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration]")
+//Hangs occasionally on Windows
+TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration][not_win64]")
 {
 	igtlioServerClientFixture fixture;
 	fixture.startServerAndClientAndConnect();
