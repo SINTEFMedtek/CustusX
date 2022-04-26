@@ -140,10 +140,11 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 {
 	"UNKNOWN",
 	"Lungs",
+	"Tumors",
 	"Lesions",
 	"Lymph Nodes",
-    "Vena Azygos",
-    "Vena Cava",
+	"Vena Azygos",
+	"Vena Cava",
 	"Aorta",
 	"Subclavian Artery",
 	"Pulmonary Vessels",
