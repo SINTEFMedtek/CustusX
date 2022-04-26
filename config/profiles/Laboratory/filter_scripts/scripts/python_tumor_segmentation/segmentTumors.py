@@ -6,9 +6,7 @@ import sys
 import getopt
 
 
-def segmentTumors(filenameInput, filenameOutput):
-    print('Segmenting tumors from: ' + filenameInput + ' to: ' + filenameOutput)
-    print(os.path.splitext(filenameInput)[1:])
+def segmentTumors(filenameInput, filenameOutput):   
     if os.path.splitext(filenameInput)[1:] != '.nii.gz':
         filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
         filenameOutput_nii_gz = os.path.splitext(filenameOutput)[0] + '.nii.gz'
