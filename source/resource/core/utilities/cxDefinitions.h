@@ -180,14 +180,14 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsVENA_CAVA,
 		lsAORTA,
 		lsSUBCLAVIAN_ARTERY,
-		lsPULMONARY_VESSELS,
+		lsLUNG_VESSELS,
 		lsHEART,
 		lsESOPHAGUS,
 		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
 		lsAIRWAYS,
 		lsCENTERLINES,
-		lsVESSELS,
-		lsPULMONARY_SYSTEM,
+		lsPULMONARY_VEINS,
+		lsPULMONARY_TRUNK,
 		lsMEDIUM_ORGANS,
 		lsSMALL_ORGANS,
 		lsNODULES,
@@ -226,9 +226,9 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		return "_lungs";
 	}
 
-	static QString airwaysFilterGetNameSuffixVessels()
+	static QString airwaysFilterGetNameSuffixLungVessels()
 	{
-		return "_vessels";
+		return "_lung_vessels";
 	}
 
 	static QString airwaysFilterGetNameSuffixVolume()
