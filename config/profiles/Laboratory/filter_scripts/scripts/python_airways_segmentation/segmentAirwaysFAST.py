@@ -4,6 +4,7 @@ import os
 import SimpleITK as sitk
 import sys
 import getopt
+import numpy as np
 
 
 def segmentAirwaysFAST(filenameInput, filenameOutputAirways):
@@ -13,6 +14,11 @@ def segmentAirwaysFAST(filenameInput, filenameOutputAirways):
 
     airways_filter = fast.AirwaySegmentation.create().connect(importer)
     segmentation_airways = airways_filter.runAndGetOutputData()
+
+    if np.asarray(segmentation_airways).size < 1000:
+        print("Error: Could not segment airways.")
+        return
+    
     exporter_airways = fast.MetaImageExporter.create(filenameOutputAirways).connect(segmentation_airways)
     exporter_airways.run()
 
