@@ -555,8 +555,8 @@ bool AirwaysFilter::postProcessVessels()
 	);
 
 	//Create temporary ImagePtr for correct output name from contour filter
-	QString uidOutput = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + "%1";
-	QString nameOutput = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + "%1";
+	QString uidOutput = mInputImage->getUid() + airwaysFilterGetNameSuffixLungVessels() + "%1";
+	QString nameOutput = mInputImage->getName() + airwaysFilterGetNameSuffixLungVessels() + "%1";
 	ImagePtr outputImage = patientService()->createSpecificData<Image>(uidOutput, nameOutput);
 
 	// Add contour internally to cx(
@@ -578,8 +578,8 @@ bool AirwaysFilter::postProcessVessels()
 	if (generateVesselCenterlines)
 	{
 		// Centerline
-		QString uid = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
-		QString name = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
+		QString uid = mInputImage->getUid() + airwaysFilterGetNameSuffixLungVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
+		QString name = mInputImage->getName() + airwaysFilterGetNameSuffixLungVessels() + airwaysFilterGetNameSuffixCenterline() + "%1";
 		MeshPtr bloodVesselsCenterline = patientService()->createSpecificData<Mesh>(uid, name);
 		bloodVesselsCenterline->setVtkPolyData(mBloodVesselCenterlineOutput);
 		bloodVesselsCenterline->get_rMd_History()->setParentSpace(mInputImage->getUid());
@@ -593,8 +593,8 @@ bool AirwaysFilter::postProcessVessels()
 	if (generateVesselVolume)
 	{
 		//Create segmented volume output
-		QString uidVolume = mInputImage->getUid() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
-		QString nameVolume = mInputImage->getName() + airwaysFilterGetNameSuffixVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+		QString uidVolume = mInputImage->getUid() + airwaysFilterGetNameSuffixLungVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
+		QString nameVolume = mInputImage->getName() + airwaysFilterGetNameSuffixLungVessels() + airwaysFilterGetNameSuffixVolume() + "%1";
 		ImagePtr outputVolume = createDerivedImage( mServices->patient(),
 													uidVolume, nameVolume,
 													mBloodVesselSegmentationOutput, mInputImage);

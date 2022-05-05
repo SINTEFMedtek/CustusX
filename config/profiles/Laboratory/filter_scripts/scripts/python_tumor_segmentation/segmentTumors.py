@@ -1,27 +1,21 @@
 
-import fast
+import lungtumormask
 import os
 import SimpleITK as sitk
 import sys
 import getopt
-import numpy as np
 
 
-def segmentAirwaysFAST(filenameInput, filenameOutputAirways):
-    importer = fast.ImageFileImporter.create(filenameInput)
-    image = importer.runAndGetOutputData()
-    print("An image was imported with size: ", image.getWidth(), image.getHeight())
-
-    airways_filter = fast.AirwaySegmentation.create().connect(importer)
-    segmentation_airways = airways_filter.runAndGetOutputData()
-
-    if np.asarray(segmentation_airways).size < 1000:
-        print("Error: Could not segment airways.")
-        return
-    
-    exporter_airways = fast.MetaImageExporter.create(filenameOutputAirways).connect(segmentation_airways)
-    exporter_airways.run()
-
+def segmentTumors(filenameInput, filenameOutput):   
+    if os.path.splitext(filenameInput)[1:] != '.nii.gz':
+        filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
+        filenameOutput_nii_gz = os.path.splitext(filenameOutput)[0] + '.nii.gz'
+        sitk.WriteImage(sitk.ReadImage(filenameInput), filenameInput_nii_gz)
+        os.system ('lungtumormask ' + filenameInput_nii_gz + ' ' + filenameOutput_nii_gz)
+        sitk.WriteImage(sitk.ReadImage(filenameOutput_nii_gz), filenameOutput)
+    else:
+        os.system('lungtumormask ' + filenameInput + ' ' + filenameOutput)
+    return filenameOutput
 
 InputVolume = ''
 OutputLabel = ''
@@ -70,9 +64,9 @@ def main(argv):
     n_argin_expected = 2  # Expect input and output volume paths
     if len(sys.argv) > n_argin_expected:  # command string is sys.argv[0]
         input_image_path = sys.argv[1]  # First argument should always be input volume
-        print(input_image_path)
+        print('Input file: ' + input_image_path)
         output_image_path = sys.argv[2]  # Second argument should always be destination volume file
-        print(output_image_path)
+        print('Output file: ' + output_image_path)
     else:
         print('Too few arguments, script aborted.')
         exit(1)  # TODO: Find proper exit code
@@ -80,7 +74,7 @@ def main(argv):
     print('Arguments: ' + arguments)
     #read_arguments(arguments)
 
-    segmentAirwaysFAST(input_image_path, output_image_path)
+    segmentTumors(input_image_path, output_image_path)
 
 
 if __name__ == "__main__":
