@@ -48,8 +48,8 @@ public:
   typedef igtl::SmartPointer<Self>        Pointer;
   typedef igtl::SmartPointer<const Self>  ConstPointer;
 
-  igtlTypeMacro(IGTLinkUSStatusMessage, igtl::MessageBase)
-	igtlNewMacro(IGTLinkUSStatusMessage)
+	igtlTypeMacro(IGTLinkUSStatusMessage, igtl::MessageBase);
+	igtlNewMacro(IGTLinkUSStatusMessage);
 
 	void SetProbeType(ProbeDefinition::TYPE probeType);
   int GetProbeType();
