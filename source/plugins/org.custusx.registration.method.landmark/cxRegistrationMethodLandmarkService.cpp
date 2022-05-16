@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxRegistrationMethodLandmarkService.h"
+#include <QLabel>
 #include "cxImageLandmarksWidget.h"
 #include "cxLandmarkImage2ImageRegistrationWidget.h"
 #include "cxLandmarkPatientRegistrationWidget.h"
@@ -61,6 +62,13 @@ QWidget *RegistrationMethodFastLandmarkImageToPatientService::createWidget()
 
 	LandmarkPatientRegistrationWidget* registrationWidget = new FastLandmarkPatientRegistrationWidget(mServices, tabWidget, "org_custusx_registration_method_fast_landmark_image_to_patient_registration_widget", "Fast Image Registration");
 
+	QLabel* heading = new QLabel(tabWidget);
+	heading->setText("<font color=red>Intraoperative registration</font>");
+	QFont font = heading->font();
+	font.setBold(true);
+	font.setPointSize(font.pointSize() + 2);
+	heading->setFont(font);
+	tabWidget->insertWidgetAtTop(heading);
 	tabWidget->addTab(orientationWidget, "Orientation");
 	tabWidget->addTab(imageLandmarkWidget, "Image landmark(s)");
 	tabWidget->addTab(patientLandmarkWidget, "Patient landmark(s)");

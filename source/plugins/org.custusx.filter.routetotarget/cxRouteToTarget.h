@@ -48,6 +48,8 @@ public:
 	double findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
+	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< double > getCameraRotation();
 
 	double getTracheaLength();
 	static std::vector<Eigen::Vector3d> getRoutePositions(MeshPtr route);
@@ -66,6 +68,8 @@ private:
 	Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
+	std::vector< double > mCameraRotation;
+    std::vector< double > mExtendedCameraRotation;
 	std::vector< Eigen::Vector3d > mBloodVesselRoutePositions;
 	std::vector< Eigen::Vector3d > mMergedAirwayAndBloodVesselRoutePositions;
 	std::vector< int > mBranchingIndex;
@@ -82,7 +86,6 @@ std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::v
 std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
 double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
-Eigen::Vector3d crossproduct(Eigen::Vector3d A, Eigen::Vector3d B);
 double variance(Eigen::VectorXd X);
 
 org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);

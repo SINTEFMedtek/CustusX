@@ -83,9 +83,11 @@ void testACSWith3GPUVolumes()
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
-//		fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
-		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.9);
+//		/fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.85);
 	}
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 } //namespace
 
@@ -94,6 +96,7 @@ TEST_CASE("Visual rendering: Init view",
 {
 	cxtest::ViewsFixture fixture;
 	REQUIRE(true);
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Visual rendering: Overlapping gridlayout",
@@ -166,8 +169,8 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 //	sleep(3);
 
 	CHECK(true);
-    //sleep(3);
-    cxtest::Utilities::sleep_sec(3);
+	//sleep(3);
+	cxtest::Utilities::sleep_sec(3);
 }
 
 //Moved to unstable, as test sometimes fail
@@ -182,7 +185,8 @@ TEST_CASE("Visual rendering: Empty view",
 
 	fixture.dumpDebugViewToDisk("emptyview", 0);
 	REQUIRE(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) == Approx(0));
-
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 //	sleep(3);
 
 }
@@ -201,6 +205,7 @@ TEST_CASE("Visual rendering: Several empty views in a sequence.",
 
 		fixture.dumpDebugViewToDisk("emptyview", 0);
 		REQUIRE(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) == Approx(0));
+		CHECK_FALSE(fixture.messageListenerContainErrors());
 	}
 }
 
@@ -208,6 +213,8 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	fixture.define3D(imagenames.image[0], NULL, 0, 0);
@@ -215,6 +222,8 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 	REQUIRE(fixture.quickRunWidget());
 	fixture.dumpDebugViewToDisk("3DvtkGPU", 0);
 	REQUIRE(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.01);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
@@ -241,6 +250,8 @@ TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(3,20) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Visual rendering: Show layout, clear, show new layout",
@@ -249,36 +260,38 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 	cxtest::ViewsFixture fixture;
 	ImageTestList imagenames;
 
-    fixture.define3D(imagenames.image[0], NULL, 1, 1);
+	fixture.define3D(imagenames.image[0], NULL, 1, 1);
 	fixture.defineSlice("A", imagenames.image[0], cx::ptAXIAL, 0, 0);
 	fixture.defineSlice("C", imagenames.image[0], cx::ptCORONAL, 1, 0);
 	fixture.defineSlice("S", imagenames.image[0], cx::ptSAGITTAL, 0, 1);
 	REQUIRE(fixture.quickRunWidget());
-    cxtest::Utilities::sleep_sec(1);
+	cxtest::Utilities::sleep_sec(1);
 
 
-    std::cout << "===== CLEAR START" << std::endl;
+	std::cout << "===== CLEAR START" << std::endl;
 
 	fixture.clear();
-    std::cout << "===== CLEAR STOP" << std::endl;
-    REQUIRE(fixture.quickRunWidget());
-    cxtest::Utilities::sleep_sec(1);
-//    return;
+	std::cout << "===== CLEAR STOP" << std::endl;
+	REQUIRE(fixture.quickRunWidget());
+	cxtest::Utilities::sleep_sec(1);
+	//    return;
 
-    std::cout << "===== DEFINE 2 START" << std::endl;
-    fixture.define3D(imagenames.image[0], NULL, 0, 2);
+	std::cout << "===== DEFINE 2 START" << std::endl;
+	fixture.define3D(imagenames.image[0], NULL, 0, 2);
 	fixture.defineSlice("Any", imagenames.image[0], cx::ptANYPLANE, 0, 0);
-    fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 1);
+	fixture.defineSlice("Dua", imagenames.image[0], cx::ptSIDEPLANE, 0, 1);
 
-    std::cout << "===== DEFINE 2 STOP" << std::endl;
-    REQUIRE(fixture.quickRunWidget());
-//    REQUIRE(fixture.quickRunWidget());
-    REQUIRE(fixture.runWidget());
-    cxtest::Utilities::sleep_sec(1);
+	std::cout << "===== DEFINE 2 STOP" << std::endl;
+	REQUIRE(fixture.quickRunWidget());
+	//    REQUIRE(fixture.quickRunWidget());
+	REQUIRE(fixture.runWidget());
+	cxtest::Utilities::sleep_sec(1);
 
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
@@ -301,6 +314,8 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
@@ -323,6 +338,8 @@ TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,0) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(1,20) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(2,20) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 volumes",
@@ -344,8 +361,10 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes",
 
 	for (unsigned i = 0; i < 3*3; ++i)
 	{
-		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.9);
+		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.88);
 	}
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 //Tagged as unstable as it sometimes fail in Linux
@@ -353,6 +372,8 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	std::vector<cx::ImagePtr> images(1);
@@ -365,6 +386,8 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
 	REQUIRE(fixture.quickRunWidget());
 
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 // Experimental opengl test based on "Visual rendering: Show Axial GPU slice, 1 volume"
@@ -385,6 +408,8 @@ TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
 	REQUIRE(fixture.quickRunWidget());
 
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
 //Tagged as unstable as it sometimes fail in Linux
@@ -392,6 +417,8 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 			"[integration][resource][visualization][not_win32][not_win64][unstable]")
 {
 	cxtest::ViewsFixture fixture;
+	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+	fixture.addFileReaderWriter(metaImageReader);
 	ImageTestList imagenames;
 
 	std::vector<cx::ImagePtr> images(2);
@@ -413,8 +440,11 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,1) > 0.02);
 	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+	
+	CHECK_FALSE(fixture.messageListenerContainErrors());
 }
 
+//These two tests fails on Ubuntu 16.04, but seems to work on Ubuntu 20.04
 TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
 			"[integration][resource][visualization][not_linux]")
 {

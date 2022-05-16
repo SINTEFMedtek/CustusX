@@ -7,8 +7,8 @@
 #
 # Description:
 #
-#             
-#################################################             
+#
+#################################################
 
 from __future__ import print_function
 from future import standard_library
@@ -22,6 +22,8 @@ import os.path
 import urllib.request, urllib.parse, urllib.error
 import getpass
 import platform
+from zipfile import ZipFile
+from io import BytesIO
 
 from cx.utils.cxShell import *
 from cx.utils.cxPrintFormatter import PrintFormatter
@@ -115,7 +117,17 @@ class Component(object):
         return ""
     def useExternalRepositories(self):
         return self.controlData.gitrepo_main_site_base == self.controlData.gitrepo_open_site_base
-
+    def download(self):
+        return urllib.request.urlretrieve(self.url_link())
+    def unzip(self):
+        if os.path.isdir(self.thoraxCTdataPath()) == False:
+            os.mkdir(self.thoraxCTdataPath())
+        if not os.listdir(self.thoraxCTdataPath()):
+            zipFilePath = self.thoraxCTdataPath() + '/' + 'temp.zip'
+            urllib.request.urlretrieve(self.url_link(), zipFilePath)
+            with ZipFile(self.thoraxCTdataPath() + '/' + 'temp.zip', 'r') as zip_ref:
+                zip_ref.extractall(self.thoraxCTdataPath())
+            os.remove(zipFilePath)
 
 # ---------------------------------------------------------
 
@@ -174,18 +186,18 @@ class ITK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('v4.12.0')
+        # Using ITK v4.12.0 with a fix for gcc 9
+        # Newer ITK versions makes IGSTK compilation fail
+        self._getBuilder().gitCheckoutSha('87b43dfc5e83819fcbc036db18ac2db021e5bfc6')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+        #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
         builder.configureCMake()
     def repository(self):
-        if self.useExternalRepositories():
-            return 'git@github.com:InsightSoftwareConsortium/ITK.git'
-        else:
-            return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
+        return '%s/ITK' % self.controlData.gitrepo_open_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -199,7 +211,7 @@ class VTK(CppComponent):
         return '%s/VTK' % self.controlData.gitrepo_open_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('1c14943c3975fe826da1e7be1624c16c893d1c68')
+        self._getBuilder().gitCheckoutSha('f404b97624ddc745204e90ae87872f3c05cd5e4f')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -236,7 +248,9 @@ class CTK(CppComponent):
         base = self.controlData.gitrepo_open_site_base
         return '%s/CTK.git' % base
     def update(self):
-        self._getBuilder().gitCheckoutSha('56d165d8f0ad500a762a595526bf30c90dc04aaa')
+        #This fixes the bug:
+        #QSqlDatabasePrivate::database: requested database does not belong to the calling thread.
+        self._getBuilder().gitCheckoutSha('7c0477fc6eeda55b0fcec1127f001a38009332ef')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -297,7 +311,10 @@ class Eigen(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:eigenteam/eigen-git-mirror.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/eigenteam/eigen-git-mirror.git'
+        else:
+            return 'git@github.com:eigenteam/eigen-git-mirror.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #See CX-208 about updating Eigen versions
@@ -324,7 +341,7 @@ class OpenIGTLink(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git://github.com/openigtlink/OpenIGTLink.git'
+        return 'https://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
 #        self._getBuilder().gitCheckoutSha('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
@@ -349,11 +366,14 @@ class OpenIGTLinkIO(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/IGSIO/OpenIGTLinkIO.git'
+        else:
+            return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('f862d6bfa270332955e8050df8ce057febf48392')
+        self._getBuilder().gitCheckoutSha('854c850ed753941860168860fc19f1c807fc0595')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -438,7 +458,9 @@ class CustusX(CppComponent):
         add('CTK_SOURCE_DIR:PATH', self._createSibling(CTK).sourcePath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
-        add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
+        add('CX_PLUGIN_org.custusx.filter.airways:BOOL', False); # Airways plugin requires FAST library
+        #if(platform.system() == 'Linux'):
+        #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
         add('CX_BUILD_USER_DOCUMENTATION:BOOL', self.controlData.build_user_doc)
         add('BUILD_TESTING:BOOL', self.controlData.mBuildTesting);
@@ -477,7 +499,10 @@ class OpenCLUtilityLibrary(CppComponent):
 #    def path(self):
 #        return self.controlData.getWorkingPath() + "/OpenCLUtilityLibrary"
     def repository(self):
-        return 'git@github.com:smistad/OpenCLUtilityLibrary'
+        if self.controlData.git_use_https:
+            return 'https://github.com/smistad/OpenCLUtilityLibrary'
+        else:
+            return 'git@github.com:smistad/OpenCLUtilityLibrary'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutSha('44b7a002195fb2b6e8ea99ea4edf3102ef556cc3')
@@ -499,13 +524,16 @@ class FAST(CppComponent):
     def sourcePath(self):
         return self.controlData.getWorkingPath() + "/FAST/FAST/"
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/FAST.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/FAST.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/FAST.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         if(platform.system() == 'Darwin'): # Use old version of FAST library for macOS
           self._getBuilder().gitCheckoutSha('cdaf1a0a41f93f9d023cc2c795f8fa67d160d702')
         else:
-          self._getBuilder().gitCheckoutSha('faddbf2995b6eba030c0d00a5a684993bbe4ba0d')
+          self._getBuilder().gitCheckoutSha('2bddc452230de58507fadb7a98b4284845e68987')
 
 #        branch = 'set_kernel_root_dir'
 #        self._getBuilder()._changeDirToSource()
@@ -579,7 +607,10 @@ class QHttpServer(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/qhttpserver.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/qhttpserver.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/qhttpserver.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutSha('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
@@ -614,7 +645,10 @@ class org_custusx_angleCorrection(CppComponent):
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/AngleCorr.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/AngleCorr.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/AngleCorr.git'
     def makeClean(self):
         pass
     def pluginPath(self):
@@ -646,7 +680,10 @@ class org_custusx_mariana(CppComponent):
     def build(self):
         pass
     def repository(self):
-        return 'git@github.com:SINTEFMedtek/Mariana.git'
+        if self.controlData.git_use_https:
+            return 'https://github.com/SINTEFMedtek/Mariana.git'
+        else:
+            return 'git@github.com:SINTEFMedtek/Mariana.git'
     def makeClean(self):
         pass
     def pluginPath(self):

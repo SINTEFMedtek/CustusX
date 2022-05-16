@@ -51,6 +51,7 @@ public:
 	static QString getTypeName();
 
 	ImagePtr getChangingImage();
+	void deleteImageToStopEmittingFrames();
 	bool is3D();
 	bool is2D();
 	bool hasVideo() const;

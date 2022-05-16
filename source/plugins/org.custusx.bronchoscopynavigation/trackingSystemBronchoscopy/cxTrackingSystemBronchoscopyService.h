@@ -61,12 +61,13 @@ class org_custusx_bronchoscopynavigation_EXPORT TrackingSystemBronchoscopyServic
 Q_OBJECT
 
 public:
-	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline);
+	TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, ToolPtr tool = NULL);
 	virtual ~TrackingSystemBronchoscopyService();
 
 	bool setTrackingSystem(QString trackingSystemName);
 
 	virtual QString getUid() const { return "org.custusx.bronchoscopynavigation"; }
+	void setTool(ToolPtr tool);
 	virtual std::vector<ToolPtr> getTools();
 
 	virtual Tool::State getState() const;
@@ -85,7 +86,7 @@ private slots:
 private:
 
 	std::vector<ToolPtr> mTools; ///< all tools
-	BronchoscopyToolPtr mTool;
+	ToolPtr mTool;
 	TrackingSystemServicePtr mBase;
 	TrackingServicePtr mTrackingService;
 	BronchoscopePositionProjectionPtr mProjectionCenterline;

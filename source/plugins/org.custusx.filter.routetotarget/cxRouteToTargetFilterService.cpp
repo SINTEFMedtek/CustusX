@@ -42,7 +42,6 @@ namespace cx
 
 RouteToTargetFilter::RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile) :
     FilterImpl(services),
-    mTargetName(""),
     mGenerateFileWithRouteInformation(createRouteInformationFile),
     mSmoothing(true)
 {
@@ -221,22 +220,19 @@ bool RouteToTargetFilter::postProcess()
 
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
 	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
-	if (!mTargetName.isEmpty())
-	{
-		uidOutputCenterline.append("_" + mTargetName);
-		nameOutputCenterline.append("_" + mTargetName);
-	}
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 	outputCenterline->setVtkPolyData(mOutput);
-	patientService()->insertData(outputCenterline);
+    outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+    patientService()->insertData(outputCenterline, true);
 
 	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
 	QString nameCenterlineExt = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixExtension();
 	MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
 	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
 	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
-	patientService()->insertData(outputCenterlineExt);
+    outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+    patientService()->insertData(outputCenterlineExt, true);
 
 	//note: mOutput and outputCenterline is in reference(r) space
 
@@ -296,7 +292,7 @@ bool RouteToTargetFilter::postProcessBloodVessels()
 
 		MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
 		outputMesh->setVtkPolyData(mAirwaysFromBloodVessel);
-		outputMesh->setColor(QColor(192, 253, 246, 255));
+        outputMesh->setColor(QColor(192, 253, 246, 255));
 		patientService()->insertData(outputMesh);
 
 		//Meshes are expected to be in data(d) space
@@ -312,6 +308,7 @@ bool RouteToTargetFilter::postProcessBloodVessels()
 	MeshPtr outputMergedCenterline = patientService()->createSpecificData<Mesh>(uidMergedCenterline, nameMergedCenterline);
 	outputMergedCenterline->setVtkPolyData(mAirwayAndBloodVesselRoute);
 	outputMergedCenterline->setColor(QColor(0, 255, 0, 255));
+    outputMergedCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
 	patientService()->insertData(outputMergedCenterline);
 
 	outputMergedCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
@@ -328,9 +325,14 @@ void RouteToTargetFilter::setSmoothing(bool smoothing)
     mSmoothing = smoothing; // default true
 }
 
-void RouteToTargetFilter::setTargetName(QString name)
+std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions()
 {
-	mTargetName = name;
+	return mRouteToTarget->getRoutePositions();
+}
+
+std::vector< double > RouteToTargetFilter::getCameraRotation()
+{
+	return mRouteToTarget->getCameraRotation();
 }
 
 BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)

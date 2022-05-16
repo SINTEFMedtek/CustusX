@@ -30,6 +30,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientStorage.h"
 #include "cxVisServices.h"
 #include "cxLogger.h"
+#include "cxRouteToTarget.h"
 
 
 
@@ -39,7 +40,8 @@ namespace cx
 VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
 	mVerticalLayout(new QVBoxLayout(this)),
-	mControlsEnabled(false),
+    mControlsEnabled(false),
+    mAutomaticRotation(true),
 	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
 	this->setObjectName("virtual_bronchoscopy_widget");
@@ -87,13 +89,17 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mViewDial->setMinimum(-60);
 	mViewDial->setMaximum(60);
 	mResetEndoscopeButton = new QPushButton("Reset");
-
+    mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
+    mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
+    mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+    mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
 	endoscopeControlLayout->addWidget(mViewDial,1,2);
 	endoscopeControlLayout->addWidget(mResetEndoscopeButton,2,0);
+    endoscopeControlLayout->addWidget(mUseAutomaticRotationButton,3,0);
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
@@ -111,6 +117,8 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	connect(mViewDial, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 	connect(mResetEndoscopeButton, &QPushButton::clicked, this, &VBWidget::resetEndoscopeSlot);
+    connect(mUseAutomaticRotationButton, &QPushButton::clicked, this, &VBWidget::automaticRotationSlot);
+    connect(mCameraPath, &CXVBcameraPath::rotationChanged, this, &VBWidget::updateRotationDialSlot);
 
 	mVerticalLayout->addStretch();
 }
@@ -130,6 +138,16 @@ void VBWidget::setRouteToTarget(QString uid)
 	mPlaybackSlider->setValue(1);
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot, Qt::UniqueConnection);
 	mPlaybackSlider->setValue(5);
+}
+
+void VBWidget::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
+{
+     mCameraPath->setRoutePositions(routePositions);
+}
+
+void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations)
+{
+    mCameraPath->setCameraRotations(cameraRotations);
 }
 
 void  VBWidget::enableControls(bool enable)
@@ -218,6 +236,27 @@ void VBWidget::resetEndoscopeSlot()
 {
 	mRotateDial->setValue(0);
 	mViewDial->setValue(0);
+}
+
+void VBWidget::automaticRotationSlot()
+{
+    mAutomaticRotation = !mAutomaticRotation;
+    mCameraPath->setAutomaticRotation(mAutomaticRotation);
+    if(mAutomaticRotation)
+    {
+        mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+        mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+    }
+    else
+    {
+        mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::gray);
+        mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+    }
+}
+
+void VBWidget::updateRotationDialSlot(int value)
+{
+    mRotateDial->setValue(value);
 }
 
 QString VBWidget::defaultWhatsThis() const

@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxActiveData.h"
 #include "cxSettings.h"
 #include "cxDisplayTextRep.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -119,6 +120,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 	connect(mGroupData.get(), &ViewGroupData::dataViewPropertiesChanged, this, &ViewWrapper::dataViewPropertiesChangedSlot);
 	connect(mGroupData.get(), &ViewGroupData::videoSourceChanged, this, &ViewWrapper::videoSourceChangedSlot);
+	connect(mGroupData.get(), &ViewGroupData::controllingToolChanged, this, &ViewWrapper::activeToolChangedSlot);
 
 	std::vector<DataPtr> data = mGroupData->getData();
 	for (unsigned i = 0; i < data.size(); ++i)
@@ -144,6 +146,7 @@ void ViewWrapper::settingsChangedSlot(QString key)
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
 	QMenu contextMenu;
+	contextMenu.setToolTipsVisible(true);
 	mDataViewPropertiesInteractor->addDataActionsOfType<Data>(&contextMenu);
 	//append specific info from derived classes
 	this->appendToContextMenu(contextMenu);
@@ -223,6 +226,19 @@ void ViewWrapper::addReps()
 void ViewWrapper::setSharedOpenGLContext(cx::SharedOpenGLContextPtr sharedOpenGLContext)
 {
 	mSharedOpenGLContext = sharedOpenGLContext;
+}
+
+ToolPtr ViewWrapper::getControllingTool()
+{
+	ToolPtr activeTool = mServices->tracking()->getActiveTool();
+	ToolPtr controllingTool;
+	if (mGroupData)
+		controllingTool = mGroupData->getControllingTool();
+	
+	if(!controllingTool)
+		controllingTool = activeTool;
+	
+	return controllingTool;
 }
 
 } //namespace cx

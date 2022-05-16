@@ -46,12 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace cx
 {
 
-TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline):
+TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, ToolPtr tool):
 	mBase(trackingService->getTrackingSystems().back()),
 	mTrackingService(trackingService),
-	mProjectionCenterline(projectionCenterline)
+	mProjectionCenterline(projectionCenterline),
+	mTool(tool)
 {
 	connect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
+	if (!mTool)
+		mTool = mTrackingService->getActiveTool(); // Use active tool if tool is not set
 	this->onStateChanged();
 }
 
@@ -71,21 +74,24 @@ bool TrackingSystemBronchoscopyService::setTrackingSystem(QString trackingSystem
 	return false;
 }
 
+void TrackingSystemBronchoscopyService::setTool(ToolPtr tool)
+{
+	mTool = tool;
+}
+
 void TrackingSystemBronchoscopyService::onStateChanged()
 {
-	ToolPtr activeTool = mTrackingService->getActiveTool();
 	std::vector<ToolPtr> tools	 = mBase->getTools();
 	mTools.clear();
 	for (unsigned i=0; i<tools.size(); ++i)
 	{
-		if (tools[i] == activeTool)
+		if (tools[i] == mTool)
 		{
 			BronchoscopyToolPtr current(new BronchoscopyTool(tools[i], mProjectionCenterline));
 			mTools.push_back(current);
 		}
 		else
 			mTools.push_back(tools[i]);
-
 	}
 	emit stateChanged();
 }

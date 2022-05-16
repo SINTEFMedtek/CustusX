@@ -111,6 +111,12 @@ void StateServiceProxy::resetDesktop()
 	mService->resetDesktop();
 }
 
+
+WorkflowStateMachinePtr StateServiceProxy::getWorkflow()
+{
+	return mService->getWorkflow();
+}
+
 bool StateServiceProxy::isNull()
 {
 	return false;

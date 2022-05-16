@@ -199,7 +199,7 @@ void Mesh::setUseColorFromPolydataScalars(bool on)
 
 bool Mesh::getUseColorFromPolydataScalars() const
 {
-	return mProperties.mUseColorFromPolydataScalars->getValue();
+    return mProperties.mUseColorFromPolydataScalars->getValue();
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)

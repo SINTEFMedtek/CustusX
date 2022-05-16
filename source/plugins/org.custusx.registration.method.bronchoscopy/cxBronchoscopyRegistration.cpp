@@ -508,7 +508,6 @@ vtkPolyDataPtr BronchoscopyRegistration::processCenterline(vtkPolyDataPtr center
 	}
 
 	mBranchListPtr->smoothBranchPositions(10);
-	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 
 	double minPointDistance = 0.5; //mm
@@ -553,7 +552,6 @@ BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyData
 	}
 
 	branchListPtr->smoothBranchPositions(10);
-	branchListPtr->calculateOrientations();
 	branchListPtr->smoothOrientations();
 
 	return branchListPtr;

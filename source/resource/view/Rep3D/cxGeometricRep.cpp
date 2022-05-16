@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxMesh.h"
 #include "cxView.h"
+#include "cxLogger.h"
 
 #include "cxTypeConversions.h"
 #include "cxVtkHelperClasses.h"
@@ -119,14 +120,19 @@ void GraphicalGeometric::meshChangedSlot()
 	mMesh->updateVtkPolyDataWithTexture();
 	mGraphicalPolyDataPtr->setData(mMesh->getVtkPolyData());
 	mGraphicalPolyDataPtr->setTexture(mMesh->getVtkTexture());
-
+	
 	mGraphicalPolyDataPtr->setOpacity(1.0);
-	mGraphicalPolyDataPtr->setScalarVisibility(mMesh->getUseColorFromPolydataScalars());
-	if(!mMesh->getUseColorFromPolydataScalars())
+	if(mMesh->getUseColorFromPolydataScalars())
 	{
-	    mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-	    mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
+		mGraphicalPolyDataPtr->setScalarVisibility(true);
+		mGraphicalPolyDataPtr->setScalarModeToUseCellData();
 	}
+	else
+	{
+		mGraphicalPolyDataPtr->setScalarVisibility(false);
+		mGraphicalPolyDataPtr->setColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
+	}
+	mGraphicalPolyDataPtr->setOpacity(mMesh->getColor().alphaF());
 
 	//Set other properties
 	vtkPropertyPtr dest = mGraphicalPolyDataPtr->getProperty();
@@ -142,6 +148,7 @@ void GraphicalGeometric::meshChangedSlot()
 	dest->SetDiffuse(src.mDiffuse->getValue());
 	dest->SetSpecular(src.mSpecular->getValue());
 	dest->SetSpecularPower(src.mSpecularPower->getValue());
+    dest->SetLineWidth(src.mLineWidth->getValue());
 }
 
 /**called when transform is changed
@@ -156,7 +163,7 @@ void GraphicalGeometric::transformChangedSlot()
 	Transform3D rrMd = mMesh->get_rMd();
 	Transform3D rMd = m_rMrr * rrMd;
 
-	mGraphicalPolyDataPtr->setUserMatrix(rMd.getVtkMatrix());
+    mGraphicalPolyDataPtr->setUserMatrix(rMd.getVtkMatrix());
 	mGraphicalGlyph3DDataPtr->setUserMatrix(rMd.getVtkMatrix());
 }
 

@@ -45,12 +45,12 @@ public:
 	CheckBoxWidget(QWidget* parent, BoolPropertyBasePtr data, QGridLayout* gridLayout = 0, int row = 0);
 
 private slots:
-    void prePaintEvent();
+	void prePaintEvent();
 	void valueChanged(bool val);
 
 private:
-    QLabel* mLabel;
-    QCheckBox* mCheckBox;
+	QLabel* mLabel;
+	QCheckBox* mCheckBox;
 	BoolPropertyBasePtr mData;
 };
 

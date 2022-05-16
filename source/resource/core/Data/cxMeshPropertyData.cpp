@@ -42,6 +42,12 @@ void MeshPropertyData::initialize()
 										  2, DoubleRange(1, 20, 1), 0);
 	mVisSize->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 	this->addProperty(mVisSize);
+    //-------------------------------------------------------------------------
+    mLineWidth = DoubleProperty::initialize("lineWidth", "Line width",
+                                          "Width of line.",
+                                          1, DoubleRange(1, 10, 1), 0);
+    mLineWidth->setGuiRepresentation(DoublePropertyBase::grSLIDER);
+    this->addProperty(mLineWidth);
 	//-------------------------------------------------------------------------
 	mBackfaceCulling = BoolProperty::initialize("backfaceCulling", "Backface culling",
 									   "Set backface culling on. This makes transparent meshes work, "

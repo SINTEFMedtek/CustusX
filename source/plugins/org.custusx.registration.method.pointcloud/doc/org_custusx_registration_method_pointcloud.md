@@ -22,7 +22,7 @@ Steps:
   \ref org_custusx_registration_method_icp_algorithm, and the patient registration
   is updated.
 
-### How to get a surface from your image
+## How to get a surface from your image
 
 A nice skin segmentation algorithm can be found in Slicer3D. 
 Use the following procedure to use it:

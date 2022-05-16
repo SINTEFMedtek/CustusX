@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -26,7 +26,7 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 {
 	mTimestamp = 0;
 	mVisible = false;
-//	read3DCrossHairSlot(0);
+	//	read3DCrossHairSlot(0);
 	connect(this, SIGNAL(tooltipOffset(double)), this, SLOT(read3DCrossHairSlot(double)));
 }
 
@@ -103,7 +103,7 @@ QString ManualTool::getName() const
 void ManualTool::setVisible(bool vis)
 {
 	if (mVisible==vis)
-	  return;
+		return;
 	mVisible = vis;
 	emit toolVisible(mVisible);
 }

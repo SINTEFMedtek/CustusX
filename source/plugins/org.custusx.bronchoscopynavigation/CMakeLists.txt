@@ -35,6 +35,7 @@ set(PLUGIN_SRCS
   cxBronchoscopyNavigationWidget.cpp
   cxBronchoscopePositionProjection.h
   cxBronchoscopePositionProjection.cpp
+  cxVirtualCameraRotationWidget.cpp
 
     trackingSystemBronchoscopy/cxBronchoscopyTool.h
     trackingSystemBronchoscopy/cxBronchoscopyTool.cpp
@@ -45,6 +46,7 @@ set(PLUGIN_SRCS
 set(PLUGIN_MOC_SRCS
   cxBronchoscopyNavigationPluginActivator.h
   cxBronchoscopyNavigationWidget.h
+  cxVirtualCameraRotationWidget.h
   trackingSystemBronchoscopy/cxBronchoscopyTool.h
   trackingSystemBronchoscopy/cxTrackingSystemBronchoscopyService.h
 )

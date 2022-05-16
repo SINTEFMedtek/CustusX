@@ -21,6 +21,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+
+bool validSpacing(Vector3D spacing)
+{
+	//Assuming (1, 1, 1) is an invalid spacing
+	if((similar(spacing[0], 1.0) && similar(spacing[0], 1.0) && similar(spacing[0], 1.0)) ||
+			similar(spacing[0], 0.0) || similar(spacing[1], 0.0) || similar(spacing[2], 0.0) )
+		return false;
+	return true;
+}
+
 /**
  * Internal container for holding incoming variable values.
  *
@@ -39,6 +49,7 @@ struct SectorInfo
 	//Spacing are sent as separate messages, should be sent with image in the future.
 	double mSpacingX;
 	double mSpacingY;
+	double mSpacingZ;
 
 	//new standard
 	std::vector<double> mOrigin;
@@ -67,11 +78,15 @@ struct SectorInfo
 
 		mSpacingX = tooLarge;
 		mSpacingY = tooLarge;
+		mSpacingZ = 1.0; //Spacing z may not be received
 
 		mImage = ImagePtr();
 	}
 	bool isValid()
 	{
+		if(!mImage)
+			return false;
+
 		bool retval = true;
 		retval = retval && mImage;
 		retval = retval && ((mProbeType == ProbeDefinition::tSECTOR) || (mProbeType == ProbeDefinition::tLINEAR));
@@ -82,11 +97,15 @@ struct SectorInfo
 		if(mProbeType == ProbeDefinition::tLINEAR)
 			retval = retval && (mLinearWidth < tooLarge);//Only for linear probes
 
-		//Send spacing for now. Try to send it as image spacing
-		retval = retval && (mSpacingX < tooLarge);
-		retval = retval && (mSpacingY < tooLarge);
-		retval = retval && !similar(mSpacingX, 0);
-		retval = retval && !similar(mSpacingY, 0);
+		Vector3D spacing = mImage->getSpacing();
+		if(!validSpacing(spacing))
+		{
+			retval = retval && (mSpacingX < tooLarge);
+			retval = retval && (mSpacingY < tooLarge);
+			retval = retval && !similar(mSpacingX, 0);
+			retval = retval && !similar(mSpacingY, 0);
+			retval = retval && !similar(mSpacingZ, 0);
+		}
 
 		return retval;
 	}
@@ -143,9 +162,13 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	double doubleValue = value.toDouble();
 	std::vector<double> doubleVector = toDoubleVector(value);
 
-//	CX_LOG_DEBUG() << "parseStringMessage: "	<< " name: " << name
-//				   << " intValue: " << intValue
-//				   << " doubleValue: " << doubleValue;
+	//if(!doubleVector.empty())
+	//{
+	//	std::cout << "parseStringMessage name: " << name << " Vector: ";
+	//	for (int i = 0; i < doubleVector.size(); ++i)
+	//		std::cout << doubleVector[i] << " ";
+	//	std::cout << endl;
+	//}
 
 	if (name == IGTLIO_KEY_PROBE_TYPE)
 	{
@@ -197,11 +220,28 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 	}
 	else if (name == IGTLIO_KEY_SPACING_X)
 	{
-		mSectorInfo->mSpacingX = doubleValue;
+		if(mSectorInfo->mSpacingX != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mSpacingX = doubleValue;
+		}
+
 	}
 	else if (name == IGTLIO_KEY_SPACING_Y)
 	{
-		mSectorInfo->mSpacingY = doubleValue;
+		if(mSectorInfo->mSpacingY != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mSpacingY = doubleValue;
+		}
+	}
+	else if (name == "SpacingZ") //IGTLIO_KEY_SPACING_Z
+	{
+		if(mSectorInfo->mSpacingZ != doubleValue)
+		{
+			mSectorInfo->mHaveChanged  = true;
+			mSectorInfo->mSpacingZ = doubleValue;
+		}
 	}
 }
 
@@ -227,9 +267,25 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 	if(!this->haveValidValues())
 		return ProbeDefinitionPtr();
 
-	//Send spacing as messages for now. Should be sent together with image.
-	mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, 1.0);
 	Vector3D spacing = mSectorInfo->mImage->getSpacing();
+	//CX_LOG_DEBUG() << "Spacing from image: " << spacing;
+	//Send spacing as messages for now. Should be sent together with image.
+	//The default should be to use the spacing from the image,
+	//not from meta info or string messages
+	// BK don't change image spacing in image when depth is changed
+	//if(validSpacing(spacing))
+	//{
+	//    CX_LOG_DEBUG() << "Using spacing from image: " << spacing
+	//                   << " instead of spacing from meta data: " << mSectorInfo->mSpacingX << " " << mSectorInfo->mSpacingY << " " << mSectorInfo->mSpacingZ;
+	//}
+	//else
+	{
+		//Use spacing from meta data if not correct spacing in image.
+		//NB: Current implementation of igtlioImageConverter::IGTLToVTKImageData discards incoming spacing.
+		//It is being set to (1, 1, 1)
+		mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, mSectorInfo->mSpacingZ);
+		spacing = mSectorInfo->mImage->getSpacing();
+	}
 	Vector3D origin_p(mSectorInfo->mOrigin[0], mSectorInfo->mOrigin[1], mSectorInfo->mOrigin[2]);
 
 	ProbeDefinitionPtr probeDefinition = this->initProbeDefinition();

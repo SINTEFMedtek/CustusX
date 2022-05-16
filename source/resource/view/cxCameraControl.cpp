@@ -83,6 +83,8 @@ void CameraData::parseXml(QDomNode dataNode)
 		return;
 	if (fabs(parallelScale) > LARGE_NUMBER)
 		return;
+	if(similar(position, focalPoint))
+		return;
 
 	this->getCamera();
 
@@ -100,7 +102,7 @@ void CameraData::parseXml(QDomNode dataNode)
 
 
 CameraControl::CameraControl(QObject* parent) :
-    QObject(parent),
+	QObject(parent),
 	mSuperiorViewAction(NULL),
 	mAnteriorViewAction(NULL)
 {
@@ -108,6 +110,35 @@ CameraControl::CameraControl(QObject* parent) :
 
 CameraControl::~CameraControl()
 {
+}
+
+Vector3D CameraControl::AnteriorDirection()
+{
+	return Vector3D(0, 1, 0);
+}
+Vector3D CameraControl::PosteriorDirection()
+{
+	return Vector3D(0, -1, 0);
+}
+Vector3D CameraControl::SuperiorDirection()
+{
+	return Vector3D(0, 0, -1);
+}
+Vector3D CameraControl::InferiorDirection()
+{
+	return Vector3D(0, 0, 1);
+}
+Vector3D CameraControl::LeftDirection()
+{
+	return Vector3D(-1, 0, 0);
+}
+Vector3D CameraControl::RightDirection()
+{
+	return Vector3D(1, 0, 0);
+}
+Vector3D CameraControl::OrthogonalDirection()
+{
+	return Vector3D(-1, 1, -1).normal();
 }
 
 /*Move the camera focus to p_r. Keep the view direction and distance constant
@@ -131,7 +162,7 @@ void CameraControl::translateByFocusTo(Vector3D p_r)
 
 void CameraControl::setSuperiorView() const
 {
-    if(mSuperiorViewAction)
+	if(mSuperiorViewAction)
 		mSuperiorViewAction->trigger();
 }
 
@@ -144,13 +175,13 @@ void CameraControl::setAnteriorView() const
 QActionGroup* CameraControl::createStandard3DViewActions()
 {
 	QActionGroup* group = new QActionGroup(this);
-	mAnteriorViewAction = this->addStandard3DViewAction("A", "Anterior View", Vector3D(0, 1, 0), group);
-	this->addStandard3DViewAction("P", "Posterior View", Vector3D(0, -1, 0), group);
-	mSuperiorViewAction = this->addStandard3DViewAction("S", "Superior View", Vector3D(0, 0, -1), group);
-	this->addStandard3DViewAction("I", "Inferior View", Vector3D(0, 0, 1), group);
-	this->addStandard3DViewAction("L", "Left View", Vector3D(-1, 0, 0), group);
-	this->addStandard3DViewAction("R", "Right View", Vector3D(1, 0, 0), group);
-	this->addStandard3DViewAction("O", "Orthogonal View", Vector3D(-1, 1, -1).normal(), group);
+	mAnteriorViewAction = this->addStandard3DViewAction("A", "Anterior View", AnteriorDirection(), group);
+	this->addStandard3DViewAction("P", "Posterior View", PosteriorDirection(), group);
+	mSuperiorViewAction = this->addStandard3DViewAction("S", "Superior View", SuperiorDirection(), group);
+	this->addStandard3DViewAction("I", "Inferior View", InferiorDirection(), group);
+	this->addStandard3DViewAction("L", "Left View", LeftDirection(), group);
+	this->addStandard3DViewAction("R", "Right View", RightDirection(), group);
+	this->addStandard3DViewAction("O", "Orthogonal View", OrthogonalDirection(), group);
 	return group;
 }
 
@@ -209,7 +240,11 @@ void CameraControl::setStandard3DViewActionSlot()
 	if (!action)
 		return;
 	Vector3D viewDirection = Vector3D::fromString(action->data().toString());
+	this->setStandard3DView(viewDirection);
+}
 
+void CameraControl::setStandard3DView(Vector3D viewDirection)
+{
 	vtkRendererPtr renderer = this->getRenderer();
 	if (!renderer)
 		return;
@@ -220,18 +255,11 @@ void CameraControl::setStandard3DViewActionSlot()
 	Vector3D focus(camera->GetFocalPoint());
 	Vector3D pos = focus - 500 * viewDirection;
 	Vector3D vup(0, 0, 1);
-	//Vector3D dir = (focus-direction).normal();
 
 	Vector3D left = cross(vup, viewDirection);
-//	CX_LOG_CHANNEL_DEBUG("CA") << "    cross(vup, viewDirection) " << cross(vup, viewDirection);
 	if (similar(left.length(), 0.0))
-		left = Vector3D(1, 0, 0);
+		left = RightDirection();
 	vup = cross(viewDirection, left).normal();
-
-//	CX_LOG_CHANNEL_DEBUG("CA") << "CameraControl::setStandard3DViewActionSlot()";
-//	CX_LOG_CHANNEL_DEBUG("CA") << "    viewDirection " << viewDirection;
-//	CX_LOG_CHANNEL_DEBUG("CA") << "    left " << left;
-//	CX_LOG_CHANNEL_DEBUG("CA") << "    vup " << vup;
 
 	camera->SetPosition(pos.begin());
 	camera->SetViewUp(vup.begin());

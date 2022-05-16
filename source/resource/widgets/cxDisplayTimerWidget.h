@@ -39,6 +39,7 @@ public:
 	void setFontSize(int fontSize);
 	void start();
 	void stop();
+    void failed();
 	int elaspedSeconds() const;
 
 private slots:

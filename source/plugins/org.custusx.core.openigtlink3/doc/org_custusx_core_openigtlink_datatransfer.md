@@ -64,7 +64,7 @@ These are in PlusServer created as a combination of **Image Name** and **Embedde
 
 Known issues
 -----------------------------------------------------------
-#### Running PlusServer from CustusX
+### Running PlusServer from CustusX
 - The start/stop tracking button is not correctly synchronized when using the PlusServer.
 - The CustusX user interface may be unresponsive when PlusServer is starting and stopping.
 - The console may print a lot of messages while the PlusServer is starting (<i>"Failed to connect to server..."</i>).

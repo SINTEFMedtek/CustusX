@@ -53,6 +53,7 @@ namespace cx
 
 typedef boost::shared_ptr<class TrackingSystemBronchoscopyService> TrackingSystemBronchoscopyServicePtr;
 typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * Widget for use in the BronchoscopyNavigation
@@ -62,7 +63,7 @@ typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePosi
  * \date 2014-10-30
  * \author Erlend Hofstad
  */
-class BronchoscopyNavigationWidget : public QWidget
+class BronchoscopyNavigationWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
@@ -73,21 +74,22 @@ private slots:
 	void processCenterlineSlot();
 	void enableSlot();
 	void disableSlot();
-    void showAdvancedOptionsSlot();
+	void showAdvancedOptionsSlot();
 
 private:
 	QString defaultWhatsThis() const;
 	QVBoxLayout*  mVerticalLayout;
 
-    BoolPropertyPtr mUseAdvancedCenterlineProjection;
+BoolPropertyPtr mUseAdvancedCenterlineProjection;
 
-    StringPropertySelectMeshPtr mSelectMeshWidget;
+	StringPropertySelectToolPtr mToolSelector;
+	StringPropertySelectMeshPtr mSelectMeshWidget;
 	QPushButton* mProcessCenterlineButton;
-    QWidget* mMaxSearchDistanceWidget;
-    QWidget* mAlphaWidget;
+	QWidget* mMaxSearchDistanceWidget;
+	QWidget* mAlphaWidget;
 	QPushButton* mEnableButton;
 	QPushButton* mDisableButton;
-    QCheckBox* mAdvancedOption;
+	QCheckBox* mAdvancedOption;
 	ToolPtr mTool;
 	TrackingSystemBronchoscopyServicePtr mTrackingSystem;
 	BronchoscopePositionProjectionPtr mProjectionCenterlinePtr;

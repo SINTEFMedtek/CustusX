@@ -65,7 +65,7 @@ cxResourceVisualization_EXPORT bool operator==(const CameraStyleData& lhs, const
 /**Define a priority for the input data.
  * High means display on top, low means in the back.
  */
-cxResourceVisualization_EXPORT  int getPriority(DataPtr data);
+cxResourceVisualization_EXPORT int getPriority(DataPtr data);
 
 /**Sorts DataPtr in default display ordering, using getPriority().
  */
@@ -132,11 +132,14 @@ public:
 	SyncedValuePtr getGlobal2DZoom();
 
 	CameraDataPtr getCamera3D() { return mCamera3D; }
-    void zoomCamera3D(int zoomFactor);
+	void zoomCamera3D(int zoomFactor);
 
 	PlaneTypeCollection getSliceDefinitions();
 	void setSliceDefinitions(PlaneTypeCollection val);
 	StringListPropertyPtr getSliceDefinitionProperty();
+	
+	ToolPtr getControllingTool();
+	void setControllingTool(ToolPtr tool);
 
 	// view options for this group.
 	struct Options
@@ -163,6 +166,7 @@ signals:
 	void videoSourceChanged(QString uid);
 	void initialized();
 	void optionsChanged();
+	void controllingToolChanged();
 
 private:
 	typedef std::pair<QString, DataViewProperties> DataAndViewPropertiesPair;
@@ -194,6 +198,7 @@ private:
 	StringListPropertyPtr mSliceDefinitionProperty;
 	DataPtr getData(QString uid) const;
 	//SharedOpenGLContextPtr mSharedOpenGLContext;
+	ToolPtr mControllingTool; ///< Tool controlling 2D/3D views for this view group. Using this overrides the active tool.
 
 };
 

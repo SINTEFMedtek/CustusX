@@ -86,7 +86,6 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
     mBranchListPtr->interpolateBranchPositions(0.1);
     this->smoothAllBranchesForVB();
 
-	mBranchListPtr->calculateOrientations();
 	mBranchListPtr->smoothOrientations();
 }
 

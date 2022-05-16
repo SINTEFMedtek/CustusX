@@ -13,6 +13,7 @@
     <geo_file>Biopsy_Needle_Model.stl</geo_file>
     <pic_file>AnserNeedle.png</pic_file>
     <doc_file></doc_file>
+    <openigtlinktransformid>AnserNeedle1</openigtlinktransformid>
     
     <!-- Instrument -->
     <instrument>

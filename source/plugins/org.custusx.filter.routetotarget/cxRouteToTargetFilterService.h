@@ -51,11 +51,13 @@ public:
 	static QString getNameSuffixAirwayModel();
 	static QString getNameSuffixAirwayAndVesselRTT();
 
+	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< double > getCameraRotation();
+
 	virtual bool execute();
 	virtual bool postProcess();
 	virtual bool postProcessBloodVessels();
     void setSmoothing(bool smoothing = true);
-	virtual void setTargetName(QString name);
 
 protected:
 	virtual void createOptions();
@@ -72,7 +74,6 @@ private:
     vtkPolyDataPtr mAirwaysFromBloodVessel;
     vtkPolyDataPtr mAirwayAndBloodVesselRoute;
     BranchListPtr mBranchListPtr;
-	QString mTargetName;
     bool mGenerateFileWithRouteInformation;
     bool mSmoothing;
     BoolPropertyPtr getBloodVesselOption(QDomElement root);

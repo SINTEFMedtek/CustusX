@@ -27,7 +27,13 @@ if(BUILD_TESTING)
         .
         ${CMAKE_CURRENT_BINARY_DIR}
     )
-    target_link_libraries(${TEST_LIB_NAME} PRIVATE ${PROJECT_NAME} cxtestUtilities cxCatch)
+    target_link_libraries(
+      ${TEST_LIB_NAME}
+      PRIVATE
+      ${PROJECT_NAME}
+      cxtestUtilities
+      cxtestResourceVisualization
+      cxCatch)
     cx_add_tests_to_catch(${TEST_LIB_NAME})
 
 endif(BUILD_TESTING)

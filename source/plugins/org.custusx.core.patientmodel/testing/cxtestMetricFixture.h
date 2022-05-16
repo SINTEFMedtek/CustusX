@@ -97,6 +97,8 @@ class CXTEST_ORG_CUSTUSX_CORE_PATIENTMODEL_EXPORT MetricFixture {
 public:
 	MetricFixture();
     ~MetricFixture();
+	
+	bool messageListenerContainErrors();
 
 	FrameMetricWithInput getFrameMetricWithInput();
 	ToolMetricWithInput getToolMetricWithInput();

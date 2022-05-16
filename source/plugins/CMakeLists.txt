@@ -39,19 +39,20 @@ set(CX_PLUGINS
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
   org.custusx.bronchoscopynavigation:ON
+  org.custusx.filter.airways:OFF
 )
 
-if(CX_APPLE)
-  set(CX_PLUGINS
-    ${CX_PLUGINS}
-    org.custusx.filter.airways:OFF
-  )
-else()
-  set(CX_PLUGINS
-    ${CX_PLUGINS}
-    org.custusx.filter.airways:ON
-  )
-endif(CX_APPLE)
+#if(CX_LINUX)
+#  set(CX_PLUGINS
+#    ${CX_PLUGINS}
+#    org.custusx.filter.airways:ON
+#  )
+#else()
+#  set(CX_PLUGINS
+#    ${CX_PLUGINS}
+#    org.custusx.filter.airways:OFF
+#  )
+#endif(CX_LINUX)
 
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,

@@ -116,6 +116,7 @@ public:
 	virtual Desktop getActiveDesktop() = 0;
 	virtual void saveDesktop(Desktop desktop) = 0;
 	virtual void resetDesktop() = 0;
+	virtual WorkflowStateMachinePtr getWorkflow() = 0;
 
 	virtual bool isNull() = 0;
 	static StateServicePtr getNullObject();

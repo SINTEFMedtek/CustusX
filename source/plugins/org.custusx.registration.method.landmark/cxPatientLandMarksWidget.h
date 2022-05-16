@@ -44,6 +44,7 @@ protected slots:
 	virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
 	void removeLandmarkButtonClickedSlot();
 	void updateToolSampleButton();
+	virtual void pointSampled(Vector3D p_r);
 
 protected:
 	virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

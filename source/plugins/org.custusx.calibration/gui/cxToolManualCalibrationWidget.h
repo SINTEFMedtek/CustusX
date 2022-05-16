@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxBaseWidget.h"
 #include "cxTransform3DWidget.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -42,6 +43,7 @@ private slots:
   void matrixWidgetChanged();
 
 private:
+	ToolPtr getTool();
   QGroupBox* mGroup;
   Transform3DWidget* mMatrixWidget;
   StringPropertySelectToolPtr mTool;

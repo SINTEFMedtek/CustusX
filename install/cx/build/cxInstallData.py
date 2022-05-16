@@ -76,6 +76,7 @@ class Common(object):
         self.build_user_doc = False
         self.mGraphviz = False
         self.git_tag = None # if none, use main_branch
+        self.git_use_https = True
 
         self.publish_release_target                 = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
         self.publish_developer_documentation_target = cx.utils.cxSSH.RemoteServerID("example.com", "/path/to/folder")
@@ -94,7 +95,10 @@ class Common(object):
         self.publish_coverage_info_target           = cx.utils.cxSSH.RemoteServerID(server, "%s/gcov"%root_folder, user) 
 
         #self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
-        self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"  
+        if self.git_use_https:
+            self.gitrepo_open_site_base = "https://github.com/SINTEFMedtek"
+        else:
+            self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"
         self.gitrepo_main_site_base = self.gitrepo_open_site_base 
 
         self.main_repo_folder = self.getCustusXRepositoryPath()

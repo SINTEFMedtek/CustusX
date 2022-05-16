@@ -61,9 +61,10 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	mVerticalLayout->setMargin(0);
 
 	mToolSelectorWidget = sscCreateDataWidget(this, mToolSelector);
+    mMergeWithExistingSessionWidget = sscCreateDataWidget(this, mMergeWithExistingSession);
 	mVerticalLayout->addWidget(mToolSelectorWidget);
-	mVerticalLayout->addWidget(mRecordSessionWidget);
-	mVerticalLayout->addWidget(sscCreateDataWidget(this, mMergeWithExistingSession));
+    mVerticalLayout->addWidget(mRecordSessionWidget);
+    mVerticalLayout->addWidget(mMergeWithExistingSessionWidget);
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
@@ -178,6 +179,12 @@ ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 {
 	return mSelectRecordSession->getRecordedTrackerData_prMt();
+}
+
+void RecordTrackingWidget::hideMergeWithExistingSession()
+{
+    if(!mMergeWithExistingSessionWidget->isHidden())
+        mMergeWithExistingSessionWidget->hide();
 }
 
 } //namespace cx

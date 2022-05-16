@@ -28,7 +28,7 @@ public:
 	{
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
 		// set fixed hash seed
-		qSetGlobalQHashSeed(42);
+		qSetGlobalQHashSeed(0);
 #endif
 		mDoc = QDomDocument();
 	}
