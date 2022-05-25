@@ -82,7 +82,7 @@ MainWindow::MainWindow() :
 
 	connect(mServices->state().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
 	connect(mServices->state().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
-	connect(mServices->state().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
+	//connect(mServices->state().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
 
 	this->updateWindowTitle();
 
@@ -295,7 +295,7 @@ void MainWindow::createActions()
 	mInteractorStyleActionGroup = mServices->view()->getInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
-	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot, Qt::DirectConnection);
+	//connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot, Qt::DirectConnection);
 }
 
 
@@ -357,6 +357,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 
 void MainWindow::saveDesktopSlot()
 {
+	CX_LOG_DEBUG() << "saveDesktopSlot";
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
 	desktop.mLayoutUid = mServices->view()->getActiveLayout(0);
