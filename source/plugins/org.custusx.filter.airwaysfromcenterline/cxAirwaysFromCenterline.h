@@ -57,7 +57,7 @@ private:
     double mAirwaysVolumeBoundaryExtentionTracheaStart;
     double mAirwaysVolumeSpacing;
     bool mBloodVessel = false;
-    bool mMergeWithOriginalAirways = false;
+		bool mMergeWithOriginalAirways = false;
 
 };
 

@@ -206,7 +206,7 @@ Transform3D BronchoscopePositionProjection::findClosestPointInBranches(Transform
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
 		{
-            double D = findDistance(positions.col(j), toolPos);
+			double D = findDistance(positions.col(j), toolPos);
 			if (D < minDistance)
 			{
 				minDistance = D;

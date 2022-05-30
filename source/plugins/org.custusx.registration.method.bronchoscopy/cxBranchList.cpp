@@ -471,6 +471,55 @@ void BranchList::excludeClosePositionsInCTCenterline(double minPointDistance){
 
 }
 
+void BranchList::markLungLap(QString name, Vector3D position)
+{
+	BranchPtr branch = findClosestBranch(position);
+	this->setLapName(branch, name);
+}
+
+//Recurcive function. Setting lap name to banch and all sub-branches
+void BranchList::setLapName(BranchPtr branch, QString name)
+{
+	CX_LOG_DEBUG() << "setting lap name: " << name;
+	branch->setLap(name);
+	branchVector bv = branch->getChildBranches();
+	CX_LOG_DEBUG() << "number of children: " << bv.size();
+	for(int i=0; i<bv.size(); i++)
+		setLapName(bv[i], name);
+}
+
+double BranchList::findDistance(Vector3D p1, Vector3D p2)
+{
+	double d0 = p1(0) - p2(0);
+	double d1 = p1(1) - p2(1);
+	double d2 = p1(2) - p2(2);
+
+	double D = sqrt( d0*d0 + d1*d1 + d2*d2 );
+
+	return D;
+}
+
+BranchPtr BranchList::findClosestBranch(Vector3D targetCoordinate_r)
+{
+	double minDistance = 100000;
+	BranchPtr minDistanceBranch;
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+		for (int j = 0; j < positions.cols(); j++)
+		{
+			double D = findDistance(positions.col(j), targetCoordinate_r);
+			if (D < minDistance)
+			{
+				minDistance = D;
+				minDistanceBranch = mBranches[i];
+			}
+		}
+	}
+
+		return minDistanceBranch;
+}
+
 /**
  * @brief BranchList::createVtkPolyDataFromBranches
  * Return a VtkPolyData object created from the

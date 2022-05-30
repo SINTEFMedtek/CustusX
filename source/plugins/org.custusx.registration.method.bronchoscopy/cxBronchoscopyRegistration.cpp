@@ -538,6 +538,11 @@ void BronchoscopyRegistration::setBranchList(BranchListPtr branchList, int numbe
 	mCenterlineProcessed = true;
 }
 
+BranchListPtr BronchoscopyRegistration::getBranchList()
+{
+	return mBranchListPtr;
+}
+
 BranchListPtr BronchoscopyRegistration::processCenterlineImage2Image(vtkPolyDataPtr centerline, int numberOfGenerations)
 {
 	BranchListPtr branchListPtr;

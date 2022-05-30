@@ -45,6 +45,10 @@ public:
     void interpolateBranchPositions(double resolution);
 	void smoothBranchPositions(int controlPointDistance);
 	void excludeClosePositionsInCTCenterline(double minPointDistance);
+	void markLungLap(QString name, Vector3D position);
+	void setLapName(BranchPtr branch, QString name);
+	double findDistance(Vector3D p1, Vector3D p2);
+	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 };
