@@ -47,6 +47,7 @@ public:
 	void excludeClosePositionsInCTCenterline(double minPointDistance);
 	void markLungLap(QString name, Vector3D position);
 	void setLapName(BranchPtr branch, QString name);
+	QString findClosestLungLap(Vector3D position);
 	double findDistance(Vector3D p1, Vector3D p2);
 	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);

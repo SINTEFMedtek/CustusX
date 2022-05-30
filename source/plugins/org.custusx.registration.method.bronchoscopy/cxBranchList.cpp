@@ -480,12 +480,16 @@ void BranchList::markLungLap(QString name, Vector3D position)
 //Recurcive function. Setting lap name to banch and all sub-branches
 void BranchList::setLapName(BranchPtr branch, QString name)
 {
-	CX_LOG_DEBUG() << "setting lap name: " << name;
 	branch->setLap(name);
 	branchVector bv = branch->getChildBranches();
-	CX_LOG_DEBUG() << "number of children: " << bv.size();
 	for(int i=0; i<bv.size(); i++)
 		setLapName(bv[i], name);
+}
+
+QString BranchList::findClosestLungLap(Vector3D position)
+{
+	BranchPtr branch = findClosestBranch(position);
+	return branch->getLap();
 }
 
 double BranchList::findDistance(Vector3D p1, Vector3D p2)
