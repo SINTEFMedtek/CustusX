@@ -176,6 +176,21 @@ ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 	return retval;
 }
 
+void RecordTrackingWidget::useBaseToolIfAvailable(bool useBaseTool)
+//used in bronchoscopy navigation to get raw tool data without projection to centerline.
+{
+	ToolPtr tool = mToolSelector->getTool();
+	if (!tool)
+		return;
+	mSelectRecordSession->setTool(tool);
+	if(useBaseTool)
+	{
+		ToolPtr baseTool = tool->getBaseTool();
+		if(baseTool)
+			mSelectRecordSession->setTool(baseTool);
+	}
+}
+
 TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 {
 	return mSelectRecordSession->getRecordedTrackerData_prMt();

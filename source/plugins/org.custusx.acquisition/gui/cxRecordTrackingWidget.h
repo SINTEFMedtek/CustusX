@@ -52,6 +52,7 @@ public:
 	virtual ~RecordTrackingWidget()	{}
 
 	ToolPtr getSuitableRecordingTool();
+	void useBaseToolIfAvailable(bool useBaseTool);
 	TimedTransformMap getRecordedTrackerData_prMt();
 	StringPropertyPtr getSessionSelector();
 	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
