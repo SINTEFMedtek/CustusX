@@ -237,7 +237,8 @@ void TrackingImplService::rebuildCachedTools()
 	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 	this->resetTrackingPositionFilters();
 	this->onTooltipOffset(mToolTipOffset);
-	this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
+	if(!mActiveTool || !getTool(mActiveTool->getUid()))
+		this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
 }
 
 void TrackingImplService::imbueManualToolWithRealProperties()
