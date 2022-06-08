@@ -26,7 +26,8 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, PLANE_TYPE, ptCOUNT)
 	"Any",
 	"Dual",
 	"Radial",
-	"ToolSide"
+	"ToolSide",
+	"InverseAny"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, PLANE_TYPE, ptCOUNT)
 
