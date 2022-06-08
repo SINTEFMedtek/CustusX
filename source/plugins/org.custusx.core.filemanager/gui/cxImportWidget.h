@@ -53,6 +53,7 @@ private:
 	void generateParentCandidates();
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 	int findRowIndexContainingButton(QPushButton *button) const;
+	void clearData();
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
