@@ -182,6 +182,7 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 void ImportWidget::importButtonClicked()
 {
+	this->clearData();
 	emit readyToImport();
 	emit finishedImporting();
 
@@ -190,7 +191,14 @@ void ImportWidget::importButtonClicked()
 
 void ImportWidget::cancelButtonClicked()
 {
+	this->clearData();
 	emit finishedImporting();
+}
+
+void ImportWidget::clearData()
+{
+	mParentCandidates.clear();
+	mNotImportedData.clear();
 }
 
 void ImportWidget::removeWidget(QWidget *widget)
