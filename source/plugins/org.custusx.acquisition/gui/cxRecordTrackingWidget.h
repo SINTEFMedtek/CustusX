@@ -57,7 +57,8 @@ public:
 	StringPropertyPtr getSessionSelector();
 	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
 	void displayToolSelector(bool on);
-    void hideMergeWithExistingSession();
+	void hideMergeWithExistingSession();
+	void drawAcquisitionIn3D(bool draw);
 
 signals:
 	void acquisitionCompleted(); ///< aquisition complete, and widget internal state is updated accordingly
@@ -75,11 +76,12 @@ private:
 
 	RecordSessionWidget* mRecordSessionWidget;
 	QWidget* mToolSelectorWidget;
-    QWidget* mMergeWithExistingSessionWidget;
+	QWidget* mMergeWithExistingSessionWidget;
 	ToolPtr mRecordingTool;
 	SelectRecordSessionPtr mSelectRecordSession;
 	StringPropertySelectToolPtr mToolSelector;
 	BoolPropertyPtr mMergeWithExistingSession;
+	bool mDrawAqquisitionIn3D;
 
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 

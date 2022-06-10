@@ -41,7 +41,8 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	QWidget(parent),
 	mServices(services),
 	mOptions(options),
-	mAcquisitionService(acquisitionService)
+	mAcquisitionService(acquisitionService),
+	mDrawAqquisitionIn3D(true)
 {
 	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
 
@@ -84,6 +85,9 @@ StringPropertyPtr RecordTrackingWidget::getSessionSelector()
 void RecordTrackingWidget::acquisitionStarted()
 {
 	mRecordingTool = this->getSuitableRecordingTool();
+
+	if(!mDrawAqquisitionIn3D)
+		return;
 
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
@@ -200,6 +204,11 @@ void RecordTrackingWidget::hideMergeWithExistingSession()
 {
     if(!mMergeWithExistingSessionWidget->isHidden())
         mMergeWithExistingSessionWidget->hide();
+}
+
+void RecordTrackingWidget::drawAcquisitionIn3D(bool draw)
+{
+	mDrawAqquisitionIn3D = draw;
 }
 
 } //namespace cx
