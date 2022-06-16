@@ -16,6 +16,10 @@ cx_initialize_OpenIGTLink()
 cx_initialize_OpenIGTLinkIO()
 cx_initialize_CTK()
 
+if(CX_LINUX)
+   cx_initialize_opencl()
+endif(CX_LINUX)
+
 #cx_initialize_FAST()
 cx_initialize_OpenCLUtilityLibrary()
 
