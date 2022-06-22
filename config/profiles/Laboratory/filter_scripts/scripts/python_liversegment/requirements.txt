@@ -19,7 +19,7 @@ matplotlib==3.2.1
 mock==4.0.1
 networkx==2.4
 nibabel==3.0.1
-numpy==1.18.4
+numpy==1.22.0
 Pillow==7.1.2
 protobuf==3.12.2
 pyparsing==2.4.7
