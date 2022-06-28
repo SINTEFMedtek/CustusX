@@ -56,6 +56,8 @@ IgstkToolManager::IgstkToolManager(ToolFileParser::TrackerInternalStructure trac
 
 IgstkToolManager::~IgstkToolManager()
 {
+	mTimer->stop();
+	disconnect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransformSlot()));
 	this->trackSlot(false);
 	this->initializeSlot(false);
 }
