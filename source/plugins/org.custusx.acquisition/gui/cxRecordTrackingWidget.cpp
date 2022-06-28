@@ -176,8 +176,12 @@ ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 {
 	ToolPtr retval = mToolSelector->getTool();
 	if(!retval)
+	{
 		retval = mServices->tracking()->getActiveTool();
-	return retval;
+		if(retval)
+			mToolSelector->setValue(retval->getUid());
+	}
+		return retval;
 }
 
 void RecordTrackingWidget::useBaseToolIfAvailable(bool useBaseTool)
