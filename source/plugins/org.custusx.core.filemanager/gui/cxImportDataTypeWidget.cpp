@@ -227,12 +227,13 @@ void ImportDataTypeWidget::updateParentCandidatesComboBox()
 
 	if(selectedIndex != 0)
 		mParentCandidatesCB->setCurrentIndex(selectedIndex);
-
-	//TODO parent guess:
-
-	QString parentGuess = this->getInitialGuessForParentFrame();
-//	CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
-	mParentCandidatesCB->setCurrentText(parentGuess);
+	else
+	{
+		//TODO parent guess:
+		QString parentGuess = this->getInitialGuessForParentFrame();
+		//CX_LOG_DEBUG() << "ParentGuess: " << parentGuess;
+		mParentCandidatesCB->setCurrentText(parentGuess);
+	}
 
 
 }

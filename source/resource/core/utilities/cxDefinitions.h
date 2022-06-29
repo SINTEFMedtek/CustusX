@@ -41,10 +41,10 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		ptCORONAL,    ///< a slice seen from the front of the patient
 		ptAXIAL,      ///< a slice seen from the top of the patient
 		ptANYPLANE,   ///< a plane aligned with the tool base plane
-        ptINVERSEANYPLANE,   ///< a plane aligned with the tool base plane, inverse of tool direction
 		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
 		ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
 		ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
+		ptINVERSEANYPLANE,   ///< a plane aligned with the tool base plane, inverse of tool direction
 		ptCOUNT
 	};
 	enum cxResource_EXPORT FOLLOW_TYPE

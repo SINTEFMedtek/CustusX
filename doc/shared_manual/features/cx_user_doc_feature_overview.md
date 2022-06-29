@@ -38,6 +38,20 @@ Right-click on a view to control which data are visualized there.
 Change layout from `Menu->Layouts`. In addition to the predefined layouts, custom ones can be created 
 in Layouts->New Layout.
 
+Different 2D planes:
+| Plane       | Symbol | Description                                                       |
+| ----------- | ------ | ----------------------------------------------------------------- |
+| Axial       | A      | Axial plane aligned with data/DICOM axes                          |
+| Coronal     | C      | Coronal plane aligned with data/DICOM axes                        |
+| Sagittal    | S      | Sagittal plane aligned with data/DICOM axes                       |
+| Any         | O      | Anyplane: A plane aligned with the tool base plane                |
+| Dual        | I      | Dual/Side Anyplane (z-rotated 90 degrees relative to anyplane)    |
+| Radial      | X      | "Birds view Anyplane" (y-rotated 90 degrees relative to anyplane) |
+| Tool Side   | T      | Similar to Dual plane, but oriented by the table up vector        |
+| Inverse Any | IO     | Anyplane in inverse tool direction                                |
+
+While the Axial, Coronal and Sagittal planes are aligned with the data (DICOM) axes, the other planes are alined with the tool axes. 
+
 It is possible to visualize overlayed volumes in 2D. Use the Slice Properties Widget to control this fully.
 
 
