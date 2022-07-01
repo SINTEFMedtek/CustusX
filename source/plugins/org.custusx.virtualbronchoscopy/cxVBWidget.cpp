@@ -68,7 +68,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mPlayButton = new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"),"");
 	mTimer = new QTimer;
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(moveCameraSlot()));
-	mTimer->setInterval(200);
+	mTimer->setInterval(20);
 
 	// Selectors for position along path and play/pause
 	QHBoxLayout *playbackHBox = new QHBoxLayout;
@@ -83,7 +83,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	playbackBox->setLayout(playbackHBox);
 	mVerticalLayout->addWidget(playbackBox);
 	mPlaybackSlider->setMinimum(0);
-	mPlaybackSlider->setMaximum(100);
+	mPlaybackSlider->setMaximum(1000);
 
 	// Selectors for virtual endoscope control
 	QGroupBox	*endoscopeBox = new QGroupBox(tr("Bronchoscope"));
@@ -259,6 +259,12 @@ void VBWidget::playButtonClickedSlot()
 void VBWidget::moveCameraSlot()
 {
 	int currentPos = mPlaybackSlider->value();
+	if(currentPos >= mPlaybackSlider->maximum())
+	{
+		mTimer->stop();
+		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
+		return;
+	}
 	mPlaybackSlider->setValue(currentPos+1);
 }
 

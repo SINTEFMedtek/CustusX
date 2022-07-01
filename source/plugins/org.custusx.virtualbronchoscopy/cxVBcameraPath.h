@@ -77,7 +77,7 @@ signals:
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);
-	void cameraPathPositionSlot(int positionPercentage);
+	void cameraPathPositionSlot(int positionPermillage);
 	void cameraViewAngleSlot(int angle);
 	void cameraRotateAngleSlot(int angle);
 

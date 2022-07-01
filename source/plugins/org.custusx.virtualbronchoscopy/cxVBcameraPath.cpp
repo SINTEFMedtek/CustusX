@@ -95,9 +95,9 @@ void CXVBcameraPath::generateSplineCurve(std::vector< Eigen::Vector3d > routePos
 
 }
 
-void CXVBcameraPath::cameraPathPositionSlot(int positionPercentage)
+void CXVBcameraPath::cameraPathPositionSlot(int positionPermillage)
 {
-    double splineParameter = positionPercentageAdjusted(positionPercentage) / 100.0;
+	double splineParameter = positionPercentageAdjusted(positionPermillage/10.0) / 100.0;
 
     //Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
     //Longer focus makes smoother turns at the first divisions.
@@ -230,6 +230,6 @@ void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)
 double positionPercentageAdjusted(double positionPercentage)
 {
     //Adjusting position to make smaller steps towards end of route
-    return 2*positionPercentage / (1 + positionPercentage/100.0);
+		return 2*positionPercentage / (1 + positionPercentage/100.0);
 }
 } /* namespace cx */
