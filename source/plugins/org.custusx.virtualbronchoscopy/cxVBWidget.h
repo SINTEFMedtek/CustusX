@@ -53,13 +53,15 @@ public:
 
 protected:
 	QString defaultWhatsThis() const;
-	QVBoxLayout*				mVerticalLayout;
+	QVBoxLayout*			mVerticalLayout;
 	QSlider*					mPlaybackSlider;
+	QPushButton				*mPlayButton;
+	QTimer*						mTimer;
 	QDial*						mRotateDial;
 	QDial*						mViewDial;
-	QPushButton*				mResetEndoscopeButton;
-    QPushButton*				mUseAutomaticRotationButton;
-    QPalette                    mAutomaticRotationButtonBackgroundColor;
+	QPushButton*			mResetEndoscopeButton;
+	QPushButton*			mUseAutomaticRotationButton;
+	QPalette					mAutomaticRotationButtonBackgroundColor;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;
@@ -75,9 +77,11 @@ signals:
 
 private slots:
 	void						inputChangedSlot();
+	void						playButtonClickedSlot();
+	void						moveCameraSlot();
 	void						resetEndoscopeSlot();
-    void                        automaticRotationSlot();
-    void                        updateRotationDialSlot(int value);
+	void						automaticRotationSlot();
+	void						updateRotationDialSlot(int value);
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
 };

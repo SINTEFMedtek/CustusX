@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QDial>
 #include <QPushButton>
+#include <QTimer>
 
 #include "cxVBWidget.h"
 #include "cxPatientModelServiceProxy.h"
@@ -63,12 +64,19 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	inputBox->setLayout(inputVbox);
 	mVerticalLayout->addWidget(inputBox);
 
+	// play/pause button
+	mPlayButton = new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"),"");
+	mTimer = new QTimer;
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(moveCameraSlot()));
+	mTimer->setInterval(200);
+
 	// Selectors for position along path and play/pause
 	QHBoxLayout *playbackHBox = new QHBoxLayout;
 	QGroupBox	*playbackBox = new QGroupBox(tr("Playback"));
 	mPlaybackSlider = new QSlider(Qt::Horizontal);
 	QLabel		*labelStart = new QLabel(tr("Start "));
 	QLabel		*labelTarget = new QLabel(tr(" Target"));
+	playbackHBox->addWidget(mPlayButton);
 	playbackHBox->addWidget(labelStart);
 	playbackHBox->addWidget(mPlaybackSlider);
 	playbackHBox->addWidget(labelTarget);
@@ -114,17 +122,19 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 			this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
 	connect(this, &VBWidget::cameraPathChanged, mCameraPath, &CXVBcameraPath::cameraRawPointsSlot);
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot);
+	connect(mPlayButton, &QPushButton::clicked, this, &VBWidget::playButtonClickedSlot);
 	connect(mViewDial, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 	connect(mResetEndoscopeButton, &QPushButton::clicked, this, &VBWidget::resetEndoscopeSlot);
-    connect(mUseAutomaticRotationButton, &QPushButton::clicked, this, &VBWidget::automaticRotationSlot);
-    connect(mCameraPath, &CXVBcameraPath::rotationChanged, this, &VBWidget::updateRotationDialSlot);
+	connect(mUseAutomaticRotationButton, &QPushButton::clicked, this, &VBWidget::automaticRotationSlot);
+	connect(mCameraPath, &CXVBcameraPath::rotationChanged, this, &VBWidget::updateRotationDialSlot);
 
 	mVerticalLayout->addStretch();
 }
 
 VBWidget::~VBWidget()
 {
+	delete mTimer;
 }
 
 void VBWidget::setRouteToTarget(QString uid)
@@ -230,6 +240,26 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 
 	// Forward the keyPressevent if not processed
 	QWidget::keyPressEvent(event);
+}
+
+void VBWidget::playButtonClickedSlot()
+{
+	if(mTimer->isActive())
+	{
+		mTimer->stop();
+		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
+	}
+	else
+	{
+		mTimer->start();
+		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-pause-3.png"));
+	}
+}
+
+void VBWidget::moveCameraSlot()
+{
+	int currentPos = mPlaybackSlider->value();
+	mPlaybackSlider->setValue(currentPos+1);
 }
 
 void VBWidget::resetEndoscopeSlot()
