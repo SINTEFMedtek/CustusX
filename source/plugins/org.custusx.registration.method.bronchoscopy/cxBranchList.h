@@ -42,7 +42,7 @@ public:
 	void smoothOrientations();
 	void smoothRadius();
 	BranchPtr findBranchWithLargestRadius();
-    void interpolateBranchPositions(double resolution);
+	void interpolateBranchPositions(double resolution);
 	void smoothBranchPositions(int controlPointDistance);
 	void excludeClosePositionsInCTCenterline(double minPointDistance);
 	void markLungLap(QString name, Vector3D position);
