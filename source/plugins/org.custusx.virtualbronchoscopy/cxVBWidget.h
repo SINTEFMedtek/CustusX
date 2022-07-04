@@ -50,9 +50,11 @@ public:
 	void setRouteToTarget(QString uid);
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotationAlongRoute(std::vector< double > cameraRotations);
+	void setRecordVideoOption(bool recordVideo);
 
 protected:
 	QString defaultWhatsThis() const;
+	VisServicesPtr		mServices;
 	QVBoxLayout*			mVerticalLayout;
 	QSlider*					mPlaybackSlider;
 	QPushButton				*mPlayButton;
@@ -67,6 +69,7 @@ protected:
 	CXVBcameraPath*				mCameraPath;
 	bool						mControlsEnabled;
 	bool						mAutomaticRotation;
+	bool						mRecordVideo;
 
 	void						enableControls(bool enable);
 
@@ -82,6 +85,8 @@ private slots:
 	void						resetEndoscopeSlot();
 	void						automaticRotationSlot();
 	void						updateRotationDialSlot(int value);
+	void						startRecordFullscreen();
+	void						stopRecordFullscreen();
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
 };

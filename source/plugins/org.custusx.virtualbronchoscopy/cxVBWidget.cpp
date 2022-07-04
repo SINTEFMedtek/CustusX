@@ -32,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxLogger.h"
 #include "cxRouteToTarget.h"
+#include "cxVLCRecorder.h"
 
 
 
@@ -40,9 +41,11 @@ namespace cx
 
 VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
+	mServices(services),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mControlsEnabled(false),
 	mAutomaticRotation(true),
+	mRecordVideo(false),
 	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
 	this->setObjectName("virtual_bronchoscopy_widget");
@@ -160,6 +163,24 @@ void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations
 	mCameraPath->setCameraRotations(cameraRotations);
 }
 
+void VBWidget::setRecordVideoOption(bool recordVideo)
+{
+	mRecordVideo = recordVideo;
+}
+
+void VBWidget::startRecordFullscreen()
+{
+	QString path = mServices->patient()->generateFilePath("Screenshots", "mp4");
+	if(!vlc()->isRecording())
+		vlc()->startRecording(path);
+}
+
+void VBWidget::stopRecordFullscreen()
+{
+	if(vlc()->isRecording())
+		vlc()->stopRecording();
+}
+
 void  VBWidget::enableControls(bool enable)
 {
 	mPlaybackSlider->setEnabled(enable);
@@ -247,11 +268,15 @@ void VBWidget::playButtonClickedSlot()
 	if(mTimer->isActive())
 	{
 		mTimer->stop();
+		if(mRecordVideo)
+			this->stopRecordFullscreen();
 		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
 	}
 	else
 	{
 		mTimer->start();
+		if(mRecordVideo)
+			this->startRecordFullscreen();
 		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-pause-3.png"));
 	}
 }
@@ -261,8 +286,7 @@ void VBWidget::moveCameraSlot()
 	int currentPos = mPlaybackSlider->value();
 	if(currentPos >= mPlaybackSlider->maximum())
 	{
-		mTimer->stop();
-		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
+		this->playButtonClickedSlot();
 		return;
 	}
 	mPlaybackSlider->setValue(currentPos+1);
