@@ -41,8 +41,8 @@ namespace cx
 VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
 	mVerticalLayout(new QVBoxLayout(this)),
-    mControlsEnabled(false),
-    mAutomaticRotation(true),
+	mControlsEnabled(false),
+	mAutomaticRotation(true),
 	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
 	this->setObjectName("virtual_bronchoscopy_widget");
@@ -97,17 +97,17 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mViewDial->setMinimum(-60);
 	mViewDial->setMaximum(60);
 	mResetEndoscopeButton = new QPushButton("Reset");
-    mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
-    mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
-    mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
-    mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+	mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
+	mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
+	mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+	mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
 	endoscopeControlLayout->addWidget(mViewDial,1,2);
 	endoscopeControlLayout->addWidget(mResetEndoscopeButton,2,0);
-    endoscopeControlLayout->addWidget(mUseAutomaticRotationButton,3,0);
+	endoscopeControlLayout->addWidget(mUseAutomaticRotationButton,3,0);
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
@@ -152,12 +152,12 @@ void VBWidget::setRouteToTarget(QString uid)
 
 void VBWidget::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
 {
-     mCameraPath->setRoutePositions(routePositions);
+	mCameraPath->setRoutePositions(routePositions);
 }
 
 void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations)
 {
-    mCameraPath->setCameraRotations(cameraRotations);
+	mCameraPath->setCameraRotations(cameraRotations);
 }
 
 void  VBWidget::enableControls(bool enable)
@@ -197,8 +197,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_Right || event->key()==Qt::Key_6)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mViewDial->value();
-            mViewDial->setValue(currentPos+1);
+			int currentPos = mViewDial->value();
+			mViewDial->setValue(currentPos+1);
 			return;
 		}
 	}
@@ -206,8 +206,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_Left || event->key()==Qt::Key_4)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mViewDial->value();
-            mViewDial->setValue(currentPos-1);
+			int currentPos = mViewDial->value();
+			mViewDial->setValue(currentPos-1);
 			return;
 		}
 	}
@@ -215,8 +215,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_PageUp || event->key()==Qt::Key_9)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mRotateDial->value();
-            mRotateDial->setValue(currentPos+1);
+			int currentPos = mRotateDial->value();
+			mRotateDial->setValue(currentPos+1);
 			return;
 		}
 	}
@@ -224,8 +224,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_PageDown || event->key()==Qt::Key_3)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mRotateDial->value();
-            mRotateDial->setValue(currentPos-1);
+			int currentPos = mRotateDial->value();
+			mRotateDial->setValue(currentPos-1);
 			return;
 		}
 	}
@@ -276,31 +276,31 @@ void VBWidget::resetEndoscopeSlot()
 
 void VBWidget::automaticRotationSlot()
 {
-    mAutomaticRotation = !mAutomaticRotation;
-    mCameraPath->setAutomaticRotation(mAutomaticRotation);
-    if(mAutomaticRotation)
-    {
-        mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
-        mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
-    }
-    else
-    {
-        mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::gray);
-        mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
-    }
+	mAutomaticRotation = !mAutomaticRotation;
+	mCameraPath->setAutomaticRotation(mAutomaticRotation);
+	if(mAutomaticRotation)
+	{
+		mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+		mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+	}
+	else
+	{
+		mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::gray);
+		mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+	}
 }
 
 void VBWidget::updateRotationDialSlot(int value)
 {
-    mRotateDial->setValue(value);
+	mRotateDial->setValue(value);
 }
 
 QString VBWidget::defaultWhatsThis() const
 {
-  return "<html>"
-	  "<h3>Virtual Bronchoscopy.</h3>"
-	  "<p>GUI for visualizing a route-to-target path</p>"
-      "</html>";
+return "<html>"
+			 "<h3>Virtual Bronchoscopy.</h3>"
+			 "<p>GUI for visualizing a route-to-target path</p>"
+			 "</html>";
 }
 
 

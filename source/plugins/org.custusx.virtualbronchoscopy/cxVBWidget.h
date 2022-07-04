@@ -66,7 +66,7 @@ protected:
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;
 	bool						mControlsEnabled;
-    bool						mAutomaticRotation;
+	bool						mAutomaticRotation;
 
 	void						enableControls(bool enable);
 
