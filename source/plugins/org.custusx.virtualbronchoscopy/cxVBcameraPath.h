@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXVBCAMERAPATH_H
 
 #include <QObject>
+#include <QElapsedTimer>
 
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"
@@ -54,6 +55,9 @@ private:
 	double mLastCameraViewAngle;
 	double mLastCameraRotAngle;
 	bool mAutomaticRotation;
+	bool mWritePositionsToFile;
+	QString mPositionsFilePath;
+	QElapsedTimer mTimeSinceStartRecording;
 
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< double > mCameraRotations;
@@ -63,6 +67,7 @@ private:
 	void generateSplineCurve(MeshPtr mesh);
 	void generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
 	std::vector< double > smoothCameraRotations(std::vector< double > cameraRotations);
+	void writePositionToFile(Transform3D prMt);
 
 public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, ViewServicePtr visualization);
@@ -70,6 +75,8 @@ public:
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotations(std::vector< double > cameraRotations);
 	void setAutomaticRotation(bool automaticRotation);
+	void setWritePositionsToFile(bool write);
+	void setWritePositionsFilePath(QString path);
 
 signals:
 	void rotationChanged(int value);

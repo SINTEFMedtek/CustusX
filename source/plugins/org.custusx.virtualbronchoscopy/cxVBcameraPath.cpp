@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <iostream>
+#include <QFile>
 #include "vtkForwardDeclarations.h"
 #include "vtkPolyData.h"
 #include "vtkCardinalSpline.h"
@@ -35,7 +36,8 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 	mViewService(visualization),
 	mLastCameraViewAngle(0),
 	mLastCameraRotAngle(0),
-	mAutomaticRotation(true)
+	mAutomaticRotation(true),
+	mWritePositionsToFile(false)
 {
 	mManualTool = mTrackingService->getManualTool();
 	mSpline = vtkParametricSplinePtr::New();
@@ -162,8 +164,46 @@ void CXVBcameraPath::updateManualToolPosition()
 
 	mManualTool->set_prMt(prMt);
 
+	if(mWritePositionsToFile)
+		this->writePositionToFile(prMt);
+
+
 	emit rotationChanged((int) (mLastCameraRotAngle * 180/M_PI));
 }
+
+void CXVBcameraPath::setWritePositionsToFile(bool write)
+{
+	mWritePositionsToFile = write;
+	if(mWritePositionsToFile)
+		mTimeSinceStartRecording.start();
+}
+
+void CXVBcameraPath::setWritePositionsFilePath(QString path)
+{
+	mPositionsFilePath = path;
+	CX_LOG_DEBUG() << "mPositionsFilePath: " << mPositionsFilePath;
+}
+
+void CXVBcameraPath::writePositionToFile(Transform3D prMt)
+{
+	QFile positionFile(mPositionsFilePath + "_positions.txt");
+	if (positionFile.open(QIODevice::Append))
+	{
+		QTextStream stream(&positionFile);
+		stream << prMt(0,0) << " " << prMt(0,1) << " " << prMt(0,2) << " " << prMt(0,3) << endl;
+		stream << prMt(1,0) << " " << prMt(1,1) << " " << prMt(1,2) << " " << prMt(1,3) << endl;
+		stream << prMt(2,0) << " " << prMt(2,1) << " " << prMt(2,2) << " " << prMt(2,3) << endl;
+	}
+
+	QFile timestampFile(mPositionsFilePath + "_timestamps.txt");
+	if (timestampFile.open(QIODevice::Append))
+	{
+		QTextStream stream(&timestampFile);
+		stream << mTimeSinceStartRecording.elapsed() << endl;
+	}
+}
+
+
 
 std::vector< double > CXVBcameraPath::smoothCameraRotations(std::vector< double > cameraRotations)
 {

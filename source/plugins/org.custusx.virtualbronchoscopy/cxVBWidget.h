@@ -85,7 +85,7 @@ private slots:
 	void						resetEndoscopeSlot();
 	void						automaticRotationSlot();
 	void						updateRotationDialSlot(int value);
-	void						startRecordFullscreen();
+	QFileInfo startRecordFullscreen();
 	void						stopRecordFullscreen();
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);

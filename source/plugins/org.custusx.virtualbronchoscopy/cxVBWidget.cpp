@@ -71,7 +71,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mPlayButton = new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"),"");
 	mTimer = new QTimer;
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(moveCameraSlot()));
-	mTimer->setInterval(20);
+	mTimer->setInterval(20); // slot processing time is about 30 ms, thus about 50 ms in total.
 
 	// Selectors for position along path and play/pause
 	QHBoxLayout *playbackHBox = new QHBoxLayout;
@@ -168,11 +168,13 @@ void VBWidget::setRecordVideoOption(bool recordVideo)
 	mRecordVideo = recordVideo;
 }
 
-void VBWidget::startRecordFullscreen()
+QFileInfo VBWidget::startRecordFullscreen()
 {
-	QString path = mServices->patient()->generateFilePath("Screenshots", "mp4");
+	QFileInfo fileInfo;
+	fileInfo.setFile(mServices->patient()->generateFilePath("Screenshots", "mp4"));
 	if(!vlc()->isRecording())
-		vlc()->startRecording(path);
+		vlc()->startRecording(fileInfo.absoluteFilePath());
+	return fileInfo;
 }
 
 void VBWidget::stopRecordFullscreen()
@@ -269,15 +271,22 @@ void VBWidget::playButtonClickedSlot()
 	{
 		mTimer->stop();
 		if(mRecordVideo)
+		{
 			this->stopRecordFullscreen();
+			mCameraPath->setWritePositionsToFile(false);
+		}
 		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
 	}
 	else
 	{
 		mTimer->start();
 		if(mRecordVideo)
-			this->startRecordFullscreen();
-		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-pause-3.png"));
+		{
+			QFileInfo fileInfo = this->startRecordFullscreen();
+			mCameraPath->setWritePositionsFilePath(fileInfo.absolutePath() + "/" + fileInfo.baseName());
+			mCameraPath->setWritePositionsToFile(true);
+		}
+			mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-pause-3.png"));
 	}
 }
 
