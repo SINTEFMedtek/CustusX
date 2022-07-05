@@ -40,40 +40,39 @@ class CXVBcameraPath : public QObject
 	Q_OBJECT
 
 private:
-    vtkParametricSplinePtr      mSpline;
-	TrackingServicePtr			mTrackingService;
-	PatientModelServicePtr		mPatientModelService;
-	ViewServicePtr				mViewService;
-	ToolPtr						mManualTool;
+	vtkParametricSplinePtr mSpline;
+	TrackingServicePtr mTrackingService;
+	PatientModelServicePtr mPatientModelService;
+	ViewServicePtr mViewService;
+	ToolPtr mManualTool;
 
-	int							mNumberOfInputPoints;
-	int							mNumberOfControlPoints;
-	Vector3D					mLastCameraPos_r;
-	Vector3D					mLastCameraFocus_r;
-    Vector3D                    mLastStoredViewVector;
-	double						mLastCameraViewAngle;
-	double						mLastCameraRotAngle;
-    bool                        mAutomaticRotation;
+	int mNumberOfInputPoints;
+	int mNumberOfControlPoints;
+	Vector3D mLastCameraPos_r;
+	Vector3D mLastCameraFocus_r;
+	Vector3D mLastStoredViewVector;
+	double mLastCameraViewAngle;
+	double mLastCameraRotAngle;
+	bool mAutomaticRotation;
 
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< double > mCameraRotations;
-    std::vector< double > mCameraRotationsSmoothed;
+	std::vector< double > mCameraRotationsSmoothed;
 
-	void		updateManualToolPosition();
-	void		generateSplineCurve(MeshPtr mesh);
-	void		generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
-    std::vector< double > smoothCameraRotations(std::vector< double > cameraRotations);
+	void updateManualToolPosition();
+	void generateSplineCurve(MeshPtr mesh);
+	void generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
+	std::vector< double > smoothCameraRotations(std::vector< double > cameraRotations);
 
 public:
-	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel,
-				   ViewServicePtr visualization);
+	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, ViewServicePtr visualization);
 
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotations(std::vector< double > cameraRotations);
-    void setAutomaticRotation(bool automaticRotation);
+	void setAutomaticRotation(bool automaticRotation);
 
 signals:
-    void		rotationChanged(int value);
+	void rotationChanged(int value);
 
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);
@@ -83,7 +82,7 @@ public slots:
 
 };
 
-    double org_custusx_virtualbronchoscopy_EXPORT positionPercentageAdjusted(double positionPercentage);
+	double org_custusx_virtualbronchoscopy_EXPORT positionPercentageAdjusted(double positionPercentage);
 
 } /* namespace cx */
 
