@@ -69,6 +69,7 @@ bool TrackingSystemBronchoscopyService::setTrackingSystem(QString trackingSystem
 		if (trackingSystems[i]->getUid() == trackingSystemName)
 		{
 			mBase = trackingSystems[i];
+			this->onStateChanged();
 			return true;
 		}
 	return false;

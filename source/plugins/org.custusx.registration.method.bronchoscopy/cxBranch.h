@@ -35,6 +35,8 @@ class Branch
 	branchVector mChildBranches;
 	BranchPtr mParentBranch;
 	double mBronchoscopeRotation = 0;
+	QString mLap;
+
 public:
 	Branch();
 	virtual ~Branch();
@@ -58,6 +60,9 @@ public:
 	void setBronchoscopeRotation(double rotation);
 	double getBronchoscopeRotation();
 	void removeEqualPositions();
+	void setLap(QString lap);
+	QString getLap();
+
 };
 
 

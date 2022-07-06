@@ -19,7 +19,7 @@ class org_custusx_bronchoscopynavigation_EXPORT BronchoscopePositionProjection
 {
 public:
 	BronchoscopePositionProjection();
-    BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D prMd);
+	BronchoscopePositionProjection(vtkPolyDataPtr centerline, Transform3D prMd);
 		void setRunFromWidget(bool runFromWidget);
 	virtual ~BronchoscopePositionProjection();
 	void setAdvancedCenterlineOption(bool useAdvancedCenterlineProjection);

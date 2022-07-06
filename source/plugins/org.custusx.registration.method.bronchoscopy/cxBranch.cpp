@@ -188,6 +188,16 @@ void Branch::removeEqualPositions()
 		mOrientations = orientations;
 }
 
+void Branch::setLap(QString lap)
+{
+	mLap = lap;
+}
+
+QString Branch::getLap()
+{
+	return mLap;
+}
+
 
 Branch::~Branch()
 {

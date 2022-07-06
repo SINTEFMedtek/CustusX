@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxRecordTrackingWidget.h"
@@ -41,7 +41,8 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	QWidget(parent),
 	mServices(services),
 	mOptions(options),
-	mAcquisitionService(acquisitionService)
+	mAcquisitionService(acquisitionService),
+	mDrawAqquisitionIn3D(true)
 {
 	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
 
@@ -61,10 +62,10 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	mVerticalLayout->setMargin(0);
 
 	mToolSelectorWidget = sscCreateDataWidget(this, mToolSelector);
-    mMergeWithExistingSessionWidget = sscCreateDataWidget(this, mMergeWithExistingSession);
+	mMergeWithExistingSessionWidget = sscCreateDataWidget(this, mMergeWithExistingSession);
 	mVerticalLayout->addWidget(mToolSelectorWidget);
-    mVerticalLayout->addWidget(mRecordSessionWidget);
-    mVerticalLayout->addWidget(mMergeWithExistingSessionWidget);
+	mVerticalLayout->addWidget(mRecordSessionWidget);
+	mVerticalLayout->addWidget(mMergeWithExistingSessionWidget);
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
@@ -84,6 +85,9 @@ StringPropertyPtr RecordTrackingWidget::getSessionSelector()
 void RecordTrackingWidget::acquisitionStarted()
 {
 	mRecordingTool = this->getSuitableRecordingTool();
+
+	if(!mDrawAqquisitionIn3D)
+		return;
 
 	ToolRep3DPtr activeRep3D = this->getToolRepIn3DView();
 	if (activeRep3D)
@@ -172,8 +176,27 @@ ToolPtr RecordTrackingWidget::getSuitableRecordingTool()
 {
 	ToolPtr retval = mToolSelector->getTool();
 	if(!retval)
+	{
 		retval = mServices->tracking()->getActiveTool();
-	return retval;
+		if(retval)
+			mToolSelector->setValue(retval->getUid());
+	}
+		return retval;
+}
+
+void RecordTrackingWidget::useBaseToolIfAvailable(bool useBaseTool)
+//used in bronchoscopy navigation to get raw tool data without projection to centerline.
+{
+	ToolPtr tool = mToolSelector->getTool();
+	if (!tool)
+		return;
+	mSelectRecordSession->setTool(tool);
+	if(useBaseTool)
+	{
+		ToolPtr baseTool = tool->getBaseTool();
+		if(baseTool)
+			mSelectRecordSession->setTool(baseTool);
+	}
 }
 
 TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
@@ -183,8 +206,13 @@ TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 
 void RecordTrackingWidget::hideMergeWithExistingSession()
 {
-    if(!mMergeWithExistingSessionWidget->isHidden())
-        mMergeWithExistingSessionWidget->hide();
+	if(!mMergeWithExistingSessionWidget->isHidden())
+		mMergeWithExistingSessionWidget->hide();
+}
+
+void RecordTrackingWidget::drawAcquisitionIn3D(bool draw)
+{
+	mDrawAqquisitionIn3D = draw;
 }
 
 } //namespace cx

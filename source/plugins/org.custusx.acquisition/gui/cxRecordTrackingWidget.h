@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef CXRECORDTRACKINGWIDGET_H
@@ -52,11 +52,13 @@ public:
 	virtual ~RecordTrackingWidget()	{}
 
 	ToolPtr getSuitableRecordingTool();
+	void useBaseToolIfAvailable(bool useBaseTool);
 	TimedTransformMap getRecordedTrackerData_prMt();
 	StringPropertyPtr getSessionSelector();
 	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
 	void displayToolSelector(bool on);
-    void hideMergeWithExistingSession();
+	void hideMergeWithExistingSession();
+	void drawAcquisitionIn3D(bool draw);
 
 signals:
 	void acquisitionCompleted(); ///< aquisition complete, and widget internal state is updated accordingly
@@ -74,11 +76,12 @@ private:
 
 	RecordSessionWidget* mRecordSessionWidget;
 	QWidget* mToolSelectorWidget;
-    QWidget* mMergeWithExistingSessionWidget;
+	QWidget* mMergeWithExistingSessionWidget;
 	ToolPtr mRecordingTool;
 	SelectRecordSessionPtr mSelectRecordSession;
 	StringPropertySelectToolPtr mToolSelector;
 	BoolPropertyPtr mMergeWithExistingSession;
+	bool mDrawAqquisitionIn3D;
 
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
