@@ -47,6 +47,7 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 
 void CXVBcameraPath::cameraRawPointsSlot(MeshPtr mesh)
 {
+
 	if(mRoutePositions.size() > 0)
 		if(mRoutePositions.size() == mCameraRotations.size())
 		{
@@ -181,7 +182,6 @@ void CXVBcameraPath::setWritePositionsToFile(bool write)
 void CXVBcameraPath::setWritePositionsFilePath(QString path)
 {
 	mPositionsFilePath = path;
-	CX_LOG_DEBUG() << "mPositionsFilePath: " << mPositionsFilePath;
 }
 
 void CXVBcameraPath::writePositionToFile(Transform3D prMt)

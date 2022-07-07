@@ -72,23 +72,25 @@ protected:
 	bool						mRecordVideo;
 
 	void						enableControls(bool enable);
+	QFileInfo				startRecordFullscreen();
+	void						stopRecordFullscreen();
 
 	PatientStoragePtr mStorage;
 
 signals:
 	void						cameraPathChanged(MeshPtr pathMesh);
+	void						cameraAtEndPosition();
 
 private slots:
 	void						inputChangedSlot();
-	void						playButtonClickedSlot();
 	void						moveCameraSlot();
 	void						resetEndoscopeSlot();
 	void						automaticRotationSlot();
 	void						updateRotationDialSlot(int value);
-	QFileInfo startRecordFullscreen();
-	void						stopRecordFullscreen();
+
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
+	void								playButtonClickedSlot();
 };
 
 } /* namespace cx */
