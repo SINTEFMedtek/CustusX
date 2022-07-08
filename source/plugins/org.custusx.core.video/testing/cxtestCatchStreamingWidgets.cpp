@@ -31,7 +31,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
-TEST_CASE("VideoConnectionWidget can stream", "[gui][not_win32][widget][streaming][integration]")
+//This test seems to fail a lot on cx-linux-bamboonode-1, so it's being disabled for Ubuntu 16.04 (not_linux = not Ubuntu 16.04)
+TEST_CASE("VideoConnectionWidget can stream", "[gui][not_win32][widget][streaming][integration][not_linux]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();
