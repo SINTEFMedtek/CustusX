@@ -122,6 +122,7 @@ void SamplerWidget::prePaintEvent()
 	if (image)
 	{
 		Vector3D p = mSpaceProvider->getActiveToolTipPoint(Space(csDATA_VOXEL,"active"), true);
+		//Vector3D p = mSpaceProvider->getActiveToolTipPoint(Space(csDATA_VOXEL, image->getUid()), true);
 		IntBoundingBox3D bb(Eigen::Vector3i(0,0,0),
 		                         Eigen::Vector3i(image->getBaseVtkImageData()->GetDimensions())-Eigen::Vector3i(1,1,1));
 		if (bb.contains(p.cast<int>()))
