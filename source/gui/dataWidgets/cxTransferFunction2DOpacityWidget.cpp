@@ -71,7 +71,7 @@ void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 
 void TransferFunction2DOpacityWidget::updateLLR(ImagePtr image)
 {
-	if(image->getModality() == imUS)
+	if(image && image->getModality() == imUS)
 		mDataLLR->setValue(1);
 }
 
