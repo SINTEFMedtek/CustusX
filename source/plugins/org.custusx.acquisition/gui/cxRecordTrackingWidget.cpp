@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxRecordTrackingWidget.h"
@@ -62,10 +62,10 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	mVerticalLayout->setMargin(0);
 
 	mToolSelectorWidget = sscCreateDataWidget(this, mToolSelector);
-    mMergeWithExistingSessionWidget = sscCreateDataWidget(this, mMergeWithExistingSession);
+	mMergeWithExistingSessionWidget = sscCreateDataWidget(this, mMergeWithExistingSession);
 	mVerticalLayout->addWidget(mToolSelectorWidget);
-    mVerticalLayout->addWidget(mRecordSessionWidget);
-    mVerticalLayout->addWidget(mMergeWithExistingSessionWidget);
+	mVerticalLayout->addWidget(mRecordSessionWidget);
+	mVerticalLayout->addWidget(mMergeWithExistingSessionWidget);
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
@@ -206,8 +206,8 @@ TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 
 void RecordTrackingWidget::hideMergeWithExistingSession()
 {
-    if(!mMergeWithExistingSessionWidget->isHidden())
-        mMergeWithExistingSessionWidget->hide();
+	if(!mMergeWithExistingSessionWidget->isHidden())
+		mMergeWithExistingSessionWidget->hide();
 }
 
 void RecordTrackingWidget::drawAcquisitionIn3D(bool draw)
