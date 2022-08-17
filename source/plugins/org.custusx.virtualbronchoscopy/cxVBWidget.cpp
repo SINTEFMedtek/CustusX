@@ -170,7 +170,6 @@ void VBWidget::setRecordVideoOption(bool recordVideo)
 
 QFileInfo VBWidget::startRecordFullscreen()
 {
-	CX_LOG_DEBUG() << "Start record video: " << vlc()->isRecording();
 	QFileInfo fileInfo;
 	fileInfo.setFile(mServices->patient()->generateFilePath("Screenshots", "mp4"));
 	if(!vlc()->isRecording())
@@ -180,10 +179,9 @@ QFileInfo VBWidget::startRecordFullscreen()
 
 void VBWidget::stopRecordFullscreen()
 {
-	CX_LOG_DEBUG() << "Stop record video 1: " << vlc()->isRecording();
 	if(vlc()->isRecording())
 		vlc()->stopRecording();
-	CX_LOG_DEBUG() << "Stop record video 2: " << vlc()->isRecording();
+	vlc()->waitForFinished();
 }
 
 void  VBWidget::enableControls(bool enable)
