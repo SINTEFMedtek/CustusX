@@ -113,7 +113,7 @@ private:
 	void recreateMultiSlicer();
 	void updateItemsFromViewGroup();
 
-	void createAndAddSliceReps(int number);
+	void createAndAddSliceReps(int numberOfSlices);
 	void removeAndResetSliceRep();
 
 	bool useGPU2DRendering();

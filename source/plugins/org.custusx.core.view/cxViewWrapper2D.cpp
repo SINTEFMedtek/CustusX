@@ -429,17 +429,15 @@ bool ViewWrapper2D::useGPU2DRendering()
 	return settings()->value("View2D/useGPU2DRendering").toBool();
 }
 
-void ViewWrapper2D::createAndAddSliceReps(int number)
+void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 {
-	for(int i = 0; i < number; ++i)
+	this->removeAndResetSliceRep();
+	for(int i = 0; i < numberOfSlices; ++i)
 	{
-		if (mSliceReps.size() <= i)
-		{
-			SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
-			sliceRep->setSliceProxy(mSliceProxy);
-			mView->addRep(sliceRep);
-			mSliceReps.push_back(sliceRep);
-		}
+		SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
+		sliceRep->setSliceProxy(mSliceProxy);
+		mView->addRep(sliceRep);
+		mSliceReps.push_back(sliceRep);
 	}
 }
 
@@ -474,7 +472,6 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 		else //software rendering
 		{
 			this->removeAndResetMultiSliceRep();
-			this->removeAndResetSliceRep();
 			setImagesSWRendering();
 		}
 	}
