@@ -474,6 +474,7 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 		else //software rendering
 		{
 			this->removeAndResetMultiSliceRep();
+			this->removeAndResetSliceRep();
 			setImagesSWRendering();
 		}
 	}
