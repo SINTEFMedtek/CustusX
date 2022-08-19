@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -57,46 +57,46 @@ class ToolConfigureGroupBox;
 
 class cxGui_EXPORT VisualizationTab : public PreferenceTab
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-  VisualizationTab(PatientModelServicePtr patientModelService, QWidget *parent = 0);
-  void init();
+	VisualizationTab(PatientModelServicePtr patientModelService, QWidget *parent = 0);
+	void init();
 
-  public slots:
-  void saveParametersSlot();
+public slots:
+	void saveParametersSlot();
 
 signals:
 
 protected:
-  PatientModelServicePtr mPatientModelService;
-  QGridLayout *mMainLayout;
-  DoublePropertyPtr mSphereRadius;
-  DoublePropertyPtr mLabelSize;
-  BoolPropertyPtr mShowDataText;
-  BoolPropertyPtr mShowLabels;
-  BoolPropertyPtr mToolCrosshair;
-  BoolPropertyPtr mShowMetricNamesInCorner;
-  StringPropertyPtr mAnnotationModel;
-  DoublePropertyPtr mAnnotationModelSize;
-  DoublePropertyPtr mAnyplaneViewOffset;
-  BoolPropertyPtr mFollowTooltip;
-  DoublePropertyPtr mFollowTooltipBoundary;
-  StringPropertyPtr mClinicalView;
+	PatientModelServicePtr mPatientModelService;
+	QGridLayout *mMainLayout;
+	DoublePropertyPtr mSphereRadius;
+	DoublePropertyPtr mLabelSize;
+	BoolPropertyPtr mShowDataText;
+	BoolPropertyPtr mShowLabels;
+	BoolPropertyPtr mToolCrosshair;
+	BoolPropertyPtr mShowMetricNamesInCorner;
+	StringPropertyPtr mAnnotationModel;
+	DoublePropertyPtr mAnnotationModelSize;
+	DoublePropertyPtr mAnyplaneViewOffset;
+	BoolPropertyPtr mFollowTooltip;
+	DoublePropertyPtr mFollowTooltipBoundary;
+	StringPropertyPtr mClinicalView;
 
-  //Stereo
-  QComboBox* mStereoTypeComboBox;
-  DoublePropertyPtr mEyeAngleAdapter;
-  QActionGroup* mStereoTypeActionGroup;
-  void initStereoTypeComboBox();
+	//Stereo
+	QComboBox* mStereoTypeComboBox;
+	DoublePropertyPtr mEyeAngleAdapter;
+	QActionGroup* mStereoTypeActionGroup;
+	void initStereoTypeComboBox();
 
 private slots:
-  //Stereo
-  void stereoTypeChangedSlot(int index);
-  void stereoFrameSequentialSlot();
-  void stereoInterlacedSlot();
-  void stereoDresdenSlot();
-  void stereoRedBlueSlot();
-  void eyeAngleSlot();
+	//Stereo
+	void stereoTypeChangedSlot(int index);
+	void stereoFrameSequentialSlot();
+	void stereoInterlacedSlot();
+	void stereoDresdenSlot();
+	void stereoRedBlueSlot();
+	void eyeAngleSlot();
 };
 
 /**
@@ -109,27 +109,27 @@ private slots:
  */
 class cxGui_EXPORT AutomationTab : public PreferenceTab
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  AutomationTab(QWidget *parent = 0);
-  void init();
+	AutomationTab(QWidget *parent = 0);
+	void init();
 
 public slots:
-  void saveParametersSlot();
+	void saveParametersSlot();
 
 
 protected:
-  QCheckBox* mAutoSelectActiveToolCheckBox;
-  QCheckBox* mAutoStartTrackingCheckBox;
-  QCheckBox* mAutoStartStreamingCheckBox;
-  QCheckBox* mAutoReconstructCheckBox;
-  QCheckBox* mAutoSaveCheckBox;
-  QCheckBox* mAutoShowNewDataCheckBox;
-  QCheckBox* mAutoLoadPatientCheckBox;
-  QCheckBox* mAutoDeleteDICOMDBCheckBox;
-  DoublePropertyPtr mAutoLoadPatientWithinHours;
-  QVBoxLayout *mMainLayout;
+	QCheckBox* mAutoSelectActiveToolCheckBox;
+	QCheckBox* mAutoStartTrackingCheckBox;
+	QCheckBox* mAutoStartStreamingCheckBox;
+	QCheckBox* mAutoReconstructCheckBox;
+	QCheckBox* mAutoSaveCheckBox;
+	QCheckBox* mAutoShowNewDataCheckBox;
+	QCheckBox* mAutoLoadPatientCheckBox;
+	QCheckBox* mAutoDeleteDICOMDBCheckBox;
+	DoublePropertyPtr mAutoLoadPatientWithinHours;
+	QVBoxLayout *mMainLayout;
 };
 
 /**
@@ -142,22 +142,22 @@ protected:
  */
 class cxGui_EXPORT VideoTab : public PreferenceTab
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  VideoTab(QWidget *parent = 0);
-  void init();
+	VideoTab(QWidget *parent = 0);
+	void init();
 
 public slots:
-  void saveParametersSlot();
+	void saveParametersSlot();
 
 protected:
-  QLineEdit* mAcquisitionNameLineEdit;
-  QVBoxLayout *mMainLayout;
+	QLineEdit* mAcquisitionNameLineEdit;
+	QVBoxLayout *mMainLayout;
 
-  QRadioButton* m24bitRadioButton;
-  QRadioButton* m8bitRadioButton;
-  QCheckBox* mCompressCheckBox;
+	QRadioButton* m24bitRadioButton;
+	QRadioButton* m8bitRadioButton;
+	QCheckBox* mCompressCheckBox;
 };
 
 /**
@@ -188,27 +188,27 @@ protected:
  */
 class cxGui_EXPORT ToolConfigTab : public PreferenceTab
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  ToolConfigTab(StateServicePtr stateService, TrackingServicePtr trackingService, QWidget* parent = 0);
-  virtual ~ToolConfigTab();
+	ToolConfigTab(StateServicePtr stateService, TrackingServicePtr trackingService, QWidget* parent = 0);
+	virtual ~ToolConfigTab();
 
-  virtual void init();
+	virtual void init();
 
 public slots:
-  virtual void saveParametersSlot();
+	virtual void saveParametersSlot();
 
 private slots:
-  void applicationChangedSlot();
-  void globalConfigurationFileChangedSlot(QString key);
+	void applicationChangedSlot();
+	void globalConfigurationFileChangedSlot(QString key);
 
 private:
-  FilePreviewWidget*  mFilePreviewWidget;
-  ToolImagePreviewWidget*  mImagePreviewWidget;
-  ToolConfigureGroupBox* mToolConfigureGroupBox;
-  ToolFilterGroupBox*    mToolFilterGroupBox;
-  StateServicePtr mStateService;
+	FilePreviewWidget*  mFilePreviewWidget;
+	ToolImagePreviewWidget*  mImagePreviewWidget;
+	ToolConfigureGroupBox* mToolConfigureGroupBox;
+	ToolFilterGroupBox*    mToolFilterGroupBox;
+	StateServicePtr mStateService;
 };
 
 /**
@@ -221,7 +221,7 @@ private:
  */
 class cxGui_EXPORT PreferencesDialog : public QDialog
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService,
@@ -230,19 +230,19 @@ public:
 	virtual ~PreferencesDialog();
 
 signals:
-  void applied();
+	void applied();
 
 private slots:
-  void selectTabSlot();
-  void applySlot();
+	void selectTabSlot();
+	void applySlot();
 
 protected:
-  void addTab(PreferenceTab* widget, QString name, int selectedIndex = 0);
+	void addTab(PreferenceTab* widget, QString name, int selectedIndex = 0);
 
-  QActionGroup* mActionGroup;
-  QStackedWidget* mTabWidget;
-  QToolBar* mToolBar;
-  QDialogButtonBox *mButtonBox;
+	QActionGroup* mActionGroup;
+	QStackedWidget* mTabWidget;
+	QToolBar* mToolBar;
+	QDialogButtonBox *mButtonBox;
 };
 
 /**
@@ -253,23 +253,23 @@ protected:
  */
 class cxGui_EXPORT DebugTab : public PreferenceTab
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  DebugTab(PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, QWidget *parent = 0);
-  void init();
+	DebugTab(PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, QWidget *parent = 0);
+	void init();
 
 public slots:
-  void saveParametersSlot();
-  void runDebugToolSlot();
+	void saveParametersSlot();
+	void runDebugToolSlot();
 
 protected:
-  QCheckBox* mIGSTKDebugLoggingCheckBox;
-  QCheckBox* mManualToolPhysicalPropertiesCheckBox;
-  QCheckBox* mRenderSpeedLoggingCheckBox;
-  QGridLayout *mMainLayout;
-  PatientModelServicePtr mPatientModelService;
-  TrackingServicePtr mTrackingService;
+	QCheckBox* mIGSTKDebugLoggingCheckBox;
+	QCheckBox* mManualToolPhysicalPropertiesCheckBox;
+	QCheckBox* mRenderSpeedLoggingCheckBox;
+	QGridLayout *mMainLayout;
+	PatientModelServicePtr mPatientModelService;
+	TrackingServicePtr mTrackingService;
 };
 
 

@@ -433,7 +433,7 @@ ToolConfigTab::ToolConfigTab(StateServicePtr stateService, TrackingServicePtr tr
 {
 	this->setObjectName("preferences_tool_config_widget");
 	mToolConfigureGroupBox = new ToolConfigureGroupBox(trackingService, stateService, this);
-	mToolFilterGroupBox  = new ToolFilterGroupBox(trackingService, this);
+	mToolFilterGroupBox = new ToolFilterGroupBox(trackingService, this);
 	mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
 
 	connect(stateService.get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
@@ -526,7 +526,7 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
 {
 	mActionGroup = new QActionGroup(this);
 	mActionGroup->setExclusive(true);
-	mToolBar =  new QToolBar;
+	mToolBar = new QToolBar;
 	mToolBar->setOrientation(Qt::Vertical);
 	mTabWidget = new QStackedWidget;
 
