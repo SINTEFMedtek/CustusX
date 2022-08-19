@@ -269,6 +269,7 @@ void MainWindow::createActions()
 	mPreferencesAction = new QAction(tr("Preferences"), this);
 	mPreferencesAction->setShortcut(tr("Ctrl+,"));
 	mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
+	mPreferencesToolConfigAction = new QAction(tr("Tool Config"), this);
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
 	mFullScreenAction->setShortcut(tr("F11"));
@@ -283,6 +284,7 @@ void MainWindow::createActions()
 
 	connect(mAboutAction, &QAction::triggered, this, &MainWindow::aboutSlot);
 	connect(mPreferencesAction, &QAction::triggered, this, &MainWindow::preferencesSlot);
+	connect(mPreferencesToolConfigAction, &QAction::triggered, this, [this]{ preferencesSlot(5); });
 	connect(mQuitAction, &QAction::triggered, qApp, &QApplication::quit);
 
 	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
@@ -481,8 +483,7 @@ void MainWindow::createMenus()
 
 	//tool
 	this->menuBar()->addMenu(mToolMenu);
-	//mToolMenu->addAction(mActions->getAction("ConfigureTools"));
-	//mToolMenu->addAction(mActions->getAction("InitializeTools"));
+	mToolMenu->addAction(mPreferencesToolConfigAction);
 	mToolMenu->addAction(mActions->getAction("TrackingTools"));
 	mToolMenu->addSeparator();
 	mToolMenu->addAction(mActions->getAction("StartStreaming"));
@@ -589,9 +590,9 @@ void MainWindow::aboutSlot()
 			);
 }
 
-void MainWindow::preferencesSlot()
+void MainWindow::preferencesSlot(int currentTabIndex)
 {
-	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), mServices->state(), mServices->tracking(), this);
+	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), mServices->state(), mServices->tracking(), currentTabIndex, this);
 	prefDialog.exec();
 }
 

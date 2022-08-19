@@ -224,7 +224,9 @@ class cxGui_EXPORT PreferencesDialog : public QDialog
     Q_OBJECT
 
 public:
-	PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, StateServicePtr stateService, TrackingServicePtr trackingService, QWidget *parent = 0);
+	PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService,
+					  StateServicePtr stateService, TrackingServicePtr trackingService,
+					  int currentTabIndex = 0, QWidget *parent = 0);
 	virtual ~PreferencesDialog();
 
 signals:
@@ -235,7 +237,7 @@ private slots:
   void applySlot();
 
 protected:
-  void addTab(PreferenceTab* widget, QString name);
+  void addTab(PreferenceTab* widget, QString name, int selectedIndex = 0);
 
   QActionGroup* mActionGroup;
   QStackedWidget* mTabWidget;
