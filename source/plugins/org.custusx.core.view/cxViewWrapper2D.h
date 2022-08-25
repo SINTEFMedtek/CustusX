@@ -113,7 +113,7 @@ private:
 	void recreateMultiSlicer();
 	void updateItemsFromViewGroup();
 
-	void createAndAddSliceRep();
+	void createAndAddSliceReps(int numberOfSlices);
 	void removeAndResetSliceRep();
 
 	bool useGPU2DRendering();
@@ -123,13 +123,15 @@ private:
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
 
+	void setImagesSWRendering();
+
 	Texture3DSlicerRepPtr mMultiSliceRep;
 
 	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;
 	SliceProxyPtr mSliceProxy;
-	SliceRepSWPtr mSliceRep;
+	std::vector<SliceRepSWPtr> mSliceReps;
 	ToolRep2DPtr mToolRep2D;
 	OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
