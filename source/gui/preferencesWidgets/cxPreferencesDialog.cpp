@@ -433,7 +433,7 @@ ToolConfigTab::ToolConfigTab(StateServicePtr stateService, TrackingServicePtr tr
 {
 	this->setObjectName("preferences_tool_config_widget");
 	mToolConfigureGroupBox = new ToolConfigureGroupBox(trackingService, stateService, this);
-	mToolFilterGroupBox  = new ToolFilterGroupBox(trackingService, this);
+	mToolFilterGroupBox = new ToolFilterGroupBox(trackingService, this);
 	mToolFilterGroupBox->setTrackingSystemSelector(mToolConfigureGroupBox->getTrackingSystemSelector());
 
 	connect(stateService.get(), &StateService::applicationStateChanged, this, &ToolConfigTab::applicationChangedSlot);
@@ -519,24 +519,26 @@ void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
 // PreferencesDialog
 //------------------------------------------------------------------------------
 
-PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService, StateServicePtr stateService, TrackingServicePtr trackingService, QWidget *parent) :
+PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelServicePtr patientModelService,
+									 StateServicePtr stateService, TrackingServicePtr trackingService,
+									 int currentIndex, QWidget *parent) :
 	QDialog(parent)
 {
 	mActionGroup = new QActionGroup(this);
 	mActionGroup->setExclusive(true);
-	mToolBar =  new QToolBar;
+	mToolBar = new QToolBar;
 	mToolBar->setOrientation(Qt::Vertical);
 	mTabWidget = new QStackedWidget;
 
 	mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 	VisServicesPtr services = VisServices::create(logicManager()->getPluginContext());
 
-	this->addTab(new GeneralTab(viewService, patientModelService), tr("General"));
+	this->addTab(new GeneralTab(viewService, patientModelService), tr("General"), currentIndex);
 	this->addTab(new PerformanceTab, tr("Performance"));
 	this->addTab(new AutomationTab, tr("Automation"));
 	this->addTab(new VisualizationTab(patientModelService), tr("Visualization"));
 	this->addTab(new VideoTab, tr("Video"));
-	this->addTab(new ToolConfigTab(stateService, trackingService), tr("Tool Configuration"));
+	this->addTab(new ToolConfigTab(stateService, trackingService), tr("Tool Configuration"), currentIndex);
 	this->addTab(new OperatingTableTab(services), tr("Table"));
 	this->addTab(new DebugTab(patientModelService, trackingService), tr("Debug"));
 
@@ -561,7 +563,7 @@ PreferencesDialog::PreferencesDialog(ViewServicePtr viewService, PatientModelSer
 	mainLayout->addWidget(mButtonBox);
 	setLayout(mainLayout);
 
-	mTabWidget->setCurrentIndex(0);
+	mTabWidget->setCurrentIndex(currentIndex);
 
 	mButtonBox->button(QDialogButtonBox::Ok)->setFocus();
 }
@@ -583,7 +585,7 @@ void PreferencesDialog::applySlot()
 	emit applied();
 }
 
-void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
+void PreferencesDialog::addTab(PreferenceTab* widget, QString name, int selectedIndex)
 {
 	widget->init();
 	connect(mButtonBox, SIGNAL(accepted()), widget, SLOT(saveParametersSlot()));
@@ -592,7 +594,7 @@ void PreferencesDialog::addTab(PreferenceTab* widget, QString name)
 	QAction* action = new QAction(name, mActionGroup);
 	action->setData(mTabWidget->count());
 	action->setCheckable(true);
-	if (!mTabWidget->count())
+	if(mTabWidget->count() == selectedIndex)
 		action->setChecked(true);
 	connect(action, SIGNAL(triggered()), this, SLOT(selectTabSlot()));
 	QToolButton* button = new QToolButton(this);
