@@ -88,6 +88,7 @@ private slots:
   void onRecordFullscreenChanged();
 
 private:
+  void fixFlickeringBar();
   void activateTool(QString uid);
   QString getToolStyle(bool visible, bool initialized, bool active);
 

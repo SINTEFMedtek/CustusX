@@ -36,7 +36,7 @@ public:
 	void tearDown();
 
 protected:
-	void doTestVessel2VesselRegistration(cx::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle);
+	void doTestVessel2VesselRegistration(cx::Transform3D perturbation, QString filenameSource, QString filenameTarget, double tol_dist, double tol_angle, cx::FileManagerServicePtr filemanager);
 	vtkPolyDataPtr generatePolyData(std::vector<cx::Vector3D> pts);
 	QStringList generateTestData();
 	void saveVTKFile(vtkPolyDataPtr data, QString filename);

@@ -17,7 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTextStream>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
-#include "cxEnumConverter.h"
+#include "cxEnumConversion.h"
 #include "cxDataLocations.h"
 #include "cxProfile.h"
 #include "cxFrame3D.h"
@@ -38,6 +38,7 @@ namespace cx
 #define REFERENCE_ATTRIBUTE "reference"
 #define OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE "openigtlinktransformid"
 #define OPENIGTLINK_IMAGE_ID_ATTRIBUTE "openigtlinkimageid"
+#define OPENIGTLINK_APPLY_REF_TO_TOOLS_ATTRIBUTE "openigtlinkApplyRefToTools"
 
 ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder) :
 				mConfigurationFilePath(absoluteConfigFilePath), mLoggingFolder(loggingFolder)
@@ -71,6 +72,7 @@ QString ConfigurationFileParser::getTrackingSystemImplementation()
 
 	if (trackingsystemImplementationNodes.count() == 0)
 	{
+		//CX_LOG_DEBUG() << "Cannot find " << CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG << " tag. Selecting " << TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
 		retval = TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;//Revert to igstk implementation for old config files
 	}
 	else if(trackingsystemImplementationNodes.count() > 1)
@@ -158,6 +160,7 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 
 	if (!this->isConfigFileValid())
 		return retval;
+	bool applyRefToTools = this->getApplyRefToTools();
 
 	QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(CONFIG_TRACKER_TOOL_FILE);
 	for (int i = 0; i < toolFileNodes.count(); ++i)
@@ -166,6 +169,7 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 		toolStructure.mAbsoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
 		toolStructure.mOpenIGTLinkTransformId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE);
 		toolStructure.mOpenIGTLinkImageId = toolFileNodes.at(i).toElement().attribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE);
+		toolStructure.mApplyRefToTool = applyRefToTools;
 
 		QString reference = toolFileNodes.at(i).toElement().attribute(REFERENCE_ATTRIBUTE);
 		if (reference.contains("yes", Qt::CaseInsensitive))
@@ -180,6 +184,29 @@ std::vector<ConfigurationFileParser::ToolStructure> ConfigurationFileParser::get
 QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
 {
 	QString retval = DataLocations::getRootConfigPath() + "/tool/TEMPLATE_configuration.xml";
+	return retval;
+}
+
+bool ConfigurationFileParser::getApplyRefToTools()
+{
+	bool retval = false;
+	if (!this->isConfigFileValid())
+		return retval;
+
+	QDomNodeList trackingsystemImplementationNodes = mConfigureDoc.elementsByTagName(CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG);
+	for (int i = 0; i < trackingsystemImplementationNodes.count(); ++i)
+	{
+		QString applyRef = trackingsystemImplementationNodes.at(i).toElement().attribute(OPENIGTLINK_APPLY_REF_TO_TOOLS_ATTRIBUTE);
+		if (applyRef.contains("yes", Qt::CaseInsensitive))
+			retval = true;
+	}
+	//Is it neccesary to check for number of tracking system implementations here?
+	//This is done in ConfigurationFileParser::getTrackingSystemImplementation()
+	if(trackingsystemImplementationNodes.count() > 1)
+	{
+		CX_LOG_ERROR() << "ConfigurationFileParser::getApplyRefToTools(): Config file: " << mConfigurationFilePath
+					   << " has more the one tracking system implementation. Only one is currently supported.";
+	}
 	return retval;
 }
 
@@ -207,7 +234,6 @@ QString ConfigurationFileParser::getToolPathFromRoot(QString root)
 
 void ConfigurationFileParser::saveConfiguration(Configuration& config)
 {
-	bool doSaveFile = true;
 	QDomDocument doc;
 	doc.appendChild(doc.createProcessingInstruction("xml version =", "\"1.0\""));
 
@@ -216,6 +242,9 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 	QDomElement trackingsystemImplementationNode = doc.createElement(CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG);
 	trackingsystemImplementationNode.setAttribute(TYPE_ATTRIBUTE, config.mTrackingSystemImplementation);
+
+	if (config.mTrackingSystemImplementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
+		trackingsystemImplementationNode.setAttribute(OPENIGTLINK_APPLY_REF_TO_TOOLS_ATTRIBUTE, (config.mApplyRefToTools ? "yes" : "no"));
 
 	configNode.appendChild(trackingsystemImplementationNode);
 
@@ -240,11 +269,6 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 			ToolFileParser toolparser(absoluteToolFilePath);
 			QString toolTrackerType = enum2string(toolparser.getTool()->mTrackerType);
 
-			if (config.mTrackingSystemImplementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
-			{
-				doSaveFile = false;
-			}
-
 			if (!trackingSystemName.contains(enum2string(toolparser.getTool()->mTrackerType), Qt::CaseInsensitive))
 			{
 				reportWarning("When saving configuration, skipping tool " + relativeToolFilePath + " of type "
@@ -254,10 +278,7 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 			QDomElement toolFileNode = doc.createElement(CONFIG_TRACKER_TOOL_FILE);
 			toolFileNode.appendChild(doc.createTextNode(relativeToolFilePath));
-			toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (it2->mReference ? "yes" : "no"));
-			//These are not saved correctly yet. See comment in ToolConfigureGroupBox::getCurrentConfiguration()
-			toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, it2->mOpenIGTLinkTransformId);// These are not saved correctly yet.
-			toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, it2->mOpenIGTLinkImageId);// These are not saved correctly yet.
+			createToolFileNode(it2, toolFileNode, toolparser);
 			trackerTagNode.appendChild(toolFileNode);
 		}
 		trackingsystemImplementationNode.appendChild(trackerTagNode);
@@ -267,22 +288,34 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
 
 	//write to file
 	QFile file(config.mFileName);
-	if(doSaveFile)
+	QDir().mkpath(QFileInfo(config.mFileName).absolutePath());
+
+	if (!file.open(QIODevice::WriteOnly))
 	{
-		QDir().mkpath(QFileInfo(config.mFileName).absolutePath());
-
-		if (!file.open(QIODevice::WriteOnly))
-		{
-			reportWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
-			return;
-		}
-
-		QTextStream stream(&file);
-		doc.save(stream, 4);
-		reportSuccess("Configuration file " + file.fileName() + " is written.");
+		reportWarning("Could not open file " + file.fileName() + ", aborting writing of config.");
+		return;
 	}
-	else
-		CX_LOG_INFO() << "Changing OpenIGTLink tool files not supported. Not overwriting config file: " << file.fileName();
+
+	QTextStream stream(&file);
+	doc.save(stream, 4);
+	reportSuccess("Configuration file " + file.fileName() + " is written.");
+}
+
+void ConfigurationFileParser::createToolFileNode(ToolStructureVector::iterator iter, QDomElement &toolFileNode, ToolFileParser &toolparser)
+{
+	toolFileNode.setAttribute(REFERENCE_ATTRIBUTE, (iter->mReference ? "yes" : "no"));
+	//Use OpenIGTLink id values from tool config file if present
+	QString transformId = iter->mOpenIGTLinkTransformId;
+	QString imageId = iter->mOpenIGTLinkImageId;
+	//Otherwise use id values from tool  file
+	if(transformId.isEmpty())
+		transformId = toolparser.getTool()->mOpenigtlinkTransformId;
+	if(imageId.isEmpty())
+		imageId = toolparser.getTool()->mOpenigtlinkImageId;
+	if(!transformId.isEmpty())
+		toolFileNode.setAttribute(OPENIGTLINK_TRANSFORM_ID_ATTRIBUTE, transformId);
+	if(!imageId.isEmpty())
+		toolFileNode.setAttribute(OPENIGTLINK_IMAGE_ID_ATTRIBUTE, imageId);
 }
 
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)

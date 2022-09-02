@@ -29,6 +29,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVideoSource.h"
 #include "cxActiveData.h"
 #include "cxVideoServiceProxy.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cx
 {
@@ -60,6 +61,7 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 	mTrackingService = TrackingServiceProxy::create(mContext);
 
 	mVideoService = VideoServiceProxy::create(mContext);
+	mFileManagerService = FileManagerServiceProxy::create(mContext);
 
 	// build object(s):
 	PatientModelServicePtr patientModelService = PatientModelServiceProxy::create(mContext);
@@ -69,12 +71,12 @@ void PatientModelImplService::createInterconnectedDataAndSpace()
 	mDataService = DataManagerImpl::create(mActiveData);
 
 	SpaceProviderPtr spaceProvider(new cx::SpaceProviderImpl(mTrackingService, patientModelService));
-	mDataService->setSpaceProvider(spaceProvider);
+	mDataService->setServices(spaceProvider, mFileManagerService);
 
 	mDataFactory.reset(new DataFactory(patientModelService, spaceProvider));
 	mDataService->setDataFactory(mDataFactory);
 
-	mPatientData.reset(new PatientData(mDataService, session));
+	mPatientData.reset(new PatientData(mDataService, session, mFileManagerService));
 }
 
 void PatientModelImplService::shutdownInterconnectedDataAndSpace()
@@ -83,7 +85,7 @@ void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 	mPatientData.reset();
 
 	// [HACK] break loop by removing connection to DataFactory and SpaceProvider
-	mDataService->setSpaceProvider(SpaceProviderPtr());
+	mDataService->setServices(SpaceProviderPtr(), FileManagerServicePtr());
 	mDataService->setDataFactory(DataFactoryPtr());
 	mDataService->clear();
 
@@ -109,12 +111,12 @@ PatientModelImplService::~PatientModelImplService()
 	this->shutdownInterconnectedDataAndSpace();
 }
 
-void PatientModelImplService::insertData(DataPtr data)
+void PatientModelImplService::insertData(DataPtr data, bool overWrite)
 {
 	QString outputBasePath = this->patientData()->getActivePatientFolder();
 
-	this->dataService()->loadData(data);
-	data->save(outputBasePath);
+	this->dataService()->loadData(data, overWrite);
+	data->save(outputBasePath, mFileManagerService);
 }
 
 DataPtr PatientModelImplService::createData(QString type, QString uid, QString name)

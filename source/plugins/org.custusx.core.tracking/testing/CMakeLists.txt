@@ -5,11 +5,9 @@ if(BUILD_TESTING)
     )
     set(CX_TEST_CATCH_org_custusx_core_tracking_SOURCE_FILES
         cxtestTrackingPlugin.cpp
-        cxtestToolFiles.cpp
-        cxtestTestToolMesh.h
-        cxtestTestToolMesh.cpp
         cxtestCatchTrackingService.cpp
         cxtestCatchProbe.cpp
+        cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
         )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_tracking_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_tracking_MOC_SOURCE_FILES})
@@ -28,6 +26,7 @@ if(BUILD_TESTING)
         cxResource
         org_custusx_core_tracking
         cxCatch
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtest_org_custusx_core_tracking)
         

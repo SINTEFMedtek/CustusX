@@ -128,7 +128,7 @@ class cxResource_EXPORT UsReconstructionFileReader
 public:
 
 public:
-	UsReconstructionFileReader();
+	UsReconstructionFileReader(FileManagerServicePtr fileManager);
 
 	/** Read all data from the files and return as a FileData object.
 	 *
@@ -160,6 +160,8 @@ private:
 
 //	ImagePtr createMaskFromConfigParams(USReconstructInputData data);
 	ImagePtr generateMask(USReconstructInputData data);
+
+	FileManagerServicePtr mFileManagerService;
 };
 
 typedef boost::shared_ptr<UsReconstructionFileReader> UsReconstructionFileReaderPtr;

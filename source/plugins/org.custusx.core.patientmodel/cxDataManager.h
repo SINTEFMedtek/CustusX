@@ -66,7 +66,7 @@ public:
 	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
 
 	// data
-	virtual void loadData(DataPtr data) = 0;
+	virtual void loadData(DataPtr data, bool overWrite = false) = 0;
 	virtual DataPtr loadData(const QString& uid, const QString& path) = 0;
     virtual std::map<QString, DataPtr> getData() const = 0;
 	virtual DataPtr getData(const QString& uid) const = 0;

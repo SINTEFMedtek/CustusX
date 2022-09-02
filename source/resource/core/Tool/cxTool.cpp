@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -19,19 +19,19 @@ namespace cx
 {
 vtkPolyDataPtr Tool::createDefaultPolyDataCone()
 {
-    vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
-    coneSource->SetResolution(25);
-    coneSource->SetRadius(10);
-    coneSource->SetHeight(100);
+	vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
+	coneSource->SetResolution(25);
+	coneSource->SetRadius(10);
+	coneSource->SetHeight(100);
 
-    coneSource->SetDirection(0, 0, 1);
-    double newCenter[3];
-    coneSource->GetCenter(newCenter);
-    newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
-    coneSource->SetCenter(newCenter);
+	coneSource->SetDirection(0, 0, 1);
+	double newCenter[3];
+	coneSource->GetCenter(newCenter);
+	newCenter[2] = newCenter[2] - coneSource->GetHeight() / 2;
+	coneSource->SetCenter(newCenter);
 
-    coneSource->Update();
-    return coneSource->GetOutput();
+	coneSource->Update();
+	return coneSource->GetOutput();
 }
 
 Tool::Tool(const QString &uid, const QString &name) :
@@ -52,7 +52,7 @@ ToolPtr Tool::getNullObject()
 QString ToolPositionMetadata::toString() const
 {
 	return mData.trimmed();
-//	return mData.toElement().ownerDocument().toString();
+	//	return mData.toElement().ownerDocument().toString();
 }
 
 } //cx

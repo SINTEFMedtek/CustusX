@@ -115,6 +115,8 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 typedef boost::shared_ptr<class CoreServices> CoreServicesPtr;
 typedef boost::shared_ptr<class RegServices> RegServicesPtr;
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
+typedef boost::shared_ptr<class FileReaderWriterService> FileReaderWriterServicePtr;
+typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class PatientModelService> PatientModelServicePtr;
 typedef boost::shared_ptr<class RegistrationService> RegistrationServicePtr;
@@ -141,6 +143,8 @@ typedef boost::shared_ptr<class DoubleProperty> DoublePropertyPtr;
 typedef boost::shared_ptr<class BoolProperty> BoolPropertyPtr;
 typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
+typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 // other stuff
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
@@ -166,6 +170,7 @@ typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
 typedef boost::shared_ptr<class ViewportListener> ViewportListenerPtr;
 typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
 typedef boost::shared_ptr<class VideoConnectionManager> VideoConnectionManagerPtr;
+typedef boost::shared_ptr<class WorkflowStateMachine> WorkflowStateMachinePtr;
 
 } // namespace cx
 

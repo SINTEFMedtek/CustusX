@@ -76,8 +76,9 @@ private:
 
 	ctkDICOMItemPtr wrapInCTK(DcmItem* item) const;
 	double getSliceSpacing() const;
-	QVector<double> getZPositions() const;
+	QVector<double> getPositions(int cIndex) const;
 	bool isMultiFrameImage() const;
+	double calculateMultiFrameSpacing(int frameIndex) const;
 };
 
 

@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkCellArray.h>
 #include <vtkColorSeries.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataWriter.h>
 #include <vtkPointData.h>
 #include <QDomDocument>
 #include <QColor>
@@ -27,10 +26,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxRegistrationTransform.h"
 #include "cxBoundingBox3D.h"
-#include "cxDataReaderWriter.h"
 #include "vtkProperty.h"
 #include "vtkImageData.h"
-
+#include "cxImage.h"
+#include "cxFileManagerService.h"
+#include "cxLogger.h"
+#include "cxNullDeleter.h"
 
 namespace cx
 {
@@ -75,10 +76,10 @@ bool Mesh::getIsWireframe() const
 	return mProperties.mRepresentation->getValue().toInt() == VTK_WIREFRAME;
 }
 
-bool Mesh::load(QString path)
+bool Mesh::load(QString path, FileManagerServicePtr filemanager)
 {
 	vtkPolyDataPtr raw;
-	raw = DataReaderWriter().loadVtkPolyData(path);
+	raw = filemanager->loadVtkPolyData(path);
 	if(raw)
 	{
 		this->setVtkPolyData(raw);
@@ -198,7 +199,7 @@ void Mesh::setUseColorFromPolydataScalars(bool on)
 
 bool Mesh::getUseColorFromPolydataScalars() const
 {
-	return mProperties.mUseColorFromPolydataScalars->getValue();
+    return mProperties.mUseColorFromPolydataScalars->getValue();
 }
 
 void Mesh::setBackfaceCullingSlot(bool backfaceCulling)
@@ -444,16 +445,13 @@ bool Mesh::isFiberBundle() const
 	return poly->GetLines()->GetNumberOfCells() > 0 && poly->GetPolys()->GetNumberOfCells() == 0 && poly->GetStrips()->GetNumberOfCells() == 0;
 }
 
-void Mesh::save(const QString& basePath)
+void Mesh::save(const QString& basePath, FileManagerServicePtr fileManager)
 {
-	vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
-	writer->SetInputData(this->getVtkPolyData());
 	QString filename = basePath + "/Images/" + this->getUid() + ".vtk";
 	this->setFilename(QDir(basePath).relativeFilePath(filename));
-	writer->SetFileName(cstring_cast(filename));
+	MeshPtr self = MeshPtr(this, null_deleter());
+	fileManager->save(self, filename);
 
-	writer->Update();
-	writer->Write();
 }
 
 } // namespace cx

@@ -45,7 +45,7 @@ signals:
 private:
 	void setConnectivityFromType(QString type);
 	QString getConnectivityType();
-	void addConnectivityAction(QString type, QString text, QMenu *contextMenu);
+	void addConnectivityAction(QString type, QString text, QString toolTip, QMenu *contextMenu);
 	void set(SyncedValuePtr value);
 
 	SyncedValuePtr mZoom2D;

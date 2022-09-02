@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #ifndef BRANCH_H_
@@ -31,8 +31,12 @@ class Branch
 {
 	Eigen::MatrixXd mPositions;
 	Eigen::MatrixXd mOrientations;
+	Eigen::VectorXd mRadius;
 	branchVector mChildBranches;
 	BranchPtr mParentBranch;
+	double mBronchoscopeRotation = 0;
+	QString mLap;
+
 public:
 	Branch();
 	virtual ~Branch();
@@ -40,15 +44,25 @@ public:
 	Eigen::MatrixXd getPositions();
 	void setOrientations(Eigen::MatrixXd orient);
 	Eigen::MatrixXd getOrientations();
+	void setRadius(Eigen::VectorXd r);
+	Eigen::VectorXd getRadius();
+	double getAverageRadius();
 	void addChildBranch(BranchPtr child); //Note that this method doesn't set this branch as parent to the child. Inconsistent?
 	void setChildBranches(branchVector children); //Note that this method doesn't set this branch as parent to the children. Inconsistent?
 	void deleteChildBranches();
 	branchVector getChildBranches();
 	void setParentBranch(BranchPtr parent); //Note that this method doesn't set this branch as a child of the parent. Inconsistent?
-    int findGenerationNumber();
-    double findBranchRadius();
+	int findGenerationNumber();
+	double findBranchRadius();
 	BranchPtr getParentBranch();
+	void calculateOrientations();
 	int findParentIndex(branchVector bv) const;
+	void setBronchoscopeRotation(double rotation);
+	double getBronchoscopeRotation();
+	void removeEqualPositions();
+	void setLap(QString lap);
+	QString getLap();
+
 };
 
 

@@ -53,18 +53,23 @@ void Zoom2DHandler::set(SyncedValuePtr value)
 
 void Zoom2DHandler::addActionsToMenu(QMenu* contextMenu)
 {
-	this->addConnectivityAction("global", "Global 2D Zoom", contextMenu);
-	this->addConnectivityAction("group", "Group 2D Zoom", contextMenu);
-	this->addConnectivityAction("local", "Disconnected 2D Zoom", contextMenu);
+	this->addConnectivityAction("global", "Global 2D Zoom",
+								"Zoom in all 2D views are synchronized", contextMenu);
+	this->addConnectivityAction("group", "Group 2D Zoom",
+								"Zoom for all 2D views in a view group with this option set\n"
+								"will be synchronized. ", contextMenu);
+	this->addConnectivityAction("local", "Disconnected 2D Zoom",
+								"2D zoom in this view will be decoupled from other 2D views", contextMenu);
 	contextMenu->addSeparator();
 }
 
-void Zoom2DHandler::addConnectivityAction(QString type, QString text, QMenu* contextMenu)
+void Zoom2DHandler::addConnectivityAction(QString type, QString text, QString toolTip, QMenu* contextMenu)
 {
 	QAction* action = new QAction(text, contextMenu);
 	action->setCheckable(true);
 	action->setData(type);
 	action->setChecked(this->getConnectivityType()==type);
+	action->setToolTip(toolTip);
 	connect(action, SIGNAL(triggered()), this, SLOT(zoom2DActionSlot()));
 	contextMenu->addAction(action);
 }

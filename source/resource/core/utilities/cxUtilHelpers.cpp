@@ -34,6 +34,15 @@ double constrainValue(double val, double min, double max)
 	return val;
 }
 
+int constrainValue(int val, int min, int max)
+{
+	if (val<=min)
+		return min;
+	if (val>=max)
+		return max;
+	return val;
+}
+
 int sign(double x)
 {
 	if (x>=0)
@@ -66,6 +75,7 @@ void sleep_ms(int ms)
 		Sleep(ms);
 #endif
 }
+
 
 } // namespace cx
 

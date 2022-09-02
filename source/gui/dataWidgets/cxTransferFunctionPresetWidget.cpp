@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxActiveData.h"
+#include "cxEnumConversion.h"
 
 namespace cx {
 
@@ -77,7 +78,7 @@ void TransferFunctionPresetWidget::populatePresetListSlot()
 		PresetWidget::populatePresetList(mPresets->getPresetList(mActiveData->getActive<Image>()->getModality()));
 	else
 		//No active image, show all available presets for debug/overview purposes
-		PresetWidget::populatePresetList(mPresets->getPresetList("UNKNOWN"));
+		PresetWidget::populatePresetList(mPresets->getPresetList(imUNKNOWN));
 }
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
@@ -101,7 +102,7 @@ void TransferFunctionPresetWidget::saveSlot()
 	// generate a name suggestion: identical if custom, appended by index if default.
 	QString newName = PresetWidget::getCurrentPreset();
 	TransferFunctions3DPresetsPtr preset = boost::dynamic_pointer_cast<TransferFunctions3DPresets>(mPresets);
-	if (!preset->getPresetList("").contains(newName))
+	if (!preset->getPresetList(imUNKNOWN).contains(newName))
 		newName = "custom preset";
 	if (preset->isDefaultPreset(newName))
 		newName += "(2)";

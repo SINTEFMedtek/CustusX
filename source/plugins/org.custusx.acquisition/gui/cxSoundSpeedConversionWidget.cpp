@@ -81,6 +81,8 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 void SoundSpeedConverterWidget::setToolSlot(const QString& uid)
 {
   ToolPtr tool = mTrackingService->getTool(uid);
+  if(!tool)
+	return;
   ProbePtr probe = tool->getProbe();
   if(!probe)
     return;

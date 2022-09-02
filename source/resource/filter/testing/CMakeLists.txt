@@ -17,6 +17,8 @@ if(BUILD_TESTING)
         cxtestBinaryThresholdImageFilter.cpp
         cxtestDilationFilter.cpp
         cxtestExportDummyClassForLinkingOnWindowsInLibWithoutExportedClass.cpp
+        cxtestScriptFilter.cpp
+				cxtestColorVariationFilter.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
@@ -31,11 +33,13 @@ if(BUILD_TESTING)
     target_link_libraries(cxtestFilter
         PRIVATE
         cxResource
-		cxtestResource
+        cxtestResource
         cxResourceFilter
-		cxResourceVisualization
+        cxResourceVisualization
         cxCatch
         cxtestUtilities
+        cxLogicManager
+				cxtest_org_custusx_core_patientmodel
     )
     cx_add_tests_to_catch(cxtestFilter)
 

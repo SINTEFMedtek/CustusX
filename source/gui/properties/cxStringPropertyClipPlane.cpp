@@ -10,8 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxStringPropertyClipPlane.h"
-#include "cxEnumConverter.h"
-#include "cxDefinitionStrings.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

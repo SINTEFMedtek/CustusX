@@ -1,4 +1,4 @@
-Registration Method Plugin: Bronchoscopy image to image {#org_custusx_registration_method_bronchoscopy}
+Registration Method Plugin: Bronchoscopy image to image {#org_custusx_registration_method_bronchoscopy_image2image}
 ===========================================================
 
 \addindex org_custusx_registration_method_bronchoscopy_image2image_widget

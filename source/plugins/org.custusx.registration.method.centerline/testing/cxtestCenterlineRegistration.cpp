@@ -10,14 +10,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
-#include "cxData.h"
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxDataLocations.h"
-#include "cxLogicManager.h"
 #include "cxPatientModelService.h"
 #include "cxCenterlineRegistration.h"
-#include <vtkImageData.h>
+#include "cxtestSessionStorageTestFixture.h"
+#include "cxVisServices.h"
 
 typedef boost::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
 
@@ -25,9 +24,12 @@ typedef boost::shared_ptr<cx::CenterlineRegistration> CenterlineRegistrationPtr;
 namespace cxtest {
 
 
-TEST_CASE("CenterlineRegistration: execute", "[unit][org.custusx.registration.method.centerline]")
+// This test just use two random centerlines and register them to each other.
+// The test only verifies that the code is running without crashing, and that all objects are created.
+TEST_CASE("CenterlineRegistration: execute", "[integration][org.custusx.registration.method.centerline]")
 {
-    cx::LogicManager::initialize();
+	cxtest::SessionStorageTestFixture storageFixture;
+	storageFixture.loadSession1();//Create test patient folder
 
     CenterlineRegistrationPtr centerlineRegistration;
     centerlineRegistration = CenterlineRegistrationPtr(new cx::CenterlineRegistration());
@@ -38,10 +40,9 @@ TEST_CASE("CenterlineRegistration: execute", "[unit][org.custusx.registration.me
     QString filenameCenterline1 = cx::DataLocations::getTestDataPath()+"/testing/Centerline/US_aneurism_cl_size0.vtk";
     QString filenameCenterline2 = cx::DataLocations::getTestDataPath()+"/testing/Centerline/US_aneurism_cl_size1.vtk";
 
-    //create a new patient
 	QString info;
-	cx::DataPtr dataCenterline1 = cx::logicManager()->getPatientModelService()->importData(filenameCenterline1, info);
-	cx::DataPtr dataCenterline2 = cx::logicManager()->getPatientModelService()->importData(filenameCenterline2, info);
+	cx::DataPtr dataCenterline1 = storageFixture.mServices->patient()->importData(filenameCenterline1, info);
+	cx::DataPtr dataCenterline2 = storageFixture.mServices->patient()->importData(filenameCenterline2, info);
 
     REQUIRE(dataCenterline1);
     REQUIRE(dataCenterline2);
@@ -57,8 +58,6 @@ TEST_CASE("CenterlineRegistration: execute", "[unit][org.custusx.registration.me
 
     cx::Transform3D rMpr = centerlineRegistration->FullRegisterMoving(cx::Transform3D::Identity());
     REQUIRE(rMpr.data());
-
-    cx::LogicManager::shutdown();
 }
 
 }; // end cxtest namespace

@@ -31,6 +31,7 @@ namespace cx
 
 
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
+typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public FilterImpl
 {
@@ -38,18 +39,25 @@ class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public Filte
 	Q_INTERFACES(cx::Filter)
 
 public:
-    RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile = false);
+	RouteToTargetFilter(VisServicesPtr services, bool createRouteInformationFile = false);
 	virtual ~RouteToTargetFilter() {}
 
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
-    static QString getNameSuffix();
-    static QString getNameSuffixExtension();
+	static QString getNameSuffix();
+	static QString getNameSuffixExtension();
+	static QString getNameSuffixBloodVessel();
+	static QString getNameSuffixAirwayModel();
+	static QString getNameSuffixAirwayAndVesselRTT();
+
+	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< double > getCameraRotation();
 
 	virtual bool execute();
 	virtual bool postProcess();
-	virtual void setTargetName(QString name);
+	virtual bool postProcessBloodVessels();
+    void setSmoothing(bool smoothing = true);
 
 protected:
 	virtual void createOptions();
@@ -62,8 +70,13 @@ private:
 	RouteToTargetPtr mRouteToTarget;
 	vtkPolyDataPtr mOutput;
     vtkPolyDataPtr mExtendedRoute;
-	QString mTargetName;
+    vtkPolyDataPtr 	mBloodVesselRoute;
+    vtkPolyDataPtr mAirwaysFromBloodVessel;
+    vtkPolyDataPtr mAirwayAndBloodVesselRoute;
+    BranchListPtr mBranchListPtr;
     bool mGenerateFileWithRouteInformation;
+    bool mSmoothing;
+    BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
 

@@ -15,9 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
-#include "math.h"
 #include "cxSettings.h"
-#include "cxMathUtils.h"
 
 namespace cx
 {
@@ -30,7 +28,7 @@ ImageDefaultTFGenerator::ImageDefaultTFGenerator(ImagePtr image) : mImage(image)
 void ImageDefaultTFGenerator::resetShading()
 {
 	// add shading for known preoperative modalities
-	if (mImage->getModality().contains("CT") || mImage->getModality().contains("MR"))
+	if ((mImage->getModality() == imCT) || (mImage->getModality() == imMR))
 		mImage->setShadingOn(settings()->value("View/shadingOn").value<bool>());
 }
 
@@ -53,6 +51,9 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	colors[smax] = QColor(Qt::white);
 	tf->resetColor(colors);
 
+	if (this->looksLikeBinaryImage())
+		tf->setLLR(smin+1);//Make zero transparent for binary volumes. Why is +1 needed? Is there an issue with LLR range?
+
 	return tf;
 }
 
@@ -70,14 +71,14 @@ ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 	// Note the ordering: add in descending order to ensure zero is
 	// always written into smin, also for binary volumes
 	// Round is required for binary volumes.
-	opacity[smin + roundAwayFromZero(0.5*srange)] = 255;
-	opacity[smin + roundAwayFromZero(0.3*srange)] = 255.0 * 0.7;
-	opacity[smin + roundAwayFromZero(0.1*srange)] = 0;
+	opacity[int(std::lround(smin + 0.5*srange))] = 255;
+	opacity[int(std::lround(smin + 0.3*srange))] = int(std::lround(255.0 * 0.7));
+	opacity[int(std::lround(smin + 0.1*srange))] = 0;
 	tf->resetAlpha(opacity);
 
 	ColorMap colors;
-	colors[smin] = QColor(Qt::black);
-	colors[smax] = QColor(Qt::white);
+	colors[int(std::lround(smin))] = QColor(Qt::black);
+	colors[int(std::lround(smax))] = QColor(Qt::white);
 	tf->resetColor(colors);
 
 	return tf;
@@ -108,13 +109,14 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange() const
 			{
 				srange.first = 0;
 				srange.second = 1;
+				return srange;
 			}
 		}
-		if (mImage->getModality().contains("CT"))
+		if (mImage->getModality() == imCT)
 		{
 			srange = this->guessCTRange();
 		}
-		if (mImage->getModality().contains("MR"))
+		if (mImage->getModality() == imMR)
 		{
 			srange = this->guessMRRange();
 		}
@@ -138,8 +140,8 @@ bool ImageDefaultTFGenerator::looksLikeBinaryImage() const
 
 double_pair ImageDefaultTFGenerator::ensureNonZeroRoundedRange(double_pair range) const
 {
-	range.first = roundAwayFromZero(range.first);
-	range.second = roundAwayFromZero(range.second);
+	range.first = std::round(range.first);
+	range.second = std::round(range.second);
 	range.second = std::max(range.second, range.first+1);
 	return range;
 }

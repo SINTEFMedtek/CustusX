@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUsReconstructionServiceProxy.h"
 #include "cxPatientModelServiceProxy.h"
 #include "cxSessionStorageService.h"
+#include "cxFileManagerServiceProxy.h"
 
 
 namespace cxtest
@@ -45,6 +46,7 @@ ReconstructionManagerTestFixture::ReconstructionManagerTestFixture() :
 
 	ctkPluginContext *pluginContext = cx::logicManager()->getPluginContext();
 	mPatientModelService = cx::PatientModelServiceProxy::create(pluginContext);
+	mFileManagerService = cx::FileManagerServiceProxy::create(pluginContext);
 }
 
 ReconstructionManagerTestFixture::~ReconstructionManagerTestFixture()
@@ -67,6 +69,11 @@ void ReconstructionManagerTestFixture::setPNN_InterpolationSteps(int value)
 		cx::reportError("Could not find adapter interpolationSteps");
 }
 
+cx::FileManagerServicePtr ReconstructionManagerTestFixture::getFileManagerService()
+{
+	return mFileManagerService;
+}
+
 void ReconstructionManagerTestFixture::reconstruct()
 {
 	mOutput.clear();
@@ -75,10 +82,11 @@ void ReconstructionManagerTestFixture::reconstruct()
 
 	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mViewService));
 
-	executer->startNonThreadedReconstruction(reconstructer->createAlgorithm(),
+	bool success = executer->startNonThreadedReconstruction(reconstructer->createAlgorithm(),
 			reconstructer->createCoreParameters(),
 			reconstructer->getSelectedFileData(),
 			createBModeWhenAngio);
+	REQUIRE(success);
 
 	mOutput = executer->getResult();
 }
@@ -91,10 +99,11 @@ void ReconstructionManagerTestFixture::threadedReconstruct()
 	cx::ReconstructionExecuterPtr executer(new cx::ReconstructionExecuter(mPatientModelService, mViewService));
 
 	bool createBModeWhenAngio = reconstructer->getParam("Dual Angio")->getValueAsVariant().toBool();
-	executer->startReconstruction(reconstructer->createAlgorithm(),
+	bool success = executer->startReconstruction(reconstructer->createAlgorithm(),
 			reconstructer->createCoreParameters(),
 			reconstructer->getSelectedFileData(),
 			createBModeWhenAngio);
+	REQUIRE(success);
 	cx::TimedAlgorithmPtr thread = executer->getThread();
 
 	QObject::connect(thread.get(), SIGNAL(finished()), qApp, SLOT(quit()));

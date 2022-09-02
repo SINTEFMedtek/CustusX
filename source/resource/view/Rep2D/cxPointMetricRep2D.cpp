@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -42,7 +42,7 @@ void PointMetricRep2D::setDynamicSize(bool on)
 	if (on)
 	{
 		mViewportListener.reset(new ViewportListener);
-//		mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
+		//mViewportListener->setCallback(boost::bind(&PointMetricRep2D::rescale, this));
 	}
 	else
 	{
@@ -52,9 +52,9 @@ void PointMetricRep2D::setDynamicSize(bool on)
 
 void PointMetricRep2D::addRepActorsToViewRenderer(ViewPtr view)
 {
-    if (mViewportListener)
-        mViewportListener->startListen(view->getRenderer());
-    DataMetricRep::addRepActorsToViewRenderer(view);
+	if (mViewportListener)
+		mViewportListener->startListen(view->getRenderer());
+	DataMetricRep::addRepActorsToViewRenderer(view);
 }
 
 void PointMetricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
@@ -63,12 +63,12 @@ void PointMetricRep2D::removeRepActorsFromViewRenderer(ViewPtr view)
 
 	if (mViewportListener)
 		mViewportListener->stopListen();
-    DataMetricRep::removeRepActorsFromViewRenderer(view);
+	DataMetricRep::removeRepActorsFromViewRenderer(view);
 }
 
 void PointMetricRep2D::clear()
 {
-    DataMetricRep::clear();
+	DataMetricRep::clear();
 }
 
 void PointMetricRep2D::onModifiedStartRender()

@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkMetaImageReader.h"
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
+#include <vtkImageChangeInformation.h>
 #include "cxForwardDeclarations.h"
 #include "cxImageDataContainer.h"
 #include "cxTypeConversions.h"
@@ -29,7 +30,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"
-#include "cxDataReaderWriter.h"
 #include "cxSender.h"
 #include "cxFilePathProperty.h"
 #include "cxProfile.h"
@@ -228,7 +228,22 @@ QString DummyImageStreamer::getType()
 
 vtkImageDataPtr DummyImageStreamer::internalLoadImage(QString filename)
 {
-	vtkImageDataPtr source = MetaImageReader().loadVtkImageData(filename);
+	//vtkImageDataPtr source = mFileManagerService->loadVtkImageData(filename);
+
+	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+	reader->SetFileName(cstring_cast(filename));
+	reader->ReleaseDataFlagOn();
+
+	//if (!ErrorObserver::checkedRead(reader, filename))
+	//	return vtkImageDataPtr();
+
+	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+	zeroer->SetInputConnection(reader->GetOutputPort());
+	zeroer->SetOutputOrigin(0, 0, 0);
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. Initialized vtkImageChangeInformation";
+	zeroer->Update();//Test "VideoConnectionWidget can stream" freeze at this point on Ubuntu 16.04
+	CX_LOG_DEBUG() << "DummyImageStreamer::internalLoadImage. updated VTK pipeline";
+	vtkImageDataPtr source = zeroer->GetOutput();
 
 	if (source)
 		std::cout << "DummyImageStreamer: Initialized with source file: " << getFileName().toStdString() << std::endl;

@@ -83,6 +83,7 @@ public:
 
 	virtual ToolPtr getActiveTool();
 	virtual void setActiveTool(const QString& uid); ///< can be set to either a connected or configured tool
+	virtual void clearActiveTool();///< Deselect active tool
 
 	virtual ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
 
@@ -94,13 +95,20 @@ public:
 	virtual ToolPtr getFirstProbe();
 
 	virtual void setPlaybackMode(PlaybackTimePtr controller);
+	virtual std::vector<TrackerConfigurationPtr> getConfigurations();
+	//virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
 	virtual TrackerConfigurationPtr getConfiguration();
+	virtual QString getCurrentTrackingSystemImplementation();
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system);
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system);
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems();
+	virtual void resetTimeSynchronization();
 
 	bool isNull();
+	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation);
+
+public slots:
 
 private slots:
 	void globalConfigurationFileChangedSlot(QString key);
@@ -114,10 +122,10 @@ private slots:
 	void onSessionSave(QDomElement& node);
 
 private:
-    void listenForTrackingSystemServices(ctkPluginContext *context);
-    void onTrackingSystemAdded(TrackingSystemService* service);
-    void onTrackingSystemRemoved(TrackingSystemService* service);
-    void onTrackingSystemModified(TrackingSystemService* service);
+	void listenForTrackingSystemServices(ctkPluginContext *context);
+	void onTrackingSystemAdded(TrackingSystemService* service);
+	void onTrackingSystemRemoved(TrackingSystemService* service);
+	void onTrackingSystemModified(TrackingSystemService* service);
 
 
 	void rebuildCachedTools();
@@ -136,6 +144,7 @@ private:
 	virtual void loadPositionHistory();
 
 	QString getLoggingFolder();
+	virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation);
 
 	ToolMap mTools; ///< all tools
 	ToolPtr mActiveTool; ///< the tool with highest priority
@@ -151,7 +160,8 @@ private:
 
 	double mToolTipOffset; ///< Common tool tip offset for all tools
 
-    boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
+	boost::shared_ptr<ServiceTrackerListener<TrackingSystemService> > mServiceListener;
+	QString mTrackingSystemImplementation;
 };
 
 bool toolTypeSort(const ToolPtr tool1, const ToolPtr tool2); ///< function for sorting tools by type

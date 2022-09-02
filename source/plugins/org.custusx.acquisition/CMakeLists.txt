@@ -72,6 +72,7 @@ ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
 set(PLUGIN_target_libraries
     ${PLUGIN_target_libraries}
     org_custusx_usreconstruction
+    #cxLogicManager
 )
 
 set(PLUGIN_OUTPUT_DIR "")

@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSpaceProviderImpl.h"
 #include "cxRegistrationTransform.h"
 #include "cxLogicManager.h"
+#include "cxFileManagerServiceProxy.h"
 
 
 namespace cxtest {
@@ -32,7 +33,12 @@ MetricFixture::MetricFixture()
 MetricFixture::~MetricFixture()
 {
 	mServices.reset();
-	CHECK(!mMessageListener->containsErrors());
+}
+
+bool MetricFixture::messageListenerContainErrors()
+{
+	//Needed to move CHECK out of destructor, as this may create a throw (not encouraged in destructors)
+	return mMessageListener->containsErrors();
 }
 
 cx::SpaceProviderPtr MetricFixture::getSpaceProvider()
@@ -219,8 +225,10 @@ bool MetricFixture::verifySingleLineHeader(QStringList list, cx::DataMetricPtr m
 
 void MetricFixture::testExportAndImportMetrics()
 {
+	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
-	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider());
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
+	cx::MetricManager manager(cx::logicManager()->getViewService(), cx::logicManager()->getPatientModelService(), cx::logicManager()->getTrackingService(), cx::logicManager()->getSpaceProvider(), filemanager);
 
 	// create metrics and insert them into the patientmodel
 	std::vector<cx::DataMetricPtr> metrics = this->createMetricsForExport();
@@ -243,6 +251,8 @@ void MetricFixture::testExportAndImportMetrics()
 
 	//get imported metrics from the patient and check that they are equal to the ones which was exported
 	this->checkImportedMetricsEqualToExported(metrics, manager);
+
+	cx::LogicManager::shutdown();
 }
 
 std::vector<cx::DataMetricPtr> MetricFixture::createMetricsForExport()

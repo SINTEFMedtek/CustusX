@@ -37,21 +37,25 @@ public:
 	static VideoServiceBackendPtr create(PatientModelServicePtr dataManager,
 								TrackingServicePtr trackingService,
 								SpaceProviderPtr spaceProvider,
-										 ctkPluginContext* context);
+								FileManagerServicePtr filemanager,
+								ctkPluginContext* context);
 	VideoServiceBackend(PatientModelServicePtr dataManager,
 								TrackingServicePtr trackingService,
 								SpaceProviderPtr spaceProvider,
-						ctkPluginContext* context);
+								FileManagerServicePtr filemanager,
+								ctkPluginContext* context);
 
 	PatientModelServicePtr getDataManager();
 	TrackingServicePtr tracking();
 	SpaceProviderPtr getSpaceProvider();
+	FileManagerServicePtr file();
 	ctkPluginContext* mContext;
 
 private:
 	PatientModelServicePtr mDataManager;
 	TrackingServicePtr mTrackingService;
 	SpaceProviderPtr mSpaceProvider;
+	FileManagerServicePtr mFileManagerService;
 };
 
 } // namespace cx

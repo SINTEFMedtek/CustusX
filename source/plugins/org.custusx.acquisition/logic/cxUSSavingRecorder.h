@@ -62,7 +62,7 @@ public:
 	/**
 	  * Start recording
 	  */
-	void startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video);
+	void startRecord(RecordSessionPtr session, ToolPtr tool, ToolPtr reference, std::vector<VideoSourcePtr> video, FileManagerServicePtr filemanager);
 	void stopRecord();
 	void cancelRecord();
 

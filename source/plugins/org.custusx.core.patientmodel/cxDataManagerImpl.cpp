@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -30,7 +30,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
 
-#include "cxDataReaderWriter.h"
 #include "cxSpaceProvider.h"
 #include "cxDataFactory.h"
 
@@ -38,8 +37,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTransferFunctions3DPresets.h"
 #include "cxProfile.h"
 #include "cxSettings.h"
-#include "cxDefinitionStrings.h"
 #include "cxActiveData.h"
+#include "cxFileManagerService.h"
+#include "cxEnumConversion.h"
 
 
 namespace cx
@@ -70,9 +70,10 @@ DataManagerImpl::~DataManagerImpl()
 {
 }
 
-void DataManagerImpl::setSpaceProvider(SpaceProviderPtr spaceProvider)
+void DataManagerImpl::setServices(SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager)
 {
 	mSpaceProvider = spaceProvider;
+	mFileManagerService = filemanager;
 }
 
 void DataManagerImpl::setDataFactory(DataFactoryPtr dataFactory)
@@ -146,13 +147,13 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 
 void DataManagerImpl::setOperatingTable(const OperatingTable &ot)
 {
-    mOperatingTable = ot;
-    emit operatingTableChanged();
+	mOperatingTable = ot;
+	emit operatingTableChanged();
 }
 
 OperatingTable DataManagerImpl::getOperatingTable() const
 {
-    return mOperatingTable;
+	return mOperatingTable;
 }
 
 
@@ -211,7 +212,7 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 	if (mData.count(uid)) // dont load same image twice
 		return mData[uid];
 
-	QString type = DataReaderWriter().findDataTypeFromFile(path);
+	QString type = mFileManagerService->findDataTypeFromFile(path);
 	if(!mDataFactory)
 		reportError("DataManagerImpl::loadData() Got no DataFactory");
 	DataPtr data = mDataFactory->create(type, uid);
@@ -222,7 +223,9 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 		return DataPtr();
 	}
 
-	bool loaded = data->load(path);
+	bool loaded = data->load(path, mFileManagerService);
+	//TODO FIX
+	//bool loaded = mFileManagerService->load(path, data);
 
 	if (!loaded)
 	{
@@ -234,7 +237,7 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path)
 	return data;
 }
 
-void DataManagerImpl::loadData(DataPtr data)
+void DataManagerImpl::loadData(DataPtr data, bool overWrite)
 {
 	if (data->getUid().contains('%'))
 	{
@@ -247,9 +250,9 @@ void DataManagerImpl::loadData(DataPtr data)
 
 	if (data)
 	{
-		if (mData.count(data->getUid()) && mData[data->getUid()]!=data)
+		if (!overWrite && mData.count(data->getUid()) && mData[data->getUid()]!=data)
 			reportError(QString("Overwriting Data with uid=%1 with new object into PasM").arg(data->getUid()));
-//		this->verifyParentFrame(data);
+		//this->verifyParentFrame(data);
 		mData[data->getUid()] = data;
 		emit dataAddedOrRemoved();
 	}
@@ -320,9 +323,9 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 	centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
 	dataManagerNode.appendChild(centerNode);
 
-    QDomElement otNode = doc.createElement("operatingTable");
+	QDomElement otNode = doc.createElement("operatingTable");
 	otNode.appendChild(doc.createTextNode(qstring_cast(mOperatingTable.rMot)));
-    dataManagerNode.appendChild(otNode);
+	dataManagerNode.appendChild(otNode);
 
 	for (DataMap::const_iterator iter = mData.begin(); iter != mData.end(); ++iter)
 	{
@@ -394,16 +397,16 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 				this->setCenter(center);
 			}
 		}
-        if (child.toElement().tagName() == "operatingTable")
-        {
-            const QString ot = child.toElement().text();
-            if (!ot.isEmpty())
-            {
-                Transform3D tr = Transform3D::fromString(ot);
-                OperatingTable t(tr);
-                this->setOperatingTable(t);
-            }
-        }
+		if (child.toElement().tagName() == "operatingTable")
+		{
+			const QString ot = child.toElement().text();
+			if (!ot.isEmpty())
+			{
+				Transform3D tr = Transform3D::fromString(ot);
+				OperatingTable t(tr);
+				this->setOperatingTable(t);
+			}
+		}
 		child = child.nextSibling();
 	}
 }
@@ -426,7 +429,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 		reportWarning(QString("Unknown type: %1 for file %2").arg(type).arg(absolutePath));
 		return DataPtr();
 	}
-	bool loaded = data->load(absolutePath);
+	bool loaded = data->load(absolutePath, mFileManagerService);
 
 	if (!loaded)
 	{
@@ -445,7 +448,7 @@ DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 	if (QDir::cleanPath(absolutePath) != QDir::cleanPath(newPath))
 	{
 		reportWarning(QString("Detected old data format, converting from %1 to %2").arg(absolutePath).arg(newPath));
-		data->save(rootPath);
+		data->save(rootPath, mFileManagerService);
 	}
 
 	return data;

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPushButton>
 #include <QTableWidget>
 #include <QLabel>
+#include <QCheckBox>
 
 #include "cxActiveToolProxy.h"
 #include "cxLandmarkListener.h"
@@ -60,6 +61,12 @@ PatientLandMarksWidget::PatientLandMarksWidget(RegServicesPtr services,
 	mVerticalLayout->addWidget(mToolSampleButton);
 	mVerticalLayout->addWidget(mAvarageAccuracyLabel);
 	mVerticalLayout->addWidget(mRemoveLandmarkButton);
+
+	mMouseClickSample->setText("Sample with mouse clicks in anyplane view.");
+	mMouseClickSample->show();
+	connect(mMouseClickSample, &QCheckBox::stateChanged, this, &PatientLandMarksWidget::mouseClickSampleStateChanged);
+
+	mVerticalLayout->addWidget(mMouseClickSample);
 
 	this->updateToolSampleButton();
 }
@@ -116,6 +123,7 @@ void PatientLandMarksWidget::showEvent(QShowEvent* event)
 {
 	mServices->view()->setRegistrationMode(rsPATIENT_REGISTRATED);
 	LandmarkRegistrationWidget::showEvent(event);
+	mMouseClickSample->setChecked(true);
 }
 
 void PatientLandMarksWidget::hideEvent(QHideEvent* event)
@@ -187,4 +195,21 @@ QString PatientLandMarksWidget::getTargetName() const
 	return "Patient";
 }
 
+void PatientLandMarksWidget::pointSampled(Vector3D p_r)
+{
+	QTableWidgetItem* item = getLandmarkTableItem();
+	if(!item)
+	{
+		CX_LOG_WARNING() << "PatientLandMarksWidget::pointSampled() Cannot get item from mLandmarkTableWidget";
+		return;
+	}
+	QString uid = item->data(Qt::UserRole).toString();
+
+	Transform3D rMtarget = this->getTargetTransform();
+	Vector3D p_target = rMtarget.inv().coord(p_r);
+
+	this->setTargetLandmark(uid, p_target);
+	this->activateLandmark(this->getNextLandmark());
+	this->performRegistration();
+}
 } //cx

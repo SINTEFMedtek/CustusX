@@ -82,7 +82,7 @@ MainWindow::MainWindow() :
 
 	connect(mServices->state().get(), &StateService::applicationStateChanged, this, &MainWindow::onApplicationStateChangedSlot);
 	connect(mServices->state().get(), &StateService::workflowStateChanged, this, &MainWindow::onWorkflowStateChangedSlot);
-	connect(mServices->state().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
+	//connect(mServices->state().get(), &StateService::workflowStateAboutToChange, this, &MainWindow::saveDesktopSlot);
 
 	this->updateWindowTitle();
 
@@ -269,6 +269,7 @@ void MainWindow::createActions()
 	mPreferencesAction = new QAction(tr("Preferences"), this);
 	mPreferencesAction->setShortcut(tr("Ctrl+,"));
 	mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
+	mPreferencesToolConfigAction = new QAction(tr("Tool Config"), this);
 
 	mFullScreenAction = new QAction(tr("Fullscreen"), this);
 	mFullScreenAction->setShortcut(tr("F11"));
@@ -283,6 +284,7 @@ void MainWindow::createActions()
 
 	connect(mAboutAction, &QAction::triggered, this, &MainWindow::aboutSlot);
 	connect(mPreferencesAction, &QAction::triggered, this, &MainWindow::preferencesSlot);
+	connect(mPreferencesToolConfigAction, &QAction::triggered, this, [this]{ preferencesSlot(5); });
 	connect(mQuitAction, &QAction::triggered, qApp, &QApplication::quit);
 
 	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
@@ -295,7 +297,7 @@ void MainWindow::createActions()
 	mInteractorStyleActionGroup = mServices->view()->getInteractorStyleActionGroup();
 
 	// cross-connect save patient to save session
-	connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot);
+	//connect(mServices->session().get(), &SessionStorageService::isSaving, this, &MainWindow::saveDesktopSlot, Qt::DirectConnection);
 }
 
 
@@ -357,6 +359,7 @@ void MainWindow::onWorkflowStateChangedSlot()
 
 void MainWindow::saveDesktopSlot()
 {
+	CX_LOG_DEBUG() << "saveDesktopSlot";
 	Desktop desktop;
 	desktop.mMainWindowState = this->saveState();
 	desktop.mLayoutUid = mServices->view()->getActiveLayout(0);
@@ -453,7 +456,7 @@ void MainWindow::createMenus()
 	mFileMenu->addAction(mActions->getAction("ClearPatient"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mActions->getAction("ExportPatient"));
-	mFileMenu->addAction(mActions->getAction("ImportData"));
+	mFileMenu->addAction(mActions->getAction("AddFilesForImport"));
 	mFileMenu->addSeparator();
 	mFileMenu->addAction(mFullScreenAction);
 	mFileMenu->addAction(mActions->getAction("StartLogConsole"));
@@ -480,8 +483,7 @@ void MainWindow::createMenus()
 
 	//tool
 	this->menuBar()->addMenu(mToolMenu);
-	mToolMenu->addAction(mActions->getAction("ConfigureTools"));
-	mToolMenu->addAction(mActions->getAction("InitializeTools"));
+	mToolMenu->addAction(mPreferencesToolConfigAction);
 	mToolMenu->addAction(mActions->getAction("TrackingTools"));
 	mToolMenu->addSeparator();
 	mToolMenu->addAction(mActions->getAction("StartStreaming"));
@@ -515,7 +517,7 @@ void MainWindow::createToolBars()
 	mDataToolBar->addAction(mActions->getAction("NewPatient"));
 	mDataToolBar->addAction(mActions->getAction("LoadFile"));
 	mDataToolBar->addAction(mActions->getAction("SaveFile"));
-	mDataToolBar->addAction(mActions->getAction("ImportData"));
+	mDataToolBar->addAction(mActions->getAction("AddFilesForImport"));
 
 	mToolToolBar = this->registerToolBar("Tools");
 	mToolToolBar->addAction(mActions->getAction("TrackingTools"));
@@ -588,9 +590,9 @@ void MainWindow::aboutSlot()
 			);
 }
 
-void MainWindow::preferencesSlot()
+void MainWindow::preferencesSlot(int currentTabIndex)
 {
-	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), mServices->state(), mServices->tracking(), this);
+	PreferencesDialog prefDialog(mServices->view(), mServices->patient(), mServices->state(), mServices->tracking(), currentTabIndex, this);
 	prefDialog.exec();
 }
 

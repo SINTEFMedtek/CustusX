@@ -24,7 +24,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QThread>
 #include <QApplication>
 #include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxTime.h"
 #include "cxMessageListener.h"
 
@@ -32,14 +31,15 @@ namespace cx
 {
 
 Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
-  mText(text),
-  mMessageLevel(messageLevel),
-  mTimeoutTime(timeoutTime),
-  mTimeStamp(QDateTime::currentDateTime()),
-  mMuted(true),
-  mChannel("console")
+	mText(text),
+	mMessageLevel(messageLevel),
+	mTimeoutTime(timeoutTime),
+	mTimeStamp(QDateTime::currentDateTime()),
+	mMuted(true),
+	mChannel("console")
 {
-	this->setThreadName();
+	mThread = "NotUsed";
+	//this->setThreadName(); //Cause crash on Ubuntu 20.04, when calling QApplication::instance()->thread()
 }
 
 Message::~Message()
@@ -83,21 +83,21 @@ QString Message::getPrintableMessage() const
 
 MESSAGE_LEVEL Message::getMessageLevel() const
 {
-  return mMessageLevel;
+	return mMessageLevel;
 }
 
 QString Message::getText() const
 {
-  return mText;
+	return mText;
 }
 
 QDateTime Message::getTimeStamp() const
 {
-  return mTimeStamp;
+	return mTimeStamp;
 }
 int Message::getTimeout() const
 {
-  return mTimeoutTime;
+	return mTimeoutTime;
 }
 QString Message::getSourceLocation() const
 {

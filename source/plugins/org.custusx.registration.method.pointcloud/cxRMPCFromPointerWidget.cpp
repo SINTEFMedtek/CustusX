@@ -46,7 +46,7 @@ void RMPCFromPointerWidget::setup()
 	connect(mSpaceListenerFixed.get(), &SpaceListener::changed, this, &RMPCFromPointerWidget::onSpacesChanged);
 
 	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices->registration(), mServices->patient()));
-	mFixedImage->setTypeRegexp("mesh");
+	mFixedImage->setTypeRegexp(Mesh::getTypeName());
 	mFixedImage->setValueName("Select Surface");
 	mFixedImage->setHelp("Select a surface model to register against.");
 

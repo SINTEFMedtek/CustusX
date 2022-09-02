@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxServiceTrackerListener.h"
 #include "cxReconstructionExecuter.h"
 #include "cxPatientModelService.h"
+#include "cxFileManagerService.h"
 
 //Windows fix
 #ifndef M_PI
@@ -38,9 +39,10 @@ namespace cx
 {
 
 
-UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, XmlOptionFile settings) :
+UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *pluginContext, PatientModelServicePtr patientModelService, ViewServicePtr viewService, FileManagerServicePtr filemanagerservice, XmlOptionFile settings) :
 	mPatientModelService(patientModelService),
-	mViewService(viewService)
+	mViewService(viewService),
+	mFileManagerService(filemanagerservice)
 {
 	mSettings = settings;
 	mSettings.getElement("algorithms");
@@ -109,7 +111,9 @@ void UsReconstructionImplService::startReconstruction()
 	connect(executer.get(), SIGNAL(reconstructFinished()), this, SLOT(reconstructFinishedSlot()));
 	mExecuters.push_back(executer);
 
-	executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	bool success = executer->startReconstruction(algo, par, fileData, mParams->getCreateBModeWhenAngio()->getValue());
+	if(!success)
+		CX_LOG_WARNING() << "US reconstruction failed. Probably an error with input data.";
 }
 
 std::set<cx::TimedAlgorithmPtr> UsReconstructionImplService::getThreadedReconstruction()
@@ -200,9 +204,14 @@ void UsReconstructionImplService::selectData(QString filename, QString calFilesP
 		return;
 	}
 
-	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader());
+	cx::UsReconstructionFileReaderPtr fileReader(new cx::UsReconstructionFileReader(mFileManagerService));
 	USReconstructInputData fileData = fileReader->readAllFiles(filename, calFilesPath);
 	fileData.mFilename = filename;
+	if(!fileData.isValid())
+	{
+		CX_LOG_WARNING() << "UsReconstructionImplService::selectData: Invalid input data";
+		return;
+	}
 	this->selectData(fileData);
 }
 
@@ -216,7 +225,7 @@ void UsReconstructionImplService::selectData(USReconstructInputData fileData)
 
 void UsReconstructionImplService::updateFromOriginalFileData()
 {
-	if (!mOriginalFileData.isValid())
+	if (mFileManagerService->isNull() || !mOriginalFileData.isValid())
 		return;
 
 	ReconstructPreprocessorPtr preprocessor(new ReconstructPreprocessor(mPatientModelService));

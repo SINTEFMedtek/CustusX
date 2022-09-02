@@ -19,8 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QSound>
 #include <QDir>
 #include <QTextStream>
-#include "cxTypeConversions.h"
-#include "cxDefinitionStrings.h"
 #include "cxTime.h"
 #include "cxMessageListener.h"
 

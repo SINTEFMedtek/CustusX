@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cxtest
 {
+typedef boost::shared_ptr<class PatientModelServiceMock> PatientModelServiceMockPtr;
 
 class CXTESTRESOURCE_EXPORT PatientModelServiceMock : public cx::PatientModelServiceNull
 {
@@ -24,10 +25,10 @@ public:
 	PatientModelServiceMock();
 	virtual ~PatientModelServiceMock() {}
 
-	virtual void insertData(cx::DataPtr data);
+	virtual void insertData(cx::DataPtr data, bool overWrite = false);
 	virtual cx::DataPtr createData(QString type, QString uid, QString name="");
 	virtual std::map<QString, cx::DataPtr> getDatas(DataFilter filter) const;
-	virtual cx::DataPtr importData(QString fileName, QString &infoText);
+	virtual cx::DataPtr importDataMock(QString fileName, QString &infoText, cx::FileManagerServicePtr filemanager);
 	virtual cx::RegistrationHistoryPtr get_rMpr_History() const;
 
 private:

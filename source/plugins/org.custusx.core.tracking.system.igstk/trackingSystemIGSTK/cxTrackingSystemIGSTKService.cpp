@@ -25,7 +25,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxPositionStorageFile.h"
 #include "cxTime.h"
-#include "cxEnumConverter.h"
 #include "cxDummyTool.h"
 #include "cxToolUsingIGSTK.h"
 #include "cxIgstkTracker.h"
@@ -83,6 +82,7 @@ void TrackingSystemIGSTKService::configure()
 		CX_LOG_DEBUG() << "TrackingSystemIGSTKService::configure(): Not using IGSTK tracking.";
 		return;
 	}
+	emit updateTrackingSystemImplementation(configParser.getTrackingSystemImplementation());
 
 	std::vector<ToolFileParser::TrackerInternalStructure> trackers = configParser.getTrackers();
 

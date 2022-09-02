@@ -39,7 +39,7 @@ public:
 	PatientModelImplService(ctkPluginContext* context);
 	virtual ~PatientModelImplService();
 
-	virtual void insertData(DataPtr data);
+	virtual void insertData(DataPtr data, bool overWrite = false);
 	virtual DataPtr createData(QString type, QString uid, QString name);
 	virtual std::map<QString, DataPtr> getDatas(DataFilter filter) const;
 	virtual DataPtr getData(const QString& uid) const;
@@ -101,6 +101,7 @@ private:
 
 	TrackingServicePtr mTrackingService;
 	VideoServicePtr mVideoService;
+	FileManagerServicePtr mFileManagerService;
 
 	std::map<QString, ToolPtr> mProbeTools;
 

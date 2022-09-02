@@ -117,7 +117,6 @@ void TrackedStream::setVideoSource(const VideoSourcePtr &videoSource)
 
 void TrackedStream::newFrameSlot()
 {
-	//TODO: Check if we need to turn this on/off
 	if (mImage && mVideoSource && mVideoSource->isStreaming())
 	{
 		mImage->setVtkImageData(mVideoSource->getVtkImageData(), false);
@@ -170,6 +169,11 @@ ImagePtr TrackedStream::getChangingImage()
 	if (!mImage)
 		mImage = ImagePtr(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
 	return mImage;
+}
+
+void TrackedStream::deleteImageToStopEmittingFrames()
+{
+	mImage = ImagePtr();
 }
 
 bool TrackedStream::is3D()

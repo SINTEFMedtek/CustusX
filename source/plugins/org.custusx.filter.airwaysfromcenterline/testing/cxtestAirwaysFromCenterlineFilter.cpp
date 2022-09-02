@@ -13,9 +13,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxData.h"
 #include "cxImage.h"
 #include "cxDataLocations.h"
-#include "cxLogicManager.h"
 #include "cxPatientModelService.h"
 #include "cxAirwaysFromCenterline.h"
+#include "cxtestSessionStorageTestFixture.h"
+#include "cxVisServices.h"
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
 
@@ -24,9 +25,10 @@ typedef boost::shared_ptr<class cx::AirwaysFromCenterline> AirwaysFromCenterline
 namespace cxtest {
 
 
-TEST_CASE("AirwaysFromCenterline: execute", "[unit][org.custusx.filter.airwaysfromcenterline]")
+TEST_CASE("AirwaysFromCenterline: execute", "[integration][org.custusx.filter.airwaysfromcenterline]")
 {
-    cx::LogicManager::initialize();
+	cxtest::SessionStorageTestFixture storageFixture;
+	storageFixture.loadSession1();//Create test patient folder
 
     //setup filter
     AirwaysFromCenterlinePtr airwaysFromCenterline = AirwaysFromCenterlinePtr(new cx::AirwaysFromCenterline());
@@ -36,7 +38,7 @@ TEST_CASE("AirwaysFromCenterline: execute", "[unit][org.custusx.filter.airwaysfr
 
     //create a new patient
 	QString info;
-    cx::DataPtr dataCenterline = cx::logicManager()->getPatientModelService()->importData(filenameCenterline, info);
+	cx::DataPtr dataCenterline = storageFixture.mServices->patient()->importData(filenameCenterline, info);
 
     REQUIRE(dataCenterline);
 
@@ -52,9 +54,6 @@ TEST_CASE("AirwaysFromCenterline: execute", "[unit][org.custusx.filter.airwaysfr
 
     REQUIRE(outputAirwayMesh);
     REQUIRE(outputCenterline->getVtkPolyData());
-
-
-    cx::LogicManager::shutdown();
 }
 
 }; // end cxtest namespace

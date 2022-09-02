@@ -61,6 +61,7 @@ public:
 	virtual ToolPtr getTool(const QString& uid) = 0; ///< get a tool
 	virtual ToolPtr getActiveTool() = 0; ///< get the tool that has higest priority when tracking
 	virtual void setActiveTool(const QString& uid) = 0; ///< set a tool to be the active tool
+	virtual void clearActiveTool() = 0;///< Deselect active tool
 	virtual ToolPtr getFirstProbe() = 0; ///< get the active probe or any if none active
 
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
@@ -73,11 +74,16 @@ public:
 
 	virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) = 0;
 	virtual void runDummyTool(DummyToolPtr tool) = 0;
+	virtual std::vector<TrackerConfigurationPtr> getConfigurations() = 0;
+	//virtual TrackerConfigurationPtr getConfiguration(QString trackingSystemImplementation) = 0;//Set as private in TrackingImplService for now
 	virtual TrackerConfigurationPtr getConfiguration() = 0;
+	virtual void setCurrentTrackingSystemImplementation(QString trackingSystemImplementation) = 0;
+	virtual QString getCurrentTrackingSystemImplementation() = 0;
 
 	virtual void installTrackingSystem(TrackingSystemServicePtr system) = 0;
 	virtual void unInstallTrackingSystem(TrackingSystemServicePtr system) = 0;
 	virtual std::vector<TrackingSystemServicePtr> getTrackingSystems() = 0;
+	virtual void resetTimeSynchronization() = 0; ///< Reset time synchronization. Used for resetting time synchronization of incoming timestamps in OpenIGTLinkTrackingSystemService
 
 	virtual bool isNull() = 0;
 	static TrackingServicePtr getNullObject();

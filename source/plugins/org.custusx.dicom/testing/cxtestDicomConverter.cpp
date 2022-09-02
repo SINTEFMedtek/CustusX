@@ -19,7 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxDicomConverter.h"
 #include "cxReporter.h"
-#include "cxDataReaderWriter.h"
 #include "cxImage.h"
 #include "cxTypeConversions.h"
 #include "vtkImageMathematics.h"
@@ -30,8 +29,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_dicom_Export.h"
 #include "cxDicomWidget.h"
 #include "cxLogicManager.h"
-
-
+#include "cxFileManagerServiceProxy.h"
 
 typedef vtkSmartPointer<vtkImageAccumulate> vtkImageAccumulatePtr;
 typedef vtkSmartPointer<vtkImageMathematics> vtkImageMathematicsPtr;
@@ -91,10 +89,11 @@ public:
 		checkImagesEqual(input1->getBaseVtkImageData(), input2->getBaseVtkImageData());
 	}
 
-	cx::ImagePtr loadImageFromFile(QString filename, QString uid)
+	cx::ImagePtr loadImageFromFile(cx::FileManagerServicePtr filemanager, QString filename, QString uid)
 	{
 		cx::ImagePtr image = cx::Image::create(uid,uid);
-		cx::MetaImageReader().readInto(image, filename);
+		filemanager->readInto(image, filename);
+		//cx::DataReaderWriter().readInto(image, filename);
 		return image;
 	}
 
@@ -195,6 +194,10 @@ TEST_CASE("DicomConverter: Open database", "[unit][plugins][org.custusx.dicom]")
 
 TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.dicom]")
 {
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+
 	cx::Reporter::initialize();
 	bool verbose = true;
 	DicomConverterTestFixture fixture;
@@ -225,8 +228,8 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 	converter.setDicomDatabase(db.data());
 	cx::ImagePtr convertedImage = converter.convertToImage(series);
 
-	cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
-	referenceImage->setModality("SC"); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
+	cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
+	referenceImage->setModality(cx::imSC); // hack: "SC" is not supported by mhd, it is instead set to "OTHER"
 
 	if (verbose)
 	{
@@ -236,18 +239,25 @@ TEST_CASE("DicomConverter: Convert Kaisa", "[integration][plugins][org.custusx.d
 		{
 			std::cout << "converted: " << streamXml2String(*convertedImage) << std::endl;
 			convertedImage->getBaseVtkImageData()->Print(std::cout);
-			cx::MetaImageReader().saveImage(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
+			filemanager->save(convertedImage, cx::DataLocations::getTestDataPath()+"/temp/kaisa_series5353_out.mhd");
 		}
 	}
 
 	fixture.checkImagesEqual(referenceImage, referenceImage); //
 	fixture.checkImagesEqual(convertedImage, referenceImage);
+
+	cx::LogicManager::shutdown();
 }
 
 TEST_CASE("DicomConverter: Convert DICOM dataset from Radiology department - verify .mhd file is written",
           "[integration][plugins][org.custusx.dicom]")
 {
     cx::Reporter::initialize();
+
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+
     bool verbose = true;
     DicomConverterTestFixture fixture;
 
@@ -276,15 +286,19 @@ TEST_CASE("DicomConverter: Convert DICOM dataset from Radiology department - ver
         imageFile.remove();
     REQUIRE(!QFileInfo::exists(fileName));
 
-    cx::MetaImageReader().saveImage(convertedImage, fileName);
+	//cx::MetaImageReader().saveImage(convertedImage, fileName);
+	filemanager->save(convertedImage, fileName);
     // Verify that image file has been written
     REQUIRE(QFileInfo::exists(fileName));
+
+		cx::LogicManager::shutdown();
 }
 
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration][plugins][org.custusx.dicom]")
 {
 	cx::Reporter::initialize();
+
 	bool verbose = true;
 	DicomConverterTestFixture fixture;
 
@@ -324,6 +338,10 @@ TEST_CASE("DicomConverter: Convert P5 and get correct z spacing", "[integration]
 
 TEST_CASE("DicomConverter: US data from SW, missing position data", "[integration][plugins][org.custusx.dicom]")
 {
+	cx::LogicManager::initialize();
+	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
+	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(context);
+
     //Transform matrix should be identity and not zero
     DicomConverterTestFixture fixture;
 
@@ -339,10 +357,12 @@ TEST_CASE("DicomConverter: US data from SW, missing position data", "[integratio
     converter.setDicomDatabase(db.data());
 
     cx::ImagePtr convertedImage = converter.convertToImage(series);
-    cx::ImagePtr referenceImage = fixture.loadImageFromFile(referenceImageFilename, "reference");
+		cx::ImagePtr referenceImage = fixture.loadImageFromFile(filemanager, referenceImageFilename, "reference");
 
     fixture.checkImagesEqual(referenceImage, referenceImage); //
     fixture.checkImagesEqual(convertedImage, referenceImage);
+
+		cx::LogicManager::shutdown();
 }
 #endif
 

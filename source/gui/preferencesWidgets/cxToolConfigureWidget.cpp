@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QDir>
 #include <QLineEdit>
-#include "cxEnumConverter.h"
 #include "cxLogger.h"
 #include "cxStateService.h"
 #include "cxTrackingService.h"
@@ -25,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolListWidget.h"
 #include "cxHelperWidgets.h"
 #include "cxTrackerConfiguration.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -46,7 +46,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(TrackingServicePtr trackingService,
 
 	mToolListWidget = new ConfigToolListWidget(trackingService, NULL);
 
-	this->createTrackingSystemSelector();
+	this->createGUISelectors();
 
 //	QGroupBox* toolGroupBox = new QGroupBox();
 //	toolGroupBox->setTitle("Tools");
@@ -63,6 +63,10 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(TrackingServicePtr trackingService,
 	layout->addWidget(mConfigFileLineEdit, row, 1, 1, 1);
 	row++;
 	sscCreateDataWidget(this, mTrackingSystemSelector, layout, row);
+	row++;
+	sscCreateDataWidget(this, mTrackingSystemImplementationSelector, layout, row);
+	row++;
+	sscCreateDataWidget(this, mApplyRefToTools, layout, row);
 	row++;
 	layout->addWidget(mToolListWidget, row, 0, 1, 2);
 	layout->setRowStretch(row, 1);
@@ -114,16 +118,60 @@ QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
 	return retval;
 }
 
-void ToolConfigureGroupBox::createTrackingSystemSelector()
+void ToolConfigureGroupBox::createGUISelectors()
 {
 	QString defaultValue = "";
+	// Just use config for first tracking system, as they should support the same systems for now
 	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
+
 	mTrackingSystemSelector = StringProperty::initialize("trackingsystem", "Tracking System",
 															   "Select tracking system to use",
 															   defaultValue,
 															   config->getSupportedTrackingSystems(),
 															   QDomNode());
-	connect(mTrackingSystemSelector.get(), SIGNAL(changed()), this, SLOT(filterToolsSlot()));
+	connect(mTrackingSystemSelector.get(), &StringProperty::changed, this, &ToolConfigureGroupBox::filterToolsSlot);
+
+	mTrackingSystemImplementationSelector = StringProperty::initialize("trackingSystemImplementation", "Tracking System Implementation",
+																	   "Select tracking system implementation to use",
+																	   defaultValue,
+																	   this->getTrackingSystemImplementationList(),
+																	   QDomNode());
+	connect(mTrackingSystemImplementationSelector.get(), &StringProperty::changed, this, &ToolConfigureGroupBox::trackingSystemImplementationChangedSlot);
+
+	mApplyRefToTools = BoolProperty::initialize("applyRefToTools", "Apply ref to tools",
+												"Apply ref tool position to other tools for transforms received over OpenIGTLink.",
+												false,
+												QDomNode());
+	connect(mApplyRefToTools.get(), &BoolProperty::changed, this, &ToolConfigureGroupBox::applyRefToToolsChangedSlot);
+}
+
+QStringList ToolConfigureGroupBox::getTrackingSystemImplementationList()
+{
+	QStringList retval;
+	std::vector<TrackerConfigurationPtr> configs = mTrackingService->getConfigurations();
+
+	for (unsigned i=0; i<configs.size(); ++i)
+	{
+		retval << configs[i]->getTrackingSystemImplementation();
+	}
+	return retval;
+}
+
+void ToolConfigureGroupBox::trackingSystemImplementationChangedSlot()
+{
+	QString systemImplementation = mTrackingSystemImplementationSelector->getValue();//TODO: Needs to be set outside of GUI as well?
+	mTrackingService->setCurrentTrackingSystemImplementation(systemImplementation);
+	if (systemImplementation.contains(TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK, Qt::CaseInsensitive))
+		mApplyRefToTools->setEnabled(true);
+	else
+		mApplyRefToTools->setEnabled(false);
+
+	mModified = true;
+}
+
+void ToolConfigureGroupBox::applyRefToToolsChangedSlot()
+{
+	mModified = true;
 }
 
 StringPropertyBasePtr ToolConfigureGroupBox::getTrackingSystemSelector()
@@ -141,7 +189,7 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 	// deconfigure toolmanager in order to be able to reread config data
 	mTrackingService->setState(Tool::tsNONE);
 
-	TrackerConfiguration::Configuration current = this->getCurrentConfiguration();
+	TrackerConfiguration::Configuration current = this->getConfiguration();
 	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
 	config->saveConfiguration(current);
 	mModified = false;
@@ -178,8 +226,9 @@ void ToolConfigureGroupBox::configChangedSlot()
 	mConfigFileLineEdit->setToolTip(data.mUid);
 	mModified = true;
 	mTrackingSystemSelector->setValue(data.mTrackingSystemName);
+	mTrackingSystemImplementationSelector->setValue(data.mTrackingSystemImplementation);
+	mApplyRefToTools->setValue(data.mApplyRefToTools);
 	mToolListWidget->configSlot(data.mTools);
-	this->mTrackingSystemImplementation = data.mTrackingSystemImplementation;
 }
 
 void ToolConfigureGroupBox::configEditedSlot()
@@ -228,7 +277,7 @@ int ToolConfigureGroupBox::addConfigurationToComboBox(QString displayName, QStri
 	return index;
 }
 
-TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
+TrackerConfiguration::Configuration ToolConfigureGroupBox::getConfiguration()
 {
 	TrackerConfiguration::Configuration retval;
 	TrackerConfigurationPtr config = mTrackingService->getConfiguration();
@@ -239,8 +288,9 @@ TrackerConfiguration::Configuration ToolConfigureGroupBox::getCurrentConfigurati
 
 	retval.mUid = QString("%1/%2.xml").arg(filepath).arg(filename);
 	retval.mClinicalApplication = application;
-	retval.mTrackingSystemImplementation = this->mTrackingSystemImplementation;
+	retval.mTrackingSystemImplementation = mTrackingService->getCurrentTrackingSystemImplementation();
 	retval.mTrackingSystemName = mTrackingSystemSelector->getValue();
+	retval.mApplyRefToTools = mApplyRefToTools->getValue();
 	retval.mTools = mToolListWidget->getTools();
 	retval.mReferenceTool = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
 

@@ -66,6 +66,7 @@ cx_install_add_library_dirs(
     ${ITK_DIR}/lib
     ${ITK_DIR}/bin
     ${FAST_LIBRARY_DIRS}
+    ${FAST_DIR}/lib
     ${FAST_DIR}/bin
     ${OpenCLUtilityLibrary_LIBRARY_DIRS}
     ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}

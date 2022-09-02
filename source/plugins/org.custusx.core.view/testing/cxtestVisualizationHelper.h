@@ -24,6 +24,9 @@ struct ViewWrapper2DFixture : public cx::ViewWrapper2D
 	void emitPointSampled();
 };
 
+/** Visualization test class.
+ * Uses ViewsFixture, so it can only be used by integration tests.
+ */
 class VisualizationHelper
 {
 public:

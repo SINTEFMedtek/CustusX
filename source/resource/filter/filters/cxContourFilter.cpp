@@ -52,44 +52,45 @@ QString ContourFilter::getType() const
 
 QString ContourFilter::getHelp() const
 {
-	return "<html>"
-	        "<h3>Surfacing.</h3>"
-	        "<p><i>Find the surface of a binary volume using marching cubes.</i></p>"
-	        "<p>- Optional factor 2 reduction</p>"
-	        "<p>- Marching Cubes contouring</p>"
-	        "<p>- Optional Windowed Sinc smoothing</p>"
-	        "<p>- Decimation of triangles</p>"
-           "</html>";
+	return	"<html>"
+					"<h3>Surfacing.</h3>"
+					"<p><i>Find the surface of a binary volume using marching cubes.</i></p>"
+					"<p>- Optional factor 2 reduction</p>"
+					"<p>- Marching Cubes contouring</p>"
+					"<p>- Optional Windowed Sinc smoothing</p>"
+					"<p>- Decimation of triangles</p>"
+				"</html>";
 }
 
 QString ContourFilter::getNameSuffix()
 {
-    return "_ge";
+	return "_ge";
 }
 
 BoolPropertyPtr ContourFilter::getReduceResolutionOption(QDomElement root)
 {
 	return BoolProperty::initialize("Reduce input", "",
-	                                           "Reduce input volumes resolution by a factor of 2 in all directions.", false, root);
+																	"Reduce input volumes resolution by a factor of 2 in all directions.",
+																	 false, root);
 }
 
 BoolPropertyPtr ContourFilter::getSmoothingOption(QDomElement root)
 {
 	return BoolProperty::initialize("Smoothing", "",
-	                                           "Smooth the output contour", true, root);
+																	"Smooth the output contour", true, root);
 }
 
 BoolPropertyPtr ContourFilter::getPreserveTopologyOption(QDomElement root)
 {
 	return BoolProperty::initialize("Preserve mesh topology", "",
-	                                           "Preserve mesh topology during reduction", true, root);
+																	"Preserve mesh topology during reduction", true, root);
 }
 
 DoublePropertyPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
 {
 	DoublePropertyPtr retval = DoubleProperty::initialize("Threshold", "",
-	                                                                            "Values from this threshold and above will be included",
-	                                                                            100.0, DoubleRange(-1000, 1000, 1), 0, root);
+																												"Values from this threshold and above will be included",
+																												100.0, DoubleRange(-1000, 1000, 1), 0, root);
 	retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
 	return retval;
 }
@@ -97,31 +98,31 @@ DoublePropertyPtr ContourFilter::getSurfaceThresholdOption(QDomElement root)
 DoublePropertyPtr ContourFilter::getDecimationOption(QDomElement root)
 {
 	DoublePropertyPtr retval = DoubleProperty::initialize("Decimation %", "",
-	                                                                            "Reduce number of triangles in output surface",
-	                                                                            0.2, DoubleRange(0, 1, 0.01), 0, root);
+																												"Reduce number of triangles in output surface",
+																												0.2, DoubleRange(0, 1, 0.01), 0, root);
 	retval->setInternal2Display(100);
 	return retval;
 }
 
 ColorPropertyPtr ContourFilter::getColorOption(QDomElement root)
 {
-	return ColorProperty::initialize("Color", "",
-	                                            "Color of output model.",
-	                                            QColor("green"), root);
+	return ColorProperty::initialize( "Color", "",
+																		"Color of output model.",
+																		QColor("green"), root);
 }
 
 DoublePropertyPtr ContourFilter::getNumberOfIterationsOption(QDomElement root)
 {
-    return DoubleProperty::initialize("Number of iterations (smoothing)", "",
-                                                                                "Number of iterations in smoothing filter. Higher number = more smoothing",
-                                                                                15, DoubleRange(1, 50, 1), 0, root);
+	return DoubleProperty::initialize("Number of iterations (smoothing)", "",
+																		"Number of iterations in smoothing filter. Higher number = more smoothing",
+																		15, DoubleRange(1, 50, 1), 0, root);
 }
 
 DoublePropertyPtr ContourFilter::getPassBandOption(QDomElement root)
 {
-    return DoubleProperty::initialize("Band pass smoothing", "",
-                                                           "Band pass width in smoothing filter. Smaller number = more smoothing",
-                                                           0.30, DoubleRange(0.05, 0.95, 0.05), 2, root);
+	return DoubleProperty::initialize("Band pass smoothing", "",
+																		"Band pass width in smoothing filter. Smaller number = more smoothing",
+																		0.30, DoubleRange(0.05, 0.95, 0.05), 2, root);
 }
 
 void ContourFilter::createOptions()
@@ -134,8 +135,8 @@ void ContourFilter::createOptions()
 	mOptionsAdapters.push_back(mSurfaceThresholdOption);
 
 	mOptionsAdapters.push_back(this->getSmoothingOption(mOptions));
-    mOptionsAdapters.push_back(this->getNumberOfIterationsOption(mOptions));
-    mOptionsAdapters.push_back(this->getPassBandOption(mOptions));
+	mOptionsAdapters.push_back(this->getNumberOfIterationsOption(mOptions));
+	mOptionsAdapters.push_back(this->getPassBandOption(mOptions));
 	mOptionsAdapters.push_back(this->getDecimationOption(mOptions));
 	mOptionsAdapters.push_back(this->getPreserveTopologyOption(mOptions));
 
@@ -189,10 +190,10 @@ void ContourFilter::imageChangedSlot(QString uid)
 
 	int extent[6];
 	image->getBaseVtkImageData()->GetExtent(extent);
-	mReduceResolutionOption->setHelp("Current input resolution: " + qstring_cast(extent[1])
-	                                 + " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
-	                                 + " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
-	                                 + qstring_cast(extent[5]/2) + ")");
+	mReduceResolutionOption->setHelp( "Current input resolution: " + qstring_cast(extent[1])
+																		+ " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
+																		+ " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
+																		+ qstring_cast(extent[5]/2) + ")");
 }
 
 void ContourFilter::thresholdSlot()
@@ -220,7 +221,7 @@ bool ContourFilter::execute()
 	if (!input)
 		return false;
 
-	//    std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
+	//std::cout << "ContourFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
 
 	BoolPropertyPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
 	BoolPropertyPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
@@ -230,27 +231,27 @@ bool ContourFilter::execute()
 	DoublePropertyPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
 	DoublePropertyPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 
-	//    report(QString("Creating contour from \"%1\"...").arg(input->getName()));
+	//report(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
-	mRawResult = this->execute(input->getBaseVtkImageData(),
-	                           surfaceThresholdOption->getValue(),
-	                           reduceResolutionOption->getValue(),
-	                           smoothingOption->getValue(),
-	                           preserveTopologyOption->getValue(),
-                               decimationOption->getValue(),
-                               numberOfIterationsOption->getValue(),
-                               passBandOption->getValue());
+	mRawResult = this->execute( input->getBaseVtkImageData(),
+															surfaceThresholdOption->getValue(),
+															reduceResolutionOption->getValue(),
+															smoothingOption->getValue(),
+															preserveTopologyOption->getValue(),
+															decimationOption->getValue(),
+															numberOfIterationsOption->getValue(),
+															passBandOption->getValue());
 	return true;
 }
 
 vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
-                                      double threshold,
-                                      bool reduceResolution,
-                                      bool smoothing,
-                                      bool preserveTopology,
-                                      double decimation,
-                                      double numberOfIterations,
-                                      double passBand)
+																			double threshold,
+																			bool reduceResolution,
+																			bool smoothing,
+																			bool preserveTopology,
+																			double decimation,
+																			double numberOfIterations,
+																			double passBand)
 {
 	if (!input)
 		return vtkPolyDataPtr();
@@ -285,12 +286,12 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 	if(smoothing)
 	{
 		smoother->SetInputData(cubesPolyData);
-        smoother->SetNumberOfIterations(numberOfIterations);// Higher number = more smoothing  -  default 15
+		smoother->SetNumberOfIterations(numberOfIterations);// Higher number = more smoothing  -  default 15
 		smoother->SetBoundarySmoothing(false);
 		smoother->SetFeatureEdgeSmoothing(false);
 		smoother->SetNormalizeCoordinates(true);
 		smoother->SetFeatureAngle(120);
-        smoother->SetPassBand(passBand);//Lower number = more smoothing  -  default 0.3
+		smoother->SetPassBand(passBand);//Lower number = more smoothing  -  default 0.3
 		smoother->Update();
 		cubesPolyData = smoother->GetOutput();
 	}
@@ -308,16 +309,18 @@ vtkPolyDataPtr ContourFilter::execute(vtkImageDataPtr input,
 		deci->SetInputConnection(trifilt->GetOutputPort());
 		deci->SetTargetReduction(decimation);
 		deci->SetPreserveTopology(preserveTopology);
-		//    deci->PreserveTopologyOn();
+		//deci->PreserveTopologyOn();
 		deci->Update();
 		cubesPolyData = deci->GetOutput();
 	}
 
-	normals->SetInputData(cubesPolyData);
-	normals->Update();
 
-	cubesPolyData->DeepCopy(normals->GetOutput());
-
+		normals->SetInputData(cubesPolyData);
+		normals->SetComputeCellNormals(true);
+		normals->AutoOrientNormalsOn();
+		normals->Update();
+		cubesPolyData->DeepCopy(normals->GetOutput());
+	
 	return cubesPolyData;
 }
 
@@ -346,8 +349,8 @@ MeshPtr ContourFilter::postProcess(PatientModelServicePtr patient, vtkPolyDataPt
 	if (!contour || !base)
 		return MeshPtr();
 
-    QString uid = base->getUid() + ContourFilter::getNameSuffix() + "%1";
-    QString name = base->getName()+ ContourFilter::getNameSuffix() + "%1";
+	QString uid = base->getUid() + ContourFilter::getNameSuffix() + "%1";
+	QString name = base->getName()+ ContourFilter::getNameSuffix() + "%1";
 	MeshPtr output = patient->createSpecificData<Mesh>(uid, name);
 	output->setVtkPolyData(contour);
 	if (!output)

@@ -195,7 +195,7 @@ QString ActiveData::getActiveImageUid()
 void ActiveData::emitSignals(DataPtr activeData)
 {
 	this->emitActiveDataChanged();
-	if(activeData && activeData->getType() == "image")
+	if(activeData && activeData->getType() == Image::getTypeName())
 		this->emitActiveImageChanged();
 }
 

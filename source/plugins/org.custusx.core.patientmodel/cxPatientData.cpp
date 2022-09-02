@@ -41,9 +41,10 @@ namespace cx
 {
 
 
-PatientData::PatientData(DataServicePtr dataManager, SessionStorageServicePtr session) :
+PatientData::PatientData(DataServicePtr dataManager, SessionStorageServicePtr session, FileManagerServicePtr fileManager) :
 	mDataManager(dataManager),
-	mSession(session)
+	mSession(session),
+	mFileManagerService(fileManager)
 {
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &PatientData::patientChanged);
 	connect(mSession.get(), &SessionStorageService::cleared, this, &PatientData::onCleared);
@@ -114,7 +115,7 @@ void PatientData::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 	DataManager::ImagesMap images = mDataManager->getImages();
 	for (DataManager::ImagesMap::iterator iter = images.begin(); iter != images.end(); ++iter)
 	{
-		iter->second->save(targetFolder);
+		iter->second->save(targetFolder, mFileManagerService);
 	}
 
 	DataManager::MeshMap meshes = mDataManager->getMeshes();
@@ -131,7 +132,7 @@ void PatientData::exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace)
 		mesh = mDataManager->getDataFactory()->createSpecific<Mesh>(mesh->getUid(), mesh->getName());
 		mesh->setVtkPolyData(poly);
 		mesh->setFilename("Images");
-		mesh->save(targetFolder);
+		mesh->save(targetFolder, mFileManagerService);
 	}
 
 	report("Exported patient data to " + targetFolder + ".");
@@ -169,8 +170,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 		return DataPtr();
 	}
 	data->setAcquisitionTime(QDateTime::currentDateTime());
-
-	data->save(mSession->getRootFolder());
+	data->save(mSession->getRootFolder(), mFileManagerService);
 
 	// remove redundant line breaks
 	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");

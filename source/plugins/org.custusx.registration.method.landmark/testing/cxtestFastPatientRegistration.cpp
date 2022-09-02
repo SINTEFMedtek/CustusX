@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
+#include <QCheckBox>
+
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxRegServices.h"
 #include "cxLogicManager.h"
@@ -107,6 +109,14 @@ TEST_CASE("FastPatientRegistrationWidget: Receive pointSampled signals when samp
 	helper.widgetFixture->triggerHideEvent();
 	helper.view()->emitPointSampled();
 	CHECK_FALSE(helper.widgetFixture->mPointSampled);
+}
+
+
+TEST_CASE("FastPatientRegistrationWidget: Test getting next landmark when landmark list is empty", "[unit][plugins][org.custusx.registration]")
+{
+	FastPatientRegistrationWidgetHelper helper;
+	QString landmark = helper.widgetFixture->getNextLandmark();
+	REQUIRE(landmark.isEmpty());
 }
 
 }//cxtest

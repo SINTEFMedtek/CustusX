@@ -50,7 +50,7 @@ Q_OBJECT
 public:
 	static DataManagerImplPtr create(ActiveDataPtr activeData);
 	virtual ~DataManagerImpl();
-	void setSpaceProvider(SpaceProviderPtr spaceProvider);
+	void setServices(SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager);
 	void setDataFactory(DataFactoryPtr dataFactory);
 
 	// streams
@@ -61,7 +61,7 @@ public:
 	// images
 	virtual std::map<QString, ImagePtr> getImages() const;
 
-	void loadData(DataPtr data);
+	void loadData(DataPtr data, bool overWrite = false);
 	DataPtr loadData(const QString& uid, const QString& path);
     std::map<QString, DataPtr> getData() const;
 	DataPtr getData(const QString& uid) const;
@@ -123,6 +123,7 @@ protected:
 	mutable PresetTransferFunctions3DPtr mPresetTransferFunctions3D;
 
 	SpaceProviderPtr mSpaceProvider;
+	FileManagerServicePtr mFileManagerService;
 	DataFactoryPtr mDataFactory;
 	ActiveDataPtr mActiveData;
 

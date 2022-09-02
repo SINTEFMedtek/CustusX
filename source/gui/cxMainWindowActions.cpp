@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopServices>
+#include <QDockWidget>
+#include <QAction>
 
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
@@ -35,6 +37,9 @@
 #include "cxViewCollectionWidget.h"
 #include "cxViewCollectionImageWriter.h"
 #include "cxFileHelpers.h"
+#include "cxFileManagerService.h"
+#include "cxFileReaderWriterService.h"
+#include "cxApplication.h"
 
 namespace cx
 {
@@ -76,7 +81,7 @@ void MainWindowActions::createActions()
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 
-	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen",
+	mRecordFullscreenStreamingAction = this->createAction("RecordFullscreen", "Record Fullscreen video with VLC (needs to be at least 7 sec to work)",
 					   QIcon(),
 					   QKeySequence("F8"), "Record a video of the full screen.",
 					   &MainWindowActions::recordFullscreen);
@@ -116,14 +121,14 @@ void MainWindowActions::createActions()
 
 void MainWindowActions::createTrackingActions()
 {
-	this->createAction("ConfigureTools", "Tool configuration",
-					   QIcon(), QKeySequence(), "",
-					   &MainWindowActions::configureSlot);
+//	this->createAction("ConfigureTools", "Tool configuration",
+//					   QIcon(), QKeySequence(), "",
+//					   &MainWindowActions::configureSlot);
 
-	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
-	this->createAction("InitializeTools", "Initialize",
-					   QIcon(), QKeySequence(), "",
-					   finit);
+//	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
+//	this->createAction("InitializeTools", "Initialize",
+//					   QIcon(), QKeySequence(), "",
+//					   finit);
 
 	mTrackingToolsAction = this->createAction("TrackingTools", "Start tracking",
 											  QIcon(), QKeySequence("Ctrl+T"), "",
@@ -171,11 +176,18 @@ void MainWindowActions::createPatientActions()
 					   "Export patient data to a folder",
 					   &MainWindowActions::exportDataSlot);
 
-	this->createAction("ImportData", "Import data",
-					   QIcon(":/icons/open_icon_library/document-import-2.png"),
-					   QKeySequence("Ctrl+I"),
-					   "Import image data",
-					   &MainWindowActions::importDataSlot);
+	//Action "AddFilesForImport" was previously called "ImportData"
+	this->createAction("AddFilesForImport", "Add files for import",
+										 QIcon(":/icons/open_icon_library/document-import-2.png"),
+										 QKeySequence("Ctrl+I"),
+										 "Add files to be imported",
+										 [=](){this->importDataSlot("AddMoreFilesButtonClickedAction");});
+
+	this->createAction("ImportSelectedData", "Import selected data",
+										 QIcon(),
+										 QKeySequence(),
+										 "Import all selected data files",
+										 [=](){this->importDataSlot("ImportButtonClickedAction");});
 }
 
 template <class T>
@@ -309,29 +321,39 @@ void MainWindowActions::exportDataSlot()
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
 }
 
-void MainWindowActions::importDataSlot()
+void MainWindowActions::importDataSlot(QString actionText)
 {
 	this->savePatientFileSlot();
 
-	QString folder = mLastImportDataFolder;
-	if (folder.isEmpty())
-		folder = profile()->getSessionRootFolder();
-
-	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")),
-		folder, tr("Image/Mesh (*.mhd *.mha *.nii *.stl *.vtk *.vtp *.mnc *.png)"));
-	if (fileName.empty())
+	QDockWidget* importDockWidget = findMainWindowChildWithObjectName<QDockWidget*>("import_widgetDockWidget");
+	if(!importDockWidget)
 	{
-		report("Import canceled");
+		CX_LOG_ERROR() << "Cannot find DockWidget for ImportWidget";
 		return;
 	}
 
-	mLastImportDataFolder = QFileInfo(fileName[0]).absolutePath();
+	importDockWidget->show();
+	importDockWidget->raise();
 
-	for (int i=0; i<fileName.size(); ++i)
+	QWidget* widget = findMainWindowChildWithObjectName<QWidget*>("import_widget");
+	if(!widget)
 	{
-		ImportDataDialog* wizard = new ImportDataDialog(mServices->patient(), mServices->view(), fileName[i], this->parentWidget());
-		wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+		CX_LOG_ERROR() << "Cannot find ImportWidget";
+		return;
 	}
+
+	bool actionFound = false;
+	QList<QAction*> actions = widget->actions();
+	foreach(QAction* action, actions)
+	{
+		if(action->text().contains(actionText))
+		{
+			actionFound =  true;
+			action->trigger();
+		}
+	}
+	if(!actionFound)
+		CX_LOG_ERROR() << "MainWindowActions::importDataSlot, action not found: " << actionText;
 }
 
 void MainWindowActions::shootScreen()

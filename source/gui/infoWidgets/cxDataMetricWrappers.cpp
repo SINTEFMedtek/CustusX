@@ -35,6 +35,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringListProperty.h"
 #include "cxStringListSelectWidget.h"
 #include "cxVisServices.h"
+#include "cxImage.h"
 
 namespace cx
 {
@@ -780,7 +781,7 @@ void CustomMetricWrapper::guiChanged()
     if (mInternalUpdate)
         return;
 
-	if(mModel->getData() && mModel->getData()->getType() == "image")
+	if(mModel->getData() && mModel->getData()->getType() == Image::getTypeName())
 		mScaleToP1Widget->setEnabled(false);
 	else
 		mScaleToP1Widget->setEnabled(true);

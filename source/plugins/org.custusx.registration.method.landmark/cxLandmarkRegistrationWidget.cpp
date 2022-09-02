@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QHeaderView>
 #include <QLabel>
 #include <QSlider>
+#include <QCheckBox>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 
@@ -35,17 +36,22 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
-LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent,
-    QString objectName, QString windowTitle, bool showAccuracy) :
+LandmarkRegistrationWidget::LandmarkRegistrationWidget(RegServicesPtr services, QWidget* parent, QString objectName, QString windowTitle, bool showAccuracy) :
 	RegistrationBaseWidget(services, parent, objectName, windowTitle), mVerticalLayout(new QVBoxLayout(this)),
-		mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
-        mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy)
+	mLandmarkTableWidget(new QTableWidget(this)), mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
+	mActiveLandmark(""),
+	mLandmarkListener(new LandmarkListener(services)), mShowAccuracy(showAccuracy),
+	mMouseClickSample(nullptr)
 {
 	//table widget
 	connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
 	connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
 
 	this->setLayout(mVerticalLayout);
+
+	mMouseClickSample = new QCheckBox("Resample with mouse clicks in anyplane view.", this);
+	mMouseClickSample->setToolTip("Allow mouse clicks in 2D anyplane view to sample patient landmarks.");
+	mMouseClickSample->hide();
 }
 
 LandmarkRegistrationWidget::~LandmarkRegistrationWidget()
@@ -93,7 +99,9 @@ void LandmarkRegistrationWidget::setManualToolPosition(Vector3D p_r)
 
 void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 {
+	this->selectFirstLandmarkIfUnselected();
 	QWidget::showEvent(event);
+	mMouseClickSample->setChecked(false);
 	mLandmarkListener->showRep();
 	connect(mServices->patient().get(), &PatientModelService::landmarkPropertiesChanged,this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	connect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
@@ -101,15 +109,31 @@ void LandmarkRegistrationWidget::showEvent(QShowEvent* event)
 
 	connect(mServices->view().get(), &ViewService::activeLayoutChanged, mLandmarkListener.get(), &LandmarkListener::showRep);
 
-//	mManager->restart();
+	//mManager->restart();
 	mServices->registration()->setLastRegistrationTime(QDateTime::currentDateTime());
 	this->setModified();
 
 }
 
+void LandmarkRegistrationWidget::selectFirstLandmarkIfUnselected()
+{
+	std::vector<Landmark> landmarks = this->getAllLandmarks();
+	if(mActiveLandmark.isEmpty() || mActiveLandmark.toInt() > landmarks.size())
+	{
+		if(landmarks.size() > 0)
+		{
+			QString firstLandmarkUid = landmarks[0].getUid();
+			this->activateLandmark(firstLandmarkUid);
+		}
+	}
+	if(!mActiveLandmark.isEmpty() && landmarks.empty())
+		this->activateLandmark("");
+}
+
 void LandmarkRegistrationWidget::hideEvent(QHideEvent* event)
 {
 	QWidget::hideEvent(event);
+	mMouseClickSample->setChecked(false);
 	disconnect(mServices->patient().get(), &PatientModelService::landmarkPropertiesChanged, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkAdded, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
 	disconnect(mServices->patient()->getPatientLandmarks().get(), &Landmarks::landmarkRemoved, this, &LandmarkRegistrationWidget::landmarkUpdatedSlot);
@@ -133,16 +157,16 @@ void LandmarkRegistrationWidget::prePaintEvent()
 
 	//ready the table widget
 	mLandmarkTableWidget->setRowCount((int)landmarks.size());
-    QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates");
-    if (mShowAccuracy)
-    {
-        mLandmarkTableWidget->setColumnCount(4);
-        headerItems.append("Accuracy (mm)");
-    }
-    else
-        mLandmarkTableWidget->setColumnCount(3);
+	QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates");
+	if (mShowAccuracy)
+	{
+		mLandmarkTableWidget->setColumnCount(4);
+		headerItems.append("Accuracy (mm)");
+	}
+	else
+		mLandmarkTableWidget->setColumnCount(3);
 
-    mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
+	mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
 	mLandmarkTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
@@ -171,7 +195,7 @@ void LandmarkRegistrationWidget::prePaintEvent()
 			int width = 5;
 			int prec = 1;
 			coordText = tr("(%1, %2, %3)").arg(coord[0], width, 'f', prec).arg(coord[1], width, 'f', prec).arg(
-				coord[2], width, 'f', prec);
+						coord[2], width, 'f', prec);
 		}
 
 		items[2] = new QTableWidgetItem(coordText);
@@ -199,8 +223,9 @@ void LandmarkRegistrationWidget::prePaintEvent()
 
 void LandmarkRegistrationWidget::activateLandmark(QString uid)
 {
-    mActiveLandmark = uid;
-    this->setModified();
+	mActiveLandmark = uid;
+	this->setModified();
+	this->selectFirstLandmarkIfUnselected();
 }
 
 /** Return the next landmark in the series of available landmarks,
@@ -208,17 +233,18 @@ void LandmarkRegistrationWidget::activateLandmark(QString uid)
   */
 QString LandmarkRegistrationWidget::getNextLandmark()
 {
-    std::vector<Landmark> lm = this->getAllLandmarks();
+	std::vector<Landmark> lm = this->getAllLandmarks();
 
-    for (int i=0; i<lm.size()-1; ++i)
-    {
-        if (lm[i].getUid()==mActiveLandmark)
-        {
-            return lm[i+1].getUid();
-        }
-    }
+	int size = int(lm.size());
+	for (unsigned i=0; int(i) < size-1; ++i)
+	{
+		if (lm[i].getUid()==mActiveLandmark)
+		{
+			return lm[i+1].getUid();
+		}
+	}
 
-    return "";
+	return "";
 }
 
 std::vector<Landmark> LandmarkRegistrationWidget::getAllLandmarks() const
@@ -275,11 +301,12 @@ void LandmarkRegistrationWidget::cellChangedSlot(int row, int column)
 
 void LandmarkRegistrationWidget::landmarkUpdatedSlot()
 {
-//  - This has too many side effects when we use the landmarks for several different registrations,
-//	i.e. image2image, patient, fast... Rather register explicitly, and add it to the buttons where you
-//  want the automation, such as in the patient reg sampler. (Mantis #0000674)
-//	this->performRegistration();
-    this->setModified();
+	//- This has too many side effects when we use the landmarks for several different registrations,
+	//i.e. image2image, patient, fast... Rather register explicitly, and add it to the buttons where you
+	//want the automation, such as in the patient reg sampler. (Mantis #0000674)
+	//this->performRegistration();
+	this->setModified();
+	this->selectFirstLandmarkIfUnselected();
 }
 
 void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
@@ -289,7 +316,7 @@ void LandmarkRegistrationWidget::updateAverageAccuracyLabel()
 	if (fixedData)
 		fixedName = fixedData->getName();
 
-    if(this->isAverageAccuracyValid() && mShowAccuracy)
+	if(this->isAverageAccuracyValid() && mShowAccuracy)
 	{
 		mAvarageAccuracyLabel->setText(tr("Mean accuracy %1 mm").arg(this->getAverageAccuracy(), 0, 'f', 2));
 		mAvarageAccuracyLabel->setToolTip(QString("Average landmark accuracy from target [%1] to fixed [%2].").arg(this->getTargetName()).arg(fixedName));
@@ -360,6 +387,32 @@ double LandmarkRegistrationWidget::getAccuracy(QString uid)
 	Vector3D p_master_r = rMmaster.coord(p_master_master);
 
 	return (p_target_r - p_master_r).length();
+}
+
+void LandmarkRegistrationWidget::mouseClickSampleStateChanged()
+{
+	if(mMouseClickSample->isChecked())
+		connect(mServices->view().get(), &ViewService::pointSampled, this, &LandmarkRegistrationWidget::pointSampled);
+	else
+		disconnect(mServices->view().get(), &ViewService::pointSampled, this, &LandmarkRegistrationWidget::pointSampled);
+}
+
+QTableWidgetItem * LandmarkRegistrationWidget::getLandmarkTableItem()
+{
+	if(!mLandmarkTableWidget)
+		return NULL;
+
+	int row = mLandmarkTableWidget->currentRow();
+	int column = mLandmarkTableWidget->currentColumn();
+
+	if((row < 0) && (mLandmarkTableWidget->rowCount() >= 0))
+		row = 0;
+	if((column < 0) && (mLandmarkTableWidget->columnCount() >= 0))
+		column = 0;
+
+	QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
+
+	return item;
 }
 
 }//namespace cx

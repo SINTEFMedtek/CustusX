@@ -42,10 +42,10 @@ public:
 	/** Execute the reconstruction in asynchronously.
 	  * When reconstructFinished() is emitted, use getResult().
 	  */
-	void startReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio);
+	bool startReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio);
 	std::vector<cx::ImagePtr> getResult(); // return latest reconstruct result (after reconstructFinished() emitted), empty during processing.
 	cx::TimedAlgorithmPtr getThread(); ///< Return the currently reconstructing thread object.
-	void startNonThreadedReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio);
+	bool startNonThreadedReconstruction(ReconstructionMethodService* algo, ReconstructCore::InputParams par, USReconstructInputData fileData, bool createBModeWhenAngio);
 
 signals:
 	void reconstructAboutToStart(); ///< emitted before reconstruction threads are fired

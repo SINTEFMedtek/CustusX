@@ -25,6 +25,8 @@ set(PLUGIN_SRCS
     cxReconstructOutputValueParamsInterfaces.cpp
     cxReconstructOutputValueParamsInterfaces.h
     cxReconstructionMethodService.h
+    cxPositionFilter.h
+    cxPositionFilter.cpp
 )
 
 # Files which should be processed by Qts moc

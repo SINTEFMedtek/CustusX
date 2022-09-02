@@ -66,7 +66,7 @@ public:
 
 	virtual void updateView();
 
-    ImagePtr getImageToDisplay();
+	ImagePtr getImageToDisplay();
 
 signals:
 	void pointSampled(Vector3D p_r);
@@ -105,23 +105,25 @@ private:
 	ORIENTATION_TYPE getOrientationType() const;
 
 	virtual void imageAdded(ImagePtr image);
-    //virtual void imageRemoved(const QString& uid);
+	//virtual void imageRemoved(const QString& uid);
 
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
-    void recreateMultiSlicer();
+	void recreateMultiSlicer();
 	void updateItemsFromViewGroup();
 
-    void createAndAddSliceRep();
-    void removeAndResetSliceRep();
+	void createAndAddSliceReps(int numberOfSlices);
+	void removeAndResetSliceRep();
 
-    bool useGPU2DRendering();
-		bool createAndAddMultiSliceRep();
-    void removeAndResetMultiSliceRep();
+	bool useGPU2DRendering();
+	bool createAndAddMultiSliceRep();
+	void removeAndResetMultiSliceRep();
 
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
+
+	void setImagesSWRendering();
 
 	Texture3DSlicerRepPtr mMultiSliceRep;
 
@@ -129,7 +131,7 @@ private:
 
 	GeometricRep2DPtr mPickerGlyphRep;
 	SliceProxyPtr mSliceProxy;
-	SliceRepSWPtr mSliceRep;
+	std::vector<SliceRepSWPtr> mSliceReps;
 	ToolRep2DPtr mToolRep2D;
 	OrientationAnnotationSmartRepPtr mOrientationAnnotationRep;
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;

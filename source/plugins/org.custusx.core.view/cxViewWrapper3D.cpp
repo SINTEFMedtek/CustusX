@@ -53,7 +53,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxToolMetricRep.h"
 #include "cxDataMetricRep.h"
 #include "cxDataLocations.h"
-#include "cxEnumConverter.h"
 #include "cxManualTool.h"
 #include "cxImage2DRep3D.h"
 
@@ -276,53 +275,70 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 		slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
 		slicePlanesAction->setCheckable(true);
 		slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
+		slicePlanesAction->setToolTip("Visialize the outline of the 2D views in 3D");
 		connect(slicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(showSlicePlanesActionSlot(bool)));
 
 		fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
 		fillSlicePlanesAction->setCheckable(true);
 		fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
 		fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
+		slicePlanesAction->setToolTip("Fill the visualized 2D views with color");
 		connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
 	}
 
 	QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
+	resetCameraAction->setToolTip("Zoom out, and show all objects in the view");
 	connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
 
 	QAction* centerImageAction = new QAction("Center to image", &contextMenu);
+	centerImageAction->setToolTip("Move view to show center of active image in all views (no zoom)");
 	connect(centerImageAction, SIGNAL(triggered()), this, SLOT(centerImageActionSlot()));
 
 	QAction* centerToolAction = new QAction("Center to tool", &contextMenu);
+	centerToolAction->setToolTip("Move view to show active tool in all views (no zoom)");
 	connect(centerToolAction, SIGNAL(triggered()), this, SLOT(centerToolActionSlot()));
 
 	QAction* showAxesAction = new QAction("Show Coordinate Axes", &contextMenu);
 	showAxesAction->setCheckable(true);
 	showAxesAction->setChecked(mShowAxes);
+	showAxesAction->setToolTip("Show coordinate axes for all objects in 3D scene.\n"
+							   "Axes are placed in obejct origin.\n"
+							   "Red = X, Green = Y, Blue = Z");
 	connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
 
 	QAction* showManualTool = new QAction("Show Manual Tool 3D", &contextMenu);
 	showManualTool->setCheckable(true);
 	showManualTool->setChecked(settings()->value("View3D/showManualTool").toBool());
+	showManualTool->setToolTip("Turn on/off visualization of the 3D vire cross");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
 	QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
 	showOrientation->setCheckable(true);
 	showOrientation->setChecked(mAnnotationMarker->getVisible());
+	showOrientation->setToolTip("Turn on/off visualization of the figure in the upper left corner in 3D,\n"
+								"and the orientation letters on the sides in 2D");
 	connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
 
 	QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
 	showToolPath->setCheckable(true);
 	showToolPath->setChecked(settings()->value("showToolPath").toBool());
+	showToolPath->setToolTip("Paint a line in 3D where the tool have been, as connected dots.\n"
+							 "Turn off to reset");
 	connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
 	QMenu* show3DSlicesMenu = new QMenu("Show 3D slices");
+	show3DSlicesMenu->setToolTip("Visualize the 2D views in 3D for the selected image");
 	mShow3DSlicesInteractor->addDataActionsOfType<Image>(show3DSlicesMenu);
 
 	QMenu* showSlicesMenu = new QMenu("Slice Type", &contextMenu);
+	showSlicesMenu->setToolTip("Specify which 2D slices to show in 3D,\n"
+							   "when 3D sclices is turned on");
 	this->createSlicesActions(showSlicesMenu);
 
 	QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
 	showRefTool->setDisabled(true);
 	showRefTool->setCheckable(true);
+	showRefTool->setToolTip("Visualize the tool set as reference in 3D");
 	ToolPtr refTool = mServices->tracking()->getReferenceTool();
 	if (refTool)
 	{
@@ -360,9 +376,10 @@ void ViewWrapper3D::createSlicesActions(QWidget* parent)
 	this->createSlicesAction(PlaneTypeCollection(ptCORONAL), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSAGITTAL), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptANYPLANE), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptINVERSEANYPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptRADIALPLANE), parent);
 	this->createSlicesAction(PlaneTypeCollection(ptSIDEPLANE), parent);
-    this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);
+	this->createSlicesAction(PlaneTypeCollection(ptTOOLSIDEPLANE), parent);
 }
 
 QAction* ViewWrapper3D::createSlicesAction(PlaneTypeCollection planes, QWidget* parent)
@@ -614,14 +631,14 @@ RepPtr ViewWrapper3D::createDataRep3D(DataPtr data)
 		TrackedStreamPtr trackedStream = boost::dynamic_pointer_cast<TrackedStream>(data);
 		return this->createTrackedStreamRep(trackedStream);
 	}
-    else
-    {
+	else
+	{
 		DataMetricRepPtr rep = this->createDataMetricRep3D(data);
 		if (rep)
 			return rep;
-    }
+	}
 
-    return RepPtr();
+	return RepPtr();
 }
 
 RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
@@ -654,35 +671,35 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 
 DataMetricRepPtr ViewWrapper3D::createDataMetricRep3D(DataPtr data)
 {
-    DataMetricRepPtr rep;
+	DataMetricRepPtr rep;
 
-    if (boost::dynamic_pointer_cast<PointMetric>(data))
+	if (boost::dynamic_pointer_cast<PointMetric>(data))
 		rep = PointMetricRep::New();
-    else if (boost::dynamic_pointer_cast<FrameMetric>(data))
+	else if (boost::dynamic_pointer_cast<FrameMetric>(data))
 		rep = FrameMetricRep::New();
 	else if (boost::dynamic_pointer_cast<ToolMetric>(data))
 		rep = ToolMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DistanceMetric>(data))
 		rep = DistanceMetricRep::New();
-    else if (boost::dynamic_pointer_cast<AngleMetric>(data))
+	else if (boost::dynamic_pointer_cast<AngleMetric>(data))
 		rep = AngleMetricRep::New();
-    else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
+	else if (boost::dynamic_pointer_cast<PlaneMetric>(data))
 		rep = PlaneMetricRep::New();
 	else if (boost::dynamic_pointer_cast<DonutMetric>(data))
 		rep = DonutMetricRep::New();
-    else if (boost::dynamic_pointer_cast<CustomMetric>(data))
-        rep = CustomMetricRep::New();
+	else if (boost::dynamic_pointer_cast<CustomMetric>(data))
+		rep = CustomMetricRep::New();
 	else if (boost::dynamic_pointer_cast<SphereMetric>(data))
 		rep = SphereMetricRep::New();
 	else if (boost::dynamic_pointer_cast<RegionOfInterestMetric>(data))
 		rep = RegionOfInterestMetricRep::New();
 
-    if (rep)
-    {
-        this->readDataRepSettings(rep);
-        rep->setDataMetric(boost::dynamic_pointer_cast<DataMetric>(data));
-    }
-    return rep;
+	if (rep)
+	{
+		this->readDataRepSettings(rep);
+		rep->setDataMetric(boost::dynamic_pointer_cast<DataMetric>(data));
+	}
+	return rep;
 }
 
 /**helper. Read settings common for all data metric reps.
@@ -794,10 +811,12 @@ ViewPtr ViewWrapper3D::getView()
 
 void ViewWrapper3D::activeToolChangedSlot()
 {
-	ToolPtr activeTool = mServices->tracking()->getActiveTool();
-	mPickerRep->setTool(activeTool);
+	ToolPtr controllingTool = this->getControllingTool();
+	//CX_LOG_DEBUG() << "ViewWrapper3D::activeToolChangedSlot - controllingTool: " << controllingTool->getName();
+
+	mPickerRep->setTool(controllingTool);
 	if (mSlices3DRep)
-		mSlices3DRep->setTool(activeTool);
+		mSlices3DRep->setTool(controllingTool);
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

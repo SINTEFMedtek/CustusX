@@ -39,8 +39,11 @@ if(BUILD_TESTING)
         cxtestTestDataStructures.h
         cxtestTestDataStructures.cpp
         cxtestDataLocations.cpp
-        cxtestDataReaderWriter.cpp
+        #cxtestDataReaderWriter.cpp
         cxtestTrackingSystemService.cpp
+        cxtestFileManagerServiceMock.h
+        cxtestFileManagerServiceMock.cpp
+        cxtestEnumConversion.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS
@@ -80,6 +83,8 @@ if(BUILD_TESTING)
         PRIVATE
         ${CX_TESTRESOURCE_LINK_LIBS}
         cxCatch
+        org_custusx_core_filemanager
+        cxLogicManager
     )
     cx_add_tests_to_catch(cxtestResource)
     

@@ -34,6 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStreamerServiceProxy.h"
 #include "cxStreamerServiceNull.h"
 #include "cxNullDeleter.h"
+#include "cxFileManagerServiceProxy.h"
 
 namespace cx
 {
@@ -47,7 +48,8 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
     TrackingServicePtr tracking = TrackingServiceProxy::create(context);
     SpaceProviderPtr spaceProvider;
     spaceProvider.reset(new cx::SpaceProviderImpl(tracking, pasm));
-    mBackend = VideoServiceBackend::create(pasm,tracking, spaceProvider, context);
+	FileManagerServicePtr filemanager = FileManagerServiceProxy::create(context);
+	mBackend = VideoServiceBackend::create(pasm,tracking, spaceProvider, filemanager, context);
 
     mEmptyVideoSource.reset(new BasicVideoSource());
     mVideoConnection.reset(new VideoConnection(mBackend));

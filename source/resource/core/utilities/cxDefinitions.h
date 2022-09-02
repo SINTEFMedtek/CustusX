@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXDEFINITIONS_H_
 
 #include "cxResourceExport.h"
+#include <QString>
 
 namespace cx
 {
@@ -22,8 +23,8 @@ namespace cx
  * @{
  */
 
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGSTK "igstk"
-#define TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK "openigtlink"
+extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
+extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 
 	/** orientation type
 	 */
@@ -42,7 +43,8 @@ namespace cx
 		ptANYPLANE,   ///< a plane aligned with the tool base plane
 		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
 		ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
-        ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
+		ptTOOLSIDEPLANE, ///< z-rotated 90* relative to anyplane like side plane, but always kept oriented like the plane defined by the table up vector/gravity and the tool z vector projected on the horizontal reference plane.
+		ptINVERSEANYPLANE,   ///< a plane aligned with the tool base plane, inverse of tool direction
 		ptCOUNT
 	};
 	enum cxResource_EXPORT FOLLOW_TYPE
@@ -144,9 +146,95 @@ namespace cx
 		ttCOUNT
 	};*/
 
+	enum cxResource_EXPORT IMAGE_MODALITY
+	{
+		imUNKNOWN,
+		imCT,
+		imMR,
+		imUS,
+		imPET,
+		imSC,
+		imCOUNT
+	};
+	enum cxResource_EXPORT IMAGE_SUBTYPE
+	{
+		istUNKNOWN,
+		istEMPTY,
+		istMRT1,
+		istMRT2,
+		istMRFLAIR,
+		istUSBMODE,
+		istANGIO,
+		istSEGMENTATION,
+		istCOUNT
+	};
+
+	enum cxResource_EXPORT LUNG_STRUCTURES
+	{
+		lsUNKNOWN,
+		lsLUNG, // The following enums are used for as buttons in StructuresSelectionWidget. lsLUNG is the first button.
+		lsTUMORS,
+		lsLESIONS,
+		lsLYMPH_NODES,
+		lsVENA_AZYGOS,
+		lsVENA_CAVA,
+		lsAORTA,
+		lsSUBCLAVIAN_ARTERY,
+		lsLUNG_VESSELS,
+		lsHEART,
+		lsESOPHAGUS,
+		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
+		lsAIRWAYS,
+		lsCENTERLINES,
+		lsPULMONARY_VEINS,
+		lsPULMONARY_TRUNK,
+		lsMEDIUM_ORGANS,
+		lsSMALL_ORGANS,
+		lsNODULES,
+		lsCOUNT,
+		lsFIRST_STRUCTURE_BUTTON = lsLUNG,
+		lsLAST_STRUCTURE_BUTTON = lsSPINE
+	};
+
 /**
  * @}
  */
+
+
+	static QString airwaysFilterGetNameSuffixCenterline()
+	{
+		return "_centerline";
+	}
+
+	static QString airwaysFilterGetNameSuffixAirways()
+	{
+		return "_airways";
+	}
+
+	static QString airwaysFilterGetNameSuffixTubes()
+	{
+		return "_tubes";
+	}
+	
+	static QString airwaysFilterGetNameSuffixColored()
+	{
+		return "_colored";
+	}
+
+	static QString airwaysFilterGetNameSuffixLungs()
+	{
+		return "_lungs";
+	}
+
+	static QString airwaysFilterGetNameSuffixLungVessels()
+	{
+		return "_lung_vessels";
+	}
+
+	static QString airwaysFilterGetNameSuffixVolume()
+	{
+		return "_volume";
+	}
 
 } //namespace end
 

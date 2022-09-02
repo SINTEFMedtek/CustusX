@@ -11,10 +11,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSpaceEditWidget.h"
 #include <iostream>
-#include "cxTypeConversions.h"
 #include "cxHelperWidgets.h"
 #include "cxLogger.h"
-#include "cxDefinitionStrings.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {

@@ -28,7 +28,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxPositionStorageFile.h"
 #include "cxTime.h"
-#include "cxEnumConverter.h"
 #include "cxDummyTool.h"
 #include "cxToolImpl.h"
 #include "cxToolConfigurationParser.h"
@@ -54,7 +53,9 @@ namespace cx
 TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 				mLastLoadPositionHistory(0),
 				mContext(context),
-				mToolTipOffset(0)
+				mToolTipOffset(0),
+				mActiveTool(ToolPtr()),
+				mReferenceTool(ToolPtr())
 {
 	mSession = SessionStorageServiceProxy::create(mContext);
 	connect(mSession.get(), &SessionStorageService::sessionChanged, this, &TrackingImplService::onSessionChanged);
@@ -66,7 +67,7 @@ TrackingImplService::TrackingImplService(ctkPluginContext *context) :
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
-    this->listenForTrackingSystemServices(context);
+	this->listenForTrackingSystemServices(context);
 }
 
 TrackingImplService::~TrackingImplService()
@@ -115,6 +116,7 @@ void TrackingImplService::setPlaybackMode(PlaybackTimePtr controller)
 			this->unInstallTrackingSystem(old[i]);
 		this->installTrackingSystem(mPlaybackSystem);
 		mPlaybackSystem->setState(Tool::tsTRACKING);
+        connect(this, &TrackingImplService::activeToolChanged, mPlaybackSystem.get(), &TrackingSystemPlaybackService::onActiveToolChanged);
 	}
 }
 
@@ -138,6 +140,7 @@ void TrackingImplService::installTrackingSystem(TrackingSystemServicePtr system)
 	mTrackingSystems.push_back(system);
 	report("Installing tracking system: " + system->getUid());
 	connect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
+	connect(system.get(), &TrackingSystemService::updateTrackingSystemImplementation, this, &TrackingImplService::setCurrentTrackingSystemImplementation, Qt::DirectConnection);
 	this->onSystemStateChanged();
 }
 
@@ -145,6 +148,7 @@ void TrackingImplService::unInstallTrackingSystem(TrackingSystemServicePtr syste
 {
 	report("Uninstalling tracking system: " + system->getUid());
 	disconnect(system.get(), &TrackingSystemService::stateChanged, this, &TrackingImplService::onSystemStateChanged);
+	disconnect(system.get(), &TrackingSystemService::updateTrackingSystemImplementation, this, &TrackingImplService::setCurrentTrackingSystemImplementation);
 
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 	{
@@ -197,23 +201,23 @@ void TrackingImplService::setState(const Tool::State val)
 
 void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *context)
 {
-    mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
-                                context,
-                                boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
-                                boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
-                                boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
-                               ));
-    mServiceListener->open();
+	mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
+							   context,
+							   boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
+							   boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
+							   boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
+							   ));
+	mServiceListener->open();
 }
 
 void TrackingImplService::onTrackingSystemAdded(TrackingSystemService* service)
 {
-    this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
+	this->installTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemRemoved(TrackingSystemService* service)
 {
-    this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
+	this->unInstallTrackingSystem(TrackingSystemServicePtr(service, null_deleter()));
 }
 
 void TrackingImplService::onTrackingSystemModified(TrackingSystemService* service)
@@ -223,17 +227,18 @@ void TrackingImplService::onTrackingSystemModified(TrackingSystemService* servic
 
 void TrackingImplService::rebuildCachedTools()
 {
-    mTools.clear();
-    for (unsigned i=0; i<mTrackingSystems.size(); ++i)
-    {
-        this->addToolsFrom(mTrackingSystems[i]);
-    }
-    mTools[mManualTool->getUid()] = mManualTool;
-    this->imbueManualToolWithRealProperties();
-    this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
+	mTools.clear();
+	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+	{
+		this->addToolsFrom(mTrackingSystems[i]);
+	}
+	mTools[mManualTool->getUid()] = mManualTool;
+	this->imbueManualToolWithRealProperties();
+	this->loadPositionHistory(); // the tools are always reconfigured after a setloggingfolder
 	this->resetTrackingPositionFilters();
 	this->onTooltipOffset(mToolTipOffset);
-	this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
+	if(!mActiveTool || !getTool(mActiveTool->getUid()))
+		this->setActiveTool(this->getManualTool()->getUid()); // this emits a signal: call after all other initialization
 }
 
 void TrackingImplService::imbueManualToolWithRealProperties()
@@ -344,6 +349,12 @@ void TrackingImplService::setActiveTool(const QString& uid)
 	}
 
 	emit activeToolChanged(uid);
+}
+
+void TrackingImplService::clearActiveTool()
+{
+	mActiveTool = mManualTool;
+	emit activeToolChanged(mActiveTool->getUid());
 }
 
 ToolPtr TrackingImplService::getReferenceTool() const
@@ -602,7 +613,7 @@ void TrackingImplService::addXml(QDomNode& parentNode)
 	ToolMap::iterator toolIt = tools.begin();
 	for (; toolIt != tools.end(); ++toolIt)
 	{
-        cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
+		cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(toolIt->second);
 		if (tool)
 		{
 			toolsNode.addObjectToElement("tool", tool);
@@ -635,7 +646,7 @@ void TrackingImplService::parseXml(QDomNode& dataNode)
 		QString tool_uid = toolNode.attribute("uid");
 		if (tools.find(tool_uid) != tools.end())
 		{
-            cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
+			cxToolPtr tool = boost::dynamic_pointer_cast<ToolImpl>(tools.find(tool_uid)->second);
 			tool->parseXml(toolNode);
 		}
 	}
@@ -679,21 +690,66 @@ ToolPtr TrackingImplService::getFirstProbe()
 	return ToolPtr();
 }
 
-//This may not work if more than one tracking system returns a configuration?
-TrackerConfigurationPtr TrackingImplService::getConfiguration()
+std::vector<TrackerConfigurationPtr> TrackingImplService::getConfigurations()
 {
-	TrackerConfigurationPtr config;
+	std::vector<TrackerConfigurationPtr> retval;
+	bool gotConfig = false;
 	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
 	{
-		TrackerConfigurationPtr config2 = mTrackingSystems[i]->getConfiguration();
-		if (config2)
+		TrackerConfigurationPtr config = mTrackingSystems[i]->getConfiguration();
+		if (config)
 		{
-			config = config2;
-//			CX_LOG_DEBUG() << "getConfiguration config TrackingSystemSolution: " << config->getTrackingSystemImplementation();
+			retval.push_back(config);
+			//CX_LOG_DEBUG() << "getConfiguration config TrackingSystemSolution: " << config->getTrackingSystemImplementation();
+			gotConfig = true;
 		}
 	}
-	return config;
+	if(!gotConfig)
+		retval.push_back(TrackerConfigurationPtr());
+
+	return retval;
 }
 
+TrackerConfigurationPtr TrackingImplService::getConfiguration(QString trackingSystemImplementation)
+{
+	std::vector<TrackerConfigurationPtr> configs = this->getConfigurations();
+	for(unsigned  i = 0; i < configs.size(); ++i)
+	{
+		if(configs[i]->getTrackingSystemImplementation() == trackingSystemImplementation)
+			return configs[i];
+	}
+	return TrackerConfigurationPtr();
+}
+
+TrackerConfigurationPtr TrackingImplService::getConfiguration()
+{
+	TrackerConfigurationPtr retval = this->getConfiguration(mTrackingSystemImplementation);
+	if(!retval)
+	{
+		//Always try to return a tool configuration
+		std::vector<TrackerConfigurationPtr> configs = this->getConfigurations();
+		if(configs.size() > 0)
+			retval = configs.at(0);
+	}
+	return retval;
+}
+void TrackingImplService::setCurrentTrackingSystemImplementation(QString trackingSystemImplementation)
+{
+	//CX_LOG_DEBUG() << "setCurrentTrackingSystemImplementation: " << trackingSystemImplementation;
+	mTrackingSystemImplementation = trackingSystemImplementation;
+}
+
+QString TrackingImplService::getCurrentTrackingSystemImplementation()
+{
+	return mTrackingSystemImplementation;
+}
+
+void TrackingImplService::resetTimeSynchronization()
+{
+	for (unsigned i=0; i<mTrackingSystems.size(); ++i)
+	{
+		mTrackingSystems[i]->resetTimeSynchronization();
+	}
+}
 
 } //namespace cx

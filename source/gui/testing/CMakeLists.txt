@@ -35,6 +35,7 @@ if(BUILD_TESTING)
         cxtestMetricManager.h
         cxtestMetricManager.cpp
         cxtestMetricsWidget.cpp
+        cxtestEraserWidget.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})

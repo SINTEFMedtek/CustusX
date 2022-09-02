@@ -54,6 +54,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep2D/cxSphereMetricRep2D
     Rep2D/cxGuideRep2D
     Rep2D/cxOrientationAnnotation2DRep
+    Rep2D/cxDistanceMetricRep2D
 
     Primitives/cxImageMapperMonitor
     Primitives/cxTexture3DSlicerProxy

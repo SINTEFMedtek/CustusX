@@ -25,35 +25,35 @@ namespace cx
 {
 
 CheckBoxWidget::CheckBoxWidget(QWidget* parent, BoolPropertyBasePtr dataInterface, QGridLayout* gridLayout, int row) :
-    OptimizedUpdateWidget(parent)
+	OptimizedUpdateWidget(parent)
 {
 	this->setEnabled(dataInterface->getEnabled());
 
 	mData = dataInterface;
-    connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
+	connect(mData.get(), SIGNAL(changed()), this, SLOT(setModified()));
 
-    mLabel = new QLabel(this);
-    mLabel->setText(dataInterface->getDisplayName());
+	mLabel = new QLabel(this);
+	mLabel->setText(dataInterface->getDisplayName());
 
 	mCheckBox = new QCheckBox(this);
 	connect(mCheckBox, SIGNAL(toggled(bool)), this, SLOT(valueChanged(bool)));
 
-    if (gridLayout) // add to input gridlayout
-    {
-        gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, addDummyMargin(this)), row, 0);
-        gridLayout->addWidget(mCheckBox, row, 1);
-    }
-    else // add directly to this
-    {
-        QHBoxLayout* topLayout = new QHBoxLayout;
-        topLayout->setMargin(0);
-        this->setLayout(topLayout);
+	if (gridLayout) // add to input gridlayout
+	{
+		gridLayout->addLayout(mergeWidgetsIntoHBoxLayout(mLabel, addDummyMargin(this)), row, 0);
+		gridLayout->addWidget(mCheckBox, row, 1);
+	}
+	else // add directly to this
+	{
+		QHBoxLayout* topLayout = new QHBoxLayout;
+		topLayout->setMargin(0);
+		this->setLayout(topLayout);
 
-        topLayout->addWidget(mLabel);
-        topLayout->addWidget(mCheckBox, 1);
-    }
+		topLayout->addWidget(mLabel);
+		topLayout->addWidget(mCheckBox, 1);
+	}
 
-    this->setModified();
+	this->setModified();
 }
 
 void CheckBoxWidget::valueChanged(bool val)
@@ -68,6 +68,7 @@ void CheckBoxWidget::prePaintEvent()
 	mCheckBox->blockSignals(true);
 
 	this->setEnabled(mData->getEnabled());
+	mCheckBox->setEnabled(mData->getEnabled());
 
 	mCheckBox->setChecked(mData->getValue());
 	mCheckBox->setToolTip(mData->getHelp());

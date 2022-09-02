@@ -14,7 +14,8 @@ set(CX_PLUGINS
   org.custusx.core.openigtlink3:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
-  org.custusx.dicom:ON
+  org.custusx.core.filemanager:ON
+  org.custusx.dicom:OFF
   org.custusx.usreconstruction.vnncl:ON
   org.custusx.usreconstruction.pnn:ON
   org.custusx.registration:ON
@@ -34,9 +35,24 @@ set(CX_PLUGINS
   org.custusx.help:ON
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
+  org.custusx.ceetron:ON
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
+  org.custusx.bronchoscopynavigation:ON
+  org.custusx.filter.airways:OFF
 )
+
+#if(CX_LINUX)
+#  set(CX_PLUGINS
+#    ${CX_PLUGINS}
+#    org.custusx.filter.airways:ON
+#  )
+#else()
+#  set(CX_PLUGINS
+#    ${CX_PLUGINS}
+#    org.custusx.filter.airways:OFF
+#  )
+#endif(CX_LINUX)
 
 # Add plugins defined externally, i.e defined outside CustusX core.
 # Why: Enables enabling of external plugins,

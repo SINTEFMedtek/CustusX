@@ -68,7 +68,7 @@ protected slots:
 
 	//application menu
 	void aboutSlot();
-	void preferencesSlot();
+	void preferencesSlot(int currentTabIndex = 0);
 	void toggleFullScreenSlot();
 
 	void showControlPanelActionSlot();
@@ -121,6 +121,7 @@ private:
 	//actions and actiongroups
 	QAction* mAboutAction;
 	QAction* mPreferencesAction;
+	QAction* mPreferencesToolConfigAction;
 	QAction* mFullScreenAction;
 	QAction* mQuitAction;
 

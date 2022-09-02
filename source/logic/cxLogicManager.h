@@ -28,6 +28,7 @@ typedef boost::shared_ptr<class StateService> StateServicePtr;
 typedef boost::shared_ptr<class ViewService> ViewServicePtr;
 typedef boost::shared_ptr<class AcquisitionService> AcquisitionServicePtr;
 typedef boost::shared_ptr<class SessionStorageService> SessionStorageServicePtr;
+typedef boost::shared_ptr<class FileManagerService> FileManagerServicePtr;
 
 /**
 * \file
@@ -83,6 +84,12 @@ public:
 	*/
   static void shutdown();
 
+
+  /**
+   * Detect if we are compiling on Ubuntu 20.04
+   */
+  static bool isUbuntu2004();
+
   /**
    * Set an application component, intended to encapsulate the application's
    * main window or similar. Must be called after initialize.
@@ -111,6 +118,7 @@ public:
   StateServicePtr getStateService();
   ViewServicePtr getViewService();
   SessionStorageServicePtr getSessionStorageService();
+  //FileManagerServicePtr getFileManagerService();
 
 private slots:
   void onRestartWithNewProfile(QString uid);
@@ -127,6 +135,7 @@ private:
 	* Assumes MainWindow already has been destroyed and the mainloop is exited.
 	*/
   void shutdownServices();
+  void shutdownServicesLight();///< Only shut down part of the resources in an attempt to prevent crashes from CTK bugs
 
   void basicSetup();
   void createLegacyStoredServices();
@@ -155,6 +164,8 @@ private:
 
 	PluginFrameworkManagerPtr mPluginFramework;
 	ApplicationComponentPtr mComponent;
+
+	bool mShutdown;
 };
 
 cxLogicManager_EXPORT LogicManager* logicManager(); // access the singleton

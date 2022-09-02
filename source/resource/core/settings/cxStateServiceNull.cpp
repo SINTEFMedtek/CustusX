@@ -32,6 +32,8 @@ Desktop StateServiceNull::getActiveDesktop() { return Desktop(); }
 void StateServiceNull::saveDesktop(Desktop desktop) {}
 void StateServiceNull::resetDesktop() {}
 
+WorkflowStateMachinePtr StateServiceNull::getWorkflow() {return WorkflowStateMachinePtr(); }
+
 bool StateServiceNull::isNull() { return true; }
 
 }

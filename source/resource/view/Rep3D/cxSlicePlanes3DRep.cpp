@@ -56,8 +56,12 @@ SlicePlanesProxy::SlicePlanesProxy()
 	mProperties.mColor[ptRADIALPLANE] = color3;
 	mProperties.mSymbol[ptRADIALPLANE] = "X";
 
-    mProperties.mColor[ptTOOLSIDEPLANE] = color4;
-    mProperties.mSymbol[ptTOOLSIDEPLANE] = "T";
+	mProperties.mColor[ptTOOLSIDEPLANE] = color4;
+	mProperties.mSymbol[ptTOOLSIDEPLANE] = "T";
+
+	mProperties.mColor[ptINVERSEANYPLANE] = color4;
+	mProperties.mSymbol[ptINVERSEANYPLANE] = "IO";
+
 
 	mProperties.m2DFontSize = 20;
 	mProperties.m3DFontSize = 28;

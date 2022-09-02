@@ -94,9 +94,9 @@ void PatientModelServiceProxy::onServiceRemoved(PatientModelService *service)
 	emit patientChanged();
 }
 
-void PatientModelServiceProxy::insertData(DataPtr data)
+void PatientModelServiceProxy::insertData(DataPtr data, bool overWrite)
 {
-	mPatientModelService->insertData(data);
+	mPatientModelService->insertData(data, overWrite);
 }
 
 DataPtr PatientModelServiceProxy::createData(QString type, QString uid, QString name)

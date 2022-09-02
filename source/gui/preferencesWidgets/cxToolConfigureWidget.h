@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDefinitions.h"
 #include "cxTrackerConfiguration.h"
 #include "cxStringProperty.h"
+#include "cxBoolProperty.h"
 #include "cxForwardDeclarations.h"
 
 
@@ -63,6 +64,7 @@ signals:
 
 public slots:
   QString requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
+  TrackerConfiguration::Configuration getConfiguration();
 
 private slots:
   void configChangedSlot();
@@ -70,15 +72,17 @@ private slots:
   void toolsChangedSlot();
   void filterToolsSlot();
   void onApplicationStateChanged();
+  void trackingSystemImplementationChangedSlot();
+  void applyRefToToolsChangedSlot();
 
 private:
-  void createTrackingSystemSelector();
+  void createGUISelectors();
+  QStringList getTrackingSystemImplementationList();
   void populateConfigurations(); ///< populates the combobox with all config files from the current application application
-	int addConfigurationToComboBox(QString displayName, QString absoluteFilePath); ///< adds a new configuration file item to the combobox
-  TrackerConfiguration::Configuration getCurrentConfiguration();
+  int addConfigurationToComboBox(QString displayName, QString absoluteFilePath); ///< adds a new configuration file item to the combobox
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
-	QString getCurrentConfigFilePath();
+  QString getCurrentConfigFilePath();
 
   QComboBox*                mConfigFilesComboBox;
   QLineEdit*                mConfigFileLineEdit; ///< name of the xml file (example.xml)
@@ -86,12 +90,10 @@ private:
   ConfigToolListWidget*     mToolListWidget;
   bool mModified; // if set: content is modified: save on exit
   StringPropertyPtr mTrackingSystemSelector;
+  StringPropertyPtr mTrackingSystemImplementationSelector;
+  BoolPropertyPtr mApplyRefToTools;
   TrackingServicePtr mTrackingService;
   StateServicePtr mStateService;
-
-	//TODO Implement in GUI
-	QString mTrackingSystemImplementation; ///< Store tracking system implementation (igstk or openigtlink)
-
 };
 
 }

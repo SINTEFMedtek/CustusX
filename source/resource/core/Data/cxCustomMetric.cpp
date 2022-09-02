@@ -18,10 +18,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxSpaceProvider.h"
 #include "cxSpaceListener.h"
-#include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
 #include "cxLogger.h"
+#include "cxFrameMetric.h"
 
 namespace cx
 {
@@ -30,7 +30,7 @@ CustomMetric::CustomMetric(const QString& uid, const QString& name, PatientModel
 				DataMetric(uid, name, dataManager, spaceProvider), mShowDistanceMarkers(false), mDistanceMarkerVisibility(50)
 {
 	mArguments.reset(new MetricReferenceArgumentList(QStringList() << "position" << "direction"));
-    mArguments->setValidArgumentTypes(QStringList() << "pointMetric" << "frameMetric");
+		mArguments->setValidArgumentTypes(QStringList() << PointMetric::getTypeName() << FrameMetric::getTypeName());
 	connect(mArguments.get(), SIGNAL(argumentsChanged()), this, SIGNAL(transformChanged()));
 	connect(this, &CustomMetric::propertiesChanged, this, &CustomMetric::onPropertiesChanged);
 	mDefineVectorUpMethod = mDefineVectorUpMethods.table;
@@ -320,7 +320,7 @@ void CustomMetric::updateTexture(MeshPtr model, Transform3D rMrr)
 
 Vector3D CustomMetric::getScale() const
 {
-	if (!mScaleToP1 || !this->getModel() || this->getModel()->getType() == "image")
+	if (!mScaleToP1 || !this->getModel() || this->getModel()->getType() == Image::getTypeName())
 		return Vector3D::Ones();
 
 	DoubleBoundingBox3D bounds = this->getModel()->boundingBox();
@@ -550,7 +550,7 @@ bool CustomMetric::modelIsImage() const
 {
 	DataPtr model = this->getModel();
 
-	return (model && model->getType() == "image");
+	return (model && model->getType() == Image::getTypeName());
 }
 
 Transform3D CustomMetric::calculateRotation(Vector3D dir, Vector3D vup) const

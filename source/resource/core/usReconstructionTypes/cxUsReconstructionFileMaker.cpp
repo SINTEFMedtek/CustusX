@@ -24,7 +24,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxXmlOptionItem.h"
 #include "cxTimeKeeper.h"
-#include "cxDataReaderWriter.h"
 #include "cxUSFrameData.h"
 #include "cxSavingVideoRecorder.h"
 #include "cxImageDataContainer.h"
@@ -352,8 +351,8 @@ void UsReconstructionFileMaker::writeUSImages(QString path, ImageDataContainerPt
 
 		CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
 		customReader->setTransform(pos[i].mPos);
-		customReader->setModality("US");
-		customReader->setImageType(mSessionDescription);
+		customReader->setModality(imUS);
+		customReader->setImageType(convertToImageSubType(mSessionDescription));
 	}
 }
 

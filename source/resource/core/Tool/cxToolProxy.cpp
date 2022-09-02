@@ -22,11 +22,11 @@ ToolProxy::ToolProxy(ToolPtr base, ctkPluginContext *pluginContext)
 void ToolProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
-								 mPluginContext,
-								 boost::bind(&ToolProxy::onServiceAdded, this, _1),
-								 boost::function<void (TrackingService*)>(),
-								 boost::bind(&ToolProxy::onServiceRemoved, this, _1)
-								 ));
+							   mPluginContext,
+							   boost::bind(&ToolProxy::onServiceAdded, this, _1),
+							   boost::function<void (TrackingService*)>(),
+							   boost::bind(&ToolProxy::onServiceRemoved, this, _1)
+							   ));
 	mServiceListener->open();
 }
 
@@ -57,7 +57,7 @@ void ToolProxy::checkToolValidity()
 	{
 		std::cout << "disabling tool reference for " << mTool->getUid() << ", [currently disabled]" << std::endl;
 		// enable this when tool manager is a first-class plugin
-//		mTool = Tool::getNullObject();
+		//		mTool = Tool::getNullObject();
 		// emit changed signals
 	}
 }
@@ -147,12 +147,12 @@ void ToolProxy::setTooltipOffset(double val)
 	mTool->setTooltipOffset(val);
 }
 
-std::map<int, Vector3D> ToolProxy::getReferencePoints() const
+std::map<QString, Vector3D> ToolProxy::getReferencePoints() const
 {
 	return mTool->getReferencePoints();
 }
 
-bool ToolProxy::hasReferencePointWithId(int id)
+bool ToolProxy::hasReferencePointWithId(QString id)
 {
 	return mTool->hasReferencePointWithId(id);
 }
@@ -180,6 +180,11 @@ void ToolProxy::set_prMt(const Transform3D& prMt, double timestamp)
 void ToolProxy::setVisible(bool vis)
 {
 	mTool->setVisible(vis);
+}
+
+ToolPtr ToolProxy::getBaseTool()
+{
+	return mTool->getBaseTool();
 }
 
 

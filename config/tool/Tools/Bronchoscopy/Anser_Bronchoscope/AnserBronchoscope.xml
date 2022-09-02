@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<!-- Minimum parameters for Tool file to be recognised: "<tool><clincal_app>" and "<sensor><type>" -->
+<!-- A tool is defined a tracking sensor attached to a instrument. -->
+
+<tool>
+    <type>pointer</type>
+    <id>AnserBronchoscope</id>
+    <name>AnserBronchoscope</name>
+    <description>EMT Pointer</description>
+    <manufacturer>UCC</manufacturer>
+    <clinical_app>Bronchoscopy</clinical_app>
+    <geo_file>Bronchoscope.stl</geo_file>
+    <pic_file></pic_file>
+    <doc_file></doc_file>
+    <openigtlinktransformid>AnserBronchoscope</openigtlinktransformid>
+    
+    <!-- Instrument -->
+    <instrument>
+        <type></type>
+        <id></id>
+        <name></name>
+        <manufacturer></manufacturer>
+        <description></description>
+    </instrument>
+    
+    <!-- Sensor -->
+    <sensor>
+        <type>Aurora</type>
+        <id>Aurora01</id>
+        <name>AuroraSensor1</name>
+        <wireless>yes</wireless>
+        <DOF>5</DOF>
+        <portnumber>1</portnumber>
+        <channelnumber>0</channelnumber>
+        <manufacturer>NDI</manufacturer>
+        <description></description>
+        <rom_file></rom_file>
+    </sensor>
+    
+    <!-- Calibration -->
+    <calibration>
+        <cal_file>Identity.cal</cal_file>
+    </calibration>
+</tool>
+

@@ -123,10 +123,10 @@ TEST_CASE("ActiveData: Get using type regexp", "[unit]")
 	activeData.setActive(testData.mesh1);
 	activeData.setActive(testData.image1);
 
-	QString regexp("image");
+	QString regexp(cx::Image::getTypeName());
 	CHECK(activeData.getActiveUsingRegexp(regexp) == activeData.getActive());
 
-	regexp = "mesh";
+	regexp = cx::Mesh::getTypeName();
 	REQUIRE(activeData.getActiveUsingRegexp(regexp));
 	CHECK(activeData.getActiveUsingRegexp(regexp)->getUid() == testData.mesh1->getUid());
 }

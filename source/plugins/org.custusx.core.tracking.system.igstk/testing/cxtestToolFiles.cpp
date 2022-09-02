@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "catch.hpp"
 
 #include <QStringList>
-#include "cxEnumConverter.h"
 #include "cxDefinitions.h"
 #include "cxTrackerConfiguration.h"
 #include "cxTrackingSystemIGSTKService.h"
@@ -20,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 #include "cxTrackerConfigurationImpl.h"
+#include "cxTypeConversions.h"
 
 namespace cxtest
 {
@@ -91,8 +91,11 @@ TEST_CASE("Verify that saveConfiguration do not loose information", "[unit][tool
 		REQUIRE(configData.mToolList.size() == configData2.mToolList.size());
 		for(unsigned i = 0; i < configData.mToolList.size(); ++i)
 		{
-			CHECK(configData.mToolList[i].mOpenIGTLinkImageId == configData2.mToolList[i].mOpenIGTLinkImageId);
-			CHECK(configData.mToolList[i].mOpenIGTLinkTransformId == configData2.mToolList[i].mOpenIGTLinkTransformId);
+			//New tool files can add OpenIGTLink id tags to tool config files
+			if(!configData.mToolList[i].mOpenIGTLinkImageId.isEmpty())
+				CHECK(configData.mToolList[i].mOpenIGTLinkImageId == configData2.mToolList[i].mOpenIGTLinkImageId);
+			if(!configData.mToolList[i].mOpenIGTLinkTransformId.isEmpty())
+				CHECK(configData.mToolList[i].mOpenIGTLinkTransformId == configData2.mToolList[i].mOpenIGTLinkTransformId);
 		}
 	}
 }

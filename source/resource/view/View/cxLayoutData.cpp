@@ -12,10 +12,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLayoutData.h"
 #include <iostream>
 #include <QDomElement>
-#include "cxTypeConversions.h"
 #include "cxLogger.h"
-#include "cxDefinitionStrings.h"
 #include "cxView.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
