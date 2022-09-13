@@ -163,6 +163,11 @@ void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations
 	mCameraPath->setCameraRotations(cameraRotations);
 }
 
+void VBWidget::setBranchingIndexAlongRoute(std::vector< int > branchingIndex)
+{
+	mCameraPath->setBranchingIndexAlongRoute(branchingIndex);
+}
+
 void VBWidget::setRecordVideoOption(bool recordVideo)
 {
 	mRecordVideo = recordVideo;

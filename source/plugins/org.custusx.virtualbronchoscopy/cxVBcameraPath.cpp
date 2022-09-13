@@ -100,24 +100,24 @@ void CXVBcameraPath::generateSplineCurve(std::vector< Eigen::Vector3d > routePos
 
 void CXVBcameraPath::cameraPathPositionSlot(int positionPermillage)
 {
-	double splineParameter = positionPercentageAdjusted(positionPermillage/10.0) / 100.0;
+	mPositionPercentage = positionPercentageAdjusted(positionPermillage/10.0) / 100.0;
 
 	//Making shorter focus distance at last 20% of path, otherwise the camera might be outside of the smallest branches.
 	//Longer focus makes smoother turns at the first divisions.
 	double splineFocusDistance = 0.05;
-	if (splineParameter > 0.8)
+	if (mPositionPercentage > 0.8)
 		splineFocusDistance = 0.02;
 
 	double pos_r[3], focus_r[3], d_r[3];
 	double splineParameterArray[3];
-	splineParameterArray[0] = splineParameter;
-	splineParameterArray[1] = splineParameter;
-	splineParameterArray[2] = splineParameter;
+	splineParameterArray[0] = mPositionPercentage;
+	splineParameterArray[1] = mPositionPercentage;
+	splineParameterArray[2] = mPositionPercentage;
 
 	mSpline->Evaluate(splineParameterArray, pos_r, d_r);
-	splineParameterArray[0] = splineParameter + splineFocusDistance;
-	splineParameterArray[1] = splineParameter + splineFocusDistance;
-	splineParameterArray[2] = splineParameter + splineFocusDistance;
+	splineParameterArray[0] = mPositionPercentage + splineFocusDistance;
+	splineParameterArray[1] = mPositionPercentage + splineFocusDistance;
+	splineParameterArray[2] = mPositionPercentage + splineFocusDistance;
 	mSpline->Evaluate(splineParameterArray, focus_r, d_r);
 
 	mLastCameraPos_r = Vector3D(pos_r[0], pos_r[1], pos_r[2]);
@@ -126,7 +126,7 @@ void CXVBcameraPath::cameraPathPositionSlot(int positionPermillage)
 	if(mAutomaticRotation)
 		if(mRoutePositions.size() > 0 && mRoutePositions.size() == mCameraRotationsSmoothed.size())
 		{
-			int index = (int) (splineParameter * (mRoutePositions.size() - 1));
+			int index = (int) (mPositionPercentage * (mRoutePositions.size() - 1));
 			mLastCameraRotAngle = mCameraRotationsSmoothed[index];
 			//CX_LOG_DEBUG() << "mLastCameraRotAngle: " << mLastCameraRotAngle*180/M_PI;
 		}
@@ -201,6 +201,17 @@ void CXVBcameraPath::writePositionToFile(Transform3D prMt)
 		QTextStream stream(&timestampFile);
 		stream << mTimeSinceStartRecording.elapsed() << endl;
 	}
+
+	QFile branchingPositionFile(mPositionsFilePath + "_branching.txt");
+	if (branchingPositionFile.open(QIODevice::Append))
+	{
+		bool branchingPoint = 0;
+		int originalRouteIndex = (int) (mRoutePositions.size()-1) * (1-mPositionPercentage);
+		if (std::find(mBranchingIndex.begin(), mBranchingIndex.end(), originalRouteIndex) != mBranchingIndex.end())
+			branchingPoint = 1;
+		QTextStream stream(&branchingPositionFile);
+		stream << branchingPoint << endl;
+	}
 }
 
 
@@ -260,6 +271,11 @@ void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
 {
 	mCameraRotations = cameraRotations;
 	mCameraRotationsSmoothed = smoothCameraRotations(mCameraRotations);
+}
+
+void CXVBcameraPath::setBranchingIndexAlongRoute(std::vector< int > branchingIndex)
+{
+	mBranchingIndex = branchingIndex;
 }
 
 void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)

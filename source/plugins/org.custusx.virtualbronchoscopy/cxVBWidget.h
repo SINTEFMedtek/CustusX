@@ -50,6 +50,7 @@ public:
 	void setRouteToTarget(QString uid);
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotationAlongRoute(std::vector< double > cameraRotations);
+	void setBranchingIndexAlongRoute(std::vector< int > branchingIndex);
 	void setRecordVideoOption(bool recordVideo);
 
 protected:

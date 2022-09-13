@@ -54,6 +54,7 @@ private:
 	Vector3D mLastStoredViewVector;
 	double mLastCameraViewAngle;
 	double mLastCameraRotAngle;
+	double mPositionPercentage;
 	bool mAutomaticRotation;
 	bool mWritePositionsToFile;
 	QString mPositionsFilePath;
@@ -62,6 +63,7 @@ private:
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< double > mCameraRotations;
 	std::vector< double > mCameraRotationsSmoothed;
+	std::vector< int > mBranchingIndex;
 
 	void updateManualToolPosition();
 	void generateSplineCurve(MeshPtr mesh);
@@ -74,6 +76,7 @@ public:
 
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotations(std::vector< double > cameraRotations);
+	void setBranchingIndexAlongRoute(std::vector< int > branchingIndex);
 	void setAutomaticRotation(bool automaticRotation);
 	void setWritePositionsToFile(bool write);
 	void setWritePositionsFilePath(QString path);
