@@ -23,6 +23,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
+#include "cxRenderWindowFactory.h"
+#include "cxtestViewServiceMockWithRenderWindowFactory.h"
+#include "cxLayoutData.h"
 
 namespace cxtest
 {
@@ -134,8 +137,10 @@ void TestRenderSpeed::createViews(int num)
 	{
 		int v = num;
 		int rmax = sqrt(v);
+		cx::LayoutViewData viewData;
 		cx::LayoutRegion region(v%rmax, v/rmax);
-		cx::ViewPtr view = mMainWidget->addView(cx::View::VIEW, region);
+		viewData.mRegion = region;
+		cx::ViewPtr view = mMainWidget->addView(viewData);
 
 		mViews.push_back(view);
 	}

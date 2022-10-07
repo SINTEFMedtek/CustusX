@@ -110,7 +110,7 @@ public:
 	LayoutWidgetUsingViewWidgets(QWidget *parent);
     virtual ~LayoutWidgetUsingViewWidgets();
 
-	virtual ViewPtr addView(View::Type type, LayoutRegion region);
+	virtual ViewPtr addView(LayoutViewData viewData);
 	virtual void setOffScreenRenderingAndClear(bool on);
 	virtual bool getOffScreenRendering() const;
 	virtual void clearViews();

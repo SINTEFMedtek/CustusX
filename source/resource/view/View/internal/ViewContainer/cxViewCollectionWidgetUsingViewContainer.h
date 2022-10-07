@@ -39,7 +39,7 @@ public:
 	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
     virtual ~ViewCollectionWidgetUsingViewContainer();
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
+	ViewPtr addView(LayoutViewData viewData);
 	virtual void setOffScreenRenderingAndClear(bool on);
 	virtual bool getOffScreenRendering() const;
 	void clearViews();

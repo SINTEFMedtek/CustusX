@@ -40,8 +40,10 @@ ViewCollectionWidgetUsingViewContainer::~ViewCollectionWidgetUsingViewContainer(
 {
 }
 
-ViewPtr ViewCollectionWidgetUsingViewContainer::addView(View::Type type, LayoutRegion region)
+ViewPtr ViewCollectionWidgetUsingViewContainer::addView(LayoutViewData viewData)
 {
+	View::Type type = viewData.mType;
+	LayoutRegion region = viewData.mRegion;
 	mViewContainer->show();
 	static int nameGenerator = 0;
 	QString uid = QString("view-%1-%2")

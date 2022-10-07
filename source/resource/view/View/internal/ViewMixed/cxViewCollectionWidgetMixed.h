@@ -57,7 +57,7 @@ public:
 	ViewCollectionWidgetMixed(QWidget *parent);
     virtual ~ViewCollectionWidgetMixed();
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
+	ViewPtr addView(LayoutViewData viewData);
 	virtual void setOffScreenRenderingAndClear(bool on);
 	virtual bool getOffScreenRendering() const;
 	virtual void clearViews();

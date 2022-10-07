@@ -46,8 +46,10 @@ void ViewCollectionWidgetMixed::initBaseLayout()
 	mTotalRegion = LayoutRegion(-1,-1);
 }
 
-ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
+ViewPtr ViewCollectionWidgetMixed::addView(LayoutViewData viewData)
 {
+	View::Type type = viewData.mType;
+	LayoutRegion region = viewData.mRegion;
 	ViewPtr view;
 	mTotalRegion = merge(region, mTotalRegion);
 
@@ -65,7 +67,7 @@ ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
 	else
 	{
 		mBaseRegion = merge(region, mBaseRegion);
-		view = mBaseLayout->addView(type, region);
+		view = mBaseLayout->addView(viewData);
 
 		// re-add the base widget with updated position in grid
 		this->addWidgetToLayout(mLayout, mBaseLayout, mBaseRegion);

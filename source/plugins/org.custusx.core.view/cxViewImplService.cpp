@@ -471,7 +471,7 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	if (!viewData.isValid())
 		return;
 
-	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);//This may also need vtkRenderWindowInteractor. Create it here instead?
+	ViewPtr view = widget->addView(viewData);
 
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();

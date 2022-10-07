@@ -45,7 +45,7 @@ public:
 
 	virtual ~ViewCollectionWidget() {}
 
-	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
+	virtual ViewPtr addView(LayoutViewData viewData) = 0;
 	virtual void setOffScreenRenderingAndClear(bool on) = 0;
 	virtual bool getOffScreenRendering() const = 0;
 	virtual void clearViews() = 0;

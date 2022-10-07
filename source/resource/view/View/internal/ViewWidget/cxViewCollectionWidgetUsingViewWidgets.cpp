@@ -72,15 +72,19 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 {
 }
 
-ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
+ViewPtr LayoutWidgetUsingViewWidgets::addView(LayoutViewData viewData)
 {
+	View::Type type = viewData.mType;
+	LayoutRegion region = viewData.mRegion;
 	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
 	ViewAndSlider viewAndSlider(view);
 
 	view->getView()->setType(type);
 	view->setParent(this->parentWidget());
 
-	if(type == View::VIEW_2D)//TODO: Use viewData.mPlane for plane type, and option to turn slider on/off
+	//Only add slider to axial view for now
+	//TODO: Connect slider to data
+	if(viewData.mPlane == ptAXIAL)//TODO: Add option to turn slider on/off
 	{
 		mLayout->addWidget(viewAndSlider.getSliderWidget(), region.pos.row, region.pos.col, region.span.row, region.span.col);
 	}
