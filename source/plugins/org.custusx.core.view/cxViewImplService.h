@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_core_view_Export.h"
 class ctkPluginContext;
 class QDomElement;
+class QSlider;
 
 namespace cx
 {
@@ -164,7 +165,7 @@ private:
 	void activateView(ViewCollectionWidget* widget, LayoutViewData viewData);
 	void setSlicePlanesProxyInViewsUpTo2DViewgroup();
 	void setRenderingInterval(int interval);
-	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData);
+	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData, QSlider *slider = nullptr);
 	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 	void autoShowInViewGroups(DataPtr data);
 	void autoResetCameraToSuperiorView();

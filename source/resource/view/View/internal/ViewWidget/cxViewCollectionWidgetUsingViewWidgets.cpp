@@ -98,6 +98,16 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(LayoutViewData viewData)
 	return view->getView();
 }
 
+QSlider* LayoutWidgetUsingViewWidgets::getSlider(ViewPtr view)
+{
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
+	{
+		ViewWidget* current = mSliderViews[i].mViewWidget;
+		if (current->getView()==view)
+			return mSliderViews[i].mSlider;
+	}
+}
+
 void LayoutWidgetUsingViewWidgets::setOffScreenRenderingAndClear(bool on)
 {
 	this->clearViews();

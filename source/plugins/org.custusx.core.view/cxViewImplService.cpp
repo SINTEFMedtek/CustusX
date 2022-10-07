@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewImplService.h"
 
 #include <QAction>
+#include <QSlider>
 #include <ctkPluginContext.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -40,6 +41,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewWrapper3D.h"
 #include "cxViewWrapperVideo.h"
 #include "cxProfile.h"
+#include "cxViewCollectionWidgetUsingViewWidgets.h"
 
 namespace cx
 {
@@ -496,17 +498,23 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	else
 		CX_LOG_WARNING() << "ViewImplService::activateView: No vtkRenderWindowInteractor";
 
-	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
+	QSlider *slider = nullptr;
+	LayoutWidgetUsingViewWidgets* widgetWithSliders = dynamic_cast<LayoutWidgetUsingViewWidgets*>(widget);
+	if(widgetWithSliders)
+		slider = widgetWithSliders->getSlider(view);
+	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData, slider);
 	mViewGroups[viewData.mGroup]->addView(wrapper);
 }
 
-ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData viewData)
+ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData viewData, QSlider *slider)
 {
 	if (viewData.mType == View::VIEW_2D)
 	{
 		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mServices, mCenterToTool2D));
 		wrapper->initializePlane(viewData.mPlane);
 		connect(wrapper.get(), &ViewWrapper2D::pointSampled, this, &ViewImplService::pointSampled);
+		if(slider)
+			wrapper->connect2DSlider(slider);
 		return wrapper;
 	}
 	else if (viewData.mType == View::VIEW_3D)

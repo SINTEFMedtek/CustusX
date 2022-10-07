@@ -22,12 +22,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkImageData.h>
 
 #include <QAction>
 #include <QActionGroup>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QSlider>
 
 #include "cxUtilHelpers.h"
 #include "cxView.h"
@@ -63,6 +65,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
+#include "cxTexture3DSlicerRep.h"
 
 namespace cx
 {
@@ -112,6 +115,10 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerTo
 
 	connect(mServices->patient().get(), &PatientModelService::videoAddedToTrackedStream, this, &ViewWrapper2D::videoSourcesChangedSlot);
 
+
+	mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::activeImageChangedSlot);
+
 	this->activeToolChangedSlot();
 	this->updateView();
 }
@@ -120,6 +127,43 @@ ViewWrapper2D::~ViewWrapper2D()
 {
 	if (mView)
 		mView->removeReps();
+}
+
+void ViewWrapper2D::activeImageChangedSlot(const QString& uid)
+{
+	ImagePtr image = mServices->patient()->getData<Image>(uid);
+	if(!image || !mSlider)
+		return;
+	int zDim = image->getBaseVtkImageData()->GetDimensions()[2];
+	//CX_LOG_DEBUG() << "Image: zDim: " << zDim << " uid:" << uid ;
+
+	//TODO: use real image position
+//	mSlider->setMinimum(0);
+//	mSlider->setMaximum(zDim);
+//	mSlider->setSliderPosition(zDim/2);
+//	mLastSliderValue = zDim/2;
+}
+
+void ViewWrapper2D::connect2DSlider(QSlider *slider)
+{
+	mSlider = slider;
+	//CX_LOG_DEBUG() << "connect2DSlider";
+	mSlider->setMinimum(0);
+	mSlider->setMaximum(400);
+	mSlider->setSliderPosition(200);
+	mLastSliderValue = 200;
+
+	connect(mSlider, &QSlider::valueChanged, this, &ViewWrapper2D::sliderChanged);
+}
+
+void ViewWrapper2D::sliderChanged(int sliderValue)
+{
+	//Axial
+	int sliderValueDiff = sliderValue - mLastSliderValue;
+	Vector3D delta_vp = Vector3D(0, 0, sliderValueDiff);
+	this->shiftAxisPos(delta_vp);//TODO: Use real positions and image size. shiftAxisPos scales with 2D view zoom
+	//this->shiftPosOutOfPlane(delta_vp);//TODO
+	mLastSliderValue = sliderValue;
 }
 
 void ViewWrapper2D::changeZoom(double delta)
@@ -641,6 +685,21 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	// set new tool position to old modified by MD:
 	tool->set_prMt(MD * prMt);
 }
+
+//TODO
+void ViewWrapper2D::shiftPosOutOfPlane(Vector3D delta_d)
+{
+	ToolPtr tool = mServices->tracking()->getManualTool();
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
+	Transform3D prMt = tool->get_prMt();
+
+	//Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
+
+	Transform3D MD = createTransformTranslate(delta_pr);
+	tool->set_prMt(MD * prMt);
+}
+
 
 void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 {

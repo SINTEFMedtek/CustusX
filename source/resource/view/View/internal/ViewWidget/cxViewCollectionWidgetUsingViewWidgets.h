@@ -123,6 +123,7 @@ public:
     virtual std::vector<ViewPtr> getViews();
     virtual QPoint getPosition(ViewPtr view);
 	virtual void enableContextMenuForViews(bool enable);
+	virtual QSlider* getSlider(ViewPtr view);
 
 protected:
 	std::vector<ViewAndSlider> mSliderViews;

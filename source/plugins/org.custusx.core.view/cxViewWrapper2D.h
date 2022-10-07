@@ -28,9 +28,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include "sscConfig.h"
+#include "cxActiveImageProxy.h"
 
 class QMouseEvent;
 class QWheelEvent;
+class QSlider;
 
 namespace cx
 {
@@ -65,6 +67,7 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	virtual void updateView();
+	void connect2DSlider(QSlider *slider);
 
 	ImagePtr getImageToDisplay();
 
@@ -79,6 +82,7 @@ protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void videoSourcesChangedSlot();
 	virtual void settingsChangedSlot(QString key);
+	void activeImageChangedSlot(const QString& uid);
 
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -92,6 +96,7 @@ private slots:
 	void toggleShowManualTool();
     void enableSliderSlot(bool visible);
     void toggle2DSlider();
+	void sliderChanged(int sliderValue);
 
 protected slots:
 	void samplePoint(Vector3D click_vp);
@@ -103,6 +108,7 @@ private:
 	Vector3D qvp2vp(QPoint pos_qvp);
 	void setAxisPos(Vector3D click_vp);
 	void shiftAxisPos(Vector3D delta_vp);
+	void shiftPosOutOfPlane(Vector3D delta_d);
 
 	ORIENTATION_TYPE getOrientationType() const;
 
@@ -137,6 +143,9 @@ private:
 	Zoom2DHandlerPtr mZoom2D;
 
 	Vector3D mLastClickPos_vp;
+	int mLastSliderValue;
+	QSlider *mSlider = nullptr;
+	ActiveImageProxyPtr mActiveImageProxy;
 
 	QActionGroup* mOrientationActionGroup;
 	void changeZoom(double delta);
