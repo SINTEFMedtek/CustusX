@@ -14,6 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
+#include <QHBoxLayout>
+#include <QSlider>
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
@@ -28,6 +30,48 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
+struct ViewAndSlider
+{
+	ViewAndSlider(ViewWidget* viewWidget):
+		mViewWidget(viewWidget) {}
+	~ViewAndSlider()
+	{
+		QHBoxLayout * mSliderlayout = nullptr;
+		QWidget * mSliderWidget = nullptr;
+		QSlider *mSlider = nullptr;
+	}
+	ViewWidget* mViewWidget;
+	QHBoxLayout * mSliderlayout = nullptr;
+	QWidget * mSliderWidget = nullptr;
+	QSlider *mSlider = nullptr;
+
+	QWidget * getSliderWidget()
+	{
+		if(!mSliderWidget)
+		{
+			mSliderWidget = new QWidget();
+			mSlider = new QSlider(Qt::Vertical, mSliderWidget);
+			mSliderlayout = new QHBoxLayout(mSliderWidget);
+			mSliderlayout->addWidget(mViewWidget);
+			mSliderlayout->addWidget(mSlider);
+		}
+		return mSliderWidget;
+	}
+
+	QWidget * getUsedWidget()
+	{
+		if(useSlider())
+			return mSliderWidget;
+		return mViewWidget;
+	}
+	bool useSlider()
+	{
+		if(mSliderWidget)
+			return true;
+		return false;
+	}
+};
 
 /**
  * ViewWidget with added Slider for manual slicing through 2D slices
@@ -81,10 +125,7 @@ public:
 	virtual void enableContextMenuForViews(bool enable);
 
 protected:
-    std::vector<ViewWidget*>                mViews;
-    std::vector<ViewWidgetWithSlider*>      mViewsWithSlider;
-    MultiViewCachePtr       mViewCache;
-    QGridLayout* mLayout; ///< the layout
+	std::vector<ViewAndSlider> mSliderViews;
 
 private:
     ViewWidget* WidgetFromView(ViewPtr view);

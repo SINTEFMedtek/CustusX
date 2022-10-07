@@ -74,21 +74,24 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-	ViewWidget* view = mViewCache->retrieveView(this->parentWidget(), type, mOffScreenRendering);
+	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
+	ViewAndSlider viewAndSlider(view);
 
 	view->getView()->setType(type);
 	view->setParent(this->parentWidget());
 
-    ViewWidgetWithSlider *widgetWithSlider = new ViewWidgetWithSlider(view);
-    QWidget *usedWidget = widgetWithSlider->getUsedWidget(type, this->useSlider());
-    mLayout->addWidget(usedWidget, region.pos.row, region.pos.col, region.span.row, region.span.col);
+	if(type == View::VIEW_2D)//TODO: Use viewData.mPlane for plane type, and option to turn slider on/off
+	{
+		mLayout->addWidget(viewAndSlider.getSliderWidget(), region.pos.row, region.pos.col, region.span.row, region.span.col);
+	}
+	else
+		mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);
 //    viewSliderWidget->show();
     view->show();
 
-    mViewsWithSlider.push_back(widgetWithSlider);
-    mViews.push_back(view);
-    return widgetWithSlider->getViewWidget()->getView();
+	mSliderViews.push_back(viewAndSlider);
+	return view->getView();
 }
 
 void LayoutWidgetUsingViewWidgets::setOffScreenRenderingAndClear(bool on)
@@ -106,30 +109,30 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 {
 	mViewCache->clearViews();
 
-    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
 	{
-        mViewsWithSlider[i]->getViewWidget()->hide();
-        mLayout->removeWidget(mViewsWithSlider[i]->getViewWidget());
+		mSliderViews[i].getUsedWidget()->hide();
+		mLayout->removeWidget(mSliderViews[i].getUsedWidget());
 	}
-    mViewsWithSlider.clear();
+	mSliderViews.clear();
 
 	view_utils::setStretchFactors(mLayout, LayoutRegion(0, 0, LayoutData::MaxGridSize, LayoutData::MaxGridSize), 0);
 }
 
 void LayoutWidgetUsingViewWidgets::setModified()
 {
-    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
 	{
-        ViewWidget* current = mViewsWithSlider[i]->getViewWidget();
+		ViewWidget* current = mSliderViews[i].mViewWidget;
 		current->setModified();
 	}
 }
 
 void LayoutWidgetUsingViewWidgets::render()
 {
-    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
 	{
-        ViewWidget* current = mViewsWithSlider[i]->getViewWidget();
+		ViewWidget* current = mSliderViews[i].mViewWidget;
 		current->render(); // render only changed scenegraph (shaky but smooth)
 	}
 
@@ -153,24 +156,20 @@ QPoint LayoutWidgetUsingViewWidgets::getPosition(ViewPtr view)
 void LayoutWidgetUsingViewWidgets::enableContextMenuForViews(bool enable)
 {
 	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
-    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
 	{
-        mViewsWithSlider[i]->setContextMenuPolicy(policy);
-    }
-	for (unsigned i=0; i<mViews.size(); ++i)
-	{
-		mViews[i]->setContextMenuPolicy(policy);
+		mSliderViews[i].mViewWidget->setContextMenuPolicy(policy);
 	}
 }
 
 ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)
 {
-    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
-    {
-        ViewWidget* current = mViewsWithSlider[i]->getViewWidget();
-        if (current->getView()==view)
-            return current;
-    }
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
+	{
+		ViewWidget* current = mSliderViews[i].mViewWidget;
+		if (current->getView()==view)
+			return current;
+	}
     return NULL;
 }
 
@@ -197,8 +196,8 @@ int LayoutWidgetUsingViewWidgets::getGridMargin() const
 std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
 {
 	std::vector<ViewPtr> retval;
-    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
-        retval.push_back(mViewsWithSlider[i]->getViewWidget()->getView());
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
+		retval.push_back(mSliderViews[i].mViewWidget->getView());
 	return retval;
 }
 
