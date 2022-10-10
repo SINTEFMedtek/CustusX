@@ -23,8 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
-#include "cxRenderWindowFactory.h"
-#include "cxtestViewServiceMockWithRenderWindowFactory.h"
 #include "cxLayoutData.h"
 
 namespace cxtest

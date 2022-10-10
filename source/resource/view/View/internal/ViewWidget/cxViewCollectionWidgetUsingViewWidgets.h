@@ -127,6 +127,8 @@ public:
 
 protected:
 	std::vector<ViewAndSlider> mSliderViews;
+	QGridLayout* mLayout; ///< the layout
+	MultiViewCachePtr mViewCache;
 
 private:
     ViewWidget* WidgetFromView(ViewPtr view);

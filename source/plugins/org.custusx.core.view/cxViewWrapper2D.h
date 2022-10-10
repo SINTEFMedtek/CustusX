@@ -29,6 +29,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTransform3D.h"
 #include "sscConfig.h"
 #include "cxActiveImageProxy.h"
+#include "cxActiveToolProxy.h"
 
 class QMouseEvent;
 class QWheelEvent;
@@ -82,7 +83,7 @@ protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void videoSourcesChangedSlot();
 	virtual void settingsChangedSlot(QString key);
-	void activeImageChangedSlot(const QString& uid);
+	void updateSlider();
 
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -108,7 +109,7 @@ private:
 	Vector3D qvp2vp(QPoint pos_qvp);
 	void setAxisPos(Vector3D click_vp);
 	void shiftAxisPos(Vector3D delta_vp);
-	void shiftPosOutOfPlane(Vector3D delta_d);
+	void shiftPosOutOfPlane(Vector3D delta_d_voxels);
 
 	ORIENTATION_TYPE getOrientationType() const;
 
@@ -126,6 +127,10 @@ private:
 	bool isAnyplane();
 
 	void setImagesSWRendering();
+
+	Vector3D get_tool_d();
+
+	Texture3DSlicerRepPtr mMultiSliceRep;
 
 	DataRepContainerPtr mDataRepContainer;
 
@@ -151,6 +156,7 @@ private:
 	void changeZoom(double delta);
 	void applyViewFollower();
 	DoubleBoundingBox3D getViewport_s() const;
+	//ActiveToolProxyPtr mActiveTool;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

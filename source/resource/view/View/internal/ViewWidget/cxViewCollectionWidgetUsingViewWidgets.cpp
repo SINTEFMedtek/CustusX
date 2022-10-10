@@ -106,6 +106,7 @@ QSlider* LayoutWidgetUsingViewWidgets::getSlider(ViewPtr view)
 		if (current->getView()==view)
 			return mSliderViews[i].mSlider;
 	}
+	return nullptr;
 }
 
 void LayoutWidgetUsingViewWidgets::setOffScreenRenderingAndClear(bool on)

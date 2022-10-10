@@ -65,7 +65,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
-#include "cxTexture3DSlicerRep.h"
+// #include "cxTexture3DSlicerRep.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -117,7 +118,10 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerTo
 
 
 	mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
-	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::activeImageChangedSlot);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::updateSlider);
+
+	//mActiveTool = ActiveToolProxy::New(mServices->tracking());
+	//connect(mActiveTool.get(), &ActiveToolProxy::toolTransformAndTimestamp, this, &ViewWrapper2D::updateSlider);//Cause side effects
 
 	this->activeToolChangedSlot();
 	this->updateView();
@@ -129,19 +133,44 @@ ViewWrapper2D::~ViewWrapper2D()
 		mView->removeReps();
 }
 
-void ViewWrapper2D::activeImageChangedSlot(const QString& uid)
+//min/max must be updated when images changes. Position must also be updated when tool position changes
+//Need to listen to toolTransformAndTimestamp? Use ActiveToolProxy?
+//Or always trigger from updateView, or with a modified?
+void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 {
-	ImagePtr image = mServices->patient()->getData<Image>(uid);
+	//ImagePtr image = mServices->patient()->getData<Image>(uid);
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
 	if(!image || !mSlider)
 		return;
 	int zDim = image->getBaseVtkImageData()->GetDimensions()[2];
 	//CX_LOG_DEBUG() << "Image: zDim: " << zDim << " uid:" << uid ;
 
-	//TODO: use real image position
-//	mSlider->setMinimum(0);
-//	mSlider->setMaximum(zDim);
-//	mSlider->setSliderPosition(zDim/2);
-//	mLastSliderValue = zDim/2;
+	//axial
+	mSlider->setMinimum(0);
+	mSlider->setMaximum(zDim);
+	mSlider->setSliderPosition(zDim/2);
+	mLastSliderValue = zDim/2;
+	return;
+
+	//TODO:
+//	Vector3D tool_d = this->get_tool_d();
+//	CX_LOG_DEBUG() << "tool_d: " << tool_d;
+//	Vector3D spacing = image->getSpacing();
+//	int outOfPlane_voxels = tool_d[2] * spacing[2];
+//	CX_LOG_DEBUG() << "outOfPlane_voxels: " << outOfPlane_voxels;
+
+//	if(outOfPlane_voxels > mSlider->maximum())
+//		outOfPlane_voxels = mSlider->maximum();
+//	else if(outOfPlane_voxels < mSlider->minimum())
+//		outOfPlane_voxels = mSlider->minimum();
+//	CX_LOG_DEBUG() << "fixed outOfPlane_voxels: " << outOfPlane_voxels;
+
+//	mSlider->setSliderPosition(outOfPlane_voxels);
+//	mSlider->blockSignals(true);
+//	mLastSliderValue = mSlider->sliderPosition();
+//	mLastSliderValue = outOfPlane_voxels;
+//	mSlider->blockSignals(false);
+//	//CX_LOG_DEBUG() << "mLastSliderValue: " << mLastSliderValue;
 }
 
 void ViewWrapper2D::connect2DSlider(QSlider *slider)
@@ -160,9 +189,8 @@ void ViewWrapper2D::sliderChanged(int sliderValue)
 {
 	//Axial
 	int sliderValueDiff = sliderValue - mLastSliderValue;
-	Vector3D delta_vp = Vector3D(0, 0, sliderValueDiff);
-	this->shiftAxisPos(delta_vp);//TODO: Use real positions and image size. shiftAxisPos scales with 2D view zoom
-	//this->shiftPosOutOfPlane(delta_vp);//TODO
+	Vector3D delta_vp = Vector3D(0, 0, sliderValueDiff);//axial
+	this->shiftPosOutOfPlane(delta_vp);
 	mLastSliderValue = sliderValue;
 }
 
@@ -523,6 +551,8 @@ void ViewWrapper2D::updateView()
 	}
 
 	this->applyViewFollower();
+
+	//updateSlider();//Too much?
 }
 
 DoubleBoundingBox3D ViewWrapper2D::getViewport_s() const
@@ -686,20 +716,41 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	tool->set_prMt(MD * prMt);
 }
 
-//TODO
-void ViewWrapper2D::shiftPosOutOfPlane(Vector3D delta_d)
+void ViewWrapper2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
 {
 	ToolPtr tool = mServices->tracking()->getManualTool();
 	Transform3D sMr = mSliceProxy->get_sMr();
 	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
-	//Vector3D delta_pr = (rMpr.inv() * sMr.inv()).vector(delta_s);
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	Vector3D spacing = image->getSpacing();
+	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
 
-	Transform3D MD = createTransformTranslate(delta_pr);
+	Transform3D rMd = image->get_rMd();
+	Transform3D prMd = rMpr.inverse()*rMd;
+	Vector3D delta_pr = rMpr.inv() * rMd.vector(delta_d_mm);
+
+	//Transform3D MD = createTransformTranslate(delta_pr);//Not following axes in axial slice correcyly, if axes have been changed by registration
+	Transform3D MD = createTransformTranslate(delta_d_mm);//This seems to work better, but not sure if it will work correctly for all cases
 	tool->set_prMt(MD * prMt);
 }
 
+Vector3D ViewWrapper2D::get_tool_d()
+{
+	ToolPtr tool = mServices->tracking()->getManualTool();
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+
+	Transform3D rMpr = mServices->patient()->get_rMpr();
+	Transform3D prMt = tool->get_prMt();
+	Transform3D rMd = image->get_rMd();
+
+	Vector3D tool_t(0, 0, tool->getTooltipOffset());
+	Vector3D tool_d = (rMd.inverse() * rMpr * prMt).coord(tool_t);
+	//CX_LOG_DEBUG() << "tool_d: " << tool_d;
+	return tool_d;
+
+}
 
 void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)
 {
