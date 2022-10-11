@@ -53,7 +53,7 @@ struct ViewAndSlider
 			mSliderWidget = new QWidget();
 			mSlider = new QSlider(Qt::Vertical, mSliderWidget);
 			mSliderlayout = new QHBoxLayout(mSliderWidget);
-			mSliderlayout->setMargin(0);
+			mSliderlayout->setContentsMargins(0, 0, 0, 0);
 			mSliderlayout->addWidget(mViewWidget);
 			mSliderlayout->addWidget(mSlider);
 		}
