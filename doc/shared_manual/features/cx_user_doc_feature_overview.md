@@ -19,7 +19,7 @@ View Layout {#feature_overview_view_layouts}
 -----------------------------------------------------------
 
 The view area consist of several Views, each of which can visualize either 2D, 3D or video data. 
-The 2D views show data in either Saggital, Axial, Coronal or in a plane defined by the active tool.
+The 2D views show data in either Sagittal, Axial, Coronal or in a plane defined by the active tool.
 Each View belong to a View Group, and all Views in a View Group display the *same data*.
 
 As an example, we display two groups containing different data, 3D+ACS and ACS. 

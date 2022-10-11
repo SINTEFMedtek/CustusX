@@ -146,9 +146,11 @@ void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 	//CX_LOG_DEBUG() << "Image: zDim: " << zDim << " uid:" << uid ;
 
 	//axial
+	mSlider->blockSignals(true);
 	mSlider->setMinimum(0);
 	mSlider->setMaximum(zDim);
 	mSlider->setSliderPosition(zDim/2);
+	mSlider->blockSignals(false);
 	mLastSliderValue = zDim/2;
 	return;
 
@@ -165,8 +167,8 @@ void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 //		outOfPlane_voxels = mSlider->minimum();
 //	CX_LOG_DEBUG() << "fixed outOfPlane_voxels: " << outOfPlane_voxels;
 
-//	mSlider->setSliderPosition(outOfPlane_voxels);
 //	mSlider->blockSignals(true);
+//	mSlider->setSliderPosition(outOfPlane_voxels);
 //	mLastSliderValue = mSlider->sliderPosition();
 //	mLastSliderValue = outOfPlane_voxels;
 //	mSlider->blockSignals(false);
@@ -176,11 +178,7 @@ void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 void ViewWrapper2D::connect2DSlider(QSlider *slider)
 {
 	mSlider = slider;
-	//CX_LOG_DEBUG() << "connect2DSlider";
-	mSlider->setMinimum(0);
-	mSlider->setMaximum(400);
-	mSlider->setSliderPosition(200);
-	mLastSliderValue = 200;
+	mLastSliderValue = 0;
 
 	connect(mSlider, &QSlider::valueChanged, this, &ViewWrapper2D::sliderChanged);
 }
@@ -189,8 +187,8 @@ void ViewWrapper2D::sliderChanged(int sliderValue)
 {
 	//Axial
 	int sliderValueDiff = sliderValue - mLastSliderValue;
-	Vector3D delta_vp = Vector3D(0, 0, sliderValueDiff);//axial
-	this->shiftPosOutOfPlane(delta_vp);
+	Vector3D delta_d = Vector3D(0, 0, sliderValueDiff);//axial
+	this->shiftPosOutOfPlane(delta_d);
 	mLastSliderValue = sliderValue;
 }
 
@@ -727,12 +725,7 @@ void ViewWrapper2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
 	Vector3D spacing = image->getSpacing();
 	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
 
-	Transform3D rMd = image->get_rMd();
-	Transform3D prMd = rMpr.inverse()*rMd;
-	Vector3D delta_pr = rMpr.inv() * rMd.vector(delta_d_mm);
-
-	//Transform3D MD = createTransformTranslate(delta_pr);//Not following axes in axial slice correcyly, if axes have been changed by registration
-	Transform3D MD = createTransformTranslate(delta_d_mm);//This seems to work better, but not sure if it will work correctly for all cases
+	Transform3D MD = createTransformTranslate(delta_d_mm);
 	tool->set_prMt(MD * prMt);
 }
 

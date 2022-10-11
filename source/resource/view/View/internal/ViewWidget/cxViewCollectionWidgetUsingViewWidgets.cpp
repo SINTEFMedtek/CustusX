@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "vtkRenderWindow.h"
 #include "cxMultiViewCache.h"
+#include "cxSettings.h"
 
 #include <QVBoxLayout>
 
@@ -82,12 +83,10 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(LayoutViewData viewData)
 	view->getView()->setType(type);
 	view->setParent(this->parentWidget());
 
-	//Only add slider to axial view for now
-	//TODO: Connect slider to data
-	if(viewData.mPlane == ptAXIAL)//TODO: Add option to turn slider on/off
-	{
+	if( (settings()->value("View2D/useAxialSlider").toBool() && viewData.mPlane == ptAXIAL)
+			|| (settings()->value("View2D/useCoronalSlider").toBool() && viewData.mPlane == ptCORONAL)
+			|| (settings()->value("View2D/useSagittalSlider").toBool() && viewData.mPlane == ptSAGITTAL) )
 		mLayout->addWidget(viewAndSlider.getSliderWidget(), region.pos.row, region.pos.col, region.span.row, region.span.col);
-	}
 	else
 		mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);
