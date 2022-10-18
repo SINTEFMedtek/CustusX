@@ -38,7 +38,8 @@ TestVideoConnectionWidget::TestVideoConnectionWidget(cx::VisServicesPtr services
 bool TestVideoConnectionWidget::canStream(QString filename)
 {
 	this->show();
-	QTest::qWaitForWindowActive(this);
+	if(!QTest::qWaitForWindowActive(this))
+		return false;
 
 	this->setupWidgetToRunStreamer(filename);
 

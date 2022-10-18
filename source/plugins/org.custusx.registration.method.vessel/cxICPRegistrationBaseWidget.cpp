@@ -223,11 +223,11 @@ void ICPRegistrationBaseWidget::registerSlot()
 	std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 	//std::cout << "v2v inverted linear result:\n" << linearTransform.inverse() << std::endl;
 
-	if ((boost::math::isnan)(linearTransform(0,0)))
-	{
-		reportWarning("ICP registration failed.");
-		return;
-	}
+    if ((std::isnan)(linearTransform(0,0)))
+    {
+        reportWarning("ICP registration failed.");
+        return;
+    }
 
 	mRegistrator->checkQuality(linearTransform);
 

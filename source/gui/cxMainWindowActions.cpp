@@ -121,14 +121,14 @@ void MainWindowActions::createActions()
 
 void MainWindowActions::createTrackingActions()
 {
-	this->createAction("ConfigureTools", "Tool configuration",
-					   QIcon(), QKeySequence(), "",
-					   &MainWindowActions::configureSlot);
+//	this->createAction("ConfigureTools", "Tool configuration",
+//					   QIcon(), QKeySequence(), "",
+//					   &MainWindowActions::configureSlot);
 
-	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
-	this->createAction("InitializeTools", "Initialize",
-					   QIcon(), QKeySequence(), "",
-					   finit);
+//	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
+//	this->createAction("InitializeTools", "Initialize",
+//					   QIcon(), QKeySequence(), "",
+//					   finit);
 
 	mTrackingToolsAction = this->createAction("TrackingTools", "Start tracking",
 											  QIcon(), QKeySequence("Ctrl+T"), "",

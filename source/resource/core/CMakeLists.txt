@@ -38,7 +38,6 @@ cx_add_class_qt_moc(cxResource_SOURCE
   Data/cxFileManagerService
   Data/cxFileManagerServiceProxy
   Data/cxFileManagerServiceNull
-  Data/cxFileManagerServiceBase
 
   Video/cxVideoSource.h
   Video/cxVideoRecorder
@@ -166,6 +165,7 @@ cx_add_class(cxResource_SOURCE
   Data/cxFrameForest
   Data/cxDataFactory
   Data/cxErrorObserver
+  Data/cxFileManagerServiceBase
 
   Math/cxBoundingBox3D
   Math/cxVector3D

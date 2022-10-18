@@ -234,11 +234,12 @@ void ViewWrapper2D::toggleShowManualTool()
 
 void ViewWrapper2D::removeAndResetSliceRep()
 {
-	if (mSliceRep)
+	for(int i = 0; i < mSliceReps.size(); ++i)
 	{
-		mView->removeRep(mSliceRep);
-		mSliceRep.reset();
+		mView->removeRep(mSliceReps[i]);
+		mSliceReps[i].reset();
 	}
+	mSliceReps.clear();
 }
 
 void ViewWrapper2D::removeAndResetMultiSliceRep()
@@ -428,37 +429,22 @@ bool ViewWrapper2D::useGPU2DRendering()
 	return settings()->value("View2D/useGPU2DRendering").toBool();
 }
 
-void ViewWrapper2D::createAndAddSliceRep()
+void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 {
-	if (!mSliceRep)
+	this->removeAndResetSliceRep();
+	for(int i = 0; i < numberOfSlices; ++i)
 	{
-		mSliceRep = SliceRepSW::New("SliceRep_" + mView->getName());
-		mSliceRep->setSliceProxy(mSliceProxy);
-		mView->addRep(mSliceRep);
+		SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
+		sliceRep->setSliceProxy(mSliceProxy);
+		mView->addRep(sliceRep);
+		mSliceReps.push_back(sliceRep);
 	}
 }
 
 QString ViewWrapper2D::getDataDescription()
 {
 	QString text;
-	if (this->useGPU2DRendering())
-	{
-		text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
-	}
-	else //software rendering
-	{
-		ImagePtr image = this->getImageToDisplay();
-		if (!image)
-			return "";
-		// list all meshes and one image.
-		QStringList textList;
-		std::vector<MeshPtr> mesh = mGroupData->getMeshes(DataViewProperties::createSlice2D());
-		for (unsigned i = 0; i < mesh.size(); ++i)
-			textList << qstring_cast(mesh[i]->getName());
-		if (image)
-			textList << image->getName();
-		text = textList.join("\n");
-	}
+	text = this->getAllDataNames(DataViewProperties::createSlice2D()).join("\n");
 	return text;
 }
 
@@ -486,15 +472,29 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 		else //software rendering
 		{
 			this->removeAndResetMultiSliceRep();
-			this->createAndAddSliceRep();
-
-			mSliceRep->setImage(image);
+			setImagesSWRendering();
 		}
 	}
 	else //no images to display in the view
 	{
 		this->removeAndResetSliceRep();
 		this->removeAndResetMultiSliceRep();
+	}
+}
+
+void ViewWrapper2D::setImagesSWRendering()
+{
+	std::vector<ImagePtr> images = this->getImagesToView();
+	this->createAndAddSliceReps(images.size());
+
+	if(mSliceReps.size() < images.size())
+	{
+		CX_LOG_ERROR() << "ViewWrapper2D::setImagesSW: mSliceReps.size() < images.size()";
+		return;
+	}
+	for(int i = 0; i < images.size(); ++i)
+	{
+		mSliceReps[i]->setImage(images[i]);
 	}
 }
 
