@@ -100,7 +100,6 @@ void VLCRecorder::startRecording(QString saveFile)
 
 void VLCRecorder::stopRecording()
 {
-	CX_LOG_DEBUG() << "In VLCRecorder::stopRecording()";
 	QString quit = "quit\n";
 	mCommandLine->write(quit.toStdString().c_str());
 }
