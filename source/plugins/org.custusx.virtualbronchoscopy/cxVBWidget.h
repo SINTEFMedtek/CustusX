@@ -55,15 +55,15 @@ public:
 
 protected:
 	QString defaultWhatsThis() const;
-	VisServicesPtr		mServices;
-	QVBoxLayout*			mVerticalLayout;
+	VisServicesPtr				mServices;
+	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;
-	QPushButton				*mPlayButton;
+	QPushButton					*mPlayButton;
 	QTimer*						mTimer;
 	QDial*						mRotateDial;
 	QDial*						mViewDial;
-	QPushButton*			mResetEndoscopeButton;
-	QPushButton*			mUseAutomaticRotationButton;
+	QPushButton*				mResetEndoscopeButton;
+	QPushButton*				mUseAutomaticRotationButton;
 	QPalette					mAutomaticRotationButtonBackgroundColor;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
@@ -73,7 +73,7 @@ protected:
 	bool						mRecordVideo;
 
 	void						enableControls(bool enable);
-	QFileInfo				startRecordFullscreen();
+	QFileInfo					startRecordFullscreen();
 	void						stopRecordFullscreen();
 
 	PatientStoragePtr mStorage;
@@ -91,7 +91,7 @@ private slots:
 
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
-	void								playButtonClickedSlot();
+	void						playButtonClickedSlot();
 };
 
 } /* namespace cx */
