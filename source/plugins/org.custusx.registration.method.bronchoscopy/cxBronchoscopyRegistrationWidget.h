@@ -66,6 +66,7 @@ private:
 	RegServicesPtr mServices;
 	QVBoxLayout* mVerticalLayout;
 	BoolPropertyPtr mUseLocalRegistration;
+	BoolPropertyPtr mUseEBUSProbe;
 	BoolPropertyPtr mUseSubsetOfGenerations;
 	DoublePropertyPtr mMaxNumberOfGenerations;
 	DoublePropertyPtr mMaxLocalRegistrationDistance;
@@ -83,6 +84,7 @@ private:
 
 	void createMaxNumberOfGenerations(QDomElement root);
 	void selectSubsetOfBranches(QDomElement root);
+	void useEBUSprobe(QDomElement root);
 	void useLocalRegistration(QDomElement root);
 	void createMaxLocalRegistrationDistance(QDomElement root);
 };

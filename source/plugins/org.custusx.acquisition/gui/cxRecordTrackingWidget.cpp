@@ -204,6 +204,21 @@ TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMt()
 	return mSelectRecordSession->getRecordedTrackerData_prMt();
 }
 
+TimedTransformMap RecordTrackingWidget::getRecordedTrackerData_prMs()
+{
+	TimedTransformMap RecordedTrackerData_prMt =  this->getRecordedTrackerData_prMt();
+	ToolPtr tool = mToolSelector->getTool();
+	if(!tool)
+		return RecordedTrackerData_prMt;
+	Transform3D tMs = tool->getCalibration_sMt().inverse();
+
+	TimedTransformMap RecordedTrackerData_prMs = RecordedTrackerData_prMt;
+	for(TimedTransformMap::iterator iter=RecordedTrackerData_prMs.begin(); iter!=RecordedTrackerData_prMs.end(); ++iter)
+		iter->second = iter->second*tMs;
+
+	return RecordedTrackerData_prMs;
+}
+
 void RecordTrackingWidget::hideMergeWithExistingSession()
 {
 	if(!mMergeWithExistingSessionWidget->isHidden())
