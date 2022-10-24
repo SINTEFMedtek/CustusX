@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QDial>
 #include <QPushButton>
+#include <QTimer>
 
 #include "cxVBWidget.h"
 #include "cxPatientModelServiceProxy.h"
@@ -31,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxLogger.h"
 #include "cxRouteToTarget.h"
+#include "cxVLCRecorder.h"
 
 
 
@@ -39,9 +41,11 @@ namespace cx
 
 VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QWidget(parent),
+	mServices(services),
 	mVerticalLayout(new QVBoxLayout(this)),
-    mControlsEnabled(false),
-    mAutomaticRotation(true),
+	mControlsEnabled(false),
+	mAutomaticRotation(true),
+	mRecordVideo(false),
 	mStorage(new PatientStorage(services->session(), "VirtualBronchoscopy"))
 {
 	this->setObjectName("virtual_bronchoscopy_widget");
@@ -63,19 +67,26 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	inputBox->setLayout(inputVbox);
 	mVerticalLayout->addWidget(inputBox);
 
+	// play/pause button
+	mPlayButton = new QPushButton(QIcon(":/icons/open_icon_library/media-playback-start-3.png"),"");
+	mTimer = new QTimer;
+	connect(mTimer, SIGNAL(timeout()), this, SLOT(moveCameraSlot()));
+	mTimer->setInterval(20); // slot processing time is about 30 ms, thus about 50 ms in total.
+
 	// Selectors for position along path and play/pause
 	QHBoxLayout *playbackHBox = new QHBoxLayout;
 	QGroupBox	*playbackBox = new QGroupBox(tr("Playback"));
 	mPlaybackSlider = new QSlider(Qt::Horizontal);
 	QLabel		*labelStart = new QLabel(tr("Start "));
 	QLabel		*labelTarget = new QLabel(tr(" Target"));
+	playbackHBox->addWidget(mPlayButton);
 	playbackHBox->addWidget(labelStart);
 	playbackHBox->addWidget(mPlaybackSlider);
 	playbackHBox->addWidget(labelTarget);
 	playbackBox->setLayout(playbackHBox);
 	mVerticalLayout->addWidget(playbackBox);
 	mPlaybackSlider->setMinimum(0);
-	mPlaybackSlider->setMaximum(100);
+	mPlaybackSlider->setMaximum(1000);
 
 	// Selectors for virtual endoscope control
 	QGroupBox	*endoscopeBox = new QGroupBox(tr("Bronchoscope"));
@@ -89,17 +100,17 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mViewDial->setMinimum(-60);
 	mViewDial->setMaximum(60);
 	mResetEndoscopeButton = new QPushButton("Reset");
-    mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
-    mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
-    mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
-    mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+	mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
+	mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
+	mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+	mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelView,0,2,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
 	endoscopeControlLayout->addWidget(mViewDial,1,2);
 	endoscopeControlLayout->addWidget(mResetEndoscopeButton,2,0);
-    endoscopeControlLayout->addWidget(mUseAutomaticRotationButton,3,0);
+	endoscopeControlLayout->addWidget(mUseAutomaticRotationButton,3,0);
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
@@ -114,17 +125,19 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 			this, &VBWidget::inputChangedSlot, Qt::UniqueConnection);
 	connect(this, &VBWidget::cameraPathChanged, mCameraPath, &CXVBcameraPath::cameraRawPointsSlot);
 	connect(mPlaybackSlider, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraPathPositionSlot);
+	connect(mPlayButton, &QPushButton::clicked, this, &VBWidget::playButtonClickedSlot);
 	connect(mViewDial, &QSlider::valueChanged, mCameraPath, &CXVBcameraPath::cameraViewAngleSlot);
 	connect(mRotateDial, &QDial::valueChanged, mCameraPath, &CXVBcameraPath::cameraRotateAngleSlot);
 	connect(mResetEndoscopeButton, &QPushButton::clicked, this, &VBWidget::resetEndoscopeSlot);
-    connect(mUseAutomaticRotationButton, &QPushButton::clicked, this, &VBWidget::automaticRotationSlot);
-    connect(mCameraPath, &CXVBcameraPath::rotationChanged, this, &VBWidget::updateRotationDialSlot);
+	connect(mUseAutomaticRotationButton, &QPushButton::clicked, this, &VBWidget::automaticRotationSlot);
+	connect(mCameraPath, &CXVBcameraPath::rotationChanged, this, &VBWidget::updateRotationDialSlot);
 
 	mVerticalLayout->addStretch();
 }
 
 VBWidget::~VBWidget()
 {
+	delete mTimer;
 }
 
 void VBWidget::setRouteToTarget(QString uid)
@@ -142,12 +155,38 @@ void VBWidget::setRouteToTarget(QString uid)
 
 void VBWidget::setRoutePositions(std::vector< Eigen::Vector3d > routePositions)
 {
-     mCameraPath->setRoutePositions(routePositions);
+	mCameraPath->setRoutePositions(routePositions);
 }
 
 void VBWidget::setCameraRotationAlongRoute(std::vector< double > cameraRotations)
 {
-    mCameraPath->setCameraRotations(cameraRotations);
+	mCameraPath->setCameraRotations(cameraRotations);
+}
+
+void VBWidget::setBranchingIndexAlongRoute(std::vector< int > branchingIndex)
+{
+	mCameraPath->setBranchingIndexAlongRoute(branchingIndex);
+}
+
+void VBWidget::setRecordVideoOption(bool recordVideo)
+{
+	mRecordVideo = recordVideo;
+}
+
+QFileInfo VBWidget::startRecordFullscreen()
+{
+	QFileInfo fileInfo;
+	fileInfo.setFile(mServices->patient()->generateFilePath("Screenshots", "mp4"));
+	if(!vlc()->isRecording())
+		vlc()->startRecording(fileInfo.absoluteFilePath());
+	return fileInfo;
+}
+
+void VBWidget::stopRecordFullscreen()
+{
+	if(vlc()->isRecording())
+		vlc()->stopRecording();
+	vlc()->waitForFinished();
 }
 
 void  VBWidget::enableControls(bool enable)
@@ -187,8 +226,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_Right || event->key()==Qt::Key_6)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mViewDial->value();
-            mViewDial->setValue(currentPos+1);
+			int currentPos = mViewDial->value();
+			mViewDial->setValue(currentPos+1);
 			return;
 		}
 	}
@@ -196,8 +235,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_Left || event->key()==Qt::Key_4)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mViewDial->value();
-            mViewDial->setValue(currentPos-1);
+			int currentPos = mViewDial->value();
+			mViewDial->setValue(currentPos-1);
 			return;
 		}
 	}
@@ -205,8 +244,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_PageUp || event->key()==Qt::Key_9)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mRotateDial->value();
-            mRotateDial->setValue(currentPos+1);
+			int currentPos = mRotateDial->value();
+			mRotateDial->setValue(currentPos+1);
 			return;
 		}
 	}
@@ -214,8 +253,8 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	if (event->key()==Qt::Key_PageDown || event->key()==Qt::Key_3)
 	{
 		if(mControlsEnabled) {
-            int currentPos = mRotateDial->value();
-            mRotateDial->setValue(currentPos-1);
+			int currentPos = mRotateDial->value();
+			mRotateDial->setValue(currentPos-1);
 			return;
 		}
 	}
@@ -232,6 +271,43 @@ void VBWidget::keyPressEvent(QKeyEvent* event)
 	QWidget::keyPressEvent(event);
 }
 
+void VBWidget::playButtonClickedSlot()
+{
+	if(mTimer->isActive())
+	{
+		mTimer->stop();
+		if(mRecordVideo)
+		{
+			this->stopRecordFullscreen();
+			mCameraPath->setWritePositionsToFile(false);
+		}
+		mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-start-3.png"));
+	}
+	else
+	{
+		mTimer->start();
+		if(mRecordVideo)
+		{
+			QFileInfo fileInfo = this->startRecordFullscreen();
+			mCameraPath->setWritePositionsFilePath(fileInfo.absolutePath() + "/" + fileInfo.baseName());
+			mCameraPath->setWritePositionsToFile(true);
+		}
+			mPlayButton->setIcon(QIcon(":/icons/open_icon_library/media-playback-pause-3.png"));
+	}
+}
+
+void VBWidget::moveCameraSlot()
+{
+	int currentPos = mPlaybackSlider->value();
+	if(currentPos >= mPlaybackSlider->maximum())
+	{
+		this->playButtonClickedSlot();
+		emit cameraAtEndPosition();
+		return;
+	}
+	mPlaybackSlider->setValue(currentPos+1);
+}
+
 void VBWidget::resetEndoscopeSlot()
 {
 	mRotateDial->setValue(0);
@@ -240,31 +316,31 @@ void VBWidget::resetEndoscopeSlot()
 
 void VBWidget::automaticRotationSlot()
 {
-    mAutomaticRotation = !mAutomaticRotation;
-    mCameraPath->setAutomaticRotation(mAutomaticRotation);
-    if(mAutomaticRotation)
-    {
-        mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
-        mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
-    }
-    else
-    {
-        mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::gray);
-        mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
-    }
+	mAutomaticRotation = !mAutomaticRotation;
+	mCameraPath->setAutomaticRotation(mAutomaticRotation);
+	if(mAutomaticRotation)
+	{
+		mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+		mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+	}
+	else
+	{
+		mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::gray);
+		mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+	}
 }
 
 void VBWidget::updateRotationDialSlot(int value)
 {
-    mRotateDial->setValue(value);
+	mRotateDial->setValue(value);
 }
 
 QString VBWidget::defaultWhatsThis() const
 {
-  return "<html>"
-	  "<h3>Virtual Bronchoscopy.</h3>"
-	  "<p>GUI for visualizing a route-to-target path</p>"
-      "</html>";
+return "<html>"
+			 "<h3>Virtual Bronchoscopy.</h3>"
+			 "<p>GUI for visualizing a route-to-target path</p>"
+			 "</html>";
 }
 
 

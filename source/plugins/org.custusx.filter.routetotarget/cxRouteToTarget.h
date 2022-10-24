@@ -50,6 +50,7 @@ public:
 	QJsonArray makeMarianaCenterlineJSON();
 	std::vector< Eigen::Vector3d > getRoutePositions();
 	std::vector< double > getCameraRotation();
+	std::vector< int > getBranchingIndex();
 
 	double getTracheaLength();
 	static std::vector<Eigen::Vector3d> getRoutePositions(MeshPtr route);

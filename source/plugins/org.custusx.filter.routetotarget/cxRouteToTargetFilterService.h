@@ -53,6 +53,7 @@ public:
 
 	std::vector< Eigen::Vector3d > getRoutePositions();
 	std::vector< double > getCameraRotation();
+	std::vector< int > getBranchingIndex();
 
 	virtual bool execute();
 	virtual bool postProcess();
