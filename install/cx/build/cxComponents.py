@@ -304,6 +304,7 @@ class OpenCV(CppComponent):
         #Try to use CX Eigen version for now
         #add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         #add('EIGEN_INCLUDE_PATH:PATH', '%s' % self._createSibling(Eigen).sourcePath())
+        add('BUILD_TESTS:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
