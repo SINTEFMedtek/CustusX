@@ -284,7 +284,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('4.6.0')
+        self._getBuilder().gitCheckoutSha('3.4.18')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -305,6 +305,7 @@ class OpenCV(CppComponent):
         #add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         #add('EIGEN_INCLUDE_PATH:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('BUILD_TESTS:BOOL', False)
+        add('BUILD_PROTOBUF:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
