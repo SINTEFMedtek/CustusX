@@ -226,14 +226,14 @@ void ImageStreamerOpenCV::initialize_local()
 
 	{
 		//determine default values
-		int default_width = mVideoCapture->get(CV_CAP_PROP_FRAME_WIDTH);
-		int default_height = mVideoCapture->get(CV_CAP_PROP_FRAME_HEIGHT);
+		int default_width = mVideoCapture->get(cv::CAP_PROP_FRAME_WIDTH);
+		int default_height = mVideoCapture->get(cv::CAP_PROP_FRAME_HEIGHT);
 
 		//set input size
 		int in_width = convertStringWithDefault(mArguments["in_width"], default_width);
 		int in_height = convertStringWithDefault(mArguments["in_height"], default_height);
-		mVideoCapture->set(CV_CAP_PROP_FRAME_WIDTH, in_width);
-		mVideoCapture->set(CV_CAP_PROP_FRAME_HEIGHT, in_height);
+		mVideoCapture->set(cv::CAP_PROP_FRAME_WIDTH, in_width);
+		mVideoCapture->set(cv::CAP_PROP_FRAME_HEIGHT, in_height);
 
 		//set output size (resize)
 		int out_width = convertStringWithDefault(mArguments["out_width"], in_width);
@@ -293,25 +293,25 @@ bool ImageStreamerOpenCV::isStreaming()
 void ImageStreamerOpenCV::dumpProperties()
 {
 #ifdef CX_USE_OpenCV
-	this->dumpProperty(CV_CAP_PROP_POS_MSEC, "CV_CAP_PROP_POS_MSEC");
-	this->dumpProperty(CV_CAP_PROP_POS_FRAMES, "CV_CAP_PROP_POS_FRAMES");
-	this->dumpProperty(CV_CAP_PROP_POS_AVI_RATIO, "CV_CAP_PROP_POS_AVI_RATIO");
-	this->dumpProperty(CV_CAP_PROP_FRAME_WIDTH, "CV_CAP_PROP_FRAME_WIDTH");
-	this->dumpProperty(CV_CAP_PROP_FRAME_HEIGHT, "CV_CAP_PROP_FRAME_HEIGHT");
-	this->dumpProperty(CV_CAP_PROP_FPS, "CV_CAP_PROP_FPS");
-	this->dumpProperty(CV_CAP_PROP_FOURCC, "CV_CAP_PROP_FOURCC");
-	this->dumpProperty(CV_CAP_PROP_FRAME_COUNT, "CV_CAP_PROP_FRAME_COUNT");
-	this->dumpProperty(CV_CAP_PROP_FORMAT, "CV_CAP_PROP_FORMAT");
-	this->dumpProperty(CV_CAP_PROP_MODE, "CV_CAP_PROP_MODE");
-	this->dumpProperty(CV_CAP_PROP_BRIGHTNESS, "CV_CAP_PROP_BRIGHTNESS");
-	this->dumpProperty(CV_CAP_PROP_CONTRAST, "CV_CAP_PROP_CONTRAST");
-	this->dumpProperty(CV_CAP_PROP_SATURATION, "CV_CAP_PROP_SATURATION");
-	this->dumpProperty(CV_CAP_PROP_HUE, "CV_CAP_PROP_HUE");
-	this->dumpProperty(CV_CAP_PROP_GAIN, "CV_CAP_PROP_GAIN");
-	this->dumpProperty(CV_CAP_PROP_EXPOSURE, "CV_CAP_PROP_EXPOSURE");
-	this->dumpProperty(CV_CAP_PROP_CONVERT_RGB, "CV_CAP_PROP_CONVERT_RGB");
-	//  this->dumpProperty(CV_CAP_PROP_WHITE_BALANCE, "CV_CAP_PROP_WHITE_BALANCE");
-	this->dumpProperty(CV_CAP_PROP_RECTIFICATION, "CV_CAP_PROP_RECTIFICATION");
+	this->dumpProperty(cv::CAP_PROP_POS_MSEC, "cv::CAP_PROP_POS_MSEC");
+	this->dumpProperty(cv::CAP_PROP_POS_FRAMES, "cv::CAP_PROP_POS_FRAMES");
+	this->dumpProperty(cv::CAP_PROP_POS_AVI_RATIO, "cv::CAP_PROP_POS_AVI_RATIO");
+	this->dumpProperty(cv::CAP_PROP_FRAME_WIDTH, "cv::CAP_PROP_FRAME_WIDTH");
+	this->dumpProperty(cv::CAP_PROP_FRAME_HEIGHT, "cv::CAP_PROP_FRAME_HEIGHT");
+	this->dumpProperty(cv::CAP_PROP_FPS, "cv::CAP_PROP_FPS");
+	this->dumpProperty(cv::CAP_PROP_FOURCC, "cv::CAP_PROP_FOURCC");
+	this->dumpProperty(cv::CAP_PROP_FRAME_COUNT, "cv::CAP_PROP_FRAME_COUNT");
+	this->dumpProperty(cv::CAP_PROP_FORMAT, "cv::CAP_PROP_FORMAT");
+	this->dumpProperty(cv::CAP_PROP_MODE, "cv::CAP_PROP_MODE");
+	this->dumpProperty(cv::CAP_PROP_BRIGHTNESS, "cv::CAP_PROP_BRIGHTNESS");
+	this->dumpProperty(cv::CAP_PROP_CONTRAST, "cv::CAP_PROP_CONTRAST");
+	this->dumpProperty(cv::CAP_PROP_SATURATION, "cv::CAP_PROP_SATURATION");
+	this->dumpProperty(cv::CAP_PROP_HUE, "cv::CAP_PROP_HUE");
+	this->dumpProperty(cv::CAP_PROP_GAIN, "cv::CAP_PROP_GAIN");
+	this->dumpProperty(cv::CAP_PROP_EXPOSURE, "cv::CAP_PROP_EXPOSURE");
+	this->dumpProperty(cv::CAP_PROP_CONVERT_RGB, "cv::CAP_PROP_CONVERT_RGB");
+	//  this->dumpProperty(cv::CAP_PROP_WHITE_BALANCE, "cv::CAP_PROP_WHITE_BALANCE");
+	this->dumpProperty(cv::CAP_PROP_RECTIFICATION, "cv::CAP_PROP_RECTIFICATION");
 #endif
 }
 
@@ -395,7 +395,7 @@ ImagePtr ImageStreamerOpenCV::getImageMessage()
 	cv::Mat frame = frame_source;
 	if (( frame.cols!=mRescaleSize.width() )|| (frame.rows!=mRescaleSize.height()))
 	{
-		cv::resize(frame_source, frame, cv::Size(mRescaleSize.width(), mRescaleSize.height()), 0, 0, CV_INTER_LINEAR);
+		cv::resize(frame_source, frame, cv::Size(mRescaleSize.width(), mRescaleSize.height()), 0, 0, cv::INTER_LINEAR);
 	}
 
 	vtkImageDataPtr raw = this->convertTovtkImageData(frame);

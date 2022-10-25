@@ -284,7 +284,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('3.3.0')
+        self._getBuilder().gitCheckoutSha('4.6.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -298,6 +298,11 @@ class OpenCV(CppComponent):
         add('WITH_JASPER:BOOL', False)
         add('WITH_FFMPEG:BOOL', False)
         add('WITH_GSTREAMER:BOOL', False)
+        #Eigen include fails if PRECOMPILED_HEADERS is on
+        #See: https://github.com/opencv/opencv/issues/14868
+        #add('ENABLE_PRECOMPILED_HEADERS:BOOL', False)
+        #Try to use CX Eigen version for now
+        add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         builder.configureCMake()
 # ---------------------------------------------------------
 
