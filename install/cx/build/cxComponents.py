@@ -274,7 +274,7 @@ class OpenCV(CppComponent):
     def name(self):
         return "OpenCV"
     def help(self):
-        return 'http://opencv.willowgarage.com'
+        return 'https://docs.opencv.org/3.4/'
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
