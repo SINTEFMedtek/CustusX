@@ -298,14 +298,7 @@ class OpenCV(CppComponent):
         add('WITH_JASPER:BOOL', False)
         add('WITH_FFMPEG:BOOL', False)
         add('WITH_GSTREAMER:BOOL', False)
-        #Eigen include fails if PRECOMPILED_HEADERS is on
-        #See: https://github.com/opencv/opencv/issues/14868
-        #add('ENABLE_PRECOMPILED_HEADERS:BOOL', False)
-        #Try to use CX Eigen version for now
-        #add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('EIGEN_INCLUDE_PATH:PATH', '%s' % self._createSibling(Eigen).sourcePath())
-        #add('BUILD_TESTS:BOOL', False)
-        #add('BUILD_PROTOBUF:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
