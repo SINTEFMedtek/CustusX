@@ -305,7 +305,7 @@ class OpenCV(CppComponent):
         #add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('EIGEN_INCLUDE_PATH:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         #add('BUILD_TESTS:BOOL', False)
-        add('BUILD_PROTOBUF:BOOL', False)
+        #add('BUILD_PROTOBUF:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
