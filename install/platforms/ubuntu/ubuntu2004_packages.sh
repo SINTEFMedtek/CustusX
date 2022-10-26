@@ -70,6 +70,8 @@ sudo apt-get install -y openssh-server
 #Cmake and Qt
 sudo apt-get install -y cmake cmake-curses-gui cmake-qt-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5x11extras5-dev libqt5xmlpatterns5-dev
 sudo apt-get install -y libxt-dev
+#Building Fraxinus robot control Qt SerialPort:
+sudo apt-get install -y libqt5serialport5-dev
 
 #OpenCL
 sudo apt install -y nvidia-opencl-dev
