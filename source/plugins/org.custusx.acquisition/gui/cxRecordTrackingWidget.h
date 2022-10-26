@@ -54,6 +54,7 @@ public:
 	ToolPtr getSuitableRecordingTool();
 	void useBaseToolIfAvailable(bool useBaseTool);
 	TimedTransformMap getRecordedTrackerData_prMt();
+	TimedTransformMap getRecordedTrackerData_prMs();
 	StringPropertyPtr getSessionSelector();
 	SelectRecordSessionPtr getSelectRecordSession() { return mSelectRecordSession; }
 	void displayToolSelector(bool on);

@@ -99,6 +99,7 @@ void BronchoscopyRegistrationWidget::setup()
 
 	this->selectSubsetOfBranches(mOptions.getElement());
 	this->createMaxNumberOfGenerations(mOptions.getElement());
+	this->useEBUSprobe(mOptions.getElement());
 	this->useLocalRegistration(mOptions.getElement());
 	this->createMaxLocalRegistrationDistance(mOptions.getElement());
 
@@ -107,6 +108,7 @@ void BronchoscopyRegistrationWidget::setup()
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseSubsetOfGenerations));
 	mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mMaxNumberOfGenerations));
 	mVerticalLayout->addWidget(mProcessCenterlineButton);
+	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseEBUSProbe));
 	mVerticalLayout->addWidget(mRecordTrackingWidget);
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
 	mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mMaxLocalRegistrationDistance));
@@ -169,9 +171,13 @@ void BronchoscopyRegistrationWidget::registerSlot()
 	//std::cout << "rMpr: " << std::endl;
 	//std::cout << old_rMpr << std::endl;
 
-	TimedTransformMap trackerRecordedData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
+	TimedTransformMap trackerRecordedData;
+	if(mUseEBUSProbe->getValue())
+		trackerRecordedData = mRecordTrackingWidget->getRecordedTrackerData_prMs();
+	else
+		trackerRecordedData = mRecordTrackingWidget->getRecordedTrackerData_prMt();
 
-	if(trackerRecordedData_prMt.empty())
+	if(trackerRecordedData.empty())
 	{
 		reportError("No positions");
 		return;
@@ -181,11 +187,11 @@ void BronchoscopyRegistrationWidget::registerSlot()
 
 	if(mUseLocalRegistration->getValue()){
 		std::cout << "Running local registration with max distance " << mMaxLocalRegistrationDistance->getValue() << " mm." << std::endl;
-		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,mMaxLocalRegistrationDistance->getValue()));
+		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData,old_rMpr,mMaxLocalRegistrationDistance->getValue()));
 	}
 	else{
 		std::cout << "Running global registration." << std::endl;
-		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData_prMt,old_rMpr,0));
+		new_rMpr = Transform3D(mBronchoscopyRegistration->runBronchoscopyRegistration(trackerRecordedData,old_rMpr,0));
 	}
 
 	new_rMpr = new_rMpr*old_rMpr;//output
@@ -213,6 +219,13 @@ void BronchoscopyRegistrationWidget::selectSubsetOfBranches(QDomElement root)
 {
 	mUseSubsetOfGenerations = BoolProperty::initialize("Select branch generations to be used in registration", "",
 																										 "Select branch generations to be used in registration", false,
+																										 root);
+}
+
+void BronchoscopyRegistrationWidget::useEBUSprobe(QDomElement root)
+{
+	mUseEBUSProbe = BoolProperty::initialize("EBUS probe", "",
+																										 "Select if EBUS probe is used registration (using prMs to exclude probe calibration)", false,
 																										 root);
 }
 
