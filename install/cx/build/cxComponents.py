@@ -274,7 +274,7 @@ class OpenCV(CppComponent):
     def name(self):
         return "OpenCV"
     def help(self):
-        return 'http://opencv.willowgarage.com'
+        return 'https://docs.opencv.org/3.4/'
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
@@ -284,7 +284,7 @@ class OpenCV(CppComponent):
             return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('3.3.0')
+        self._getBuilder().gitCheckoutSha('3.4.18')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -298,6 +298,7 @@ class OpenCV(CppComponent):
         add('WITH_JASPER:BOOL', False)
         add('WITH_FFMPEG:BOOL', False)
         add('WITH_GSTREAMER:BOOL', False)
+        add('EIGEN_INCLUDE_PATH:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         builder.configureCMake()
 # ---------------------------------------------------------
 
