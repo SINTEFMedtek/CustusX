@@ -299,6 +299,7 @@ class OpenCV(CppComponent):
         add('WITH_FFMPEG:BOOL', False)
         add('WITH_GSTREAMER:BOOL', False)
         add('EIGEN_INCLUDE_PATH:PATH', '%s' % self._createSibling(Eigen).sourcePath())
+        add('BUILD_TESTS:BOOL', False)
         builder.configureCMake()
 # ---------------------------------------------------------
 
