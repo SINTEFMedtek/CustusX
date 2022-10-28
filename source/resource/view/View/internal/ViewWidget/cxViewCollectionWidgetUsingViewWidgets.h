@@ -128,9 +128,11 @@ public:
 
 protected:
 	std::vector<ViewAndSlider> mSliderViews;
+	ViewAndSlider getViewAndSlider(LayoutViewData viewData, bool offScreenRendering);
+	bool useSlider(PLANE_TYPE planeType);
+
 	QGridLayout* mLayout; ///< the layout
 	MultiViewCachePtr mViewCache;
-
 private:
     ViewWidget* WidgetFromView(ViewPtr view);
 

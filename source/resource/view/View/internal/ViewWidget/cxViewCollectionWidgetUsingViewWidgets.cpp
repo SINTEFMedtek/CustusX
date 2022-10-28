@@ -75,26 +75,36 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(LayoutViewData viewData)
 {
-	View::Type type = viewData.mType;
 	LayoutRegion region = viewData.mRegion;
-	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
+	ViewAndSlider viewAndSlider = getViewAndSlider(viewData, mOffScreenRendering);
+
+	mLayout->addWidget(viewAndSlider.getUsedWidget(), region.pos.row, region.pos.col, region.span.row, region.span.col);
+	view_utils::setStretchFactors(mLayout, region, 1);
+
+	mSliderViews.push_back(viewAndSlider);
+	return viewAndSlider.mViewWidget->getView();
+}
+
+ViewAndSlider LayoutWidgetUsingViewWidgets::getViewAndSlider(LayoutViewData viewData, bool offScreenRendering)
+{
+	View::Type type = viewData.mType;
+	ViewWidget* view = mViewCache->retrieveView(this, type, offScreenRendering);
 	ViewAndSlider viewAndSlider(view);
 
 	view->getView()->setType(type);
-	view->setParent(this->parentWidget());
+	view->show();
 
-	if( (settings()->value("View2D/useAxialSlider").toBool() && viewData.mPlane == ptAXIAL)
-			|| (settings()->value("View2D/useCoronalSlider").toBool() && viewData.mPlane == ptCORONAL)
-			|| (settings()->value("View2D/useSagittalSlider").toBool() && viewData.mPlane == ptSAGITTAL) )
-		mLayout->addWidget(viewAndSlider.getSliderWidget(), region.pos.row, region.pos.col, region.span.row, region.span.col);
-	else
-		mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
-	view_utils::setStretchFactors(mLayout, region, 1);
-//    viewSliderWidget->show();
-    view->show();
+	if(useSlider(viewData.mPlane))
+		viewAndSlider.getSliderWidget();//Create slider widget
+	return viewAndSlider;
+}
 
-	mSliderViews.push_back(viewAndSlider);
-	return view->getView();
+bool LayoutWidgetUsingViewWidgets::useSlider(PLANE_TYPE planeType)
+{
+	bool useSliderWidget = (settings()->value("View2D/useAxialSlider").toBool() && planeType == ptAXIAL)
+			|| (settings()->value("View2D/useCoronalSlider").toBool() && planeType == ptCORONAL)
+			|| (settings()->value("View2D/useSagittalSlider").toBool() && planeType == ptSAGITTAL);
+	return useSliderWidget;
 }
 
 QSlider* LayoutWidgetUsingViewWidgets::getSlider(ViewPtr view)
