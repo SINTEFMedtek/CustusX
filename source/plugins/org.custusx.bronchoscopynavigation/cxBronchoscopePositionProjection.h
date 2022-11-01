@@ -2,6 +2,7 @@
 #define CXBRONCHOSCOPEPOSITIONPROJECTION_H
 
 #include "org_custusx_bronchoscopynavigation_Export.h"
+#include "cxForwardDeclarations.h"
 #include "cxMesh.h"
 #include <QDomElement>
 
@@ -11,9 +12,6 @@ namespace cx
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 typedef boost::shared_ptr<class BronchoscopePositionProjection> BronchoscopePositionProjectionPtr;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
-typedef boost::shared_ptr<class Branch> BranchPtr;
-
 
 class org_custusx_bronchoscopynavigation_EXPORT BronchoscopePositionProjection
 {

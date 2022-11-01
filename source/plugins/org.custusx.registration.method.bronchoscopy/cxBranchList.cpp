@@ -110,6 +110,7 @@ void BranchList::calculateBronchoscopeRotation(BranchPtr branch)
 		Vector3D bendingDirection = calculateBronchoscopeBendingDirection(parentBranchOrientationEnd, branchOrientationStart);
 		double bronchoscopeRotation = bendingDirectionToBronchoscopeRotation(bendingDirection, parentBranchOrientationEnd, parentRotation);
 
+		branch->setBronchoscopeBendingDirection(bendingDirection);
 		branch->setBronchoscopeRotation(bronchoscopeRotation);
 	}
 

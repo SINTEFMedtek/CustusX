@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXAIRWAYSFROMCENTERLINE_H
 
 #include "cxMesh.h"
+#include "cxForwardDeclarations.h"
 #include <QDomElement>
 #include "org_custusx_filter_airwaysfromcenterline_Export.h"
 
@@ -21,9 +22,6 @@ namespace cx
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
-typedef boost::shared_ptr<class Branch> BranchPtr;
-
 
 class org_custusx_filter_airwaysfromcenterline_EXPORT AirwaysFromCenterline
 {

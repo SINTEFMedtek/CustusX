@@ -330,6 +330,11 @@ std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions()
 	return mRouteToTarget->getRoutePositions();
 }
 
+std::vector<BranchPtr> RouteToTargetFilter::getRouteBranches()
+{
+	return mRouteToTarget->getRouteBranches();
+}
+
 std::vector< double > RouteToTargetFilter::getCameraRotation()
 {
 	return mRouteToTarget->getCameraRotation();

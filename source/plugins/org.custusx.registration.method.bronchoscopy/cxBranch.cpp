@@ -154,6 +154,17 @@ double Branch::findBranchRadius()
 		return 2;
 }
 
+
+void Branch::setBronchoscopeBendingDirection(Vector3D bendingDirection)
+{
+	mBendingDirection = bendingDirection;
+}
+
+Vector3D Branch::getBronchoscopeBendingDirection()
+{
+	return mBendingDirection;
+}
+
 void Branch::setBronchoscopeRotation(double rotation)
 {
 	mBronchoscopeRotation = rotation;

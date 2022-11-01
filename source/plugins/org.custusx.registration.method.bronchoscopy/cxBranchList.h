@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define BRANCHLIST_H_
 
 #include "cxBranch.h"
+#include "cxForwardDeclarations.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include "org_custusx_registration_method_bronchoscopy_Export.h"
@@ -21,7 +22,6 @@ namespace cx
 {
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 #define MAX_ROTATION_TO_TILT_DOWN_DEGREES 30 //Threshold between rotation direction of scope to tilt up or down in a bifurcation.
 

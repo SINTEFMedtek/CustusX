@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define BRANCH_H_
 
 #include <vector>
+#include "cxForwardDeclarations.h"
 #include "cxMesh.h"
 #include "cxVector3D.h"
 #include "org_custusx_registration_method_bronchoscopy_Export.h"
@@ -24,7 +25,6 @@ namespace cx
 {
 
 class org_custusx_registration_method_bronchoscopy_EXPORT Branch;
-typedef boost::shared_ptr<class Branch> BranchPtr;
 typedef std::vector<BranchPtr> branchVector;
 
 class Branch
@@ -34,6 +34,7 @@ class Branch
 	Eigen::VectorXd mRadius;
 	branchVector mChildBranches;
 	BranchPtr mParentBranch;
+	Vector3D mBendingDirection;
 	double mBronchoscopeRotation = 0;
 	QString mLap;
 
@@ -57,6 +58,8 @@ public:
 	BranchPtr getParentBranch();
 	void calculateOrientations();
 	int findParentIndex(branchVector bv) const;
+	void setBronchoscopeBendingDirection(Vector3D bendingDirection);
+	Vector3D getBronchoscopeBendingDirection();
 	void setBronchoscopeRotation(double rotation);
 	double getBronchoscopeRotation();
 	void removeEqualPositions();
