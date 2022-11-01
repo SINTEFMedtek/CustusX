@@ -17,7 +17,11 @@ cx_initialize_OpenIGTLinkIO()
 cx_initialize_CTK()
 
 #cx_initialize_FAST()
-cx_initialize_OpenCLUtilityLibrary()
+
+#Turn off all OpenCL use in CustusX
+#cx_initialize_OpenCLUtilityLibrary()
+set(CX_USE_OPENCL_UTILITY OFF)
+set(CX_PLUGIN_org.custusx.usreconstruction.vnncl OFF)
 
 find_package(OpenGL)
 cx_opengl_version()
