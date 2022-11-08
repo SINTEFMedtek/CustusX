@@ -21,6 +21,7 @@ namespace cx
 
 class org_custusx_core_filemanager_EXPORT ExportWidget  : public BaseWidget
 {
+	Q_OBJECT
 public:
 	ExportWidget(FileManagerServicePtr filemanager, VisServicesPtr services);
 
