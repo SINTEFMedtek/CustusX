@@ -50,6 +50,7 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cxResource_EXPORT, cx, CX_SOCKETCONNECTION_ST
 namespace cx {
 
 typedef boost::shared_ptr<class SocketConnector> SocketConnectorPtr;
+typedef boost::shared_ptr<class SocketConnection> SocketConnectionPtr;
 
 class cxResource_EXPORT SocketConnection : public QObject
 {
@@ -82,6 +83,8 @@ public:
     virtual void requestConnect(); ///< not thread-safe: use invoke
     virtual void requestDisconnect(); ///< not thread-safe: use invoke
 
+	bool socketReceive(void *packPointer, int packSize) const;
+
 public slots:
     bool sendData(const char* data, qint64 maxSize); ///< not thread-safe
 
@@ -91,19 +94,19 @@ signals:
     void connected();
     void disconnected();
     void error();
+	void dataAvailable();
 
 private slots:
     void internalConnected();
     void internalDisconnected();
     void internalError(QAbstractSocket::SocketError socketError);
-    virtual void internalDataAvailable() = 0;
+	virtual void internalDataAvailable();
 
 protected:
-    virtual void setProtocol(QString protocolname) = 0;
+	virtual void setProtocol(QString protocolname);
     SocketConnectorPtr createConnector(ConnectionInfo info);
     bool socketIsConnected();
-    bool enoughBytesAvailableOnSocket(int bytes) const;
-    bool socketReceive(void *packPointer, int packSize) const;
+	bool enoughBytesAvailableOnSocket(int bytes) const;
     QStringList getAllServerHostnames();
     void setCurrentConnectionInfo();
     void stateChange(CX_SOCKETCONNECTION_STATE newState);
