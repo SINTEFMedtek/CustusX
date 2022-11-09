@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXTRACKINGSHAPEWIDGET_H_
 #define CXTRACKINGSHAPEWIDGET_H_
 
+#include "org_custusx_tracking_shape_Export.h"
 #include <QWidget>
 #include "cxSocketConnection.h"
 #include "cxForwardDeclarations.h"
@@ -30,7 +31,7 @@ namespace cx
  * \date 2022-11-08
  * \author Ole Vegard Solberg
  */
-class ShapeSensorWidget : public QWidget
+class org_custusx_tracking_shape_EXPORT ShapeSensorWidget : public QWidget
 {
 	Q_OBJECT
 public:

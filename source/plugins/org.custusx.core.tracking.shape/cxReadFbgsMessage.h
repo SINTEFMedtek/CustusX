@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXREADFBGSMESSAGE_H
 #define CXREADFBGSMESSAGE_H
 
+#include "org_custusx_tracking_shape_Export.h"
 #include <vector>
 #include <QString>
 #include <QColor>
@@ -28,7 +29,7 @@ namespace cx
  * \date 2022-11-09
  * \author Ole Vegard Solberg
  */
-class ReadFbgsMessage
+class org_custusx_tracking_shape_EXPORT ReadFbgsMessage
 {
 public:
 	enum AXIS
@@ -61,7 +62,7 @@ protected:
 	bool readPositions(AXIS axis, QString buffer, int bufferPos);
 	QString getAxisString(AXIS axis);
 	std::vector<double> getAxisPosVector(AXIS axis);
-	void createPolyData();
+	bool createPolyData();
 	void clearPolyData();
 	void clearAxisVectors();
 };
