@@ -13,21 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <QStringRef>
 #include <string>
 #include "cxProfile.h"
 #include "cxXmlOptionItem.h"
-//#include "cxStringPropertyBase.h"
-//#include "cxSocketConnection.h"
-
-//#include "cxStringPropertyBase.h"
-//#include "cxDoublePropertyBase.h"
 #include "cxDoubleWidgets.h"
 #include "cxVisServices.h"
 #include "cxHelperWidgets.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
-//#include "cxDataSelectWidget.h"
 #include "cxLogger.h"
 
 namespace cx
@@ -158,58 +151,8 @@ void ShapeSensorWidget::dataAvailableSlot()
 	QString buffer(charBuffer);//TODO: Need terminator?
 	free(charBuffer);
 	CX_LOG_DEBUG() << "Read buffer: " << buffer;
-	this->readBuffer(buffer);
-}
-
-void ShapeSensorWidget::readBuffer(QString buffer)
-{
-	QString xString("Shape x [cm]");
-	QString yString("Shape y [cm]");
-	QString zString("Shape z [cm]");
-	QStringList axisStrings;
-	axisStrings<< xString << yString << zString;
-	for(int i = 0; i < axisStrings.size(); ++i)
-	{
-		if(!this->readShape(axisStrings[i], buffer))
-		{
-			CX_LOG_WARNING() << "Error reading " << axisStrings[i] << " values from TCP socket";
-			return;
-		}
-	}
-}
-
-bool ShapeSensorWidget::readShape(QString axisString, QString buffer)
-{
-	int bufferPos = 0;
-	bufferPos = buffer.indexOf(axisString, bufferPos, Qt::CaseInsensitive);
-	if(bufferPos == -1)
-	{
-		CX_LOG_WARNING() << "Cannot read " << axisString << " from TCP socket";
-		return false;
-	}
-	bufferPos += axisString.size();
-	return this->readPositions(buffer, bufferPos);
-}
-
-bool ShapeSensorWidget::readPositions(QString buffer, int bufferPos)
-{
-	bool ok;
-	QStringRef numberString(&buffer, bufferPos, sizeof(int));
-	int numValues = numberString.toInt(&ok);
-	if(!ok)
-		return false;
-	for(int i = 0; i < numValues; ++i)
-	{
-		//Use sizeof(float) instead?
-		numberString = QStringRef(&buffer, bufferPos, sizeof(double));
-		double value = numberString.toDouble(&ok);
-		//TODO: use values
-		//Create a vtkPolyData, see cxToolTracer?
-		if(!ok)
-			return false;
-		bufferPos += sizeof(double);
-	}
-	return true;
+	mReadFbgsMessage.readBuffer(buffer);
+	vtkPolyDataPtr polyData = mReadFbgsMessage.getPolyData();
 }
 
 } /* namespace cx */

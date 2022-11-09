@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QWidget>
 #include "cxSocketConnection.h"
 #include "cxForwardDeclarations.h"
+#include "cxReadFbgsMessage.h"
 class QVBoxLayout;
 class QPushButton;
 
@@ -46,6 +47,7 @@ private:
 	StringPropertyBasePtr mIpAddress;
 	DoublePropertyBasePtr mIpPort;
 	QPushButton *mConnectButton;
+	ReadFbgsMessage mReadFbgsMessage;
 
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);

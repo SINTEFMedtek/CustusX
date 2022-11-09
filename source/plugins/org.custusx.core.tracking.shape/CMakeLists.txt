@@ -6,6 +6,8 @@ set(PLUGIN_SRCS
   cxTrackingShapePluginActivator.cpp
   cxTrackingShapeGUIExtenderService.cpp
   cxShapeSensorWidget.cpp
+  cxReadFbgsMessage.h
+  cxReadFbgsMessage.cpp
 )
 
 # Files which should be processed by Qts moc

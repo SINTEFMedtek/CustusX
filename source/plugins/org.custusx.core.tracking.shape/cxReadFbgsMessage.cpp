@@ -1,0 +1,207 @@
+/*=========================================================================
+This file is part of CustusX, an Image Guided Therapy Application.
+
+Copyright (c) SINTEF Department of Medical Technology.
+All rights reserved.
+
+CustusX is released under a BSD 3-Clause license.
+
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
+=========================================================================*/
+
+#include "cxReadFbgsMessage.h"
+#include <QStringRef>
+#include <QStringList>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkCellArray.h>
+//#include <vtkFloatArray.h>
+//#include <vtkUnsignedCharArray.h>
+#include <vtkProperty.h>
+#include <vtkMatrix4x4.h>
+#include "cxLogger.h"
+#include "cxTransform3D.h"
+
+namespace cx
+{
+ReadFbgsMessage::ReadFbgsMessage()
+{
+	//Using code from cxToolTracer as a basis
+	mPolyData = vtkPolyDataPtr::New();
+	mActor = vtkActorPtr::New();
+	mPolyDataMapper = vtkPolyDataMapperPtr::New();
+
+	mPolyDataMapper->SetInputData(mPolyData);
+	mActor->SetMapper(mPolyDataMapper);
+
+	mProperty = vtkPropertyPtr::New();
+	mActor->SetProperty( mProperty );
+	mProperty->SetPointSize(4);
+
+	this->setColor(QColor("red"));
+
+	mPoints = vtkPointsPtr::New();
+	mLines = vtkCellArrayPtr::New();
+
+	mPolyData->SetPoints(mPoints);
+	mPolyData->SetLines(mLines);
+	mPolyData->SetVerts(mLines);
+
+	mAxis.push_back(axisX);
+	mAxis.push_back(axisY);
+	mAxis.push_back(axisZ);
+
+}
+
+vtkPolyDataPtr ReadFbgsMessage::getPolyData()
+{
+	return mPolyData;
+}
+
+vtkActorPtr ReadFbgsMessage::getActor()
+{
+	return mActor;
+}
+
+void ReadFbgsMessage::set_rMpr(Transform3D rMpr)
+{
+	mActor->SetUserMatrix(rMpr.getVtkMatrix());
+}
+
+void ReadFbgsMessage::setColor(QColor color)
+{
+	mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
+}
+
+QString ReadFbgsMessage::getAxisString(AXIS axis)
+{
+	switch(axis)
+	{
+	case axisX:
+		return QString("Shape x [cm]");
+		break;
+	case axisY:
+		return QString("Shape y [cm]");
+		break;
+	case axisZ:
+		return QString("Shape z [cm]");
+		break;
+	case axisCOUNT:
+	default:
+		return QString();
+		break;
+	}
+}
+
+std::vector<double> ReadFbgsMessage::getAxisPosVector(AXIS axis)
+{
+	switch(axis)
+	{
+	case axisX:
+		return mXaxis;
+		break;
+	case axisY:
+		return mYaxis;
+		break;
+	case axisZ:
+		return mZaxis;
+		break;
+	case axisCOUNT:
+	default:
+		return std::vector<double>();
+		break;
+	}
+}
+
+void ReadFbgsMessage::readBuffer(QString buffer)
+{
+	for(int i = 0; i < mAxis.size(); ++i)
+	{
+		if(!this->readShape(mAxis[i], buffer))
+		{
+			CX_LOG_WARNING() << "Error reading " << getAxisString(mAxis[i]) << " values from TCP socket";
+			return;
+		}
+	}
+	this->createPolyData();
+}
+
+bool ReadFbgsMessage::readShape(AXIS axis, QString buffer)
+{
+	QString axisString = getAxisString(axis);
+	int bufferPos = 0;
+	bufferPos = buffer.indexOf(axisString, bufferPos, Qt::CaseInsensitive);
+	if(bufferPos == -1)
+	{
+		CX_LOG_WARNING() << "Cannot read " << axisString << " from TCP socket";
+		return false;
+	}
+	bufferPos += axisString.size();
+	return this->readPositions(axis, buffer, bufferPos);
+}
+
+bool ReadFbgsMessage::readPositions(AXIS axis, QString buffer, int bufferPos)
+{
+	bool ok;
+	QStringRef numberString(&buffer, bufferPos, sizeof(int));
+	int numValues = numberString.toInt(&ok);
+	if(!ok)
+		return false;
+
+	std::vector<double> axisVextor = getAxisPosVector(axis);
+
+	for(int i = 0; i < numValues; ++i)
+	{
+		//Use sizeof(float) instead?
+		numberString = QStringRef(&buffer, bufferPos, sizeof(double));
+		double value = numberString.toDouble(&ok);
+		axisVextor.push_back(value);
+		if(!ok)
+			return false;
+		bufferPos += sizeof(double);
+	}
+	return true;
+}
+
+void ReadFbgsMessage::createPolyData()
+{
+	this->clearPolyData();
+	if(mXaxis.size() != mYaxis.size() != mZaxis.size())
+	{
+		CX_LOG_WARNING() << "Not equal number of position data in all axes";
+		return;
+	}
+	for(int i=0; i < mXaxis.size(); ++i)
+	{
+		Vector3D p(mXaxis[i], mYaxis[i], mZaxis[i]);
+		mPoints->InsertNextPoint(p.begin());
+	}
+
+	// fill cell points for the entire polydata.
+	mLines->Initialize();
+	std::vector<vtkIdType> ids(mPoints->GetNumberOfPoints());
+	for (unsigned i=0; i<ids.size(); ++i)
+		ids[i] = i;
+	mLines->InsertNextCell(ids.size(), &(*ids.begin()));
+	mLines->Modified();
+
+	mPolyData->Modified();
+	this->clearAxisVectors();
+
+}
+void ReadFbgsMessage::clearPolyData()
+{
+	mPoints->Reset();
+	mLines->Reset();
+	mPolyData->Modified();
+}
+
+void ReadFbgsMessage::clearAxisVectors()
+{
+	mXaxis.clear();
+	mYaxis.clear();
+	mZaxis.clear();
+}
+}//cx
