@@ -23,6 +23,9 @@ cx_initialize_CTK()
 set(CX_USE_OPENCL_UTILITY OFF)
 set(CX_PLUGIN_org.custusx.usreconstruction.vnncl OFF)
 
+#Turn off obsolete plugins
+set(CX_PLUGIN_org.custusx.anglecorrection OFF)
+
 find_package(OpenGL)
 cx_opengl_version()
 find_package(X11)
