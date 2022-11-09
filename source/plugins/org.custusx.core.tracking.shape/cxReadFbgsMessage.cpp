@@ -168,7 +168,7 @@ bool ReadFbgsMessage::readPositions(AXIS axis, QString buffer, int bufferPos)
 bool ReadFbgsMessage::createPolyData()
 {
 	this->clearPolyData();
-	if(mXaxis.size() != mYaxis.size() != mZaxis.size())
+	if((mXaxis.size() != mYaxis.size()) || (mXaxis.size() != mZaxis.size()))
 	{
 		CX_LOG_WARNING() << "Not equal number of position data in all axes";
 		return false;

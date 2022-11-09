@@ -53,7 +53,7 @@ TEST_CASE("ReadFbgsMessage: createPolyData", "[unit][plugins][org.custusx.tracki
 	CHECK(readFbgsMessage.getAxisPosVector(cx::ReadFbgsMessage::axisX).size() == 3);
 
 	CHECK(readFbgsMessage.createPolyData());
-	//CHECK(readFbgsMessage.getAxisPosVector(cx::ReadFbgsMessage::axisX).size() == 0);
+	CHECK(readFbgsMessage.getAxisPosVector(cx::ReadFbgsMessage::axisX).size() == 0);
 	vtkPolyDataPtr polydata = readFbgsMessage.getPolyData();
 
 	REQUIRE(polydata);
