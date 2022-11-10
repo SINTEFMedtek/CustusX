@@ -50,7 +50,7 @@ public:
 	static QString getNameSuffixAirwayModel();
 	static QString getNameSuffixAirwayAndVesselRTT();
 
-	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
 	std::vector<BranchPtr> getRouteBranches();
 	std::vector< double > getCameraRotation();
 

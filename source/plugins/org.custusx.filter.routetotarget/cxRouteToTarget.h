@@ -46,7 +46,7 @@ public:
 	double findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
-	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
 	std::vector< BranchPtr > getRouteBranches();
 	std::vector< double > getCameraRotation();
 
@@ -88,6 +88,7 @@ Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVec
 double variance(Eigen::VectorXd X);
 
 org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
+org_custusx_filter_routetotarget_EXPORT std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 
 } /* namespace cx */
 

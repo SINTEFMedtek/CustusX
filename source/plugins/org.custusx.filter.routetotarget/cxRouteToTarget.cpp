@@ -615,16 +615,24 @@ double RouteToTarget::findDistanceToSegmentationEdge(vtkImageDataPtr bloodVessel
 	return retval;
 }
 
-std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions()
+std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions(bool extendedRoute)
 {
-	std::vector< Eigen::Vector3d > positions = mExtendedRoutePositions;
+
+	std::vector< Eigen::Vector3d > positions;
+	if(extendedRoute)
+		positions = mExtendedRoutePositions;
+	else
+		positions = mRoutePositions;
+
 	std::reverse(positions.begin(), positions.end());
 	return positions;
 }
 
 std::vector< BranchPtr > RouteToTarget::getRouteBranches()
 {
-	return mRoutePositionsBranch;
+	std::vector< BranchPtr > routePositionsBranch = mRoutePositionsBranch;
+	std::reverse(routePositionsBranch.begin(), routePositionsBranch.end());
+	return routePositionsBranch;
 }
 
 std::vector< double > RouteToTarget::getCameraRotation()

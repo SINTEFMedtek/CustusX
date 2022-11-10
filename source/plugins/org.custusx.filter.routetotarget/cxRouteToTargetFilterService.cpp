@@ -325,9 +325,9 @@ void RouteToTargetFilter::setSmoothing(bool smoothing)
     mSmoothing = smoothing; // default true
 }
 
-std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions()
+std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions(bool extendedRoute)
 {
-	return mRouteToTarget->getRoutePositions();
+	return mRouteToTarget->getRoutePositions(extendedRoute);
 }
 
 std::vector<BranchPtr> RouteToTargetFilter::getRouteBranches()

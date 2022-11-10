@@ -61,7 +61,8 @@ std::pair<Eigen::MatrixXd::Index, double> org_custusx_registration_method_bronch
 std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > org_custusx_registration_method_bronchoscopy_EXPORT dsearchn(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 std::vector<Eigen::Vector3d> org_custusx_registration_method_bronchoscopy_EXPORT smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation, double parentRotation);
-Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B);
+
+org_custusx_registration_method_bronchoscopy_EXPORT Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B);
 
 }//namespace cx
 
