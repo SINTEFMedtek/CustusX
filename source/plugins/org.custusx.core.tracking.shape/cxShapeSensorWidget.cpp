@@ -25,6 +25,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDoubleProperty.h"
 #include "cxLogger.h"
 #include "cxViewService.h"
+#include "cxActiveToolWidget.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
@@ -49,8 +51,14 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 
 	this->setWhatsThis(this->defaultWhatsThis());
 
-	//mVerticalLayout->addWidget(new QLabel("Hello Plugin!"));
+	//Is tool selector needed?
+	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(services->tracking(), this);
+	mSelector = activeToolWidget->getSelector();
+	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
 
+	//Connect to tool
+	mTool = mServices->tracking()->getActiveTool();
+	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
 
 	mConnectButton = new QPushButton("Connect", this);
 	mShowShapeButton = new QPushButton("Show shape", this);
@@ -63,17 +71,20 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	connect(mSocketConnection.get(), &SocketConnection::dataAvailable, this, &ShapeSensorWidget::dataAvailableSlot);
 
 	QWidget* addressWidget = sscCreateDataWidget(this, mIpAddress);
-	//QWidget* portWidget = new SliderGroupWidget(this, mIpPort);
 	QWidget* portWidget = sscCreateDataWidget(this, mIpPort);
+
 	mVerticalLayout->addWidget(addressWidget);
 	mVerticalLayout->addWidget(portWidget);
 
 	mVerticalLayout->addWidget(mConnectButton);
 	mVerticalLayout->addWidget(mShowShapeButton);
+	mVerticalLayout->addWidget(activeToolWidget);
 	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addStretch(1);
 	mVerticalLayout->addWidget(mTestShapeButton);
 	mVerticalLayout->addStretch();
+
+	this->activeToolChangedSlot();
 }
 
 ShapeSensorWidget::~ShapeSensorWidget()
@@ -193,4 +204,16 @@ void ShapeSensorWidget::dataAvailableSlot()
 	vtkPolyDataPtr polyData = mReadFbgsMessage.getPolyData();
 }
 
+void ShapeSensorWidget::activeToolChangedSlot()
+{
+	disconnect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
+	//mTool = mServices->tracking()->getTool(mSelector->getValue());
+	mTool = mServices->tracking()->getActiveTool();
+	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
+}
+
+void ShapeSensorWidget::receiveTransforms(Transform3D prMt, double timestamp)
+{
+	mReadFbgsMessage.set_prMt(prMt);
+}
 } /* namespace cx */

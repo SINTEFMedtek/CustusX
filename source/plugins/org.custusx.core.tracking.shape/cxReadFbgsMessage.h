@@ -44,7 +44,7 @@ public:
 	void setColor(QColor color);
 	vtkPolyDataPtr getPolyData();
 	vtkActorPtr getActor();
-	void set_rMpr(Transform3D rMpr);
+	void set_prMt(Transform3D prMt);
 	bool createPolyData();
 	std::vector<double> *getAxisPosVector(AXIS axis);
 protected:

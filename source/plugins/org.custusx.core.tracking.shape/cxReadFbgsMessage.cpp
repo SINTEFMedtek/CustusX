@@ -65,9 +65,9 @@ vtkActorPtr ReadFbgsMessage::getActor()
 	return mActor;
 }
 
-void ReadFbgsMessage::set_rMpr(Transform3D rMpr)
+void ReadFbgsMessage::set_prMt(Transform3D prMt)
 {
-	mActor->SetUserMatrix(rMpr.getVtkMatrix());
+	mActor->SetUserMatrix(prMt.getVtkMatrix());
 }
 
 void ReadFbgsMessage::setColor(QColor color)

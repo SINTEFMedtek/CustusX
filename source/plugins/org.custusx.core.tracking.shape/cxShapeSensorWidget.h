@@ -44,6 +44,8 @@ private slots:
 	void connectClickedSlot();
 	void showClickedSlot();
 	void testShapeClickedSlot();
+	void activeToolChangedSlot();
+	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
 	VisServicesPtr mServices;
 	QVBoxLayout*  mVerticalLayout;
@@ -55,6 +57,8 @@ private:
 	QPushButton *mTestShapeButton;
 	ReadFbgsMessage mReadFbgsMessage;
 	bool mShowShape = false;
+	StringPropertyBasePtr mSelector;
+	ToolPtr mTool;
 
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);
