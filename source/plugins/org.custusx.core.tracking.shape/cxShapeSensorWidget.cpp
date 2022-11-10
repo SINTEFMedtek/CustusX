@@ -14,6 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <string>
+#include <vtkRenderer.h>
+#include <vtkPolyData.h>
 #include "cxProfile.h"
 #include "cxXmlOptionItem.h"
 #include "cxDoubleWidgets.h"
@@ -22,18 +24,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxLogger.h"
+#include "cxViewService.h"
 
 namespace cx
 {
 
 ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
-	QWidget(parent),
+	BaseWidget(parent, "ShapeSensorWidget", "Shape Sensor"),
+	mServices(services),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mSocketConnection(new SocketConnection(this))
 {
-	this->setObjectName("ShapeSensorWidget");
-	this->setWindowTitle("Shape Sensor");
-
 	SocketConnection::ConnectionInfo info = mSocketConnection->getConnectionInfo();
 	info.port = 5001;
 	mSocketConnection->setConnectionInfo(info);
@@ -52,8 +53,12 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 
 
 	mConnectButton = new QPushButton("Connect", this);
+	mShowShapeButton = new QPushButton("Show shape", this);
+	mTestShapeButton = new QPushButton("Create test shape", this);
 
 	connect(mConnectButton, &QPushButton::clicked, this, &ShapeSensorWidget::connectClickedSlot);
+	connect(mShowShapeButton, &QPushButton::clicked, this, &ShapeSensorWidget::showClickedSlot);
+	connect(mTestShapeButton, &QPushButton::clicked, this, &ShapeSensorWidget::testShapeClickedSlot);
 	connect(mSocketConnection.get(), &SocketConnection::stateChanged, this, &ShapeSensorWidget::connectStateChangedSlot);
 	connect(mSocketConnection.get(), &SocketConnection::dataAvailable, this, &ShapeSensorWidget::dataAvailableSlot);
 
@@ -64,6 +69,10 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	mVerticalLayout->addWidget(portWidget);
 
 	mVerticalLayout->addWidget(mConnectButton);
+	mVerticalLayout->addWidget(mShowShapeButton);
+	mVerticalLayout->addWidget(this->createHorizontalLine());
+	mVerticalLayout->addStretch(1);
+	mVerticalLayout->addWidget(mTestShapeButton);
 	mVerticalLayout->addStretch();
 }
 
@@ -116,17 +125,46 @@ void ShapeSensorWidget::connectStateChangedSlot(CX_SOCKETCONNECTION_STATE status
 void ShapeSensorWidget::connectClickedSlot()
 {
 	if(mSocketConnection->getState() != scsCONNECTED)
-	{
 		mSocketConnection->requestConnect();
-		//mConnectButton->setText("Disconnect");
+	else
+		mSocketConnection->disconnect();
+
+//	this->adjustSize();
+}
+
+
+void ShapeSensorWidget::showClickedSlot()
+{
+	vtkPolyDataPtr polydata = mReadFbgsMessage.getPolyData();
+	CX_LOG_DEBUG() << "showClickedSlot polydata points: " << polydata->GetPoints()->GetNumberOfPoints();
+	if(mShowShape)
+	{
+		mServices->view()->get3DView()->getRenderer()->RemoveActor(mReadFbgsMessage.getActor());
+		mShowShapeButton->setText("Show shape");
 	}
 	else
 	{
-		mSocketConnection->disconnect();
-		//mConnectButton->setText("Connect");
+		mServices->view()->get3DView()->getRenderer()->AddActor(mReadFbgsMessage.getActor());
+		mShowShapeButton->setText("Hide shape");
 	}
+	mShowShape = !mShowShape;
+}
 
-	this->adjustSize();
+void ShapeSensorWidget::testShapeClickedSlot()
+{
+	std::vector<double> *xAxis = mReadFbgsMessage.getAxisPosVector(ReadFbgsMessage::axisX);
+	std::vector<double> *yAxis = mReadFbgsMessage.getAxisPosVector(ReadFbgsMessage::axisY);
+	std::vector<double> *zAxis = mReadFbgsMessage.getAxisPosVector(ReadFbgsMessage::axisZ);
+	xAxis->push_back(0);
+	yAxis->push_back(0);
+	zAxis->push_back(0);
+	for(int i = 1; i < 100; ++i)
+	{
+		xAxis->push_back(i+std::rand()/((RAND_MAX + 1u)/3));
+		yAxis->push_back(i+std::rand()/((RAND_MAX + 1u)/3));
+		zAxis->push_back(i+std::rand()/((RAND_MAX + 1u)/3));
+	}
+	mReadFbgsMessage.createPolyData();
 }
 
 void ShapeSensorWidget::dataAvailableSlot()

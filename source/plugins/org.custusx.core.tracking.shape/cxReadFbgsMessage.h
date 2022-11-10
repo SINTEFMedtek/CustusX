@@ -45,6 +45,8 @@ public:
 	vtkPolyDataPtr getPolyData();
 	vtkActorPtr getActor();
 	void set_rMpr(Transform3D rMpr);
+	bool createPolyData();
+	std::vector<double> *getAxisPosVector(AXIS axis);
 protected:
 	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
 	vtkActorPtr mActor;
@@ -61,8 +63,6 @@ protected:
 	bool readShape(AXIS axis, QString buffer);
 	bool readPositions(AXIS axis, QString buffer, int bufferPos);
 	QString getAxisString(AXIS axis);
-	std::vector<double> getAxisPosVector(AXIS axis);
-	bool createPolyData();
 	void clearPolyData();
 	void clearAxisVectors();
 };

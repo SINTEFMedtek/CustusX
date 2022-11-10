@@ -26,7 +26,7 @@ public:
 	}
 	std::vector<double> getAxisPosVector(AXIS axis)
 	{
-		return cx::ReadFbgsMessage::getAxisPosVector(axis);
+		return *cx::ReadFbgsMessage::getAxisPosVector(axis);
 	}
 	void initAxisVectors()
 	{

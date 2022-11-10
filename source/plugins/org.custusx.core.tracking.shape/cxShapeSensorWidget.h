@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSHAPEWIDGET_H_
 
 #include "org_custusx_tracking_shape_Export.h"
-#include <QWidget>
+#include "cxBaseWidget.h"
 #include "cxSocketConnection.h"
 #include "cxForwardDeclarations.h"
 #include "cxReadFbgsMessage.h"
@@ -31,7 +31,7 @@ namespace cx
  * \date 2022-11-08
  * \author Ole Vegard Solberg
  */
-class org_custusx_tracking_shape_EXPORT ShapeSensorWidget : public QWidget
+class org_custusx_tracking_shape_EXPORT ShapeSensorWidget : public BaseWidget
 {
 	Q_OBJECT
 public:
@@ -42,13 +42,19 @@ private slots:
 	void dataAvailableSlot();
 	void connectStateChangedSlot(CX_SOCKETCONNECTION_STATE status);
 	void connectClickedSlot();
+	void showClickedSlot();
+	void testShapeClickedSlot();
 private:
+	VisServicesPtr mServices;
 	QVBoxLayout*  mVerticalLayout;
 	SocketConnectionPtr mSocketConnection;
 	StringPropertyBasePtr mIpAddress;
 	DoublePropertyBasePtr mIpPort;
 	QPushButton *mConnectButton;
+	QPushButton *mShowShapeButton;
+	QPushButton *mTestShapeButton;
 	ReadFbgsMessage mReadFbgsMessage;
+	bool mShowShape = false;
 
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);

@@ -28,7 +28,7 @@ namespace cx
 {
 ReadFbgsMessage::ReadFbgsMessage()
 {
-	//Using code from cxToolTracer as a basis
+	//Using code from cxToolTracer as a basis (Used by ToolRep3D)
 	mPolyData = vtkPolyDataPtr::New();
 	mActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
@@ -95,22 +95,22 @@ QString ReadFbgsMessage::getAxisString(AXIS axis)
 	}
 }
 
-std::vector<double> ReadFbgsMessage::getAxisPosVector(AXIS axis)
+std::vector<double>* ReadFbgsMessage::getAxisPosVector(AXIS axis)
 {
 	switch(axis)
 	{
 	case axisX:
-		return mXaxis;
+		return &mXaxis;
 		break;
 	case axisY:
-		return mYaxis;
+		return &mYaxis;
 		break;
 	case axisZ:
-		return mZaxis;
+		return &mZaxis;
 		break;
 	case axisCOUNT:
 	default:
-		return std::vector<double>();
+		return nullptr;
 		break;
 	}
 }
@@ -150,7 +150,7 @@ bool ReadFbgsMessage::readPositions(AXIS axis, QString buffer, int bufferPos)
 	if(!ok)
 		return false;
 
-	std::vector<double> axisVextor = getAxisPosVector(axis);
+	std::vector<double> axisVextor = *getAxisPosVector(axis);
 
 	for(int i = 0; i < numValues; ++i)
 	{
