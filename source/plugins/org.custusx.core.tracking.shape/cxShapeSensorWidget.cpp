@@ -180,27 +180,36 @@ void ShapeSensorWidget::testShapeClickedSlot()
 
 void ShapeSensorWidget::dataAvailableSlot()
 {
-	char charSize[4];
+	unsigned char charSize[4];
 	bool ok = mSocketConnection->socketReceive(&charSize, 4);
 	if(!ok)
 	{
 		CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
 		return;
 	}
-	CX_LOG_DEBUG() << "convert to int: " << charSize;
-	int dataLength = 0;
-	try
-	{
-		dataLength = std::stoi(charSize);
-	}
-	catch(std::invalid_argument const& ex)
-	{
-		std::cout << "std::invalid_argument::what(): " << ex.what() << '\n';
-	}
-	catch(std::out_of_range const& ex)
-	{
-		std::cout << "std::out_of_range::what(): " << ex.what() << '\n';
-	}
+	CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << int(charSize[2]) << int(charSize[3]);
+	int dataLength = int((unsigned char)(charSize[0]) << 24 |
+				(unsigned char)(charSize[1]) << 16 |
+				(unsigned char)(charSize[2]) << 8 |
+				(unsigned char)(charSize[3]));
+
+//	int dataLength = 0;
+//	std::size_t pos{};
+//	try
+//	{
+//		dataLength = std::stoi(charSize, &pos);
+//		std::cout << dataLength << "; pos: " << pos << '\n';
+//	}
+//	catch(std::invalid_argument const& ex)
+//	{
+//		std::cout << "std::invalid_argument::what(): " << ex.what() << '\n';
+//		return;
+//	}
+//	catch(std::out_of_range const& ex)
+//	{
+//		std::cout << "std::out_of_range::what(): " << ex.what() << '\n';
+//		return;
+//	}
 	CX_LOG_DEBUG() << "dataLength: " << dataLength;
 
 	char *charBuffer = (char*)malloc(dataLength);
