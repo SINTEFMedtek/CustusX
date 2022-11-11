@@ -50,36 +50,48 @@ public:
 	void setRouteToTarget(QString uid);
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
 	void setCameraRotationAlongRoute(std::vector< double > cameraRotations);
+	void setBranchingIndexAlongRoute(std::vector< int > branchingIndex);
+	void setRecordVideoOption(bool recordVideo);
 
 protected:
 	QString defaultWhatsThis() const;
+	VisServicesPtr				mServices;
 	QVBoxLayout*				mVerticalLayout;
 	QSlider*					mPlaybackSlider;
+	QPushButton					*mPlayButton;
+	QTimer*						mTimer;
 	QDial*						mRotateDial;
 	QDial*						mViewDial;
 	QPushButton*				mResetEndoscopeButton;
-    QPushButton*				mUseAutomaticRotationButton;
-    QPalette                    mAutomaticRotationButtonBackgroundColor;
+	QPushButton*				mUseAutomaticRotationButton;
+	QPalette					mAutomaticRotationButtonBackgroundColor;
 
 	StringPropertySelectMeshPtr	mRouteToTarget;
 	CXVBcameraPath*				mCameraPath;
 	bool						mControlsEnabled;
-    bool						mAutomaticRotation;
+	bool						mAutomaticRotation;
+	bool						mRecordVideo;
 
 	void						enableControls(bool enable);
+	QFileInfo					startRecordFullscreen();
+	void						stopRecordFullscreen();
 
 	PatientStoragePtr mStorage;
 
 signals:
 	void						cameraPathChanged(MeshPtr pathMesh);
+	void						cameraAtEndPosition();
 
 private slots:
 	void						inputChangedSlot();
+	void						moveCameraSlot();
 	void						resetEndoscopeSlot();
-    void                        automaticRotationSlot();
-    void                        updateRotationDialSlot(int value);
+	void						automaticRotationSlot();
+	void						updateRotationDialSlot(int value);
+
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
+	void						playButtonClickedSlot();
 };
 
 } /* namespace cx */

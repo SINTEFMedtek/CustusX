@@ -642,6 +642,11 @@ std::vector< double > RouteToTarget::getCameraRotation()
 	return rotations;
 }
 
+std::vector< int > RouteToTarget::getBranchingIndex()
+{
+	return mBranchingIndex;
+}
+
 void RouteToTarget::makeMarianaCenterlineFile(QString filename)
 {
 	if (mExtendedRoutePositions.empty())

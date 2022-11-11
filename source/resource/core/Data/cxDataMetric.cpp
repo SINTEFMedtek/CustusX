@@ -83,20 +83,20 @@ bool DataMetric::load(QString path, FileManagerServicePtr filemanager)
 	//TODO is this good enough????
 
 	QFileInfo to_be_loaded(path);
-	CX_LOG_DEBUG() << "TRYING TO LOAD DATAMETRIC WITH PATH: " << path ;
-	CX_LOG_DEBUG() << "Sym: "<< to_be_loaded.isSymLink();
-	CX_LOG_DEBUG() << "Dir: "<< to_be_loaded.isDir();
-	CX_LOG_DEBUG() << "File: "<< to_be_loaded.isFile();
+	//CX_LOG_DEBUG() << "TRYING TO LOAD DATAMETRIC WITH PATH: " << path ;
+	//CX_LOG_DEBUG() << "Sym: "<< to_be_loaded.isSymLink();
+	//CX_LOG_DEBUG() << "Dir: "<< to_be_loaded.isDir();
+	//CX_LOG_DEBUG() << "File: "<< to_be_loaded.isFile();
 
 	if(to_be_loaded.isDir() || !to_be_loaded.exists())
 	{
-		CX_LOG_DEBUG() << "does not exist";
+		//CX_LOG_DEBUG() << "does not exist";
 		//when trying to load metrics from xml file, this function will be called without a valid path
 		return true; //simulating old behaviour
 	}
 	else
 	{
-		CX_LOG_DEBUG() << "exist";
+		//CX_LOG_DEBUG() << "exist";
 		//when trying to use the import functionality to read MNI Tag Point files for example the path will be valid
 		DataMetricPtr self = DataMetricPtr(this, null_deleter());
 		return filemanager->readInto(self, path);

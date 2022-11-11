@@ -340,6 +340,11 @@ std::vector< double > RouteToTargetFilter::getCameraRotation()
 	return mRouteToTarget->getCameraRotation();
 }
 
+std::vector< int > RouteToTargetFilter::getBranchingIndex()
+{
+	return mRouteToTarget->getBranchingIndex();
+}
+
 BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)
 {
 	BoolPropertyPtr retval =

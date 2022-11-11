@@ -12,6 +12,7 @@ namespace cxtest
 
 class CXTEST_ORG_CUSTUSX_CORE_OPENIGTLINK3_EXPORT IOReceiver : public Receiver
 {
+	Q_OBJECT
 public:
 	IOReceiver(igtlioLogicPointer logic);
 
