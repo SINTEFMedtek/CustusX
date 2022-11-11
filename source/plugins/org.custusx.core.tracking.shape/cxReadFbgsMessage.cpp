@@ -148,18 +148,28 @@ bool ReadFbgsMessage::readPositions(AXIS axis, QString buffer, int bufferPos)
 	QStringRef numberString(&buffer, bufferPos, sizeof(int));
 	int numValues = numberString.toInt(&ok);
 	if(!ok)
+	{
+		CX_LOG_DEBUG() << "Cannot convert " << numberString.string() << " to int";
 		return false;
+	}
 
 	std::vector<double> axisVextor = *getAxisPosVector(axis);
+
+	QStringRef numbers = QStringRef(&buffer, bufferPos, buffer.size() - bufferPos);
+	QStringList numberList = numbers.string()->split("	");
 
 	for(int i = 0; i < numValues; ++i)
 	{
 		//Use sizeof(float) instead?
-		numberString = QStringRef(&buffer, bufferPos, sizeof(double));
-		double value = numberString.toDouble(&ok);
+		//numberString = QStringRef(&buffer, bufferPos, sizeof(double));
+		//double value = numberString.toDouble(&ok);
+		double value = numberList[1].toDouble(&ok);
 		axisVextor.push_back(value);
 		if(!ok)
+		{
+			CX_LOG_DEBUG() << "Cannot convert " << numberList[1] << " to double";
 			return false;
+		}
 		bufferPos += sizeof(double);
 	}
 	return true;

@@ -187,7 +187,20 @@ void ShapeSensorWidget::dataAvailableSlot()
 		CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
 		return;
 	}
-	int dataLength = std::stoi(charSize);
+	CX_LOG_DEBUG() << "convert to int: " << charSize;
+	int dataLength = 0;
+	try
+	{
+		dataLength = std::stoi(charSize);
+	}
+	catch(std::invalid_argument const& ex)
+	{
+		std::cout << "std::invalid_argument::what(): " << ex.what() << '\n';
+	}
+	catch(std::out_of_range const& ex)
+	{
+		std::cout << "std::out_of_range::what(): " << ex.what() << '\n';
+	}
 	CX_LOG_DEBUG() << "dataLength: " << dataLength;
 
 	char *charBuffer = (char*)malloc(dataLength);
