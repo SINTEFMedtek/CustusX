@@ -59,6 +59,7 @@ private:
 	bool mShowShape = false;
 	StringPropertyBasePtr mSelector;
 	ToolPtr mTool;
+	int mDataLenght = 0;
 
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);

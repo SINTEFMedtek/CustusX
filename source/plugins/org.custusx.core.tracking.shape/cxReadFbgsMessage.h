@@ -60,8 +60,6 @@ protected:
 	std::vector<double> mYaxis;
 	std::vector<double> mZaxis;
 
-//	bool readShape(AXIS axis, QString buffer);
-//	bool readPositions(AXIS axis, QString buffer, int bufferPos);
 	QString getAxisString(AXIS axis);
 	void clearPolyData();
 	void clearAxisVectors();

@@ -191,7 +191,7 @@ void SocketConnection::internalError(QAbstractSocket::SocketError socketError)
 void SocketConnection::internalDataAvailable()
 {
 	//TODO
-	CX_LOG_DEBUG() << "Read data";
+	//CX_LOG_DEBUG() << "Read data";
 }
 
 void SocketConnection::setProtocol(QString protocolname)

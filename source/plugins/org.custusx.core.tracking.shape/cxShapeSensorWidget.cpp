@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewService.h"
 #include "cxActiveToolWidget.h"
 #include "cxTrackingService.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
@@ -135,10 +136,16 @@ void ShapeSensorWidget::connectStateChangedSlot(CX_SOCKETCONNECTION_STATE status
 
 void ShapeSensorWidget::connectClickedSlot()
 {
+
+	SocketConnection::ConnectionInfo info = mSocketConnection->getConnectionInfo();
+	info.port = mIpPort->getValue();
+	info.host = mIpAddress->getValue();
+	mSocketConnection->setConnectionInfo(info);
+
 	if(mSocketConnection->getState() != scsCONNECTED)
 		mSocketConnection->requestConnect();
 	else
-		mSocketConnection->disconnect();
+		mSocketConnection->requestDisconnect();
 
 //	this->adjustSize();
 }
@@ -180,50 +187,41 @@ void ShapeSensorWidget::testShapeClickedSlot()
 
 void ShapeSensorWidget::dataAvailableSlot()
 {
-	unsigned char charSize[4];
-	bool ok = mSocketConnection->socketReceive(&charSize, 4);
+	bool ok = true;
+	if(mDataLenght == 0)//Use previously read value
+	{
+		unsigned char charSize[4];
+		ok = mSocketConnection->socketReceive(&charSize, 4);
+		if(!ok)
+		{
+			CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
+			return;
+		}
+		CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << " " << int(charSize[2]) << " " << int(charSize[3]);
+		mDataLenght = int((unsigned char)(charSize[0]) << 24 |
+														  (unsigned char)(charSize[1]) << 16 |
+																						  (unsigned char)(charSize[2]) << 8 |
+																														  (unsigned char)(charSize[3]));
+		CX_LOG_DEBUG() << "mDataLenght: " << mDataLenght;
+	}
+	else
+		CX_LOG_DEBUG() << "Another try to read " << mDataLenght << "data";
+
+	char *charBuffer = (char*)malloc(mDataLenght);
+	ok = mSocketConnection->socketReceive(charBuffer, mDataLenght);
 	if(!ok)
 	{
-		CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
+		CX_LOG_DEBUG() << "Cannot read " << mDataLenght << " characters from TCP socket. Waiting...";
 		return;
 	}
-	CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << " " << int(charSize[2]) << " " << int(charSize[3]);
-	int dataLength = int((unsigned char)(charSize[0]) << 24 |
-				(unsigned char)(charSize[1]) << 16 |
-				(unsigned char)(charSize[2]) << 8 |
-				(unsigned char)(charSize[3]));
-
-//	int dataLength = 0;
-//	std::size_t pos{};
-//	try
-//	{
-//		dataLength = std::stoi(charSize, &pos);
-//		std::cout << dataLength << "; pos: " << pos << '\n';
-//	}
-//	catch(std::invalid_argument const& ex)
-//	{
-//		std::cout << "std::invalid_argument::what(): " << ex.what() << '\n';
-//		return;
-//	}
-//	catch(std::out_of_range const& ex)
-//	{
-//		std::cout << "std::out_of_range::what(): " << ex.what() << '\n';
-//		return;
-//	}
-	CX_LOG_DEBUG() << "dataLength: " << dataLength;
-
-	char *charBuffer = (char*)malloc(dataLength);
-	ok = mSocketConnection->socketReceive(charBuffer, dataLength);
-	if(!ok)
-	{
-		CX_LOG_WARNING() << "Cannot read " << dataLength << " characters from TCP socket";
-		return;
-	}
+	else
+		mDataLenght = 0;
 	QString buffer(charBuffer);//TODO: Need terminator?
 	free(charBuffer);
 	//CX_LOG_DEBUG() << "Read buffer: " << buffer;
 	mReadFbgsMessage.readBuffer(buffer);
-	vtkPolyDataPtr polyData = mReadFbgsMessage.getPolyData();
+	/*vtkPolyDataPtr polyData = */mReadFbgsMessage.getPolyData();
+	//mSocketConnection->requestDisconnect();
 }
 
 void ShapeSensorWidget::activeToolChangedSlot()
