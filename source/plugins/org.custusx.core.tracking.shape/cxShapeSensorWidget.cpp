@@ -187,7 +187,7 @@ void ShapeSensorWidget::dataAvailableSlot()
 		CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
 		return;
 	}
-	CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << int(charSize[2]) << int(charSize[3]);
+	CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << " " << int(charSize[2]) << " " << int(charSize[3]);
 	int dataLength = int((unsigned char)(charSize[0]) << 24 |
 				(unsigned char)(charSize[1]) << 16 |
 				(unsigned char)(charSize[2]) << 8 |
@@ -221,7 +221,7 @@ void ShapeSensorWidget::dataAvailableSlot()
 	}
 	QString buffer(charBuffer);//TODO: Need terminator?
 	free(charBuffer);
-	CX_LOG_DEBUG() << "Read buffer: " << buffer;
+	//CX_LOG_DEBUG() << "Read buffer: " << buffer;
 	mReadFbgsMessage.readBuffer(buffer);
 	vtkPolyDataPtr polyData = mReadFbgsMessage.getPolyData();
 }

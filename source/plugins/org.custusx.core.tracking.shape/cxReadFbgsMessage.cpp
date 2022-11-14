@@ -122,7 +122,7 @@ void ReadFbgsMessage::readBuffer(QString buffer)
 		if(!this->readShape(mAxis[i], buffer))
 		{
 			CX_LOG_WARNING() << "Error reading " << getAxisString(mAxis[i]) << " values from TCP socket";
-			return;
+			//return;
 		}
 	}
 	this->createPolyData();
@@ -145,32 +145,37 @@ bool ReadFbgsMessage::readShape(AXIS axis, QString buffer)
 bool ReadFbgsMessage::readPositions(AXIS axis, QString buffer, int bufferPos)
 {
 	bool ok;
-	QStringRef numberString(&buffer, bufferPos, sizeof(int));
+	//QStringRef numberString(&buffer, bufferPos, sizeof(int));
+	QString numberString = buffer.mid(bufferPos, sizeof(int));
 	int numValues = numberString.toInt(&ok);
 	if(!ok)
 	{
-		CX_LOG_DEBUG() << "Cannot convert " << numberString.string() << " to int";
+		CX_LOG_DEBUG() << "Cannot convert " << numberString << " to int";
 		return false;
 	}
+	else
+		CX_LOG_DEBUG() << "Read " << numValues << " positions";//Test debug
+	bufferPos += sizeof(int);
 
 	std::vector<double> axisVextor = *getAxisPosVector(axis);
 
-	QStringRef numbers = QStringRef(&buffer, bufferPos, buffer.size() - bufferPos);
-	QStringList numberList = numbers.string()->split("	");
+	//QStringRef numbers = QStringRef(&buffer, bufferPos, buffer.size() - bufferPos);
+	QString numbers = buffer.mid(bufferPos, buffer.size() - bufferPos);
+	QStringList numberList = numbers.split("	");
 
 	for(int i = 0; i < numValues; ++i)
 	{
 		//Use sizeof(float) instead?
 		//numberString = QStringRef(&buffer, bufferPos, sizeof(double));
 		//double value = numberString.toDouble(&ok);
-		double value = numberList[1].toDouble(&ok);
+		double value = numberList[i].toDouble(&ok);
 		axisVextor.push_back(value);
 		if(!ok)
 		{
-			CX_LOG_DEBUG() << "Cannot convert " << numberList[1] << " to double";
+			CX_LOG_DEBUG() << "Cannot convert number " << i << " value: " << numberList[i] << " to double";
 			return false;
 		}
-		bufferPos += sizeof(double);
+		//bufferPos += sizeof(double);
 	}
 	return true;
 }
