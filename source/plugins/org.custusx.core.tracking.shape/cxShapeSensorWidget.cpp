@@ -53,18 +53,17 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	this->setWhatsThis(this->defaultWhatsThis());
 
 	//Is tool selector needed?
-//	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(services->tracking(), this);
-//	mSelector = activeToolWidget->getSelector();
-//	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
-
-	connect(services->tracking().get(), &TrackingService::activeToolChanged,this, &ShapeSensorWidget::activeToolChangedSlot);
+	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(services->tracking(), this);
+	mSelector = activeToolWidget->getSelector();
+	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+	//connect(services->tracking().get(), &TrackingService::activeToolChanged,this, &ShapeSensorWidget::activeToolChangedSlot);
 
 	//Connect to tool
 	mTool = mServices->tracking()->getActiveTool();
 	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
 
 	mConnectButton = new QPushButton("Connect", this);
-	mShowShapeButton = new QPushButton("Show shape", this);
+	mShowShapeButton = new QPushButton("Hide shape", this);
 	mTestShapeButton = new QPushButton("Create test shape", this);
 
 	connect(mConnectButton, &QPushButton::clicked, this, &ShapeSensorWidget::connectClickedSlot);
@@ -85,7 +84,7 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addWidget(mShowShapeButton);
 	mVerticalLayout->addWidget(shapePointLockWidget);
-//	mVerticalLayout->addWidget(activeToolWidget);
+	mVerticalLayout->addWidget(activeToolWidget);
 	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addStretch(1);
 	mVerticalLayout->addWidget(mTestShapeButton);
@@ -185,6 +184,7 @@ void ShapeSensorWidget::connectClickedSlot()
 	else
 		mSocketConnection->requestDisconnect();
 
+	this->showShape();
 //	this->adjustSize();
 }
 
@@ -194,16 +194,19 @@ void ShapeSensorWidget::showClickedSlot()
 	vtkPolyDataPtr polydata = mReadFbgsMessage.getPolyData();
 //	CX_LOG_DEBUG() << "showClickedSlot polydata points: " << polydata->GetPoints()->GetNumberOfPoints();
 	if(mShowShape)
-	{
-		mServices->view()->get3DView()->getRenderer()->RemoveActor(mReadFbgsMessage.getActor());
 		mShowShapeButton->setText("Show shape");
-	}
 	else
-	{
-		mServices->view()->get3DView()->getRenderer()->AddActor(mReadFbgsMessage.getActor());
 		mShowShapeButton->setText("Hide shape");
-	}
 	mShowShape = !mShowShape;
+	this->showShape();
+}
+
+void ShapeSensorWidget::showShape()
+{
+	if(mShowShape)
+		mServices->view()->get3DView()->getRenderer()->AddActor(mReadFbgsMessage.getActor());
+	else
+		mServices->view()->get3DView()->getRenderer()->RemoveActor(mReadFbgsMessage.getActor());
 }
 
 void ShapeSensorWidget::testShapeClickedSlot()
@@ -259,15 +262,17 @@ void ShapeSensorWidget::dataAvailableSlot()
 	mReadFbgsMessage.readBuffer(buffer);
 
 	this->updateRange();
-	mReadFbgsMessage.getPolyData();
 }
 
 void ShapeSensorWidget::activeToolChangedSlot()
 {
-	disconnect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
-	//mTool = mServices->tracking()->getTool(mSelector->getValue());
-	mTool = mServices->tracking()->getActiveTool();
-	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
+//	disconnect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
+//	mTool = mServices->tracking()->getActiveTool();
+//	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
+
+	disconnect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+	mTool = mServices->tracking()->getTool(mSelector->getValue());
+	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
 }
 
 void ShapeSensorWidget::receiveTransforms(Transform3D prMt, double timestamp)

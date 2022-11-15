@@ -58,7 +58,7 @@ private:
 	QPushButton *mShowShapeButton;
 	QPushButton *mTestShapeButton;
 	ReadFbgsMessage mReadFbgsMessage;
-	bool mShowShape = false;
+	bool mShowShape = true;
 	StringPropertyBasePtr mSelector;
 	ToolPtr mTool;
 	int mDataLenght = 0;
@@ -71,6 +71,7 @@ private:
 	bool readShape(QString axisString, QString buffer);
 	bool readPositions(QString buffer, int bufferPos);
 	void updateRange();
+	void showShape();
 };
 
 } /* namespace cx */
