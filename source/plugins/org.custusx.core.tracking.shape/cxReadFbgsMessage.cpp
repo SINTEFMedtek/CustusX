@@ -136,7 +136,7 @@ void ReadFbgsMessage::readBuffer(QString buffer)
 		if(pos == -1)
 		{
 			CX_LOG_WARNING() << "Error reading " << getAxisString(mAxis[i]) << " values from TCP socket";
-			//return;
+			return;
 		}
 	}
 	this->createPolyData();
@@ -151,12 +151,17 @@ int ReadFbgsMessage::readPosForOneAxis(AXIS axis, QStringList &bufferList, int p
 		++pos;
 
 	int numValues;
-	if(!this->toInt(bufferList[pos++], numValues))
+	if((bufferList.size() < 2) || !this->toInt(bufferList[pos++], numValues))
 		return -1;
 //	CX_LOG_DEBUG() << "numValues: " << numValues;
 
 	std::vector<double> *axisVextor = getAxisPosVector(axis);
 	int stopPos = pos + numValues;
+	if(stopPos > bufferList.size())
+	{
+		CX_LOG_WARNING() << "Buffer don't have enough (" << numValues << ") values along axis: " << getAxisString(axis);
+		return -1;
+	}
 	for(; pos < stopPos; ++pos)
 	{
 		double value;

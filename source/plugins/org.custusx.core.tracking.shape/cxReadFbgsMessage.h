@@ -72,7 +72,7 @@ protected:
 	int getAxisStringPosition(QStringList &bufferList, AXIS axis, int startFrom);
 	bool toInt(QString string, int &value);
 	bool toDouble(QString string, double &value);
-	void lockShape(Vector3D shapePointLockVector);
+	virtual void lockShape(Vector3D shapePointLockVector);
 };
 
 }//cx
