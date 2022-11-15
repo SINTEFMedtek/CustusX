@@ -27,7 +27,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewService.h"
 #include "cxActiveToolWidget.h"
 #include "cxTrackingService.h"
-#include "cxUtilHelpers.h"
 
 namespace cx
 {
@@ -53,9 +52,11 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	this->setWhatsThis(this->defaultWhatsThis());
 
 	//Is tool selector needed?
-	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(services->tracking(), this);
-	mSelector = activeToolWidget->getSelector();
-	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+//	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(services->tracking(), this);
+//	mSelector = activeToolWidget->getSelector();
+//	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+
+	connect(services->tracking().get(), &TrackingService::activeToolChanged,this, &ShapeSensorWidget::activeToolChangedSlot);
 
 	//Connect to tool
 	mTool = mServices->tracking()->getActiveTool();
@@ -79,7 +80,7 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 
 	mVerticalLayout->addWidget(mConnectButton);
 	mVerticalLayout->addWidget(mShowShapeButton);
-	mVerticalLayout->addWidget(activeToolWidget);
+//	mVerticalLayout->addWidget(activeToolWidget);
 	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addStretch(1);
 	mVerticalLayout->addWidget(mTestShapeButton);
@@ -105,7 +106,7 @@ StringPropertyBasePtr ShapeSensorWidget::getIPAddress(QDomElement root)
 	StringPropertyPtr retval;
 	QString defaultValue = "127.0.0.1";
 	retval = StringProperty::initialize("ip_address", "Address", "TCP/IP Address",
-												defaultValue, root);
+										defaultValue, root);
 	retval->setGroup("Connection");
 	return retval;
 }
@@ -123,7 +124,6 @@ DoublePropertyBasePtr ShapeSensorWidget::getIPPort(QDomElement root)
 
 void ShapeSensorWidget::connectStateChangedSlot(CX_SOCKETCONNECTION_STATE status)
 {
-	CX_LOG_DEBUG() << "connectStateChangedSlot: " << status;
 	if(status == scsCONNECTED)
 	{
 		mConnectButton->setText("Disconnect");
@@ -154,7 +154,7 @@ void ShapeSensorWidget::connectClickedSlot()
 void ShapeSensorWidget::showClickedSlot()
 {
 	vtkPolyDataPtr polydata = mReadFbgsMessage.getPolyData();
-	CX_LOG_DEBUG() << "showClickedSlot polydata points: " << polydata->GetPoints()->GetNumberOfPoints();
+//	CX_LOG_DEBUG() << "showClickedSlot polydata points: " << polydata->GetPoints()->GetNumberOfPoints();
 	if(mShowShape)
 	{
 		mServices->view()->get3DView()->getRenderer()->RemoveActor(mReadFbgsMessage.getActor());
@@ -197,31 +197,29 @@ void ShapeSensorWidget::dataAvailableSlot()
 			CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
 			return;
 		}
-		CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << " " << int(charSize[2]) << " " << int(charSize[3]);
-		mDataLenght = int((unsigned char)(charSize[0]) << 24 |
-														  (unsigned char)(charSize[1]) << 16 |
-																						  (unsigned char)(charSize[2]) << 8 |
-																														  (unsigned char)(charSize[3]));
-		CX_LOG_DEBUG() << "mDataLenght: " << mDataLenght;
+		//CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << " " << int(charSize[2]) << " " << int(charSize[3]);
+		mDataLenght = int( ( (unsigned char)(charSize[0]) << 24 )
+				| ( (unsigned char)(charSize[1]) << 16 )
+				| ( (unsigned char)(charSize[2]) << 8 )
+				| ( (unsigned char)(charSize[3]) ) );
+		//CX_LOG_DEBUG() << "mDataLenght: " << mDataLenght;
 	}
-	else
-		CX_LOG_DEBUG() << "Another try to read " << mDataLenght << "data";
+//	else
+//		CX_LOG_DEBUG() << "Another try to read " << mDataLenght << " data";
 
 	char *charBuffer = (char*)malloc(mDataLenght);
 	ok = mSocketConnection->socketReceive(charBuffer, mDataLenght);
 	if(!ok)
 	{
-		CX_LOG_DEBUG() << "Cannot read " << mDataLenght << " characters from TCP socket. Waiting...";
+		//CX_LOG_DEBUG() << "Cannot read " << mDataLenght << " characters from TCP socket. Waiting...";
 		return;
 	}
 	else
 		mDataLenght = 0;
-	QString buffer(charBuffer);//TODO: Need terminator?
+	QString buffer(charBuffer);
 	free(charBuffer);
-	//CX_LOG_DEBUG() << "Read buffer: " << buffer;
 	mReadFbgsMessage.readBuffer(buffer);
-	/*vtkPolyDataPtr polyData = */mReadFbgsMessage.getPolyData();
-	//mSocketConnection->requestDisconnect();
+	mReadFbgsMessage.getPolyData();
 }
 
 void ShapeSensorWidget::activeToolChangedSlot()

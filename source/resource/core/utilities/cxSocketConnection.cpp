@@ -207,8 +207,8 @@ bool SocketConnection::socketIsConnected()
 bool SocketConnection::enoughBytesAvailableOnSocket(int bytes) const
 {
     bool enoughBytes = mSocket->bytesAvailable() >= bytes;
-    if(!enoughBytes)
-        CX_LOG_DEBUG() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket atm.";
+//    if(!enoughBytes)
+//        CX_LOG_DEBUG() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket atm.";
     return enoughBytes;
 }
 

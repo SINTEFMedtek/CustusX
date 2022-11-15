@@ -142,11 +142,11 @@ int ReadFbgsMessage::readPosForOneAxis(AXIS axis, QStringList &bufferList, int p
 	int numValues;
 	if(!this->toInt(bufferList[pos++], numValues))
 		return -1;
-	CX_LOG_DEBUG() << "numValues: " << numValues;
+//	CX_LOG_DEBUG() << "numValues: " << numValues;
 
 	std::vector<double> *axisVextor = getAxisPosVector(axis);
 	int stopPos = pos + numValues;
-	for(; pos < (stopPos); ++pos)
+	for(; pos < stopPos; ++pos)
 	{
 		double value;
 		if(!this->toDouble(bufferList[pos], value))
