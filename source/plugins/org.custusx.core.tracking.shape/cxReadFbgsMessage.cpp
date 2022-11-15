@@ -67,7 +67,18 @@ vtkActorPtr ReadFbgsMessage::getActor()
 
 void ReadFbgsMessage::set_prMt(Transform3D prMt)
 {
+	m_prMt = prMt;
 	mActor->SetUserMatrix(prMt.getVtkMatrix());
+}
+
+void ReadFbgsMessage::setShapePointLock(int posNumber)
+{
+	mShapePointLockNumber = posNumber;
+}
+
+int ReadFbgsMessage::getRangeMax()
+{
+	return mRangeMax-1;
 }
 
 void ReadFbgsMessage::setColor(QColor color)
@@ -196,15 +207,18 @@ int ReadFbgsMessage::getAxisStringPosition(QStringList &bufferList, AXIS axis, i
 bool ReadFbgsMessage::createPolyData()
 {
 	this->clearPolyData();
-	if((mXaxis.size() != mYaxis.size()) || (mXaxis.size() != mZaxis.size()))
+	mRangeMax = mXaxis.size();
+	if((mRangeMax != mYaxis.size()) || (mRangeMax != mZaxis.size()))
 	{
 		CX_LOG_WARNING() << "Not equal number of position data in all axes";
 		return false;
 	}
-	for(int i=0; i < mXaxis.size(); ++i)
+	for(int i=0; i < mRangeMax; ++i)
 	{
 		Vector3D p(mXaxis[i], mYaxis[i], mZaxis[i]);
 		mPoints->InsertNextPoint(p.begin());
+		if(i == mShapePointLockNumber)
+			this->lockShape(p);
 	}
 
 	// fill cell points for the entire polydata.
@@ -219,6 +233,14 @@ bool ReadFbgsMessage::createPolyData()
 	this->clearAxisVectors();
 	return true;
 }
+
+void ReadFbgsMessage::lockShape(Vector3D shapePointLockVector)
+{
+	Transform3D tMshape = createTransformTranslate(shapePointLockVector);
+	Transform3D prMshape = m_prMt * tMshape.inv();
+	mActor->SetUserMatrix(prMshape.getVtkMatrix());
+}
+
 void ReadFbgsMessage::clearPolyData()
 {
 	mPoints->Reset();

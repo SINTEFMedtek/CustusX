@@ -39,6 +39,7 @@ public:
 	virtual ~ShapeSensorWidget();
 
 private slots:
+	void shapePointLockChangedSlot();
 	void dataAvailableSlot();
 	void connectStateChangedSlot(CX_SOCKETCONNECTION_STATE status);
 	void connectClickedSlot();
@@ -52,6 +53,7 @@ private:
 	SocketConnectionPtr mSocketConnection;
 	StringPropertyBasePtr mIpAddress;
 	DoublePropertyBasePtr mIpPort;
+	DoublePropertyPtr mShapePointLock;
 	QPushButton *mConnectButton;
 	QPushButton *mShowShapeButton;
 	QPushButton *mTestShapeButton;
@@ -64,9 +66,11 @@ private:
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);
 	DoublePropertyBasePtr getIPPort(QDomElement root);
+	DoublePropertyPtr getShapePointLock(QDomElement root);
 	void readBuffer(QString buffer);
 	bool readShape(QString axisString, QString buffer);
 	bool readPositions(QString buffer, int bufferPos);
+	void updateRange();
 };
 
 } /* namespace cx */

@@ -48,6 +48,7 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 
 	mIpAddress = this->getIPAddress(element);
 	mIpPort = this->getIPPort(element);
+	mShapePointLock = this->getShapePointLock(element);
 
 	this->setWhatsThis(this->defaultWhatsThis());
 
@@ -71,15 +72,19 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	connect(mTestShapeButton, &QPushButton::clicked, this, &ShapeSensorWidget::testShapeClickedSlot);
 	connect(mSocketConnection.get(), &SocketConnection::stateChanged, this, &ShapeSensorWidget::connectStateChangedSlot);
 	connect(mSocketConnection.get(), &SocketConnection::dataAvailable, this, &ShapeSensorWidget::dataAvailableSlot);
+	connect(mShapePointLock.get(), &Property::changed, this, &ShapeSensorWidget::shapePointLockChangedSlot);
 
 	QWidget* addressWidget = sscCreateDataWidget(this, mIpAddress);
 	QWidget* portWidget = sscCreateDataWidget(this, mIpPort);
+	QWidget* shapePointLockWidget = sscCreateDataWidget(this, mShapePointLock);
 
 	mVerticalLayout->addWidget(addressWidget);
 	mVerticalLayout->addWidget(portWidget);
 
 	mVerticalLayout->addWidget(mConnectButton);
+	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addWidget(mShowShapeButton);
+	mVerticalLayout->addWidget(shapePointLockWidget);
 //	mVerticalLayout->addWidget(activeToolWidget);
 	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addStretch(1);
@@ -115,11 +120,44 @@ DoublePropertyBasePtr ShapeSensorWidget::getIPPort(QDomElement root)
 {
 	DoublePropertyPtr retval;
 	retval = DoubleProperty::initialize("ip_port", "Port", "TCP/IP Port (default 5001)",
-												5001, DoubleRange(1024, 49151, 1), 0, root);
+										5001, DoubleRange(1024, 49151, 1), 0, root);
 	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
 	retval->setAdvanced(true);
 	retval->setGroup("Connection");
 	return retval;
+}
+
+DoublePropertyPtr ShapeSensorWidget::getShapePointLock(QDomElement root)
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("shape_point_lock", "Lock shape point number to tool",
+										"Lock a specific point in the shape to the position of the active tool ",
+										0, DoubleRange(0, 1000, 1), 0, root);
+	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
+	retval->setAdvanced(true);
+	retval->setGroup("Connection");
+	return retval;
+}
+
+void ShapeSensorWidget::shapePointLockChangedSlot()
+{
+	mReadFbgsMessage.setShapePointLock(mShapePointLock->getValue());
+}
+
+void ShapeSensorWidget::updateRange()
+{
+	int rangeMax = mReadFbgsMessage.getRangeMax();
+	if(rangeMax > 0)
+	{
+		DoubleRange range = mShapePointLock->getValueRange();
+		if (range.max() != rangeMax)
+		{
+			range.mMax = rangeMax;
+			mShapePointLock->setValueRange(range);
+		}
+		if (mShapePointLock->getValue() > rangeMax)
+			mShapePointLock->setValue(rangeMax);
+	}
 }
 
 void ShapeSensorWidget::connectStateChangedSlot(CX_SOCKETCONNECTION_STATE status)
@@ -219,6 +257,8 @@ void ShapeSensorWidget::dataAvailableSlot()
 	QString buffer(charBuffer);
 	free(charBuffer);
 	mReadFbgsMessage.readBuffer(buffer);
+
+	this->updateRange();
 	mReadFbgsMessage.getPolyData();
 }
 

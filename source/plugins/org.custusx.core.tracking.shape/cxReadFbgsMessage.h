@@ -45,8 +45,10 @@ public:
 	vtkPolyDataPtr getPolyData();
 	vtkActorPtr getActor();
 	void set_prMt(Transform3D prMt);
+	void setShapePointLock(int posNumber);
 	bool createPolyData();
 	std::vector<double> *getAxisPosVector(AXIS axis);
+	int getRangeMax();
 protected:
 	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
 	vtkActorPtr mActor;
@@ -54,6 +56,9 @@ protected:
 	vtkPropertyPtr mProperty;
 	vtkPointsPtr mPoints;
 	vtkCellArrayPtr mLines;
+	int mShapePointLockNumber = 0;
+	Transform3D m_prMt;
+	int mRangeMax = 0;
 
 	std::vector<AXIS> mAxis;
 	std::vector<double> mXaxis;
@@ -67,6 +72,7 @@ protected:
 	int getAxisStringPosition(QStringList &bufferList, AXIS axis, int startFrom);
 	bool toInt(QString string, int &value);
 	bool toDouble(QString string, double &value);
+	void lockShape(Vector3D shapePointLockVector);
 };
 
 }//cx
