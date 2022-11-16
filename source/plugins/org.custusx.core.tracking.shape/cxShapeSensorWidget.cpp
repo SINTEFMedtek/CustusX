@@ -32,7 +32,7 @@ namespace cx
 {
 
 ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
-	BaseWidget(parent, "ShapeSensorWidget", "Shape Sensor"),
+	BaseWidget(parent, "shape_sensor_widget", "Shape Sensor"),
 	mServices(services),
 	mVerticalLayout(new QVBoxLayout(this)),
 	mSocketConnection(new SocketConnection(this))
