@@ -68,7 +68,7 @@ vtkActorPtr ReadFbgsMessage::getActor()
 void ReadFbgsMessage::set_prMt(Transform3D prMt)
 {
 	m_prMt = prMt;
-	mActor->SetUserMatrix(prMt.getVtkMatrix());
+	//mActor->SetUserMatrix(prMt.getVtkMatrix());
 }
 
 void ReadFbgsMessage::setShapePointLock(int posNumber)
@@ -223,7 +223,7 @@ bool ReadFbgsMessage::createPolyData()
 		Vector3D p(mXaxis[i], mYaxis[i], mZaxis[i]);
 		mPoints->InsertNextPoint(p.begin());
 		if(i == mShapePointLockNumber)
-			this->lockShape(p);
+			this->lockShape(i);
 	}
 
 	// fill cell points for the entire polydata.
@@ -239,11 +239,38 @@ bool ReadFbgsMessage::createPolyData()
 	return true;
 }
 
-void ReadFbgsMessage::lockShape(Vector3D shapePointLockVector)
+Vector3D ReadFbgsMessage::lockShape(int position)
 {
-	Transform3D tMshape = createTransformTranslate(shapePointLockVector);
-	Transform3D prMshape = m_prMt * tMshape.inv();
+	Vector3D p(mXaxis[position], mYaxis[position], mZaxis[position]);
+
+	Transform3D translateToP = createTransformTranslate(p);
+	Vector3D delta_p = getDeltaPosition(position);
+	Transform3D rotatePdirectionToZaxis = createTransformRotationBetweenVectors(delta_p, Vector3D::UnitZ());
+
+	Transform3D prMshape = m_prMt * rotatePdirectionToZaxis * translateToP.inv();
 	mActor->SetUserMatrix(prMshape.getVtkMatrix());
+
+	return p;
+}
+
+Vector3D ReadFbgsMessage::getDeltaPosition(int pos)
+{
+	int localRange = 5;
+	if(mRangeMax < localRange * 2)
+		return Vector3D(0,0,1);
+	int pos1 = pos - localRange;
+	int pos2 = pos + localRange;
+	int shift = 0;
+	if(pos1 < 0)
+		shift = pos1;
+	if(pos2 >= mRangeMax)
+		shift = pos2 - mRangeMax + 1;
+	pos1 -= shift;
+	pos2 -= shift;
+	Vector3D p1 = Vector3D(mXaxis[pos1], mYaxis[pos1], mZaxis[pos1]);
+	Vector3D p2 = Vector3D(mXaxis[pos2], mYaxis[pos2], mZaxis[pos2]);
+	Vector3D delta_p = p2-p1;
+	return delta_p;
 }
 
 void ReadFbgsMessage::clearPolyData()

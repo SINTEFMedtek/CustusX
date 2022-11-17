@@ -49,10 +49,10 @@ public:
 		return cx::ReadFbgsMessage::getAxisString(axis);
 	}
 
-	void lockShape(cx::Vector3D shapePointLockVector)
+	cx::Vector3D lockShape(int pos)
 	{
-		mShapePointLockVector = shapePointLockVector;
-		cx::ReadFbgsMessage::lockShape(shapePointLockVector);
+		mShapePointLockVector = cx::ReadFbgsMessage::lockShape(pos);
+		return mShapePointLockVector;
 	}
 
 	QString bufferWithOneValue()
