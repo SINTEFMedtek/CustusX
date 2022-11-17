@@ -45,7 +45,7 @@ private slots:
 	void connectClickedSlot();
 	void showClickedSlot();
 	void testShapeClickedSlot();
-	void activeToolChangedSlot();
+	void toolChangedSlot();
 	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
 	VisServicesPtr mServices;
@@ -70,7 +70,7 @@ private:
 	void readBuffer(QString buffer);
 	bool readShape(QString axisString, QString buffer);
 	bool readPositions(QString buffer, int bufferPos);
-	void updateRange();
+	void updateShapePointLockRange();
 	void showShape();
 };
 

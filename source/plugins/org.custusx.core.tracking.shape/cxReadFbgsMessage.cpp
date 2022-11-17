@@ -135,7 +135,7 @@ void ReadFbgsMessage::readBuffer(QString buffer)
 		pos = this->readPosForOneAxis(mAxis[i], bufferList, pos);
 		if(pos == -1)
 		{
-			CX_LOG_WARNING() << "Error reading " << getAxisString(mAxis[i]) << " values from TCP socket";
+			CX_LOG_WARNING() << "ReadFbgsMessage::readBuffer: Error reading " << getAxisString(mAxis[i]) << " values from TCP socket";
 			return;
 		}
 	}
@@ -153,13 +153,12 @@ int ReadFbgsMessage::readPosForOneAxis(AXIS axis, QStringList &bufferList, int p
 	int numValues;
 	if((bufferList.size() < 2) || !this->toInt(bufferList[pos++], numValues))
 		return -1;
-//	CX_LOG_DEBUG() << "numValues: " << numValues;
 
 	std::vector<double> *axisVextor = getAxisPosVector(axis);
 	int stopPos = pos + numValues;
 	if(stopPos > bufferList.size())
 	{
-		CX_LOG_WARNING() << "Buffer don't have enough (" << numValues << ") values along axis: " << getAxisString(axis);
+		CX_LOG_WARNING() << "ReadFbgsMessage::readPosForOneAxis: Buffer don't have enough (" << numValues << ") values along axis: " << getAxisString(axis);
 		return -1;
 	}
 	for(; pos < stopPos; ++pos)
@@ -168,7 +167,6 @@ int ReadFbgsMessage::readPosForOneAxis(AXIS axis, QStringList &bufferList, int p
 		if(!this->toDouble(bufferList[pos], value))
 			return -1;
 		axisVextor->push_back(value*10);
-		//CX_LOG_DEBUG() << "value : " << value;
 	}
 	return pos;
 }
@@ -178,7 +176,7 @@ bool ReadFbgsMessage::toInt(QString string, int &value)
 	bool ok;
 	value = string.toInt(&ok);
 	if(!ok)
-		CX_LOG_DEBUG() << "Cannot convert " << string << " to int";
+		CX_LOG_WARNING() << "ReadFbgsMessage::toInt: Cannot convert " << string << " to int";
 	return ok;
 }
 
@@ -193,7 +191,7 @@ bool ReadFbgsMessage::toDouble(QString string, double &value)
 		ok = this->toInt(string, intValue);
 		value = double(intValue);
 		if(!ok)
-			CX_LOG_DEBUG() << "Cannot convert " << string << " to double";
+			CX_LOG_WARNING() << "ReadFbgsMessage::toDouble: Cannot convert " << string << " to double";
 	}
 	return ok;
 }
@@ -205,7 +203,7 @@ int ReadFbgsMessage::getAxisStringPosition(QStringList &bufferList, AXIS axis, i
 		if (bufferList[i] == axisString)
 			return i;
 
-	CX_LOG_DEBUG() << "could't find separator string: " << axisString;
+	CX_LOG_WARNING() << "ReadFbgsMessage::getAxisStringPosition: Could't find separator string: " << axisString;
 	return -1;
 }
 
@@ -215,7 +213,7 @@ bool ReadFbgsMessage::createPolyData()
 	mRangeMax = mXaxis.size();
 	if((mRangeMax != mYaxis.size()) || (mRangeMax != mZaxis.size()))
 	{
-		CX_LOG_WARNING() << "Not equal number of position data in all axes";
+		CX_LOG_WARNING() << "ReadFbgsMessage::createPolyData: Not equal number of position data in all axes";
 		return false;
 	}
 	for(int i=0; i < mRangeMax; ++i)

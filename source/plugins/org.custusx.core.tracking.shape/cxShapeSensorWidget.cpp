@@ -55,7 +55,7 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	//Is tool selector needed?
 	ActiveToolWidget* activeToolWidget = new ActiveToolWidget(services->tracking(), this);
 	mSelector = activeToolWidget->getSelector();
-	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::toolChangedSlot);
 	//connect(services->tracking().get(), &TrackingService::activeToolChanged,this, &ShapeSensorWidget::activeToolChangedSlot);
 
 	//Connect to tool
@@ -90,7 +90,7 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	mVerticalLayout->addWidget(mTestShapeButton);
 	mVerticalLayout->addStretch();
 
-	this->activeToolChangedSlot();
+	this->toolChangedSlot();
 }
 
 ShapeSensorWidget::~ShapeSensorWidget()
@@ -143,7 +143,7 @@ void ShapeSensorWidget::shapePointLockChangedSlot()
 	mReadFbgsMessage.setShapePointLock(mShapePointLock->getValue());
 }
 
-void ShapeSensorWidget::updateRange()
+void ShapeSensorWidget::updateShapePointLockRange()
 {
 	int rangeMax = mReadFbgsMessage.getRangeMax();
 	if(rangeMax > 0)
@@ -192,7 +192,6 @@ void ShapeSensorWidget::connectClickedSlot()
 void ShapeSensorWidget::showClickedSlot()
 {
 	vtkPolyDataPtr polydata = mReadFbgsMessage.getPolyData();
-//	CX_LOG_DEBUG() << "showClickedSlot polydata points: " << polydata->GetPoints()->GetNumberOfPoints();
 	if(mShowShape)
 		mShowShapeButton->setText("Show shape");
 	else
@@ -235,44 +234,38 @@ void ShapeSensorWidget::dataAvailableSlot()
 		ok = mSocketConnection->socketReceive(&charSize, 4);
 		if(!ok)
 		{
-			CX_LOG_WARNING() << "Cannot read 4 characters from TCP socket";
+			CX_LOG_WARNING() << "ShapeSensorWidget::dataAvailableSlot: Cannot read 4 characters from TCP socket";
 			return;
 		}
-		//CX_LOG_DEBUG() << "convert 4 bytes to int: " << int(charSize[0]) << " " << int(charSize[1]) << " " << int(charSize[2]) << " " << int(charSize[3]);
 		mDataLenght = int( ( (unsigned char)(charSize[0]) << 24 )
 				| ( (unsigned char)(charSize[1]) << 16 )
 				| ( (unsigned char)(charSize[2]) << 8 )
 				| ( (unsigned char)(charSize[3]) ) );
-		//CX_LOG_DEBUG() << "mDataLenght: " << mDataLenght;
 	}
-//	else
-//		CX_LOG_DEBUG() << "Another try to read " << mDataLenght << " data";
 
 	char *charBuffer = (char*)malloc(mDataLenght);
 	ok = mSocketConnection->socketReceive(charBuffer, mDataLenght);
 	if(!ok)
-	{
-		//CX_LOG_DEBUG() << "Cannot read " << mDataLenght << " characters from TCP socket. Waiting...";
 		return;
-	}
 	else
 		mDataLenght = 0;
 	QString buffer(charBuffer);
 	free(charBuffer);
 	mReadFbgsMessage.readBuffer(buffer);
 
-	this->updateRange();
+	this->updateShapePointLockRange();
 }
 
-void ShapeSensorWidget::activeToolChangedSlot()
+void ShapeSensorWidget::toolChangedSlot()
 {
+// Alternative code for connecting to active tool instead of tool selector
 //	disconnect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
 //	mTool = mServices->tracking()->getActiveTool();
 //	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &ShapeSensorWidget::receiveTransforms);
 
-	disconnect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+	disconnect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::toolChangedSlot);
 	mTool = mServices->tracking()->getTool(mSelector->getValue());
-	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::activeToolChangedSlot);
+	connect(mSelector.get(), &StringPropertyBase::changed, this, &ShapeSensorWidget::toolChangedSlot);
 }
 
 void ShapeSensorWidget::receiveTransforms(Transform3D prMt, double timestamp)
