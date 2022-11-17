@@ -23,7 +23,6 @@ namespace cx
 {
 
 typedef std::map<double, Transform3D> TimedTransformMap;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BronchoscopyRegistration
 {

@@ -223,6 +223,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 	{
 		mRoutePositions.push_back(positions[i]);
+		mRoutePositionsBranch.push_back(searchBranchPtr);
 		mCameraRotation.push_back(cameraRotation);
 	}
 
@@ -614,16 +615,29 @@ double RouteToTarget::findDistanceToSegmentationEdge(vtkImageDataPtr bloodVessel
 	return retval;
 }
 
-std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions()
+std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions(bool extendedRoute)
 {
-    std::vector< Eigen::Vector3d > positions = mExtendedRoutePositions;
+
+	std::vector< Eigen::Vector3d > positions;
+	if(extendedRoute)
+		positions = mExtendedRoutePositions;
+	else
+		positions = mRoutePositions;
+
 	std::reverse(positions.begin(), positions.end());
 	return positions;
 }
 
+std::vector< BranchPtr > RouteToTarget::getRouteBranches()
+{
+	std::vector< BranchPtr > routePositionsBranch = mRoutePositionsBranch;
+	std::reverse(routePositionsBranch.begin(), routePositionsBranch.end());
+	return routePositionsBranch;
+}
+
 std::vector< double > RouteToTarget::getCameraRotation()
 {
-    std::vector< double > rotations = mExtendedCameraRotation;
+	std::vector< double > rotations = mExtendedCameraRotation;
 	std::reverse(rotations.begin(), rotations.end());
 	return rotations;
 }

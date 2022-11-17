@@ -5,6 +5,7 @@
 
 #include "cxMesh.h"
 #include <QDomElement>
+#include "cxForwardDeclarations.h"
 
 
 namespace cx
@@ -12,9 +13,6 @@ namespace cx
 
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
-typedef boost::shared_ptr<class Branch> BranchPtr;
-
 
 class org_custusx_filter_routetotarget_EXPORT RouteToTarget
 {
@@ -48,7 +46,8 @@ public:
 	double findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
-	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
+	std::vector< BranchPtr > getRouteBranches();
 	std::vector< double > getCameraRotation();
 	std::vector< int > getBranchingIndex();
 
@@ -69,12 +68,12 @@ private:
 	Vector3D mTargetPosition;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
+	std::vector<BranchPtr> mRoutePositionsBranch;
 	std::vector< double > mCameraRotation;
-    std::vector< double > mExtendedCameraRotation;
+	std::vector< double > mExtendedCameraRotation;
 	std::vector< Eigen::Vector3d > mBloodVesselRoutePositions;
 	std::vector< Eigen::Vector3d > mMergedAirwayAndBloodVesselRoutePositions;
 	std::vector< int > mBranchingIndex;
-	std::vector<BranchPtr> mSearchBranchPtrVector;
 	std::vector<int> mSearchIndexVector;
 	Eigen::MatrixXd mConnectedPointsInBVCL;
 	bool checkIfRouteToTargetEndsAtEndOfLastBranch();
@@ -83,13 +82,13 @@ private:
 
 Eigen::MatrixXd findClosestBloodVesselSegments(Eigen::MatrixXd bloodVesselPositions , Eigen::MatrixXd airwayPositions, Vector3D targetPosition);
 std::pair< Eigen::MatrixXd, Eigen::MatrixXd > findLocalPointsInCT(int closestCLIndex , Eigen::MatrixXd CLpoints);
-std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 std::vector< Eigen::Vector3d > getBranchPositions(BranchPtr branchPtr, int startIndex);
-double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 Eigen::MatrixXd convertToEigenMatrix(std::vector< Eigen::Vector3d > positionsVector);
 double variance(Eigen::VectorXd X);
 
 org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
+org_custusx_filter_routetotarget_EXPORT double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
+org_custusx_filter_routetotarget_EXPORT std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 
 } /* namespace cx */
 

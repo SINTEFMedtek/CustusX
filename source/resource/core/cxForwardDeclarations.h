@@ -147,6 +147,8 @@ typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
 
 // other stuff
+typedef boost::shared_ptr<class Branch> BranchPtr;
+typedef boost::shared_ptr<class BranchList> BranchListPtr;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 typedef boost::shared_ptr<class Clippers> ClippersPtr;
 typedef boost::shared_ptr<class CyclicActionLogger> CyclicActionLoggerPtr;

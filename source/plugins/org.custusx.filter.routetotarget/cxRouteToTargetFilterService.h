@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXROUTETOTARGETFILTER_H
 
 #include "org_custusx_filter_routetotarget_Export.h"
-
+#include "cxForwardDeclarations.h"
 #include "cxPatientModelService.h"
 #include "cxFilterImpl.h"
 
@@ -31,7 +31,6 @@ namespace cx
 
 
 typedef boost::shared_ptr<class RouteToTarget> RouteToTargetPtr;
-typedef boost::shared_ptr<class BranchList> BranchListPtr;
 
 class org_custusx_filter_routetotarget_EXPORT RouteToTargetFilter : public FilterImpl
 {
@@ -51,7 +50,8 @@ public:
 	static QString getNameSuffixAirwayModel();
 	static QString getNameSuffixAirwayAndVesselRTT();
 
-	std::vector< Eigen::Vector3d > getRoutePositions();
+	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
+	std::vector<BranchPtr> getRouteBranches();
 	std::vector< double > getCameraRotation();
 	std::vector< int > getBranchingIndex();
 
