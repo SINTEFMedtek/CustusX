@@ -82,7 +82,7 @@ protected:
 	int getAxisStringPosition(QStringList &bufferList, AXIS axis, int startFrom);
 	bool toInt(QString string, int &value);
 	bool toDouble(QString string, double &value);
-	virtual Vector3D lockShape(int position);
+	virtual Transform3D lockShape(int position);
 	Vector3D getDeltaPosition(int pos);
 };
 

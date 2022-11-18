@@ -220,12 +220,13 @@ bool ReadFbgsMessage::createPolyData()
 		CX_LOG_WARNING() << "ReadFbgsMessage::createPolyData: Not equal number of position data in all axes";
 		return false;
 	}
+
+	Transform3D prMshape = this->lockShape(mShapePointLockNumber);
 	for(int i=0; i < mRangeMax; ++i)
 	{
 		Vector3D p(mXaxis[i], mYaxis[i], mZaxis[i]);
-		mPoints->InsertNextPoint(p.begin());
-		if(i == mShapePointLockNumber)
-			this->lockShape(i);
+		Vector3D p_pr = prMshape * p;
+		mPoints->InsertNextPoint(p_pr.begin());
 	}
 
 	// fill cell points for the entire polydata.
@@ -243,7 +244,7 @@ bool ReadFbgsMessage::createPolyData()
 	return true;
 }
 
-Vector3D ReadFbgsMessage::lockShape(int position)
+Transform3D ReadFbgsMessage::lockShape(int position)
 {
 	Vector3D p(mXaxis[position], mYaxis[position], mZaxis[position]);
 
@@ -252,11 +253,13 @@ Vector3D ReadFbgsMessage::lockShape(int position)
 	Transform3D rotatePdirectionToZaxis = createTransformRotationBetweenVectors(delta_p, Vector3D::UnitZ());
 
 	Transform3D prMshape = m_prMt * rotatePdirectionToZaxis * translateToP.inv();
-	mActor->SetUserMatrix(prMshape.getVtkMatrix());
 
-	getMesh()->get_rMd_History()->setRegistration(prMshape);
+	// Transform points in vtkPolyData instead if setting a global transform
+//	mActor->SetUserMatrix(prMshape.getVtkMatrix());
+//	getMesh()->get_rMd_History()->setRegistration(prMshape);
+	getMesh()->get_rMd_History()->setRegistration(Transform3D::Identity());
 
-	return p;
+	return prMshape;
 }
 
 Vector3D ReadFbgsMessage::getDeltaPosition(int pos)

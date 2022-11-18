@@ -13,13 +13,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPolyData.h>
 #include "cxLogger.h"
 #include "cxVisServices.h"
+#include "cxVector3D.h"
 
 namespace cxtest {
 
 class ReadFbgsMessageTest : public cx::ReadFbgsMessage
 {
 public:
-	cx::Vector3D mShapePointLockVector = cx::Vector3D(0, 0, 0);
+	cx::Transform3D mShapePointLockTransform = cx::Transform3D::Identity();
 
 	ReadFbgsMessageTest() :
 		cx::ReadFbgsMessage(cx::VisServices::getNullObjects())
@@ -50,10 +51,10 @@ public:
 		return cx::ReadFbgsMessage::getAxisString(axis);
 	}
 
-	cx::Vector3D lockShape(int pos)
+	cx::Transform3D lockShape(int pos)
 	{
-		mShapePointLockVector = cx::ReadFbgsMessage::lockShape(pos);
-		return mShapePointLockVector;
+		mShapePointLockTransform = cx::ReadFbgsMessage::lockShape(pos);
+		return mShapePointLockTransform;
 	}
 
 	QString bufferWithOneValue()
@@ -149,7 +150,8 @@ TEST_CASE("ReadFbgsMessage: readBuffer with simple data", "[unit][plugins][org.c
 TEST_CASE("ReadFbgsMessage: Lock specific point to tool", "[unit][plugins][org.custusx.tracking.shape]")
 {
 	ReadFbgsMessageTest readFbgsMessage;
-	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(0, 0, 0));
+	cx::Transform3D identity = cx::Transform3D::Identity();
+	CHECK(cx::similar(readFbgsMessage.mShapePointLockTransform, identity));
 	QString buffer = readFbgsMessage.bufferWithThreeValues();
 	readFbgsMessage.setShapePointLock(1);
 	readFbgsMessage.readBuffer(buffer);
@@ -158,11 +160,11 @@ TEST_CASE("ReadFbgsMessage: Lock specific point to tool", "[unit][plugins][org.c
 	REQUIRE(polydata);
 	CHECK(polydata->GetNumberOfPoints() == 3);
 
-	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(10, 10, 10));//In data is in cm, while out data for CX in is mm
+	CHECK_FALSE(cx::similar(readFbgsMessage.mShapePointLockTransform, identity));
 
 	readFbgsMessage.setShapePointLock(2);
 	readFbgsMessage.readBuffer(buffer);
-	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(30, 30, 30));
+	CHECK_FALSE(cx::similar(readFbgsMessage.mShapePointLockTransform, identity));
 }
 
 TEST_CASE("ReadFbgsMessage: getDeltaPosition", "[unit][plugins][org.custusx.tracking.shape]")
