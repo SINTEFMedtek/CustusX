@@ -79,6 +79,16 @@ public:
 		buffer += "0	1	3	";
 		return buffer;
 	}
+
+	cx::Vector3D getDeltaPosition(int pos)
+	{
+		return cx::ReadFbgsMessage::getDeltaPosition((pos));
+	}
+
+	void setRangeMax(int range)
+	{
+		mRangeMax = range;
+	}
 };
 
 TEST_CASE("ReadFbgsMessage: createPolyData", "[unit][plugins][org.custusx.tracking.shape]")
@@ -152,6 +162,27 @@ TEST_CASE("ReadFbgsMessage: Lock specific point to tool", "[unit][plugins][org.c
 	readFbgsMessage.setShapePointLock(2);
 	readFbgsMessage.readBuffer(buffer);
 	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(30, 30, 30));
+}
+
+TEST_CASE("ReadFbgsMessage: getDeltaPosition", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	readFbgsMessage.setRangeMax(1);
+	cx::Vector3D delta_p = readFbgsMessage.getDeltaPosition(1);
+	CHECK(delta_p == cx::Vector3D(0,0,1));
+
+
+	QString buffer = readFbgsMessage.bufferWithThreeValues();
+	readFbgsMessage.readBuffer(buffer);
+	CHECK(readFbgsMessage.getRangeMax() == 3-1);//mRangeMax == 3, but getRangeMax() subtrackts 1
+
+	cx::Vector3D delta_p_max_3 = readFbgsMessage.getDeltaPosition(1);
+	CHECK(delta_p_max_3 != cx::Vector3D(0,0,1));
+
+	readFbgsMessage.setRangeMax(2);
+	cx::Vector3D delta_p_max_2 = readFbgsMessage.getDeltaPosition(1);
+	CHECK(delta_p_max_2 != cx::Vector3D(0,0,1));
+	CHECK(delta_p_max_2 != delta_p_max_3);
 }
 
 }//cxtest

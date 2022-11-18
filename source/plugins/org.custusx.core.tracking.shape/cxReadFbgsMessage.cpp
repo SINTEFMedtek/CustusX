@@ -254,8 +254,11 @@ Vector3D ReadFbgsMessage::lockShape(int position)
 Vector3D ReadFbgsMessage::getDeltaPosition(int pos)
 {
 	int localRange = 5;
-	if(mRangeMax < localRange * 2)
+	if(mRangeMax < 2)
 		return Vector3D(0,0,1);
+	else if(mRangeMax < localRange * 2)
+		localRange = mRangeMax/2;
+
 	int pos1 = pos - localRange;
 	int pos2 = pos + localRange;
 	int shift = 0;
