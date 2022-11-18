@@ -45,6 +45,7 @@ private slots:
 	void connectClickedSlot();
 	void showClickedSlot();
 	void testShapeClickedSlot();
+	void saveShapeClickedSlot();
 	void toolChangedSlot();
 	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
@@ -57,7 +58,8 @@ private:
 	QPushButton *mConnectButton;
 	QPushButton *mShowShapeButton;
 	QPushButton *mTestShapeButton;
-	ReadFbgsMessage mReadFbgsMessage;
+	QPushButton *mSaveShapeButton;
+	ReadFbgsMessagePtr mReadFbgsMessage = nullptr;
 	bool mShowShape = true;
 	StringPropertyBasePtr mSelector;
 	ToolPtr mTool;

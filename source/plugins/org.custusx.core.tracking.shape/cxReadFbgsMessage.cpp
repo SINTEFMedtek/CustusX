@@ -17,16 +17,21 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
-//#include <vtkFloatArray.h>
-//#include <vtkUnsignedCharArray.h>
 #include <vtkProperty.h>
 #include <vtkMatrix4x4.h>
 #include "cxLogger.h"
 #include "cxTransform3D.h"
+#include "cxMesh.h"
+#include "cxVisServices.h"
+#include "cxRegistrationTransform.h"
+#include "cxFileManagerService.h"
+#include "cxSessionStorageService.h"
+#include "cxTime.h"
 
 namespace cx
 {
-ReadFbgsMessage::ReadFbgsMessage()
+ReadFbgsMessage::ReadFbgsMessage(VisServicesPtr services) :
+	mServices(services)
 {
 	//Using code from cxToolTracer as a basis (Used by ToolRep3D)
 	mPolyData = vtkPolyDataPtr::New();
@@ -52,7 +57,6 @@ ReadFbgsMessage::ReadFbgsMessage()
 	mAxis.push_back(axisX);
 	mAxis.push_back(axisY);
 	mAxis.push_back(axisZ);
-
 }
 
 vtkPolyDataPtr ReadFbgsMessage::getPolyData()
@@ -234,6 +238,8 @@ bool ReadFbgsMessage::createPolyData()
 
 	mPolyData->Modified();
 	this->clearAxisVectors();
+
+	getMesh();
 	return true;
 }
 
@@ -247,6 +253,8 @@ Vector3D ReadFbgsMessage::lockShape(int position)
 
 	Transform3D prMshape = m_prMt * rotatePdirectionToZaxis * translateToP.inv();
 	mActor->SetUserMatrix(prMshape.getVtkMatrix());
+
+	getMesh()->get_rMd_History()->setRegistration(prMshape);
 
 	return p;
 }
@@ -287,4 +295,36 @@ void ReadFbgsMessage::clearAxisVectors()
 	mYaxis.clear();
 	mZaxis.clear();
 }
+
+MeshPtr ReadFbgsMessage::getMesh()
+{
+	//Using insertData adds the mesh as a CX mesh, while save just saves the file
+	//mServices->file()->save(mMesh, filename);
+
+	//Reuse existing mesh
+	mMesh = boost::dynamic_pointer_cast<Mesh>(mServices->patient()->getData(getMeshUid()));
+
+	if(!mMesh)
+	{
+		mMesh = Mesh::create(getMeshUid(),"FBGS fiber shape");
+		mMesh->setVtkPolyData(mPolyData);
+		mServices->patient()->insertData(mMesh, true);
+	}
+
+	if(!mMeshAdded)
+	{
+		//Need to set this once, to connect correctly to Mesh::changed signal
+		mMesh->setVtkPolyData(mPolyData);
+		mMeshAdded = true;
+	}
+	return mMesh;
+}
+
+void ReadFbgsMessage::saveMeshSnapshot()
+{
+	QString export_folder = mServices->session()->getSubFolder("Export");
+	QString filename = export_folder+"/"+mMesh->getUid()+ "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat()) + ".vtk";
+	mServices->file()->save(mMesh, filename);
+}
+
 }//cx

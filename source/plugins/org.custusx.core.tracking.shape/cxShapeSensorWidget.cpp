@@ -35,7 +35,8 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	BaseWidget(parent, "shape_sensor_widget", "Shape Sensor"),
 	mServices(services),
 	mVerticalLayout(new QVBoxLayout(this)),
-	mSocketConnection(new SocketConnection(this))
+	mSocketConnection(new SocketConnection(this)),
+	mReadFbgsMessage(new ReadFbgsMessage(services))
 {
 	SocketConnection::ConnectionInfo info = mSocketConnection->getConnectionInfo();
 	info.port = 5001;
@@ -64,10 +65,12 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 
 	mConnectButton = new QPushButton("Connect", this);
 	mShowShapeButton = new QPushButton("Hide shape", this);
+	mSaveShapeButton = new QPushButton("Save mesh snapshot to file", this);
 	mTestShapeButton = new QPushButton("Create test shape", this);
 
 	connect(mConnectButton, &QPushButton::clicked, this, &ShapeSensorWidget::connectClickedSlot);
 	connect(mShowShapeButton, &QPushButton::clicked, this, &ShapeSensorWidget::showClickedSlot);
+	connect(mSaveShapeButton, &QPushButton::clicked, this, &ShapeSensorWidget::saveShapeClickedSlot);
 	connect(mTestShapeButton, &QPushButton::clicked, this, &ShapeSensorWidget::testShapeClickedSlot);
 	connect(mSocketConnection.get(), &SocketConnection::stateChanged, this, &ShapeSensorWidget::connectStateChangedSlot);
 	connect(mSocketConnection.get(), &SocketConnection::dataAvailable, this, &ShapeSensorWidget::dataAvailableSlot);
@@ -87,6 +90,7 @@ ShapeSensorWidget::ShapeSensorWidget(VisServicesPtr services, QWidget* parent) :
 	mVerticalLayout->addWidget(activeToolWidget);
 	mVerticalLayout->addWidget(this->createHorizontalLine());
 	mVerticalLayout->addStretch(1);
+	mVerticalLayout->addWidget(mSaveShapeButton);
 	mVerticalLayout->addWidget(mTestShapeButton);
 	mVerticalLayout->addStretch();
 
@@ -140,12 +144,12 @@ DoublePropertyPtr ShapeSensorWidget::getShapePointLock(QDomElement root)
 
 void ShapeSensorWidget::shapePointLockChangedSlot()
 {
-	mReadFbgsMessage.setShapePointLock(mShapePointLock->getValue());
+	mReadFbgsMessage->setShapePointLock(mShapePointLock->getValue());
 }
 
 void ShapeSensorWidget::updateShapePointLockRange()
 {
-	int rangeMax = mReadFbgsMessage.getRangeMax();
+	int rangeMax = mReadFbgsMessage->getRangeMax();
 	if(rangeMax > 0)
 	{
 		DoubleRange range = mShapePointLock->getValueRange();
@@ -191,7 +195,7 @@ void ShapeSensorWidget::connectClickedSlot()
 
 void ShapeSensorWidget::showClickedSlot()
 {
-	vtkPolyDataPtr polydata = mReadFbgsMessage.getPolyData();
+	vtkPolyDataPtr polydata = mReadFbgsMessage->getPolyData();
 	if(mShowShape)
 		mShowShapeButton->setText("Show shape");
 	else
@@ -203,16 +207,16 @@ void ShapeSensorWidget::showClickedSlot()
 void ShapeSensorWidget::showShape()
 {
 	if(mShowShape)
-		mServices->view()->get3DView()->getRenderer()->AddActor(mReadFbgsMessage.getActor());
+		mServices->view()->get3DView()->getRenderer()->AddActor(mReadFbgsMessage->getActor());
 	else
-		mServices->view()->get3DView()->getRenderer()->RemoveActor(mReadFbgsMessage.getActor());
+		mServices->view()->get3DView()->getRenderer()->RemoveActor(mReadFbgsMessage->getActor());
 }
 
 void ShapeSensorWidget::testShapeClickedSlot()
 {
-	std::vector<double> *xAxis = mReadFbgsMessage.getAxisPosVector(ReadFbgsMessage::axisX);
-	std::vector<double> *yAxis = mReadFbgsMessage.getAxisPosVector(ReadFbgsMessage::axisY);
-	std::vector<double> *zAxis = mReadFbgsMessage.getAxisPosVector(ReadFbgsMessage::axisZ);
+	std::vector<double> *xAxis = mReadFbgsMessage->getAxisPosVector(ReadFbgsMessage::axisX);
+	std::vector<double> *yAxis = mReadFbgsMessage->getAxisPosVector(ReadFbgsMessage::axisY);
+	std::vector<double> *zAxis = mReadFbgsMessage->getAxisPosVector(ReadFbgsMessage::axisZ);
 	xAxis->push_back(0);
 	yAxis->push_back(0);
 	zAxis->push_back(0);
@@ -222,7 +226,12 @@ void ShapeSensorWidget::testShapeClickedSlot()
 		yAxis->push_back(i+std::rand()/((RAND_MAX + 1u)/3));
 		zAxis->push_back(i+std::rand()/((RAND_MAX + 1u)/3));
 	}
-	mReadFbgsMessage.createPolyData();
+	mReadFbgsMessage->createPolyData();
+}
+
+void ShapeSensorWidget::saveShapeClickedSlot()
+{
+	mReadFbgsMessage->saveMeshSnapshot();
 }
 
 void ShapeSensorWidget::dataAvailableSlot()
@@ -251,7 +260,7 @@ void ShapeSensorWidget::dataAvailableSlot()
 		mDataLenght = 0;
 	QString buffer(charBuffer);
 	free(charBuffer);
-	mReadFbgsMessage.readBuffer(buffer);
+	mReadFbgsMessage->readBuffer(buffer);
 
 	this->updateShapePointLockRange();
 }
@@ -270,6 +279,6 @@ void ShapeSensorWidget::toolChangedSlot()
 
 void ShapeSensorWidget::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	mReadFbgsMessage.set_prMt(prMt);
+	mReadFbgsMessage->set_prMt(prMt);
 }
 } /* namespace cx */

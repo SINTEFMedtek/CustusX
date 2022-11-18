@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxReadFbgsMessage.h"
 #include <vtkPolyData.h>
 #include "cxLogger.h"
+#include "cxVisServices.h"
 
 namespace cxtest {
 
@@ -21,7 +22,7 @@ public:
 	cx::Vector3D mShapePointLockVector = cx::Vector3D(0, 0, 0);
 
 	ReadFbgsMessageTest() :
-		cx::ReadFbgsMessage()
+		cx::ReadFbgsMessage(cx::VisServices::getNullObjects())
 	{}
 	bool createPolyData()
 	{
