@@ -76,6 +76,7 @@ SocketConnection::SocketConnection(QObject *parent) :
     connect(mSocket, &QTcpSocket::connected, this, &SocketConnection::internalConnected);
     connect(mSocket, &QTcpSocket::disconnected, this, &SocketConnection::internalDisconnected);
     connect(mSocket, &QTcpSocket::readyRead, this, &SocketConnection::internalDataAvailable);
+	connect(mSocket, &QTcpSocket::readyRead, this, &SocketConnection::dataAvailable);
 
     //see http://stackoverflow.com/questions/26062397/qt-connect-function-signal-disambiguation-using-lambdas
     void (QTcpSocket::* errorOverloaded)(QAbstractSocket::SocketError) = &QTcpSocket::error;
@@ -184,7 +185,18 @@ void SocketConnection::internalError(QAbstractSocket::SocketError socketError)
                       .arg(QString::number(socketError))
                       .arg(mSocket->errorString());
 
-    this->stateChange(this->computeState());
+	this->stateChange(this->computeState());
+}
+
+void SocketConnection::internalDataAvailable()
+{
+	//TODO
+	//CX_LOG_DEBUG() << "Read data";
+}
+
+void SocketConnection::setProtocol(QString protocolname)
+{
+	//TODO?
 }
 
 bool SocketConnection::socketIsConnected()
@@ -195,8 +207,8 @@ bool SocketConnection::socketIsConnected()
 bool SocketConnection::enoughBytesAvailableOnSocket(int bytes) const
 {
     bool enoughBytes = mSocket->bytesAvailable() >= bytes;
-    if(!enoughBytes)
-        CX_LOG_DEBUG() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket atm.";
+//    if(!enoughBytes)
+//        CX_LOG_DEBUG() << "Want " << bytes << " but only "<< mSocket->bytesAvailable() << " are available on the socket atm.";
     return enoughBytes;
 }
 
