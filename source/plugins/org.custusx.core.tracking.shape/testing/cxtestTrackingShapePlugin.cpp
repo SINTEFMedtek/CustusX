@@ -96,6 +96,10 @@ public:
 	{
 		return mMeshAdded;
 	}
+	cx::Transform3D getPrMt()
+	{
+		return m_prMt;
+	}
 };
 
 TEST_CASE("ReadFbgsMessage: createPolyData", "[unit][plugins][org.custusx.tracking.shape]")
@@ -214,4 +218,12 @@ TEST_CASE("ReadFbgsMessage: saveMeshSnapshot", "[unit][plugins][org.custusx.trac
 	CHECK(readFbgsMessage.saveMeshSnapshot());
 }
 
+TEST_CASE("ReadFbgsMessage: set_prMt", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	CHECK(cx::similar(readFbgsMessage.getPrMt(), cx::Transform3D::Identity()));
+	cx::Transform3D prMt = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(2,2,2)));
+	readFbgsMessage.set_prMt(prMt);
+	CHECK(cx::similar(readFbgsMessage.getPrMt(), prMt));
+}
 }//cxtest

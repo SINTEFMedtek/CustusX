@@ -31,7 +31,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 ReadFbgsMessage::ReadFbgsMessage(VisServicesPtr services) :
-	mServices(services)
+	mServices(services),
+	m_prMt(Transform3D::Identity())
 {
 	//Using code from cxToolTracer as a basis (Used by ToolRep3D)
 	mPolyData = vtkPolyDataPtr::New();
