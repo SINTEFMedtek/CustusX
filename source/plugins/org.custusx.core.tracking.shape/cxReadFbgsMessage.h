@@ -54,7 +54,7 @@ public:
 	std::vector<double> *getAxisPosVector(AXIS axis);
 	int getRangeMax();
 	MeshPtr getMesh();
-	void saveMeshSnapshot();
+	bool saveMeshSnapshot();
 	static QString getMeshUid() {return QString("FBGS_fiber");}
 protected:
 	VisServicesPtr mServices;

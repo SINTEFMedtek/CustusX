@@ -318,11 +318,17 @@ MeshPtr ReadFbgsMessage::getMesh()
 	return mMesh;
 }
 
-void ReadFbgsMessage::saveMeshSnapshot()
+bool ReadFbgsMessage::saveMeshSnapshot()
 {
+	if(!mMesh)
+	{
+		CX_LOG_WARNING() << "ReadFbgsMessage::saveMeshSnapshot: No mesh";
+		return false;
+	}
 	QString export_folder = mServices->session()->getSubFolder("Export");
 	QString filename = export_folder+"/"+mMesh->getUid()+ "_" + QDateTime::currentDateTime().toString(timestampSecondsFormat()) + ".vtk";
 	mServices->file()->save(mMesh, filename);
+	return true;
 }
 
 }//cx

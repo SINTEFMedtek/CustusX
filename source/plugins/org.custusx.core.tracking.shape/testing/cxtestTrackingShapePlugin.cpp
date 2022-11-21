@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxVisServices.h"
 #include "cxVector3D.h"
+#include "cxMesh.h"
 
 namespace cxtest {
 
@@ -91,6 +92,10 @@ public:
 	{
 		mRangeMax = range;
 	}
+	bool getMeshAdded()
+	{
+		return mMeshAdded;
+	}
 };
 
 TEST_CASE("ReadFbgsMessage: createPolyData", "[unit][plugins][org.custusx.tracking.shape]")
@@ -127,8 +132,8 @@ TEST_CASE("ReadFbgsMessage: readBuffer with incomplete data", "[unit][plugins][o
 	readFbgsMessage.readBuffer(buffer);
 	buffer += "0	";
 	readFbgsMessage.readBuffer(buffer);
-	CHECK(true);
 
+	CHECK_FALSE(readFbgsMessage.createPolyData());
 }
 
 TEST_CASE("ReadFbgsMessage: readBuffer with simple data", "[unit][plugins][org.custusx.tracking.shape]")
@@ -186,6 +191,27 @@ TEST_CASE("ReadFbgsMessage: getDeltaPosition", "[unit][plugins][org.custusx.trac
 	cx::Vector3D delta_p_max_2 = readFbgsMessage.getDeltaPosition(1);
 	CHECK(delta_p_max_2 != cx::Vector3D(0,0,1));
 	CHECK(delta_p_max_2 != delta_p_max_3);
+}
+
+TEST_CASE("ReadFbgsMessage: getMesh", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	CHECK_FALSE(readFbgsMessage.getMeshAdded());
+	cx::MeshPtr mesh = readFbgsMessage.getMesh();
+	CHECK(readFbgsMessage.getMeshAdded());
+	REQUIRE(mesh);
+	CHECK(mesh->getUid() == readFbgsMessage.getMeshUid());
+
+	CHECK(mesh->getVtkPolyData() == readFbgsMessage.getPolyData());
+}
+
+TEST_CASE("ReadFbgsMessage: saveMeshSnapshot", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	CHECK_FALSE(readFbgsMessage.saveMeshSnapshot());
+
+	cx::MeshPtr mesh = readFbgsMessage.getMesh();
+	CHECK(readFbgsMessage.saveMeshSnapshot());
 }
 
 }//cxtest
