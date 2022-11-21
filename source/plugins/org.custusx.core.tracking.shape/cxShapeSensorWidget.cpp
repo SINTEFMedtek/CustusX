@@ -189,7 +189,6 @@ void ShapeSensorWidget::connectClickedSlot()
 		mSocketConnection->requestDisconnect();
 
 	this->showShape();
-//	this->adjustSize();
 }
 
 

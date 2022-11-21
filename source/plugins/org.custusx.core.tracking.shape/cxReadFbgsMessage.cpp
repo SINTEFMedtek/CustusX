@@ -253,12 +253,6 @@ Transform3D ReadFbgsMessage::lockShape(int position)
 	Transform3D rotatePdirectionToZaxis = createTransformRotationBetweenVectors(delta_p, Vector3D::UnitZ());
 
 	Transform3D prMshape = m_prMt * rotatePdirectionToZaxis * translateToP.inv();
-
-	// Transform points in vtkPolyData instead if setting a global transform
-//	mActor->SetUserMatrix(prMshape.getVtkMatrix());
-//	getMesh()->get_rMd_History()->setRegistration(prMshape);
-	getMesh()->get_rMd_History()->setRegistration(Transform3D::Identity());
-
 	return prMshape;
 }
 
@@ -310,6 +304,7 @@ MeshPtr ReadFbgsMessage::getMesh()
 	if(!mMesh)
 	{
 		mMesh = Mesh::create(getMeshUid(),"FBGS fiber shape");
+		mMesh->getProperties().mLineWidth->setValue(5);
 		mMesh->setVtkPolyData(mPolyData);
 		mServices->patient()->insertData(mMesh, true);
 	}
