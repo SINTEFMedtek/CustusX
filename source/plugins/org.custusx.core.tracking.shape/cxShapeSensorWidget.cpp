@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <QApplication>
 #include <string>
 #include <vtkRenderer.h>
 #include <vtkPolyData.h>
@@ -235,33 +236,76 @@ void ShapeSensorWidget::saveShapeClickedSlot()
 
 void ShapeSensorWidget::dataAvailableSlot()
 {
+	this->processData();
+}
+
+void ShapeSensorWidget::processData()
+{
+	//This processing could cause the GUI to slow down. Especially opening new windows seems to fail
+	//Using prePaintEvent Don't work for rendering in 3D scene
+	//Could possibly use RenderLoop::preRender in ViewImplService
+	//Current solution is to first process all events in the QEventLoop:
+	qApp->processEvents();
+
+	bool bufferUpdated = this->readBuffer();
+	if(!bufferUpdated)
+		return;
+
+	mReadFbgsMessage->readBuffer(mBuffer);
+	this->updateShapePointLockRange();
+}
+
+bool ShapeSensorWidget::readBuffer()
+{
+	bool ok = this->readMessageLenght();
+	if(!ok)
+		return false;
+
+	bool bufferUpdated = false;
+	int numberRead = 0;
+
+	//Read messages until we get the latest
+
+	QTime timer;
+	timer.start();
+	do
+	{
+		char *charBuffer = (char*)malloc(mDataLenght);
+		ok = mSocketConnection->socketReceive(charBuffer, mDataLenght);
+		if(ok)
+		{
+			bufferUpdated = true;
+			mDataLenght = 0;
+			mBuffer = QString(charBuffer);
+			ok = this->readMessageLenght();
+			if(ok)
+				numberRead++;
+		}
+		free(charBuffer);
+	}
+	while (ok);
+//	CX_LOG_DEBUG() << "Read " << numberRead << " tcp messages.";
+	return bufferUpdated;
+}
+
+bool ShapeSensorWidget::readMessageLenght()
+{
 	bool ok = true;
-	if(mDataLenght == 0)//Use previously read value
+	if(mDataLenght == 0)//Use previously read value, if not whole buffer could be read last time
 	{
 		unsigned char charSize[4];
 		ok = mSocketConnection->socketReceive(&charSize, 4);
 		if(!ok)
 		{
-			CX_LOG_WARNING() << "ShapeSensorWidget::dataAvailableSlot: Cannot read 4 characters from TCP socket";
-			return;
+			//CX_LOG_WARNING() << "ShapeSensorWidget::readMessageLenght: Cannot read 4 characters from TCP socket";
+			return false;
 		}
 		mDataLenght = int( ( (unsigned char)(charSize[0]) << 24 )
 				| ( (unsigned char)(charSize[1]) << 16 )
 				| ( (unsigned char)(charSize[2]) << 8 )
 				| ( (unsigned char)(charSize[3]) ) );
 	}
-
-	char *charBuffer = (char*)malloc(mDataLenght);
-	ok = mSocketConnection->socketReceive(charBuffer, mDataLenght);
-	if(!ok)
-		return;
-	else
-		mDataLenght = 0;
-	QString buffer(charBuffer);
-	free(charBuffer);
-	mReadFbgsMessage->readBuffer(buffer);
-
-	this->updateShapePointLockRange();
+	return true;
 }
 
 void ShapeSensorWidget::toolChangedSlot()

@@ -64,6 +64,7 @@ private:
 	StringPropertyBasePtr mSelector;
 	ToolPtr mTool;
 	int mDataLenght = 0;
+	QString mBuffer;
 
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);
@@ -74,6 +75,9 @@ private:
 	bool readPositions(QString buffer, int bufferPos);
 	void updateShapePointLockRange();
 	void showShape();
+	bool readBuffer();
+	bool readMessageLenght();
+	void processData();
 };
 
 } /* namespace cx */
