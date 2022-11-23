@@ -139,6 +139,7 @@ private:
 	static ProfileManager* mInstance; ///< The only instance of this class that can exist.
 	ProfilePtr mActive;
 	QSettingsPtr getGenericSettings();
+	QSettingsPtr getGenericSettingsFromInstaller();
 
 	SettingsPtr mSettings; ///< used by Profile, changes content for each profile change
 
