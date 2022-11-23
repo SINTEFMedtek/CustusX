@@ -141,7 +141,7 @@ void ReadFbgsMessage::readBuffer(QString buffer)
 		if(pos == -1)
 		{
 			CX_LOG_WARNING() << "ReadFbgsMessage::readBuffer: Error reading " << getAxisString(mAxis[i]) << " values from TCP socket";
-			CX_LOG_DEBUG() << "buffer: " << buffer;
+//			CX_LOG_DEBUG() << "buffer: " << buffer;
 			return;
 		}
 	}
