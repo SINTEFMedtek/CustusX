@@ -18,9 +18,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QColor>
 #include "vtkForwardDeclarations.h"
 #include "cxTransform3D.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class ReadFbgsMessage> ReadFbgsMessagePtr;
+
 /**
  * Class for decoding the messages from the FBGS, and creating a vtkPolyData.
  *
@@ -39,7 +43,7 @@ public:
 		axisZ,
 		axisCOUNT
 	};
-	ReadFbgsMessage();
+	ReadFbgsMessage(VisServicesPtr services);
 	void readBuffer(QString buffer);
 	void setColor(QColor color);
 	vtkPolyDataPtr getPolyData();
@@ -49,7 +53,11 @@ public:
 	bool createPolyData();
 	std::vector<double> *getAxisPosVector(AXIS axis);
 	int getRangeMax();
+	MeshPtr getMesh();
+	bool saveMeshSnapshot();
+	static QString getMeshUid() {return QString("FBGS_fiber");}
 protected:
+	VisServicesPtr mServices;
 	vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
 	vtkActorPtr mActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
@@ -59,6 +67,8 @@ protected:
 	int mShapePointLockNumber = 0;
 	Transform3D m_prMt;
 	int mRangeMax = 0;
+	MeshPtr mMesh;
+	bool mMeshAdded = false;
 
 	std::vector<AXIS> mAxis;
 	std::vector<double> mXaxis;
@@ -72,7 +82,7 @@ protected:
 	int getAxisStringPosition(QStringList &bufferList, AXIS axis, int startFrom);
 	bool toInt(QString string, int &value);
 	bool toDouble(QString string, double &value);
-	virtual Vector3D lockShape(int position);
+	virtual Transform3D lockShape(int position);
 	Vector3D getDeltaPosition(int pos);
 };
 

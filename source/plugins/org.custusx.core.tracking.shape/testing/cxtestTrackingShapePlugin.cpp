@@ -12,16 +12,19 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxReadFbgsMessage.h"
 #include <vtkPolyData.h>
 #include "cxLogger.h"
+#include "cxVisServices.h"
+#include "cxVector3D.h"
+#include "cxMesh.h"
 
 namespace cxtest {
 
 class ReadFbgsMessageTest : public cx::ReadFbgsMessage
 {
 public:
-	cx::Vector3D mShapePointLockVector = cx::Vector3D(0, 0, 0);
+	cx::Transform3D mShapePointLockTransform = cx::Transform3D::Identity();
 
 	ReadFbgsMessageTest() :
-		cx::ReadFbgsMessage()
+		cx::ReadFbgsMessage(cx::VisServices::getNullObjects())
 	{}
 	bool createPolyData()
 	{
@@ -49,10 +52,10 @@ public:
 		return cx::ReadFbgsMessage::getAxisString(axis);
 	}
 
-	cx::Vector3D lockShape(int pos)
+	cx::Transform3D lockShape(int pos)
 	{
-		mShapePointLockVector = cx::ReadFbgsMessage::lockShape(pos);
-		return mShapePointLockVector;
+		mShapePointLockTransform = cx::ReadFbgsMessage::lockShape(pos);
+		return mShapePointLockTransform;
 	}
 
 	QString bufferWithOneValue()
@@ -88,6 +91,14 @@ public:
 	void setRangeMax(int range)
 	{
 		mRangeMax = range;
+	}
+	bool getMeshAdded()
+	{
+		return mMeshAdded;
+	}
+	cx::Transform3D getPrMt()
+	{
+		return m_prMt;
 	}
 };
 
@@ -125,8 +136,8 @@ TEST_CASE("ReadFbgsMessage: readBuffer with incomplete data", "[unit][plugins][o
 	readFbgsMessage.readBuffer(buffer);
 	buffer += "0	";
 	readFbgsMessage.readBuffer(buffer);
-	CHECK(true);
 
+	CHECK_FALSE(readFbgsMessage.createPolyData());
 }
 
 TEST_CASE("ReadFbgsMessage: readBuffer with simple data", "[unit][plugins][org.custusx.tracking.shape]")
@@ -148,7 +159,8 @@ TEST_CASE("ReadFbgsMessage: readBuffer with simple data", "[unit][plugins][org.c
 TEST_CASE("ReadFbgsMessage: Lock specific point to tool", "[unit][plugins][org.custusx.tracking.shape]")
 {
 	ReadFbgsMessageTest readFbgsMessage;
-	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(0, 0, 0));
+	cx::Transform3D identity = cx::Transform3D::Identity();
+	CHECK(cx::similar(readFbgsMessage.mShapePointLockTransform, identity));
 	QString buffer = readFbgsMessage.bufferWithThreeValues();
 	readFbgsMessage.setShapePointLock(1);
 	readFbgsMessage.readBuffer(buffer);
@@ -157,11 +169,11 @@ TEST_CASE("ReadFbgsMessage: Lock specific point to tool", "[unit][plugins][org.c
 	REQUIRE(polydata);
 	CHECK(polydata->GetNumberOfPoints() == 3);
 
-	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(10, 10, 10));//In data is in cm, while out data for CX in is mm
+	CHECK_FALSE(cx::similar(readFbgsMessage.mShapePointLockTransform, identity));
 
 	readFbgsMessage.setShapePointLock(2);
 	readFbgsMessage.readBuffer(buffer);
-	CHECK(readFbgsMessage.mShapePointLockVector == cx::Vector3D(30, 30, 30));
+	CHECK_FALSE(cx::similar(readFbgsMessage.mShapePointLockTransform, identity));
 }
 
 TEST_CASE("ReadFbgsMessage: getDeltaPosition", "[unit][plugins][org.custusx.tracking.shape]")
@@ -185,4 +197,33 @@ TEST_CASE("ReadFbgsMessage: getDeltaPosition", "[unit][plugins][org.custusx.trac
 	CHECK(delta_p_max_2 != delta_p_max_3);
 }
 
+TEST_CASE("ReadFbgsMessage: getMesh", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	CHECK_FALSE(readFbgsMessage.getMeshAdded());
+	cx::MeshPtr mesh = readFbgsMessage.getMesh();
+	CHECK(readFbgsMessage.getMeshAdded());
+	REQUIRE(mesh);
+	CHECK(mesh->getUid() == readFbgsMessage.getMeshUid());
+
+	CHECK(mesh->getVtkPolyData() == readFbgsMessage.getPolyData());
+}
+
+TEST_CASE("ReadFbgsMessage: saveMeshSnapshot", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	CHECK_FALSE(readFbgsMessage.saveMeshSnapshot());
+
+	cx::MeshPtr mesh = readFbgsMessage.getMesh();
+	CHECK(readFbgsMessage.saveMeshSnapshot());
+}
+
+TEST_CASE("ReadFbgsMessage: set_prMt", "[unit][plugins][org.custusx.tracking.shape]")
+{
+	ReadFbgsMessageTest readFbgsMessage;
+	CHECK(cx::similar(readFbgsMessage.getPrMt(), cx::Transform3D::Identity()));
+	cx::Transform3D prMt = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(2,2,2)));
+	readFbgsMessage.set_prMt(prMt);
+	CHECK(cx::similar(readFbgsMessage.getPrMt(), prMt));
+}
 }//cxtest

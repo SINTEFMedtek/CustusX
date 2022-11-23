@@ -45,6 +45,7 @@ private slots:
 	void connectClickedSlot();
 	void showClickedSlot();
 	void testShapeClickedSlot();
+	void saveShapeClickedSlot();
 	void toolChangedSlot();
 	void receiveTransforms(Transform3D prMt, double timestamp);
 private:
@@ -57,11 +58,13 @@ private:
 	QPushButton *mConnectButton;
 	QPushButton *mShowShapeButton;
 	QPushButton *mTestShapeButton;
-	ReadFbgsMessage mReadFbgsMessage;
+	QPushButton *mSaveShapeButton;
+	ReadFbgsMessagePtr mReadFbgsMessage = nullptr;
 	bool mShowShape = true;
 	StringPropertyBasePtr mSelector;
 	ToolPtr mTool;
 	int mDataLenght = 0;
+	QString mBuffer;
 
 	QString defaultWhatsThis() const;
 	StringPropertyBasePtr getIPAddress(QDomElement root);
@@ -72,6 +75,9 @@ private:
 	bool readPositions(QString buffer, int bufferPos);
 	void updateShapePointLockRange();
 	void showShape();
+	bool readBuffer();
+	bool readMessageLenght();
+	void processData();
 };
 
 } /* namespace cx */
