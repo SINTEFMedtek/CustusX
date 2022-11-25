@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxDicomConverter.h"
 #include "cxDicomImageReader.h"
+#include "cxReporter.h"
 
 namespace cx
 {
@@ -33,6 +34,10 @@ DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 // so output should only be used for debug.
 bool DICOMReader::canRead(const QString &type, const QString &filename)
 {
+	//Assume DICOM if filename is a directory
+	if(QFileInfo(filename).isDir())
+		return true;
+
 	QString fileType = QFileInfo(filename).suffix();
 	QFile file(filename);
 	bool opened = file.open(QIODevice::ReadOnly);
@@ -125,6 +130,10 @@ bool DICOMReader::canWrite(const QString &type, const QString &filename) const
 //Also copied DicomConverter and DicomImageReader files from the dicom plugin
 std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestSeries)
 {
+	//Turn off Qt messages temporarily
+	CX_LOG_DEBUG() << "stopQtMessages";
+	reporter()->stopQtMessages();
+
 	cx::DicomConverter converter;
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
 	database->openDatabase(":memory:");
@@ -134,7 +143,7 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	QString folder = dir.absolutePath();
 
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
-	DICOMIndexer->addDirectory(*database,folder,"");
+	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out a list of all files
 	std::vector<ImagePtr> retval;
 	if(readBestSeries)
 		retval = importBestSeries(database);
@@ -143,6 +152,9 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 
 	database->closeDatabase();
 
+	//Turn Qt messages back on
+	reporter()->startQtMessages();
+	CX_LOG_DEBUG() << "startQtMessages";
 	return retval;
 }
 

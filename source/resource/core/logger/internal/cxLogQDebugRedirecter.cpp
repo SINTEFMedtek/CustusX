@@ -63,5 +63,7 @@ void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, c
 	reporter()->sendMessage(message);
 }
 
+void silenceQtMessages(QtMsgType type, const QMessageLogContext &, const QString &msg)
+{}
 
 } //End namespace cx
