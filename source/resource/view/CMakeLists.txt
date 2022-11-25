@@ -3,6 +3,7 @@
 ###########################################################
 
 find_package(GLEW REQUIRED)
+find_package(CTK REQUIRED)
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
@@ -136,6 +137,7 @@ qt5_wrap_cpp( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     cxResource
     cxPluginUtilities
+    CTKWidgets
     ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
@@ -167,6 +169,7 @@ target_include_directories(cxResourceVisualization
     ./View/internal/ViewMixed
     ./View/internal/ViewWidget
     ${GLEW_INCLUDE_DIRS}
+    ${CTK_USE_FILE}
 )
 target_link_libraries(cxResourceVisualization
     PRIVATE
