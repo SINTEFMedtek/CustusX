@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QFileInfo>
+#include <vtkImageData.h>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
 #include "cxFileManagerService.h"
@@ -67,8 +68,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
-	mTableWidget->setColumnCount(4);
-	mTableHeader<<"#"<<"Type"<<"Name"<<"Space";
+	mTableWidget->setColumnCount(5);
+	mTableHeader<<"#"<<"Type"<<"Name"<<"Space"<<"Num slices";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setStretchLastSection(true);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -156,6 +157,11 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 
 	if(image)
 	{
+		int dims[3];
+		image->getBaseVtkImageData()->GetDimensions(dims);
+		QString numSlices = QString::number(dims[2]);
+		mTableWidget->setItem(mTableWidget->rowCount()-1, 4, new QTableWidgetItem(numSlices));
+
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
 		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
 		mModalityAdapter->setData(image);

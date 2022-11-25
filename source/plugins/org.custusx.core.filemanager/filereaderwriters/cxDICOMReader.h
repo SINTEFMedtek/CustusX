@@ -52,8 +52,11 @@ public:
 	virtual vtkImageDataPtr loadVtkImageData(QString filename);
 
 protected:
-	ImagePtr importSeries(QString fileName);
+	std::vector<ImagePtr> importSeries(QString fileName, bool readBestSeries);
 	QString getBestDICOMSeries(ctkDICOMDatabasePtr database);
+	QStringList getAllDICOMSeries(ctkDICOMDatabasePtr database);
+	std::vector<ImagePtr> importBestSeries(ctkDICOMDatabasePtr database);
+	std::vector<ImagePtr> importAllSeries(ctkDICOMDatabasePtr database);
 };
 
 } //cx
