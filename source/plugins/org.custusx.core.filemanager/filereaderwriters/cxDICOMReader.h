@@ -57,6 +57,7 @@ protected:
 	QStringList getAllDICOMSeries(ctkDICOMDatabasePtr database);
 	std::vector<ImagePtr> importBestSeries(ctkDICOMDatabasePtr database);
 	std::vector<ImagePtr> importAllSeries(ctkDICOMDatabasePtr database);
+	void stopDCMTKMessages();
 };
 
 } //cx

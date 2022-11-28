@@ -22,12 +22,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDicomImageReader.h"
 #include "cxReporter.h"
 
+//dcmtk includes
+#include "dcmtk/config/osconfig.h"
+#include "dcmtk/oflog/nullap.h"
+
 namespace cx
 {
 DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 	FileReaderWriterImplService("DICOMReader" ,Image::getTypeName(), "", "dcm *", patientModelService)
 {
-
+	this->stopDCMTKMessages();
 }
 
 // This function is used for checking all readers if they can read a file,
@@ -134,10 +138,8 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	CX_LOG_DEBUG() << "stopQtMessages";
 	reporter()->stopQtMessages();
 
-	cx::DicomConverter converter;
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
 	database->openDatabase(":memory:");
-	converter.setDicomDatabase(database.data());
 
 	QFileInfo dir = QFileInfo(fileName);
 	QString folder = dir.absolutePath();
@@ -156,6 +158,24 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	reporter()->startQtMessages();
 	CX_LOG_DEBUG() << "startQtMessages";
 	return retval;
+}
+
+void DICOMReader::stopDCMTKMessages()
+{
+	//DCMTK sometimes prints a lot of warnings about zeroes in the data:
+	//W: DcmItem: Element (0000,0000) found twice in one dataset/item, ignoring second entry
+	//This can delay the application several minutes
+
+	//Still this soution is also a bit slow. Removing the warning print line in DCMTK is faster:
+	//in DcmItem::readSubElement() - line 1104 and 1105:
+	//DCMDATA_WARN("DcmItem: Element " << newTag << " found twice in one dataset/item, ignoring second entry");
+
+	//Example from: https://support.dcmtk.org/redmine/projects/dcmtk/wiki/howto_logprogram
+	dcmtk::log4cplus::SharedAppenderPtr nullapp(new dcmtk::log4cplus::NullAppender());
+	/* make sure that only the null logger is used */
+	dcmtk::log4cplus::Logger log = dcmtk::log4cplus::Logger::getRoot();
+	log.removeAllAppenders();
+	log.addAppender(nullapp);
 }
 
 std::vector<ImagePtr> DICOMReader::importBestSeries(ctkDICOMDatabasePtr database)
