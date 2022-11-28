@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPushButton>
 #include <QLabel>
 #include <QTableWidget>
+#include <QListView>
 #include <QHeaderView>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -160,7 +161,7 @@ void ImportWidget::addMoreFilesButtonClicked()
 				//All DICOM files can be added to a QStringList before sending them to the reader.
 				//Then the reader can determine which files are from the same/different series
 				CX_LOG_WARNING() << "Import of multiple DICOM series at once is not supported. Skipping series based on file: " << filename;
-				continue;
+				//continue;//Need to remove?
 			}
 			addedDICOM = true;
 		}
@@ -168,9 +169,12 @@ void ImportWidget::addMoreFilesButtonClicked()
 		mFileNames.push_back(filename);
 
 		std::vector<DataPtr> newData = mFileManager->read(filename);
+//		CX_LOG_DEBUG() << "filename: " << filename << " newData.size: " << newData.size();
+		//The ImportDataTypeWidget based on DICOM data gets a strange title, or unconnected GUI objects?
 		if(newData.size() > 0)
 		{
 			int index = this->insertDataIntoTable(filename, newData);
+//			CX_LOG_DEBUG() << "index: " << index;
 			widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
 			mStackedWidget->insertWidget(index, widget);
 			mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
@@ -253,14 +257,69 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 {
 	QString file_type_filter = generateFileTypeFilter();
 
-	QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
+	//QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
+
+	QFileDialog dialog(this->parentWidget(), QString(tr("Select data file(s) for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
+	dialog.setFileMode(QFileDialog::Directory);
+
+	// Select multiple files and directories at the same time in QFileDialog
+	//https://www.qtcentre.org/threads/43841-QFileDialog-to-select-files-AND-folders
+	dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+	QListView *l = dialog.findChild<QListView*>("listView");
+	if (l)
+		l->setSelectionMode(QAbstractItemView::MultiSelection);
+	QTreeView *t = dialog.findChild<QTreeView*>();
+	if (t)
+		t->setSelectionMode(QAbstractItemView::MultiSelection);
+
+	QStringList fileName;
+	if (dialog.exec())
+		fileName = dialog.selectedFiles();
+	fileName = removeDirIfSubdirIsIncluded(fileName);
+
 	if (fileName.empty())
 	{
 		report("Import canceled");
 	}
 
 	return fileName;
+}
 
+QStringList ImportWidget::removeDirIfSubdirIsIncluded(QStringList importFiles)
+{
+	QStringList retval;
+	QStringList allDirs;
+	for(int i = 0; i < importFiles.size(); ++i)
+	{
+		if(!QFileInfo(importFiles[i]).isDir())
+			retval << importFiles[i];//Insert all files
+		else
+			allDirs << importFiles[i];
+	}
+
+	QStringList removeDirs;
+	for(int i = 0; i < allDirs.size(); ++i)
+	{
+		for(int j = 0; j < allDirs.size(); ++j)
+		{
+			if(i != j)
+				if(allDirs[i].contains(allDirs[j]))
+					removeDirs << allDirs[j];
+		}
+	}
+	for(int i = 0; i < allDirs.size(); ++i)
+	{
+		bool addDir = true;
+		for(int j  = 0; j < removeDirs.size(); ++j)
+		{
+			if(allDirs[i] == removeDirs[j])
+				addDir = false;
+		}
+		if(addDir)
+			retval << allDirs[i];
+	}
+
+	return retval;
 }
 
 QString ImportWidget::generateFileTypeFilter() const

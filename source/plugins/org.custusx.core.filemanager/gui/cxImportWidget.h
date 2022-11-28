@@ -54,6 +54,7 @@ private:
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 	int findRowIndexContainingButton(QPushButton *button) const;
 	void clearData();
+	QStringList removeDirIfSubdirIsIncluded(QStringList importFiles);
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
