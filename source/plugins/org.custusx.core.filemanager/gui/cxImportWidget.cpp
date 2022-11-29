@@ -127,20 +127,6 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 	return newRowIndex;
 }
 
-int ImportWidget::findRowIndexContainingButton(QPushButton *button) const
-{
-	int retval = -1;
-	for(int i=0; i<mTableWidget->rowCount(); ++i)
-	{
-		int buttonColoumn = 0;
-		QTableWidgetItem *item = mTableWidget->item(i,buttonColoumn);
-		QWidget *cellWidget = mTableWidget->cellWidget(i,buttonColoumn);
-		if(button == cellWidget)
-			retval = i;
-	}
-	return retval;
-}
-
 void ImportWidget::addMoreFilesButtonClicked()
 {
 	QStringList filenames = this->openFileBrowserForSelectingFiles();
@@ -213,7 +199,7 @@ void ImportWidget::removeWidget(QWidget *widget)
 void ImportWidget::removeRowFromTableAndRemoveFilenameFromImportList()
 {
 	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
-	int rowindex = this->findRowIndexContainingButton(button);
+	int rowindex = ImportDataTypeWidget::findRowIndexContainingButton(button, mTableWidget);
 	int filenamecoloumn = 2;
 	QString fullfilename = mTableWidget->item(rowindex, filenamecoloumn)->data(Qt::ToolTipRole).toString();
 	if(rowindex != -1)

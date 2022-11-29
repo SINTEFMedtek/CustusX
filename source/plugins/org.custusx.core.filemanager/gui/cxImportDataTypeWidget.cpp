@@ -104,12 +104,18 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		//add image or mesh directly to the table
 		else
 		{
+
+			QIcon trashcan(":/icons/open_icon_library/edit-delete-2.png");
+			QPushButton *removeButton = new QPushButton(trashcan,"");
+			connect(removeButton, &QPushButton::clicked, this, &ImportDataTypeWidget::removeRowFromTableAndDataFromImportList);
+
 			int newRowIndex = mTableWidget->rowCount();
 			mTableWidget->setRowCount(newRowIndex+1);
-			mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem("1"));
-			mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
-			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(space));
+			mTableWidget->setCellWidget(newRowIndex, 0, removeButton);
+			mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem("1"));
+			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(name));
+			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(type));
+			mTableWidget->setItem(newRowIndex, 4, new QTableWidgetItem(space));
 		}
 		this->createDataSpecificGui(i);
 	}
@@ -150,6 +156,19 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
 }
 
+int ImportDataTypeWidget::findRowIndexContainingButton(QPushButton *button, QTableWidget* tableWidget)
+{
+	int retval = -1;
+	for(int i=0; i<tableWidget->rowCount(); ++i)
+	{
+		int buttonColoumn = 0;
+		QWidget *cellWidget = tableWidget->cellWidget(i,buttonColoumn);
+		if(button == cellWidget)
+			retval = i;
+	}
+	return retval;
+}
+
 void ImportDataTypeWidget::createDataSpecificGui(int index)
 {
 	QWidget* paramWidget = new QWidget(this);
@@ -160,7 +179,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 		int dims[3];
 		image->getBaseVtkImageData()->GetDimensions(dims);
 		QString numSlices = QString::number(dims[2]);
-		mTableWidget->setItem(mTableWidget->rowCount()-1, 4, new QTableWidgetItem(numSlices));
+		mTableWidget->setItem(mTableWidget->rowCount()-1, 5, new QTableWidgetItem(numSlices));
 
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
 		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
@@ -187,6 +206,27 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 void ImportDataTypeWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
 	mStackedWidgetImageParameters->setCurrentIndex(currentRow);
+}
+
+void ImportDataTypeWidget::removeRowFromTableAndDataFromImportList()
+{
+	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
+	int rowindex = this->findRowIndexContainingButton(button, mTableWidget);
+	int filenamecoloumn = 2;
+	QString fullfilename = mTableWidget->item(rowindex, filenamecoloumn)->text();
+	if(rowindex != -1)
+		mTableWidget->removeRow(rowindex);
+
+	for (std::vector<DataPtr>::iterator it = mData.begin(); it != mData.end();)
+	{
+		if((*it)->getName() == fullfilename)
+			mData.erase(it);
+		else
+			++ it;
+	}
+
+	QWidget *widgetToRemove = mStackedWidgetImageParameters->widget(rowindex);
+	mStackedWidgetImageParameters->removeWidget(widgetToRemove);
 }
 
 void ImportDataTypeWidget::updateImageType()
@@ -553,10 +593,10 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 
 		int newRowIndex = mTableWidget->rowCount();
 		mTableWidget->setRowCount(newRowIndex+1);
-		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
-		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
-		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
+		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(name));
+		mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(type));
+		mTableWidget->setCellWidget(newRowIndex, 4, spaceCB);
 	}
 }
 

@@ -38,6 +38,8 @@ public:
 	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename);
 	~ImportDataTypeWidget();
 
+	static int findRowIndexContainingButton(QPushButton *button, QTableWidget *tableWidget);
+
 public slots:
 	void update();
 	void prepareDataForImport();
@@ -47,6 +49,7 @@ private slots:
 	void pointMetricGroupSpaceChanged(int index);
 	void updateImageType();
 	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
+	void removeRowFromTableAndDataFromImportList();
 
 private:
 	void createDataSpecificGui(int index);

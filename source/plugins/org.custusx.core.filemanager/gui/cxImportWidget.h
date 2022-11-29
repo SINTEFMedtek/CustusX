@@ -52,7 +52,6 @@ private:
 	QString generateUid(QString filename) const;
 	void generateParentCandidates();
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
-	int findRowIndexContainingButton(QPushButton *button) const;
 	void clearData();
 	QStringList removeDirIfSubdirIsIncluded(QStringList importFiles);
 
