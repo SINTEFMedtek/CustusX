@@ -44,36 +44,46 @@ namespace cx
  */
 
 
-ImportDataDialog::ImportDataDialog(ImportDataTypeWidget* widget, QWidget* parent) :
+SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWidget* parent) :
 	mImportDataTypeWidget(widget),
 	QDialog(parent)
 {
+	this->setAttribute(Qt::WA_DeleteOnClose);
+
 	this->setWindowTitle("Select data for import");
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	QTableWidget* tableWidget = mImportDataTypeWidget->getTableWidget();
+
 	layout->addWidget(tableWidget);
-	connect(tableWidget, &QTableWidget::currentCellChanged, this, &ImportDataDialog::tableItemSelected);
+	connect(tableWidget, &QTableWidget::currentCellChanged, this, &SimpleImportDataDialog::tableItemSelected);
+
+	mOkButton = new QPushButton("Select all", this);
+	layout->addStretch();
+	layout->addWidget(mOkButton);
+	connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
+	mOkButton->setDefault(true);
+	mOkButton->setFocus();
 }
 
-void ImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
+void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
 	int filenamecoloumn = 2;
 	QString fullfilename = mImportDataTypeWidget->getTableWidget()->item(currentRow, filenamecoloumn)->text();
 	std::vector<DataPtr> datas = mImportDataTypeWidget->getDatas();
 	DataPtr selected;
-	for (std::vector<DataPtr>::iterator it = datas.begin(); it != datas.end();)
+	for (std::vector<DataPtr>::iterator it = datas.begin(); it != datas.end(); ++it)
 	{
 		if((*it)->getName() == fullfilename)
 			selected = *it;
 	}
-	datas.clear();
 	if(selected)
 	{
-		CX_LOG_DEBUG() << "Data selected: " << selected->getName();
+		datas = std::vector<DataPtr>();
 		datas.push_back(selected);
+		mImportDataTypeWidget->setData(datas);
 	}
 
-	accept();
+	accept();//Trigger accept slot
 }
 
 ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisServicesPtr services) :
@@ -167,7 +177,7 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 void ImportWidget::addFilesForImportWithDialogTriggerend()
 {
 	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked();
-	ImportDataDialog* dialog = new ImportDataDialog(widget, this);
+	SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
 	dialog->exec();
 }
 

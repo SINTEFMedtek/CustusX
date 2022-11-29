@@ -70,8 +70,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mStackedWidgetImageParameters = new QStackedWidget;
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
-	mTableWidget->setColumnCount(5);
-	mTableHeader<<"#"<<"Type"<<"Name"<<"Space"<<"Num slices";
+	mTableWidget->setColumnCount(6);
+	mTableHeader<<""<<"#"<<"Type"<<"Name"<<"Space"<<"Num slices";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setStretchLastSection(true);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);

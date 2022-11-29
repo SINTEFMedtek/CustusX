@@ -25,16 +25,17 @@ namespace cx
 {
 class ImportDataTypeWidget;
 
-class org_custusx_core_filemanager_EXPORT ImportDataDialog : public QDialog
+class org_custusx_core_filemanager_EXPORT SimpleImportDataDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	ImportDataDialog(ImportDataTypeWidget *widget, QWidget* parent=NULL);
-	virtual ~ImportDataDialog();
+	SimpleImportDataDialog(ImportDataTypeWidget *widget, QWidget* parent=NULL);
+	virtual ~SimpleImportDataDialog(){};
 private slots:
 	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
 private:
 	ImportDataTypeWidget* mImportDataTypeWidget;
+	QPushButton* mOkButton;
 };
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget

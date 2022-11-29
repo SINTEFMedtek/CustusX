@@ -42,6 +42,7 @@ public:
 	//Functions used by ImportDataDialog
 	QTableWidget* getTableWidget() {return mTableWidget;};
 	std::vector<DataPtr> getDatas() {return mData;};
+	void setData(std::vector<DataPtr> datas) {mData = datas;}
 
 public slots:
 	void update();
