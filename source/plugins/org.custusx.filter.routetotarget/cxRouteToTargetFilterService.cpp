@@ -173,9 +173,17 @@ bool RouteToTargetFilter::execute()
 	if (!targetPoint)
 		return false;
 
-    mRouteToTarget->setSmoothing(mSmoothing);
+	mRouteToTarget->setSmoothing(mSmoothing);
 
-    mRouteToTarget->processCenterline(mesh);
+	if(mReprocessCenterline || !mBranchListPtr)
+	{
+		mRouteToTarget->processCenterline(mesh);
+		mBranchListPtr = mRouteToTarget->getBranchList();
+	}
+	else
+	{
+		mRouteToTarget->setBranchList(mBranchListPtr);
+	}
 
     //note: mOutput is in reference space
 	mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
@@ -344,6 +352,21 @@ std::vector< double > RouteToTargetFilter::getCameraRotation()
 std::vector< int > RouteToTargetFilter::getBranchingIndex()
 {
 	return mRouteToTarget->getBranchingIndex();
+}
+
+BranchListPtr RouteToTargetFilter::getBranchList()
+{
+	return mBranchListPtr;
+}
+
+void RouteToTargetFilter::setBranchList(BranchListPtr branchList)
+{
+	mBranchListPtr = branchList;
+}
+
+void RouteToTargetFilter::setReprocessCenterline(bool reprocess)
+{
+	mReprocessCenterline = reprocess;
 }
 
 BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)

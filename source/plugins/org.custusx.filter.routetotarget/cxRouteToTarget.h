@@ -25,6 +25,7 @@ public:
 	void setSmoothing(bool smoothing);
 	void processCenterline(MeshPtr mesh);
 	void setBranchList(BranchListPtr branchList);
+	BranchListPtr getBranchList();
 	void processBloodVesselCenterline(Eigen::MatrixXd positions);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findClosestPointInBloodVesselBranches(Vector3D targetCoordinate_r);
