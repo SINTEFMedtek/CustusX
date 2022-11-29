@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXIMPORTWIDGET_H
 #define CXIMPORTWIDGET_H
 
+#include <QDialog>
 #include "cxBaseWidget.h"
 #include "cxFileManagerService.h"
 #include "org_custusx_core_filemanager_Export.h"
@@ -22,6 +23,19 @@ class QPushButton;
 
 namespace cx
 {
+class ImportDataTypeWidget;
+
+class org_custusx_core_filemanager_EXPORT ImportDataDialog : public QDialog
+{
+	Q_OBJECT
+public:
+	ImportDataDialog(ImportDataTypeWidget *widget, QWidget* parent=NULL);
+	virtual ~ImportDataDialog();
+private slots:
+	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
+private:
+	ImportDataTypeWidget* mImportDataTypeWidget;
+};
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
 {
@@ -36,9 +50,10 @@ signals:
 	void parentCandidatesUpdated();
 
 private slots:
+	void addFilesForImportWithDialogTriggerend();
 	void importButtonClicked();
 	void cancelButtonClicked();
-	void addMoreFilesButtonClicked();
+	ImportDataTypeWidget *addMoreFilesButtonClicked();
 	void removeWidget(QWidget *widget);
 	void removeRowFromTableAndRemoveFilenameFromImportList();
 

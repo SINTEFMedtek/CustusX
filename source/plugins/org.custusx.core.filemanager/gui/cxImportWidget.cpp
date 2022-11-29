@@ -43,6 +43,39 @@ namespace cx
  * * implement auto RAS to LPS conversion
  */
 
+
+ImportDataDialog::ImportDataDialog(ImportDataTypeWidget* widget, QWidget* parent) :
+	mImportDataTypeWidget(widget),
+	QDialog(parent)
+{
+	this->setWindowTitle("Select data for import");
+	QVBoxLayout* layout = new QVBoxLayout(this);
+	QTableWidget* tableWidget = mImportDataTypeWidget->getTableWidget();
+	layout->addWidget(tableWidget);
+	connect(tableWidget, &QTableWidget::currentCellChanged, this, &ImportDataDialog::tableItemSelected);
+}
+
+void ImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+	int filenamecoloumn = 2;
+	QString fullfilename = mImportDataTypeWidget->getTableWidget()->item(currentRow, filenamecoloumn)->text();
+	std::vector<DataPtr> datas = mImportDataTypeWidget->getDatas();
+	DataPtr selected;
+	for (std::vector<DataPtr>::iterator it = datas.begin(); it != datas.end();)
+	{
+		if((*it)->getName() == fullfilename)
+			selected = *it;
+	}
+	datas.clear();
+	if(selected)
+	{
+		CX_LOG_DEBUG() << "Data selected: " << selected->getName();
+		datas.push_back(selected);
+	}
+
+	accept();
+}
+
 ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisServicesPtr services) :
 	BaseWidget(NULL, "import_widget", "Import"),
 	mSelectedIndexInTable(0),
@@ -93,6 +126,10 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	this->addAction(addMoreFilesButtonClickedAction);
 	connect(addMoreFilesButtonClickedAction, &QAction::triggered, this, &ImportWidget::addMoreFilesButtonClicked);
 
+	QAction* addFilesForImportWithDialogAction = new QAction("AddFilesForImportWithDialogAction", this);
+	this->addAction(addFilesForImportWithDialogAction);
+	connect(addFilesForImportWithDialogAction, &QAction::triggered, this, &ImportWidget::addFilesForImportWithDialogTriggerend);
+
 	QAction* importButtonClickedAction = new QAction("ImportButtonClickedAction", this);
 	this->addAction(importButtonClickedAction);
 	connect(importButtonClickedAction, &QAction::triggered, this, &ImportWidget::importButtonClicked);
@@ -127,7 +164,14 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 	return newRowIndex;
 }
 
-void ImportWidget::addMoreFilesButtonClicked()
+void ImportWidget::addFilesForImportWithDialogTriggerend()
+{
+	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked();
+	ImportDataDialog* dialog = new ImportDataDialog(widget, this);
+	dialog->exec();
+}
+
+ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()
 {
 	QStringList filenames = this->openFileBrowserForSelectingFiles();
 
@@ -167,6 +211,7 @@ void ImportWidget::addMoreFilesButtonClicked()
 	}
 
 	this->generateParentCandidates();
+	return widget;
 }
 
 void ImportWidget::importButtonClicked()

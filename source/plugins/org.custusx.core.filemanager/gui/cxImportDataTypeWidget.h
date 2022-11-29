@@ -39,6 +39,9 @@ public:
 	~ImportDataTypeWidget();
 
 	static int findRowIndexContainingButton(QPushButton *button, QTableWidget *tableWidget);
+	//Functions used by ImportDataDialog
+	QTableWidget* getTableWidget() {return mTableWidget;};
+	std::vector<DataPtr> getDatas() {return mData;};
 
 public slots:
 	void update();
