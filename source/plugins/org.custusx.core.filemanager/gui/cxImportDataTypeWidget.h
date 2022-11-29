@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataInterface.h"
 
 class QTableWidget;
+class QStackedWidget;
 
 namespace cx
 {
@@ -45,9 +46,10 @@ private slots:
 	virtual void showEvent(QShowEvent *event);
 	void pointMetricGroupSpaceChanged(int index);
 	void updateImageType();
+	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
 
 private:
-	void createDataSpecificGui(DataPtr data);
+	void createDataSpecificGui(int index);
 	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
@@ -91,6 +93,7 @@ private:
 	int mSelectedIndexInTable;
 
 	//image specific
+	QStackedWidget *mStackedWidgetImageParameters;
 	StringPropertyDataModalityPtr mModalityAdapter;
 	StringPropertyImageTypePtr mImageTypeAdapter;
 	QWidget* mImageTypeCombo;

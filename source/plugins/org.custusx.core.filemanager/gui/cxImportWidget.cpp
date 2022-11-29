@@ -170,7 +170,6 @@ void ImportWidget::addMoreFilesButtonClicked()
 
 		std::vector<DataPtr> newData = mFileManager->read(filename);
 //		CX_LOG_DEBUG() << "filename: " << filename << " newData.size: " << newData.size();
-		//The ImportDataTypeWidget based on DICOM data gets a strange title, or unconnected GUI objects?
 		if(newData.size() > 0)
 		{
 			int index = this->insertDataIntoTable(filename, newData);

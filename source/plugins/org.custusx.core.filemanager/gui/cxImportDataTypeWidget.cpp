@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QFileInfo>
+#include <QStackedWidget>
 #include <vtkImageData.h>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
@@ -66,6 +67,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mShouldConvertDataToUnsigned = new QCheckBox();
 	mShouldConvertDataToUnsigned->setCheckState(Qt::Unchecked);
 
+	mStackedWidgetImageParameters = new QStackedWidget;
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
 	mTableWidget->setColumnCount(5);
@@ -80,6 +82,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportDataTypeWidget::tableItemSelected);
 
 	QString type, name;
 	for(unsigned i=0; i<mData.size(); ++i)
@@ -108,7 +111,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
 			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(space));
 		}
-		this->createDataSpecificGui(mData[i]);
+		this->createDataSpecificGui(i);
 	}
 	this->addPointMetricGroupsToTable();
 
@@ -132,10 +135,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	gridLayout->addWidget(new QLabel("Convert data to unsigned?"), 4, 0);
 	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
 	gridLayout->addWidget(mTableWidget, 5, 0, 1, 2);
-	if(mModalityCombo)
-		gridLayout->addWidget(mModalityCombo);
-	if(mImageTypeCombo)
-		gridLayout->addWidget(mImageTypeCombo);
+	gridLayout->addWidget(mStackedWidgetImageParameters);
 
 	groupBox->setLayout(gridLayout);
 	topLayout->addWidget(groupBox);
@@ -150,11 +150,11 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
 }
 
-
-void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
+void ImportDataTypeWidget::createDataSpecificGui(int index)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	QWidget* paramWidget = new QWidget(this);
 
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[index]);
 	if(image)
 	{
 		int dims[3];
@@ -175,7 +175,18 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 			mModalityAdapter->setValue(enum2string(imMR));
 			updateImageType();
 		}
+		QHBoxLayout* layout = new QHBoxLayout();
+		layout->addWidget(mModalityCombo);
+		layout->addWidget(mImageTypeCombo);
+		paramWidget->setLayout(layout);
 	}
+
+	mStackedWidgetImageParameters->insertWidget(index, paramWidget);
+}
+
+void ImportDataTypeWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+	mStackedWidgetImageParameters->setCurrentIndex(currentRow);
 }
 
 void ImportDataTypeWidget::updateImageType()
