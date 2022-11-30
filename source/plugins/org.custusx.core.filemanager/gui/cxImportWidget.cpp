@@ -348,12 +348,12 @@ QStringList ImportWidget::removeDirIfSubdirIsIncluded(QStringList importFiles)
 	}
 
 	QStringList removeDirs;
-	for(int i = 0; i < allDirs.size(); ++i)
+	for(int i = 0; i < importFiles.size(); ++i)
 	{
 		for(int j = 0; j < allDirs.size(); ++j)
 		{
 			if(i != j)
-				if(allDirs[i].contains(allDirs[j]))
+				if(importFiles[i].contains(allDirs[j]))
 					removeDirs << allDirs[j];
 		}
 	}
@@ -368,7 +368,6 @@ QStringList ImportWidget::removeDirIfSubdirIsIncluded(QStringList importFiles)
 		if(addDir)
 			retval << allDirs[i];
 	}
-
 	return retval;
 }
 
