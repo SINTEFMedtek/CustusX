@@ -57,18 +57,14 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 	layout->addWidget(tableWidget);
 	connect(tableWidget, &QTableWidget::currentCellChanged, this, &SimpleImportDataDialog::tableItemSelected);
 
-	QPushButton* okButton = new QPushButton("Select all", this);
 	QPushButton* cancelButton = new QPushButton("Cancel", this);
 	layout->addStretch();
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
-	buttonLayout->addWidget(okButton);
 	buttonLayout->addWidget(cancelButton);
 	layout->addLayout(buttonLayout);
 
-	connect(okButton, &QPushButton::clicked, this, &QDialog::accept);
 	connect(cancelButton, &QPushButton::clicked, this, &SimpleImportDataDialog::cancelClicked);
-	okButton->setDefault(true);
-	okButton->setFocus();
+	cancelButton->setFocus();
 	this->setMinimumSize(400, 100);
 }
 
@@ -189,8 +185,11 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 void ImportWidget::addFilesForImportWithDialogTriggerend()
 {
 	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked();
-	SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
-	dialog->exec();
+	if(widget && widget->getDatas().size() > 0)
+	{
+		SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
+		dialog->exec();
+	}
 }
 
 ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()

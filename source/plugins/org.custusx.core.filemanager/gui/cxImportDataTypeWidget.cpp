@@ -644,4 +644,4 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	return simpleTableWidget;
 }
 
-}
+}//cx
