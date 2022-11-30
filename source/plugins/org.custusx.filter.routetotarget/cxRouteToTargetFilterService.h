@@ -54,6 +54,9 @@ public:
 	std::vector<BranchPtr> getRouteBranches();
 	std::vector< double > getCameraRotation();
 	std::vector< int > getBranchingIndex();
+	BranchListPtr getBranchList();
+	void setBranchList(BranchListPtr branchList);
+	void setReprocessCenterline(bool reprocess);
 
 	virtual bool execute();
 	virtual bool postProcess();
@@ -77,6 +80,7 @@ private:
     BranchListPtr mBranchListPtr;
     bool mGenerateFileWithRouteInformation;
     bool mSmoothing;
+		bool mReprocessCenterline = true;
     BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;

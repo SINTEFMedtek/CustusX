@@ -90,6 +90,11 @@ void RouteToTarget::setBranchList(BranchListPtr branchList)
 	mBranchListPtr = branchList;
 }
 
+BranchListPtr RouteToTarget::getBranchList()
+{
+	return mBranchListPtr;
+}
+
 void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 {
 	if (mBloodVesselBranchListPtr)

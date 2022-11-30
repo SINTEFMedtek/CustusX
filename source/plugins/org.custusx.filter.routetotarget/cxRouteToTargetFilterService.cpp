@@ -173,9 +173,17 @@ bool RouteToTargetFilter::execute()
 	if (!targetPoint)
 		return false;
 
-    mRouteToTarget->setSmoothing(mSmoothing);
+	mRouteToTarget->setSmoothing(mSmoothing);
 
-    mRouteToTarget->processCenterline(mesh);
+	if(mReprocessCenterline || !mBranchListPtr)
+	{
+		mRouteToTarget->processCenterline(mesh);
+		mBranchListPtr = mRouteToTarget->getBranchList();
+	}
+	else
+	{
+		mRouteToTarget->setBranchList(mBranchListPtr);
+	}
 
     //note: mOutput is in reference space
 	mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
@@ -223,25 +231,26 @@ bool RouteToTargetFilter::postProcess()
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 	outputCenterline->setVtkPolyData(mOutput);
-    outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
-    patientService()->insertData(outputCenterline, true);
+	outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+	patientService()->insertData(outputCenterline, true);
 
 	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
 	QString nameCenterlineExt = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixExtension();
 	MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
 	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
 	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
-    outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
-    patientService()->insertData(outputCenterlineExt, true);
+	outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+	patientService()->insertData(outputCenterlineExt, true);
 
 	//note: mOutput and outputCenterline is in reference(r) space
 
 
 	//Meshes are expected to be in data(d) space
 	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
-    outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
+	outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
-	mServices->view()->autoShowData(outputCenterline);
+	//mServices->view()->autoShowData(outputCenterlineExt);
+	//mServices->view()->autoShowData(outputCenterline);
 
 	if(mOutputTypes.size() > 0)
 		mOutputTypes[0]->setValue(outputCenterline->getUid());
@@ -343,6 +352,21 @@ std::vector< double > RouteToTargetFilter::getCameraRotation()
 std::vector< int > RouteToTargetFilter::getBranchingIndex()
 {
 	return mRouteToTarget->getBranchingIndex();
+}
+
+BranchListPtr RouteToTargetFilter::getBranchList()
+{
+	return mBranchListPtr;
+}
+
+void RouteToTargetFilter::setBranchList(BranchListPtr branchList)
+{
+	mBranchListPtr = branchList;
+}
+
+void RouteToTargetFilter::setReprocessCenterline(bool reprocess)
+{
+	mReprocessCenterline = reprocess;
 }
 
 BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)
