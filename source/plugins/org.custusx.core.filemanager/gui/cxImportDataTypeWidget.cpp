@@ -616,4 +616,32 @@ bool ImportDataTypeWidget::isSegmentation(QString filename)
 	return false;
 }
 
+QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
+{
+	QTableWidget* simpleTableWidget = new QTableWidget();
+	simpleTableWidget->setRowCount(0);
+	simpleTableWidget->setColumnCount(2);
+	QStringList tableHeader;
+	tableHeader<<"Name"<<"Num slices";
+	simpleTableWidget->setHorizontalHeaderLabels(tableHeader);
+	simpleTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	simpleTableWidget->verticalHeader()->setVisible(false);
+	simpleTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	simpleTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+	simpleTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+	simpleTableWidget->setShowGrid(false);
+	simpleTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
+	simpleTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+
+
+	simpleTableWidget->setRowCount(mTableWidget->rowCount());
+	for(int i = 0; i < mTableWidget->rowCount(); ++i)
+	{
+		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, 2)->text()));
+		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, 5)->text()));
+	}
+
+	return simpleTableWidget;
+}
+
 }

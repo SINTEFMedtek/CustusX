@@ -50,25 +50,32 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
-	this->setWindowTitle("Select data for import");
+	this->setWindowTitle("Select data for import (Click on a line)");
 	QVBoxLayout* layout = new QVBoxLayout(this);
-	QTableWidget* tableWidget = mImportDataTypeWidget->getTableWidget();
+	QTableWidget* tableWidget = mImportDataTypeWidget->getSimpleTableWidget();
 
 	layout->addWidget(tableWidget);
 	connect(tableWidget, &QTableWidget::currentCellChanged, this, &SimpleImportDataDialog::tableItemSelected);
 
-	mOkButton = new QPushButton("Select all", this);
+	QPushButton* okButton = new QPushButton("Select all", this);
+	QPushButton* cancelButton = new QPushButton("Cancel", this);
 	layout->addStretch();
-	layout->addWidget(mOkButton);
-	connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
-	mOkButton->setDefault(true);
-	mOkButton->setFocus();
+	QHBoxLayout* buttonLayout = new QHBoxLayout();
+	buttonLayout->addWidget(okButton);
+	buttonLayout->addWidget(cancelButton);
+	layout->addLayout(buttonLayout);
+
+	connect(okButton, &QPushButton::clicked, this, &QDialog::accept);
+	connect(cancelButton, &QPushButton::clicked, this, &SimpleImportDataDialog::cancelClicked);
+	okButton->setDefault(true);
+	okButton->setFocus();
+	this->setMinimumSize(400, 100);
 }
 
 void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
-	int filenamecoloumn = 2;
-	QString fullfilename = mImportDataTypeWidget->getTableWidget()->item(currentRow, filenamecoloumn)->text();
+	int filenameColoumn = 0;
+	QString fullfilename = mImportDataTypeWidget->getSimpleTableWidget()->item(currentRow, filenameColoumn)->text();
 	std::vector<DataPtr> datas = mImportDataTypeWidget->getDatas();
 	DataPtr selected;
 	for (std::vector<DataPtr>::iterator it = datas.begin(); it != datas.end(); ++it)
@@ -82,8 +89,13 @@ void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn
 		datas.push_back(selected);
 		mImportDataTypeWidget->setData(datas);
 	}
+	accept();
+}
 
-	accept();//Trigger accept slot
+void SimpleImportDataDialog::cancelClicked()
+{
+	mImportDataTypeWidget->setData(std::vector<DataPtr>());
+	reject();
 }
 
 ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisServicesPtr services) :
@@ -297,9 +309,7 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 {
 	QString file_type_filter = generateFileTypeFilter();
 
-	//QStringList fileName = QFileDialog::getOpenFileNames(this->parentWidget(), QString(tr("Select data file(s) for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
-
-	QFileDialog dialog(this->parentWidget(), QString(tr("Select data file(s) for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
+	QFileDialog dialog(this->parentWidget(), QString(tr("Select data file(s)/directories for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
 	dialog.setFileMode(QFileDialog::Directory);
 
 	// Select multiple files and directories at the same time in QFileDialog

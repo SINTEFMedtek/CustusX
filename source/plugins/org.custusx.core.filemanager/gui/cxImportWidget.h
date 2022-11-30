@@ -33,9 +33,9 @@ public:
 	virtual ~SimpleImportDataDialog(){};
 private slots:
 	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
+	void cancelClicked();
 private:
 	ImportDataTypeWidget* mImportDataTypeWidget;
-	QPushButton* mOkButton;
 };
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
