@@ -147,7 +147,7 @@ void RouteToTarget::findClosestPointInBranches(Vector3D targetCoordinate_r)
 	int minDistancePositionIndex;
 	BranchPtr minDistanceBranch;
 	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
-	for (int i = 0; i < branches.size(); i++)
+	for (int i = 1; i < branches.size(); i++) //starting at i=1, not including Trachea (0)
 	{
 		Eigen::MatrixXd positions = branches[i]->getPositions();
 		for (int j = 0; j < positions.cols(); j++)
