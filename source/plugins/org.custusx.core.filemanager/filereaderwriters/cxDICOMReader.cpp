@@ -38,13 +38,41 @@ DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 // so output should only be used for debug.
 bool DICOMReader::canRead(const QString &type, const QString &filename)
 {
-	//Assume DICOM if filename is a directory
 	if(QFileInfo(filename).isDir())
-		return true;
+		return this->canReadDir(filename, 3);//Only check 3 levels of subdirs
 
-	QString fileType = QFileInfo(filename).suffix();
+	return this->canReadFile(filename);
+}
+
+bool DICOMReader::canReadDir(QString dirname, int checkSubDirsLevel)
+{
+	QDir dir(dirname);
+	QStringList files = dir.entryList(QDir::NoDotAndDotDot | QDir::AllEntries);
+	for(int i = 0; i < files.size(); ++i)
+	{
+		QString fullPath = dirname+"/"+files[i];
+		if(this->canReadFile(fullPath))
+			return true;
+		else if(checkSubDirsLevel > 0 && QFileInfo(fullPath).isDir())
+		{
+			if(this->canReadDir(fullPath, --checkSubDirsLevel))
+				return true;
+		}
+	}
+	return false;
+}
+
+bool DICOMReader::canReadFile(QString filename)
+{
+	if(QFileInfo(filename).isDir())
+	{
+		return false; //Don't look into subdirs
+	}
+
 	QFile file(filename);
 	bool opened = file.open(QIODevice::ReadOnly);
+	if(!opened)
+		return false;
 
 	// A DICOM file should have the characters "DICM" at position 0x80
 	bool success = file.seek(0x80);
@@ -135,7 +163,7 @@ bool DICOMReader::canWrite(const QString &type, const QString &filename) const
 std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestSeries)
 {
 	//Turn off Qt messages temporarily
-	CX_LOG_DEBUG() << "stopQtMessages";
+	CX_LOG_DEBUG() << "stopQtMessages while reading DICOM files";
 	reporter()->stopQtMessages();
 
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
@@ -160,7 +188,7 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 
 	//Turn Qt messages back on
 	reporter()->startQtMessages();
-	CX_LOG_DEBUG() << "startQtMessages";
+	CX_LOG_DEBUG() << "DICOM files read - startQtMessages";
 	return retval;
 }
 

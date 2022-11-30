@@ -58,6 +58,8 @@ protected:
 	std::vector<ImagePtr> importBestSeries(ctkDICOMDatabasePtr database);
 	std::vector<ImagePtr> importAllSeries(ctkDICOMDatabasePtr database);
 	void stopDCMTKMessages();
+	bool canReadDir(QString dirname, int checkSubDirsLevel);
+	bool canReadFile(QString filename);
 };
 
 } //cx

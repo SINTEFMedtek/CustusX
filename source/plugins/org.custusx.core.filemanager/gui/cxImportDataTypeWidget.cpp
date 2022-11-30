@@ -73,7 +73,6 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setColumnCount(6);
 	mTableHeader<<""<<"#"<<"Name"<<"Type"<<"Space"<<"Num slices";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
-	mTableWidget->horizontalHeader()->setStretchLastSection(true);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
 	mTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
