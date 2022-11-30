@@ -145,7 +145,11 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	QString folder = dir.absolutePath();
 
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
-	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out a list of all files
+
+	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout
+	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out (with std::cout) a list of all files (ctkDICOMIndexer.cpp, line 93)
+	std::cout.clear();//Turn on std::cout again
+
 	std::vector<ImagePtr> retval;
 	if(readBestSeries)
 		retval = importBestSeries(database);
