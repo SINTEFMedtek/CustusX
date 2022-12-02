@@ -141,9 +141,11 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
 	gridLayout->addWidget(mTableWidget, 5, 0, 1, 2);
 	gridLayout->addWidget(mStackedWidgetImageParameters);
+	gridLayout->setSpacing(1);//Make Widget more compact
 
 	groupBox->setLayout(gridLayout);
-	topLayout->addWidget(groupBox);
+	topLayout->addWidget(groupBox, 1);
+	topLayout->addStretch();
 
 	connect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
 	connect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
@@ -635,7 +637,7 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	simpleTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	simpleTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 	simpleTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-	simpleTableWidget->setShowGrid(false);
+	simpleTableWidget->setShowGrid(true);
 	simpleTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
 	simpleTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
 

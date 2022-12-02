@@ -39,7 +39,7 @@ public:
 	~ImportDataTypeWidget();
 
 	static int findRowIndexContainingButton(QPushButton *button, QTableWidget *tableWidget);
-	//Functions used by ImportDataDialog
+	//Functions used by SimpleImportDataDialog
 	QTableWidget* getSimpleTableWidget();
 	std::vector<DataPtr> getDatas() {return mData;};
 	void setData(std::vector<DataPtr> datas) {mData = datas;}

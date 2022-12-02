@@ -56,7 +56,7 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 	QVBoxLayout* layout = new QVBoxLayout(this);
 	QTableWidget* tableWidget = mImportDataTypeWidget->getSimpleTableWidget();
 
-	layout->addWidget(tableWidget);
+	layout->addWidget(tableWidget, 1);
 	connect(tableWidget, &QTableWidget::currentCellChanged, this, &SimpleImportDataDialog::tableItemSelected);
 
 	QPushButton* cancelButton = new QPushButton("Cancel", this);
@@ -67,7 +67,7 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 
 	connect(cancelButton, &QPushButton::clicked, this, &SimpleImportDataDialog::cancelClicked);
 	cancelButton->setFocus();
-	this->setMinimumSize(400, 100);
+	this->setMinimumSize(500, 300);
 }
 
 void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -134,7 +134,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTopLayout->addLayout(buttonLayout);
 	mTopLayout->addWidget(new QLabel("Supports: "+this->generateFileTypeFilter()));
 	mTopLayout->addWidget(mTableWidget);
-	mTopLayout->addWidget(mStackedWidget);
+	mTopLayout->addWidget(mStackedWidget, 1);
 	mTopLayout->addStretch();
 
 	connect(addMoreFilesButton, &QPushButton::clicked, this, &ImportWidget::addMoreFilesButtonClicked);
@@ -246,7 +246,7 @@ void ImportWidget::showProgressDialog(QProgressDialog &progress)
 	progress.setMinimumDuration(0);
 	//It seems like QProgressDialog won't show correctly for only a few steps, or for a long processing time
 	//This helps start the progress bar
-	for(int i = 0; i < 50; ++i)
+	for(int i = 0; i < 100; ++i)
 	{
 		progress.setValue(i);
 		sleep_ms(1);
