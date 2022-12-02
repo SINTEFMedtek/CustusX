@@ -70,8 +70,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mStackedWidgetImageParameters = new QStackedWidget;
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
-	mTableWidget->setColumnCount(6);
-	mTableHeader<<""<<"#"<<"Name"<<"Type"<<"Space"<<"Num slices";
+	mTableWidget->setColumnCount(5);
+	mTableHeader<<""<<"#"<<"Name"<<"Type"<<"Space";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
@@ -175,10 +175,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[index]);
 	if(image)
 	{
-		int dims[3];
-		image->getBaseVtkImageData()->GetDimensions(dims);
-		QString numSlices = QString::number(dims[2]);
-		mTableWidget->setItem(mTableWidget->rowCount()-1, 5, new QTableWidgetItem(numSlices));
+		this->updateTableWithNumberOfSlices(image);
 
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
 		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
@@ -200,6 +197,16 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 	}
 
 	mStackedWidgetImageParameters->insertWidget(index, paramWidget);
+}
+
+void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
+{
+	int dims[3];
+	image->getBaseVtkImageData()->GetDimensions(dims);
+	QString numSlices = QString::number(dims[2]);
+	int numSlicesColoumn = 1;
+	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, numSlicesColoumn);
+	tableItem->setText(numSlices);
 }
 
 void ImportDataTypeWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -634,10 +641,12 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 
 
 	simpleTableWidget->setRowCount(mTableWidget->rowCount());
+	int filenamecoloumn = 2;
+	int numSlicesColoumn = 1;
 	for(int i = 0; i < mTableWidget->rowCount(); ++i)
 	{
-		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, 2)->text()));
-		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, 5)->text()));
+		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, filenamecoloumn)->text()));
+		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, numSlicesColoumn)->text()));
 	}
 
 	return simpleTableWidget;
