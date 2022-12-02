@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 class QTableWidget;
 class QStackedWidget;
 class QPushButton;
+class QProgressDialog;
 
 namespace cx
 {
@@ -70,6 +71,7 @@ private:
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
 	void clearData();
 	QStringList removeDirIfSubdirIsIncluded(QStringList importFiles);
+	void showProgressDialog(QProgressDialog &progress);
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;

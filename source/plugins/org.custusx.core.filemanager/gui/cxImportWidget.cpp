@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QStackedWidget>
+#include <QProgressDialog>
 #include "cxForwardDeclarations.h"
 #include "cxFileReaderWriterService.h"
 #include "cxVisServices.h"
@@ -33,6 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxMesh.h"
 #include "cxPointMetric.h"
+#include "cxUtilHelpers.h"
 
 namespace cx
 {
@@ -127,13 +129,13 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	QPushButton *cancelButton = new QPushButton("Cancel");
 	buttonLayout->addWidget(importButton);
 	buttonLayout->addWidget(cancelButton);
+	buttonLayout->addWidget(addMoreFilesButton);
 	buttonLayout->addStretch();
-	mTopLayout->addWidget(addMoreFilesButton);
+	mTopLayout->addLayout(buttonLayout);
 	mTopLayout->addWidget(new QLabel("Supports: "+this->generateFileTypeFilter()));
 	mTopLayout->addWidget(mTableWidget);
 	mTopLayout->addWidget(mStackedWidget);
 	mTopLayout->addStretch();
-	mTopLayout->addLayout(buttonLayout);
 
 	connect(addMoreFilesButton, &QPushButton::clicked, this, &ImportWidget::addMoreFilesButtonClicked);
 	connect(importButton, &QPushButton::clicked, this, &ImportWidget::importButtonClicked);
@@ -198,6 +200,9 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()
 
 	bool addedDICOM = false;
 
+	QProgressDialog progress("Importing files...", QString(), 0, 0, this);
+	this->showProgressDialog(progress);
+
 	ImportDataTypeWidget *widget = NULL;
 	for(int i = 0; i < filenames.size(); ++i)
 	{
@@ -233,6 +238,19 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()
 
 	this->generateParentCandidates();
 	return widget;
+}
+
+void ImportWidget::showProgressDialog(QProgressDialog &progress)
+{
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setMinimumDuration(0);
+	//It seems like QProgressDialog won't show correctly for only a few steps, or for a long processing time
+	//This helps start the progress bar
+	for(int i = 0; i < 50; ++i)
+	{
+		progress.setValue(i);
+		sleep_ms(1);
+	}
 }
 
 void ImportWidget::importButtonClicked()
