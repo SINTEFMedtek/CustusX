@@ -171,6 +171,8 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 
 	QFileInfo dir = QFileInfo(fileName);
 	QString folder = dir.absolutePath();
+	if(dir.isDir())
+		folder = fileName;
 
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
 
