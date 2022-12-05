@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDICOMReader.h"
 
 #include <QDir>
+#include <QProgressDialog>
 #include <vtkImageData.h>
 #include <ctkDICOMDatabase.h>
 #include <ctkDICOMIndexer.h>
@@ -39,7 +40,7 @@ DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 bool DICOMReader::canRead(const QString &type, const QString &filename)
 {
 	if(QFileInfo(filename).isDir())
-		return this->canReadDir(filename, 3);//Only check 3 levels of subdirs
+		return this->canReadDir(filename, 30);//Only check 3 levels of subdirs
 
 	return this->canReadFile(filename);
 }
@@ -161,7 +162,7 @@ bool DICOMReader::canWrite(const QString &type, const QString &filename) const
 //Copied from DicomWidget::importSeries
 //Also copied DicomConverter and DicomImageReader files from the dicom plugin
 std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestSeries)
-{
+{	
 	//Turn off Qt messages temporarily
 	CX_LOG_DEBUG() << "stopQtMessages while reading DICOM files";
 	reporter()->stopQtMessages();
@@ -174,17 +175,25 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	if(dir.isDir())
 		folder = fileName;
 
-	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
+	QStringList dicomFolders = this->findAllSubfoldersWithDicomFiles(folder);
 
-	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout
-	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out (with std::cout) a list of all files (ctkDICOMIndexer.cpp, line 93)
-	std::cout.clear();//Turn on std::cout again
+	QProgressDialog progress("Reading DICOM series...", QString(), 0, dicomFolders.size());
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setMinimumDuration(0);
+
+//	addFolderToDicomDatabase(database,folder);
+	for(int i = 0; i < dicomFolders.size(); ++i)
+	{
+		progress.setValue(i);
+//		CX_LOG_DEBUG() << "Read folder: " << dicomFolders[i];
+		addFolderToDicomDatabase(database,dicomFolders[i]);
+	}
 
 	std::vector<ImagePtr> retval;
 	if(readBestSeries)
 		retval = importBestSeries(database);
 	else
-		retval = importAllSeries(database);
+		retval = importAllSeries(database, progress);
 
 	database->closeDatabase();
 
@@ -192,6 +201,51 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	reporter()->startQtMessages();
 	CX_LOG_DEBUG() << "DICOM files read - startQtMessages";
 	return retval;
+}
+
+
+QStringList DICOMReader::findAllSubfoldersWithDicomFiles(QString folder)
+{
+	QStringList subDirs = findAllSubDirs(folder);
+//	CX_LOG_DEBUG() << "findAllSubDirs:\n" << subDirs.join("\n");
+	QStringList retval;
+	for(int i = 0; i < subDirs.size(); ++i)
+	{
+		if(this->canReadDir(subDirs[i], 0))
+			retval << subDirs[i];
+	}
+//	CX_LOG_DEBUG() << "findAllSubfoldersWithDicomFiles:\n" << retval.join("\n");
+	return retval;
+}
+
+QStringList DICOMReader::findAllSubDirs(QString folder)
+{
+	if(!QFileInfo(folder).isDir())
+		return QStringList();
+
+	QStringList allSubDirs;
+
+	QDir dir(folder);
+	QStringList files = dir.entryList(QDir::NoDotAndDotDot | QDir::Dirs);
+	for(int i = 0; i < files.size(); ++i)
+	{
+		QString fullPath = folder+"/"+files[i];
+		QStringList subDirs = findAllSubDirs(fullPath);
+		allSubDirs << subDirs;
+	}
+	//if(files.size() == 0)
+	//	allSubDirs << folder;//Only add folder if it got no subdirs
+	allSubDirs << folder;//Add all traversed folders
+
+	return allSubDirs;
+}
+
+void DICOMReader::addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder)
+{
+	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer); //TODO: Reuse instead on creating new one?
+	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout
+	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out (with std::cout) a list of all files (ctkDICOMIndexer.cpp, line 93)
+	std::cout.clear();//Turn on std::cout again
 }
 
 void DICOMReader::stopDCMTKMessages()
@@ -226,11 +280,14 @@ std::vector<ImagePtr> DICOMReader::importBestSeries(ctkDICOMDatabasePtr database
 	return retval;
 }
 
-std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database)
+std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database, QProgressDialog &progress)
 {
 	//TODO: Allow user to select serie
 
 	QStringList allSeriesUid = this->getAllDICOMSeries(database);
+
+	progress.setLabelText("Converting DICOM series...");
+	progress.setMaximum(allSeriesUid.size());
 
 	cx::DicomConverter converter;
 	converter.setDicomDatabase(database.data());
@@ -238,6 +295,7 @@ std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database)
 	std::vector<ImagePtr> retval;
 	for(int i = 0; i < allSeriesUid.size(); ++i)
 	{
+		progress.setValue(i);
 		cx::ImagePtr convertedImage = converter.convertToImage(allSeriesUid[i]);
 
 		if (convertedImage)

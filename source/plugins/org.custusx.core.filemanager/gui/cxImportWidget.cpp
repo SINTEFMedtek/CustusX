@@ -200,8 +200,8 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()
 
 	bool addedDICOM = false;
 
-	QProgressDialog progress("Importing files...", QString(), 0, 0, this);
-	this->showProgressDialog(progress);
+//	QProgressDialog progress("Importing files...", QString(), 0, 0, this);
+//	this->showProgressDialog(progress);
 
 	ImportDataTypeWidget *widget = NULL;
 	for(int i = 0; i < filenames.size(); ++i)

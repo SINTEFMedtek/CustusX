@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxFileReaderWriterService.h"
 #include "org_custusx_core_filemanager_Export.h"
+class QProgressDialog;
 
 typedef QSharedPointer<class ctkDICOMDatabase> ctkDICOMDatabasePtr;
 
@@ -56,10 +57,13 @@ protected:
 	QString getBestDICOMSeries(ctkDICOMDatabasePtr database);
 	QStringList getAllDICOMSeries(ctkDICOMDatabasePtr database);
 	std::vector<ImagePtr> importBestSeries(ctkDICOMDatabasePtr database);
-	std::vector<ImagePtr> importAllSeries(ctkDICOMDatabasePtr database);
+	std::vector<ImagePtr> importAllSeries(ctkDICOMDatabasePtr database, QProgressDialog &progress);
 	void stopDCMTKMessages();
 	bool canReadDir(QString dirname, int checkSubDirsLevel);
 	bool canReadFile(QString filename);
+	void addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder);
+	QStringList findAllSubfoldersWithDicomFiles(QString folder);
+	QStringList findAllSubDirs(QString folder);
 };
 
 } //cx
