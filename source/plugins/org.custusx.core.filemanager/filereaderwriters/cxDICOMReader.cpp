@@ -40,12 +40,12 @@ DICOMReader::DICOMReader(PatientModelServicePtr patientModelService) :
 bool DICOMReader::canRead(const QString &type, const QString &filename)
 {
 	if(QFileInfo(filename).isDir())
-		return this->canReadDir(filename, 30);//Only check 3 levels of subdirs
+		return this->canReadDir(filename, true);
 
 	return this->canReadFile(filename);
 }
 
-bool DICOMReader::canReadDir(QString dirname, int checkSubDirsLevel)
+bool DICOMReader::canReadDir(QString dirname, bool checkSubDirs)
 {
 	QDir dir(dirname);
 	QStringList files = dir.entryList(QDir::NoDotAndDotDot | QDir::AllEntries);
@@ -54,9 +54,9 @@ bool DICOMReader::canReadDir(QString dirname, int checkSubDirsLevel)
 		QString fullPath = dirname+"/"+files[i];
 		if(this->canReadFile(fullPath))
 			return true;
-		else if(checkSubDirsLevel > 0 && QFileInfo(fullPath).isDir())
+		else if(checkSubDirs && QFileInfo(fullPath).isDir())
 		{
-			if(this->canReadDir(fullPath, --checkSubDirsLevel))
+			if(this->canReadDir(fullPath, checkSubDirs))
 				return true;
 		}
 	}
@@ -148,7 +148,6 @@ vtkImageDataPtr DICOMReader::loadVtkImageData(QString filename)
 	return images[0]->getBaseVtkImageData();
 }
 
-
 QString DICOMReader::canWriteDataType() const
 {
 	return "";
@@ -162,7 +161,7 @@ bool DICOMReader::canWrite(const QString &type, const QString &filename) const
 //Copied from DicomWidget::importSeries
 //Also copied DicomConverter and DicomImageReader files from the dicom plugin
 std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestSeries)
-{	
+{
 	//Turn off Qt messages temporarily
 	CX_LOG_DEBUG() << "stopQtMessages while reading DICOM files";
 	reporter()->stopQtMessages();
@@ -175,17 +174,21 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 	if(dir.isDir())
 		folder = fileName;
 
-	QStringList dicomFolders = this->findAllSubfoldersWithDicomFiles(folder);
-
-	QProgressDialog progress("Reading DICOM series...", QString(), 0, dicomFolders.size());
+	QProgressDialog progress("Reading DICOM series...", "Cancel", 0, 0);
 	progress.setWindowModality(Qt::WindowModal);
 	progress.setMinimumDuration(0);
+	progress.setValue(0);
 
-//	addFolderToDicomDatabase(database,folder);
+	QStringList dicomFolders = this->findAllSubfoldersWithDicomFiles(folder, progress);
+
+	progress.setLabelText("Reading DICOM series...");
+	progress.setMaximum(dicomFolders.size());
+
 	for(int i = 0; i < dicomFolders.size(); ++i)
 	{
 		progress.setValue(i);
-//		CX_LOG_DEBUG() << "Read folder: " << dicomFolders[i];
+		if (progress.wasCanceled())
+			break;
 		addFolderToDicomDatabase(database,dicomFolders[i]);
 	}
 
@@ -204,17 +207,22 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 }
 
 
-QStringList DICOMReader::findAllSubfoldersWithDicomFiles(QString folder)
+QStringList DICOMReader::findAllSubfoldersWithDicomFiles(QString folder, QProgressDialog &progress)
 {
+	CX_LOG_DEBUG() << "Finding all subfolders in: " << folder;
 	QStringList subDirs = findAllSubDirs(folder);
-//	CX_LOG_DEBUG() << "findAllSubDirs:\n" << subDirs.join("\n");
+
+	progress.setLabelText("Searcing all subdirectories for DICOM series: "+folder);
+	progress.setMaximum(subDirs.size());
 	QStringList retval;
 	for(int i = 0; i < subDirs.size(); ++i)
 	{
-		if(this->canReadDir(subDirs[i], 0))
+		progress.setValue(i);
+		if (progress.wasCanceled())
+			break;
+		if(this->canReadDir(subDirs[i], false))
 			retval << subDirs[i];
 	}
-//	CX_LOG_DEBUG() << "findAllSubfoldersWithDicomFiles:\n" << retval.join("\n");
 	return retval;
 }
 
@@ -233,9 +241,7 @@ QStringList DICOMReader::findAllSubDirs(QString folder)
 		QStringList subDirs = findAllSubDirs(fullPath);
 		allSubDirs << subDirs;
 	}
-	//if(files.size() == 0)
-	//	allSubDirs << folder;//Only add folder if it got no subdirs
-	allSubDirs << folder;//Add all traversed folders
+	allSubDirs << folder;
 
 	return allSubDirs;
 }
@@ -282,8 +288,6 @@ std::vector<ImagePtr> DICOMReader::importBestSeries(ctkDICOMDatabasePtr database
 
 std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database, QProgressDialog &progress)
 {
-	//TODO: Allow user to select serie
-
 	QStringList allSeriesUid = this->getAllDICOMSeries(database);
 
 	progress.setLabelText("Converting DICOM series...");
@@ -296,18 +300,12 @@ std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database,
 	for(int i = 0; i < allSeriesUid.size(); ++i)
 	{
 		progress.setValue(i);
+		if (progress.wasCanceled())
+			break;
 		cx::ImagePtr convertedImage = converter.convertToImage(allSeriesUid[i]);
 
 		if (convertedImage)
-		{
-//			int dims[3];
-//			convertedImage->getBaseVtkImageData()->GetDimensions(dims);
-//			CX_LOG_DEBUG() << "Num slizes in image: " << dims[2];
-//			QStringList files = database->filesForSeries(allSeriesUid[i]);
-//			CX_LOG_DEBUG() << "Num files in series: " << files.size();
-
 			retval.push_back(convertedImage);
-		}
 		else
 			reportError(QString("Failed to convert DICOM series %1").arg(allSeriesUid[i]));
 	}

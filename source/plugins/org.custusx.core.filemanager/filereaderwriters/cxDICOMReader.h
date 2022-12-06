@@ -59,10 +59,10 @@ protected:
 	std::vector<ImagePtr> importBestSeries(ctkDICOMDatabasePtr database);
 	std::vector<ImagePtr> importAllSeries(ctkDICOMDatabasePtr database, QProgressDialog &progress);
 	void stopDCMTKMessages();
-	bool canReadDir(QString dirname, int checkSubDirsLevel);
+	bool canReadDir(QString dirname, bool checkSubDirs);
 	bool canReadFile(QString filename);
 	void addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder);
-	QStringList findAllSubfoldersWithDicomFiles(QString folder);
+	QStringList findAllSubfoldersWithDicomFiles(QString folder, QProgressDialog &progress);
 	QStringList findAllSubDirs(QString folder);
 };
 
