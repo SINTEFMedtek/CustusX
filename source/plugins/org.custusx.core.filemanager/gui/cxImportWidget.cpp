@@ -67,7 +67,6 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 
 	connect(cancelButton, &QPushButton::clicked, this, &SimpleImportDataDialog::cancelClicked);
 	cancelButton->setFocus();
-	this->setMinimumSize(500, 300);
 }
 
 void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)

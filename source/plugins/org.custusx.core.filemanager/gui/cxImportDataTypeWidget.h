@@ -13,16 +13,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXIMPORTDATATYPEWIDGET_H
 
 #include "org_custusx_core_filemanager_Export.h"
+#include <QPushButton>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxLogger.h"
-#include  <QPushButton>
 #include "cxVisServices.h"
 #include "cxFileManagerService.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataInterface.h"
-
 class QTableWidget;
 class QStackedWidget;
 
@@ -38,7 +37,9 @@ public:
 	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename);
 	~ImportDataTypeWidget();
 
+	static QSize getQTableWidgetSize(QTableWidget *t);
 	static int findRowIndexContainingButton(QPushButton *button, QTableWidget *tableWidget);
+
 	//Functions used by SimpleImportDataDialog
 	QTableWidget* getSimpleTableWidget();
 	std::vector<DataPtr> getDatas() {return mData;};

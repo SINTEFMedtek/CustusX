@@ -39,6 +39,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+//From https://stackoverflow.com/questions/8766633/how-to-determine-the-correct-size-of-a-qtablewidget
+QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
+{
+	int w = t->verticalHeader()->width() + 4;
+	for (int i = 0; i < t->columnCount(); i++)
+		w += t->columnWidth(i);
+	int h = t->horizontalHeader()->height() + 4;
+	for (int i = 0; i < t->rowCount(); i++)
+		h += t->rowHeight(i);
+	return QSize(w, h);
+}
+
 ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
 	mImportWidget(parent),
@@ -119,6 +131,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		this->createDataSpecificGui(i);
 	}
 	this->addPointMetricGroupsToTable();
+	mTableWidget->setMaximumSize(getQTableWidgetSize(mTableWidget));
+	mTableWidget->setMinimumHeight(getQTableWidgetSize(mTableWidget).height());
 
 	//gui
 	QVBoxLayout *topLayout = new QVBoxLayout(this);
@@ -650,6 +664,7 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, filenamecoloumn)->text()));
 		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, numSlicesColoumn)->text()));
 	}
+	simpleTableWidget->setMinimumSize(getQTableWidgetSize(simpleTableWidget));
 
 	return simpleTableWidget;
 }
