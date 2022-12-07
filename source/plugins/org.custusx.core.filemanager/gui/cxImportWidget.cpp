@@ -71,7 +71,7 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 
 void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
 {
-	int filenameColoumn = 0;
+	int filenameColoumn = 1;
 	QString fullfilename = mImportDataTypeWidget->getSimpleTableWidget()->item(currentRow, filenameColoumn)->text();
 	std::vector<DataPtr> datas = mImportDataTypeWidget->getDatas();
 	DataPtr selected;
