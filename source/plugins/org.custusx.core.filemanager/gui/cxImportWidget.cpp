@@ -325,7 +325,7 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 {
 	QString file_type_filter = generateFileTypeFilter();
 
-	QFileDialog dialog(this->parentWidget(), QString(tr("Select data file(s)/directories for import")), profile()->getSessionRootFolder(), tr(file_type_filter.toStdString().c_str()));
+	QFileDialog dialog(this->parentWidget(), QString(tr("Select image data file(s)/directories for import")), QDir::homePath(), tr(file_type_filter.toStdString().c_str()));
 	dialog.setFileMode(QFileDialog::Directory);
 
 	// Select multiple files and directories at the same time in QFileDialog
