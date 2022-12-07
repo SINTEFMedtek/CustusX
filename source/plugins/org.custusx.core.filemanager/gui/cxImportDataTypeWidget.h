@@ -59,6 +59,7 @@ private slots:
 private:
 	void createDataSpecificGui(int index);
 	void updateTableWithNumberOfSlices(ImagePtr image);
+	void updateTableWithSliceSpacing(ImagePtr image);
 	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
@@ -112,7 +113,8 @@ private:
 	int mNumSlicesColoumn = 2;
 	int mFilenameColoumn = 3;
 	int mTypeColoumn = 4;
-	int mSpaceColoumn = 5;
+	int mSliceSpacingColoumn = 5;
+	int mSpaceColoumn = 6;
 };
 
 }

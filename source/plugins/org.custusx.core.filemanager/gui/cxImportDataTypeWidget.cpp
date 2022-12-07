@@ -82,8 +82,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mStackedWidgetImageParameters = new QStackedWidget;
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
-	mTableWidget->setColumnCount(6);
-	mTableHeader<<""<<"Series num"<<"#"<<"Name"<<"Type"<<"Space";
+	mTableWidget->setColumnCount(7);
+	mTableHeader<<""<<"Series num"<<"#"<<"Name"<<"Type"<<"Slice spacing"<<"Space";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
@@ -193,6 +193,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 	{
 		mTableWidget->setItem(mTableWidget->rowCount()-1, mSeriesNumColumn, new QTableWidgetItem(image->getDicomSeriesNumber()));
 		this->updateTableWithNumberOfSlices(image);
+		this->updateTableWithSliceSpacing(image);
 
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
 		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
@@ -223,6 +224,15 @@ void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
 	QString numSlices = QString::number(dims[2]);
 	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, mNumSlicesColoumn);
 	tableItem->setText(numSlices);
+}
+
+
+void ImportDataTypeWidget::updateTableWithSliceSpacing(ImagePtr image)
+{
+	double spacing = image->getSpacing()[2];
+	QString spacingText;
+	spacingText.setNum(spacing, 'g', 2);
+	mTableWidget->setItem(mTableWidget->rowCount()-1, mSliceSpacingColoumn, new QTableWidgetItem(spacingText+" mm"));
 }
 
 void ImportDataTypeWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -641,9 +651,9 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 {
 	QTableWidget* simpleTableWidget = new QTableWidget();
 	simpleTableWidget->setRowCount(0);
-	simpleTableWidget->setColumnCount(3);
+	simpleTableWidget->setColumnCount(4);
 	QStringList tableHeader;
-	tableHeader<<"Series num"<<"Name"<<"Num slices";
+	tableHeader<<"Series num"<<"Name"<<"Num slices"<<"Slice spacing";
 	simpleTableWidget->setHorizontalHeaderLabels(tableHeader);
 	simpleTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	simpleTableWidget->verticalHeader()->setVisible(false);
@@ -661,6 +671,7 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, mSeriesNumColumn)->text()));
 		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, mFilenameColoumn)->text()));
 		simpleTableWidget->setItem(i, 2, new QTableWidgetItem(mTableWidget->item(i, mNumSlicesColoumn)->text()));
+		simpleTableWidget->setItem(i, 3, new QTableWidgetItem(mTableWidget->item(i, mSliceSpacingColoumn)->text()));
 	}
 	simpleTableWidget->setMinimumSize(getQTableWidgetSize(simpleTableWidget));
 
