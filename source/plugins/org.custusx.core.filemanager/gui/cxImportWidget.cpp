@@ -133,7 +133,7 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTopLayout->addLayout(buttonLayout);
 	mTopLayout->addWidget(new QLabel("Supports: "+this->generateFileTypeFilter()));
 	mTopLayout->addWidget(mTableWidget);
-	mTopLayout->addWidget(mStackedWidget, 1);
+	mTopLayout->addWidget(mStackedWidget);
 	mTopLayout->addStretch();
 
 	connect(addMoreFilesButton, &QPushButton::clicked, this, &ImportWidget::addMoreFilesButtonClicked);
