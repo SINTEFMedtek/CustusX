@@ -107,6 +107,12 @@ private:
 	StringPropertyImageTypePtr mImageTypeAdapter;
 	QWidget* mImageTypeCombo;
 	QWidget* mModalityCombo;
+
+	int mSeriesNumColumn = 1;
+	int mNumSlicesColoumn = 2;
+	int mFilenameColoumn = 3;
+	int mTypeColoumn = 4;
+	int mSpaceColoumn = 5;
 };
 
 }

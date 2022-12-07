@@ -70,12 +70,17 @@ QString DicomConverter::convertToValidName(QString text) const
 	return text	;
 }
 
-
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
 	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
 	QString name = convertToValidName(seriesDescription);
 	return name;
+}
+
+QString DicomConverter::getSeriesNumber(DicomImageReaderPtr reader)
+{
+	QString seriesNumber = reader->item()->GetElementAsString(DCM_SeriesNumber);
+	return seriesNumber;
 }
 
 ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
@@ -102,6 +107,7 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	QString uid = this->generateUid(reader);
 	QString name = this->generateName(reader);
 	cx::ImagePtr image = cx::Image::create(uid, name);
+	image->setDicomSeriesNumber(this->getSeriesNumber(reader));
 
 	vtkImageDataPtr imageData = reader->createVtkImageData();
 	if (!imageData)

@@ -500,6 +500,16 @@ bool Image::is2D()
 	return this->getBaseVtkImageData()->GetDimensions()[2]==1;
 }
 
+void Image::setDicomSeriesNumber(QString seriesNumber)
+{
+	mDicomSeriesNumber = seriesNumber;
+}
+
+QString Image::getDicomSeriesNumber()
+{
+	return mDicomSeriesNumber;
+}
+
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);

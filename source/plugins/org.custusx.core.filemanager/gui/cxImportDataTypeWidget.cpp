@@ -82,8 +82,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mStackedWidgetImageParameters = new QStackedWidget;
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
-	mTableWidget->setColumnCount(5);
-	mTableHeader<<""<<"#"<<"Name"<<"Type"<<"Space";
+	mTableWidget->setColumnCount(6);
+	mTableHeader<<""<<"Series num"<<"#"<<"Name"<<"Type"<<"Space";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
@@ -123,10 +123,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			int newRowIndex = mTableWidget->rowCount();
 			mTableWidget->setRowCount(newRowIndex+1);
 			mTableWidget->setCellWidget(newRowIndex, 0, removeButton);
-			mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem("1"));
-			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(name));
-			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(type));
-			mTableWidget->setItem(newRowIndex, 4, new QTableWidgetItem(space));
+			mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem("1"));
+			mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
+			mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
+			//mTableWidget->setItem(newRowIndex, 5, new QTableWidgetItem(space));
 		}
 		this->createDataSpecificGui(i);
 	}
@@ -191,6 +191,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[index]);
 	if(image)
 	{
+		mTableWidget->setItem(mTableWidget->rowCount()-1, mSeriesNumColumn, new QTableWidgetItem(image->getDicomSeriesNumber()));
 		this->updateTableWithNumberOfSlices(image);
 
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
@@ -220,8 +221,7 @@ void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
 	int dims[3];
 	image->getBaseVtkImageData()->GetDimensions(dims);
 	QString numSlices = QString::number(dims[2]);
-	int numSlicesColoumn = 1;
-	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, numSlicesColoumn);
+	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, mNumSlicesColoumn);
 	tableItem->setText(numSlices);
 }
 
@@ -234,8 +234,7 @@ void ImportDataTypeWidget::removeRowFromTableAndDataFromImportList()
 {
 	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
 	int rowindex = this->findRowIndexContainingButton(button, mTableWidget);
-	int filenamecoloumn = 2;
-	QString fullfilename = mTableWidget->item(rowindex, filenamecoloumn)->text();
+	QString fullfilename = mTableWidget->item(rowindex, mFilenameColoumn)->text();
 	if(rowindex != -1)
 		mTableWidget->removeRow(rowindex);
 
@@ -615,10 +614,10 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 
 		int newRowIndex = mTableWidget->rowCount();
 		mTableWidget->setRowCount(newRowIndex+1);
-		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(QString::number(datas.size())));
-		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(name));
-		mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(type));
-		mTableWidget->setCellWidget(newRowIndex, 4, spaceCB);
+		mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
+		mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
+		mTableWidget->setCellWidget(newRowIndex, mSpaceColoumn, spaceCB);
 	}
 }
 
@@ -642,9 +641,9 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 {
 	QTableWidget* simpleTableWidget = new QTableWidget();
 	simpleTableWidget->setRowCount(0);
-	simpleTableWidget->setColumnCount(2);
+	simpleTableWidget->setColumnCount(3);
 	QStringList tableHeader;
-	tableHeader<<"Name"<<"Num slices";
+	tableHeader<<"Series num"<<"Name"<<"Num slices";
 	simpleTableWidget->setHorizontalHeaderLabels(tableHeader);
 	simpleTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	simpleTableWidget->verticalHeader()->setVisible(false);
@@ -657,12 +656,11 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 
 
 	simpleTableWidget->setRowCount(mTableWidget->rowCount());
-	int filenamecoloumn = 2;
-	int numSlicesColoumn = 1;
 	for(int i = 0; i < mTableWidget->rowCount(); ++i)
 	{
-		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, filenamecoloumn)->text()));
-		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, numSlicesColoumn)->text()));
+		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, mSeriesNumColumn)->text()));
+		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, mFilenameColoumn)->text()));
+		simpleTableWidget->setItem(i, 2, new QTableWidgetItem(mTableWidget->item(i, mNumSlicesColoumn)->text()));
 	}
 	simpleTableWidget->setMinimumSize(getQTableWidgetSize(simpleTableWidget));
 
