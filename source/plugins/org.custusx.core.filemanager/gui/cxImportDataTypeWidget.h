@@ -13,17 +13,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXIMPORTDATATYPEWIDGET_H
 
 #include "org_custusx_core_filemanager_Export.h"
+#include <QPushButton>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxLogger.h"
-#include  <QPushButton>
 #include "cxVisServices.h"
 #include "cxFileManagerService.h"
 #include "cxPatientModelService.h"
 #include "cxRegistrationTransform.h"
 #include "cxDataInterface.h"
-
 class QTableWidget;
+class QStackedWidget;
 
 namespace cx
 {
@@ -37,6 +37,14 @@ public:
 	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename);
 	~ImportDataTypeWidget();
 
+	static QSize getQTableWidgetSize(QTableWidget *t);
+	static int findRowIndexContainingButton(QPushButton *button, QTableWidget *tableWidget);
+
+	//Functions used by SimpleImportDataDialog
+	QTableWidget* getSimpleTableWidget();
+	std::vector<DataPtr> getDatas() {return mData;};
+	void setData(std::vector<DataPtr> datas) {mData = datas;}
+
 public slots:
 	void update();
 	void prepareDataForImport();
@@ -45,9 +53,13 @@ private slots:
 	virtual void showEvent(QShowEvent *event);
 	void pointMetricGroupSpaceChanged(int index);
 	void updateImageType();
+	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
+	void removeRowFromTableAndDataFromImportList();
 
 private:
-	void createDataSpecificGui(DataPtr data);
+	void createDataSpecificGui(int index);
+	void updateTableWithNumberOfSlices(ImagePtr image);
+	void updateTableWithSliceSpacing(ImagePtr image);
 	std::map<QString, QString> getParentCandidateList();
 
 	void updateSpaceComboBox(QComboBox *box, QString space);
@@ -91,10 +103,18 @@ private:
 	int mSelectedIndexInTable;
 
 	//image specific
+	QStackedWidget *mStackedWidgetImageParameters;
 	StringPropertyDataModalityPtr mModalityAdapter;
 	StringPropertyImageTypePtr mImageTypeAdapter;
 	QWidget* mImageTypeCombo;
 	QWidget* mModalityCombo;
+
+	int mSeriesNumColumn = 1;
+	int mNumSlicesColoumn = 2;
+	int mFilenameColoumn = 3;
+	int mTypeColoumn = 4;
+	int mSliceSpacingColoumn = 5;
+	int mSpaceColoumn = 6;
 };
 
 }

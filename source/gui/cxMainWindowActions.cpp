@@ -188,6 +188,12 @@ void MainWindowActions::createPatientActions()
 										 QKeySequence(),
 										 "Import all selected data files",
 										 [=](){this->importDataSlot("ImportButtonClickedAction");});
+
+	this->createAction("AddFilesForImportWithDialog", "Add files for import (Dialog)",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportWithDialogAction");});
 }
 
 template <class T>

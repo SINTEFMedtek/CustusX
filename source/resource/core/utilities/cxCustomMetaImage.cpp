@@ -37,6 +37,8 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 		retval = imUS;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imPET), Qt::CaseInsensitive))
 		retval = imPET;
+	else if(modalityString == "PT")
+		retval = imPET;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imSC), Qt::CaseInsensitive))
 		retval = imSC;
 	else

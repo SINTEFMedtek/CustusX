@@ -44,6 +44,7 @@ namespace cx
 typedef boost::shared_ptr<class MessageObserver> MessageObserverPtr;
 typedef boost::shared_ptr<class MessageListener> MessageListenerPtr;
 typedef boost::shared_ptr<class LogThread> LogThreadPtr;
+typedef boost::shared_ptr<class ReporterThread> ReporterThreadPtr;
 typedef boost::shared_ptr<class Log> LogPtr;
 
 /**
@@ -64,6 +65,8 @@ public:
 
   void installObserver(MessageObserverPtr observer, bool resend);
   void uninstallObserver(MessageObserverPtr observer);
+  void stopQtMessages();
+  void startQtMessages();
 
 signals:
   void loggingFolderChanged();

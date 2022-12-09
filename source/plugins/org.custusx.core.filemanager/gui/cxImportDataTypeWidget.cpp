@@ -20,6 +20,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QFileInfo>
+#include <QStackedWidget>
+#include <vtkImageData.h>
 #include "cxOptionsWidget.h"
 #include "cxFileReaderWriterService.h"
 #include "cxFileManagerService.h"
@@ -36,6 +38,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+
+//From https://stackoverflow.com/questions/8766633/how-to-determine-the-correct-size-of-a-qtablewidget
+QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
+{
+	int w = t->verticalHeader()->width() + 4;
+	for (int i = 0; i < t->columnCount(); i++)
+		w += t->columnWidth(i);
+	int h = t->horizontalHeader()->height() + 4;
+	for (int i = 0; i < t->rowCount(); i++)
+		h += t->rowHeight(i);
+	return QSize(w, h);
+}
 
 ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
@@ -65,12 +79,12 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mShouldConvertDataToUnsigned = new QCheckBox();
 	mShouldConvertDataToUnsigned->setCheckState(Qt::Unchecked);
 
+	mStackedWidgetImageParameters = new QStackedWidget;
 	mTableWidget = new QTableWidget();
 	mTableWidget->setRowCount(0);
-	mTableWidget->setColumnCount(4);
-	mTableHeader<<"#"<<"Type"<<"Name"<<"Space";
+	mTableWidget->setColumnCount(7);
+	mTableHeader<<""<<"Series num"<<"#"<<"Name"<<"Type"<<"Slice spacing"<<"Space";
 	mTableWidget->setHorizontalHeaderLabels(mTableHeader);
-	mTableWidget->horizontalHeader()->setStretchLastSection(true);
 	mTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mTableWidget->verticalHeader()->setVisible(false);
 	mTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -79,6 +93,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportDataTypeWidget::tableItemSelected);
 
 	QString type, name;
 	for(unsigned i=0; i<mData.size(); ++i)
@@ -100,16 +115,23 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 		//add image or mesh directly to the table
 		else
 		{
+
+			QIcon trashcan(":/icons/open_icon_library/edit-delete-2.png");
+			QPushButton *removeButton = new QPushButton(trashcan,"");
+			connect(removeButton, &QPushButton::clicked, this, &ImportDataTypeWidget::removeRowFromTableAndDataFromImportList);
+
 			int newRowIndex = mTableWidget->rowCount();
 			mTableWidget->setRowCount(newRowIndex+1);
-			mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem("1"));
-			mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-			mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
-			mTableWidget->setItem(newRowIndex, 3, new QTableWidgetItem(space));
+			mTableWidget->setCellWidget(newRowIndex, 0, removeButton);
+			mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem("1"));
+			mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
+			mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
 		}
-		this->createDataSpecificGui(mData[i]);
+		this->createDataSpecificGui(i);
 	}
 	this->addPointMetricGroupsToTable();
+	mTableWidget->setMaximumSize(getQTableWidgetSize(mTableWidget));
+	mTableWidget->setMinimumHeight(getQTableWidgetSize(mTableWidget).height());
 
 	//gui
 	QVBoxLayout *topLayout = new QVBoxLayout(this);
@@ -131,13 +153,12 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	gridLayout->addWidget(new QLabel("Convert data to unsigned?"), 4, 0);
 	gridLayout->addWidget(mShouldConvertDataToUnsigned, 4,1);
 	gridLayout->addWidget(mTableWidget, 5, 0, 1, 2);
-	if(mModalityCombo)
-		gridLayout->addWidget(mModalityCombo);
-	if(mImageTypeCombo)
-		gridLayout->addWidget(mImageTypeCombo);
+	gridLayout->addWidget(mStackedWidgetImageParameters);
+	gridLayout->setSpacing(1);//Make Widget more compact
 
 	groupBox->setLayout(gridLayout);
-	topLayout->addWidget(groupBox);
+	topLayout->addWidget(groupBox, 1);
+	topLayout->addStretch();
 
 	connect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
 	connect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
@@ -149,13 +170,30 @@ ImportDataTypeWidget::~ImportDataTypeWidget()
 	disconnect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
 }
 
-
-void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
+int ImportDataTypeWidget::findRowIndexContainingButton(QPushButton *button, QTableWidget* tableWidget)
 {
-	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	int retval = -1;
+	for(int i=0; i<tableWidget->rowCount(); ++i)
+	{
+		int buttonColoumn = 0;
+		QWidget *cellWidget = tableWidget->cellWidget(i,buttonColoumn);
+		if(button == cellWidget)
+			retval = i;
+	}
+	return retval;
+}
 
+void ImportDataTypeWidget::createDataSpecificGui(int index)
+{
+	QWidget* paramWidget = new QWidget(this);
+
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[index]);
 	if(image)
 	{
+		mTableWidget->setItem(mTableWidget->rowCount()-1, mSeriesNumColumn, new QTableWidgetItem(image->getDicomSeriesNumber()));
+		this->updateTableWithNumberOfSlices(image);
+		this->updateTableWithSliceSpacing(image);
+
 		mModalityAdapter = StringPropertyDataModality::New(mServices->patient());
 		mModalityCombo = new LabeledComboBoxWidget(this, mModalityAdapter);
 		mModalityAdapter->setData(image);
@@ -169,7 +207,56 @@ void ImportDataTypeWidget::createDataSpecificGui(DataPtr data)
 			mModalityAdapter->setValue(enum2string(imMR));
 			updateImageType();
 		}
+		QHBoxLayout* layout = new QHBoxLayout();
+		layout->addWidget(mModalityCombo);
+		layout->addWidget(mImageTypeCombo);
+		paramWidget->setLayout(layout);
 	}
+
+	mStackedWidgetImageParameters->insertWidget(index, paramWidget);
+}
+
+void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
+{
+	int dims[3];
+	image->getBaseVtkImageData()->GetDimensions(dims);
+	QString numSlices = QString::number(dims[2]);
+	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, mNumSlicesColoumn);
+	tableItem->setText(numSlices);
+}
+
+
+void ImportDataTypeWidget::updateTableWithSliceSpacing(ImagePtr image)
+{
+	double spacing = image->getSpacing()[2];
+	QString spacingText;
+	spacingText.setNum(spacing, 'g', 2);
+	mTableWidget->setItem(mTableWidget->rowCount()-1, mSliceSpacingColoumn, new QTableWidgetItem(spacingText+" mm"));
+}
+
+void ImportDataTypeWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
+{
+	mStackedWidgetImageParameters->setCurrentIndex(currentRow);
+}
+
+void ImportDataTypeWidget::removeRowFromTableAndDataFromImportList()
+{
+	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
+	int rowindex = this->findRowIndexContainingButton(button, mTableWidget);
+	QString fullfilename = mTableWidget->item(rowindex, mFilenameColoumn)->text();
+	if(rowindex != -1)
+		mTableWidget->removeRow(rowindex);
+
+	for (std::vector<DataPtr>::iterator it = mData.begin(); it != mData.end();)
+	{
+		if((*it)->getName() == fullfilename)
+			mData.erase(it);
+		else
+			++ it;
+	}
+
+	QWidget *widgetToRemove = mStackedWidgetImageParameters->widget(rowindex);
+	mStackedWidgetImageParameters->removeWidget(widgetToRemove);
 }
 
 void ImportDataTypeWidget::updateImageType()
@@ -536,10 +623,10 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 
 		int newRowIndex = mTableWidget->rowCount();
 		mTableWidget->setRowCount(newRowIndex+1);
-		mTableWidget->setItem(newRowIndex, 0, new QTableWidgetItem(QString::number(datas.size())));
-		mTableWidget->setItem(newRowIndex, 1, new QTableWidgetItem(name));
-		mTableWidget->setItem(newRowIndex, 2, new QTableWidgetItem(type));
-		mTableWidget->setCellWidget(newRowIndex, 3, spaceCB);
+		mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
+		mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
+		mTableWidget->setCellWidget(newRowIndex, mSpaceColoumn, spaceCB);
 	}
 }
 
@@ -559,4 +646,35 @@ bool ImportDataTypeWidget::isSegmentation(QString filename)
 	return false;
 }
 
+QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
+{
+	QTableWidget* simpleTableWidget = new QTableWidget();
+	simpleTableWidget->setRowCount(0);
+	simpleTableWidget->setColumnCount(4);
+	QStringList tableHeader;
+	tableHeader<<"Series num"<<"Name"<<"Num slices"<<"Slice spacing";
+	simpleTableWidget->setHorizontalHeaderLabels(tableHeader);
+	simpleTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	simpleTableWidget->verticalHeader()->setVisible(false);
+	simpleTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	simpleTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+	simpleTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+	simpleTableWidget->setShowGrid(true);
+	simpleTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
+	simpleTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+
+
+	simpleTableWidget->setRowCount(mTableWidget->rowCount());
+	for(int i = 0; i < mTableWidget->rowCount(); ++i)
+	{
+		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, mSeriesNumColumn)->text()));
+		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, mFilenameColoumn)->text()));
+		simpleTableWidget->setItem(i, 2, new QTableWidgetItem(mTableWidget->item(i, mNumSlicesColoumn)->text()));
+		simpleTableWidget->setItem(i, 3, new QTableWidgetItem(mTableWidget->item(i, mSliceSpacingColoumn)->text()));
+	}
+	simpleTableWidget->setMinimumSize(getQTableWidgetSize(simpleTableWidget));
+
+	return simpleTableWidget;
 }
+
+}//cx
