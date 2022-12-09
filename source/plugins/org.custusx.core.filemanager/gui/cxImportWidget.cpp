@@ -199,9 +199,6 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()
 
 	bool addedDICOM = false;
 
-//	QProgressDialog progress("Importing files...", QString(), 0, 0, this);
-//	this->showProgressDialog(progress);
-
 	ImportDataTypeWidget *widget = NULL;
 	for(int i = 0; i < filenames.size(); ++i)
 	{
@@ -224,11 +221,9 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked()
 		mFileNames.push_back(filename);
 
 		std::vector<DataPtr> newData = mFileManager->read(filename);
-//		CX_LOG_DEBUG() << "filename: " << filename << " newData.size: " << newData.size();
 		if(newData.size() > 0)
 		{
 			int index = this->insertDataIntoTable(filename, newData);
-//			CX_LOG_DEBUG() << "index: " << index;
 			widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename);
 			mStackedWidget->insertWidget(index, widget);
 			mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
@@ -325,7 +320,7 @@ QStringList ImportWidget::openFileBrowserForSelectingFiles()
 {
 	QString file_type_filter = generateFileTypeFilter();
 
-	QFileDialog dialog(this->parentWidget(), QString(tr("Select image data file(s)/directories for import")), QDir::homePath(), tr(file_type_filter.toStdString().c_str()));
+	QFileDialog dialog(this->parentWidget(), QString(tr("Select Medical Image file(s)/folder(s) for import")), QDir::homePath(), tr(file_type_filter.toStdString().c_str()));
 	dialog.setFileMode(QFileDialog::Directory);
 
 	// Select multiple files and directories at the same time in QFileDialog

@@ -142,7 +142,7 @@ void Log::stopQtMessages()
 	if (reporterThread)
 		reporterThread->stopQtMessages();
 	else
-		CX_LOG_DEBUG() << "Found no reporterThread";
+		CX_LOG_WARNING() << "Found no reporterThread";
 }
 void Log::startQtMessages()
 {

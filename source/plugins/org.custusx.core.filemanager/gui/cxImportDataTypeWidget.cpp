@@ -126,7 +126,6 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem("1"));
 			mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
 			mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
-			//mTableWidget->setItem(newRowIndex, 5, new QTableWidgetItem(space));
 		}
 		this->createDataSpecificGui(i);
 	}

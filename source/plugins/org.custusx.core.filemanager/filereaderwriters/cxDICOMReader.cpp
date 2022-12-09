@@ -163,7 +163,7 @@ bool DICOMReader::canWrite(const QString &type, const QString &filename) const
 std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestSeries)
 {
 	//Turn off Qt messages temporarily
-	CX_LOG_DEBUG() << "stopQtMessages while reading DICOM files";
+	CX_LOG_INFO() << "stopQtMessages while reading DICOM files";
 	reporter()->stopQtMessages();
 
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
@@ -202,14 +202,14 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 
 	//Turn Qt messages back on
 	reporter()->startQtMessages();
-	CX_LOG_DEBUG() << "DICOM files read - startQtMessages";
+	CX_LOG_INFO() << "DICOM files read - startQtMessages";
 	return retval;
 }
 
 
 QStringList DICOMReader::findAllSubfoldersWithDicomFiles(QString folder, QProgressDialog &progress)
 {
-	CX_LOG_DEBUG() << "Finding all subfolders in: " << folder;
+	CX_LOG_INFO() << "Finding all subfolders in: " << folder;
 	QStringList subDirs = findAllSubDirs(folder);
 
 	progress.setLabelText("Searcing all subdirectories for DICOM series: "+folder);
