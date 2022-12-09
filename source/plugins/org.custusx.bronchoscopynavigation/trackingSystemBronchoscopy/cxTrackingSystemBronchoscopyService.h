@@ -84,6 +84,7 @@ private slots:
 	void onStateChanged();
 
 private:
+	TrackingSystemServicePtr getIGSTKTrackingSystemService();
 
 	std::vector<ToolPtr> mTools; ///< all tools
 	ToolPtr mTool;
