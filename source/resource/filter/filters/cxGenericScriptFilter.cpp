@@ -241,10 +241,12 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	CommandStringVariables variables = createCommandStringVariables(input);
 
-	CX_LOG_DEBUG() << "deepSintefCommandString(variables): " << deepSintefCommandString(variables);
+	//CX_LOG_DEBUG() << "deepSintefCommandString(variables): " << deepSintefCommandString(variables);
 
 	if(isUsingDeepSintefEngine(variables))
 		return deepSintefCommandString(variables);
+	else if(isUsingRaidionicsEngine(variables))
+		return raidionicsCommandString(variables);
 
 	return standardCommandString(variables);
 }
@@ -281,6 +283,13 @@ bool GenericScriptFilter::isUsingDeepSintefEngine(CommandStringVariables variabl
 	return false;
 }
 
+bool GenericScriptFilter::isUsingRaidionicsEngine(CommandStringVariables variables)
+{
+	if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
+		return true;
+	return false;
+}
+
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
 {
 	QString commandString = variables.envPath;
@@ -294,6 +303,30 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 	commandString.append(",ModelsList ");
 	commandString.append(variables.model);
 	commandString.append("\"");
+	return commandString;
+}
+
+QString GenericScriptFilter::raidionicsCommandString(CommandStringVariables variables)
+{
+	//TODO:
+	// - Create raidionics main ini file. Using example set in raidionics_Airways.ini for now
+	// - Create raidionics json file
+	// - Create Python wrapper as we have done for deepSintef
+
+	//Example code for running raidionics with the example setup
+	//The output isn't automatically imported into CustusX
+
+	//The raidionics virual environment it set up like this:
+//	sudo apt-get update
+//	sudo apt install python3.8-venv
+//	python3 -m venv venv
+//	source venv/bin/activate
+//	pip install --upgrade pip
+//	pip install git+https://github.com/dbouget/raidionics-rads-lib.git
+
+	QString commandString = variables.envPath;
+	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + variables.cArguments);
 	return commandString;
 }
 
