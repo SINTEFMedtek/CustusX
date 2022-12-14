@@ -316,13 +316,7 @@ QString GenericScriptFilter::raidionicsCommandString(CommandStringVariables vari
 	//Example code for running raidionics with the example setup
 	//The output isn't automatically imported into CustusX
 
-	//The raidionics virual environment it set up like this:
-//	sudo apt-get update
-//	sudo apt install python3.8-venv
-//	python3 -m venv venv
-//	source venv/bin/activate
-//	pip install --upgrade pip
-//	pip install git+https://github.com/dbouget/raidionics-rads-lib.git
+	//The raidionics virtual environment can be setup with the script: cxCreateRaidionicsVenv.sh
 
 	QString commandString = variables.envPath;
 	commandString.append(" " + variables.scriptFilePath);
