@@ -40,6 +40,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFilePathProperty.h"
 #include "cxProfile.h"
 #include "cxLogger.h"
+#include "cxRaidionics.h"
 
 namespace cx
 {
@@ -246,7 +247,9 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	if(isUsingDeepSintefEngine(variables))
 		return deepSintefCommandString(variables);
 	else if(isUsingRaidionicsEngine(variables))
-		return raidionicsCommandString(variables);
+	{
+		return Raidionics::raidionicsCommandString(variables);
+	}
 
 	return standardCommandString(variables);
 }
@@ -306,27 +309,10 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 	return commandString;
 }
 
-QString GenericScriptFilter::raidionicsCommandString(CommandStringVariables variables)
-{
-	//TODO:
-	// - Create raidionics main ini file. Using example set in raidionics_Airways.ini for now
-	// - Create raidionics json file
-	// - Create Python wrapper as we have done for deepSintef
-
-	//Example code for running raidionics with the example setup
-	//The output isn't automatically imported into CustusX
-
-	//The raidionics virtual environment can be setup with the script: cxCreateRaidionicsVenv.sh
-
-	QString commandString = variables.envPath;
-	commandString.append(" " + variables.scriptFilePath);
-	commandString.append(" " + variables.cArguments);
-	return commandString;
-}
 
 bool GenericScriptFilter::environmentExist(QString path)
 {
-	return QFileInfo(path).exists();
+	return QFileInfo::exists(path);
 }
 
 QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables)

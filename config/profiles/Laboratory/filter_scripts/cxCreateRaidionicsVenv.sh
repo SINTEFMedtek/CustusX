@@ -3,7 +3,7 @@
 # Create raidionics python virtual environment
 # Usage:
 # cxCreateRaidionicsVenv venvBasePath
-# venvBasePath = Path to location where the venv should be craeted
+# venvBasePath = Path to location where the venv should be created. Skip for . (current folder)
 
 venvBasePath=$1;
 

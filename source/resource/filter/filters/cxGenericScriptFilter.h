@@ -98,7 +98,6 @@ protected:
 	bool isUsingDeepSintefEngine(CommandStringVariables variables);
 	bool isUsingRaidionicsEngine(CommandStringVariables variables);
 	QString deepSintefCommandString(CommandStringVariables variables);
-	QString raidionicsCommandString(CommandStringVariables variables);
 	
 	bool environmentExist(QString path);
 	QString getEnvironmentPath(CommandStringVariables variables);
