@@ -248,6 +248,7 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 		return deepSintefCommandString(variables);
 	else if(isUsingRaidionicsEngine(variables))
 	{
+		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh");
 		return Raidionics::raidionicsCommandString(variables);
 	}
 
@@ -309,7 +310,6 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 	return commandString;
 }
 
-
 bool GenericScriptFilter::environmentExist(QString path)
 {
 	return QFileInfo::exists(path);
@@ -326,10 +326,12 @@ QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables
 QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
 {
 	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
-	//CX_LOG_DEBUG() << "basePath: " << basePath;
+	QDir dir(basePath);
+	dir.cdUp();
+	basePath = dir.absolutePath();
 	
 	if(!this->environmentExist(basePath))
-		basePath = this->findRequirementsFileLocation(basePath);	
+		basePath = this->findRequirementsFileLocation(basePath);
 	
 	return basePath;
 }
@@ -372,18 +374,33 @@ QString GenericScriptFilter::findRequirementsFileLocation(QString path)
 	return retval;
 }
 
-bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath)
+bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript)
 {
-	if(!this->environmentExist(environmentPath) && this->isVirtualEnvironment(environmentPath))
+	if(createScript.isEmpty())
+		createScript = "cxCreateVenv.sh";
+
+	environmentPath = removeTrailingPythonVariable(environmentPath);
+
+	if(!this->environmentExist(environmentPath) || !this->isVirtualEnvironment(environmentPath))
 	{
+		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
+		CX_LOG_WARNING() << "Admin password may be required for the command shown below";
 		if(!this->createProcess())
 			return false;
 		QString basePath = this->getEnvironmentBasePath(environmentPath);
 		QString scriptPath = getScriptPath();
-		bool retval = runCommandStringAndWait(scriptPath+"/cxCreateVenv.sh " + basePath + " " + requirementsPath);
+		bool retval = runCommandStringAndWait(scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath);
 		return retval;
 	}
+//	else
+//		CX_LOG_DEBUG() << "Virtual environment existing: " << environmentPath;
 	return false;
+}
+
+QString GenericScriptFilter::removeTrailingPythonVariable(QString environmentPath)
+{
+	//Only remove the possible trailing " -u" for now
+	return environmentPath.split(" -u")[0];
 }
 
 bool GenericScriptFilter::isVirtualEnvironment(QString path)
@@ -395,7 +412,7 @@ bool GenericScriptFilter::isVirtualEnvironment(QString path)
 
 QString GenericScriptFilter::getFixedEnvironmentSubdir()
 {
-	QString retval("venv/bin/python");
+	QString retval("bin/python");
 	return retval;
 }
 
@@ -413,10 +430,10 @@ QString GenericScriptFilter::getScriptPath()
 	scriptFilePath.replace("./","/");
 
 	retval = QFileInfo(parameterFilePath).absoluteDir().absolutePath()+QFileInfo(scriptFilePath).dir().path();
-	CX_LOG_DEBUG() << "Pyton script file path: " << retval;
+//	CX_LOG_DEBUG() << "Pyton script file path: " << retval;
 
 	retval = QFileInfo(parameterFilePath).absoluteDir().absolutePath();
-	CX_LOG_DEBUG() << "Using ini file path as script path: " << retval;
+//	CX_LOG_DEBUG() << "Using ini file path as script path: " << retval;
 
 	return retval;
 }
@@ -525,7 +542,6 @@ bool GenericScriptFilter::execute()
 bool GenericScriptFilter::createProcess()
 {
 	mCommandLine.reset();//delete
-	CX_LOG_DEBUG() << "createProcess";
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
 	mCommandLine->turnOffReporting();//Handle output in this class instead
 

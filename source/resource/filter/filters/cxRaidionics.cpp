@@ -36,6 +36,7 @@ QString Raidionics::raidionicsCommandString(CommandStringVariables variables)
 	QString raidionicsIni = Raidionics::createRaidionicsIniFile(variables);
 
 	QString commandString = variables.envPath;
+
 	commandString.append(" " + variables.scriptFilePath);
 	commandString.append(" " + raidionicsIni);
 //	commandString.append(" " + variables.cArguments);

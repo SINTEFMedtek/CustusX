@@ -32,17 +32,17 @@ struct cxResourceFilter_EXPORT CommandStringVariables
 	QString scriptEngine;
 	QString model;
 
-    CommandStringVariables(QString parameterFilePath, ImagePtr input);
+	CommandStringVariables(QString parameterFilePath, ImagePtr input);
 };
 
 struct cxResourceFilter_EXPORT OutputVariables
 {
-    bool mCreateOutputVolume;
-    bool mCreateOutputMesh;
-    QStringList mOutputColorList;
-    QStringList mOutputClasses;
+	bool mCreateOutputVolume;
+	bool mCreateOutputMesh;
+	QStringList mOutputColorList;
+	QStringList mOutputClasses;
 
-    OutputVariables(QString parameterFilePath);
+	OutputVariables(QString parameterFilePath);
 };
 
 /** Generic filter calling external filter script.
@@ -70,7 +70,7 @@ public:
 
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
-    void setParameterFilePath(QString path);
+	void setParameterFilePath(QString path);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
 
@@ -103,11 +103,12 @@ protected:
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
 	QString findRequirementsFileLocation(QString path);
-	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath);
+	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript = QString());
 	bool isVirtualEnvironment(QString path);
 	QString getFixedEnvironmentSubdir();
+	QString removeTrailingPythonVariable(QString environmentPath);
 
-    FilePathPropertyPtr mScriptFile;
+	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
 	vtkImageDataPtr mRawResult;
