@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <QDirIterator>
 #include <QTextStream>
+#include <QMessageBox>
+#include <QVBoxLayout>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -245,13 +247,15 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	//CX_LOG_DEBUG() << "deepSintefCommandString(variables): " << deepSintefCommandString(variables);
 
 	if(isUsingDeepSintefEngine(variables))
+	{
 		return deepSintefCommandString(variables);
+	}
 	else if(isUsingRaidionicsEngine(variables))
 	{
-		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh");
-		return Raidionics::raidionicsCommandString(variables);
+		QString command =  Raidionics::raidionicsCommandString(variables);
+		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh", command);
+		return command;
 	}
-
 	return standardCommandString(variables);
 }
 
@@ -374,7 +378,7 @@ QString GenericScriptFilter::findRequirementsFileLocation(QString path)
 	return retval;
 }
 
-bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript)
+bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript, QString command)
 {
 	if(createScript.isEmpty())
 		createScript = "cxCreateVenv.sh";
@@ -384,16 +388,56 @@ bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath
 	if(!this->environmentExist(environmentPath) || !this->isVirtualEnvironment(environmentPath))
 	{
 		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
-		CX_LOG_WARNING() << "Admin password may be required for the command shown below";
-		if(!this->createProcess())
-			return false;
+		CX_LOG_WARNING() << "Admin password may be required for the command run below";
 		QString basePath = this->getEnvironmentBasePath(environmentPath);
 		QString scriptPath = getScriptPath();
-		bool retval = runCommandStringAndWait(scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath);
-		return retval;
+		QString createCommand = scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath;
+		bool retval = false;
+		emit launchDialog(basePath, createCommand, command);
+
+		return this->createVenv(createCommand, command);	}
+	else
+	{
+		//CX_LOG_DEBUG() << "Virtual environment existing: " << environmentPath;
 	}
-//	else
-//		CX_LOG_DEBUG() << "Virtual environment existing: " << environmentPath;
+	return true;
+}
+
+void GenericScriptFilter::launchDialogSlot(QString venvPath, QString createCommand, QString command)
+{
+	showVenvInfoDialog(venvPath, createCommand);
+}
+
+bool GenericScriptFilter::createVenv(QString createCommand, QString command)
+{
+	if(!this->createProcess())
+		return false;
+	runCommandStringAndWait(createCommand);
+	return true;
+}
+
+bool GenericScriptFilter::showVenvInfoDialog(QString venvPath, QString createCommand)
+{
+//	CX_LOG_DEBUG() << "showVenvInfoDialog";
+	QString messageText;
+	messageText += "There is no virtual environment at: <br><code>" + venvPath + "</code><br><br>";
+	messageText += "CustusX may try to create one, and this will probably require that an administrator password is entered in the command line";
+//	messageText += "Running:<br>";
+//	messageText += "<code>" + createCommand + "</code>";
+
+	QMessageBox messageBox;
+	messageBox.setWindowModality(Qt::WindowModal);
+	messageBox.setTextFormat(Qt::RichText);
+	messageBox.setText("Virtual environment missing");
+	messageBox.setInformativeText(messageText);
+//	messageBox.setStandardButtons(QMessageBox::Cancel| QMessageBox::Ok);
+//	messageBox.setDefaultButton(QMessageBox::Ok);
+
+
+	messageBox.exec();
+	int result = messageBox.result();
+	if (result == QMessageBox::Ok)
+		return true;
 	return false;
 }
 
@@ -537,7 +581,6 @@ bool GenericScriptFilter::execute()
 
 	return retval; // Check for error?
 }
-
 
 bool GenericScriptFilter::createProcess()
 {

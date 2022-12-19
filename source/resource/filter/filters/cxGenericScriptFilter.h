@@ -74,6 +74,11 @@ public:
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
 
+signals:
+	void launchDialog(QString venvPath, QString createCommand, QString command);
+public slots:
+	void launchDialogSlot(QString venvPath, QString createCommand, QString command);
+
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
@@ -103,10 +108,12 @@ protected:
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
 	QString findRequirementsFileLocation(QString path);
-	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript = QString());
+	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript = QString(), QString command = QString());
 	bool isVirtualEnvironment(QString path);
 	QString getFixedEnvironmentSubdir();
 	QString removeTrailingPythonVariable(QString environmentPath);
+	bool showVenvInfoDialog(QString venvPath, QString createCommand);
+	bool createVenv(QString createCommand, QString command);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
