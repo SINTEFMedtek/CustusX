@@ -26,6 +26,8 @@ public:
 	static QString raidionicsCommandString(CommandStringVariables variables);
 	static QString createRaidionicsIniFile(CommandStringVariables variables);
 	static void createRaidionicsJasonFile(QString jsonFilePath);
+	static QString copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder);
+	static QString getModelFolder();
 };
 }//cx
 #endif // CXRAIDIONICS_H

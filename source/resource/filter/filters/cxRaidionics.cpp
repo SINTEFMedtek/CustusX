@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QJsonArray>
 #include "cxDataLocations.h"
 #include "cxLogger.h"
+#include "cxProfile.h"
 
 namespace cx
 {
@@ -50,30 +51,15 @@ QString Raidionics::createRaidionicsIniFile(CommandStringVariables variables)
 	QDir().mkpath(tempFolder);
 
 	QString iniFilePath = tempFolder + "Raidionics.ini";
-//	QString iniFilePath = variables.scriptFilePath;
 	QString jsonFilePath = tempFolder + "Raidionics.json";
 	createRaidionicsJasonFile(jsonFilePath);
 
-	QString inputFolder = tempFolder + "input/";
 	QString outputFolder = tempFolder + "output/";
-	QString modelFolder = tempFolder + "model/";//TODO: Don't use a temp folder for models
-	QDir().mkpath(inputFolder);
+	QString modelFolder = getModelFolder();
 	QDir().mkpath(outputFolder);
 	QDir().mkpath(modelFolder);
 
-
-	QString inputFileName(variables.inputFilePath);
-	QFile inputFile(inputFileName);
-	QFileInfo inputFileInfo(variables.inputFilePath);
-	inputFile.copy(inputFolder+inputFileInfo.fileName());
-
-	if (inputFileName.contains(".mhd"))
-	{
-		QString fileNameRaw = inputFileName.left(inputFileName.lastIndexOf("."))+".raw";
-		QFile inputRawFile(fileNameRaw);
-		QFileInfo inputRawFileInfo(fileNameRaw);
-		inputRawFile.copy(inputFolder+inputRawFileInfo.fileName());
-	}
+	QString inputFolder = copyInputFiles(tempFolder, variables.inputFilePath, "T0");
 
 	QSettings settings(iniFilePath, QSettings::IniFormat);
 
@@ -103,6 +89,32 @@ QString Raidionics::createRaidionicsIniFile(CommandStringVariables variables)
 //	settings.endGroup();
 
 	return iniFilePath;
+}
+
+QString Raidionics::copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder)
+{
+	QString inputFolder = parentFolder + "input/";
+
+	QString fullInputFolder = inputFolder + "/" + subfolder + "/";
+	QDir().mkpath(fullInputFolder);
+
+	QFile inputFile(inputFileName);
+	QFileInfo inputFileInfo(inputFile);
+	inputFile.copy(fullInputFolder+inputFileInfo.fileName());
+
+	if (inputFileName.contains(".mhd"))
+	{
+		QString fileNameRaw = inputFileName.left(inputFileName.lastIndexOf("."))+".raw";
+		QFile inputRawFile(fileNameRaw);
+		QFileInfo inputRawFileInfo(fileNameRaw);
+		inputRawFile.copy(fullInputFolder+inputRawFileInfo.fileName());
+	}
+	return inputFolder;
+}
+
+QString Raidionics::getModelFolder()
+{
+	return profile()->getPath() + "/raidionics_models";
 }
 
 //The ordering of the Qt generated json file is alphabetoical, and will not match the json example file

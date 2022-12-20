@@ -100,7 +100,7 @@ void GenericScriptFilter::processStateChanged()
 	QProcess::ProcessState newState = mCommandLine->getProcess()->state();
 	if (newState == QProcess::Running)
 	{
-		CX_LOG_DEBUG() << "GenericScriptFilter process running";
+//		CX_LOG_DEBUG() << "GenericScriptFilter process running";
 		//emit started(0);
 	}
 	if (newState == QProcess::NotRunning)
