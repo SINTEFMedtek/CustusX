@@ -632,7 +632,7 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 
 bool ImportDataTypeWidget::isInputFileInNiftiFormat()
 {
-	if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
+	if(mFilename.endsWith(".nii", Qt::CaseInsensitive) || mFilename.endsWith(".nii.gz", Qt::CaseInsensitive))
 		return true;
 	return false;
 }
