@@ -128,7 +128,7 @@ public:
 	}
 	bool testIsUsingDeepSintefEngine(cx::CommandStringVariables variables)
 	{
-		return isUsingDeepSintefEngine(variables);
+		return (mScriptEngine == seDeepSintef);
 	}
 	
 	bool testEnvironmentExist(QString environmentPath)

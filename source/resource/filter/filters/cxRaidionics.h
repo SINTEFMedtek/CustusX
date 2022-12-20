@@ -21,13 +21,22 @@ namespace cx
 class Raidionics
 {
 public:
-	Raidionics();
+	Raidionics(CommandStringVariables variables, QStringList targets);
 
-	static QString raidionicsCommandString(CommandStringVariables variables);
-	static QString createRaidionicsIniFile(CommandStringVariables variables);
-	static void createRaidionicsJasonFile(QString jsonFilePath);
-	static QString copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder);
-	static QString getModelFolder();
+	QString raidionicsCommandString();
+	QString getOutputFolder();
+
+protected:
+	QString createRaidionicsIniFile();
+	void createRaidionicsJasonFile(QString jsonFilePath);
+	QString copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder);
+	QString getModelFolder();
+
+	CommandStringVariables mVariables;
+	QString mOutputFolder;
+	QStringList mTargets;
 };
+
+typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
 }//cx
 #endif // CXRAIDIONICS_H

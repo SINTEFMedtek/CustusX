@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
 
 struct cxResourceFilter_EXPORT CommandStringVariables
 {
@@ -61,6 +62,15 @@ public:
 	GenericScriptFilter(VisServicesPtr services);
 	virtual ~GenericScriptFilter();
 
+	enum SCRIPT_ENGINE
+	{
+		seUnknown,
+		seStandard,
+		seDeepSintef,
+		seRaidionics,
+		seCOUNT
+	};
+
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
@@ -100,8 +110,7 @@ protected:
 
 	CommandStringVariables createCommandStringVariables(ImagePtr input);
 	QString standardCommandString(CommandStringVariables variables);
-	bool isUsingDeepSintefEngine(CommandStringVariables variables);
-	bool isUsingRaidionicsEngine(CommandStringVariables variables);
+	bool isUsingRaidionicsEngine();
 	QString deepSintefCommandString(CommandStringVariables variables);
 	
 	bool environmentExist(QString path);
@@ -114,6 +123,8 @@ protected:
 	QString removeTrailingPythonVariable(QString environmentPath);
 	bool showVenvInfoDialog(QString venvPath, QString createCommand);
 	bool createVenv(QString createCommand, QString command);
+	void setScriptEngine(CommandStringVariables variables);
+	void initRaidionicsEngine(CommandStringVariables variables);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
@@ -131,6 +142,8 @@ protected:
     SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
     StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
+	SCRIPT_ENGINE mScriptEngine = seUnknown;
+	RaidionicsPtr mRaidionicsUtilities;
 
 protected slots:
 	void scriptFileChanged();
@@ -142,7 +155,6 @@ protected slots:
 	bool createProcess();
 	bool deleteProcess();
 	bool disconnectProcess();
-
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 

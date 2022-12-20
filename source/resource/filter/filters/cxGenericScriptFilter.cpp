@@ -72,7 +72,7 @@ OutputVariables::OutputVariables(QString parameterFilePath)
     QString allColors = settings.value("color").toString();
     mOutputColorList = allColors.split(";");
     QString outputClass = settings.value("classes").toString();
-    mOutputClasses = outputClass.split(" ");
+	mOutputClasses = outputClass.split(" ");
     settings.endGroup();
 }
 
@@ -243,20 +243,29 @@ void GenericScriptFilter::scriptFileChanged()
 QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	CommandStringVariables variables = createCommandStringVariables(input);
-
-	//CX_LOG_DEBUG() << "deepSintefCommandString(variables): " << deepSintefCommandString(variables);
-
-	if(isUsingDeepSintefEngine(variables))
+	setScriptEngine(variables);
+	QString command;
+	switch (mScriptEngine)
 	{
+	case seStandard:
+		return standardCommandString(variables);
+		break;
+	case seDeepSintef:
 		return deepSintefCommandString(variables);
-	}
-	else if(isUsingRaidionicsEngine(variables))
-	{
-		QString command =  Raidionics::raidionicsCommandString(variables);
+		break;
+	case seRaidionics:
+		if(mRaidionicsUtilities)
+			command =  mRaidionicsUtilities->raidionicsCommandString();
+		else
+			CX_LOG_ERROR() << "GenericScriptFilter::createCommandString: No mRaidionicsUtilities";
 		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh", command);
 		return command;
+		break;
+	default:
+		CX_LOG_WARNING() << "Unknown Script engine: " << mScriptEngine << ". Using default setup";
+		return standardCommandString(variables);
+		break;
 	}
-	return standardCommandString(variables);
 }
 
 CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePtr input)
@@ -284,18 +293,32 @@ QString GenericScriptFilter::standardCommandString(CommandStringVariables variab
 	return commandString;
 }
 
-bool GenericScriptFilter::isUsingDeepSintefEngine(CommandStringVariables variables)
+bool GenericScriptFilter::isUsingRaidionicsEngine()
 {
-	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
-		return true;
-	return false;
+	bool retval = mScriptEngine == seRaidionics;
+	if(retval && !mRaidionicsUtilities)
+		CX_LOG_ERROR() << "GenericScriptFilter::isUsingRaidionicsEngine: No mRaidionicsUtilities";
+	return retval;
 }
 
-bool GenericScriptFilter::isUsingRaidionicsEngine(CommandStringVariables variables)
+void GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 {
-	if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
-		return true;
-	return false;
+	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
+		mScriptEngine = seDeepSintef;
+	else if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
+	{
+		this->initRaidionicsEngine(variables);
+		mScriptEngine = seRaidionics;
+	}
+	else
+		mScriptEngine = seStandard;
+}
+
+void GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
+{
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
+	OutputVariables outputVariables = OutputVariables(parameterFilePath);
+	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(variables, outputVariables.mOutputClasses));
 }
 
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
@@ -716,6 +739,7 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 
 bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh)
 {
+//	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles";
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
 	{
@@ -730,13 +754,30 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
+	if(isUsingRaidionicsEngine())
+		outputDir = mRaidionicsUtilities->getOutputFolder();
+//	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
+
+
+
 	QDirIterator fileIterator(outputDir, QDir::Files);
 	while (fileIterator.hasNext())
 	{
 		QString filePath = fileIterator.next();
-		if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".mhd"))
+//		CX_LOG_DEBUG() << "Importing: " << filePath;
+
+		if(filePath.contains(outputFileNamesNoExtention) &&
+				(filePath.contains(".mhd")) || filePath.contains(".nii") || filePath.contains(".nii.gz"))
 		{
 			QFileInfo fileInfoOutput(filePath);
+			if(outputFileNamesNoExtention == fileInfoOutput.baseName() || outputFileNamesNoExtention == QFileInfo(fileInfoOutput.baseName()).baseName())
+			{
+				CX_LOG_INFO() << "Skipping copy of input image: " << filePath;
+				continue;//Skip input volume. The mesh creation in this use a very long time
+			}
+			else
+				CX_LOG_INFO() << "Importing: " << filePath;
+
 			QString uid =	fileInfoOutput.fileName().replace(".mhd", "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
@@ -826,15 +867,15 @@ void GenericScriptFilter::createOutputVolume()
 void GenericScriptFilter::deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume)
 {
     //delete files not used anymore
-    if (QFileInfo(fileNameMhd).exists() && !createOutputVolume)
+	if (QFileInfo::exists(fileNameMhd) && !createOutputVolume)
         QFile(fileNameMhd).remove();
 
     QString fileNameRaw = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".raw";
-    if (QFileInfo(fileNameRaw).exists() && !createOutputVolume)
+	if (QFileInfo::exists(fileNameRaw) && !createOutputVolume)
         QFile(fileNameRaw).remove();
 
     QString fileNameNii = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".nii";
-    if (QFileInfo(fileNameNii).exists())
+	if (QFileInfo::exists(fileNameNii))
         QFile(fileNameNii).remove();
 }
 

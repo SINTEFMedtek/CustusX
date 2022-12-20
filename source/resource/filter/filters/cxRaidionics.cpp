@@ -21,10 +21,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-Raidionics::Raidionics()
+Raidionics::Raidionics(CommandStringVariables variables, QStringList targets) :
+	mVariables(variables),
+	mTargets(targets)
 {}
 
-QString Raidionics::raidionicsCommandString(CommandStringVariables variables)
+QString Raidionics::raidionicsCommandString()
 {
 	//TODO:
 	// - Create Python wrapper as we have done for deepSintef
@@ -34,17 +36,23 @@ QString Raidionics::raidionicsCommandString(CommandStringVariables variables)
 
 	//The raidionics virtual environment can be setup with the script: cxCreateRaidionicsVenv.sh
 
-	QString raidionicsIni = Raidionics::createRaidionicsIniFile(variables);
+	QString raidionicsIni = Raidionics::createRaidionicsIniFile();
 
-	QString commandString = variables.envPath;
+	QString commandString = mVariables.envPath;
 
-	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + mVariables.scriptFilePath);
 	commandString.append(" " + raidionicsIni);
 //	commandString.append(" " + variables.cArguments);
 	return commandString;
 }
 
-QString Raidionics::createRaidionicsIniFile(CommandStringVariables variables)
+QString Raidionics::getOutputFolder()
+{
+	QString subfolder = "T0";
+	return mOutputFolder + "/" + subfolder;
+}
+
+QString Raidionics::createRaidionicsIniFile()
 {
 	QString tempFolder = DataLocations::getCachePath() + "/Raidionics_temp/";
 	CX_LOG_DEBUG() << "Creating Raidionics temp folder: " << tempFolder;
@@ -54,12 +62,12 @@ QString Raidionics::createRaidionicsIniFile(CommandStringVariables variables)
 	QString jsonFilePath = tempFolder + "Raidionics.json";
 	createRaidionicsJasonFile(jsonFilePath);
 
-	QString outputFolder = tempFolder + "output/";
+	mOutputFolder = tempFolder + "output/";
 	QString modelFolder = getModelFolder();
-	QDir().mkpath(outputFolder);
+	QDir().mkpath(mOutputFolder);
 	QDir().mkpath(modelFolder);
 
-	QString inputFolder = copyInputFiles(tempFolder, variables.inputFilePath, "T0");
+	QString inputFolder = copyInputFiles(tempFolder, mVariables.inputFilePath, "T0");
 
 	QSettings settings(iniFilePath, QSettings::IniFormat);
 
@@ -72,7 +80,7 @@ QString Raidionics::createRaidionicsIniFile(CommandStringVariables variables)
 	settings.beginGroup("System");
 	settings.setValue("gpu_id", "1");
 	settings.setValue("input_folder", inputFolder);//Example. Actually need to copy volume and convert to T0/*_gd.nii.gz
-	settings.setValue("output_folder", outputFolder);
+	settings.setValue("output_folder", mOutputFolder);
 	settings.setValue("model_folder", modelFolder);
 	settings.setValue("pipeline_filename", jsonFilePath);
 	settings.endGroup();
@@ -127,10 +135,7 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 
 	QJsonObject rootObject;
 
-	QStringList targets;
-	targets << "Lungs" << "Airways";
-
-	for(int i = 0; i < targets.size(); ++i)
+	for(int i = 0; i < mTargets.size(); ++i)
 	{
 		QJsonObject taskObject;
 		QJsonObject inputObject;
@@ -147,10 +152,10 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 		number0Object.insert("0", inputObject);
 		taskObject.insert("inputs", number0Object);
 		QJsonArray targetArray;
-		targetArray.push_back(targets[i]);
+		targetArray.push_back(mTargets[i]);
 		taskObject.insert("target", targetArray);//TODO: Need more than one target in array?
-		taskObject.insert("model", "CT_"+targets[i]);
-		taskObject.insert("description", targets[i]+" segmentation in T1CE (T0)");
+		taskObject.insert("model", "CT_"+mTargets[i]);
+		taskObject.insert("description", mTargets[i]+" segmentation in T1CE (T0)");
 		QString taskNumber;
 		taskNumber.setNum(i+1);
 		rootObject.insert(taskNumber, taskObject);
