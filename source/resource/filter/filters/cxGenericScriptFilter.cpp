@@ -243,7 +243,6 @@ void GenericScriptFilter::scriptFileChanged()
 QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	CommandStringVariables variables = createCommandStringVariables(input);
-	setScriptEngine(variables);
 	QString command;
 	switch (mScriptEngine)
 	{
@@ -279,6 +278,7 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	variables.inputFilePath = getInputFilePath(input);
 	variables.outputFilePath = getOutputFilePath(input);
 
+	setScriptEngine(variables);
 	return variables;
 }
 
@@ -748,8 +748,8 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	}
 
 	QFileInfo fileInfoInput(parentImage->getFilename());
-	QString outputFileName = fileInfoInput.baseName();
-	QFileInfo outputFileInfo(outputFileName.append(mResultFileEnding));
+	QString inputFileName = fileInfoInput.baseName();
+	QFileInfo outputFileInfo(inputFileName + mResultFileEnding);
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
@@ -770,14 +770,6 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 				(filePath.contains(".mhd")) || filePath.contains(".nii") || filePath.contains(".nii.gz"))
 		{
 			QFileInfo fileInfoOutput(filePath);
-			if(outputFileNamesNoExtention == fileInfoOutput.baseName() || outputFileNamesNoExtention == QFileInfo(fileInfoOutput.baseName()).baseName())
-			{
-				CX_LOG_INFO() << "Skipping copy of input image: " << filePath;
-				continue;//Skip input volume. The mesh creation in this use a very long time
-			}
-			else
-				CX_LOG_INFO() << "Importing: " << filePath;
-
 			QString uid =	fileInfoOutput.fileName().replace(".mhd", "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
@@ -789,6 +781,16 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 			mOutputImage = createDerivedImage(mServices->patient(),
 												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
+
+			if(inputFileName == fileInfoOutput.baseName() || inputFileName == QFileInfo(fileInfoOutput.baseName()).baseName())
+			{
+				CX_LOG_INFO() << "Skipping copy of input image: " << filePath;
+				CX_LOG_INFO() << "Input image was: " << parentImage->getFilename();
+				continue;//Skip input volume. The mesh creation of this use a very long time
+			}
+			else
+				CX_LOG_INFO() << "Importing: " << filePath;
+
 			if(!mOutputImage)
 			{
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: Problem creating derived image";
