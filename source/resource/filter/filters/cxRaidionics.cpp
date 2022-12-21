@@ -78,7 +78,7 @@ QString Raidionics::createRaidionicsIniFile()
 	settings.endGroup();
 
 	settings.beginGroup("System");
-	settings.setValue("gpu_id", "1");
+	settings.setValue("gpu_id", "-1");
 	settings.setValue("input_folder", inputFolder);//Example. Actually need to copy volume and convert to T0/*_gd.nii.gz
 	settings.setValue("output_folder", mOutputFolder);
 	settings.setValue("model_folder", modelFolder);
