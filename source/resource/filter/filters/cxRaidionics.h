@@ -31,6 +31,7 @@ protected:
 	void createRaidionicsJasonFile(QString jsonFilePath);
 	QString copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder);
 	QString getModelFolder();
+	static QString subfolderT0() {return "T0";}
 
 	CommandStringVariables mVariables;
 	QString mOutputFolder;

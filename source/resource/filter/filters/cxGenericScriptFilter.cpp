@@ -418,7 +418,8 @@ bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath
 		bool retval = false;
 		emit launchDialog(basePath, createCommand, command);
 
-		return this->createVenv(createCommand, command);	}
+		return this->createVenv(createCommand, command);
+	}
 	else
 	{
 		//CX_LOG_DEBUG() << "Virtual environment existing: " << environmentPath;
@@ -455,7 +456,6 @@ bool GenericScriptFilter::showVenvInfoDialog(QString venvPath, QString createCom
 	messageBox.setInformativeText(messageText);
 //	messageBox.setStandardButtons(QMessageBox::Cancel| QMessageBox::Ok);
 //	messageBox.setDefaultButton(QMessageBox::Ok);
-
 
 	messageBox.exec();
 	int result = messageBox.result();
@@ -739,7 +739,6 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 
 bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh)
 {
-//	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles";
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
 	{
@@ -764,7 +763,6 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	while (fileIterator.hasNext())
 	{
 		QString filePath = fileIterator.next();
-//		CX_LOG_DEBUG() << "Importing: " << filePath;
 
 		if(filePath.contains(outputFileNamesNoExtention) &&
 				(filePath.contains(".mhd")) || filePath.contains(".nii") || filePath.contains(".nii.gz"))

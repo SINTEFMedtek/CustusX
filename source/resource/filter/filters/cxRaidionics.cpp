@@ -28,14 +28,6 @@ Raidionics::Raidionics(CommandStringVariables variables, QStringList targets) :
 
 QString Raidionics::raidionicsCommandString()
 {
-	//TODO:
-	// - Create Python wrapper as we have done for deepSintef
-
-	//Example code for running raidionics with the example setup
-	//The output isn't automatically imported into CustusX yet
-
-	//The raidionics virtual environment can be setup with the script: cxCreateRaidionicsVenv.sh
-
 	QString raidionicsIni = Raidionics::createRaidionicsIniFile();
 
 	QString commandString = mVariables.envPath;
@@ -48,8 +40,7 @@ QString Raidionics::raidionicsCommandString()
 
 QString Raidionics::getOutputFolder()
 {
-	QString subfolder = "T0";
-	return mOutputFolder + "/" + subfolder;
+	return mOutputFolder + "/" + subfolderT0();
 }
 
 QString Raidionics::createRaidionicsIniFile()
@@ -67,7 +58,7 @@ QString Raidionics::createRaidionicsIniFile()
 	QDir().mkpath(mOutputFolder);
 	QDir().mkpath(modelFolder);
 
-	QString inputFolder = copyInputFiles(tempFolder, mVariables.inputFilePath, "T0");
+	QString inputFolder = copyInputFiles(tempFolder, mVariables.inputFilePath, subfolderT0());
 
 	QSettings settings(iniFilePath, QSettings::IniFormat);
 
@@ -79,7 +70,7 @@ QString Raidionics::createRaidionicsIniFile()
 
 	settings.beginGroup("System");
 	settings.setValue("gpu_id", "-1");
-	settings.setValue("input_folder", inputFolder);//Example. Actually need to copy volume and convert to T0/*_gd.nii.gz
+	settings.setValue("input_folder", inputFolder);
 	settings.setValue("output_folder", mOutputFolder);
 	settings.setValue("model_folder", modelFolder);
 	settings.setValue("pipeline_filename", jsonFilePath);
@@ -155,7 +146,7 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 		targetArray.push_back(mTargets[i]);
 		taskObject.insert("target", targetArray);//TODO: Need more than one target in array?
 		taskObject.insert("model", "CT_"+mTargets[i]);
-		taskObject.insert("description", mTargets[i]+" segmentation in T1CE (T0)");
+		taskObject.insert("description", mTargets[i]+" segmentation in T1CE ("+subfolderT0()+")");
 		QString taskNumber;
 		taskNumber.setNum(i+1);
 		rootObject.insert(taskNumber, taskObject);
