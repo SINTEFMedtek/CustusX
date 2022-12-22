@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxtestUtilities.h"
+#include "cxRaidionics.h"
 
 namespace cxtest
 {
@@ -89,6 +90,14 @@ public:
 
 		mScriptFile->setValueFromVariant(scriptFile);
 	}
+
+	void setRaidionicsScriptFile()
+	{
+		QString configPath = cx::DataLocations::getRootConfigPath();
+		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/raidionics_Airways.ini";
+		mScriptFile->setValueFromVariant(scriptFile);
+	}
+
 	void testSetupOutputColors(QStringList colorList)
 	{
 		setupOutputColors(colorList);
@@ -159,6 +168,18 @@ public:
 	QString testGetFixedEnvironmentSubdir()
 	{
 		return getFixedEnvironmentSubdir();
+	}
+	cx::FilePathPropertyPtr getScriptFile()
+	{
+		return mScriptFile;
+	}
+	SCRIPT_ENGINE getScriptEngine()
+	{
+		return mScriptEngine;
+	}
+	bool isUsingRaidionicsEngine()
+	{
+		return cx::GenericScriptFilter::isUsingRaidionicsEngine();
 	}
 
 public slots:
@@ -575,6 +596,41 @@ TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64][hide]")
 	
 	cx::LogicManager::shutdown();
 }
+
+TEST_CASE("Raidionics: init", "[unit]")
+{
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
+
+	filter->getOptions();
+	filter->setRaidionicsScriptFile();
+
+	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
+
+	REQUIRE(filter->getScriptFile());
+	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
+
+	CHECK(filter->getScriptEngine() == cx::GenericScriptFilter::seRaidionics);
+
+	QString parameterFilePath = filter->getScriptFile()->getEmbeddedPath().getAbsoluteFilepath();
+	REQUIRE_FALSE(parameterFilePath.isEmpty());
+
+	cx::OutputVariables outputVariables = cx::OutputVariables(parameterFilePath);
+
+	cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(variables, outputVariables.mOutputClasses));
+
+	REQUIRE(filter->isUsingRaidionicsEngine());
+
+	QString command =  raidionicsUtilities->raidionicsCommandString();
+	CHECK_FALSE(command.isEmpty());
+	CHECK_FALSE(raidionicsUtilities->getOutputFolder().isEmpty());
+
+	cx::LogicManager::shutdown();
+}
+
 
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64][hide]")

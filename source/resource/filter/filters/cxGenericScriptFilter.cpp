@@ -269,6 +269,11 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 
 CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePtr input)
 {
+	if(!mScriptFile)
+	{
+		CX_LOG_ERROR() << "GenericScriptFilter::createCommandStringVariables: Got no mScriptFile";
+		return CommandStringVariables("", input);
+	}
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
