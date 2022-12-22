@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-class Raidionics
+class cxResourceFilter_EXPORT Raidionics
 {
 public:
 	Raidionics(CommandStringVariables variables, QStringList targets);

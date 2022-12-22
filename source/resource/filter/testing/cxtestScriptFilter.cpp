@@ -139,7 +139,7 @@ public:
 	{
 		return (mScriptEngine == seDeepSintef);
 	}
-	
+
 	bool testEnvironmentExist(QString environmentPath)
 	{
 		return environmentExist(environmentPath);
@@ -530,7 +530,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << variables.cArguments;
 	//CX_LOG_DEBUG() << variables.scriptEngine;
 	//CX_LOG_DEBUG() << variables.model;
-	
+
 	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
 	REQUIRE_FALSE(variables.inputFilePath.isEmpty());
 	REQUIRE_FALSE(variables.outputFilePath.isEmpty());
@@ -589,11 +589,11 @@ TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64][hide]")
 
 	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
 	CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
-	
+
 	//filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
 	//variables = filter->testCreateCommandStringVariables(dummyImage);
 	//CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
-	
+
 	cx::LogicManager::shutdown();
 }
 
@@ -646,32 +646,32 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][n
 	filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
 	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
 	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
-	
+
 	QString requirementsPath = filter->testGetEnvironmentPath(variables);
 	// Create new venv in the temptorary test folder instead of using path from ini-file.
 	QString environmentPath = cx::DataLocations::getTestDataPath() + "/" + filter->testGetFixedEnvironmentSubdir();
 	QString environmentBasePath = filter->testGetEnvironmentBasePath(environmentPath);
 	requirementsPath = filter->testGetEnvironmentBasePath(requirementsPath);
-	
+
 	CX_LOG_DEBUG() << "Test environmentPath: " << environmentPath;
 	CX_LOG_DEBUG() << "requirementsPath: " << requirementsPath;
 	CX_LOG_DEBUG() << "environmentBasePath: " << environmentBasePath;
-	
+
 	requirementsPath = QFileInfo(requirementsPath).absolutePath();
 	CX_LOG_DEBUG() << "Absolute requirementsPath: " << requirementsPath;
-		
+
 	REQUIRE(QFileInfo(environmentBasePath).exists());
 	REQUIRE(QFileInfo(requirementsPath).exists());
 	CHECK_FALSE(filter->testEnvironmentExist(environmentPath));
 
 	CHECK(filter->testCreateVirtualPythonEnvironment(environmentPath, requirementsPath));
 	CHECK(filter->testEnvironmentExist(environmentPath));
-	
+
 	QString venvPath = environmentBasePath + "venv";
 	QDir dir(venvPath);
 	CX_LOG_DEBUG() << "Going to delete newly created venv: " << dir.absolutePath();
 	dir.removeRecursively();
-	
+
 	cx::LogicManager::shutdown();
 }
 #endif
