@@ -29,6 +29,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSliceProxy.h"
 #include "cxTypeConversions.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -112,14 +113,26 @@ void GeometricRep2D::meshChangedSlot()
 
 	//Set mesh color
 	mActor->GetProperty()->SetColor(mMesh->getColor().redF(), mMesh->getColor().greenF(), mMesh->getColor().blueF());
-	//Set mesh opacity
-	mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+	this->setOpacity();
 
 	// Turn lightning off - we dont want 3D effects but a clear view of the slice
 	mActor->GetProperty()->LightingOff();
 	
 	//Set linewidth of mesh
 	mActor->GetProperty()->SetLineWidth(mMesh->getProperties().mLineWidth->getValue());
+}
+
+void GeometricRep2D::setOpacity()
+{
+	if(settings()->value("View2D/useGPU2DRendering").toBool())
+	{
+		mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
+	}
+	else
+	{
+		//Setting opacity for CPU rendering in 2D cause meshed to disappear
+		mActor->GetProperty()->SetOpacity(1.0);
+	}
 }
 
 /**called when transform is changed
