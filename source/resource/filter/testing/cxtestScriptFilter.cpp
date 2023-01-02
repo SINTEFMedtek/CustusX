@@ -628,6 +628,14 @@ TEST_CASE("Raidionics: init", "[unit]")
 	CHECK_FALSE(command.isEmpty());
 	CHECK_FALSE(raidionicsUtilities->getOutputFolder().isEmpty());
 
+	QString tempFolder = raidionicsUtilities->getTempFolder();
+	CHECK_FALSE(tempFolder.isEmpty());
+
+	QString iniFilePath = tempFolder + raidionicsUtilities->getIniFileName();
+	QString jsonFilePath = tempFolder + raidionicsUtilities->getJsonFileName();
+	CHECK(QFileInfo::exists(iniFilePath));
+	CHECK(QFileInfo::exists(jsonFilePath));
+
 	cx::LogicManager::shutdown();
 }
 
@@ -660,8 +668,8 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][n
 	requirementsPath = QFileInfo(requirementsPath).absolutePath();
 	CX_LOG_DEBUG() << "Absolute requirementsPath: " << requirementsPath;
 
-	REQUIRE(QFileInfo(environmentBasePath).exists());
-	REQUIRE(QFileInfo(requirementsPath).exists());
+	REQUIRE(QFileInfo::exists(environmentBasePath));
+	REQUIRE(QFileInfo::exists(requirementsPath));
 	CHECK_FALSE(filter->testEnvironmentExist(environmentPath));
 
 	CHECK(filter->testCreateVirtualPythonEnvironment(environmentPath, requirementsPath));

@@ -25,16 +25,20 @@ public:
 
 	QString raidionicsCommandString();
 	QString getOutputFolder();
+	QString getTempFolder();
+	static QString getIniFileName() {return "Raidionics.ini";}
+	static QString getJsonFileName() {return "Raidionics.json";}
 
 protected:
 	QString createRaidionicsIniFile();
 	void createRaidionicsJasonFile(QString jsonFilePath);
-	QString copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder);
+	QString copyInputFiles(QString inputFileName, QString subfolder);
 	QString getModelFolder();
 	static QString subfolderT0() {return "T0";}
 
 	CommandStringVariables mVariables;
 	QString mOutputFolder;
+	QString mTempFolder;
 	QStringList mTargets;
 };
 

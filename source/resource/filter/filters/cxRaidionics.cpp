@@ -43,22 +43,27 @@ QString Raidionics::getOutputFolder()
 	return mOutputFolder + "/" + subfolderT0();
 }
 
+QString Raidionics::getTempFolder()
+{
+	return mTempFolder;
+}
+
 QString Raidionics::createRaidionicsIniFile()
 {
-	QString tempFolder = DataLocations::getCachePath() + "/Raidionics_temp/";
-	CX_LOG_DEBUG() << "Creating Raidionics temp folder: " << tempFolder;
-	QDir().mkpath(tempFolder);
+	mTempFolder = DataLocations::getCachePath() + "/Raidionics_temp/";
+	CX_LOG_DEBUG() << "Creating Raidionics temp folder: " << mTempFolder;
+	QDir().mkpath(mTempFolder);
 
-	QString iniFilePath = tempFolder + "Raidionics.ini";
-	QString jsonFilePath = tempFolder + "Raidionics.json";
+	QString iniFilePath = mTempFolder + getIniFileName();
+	QString jsonFilePath = mTempFolder + getJsonFileName();
 	createRaidionicsJasonFile(jsonFilePath);
 
-	mOutputFolder = tempFolder + "output/";
+	mOutputFolder = mTempFolder + "output/";
 	QString modelFolder = getModelFolder();
 	QDir().mkpath(mOutputFolder);
 	QDir().mkpath(modelFolder);
 
-	QString inputFolder = copyInputFiles(tempFolder, mVariables.inputFilePath, subfolderT0());
+	QString inputFolder = copyInputFiles(mVariables.inputFilePath, subfolderT0());
 
 	QSettings settings(iniFilePath, QSettings::IniFormat);
 
@@ -90,9 +95,9 @@ QString Raidionics::createRaidionicsIniFile()
 	return iniFilePath;
 }
 
-QString Raidionics::copyInputFiles(QString parentFolder, QString inputFileName, QString subfolder)
+QString Raidionics::copyInputFiles(QString inputFileName, QString subfolder)
 {
-	QString inputFolder = parentFolder + "input/";
+	QString inputFolder = mTempFolder + "input/";
 
 	QString fullInputFolder = inputFolder + "/" + subfolder + "/";
 	QDir().mkpath(fullInputFolder);
