@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
-//#include <QProcess>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
@@ -139,8 +138,8 @@ protected:
 	QList<QColor> mOutputColors;
 	QStringList mOutputClasses;
 
-    SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
-    StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
+	SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
+	StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
 	RaidionicsPtr mRaidionicsUtilities;
