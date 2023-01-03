@@ -161,14 +161,13 @@ ViewWrapper3D::~ViewWrapper3D()
 
 void ViewWrapper3D::setupTransparentMeshes()
 {
-	//Setting up depth peeling in constructor seems to fail.
-	//Delay until we get first active data to make sure VTK structures are correcyly setup.
+	//Setting up depth peeling in constructor fails (on Ubuntu 20.04).
+	//Delay until we get first active data to make sure VTK structures are correctly setup.
 	connect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
 }
 
 void ViewWrapper3D::enableTransparentMeshesSlot()
 {
-	CX_LOG_DEBUG() << "enableTransparentMeshesSlot";
 	this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 	disconnect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
 }

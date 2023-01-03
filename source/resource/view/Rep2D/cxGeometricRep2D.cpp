@@ -130,7 +130,7 @@ void GeometricRep2D::setOpacity()
 	}
 	else
 	{
-		//Setting opacity for CPU rendering in 2D cause meshed to disappear
+		//Setting opacity for CPU rendering in 2D cause meshes to disappear
 		mActor->GetProperty()->SetOpacity(1.0);
 	}
 }
