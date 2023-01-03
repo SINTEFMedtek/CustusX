@@ -90,6 +90,8 @@ private slots:
 	void optionChangedSlot();
 	void showManualToolSlot(bool visible);
 	void toggleShowManualTool();
+    void enableSliderSlot(bool visible);
+    void toggle2DSlider();
 
 protected slots:
 	void samplePoint(Vector3D click_vp);

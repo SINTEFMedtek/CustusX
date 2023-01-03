@@ -158,6 +158,12 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	showManualTool->setToolTip("Turn on/off visualization of the vire cross in 2D");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 	contextMenu.addAction(showManualTool);
+    QAction* showSlider = new QAction("Enable 2D Slider", &contextMenu);
+    showSlider->setCheckable(true);
+    showSlider->setChecked(settings()->value("View2D/showSlider").toBool());
+    showSlider->setToolTip("Turn on/off slider for 2D slices");
+    connect(showSlider, SIGNAL(triggered(bool)), this, SLOT(enableSliderSlot(bool)));
+    contextMenu.addAction(showSlider);
 }
 
 void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
@@ -222,6 +228,10 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->toggleShowManualTool();
 	}
+    if (key == "View2D/showSlider")
+    {
+        this->toggle2DSlider();
+    }
 }
 
 void ViewWrapper2D::toggleShowManualTool()
@@ -229,7 +239,17 @@ void ViewWrapper2D::toggleShowManualTool()
 	if (settings()->value("View2D/showManualTool").toBool())
 		mView->addRep(mToolRep2D);
 	else
-		mView->removeRep(mToolRep2D);
+        mView->removeRep(mToolRep2D);
+}
+
+void ViewWrapper2D::enableSliderSlot(bool visible)
+{
+    settings()->setValue("View2D/showSlider", visible);
+}
+
+void ViewWrapper2D::toggle2DSlider()
+{
+
 }
 
 void ViewWrapper2D::removeAndResetSliceRep()
