@@ -76,6 +76,7 @@ public:
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void settingsChangedSlot(QString key);
+	void enableTransparentMeshesSlot();
 private slots:
 	void showSlices();
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -122,6 +123,7 @@ private:
 	void addVolumeDataRep(DataPtr data);
 	void removeVolumeDataRep(QString uid);
 
+	void setupTransparentMeshes();
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 	void initializeMultiVolume3DRepProducer();
 	void updateMetricNamesRep();

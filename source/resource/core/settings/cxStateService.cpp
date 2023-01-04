@@ -104,7 +104,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/showMetricNamesInCorner", false);
 	this->fillDefault("View3D/annotationModelSize", 0.2);
 	this->fillDefault("View3D/annotationModel", "woman.stl");
-	this->fillDefault("View3D/depthPeeling", false);
+	this->fillDefault("View3D/depthPeeling", true);
 	this->fillDefault("View3D/ImageRender3DVisualizer", "vtkGPUVolumeRayCastMapper");
 	this->fillDefault("View3D/maxRenderSize", 10 * pow(10.0,6));
 	this->fillDefault("View/shadingOn", true);
