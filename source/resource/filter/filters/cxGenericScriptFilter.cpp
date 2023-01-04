@@ -550,7 +550,7 @@ bool GenericScriptFilter::runCommandStringAndWait(QString command)
 	if(!mCommandLine)
 		return false;
 	
-	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
+//	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
 	bool success = mCommandLine->launch(command);
 	if(success)
 		return mCommandLine->waitForFinished(1000*60*30);//Wait at least 30 min
@@ -603,7 +603,11 @@ bool GenericScriptFilter::execute()
 	// Run command string on console
 	bool retval = this->runCommandStringAndWait(command);
 	if(!retval)
-		CX_LOG_WARNING() << "External process failed. QProcess::ProcessError: " << mCommandLine->getProcess()->error();
+	{
+		//CX_LOG_WARNING() << "External process failed. QProcess::ProcessError: " << mCommandLine->getProcess()->error();
+		//CX_LOG_WARNING() << "ExitStatus: " << mCommandLine->getProcess()->exitStatus();
+		processError(mCommandLine->getProcess()->error());
+	}
 	retval = retval & deleteProcess();
 
 	return retval; // Check for error?
