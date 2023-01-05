@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDirIterator>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QApplication>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -289,12 +290,28 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 QString GenericScriptFilter::standardCommandString(CommandStringVariables variables)
 {
 	QString commandString = variables.envPath;
-	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + findScriptFile(variables.scriptFilePath));
 	commandString.append(" " + variables.inputFilePath);
 	commandString.append(" " + variables.outputFilePath);
 	commandString.append(" " + variables.cArguments);
 
 	return commandString;
+}
+
+QString GenericScriptFilter::findScriptFile(QString path)
+{
+	QDir appDir(qApp->applicationDirPath());
+	QDir scriptDir(getScriptPath());
+	if(QFileInfo::exists(path))
+		return path;
+	if(appDir.exists(path))
+		return path;//Don't change path if relative to application path
+	if(scriptDir.exists(path))
+		return  scriptDir.absoluteFilePath(path);
+
+	CX_LOG_WARNING() << "Couldn't find script file: " << path;
+	CX_LOG_WARNING() << "Looked in " << appDir.path() << " and: " << scriptDir.path();
+	return path;
 }
 
 bool GenericScriptFilter::isUsingRaidionicsEngine()
@@ -328,7 +345,7 @@ void GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
 {
 	QString commandString = variables.envPath;
-	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + findScriptFile(variables.scriptFilePath));
 	commandString.append(" --Task database --Arguments ");
 	commandString.append("\"");
 	commandString.append("InputVolume ");

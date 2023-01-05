@@ -109,6 +109,7 @@ protected:
 
 	CommandStringVariables createCommandStringVariables(ImagePtr input);
 	QString standardCommandString(CommandStringVariables variables);
+	QString findScriptFile(QString path);
 	bool isUsingRaidionicsEngine();
 	QString deepSintefCommandString(CommandStringVariables variables);
 	
