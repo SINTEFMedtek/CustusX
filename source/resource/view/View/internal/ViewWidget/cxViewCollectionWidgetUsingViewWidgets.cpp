@@ -24,24 +24,18 @@ namespace cx
 ViewWidgetWithSlider::ViewWidgetWithSlider(ViewWidget* view) :
     mSliceWidget(view)
 {
-    mSliceWidgetWithSlider = nullptr;
+    mSliceWidgetWithSlider = new QWidget();
+    mSliceSlider = new ctkDoubleSlider(Qt::Horizontal, mSliceWidgetWithSlider);
+    QVBoxLayout *widgetWithSliderLayout = new QVBoxLayout(mSliceWidgetWithSlider);
+    widgetWithSliderLayout->setContentsMargins(0,0,0,0);
+    widgetWithSliderLayout->addWidget(mSliceWidget);
+    widgetWithSliderLayout->addWidget(mSliceSlider);
 }
 
 
-QWidget *ViewWidgetWithSlider::getWidgetWithSlider()
+QWidget *ViewWidgetWithSlider::getViewWidgetWithSlider()
 {
-    if(!mSliceWidgetWithSlider)
-    {
-        mSliceWidgetWithSlider = new QWidget();
-        mSliceSlider = new ctkDoubleSlider(Qt::Horizontal, mSliceWidgetWithSlider);
-        QVBoxLayout *widgetWithSliderLayout = new QVBoxLayout(mSliceWidgetWithSlider);
-        widgetWithSliderLayout->setContentsMargins(0,0,0,0);
-        widgetWithSliderLayout->addWidget(mSliceWidget);
-        widgetWithSliderLayout->addWidget(mSliceSlider);
-    }
-    //        return mSliceWidgetWithSlider;
-    //    } else {
-    return mSliceWidgetWithSlider/*mSliceWidget*/;
+    return mSliceWidgetWithSlider;
 }
 
 
@@ -85,7 +79,7 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
     view->getView()->setType(type);
 
     ViewWidgetWithSlider *widgetWithSlider = new ViewWidgetWithSlider(view);
-    QWidget *viewSliderWidget = widgetWithSlider->getWidgetWithSlider();
+    QWidget *viewSliderWidget = widgetWithSlider->getViewWidgetWithSlider();
     QWidget *usedWidget = widgetWithSlider->getUsedWidget(type, this->useSlider());
     mLayout->addWidget(usedWidget, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);
@@ -94,8 +88,7 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
 
     mViewsWithSlider.push_back(widgetWithSlider);
     mViews.push_back(view);
-//    return widgetWithSlider->getViewWidget()->getView();
-    return view->getView();
+    return widgetWithSlider->getViewWidget()->getView();
 }
 
 void LayoutWidgetUsingViewWidgets::setOffScreenRenderingAndClear(bool on)
@@ -164,13 +157,6 @@ void LayoutWidgetUsingViewWidgets::enableContextMenuForViews(bool enable)
 	{
 		mViews[i]->setContextMenuPolicy(policy);
     }
-}
-
-ViewWidgetWithSlider LayoutWidgetUsingViewWidgets::getViewWithSlider(View::Type type, bool offScreenRendering)
-{
-    ViewWidget* view = mViewCache->retrieveView(this, type, offScreenRendering);
-//    ViewWidgetWithSlider widgetWithSlider = viewWidgetAndSlider(view);
-    view->getView()->setType(type);
 }
 
 ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)

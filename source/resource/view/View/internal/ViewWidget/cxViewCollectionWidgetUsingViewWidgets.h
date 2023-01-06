@@ -46,7 +46,7 @@ private:
 
 public:
     ViewWidgetWithSlider(ViewWidget *view);
-    QWidget*        getWidgetWithSlider();
+    QWidget*        getViewWidgetWithSlider();
     QWidget*        getUsedWidget(View::Type type, bool useSlider);
     ViewWidget*     getViewWidget();
 };
@@ -83,7 +83,6 @@ public:
 protected:
     std::vector<ViewWidget*>                mViews;
     std::vector<ViewWidgetWithSlider*>      mViewsWithSlider;
-    ViewWidgetWithSlider    getViewWithSlider(View::Type type, bool offScreenRendering);
     MultiViewCachePtr       mViewCache;
     QGridLayout* mLayout; ///< the layout
 
