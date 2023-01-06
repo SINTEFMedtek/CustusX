@@ -784,10 +784,10 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 		QString filePath = fileIterator.next();
 
 		if(filePath.contains(outputFileNamesNoExtention) &&
-				(filePath.contains(".mhd")) || filePath.contains(".nii") || filePath.contains(".nii.gz"))
+				(filePath.contains(".mhd")) || filePath.contains(".nii"))
 		{
 			QFileInfo fileInfoOutput(filePath);
-			QString uid =	fileInfoOutput.fileName().replace(".mhd", "");
+			QString uid = changeExtension(fileInfoOutput.fileName(), "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
 			{
