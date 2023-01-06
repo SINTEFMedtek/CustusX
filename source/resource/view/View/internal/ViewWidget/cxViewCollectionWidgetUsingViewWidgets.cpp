@@ -79,7 +79,6 @@ ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion regi
     view->getView()->setType(type);
 
     ViewWidgetWithSlider *widgetWithSlider = new ViewWidgetWithSlider(view);
-    QWidget *viewSliderWidget = widgetWithSlider->getViewWidgetWithSlider();
     QWidget *usedWidget = widgetWithSlider->getUsedWidget(type, this->useSlider());
     mLayout->addWidget(usedWidget, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);
@@ -106,30 +105,30 @@ void LayoutWidgetUsingViewWidgets::clearViews()
 {
 	mViewCache->clearViews();
 
-	for (unsigned i=0; i<mViews.size(); ++i)
+    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
 	{
-		mViews[i]->hide();
-		mLayout->removeWidget(mViews[i]);
+        mViewsWithSlider[i]->getViewWidget()->hide();
+        mLayout->removeWidget(mViewsWithSlider[i]->getViewWidget());
 	}
-	mViews.clear();
+    mViewsWithSlider.clear();
 
 	view_utils::setStretchFactors(mLayout, LayoutRegion(0, 0, LayoutData::MaxGridSize, LayoutData::MaxGridSize), 0);
 }
 
 void LayoutWidgetUsingViewWidgets::setModified()
 {
-	for (unsigned i=0; i<mViews.size(); ++i)
+    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
 	{
-		ViewWidget* current = mViews[i];
+        ViewWidget* current = mViewsWithSlider[i]->getViewWidget();
 		current->setModified();
 	}
 }
 
 void LayoutWidgetUsingViewWidgets::render()
 {
-	for (unsigned i=0; i<mViews.size(); ++i)
+    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
 	{
-		ViewWidget* current = mViews[i];
+        ViewWidget* current = mViewsWithSlider[i]->getViewWidget();
 		current->render(); // render only changed scenegraph (shaky but smooth)
 	}
 
@@ -153,17 +152,17 @@ QPoint LayoutWidgetUsingViewWidgets::getPosition(ViewPtr view)
 void LayoutWidgetUsingViewWidgets::enableContextMenuForViews(bool enable)
 {
 	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
-	for (unsigned i=0; i<mViews.size(); ++i)
+    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
 	{
-		mViews[i]->setContextMenuPolicy(policy);
+        mViewsWithSlider[i]->setContextMenuPolicy(policy);
     }
 }
 
 ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)
 {
-    for (unsigned i=0; i<mViews.size(); ++i)
+    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
     {
-        ViewWidget* current = mViews[i];
+        ViewWidget* current = mViewsWithSlider[i]->getViewWidget();
         if (current->getView()==view)
             return current;
     }
@@ -193,8 +192,8 @@ int LayoutWidgetUsingViewWidgets::getGridMargin() const
 std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
 {
 	std::vector<ViewPtr> retval;
-	for (unsigned i=0; i<mViews.size(); ++i)
-		retval.push_back(mViews[i]->getView());
+    for (unsigned i=0; i<mViewsWithSlider.size(); ++i)
+        retval.push_back(mViewsWithSlider[i]->getViewWidget()->getView());
 	return retval;
 }
 
