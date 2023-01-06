@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxViewContainer.h"
 #include "cxRenderWindowFactory.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -36,7 +37,12 @@ QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(Rend
 QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(RenderWindowFactoryPtr factory, QWidget *parent)
 {
 //	return new ViewCollectionWidgetUsingViewContainer();
-	return new ViewCollectionWidgetMixed(factory, parent);
+    return new ViewCollectionWidgetMixed(factory, parent);
+}
+
+bool ViewCollectionWidget::useSlider()
+{
+    return settings()->value("View2D/showSlider").toBool();
 }
 
 } // namespace cx

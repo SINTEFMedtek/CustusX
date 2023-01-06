@@ -63,6 +63,7 @@ public:
 	 * given in qt-coordinates of this (the ViewCollectionWidget).
 	 */
     virtual QPoint getPosition(ViewPtr view) = 0;
+    bool useSlider();
 
 signals:
     void rendered();

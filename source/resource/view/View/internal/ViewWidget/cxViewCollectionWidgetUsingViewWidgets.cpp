@@ -16,8 +16,49 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkRenderWindow.h"
 #include "cxMultiViewCache.h"
 
+#include <QVBoxLayout>
+
 namespace cx
 {
+
+ViewWidgetWithSlider::ViewWidgetWithSlider(ViewWidget* view) :
+    mSliceWidget(view)
+{
+    mSliceWidgetWithSlider = nullptr;
+}
+
+
+QWidget *ViewWidgetWithSlider::getWidgetWithSlider()
+{
+    if(!mSliceWidgetWithSlider)
+    {
+        mSliceWidgetWithSlider = new QWidget();
+        mSliceSlider = new ctkDoubleSlider(Qt::Horizontal, mSliceWidgetWithSlider);
+        QVBoxLayout *widgetWithSliderLayout = new QVBoxLayout(mSliceWidgetWithSlider);
+        widgetWithSliderLayout->setContentsMargins(0,0,0,0);
+        widgetWithSliderLayout->addWidget(mSliceWidget);
+        widgetWithSliderLayout->addWidget(mSliceSlider);
+    }
+    //        return mSliceWidgetWithSlider;
+    //    } else {
+    return mSliceWidgetWithSlider/*mSliceWidget*/;
+}
+
+
+QWidget *ViewWidgetWithSlider::getUsedWidget(View::Type type, bool useSlider)
+{
+    if(type == View::VIEW_2D && useSlider) {
+        return mSliceWidgetWithSlider;
+    } else {
+        return mSliceWidget;
+    }
+}
+
+ViewWidget *ViewWidgetWithSlider::getViewWidget()
+{
+    return mSliceWidget;
+}
+
 
 LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(RenderWindowFactoryPtr factory, QWidget* parent) :
 	ViewCollectionWidget(parent)
@@ -39,16 +80,22 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
+    ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
 
-	view->getView()->setType(type);
+    view->getView()->setType(type);
 
-	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
+    ViewWidgetWithSlider *widgetWithSlider = new ViewWidgetWithSlider(view);
+    QWidget *viewSliderWidget = widgetWithSlider->getWidgetWithSlider();
+    QWidget *usedWidget = widgetWithSlider->getUsedWidget(type, this->useSlider());
+    mLayout->addWidget(usedWidget, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);
-	view->show();
+//    viewSliderWidget->show();
+    view->show();
 
-	mViews.push_back(view);
-	return view->getView();
+    mViewsWithSlider.push_back(widgetWithSlider);
+    mViews.push_back(view);
+//    return widgetWithSlider->getViewWidget()->getView();
+    return view->getView();
 }
 
 void LayoutWidgetUsingViewWidgets::setOffScreenRenderingAndClear(bool on)
@@ -116,7 +163,14 @@ void LayoutWidgetUsingViewWidgets::enableContextMenuForViews(bool enable)
 	for (unsigned i=0; i<mViews.size(); ++i)
 	{
 		mViews[i]->setContextMenuPolicy(policy);
-	}
+    }
+}
+
+ViewWidgetWithSlider LayoutWidgetUsingViewWidgets::getViewWithSlider(View::Type type, bool offScreenRendering)
+{
+    ViewWidget* view = mViewCache->retrieveView(this, type, offScreenRendering);
+//    ViewWidgetWithSlider widgetWithSlider = viewWidgetAndSlider(view);
+    view->getView()->setType(type);
 }
 
 ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)

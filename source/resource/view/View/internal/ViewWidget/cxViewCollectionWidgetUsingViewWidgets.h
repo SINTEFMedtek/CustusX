@@ -20,12 +20,36 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
 
+#include "ctkDoubleSlider.h"
+
 class QGridLayout;
 
 namespace cx
 {
 
 typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
+
+/**
+ * ViewWidget with added Slider for manual slicing through 2D slices
+ *
+ * \ingroup cx_resource_view_internal
+ * \date 2023-01-04
+ * \author Geir Arne Tangen
+ */
+class cxResourceVisualization_EXPORT ViewWidgetWithSlider : public QWidget
+{
+    Q_OBJECT
+private:
+    ctkDoubleSlider *mSliceSlider;
+    ViewWidget      *mSliceWidget;
+    QWidget         *mSliceWidgetWithSlider;
+
+public:
+    ViewWidgetWithSlider(ViewWidget *view);
+    QWidget*        getWidgetWithSlider();
+    QWidget*        getUsedWidget(View::Type type, bool useSlider);
+    ViewWidget*     getViewWidget();
+};
 
 /**
  * Widget for displaying Views, Containing a QGridLayout of QVTKWidgets,
@@ -57,13 +81,15 @@ public:
 	virtual void enableContextMenuForViews(bool enable);
 
 protected:
-	std::vector<ViewWidget*> mViews;
+    std::vector<ViewWidget*>                mViews;
+    std::vector<ViewWidgetWithSlider*>      mViewsWithSlider;
+    ViewWidgetWithSlider    getViewWithSlider(View::Type type, bool offScreenRendering);
+    MultiViewCachePtr       mViewCache;
+    QGridLayout* mLayout; ///< the layout
 
 private:
     ViewWidget* WidgetFromView(ViewPtr view);
 
-	MultiViewCachePtr mViewCache;
-	QGridLayout* mLayout; ///< the layout
 	bool mOffScreenRendering;
 };
 
