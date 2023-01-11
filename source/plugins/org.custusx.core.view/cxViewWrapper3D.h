@@ -35,7 +35,7 @@ typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWi
 
 namespace cx
 {
-typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
+//typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
 
@@ -137,7 +137,7 @@ private:
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-	Slices3DRepPtr mSlices3DRep;
+//	Slices3DRepPtr mSlices3DRep;
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 

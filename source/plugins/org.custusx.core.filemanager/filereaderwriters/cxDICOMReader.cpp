@@ -250,7 +250,8 @@ void DICOMReader::addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString
 {
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer); //TODO: Reuse instead on creating new one?
 	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout
-	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out (with std::cout) a list of all files (ctkDICOMIndexer.cpp, line 93)
+//	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out (with std::cout) a list of all files (ctkDICOMIndexer.cpp, line 93)
+	DICOMIndexer->addDirectory(database.data(), folder);
 	std::cout.clear();//Turn on std::cout again
 }
 

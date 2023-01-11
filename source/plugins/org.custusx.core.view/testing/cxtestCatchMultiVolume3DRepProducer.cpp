@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkVolumeTextureMapper3D.h>
+//#include <vtkVolumeTextureMapper3D.h>
 #include <vtkVolume.h>
 
 #include "catch.hpp"

@@ -94,7 +94,8 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 	CX_LOG_DEBUG() << "dicomInput: " << dicomInput;
 
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer);
-	DICOMIndexer->addDirectory(*database, dicomInput,"");
+//	DICOMIndexer->addDirectory(*database, dicomInput,"");
+	DICOMIndexer->addDirectory(database.data(), dicomInput);
 
 	QStringList patients = database->patients();
 	REQUIRE(patients.size() == 1);

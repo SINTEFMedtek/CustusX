@@ -15,7 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sstream>
 
 #include <QtWidgets>
-#include "QVTKWidget.h"
+//#include "QVTKWidget.h"
+#include <QVTKOpenGLNativeWidget.h>
 
 #include <vtkImageData.h>
 #include <vtkMetaImageReader.h>
@@ -138,18 +139,19 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 	mainWidget.setLayout(layout);
 	mainWidget.setGeometry(150,150,400,400);
 
-	QVTKWidget* vtkWidget = new QVTKWidget();
+//	QVTKWidget* vtkWidget = new QVTKWidget();
+	QVTKOpenGLNativeWidget* vtkWidget = new QVTKOpenGLNativeWidget();
 	//	viewWidget clear
 //  set custom renderwindow
 //	viewWidget clear
 
-	vtkWidget->GetRenderWindow()->GetInteractor()->EnableRenderOff();
-	vtkWidget->GetRenderWindow()->GetInteractor()->Disable();
+	vtkWidget->renderWindow()->GetInteractor()->EnableRenderOff();
+	vtkWidget->renderWindow()->GetInteractor()->Disable();
 //	std::cout << "renderer count = " << vtkWidget->GetRenderWindow()->GetRenderers()->GetNumberOfItems() << std::endl;
 //	vtkWidget->GetRenderWindow()->GetRenderers()->GetFirstRenderer()->Render();
 	vtkRendererPtr renderer = vtkRendererPtr::New();
 	renderer->SetBackground(0,0,0);
-	vtkWidget->GetRenderWindow()->AddRenderer(renderer);
+	vtkWidget->renderWindow()->AddRenderer(renderer);
 	// dette bomber visualizeringa
 //	vtkWidget->GetRenderWindow()->Render();
 
@@ -164,7 +166,7 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 //	QSize size = vtkWidget->size();
 //	double factor = 2;
 //	vtkWidget->GetRenderWindow()->SetSize(size.width()*factor, size.height()*factor);
-	vtkWidget->GetRenderWindow()->Render();
+	vtkWidget->renderWindow()->Render();
 
 //	sleep(3);
 

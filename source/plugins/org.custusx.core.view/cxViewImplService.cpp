@@ -478,14 +478,19 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
-	//Turn off rendering in vtkRenderWindowInteractor
-	interactor->EnableRenderOff();
+	if(interactor)
+	{
+		//Turn off rendering in vtkRenderWindowInteractor
+//		interactor->EnableRenderOff();
 	//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
 	double rate = settings()->value("stillUpdateRate").value<double>();
 	interactor->SetStillUpdateRate(rate);
 	// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
 	// The real challenge is updating while the tracking is active, and this uses the still update rate.
 	interactor->SetDesiredUpdateRate(rate);
+	}
+	else
+		CX_LOG_WARNING() << "No vtkRenderWindowInteractor";
 
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
 	if(!mRenderWindowFactory->getSharedOpenGLContext())

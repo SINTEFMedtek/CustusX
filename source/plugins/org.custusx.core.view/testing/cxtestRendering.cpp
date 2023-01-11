@@ -29,9 +29,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkVolumeProperty.h>
 #include <vtkPiecewiseFunction.h>
 
-#ifndef CX_VTK_OPENGL2
-#include <vtkVolumeTextureMapper3D.h>
-#endif
+//#ifndef CX_VTK_OPENGL2
+//#include <vtkVolumeTextureMapper3D.h>
+//#endif
 
 namespace cxtest
 {
@@ -66,7 +66,8 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 	mRenderer->AddActor(textActor);
 
 	//Volume
-	vtkVolumeTextureMapper3DPtr volumeMapper = vtkVolumeTextureMapper3DPtr::New();
+//	vtkVolumeTextureMapper3DPtr volumeMapper = vtkVolumeTextureMapper3DPtr::New();
+	vtkNew<vtkSmartVolumeMapper> volumeMapper;
 	volumeMapper->SetInputData(image);
 
 	vtkVolumePtr volume = vtkVolumePtr::New();
@@ -76,9 +77,9 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 	mRenderer->ResetCamera();
 	renderWindow->Render();
 
-#ifndef CX_VTK_OPENGL2
-	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
-#endif
+//#ifndef CX_VTK_OPENGL2
+//	REQUIRE(volumeMapper->IsRenderSupported(volume->GetProperty(), mRenderer));
+//#endif
 
 	int numRenders = 3000;
 	for (int i = 0; i < numRenders; ++i)

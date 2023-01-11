@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxAccusurf.h"
 #include <vtkImageData.h>
+#include <vtkPolyData.h>
 
 typedef boost::shared_ptr<class cx::Accusurf> AccusurfPtr;
 
