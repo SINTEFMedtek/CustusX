@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
+#include <vtkPolyData.h>
 #include "cxLogger.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"

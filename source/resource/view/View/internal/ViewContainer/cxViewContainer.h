@@ -17,7 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxConfig.h"
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
-#include "QVTKWidget.h"
+//#include "QVTKWidget.h"
+#include <QVTKOpenGLNativeWidget.h>
 #include "cxLayoutData.h"
 #include "cxViewService.h"
 
@@ -36,10 +37,11 @@ typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
  * \author Christian Askeland
  * \ingroup cx_resource_view_internal
  */
-class cxResourceVisualization_EXPORT ViewContainer : public QVTKWidget
+class cxResourceVisualization_EXPORT ViewContainer : public QVTKOpenGLNativeWidget
 {
 	Q_OBJECT
-	typedef QVTKWidget inherited_widget;
+//	typedef QVTKWidget inherited_widget;
+	typedef QVTKOpenGLNativeWidget inherited_widget;
 
 public:
 	ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent = NULL, Qt::WindowFlags f = 0);

@@ -28,7 +28,8 @@ namespace cx
 
 ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt::WindowFlags f) :
 	mRenderWindowFactory(factory),
-	QVTKWidget(parent, f),
+//	QVTKWidget(parent, f),
+	QVTKOpenGLNativeWidget(parent, f),
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
 {
@@ -134,7 +135,7 @@ void ViewContainer::initializeRenderWindow()
 	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
 	if(!renderWindowExists)
 		this->addBackgroundRenderer(mRenderWindow);
-	this->SetRenderWindow(mRenderWindow);
+	this->setRenderWindow(mRenderWindow);
 	mRenderWindow->GetInteractor()->EnableRenderOff();
 
 

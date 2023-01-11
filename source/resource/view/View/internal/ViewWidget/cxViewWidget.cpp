@@ -35,7 +35,7 @@ ViewWidget::ViewWidget(RenderWindowFactoryPtr factory, const QString& uid, const
 	mView = ViewLinkingViewWidget::create(this, rw);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 	vtkRenderWindowPtr renderWindow = mView->getRenderWindow();
-	this->SetRenderWindow(renderWindow);
+	this->setRenderWindow(renderWindow);
 	mView->getRenderWindow()->GetInteractor()->EnableRenderOff();
 	mView->clear();
 	disableGLHiDPI(this->winId());

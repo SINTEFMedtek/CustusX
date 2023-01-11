@@ -110,22 +110,22 @@ private:
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
-	void recreateMultiSlicer();
+//	void recreateMultiSlicer();
 	void updateItemsFromViewGroup();
 
 	void createAndAddSliceReps(int numberOfSlices);
 	void removeAndResetSliceRep();
 
 	bool useGPU2DRendering();
-	bool createAndAddMultiSliceRep();
-	void removeAndResetMultiSliceRep();
+//	bool createAndAddMultiSliceRep();
+//	void removeAndResetMultiSliceRep();
 
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
 
 	void setImagesSWRendering();
 
-	Texture3DSlicerRepPtr mMultiSliceRep;
+//	Texture3DSlicerRepPtr mMultiSliceRep;
 
 	DataRepContainerPtr mDataRepContainer;
 

@@ -100,3 +100,6 @@ sudo apt-get install -y python3-lxml
 
 #For enabling vlc integration, and showing the H.264 encoded video from VLC
 sudo apt install -y vlc-plugin-access-extra gstreamer1.0-libav
+
+#VTK 9: GLVND libraries
+sudo apt install -y libglvnd-dev

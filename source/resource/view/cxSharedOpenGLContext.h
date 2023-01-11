@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <windows.h>
 #endif
 
-#include <GL/glew.h>
+//#include <GL/glew.h>
 
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"

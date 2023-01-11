@@ -50,8 +50,8 @@ bool SharedOpenGLContext::isValid(vtkOpenGLRenderWindowPtr opengl_renderwindow, 
 		CX_LOG_DEBUG() <<  "\n==== START SharedContext ====";
 		//NB! opengl_renderwindow->SupportsOpenGL() creates a new context even if you have one, and this seg fault on render in vtkCocoaRenderWindow::CreateGLContext().
 		//CX_LOG_DEBUG() <<  "SupportsOpenGL: " << opengl_renderwindow->SupportsOpenGL();
-		CX_LOG_DEBUG() <<  "IsDrawable: " << opengl_renderwindow->IsDrawable();
-		CX_LOG_DEBUG() <<  "Context support for open gl core 3.2: " << (vtkOpenGLRenderWindow::GetContextSupportsOpenGL32() ? "true" : "false");
+//		CX_LOG_DEBUG() <<  "IsDrawable: " << opengl_renderwindow->IsDrawable();
+//		CX_LOG_DEBUG() <<  "Context support for open gl core 3.2: " << (vtkOpenGLRenderWindow::GetContextSupportsOpenGL32() ? "true" : "false");
 		CX_LOG_DEBUG() <<  "Context was created at: " << opengl_renderwindow->GetContextCreationTime();
 		const char *renderlib = vtkRenderWindow::GetRenderLibrary();
 		CX_LOG_DEBUG() <<  "GetRenderLibrary: " << ((renderlib!=0) ? std::string(renderlib) : "NOT FOUND");

@@ -12,7 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXVIEWWIDGET_H_
 #define CXVIEWWIDGET_H_
 
-#include "QVTKWidget.h"
+//#include "QVTKWidget.h"
+#include <QVTKOpenGLNativeWidget.h>
 
 #include "cxTransform3D.h"
 #include "cxView.h"
@@ -26,10 +27,11 @@ namespace cx
   *
   * \ingroup cx_resource_view_internal
   */
-class cxResourceVisualization_EXPORT ViewWidget : public QVTKWidget
+class cxResourceVisualization_EXPORT ViewWidget : public QVTKOpenGLNativeWidget
 {
 Q_OBJECT
-	typedef QVTKWidget inherited;
+	//typedef QVTKWidget inherited;
+	typedef QVTKOpenGLNativeWidget inherited;
 
 public:
 	ViewRepCollectionPtr getView();

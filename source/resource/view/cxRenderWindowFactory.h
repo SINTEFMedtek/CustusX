@@ -21,7 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxForwardDeclarations.h"
 #include "cxSharedContextCreatedCallback.h"
 
-class QVTKWidget;
+//class QVTKWidget;
+class QVTKOpenGLNativeWidget;
 
 namespace cx
 {
@@ -58,7 +59,8 @@ private:
 	std::map<QString, vtkRenderWindowPtr> mRenderWindows;
 	SharedContextCreatedCallbackPtr mSharedContextCreatedCallback;
 	SharedOpenGLContextPtr mSharedOpenGLContext;
-	QVTKWidget* mQvtkWidgetForHidingSharedContextRenderWindow;
+//	QVTKWidget* mQvtkWidgetForHidingSharedContextRenderWindow;
+	QVTKOpenGLNativeWidget* mQvtkWidgetForHidingSharedContextRenderWindow;
 
 	static bool mInstanceExisting;
 

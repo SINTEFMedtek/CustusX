@@ -14,7 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QString>
 #include <vtkRenderWindow.h>
 #include <vtkOpenGLRenderWindow.h>
-#include "QVTKWidget.h"
+//#include "QVTKWidget.h"
+#include <QVTKOpenGLNativeWidget.h>
 #include "cxSharedOpenGLContext.h"
 #include "cxLogger.h"
 
@@ -38,8 +39,9 @@ RenderWindowFactory::RenderWindowFactory()
 
 void RenderWindowFactory::preventSharedContextRenderWindowFromBeingShownOnScreen(vtkRenderWindowPtr renderWindow)
 {
-	mQvtkWidgetForHidingSharedContextRenderWindow = new QVTKWidget();
-	mQvtkWidgetForHidingSharedContextRenderWindow->SetRenderWindow(renderWindow);
+	//mQvtkWidgetForHidingSharedContextRenderWindow = new QVTKWidget();
+	mQvtkWidgetForHidingSharedContextRenderWindow = new QVTKOpenGLNativeWidget();
+	mQvtkWidgetForHidingSharedContextRenderWindow->setRenderWindow(renderWindow);
 }
 
 vtkRenderWindowPtr RenderWindowFactory::getRenderWindow(QString uid, bool offScreenRendering)
@@ -104,7 +106,7 @@ vtkRenderWindowPtr RenderWindowFactory::createRenderWindow(QString uid, bool off
 	{
 		CX_LOG_ERROR() << "The created renderwindow is not an opengl renderwindow.";
 	}
-	opengl_renderwindow->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
+//	opengl_renderwindow->AddObserver(vtkCommand::CXSharedContextCreatedEvent, mSharedContextCreatedCallback);
 
 	mRenderWindows[uid] = renderWindow;
 

@@ -242,62 +242,62 @@ void ViewWrapper2D::removeAndResetSliceRep()
 	mSliceReps.clear();
 }
 
-void ViewWrapper2D::removeAndResetMultiSliceRep()
-{
-	if (mMultiSliceRep)
-	{
-		mView->removeRep(mMultiSliceRep);
-		mMultiSliceRep.reset();
-	}
-}
+//void ViewWrapper2D::removeAndResetMultiSliceRep()
+//{
+//	if (mMultiSliceRep)
+//	{
+//		mView->removeRep(mMultiSliceRep);
+//		mMultiSliceRep.reset();
+//	}
+//}
 
-bool ViewWrapper2D::createAndAddMultiSliceRep()
-{
-	if(!mSharedOpenGLContext)
-	{
-		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
-		return false;
-	}
-	if (mMultiSliceRep)
-		return true;
+//bool ViewWrapper2D::createAndAddMultiSliceRep()
+//{
+//	if(!mSharedOpenGLContext)
+//	{
+//		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
+//		return false;
+//	}
+//	if (mMultiSliceRep)
+//		return true;
 
-	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
-	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-	mMultiSliceRep->setSliceProxy(mSliceProxy);
-	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
+//	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
+//	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
+//	mMultiSliceRep->setSliceProxy(mSliceProxy);
+//	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
 
-	mView->addRep(mMultiSliceRep);
+//	mView->addRep(mMultiSliceRep);
 
-	return true;
-}
+//	return true;
+//}
 
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
  * Fix: now reuses slicer, seem to have fixed issue.
  *
  */
-void ViewWrapper2D::recreateMultiSlicer()
-{
-	this->removeAndResetSliceRep();
+//void ViewWrapper2D::recreateMultiSlicer()
+//{
+//	this->removeAndResetSliceRep();
 
-	if (!this->useGPU2DRendering())
-	{
-		this->removeAndResetMultiSliceRep();
-		return;
-	}
+//	if (!this->useGPU2DRendering())
+//	{
+//		this->removeAndResetMultiSliceRep();
+//		return;
+//	}
 
-	if(!this->createAndAddMultiSliceRep())
-	{
-		return;
-	}
+//	if(!this->createAndAddMultiSliceRep())
+//	{
+//		return;
+//	}
 
-	if (mGroupData)
-		mMultiSliceRep->setImages(this->getImagesToView());
-	else
-		mMultiSliceRep->setImages(std::vector<ImagePtr>());
+//	if (mGroupData)
+//		mMultiSliceRep->setImages(this->getImagesToView());
+//	else
+//		mMultiSliceRep->setImages(std::vector<ImagePtr>());
 
-	this->viewportChanged();
-}
+//	this->viewportChanged();
+//}
 
 std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
 {
@@ -467,18 +467,18 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 
 		if (this->useGPU2DRendering())
 		{
-			this->recreateMultiSlicer();
+//			this->recreateMultiSlicer();
 		}
 		else //software rendering
 		{
-			this->removeAndResetMultiSliceRep();
+//			this->removeAndResetMultiSliceRep();
 			setImagesSWRendering();
 		}
 	}
 	else //no images to display in the view
 	{
 		this->removeAndResetSliceRep();
-		this->removeAndResetMultiSliceRep();
+//		this->removeAndResetMultiSliceRep();
 	}
 }
 

@@ -17,6 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 
+//#include <GL/glew.h>
+
 int main(int argc, char *argv[])
 {
 
@@ -25,6 +27,10 @@ int main(int argc, char *argv[])
   //instead we solve the problem by adding a handmade header for the cxResources.qrc file
   Q_INIT_RESOURCE(cxResources);
 #endif
+
+	//VTK 9:
+	// before initializing QApplication, set the default surface format.
+	QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
 
   cx::Application app(argc, argv);
   app.setOrganizationName("CustusX");

@@ -24,10 +24,10 @@ namespace cx
 
 
 
-template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
-template class ThreadedTimedAlgorithm<ImagePtr>; //resample
-//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
-template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
+//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
+//template class ThreadedTimedAlgorithm<ImagePtr>; //resample
+////template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
+//template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
 template class ThreadedTimedAlgorithm<void>;
 template class ThreadedTimedAlgorithm<bool>;
 

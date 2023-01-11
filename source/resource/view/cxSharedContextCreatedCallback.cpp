@@ -44,19 +44,19 @@ void SharedContextCreatedCallback::Execute(vtkObject *renderWindow, unsigned lon
 		return;
 	}
 
-	if(eventId == vtkCommand::CXSharedContextCreatedEvent)
-	{
-		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
+//	if(eventId == vtkCommand::CXSharedContextCreatedEvent)
+//	{
+//		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
 
-		if(SharedOpenGLContext::isValid(opengl_renderwindow))
-		{
-			mRenderWindowFactory->setSharedRenderWindow(opengl_renderwindow);
-		}
-		else
-		{
-			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
-		}
-	}
+//		if(SharedOpenGLContext::isValid(opengl_renderwindow))
+//		{
+//			mRenderWindowFactory->setSharedRenderWindow(opengl_renderwindow);
+//		}
+//		else
+//		{
+//			CX_LOG_WARNING() << "VTK render window is not an opengl renderwindow. This means we don't have an OpenGL shared context";
+//		}
+//	}
 }
 
 }//cx

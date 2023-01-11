@@ -24,14 +24,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkFollower.h>
 #include <vtkVectorText.h>
 #include <vtkCamera.h>
+#include <vtkArrowSource.h>
+#include <vtkMatrix4x4.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkTextProperty.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkTexture.h>
 #include "cxTypeConversions.h"
 #include "cxBoundingBox3D.h"
-#include "vtkArrowSource.h"
-#include "vtkMatrix4x4.h"
-#include "vtkCaptionActor2D.h"
-#include "vtkTextProperty.h"
 #include "cxVtkHelperClasses.h"
-#include "vtkPolyDataNormals.h"
 
 namespace cx
 {

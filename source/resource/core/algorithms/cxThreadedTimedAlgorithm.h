@@ -73,8 +73,9 @@ protected:
   }
   T getResult() ///< This gets the result calculated in calculate, should only be used after calculate is finished
   {
-	  T result = mWatcher.future().result();
-	  return result;
+//	  T result = mWatcher.future().result();
+	  return mWatcher.future().result();
+//	  return result;
   }
 
 private:

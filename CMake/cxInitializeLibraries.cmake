@@ -169,21 +169,35 @@ macro(cx_initialize_VTK)
 	#
 	# See http://www.vtk.org/Wiki/VTK/Build_System_Migration
 	#
+
+	if(VTK_VERSION VERSION_LESS 8.9.0)
+	  set(VTK_PREFIX vtk)
+	else()
+	  set(VTK_PREFIX "")
+	endif()
+
 	find_package(VTK COMPONENTS
-		vtkCommonCore
-		vtkRenderingCore
-		vtkRenderingQt
-		vtkInteractionStyle
-		vtkRenderingVolume
-		vtkIOGeometry vtkIOLegacy vtkIOMINC vtkIOXML
-		vtkIOXMLParser
-		vtkFiltersModeling
-		vtkInteractionWidgets
-		vtkParallelCore
-		vtkFiltersParallel
-                vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics vtkImagingStencil
-		vtkRenderingOpenGL2
-		vtkRenderingVolumeOpenGL2
+	        ${VTK_PREFIX}CommonCore
+		${VTK_PREFIX}RenderingCore
+		${VTK_PREFIX}RenderingQt
+		${VTK_PREFIX}InteractionStyle
+		${VTK_PREFIX}RenderingVolume
+		${VTK_PREFIX}IOGeometry
+		${VTK_PREFIX}IOLegacy
+		${VTK_PREFIX}IOMINC
+		${VTK_PREFIX}IOXML
+		${VTK_PREFIX}IOXMLParser
+		${VTK_PREFIX}FiltersModeling
+		${VTK_PREFIX}InteractionWidgets
+		${VTK_PREFIX}ParallelCore
+		${VTK_PREFIX}FiltersParallel
+		${VTK_PREFIX}ImagingMath
+		${VTK_PREFIX}ImagingMorphological
+		${VTK_PREFIX}ImagingColor
+		${VTK_PREFIX}ImagingStatistics
+		${VTK_PREFIX}ImagingStencil
+		${VTK_PREFIX}RenderingOpenGL2
+		${VTK_PREFIX}RenderingVolumeOpenGL2
 		NO_MODULE)
 
 

@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxReconstructCore.h"
 #include <vtkImageData.h>
+#include <vtkPolyData.h>
 #include <QFileInfo>
 #include "cxTime.h"
 #include "cxTypeConversions.h"

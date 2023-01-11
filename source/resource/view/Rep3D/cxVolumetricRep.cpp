@@ -68,13 +68,15 @@ void VolumetricRep::setUseGPUVolumeRayCastMapper()
 //TODO: Use vtkSmartVolumeMapper instead
 void VolumetricRep::setUseVolumeTextureMapper()
 {
-	vtkVolumeTextureMapper3DPtr mapper = vtkVolumeTextureMapper3DPtr::New();
+//	vtkVolumeTextureMapper3DPtr mapper = vtkVolumeTextureMapper3DPtr::New();
+
+	vtkNew<vtkSmartVolumeMapper> mapper;
 	mMapper = mapper;
 
 	// from snws
-#ifndef CX_VTK_OPENGL2
-	mapper->SetPreferredMethodToNVidia();
-#endif
+//#ifndef CX_VTK_OPENGL2
+//	mapper->SetPreferredMethodToNVidia();
+//#endif
 	mMapper->SetBlendModeToComposite();
 
 	mVolume->SetMapper( mMapper );
