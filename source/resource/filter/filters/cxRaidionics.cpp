@@ -104,16 +104,22 @@ QString Raidionics::copyInputFiles(QString inputFileName, QString subfolder)
 
 	QFile inputFile(inputFileName);
 	QFileInfo inputFileInfo(inputFile);
-	inputFile.copy(fullInputFolder+inputFileInfo.fileName());
+	inputFile.copy(fullInputFolder+getRaidionicsCTFileNamePrefix()+inputFileInfo.fileName());
 
 	if (inputFileName.contains(".mhd"))
 	{
 		QString fileNameRaw = inputFileName.left(inputFileName.lastIndexOf("."))+".raw";
 		QFile inputRawFile(fileNameRaw);
 		QFileInfo inputRawFileInfo(fileNameRaw);
-		inputRawFile.copy(fullInputFolder+inputRawFileInfo.fileName());
+		inputRawFile.copy(fullInputFolder+getRaidionicsCTFileNamePrefix()+inputRawFileInfo.fileName());
 	}
 	return inputFolder;
+}
+
+QString Raidionics::getRadionicsInputFileName(QString inputFile)
+{
+	QFileInfo inputFileInfo(inputFile);
+	return getRaidionicsCTFileNamePrefix()+inputFileInfo.fileName();
 }
 
 QString Raidionics::getModelFolder()

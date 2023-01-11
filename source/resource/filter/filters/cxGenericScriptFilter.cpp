@@ -799,6 +799,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
 
+			inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 			if(inputFileName == fileInfoOutput.baseName() || inputFileName == QFileInfo(fileInfoOutput.baseName()).baseName())
 			{
 				CX_LOG_INFO() << "Skipping copy of input image: " << filePath;

@@ -28,6 +28,8 @@ public:
 	QString getTempFolder();
 	static QString getIniFileName() {return "Raidionics.ini";}
 	static QString getJsonFileName() {return "Raidionics.json";}
+	static QString getRaidionicsCTFileNamePrefix() {return "input_ct_gd_";}
+	QString getRadionicsInputFileName(QString inputFile);
 
 protected:
 	QString createRaidionicsIniFile();
