@@ -176,10 +176,11 @@ macro(cx_initialize_VTK)
 	  set(VTK_PREFIX "")
 	endif()
 
+	set(VTK_PREFIX "")
 	find_package(VTK COMPONENTS
 	        ${VTK_PREFIX}CommonCore
 		${VTK_PREFIX}RenderingCore
-		${VTK_PREFIX}RenderingQt
+#		${VTK_PREFIX}RenderingQt
 		${VTK_PREFIX}InteractionStyle
 		${VTK_PREFIX}RenderingVolume
 		${VTK_PREFIX}IOGeometry
@@ -202,7 +203,7 @@ macro(cx_initialize_VTK)
 
 
 #    find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
-    include(${VTK_USE_FILE})
+#    include(${VTK_USE_FILE})
 endmacro()
 
 ###############################################################################

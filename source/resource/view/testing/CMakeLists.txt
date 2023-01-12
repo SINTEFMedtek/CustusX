@@ -45,5 +45,5 @@ if(BUILD_TESTING)
         cxPluginUtilities
     )
     cx_add_tests_to_catch(cxtestResourceVisualization)
-    
+
 endif(BUILD_TESTING)

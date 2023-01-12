@@ -174,4 +174,8 @@ target_link_libraries(cxResourceVisualization
 #    ${GLEW_LIBRARY}
 )
 
+vtk_module_autoinit(
+  TARGETS cxResourceVisualization
+  MODULES ${VTK_LIBRARIES}
+  )
 add_subdirectory(testing)

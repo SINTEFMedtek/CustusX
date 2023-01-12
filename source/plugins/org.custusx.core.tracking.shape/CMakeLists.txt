@@ -1,4 +1,4 @@
-project(org_custusx_tracking_shape)
+project(org_custusx_core_tracking_shape)
 
 set(PLUGIN_export_directive "${PROJECT_NAME}_EXPORT")
 
@@ -57,7 +57,7 @@ ctkMacroBuildPlugin(
   ${CX_CTK_PLUGIN_NO_INSTALL}
 )
 
-target_include_directories(org_custusx_tracking_shape
+target_include_directories(${PROJECT_NAME}
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}

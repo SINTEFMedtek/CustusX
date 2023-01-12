@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXREADFBGSMESSAGE_H
 #define CXREADFBGSMESSAGE_H
 
-#include "org_custusx_tracking_shape_Export.h"
+#include "org_custusx_core_tracking_shape_Export.h"
 #include <vector>
 #include <QString>
 #include <QColor>
@@ -28,12 +28,12 @@ typedef boost::shared_ptr<class ReadFbgsMessage> ReadFbgsMessagePtr;
 /**
  * Class for decoding the messages from the FBGS, and creating a vtkPolyData.
  *
- * \ingroup org_custusx_tracking_shape
+ * \ingroup org_custusx_core_tracking_shape
  *
  * \date 2022-11-09
  * \author Ole Vegard Solberg
  */
-class org_custusx_tracking_shape_EXPORT ReadFbgsMessage
+class org_custusx_core_tracking_shape_EXPORT ReadFbgsMessage
 {
 public:
 	enum AXIS

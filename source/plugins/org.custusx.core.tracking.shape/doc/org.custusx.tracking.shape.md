@@ -1,4 +1,4 @@
-Tracking Shape Plugin {#org_custusx_tracking_shape}
+Tracking Shape Plugin {#org_custusx_core_tracking_shape}
 ===================
 
 Connects to the Fiber Bragg Grating Sensor (FBGS), and shows its shape in CustusX.

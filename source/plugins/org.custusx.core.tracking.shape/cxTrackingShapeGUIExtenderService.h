@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXTRACKINGSHAPEGUIEXTENDERSERVICE_H_
 
 #include "cxGUIExtenderService.h"
-#include "org_custusx_tracking_shape_Export.h"
+#include "org_custusx_core_tracking_shape_Export.h"
 class ctkPluginContext;
 
 namespace cx
@@ -22,12 +22,12 @@ namespace cx
 /**
  * Implementation of TrackingShape service.
  *
- * \ingroup org_custusx_tracking_shape
+ * \ingroup org_custusx_core_tracking_shape
  *
  * \date 2022-11-08
  * \author Ole Vegard Solberg
  */
-class org_custusx_tracking_shape_EXPORT TrackingShapeGUIExtenderService : public GUIExtenderService
+class org_custusx_core_tracking_shape_EXPORT TrackingShapeGUIExtenderService : public GUIExtenderService
 {
 	Q_INTERFACES(cx::GUIExtenderService)
 public:

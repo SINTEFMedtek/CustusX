@@ -92,4 +92,30 @@ TEST_CASE("Render volume with texture mapper and text overlay", "[integration][r
 
 }
 
+TEST_CASE("vtkSmartVolumeMapper init", "[integration][resource][visualization]")
+{
+	//Code copied from https://kitware.github.io/vtk-examples/site/Cxx/VolumeRendering/SmartVolumeMapper/
+	vtkNew<vtkRenderWindow> renWin;
+	vtkNew<vtkRenderer> ren1;
+	CHECK(renWin);
+	CHECK(ren1);
+	ren1->SetBackground(0.1, 0.4, 0.2);
+	renWin->AddRenderer(ren1);
+	renWin->SetSize(301, 300); // intentional odd and NPOT  width/height
+
+	vtkNew<vtkRenderWindowInteractor> iren;
+	CHECK(iren);
+	iren->SetRenderWindow(renWin);
+	renWin->Render(); // make sure we have an OpenGL context.
+
+	//Both crash if vtk_module_autoinit isn't run
+	vtkNew<vtkSmartVolumeMapper> volumeMapper;
+//	vtkSmartPointer<vtkSmartVolumeMapper> volumeMapper = vtkSmartPointer<vtkSmartVolumeMapper>::New();
+	CHECK(volumeMapper);
+
+
+	vtkRenderWindowInteractorPtr i = renWin->GetInteractor();
+	CHECK(i);
+}
+
 } //namespace cxtest

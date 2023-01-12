@@ -345,6 +345,11 @@ target_link_libraries(cxResource
 	${SSC_GCOV_LIBRARY} # add gcov LAST in the link sequence! (http://stackoverflow.com/questions/566472/where-are-the-gcov-symbols)
 	)
 
+  vtk_module_autoinit(
+    TARGETS cxResource
+    MODULES ${VTK_LIBRARIES}
+#    MODULES VTK::RenderingVolumeOpenGL2 VTK::CommonDataModel
+    )
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/Data/doc")
 cx_add_non_source_file("usReconstructionTypes/doc/org.custusx.resource.core.usacquisitionfileformat.md")

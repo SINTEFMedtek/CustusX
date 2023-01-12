@@ -136,7 +136,15 @@ void ViewContainer::initializeRenderWindow()
 	if(!renderWindowExists)
 		this->addBackgroundRenderer(mRenderWindow);
 	this->setRenderWindow(mRenderWindow);
-	mRenderWindow->GetInteractor()->EnableRenderOff();
+	if(mRenderWindow->GetInteractor())
+		mRenderWindow->GetInteractor()->EnableRenderOff();//Interactor is missing. Create?
+	else
+	{
+		vtkRenderWindowInteractorPtr interactor = vtkRenderWindowInteractorPtr::New();
+		interactor->SetRenderWindow(mRenderWindow);
+		CX_LOG_WARNING() << "ViewContainer::initializeRenderWindow(): No vtkRenderWindowInteractor - Test created it here";
+		mRenderWindow->GetInteractor()->EnableRenderOff();
+	}
 
 
 

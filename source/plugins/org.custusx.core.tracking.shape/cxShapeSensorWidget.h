@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXTRACKINGSHAPEWIDGET_H_
 #define CXTRACKINGSHAPEWIDGET_H_
 
-#include "org_custusx_tracking_shape_Export.h"
+#include "org_custusx_core_tracking_shape_Export.h"
 #include "cxBaseWidget.h"
 #include "cxSocketConnection.h"
 #include "cxForwardDeclarations.h"
@@ -26,12 +26,12 @@ namespace cx
 /**
  * Widget for use in the plugin tracking_shape
  *
- * \ingroup org_custusx_tracking_shape
+ * \ingroup org_custusx_core_tracking_shape
  *
  * \date 2022-11-08
  * \author Ole Vegard Solberg
  */
-class org_custusx_tracking_shape_EXPORT ShapeSensorWidget : public BaseWidget
+class org_custusx_core_tracking_shape_EXPORT ShapeSensorWidget : public BaseWidget
 {
 	Q_OBJECT
 public:

@@ -24,7 +24,7 @@ typedef boost::shared_ptr<class RegisteredService> RegisteredServicePtr;
 /**
  * Activator for the tracking_shape plugin
  *
- * \ingroup org_custusx_tracking_shape
+ * \ingroup org_custusx_core_tracking_shape
  *
  * \date 2022-11-08
  * \author Ole Vegard Solberg
@@ -33,7 +33,7 @@ class TrackingShapePluginActivator :  public QObject, public ctkPluginActivator
 {
 	Q_OBJECT
 	Q_INTERFACES(ctkPluginActivator)
-	Q_PLUGIN_METADATA(IID "org_custusx_tracking_shape")
+	Q_PLUGIN_METADATA(IID "org_custusx_core_tracking_shape")
 
 public:
 

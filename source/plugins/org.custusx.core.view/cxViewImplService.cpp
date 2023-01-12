@@ -474,27 +474,34 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	if (!viewData.isValid())
 		return;
 
-	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
+	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);//This may also need vtkRenderWindowInteractor. Create it here instead?
 
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
+	if(!interactor)
+	{
+		interactor = vtkRenderWindowInteractorPtr::New();
+		interactor->SetRenderWindow(view->getRenderWindow());
+		CX_LOG_WARNING() << "ViewImplService::activateView: Created vtkRenderWindowInteractor";
+	}
+	interactor = view->getRenderWindow()->GetInteractor();
 	if(interactor)
 	{
 		//Turn off rendering in vtkRenderWindowInteractor
-//		interactor->EnableRenderOff();
-	//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-	double rate = settings()->value("stillUpdateRate").value<double>();
-	interactor->SetStillUpdateRate(rate);
-	// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
-	// The real challenge is updating while the tracking is active, and this uses the still update rate.
-	interactor->SetDesiredUpdateRate(rate);
+		interactor->EnableRenderOff();
+		//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
+		double rate = settings()->value("stillUpdateRate").value<double>();
+		interactor->SetStillUpdateRate(rate);
+		// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
+		// The real challenge is updating while the tracking is active, and this uses the still update rate.
+		interactor->SetDesiredUpdateRate(rate);
 	}
 	else
-		CX_LOG_WARNING() << "No vtkRenderWindowInteractor";
+		CX_LOG_WARNING() << "ViewImplService::activateView: No vtkRenderWindowInteractor";
 
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
-	if(!mRenderWindowFactory->getSharedOpenGLContext())
-		CX_LOG_WARNING() << "ViewImplService::activateView: got not shared OpenGL context";
+//	if(!mRenderWindowFactory->getSharedOpenGLContext())
+//		CX_LOG_WARNING() << "ViewImplService::activateView: got not shared OpenGL context";
 	mViewGroups[viewData.mGroup]->addView(wrapper, mRenderWindowFactory->getSharedOpenGLContext());
 }
 

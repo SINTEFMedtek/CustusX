@@ -83,7 +83,11 @@ target_include_directories(org_custusx_core_view
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
-
+vtk_module_autoinit(
+  TARGETS ${PROJECT_NAME}
+  MODULES ${VTK_LIBRARIES}
+#  MODULES VTK::RenderingVolumeOpenGL2 VTK::CommonCore
+  )
 
 add_subdirectory(testing)
 
