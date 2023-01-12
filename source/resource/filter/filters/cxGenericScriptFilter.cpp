@@ -339,7 +339,7 @@ void GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
 {
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 	OutputVariables outputVariables = OutputVariables(parameterFilePath);
-	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(variables, outputVariables.mOutputClasses));
+	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, outputVariables.mOutputClasses));
 }
 
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
@@ -768,6 +768,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	QFileInfo fileInfoInput(parentImage->getFilename());
 	QString inputFileName = fileInfoInput.baseName();
 	QFileInfo outputFileInfo(inputFileName + mResultFileEnding);
+	inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
@@ -799,12 +800,11 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
 
-			inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 			if(inputFileName == fileInfoOutput.baseName() || inputFileName == QFileInfo(fileInfoOutput.baseName()).baseName())
 			{
 				CX_LOG_INFO() << "Skipping copy of input image: " << filePath;
 				CX_LOG_INFO() << "Input image was: " << parentImage->getFilename();
-				continue;//Skip input volume. The mesh creation of this use a very long time
+				continue;//Skip input volume. The mesh creation of this takes a very long time
 			}
 			else
 				CX_LOG_INFO() << "Importing: " << filePath;

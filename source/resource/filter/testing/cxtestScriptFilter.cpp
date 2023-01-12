@@ -620,7 +620,7 @@ TEST_CASE("Raidionics: init", "[unit]")
 
 	cx::OutputVariables outputVariables = cx::OutputVariables(parameterFilePath);
 
-	cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(variables, outputVariables.mOutputClasses));
+	cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(services, variables, outputVariables.mOutputClasses));
 
 	REQUIRE(filter->isUsingRaidionicsEngine());
 

@@ -21,7 +21,7 @@ namespace cx
 class cxResourceFilter_EXPORT Raidionics
 {
 public:
-	Raidionics(CommandStringVariables variables, QStringList targets);
+	Raidionics(VisServicesPtr services, CommandStringVariables variables, QStringList targets);
 
 	QString raidionicsCommandString();
 	QString getOutputFolder();
@@ -38,6 +38,7 @@ protected:
 	QString getModelFolder();
 	static QString subfolderT0() {return "T0";}
 
+	VisServicesPtr mServices;
 	CommandStringVariables mVariables;
 	QString mOutputFolder;
 	QString mTempFolder;

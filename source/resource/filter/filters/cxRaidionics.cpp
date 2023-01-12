@@ -17,11 +17,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxLogger.h"
 #include "cxProfile.h"
+#include "cxVisServices.h"
+#include "cxFileManagerService.h"
+#include "cxData.h"
 
 namespace cx
 {
 
-Raidionics::Raidionics(CommandStringVariables variables, QStringList targets) :
+Raidionics::Raidionics(VisServicesPtr services, CommandStringVariables variables, QStringList targets) :
+	mServices(services),
 	mVariables(variables),
 	mTargets(targets)
 {}
@@ -104,15 +108,13 @@ QString Raidionics::copyInputFiles(QString inputFileName, QString subfolder)
 
 	QFile inputFile(inputFileName);
 	QFileInfo inputFileInfo(inputFile);
-	inputFile.copy(fullInputFolder+getRaidionicsCTFileNamePrefix()+inputFileInfo.fileName());
 
-	if (inputFileName.contains(".mhd"))
-	{
-		QString fileNameRaw = inputFileName.left(inputFileName.lastIndexOf("."))+".raw";
-		QFile inputRawFile(fileNameRaw);
-		QFileInfo inputRawFileInfo(fileNameRaw);
-		inputRawFile.copy(fullInputFolder+getRaidionicsCTFileNamePrefix()+inputRawFileInfo.fileName());
-	}
+	std::vector<DataPtr> datas = mServices->file()->read(inputFileName);
+	if(datas.size() == 1)
+		mServices->file()->save(datas[0], fullInputFolder+getRadionicsInputFileName(inputFileInfo.fileName()));
+	else
+		CX_LOG_WARNING() << "Raidionics::copyInputFiles: Got " << datas.size() << " input files. Expecting 1";
+
 	return inputFolder;
 }
 
