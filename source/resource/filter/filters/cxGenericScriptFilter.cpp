@@ -785,7 +785,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 		QString filePath = fileIterator.next();
 
 		if(filePath.contains(outputFileNamesNoExtention) &&
-				(filePath.contains(".mhd")) || filePath.contains(".nii"))
+				(filePath.contains(".mhd")) || (isUsingRaidionicsEngine() && filePath.contains(".nii")))
 		{
 			QFileInfo fileInfoOutput(filePath);
 			QString uid = changeExtension(fileInfoOutput.fileName(), "");
@@ -833,7 +833,8 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 					outputColor = mOutputColors.at(colorNumber);
 				this->createOutputMesh(outputColor);
 			}
-			this->deleteNotUsedFiles(filePath, createOutputVolume);
+			if(!isUsingRaidionicsEngine())
+				this->deleteNotUsedFiles(filePath, createOutputVolume);
 		}
 		else if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".vtk"))
 		{
