@@ -87,5 +87,5 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image with
 
 //	cx::TextDisplay::forceUseVtkTextMapper();
 	mMachine->addTextToVtkRenderWindow("test text");
-	mMachine->renderAndUpdateText(5000);
+	mMachine->renderAndUpdateText(100);
 }

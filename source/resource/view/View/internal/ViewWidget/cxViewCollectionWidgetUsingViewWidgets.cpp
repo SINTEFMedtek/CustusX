@@ -39,9 +39,10 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
+	ViewWidget* view = mViewCache->retrieveView(this->parentWidget(), type, mOffScreenRendering);
 
 	view->getView()->setType(type);
+	view->setParent(this->parentWidget());
 
 	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);

@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QString>
 #include <vtkRenderWindow.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 //#include "QVTKWidget.h"
 #include <QVTKOpenGLNativeWidget.h>
 #include "cxSharedOpenGLContext.h"
@@ -32,13 +33,15 @@ RenderWindowFactory::RenderWindowFactory()
 		mInstanceExisting = true;
 
 	//Note: Setting offScreenRendering to true gives crash in render
-	vtkRenderWindowPtr renderWindow = createRenderWindow("cx_shared_context", false);
-	this->preventSharedContextRenderWindowFromBeingShownOnScreen(renderWindow);
-	renderWindow->Render();
+	//Remove extra cx_shared_context renderwindow. This should not be needed any longer
+//	vtkRenderWindowPtr renderWindow = createRenderWindow("cx_shared_context", false);
+//	this->preventSharedContextRenderWindowFromBeingShownOnScreen(renderWindow);
+//	renderWindow->Render();
 }
 
 void RenderWindowFactory::preventSharedContextRenderWindowFromBeingShownOnScreen(vtkRenderWindowPtr renderWindow)
 {
+	//mQvtkWidgetForHidingSharedContextRenderWindow not needed any longer?
 	//mQvtkWidgetForHidingSharedContextRenderWindow = new QVTKWidget();
 	mQvtkWidgetForHidingSharedContextRenderWindow = new QVTKOpenGLNativeWidget();
 	mQvtkWidgetForHidingSharedContextRenderWindow->setRenderWindow(renderWindow);
@@ -95,7 +98,9 @@ SharedOpenGLContextPtr RenderWindowFactory::getSharedOpenGLContext() const
 
 vtkRenderWindowPtr RenderWindowFactory::createRenderWindow(QString uid, bool offScreenRendering)
 {
-	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+	CX_LOG_DEBUG() << "RenderWindowFactory::createRenderWindow: " << uid << " offScreenRendering: " << offScreenRendering;
+//	vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();//TODO: Fix - Use vtkGenericOpenGLRenderWindow
+	vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;//Don't work yet - lots of GL errors
 	renderWindow->SetOffScreenRendering(offScreenRendering);
 
 	mSharedContextCreatedCallback = SharedContextCreatedCallbackPtr::New();

@@ -96,7 +96,6 @@ public:
 	virtual void setSlicePlanesProxy(SlicePlanesProxyPtr proxy) = 0;
 	virtual void setViewGroup(ViewGroupDataPtr group);
 	virtual void updateView();
-	virtual void setSharedOpenGLContext(SharedOpenGLContextPtr sharedOpenGLContext);
 	ToolPtr getControllingTool();
 
 signals:
@@ -124,7 +123,6 @@ protected:
 	VisServicesPtr mServices;
 	DataViewPropertiesInteractorPtr mDataViewPropertiesInteractor;
 	DataViewPropertiesInteractorPtr mShow3DSlicesInteractor;
-	SharedOpenGLContextPtr mSharedOpenGLContext;
 
 private:
 	DisplayTextRepPtr mPlaneTypeText;

@@ -98,9 +98,9 @@ TestRenderSpeed::TestRenderSpeed()
 
 	bool optimizedViews = cx::settings()->value("optimizedViews").toBool();
 	if (optimizedViews)
-		mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory()).data());
+		mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory(), NULL/*need QApplication??*/).data());
 	else
-		mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(viewService->getRenderWindowFactory()).data());
+		mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(viewService->getRenderWindowFactory(), NULL/*need QApplication??*/).data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()

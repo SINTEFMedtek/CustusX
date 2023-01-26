@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSharedOpenGLContext.h"
 #include <vtkRenderWindow.h>
 #include <vtkOpenGLRenderWindow.h>
+#include <vtkGenericOpenGLRenderWindow.h>
 #include <QString>
 
 namespace cxtest {
@@ -115,6 +116,7 @@ TEST_CASE("Speed: Render time of vtkOpenGLRenderWindow", "[speed]")
 	for (int i = 0; i < numRenderWindows; ++i)
 	{
 		vtkRenderWindowPtr renderWindow = vtkRenderWindowPtr::New();
+//		vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;//Test with vtkGenericOpenGLRenderWindow - 0 ms per render, opposed to 33 ms for the line above. Still not sure it it works?
 		vtkOpenGLRenderWindowPtr opengl_renderwindow = vtkOpenGLRenderWindow::SafeDownCast(renderWindow);
 		REQUIRE(opengl_renderwindow);
 		openGLRenderWindows.push_back(opengl_renderwindow);

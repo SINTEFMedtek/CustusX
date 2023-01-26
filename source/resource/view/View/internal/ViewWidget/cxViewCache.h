@@ -63,7 +63,7 @@ public:
 					.arg(mTypeText)
 					.arg(mNameGenerator++)
 					.arg(reinterpret_cast<long>(this));
-			VIEW_TYPE* view = new VIEW_TYPE(mRenderWindowFactory, uid, uid, mCentralWidget);
+			VIEW_TYPE* view = new VIEW_TYPE(mRenderWindowFactory, mCentralWidget, uid, uid);
 			mCached.push_back(view);
 		}
 

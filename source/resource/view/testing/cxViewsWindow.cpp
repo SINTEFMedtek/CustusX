@@ -37,8 +37,8 @@ ViewsWindow::ViewsWindow(cx::RenderWindowFactoryPtr factory)
 
 	this->setNiceSize();
 
-	mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(factory);
-//	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout();
+	mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(factory, this);
+//	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout(factory, this);
 	this->setCentralWidget(mLayoutWidget);
 
 	mRenderingTimer = new QTimer(this);

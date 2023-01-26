@@ -238,6 +238,7 @@ class VTK(CppComponent):
         add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
         #VTK 9
         add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
+        #add('VTK_MODULE_ENABLE_VTK_RenderingQt:STRING', 'YES') #Didn't fix the issue. Not needed?
         add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
         builder.configureCMake()
 # ---------------------------------------------------------

@@ -199,6 +199,14 @@ macro(cx_initialize_VTK)
 		${VTK_PREFIX}ImagingStencil
 		${VTK_PREFIX}RenderingOpenGL2
 		${VTK_PREFIX}RenderingVolumeOpenGL2
+#		ImagingCore
+#		ImagingHybrid
+#		RenderingContextOpenGL2
+#		RenderingFreeType
+#		RenderingGL2PSOpenGL2
+                ViewsQt
+                GUISupportQt
+                RenderingQt #Default in CMake == OFF?
 		NO_MODULE)
 
 

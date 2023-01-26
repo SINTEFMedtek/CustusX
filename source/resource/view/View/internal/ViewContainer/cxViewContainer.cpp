@@ -28,7 +28,6 @@ namespace cx
 
 ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt::WindowFlags f) :
 	mRenderWindowFactory(factory),
-//	QVTKWidget(parent, f),
 	QVTKOpenGLNativeWidget(parent, f),
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
@@ -39,7 +38,7 @@ ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt
 	mMTimeHash = 0;
 	mMouseEventTarget = NULL;
 	this->setLayout(new QGridLayout);
-	disableGLHiDPI(this->winId());
+//	disableGLHiDPI(this->winId());//vtk9: Probably not needed any longer
 }
 
 ViewContainer::~ViewContainer()
@@ -130,23 +129,13 @@ void ViewContainer::initializeRenderWindow()
 
 	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
 
-	bool renderWindowExists = mRenderWindowFactory->renderWindowExists(uid);
+//	bool renderWindowExists = mRenderWindowFactory->renderWindowExists(uid);
 
-	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
-	if(!renderWindowExists)
-		this->addBackgroundRenderer(mRenderWindow);
+//	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
+	mRenderWindow = this->renderWindow();//vtk9: Using renderWindow created in QVTKOpenGLNativeWidget - skipping factory
+//	if(!renderWindowExists)
+//		this->addBackgroundRenderer(mRenderWindow);//vtk9: Not needed?
 	this->setRenderWindow(mRenderWindow);
-	if(mRenderWindow->GetInteractor())
-		mRenderWindow->GetInteractor()->EnableRenderOff();//Interactor is missing. Create?
-	else
-	{
-		vtkRenderWindowInteractorPtr interactor = vtkRenderWindowInteractorPtr::New();
-		interactor->SetRenderWindow(mRenderWindow);
-		CX_LOG_WARNING() << "ViewContainer::initializeRenderWindow(): No vtkRenderWindowInteractor - Test created it here";
-		mRenderWindow->GetInteractor()->EnableRenderOff();
-	}
-
-
 
 //	if (!mCachedRenderWindows.count(uid))
 //	{

@@ -174,15 +174,15 @@ QWidget *ViewImplService::createLayoutWidget(QWidget* parent, int index)
 
 		if (optimizedViews)
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mRenderWindowFactory);
+			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mRenderWindowFactory, parent);
 		}
 		else
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mRenderWindowFactory);
+			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mRenderWindowFactory, parent);
 		}
 
 		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewImplService::layoutWidgetDestroyed);
-		mRenderLoop->addLayout(mLayoutWidgets[index]);
+		mRenderLoop->addLayout(mLayoutWidgets[index]);//test: disconnect from renderLoop - removes GL errors, but gived no rendering in 2D
 
 		this->rebuildLayouts();
 	}
@@ -488,7 +488,7 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	if(interactor)
 	{
 		//Turn off rendering in vtkRenderWindowInteractor
-		interactor->EnableRenderOff();
+//		interactor->EnableRenderOff();//vtk9: Removing this seems to fix GL error for 3D, but not 2D
 		//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
 		double rate = settings()->value("stillUpdateRate").value<double>();
 		interactor->SetStillUpdateRate(rate);
@@ -500,9 +500,7 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 		CX_LOG_WARNING() << "ViewImplService::activateView: No vtkRenderWindowInteractor";
 
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
-//	if(!mRenderWindowFactory->getSharedOpenGLContext())
-//		CX_LOG_WARNING() << "ViewImplService::activateView: got not shared OpenGL context";
-	mViewGroups[viewData.mGroup]->addView(wrapper, mRenderWindowFactory->getSharedOpenGLContext());
+	mViewGroups[viewData.mGroup]->addView(wrapper);
 }
 
 ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData viewData)

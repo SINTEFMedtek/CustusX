@@ -78,7 +78,9 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 	this->connectContextMenu(mView);
 
 	// disable vtk interactor: this wrapper IS an interactor
-	mView->getRenderWindow()->GetInteractor()->Disable();
+//	mView->getRenderWindow()->GetInteractor()->Disable();//vtk9 - Removing this fixes GL error, but allows 3D rotations in the 2D views
+	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();//vtk9 - Remove observers instead of disabling interactor
+
 	mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	double length = clipDepth*10;
@@ -206,10 +208,6 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 {
 	this->ViewWrapper::settingsChangedSlot(key);
 
-	if (key == "View2D/useGPU2DRendering")
-	{
-		this->updateView();
-	}
 	if (key == "View2D/useLinearInterpolationIn2DRendering")
 	{
 		this->updateView();
@@ -424,11 +422,6 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 	return image;
 }
 
-bool ViewWrapper2D::useGPU2DRendering()
-{
-	return settings()->value("View2D/useGPU2DRendering").toBool();
-}
-
 void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 {
 	this->removeAndResetSliceRep();
@@ -464,21 +457,11 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 	{
 		Vector3D c = image->get_rMd().coord(image->boundingBox().center());
 		mSliceProxy->setDefaultCenter(c);
-
-		if (this->useGPU2DRendering())
-		{
-//			this->recreateMultiSlicer();
-		}
-		else //software rendering
-		{
-//			this->removeAndResetMultiSliceRep();
-			setImagesSWRendering();
-		}
+		setImagesSWRendering();
 	}
 	else //no images to display in the view
 	{
 		this->removeAndResetSliceRep();
-//		this->removeAndResetMultiSliceRep();
 	}
 }
 

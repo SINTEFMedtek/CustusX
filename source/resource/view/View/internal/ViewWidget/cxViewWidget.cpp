@@ -15,31 +15,40 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QApplication>
 #include <QDesktopWidget>
 #include "vtkRenderWindow.h"
+#include <vtkGenericOpenGLRenderWindow.h>
 #include "cxBoundingBox3D.h"
 #include "cxViewLinkingViewWidget.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
 #include "cxOSXHelper.h"
 #include "cxRenderWindowFactory.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-ViewWidget::ViewWidget(RenderWindowFactoryPtr factory, const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
+ViewWidget::ViewWidget(RenderWindowFactoryPtr factory, QWidget *parent, const QString& uid, const QString& name, Qt::WindowFlags f) :
 	inherited(parent, f)
 {
+	CX_LOG_DEBUG() << "ViewWidget parent: " << parent;
 	mMTimeHash = 0;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	mZoomFactor = -1.0;
-	vtkRenderWindowPtr rw = factory->getRenderWindow(uid);
-	mView = ViewLinkingViewWidget::create(this, rw);
+//	vtkRenderWindowPtr renderWindow = factory->getRenderWindow(uid);
+	vtkRenderWindowPtr renderWindow = this->renderWindow();//vtk9: Using renderWindow created in QVTKOpenGLNativeWidget - skipping factory
+	if(!renderWindow)
+		CX_LOG_ERROR() << "ViewWidget: Got no renderWindow";
+
+	mView = ViewLinkingViewWidget::create(this, renderWindow);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
-	vtkRenderWindowPtr renderWindow = mView->getRenderWindow();
-	this->setRenderWindow(renderWindow);
-	if(mView->getRenderWindow()->GetInteractor())
-		mView->getRenderWindow()->GetInteractor()->EnableRenderOff();//Crash
+
+//	if(mView->getRenderWindow()->GetInteractor())
+//	{
+		//Don't turn off rendering any longer
+//		mView->getRenderWindow()->GetInteractor()->EnableRenderOff();//Crash with vtk9
+//	}
 	mView->clear();
-	disableGLHiDPI(this->winId());
+//	disableGLHiDPI(this->winId());//vtk9: Probably not needed any longer
 }
 
 void ViewWidget::customContextMenuRequestedSlot(const QPoint& point)
@@ -72,10 +81,11 @@ void ViewWidget::render()
 
 	if (hash != mMTimeHash)
 	{
-		this->getRenderWindow()->Render();
+//		this->getRenderWindow()->Render();
+		QVTKOpenGLNativeWidget::renderWindow()->Render();//vtk9
 		mMTimeHash = hash;
 
-		QString msg("During rendering of view: " + this->getView()->getName());
+		QString msg("During rendering of view: " + this->getView()->getName() + " " + this->getView()->getTypeString());
 		report_gl_error_text(cstring_cast(msg));
 	}
 }
