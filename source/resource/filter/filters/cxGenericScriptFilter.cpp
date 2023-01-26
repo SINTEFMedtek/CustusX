@@ -751,6 +751,7 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 	outputMesh->setColor(color);
 	patientService()->insertData(outputMesh);
 	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
+	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
