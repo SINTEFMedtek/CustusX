@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkCardinalSpline.h"
 #include "cxLogger.h"
 #include <vtkImageResample.h>
+#include <vtkImageConnectivityFilter.h>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -123,6 +124,9 @@ vtkPolyDataPtr AirwaysFromCenterline::generateTubes(double staticRadius, bool me
 		airwaysVolumePtr = this->initializeEmptyAirwaysVolume();
 
 	airwaysVolumePtr = addSpheresAlongCenterlines(airwaysVolumePtr, staticRadius);
+
+	if(mMergeWithOriginalAirways)
+		airwaysVolumePtr = this->removeIslandsFromImage(airwaysVolumePtr);
 
 	//create contour from image
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
@@ -290,6 +294,17 @@ vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysV
 			}
 
 	return airwaysVolumePtr;
+}
+
+vtkImageDataPtr AirwaysFromCenterline::removeIslandsFromImage(vtkImageDataPtr image)
+{//Returns largest connected area of image
+	vtkImageConnectivityFilter* connectivityFilerPtr = vtkImageConnectivityFilter::New();
+	connectivityFilerPtr->SetInputData(image);
+	connectivityFilerPtr->SetExtractionModeToLargestRegion();
+	connectivityFilerPtr->SetScalarRange(1,1);
+	connectivityFilerPtr->Update();
+	vtkImageDataPtr filteredImage = connectivityFilerPtr->GetOutput();
+	return filteredImage;
 }
 
 void AirwaysFromCenterline::smoothAllBranchesForVB()
