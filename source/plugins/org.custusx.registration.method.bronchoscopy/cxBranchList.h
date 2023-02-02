@@ -24,6 +24,12 @@ namespace cx
 typedef std::vector< Eigen::Matrix4d > M4Vector;
 
 #define MAX_ROTATION_TO_TILT_DOWN_DEGREES 30 //Threshold between rotation direction of scope to tilt up or down in a bifurcation.
+#define MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH 3 //mm
+#define MIN_BRANCH_SEGMENT_LENGTH 5 //Number of connected points
+#define MAX_DISTANCE_TO_EXISTING_BRANCH 15 //mm. Max distance to main airway tree for inclusion of points.
+#define DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION 5 //mm. If distance to main branch tree exceeds value, use direction to connect to correct branch.
+#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION 30 //deg
+
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
 {
@@ -50,6 +56,7 @@ public:
 	QString findClosestLungLap(Vector3D position);
 	double findDistance(Vector3D p1, Vector3D p2);
 	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
+	std::vector<BranchPtr> findClosesBranches(Vector3D position, double maxDistance);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 };
@@ -61,6 +68,7 @@ std::pair<Eigen::MatrixXd::Index, double> org_custusx_registration_method_bronch
 std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > org_custusx_registration_method_bronchoscopy_EXPORT dsearchn(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 std::vector<Eigen::Vector3d> org_custusx_registration_method_bronchoscopy_EXPORT smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation, double parentRotation);
+double calculateAngleBetweenTwo3DVectors(Vector3D A, Vector3D B);
 
 org_custusx_registration_method_bronchoscopy_EXPORT Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B);
 

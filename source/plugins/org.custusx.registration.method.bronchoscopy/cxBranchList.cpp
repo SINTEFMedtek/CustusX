@@ -332,16 +332,16 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 
 	Eigen::MatrixXd positionsNotUsed_r = positions_r;
 
-	//	int minIndex;
 	int index;
 	int splitIndex;
+	double minDistance;
 	Eigen::MatrixXd::Index startIndex;
 	BranchPtr branchToSplit;
 	while (positionsNotUsed_r.cols() > 0)
 	{
 		if (!mBranches.empty())
-		{
-			double minDistance = 1000;
+		{// Find remaining point which is closest to an existing branch
+			minDistance = MAX_DISTANCE_TO_EXISTING_BRANCH;
 			for (int i = 0; i < mBranches.size(); i++)
 			{
 				std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
@@ -356,6 +356,9 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 						break;
 				}
 			}
+			if(minDistance == MAX_DISTANCE_TO_EXISTING_BRANCH)
+				break; //No more close positions found: Airway centerline tree completed.
+
 			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
 			splitIndex = dsearchResult.first;
 		}
@@ -363,57 +366,97 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			startIndex = positionsNotUsed_r.cols() - 1;
 
 		std::pair<Eigen::MatrixXd,Eigen::MatrixXd > connectedPointsResult = findConnectedPointsInCT(startIndex , positionsNotUsed_r);
-		Eigen::MatrixXd branchPositions = connectedPointsResult.first;
+		Eigen::MatrixXd newBranchPositions = connectedPointsResult.first;
 		positionsNotUsed_r = connectedPointsResult.second;
 
-		if (branchPositions.cols() >= 5) //only include brances of length >= 5 points
-		{
-			BranchPtr newBranch = BranchPtr(new Branch());
-			newBranch->setPositions(branchPositions);
-			mBranches.push_back(newBranch);
+		if (newBranchPositions.cols() < MIN_BRANCH_SEGMENT_LENGTH) //only include brances of length >= 5 points
+			continue;
 
-			if (mBranches.size() > 1) // do not try to split another branch when the first branch is processed
+		BranchPtr newBranch = BranchPtr(new Branch());
+		newBranch->setPositions(newBranchPositions);
+
+		if(minDistance > DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION)
+		{ // If distance to closest branch is above DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION
+			// we look at all branches at a distance below MAX_DISTANCE_TO_EXISTING_BRANCH and select the one wtih
+			// lowest orientation deviation between the conection part and the new and the existing branch.
+			std::vector<BranchPtr> existingCloseBranches = findClosesBranches(newBranchPositions.col(0), MAX_DISTANCE_TO_EXISTING_BRANCH);
+			Eigen::MatrixXd newBranchOrientations =newBranch->getOrientations();
+			int numberOfColumnsInNewBranch = newBranchOrientations.cols();
+			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch)).rowwise().mean(); //smoothing
+			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
+			BranchPtr branchToConnect;
+			double minOrintationDeviation = 360.0; //deg
+			for (int i=0; i<existingCloseBranches.size(); i++)
 			{
-				if ((splitIndex + 1 >= 5) && (branchToSplit->getPositions().cols() - splitIndex - 1 >= 5))
-					//do not split branch if the new branch is close to the edge of the branch
-					//if the new branch is not close to one of the edges of the
-					//connected existing branch: Split the existing branch
-				{
-					BranchPtr newBranchFromSplit = BranchPtr(new Branch());
-					Eigen::MatrixXd branchToSplitPositions = branchToSplit->getPositions();
-					newBranchFromSplit->setPositions(branchToSplitPositions.rightCols(branchToSplitPositions.cols() - splitIndex - 1));
-					branchToSplit->setPositions(branchToSplitPositions.leftCols(splitIndex + 1));
-					mBranches.push_back(newBranchFromSplit);
-					newBranchFromSplit->setParentBranch(branchToSplit);
-					newBranch->setParentBranch(branchToSplit);
-					newBranchFromSplit->setChildBranches(branchToSplit->getChildBranches());
-					branchVector branchToSplitChildren = branchToSplit->getChildBranches();
-					for (int i = 0; i < branchToSplitChildren.size(); i++)
-						branchToSplitChildren[i]->setParentBranch(newBranchFromSplit);
-					branchToSplit->deleteChildBranches();
-					branchToSplit->addChildBranch(newBranchFromSplit);
-					branchToSplit->addChildBranch(newBranch);
+				Eigen::MatrixXd existingCloseBranchOrientations = existingCloseBranches[i]->getOrientations();
+				int numberOfColumnsInExistingBranch = existingCloseBranchOrientations.cols();
+				Vector3D existingCloseBranchOrientationEnd = existingCloseBranchOrientations.rightCols(std::min(10, numberOfColumnsInExistingBranch)).rowwise().mean(); //smoothing
+				existingCloseBranchOrientationEnd = existingCloseBranchOrientationEnd / existingCloseBranchOrientationEnd.norm(); // normalizing
+				Eigen::MatrixXd existingCloseBranchPositions = existingCloseBranches[i]->getPositions();
+				Vector3D orientationBetweenBranches = newBranchPositions.leftCols(1) - existingCloseBranchPositions.rightCols(1);
+				orientationBetweenBranches = orientationBetweenBranches / orientationBetweenBranches.norm(); // normalizing
+				double angleDeviationInConnectionOne = calculateAngleBetweenTwo3DVectors(existingCloseBranchOrientationEnd, orientationBetweenBranches) * 180/M_PI;
+				double angleDeviationInConnectionTwo = calculateAngleBetweenTwo3DVectors(orientationBetweenBranches, newBranchOrientationStart) * 180/M_PI;
+				if (angleDeviationInConnectionOne + angleDeviationInConnectionTwo < minOrintationDeviation)
+				{// Finding min orientation deviation for all candidate branches to connect to
+					minOrintationDeviation = angleDeviationInConnectionOne + angleDeviationInConnectionTwo;
+					branchToConnect = existingCloseBranches[i];
 				}
-				else if (splitIndex + 1 < 5)
-					// If the new branch is close to the start of the existing
-					// branch: Connect it to the same position start as the
-					// existing branch
-				{
-					newBranch->setParentBranch(branchToSplit->getParentBranch());
-					if(branchToSplit->getParentBranch())
-						branchToSplit->getParentBranch()->addChildBranch(newBranch);
-				}
-				else if (branchToSplit->getPositions().cols() - splitIndex - 1 < 5)
-					// If the new branch is close to the end of the existing
-					// branch: Connect it to the end of the existing branch
-				{
-					newBranch->setParentBranch(branchToSplit);
-					branchToSplit->addChildBranch(newBranch);
-				}
-
 			}
-
+			if (branchToConnect && minOrintationDeviation/2 < MAX_DIRECTION_DEVIATION_FOR_CONNECTION)
+			{ // Checking if the best fit in orientation is lower than MAX_DIRECTION_DEVIATION_FOR_CONNECTION
+				// (in average for the two connection points)
+				branchToSplit = branchToConnect;
+				splitIndex = branchToConnect->getPositions().cols()-1; //connect to last position
+				Eigen::MatrixXd positions = branchToConnect->getPositions();//debug
+				CX_LOG_DEBUG() << "Branch to include found: " << positions.rightCols(1);
+			}
+			else
+				continue; //do not add new branch if orientation match is not found
 		}
+
+		mBranches.push_back(newBranch);
+
+		if (mBranches.size() <= 1) // do not try to split another branch when the first branch is processed
+			continue;
+
+		if ((splitIndex + 1 >= MIN_BRANCH_SEGMENT_LENGTH) && (branchToSplit->getPositions().cols() - splitIndex - 1 >= MIN_BRANCH_SEGMENT_LENGTH))
+			//do not split branch if the new branch is close to the edge of the branch
+			//if the new branch is not close to one of the edges of the
+			//connected existing branch: Split the existing branch
+		{
+			BranchPtr newBranchFromSplit = BranchPtr(new Branch());
+			Eigen::MatrixXd branchToSplitPositions = branchToSplit->getPositions();
+			newBranchFromSplit->setPositions(branchToSplitPositions.rightCols(branchToSplitPositions.cols() - splitIndex - 1));
+			branchToSplit->setPositions(branchToSplitPositions.leftCols(splitIndex + 1));
+			mBranches.push_back(newBranchFromSplit);
+			newBranchFromSplit->setParentBranch(branchToSplit);
+			newBranch->setParentBranch(branchToSplit);
+			newBranchFromSplit->setChildBranches(branchToSplit->getChildBranches());
+			branchVector branchToSplitChildren = branchToSplit->getChildBranches();
+			for (int i = 0; i < branchToSplitChildren.size(); i++)
+				branchToSplitChildren[i]->setParentBranch(newBranchFromSplit);
+			branchToSplit->deleteChildBranches();
+			branchToSplit->addChildBranch(newBranchFromSplit);
+			branchToSplit->addChildBranch(newBranch);
+		}
+		else if (splitIndex + 1 < MIN_BRANCH_SEGMENT_LENGTH)
+			// If the new branch is close to the start of the existing
+			// branch: Connect it to the same position start as the
+			// existing branch
+		{
+			newBranch->setParentBranch(branchToSplit->getParentBranch());
+			if(branchToSplit->getParentBranch())
+				branchToSplit->getParentBranch()->addChildBranch(newBranch);
+		}
+		else if (branchToSplit->getPositions().cols() - splitIndex - 1 < MIN_BRANCH_SEGMENT_LENGTH)
+			// If the new branch is close to the end of the existing
+			// branch: Connect it to the end of the existing branch
+		{
+			newBranch->setParentBranch(branchToSplit);
+			branchToSplit->addChildBranch(newBranch);
+		}
+
 	}
 }
 
@@ -523,6 +566,19 @@ BranchPtr BranchList::findClosestBranch(Vector3D targetCoordinate_r)
 	}
 
 		return minDistanceBranch;
+}
+
+std::vector<BranchPtr> BranchList::findClosesBranches(Vector3D position, double maxDistance)
+{//Returning branches with last position closer than maxDistance from input position
+	std::vector<BranchPtr> closeBranches;
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		Eigen::MatrixXd positions = mBranches[i]->getPositions();
+		double D = findDistance(positions.rightCols(1), position);
+		if (D < maxDistance)
+			closeBranches.push_back(mBranches[i]);
+	}
+		return closeBranches;
 }
 
 /**
@@ -673,7 +729,7 @@ std::pair<Eigen::MatrixXd,Eigen::MatrixXd > findConnectedPointsInCT(int startInd
 		std::pair<Eigen::MatrixXd::Index, double > minDistance = dsearch(thisPosition, positionsNotUsed);
 		Eigen::MatrixXd::Index index = minDistance.first;
 		double d = minDistance.second;
-		if (d > 3) // more than 3 mm distance to closest point --> branch is compledted
+		if (d > MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH) // more than 3 mm distance to closest point --> branch is compledted
 			break;
 
 		thisPosition = positionsNotUsed.col(index);
@@ -778,6 +834,17 @@ std::vector< Eigen::Vector3d > smoothBranch(BranchPtr branchPtr, int startIndex,
 	}
 
 	return smoothingResult;
+}
+
+double calculateAngleBetweenTwo3DVectors(Vector3D A, Vector3D B)
+{
+	double dot = A(0)*B(0) + A(1)*B(1) + A(2)*B(2);
+	double cross_x = A(1)*B(2) - A(2)*B(1);
+	double cross_y = A(2)*B(0) - A(0)*B(2);
+	double cross_z = A(0)*B(1) - A(1)*B(0);
+	double det = sqrt(cross_x*cross_x + cross_y*cross_y + cross_z*cross_z);
+	double angle = atan2(det, dot);
+	return angle;
 }
 
 }//namespace cx
