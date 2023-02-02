@@ -90,9 +90,12 @@ void Branch::calculateOrientations()
 {
 	Eigen::MatrixXd positions = this->getPositions();
 	Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
-	Eigen::MatrixXd orientations(positions.rows(),positions.cols());
-	orientations.leftCols(orientations.cols() - 1) = diff / diff.norm();
-	orientations.rightCols(1) = orientations.col(orientations.cols() - 1);
+	int numberOfRows = positions.rows();
+	int numberOfCols = positions.cols();
+	Eigen::MatrixXd orientations(numberOfRows,numberOfCols);
+	for (int i=0; i<numberOfCols-1; i++)
+		orientations.col(i) = diff.col(i) / diff.col(i).norm();
+	orientations.rightCols(1) = orientations.col(orientations.cols() - 2);
 	this->setOrientations(orientations);
 }
 
