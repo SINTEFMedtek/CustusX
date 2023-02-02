@@ -385,7 +385,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch)).rowwise().mean(); //smoothing
 			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
 			BranchPtr branchToConnect;
-			double minOrintationDeviation = 360.0; //deg
+			double minOrintationDeviationToNewBranch = MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH; //deg
 			for (int i=0; i<existingCloseBranches.size(); i++)
 			{
 				Eigen::MatrixXd existingCloseBranchOrientations = existingCloseBranches[i]->getOrientations();
@@ -395,17 +395,16 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 				Eigen::MatrixXd existingCloseBranchPositions = existingCloseBranches[i]->getPositions();
 				Vector3D orientationBetweenBranches = newBranchPositions.leftCols(1) - existingCloseBranchPositions.rightCols(1);
 				orientationBetweenBranches = orientationBetweenBranches / orientationBetweenBranches.norm(); // normalizing
-				double angleDeviationInConnectionOne = calculateAngleBetweenTwo3DVectors(existingCloseBranchOrientationEnd, orientationBetweenBranches) * 180/M_PI;
-				double angleDeviationInConnectionTwo = calculateAngleBetweenTwo3DVectors(orientationBetweenBranches, newBranchOrientationStart) * 180/M_PI;
-				if (angleDeviationInConnectionOne + angleDeviationInConnectionTwo < minOrintationDeviation)
+				double angleDeviationInConnectionToExistingBranch = calculateAngleBetweenTwo3DVectors(existingCloseBranchOrientationEnd, orientationBetweenBranches) * 180/M_PI;
+				double angleDeviationInConnectionToNewBranch = calculateAngleBetweenTwo3DVectors(orientationBetweenBranches, newBranchOrientationStart) * 180/M_PI;
+				if (angleDeviationInConnectionToExistingBranch < MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH && angleDeviationInConnectionToNewBranch < minOrintationDeviationToNewBranch)
 				{// Finding min orientation deviation for all candidate branches to connect to
-					minOrintationDeviation = angleDeviationInConnectionOne + angleDeviationInConnectionTwo;
+					minOrintationDeviationToNewBranch = angleDeviationInConnectionToNewBranch;
 					branchToConnect = existingCloseBranches[i];
 				}
 			}
-			if (branchToConnect && minOrintationDeviation/2 < MAX_DIRECTION_DEVIATION_FOR_CONNECTION)
-			{ // Checking if the best fit in orientation is lower than MAX_DIRECTION_DEVIATION_FOR_CONNECTION
-				// (in average for the two connection points)
+			if (branchToConnect)
+			{ // Checking if branch with orientation fit is found
 				branchToSplit = branchToConnect;
 				splitIndex = branchToConnect->getPositions().cols()-1; //connect to last position
 				Eigen::MatrixXd positions = branchToConnect->getPositions();//debug

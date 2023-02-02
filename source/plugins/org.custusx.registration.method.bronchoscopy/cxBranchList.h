@@ -28,7 +28,8 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 #define MIN_BRANCH_SEGMENT_LENGTH 5 //Number of connected points
 #define MAX_DISTANCE_TO_EXISTING_BRANCH 15 //mm. Max distance to main airway tree for inclusion of points.
 #define DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION 5 //mm. If distance to main branch tree exceeds value, use direction to connect to correct branch.
-#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION 30 //deg
+#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH 60 //deg
+#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH 20 //deg
 
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
