@@ -31,6 +31,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewService.h"
 #include "cxLog.h"
+#include "cxImage.h"
 
 #include <vtkPolyData.h>
 
@@ -83,6 +84,11 @@ void AirwaysFromCenterlineFilter::createInputTypes()
 	centerline->setValueName("Airways centerline");
 	centerline->setHelp("Select airways centerline");
 	mInputTypes.push_back(centerline);
+	StringPropertySelectImagePtr segmentedVolume;
+	segmentedVolume = StringPropertySelectImage::New(mServices->patient());
+	segmentedVolume->setValueName("Segmented volume (optional)");
+	segmentedVolume->setHelp("Select segmented airways volume");
+	mInputTypes.push_back(segmentedVolume);
 
 }
 
@@ -104,21 +110,26 @@ void AirwaysFromCenterlineFilter::createOutputTypes()
 
 bool AirwaysFromCenterlineFilter::execute()
 {
-    mAirwaysFromCenterline.reset(new AirwaysFromCenterline());
+	mAirwaysFromCenterline.reset(new AirwaysFromCenterline());
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
-    if (!mesh)
-        return false;
+	if (!mesh)
+		return false;
 
 	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
-    mAirwaysFromCenterline->processCenterline(centerline_r);
+	mAirwaysFromCenterline->processCenterline(centerline_r);
 
-    //note: mOutputAirwayMesh is in reference space
-    mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes();
+	ImagePtr segmentedVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
 
-    //if(mOutputAirwayMesh->GetNumberOfPoints() < 1)
-    //    return false;
+	if(segmentedVolume)
+	{
+		mAirwaysFromCenterline->setSegmentedVolume(segmentedVolume->getBaseVtkImageData(), segmentedVolume->get_rMd());
+		mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes(0, true);
+	}
+	else
+	mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes();
+	//note: mOutputAirwayMesh is in reference space
 
 	return true;
 }
@@ -139,7 +150,14 @@ bool AirwaysFromCenterlineFilter::postProcess()
 		patientService()->insertData(outputMesh);
 
 		//Meshes are expected to be in data(d) space
-		outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
+		ImagePtr segmentedinputVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
+		if(segmentedinputVolume)
+		{
+			outputMesh->get_rMd_History()->setParentSpace(segmentedinputVolume->getUid());
+			outputMesh->get_rMd_History()->setRegistration(segmentedinputVolume->get_rMd());
+		}
+		else
+			outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
 		mServices->view()->autoShowData(outputMesh);
 
