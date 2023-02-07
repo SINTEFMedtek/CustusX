@@ -34,6 +34,7 @@ public:
 	void setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd = Transform3D::Identity());
 	void processCenterline(vtkPolyDataPtr centerline_r);
 	BranchListPtr getBranchList();
+	vtkImageDataPtr getFilteredSegmentedVolume();
 	vtkPolyDataPtr generateTubes(double staticRadius = 0, bool mergeWithOriginalAirways = false);
 	vtkImageDataPtr initializeEmptyAirwaysVolume();
 	vtkImageDataPtr initializeAirwaysVolumeFromOriginalSegmentation();
@@ -48,6 +49,7 @@ private:
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
 	vtkImageDataPtr mOriginalSegmentedVolume;
+	vtkImageDataPtr mFilteredSegmentedVolumePtr;
 	double mOrigin[3];
 	Vector3D mSpacing;
 	double mBounds[6];

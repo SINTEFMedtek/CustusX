@@ -96,6 +96,11 @@ BranchListPtr AirwaysFromCenterline::getBranchList()
 	return mBranchListPtr;
 }
 
+vtkImageDataPtr AirwaysFromCenterline::getFilteredSegmentedVolume()
+{
+	return mFilteredSegmentedVolumePtr;
+}
+
 /*
 	AirwaysFromCenterline::generateTubes makes artificial airway tubes around the input centerline. The radius
 	of the tubes is decided by the generation number, based on Weibel's model of airways. In contradiction to the model,
@@ -106,31 +111,30 @@ BranchListPtr AirwaysFromCenterline::getBranchList()
 vtkPolyDataPtr AirwaysFromCenterline::generateTubes(double staticRadius, bool mergeWithOriginalAirways) // if staticRadius == 0, radius is retrieved from branch generation number
 {
 	mMergeWithOriginalAirways = mergeWithOriginalAirways;
-	vtkImageDataPtr airwaysVolumePtr;
 
 	if (mergeWithOriginalAirways)
 	{
 		if (mOriginalSegmentedVolume)
 		{
-			airwaysVolumePtr = this->initializeAirwaysVolumeFromOriginalSegmentation();
+			mFilteredSegmentedVolumePtr = this->initializeAirwaysVolumeFromOriginalSegmentation();
 		}
 		else
 		{
 			CX_LOG_WARNING() << "AirwaysFromCenterline::generateTubes: Segmented airways volume not set. Creating pure artificaial tubes around centerlines.";
-			 airwaysVolumePtr = this->initializeEmptyAirwaysVolume();
+			 mFilteredSegmentedVolumePtr = this->initializeEmptyAirwaysVolume();
 		}
 	}
 	else
-		airwaysVolumePtr = this->initializeEmptyAirwaysVolume();
+		mFilteredSegmentedVolumePtr = this->initializeEmptyAirwaysVolume();
 
-	airwaysVolumePtr = addSpheresAlongCenterlines(airwaysVolumePtr, staticRadius);
+	mFilteredSegmentedVolumePtr = addSpheresAlongCenterlines(mFilteredSegmentedVolumePtr, staticRadius);
 
 	if(mMergeWithOriginalAirways)
-		airwaysVolumePtr = this->removeIslandsFromImage(airwaysVolumePtr);
+		mFilteredSegmentedVolumePtr = this->removeIslandsFromImage(mFilteredSegmentedVolumePtr);
 
 	//create contour from image
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
-				airwaysVolumePtr,
+				mFilteredSegmentedVolumePtr,
 			1, //treshold
 			false, // reduce resolution
 			true, // smoothing

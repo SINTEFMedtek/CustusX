@@ -32,6 +32,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewService.h"
 #include "cxLog.h"
 #include "cxImage.h"
+#include "cxVolumeHelpers.h"
 
 #include <vtkPolyData.h>
 
@@ -72,8 +73,17 @@ QString AirwaysFromCenterlineFilter::getNameSuffixCenterline()
     return "_SmoothedCenterline";
 }
 
+BoolPropertyPtr AirwaysFromCenterlineFilter::getSaveOutputVolumeOption(QDomElement root)
+{
+	return BoolProperty::initialize("Save airways volume", "",
+																	"Save volume of airways model after filtering.",
+																	 false, root);
+}
+
 void AirwaysFromCenterlineFilter::createOptions()
 {
+	mSaveOutputVolumeOption = this->getSaveOutputVolumeOption(mOptions);
+	mOptionsAdapters.push_back(mSaveOutputVolumeOption);
 
 }
 
@@ -94,17 +104,23 @@ void AirwaysFromCenterlineFilter::createInputTypes()
 
 void AirwaysFromCenterlineFilter::createOutputTypes()
 {
-    StringPropertySelectMeshPtr tempAirwaysModelMeshStringAdapter;
-    tempAirwaysModelMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-    tempAirwaysModelMeshStringAdapter->setValueName("Airways surface model mesh");
-    tempAirwaysModelMeshStringAdapter->setHelp("Generated airways surface model mesh (vtk-format).");
-    mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
+	StringPropertySelectMeshPtr tempAirwaysModelMeshStringAdapter;
+	tempAirwaysModelMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempAirwaysModelMeshStringAdapter->setValueName("Airways surface model mesh");
+	tempAirwaysModelMeshStringAdapter->setHelp("Generated airways surface model mesh (vtk-format).");
+	mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
 
-    StringPropertySelectMeshPtr tempSmoothedCenterlineMeshStringAdapter;
-    tempSmoothedCenterlineMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-		tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed centerline");
-    tempSmoothedCenterlineMeshStringAdapter->setHelp("Smoothed centerline (vtk-format).");
-    mOutputTypes.push_back(tempSmoothedCenterlineMeshStringAdapter);
+	StringPropertySelectMeshPtr tempSmoothedCenterlineMeshStringAdapter;
+	tempSmoothedCenterlineMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed centerline");
+	tempSmoothedCenterlineMeshStringAdapter->setHelp("Smoothed centerline (vtk-format).");
+	mOutputTypes.push_back(tempSmoothedCenterlineMeshStringAdapter);
+
+	StringPropertySelectImagePtr tempAirwaysModelVolumeStringAdapter;
+	tempAirwaysModelVolumeStringAdapter = StringPropertySelectImage::New(mServices->patient());
+	tempAirwaysModelVolumeStringAdapter->setValueName("Airways surface model volume");
+	tempAirwaysModelVolumeStringAdapter->setHelp("Generated airways surface model volume.");
+	mOutputTypes.push_back(tempAirwaysModelVolumeStringAdapter);
 }
 
 
@@ -173,6 +189,24 @@ bool AirwaysFromCenterlineFilter::postProcess()
 				mOutputTypes[0]->setValue(outputMesh->getUid());
 		if(mOutputTypes.size() > 1)
 				mOutputTypes[1]->setValue(outputCenterline->getUid());
+
+		if(mSaveOutputVolumeOption && segmentedinputVolume)
+		{
+			vtkImageDataPtr segmentedOutputVolume = mAirwaysFromCenterline->getFilteredSegmentedVolume();
+			if(segmentedOutputVolume)
+			{
+				QString uidOutputVolume = segmentedinputVolume->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+				QString nameOutputVolume = segmentedinputVolume->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+				ImagePtr outputVolume = createDerivedImage(mServices->patient(),
+																						 uidOutputVolume, nameOutputVolume,
+																						 segmentedOutputVolume, segmentedinputVolume);
+				outputVolume->mergevtkSettingsIntosscTransform();
+				patientService()->insertData(outputVolume);
+
+				if(mOutputTypes.size() > 2)
+						mOutputTypes[2]->setValue(outputVolume->getUid());
+			}
+		}
 
     return true;
 }
