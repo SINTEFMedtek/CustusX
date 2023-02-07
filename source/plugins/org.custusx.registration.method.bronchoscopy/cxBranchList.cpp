@@ -388,6 +388,9 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			double minOrintationDeviationToNewBranch = MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH; //deg
 			for (int i=0; i<existingCloseBranches.size(); i++)
 			{
+				if(existingCloseBranches[i]->findGenerationNumber()==1)
+					continue; //Do not try to connect to trachea
+
 				Eigen::MatrixXd existingCloseBranchOrientations = existingCloseBranches[i]->getOrientations();
 				int numberOfColumnsInExistingBranch = existingCloseBranchOrientations.cols();
 				Vector3D existingCloseBranchOrientationEnd = existingCloseBranchOrientations.rightCols(std::min(10, numberOfColumnsInExistingBranch)).rowwise().mean(); //smoothing
