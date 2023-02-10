@@ -15,7 +15,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sstream>
 
 #include <QtWidgets>
-//#include "QVTKWidget.h"
 #include <QVTKOpenGLNativeWidget.h>
 
 #include <vtkImageData.h>
@@ -139,7 +138,6 @@ TEST_CASE("Visual rendering: Empty QVTKWidget",
 	mainWidget.setLayout(layout);
 	mainWidget.setGeometry(150,150,400,400);
 
-//	QVTKWidget* vtkWidget = new QVTKWidget();
 	QVTKOpenGLNativeWidget* vtkWidget = new QVTKOpenGLNativeWidget();
 	//	viewWidget clear
 //  set custom renderwindow
