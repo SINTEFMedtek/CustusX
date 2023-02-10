@@ -146,12 +146,13 @@ target_link_libraries(cxGui
     cxGUIExtenderService
     cxPluginUtilities
     cxResourceFilter
-    )
+)
 
-  vtk_module_autoinit(
-    TARGETS cxGui
-    MODULES ${VTK_LIBRARIES}
-    )
+vtk_module_autoinit(
+  TARGETS cxGui
+#  MODULES ${VTK_LIBRARIES}
+  MODULES VTK::CommonCore
+)
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/preferences.md")

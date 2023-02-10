@@ -279,6 +279,23 @@ configure_file(
 # extra definitions:
 add_subdirectory(settings)
 
+set(VTK_MODULES
+  VTK::CommonCore
+  VTK::CommonColor
+  VTK::CommonSystem
+  VTK::RenderingCore
+  VTK::RenderingVolumeOpenGL2
+  VTK::CommonDataModel
+  VTK::FiltersTexture
+  VTK::FiltersSources
+  VTK::FiltersHybrid
+  VTK::ImagingStatistics
+  VTK::ImagingColor
+  VTK::IOImage
+  VTK::IOGeometry
+  VTK::IOMINC
+)
+
 set(CX_PUBLIC_RESOURCE_LIBRARIES
   Qt5::Core
   Qt5::Widgets
@@ -288,7 +305,8 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
   Qt5::Concurrent
   CTKPluginFramework
   cxPluginUtilities
-  ${VTK_LIBRARIES}
+  ${VTK_LIBRARIES}#Can this be removed/limited now that we have to use vtk_module_autoinit?
+#  ${VTK_MODULES}#Compile fails: Cannot find QVTKOpenGLNativeWidget.h
   ${OPENGL_LIBRARIES}
   )
 
@@ -347,8 +365,9 @@ target_link_libraries(cxResource
 
   vtk_module_autoinit(
     TARGETS cxResource
-    MODULES ${VTK_LIBRARIES}
-#    MODULES VTK::RenderingVolumeOpenGL2 VTK::CommonDataModel
+#    MODULES ${VTK_LIBRARIES}
+    MODULES ${VTK_MODULES}
+#    MODULES VTK::CommonCore VTK::RenderingCore VTK::RenderingVolumeOpenGL2 VTK::CommonDataModel
     )
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/Data/doc")

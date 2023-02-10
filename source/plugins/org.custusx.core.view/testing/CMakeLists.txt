@@ -57,8 +57,8 @@ if(BUILD_TESTING)
 #  if (NOT VTK_VERSION VERSION_LESS "8.90.0")
   vtk_module_autoinit(
     TARGETS ${PROJECT_NAME}
-    MODULES ${VTK_LIBRARIES}
-#    MODULES VTK::RenderingVolumeOpenGL2
+#    MODULES ${VTK_LIBRARIES}
+    MODULES VTK::RenderingVolumeOpenGL2
     )
 #  endif()
 
