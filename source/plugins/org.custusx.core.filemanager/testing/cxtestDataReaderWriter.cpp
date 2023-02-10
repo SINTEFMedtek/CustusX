@@ -37,8 +37,40 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include "cxDicomConverter.h"
 #include "cxLogicManager.h"
+#include "cxDICOMReader.h"
+#include "cxPatientModelService.h"
 
 typedef QSharedPointer<ctkDICOMDatabase> ctkDICOMDatabasePtr;
+
+namespace
+{
+class DICOMReaderTest : public cx::DICOMReader
+{
+public:
+	DICOMReaderTest() :
+		DICOMReader(cx::PatientModelService::getNullObject())
+	{
+//		cx::PatientModelServicePtr patientModelService = cx::PatientModelService::getNullObject();
+	}
+
+	QString getDICOMDatabaseDirectory()
+	{
+		return cx::DICOMReader::getDICOMDatabaseDirectory();
+	}
+	void setupDatabaseDirectory()
+	{
+		return cx::DICOMReader::setupDatabaseDirectory();
+	}
+	void deleteDatabase(ctkDICOMDatabasePtr database)
+	{
+		return cx::DICOMReader::deleteDatabase(database);
+	}
+	QString setupDatabaseFiles()
+	{
+		return cx::DICOMReader::setupDatabaseFiles();
+	}
+};
+}
 
 namespace cxtest
 {
@@ -122,5 +154,33 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 	REQUIRE(convertedImage);
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("DICOMReader: Create and delete database files", "[unit]")
+{
+	DICOMReaderTest reader;
+
+	QString databaseDir = reader.getDICOMDatabaseDirectory();
+	CHECK_FALSE(databaseDir.isEmpty());
+
+	QDir dir(databaseDir);
+	CHECK(dir.isEmpty());
+
+	reader.setupDatabaseDirectory();
+	CHECK(dir.isEmpty());
+
+	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
+	CHECK_FALSE(database->isOpen());
+
+	database->openDatabase(reader.setupDatabaseFiles()); // Prints: TagCacheDatabase adding table
+	CHECK_FALSE(dir.isEmpty());
+	CHECK_FALSE(database->isInMemory());
+	CHECK(database->isOpen());
+
+	database->closeDatabase();
+	CHECK_FALSE(database->isOpen());
+
+	reader.deleteDatabase(database);
+	CHECK(dir.isEmpty());
 }
 } //cxtest

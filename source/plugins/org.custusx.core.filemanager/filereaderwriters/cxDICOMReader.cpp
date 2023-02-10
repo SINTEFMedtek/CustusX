@@ -159,11 +159,9 @@ bool DICOMReader::canWrite(const QString &type, const QString &filename) const
 	return false;
 }
 
-//Copied from DicomWidget getDICOMDatabaseDirectory(), setupDatabaseDirectory(), and deleteDICOMDB
 QString DICOMReader::getDICOMDatabaseDirectory()
 {
 	QString databaseDirectory = profile()->getSettingsPath() + "/DICOMDatabase";
-
 	return databaseDirectory;
 }
 
@@ -179,48 +177,55 @@ void DICOMReader::setupDatabaseDirectory()
 			CX_LOG_CHANNEL_ERROR("dicom") << "Could not create database directory \"" << databaseDirectory;
 		}
 	}
-
-	CX_LOG_CHANNEL_INFO("dicom") << "DatabaseDirectory set to: " << databaseDirectory;
+//	CX_LOG_CHANNEL_INFO("dicom") << "DatabaseDirectory set to: " << databaseDirectory;
 }
 
-//TODO: Delete database after use
-//void DICOMReader::deleteDICOMDB()
-//{
-//	CX_LOG_CHANNEL_INFO("dicom") << "Deleting DICOM database: " << this->getDICOMDatabaseDirectory();
-//	bool autoDeleteDICOMDB = settings()->value("Automation/autoDeleteDICOMDatabase").toBool();
-//	if(autoDeleteDICOMDB)
-//	{
-//		ctkDICOMDatabase* database = this->getDatabase();
-//		if(database)
-//		{
-//			QStringList patients = database->patients();
-//			foreach(QString patient , patients)
-//			{
-//				this->getDatabase()->removePatient(patient);
-//			}
-//		}
-//	}
-//}
+QString DICOMReader::setupDatabaseFiles()
+{
+	this->setupDatabaseDirectory();
+	QString databaseFileName = this->getDICOMDatabaseDirectory() + QString("/ctkDICOM.sql");
+	return databaseFileName;
+}
 
+void DICOMReader::deleteDatabase(ctkDICOMDatabasePtr database)
+{
+	QStringList patients = database->patients();
+	foreach(QString patient , patients)
+	{
+		database->removePatient(patient);
+	}
+
+	QDir dir(this->getDICOMDatabaseDirectory());
+	bool success = dir.removeRecursively();
+	if(!success)
+		CX_LOG_WARNING() << "DICOMReader::deleteDatabase: Counldn't delete DICOM database folder: " << this->getDICOMDatabaseDirectory();
+}
+
+void DICOMReader::stopQtMessages(bool stopMessages)
+{
+	if(stopMessages)
+	{
+//		CX_LOG_INFO() << "StopQtMessages while reading DICOM files";
+		reporter()->stopQtMessages();
+	}
+	else
+	{
+		reporter()->startQtMessages();
+//		CX_LOG_INFO() << "StartQtMessages - Finished reading DICOM files";
+	}
+}
 
 //Copied from DicomWidget::importSeries
 //Also copied DicomConverter and DicomImageReader files from the dicom plugin
 std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestSeries)
 {
-	//Turn off Qt messages temporarily
-	CX_LOG_INFO() << "stopQtMessages while reading DICOM files";
-//	reporter()->stopQtMessages();
+	this->stopQtMessages(true);
 
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
-//	database->openDatabase(":memory:");//Looks like the memory option no longer works. ctkDICOMIndexerPrivateWorker::start() requires a file. TODO: Create CTK issue report?
-	this->setupDatabaseDirectory();
-
-	QString databaseFileName = this->getDICOMDatabaseDirectory() + QString("/ctkDICOM.sql");
-
-	database->openDatabase(databaseFileName);//This seems to work
-	CX_LOG_DEBUG() << "this->getDICOMDatabaseDirectory(): " << this->getDICOMDatabaseDirectory();
-	CX_LOG_DEBUG() << "database->isInMemory(): " << database->isInMemory();
-	CX_LOG_DEBUG() << "database->isOpen(): " << database->isOpen();
+	//It looks like keeping the database only in memory no longer works.
+	//ctkDICOMIndexerPrivateWorker::start() uses the database file directly, not the database object. TODO: Create CTK issue report?
+//	database->openDatabase(":memory:");
+	database->openDatabase(this->setupDatabaseFiles());
 
 	QFileInfo dir = QFileInfo(fileName);
 	QString folder = dir.absolutePath();
@@ -245,10 +250,6 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 		addFolderToDicomDatabase(database,dicomFolders[i]);
 	}
 
-
-	QStringList patients = database.data()->patients();
-	CX_LOG_DEBUG() << "DICOMReader::importSeries patients: " << patients.join(", ");
-
 	std::vector<ImagePtr> retval;
 	if(readBestSeries)
 		retval = importBestSeries(database);
@@ -256,13 +257,12 @@ std::vector<ImagePtr> DICOMReader::importSeries(QString fileName, bool readBestS
 		retval = importAllSeries(database, progress);
 
 	database->closeDatabase();
+	//Delete database files as the CTK functionality with having the database only in memory no longer works
+	this->deleteDatabase(database);
 
-	//Turn Qt messages back on
-//	reporter()->startQtMessages();
-	CX_LOG_INFO() << "DICOM files read - startQtMessages";
+	this->stopQtMessages(false);
 	return retval;
 }
-
 
 QStringList DICOMReader::findAllSubfoldersWithDicomFiles(QString folder, QProgressDialog &progress)
 {
@@ -306,26 +306,17 @@ QStringList DICOMReader::findAllSubDirs(QString folder)
 void DICOMReader::addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder)
 {
 	QSharedPointer<ctkDICOMIndexer> DICOMIndexer = QSharedPointer<ctkDICOMIndexer> (new ctkDICOMIndexer); //TODO: Reuse instead on creating new one?
-//	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout
-//	DICOMIndexer->addDirectory(*database,folder,"");//This function prints out (with std::cout) a list of all files (ctkDICOMIndexer.cpp, line 93)
+//	std::cout.setstate(std::ios_base::failbit);//Hack to silence std::cout. Probably not longer needed with latest CTK
 
+	//For debugging
+//	connect(DICOMIndexer.get(), &ctkDICOMIndexer::indexingComplete, this, &DICOMReader::indexingCompleteSlot);
 
-	connect(DICOMIndexer.get(), &ctkDICOMIndexer::indexingComplete, this, &DICOMReader::indexingCompleteSlot);
-
-//	DICOMIndexer->addDirectory(database.data(), folder);
-
-	//Test
 	DICOMIndexer->setDatabase(database.data());
-
-//	DICOMIndexer->setDatabase(database);
 	DICOMIndexer->addDirectory(folder);
 //	DICOMIndexer->addDicomdir(folder);
-	CX_LOG_DEBUG() << "DICOMIndexer->addDirectory finished. isImporting:" << DICOMIndexer->isImporting();
+//	CX_LOG_DEBUG() << "DICOMIndexer->addDirectory finished. isImporting:" << DICOMIndexer->isImporting();
 
 //	std::cout.clear();//Turn on std::cout again
-
-
-	CX_LOG_DEBUG() << "DICOMReader::addFolderToDicomDatabase database->seriesCount(): " << database->seriesCount();
 }
 
 //Debug function
@@ -369,7 +360,7 @@ std::vector<ImagePtr> DICOMReader::importBestSeries(ctkDICOMDatabasePtr database
 std::vector<ImagePtr> DICOMReader::importAllSeries(ctkDICOMDatabasePtr database, QProgressDialog &progress)
 {
 	QStringList allSeriesUid = this->getAllDICOMSeries(database);
-	CX_LOG_DEBUG() << "DICOMReader::importAllSeries: " << allSeriesUid.join(", ");
+//	CX_LOG_DEBUG() << "DICOMReader::importAllSeries: " << allSeriesUid.join(", ");
 
 	progress.setLabelText("Converting DICOM series...");
 	progress.setMaximum(allSeriesUid.size());
@@ -398,18 +389,16 @@ QStringList DICOMReader::getAllDICOMSeries(ctkDICOMDatabasePtr database)
 {
 	QStringList series;
 	QStringList patients = database.data()->patients();
-	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries patients: " << patients.join(", ");
-	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries database->seriesCount(): " << database->seriesCount();
-	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries database.data()->seriesCount(): " << database.data()->seriesCount();
-	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries studiesCount: " << database.data()->studiesCount();
-	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries imagesCount: " << database.data()->imagesCount();
-	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries patientsCount: " << database.data()->patientsCount();
+//	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries patients: " << patients.join(", ");
+//	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries studiesCount: " << database.data()->studiesCount();
+//	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries imagesCount: " << database.data()->imagesCount();
+//	CX_LOG_DEBUG() << "DICOMReader::getAllDICOMSeries patientsCount: " << database.data()->patientsCount();
 	for(int pNr = 0; pNr < patients.size(); ++pNr)
 	{
 		QString patient = patients[pNr];
-		CX_LOG_DEBUG() << "Got " << patients.size() << " DICOM patients.";
 		QStringList studies = database->studiesForPatient(patient);
-		CX_LOG_DEBUG() << "Got " << studies.size() << " DICOM studies for patient " << patient;
+//		CX_LOG_DEBUG() << "Got " << patients.size() << " DICOM patients.";
+//		CX_LOG_DEBUG() << "Got " << studies.size() << " DICOM studies for patient " << patient;
 		for(int sNr = 0; sNr < studies.size(); ++sNr)
 		{
 			QString study = studies[sNr];

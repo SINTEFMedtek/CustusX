@@ -67,6 +67,9 @@ protected:
 	void indexingCompleteSlot(int patientsAdded, int studiesAdded, int seriesAdded, int imagesAdded);
 	QString getDICOMDatabaseDirectory();
 	void setupDatabaseDirectory();
+	void deleteDatabase(ctkDICOMDatabasePtr database);
+	QString setupDatabaseFiles();
+	void stopQtMessages(bool stopMessages);
 };
 
 } //cx
