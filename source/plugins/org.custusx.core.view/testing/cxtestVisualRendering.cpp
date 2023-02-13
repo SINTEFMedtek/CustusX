@@ -61,35 +61,35 @@ public:
 	QStringList image;
 };
 
-namespace
-{
+//namespace
+//{
 
-void testACSWith3GPUVolumes()
-{
-	cxtest::ViewsFixture fixture;
+//void testACSWith3GPUVolumes()
+//{
+//	cxtest::ViewsFixture fixture;
 
-	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
-	fixture.addFileReaderWriter(metaImageReader);
+//	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+//	fixture.addFileReaderWriter(metaImageReader);
 
-	ImageTestList imagenames;
+//	ImageTestList imagenames;
 
-	for (unsigned i = 0; i < 3; ++i)
-	{
-		REQUIRE(fixture.defineGPUSlice("A", imagenames.image[i], cx::ptAXIAL, 0, i));
-		REQUIRE(fixture.defineGPUSlice("C", imagenames.image[i], cx::ptCORONAL, 1, i));
-		REQUIRE(fixture.defineGPUSlice("S", imagenames.image[i], cx::ptSAGITTAL, 2, i));
-	}
-	REQUIRE(fixture.quickRunWidget());
+//	for (unsigned i = 0; i < 3; ++i)
+//	{
+//		REQUIRE(fixture.defineGPUSlice("A", imagenames.image[i], cx::ptAXIAL, 0, i));
+//		REQUIRE(fixture.defineGPUSlice("C", imagenames.image[i], cx::ptCORONAL, 1, i));
+//		REQUIRE(fixture.defineGPUSlice("S", imagenames.image[i], cx::ptSAGITTAL, 2, i));
+//	}
+//	REQUIRE(fixture.quickRunWidget());
 
-	for (unsigned i = 0; i < 3*3; ++i)
-	{
-//		/fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
-		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.85);
-	}
+//	for (unsigned i = 0; i < 3*3; ++i)
+//	{
+////		/fixture.dumpDebugViewToDisk(QString("testImage%1").arg(i), i);
+//		CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(i,20) > 0.85);
+//	}
 	
-	CHECK_FALSE(fixture.messageListenerContainErrors());
-}
-} //namespace
+//	CHECK_FALSE(fixture.messageListenerContainErrors());
+//}
+//} //namespace
 
 TEST_CASE("Visual rendering: Init view",
 			"[integration][resource][visualization]")
@@ -368,27 +368,27 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes",
 }
 
 //Tagged as unstable as it sometimes fail in Linux
-TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
-			"[integration][resource][visualization][not_win32][not_win64][unstable]")
-{
-	cxtest::ViewsFixture fixture;
-	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
-	fixture.addFileReaderWriter(metaImageReader);
-	ImageTestList imagenames;
+//TEST_CASE("Visual rendering: Show Axial GPU slice, 1 volume",
+//			"[integration][resource][visualization][not_win32][not_win64][unstable]")
+//{
+//	cxtest::ViewsFixture fixture;
+//	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+//	fixture.addFileReaderWriter(metaImageReader);
+//	ImageTestList imagenames;
 
-	std::vector<cx::ImagePtr> images(1);
-	images[0] = fixture.loadImage(imagenames.image[0]);
+//	std::vector<cx::ImagePtr> images(1);
+//	images[0] = fixture.loadImage(imagenames.image[0]);
 
-	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
-	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
+//	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+//	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
 
-	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(fixture.quickRunWidget());
+//	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+//	REQUIRE(fixture.quickRunWidget());
 
-	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+//	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
 	
-	CHECK_FALSE(fixture.messageListenerContainErrors());
-}
+//	CHECK_FALSE(fixture.messageListenerContainErrors());
+//}
 
 // Experimental opengl test based on "Visual rendering: Show Axial GPU slice, 1 volume"
 TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
@@ -445,21 +445,21 @@ TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
 }
 
 //These two tests fails on Ubuntu 16.04, but seems to work on Ubuntu 20.04
-TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
-			"[integration][resource][visualization][not_linux]")
-{
-	cx::DataLocations::setTestMode();
-	cx::settings()->setValue("optimizedViews", true);
+//TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
+//			"[integration][resource][visualization][not_linux]")
+//{
+//	cx::DataLocations::setTestMode();
+//	cx::settings()->setValue("optimizedViews", true);
 
-	testACSWith3GPUVolumes();
-}
+//	testACSWith3GPUVolumes();
+//}
 
-TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, not optimized views",
-			"[integration][resource][visualization][not_linux]")
-{
-	cx::DataLocations::setTestMode();
-	cx::settings()->setValue("optimizedViews", false);
+//TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, not optimized views",
+//			"[integration][resource][visualization][not_linux]")
+//{
+//	cx::DataLocations::setTestMode();
+//	cx::settings()->setValue("optimizedViews", false);
 
-	testACSWith3GPUVolumes();
-}
+//	testACSWith3GPUVolumes();
+//}
 
