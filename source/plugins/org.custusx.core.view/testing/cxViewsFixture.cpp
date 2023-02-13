@@ -104,29 +104,29 @@ cx::ViewPtr ViewsFixture::addView(int row, int col)
 	return mWindow->addView(cx::View::VIEW, row, col);
 }
 
-bool ViewsFixture::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
-{
-	std::vector<cx::ImagePtr> images(1);
-	images[0] = this->loadImage(imageFilename);
+//bool ViewsFixture::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
+//{
+//	std::vector<cx::ImagePtr> images(1);
+//	images[0] = this->loadImage(imageFilename);
 
-	return this->defineGPUSlice(uid, images, plane, r, c);
-}
+//	return this->defineGPUSlice(uid, images, plane, r, c);
+//}
 
-bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
-{
-	cx::ViewPtr view = mWindow->add2DView(r, c);
+//bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
+//{
+//	cx::ViewPtr view = mWindow->add2DView(r, c);
 
-	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
-	REQUIRE(sharedOpenGLContext);
-	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
-	rep->setShaderPath(mShaderFolder);
-	rep->setSliceProxy(proxy);
-	rep->setImages(images);
-	view->addRep(rep);
+//	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
+//	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
+//	REQUIRE(sharedOpenGLContext);
+//	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
+//	rep->setShaderPath(mShaderFolder);
+//	rep->setSliceProxy(proxy);
+//	rep->setImages(images);
+//	view->addRep(rep);
 
-	return true;
-}
+//	return true;
+//}
 
 void ViewsFixture::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {

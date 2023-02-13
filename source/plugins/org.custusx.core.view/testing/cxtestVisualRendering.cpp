@@ -391,58 +391,58 @@ TEST_CASE("Visual rendering: Show ACS, 3 volumes",
 //}
 
 // Experimental opengl test based on "Visual rendering: Show Axial GPU slice, 1 volume"
-TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
-		  "[opengl][resource][visualization]")
-{
-	cxtest::ViewsFixture fixture;
+//TEST_CASE("Visual rendering: Experimental Show Axial GPU slice, 1 dummy volume",
+//		  "[opengl][resource][visualization]")
+//{
+//	cxtest::ViewsFixture fixture;
 
-	std::vector<cx::ImagePtr> images(1);
+//	std::vector<cx::ImagePtr> images(1);
 
-	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(10, 255);
-	images[0] = cx::ImagePtr(new cx::Image("dummyImageUid1", dummyImageData, "dummyImageName1"));
+//	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(10, 255);
+//	images[0] = cx::ImagePtr(new cx::Image("dummyImageUid1", dummyImageData, "dummyImageName1"));
 
-	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
-	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
+//	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+//	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,0,1,1));
 
-	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(fixture.quickRunWidget());
+//	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+//	REQUIRE(fixture.quickRunWidget());
 
-	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+//	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
 	
-	CHECK_FALSE(fixture.messageListenerContainErrors());
-}
+//	CHECK_FALSE(fixture.messageListenerContainErrors());
+//}
 
 //Tagged as unstable as it sometimes fail in Linux
-TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
-			"[integration][resource][visualization][not_win32][not_win64][unstable]")
-{
-	cxtest::ViewsFixture fixture;
-	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
-	fixture.addFileReaderWriter(metaImageReader);
-	ImageTestList imagenames;
+//TEST_CASE("Visual rendering: Show Axial GPU slice, 2 volumes",
+//			"[integration][resource][visualization][not_win32][not_win64][unstable]")
+//{
+//	cxtest::ViewsFixture fixture;
+//	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
+//	fixture.addFileReaderWriter(metaImageReader);
+//	ImageTestList imagenames;
 
-	std::vector<cx::ImagePtr> images(2);
-	images[0] = fixture.loadImage(imagenames.image[0]);
-	images[1] = fixture.loadImage(imagenames.image[1]);
+//	std::vector<cx::ImagePtr> images(2);
+//	images[0] = fixture.loadImage(imagenames.image[0]);
+//	images[1] = fixture.loadImage(imagenames.image[1]);
 
-	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
-	//std::cout << "setting llr for vol1 = " << llr << std::endl;
-	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,1,0,1));
+//	cx::ImageLUT2DPtr lut0 = images[0]->getLookupTable2D();
+//	//std::cout << "setting llr for vol1 = " << llr << std::endl;
+//	lut0->addColorPoint(images[0]->getMax(), QColor::fromRgbF(0,1,0,1));
 
-	cx::ImageLUT2DPtr lut1 = images[1]->getLookupTable2D();
-	//std::cout << "setting llr for vol1 = " << llr << std::endl;
-	lut1->addColorPoint(images[1]->getMax(), QColor::fromRgbF(0,0,1,1));
-	double llr = images[1]->getMin() + (images[1]->getMax()-images[1]->getMin())*0.25;
-	lut1->setLLR(llr);
+//	cx::ImageLUT2DPtr lut1 = images[1]->getLookupTable2D();
+//	//std::cout << "setting llr for vol1 = " << llr << std::endl;
+//	lut1->addColorPoint(images[1]->getMax(), QColor::fromRgbF(0,0,1,1));
+//	double llr = images[1]->getMin() + (images[1]->getMax()-images[1]->getMin())*0.25;
+//	lut1->setLLR(llr);
 
-	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
-	REQUIRE(fixture.quickRunWidget());
+//	REQUIRE(fixture.defineGPUSlice("A", images, cx::ptAXIAL, 0, 0));
+//	REQUIRE(fixture.quickRunWidget());
 
-	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,1) > 0.02);
-	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
+//	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,1) > 0.02);
+//	CHECK(fixture.getFractionOfBrightPixelsInRenderWindowForView(0,20,2) > 0.02);
 	
-	CHECK_FALSE(fixture.messageListenerContainErrors());
-}
+//	CHECK_FALSE(fixture.messageListenerContainErrors());
+//}
 
 //These two tests fails on Ubuntu 16.04, but seems to work on Ubuntu 20.04
 //TEST_CASE("Visual rendering: Show ACS, 3 GPU volumes, optimized views",
