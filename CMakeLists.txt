@@ -56,10 +56,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
 
 # Use the old RPATH functionality that was the default in Ubuntu 16.04, instead of the new default: RUNPATH, or using LD_LIBRARY_PATH
-#if(CX_LINUX)
+if(CX_LINUX)
     set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--disable-new-dtags")
     set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
-#endif(CX_LINUX)
+endif(CX_LINUX)
 
 
 message( STATUS "The " ${CMAKE_GENERATOR} " was used." )
