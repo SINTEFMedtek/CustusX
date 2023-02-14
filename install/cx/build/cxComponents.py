@@ -227,6 +227,8 @@ class VTK(CppComponent):
             add('VTK_Group_Qt:BOOL', "ON")
             if(platform.system() == 'Darwin'):
               add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+            if(platform.system() == 'Linux'):
+              add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
             add('Module_vtkGUISupportQt:BOOL', 'ON')
