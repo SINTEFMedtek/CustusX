@@ -225,7 +225,8 @@ class VTK(CppComponent):
         if use_qt5:
             add('VTK_QT_VERSION:STRING', "5")
             add('VTK_Group_Qt:BOOL', "ON")
-            add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+            if(platform.system() == 'Darwin'):
+              add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
             add('Module_vtkGUISupportQt:BOOL', 'ON')
@@ -268,7 +269,8 @@ class CTK(CppComponent):
         add('CTK_LIB_DICOM/Widgets:BOOL', 'ON')
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
-        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('BUILD_TESTING:BOOL', 'OFF')
