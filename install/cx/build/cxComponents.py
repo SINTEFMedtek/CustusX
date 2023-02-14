@@ -273,6 +273,8 @@ class CTK(CppComponent):
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         if(platform.system() == 'Darwin'):
           add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('BUILD_TESTING:BOOL', 'OFF')
@@ -483,6 +485,8 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         if(platform.system() == 'Darwin'):
           add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         # See CX-208 about this Eigen flag and about updating Eigen.
         # The second one should be used when upgrading
         # to version > 3.2, as the old one is depracated in version 3.3.
