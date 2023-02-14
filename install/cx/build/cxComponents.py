@@ -477,7 +477,8 @@ class CustusX(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
-        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Darwin')
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
         # See CX-208 about this Eigen flag and about updating Eigen.
         # The second one should be used when upgrading
         # to version > 3.2, as the old one is depracated in version 3.3.
