@@ -1,5 +1,6 @@
 #include "cxToolProxy.h"
 #include "boost/bind.hpp"
+#include <vtkPolyData.h>
 #include "cxNullDeleter.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
