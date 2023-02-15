@@ -188,7 +188,7 @@ class ITK(CppComponent):
         self._getBuilder().gitSetRemoteURL(self.repository())
         # Using ITK v4.12.0 with a fix for gcc 9
         # Newer ITK versions makes IGSTK compilation fail
-        self._getBuilder().gitCheckoutSha('87b43dfc5e83819fcbc036db18ac2db021e5bfc6')
+        self._getBuilder().gitCheckoutSha('43737f0ffa907fcdb393227b8d5cb7d2dbbaea84')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
