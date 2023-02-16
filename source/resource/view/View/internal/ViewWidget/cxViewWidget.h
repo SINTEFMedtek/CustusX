@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXVIEWWIDGET_H_
 #define CXVIEWWIDGET_H_
 
-//#include "QVTKWidget.h"
 #include <QVTKOpenGLNativeWidget.h>
 
 #include "cxTransform3D.h"
@@ -30,13 +29,12 @@ namespace cx
 class cxResourceVisualization_EXPORT ViewWidget : public QVTKOpenGLNativeWidget
 {
 Q_OBJECT
-	//typedef QVTKWidget inherited;
 	typedef QVTKOpenGLNativeWidget inherited;
 
 public:
 	ViewRepCollectionPtr getView();
 
-	ViewWidget(RenderWindowFactoryPtr factory, QWidget *parent, const QString& uid="", const QString& name = "", Qt::WindowFlags f = 0); ///< constructor
+	ViewWidget(QWidget *parent, const QString& uid="", const QString& name = "", Qt::WindowFlags f = 0); ///< constructor
 	virtual ~ViewWidget();
 
 	virtual vtkRenderWindowPtr getRenderWindow() { return this->getView()->getRenderWindow(); } ///< Get the vtkRenderWindow used by this \a View.
@@ -77,8 +75,6 @@ private:
 	double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
 	boost::shared_ptr<class ViewRepCollection> mView;
 	unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-
-//	SharedOpenGLContextPtr mSharedOpenGLContext;
 };
 
 } // namespace cx

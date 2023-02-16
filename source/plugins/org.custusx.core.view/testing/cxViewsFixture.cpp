@@ -18,15 +18,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDummyToolManager.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
-#include "cxTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
 #include "cxViewsWindow.h"
 #include <QApplication>
 #include "cxPatientModelService.h"
 #include <vtkOpenGLRenderWindow.h>
-#include "cxSharedOpenGLContext.h"
-#include "cxRenderWindowFactory.h"
 
 #include "catch.hpp"
 
@@ -59,9 +56,7 @@ ViewsFixture::ViewsFixture(QString displayText)
 	// Initialize dummy toolmanager.
 	mServices->tracking()->setState(cx::Tool::tsTRACKING);
 
-	mFactory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-
-	mWindow.reset(new ViewsWindow(mFactory));//TODO: Create moc viewService with RenderWindowFactory?
+	mWindow.reset(new ViewsWindow());
 	mWindow->setDescription(displayText);
 }
 
@@ -103,30 +98,6 @@ cx::ViewPtr ViewsFixture::addView(int row, int col)
 {
 	return mWindow->addView(cx::View::VIEW, row, col);
 }
-
-//bool ViewsFixture::defineGPUSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
-//{
-//	std::vector<cx::ImagePtr> images(1);
-//	images[0] = this->loadImage(imageFilename);
-
-//	return this->defineGPUSlice(uid, images, plane, r, c);
-//}
-
-//bool ViewsFixture::defineGPUSlice(const QString& uid, const std::vector<cx::ImagePtr> images, cx::PLANE_TYPE plane, int r, int c)
-//{
-//	cx::ViewPtr view = mWindow->add2DView(r, c);
-
-//	cx::SliceProxyPtr proxy = this->createSliceProxy(plane);
-//	cx::SharedOpenGLContextPtr sharedOpenGLContext = mFactory->getSharedOpenGLContext();
-//	REQUIRE(sharedOpenGLContext);
-//	cx::Texture3DSlicerRepPtr rep = cx::Texture3DSlicerRep::New(sharedOpenGLContext, uid);
-//	rep->setShaderPath(mShaderFolder);
-//	rep->setSliceProxy(proxy);
-//	rep->setImages(images);
-//	view->addRep(rep);
-
-//	return true;
-//}
 
 void ViewsFixture::defineSlice(const QString& uid, const QString& imageFilename, cx::PLANE_TYPE plane, int r, int c)
 {

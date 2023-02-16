@@ -792,9 +792,6 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
-//	if (mSlices3DRep)
-//		mView->removeRep(mSlices3DRep);
-
 	if (!mGroupData)
 		return;
 
@@ -806,13 +803,6 @@ void ViewWrapper3D::updateSlices()
 	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
 	if (planes.empty())
 		return;
-//	mSlices3DRep = Slices3DRep::New(mSharedOpenGLContext, "MultiSliceRep_" + mView->getName());
-//	for (unsigned i=0; i<planes.size(); ++i)
-//		mSlices3DRep->addPlane(planes[i], mServices->patient());
-//	mSlices3DRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-//	mSlices3DRep->setImages(images);
-//	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
-//	mView->addRep(mSlices3DRep);
 }
 
 ViewPtr ViewWrapper3D::getView()

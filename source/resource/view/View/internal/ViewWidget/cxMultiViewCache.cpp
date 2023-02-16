@@ -12,23 +12,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMultiViewCache.h"
 #include "vtkRenderWindow.h"
 #include "cxViewService.h"
-#include "cxRenderWindowFactory.h"
 #include "cxLogger.h"
 
 namespace cx
 {
 
-MultiViewCache::MultiViewCache(RenderWindowFactoryPtr factory) :
-	mRenderWindowFactory(factory)
+MultiViewCache::MultiViewCache()
 {
-	// add a hidden window in order to handle the shared context (ref hack in vtkRenderWindow descendants
-	// that add support for shared gl contexts)
-//	if (!mStaticRenderWindow.GetPointer())
-//	{
-//		mStaticRenderWindow = mRenderWindowFactory->getSharedRenderWindow();
-//		if(mStaticRenderWindow)
-//			mStaticRenderWindow->Render();
-//	}
 }
 
 ViewWidget* MultiViewCache::retrieveView(QWidget* widget, View::Type type, bool offScreenRendering)
@@ -36,9 +26,9 @@ ViewWidget* MultiViewCache::retrieveView(QWidget* widget, View::Type type, bool 
 	// create one cache per type. This alleviates cross-settings between 2D and 3D,
 	// and also separates on/offscreen rendering, which doesn't mix well.
 	QString cache_uid = QString("View_%1_%2").arg(type).arg(offScreenRendering);
-	CX_LOG_DEBUG() << "MultiViewCache::retrieveView: " << cache_uid << " " << type;
+//	CX_LOG_DEBUG() << "MultiViewCache::retrieveView: " << cache_uid << " " << type;
 	if (!mViewCache.count(cache_uid))
-		mViewCache[cache_uid].reset(new ViewCache<ViewWidget>(mRenderWindowFactory, widget, cache_uid));
+		mViewCache[cache_uid].reset(new ViewCache<ViewWidget>(widget, cache_uid));
 	ViewCachePtr cache = mViewCache[cache_uid];
 
 	ViewWidget* vw = cache->retrieveView();

@@ -64,8 +64,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
 
-#include "cxTexture3DSlicerRep.h"
-
 namespace cx
 {
 
@@ -239,63 +237,6 @@ void ViewWrapper2D::removeAndResetSliceRep()
 	}
 	mSliceReps.clear();
 }
-
-//void ViewWrapper2D::removeAndResetMultiSliceRep()
-//{
-//	if (mMultiSliceRep)
-//	{
-//		mView->removeRep(mMultiSliceRep);
-//		mMultiSliceRep.reset();
-//	}
-//}
-
-//bool ViewWrapper2D::createAndAddMultiSliceRep()
-//{
-//	if(!mSharedOpenGLContext)
-//	{
-//		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
-//		return false;
-//	}
-//	if (mMultiSliceRep)
-//		return true;
-
-//	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
-//	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-//	mMultiSliceRep->setSliceProxy(mSliceProxy);
-//	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
-
-//	mView->addRep(mMultiSliceRep);
-
-//	return true;
-//}
-
-/**Hack: gpu slicer recreate and fill with images every time,
- * due to internal instabilities.
- * Fix: now reuses slicer, seem to have fixed issue.
- *
- */
-//void ViewWrapper2D::recreateMultiSlicer()
-//{
-//	this->removeAndResetSliceRep();
-
-//	if (!this->useGPU2DRendering())
-//	{
-//		this->removeAndResetMultiSliceRep();
-//		return;
-//	}
-
-//	if(!this->createAndAddMultiSliceRep())
-//	{
-//		return;
-//	}
-
-//	if (mGroupData)
-//		mMultiSliceRep->setImages(this->getImagesToView());
-//	else
-//		mMultiSliceRep->setImages(std::vector<ImagePtr>());
-
-//	this->viewportChanged();
-//}
 
 std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
 {

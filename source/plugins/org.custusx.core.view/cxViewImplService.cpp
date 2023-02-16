@@ -23,7 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxViewGroupData.h"
 #include "cxClippers.h"
-#include "cxRenderWindowFactory.h"
 #include "cxRenderLoop.h"
 #include "cxViewImplService.h"
 #include "cxSlicePlanes3DRep.h"
@@ -66,8 +65,6 @@ ViewImplService::~ViewImplService()
 
 void ViewImplService::init()
 {
-	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
-
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewImplService::updateViews);
 	connect(mRenderLoop.get(), &RenderLoop::fps, this, &ViewImplService::fps);
@@ -174,11 +171,11 @@ QWidget *ViewImplService::createLayoutWidget(QWidget* parent, int index)
 
 		if (optimizedViews)
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mRenderWindowFactory, parent);
+			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(parent);
 		}
 		else
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mRenderWindowFactory, parent);
+			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(parent);
 		}
 
 		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewImplService::layoutWidgetDestroyed);

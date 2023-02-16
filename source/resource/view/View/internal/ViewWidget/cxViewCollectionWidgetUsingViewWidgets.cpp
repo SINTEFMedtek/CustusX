@@ -19,10 +19,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(RenderWindowFactoryPtr factory, QWidget* parent) :
+LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
-	mViewCache = MultiViewCache::create(factory);
+	mViewCache = MultiViewCache::create();
 	mOffScreenRendering = false;
 
 	mLayout = new QGridLayout;

@@ -30,7 +30,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxCoreServices.h"
 #include "cxLogger.h"
 #include "cxStringListProperty.h"
-#include "cxSharedOpenGLContext.h"
 
 namespace cx
 {
@@ -379,25 +378,8 @@ void ViewGroupData::addDataSorted(QString uid)
 
 void ViewGroupData::insertData(std::vector<DataAndViewPropertiesPair>::iterator iter, DataAndViewPropertiesPair &item)
 {
-	//this->upload3DTextureIfImageToSharedContext(item.first);
 	this->mData.insert(iter, item);
 }
-
-/*
-//TODO remove? maybe it is better to do this in the proxy?
-void ViewGroupData::upload3DTextureIfImageToSharedContext(QString uid)
-{
-	CX_LOG_DEBUG() << "upload3DTextureIfImageToSharedContext: " << uid;
-	ImagePtr image = mServices->patient()->getData<Image>(uid);
-	if(image)
-	{
-		if(mSharedOpenGLContext)
-			mSharedOpenGLContext->upload3DTexture(image);
-		else
-			CX_LOG_ERROR() << "ViewGroupData::uploadIfImageToSharedContext: Got no shared OpenGL context";
-	}
-}
-*/
 
 DataViewProperties ViewGroupData::getProperties(QString uid)
 {

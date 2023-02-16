@@ -19,7 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVtkHelperClasses.h"
 #include "cxVolumeHelpers.h"
 #include "cxTypeConversions.h"
-#include "cxRenderWindowFactory.h"
 #include "cxViewCollectionWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxViewWidget.h"
@@ -169,12 +168,9 @@ TEST_CASE("QVTKOpenGLNativeWidget render", "[integration][resource][visualizatio
 	cx::ViewPtr view;
 	QWidget *widget = nullptr;
 
-	//Use ViewCollectionWidget for creating widgets/renderwindows
-	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-
 	//Swicth between createViewWidgetLayout and createOptimizedLayout
-	cx::ViewCollectionWidget* mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout(factory, mainWindow);
-//	cx::ViewCollectionWidget* mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(factory, mainWindow);
+	cx::ViewCollectionWidget* mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout(mainWindow);
+//	cx::ViewCollectionWidget* mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(mainWindow);
 
 	widget = mLayoutWidget;
 	view = mLayoutWidget->addView(cx::View::VIEW_3D, cx::LayoutRegion(0,0));

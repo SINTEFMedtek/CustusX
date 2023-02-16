@@ -142,7 +142,6 @@ protected:
 
 	VisServicesPtr mServices;
 	std::vector<QPointer<ViewCollectionWidget> > mLayoutWidgets;
-	RenderWindowFactoryPtr mRenderWindowFactory;
 	RenderLoopPtr mRenderLoop;
 
 private:

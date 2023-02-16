@@ -26,8 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt::WindowFlags f) :
-	mRenderWindowFactory(factory),
+ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
 	QVTKOpenGLNativeWidget(parent, f),
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
@@ -127,32 +126,10 @@ void ViewContainer::initializeRenderWindow()
 	if (mRenderWindow)
 		return;
 
-	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
-
-//	bool renderWindowExists = mRenderWindowFactory->renderWindowExists(uid);
-
-//	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
-	mRenderWindow = this->renderWindow();//vtk9: Using renderWindow created in QVTKOpenGLNativeWidget - skipping factory
+	mRenderWindow = this->renderWindow();
 //	if(!renderWindowExists)
 //		this->addBackgroundRenderer(mRenderWindow);//vtk9: Not needed?
 	this->setRenderWindow(mRenderWindow);
-
-//	if (!mCachedRenderWindows.count(uid))
-//	{
-////		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
-//		vtkRenderWindowPtr rw = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
-//		this->addBackgroundRenderer(rw);
-//		mCachedRenderWindows[uid] = rw;
-//	}
-
-//	// replace the previous renderwindow with one from the cache.
-//	// the old renderwindow is not hidden explicitly: is this a problem??
-////	if (mRenderWindow != mCachedRenderWindows[uid])
-////	{
-//		mRenderWindow = mCachedRenderWindows[uid];
-//		this->SetRenderWindow(mRenderWindow);
-//		mRenderWindow->GetInteractor()->EnableRenderOff();
-////	}
 }
 
 void ViewContainer::addBackgroundRenderer(vtkRenderWindowPtr rw)
