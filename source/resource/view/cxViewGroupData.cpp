@@ -12,7 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewGroupData.h"
 
 #include <QMenu>
-#include "vtkCamera.h"
+#include <vtkCamera.h>
+#include <vtkOpenGLRenderWindow.h>
 
 #include "cxPatientModelService.h"
 #include "cxMesh.h"

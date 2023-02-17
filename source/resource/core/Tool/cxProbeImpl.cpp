@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProbeImpl.h"
 
 #include <QStringList>
+#include <vtkPolyData.h>
 #include "cxVideoSource.h"
 #include "cxLogger.h"
 #include "cxProbeSector.h"

@@ -20,12 +20,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
-#include "cxTypeConversions.h"
 #include "vtkTextActor.h"
+#include "vtkMatrix4x4.h"
+
+#include "cxTypeConversions.h"
 #include "cxGraphicalPrimitives.h"
 #include "cxShapedMetric.h"
 #include "cxGraphicalPrimitives.h"
-#include "vtkMatrix4x4.h"
 #include "cxGraphicalTorus3D.h"
 #include "cxGraphicalDisk.h"
 

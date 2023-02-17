@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxNavigation.h"
+#include <vtkCamera.h>
 #include "cxImage.h"
 #include "cxBoundingBox3D.h"
 #include "cxPatientModelService.h"
