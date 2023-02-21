@@ -45,6 +45,9 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+set(VTK_MODULES
+  VTK::ImagingGeneral
+)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -55,6 +58,7 @@ set(PLUGIN_target_libraries
 	cxLogicManager
 	cxGUIExtenderService
 	org_custusx_acquisition
+	${VTK_MODULES}
 	)
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -81,6 +85,11 @@ target_include_directories(org_custusx_calibration
 	./gui
 	./logic
 	${CMAKE_CURRENT_BINARY_DIR}
+)
+
+vtk_module_autoinit(
+  TARGETS ${PROJECT_NAME}
+  MODULES ${VTK_MODULES}
 )
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")

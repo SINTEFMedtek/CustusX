@@ -279,21 +279,24 @@ configure_file(
 # extra definitions:
 add_subdirectory(settings)
 
+#Trying to reduce the number of included libs, as the Windows build for
+#org_custusx_core_tracking_system_igstk.dir\cxIGSTKTrackingPluginActivator.cpp.obj fails. (Too long command)
 set(VTK_MODULES
-  VTK::CommonCore
   VTK::CommonColor
+  VTK::CommonCore
+  VTK::CommonDataModel#test
   VTK::CommonSystem
   VTK::RenderingCore
   VTK::RenderingVolumeOpenGL2
-  VTK::CommonDataModel
-  VTK::FiltersTexture
-  VTK::FiltersSources
   VTK::FiltersHybrid
-  VTK::ImagingStatistics
+  VTK::FiltersSources
+  VTK::FiltersTexture
   VTK::ImagingColor
+  VTK::ImagingStatistics
   VTK::IOImage
   VTK::IOGeometry
   VTK::IOMINC
+#  VTK::ParallelCore
 )
 
 set(CX_PUBLIC_RESOURCE_LIBRARIES
@@ -305,8 +308,8 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
   Qt5::Concurrent
   CTKPluginFramework
   cxPluginUtilities
-  ${VTK_LIBRARIES}#Can this be removed/limited now that we have to use vtk_module_autoinit?
-#  ${VTK_MODULES}#Compile fails: Cannot find QVTKOpenGLNativeWidget.h
+#  ${VTK_LIBRARIES}#Can this be removed/limited now that we have to use vtk_module_autoinit?
+  ${VTK_MODULES}
   ${OPENGL_LIBRARIES}
   )
 
@@ -367,7 +370,6 @@ target_link_libraries(cxResource
     TARGETS cxResource
 #    MODULES ${VTK_LIBRARIES}
     MODULES ${VTK_MODULES}
-#    MODULES VTK::CommonCore VTK::RenderingCore VTK::RenderingVolumeOpenGL2 VTK::CommonDataModel
     )
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/Data/doc")
