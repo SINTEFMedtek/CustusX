@@ -630,6 +630,11 @@ class QHttpServer(CppComponent):
         self._getBuilder().gitCheckoutSha('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
+        add = builder.addCMakeOption
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
