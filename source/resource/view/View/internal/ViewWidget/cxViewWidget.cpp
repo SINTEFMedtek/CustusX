@@ -100,10 +100,15 @@ void ViewWidget::mouseMoveEvent(QMouseEvent* event)
 void ViewWidget::mousePressEvent(QMouseEvent* event)
 {
 	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
-	// this sets the render interactor in a zoom state after each menu call. This hack prevents
+	// this sets the render interactor in a zoom state after each menu call. This fix prevents
 	// the mouse press event in this case.
 	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
+	{
+		vtkRenderWindowInteractor* iren = mView->getRenderWindow()->GetInteractor();
+		if (iren != nullptr)
+			iren->RightButtonReleaseEvent();//VTK 9
 		return;
+	}
 
 	inherited::mousePressEvent(event);
 	emit mousePress(event->x(), event->y(), event->buttons());
