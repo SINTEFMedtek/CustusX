@@ -117,9 +117,11 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 
 	cx::ImagePtr convertedImage;
 	cx::DicomConverter converter;
+	DICOMReaderTest reader;
 
 	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
-	database->openDatabase(":memory:");
+//	database->openDatabase(":memory:");//Don't work with latest CTK
+	database->openDatabase(reader.setupDatabaseFiles());
 	converter.setDicomDatabase(database.data());
 
 	QString dicomInput = inputDicomDataDirectory; // Need directory, not one of the files.
