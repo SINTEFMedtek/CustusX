@@ -636,6 +636,8 @@ class QHttpServer(CppComponent):
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         builder.configureCMake()
