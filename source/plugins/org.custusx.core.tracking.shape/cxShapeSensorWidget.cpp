@@ -16,7 +16,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QApplication>
 #include <string>
 #include <vtkRenderer.h>
-#include <vtkPolyData.h>
 #include "cxProfile.h"
 #include "cxXmlOptionItem.h"
 #include "cxDoubleWidgets.h"

@@ -14,6 +14,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_tracking_shape_Export.h"
 #include "cxBaseWidget.h"
+
+#include <vtkCellArray.h>
+#include <vtkPoints.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkActor.h>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
+
 #include "cxSocketConnection.h"
 #include "cxForwardDeclarations.h"
 #include "cxReadFbgsMessage.h"
