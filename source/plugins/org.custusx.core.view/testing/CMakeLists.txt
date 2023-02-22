@@ -53,13 +53,9 @@ if(BUILD_TESTING)
     )
   cx_add_tests_to_catch(${PROJECT_NAME})
 
-# This fixes crash when trying to use vtkSmartVolumeMapper
-#  if (NOT VTK_VERSION VERSION_LESS "8.90.0")
   vtk_module_autoinit(
     TARGETS ${PROJECT_NAME}
-#    MODULES ${VTK_LIBRARIES}
     MODULES VTK::RenderingVolumeOpenGL2
     )
-#  endif()
 
 endif(BUILD_TESTING)

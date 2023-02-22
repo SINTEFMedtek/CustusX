@@ -86,8 +86,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStream2DRep3D.h"
 #include "cxActiveData.h"
 
-//#include "cxSlices3DRep.h"
-
 namespace cx
 {
 

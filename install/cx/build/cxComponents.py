@@ -226,7 +226,6 @@ class VTK(CppComponent):
             add('VTK_QT_VERSION:STRING', "5")
             add('VTK_Group_Qt:BOOL', "ON")
             if(platform.system() == 'Darwin'):
-              #add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
               add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
             if(platform.system() == 'Linux'):
               add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
@@ -273,7 +272,6 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         if(platform.system() == 'Darwin'):
-          #add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
           add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
@@ -486,7 +484,6 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         if(platform.system() == 'Darwin'):
-          #add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
           add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")

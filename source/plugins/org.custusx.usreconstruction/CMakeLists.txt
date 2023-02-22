@@ -68,8 +68,6 @@ set(PLUGIN_target_libraries
     cxResourceWidgets
     cxResourceVisualization
     cxPluginUtilities
-#    PUBLIC
-#      ${VTK_MODULES}
     )
 
 set(PLUGIN_OUTPUT_DIR "")

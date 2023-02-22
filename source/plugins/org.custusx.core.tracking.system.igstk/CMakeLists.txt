@@ -78,7 +78,7 @@ target_include_directories(org_custusx_core_tracking_system_igstk
 )
 
 vtk_module_autoinit(
-  TARGETS cxGui
+  TARGETS ${PROJECT_NAME}
   MODULES VTK::CommonCore
 )
 

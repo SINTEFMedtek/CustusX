@@ -27,7 +27,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestMultiVolume3DRepProducerFixture.h"
 
 #include "cxMehdiGPURayCastMultiVolumeRep.h"
-//#include "vtkOpenGLGPUMultiVolumeRayCastMapper.h"
 
 namespace cxtest
 {

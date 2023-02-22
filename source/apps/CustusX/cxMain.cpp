@@ -19,8 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxConfig.h"
 
-//#include <GL/glew.h>
-
 int main(int argc, char *argv[])
 {
 
