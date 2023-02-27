@@ -499,7 +499,6 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
       "${QT_LIBS_DIR}/*xcb*"
       "${QT_LIBS_DIR}/libQt*"
       "${QT_LIBS_DIR}/*-qt5*"
-      "${QT_LIBS_DIR}/Qt*"
       # These libraries are needed for the Linux installation:
       "${QT_LIBS_DIR}/libicui18n.*"
       "${QT_LIBS_DIR}/libicuuc.*"
@@ -509,6 +508,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
     file(GLOB REMOVE_FILE_LIST
       LIST_DIRECTORIES false
      "${QT_LIBS_DIR}/*.a"
+     "${QT_LIBS_DIR}/*dSYM*"
       )
 
     list(REMOVE_ITEM INSTALL_FILE_LIST ${REMOVE_FILE_LIST} )
