@@ -193,7 +193,7 @@ macro(cx_initialize_VTK)
 	  RenderingVolumeOpenGL2
 	  ViewsQt
 	  GUISupportQt
-	  RenderingQt #Default in CMake == OFF?
+	  #RenderingQt #Default in CMake == OFF?
 	  NO_MODULE)
 
 
