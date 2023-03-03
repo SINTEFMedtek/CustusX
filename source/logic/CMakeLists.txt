@@ -43,10 +43,9 @@ target_link_libraries(cxLogicManager
     ${VTK_MODULES}
 )
 
-vtk_module_autoinit(
-  TARGETS cxLogicManager
-#  MODULES ${VTK_LIBRARIES}
-  ${VTK_MODULES}
-)
+#vtk_module_autoinit(
+#  TARGETS cxLogicManager
+#  ${VTK_MODULES}
+#)
 add_subdirectory(testing)
 
