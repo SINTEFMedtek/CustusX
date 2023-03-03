@@ -569,6 +569,7 @@ install(DIRECTORY "${QT_QML_DIR}/"
                 set(LIB_PATTERN_CODE "
     ${LIB_PATTERN_CODE}
     set\(TEMP \"\${CMAKE_INSTALL_PREFIX}/${TARGET_FILEPATH}\"\)
+    list(FILTER TEMP EXCLUDE REGEX \".*dylib.dSYM.*\")
     set(PLUGINS \${PLUGINS} \${TEMP})
                         ")
 	endforeach()
@@ -599,6 +600,7 @@ install(DIRECTORY "${QT_QML_DIR}/"
     "${LIB_PATTERN_CODE}
     set(TEMP)
     file\(GLOB_RECURSE TEMP \"\${CMAKE_INSTALL_PREFIX}/${PATTERN}\"\)
+    list(FILTER TEMP EXCLUDE REGEX \".*dylib.dSYM.*\")
     set(PLUGINS \${PLUGINS} \${TEMP})
     "
 			)
