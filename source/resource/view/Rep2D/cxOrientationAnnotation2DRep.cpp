@@ -32,7 +32,7 @@ OrientationAnnotationSmartRep::OrientationAnnotationSmartRep() :
 	RepImpl()
 {
 	mAngle = M_PI*60/180;
-	mOrientation = OrientationAnnotationPtr::New();
+	mOrientation = vtkCornerAnnotationPtr::New();
 	mOrientation->SetNonlinearFontScaleFactor(0.35);
 	mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039);
 

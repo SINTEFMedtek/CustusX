@@ -27,7 +27,6 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class OrientationAnnotationSmartRep> OrientationAnnotationSmartRepPtr;
-typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
 
 /** \brief A class that annotated 2D views with otientation information.
  * \ingroup cx_resource_view
@@ -68,7 +67,7 @@ protected:
 
 	double mAngle;
 	SliceProxyPtr mSlicer;
-	OrientationAnnotationPtr mOrientation;
+	vtkCornerAnnotationPtr mOrientation;
 	std::map<QString, Vector3D> mDCMDirections_r; ///< directions of DICOM labels APSILR
 	std::map<vtkCornerAnnotation::TextPosition, Vector3D> mPlaneDirections_s; ///< the four directions in the slice plane
 };

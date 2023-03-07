@@ -29,32 +29,6 @@ namespace cx
 // --------------------------------------------------------
 {
 
-
-/** Follows vtk spec.
- */
-OrientationAnnotation* OrientationAnnotation::New()
-{
-	vtkObject* ret = vtkObjectFactory::CreateInstance("OrientationAnnotation");
-	if (ret)
-	{
-		return static_cast<OrientationAnnotation*>(ret);
-	}
-	return new OrientationAnnotation;
-}
-
-OrientationAnnotation::OrientationAnnotation()
-{
-}
-
-OrientationAnnotation::~OrientationAnnotation()
-{
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
 OrientationAnnotationRep::OrientationAnnotationRep(PatientModelServicePtr dataManager) :
 	RepImpl(),
 	mDataManager(dataManager)
@@ -196,7 +170,7 @@ void OrientationAnnotationRep::createAnnotation()
 {
 	if (!mOrientation)
 	{
-		mOrientation = OrientationAnnotationPtr::New();
+		mOrientation = vtkCornerAnnotationPtr::New();
 		mOrientation->SetNonlinearFontScaleFactor (0.35 );
 		mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039 );
 	}

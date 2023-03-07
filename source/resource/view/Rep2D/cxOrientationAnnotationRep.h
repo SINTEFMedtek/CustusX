@@ -24,17 +24,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-class cxResourceVisualization_EXPORT OrientationAnnotation : public vtkCornerAnnotation
-{
-	vtkTypeMacro(OrientationAnnotation, vtkCornerAnnotation);
-public:
-	static OrientationAnnotation* New();
-	OrientationAnnotation();
-	~OrientationAnnotation();
-};
-
-typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
-
 /**\brief Display direction annotations in a 2D view.
  *
  * Based on the input PLANE_TYPE, decorate with the letters APSILR (Anterior,
@@ -68,7 +57,7 @@ protected:
 	void setPlaneTypeRadiology(PLANE_TYPE type);
 	void createAnnotation();
 
-	OrientationAnnotationPtr mOrientation;
+	vtkCornerAnnotationPtr mOrientation;
 	PLANE_TYPE mPlane;
 	PatientModelServicePtr mDataManager;
 
