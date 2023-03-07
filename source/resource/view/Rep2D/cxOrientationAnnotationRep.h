@@ -31,8 +31,6 @@ public:
 	static OrientationAnnotation* New();
 	OrientationAnnotation();
 	~OrientationAnnotation();
-	virtual void SetTextActorsPosition(int vsize[2]);
-	virtual void SetTextActorsJustification();
 };
 
 typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;

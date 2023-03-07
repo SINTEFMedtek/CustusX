@@ -44,40 +44,11 @@ OrientationAnnotation* OrientationAnnotation::New()
 
 OrientationAnnotation::OrientationAnnotation()
 {
-
 }
 
 OrientationAnnotation::~OrientationAnnotation()
 {
 }
-
-void OrientationAnnotation::SetTextActorsPosition(int vsize[2])
-{
-	//Logger::log("nav.log","set text position");
-	this->TextActor[2]->SetPosition(5, vsize[1]/2);
-	this->TextActor[3]->SetPosition(vsize[0]/2, 7);
-	this->TextActor[0]->SetPosition(vsize[0]-7, vsize[1]/2);
-	this->TextActor[1]->SetPosition(vsize[0]/2, vsize[1]-7);
-}
-void OrientationAnnotation::SetTextActorsJustification()
-{
-	vtkTextProperty* tprop = this->TextMapper[2]->GetTextProperty();
-	tprop->SetJustificationToLeft();
-	tprop->SetVerticalJustificationToCentered();
-
-	tprop = this->TextMapper[3]->GetTextProperty();
-	tprop->SetJustificationToCentered();
-	tprop->SetVerticalJustificationToBottom();
-
-	tprop = this->TextMapper[0]->GetTextProperty();
-	tprop->SetJustificationToRight();
-	tprop->SetVerticalJustificationToCentered();
-
-	tprop = this->TextMapper[1]->GetTextProperty();
-	tprop->SetJustificationToCentered();
-	tprop->SetVerticalJustificationToTop();
-}
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -229,10 +200,11 @@ void OrientationAnnotationRep::createAnnotation()
 		mOrientation->SetNonlinearFontScaleFactor (0.35 );
 		mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039 );
 	}
-	mOrientation->SetText(0, cstring_cast(mEastAnnotation) );
-	mOrientation->SetText(1, cstring_cast(mNorthAnnotation) );
-	mOrientation->SetText(2, cstring_cast(mWestAnnotation) );
-	mOrientation->SetText(3, cstring_cast(mSouthAnnotation) );
+
+	mOrientation->SetText(vtkCornerAnnotation::TextPosition::RightEdge, cstring_cast(mEastAnnotation) );
+	mOrientation->SetText(vtkCornerAnnotation::TextPosition::UpperEdge, cstring_cast(mNorthAnnotation) );
+	mOrientation->SetText(vtkCornerAnnotation::TextPosition::LeftEdge, cstring_cast(mWestAnnotation) );
+	mOrientation->SetText(vtkCornerAnnotation::TextPosition::LowerEdge, cstring_cast(mSouthAnnotation) );
 }
 
 
