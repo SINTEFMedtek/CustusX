@@ -130,7 +130,7 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 
 		mBloodVesselBranchListPtr->deleteAllBranches();
 
-		mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
+		mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false, false);
 		mBloodVesselBranchListPtr->smoothOrientations();
 		mBloodVesselBranchListPtr->smoothBranchPositions(40);
 		setBloodVesselRadius();

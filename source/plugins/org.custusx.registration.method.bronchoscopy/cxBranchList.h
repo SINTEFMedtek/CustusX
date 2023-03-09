@@ -26,10 +26,10 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 #define MAX_ROTATION_TO_TILT_DOWN_DEGREES 30 //Threshold between rotation direction of scope to tilt up or down in a bifurcation.
 #define MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH 3 //mm
 #define MIN_BRANCH_SEGMENT_LENGTH 5 //Number of connected points
-#define MAX_DISTANCE_TO_EXISTING_BRANCH 15 //mm. Max distance to main airway tree for inclusion of points.
-#define DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION 5 //mm. If distance to main branch tree exceeds value, use direction to connect to correct branch.
-#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH 60 //deg
-#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH 20 //deg
+#define MAX_DISTANCE_TO_EXISTING_BRANCH 20 //mm. Max distance to main airway tree for inclusion of points.
+#define DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION 3 //mm. If distance to main branch tree exceeds value, use direction to connect to correct branch.
+#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH 90 //deg
+#define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH 40 //deg
 
 
 class org_custusx_registration_method_bronchoscopy_EXPORT BranchList
@@ -42,7 +42,7 @@ public:
 	void deleteBranch(BranchPtr b);
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
-	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true);
+	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true);
 	void selectGenerations(int maxGeneration);
 	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);

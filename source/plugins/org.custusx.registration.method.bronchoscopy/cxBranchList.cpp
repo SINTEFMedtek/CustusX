@@ -325,10 +325,17 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 	}
 }
 
-void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex)
+void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments)
 {
+	//TO DO: Find main airway tree
 	if (sortByZindex)
 		positions_r = sortMatrix(2,positions_r);
+
+	double maxDistanceToExistingBranch;
+	if(connectSeparateSegments)
+		maxDistanceToExistingBranch = MAX_DISTANCE_TO_EXISTING_BRANCH;
+	else
+		maxDistanceToExistingBranch = MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH;
 
 	Eigen::MatrixXd positionsNotUsed_r = positions_r;
 
@@ -341,7 +348,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 	{
 		if (!mBranches.empty())
 		{// Find remaining point which is closest to an existing branch
-			minDistance = MAX_DISTANCE_TO_EXISTING_BRANCH;
+			minDistance = maxDistanceToExistingBranch;
 			for (int i = 0; i < mBranches.size(); i++)
 			{
 				std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
@@ -356,7 +363,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 						break;
 				}
 			}
-			if(minDistance == MAX_DISTANCE_TO_EXISTING_BRANCH)
+			if(minDistance == maxDistanceToExistingBranch)
 				break; //No more close positions found: Airway centerline tree completed.
 
 			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
@@ -369,7 +376,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 		Eigen::MatrixXd newBranchPositions = connectedPointsResult.first;
 		positionsNotUsed_r = connectedPointsResult.second;
 
-		if (newBranchPositions.cols() < MIN_BRANCH_SEGMENT_LENGTH) //only include brances of length >= 5 points
+		if (newBranchPositions.cols() < MIN_BRANCH_SEGMENT_LENGTH) //only include branches of length >= 5 points
 			continue;
 
 		BranchPtr newBranch = BranchPtr(new Branch());
@@ -379,12 +386,13 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 		{ // If distance to closest branch is above DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION
 			// we look at all branches at a distance below MAX_DISTANCE_TO_EXISTING_BRANCH and select the one wtih
 			// lowest orientation deviation between the conection part and the new and the existing branch.
-			std::vector<BranchPtr> existingCloseBranches = findClosesBranches(newBranchPositions.col(0), MAX_DISTANCE_TO_EXISTING_BRANCH);
+			std::vector<BranchPtr> existingCloseBranches = findClosesBranches(newBranchPositions.col(0), maxDistanceToExistingBranch);
 			Eigen::MatrixXd newBranchOrientations =newBranch->getOrientations();
 			int numberOfColumnsInNewBranch = newBranchOrientations.cols();
-			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch)).rowwise().mean(); //smoothing
+			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch-1)).rowwise().mean(); //smoothing
 			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
 			BranchPtr branchToConnect;
+			CX_LOG_DEBUG() << "newBranchPositions.col(0): " << newBranchPositions.col(0) << " - newBranchOrientationStart: " << newBranchOrientationStart;
 			double minOrintationDeviationToNewBranch = MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH; //deg
 			for (int i=0; i<existingCloseBranches.size(); i++)
 			{
@@ -405,6 +413,8 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 					minOrintationDeviationToNewBranch = angleDeviationInConnectionToNewBranch;
 					branchToConnect = existingCloseBranches[i];
 				}
+				CX_LOG_DEBUG() << "existingCloseBranchPositions.rightCols(): " << existingCloseBranchPositions.rightCols(1) << " - existingCloseBranchOrientationEnd: " << existingCloseBranchOrientationEnd;
+				CX_LOG_DEBUG() << "angleDeviationInConnectionToExistingBranch: " << angleDeviationInConnectionToExistingBranch << " - angleDeviationInConnectionToNewBranch: " << angleDeviationInConnectionToNewBranch;
 			}
 			if (branchToConnect)
 			{ // Checking if branch with orientation fit is found
