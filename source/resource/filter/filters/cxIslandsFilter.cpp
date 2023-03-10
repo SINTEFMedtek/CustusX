@@ -26,6 +26,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "vtkForwardDeclarations.h"
 #include "cxLogger.h"
+#include "vtkImageConnectivityFilter.h"
+#include "vtkImageData.h"
+#include "cxPatientModelService.h"
+#include "cxVolumeHelpers.h"
 
 namespace cx
 {
@@ -107,10 +111,30 @@ ImagePtr IslandsFilter::execute(ImagePtr inputImage, int minimumSize)
 	if (!inputImage)
 		return ImagePtr();
 
+	vtkImageDataPtr labeledImage = this->findIslandsInImage(inputImage->getBaseVtkImageData(), minimumSize);
+	if(!labeledImage)
+		return ImagePtr();
 
-	ImagePtr outputImage;
-	return outputImage;
+	ImagePtr input = this->getCopiedInputImage(0);
+
+	QString uid = input->getUid() + "_Islands%1";
+	QString name = input->getName()+" Islands%1";
+	ImagePtr output = createDerivedImage(mServices->patient(),
+																			 uid, name,
+																			 labeledImage, input);
+	output->mergevtkSettingsIntosscTransform();
+
+	if (!output)
+			return ImagePtr();
+
+	mServices->patient()->insertData(output);
+
+	// set output
+	mOutputTypes.front()->setValue(output->getUid());
+
+	return output;
 }
+
 
 ImagePtr IslandsFilter::getOutputImage()
 {
@@ -123,6 +147,23 @@ bool IslandsFilter::postProcess()
 		mOutputTypes.front()->setValue(mOutputTypes.front()->getData()->getUid());
 
 	return true;
+}
+
+vtkImageDataPtr IslandsFilter::findIslandsInImage(vtkImageDataPtr image, int minimumSize)
+{
+	if(!image)
+		return vtkImageDataPtr();
+
+	vtkImageConnectivityFilter* connectivityFilterPtr = vtkImageConnectivityFilter::New();
+	connectivityFilterPtr->SetInputData(image);
+	connectivityFilterPtr->SetExtractionModeToAllRegions();
+	connectivityFilterPtr->SetLabelModeToSizeRank();
+	connectivityFilterPtr->SetScalarRange(1,1);
+	connectivityFilterPtr->SetSizeRange(minimumSize, VTK_ID_MAX);
+	connectivityFilterPtr->Update();
+	vtkImageDataPtr labeledImage = connectivityFilterPtr->GetOutput();
+
+	return labeledImage;
 }
 
 
