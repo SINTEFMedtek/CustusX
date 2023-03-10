@@ -27,6 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxColorVariationFilter.h"
 #include "cxFilterPresetWidget.h"
 #include "cxDilationFilter.h"
+#include "cxMeshesFromLabelsFilter.h"
 #include "cxPluginFramework.h"
 #include "cxLogicManager.h"
 #include <boost/bind.hpp>
@@ -129,6 +130,7 @@ void FiltersWidget::appendFiltersThatAreNotServices(VisServicesPtr services)
 	this->appendFilterIfWanted(FilterPtr(new GenericScriptFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new ResampleImageFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new DilationFilter(services)));
+	this->appendFilterIfWanted(FilterPtr(new MeshesFromLabelsFilter(services)));
 }
 
 void FiltersWidget::appendFilterServices()
