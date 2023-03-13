@@ -249,16 +249,10 @@ bool MeshesFromLabelsFilter::execute()
 	if (!input)
 		return false;
 
-
-//	int startLabel = 0;
-//	int endLabel = input->getRange();
-
-	//std::cout << "MeshesFromLabelsFilter::execute : " << mCopiedOptions.ownerDocument().toString() << std::endl;
-
 	BoolPropertyPtr reduceResolutionOption = this->getReduceResolutionOption(mCopiedOptions);
 	BoolPropertyPtr smoothingOption = this->getSmoothingOption(mCopiedOptions);
-    DoublePropertyPtr numberOfIterationsOption = this->getNumberOfIterationsOption(mCopiedOptions);
-    DoublePropertyPtr passBandOption = this->getPassBandOption(mCopiedOptions);
+	DoublePropertyPtr numberOfIterationsOption = this->getNumberOfIterationsOption(mCopiedOptions);
+	DoublePropertyPtr passBandOption = this->getPassBandOption(mCopiedOptions);
 	BoolPropertyPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
 	DoublePropertyPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
 	DoublePropertyPtr decimationOption = this->getDecimationOption(mCopiedOptions);
@@ -266,11 +260,8 @@ bool MeshesFromLabelsFilter::execute()
 	DoublePropertyPtr endLabelOption = this->getEndLabelOption(mCopiedOptions);
 
 
-	//report(QString("Creating contour from \"%1\"...").arg(input->getName()));
 
 	mRawResult = this->execute( input->getBaseVtkImageData(),
-//								startLabel,
-//								endLabel,
 								startLabelOption->getValue(),
 								endLabelOption->getValue(),
 								surfaceThresholdOption->getValue(),
@@ -285,7 +276,6 @@ bool MeshesFromLabelsFilter::execute()
 
 //Example code for vtkDiscreteMarchingCubes and vtkDiscreteFlyingEdges3D
 //https://kitware.github.io/vtk-examples/site/Cxx/Medical/GenerateModelsFromLabels/
-
 std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr input,
 											   int startLabel,
 											   int endLabel,
@@ -304,7 +294,6 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 	vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
 	if(reduceResolution)
 	{
-//		std::cout << "smooth" << std::endl;
 		shrinker->SetInputData(input);
 		shrinker->SetShrinkFactors(2,2,2);
 		shrinker->Update();
@@ -351,25 +340,6 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 		smoother->Update();
 	}
 
-	//Create a surface of triangles
-
-	//Not working here. Move down as the normals prosessing
-//	//Decimate surface model (remove a percentage of the polygons)
-//	vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
-//	vtkDecimateProPtr deci = vtkDecimateProPtr::New();
-//	if (decimation > 0.000001)
-//	{
-//		trifilt->SetInputConnection(outputPort);
-//		outputPort = trifilt->GetOutputPort();
-//		trifilt->Update();
-
-//		deci->SetInputConnection(outputPort);
-//		outputPort = deci->GetOutputPort();
-
-//		deci->SetTargetReduction(decimation);
-//		deci->SetPreserveTopology(preserveTopology);
-//		deci->Update();
-//	}
 
 	vtkNew<vtkThreshold> selector;
 	selector->SetInputConnection(outputPort);
@@ -402,6 +372,7 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 	geometry->SetInputConnection(scalarsOff->GetOutputPort());
 	outputPort = geometry->GetOutputPort();
 
+	//Create a surface of triangles
 	//Need do decimation and normals at the end of the pipeline
 	//Decimate surface model (remove a percentage of the polygons)
 	vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
@@ -419,7 +390,6 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 	}
 
 	vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
-//	normals->SetInputConnection(geometry->GetOutputPort());
 	normals->SetInputConnection(outputPort);
 	normals->SetComputeCellNormals(true);
 	normals->AutoOrientNormalsOn();
@@ -456,18 +426,12 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 //		writer->SetFileName(ss.str().c_str());
 //		writer->Write();
 
-
-
-//		geometry->Update();
 		normals->Update();
 
-//		vtkPolyDataPtr cubesPolyData = normals->GetOutput();
 		//Need to do a copy, to break pipeline. If not all meshes will show the last label.
 		//It seems a shallow copy may be enough
 		vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
 		cubesPolyData->ShallowCopy(normals->GetOutput());
-//		cubesPolyData->DeepCopy(normals->GetOutput());
-//		CX_LOG_DEBUG() << "Num points: " << cubesPolyData->GetNumberOfPoints();
 		retval.push_back(cubesPolyData);
 	}
 	
