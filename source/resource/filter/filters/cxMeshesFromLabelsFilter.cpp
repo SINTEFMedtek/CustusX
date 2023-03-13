@@ -148,12 +148,6 @@ DoublePropertyPtr MeshesFromLabelsFilter::getEndLabelOption(QDomElement root)
 									  "Stop creating meshes from labeled volume at this label",
 									  0, DoubleRange(-1000, 1000, 1), 0, root);
 }
-DoublePropertyPtr MeshesFromLabelsFilter::getCombineLabelsOption(QDomElement root)
-{
-	return DoubleProperty::initialize("Combine labels", "",
-									  "Combine labels into buckets",
-									  1, DoubleRange(1, 100, 1), 0, root);
-}
 
 void MeshesFromLabelsFilter::createOptions()
 {
@@ -175,7 +169,6 @@ void MeshesFromLabelsFilter::createOptions()
 	//TODO: Update label values from image. Use FilterImpl::updateThresholdPairFromImageChange()?
 	mOptionsAdapters.push_back(this->getStartLabelOption(mOptions));
 	mOptionsAdapters.push_back(this->getEndLabelOption(mOptions));
-	mOptionsAdapters.push_back(this->getCombineLabelsOption(mOptions));
 }
 
 void MeshesFromLabelsFilter::createInputTypes()
@@ -271,7 +264,6 @@ bool MeshesFromLabelsFilter::execute()
 	DoublePropertyPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 	DoublePropertyPtr startLabelOption = this->getStartLabelOption(mCopiedOptions);
 	DoublePropertyPtr endLabelOption = this->getEndLabelOption(mCopiedOptions);
-	DoublePropertyPtr combineLabelsOption = this->getCombineLabelsOption(mCopiedOptions);
 
 
 	//report(QString("Creating contour from \"%1\"...").arg(input->getName()));
@@ -281,7 +273,6 @@ bool MeshesFromLabelsFilter::execute()
 //								endLabel,
 								startLabelOption->getValue(),
 								endLabelOption->getValue(),
-								combineLabelsOption->getValue(),
 								surfaceThresholdOption->getValue(),
 								reduceResolutionOption->getValue(),
 								smoothingOption->getValue(),
@@ -298,7 +289,6 @@ bool MeshesFromLabelsFilter::execute()
 std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr input,
 											   int startLabel,
 											   int endLabel,
-											   int combineLabels,
 											   double threshold,
 											   bool reduceResolution,
 											   bool smoothing,
@@ -441,10 +431,7 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 
 	std::vector<vtkPolyDataPtr> retval;
 
-	//Experimenting with combining labels. Allows dividing regular volume as well, not just label volume
-	//It really don't work that well, the combined mesh looks like something that is knitted
-//	for (unsigned int i = startLabel; i <= endLabel; i++)
-	for (unsigned int i = startLabel; i <= endLabel; i += combineLabels)
+	for (unsigned int i = startLabel; i <= endLabel; i++)
 	{
 		// see if the label exists, if not skip it
 		double frequency = histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
@@ -455,7 +442,7 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 		// select the cells for a given label
 		//selector->SetLowerThreshold(i);
 		//selector->SetUpperThreshold(i);
-		selector->ThresholdBetween(i,i+combineLabels);//VTK 7.1. To be replaced with the above lines
+		selector->ThresholdBetween(i,i);//VTK 7.1. To be replaced with the above lines
 		selector->Update();
 
 

@@ -54,7 +54,6 @@ public:
 	DoublePropertyPtr getPassBandOption(QDomElement root);
 	DoublePropertyPtr getStartLabelOption(QDomElement root);
 	DoublePropertyPtr getEndLabelOption(QDomElement root);
-	DoublePropertyPtr getCombineLabelsOption(QDomElement root);
 
 	/** This is the core algorithm, call this if you dont need all the filter stuff.
 	    Generate a contour from a vtkImageData.
@@ -62,7 +61,6 @@ public:
 	static std::vector<vtkPolyDataPtr> execute(vtkImageDataPtr input,
 								  int startLabel,
 								  int endLabel,
-								  int combineLabels,
 								  double threshold,
 								  bool reduceResolution=false,
 								  bool smoothing=true,
