@@ -51,6 +51,7 @@ protected:
 
 private:
 	DoublePropertyPtr getMinimumSizeOption(QDomElement root);
+	vtkImageDataPtr findIslandsInImage(vtkImageDataPtr image, int minimumSize);
 
 	ImagePtr mOutputImage;
 };
