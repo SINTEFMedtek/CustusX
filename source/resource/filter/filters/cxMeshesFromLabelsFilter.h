@@ -50,6 +50,7 @@ public:
 	DoublePropertyPtr getSurfaceThresholdOption(QDomElement root);
 	DoublePropertyPtr getDecimationOption(QDomElement root);
 	ColorPropertyPtr getColorOption(QDomElement root);
+	BoolPropertyPtr getGenerateColorOption(QDomElement root);
     DoublePropertyPtr getNumberOfIterationsOption(QDomElement root);
 	DoublePropertyPtr getPassBandOption(QDomElement root);
 	DoublePropertyPtr getStartLabelOption(QDomElement root);
@@ -71,12 +72,13 @@ public:
 	/** Generate a mesh from the contour using base to generate name.
 	  * Save to dataManager.
 	  */
-	static std::vector<MeshPtr> postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor color);
+	static std::vector<MeshPtr> postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor color, bool generateColors);
 
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
+	static QColor generateColor(int colorNum, int colorCount);
 
 private slots:
 	/** Set new value+range of the threshold option.

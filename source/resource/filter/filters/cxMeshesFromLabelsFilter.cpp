@@ -122,6 +122,12 @@ ColorPropertyPtr MeshesFromLabelsFilter::getColorOption(QDomElement root)
 																		QColor("green"), root);
 }
 
+BoolPropertyPtr MeshesFromLabelsFilter::getGenerateColorOption(QDomElement root)
+{
+	return BoolProperty::initialize("Generate color", "",
+									"Generate different colors for each label instead of applying the same color on all labels", true, root);
+}
+
 DoublePropertyPtr MeshesFromLabelsFilter::getNumberOfIterationsOption(QDomElement root)
 {
 	return DoubleProperty::initialize("Number of iterations (smoothing)", "",
@@ -165,6 +171,7 @@ void MeshesFromLabelsFilter::createOptions()
 	mOptionsAdapters.push_back(this->getPreserveTopologyOption(mOptions));
 
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
+	mOptionsAdapters.push_back(this->getGenerateColorOption(mOptions));
 
 	//TODO: Update label values from image. Use FilterImpl::updateThresholdPairFromImageChange()?
 	mOptionsAdapters.push_back(this->getStartLabelOption(mOptions));
@@ -449,7 +456,8 @@ bool MeshesFromLabelsFilter::postProcess()
 		return false;
 
 	ColorPropertyPtr colorOption = this->getColorOption(mOptions);
-	std::vector<MeshPtr> output = this->postProcess(mServices->patient(), mRawResult, input, colorOption->getValue());
+	BoolPropertyPtr genarateColorOption = this->getGenerateColorOption(mOptions);
+	std::vector<MeshPtr> output = this->postProcess(mServices->patient(), mRawResult, input, colorOption->getValue(), genarateColorOption->getValue());
 	mRawResult.clear();
 
 	if (!output.empty())
@@ -458,7 +466,7 @@ bool MeshesFromLabelsFilter::postProcess()
 	return true;
 }
 
-std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor color)
+std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor color, bool generateColors)
 {
 	if (contours.empty() || !base)
 		return std::vector<MeshPtr>();
@@ -475,6 +483,8 @@ std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr 
 		output->get_rMd_History()->setRegistration(base->get_rMd());
 		output->get_rMd_History()->setParentSpace(base->getUid());
 
+		if(generateColors)
+			color = generateColor(i, contours.size());
 		output->setColor(color);
 
 		patient->insertData(output);
@@ -482,6 +492,14 @@ std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr 
 	}
 
 	return retval;
+}
+
+//From code example: https://wiki.qt.io/Color_palette_generator
+QColor MeshesFromLabelsFilter::generateColor(int colorNum, int colorCount)
+{
+	double golden_ratio = 0.618033988749895;
+	double hue = golden_ratio * 360/colorCount * colorNum;
+	return  QColor::fromHsv(int(hue), 245, 245, 255);
 }
 
 } // namespace cx
