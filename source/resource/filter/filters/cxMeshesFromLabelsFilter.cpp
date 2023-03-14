@@ -58,7 +58,7 @@ QString MeshesFromLabelsFilter::getName() const
 
 QString MeshesFromLabelsFilter::getType() const
 {
-	return "MeshesFromLabels_filter";
+	return "meshes_from_labels_filter";
 }
 
 QString MeshesFromLabelsFilter::getHelp() const
@@ -108,14 +108,14 @@ DoublePropertyPtr MeshesFromLabelsFilter::getDecimationOption(QDomElement root)
 
 ColorPropertyPtr MeshesFromLabelsFilter::getColorOption(QDomElement root)
 {
-	return ColorProperty::initialize( "Color", "",
-																		"Color of output model.",
-																		QColor("green"), root);
+	return ColorProperty::initialize( "Same color for all meshes", "",
+									  "Apply the same color to all output models",
+									  QColor("green"), root);
 }
 
 BoolPropertyPtr MeshesFromLabelsFilter::getGenerateColorOption(QDomElement root)
 {
-	return BoolProperty::initialize("Generate color", "",
+	return BoolProperty::initialize("Generate different colors", "",
 									"Generate different colors for each label instead of applying the same color on all labels", true, root);
 }
 
@@ -148,6 +148,11 @@ DoublePropertyPtr MeshesFromLabelsFilter::getEndLabelOption(QDomElement root)
 
 void MeshesFromLabelsFilter::createOptions()
 {
+	mStartLabelOption = this->getStartLabelOption(mOptions);
+	mEndLabelOption = this->getEndLabelOption(mOptions);
+	mOptionsAdapters.push_back(mStartLabelOption);
+	mOptionsAdapters.push_back(mEndLabelOption);
+
 	mReduceResolutionOption = this->getReduceResolutionOption(mOptions);
 	mOptionsAdapters.push_back(mReduceResolutionOption);
 
@@ -159,11 +164,6 @@ void MeshesFromLabelsFilter::createOptions()
 
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 	mOptionsAdapters.push_back(this->getGenerateColorOption(mOptions));
-
-	mStartLabelOption = this->getStartLabelOption(mOptions);
-	mEndLabelOption = this->getEndLabelOption(mOptions);
-	mOptionsAdapters.push_back(mStartLabelOption);
-	mOptionsAdapters.push_back(mEndLabelOption);
 }
 
 void MeshesFromLabelsFilter::createInputTypes()
