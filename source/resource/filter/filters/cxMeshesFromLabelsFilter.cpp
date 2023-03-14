@@ -97,20 +97,11 @@ BoolPropertyPtr MeshesFromLabelsFilter::getPreserveTopologyOption(QDomElement ro
 																	"Preserve mesh topology during reduction", true, root);
 }
 
-DoublePropertyPtr MeshesFromLabelsFilter::getSurfaceThresholdOption(QDomElement root)
-{
-	DoublePropertyPtr retval = DoubleProperty::initialize("Threshold", "",
-																												"Values from this threshold and above will be included",
-																												100.0, DoubleRange(-1000, 1000, 1), 0, root);
-	retval->setGuiRepresentation(DoublePropertyBase::grSLIDER);
-	return retval;
-}
-
 DoublePropertyPtr MeshesFromLabelsFilter::getDecimationOption(QDomElement root)
 {
 	DoublePropertyPtr retval = DoubleProperty::initialize("Decimation %", "",
-																												"Reduce number of triangles in output surface",
-																												0.2, DoubleRange(0, 1, 0.01), 0, root);
+														  "Reduce number of triangles in output surface",
+														  0.99, DoubleRange(0, 1, 0.01), 0, root);
 	retval->setInternal2Display(100);
 	return retval;
 }
@@ -138,8 +129,8 @@ DoublePropertyPtr MeshesFromLabelsFilter::getNumberOfIterationsOption(QDomElemen
 DoublePropertyPtr MeshesFromLabelsFilter::getPassBandOption(QDomElement root)
 {
 	return DoubleProperty::initialize("Band pass smoothing", "",
-																		"Band pass width in smoothing filter. Smaller number = more smoothing",
-																		0.30, DoubleRange(0.01, 0.95, 0.01), 2, root);
+									  "Band pass width in smoothing filter. Smaller number = more smoothing",
+									  0.03, DoubleRange(0.01, 0.95, 0.01), 2, root);
 }
 DoublePropertyPtr MeshesFromLabelsFilter::getStartLabelOption(QDomElement root)
 {
@@ -160,10 +151,6 @@ void MeshesFromLabelsFilter::createOptions()
 	mReduceResolutionOption = this->getReduceResolutionOption(mOptions);
 	mOptionsAdapters.push_back(mReduceResolutionOption);
 
-	mSurfaceThresholdOption = this->getSurfaceThresholdOption(mOptions);
-	connect(mSurfaceThresholdOption.get(), SIGNAL(changed()), this, SLOT(thresholdSlot()));
-	mOptionsAdapters.push_back(mSurfaceThresholdOption);
-
 	mOptionsAdapters.push_back(this->getSmoothingOption(mOptions));
 	mOptionsAdapters.push_back(this->getNumberOfIterationsOption(mOptions));
 	mOptionsAdapters.push_back(this->getPassBandOption(mOptions));
@@ -173,9 +160,10 @@ void MeshesFromLabelsFilter::createOptions()
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
 	mOptionsAdapters.push_back(this->getGenerateColorOption(mOptions));
 
-	//TODO: Update label values from image. Use FilterImpl::updateThresholdPairFromImageChange()?
-	mOptionsAdapters.push_back(this->getStartLabelOption(mOptions));
-	mOptionsAdapters.push_back(this->getEndLabelOption(mOptions));
+	mStartLabelOption = this->getStartLabelOption(mOptions);
+	mEndLabelOption = this->getEndLabelOption(mOptions);
+	mOptionsAdapters.push_back(mStartLabelOption);
+	mOptionsAdapters.push_back(mEndLabelOption);
 }
 
 void MeshesFromLabelsFilter::createInputTypes()
@@ -220,8 +208,11 @@ void MeshesFromLabelsFilter::imageChangedSlot(QString uid)
 	if(!image)
 		return;
 
-	this->updateThresholdFromImageChange(uid, mSurfaceThresholdOption);
-	this->stopPreview();
+	int min = image->getMin();
+	if(min == 0)
+		min = 1;//Default: Skip label 0. Still label 0 may be usedful, as the vtkDiscreteMarchingCubes filter seems to merge all labels >0 into this instead of using the 0 label
+	mStartLabelOption->setValue(min);
+	mEndLabelOption->setValue(image->getMax());
 
 	int extent[6];
 	image->getBaseVtkImageData()->GetExtent(extent);
@@ -229,19 +220,6 @@ void MeshesFromLabelsFilter::imageChangedSlot(QString uid)
 																		+ " " + qstring_cast(extent[3]) + " " + qstring_cast(extent[5])
 																		+ " (If checked: " + qstring_cast(extent[1]/2)+ " " + qstring_cast(extent[3]/2) + " "
 																		+ qstring_cast(extent[5]/2) + ")");
-}
-
-void MeshesFromLabelsFilter::thresholdSlot()
-{
-	if (mActive)
-	{
-		mPreviewImage = boost::dynamic_pointer_cast<Image>(mInputTypes[0]->getData());
-		if(mPreviewImage)
-		{
-			Eigen::Vector2d threshold = Eigen::Vector2d(mSurfaceThresholdOption->getValue(),  mPreviewImage->getMax());
-			mPreviewImage->startThresholdPreview(threshold);
-		}
-	}
 }
 
 bool MeshesFromLabelsFilter::preProcess()
@@ -261,7 +239,6 @@ bool MeshesFromLabelsFilter::execute()
 	DoublePropertyPtr numberOfIterationsOption = this->getNumberOfIterationsOption(mCopiedOptions);
 	DoublePropertyPtr passBandOption = this->getPassBandOption(mCopiedOptions);
 	BoolPropertyPtr preserveTopologyOption = this->getPreserveTopologyOption(mCopiedOptions);
-	DoublePropertyPtr surfaceThresholdOption = this->getSurfaceThresholdOption(mCopiedOptions);
 	DoublePropertyPtr decimationOption = this->getDecimationOption(mCopiedOptions);
 	DoublePropertyPtr startLabelOption = this->getStartLabelOption(mCopiedOptions);
 	DoublePropertyPtr endLabelOption = this->getEndLabelOption(mCopiedOptions);
@@ -271,7 +248,6 @@ bool MeshesFromLabelsFilter::execute()
 	mRawResult = this->execute( input->getBaseVtkImageData(),
 								startLabelOption->getValue(),
 								endLabelOption->getValue(),
-								surfaceThresholdOption->getValue(),
 								reduceResolutionOption->getValue(),
 								smoothingOption->getValue(),
 								preserveTopologyOption->getValue(),
@@ -286,7 +262,6 @@ bool MeshesFromLabelsFilter::execute()
 std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr input,
 											   int startLabel,
 											   int endLabel,
-											   double threshold,
 											   bool reduceResolution,
 											   bool smoothing,
 											   bool preserveTopology,
