@@ -100,6 +100,8 @@ bool IslandsFilter::execute()
 	int minimumSize = int(this->getMinimumSizeOption(mOptions)->getValue());
 	
 	mOutputImage = this->execute(inputImage, minimumSize);
+	if(!mOutputImage)
+		return false;
 
 	if(mOutputTypes.size() > 0)
 		mOutputTypes[0]->setValue(mOutputImage->getUid());
