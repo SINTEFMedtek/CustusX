@@ -49,7 +49,6 @@ void AirwaysFromCenterline::setTypeToBloodVessel(bool bloodVessel)
 
 Eigen::MatrixXd AirwaysFromCenterline::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
-
 	int N = centerline_r->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
@@ -68,9 +67,11 @@ void AirwaysFromCenterline::setBranches(BranchListPtr branches)
 	mBranchListPtr = branches;
 }
 
-void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume)
+void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd)
 {
 	mOriginalSegmentedVolume = segmentedVolume;
+	m_rMd = rMd;
+
 }
 
 void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
@@ -245,11 +246,12 @@ vtkImageDataPtr AirwaysFromCenterline::addSpheresAlongCenterlines(vtkImageDataPt
 
 		for (int j = 0; j < numberOfPositionsInBranch; j++)
 		{
-			double spherePos[3];
-			spherePos[0] = positions(0,j);
-			spherePos[1] = positions(1,j);
-			spherePos[2] = positions(2,j);
-			airwaysVolumePtr = addSphereToImage(airwaysVolumePtr, spherePos, radius);
+			positions.block(0 , j , 3 , 1) = m_rMd.inverse().coord(positions.block(0 , j , 3 , 1)); //transfrom from r to d
+			double spherePos_d[3];
+			spherePos_d[0] = positions(0,j);
+			spherePos_d[1] = positions(1,j);
+			spherePos_d[2] = positions(2,j);
+			airwaysVolumePtr = addSphereToImage(airwaysVolumePtr, spherePos_d, radius);
 		}
 	}
 	return airwaysVolumePtr;

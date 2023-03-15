@@ -208,7 +208,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 
 	static QString airwaysFilterGetNameSuffixAirways()
 	{
-		return "_airways";
+		return "Airways"; //"_airways"
 	}
 
 	static QString airwaysFilterGetNameSuffixTubes()

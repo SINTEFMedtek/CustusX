@@ -128,9 +128,13 @@ void FiltersWidget::appendFiltersThatAreNotServices(VisServicesPtr services)
 	this->appendFilterIfWanted(FilterPtr(new IslandsFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new ColorVariationFilter(services)));
 	this->appendFilterIfWanted(FilterPtr(new SmoothingImageFilter(services)));
-	this->appendFilterIfWanted(FilterPtr(new GenericScriptFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new ResampleImageFilter(services)));
     this->appendFilterIfWanted(FilterPtr(new DilationFilter(services)));
+
+	GenericScriptFilterPtr genericScriptFilter(new GenericScriptFilter(services));
+	this->appendFilterIfWanted(FilterPtr(genericScriptFilter));
+
+	connect(genericScriptFilter.get(), &GenericScriptFilter::launchDialog, genericScriptFilter.get(), &GenericScriptFilter::launchDialogSlot);
 }
 
 void FiltersWidget::appendFilterServices()

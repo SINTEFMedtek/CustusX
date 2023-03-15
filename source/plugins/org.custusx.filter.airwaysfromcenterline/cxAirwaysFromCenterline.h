@@ -31,7 +31,7 @@ public:
 	void setTypeToBloodVessel(bool bloodVessel);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void setBranches(BranchListPtr branches);
-	void setSegmentedVolume(vtkImageDataPtr segmentedVolume);
+	void setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd = Transform3D::Identity());
 	void processCenterline(vtkPolyDataPtr centerline_r);
 	BranchListPtr getBranchList();
 	vtkPolyDataPtr generateTubes(double staticRadius = 0, bool mergeWithOriginalAirways = false);
@@ -56,6 +56,7 @@ private:
 	double mAirwaysVolumeSpacing;
 	bool mBloodVessel = false;
 	bool mMergeWithOriginalAirways = false;
+	Transform3D m_rMd = Transform3D::Identity();
 
 };
 

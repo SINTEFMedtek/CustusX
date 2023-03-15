@@ -44,6 +44,8 @@ void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties prop
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
 {
 	DataPtr data = mServices->patient()->getData(uid);
+	if(!data)
+		return;
 
 	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 

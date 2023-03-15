@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
-//#include <QProcess>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
@@ -21,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
 
 struct cxResourceFilter_EXPORT CommandStringVariables
 {
@@ -32,17 +32,17 @@ struct cxResourceFilter_EXPORT CommandStringVariables
 	QString scriptEngine;
 	QString model;
 
-    CommandStringVariables(QString parameterFilePath, ImagePtr input);
+	CommandStringVariables(QString parameterFilePath, ImagePtr input);
 };
 
 struct cxResourceFilter_EXPORT OutputVariables
 {
-    bool mCreateOutputVolume;
-    bool mCreateOutputMesh;
-    QStringList mOutputColorList;
-    QStringList mOutputClasses;
+	bool mCreateOutputVolume;
+	bool mCreateOutputMesh;
+	QStringList mOutputColorList;
+	QStringList mOutputClasses;
 
-    OutputVariables(QString parameterFilePath);
+	OutputVariables(QString parameterFilePath);
 };
 
 /** Generic filter calling external filter script.
@@ -61,6 +61,15 @@ public:
 	GenericScriptFilter(VisServicesPtr services);
 	virtual ~GenericScriptFilter();
 
+	enum SCRIPT_ENGINE
+	{
+		seUnknown,
+		seStandard,
+		seDeepSintef,
+		seRaidionics,
+		seCOUNT
+	};
+
 	virtual QString getType() const;
 	virtual QString getName() const;
 	virtual QString getHelp() const;
@@ -70,9 +79,14 @@ public:
 
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
-    void setParameterFilePath(QString path);
+	void setParameterFilePath(QString path);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
+
+signals:
+	void launchDialog(QString venvPath, QString createCommand, QString command);
+public slots:
+	void launchDialogSlot(QString venvPath, QString createCommand, QString command);
 
 protected:
 	virtual void createOptions();
@@ -95,18 +109,24 @@ protected:
 
 	CommandStringVariables createCommandStringVariables(ImagePtr input);
 	QString standardCommandString(CommandStringVariables variables);
-	bool isUsingDeepSintefEngine(CommandStringVariables variables);
+	QString findScriptFile(QString path);
+	bool isUsingRaidionicsEngine();
 	QString deepSintefCommandString(CommandStringVariables variables);
 	
 	bool environmentExist(QString path);
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
 	QString findRequirementsFileLocation(QString path);
-	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath);
+	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript = QString(), QString command = QString());
 	bool isVirtualEnvironment(QString path);
 	QString getFixedEnvironmentSubdir();
+	QString removeTrailingPythonVariable(QString environmentPath);
+	bool showVenvInfoDialog(QString venvPath, QString createCommand);
+	bool createVenv(QString createCommand, QString command);
+	void setScriptEngine(CommandStringVariables variables);
+	void initRaidionicsEngine(CommandStringVariables variables);
 
-    FilePathPropertyPtr mScriptFile;
+	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
 
 	vtkImageDataPtr mRawResult;
@@ -119,9 +139,11 @@ protected:
 	QList<QColor> mOutputColors;
 	QStringList mOutputClasses;
 
-    SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
-    StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
+	SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
+	StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
+	SCRIPT_ENGINE mScriptEngine = seUnknown;
+	RaidionicsPtr mRaidionicsUtilities;
 
 protected slots:
 	void scriptFileChanged();
@@ -133,7 +155,6 @@ protected slots:
 	bool createProcess();
 	bool deleteProcess();
 	bool disconnectProcess();
-
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 
