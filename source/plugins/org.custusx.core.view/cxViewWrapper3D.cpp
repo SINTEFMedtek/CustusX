@@ -168,7 +168,9 @@ void ViewWrapper3D::setupTransparentMeshes()
 
 void ViewWrapper3D::enableTransparentMeshesSlot()
 {
-	this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	//Fix for mac (CX-510): Only set depth peeling if View3D/depthPeeling == true
+	if(settings()->value("View3D/depthPeeling").toBool())
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
 	disconnect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
 }
 
