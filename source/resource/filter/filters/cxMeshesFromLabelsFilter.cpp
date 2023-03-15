@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMeshesFromLabelsFilter.h"
 
 #include <vtkImageShrink3D.h>
-//#include <vtkMarchingCubes.h>
 #include <vtkWindowedSincPolyDataFilter.h>
 #include <vtkTriangleFilter.h>
 #include <vtkDecimatePro.h>
@@ -28,7 +27,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPointData.h>
 #include <vtkMaskFields.h>
 #include <vtkGeometryFilter.h>
-//#include <vtkXMLPolyDataWriter.h>//Test
 
 #include "cxRegistrationTransform.h"
 #include "cxTypeConversions.h"
@@ -301,7 +299,6 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 	discreteCubes->GenerateValues(endLabel - startLabel + 1, startLabel, endLabel);
 	discreteCubes->Update();
 
-
 	// Smooth surface model
 	vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
 
@@ -318,10 +315,9 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 		smoother->SetFeatureEdgeSmoothing(false);
 		smoother->SetNormalizeCoordinates(true);
 		smoother->SetFeatureAngle(120);
-		smoother->SetPassBand(passBand);//Lower number = more smoothing  -  default 0.3
+		smoother->SetPassBand(passBand);//Lower number = more smoothing  -  default 0.03
 		smoother->Update();
 	}
-
 
 	vtkNew<vtkThreshold> selector;
 	selector->SetInputConnection(outputPort);
@@ -336,15 +332,12 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 									 vtkDataSetAttributes::SCALARS);
 //  #endif
 
-
 	// Strip the scalars from the output
 	vtkNew<vtkMaskFields> scalarsOff;
 	scalarsOff->SetInputConnection(selector->GetOutputPort());
 	scalarsOff->CopyAttributeOff(vtkMaskFields::POINT_DATA, vtkDataSetAttributes::SCALARS);
 	scalarsOff->CopyAttributeOff(vtkMaskFields::CELL_DATA, vtkDataSetAttributes::SCALARS);
 
-
-//	selector->SetInputConnection(smoother->GetOutputPort());
 	selector->SetInputConnection(outputPort);
 	selector->SetInputArrayToProcess(0, 0, 0,
 									 vtkDataObject::FIELD_ASSOCIATION_CELLS,
@@ -387,7 +380,7 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 	{
 		// see if the label exists, if not skip it
 		double frequency = histogram->GetOutput()->GetPointData()->GetScalars()->GetTuple1(i);
-		CX_LOG_DEBUG() << "Label " << i << " frequency: " << frequency;
+//		CX_LOG_DEBUG() << "Label " << i << " frequency: " << frequency;
 		if (frequency == 0.0)
 			continue;
 
@@ -397,21 +390,9 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 		selector->ThresholdBetween(i,i);//VTK 7.1. To be replaced with the above lines
 		selector->Update();
 
-
-		//Test: Save polydata to file
-//		vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-//		writer->SetInputConnection(geometry->GetOutputPort());
-//		std::stringstream ss;
-//		std::string filePrefix = "Label";
-//		ss << filePrefix << i << ".vtp";
-//		cout << " writing " << ss.str() << endl;
-//		writer->SetFileName(ss.str().c_str());
-//		writer->Write();
-
 		normals->Update();
 
 		//Need to do a copy, to break pipeline. If not all meshes will show the last label.
-		//It seems a shallow copy may be enough
 		vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
 		cubesPolyData->ShallowCopy(normals->GetOutput());
 		retval.push_back(cubesPolyData);
