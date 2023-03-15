@@ -108,15 +108,15 @@ DoublePropertyPtr MeshesFromLabelsFilter::getDecimationOption(QDomElement root)
 
 ColorPropertyPtr MeshesFromLabelsFilter::getColorOption(QDomElement root)
 {
-	return ColorProperty::initialize( "Same color for all meshes", "",
-									  "Apply the same color to all output models",
-									  QColor("green"), root);
+	return ColorProperty::initialize( "Color", "",
+									  "Apply color to all output models",
+									  QColor("red"), root);
 }
 
 BoolPropertyPtr MeshesFromLabelsFilter::getGenerateColorOption(QDomElement root)
 {
 	return BoolProperty::initialize("Generate different colors", "",
-									"Generate different colors for each label instead of applying the same color on all labels", true, root);
+									"Generate different colors for each label, starting with the initial color, and going through the color circle", true, root);
 }
 
 DoublePropertyPtr MeshesFromLabelsFilter::getNumberOfIterationsOption(QDomElement root)
@@ -441,7 +441,7 @@ bool MeshesFromLabelsFilter::postProcess()
 	return true;
 }
 
-std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor color, bool generateColors)
+std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor initialColor, bool generateColors)
 {
 	if (contours.empty() || !base)
 		return std::vector<MeshPtr>();
@@ -458,8 +458,9 @@ std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr 
 		output->get_rMd_History()->setRegistration(base->get_rMd());
 		output->get_rMd_History()->setParentSpace(base->getUid());
 
+		QColor color = initialColor;
 		if(generateColors)
-			color = generateColor(i, contours.size());
+			color = generateColor(initialColor, i, contours.size());
 		output->setColor(color);
 
 		patient->insertData(output);
@@ -469,12 +470,14 @@ std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr 
 	return retval;
 }
 
-//From code example: https://wiki.qt.io/Color_palette_generator
-QColor MeshesFromLabelsFilter::generateColor(int colorNum, int colorCount)
+//Start the generated colors on the input color, but still use the whole color circle
+//Keep the hue, saturation and alpha of the input color
+QColor MeshesFromLabelsFilter::generateColor(QColor initialColor, int colorNum, int colorCount)
 {
-	double golden_ratio = 0.618033988749895;
-	double hue = golden_ratio * 360/colorCount * colorNum;
-	return  QColor::fromHsv(int(hue), 245, 245, 255);
+	int hue = int(360.0/colorCount * colorNum);
+	hue += initialColor.hsvHue();
+	hue %= 360;//hue range should be 0-359
+	return  QColor::fromHsv(hue, initialColor.saturation(), initialColor.value(), initialColor.alpha());
 }
 
 } // namespace cx

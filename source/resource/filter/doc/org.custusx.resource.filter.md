@@ -138,8 +138,7 @@ The filter is similar to the Contour Filter, but provides several output meshes.
 - Optional preserve mesh topology
 - Number of iterations in smoothing filter. Higher number = more smoothing
 - Band pass width in smoothing filter. Smaller number = more smoothing
-- Optional generate different colors on all meshes, or specify the same color for all
-
+- Specify the same color for all meshes, or optionally generating different colors starting with the selected one
 
 \addtogroup cx_user_doc_group_filter
 

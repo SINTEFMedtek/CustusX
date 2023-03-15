@@ -70,13 +70,13 @@ public:
 	/** Generate meshes from the contours using base to generate name.
 	* Save to dataManager.
 	*/
-	static std::vector<MeshPtr> postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor color, bool generateColors);
+	static std::vector<MeshPtr> postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor initialColor, bool generateColors);
 
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
-	static QColor generateColor(int colorNum, int colorCount);
+	static QColor generateColor(QColor initialColor, int colorNum, int colorCount);
 
 private slots:
 	void imageChangedSlot(QString uid);
