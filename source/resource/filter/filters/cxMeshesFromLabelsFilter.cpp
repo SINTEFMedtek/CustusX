@@ -413,7 +413,7 @@ bool MeshesFromLabelsFilter::postProcess()
 
 	ColorPropertyPtr colorOption = this->getColorOption(mOptions);
 	BoolPropertyPtr genarateColorOption = this->getGenerateColorOption(mOptions);
-	std::vector<MeshPtr> output = this->postProcess(mServices->patient(), mRawResult, input, colorOption->getValue(), genarateColorOption->getValue());
+	std::vector<MeshPtr> output = this->postProcess(mServices, mRawResult, input, colorOption->getValue(), genarateColorOption->getValue());
 	mRawResult.clear();
 
 	if (!output.empty())
@@ -422,7 +422,7 @@ bool MeshesFromLabelsFilter::postProcess()
 	return true;
 }
 
-std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr patient, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor initialColor, bool generateColors)
+std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(VisServicesPtr services, std::vector<vtkPolyDataPtr> contours, ImagePtr base, QColor initialColor, bool generateColors)
 {
 	if (contours.empty() || !base)
 		return std::vector<MeshPtr>();
@@ -433,7 +433,7 @@ std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr 
 	{
 		QString uid = base->getUid() + MeshesFromLabelsFilter::getNameSuffix() + "%1";
 		QString name = base->getName()+ MeshesFromLabelsFilter::getNameSuffix() + "%1";
-		MeshPtr output = patient->createSpecificData<Mesh>(uid, name);
+		MeshPtr output = services->patient()->createSpecificData<Mesh>(uid, name);
 		output->setVtkPolyData(contours[i]);
 
 		output->get_rMd_History()->setRegistration(base->get_rMd());
@@ -444,9 +444,11 @@ std::vector<MeshPtr> MeshesFromLabelsFilter::postProcess(PatientModelServicePtr 
 			color = generateColor(initialColor, i, contours.size());
 		output->setColor(color);
 
-		patient->insertData(output);
+		services->patient()->insertData(output);
+		services->view()->autoShowData(output);
 		retval.push_back(output);
 	}
+	services->patient()->autoSave();
 
 	return retval;
 }
