@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
 #include "cxVisServices.h"
+#include "cxMeshesFromLabelsFilter.h"
 
 namespace cx
 {
@@ -206,7 +207,8 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	for(int i=0; i<mRawResult.size(); i++)
+	int numberOfCenterlines = mRawResult.size();
+	for(int i=0; i<numberOfCenterlines; i++)
 	{
 		ImagePtr outImage = createDerivedImage(mServices->patient(),
 											 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
@@ -222,7 +224,8 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 		QString name = input->getName()+" cl%1";
 		MeshPtr mesh = mServices->patient()->createSpecificData<Mesh>(uid, name);
 		mesh->setVtkPolyData(centerlinePolyData);
-		mesh->setColor(outputColor->getValue());
+		QColor color = MeshesFromLabelsFilter::generateColor(outputColor->getValue(), i, numberOfCenterlines);
+		mesh->setColor(color);
 		mesh->get_rMd_History()->setParentSpace(input->getUid());
 		mServices->patient()->insertData(mesh);
 
