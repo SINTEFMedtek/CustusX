@@ -145,9 +145,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
-	//Only try to set depth peeling if View3D/depthPeeling == true
-	if(settings()->value("View3D/depthPeeling").toBool())
-		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	setupTransparentMeshes();
 
 	this->updateView();
 }
@@ -159,6 +157,21 @@ ViewWrapper3D::~ViewWrapper3D()
 		mView->removeReps();
 		mMultiVolume3DRepProducer->removeRepsFromView();
 	}
+}
+
+void ViewWrapper3D::setupTransparentMeshes()
+{
+	//Setting up depth peeling in constructor fails (on Ubuntu 20.04).
+	//Delay until we get first active data to make sure VTK structures are correctly setup.
+	connect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
+}
+
+void ViewWrapper3D::enableTransparentMeshesSlot()
+{
+	//Fix for mac (CX-510): Only set depth peeling if View3D/depthPeeling == true
+	if(settings()->value("View3D/depthPeeling").toBool())
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	disconnect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
 }
 
 void ViewWrapper3D::initializeMultiVolume3DRepProducer()

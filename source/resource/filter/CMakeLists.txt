@@ -22,6 +22,8 @@ cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
     filters/cxResampleImageFilter
     filters/cxGenericScriptFilter
     filters/cxColorVariationFilter
+    filters/cxIslandsFilter
+    filters/cxMeshesFromLabelsFilter
 )
 
 cx_create_export_header("cxResourceFilter")
