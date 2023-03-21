@@ -29,7 +29,6 @@ class RecordSessionWidget;
 typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 //typedef boost::shared_ptr<class BronchoscopyRegistration> BronchoscopyRegistrationPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
 /**

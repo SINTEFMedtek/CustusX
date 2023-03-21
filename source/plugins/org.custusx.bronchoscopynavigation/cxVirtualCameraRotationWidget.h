@@ -45,7 +45,6 @@ class QVBoxLayout;
 
 namespace cx
 {
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 	
 /**
  * Widget for calibration virtual camera rotation

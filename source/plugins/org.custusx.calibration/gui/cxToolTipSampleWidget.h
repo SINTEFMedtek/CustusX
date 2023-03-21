@@ -26,7 +26,6 @@ namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
 typedef boost::shared_ptr<class StringPropertySelectData> StringPropertySelectDataPtr;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 typedef boost::shared_ptr<class StringPropertySelectCoordinateSystem> StringPropertySelectCoordinateSystemPtr;
 class LabeledComboBoxWidget;
 

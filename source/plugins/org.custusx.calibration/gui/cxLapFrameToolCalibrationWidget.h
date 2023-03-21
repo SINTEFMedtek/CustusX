@@ -28,7 +28,6 @@ class QLineEdit;
 namespace cx
 {
 typedef boost::shared_ptr<class VisServices> VisServicesPtr;
-typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 /**
  * \file
