@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBinaryThinningImageFilter3DFilter.h"
 
 #include <itkBinaryThinningImageFilter3D.h>
+#include <itkBinaryThresholdImageFilter.h>
 
 #include "cxLogger.h"
 #include "cxRegistrationTransform.h"
@@ -78,9 +79,17 @@ ColorPropertyBasePtr BinaryThinningImageFilter3DFilter::getColorOption(QDomEleme
 	                                            QColor("green"), root);
 }
 
+BoolPropertyPtr BinaryThinningImageFilter3DFilter::getLabeledVolumeOption(QDomElement root)
+{
+	return BoolProperty::initialize("Labeled volume", "",
+																	"Select to generate seperate centerlines for each label in input volume.",
+																	 false, root);
+}
+
 void BinaryThinningImageFilter3DFilter::createOptions()
 {
 	mOptionsAdapters.push_back(this->getColorOption(mOptions));
+	mOptionsAdapters.push_back(this->getLabeledVolumeOption(mOptions));
 }
 
 void BinaryThinningImageFilter3DFilter::createInputTypes()
@@ -129,65 +138,100 @@ bool BinaryThinningImageFilter3DFilter::execute()
 	if (!input)
 		return false;
 
-	if (input->getMax() != 1 || input->getMin() != 0)
-	{
-		return false;
-	}
-
 	//      report(QString("Creating centerline from \"%1\"...").arg(input->getName()));
+
+	BoolPropertyPtr labeledVolumeOption = this->getLabeledVolumeOption(mCopiedOptions);
+	mRawResult =  this->execute(input, labeledVolumeOption->getValue());
+	if (mRawResult.empty())
+		return false;
+	else
+		return true;
+}
+
+std::vector<vtkImageDataPtr> BinaryThinningImageFilter3DFilter::execute(ImagePtr input, bool labeledVolume)
+{
+
+	std::vector<vtkImageDataPtr> retval;
 
 	itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(input);
 
-	//Centerline extraction
-	typedef itk::BinaryThinningImageFilter3D<itkImageType, itkImageType> centerlineFilterType;
-	centerlineFilterType::Pointer centerlineFilter = centerlineFilterType::New();
-	centerlineFilter->SetInput(itkImage);
-	centerlineFilter->Update();
-	itkImage = centerlineFilter->GetOutput();
+	int minValue = input->getMin();
+	int maxValue = input->getMax();
 
-	//Convert ITK to VTK
-	itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-	itkToVtkFilter->SetInput(itkImage);
-	itkToVtkFilter->Update();
+	if(!labeledVolume)
+	{
+		if (maxValue != 1 || minValue != 0)
+			return retval;
+	}
 
-	vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-	rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+	typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
+	thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
+	thresholdFilter->SetInput(itkImage);
+	thresholdFilter->SetOutsideValue(0);
+	thresholdFilter->SetInsideValue(1);
+	for(int value=minValue+1; value<=maxValue; value++)
+	{
+		thresholdFilter->SetLowerThreshold(value);
+		thresholdFilter->SetUpperThreshold(value);
+		thresholdFilter->Update();
+		itkImageType::ConstPointer itkBinaryImage = thresholdFilter->GetOutput();
 
-	mRawResult =  rawResult;
-	return true;
+		//Centerline extraction
+		typedef itk::BinaryThinningImageFilter3D<itkImageType, itkImageType> centerlineFilterType;
+		centerlineFilterType::Pointer centerlineFilter = centerlineFilterType::New();
+		centerlineFilter->SetInput(itkBinaryImage);
+		centerlineFilter->Update();
+		itkImageType::ConstPointer itkOutputImage = centerlineFilter->GetOutput();
+
+		//Convert ITK to VTK
+		itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+		itkToVtkFilter->SetInput(itkOutputImage);
+		itkToVtkFilter->Update();
+
+		vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+		rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+		retval.push_back(rawResult);
+	}
+
+	return retval;
 }
 
 bool BinaryThinningImageFilter3DFilter::postProcess()
 {
 	bool success = false;
-	if(!mRawResult)
+	if(mRawResult.empty())
 		return success;
 
 	ColorPropertyBasePtr outputColor = this->getColorOption(mCopiedOptions);
 
 	ImagePtr input = this->getCopiedInputImage();
 
-	ImagePtr outImage = createDerivedImage(mServices->patient(),
-										 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
-										 mRawResult, input);
+	for(int i=0; i<mRawResult.size(); i++)
+	{
+		ImagePtr outImage = createDerivedImage(mServices->patient(),
+											 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
+											 mRawResult[i], input);
 
-	mRawResult = NULL;
-	outImage->resetTransferFunctions();
+		mRawResult[i] = NULL;
+		outImage->resetTransferFunctions();
 
-	//automatically generate a mesh from the centerline
-	vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(outImage, 1, 0);
+		//automatically generate a mesh from the centerline
+		vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(outImage, 1, 0);
 
-	QString uid = input->getUid() + "_cl%1";
-	QString name = input->getName()+" cl%1";
-	MeshPtr mesh = mServices->patient()->createSpecificData<Mesh>(uid, name);
-	mesh->setVtkPolyData(centerlinePolyData);
-	mesh->setColor(outputColor->getValue());
-	mesh->get_rMd_History()->setParentSpace(input->getUid());
-	mServices->patient()->insertData(mesh);
+		QString uid = input->getUid() + "_cl%1";
+		QString name = input->getName()+" cl%1";
+		MeshPtr mesh = mServices->patient()->createSpecificData<Mesh>(uid, name);
+		mesh->setVtkPolyData(centerlinePolyData);
+		mesh->setColor(outputColor->getValue());
+		mesh->get_rMd_History()->setParentSpace(input->getUid());
+		mServices->patient()->insertData(mesh);
 
-	// set output
-	mOutputTypes.front()->setValue(mesh->getUid());
-	success = true;
+		// set first centerline as output in filter
+		if(i==0)
+			mOutputTypes.front()->setValue(mesh->getUid());
+
+		success = true;
+	}
 
 	return success;
 }
