@@ -285,6 +285,15 @@ std::string matrixAsSingleLineString(cx::Transform3D transform)
 	return stream.str();
 }
 
+bool isValid(const Transform3D& transform)
+{
+	double sum = transform.matrix().sum();
+	if(boost::math::isnan(sum))
+		return false;
+	if(boost::math::isinf(sum))
+		return false;
+	return true;
+}
 
 } // namespace cx
 // --------------------------------------------------------
