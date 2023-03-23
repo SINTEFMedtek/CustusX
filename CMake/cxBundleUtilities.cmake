@@ -287,7 +287,7 @@ function(cx_get_bundle_keys app libs dirs keys_var)
   endif()
 endfunction()
 
-# Based on the vanilla version (3.6.2),
+# Based on the vanilla version (3.6.2) - Updated with code from 3.26
 # EXCEPT: - cx_get_bundle_keys() is called instead of get_bundle_keys()
 #         - binaries are chmoded to writable prior to fixup (BU_CHMOD_BUNDLE_ITEMS=ON)
 #
@@ -357,6 +357,9 @@ function(cx_fixup_bundle app libs dirs)
             set (BU_CHMOD_BUNDLE_ITEMS ON)
           endif()
           copy_resolved_item_into_bundle("${${key}_RESOLVED_ITEM}"
+            "${${key}_RESOLVED_EMBEDDED_ITEM}")
+          #Test Copy all items into framework as well, to see if this fixes the issue with missing dylib files on Mac
+          copy_resolved_framework_into_bundle("${${key}_RESOLVED_ITEM}"
             "${${key}_RESOLVED_EMBEDDED_ITEM}")
         endif()
       endif()
