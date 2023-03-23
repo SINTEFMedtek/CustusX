@@ -106,3 +106,7 @@ sudo apt install -y libglvnd-dev
 
 #For more convenient use of CustusX build scripts
 sudo apt install -y python-is-python3
+
+# Python future may still be needed
+sudo apt install -y python3-pip
+pip install future
