@@ -358,9 +358,6 @@ function(cx_fixup_bundle app libs dirs)
           endif()
           copy_resolved_item_into_bundle("${${key}_RESOLVED_ITEM}"
             "${${key}_RESOLVED_EMBEDDED_ITEM}")
-          #Test Copy all items into framework as well, to see if this fixes the issue with missing dylib files on Mac
-          copy_resolved_framework_into_bundle("${${key}_RESOLVED_ITEM}"
-            "${${key}_RESOLVED_EMBEDDED_ITEM}")
         endif()
       endif()
     endforeach()

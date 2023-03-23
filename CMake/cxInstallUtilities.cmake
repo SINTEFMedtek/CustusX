@@ -130,6 +130,7 @@ macro(cx_install_set_relative_path)
         if(CX_APPLE)
                 # Add support for Frameworks installed into the bundle:
                 # http://cmake.org/Wiki/CMake_RPATH_handling
+                SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:@executable_path/")
                 SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:@executable_path/../Frameworks/")
         endif(CX_APPLE)
 
