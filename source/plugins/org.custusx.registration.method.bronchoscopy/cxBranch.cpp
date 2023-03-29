@@ -210,12 +210,12 @@ void Branch::removeEqualPositions()
 
 void Branch::setLap(QString lap)
 {
-	mLap = lap;
+	mLobe = lap;
 }
 
 QString Branch::getLap()
 {
-	return mLap;
+	return mLobe;
 }
 
 
