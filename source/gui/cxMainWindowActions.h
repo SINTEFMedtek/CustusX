@@ -48,7 +48,7 @@ private slots:
 	void updatePointPickerActionSlot();
 
 	//tool menu
-	void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
+	void reconfigureTrackingSlot();///< Deconfigure tools, and start tracking again. Useful when changing tool configuration. (Run: deconfigure -> configure -> initialize -> start tracking)
 
 	// help
 	void onGotoDocumentation();

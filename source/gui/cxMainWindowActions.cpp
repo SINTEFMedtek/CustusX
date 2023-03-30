@@ -121,14 +121,9 @@ void MainWindowActions::createActions()
 
 void MainWindowActions::createTrackingActions()
 {
-//	this->createAction("ConfigureTools", "Tool configuration",
-//					   QIcon(), QKeySequence(), "",
-//					   &MainWindowActions::configureSlot);
-
-//	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
-//	this->createAction("InitializeTools", "Initialize",
-//					   QIcon(), QKeySequence(), "",
-//					   finit);
+	this->createAction("ReconfigureTools", "Reconfigure tracking",
+					   QIcon(), QKeySequence(), "Deconfigure tools, and start tracking again. Useful when changing tool configuration",
+					   &MainWindowActions::reconfigureTrackingSlot);
 
 	mTrackingToolsAction = this->createAction("TrackingTools", "Start tracking",
 											  QIcon(), QKeySequence("Ctrl+T"), "",
@@ -484,9 +479,10 @@ void MainWindowActions::updateTrackingActionSlot()
 	}
 }
 
-void MainWindowActions::configureSlot()
+void MainWindowActions::reconfigureTrackingSlot()
 {
-	mServices->tracking()->setState(Tool::tsCONFIGURED);
+	mServices->tracking()->setState(Tool::tsNONE);
+	mServices->tracking()->setState(Tool::tsTRACKING);
 }
 
 void MainWindowActions::toggleTrackingSlot()

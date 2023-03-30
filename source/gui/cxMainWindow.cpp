@@ -484,6 +484,7 @@ void MainWindow::createMenus()
 	//tool
 	this->menuBar()->addMenu(mToolMenu);
 	mToolMenu->addAction(mPreferencesToolConfigAction);
+	mToolMenu->addAction(mActions->getAction("ReconfigureTools"));
 	mToolMenu->addAction(mActions->getAction("TrackingTools"));
 	mToolMenu->addSeparator();
 	mToolMenu->addAction(mActions->getAction("StartStreaming"));
