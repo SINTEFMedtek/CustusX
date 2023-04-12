@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 // --------------------------------------------------------
 namespace cx_transform3D_internal
