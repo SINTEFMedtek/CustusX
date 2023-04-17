@@ -6,13 +6,13 @@
 <!-- ==== -->
 <tool>
   <type>pointer</type>
-  <id>AuroraCatheter04</id>
-  <name>Aurora catheter port 4</name>
-  <description>Aurora catheter port 4</description>
+  <id>AuroraCatheter02</id>
+  <name>Aurora catheter port 2</name>
+  <description>Aurora catheter port 2</description>
   <manufacturer>NDI</manufacturer>
   <clinical_app>Laboratory Laparoscopy Endovascular Bronchoscopy</clinical_app>
   <geo_file>cylinder.stl</geo_file>
-  <pic_file>catheter_6DOF.png</pic_file>
+  <pic_file></pic_file>
   <doc_file></doc_file>  
 
   <!-- Instrument -->
@@ -27,11 +27,11 @@
   <!-- Sensor -->
   <sensor>
     <type>Aurora</type>
-    <id>Aurora03</id>
+    <id>Aurora01</id>
     <name>AuroraSensor1</name>
     <wireless>yes</wireless>
-    <DOF>6</DOF>
-    <portnumber>3</portnumber>
+    <DOF>5</DOF>
+    <portnumber>1</portnumber>
     <channelnumber>0</channelnumber>
     <manufacturer>NDI</manufacturer>
     <description></description>
@@ -40,6 +40,6 @@
 
   <!-- Calibration -->
   <calibration>
-    <cal_file>AuroraCatheter_port4.cal</cal_file>
+    <cal_file>AuroraCatheter_port2_reverse_orientation.cal</cal_file>
   </calibration>
 </tool>
