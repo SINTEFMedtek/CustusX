@@ -6,15 +6,16 @@ import sys
 import getopt
 
 
-def segmentTumors(filenameInput, filenameOutput):   
+def segmentTumors(filenameInput, filenameOutput): 
+    venv_path = os.path.dirname(sys.executable) 
     if os.path.splitext(filenameInput)[1:] != '.nii.gz':
         filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
         filenameOutput_nii_gz = os.path.splitext(filenameOutput)[0] + '.nii.gz'
         sitk.WriteImage(sitk.ReadImage(filenameInput), filenameInput_nii_gz)
-        os.system ('lungtumormask ' + filenameInput_nii_gz + ' ' + filenameOutput_nii_gz)
+        os.system (venv_path + '/lungtumormask ' + filenameInput_nii_gz + ' ' + filenameOutput_nii_gz)
         sitk.WriteImage(sitk.ReadImage(filenameOutput_nii_gz), filenameOutput)
     else:
-        os.system('lungtumormask ' + filenameInput + ' ' + filenameOutput)
+        os.system(venv_path + '/lungtumormask ' + filenameInput + ' ' + filenameOutput)
     return filenameOutput
 
 InputVolume = ''
