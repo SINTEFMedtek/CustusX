@@ -293,6 +293,7 @@ set(VTK_MODULES
   VTK::FiltersTexture
   VTK::ImagingColor
   VTK::ImagingStatistics
+  VTK::ImagingMorphological
   VTK::IOImage
   VTK::IOGeometry
   VTK::IOMINC
