@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkCardinalSpline.h"
 #include "cxLogger.h"
 #include <vtkImageResample.h>
+#include <vtkImageConnectivityFilter.h>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -49,7 +50,6 @@ void AirwaysFromCenterline::setTypeToBloodVessel(bool bloodVessel)
 
 Eigen::MatrixXd AirwaysFromCenterline::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
-
 	int N = centerline_r->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
@@ -68,9 +68,11 @@ void AirwaysFromCenterline::setBranches(BranchListPtr branches)
 	mBranchListPtr = branches;
 }
 
-void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume)
+void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd)
 {
 	mOriginalSegmentedVolume = segmentedVolume;
+	m_rMd = rMd;
+
 }
 
 void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
@@ -122,6 +124,9 @@ vtkPolyDataPtr AirwaysFromCenterline::generateTubes(double staticRadius, bool me
 		airwaysVolumePtr = this->initializeEmptyAirwaysVolume();
 
 	airwaysVolumePtr = addSpheresAlongCenterlines(airwaysVolumePtr, staticRadius);
+
+	if(mMergeWithOriginalAirways)
+		airwaysVolumePtr = this->removeIslandsFromImage(airwaysVolumePtr);
 
 	//create contour from image
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
@@ -245,11 +250,12 @@ vtkImageDataPtr AirwaysFromCenterline::addSpheresAlongCenterlines(vtkImageDataPt
 
 		for (int j = 0; j < numberOfPositionsInBranch; j++)
 		{
-			double spherePos[3];
-			spherePos[0] = positions(0,j);
-			spherePos[1] = positions(1,j);
-			spherePos[2] = positions(2,j);
-			airwaysVolumePtr = addSphereToImage(airwaysVolumePtr, spherePos, radius);
+			positions.block(0 , j , 3 , 1) = m_rMd.inverse().coord(positions.block(0 , j , 3 , 1)); //transfrom from r to d
+			double spherePos_d[3];
+			spherePos_d[0] = positions(0,j);
+			spherePos_d[1] = positions(1,j);
+			spherePos_d[2] = positions(2,j);
+			airwaysVolumePtr = addSphereToImage(airwaysVolumePtr, spherePos_d, radius);
 		}
 	}
 	return airwaysVolumePtr;
@@ -288,6 +294,17 @@ vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysV
 			}
 
 	return airwaysVolumePtr;
+}
+
+vtkImageDataPtr AirwaysFromCenterline::removeIslandsFromImage(vtkImageDataPtr image)
+{//Returns largest connected area of image
+	vtkImageConnectivityFilter* connectivityFilerPtr = vtkImageConnectivityFilter::New();
+	connectivityFilerPtr->SetInputData(image);
+	connectivityFilerPtr->SetExtractionModeToLargestRegion();
+	connectivityFilerPtr->SetScalarRange(1,1);
+	connectivityFilerPtr->Update();
+	vtkImageDataPtr filteredImage = connectivityFilerPtr->GetOutput();
+	return filteredImage;
 }
 
 void AirwaysFromCenterline::smoothAllBranchesForVB()

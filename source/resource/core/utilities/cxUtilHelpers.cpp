@@ -57,6 +57,9 @@ QString changeExtension(QString name, QString ext)
 	if (splitName.size()==1)
 		return name;
 
+	if(splitName[splitName.size()-1] == "gz")//Handle .nii.gz
+		splitName.pop_back();
+
 	splitName[splitName.size()-1] = ext;
 
 	if (ext.isEmpty())

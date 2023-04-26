@@ -106,6 +106,40 @@ Options:
 - Local variance: The maximum color step between two neighbour polygons
 - Smoothing: Number of smooting iterations to remove sharp color transitions
 
+
+\addindex islands_filter
+Islands Filter {#org_custusx_resource_filter_islands}
+===========================================================
+
+*Divides a binary volume into islands*
+
+vtkImageConnectivityFilter
+
+This filter divides a binary volume into islands. Each separate island is
+assigned a label. Largest area is assigned label 1, second largest
+number 2, and so on. Input must be a binary volume.
+The filter is using vtkImageConnectivityFilter.
+
+Options:
+- Min size (voxels): Minimum island size to be labeled and included in output
+
+
+\addindex meshes_from_labels_filter
+Meshes from Labels Filter {#org_custusx_resource_filter_meshes_from_labels}
+===========================================================
+This filter finds the surfaces of a label volume using discrete marching cubes.
+The filter is similar to the Contour Filter, but provides several output meshes.
+
+- Specify start and end label
+- Optional: Reduce input volume by a factor of 2 in each direction = 1/8 of original volume size
+- Marching Cubes contouring
+- Optional Windowed Sinc smoothing
+- Decimation of triangles
+- Optional preserve mesh topology
+- Number of iterations in smoothing filter. Higher number = more smoothing
+- Band pass width in smoothing filter. Smaller number = more smoothing
+- Specify the same color for all meshes, or optionally generating different colors starting with the selected one
+
 \addtogroup cx_user_doc_group_filter
 
 * \ref org_custusx_resource_filter_dilation
@@ -114,4 +148,6 @@ Options:
 * \ref org_custusx_resource_filter_smoothing_image
 * \ref org_custusx_resource_filter_binary_threshold_image
 * \ref org_custusx_resource_filter_color_variation
+* \ref org_custusx_resource_filter_islands
+* \ref org_custusx_resource_filter_meshes_from_labels
 

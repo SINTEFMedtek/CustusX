@@ -145,6 +145,7 @@ typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 // other stuff
 typedef boost::shared_ptr<class Branch> BranchPtr;

@@ -234,16 +234,6 @@ QStringList DataLocations::appendStringToAllElements(QStringList root, QString s
 	return retval;
 }
 
-namespace
-{
-QString changeExtension(QString name, QString ext)
-{
-	QStringList splitName = name.split(".");
-	splitName[splitName.size()-1] = ext;
-	return splitName.join(".");
-}
-} //namespace
-
 QString DataLocations::getCachePath()
 {
 	QString path(getPersistentWritablePath()+"/cache");
