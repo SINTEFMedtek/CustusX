@@ -385,9 +385,8 @@ std::vector<vtkPolyDataPtr> MeshesFromLabelsFilter::execute(vtkImageDataPtr inpu
 			continue;
 
 		// select the cells for a given label
-		//selector->SetLowerThreshold(i);
-		//selector->SetUpperThreshold(i);
-		selector->ThresholdBetween(i,i);//VTK 7.1. To be replaced with the above lines
+		selector->SetLowerThreshold(i);
+		selector->SetUpperThreshold(i);
 		selector->Update();
 
 		normals->Update();
