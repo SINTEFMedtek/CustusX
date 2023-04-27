@@ -91,6 +91,8 @@ private:
 	 *  highest i. All other transform files can be found from
 	 *  this one.
 	 */
+	Transform3D centerToCenterTranslation(bool printDebug = false);
+	bool volumesOverlap();
 	QString findMostRecentTransformOutputFile() const;
 	/** Return the result of the latest registration as a linear transform mMf.
 	 *

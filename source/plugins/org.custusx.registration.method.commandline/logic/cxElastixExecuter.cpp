@@ -149,10 +149,12 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	Transform3D rMm = moving->get_rMd();
 	Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
 	Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
+	Transform3D mCenterMfCenter_r = centerToCenterTranslation(true);
+
 //	Transform3D mMf = rMm.inv() * rMf;
 	// -->
 	// The remainder transform, not stored in mhd files, must be sent to elastiX:
-	Transform3D T0 = mmMm*rMm.inv()*rMf*ffMf.inv();
+	Transform3D T0 = mmMm*rMm.inv()*mCenterMfCenter_r*rMf*ffMf.inv();
 
 //	Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
 	ElastixEulerTransform E = ElastixEulerTransform::create(T0, fixed->boundingBox().center());
@@ -189,12 +191,53 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 	DataPtr moving,
 	QString outdir)
 {
-	Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
+	Transform3D mCenterMfCenter_r = centerToCenterTranslation();
+	Transform3D mMf = moving->get_rMd().inv() * mCenterMfCenter_r * fixed->get_rMd();
 
 	TransformFile file(outdir+"/moving_M_fixed_initial.cal");
 	file.write(mMf);
 
 	return file.fileName();
+}
+
+Transform3D ElastixExecuter::centerToCenterTranslation(bool printDebug)
+{
+	if(volumesOverlap())
+		return Transform3D::Identity();
+
+	Vector3D fCenter_r = mFixed->get_rMd().coord(mFixed->boundingBox().center());
+	Vector3D mCenter_r = mMoving->get_rMd().coord(mMoving->boundingBox().center());
+	Transform3D mCenterMfCenter_r = createTransformTranslate(mCenter_r - fCenter_r);//center to center translation in r
+	if(printDebug)
+		CX_LOG_DEBUG() << "Volumes sent to Elastix don't overlap. Apply transform to move center to center:\n" << mCenterMfCenter_r;
+	return mCenterMfCenter_r;
+}
+
+bool ElastixExecuter::volumesOverlap()
+{
+	DoubleBoundingBox3D fixedBB = mFixed->boundingBox();
+	DoubleBoundingBox3D movingBB = mMoving->boundingBox();
+	fixedBB.translate(mFixed->get_rMd());
+	movingBB.translate(mMoving->get_rMd());
+
+	DoubleBoundingBox3D bbIntersection = intersection(fixedBB, movingBB);
+//	CX_LOG_DEBUG() << "range fixedBB: " << fixedBB.range();
+//	CX_LOG_DEBUG() << "range movingBB: " << movingBB.range();
+//	CX_LOG_DEBUG() << "range bbIntersection: " << bbIntersection.range();
+	if(bbIntersection==DoubleBoundingBox3D::zero())
+		return false;
+
+	//Require range above a threshold. Use 10% of range of fixed?
+	Vector3D rangeFixed = fixedBB.range();
+	double threshold = std::min(rangeFixed[0]/10.0, rangeFixed[2]/10.0);//Use x and z for now as x and y is usually equal
+	Vector3D rangeIntersection = bbIntersection.range();
+	double minIntersectionRange = std::min(rangeIntersection[0], rangeIntersection[2]);
+//	CX_LOG_DEBUG() << "threshold: " << threshold;
+//	CX_LOG_DEBUG() << "minIntersectionRange: " << minIntersectionRange;
+	if(minIntersectionRange < threshold)
+		return false;
+
+	return true;
 }
 
 void ElastixExecuter::processReadyRead()
