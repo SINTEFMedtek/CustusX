@@ -151,6 +151,8 @@ void TrackingSystemIGSTKService::trackerConfiguredSlot(bool on)
 		else
 			reportWarning("Creation of the cxTool " + it->second->getUid() + " failed.");
 	}
+	if(mExternalTool)
+		mTools.push_back(mExternalTool);
 
 	mState = Tool::tsCONFIGURED;
 
