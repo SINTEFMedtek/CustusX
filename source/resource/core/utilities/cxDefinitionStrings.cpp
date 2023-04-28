@@ -148,7 +148,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Vena Cava",
 	"Aorta",
 	"Subclavian Artery",
-	"Lung Vessels",
+//	"Lung Vessels",
 	"Heart",
 	"Esophagus",
 	"Spine",
