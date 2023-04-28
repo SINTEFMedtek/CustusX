@@ -42,7 +42,7 @@ public:
 	void deleteBranch(BranchPtr b);
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
-	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true);
+	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true, vtkPolyDataPtr bloodVessels_r = vtkPolyDataPtr());
 	void selectGenerations(int maxGeneration);
 	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);
@@ -70,6 +70,7 @@ std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > org_custusx_reg
 std::vector<Eigen::Vector3d> org_custusx_registration_method_bronchoscopy_EXPORT smoothBranch(BranchPtr branchPtr, int startIndex, Eigen::MatrixXd startPosition);
 double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation, double parentRotation);
 double calculateAngleBetweenTwo3DVectors(Vector3D A, Vector3D B);
+double calculate3DVaiance(Eigen::MatrixXd A);
 
 org_custusx_registration_method_bronchoscopy_EXPORT Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B);
 

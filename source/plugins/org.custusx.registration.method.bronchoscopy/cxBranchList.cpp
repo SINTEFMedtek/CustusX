@@ -325,8 +325,9 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 	}
 }
 
-void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments)
+void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments, vtkPolyDataPtr bloodVessels_r)
 {
+	if(bloodVessels_r)
 	//TO DO: Find main airway tree
 	if (sortByZindex)
 		positions_r = sortMatrix(2,positions_r);
@@ -387,7 +388,9 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			// we look at all branches at a distance below MAX_DISTANCE_TO_EXISTING_BRANCH and select the one wtih
 			// lowest orientation deviation between the conection part and the new and the existing branch.
 			std::vector<BranchPtr> existingCloseBranches = findClosesBranches(newBranchPositions.col(0), maxDistanceToExistingBranch);
-			Eigen::MatrixXd newBranchOrientations =newBranch->getOrientations();
+			Eigen::MatrixXd newBranchOrientations = newBranch->getOrientations();
+			double orientationVariance = calculate3DVaiance(newBranchOrientations);
+			CX_LOG_DEBUG() << "Orientation variance of new branch: " << orientationVariance;
 			int numberOfColumnsInNewBranch = newBranchOrientations.cols();
 			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch-1)).rowwise().mean(); //smoothing
 			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
@@ -857,6 +860,28 @@ double calculateAngleBetweenTwo3DVectors(Vector3D A, Vector3D B)
 	double det = sqrt(cross_x*cross_x + cross_y*cross_y + cross_z*cross_z);
 	double angle = atan2(det, dot);
 	return angle;
+}
+
+double calculate3DVaiance(Eigen::MatrixXd A)
+{ // Calculate variance in 3D. Variance found as the sum of variances for each dimension/axis.
+	if(A.rows() != 3)
+	{
+		CX_LOG_WARNING() << "In calculate3DVaiance: Input matrix must be 3xN.";
+		return 0;
+	}
+	Eigen::Vector3d mean = A.rowwise().mean();
+	Eigen::Vector3d variance = Eigen::Vector3d::Zero();
+
+	for (int i = 0; i < A.rows(); i++)
+	{
+		for (int j = 0; j < A.cols(); j++)
+			variance(i) += ( A(i,j)-mean(i) ) * ( A(i,j)-mean(i) );
+	}
+
+	variance = variance/A.cols();
+	double variance3D = variance.sum();
+
+	return variance3D;
 }
 
 }//namespace cx
