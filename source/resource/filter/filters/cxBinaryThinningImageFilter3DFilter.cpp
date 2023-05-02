@@ -158,12 +158,20 @@ std::vector<vtkImageDataPtr> BinaryThinningImageFilter3DFilter::execute(ImagePtr
 
 	int minValue = input->getMin();
 	int maxValue = input->getMax();
+	int numberOfLabels = maxValue - (minValue - 1);
 
 	if(!labeledVolume)
 	{
 		if (maxValue != 1 || minValue != 0)
 			return retval;
 	}
+	else if((numberOfLabels >= 500))
+	{
+		CX_LOG_WARNING() << "Too many labes found in centerline filter (" << numberOfLabels << " labels). Aborting.";
+		return retval;
+	}
+	else if(numberOfLabels >= 50)
+		CX_LOG_WARNING() << "Many labes found in centerline filter (" << numberOfLabels << " labels).";
 
 	typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
 	thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
