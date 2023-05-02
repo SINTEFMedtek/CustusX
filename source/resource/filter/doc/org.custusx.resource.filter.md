@@ -73,10 +73,14 @@ This filter computes one-pixel-wide skeleton of a 3D input image.
 This class is parametrized over the type of the input image 
 and the type of the output image.
 
-The input is assumed to be a binary image. All non-zero valued voxels 
-are set to 1 internally to simplify the computation. The filter will 
-produce a skeleton of the object.  The output background values are 0, 
-and the foreground values are 1.
+The input is assumed to be a binary image, if labeled volume option is
+not selected. All non-zero valued voxels are set to 1 internally to
+simplify the computation. The filter will produce a skeleton of the
+object.  The output background values are 0, and the foreground values are 1.
+
+If the labeled volume option is selected, the computation is performed for
+each value/label. The result mesh for each label is assigned an individiual
+color.
 
 A 26-neighbourhood configuration is used for the foreground and a
 6-neighbourhood configuration for the background. Thinning is performed
