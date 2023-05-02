@@ -391,6 +391,8 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			Eigen::MatrixXd newBranchOrientations = newBranch->getOrientations();
 			double orientationVariance = calculate3DVaiance(newBranchOrientations);
 			CX_LOG_DEBUG() << "Orientation variance of new branch: " << orientationVariance;
+			if(orientationVariance > MAX_ORIENTATION_VARIANCE_IN_NEW_BRANCH)
+				continue;
 			int numberOfColumnsInNewBranch = newBranchOrientations.cols();
 			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch-1)).rowwise().mean(); //smoothing
 			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
