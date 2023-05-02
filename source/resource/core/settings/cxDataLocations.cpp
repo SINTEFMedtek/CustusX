@@ -240,6 +240,12 @@ QString DataLocations::getCachePath()
 	return path;
 }
 
+QString DataLocations::getModelsPath()
+{
+	QString path(getPersistentWritablePath()+"/models");
+	return path;
+}
+
 QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
 	return findConfigPath("", pathRelativeToConfigRoot, alternativeAbsolutePath);
