@@ -43,6 +43,7 @@ public:
 	static QString getPersistentWritablePath(); ///< Path to location usable for persistent and temporary storage of config. Do not use directly, prefer to create methods displaying subpaths.
 	static void deletePersistentWritablePath(); ///< Deletes the folder called *_settings
 	static QString getCachePath(); ///< return path to a folder that is used during execution, will be cleared at start and stop.
+	static QString getModelsPath(); ///< return path to a folder contiaining AI processing/segmentation models.
 	static QStringList getDefaultPluginsPath(); ///< return the folder where plugins should be located, by default.
 
 	static void setTestMode(); ///< set a testing mode that changes location of settings files to a temp folder.

@@ -12,10 +12,10 @@ def segmentTumors(filenameInput, filenameOutput):
         filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
         filenameOutput_nii_gz = os.path.splitext(filenameOutput)[0] + '.nii.gz'
         sitk.WriteImage(sitk.ReadImage(filenameInput), filenameInput_nii_gz)
-        os.system (venv_path + '/lungtumormask ' + filenameInput_nii_gz + ' ' + filenameOutput_nii_gz)
+        os.system (venv_path + '/lungtumormask ' + filenameInput_nii_gz + ' ' + filenameOutput_nii_gz + ' --lung-filter --threshold 0.5 --radius 3')
         sitk.WriteImage(sitk.ReadImage(filenameOutput_nii_gz), filenameOutput)
     else:
-        os.system(venv_path + '/lungtumormask ' + filenameInput + ' ' + filenameOutput)
+        os.system(venv_path + '/lungtumormask ' + filenameInput + ' ' + filenameOutput + ' --lung-filter --threshold 0.5 --radius 3')
     return filenameOutput
 
 InputVolume = ''
