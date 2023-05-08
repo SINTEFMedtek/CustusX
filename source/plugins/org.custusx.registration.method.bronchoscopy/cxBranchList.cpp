@@ -89,7 +89,9 @@ void BranchList::selectGenerations(int maxGeneration)
 
 void BranchList::findBronchoscopeRotation()
 {
-	BranchPtr trachea = this->getBranches()[0];
+	if(mBranches.empty())
+		return;
+	BranchPtr trachea = mBranches[0];
 	if(trachea)
 		calculateBronchoscopeRotation(trachea);
 }
@@ -365,13 +367,23 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 				}
 			}
 			if(minDistance == maxDistanceToExistingBranch)
-				break; //No more close positions found: Airway centerline tree completed.
-
+			{//No more close positions found
+				if(mBranches.size() < 5)
+				{//Main airway tree not found. Delete and restart.
+					this->deleteAllBranches();
+					continue;
+				}
+				else
+					break; //Airway centerline tree completed.
+			}
 			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
 			splitIndex = dsearchResult.first;
 		}
 		else //if this is the first branch. Select the top position (Trachea).
+		{
 			startIndex = positionsNotUsed_r.cols() - 1;
+			minDistance = 0;
+		}
 
 		std::pair<Eigen::MatrixXd,Eigen::MatrixXd > connectedPointsResult = findConnectedPointsInCT(startIndex , positionsNotUsed_r);
 		Eigen::MatrixXd newBranchPositions = connectedPointsResult.first;
