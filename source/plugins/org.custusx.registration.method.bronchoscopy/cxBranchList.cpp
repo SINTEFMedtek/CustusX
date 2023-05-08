@@ -327,7 +327,7 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 
 void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments, vtkPolyDataPtr bloodVessels_r)
 {
-	if(bloodVessels_r)
+	//if(bloodVessels_r)
 	//TO DO: Find main airway tree
 	if (sortByZindex)
 		positions_r = sortMatrix(2,positions_r);

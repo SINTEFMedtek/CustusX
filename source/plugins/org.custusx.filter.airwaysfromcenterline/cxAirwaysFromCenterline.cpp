@@ -87,11 +87,12 @@ void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr airwaysCenterline_r
 	else
 		mBranchListPtr->findBranchesInCenterline(airwayCenterlinePoints_r);
 
-	mBranchListPtr->smoothBranchPositions(40);
-	mBranchListPtr->interpolateBranchPositions(0.1);
+	mBranchListPtr->smoothBranchPositions();
+	mBranchListPtr->interpolateBranchPositions();
 	this->smoothAllBranchesForVB();
 
 	mBranchListPtr->smoothOrientations();
+	mBranchListPtr->findBronchoscopeRotation();
 }
 
 BranchListPtr AirwaysFromCenterline::getBranchList()

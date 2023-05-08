@@ -27,7 +27,7 @@ typedef std::vector< Eigen::Matrix4d > M4Vector;
 #define MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH 3 //mm
 #define MIN_BRANCH_SEGMENT_LENGTH 5 //Number of connected points
 #define MAX_DISTANCE_TO_EXISTING_BRANCH 20 //mm. Max distance to main airway tree for inclusion of points.
-#define DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION 3 //mm. If distance to main branch tree exceeds value, use direction to connect to correct branch.
+#define DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION 5 //mm. If distance to main branch tree exceeds value, use direction to connect to correct branch.
 #define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_EXISTING_BRANCH 60 //deg
 #define MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH 40 //deg
 #define MAX_ORIENTATION_VARIANCE_IN_NEW_BRANCH 0.6 // To exclude "noisy" branches which are difficult to connect correctly
@@ -50,8 +50,8 @@ public:
 	void smoothOrientations();
 	void smoothRadius();
 	BranchPtr findBranchWithLargestRadius();
-	void interpolateBranchPositions(double resolution);
-	void smoothBranchPositions(int controlPointDistance);
+	void interpolateBranchPositions(double resolution = 0.1);
+	void smoothBranchPositions(int controlPointDistance = 40);
 	void excludeClosePositionsInCTCenterline(double minPointDistance);
 	void markLungLap(QString name, Vector3D position);
 	void setLapName(BranchPtr branch, QString name);
