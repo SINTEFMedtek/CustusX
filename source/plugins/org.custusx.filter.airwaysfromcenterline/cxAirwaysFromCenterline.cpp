@@ -35,7 +35,7 @@ AirwaysFromCenterline::AirwaysFromCenterline():
 	mBranchListPtr(new BranchList),
 	mAirwaysVolumeBoundaryExtention(10),
 	mAirwaysVolumeBoundaryExtentionTracheaStart(2),
-	mAirwaysVolumeSpacing(0.5)
+	mAirwaysVolumeSpacing(0.4)
 {
 }
 
