@@ -378,7 +378,7 @@ QStringList StringPropertyDataModality::getValueRange() const
 	retval << "";
 	if (mData)
 		retval << enum2string(mData->getModality());
-	retval << enum2string(imCT) << enum2string(imMR) << enum2string(imUS);
+	retval << enum2string(imCT) << enum2string(imMR) << enum2string(imUS) << enum2string(imPET);
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }
 
