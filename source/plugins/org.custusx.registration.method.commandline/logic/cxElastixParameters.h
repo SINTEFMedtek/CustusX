@@ -45,7 +45,10 @@ public:
 
 	FilePathPropertyPtr getActiveParameterFile0() const { return mActiveParameterFile0; }
 	FilePathPropertyPtr getActiveParameterFile1() const { return mActiveParameterFile1; }
+	FilePathPropertyPtr getActiveParameterFile2() const { return mActiveParameterFile2; }
 	FilePathPropertyPtr getActiveExecutable() const { return mActiveExecutable; }
+	QString getDeformImage() const {return mDeformImage; }
+	void setDeformImage(QString deformImage) { mDeformImage = deformImage; }
 
     QStringList getActiveParameterFiles() const;
     QString getPresetNameSuggesion() const; ///< create a name describing the active state, can be used as name for a new preset.
@@ -65,10 +68,12 @@ private:
 	FilePathPropertyPtr getExecutable();
 	FilePathPropertyPtr getParameterFile(QString uid);
 
-    StringPropertyPtr mCurrentPreset;
+	StringPropertyPtr mCurrentPreset;
 	FilePathPropertyPtr mActiveExecutable;
 	FilePathPropertyPtr mActiveParameterFile0;
 	FilePathPropertyPtr mActiveParameterFile1;
+	FilePathPropertyPtr mActiveParameterFile2;
+	QString mDeformImage;
     XmlOptionFile mOptions;
 };
 typedef boost::shared_ptr<ElastixParameters> ElastixParametersPtr;

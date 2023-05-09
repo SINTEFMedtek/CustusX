@@ -30,17 +30,20 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFilePathProperty.h"
 #include "cxDataLocations.h"
 #include "cxHelperWidgets.h"
+#include "cxSelectDataStringProperty.h"
 
 namespace cx
 {
 
 ElastixWidget::ElastixWidget(RegServicesPtr services, QWidget* parent) :
 	RegistrationBaseWidget(services, parent, "org_custusx_registration_method_commandline_elastix_widget", "ElastiX Registration"),
-	mRegisterButton(NULL),
-	mParameterFileWidget0(NULL),
-	mFilePreviewWidget(NULL),
-	mTimedAlgorithmProgressBar(NULL),
-	mOptionsWidget(NULL)
+	mRegisterButton(nullptr),
+	mParameterFileWidget0(nullptr),
+	mParameterFileWidget1(nullptr),
+	mParameterFileWidget2(nullptr),
+	mFilePreviewWidget(nullptr),
+	mTimedAlgorithmProgressBar(nullptr),
+	mOptionsWidget(nullptr)
 {
 	this->setModified();
 }
@@ -73,12 +76,23 @@ void ElastixWidget::createUI()
 	QGridLayout* entryLayout = new QGridLayout;
 	entryLayout->setColumnStretch(1, 1);
 
+	int row = 0;
 	mFixedImage.reset(new StringPropertyRegistrationFixedImage(mServices->registration(), mServices->patient()));
-	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
-	mMovingImage.reset(new StringPropertyRegistrationMovingImage(mServices->registration(), mServices->patient()));
-	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
+	new LabeledComboBoxWidget(this, mFixedImage, entryLayout, row++);
 
-	new LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, 2);
+	StringPropertyRegistrationMovingImagePtr movingImage = StringPropertyRegistrationMovingImagePtr(new StringPropertyRegistrationMovingImage(mServices->registration(), mServices->patient()));
+	movingImage->setValueName("Moving image");
+	mMovingImage = movingImage;
+	new LabeledComboBoxWidget(this, mMovingImage, entryLayout, row++);
+
+	//Add PET image to be deformed by registration result
+	mDeformImage = StringPropertySelectImage::New(mServices->patient());
+	mDeformImage->setValueName("Moving/deforming image 2");
+	mDeformImage->setHelp("Select image to be registered and deformed in the same way as the moving image above");
+	sscCreateDataWidget(this, mDeformImage, entryLayout, row++);
+	connect(mDeformImage.get(), &SelectDataStringPropertyBase::dataChanged, this, &ElastixWidget::deformImageChanged);
+
+	new LabeledComboBoxWidget(this, mElastixManager->getParameters()->getCurrentPreset(), entryLayout, row++);
 
 	QHBoxLayout* buttonsLayout = new QHBoxLayout;
 	buttonsLayout->addWidget(mRegisterButton);
@@ -113,12 +127,19 @@ QWidget* ElastixWidget::createOptionsWidget()
 	int line = 0;
 
 	layout->addWidget(this->createHorizontalLine(), line, 0, 1, 3);
-	++line;
 
-	layout->addWidget(new QLabel("Parameter File", this), line, 0);
 	mParameterFileWidget0 = new FileSelectWidget(this);
-	connect(mParameterFileWidget0, SIGNAL(fileSelected(QString)), this, SLOT(userParameterFileSelected(QString)));
+	mParameterFileWidget1 = new FileSelectWidget(this);
+	mParameterFileWidget2 = new FileSelectWidget(this);
+	layout->addWidget(new QLabel("Parameter File 1", this), ++line, 0);
 	layout->addWidget(mParameterFileWidget0, line, 1, 1, 2);
+	layout->addWidget(new QLabel("Parameter File 2", this), ++line, 0);
+	layout->addWidget(mParameterFileWidget1, line, 1, 1, 2);
+	layout->addWidget(new QLabel("Parameter File 3", this), ++line, 0);
+	layout->addWidget(mParameterFileWidget2, line, 1, 1, 2);
+	connect(mParameterFileWidget0, &FileSelectWidget::fileSelected, this, &ElastixWidget::userParameterFile0Selected);
+	connect(mParameterFileWidget1, &FileSelectWidget::fileSelected, this, &ElastixWidget::userParameterFile1Selected);
+	connect(mParameterFileWidget2, &FileSelectWidget::fileSelected, this, &ElastixWidget::userParameterFile2Selected);
 	++line;
 
 	QWidget* executableWidget = sscCreateDataWidget(this, mElastixManager->getParameters()->getActiveExecutable());
@@ -179,9 +200,21 @@ void ElastixWidget::deletePresetSlot()
 	mElastixManager->getParameters()->removeCurrentPreset();
 }
 
-void ElastixWidget::userParameterFileSelected(QString filename)
+void ElastixWidget::userParameterFile0Selected(QString filename)
 {
 	mElastixManager->getParameters()->getActiveParameterFile0()->setValue(filename);
+}
+void ElastixWidget::userParameterFile1Selected(QString filename)
+{
+	mElastixManager->getParameters()->getActiveParameterFile1()->setValue(filename);
+}
+void ElastixWidget::userParameterFile2Selected(QString filename)
+{
+	mElastixManager->getParameters()->getActiveParameterFile2()->setValue(filename);
+}
+void ElastixWidget::deformImageChanged(QString imageUid)
+{
+	mElastixManager->getParameters()->setDeformImage(imageUid);
 }
 
 void ElastixWidget::recurseParameterFolders(QString root, QStringList* retval)
@@ -205,16 +238,24 @@ void ElastixWidget::elastixChangedSlot()
 {
 	ElastixParametersPtr par = mElastixManager->getParameters();
 	EmbeddedFilepath par0 = par->getActiveParameterFile0()->getEmbeddedPath();
+	EmbeddedFilepath par1 = par->getActiveParameterFile1()->getEmbeddedPath();
+	EmbeddedFilepath par2 = par->getActiveParameterFile2()->getEmbeddedPath();
 	QStringList folders = par0.getRootPaths();
 	QStringList parfolders;
 	for (int i=0; i<folders.size(); ++i)
 		this->recurseParameterFolders(folders[i], &parfolders);
 
 	mParameterFileWidget0->setPaths(parfolders);
+	mParameterFileWidget1->setPaths(parfolders);
+	mParameterFileWidget2->setPaths(parfolders);
 	QStringList nameFilters;
 	nameFilters << "*";
 	mParameterFileWidget0->setNameFilter(nameFilters);
+	mParameterFileWidget1->setNameFilter(nameFilters);
+	mParameterFileWidget2->setNameFilter(nameFilters);
 	mParameterFileWidget0->setFilename(par0.getAbsoluteFilepath());
+	mParameterFileWidget1->setFilename(par1.getAbsoluteFilepath());
+	mParameterFileWidget2->setFilename(par2.getAbsoluteFilepath());
 
 
 	mFilePreviewWidget->previewFileSlot(par0.getAbsoluteFilepath());
