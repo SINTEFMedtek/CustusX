@@ -406,7 +406,9 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			if(orientationVariance > MAX_ORIENTATION_VARIANCE_IN_NEW_BRANCH)
 				continue;
 			int numberOfColumnsInNewBranch = newBranchOrientations.cols();
-			Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch-1)).rowwise().mean(); //smoothing
+
+			Vector3D newBranchOrientationStart = newBranchPositions.col(std::min(numberOfColumnsInNewBranch-1, 10)) - newBranchPositions.col(0);
+			//Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch-1)).rowwise().mean(); //smoothing
 			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
 			BranchPtr branchToConnect;
 			CX_LOG_DEBUG() << "newBranchPositions.col(0): " << newBranchPositions.col(0) << " - newBranchOrientationStart: " << newBranchOrientationStart;
@@ -416,11 +418,12 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 				if(existingCloseBranches[i]->findGenerationNumber()==1)
 					continue; //Do not try to connect to trachea
 
+				Eigen::MatrixXd existingCloseBranchPositions = existingCloseBranches[i]->getPositions();
 				Eigen::MatrixXd existingCloseBranchOrientations = existingCloseBranches[i]->getOrientations();
 				int numberOfColumnsInExistingBranch = existingCloseBranchOrientations.cols();
-				Vector3D existingCloseBranchOrientationEnd = existingCloseBranchOrientations.rightCols(std::min(10, numberOfColumnsInExistingBranch)).rowwise().mean(); //smoothing
+				Vector3D existingCloseBranchOrientationEnd = existingCloseBranchPositions.col(numberOfColumnsInExistingBranch-1) - existingCloseBranchPositions.col(std::max(numberOfColumnsInExistingBranch-10, 0));
+				//Vector3D existingCloseBranchOrientationEnd = existingCloseBranchOrientations.rightCols(std::min(10, numberOfColumnsInExistingBranch)).rowwise().mean(); //smoothing
 				existingCloseBranchOrientationEnd = existingCloseBranchOrientationEnd / existingCloseBranchOrientationEnd.norm(); // normalizing
-				Eigen::MatrixXd existingCloseBranchPositions = existingCloseBranches[i]->getPositions();
 				Vector3D orientationBetweenBranches = newBranchPositions.leftCols(1) - existingCloseBranchPositions.rightCols(1);
 				orientationBetweenBranches = orientationBetweenBranches / orientationBetweenBranches.norm(); // normalizing
 				double angleDeviationInConnectionToExistingBranch = calculateAngleBetweenTwo3DVectors(existingCloseBranchOrientationEnd, orientationBetweenBranches) * 180/M_PI;
