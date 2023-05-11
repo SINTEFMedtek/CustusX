@@ -150,13 +150,13 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Subclavian Artery",
 //	"Lung Vessels",
 	"Heart",
+	"Pulmonary Veins",
+	"Pulmonary Trunk",
 	"Esophagus",
 	"Spine",
 	"Lung Vessels",
 	"Airways",
 	"Centerlines",
-	"Pulmonary Veins",
-	"Pulmonary Trunk",
 	"Medium Organs",
 	"Small Organs"
 }
