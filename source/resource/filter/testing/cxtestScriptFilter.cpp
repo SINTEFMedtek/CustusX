@@ -541,7 +541,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	REQUIRE(variables.model == "CT_Lungs");
 
 	//CX_LOG_DEBUG() << "ParameterFilePath: " << filter->getParameterFilePath();
-	REQUIRE(QFileInfo(filter->getParameterFilePath()).exists());
+	REQUIRE(QFileInfo::exists(filter->getParameterFilePath()));
 
 	cx::OutputVariables outputVariables = cx::OutputVariables(filter->getParameterFilePath());
 
@@ -552,6 +552,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << outputVariables.mOutputClasses.join(";");
 
 	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
+	REQUIRE(outputVariables.mValid);
 	REQUIRE(outputVariables.mCreateOutputVolume);
 	REQUIRE(outputVariables.mCreateOutputMesh);
 

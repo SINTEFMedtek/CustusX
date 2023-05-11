@@ -41,6 +41,7 @@ struct cxResourceFilter_EXPORT OutputVariables
 	bool mCreateOutputMesh;
 	QStringList mOutputColorList;
 	QStringList mOutputClasses;
+	bool mValid = false;
 
 	OutputVariables(QString parameterFilePath);
 };
@@ -123,8 +124,8 @@ protected:
 	QString removeTrailingPythonVariable(QString environmentPath);
 	bool showVenvInfoDialog(QString venvPath, QString createCommand);
 	bool createVenv(QString createCommand, QString command);
-	void setScriptEngine(CommandStringVariables variables);
-	void initRaidionicsEngine(CommandStringVariables variables);
+	bool setScriptEngine(CommandStringVariables variables);
+	bool initRaidionicsEngine(CommandStringVariables variables);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

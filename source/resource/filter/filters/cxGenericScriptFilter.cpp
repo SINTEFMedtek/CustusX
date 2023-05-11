@@ -64,6 +64,7 @@ CommandStringVariables::CommandStringVariables(QString parameterFilePath, ImageP
 
 OutputVariables::OutputVariables(QString parameterFilePath)
 {
+	mValid = true;
 	// Parse .ini file
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("output");
@@ -73,6 +74,12 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 	mOutputColorList = allColors.split(";");
 	QString outputClass = settings.value("classes").toString();
 	mOutputClasses = outputClass.split(" ");
+	if(mOutputClasses.isEmpty() || mOutputClasses[0].isEmpty())
+	{
+		CX_LOG_DEBUG() << "OutputVariables::OutputVariables: Problem with file: " << parameterFilePath;
+		CX_LOG_WARNING() << "OutputVariables::OutputVariables: Wrong formatting of class (should be separated with space): " << outputClass;
+		mValid = false;
+	}
 	settings.endGroup();
 }
 
@@ -283,7 +290,11 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	variables.inputFilePath = getInputFilePath(input);
 	variables.outputFilePath = getOutputFilePath(input);
 
-	setScriptEngine(variables);
+	if(!setScriptEngine(variables))
+	{
+		CX_LOG_ERROR() << "GenericScriptFilter::createCommandStringVariables: Error setting up engine";
+		return CommandStringVariables("", input);
+	}
 	return variables;
 }
 
@@ -322,24 +333,29 @@ bool GenericScriptFilter::isUsingRaidionicsEngine()
 	return retval;
 }
 
-void GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
+bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 {
 	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
 		mScriptEngine = seDeepSintef;
 	else if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
 	{
-		this->initRaidionicsEngine(variables);
+		if(!this->initRaidionicsEngine(variables))
+			return false;
 		mScriptEngine = seRaidionics;
 	}
 	else
 		mScriptEngine = seStandard;
+	return true;
 }
 
-void GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
+bool GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
 {
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 	OutputVariables outputVariables = OutputVariables(parameterFilePath);
+	if(!outputVariables.mValid)
+		return false;
 	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, outputVariables.mOutputClasses));
+	return true;
 }
 
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
