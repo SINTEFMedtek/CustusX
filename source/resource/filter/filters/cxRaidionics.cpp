@@ -139,6 +139,8 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 
 	QJsonObject rootObject;
 
+	QString sequence = "High-resolution";
+
 	for(int i = 0; i < mTargets.size(); ++i)
 	{
 		QJsonObject taskObject;
@@ -146,18 +148,17 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 		QJsonObject spaceObject;
 		QJsonObject number0Object;
 		inputObject.insert("timestamp", 0);
-		inputObject.insert("sequence", "T1-CE");
+		inputObject.insert("sequence", sequence);
 		inputObject.insert("labels", QJsonValue::Null);
 		spaceObject.insert("timestamp", 0);
-		spaceObject.insert("sequence", "T1-CE");
+		spaceObject.insert("sequence", sequence);
 		inputObject.insert("space", spaceObject);
 
 		taskObject.insert("task", "Segmentation");
 		number0Object.insert("0", inputObject);
 		taskObject.insert("inputs", number0Object);
-		QJsonArray targetArray;
-		targetArray.push_back(mTargets[i]);
-		taskObject.insert("target", targetArray);//TODO: Need more than one target in array?
+		QJsonArray targetArray = createTargetArray(mTargets[i]);
+		taskObject.insert("target", targetArray);
 		taskObject.insert("model", "CT_"+mTargets[i]);
 		taskObject.insert("description", mTargets[i]+" segmentation in T1CE ("+subfolderT0()+")");
 		QString taskNumber;
@@ -168,6 +169,25 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 	QJsonDocument jsonDoc(rootObject);
 	jsonFile.write(jsonDoc.toJson());
 	jsonFile.close();
+}
+
+QJsonArray Raidionics::createTargetArray(QString target)
+{
+	QJsonArray targetArray;
+	QStringList targets;
+	//TODO: Read targets from json file in model folders instead?
+	if(target == "MediumOrgansMediastinum")
+		targets << "VenaCava" << "AorticArch" << "AscendingAorta" << "DescendingAorta" << "Spine";
+	if(target == "PulmSystHeart")
+		targets << "Heart" << "PulmonaryVeins" << "PulmonaryTrunk";
+	if(target == "SmallOrgansMediastinum")
+		targets << "BrachiocephalicVeins" << "SubCarArt" << "Azygos" << "Esophagus";
+	else
+		targets << target;
+
+	for(int i = 0; i < targets.size(); ++i)
+		targetArray.push_back(targets[i]);
+	return targetArray;
 }
 
 }//cx
