@@ -139,10 +139,13 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 
 	QJsonObject rootObject;
 
-	QString sequence = "High-resolution";
+//	QString sequence = "High-resolution";
+	QString sequence = "T1-CE";
 
 	for(int i = 0; i < mTargets.size(); ++i)
 	{
+		QString target = mTargets[i];
+
 		QJsonObject taskObject;
 		QJsonObject inputObject;
 		QJsonObject spaceObject;
@@ -155,12 +158,14 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 		inputObject.insert("space", spaceObject);
 
 		taskObject.insert("task", "Segmentation");
+		if(useFormatThresholding(target))
+			taskObject.insert("format", "thresholding");
 		number0Object.insert("0", inputObject);
 		taskObject.insert("inputs", number0Object);
-		QJsonArray targetArray = createTargetArray(mTargets[i]);
+		QJsonArray targetArray = createTargetArray(target);
 		taskObject.insert("target", targetArray);
-		taskObject.insert("model", "CT_"+mTargets[i]);
-		taskObject.insert("description", mTargets[i]+" segmentation in T1CE ("+subfolderT0()+")");
+		taskObject.insert("model", "CT_"+target);
+		taskObject.insert("description", targetDescription(target)+" segmentation in "+sequence+" ("+subfolderT0()+")");
 		QString taskNumber;
 		taskNumber.setNum(i+1);
 		rootObject.insert(taskNumber, taskObject);
@@ -171,20 +176,42 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 	jsonFile.close();
 }
 
-QJsonArray Raidionics::createTargetArray(QString target)
+bool Raidionics::useFormatThresholding(QString target)
 {
-	QJsonArray targetArray;
+	if(target == "Lungs")
+		return true;
+	return false;
+}
+
+QStringList Raidionics::createTargetList(QString target)
+{
+	//Read targets from json file in model folders instead?
+
+	//TODO: Create enums with strings for the model and target strings?
+	//Target strings differ slightly from LUNG_STRUCTURES
 	QStringList targets;
-	//TODO: Read targets from json file in model folders instead?
 	if(target == "MediumOrgansMediastinum")
 		targets << "VenaCava" << "AorticArch" << "AscendingAorta" << "DescendingAorta" << "Spine";
-	if(target == "PulmSystHeart")
+	else if(target == "PulmSystHeart")
 		targets << "Heart" << "PulmonaryVeins" << "PulmonaryTrunk";
-	if(target == "SmallOrgansMediastinum")
+	else if(target == "SmallOrgansMediastinum")
 		targets << "BrachiocephalicVeins" << "SubCarArt" << "Azygos" << "Esophagus";
 	else
 		targets << target;
+	return targets;
+}
 
+QString Raidionics::targetDescription(QString target)
+{
+	QStringList targets = createTargetList(target);
+	QString retval = targets.join(", ");
+	return retval;
+}
+
+QJsonArray Raidionics::createTargetArray(QString target)
+{
+	QStringList targets = createTargetList(target);
+	QJsonArray targetArray;
 	for(int i = 0; i < targets.size(); ++i)
 		targetArray.push_back(targets[i]);
 	return targetArray;

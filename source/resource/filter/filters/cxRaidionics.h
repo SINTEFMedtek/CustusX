@@ -37,6 +37,9 @@ protected:
 	QString copyInputFiles(QString inputFileName, QString subfolder);
 	QString getModelFolder();
 	static QString subfolderT0() {return "T0";}
+	bool useFormatThresholding(QString target);
+	QStringList createTargetList(QString target);
+	QString targetDescription(QString target);
 	QJsonArray createTargetArray(QString target);
 
 	VisServicesPtr mServices;
