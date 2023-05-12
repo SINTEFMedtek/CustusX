@@ -73,8 +73,7 @@ QString Raidionics::createRaidionicsIniFile()
 	QSettings settings(iniFilePath, QSettings::IniFormat);
 
 	settings.beginGroup("Default");
-	settings.setValue("task", "neuro_diagnosis");
-//	settings.setValue("task", "mediastinum_diagnosis");
+	settings.setValue("task", "mediastinum_diagnosis");
 	settings.setValue("trace", "False");
 	settings.setValue("caller", "CustusX");
 	settings.endGroup();
@@ -141,8 +140,8 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 
 	QJsonObject rootObject;
 
-//	QString sequence = "High-resolution"; //For task=mediastinum_diagnosis
-	QString sequence = "T1-CE"; //For task=neuro_diagnosis
+	QString sequence = "High-resolution"; //For task=mediastinum_diagnosis
+//	QString sequence = "T1-CE"; //For task=neuro_diagnosis
 
 	for(int i = 0; i < mTargets.size(); ++i)
 	{
