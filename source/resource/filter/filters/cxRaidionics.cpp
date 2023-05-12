@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxFileManagerService.h"
 #include "cxData.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -73,6 +74,7 @@ QString Raidionics::createRaidionicsIniFile()
 
 	settings.beginGroup("Default");
 	settings.setValue("task", "neuro_diagnosis");
+//	settings.setValue("task", "mediastinum_diagnosis");
 	settings.setValue("trace", "False");
 	settings.setValue("caller", "CustusX");
 	settings.endGroup();
@@ -139,8 +141,8 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 
 	QJsonObject rootObject;
 
-//	QString sequence = "High-resolution";
-	QString sequence = "T1-CE";
+//	QString sequence = "High-resolution"; //For task=mediastinum_diagnosis
+	QString sequence = "T1-CE"; //For task=neuro_diagnosis
 
 	for(int i = 0; i < mTargets.size(); ++i)
 	{
@@ -178,26 +180,25 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 
 bool Raidionics::useFormatThresholding(QString target)
 {
-	if(target == "Lungs")
+	if(target == enum2string(lsLUNG))
 		return true;
 	return false;
 }
 
 QStringList Raidionics::createTargetList(QString target)
 {
-	//Read targets from json file in model folders instead?
-
-	//TODO: Create enums with strings for the model and target strings?
-	//Target strings differ slightly from LUNG_STRUCTURES
 	QStringList targets;
-	if(target == "MediumOrgansMediastinum")
-		targets << "VenaCava" << "AorticArch" << "AscendingAorta" << "DescendingAorta" << "Spine";
-	else if(target == "PulmSystHeart")
-		targets << "Heart" << "PulmonaryVeins" << "PulmonaryTrunk";
-	else if(target == "SmallOrgansMediastinum")
-		targets << "BrachiocephalicVeins" << "SubCarArt" << "Azygos" << "Esophagus";
-	else
+
+	LUNG_MODELS model = string2enum<LUNG_MODELS> (target);
+	if(model == lmCOUNT)
 		targets << target;
+	else if(model == lmMEDIUM_ORGANS_MEDIASTINUM)
+		targets << enum2string(lmtVENA_CAVA) << enum2string(lmtAORTIC_ARCH) << enum2string(lmtASCENDING_AORTA) << enum2string(lmtDESCENDING_AORTA) << enum2string(lmtSPINE);
+	else if(model == lmPULMSYST_HEART)
+		targets << enum2string(lmtHEART) << enum2string(lmtPULMONARY_VEINS) << enum2string(lmtPULMONARY_TRUNK);
+	else if(target == lmSMALL_ORGANS_MEDIASTINUM)
+		targets << enum2string(lmtBRACHIO_CEPHALIC_VEINS) << enum2string(lmtSUBCAR_ART) << enum2string(lmtAZYGOS) <<	enum2string(lmtESOPHAGUS);
+
 	return targets;
 }
 

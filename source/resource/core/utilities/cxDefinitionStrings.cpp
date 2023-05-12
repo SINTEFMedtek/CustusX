@@ -162,3 +162,30 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Nodules"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODELS, lmCOUNT)
+{
+	"UNKNOWN",
+	"MediumOrgansMediastinum",
+	"PulmSystHeart",
+	"SmallOrgansMediastinum"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_MODELS, lmCOUNT)
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODEL_TARGETS, lmtCOUNT)
+{
+	"UNKNOWN",
+	"VenaCava",
+	"AorticArch",
+	"AscendingAorta",
+	"DescendingAorta",
+	"Spine",
+	"Heart",
+	"PulmonaryVeins",
+	"PulmonaryTrunk",
+	"BrachiocephalicVeins",
+	"SubCarArt",
+	"Azygos",
+	"Esophagus"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_MODEL_TARGETS, lmtCOUNT)
