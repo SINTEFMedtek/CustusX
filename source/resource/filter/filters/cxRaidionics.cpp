@@ -195,7 +195,7 @@ QStringList Raidionics::createTargetList(QString target)
 		targets << enum2string(lmtVENA_CAVA) << enum2string(lmtAORTIC_ARCH) << enum2string(lmtASCENDING_AORTA) << enum2string(lmtDESCENDING_AORTA) << enum2string(lmtSPINE);
 	else if(model == lmPULMSYST_HEART)
 		targets << enum2string(lmtHEART) << enum2string(lmtPULMONARY_VEINS) << enum2string(lmtPULMONARY_TRUNK);
-	else if(target == lmSMALL_ORGANS_MEDIASTINUM)
+	else if(model == lmSMALL_ORGANS_MEDIASTINUM)
 		targets << enum2string(lmtBRACHIO_CEPHALIC_VEINS) << enum2string(lmtSUBCAR_ART) << enum2string(lmtAZYGOS) <<	enum2string(lmtESOPHAGUS);
 
 	return targets;
@@ -215,6 +215,18 @@ QJsonArray Raidionics::createTargetArray(QString target)
 	for(int i = 0; i < targets.size(); ++i)
 		targetArray.push_back(targets[i]);
 	return targetArray;
+}
+
+QStringList Raidionics::updateOutputClasses()
+{
+	QStringList retval;
+	for(int i = 0; i < mTargets.size(); ++i)
+	{
+		QString target = mTargets[i];
+		QStringList targets = createTargetList(target);
+		retval << targets;
+	}
+	return retval;
 }
 
 }//cx

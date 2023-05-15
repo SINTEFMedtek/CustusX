@@ -30,6 +30,7 @@ public:
 	static QString getJsonFileName() {return "Raidionics.json";}
 	static QString getRaidionicsCTFileNamePrefix() {return "input_ct_gd_";}
 	QString getRadionicsInputFileName(QString inputFile);
+	QStringList updateOutputClasses();
 
 protected:
 	QString createRaidionicsIniFile();

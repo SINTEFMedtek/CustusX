@@ -690,6 +690,10 @@ bool GenericScriptFilter::postProcess()
 {
 //	CX_LOG_DEBUG() << "postProcess";
 
+	//TODO: Run postProcess in separate thread as well?
+	//Need to put all postProcess code in a separate (worker) class and use moveToThread()
+//	QThread* mPostprosessingThread = new QThread;
+
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 	OutputVariables outputVariables = OutputVariables(parameterFilePath);
 
@@ -697,10 +701,19 @@ bool GenericScriptFilter::postProcess()
 	bool createOutputMesh = outputVariables.mCreateOutputMesh;
 	QStringList colorList = outputVariables.mOutputColorList;
 	mOutputClasses = outputVariables.mOutputClasses;
+//	this->updateOutputClasses();
+
 	this->setupOutputColors(colorList);
 
 	return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
 }
+
+//void GenericScriptFilter::updateOutputClasses()
+//{
+//	if(isUsingRaidionicsEngine())
+//		mOutputClasses = mRaidionicsUtilities->updateOutputClasses();
+////	CX_LOG_DEBUG() << "Updated output class list: " << mOutputClasses.join(" ");
+//}
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
 {
@@ -785,13 +798,16 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	QFileInfo fileInfoInput(parentImage->getFilename());
 	QString inputFileName = fileInfoInput.baseName();
 	QFileInfo outputFileInfo(inputFileName + mResultFileEnding);
-	inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
 	if(isUsingRaidionicsEngine())
+	{
+		mOutputClasses = mRaidionicsUtilities->updateOutputClasses();
+		inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 		outputDir = mRaidionicsUtilities->getOutputFolder();
+	}
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
 
 

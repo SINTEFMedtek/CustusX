@@ -126,6 +126,7 @@ protected:
 	bool createVenv(QString createCommand, QString command);
 	bool setScriptEngine(CommandStringVariables variables);
 	bool initRaidionicsEngine(CommandStringVariables variables);
+//	void updateOutputClasses();
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
@@ -144,7 +145,7 @@ protected:
 	StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
-	RaidionicsPtr mRaidionicsUtilities;
+	RaidionicsPtr mRaidionicsUtilities = nullptr;
 
 protected slots:
 	void scriptFileChanged();

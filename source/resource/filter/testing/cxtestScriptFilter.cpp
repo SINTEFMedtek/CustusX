@@ -640,6 +640,29 @@ TEST_CASE("Raidionics: init", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
+TEST_CASE("Raidionics: target generation", "[unit]")
+{
+	cx::VisServicesPtr services = cx::VisServices::getNullObjects();
+	cx::CommandStringVariables variables = cx::CommandStringVariables("", cx::ImagePtr());
+
+	for(int i = cx::lmMEDIUM_ORGANS_MEDIASTINUM; i <= cx::lmCOUNT; ++i)
+	{
+		QStringList classes;
+		classes << enum2string(cx::LUNG_MODELS(i));
+
+		cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(services, variables, classes));
+
+		QStringList outputClasses = raidionicsUtilities->updateOutputClasses();
+
+//		CX_LOG_DEBUG() << "Input classes: " << classes.join(" ");
+//		CX_LOG_DEBUG() << "Output Classes: " << outputClasses.join(" ");
+		if(i == cx::lmCOUNT)
+			CHECK(outputClasses.size() == 1);
+		else
+		CHECK(outputClasses.size() > 1);
+	}
+}
+
 
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64][hide]")
