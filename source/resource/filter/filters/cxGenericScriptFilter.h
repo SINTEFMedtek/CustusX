@@ -126,7 +126,7 @@ protected:
 	bool createVenv(QString createCommand, QString command);
 	bool setScriptEngine(CommandStringVariables variables);
 	bool initRaidionicsEngine(CommandStringVariables variables);
-//	void updateOutputClasses();
+	void setOutputClasses(QStringList outputClasses);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

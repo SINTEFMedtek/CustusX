@@ -700,20 +700,19 @@ bool GenericScriptFilter::postProcess()
 	bool createOutputVolume = outputVariables.mCreateOutputVolume;
 	bool createOutputMesh = outputVariables.mCreateOutputMesh;
 	QStringList colorList = outputVariables.mOutputColorList;
-	mOutputClasses = outputVariables.mOutputClasses;
-//	this->updateOutputClasses();
+	this->setOutputClasses(outputVariables.mOutputClasses);
 
 	this->setupOutputColors(colorList);
 
 	return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
 }
 
-//void GenericScriptFilter::updateOutputClasses()
-//{
-//	if(isUsingRaidionicsEngine())
-//		mOutputClasses = mRaidionicsUtilities->updateOutputClasses();
-////	CX_LOG_DEBUG() << "Updated output class list: " << mOutputClasses.join(" ");
-//}
+void GenericScriptFilter::setOutputClasses(QStringList outputClasses)
+{
+	mOutputClasses = outputClasses;
+	if(isUsingRaidionicsEngine())
+		mOutputClasses = mRaidionicsUtilities->updateOutputClasses();
+}
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
 {
@@ -804,7 +803,6 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 
 	if(isUsingRaidionicsEngine())
 	{
-		mOutputClasses = mRaidionicsUtilities->updateOutputClasses();
 		inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 		outputDir = mRaidionicsUtilities->getOutputFolder();
 	}
