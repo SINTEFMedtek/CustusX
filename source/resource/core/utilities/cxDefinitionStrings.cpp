@@ -142,7 +142,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"UNKNOWN",
 	"Lungs",
 	"Tumors",
-	"Lesions",
+	"Nodules",
 	"Lymph Nodes",
 	"Vena Azygos",
 	"Vena Cava",
@@ -150,15 +150,14 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Subclavian Artery",
 //	"Lung Vessels",
 	"Heart",
+	"Pulmonary Veins",
+	"Pulmonary Trunk",
 	"Esophagus",
 	"Spine",
 	"Lung Vessels",
 	"Airways",
 	"Centerlines",
-	"Pulmonary Veins",
-	"Pulmonary Trunk",
 	"Medium Organs",
-	"Small Organs",
-	"Nodules"
+	"Small Organs"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)

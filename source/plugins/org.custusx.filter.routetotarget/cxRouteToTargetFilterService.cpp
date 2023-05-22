@@ -349,6 +349,11 @@ std::vector< double > RouteToTargetFilter::getCameraRotation()
 	return mRouteToTarget->getCameraRotation();
 }
 
+std::vector<int> RouteToTargetFilter::getGenerationNumbers()
+{
+	return mRouteToTarget->getGenerationNumbers();
+}
+
 std::vector< int > RouteToTargetFilter::getBranchingIndex()
 {
 	return mRouteToTarget->getBranchingIndex();
