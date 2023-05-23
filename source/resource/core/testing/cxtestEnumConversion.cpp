@@ -78,10 +78,10 @@ TEST_CASE("Lung structures conversions", "[unit][resource][core][enum]")
 {
 	CHECK(enum2string(cx::lsUNKNOWN) == "UNKNOWN");
 	CHECK(enum2string(cx::lsLUNG) == "Lungs");
-	CHECK(enum2string(cx::lsLESIONS) == "Lesions");
+	CHECK(enum2string(cx::lsNODULES) == "Nodules");
 
 	CHECK(string2enum<cx::LUNG_STRUCTURES>("Lungs") == cx::lsLUNG);
-	CHECK(string2enum<cx::LUNG_STRUCTURES>("Lesions") == cx::lsLESIONS);
+	CHECK(string2enum<cx::LUNG_STRUCTURES>("Nodules") == cx::lsNODULES);
 }
 
 }//cxtest
