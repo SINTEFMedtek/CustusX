@@ -44,6 +44,8 @@ QDomDocument FrameForest::getDocument()
  */
 void FrameForest::insertFrame(DataPtr data)
 {
+	if(!data)
+		return;
 	QString parentFrame = data->getParentSpace();
 	QString currentFrame = data->getSpace();
 

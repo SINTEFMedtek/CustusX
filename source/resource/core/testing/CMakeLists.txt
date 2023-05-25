@@ -44,6 +44,7 @@ if(BUILD_TESTING)
         cxtestFileManagerServiceMock.h
         cxtestFileManagerServiceMock.cpp
         cxtestEnumConversion.cpp
+        cxTestFrameForest.cpp
     )
 
     set(CX_TESTRESOURCE_LINK_LIBS
