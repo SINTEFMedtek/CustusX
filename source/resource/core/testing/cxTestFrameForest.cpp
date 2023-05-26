@@ -143,7 +143,7 @@ TEST_CASE("FrameForest: Get ancestors from cyclic graph", "[unit]")
 //	CX_LOG_DEBUG() << node0.toElement().tagName();
 //	CX_LOG_DEBUG() << node1.toElement().tagName();
 //	CX_LOG_DEBUG() << node2.toElement().tagName();
-	//This is not running the problematic FrameForest::isAncestorOf(), since the nodes are empty
+	//This is not running the problematic part of FrameForest::isAncestorOf(), since the nodes are empty
 	ancestorNode0 = forest.getOldestAncestorNotCommonToRef(node0, node2);
 //	CHECK_FALSE(ancestorNode0.isNull());
 	CHECK(true);

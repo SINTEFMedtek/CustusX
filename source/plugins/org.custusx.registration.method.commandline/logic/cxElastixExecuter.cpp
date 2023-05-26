@@ -498,7 +498,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		bool useDirectionCosines = file.readParameterBool("UseDirectionCosines");
 		if (useDirectionCosines)
 		{
-			reportWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
+//			reportWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
 		}
 
 		QString transformType = file.readParameterString("Transform");
