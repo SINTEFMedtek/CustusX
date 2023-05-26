@@ -38,10 +38,12 @@ public:
 	virtual QString getHelp() const;
 	static QString getNameSuffix();
 	virtual void setActive(bool on);
+	static QColor generateColor(QColor initialColor, int colorNum, int colorCount);
 
 	bool preProcess();
 	virtual bool execute();
 	virtual bool postProcess();
+
 
 	// extensions:
 	BoolPropertyPtr getReduceResolutionOption(QDomElement root);
@@ -76,7 +78,6 @@ protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
-	static QColor generateColor(QColor initialColor, int colorNum, int colorCount);
 
 private slots:
 	void imageChangedSlot(QString uid);

@@ -126,7 +126,7 @@ QString Raidionics::getRadionicsInputFileName(QString inputFile)
 
 QString Raidionics::getModelFolder()
 {
-	return profile()->getPath() + "/raidionics_models";
+	return DataLocations::getModelsPath() + "/raidionics_models";
 }
 
 //The ordering of the Qt generated json file is alphabetoical, and will not match the json example file
