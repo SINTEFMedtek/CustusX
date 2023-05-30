@@ -230,6 +230,7 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 		mRoutePositions.push_back(positions[i]);
 		mRoutePositionsBranch.push_back(searchBranchPtr);
 		mCameraRotation.push_back(cameraRotation);
+		mGenerationNumber.push_back(searchBranchPtr->findGenerationNumber());
 	}
 
 	mBranchingIndex.push_back(mRoutePositions.size()-1);
@@ -284,6 +285,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
     mExtendedRoutePositions = mRoutePositions;
     mExtendedCameraRotation.clear();
     mExtendedCameraRotation = mCameraRotation;
+		mExtendedGenerationNumber = mGenerationNumber;
 	if(mRoutePositions.size() > 0)
 	{
 		double extensionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
@@ -294,7 +296,8 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 		for (int i = 1; i<= numberOfextensionPoints; i++)
 		{
 			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extensionPointIncrementVector*i);
-            mExtendedCameraRotation.insert(mExtendedCameraRotation.begin(), mExtendedCameraRotation.front());
+			mExtendedCameraRotation.insert(mExtendedCameraRotation.begin(), mExtendedCameraRotation.front());
+			mExtendedGenerationNumber.insert(mExtendedGenerationNumber.begin(), mExtendedGenerationNumber.front());
 		}
 	}
 
@@ -645,6 +648,13 @@ std::vector< double > RouteToTarget::getCameraRotation()
 	std::vector< double > rotations = mExtendedCameraRotation;
 	std::reverse(rotations.begin(), rotations.end());
 	return rotations;
+}
+
+std::vector< int > RouteToTarget::getGenerationNumbers()
+{
+	std::vector< int > generationNumbers = mExtendedGenerationNumber;
+	std::reverse(generationNumbers.begin(), generationNumbers.end());
+	return generationNumbers;
 }
 
 std::vector< int > RouteToTarget::getBranchingIndex()
