@@ -174,7 +174,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsUNKNOWN,
 		lsLUNG, // The following enums are used for as buttons in StructuresSelectionWidget. lsLUNG is the first button.
 		lsTUMORS,
-		lsLESIONS,
+		lsNODULES,
 		lsLYMPH_NODES,
 		lsVENA_AZYGOS,
 		lsVENA_CAVA,
@@ -182,16 +182,15 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsSUBCLAVIAN_ARTERY,
 		//lsLUNG_VESSELS,
 		lsHEART,
+		lsPULMONARY_VEINS,
+		lsPULMONARY_TRUNK,
 		lsESOPHAGUS,
 		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
 		lsLUNG_VESSELS,
 		lsAIRWAYS,
 		lsCENTERLINES,
-		lsPULMONARY_VEINS,
-		lsPULMONARY_TRUNK,
 		lsMEDIUM_ORGANS,
 		lsSMALL_ORGANS,
-		lsNODULES,
 		lsCOUNT,
 		lsFIRST_STRUCTURE_BUTTON = lsLUNG,
 		lsLAST_STRUCTURE_BUTTON = lsSPINE

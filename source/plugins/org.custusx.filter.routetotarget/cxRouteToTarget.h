@@ -50,6 +50,7 @@ public:
 	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
 	std::vector< BranchPtr > getRouteBranches();
 	std::vector< double > getCameraRotation();
+	std::vector< int > getGenerationNumbers();
 	std::vector< int > getBranchingIndex();
 
 	double getTracheaLength();
@@ -73,6 +74,8 @@ private:
 	std::vector<BranchPtr> mRoutePositionsBranch;
 	std::vector< double > mCameraRotation;
 	std::vector< double > mExtendedCameraRotation;
+	std::vector< int > mGenerationNumber;
+	std::vector< int > mExtendedGenerationNumber;
 	std::vector< Eigen::Vector3d > mBloodVesselRoutePositions;
 	std::vector< Eigen::Vector3d > mMergedAirwayAndBloodVesselRoutePositions;
 	std::vector< int > mBranchingIndex;
