@@ -139,6 +139,9 @@ public:
 
 	void addInteractiveClipPlane(vtkPlanePtr plane);
 	void removeInteractiveClipPlane(vtkPlanePtr plane);
+
+	virtual ORGAN_TYPE getOrganType() const;
+	virtual void setOrganType(const ORGAN_TYPE &val);
 signals:
 	void transformChanged(); ///< emitted when transform is changed
 	void propertiesChanged(); ///< emitted when one of the metadata properties (uid, name etc) changes
@@ -161,6 +164,7 @@ protected:
 	std::vector<vtkPlanePtr> mPersistentClipPlanes;
 	std::vector<vtkPlanePtr> mInteractiveClipPlanes;
 	vtkPlanePtr mInteractiveClipPlane;
+	ORGAN_TYPE mOrganType;
 
 private:
 	Data(const Data& other);

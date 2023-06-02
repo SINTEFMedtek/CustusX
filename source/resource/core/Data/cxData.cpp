@@ -24,12 +24,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxCoordinateSystemHelpers.h"
 #include "cxLogger.h"
 #include "cxBoundingBox3D.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
 
 Data::Data(const QString& uid, const QString& name) :
-	mUid(uid), mFilename(""), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
+	mUid(uid), mFilename(""), mRegistrationStatus(rsNOT_REGISTRATED),mOrganType(otUNKNOWN)//, mParentFrame("")
 {
 	mTimeInfo.mAcquisitionTime = QDateTime::currentDateTime();
 	mTimeInfo.mSoftwareAcquisitionTime = QDateTime();
@@ -138,6 +139,11 @@ void Data::addXml(QDomNode& dataNode)
 	acqTimeNode.appendChild(doc.createTextNode(mTimeInfo.mAcquisitionTime.toString(timestampMilliSecondsFormat())));
 	dataNode.appendChild(acqTimeNode);
 
+
+	QDomElement organTypeNode = doc.createElement("organType");
+	organTypeNode.appendChild(doc.createTextNode(enum2string(mOrganType)));
+	dataNode.appendChild(organTypeNode);
+
 	if (!mLandmarks->getLandmarks().empty())
 	{
 		QDomElement landmarksNode = doc.createElement("landmarks");
@@ -150,6 +156,8 @@ void Data::parseXml(QDomNode& dataNode)
 {
 	if (dataNode.isNull())
 		return;
+
+	mOrganType = string2enum<ORGAN_TYPE>(dataNode.namedItem("organType").toElement().text());
 
 	QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
 	m_rMd_History->parseXml(registrationHistory);
@@ -271,4 +279,17 @@ void Data::removeInteractiveClipPlane(vtkPlanePtr plane)
 
 	emit clipPlanesChanged();
 }
+
+ORGAN_TYPE Data::getOrganType() const
+{
+	return mOrganType;
+}
+
+void Data::setOrganType(const ORGAN_TYPE &val)
+{
+	CX_LOG_DEBUG() << "Data::setOrganType old: " << enum2string(mOrganType) << " new: " << enum2string(val);
+	mOrganType = val;
+	emit propertiesChanged();
+}
+
 } // namespace cx

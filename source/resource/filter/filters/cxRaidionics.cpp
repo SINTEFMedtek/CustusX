@@ -192,11 +192,11 @@ QStringList Raidionics::createTargetList(QString target)
 	if(model == lmCOUNT)
 		targets << target;
 	else if(model == lmMEDIUM_ORGANS_MEDIASTINUM)
-		targets << enum2string(lmtVENA_CAVA) << enum2string(lmtAORTIC_ARCH) << enum2string(lmtASCENDING_AORTA) << enum2string(lmtDESCENDING_AORTA) << enum2string(lmtSPINE);
+		targets << enum2string(otVENA_CAVA) << enum2string(otAORTIC_ARCH) << enum2string(otASCENDING_AORTA) << enum2string(otDESCENDING_AORTA) << enum2string(otSPINE);
 	else if(model == lmPULMSYST_HEART)
-		targets << enum2string(lmtHEART) << enum2string(lmtPULMONARY_VEINS) << enum2string(lmtPULMONARY_TRUNK);
+		targets << enum2string(otHEART) << enum2string(otPULMONARY_VEINS) << enum2string(otPULMONARY_TRUNK);
 	else if(model == lmSMALL_ORGANS_MEDIASTINUM)
-		targets << enum2string(lmtBRACHIO_CEPHALIC_VEINS) << enum2string(lmtSUBCAR_ART) << enum2string(lmtAZYGOS) <<	enum2string(lmtESOPHAGUS);
+		targets << enum2string(otBRACHIO_CEPHALIC_VEINS) << enum2string(otSUBCAR_ART) << enum2string(otAZYGOS) <<	enum2string(otESOPHAGUS);
 
 	return targets;
 }
@@ -217,16 +217,68 @@ QJsonArray Raidionics::createTargetArray(QString target)
 	return targetArray;
 }
 
-QStringList Raidionics::updateOutputClasses()
+QStringList Raidionics::expandOutputClasses(QStringList targetList)
 {
 	QStringList retval;
-	for(int i = 0; i < mTargets.size(); ++i)
+	for(int i = 0; i < targetList.size(); ++i)
 	{
-		QString target = mTargets[i];
+		QString target = targetList[i];
 		QStringList targets = createTargetList(target);
 		retval << targets;
 	}
 	return retval;
+}
+
+QStringList Raidionics::setOutputClasses(QStringList outputClasses)
+{
+	mTargets = outputClasses;
+	return this->expandOutputClasses(mTargets);
+}
+
+QString Raidionics::colorForLungClass(QString outputClass)
+{
+	QString color = "255,0,0";
+
+	ORGAN_TYPE target = string2enum<ORGAN_TYPE>(outputClass);
+	switch (target)
+	{
+	case otAIRWAYS:
+		color = "254,175,180,43";break;
+	case otLUNGS:
+		color = "254,175,180,43";break;
+	case otLYMPH_NODES:
+		color = "0,255,0,255";break;
+	case otVENA_CAVA:
+		color = "153,153,255,255";break;
+	case otAORTIC_ARCH:
+		color = "255,127,127,255";break;
+	case otASCENDING_AORTA:
+		color = "255,127,127,255";break;
+	case otDESCENDING_AORTA:
+		color = "255,127,127,255";break;
+	case otSPINE:
+		color = "255,255,255,255";break;
+	case otHEART:
+		color = "254,128,204,128";break;
+	case otPULMONARY_VEINS:
+		color = "131,105,79,255";break;
+	case otPULMONARY_TRUNK:
+		color = "229,179,255,255";break;
+	case otBRACHIO_CEPHALIC_VEINS:
+		color = "255,127,127,255";break;
+	case otSUBCAR_ART:
+		color = "170,85,0,255";break;
+	case otAZYGOS:
+		color = "153,153,255,255";break;
+	case otESOPHAGUS:
+		color = "153,153,255,255";break;
+	default:
+//	otUNKNOWN,
+//	organtypeCOUNT
+		CX_LOG_WARNING() << "GenericScriptFilter::colorForClass(): No color found for " << enum2string(target) << " (Converted from string: " << outputClass << "). Setting color to red";
+		break;
+	}
+	return color;
 }
 
 }//cx

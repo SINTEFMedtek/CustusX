@@ -652,7 +652,7 @@ TEST_CASE("Raidionics: target generation", "[unit]")
 
 		cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(services, variables, classes));
 
-		QStringList outputClasses = raidionicsUtilities->updateOutputClasses();
+		QStringList outputClasses = raidionicsUtilities->expandOutputClasses(classes);
 
 //		CX_LOG_DEBUG() << "Input classes: " << classes.join(" ");
 //		CX_LOG_DEBUG() << "Output Classes: " << outputClasses.join(" ");
@@ -663,6 +663,24 @@ TEST_CASE("Raidionics: target generation", "[unit]")
 	}
 }
 
+TEST_CASE("Raidionics: Test color generation", "[unit]")
+{
+	QString testClass;
+	QString colorUnknownClass;
+	colorUnknownClass = cx::Raidionics::colorForLungClass(testClass);
+	CHECK_FALSE(colorUnknownClass.isEmpty());
+	testClass = "not a correct class name";
+	CHECK(cx::Raidionics::colorForLungClass(testClass) == colorUnknownClass);
+
+	QString testColor;
+	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)//Assumes continious numbers in enum
+	{
+		testColor = cx::Raidionics::colorForLungClass(enum2string(cx::ORGAN_TYPE(target)));
+		CHECK_FALSE(testColor.isEmpty());
+		CHECK(testColor != colorUnknownClass);
+	}
+
+}
 
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64][hide]")

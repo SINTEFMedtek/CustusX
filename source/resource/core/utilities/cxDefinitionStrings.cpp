@@ -171,9 +171,12 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODELS, lmCOUNT)
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_MODELS, lmCOUNT)
 
-DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODEL_TARGETS, lmtCOUNT)
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 {
 	"UNKNOWN",
+	"Airways",
+	"Lungs",
+	"LymphNodes",
 	"VenaCava",
 	"AorticArch",
 	"AscendingAorta",
@@ -185,6 +188,12 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODEL_TARGETS, lmtCOUNT)
 	"BrachiocephalicVeins",
 	"SubCarArt",
 	"Azygos",
-	"Esophagus"
+	"Esophagus",
+	"Tumors",
+	"Nodules",
+	"LungVessels",
+	"Centerlines",
+	"AirwayCenterlines",
+	"AirwayTubes"
 }
-DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_MODEL_TARGETS, lmtCOUNT)
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, ORGAN_TYPE, organtypeCOUNT)
