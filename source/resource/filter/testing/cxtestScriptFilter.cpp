@@ -573,7 +573,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64][hide]")
+TEST_CASE("GenericScriptFilter: Test environment", "[not_win64][hide]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
