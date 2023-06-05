@@ -264,11 +264,13 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint, PointMetricPtr centerlinEndPoint)
 {
 	mTargetPosition = targetPoint->getCoordinate();
-
-	findClosestPointInBranches(mTargetPosition);
+	if(centerlinEndPoint)
+		findClosestPointInBranches(centerlinEndPoint->getCoordinate());
+	else
+		findClosestPointInBranches(mTargetPosition);
 	findRoutePositions();
 
 	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
