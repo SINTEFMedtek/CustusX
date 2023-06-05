@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogicManager.h"
 #include "cxFileManagerServiceProxy.h"
 #include "cxNIfTIReader.h"
+#include "cxEnumConversion.h"
 
 namespace
 {
@@ -58,6 +59,14 @@ cx::ImagePtr readKaisaTestImage(cx::FileManagerServicePtr filemanager)
 	QString uid = "kaisaTestImage";
 	QString filename = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/MetaImage/Kaisa.mhd";
 	return readMhdTestImage(uid, filename, filemanager);
+}
+
+bool checkSetOrganType(cx::ImagePtr image, cx::ORGAN_TYPE organType)
+{
+	image->setOrganType(cx::otUNKNOWN);
+	image->setName(enum2string(organType));
+	image->guessOrganType();
+	return image->getOrganType() == organType;
 }
 
 class TransferFunctionPresetsHelper
@@ -299,6 +308,31 @@ TEST_CASE("Image: Changed initial window is kept after using addXml and parseXml
 	helper.checkInitialWindow(image, initialWindowWidth, initialWindowlevel);
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("Data: guessOrganType", "[unit][resource][core]")
+{
+	vtkImageDataPtr dummyImageData = cx::Image::createDummyImageData(2, 1);
+	cx::ImagePtr image(new cx::Image("DummyImage", dummyImageData, "DummyName"));
+	CHECK(image->getOrganType() == cx::otUNKNOWN);
+
+	image->guessOrganType();
+	CHECK(image->getOrganType() == cx::organtypeCOUNT);
+
+	cx::ORGAN_TYPE organType = cx::otLUNGS;
+	image->setOrganType(cx::otUNKNOWN);
+	image->setName(enum2string(organType));
+	image->guessOrganType();
+	CHECK(image->getOrganType() == organType);
+
+	CHECK(checkSetOrganType(image, cx::otCENTERLINES));
+	CHECK(checkSetOrganType(image, cx::otAIRWAYS_CENTERLINES));
+
+	for(int i = int(cx::otUNKNOWN); i < int(cx::organtypeCOUNT); ++i)
+	{
+		cx::ORGAN_TYPE organType = cx::ORGAN_TYPE(i);
+		CHECK(checkSetOrganType(image, organType));
+	}
 }
 
 } // namespace cxtest

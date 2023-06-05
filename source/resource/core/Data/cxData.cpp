@@ -158,6 +158,7 @@ void Data::parseXml(QDomNode& dataNode)
 		return;
 
 	mOrganType = string2enum<ORGAN_TYPE>(dataNode.namedItem("organType").toElement().text());
+	this->guessOrganType();
 
 	QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
 	m_rMd_History->parseXml(registrationHistory);
@@ -168,6 +169,27 @@ void Data::parseXml(QDomNode& dataNode)
 
 	if (mLandmarks)
 		mLandmarks->parseXml(dataNode.namedItem("landmarks"));
+}
+
+void Data::guessOrganType()
+{
+	if((mOrganType != organtypeCOUNT) && (mOrganType != otUNKNOWN))
+		return;
+	QString nameWithouthSpaces = this->mName.simplified();
+	nameWithouthSpaces.replace(" ", "");
+	mOrganType = string2enum<ORGAN_TYPE>(nameWithouthSpaces);
+	if((mOrganType != organtypeCOUNT) && (mOrganType != otUNKNOWN))
+		return;
+
+	QString uidWithouthSpaces = this->mUid.simplified();
+	uidWithouthSpaces.replace(" ", "");
+	for(int i = int(otUNKNOWN); i < int(organtypeCOUNT); ++i)
+	{
+		ORGAN_TYPE organType = ORGAN_TYPE(i);
+		QString organTypeString = enum2string(organType);
+		if(uidWithouthSpaces.contains(organTypeString))
+			mOrganType = organType;
+	}
 }
 
 /**Get the time the data was created from a data source.
@@ -287,7 +309,6 @@ ORGAN_TYPE Data::getOrganType() const
 
 void Data::setOrganType(const ORGAN_TYPE &val)
 {
-	CX_LOG_DEBUG() << "Data::setOrganType old: " << enum2string(mOrganType) << " new: " << enum2string(val);
 	mOrganType = val;
 	emit propertiesChanged();
 }
