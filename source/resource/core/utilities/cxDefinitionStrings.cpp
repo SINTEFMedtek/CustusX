@@ -186,7 +186,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"PulmonaryVeins",
 	"PulmonaryTrunk",
 	"BrachiocephalicVeins",
-	"SubCarArt",
+	"Subclavian Artery", //"SubCarArt" in Raidionics
 	"Azygos",
 	"Esophagus",
 	"Tumors",

@@ -129,6 +129,7 @@ protected:
 	bool initRaidionicsEngine(CommandStringVariables variables);
 	void setOutputColorsFromClasses();
 	int getClassNumber(QString filePath);
+	ORGAN_TYPE getOrganType(int classNumber);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;

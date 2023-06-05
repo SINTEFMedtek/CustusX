@@ -45,6 +45,8 @@ protected:
 	bool useFormatThresholding(QString target);
 	QString targetDescription(QString target);
 	QJsonArray createTargetArray(QString target);
+	static QString getTarget(ORGAN_TYPE organType);
+	static ORGAN_TYPE getOrganType(QString target);
 
 	VisServicesPtr mServices;
 	CommandStringVariables mVariables;

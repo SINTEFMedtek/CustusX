@@ -192,13 +192,29 @@ QStringList Raidionics::createTargetList(QString target)
 	if(model == lmCOUNT)
 		targets << target;
 	else if(model == lmMEDIUM_ORGANS_MEDIASTINUM)
-		targets << enum2string(otVENA_CAVA) << enum2string(otAORTIC_ARCH) << enum2string(otASCENDING_AORTA) << enum2string(otDESCENDING_AORTA) << enum2string(otSPINE);
+		targets << getTarget(otVENA_CAVA) << getTarget(otAORTIC_ARCH) << getTarget(otASCENDING_AORTA) << getTarget(otDESCENDING_AORTA) << getTarget(otSPINE);
 	else if(model == lmPULMSYST_HEART)
-		targets << enum2string(otHEART) << enum2string(otPULMONARY_VEINS) << enum2string(otPULMONARY_TRUNK);
+		targets << getTarget(otHEART) << getTarget(otPULMONARY_VEINS) << getTarget(otPULMONARY_TRUNK);
 	else if(model == lmSMALL_ORGANS_MEDIASTINUM)
-		targets << enum2string(otBRACHIO_CEPHALIC_VEINS) << enum2string(otSUBCAR_ART) << enum2string(otAZYGOS) <<	enum2string(otESOPHAGUS);
+		targets << getTarget(otBRACHIO_CEPHALIC_VEINS) << getTarget(otSUBCLAVIAN_ARTERY) << getTarget(otAZYGOS) <<	getTarget(otESOPHAGUS);
 
 	return targets;
+}
+
+QString Raidionics::getTarget(ORGAN_TYPE organType)
+{
+	QString target = enum2string(organType);
+	if(organType == otSUBCLAVIAN_ARTERY)
+		target = "SubCarArt";
+	return target;
+}
+
+ORGAN_TYPE Raidionics::getOrganType(QString target)
+{
+	ORGAN_TYPE organType = string2enum<ORGAN_TYPE>(target);
+	if(target == "SubCarArt")
+		organType = otSUBCLAVIAN_ARTERY;
+	return organType;
 }
 
 QString Raidionics::targetDescription(QString target)
@@ -239,7 +255,7 @@ QString Raidionics::colorForLungClass(QString outputClass)
 {
 	QString color = "255,0,0";
 
-	ORGAN_TYPE target = string2enum<ORGAN_TYPE>(outputClass);
+	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
 	switch (target)
 	{
 	case otAIRWAYS:
@@ -266,7 +282,7 @@ QString Raidionics::colorForLungClass(QString outputClass)
 		color = "229,179,255,255";break;
 	case otBRACHIO_CEPHALIC_VEINS:
 		color = "255,127,127,255";break;
-	case otSUBCAR_ART:
+	case otSUBCLAVIAN_ARTERY:
 		color = "170,85,0,255";break;
 	case otAZYGOS:
 		color = "153,153,255,255";break;

@@ -846,7 +846,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
 			int classNumber = getClassNumber(filePath);
-			ORGAN_TYPE organType = string2enum<ORGAN_TYPE>(mOutputClasses[classNumber]);
+			ORGAN_TYPE organType = this->getOrganType(classNumber);
 			mOutputImage->setOrganType(organType);
 
 			if(inputFileName == fileInfoOutput.baseName() || inputFileName == QFileInfo(fileInfoOutput.baseName()).baseName())
@@ -897,6 +897,18 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 
 	return true;
 }
+
+ORGAN_TYPE GenericScriptFilter::getOrganType(int classNumber)
+{
+	QString organTypeString = mOutputClasses[classNumber];
+	ORGAN_TYPE organType = string2enum<ORGAN_TYPE>(organTypeString);
+	if(organTypeString == "SubCarArt")
+		organType = otSUBCLAVIAN_ARTERY;
+	if(organType == otUNKNOWN || organType == organtypeCOUNT)
+		CX_LOG_WARNING() << "GenericScriptFilter::getOrganType: Cannot find organ type: " << organTypeString;
+	return organType;
+}
+
 
 int GenericScriptFilter::getClassNumber(QString filePath)
 {

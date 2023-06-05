@@ -263,6 +263,23 @@ public slots:
 		REQUIRE(data);
 		return data;
 	}
+
+
+
+	class TestRaidionics : public cx::Raidionics
+	{
+	public:
+		static QString getTarget(cx::ORGAN_TYPE organType)
+		{
+			return cx::Raidionics::getTarget(organType);
+		}
+
+		static cx::ORGAN_TYPE getOrganType(QString target)
+		{
+			return cx::Raidionics::getOrganType(target);
+		}
+	};
+
 } //cxtest
 
 TEST_CASE("GenericScriptFilter: Create", "[unit]")
@@ -680,6 +697,23 @@ TEST_CASE("Raidionics: Test color generation", "[unit]")
 		CHECK(testColor != colorUnknownClass);
 	}
 
+}
+
+TEST_CASE("Raidionics: target conversion", "[unit]")
+{
+	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)
+	{
+		cx::ORGAN_TYPE organType = cx::ORGAN_TYPE(target);
+		QString organTypeString = enum2string(cx::ORGAN_TYPE(target));
+		QString targetString = cxtest::TestRaidionics::getTarget(organType);
+		if(organType != cx::otSUBCLAVIAN_ARTERY)
+			CHECK(organTypeString == targetString);
+		else
+			CHECK("SubCarArt" == targetString);
+
+		cx::ORGAN_TYPE organTypeRaidionics = cxtest::TestRaidionics::getOrganType(organTypeString);
+		CHECK(organTypeRaidionics == organType);
+	}
 }
 
 #ifdef CX_CUSTUS_SINTEF
