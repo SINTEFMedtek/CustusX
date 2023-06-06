@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QVariant>
 #include <QDomDocument>
 #include <QColor>
+#include "cxDefinitions.h"
 
 #ifndef Q_MOC_RUN // workaround for bug in moc vs boost 1.48+: https://bugreports.qt-project.org/browse/QTBUG-22829
 #include <boost/lexical_cast.hpp>
@@ -99,6 +100,12 @@ template<> cxResource_EXPORT QString streamXml2String(QString& val);
 
 cxResource_EXPORT QString color2string(QColor color);
 cxResource_EXPORT QColor string2color(QString input, QColor defaultValue=QColor("green"));
+
+namespace cx
+{
+QString convertToReadableString(QString string);
+QString convertToReadableString(ORGAN_TYPE target);
+}//cx
 
 /**
  * \}

@@ -856,7 +856,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 				continue;//Skip input volume. The mesh creation of this takes a very long time
 			}
 			else
-				CX_LOG_INFO() << "Importing: " << filePath;
+				CX_LOG_INFO() << "Importing: " << filePath << " (as organ type: " << enum2string(organType) << ")";
 
 			if(!mOutputImage)
 			{

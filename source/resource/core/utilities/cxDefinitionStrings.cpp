@@ -186,14 +186,16 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"PulmonaryVeins",
 	"PulmonaryTrunk",
 	"BrachiocephalicVeins",
-	"Subclavian Artery", //"SubCarArt" in Raidionics
+	"SubclavianArtery", //"SubCarArt" in Raidionics
 	"Azygos",
 	"Esophagus",
 	"Tumors",
 	"Nodules",
 	"LungVessels",
+	"AirwaysEnhanced",
 	"Centerlines",
 	"AirwayCenterlines",
-	"AirwayTubes"
+	"RouteToTarget",
+	"RouteToTargetExtended"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, ORGAN_TYPE, organtypeCOUNT)

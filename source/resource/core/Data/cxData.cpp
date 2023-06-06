@@ -174,12 +174,18 @@ void Data::parseXml(QDomNode& dataNode)
 void Data::guessOrganType()
 {
 	if((mOrganType != organtypeCOUNT) && (mOrganType != otUNKNOWN))
+	{
+//		CX_LOG_DEBUG() << "Data::guessOrganType: Already got organ type: " << mOrganType << "  " << this->mName;
 		return;
+	}
 	QString nameWithouthSpaces = this->mName.simplified();
 	nameWithouthSpaces.replace(" ", "");
 	mOrganType = string2enum<ORGAN_TYPE>(nameWithouthSpaces);
 	if((mOrganType != organtypeCOUNT) && (mOrganType != otUNKNOWN))
+	{
+//		CX_LOG_DEBUG() << "Data::guessOrganType: Found organ: " << mOrganType << " " << enum2string(mOrganType) << ". From name: " << this->mName;
 		return;
+	}
 
 	QString uidWithouthSpaces = this->mUid.simplified();
 	uidWithouthSpaces.replace(" ", "");
@@ -188,7 +194,37 @@ void Data::guessOrganType()
 		ORGAN_TYPE organType = ORGAN_TYPE(i);
 		QString organTypeString = enum2string(organType);
 		if(uidWithouthSpaces.contains(organTypeString))
+		{
 			mOrganType = organType;
+//			CX_LOG_DEBUG() << "Data::guessOrganType: Found organ: " << mOrganType << " " << enum2string(mOrganType) << ". From uid: " << this->mUid;
+		}
+	}
+
+	if(mOrganType == otAIRWAYS)
+	{
+		if(uidWithouthSpaces.contains("Airways_tubes_centerline"))
+			mOrganType =  otAIRWAYS_CENTERLINES;
+		else if (uidWithouthSpaces.contains("Airways_tubes_colored"))
+			mOrganType = otAIRWAYS_ENHANCED;
+	}
+	if((mOrganType == organtypeCOUNT) && (mOrganType == otUNKNOWN))
+	{
+//		CX_LOG_DEBUG() << "Data::guessOrganType: Still no organ match. Check for route to target";
+		if(uidWithouthSpaces.contains("rtt_cl_ext"))
+		{
+			mOrganType = otROUTE_TO_TARGET_EXTENDED;
+//			CX_LOG_DEBUG() << "Data::guessOrganType: Found organ: " << mOrganType << " " << enum2string(mOrganType) << ". From uid: " << this->mUid;
+		}
+		else if(uidWithouthSpaces.contains("rtt_cl"))
+		{
+			mOrganType = otROUTE_TO_TARGET;
+//			CX_LOG_DEBUG() << "Data::guessOrganType: Found organ: " << mOrganType << " " << enum2string(mOrganType) << ". From uid: " << this->mUid;
+		}
+		else
+		{
+			mOrganType = otUNKNOWN;
+			CX_LOG_DEBUG() << "Data::guessOrganType: Cannot find organ type from uid or name. (Name: " << this->mName << ", uid: " << this->mUid << ")";
+		}
 	}
 }
 

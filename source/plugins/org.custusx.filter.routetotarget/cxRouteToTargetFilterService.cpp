@@ -227,19 +227,21 @@ bool RouteToTargetFilter::postProcess()
 		return false;
 
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
-	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
+	QString nameOutputCenterline = convertToReadableString(otROUTE_TO_TARGET);
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 	outputCenterline->setVtkPolyData(mOutput);
 	outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+	outputCenterline->setOrganType(otROUTE_TO_TARGET);
 	patientService()->insertData(outputCenterline, true);
 
 	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
-	QString nameCenterlineExt = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixExtension();
+	QString nameCenterlineExt = convertToReadableString(otROUTE_TO_TARGET_EXTENDED);
 	MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
 	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
 	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
 	outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+	outputCenterlineExt->setOrganType(otROUTE_TO_TARGET_EXTENDED);
 	patientService()->insertData(outputCenterlineExt, true);
 
 	//note: mOutput and outputCenterline is in reference(r) space
@@ -272,8 +274,10 @@ bool RouteToTargetFilter::postProcess()
 	return true;
 }
 
+//TODO: Not used
 bool RouteToTargetFilter::postProcessBloodVessels()
 {
+//	CX_LOG_DEBUG() << "Not Used? -------------------RouteToTargetFilter::postProcessBloodVessels()";
 	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
