@@ -44,6 +44,8 @@ public:
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
 	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true);
+	void splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int splitIndex);
+	BranchPtr findBranchToConnect(BranchPtr newBranch, double maxDistanceToExistingBranch);
 	void selectGenerations(int maxGeneration);
 	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);
