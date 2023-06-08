@@ -43,7 +43,7 @@ public:
 	void deleteBranch(BranchPtr b);
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
-	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true, vtkPolyDataPtr bloodVessels_r = vtkPolyDataPtr());
+	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true);
 	void selectGenerations(int maxGeneration);
 	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);

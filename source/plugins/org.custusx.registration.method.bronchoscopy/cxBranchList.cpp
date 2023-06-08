@@ -327,10 +327,8 @@ void BranchList::smoothBranchPositions(int controlPointDistance)
 	}
 }
 
-void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments, vtkPolyDataPtr bloodVessels_r)
+void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex, bool connectSeparateSegments)
 {
-	//if(bloodVessels_r)
-	//TO DO: Find main airway tree
 	if (sortByZindex)
 		positions_r = sortMatrix(2,positions_r);
 
@@ -372,13 +370,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			}
 			if(minDistance == maxDistanceToExistingBranch)
 			{//No more close positions found
-				if(mBranches.size() < 5)
-				{//Main airway tree not found. Delete and restart.
-					this->deleteAllBranches();
-					continue;
-				}
-				else
-					break; //Airway centerline tree completed.
+				break; //Airway centerline tree completed.
 			}
 			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
 			splitIndex = dsearchResult.first;
@@ -407,16 +399,13 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			std::vector<BranchPtr> existingCloseBranches = findClosesBranches(newBranchPositions.col(0), maxDistanceToExistingBranch);
 			Eigen::MatrixXd newBranchOrientations = newBranch->getOrientations();
 			double orientationVariance = calculate3DVaiance(newBranchOrientations);
-//			CX_LOG_DEBUG() << "Orientation variance of new branch: " << orientationVariance;
 			if(orientationVariance > MAX_ORIENTATION_VARIANCE_IN_NEW_BRANCH)
 				continue;
 			int numberOfColumnsInNewBranch = newBranchOrientations.cols();
 
 			Vector3D newBranchOrientationStart = newBranchPositions.col(std::min(numberOfColumnsInNewBranch-1, 10)) - newBranchPositions.col(0);
-			//Vector3D newBranchOrientationStart = newBranchOrientations.leftCols(std::min(10, numberOfColumnsInNewBranch-1)).rowwise().mean(); //smoothing
 			newBranchOrientationStart = newBranchOrientationStart / newBranchOrientationStart.norm(); // normalizing
 			BranchPtr branchToConnect;
-//			CX_LOG_DEBUG() << "newBranchPositions.col(0): " << newBranchPositions.col(0) << " - newBranchOrientationStart: " << newBranchOrientationStart;
 			double minOrintationDeviationToNewBranch = MAX_DIRECTION_DEVIATION_FOR_CONNECTION_NEW_BRANCH; //deg
 			for (int i=0; i<existingCloseBranches.size(); i++)
 			{
@@ -427,7 +416,6 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 				Eigen::MatrixXd existingCloseBranchOrientations = existingCloseBranches[i]->getOrientations();
 				int numberOfColumnsInExistingBranch = existingCloseBranchOrientations.cols();
 				Vector3D existingCloseBranchOrientationEnd = existingCloseBranchPositions.col(numberOfColumnsInExistingBranch-1) - existingCloseBranchPositions.col(std::max(numberOfColumnsInExistingBranch-10, 0));
-				//Vector3D existingCloseBranchOrientationEnd = existingCloseBranchOrientations.rightCols(std::min(10, numberOfColumnsInExistingBranch)).rowwise().mean(); //smoothing
 				existingCloseBranchOrientationEnd = existingCloseBranchOrientationEnd / existingCloseBranchOrientationEnd.norm(); // normalizing
 				Vector3D orientationBetweenBranches = newBranchPositions.leftCols(1) - existingCloseBranchPositions.rightCols(1);
 				orientationBetweenBranches = orientationBetweenBranches / orientationBetweenBranches.norm(); // normalizing
@@ -438,15 +426,11 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 					minOrintationDeviationToNewBranch = angleDeviationInConnectionToNewBranch;
 					branchToConnect = existingCloseBranches[i];
 				}
-//				CX_LOG_DEBUG() << "existingCloseBranchPositions.rightCols(): " << existingCloseBranchPositions.rightCols(1) << " - existingCloseBranchOrientationEnd: " << existingCloseBranchOrientationEnd;
-//				CX_LOG_DEBUG() << "angleDeviationInConnectionToExistingBranch: " << angleDeviationInConnectionToExistingBranch << " - angleDeviationInConnectionToNewBranch: " << angleDeviationInConnectionToNewBranch;
 			}
 			if (branchToConnect)
-			{ // Checking if branch with orientation fit is found
+			{ // Checking if branch with orientation match is found
 				branchToSplit = branchToConnect;
 				splitIndex = branchToConnect->getPositions().cols()-1; //connect to last position
-				Eigen::MatrixXd positions = branchToConnect->getPositions();//debug
-//				CX_LOG_DEBUG() << "Branch to include found: " << positions.rightCols(1);
 			}
 			else
 				continue; //do not add new branch if orientation match is not found

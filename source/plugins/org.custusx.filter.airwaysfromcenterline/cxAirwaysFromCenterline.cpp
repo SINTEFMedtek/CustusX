@@ -75,17 +75,14 @@ void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume, 
 
 }
 
-void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr airwaysCenterline_r, vtkPolyDataPtr bloodVesselsCenterline_r)
+void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr airwaysCenterline_r)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
 	Eigen::MatrixXd airwayCenterlinePoints_r = getCenterlinePositions(airwaysCenterline_r);
 
-	if (bloodVesselsCenterline_r)
-		mBranchListPtr->findBranchesInCenterline(airwayCenterlinePoints_r, true, true, bloodVesselsCenterline_r);
-	else
-		mBranchListPtr->findBranchesInCenterline(airwayCenterlinePoints_r);
+	mBranchListPtr->findBranchesInCenterline(airwayCenterlinePoints_r);
 
 	mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->interpolateBranchPositions();

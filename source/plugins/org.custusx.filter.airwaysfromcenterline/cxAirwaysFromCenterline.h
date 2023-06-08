@@ -32,7 +32,7 @@ public:
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void setBranches(BranchListPtr branches);
 	void setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd = Transform3D::Identity());
-	void processCenterline(vtkPolyDataPtr centerline_r, vtkPolyDataPtr bloodVesselsCenterline_r = vtkPolyDataPtr());
+	void processCenterline(vtkPolyDataPtr centerline_r);
 	BranchListPtr getBranchList();
 	vtkImageDataPtr getFilteredSegmentedVolume();
 	vtkPolyDataPtr generateTubes(double staticRadius = 0, bool mergeWithOriginalAirways = false);
