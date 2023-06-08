@@ -373,6 +373,8 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 				break; //Airway centerline tree completed.
 			}
 			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
+			if (dsearchResult.second > 5) //stop if no new branch closer than 5 mm to existing branch is found
+				break;
 			splitIndex = dsearchResult.first;
 		}
 		else //if this is the first branch. Select the top position (Trachea).

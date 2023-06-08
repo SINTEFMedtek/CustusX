@@ -38,9 +38,11 @@ public:
 
 	virtual bool preProcess();
 	virtual bool execute();
+	std::vector<vtkImageDataPtr> execute(ImagePtr input, bool labeledVolume);
 	virtual bool postProcess();
 
 	ColorPropertyBasePtr getColorOption(QDomElement root);
+	BoolPropertyPtr getLabeledVolumeOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
@@ -48,7 +50,7 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-	vtkImageDataPtr mRawResult;
+	std::vector<vtkImageDataPtr> mRawResult;
 };
 
 

@@ -133,6 +133,9 @@ vtkPolyDataPtr AirwaysFromCenterline::generateTubes(double staticRadius, bool me
 	if(mMergeWithOriginalAirways)
 		mFilteredSegmentedVolumePtr = this->removeIslandsFromImage(mFilteredSegmentedVolumePtr);
 
+	if(mMergeWithOriginalAirways)
+		airwaysVolumePtr = this->removeIslandsFromImage(airwaysVolumePtr);
+
 	//create contour from image
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
 				mFilteredSegmentedVolumePtr,

@@ -223,7 +223,11 @@ class VTK(CppComponent):
         if use_qt5:
             add('VTK_QT_VERSION:STRING', "5")
             add('VTK_Group_Qt:BOOL', "ON")
-            add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+            if(platform.system() == 'Darwin'):
+              #add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+              add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+            if(platform.system() == 'Linux'):
+              add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
             add('Module_vtkGUISupportQt:BOOL', 'ON')
@@ -260,7 +264,11 @@ class CTK(CppComponent):
         add('CTK_LIB_DICOM/Widgets:BOOL', 'ON')
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
-        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Darwin'):
+          #add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('BUILD_TESTING:BOOL', 'OFF')
@@ -469,7 +477,11 @@ class CustusX(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
-        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Darwin'):
+          #add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         # See CX-208 about this Eigen flag and about updating Eigen.
         # The second one should be used when upgrading
         # to version > 3.2, as the old one is depracated in version 3.3.
@@ -618,6 +630,11 @@ class QHttpServer(CppComponent):
         self._getBuilder().gitCheckoutSha('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
+        add = builder.addCMakeOption
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
