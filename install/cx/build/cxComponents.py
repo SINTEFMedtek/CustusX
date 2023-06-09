@@ -209,10 +209,9 @@ class VTK(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         #return '%s/VTK' % self.controlData.gitrepo_open_site_base
-        return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later
+        return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        #self._getBuilder().gitCheckoutSha('f404b97624ddc745204e90ae87872f3c05cd5e4f')
         self._getBuilder().gitCheckout('v9.2.4')
     def configure(self):
         builder = self._getBuilder()
@@ -241,7 +240,6 @@ class VTK(CppComponent):
         add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
         #VTK 9
         add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
-        #add('VTK_MODULE_ENABLE_VTK_RenderingQt:STRING', 'YES') #Didn't fix the issue. Not needed?
         add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
         builder.configureCMake()
 # ---------------------------------------------------------
@@ -256,11 +254,8 @@ class CTK(CppComponent):
     def repository(self):
         #base = self.controlData.gitrepo_open_site_base
         #return '%s/CTK.git' % base
-        return 'https://github.com/commontk/CTK.git'
+        return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        #This fixes the bug:
-        #QSqlDatabasePrivate::database: requested database does not belong to the calling thread.
-        #self._getBuilder().gitCheckoutSha('7c0477fc6eeda55b0fcec1127f001a38009332ef')
         self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
@@ -360,9 +355,8 @@ class OpenIGTLink(CppComponent):
         return 'https://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-#        self._getBuilder().gitCheckoutSha('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
-#        self._getBuilder().gitCheckoutSha('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
-        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
+#        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
+        self._getBuilder().gitCheckoutSha('8f586ed476335bbd916782caa7b32fa3b4ea4b9b') # 17. May 2023
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -389,8 +383,7 @@ class OpenIGTLinkIO(CppComponent):
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        #self._getBuilder().gitCheckoutSha('854c850ed753941860168860fc19f1c807fc0595')
-        self._getBuilder().gitCheckoutSha('46975d197796063b956573f1b1022ac2e3643fe4')
+        self._getBuilder().gitCheckoutSha('46975d197796063b956573f1b1022ac2e3643fe4') # 3. Nov 2022
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption

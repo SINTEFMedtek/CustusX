@@ -90,10 +90,8 @@ target_include_directories(org_custusx_core_view
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 #vtk_module_autoinit(
-#  TARGETS ${PROJECT_NAME}
-##  MODULES ${VTK_LIBRARIES}
+#  TARGETS ${PROJECT_NAME}}
 #  MODULES ${VTK_MODULES}
-##  MODULES VTK::RenderingVolumeOpenGL2 VTK::CommonCore #Adding only the needed modules is the preferred way, but finding the correct ones may take some time. Missing some cause crash at runtime (Ubuntu 20.04)
 #  )
 
 add_subdirectory(testing)

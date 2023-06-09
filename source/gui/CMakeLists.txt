@@ -156,7 +156,6 @@ target_link_libraries(cxGui
 
 vtk_module_autoinit(
   TARGETS cxGui
-#  MODULES ${VTK_LIBRARIES}
   MODULES ${VTK_MODULES}
 )
 
