@@ -274,10 +274,8 @@ bool RouteToTargetFilter::postProcess()
 	return true;
 }
 
-//TODO: Not used
 bool RouteToTargetFilter::postProcessBloodVessels()
 {
-//	CX_LOG_DEBUG() << "Not Used? -------------------RouteToTargetFilter::postProcessBloodVessels()";
 	MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();

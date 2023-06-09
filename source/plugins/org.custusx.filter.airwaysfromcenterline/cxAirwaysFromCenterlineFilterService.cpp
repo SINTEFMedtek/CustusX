@@ -123,17 +123,13 @@ bool AirwaysFromCenterlineFilter::execute()
 	return true;
 }
 
-//TODO: Not used?
 bool AirwaysFromCenterlineFilter::postProcess()
 {
-//	CX_LOG_DEBUG() << "Not used? ------------------AirwaysFromCenterlineFilter::postProcess()";
-
     MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
     if (!inputMesh)
         return false;
 
 		QString uidSurfaceModel = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
-//		QString nameSurfaceModel = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
 		QString nameSurfaceModel = convertToReadableString(otAIRWAYS);
 
 		MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
@@ -148,7 +144,6 @@ bool AirwaysFromCenterlineFilter::postProcess()
 		mServices->view()->autoShowData(outputMesh);
 
 		QString uidCenterline = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
-//		QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
 		QString nameCenterline = convertToReadableString(otCENTERLINES);
 
 		MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
