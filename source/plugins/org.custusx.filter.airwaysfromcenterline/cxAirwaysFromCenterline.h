@@ -38,14 +38,15 @@ public:
 	vtkPolyDataPtr generateTubes(double staticRadius = 0, bool mergeWithOriginalAirways = false);
 	vtkImageDataPtr initializeEmptyAirwaysVolume();
 	vtkImageDataPtr initializeAirwaysVolumeFromOriginalSegmentation();
-	vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double staticRadius = 0);
-	vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
-	vtkImageDataPtr removeIslandsFromImage(vtkImageDataPtr image);
 	void smoothAllBranchesForVB();
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	vtkPolyDataPtr getVTKPoints();
 
 private:
+	void addSpheresAlongCenterlines(double staticRadius = 0);
+	void addSphereToImage(double position[3], double radius);
+	void removeIslandsFromImage();
+
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
 	vtkImageDataPtr mOriginalSegmentedVolume;
