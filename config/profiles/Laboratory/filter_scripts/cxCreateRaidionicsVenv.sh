@@ -14,8 +14,8 @@ if [ -z $venvBasePath ]; then
 fi
 
 cd "$venvBasePath";
-sudo apt-get update
-sudo apt install python3.8-venv
+sudo apt-get -y update
+sudo apt install -y python3.8-venv
 python3 -m venv raidionicsVenv
 source raidionicsVenv/bin/activate
 pip install --upgrade pip
