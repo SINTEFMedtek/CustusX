@@ -27,6 +27,7 @@ class QLineEdit;
 namespace cx
 {
 typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
+typedef boost::shared_ptr<class SelectDataStringPropertyBase> SelectDataStringPropertyBasePtr;
 class TimedAlgorithmProgressBar;
 
 /**
@@ -52,7 +53,10 @@ public slots:
 
 private slots:
 	void registerSlot();
-	void userParameterFileSelected(QString filename);
+	void userParameterFile0Selected(QString filename);
+	void userParameterFile1Selected(QString filename);
+	void userParameterFile2Selected(QString filename);
+	void deformImageChanged(QString imageUid);
 	void elastixChangedSlot();
 	void toggleDetailsSlot();
 	void savePresetSlot();
@@ -71,7 +75,10 @@ private:
 
 	StringPropertyBasePtr mFixedImage;
 	StringPropertyBasePtr mMovingImage;
+	SelectDataStringPropertyBasePtr mDeformImage;
 	FileSelectWidget* mParameterFileWidget0;
+	FileSelectWidget* mParameterFileWidget1;
+	FileSelectWidget* mParameterFileWidget2;
 	FilePreviewWidget* mFilePreviewWidget;
 	cx::TimedAlgorithmProgressBar* mTimedAlgorithmProgressBar;
 	QWidget* mOptionsWidget;

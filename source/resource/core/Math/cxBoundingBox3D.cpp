@@ -285,6 +285,18 @@ DoubleBoundingBox3D DoubleBoundingBox3D::unionWith(const DoubleBoundingBox3D& ot
 	return fromCloud(cloud);
 }
 
+void DoubleBoundingBox3D::translate(Transform3D translation)
+{
+	Vector3D translatedTopRight = translation * topRight();
+	Vector3D translatedBottomLeft = translation * bottomLeft();
+	elems[0] = translatedBottomLeft[0];
+	elems[1] = translatedTopRight[0];
+	elems[2] = translatedBottomLeft[1];
+	elems[3] = translatedTopRight[1];
+	elems[4] = translatedBottomLeft[2];
+	elems[5] = translatedTopRight[2];
+}
+
 DoubleBoundingBox3D intersection(DoubleBoundingBox3D a, DoubleBoundingBox3D b)
 {
 	DoubleBoundingBox3D bb = a;

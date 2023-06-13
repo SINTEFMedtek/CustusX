@@ -56,10 +56,11 @@ public:
 	void setDisplayProcessMessages(bool on);
 
 	bool setInput(QString application,
-	         DataPtr fixed,
-	         DataPtr moving,
-	         QString outdir,
-	         QStringList parameterfiles);
+				  DataPtr fixed,
+				  DataPtr moving,
+				  QString outdir,
+				  QStringList parameterfiles);
+	bool runTransformix(ImagePtr deformImage);
 	virtual void execute();
 	virtual bool isFinished() const;
     virtual bool isRunning() const;
@@ -70,7 +71,7 @@ public:
 	 * getAffineResult_mmMff for a full discussion.
 	 */
 	Transform3D getAffineResult_mMf(bool* ok = 0) ;
-	QString getNonlinearResultVolume(bool* ok = 0);
+	QString getNonlinearResultVolume(bool* ok = 0, bool getTransformixResult = false);
 
 private slots:
 	void processStateChanged(QProcess::ProcessState newState);
@@ -91,6 +92,8 @@ private:
 	 *  highest i. All other transform files can be found from
 	 *  this one.
 	 */
+	Transform3D centerToCenterTranslation(bool printDebug = false);
+	bool volumesOverlap();
 	QString findMostRecentTransformOutputFile() const;
 	/** Return the result of the latest registration as a linear transform mMf.
 	 *
@@ -119,11 +122,22 @@ private:
 	 */
 	Transform3D getFileTransform_ddMd(DataPtr volume);
 
+	void setProcessEnvironment(QProcess *process);
+	QString createTransformixCommandLine(QString elastixApplication, QString outdir, QStringList parameterfiles);
+	void updateProcessName(bool transformix = false);
+//	QString changeInitialTransformsFromParametersFile(QString transformParametersFile, QString initTransformFilename);
+
 	QString mLastOutdir;
 	QProcess* mProcess;
+	QProcess* mTransformixProcess = nullptr;
 	DataPtr mFixed;
 	DataPtr mMoving;
+	ImagePtr mDeformImage;
 	RegServicesPtr mServices;
+
+	QString mOutdir;
+	QStringList mParameterfiles;
+	QString mElastiXApplication;
 };
 
 /**Reader class for an Elastix-style parameter file.
