@@ -336,15 +336,8 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 	if (sortByZindex)
 		mainAirwayTree_r = sortMatrix(2,mainAirwayTree_r);
 
-	double maxDistanceToExistingBranch;
-	if(connectSeparateSegments)
-		maxDistanceToExistingBranch = MAX_DISTANCE_TO_EXISTING_BRANCH;
-	else
-		maxDistanceToExistingBranch = MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH;
-
 	Eigen::MatrixXd positionsNotUsed_r = positions_r;
 
-	int index;
 	int splitIndex;
 	double minDistance;
 	Eigen::MatrixXd::Index startIndex;
@@ -352,28 +345,11 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 	while (positionsNotUsed_r.cols() > 0)
 	{
 		if (!mBranches.empty())
-		{// Find remaining point which is closest to an existing branch
-			minDistance = maxDistanceToExistingBranch;
-			for (int i = 0; i < mBranches.size(); i++)
-			{
-				std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
-				distances = dsearchn(positionsNotUsed_r, mBranches[i]->getPositions());
-				double d = distances.second.minCoeff(&index);
-				if (d < minDistance)
-				{
-					minDistance = d;
-					branchToSplit = mBranches[i];
-					startIndex = index;
-					if (minDistance < 2)
-						break;
-				}
-			}
-			if(minDistance == maxDistanceToExistingBranch)
-			{//No more close positions found
-				break; //Airway centerline tree completed.
-			}
-			std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
-			splitIndex = dsearchResult.first;
+		{
+			minDistance = maxDistanceToExistingBranch(connectSeparateSegments);
+			bool treeCompleted = findRemainingPointClosestToExistingBranch(connectSeparateSegments, positionsNotUsed_r, minDistance, startIndex, splitIndex, branchToSplit);
+			if(treeCompleted)
+				break;
 		}
 		else //if this is the first branch. Select the top position (Trachea).
 		{
@@ -396,7 +372,7 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 		{ // If distance to closest branch is above DISTANCE_TO_USE_BRANCH_DIRECTION_FOR_CONNECTION
 			// we look at all branches at a distance below MAX_DISTANCE_TO_EXISTING_BRANCH and select the one wtih
 			// lowest orientation deviation between the conection part and the new and the existing branch.
-			BranchPtr branchToConnect = findBranchToConnect(newBranch, maxDistanceToExistingBranch);
+			BranchPtr branchToConnect = findBranchToConnect(newBranch, maxDistanceToExistingBranch(connectSeparateSegments));
 			if (branchToConnect)
 			{ // Checking if branch with orientation match is found
 				branchToSplit = branchToConnect;
@@ -454,6 +430,41 @@ void BranchList::splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int s
 		branchToSplit->addChildBranch(newBranch);
 	}
 
+}
+
+bool BranchList::findRemainingPointClosestToExistingBranch(bool connectSeparateSegments, Eigen::MatrixXd positionsNotUsed_r, double& minDistance, Eigen::MatrixXd::Index& startIndex, int& splitIndex, BranchPtr& branchToSplit)
+{
+	int index;
+	for (int i = 0; i < mBranches.size(); i++)
+	{
+		std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd> distances;
+		distances = dsearchn(positionsNotUsed_r, mBranches[i]->getPositions());
+		double d = distances.second.minCoeff(&index);
+		if (d < minDistance)
+		{
+			minDistance = d;
+			branchToSplit = mBranches[i];
+			startIndex = index;
+			if (minDistance < 2)
+				break;
+		}
+	}
+	if(minDistance == maxDistanceToExistingBranch(connectSeparateSegments))
+	{//No more close positions found
+		return true; //Airway centerline tree completed.
+	}
+	std::pair<Eigen::MatrixXd::Index, double> dsearchResult = dsearch(positionsNotUsed_r.col(startIndex) , branchToSplit->getPositions());
+	splitIndex = dsearchResult.first;
+
+	return false;
+}
+
+double BranchList::maxDistanceToExistingBranch(bool connectSeparateSegments)
+{
+	if(connectSeparateSegments)
+		return MAX_DISTANCE_TO_EXISTING_BRANCH;
+	else
+		return MAX_DISTANCE_BETWEEN_CONNECTED_POINTS_IN_BRANCH;
 }
 
 BranchPtr BranchList::findBranchToConnect(BranchPtr newBranch, double maxDistanceToExistingBranch)
@@ -704,7 +715,7 @@ vtkPolyDataPtr BranchList::createVtkPolyDataFromBranches(bool fullyConnected, bo
 	return retval;
 }
 
-Eigen::MatrixXd BranchList:: findMainConnectedAirwayTree(Eigen::MatrixXd positions_r)
+Eigen::MatrixXd BranchList::findMainConnectedAirwayTree(Eigen::MatrixXd positions_r)
 {
 	Eigen::MatrixXd mainAirwayTree_r;
 	std::vector<Eigen::MatrixXd> connectedSegments;

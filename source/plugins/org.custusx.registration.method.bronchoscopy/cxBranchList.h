@@ -44,8 +44,6 @@ public:
 	void deleteAllBranches();
 	std::vector<BranchPtr> getBranches();
 	void findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sortByZindex = true, bool connectSeparateSegments = true);
-	void splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int splitIndex);
-	BranchPtr findBranchToConnect(BranchPtr newBranch, double maxDistanceToExistingBranch);
 	void selectGenerations(int maxGeneration);
 	void findBronchoscopeRotation();
 	void calculateBronchoscopeRotation(BranchPtr branch);
@@ -58,11 +56,17 @@ public:
 	void markLungLap(QString name, Vector3D position);
 	void setLapName(BranchPtr branch, QString name);
 	QString findClosestLungLap(Vector3D position);
-	double findDistance(Vector3D p1, Vector3D p2);
-	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
-	std::vector<BranchPtr> findClosesBranches(Vector3D position, double maxDistance);
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
+
+private:
+	void splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int splitIndex);
+	BranchPtr findBranchToConnect(BranchPtr newBranch, double maxDistanceToExistingBranch);
+	bool findRemainingPointClosestToExistingBranch(bool connectSeparateSegments, Eigen::MatrixXd positionsNotUsed_r, double& minDistance, Eigen::MatrixXd::Index& startIndex, int &splitIndex, BranchPtr& branchToSplit);
+	double maxDistanceToExistingBranch(bool connectSeparateSegments);
+	std::vector<BranchPtr> findClosesBranches(Vector3D position, double maxDistance);
+	double findDistance(Vector3D p1, Vector3D p2);
+	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);
 	Eigen::MatrixXd findMainConnectedAirwayTree(Eigen::MatrixXd positions_r);
 };
 
