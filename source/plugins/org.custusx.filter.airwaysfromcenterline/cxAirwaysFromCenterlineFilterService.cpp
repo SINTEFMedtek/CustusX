@@ -197,11 +197,12 @@ bool AirwaysFromCenterlineFilter::postProcess()
 			if(segmentedOutputVolume)
 			{
 				QString uidOutputVolume = segmentedinputVolume->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
-				QString nameOutputVolume = segmentedinputVolume->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+				QString nameOutputVolume = convertToReadableString(otAIRWAYS);
 				ImagePtr outputVolume = createDerivedImage(mServices->patient(),
 																						 uidOutputVolume, nameOutputVolume,
 																						 segmentedOutputVolume, segmentedinputVolume);
 				outputVolume->mergevtkSettingsIntosscTransform();
+				outputVolume->setOrganType(otAIRWAYS);
 				patientService()->insertData(outputVolume);
 
 				if(mOutputTypes.size() > 2)
