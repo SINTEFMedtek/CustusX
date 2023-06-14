@@ -21,7 +21,6 @@ public:
 	virtual ~RouteToTarget();
 	void setBloodVesselVolume(ImagePtr bloodVesselVolume);
 	//void setCenterline(vtkPolyDataPtr centerline);
-	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void setSmoothing(bool smoothing);
 	void processCenterline(MeshPtr mesh);
 	void setBranchList(BranchListPtr branchList);
@@ -33,7 +32,7 @@ public:
 	void findRoutePositionsInBloodVessels();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
 	void searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int startIndex);
-	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint);
+	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint, PointMetricPtr centerlinEndPoint = NULL);
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint);
 	vtkPolyDataPtr generateAirwaysFromBloodVesselCenterlines();
@@ -68,6 +67,7 @@ private:
 	int mProjectedBloodVesselIndex;
 	ImagePtr mBloodVesselVolume;
 	Vector3D mTargetPosition;
+	Vector3D mEndPointAlongCenterline;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
 	std::vector<BranchPtr> mRoutePositionsBranch;
@@ -92,7 +92,8 @@ double variance(Eigen::VectorXd X);
 
 org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
 org_custusx_filter_routetotarget_EXPORT double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
-org_custusx_filter_routetotarget_EXPORT std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+ std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+org_custusx_filter_routetotarget_EXPORT	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 
 } /* namespace cx */
 

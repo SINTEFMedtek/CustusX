@@ -36,7 +36,7 @@ class Branch
 	BranchPtr mParentBranch;
 	Vector3D mBendingDirection;
 	double mBronchoscopeRotation = 0;
-	QString mLap;
+	QString mLobe;
 
 public:
 	Branch();

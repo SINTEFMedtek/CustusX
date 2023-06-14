@@ -31,6 +31,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewService.h"
 #include "cxLog.h"
+#include "cxImage.h"
+#include "cxVolumeHelpers.h"
 
 #include <vtkPolyData.h>
 
@@ -71,8 +73,17 @@ QString AirwaysFromCenterlineFilter::getNameSuffixCenterline()
     return "_SmoothedCenterline";
 }
 
+BoolPropertyPtr AirwaysFromCenterlineFilter::getSaveOutputVolumeOption(QDomElement root)
+{
+	return BoolProperty::initialize("Save airways volume", "",
+																	"Save volume of airways model after filtering.",
+																	 false, root);
+}
+
 void AirwaysFromCenterlineFilter::createOptions()
 {
+	mSaveOutputVolumeOption = this->getSaveOutputVolumeOption(mOptions);
+	mOptionsAdapters.push_back(mSaveOutputVolumeOption);
 
 }
 
@@ -83,42 +94,58 @@ void AirwaysFromCenterlineFilter::createInputTypes()
 	centerline->setValueName("Airways centerline");
 	centerline->setHelp("Select airways centerline");
 	mInputTypes.push_back(centerline);
+	StringPropertySelectImagePtr segmentedVolume;
+	segmentedVolume = StringPropertySelectImage::New(mServices->patient());
+	segmentedVolume->setValueName("Segmented volume (optional)");
+	segmentedVolume->setHelp("Select segmented airways volume");
+	mInputTypes.push_back(segmentedVolume);
 
 }
 
 void AirwaysFromCenterlineFilter::createOutputTypes()
 {
-    StringPropertySelectMeshPtr tempAirwaysModelMeshStringAdapter;
-    tempAirwaysModelMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-    tempAirwaysModelMeshStringAdapter->setValueName("Airways surface model mesh");
-    tempAirwaysModelMeshStringAdapter->setHelp("Generated airways surface model mesh (vtk-format).");
-    mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
+	StringPropertySelectMeshPtr tempAirwaysModelMeshStringAdapter;
+	tempAirwaysModelMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempAirwaysModelMeshStringAdapter->setValueName("Airways surface model mesh");
+	tempAirwaysModelMeshStringAdapter->setHelp("Generated airways surface model mesh (vtk-format).");
+	mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
 
-    StringPropertySelectMeshPtr tempSmoothedCenterlineMeshStringAdapter;
-    tempSmoothedCenterlineMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
-		tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed centerline");
-    tempSmoothedCenterlineMeshStringAdapter->setHelp("Smoothed centerline (vtk-format).");
-    mOutputTypes.push_back(tempSmoothedCenterlineMeshStringAdapter);
+	StringPropertySelectMeshPtr tempSmoothedCenterlineMeshStringAdapter;
+	tempSmoothedCenterlineMeshStringAdapter = StringPropertySelectMesh::New(mServices->patient());
+	tempSmoothedCenterlineMeshStringAdapter->setValueName("Smoothed centerline");
+	tempSmoothedCenterlineMeshStringAdapter->setHelp("Smoothed centerline (vtk-format).");
+	mOutputTypes.push_back(tempSmoothedCenterlineMeshStringAdapter);
+
+	StringPropertySelectImagePtr tempAirwaysModelVolumeStringAdapter;
+	tempAirwaysModelVolumeStringAdapter = StringPropertySelectImage::New(mServices->patient());
+	tempAirwaysModelVolumeStringAdapter->setValueName("Airways surface model volume");
+	tempAirwaysModelVolumeStringAdapter->setHelp("Generated airways surface model volume.");
+	mOutputTypes.push_back(tempAirwaysModelVolumeStringAdapter);
 }
 
 
 bool AirwaysFromCenterlineFilter::execute()
 {
-    mAirwaysFromCenterline.reset(new AirwaysFromCenterline());
+	mAirwaysFromCenterline.reset(new AirwaysFromCenterline());
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
-    if (!mesh)
-        return false;
+	if (!mesh)
+		return false;
 
 	vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
 
-    mAirwaysFromCenterline->processCenterline(centerline_r);
+	mAirwaysFromCenterline->processCenterline(centerline_r);
 
-    //note: mOutputAirwayMesh is in reference space
-    mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes();
+	ImagePtr segmentedVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
 
-    //if(mOutputAirwayMesh->GetNumberOfPoints() < 1)
-    //    return false;
+	if(segmentedVolume)
+	{
+		mAirwaysFromCenterline->setSegmentedVolume(segmentedVolume->getBaseVtkImageData(), segmentedVolume->get_rMd());
+		mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes(0, true);
+	}
+	else
+	mOutputAirwayMesh = mAirwaysFromCenterline->generateTubes();
+	//note: mOutputAirwayMesh is in reference space
 
 	return true;
 }
@@ -139,7 +166,14 @@ bool AirwaysFromCenterlineFilter::postProcess()
 		patientService()->insertData(outputMesh);
 
 		//Meshes are expected to be in data(d) space
-		outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
+		ImagePtr segmentedinputVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
+		if(segmentedinputVolume)
+		{
+			outputMesh->get_rMd_History()->setParentSpace(segmentedinputVolume->getUid());
+			outputMesh->get_rMd_History()->setRegistration(segmentedinputVolume->get_rMd());
+		}
+		else
+			outputMesh->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
 		mServices->view()->autoShowData(outputMesh);
 
@@ -156,6 +190,24 @@ bool AirwaysFromCenterlineFilter::postProcess()
 				mOutputTypes[0]->setValue(outputMesh->getUid());
 		if(mOutputTypes.size() > 1)
 				mOutputTypes[1]->setValue(outputCenterline->getUid());
+
+		if(mSaveOutputVolumeOption && segmentedinputVolume)
+		{
+			vtkImageDataPtr segmentedOutputVolume = mAirwaysFromCenterline->getFilteredSegmentedVolume();
+			if(segmentedOutputVolume)
+			{
+				QString uidOutputVolume = segmentedinputVolume->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+				QString nameOutputVolume = segmentedinputVolume->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+				ImagePtr outputVolume = createDerivedImage(mServices->patient(),
+																						 uidOutputVolume, nameOutputVolume,
+																						 segmentedOutputVolume, segmentedinputVolume);
+				outputVolume->mergevtkSettingsIntosscTransform();
+				patientService()->insertData(outputVolume);
+
+				if(mOutputTypes.size() > 2)
+						mOutputTypes[2]->setValue(outputVolume->getUid());
+			}
+		}
 
     return true;
 }

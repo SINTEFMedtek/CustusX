@@ -74,6 +74,7 @@ protected:
   void startTiming();
   void stopTiming();
   bool mUseDefaultMessages;
+  QString mProduct;
 
   QString getSecondsPassedAsString() const;
 
@@ -89,7 +90,6 @@ private:
 
   QTimer*    mTimer;
   QDateTime mStartTime;
-  QString   mProduct;
 };
 typedef boost::shared_ptr<TimedBaseAlgorithm> TimedAlgorithmPtr;
 

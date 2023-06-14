@@ -45,22 +45,6 @@ void RouteToTarget::setBloodVesselVolume(ImagePtr bloodVesselVolume)
 	mBloodVesselVolume = bloodVesselVolume;
 }
 
-Eigen::MatrixXd RouteToTarget::getCenterlinePositions(vtkPolyDataPtr centerline_r)
-{
-
-	int N = centerline_r->GetNumberOfPoints();
-	Eigen::MatrixXd CLpoints(3,N);
-	for(vtkIdType i = 0; i < N; i++)
-		{
-		double p[3];
-		centerline_r->GetPoint(i,p);
-		Eigen::Vector3d position;
-		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
-		CLpoints.block(0 , i , 3 , 1) = position;
-		}
-	return CLpoints;
-}
-
 void RouteToTarget::setSmoothing(bool smoothing)
 {
 	mSmoothing = smoothing; // default true
@@ -78,7 +62,7 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 	mBranchListPtr->findBranchesInCenterline(mCLpoints);
 
     mBranchListPtr->smoothOrientations();
-	//mBranchListPtr->smoothBranchPositions(40);
+	//mBranchListPtr->smoothBranchPositions();
 	mBranchListPtr->findBronchoscopeRotation();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
@@ -103,7 +87,7 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 	mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
 
 	mBloodVesselBranchListPtr->smoothOrientations();
-	mBloodVesselBranchListPtr->smoothBranchPositions(40);
+	mBloodVesselBranchListPtr->smoothBranchPositions();
 	setBloodVesselRadius();
 	mBloodVesselBranchListPtr->smoothRadius();
 
@@ -130,9 +114,9 @@ void RouteToTarget::processBloodVesselCenterline(Eigen::MatrixXd positions)
 
 		mBloodVesselBranchListPtr->deleteAllBranches();
 
-		mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false);
+		mBloodVesselBranchListPtr->findBranchesInCenterline(positions, false, false);
 		mBloodVesselBranchListPtr->smoothOrientations();
-		mBloodVesselBranchListPtr->smoothBranchPositions(40);
+		mBloodVesselBranchListPtr->smoothBranchPositions();
 		setBloodVesselRadius();
 		mBloodVesselBranchListPtr->smoothRadius();
 	}
@@ -264,11 +248,13 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint, PointMetricPtr centerlinEndPoint)
 {
 	mTargetPosition = targetPoint->getCoordinate();
-
-	findClosestPointInBranches(mTargetPosition);
+	if(centerlinEndPoint)
+		findClosestPointInBranches(centerlinEndPoint->getCoordinate());
+	else
+		findClosestPointInBranches(mTargetPosition);
 	findRoutePositions();
 
 	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
@@ -340,7 +326,7 @@ vtkPolyDataPtr RouteToTarget::generateAirwaysFromBloodVesselCenterlines()
 
 	AirwaysFromCenterlinePtr airwaysFromBVCenterlinePtr = AirwaysFromCenterlinePtr(new AirwaysFromCenterline());
 	airwaysFromBVCenterlinePtr->setTypeToBloodVessel(true);
-    mBloodVesselBranchListPtr->interpolateBranchPositions(0.1);
+	mBloodVesselBranchListPtr->interpolateBranchPositions();
 	airwaysFromBVCenterlinePtr->setBranches(mBloodVesselBranchListPtr);
 
 	airwayMesh = airwaysFromBVCenterlinePtr->generateTubes(2);
@@ -872,6 +858,22 @@ double variance(Eigen::VectorXd X)
 
 	var = var/X.size();
 	return var;
+}
+
+Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r)
+{
+
+	int N = centerline_r->GetNumberOfPoints();
+	Eigen::MatrixXd CLpoints(3,N);
+	for(vtkIdType i = 0; i < N; i++)
+		{
+		double p[3];
+		centerline_r->GetPoint(i,p);
+		Eigen::Vector3d position;
+		position(0) = p[0]; position(1) = p[1]; position(2) = p[2];
+		CLpoints.block(0 , i , 3 , 1) = position;
+		}
+	return CLpoints;
 }
 
 } /* namespace cx */
