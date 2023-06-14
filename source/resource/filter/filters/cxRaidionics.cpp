@@ -281,13 +281,13 @@ QString Raidionics::colorForLungClass(QString outputClass)
 	case otPULMONARY_TRUNK:
 		color = "229,179,255,255";break;
 	case otBRACHIO_CEPHALIC_VEINS:
-		color = "255,127,127,255";break;
+		color = "153,153,255,255";break;
 	case otSUBCLAVIAN_ARTERY:
-		color = "170,85,0,255";break;
+		color = "255,127,127,255";break;
 	case otAZYGOS:
 		color = "153,153,255,255";break;
 	case otESOPHAGUS:
-		color = "153,153,255,255";break;
+		color = "170,85,0,255";break;
 	default:
 //	otUNKNOWN,
 //	organtypeCOUNT
