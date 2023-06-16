@@ -769,13 +769,15 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	QFileInfo fileInfoInput(parentImage->getFilename());
 	QString inputFileName = fileInfoInput.baseName();
 	QFileInfo outputFileInfo(inputFileName + mResultFileEnding);
-	inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
 	if(isUsingRaidionicsEngine())
+	{
+		inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 		outputDir = mRaidionicsUtilities->getOutputFolder();
+	}
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
 
 
