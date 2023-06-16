@@ -189,6 +189,18 @@ void MainWindowActions::createPatientActions()
 										 QKeySequence(),
 										 "Add files to be imported",
 										 [=](){this->importDataSlot("AddFilesForImportWithDialogAction");});
+
+	this->createAction("AddFilesForImportWithDialogCT", "Add CT files for import (Dialog)",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add CT files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportWithDialogActionCT");});
+
+	this->createAction("AddFilesForImportWithDialogPET", "Add PET files for import (Dialog)",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add PET files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportWithDialogActionPET");});
 }
 
 template <class T>
