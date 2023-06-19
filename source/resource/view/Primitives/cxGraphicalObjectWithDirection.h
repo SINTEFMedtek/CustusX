@@ -13,6 +13,20 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define GRAPHICALOBJECTWITHDIRECTION_H
 
 #include "cxResourceVisualizationExport.h"
+#include <vtkActor2D.h>
+#include <vtkArcSource.h>
+#include <vtkArrowSource.h>
+#include <vtkAxesActor.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkCursor2D.h>
+#include <vtkFollower.h>
+#include <vtkLineSource.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkProperty.h>
+#include <vtkSphereSource.h>
+#include <vtkTextMapper.h>
+#include <vtkVectorText.h>
+
 #include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 #include "cxVector3D.h"

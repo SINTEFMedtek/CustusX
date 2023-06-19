@@ -12,14 +12,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxUSFrameData.h"
 
+#include <QFileInfo>
 #include <vtkImageData.h>
 #include <vtkImageLuminance.h>
 #include <vtkImageClip.h>
 #include <vtkImageAppend.h>
 #include <vtkMetaImageWriter.h>
 #include <vtkImageImport.h>
+#include <vtkPolyData.h>
 #include "cxTypeConversions.h"
-#include <QFileInfo>
 #include "cxTimeKeeper.h"
 #include "cxImageDataContainer.h"
 #include "cxVolumeHelpers.h"

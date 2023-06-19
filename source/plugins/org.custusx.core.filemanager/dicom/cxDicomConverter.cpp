@@ -21,9 +21,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLogger.h"
 #include "ctkDICOMItem.h"
-#include "dcfilefo.h" // DcmFileFormat
-#include "dcdeftag.h" // defines all dcm tags
-#include "dcmimage.h"
+#include <dcmtk/dcmdata/dcfilefo.h> // DcmFileFormat
+#include <dcmtk/dcmdata/dcdeftag.h> // defines all dcm tags
+#include <dcmtk/dcmimgle/dcmimage.h>
 #include <string.h>
 
 #include "cxDicomImageReader.h"

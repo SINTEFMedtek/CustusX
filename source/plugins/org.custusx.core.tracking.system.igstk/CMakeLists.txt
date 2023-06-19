@@ -77,5 +77,10 @@ target_include_directories(org_custusx_core_tracking_system_igstk
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+vtk_module_autoinit(
+  TARGETS ${PROJECT_NAME}
+  MODULES VTK::CommonCore
+)
+
 add_subdirectory(testing)
 

@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxCommandlineImageStreamerFactory.h"
 
+#include <vtkImageData.h>
 #include "cxLogger.h"
 #include "cxImageStreamerOpenCV.h"
 #include "cxMHDImageStreamer.h"

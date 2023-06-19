@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxAlgorithmHelpers.h"
 #include <itkBinaryThresholdImageFilter.h>
 #include <vtkImageCast.h>
+#include <vtkPolyData.h>
 #include "cxUtilHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringProperty.h"

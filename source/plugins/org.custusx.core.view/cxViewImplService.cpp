@@ -23,7 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxViewGroupData.h"
 #include "cxClippers.h"
-#include "cxRenderWindowFactory.h"
 #include "cxRenderLoop.h"
 #include "cxViewImplService.h"
 #include "cxSlicePlanes3DRep.h"
@@ -66,8 +65,6 @@ ViewImplService::~ViewImplService()
 
 void ViewImplService::init()
 {
-	mRenderWindowFactory = RenderWindowFactoryPtr(new RenderWindowFactory());
-
 	mRenderLoop.reset(new RenderLoop());
 	connect(mRenderLoop.get(), &RenderLoop::preRender, this, &ViewImplService::updateViews);
 	connect(mRenderLoop.get(), &RenderLoop::fps, this, &ViewImplService::fps);
@@ -174,15 +171,15 @@ QWidget *ViewImplService::createLayoutWidget(QWidget* parent, int index)
 
 		if (optimizedViews)
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(mRenderWindowFactory);
+			mLayoutWidgets[index] = ViewCollectionWidget::createOptimizedLayout(parent);
 		}
 		else
 		{
-			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(mRenderWindowFactory);
+			mLayoutWidgets[index] = ViewCollectionWidget::createViewWidgetLayout(parent);
 		}
 
 		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewImplService::layoutWidgetDestroyed);
-		mRenderLoop->addLayout(mLayoutWidgets[index]);
+		mRenderLoop->addLayout(mLayoutWidgets[index]);//test: disconnect from renderLoop - removes GL errors, but gived no rendering in 2D
 
 		this->rebuildLayouts();
 	}
@@ -474,23 +471,33 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	if (!viewData.isValid())
 		return;
 
-	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);
+	ViewPtr view = widget->addView(viewData.mType, viewData.mRegion);//This may also need vtkRenderWindowInteractor. Create it here instead?
 
 
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
-	//Turn off rendering in vtkRenderWindowInteractor
-	interactor->EnableRenderOff();
-	//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
-	double rate = settings()->value("stillUpdateRate").value<double>();
-	interactor->SetStillUpdateRate(rate);
-	// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
-	// The real challenge is updating while the tracking is active, and this uses the still update rate.
-	interactor->SetDesiredUpdateRate(rate);
+	if(!interactor)
+	{
+		interactor = vtkRenderWindowInteractorPtr::New();
+		interactor->SetRenderWindow(view->getRenderWindow());
+		CX_LOG_WARNING() << "ViewImplService::activateView: Created vtkRenderWindowInteractor";
+	}
+	interactor = view->getRenderWindow()->GetInteractor();
+	if(interactor)
+	{
+		//Turn off rendering in vtkRenderWindowInteractor
+//		interactor->EnableRenderOff();//vtk9: Removing this seems to fix GL error for 3D, but not 2D
+		//Increase the StillUpdateRate in the vtkRenderWindowInteractor (default is 0.0001 images per second)
+		double rate = settings()->value("stillUpdateRate").value<double>();
+		interactor->SetStillUpdateRate(rate);
+		// Set the same value when moving (seems counterintuitive, but for us, moving isnt really special.
+		// The real challenge is updating while the tracking is active, and this uses the still update rate.
+		interactor->SetDesiredUpdateRate(rate);
+	}
+	else
+		CX_LOG_WARNING() << "ViewImplService::activateView: No vtkRenderWindowInteractor";
 
 	ViewWrapperPtr wrapper = this->createViewWrapper(view, viewData);
-	if(!mRenderWindowFactory->getSharedOpenGLContext())
-		CX_LOG_WARNING() << "ViewImplService::activateView: got not shared OpenGL context";
-	mViewGroups[viewData.mGroup]->addView(wrapper, mRenderWindowFactory->getSharedOpenGLContext());
+	mViewGroups[viewData.mGroup]->addView(wrapper);
 }
 
 ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData viewData)

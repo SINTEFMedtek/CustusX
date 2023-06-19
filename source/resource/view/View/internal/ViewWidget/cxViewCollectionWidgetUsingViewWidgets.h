@@ -39,7 +39,7 @@ class cxResourceVisualization_EXPORT LayoutWidgetUsingViewWidgets : public ViewC
 {
 	Q_OBJECT
 public:
-	LayoutWidgetUsingViewWidgets(RenderWindowFactoryPtr factory, QWidget *parent);
+	LayoutWidgetUsingViewWidgets(QWidget *parent);
     virtual ~LayoutWidgetUsingViewWidgets();
 
 	virtual ViewPtr addView(View::Type type, LayoutRegion region);

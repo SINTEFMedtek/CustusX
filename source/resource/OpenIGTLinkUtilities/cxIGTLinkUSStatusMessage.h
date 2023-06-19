@@ -43,10 +43,10 @@ String DataFormat: Format of image. B-mode, Angio, Beamdata, etc.
 class IGTLCommon_EXPORT IGTLinkUSStatusMessage : public igtl::MessageBase
 {
 public:
-  typedef IGTLinkUSStatusMessage      		Self;
-  typedef igtl::MessageBase               Superclass;
-  typedef igtl::SmartPointer<Self>        Pointer;
-  typedef igtl::SmartPointer<const Self>  ConstPointer;
+//  typedef IGTLinkUSStatusMessage      		Self;
+//  typedef igtl::MessageBase               Superclass;
+//  typedef igtl::SmartPointer<Self>        Pointer;
+//  typedef igtl::SmartPointer<const Self>  ConstPointer;
 
 	igtlTypeMacro(IGTLinkUSStatusMessage, igtl::MessageBase);
 	igtlNewMacro(IGTLinkUSStatusMessage);

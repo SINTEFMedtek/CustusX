@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTool.h"
 
 #include <vtkConeSource.h>
+#include <vtkPolyData.h>
 #include "cxToolNull.h"
 #include "cxNullDeleter.h"
 

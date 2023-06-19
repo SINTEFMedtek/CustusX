@@ -15,30 +15,32 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QApplication>
 #include <QDesktopWidget>
 #include "vtkRenderWindow.h"
+#include <vtkGenericOpenGLRenderWindow.h>
 #include "cxBoundingBox3D.h"
 #include "cxViewLinkingViewWidget.h"
 #include "cxTypeConversions.h"
 #include "cxGLHelpers.h"
 #include "cxOSXHelper.h"
-#include "cxRenderWindowFactory.h"
+#include "cxLogger.h"
 
 namespace cx
 {
 
-ViewWidget::ViewWidget(RenderWindowFactoryPtr factory, const QString& uid, const QString& name, QWidget *parent, Qt::WindowFlags f) :
+ViewWidget::ViewWidget(QWidget *parent, const QString& uid, const QString& name, Qt::WindowFlags f) :
 	inherited(parent, f)
 {
 	mMTimeHash = 0;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	mZoomFactor = -1.0;
-	vtkRenderWindowPtr rw = factory->getRenderWindow(uid);
-	mView = ViewLinkingViewWidget::create(this, rw);
+	vtkRenderWindowPtr renderWindow = this->renderWindow();
+	if(!renderWindow)
+		CX_LOG_ERROR() << "ViewWidget: Got no renderWindow";
+
+	mView = ViewLinkingViewWidget::create(this, renderWindow);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
-	vtkRenderWindowPtr renderWindow = mView->getRenderWindow();
-	this->SetRenderWindow(renderWindow);
-	mView->getRenderWindow()->GetInteractor()->EnableRenderOff();
+
 	mView->clear();
-	disableGLHiDPI(this->winId());
+//	disableGLHiDPI(this->winId());//vtk9: Probably not needed any longer
 }
 
 void ViewWidget::customContextMenuRequestedSlot(const QPoint& point)
@@ -71,10 +73,10 @@ void ViewWidget::render()
 
 	if (hash != mMTimeHash)
 	{
-		this->getRenderWindow()->Render();
+		QVTKOpenGLNativeWidget::renderWindow()->Render();
 		mMTimeHash = hash;
 
-		QString msg("During rendering of view: " + this->getView()->getName());
+		QString msg("During rendering of view: " + this->getView()->getName() + " " + this->getView()->getTypeString());
 		report_gl_error_text(cstring_cast(msg));
 	}
 }
@@ -98,10 +100,15 @@ void ViewWidget::mouseMoveEvent(QMouseEvent* event)
 void ViewWidget::mousePressEvent(QMouseEvent* event)
 {
 	// special case for CustusX: when context menu is opened, mousereleaseevent is never called.
-	// this sets the render interactor in a zoom state after each menu call. This hack prevents
+	// this sets the render interactor in a zoom state after each menu call. This fix prevents
 	// the mouse press event in this case.
 	if ((this->contextMenuPolicy() == Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
+	{
+		vtkRenderWindowInteractor* iren = mView->getRenderWindow()->GetInteractor();
+		if (iren != nullptr)
+			iren->RightButtonReleaseEvent();//VTK 9
 		return;
+	}
 
 	inherited::mousePressEvent(event);
 	emit mousePress(event->x(), event->y(), event->buttons());

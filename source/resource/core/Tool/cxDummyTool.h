@@ -19,6 +19,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QThread>
 #include <QDateTime>
 #include <QTimer>
+
+#include <vtkPolyData.h>
+
 #include "cxBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
 #include "cxProbeSector.h"

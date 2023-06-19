@@ -19,29 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewServiceNull.h"
 class ctkPluginContext;
 
-/*
-
-namespace
-{
-
-//WARNING COPY PASTE
-typedef boost::shared_ptr<class ViewServiceMocWithRenderWindowFactory> ViewServiceMocWithRenderWindowFactoryPtr;
-
-class CXTESTRESOURCE_EXPORT ViewServiceMocWithRenderWindowFactory : public cx::ViewServiceNull
-{
-public:
-	ViewServiceMocWithRenderWindowFactory();
-	virtual vtkRenderWindowPtr getRenderWindow(QString uid, bool offScreenRendering = true);
-	virtual vtkRenderWindowPtr getSharedRenderWindow() const;
-	cx::RenderWindowFactoryPtr getRenderWindowFactory() const;
-private:
-	cx::RenderWindowFactoryPtr mRenderWindowFactory;
-};
-//WARNING COPY PASTE
-}
-*/
-
-
 namespace cxtest
 {
 

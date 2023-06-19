@@ -382,9 +382,14 @@ void PickerRep::connectInteractor()
 		return;
 
 	vtkRenderWindowInteractorPtr i = this->getView()->getRenderWindow()->GetInteractor();
-	i->AddObserver(vtkCommand::MouseMoveEvent, this->mCallbackCommand, 1.0);
-	i->AddObserver(vtkCommand::LeftButtonPressEvent, this->mCallbackCommand, 1.0);
-	i->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->mCallbackCommand, 1.0);
+	if(i)
+	{
+		i->AddObserver(vtkCommand::MouseMoveEvent, this->mCallbackCommand, 1.0);
+		i->AddObserver(vtkCommand::LeftButtonPressEvent, this->mCallbackCommand, 1.0);
+		i->AddObserver(vtkCommand::LeftButtonReleaseEvent, this->mCallbackCommand, 1.0);
+	}
+	else
+		CX_LOG_WARNING() << "PickerRep::connectInteractor: No vtkRenderWindowInteractor";
 
 	mConnected = true;
 }
