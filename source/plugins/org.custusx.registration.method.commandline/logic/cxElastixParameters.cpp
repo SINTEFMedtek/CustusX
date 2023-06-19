@@ -26,18 +26,19 @@ namespace cx
 
 ElastixParameters::ElastixParameters(XmlOptionFile options)
 {
-    mOptions = options;
+	mOptions = options;
 
 	mActiveExecutable = this->getExecutable();
 	mActiveParameterFile0 = this->getParameterFile("0");
 	mActiveParameterFile1 = this->getParameterFile("1");
+	mActiveParameterFile2 = this->getParameterFile("2");
 
 	mCurrentPreset = StringProperty::initialize("currentPreset", "Preset",
 												"Current Preset", "Select Preset...",
 												QStringList(), mOptions.getElement());
-    connect(mCurrentPreset.get(), SIGNAL(changed()), this, SLOT(currentPresetChangedSlot()));
+	connect(mCurrentPreset.get(), &StringProperty::changed, this, &ElastixParameters::currentPresetChangedSlot);
 
-    this->currentPresetChangedSlot();
+	this->currentPresetChangedSlot();
 }
 
 void ElastixParameters::addDefaultPresets()
@@ -45,8 +46,8 @@ void ElastixParameters::addDefaultPresets()
     FilePathPropertyPtr exe = this->getExecutable();
 
     if (DataLocations::isRunFromBuildFolder())
-    {
-        exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
+	{
+		exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
     }
     else
     {
@@ -84,6 +85,7 @@ void ElastixParameters::currentPresetChangedSlot()
 
 	mActiveParameterFile0->setValue(node.getElement().attribute("parameterFile0"));
 	mActiveParameterFile1->setValue(node.getElement().attribute("parameterFile1"));
+	mActiveParameterFile2->setValue(node.getElement().attribute("parameterFile2"));
 
 	emit elastixParametersChanged();
 }
@@ -135,6 +137,7 @@ void ElastixParameters::saveCurrentPreset(QString name)
 	node.getElement().setAttribute("executable", mActiveExecutable->getEmbeddedPath().getRelativeFilepath());
 	node.getElement().setAttribute("parameterFile0", mActiveParameterFile0->getEmbeddedPath().getRelativeFilepath());
 	node.getElement().setAttribute("parameterFile1", mActiveParameterFile1->getEmbeddedPath().getRelativeFilepath());
+	node.getElement().setAttribute("parameterFile2", mActiveParameterFile2->getEmbeddedPath().getRelativeFilepath());
     mCurrentPreset->setValue(name);
 }
 
@@ -180,20 +183,23 @@ FilePathPropertyPtr ElastixParameters::getParameterFile(QString uid)
 
 bool ElastixParameters::validParameterFile(QString file) const
 {
-    return QFileInfo(file).exists() && QFileInfo(file).isFile();
+	return QFileInfo::exists(file) && QFileInfo(file).isFile();
 }
 
 QStringList ElastixParameters::getActiveParameterFiles() const
 {
 	QString p0 = mActiveParameterFile0->getEmbeddedPath().getAbsoluteFilepath();
 	QString p1 = mActiveParameterFile1->getEmbeddedPath().getAbsoluteFilepath();
+	QString p2 = mActiveParameterFile2->getEmbeddedPath().getAbsoluteFilepath();
 
-    QStringList retval;
+	QStringList retval;
 	if (this->validParameterFile(p0))
 		retval << p0;
 	if (this->validParameterFile(p1))
 		retval  << p1;
-    return retval;
+	if (this->validParameterFile(p2))
+		retval  << p2;
+	return retval;
 }
 
 QString ElastixParameters::getPresetNameSuggesion() const

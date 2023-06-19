@@ -50,6 +50,8 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 
+	BoolPropertyPtr getSaveOutputVolumeOption(QDomElement root);
+
 protected:
 	virtual void createOptions();
 	virtual void createInputTypes();
@@ -58,9 +60,10 @@ protected:
 private slots:
 
 private:
-    AirwaysFromCenterlinePtr mAirwaysFromCenterline;
-    vtkPolyDataPtr mOutputAirwayMesh;
-    vtkPolyDataPtr mOutputSmoothedCenterline;
+	BoolPropertyPtr mSaveOutputVolumeOption;
+	AirwaysFromCenterlinePtr mAirwaysFromCenterline;
+	vtkPolyDataPtr mOutputAirwayMesh;
+	vtkPolyDataPtr mOutputSmoothedCenterline;
 };
 typedef boost::shared_ptr<class AirwaysFromCenterlineFilter> AirwaysFromCenterlineFilterPtr;
 

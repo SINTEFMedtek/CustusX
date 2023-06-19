@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "cxElastixParameters.h"
 #include "cxRegServices.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -54,9 +55,15 @@ signals:
 private slots:
 	void executionFinishedSlot();
 	void preprocessExecuter();
+	void postponedRegistration();
 
 private:
 	void addNonlinearData();
+	void deformAdditionalImage();
+	ImagePtr getNonLinearBaseImage();
+	QString removeParent(ImagePtr image);
+	void setParent(ImagePtr image, QString parentSpace);
+	void doRegistration(Transform3D delta_pre_rMd, QString desc);
 
 	ElastixParametersPtr mParameters;
 	XmlOptionFile mOptions;
@@ -64,6 +71,11 @@ private:
 	BoolPropertyPtr mDisableRendering;
 	ElastixExecuterPtr mExecuter;
 	RegServicesPtr mServices;
+	bool mRunningTransformix = false;
+
+	Transform3D mDelta_pre_rMd;
+	QString mDesc;
+	ImagePtr mLastNonLonearImage;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 
