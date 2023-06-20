@@ -30,6 +30,11 @@ public:
 	static QString getJsonFileName() {return "Raidionics.json";}
 	static QString getRaidionicsCTFileNamePrefix() {return "input_ct_gd_";}
 	QString getRadionicsInputFileName(QString inputFile);
+	QStringList setOutputClasses(QStringList outputClasses);
+	//Utility functions
+	static QStringList expandOutputClasses(QStringList targetList);
+	static QString colorForLungClass(QString outputClass);
+	static QStringList createTargetList(QString target);
 
 protected:
 	QString createRaidionicsIniFile();
@@ -37,6 +42,11 @@ protected:
 	QString copyInputFiles(QString inputFileName, QString subfolder);
 	QString getModelFolder();
 	static QString subfolderT0() {return "T0";}
+	bool useFormatThresholding(QString target);
+	QString targetDescription(QString target);
+	QJsonArray createTargetArray(QString target);
+	static QString getTarget(ORGAN_TYPE organType);
+	static ORGAN_TYPE getOrganType(QString target);
 
 	VisServicesPtr mServices;
 	CommandStringVariables mVariables;

@@ -37,11 +37,13 @@ struct cxResourceFilter_EXPORT CommandStringVariables
 
 struct cxResourceFilter_EXPORT OutputVariables
 {
-	bool mCreateOutputVolume;
-	bool mCreateOutputMesh;
+	bool mCreateOutputVolume = false;
+	bool mCreateOutputMesh = false;
 	QStringList mOutputColorList;
 	QStringList mOutputClasses;
+	bool mValid = false;
 
+	OutputVariables();
 	OutputVariables(QString parameterFilePath);
 };
 
@@ -56,7 +58,6 @@ struct cxResourceFilter_EXPORT OutputVariables
 class cxResourceFilter_EXPORT GenericScriptFilter : public FilterImpl
 {
 	Q_OBJECT
-
 public:
 	GenericScriptFilter(VisServicesPtr services);
 	virtual ~GenericScriptFilter();
@@ -82,6 +83,7 @@ public:
 	void setParameterFilePath(QString path);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
+	void setOutputClasses(QStringList outputClasses);
 
 signals:
 	void launchDialog(QString venvPath, QString createCommand, QString command);
@@ -123,11 +125,15 @@ protected:
 	QString removeTrailingPythonVariable(QString environmentPath);
 	bool showVenvInfoDialog(QString venvPath, QString createCommand);
 	bool createVenv(QString createCommand, QString command);
-	void setScriptEngine(CommandStringVariables variables);
-	void initRaidionicsEngine(CommandStringVariables variables);
+	bool setScriptEngine(CommandStringVariables variables);
+	bool initRaidionicsEngine(CommandStringVariables variables);
+	void setOutputColorsFromClasses();
+	int getClassNumber(QString filePath);
+	ORGAN_TYPE getOrganType(int classNumber);
 
 	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
+	OutputVariables mOutputVariables;
 
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
@@ -138,12 +144,13 @@ protected:
 	ImagePtr mOutputImage;
 	QList<QColor> mOutputColors;
 	QStringList mOutputClasses;
+	QStringList mOutputColorList;
 
 	SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
 	StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
-	RaidionicsPtr mRaidionicsUtilities;
+	RaidionicsPtr mRaidionicsUtilities = nullptr;
 
 protected slots:
 	void scriptFileChanged();

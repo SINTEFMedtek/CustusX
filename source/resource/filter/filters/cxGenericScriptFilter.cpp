@@ -62,8 +62,13 @@ CommandStringVariables::CommandStringVariables(QString parameterFilePath, ImageP
 	settings.endGroup();
 }
 
+OutputVariables::OutputVariables()
+{
+}
+
 OutputVariables::OutputVariables(QString parameterFilePath)
 {
+	mValid = true;
 	// Parse .ini file
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("output");
@@ -73,6 +78,12 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 	mOutputColorList = allColors.split(";");
 	QString outputClass = settings.value("classes").toString();
 	mOutputClasses = outputClass.split(" ");
+	if(mOutputClasses.isEmpty() || mOutputClasses[0].isEmpty())
+	{
+		CX_LOG_DEBUG() << "OutputVariables::OutputVariables: Problem with file: " << parameterFilePath;
+		CX_LOG_WARNING() << "OutputVariables::OutputVariables: Wrong formatting of class (should be separated with space): " << outputClass;
+		mValid = false;
+	}
 	settings.endGroup();
 }
 
@@ -238,6 +249,11 @@ void GenericScriptFilter::createOptions()
 void GenericScriptFilter::scriptFileChanged()
 {
 	mScriptFilePreview->setValue(mScriptFile->getValue());
+
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
+	mOutputVariables = OutputVariables(parameterFilePath);
+	mOutputClasses = mOutputVariables.mOutputClasses;
+	mOutputColorList = mOutputVariables.mOutputColorList;
 }
 
 QString GenericScriptFilter::createCommandString(ImagePtr input)
@@ -283,7 +299,11 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	variables.inputFilePath = getInputFilePath(input);
 	variables.outputFilePath = getOutputFilePath(input);
 
-	setScriptEngine(variables);
+	if(!setScriptEngine(variables))
+	{
+		CX_LOG_ERROR() << "GenericScriptFilter::createCommandStringVariables: Error setting up engine";
+		return CommandStringVariables("", input);
+	}
 	return variables;
 }
 
@@ -322,24 +342,27 @@ bool GenericScriptFilter::isUsingRaidionicsEngine()
 	return retval;
 }
 
-void GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
+bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 {
 	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
 		mScriptEngine = seDeepSintef;
 	else if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
 	{
-		this->initRaidionicsEngine(variables);
+		if(!this->initRaidionicsEngine(variables))
+			return false;
 		mScriptEngine = seRaidionics;
 	}
 	else
 		mScriptEngine = seStandard;
+	return true;
 }
 
-void GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
+bool GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
 {
-	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
-	OutputVariables outputVariables = OutputVariables(parameterFilePath);
-	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, outputVariables.mOutputClasses));
+	if(!mOutputVariables.mValid)
+		return false;
+	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, mOutputClasses));
+	return true;
 }
 
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
@@ -674,16 +697,35 @@ bool GenericScriptFilter::postProcess()
 {
 //	CX_LOG_DEBUG() << "postProcess";
 
-	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
-	OutputVariables outputVariables = OutputVariables(parameterFilePath);
+	//TODO: Run postProcess in separate thread as well?
+	//Need to put all postProcess code in a separate (worker) class and use moveToThread()
+//	QThread* mPostprosessingThread = new QThread;
 
-	bool createOutputVolume = outputVariables.mCreateOutputVolume;
-	bool createOutputMesh = outputVariables.mCreateOutputMesh;
-	QStringList colorList = outputVariables.mOutputColorList;
-	mOutputClasses = outputVariables.mOutputClasses;
-	this->setupOutputColors(colorList);
+	bool createOutputVolume = mOutputVariables.mCreateOutputVolume;
+	bool createOutputMesh = mOutputVariables.mCreateOutputMesh;
+
+	this->setOutputClasses(mOutputClasses);
+	this->setOutputColorsFromClasses();
 
 	return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
+}
+
+void GenericScriptFilter::setOutputClasses(QStringList outputClasses)
+{
+	mOutputClasses = outputClasses;
+	if(isUsingRaidionicsEngine())
+		mOutputClasses = mRaidionicsUtilities->setOutputClasses(outputClasses);
+}
+
+void GenericScriptFilter::setOutputColorsFromClasses()
+{
+	if(isUsingRaidionicsEngine())
+	{
+		mOutputColorList.clear();
+		for(int i = 0; i < mOutputClasses.size(); ++i)
+			mOutputColorList << Raidionics::colorForLungClass(mOutputClasses[i]);
+	}
+	this->setupOutputColors(mOutputColorList);
 }
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
@@ -752,6 +794,7 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 	patientService()->insertData(outputMesh);
 	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
 	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
+	outputMesh->setOrganType(mOutputImage->getOrganType());
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
@@ -769,13 +812,15 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	QFileInfo fileInfoInput(parentImage->getFilename());
 	QString inputFileName = fileInfoInput.baseName();
 	QFileInfo outputFileInfo(inputFileName + mResultFileEnding);
-	inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
 
 	if(isUsingRaidionicsEngine())
+	{
+		inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
 		outputDir = mRaidionicsUtilities->getOutputFolder();
+	}
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
 
 
@@ -800,6 +845,9 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 			mOutputImage = createDerivedImage(mServices->patient(),
 												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
+			int classNumber = getClassNumber(filePath);
+			ORGAN_TYPE organType = this->getOrganType(classNumber);
+			mOutputImage->setOrganType(organType);
 
 			if(inputFileName == fileInfoOutput.baseName() || inputFileName == QFileInfo(fileInfoOutput.baseName()).baseName())
 			{
@@ -808,30 +856,22 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 				continue;//Skip input volume. The mesh creation of this takes a very long time
 			}
 			else
-				CX_LOG_INFO() << "Importing: " << filePath;
+				CX_LOG_INFO() << "Importing: " << filePath << " (as organ type: " << enum2string(organType) << ")";
 
 			if(!mOutputImage)
 			{
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: Problem creating derived image";
 				continue;
 			}
-			if (createOutputVolume)
+			if (createOutputVolume || (organType==otAIRWAYS))//Always create volume for Airways
 				this->createOutputVolume();
+
 
 			if(createOutputMesh && mOutputImage)
 			{
-				int colorNumber = 0;
-				for(int i=0; i<mOutputClasses.size(); i++)
-				{
-					if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
-					{
-						colorNumber = i;
-						break;
-					}
-				}
 				QColor outputColor = getDefaultColor();
-				if(mOutputColors.size() > colorNumber)
-					outputColor = mOutputColors.at(colorNumber);
+				if(mOutputColors.size() > classNumber)
+					outputColor = mOutputColors.at(classNumber);
 				this->createOutputMesh(outputColor);
 			}
 			if(!isUsingRaidionicsEngine())
@@ -858,16 +898,40 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	return true;
 }
 
+ORGAN_TYPE GenericScriptFilter::getOrganType(int classNumber)
+{
+	QString organTypeString = mOutputClasses[classNumber];
+	ORGAN_TYPE organType = string2enum<ORGAN_TYPE>(organTypeString);
+	if(organTypeString == "SubCarArt")
+		organType = otSUBCLAVIAN_ARTERY;
+	if(organType == otUNKNOWN || organType == organtypeCOUNT)
+		CX_LOG_WARNING() << "GenericScriptFilter::getOrganType: Cannot find organ type: " << organTypeString;
+	return organType;
+}
+
+
+int GenericScriptFilter::getClassNumber(QString filePath)
+{
+	int classNumber = 0;
+	for(int i=0; i<mOutputClasses.size(); i++)
+	{
+		if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
+		{
+			classNumber = i;
+			break;
+		}
+	}
+	return classNumber;
+}
+
 QString GenericScriptFilter::createImageName(QString parentName, QString filePath)
 {
 	QString retval = parentName;
 	QString nameEnding = mResultFileEnding;
 	nameEnding.replace(".mhd", "");
-	for(int i=0; i<mOutputClasses.size(); i++)
-	{
-		if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
-			retval = retval + QString("_") + mOutputClasses[i] + QString("_");
-	}
+	int classNumber = getClassNumber(filePath);
+	if(mOutputClasses.size() > classNumber)
+		retval = retval + QString("_") + mOutputClasses[classNumber];
 	retval.append(nameEnding);
 	return retval;
 }

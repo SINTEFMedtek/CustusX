@@ -11,8 +11,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTypeConversions.h"
 #include <QStringList>
+#include <QRegularExpression>
 #include <iostream>
 #include "cxVector3D.h"
+#include "cxEnumConversion.h"
 
 template<> cstring_cast_Placeholder cstring_cast<QString>(const QString& val)
 {
@@ -79,5 +81,21 @@ QColor string2color(QString input, QColor defaultValue)
 	return retval;
 }
 
+QString cx::convertToReadableString(QString string)
+{
+	QRegularExpression regexp("[A-Z][^A-Z]*");
+	QRegularExpressionMatchIterator match = regexp.globalMatch(string);
 
+	string.clear();
+	if(match.hasNext())
+		string = match.next().capturedTexts().join("");
+	while(match.hasNext())
+		string += " "+match.next().capturedTexts().join("");
+	return string;
+}
 
+QString cx::convertToReadableString(ORGAN_TYPE target)
+{
+	QString string = enum2string(target);
+	return convertToReadableString(string);
+}
