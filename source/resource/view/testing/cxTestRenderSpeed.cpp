@@ -22,8 +22,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
-#include "cxRenderWindowFactory.h"
-#include "cxtestViewServiceMockWithRenderWindowFactory.h"
 
 namespace cxtest
 {
@@ -92,15 +90,14 @@ int RenderSpeedCounter::getRenderFPS()
 
 TestRenderSpeed::TestRenderSpeed()
 {
-	ViewServiceMocWithRenderWindowFactoryPtr viewService = ViewServiceMocWithRenderWindowFactoryPtr(new ViewServiceMockWithRenderWindowFactory());
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
 
 	bool optimizedViews = cx::settings()->value("optimizedViews").toBool();
 	if (optimizedViews)
-		mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(viewService->getRenderWindowFactory()).data());
+		mMainWidget.reset(cx::ViewCollectionWidget::createOptimizedLayout(NULL/*need QApplication??*/).data());
 	else
-		mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(viewService->getRenderWindowFactory()).data());
+		mMainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(NULL/*need QApplication??*/).data());
 }
 
 TestRenderSpeed::~TestRenderSpeed()

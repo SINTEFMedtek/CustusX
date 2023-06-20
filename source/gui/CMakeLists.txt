@@ -137,6 +137,11 @@ target_include_directories(cxGui
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CustusX_SOURCE_DIR}/source/ThirdParty
 )
+
+set(VTK_MODULES
+  VTK::InteractionWidgets
+)
+
 target_link_libraries(cxGui
     PRIVATE
     cxResource
@@ -145,8 +150,14 @@ target_link_libraries(cxGui
     cxResourceVisualization
     cxGUIExtenderService
     cxPluginUtilities
-	cxResourceFilter
-	)
+    cxResourceFilter
+    ${VTK_MODULES}
+)
+
+vtk_module_autoinit(
+  TARGETS cxGui
+  MODULES ${VTK_MODULES}
+)
 
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/preferences.md")

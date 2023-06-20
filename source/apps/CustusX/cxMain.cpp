@@ -10,6 +10,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <iostream>
+#include <QSurfaceFormat>
+#include <QVTKOpenGLNativeWidget.h>
 #include "cxMainWindow.h"
 #include "cxMainWindowApplicationComponent.h"
 #include "cxLogicManager.h"
@@ -25,6 +27,11 @@ int main(int argc, char *argv[])
   //instead we solve the problem by adding a handmade header for the cxResources.qrc file
   Q_INIT_RESOURCE(cxResources);
 #endif
+
+	//VTK 9:
+	// before initializing QApplication, set the default surface format.
+	//Not sure if this is needed
+	QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
 
   cx::Application app(argc, argv);
   app.setOrganizationName("CustusX");

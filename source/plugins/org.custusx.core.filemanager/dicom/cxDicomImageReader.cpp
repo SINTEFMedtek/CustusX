@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDicomImageReader.h"
 
 #include "cxVolumeHelpers.h"
-#include "dcvrpn.h"
+#include <dcmtk/dcmdata/dcvrpn.h>
 #include "cxLogger.h"
 
 namespace cx

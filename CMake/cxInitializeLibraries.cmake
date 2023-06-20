@@ -169,26 +169,36 @@ macro(cx_initialize_VTK)
 	#
 	# See http://www.vtk.org/Wiki/VTK/Build_System_Migration
 	#
+
 	find_package(VTK COMPONENTS
-		vtkCommonCore
-		vtkRenderingCore
-		vtkRenderingQt
-		vtkInteractionStyle
-		vtkRenderingVolume
-		vtkIOGeometry vtkIOLegacy vtkIOMINC vtkIOXML
-		vtkIOXMLParser
-		vtkFiltersModeling
-		vtkInteractionWidgets
-		vtkParallelCore
-		vtkFiltersParallel
-                vtkImagingMath vtkImagingMorphological vtkImagingColor vtkImagingStatistics vtkImagingStencil
-		vtkRenderingOpenGL2
-		vtkRenderingVolumeOpenGL2
-		NO_MODULE)
+	  CommonCore
+	  RenderingCore
+	  InteractionStyle
+	  RenderingVolume
+	  IOGeometry
+	  IOLegacy
+	  IOMINC
+	  IOXML
+	  IOXMLParser
+	  FiltersModeling
+	  InteractionWidgets
+	  ParallelCore
+	  FiltersParallel
+	  ImagingMath
+	  ImagingMorphological
+	  ImagingColor
+	  ImagingStatistics
+	  ImagingStencil
+	  RenderingOpenGL2
+	  RenderingVolumeOpenGL2
+	  ViewsQt
+	  GUISupportQt
+	  #RenderingQt #Default in CMake == OFF?
+	  NO_MODULE)
 
 
 #    find_package(VTK REQUIRED) # import all libs - try this for debugging lib includes
-    include(${VTK_USE_FILE})
+#    include(${VTK_USE_FILE})
 endmacro()
 
 ###############################################################################

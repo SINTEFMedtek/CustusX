@@ -17,6 +17,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vtkProperty.h>
 #include <vtkActor.h>
+#include <vtkAxesActor.h>
+#include <vtkCursor2D.h>
+#include <vtkTextMapper.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkRenderer.h>
 
 namespace cx
 {

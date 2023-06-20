@@ -197,7 +197,6 @@ private:
 	SyncedValuePtr mGlobal2DZoom;
 	StringListPropertyPtr mSliceDefinitionProperty;
 	DataPtr getData(QString uid) const;
-	//SharedOpenGLContextPtr mSharedOpenGLContext;
 	ToolPtr mControllingTool; ///< Tool controlling 2D/3D views for this view group. Using this overrides the active tool.
 
 };

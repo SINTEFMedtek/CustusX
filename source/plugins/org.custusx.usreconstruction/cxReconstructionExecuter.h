@@ -17,6 +17,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "boost/shared_ptr.hpp"
 #include <QObject>
 #include <set>
+#include <vtkPolyData.h>
+#include <vtkImageData.h>
 
 #include "cxReconstructionMethodService.h"
 #include "cxReconstructPreprocessor.h"

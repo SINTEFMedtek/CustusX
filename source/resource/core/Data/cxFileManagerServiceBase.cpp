@@ -79,13 +79,12 @@ FileReaderWriterServicePtr FileManagerServiceBase::findWriter(const QString& pat
 
 vtkImageDataPtr FileManagerServiceBase::loadVtkImageData(QString filename)
 {
-	vtkImageDataPtr retval = vtkImageDataPtr();
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 	{
-		retval = reader->loadVtkImageData(filename);
+		return reader->loadVtkImageData(filename);
 	}
-	return retval;
+	return vtkImageDataPtr();
 }
 
 vtkPolyDataPtr FileManagerServiceBase::loadVtkPolyData(QString filename)

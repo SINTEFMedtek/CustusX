@@ -25,6 +25,9 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+set(VTK_MODULES
+  VTK::CommonComputationalGeometry
+)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -39,8 +42,9 @@ set(PLUGIN_target_libraries
     cxResourceVisualization
     cxResourceWidgets
     Qt5::Widgets
-		org_custusx_filter_routetotarget
-    )
+    org_custusx_filter_routetotarget
+    ${VTK_MODULES}
+)
 
 set(PLUGIN_OUTPUT_DIR "")
 if(CX_WINDOWS)
@@ -64,6 +68,11 @@ target_include_directories(org_custusx_virtualbronchoscopy
     PUBLIC
     .
     ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+vtk_module_autoinit(
+  TARGETS ${PROJECT_NAME}
+  MODULES ${VTK_MODULES}
 )
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")

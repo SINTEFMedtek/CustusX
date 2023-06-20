@@ -60,9 +60,8 @@ cx_install_add_library_dirs(
     ${VTK_DIR}/lib
     ${VTK_DIR}/bin
     ${CTK_DIR}/CTK-build/bin
-    ${CTK_DIR}/DCMTK-build/bin
-    ${CTK_DCMTK_DIR}/lib
-    ${CTK_DCMTK_DIR}/bin
+    ${DCMTK_DIR}/lib
+    ${DCMTK_DIR}/bin
     ${ITK_DIR}/lib
     ${ITK_DIR}/bin
     ${FAST_LIBRARY_DIRS}

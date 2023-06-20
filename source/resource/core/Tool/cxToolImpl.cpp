@@ -25,7 +25,7 @@ ToolImpl::ToolImpl(const QString& uid, const QString& name) :
 	Tool(uid, name),
 	mPositionHistory(new TimedTransformMap()),
 	m_prMt(Transform3D::Identity()),
-	mPolyData(NULL),
+	mPolyData(vtkPolyDataPtr::New()),
 	mTooltipOffset(0)
 {
 }

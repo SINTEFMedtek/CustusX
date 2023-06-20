@@ -19,10 +19,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(RenderWindowFactoryPtr factory, QWidget* parent) :
+LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
-	mViewCache = MultiViewCache::create(factory);
+	mViewCache = MultiViewCache::create();
 	mOffScreenRendering = false;
 
 	mLayout = new QGridLayout;
@@ -39,9 +39,10 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-	ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
+	ViewWidget* view = mViewCache->retrieveView(this->parentWidget(), type, mOffScreenRendering);
 
 	view->getView()->setType(type);
+	view->setParent(this->parentWidget());
 
 	mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col);
 	view_utils::setStretchFactors(mLayout, region, 1);

@@ -11,7 +11,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include "cxDistanceMetricRep.h"
-#include "cxView.h"
 
 #include <vtkVectorText.h>
 #include <vtkFollower.h>
@@ -21,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkCamera.h>
 #include <vtkRenderWindow.h>
 #include "cxTypeConversions.h"
+#include "cxView.h"
 
 namespace cx
 {

@@ -18,19 +18,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxGLHelpers.h"
 #include "cxLogger.h"
 #include "cxMultiViewCache.h"
-#include "cxRenderWindowFactory.h"
 
 namespace cx
 {
 
-ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(RenderWindowFactoryPtr factory, QWidget* parent) :
+ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
 	mLayout = new QGridLayout(this);
 	this->setLayout(mLayout);
-	mViewCache = MultiViewCache::create(factory);
+	mViewCache = MultiViewCache::create();
 
-	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(factory, this);
+	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->initBaseLayout();
 	this->setGridMargin(4);
 	this->setGridSpacing(2);

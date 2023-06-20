@@ -49,6 +49,11 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+#Get these from cxResourceVisualization instead?
+set(VTK_MODULES
+#  VTK::FiltersModeling
+#  VTK::RenderingAnnotation
+)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -58,6 +63,7 @@ set(PLUGIN_target_libraries
     cxResourceVisualization
     cxPluginUtilities
     cxGui
+#    ${VTK_MODULES}
     )
 
 set(PLUGIN_OUTPUT_DIR "")
@@ -83,7 +89,10 @@ target_include_directories(org_custusx_core_view
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
-
+#vtk_module_autoinit(
+#  TARGETS ${PROJECT_NAME}}
+#  MODULES ${VTK_MODULES}
+#  )
 
 add_subdirectory(testing)
 
