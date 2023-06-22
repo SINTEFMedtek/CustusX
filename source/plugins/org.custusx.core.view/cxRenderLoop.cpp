@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxCyclicActionLogger.h"
 #include <QTimer>
+#include <QApplication>
 #include "cxView.h"
 #include "vtkRenderWindow.h"
 #include "cxTypeConversions.h"
@@ -108,6 +109,9 @@ void RenderLoop::timeoutSlot()
 
 	this->emitFPSIfRequired();
 
+	//Make sure events gets processed. Like "Load Patient" may hang if rendering speed is too high
+	qApp->processEvents();
+
 	int timeToNext = this->calculateTimeToNextRender();
 	this->sendRenderIntervalToTimer(timeToNext);
 }
@@ -176,7 +180,7 @@ int RenderLoop::calculateTimeToNextRender()
 	int usage = mLastBeginRender.msecsTo(QDateTime::currentDateTime()); // time spent in rendering
 	int leftover = std::max(0, mTimer->interval() - usage); // time left of the rendering interval
 	int timeToNext = std::max(1, leftover); // always wait at least 1ms - give others time to do stuff
-	//    std::cout << QString("setting interval %1, usage is %2").arg(timeToNext).arg(usage) << std::endl;
+//	std::cout << QString("setting interval %1, usage is %2, time left %3, last interval %4").arg(timeToNext).arg(usage).arg(leftover).arg(mTimer->interval()) << std::endl;
 	return timeToNext;
 }
 
