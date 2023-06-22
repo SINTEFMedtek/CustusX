@@ -32,7 +32,7 @@ OrientationAnnotationSmartRep::OrientationAnnotationSmartRep() :
 	RepImpl()
 {
 	mAngle = M_PI*60/180;
-	mOrientation = OrientationAnnotationPtr::New();
+	mOrientation = vtkCornerAnnotationPtr::New();
 	mOrientation->SetNonlinearFontScaleFactor(0.35);
 	mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039);
 
@@ -43,11 +43,10 @@ OrientationAnnotationSmartRep::OrientationAnnotationSmartRep() :
 	mDCMDirections_r["S"] = Vector3D( 0, 0, 1); // Superior
 	mDCMDirections_r["I"] = Vector3D( 0, 0,-1); // Inferior
 
-	mPlaneDirections_s.resize(4);
-	mPlaneDirections_s[0] = Vector3D( 1, 0, 0); // East
-	mPlaneDirections_s[1] = Vector3D( 0, 1, 0); // North
-	mPlaneDirections_s[2] = Vector3D(-1, 0, 0); // West
-	mPlaneDirections_s[3] = Vector3D( 0,-1, 0); // South
+	mPlaneDirections_s[vtkCornerAnnotation::TextPosition::RightEdge] = Vector3D( 1, 0, 0); // East
+	mPlaneDirections_s[vtkCornerAnnotation::TextPosition::UpperEdge] = Vector3D( 0, 1, 0); // North
+	mPlaneDirections_s[vtkCornerAnnotation::TextPosition::LeftEdge] = Vector3D(-1, 0, 0); // West
+	mPlaneDirections_s[vtkCornerAnnotation::TextPosition::LowerEdge] = Vector3D( 0,-1, 0); // South
 }
 
 
@@ -135,10 +134,10 @@ void OrientationAnnotationSmartRep::createAnnotation()
 	Transform3D rMs = mSlicer->get_sMr().inv();
 
 	// update texts
-	for (unsigned int i=0; i<mPlaneDirections_s.size(); ++i)
+	for (std::map<vtkCornerAnnotation::TextPosition, Vector3D>::iterator iter=mPlaneDirections_s.begin(); iter!=mPlaneDirections_s.end(); ++iter)
 	{
-		QString text = this->determineAnnotation(mPlaneDirections_s[i], rMs);
-		mOrientation->SetText(i, cstring_cast(text));
+		QString text = this->determineAnnotation(iter->second, rMs);
+		mOrientation->SetText(iter->first, cstring_cast(text));
 	}
 }
 

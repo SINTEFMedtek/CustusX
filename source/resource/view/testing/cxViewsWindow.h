@@ -30,7 +30,7 @@ class CXTESTRESOURCEVISUALIZATION_EXPORT ViewsWindow : public QMainWindow
 	Q_OBJECT
 
 public:
-	ViewsWindow(cx::RenderWindowFactoryPtr factory);
+	ViewsWindow();
 	virtual ~ViewsWindow();
 
 	void setDescription(const QString& desc);

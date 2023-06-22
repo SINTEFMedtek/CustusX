@@ -134,6 +134,7 @@ ImagePtr Image::copy()
 	retval->mUnsigned = mUnsigned;
 	retval->mModality = mModality;
 	retval->mImageType = mImageType;
+	retval->mOrganType = mOrganType;
 	retval->mMaxRGBIntensity = mMaxRGBIntensity;
 	retval->mInterpolationType = mInterpolationType;
 	retval->mImageLookupTable2D = mImageLookupTable2D;

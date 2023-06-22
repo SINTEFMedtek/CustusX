@@ -29,11 +29,11 @@ QWidget *ViewServiceMock::createLayoutWidget(QWidget* parent, int index)
 
 		if (optimizedViews)
 		{
-			mLayoutWidgets[index] = new LayoutWidgetUsingViewWidgetsMock(mRenderWindowFactory, parent);
+			mLayoutWidgets[index] = new LayoutWidgetUsingViewWidgetsMock(parent);
 		}
 		else
 		{
-			mLayoutWidgets[index] = new ViewCollectionWidgetMixedMock(mRenderWindowFactory, parent);
+			mLayoutWidgets[index] = new ViewCollectionWidgetMixedMock(parent);
 		}
 		connect(mLayoutWidgets[index].data(), &QObject::destroyed, this, &ViewServiceMock::layoutWidgetDestroyed);
 		mRenderLoop->addLayout(mLayoutWidgets[index]);

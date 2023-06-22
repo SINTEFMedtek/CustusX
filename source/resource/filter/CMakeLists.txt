@@ -3,8 +3,8 @@
 ###########################################################
 
 cx_add_class(CX_RESOURCE_FILTER_FILES
-	cxFilterGroup
-	filters/cxRaidionics
+        cxFilterGroup
+        filters/cxRaidionics
 )
 cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
     cxFilter

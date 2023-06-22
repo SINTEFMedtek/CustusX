@@ -737,7 +737,7 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 
 	if (!mt_doOnlyLinear)
 	{
-		ofstream file_out(nonLinearFile.c_str());
+		std::ofstream file_out(nonLinearFile.c_str());
 
 		//Non-linear Warped Transform
 		HackTPSTransform* l_theWarpTransform = ((HackTPSTransform*) myConcatenation->GetConcatenatedTransform(0));
@@ -778,7 +778,7 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
 
 	}
 
-	ofstream file_out2(linearFile.c_str());
+	std::ofstream file_out2(linearFile.c_str());
 
 	//Linear Transform
 	file_out2 << "MNI Transform File\n" << std::endl;

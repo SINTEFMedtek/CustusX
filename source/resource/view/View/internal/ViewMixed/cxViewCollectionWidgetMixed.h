@@ -54,7 +54,7 @@ class	cxResourceVisualization_EXPORT ViewCollectionWidgetMixed : public ViewColl
 {
 	Q_OBJECT
 public:
-	ViewCollectionWidgetMixed(RenderWindowFactoryPtr factory, QWidget *parent);
+	ViewCollectionWidgetMixed(QWidget *parent);
     virtual ~ViewCollectionWidgetMixed();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);

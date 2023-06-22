@@ -161,3 +161,41 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Small Organs"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODELS, lmCOUNT)
+{
+	"UNKNOWN",
+	"MediumOrgansMediastinum",
+	"PulmSystHeart",
+	"SmallOrgansMediastinum"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_MODELS, lmCOUNT)
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
+{
+	"UNKNOWN",
+	"Airways",
+	"Lungs",
+	"LymphNodes",
+	"VenaCava",
+	"AorticArch",
+	"AscendingAorta",
+	"DescendingAorta",
+	"Spine",
+	"Heart",
+	"PulmonaryVeins",
+	"PulmonaryTrunk",
+	"BrachiocephalicVeins",
+	"SubclavianArtery", //"SubCarArt" in Raidionics
+	"Azygos",
+	"Esophagus",
+	"Tumors",
+	"Nodules",
+	"LungVessels",
+	"AirwaysEnhanced",
+	"Centerlines",
+	"AirwayCenterlines",
+	"RouteToTarget",
+	"RouteToTargetExtended"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, ORGAN_TYPE, organtypeCOUNT)

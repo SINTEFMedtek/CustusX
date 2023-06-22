@@ -13,12 +13,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_calibration_Export.h"
 
-#include "cxBaseWidget.h"
-#include "cxRecordSessionWidget.h"
 #include <QFuture>
 #include <QFutureWatcher>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
+
+#include "cxBaseWidget.h"
+#include "cxRecordSessionWidget.h"
 #include "cxFileSelectWidget.h"
-#include <cxTemporalCalibration.h>
+#include "cxTemporalCalibration.h"
 #include "cxUSAcqusitionWidget.h"
 
 namespace cx

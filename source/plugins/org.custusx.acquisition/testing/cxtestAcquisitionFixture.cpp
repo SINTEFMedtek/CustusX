@@ -11,6 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestAcquisitionFixture.h"
 
 #include <vtkImageData.h>
+#include <vtkPolyData.h>
 #include "catch.hpp"
 #include <QApplication>
 

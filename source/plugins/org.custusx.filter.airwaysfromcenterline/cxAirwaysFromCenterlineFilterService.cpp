@@ -152,17 +152,17 @@ bool AirwaysFromCenterlineFilter::execute()
 
 bool AirwaysFromCenterlineFilter::postProcess()
 {
-
     MeshPtr inputMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
     if (!inputMesh)
         return false;
 
 		QString uidSurfaceModel = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
-		QString nameSurfaceModel = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+		QString nameSurfaceModel = convertToReadableString(otAIRWAYS);
 
 		MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidSurfaceModel, nameSurfaceModel);
 		outputMesh->setVtkPolyData(mOutputAirwayMesh);
 		outputMesh->setColor(QColor(253, 173, 136, 255));
+		outputMesh->setOrganType(otAIRWAYS);
 		patientService()->insertData(outputMesh);
 
 		//Meshes are expected to be in data(d) space
@@ -178,11 +178,12 @@ bool AirwaysFromCenterlineFilter::postProcess()
 		mServices->view()->autoShowData(outputMesh);
 
 		QString uidCenterline = inputMesh->getUid() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
-		QString nameCenterline = inputMesh->getName() + AirwaysFromCenterlineFilter::getNameSuffixCenterline() + "%1";
+		QString nameCenterline = convertToReadableString(otCENTERLINES);
 
 		MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidCenterline, nameCenterline);
 		outputCenterline->setVtkPolyData(mAirwaysFromCenterline->getVTKPoints());
 		outputCenterline->setColor(QColor(0, 200, 0, 255));
+		outputMesh->setOrganType(otCENTERLINES);
 		patientService()->insertData(outputCenterline);
 
 		if(mOutputTypes.size() > 0)
@@ -196,11 +197,12 @@ bool AirwaysFromCenterlineFilter::postProcess()
 			if(segmentedOutputVolume)
 			{
 				QString uidOutputVolume = segmentedinputVolume->getUid() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
-				QString nameOutputVolume = segmentedinputVolume->getName() + AirwaysFromCenterlineFilter::getNameSuffix() + "%1";
+				QString nameOutputVolume = convertToReadableString(otAIRWAYS);
 				ImagePtr outputVolume = createDerivedImage(mServices->patient(),
 																						 uidOutputVolume, nameOutputVolume,
 																						 segmentedOutputVolume, segmentedinputVolume);
 				outputVolume->mergevtkSettingsIntosscTransform();
+				outputVolume->setOrganType(otAIRWAYS);
 				patientService()->insertData(outputVolume);
 
 				if(mOutputTypes.size() > 2)

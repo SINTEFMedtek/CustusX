@@ -14,7 +14,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vtkImageData.h>
 #include <vtkPolyData.h>
+#include <vtkImageMask.h>
+#include <vtkImageThreshold.h>
+#include <vtkTextureMapToPlane.h>
+#include <vtkTransformTextureCoords.h>
+#include <vtkDataSetMapper.h>
+#include <vtkTexture.h>
+#include <vtkPlaneSource.h>
+#include <vtkActor.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkLookupTable.h>
 
+#include "cxUltrasoundSectorSource.h"
 
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"

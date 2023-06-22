@@ -239,6 +239,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(ImagePtr image)
 	retval["Filename"] = image->getFilename().toStdString();
 	retval["Coordinate system"] = image->getCoordinateSystem().toString().toStdString();
 	retval["Image type"] = enum2string(image->getImageType()).toStdString();
+	retval["Organ type"] = enum2string(image->getOrganType()).toStdString();
 	retval["Scalar minimum"] = string_cast(image->getMin());
 	retval["Scalar maximum"] = string_cast(image->getMax());
 	retval["Range (max - min)"] = string_cast(image->getRange());

@@ -64,6 +64,12 @@ protected:
 	void addFolderToDicomDatabase(ctkDICOMDatabasePtr database, QString folder);
 	QStringList findAllSubfoldersWithDicomFiles(QString folder, QProgressDialog &progress);
 	QStringList findAllSubDirs(QString folder);
+	void indexingCompleteSlot(int patientsAdded, int studiesAdded, int seriesAdded, int imagesAdded);
+	QString getDICOMDatabaseDirectory();
+	void setupDatabaseDirectory();
+	void deleteDatabase(ctkDICOMDatabasePtr database);
+	QString setupDatabaseFiles();
+	void stopQtMessages(bool stopMessages);
 };
 
 } //cx

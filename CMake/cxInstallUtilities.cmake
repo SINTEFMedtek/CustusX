@@ -248,7 +248,8 @@ macro(cx_install_set_folder_structure)
                 set(CX_INSTALL_BINARY_DIR "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/MacOS")
                 set(CX_INSTALL_CONFIG_DIR "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/config")
                 set(CX_INSTALL_DOC_DIR    "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/doc")
-                set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
+                #set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BINARY_DIR}")
+                set(CX_INSTALL_PLUGIN_DIR "${CX_INSTALL_BUNDLE_CONTENTS_DIR}/Frameworks")
         endif(APPLE)
 
         set(CX_CONFIG_ROOT_RELATIVE_INSTALLED ../config)
@@ -508,6 +509,7 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
     file(GLOB REMOVE_FILE_LIST
       LIST_DIRECTORIES false
      "${QT_LIBS_DIR}/*.a"
+     #"${QT_LIBS_DIR}/*dSYM*"
       )
 
     list(REMOVE_ITEM INSTALL_FILE_LIST ${REMOVE_FILE_LIST} )
@@ -543,8 +545,8 @@ function(cx_fixup_and_add_qtplugins_to_bundle APPS_LOCAL INSTALL_BINARY_DIR DIRS
 # Install Qt qml by copying all files in the qml directory
 SET(INSTALL_QTQML_DIR "${INSTALL_BINARY_DIR}")
 install(DIRECTORY "${QT_QML_DIR}/"
-	DESTINATION ${INSTALL_QTQML_DIR}
-	DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
+        DESTINATION ${INSTALL_QTQML_DIR}
+        DIRECTORY_PERMISSIONS ${CX_FULL_PERMISSIONS}
 )
 
   message(STATUS "QT_PLUGINS_DIR: " ${QT_PLUGINS_DIR})

@@ -26,9 +26,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt::WindowFlags f) :
-	mRenderWindowFactory(factory),
-	QVTKWidget(parent, f),
+ViewContainer::ViewContainer(QWidget *parent, Qt::WindowFlags f) :
+	QVTKOpenGLNativeWidget(parent, f),
 	mMouseEventTarget(NULL),
 	mRenderWindow(NULL)
 {
@@ -38,7 +37,7 @@ ViewContainer::ViewContainer(RenderWindowFactoryPtr factory, QWidget *parent, Qt
 	mMTimeHash = 0;
 	mMouseEventTarget = NULL;
 	this->setLayout(new QGridLayout);
-	disableGLHiDPI(this->winId());
+//	disableGLHiDPI(this->winId());//vtk9: Probably not needed any longer
 }
 
 ViewContainer::~ViewContainer()
@@ -127,34 +126,10 @@ void ViewContainer::initializeRenderWindow()
 	if (mRenderWindow)
 		return;
 
-	QString uid = QString("rw_oscr=%1").arg(mOffScreenRendering);
-
-	bool renderWindowExists = mRenderWindowFactory->renderWindowExists(uid);
-
-	mRenderWindow = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
-	if(!renderWindowExists)
-		this->addBackgroundRenderer(mRenderWindow);
-	this->SetRenderWindow(mRenderWindow);
-	mRenderWindow->GetInteractor()->EnableRenderOff();
-
-
-
-//	if (!mCachedRenderWindows.count(uid))
-//	{
-////		vtkRenderWindowPtr rw = vtkRenderWindowPtr::New();
-//		vtkRenderWindowPtr rw = mRenderWindowFactory->getRenderWindow(uid, mOffScreenRendering);
-//		this->addBackgroundRenderer(rw);
-//		mCachedRenderWindows[uid] = rw;
-//	}
-
-//	// replace the previous renderwindow with one from the cache.
-//	// the old renderwindow is not hidden explicitly: is this a problem??
-////	if (mRenderWindow != mCachedRenderWindows[uid])
-////	{
-//		mRenderWindow = mCachedRenderWindows[uid];
-//		this->SetRenderWindow(mRenderWindow);
-//		mRenderWindow->GetInteractor()->EnableRenderOff();
-////	}
+	mRenderWindow = this->renderWindow();
+//	if(!renderWindowExists)
+//		this->addBackgroundRenderer(mRenderWindow);//vtk9: Not needed?
+	this->setRenderWindow(mRenderWindow);
 }
 
 void ViewContainer::addBackgroundRenderer(vtkRenderWindowPtr rw)

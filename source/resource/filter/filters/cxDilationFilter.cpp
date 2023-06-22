@@ -11,6 +11,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxDilationFilter.h"
 
+#include <vtkImageCast.h>
+#include <vtkPolyData.h>
+
 #include "cxDoubleProperty.h"
 #include "cxColorProperty.h"
 #include "cxBoolProperty.h"
@@ -20,7 +23,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <itkBinaryDilateImageFilter.h>
 #include <itkBinaryBallStructuringElement.h>
 #include "cxAlgorithmHelpers.h"
-#include <vtkImageCast.h>
 #include "cxUtilHelpers.h"
 #include "cxContourFilter.h"
 #include "cxMesh.h"

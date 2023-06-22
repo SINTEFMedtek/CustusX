@@ -658,7 +658,7 @@ void RouteToTarget::makeMarianaCenterlineFile(QString filename)
 
 	int numberOfExtendedPositions = mExtendedRoutePositions.size() - mRoutePositions.size();
 
-	ofstream out(filename.toStdString().c_str());
+	std::ofstream out(filename.toStdString().c_str());
 	out << "# [xPos yPos zPos BranchingPoint (0=Normal, 1=Branching position, 2=Extended from airway to target)] ";
 	out << "Number of positions: ";
 	out << mExtendedRoutePositions.size(); // write number of positions

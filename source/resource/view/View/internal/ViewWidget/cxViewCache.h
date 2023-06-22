@@ -20,7 +20,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxOSXHelper.h"
 #include "cxViewWidget.h"
-#include "cxRenderWindowFactory.h"
 
 namespace cx
 {
@@ -46,8 +45,7 @@ template<class VIEW_TYPE>
 class cxResourceVisualization_EXPORT ViewCache
 {
 public:
-	ViewCache(RenderWindowFactoryPtr factory, QWidget* widget, QString typeText) :
-		mRenderWindowFactory(factory),
+	ViewCache(QWidget* widget, QString typeText) :
 		mCentralWidget(widget),
 		mNameGenerator(0),
 		mTypeText(typeText)
@@ -63,7 +61,7 @@ public:
 					.arg(mTypeText)
 					.arg(mNameGenerator++)
 					.arg(reinterpret_cast<long>(this));
-			VIEW_TYPE* view = new VIEW_TYPE(mRenderWindowFactory, uid, uid, mCentralWidget);
+			VIEW_TYPE* view = new VIEW_TYPE(mCentralWidget, uid, uid);
 			mCached.push_back(view);
 		}
 
@@ -95,7 +93,6 @@ private:
 	QString mTypeText;
 	std::vector<VIEW_TYPE*> mCached;
 	std::vector<VIEW_TYPE*> mUsed;
-	RenderWindowFactoryPtr mRenderWindowFactory;
 };
 
 

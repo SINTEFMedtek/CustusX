@@ -263,6 +263,23 @@ public slots:
 		REQUIRE(data);
 		return data;
 	}
+
+
+
+	class TestRaidionics : public cx::Raidionics
+	{
+	public:
+		static QString getTarget(cx::ORGAN_TYPE organType)
+		{
+			return cx::Raidionics::getTarget(organType);
+		}
+
+		static cx::ORGAN_TYPE getOrganType(QString target)
+		{
+			return cx::Raidionics::getOrganType(target);
+		}
+	};
+
 } //cxtest
 
 TEST_CASE("GenericScriptFilter: Create", "[unit]")
@@ -541,7 +558,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	REQUIRE(variables.model == "CT_Lungs");
 
 	//CX_LOG_DEBUG() << "ParameterFilePath: " << filter->getParameterFilePath();
-	REQUIRE(QFileInfo(filter->getParameterFilePath()).exists());
+	REQUIRE(QFileInfo::exists(filter->getParameterFilePath()));
 
 	cx::OutputVariables outputVariables = cx::OutputVariables(filter->getParameterFilePath());
 
@@ -552,6 +569,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << outputVariables.mOutputClasses.join(";");
 
 	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
+	REQUIRE(outputVariables.mValid);
 	REQUIRE(outputVariables.mCreateOutputVolume);
 	REQUIRE(outputVariables.mCreateOutputMesh);
 
@@ -639,6 +657,64 @@ TEST_CASE("Raidionics: init", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
+TEST_CASE("Raidionics: target generation", "[unit]")
+{
+	cx::VisServicesPtr services = cx::VisServices::getNullObjects();
+	cx::CommandStringVariables variables = cx::CommandStringVariables("", cx::ImagePtr());
+
+	for(int i = cx::lmMEDIUM_ORGANS_MEDIASTINUM; i <= cx::lmCOUNT; ++i)
+	{
+		QStringList classes;
+		classes << enum2string(cx::LUNG_MODELS(i));
+
+		cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(services, variables, classes));
+
+		QStringList outputClasses = raidionicsUtilities->expandOutputClasses(classes);
+
+//		CX_LOG_DEBUG() << "Input classes: " << classes.join(" ");
+//		CX_LOG_DEBUG() << "Output Classes: " << outputClasses.join(" ");
+		if(i == cx::lmCOUNT)
+			CHECK(outputClasses.size() == 1);
+		else
+		CHECK(outputClasses.size() > 1);
+	}
+}
+
+TEST_CASE("Raidionics: Test color generation", "[unit]")
+{
+	QString testClass;
+	QString colorUnknownClass;
+	colorUnknownClass = cx::Raidionics::colorForLungClass(testClass);
+	CHECK_FALSE(colorUnknownClass.isEmpty());
+	testClass = "not a correct class name";
+	CHECK(cx::Raidionics::colorForLungClass(testClass) == colorUnknownClass);
+
+	QString testColor;
+	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)//Assumes continious numbers in enum
+	{
+		testColor = cx::Raidionics::colorForLungClass(enum2string(cx::ORGAN_TYPE(target)));
+		CHECK_FALSE(testColor.isEmpty());
+		CHECK(testColor != colorUnknownClass);
+	}
+
+}
+
+TEST_CASE("Raidionics: target conversion", "[unit]")
+{
+	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)
+	{
+		cx::ORGAN_TYPE organType = cx::ORGAN_TYPE(target);
+		QString organTypeString = enum2string(cx::ORGAN_TYPE(target));
+		QString targetString = cxtest::TestRaidionics::getTarget(organType);
+		if(organType != cx::otSUBCLAVIAN_ARTERY)
+			CHECK(organTypeString == targetString);
+		else
+			CHECK("SubCarArt" == targetString);
+
+		cx::ORGAN_TYPE organTypeRaidionics = cxtest::TestRaidionics::getOrganType(organTypeString);
+		CHECK(organTypeRaidionics == organType);
+	}
+}
 
 #ifdef CX_CUSTUS_SINTEF
 TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64][hide]")

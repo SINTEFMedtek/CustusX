@@ -20,21 +20,19 @@ namespace cxtest {
 
 TEST_CASE("MultiViewCache init", "[opengl][resource][visualization][integration]")
 {
-	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-	cx::MultiViewCachePtr viewCache = cx::MultiViewCache::create(factory);
+	cx::MultiViewCachePtr viewCache = cx::MultiViewCache::create();
 	REQUIRE(viewCache);
 }
 
 TEST_CASE("MultiViewCache retrieveView 3D", "[opengl][resource][visualization][integration]")
 {
-	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-	cx::MultiViewCachePtr viewCache = cx::MultiViewCache::create(factory);
+	cx::MultiViewCachePtr viewCache = cx::MultiViewCache::create();
 	REQUIRE(viewCache);
 
 	viewCache->clearCache();
 
 	boost::shared_ptr<cx::ViewCollectionWidget> mainWidget;
-	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(factory).data());
+	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(NULL/*need QApplication??*/).data());
 
 	cx::ViewWidget* view = viewCache->retrieveView(mainWidget.get(), cx::View::VIEW_3D, false);
 	REQUIRE(view);
@@ -42,14 +40,13 @@ TEST_CASE("MultiViewCache retrieveView 3D", "[opengl][resource][visualization][i
 
 TEST_CASE("MultiViewCache retrieveView 2D", "[opengl][resource][visualization][integration]")
 {
-	cx::RenderWindowFactoryPtr factory = cx::RenderWindowFactoryPtr(new cx::RenderWindowFactory());
-	cx::MultiViewCachePtr viewCache = cx::MultiViewCache::create(factory);
+	cx::MultiViewCachePtr viewCache = cx::MultiViewCache::create();
 	REQUIRE(viewCache);
 
 	viewCache->clearCache();
 
 	boost::shared_ptr<cx::ViewCollectionWidget> mainWidget;
-	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(factory).data());
+	mainWidget.reset(cx::ViewCollectionWidget::createViewWidgetLayout(NULL/*need QApplication??*/).data());
 
 	cx::ViewWidget* view = viewCache->retrieveView(mainWidget.get(), cx::View::VIEW_2D, false);
 	REQUIRE(view);

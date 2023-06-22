@@ -27,6 +27,11 @@ target_include_directories(cxLogicManager
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+set(VTK_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+)
+
 target_link_libraries(cxLogicManager
     PUBLIC
     cxResource
@@ -35,7 +40,12 @@ target_link_libraries(cxLogicManager
     PRIVATE
     Qt5::Core
     cxPluginUtilities
+    ${VTK_MODULES}
 )
 
+#vtk_module_autoinit(
+#  TARGETS cxLogicManager
+#  ${VTK_MODULES}
+#)
 add_subdirectory(testing)
 

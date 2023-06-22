@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxProbeSector.h"
 
-#include "vtkImageData.h"
+#include <vtkImageData.h>
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPolyData.h>
