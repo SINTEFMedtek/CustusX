@@ -55,8 +55,9 @@ void DisplayTimerWidget::stop()
 
 void DisplayTimerWidget::failed()
 {
-    mTimer->stop();
-    this->printText("red");
+	if(mTimer)
+		mTimer->stop();
+	this->printText("red");
 }
 
 void DisplayTimerWidget::timeoutSlot()

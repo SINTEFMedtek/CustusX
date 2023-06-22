@@ -342,7 +342,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit][not_win64]")
 }
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[unit][hide]")
+TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[hide]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();

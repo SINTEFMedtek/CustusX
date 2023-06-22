@@ -46,7 +46,7 @@ private slots:
 	void timeoutSlot();
 private:
 	void printText(QString color);
-	QTimer* mTimer;
+	QTimer* mTimer = nullptr;
 	QLabel* mLabel;
 	QDateTime mStartTime;
 	int mFontSize;
