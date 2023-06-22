@@ -145,8 +145,8 @@ void CXVBcameraPath::updateManualToolPosition()
 		mLastStoredViewVector = viewDirection_r;
 	}
 
-
-	Vector3D xVector = Vector3D(0,1,0);
+	// Finding xVector which is as similar to Vector3D(0,1,0) as possible but still orthogonal to viewDirection_r
+	Vector3D xVector = ( Vector3D(0,1,0) - viewDirection_r * dot(viewDirection_r, Vector3D(0,1,0)) ).normalized();
 	Vector3D yVector = cross(viewDirection_r, xVector).normalized();
 
 	// Construct tool transform
