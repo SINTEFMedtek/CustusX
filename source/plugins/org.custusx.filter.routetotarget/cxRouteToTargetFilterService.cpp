@@ -242,7 +242,7 @@ bool RouteToTargetFilter::postProcess()
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 	outputCenterline->setVtkPolyData(mOutput);
-	outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+	outputCenterline->getProperties().mLineWidth->setValue(8); //Setting thicker line for RTT
 	outputCenterline->setOrganType(otROUTE_TO_TARGET);
 	patientService()->insertData(outputCenterline, true);
 
