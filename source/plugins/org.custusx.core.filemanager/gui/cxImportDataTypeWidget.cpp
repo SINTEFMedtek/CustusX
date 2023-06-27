@@ -51,7 +51,7 @@ QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
 	return QSize(w, h);
 }
 
-ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename) :
+ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
 	mImportWidget(parent),
 	mServices(services),
@@ -127,7 +127,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
 			mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
 		}
-		this->createDataSpecificGui(i);
+		this->createDataSpecificGui(i, modalitySuggestion);
 	}
 	this->addPointMetricGroupsToTable();
 	mTableWidget->setMaximumSize(getQTableWidgetSize(mTableWidget));
@@ -183,7 +183,7 @@ int ImportDataTypeWidget::findRowIndexContainingButton(QPushButton *button, QTab
 	return retval;
 }
 
-void ImportDataTypeWidget::createDataSpecificGui(int index)
+void ImportDataTypeWidget::createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion)
 {
 	QWidget* paramWidget = new QWidget(this);
 
@@ -202,11 +202,8 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
 		mImageTypeAdapter->setData(image);
 
-		if(isInputFileInNiftiFormat()) // NIfTI files are usually MR. Set this as the default
-		{
-			mModalityAdapter->setValue(enum2string(imMR));
-			updateImageType();
-		}
+		setModality(image, modalitySuggestion);
+
 		QHBoxLayout* layout = new QHBoxLayout();
 		layout->addWidget(mModalityCombo);
 		layout->addWidget(mImageTypeCombo);
@@ -214,6 +211,23 @@ void ImportDataTypeWidget::createDataSpecificGui(int index)
 	}
 
 	mStackedWidgetImageParameters->insertWidget(index, paramWidget);
+}
+
+void ImportDataTypeWidget::setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion)
+{
+	if(image->getModality() == imUNKNOWN || image->getModality() == imCOUNT)
+	{
+		if(modalitySuggestion == imUNKNOWN)
+		{
+			if(isInputFileInNiftiFormat()) // NIfTI files are usually MR? This may not be the case any longer
+				mModalityAdapter->setValue(enum2string(imMR));
+			else
+				return;
+		}
+		else
+			mModalityAdapter->setValue(enum2string(modalitySuggestion));
+	}
+	updateImageType();
 }
 
 void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
@@ -224,7 +238,6 @@ void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
 	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, mNumSlicesColoumn);
 	tableItem->setText(numSlices);
 }
-
 
 void ImportDataTypeWidget::updateTableWithSliceSpacing(ImagePtr image)
 {
@@ -263,7 +276,8 @@ void ImportDataTypeWidget::updateImageType()
 {
 	// Test code: Trying to use convertToImageSubType on file name to find correct subtype.
 	IMAGE_SUBTYPE imageSubType = convertToImageSubType(mFilename);
-	mImageTypeAdapter->setValue(enum2string(imageSubType));
+	if(mImageTypeAdapter)
+		mImageTypeAdapter->setValue(enum2string(imageSubType));
 }
 
 std::map<QString, QString> ImportDataTypeWidget::getParentCandidateList()

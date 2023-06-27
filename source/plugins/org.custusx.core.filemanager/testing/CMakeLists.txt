@@ -8,6 +8,7 @@ if(BUILD_TESTING)
         cxtestTestToolMesh.h
         cxtestTestToolMesh.cpp
         cxtestDataReaderWriter.cpp
+        cxtestImportWidget.cpp
         )
 
     qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_filemanager_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_filemanager_MOC_SOURCE_FILES})

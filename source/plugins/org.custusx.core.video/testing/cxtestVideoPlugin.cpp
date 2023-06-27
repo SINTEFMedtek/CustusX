@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "catch.hpp"
 
-TEST_CASE("VideoPlugin: Check nothing", "[unit][plugins][org.custusx.core.video][hide]")
+TEST_CASE("VideoPlugin: Check nothing", "[plugins][org.custusx.core.video][hide]")
 {
 	CHECK(true);
 }

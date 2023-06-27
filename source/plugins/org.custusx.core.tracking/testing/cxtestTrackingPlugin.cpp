@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
-TEST_CASE("TrackingPlugin: Check nothing", "[unit][plugins][org.custusx.core.tracking][hide]")
+TEST_CASE("TrackingPlugin: Check nothing", "[plugins][org.custusx.core.tracking][hide]")
 {
 	CHECK(true);
 }
