@@ -51,7 +51,7 @@ QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
 	return QSize(w, h);
 }
 
-ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion) :
+ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
 	mImportWidget(parent),
 	mServices(services),
@@ -127,7 +127,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
 			mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
 		}
-		this->createDataSpecificGui(i, modalitySuggestion);
+		this->createDataSpecificGui(i, modalitySuggestion, subtype);
 	}
 	this->addPointMetricGroupsToTable();
 	mTableWidget->setMaximumSize(getQTableWidgetSize(mTableWidget));
@@ -183,7 +183,7 @@ int ImportDataTypeWidget::findRowIndexContainingButton(QPushButton *button, QTab
 	return retval;
 }
 
-void ImportDataTypeWidget::createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion)
+void ImportDataTypeWidget::createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype)
 {
 	QWidget* paramWidget = new QWidget(this);
 
@@ -202,7 +202,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index, IMAGE_MODALITY modal
 		mImageTypeCombo = new LabeledComboBoxWidget(this, mImageTypeAdapter);
 		mImageTypeAdapter->setData(image);
 
-		setModality(image, modalitySuggestion);
+		setModality(image, modalitySuggestion, subtype);
 
 		QHBoxLayout* layout = new QHBoxLayout();
 		layout->addWidget(mModalityCombo);
@@ -213,7 +213,7 @@ void ImportDataTypeWidget::createDataSpecificGui(int index, IMAGE_MODALITY modal
 	mStackedWidgetImageParameters->insertWidget(index, paramWidget);
 }
 
-void ImportDataTypeWidget::setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion)
+void ImportDataTypeWidget::setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype)
 {
 	if(image->getModality() == imUNKNOWN || image->getModality() == imCOUNT)
 	{
@@ -227,6 +227,7 @@ void ImportDataTypeWidget::setModality(ImagePtr image, IMAGE_MODALITY modalitySu
 		else
 			mModalityAdapter->setValue(enum2string(modalitySuggestion));
 	}
+	mImageTypeAdapter->setValue(enum2string(subtype));
 	updateImageType();
 }
 

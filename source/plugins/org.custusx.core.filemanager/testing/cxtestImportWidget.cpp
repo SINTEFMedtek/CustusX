@@ -42,9 +42,9 @@ public:
 		cx::ImportDataTypeWidget(variables.mImportwidget, variables.mVisServices, variables.mDatas, variables.mParentCandidates, variables.mFileName, variables.mModalitySuggestion)
 	{}
 
-	void setModality(cx::ImagePtr image, cx::IMAGE_MODALITY modalitySuggestion)
+	void setModality(cx::ImagePtr image, cx::IMAGE_MODALITY modalitySuggestion, cx::IMAGE_SUBTYPE subtype = cx::istUNKNOWN)
 	{
-		return cx::ImportDataTypeWidget::setModality(image, modalitySuggestion);
+		return cx::ImportDataTypeWidget::setModality(image, modalitySuggestion, subtype);
 	}
 };
 
@@ -78,8 +78,9 @@ TEST_CASE("ImportDataTypeWidget::setModality", "[unit]")
 	CHECK(image->getModality() == cx::imPET);
 
 	image->setModality(cx::imUNKNOWN);
-	widget->setModality(image, cx::imCT);
+	widget->setModality(image, cx::imCT, cx::istTHORAX_CT);
 	CHECK(image->getModality() == cx::imCT);
+	CHECK(image->getImageType() == cx::istTHORAX_CT);
 
 	delete widget;
 }

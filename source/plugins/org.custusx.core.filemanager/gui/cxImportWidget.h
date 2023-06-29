@@ -52,10 +52,10 @@ signals:
 	void parentCandidatesUpdated();
 
 private slots:
-	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN);
+	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	void importButtonClicked();
 	void cancelButtonClicked();
-	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN);
+	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	void removeWidget(QWidget *widget);
 	void removeRowFromTableAndRemoveFilenameFromImportList();
 

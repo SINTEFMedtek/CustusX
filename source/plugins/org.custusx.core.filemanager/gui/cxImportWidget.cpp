@@ -147,13 +147,16 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 
 	//Create actions for setting CT and PET modality, used by Fraxinus
 	QAction* addFilesForImportWithDialogAction = new QAction("AddFilesForImportWithDialogAction", this);
-	QAction* addFilesForImportWithDialogActionCT = new QAction("AddFilesForImportWithDialogActionCT", this);
+	QAction* addFilesForImportWithDialogActionCTThorax = new QAction("AddFilesForImportWithDialogActionCTThorax", this);
+	QAction* addFilesForImportWithDialogActionPETCT = new QAction("AddFilesForImportWithDialogActionPETCT", this);
 	QAction* addFilesForImportWithDialogActionPET = new QAction("AddFilesForImportWithDialogActionPET", this);
 	this->addAction(addFilesForImportWithDialogAction);
-	this->addAction(addFilesForImportWithDialogActionCT);
+	this->addAction(addFilesForImportWithDialogActionCTThorax);
+	this->addAction(addFilesForImportWithDialogActionPETCT);
 	this->addAction(addFilesForImportWithDialogActionPET);
 	connect(addFilesForImportWithDialogAction, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend();});
-	connect(addFilesForImportWithDialogActionCT, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imCT);});
+	connect(addFilesForImportWithDialogActionCTThorax, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imCT, istTHORAX_CT);});
+	connect(addFilesForImportWithDialogActionPETCT, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imCT, istPET_CT);});
 	connect(addFilesForImportWithDialogActionPET, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imPET);});
 
 	QAction* importButtonClickedAction = new QAction("ImportButtonClickedAction", this);
@@ -190,9 +193,9 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 	return newRowIndex;
 }
 
-void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion)
+void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype)
 {
-	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked(modalitySuggestion);
+	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked(modalitySuggestion, subtype);
 	if(widget && widget->getDatas().size() > 0)
 	{
 		SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
@@ -200,7 +203,7 @@ void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modality
 	}
 }
 
-ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion)
+ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype)
 {
 	QStringList filenames = this->openFileBrowserForSelectingFiles();
 
@@ -232,7 +235,7 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 		{
 			//TODO: Make sure we get no circular parent hierarchies
 			int index = this->insertDataIntoTable(filename, newData);
-			widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename, modalitySuggestion);
+			widget = new ImportDataTypeWidget(this, mVisServices, newData, mParentCandidates, filename, modalitySuggestion, subtype);
 			mStackedWidget->insertWidget(index, widget);
 			mNotImportedData.insert(mNotImportedData.end(), newData.begin(), newData.end());//Update mNotImportedData with new data
 		}

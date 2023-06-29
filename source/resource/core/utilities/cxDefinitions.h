@@ -166,6 +166,11 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		istUSBMODE,
 		istANGIO,
 		istSEGMENTATION,
+		istPET_CT,
+		istTHORAX_CT,
+		istPET,
+		istPET_REGISTERED,
+		istCOPY,
 		istCOUNT
 	};
 

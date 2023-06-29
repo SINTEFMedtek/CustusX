@@ -132,7 +132,10 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, IMAGE_SUBTYPE, istCOUNT)
 	"FLAIR",
 	"B-Mode",
 	"Angio",
-	"Segmentation"
+	"Segmentation",
+	"PET CT",
+	"Thorax CT",
+	"Copy"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, IMAGE_SUBTYPE, istCOUNT)
 

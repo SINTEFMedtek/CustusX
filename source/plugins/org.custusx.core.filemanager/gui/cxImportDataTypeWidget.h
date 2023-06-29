@@ -34,7 +34,7 @@ class org_custusx_core_filemanager_EXPORT ImportDataTypeWidget : public BaseWidg
 {
 	Q_OBJECT
 public:
-	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion = imUNKNOWN);
+	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	~ImportDataTypeWidget();
 
 	static QSize getQTableWidgetSize(QTableWidget *t);
@@ -57,10 +57,10 @@ private slots:
 	void removeRowFromTableAndDataFromImportList();
 
 protected:
-	void setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion);
+	void setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype = istUNKNOWN);
 
 private:
-	void createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion);
+	void createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype);
 	void updateTableWithNumberOfSlices(ImagePtr image);
 	void updateTableWithSliceSpacing(ImagePtr image);
 	std::map<QString, QString> getParentCandidateList();
