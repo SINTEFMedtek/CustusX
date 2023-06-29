@@ -367,7 +367,11 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 
 void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 {
-	this->removeAndResetSliceRep();
+	//TODO: Don't remove and add the same slice reps. Reuse existing ones
+	if(mSliceReps.size()== numberOfSlices)//Simple first fix
+		return;
+
+	this->removeAndResetSliceRep();//This use a lot of time in vtkGarbageCollectorImpl. When doing SW rendering it is probably not needed to remove and add, as we did for GPU rendering
 	for(int i = 0; i < numberOfSlices; ++i)
 	{
 		SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
