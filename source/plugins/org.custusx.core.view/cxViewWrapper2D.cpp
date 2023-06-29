@@ -77,6 +77,8 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 
 	// disable vtk interactor: this wrapper IS an interactor
 //	mView->getRenderWindow()->GetInteractor()->Disable();//vtk9 - Removing this fixes GL error, but allows 3D rotations in the 2D views
+
+	//Removing observers also disables rendering with VTK. Render is called in  ViewContainer::doRender()
 	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();//vtk9 - Remove observers instead of disabling interactor
 
 	mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);

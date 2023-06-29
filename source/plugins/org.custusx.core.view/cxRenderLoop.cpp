@@ -99,6 +99,7 @@ void RenderLoop::clearViews()
 
 void RenderLoop::timeoutSlot()
 {
+	//For 3D these renderings are in addition to the ones triggered from the VTK interactor, while for 2D they may be the only ones
 	mCyclicLogger->begin();
 	mLastBeginRender = QDateTime::currentDateTime();
 	this->sendRenderIntervalToTimer(mBaseRenderInterval);
@@ -108,9 +109,6 @@ void RenderLoop::timeoutSlot()
 	this->renderViews();
 
 	this->emitFPSIfRequired();
-
-	//Make sure events gets processed. Like "Load Patient" may hang if rendering speed is too high
-	qApp->processEvents();
 
 	int timeToNext = this->calculateTimeToNextRender();
 	this->sendRenderIntervalToTimer(timeToNext);
@@ -125,7 +123,11 @@ void RenderLoop::renderViews()
 		if (mLayoutWidgets[i])
 		{
 			if (!smart)
+			{
 				mLayoutWidgets[i]->setModified();
+				//Make sure events gets processed. Actions like "Load Patient" may hang if rendering speed is too high
+				qApp->processEvents();
+			}
 			mLayoutWidgets[i]->render();
 		}
 	}
