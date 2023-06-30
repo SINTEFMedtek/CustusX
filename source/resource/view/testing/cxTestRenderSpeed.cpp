@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTime>
 #include <QGridLayout>
 #include <QBoxLayout>
+#include <QVTKOpenGLWindow.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "cxDataLocations.h"
@@ -90,6 +91,7 @@ int RenderSpeedCounter::getRenderFPS()
 
 TestRenderSpeed::TestRenderSpeed()
 {
+	QSurfaceFormat::setDefaultFormat(QVTKOpenGLWindow::defaultFormat());
 	mCounter.setName("cxView");
 	cx::reporter()->initialize();
 
