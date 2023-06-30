@@ -233,15 +233,17 @@ QWidget* MainWindowActions::parentWidget()
 
 void MainWindowActions::newPatientSlot()
 {
+	mServices->view()->enableRender(false);
 	QString choosenDir = this->selectNewPatientFolder();
-	if(choosenDir.isEmpty())
-		return;
+	if(!choosenDir.isEmpty())
+	{
+		// Update global patient number
+		int patientNumber = settings()->value("globalPatientNumber").toInt();
+		settings()->setValue("globalPatientNumber", ++patientNumber);
 
-	// Update global patient number
-	int patientNumber = settings()->value("globalPatientNumber").toInt();
-	settings()->setValue("globalPatientNumber", ++patientNumber);
-
-	mServices->session()->load(choosenDir);
+		mServices->session()->load(choosenDir);
+	}
+	mServices->view()->enableRender(true);
 }
 
 QString MainWindowActions::selectNewPatientFolder()
@@ -277,71 +279,82 @@ QString MainWindowActions::getExistingSessionFolder()
 
 void MainWindowActions::clearPatientSlot()
 {
+	mServices->view()->enableRender(false);
 	mServices->session()->clear();
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::savePatientFileSlot()
 {
+	mServices->view()->enableRender(false);
 	if (mServices->patient()->getActivePatientFolder().isEmpty())
 	{
 		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
+		mServices->view()->enableRender(true);
 		return;
 	}
 
 	mServices->session()->save();
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::loadPatientFileSlot()
 {
+	mServices->view()->enableRender(false);
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	// Open file dialog
 	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
-	if (folder.isEmpty())
-		return;
+	if (!folder.isEmpty())
+		mServices->session()->load(folder);
 
-	mServices->session()->load(folder);
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::loadPatientFileCopySlot()
 {
+	mServices->view()->enableRender(false);
 	QString patientDatafolder = profile()->getPatientTemplatePath();
 
 	// Open file dialog
 	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
-	if (folder.isEmpty())
-		return;
-
-	QString newFolder = this->selectNewPatientFolder();
-	if (newFolder.isEmpty())
-		return;
-
-	if(!copyRecursively(folder, newFolder, true))
+	if (!folder.isEmpty())
 	{
-		CX_LOG_WARNING() << "MainWindowActions::loadPatientFileCopySlot(): Cannot copy patient folder: " << folder;
-		return;
+		QString newFolder = this->selectNewPatientFolder();
+		if (!newFolder.isEmpty())
+		{
+			if(!copyRecursively(folder, newFolder, true))
+			{
+				CX_LOG_WARNING() << "MainWindowActions::loadPatientFileCopySlot(): Cannot copy patient folder: " << folder;
+			}
+			else
+				mServices->session()->load(newFolder);
+		}
 	}
-
-	mServices->session()->load(newFolder);
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
+	mServices->view()->enableRender(false);
 	ExportDataDialog* wizard = new ExportDataDialog(mServices->patient(), this->parentWidget());
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::importDataSlot(QString actionText)
 {
 	this->savePatientFileSlot();
+	mServices->view()->enableRender(false);
 
 	QDockWidget* importDockWidget = findMainWindowChildWithObjectName<QDockWidget*>("import_widgetDockWidget");
 	if(!importDockWidget)
 	{
 		CX_LOG_ERROR() << "Cannot find DockWidget for ImportWidget";
+		mServices->view()->enableRender(true);
 		return;
 	}
 
@@ -352,6 +365,7 @@ void MainWindowActions::importDataSlot(QString actionText)
 	if(!widget)
 	{
 		CX_LOG_ERROR() << "Cannot find ImportWidget";
+		mServices->view()->enableRender(true);
 		return;
 	}
 
@@ -367,6 +381,7 @@ void MainWindowActions::importDataSlot(QString actionText)
 	}
 	if(!actionFound)
 		CX_LOG_ERROR() << "MainWindowActions::importDataSlot, action not found: " << actionText;
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::shootScreen()
