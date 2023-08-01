@@ -74,7 +74,7 @@ cx::FileManagerServicePtr ReconstructionManagerTestFixture::getFileManagerServic
 	return mFileManagerService;
 }
 
-void ReconstructionManagerTestFixture::reconstruct()
+void ReconstructionManagerTestFixture::reconstruct(bool requireSuccess)
 {
 	mOutput.clear();
 	cx::UsReconstructionServicePtr reconstructer = this->getManager();
@@ -86,7 +86,10 @@ void ReconstructionManagerTestFixture::reconstruct()
 			reconstructer->createCoreParameters(),
 			reconstructer->getSelectedFileData(),
 			createBModeWhenAngio);
-	REQUIRE(success);
+	if(requireSuccess)
+		REQUIRE(success);
+	else
+		REQUIRE_FALSE(success);
 
 	mOutput = executer->getResult();
 }

@@ -34,7 +34,7 @@ public:
 	~ReconstructionManagerTestFixture();
 
 	cx::UsReconstructionServicePtr getManager();
-	void reconstruct();	///< run the reconstruction in the main thread
+	void reconstruct(bool requireSuccess = true);	///< run the reconstruction in the main thread
 	void threadedReconstruct();
 	std::vector<cx::ImagePtr> getOutput();
 	SyntheticVolumeComparerPtr getComparerForOutput(SyntheticReconstructInputPtr input, int index);
