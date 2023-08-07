@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <sstream>
 #include <QTextEdit>
 #include <QTimer>
+#include <QVTKOpenGLWindow.h>
 
 #include "cxDummyTool.h"
 #include "cxTypeConversions.h"
@@ -36,6 +37,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
+    QSurfaceFormat::setDefaultFormat(QVTKOpenGLWindow::defaultFormat());
 	mTestData += "Test Results:\n";
 	mBaseTime = 1000;
 	mMeasuredFPS = 0;

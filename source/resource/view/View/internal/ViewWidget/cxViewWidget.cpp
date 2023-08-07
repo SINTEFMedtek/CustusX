@@ -39,6 +39,9 @@ ViewWidget::ViewWidget(QWidget *parent, const QString& uid, const QString& name,
 	mView = ViewLinkingViewWidget::create(this, renderWindow);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequestedSlot(const QPoint &)));
 
+//	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();//vtk9 - Remove observers instead of disabling interactor. This disables VTK rendering as well, but allows calling render()
+//	mView->getRenderWindow()->GetInteractor()->EnableRenderOff();//This turns off all rendering? Calling render don't work
+
 	mView->clear();
 //	disableGLHiDPI(this->winId());//vtk9: Probably not needed any longer
 }
@@ -68,12 +71,12 @@ vtkRendererPtr ViewWidget::getRenderer()
 void ViewWidget::render()
 {
 	// Render is called only when mtime is changed.
-	// At least on MaxOS, this is not done automatically.
+	// At least on MacOS, this is not done automatically.
 	unsigned long hash = mView->computeTotalMTime();
 
 	if (hash != mMTimeHash)
 	{
-		QVTKOpenGLNativeWidget::renderWindow()->Render();
+		mView->getRenderWindow()->GetInteractor()->Render();
 		mMTimeHash = hash;
 
 		QString msg("During rendering of view: " + this->getView()->getName() + " " + this->getView()->getTypeString());
