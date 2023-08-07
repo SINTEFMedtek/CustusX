@@ -25,7 +25,7 @@ vtkImageDataPtr USReconstructInputData::getMask()
 
 bool USReconstructInputData::isValid() const
 {
-	if (mFrames.empty() || !mUsRaw || mPositions.empty())
+	if (mFrames.size() < 3 || !mUsRaw || mPositions.empty())
 		return false;
 	if(mUsRaw->is4D())
 	{
