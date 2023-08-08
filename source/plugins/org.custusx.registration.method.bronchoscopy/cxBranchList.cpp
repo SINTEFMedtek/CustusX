@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include "cxMesh.h"
+#include "cxImage.h"
+#include "vtkImageData.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
 #include <vtkCardinalSpline.h>
@@ -744,6 +746,88 @@ Eigen::MatrixXd BranchList::findMainConnectedAirwayTree(Eigen::MatrixXd position
 	}
 
 	return mainAirwayTree_r;
+}
+
+
+void BranchList::setRadius(ImagePtr segmentationVolume)
+{
+	std::vector<BranchPtr> branches = this->getBranches();
+
+	for (int i = 0; i < branches.size(); i++)
+		{
+			Eigen::MatrixXd positions = branches[i]->getPositions();
+			Eigen::MatrixXd orientations = branches[i]->getOrientations();
+			Eigen::VectorXd radius(positions.cols());
+
+			for (int j = 0; j < positions.cols(); j++)
+			{
+				radius(j) = calculateRadius(positions.col(j), orientations.col(j), segmentationVolume);
+			}
+
+			branches[i]->setRadius(radius);
+		}
+
+}
+
+double BranchList::calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume)
+{
+	double radius = 0;
+	if (!segmentationVolume)
+		return radius;
+
+	vtkImageDataPtr segmentationImage = segmentationVolume->getBaseVtkImageData();
+	int* dim = segmentationImage->GetDimensions();
+	double* spacing = segmentationImage->GetSpacing();
+	Transform3D dMr = segmentationVolume->get_rMd().inverse();
+	Eigen::Vector3d position_r = dMr.coord(position);
+	int x = (int) boost::math::round( position_r[0]/spacing[0] );
+	int y = (int) boost::math::round( position_r[1]/spacing[1] );
+	int z = (int) boost::math::round( position_r[2]/spacing[2] );
+	Eigen::Vector3i indexVector;
+	indexVector(0) = x;
+	indexVector(1) = y;
+	indexVector(2) = z;
+
+	Eigen::MatrixXd maxRadius(3,2);
+	Eigen::Vector3d perpendicularX = orientation.cross(Eigen::Vector3d::UnitX());
+	maxRadius(0,0) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularX, dim, spacing, 1);
+	maxRadius(0,1) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularX, dim, spacing, -1);
+	Eigen::Vector3d perpendicularY = orientation.cross(Eigen::Vector3d::UnitY());
+	maxRadius(1,0) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularY, dim, spacing, 1);
+	maxRadius(1,1) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularY, dim, spacing, -1);
+	Eigen::Vector3d perpendicularZ = orientation.cross(Eigen::Vector3d::UnitZ());
+	maxRadius(2,0) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularZ, dim, spacing, 1);
+	maxRadius(2,1) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularZ, dim, spacing, -1);
+
+	radius = maxRadius.rowwise().mean().minCoeff();
+
+	if (std::isnan(radius))
+		radius = 0;
+
+	return radius;
+}
+
+double BranchList::findDistanceToSegmentationEdge(vtkImageDataPtr segmentationImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction)
+{
+	double retval;
+	double maxValue = segmentationImage->GetScalarRange()[1];
+	for (int radiusVoxels=1; radiusVoxels<30; radiusVoxels++)
+	{
+		if (perpendicularVector.sum() != 0)
+		{
+			Eigen::Vector3d searchDirection =  perpendicularVector.normalized() * radiusVoxels;
+			int xIndex = std::max(std::min(indexVector(0) + direction * (int) std::round(searchDirection(0)), dim[0]-1), 0);
+			int yIndex = std::max(std::min(indexVector(1) + direction * (int) std::round(searchDirection(1)), dim[1]-1), 0);
+			int zIndex = std::max(std::min(indexVector(2) + direction * (int) std::round(searchDirection(2)), dim[2]-1), 0);
+			if (segmentationImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
+			{
+				searchDirection =  perpendicularVector.normalized() * (radiusVoxels-1);
+				retval = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
+				break;
+			}
+		}
+	}
+	return retval;
 }
 
 bool checkIfTwoPointCloudsAreClose(Eigen::MatrixXd C1, Eigen::MatrixXd C2, double maxDistance/*mm*/)

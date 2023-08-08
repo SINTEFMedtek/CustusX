@@ -41,9 +41,6 @@ public:
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	void addRouteInformationToFile(VisServicesPtr services);
 	static double calculateRouteLength(std::vector< Eigen::Vector3d > route);
-	void setBloodVesselRadius();
-	double calculateBloodVesselRadius(Eigen::Vector3d position, Eigen::Vector3d orientation);
-	double findDistanceToSegmentationEdge(vtkImageDataPtr bloodVesselImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
 	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
