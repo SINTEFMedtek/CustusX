@@ -50,7 +50,9 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 
 IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 {
-	IMAGE_SUBTYPE retval = istUNKNOWN;
+	IMAGE_SUBTYPE retval =  string2enum<IMAGE_SUBTYPE>(imageTypeSubString);
+	if((retval != istUNKNOWN) || retval != istCOUNT)
+		return retval;
 
 	if (imageTypeSubString.isEmpty() || imageTypeSubString == " ")
 		retval = istEMPTY;
