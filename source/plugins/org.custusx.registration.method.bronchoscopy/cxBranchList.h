@@ -59,6 +59,7 @@ public:
 	BranchListPtr removePositionsForLocalRegistration(Eigen::MatrixXd trackingPositions, double maxDistance);
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 	void setRadius(ImagePtr segmentationVolume);
+	bool isRadiusAvailable();
 
 private:
 	void splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int splitIndex);
@@ -71,6 +72,8 @@ private:
 	Eigen::MatrixXd findMainConnectedAirwayTree(Eigen::MatrixXd positions_r);
 	double calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume);
 	double findDistanceToSegmentationEdge(vtkImageDataPtr segmentationVolume, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction);
+
+	bool mIsRadiusAvailable = false;
 };
 
 std::pair<Eigen::MatrixXd,Eigen::MatrixXd > org_custusx_registration_method_bronchoscopy_EXPORT findConnectedPointsInCT(int startIndex , Eigen::MatrixXd positionsNotUsed);

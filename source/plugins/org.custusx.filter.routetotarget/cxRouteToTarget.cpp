@@ -9,7 +9,6 @@
 #include <vtkCellArray.h>
 #include "vtkCardinalSpline.h"
 #include "vtkImageData.h"
-#include <boost/math/special_functions/round.hpp>
 #include "cxLogger.h"
 #include <QDir>
 #include "cxTime.h"
@@ -215,6 +214,12 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 		mRoutePositionsBranch.push_back(searchBranchPtr);
 		mCameraRotation.push_back(cameraRotation);
 		mGenerationNumber.push_back(searchBranchPtr->findGenerationNumber());
+		Eigen::VectorXd radius = searchBranchPtr->getRadius();
+
+		if(radius.size() > i)
+			mRadius.push_back(radius(i));
+		else
+			mRadius.push_back(0.0);
 	}
 
 	mBranchingIndex.push_back(mRoutePositions.size()-1);
@@ -272,6 +277,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
     mExtendedCameraRotation.clear();
     mExtendedCameraRotation = mCameraRotation;
 		mExtendedGenerationNumber = mGenerationNumber;
+		mExtendedRadius = mRadius;
 	if(mRoutePositions.size() > 0)
 	{
 		double extensionDistance = findDistance(mRoutePositions.front(),mTargetPosition);
@@ -284,6 +290,7 @@ vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 			mExtendedRoutePositions.insert(mExtendedRoutePositions.begin(), mRoutePositions.front() + extensionPointIncrementVector*i);
 			mExtendedCameraRotation.insert(mExtendedCameraRotation.begin(), mExtendedCameraRotation.front());
 			mExtendedGenerationNumber.insert(mExtendedGenerationNumber.begin(), mExtendedGenerationNumber.front());
+			mExtendedRadius.insert(mExtendedRadius.begin(), 0.0);
 		}
 	}
 
@@ -560,6 +567,13 @@ std::vector< int > RouteToTarget::getGenerationNumbers()
 	std::vector< int > generationNumbers = mExtendedGenerationNumber;
 	std::reverse(generationNumbers.begin(), generationNumbers.end());
 	return generationNumbers;
+}
+
+std::vector< double > RouteToTarget::getRadius()
+{
+	std::vector< double > radius = mExtendedRadius;
+	std::reverse(radius.begin(), radius.end());
+	return radius;
 }
 
 std::vector< int > RouteToTarget::getBranchingIndex()
