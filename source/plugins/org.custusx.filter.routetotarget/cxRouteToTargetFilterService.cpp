@@ -367,6 +367,11 @@ std::vector<int> RouteToTargetFilter::getGenerationNumbers()
 	return mRouteToTarget->getGenerationNumbers();
 }
 
+std::vector<double> RouteToTargetFilter::getRadius()
+{
+	return mRouteToTarget->getRadius();
+}
+
 std::vector< int > RouteToTargetFilter::getBranchingIndex()
 {
 	return mRouteToTarget->getBranchingIndex();

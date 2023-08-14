@@ -54,6 +54,7 @@ public:
 	std::vector<BranchPtr> getRouteBranches();
 	std::vector< double > getCameraRotation();
 	std::vector< int > getGenerationNumbers();
+	std::vector<double> getRadius();
 	std::vector< int > getBranchingIndex();
 	BranchListPtr getBranchList();
 	void setBranchList(BranchListPtr branchList);
