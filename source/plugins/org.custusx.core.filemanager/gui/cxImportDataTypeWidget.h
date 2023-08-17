@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_filemanager_Export.h"
 #include <QPushButton>
+#include <QTableWidgetItem>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxLogger.h"
@@ -45,6 +46,10 @@ public:
 	std::vector<DataPtr> getDatas() {return mData;};
 	void setData(std::vector<DataPtr> datas) {mData = datas;}
 
+	const int mCheckBoxCTColumn;
+	const int mCheckBoxPETColumn;
+	const int mCheckBoxPETCTColumn;
+
 public slots:
 	void update();
 	void prepareDataForImport();
@@ -58,6 +63,7 @@ private slots:
 
 protected:
 	void setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype = istUNKNOWN);
+	QTableWidgetItem *createCheckbox(QString text);
 
 private:
 	void createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype);
@@ -113,11 +119,15 @@ private:
 	QWidget* mModalityCombo;
 
 	int mSeriesNumColumn = 1;
-	int mNumSlicesColoumn = 2;
-	int mFilenameColoumn = 3;
-	int mTypeColoumn = 4;
-	int mSliceSpacingColoumn = 5;
-	int mSpaceColoumn = 6;
+	int mNumSlicesColumn = 2;
+	int mFilenameColumn = 3;
+	int mTypeColumn = 4;
+	int mSliceSpacingColumn = 5;
+	int mSpaceColumn = 6;
+
+	QTableWidgetItem *mCheckBoxWidgetCT;
+	QTableWidgetItem *mCheckBoxWidgetPET;
+	QTableWidgetItem *mCheckBoxWidgetPETCT;
 };
 
 }

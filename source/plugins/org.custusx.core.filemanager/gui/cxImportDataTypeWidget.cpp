@@ -53,6 +53,9 @@ QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
 
 ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
+	mCheckBoxCTColumn(4),
+	mCheckBoxPETColumn(5),
+	mCheckBoxPETCTColumn(6),
 	mImportWidget(parent),
 	mServices(services),
 	mData(data),
@@ -95,6 +98,10 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
 	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportDataTypeWidget::tableItemSelected);
 
+	mCheckBoxWidgetCT = this->createCheckbox("CT");
+	mCheckBoxWidgetPET = this->createCheckbox("PET");
+	mCheckBoxWidgetPETCT = this->createCheckbox("PET CT");
+
 	QString type, name;
 	for(unsigned i=0; i<mData.size(); ++i)
 	{
@@ -123,9 +130,9 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 			int newRowIndex = mTableWidget->rowCount();
 			mTableWidget->setRowCount(newRowIndex+1);
 			mTableWidget->setCellWidget(newRowIndex, 0, removeButton);
-			mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem("1"));
-			mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
-			mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
+			mTableWidget->setItem(newRowIndex, mNumSlicesColumn, new QTableWidgetItem("1"));
+			mTableWidget->setItem(newRowIndex, mFilenameColumn, new QTableWidgetItem(name));
+			mTableWidget->setItem(newRowIndex, mTypeColumn, new QTableWidgetItem(type));
 		}
 		this->createDataSpecificGui(i, modalitySuggestion, subtype);
 	}
@@ -164,6 +171,15 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	connect(mImportWidget, &ImportWidget::parentCandidatesUpdated, this, &ImportDataTypeWidget::update);
 }
 
+QTableWidgetItem *ImportDataTypeWidget::createCheckbox(QString text)
+{
+	//Use checkable QTableItem instead of QCheckBox, as the check boxes seems to disappear when clicking in the table cell outside the check box
+	QTableWidgetItem *checkBoxItem = new QTableWidgetItem(text);
+	checkBoxItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+	checkBoxItem->setCheckState(Qt::Unchecked);
+	return checkBoxItem;
+}
+
 ImportDataTypeWidget::~ImportDataTypeWidget()
 {
 	disconnect(mImportWidget, &ImportWidget::readyToImport, this, &ImportDataTypeWidget::prepareDataForImport);
@@ -175,8 +191,8 @@ int ImportDataTypeWidget::findRowIndexContainingButton(QPushButton *button, QTab
 	int retval = -1;
 	for(int i=0; i<tableWidget->rowCount(); ++i)
 	{
-		int buttonColoumn = 0;
-		QWidget *cellWidget = tableWidget->cellWidget(i,buttonColoumn);
+		int buttonColumn = 0;
+		QWidget *cellWidget = tableWidget->cellWidget(i,buttonColumn);
 		if(button == cellWidget)
 			retval = i;
 	}
@@ -236,7 +252,7 @@ void ImportDataTypeWidget::updateTableWithNumberOfSlices(ImagePtr image)
 	int dims[3];
 	image->getBaseVtkImageData()->GetDimensions(dims);
 	QString numSlices = QString::number(dims[2]);
-	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, mNumSlicesColoumn);
+	QTableWidgetItem *tableItem = mTableWidget->item(mTableWidget->rowCount()-1, mNumSlicesColumn);
 	tableItem->setText(numSlices);
 }
 
@@ -245,7 +261,7 @@ void ImportDataTypeWidget::updateTableWithSliceSpacing(ImagePtr image)
 	double spacing = image->getSpacing()[2];
 	QString spacingText;
 	spacingText.setNum(spacing, 'g', 2);
-	mTableWidget->setItem(mTableWidget->rowCount()-1, mSliceSpacingColoumn, new QTableWidgetItem(spacingText+" mm"));
+	mTableWidget->setItem(mTableWidget->rowCount()-1, mSliceSpacingColumn, new QTableWidgetItem(spacingText+" mm"));
 }
 
 void ImportDataTypeWidget::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
@@ -257,7 +273,7 @@ void ImportDataTypeWidget::removeRowFromTableAndDataFromImportList()
 {
 	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
 	int rowindex = this->findRowIndexContainingButton(button, mTableWidget);
-	QString fullfilename = mTableWidget->item(rowindex, mFilenameColoumn)->text();
+	QString fullfilename = mTableWidget->item(rowindex, mFilenameColumn)->text();
 	if(rowindex != -1)
 		mTableWidget->removeRow(rowindex);
 
@@ -638,10 +654,10 @@ void ImportDataTypeWidget::addPointMetricGroupsToTable()
 
 		int newRowIndex = mTableWidget->rowCount();
 		mTableWidget->setRowCount(newRowIndex+1);
-		mTableWidget->setItem(newRowIndex, mNumSlicesColoumn, new QTableWidgetItem(QString::number(datas.size())));
-		mTableWidget->setItem(newRowIndex, mFilenameColoumn, new QTableWidgetItem(name));
-		mTableWidget->setItem(newRowIndex, mTypeColoumn, new QTableWidgetItem(type));
-		mTableWidget->setCellWidget(newRowIndex, mSpaceColoumn, spaceCB);
+		mTableWidget->setItem(newRowIndex, mNumSlicesColumn, new QTableWidgetItem(QString::number(datas.size())));
+		mTableWidget->setItem(newRowIndex, mFilenameColumn, new QTableWidgetItem(name));
+		mTableWidget->setItem(newRowIndex, mTypeColumn, new QTableWidgetItem(type));
+		mTableWidget->setCellWidget(newRowIndex, mSpaceColumn, spaceCB);
 	}
 }
 
@@ -665,15 +681,16 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 {
 	QTableWidget* simpleTableWidget = new QTableWidget();
 	simpleTableWidget->setRowCount(0);
-	simpleTableWidget->setColumnCount(4);
+	simpleTableWidget->setColumnCount(7);
 	QStringList tableHeader;
-	tableHeader<<"Series num"<<"Name"<<"Num slices"<<"Slice spacing";
+	tableHeader<<"Series num"<<"Name"<<"Num slices"<<"Slice spacing"<<"CT"<<"PET"<<"PET CT";
 	simpleTableWidget->setHorizontalHeaderLabels(tableHeader);
 	simpleTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	simpleTableWidget->verticalHeader()->setVisible(false);
 	simpleTableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	simpleTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-	simpleTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+//	simpleTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+//	simpleTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+	simpleTableWidget->setSelectionMode(QAbstractItemView::NoSelection);
 	simpleTableWidget->setShowGrid(true);
 	simpleTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
 	simpleTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
@@ -683,9 +700,12 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	for(int i = 0; i < mTableWidget->rowCount(); ++i)
 	{
 		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, mSeriesNumColumn)->text()));
-		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, mFilenameColoumn)->text()));
-		simpleTableWidget->setItem(i, 2, new QTableWidgetItem(mTableWidget->item(i, mNumSlicesColoumn)->text()));
-		simpleTableWidget->setItem(i, 3, new QTableWidgetItem(mTableWidget->item(i, mSliceSpacingColoumn)->text()));
+		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, mFilenameColumn)->text()));
+		simpleTableWidget->setItem(i, 2, new QTableWidgetItem(mTableWidget->item(i, mNumSlicesColumn)->text()));
+		simpleTableWidget->setItem(i, 3, new QTableWidgetItem(mTableWidget->item(i, mSliceSpacingColumn)->text()));
+		simpleTableWidget->setItem(i, mCheckBoxCTColumn, new QTableWidgetItem(*mCheckBoxWidgetCT));
+		simpleTableWidget->setItem(i, mCheckBoxPETColumn, new QTableWidgetItem(*mCheckBoxWidgetPET));
+		simpleTableWidget->setItem(i, mCheckBoxPETCTColumn, new QTableWidgetItem(*mCheckBoxWidgetPETCT));
 	}
 	simpleTableWidget->setMinimumSize(getQTableWidgetSize(simpleTableWidget));
 

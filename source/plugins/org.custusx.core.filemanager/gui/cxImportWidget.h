@@ -33,10 +33,15 @@ public:
 	SimpleImportDataDialog(ImportDataTypeWidget *widget, QWidget* parent=NULL);
 	virtual ~SimpleImportDataDialog(){};
 private slots:
-	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
+	void importClicked();
 	void cancelClicked();
+	void cellChangedSlot(int row, int column);
 private:
 	ImportDataTypeWidget* mImportDataTypeWidget;
+	QTableWidget* mSimpleTableWidget;
+
+	std::vector<DataPtr> getSelectedData();
+	bool isSelectedAndSetType(DataPtr data);
 };
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget

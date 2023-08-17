@@ -35,6 +35,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMesh.h"
 #include "cxPointMetric.h"
 #include "cxUtilHelpers.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -52,40 +53,114 @@ SimpleImportDataDialog::SimpleImportDataDialog(ImportDataTypeWidget* widget, QWi
 {
 	this->setAttribute(Qt::WA_DeleteOnClose);
 
-	this->setWindowTitle("Select data for import (Click on a line)");
+	this->setWindowTitle("Select data for import: Mark the correct type in the data lines");
 	QVBoxLayout* layout = new QVBoxLayout(this);
-	QTableWidget* tableWidget = mImportDataTypeWidget->getSimpleTableWidget();
 
-	layout->addWidget(tableWidget, 1);
-	connect(tableWidget, &QTableWidget::currentCellChanged, this, &SimpleImportDataDialog::tableItemSelected);
+	mSimpleTableWidget = mImportDataTypeWidget->getSimpleTableWidget();
 
+	connect(mSimpleTableWidget, &QTableWidget::cellChanged, this, &SimpleImportDataDialog::cellChangedSlot);
+
+	layout->addWidget(mSimpleTableWidget, 1);
+
+	QPushButton* importButton = new QPushButton("Import", this);
 	QPushButton* cancelButton = new QPushButton("Cancel", this);
 	layout->addStretch();
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
 	buttonLayout->addWidget(cancelButton);
+	buttonLayout->addWidget(importButton);
 	layout->addLayout(buttonLayout);
 
+	connect(importButton, &QPushButton::clicked, this, &SimpleImportDataDialog::importClicked);
 	connect(cancelButton, &QPushButton::clicked, this, &SimpleImportDataDialog::cancelClicked);
 	cancelButton->setFocus();
 }
 
-void SimpleImportDataDialog::tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn)
+void SimpleImportDataDialog::cellChangedSlot(int row, int column)
 {
-	int filenameColoumn = 1;
-	QString fullfilename = mImportDataTypeWidget->getSimpleTableWidget()->item(currentRow, filenameColoumn)->text();
+	if(column == mImportDataTypeWidget->mCheckBoxCTColumn)
+	{
+		if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxCTColumn)->checkState() == Qt::Checked)
+		{
+			mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETColumn)->setCheckState(Qt::Unchecked);
+			mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETCTColumn)->setCheckState(Qt::Unchecked);
+		}
+	}
+	else if(column == mImportDataTypeWidget->mCheckBoxPETColumn)
+	{
+		if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETColumn)->checkState() == Qt::Checked)
+		{
+			mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxCTColumn)->setCheckState(Qt::Unchecked);
+			mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETCTColumn)->setCheckState(Qt::Unchecked);
+		}
+	}
+	else if(column == mImportDataTypeWidget->mCheckBoxPETCTColumn)
+	{
+		if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETCTColumn)->checkState() == Qt::Checked)
+		{
+			mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxCTColumn)->setCheckState(Qt::Unchecked);
+			mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETColumn)->setCheckState(Qt::Unchecked);
+		}
+	}
+}
+
+std::vector<DataPtr> SimpleImportDataDialog::getSelectedData()
+{
 	std::vector<DataPtr> datas = mImportDataTypeWidget->getDatas();
-	DataPtr selected;
+	std::vector<DataPtr> retval = std::vector<DataPtr>();
+
 	for (std::vector<DataPtr>::iterator it = datas.begin(); it != datas.end(); ++it)
 	{
-		if((*it)->getName() == fullfilename)
-			selected = *it;
+		DataPtr data = (*it);
+		if(this->isSelectedAndSetType(data))
+			retval.push_back(data);
 	}
-	if(selected)
+	return retval;
+}
+
+bool SimpleImportDataDialog::isSelectedAndSetType(DataPtr data)
+{
+	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+	if(!image)
+		return false;
+
+	int filenameColumn = 1;
+
+	for(int row = 0; row < mSimpleTableWidget->rowCount(); ++row)
 	{
-		datas = std::vector<DataPtr>();
-		datas.push_back(selected);
-		mImportDataTypeWidget->setData(datas);
+		if(image->getName() == mSimpleTableWidget->item(row, filenameColumn)->text())
+		{
+			IMAGE_MODALITY modality = imUNKNOWN;
+			IMAGE_SUBTYPE subtype = istUNKNOWN;
+			if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxCTColumn)->checkState() == Qt::Checked)
+			{
+				modality = imCT;
+				subtype = istTHORAX_CT;
+			}
+			else if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETColumn)->checkState() == Qt::Checked)
+			{
+				modality = imPET;
+				subtype = istPET;
+			}
+			else if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETCTColumn)->checkState() == Qt::Checked)
+			{
+				modality = imCT;
+				subtype = istPET_CT;
+			}
+			else
+				return false;
+
+//			CX_LOG_DEBUG() << "Setting image " << image->getName() << " modalitye to: "  << enum2string(modality) << " subtype to: " << enum2string(subtype);
+			image->setModality(modality);
+			image->setImageType(subtype);
+			return true;
+		}
 	}
+	return false;
+}
+
+void SimpleImportDataDialog::importClicked()
+{
+	mImportDataTypeWidget->setData(this->getSelectedData());
 	accept();
 }
 
@@ -289,8 +364,8 @@ void ImportWidget::removeRowFromTableAndRemoveFilenameFromImportList()
 {
 	QPushButton *button = qobject_cast<QPushButton*>(QObject::sender());
 	int rowindex = ImportDataTypeWidget::findRowIndexContainingButton(button, mTableWidget);
-	int filenamecoloumn = 2;
-	QString fullfilename = mTableWidget->item(rowindex, filenamecoloumn)->data(Qt::ToolTipRole).toString();
+	int filenamecolumn = 2;
+	QString fullfilename = mTableWidget->item(rowindex, filenamecolumn)->data(Qt::ToolTipRole).toString();
 	if(rowindex != -1)
 		mTableWidget->removeRow(rowindex);
 	int numberOfRemovedEntries = mFileNames.removeAll(fullfilename);
