@@ -11,11 +11,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxImageDefaultTFGenerator.h"
 
-#include "vtkImageData.h"
+#include <vtkImageData.h>
+#include <vtkImageAccumulate.h>
 #include "cxImage.h"
 #include "cxImageLUT2D.h"
 #include "cxImageTF3D.h"
 #include "cxSettings.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -34,6 +36,9 @@ void ImageDefaultTFGenerator::resetShading()
 
 ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 {
+	if(mImage->getModality() == imPET)
+		return this->generate2DTFPresetPET();
+
 	ImageLUT2DPtr tf(new ImageLUT2D());
 
 	double_pair fullRange = this->getFullScalarRange();
@@ -59,6 +64,9 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 
 ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 {
+	if(mImage->getModality() == imPET)
+		return this->generate3DTFPresetPET();
+
 	ImageTF3DPtr tf(new ImageTF3D());
 
 	double_pair range = this->guessInitialScalarRange();
@@ -80,6 +88,68 @@ ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPreset()
 	colors[int(std::lround(smin))] = QColor(Qt::black);
 	colors[int(std::lround(smax))] = QColor(Qt::white);
 	tf->resetColor(colors);
+
+	return tf;
+}
+
+ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPresetPET()
+{
+	ImageLUT2DPtr tf(new ImageLUT2D());
+
+	double_pair range = this->getFullScalarRange();
+	double smax = range.second;
+
+	vtkImageAccumulatePtr histogram = mImage->getHistogram();
+	int mean = std::lround(histogram->GetMean()[0]);
+	int stdDev = std::lround(histogram->GetStandardDeviation()[0]);
+
+	IntIntMap opacity;
+
+	//Similar to 3D
+	opacity[int(std::lround(smax))] = 255;
+	opacity[mean+stdDev*6] = 255;
+	opacity[mean+stdDev*3] = 0;
+	opacity[mean] = 0;
+	opacity[0] = 0;
+	tf->resetAlpha(opacity);
+
+	ColorMap colors;
+	colors[mean] = QColor(Qt::black);
+	colors[mean+stdDev*3] = QColor(114,159,207);
+	colors[mean+stdDev*6] = QColor(239,41,41);
+	colors[mean+stdDev*9] = QColor(Qt::yellow);
+	tf->resetColor(colors);
+
+	return tf;
+}
+
+ImageTF3DPtr ImageDefaultTFGenerator::generate3DTFPresetPET()
+{
+	ImageTF3DPtr tf(new ImageTF3D());
+
+	double_pair range = this->getFullScalarRange();
+	double smax = range.second;
+
+	vtkImageAccumulatePtr histogram = mImage->getHistogram();
+	int mean = std::lround(histogram->GetMean()[0]);
+	int stdDev = std::lround(histogram->GetStandardDeviation()[0]);
+
+	IntIntMap opacity;
+
+	opacity[int(std::lround(smax))] = 255;
+	opacity[mean+stdDev*9] = 100;
+	opacity[mean+stdDev*3] = 0;
+	opacity[mean] = 0;
+	opacity[0] = 0;
+	tf->resetAlpha(opacity);
+
+	ColorMap colors;
+	colors[mean] = QColor(Qt::black);
+	colors[mean+stdDev*3] = QColor(114,159,207);
+	colors[mean+stdDev*6] = QColor(239,41,41);
+	colors[mean+stdDev*9] = QColor(Qt::yellow);
+	tf->resetColor(colors);
+
 
 	return tf;
 }
@@ -116,7 +186,7 @@ double_pair ImageDefaultTFGenerator::guessInitialScalarRange() const
 		{
 			srange = this->guessCTRange();
 		}
-		if (mImage->getModality() == imMR)
+		else if (mImage->getModality() == imMR)
 		{
 			srange = this->guessMRRange();
 		}
@@ -181,6 +251,5 @@ double_pair ImageDefaultTFGenerator::guessMRRange() const
 	srange.second *= 0.25; // usually lots of high-intensity noise of no interest
 	return srange;
 }
-
 
 } // namespace cx
