@@ -33,6 +33,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxElastixParameters.h"
 #include "cxLogicManager.h"
 #include "cxRegServices.h"
+#include "cxFilePathProperty.h"
 
 #include "cxReporter.h"
 
@@ -92,6 +93,28 @@ public:
 		return (fabs(angle/M_PI*180.0) < 0.1) && (shift.length() < 0.1);
 	}
 };
+
+TEST_CASE("Find ElastiX executable path", "[unit][elastix][not_win32][not_win64]")
+{
+	cx::ElastixParametersPtr parameters(new cx::ElastixParameters(cx::XmlOptionFile()));
+	cx::FilePathPropertyPtr executableProperty = parameters->getActiveExecutable();
+	INFO("ElastiX executable: "+executableProperty->getValue());
+	REQUIRE_FALSE(executableProperty->getValue().isEmpty());
+	CHECK(executableProperty->getValue() != ".");
+}
+
+TEST_CASE("ElastiX executable is present", "[elastix][not_win32][not_win64]")
+{
+	cx::ElastixParametersPtr parameters(new cx::ElastixParameters(cx::XmlOptionFile()));
+	cx::FilePathPropertyPtr executableProperty = parameters->getActiveExecutable();
+	INFO("ElastiX executable: "+executableProperty->getValue());
+	REQUIRE_FALSE(executableProperty->getValue().isEmpty());
+
+	//These 3 lines require ElastiX to be installed in home folder: Fraxinus/elastix/bin/elastix
+	QFileInfo exeFileInfo(executableProperty->getValue());
+	CHECK(exeFileInfo.exists());
+	CHECK(exeFileInfo.isExecutable());
+}
 
 
 #ifdef CX_CUSTUS_SINTEF
