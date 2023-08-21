@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -43,21 +43,21 @@ class TransferFunctionColorWidget;
  */
 class cxGui_EXPORT DoublePropertyImageTFDataBase : public DoublePropertyBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  DoublePropertyImageTFDataBase();
-  virtual ~DoublePropertyImageTFDataBase() {}
-  virtual double getValue() const;
-  virtual bool setValue(double val);
-  virtual void connectValueSignals(bool on) {}
+	DoublePropertyImageTFDataBase();
+	virtual ~DoublePropertyImageTFDataBase() {}
+	virtual double getValue() const;
+	virtual bool setValue(double val);
+	virtual void connectValueSignals(bool on) {}
 public:
-  void setImageTFData(ImageTFDataPtr tfData, ImagePtr image);
+	void setImageTFData(ImageTFDataPtr tfData, ImagePtr image);
 protected:
-  virtual double getValueInternal() const = 0;
-  virtual void setValueInternal(double val) = 0;
+	virtual double getValueInternal() const = 0;
+	virtual void setValueInternal(double val) = 0;
 
-  ImageTFDataPtr mImageTFData;
-  ImagePtr mImage;
+	ImageTFDataPtr mImageTFData;
+	ImagePtr mImage;
 };
 typedef boost::shared_ptr<DoublePropertyImageTFDataBase> DoublePropertyImageTFDataBasePtr;
 typedef boost::shared_ptr<class DoublePropertyImageTFSlider> DoublePropertyImageTFSliderPtr;
@@ -68,37 +68,37 @@ typedef boost::shared_ptr<class DoublePropertyImageTFSlider> DoublePropertyImage
 class cxGui_EXPORT DoublePropertyImageTFDataWindow : public DoublePropertyImageTFDataBase
 {
 public:
-  virtual ~DoublePropertyImageTFDataWindow() {}
-  virtual QString getDisplayName() const { return "Window width"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoublePropertyImageTFDataWindow() {}
+	virtual QString getDisplayName() const { return "Window width"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 };
 
 /**DataInterface implementation for the tf level value
  */
 class cxGui_EXPORT DoublePropertyImageTFDataLevel : public DoublePropertyImageTFDataBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  virtual ~DoublePropertyImageTFDataLevel() {}
-  virtual QString getDisplayName() const { return "Window level"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoublePropertyImageTFDataLevel() {}
+	virtual QString getDisplayName() const { return "Window level"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 };
 
 /**DataInterface implementation for the sliding both colors and tfs
  */
 class cxGui_EXPORT DoublePropertyImageTFSlider : public DoublePropertyImageTFDataBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  virtual ~DoublePropertyImageTFSlider() {}
-  virtual QString getDisplayName() const { return "Slide color/alpha in 3D/2D"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoublePropertyImageTFSlider() {}
+	virtual QString getDisplayName() const { return "Slide color/alpha in 3D/2D"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 signals:
 	void valueChanged();
 };
@@ -107,70 +107,70 @@ signals:
  */
 class cxGui_EXPORT DoublePropertyImageTFDataLLR : public DoublePropertyImageTFDataBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  virtual ~DoublePropertyImageTFDataLLR() {}
-  virtual QString getDisplayName() const { return "LLR"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoublePropertyImageTFDataLLR() {}
+	virtual QString getDisplayName() const { return "LLR"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 };
 
 /**DataInterface implementation for the tf alpha value
  */
 class cxGui_EXPORT DoublePropertyImageTFDataAlpha : public DoublePropertyImageTFDataBase
 {
-  Q_OBJECT
+	Q_OBJECT
 public:
-  virtual ~DoublePropertyImageTFDataAlpha() {}
-  virtual QString getDisplayName() const { return "Alpha"; }
-  virtual double getValueInternal() const;
-  virtual void setValueInternal(double val);
-  virtual DoubleRange getValueRange() const;
+	virtual ~DoublePropertyImageTFDataAlpha() {}
+	virtual QString getDisplayName() const { return "Alpha"; }
+	virtual double getValueInternal() const;
+	virtual void setValueInternal(double val);
+	virtual DoubleRange getValueRange() const;
 };
 
 class cxGui_EXPORT TransferFunction3DWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  TransferFunction3DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
-  virtual ~TransferFunction3DWidget() {}
+	TransferFunction3DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
+	virtual ~TransferFunction3DWidget() {}
 
 public slots:
-  void activeImageChangedSlot();
-  void imageChangedSlot(ImagePtr image);
-  void sliderChangedSlot();
+	void activeImageChangedSlot();
+	void imageChangedSlot(ImagePtr image);
+	void sliderChangedSlot();
 protected:
-  QVBoxLayout* mLayout;
-  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
-  TransferFunctionColorWidget* mTransferFunctionColorWidget;
+	QVBoxLayout* mLayout;
+	TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
+	TransferFunctionColorWidget* mTransferFunctionColorWidget;
 
-  ActiveImageProxyPtr mActiveImageProxy;
-  ActiveDataPtr mActiveData;
+	ActiveImageProxyPtr mActiveImageProxy;
+	ActiveDataPtr mActiveData;
 
-  DoublePropertyImageTFSliderPtr mTFSlider, mTFSlider2D;
+	DoublePropertyImageTFSliderPtr mTFSlider, mTFSlider2D;
 };
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
-  virtual ~TransferFunction2DWidget() {}
+	TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage = true);
+	virtual ~TransferFunction2DWidget() {}
 
 public slots:
-  void activeImageChangedSlot();
+	void activeImageChangedSlot();
 
 protected:
-  QVBoxLayout* mLayout;
-  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
-  TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
+	QVBoxLayout* mLayout;
+	TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
+	TransferFunctionColorWidget* mTransferFunctionColorWidget;
+	DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
-  ActiveImageProxyPtr mActiveImageProxy;
-  ActiveDataPtr mActiveData;
+	ActiveImageProxyPtr mActiveImageProxy;
+	ActiveDataPtr mActiveData;
 };
 
 
@@ -185,11 +185,11 @@ protected:
  */
 class cxGui_EXPORT TransferFunctionWidget : public BaseWidget
 {
-  Q_OBJECT
+	Q_OBJECT
 
 public:
-  TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
-  virtual ~TransferFunctionWidget() {}
+	TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage = true);
+	virtual ~TransferFunctionWidget() {}
 };
 
 /**
