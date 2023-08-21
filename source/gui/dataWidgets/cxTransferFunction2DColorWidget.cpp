@@ -30,6 +30,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(ActiveDataPtr activ
 
   mDataWindow.reset(new DoublePropertyImageTFDataWindow);
   mDataLevel.reset(new DoublePropertyImageTFDataLevel);
+  mTFSlider.reset(new DoublePropertyImageTFSlider);
 
   mActiveImageProxy = ActiveImageProxy::New(mActiveData);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DColorWidget::activeImageChangedSlot);
@@ -48,6 +49,7 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(ActiveDataPtr activ
   layout->addLayout(gridLayout);
   new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
   new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+  new SliderGroupWidget(this, mTFSlider,   gridLayout, 2);
 
   this->setLayout(layout);
   this->activeImageChangedSlot();
@@ -73,6 +75,7 @@ void TransferFunction2DColorWidget::activeImageChangedSlot()
 
   mDataWindow->setImageTFData(tf, image);
   mDataLevel->setImageTFData(tf, image);
+  mTFSlider->setImageTFData(tf, image);
 }
 
 

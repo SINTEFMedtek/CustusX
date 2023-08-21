@@ -34,6 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 #include "cxActiveData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -122,6 +123,34 @@ DoubleRange DoublePropertyImageTFDataLevel::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+double DoublePropertyImageTFSlider::getValueInternal() const
+{
+  return mImageTFData->getLevel();
+}
+
+void DoublePropertyImageTFSlider::setValueInternal(double val)
+{
+	double oldLevel = mImageTFData->getLevel();
+	double oldLLR = mImageTFData->getLLR();
+	double diff = val - oldLevel;
+  mImageTFData->setLevel(val);
+  mImageTFData->setLLR(oldLLR+diff);
+}
+
+DoubleRange DoublePropertyImageTFSlider::getValueRange() const
+{
+  if (!mImageTFData)
+	return DoubleRange();
+
+  double max = mImage->getMax();
+  double min = mImage->getMin();
+  return DoubleRange(min,max,1);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 double DoublePropertyImageTFDataLLR::getValueInternal() const
 {
   return mImageTFData->getLLR();
@@ -174,6 +203,8 @@ TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWi
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
+  mTFSlider.reset(new DoublePropertyImageTFSlider);
+
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
@@ -181,6 +212,10 @@ TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWi
 
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
+
+  QGridLayout* gridLayout = new QGridLayout;
+  mLayout->addLayout(gridLayout);
+  new SliderGroupWidget(this, mTFSlider,  gridLayout, 0);
 
   this->setLayout(mLayout);
 
@@ -209,12 +244,14 @@ void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
 
 	mTransferFunctionAlphaWidget->setData(image, tf);
 	mTransferFunctionColorWidget->setData(image, tf);
+	mTFSlider->setImageTFData(tf, image);
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+//NB: This widget is not used. The functionality is split into ColorWidget and OverlayWidget
 TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
   BaseWidget(parent, "transfer_function_2d_widget", "2D"),
   mLayout(new QVBoxLayout(this)),
@@ -229,6 +266,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWi
   mDataLevel.reset(new DoublePropertyImageTFDataLevel);
   mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
   mDataLLR.reset(new DoublePropertyImageTFDataLLR);
+  mTFSlider.reset(new DoublePropertyImageTFSlider);
 
   mActiveImageProxy = ActiveImageProxy::New(mActiveData);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
@@ -248,6 +286,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWi
   new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
   new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
   new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+  new SliderGroupWidget(this, mTFSlider,   gridLayout, 4);
 
   this->setLayout(mLayout);
   this->activeImageChangedSlot();
@@ -269,6 +308,7 @@ void TransferFunction2DWidget::activeImageChangedSlot()
   mDataLevel->setImageTFData(tf, image);
   mDataAlpha->setImageTFData(tf, image);
   mDataLLR->setImageTFData(tf, image);
+  mTFSlider->setImageTFData(tf, image);
 }
 
 

@@ -87,6 +87,19 @@ public:
   virtual DoubleRange getValueRange() const;
 };
 
+/**DataInterface implementation for the sliding both colors and tfs
+ */
+class cxGui_EXPORT DoublePropertyImageTFSlider : public DoublePropertyImageTFDataBase
+{
+  Q_OBJECT
+public:
+  virtual ~DoublePropertyImageTFSlider() {}
+  virtual QString getDisplayName() const { return "Slide color and alpha"; }
+  virtual double getValueInternal() const;
+  virtual void setValueInternal(double val);
+  virtual DoubleRange getValueRange() const;
+};
+
 /**DataInterface implementation for the tf llr value
  */
 class cxGui_EXPORT DoublePropertyImageTFDataLLR : public DoublePropertyImageTFDataBase
@@ -132,6 +145,8 @@ protected:
 
   ActiveImageProxyPtr mActiveImageProxy;
   ActiveDataPtr mActiveData;
+
+  DoublePropertyImageTFDataBasePtr mTFSlider;
 };
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
@@ -149,7 +164,7 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
+  DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel, mTFSlider;
 
   ActiveImageProxyPtr mActiveImageProxy;
   ActiveDataPtr mActiveData;
