@@ -60,6 +60,7 @@ protected:
   ImagePtr mImage;
 };
 typedef boost::shared_ptr<DoublePropertyImageTFDataBase> DoublePropertyImageTFDataBasePtr;
+typedef boost::shared_ptr<class DoublePropertyImageTFSlider> DoublePropertyImageTFSliderPtr;
 
 
 /**DataInterface implementation for the tf window value
@@ -94,10 +95,12 @@ class cxGui_EXPORT DoublePropertyImageTFSlider : public DoublePropertyImageTFDat
   Q_OBJECT
 public:
   virtual ~DoublePropertyImageTFSlider() {}
-  virtual QString getDisplayName() const { return "Slide color and alpha"; }
+  virtual QString getDisplayName() const { return "Slide color/alpha in 3D/2D"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
   virtual DoubleRange getValueRange() const;
+signals:
+	void valueChanged();
 };
 
 /**DataInterface implementation for the tf llr value
@@ -136,8 +139,8 @@ public:
 
 public slots:
   void activeImageChangedSlot();
-
   void imageChangedSlot(ImagePtr image);
+  void sliderChangedSlot();
 protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
@@ -146,7 +149,7 @@ protected:
   ActiveImageProxyPtr mActiveImageProxy;
   ActiveDataPtr mActiveData;
 
-  DoublePropertyImageTFDataBasePtr mTFSlider;
+  DoublePropertyImageTFSliderPtr mTFSlider, mTFSlider2D;
 };
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget
@@ -164,7 +167,7 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel, mTFSlider;
+  DoublePropertyImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 
   ActiveImageProxyPtr mActiveImageProxy;
   ActiveDataPtr mActiveData;

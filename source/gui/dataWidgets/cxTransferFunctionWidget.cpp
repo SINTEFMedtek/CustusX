@@ -135,6 +135,7 @@ void DoublePropertyImageTFSlider::setValueInternal(double val)
 	double diff = val - oldLevel;
   mImageTFData->setLevel(val);
   mImageTFData->setLLR(oldLLR+diff);
+  emit valueChanged();
 }
 
 DoubleRange DoublePropertyImageTFSlider::getValueRange() const
@@ -204,6 +205,8 @@ TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWi
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
   mTFSlider.reset(new DoublePropertyImageTFSlider);
+  mTFSlider2D.reset(new DoublePropertyImageTFSlider);
+  connect(mTFSlider.get(), &DoublePropertyImageTFSlider::valueChanged,  this, &TransferFunction3DWidget::sliderChangedSlot);
 
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
                                               QSizePolicy::MinimumExpanding);
@@ -236,15 +239,24 @@ void TransferFunction3DWidget::activeImageChangedSlot()
 
 void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
 {
-	ImageTFDataPtr tf;
+	ImageTFDataPtr tf, tf2D;
 	if (image)
+	{
 	  tf = image->getTransferFunctions3D();
+	  tf2D = image->getLookupTable2D();
+	}
 	else
 	  image.reset();
 
 	mTransferFunctionAlphaWidget->setData(image, tf);
 	mTransferFunctionColorWidget->setData(image, tf);
 	mTFSlider->setImageTFData(tf, image);
+	mTFSlider2D->setImageTFData(tf2D, image);
+}
+
+void TransferFunction3DWidget::sliderChangedSlot()
+{
+	mTFSlider2D->setValue(mTFSlider->getValue());
 }
 
 //---------------------------------------------------------
@@ -266,7 +278,6 @@ TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWi
   mDataLevel.reset(new DoublePropertyImageTFDataLevel);
   mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
   mDataLLR.reset(new DoublePropertyImageTFDataLLR);
-  mTFSlider.reset(new DoublePropertyImageTFSlider);
 
   mActiveImageProxy = ActiveImageProxy::New(mActiveData);
   connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
@@ -286,7 +297,6 @@ TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWi
   new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
   new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
   new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
-  new SliderGroupWidget(this, mTFSlider,   gridLayout, 4);
 
   this->setLayout(mLayout);
   this->activeImageChangedSlot();
@@ -308,7 +318,6 @@ void TransferFunction2DWidget::activeImageChangedSlot()
   mDataLevel->setImageTFData(tf, image);
   mDataAlpha->setImageTFData(tf, image);
   mDataLLR->setImageTFData(tf, image);
-  mTFSlider->setImageTFData(tf, image);
 }
 
 

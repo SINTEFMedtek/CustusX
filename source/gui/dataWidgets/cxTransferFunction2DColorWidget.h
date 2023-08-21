@@ -48,7 +48,7 @@ public slots:
 protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  DoublePropertyImageTFDataBasePtr mDataWindow, mDataLevel, mTFSlider;
+  DoublePropertyImageTFDataBasePtr mDataWindow, mDataLevel;
   ActiveImageProxyPtr mActiveImageProxy;
   ActiveDataPtr mActiveData;
 };
