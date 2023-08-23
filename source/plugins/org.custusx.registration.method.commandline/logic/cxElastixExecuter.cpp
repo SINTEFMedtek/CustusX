@@ -331,18 +331,21 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 
 Transform3D ElastixExecuter::centerToCenterTranslation(bool printDebug)
 {
-	if(volumesOverlap())
-	{
-		if(printDebug)
-			CX_LOG_DEBUG() << "ElastixExecuter::centerToCenterTranslation: Volumes overlap. No need to move";
-		return Transform3D::Identity();
-	}
+//	if(volumesOverlap())
+//	{
+//		if(printDebug)
+//			CX_LOG_DEBUG() << "ElastixExecuter::centerToCenterTranslation: Volumes overlap. No need to move";
+//		return Transform3D::Identity();
+//	}
 
 	Vector3D fCenter_r = mFixed->get_rMd().coord(mFixed->boundingBox().center());
 	Vector3D mCenter_r = mMoving->get_rMd().coord(mMoving->boundingBox().center());
 	Transform3D mCenterMfCenter_r = createTransformTranslate(mCenter_r - fCenter_r);//center to center translation in r
 	if(printDebug)
-		CX_LOG_DEBUG() << "Volumes sent to Elastix don't overlap. Apply transform to move center to center:\n" << mCenterMfCenter_r;
+	{
+//		CX_LOG_DEBUG() << "Volumes sent to Elastix don't overlap. Apply transform to move center to center:\n" << mCenterMfCenter_r;
+		CX_LOG_DEBUG() << "ElastixExecuter: Applying transform to move center to center:\n" << mCenterMfCenter_r;
+	}
 	return mCenterMfCenter_r;
 }
 
