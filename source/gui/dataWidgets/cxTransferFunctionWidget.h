@@ -61,6 +61,7 @@ protected:
 };
 typedef boost::shared_ptr<DoublePropertyImageTFDataBase> DoublePropertyImageTFDataBasePtr;
 typedef boost::shared_ptr<class DoublePropertyImageTFSlider> DoublePropertyImageTFSliderPtr;
+typedef boost::shared_ptr<class DoublePropertyImageTFSlider2DAnd3D> DoublePropertyImageTFSlider2DAnd3DPtr;
 
 
 /**DataInterface implementation for the tf window value
@@ -88,19 +89,39 @@ public:
 	virtual DoubleRange getValueRange() const;
 };
 
-/**DataInterface implementation for the sliding both colors and tfs
+/**DataInterface implementation for sliding both colors and tfs
  */
 class cxGui_EXPORT DoublePropertyImageTFSlider : public DoublePropertyImageTFDataBase
 {
 	Q_OBJECT
 public:
 	virtual ~DoublePropertyImageTFSlider() {}
-	virtual QString getDisplayName() const { return "Slide color/alpha in 3D/2D"; }
+	virtual QString getDisplayName() const { return "Slide color/alpha"; }
 	virtual double getValueInternal() const;
 	virtual void setValueInternal(double val);
 	virtual DoubleRange getValueRange() const;
 signals:
 	void valueChanged();
+};
+
+/**DataInterface implementation for sliding both colors and tfs in 2D and 3D at the same time
+ */
+class cxGui_EXPORT DoublePropertyImageTFSlider2DAnd3D : public DoublePropertyImageTFSlider
+{
+	Q_OBJECT
+public:
+	DoublePropertyImageTFSlider2DAnd3D();
+	virtual ~DoublePropertyImageTFSlider2DAnd3D();
+	virtual QString getDisplayName() const { return mDisplayName; }
+	virtual void setDisplayName(QString name) { mDisplayName = name; }
+	void setImage(ImagePtr image);
+signals:
+	void valueChanged();
+private slots:
+	void sliderChangedSlot();
+private:
+	QString mDisplayName = "Slide color/alpha in 3D/2D";
+	DoublePropertyImageTFSliderPtr mTFSlider2D;
 };
 
 /**DataInterface implementation for the tf llr value
@@ -140,7 +161,6 @@ public:
 public slots:
 	void activeImageChangedSlot();
 	void imageChangedSlot(ImagePtr image);
-	void sliderChangedSlot();
 protected:
 	QVBoxLayout* mLayout;
 	TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
@@ -149,7 +169,7 @@ protected:
 	ActiveImageProxyPtr mActiveImageProxy;
 	ActiveDataPtr mActiveData;
 
-	DoublePropertyImageTFSliderPtr mTFSlider, mTFSlider2D;
+	DoublePropertyImageTFSlider2DAnd3DPtr mTFSlider;
 };
 
 class cxGui_EXPORT TransferFunction2DWidget : public BaseWidget

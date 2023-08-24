@@ -163,7 +163,8 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Airways",
 	"Centerlines",
 	"Medium Organs",
-	"Small Organs"
+	"Small Organs",
+	"PET"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
 

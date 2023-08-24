@@ -448,7 +448,7 @@ QStringList StringPropertyImageType::getValueRange() const
 		if (mData->getModality() == imUS)
 			retval << enum2string(istUSBMODE) << enum2string(istANGIO) << enum2string(istSEGMENTATION);
 		if (mData->getModality() == imPET)
-			retval << enum2string(istPET);
+			retval << enum2string(istPET) << enum2string(istPET_REGISTERED);
 	}
 	return QStringList::fromSet(QSet<QString>::fromList(retval));
 }

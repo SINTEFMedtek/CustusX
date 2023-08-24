@@ -152,6 +152,41 @@ DoubleRange DoublePropertyImageTFSlider::getValueRange() const
 //---------------------------------------------------------
 
 
+DoublePropertyImageTFSlider2DAnd3D::DoublePropertyImageTFSlider2DAnd3D()
+{
+	mTFSlider2D.reset(new DoublePropertyImageTFSlider);
+	connect(this, &DoublePropertyImageTFSlider::valueChanged,  this, &DoublePropertyImageTFSlider2DAnd3D::sliderChangedSlot);
+}
+
+DoublePropertyImageTFSlider2DAnd3D::~DoublePropertyImageTFSlider2DAnd3D()
+{
+	disconnect(this, &DoublePropertyImageTFSlider::valueChanged,  this, &DoublePropertyImageTFSlider2DAnd3D::sliderChangedSlot);
+}
+
+void DoublePropertyImageTFSlider2DAnd3D::setImage(ImagePtr image)
+{
+	ImageTFDataPtr tf, tf2D;
+	if (image)
+	{
+		tf = image->getTransferFunctions3D();
+		tf2D = image->getLookupTable2D();
+	}
+	else
+		image.reset();
+
+	this->setImageTFData(tf, image);
+	mTFSlider2D->setImageTFData(tf2D, image);
+}
+
+void DoublePropertyImageTFSlider2DAnd3D::sliderChangedSlot()
+{
+	mTFSlider2D->setValue(this->getValue());
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 double DoublePropertyImageTFDataLLR::getValueInternal() const
 {
 	return mImageTFData->getLLR();
@@ -204,9 +239,7 @@ TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWi
 	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
 	mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
-	mTFSlider.reset(new DoublePropertyImageTFSlider);
-	mTFSlider2D.reset(new DoublePropertyImageTFSlider);
-	connect(mTFSlider.get(), &DoublePropertyImageTFSlider::valueChanged,  this, &TransferFunction3DWidget::sliderChangedSlot);
+	mTFSlider.reset(new DoublePropertyImageTFSlider2DAnd3D);
 
 	mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
 												QSizePolicy::MinimumExpanding);
@@ -250,13 +283,7 @@ void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
 
 	mTransferFunctionAlphaWidget->setData(image, tf);
 	mTransferFunctionColorWidget->setData(image, tf);
-	mTFSlider->setImageTFData(tf, image);
-	mTFSlider2D->setImageTFData(tf2D, image);
-}
-
-void TransferFunction3DWidget::sliderChangedSlot()
-{
-	mTFSlider2D->setValue(mTFSlider->getValue());
+	mTFSlider->setImage(image);
 }
 
 //---------------------------------------------------------
