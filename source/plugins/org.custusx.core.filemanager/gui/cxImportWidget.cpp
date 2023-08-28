@@ -160,8 +160,12 @@ bool SimpleImportDataDialog::isSelectedAndSetType(DataPtr data)
 
 void SimpleImportDataDialog::importClicked()
 {
-	mImportDataTypeWidget->setData(this->getSelectedData());
-	accept();
+	std::vector<DataPtr> selectedData = this->getSelectedData();
+	if(!selectedData.empty())
+	{
+		mImportDataTypeWidget->setData(this->getSelectedData());
+		accept();
+	}
 }
 
 void SimpleImportDataDialog::cancelClicked()
