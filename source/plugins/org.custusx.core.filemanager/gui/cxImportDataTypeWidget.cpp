@@ -291,7 +291,11 @@ void ImportDataTypeWidget::removeRowFromTableAndDataFromImportList()
 
 void ImportDataTypeWidget::updateImageType()
 {
-	// Test code: Trying to use convertToImageSubType on file name to find correct subtype.
+	if((string2enum<IMAGE_SUBTYPE>(mImageTypeAdapter->getValue()) != istUNKNOWN) || (string2enum<IMAGE_SUBTYPE>(mImageTypeAdapter->getValue()) != istCOUNT))
+		return;
+
+	// Trying to use convertToImageSubType on file name to find correct subtype.
+	// Only trying this if type is unknown
 	IMAGE_SUBTYPE imageSubType = convertToImageSubType(mFilename);
 	if(mImageTypeAdapter)
 		mImageTypeAdapter->setValue(enum2string(imageSubType));
