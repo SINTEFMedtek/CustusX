@@ -78,8 +78,8 @@ IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 		retval = istSEGMENTATION;
 	else if(imageTypeSubString.contains("label", Qt::CaseInsensitive))
 		retval = istSEGMENTATION;
-	else
-		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
+//	else
+//		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
 
 	return retval;
 }
