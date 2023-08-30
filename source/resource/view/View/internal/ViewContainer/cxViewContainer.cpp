@@ -261,6 +261,7 @@ void ViewContainer::doRender()
 {
 	if (!mRenderWindow)
 		return;
+	//This can be skipped if we use VTK interactor for rendering instead
 	this->getRenderWindow()->Render();
 }
 

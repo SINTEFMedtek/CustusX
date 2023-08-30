@@ -11,11 +11,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBranchList.h"
 #include "cxBranch.h"
 #include "cxMesh.h"
+#include "cxImage.h"
+#include "vtkImageData.h"
 #include "cxVector3D.h"
 #include <vtkPolyData.h>
 #include <vtkCardinalSpline.h>
 #include "cxLogger.h"
 #include <boost/math/special_functions/fpclassify.hpp> // isnan
+#include <boost/math/special_functions/round.hpp>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -746,6 +749,109 @@ Eigen::MatrixXd BranchList::findMainConnectedAirwayTree(Eigen::MatrixXd position
 	return mainAirwayTree_r;
 }
 
+
+void BranchList::setRadius(ImagePtr segmentationVolume)
+{
+
+	std::vector<BranchPtr> branches = this->getBranches();
+
+	for (int i = 0; i < branches.size(); i++)
+	{
+		Eigen::MatrixXd positions = branches[i]->getPositions();
+		Eigen::MatrixXd orientations = branches[i]->getOrientations();
+		Eigen::VectorXd radius(positions.cols());
+
+		for (int j = 0; j < positions.cols(); j++)
+			radius(j) = calculateRadius(positions.col(j), orientations.col(j), segmentationVolume);
+
+		branches[i]->setRadius(radius);
+	}
+	mIsRadiusAvailable = true;
+}
+
+double BranchList::calculateRadius(Eigen::Vector3d position, Eigen::Vector3d orientation, ImagePtr segmentationVolume)
+{
+	double radius = 0;
+	if (!segmentationVolume)
+		return radius;
+
+	vtkImageDataPtr segmentationImage = segmentationVolume->getBaseVtkImageData();
+	int* dim = segmentationImage->GetDimensions();
+	double* spacing = segmentationImage->GetSpacing();
+	Transform3D dMr = segmentationVolume->get_rMd().inverse();
+	Eigen::Vector3d position_r = dMr.coord(position);
+	int x = (int) boost::math::round( position_r[0]/spacing[0] );
+	int y = (int) boost::math::round( position_r[1]/spacing[1] );
+	int z = (int) boost::math::round( position_r[2]/spacing[2] );
+	Eigen::Vector3i indexVector;
+	indexVector(0) = x;
+	indexVector(1) = y;
+	indexVector(2) = z;
+
+	Eigen::MatrixXd maxRadius(3,2);
+	int index = -1;
+	if(!similar(orientation, Eigen::Vector3d::UnitX()))
+	{
+		index++;
+		Eigen::Vector3d perpendicularX = orientation.cross(Eigen::Vector3d::UnitX());
+		maxRadius(index,0) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularX, dim, spacing, 1);
+		maxRadius(index,1) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularX, dim, spacing, -1);
+	}
+	if(!similar(orientation, Eigen::Vector3d::UnitY()))
+	{
+		index++;
+		Eigen::Vector3d perpendicularY = orientation.cross(Eigen::Vector3d::UnitY());
+		maxRadius(index,0) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularY, dim, spacing, 1);
+		maxRadius(index,1) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularY, dim, spacing, -1);
+	}
+	if(!similar(orientation, Eigen::Vector3d::UnitZ()))
+	{
+		index++;
+		Eigen::Vector3d perpendicularZ = orientation.cross(Eigen::Vector3d::UnitZ());
+		maxRadius(index,0) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularZ, dim, spacing, 1);
+		maxRadius(index,1) = findDistanceToSegmentationEdge(segmentationImage, indexVector, perpendicularZ, dim, spacing, -1);
+	}
+
+	for(int i=0; i<=index; i++)
+		for(int j=0; j<maxRadius.cols(); j++)
+			if (std::isnan(maxRadius(i,j)) || std::isinf(maxRadius(i,j)))
+				maxRadius(i,j) = 0;
+
+	radius = maxRadius.topRows(index+1).rowwise().mean().minCoeff();
+
+	return radius;
+}
+
+double BranchList::findDistanceToSegmentationEdge(vtkImageDataPtr segmentationImage, Eigen::Vector3i indexVector, Eigen::Vector3d perpendicularVector, int* dim, double* spacing, int direction)
+{
+	double retval = 0;
+
+	if (similar(perpendicularVector.cwiseAbs().sum(), 0))
+		return retval;
+
+	double maxValue = segmentationImage->GetScalarRange()[1];
+
+	for (int radiusVoxels=1; radiusVoxels<200; radiusVoxels++)
+	{
+		Eigen::Vector3d searchDirection =  perpendicularVector.normalized() * radiusVoxels;
+		int xIndex = std::max(std::min(indexVector(0) + direction * (int) std::round(searchDirection(0)), dim[0]-1), 0);
+		int yIndex = std::max(std::min(indexVector(1) + direction * (int) std::round(searchDirection(1)), dim[1]-1), 0);
+		int zIndex = std::max(std::min(indexVector(2) + direction * (int) std::round(searchDirection(2)), dim[2]-1), 0);
+		if (segmentationImage->GetScalarComponentAsDouble(xIndex, yIndex, zIndex, 0) < maxValue)
+		{
+			searchDirection =  perpendicularVector.normalized() * (radiusVoxels-1);
+			retval = std::sqrt( std::pow(searchDirection(0)*spacing[0],2) + std::pow(searchDirection(1)*spacing[1],2) + std::pow(searchDirection(2)*spacing[2],2) );
+			break;
+		}
+	}
+
+	return retval;
+}
+bool BranchList::isRadiusAvailable()
+{
+	return mIsRadiusAvailable;
+}
+
 bool checkIfTwoPointCloudsAreClose(Eigen::MatrixXd C1, Eigen::MatrixXd C2, double maxDistance/*mm*/)
 {
 	Eigen::MatrixXd::Index index;
@@ -753,6 +859,7 @@ bool checkIfTwoPointCloudsAreClose(Eigen::MatrixXd C1, Eigen::MatrixXd C2, doubl
 	{
 		// find nearest neighbour
 		(C2.colwise() - C1.col(i)).colwise().squaredNorm().minCoeff(&index);
+
 		double distance = (C2.col(index) - C1.col(i)).norm();
 		if(distance < maxDistance)
 			return true;

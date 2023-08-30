@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 #include <QPointer>
 #include <QObject>
+#include <vtkCallbackCommand.h>
 #include "cxDefinitions.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
@@ -141,6 +142,9 @@ private:
 
 	ViewPtr mView;
 	RepPtr createTrackedStreamRep(TrackedStreamPtr trackedStream);
+
+	static void ProcessEvents(vtkObject *object, unsigned long event, void *clientdata, void *calldata);
+	vtkCallbackCommandPtr mCallbackCommand = nullptr;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 

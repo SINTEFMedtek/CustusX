@@ -21,6 +21,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackerConfigurationImpl.h"
 #include "cxTypeConversions.h"
 
+namespace
+{
+QString newFileLocation(QString filename)
+{
+	QFileInfo fileInfo(filename);
+	QString newFileName = cx::DataLocations::getCachePath() + "/" + fileInfo.fileName();
+	return newFileName;
+}
+}
+
 namespace cxtest
 {
 
@@ -77,10 +87,11 @@ TEST_CASE("Verify that saveConfiguration do not loose information", "[unit][tool
 	{
 		cx::TrackerConfiguration::Configuration configData = config->getConfiguration(filename);
 
+		configData.mUid = newFileLocation(filename);
 		trackerConfig->saveConfiguration(configData);
 
 		// Check that we don't lose info during save
-		cx::TrackerConfiguration::Configuration configData2 = config->getConfiguration(filename);
+		cx::TrackerConfiguration::Configuration configData2 = config->getConfiguration(configData.mUid);
 		CHECK(configData.mUid == configData2.mUid);
 		CHECK(configData.mName == configData2.mName);
 		CHECK(configData.mClinicalApplication == configData2.mClinicalApplication);

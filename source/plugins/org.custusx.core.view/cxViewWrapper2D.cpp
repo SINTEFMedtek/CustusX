@@ -77,6 +77,8 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
 
 	// disable vtk interactor: this wrapper IS an interactor
 //	mView->getRenderWindow()->GetInteractor()->Disable();//vtk9 - Removing this fixes GL error, but allows 3D rotations in the 2D views
+
+	//Removing observers also disables rendering with VTK. Render is called in  ViewContainer::doRender()
 	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();//vtk9 - Remove observers instead of disabling interactor
 
 	mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
@@ -365,7 +367,11 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 
 void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 {
-	this->removeAndResetSliceRep();
+	//TODO: Don't remove and add the same slice reps. Reuse existing ones
+	if(mSliceReps.size()== numberOfSlices)//Simple first fix
+		return;
+
+	this->removeAndResetSliceRep();//This use a lot of time in vtkGarbageCollectorImpl. When doing SW rendering it is probably not needed to remove and add, as we did for GPU rendering
 	for(int i = 0; i < numberOfSlices; ++i)
 	{
 		SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
