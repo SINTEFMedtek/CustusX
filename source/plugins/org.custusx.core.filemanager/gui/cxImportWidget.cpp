@@ -108,16 +108,18 @@ std::vector<DataPtr> SimpleImportDataDialog::getSelectedData()
 	std::vector<DataPtr> datas = mImportDataTypeWidget->getDatas();
 	std::vector<DataPtr> retval = std::vector<DataPtr>();
 
+	int row = 0;
 	for (std::vector<DataPtr>::iterator it = datas.begin(); it != datas.end(); ++it)
 	{
 		DataPtr data = (*it);
-		if(this->isSelectedAndSetType(data))
+		if(this->isSelectedAndSetType(data, row))
 			retval.push_back(data);
+		row++;
 	}
 	return retval;
 }
 
-bool SimpleImportDataDialog::isSelectedAndSetType(DataPtr data)
+bool SimpleImportDataDialog::isSelectedAndSetType(DataPtr data, int row)
 {
 	ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 	if(!image)
@@ -125,37 +127,30 @@ bool SimpleImportDataDialog::isSelectedAndSetType(DataPtr data)
 
 	int filenameColumn = 1;
 
-	for(int row = 0; row < mSimpleTableWidget->rowCount(); ++row)
+	IMAGE_MODALITY modality = imUNKNOWN;
+	IMAGE_SUBTYPE subtype = istUNKNOWN;
+	if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxCTColumn)->checkState() == Qt::Checked)
 	{
-		if(image->getName() == mSimpleTableWidget->item(row, filenameColumn)->text())
-		{
-			IMAGE_MODALITY modality = imUNKNOWN;
-			IMAGE_SUBTYPE subtype = istUNKNOWN;
-			if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxCTColumn)->checkState() == Qt::Checked)
-			{
-				modality = imCT;
-				subtype = istTHORAX_CT;
-			}
-			else if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETColumn)->checkState() == Qt::Checked)
-			{
-				modality = imPET;
-				subtype = istPET;
-			}
-			else if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETCTColumn)->checkState() == Qt::Checked)
-			{
-				modality = imCT;
-				subtype = istPET_CT;
-			}
-			else
-				return false;
-
-//			CX_LOG_DEBUG() << "Setting image " << image->getName() << " modalitye to: "  << enum2string(modality) << " subtype to: " << enum2string(subtype);
-			image->setModality(modality);
-			image->setImageType(subtype);
-			return true;
-		}
+		modality = imCT;
+		subtype = istTHORAX_CT;
 	}
-	return false;
+	else if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETColumn)->checkState() == Qt::Checked)
+	{
+		modality = imPET;
+		subtype = istPET;
+	}
+	else if(mSimpleTableWidget->item(row, mImportDataTypeWidget->mCheckBoxPETCTColumn)->checkState() == Qt::Checked)
+	{
+		modality = imCT;
+		subtype = istPET_CT;
+	}
+	else
+		return false;
+
+//	CX_LOG_DEBUG() << "Setting image " << image->getName() << " modality to: "  << enum2string(modality) << " subtype to: " << enum2string(subtype);
+	image->setModality(modality);
+	image->setImageType(subtype);
+	return true;
 }
 
 void SimpleImportDataDialog::importClicked()
@@ -163,7 +158,7 @@ void SimpleImportDataDialog::importClicked()
 	std::vector<DataPtr> selectedData = this->getSelectedData();
 	if(!selectedData.empty())
 	{
-		mImportDataTypeWidget->setData(this->getSelectedData());
+		mImportDataTypeWidget->setData(selectedData);
 		accept();
 	}
 }

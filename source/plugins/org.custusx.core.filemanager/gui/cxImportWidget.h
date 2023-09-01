@@ -41,7 +41,7 @@ private:
 	QTableWidget* mSimpleTableWidget;
 
 	std::vector<DataPtr> getSelectedData();
-	bool isSelectedAndSetType(DataPtr data);
+	bool isSelectedAndSetType(DataPtr data, int row);
 };
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
