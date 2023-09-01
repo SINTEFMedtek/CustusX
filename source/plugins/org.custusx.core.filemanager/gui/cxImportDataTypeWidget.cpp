@@ -53,9 +53,9 @@ QSize ImportDataTypeWidget::getQTableWidgetSize(QTableWidget *t)
 
 ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype) :
 	BaseWidget(parent, "ImportDataTypeWidget", "Import"),
-	mCheckBoxCTColumn(4),
-	mCheckBoxPETColumn(5),
-	mCheckBoxPETCTColumn(6),
+	mCheckBoxCTColumn(5),
+	mCheckBoxPETColumn(mCheckBoxCTColumn+1),
+	mCheckBoxPETCTColumn(mCheckBoxPETColumn+1),
 	mImportWidget(parent),
 	mServices(services),
 	mData(data),
@@ -685,9 +685,9 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 {
 	QTableWidget* simpleTableWidget = new QTableWidget();
 	simpleTableWidget->setRowCount(0);
-	simpleTableWidget->setColumnCount(7);
+	simpleTableWidget->setColumnCount(mCheckBoxPETCTColumn+1);
 	QStringList tableHeader;
-	tableHeader<<"Series num"<<"Name"<<"Num slices"<<"Slice spacing"<<"CT"<<"PET"<<"PET CT";
+	tableHeader<<"Series num"<<"Name"<<"Num slices"<<"Slice spacing"<<"Modality"<<"CT"<<"PET"<<"PET CT";
 	simpleTableWidget->setHorizontalHeaderLabels(tableHeader);
 	simpleTableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	simpleTableWidget->verticalHeader()->setVisible(false);
@@ -703,10 +703,16 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	simpleTableWidget->setRowCount(mTableWidget->rowCount());
 	for(int i = 0; i < mTableWidget->rowCount(); ++i)
 	{
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(mData[i]);
+		QString modality;
+		if(image)
+			modality = enum2string(image->getModality());
+
 		simpleTableWidget->setItem(i, 0, new QTableWidgetItem(mTableWidget->item(i, mSeriesNumColumn)->text()));
 		simpleTableWidget->setItem(i, 1, new QTableWidgetItem(mTableWidget->item(i, mFilenameColumn)->text()));
 		simpleTableWidget->setItem(i, 2, new QTableWidgetItem(mTableWidget->item(i, mNumSlicesColumn)->text()));
 		simpleTableWidget->setItem(i, 3, new QTableWidgetItem(mTableWidget->item(i, mSliceSpacingColumn)->text()));
+		simpleTableWidget->setItem(i, 4, new QTableWidgetItem(modality));
 		simpleTableWidget->setItem(i, mCheckBoxCTColumn, new QTableWidgetItem(*mCheckBoxWidgetCT));
 		simpleTableWidget->setItem(i, mCheckBoxPETColumn, new QTableWidgetItem(*mCheckBoxWidgetPET));
 		simpleTableWidget->setItem(i, mCheckBoxPETCTColumn, new QTableWidgetItem(*mCheckBoxWidgetPETCT));
