@@ -43,21 +43,24 @@ ElastixParameters::ElastixParameters(XmlOptionFile options)
 
 void ElastixParameters::addDefaultPresets()
 {
-    FilePathPropertyPtr exe = this->getExecutable();
+	FilePathPropertyPtr exe = this->getExecutable();
 
-    if (DataLocations::isRunFromBuildFolder())
+	if(exe->getValue().isEmpty())
 	{
-		exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
-    }
-    else
-    {
-        exe->setValue(DataLocations::findExecutableInStandardLocations("elastix"));
-    }
+		if (DataLocations::isRunFromBuildFolder())
+		{
+			exe->setValue(cx::DataLocations::findConfigFilePath("run_elastix.sh", this->getConfigUid()+"/elastix/bin"));
+		}
+		else
+		{
+			exe->setValue(DataLocations::findExecutableInStandardLocations("elastix"));
+		}
+	}
 
-    FilePathPropertyPtr par0 = this->getParameterFile("0");
-    par0->setValue("elastix/par/p_Rigid.txt");
+	FilePathPropertyPtr par0 = this->getParameterFile("0");
+	par0->setValue("elastix/par/p_Rigid.txt");
 
-    this->addDefaultPreset("elastix/p_Rigid", exe->getValue(), QStringList() << par0->getValue());
+	this->addDefaultPreset("elastix/p_Rigid", exe->getValue(), QStringList() << par0->getValue());
 }
 
 void ElastixParameters::addDefaultPreset(QString name, QString executable, QStringList parameterFiles)
@@ -78,10 +81,12 @@ void ElastixParameters::addDefaultPreset(QString name, QString executable, QStri
 
 void ElastixParameters::currentPresetChangedSlot()
 {
-    this->reloadPresets();
+	this->reloadPresets();
 
-    XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
-	mActiveExecutable->setValue(node.getElement().attribute("executable"));
+	XmlOptionFile node = mOptions.descend("preset", "name", mCurrentPreset->getValue());
+	QString presetExePath = node.getElement().attribute("executable");
+	if(!presetExePath.isEmpty())
+		mActiveExecutable->setValue(node.getElement().attribute("executable"));
 
 	mActiveParameterFile0->setValue(node.getElement().attribute("parameterFile0"));
 	mActiveParameterFile1->setValue(node.getElement().attribute("parameterFile1"));
@@ -154,11 +159,13 @@ FilePathPropertyPtr ElastixParameters::getExecutable()
         paths << qApp->applicationDirPath();
     }
 
+	QString elastixFraxinusInstallPath = DataLocations::getUserHomePath()+"/Fraxinus/elastix/bin/elastix";
+
 	QDomElement root;
 	FilePathPropertyPtr retval;
 	retval = FilePathProperty::initialize("executable", "Executable",
 										  "Name of registration executable",
-										  "",
+										  elastixFraxinusInstallPath,
 										  paths,
 										  root);
 	connect(retval.get(), &FilePathProperty::changed, this, &ElastixParameters::elastixParametersChanged);

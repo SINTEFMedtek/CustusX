@@ -811,6 +811,10 @@ IMAGE_MODALITY Image::getModality() const
 void Image::setModality(const IMAGE_MODALITY& val)
 {
 	mModality = val;
+	//Create default transfer functions for PET when changing to PET modality
+	if(val == imPET)
+		this->resetTransferFunctions();
+
 	emit propertiesChanged();
 }
 

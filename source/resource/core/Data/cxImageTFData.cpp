@@ -101,7 +101,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	}
 	else
 	{
-		CX_LOG_WARNING() << "ImageTF3D::parseXml() found no alpha transferfunction";
+//		CX_LOG_WARNING() << "ImageTF3D::parseXml() found no alpha transferfunction";
 	}
 
 	QDomNode colorNode = dataNode.namedItem("color");
@@ -120,7 +120,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	}
 	else
 	{
-		CX_LOG_WARNING() << "ImageTF3D::parseXml() found no color transferfunction";
+//		CX_LOG_WARNING() << "ImageTF3D::parseXml() found no color transferfunction";
 	}
 
 	this->internalsHaveChanged();

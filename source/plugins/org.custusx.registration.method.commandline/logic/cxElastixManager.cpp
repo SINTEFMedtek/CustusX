@@ -227,6 +227,9 @@ void ElastixManager::addNonlinearData()
 	// volume is resampled into the space of the fixed data:
 	nlVolume->get_rMd_History()->setRegistration(mServices->registration()->getFixedData()->get_rMd());
 
+	if(nlVolume->getModality() == imPET)
+		nlVolume->setImageType(istPET_REGISTERED);
+
 	mServices->patient()->insertData(nlVolume);
 	mLastNonLonearImage = nlVolume;
 

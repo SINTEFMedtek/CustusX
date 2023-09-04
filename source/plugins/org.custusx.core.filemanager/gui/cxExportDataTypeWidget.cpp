@@ -32,7 +32,7 @@ Q_OBJECTExportDataTypeWidget::Q_OBJECTExportDataTypeWidget(QWidget *parent, QStr
 {
 	QStringList exporters;
 	std::vector<FileReaderWriterServicePtr> writers = filemanager->getExportersForDataType(mDataType);
-	CX_LOG_DEBUG() << "Found " << writers.size() << " writers that export " << mDataType;
+//	CX_LOG_DEBUG() << "Found " << writers.size() << " writers that export " << mDataType;
 	for(int i=0; i<writers.size(); ++i)
 	{
 		//exporters << writers[i]->getName()+ " (*." + writers[i]->getFileSuffix() +")";

@@ -331,46 +331,14 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 
 Transform3D ElastixExecuter::centerToCenterTranslation(bool printDebug)
 {
-	if(volumesOverlap())
-	{
-		if(printDebug)
-			CX_LOG_DEBUG() << "ElastixExecuter::centerToCenterTranslation: Volumes overlap. No need to move";
-		return Transform3D::Identity();
-	}
-
 	Vector3D fCenter_r = mFixed->get_rMd().coord(mFixed->boundingBox().center());
 	Vector3D mCenter_r = mMoving->get_rMd().coord(mMoving->boundingBox().center());
 	Transform3D mCenterMfCenter_r = createTransformTranslate(mCenter_r - fCenter_r);//center to center translation in r
 	if(printDebug)
-		CX_LOG_DEBUG() << "Volumes sent to Elastix don't overlap. Apply transform to move center to center:\n" << mCenterMfCenter_r;
+	{
+		CX_LOG_DEBUG() << "ElastixExecuter: Applying transform to move center to center:\n" << mCenterMfCenter_r;
+	}
 	return mCenterMfCenter_r;
-}
-
-bool ElastixExecuter::volumesOverlap()
-{
-	DoubleBoundingBox3D fixedBB = mFixed->boundingBox();
-	DoubleBoundingBox3D movingBB = mMoving->boundingBox();
-	fixedBB.translate(mFixed->get_rMd());
-	movingBB.translate(mMoving->get_rMd());
-
-	DoubleBoundingBox3D bbIntersection = intersection(fixedBB, movingBB);
-//	CX_LOG_DEBUG() << "range fixedBB: " << fixedBB.range();
-//	CX_LOG_DEBUG() << "range movingBB: " << movingBB.range();
-//	CX_LOG_DEBUG() << "range bbIntersection: " << bbIntersection.range();
-	if(bbIntersection==DoubleBoundingBox3D::zero())
-		return false;
-
-	//Require range above a threshold. Use 10% of range of fixed?
-	Vector3D rangeFixed = fixedBB.range();
-	double threshold = std::min(rangeFixed[0]/10.0, rangeFixed[2]/10.0);//Use x and z for now as x and y is usually equal
-	Vector3D rangeIntersection = bbIntersection.range();
-	double minIntersectionRange = std::min(rangeIntersection[0], rangeIntersection[2]);
-//	CX_LOG_DEBUG() << "threshold: " << threshold;
-//	CX_LOG_DEBUG() << "minIntersectionRange: " << minIntersectionRange;
-	if(minIntersectionRange < threshold)
-		return false;
-
-	return true;
 }
 
 void ElastixExecuter::processReadyRead()

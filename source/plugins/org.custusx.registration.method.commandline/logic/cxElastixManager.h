@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxElastixParameters.h"
 #include "cxRegServices.h"
 #include "cxTransform3D.h"
+#include "org_custusx_registration_method_commandline_Export.h"
 
 namespace cx
 {
@@ -36,7 +37,7 @@ typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class ElastixManager : public QObject
+class org_custusx_registration_method_commandline_EXPORT ElastixManager : public QObject
 {
 	Q_OBJECT
 public:

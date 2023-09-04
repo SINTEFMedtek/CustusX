@@ -67,12 +67,20 @@ QString DicomConverter::convertToValidName(QString text) const
 			<< "\\^" << "," << "\\%";
 	QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
 	text = text.replace(regexp, "_");
-	return text	;
+	return text;
 }
 
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
-	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
+	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);//TODO Use DCM_CodeMeaning if DCM_SeriesDescription is missing?
+
+	if (seriesDescription.isEmpty())
+	{
+		//Modified code from ctkDICOMItem::GetElementAsString, searcing sub parameters as well
+		OFString s;
+		if ( reader->item()->CheckCondition( reader->item()->findAndGetOFString(DCM_CodeMeaning, s, 0, OFTrue) ) )
+			seriesDescription = reader->item()->Decode( DCM_CodeMeaning, s );
+	}
 	QString name = convertToValidName(seriesDescription);
 	return name;
 }

@@ -32,5 +32,10 @@ TEST_CASE("User documentation url is set", "[unit][datalocations]")
     CHECK(!DataLocations::getWebsiteUserDocumentationURL().isEmpty());
 }
 
+TEST_CASE("Get user home path", "[unit][datalocations]")
+{
+	CHECK(!DataLocations::getUserHomePath().isEmpty());
+}
+
 } // namespace cx
 

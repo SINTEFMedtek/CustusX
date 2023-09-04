@@ -132,7 +132,12 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, IMAGE_SUBTYPE, istCOUNT)
 	"FLAIR",
 	"B-Mode",
 	"Angio",
-	"Segmentation"
+	"Segmentation",
+	"PET CT",
+	"Thorax CT",
+	"PET",
+	"Registered PET",
+	"Copy"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, IMAGE_SUBTYPE, istCOUNT)
 
@@ -158,7 +163,8 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Airways",
 	"Centerlines",
 	"Medium Organs",
-	"Small Organs"
+	"Small Organs",
+	"PET"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
 

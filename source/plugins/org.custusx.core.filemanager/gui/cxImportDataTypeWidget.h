@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "org_custusx_core_filemanager_Export.h"
 #include <QPushButton>
+#include <QTableWidgetItem>
 #include "cxBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxLogger.h"
@@ -34,7 +35,7 @@ class org_custusx_core_filemanager_EXPORT ImportDataTypeWidget : public BaseWidg
 {
 	Q_OBJECT
 public:
-	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion = imUNKNOWN);
+	ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr services, std::vector<DataPtr> data, std::vector<DataPtr> &parentCandidates, QString filename, IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	~ImportDataTypeWidget();
 
 	static QSize getQTableWidgetSize(QTableWidget *t);
@@ -44,6 +45,10 @@ public:
 	QTableWidget* getSimpleTableWidget();
 	std::vector<DataPtr> getDatas() {return mData;};
 	void setData(std::vector<DataPtr> datas) {mData = datas;}
+
+	const int mCheckBoxCTColumn;
+	const int mCheckBoxPETColumn;
+	const int mCheckBoxPETCTColumn;
 
 public slots:
 	void update();
@@ -57,10 +62,11 @@ private slots:
 	void removeRowFromTableAndDataFromImportList();
 
 protected:
-	void setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion);
+	void setModality(ImagePtr image, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype = istUNKNOWN);
+	QTableWidgetItem *createCheckbox(QString text);
 
 private:
-	void createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion);
+	void createDataSpecificGui(int index, IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype);
 	void updateTableWithNumberOfSlices(ImagePtr image);
 	void updateTableWithSliceSpacing(ImagePtr image);
 	std::map<QString, QString> getParentCandidateList();
@@ -113,11 +119,15 @@ private:
 	QWidget* mModalityCombo;
 
 	int mSeriesNumColumn = 1;
-	int mNumSlicesColoumn = 2;
-	int mFilenameColoumn = 3;
-	int mTypeColoumn = 4;
-	int mSliceSpacingColoumn = 5;
-	int mSpaceColoumn = 6;
+	int mNumSlicesColumn = 2;
+	int mFilenameColumn = 3;
+	int mTypeColumn = 4;
+	int mSliceSpacingColumn = 5;
+	int mSpaceColumn = 6;
+
+	QTableWidgetItem *mCheckBoxWidgetCT;
+	QTableWidgetItem *mCheckBoxWidgetPET;
+	QTableWidgetItem *mCheckBoxWidgetPETCT;
 };
 
 }

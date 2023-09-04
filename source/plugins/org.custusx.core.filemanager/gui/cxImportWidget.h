@@ -33,10 +33,15 @@ public:
 	SimpleImportDataDialog(ImportDataTypeWidget *widget, QWidget* parent=NULL);
 	virtual ~SimpleImportDataDialog(){};
 private slots:
-	void tableItemSelected(int currentRow, int currentColumn, int previousRow, int previousColumn);
+	void importClicked();
 	void cancelClicked();
+	void cellChangedSlot(int row, int column);
 private:
 	ImportDataTypeWidget* mImportDataTypeWidget;
+	QTableWidget* mSimpleTableWidget;
+
+	std::vector<DataPtr> getSelectedData();
+	bool isSelectedAndSetType(DataPtr data, int row);
 };
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
@@ -52,10 +57,10 @@ signals:
 	void parentCandidatesUpdated();
 
 private slots:
-	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN);
+	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	void importButtonClicked();
 	void cancelButtonClicked();
-	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN);
+	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	void removeWidget(QWidget *widget);
 	void removeRowFromTableAndRemoveFilenameFromImportList();
 
