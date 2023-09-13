@@ -167,7 +167,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
 		igtlioLabels << IGTLIO_KEY_SPACING_X;
 		igtlioLabels << IGTLIO_KEY_SPACING_Y;
-		igtlioLabels << QString("SpacingZ"); //IGTLIO_KEY_SPACING_Z;
+                igtlioLabels << IGTLIO_KEY_SPACING_Z;
+                igtlioLabels << IGTLIO_KEY_TIMESTAMP;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
 		mProbeDefinitionFromStringMessages->setImage(cximage);
@@ -185,6 +186,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			{
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
+                                if(metaLabel.c_str() == IGTLIO_KEY_TIMESTAMP)
+                                {
+                                    int originalTime = QString(metaDataValue.c_str()).toInt();
+                                    cximage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(originalTime)));
+                                }
 			}
 		}
 		mGotMoreThanOneImage = true;
