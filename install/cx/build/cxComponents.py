@@ -377,13 +377,15 @@ class OpenIGTLinkIO(CppComponent):
         return self.controlData.getBuildExternalsType()
     def repository(self):
         if self.controlData.git_use_https:
-            return 'https://github.com/IGSIO/OpenIGTLinkIO.git'
+#            return 'https://github.com/IGSIO/OpenIGTLinkIO.git'
+            return 'https://github.com/SINTEFMedtek/OpenIGTLinkIO.git'
         else:
-            return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
-#        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
+#            return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
+            return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('46975d197796063b956573f1b1022ac2e3643fe4') # 3. Nov 2022
+        #self._getBuilder().gitCheckoutSha('46975d197796063b956573f1b1022ac2e3643fe4') # 3. Nov 2022
+        self._getBuilder().gitCheckoutSha('2af90ac6aa89fdbbee4025cccb7d64a2c19e6d3d') # RAMPUS
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
