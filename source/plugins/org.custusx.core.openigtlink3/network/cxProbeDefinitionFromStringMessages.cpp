@@ -176,9 +176,6 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 		{
 			mSectorInfo->mProbeType = static_cast<ProbeDefinition::TYPE>(intValue);
 		}
-		//Hack to get BK streaming to work in the RAMPUS project
-		if(mSectorInfo->mProbeType == ProbeDefinition::tNONE)
-			mSectorInfo->mProbeType = ProbeDefinition::tSECTOR;
 	}
 	//New standard
 	else if (name == IGTLIO_KEY_ORIGIN)
