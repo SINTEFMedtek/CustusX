@@ -50,6 +50,7 @@ public:
 
 protected:
 	SectorInfoPtr mSectorInfo;
+	int mOriginalTime;
 
 private:
 	std::vector<double> toDoubleVector(QString values, QString separator = QString(" ")) const;

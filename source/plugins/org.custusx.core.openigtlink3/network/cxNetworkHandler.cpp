@@ -194,7 +194,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			{
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
-				if(metaLabel.c_str() == IGTLIO_KEY_TIMESTAMP)
+				//It seems like we still don't get meta info from PLUS, use string messages for now (See ProbeDefinitionFromStringMessages)
+				if(QString(metaLabel.c_str()) == IGTLIO_KEY_TIMESTAMP)
 				{
 					int originalTime = QString(metaDataValue.c_str()).toInt();
 					cximage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(originalTime)));

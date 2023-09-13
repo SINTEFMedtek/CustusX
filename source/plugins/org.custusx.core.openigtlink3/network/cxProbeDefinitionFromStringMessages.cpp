@@ -119,7 +119,8 @@ struct SectorInfo
 
 
 ProbeDefinitionFromStringMessages::ProbeDefinitionFromStringMessages() :
-	mSectorInfo(new SectorInfo)
+	mSectorInfo(new SectorInfo),
+	mOriginalTime(0)
 {}
 
 void ProbeDefinitionFromStringMessages::reset()
@@ -235,7 +236,7 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mSpacingY = doubleValue;
 		}
 	}
-	else if (name == "SpacingZ") //IGTLIO_KEY_SPACING_Z
+	else if (name == IGTLIO_KEY_SPACING_Z)
 	{
 		if(mSectorInfo->mSpacingZ != doubleValue)
 		{
@@ -243,11 +244,17 @@ void ProbeDefinitionFromStringMessages::parseValue(QString name, QString value)
 			mSectorInfo->mSpacingZ = doubleValue;
 		}
 	}
+	else if (name == IGTLIO_KEY_TIMESTAMP)
+	{
+		mOriginalTime = intValue;
+		mSectorInfo->mImage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(mOriginalTime)));
+	}
 }
 
 void ProbeDefinitionFromStringMessages::setImage(ImagePtr image)
 {
 	mSectorInfo->mImage = image;
+	mSectorInfo->mImage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(mOriginalTime)));
 }
 
 bool ProbeDefinitionFromStringMessages::haveValidValues()
