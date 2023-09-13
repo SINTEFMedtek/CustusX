@@ -66,6 +66,7 @@ NetworkHandler::~NetworkHandler()
 igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s)
 {
 	mSession = mLogic->ConnectToServer(serverHost, serverPort, sync, timeout_s);
+	mSession2 = mLogic->ConnectToServer(serverHost, 18945, sync, timeout_s);//Hack for getting video and tracking from two different OpenIGTLink servers
 	return mSession;
 }
 
@@ -77,6 +78,13 @@ void NetworkHandler::disconnectFromServer()
 		igtlioConnectorPointer connector = mSession->GetConnector();
 		connector->Stop();
 		mLogic->RemoveConnector(connector);
+	}
+	if (mSession2->GetConnector() && mSession2->GetConnector()->GetState()!=igtlioConnector::STATE_OFF)
+	{
+		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession2->GetConnector()->GetName();
+		igtlioConnectorPointer connector2 = mSession2->GetConnector();
+		connector2->Stop();
+		mLogic->RemoveConnector(connector2);
 	}
 	mProbeDefinitionFromStringMessages->reset();
 }
@@ -186,11 +194,11 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			{
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
-                                if(metaLabel.c_str() == IGTLIO_KEY_TIMESTAMP)
-                                {
-                                    int originalTime = QString(metaDataValue.c_str()).toInt();
-                                    cximage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(originalTime)));
-                                }
+				if(metaLabel.c_str() == IGTLIO_KEY_TIMESTAMP)
+				{
+					int originalTime = QString(metaDataValue.c_str()).toInt();
+					cximage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(originalTime)));
+				}
 			}
 		}
 		mGotMoreThanOneImage = true;

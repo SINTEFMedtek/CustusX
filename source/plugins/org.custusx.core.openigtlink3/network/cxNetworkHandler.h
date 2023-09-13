@@ -71,7 +71,7 @@ protected:
 	bool verifyTimestamp(double &timestampMS);
 
 	igtlioLogicPointer mLogic;
-	igtlioSessionPointer mSession;
+	igtlioSessionPointer mSession, mSession2;
 	QTimer *mTimer;
 	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
 
