@@ -53,13 +53,13 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 	int line = 0;
 
 	// PlusServer path
-	mPlusPath = settings()->value("plus/Path").toString();
-	if(!QFile::exists(mPlusPath))
-		this->searchForPlus();
+	mPlusPathComboBox = new QComboBox();
+	//mPlusPath = settings()->value("plus/Path").toString();
+	//if(!QFile::exists(mPlusPath))
+	this->searchForPlus();
+	connect(mPlusPathComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlusConnectWidget::plusPathChangedSlot);
 
 	QLabel* plusPathLabel = new QLabel(tr("PlusServer path:"));
-	mPlusPathComboBox = new QComboBox();
-	mPlusPathComboBox->addItem(mPlusPath);
 	QAction* browsePlusPathAction = new QAction(QIcon(":/icons/open.png"), tr("Browse for PlusServer..."), this);
 	connect(browsePlusPathAction, &QAction::triggered, this, &PlusConnectWidget::browsePlusPathSlot);
 	QToolButton* browsePlusPathButton = new QToolButton(this);
@@ -112,13 +112,37 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 
 void PlusConnectWidget::searchForPlus()
 {
-	QString possiblePath = QDir::homePath() + "/dev/plus-2.6/PlusB-bin/bin/PlusServer";
+	//Search for Plusserver. Prioritize first found version
+	QStringList possiblePaths;
+	QString possiblePath = QDir::homePath() + "/dev/plus_mod/PlusB-bin/bin/PlusServer";
+	possiblePaths << possiblePath;
+	possiblePath = QDir::homePath() + "/dev/plus-2.8/PlusB-bin/bin/PlusServer";
+	possiblePaths << possiblePath;
+	possiblePath = QDir::homePath() + "/dev/plus/PlusB-bin/bin/PlusServer";
+	possiblePaths << possiblePath;
+	possiblePath = QDir::homePath() + "/dev/plus-2.6/PlusB-bin/bin/PlusServer";
+	possiblePaths << possiblePath;
 
-	if(QFile::exists(possiblePath))
+	bool found1st = false;
+	for(int i = 0; i < possiblePaths.size(); ++i)
 	{
-		CX_LOG_DEBUG() << "Found PlusServer in: " << possiblePath;
-		mPlusPath = possiblePath;
+		possiblePath = possiblePaths[i];
+		if(QFile::exists(possiblePath))
+		{
+			CX_LOG_DEBUG() << "Found PlusServer in: " << possiblePath;
+			if(!found1st)
+			{
+				found1st = true;
+				mPlusPath = possiblePath;
+			}
+			mPlusPathComboBox->addItem(possiblePath);
+		}
 	}
+}
+
+void PlusConnectWidget::plusPathChangedSlot()
+{
+	mPlusPath = mPlusPathComboBox->currentText();
 }
 
 QStringList PlusConnectWidget::getPlusConfigFilePaths()
@@ -150,7 +174,7 @@ void PlusConnectWidget::browsePlusPathSlot()
 	if(!mPlusPath.isEmpty())
 	{
 		mPlusPathComboBox->addItem( mPlusPath );
-		mPlusPathComboBox->setCurrentIndex( mPlusPathComboBox->currentIndex() + 1 );
+		mPlusPathComboBox->setCurrentIndex( mPlusPathComboBox->count() - 1 );
 	}
 }
 
