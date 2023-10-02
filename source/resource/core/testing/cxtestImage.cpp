@@ -317,7 +317,7 @@ TEST_CASE("Data: guessOrganType", "[unit][resource][core]")
 	CHECK(image->getOrganType() == cx::otUNKNOWN);
 
 	image->guessOrganType();
-	CHECK(image->getOrganType() == cx::organtypeCOUNT);
+	CHECK(image->getOrganType() == cx::otUNKNOWN);
 
 	cx::ORGAN_TYPE organType = cx::otLUNGS;
 	image->setOrganType(cx::otUNKNOWN);

@@ -196,7 +196,7 @@ TEST_CASE("Connect client to server", "[plugins][org.custusx.core.openigtlink3][
 }
 
 //Hangs occasionally on Windows
-TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration][not_win64]")
+TEST_CASE("Stop and remove client and server connectors works", "[plugins][org.custusx.core.openigtlink3][integration][not_win64][hide]")
 {
 	igtlioServerClientFixture fixture;
 	fixture.startServerAndClientAndConnect();

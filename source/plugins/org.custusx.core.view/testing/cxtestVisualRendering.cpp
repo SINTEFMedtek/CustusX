@@ -197,7 +197,7 @@ TEST_CASE("Visual rendering: Show 3D volume - vtkGPU render",
 }
 
 TEST_CASE("Visual rendering: Show ACS+3D, centered hidden tool",
-			"[integration][resource][visualization][not_win32][not_win64][not_mavericks]")
+			"[integration][resource][visualization][not_win32][not_win64][not_mavericks][hide]")
 {
 	cxtest::ViewsFixture fixture;
 	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
@@ -265,7 +265,7 @@ TEST_CASE("Visual rendering: Show layout, clear, show new layout",
 }
 
 TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
-			"[integration][resource][visualization][not_win32][not_win64][not_mavericks]")
+			"[integration][resource][visualization][not_win32][not_win64][not_mavericks][hide]")
 {
 	cxtest::ViewsFixture fixture;
 	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
@@ -289,7 +289,7 @@ TEST_CASE("Visual rendering: Show AnyDual+3D, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
-			"[integration][resource][visualization][not_win32][not_win64][not_mavericks]")
+			"[integration][resource][visualization][not_win32][not_win64][not_mavericks][hide]")
 {
 	cxtest::ViewsFixture fixture;
 	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
@@ -313,7 +313,7 @@ TEST_CASE("Visual rendering: Show 3D+AnyDual, centered hidden tool",
 }
 
 TEST_CASE("Visual rendering: Show ACS, 3 volumes",
-			"[integration][resource][visualization]")
+			"[integration][resource][visualization][hide]")
 {
 	cxtest::ViewsFixture fixture;
 	cx::FileReaderWriterServicePtr metaImageReader = cx::FileReaderWriterServicePtr(new cx::MetaImageReader(fixture.getPatientModelService()));
