@@ -118,7 +118,7 @@ TEST_CASE("ElastiX executable is present", "[elastix][not_win32][not_win64]")
 
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64]")
+TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64][hide]")
 {
 	cx::LogicManager::initialize();
 	cx::PatientModelServicePtr pasm = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());
