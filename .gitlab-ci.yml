@@ -68,6 +68,11 @@ deploy-job:      # This job runs in the deploy stage.
   environment: production
   script:
     - echo "Deploying application..."
+    - INSTALLER_FILE=$(find package_artefacts/CustusX*.tar.gz)
+    - 'curl
+           --header "JOB-TOKEN: $CI_JOB_TOKEN"
+           --upload-file $INSTALLER_FILE
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/Content/${CI_COMMIT_SHORT_SHA}/$INSTALLER_FILE"'
     #- mv package_artefacts/ public/ #This is the path to the gitlab pages (project website), so it may not be the correct place to put the artifacts
     #- echo "Application successfully deployed."
 #  artifacts:
