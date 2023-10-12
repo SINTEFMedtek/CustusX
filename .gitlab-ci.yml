@@ -30,7 +30,7 @@ build-job:       # This job runs in the build stage, which runs first.
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
     - cd $CI_PROJECT_DIR
-    - ./install/cxJenkinsMasterBuild.py --coverage --create_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    - ./install/cxJenkinsMasterBuild.py --coverage --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     - echo "Compile complete."
   artifacts:
     paths:
