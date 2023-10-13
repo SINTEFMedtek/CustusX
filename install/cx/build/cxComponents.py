@@ -69,6 +69,9 @@ class Component(object):
             return
         if self._checkout_check_exist('%s/.svn'%path):
             return
+        if self._checkout_check_exist('%s'%path):
+            print("Not a git repo, removing folder and contents of %s." % self.repo_path)
+            shutil.rmtree(self.repo_path)
         self._rawCheckout()
 #    def _rawCheckout(self):
 #        'checkout the component source from external source to this computer (svn co or similar)'
