@@ -69,7 +69,8 @@ deploy-job:      # This job runs in the deploy stage.
   environment: production
   script:
     - echo "Deploying application..."
-    - INSTALLER_FILE=$(find package_artefacts/CustusX*.tar.gz)
+    - cd $CI_PROJECT_DIR/package_artefacts
+    - INSTALLER_FILE=$(find CustusX*.tar.gz)
     - 'curl
            --header "JOB-TOKEN: $CI_JOB_TOKEN"
            --upload-file $INSTALLER_FILE
