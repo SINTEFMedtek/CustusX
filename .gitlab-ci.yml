@@ -17,7 +17,8 @@
 # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
 
 default:
-  image: olevs/custusx-build-ubuntu2004
+  #image: olevs/custusx-build-ubuntu2004 #Prebuilt CustusX
+  image: olevs/custusx-ubuntu2004 #Empty image, with only environment
 
 stages:          # List of stages for jobs, and their order of execution
   - build
