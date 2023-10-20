@@ -385,7 +385,7 @@ class OpenIGTLinkIO(CppComponent):
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         #self._getBuilder().gitCheckoutSha('46975d197796063b956573f1b1022ac2e3643fe4') # 3. Nov 2022
-        self._getBuilder().gitCheckoutSha('2af90ac6aa89fdbbee4025cccb7d64a2c19e6d3d') # RAMPUS
+        self._getBuilder().gitCheckoutSha('f912760a71e681454adc842552139783cb957de5') # RAMPUS
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
