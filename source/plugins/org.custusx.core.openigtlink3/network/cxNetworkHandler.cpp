@@ -175,8 +175,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
 		igtlioLabels << IGTLIO_KEY_SPACING_X;
 		igtlioLabels << IGTLIO_KEY_SPACING_Y;
-                igtlioLabels << IGTLIO_KEY_SPACING_Z;
-                igtlioLabels << IGTLIO_KEY_TIMESTAMP;
+		igtlioLabels << IGTLIO_KEY_SPACING_Z;
+		igtlioLabels << IGTLIO_KEY_TIMESTAMP;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
 		mProbeDefinitionFromStringMessages->setImage(cximage);
@@ -195,6 +195,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
 				//It seems like we still don't get meta info from PLUS, use string messages for now (See ProbeDefinitionFromStringMessages)
+				//To fix this for now: Set ClientHeaderVersion to IGTL_HEADER_VERSION_2 in src/PlusOpenIGTLink/PlusIgtlClientInfo.cxx, instead of IGTL_HEADER_VERSION_1
 				if(QString(metaLabel.c_str()) == IGTLIO_KEY_TIMESTAMP)
 				{
 					int originalTime = QString(metaDataValue.c_str()).toInt();
@@ -224,9 +225,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
 
-//		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
-//										<< " streamIdTo: " << content.streamIdTo
-//										<< " streamIdFrom: " << content.streamIdFrom
+//		CX_LOG_DEBUG() << "TRANSFORM: "
 //										<< " deviceName: " << deviceName
 //										<< " transform: " << cxtransform;
 

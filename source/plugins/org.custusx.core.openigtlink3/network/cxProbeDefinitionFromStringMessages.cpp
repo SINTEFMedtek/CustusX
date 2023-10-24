@@ -275,7 +275,7 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 		return ProbeDefinitionPtr();
 
 	Vector3D spacing = mSectorInfo->mImage->getSpacing();
-	//CX_LOG_DEBUG() << "Spacing from image: " << spacing;
+//	CX_LOG_DEBUG() << "Spacing from image stream: " << spacing;
 	//Send spacing as messages for now. Should be sent together with image.
 	//The default should be to use the spacing from the image,
 	//not from meta info or string messages
@@ -289,17 +289,23 @@ ProbeDefinitionPtr ProbeDefinitionFromStringMessages::createProbeDefintion(QStri
 	{
 		//Use spacing from meta data if not correct spacing in image.
 		//NB: Current implementation of igtlioImageConverter::IGTLToVTKImageData discards incoming spacing.
-		//It is being set to (1, 1, 1)
+		//It is being set to the value in the PLUS config file. Typically: (1, 1, 1) or (0.2, 0.2, 0.2)
 		mSectorInfo->mImage->getBaseVtkImageData()->SetSpacing(mSectorInfo->mSpacingX, mSectorInfo->mSpacingY, mSectorInfo->mSpacingZ);
 		spacing = mSectorInfo->mImage->getSpacing();
 	}
 	Vector3D origin_p(mSectorInfo->mOrigin[0], mSectorInfo->mOrigin[1], mSectorInfo->mOrigin[2]);
+//	CX_LOG_DEBUG() << "New spacing from image: " << spacing;
+//	CX_LOG_DEBUG() << "origin_p: " << origin_p;
+//	CX_LOG_DEBUG() << "size: " << this->getSize().width() << " " << this->getSize().height();
+//	CX_LOG_DEBUG() << "BoundingBox: " << this->getBoundingBox();
+//	CX_LOG_DEBUG() << "Depths: " << mSectorInfo->mDepths[0] << " " << mSectorInfo->mDepths[1];
+//	CX_LOG_DEBUG() << "Width: " << this->getWidth();
 
 	ProbeDefinitionPtr probeDefinition = this->initProbeDefinition();
 	probeDefinition->setUid(uid);
 	probeDefinition->setOrigin_p(origin_p);
 	probeDefinition->setSpacing(spacing);
-	probeDefinition->setClipRect_p(this->getBoundinBox());
+	probeDefinition->setClipRect_p(this->getBoundingBox());
 	probeDefinition->setSector(mSectorInfo->mDepths[0], mSectorInfo->mDepths[1], this->getWidth());
 	probeDefinition->setSize(this->getSize());
 	probeDefinition->setUseDigitalVideo(true);
@@ -340,7 +346,7 @@ QSize ProbeDefinitionFromStringMessages::getSize()
 	return size;
 }
 
-DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundinBox() const
+DoubleBoundingBox3D ProbeDefinitionFromStringMessages::getBoundingBox() const
 {
 	DoubleBoundingBox3D retval(mSectorInfo->mBoundingBox[0], mSectorInfo->mBoundingBox[1],
 			mSectorInfo->mBoundingBox[2], mSectorInfo->mBoundingBox[3],
