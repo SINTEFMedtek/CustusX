@@ -3,7 +3,8 @@
 default:
   #image: olevs/custusx-build-ubuntu2004 #Prebuilt CustusX, Dockerhub
   #image: olevs/custusx-ubuntu2004 #Empty image, with only environment
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-ubuntu2004
+  #image: gitlab.sintef.no:5050/custusx/custusx/custusx-ubuntu2004 # Slower build if not reusing the build from last run
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
 
 stages:          # List of stages for jobs, and their order of execution
   - build
@@ -62,15 +63,16 @@ deploy-job:      # This job runs in the deploy stage.
            --upload-file $INSTALLER_FILE
            "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_SHORT_SHA}/$INSTALLER_FILE"'
     # version number (23.10) can be replaced with ${CI_COMMIT_TAG} if a git tag is present
-    #Upload documentation
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH      # Run for all changes to the default branch only
+
+pages:
+  stage: deploy
+  environment: production
+  script:
     - cd $CI_PROJECT_DIR
     - mv package_artefacts/html_pure/ public/user_doc/
     - mv package_artefacts/html_dev/ public/developer_doc/
-
-    #- mv package_artefacts/ public/ #This is the path to the gitlab pages (project website), so it may not be the correct place to put the artifacts
-    #- echo "Application successfully deployed."
-#  artifacts:
-#    paths:
-#      - "public/" #Path to the gitlab pages
-#  rules:
-#    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH      # Run for all changes to the default branch only
+  artifacts:
+    paths:
+      - public
