@@ -71,8 +71,9 @@ pages:
   environment: production
   script:
     - cd $CI_PROJECT_DIR
-#    - mv package_artefacts/html_pure/ public/user_doc/ #Too large for default pages artifact size
-    - mv package_artefacts/html_dev/ public/developer_doc/
+     #Too large for default pages artifact size?
+    - mv package_artefacts/html_pure/ public/user_doc/
+#    - mv package_artefacts/html_dev/ public/developer_doc/
   artifacts:
     paths:
       - public
