@@ -44,27 +44,35 @@ test-job:   # This job runs the Unit + Integration tests
         coverage_format: cobertura
         path: ${CI_PROJECT_DIR}/test_results/coverage.xml
 
-#lint-test-job:   # This job also runs in the test stage.
-#  stage: test    # It can run at the same time as unit-test-job (in parallel).
-#  script:
-#    - echo "Linting code... This will take about 10 seconds."
-#   - #sleep 10
-#    - echo "No lint issues found."
-
-deploy-job:      # This job runs in the deploy stage.
+deploy-commmit:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
   environment: production
   script:
-    - echo "Deploying application..."
+    - echo "Deploying application for commit..."
     - cd $CI_PROJECT_DIR/package_artefacts
     - INSTALLER_FILE=$(find CustusX*.tar.gz)
     - 'curl
            --header "JOB-TOKEN: $CI_JOB_TOKEN"
            --upload-file $INSTALLER_FILE
            "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_SHORT_SHA}/$INSTALLER_FILE"'
-    # version number (23.10) can be replaced with ${CI_COMMIT_TAG} if a git tag is present
+  rules:
+    - if: '$CI_COMMIT_TAG == null' # Run for all commits, except tags
 #  rules:
 #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH      # Run for all changes to the default branch only
+
+deploy-tag:
+  stage: deploy
+  environment: production
+  script:
+    - echo "Deploying application release..."
+    - cd $CI_PROJECT_DIR/package_artefacts
+    - INSTALLER_FILE=$(find CustusX*.tar.gz)
+    - 'curl
+           --header "JOB-TOKEN: $CI_JOB_TOKEN"
+           --upload-file $INSTALLER_FILE
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}/$INSTALLER_FILE"'
+  rules:
+    - if: '$CI_COMMIT_TAG != null' # Run if a tag is present (= release or release candidate)
 
 pages:
   stage: deploy
