@@ -45,7 +45,7 @@ test-job:   # This job runs the Unit + Integration tests
         coverage_format: cobertura
         path: ${CI_PROJECT_DIR}/test_results/coverage.xml
 
-.deploy
+.deploy:
   stage: deploy
   environment: production
   variables:
