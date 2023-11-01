@@ -25,6 +25,7 @@ build-job:       # This job runs in the build stage, which runs first.
       - package_artefacts/CustusX*.tar.gz
       - package_artefacts/html_pure/
       - package_artefacts/html_dev/
+    #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
 test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -44,33 +45,33 @@ test-job:   # This job runs the Unit + Integration tests
         coverage_format: cobertura
         path: ${CI_PROJECT_DIR}/test_results/coverage.xml
 
-deploy-commmit:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+.deploy
+  stage: deploy
   environment: production
+  variables:
+    VERSION: ${CI_COMMIT_SHORT_SHA}
   script:
-    - echo "Deploying application for commit..."
-    - cd $CI_PROJECT_DIR/package_artefacts
-    - INSTALLER_FILE=$(find CustusX*.tar.gz)
-    - 'curl
-           --header "JOB-TOKEN: $CI_JOB_TOKEN"
-           --upload-file $INSTALLER_FILE
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_SHORT_SHA}/$INSTALLER_FILE"'
+  - echo "Deploying application..."
+  - cd $CI_PROJECT_DIR/package_artefacts
+  - INSTALLER_FILE=$(find CustusX*.tar.gz)
+  - 'curl
+     --header "JOB-TOKEN: $CI_JOB_TOKEN"
+     --upload-file $INSTALLER_FILE
+     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$INSTALLER_FILE"'
+
+deploy-commmit:
+  extends: .deploy
+  variables:
+    VERSION: ${CI_COMMIT_SHORT_SHA}
   rules:
     - if: '$CI_COMMIT_TAG == null' # Run for all commits, except tags
 #  rules:
 #    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH      # Run for all changes to the default branch only
 
 deploy-tag:
-  stage: deploy
-  environment: production
-  script:
-    - echo "Deploying application release..."
-    - cd $CI_PROJECT_DIR/package_artefacts
-    - INSTALLER_FILE=$(find CustusX*.tar.gz)
-    - 'curl
-           --header "JOB-TOKEN: $CI_JOB_TOKEN"
-           --upload-file $INSTALLER_FILE
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}/$INSTALLER_FILE"'
+  extends: .deploy
+  variables:
+    VERSION: ${CI_COMMIT_TAG}
   rules:
     - if: '$CI_COMMIT_TAG != null' # Run if a tag is present (= release or release candidate)
 
