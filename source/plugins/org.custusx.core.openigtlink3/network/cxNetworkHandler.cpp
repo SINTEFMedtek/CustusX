@@ -230,7 +230,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 //										<< " transform: " << cxtransform;
 
 
-		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
+		// Try to use equipmentId from OpenIGTLink meta data. If not present use deviceName.
 		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
 		// and added to the messages from Plus.
 		std::string openigtlinktransformid;
@@ -366,9 +366,12 @@ void NetworkHandler::processImageAndEmitProbeDefinition(ImagePtr cximage, QStrin
 
 bool NetworkHandler::emitProbeDefinitionIfChanged(QString deviceName)
 {
-	if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
+	//if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
+	//Always send probe definition - Needed for combining IGSTK tracking with OpenIGTLink video
+	if (mProbeDefinitionFromStringMessages->haveValidValues())
 	{
 		mProbeDefinition = mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName);
+		//CX_LOG_DEBUG() << "emitProbeDefinitionIfChanged";
 		emit probedefinition(deviceName, mProbeDefinition);
 		return true;
 	}
