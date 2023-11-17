@@ -59,16 +59,17 @@ class Component(object):
 #        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
-            print("*** %s already exists, checkout ignored." % path)
             return True
         return False
     def checkout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         path = self.path()+'/'+self.sourceFolder()
         if self._checkout_check_exist('%s/.git'%path):
+            print("*** %s already exists, checkout ignored." % path)
             return
-        if self._checkout_check_exist('%s/.svn'%path):
-            return
+        if self._checkout_check_exist('%s'%path):
+            print("Not a git repo, removing folder and contents of %s before cloning." % path)
+            shutil.rmtree(path)
         self._rawCheckout()
 #    def _rawCheckout(self):
 #        'checkout the component source from external source to this computer (svn co or similar)'

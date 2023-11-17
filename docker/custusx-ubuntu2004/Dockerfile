@@ -1,15 +1,14 @@
-# Docker image with prebuilt libraries and CustusX
+# Empty Docker image with build environment for CustusX
 # Useful docker commands.
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
 # Create:
-# sudo docker build -t custusx-build-ubuntu2004 .
-# sudo docker build --no-cache -t custusx-build-ubuntu2004 .
+# sudo docker build -t custusx-ubuntu2004 .
 
 # Give created image a name/tag, and upload new image
 # TODO: Create a CustusX organization on Docker
-# sudo docker tag custusx-build-ubuntu2004 olevs/custusx-build-ubuntu2004
-# sudo docker push olevs/custusx-build-ubuntu2004
+# sudo docker tag custusx-ubuntu2004 olevs/custusx-ubuntu2004
+# sudo docker push olevs/custusx-ubuntu2004
 
 # List all docker container
 # sudo docker ps --all
@@ -62,32 +61,7 @@ RUN \
   DEBIAN_FRONTEND=noninteractive \
   apt install -y \
   doxygen gnuplot \
-  xvfb gcovr curl
-
-# Ubuntu 20.04, from https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/linux.html
-#RUN DEBIAN_FRONTEND=noninteractive apt install -y git subversion build-essential cmake cmake-curses-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5xmlpatterns5-dev libqt5svg5-dev qtwebengine5-dev qtscript5-dev qtbase5-private-dev libqt5x11extras5-dev libxt-dev
-#RUN apt install -y ninja-build gawk
-
-# Install Xvfb - to be run from gitlab runner
-
-# Prepare gitlab build
-# gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
-RUN \
-  mkdir -p /builds/custusx && \
-  cd /builds/custusx && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git && \
-  cd CustusX && \
-  git checkout develop
-
-RUN \
-  cd /builds/custusx/CustusX && \
-  ./install/cxJenkinsMasterBuild.py --create_package
-
-
-RUN \
-  apt-get upgrade -y && apt-get update -y && \
-  DEBIAN_FRONTEND=noninteractive \
-  apt install -y \
+  xvfb gcovr curl \
   libqt5serialport5-dev
 
 WORKDIR /builds/custusx/CustusX
