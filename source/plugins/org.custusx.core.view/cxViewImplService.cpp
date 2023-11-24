@@ -504,7 +504,7 @@ ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData v
 {
 	if (viewData.mType == View::VIEW_2D)
 	{
-		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mServices));
+		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mServices, mSenterToTool2D));
 		wrapper->initializePlane(viewData.mPlane);
 		connect(wrapper.get(), &ViewWrapper2D::pointSampled, this, &ViewImplService::pointSampled);
 		return wrapper;
@@ -691,6 +691,11 @@ void ViewImplService::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
 void ViewImplService::addDefaultLayout(LayoutData layoutData)
 {
 	mLayoutRepository->addDefault(layoutData);
+}
+
+void ViewImplService::setSenterToTool2D(bool senterToTool2D)
+{
+	mSenterToTool2D = senterToTool2D;
 }
 
 void ViewImplService::enableContextMenuForViews(bool enable)

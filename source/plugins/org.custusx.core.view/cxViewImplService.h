@@ -117,6 +117,7 @@ public:
 
 	virtual void setCameraStyle(CAMERA_STYLE_TYPE style, int groupIdx);
 	virtual void zoomCamera3D(int viewGroup3DNumber, int zoomFactor);
+	virtual void setSenterToTool2D(bool senterToTool2D);
 
 public slots:
     virtual void aboutToStop();
@@ -188,6 +189,8 @@ private:
 	SlicePlanesProxyPtr mSlicePlanesProxy;
 
 	CameraStyleInteractorPtr mCameraStyleInteractor;
+
+	bool mSenterToTool2D = true;
 
 };
 typedef boost::shared_ptr<ViewImplService> ViewImplServicePtr;
