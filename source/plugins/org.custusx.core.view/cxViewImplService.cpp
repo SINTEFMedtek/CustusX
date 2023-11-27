@@ -504,7 +504,7 @@ ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData v
 {
 	if (viewData.mType == View::VIEW_2D)
 	{
-		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mServices, mSenterToTool2D));
+		ViewWrapper2DPtr wrapper(new ViewWrapper2D(view, mServices, mCenterToTool2D));
 		wrapper->initializePlane(viewData.mPlane);
 		connect(wrapper.get(), &ViewWrapper2D::pointSampled, this, &ViewImplService::pointSampled);
 		return wrapper;
@@ -693,9 +693,9 @@ void ViewImplService::addDefaultLayout(LayoutData layoutData)
 	mLayoutRepository->addDefault(layoutData);
 }
 
-void ViewImplService::setSenterToTool2D(bool senterToTool2D)
+void ViewImplService::setCenterToTool2D(bool centerToTool2D)
 {
-	mSenterToTool2D = senterToTool2D;
+	mCenterToTool2D = centerToTool2D;
 }
 
 void ViewImplService::enableContextMenuForViews(bool enable)

@@ -57,7 +57,7 @@ class org_custusx_core_view_EXPORT ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool senterToTool = true);
+	ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerToTool = true);
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewPtr getView();
@@ -129,7 +129,7 @@ private:
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
 	ViewPtr mView;
 	ViewFollowerPtr mViewFollower;
-	bool mSenterToTool;
+	bool mCenterToTool;
 
 	// synchronized data
 	Zoom2DHandlerPtr mZoom2D;

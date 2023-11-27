@@ -184,9 +184,9 @@ void ViewServiceProxy::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
 	mViewService->zoomCamera3D(viewGroup3DNumber, zoomFactor);
 }
 
-void ViewServiceProxy::setSenterToTool2D(bool senterToTool2D)
+void ViewServiceProxy::setCenterToTool2D(bool centerToTool2D)
 {
-	mViewService->setSenterToTool2D(senterToTool2D);
+	mViewService->setCenterToTool2D(centerToTool2D);
 }
 
 void ViewServiceProxy::addDefaultLayout(LayoutData layoutData)
