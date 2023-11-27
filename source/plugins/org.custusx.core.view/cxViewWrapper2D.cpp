@@ -67,9 +67,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
+ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerToTool) :
 	ViewWrapper(backend),
-	mOrientationActionGroup(new QActionGroup(view.get()))
+	mOrientationActionGroup(new QActionGroup(view.get())),
+	mCenterToTool(centerToTool)
 {
 	qRegisterMetaType<Vector3D>("Vector3D");
 	mView = view;
@@ -302,8 +303,11 @@ void ViewWrapper2D::applyViewFollower()
 //	CX_LOG_CHANNEL_DEBUG("CA") << "roi=" << roiUid;
 //	CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom=" << result.zoom << ", center=" << result.center_shift_s;
 	this->changeZoom(result.zoom);
-	Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
-	mServices->patient()->setCenter(newcenter_r);
+	if (mCenterToTool)
+	{
+		Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
+		mServices->patient()->setCenter(newcenter_r);
+	}
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
