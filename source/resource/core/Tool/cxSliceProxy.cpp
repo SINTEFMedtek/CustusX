@@ -63,6 +63,7 @@ void SliceProxy::setTool(ToolPtr tool)
 	}
 
 	mTool = tool;
+	mCutplane->setIsProbe(mTool->hasType(Tool::TOOL_US_PROBE));
 
 	if (mTool)
 	{
