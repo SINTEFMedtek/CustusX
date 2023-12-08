@@ -91,6 +91,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	// Selectors for virtual endoscope control
 	QGroupBox	*endoscopeBox = new QGroupBox(tr("Bronchoscope"));
 	QGridLayout	*endoscopeControlLayout = new QGridLayout;
+	QGridLayout	*endoscopeButtonsLayout = new QGridLayout;
 	QLabel		*labelRot = new QLabel(tr("Rotate (W/S)"));
 	QLabel		*labelViewLeftRight = new QLabel(tr("Left/right (R/F)"));
 	QLabel		*labelViewUpDown = new QLabel(tr("Up/Down (E/D)"));
@@ -115,8 +116,9 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	endoscopeControlLayout->addWidget(mRotateDial,1,0);
 	endoscopeControlLayout->addWidget(mViewDialUpDown,1,1);
 	endoscopeControlLayout->addWidget(mViewDialLeftRight,1,2);
-	endoscopeControlLayout->addWidget(mResetEndoscopeButton,2,0);
-	endoscopeControlLayout->addWidget(mUseAutomaticRotationButton,2,2);
+	endoscopeButtonsLayout->addWidget(mResetEndoscopeButton,0,0);
+	endoscopeButtonsLayout->addWidget(mUseAutomaticRotationButton,0,1);
+	endoscopeControlLayout->addLayout(endoscopeButtonsLayout,2,0,1,3);
 	endoscopeBox->setLayout(endoscopeControlLayout);
 	mVerticalLayout->addWidget(endoscopeBox);
 
