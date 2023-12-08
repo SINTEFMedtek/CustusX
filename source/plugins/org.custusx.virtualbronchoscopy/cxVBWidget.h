@@ -61,7 +61,8 @@ protected:
 	QPushButton					*mPlayButton;
 	QTimer*						mTimer;
 	QDial*						mRotateDial;
-	QDial*						mViewDial;
+	QDial*						mViewDialLeftRight;
+	QDial*						mViewDialUpDown;
 	QPushButton*				mResetEndoscopeButton;
 	QPushButton*				mUseAutomaticRotationButton;
 	QPalette					mAutomaticRotationButtonBackgroundColor;

@@ -52,7 +52,8 @@ private:
 	Vector3D mLastCameraPos_r;
 	Vector3D mLastCameraFocus_r;
 	Vector3D mLastStoredViewVector;
-	double mLastCameraViewAngle;
+	double mLastCameraViewAngleX;
+	double mLastCameraViewAngleY;
 	double mLastCameraRotAngle;
 	double mPositionPercentage;
 	bool mAutomaticRotation;
@@ -87,7 +88,8 @@ signals:
 public slots:
 	void cameraRawPointsSlot(MeshPtr mesh);
 	void cameraPathPositionSlot(int positionPermillage);
-	void cameraViewAngleSlot(int angle);
+	void cameraViewAngleXSlot(int angle);
+	void cameraViewAngleYSlot(int angle);
 	void cameraRotateAngleSlot(int angle);
 
 };

@@ -34,7 +34,8 @@ CXVBcameraPath::CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePt
 	mTrackingService(tracker),
 	mPatientModelService(patientModel),
 	mViewService(visualization),
-	mLastCameraViewAngle(0),
+	mLastCameraViewAngleX(0),
+	mLastCameraViewAngleY(0),
 	mLastCameraRotAngle(0),
 	mAutomaticRotation(true),
 	mWritePositionsToFile(false)
@@ -156,11 +157,12 @@ void CXVBcameraPath::updateManualToolPosition()
 	rMt.matrix().col(2).head(3) = viewDirection_r;
 	rMt.matrix().col(3).head(3) = mLastCameraPos_r;
 
-	Transform3D rotateX = createTransformRotateX(mLastCameraViewAngle);
+	Transform3D rotateX = createTransformRotateX(mLastCameraViewAngleX);
+	Transform3D rotateY = createTransformRotateY(mLastCameraViewAngleY);
 	Transform3D rotateZ = createTransformRotateZ(mLastCameraRotAngle);
 
 	Transform3D rMpr = mPatientModelService->get_rMpr();
-	Transform3D prMt = rMpr.inv() * rMt * rotateZ * rotateX;
+	Transform3D prMt = rMpr.inv() * rMt * rotateZ * rotateY * rotateX;
 
 	mManualTool->set_prMt(prMt);
 
@@ -249,9 +251,15 @@ std::vector< double > CXVBcameraPath::smoothCameraRotations(std::vector< double 
 }
 
 
-void CXVBcameraPath::cameraViewAngleSlot(int angle)
+void CXVBcameraPath::cameraViewAngleXSlot(int angle)
 {
-	mLastCameraViewAngle = static_cast<double>(angle) * (M_PI / 180.0);
+	mLastCameraViewAngleX = static_cast<double>(angle) * (M_PI / 180.0);
+	this->updateManualToolPosition();
+}
+
+void CXVBcameraPath::cameraViewAngleYSlot(int angle)
+{
+	mLastCameraViewAngleY = static_cast<double>(angle) * (M_PI / 180.0);
 	this->updateManualToolPosition();
 }
 
