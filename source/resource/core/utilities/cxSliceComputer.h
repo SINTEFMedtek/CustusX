@@ -91,7 +91,7 @@ private:
 	PLANE_TYPE mPlaneType;
 	FOLLOW_TYPE mFollowType;
 	Vector3D mFixedCenter;
-	bool mIsProbe;
+	bool mIsProbe = false;
 
 	Transform3D m_rMt;
 	double mToolOffset;
