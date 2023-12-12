@@ -138,7 +138,10 @@ TEST_CASE("SliceComputer handles anyplanes using follow tool", "[unit][resource]
 	// test viewOffset
 	slicer.setToolViewOffset(true, 40, 0.25);
 	slicer.setPlaneType(cx::ptANYPLANE);
+	slicer.setIsProbe(true);
 	CHECK(cx::similar(slicer.getPlane().c, c_tool-10.0*cx::Vector3D(0, 0, 1)));
+	slicer.setIsProbe(false);
+	CHECK(cx::similar(slicer.getPlane().c, c_tool+10.0*cx::Vector3D(0, 0, 1)));
 	slicer.setToolViewOffset(false, 40, 0.25);
 
 	// perform test with gravity vector normal to any direction.
