@@ -199,6 +199,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"Nodules",
 	"LungVessels",
 	"AirwaysEnhanced",
+	"AirwaysEnhancedCopy",
 	"Centerlines",
 	"AirwayCenterlines",
 	"RouteToTarget",

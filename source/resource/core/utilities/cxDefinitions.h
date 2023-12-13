@@ -233,6 +233,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		otNODULES,
 		otLUNG_VESSELS,
 		otAIRWAYS_ENHANCED,
+		otAIRWAYS_ENHANCED_COPY,
 		otCENTERLINES,
 		otAIRWAYS_CENTERLINES,
 		otROUTE_TO_TARGET,
@@ -265,6 +266,11 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 	static QString airwaysFilterGetNameSuffixColored()
 	{
 		return "_colored";
+	}
+
+	static QString airwaysFilterGetNameSuffixCopy()
+	{
+		return "_copy";
 	}
 
 	static QString airwaysFilterGetNameSuffixLungs()

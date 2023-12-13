@@ -109,6 +109,11 @@ Transform3D SliceComputer::getToolPosition() const
 	return m_rMt;
 }
 
+void SliceComputer::setIsProbe(bool isProbe)
+{
+	mIsProbe = isProbe;
+}
+
 /**Set the position of the navigation tool, using the
  * standard definition of a tool transform (given in Tool).
  */
@@ -246,14 +251,18 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
 	Vector3D newCenter = toolOffsetCenter + centerOffset * base.j;
 	double toolOffsetDistance = dot(newCenter - base.c, base.j);
 
-	// limit by tooltip
-	Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
-	newCenter = toolCenter - centerOffset * base.j;
-	double toolDistance = dot(newCenter - base.c, base.j);
+	if(mIsProbe)
+	{// limit by tooltip
+		Vector3D toolCenter = m_rMt.coord(Vector3D(0,0,0));
+		newCenter = toolCenter - centerOffset * base.j;
+		double toolDistance = dot(newCenter - base.c, base.j);
 
-	// select a dist and apply
-	double usedDistance = std::min(toolOffsetDistance, toolDistance);
-	retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
+		// select a dist and apply
+		double usedDistance = std::min(toolOffsetDistance, toolDistance);
+		retval.c = base.c + usedDistance * base.j; // extract j-component of newCenter
+	}
+	else
+		retval.c = base.c + toolOffsetDistance * base.j; // extract j-component of newCenter
 
 	return retval;
 }
