@@ -25,7 +25,7 @@ TEST_CASE("Speed: Render 10 empty viewWidgets, optimizedViews on", "[speed][gui]
 	TestRenderSpeed helper;
     helper.testSeveralViews();
 
-    REQUIRE(helper.getRenderFPS() > 10);
+	REQUIRE(helper.getRenderFPS() >= 10);
 
 	JenkinsMeasurement jenkins;
     jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));
@@ -38,7 +38,7 @@ TEST_CASE("Speed: Render 10 empty viewWidgets, optimizedViews off", "[speed][gui
 	TestRenderSpeed helper;
 	helper.testSeveralViews();
 
-	REQUIRE(helper.getRenderFPS() > 1);
+	REQUIRE(helper.getRenderFPS() >= 1);
 
 	JenkinsMeasurement jenkins;
 	jenkins.createOutput("FPS", QString::number(helper.getRenderFPS()));

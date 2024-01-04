@@ -70,7 +70,8 @@ class Controller(cxBuildScript.BuildScript):
                 target_platform=self.controlData().getTargetPlatform(),                                                                    
                 root_dir=self.controlData().getRootDir(),
                 install_root=self.cxInstaller.getInstalledFolder(),
-                system_base_name=self.controlData().system_base_name)
+                system_base_name=self.controlData().system_base_name,
+                source_custusx_path=self.cxInstaller.source_custusx_path)
 
     def runAnalyze(self):
 #        self.cxBuilder.deleteCustusXBuildFolder()

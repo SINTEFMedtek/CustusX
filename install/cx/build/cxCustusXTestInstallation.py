@@ -36,7 +36,7 @@ class CustusXTestInstallation(object):
     Represents one installed version of CustusX,
     along with functionality for testing it.
     '''
-    def __init__(self, target_platform, root_dir, install_root, system_base_name):
+    def __init__(self, target_platform, root_dir, install_root, system_base_name, source_custusx_path):
         '''
         target_platform: cxUtilities.PlatformInfo instance describing target platform
         root_dir: root dir for user data. Test results can be placed here.
@@ -47,12 +47,13 @@ class CustusXTestInstallation(object):
         self.root_dir = root_dir
         self.install_root = install_root
         self.system_base_name = system_base_name
+        self.source_custusx_path = source_custusx_path
         
     def getTestDataPath(self):
-        return "%s/CX/CX/data" % self.root_dir
+        return "%s/custusx/CustusX/data" % self.root_dir
 
     def getLargeTestDataPath(self):
-        return "%s/CX/CX/largedata" % self.root_dir
+        return "%s/custusx/CustusX/largedata" % self.root_dir
 
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)
@@ -80,7 +81,7 @@ class CustusXTestInstallation(object):
         testRunner = cxTestRunner.TestRunner(self.target_platform)
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
         tags = testRunner.includeTagsForOS(tags)
-        outPath = testRunner.generateOutpath(self.root_dir)
+        outPath = testRunner.generateOutpath(self.source_custusx_path)
         testRunner.runCatchTestsWrappedInCTestGenerateJUnit(tags, catchPath=appPath, outPath=outPath)
 
     def _runCatchTestsOnInstalled(self, tags):
@@ -89,7 +90,7 @@ class CustusXTestInstallation(object):
         testRunner = cxTestRunner.TestRunner(self.target_platform)
         testRunner.resetCustusXDataRepo(self.getTestDataPath())
         tags = testRunner.includeTagsForOS(tags)
-        outPath = testRunner.generateOutpath(self.root_dir)
+        outPath = testRunner.generateOutpath(self.source_custusx_path)
         testRunner.runCatch(tag=tags, path=appPath, outpath=outPath)
 
     def _getInstalledBinaryPath(self):

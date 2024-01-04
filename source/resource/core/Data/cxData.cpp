@@ -181,7 +181,9 @@ void Data::guessOrganType()
 	QString nameWithouthSpaces = this->mName.simplified();
 	nameWithouthSpaces.replace(" ", "");
 	mOrganType = string2enum<ORGAN_TYPE>(nameWithouthSpaces);
-	if((mOrganType != organtypeCOUNT) && (mOrganType != otUNKNOWN))
+	if(mOrganType == organtypeCOUNT)
+		mOrganType = otUNKNOWN;
+	if(mOrganType != otUNKNOWN)
 	{
 //		CX_LOG_DEBUG() << "Data::guessOrganType: Found organ: " << mOrganType << " " << enum2string(mOrganType) << ". From name: " << this->mName;
 		return;

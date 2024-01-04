@@ -55,6 +55,7 @@ class cxResource_EXPORT SliceComputer
 public:
 	SliceComputer();
 	~SliceComputer();
+	void setIsProbe(bool isProbe);
 	void setToolPosition(const Transform3D& rMt);
 	void setOrientationType(ORIENTATION_TYPE val);
 	void setPlaneType(PLANE_TYPE val);
@@ -90,6 +91,7 @@ private:
 	PLANE_TYPE mPlaneType;
 	FOLLOW_TYPE mFollowType;
 	Vector3D mFixedCenter;
+	bool mIsProbe = false;
 
 	Transform3D m_rMt;
 	double mToolOffset;

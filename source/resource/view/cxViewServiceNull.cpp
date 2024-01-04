@@ -95,6 +95,11 @@ void ViewServiceNull::zoomCamera3D(int viewGroup3DNumber, int zoomFactor)
 	printWarning();
 }
 
+void ViewServiceNull::setCenterToTool2D(bool centerToTool2D)
+{
+	printWarning();
+}
+
 void ViewServiceNull::addDefaultLayout(LayoutData layoutData)
 {
 	printWarning();
