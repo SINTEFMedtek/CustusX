@@ -63,7 +63,8 @@ public:
 	virtual bool execute();
 	virtual bool postProcess();
 	virtual bool postProcessBloodVessels();
-    void setSmoothing(bool smoothing = true);
+	void setSmoothing(bool smoothing = true);
+	void setUseExtraAirwayPoints(bool useExtraAirwayPoints);
 
 protected:
 	virtual void createOptions();
@@ -82,6 +83,7 @@ private:
     BranchListPtr mBranchListPtr;
     bool mGenerateFileWithRouteInformation;
     bool mSmoothing;
+		bool mUseExtraAirwayPoints = false;
 		bool mReprocessCenterline = true;
     BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };

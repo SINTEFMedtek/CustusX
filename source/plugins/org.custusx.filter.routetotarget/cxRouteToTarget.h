@@ -28,11 +28,12 @@ public:
 	void processBloodVesselCenterline(Eigen::MatrixXd positions);
 	void findClosestPointInBranches(Vector3D targetCoordinate_r);
 	void findClosestPointInBloodVesselBranches(Vector3D targetCoordinate_r);
-	void findRoutePositions();
+	void findRoutePositions(std::vector< Eigen::Vector3d > initialRoutePositions = std::vector< Eigen::Vector3d >());
 	void findRoutePositionsInBloodVessels();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
 	void searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int startIndex);
-	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint, PointMetricPtr centerlinEndPoint = NULL);
+	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint, std::map<QString, PointMetricPtr> extraAirwayPoints = std::map<QString, PointMetricPtr>());
+	std::vector<Eigen::Vector3d> findRouteAlongExtraPoints(Vector3D targetPosition, std::map<QString, PointMetricPtr> extraAirwayPoints);
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint);
 	vtkPolyDataPtr generateAirwaysFromBloodVesselCenterlines();
@@ -55,6 +56,8 @@ public:
 
 
 private:
+	std::vector<Eigen::Vector3d> insertAndinterpolate(std::vector<Eigen::Vector3d> routePositions, Vector3D newPosition, double interpolationDistance);
+
 	Eigen::MatrixXd mCLpoints;
 	bool mSmoothing = true;
 	BranchListPtr mBranchListPtr;
@@ -66,6 +69,7 @@ private:
 	ImagePtr mBloodVesselVolume;
 	Vector3D mTargetPosition;
 	Vector3D mEndPointAlongCenterline;
+	std::vector< Eigen::Vector3d > mExtraAirwayPoints;
 	std::vector< Eigen::Vector3d > mRoutePositions;
 	std::vector< Eigen::Vector3d > mExtendedRoutePositions;
 	std::vector<BranchPtr> mRoutePositionsBranch;
