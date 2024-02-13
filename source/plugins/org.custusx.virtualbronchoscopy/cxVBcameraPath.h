@@ -36,7 +36,7 @@ namespace cx {
  * \author Geir Arne Tangen, SINTEF
  */
 
-class CXVBcameraPath : public QObject
+class org_custusx_virtualbronchoscopy_EXPORT CXVBcameraPath : public QObject
 {
 	Q_OBJECT
 
