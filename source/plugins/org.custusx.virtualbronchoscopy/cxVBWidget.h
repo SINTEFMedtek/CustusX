@@ -52,6 +52,7 @@ public:
 	void setCameraRotationAlongRoute(std::vector< double > cameraRotations);
 	void setBranchingIndexAlongRoute(std::vector< int > branchingIndex);
 	void setRecordVideoOption(bool recordVideo);
+	void disableAutomaticRotation();
 
 protected:
 	QString defaultWhatsThis() const;

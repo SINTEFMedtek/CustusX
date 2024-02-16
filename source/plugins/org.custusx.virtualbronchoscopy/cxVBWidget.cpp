@@ -364,6 +364,12 @@ void VBWidget::updateRotationDialSlot(int value)
 	mRotateDial->setValue(value);
 }
 
+void VBWidget::disableAutomaticRotation()
+{
+	if(mAutomaticRotation)
+		this->automaticRotationSlot();
+}
+
 QString VBWidget::defaultWhatsThis() const
 {
 return "<html>"

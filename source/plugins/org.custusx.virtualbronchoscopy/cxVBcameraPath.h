@@ -57,16 +57,19 @@ private:
 	double mLastCameraRotAngle;
 	double mPositionPercentage;
 	bool mAutomaticRotation;
+	bool mNavigateAlongAirwayWall = false;
 	bool mWritePositionsToFile;
 	QString mPositionsFilePath;
 	QElapsedTimer mTimeSinceStartRecording;
 
 	std::vector< Eigen::Vector3d > mRoutePositions;
+	std::vector< double > mRadius;
 	std::vector< double > mCameraRotations;
 	std::vector< double > mCameraRotationsSmoothed;
 	std::vector< int > mBranchingIndex;
 
 	void updateManualToolPosition();
+	Transform3D moveToolPositionToAirwayWall(Transform3D prMt);
 	void generateSplineCurve(MeshPtr mesh);
 	void generateSplineCurve(std::vector< Eigen::Vector3d > routePositions);
 	std::vector< double > smoothCameraRotations(std::vector< double > cameraRotations);
@@ -76,9 +79,11 @@ public:
 	CXVBcameraPath(TrackingServicePtr tracker, PatientModelServicePtr patientModel, ViewServicePtr visualization);
 
 	void setRoutePositions(std::vector< Eigen::Vector3d > routePositions);
+	void setRadiusAlongRoute(std::vector< double > radius);
 	void setCameraRotations(std::vector< double > cameraRotations);
 	void setBranchingIndexAlongRoute(std::vector< int > branchingIndex);
 	void setAutomaticRotation(bool automaticRotation);
+	void setNavigateAlongAirwayWall(bool navigateAlongAirwayWall);
 	void setWritePositionsToFile(bool write);
 	void setWritePositionsFilePath(QString path);
 
