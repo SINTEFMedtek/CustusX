@@ -165,11 +165,7 @@ void CXVBcameraPath::updateManualToolPosition()
 	Transform3D prMt = rMpr.inv() * rMt * rotateZ * rotateY * rotateX;
 
 	if(mNavigateAlongAirwayWall)
-	{
-		CX_LOG_DEBUG() << "Position before adjustment: " << prMt;
 		prMt = moveToolPositionToAirwayWall(prMt);
-		CX_LOG_DEBUG() << "Position after adjustment: " << prMt;
-	}
 
 	mManualTool->set_prMt(prMt);
 
@@ -188,16 +184,14 @@ Transform3D CXVBcameraPath::moveToolPositionToAirwayWall(Transform3D prMt)
 	if(!USprobe)
 		return prMt;
 
-	ProbeDefinition probeDefinition = USprobe->getProbeDefinition(); // Need to check if probeDefinition exists?
+	ProbeDefinition probeDefinition = USprobe->getProbeDefinition();
 	int index = (int) (mPositionPercentage * (mRoutePositions.size() - 1));
 	double probeOffset = probeDefinition.getDepthStart();
 	int distanceToWall = mRadius[index] - probeOffset;
 	Transform3D tMw = Transform3D::Identity();
 	tMw.matrix().col(3).head(3) = Vector3D(0, 0, 1) * distanceToWall;
-	CX_LOG_DEBUG() << "tMw: " << tMw;
 
 	return prMt * tMw;
-
 }
 
 void CXVBcameraPath::setWritePositionsToFile(bool write)
