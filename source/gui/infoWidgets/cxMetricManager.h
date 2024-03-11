@@ -40,6 +40,7 @@ public:
 	MetricManager(ViewServicePtr viewService, PatientModelServicePtr patientModelService, TrackingServicePtr trackingService, SpaceProviderPtr spaceProvider, FileManagerServicePtr filemanager);
 
 	DataMetricPtr getMetric(QString uid);
+	std::map<QString, PointMetricPtr> getPointMetrics(QString nameContains);
 	int getNumberOfMetrics() const;
 	void moveToMetric(QString uid);
 	void setSelection(std::set<QString> selection);

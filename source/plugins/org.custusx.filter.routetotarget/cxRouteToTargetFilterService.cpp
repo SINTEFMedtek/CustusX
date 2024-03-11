@@ -33,6 +33,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewService.h"
 #include "cxLog.h"
+#include "cxMetricManager.h"
 
 #include <vtkPolyData.h>
 
@@ -112,12 +113,6 @@ void RouteToTargetFilter::createInputTypes()
 	targetPoint->setHelp("Select target point metric");
 	mInputTypes.push_back(targetPoint);
 
-	StringPropertySelectPointMetricPtr viaPoint;
-	viaPoint = StringPropertySelectPointMetric::New(mServices->patient());
-	viaPoint->setValueName("Via point");
-	viaPoint->setHelp("Select via point metric");
-	mInputTypes.push_back(viaPoint);
-
 	StringPropertySelectMeshPtr bloodVesselCenterline;
 	bloodVesselCenterline = StringPropertySelectMesh::New(mServices->patient());
 	bloodVesselCenterline->setValueName("Blood vessel centerline");
@@ -166,10 +161,17 @@ void RouteToTargetFilter::createOutputTypes()
     mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
 }
 
-
 bool RouteToTargetFilter::execute()
 {
 	mRouteToTarget.reset(new RouteToTarget());
+
+	std::map<QString, PointMetricPtr> extraAirwayPoints;
+	if(mUseExtraAirwayPoints)
+	{
+		MetricManagerPtr metricManager = MetricManagerPtr(new MetricManager(mServices->view(), mServices->patient(), mServices->tracking(), mServices->spaceProvider(), mServices->file()));
+		extraAirwayPoints = metricManager->getPointMetrics("AirwayPoint");
+		CX_LOG_DEBUG() << "extraAirwayPoints.size(): " << extraAirwayPoints.size();
+	}
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!mesh)
@@ -178,8 +180,6 @@ bool RouteToTargetFilter::execute()
 	PointMetricPtr targetPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[1])->getPointMetric();
 	if (!targetPoint)
 		return false;
-
-	PointMetricPtr viaPoint = boost::dynamic_pointer_cast<StringPropertySelectPointMetric>(mInputTypes[2])->getPointMetric();
 
 	mRouteToTarget->setSmoothing(mSmoothing);
 
@@ -194,8 +194,8 @@ bool RouteToTargetFilter::execute()
 	}
 
     //note: mOutput is in reference space
-	if(viaPoint)
-		mOutput = mRouteToTarget->findRouteToTarget(targetPoint, viaPoint);
+	if(!extraAirwayPoints.empty())
+		mOutput = mRouteToTarget->findRouteToTarget(targetPoint, extraAirwayPoints);
 	else
 		mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
 
@@ -211,7 +211,7 @@ bool RouteToTargetFilter::execute()
 	{
 		ImagePtr bloodVesselVolume = this->getCopiedInputImage(3);
 
-		MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[3])->getMesh();
+		MeshPtr bloodVesselCenterline = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 		if (bloodVesselCenterline)
 		{
 			if (bloodVesselVolume)
@@ -270,7 +270,7 @@ bool RouteToTargetFilter::postProcess()
 	if(mOutputTypes.size() > 1)
 		mOutputTypes[1]->setValue(outputCenterlineExt->getUid());
 
-	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[3])->getMesh();
+	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 	if(mBloodVesselRoute && bloodVesselCenterlineMesh && getBloodVesselOption(mOptions)->getValue())
 		postProcessBloodVessels();
 
@@ -293,7 +293,7 @@ bool RouteToTargetFilter::postProcessBloodVessels()
 	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 
-	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[3])->getMesh();
+	MeshPtr bloodVesselCenterlineMesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[2])->getMesh();
 
 	QString uidCenterlineBV = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixBloodVessel();
 	QString nameCenterlineBV = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixBloodVessel();
@@ -345,6 +345,11 @@ bool RouteToTargetFilter::postProcessBloodVessels()
 void RouteToTargetFilter::setSmoothing(bool smoothing)
 {
     mSmoothing = smoothing; // default true
+}
+
+void RouteToTargetFilter::setUseExtraAirwayPoints(bool useExtraAirwayPoints)
+{
+	mUseExtraAirwayPoints = useExtraAirwayPoints; // default false
 }
 
 std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions(bool extendedRoute)
