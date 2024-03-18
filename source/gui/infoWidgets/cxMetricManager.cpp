@@ -73,6 +73,22 @@ DataMetricPtr MetricManager::getMetric(QString uid)
 	return metric;
 }
 
+std::map<QString, PointMetricPtr> MetricManager::getPointMetrics(QString nameContains)
+{
+	std::map<QString, PointMetricPtr> allMetrics = mPatientModelService->getDataOfType<PointMetric>();
+	std::map<QString, PointMetricPtr>::iterator it = allMetrics.begin();
+	std::map<QString, PointMetricPtr> selectedMetrics;
+	for( ; it != allMetrics.end(); ++it)
+	{
+		if(it->first.contains(nameContains))
+		{
+			selectedMetrics.insert({it->first, it->second});
+		}
+	}
+
+	return selectedMetrics;
+}
+
 int MetricManager::getNumberOfMetrics() const
 {
 	return this->getAllMetrics().size();
