@@ -158,6 +158,8 @@ void LogicManager::setApplicationComponent(ApplicationComponentPtr component)
 
 	if (mComponent)
 		mComponent->create();
+
+	emit pluginsStarted();
 }
 
 void LogicManager::restartWithNewProfile(QString uid)
