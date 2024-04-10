@@ -47,11 +47,12 @@ namespace cx
 {
 
 TrackingSystemBronchoscopyService::TrackingSystemBronchoscopyService(TrackingServicePtr trackingService, BronchoscopePositionProjectionPtr projectionCenterline, ToolPtr tool):
-	mBase(trackingService->getTrackingSystems().back()),
 	mTrackingService(trackingService),
 	mProjectionCenterline(projectionCenterline),
 	mTool(tool)
 {
+	mBase = this->getIGSTKTrackingSystemService();
+
 	connect(mBase.get(), &TrackingSystemService::stateChanged, this, &TrackingSystemBronchoscopyService::onStateChanged);
 	if (!mTool)
 		mTool = mTrackingService->getActiveTool(); // Use active tool if tool is not set
@@ -73,6 +74,17 @@ bool TrackingSystemBronchoscopyService::setTrackingSystem(QString trackingSystem
 			return true;
 		}
 	return false;
+}
+
+TrackingSystemServicePtr TrackingSystemBronchoscopyService::getIGSTKTrackingSystemService()
+{
+	std::vector<TrackingSystemServicePtr> trackingSystems = mTrackingService->getTrackingSystems();
+	for (unsigned i = 0; i < trackingSystems.size(); ++i)
+	{
+		if(trackingSystems[i]->getUid() == "org.custusx.core.tracking.system.igstk")
+			return trackingSystems[i];
+	}
+	return TrackingSystemServicePtr();
 }
 
 void TrackingSystemBronchoscopyService::setTool(ToolPtr tool)

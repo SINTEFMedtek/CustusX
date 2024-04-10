@@ -26,6 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxMessageListener.h"
 #include "internal/cxLogThread.h"
+#include "internal/cxReporterThread.h"
 #include "QApplication"
 
 namespace cx
@@ -133,6 +134,21 @@ void Log::uninstallObserver(MessageObserverPtr observer)
 {
 	if (mWorker)
 		mWorker->uninstallObserver(observer);
+}
+
+void Log::stopQtMessages()
+{
+	ReporterThreadPtr reporterThread = boost::dynamic_pointer_cast<ReporterThread>(mWorker);
+	if (reporterThread)
+		reporterThread->stopQtMessages();
+	else
+		CX_LOG_WARNING() << "Found no reporterThread";
+}
+void Log::startQtMessages()
+{
+	ReporterThreadPtr reporterThread = boost::dynamic_pointer_cast<ReporterThread>(mWorker);
+	if (reporterThread)
+		reporterThread->startQtMessages();
 }
 
 

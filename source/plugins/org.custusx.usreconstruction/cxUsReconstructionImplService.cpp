@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <boost/bind.hpp>
 #include <ctkPluginContext.h>
+#include <vtkPolyData.h>
 #include "cxLogger.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
@@ -72,7 +73,7 @@ bool UsReconstructionImplService::isNull()
 
 void UsReconstructionImplService::patientChangedSlot()
 {
-	this->selectData(mPatientModelService->getActivePatientFolder() + "/US_Acq/");
+//	this->selectData(mPatientModelService->getActivePatientFolder() + "/US_Acq/");
 	emit newInputDataPath(this->getSelectedFileData().mFilename);
 }
 

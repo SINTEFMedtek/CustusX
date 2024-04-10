@@ -31,22 +31,26 @@ public:
 	void setTypeToBloodVessel(bool bloodVessel);
 	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 	void setBranches(BranchListPtr branches);
-	void setSegmentedVolume(vtkImageDataPtr segmentedVolume);
+	void setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd = Transform3D::Identity());
 	void processCenterline(vtkPolyDataPtr centerline_r);
 	BranchListPtr getBranchList();
+	vtkImageDataPtr getFilteredSegmentedVolume();
 	vtkPolyDataPtr generateTubes(double staticRadius = 0, bool mergeWithOriginalAirways = false);
 	vtkImageDataPtr initializeEmptyAirwaysVolume();
 	vtkImageDataPtr initializeAirwaysVolumeFromOriginalSegmentation();
-	vtkImageDataPtr addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double staticRadius = 0);
-	vtkImageDataPtr addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius);
 	void smoothAllBranchesForVB();
 	vtkPolyDataPtr addVTKPoints(std::vector< Eigen::Vector3d > positions);
 	vtkPolyDataPtr getVTKPoints();
 
 private:
+	void addSpheresAlongCenterlines(double staticRadius = 0);
+	void addSphereToImage(double position[3], double radius);
+	void removeIslandsFromImage();
+
 	Eigen::MatrixXd mCLpoints;
 	BranchListPtr mBranchListPtr;
 	vtkImageDataPtr mOriginalSegmentedVolume;
+	vtkImageDataPtr mFilteredSegmentedVolumePtr;
 	double mOrigin[3];
 	Vector3D mSpacing;
 	double mBounds[6];
@@ -56,6 +60,7 @@ private:
 	double mAirwaysVolumeSpacing;
 	bool mBloodVessel = false;
 	bool mMergeWithOriginalAirways = false;
+	Transform3D m_rMd = Transform3D::Identity();
 
 };
 

@@ -21,9 +21,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLogger.h"
 #include "ctkDICOMItem.h"
-#include "dcfilefo.h" // DcmFileFormat
-#include "dcdeftag.h" // defines all dcm tags
-#include "dcmimage.h"
+#include <dcmtk/dcmdata/dcfilefo.h> // DcmFileFormat
+#include <dcmtk/dcmdata/dcdeftag.h> // defines all dcm tags
+#include <dcmtk/dcmimgle/dcmimage.h>
 #include <string.h>
 
 #include "cxDicomImageReader.h"
@@ -67,15 +67,28 @@ QString DicomConverter::convertToValidName(QString text) const
 			<< "\\^" << "," << "\\%";
 	QRegExp regexp(QString("(%1)").arg(illegal.join("|")));
 	text = text.replace(regexp, "_");
-	return text	;
+	return text;
 }
-
 
 QString DicomConverter::generateName(DicomImageReaderPtr reader)
 {
-	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);
+	QString seriesDescription = reader->item()->GetElementAsString(DCM_SeriesDescription);//TODO Use DCM_CodeMeaning if DCM_SeriesDescription is missing?
+
+	if (seriesDescription.isEmpty())
+	{
+		//Modified code from ctkDICOMItem::GetElementAsString, searcing sub parameters as well
+		OFString s;
+		if ( reader->item()->CheckCondition( reader->item()->findAndGetOFString(DCM_CodeMeaning, s, 0, OFTrue) ) )
+			seriesDescription = reader->item()->Decode( DCM_CodeMeaning, s );
+	}
 	QString name = convertToValidName(seriesDescription);
 	return name;
+}
+
+QString DicomConverter::getSeriesNumber(DicomImageReaderPtr reader)
+{
+	QString seriesNumber = reader->item()->GetElementAsString(DCM_SeriesNumber);
+	return seriesNumber;
 }
 
 ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignoreLocalizerImages)
@@ -102,6 +115,7 @@ ImagePtr DicomConverter::createCxImageFromDicomFile(QString filename, bool ignor
 	QString uid = this->generateUid(reader);
 	QString name = this->generateName(reader);
 	cx::ImagePtr image = cx::Image::create(uid, name);
+	image->setDicomSeriesNumber(this->getSeriesNumber(reader));
 
 	vtkImageDataPtr imageData = reader->createVtkImageData();
 	if (!imageData)

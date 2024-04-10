@@ -133,4 +133,15 @@ void ReporterThread::sendToCout(Message message)
 	mCout->sendUnredirected(message.getPrintableMessage()+"\n");
 }
 
+void ReporterThread::stopQtMessages()
+{
+	qInstallMessageHandler(silenceQtMessages);
+}
+
+void ReporterThread::startQtMessages()
+{
+	qInstallMessageHandler(convertQtMessagesToCxMessages);
+}
+
+
 } //End namespace cx

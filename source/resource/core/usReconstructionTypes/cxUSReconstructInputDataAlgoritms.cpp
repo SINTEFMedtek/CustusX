@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxUSReconstructInputDataAlgoritms.h"
+#include <vtkPolyData.h>
 
 namespace cx
 {

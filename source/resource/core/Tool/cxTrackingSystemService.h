@@ -51,6 +51,8 @@ public:
 
 	virtual void resetTimeSynchronization() {}; ///< Reset time synchronization. Used for resetting time synchronization of incoming timestamps in OpenIGTLinkTrackingSystemService
 
+	void addExternalTool(ToolPtr tool);
+
 signals:
 	void stateChanged();
 	void updateTrackingSystemImplementation(QString trackingSystemImplementation);
@@ -67,6 +69,7 @@ protected:
 	Tool::State mState;
 	QString mConfigurationFilePath; ///< path to the configuration file
 	QString mLoggingFolder; ///< path to where logging should be saved
+	ToolPtr mExternalTool;
 
 	virtual bool isConfigured() const;
 	virtual bool isInitialized() const;

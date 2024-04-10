@@ -36,7 +36,7 @@ class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : pu
 {
 	Q_OBJECT
 public:
-	ViewCollectionWidgetUsingViewContainer(RenderWindowFactoryPtr factory, QWidget* parent);
+	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
     virtual ~ViewCollectionWidgetUsingViewContainer();
 
 	ViewPtr addView(View::Type type, LayoutRegion region);

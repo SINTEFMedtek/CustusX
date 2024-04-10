@@ -95,7 +95,9 @@ QString NIfTIReader::canReadDataType() const
 
 bool NIfTIReader::canRead(const QString &type, const QString &filename)
 {
-	return this->canReadInternal(type, filename);
+	if(filename.endsWith(".nii", Qt::CaseInsensitive) || filename.endsWith(".nii.gz", Qt::CaseInsensitive))
+		return true;
+	return false;
 }
 
 DataPtr NIfTIReader::read(const QString &uid, const QString &filename)

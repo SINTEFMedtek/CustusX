@@ -57,7 +57,7 @@ class org_custusx_core_view_EXPORT ViewWrapper2D: public ViewWrapper
 {
 Q_OBJECT
 public:
-	ViewWrapper2D(ViewPtr view, VisServicesPtr backend);
+	ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerToTool = true);
 	virtual ~ViewWrapper2D();
 	virtual void initializePlane(PLANE_TYPE plane);
 	virtual ViewPtr getView();
@@ -107,27 +107,19 @@ private:
 	ORIENTATION_TYPE getOrientationType() const;
 
 	virtual void imageAdded(ImagePtr image);
-	//virtual void imageRemoved(const QString& uid);
 
 	virtual void dataAdded(DataPtr data);
 	virtual void dataRemoved(const QString& uid);
 
-	void recreateMultiSlicer();
 	void updateItemsFromViewGroup();
 
 	void createAndAddSliceReps(int numberOfSlices);
 	void removeAndResetSliceRep();
 
-	bool useGPU2DRendering();
-	bool createAndAddMultiSliceRep();
-	void removeAndResetMultiSliceRep();
-
 	std::vector<ImagePtr> getImagesToView();
 	bool isAnyplane();
 
 	void setImagesSWRendering();
-
-	Texture3DSlicerRepPtr mMultiSliceRep;
 
 	DataRepContainerPtr mDataRepContainer;
 
@@ -139,6 +131,7 @@ private:
 	SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
 	ViewPtr mView;
 	ViewFollowerPtr mViewFollower;
+	bool mCenterToTool;
 
 	// synchronized data
 	Zoom2DHandlerPtr mZoom2D;
@@ -146,7 +139,6 @@ private:
 	Vector3D mLastClickPos_vp;
 
 	QActionGroup* mOrientationActionGroup;
-	//	void sendROItoFollower();
 	void changeZoom(double delta);
 	void applyViewFollower();
 	DoubleBoundingBox3D getViewport_s() const;

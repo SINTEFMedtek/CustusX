@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkCamera.h>
 #include <vtkImageActor.h>
 #include <vtkSelectVisiblePoints.h>
+
 #include "cxTypeConversions.h"
 #include "cxCustomMetric.h"
 #include "cxLogger.h"

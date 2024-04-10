@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -34,6 +34,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxSettings.h"
 #include "cxPatientModelService.h"
 #include "cxActiveData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -48,31 +49,31 @@ DoublePropertyImageTFDataBase::DoublePropertyImageTFDataBase()
 
 void DoublePropertyImageTFDataBase::setImageTFData(ImageTFDataPtr tfData, ImagePtr image)
 {
-  if (mImage)
-	  disconnect(mImage.get(), &Image::transferFunctionsChanged, this, &Property::changed);
+	if (mImage)
+		disconnect(mImage.get(), &Image::transferFunctionsChanged, this, &Property::changed);
 
-  mImageTFData = tfData;
-  mImage = image;
+	mImageTFData = tfData;
+	mImage = image;
 
-  if (image)
-	  connect(image.get(), &Image::transferFunctionsChanged, this, &Property::changed);
+	if (image)
+		connect(image.get(), &Image::transferFunctionsChanged, this, &Property::changed);
 
-  emit changed();
+	emit changed();
 }
 
 double DoublePropertyImageTFDataBase::getValue() const
 {
-  if (!mImageTFData)
-    return 0.0;
-  return this->getValueInternal();
+	if (!mImageTFData)
+		return 0.0;
+	return this->getValueInternal();
 }
 
 bool DoublePropertyImageTFDataBase::setValue(double val)
 {
-  if (!mImageTFData)
-    return false;
-  this->setValueInternal(val);
-  return true;
+	if (!mImageTFData)
+		return false;
+	this->setValueInternal(val);
+	return true;
 }
 
 //---------------------------------------------------------
@@ -80,20 +81,20 @@ bool DoublePropertyImageTFDataBase::setValue(double val)
 
 double DoublePropertyImageTFDataWindow::getValueInternal() const
 {
-  return mImageTFData->getWindow();
+	return mImageTFData->getWindow();
 }
 
 void DoublePropertyImageTFDataWindow::setValueInternal(double val)
 {
-  mImageTFData->setWindow(val);
+	mImageTFData->setWindow(val);
 }
 
 DoubleRange DoublePropertyImageTFDataWindow::getValueRange() const
 {
-  if (!mImage)
-    return DoubleRange();
-  double range = mImage->getMax() - mImage->getMin();
-  return DoubleRange(1,range,range/1000.0);
+	if (!mImage)
+		return DoubleRange();
+	double range = mImage->getMax() - mImage->getMin();
+	return DoubleRange(1,range,range/1000.0);
 }
 
 //---------------------------------------------------------
@@ -101,42 +102,106 @@ DoubleRange DoublePropertyImageTFDataWindow::getValueRange() const
 
 double DoublePropertyImageTFDataLevel::getValueInternal() const
 {
-  return mImageTFData->getLevel();
+	return mImageTFData->getLevel();
 }
 
 void DoublePropertyImageTFDataLevel::setValueInternal(double val)
 {
-  mImageTFData->setLevel(val);
+	mImageTFData->setLevel(val);
 }
 
 DoubleRange DoublePropertyImageTFDataLevel::getValueRange() const
 {
-  if (!mImageTFData)
-    return DoubleRange();
+	if (!mImageTFData)
+		return DoubleRange();
 
-  double max = mImage->getMax();
-  double min = mImage->getMin();
-  return DoubleRange(min,max,1);
+	double max = mImage->getMax();
+	double min = mImage->getMin();
+	return DoubleRange(min,max,1);
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
+
+double DoublePropertyImageTFSlider::getValueInternal() const
+{
+	return mImageTFData->getLevel();
+}
+
+void DoublePropertyImageTFSlider::setValueInternal(double val)
+{
+	double oldLevel = mImageTFData->getLevel();
+	double oldLLR = mImageTFData->getLLR();
+	double diff = val - oldLevel;
+	mImageTFData->setLevel(val);
+	mImageTFData->setLLR(oldLLR+diff);
+	emit valueChanged();
+}
+
+DoubleRange DoublePropertyImageTFSlider::getValueRange() const
+{
+	if (!mImageTFData)
+		return DoubleRange();
+
+	double max = mImage->getMax();
+	double min = mImage->getMin();
+	return DoubleRange(min,max,1);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+DoublePropertyImageTFSlider2DAnd3D::DoublePropertyImageTFSlider2DAnd3D()
+{
+	mTFSlider2D.reset(new DoublePropertyImageTFSlider);
+	connect(this, &DoublePropertyImageTFSlider::valueChanged,  this, &DoublePropertyImageTFSlider2DAnd3D::sliderChangedSlot);
+}
+
+DoublePropertyImageTFSlider2DAnd3D::~DoublePropertyImageTFSlider2DAnd3D()
+{
+	disconnect(this, &DoublePropertyImageTFSlider::valueChanged,  this, &DoublePropertyImageTFSlider2DAnd3D::sliderChangedSlot);
+}
+
+void DoublePropertyImageTFSlider2DAnd3D::setImage(ImagePtr image)
+{
+	ImageTFDataPtr tf, tf2D;
+	if (image)
+	{
+		tf = image->getTransferFunctions3D();
+		tf2D = image->getLookupTable2D();
+	}
+	else
+		image.reset();
+
+	this->setImageTFData(tf, image);
+	mTFSlider2D->setImageTFData(tf2D, image);
+}
+
+void DoublePropertyImageTFSlider2DAnd3D::sliderChangedSlot()
+{
+	mTFSlider2D->setValue(this->getValue());
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 
 double DoublePropertyImageTFDataLLR::getValueInternal() const
 {
-  return mImageTFData->getLLR();
+	return mImageTFData->getLLR();
 }
 void DoublePropertyImageTFDataLLR::setValueInternal(double val)
 {
-  mImageTFData->setLLR(val);
+	mImageTFData->setLLR(val);
 }
 DoubleRange DoublePropertyImageTFDataLLR::getValueRange() const
 {
-  if (!mImageTFData)
-    return DoubleRange();
+	if (!mImageTFData)
+		return DoubleRange();
 
-  double max = mImage->getMax();
-  double min = mImage->getMin();
+	double max = mImage->getMax();
+	double min = mImage->getMin();
 	//Set range to min - 1 to allow an llr that shows all values
 	return DoubleRange(min - 1,max,(max-min)/1000.0);
 }
@@ -146,129 +211,140 @@ DoubleRange DoublePropertyImageTFDataLLR::getValueRange() const
 
 double DoublePropertyImageTFDataAlpha::getValueInternal() const
 {
-  return mImageTFData->getAlpha();
+	return mImageTFData->getAlpha();
 }
 void DoublePropertyImageTFDataAlpha::setValueInternal(double val)
 {
-  mImageTFData->setAlpha(val);
+	mImageTFData->setAlpha(val);
 }
 DoubleRange DoublePropertyImageTFDataAlpha::getValueRange() const
 {
-  if (!mImageTFData)
-    return DoubleRange();
+	if (!mImageTFData)
+		return DoubleRange();
 
-  double max = 1.0;
-  return DoubleRange(0,max,max/100.0);
+	double max = 1.0;
+	return DoubleRange(0,max,max/100.0);
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 TransferFunction3DWidget::TransferFunction3DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
-  BaseWidget(parent, "transfer_function_3d_widget", "3D"),
-  mLayout(new QVBoxLayout(this)),
-  mActiveImageProxy(ActiveImageProxyPtr()),
-  mActiveData(activeData)
+	BaseWidget(parent, "transfer_function_3d_widget", "3D"),
+	mLayout(new QVBoxLayout(this)),
+	mActiveImageProxy(ActiveImageProxyPtr()),
+	mActiveData(activeData)
 {
 	this->setToolTip("Set a transfer function on a 3D volume");
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
+	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
+	mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
-  mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
-                                              QSizePolicy::MinimumExpanding);
-  mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
-                                              QSizePolicy::Fixed);
+	mTFSlider.reset(new DoublePropertyImageTFSlider2DAnd3D);
 
-  mLayout->addWidget(mTransferFunctionAlphaWidget);
-  mLayout->addWidget(mTransferFunctionColorWidget);
+	mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
+												QSizePolicy::MinimumExpanding);
+	mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
+												QSizePolicy::Fixed);
 
-  this->setLayout(mLayout);
+	mLayout->addWidget(mTransferFunctionAlphaWidget);
+	mLayout->addWidget(mTransferFunctionColorWidget);
 
-  if(connectToActiveImage)
-  {
-	  mActiveImageProxy = ActiveImageProxy::New(mActiveData);
-	  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
-	  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
-  }
-  this->activeImageChangedSlot();
+	QGridLayout* gridLayout = new QGridLayout;
+	mLayout->addLayout(gridLayout);
+	new SliderGroupWidget(this, mTFSlider,  gridLayout, 0);
+
+	this->setLayout(mLayout);
+
+	if(connectToActiveImage)
+	{
+		mActiveImageProxy = ActiveImageProxy::New(mActiveData);
+		connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
+		connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction3DWidget::activeImageChangedSlot);
+	}
+	this->activeImageChangedSlot();
 }
 
 void TransferFunction3DWidget::activeImageChangedSlot()
 {
-  ImagePtr activeImage = mActiveData->getActive<Image>();
-  this->imageChangedSlot(activeImage);
+	ImagePtr activeImage = mActiveData->getActive<Image>();
+	this->imageChangedSlot(activeImage);
 }
 
 void TransferFunction3DWidget::imageChangedSlot(ImagePtr image)
 {
-	ImageTFDataPtr tf;
+	ImageTFDataPtr tf, tf2D;
 	if (image)
-	  tf = image->getTransferFunctions3D();
+	{
+		tf = image->getTransferFunctions3D();
+		tf2D = image->getLookupTable2D();
+	}
 	else
-	  image.reset();
+		image.reset();
 
 	mTransferFunctionAlphaWidget->setData(image, tf);
 	mTransferFunctionColorWidget->setData(image, tf);
+	mTFSlider->setImage(image);
 }
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+//NB: This widget is not used. The functionality is split into ColorWidget and OverlayWidget
 TransferFunction2DWidget::TransferFunction2DWidget(ActiveDataPtr activeData, QWidget* parent, bool connectToActiveImage) :
-  BaseWidget(parent, "transfer_function_2d_widget", "2D"),
-  mLayout(new QVBoxLayout(this)),
-  mActiveData(activeData)
+	BaseWidget(parent, "transfer_function_2d_widget", "2D"),
+	mLayout(new QVBoxLayout(this)),
+	mActiveData(activeData)
 {
 	this->setToolTip("Set a transfer function on a 2D image");
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
-  mTransferFunctionAlphaWidget->setReadOnly(true);
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
+	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(activeData, this);
+	mTransferFunctionAlphaWidget->setReadOnly(true);
+	mTransferFunctionColorWidget = new TransferFunctionColorWidget(activeData, this);
 
-  mDataWindow.reset(new DoublePropertyImageTFDataWindow);
-  mDataLevel.reset(new DoublePropertyImageTFDataLevel);
-  mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
-  mDataLLR.reset(new DoublePropertyImageTFDataLLR);
+	mDataWindow.reset(new DoublePropertyImageTFDataWindow);
+	mDataLevel.reset(new DoublePropertyImageTFDataLevel);
+	mDataAlpha.reset(new DoublePropertyImageTFDataAlpha);
+	mDataLLR.reset(new DoublePropertyImageTFDataLLR);
 
-  mActiveImageProxy = ActiveImageProxy::New(mActiveData);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
-  connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
+	mActiveImageProxy = ActiveImageProxy::New(mActiveData);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::transferFunctionsChanged, this, &TransferFunction2DWidget::activeImageChangedSlot);
 
-  mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
-                                              QSizePolicy::MinimumExpanding);
-  mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
-                                              QSizePolicy::Fixed);
+	mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
+												QSizePolicy::MinimumExpanding);
+	mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
+												QSizePolicy::Fixed);
 
-  mLayout->addWidget(mTransferFunctionAlphaWidget);
-  mLayout->addWidget(mTransferFunctionColorWidget);
+	mLayout->addWidget(mTransferFunctionAlphaWidget);
+	mLayout->addWidget(mTransferFunctionColorWidget);
 
-  QGridLayout* gridLayout = new QGridLayout;
-  mLayout->addLayout(gridLayout);
-  new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
-  new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
-  new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
-  new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+	QGridLayout* gridLayout = new QGridLayout;
+	mLayout->addLayout(gridLayout);
+	new SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+	new SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+	new SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+	new SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
-  this->setLayout(mLayout);
-  this->activeImageChangedSlot();
+	this->setLayout(mLayout);
+	this->activeImageChangedSlot();
 }
 
 void TransferFunction2DWidget::activeImageChangedSlot()
 {
-  ImagePtr image = mActiveData->getActive<Image>();
-  ImageTFDataPtr tf;
-  if (image)
-    tf = image->getLookupTable2D();
-  else
-    image.reset();
+	ImagePtr image = mActiveData->getActive<Image>();
+	ImageTFDataPtr tf;
+	if (image)
+		tf = image->getLookupTable2D();
+	else
+		image.reset();
 
-  mTransferFunctionAlphaWidget->setData(image, tf);
-  mTransferFunctionColorWidget->setData(image, tf);
+	mTransferFunctionAlphaWidget->setData(image, tf);
+	mTransferFunctionColorWidget->setData(image, tf);
 
-  mDataWindow->setImageTFData(tf, image);
-  mDataLevel->setImageTFData(tf, image);
-  mDataAlpha->setImageTFData(tf, image);
-  mDataLLR->setImageTFData(tf, image);
+	mDataWindow->setImageTFData(tf, image);
+	mDataLevel->setImageTFData(tf, image);
+	mDataAlpha->setImageTFData(tf, image);
+	mDataLLR->setImageTFData(tf, image);
 }
 
 
@@ -277,18 +353,18 @@ void TransferFunction2DWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 
 TransferFunctionWidget::TransferFunctionWidget(PatientModelServicePtr patientModelService, QWidget* parent, bool connectToActiveImage) :
-  BaseWidget(parent, "transfer_function_widget", "Transfer Function")
+	BaseWidget(parent, "transfer_function_widget", "Transfer Function")
 {
 	this->setToolTip("Set a new or predefined transfer function on a volume");
-  QVBoxLayout* mLayout = new QVBoxLayout(this);
+	QVBoxLayout* mLayout = new QVBoxLayout(this);
 
-  TransferFunction3DWidget* transferFunctionWidget = new TransferFunction3DWidget(patientModelService->getActiveData(), this, connectToActiveImage);
+	TransferFunction3DWidget* transferFunctionWidget = new TransferFunction3DWidget(patientModelService->getActiveData(), this, connectToActiveImage);
 
-  mLayout->setMargin(0);
-  mLayout->addWidget(transferFunctionWidget);
-  mLayout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, true));
+	mLayout->setMargin(0);
+	mLayout->addWidget(transferFunctionWidget);
+	mLayout->addWidget(new TransferFunctionPresetWidget(patientModelService, this, true));
 
-  this->setLayout(mLayout);
+	this->setLayout(mLayout);
 }
 
 }//namespace cx

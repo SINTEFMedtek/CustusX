@@ -13,20 +13,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QTimer>
 #include <QDateTime>
-#include "vtkImageData.h"
-#include "vtkMetaImageReader.h"
-#include "vtkLookupTable.h"
-#include "vtkImageMapToColors.h"
+#include <QFileInfo>
+#include <vtkMetaImageReader.h>
+#include <vtkLookupTable.h>
+#include <vtkImageMapToColors.h>
 #include <vtkImageChangeInformation.h>
-#include "cxForwardDeclarations.h"
-#include "cxImageDataContainer.h"
-#include "cxTypeConversions.h"
-
 #include <vtkImageExtractComponents.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageLuminance.h>
-#include <QFileInfo>
 
+#include "cxForwardDeclarations.h"
+#include "cxImageDataContainer.h"
+#include "cxTypeConversions.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
 #include "cxBoolProperty.h"

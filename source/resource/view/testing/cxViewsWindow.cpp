@@ -25,20 +25,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QLabel>
 #include <QScreen>
 
-#include "cxRenderWindowFactory.h"
-
-
 namespace cxtest
 {
 
-ViewsWindow::ViewsWindow(cx::RenderWindowFactoryPtr factory)
+ViewsWindow::ViewsWindow()
 {
 	mZoomFactor = 1;
 
 	this->setNiceSize();
 
-	mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(factory);
-//	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout();
+	mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(this);
+//	mLayoutWidget = cx::ViewCollectionWidget::createViewWidgetLayout(this);
 	this->setCentralWidget(mLayoutWidget);
 
 	mRenderingTimer = new QTimer(this);

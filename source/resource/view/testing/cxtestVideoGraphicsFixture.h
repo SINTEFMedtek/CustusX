@@ -13,8 +13,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxtestresourcevisualization_export.h"
 
-#include "cxTransform3D.h"
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkTextMapper.h>
 
+#include "cxTransform3D.h"
 #include "cxVideoGraphics.h"
 #include "cxProbeDefinition.h"
 #include "cxtestRenderTester.h"

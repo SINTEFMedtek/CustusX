@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFrameForest.h"
 
 #include "cxData.h"
+#include "cxLogger.h"
 
 namespace cx
 {
@@ -43,6 +44,8 @@ QDomDocument FrameForest::getDocument()
  */
 void FrameForest::insertFrame(DataPtr data)
 {
+	if(!data)
+		return;
 	QString parentFrame = data->getParentSpace();
 	QString currentFrame = data->getSpace();
 
@@ -90,6 +93,8 @@ bool FrameForest::isAncestorOf(QDomNode node, QDomNode ancestor)
 {
 	//std::cout << "isAncestorOf : " << node.toElement().tagName() << "---"  << ancestor.toElement().tagName() << std::endl;
 
+	std::vector<QDomNode> parents;
+
 	while (!this->isRootNode(node))
 	{
 		if (node == ancestor)
@@ -97,6 +102,14 @@ bool FrameForest::isAncestorOf(QDomNode node, QDomNode ancestor)
 			//std::cout << "return true" << std::endl;;
 			return true;
 		}
+
+		if(std::find(parents.begin(), parents.end(), node) != parents.end())
+		{
+			CX_LOG_WARNING() << "FrameForest::isAncestorOf: Had to break cyclic parent graph";
+			break;
+		}
+		parents.push_back(node);
+
 		node = node.parentNode();
 	}
 	//std::cout << "return false" << std::endl;;
@@ -114,8 +127,20 @@ QDomNode FrameForest::getOldestAncestor(QDomNode node)
 {
 	if (this->isRootNode(node))
 		return node;
+
+	std::vector<QDomNode> parents;
+
 	while (!this->isRootNode(node.parentNode()))
+	{
+		if(std::find(parents.begin(), parents.end(), node) != parents.end())
+		{
+			CX_LOG_WARNING() << "FrameForest::getOldestAncestor: Had to break cyclic parent graph";
+			break;
+		}
+		parents.push_back(node);
+
 		node = node.parentNode();
+	}
 	return node;
 }
 

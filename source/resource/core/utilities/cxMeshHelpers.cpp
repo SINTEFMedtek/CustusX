@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMesh.h"
 #include "cxTypeConversions.h"
 #include "cxTime.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -90,6 +91,7 @@ std::map<std::string, std::string> getDisplayFriendlyInfo(MeshPtr mesh)
 //	retval["Is wireframe"] = string_cast(mesh->getIsWireframe());
 	retval["Acquisition time"] = string_cast(mesh->getAcquisitionTime().toString(timestampSecondsFormatNice()));
 	retval["Fiber bundle"] = string_cast(mesh->isFiberBundle());
+	retval["Organ type"] = enum2string(mesh->getOrganType()).toStdString();
 
 	//vtkPolyData
 	float actualMemorySizeKB = (float)mesh->getVtkPolyData()->GetActualMemorySize();

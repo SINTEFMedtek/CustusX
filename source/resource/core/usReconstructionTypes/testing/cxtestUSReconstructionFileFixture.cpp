@@ -12,6 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestUSReconstructionFileFixture.h"
 
 #include <QFileInfo>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
 #include "cxFileHelpers.h"
 #include "cxDataLocations.h"
 #include "cxUsReconstructionFileMaker.h"
@@ -20,7 +22,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDummyTool.h"
 #include "cxUSFrameData.h"
 #include "cxVolumeHelpers.h"
-#include "vtkImageData.h"
 
 #include "catch.hpp"
 

@@ -33,6 +33,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxElastixParameters.h"
 #include "cxLogicManager.h"
 #include "cxRegServices.h"
+#include "cxFilePathProperty.h"
 
 #include "cxReporter.h"
 
@@ -93,9 +94,31 @@ public:
 	}
 };
 
+TEST_CASE("Find ElastiX executable path", "[unit][elastix][not_win32][not_win64]")
+{
+	cx::ElastixParametersPtr parameters(new cx::ElastixParameters(cx::XmlOptionFile()));
+	cx::FilePathPropertyPtr executableProperty = parameters->getActiveExecutable();
+	INFO("ElastiX executable: "+executableProperty->getValue());
+	REQUIRE_FALSE(executableProperty->getValue().isEmpty());
+	CHECK(executableProperty->getValue() != ".");
+}
+
+TEST_CASE("ElastiX executable is present", "[elastix][not_win32][not_win64]")
+{
+	cx::ElastixParametersPtr parameters(new cx::ElastixParameters(cx::XmlOptionFile()));
+	cx::FilePathPropertyPtr executableProperty = parameters->getActiveExecutable();
+	INFO("ElastiX executable: "+executableProperty->getValue());
+	REQUIRE_FALSE(executableProperty->getValue().isEmpty());
+
+	//These 3 lines require ElastiX to be installed in home folder: Fraxinus/elastix/bin/elastix
+	QFileInfo exeFileInfo(executableProperty->getValue());
+	CHECK(exeFileInfo.exists());
+	CHECK(exeFileInfo.isExecutable());
+}
+
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64]")
+TEST_CASE("ElastiX should register kaisa to a translated+resampled version of same", "[pluginRegistration][integration][not_win32][not_win64][hide]")
 {
 	cx::LogicManager::initialize();
 	cx::PatientModelServicePtr pasm = cx::PatientModelServiceProxy::create(cx::logicManager()->getPluginContext());

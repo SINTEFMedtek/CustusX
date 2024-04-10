@@ -15,10 +15,6 @@ if(BUILD_TESTING)
         cxtestVideoGraphics.cpp
         cxtestImageEnveloper.cpp
         cxtestStream2DRep3D.cpp
-        cxtestSharedOpenGLContext.cpp
-        cxtestRenderWindowFactory.cpp
-        cxtestViewServiceMockWithRenderWindowFactory.h
-        cxtestViewServiceMockWithRenderWindowFactory.cpp
         cxtestMultiViewCache.cpp
     )
 
@@ -45,5 +41,5 @@ if(BUILD_TESTING)
         cxPluginUtilities
     )
     cx_add_tests_to_catch(cxtestResourceVisualization)
-    
+
 endif(BUILD_TESTING)

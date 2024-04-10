@@ -79,13 +79,12 @@ FileReaderWriterServicePtr FileManagerServiceBase::findWriter(const QString& pat
 
 vtkImageDataPtr FileManagerServiceBase::loadVtkImageData(QString filename)
 {
-	vtkImageDataPtr retval = vtkImageDataPtr();
 	FileReaderWriterServicePtr reader = this->findReader(filename);
 	if (reader)
 	{
-		retval = reader->loadVtkImageData(filename);
+		return reader->loadVtkImageData(filename);
 	}
-	return retval;
+	return vtkImageDataPtr();
 }
 
 vtkPolyDataPtr FileManagerServiceBase::loadVtkPolyData(QString filename)
@@ -169,7 +168,7 @@ void FileManagerServiceBase::addFileReaderWriter(FileReaderWriterService *servic
 {
 	// adding a service inside a smartpointer... not so smart, think it is fixed with null_deleter
 	mDataReaders.insert(FileReaderWriterServicePtr(service, null_deleter()));
-	CX_LOG_DEBUG() << "Adding a reader/writer: " << service->objectName() << " to: " << this;
+//	CX_LOG_DEBUG() << "Adding a reader/writer: " << service->objectName() << " to: " << this;
 }
 
 void FileManagerServiceBase::removeFileReaderWriter(FileReaderWriterService *service)

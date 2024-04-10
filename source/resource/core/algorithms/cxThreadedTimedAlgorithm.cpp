@@ -11,11 +11,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxThreadedTimedAlgorithm.h"
 
-#include "cxTimedAlgorithm.h"
+#include <vtkMetaImageWriter.h>
+#include <vtkPolyData.h>
+#include <vtkImageData.h>
 
+#include "cxTimedAlgorithm.h"
 #include "itkImageFileReader.h"
 #include "cxTypeConversions.h"
-#include "vtkMetaImageWriter.h"
 #include "cxSettings.h"
 #include "cxUtilHelpers.h"
 

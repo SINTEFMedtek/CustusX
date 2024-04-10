@@ -40,6 +40,7 @@ public:
 private:
 	QString generateUid(DicomImageReaderPtr reader);
 	QString generateName(DicomImageReaderPtr reader);
+	QString getSeriesNumber(DicomImageReaderPtr reader);
 	std::map<double, ImagePtr> sortImagesAlongDirection(std::vector<ImagePtr> images, Vector3D  e_sort);
 	ImagePtr mergeSlices(std::map<double, ImagePtr> sorted) const;
 	double getMeanSliceDistance(std::map<double, ImagePtr> sorted) const;

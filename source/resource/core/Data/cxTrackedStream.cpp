@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackedStream.h"
 
 #include <vtkImageData.h>
+#include <vtkPolyData.h>
 
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"

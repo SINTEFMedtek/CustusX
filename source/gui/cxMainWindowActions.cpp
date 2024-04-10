@@ -121,14 +121,9 @@ void MainWindowActions::createActions()
 
 void MainWindowActions::createTrackingActions()
 {
-//	this->createAction("ConfigureTools", "Tool configuration",
-//					   QIcon(), QKeySequence(), "",
-//					   &MainWindowActions::configureSlot);
-
-//	boost::function<void()> finit = boost::bind(&TrackingService::setState, mServices->tracking(), Tool::tsINITIALIZED);
-//	this->createAction("InitializeTools", "Initialize",
-//					   QIcon(), QKeySequence(), "",
-//					   finit);
+	this->createAction("ReconfigureTools", "Reconfigure tracking",
+					   QIcon(), QKeySequence(), "Deconfigure tools, and start tracking again. Useful when changing tool configuration",
+					   &MainWindowActions::reconfigureTrackingSlot);
 
 	mTrackingToolsAction = this->createAction("TrackingTools", "Start tracking",
 											  QIcon(), QKeySequence("Ctrl+T"), "",
@@ -188,6 +183,24 @@ void MainWindowActions::createPatientActions()
 										 QKeySequence(),
 										 "Import all selected data files",
 										 [=](){this->importDataSlot("ImportButtonClickedAction");});
+
+	this->createAction("AddFilesForImportWithDialog", "Add files for import (Dialog)",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportWithDialogAction");});
+
+	this->createAction("AddFilesForImportWithDialogCT", "Add CT files for import (Dialog)",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add CT files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportWithDialogActionCT");});
+
+	this->createAction("AddFilesForImportWithDialogPET", "Add PET files for import (Dialog)",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add PET files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportWithDialogActionPET");});
 }
 
 template <class T>
@@ -220,15 +233,17 @@ QWidget* MainWindowActions::parentWidget()
 
 void MainWindowActions::newPatientSlot()
 {
+	mServices->view()->enableRender(false);
 	QString choosenDir = this->selectNewPatientFolder();
-	if(choosenDir.isEmpty())
-		return;
+	if(!choosenDir.isEmpty())
+	{
+		// Update global patient number
+		int patientNumber = settings()->value("globalPatientNumber").toInt();
+		settings()->setValue("globalPatientNumber", ++patientNumber);
 
-	// Update global patient number
-	int patientNumber = settings()->value("globalPatientNumber").toInt();
-	settings()->setValue("globalPatientNumber", ++patientNumber);
-
-	mServices->session()->load(choosenDir);
+		mServices->session()->load(choosenDir);
+	}
+	mServices->view()->enableRender(true);
 }
 
 QString MainWindowActions::selectNewPatientFolder()
@@ -264,71 +279,82 @@ QString MainWindowActions::getExistingSessionFolder()
 
 void MainWindowActions::clearPatientSlot()
 {
+	mServices->view()->enableRender(false);
 	mServices->session()->clear();
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::savePatientFileSlot()
 {
+	mServices->view()->enableRender(false);
 	if (mServices->patient()->getActivePatientFolder().isEmpty())
 	{
 		reportWarning("No patient selected, select or create patient before saving!");
 		this->newPatientSlot();
+		mServices->view()->enableRender(true);
 		return;
 	}
 
 	mServices->session()->save();
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::loadPatientFileSlot()
 {
+	mServices->view()->enableRender(false);
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	// Open file dialog
 	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
-	if (folder.isEmpty())
-		return;
+	if (!folder.isEmpty())
+		mServices->session()->load(folder);
 
-	mServices->session()->load(folder);
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::loadPatientFileCopySlot()
 {
+	mServices->view()->enableRender(false);
 	QString patientDatafolder = profile()->getPatientTemplatePath();
 
 	// Open file dialog
 	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select template patient to copy", patientDatafolder, QFileDialog::ShowDirsOnly);
-	if (folder.isEmpty())
-		return;
-
-	QString newFolder = this->selectNewPatientFolder();
-	if (newFolder.isEmpty())
-		return;
-
-	if(!copyRecursively(folder, newFolder, true))
+	if (!folder.isEmpty())
 	{
-		CX_LOG_WARNING() << "MainWindowActions::loadPatientFileCopySlot(): Cannot copy patient folder: " << folder;
-		return;
+		QString newFolder = this->selectNewPatientFolder();
+		if (!newFolder.isEmpty())
+		{
+			if(!copyRecursively(folder, newFolder, true))
+			{
+				CX_LOG_WARNING() << "MainWindowActions::loadPatientFileCopySlot(): Cannot copy patient folder: " << folder;
+			}
+			else
+				mServices->session()->load(newFolder);
+		}
 	}
-
-	mServices->session()->load(newFolder);
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::exportDataSlot()
 {
 	this->savePatientFileSlot();
 
+	mServices->view()->enableRender(false);
 	ExportDataDialog* wizard = new ExportDataDialog(mServices->patient(), this->parentWidget());
 	wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction with the system
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::importDataSlot(QString actionText)
 {
 	this->savePatientFileSlot();
+	mServices->view()->enableRender(false);
 
 	QDockWidget* importDockWidget = findMainWindowChildWithObjectName<QDockWidget*>("import_widgetDockWidget");
 	if(!importDockWidget)
 	{
 		CX_LOG_ERROR() << "Cannot find DockWidget for ImportWidget";
+		mServices->view()->enableRender(true);
 		return;
 	}
 
@@ -339,6 +365,7 @@ void MainWindowActions::importDataSlot(QString actionText)
 	if(!widget)
 	{
 		CX_LOG_ERROR() << "Cannot find ImportWidget";
+		mServices->view()->enableRender(true);
 		return;
 	}
 
@@ -354,6 +381,7 @@ void MainWindowActions::importDataSlot(QString actionText)
 	}
 	if(!actionFound)
 		CX_LOG_ERROR() << "MainWindowActions::importDataSlot, action not found: " << actionText;
+	mServices->view()->enableRender(true);
 }
 
 void MainWindowActions::shootScreen()
@@ -478,9 +506,10 @@ void MainWindowActions::updateTrackingActionSlot()
 	}
 }
 
-void MainWindowActions::configureSlot()
+void MainWindowActions::reconfigureTrackingSlot()
 {
-	mServices->tracking()->setState(Tool::tsCONFIGURED);
+	mServices->tracking()->setState(Tool::tsNONE);
+	mServices->tracking()->setState(Tool::tsTRACKING);
 }
 
 void MainWindowActions::toggleTrackingSlot()

@@ -187,6 +187,7 @@ void ProfileManager::shutdown()
 ProfileManager::ProfileManager(QString defaultProfile)
 {
 	QString profileUid = this->getDefaultProfileUid(defaultProfile);
+	profileUid = this->getGenericSettingsFromInstaller()->value("profile", profileUid).toString();
 	profileUid = this->getGenericSettings()->value("profile", profileUid).toString();
 
 	mSettings.reset(new Settings());
@@ -224,6 +225,13 @@ QString ProfileManager::getSettingsPath()
 QSettingsPtr ProfileManager::getGenericSettings()
 {
 	QString filename = this->getCustomPath() + "/generic_settings.ini";
+	return QSettingsPtr(new QSettings(filename, QSettings::IniFormat));
+}
+
+QSettingsPtr ProfileManager::getGenericSettingsFromInstaller()
+{
+	QString configPath = DataLocations::getRootConfigPath();
+	QString filename = configPath + "/profiles/generic_settings.ini";
 	return QSettingsPtr(new QSettings(filename, QSettings::IniFormat));
 }
 

@@ -166,6 +166,11 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		istUSBMODE,
 		istANGIO,
 		istSEGMENTATION,
+		istPET_CT,
+		istTHORAX_CT,
+		istPET,
+		istPET_REGISTERED,
+		istCOPY,
 		istCOUNT
 	};
 
@@ -174,26 +179,68 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		lsUNKNOWN,
 		lsLUNG, // The following enums are used for as buttons in StructuresSelectionWidget. lsLUNG is the first button.
 		lsTUMORS,
-		lsLESIONS,
+		lsNODULES,
 		lsLYMPH_NODES,
 		lsVENA_AZYGOS,
 		lsVENA_CAVA,
 		lsAORTA,
 		lsSUBCLAVIAN_ARTERY,
-		lsLUNG_VESSELS,
+		//lsLUNG_VESSELS,
 		lsHEART,
-		lsESOPHAGUS,
-		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
-		lsAIRWAYS,
-		lsCENTERLINES,
 		lsPULMONARY_VEINS,
 		lsPULMONARY_TRUNK,
+		lsESOPHAGUS,
+		lsSPINE, // Last button. The values below are other kind of structures, not used used in the button list in StructuresSelectionWidget.
+		lsLUNG_VESSELS,
+		lsAIRWAYS,
+		lsCENTERLINES,
 		lsMEDIUM_ORGANS,
 		lsSMALL_ORGANS,
-		lsNODULES,
+		lsPET_REGISTERED,
 		lsCOUNT,
 		lsFIRST_STRUCTURE_BUTTON = lsLUNG,
 		lsLAST_STRUCTURE_BUTTON = lsSPINE
+	};
+
+	enum cxResource_EXPORT LUNG_MODELS
+	{
+		lmUNKNOWN,
+		lmMEDIUM_ORGANS_MEDIASTINUM,
+		lmPULMSYST_HEART,
+		lmSMALL_ORGANS_MEDIASTINUM,
+		lmCOUNT
+	};
+
+	enum cxResource_EXPORT ORGAN_TYPE
+	{
+		otUNKNOWN,
+		otAIRWAYS, //Start Raidionics structures. Update otRAIDIONICS_BEGIN
+		otLUNGS,
+		otLYMPH_NODES,
+		otVENA_CAVA,
+		otAORTIC_ARCH,
+		otASCENDING_AORTA,
+		otDESCENDING_AORTA,
+		otSPINE,
+		otHEART,
+		otPULMONARY_VEINS,
+		otPULMONARY_TRUNK,
+		otBRACHIO_CEPHALIC_VEINS,
+		otSUBCLAVIAN_ARTERY,
+		otAZYGOS,
+		otESOPHAGUS, //End Raidionics structures. Update otRAIDIONICS_END
+		otTUMORS,
+		otNODULES,
+		otLUNG_VESSELS,
+		otAIRWAYS_ENHANCED,
+		otAIRWAYS_ENHANCED_COPY,
+		otCENTERLINES,
+		otAIRWAYS_CENTERLINES,
+		otROUTE_TO_TARGET,
+		otROUTE_TO_TARGET_EXTENDED,
+		organtypeCOUNT, //otCOUNT is used by ORIENTATION_TYPE
+		otRAIDIONICS_BEGIN = otAIRWAYS,
+		otRAIDIONICS_END = otESOPHAGUS
 	};
 
 /**
@@ -208,7 +255,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 
 	static QString airwaysFilterGetNameSuffixAirways()
 	{
-		return "_airways";
+		return "Airways"; //"_airways"
 	}
 
 	static QString airwaysFilterGetNameSuffixTubes()
@@ -221,9 +268,14 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		return "_colored";
 	}
 
+	static QString airwaysFilterGetNameSuffixCopy()
+	{
+		return "_copy";
+	}
+
 	static QString airwaysFilterGetNameSuffixLungs()
 	{
-		return "_lungs";
+		return "lungs";
 	}
 
 	static QString airwaysFilterGetNameSuffixLungVessels()

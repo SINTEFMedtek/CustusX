@@ -10,9 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "catch.hpp"
+#include <vtkPolyData.h>
 
 #include "cxtestUSReconstructionFileFixture.h"
-
 #include "cxUsReconstructionFileMaker.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxUSFrameData.h"

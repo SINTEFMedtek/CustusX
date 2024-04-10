@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "boost/array.hpp"
 #include "cxVector3D.h"
+#include "cxTransform3D.h"
 #include <vector>
 
 // --------------------------------------------------------
@@ -81,6 +82,7 @@ public:
 	Vector3D corner(int x, int y, int z) const;
 	bool contains(const Vector3D& p) const;
 	DoubleBoundingBox3D unionWith(const DoubleBoundingBox3D& other) const;
+	void translate(Transform3D translation);
 };
 // --------------------------------------------------------
 

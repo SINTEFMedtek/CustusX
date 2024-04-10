@@ -112,6 +112,7 @@ bool ProcessWrapper::internalLaunch(QString executable, QStringList arguments)
 		mProcess->start(executable, arguments);
 
 	mLastExecutablePath = executable;
+	return waitForStarted(500);
 	return true;
 }
 }

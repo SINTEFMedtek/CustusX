@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageData.h>
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
+#include <vtkPolyData.h>
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 #include "cxSettings.h"

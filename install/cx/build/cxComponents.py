@@ -59,16 +59,17 @@ class Component(object):
 #        raise "Not Implemented"
     def _checkout_check_exist(self, path):
         if os.path.exists(path):
-            print("*** %s already exists, checkout ignored." % path)
             return True
         return False
     def checkout(self):
         'checkout the component source from external source to this computer (svn co or similar)'
         path = self.path()+'/'+self.sourceFolder()
         if self._checkout_check_exist('%s/.git'%path):
+            print("*** %s already exists, checkout ignored." % path)
             return
-        if self._checkout_check_exist('%s/.svn'%path):
-            return
+        if self._checkout_check_exist('%s'%path):
+            print("Not a git repo, removing folder and contents of %s before cloning." % path)
+            shutil.rmtree(path)
         self._rawCheckout()
 #    def _rawCheckout(self):
 #        'checkout the component source from external source to this computer (svn co or similar)'
@@ -188,7 +189,7 @@ class ITK(CppComponent):
         self._getBuilder().gitSetRemoteURL(self.repository())
         # Using ITK v4.12.0 with a fix for gcc 9
         # Newer ITK versions makes IGSTK compilation fail
-        self._getBuilder().gitCheckoutSha('87b43dfc5e83819fcbc036db18ac2db021e5bfc6')
+        self._getBuilder().gitCheckoutSha('43737f0ffa907fcdb393227b8d5cb7d2dbbaea84')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -208,10 +209,11 @@ class VTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        return '%s/VTK' % self.controlData.gitrepo_open_site_base
+        #return '%s/VTK' % self.controlData.gitrepo_open_site_base
+        return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('f404b97624ddc745204e90ae87872f3c05cd5e4f')
+        self._getBuilder().gitCheckout('v9.2.4')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -223,7 +225,10 @@ class VTK(CppComponent):
         if use_qt5:
             add('VTK_QT_VERSION:STRING', "5")
             add('VTK_Group_Qt:BOOL', "ON")
-            add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+            if(platform.system() == 'Darwin'):
+              add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+            if(platform.system() == 'Linux'):
+              add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         else:
             add('DESIRED_QT_VERSION:STRING', 4)
             add('Module_vtkGUISupportQt:BOOL', 'ON')
@@ -234,6 +239,9 @@ class VTK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
         add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
+        #VTK 9
+        add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
+        add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -245,12 +253,11 @@ class CTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        base = self.controlData.gitrepo_open_site_base
-        return '%s/CTK.git' % base
+        #base = self.controlData.gitrepo_open_site_base
+        #return '%s/CTK.git' % base
+        return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        #This fixes the bug:
-        #QSqlDatabasePrivate::database: requested database does not belong to the calling thread.
-        self._getBuilder().gitCheckoutSha('7c0477fc6eeda55b0fcec1127f001a38009332ef')
+        self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -260,7 +267,10 @@ class CTK(CppComponent):
         add('CTK_LIB_DICOM/Widgets:BOOL', 'ON')
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
-        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('BUILD_TESTING:BOOL', 'OFF')
@@ -346,9 +356,8 @@ class OpenIGTLink(CppComponent):
         return 'https://github.com/openigtlink/OpenIGTLink.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-#        self._getBuilder().gitCheckoutSha('805472b43aebf96fec0b62b2898a24446fe19c08') # Previous version used by CustusX
-        self._getBuilder().gitCheckoutSha('4c39d0fcd26db74022b5b891a9b274c51362cb28') # Latest version
 #        self._getBuilder().gitCheckoutBranch('master')#TODO: Switch to a sha before merging the branch back to develop
+        self._getBuilder().gitCheckoutSha('8f586ed476335bbd916782caa7b32fa3b4ea4b9b') # 17. May 2023
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -375,7 +384,7 @@ class OpenIGTLinkIO(CppComponent):
 #        return 'git@github.com:SINTEFMedtek/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('854c850ed753941860168860fc19f1c807fc0595')
+        self._getBuilder().gitCheckoutSha('46975d197796063b956573f1b1022ac2e3643fe4') # 3. Nov 2022
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -403,9 +412,8 @@ class IGSTK(CppComponent):
         repo = '%s/IGSTK.git' % base
         return repo
     def update(self):
-        branch = 'IGSTK-CX-modifications'
-        self._getBuilder().gitSetRemoteURL(self.repository(), branch=branch)
-        self._getBuilder().gitCheckoutSha('bda6b6fa88054b474aa113af5477813610e4ac3b')
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckoutSha('79be2fd9cd985f73662f325d8b13dd22870a2ec1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -469,7 +477,10 @@ class CustusX(CppComponent):
         add('SSC_USE_GCOV:BOOL', self.controlData.mCoverage);
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
-        add('CMAKE_PREFIX_PATH:PATH', "/opt/local/libexec/qt5-mac")
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         # See CX-208 about this Eigen flag and about updating Eigen.
         # The second one should be used when upgrading
         # to version > 3.2, as the old one is depracated in version 3.3.
@@ -618,6 +629,11 @@ class QHttpServer(CppComponent):
         self._getBuilder().gitCheckoutSha('5b7d7e15cfda2bb2097b6c0ceab99eeb50b4f639') # latest tested SHA
     def configure(self):
         builder = self._getBuilder()
+        add = builder.addCMakeOption
+        if(platform.system() == 'Darwin'):
+          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+        if(platform.system() == 'Linux'):
+          add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption

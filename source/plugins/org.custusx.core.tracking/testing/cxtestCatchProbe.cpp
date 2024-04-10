@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 //Disabled for now. Test will output a warning. Use the test below with the Mock XmlParser instead
-TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", "[unit][service][tracking][hide][org.custus.core.tracking]")
+TEST_CASE_METHOD(cxtest::ProbeFixture, "Probe: Create with default XML parser", "[service][tracking][hide][org.custus.core.tracking]")
 {
 	mProbe = cx::ProbeImpl::New(mProbeName, mScannerName);
 

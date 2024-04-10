@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vector>
 #include <QPointer>
 #include <QObject>
+#include <vtkCallbackCommand.h>
 #include "cxDefinitions.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
@@ -35,7 +36,6 @@ typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWi
 
 namespace cx
 {
-typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 typedef boost::shared_ptr<class DataMetricRep> DataMetricRepPtr;
 typedef boost::shared_ptr<class MetricNamesRep> MetricNamesRepPtr;
 
@@ -76,6 +76,7 @@ public:
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void settingsChangedSlot(QString key);
+	void enableTransparentMeshesSlot();
 private slots:
 	void showSlices();
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -122,6 +123,7 @@ private:
 	void addVolumeDataRep(DataPtr data);
 	void removeVolumeDataRep(QString uid);
 
+	void setupTransparentMeshes();
 	void setTranslucentRenderingToDepthPeeling(bool setDepthPeeling);
 	void initializeMultiVolume3DRepProducer();
 	void updateMetricNamesRep();
@@ -135,12 +137,14 @@ private:
 	std::vector<AxisConnectorPtr> mAxis;
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
-	Slices3DRepPtr mSlices3DRep;
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 
 	ViewPtr mView;
 	RepPtr createTrackedStreamRep(TrackedStreamPtr trackedStream);
+
+	static void ProcessEvents(vtkObject *object, unsigned long event, void *clientdata, void *calldata);
+	vtkCallbackCommandPtr mCallbackCommand = nullptr;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 

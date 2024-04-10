@@ -86,8 +86,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStream2DRep3D.h"
 #include "cxActiveData.h"
 
-#include "cxSlices3DRep.h"
-
 namespace cx
 {
 
@@ -101,6 +99,18 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	mShowAxes = false;
 	mView = view;
 	this->connectContextMenu(mView);
+
+	//This stops both rendering and interactor.
+//	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();
+	//Just stopping the VTK rendering, and not the interactor cannot be done the same way we did for VTK 7
+	//All VTK events may trigger rendering, but some are needed for using the VTK interactor.
+	//For now we use the VTK interactor, but only let a few events through. See ViewWrapper3D::ProcessEvents() below
+
+	this->mCallbackCommand = vtkCallbackCommandPtr::New();
+	this->mCallbackCommand->SetClientData(this);
+	this->mCallbackCommand->SetCallback(ViewWrapper3D::ProcessEvents);
+	mView->getRenderWindow()->GetInteractor()->AddObserver(vtkCommand::AnyEvent, this->mCallbackCommand, 1.0);//Catch all events
+
 	QString index = QString::number(startIndex);
 	QColor background = settings()->value("backgroundColor").value<QColor>();
 	mView->setBackgroundColor(background);
@@ -145,9 +155,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	this->setStereoType(settings()->value("View3D/stereoType").toInt());
 	this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
-	//Only try to set depth peeling if View3D/depthPeeling == true
-	if(settings()->value("View3D/depthPeeling").toBool())
-		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	setupTransparentMeshes();
 
 	this->updateView();
 }
@@ -158,7 +166,44 @@ ViewWrapper3D::~ViewWrapper3D()
 	{
 		mView->removeReps();
 		mMultiVolume3DRepProducer->removeRepsFromView();
+		mView->getRenderWindow()->GetInteractor()->RemoveObserver(this->mCallbackCommand);
+		this->mCallbackCommand = nullptr;
 	}
+}
+
+void ViewWrapper3D::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long event, void* clientdata, void* calldata)
+{
+	ViewWrapper3D* self = reinterpret_cast<ViewWrapper3D *>(clientdata);
+
+	//All events makes VTK do additional rendering, but some needs to be sent further to allow the use of VTK interactor
+	//Block all other events
+	if(event == vtkCommand::LeftButtonPressEvent
+			|| event == vtkCommand::MouseWheelForwardEvent
+			|| event == vtkCommand::MouseWheelBackwardEvent
+			|| event == vtkCommand::CharEvent
+//			|| event == vtkCommand::KeyPressEvent
+//			|| event == vtkCommand::KeyReleaseEvent
+//			|| event == vtkCommand::ModifiedEvent
+//			|| event == vtkCommand::RenderEvent
+			)
+		return;
+//	CX_LOG_DEBUG() << "Block VTK event: " << vtkCommand::GetStringFromEventId(event);
+	self->mCallbackCommand.Get()->SetAbortFlag(1);
+}
+
+void ViewWrapper3D::setupTransparentMeshes()
+{
+	//Setting up depth peeling in constructor fails (on Ubuntu 20.04).
+	//Delay until we get first active data to make sure VTK structures are correctly setup.
+	connect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
+}
+
+void ViewWrapper3D::enableTransparentMeshesSlot()
+{
+	//Fix for mac (CX-510): Only set depth peeling if View3D/depthPeeling == true
+	if(settings()->value("View3D/depthPeeling").toBool())
+		this->setTranslucentRenderingToDepthPeeling(settings()->value("View3D/depthPeeling").toBool());
+	disconnect(mServices->patient()->getActiveData().get(), &ActiveData::activeDataChanged, this, &ViewWrapper3D::enableTransparentMeshesSlot);
 }
 
 void ViewWrapper3D::initializeMultiVolume3DRepProducer()
@@ -781,9 +826,6 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
-	if (mSlices3DRep)
-		mView->removeRep(mSlices3DRep);
-
 	if (!mGroupData)
 		return;
 
@@ -795,13 +837,6 @@ void ViewWrapper3D::updateSlices()
 	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
 	if (planes.empty())
 		return;
-	mSlices3DRep = Slices3DRep::New(mSharedOpenGLContext, "MultiSliceRep_" + mView->getName());
-	for (unsigned i=0; i<planes.size(); ++i)
-		mSlices3DRep->addPlane(planes[i], mServices->patient());
-	mSlices3DRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-	mSlices3DRep->setImages(images);
-	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
-	mView->addRep(mSlices3DRep);
 }
 
 ViewPtr ViewWrapper3D::getView()
@@ -815,8 +850,8 @@ void ViewWrapper3D::activeToolChangedSlot()
 	//CX_LOG_DEBUG() << "ViewWrapper3D::activeToolChangedSlot - controllingTool: " << controllingTool->getName();
 
 	mPickerRep->setTool(controllingTool);
-	if (mSlices3DRep)
-		mSlices3DRep->setTool(controllingTool);
+//	if (mSlices3DRep)
+//		mSlices3DRep->setTool(controllingTool);
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

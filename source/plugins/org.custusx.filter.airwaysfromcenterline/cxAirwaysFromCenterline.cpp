@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkCardinalSpline.h"
 #include "cxLogger.h"
 #include <vtkImageResample.h>
+#include <vtkImageConnectivityFilter.h>
 
 typedef vtkSmartPointer<class vtkCardinalSpline> vtkCardinalSplinePtr;
 
@@ -34,7 +35,7 @@ AirwaysFromCenterline::AirwaysFromCenterline():
 	mBranchListPtr(new BranchList),
 	mAirwaysVolumeBoundaryExtention(10),
 	mAirwaysVolumeBoundaryExtentionTracheaStart(2),
-	mAirwaysVolumeSpacing(0.5)
+	mAirwaysVolumeSpacing(0.4)
 {
 }
 
@@ -49,7 +50,6 @@ void AirwaysFromCenterline::setTypeToBloodVessel(bool bloodVessel)
 
 Eigen::MatrixXd AirwaysFromCenterline::getCenterlinePositions(vtkPolyDataPtr centerline_r)
 {
-
 	int N = centerline_r->GetNumberOfPoints();
 	Eigen::MatrixXd CLpoints(3,N);
 	for(vtkIdType i = 0; i < N; i++)
@@ -68,30 +68,38 @@ void AirwaysFromCenterline::setBranches(BranchListPtr branches)
 	mBranchListPtr = branches;
 }
 
-void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume)
+void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume, Transform3D rMd)
 {
 	mOriginalSegmentedVolume = segmentedVolume;
+	m_rMd = rMd;
+
 }
 
-void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr centerline_r)
+void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr airwaysCenterline_r)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
-	Eigen::MatrixXd CLpoints_r = getCenterlinePositions(centerline_r);
+	Eigen::MatrixXd airwayCenterlinePoints_r = getCenterlinePositions(airwaysCenterline_r);
 
-	mBranchListPtr->findBranchesInCenterline(CLpoints_r);
+	mBranchListPtr->findBranchesInCenterline(airwayCenterlinePoints_r);
 
-	mBranchListPtr->smoothBranchPositions(40);
-	mBranchListPtr->interpolateBranchPositions(0.1);
+	mBranchListPtr->smoothBranchPositions();
+	mBranchListPtr->interpolateBranchPositions();
 	this->smoothAllBranchesForVB();
 
 	mBranchListPtr->smoothOrientations();
+	mBranchListPtr->findBronchoscopeRotation();
 }
 
 BranchListPtr AirwaysFromCenterline::getBranchList()
 {
 	return mBranchListPtr;
+}
+
+vtkImageDataPtr AirwaysFromCenterline::getFilteredSegmentedVolume()
+{
+	return mFilteredSegmentedVolumePtr;
 }
 
 /*
@@ -104,28 +112,30 @@ BranchListPtr AirwaysFromCenterline::getBranchList()
 vtkPolyDataPtr AirwaysFromCenterline::generateTubes(double staticRadius, bool mergeWithOriginalAirways) // if staticRadius == 0, radius is retrieved from branch generation number
 {
 	mMergeWithOriginalAirways = mergeWithOriginalAirways;
-	vtkImageDataPtr airwaysVolumePtr;
 
 	if (mergeWithOriginalAirways)
 	{
 		if (mOriginalSegmentedVolume)
 		{
-			airwaysVolumePtr = this->initializeAirwaysVolumeFromOriginalSegmentation();
+			mFilteredSegmentedVolumePtr = this->initializeAirwaysVolumeFromOriginalSegmentation();
 		}
 		else
 		{
 			CX_LOG_WARNING() << "AirwaysFromCenterline::generateTubes: Segmented airways volume not set. Creating pure artificaial tubes around centerlines.";
-			 airwaysVolumePtr = this->initializeEmptyAirwaysVolume();
+			 mFilteredSegmentedVolumePtr = this->initializeEmptyAirwaysVolume();
 		}
 	}
 	else
-		airwaysVolumePtr = this->initializeEmptyAirwaysVolume();
+		mFilteredSegmentedVolumePtr = this->initializeEmptyAirwaysVolume();
 
-	airwaysVolumePtr = addSpheresAlongCenterlines(airwaysVolumePtr, staticRadius);
+	addSpheresAlongCenterlines(staticRadius);
+
+	if(mMergeWithOriginalAirways)
+		removeIslandsFromImage();
 
 	//create contour from image
 	vtkPolyDataPtr rawContour = ContourFilter::execute(
-				airwaysVolumePtr,
+				mFilteredSegmentedVolumePtr,
 			1, //treshold
 			false, // reduce resolution
 			true, // smoothing
@@ -224,7 +234,7 @@ vtkImageDataPtr AirwaysFromCenterline::initializeAirwaysVolumeFromOriginalSegmen
 }
 
 
-vtkImageDataPtr AirwaysFromCenterline::addSpheresAlongCenterlines(vtkImageDataPtr airwaysVolumePtr, double staticRadius)
+void AirwaysFromCenterline::addSpheresAlongCenterlines(double staticRadius)
 {
 	std::vector<BranchPtr> branches = mBranchListPtr->getBranches();
 
@@ -245,17 +255,17 @@ vtkImageDataPtr AirwaysFromCenterline::addSpheresAlongCenterlines(vtkImageDataPt
 
 		for (int j = 0; j < numberOfPositionsInBranch; j++)
 		{
-			double spherePos[3];
-			spherePos[0] = positions(0,j);
-			spherePos[1] = positions(1,j);
-			spherePos[2] = positions(2,j);
-			airwaysVolumePtr = addSphereToImage(airwaysVolumePtr, spherePos, radius);
+			positions.block(0 , j , 3 , 1) = m_rMd.inverse().coord(positions.block(0 , j , 3 , 1)); //transfrom from r to d
+			double spherePos_d[3];
+			spherePos_d[0] = positions(0,j);
+			spherePos_d[1] = positions(1,j);
+			spherePos_d[2] = positions(2,j);
+			addSphereToImage(spherePos_d, radius);
 		}
 	}
-	return airwaysVolumePtr;
 }
 
-vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysVolumePtr, double position[3], double radius)
+void AirwaysFromCenterline::addSphereToImage(double position[3], double radius)
 {
 	int value = 1;
 	int centerIndex[3];
@@ -282,12 +292,20 @@ vtkImageDataPtr AirwaysFromCenterline::addSphereToImage(vtkImageDataPtr airwaysV
 
 				if (distanceFromCenter < radius)
 				{
-						unsigned char* dataPtrImage = static_cast<unsigned char*>(airwaysVolumePtr->GetScalarPointer(x,y,z));
+						unsigned char* dataPtrImage = static_cast<unsigned char*>(mFilteredSegmentedVolumePtr->GetScalarPointer(x,y,z));
 						dataPtrImage[0] = value;
 				}
 			}
+}
 
-	return airwaysVolumePtr;
+void AirwaysFromCenterline::removeIslandsFromImage()
+{//Returns largest connected area of image
+	vtkImageConnectivityFilter* connectivityFilerPtr = vtkImageConnectivityFilter::New();
+	connectivityFilerPtr->SetInputData(mFilteredSegmentedVolumePtr);
+	connectivityFilerPtr->SetExtractionModeToLargestRegion();
+	connectivityFilerPtr->SetScalarRange(1,1);
+	connectivityFilerPtr->Update();
+	mFilteredSegmentedVolumePtr = connectivityFilerPtr->GetOutput();
 }
 
 void AirwaysFromCenterline::smoothAllBranchesForVB()

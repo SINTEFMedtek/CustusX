@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <QDirIterator>
 #include <QTextStream>
+#include <QMessageBox>
+#include <QApplication>
 
 #include "cxAlgorithmHelpers.h"
 #include "cxSelectDataStringProperty.h"
@@ -40,6 +42,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFilePathProperty.h"
 #include "cxProfile.h"
 #include "cxLogger.h"
+#include "cxRaidionics.h"
 
 namespace cx
 {
@@ -56,21 +59,32 @@ CommandStringVariables::CommandStringVariables(QString parameterFilePath, ImageP
 	cArguments = settings.value("arguments").toString();
 	scriptEngine = settings.value("engine").toString();
 	model = settings.value("model").toString();
-    settings.endGroup();
+	settings.endGroup();
+}
+
+OutputVariables::OutputVariables()
+{
 }
 
 OutputVariables::OutputVariables(QString parameterFilePath)
 {
-    // Parse .ini file
-    QSettings settings(parameterFilePath, QSettings::IniFormat);
-    settings.beginGroup("output");
-    mCreateOutputVolume = settings.value("volume").toBool();
-    mCreateOutputMesh = settings.value("mesh").toBool();
-    QString allColors = settings.value("color").toString();
-    mOutputColorList = allColors.split(";");
-    QString outputClass = settings.value("classes").toString();
-    mOutputClasses = outputClass.split(" ");
-    settings.endGroup();
+	mValid = true;
+	// Parse .ini file
+	QSettings settings(parameterFilePath, QSettings::IniFormat);
+	settings.beginGroup("output");
+	mCreateOutputVolume = settings.value("volume").toBool();
+	mCreateOutputMesh = settings.value("mesh").toBool();
+	QString allColors = settings.value("color").toString();
+	mOutputColorList = allColors.split(";");
+	QString outputClass = settings.value("classes").toString();
+	mOutputClasses = outputClass.split(" ");
+	if(mOutputClasses.isEmpty() || mOutputClasses[0].isEmpty())
+	{
+		CX_LOG_DEBUG() << "OutputVariables::OutputVariables: Problem with file: " << parameterFilePath;
+		CX_LOG_WARNING() << "OutputVariables::OutputVariables: Wrong formatting of class (should be separated with space): " << outputClass;
+		mValid = false;
+	}
+	settings.endGroup();
 }
 
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
@@ -97,7 +111,7 @@ void GenericScriptFilter::processStateChanged()
 	QProcess::ProcessState newState = mCommandLine->getProcess()->state();
 	if (newState == QProcess::Running)
 	{
-		CX_LOG_DEBUG() << "GenericScriptFilter process running";
+//		CX_LOG_DEBUG() << "GenericScriptFilter process running";
 		//emit started(0);
 	}
 	if (newState == QProcess::NotRunning)
@@ -180,11 +194,11 @@ QString GenericScriptFilter::getType() const
 QString GenericScriptFilter::getHelp() const
 {
 	return "<html>"
-			"<h3>Script.</h3>"
-			"<p>Support for calling external scripts from Custus"
-			"<p>Uses parameter file... "
-			"....</p>"
-	        "</html>";
+		   "<h3>Script.</h3>"
+		   "<p>Support for calling external scripts from Custus"
+		   "<p>Uses parameter file... "
+		   "....</p>"
+		   "</html>";
 }
 
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
@@ -205,8 +219,8 @@ FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 
 void GenericScriptFilter::setParameterFilePath(QString path)
 {
-    mScriptFile->setValue(path);
-    this->scriptFileChanged();
+	mScriptFile->setValue(path);
+	this->scriptFileChanged();
 }
 
 FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
@@ -235,22 +249,47 @@ void GenericScriptFilter::createOptions()
 void GenericScriptFilter::scriptFileChanged()
 {
 	mScriptFilePreview->setValue(mScriptFile->getValue());
+
+	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
+	mOutputVariables = OutputVariables(parameterFilePath);
+	mOutputClasses = mOutputVariables.mOutputClasses;
+	mOutputColorList = mOutputVariables.mOutputColorList;
 }
 
 QString GenericScriptFilter::createCommandString(ImagePtr input)
 {
 	CommandStringVariables variables = createCommandStringVariables(input);
-
-	CX_LOG_DEBUG() << "deepSintefCommandString(variables): " << deepSintefCommandString(variables);
-
-	if(isUsingDeepSintefEngine(variables))
+	QString command;
+	switch (mScriptEngine)
+	{
+	case seStandard:
+		return standardCommandString(variables);
+		break;
+	case seDeepSintef:
 		return deepSintefCommandString(variables);
-
-	return standardCommandString(variables);
+		break;
+	case seRaidionics:
+		if(mRaidionicsUtilities)
+			command =  mRaidionicsUtilities->raidionicsCommandString();
+		else
+			CX_LOG_ERROR() << "GenericScriptFilter::createCommandString: No mRaidionicsUtilities";
+		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh", command);
+		return command;
+		break;
+	default:
+		CX_LOG_WARNING() << "Unknown Script engine: " << mScriptEngine << ". Using default setup";
+		return standardCommandString(variables);
+		break;
+	}
 }
 
 CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePtr input)
 {
+	if(!mScriptFile)
+	{
+		CX_LOG_ERROR() << "GenericScriptFilter::createCommandStringVariables: Got no mScriptFile";
+		return CommandStringVariables("", input);
+	}
 	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
@@ -260,13 +299,18 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	variables.inputFilePath = getInputFilePath(input);
 	variables.outputFilePath = getOutputFilePath(input);
 
+	if(!setScriptEngine(variables))
+	{
+		CX_LOG_ERROR() << "GenericScriptFilter::createCommandStringVariables: Error setting up engine";
+		return CommandStringVariables("", input);
+	}
 	return variables;
 }
 
 QString GenericScriptFilter::standardCommandString(CommandStringVariables variables)
 {
 	QString commandString = variables.envPath;
-	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + findScriptFile(variables.scriptFilePath));
 	commandString.append(" " + variables.inputFilePath);
 	commandString.append(" " + variables.outputFilePath);
 	commandString.append(" " + variables.cArguments);
@@ -274,17 +318,57 @@ QString GenericScriptFilter::standardCommandString(CommandStringVariables variab
 	return commandString;
 }
 
-bool GenericScriptFilter::isUsingDeepSintefEngine(CommandStringVariables variables)
+QString GenericScriptFilter::findScriptFile(QString path)
+{
+	QDir appDir(qApp->applicationDirPath());
+	QDir scriptDir(getScriptPath());
+	if(QFileInfo::exists(path))
+		return path;
+	if(appDir.exists(path))
+		return path;//Don't change path if relative to application path
+	if(scriptDir.exists(path))
+		return  scriptDir.absoluteFilePath(path);
+
+	CX_LOG_WARNING() << "Couldn't find script file: " << path;
+	CX_LOG_WARNING() << "Looked in " << appDir.path() << " and: " << scriptDir.path();
+	return path;
+}
+
+bool GenericScriptFilter::isUsingRaidionicsEngine()
+{
+	bool retval = mScriptEngine == seRaidionics;
+	if(retval && !mRaidionicsUtilities)
+		CX_LOG_ERROR() << "GenericScriptFilter::isUsingRaidionicsEngine: No mRaidionicsUtilities";
+	return retval;
+}
+
+bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 {
 	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
-		return true;
-	return false;
+		mScriptEngine = seDeepSintef;
+	else if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
+	{
+		if(!this->initRaidionicsEngine(variables))
+			return false;
+		mScriptEngine = seRaidionics;
+	}
+	else
+		mScriptEngine = seStandard;
+	return true;
+}
+
+bool GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
+{
+	if(!mOutputVariables.mValid)
+		return false;
+	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, mOutputClasses));
+	return true;
 }
 
 QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
 {
 	QString commandString = variables.envPath;
-	commandString.append(" " + variables.scriptFilePath);
+	commandString.append(" " + findScriptFile(variables.scriptFilePath));
 	commandString.append(" --Task database --Arguments ");
 	commandString.append("\"");
 	commandString.append("InputVolume ");
@@ -299,7 +383,7 @@ QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables vari
 
 bool GenericScriptFilter::environmentExist(QString path)
 {
-	return QFileInfo(path).exists();
+	return QFileInfo::exists(path);
 }
 
 QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables)
@@ -313,10 +397,12 @@ QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables
 QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
 {
 	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
-	//CX_LOG_DEBUG() << "basePath: " << basePath;
+	QDir dir(basePath);
+	dir.cdUp();
+	basePath = dir.absolutePath();
 	
 	if(!this->environmentExist(basePath))
-		basePath = this->findRequirementsFileLocation(basePath);	
+		basePath = this->findRequirementsFileLocation(basePath);
 	
 	return basePath;
 }
@@ -359,18 +445,73 @@ QString GenericScriptFilter::findRequirementsFileLocation(QString path)
 	return retval;
 }
 
-bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath)
+bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript, QString command)
 {
-	if(!this->environmentExist(environmentPath) && this->isVirtualEnvironment(environmentPath))
+	if(createScript.isEmpty())
+		createScript = "cxCreateVenv.sh";
+
+	environmentPath = removeTrailingPythonVariable(environmentPath);
+
+	if(!this->environmentExist(environmentPath) || !this->isVirtualEnvironment(environmentPath))
 	{
-		if(!this->createProcess())
-			return false;
+		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
+		CX_LOG_WARNING() << "Admin password may be required for the command run below";
 		QString basePath = this->getEnvironmentBasePath(environmentPath);
 		QString scriptPath = getScriptPath();
-		bool retval = runCommandStringAndWait(scriptPath+"/cxCreateVenv.sh " + basePath + " " + requirementsPath);
-		return retval;
+		QString createCommand = scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath;
+		bool retval = false;
+		emit launchDialog(basePath, createCommand, command);
+
+		return this->createVenv(createCommand, command);
 	}
+	else
+	{
+		//CX_LOG_DEBUG() << "Virtual environment existing: " << environmentPath;
+	}
+	return true;
+}
+
+void GenericScriptFilter::launchDialogSlot(QString venvPath, QString createCommand, QString command)
+{
+	showVenvInfoDialog(venvPath, createCommand);
+}
+
+bool GenericScriptFilter::createVenv(QString createCommand, QString command)
+{
+	if(!this->createProcess())
+		return false;
+	runCommandStringAndWait(createCommand);
+	return true;
+}
+
+bool GenericScriptFilter::showVenvInfoDialog(QString venvPath, QString createCommand)
+{
+//	CX_LOG_DEBUG() << "showVenvInfoDialog";
+	QString messageText;
+	messageText += "There is no virtual environment at: <br><code>" + venvPath + "</code><br><br>";
+	messageText += "CustusX may try to create one, and this will probably require that an administrator password is entered in the command line";
+//	messageText += "Running:<br>";
+//	messageText += "<code>" + createCommand + "</code>";
+
+	QMessageBox messageBox;
+	messageBox.setWindowModality(Qt::WindowModal);
+	messageBox.setTextFormat(Qt::RichText);
+	messageBox.setText("Virtual environment missing");
+	messageBox.setInformativeText(messageText);
+//	messageBox.setStandardButtons(QMessageBox::Cancel| QMessageBox::Ok);
+//	messageBox.setDefaultButton(QMessageBox::Ok);
+
+	messageBox.exec();
+	int result = messageBox.result();
+	if (result == QMessageBox::Ok)
+		return true;
 	return false;
+}
+
+QString GenericScriptFilter::removeTrailingPythonVariable(QString environmentPath)
+{
+	//Only remove the possible trailing " -u" for now
+	return environmentPath.split(" -u")[0];
 }
 
 bool GenericScriptFilter::isVirtualEnvironment(QString path)
@@ -382,7 +523,7 @@ bool GenericScriptFilter::isVirtualEnvironment(QString path)
 
 QString GenericScriptFilter::getFixedEnvironmentSubdir()
 {
-	QString retval("venv/bin/python");
+	QString retval("bin/python");
 	return retval;
 }
 
@@ -400,10 +541,10 @@ QString GenericScriptFilter::getScriptPath()
 	scriptFilePath.replace("./","/");
 
 	retval = QFileInfo(parameterFilePath).absoluteDir().absolutePath()+QFileInfo(scriptFilePath).dir().path();
-	CX_LOG_DEBUG() << "Pyton script file path: " << retval;
+//	CX_LOG_DEBUG() << "Pyton script file path: " << retval;
 
 	retval = QFileInfo(parameterFilePath).absoluteDir().absolutePath();
-	CX_LOG_DEBUG() << "Using ini file path as script path: " << retval;
+//	CX_LOG_DEBUG() << "Using ini file path as script path: " << retval;
 
 	return retval;
 }
@@ -434,25 +575,22 @@ QString GenericScriptFilter::getOutputFilePath(ImagePtr input)
 	outputFileName.append(mResultFileEnding);
 	outputFilePath.append("/" + fi.path());
 	outputFilePath.append("/" + outputFileName);
-	CX_LOG_DEBUG() << "outputFilePath: " << outputFilePath;
+	//CX_LOG_DEBUG() << "outputFilePath: " << outputFilePath;
 
 	return outputFilePath;
 }
 
 bool GenericScriptFilter::runCommandStringAndWait(QString command)
 {
-	CX_LOG_DEBUG() << "Command to run: " << command;
-
-	QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
+	CX_LOG_INFO() << "Command to run: " << command;
 
 	CX_ASSERT(mCommandLine)
 	if(!mCommandLine)
 		return false;
-	
-	mCommandLine->getProcess()->setWorkingDirectory(getScriptPath()); //TODO: Use ini file path or python script file path?
+
 	bool success = mCommandLine->launch(command);
 	if(success)
-        return mCommandLine->waitForFinished(1000*60*30);//Wait at least 30 min
+		return mCommandLine->waitForFinished(1000*60*30);//Wait at least 30 min
 	else
 	{
 		CX_LOG_WARNING() << "GenericScriptFilter::runCommandStringAndWait: Cannot start command!";
@@ -472,15 +610,15 @@ void GenericScriptFilter::createInputTypes()
 
 void GenericScriptFilter::createOutputTypes()
 {
-    mOutputImageSelectDataPtr = StringPropertySelectData::New(mServices->patient());
-    mOutputImageSelectDataPtr->setValueName("Output");
-    mOutputImageSelectDataPtr->setHelp("Output smoothed image");
-    mOutputTypes.push_back(mOutputImageSelectDataPtr);
+	mOutputImageSelectDataPtr = StringPropertySelectData::New(mServices->patient());
+	mOutputImageSelectDataPtr->setValueName("Output");
+	mOutputImageSelectDataPtr->setHelp("Output smoothed image");
+	mOutputTypes.push_back(mOutputImageSelectDataPtr);
 
-    mOutputMeshSelectMeshPtr = StringPropertySelectMesh::New(mServices->patient());
-    mOutputMeshSelectMeshPtr->setValueName("Output Mesh");
-    mOutputMeshSelectMeshPtr->setHelp("Output surface model");
-    mOutputTypes.push_back(mOutputMeshSelectMeshPtr);
+	mOutputMeshSelectMeshPtr = StringPropertySelectMesh::New(mServices->patient());
+	mOutputMeshSelectMeshPtr->setValueName("Output Mesh");
+	mOutputMeshSelectMeshPtr->setHelp("Output surface model");
+	mOutputTypes.push_back(mOutputMeshSelectMeshPtr);
 
 }
 
@@ -502,17 +640,17 @@ bool GenericScriptFilter::execute()
 	// Run command string on console
 	bool retval = this->runCommandStringAndWait(command);
 	if(!retval)
-		CX_LOG_WARNING() << "External process failed. QProcess::ProcessError: " << mCommandLine->getProcess()->error();
+	{
+		processError(mCommandLine->getProcess()->error());
+	}
 	retval = retval & deleteProcess();
 
 	return retval; // Check for error?
 }
 
-
 bool GenericScriptFilter::createProcess()
 {
 	mCommandLine.reset();//delete
-	CX_LOG_DEBUG() << "createProcess";
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
 	mCommandLine->turnOffReporting();//Handle output in this class instead
 
@@ -557,78 +695,96 @@ bool GenericScriptFilter::disconnectProcess()
 
 bool GenericScriptFilter::postProcess()
 {
-	CX_LOG_DEBUG() << "postProcess";
+//	CX_LOG_DEBUG() << "postProcess";
 
-    QString parameterFilePath = mScriptFile->getEmbeddedPath().getAbsoluteFilepath();
-    OutputVariables outputVariables = OutputVariables(parameterFilePath);
+	//TODO: Run postProcess in separate thread as well?
+	//Need to put all postProcess code in a separate (worker) class and use moveToThread()
+//	QThread* mPostprosessingThread = new QThread;
 
-    bool createOutputVolume = outputVariables.mCreateOutputVolume;
-    bool createOutputMesh = outputVariables.mCreateOutputMesh;
-    QStringList colorList = outputVariables.mOutputColorList;
-    mOutputClasses = outputVariables.mOutputClasses;
-    this->setupOutputColors(colorList);
+	bool createOutputVolume = mOutputVariables.mCreateOutputVolume;
+	bool createOutputMesh = mOutputVariables.mCreateOutputMesh;
 
-    return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
+	this->setOutputClasses(mOutputClasses);
+	this->setOutputColorsFromClasses();
+
+	return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
+}
+
+void GenericScriptFilter::setOutputClasses(QStringList outputClasses)
+{
+	mOutputClasses = outputClasses;
+	if(isUsingRaidionicsEngine())
+		mOutputClasses = mRaidionicsUtilities->setOutputClasses(outputClasses);
+}
+
+void GenericScriptFilter::setOutputColorsFromClasses()
+{
+	if(isUsingRaidionicsEngine())
+	{
+		mOutputColorList.clear();
+		for(int i = 0; i < mOutputClasses.size(); ++i)
+			mOutputColorList << Raidionics::colorForLungClass(mOutputClasses[i]);
+	}
+	this->setupOutputColors(mOutputColorList);
 }
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
 {
-    mOutputColors.clear();
-    int i=0;
-    do
-    {
-        if (colorList.size() > i)
-        {
-            QStringList color = colorList[i].split(",");
-            QColor addColor = createColor(color);
-            mOutputColors.append(addColor);
-        }
-        else
-        {
-            QString outputClass("");
-            if(mOutputClasses.size() >= i)
-              outputClass = mOutputClasses[i];
-            CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): No color set in ini for " << outputClass << " file. Setting mesh color to red.";
-            mOutputColors.append(getDefaultColor());
-        }
-    }
-    while (++i < mOutputClasses.size());
+	mOutputColors.clear();
+	int i=0;
+	do
+	{
+		if (colorList.size() > i)
+		{
+			QStringList color = colorList[i].split(",");
+			QColor addColor = createColor(color);
+			mOutputColors.append(addColor);
+		}
+		else
+		{
+			QString outputClass("");
+			if(mOutputClasses.size() >= i)
+				outputClass = mOutputClasses[i];
+			CX_LOG_WARNING() << "In GenericScriptFilter::setupOutputColors(): No color set in ini for " << outputClass << " file. Setting mesh color to red.";
+			mOutputColors.append(getDefaultColor());
+		}
+	}
+	while (++i < mOutputClasses.size());
 }
 
 QColor GenericScriptFilter::createColor(QStringList color)
 {
-  QColor retval;
-  if (color.size() == 4)
-      retval.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
-  if (!retval.isValid())
-  {
-      CX_LOG_WARNING() << "In GenericScriptFilter::createColor(): Invalid color set in ini file. Setting color to red.";
-      retval = getDefaultColor();
-  }
-  return retval;
+	QColor retval;
+	if (color.size() == 4)
+		retval.setRgb(color[0].toDouble(), color[1].toDouble(), color[2].toDouble(), color[3].toDouble());
+	if (!retval.isValid())
+	{
+		CX_LOG_WARNING() << "In GenericScriptFilter::createColor(): Invalid color set in ini file. Setting color to red.";
+		retval = getDefaultColor();
+	}
+	return retval;
 }
 
 QColor GenericScriptFilter::getDefaultColor()
 {
-  QColor retval;
-  retval.setNamedColor("red");
-  return retval;
+	QColor retval;
+	retval.setNamedColor("red");
+	return retval;
 }
 
 void GenericScriptFilter::createOutputMesh(QColor color)
 {
-
-    // Make contour of segmented volume
+	// Make contour of segmented volume
 	double threshold = 1; /// because the segmented image is 0..1
 
-    vtkPolyDataPtr rawContour = ContourFilter::execute(
-	mOutputImage->getBaseVtkImageData(),
-	threshold,
-	false, // reduce resolution
-	true, // smoothing
-    true, // keep topology
-	0 // target decimation
-	);
+	vtkPolyDataPtr rawContour = ContourFilter::execute(
+				mOutputImage->getBaseVtkImageData(),
+				threshold,
+				false, // reduce resolution
+				true, // smoothing
+				true, // keep topology
+				0 // target decimation
+				);
 
 	QString uidOutputMesh = mOutputImage->getUid() + "_mesh";
 	QString nameOutputMesh = mOutputImage->getName() + "_mesh";
@@ -637,9 +793,11 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 	outputMesh->setColor(color);
 	patientService()->insertData(outputMesh);
 	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
+	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
+	outputMesh->setOrganType(mOutputImage->getOrganType());
 	mServices->view()->autoShowData(outputMesh);
 
-    mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
+	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
 }
 
 bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh)
@@ -652,20 +810,31 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	}
 
 	QFileInfo fileInfoInput(parentImage->getFilename());
-	QString outputFileName = fileInfoInput.baseName();
-	QFileInfo outputFileInfo(outputFileName.append(mResultFileEnding));
+	QString inputFileName = fileInfoInput.baseName();
+	QFileInfo outputFileInfo(inputFileName + mResultFileEnding);
 	QString outputFilePath = mServices->patient()->getActivePatientFolder();
 	QString outputDir(outputFilePath.append("/" + fileInfoInput.path()));
 	QString outputFileNamesNoExtention = outputFileInfo.baseName();
+
+	if(isUsingRaidionicsEngine())
+	{
+		inputFileName = mRaidionicsUtilities->getRadionicsInputFileName(inputFileName);
+		outputDir = mRaidionicsUtilities->getOutputFolder();
+	}
+//	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
+
+
 
 	QDirIterator fileIterator(outputDir, QDir::Files);
 	while (fileIterator.hasNext())
 	{
 		QString filePath = fileIterator.next();
-		if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".mhd"))
+
+		if(filePath.contains(outputFileNamesNoExtention) &&
+				(filePath.contains(".mhd")) || (isUsingRaidionicsEngine() && filePath.contains(".nii")))
 		{
 			QFileInfo fileInfoOutput(filePath);
-			QString uid =	fileInfoOutput.fileName().replace(".mhd", "");
+			QString uid = changeExtension(fileInfoOutput.fileName(), "");
 			ImagePtr newImage = boost::dynamic_pointer_cast<Image>(mServices->file()->load(uid, filePath));
 			if(!newImage)
 			{
@@ -676,31 +845,37 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 			mOutputImage = createDerivedImage(mServices->patient(),
 												uid, createImageName(parentImage->getName(), filePath),
 												newImage->getBaseVtkImageData(), parentImage);
+			int classNumber = getClassNumber(filePath);
+			ORGAN_TYPE organType = this->getOrganType(classNumber);
+			mOutputImage->setOrganType(organType);
+
+			if(inputFileName == fileInfoOutput.baseName() || inputFileName == QFileInfo(fileInfoOutput.baseName()).baseName())
+			{
+				CX_LOG_INFO() << "Skipping copy of input image: " << filePath;
+				CX_LOG_INFO() << "Input image was: " << parentImage->getFilename();
+				continue;//Skip input volume. The mesh creation of this takes a very long time
+			}
+			else
+				CX_LOG_INFO() << "Importing: " << filePath << " (as organ type: " << enum2string(organType) << ")";
+
 			if(!mOutputImage)
 			{
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: Problem creating derived image";
 				continue;
 			}
-			if (createOutputVolume)
+			if (createOutputVolume || (organType==otAIRWAYS))//Always create volume for Airways
 				this->createOutputVolume();
+
 
 			if(createOutputMesh && mOutputImage)
 			{
-				int colorNumber = 0;
-				for(int i=0; i<mOutputClasses.size(); i++)
-				{
-					if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
-					{
-						colorNumber = i;
-						break;
-					}
-				}
 				QColor outputColor = getDefaultColor();
-				if(mOutputColors.size() > colorNumber)
-					outputColor = mOutputColors.at(colorNumber);
+				if(mOutputColors.size() > classNumber)
+					outputColor = mOutputColors.at(classNumber);
 				this->createOutputMesh(outputColor);
 			}
-			this->deleteNotUsedFiles(filePath, createOutputVolume);
+			if(!isUsingRaidionicsEngine())
+				this->deleteNotUsedFiles(filePath, createOutputVolume);
 		}
 		else if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".vtk"))
 		{
@@ -723,47 +898,71 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 	return true;
 }
 
+ORGAN_TYPE GenericScriptFilter::getOrganType(int classNumber)
+{
+	QString organTypeString = mOutputClasses[classNumber];
+	ORGAN_TYPE organType = string2enum<ORGAN_TYPE>(organTypeString);
+	if(organTypeString == "SubCarArt")
+		organType = otSUBCLAVIAN_ARTERY;
+	if(organType == otUNKNOWN || organType == organtypeCOUNT)
+		CX_LOG_WARNING() << "GenericScriptFilter::getOrganType: Cannot find organ type: " << organTypeString;
+	return organType;
+}
+
+
+int GenericScriptFilter::getClassNumber(QString filePath)
+{
+	int classNumber = 0;
+	for(int i=0; i<mOutputClasses.size(); i++)
+	{
+		if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
+		{
+			classNumber = i;
+			break;
+		}
+	}
+	return classNumber;
+}
+
 QString GenericScriptFilter::createImageName(QString parentName, QString filePath)
 {
 	QString retval = parentName;
 	QString nameEnding = mResultFileEnding;
 	nameEnding.replace(".mhd", "");
-	for(int i=0; i<mOutputClasses.size(); i++)
-	{
-		if(filePath.contains(mOutputClasses[i], Qt::CaseSensitive))
-			retval = retval + QString("_") + mOutputClasses[i] + QString("_");
-	}
+	int classNumber = getClassNumber(filePath);
+	if(mOutputClasses.size() > classNumber)
+		retval = retval + QString("_") + mOutputClasses[classNumber];
 	retval.append(nameEnding);
 	return retval;
 }
 
 void GenericScriptFilter::createOutputVolume()
 {
-    if(!mOutputImage)
-        return;
+	if(!mOutputImage)
+		return;
 
-    mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
-    mOutputImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
+	mOutputImage->setImageType(istSEGMENTATION);//Mark with correct type
+	mOutputImage->resetTransferFunctions();//Reset transfer functions to get some useful values for visualization
 
-    mServices->patient()->insertData(mOutputImage);
-    mServices->view()->autoShowData(mOutputImage);
+	mServices->patient()->insertData(mOutputImage);
+	mServices->view()->autoShowData(mOutputImage);
 
-    mOutputImageSelectDataPtr->setValue(mOutputImage->getUid());
+	mOutputImageSelectDataPtr->setValue(mOutputImage->getUid());
 }
 
 void GenericScriptFilter::deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume)
 {
-    //delete files not used anymore
-    if (QFileInfo(fileNameMhd).exists() && !createOutputVolume)
-        QFile(fileNameMhd).remove();
+	//delete files not used anymore
+	if (QFileInfo::exists(fileNameMhd) && !createOutputVolume)
+		QFile(fileNameMhd).remove();
 
-    QString fileNameRaw = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".raw";
-    if (QFileInfo(fileNameRaw).exists() && !createOutputVolume)
-        QFile(fileNameRaw).remove();
+	QString fileNameRaw = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".raw";
+	if (QFileInfo::exists(fileNameRaw) && !createOutputVolume)
+		QFile(fileNameRaw).remove();
 
-    QString fileNameNii = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".nii";
-    if (QFileInfo(fileNameNii).exists())
-        QFile(fileNameNii).remove();
+	QString fileNameNii = fileNameMhd.left(fileNameMhd.lastIndexOf("."))+".nii";
+	if (QFileInfo::exists(fileNameNii))
+		QFile(fileNameNii).remove();
 }
 
 } // namespace cx

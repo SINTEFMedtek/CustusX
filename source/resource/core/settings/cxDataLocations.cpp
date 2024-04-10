@@ -202,6 +202,14 @@ QStringList DataLocations::getRootConfigPaths()
 	return retval;
 }
 
+QString DataLocations::getUserHomePath()
+{
+	QString retval = getenv("HOME");//Ubuntu/Mac
+	if(retval.isEmpty())
+		retval = getenv("USERPROFILE");//Windows
+	return retval;
+}
+
 QString DataLocations::getDocPath()
 {
 	if(!isRunFromBuildFolder())
@@ -234,19 +242,15 @@ QStringList DataLocations::appendStringToAllElements(QStringList root, QString s
 	return retval;
 }
 
-namespace
-{
-QString changeExtension(QString name, QString ext)
-{
-	QStringList splitName = name.split(".");
-	splitName[splitName.size()-1] = ext;
-	return splitName.join(".");
-}
-} //namespace
-
 QString DataLocations::getCachePath()
 {
 	QString path(getPersistentWritablePath()+"/cache");
+	return path;
+}
+
+QString DataLocations::getModelsPath()
+{
+	QString path(getPersistentWritablePath()+"/models");
 	return path;
 }
 

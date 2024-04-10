@@ -16,10 +16,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFile>
 #include <QDir>
 #include <QtGlobal>
+#include <QTextStream>
 
 #include "cxTypeConversions.h"
 #include "cxTime.h"
 #include "cxData.h"
+#include "cxImage.h"
 #include "cxBoundingBox3D.h"
 #include "cxTransformFile.h"
 #include "cxCustomMetaImage.h"
@@ -67,6 +69,9 @@ bool ElastixExecuter::setInput(QString application,
 {
 	mFixed = fixed;
 	mMoving = moving;
+	mOutdir = outdir;
+	mParameterfiles = parameterfiles;
+	mElastiXApplication = application;
 
 	if (!fixed || !moving)
 	{
@@ -100,16 +105,137 @@ bool ElastixExecuter::setInput(QString application,
 	QString commandLine = cmd.join(" ");
 	report(QString("Executing registration with command line: [%1]").arg(commandLine));
 
+	updateProcessName();
+	this->setProcessEnvironment(mProcess);
+	mProcess->start(commandLine);
+	return true;
+}
+
+void ElastixExecuter::updateProcessName(bool transformix)
+{
+	if(transformix)
+		mProduct = "Transformix";
+	else
+		mProduct = "ElastiX";
+}
+
+bool ElastixExecuter::runTransformix(ImagePtr deformImage)
+{
+	//Need a separete process for Transformix
+	mTransformixProcess = new QProcess(this);
+	connect(mTransformixProcess, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(processStateChanged(QProcess::ProcessState)));
+	connect(mTransformixProcess, SIGNAL(error(QProcess::ProcessError)), this, SLOT(processError(QProcess::ProcessError)));
+	connect(mTransformixProcess, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(processFinished(int, QProcess::ExitStatus)));
+
+	mDeformImage = deformImage;
+	QString commandLine = createTransformixCommandLine(mElastiXApplication, mOutdir, mParameterfiles);
+	report(QString("Executing deformation with command line: [%1]").arg(commandLine));
+
+	updateProcessName(true);
+	this->setProcessEnvironment(mTransformixProcess);
+	mTransformixProcess->start(commandLine);
+	return true;
+}
+
+void ElastixExecuter::setProcessEnvironment(QProcess* process)
+{
 #ifdef Q_OS_LINUX
 	// hack that inserts . into library path for linux. Solveds issue with elastix lib not being fixed up on linux.
-	QString path = QFileInfo(application).absolutePath();
+	QString path = QFileInfo(mElastiXApplication).absolutePath();
 	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 	env.insert("LD_LIBRARY_PATH", path);
-	mProcess->setProcessEnvironment(env);
+	process->setProcessEnvironment(env);
 #endif
-    mProcess->start(commandLine);
-    return true;
 }
+
+QString ElastixExecuter::createTransformixCommandLine(QString elastixApplication, QString outdir, QStringList parameterfiles)
+{
+	if(!mDeformImage)
+	{
+		CX_LOG_DEBUG() << "ElastixExecuter::createTransformixCommandLine: No mDeformImage. No need to run transformix";
+		return QString("");
+	}
+	//Assuming transformix is placed together with elastix
+	QString path = QFileInfo(elastixApplication).absolutePath();
+	QString transformixApplication = path + "/" + "transformix";
+	if(!QFile::exists(transformixApplication))
+	{
+		CX_LOG_WARNING() << "ElastixExecuter::createTransformixCommandLine: Cannot find transformix application at: " << transformixApplication;
+		return QString("");
+	}
+
+//	QString transformParametersFile = this->findMostRecentTransformOutputFile();
+	int transformParameterFileNumber = parameterfiles.size() - 1;
+	QString transformParametersFile = QString(mLastOutdir + "/TransformParameters.%1.txt").arg(transformParameterFileNumber);
+	if (transformParametersFile.isEmpty())
+	{
+		CX_LOG_WARNING() << "ElastixExecuter::createTransformixCommandLine: Cannot find transformParameters";
+		return QString("");
+	}
+
+	//This only seems to only do a clipping, and not run the transform
+	//Turing this off requires removing parent from deformImage
+//	QString initTransformFilename = this->writeInitTransformToElastixfile(mFixed, mDeformImage, mOutdir);
+//	transformParametersFile = changeInitialTransformsFromParametersFile(transformParametersFile, initTransformFilename);//TODO: on/off? - Not always working?
+
+	//Can only get this to work by moving mDeformImage back to start position (by undoing registration), and applying all Elastix transforms
+	//This require skipping the 2 above lines, but handing either parent or moving the volume
+	//Or remove mDeformImage parent before running Elastix (gives same starting position)
+	//Skipping adding a CX registration from Elastix should work, or postponing it
+
+	QStringList cmd;
+	cmd << "\"" + transformixApplication + "\"";
+	cmd << "-in" << mServices->patient()->getActivePatientFolder()+"/"+mDeformImage->getFilename();
+	cmd << "-out" << outdir;
+	cmd << "-tp" << transformParametersFile;
+
+	QString commandLine = cmd.join(" ");
+	return commandLine;
+}
+
+//Need to add an initial transform
+//QString ElastixExecuter::changeInitialTransformsFromParametersFile(QString transformParametersFile, QString initTransformFilename)
+//{
+//	QString path = QFileInfo(transformParametersFile).absolutePath();
+//	QString newFileName = path + "/" + "TransformParametersDeformationOnly.txt";
+
+////	CX_LOG_DEBUG() << "ElastixExecuter::changeInitialTransformsFromParametersFile: convert " << transformParametersFile << " (read) to " << newFileName << " (write)";
+
+//	QFile oldFile(transformParametersFile);
+//	if(!oldFile.open(QIODevice::ReadOnly|QIODevice::Text))
+//	{
+//		CX_LOG_WARNING() << "ElastixExecuter::changeInitialTransformsFromParametersFile: Cannot open file " << transformParametersFile << " for reading";
+//		return transformParametersFile;
+//	}
+
+//	QString fileContents;
+//	QTextStream inStream(&oldFile);
+//	QString fileLine;
+//	while (inStream.readLineInto(&fileLine))
+//	{
+//		if(fileLine.startsWith("(InitialTransformParametersFileName"))
+//		{
+//			if(initTransformFilename.isEmpty())
+//				fileLine = "(InitialTransformParametersFileName \"NoInitialTransform\")";//Not enough
+//			fileLine = "(InitialTransformParametersFileName \"" + initTransformFilename + "\")";
+//		}
+//		fileContents += fileLine + "\n";
+//	}
+//	oldFile.close();
+
+//	QFile newFile(newFileName);
+//	if(!newFile.open(QIODevice::WriteOnly|QIODevice::Text))
+//	{
+//		CX_LOG_WARNING() << "ElastixExecuter::changeInitialTransformsFromParametersFile: Cannot open file " << newFileName << " for writeing";
+//		return transformParametersFile;
+//	}
+
+//	QTextStream outStream(&newFile);
+//	outStream << fileContents;
+//	newFile.close();
+
+//	return newFileName;
+//}
 
 void ElastixExecuter::execute()
 {
@@ -124,7 +250,10 @@ bool ElastixExecuter::isFinished() const
 
 bool ElastixExecuter::isRunning() const
 {
-	return mProcess->state()!=QProcess::NotRunning;
+	bool retval = mProcess->state()!=QProcess::NotRunning;
+	if(mTransformixProcess)
+		retval = retval || mTransformixProcess->state()!=QProcess::NotRunning;
+	return retval;
 }
 
 QString ElastixExecuter::writeInitTransformToElastixfile(
@@ -147,12 +276,14 @@ QString ElastixExecuter::writeInitTransformToElastixfile(
 	//
 	Transform3D rMf = fixed->get_rMd();
 	Transform3D rMm = moving->get_rMd();
-	Transform3D ffMf = this->getFileTransform_ddMd(mFixed);
-	Transform3D mmMm = this->getFileTransform_ddMd(mMoving);
+	Transform3D ffMf = this->getFileTransform_ddMd(fixed);
+	Transform3D mmMm = this->getFileTransform_ddMd(moving);
+	Transform3D mCenterMfCenter_r = centerToCenterTranslation(true);
+
 //	Transform3D mMf = rMm.inv() * rMf;
 	// -->
 	// The remainder transform, not stored in mhd files, must be sent to elastiX:
-	Transform3D T0 = mmMm*rMm.inv()*rMf*ffMf.inv();
+	Transform3D T0 = mmMm*rMm.inv()*mCenterMfCenter_r*rMf*ffMf.inv();
 
 //	Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
 	ElastixEulerTransform E = ElastixEulerTransform::create(T0, fixed->boundingBox().center());
@@ -189,12 +320,25 @@ QString ElastixExecuter::writeInitTransformToCalfile(
 	DataPtr moving,
 	QString outdir)
 {
-	Transform3D mMf = moving->get_rMd().inv() * fixed->get_rMd();
+	Transform3D mCenterMfCenter_r = centerToCenterTranslation();
+	Transform3D mMf = moving->get_rMd().inv() * mCenterMfCenter_r * fixed->get_rMd();
 
 	TransformFile file(outdir+"/moving_M_fixed_initial.cal");
 	file.write(mMf);
 
 	return file.fileName();
+}
+
+Transform3D ElastixExecuter::centerToCenterTranslation(bool printDebug)
+{
+	Vector3D fCenter_r = mFixed->get_rMd().coord(mFixed->boundingBox().center());
+	Vector3D mCenter_r = mMoving->get_rMd().coord(mMoving->boundingBox().center());
+	Transform3D mCenterMfCenter_r = createTransformTranslate(mCenter_r - fCenter_r);//center to center translation in r
+	if(printDebug)
+	{
+		CX_LOG_DEBUG() << "ElastixExecuter: Applying transform to move center to center:\n" << mCenterMfCenter_r;
+	}
+	return mCenterMfCenter_r;
 }
 
 void ElastixExecuter::processReadyRead()
@@ -270,7 +414,7 @@ QString ElastixExecuter::findMostRecentTransformOutputFile() const
 	for (int i=0; ; ++i)
 	{
 		QString filename = QString(mLastOutdir + "/TransformParameters.%1.txt").arg(i);
-		if (!QFileInfo(filename).exists())
+		if (!QFileInfo::exists(filename))
 			break;
 		retval = filename;
 	}
@@ -322,7 +466,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		bool useDirectionCosines = file.readParameterBool("UseDirectionCosines");
 		if (useDirectionCosines)
 		{
-			reportWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
+//			reportWarning("Elastix UseDirectionCosines is not supported. Result is probably wrong.");
 		}
 
 		QString transformType = file.readParameterString("Transform");
@@ -359,7 +503,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 }
 
 
-QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
+QString ElastixExecuter::getNonlinearResultVolume(bool* ok, bool getTransformixResult)
 {
 	if (ok)
 		*ok = false;
@@ -370,9 +514,15 @@ QString ElastixExecuter::getNonlinearResultVolume(bool* ok)
 	{
 		//TODO only mhd supported
 		QString filename = QString(mLastOutdir + "/result.%1.mhd").arg(i);
-		if (!QFileInfo(filename).exists())
+		if (!QFileInfo::exists(filename))
 			break;
 		retval = filename;
+	}
+	if(getTransformixResult)
+	{
+		QString filename = QString(mLastOutdir + "/result.mhd");
+		if (QFileInfo::exists(filename))
+			retval = filename;
 	}
 
 	if (retval.isEmpty())

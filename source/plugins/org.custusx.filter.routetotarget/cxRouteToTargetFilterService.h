@@ -53,12 +53,18 @@ public:
 	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
 	std::vector<BranchPtr> getRouteBranches();
 	std::vector< double > getCameraRotation();
+	std::vector< int > getGenerationNumbers();
+	std::vector<double> getRadius();
 	std::vector< int > getBranchingIndex();
+	BranchListPtr getBranchList();
+	void setBranchList(BranchListPtr branchList);
+	void setReprocessCenterline(bool reprocess);
 
 	virtual bool execute();
 	virtual bool postProcess();
 	virtual bool postProcessBloodVessels();
-    void setSmoothing(bool smoothing = true);
+	void setSmoothing(bool smoothing = true);
+	void setUseExtraAirwayPoints(bool useExtraAirwayPoints);
 
 protected:
 	virtual void createOptions();
@@ -77,6 +83,8 @@ private:
     BranchListPtr mBranchListPtr;
     bool mGenerateFileWithRouteInformation;
     bool mSmoothing;
+		bool mUseExtraAirwayPoints = false;
+		bool mReprocessCenterline = true;
     BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;

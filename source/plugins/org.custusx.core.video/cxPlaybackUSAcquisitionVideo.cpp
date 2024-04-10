@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <boost/bind.hpp>
 #include "vtkImageImport.h"
 #include "vtkImageData.h"
+#include <vtkPolyData.h>
 #include "cxTypeConversions.h"
 #include "cxUsReconstructionFileReader.h"
 #include "cxTestVideoSource.h"

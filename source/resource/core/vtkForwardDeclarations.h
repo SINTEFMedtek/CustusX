@@ -44,6 +44,7 @@ typedef vtkSmartPointer<class vtkClipPolyData> vtkClipPolyDataPtr;
 typedef vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
 typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
 typedef vtkSmartPointer<class vtkContourFilter> vtkContourFilterPtr;
+typedef vtkSmartPointer<class vtkCornerAnnotation> vtkCornerAnnotationPtr;
 typedef vtkSmartPointer<class vtkCursor2D> vtkCursor2DPtr;
 typedef vtkSmartPointer<class vtkCursor3D> vtkCursor3DPtr;
 typedef vtkSmartPointer<class vtkCutter> vtkCutterPtr;

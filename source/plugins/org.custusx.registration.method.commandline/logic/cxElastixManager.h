@@ -18,6 +18,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxStringProperty.h"
 #include "cxElastixParameters.h"
 #include "cxRegServices.h"
+#include "cxTransform3D.h"
+#include "org_custusx_registration_method_commandline_Export.h"
 
 namespace cx
 {
@@ -35,7 +37,7 @@ typedef boost::shared_ptr<class ElastixExecuter> ElastixExecuterPtr;
  * \date Feb 4, 2012
  * \author Christian Askeland, SINTEF
  */
-class ElastixManager : public QObject
+class org_custusx_registration_method_commandline_EXPORT ElastixManager : public QObject
 {
 	Q_OBJECT
 public:
@@ -54,9 +56,15 @@ signals:
 private slots:
 	void executionFinishedSlot();
 	void preprocessExecuter();
+	void postponedRegistration();
 
 private:
 	void addNonlinearData();
+	void deformAdditionalImage();
+	ImagePtr getNonLinearBaseImage();
+	QString removeParent(ImagePtr image);
+	void setParent(ImagePtr image, QString parentSpace);
+	void doRegistration(Transform3D delta_pre_rMd, QString desc);
 
 	ElastixParametersPtr mParameters;
 	XmlOptionFile mOptions;
@@ -64,6 +72,11 @@ private:
 	BoolPropertyPtr mDisableRendering;
 	ElastixExecuterPtr mExecuter;
 	RegServicesPtr mServices;
+	bool mRunningTransformix = false;
+
+	Transform3D mDelta_pre_rMd;
+	QString mDesc;
+	ImagePtr mLastNonLonearImage;
 };
 typedef boost::shared_ptr<ElastixManager> ElastixManagerPtr;
 

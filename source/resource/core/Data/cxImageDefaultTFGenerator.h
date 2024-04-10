@@ -37,6 +37,8 @@ public:
 	ImageDefaultTFGenerator(ImagePtr image);
 	ImageLUT2DPtr generate2DTFPreset();
 	ImageTF3DPtr generate3DTFPreset();
+	ImageLUT2DPtr generate2DTFPresetPET();
+	ImageTF3DPtr generate3DTFPresetPET();
 	void resetShading();
 
 private:

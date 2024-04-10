@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxtestUtilities.h"
+#include "cxRaidionics.h"
 
 namespace cxtest
 {
@@ -89,6 +90,14 @@ public:
 
 		mScriptFile->setValueFromVariant(scriptFile);
 	}
+
+	void setRaidionicsScriptFile()
+	{
+		QString configPath = cx::DataLocations::getRootConfigPath();
+		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/raidionics_Airways.ini";
+		mScriptFile->setValueFromVariant(scriptFile);
+	}
+
 	void testSetupOutputColors(QStringList colorList)
 	{
 		setupOutputColors(colorList);
@@ -128,9 +137,9 @@ public:
 	}
 	bool testIsUsingDeepSintefEngine(cx::CommandStringVariables variables)
 	{
-		return isUsingDeepSintefEngine(variables);
+		return (mScriptEngine == seDeepSintef);
 	}
-	
+
 	bool testEnvironmentExist(QString environmentPath)
 	{
 		return environmentExist(environmentPath);
@@ -159,6 +168,18 @@ public:
 	QString testGetFixedEnvironmentSubdir()
 	{
 		return getFixedEnvironmentSubdir();
+	}
+	cx::FilePathPropertyPtr getScriptFile()
+	{
+		return mScriptFile;
+	}
+	SCRIPT_ENGINE getScriptEngine()
+	{
+		return mScriptEngine;
+	}
+	bool isUsingRaidionicsEngine()
+	{
+		return cx::GenericScriptFilter::isUsingRaidionicsEngine();
 	}
 
 public slots:
@@ -242,6 +263,23 @@ public slots:
 		REQUIRE(data);
 		return data;
 	}
+
+
+
+	class TestRaidionics : public cx::Raidionics
+	{
+	public:
+		static QString getTarget(cx::ORGAN_TYPE organType)
+		{
+			return cx::Raidionics::getTarget(organType);
+		}
+
+		static cx::ORGAN_TYPE getOrganType(QString target)
+		{
+			return cx::Raidionics::getOrganType(target);
+		}
+	};
+
 } //cxtest
 
 TEST_CASE("GenericScriptFilter: Create", "[unit]")
@@ -304,7 +342,7 @@ TEST_CASE("GenericScriptFilter: Set input and execute", "[unit][not_win64]")
 }
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[unit][hide]")
+TEST_CASE("GenericScriptFilter: Set input and execute for machine learning", "[hide]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -509,7 +547,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << variables.cArguments;
 	//CX_LOG_DEBUG() << variables.scriptEngine;
 	//CX_LOG_DEBUG() << variables.model;
-	
+
 	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
 	REQUIRE_FALSE(variables.inputFilePath.isEmpty());
 	REQUIRE_FALSE(variables.outputFilePath.isEmpty());
@@ -520,7 +558,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	REQUIRE(variables.model == "CT_Lungs");
 
 	//CX_LOG_DEBUG() << "ParameterFilePath: " << filter->getParameterFilePath();
-	REQUIRE(QFileInfo(filter->getParameterFilePath()).exists());
+	REQUIRE(QFileInfo::exists(filter->getParameterFilePath()));
 
 	cx::OutputVariables outputVariables = cx::OutputVariables(filter->getParameterFilePath());
 
@@ -531,6 +569,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << outputVariables.mOutputClasses.join(";");
 
 	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
+	REQUIRE(outputVariables.mValid);
 	REQUIRE(outputVariables.mCreateOutputVolume);
 	REQUIRE(outputVariables.mCreateOutputMesh);
 
@@ -551,7 +590,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	cx::LogicManager::shutdown();
 }
 
-TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64][hide]")
+TEST_CASE("GenericScriptFilter: Test environment", "[not_win64][hide]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -568,12 +607,113 @@ TEST_CASE("GenericScriptFilter: Test environment", "[unit][not_win64][hide]")
 
 	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
 	CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
-	
+
 	//filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
 	//variables = filter->testCreateCommandStringVariables(dummyImage);
 	//CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
-	
+
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("Raidionics: init", "[unit]")
+{
+	cx::LogicManager::initialize();
+	cx::DataLocations::setTestMode();
+	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+
+	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter(services));
+
+	filter->getOptions();
+	filter->setRaidionicsScriptFile();
+
+	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
+
+	REQUIRE(filter->getScriptFile());
+	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
+
+	CHECK(filter->getScriptEngine() == cx::GenericScriptFilter::seRaidionics);
+
+	QString parameterFilePath = filter->getScriptFile()->getEmbeddedPath().getAbsoluteFilepath();
+	REQUIRE_FALSE(parameterFilePath.isEmpty());
+
+	cx::OutputVariables outputVariables = cx::OutputVariables(parameterFilePath);
+
+	cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(services, variables, outputVariables.mOutputClasses));
+
+	REQUIRE(filter->isUsingRaidionicsEngine());
+
+	QString command =  raidionicsUtilities->raidionicsCommandString();
+	CHECK_FALSE(command.isEmpty());
+	CHECK_FALSE(raidionicsUtilities->getOutputFolder().isEmpty());
+
+	QString tempFolder = raidionicsUtilities->getTempFolder();
+	CHECK_FALSE(tempFolder.isEmpty());
+
+	QString iniFilePath = tempFolder + raidionicsUtilities->getIniFileName();
+	QString jsonFilePath = tempFolder + raidionicsUtilities->getJsonFileName();
+	CHECK(QFileInfo::exists(iniFilePath));
+	CHECK(QFileInfo::exists(jsonFilePath));
+
+	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("Raidionics: target generation", "[unit]")
+{
+	cx::VisServicesPtr services = cx::VisServices::getNullObjects();
+	cx::CommandStringVariables variables = cx::CommandStringVariables("", cx::ImagePtr());
+
+	for(int i = cx::lmMEDIUM_ORGANS_MEDIASTINUM; i <= cx::lmCOUNT; ++i)
+	{
+		QStringList classes;
+		classes << enum2string(cx::LUNG_MODELS(i));
+
+		cx::RaidionicsPtr raidionicsUtilities = cx::RaidionicsPtr(new cx::Raidionics(services, variables, classes));
+
+		QStringList outputClasses = raidionicsUtilities->expandOutputClasses(classes);
+
+//		CX_LOG_DEBUG() << "Input classes: " << classes.join(" ");
+//		CX_LOG_DEBUG() << "Output Classes: " << outputClasses.join(" ");
+		if(i == cx::lmCOUNT)
+			CHECK(outputClasses.size() == 1);
+		else
+		CHECK(outputClasses.size() > 1);
+	}
+}
+
+TEST_CASE("Raidionics: Test color generation", "[unit]")
+{
+	QString testClass;
+	QString colorUnknownClass;
+	colorUnknownClass = cx::Raidionics::colorForLungClass(testClass);
+	CHECK_FALSE(colorUnknownClass.isEmpty());
+	testClass = "not a correct class name";
+	CHECK(cx::Raidionics::colorForLungClass(testClass) == colorUnknownClass);
+
+	QString testColor;
+	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)//Assumes continious numbers in enum
+	{
+		testColor = cx::Raidionics::colorForLungClass(enum2string(cx::ORGAN_TYPE(target)));
+		CHECK_FALSE(testColor.isEmpty());
+		CHECK(testColor != colorUnknownClass);
+	}
+
+}
+
+TEST_CASE("Raidionics: target conversion", "[unit]")
+{
+	for(int target = cx::otRAIDIONICS_BEGIN; target < cx::otRAIDIONICS_END; ++target)
+	{
+		cx::ORGAN_TYPE organType = cx::ORGAN_TYPE(target);
+		QString organTypeString = enum2string(cx::ORGAN_TYPE(target));
+		QString targetString = cxtest::TestRaidionics::getTarget(organType);
+		if(organType != cx::otSUBCLAVIAN_ARTERY)
+			CHECK(organTypeString == targetString);
+		else
+			CHECK("SubCarArt" == targetString);
+
+		cx::ORGAN_TYPE organTypeRaidionics = cxtest::TestRaidionics::getOrganType(organTypeString);
+		CHECK(organTypeRaidionics == organType);
+	}
 }
 
 #ifdef CX_CUSTUS_SINTEF
@@ -590,32 +730,32 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][n
 	filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
 	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
 	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
-	
+
 	QString requirementsPath = filter->testGetEnvironmentPath(variables);
 	// Create new venv in the temptorary test folder instead of using path from ini-file.
 	QString environmentPath = cx::DataLocations::getTestDataPath() + "/" + filter->testGetFixedEnvironmentSubdir();
 	QString environmentBasePath = filter->testGetEnvironmentBasePath(environmentPath);
 	requirementsPath = filter->testGetEnvironmentBasePath(requirementsPath);
-	
+
 	CX_LOG_DEBUG() << "Test environmentPath: " << environmentPath;
 	CX_LOG_DEBUG() << "requirementsPath: " << requirementsPath;
 	CX_LOG_DEBUG() << "environmentBasePath: " << environmentBasePath;
-	
+
 	requirementsPath = QFileInfo(requirementsPath).absolutePath();
 	CX_LOG_DEBUG() << "Absolute requirementsPath: " << requirementsPath;
-		
-	REQUIRE(QFileInfo(environmentBasePath).exists());
-	REQUIRE(QFileInfo(requirementsPath).exists());
+
+	REQUIRE(QFileInfo::exists(environmentBasePath));
+	REQUIRE(QFileInfo::exists(requirementsPath));
 	CHECK_FALSE(filter->testEnvironmentExist(environmentPath));
 
 	CHECK(filter->testCreateVirtualPythonEnvironment(environmentPath, requirementsPath));
 	CHECK(filter->testEnvironmentExist(environmentPath));
-	
+
 	QString venvPath = environmentBasePath + "venv";
 	QDir dir(venvPath);
 	CX_LOG_DEBUG() << "Going to delete newly created venv: " << dir.absolutePath();
 	dir.removeRecursively();
-	
+
 	cx::LogicManager::shutdown();
 }
 #endif

@@ -42,7 +42,8 @@ ViewWrapperVideo::ViewWrapperVideo(ViewPtr view, VisServicesPtr services) :
 	this->connectContextMenu(mView);
 
 	// disable vtk interactor: this wrapper IS an interactor
-	mView->getRenderWindow()->GetInteractor()->Disable();
+//	mView->getRenderWindow()->GetInteractor()->Disable();//vtk9
+	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();//vtk9 - Remove observers instead of disabling interactor
 	mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth / 2.0, clipDepth / 2.0);

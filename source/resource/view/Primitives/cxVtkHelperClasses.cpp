@@ -25,8 +25,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkRenderer.h>
 #include <vtkCursor2D.h>
 #include <vtkLeaderActor2D.h>
-#include "cxTypeConversions.h"
 #include <vtkProperty.h>
+#include <vtkFollower.h>
+#include <vtkVectorText.h>
+#include <vtkArrowSource.h>
+#include <vtkArcSource.h>
+#include <vtkPolyDataMapper.h>
+
+#include "cxTypeConversions.h"
 #include "cxBoundingBox3D.h"
 #include "cxLogger.h"
 

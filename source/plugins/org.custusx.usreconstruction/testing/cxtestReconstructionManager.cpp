@@ -114,6 +114,32 @@ TEST_CASE("ReconstructManager: PNN on angio sphere","[unit][usreconstruction][sy
 	}
 }
 
+
+TEST_CASE("ReconstructManager: PNN on empty data","[unit][usreconstruction][synthetic][not_win32][pnn]")
+{
+	ReconstructionManagerTestFixture fixture;
+	cx::MessageListenerPtr messageListener = cx::MessageListener::createWithQueue();
+	fixture.setVerbose(true);
+
+	SyntheticReconstructInputPtr input(new SyntheticReconstructInput);
+	input->setOverallBoundsAndSpacing(1, 10);//A small size number may cause reconstruction to fail
+	input->setSpherePhantom();
+	cx::USReconstructInputData inputData = input->generateSynthetic_USReconstructInputData();
+
+	cx::UsReconstructionServicePtr reconstructer = fixture.getManager();
+	reconstructer->selectData(inputData);
+	reconstructer->getParam("Algorithm")->setValueFromVariant("pnn");
+	reconstructer->getParam("Dual Angio")->setValueFromVariant(false);
+	reconstructer->getParam("Position Filter Strength")->setValueFromVariant("0");
+	// set an algorithm-specific parameter
+	fixture.setPNN_InterpolationSteps(1);
+
+	// run the reconstruction in the main thread. Expect the reconstruction to fail, but prevent seg. fault.
+	fixture.reconstruct(false);
+
+	CHECK(!messageListener->containsErrors());
+}
+
 TEST_CASE("ReconstructManager: Angio Reconstruction on real data", "[usreconstruction][integration][not_win32]")
 {
 	ReconstructionManagerTestFixture fixture;

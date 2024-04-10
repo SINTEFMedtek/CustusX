@@ -40,8 +40,8 @@ class cxResourceVisualization_EXPORT ViewCollectionWidget : public QWidget
 {
 	Q_OBJECT
 public:
-	static QPointer<ViewCollectionWidget> createViewWidgetLayout(RenderWindowFactoryPtr factory, QWidget* parent = NULL);
-	static QPointer<ViewCollectionWidget> createOptimizedLayout(RenderWindowFactoryPtr factory, QWidget* parent = NULL);
+	static QPointer<ViewCollectionWidget> createViewWidgetLayout(QWidget* parent);
+	static QPointer<ViewCollectionWidget> createOptimizedLayout(QWidget* parent);
 
 	virtual ~ViewCollectionWidget() {}
 

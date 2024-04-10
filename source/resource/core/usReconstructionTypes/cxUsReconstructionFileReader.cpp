@@ -14,9 +14,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFileInfo>
 #include <QStringList>
 #include <QDataStream>
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
 #include "cxLogger.h"
 #include "cxTypeConversions.h"
-#include <vtkImageData.h>
 #include "cxImage.h"
 #include "cxUtilHelpers.h"
 #include "cxCreateProbeDefinitionFromConfiguration.h"

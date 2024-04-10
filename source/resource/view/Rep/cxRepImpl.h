@@ -15,6 +15,27 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
+//With VTK 9 most reps need a lot of VTK includes on Windows
+#include <vtkActor2D.h>
+#include <vtkArcSource.h>
+#include <vtkArrowSource.h>
+#include <vtkAxesActor.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkCursor2D.h>
+#include <vtkFollower.h>
+#include <vtkLinearExtrusionFilter.h>
+#include <vtkLineSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyDataMapper2D.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkSphereSource.h>
+#include <vtkSectorSource.h>
+#include <vtkSuperquadricSource.h>
+#include <vtkTextActor.h>
+#include <vtkTextMapper.h>
+#include <vtkVectorText.h>
+
 #include <set>
 #include "cxRep.h"
 #include "cxIndent.h"

@@ -12,26 +12,32 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxGraphicalPrimitives.h"
 
 #include "boost/bind.hpp"
-#include <vtkSphereSource.h>
-#include <vtkLineSource.h>
-#include <vtkArcSource.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkArcSource.h>
+#include <vtkArrowSource.h>
+#include <vtkAxesActor.h>
+#include <vtkCamera.h>
 #include <vtkCellArray.h>
+#include <vtkCaptionActor2D.h>
+#include <vtkCommand.h>
+#include <vtkCursor2D.h>
+#include <vtkFollower.h>
+#include <vtkLineSource.h>
+#include <vtkMatrix4x4.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyDataMapper2D.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
-#include <vtkCommand.h>
-#include <vtkFollower.h>
+#include <vtkSphereSource.h>
+#include <vtkTextProperty.h>
+#include <vtkTexture.h>
+#include <vtkTextMapper.h>
 #include <vtkVectorText.h>
-#include <vtkCamera.h>
+
 #include "cxTypeConversions.h"
 #include "cxBoundingBox3D.h"
-#include "vtkArrowSource.h"
-#include "vtkMatrix4x4.h"
-#include "vtkCaptionActor2D.h"
-#include "vtkTextProperty.h"
 #include "cxVtkHelperClasses.h"
-#include "vtkPolyDataNormals.h"
 
 namespace cx
 {

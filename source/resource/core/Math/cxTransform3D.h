@@ -233,6 +233,13 @@ typedef boost::shared_ptr<Transform3D> Transform3DPtr;
 cxResource_EXPORT std::string matrixAsSingleLineString(Transform3D transform);
 
 /**
+ * Simple check if transform is corrupt.
+ *
+ * Calculate the sum of all elements and check for nan and inf.
+ */
+cxResource_EXPORT bool isValid(const Transform3D& transform);
+
+/**
  * @}
  */
 

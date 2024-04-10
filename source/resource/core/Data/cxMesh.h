@@ -55,7 +55,7 @@ public:
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
 
 	virtual vtkPolyDataPtr getVtkPolyData() const;
-	virtual vtkTexturePtr getVtkTexture() const;
+	virtual vtkTexturePtr getVtkTexture();
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.

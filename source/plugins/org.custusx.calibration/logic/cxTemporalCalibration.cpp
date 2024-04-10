@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPiecewiseFunction.h>
 #include <vtkPointData.h>
 #include <vtkImageData.h>
+#include <vtkPolyData.h>
 #include "cxTypeConversions.h"
 #include "cxSettings.h"
 #include "cxUtilHelpers.h"

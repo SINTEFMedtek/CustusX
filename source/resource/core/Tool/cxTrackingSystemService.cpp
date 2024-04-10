@@ -110,4 +110,9 @@ void TrackingSystemService::startTracking()
 void TrackingSystemService::stopTracking()
 {
 }
+
+void TrackingSystemService::addExternalTool(ToolPtr tool)
+{
+	mExternalTool = tool;
+}
 }//cx

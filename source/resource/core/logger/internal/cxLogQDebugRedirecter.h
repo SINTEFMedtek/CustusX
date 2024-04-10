@@ -24,6 +24,7 @@ namespace cx
 {
 
 void convertQtMessagesToCxMessages(QtMsgType type, const QMessageLogContext &, const QString &msg);
+void silenceQtMessages(QtMsgType type, const QMessageLogContext &, const QString &msg);
 
 } //namespace cx
 

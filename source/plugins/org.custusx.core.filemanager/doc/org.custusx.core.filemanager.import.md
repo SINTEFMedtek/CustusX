@@ -32,7 +32,7 @@ Image / volume data:
 | ----------------------- | -----------------------------------------   | -------------------------------------------------- |
 | DICOM                   | 8, 16, or 32 bit (signed or unsigned)       | http://dicom.nema.org/standard.html                |
 | .mhd                    | VTK mhd reader (with some CX additions)     | https://itk.org/Wiki/ITK/MetaIO/Documentation      |
-| .nii                    | VTK NIfTI reader                            | NIfTI file format                                  |
+| .nii(.gz)               | VTK NIfTI reader                            | NIfTI file format                                  |
 | .png                    | VTK png reader                              | 2D pictures                                        |
 
 

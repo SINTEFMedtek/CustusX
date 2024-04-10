@@ -21,7 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
+std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map, ToolPtr externalTool)
 {
 	std::vector<ToolPtr> retval;
 	std::map<QString, OpenIGTLinkToolPtr>::iterator it = map.begin();
@@ -29,6 +29,8 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map)
 	{
 		retval.push_back(it->second);
 	}
+	if(externalTool)
+		retval.push_back(externalTool);
 	return retval;
 }
 
@@ -73,7 +75,7 @@ void OpenIGTLinkTrackingSystemService::internalSetState(Tool::State val)
 
 std::vector<ToolPtr> OpenIGTLinkTrackingSystemService::getTools()
 {
-	return toVector(mTools);
+	return toVector(mTools, mExternalTool);
 }
 
 TrackerConfigurationPtr OpenIGTLinkTrackingSystemService::getConfiguration()

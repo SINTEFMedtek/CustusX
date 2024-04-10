@@ -44,6 +44,8 @@ void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties prop
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
 {
 	DataPtr data = mServices->patient()->getData(uid);
+	if(!data)
+		return;
 
 	QAction* action = new QAction(qstring_cast(data->getName()), parent);
 
@@ -221,11 +223,6 @@ void ViewWrapper::addReps()
 	mDataNameText = DisplayTextRep::New();
 	mDataNameText->addText(QColor(Qt::green), "--", Vector3D(0.02, 0.02, 0.0));
 	this->getView()->addRep(mDataNameText);
-}
-
-void ViewWrapper::setSharedOpenGLContext(cx::SharedOpenGLContextPtr sharedOpenGLContext)
-{
-	mSharedOpenGLContext = sharedOpenGLContext;
 }
 
 ToolPtr ViewWrapper::getControllingTool()

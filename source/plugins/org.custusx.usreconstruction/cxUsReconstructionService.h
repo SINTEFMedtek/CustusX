@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <set>
 #include <vector>
 #include <QObject>
+#include <vtkImageData.h>
 #include "cxForwardDeclarations.h"
 #include "cxReconstructCore.h"
 

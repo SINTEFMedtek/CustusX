@@ -54,6 +54,10 @@ set(PLUGIN_UI_FORMS
 set(PLUGIN_resources
 )
 
+set(VTK_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+)
 
 #Compute the plugin dependencies
 ctkFunctionGetTargetLibraries(PLUGIN_target_libraries)
@@ -89,6 +93,11 @@ target_include_directories(org_custusx_usreconstruction
     .
     ${CMAKE_CURRENT_BINARY_DIR}
 )
+
+#vtk_module_autoinit(
+#  TARGETS ${PROJECT_NAME}
+#  MODULES ${VTK_MODULES}
+#)
 
 cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
 cx_add_non_source_file("doc/org.custusx.usreconstruction.md")

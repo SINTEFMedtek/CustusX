@@ -11,6 +11,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxReconstructThreads.h"
 
+#include <vtkPolyData.h>
+#include <vtkImageData.h>
+
 #include "cxImage.h"
 #include "cxReconstructPreprocessor.h"
 #include "cxReconstructCore.h"

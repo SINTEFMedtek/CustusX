@@ -22,6 +22,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceVisualizationExport.h"
 
 #include <vector>
+#include <vtkCamera.h>
+
 #include "cxVector3D.h"
 //#include "cxDoubleWidgets.h"
 #include "cxForwardDeclarations.h"

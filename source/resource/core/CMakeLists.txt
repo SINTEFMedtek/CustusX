@@ -279,6 +279,27 @@ configure_file(
 # extra definitions:
 add_subdirectory(settings)
 
+#Trying to reduce the number of included libs, as the Windows build for
+#org_custusx_core_tracking_system_igstk.dir\cxIGSTKTrackingPluginActivator.cpp.obj fails. (Too long command)
+set(VTK_MODULES
+  VTK::CommonColor
+  VTK::CommonCore
+  VTK::CommonDataModel#test
+  VTK::CommonSystem
+  VTK::RenderingCore
+  VTK::RenderingVolumeOpenGL2
+  VTK::FiltersHybrid
+  VTK::FiltersSources
+  VTK::FiltersTexture
+  VTK::ImagingColor
+  VTK::ImagingStatistics
+  VTK::ImagingMorphological
+  VTK::IOImage
+  VTK::IOGeometry
+  VTK::IOMINC
+#  VTK::ParallelCore
+)
+
 set(CX_PUBLIC_RESOURCE_LIBRARIES
   Qt5::Core
   Qt5::Widgets
@@ -288,7 +309,8 @@ set(CX_PUBLIC_RESOURCE_LIBRARIES
   Qt5::Concurrent
   CTKPluginFramework
   cxPluginUtilities
-  ${VTK_LIBRARIES}
+#  ${VTK_LIBRARIES}#Can this be removed/limited now that we have to use vtk_module_autoinit?
+  ${VTK_MODULES}
   ${OPENGL_LIBRARIES}
   )
 
@@ -345,6 +367,11 @@ target_link_libraries(cxResource
 	${SSC_GCOV_LIBRARY} # add gcov LAST in the link sequence! (http://stackoverflow.com/questions/566472/where-are-the-gcov-symbols)
 	)
 
+  vtk_module_autoinit(
+    TARGETS cxResource
+#    MODULES ${VTK_LIBRARIES}
+    MODULES ${VTK_MODULES}
+    )
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/usReconstructionTypes/doc")
 cx_doc_define_user_docs("${CMAKE_CURRENT_SOURCE_DIR}/Data/doc")
 cx_add_non_source_file("usReconstructionTypes/doc/org.custusx.resource.core.usacquisitionfileformat.md")

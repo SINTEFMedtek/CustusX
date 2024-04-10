@@ -10,6 +10,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxUSReconstructInputData.h"
+#include <vtkImageData.h>
+#include <vtkPolyData.h>
 #include "cxUSFrameData.h"
 #include "cxLogger.h"
 
@@ -23,7 +25,7 @@ vtkImageDataPtr USReconstructInputData::getMask()
 
 bool USReconstructInputData::isValid() const
 {
-	if (mFrames.empty() || !mUsRaw || mPositions.empty())
+	if (mFrames.size() < 3 || !mUsRaw || mPositions.empty())
 		return false;
 	if(mUsRaw->is4D())
 	{

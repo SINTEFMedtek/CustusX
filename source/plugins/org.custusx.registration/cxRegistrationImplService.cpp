@@ -384,7 +384,7 @@ Transform3D RegistrationImplService::performLandmarkRegistration(vtkPointsPtr so
 
 	Transform3D tar_M_src(landmarktransform->GetMatrix());
 
-	if (QString::number(tar_M_src(0,0))=="nan") // harry but quick way to check badness of transform...
+	if (!isValid(tar_M_src))
 	{
 		return Transform3D::Identity();
 	}

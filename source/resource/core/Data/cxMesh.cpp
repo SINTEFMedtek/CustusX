@@ -47,7 +47,9 @@ MeshPtr Mesh::create(const QString& uid, const QString& name, PatientModelServic
 }
 
 Mesh::Mesh(const QString& uid, const QString& name, vtkPolyDataPtr polyData, PatientModelServicePtr patientModelService, SpaceProviderPtr spaceProvider) :
-	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false), mOrientationArray(""), mColorArray(""), mPatientModelService(patientModelService),
+	Data(uid, name), mVtkPolyData(polyData), mHasGlyph(false),
+	mVtkTexture(vtkTexturePtr::New()),
+	mOrientationArray(""), mColorArray(""), mPatientModelService(patientModelService),
 	mSpaceProvider(spaceProvider), mTextureData(patientModelService)
 {
 	if (!mVtkPolyData)
@@ -132,7 +134,7 @@ vtkPolyDataPtr Mesh::getVtkPolyData() const
 	return mVtkPolyData;
 }
 
-vtkTexturePtr Mesh::getVtkTexture() const
+vtkTexturePtr Mesh::getVtkTexture()
 {
 	return mVtkTexture;
 }
@@ -312,7 +314,7 @@ void Mesh::updateVtkPolyDataWithTexture()
 {
 	if (!this->hasTexture())
 	{
-		mVtkTexture = NULL;
+		mVtkTexture = vtkTexturePtr::New();
 		if(mVtkPolyDataOriginal)
 		  mVtkPolyData = mVtkPolyDataOriginal;
 		return;

@@ -57,7 +57,7 @@ ViewWidget *ViewWidgetWithSlider::getViewWidget()
 LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(RenderWindowFactoryPtr factory, QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
-	mViewCache = MultiViewCache::create(factory);
+	mViewCache = MultiViewCache::create();
 	mOffScreenRendering = false;
 
 	mLayout = new QGridLayout;
@@ -74,9 +74,10 @@ LayoutWidgetUsingViewWidgets::~LayoutWidgetUsingViewWidgets()
 
 ViewPtr LayoutWidgetUsingViewWidgets::addView(View::Type type, LayoutRegion region)
 {
-    ViewWidget* view = mViewCache->retrieveView(this, type, mOffScreenRendering);
+	ViewWidget* view = mViewCache->retrieveView(this->parentWidget(), type, mOffScreenRendering);
 
-    view->getView()->setType(type);
+	view->getView()->setType(type);
+	view->setParent(this->parentWidget());
 
     ViewWidgetWithSlider *widgetWithSlider = new ViewWidgetWithSlider(view);
     QWidget *usedWidget = widgetWithSlider->getUsedWidget(type, this->useSlider());

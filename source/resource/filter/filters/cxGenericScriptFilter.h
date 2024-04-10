@@ -12,7 +12,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXGENERICSCRIPTFILTER_H
 
 #include "cxFilterImpl.h"
-//#include <QProcess>
 #include "cxSettings.h"
 #include "cxProcessWrapper.h"
 #include <QColor>
@@ -21,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+typedef boost::shared_ptr<class Raidionics> RaidionicsPtr;
 
 struct cxResourceFilter_EXPORT CommandStringVariables
 {
@@ -32,17 +32,19 @@ struct cxResourceFilter_EXPORT CommandStringVariables
 	QString scriptEngine;
 	QString model;
 
-    CommandStringVariables(QString parameterFilePath, ImagePtr input);
+	CommandStringVariables(QString parameterFilePath, ImagePtr input);
 };
 
 struct cxResourceFilter_EXPORT OutputVariables
 {
-    bool mCreateOutputVolume;
-    bool mCreateOutputMesh;
-    QStringList mOutputColorList;
-    QStringList mOutputClasses;
+	bool mCreateOutputVolume = false;
+	bool mCreateOutputMesh = false;
+	QStringList mOutputColorList;
+	QStringList mOutputClasses;
+	bool mValid = false;
 
-    OutputVariables(QString parameterFilePath);
+	OutputVariables();
+	OutputVariables(QString parameterFilePath);
 };
 
 /** Generic filter calling external filter script.
@@ -56,10 +58,18 @@ struct cxResourceFilter_EXPORT OutputVariables
 class cxResourceFilter_EXPORT GenericScriptFilter : public FilterImpl
 {
 	Q_OBJECT
-
 public:
 	GenericScriptFilter(VisServicesPtr services);
 	virtual ~GenericScriptFilter();
+
+	enum SCRIPT_ENGINE
+	{
+		seUnknown,
+		seStandard,
+		seDeepSintef,
+		seRaidionics,
+		seCOUNT
+	};
 
 	virtual QString getType() const;
 	virtual QString getName() const;
@@ -70,9 +80,15 @@ public:
 
 	// extensions:
 	FilePathPropertyPtr getParameterFile(QDomElement root);
-    void setParameterFilePath(QString path);
+	void setParameterFilePath(QString path);
 	FilePreviewPropertyPtr getIniFileOption(QDomElement root);
 	PatientModelServicePtr mPatientModelService;
+	void setOutputClasses(QStringList outputClasses);
+
+signals:
+	void launchDialog(QString venvPath, QString createCommand, QString command);
+public slots:
+	void launchDialogSlot(QString venvPath, QString createCommand, QString command);
 
 protected:
 	virtual void createOptions();
@@ -95,19 +111,29 @@ protected:
 
 	CommandStringVariables createCommandStringVariables(ImagePtr input);
 	QString standardCommandString(CommandStringVariables variables);
-	bool isUsingDeepSintefEngine(CommandStringVariables variables);
+	QString findScriptFile(QString path);
+	bool isUsingRaidionicsEngine();
 	QString deepSintefCommandString(CommandStringVariables variables);
 	
 	bool environmentExist(QString path);
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
 	QString findRequirementsFileLocation(QString path);
-	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath);
+	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript = QString(), QString command = QString());
 	bool isVirtualEnvironment(QString path);
 	QString getFixedEnvironmentSubdir();
+	QString removeTrailingPythonVariable(QString environmentPath);
+	bool showVenvInfoDialog(QString venvPath, QString createCommand);
+	bool createVenv(QString createCommand, QString command);
+	bool setScriptEngine(CommandStringVariables variables);
+	bool initRaidionicsEngine(CommandStringVariables variables);
+	void setOutputColorsFromClasses();
+	int getClassNumber(QString filePath);
+	ORGAN_TYPE getOrganType(int classNumber);
 
-    FilePathPropertyPtr mScriptFile;
+	FilePathPropertyPtr mScriptFile;
 	FilePreviewPropertyPtr mScriptFilePreview;
+	OutputVariables mOutputVariables;
 
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
@@ -118,10 +144,13 @@ protected:
 	ImagePtr mOutputImage;
 	QList<QColor> mOutputColors;
 	QStringList mOutputClasses;
+	QStringList mOutputColorList;
 
-    SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
-    StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
+	SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
+	StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;
 	BoolPropertyPtr mOutputMeshOption;
+	SCRIPT_ENGINE mScriptEngine = seUnknown;
+	RaidionicsPtr mRaidionicsUtilities = nullptr;
 
 protected slots:
 	void scriptFileChanged();
@@ -133,7 +162,6 @@ protected slots:
 	bool createProcess();
 	bool deleteProcess();
 	bool disconnectProcess();
-
 };
 typedef boost::shared_ptr<class GenericScriptFilter> GenericScriptFilterPtr;
 

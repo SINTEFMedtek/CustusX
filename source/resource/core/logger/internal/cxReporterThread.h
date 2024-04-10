@@ -60,6 +60,9 @@ public:
 	ReporterThread(QObject* parent = NULL);
 	virtual ~ReporterThread();
 
+	void stopQtMessages();
+	void startQtMessages();
+
 public slots:
 	virtual void logMessage(Message msg);
 

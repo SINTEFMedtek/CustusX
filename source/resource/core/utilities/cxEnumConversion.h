@@ -9,8 +9,8 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
-#ifndef CXEMUNCONVERSION_H
-#define CXEMUNCONVERSION_H
+#ifndef CXENUMCONVERSION_H
+#define CXENUMCONVERSION_H
 
 #include "cxDefinitionStrings.h"
 
@@ -20,4 +20,5 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 // Just including cxEnumConverter.h will create IDE/compiler warnings because the template function implementation isn't there.
 // The template function implementation is made by the macros in cxDefinitionStrings.h.
 
-#endif // CXEMUNCONVERSION_H
+
+#endif // CXENUMCONVERSION_H

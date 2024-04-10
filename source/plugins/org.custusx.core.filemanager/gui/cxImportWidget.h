@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXIMPORTWIDGET_H
 #define CXIMPORTWIDGET_H
 
+#include <QDialog>
 #include "cxBaseWidget.h"
 #include "cxFileManagerService.h"
 #include "org_custusx_core_filemanager_Export.h"
@@ -19,9 +20,29 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 class QTableWidget;
 class QStackedWidget;
 class QPushButton;
+class QProgressDialog;
 
 namespace cx
 {
+class ImportDataTypeWidget;
+
+class org_custusx_core_filemanager_EXPORT SimpleImportDataDialog : public QDialog
+{
+	Q_OBJECT
+public:
+	SimpleImportDataDialog(ImportDataTypeWidget *widget, QWidget* parent=NULL);
+	virtual ~SimpleImportDataDialog(){};
+private slots:
+	void importClicked();
+	void cancelClicked();
+	void cellChangedSlot(int row, int column);
+private:
+	ImportDataTypeWidget* mImportDataTypeWidget;
+	QTableWidget* mSimpleTableWidget;
+
+	std::vector<DataPtr> getSelectedData();
+	bool isSelectedAndSetType(DataPtr data, int row);
+};
 
 class org_custusx_core_filemanager_EXPORT ImportWidget  : public BaseWidget
 {
@@ -36,9 +57,10 @@ signals:
 	void parentCandidatesUpdated();
 
 private slots:
+	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	void importButtonClicked();
 	void cancelButtonClicked();
-	void addMoreFilesButtonClicked();
+	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
 	void removeWidget(QWidget *widget);
 	void removeRowFromTableAndRemoveFilenameFromImportList();
 
@@ -52,8 +74,9 @@ private:
 	QString generateUid(QString filename) const;
 	void generateParentCandidates();
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);
-	int findRowIndexContainingButton(QPushButton *button) const;
 	void clearData();
+	QStringList removeDirIfSubdirIsIncluded(QStringList importFiles);
+	void showProgressDialog(QProgressDialog &progress);
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;

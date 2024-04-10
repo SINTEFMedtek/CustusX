@@ -124,7 +124,9 @@ void LogicManager::basicSetup()
 	Reporter::initialize();
 
 	mPluginFramework = PluginFrameworkManager::create();
+	reporter()->stopQtMessages(); //Hide the "[QT] Using database: ..." messages at startup
 	mPluginFramework->start();
+	reporter()->startQtMessages();
 	mPluginFramework->setSearchPaths(QStringList());
 
 	this->createLegacyStoredServices();

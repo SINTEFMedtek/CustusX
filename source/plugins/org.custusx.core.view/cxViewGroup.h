@@ -51,7 +51,7 @@ public:
 	explicit ViewGroup(CoreServicesPtr backend, QString uid);
 	virtual ~ViewGroup();
 
-	void addView(ViewWrapperPtr wrapper, SharedOpenGLContextPtr sharedOpenGLContext);
+	void addView(ViewWrapperPtr wrapper);
 	void removeViews();
 	ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
 	std::vector<ViewWrapperPtr> getWrappers() const { return mViewWrappers; }

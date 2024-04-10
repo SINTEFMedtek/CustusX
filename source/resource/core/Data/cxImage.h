@@ -157,6 +157,8 @@ public:
 	double getVTKMinValue();
 	double getVTKMaxValue();
 	bool is2D();
+	void setDicomSeriesNumber(QString seriesNumber);
+	QString getDicomSeriesNumber();
 
 signals:
 	void vtkImageDataChanged(QString uid = QString()); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
@@ -216,6 +218,8 @@ private:
 	bool mThresholdPreview;
 	ImageTF3DPtr mTresholdPreviewTransferfunctions3D;
 	ImageLUT2DPtr mTresholdPreviewLookupTable2D;
+
+	QString mDicomSeriesNumber;
 };
 
 } // end namespace cx

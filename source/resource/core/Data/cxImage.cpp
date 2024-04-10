@@ -134,6 +134,7 @@ ImagePtr Image::copy()
 	retval->mUnsigned = mUnsigned;
 	retval->mModality = mModality;
 	retval->mImageType = mImageType;
+	retval->mOrganType = mOrganType;
 	retval->mMaxRGBIntensity = mMaxRGBIntensity;
 	retval->mInterpolationType = mInterpolationType;
 	retval->mImageLookupTable2D = mImageLookupTable2D;
@@ -500,6 +501,16 @@ bool Image::is2D()
 	return this->getBaseVtkImageData()->GetDimensions()[2]==1;
 }
 
+void Image::setDicomSeriesNumber(QString seriesNumber)
+{
+	mDicomSeriesNumber = seriesNumber;
+}
+
+QString Image::getDicomSeriesNumber()
+{
+	return mDicomSeriesNumber;
+}
+
 void Image::addXml(QDomNode& dataNode)
 {
 	Data::addXml(dataNode);
@@ -800,6 +811,10 @@ IMAGE_MODALITY Image::getModality() const
 void Image::setModality(const IMAGE_MODALITY& val)
 {
 	mModality = val;
+	//Create default transfer functions for PET when changing to PET modality
+	if(val == imPET)
+		this->resetTransferFunctions();
+
 	emit propertiesChanged();
 }
 

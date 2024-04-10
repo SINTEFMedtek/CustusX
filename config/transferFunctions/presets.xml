@@ -115,4 +115,16 @@
 		</transferfunctions>
 	    <shading on="1" ambient="0.15" diffuse="0.90" specular="0.30" specularPower="15.0"/>
 	</Preset>
+
+    <Preset modality="PET" name="PET">
+        <lookuptable2D>
+            <alpha>-718=0 -717=255</alpha>
+            <color>-100=0/0/0 1180=114/159/207 2120=239/41/41 2320=252/233/79</color>
+        </lookuptable2D>
+        <transferfunctions>
+            <alpha>153=0 921=0 11798=166</alpha>
+            <color>-100=0/0/0 1180=114/159/207 2120=239/41/41 2320=252/233/79</color>
+        </transferfunctions>
+        <shading on="1" ambient="0.2" specular="0.3" specularPower="15" diffuse="0.9"/>
+    </Preset>
 </root>

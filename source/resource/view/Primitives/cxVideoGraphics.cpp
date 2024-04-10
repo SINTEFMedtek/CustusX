@@ -258,11 +258,11 @@ void VideoGraphics::updateLUT()
 		}
 
 		mTexture->GetLookupTable()->SetRange(srange[0], srange[1]);
-		mTexture->MapColorScalarsThroughLookupTableOn();
+		mTexture->SetColorModeToMapScalars();
 	}
 	else
 	{
-		mTexture->MapColorScalarsThroughLookupTableOff();
+		mTexture->SetColorModeToDefault();
 	}
 }
 

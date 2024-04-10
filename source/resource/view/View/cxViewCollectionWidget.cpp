@@ -27,14 +27,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(RenderWindowFactoryPtr factory, QWidget *parent)
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createViewWidgetLayout(QWidget *parent)
 {
 //	return new LayoutWidgetUsingViewCollection(); // testing
-	return new LayoutWidgetUsingViewWidgets(factory, parent);
+	return new LayoutWidgetUsingViewWidgets(parent);
 //	return new ViewCollectionWidgetMixed(); //testing
 }
 
-QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(RenderWindowFactoryPtr factory, QWidget *parent)
+QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(QWidget *parent)
 {
 //	return new ViewCollectionWidgetUsingViewContainer();
     return new ViewCollectionWidgetMixed(factory, parent);

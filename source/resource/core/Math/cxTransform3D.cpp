@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
+#include <boost/math/special_functions/fpclassify.hpp> // isnan
 
 // --------------------------------------------------------
 namespace cx_transform3D_internal
@@ -285,6 +286,15 @@ std::string matrixAsSingleLineString(cx::Transform3D transform)
 	return stream.str();
 }
 
+bool isValid(const Transform3D& transform)
+{
+	double sum = transform.matrix().sum();
+	if(boost::math::isnan(sum))
+		return false;
+	if(boost::math::isinf(sum))
+		return false;
+	return true;
+}
 
 } // namespace cx
 // --------------------------------------------------------

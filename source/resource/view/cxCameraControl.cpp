@@ -18,10 +18,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxCameraControl.h"
 
 #include <QAction>
-#include "vtkRenderer.h"
-#include "vtkCamera.h"
-#include "cxView.h"
 #include <QDomNode>
+#include <vtkRenderer.h>
+#include "cxView.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"
 

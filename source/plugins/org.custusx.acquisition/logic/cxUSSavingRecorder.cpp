@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QtConcurrentRun>
 #include "boost/bind.hpp"
+#include <vtkPolyData.h>
 
 #include "cxTypeConversions.h"
 

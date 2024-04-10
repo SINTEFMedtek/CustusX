@@ -145,6 +145,7 @@ typedef boost::shared_ptr<class ColorProperty> ColorPropertyPtr;
 typedef boost::shared_ptr<class DoublePairProperty> DoublePairPropertyPtr;
 typedef boost::shared_ptr<class FilePathProperty> FilePathPropertyPtr;
 typedef boost::shared_ptr<class FilePreviewProperty> FilePreviewPropertyPtr;
+typedef boost::shared_ptr<class StringPropertySelectTool> StringPropertySelectToolPtr;
 
 // other stuff
 typedef boost::shared_ptr<class Branch> BranchPtr;
@@ -160,10 +161,7 @@ typedef boost::shared_ptr<class LayoutRepository> LayoutRepositoryPtr;
 typedef boost::shared_ptr<class Navigation> NavigationPtr;
 typedef boost::shared_ptr<class Presets> PresetsPtr;
 typedef boost::shared_ptr<class ProcessedUSInputData> ProcessedUSInputDataPtr;
-typedef boost::shared_ptr<class RenderWindowFactory> RenderWindowFactoryPtr;
 typedef boost::shared_ptr<class RepContainer> RepContainerPtr;
-typedef vtkSmartPointer<class SharedContextCreatedCallback> SharedContextCreatedCallbackPtr;
-typedef boost::shared_ptr<class SharedOpenGLContext> SharedOpenGLContextPtr;
 typedef boost::shared_ptr<class UsReconstructionFileReader> UsReconstructionFileReaderPtr;
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;

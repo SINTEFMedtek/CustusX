@@ -9,6 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 #include "cxBranch.h"
+#include "cxLog.h"
 
 namespace cx
 {
@@ -89,10 +90,18 @@ BranchPtr Branch::getParentBranch()
 void Branch::calculateOrientations()
 {
 	Eigen::MatrixXd positions = this->getPositions();
+	int numberOfRows = positions.rows();
+	int numberOfCols = positions.cols();
+	if(numberOfCols < 2)
+	{
+		CX_LOG_WARNING("In Branch::calculateOrientations() - Need at least two positions to calculate orientations.");
+		return;
+	}
 	Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
-	Eigen::MatrixXd orientations(positions.rows(),positions.cols());
-	orientations.leftCols(orientations.cols() - 1) = diff / diff.norm();
-	orientations.rightCols(1) = orientations.col(orientations.cols() - 1);
+	Eigen::MatrixXd orientations(numberOfRows,numberOfCols);
+	for (int i=0; i<numberOfCols-1; i++)
+		orientations.col(i) = diff.col(i) / diff.col(i).norm();
+	orientations.rightCols(1) = orientations.col(orientations.cols() - 2);
 	this->setOrientations(orientations);
 }
 
@@ -201,12 +210,12 @@ void Branch::removeEqualPositions()
 
 void Branch::setLap(QString lap)
 {
-	mLap = lap;
+	mLobe = lap;
 }
 
 QString Branch::getLap()
 {
-	return mLap;
+	return mLobe;
 }
 
 

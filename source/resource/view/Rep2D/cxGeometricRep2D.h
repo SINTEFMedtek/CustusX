@@ -54,6 +54,7 @@ protected:
 	GeometricRep2D();
 	virtual void addRepActorsToViewRenderer(ViewPtr view);
 	virtual void removeRepActorsFromViewRenderer(ViewPtr view);
+	void setOpacity();
 
 	vtkPolyDataMapperPtr mMapper;
 	vtkPropertyPtr mProperty;

@@ -13,8 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CXMHDIMAGESTREAMER_H_
 
 #include "cxGrabberExport.h"
-
 #include "boost/shared_ptr.hpp"
+#include <vtkImageData.h>
 #include "cxStreamer.h"
 #include "cxForwardDeclarations.h"
 

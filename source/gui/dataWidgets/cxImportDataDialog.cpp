@@ -150,7 +150,7 @@ void ImportDataDialog::importDataSlot()
 
   //NIfTI files are assumed to be in the RAS (right-anterior-superior) coordinate system,
   //CX requires LPS (left-posterior-superio)
-  if(mFilename.endsWith(".nii", Qt::CaseInsensitive))
+  if(mFilename.endsWith(".nii", Qt::CaseInsensitive) || mFilename.endsWith(".nii.gz", Qt::CaseInsensitive))
 	  mNiftiFormatCheckBox->setChecked(true);
 
   mConvertToUnsignedCheckBox->setEnabled(false);

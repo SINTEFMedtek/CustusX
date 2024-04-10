@@ -22,7 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(RenderWindowFactoryPtr factory, QWidget* parent) :
+ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(QWidget* parent) :
 	ViewCollectionWidget(parent),
 	mViewContainer(NULL)
 {
@@ -30,7 +30,7 @@ ViewCollectionWidgetUsingViewContainer::ViewCollectionWidgetUsingViewContainer(R
 	this->setLayout(layout);
 	layout->setSpacing(0);
 	layout->setMargin(0);
-	mViewContainer = new ViewContainer(factory, this);
+	mViewContainer = new ViewContainer(this);
 	mViewContainer->getGridLayout()->setSpacing(2);
 	mViewContainer->getGridLayout()->setMargin(4);
 	layout->addWidget(mViewContainer);

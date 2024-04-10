@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDicomImageReader.h"
 
 #include "cxVolumeHelpers.h"
-#include "dcvrpn.h"
+#include <dcmtk/dcmdata/dcvrpn.h>
 #include "cxLogger.h"
 
 namespace cx
@@ -221,13 +221,20 @@ vtkImageDataPtr DicomImageReader::createVtkImageData()
 //		std::cout << "  VTK_INT" << std::endl;
 		data->AllocateScalars(VTK_INT, samplesPerPixel);
 		break;
+	default:
+		CX_LOG_WARNING() << "Unknown pixel format: " << pixels->getRepresentation();
+		return vtkImageDataPtr();
+		break;
 	}
 
 	int bytesPerPixel = data->GetScalarSize() * samplesPerPixel;
 
-	memcpy(data->GetScalarPointer(), pixels->getData(), pixels->getCount()*bytesPerPixel);
 	if (pixels->getCount()!=scalarSize)
-		this->error("Mismatch in pixel counts");
+	{
+		CX_LOG_WARNING() << "DicomImageReader::createVtkImageData: Mismatch in pixel counts: " << pixels->getCount() << " != " << scalarSize << " Wrong number of bytesPerPixel? = " << bytesPerPixel;
+		return vtkImageDataPtr();//Prevent seg.fault. in memcopy line below
+	}
+	memcpy(data->GetScalarPointer(), pixels->getData(), pixels->getCount()*bytesPerPixel);
 	setDeepModified(data);
 	return data;
 }

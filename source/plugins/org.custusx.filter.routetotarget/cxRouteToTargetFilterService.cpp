@@ -33,6 +33,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelServiceProxy.h"
 #include "cxViewService.h"
 #include "cxLog.h"
+#include "cxMetricManager.h"
 
 #include <vtkPolyData.h>
 
@@ -160,10 +161,17 @@ void RouteToTargetFilter::createOutputTypes()
     mOutputTypes.push_back(tempAirwaysModelMeshStringAdapter);
 }
 
-
 bool RouteToTargetFilter::execute()
 {
 	mRouteToTarget.reset(new RouteToTarget());
+
+	std::map<QString, PointMetricPtr> extraAirwayPoints;
+	if(mUseExtraAirwayPoints)
+	{
+		MetricManagerPtr metricManager = MetricManagerPtr(new MetricManager(mServices->view(), mServices->patient(), mServices->tracking(), mServices->spaceProvider(), mServices->file()));
+		extraAirwayPoints = metricManager->getPointMetrics("AirwayPoint");
+		CX_LOG_DEBUG() << "extraAirwayPoints.size(): " << extraAirwayPoints.size();
+	}
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
 	if (!mesh)
@@ -173,12 +181,23 @@ bool RouteToTargetFilter::execute()
 	if (!targetPoint)
 		return false;
 
-    mRouteToTarget->setSmoothing(mSmoothing);
+	mRouteToTarget->setSmoothing(mSmoothing);
 
-    mRouteToTarget->processCenterline(mesh);
+	if(mReprocessCenterline || !mBranchListPtr)
+	{
+		mRouteToTarget->processCenterline(mesh);
+		mBranchListPtr = mRouteToTarget->getBranchList();
+	}
+	else
+	{
+		mRouteToTarget->setBranchList(mBranchListPtr);
+	}
 
     //note: mOutput is in reference space
-	mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
+	if(!extraAirwayPoints.empty())
+		mOutput = mRouteToTarget->findRouteToTarget(targetPoint, extraAirwayPoints);
+	else
+		mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
 
 	if(mOutput->GetNumberOfPoints() < 1)
 		return false;
@@ -219,29 +238,32 @@ bool RouteToTargetFilter::postProcess()
 		return false;
 
 	QString uidOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
-	QString nameOutputCenterline = inputMesh->getName() + "_" + targetPoint->getName() + RouteToTargetFilter::getNameSuffix();
+	QString nameOutputCenterline = convertToReadableString(otROUTE_TO_TARGET);
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
 	outputCenterline->setVtkPolyData(mOutput);
-    outputCenterline->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
-    patientService()->insertData(outputCenterline, true);
+	outputCenterline->getProperties().mLineWidth->setValue(8); //Setting thicker line for RTT
+	outputCenterline->setOrganType(otROUTE_TO_TARGET);
+	patientService()->insertData(outputCenterline, true);
 
 	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
-	QString nameCenterlineExt = outputCenterline->getName() + RouteToTargetFilter::getNameSuffixExtension();
+	QString nameCenterlineExt = convertToReadableString(otROUTE_TO_TARGET_EXTENDED);
 	MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
 	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
 	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
-    outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
-    patientService()->insertData(outputCenterlineExt, true);
+	outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
+	outputCenterlineExt->setOrganType(otROUTE_TO_TARGET_EXTENDED);
+	patientService()->insertData(outputCenterlineExt, true);
 
 	//note: mOutput and outputCenterline is in reference(r) space
 
 
 	//Meshes are expected to be in data(d) space
 	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
-    outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
+	outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
-	mServices->view()->autoShowData(outputCenterline);
+	//mServices->view()->autoShowData(outputCenterlineExt);
+	//mServices->view()->autoShowData(outputCenterline);
 
 	if(mOutputTypes.size() > 0)
 		mOutputTypes[0]->setValue(outputCenterline->getUid());
@@ -325,6 +347,11 @@ void RouteToTargetFilter::setSmoothing(bool smoothing)
     mSmoothing = smoothing; // default true
 }
 
+void RouteToTargetFilter::setUseExtraAirwayPoints(bool useExtraAirwayPoints)
+{
+	mUseExtraAirwayPoints = useExtraAirwayPoints; // default false
+}
+
 std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions(bool extendedRoute)
 {
 	return mRouteToTarget->getRoutePositions(extendedRoute);
@@ -340,9 +367,34 @@ std::vector< double > RouteToTargetFilter::getCameraRotation()
 	return mRouteToTarget->getCameraRotation();
 }
 
+std::vector<int> RouteToTargetFilter::getGenerationNumbers()
+{
+	return mRouteToTarget->getGenerationNumbers();
+}
+
+std::vector<double> RouteToTargetFilter::getRadius()
+{
+	return mRouteToTarget->getRadius();
+}
+
 std::vector< int > RouteToTargetFilter::getBranchingIndex()
 {
 	return mRouteToTarget->getBranchingIndex();
+}
+
+BranchListPtr RouteToTargetFilter::getBranchList()
+{
+	return mBranchListPtr;
+}
+
+void RouteToTargetFilter::setBranchList(BranchListPtr branchList)
+{
+	mBranchListPtr = branchList;
+}
+
+void RouteToTargetFilter::setReprocessCenterline(bool reprocess)
+{
+	mReprocessCenterline = reprocess;
 }
 
 BoolPropertyPtr RouteToTargetFilter::getBloodVesselOption(QDomElement root)

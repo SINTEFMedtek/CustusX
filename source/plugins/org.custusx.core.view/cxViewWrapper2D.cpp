@@ -64,21 +64,24 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
 
-#include "cxTexture3DSlicerRep.h"
-
 namespace cx
 {
 
-ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend) :
+ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerToTool) :
 	ViewWrapper(backend),
-	mOrientationActionGroup(new QActionGroup(view.get()))
+	mOrientationActionGroup(new QActionGroup(view.get())),
+	mCenterToTool(centerToTool)
 {
 	qRegisterMetaType<Vector3D>("Vector3D");
 	mView = view;
 	this->connectContextMenu(mView);
 
 	// disable vtk interactor: this wrapper IS an interactor
-	mView->getRenderWindow()->GetInteractor()->Disable();
+//	mView->getRenderWindow()->GetInteractor()->Disable();//vtk9 - Removing this fixes GL error, but allows 3D rotations in the 2D views
+
+	//Removing observers also disables rendering with VTK. Render is called in  ViewContainer::doRender()
+	mView->getRenderWindow()->GetInteractor()->RemoveAllObservers();//vtk9 - Remove observers instead of disabling interactor
+
 	mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 	double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
 	double length = clipDepth*10;
@@ -212,10 +215,6 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 {
 	this->ViewWrapper::settingsChangedSlot(key);
 
-	if (key == "View2D/useGPU2DRendering")
-	{
-		this->updateView();
-	}
 	if (key == "View2D/useLinearInterpolationIn2DRendering")
 	{
 		this->updateView();
@@ -260,63 +259,6 @@ void ViewWrapper2D::removeAndResetSliceRep()
 		mSliceReps[i].reset();
 	}
 	mSliceReps.clear();
-}
-
-void ViewWrapper2D::removeAndResetMultiSliceRep()
-{
-	if (mMultiSliceRep)
-	{
-		mView->removeRep(mMultiSliceRep);
-		mMultiSliceRep.reset();
-	}
-}
-
-bool ViewWrapper2D::createAndAddMultiSliceRep()
-{
-	if(!mSharedOpenGLContext)
-	{
-		CX_LOG_WARNING() << "ViewWrapper2D::createAndAddMultiSliceRep(): Got no mSharedOpenGLContext";
-		return false;
-	}
-	if (mMultiSliceRep)
-		return true;
-
-	mMultiSliceRep = Texture3DSlicerRep::New(mSharedOpenGLContext);
-	mMultiSliceRep->setShaderPath(DataLocations::findConfigFolder("/shaders"));
-	mMultiSliceRep->setSliceProxy(mSliceProxy);
-	mMultiSliceRep->setRenderWindow(mView->getRenderWindow());
-
-	mView->addRep(mMultiSliceRep);
-
-	return true;
-}
-
-/**Hack: gpu slicer recreate and fill with images every time,
- * due to internal instabilities.
- * Fix: now reuses slicer, seem to have fixed issue.
- *
- */
-void ViewWrapper2D::recreateMultiSlicer()
-{
-	this->removeAndResetSliceRep();
-
-	if (!this->useGPU2DRendering())
-	{
-		this->removeAndResetMultiSliceRep();
-		return;
-	}
-
-	if(!this->createAndAddMultiSliceRep())
-	{
-		return;
-	}
-
-	if (mGroupData)
-		mMultiSliceRep->setImages(this->getImagesToView());
-	else
-		mMultiSliceRep->setImages(std::vector<ImagePtr>());
-
-	this->viewportChanged();
 }
 
 std::vector<ImagePtr> ViewWrapper2D::getImagesToView()
@@ -381,8 +323,11 @@ void ViewWrapper2D::applyViewFollower()
 //	CX_LOG_CHANNEL_DEBUG("CA") << "roi=" << roiUid;
 //	CX_LOG_CHANNEL_DEBUG("CA") << this << " autozoom zoom=" << result.zoom << ", center=" << result.center_shift_s;
 	this->changeZoom(result.zoom);
-	Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
-	mServices->patient()->setCenter(newcenter_r);
+	if (mCenterToTool)
+	{
+		Vector3D newcenter_r = mViewFollower->findCenter_r_fromShift_s(result.center_shift_s);
+		mServices->patient()->setCenter(newcenter_r);
+	}
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -444,14 +389,13 @@ ImagePtr ViewWrapper2D::getImageToDisplay()
 	return image;
 }
 
-bool ViewWrapper2D::useGPU2DRendering()
-{
-	return settings()->value("View2D/useGPU2DRendering").toBool();
-}
-
 void ViewWrapper2D::createAndAddSliceReps(int numberOfSlices)
 {
-	this->removeAndResetSliceRep();
+	//TODO: Don't remove and add the same slice reps. Reuse existing ones
+	if(mSliceReps.size()== numberOfSlices)//Simple first fix
+		return;
+
+	this->removeAndResetSliceRep();//This use a lot of time in vtkGarbageCollectorImpl. When doing SW rendering it is probably not needed to remove and add, as we did for GPU rendering
 	for(int i = 0; i < numberOfSlices; ++i)
 	{
 		SliceRepSWPtr sliceRep = SliceRepSW::New("SliceRep_" + mView->getName() + "_" + i);
@@ -484,21 +428,11 @@ void ViewWrapper2D::updateItemsFromViewGroup()
 	{
 		Vector3D c = image->get_rMd().coord(image->boundingBox().center());
 		mSliceProxy->setDefaultCenter(c);
-
-		if (this->useGPU2DRendering())
-		{
-			this->recreateMultiSlicer();
-		}
-		else //software rendering
-		{
-			this->removeAndResetMultiSliceRep();
-			setImagesSWRendering();
-		}
+		setImagesSWRendering();
 	}
 	else //no images to display in the view
 	{
 		this->removeAndResetSliceRep();
-		this->removeAndResetMultiSliceRep();
 	}
 }
 

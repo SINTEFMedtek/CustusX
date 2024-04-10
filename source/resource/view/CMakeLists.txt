@@ -24,8 +24,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxToolRep3D
     Rep3D/cxPickerRep
     Rep3D/cxVolumetricRep
-    Rep3D/cxTexture3DSlicerRep
-    Rep3D/cxSlices3DRep
     Rep3D/cxSlicePlanes3DRep
     Rep3D/cxGeometricRep
     Rep3D/cxFiberBundleRep
@@ -58,7 +56,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep2D/cxDistanceMetricRep2D
 
     Primitives/cxImageMapperMonitor
-    Primitives/cxTexture3DSlicerProxy
     Primitives/cxSlicePlaneClipper
     Primitives/cxToolTracer
     Primitives/cxVolumeProperty
@@ -75,7 +72,6 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     cxInteractiveCropper
     cxCameraControl
     cxCameraStyleInteractor
-    cxRenderWindowFactory
 )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -122,8 +118,6 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
 	Primitives/cxShaderCallback
 	Primitives/cxOpenGLShaders
 	cxRepContainer
-	cxSharedOpenGLContext
-	cxSharedContextCreatedCallback
 )
 
 configure_file(Rep/Shaders/glsl/upscale.frag Rep COPYONLY)
@@ -134,6 +128,19 @@ configure_file(Rep/Shaders/glsl/raycasting_shader.vert Rep COPYONLY)
 cx_create_export_header("cxResourceVisualization")
 qt5_wrap_cpp( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
+set(VTK_MODULES
+  VTK::CommonCore
+  VTK::CommonDataModel
+  VTK::FiltersModeling
+  VTK::GUISupportQt
+  VTK::InteractionStyle
+  VTK::RenderingAnnotation
+  VTK::RenderingFreeType
+#  VTK::RenderingVolume#??
+  VTK::FiltersParallel
+  VTK::RenderingGL2PSOpenGL2
+)
+
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     cxResource
     cxPluginUtilities
@@ -141,6 +148,7 @@ set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}
+#    ${VTK_MODULES}
 )
 
 if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
@@ -149,7 +157,6 @@ if(CX_BUILD_MEHDI_VTKMULTIVOLUME)
         vtkGPUMultiVolumeRender
     )
 endif()
-
 
 add_library(cxResourceVisualization ${CX_RESOURCE_VISUALIZATION_FILES})
 target_include_directories(cxResourceVisualization
@@ -172,9 +179,16 @@ target_include_directories(cxResourceVisualization
     ${CTK_USE_FILE}
 )
 target_link_libraries(cxResourceVisualization
-    PRIVATE
+    PUBLIC
+    ${VTK_MODULES}
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
+    PRIVATE
 #    ${GLEW_LIBRARY}
 )
 
+vtk_module_autoinit(
+  TARGETS cxResourceVisualization
+  MODULES ${VTK_LIBRARIES} #Removing this cause 3D render to crash: vtkRayCastImageDisplayH:20    WARN| Error: no override found for 'vtkRayCastImageDisplayHelper'.
+#  MODULES ${VTK_MODULES}
+  )
 add_subdirectory(testing)

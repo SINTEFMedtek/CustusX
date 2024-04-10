@@ -37,6 +37,8 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 		retval = imUS;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imPET), Qt::CaseInsensitive))
 		retval = imPET;
+	else if(modalityString == "PT")
+		retval = imPET;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imSC), Qt::CaseInsensitive))
 		retval = imSC;
 	else
@@ -48,7 +50,9 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 
 IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 {
-	IMAGE_SUBTYPE retval = istUNKNOWN;
+	IMAGE_SUBTYPE retval =  string2enum<IMAGE_SUBTYPE>(imageTypeSubString);
+	if((retval != istUNKNOWN) && retval != istCOUNT)
+		return retval;
 
 	if (imageTypeSubString.isEmpty() || imageTypeSubString == " ")
 		retval = istEMPTY;
@@ -74,8 +78,8 @@ IMAGE_SUBTYPE convertToImageSubType(QString imageTypeSubString)
 		retval = istSEGMENTATION;
 	else if(imageTypeSubString.contains("label", Qt::CaseInsensitive))
 		retval = istSEGMENTATION;
-	else
-		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
+//	else
+//		CX_LOG_WARNING() << "convertToImageSubType - Cannot convert the string \"" << imageTypeSubString << "\" to a known image subtype";
 
 	return retval;
 }

@@ -86,6 +86,10 @@ DoubleRange DoubleProperty::getValueRange() const
 void DoubleProperty::setValueRange(DoubleRange range)
 {
 	mRange = range;
+	if(mValue < mRange.mMin)
+		setValue(mRange.mMin);
+	if(mValue > mRange.mMax)
+		setValue(mRange.mMax);
 	emit changed();
 }
 

@@ -132,7 +132,12 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, IMAGE_SUBTYPE, istCOUNT)
 	"FLAIR",
 	"B-Mode",
 	"Angio",
-	"Segmentation"
+	"Segmentation",
+	"PET CT",
+	"Thorax CT",
+	"PET",
+	"Registered PET",
+	"Copy"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, IMAGE_SUBTYPE, istCOUNT)
 
@@ -142,22 +147,62 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"UNKNOWN",
 	"Lungs",
 	"Tumors",
-	"Lesions",
+	"Nodules",
 	"Lymph Nodes",
 	"Vena Azygos",
 	"Vena Cava",
 	"Aorta",
 	"Subclavian Artery",
-	"Lung Vessels",
+//	"Lung Vessels",
 	"Heart",
-	"Esophagus",
-	"Spine",
-	"Airways",
-	"Centerlines",
 	"Pulmonary Veins",
 	"Pulmonary Trunk",
+	"Esophagus",
+	"Spine",
+	"Lung Vessels",
+	"Airways",
+	"Centerlines",
 	"Medium Organs",
 	"Small Organs",
-	"Nodules"
+	"PET"
 }
 DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_STRUCTURES, lsCOUNT)
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_MODELS, lmCOUNT)
+{
+	"UNKNOWN",
+	"MediumOrgansMediastinum",
+	"PulmSystHeart",
+	"SmallOrgansMediastinum"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, LUNG_MODELS, lmCOUNT)
+
+DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
+{
+	"UNKNOWN",
+	"Airways",
+	"Lungs",
+	"LymphNodes",
+	"VenaCava",
+	"AorticArch",
+	"AscendingAorta",
+	"DescendingAorta",
+	"Spine",
+	"Heart",
+	"PulmonaryVeins",
+	"PulmonaryTrunk",
+	"BrachiocephalicVeins",
+	"SubclavianArtery", //"SubCarArt" in Raidionics
+	"Azygos",
+	"Esophagus",
+	"Tumors",
+	"Nodules",
+	"LungVessels",
+	"AirwaysEnhanced",
+	"AirwaysEnhancedCopy",
+	"Centerlines",
+	"AirwayCenterlines",
+	"RouteToTarget",
+	"RouteToTargetExtended"
+}
+DEFINE_ENUM_STRING_CONVERTERS_END(cx, ORGAN_TYPE, organtypeCOUNT)

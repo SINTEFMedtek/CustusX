@@ -64,9 +64,8 @@ void ViewGroup::optionChangedSlot()
 
 /**Add one view wrapper and setup the necessary connections.
  */
-void ViewGroup::addView(ViewWrapperPtr wrapper, SharedOpenGLContextPtr sharedOpenGLContext)
+void ViewGroup::addView(ViewWrapperPtr wrapper)
 {
-	wrapper->setSharedOpenGLContext(sharedOpenGLContext);
 	mViews.push_back(wrapper->getView());
 	mViewWrappers.push_back(wrapper);
 

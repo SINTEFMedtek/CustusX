@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtest_org_custusx_core_view_export.h"
 
 #include <vtkGPUVolumeRayCastMapper.h>
-#include <vtkVolumeTextureMapper3D.h>
 #include <vtkVolume.h>
 
 #include "catch.hpp"
