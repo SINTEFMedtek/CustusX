@@ -54,7 +54,7 @@ ViewWidget *ViewWidgetWithSlider::getViewWidget()
 }
 
 
-LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(RenderWindowFactoryPtr factory, QWidget* parent) :
+LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
 	ViewCollectionWidget(parent)
 {
 	mViewCache = MultiViewCache::create();
@@ -157,6 +157,10 @@ void LayoutWidgetUsingViewWidgets::enableContextMenuForViews(bool enable)
 	{
         mViewsWithSlider[i]->setContextMenuPolicy(policy);
     }
+	for (unsigned i=0; i<mViews.size(); ++i)
+	{
+		mViews[i]->setContextMenuPolicy(policy);
+	}
 }
 
 ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)
