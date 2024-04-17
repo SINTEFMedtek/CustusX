@@ -24,10 +24,6 @@ namespace cx
 ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
 	LayoutWidgetUsingViewWidgets(parent)
 {
-	mLayout = new QGridLayout(this);
-	this->setLayout(mLayout);
-	mViewCache = MultiViewCache::create();
-
 	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->initBaseLayout();
 	ViewCollectionWidgetMixed::setGridMargin(4);
