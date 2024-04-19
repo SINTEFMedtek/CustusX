@@ -52,6 +52,7 @@ public:
 	void setCameraRotationAlongRoute(std::vector< double > cameraRotations);
 	void setBranchingIndexAlongRoute(std::vector< int > branchingIndex);
 	void setRecordVideoOption(bool recordVideo);
+	void disableAutomaticRotation();
 
 protected:
 	QString defaultWhatsThis() const;
@@ -86,13 +87,13 @@ signals:
 private slots:
 	void						inputChangedSlot();
 	void						moveCameraSlot();
-	void						resetEndoscopeSlot();
 	void						automaticRotationSlot();
 	void						updateRotationDialSlot(int value);
 
 protected slots:
 	virtual void				keyPressEvent(QKeyEvent* event);
 	void						playButtonClickedSlot();
+	void						resetEndoscopeSlot();
 };
 
 } /* namespace cx */

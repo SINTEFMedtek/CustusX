@@ -18,8 +18,8 @@ namespace cx
 ManualToolAdapter::ManualToolAdapter(QString uid) :
 	ManualTool(uid)
 {
-	ToolPtr initial(new ManualTool(uid + "base"));
-	this->setBase(initial);
+	mInitialBase = ToolPtr(new ManualTool(uid + "base"));
+	this->setBase(mInitialBase);
 	//	mBase.reset(new ManualTool(uid + "base"));
 	//	connect(mBase.get(), SIGNAL(toolProbeSector()), this, SIGNAL(toolProbeSector()));
 }
@@ -45,6 +45,9 @@ void ManualToolAdapter::setBase(ToolPtr base)
 	}
 
 	mBase = base;
+
+	if(!mBase)
+		mBase = mInitialBase;
 
 	if (mBase)
 	{
@@ -106,15 +109,16 @@ std::set<Tool::Type> ManualToolAdapter::getTypes() const
 
 void ManualToolAdapter::startEmittingContinuousPositions(int msecBetweenPositions)
 {
-	QTimer* positionTimer = new QTimer(this);
-	connect(positionTimer, SIGNAL(timeout()), this, SLOT(emitPosition()));
-	positionTimer->start(msecBetweenPositions);
+	mPositionTimer = new QTimer(this);
+	connect(mPositionTimer, SIGNAL(timeout()), this, SLOT(emitPosition()));
+	mPositionTimer->start(msecBetweenPositions);
 }
 
 //Not used for now
 //void ManualToolAdapter::stopEmittingContinuousPositions()
 //{
-//	positionTimer->stop();
+//	mPositionTimer->stop();
+//	disconnect(mPositionTimer, SIGNAL(timeout()), this, SLOT(emitPosition()));
 //}
 
 void ManualToolAdapter::emitPosition()

@@ -164,13 +164,34 @@ void CXVBcameraPath::updateManualToolPosition()
 	Transform3D rMpr = mPatientModelService->get_rMpr();
 	Transform3D prMt = rMpr.inv() * rMt * rotateZ * rotateY * rotateX;
 
+	if(mNavigateAlongAirwayWall)
+		prMt = moveToolPositionToAirwayWall(prMt);
+
 	mManualTool->set_prMt(prMt);
 
 	if(mWritePositionsToFile)
 		this->writePositionToFile(prMt);
 
-
 	emit rotationChanged((int) (mLastCameraRotAngle * 180/M_PI));
+}
+
+Transform3D CXVBcameraPath::moveToolPositionToAirwayWall(Transform3D prMt)
+{
+	if( !(mRoutePositions.size() > 0 && mRoutePositions.size() == mRadius.size()) )
+		return prMt;
+
+	ProbePtr USprobe = mManualTool->getProbe();
+	if(!USprobe)
+		return prMt;
+
+	ProbeDefinition probeDefinition = USprobe->getProbeDefinition();
+	int index = (int) (mPositionPercentage * (mRoutePositions.size() - 1));
+	double probeOffset = probeDefinition.getDepthStart();
+	int distanceToWall = mRadius[index] - probeOffset;
+	Transform3D tMw = Transform3D::Identity();
+	tMw.matrix().col(3).head(3) = Vector3D(0, 0, 1) * distanceToWall;
+
+	return prMt * tMw;
 }
 
 void CXVBcameraPath::setWritePositionsToFile(bool write)
@@ -274,6 +295,11 @@ void CXVBcameraPath::setRoutePositions(std::vector< Eigen::Vector3d > routePosit
 	mRoutePositions = routePositions;
 }
 
+void CXVBcameraPath::setRadiusAlongRoute(std::vector< double > radius)
+{
+	mRadius = radius;
+}
+
 void CXVBcameraPath::setCameraRotations(std::vector< double > cameraRotations)
 {
 	mCameraRotations = cameraRotations;
@@ -288,6 +314,11 @@ void CXVBcameraPath::setBranchingIndexAlongRoute(std::vector< int > branchingInd
 void CXVBcameraPath::setAutomaticRotation(bool automaticRotation)
 {
 	mAutomaticRotation = automaticRotation;
+}
+
+void CXVBcameraPath::setNavigateAlongAirwayWall(bool navigateAlongAirwayWall)
+{//For EBUS simulator
+	mNavigateAlongAirwayWall = navigateAlongAirwayWall;
 }
 
 double positionPercentageAdjusted(double positionPercentage)
