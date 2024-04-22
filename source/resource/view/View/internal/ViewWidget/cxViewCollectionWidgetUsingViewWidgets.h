@@ -16,13 +16,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QHBoxLayout>
 #include <QSlider>
+#include "ctkDoubleSlider.h"
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
-
-#include "ctkDoubleSlider.h"
 
 class QGridLayout;
 
@@ -37,21 +36,22 @@ struct ViewAndSlider
 		mViewWidget(viewWidget) {}
 	~ViewAndSlider()
 	{
-		QHBoxLayout * mSliderlayout = nullptr;
-		QWidget * mSliderWidget = nullptr;
-		QSlider *mSlider = nullptr;
+		mSliderlayout = nullptr;
+		mSliderWidget = nullptr;
+		mSlider = nullptr;
 	}
 	ViewWidget* mViewWidget;
 	QHBoxLayout * mSliderlayout = nullptr;
 	QWidget * mSliderWidget = nullptr;
-	QSlider *mSlider = nullptr;
+	ctkDoubleSlider *mSlider = nullptr;
 
 	QWidget * getSliderWidget()
 	{
 		if(!mSliderWidget)
 		{
 			mSliderWidget = new QWidget();
-			mSlider = new QSlider(Qt::Vertical, mSliderWidget);
+			//Move to .cpp file? This may reduce the need to include ctkDoubleSlider.h (like in cxViewImplService)
+			mSlider = new ctkDoubleSlider(Qt::Vertical, mSliderWidget);
 			mSliderlayout = new QHBoxLayout(mSliderWidget);
 			mSliderlayout->setContentsMargins(0, 0, 0, 0);
 			mSliderlayout->addWidget(mViewWidget);
@@ -124,7 +124,7 @@ public:
     virtual std::vector<ViewPtr> getViews();
     virtual QPoint getPosition(ViewPtr view);
 	virtual void enableContextMenuForViews(bool enable);
-	virtual QSlider* getSlider(ViewPtr view);
+	virtual ctkDoubleSlider* getSlider(ViewPtr view);
 
 protected:
 	std::vector<ViewAndSlider> mSliderViews;

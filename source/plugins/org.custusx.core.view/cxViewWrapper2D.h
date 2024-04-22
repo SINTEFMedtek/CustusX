@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vector>
 #include <QPointer>
+#include "ctkDoubleSlider.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
 #include "cxViewWrapper.h"
@@ -68,7 +69,7 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	virtual void updateView();
-	void connect2DSlider(QSlider *slider);
+	void connect2DSlider(ctkDoubleSlider *slider);
 
 	ImagePtr getImageToDisplay();
 
@@ -97,7 +98,7 @@ private slots:
 	void toggleShowManualTool();
     void enableSliderSlot(bool visible);
     void toggle2DSlider();
-	void sliderChanged(int sliderValue);
+	void sliderChanged(double sliderValue);
 
 protected slots:
 	void samplePoint(Vector3D click_vp);
@@ -149,7 +150,7 @@ private:
 
 	Vector3D mLastClickPos_vp;
 	int mLastSliderValue;
-	QSlider *mSlider = nullptr;
+	ctkDoubleSlider *mSlider = nullptr;
 	ActiveImageProxyPtr mActiveImageProxy;
 
 	QActionGroup* mOrientationActionGroup;

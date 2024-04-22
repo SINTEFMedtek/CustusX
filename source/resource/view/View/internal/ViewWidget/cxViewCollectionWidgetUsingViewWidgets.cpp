@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
+//TODO: Decide which one to use: ViewWidgetWithSlider or ViewAndSlider
 ViewWidgetWithSlider::ViewWidgetWithSlider(ViewWidget* view) :
     mSliceWidget(view)
 {
@@ -107,7 +108,7 @@ bool LayoutWidgetUsingViewWidgets::useSlider(PLANE_TYPE planeType)
 	return useSliderWidget;
 }
 
-QSlider* LayoutWidgetUsingViewWidgets::getSlider(ViewPtr view)
+ctkDoubleSlider *LayoutWidgetUsingViewWidgets::getSlider(ViewPtr view)
 {
 	for (unsigned i=0; i<mSliderViews.size(); ++i)
 	{

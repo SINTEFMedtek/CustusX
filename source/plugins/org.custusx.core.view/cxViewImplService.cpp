@@ -498,7 +498,7 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	else
 		CX_LOG_WARNING() << "ViewImplService::activateView: No vtkRenderWindowInteractor";
 
-	QSlider *slider = nullptr;
+	ctkDoubleSlider *slider = nullptr;
 	LayoutWidgetUsingViewWidgets* widgetWithSliders = dynamic_cast<LayoutWidgetUsingViewWidgets*>(widget);
 	if(widgetWithSliders)
 		slider = widgetWithSliders->getSlider(view);
@@ -506,7 +506,7 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 	mViewGroups[viewData.mGroup]->addView(wrapper);
 }
 
-ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData viewData, QSlider *slider)
+ViewWrapperPtr ViewImplService::createViewWrapper(ViewPtr view, LayoutViewData viewData, ctkDoubleSlider *slider)
 {
 	if (viewData.mType == View::VIEW_2D)
 	{

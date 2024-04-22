@@ -175,15 +175,15 @@ void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 //	//CX_LOG_DEBUG() << "mLastSliderValue: " << mLastSliderValue;
 }
 
-void ViewWrapper2D::connect2DSlider(QSlider *slider)
+void ViewWrapper2D::connect2DSlider(ctkDoubleSlider *slider)
 {
 	mSlider = slider;
 	mLastSliderValue = 0;
 
-	connect(mSlider, &QSlider::valueChanged, this, &ViewWrapper2D::sliderChanged);
+	connect(mSlider, &ctkDoubleSlider::valueChanged, this, &ViewWrapper2D::sliderChanged);
 }
 
-void ViewWrapper2D::sliderChanged(int sliderValue)
+void ViewWrapper2D::sliderChanged(double sliderValue)
 {
 	//Axial
 	int sliderValueDiff = sliderValue - mLastSliderValue;
