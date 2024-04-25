@@ -104,6 +104,7 @@ public:
     virtual QWidget* getLayoutWidget(int index);
 	virtual QString getActiveLayout(int widgetIndex = 0) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
+	virtual void rebuildLayouts();
 	virtual ClippersPtr getClippers();
 	virtual InteractiveCropperPtr getCropper();
 	virtual CyclicActionLoggerPtr getRenderTimer();
@@ -140,7 +141,6 @@ private slots:
 	void settingsChangedSlot(QString key);
 
 protected:
-	void rebuildLayouts();
 	QList<unsigned> getViewGroupsToAutoShowIn();
 
 	VisServicesPtr mServices;

@@ -73,6 +73,7 @@ QWidget* ViewServiceNull::createLayoutWidget(QWidget *parent, int index) { retur
 QWidget* ViewServiceNull::getLayoutWidget(int index) { return NULL; }
 QString ViewServiceNull::getActiveLayout(int widgetIndex) const { return ""; }
 void ViewServiceNull::setActiveLayout(const QString& uid, int widgetIndex) {}
+void ViewServiceNull::rebuildLayouts() {}
 InteractiveCropperPtr ViewServiceNull::getCropper() { return InteractiveCropperPtr(); }
 CyclicActionLoggerPtr ViewServiceNull::getRenderTimer() { return CyclicActionLoggerPtr(); }
 NavigationPtr ViewServiceNull::getNavigation(int group) { return NavigationPtr(); }

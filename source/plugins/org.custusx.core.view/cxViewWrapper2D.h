@@ -79,6 +79,7 @@ signals:
 protected:
 	virtual QString getDataDescription();
 	virtual QString getViewDescription();
+	void addSliderCheckbox(QMenu& contextMenu);
 
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
@@ -96,8 +97,8 @@ private slots:
 	void optionChangedSlot();
 	void showManualToolSlot(bool visible);
 	void toggleShowManualTool();
-    void enableSliderSlot(bool visible);
-    void toggle2DSlider();
+	void enableSliderSlot(bool visible, QString settingString);
+	void toggle2DSlider();
 	void sliderChanged(double sliderValue);
 
 protected slots:

@@ -231,12 +231,42 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	showManualTool->setToolTip("Turn on/off visualization of the vire cross in 2D");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 	contextMenu.addAction(showManualTool);
-    QAction* showSlider = new QAction("Enable 2D Slider", &contextMenu);
-    showSlider->setCheckable(true);
-    showSlider->setChecked(settings()->value("View2D/showSlider").toBool());
-    showSlider->setToolTip("Turn on/off slider for 2D slices");
-    connect(showSlider, SIGNAL(triggered(bool)), this, SLOT(enableSliderSlot(bool)));
-    contextMenu.addAction(showSlider);
+	this->addSliderCheckbox(contextMenu);
+}
+
+void ViewWrapper2D::addSliderCheckbox(QMenu& contextMenu)
+{
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	QString settingString, text;
+	if(plane == ptAXIAL)
+	{
+		text = "Axial";
+		settingString = "View2D/useAxialSlider";
+	}
+	else if(plane == ptCORONAL)
+	{
+		text = "Coronal";
+		settingString = "View2D/useCoronalSlider";
+	}
+	else if(plane == ptSAGITTAL)
+	{
+		text = "Sagittal";
+		settingString = "View2D/useSagittalSlider";
+	}
+	else
+		return;
+
+	QString actionString = "Enable 2D " + text + " Slider";
+	QString toolTip = "Turn on/off slider for " + text + " 2D slices";
+	QAction* showSlider = new QAction(actionString, &contextMenu);
+	showSlider->setCheckable(true);
+	showSlider->setChecked(settings()->value(settingString).toBool());
+	showSlider->setToolTip(toolTip);
+	connect(showSlider, &QAction::triggered, this, [settingString, showSlider, this]()
+			{
+				this->enableSliderSlot(showSlider->isChecked(), settingString);
+			});
+	contextMenu.addAction(showSlider);
 }
 
 void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
@@ -297,10 +327,12 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->toggleShowManualTool();
 	}
-    if (key == "View2D/showSlider")
-    {
-        this->toggle2DSlider();
-    }
+	if ((key == "View2D/useAxialSlider")
+		|| (key == "View2D/useCoronalSlider")
+		|| (key == "View2D/useSagittalSlider") )
+	{
+		this->toggle2DSlider();
+	}
 }
 
 void ViewWrapper2D::toggleShowManualTool()
@@ -308,17 +340,17 @@ void ViewWrapper2D::toggleShowManualTool()
 	if (settings()->value("View2D/showManualTool").toBool())
 		mView->addRep(mToolRep2D);
 	else
-        mView->removeRep(mToolRep2D);
+		mView->removeRep(mToolRep2D);
 }
 
-void ViewWrapper2D::enableSliderSlot(bool visible)
+void ViewWrapper2D::enableSliderSlot(bool visible, QString settingString)
 {
-    settings()->setValue("View2D/showSlider", visible);
+	settings()->setValue(settingString, visible);
 }
 
 void ViewWrapper2D::toggle2DSlider()
 {
-
+	mServices->view()->rebuildLayouts();
 }
 
 void ViewWrapper2D::removeAndResetSliceRep()
