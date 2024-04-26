@@ -133,6 +133,8 @@ ViewWrapper2D::~ViewWrapper2D()
 		mView->removeReps();
 }
 
+//Slider position seems to update ok before starting to use slider, but not after
+
 //min/max must be updated when images changes. Position must also be updated when tool position changes
 //Need to listen to toolTransformAndTimestamp? Use ActiveToolProxy?
 //Or always trigger from updateView, or with a modified?
@@ -149,30 +151,30 @@ void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 	mSlider->blockSignals(true);
 	mSlider->setMinimum(0);
 	mSlider->setMaximum(zDim);
-	mSlider->setSliderPosition(zDim/2);
+//	mSlider->setSliderPosition(zDim/2);
 	mSlider->blockSignals(false);
-	mLastSliderValue = zDim/2;
-	return;
+//	mLastSliderValue = zDim/2;
+//	return;
 
 	//TODO:
-//	Vector3D tool_d = this->get_tool_d();
-//	CX_LOG_DEBUG() << "tool_d: " << tool_d;
-//	Vector3D spacing = image->getSpacing();
-//	int outOfPlane_voxels = tool_d[2] * spacing[2];
-//	CX_LOG_DEBUG() << "outOfPlane_voxels: " << outOfPlane_voxels;
+	Vector3D tool_d = this->get_tool_d();
+	CX_LOG_DEBUG() << "tool_d: " << tool_d;
+	Vector3D spacing = image->getSpacing();
+	int outOfPlane_voxels = tool_d[2] * spacing[2];
+	CX_LOG_DEBUG() << "outOfPlane_voxels: " << outOfPlane_voxels;
 
-//	if(outOfPlane_voxels > mSlider->maximum())
-//		outOfPlane_voxels = mSlider->maximum();
-//	else if(outOfPlane_voxels < mSlider->minimum())
-//		outOfPlane_voxels = mSlider->minimum();
-//	CX_LOG_DEBUG() << "fixed outOfPlane_voxels: " << outOfPlane_voxels;
+	if(outOfPlane_voxels > mSlider->maximum())
+		outOfPlane_voxels = mSlider->maximum();
+	else if(outOfPlane_voxels < mSlider->minimum())
+		outOfPlane_voxels = mSlider->minimum();
+	CX_LOG_DEBUG() << "fixed outOfPlane_voxels: " << outOfPlane_voxels;
 
-//	mSlider->blockSignals(true);
-//	mSlider->setSliderPosition(outOfPlane_voxels);
-//	mLastSliderValue = mSlider->sliderPosition();
-//	mLastSliderValue = outOfPlane_voxels;
-//	mSlider->blockSignals(false);
-//	//CX_LOG_DEBUG() << "mLastSliderValue: " << mLastSliderValue;
+	mSlider->blockSignals(true);
+	mSlider->setSliderPosition(outOfPlane_voxels);
+	mLastSliderValue = mSlider->sliderPosition();
+	mLastSliderValue = outOfPlane_voxels;
+	mSlider->blockSignals(false);
+	//CX_LOG_DEBUG() << "mLastSliderValue: " << mLastSliderValue;
 }
 
 void ViewWrapper2D::connect2DSlider(ctkDoubleSlider *slider)
@@ -582,7 +584,7 @@ void ViewWrapper2D::updateView()
 
 	this->applyViewFollower();
 
-	//updateSlider();//Too much?
+	updateSlider();//Too much?
 }
 
 DoubleBoundingBox3D ViewWrapper2D::getViewport_s() const
