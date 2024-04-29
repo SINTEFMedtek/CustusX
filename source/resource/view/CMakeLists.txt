@@ -3,7 +3,7 @@
 ###########################################################
 
 find_package(GLEW REQUIRED)
-find_package(CTK REQUIRED)
+cx_initialize_CTK()
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
@@ -140,7 +140,6 @@ set(VTK_MODULES
   VTK::FiltersParallel
   VTK::RenderingGL2PSOpenGL2
 )
-#TODO: Fix CTK folder warnings on Ubuntu
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     cxResource
     cxPluginUtilities
@@ -176,7 +175,6 @@ target_include_directories(cxResourceVisualization
     ./View/internal/ViewMixed
     ./View/internal/ViewWidget
     ${GLEW_INCLUDE_DIRS}
-    ${CTK_USE_FILE}
 )
 target_link_libraries(cxResourceVisualization
     PUBLIC
