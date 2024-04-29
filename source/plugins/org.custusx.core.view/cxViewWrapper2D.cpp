@@ -117,9 +117,8 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerTo
 	connect(mServices->patient().get(), &PatientModelService::videoAddedToTrackedStream, this, &ViewWrapper2D::videoSourcesChangedSlot);
 
 
-	mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
-	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::updateSlider);
-
+	// mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
+	// connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::updateSlider);
 	//mActiveTool = ActiveToolProxy::New(mServices->tracking());
 	//connect(mActiveTool.get(), &ActiveToolProxy::toolTransformAndTimestamp, this, &ViewWrapper2D::updateSlider);//Cause side effects
 
@@ -133,48 +132,43 @@ ViewWrapper2D::~ViewWrapper2D()
 		mView->removeReps();
 }
 
-//Slider position seems to update ok before starting to use slider, but not after
-
 //min/max must be updated when images changes. Position must also be updated when tool position changes
 //Need to listen to toolTransformAndTimestamp? Use ActiveToolProxy?
 //Or always trigger from updateView, or with a modified?
 void ViewWrapper2D::updateSlider(/*const QString& uid*/)
 {
+	if(!mSlider)
+		return;
 	//ImagePtr image = mServices->patient()->getData<Image>(uid);
 	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
-	if(!image || !mSlider)
+	if(!image)
 		return;
-	int zDim = image->getBaseVtkImageData()->GetDimensions()[2];
-	//CX_LOG_DEBUG() << "Image: zDim: " << zDim << " uid:" << uid ;
 
-	//axial
+	int dim = 0;
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	if(plane == ptAXIAL)
+		dim = 2;//z dim for axial
+	if(plane == ptCORONAL)
+		dim = 1;//y dim
+	if(plane == ptSAGITTAL)
+		dim = 0;//x dim
+
+	Vector3D spacing = image->getSpacing();
+	double dimsize = image->getBaseVtkImageData()->GetDimensions()[dim] * spacing[dim];
+	Vector3D tool_d = this->get_tool_d();
+	double outOfPlane_voxels = tool_d[dim];
+	if(outOfPlane_voxels > dimsize)
+		outOfPlane_voxels = dimsize;
+	else if(outOfPlane_voxels < 0)
+		outOfPlane_voxels = 0;
+
 	mSlider->blockSignals(true);
 	mSlider->setMinimum(0);
-	mSlider->setMaximum(zDim);
-//	mSlider->setSliderPosition(zDim/2);
-	mSlider->blockSignals(false);
-//	mLastSliderValue = zDim/2;
-//	return;
-
-	//TODO:
-	Vector3D tool_d = this->get_tool_d();
-	CX_LOG_DEBUG() << "tool_d: " << tool_d;
-	Vector3D spacing = image->getSpacing();
-	int outOfPlane_voxels = tool_d[2] * spacing[2];
-	CX_LOG_DEBUG() << "outOfPlane_voxels: " << outOfPlane_voxels;
-
-	if(outOfPlane_voxels > mSlider->maximum())
-		outOfPlane_voxels = mSlider->maximum();
-	else if(outOfPlane_voxels < mSlider->minimum())
-		outOfPlane_voxels = mSlider->minimum();
-	CX_LOG_DEBUG() << "fixed outOfPlane_voxels: " << outOfPlane_voxels;
-
-	mSlider->blockSignals(true);
+	mSlider->setMaximum(dimsize);
 	mSlider->setSliderPosition(outOfPlane_voxels);
 	mLastSliderValue = mSlider->sliderPosition();
 	mLastSliderValue = outOfPlane_voxels;
 	mSlider->blockSignals(false);
-	//CX_LOG_DEBUG() << "mLastSliderValue: " << mLastSliderValue;
 }
 
 void ViewWrapper2D::connect2DSlider(ctkDoubleSlider *slider)
@@ -187,9 +181,17 @@ void ViewWrapper2D::connect2DSlider(ctkDoubleSlider *slider)
 
 void ViewWrapper2D::sliderChanged(double sliderValue)
 {
-	//Axial
 	int sliderValueDiff = sliderValue - mLastSliderValue;
-	Vector3D delta_d = Vector3D(0, 0, sliderValueDiff);//axial
+	Vector3D delta_d;
+
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	if(plane == ptAXIAL)
+		delta_d = Vector3D(0, 0, sliderValueDiff);
+	else if(plane == ptCORONAL)
+		delta_d = Vector3D(0, sliderValueDiff, 0);
+	else if(plane == ptSAGITTAL)
+		delta_d = Vector3D(sliderValueDiff, 0, 0);
+
 	this->shiftPosOutOfPlane(delta_d);
 	mLastSliderValue = sliderValue;
 }

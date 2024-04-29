@@ -152,7 +152,7 @@ private:
 	Vector3D mLastClickPos_vp;
 	int mLastSliderValue;
 	ctkDoubleSlider *mSlider = nullptr;
-	ActiveImageProxyPtr mActiveImageProxy;
+	// ActiveImageProxyPtr mActiveImageProxy;
 
 	QActionGroup* mOrientationActionGroup;
 	void changeZoom(double delta);
