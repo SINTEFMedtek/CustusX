@@ -75,28 +75,6 @@ struct ViewAndSlider
 };
 
 /**
- * ViewWidget with added Slider for manual slicing through 2D slices
- *
- * \ingroup cx_resource_view_internal
- * \date 2023-01-04
- * \author Geir Arne Tangen
- */
-class cxResourceVisualization_EXPORT ViewWidgetWithSlider : public QWidget
-{
-    Q_OBJECT
-private:
-    ctkDoubleSlider *mSliceSlider;
-    ViewWidget      *mSliceWidget;
-    QWidget         *mSliceWidgetWithSlider;
-
-public:
-    ViewWidgetWithSlider(ViewWidget *view);
-    QWidget*        getViewWidgetWithSlider();
-    QWidget*        getUsedWidget(View::Type type, bool useSlider);
-    ViewWidget*     getViewWidget();
-};
-
-/**
  * Widget for displaying Views, Containing a QGridLayout of QVTKWidgets,
  * one for each view.
  *

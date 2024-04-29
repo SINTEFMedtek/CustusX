@@ -39,10 +39,4 @@ QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(QWidg
 	return new ViewCollectionWidgetMixed(parent);
 }
 
-bool ViewCollectionWidget::useSlider()
-{
-    return settings()->value("View2D/showSlider").toBool();
-}
-
 } // namespace cx
-

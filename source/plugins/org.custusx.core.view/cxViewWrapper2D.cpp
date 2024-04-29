@@ -116,12 +116,6 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerTo
 
 	connect(mServices->patient().get(), &PatientModelService::videoAddedToTrackedStream, this, &ViewWrapper2D::videoSourcesChangedSlot);
 
-
-	// mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
-	// connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::updateSlider);
-	//mActiveTool = ActiveToolProxy::New(mServices->tracking());
-	//connect(mActiveTool.get(), &ActiveToolProxy::toolTransformAndTimestamp, this, &ViewWrapper2D::updateSlider);//Cause side effects
-
 	this->activeToolChangedSlot();
 	this->updateView();
 }
@@ -132,14 +126,10 @@ ViewWrapper2D::~ViewWrapper2D()
 		mView->removeReps();
 }
 
-//min/max must be updated when images changes. Position must also be updated when tool position changes
-//Need to listen to toolTransformAndTimestamp? Use ActiveToolProxy?
-//Or always trigger from updateView, or with a modified?
-void ViewWrapper2D::updateSlider(/*const QString& uid*/)
+void ViewWrapper2D::updateSlider()
 {
 	if(!mSlider)
 		return;
-	//ImagePtr image = mServices->patient()->getData<Image>(uid);
 	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
 	if(!image)
 		return;

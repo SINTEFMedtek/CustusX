@@ -62,8 +62,7 @@ public:
 	 * Get the position of the Upper Left corner of the view,
 	 * given in qt-coordinates of this (the ViewCollectionWidget).
 	 */
-    virtual QPoint getPosition(ViewPtr view) = 0;
-    bool useSlider();
+	virtual QPoint getPosition(ViewPtr view) = 0;
 
 signals:
     void rendered();

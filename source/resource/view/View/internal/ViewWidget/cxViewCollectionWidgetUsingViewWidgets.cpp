@@ -22,40 +22,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-//TODO: Decide which one to use: ViewWidgetWithSlider or ViewAndSlider
-ViewWidgetWithSlider::ViewWidgetWithSlider(ViewWidget* view) :
-    mSliceWidget(view)
-{
-    mSliceWidgetWithSlider = new QWidget();
-    mSliceSlider = new ctkDoubleSlider(Qt::Horizontal, mSliceWidgetWithSlider);
-    QVBoxLayout *widgetWithSliderLayout = new QVBoxLayout(mSliceWidgetWithSlider);
-    widgetWithSliderLayout->setContentsMargins(0,0,0,0);
-    widgetWithSliderLayout->addWidget(mSliceWidget);
-    widgetWithSliderLayout->addWidget(mSliceSlider);
-}
-
-
-QWidget *ViewWidgetWithSlider::getViewWidgetWithSlider()
-{
-    return mSliceWidgetWithSlider;
-}
-
-
-QWidget *ViewWidgetWithSlider::getUsedWidget(View::Type type, bool useSlider)
-{
-    if(type == View::VIEW_2D && useSlider) {
-        return mSliceWidgetWithSlider;
-    } else {
-        return mSliceWidget;
-    }
-}
-
-ViewWidget *ViewWidgetWithSlider::getViewWidget()
-{
-    return mSliceWidget;
-}
-
-
 LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
 	ViewCollectionWidget(parent)
 {

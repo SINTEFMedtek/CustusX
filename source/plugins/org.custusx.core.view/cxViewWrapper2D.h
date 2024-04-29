@@ -152,13 +152,11 @@ private:
 	Vector3D mLastClickPos_vp;
 	int mLastSliderValue;
 	ctkDoubleSlider *mSlider = nullptr;
-	// ActiveImageProxyPtr mActiveImageProxy;
 
 	QActionGroup* mOrientationActionGroup;
 	void changeZoom(double delta);
 	void applyViewFollower();
 	DoubleBoundingBox3D getViewport_s() const;
-	//ActiveToolProxyPtr mActiveTool;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 
