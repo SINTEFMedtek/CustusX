@@ -14,14 +14,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
-#include <QHBoxLayout>
-#include <QSlider>
 #include "cxView.h"
 #include "cxLayoutData.h"
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
 
 class QGridLayout;
+class QHBoxLayout;
 class ctkDoubleSlider;
 
 namespace cx

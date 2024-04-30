@@ -10,13 +10,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
+#include <QVBoxLayout>
 #include "ctkDoubleSlider.h"
 #include "cxViewUtilities.h"
 #include "cxLogger.h"
 #include "cxMultiViewCache.h"
 #include "cxSettings.h"
-
-#include <QVBoxLayout>
 
 namespace cx
 {
