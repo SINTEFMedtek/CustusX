@@ -94,7 +94,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View2D/showToolCrosshair", true);
 	this->fillDefault("View3D/showManualTool", false);
 	this->fillDefault("View2D/showManualTool", true);
-	this->fillDefault("View2D/useAxialSlider", true);
+	this->fillDefault("View2D/useAxialSlider", false);
 	this->fillDefault("View2D/useCoronalSlider", false);
 	this->fillDefault("View2D/useSagittalSlider", false);
 
