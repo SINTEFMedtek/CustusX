@@ -10,10 +10,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxViewCollectionWidgetUsingViewWidgets.h"
-#include "cxGLHelpers.h"
+#include "ctkDoubleSlider.h"
 #include "cxViewUtilities.h"
 #include "cxLogger.h"
-#include "vtkRenderWindow.h"
 #include "cxMultiViewCache.h"
 #include "cxSettings.h"
 
@@ -21,6 +20,40 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 namespace cx
 {
+
+ViewAndSlider::~ViewAndSlider()
+{
+	mSliderlayout = nullptr;
+	mSliderWidget = nullptr;
+	mSlider = nullptr;
+}
+
+QWidget *ViewAndSlider::getSliderWidget()
+{
+	if (!mSliderWidget) {
+		mSliderWidget = new QWidget();
+		mSlider = new ctkDoubleSlider(Qt::Vertical, mSliderWidget);
+		mSliderlayout = new QHBoxLayout(mSliderWidget);
+		mSliderlayout->setContentsMargins(0, 0, 0, 0);
+		mSliderlayout->addWidget(mViewWidget);
+		mSliderlayout->addWidget(mSlider);
+	}
+	return mSliderWidget;
+}
+
+QWidget *ViewAndSlider::getUsedWidget()
+{
+	if (useSlider())
+		return mSliderWidget;
+	return mViewWidget;
+}
+
+bool ViewAndSlider::useSlider()
+{
+	if (mSliderWidget)
+		return true;
+	return false;
+}
 
 LayoutWidgetUsingViewWidgets::LayoutWidgetUsingViewWidgets(QWidget* parent) :
 	ViewCollectionWidget(parent)
@@ -127,20 +160,20 @@ void LayoutWidgetUsingViewWidgets::render()
 		current->render(); // render only changed scenegraph (shaky but smooth)
 	}
 
-    emit rendered();
+	emit rendered();
 }
 
 QPoint LayoutWidgetUsingViewWidgets::getPosition(ViewPtr view)
 {
-    ViewWidget* widget = this->WidgetFromView(view);
-    if (!widget)
-    {
-        CX_LOG_ERROR() << "Did not find view in layout " << view->getUid();
-        return QPoint(0,0);
-    }
+	ViewWidget* widget = this->WidgetFromView(view);
+	if (!widget)
+	{
+		CX_LOG_ERROR() << "Did not find view in layout " << view->getUid();
+		return QPoint(0,0);
+	}
 
-    QPoint p = widget->mapToGlobal(QPoint(0,0));
-    p = this->mapFromGlobal(p);
+	QPoint p = widget->mapToGlobal(QPoint(0,0));
+	p = this->mapFromGlobal(p);
 	return p;
 }
 
@@ -161,7 +194,7 @@ ViewWidget* LayoutWidgetUsingViewWidgets::WidgetFromView(ViewPtr view)
 		if (current->getView()==view)
 			return current;
 	}
-    return NULL;
+	return NULL;
 }
 
 void LayoutWidgetUsingViewWidgets::setGridSpacing(int val)
@@ -176,12 +209,12 @@ void LayoutWidgetUsingViewWidgets::setGridMargin(int val)
 
 int LayoutWidgetUsingViewWidgets::getGridSpacing() const
 {
-    return mLayout->spacing();
+	return mLayout->spacing();
 }
 
 int LayoutWidgetUsingViewWidgets::getGridMargin() const
 {
-    return mLayout->margin();
+	return mLayout->margin();
 }
 
 std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
@@ -191,5 +224,4 @@ std::vector<ViewPtr> LayoutWidgetUsingViewWidgets::getViews()
 		retval.push_back(mSliderViews[i].mViewWidget->getView());
 	return retval;
 }
-
-} // cx
+} // namespace cx

@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include "cxViewGroup.h"
-#include "cxRepManager.h"
 #include "cxVisServices.h"
 #include "cxSessionStorageServiceProxy.h"
 #include "cxXMLNodeWrapper.h"

@@ -13,9 +13,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QGridLayout>
 #include "cxViewCollectionWidgetUsingViewContainer.h"
 #include "cxViewUtilities.h"
-#include "vtkRenderWindow.h"
-#include "cxGLHelpers.h"
-#include "cxLogger.h"
 #include "cxMultiViewCache.h"
 
 namespace cx
@@ -130,7 +127,7 @@ int ViewCollectionWidgetMixed::getGridSpacing() const
 
 int ViewCollectionWidgetMixed::getGridMargin() const
 {
-    return mLayout->margin();
+	return mLayout->margin();
 }
 
 std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
@@ -144,18 +141,18 @@ std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
 QPoint ViewCollectionWidgetMixed::getPosition(ViewPtr view)
 {
 	for (unsigned i=0; i<mSliderViews.size(); ++i)
-    {
+	{
 		if (mSliderViews[i].mViewWidget->getView()==view)
-        {
+		{
 			QPoint p = mSliderViews[i].mViewWidget->mapToGlobal(QPoint(0,0));
-            p = this->mapFromGlobal(p);
-            return p;
-        }
-    }
+			p = this->mapFromGlobal(p);
+			return p;
+		}
+	}
 
-    QPoint p = mBaseLayout->getPosition(view);
-    p = mBaseLayout->mapToGlobal(p);
-    p = this->mapFromGlobal(p);
+	QPoint p = mBaseLayout->getPosition(view);
+	p = mBaseLayout->mapToGlobal(p);
+	p = this->mapFromGlobal(p);
 	return p;
 }
 

@@ -29,8 +29,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include "sscConfig.h"
-#include "cxActiveImageProxy.h"
-#include "cxActiveToolProxy.h"
 
 class QMouseEvent;
 class QWheelEvent;

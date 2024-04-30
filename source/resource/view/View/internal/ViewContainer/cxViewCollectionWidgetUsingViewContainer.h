@@ -37,7 +37,7 @@ class cxResourceVisualization_EXPORT ViewCollectionWidgetUsingViewContainer : pu
 	Q_OBJECT
 public:
 	ViewCollectionWidgetUsingViewContainer(QWidget* parent);
-    virtual ~ViewCollectionWidgetUsingViewContainer();
+	virtual ~ViewCollectionWidgetUsingViewContainer();
 
 	ViewPtr addView(LayoutViewData viewData);
 	virtual void setOffScreenRenderingAndClear(bool on);
@@ -47,10 +47,10 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+	virtual int getGridSpacing() const;
+	virtual int getGridMargin() const;
+	virtual std::vector<ViewPtr> getViews();
+	virtual QPoint getPosition(ViewPtr view);
 	virtual void enableContextMenuForViews(bool enable);
 
 private:

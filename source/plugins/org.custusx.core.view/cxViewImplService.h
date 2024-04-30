@@ -14,10 +14,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxViewService.h"
 #include "org_custusx_core_view_Export.h"
-#include "ctkDoubleSlider.h"//Needed?
 class ctkPluginContext;
 class QDomElement;
 class QSlider;
+class ctkDoubleSlider;
 
 namespace cx
 {

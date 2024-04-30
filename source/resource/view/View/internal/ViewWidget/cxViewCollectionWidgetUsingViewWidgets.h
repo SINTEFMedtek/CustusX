@@ -16,14 +16,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QHBoxLayout>
 #include <QSlider>
-#include "ctkDoubleSlider.h"
 #include "cxView.h"
 #include "cxLayoutData.h"
-#include "cxViewCache.h"
 #include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
 
 class QGridLayout;
+class ctkDoubleSlider;
 
 namespace cx
 {
@@ -34,44 +33,14 @@ struct ViewAndSlider
 {
 	ViewAndSlider(ViewWidget* viewWidget):
 		mViewWidget(viewWidget) {}
-	~ViewAndSlider()
-	{
-		mSliderlayout = nullptr;
-		mSliderWidget = nullptr;
-		mSlider = nullptr;
-	}
+	~ViewAndSlider();
+	QWidget *getSliderWidget();
+	QWidget *getUsedWidget();
+	bool useSlider();
 	ViewWidget* mViewWidget;
 	QHBoxLayout * mSliderlayout = nullptr;
 	QWidget * mSliderWidget = nullptr;
 	ctkDoubleSlider *mSlider = nullptr;
-
-	QWidget * getSliderWidget()
-	{
-		if(!mSliderWidget)
-		{
-			mSliderWidget = new QWidget();
-			//Move to .cpp file? This may reduce the need to include ctkDoubleSlider.h (like in cxViewImplService)
-			mSlider = new ctkDoubleSlider(Qt::Vertical, mSliderWidget);
-			mSliderlayout = new QHBoxLayout(mSliderWidget);
-			mSliderlayout->setContentsMargins(0, 0, 0, 0);
-			mSliderlayout->addWidget(mViewWidget);
-			mSliderlayout->addWidget(mSlider);
-		}
-		return mSliderWidget;
-	}
-
-	QWidget * getUsedWidget()
-	{
-		if(useSlider())
-			return mSliderWidget;
-		return mViewWidget;
-	}
-	bool useSlider()
-	{
-		if(mSliderWidget)
-			return true;
-		return false;
-	}
 };
 
 /**
@@ -87,7 +56,7 @@ class cxResourceVisualization_EXPORT LayoutWidgetUsingViewWidgets : public ViewC
 	Q_OBJECT
 public:
 	LayoutWidgetUsingViewWidgets(QWidget *parent);
-    virtual ~LayoutWidgetUsingViewWidgets();
+	virtual ~LayoutWidgetUsingViewWidgets();
 
 	virtual ViewPtr addView(LayoutViewData viewData);
 	virtual void setOffScreenRenderingAndClear(bool on);
@@ -97,10 +66,10 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+	virtual int getGridSpacing() const;
+	virtual int getGridMargin() const;
+	virtual std::vector<ViewPtr> getViews();
+	virtual QPoint getPosition(ViewPtr view);
 	virtual void enableContextMenuForViews(bool enable);
 	virtual ctkDoubleSlider* getSlider(ViewPtr view);
 
@@ -112,7 +81,7 @@ protected:
 	QGridLayout* mLayout; ///< the layout
 	MultiViewCachePtr mViewCache;
 private:
-    ViewWidget* WidgetFromView(ViewPtr view);
+	ViewWidget* WidgetFromView(ViewPtr view);
 
 	bool mOffScreenRendering;
 };

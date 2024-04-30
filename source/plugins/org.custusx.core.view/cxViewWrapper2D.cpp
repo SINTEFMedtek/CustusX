@@ -31,29 +31,22 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QWheelEvent>
 #include <QSlider>
 
-#include "cxUtilHelpers.h"
 #include "cxView.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
 #include "cxToolRep2D.h"
-#include "cxOrientationAnnotationRep.h"
 #include "cxOrientationAnnotation2DRep.h"
 #include "cxDisplayTextRep.h"
 
-#include "cxManualTool.h"
 #include "cxTrackingService.h"
 #include "cxViewGroup.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceComputer.h"
 #include "cxGeometricRep2D.h"
-#include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "cxGLHelpers.h"
 #include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
-#include "cxTrackedStream.h"
-#include "cxPointMetricRep2D.h"
 
 #include "cxViewFollower.h"
 #include "cxVisServices.h"
@@ -64,7 +57,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxViewService.h"
-#include "cxRegionOfInterestMetric.h"
 #include "cxActiveData.h"
 
 namespace cx
