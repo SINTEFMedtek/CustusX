@@ -21,7 +21,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewCollectionWidgetMixed.h"
 
 #include "cxViewContainer.h"
-#include "cxSettings.h"
 
 namespace cx
 {

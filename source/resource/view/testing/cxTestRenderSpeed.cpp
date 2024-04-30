@@ -17,13 +17,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QVTKOpenGLWindow.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
 #include "cxTypeConversions.h"
 #include "catch.hpp"
-#include "cxLayoutData.h"
 
 namespace cxtest
 {

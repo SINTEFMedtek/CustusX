@@ -120,6 +120,9 @@ public:
   SessionStorageServicePtr getSessionStorageService();
   //FileManagerServicePtr getFileManagerService();
 
+signals:
+  void pluginsStarted();
+
 private slots:
   void onRestartWithNewProfile(QString uid);
 

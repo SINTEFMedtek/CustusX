@@ -65,7 +65,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxViewService.h"
 #include "cxRegionOfInterestMetric.h"
-// #include "cxTexture3DSlicerRep.h"
 #include "cxActiveData.h"
 
 namespace cx

@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include "cxManualTool.h"
+#include <QTimer>
 
 namespace cx
 {
@@ -34,6 +35,7 @@ namespace cx
 class cxResource_EXPORT ManualToolAdapter : public ManualTool
 {
 	Q_OBJECT
+
 public:
 	explicit ManualToolAdapter(QString uid);
 	explicit ManualToolAdapter(ToolPtr base);
@@ -47,7 +49,7 @@ public:
 	virtual Transform3D getCalibration_sMt() const;
 	virtual std::map<QString, Vector3D> getReferencePoints() const;
 
-	void setBase(ToolPtr base);
+	void setBase(ToolPtr base = nullptr);
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
@@ -57,6 +59,8 @@ private slots:
 	void emitPosition();
 private:
 	ToolPtr mBase;
+	ToolPtr mInitialBase;
+	QTimer* mPositionTimer;
 };
 
 typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;

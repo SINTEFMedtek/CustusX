@@ -132,8 +132,6 @@ private:
 
 	Vector3D get_tool_d();
 
-	Texture3DSlicerRepPtr mMultiSliceRep;
-
 	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;

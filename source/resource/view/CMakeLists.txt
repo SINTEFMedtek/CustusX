@@ -140,6 +140,7 @@ set(VTK_MODULES
   VTK::FiltersParallel
   VTK::RenderingGL2PSOpenGL2
 )
+
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     cxResource
     cxPluginUtilities

@@ -475,7 +475,6 @@ void ViewImplService::activateView(ViewCollectionWidget* widget, LayoutViewData 
 
 	ViewPtr view = widget->addView(viewData);
 
-
 	vtkRenderWindowInteractorPtr interactor = view->getRenderWindow()->GetInteractor();
 	if(!interactor)
 	{
