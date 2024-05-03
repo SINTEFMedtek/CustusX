@@ -22,15 +22,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vector>
 #include <QPointer>
-#include "ctkDoubleSlider.h"
 #include "cxForwardDeclarations.h"
 #include "cxDefinitions.h"
 #include "cxViewWrapper.h"
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include "sscConfig.h"
-#include "cxActiveImageProxy.h"
-#include "cxActiveToolProxy.h"
+#include "cxSlider2D.h"
 
 class QMouseEvent;
 class QWheelEvent;
@@ -85,8 +83,6 @@ protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void videoSourcesChangedSlot();
 	virtual void settingsChangedSlot(QString key);
-	void imageChanged();
-	void updateSliderPosition();
 
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -100,7 +96,6 @@ private slots:
 	void toggleShowManualTool();
 	void enableSliderSlot(bool visible, QString settingString);
 	void toggle2DSlider();
-	void sliderChanged(double sliderValue);
 
 protected slots:
 	void samplePoint(Vector3D click_vp);
@@ -112,11 +107,6 @@ private:
 	Vector3D qvp2vp(QPoint pos_qvp);
 	void setAxisPos(Vector3D click_vp);
 	void shiftAxisPos(Vector3D delta_vp);
-	double getOutOfPlaneVoxels();
-	void shiftPosOutOfPlane(Vector3D delta_d_voxels);
-	bool correctSliderValue(double &sliderValue);
-	void updateSliderDiffIfOutOfRange(double &sliderValueDiff);
-	int getDimension();
 
 	ORIENTATION_TYPE getOrientationType() const;
 
@@ -154,9 +144,7 @@ private:
 
 	Vector3D mLastClickPos_vp;
 	int mLastSliderValue;
-	ctkDoubleSlider *mSlider = nullptr;
-	ActiveImageProxyPtr mActiveImageProxy;
-	ActiveToolProxyPtr mActiveTool;
+	Slider2DPtr mSlider;
 
 	QActionGroup* mOrientationActionGroup;
 	void changeZoom(double delta);

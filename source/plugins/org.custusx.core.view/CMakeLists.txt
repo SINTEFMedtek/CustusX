@@ -19,8 +19,9 @@ set(PLUGIN_SRCS
     cxViewWrapperVideo.cpp
     cxDataRepContainer.h
     cxDataRepContainer.cpp
-	cxNavigationAlgorithms.cpp
-	cxNavigationAlgorithms.h
+    cxNavigationAlgorithms.cpp
+    cxNavigationAlgorithms.h
+    cxSlider2D.cpp
 )
 
 # Files which should be processed by Qts moc
@@ -39,6 +40,7 @@ set(PLUGIN_MOC_SRCS
     cxViewWrapper3D.h
     cxViewWrapperVideo.h
     cxViewImplService.h
+    cxSlider2D.h
 )
 
 # Qt Designer files which should be processed by Qts uic
