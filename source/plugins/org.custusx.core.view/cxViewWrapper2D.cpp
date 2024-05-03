@@ -107,6 +107,11 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerTo
 
 	connect(mServices->patient().get(), &PatientModelService::videoAddedToTrackedStream, this, &ViewWrapper2D::videoSourcesChangedSlot);
 
+	mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
+	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &ViewWrapper2D::imageChanged);
+	mActiveTool = ActiveToolProxy::New(mServices->tracking());
+	connect(mActiveTool.get(), &ActiveToolProxy::toolTransformAndTimestamp, this, &ViewWrapper2D::updateSliderPosition);
+
 	this->activeToolChangedSlot();
 	this->updateView();
 }
@@ -117,7 +122,7 @@ ViewWrapper2D::~ViewWrapper2D()
 		mView->removeReps();
 }
 
-void ViewWrapper2D::updateSlider()
+void ViewWrapper2D::imageChanged()
 {
 	if(!mSlider)
 		return;
@@ -125,6 +130,43 @@ void ViewWrapper2D::updateSlider()
 	if(!image)
 		return;
 
+	int dim = this->getDimension();
+	double dimsize = image->getBaseVtkImageData()->GetDimensions()[dim];
+	mSlider->blockSignals(true);
+	mSlider->setRange(0, dimsize);
+	mSlider->blockSignals(false);
+	this->updateSliderPosition();
+}
+
+
+void ViewWrapper2D::updateSliderPosition()
+{
+	if(!mSlider)
+		return;
+
+	double outOfPlane_voxels = this->getOutOfPlaneVoxels();
+	correctSliderValue(outOfPlane_voxels);
+
+	mSlider->blockSignals(true);
+	mLastSliderValue = mSlider->sliderPosition();
+	mSlider->setSliderPosition(outOfPlane_voxels);
+	mSlider->blockSignals(false);
+}
+
+double ViewWrapper2D::getOutOfPlaneVoxels()
+{
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	if(!image)
+		return 0;
+	int dim = this->getDimension();
+	Vector3D spacing = image->getSpacing();
+	Vector3D tool_d = this->get_tool_d();
+	double outOfPlane_voxels = tool_d[dim] / spacing[dim];
+	return outOfPlane_voxels;
+}
+
+int ViewWrapper2D::getDimension()
+{
 	int dim = 0;
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 	if(plane == ptAXIAL)
@@ -133,36 +175,40 @@ void ViewWrapper2D::updateSlider()
 		dim = 1;//y dim
 	if(plane == ptSAGITTAL)
 		dim = 0;//x dim
-
-	Vector3D spacing = image->getSpacing();
-	double dimsize = image->getBaseVtkImageData()->GetDimensions()[dim] * spacing[dim];
-	Vector3D tool_d = this->get_tool_d();
-	double outOfPlane_voxels = tool_d[dim];
-	if(outOfPlane_voxels > dimsize)
-		outOfPlane_voxels = dimsize;
-	else if(outOfPlane_voxels < 0)
-		outOfPlane_voxels = 0;
-
-	mSlider->blockSignals(true);
-	mSlider->setMinimum(0);
-	mSlider->setMaximum(dimsize);
-	mSlider->setSliderPosition(outOfPlane_voxels);
-	mLastSliderValue = mSlider->sliderPosition();
-	mLastSliderValue = outOfPlane_voxels;
-	mSlider->blockSignals(false);
+	return dim;
 }
 
 void ViewWrapper2D::connect2DSlider(ctkDoubleSlider *slider)
 {
 	mSlider = slider;
 	mLastSliderValue = 0;
-
+	this->imageChanged();
 	connect(mSlider, &ctkDoubleSlider::valueChanged, this, &ViewWrapper2D::sliderChanged);
+}
+
+bool ViewWrapper2D::correctSliderValue(double &sliderValue)
+{
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	if(!image)
+		return false;
+
+	int dim = this->getDimension();
+	double dimsize = image->getBaseVtkImageData()->GetDimensions()[dim];
+	bool retval = true;
+	if(sliderValue > dimsize)
+		sliderValue = dimsize;
+	else if(sliderValue < 0)
+		sliderValue = 0;
+	else
+		retval = false;
+	return retval;
 }
 
 void ViewWrapper2D::sliderChanged(double sliderValue)
 {
-	int sliderValueDiff = sliderValue - mLastSliderValue;
+	double sliderValueDiff = sliderValue - mLastSliderValue;
+	mLastSliderValue = sliderValue;
+	this->updateSliderDiffIfOutOfRange(sliderValueDiff);
 	Vector3D delta_d;
 
 	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
@@ -174,7 +220,33 @@ void ViewWrapper2D::sliderChanged(double sliderValue)
 		delta_d = Vector3D(sliderValueDiff, 0, 0);
 
 	this->shiftPosOutOfPlane(delta_d);
-	mLastSliderValue = sliderValue;
+}
+
+void ViewWrapper2D::updateSliderDiffIfOutOfRange(double &sliderValueDiff)
+{
+	double outOfPlane_voxels = this->getOutOfPlaneVoxels();
+	double newDiff = mLastSliderValue - outOfPlane_voxels;
+	bool correctedSliderValue = correctSliderValue(outOfPlane_voxels);
+	if(correctedSliderValue)
+	{
+		sliderValueDiff = newDiff;
+		mLastSliderValue = outOfPlane_voxels;
+	}
+}
+
+void ViewWrapper2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
+{
+	ToolPtr tool = mServices->tracking()->getManualTool();
+	Transform3D sMr = mSliceProxy->get_sMr();
+	Transform3D rMpr = mServices->patient()->get_rMpr();
+	Transform3D prMt = tool->get_prMt();
+
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	Vector3D spacing = image->getSpacing();
+	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
+
+	Transform3D MD = createTransformTranslate(delta_d_mm);
+	tool->set_prMt(MD * prMt);
 }
 
 void ViewWrapper2D::changeZoom(double delta)
@@ -566,8 +638,6 @@ void ViewWrapper2D::updateView()
 	}
 
 	this->applyViewFollower();
-
-	updateSlider();//Too much?
 }
 
 DoubleBoundingBox3D ViewWrapper2D::getViewport_s() const
@@ -731,21 +801,6 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	tool->set_prMt(MD * prMt);
 }
 
-void ViewWrapper2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
-{
-	ToolPtr tool = mServices->tracking()->getManualTool();
-	Transform3D sMr = mSliceProxy->get_sMr();
-	Transform3D rMpr = mServices->patient()->get_rMpr();
-	Transform3D prMt = tool->get_prMt();
-
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
-	Vector3D spacing = image->getSpacing();
-	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
-
-	Transform3D MD = createTransformTranslate(delta_d_mm);
-	tool->set_prMt(MD * prMt);
-}
-
 Vector3D ViewWrapper2D::get_tool_d()
 {
 	ToolPtr tool = mServices->tracking()->getManualTool();
@@ -757,7 +812,6 @@ Vector3D ViewWrapper2D::get_tool_d()
 
 	Vector3D tool_t(0, 0, tool->getTooltipOffset());
 	Vector3D tool_d = (rMd.inverse() * rMpr * prMt).coord(tool_t);
-	//CX_LOG_DEBUG() << "tool_d: " << tool_d;
 	return tool_d;
 
 }

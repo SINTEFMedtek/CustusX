@@ -29,6 +29,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include "sscConfig.h"
+#include "cxActiveImageProxy.h"
+#include "cxActiveToolProxy.h"
 
 class QMouseEvent;
 class QWheelEvent;
@@ -83,7 +85,8 @@ protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
 	virtual void videoSourcesChangedSlot();
 	virtual void settingsChangedSlot(QString key);
-	void updateSlider();
+	void imageChanged();
+	void updateSliderPosition();
 
 private slots:
 	void activeToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -109,7 +112,11 @@ private:
 	Vector3D qvp2vp(QPoint pos_qvp);
 	void setAxisPos(Vector3D click_vp);
 	void shiftAxisPos(Vector3D delta_vp);
+	double getOutOfPlaneVoxels();
 	void shiftPosOutOfPlane(Vector3D delta_d_voxels);
+	bool correctSliderValue(double &sliderValue);
+	void updateSliderDiffIfOutOfRange(double &sliderValueDiff);
+	int getDimension();
 
 	ORIENTATION_TYPE getOrientationType() const;
 
@@ -148,6 +155,8 @@ private:
 	Vector3D mLastClickPos_vp;
 	int mLastSliderValue;
 	ctkDoubleSlider *mSlider = nullptr;
+	ActiveImageProxyPtr mActiveImageProxy;
+	ActiveToolProxyPtr mActiveTool;
 
 	QActionGroup* mOrientationActionGroup;
 	void changeZoom(double delta);
