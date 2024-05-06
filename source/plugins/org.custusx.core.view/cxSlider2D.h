@@ -27,20 +27,23 @@ public:
 	Slider2D(VisServicesPtr services, SliceProxyPtr sliceProxy, ctkDoubleSlider *slider);
 
 protected slots:
-	void imageChanged();
-	void updateSliderPosition();
-	void sliderChanged(double sliderValue);
+	virtual void imageChanged();
+	virtual void updateSliderPosition();
+	virtual void sliderChanged(double sliderValue);
 
 protected:
-	double getOutOfPlaneVoxels();
-	int getDimension();
-	Vector3D get_tool_d();
-	bool correctSliderValue(double &sliderValue);
-	void updateSliderDiffIfOutOfRange(double &sliderValueDiff);
-	void shiftPosOutOfPlane(Vector3D delta_d_voxels);
+	virtual ImagePtr getImage();
+	virtual double getOutOfPlaneVoxels();
+	virtual int getDimension();
+	virtual PLANE_TYPE getPlaneType();
+	virtual Vector3D get_tool_d();
+	virtual bool correctSliderValue(double &sliderValue);
+	virtual void updateSliderDiffIfOutOfRange(double &sliderValueDiff);
+	virtual void shiftPosOutOfPlane(Vector3D delta_d_voxels);
+	virtual Transform3D get_sMr();
 
 	VisServicesPtr mServices;
-	int mLastSliderValue;
+	double mLastSliderValue;
 	ctkDoubleSlider *mSlider = nullptr;
 	ActiveImageProxyPtr mActiveImageProxy;
 	ActiveToolProxyPtr mActiveTool;

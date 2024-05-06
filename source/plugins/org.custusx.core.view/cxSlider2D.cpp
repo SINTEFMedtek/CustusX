@@ -40,7 +40,7 @@ void Slider2D::imageChanged()
 {
 	if(!mSlider)
 		return;
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	ImagePtr image = this->getImage();
 	if(!image)
 		return;
 
@@ -51,6 +51,12 @@ void Slider2D::imageChanged()
 	mSlider->blockSignals(false);
 	this->updateSliderPosition();
 	mLastSliderValue = mSlider->sliderPosition();
+}
+
+ImagePtr Slider2D::getImage()
+{
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	return image;
 }
 
 void Slider2D::updateSliderPosition()
@@ -69,7 +75,7 @@ void Slider2D::updateSliderPosition()
 
 double Slider2D::getOutOfPlaneVoxels()
 {
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	ImagePtr image = this->getImage();
 	if(!image)
 		return 0;
 	int dim = this->getDimension();
@@ -82,7 +88,7 @@ double Slider2D::getOutOfPlaneVoxels()
 int Slider2D::getDimension()
 {
 	int dim = 0;
-	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	PLANE_TYPE plane = this->getPlaneType();
 	if(plane == ptAXIAL)
 		dim = 2;//z dim for axial
 	if(plane == ptCORONAL)
@@ -92,10 +98,18 @@ int Slider2D::getDimension()
 	return dim;
 }
 
+PLANE_TYPE Slider2D::getPlaneType()
+{
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	return plane;
+}
+
 Vector3D Slider2D::get_tool_d()
 {
 	ToolPtr tool = mServices->tracking()->getManualTool();
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	ImagePtr image = this->getImage();
+	if(!tool || !image)
+		return Vector3D::Identity();
 
 	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
@@ -108,7 +122,7 @@ Vector3D Slider2D::get_tool_d()
 
 bool Slider2D::correctSliderValue(double &sliderValue)
 {
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	ImagePtr image = this->getImage();
 	if(!image)
 		return false;
 
@@ -131,7 +145,7 @@ void Slider2D::sliderChanged(double sliderValue)
 	this->updateSliderDiffIfOutOfRange(sliderValueDiff);
 	Vector3D delta_d;
 
-	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	PLANE_TYPE plane = this->getPlaneType();
 	if(plane == ptAXIAL)
 		delta_d = Vector3D(0, 0, sliderValueDiff);
 	else if(plane == ptCORONAL)
@@ -157,16 +171,23 @@ void Slider2D::updateSliderDiffIfOutOfRange(double &sliderValueDiff)
 void Slider2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
 {
 	ToolPtr tool = mServices->tracking()->getManualTool();
-	Transform3D sMr = mSliceProxy->get_sMr();
+	if(!tool)
+		return;
+	Transform3D sMr = this->get_sMr();
 	Transform3D rMpr = mServices->patient()->get_rMpr();
 	Transform3D prMt = tool->get_prMt();
 
-	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+	ImagePtr image = this->getImage();
 	Vector3D spacing = image->getSpacing();
 	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
 
 	Transform3D MD = createTransformTranslate(delta_d_mm);
 	tool->set_prMt(MD * prMt);
+}
+
+Transform3D Slider2D::get_sMr()
+{
+	return mSliceProxy->get_sMr();
 }
 
 }//cx
