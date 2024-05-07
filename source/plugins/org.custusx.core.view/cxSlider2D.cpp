@@ -180,9 +180,12 @@ void Slider2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
 	ImagePtr image = this->getImage();
 	Vector3D spacing = image->getSpacing();
 	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
-
 	Transform3D MD = createTransformTranslate(delta_d_mm);
-	tool->set_prMt(MD * prMt);
+
+	Transform3D rMd = image->get_rMd();
+	Transform3D dMpr = rMd.inv() * rMpr;
+
+	tool->set_prMt(dMpr.inv() * MD * dMpr * prMt);
 }
 
 Transform3D Slider2D::get_sMr()
