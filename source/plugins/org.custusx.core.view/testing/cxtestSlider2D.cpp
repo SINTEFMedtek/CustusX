@@ -193,6 +193,19 @@ TEST_CASE("Slider2D correctSliderValue", "[unit][plugins][org.custusx.core.view]
 	CHECK_FALSE(slider2D->correctSliderValue(sliderValue));
 }
 
+TEST_CASE("Slider2D updateSliderDiffIfOutOfRange", "[unit][plugins][org.custusx.core.view]")
+{
+	Slider2DTestPtr slider2D = Slider2DTestPtr(new Slider2DTest());
+	slider2D->createDummyImage();
+	double sliderValueDiff = 50;
+	double initalDiff = sliderValueDiff;
+	double initalSliderValue = slider2D->getLastSliderValue();
+	slider2D->mToolposition = 50;
+	slider2D->updateSliderDiffIfOutOfRange(sliderValueDiff);
+	CHECK_FALSE(cx::similar(sliderValueDiff, initalDiff));
+	CHECK_FALSE(cx::similar(slider2D->getLastSliderValue(), initalSliderValue));
+}
+
 TEST_CASE("Slider2D sliderChanged", "[unit][plugins][org.custusx.core.view]")
 {
 	Slider2DTestPtr slider2D = Slider2DTestPtr(new Slider2DTest());
