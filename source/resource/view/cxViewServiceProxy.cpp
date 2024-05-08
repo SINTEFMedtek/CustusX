@@ -139,6 +139,11 @@ void ViewServiceProxy::setActiveLayout(const QString& uid, int widgetIndex)
 	mViewService->setActiveLayout(uid, widgetIndex);
 }
 
+void ViewServiceProxy::rebuildLayouts()
+{
+	mViewService->rebuildLayouts();
+}
+
 InteractiveCropperPtr ViewServiceProxy::getCropper()
 {
 	return mViewService->getCropper();

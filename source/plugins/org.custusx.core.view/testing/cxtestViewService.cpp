@@ -38,10 +38,10 @@ void checkContextMenuPolicy(Qt::ContextMenuPolicy policy, cxtest::ViewServiceMoc
 		cxtest::LayoutWidgetUsingViewWidgetsMock* lwuvwm = dynamic_cast<cxtest::LayoutWidgetUsingViewWidgetsMock*>(widget);
 		if(lwuvwm)
 		{
-			std::vector<cx::ViewWidget*> widgets = lwuvwm->getViewWidgets();
+			std::vector<cx::ViewAndSlider> widgets = lwuvwm->getSliderWidgets();
 			for(int j=0; j<widgets.size(); ++j)
 			{
-				REQUIRE(widgets[j]->contextMenuPolicy() == policy);
+				REQUIRE(widgets[j].mViewWidget->contextMenuPolicy() == policy);
 				widgetschecked=+1;
 			}
 		}

@@ -45,7 +45,7 @@ public:
 
 	virtual ~ViewCollectionWidget() {}
 
-	virtual ViewPtr addView(View::Type type, LayoutRegion region) = 0;
+	virtual ViewPtr addView(LayoutViewData viewData) = 0;
 	virtual void setOffScreenRenderingAndClear(bool on) = 0;
 	virtual bool getOffScreenRendering() const = 0;
 	virtual void clearViews() = 0;
@@ -62,7 +62,7 @@ public:
 	 * Get the position of the Upper Left corner of the view,
 	 * given in qt-coordinates of this (the ViewCollectionWidget).
 	 */
-    virtual QPoint getPosition(ViewPtr view) = 0;
+	virtual QPoint getPosition(ViewPtr view) = 0;
 
 signals:
     void rendered();

@@ -29,6 +29,7 @@ if(BUILD_TESTING)
     cxtestVisualRendering.cpp
     cxtestGeometricRep.cpp
     cxViewsFixture.cpp
+    cxtestSlider2D.cpp
 	)
   qt5_wrap_cpp(CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})
   add_library(${PROJECT_NAME} ${CX_TEST_CATCH_org_custusx_core_view_SOURCE_FILES} ${CX_TEST_CATCH_org_custusx_core_view_MOC_SOURCE_FILES})

@@ -39,4 +39,3 @@ QPointer<ViewCollectionWidget> ViewCollectionWidget::createOptimizedLayout(QWidg
 }
 
 } // namespace cx
-

@@ -173,7 +173,10 @@ TEST_CASE("QVTKOpenGLNativeWidget render", "[integration][resource][visualizatio
 //	cx::ViewCollectionWidget* mLayoutWidget = cx::ViewCollectionWidget::createOptimizedLayout(mainWindow);
 
 	widget = mLayoutWidget;
-	view = mLayoutWidget->addView(cx::View::VIEW_3D, cx::LayoutRegion(0,0));
+	cx::LayoutViewData viewData;
+	viewData.mType = cx::View::VIEW_3D;
+	viewData.mRegion = cx::LayoutRegion(0,0);
+	view = mLayoutWidget->addView(viewData);
 //	mLayoutWidget->addView(cx::View::VIEW_3D, cx::LayoutRegion(0,1));//Adding more views works
 	std::vector<cx::ViewPtr> views = mLayoutWidget->getViews();
 	CHECK(views.size() > 0);
