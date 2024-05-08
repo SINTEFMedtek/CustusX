@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "ctkDoubleSlider.h"
 #include "cxActiveImageProxy.h"
-#include "cxActiveToolProxy.h"
+#include "cxTransform3D.h"
 
 namespace cx
 {
@@ -46,7 +46,7 @@ protected:
 	double mLastSliderValue;
 	ctkDoubleSlider *mSlider = nullptr;
 	ActiveImageProxyPtr mActiveImageProxy;
-	ActiveToolProxyPtr mActiveTool;
+	ToolPtr mTool;
 	SliceProxyPtr mSliceProxy;
 
 };

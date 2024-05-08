@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestVisServices.h"
 #include "cxImage.h"
 #include "cxLogger.h"
+#include "cxTool.h"
 
 namespace
 {
@@ -24,14 +25,12 @@ public:
 	cx::PLANE_TYPE mPlane;
 	cx::ImagePtr mImage;
 	int mImageAxisSize;
-	double mToolposition;
 
 	Slider2DTest() :
 	cx::Slider2D(cxtest::TestVisServices::create(), nullptr, new ctkDoubleSlider(Qt::Vertical)),
 		mPlane(cx::ptAXIAL),
 		mImage(nullptr),
-		mImageAxisSize(10),
-		mToolposition(5)
+		mImageAxisSize(10)
 	{
 	}
 
@@ -48,23 +47,19 @@ public:
 	{
 		return mImage;
 	}
-	cx::Vector3D get_tool_d()
-	{
-		return cx::Vector3D(mToolposition, mToolposition, mToolposition);
-	}
 
 	// Allow using protected functions
 	int getDimension()
 	{
 		return cx::Slider2D::getDimension();
 	}
+	cx::Vector3D get_tool_d()
+	{
+		return cx::Slider2D::get_tool_d();
+	}
 	double getOutOfPlaneVoxels()
 	{
 		return cx::Slider2D::getOutOfPlaneVoxels();
-	}
-	cx::Vector3D protected_get_tool_d()
-	{
-		return cx::Slider2D::get_tool_d();
 	}
 	bool correctSliderValue(double &sliderValue)
 	{
@@ -94,6 +89,10 @@ public:
 	double getLastSliderValue()
 	{
 		return mLastSliderValue;
+	}
+	cx::ToolPtr getTool()
+	{
+		return mTool;
 	}
 
 public slots:
@@ -128,7 +127,7 @@ TEST_CASE("Slider2D Test with no data", "[unit][plugins][org.custusx.core.view]"
 	CHECK(slider2D->getOutOfPlaneVoxels() == 0);
 	CHECK(slider2D->getDimension() == 2);
 	CHECK(slider2D->getPlaneType() == cx::ptAXIAL);
-	slider2D->protected_get_tool_d();
+	slider2D->get_tool_d();
 	double sliderValue = 0;
 	double sliderValueDiff = 0;
 	CHECK_FALSE(slider2D->correctSliderValue(sliderValue));
@@ -160,14 +159,14 @@ TEST_CASE("Slider2D Test setting image", "[unit][plugins][org.custusx.core.view]
 	CHECK(slider2D->getSlider()->maximum() != initalMax);
 	CHECK(cx::similar(slider2D->getSlider()->minimum(), 0));
 	CHECK(cx::similar(slider2D->getSlider()->maximum(), slider2D->mImageAxisSize));
-	CHECK(cx::similar(slider2D->getSlider()->sliderPosition(), slider2D->mToolposition));
+	CHECK(cx::similar(slider2D->getSlider()->sliderPosition(), slider2D->get_tool_d()[2]));
 }
 
 TEST_CASE("Slider2D getOutOfPlaneVoxels", "[unit][plugins][org.custusx.core.view]")
 {
 	Slider2DTestPtr slider2D = Slider2DTestPtr(new Slider2DTest());
 	slider2D->createDummyImage();
-	CHECK(cx::similar(slider2D->getOutOfPlaneVoxels(), slider2D->mToolposition));
+	CHECK(cx::similar(slider2D->getOutOfPlaneVoxels(), slider2D->get_tool_d()[2]));
 }
 
 TEST_CASE("Slider2D updateSliderPosition", "[unit][plugins][org.custusx.core.view]")
@@ -176,7 +175,7 @@ TEST_CASE("Slider2D updateSliderPosition", "[unit][plugins][org.custusx.core.vie
 	CHECK(cx::similar(slider2D->getSlider()->sliderPosition(), 0));
 	slider2D->createDummyImage();
 	slider2D->updateSliderPosition();
-	CHECK(cx::similar(slider2D->getSlider()->sliderPosition(), slider2D->mToolposition));
+	CHECK(cx::similar(slider2D->getSlider()->sliderPosition(), slider2D->get_tool_d()[2]));
 }
 
 TEST_CASE("Slider2D correctSliderValue", "[unit][plugins][org.custusx.core.view]")
@@ -200,7 +199,8 @@ TEST_CASE("Slider2D updateSliderDiffIfOutOfRange", "[unit][plugins][org.custusx.
 	double sliderValueDiff = 50;
 	double initalDiff = sliderValueDiff;
 	double initalSliderValue = slider2D->getLastSliderValue();
-	slider2D->mToolposition = 50;
+	cx::Transform3D prMt = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(50,50,50)));
+	slider2D->getTool()->set_prMt(prMt);
 	slider2D->updateSliderDiffIfOutOfRange(sliderValueDiff);
 	CHECK_FALSE(cx::similar(sliderValueDiff, initalDiff));
 	CHECK_FALSE(cx::similar(slider2D->getLastSliderValue(), initalSliderValue));
@@ -209,11 +209,15 @@ TEST_CASE("Slider2D updateSliderDiffIfOutOfRange", "[unit][plugins][org.custusx.
 TEST_CASE("Slider2D sliderChanged", "[unit][plugins][org.custusx.core.view]")
 {
 	Slider2DTestPtr slider2D = Slider2DTestPtr(new Slider2DTest());
+	cx::Transform3D prMt = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(5,5,5)));
+	slider2D->getTool()->set_prMt(prMt);
 	CHECK(cx::similar(slider2D->getLastSliderValue(), 0));
 	slider2D->createDummyImage();
 	slider2D->imageChanged();
 	CHECK(cx::similar(slider2D->getLastSliderValue(), 5));
 	double sliderValue = 7;
+	prMt = cx::Transform3D(cx::createTransformTranslate(cx::Vector3D(7,7,7)));
+	slider2D->getTool()->set_prMt(prMt);
 	slider2D->sliderChanged(sliderValue);
 	CHECK(cx::similar(sliderValue, slider2D->getLastSliderValue()));
 }

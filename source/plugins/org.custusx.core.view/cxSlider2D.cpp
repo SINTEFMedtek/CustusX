@@ -25,6 +25,7 @@ Slider2D::Slider2D(VisServicesPtr services, SliceProxyPtr sliceProxy, ctkDoubleS
 	mServices(services),
 	mSlider(slider),
 	mLastSliderValue(0),
+	mTool(mServices->tracking()->getManualTool()),
 	mSliceProxy(sliceProxy)
 {
 	this->imageChanged();
@@ -32,8 +33,7 @@ Slider2D::Slider2D(VisServicesPtr services, SliceProxyPtr sliceProxy, ctkDoubleS
 
 	mActiveImageProxy = ActiveImageProxy::New(mServices->patient()->getActiveData());
 	connect(mActiveImageProxy.get(), &ActiveImageProxy::activeImageChanged, this, &Slider2D::imageChanged);
-	mActiveTool = ActiveToolProxy::New(mServices->tracking());
-	connect(mActiveTool.get(), &ActiveToolProxy::toolTransformAndTimestamp, this, &Slider2D::updateSliderPosition);
+	connect(mTool.get(), &Tool::toolTransformAndTimestamp, this, &Slider2D::updateSliderPosition);
 }
 
 void Slider2D::imageChanged()
@@ -106,16 +106,15 @@ PLANE_TYPE Slider2D::getPlaneType()
 
 Vector3D Slider2D::get_tool_d()
 {
-	ToolPtr tool = mServices->tracking()->getManualTool();
 	ImagePtr image = this->getImage();
-	if(!tool || !image)
+	if(!mTool || !image)
 		return Vector3D::Identity();
 
 	Transform3D rMpr = mServices->patient()->get_rMpr();
-	Transform3D prMt = tool->get_prMt();
+	Transform3D prMt = mTool->get_prMt();
 	Transform3D rMd = image->get_rMd();
 
-	Vector3D tool_t(0, 0, tool->getTooltipOffset());
+	Vector3D tool_t(0, 0, mTool->getTooltipOffset());
 	Vector3D tool_d = (rMd.inverse() * rMpr * prMt).coord(tool_t);
 	return tool_d;
 }
@@ -170,14 +169,13 @@ void Slider2D::updateSliderDiffIfOutOfRange(double &sliderValueDiff)
 
 void Slider2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
 {
-	ToolPtr tool = mServices->tracking()->getManualTool();
-	if(!tool)
+	ImagePtr image = this->getImage();
+	if(!mTool || !image)
 		return;
 	Transform3D sMr = this->get_sMr();
 	Transform3D rMpr = mServices->patient()->get_rMpr();
-	Transform3D prMt = tool->get_prMt();
+	Transform3D prMt = mTool->get_prMt();
 
-	ImagePtr image = this->getImage();
 	Vector3D spacing = image->getSpacing();
 	Vector3D delta_d_mm = Vector3D(delta_d_voxels[0]*spacing[0], delta_d_voxels[1]*spacing[1], delta_d_voxels[2]*spacing[2]);
 	Transform3D MD = createTransformTranslate(delta_d_mm);
@@ -185,7 +183,7 @@ void Slider2D::shiftPosOutOfPlane(Vector3D delta_d_voxels)
 	Transform3D rMd = image->get_rMd();
 	Transform3D dMpr = rMd.inv() * rMpr;
 
-	tool->set_prMt(dMpr.inv() * MD * dMpr * prMt);
+	mTool->set_prMt(dMpr.inv() * MD * dMpr * prMt);
 }
 
 Transform3D Slider2D::get_sMr()

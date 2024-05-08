@@ -54,7 +54,7 @@ public:
 	virtual void set_rMpr(const Transform3D& val);
 	virtual ToolPtr getReferenceTool() const;
 
-	virtual ToolPtr getManualTool() { return ToolPtr(); }
+	virtual ToolPtr getManualTool() { return mActiveTool; }
 //	virtual void savePositionHistory() {}
 //	virtual void loadPositionHistory() {}
 //	virtual void addXml(QDomNode& parentNode) {}
