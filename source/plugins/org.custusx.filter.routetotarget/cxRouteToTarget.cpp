@@ -187,6 +187,10 @@ void RouteToTarget::findRoutePositions(std::vector<Eigen::Vector3d> initialRoute
 
 	mRoutePositions = initialRoutePositions;
 
+	double cameraRotation = mProjectedBranchPtr->getBronchoscopeRotation();
+	std::vector< double > initialRouteRotations(mRoutePositions.size(), cameraRotation);;
+	mCameraRotation = initialRouteRotations;
+
 	searchBranchUp(mProjectedBranchPtr, mProjectedIndex);
 }
 
