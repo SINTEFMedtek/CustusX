@@ -199,6 +199,10 @@ bool RouteToTargetFilter::execute()
 	else
 		mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
 
+	if(mMaxGenerationNumerForAutomaticRotation != 0)
+		mRouteToTarget->limitCameraRotation(mMaxGenerationNumerForAutomaticRotation);
+
+
 	if(mOutput->GetNumberOfPoints() < 1)
 		return false;
 
@@ -350,6 +354,11 @@ void RouteToTargetFilter::setSmoothing(bool smoothing)
 void RouteToTargetFilter::setUseExtraAirwayPoints(bool useExtraAirwayPoints)
 {
 	mUseExtraAirwayPoints = useExtraAirwayPoints; // default false
+}
+
+void RouteToTargetFilter::setMaxGenerationForCameraRotation(int maxGenerationNumber)
+{
+	mMaxGenerationNumerForAutomaticRotation = maxGenerationNumber;
 }
 
 std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions(bool extendedRoute)

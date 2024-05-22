@@ -44,6 +44,7 @@ public:
 	static double calculateRouteLength(std::vector< Eigen::Vector3d > route);
 	void makeMarianaCenterlineFile(QString filename);
 	QJsonArray makeMarianaCenterlineJSON();
+	void limitCameraRotation(int maxGenerationNumber);
 	std::vector< Eigen::Vector3d > getRoutePositions(bool extendedRoute = true);
 	std::vector< BranchPtr > getRouteBranches();
 	std::vector< double > getCameraRotation();

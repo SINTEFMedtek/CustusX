@@ -59,6 +59,7 @@ public:
 	BranchListPtr getBranchList();
 	void setBranchList(BranchListPtr branchList);
 	void setReprocessCenterline(bool reprocess);
+	void setMaxGenerationForCameraRotation(int maxGenerationNumber);
 
 	virtual bool execute();
 	virtual bool postProcess();
@@ -85,6 +86,7 @@ private:
     bool mSmoothing;
 		bool mUseExtraAirwayPoints = false;
 		bool mReprocessCenterline = true;
+		int mMaxGenerationNumerForAutomaticRotation = 0;
     BoolPropertyPtr getBloodVesselOption(QDomElement root);
 };
 typedef boost::shared_ptr<class RouteToTargetFilter> RouteToTargetFilterPtr;
