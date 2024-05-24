@@ -96,19 +96,15 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	QLabel		*labelViewLeftRight = new QLabel(tr("Left/right (R/F)"));
 	QLabel		*labelViewUpDown = new QLabel(tr("Up/Down (E/D)"));
 	mRotateDial = new QDial;
-	mRotateDial->setMinimum(-180);
-	mRotateDial->setMaximum(180);
 	mViewDialLeftRight = new QDial;
-	mViewDialLeftRight->setMinimum(-60);
-	mViewDialLeftRight->setMaximum(60);
 	mViewDialUpDown = new QDial;
-	mViewDialUpDown->setMinimum(-60);
-	mViewDialUpDown->setMaximum(60);
 	mResetEndoscopeButton = new QPushButton("Reset");
 	mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
 	mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
 	mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
 	mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
+
+	resetEndoscopeSlot();
 
 	endoscopeControlLayout->addWidget(labelRot,0,0,Qt::AlignHCenter);
 	endoscopeControlLayout->addWidget(labelViewUpDown,0,1,Qt::AlignHCenter);
@@ -338,9 +334,17 @@ void VBWidget::moveCameraSlot()
 
 void VBWidget::resetEndoscopeSlot()
 {
+	mRotateDial->setMinimum(-180);
+	mRotateDial->setMaximum(180);
+	mViewDialLeftRight->setMinimum(-60);
+	mViewDialLeftRight->setMaximum(60);
+	mViewDialUpDown->setMinimum(-60);
+	mViewDialUpDown->setMaximum(60);
 	mRotateDial->setValue(0);
 	mViewDialLeftRight->setValue(0);
 	mViewDialUpDown->setValue(0);
+	mResetEndoscopeButton->show();
+	mUseAutomaticRotationButton->show();
 }
 
 void VBWidget::automaticRotationSlot()
