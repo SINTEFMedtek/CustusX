@@ -14,10 +14,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceVisualizationExport.h"
 
+#include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxView.h"
 #include "cxLayoutData.h"
-#include "cxViewCache.h"
-#include "cxViewWidget.h"
 #include "cxViewCollectionWidget.h"
 
 
@@ -50,14 +49,14 @@ class LayoutWidgetUsingViewWidgets;
  * \author Christian Askeland
  * \ingroup cx_resource_view_internal
  */
-class	cxResourceVisualization_EXPORT ViewCollectionWidgetMixed : public ViewCollectionWidget
+class	cxResourceVisualization_EXPORT ViewCollectionWidgetMixed : public LayoutWidgetUsingViewWidgets
 {
 	Q_OBJECT
 public:
 	ViewCollectionWidgetMixed(QWidget *parent);
-    virtual ~ViewCollectionWidgetMixed();
+	virtual ~ViewCollectionWidgetMixed();
 
-	ViewPtr addView(View::Type type, LayoutRegion region);
+	ViewPtr addView(LayoutViewData viewData);
 	virtual void setOffScreenRenderingAndClear(bool on);
 	virtual bool getOffScreenRendering() const;
 	virtual void clearViews();
@@ -65,10 +64,10 @@ public:
 	virtual void render();
 	virtual void setGridSpacing(int val);
 	virtual void setGridMargin(int val);
-    virtual int getGridSpacing() const;
-    virtual int getGridMargin() const;
-    virtual std::vector<ViewPtr> getViews();
-    virtual QPoint getPosition(ViewPtr view);
+	virtual int getGridSpacing() const;
+	virtual int getGridMargin() const;
+	virtual std::vector<ViewPtr> getViews();
+	virtual QPoint getPosition(ViewPtr view);
 	virtual void enableContextMenuForViews(bool enable);
 
 protected:
@@ -79,13 +78,7 @@ private:
 	void initBaseLayout();
 	LayoutRegion mBaseRegion;
 	LayoutRegion mTotalRegion;
-	QGridLayout* mLayout;
-	std::vector<ViewWidget*> mOverlays;
-
-	MultiViewCachePtr mViewCache;
 };
-
-
 
 } // namespace cx
 

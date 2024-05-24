@@ -22,36 +22,31 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+#include <vtkImageData.h>
 
 #include <QAction>
 #include <QActionGroup>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QSlider>
 
-#include "cxUtilHelpers.h"
 #include "cxView.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
 #include "cxToolRep2D.h"
-#include "cxOrientationAnnotationRep.h"
 #include "cxOrientationAnnotation2DRep.h"
 #include "cxDisplayTextRep.h"
 
-#include "cxManualTool.h"
 #include "cxTrackingService.h"
 #include "cxViewGroup.h"
 #include "cxSlicePlanes3DRep.h"
 #include "cxSliceComputer.h"
 #include "cxGeometricRep2D.h"
-#include "cxDataLocations.h"
 #include "cxSettings.h"
-#include "cxGLHelpers.h"
 #include "cxData.h"
 #include "cxMesh.h"
 #include "cxImage.h"
-#include "cxTrackedStream.h"
-#include "cxPointMetricRep2D.h"
 
 #include "cxViewFollower.h"
 #include "cxVisServices.h"
@@ -62,7 +57,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxLogger.h"
 #include "cxViewService.h"
-#include "cxRegionOfInterestMetric.h"
+#include "cxActiveData.h"
 
 namespace cx
 {
@@ -122,6 +117,11 @@ ViewWrapper2D::~ViewWrapper2D()
 		mView->removeReps();
 }
 
+void ViewWrapper2D::connect2DSlider(ctkDoubleSlider *slider)
+{
+	mSlider = Slider2DPtr(new Slider2D(mServices, mSliceProxy, slider));
+}
+
 void ViewWrapper2D::changeZoom(double delta)
 {
 	if (similar(delta, 1.0))
@@ -161,6 +161,42 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 	showManualTool->setToolTip("Turn on/off visualization of the vire cross in 2D");
 	connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 	contextMenu.addAction(showManualTool);
+	this->addSliderCheckbox(contextMenu);
+}
+
+void ViewWrapper2D::addSliderCheckbox(QMenu& contextMenu)
+{
+	PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+	QString settingString, text;
+	if(plane == ptAXIAL)
+	{
+		text = "Axial";
+		settingString = "View2D/useAxialSlider";
+	}
+	else if(plane == ptCORONAL)
+	{
+		text = "Coronal";
+		settingString = "View2D/useCoronalSlider";
+	}
+	else if(plane == ptSAGITTAL)
+	{
+		text = "Sagittal";
+		settingString = "View2D/useSagittalSlider";
+	}
+	else
+		return;
+
+	QString actionString = "Enable 2D " + text + " Slider";
+	QString toolTip = "Turn on/off slider for " + text + " 2D slices";
+	QAction* showSlider = new QAction(actionString, &contextMenu);
+	showSlider->setCheckable(true);
+	showSlider->setChecked(settings()->value(settingString).toBool());
+	showSlider->setToolTip(toolTip);
+	connect(showSlider, &QAction::triggered, this, [settingString, showSlider, this]()
+			{
+				this->enableSliderSlot(showSlider->isChecked(), settingString);
+			});
+	contextMenu.addAction(showSlider);
 }
 
 void ViewWrapper2D::setViewGroup(ViewGroupDataPtr group)
@@ -221,6 +257,12 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 	{
 		this->toggleShowManualTool();
 	}
+	if ((key == "View2D/useAxialSlider")
+		|| (key == "View2D/useCoronalSlider")
+		|| (key == "View2D/useSagittalSlider") )
+	{
+		this->toggle2DSlider();
+	}
 }
 
 void ViewWrapper2D::toggleShowManualTool()
@@ -229,6 +271,16 @@ void ViewWrapper2D::toggleShowManualTool()
 		mView->addRep(mToolRep2D);
 	else
 		mView->removeRep(mToolRep2D);
+}
+
+void ViewWrapper2D::enableSliderSlot(bool visible, QString settingString)
+{
+	settings()->setValue(settingString, visible);
+}
+
+void ViewWrapper2D::toggle2DSlider()
+{
+	mServices->view()->rebuildLayouts();
 }
 
 void ViewWrapper2D::removeAndResetSliceRep()
@@ -620,6 +672,20 @@ void ViewWrapper2D::setAxisPos(Vector3D click_vp)
 	Transform3D MD = createTransformTranslate(delta_pr);
 	// set new tool position to old modified by MD:
 	tool->set_prMt(MD * prMt);
+}
+
+Vector3D ViewWrapper2D::get_tool_d()
+{
+	ToolPtr tool = mServices->tracking()->getManualTool();
+	ImagePtr image = mServices->patient()->getActiveData()->getActive<Image>();
+
+	Transform3D rMpr = mServices->patient()->get_rMpr();
+	Transform3D prMt = tool->get_prMt();
+	Transform3D rMd = image->get_rMd();
+
+	Vector3D tool_t(0, 0, tool->getTooltipOffset());
+	Vector3D tool_d = (rMd.inverse() * rMpr * prMt).coord(tool_t);
+	return tool_d;
 }
 
 void ViewWrapper2D::setSlicePlanesProxy(SlicePlanesProxyPtr proxy)

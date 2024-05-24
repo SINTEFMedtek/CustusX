@@ -3,6 +3,7 @@
 ###########################################################
 
 find_package(GLEW REQUIRED)
+cx_initialize_CTK()
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     View/cxView
@@ -143,6 +144,7 @@ set(VTK_MODULES
 set(CX_RESOURCE_VISUALIZATION_LIBRARIES
     cxResource
     cxPluginUtilities
+    CTKWidgets
     ${OPENGL_LIBRARIES}
     ${Boost_LIBRARIES}
     ${ITK_LIBRARIES}

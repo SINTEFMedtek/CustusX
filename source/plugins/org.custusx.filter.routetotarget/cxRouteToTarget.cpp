@@ -175,9 +175,21 @@ void RouteToTarget::findClosestPointInBloodVesselBranches(Vector3D targetCoordin
 }
 
 
-void RouteToTarget::findRoutePositions()
+void RouteToTarget::findRoutePositions(std::vector<Eigen::Vector3d> initialRoutePositions)
 {
 	mRoutePositions.clear();
+	if(!initialRoutePositions.empty())
+	{
+		std::vector< Eigen::Vector3d > branchPositions = getBranchPositions(mProjectedBranchPtr,mProjectedIndex);
+		if(!branchPositions.empty())
+			initialRoutePositions = insertAndinterpolate(initialRoutePositions, branchPositions.front(), 0.25);
+	}
+
+	mRoutePositions = initialRoutePositions;
+
+	double cameraRotation = mProjectedBranchPtr->getBronchoscopeRotation();
+	std::vector< double > initialRouteRotations(mRoutePositions.size(), cameraRotation);
+	mCameraRotation = initialRouteRotations;
 
 	searchBranchUp(mProjectedBranchPtr, mProjectedIndex);
 }
@@ -253,20 +265,67 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint, PointMetricPtr centerlinEndPoint)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint, std::map<QString, PointMetricPtr> extraAirwayPoints)
 {
 	mTargetPosition = targetPoint->getCoordinate();
-	if(centerlinEndPoint)
-		findClosestPointInBranches(centerlinEndPoint->getCoordinate());
-	else
-		findClosestPointInBranches(mTargetPosition);
-	findRoutePositions();
+	Vector3D startPosition;
+	std::vector<Eigen::Vector3d> initialRoutePositions;
+	if(!extraAirwayPoints.empty())
+	{
+		initialRoutePositions = findRouteAlongExtraPoints(mTargetPosition, extraAirwayPoints);
+		startPosition = initialRoutePositions.back();
+	}
+		else
+		startPosition = mTargetPosition;
+
+	findClosestPointInBranches(startPosition);
+	findRoutePositions(initialRoutePositions);
 
 	vtkPolyDataPtr retval = addVTKPoints(mRoutePositions);
 
 	return retval;
 }
 
+std::vector<Eigen::Vector3d> RouteToTarget::findRouteAlongExtraPoints(Vector3D targetPosition,std::map<QString, PointMetricPtr> extraAirwayPoints)
+{
+	std::map<QString, PointMetricPtr>::iterator it = extraAirwayPoints.begin();
+	std::vector<Eigen::Vector3d> extraAirwayPointsPositions;
+	for( ; it != extraAirwayPoints.end(); ++it)
+		extraAirwayPointsPositions.push_back(it->second->getCoordinate());
+
+	std::vector<Eigen::Vector3d> routePositions;
+	routePositions.push_back(targetPosition);
+	Vector3D closestPointCoordinate = targetPosition;
+	while(!extraAirwayPointsPositions.empty())
+	{
+		std::pair<int, double> closestPoint = findDistanceFromPointToLine(closestPointCoordinate, extraAirwayPointsPositions);
+		int index = closestPoint.first;
+		closestPointCoordinate = extraAirwayPointsPositions[index];
+		routePositions = insertAndinterpolate(routePositions, closestPointCoordinate, 0.25);
+		extraAirwayPointsPositions.erase(extraAirwayPointsPositions.begin() + index);
+	}
+
+	return routePositions;
+}
+
+std::vector<Eigen::Vector3d> RouteToTarget::insertAndinterpolate(std::vector<Eigen::Vector3d> routePositions, Eigen::Vector3d newPosition, double interpolationDistance/*mm*/)
+{
+	if(routePositions.size()<1)
+		return routePositions;
+
+	Eigen::Vector3d lastPosition = routePositions.back();
+	double extensionDistance = findDistance(lastPosition,newPosition);
+	Eigen::Vector3d extensionVectorNormalized = ( newPosition - lastPosition ) / extensionDistance;
+	int numberOfextensionPoints = int(extensionDistance / interpolationDistance);
+	Eigen::Vector3d extensionPointIncrementVector = extensionVectorNormalized * extensionDistance / numberOfextensionPoints;
+
+	for (int i = 1; i<= numberOfextensionPoints; i++)
+	{
+		routePositions.push_back(lastPosition + extensionPointIncrementVector*i);
+	}
+
+return routePositions;
+}
 
 vtkPolyDataPtr RouteToTarget::findExtendedRoute(PointMetricPtr targetPoint)
 {
@@ -533,6 +592,14 @@ double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
 	}
 
 	return routeLenght;
+}
+
+void RouteToTarget::limitCameraRotation(int maxGenerationNumber)
+{
+	if(mCameraRotation.size() == mGenerationNumber.size())
+		for(int i=mCameraRotation.size()-2; i>=0; i--)
+			if(mGenerationNumber[i]>maxGenerationNumber)
+				mCameraRotation[i] = mCameraRotation[i+1];
 }
 
 std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions(bool extendedRoute)

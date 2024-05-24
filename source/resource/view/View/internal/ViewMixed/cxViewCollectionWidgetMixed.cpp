@@ -12,27 +12,19 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewCollectionWidgetMixed.h"
 #include <QGridLayout>
 #include "cxViewCollectionWidgetUsingViewContainer.h"
-#include "cxViewCollectionWidgetUsingViewWidgets.h"
 #include "cxViewUtilities.h"
-#include "vtkRenderWindow.h"
-#include "cxGLHelpers.h"
-#include "cxLogger.h"
 #include "cxMultiViewCache.h"
 
 namespace cx
 {
 
 ViewCollectionWidgetMixed::ViewCollectionWidgetMixed(QWidget* parent) :
-	ViewCollectionWidget(parent)
+	LayoutWidgetUsingViewWidgets(parent)
 {
-	mLayout = new QGridLayout(this);
-	this->setLayout(mLayout);
-	mViewCache = MultiViewCache::create();
-
 	mBaseLayout = new ViewCollectionWidgetUsingViewContainer(this);
 	this->initBaseLayout();
-	this->setGridMargin(4);
-	this->setGridSpacing(2);
+	ViewCollectionWidgetMixed::setGridMargin(4);
+	ViewCollectionWidgetMixed::setGridSpacing(2);
 }
 
 ViewCollectionWidgetMixed::~ViewCollectionWidgetMixed()
@@ -46,26 +38,25 @@ void ViewCollectionWidgetMixed::initBaseLayout()
 	mTotalRegion = LayoutRegion(-1,-1);
 }
 
-ViewPtr ViewCollectionWidgetMixed::addView(View::Type type, LayoutRegion region)
+ViewPtr ViewCollectionWidgetMixed::addView(LayoutViewData viewData)
 {
+	LayoutRegion region = viewData.mRegion;
 	ViewPtr view;
 	mTotalRegion = merge(region, mTotalRegion);
 
-	if (type==View::VIEW_3D)
+	if (viewData.mType==View::VIEW_3D || useSlider(viewData.mPlane))
 	{
 		//Using cached 3D view don't work if mBaseRegion covers the 3D view region (In some cases.) CX-63
 		this->mViewCache->clearCache();
-		ViewWidget* overlay = this->mViewCache->retrieveView(this, View::VIEW_3D, mBaseLayout->getOffScreenRendering());
-		overlay->getView()->setType(type);
-		overlay->show();
-		mOverlays.push_back(overlay);
-		view = overlay->getView();
-		this->addWidgetToLayout(mLayout, overlay, region);
+		ViewAndSlider viewAndSlider = getViewAndSlider(viewData, mBaseLayout->getOffScreenRendering());
+		mSliderViews.push_back(viewAndSlider);
+		view = viewAndSlider.mViewWidget->getView();
+		this->addWidgetToLayout(mLayout, viewAndSlider.getUsedWidget(), region);
 	}
 	else
 	{
 		mBaseRegion = merge(region, mBaseRegion);
-		view = mBaseLayout->addView(type, region);
+		view = mBaseLayout->addView(viewData);
 
 		// re-add the base widget with updated position in grid
 		this->addWidgetToLayout(mLayout, mBaseLayout, mBaseRegion);
@@ -95,14 +86,7 @@ void ViewCollectionWidgetMixed::addWidgetToLayout(QGridLayout* layout, QWidget* 
 
 void ViewCollectionWidgetMixed::clearViews()
 {
-	mViewCache->clearViews();
-
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-	{
-		mOverlays[i]->hide();
-		mLayout->removeWidget(mOverlays[i]);
-	}
-	mOverlays.clear();
+	LayoutWidgetUsingViewWidgets::clearViews();
 
 	mBaseLayout->clearViews();
 	mLayout->removeWidget(mBaseLayout);
@@ -114,21 +98,14 @@ void ViewCollectionWidgetMixed::clearViews()
 
 void ViewCollectionWidgetMixed::setModified()
 {
+	LayoutWidgetUsingViewWidgets::setModified();
 	mBaseLayout->setModified();
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-		mOverlays[i]->setModified();
 }
 
 void ViewCollectionWidgetMixed::render()
 {
 	mBaseLayout->render();
-
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-	{
-		mOverlays[i]->render();
-	}
-
-    emit rendered();
+	LayoutWidgetUsingViewWidgets::render();
 }
 
 void ViewCollectionWidgetMixed::setGridSpacing(int val)
@@ -150,44 +127,39 @@ int ViewCollectionWidgetMixed::getGridSpacing() const
 
 int ViewCollectionWidgetMixed::getGridMargin() const
 {
-    return mLayout->margin();
+	return mLayout->margin();
 }
-
 
 std::vector<ViewPtr> ViewCollectionWidgetMixed::getViews()
 {
 	std::vector<ViewPtr> retval = mBaseLayout->getViews();
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-		retval.push_back(mOverlays[i]->getView());
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
+		retval.push_back(mSliderViews[i].mViewWidget->getView());
 	return retval;
 }
 
 QPoint ViewCollectionWidgetMixed::getPosition(ViewPtr view)
 {
-    for (unsigned i=0; i<mOverlays.size(); ++i)
-    {
-        if (mOverlays[i]->getView()==view)
-        {
-            QPoint p = mOverlays[i]->mapToGlobal(QPoint(0,0));
-            p = this->mapFromGlobal(p);
-            return p;
-        }
-    }
+	for (unsigned i=0; i<mSliderViews.size(); ++i)
+	{
+		if (mSliderViews[i].mViewWidget->getView()==view)
+		{
+			QPoint p = mSliderViews[i].mViewWidget->mapToGlobal(QPoint(0,0));
+			p = this->mapFromGlobal(p);
+			return p;
+		}
+	}
 
-    QPoint p = mBaseLayout->getPosition(view);
-    p = mBaseLayout->mapToGlobal(p);
-    p = this->mapFromGlobal(p);
+	QPoint p = mBaseLayout->getPosition(view);
+	p = mBaseLayout->mapToGlobal(p);
+	p = this->mapFromGlobal(p);
 	return p;
 }
 
 void ViewCollectionWidgetMixed::enableContextMenuForViews(bool enable)
 {
 	mBaseLayout->enableContextMenuForViews(enable);
-	Qt::ContextMenuPolicy policy = enable ? Qt::CustomContextMenu : Qt::PreventContextMenu;
-	for (unsigned i=0; i<mOverlays.size(); ++i)
-	{
-		mOverlays[i]->setContextMenuPolicy(policy);
-	}
+	LayoutWidgetUsingViewWidgets::enableContextMenuForViews(enable);
 }
 
 } /* namespace cx */

@@ -69,6 +69,7 @@ public:
     virtual QWidget* getLayoutWidget(int index) = 0; ///< Get the specified layout widget, NULL if not created
     virtual QString getActiveLayout(int widgetIndex=0) const = 0;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex=0) = 0;
+	virtual void rebuildLayouts() = 0;
 	virtual void deactivateLayout();
 	virtual ClippersPtr getClippers() = 0;
 	virtual InteractiveCropperPtr getCropper() = 0;

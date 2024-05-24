@@ -34,6 +34,7 @@ set(PLUGIN_target_libraries
     #cxPluginAlgorithm
 
     PRIVATE
+    cxGui
     cxResource
     cxResourceFilter
     cxPluginUtilities
