@@ -50,10 +50,11 @@ public:
 
 protected:
 	SectorInfoPtr mSectorInfo;
+	int mOriginalTime;
 
 private:
 	std::vector<double> toDoubleVector(QString values, QString separator = QString(" ")) const;
-	DoubleBoundingBox3D getBoundinBox() const;
+	DoubleBoundingBox3D getBoundingBox() const;
 	double getWidth();
 	ProbeDefinitionPtr initProbeDefinition();
 	QSize getSize();

@@ -39,6 +39,7 @@ private slots:
 	void connectButtonClickedSlot();
 	void browsePlusPathSlot();
 	void plusAppStateChanged();
+	void plusPathChangedSlot();
 
 //	void browsePlusConfigFileSlot();
 	void configFileFileSelected(QString filename);
