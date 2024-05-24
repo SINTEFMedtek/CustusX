@@ -54,8 +54,6 @@ PlusConnectWidget::PlusConnectWidget(VisServicesPtr services, QWidget* parent) :
 
 	// PlusServer path
 	mPlusPathComboBox = new QComboBox();
-	//mPlusPath = settings()->value("plus/Path").toString();
-	//if(!QFile::exists(mPlusPath))
 	this->searchForPlus();
 	connect(mPlusPathComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &PlusConnectWidget::plusPathChangedSlot);
 

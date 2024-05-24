@@ -366,12 +366,10 @@ void NetworkHandler::processImageAndEmitProbeDefinition(ImagePtr cximage, QStrin
 
 bool NetworkHandler::emitProbeDefinitionIfChanged(QString deviceName)
 {
-	//if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
 	//Always send probe definition - Needed for combining IGSTK tracking with OpenIGTLink video
 	if (mProbeDefinitionFromStringMessages->haveValidValues())
 	{
 		mProbeDefinition = mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName);
-		//CX_LOG_DEBUG() << "emitProbeDefinitionIfChanged";
 		emit probedefinition(deviceName, mProbeDefinition);
 		return true;
 	}
