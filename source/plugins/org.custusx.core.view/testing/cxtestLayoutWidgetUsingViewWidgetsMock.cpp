@@ -9,8 +9,8 @@ LayoutWidgetUsingViewWidgetsMock::LayoutWidgetUsingViewWidgetsMock(QWidget *pare
 LayoutWidgetUsingViewWidgetsMock::~LayoutWidgetUsingViewWidgetsMock()
 {}
 
-std::vector<cx::ViewWidget*> LayoutWidgetUsingViewWidgetsMock::getViewWidgets() const
+std::vector<cx::ViewAndSlider> LayoutWidgetUsingViewWidgetsMock::getSliderWidgets() const
 {
-    return mViews;
+	return mSliderViews;
 }
 }

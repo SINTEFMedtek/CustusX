@@ -66,6 +66,7 @@ NetworkHandler::~NetworkHandler()
 igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s)
 {
 	mSession = mLogic->ConnectToServer(serverHost, serverPort, sync, timeout_s);
+	mSession2 = mLogic->ConnectToServer(serverHost, 18945, sync, timeout_s);//Hack for getting video and tracking from two different OpenIGTLink servers
 	return mSession;
 }
 
@@ -77,6 +78,13 @@ void NetworkHandler::disconnectFromServer()
 		igtlioConnectorPointer connector = mSession->GetConnector();
 		connector->Stop();
 		mLogic->RemoveConnector(connector);
+	}
+	if (mSession2->GetConnector() && mSession2->GetConnector()->GetState()!=igtlioConnector::STATE_OFF)
+	{
+		CX_LOG_DEBUG() << "NetworkHandler: Disconnecting from server" << mSession2->GetConnector()->GetName();
+		igtlioConnectorPointer connector2 = mSession2->GetConnector();
+		connector2->Stop();
+		mLogic->RemoveConnector(connector2);
 	}
 	mProbeDefinitionFromStringMessages->reset();
 }
@@ -167,7 +175,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << IGTLIO_KEY_LINEAR_WIDTH;
 		igtlioLabels << IGTLIO_KEY_SPACING_X;
 		igtlioLabels << IGTLIO_KEY_SPACING_Y;
-		igtlioLabels << QString("SpacingZ"); //IGTLIO_KEY_SPACING_Z;
+		igtlioLabels << IGTLIO_KEY_SPACING_Z;
+		igtlioLabels << IGTLIO_KEY_TIMESTAMP;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
 		mProbeDefinitionFromStringMessages->setImage(cximage);
@@ -185,6 +194,13 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			{
 				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
+				//It seems like we still don't get meta info from PLUS, use string messages for now (See ProbeDefinitionFromStringMessages)
+				//To fix this for now: Set ClientHeaderVersion to IGTL_HEADER_VERSION_2 in src/PlusOpenIGTLink/PlusIgtlClientInfo.cxx, instead of IGTL_HEADER_VERSION_1
+				if(QString(metaLabel.c_str()) == IGTLIO_KEY_TIMESTAMP)
+				{
+					int originalTime = QString(metaDataValue.c_str()).toInt();
+					cximage->setOriginalAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(originalTime)));
+				}
 			}
 		}
 		mGotMoreThanOneImage = true;
@@ -209,14 +225,12 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		//QString streamIdFrom(content.streamIdFrom.c_str());
 		Transform3D cxtransform = Transform3D::fromVtkMatrix(content.transform);
 
-//		CX_LOG_DEBUG() << "TRANSFORM: "	<< " equipmentId: " << header.equipmentId
-//										<< " streamIdTo: " << content.streamIdTo
-//										<< " streamIdFrom: " << content.streamIdFrom
+//		CX_LOG_DEBUG() << "TRANSFORM: "
 //										<< " deviceName: " << deviceName
 //										<< " transform: " << cxtransform;
 
 
-		// Try to use equipmentId from OpenIGTLink meta data. If not presnet use deviceName.
+		// Try to use equipmentId from OpenIGTLink meta data. If not present use deviceName.
 		// Having equipmentId in OpenIGTLink meta data is something we would like to have a part of the OpenIGTLinkIO standard,
 		// and added to the messages from Plus.
 		std::string openigtlinktransformid;
@@ -352,7 +366,8 @@ void NetworkHandler::processImageAndEmitProbeDefinition(ImagePtr cximage, QStrin
 
 bool NetworkHandler::emitProbeDefinitionIfChanged(QString deviceName)
 {
-	if (mProbeDefinitionFromStringMessages->haveValidValues() && mProbeDefinitionFromStringMessages->haveChanged())
+	//Always send probe definition - Needed for combining IGSTK tracking with OpenIGTLink video
+	if (mProbeDefinitionFromStringMessages->haveValidValues())
 	{
 		mProbeDefinition = mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName);
 		emit probedefinition(deviceName, mProbeDefinition);

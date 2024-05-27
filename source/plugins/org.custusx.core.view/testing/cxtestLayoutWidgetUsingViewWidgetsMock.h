@@ -12,7 +12,7 @@ public:
 	LayoutWidgetUsingViewWidgetsMock(QWidget *parent);
 	virtual ~LayoutWidgetUsingViewWidgetsMock();
 
-	std::vector<cx::ViewWidget*> getViewWidgets() const;
+	std::vector<cx::ViewAndSlider> getSliderWidgets() const;
 };
 
 }

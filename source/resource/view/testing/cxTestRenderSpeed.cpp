@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QVTKOpenGLWindow.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "cxDataLocations.h"
 #include "cxSettings.h"
 #include "cxReporter.h"
 #include "vtkRenderWindowInteractor.h"
@@ -134,8 +133,10 @@ void TestRenderSpeed::createViews(int num)
 	{
 		int v = num;
 		int rmax = sqrt(v);
+		cx::LayoutViewData viewData;
 		cx::LayoutRegion region(v%rmax, v/rmax);
-		cx::ViewPtr view = mMainWidget->addView(cx::View::VIEW, region);
+		viewData.mRegion = region;
+		cx::ViewPtr view = mMainWidget->addView(viewData);
 
 		mViews.push_back(view);
 	}

@@ -187,6 +187,10 @@ void RouteToTarget::findRoutePositions(std::vector<Eigen::Vector3d> initialRoute
 
 	mRoutePositions = initialRoutePositions;
 
+	double cameraRotation = mProjectedBranchPtr->getBronchoscopeRotation();
+	std::vector< double > initialRouteRotations(mRoutePositions.size(), cameraRotation);
+	mCameraRotation = initialRouteRotations;
+
 	searchBranchUp(mProjectedBranchPtr, mProjectedIndex);
 }
 
@@ -588,6 +592,14 @@ double RouteToTarget::calculateRouteLength(std::vector< Eigen::Vector3d > route)
 	}
 
 	return routeLenght;
+}
+
+void RouteToTarget::limitCameraRotation(int maxGenerationNumber)
+{
+	if(mCameraRotation.size() == mGenerationNumber.size())
+		for(int i=mCameraRotation.size()-2; i>=0; i--)
+			if(mGenerationNumber[i]>maxGenerationNumber)
+				mCameraRotation[i] = mCameraRotation[i+1];
 }
 
 std::vector< Eigen::Vector3d > RouteToTarget::getRoutePositions(bool extendedRoute)

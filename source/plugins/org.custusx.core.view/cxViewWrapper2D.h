@@ -28,9 +28,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoundingBox3D.h"
 #include "cxTransform3D.h"
 #include "sscConfig.h"
+#include "cxSlider2D.h"
 
 class QMouseEvent;
 class QWheelEvent;
+class QSlider;
 
 namespace cx
 {
@@ -65,6 +67,7 @@ public:
 	virtual void setViewGroup(ViewGroupDataPtr group);
 
 	virtual void updateView();
+	void connect2DSlider(ctkDoubleSlider *slider);
 
 	ImagePtr getImageToDisplay();
 
@@ -74,6 +77,7 @@ signals:
 protected:
 	virtual QString getDataDescription();
 	virtual QString getViewDescription();
+	void addSliderCheckbox(QMenu& contextMenu);
 
 protected slots:
 	virtual void dataViewPropertiesChangedSlot(QString uid);
@@ -90,6 +94,8 @@ private slots:
 	void optionChangedSlot();
 	void showManualToolSlot(bool visible);
 	void toggleShowManualTool();
+	void enableSliderSlot(bool visible, QString settingString);
+	void toggle2DSlider();
 
 protected slots:
 	void samplePoint(Vector3D click_vp);
@@ -119,6 +125,8 @@ private:
 
 	void setImagesSWRendering();
 
+	Vector3D get_tool_d();
+
 	DataRepContainerPtr mDataRepContainer;
 
 	GeometricRep2DPtr mPickerGlyphRep;
@@ -135,6 +143,8 @@ private:
 	Zoom2DHandlerPtr mZoom2D;
 
 	Vector3D mLastClickPos_vp;
+	int mLastSliderValue;
+	Slider2DPtr mSlider;
 
 	QActionGroup* mOrientationActionGroup;
 	void changeZoom(double delta);

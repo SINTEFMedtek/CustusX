@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_core_view_Export.h"
 class ctkPluginContext;
 class QDomElement;
+class QSlider;
+class ctkDoubleSlider;
 
 namespace cx
 {
@@ -102,6 +104,7 @@ public:
     virtual QWidget* getLayoutWidget(int index);
 	virtual QString getActiveLayout(int widgetIndex = 0) const;
 	virtual void setActiveLayout(const QString& uid, int widgetIndex);
+	virtual void rebuildLayouts();
 	virtual ClippersPtr getClippers();
 	virtual InteractiveCropperPtr getCropper();
 	virtual CyclicActionLoggerPtr getRenderTimer();
@@ -138,7 +141,6 @@ private slots:
 	void settingsChangedSlot(QString key);
 
 protected:
-	void rebuildLayouts();
 	QList<unsigned> getViewGroupsToAutoShowIn();
 
 	VisServicesPtr mServices;
@@ -164,7 +166,7 @@ private:
 	void activateView(ViewCollectionWidget* widget, LayoutViewData viewData);
 	void setSlicePlanesProxyInViewsUpTo2DViewgroup();
 	void setRenderingInterval(int interval);
-	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData);
+	ViewWrapperPtr createViewWrapper(ViewPtr view, LayoutViewData viewData, ctkDoubleSlider *slider = nullptr);
 	int findGroupContaining3DViewGivenGuess(int preferredGroup);
 	void autoShowInViewGroups(DataPtr data);
 	void autoResetCameraToSuperiorView();

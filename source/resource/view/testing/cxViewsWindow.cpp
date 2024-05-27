@@ -71,7 +71,10 @@ ViewsWindow::~ViewsWindow()
 
 cx::ViewPtr ViewsWindow::addView(cx::View::Type type, int r, int c)
 {
-	cx::ViewPtr view = mLayoutWidget->addView(type, cx::LayoutRegion(r,c));
+	cx::LayoutViewData viewData;
+	viewData.mType = type;
+	viewData.mRegion = cx::LayoutRegion(r,c);
+	cx::ViewPtr view = mLayoutWidget->addView(viewData);
 	mViews.push_back(view);
 	return view;
 }

@@ -73,7 +73,7 @@ double ProbeAdapterRTSource::getTimestamp()
 
 TimeInfo ProbeAdapterRTSource::getAdvancedTimeInfo()
 {
-	TimeInfo retval;
+	TimeInfo retval = mBase->getAdvancedTimeInfo();
 	retval.mAcquisitionTime.setMSecsSinceEpoch(this->getTimestamp());
 	return retval;
 }
