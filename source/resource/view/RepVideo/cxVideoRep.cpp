@@ -34,12 +34,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+VideoFixedPlaneRep::VideoFixedPlaneRep(CoreServicesPtr services, const QString& uid, const QString& name) :
+	RepImpl(uid, name),
+	mServices(services)
 {
-	SpaceProviderPtr nullProvider;
-
-	mRTGraphics.reset(new VideoSourceGraphics(nullProvider));
+	mRTGraphics.reset(new VideoSourceGraphics(mServices));
 	connect(mRTGraphics.get(), &VideoSourceGraphics::newData, this, &VideoFixedPlaneRep::newDataSlot);
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);

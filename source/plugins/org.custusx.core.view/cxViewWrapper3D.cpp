@@ -703,7 +703,7 @@ RepPtr ViewWrapper3D::createTrackedStreamRep(TrackedStreamPtr trackedStream)
 	}
 	else if (trackedStream->is2D())
 	{
-		Stream2DRep3DPtr rep = Stream2DRep3D::New(mServices->spaceProvider());
+		Stream2DRep3DPtr rep = Stream2DRep3D::New(mServices);
 		rep->setTrackedStream(trackedStream);
 		return rep;
 	}

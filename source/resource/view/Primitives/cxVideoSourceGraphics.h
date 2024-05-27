@@ -38,7 +38,7 @@ class cxResourceVisualization_EXPORT VideoSourceGraphics : public QObject
 {
 	Q_OBJECT
 public:
-	explicit VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool useMaskFilter=false);
+	explicit VideoSourceGraphics(CoreServicesPtr services, bool useMaskFilter=false);
 	virtual ~VideoSourceGraphics();
 
 	void setRealtimeStream(VideoSourcePtr data);
@@ -48,6 +48,11 @@ public:
 	void setClipToSector(bool on); ///< Turn sector clipping on/off. If on, only the area inside the probe sector is shown.
 	void setShowInToolSpace(bool on);
 	vtkActorPtr getActor();
+
+protected:
+	void updateBronchoscopyTool();
+    bool isToolInToolMap(std::map<QString, ToolPtr> tools, ToolPtr tool);
+	bool isBronchoscopyTool(ToolPtr tool);
 
 signals:
 	void newData();
@@ -62,9 +67,10 @@ private:
 	VideoGraphicsPtr mPipeline;
 	bool mShowInToolSpace;
 	ToolPtr mTool;
+    ToolPtr mOriginalTool;
 	ProbeSector mProbeDefinition;
 	VideoSourcePtr mData;
-	SpaceProviderPtr mSpaceProvider;
+    CoreServicesPtr mServices;
 };
 
 } // namespace cx

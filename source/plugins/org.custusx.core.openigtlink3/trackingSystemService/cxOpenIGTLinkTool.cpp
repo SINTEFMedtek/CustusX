@@ -98,14 +98,14 @@ QString OpenIGTLinkTool::getName() const
 
 double OpenIGTLinkTool::getTooltipOffset() const
 {
-	if(this->getProbe())
+	if(this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
 		return this->getProbe()->getProbeDefinition().getDepthStart();
 	return ToolImpl::getTooltipOffset();
 }
 
 void OpenIGTLinkTool::setTooltipOffset(double val)
 {
-	if(this->getProbe())
+	if(this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
 		return;
 	ToolImpl::setTooltipOffset(val);
 }

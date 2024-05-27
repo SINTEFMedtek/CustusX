@@ -18,14 +18,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 TEST_CASE("Stream2DRep3D init", "[unit][resource]")
 {
 	cxtest::TestVisServicesPtr mServices = cxtest::TestVisServices::create();
-	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
+	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices);
 	REQUIRE(rep);
 }
 
 TEST_CASE("Stream2DRep3D Set TrackedStream", "[unit][resource]")
 {
 	cxtest::TestVisServicesPtr mServices = cxtest::TestVisServices::create();
-	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices->spaceProvider());
+	cx::Stream2DRep3DPtr rep = cx::Stream2DRep3D::New(mServices);
 	REQUIRE(rep);
 
 	cx::TrackedStreamPtr trackedStream = cx::TrackedStream::create("streamUid", "streamName");

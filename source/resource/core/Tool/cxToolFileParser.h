@@ -57,6 +57,7 @@ public:
 		bool mIsReference;
 		bool mIsPointer;
 		bool mIsProbe;
+		bool mIsScope;
 		//    Tool::Type   mType;                  ///< the tools type
 		QString mName; ///< the tools name
 		QString mUid; ///< the tools unique id
@@ -80,7 +81,7 @@ public:
 		QString mOpenigtlinkImageId; ///< The image id when sent over OpenIGTLink
 		QString mOpenigtlinkTransformId; ///< The transform id when sent over OpenIGTLink
 		ToolInternalStructure() :
-			mIsReference(false), mIsPointer(false), mIsProbe(false),
+			mIsReference(false), mIsPointer(false), mIsProbe(false), mIsScope(false),
 			//mType(Tool::TOOL_NONE),
 			mName(""), mUid(""),
 			mTrackerType(tsNONE), mSROMFilename(""),

@@ -22,17 +22,17 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-Stream2DRep3DPtr Stream2DRep3D::New(SpaceProviderPtr spaceProvider, const QString& uid)
+Stream2DRep3DPtr Stream2DRep3D::New(CoreServicesPtr services, const QString& uid)
 {
-	return wrap_new(new Stream2DRep3D(spaceProvider), uid);
+	return wrap_new(new Stream2DRep3D(services), uid);
 }
 
-Stream2DRep3D::Stream2DRep3D(SpaceProviderPtr spaceProvider) :
+Stream2DRep3D::Stream2DRep3D(CoreServicesPtr services) :
 	RepImpl(),
-	mSpaceProvider(spaceProvider)
+	mServices(services)
 {
 	bool useMask = true;
-	mRTStream.reset(new VideoSourceGraphics(mSpaceProvider, useMask));
+	mRTStream.reset(new VideoSourceGraphics(mServices, useMask));
 }
 
 QString Stream2DRep3D::getType() const
