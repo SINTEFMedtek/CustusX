@@ -39,14 +39,14 @@ PatientModelImplService::PatientModelImplService(ctkPluginContext *context) :
 {
 	this->createInterconnectedDataAndSpace();
 
-	connect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-	connect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
-	connect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
-	connect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
+	connect(mDataService.get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
+	connect(mDataService.get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
+	connect(mDataService.get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
+	connect(mDataService.get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
-	connect(this->dataService().get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
-    connect(this->dataService().get(), &DataManager::operatingTableChanged, this, &PatientModelService::operatingTableChanged);
-	connect(this->dataService().get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
+	connect(mDataService.get(), &DataManager::centerChanged, this, &PatientModelService::centerChanged);
+	connect(mDataService.get(), &DataManager::operatingTableChanged, this, &PatientModelService::operatingTableChanged);
+	connect(mDataService.get(), &DataManager::landmarkPropertiesChanged, this, &PatientModelService::landmarkPropertiesChanged);
 
 	connect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 
@@ -98,12 +98,12 @@ void PatientModelImplService::shutdownInterconnectedDataAndSpace()
 
 PatientModelImplService::~PatientModelImplService()
 {
-	if(dataService())
+	if(mDataService)
 	{
-		disconnect(this->dataService().get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
-		disconnect(this->dataService().get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
-		disconnect(this->dataService().get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
-		disconnect(this->dataService().get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
+		disconnect(mDataService.get(), &DataManager::dataAddedOrRemoved, this, &PatientModelService::dataAddedOrRemoved);
+		disconnect(mDataService.get(), &DataManager::rMprChanged, this, &PatientModelService::rMprChanged);
+		disconnect(mDataService.get(), &DataManager::streamLoaded, this, &PatientModelService::streamLoaded);
+		disconnect(mDataService.get(), &DataManager::clinicalApplicationChanged, this, &PatientModelService::clinicalApplicationChanged);
 
 		disconnect(this->patientData().get(), &PatientData::patientChanged, this, &PatientModelService::patientChanged);
 	}
