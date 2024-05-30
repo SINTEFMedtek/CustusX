@@ -55,12 +55,13 @@ public:
 	virtual void setTooltipOffset(double val);
 
 	void startEmittingContinuousPositions(int msecBetweenPositions);
+	void stopEmittingContinuousPositions();
 private slots:
 	void emitPosition();
 private:
 	ToolPtr mBase;
 	ToolPtr mInitialBase;
-	QTimer* mPositionTimer;
+	QTimer* mPositionTimer = nullptr;
 };
 
 typedef boost::shared_ptr<ManualToolAdapter> ManualToolAdapterPtr;

@@ -109,17 +109,20 @@ std::set<Tool::Type> ManualToolAdapter::getTypes() const
 
 void ManualToolAdapter::startEmittingContinuousPositions(int msecBetweenPositions)
 {
-	mPositionTimer = new QTimer(this);
-	connect(mPositionTimer, SIGNAL(timeout()), this, SLOT(emitPosition()));
+	if(!mPositionTimer)
+		mPositionTimer = new QTimer(this);
+	connect(mPositionTimer, &QTimer::timeout, this, &ManualToolAdapter::emitPosition);
 	mPositionTimer->start(msecBetweenPositions);
 }
 
-//Not used for now
-//void ManualToolAdapter::stopEmittingContinuousPositions()
-//{
-//	mPositionTimer->stop();
-//	disconnect(mPositionTimer, SIGNAL(timeout()), this, SLOT(emitPosition()));
-//}
+void ManualToolAdapter::stopEmittingContinuousPositions()
+{
+	if(mPositionTimer)
+	{
+		mPositionTimer->stop();
+		disconnect(mPositionTimer, &QTimer::timeout, this, &ManualToolAdapter::emitPosition);
+	}
+}
 
 void ManualToolAdapter::emitPosition()
 {
