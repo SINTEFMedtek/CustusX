@@ -55,6 +55,9 @@ public:
 
 	DoublePropertyBasePtr getVideoPortOption(QDomElement root);
 	BoolPropertyBasePtr getPrintPropertiesOption(QDomElement root);
+	BoolPropertyBasePtr getStreamerResolutionOption(QDomElement root);
+	DoublePropertyBasePtr getHeightResolutionOption(QDomElement root);
+	DoublePropertyBasePtr getWidthResolutionOption(QDomElement root);
 };
 
 /**

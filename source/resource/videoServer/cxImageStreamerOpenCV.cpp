@@ -44,6 +44,9 @@ std::vector<PropertyPtr> ImageStreamerOpenCVArguments::getSettings(QDomElement r
 	std::vector<PropertyPtr> retval;
 	retval.push_back(this->getVideoPortOption(root));
 	retval.push_back(this->getPrintPropertiesOption(root));
+	retval.push_back(this->getStreamerResolutionOption(root));
+	retval.push_back(this->getHeightResolutionOption(root));
+	retval.push_back(this->getWidthResolutionOption(root));
 	return retval;
 }
 
@@ -68,6 +71,40 @@ BoolPropertyBasePtr ImageStreamerOpenCVArguments::getPrintPropertiesOption(QDomE
 	return retval;
 }
 
+BoolPropertyBasePtr ImageStreamerOpenCVArguments::getStreamerResolutionOption(QDomElement root)
+{
+	BoolPropertyPtr retval;
+	bool defaultValue = false;
+	retval = BoolProperty::initialize("resolution", "Set Resolution",
+											"Set resolution of input stream in video grabber",
+											defaultValue, root);
+	retval->setAdvanced(true);
+	retval->setGroup("OpenCV");
+	return retval;
+}
+
+DoublePropertyBasePtr ImageStreamerOpenCVArguments::getHeightResolutionOption(QDomElement root)
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("height", "Height", "Height (video grabber resolution)",
+												1080, DoubleRange(1, 2160, 1), 0, root);
+	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
+	retval->setAdvanced(true);
+	retval->setGroup("OpenCV");
+	return retval;
+}
+
+DoublePropertyBasePtr ImageStreamerOpenCVArguments::getWidthResolutionOption(QDomElement root)
+{
+	DoublePropertyPtr retval;
+	retval = DoubleProperty::initialize("width", "Width", "Width (video grabber resolution)",
+												1920, DoubleRange(1, 3840, 1), 0, root);
+	retval->setGuiRepresentation(DoublePropertyBase::grSPINBOX);
+	retval->setAdvanced(true);
+	retval->setGroup("OpenCV");
+	return retval;
+}
+
 StringMap ImageStreamerOpenCVArguments::convertToCommandLineArguments(QDomElement root)
 {
 	StringMap retval;
@@ -75,6 +112,11 @@ StringMap ImageStreamerOpenCVArguments::convertToCommandLineArguments(QDomElemen
 	retval["--videoport"] = this->getVideoPortOption(root)->getValueAsVariant().toString();
 	if (this->getPrintPropertiesOption(root)->getValue())
 		retval["--properties"] = "1";
+	if (this->getStreamerResolutionOption(root)->getValue())
+	{
+		retval["--in_width"] = this->getWidthResolutionOption(root)->getValue();
+		retval["--in_height"] = this->getHeightResolutionOption(root)->getValue();
+	}
 	return retval;
 }
 
@@ -232,6 +274,7 @@ void ImageStreamerOpenCV::initialize_local()
 		//set input size
 		int in_width = convertStringWithDefault(mArguments["in_width"], default_width);
 		int in_height = convertStringWithDefault(mArguments["in_height"], default_height);
+
 		mVideoCapture->set(cv::CAP_PROP_FRAME_WIDTH, in_width);
 		mVideoCapture->set(cv::CAP_PROP_FRAME_HEIGHT, in_height);
 
