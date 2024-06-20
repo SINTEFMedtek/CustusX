@@ -139,7 +139,7 @@ void MainWindowActions::createPatientActions()
 					   QIcon(":/icons/open_icon_library/document-new-8.png"),
 					   QKeySequence("Ctrl+N"),
 					   "Create a new patient file",
-					   &MainWindowActions::newPatientSlot);
+						 [=](){this->newPatientSlot(true);});
 
 	this->createAction("CreatePatientWithoutDialog", "New Patient",
 						 QIcon(),
@@ -299,7 +299,7 @@ void MainWindowActions::savePatientFileSlot()
 	if (mServices->patient()->getActivePatientFolder().isEmpty())
 	{
 		reportWarning("No patient selected, select or create patient before saving!");
-		this->newPatientSlot();
+		this->newPatientSlot(true);
 		mServices->view()->enableRender(true);
 		return;
 	}
