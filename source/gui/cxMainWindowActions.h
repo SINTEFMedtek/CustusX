@@ -35,7 +35,7 @@ public:
 
 private slots:
 	// File menu
-	void newPatientSlot(); ///< Create new patient with directory structure
+	void newPatientSlot(bool showDialog = true); ///< Create new patient with directory structure
 	void loadPatientFileSlot();///< Load all application data from XML file
 	void loadPatientFileCopySlot();///< Take a copy of the patient folder, and load all application data from XML file
 	void savePatientFileSlot();///< Save all application data to XML file
@@ -94,7 +94,7 @@ private:
 	QAction* createAction(QString uid, QString text, QIcon icon,
 											 QKeySequence shortcut, QString help,
 						  T triggerSlot);
-	QString selectNewPatientFolder();
+	QString selectNewPatientFolder(bool showDialog = true);
 };
 
 } // namespace cx

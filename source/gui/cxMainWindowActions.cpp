@@ -141,6 +141,12 @@ void MainWindowActions::createPatientActions()
 					   "Create a new patient file",
 					   &MainWindowActions::newPatientSlot);
 
+	this->createAction("CreatePatientWithoutDialog", "New Patient",
+						 QIcon(),
+						 QKeySequence(),
+						 "Create a new patient file",
+						 [=](){this->newPatientSlot(false);});
+
 	this->createAction("SaveFile", "Save Patient",
 					   QIcon(":/icons/open_icon_library/document-save-5.png"),
 					   QKeySequence("Ctrl+S"),
@@ -231,10 +237,10 @@ QWidget* MainWindowActions::parentWidget()
 }
 
 
-void MainWindowActions::newPatientSlot()
+void MainWindowActions::newPatientSlot(bool showDialog)
 {
 	mServices->view()->enableRender(false);
-	QString choosenDir = this->selectNewPatientFolder();
+	QString choosenDir = this->selectNewPatientFolder(showDialog);
 	if(!choosenDir.isEmpty())
 	{
 		// Update global patient number
@@ -246,7 +252,7 @@ void MainWindowActions::newPatientSlot()
 	mServices->view()->enableRender(true);
 }
 
-QString MainWindowActions::selectNewPatientFolder()
+QString MainWindowActions::selectNewPatientFolder(bool showDialog)
 {
 	QString patientDatafolder = this->getExistingSessionFolder();
 
@@ -258,13 +264,16 @@ QString MainWindowActions::selectNewPatientFolder()
 
 	QString choosenDir = patientDatafolder + "/" + filename;
 
-	QFileDialog dialog(this->parentWidget(), tr("Select directory to save patient in"), patientDatafolder + "/");
-	dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-	dialog.setOption(QFileDialog::ShowDirsOnly, true);
-	dialog.selectFile(filename);
-	if (!dialog.exec())
-		return QString();
-	choosenDir = dialog.selectedFiles().front();
+	if(showDialog)
+	{
+		QFileDialog dialog(this->parentWidget(), tr("Select directory to save patient in"), patientDatafolder + "/");
+		dialog.setOption(QFileDialog::DontUseNativeDialog, true);
+		dialog.setOption(QFileDialog::ShowDirsOnly, true);
+		dialog.selectFile(filename);
+		if (!dialog.exec())
+			return QString();
+		choosenDir = dialog.selectedFiles().front();
+	}
 
 	if (!choosenDir.endsWith(".cx3"))
 		choosenDir += QString(".cx3");
