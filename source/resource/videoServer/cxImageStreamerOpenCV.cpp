@@ -114,8 +114,8 @@ StringMap ImageStreamerOpenCVArguments::convertToCommandLineArguments(QDomElemen
 		retval["--properties"] = "1";
 	if (this->getStreamerResolutionOption(root)->getValue())
 	{
-		retval["--in_width"] = this->getWidthResolutionOption(root)->getValue();
-		retval["--in_height"] = this->getHeightResolutionOption(root)->getValue();
+		retval["--in_width"] = QString::number(this->getWidthResolutionOption(root)->getValue());
+		retval["--in_height"] = QString::number(this->getHeightResolutionOption(root)->getValue());
 	}
 	return retval;
 }
