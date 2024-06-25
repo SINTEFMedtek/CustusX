@@ -83,14 +83,14 @@ QString ToolUsingIGSTK::getName() const
 
 double ToolUsingIGSTK::getTooltipOffset() const
 {
-    if(this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
+	if(this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
 		return this->getProbe()->getProbeDefinition().getDepthStart();
 	return ToolImpl::getTooltipOffset();
 }
 
 void ToolUsingIGSTK::setTooltipOffset(double val)
 {
-    if(this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
+	if(this->getProbe() && !this->hasType(Tool::TOOL_SCOPE))
 		return;
 	ToolImpl::setTooltipOffset(val);
 }

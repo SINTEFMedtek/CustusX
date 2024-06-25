@@ -51,7 +51,7 @@ public:
 
 protected:
 	void updateBronchoscopyTool();
-    bool isToolInToolMap(std::map<QString, ToolPtr> tools, ToolPtr tool);
+	bool isToolInToolMap(std::map<QString, ToolPtr> tools, ToolPtr tool);
 	bool isBronchoscopyTool(ToolPtr tool);
 
 signals:
@@ -67,10 +67,10 @@ private:
 	VideoGraphicsPtr mPipeline;
 	bool mShowInToolSpace;
 	ToolPtr mTool;
-    ToolPtr mOriginalTool;
+	ToolPtr mOriginalTool;
 	ProbeSector mProbeDefinition;
 	VideoSourcePtr mData;
-    CoreServicesPtr mServices;
+	CoreServicesPtr mServices;
 };
 
 } // namespace cx
