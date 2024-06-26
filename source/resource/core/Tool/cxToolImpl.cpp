@@ -46,6 +46,8 @@ std::set<Tool::Type> ToolImpl::getTypes() const
 		retval.insert(Tool::TOOL_POINTER);
 	if (toolStructure->mIsProbe)
 		retval.insert(Tool::TOOL_US_PROBE);
+	if (toolStructure->mIsScope)
+		retval.insert(Tool::TOOL_SCOPE);
 
 	return retval;
 }

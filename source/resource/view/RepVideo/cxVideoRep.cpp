@@ -34,12 +34,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 
-VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+VideoFixedPlaneRep::VideoFixedPlaneRep(CoreServicesPtr services, const QString& uid, const QString& name) :
+	RepImpl(uid, name),
+	mServices(services)
 {
-	SpaceProviderPtr nullProvider;
-
-	mRTGraphics.reset(new VideoSourceGraphics(nullProvider));
+	mRTGraphics.reset(new VideoSourceGraphics(mServices));
 	connect(mRTGraphics.get(), &VideoSourceGraphics::newData, this, &VideoFixedPlaneRep::newDataSlot);
 	mRTGraphics->setShowInToolSpace(false);
 	mRTGraphics->setClipToSector(false);
@@ -158,17 +157,17 @@ void VideoFixedPlaneRep::setCamera()
 	if (w_vp > vw) // if image too wide: reduce scale
 		scale = w_vp/vw;
 
-    //Set camera position and focus so that it looks at the video stream center
-    double position[3];
-    camera->GetPosition(position);
-    position[0] = bounds.center()[0];
-    position[1] = bounds.center()[1];
-    camera->SetPosition(position);
+	//Set camera position and focus so that it looks at the video stream center
+	double position[3];
+	camera->GetPosition(position);
+	position[0] = bounds.center()[0];
+	position[1] = bounds.center()[1];
+	camera->SetPosition(position);
 
-    camera->GetFocalPoint(position);
-    position[0] = bounds.center()[0];
-    position[1] = bounds.center()[1];
-    camera->SetFocalPoint(position);
+	camera->GetFocalPoint(position);
+	position[0] = bounds.center()[0];
+	position[1] = bounds.center()[1];
+	camera->SetFocalPoint(position);
 
 	camera->SetParallelScale(h/2*scale*1.01); // exactly fill the viewport height
 	mViewportListener->startListen(mRenderer);

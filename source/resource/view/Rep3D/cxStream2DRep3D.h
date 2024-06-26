@@ -32,10 +32,10 @@ typedef boost::shared_ptr<class VideoSourceGraphics> VideoSourceGraphicsPtr;
  */
 class cxResourceVisualization_EXPORT Stream2DRep3D : public RepImpl
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    static Stream2DRep3DPtr New(SpaceProviderPtr spaceProvider, const QString& uid = "");
-    virtual QString getType() const;
+	static Stream2DRep3DPtr New(CoreServicesPtr services, const QString& uid = "");
+	virtual QString getType() const;
 	void setTrackedStream(TrackedStreamPtr trackedStream);
 	bool isReady();
 protected:
@@ -44,11 +44,11 @@ protected:
 private slots:
 	void trackedStreamChanged();
 private:
-    Stream2DRep3D(SpaceProviderPtr spaceProvider);
+	Stream2DRep3D(CoreServicesPtr services);
 
-    SpaceProviderPtr mSpaceProvider;
-    VideoSourceGraphicsPtr mRTStream;
-    TrackedStreamPtr mTrackedStream;
+	CoreServicesPtr mServices;
+	VideoSourceGraphicsPtr mRTStream;
+	TrackedStreamPtr mTrackedStream;
 };
 
 } //cx

@@ -86,7 +86,8 @@ public:
 		TOOL_POINTER,   ///< Navigation pointer. Pointing functionality such as tool offset.
 		TOOL_US_PROBE,  ///< Ultrasond probe. The tool has a Probe subinterface with a sector and a video stream.
 		TOOL_MICROSCOPE,///< A tool following the focus point of a microscope
-		TOOL_SHAPE      ///< A shape tool. Based on the shape of an FBGS fiber
+		TOOL_SHAPE,     ///< A shape tool. Based on the shape of an FBGS fiber
+		TOOL_SCOPE      ///< Common tag for all "scope" tools (bronchscope, endoscope, microscope, ...)
 	};
 
 	virtual ToolPositionMetadata getMetadata() const = 0;

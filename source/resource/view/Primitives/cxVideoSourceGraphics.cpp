@@ -1,11 +1,11 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
-                 
+
 Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
-                 
+
 CustusX is released under a BSD 3-Clause license.
-                 
+
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
@@ -33,13 +33,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVideoSource.h"
 #include "cxSpaceProvider.h"
 #include "cxLogger.h"
+#include "cxCoreServices.h"
+#include "cxTrackingService.h"
 
 namespace cx
 {
 
-VideoSourceGraphics::VideoSourceGraphics(SpaceProviderPtr spaceProvider, bool useMaskFilter)
+VideoSourceGraphics::VideoSourceGraphics(CoreServicesPtr services, bool useMaskFilter)
 {
-	mSpaceProvider = spaceProvider;
+	mServices = services;
 	mClipToSector = true;
 	mPipeline.reset(new VideoGraphics());
 	mShowInToolSpace = true;
@@ -85,6 +87,10 @@ void VideoSourceGraphics::setTool(ToolPtr tool)
 	{
 		mTool = tool;
 	}
+
+	//double scopeFocusDepth = 30; //mm
+	//if (tool && tool->hasType(Tool::TOOL_SCOPE))
+	//    mTool->setTooltipOffset(scopeFocusDepth);
 
 	// setup new
 	if (mTool )
@@ -148,10 +154,76 @@ void VideoSourceGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	if (!mShowInToolSpace)
 		return;
-	Transform3D rMpr = mSpaceProvider->get_rMpr();
+	Transform3D rMpr = mServices->spaceProvider()->get_rMpr();
 	Transform3D tMu = mProbeDefinition.get_tMu();
+
+	if (mTool->hasType(Tool::TOOL_SCOPE))
+	{
+		this->updateBronchoscopyTool();
+		Transform3D Rx = createTransformRotateX(M_PI);
+		Transform3D Rz = createTransformRotateZ(M_PI/2.0);
+		Transform3D R = (Rx * Rz);
+		if (mData)
+		{
+			QString streamUid = mData->getUid();
+			ProbeDefinition probeDefinition = mTool->getProbe()->getProbeDefinition(streamUid);
+			Vector3D origin_p = probeDefinition.getOrigin_p();
+			Vector3D spacing = probeDefinition.getSpacing();
+			QSize size = probeDefinition.getSize();
+			//double scpoeFocusDepth = mTool->getTooltipOffset();
+			double videoFocusDepth = 30;
+			//TO DO: Scale spacing based on focus depth?
+			Vector3D origin_u(origin_p[0]*spacing[0], (origin_p[1] + size.height()/2)*spacing[1], origin_p[2]*spacing[2] + videoFocusDepth);
+			Transform3D T = createTransformTranslate(-origin_u);
+			tMu = R * T;
+		}
+	}
+
 	Transform3D rMu = rMpr * prMt * tMu;
 	mPipeline->setActorUserMatrix(rMu.getVtkMatrix());
+}
+
+void VideoSourceGraphics::updateBronchoscopyTool()
+{
+	std::map<QString, ToolPtr> tools = mServices->tracking()->getTools();
+	if(isBronchoscopyTool(mTool))
+	{
+		if(!isToolInToolMap(tools, mTool))
+		{
+			if(mOriginalTool)
+				setTool(mOriginalTool); //Return to original tool if bronchoscopy tool is disabled
+		}
+		return;
+	}
+
+	for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
+	{
+		ToolPtr bronchoscopyTool = iter->second;
+		if(isBronchoscopyTool(bronchoscopyTool))
+			if(mTool->getUid() == bronchoscopyTool->getUid()) //Assuming tool uids are equal. See cxBronchoscopyTool
+			{
+				mOriginalTool = mTool;
+				setTool(bronchoscopyTool);
+			}
+	}
+}
+
+bool  VideoSourceGraphics::isToolInToolMap(std::map<QString, ToolPtr> tools, ToolPtr tool)
+{
+	for (std::map<QString, ToolPtr>::const_iterator iter = tools.begin(); iter != tools.end(); ++iter)
+	{
+		if (tool == iter->second)
+			return true;
+	}
+	return false;
+}
+
+bool VideoSourceGraphics::isBronchoscopyTool(ToolPtr tool)
+{
+	QString toolName = tool->getName();
+	if(toolName.contains("Bronchoscopy Navigation", Qt::CaseInsensitive))
+		return true;
+	return false;
 }
 
 void VideoSourceGraphics::newDataSlot()
