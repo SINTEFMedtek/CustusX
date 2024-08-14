@@ -264,6 +264,8 @@ QString Raidionics::colorForLungClass(QString outputClass)
 		color = "254,175,180,43";break;
 	case otLYMPH_NODES:
 		color = "0,255,0,255";break;
+	case otTUMOR:
+		color = "255,255,0,255";break;
 	case otVENA_CAVA:
 		color = "153,153,255,255";break;
 	case otAORTIC_ARCH:

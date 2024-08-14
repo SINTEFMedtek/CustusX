@@ -146,7 +146,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 {
 	"UNKNOWN",
 	"Lungs",
-	"Tumors",
+	"Tumor",
 	"Nodules",
 	"Lymph Nodes",
 	"Vena Azygos",
@@ -183,6 +183,7 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"Airways",
 	"Lungs",
 	"LymphNodes",
+	"Tumor",
 	"VenaCava",
 	"AorticArch",
 	"AscendingAorta",
@@ -195,7 +196,6 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, ORGAN_TYPE, organtypeCOUNT)
 	"SubclavianArtery", //"SubCarArt" in Raidionics
 	"Azygos",
 	"Esophagus",
-	"Tumors",
 	"Nodules",
 	"LungVessels",
 	"AirwaysEnhanced",
