@@ -178,7 +178,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 	{
 		lsUNKNOWN,
 		lsLUNG, // The following enums are used for as buttons in StructuresSelectionWidget. lsLUNG is the first button.
-		lsTUMORS,
+		lsTUMOR,
 		lsNODULES,
 		lsLYMPH_NODES,
 		lsVENA_AZYGOS,
@@ -217,6 +217,7 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		otAIRWAYS, //Start Raidionics structures. Update otRAIDIONICS_BEGIN
 		otLUNGS,
 		otLYMPH_NODES,
+		otTUMOR,
 		otVENA_CAVA,
 		otAORTIC_ARCH,
 		otASCENDING_AORTA,
@@ -229,7 +230,6 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		otSUBCLAVIAN_ARTERY,
 		otAZYGOS,
 		otESOPHAGUS, //End Raidionics structures. Update otRAIDIONICS_END
-		otTUMORS,
 		otNODULES,
 		otLUNG_VESSELS,
 		otAIRWAYS_ENHANCED,
