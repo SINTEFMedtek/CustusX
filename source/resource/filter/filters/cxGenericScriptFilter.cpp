@@ -72,8 +72,10 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 	// Parse .ini file
 	QSettings settings(parameterFilePath, QSettings::IniFormat);
 	settings.beginGroup("output");
-	mCreateOutputVolume = settings.value("volume").toBool();
-	mCreateOutputMesh = settings.value("mesh").toBool();
+	QString createOutputVolumeList = settings.value("volume").toString();
+	mCreateOutputVolumeList = createOutputVolumeList.split(" ");
+	QString createOutputMeshList = settings.value("mesh").toString();
+	mCreateOutputMeshList = createOutputMeshList.split(" ");
 	QString allColors = settings.value("color").toString();
 	mOutputColorList = allColors.split(";");
 	QString outputClass = settings.value("classes").toString();
@@ -701,13 +703,10 @@ bool GenericScriptFilter::postProcess()
 	//Need to put all postProcess code in a separate (worker) class and use moveToThread()
 //	QThread* mPostprosessingThread = new QThread;
 
-	bool createOutputVolume = mOutputVariables.mCreateOutputVolume;
-	bool createOutputMesh = mOutputVariables.mCreateOutputMesh;
-
 	this->setOutputClasses(mOutputClasses);
 	this->setOutputColorsFromClasses();
 
-	return readGeneratedSegmentationFiles(createOutputVolume, createOutputMesh);
+	return readGeneratedSegmentationFiles(mOutputVariables.mCreateOutputVolumeList, mOutputVariables.mCreateOutputMeshList);
 }
 
 void GenericScriptFilter::setOutputClasses(QStringList outputClasses)
@@ -800,7 +799,7 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
 }
 
-bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh)
+bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutputVolumeList, QStringList createOutputMeshList)
 {
 	ImagePtr parentImage = this->getCopiedInputImage();
 	if(!parentImage)
@@ -863,9 +862,21 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(bool createOutputVolume
 				CX_LOG_WARNING() << "GenericScriptFilter::readGeneratedSegmentationFiles: Problem creating derived image";
 				continue;
 			}
+
+			bool createOutputVolume = false;
+			if(createOutputVolumeList.size() > classNumber)
+				createOutputVolume = (createOutputVolumeList.at(classNumber) == "true");
+			else if(createOutputVolumeList.size() > 0)
+				createOutputVolume = (createOutputVolumeList.at(0) == "true");
+
 			if (createOutputVolume || (organType==otAIRWAYS))//Always create volume for Airways
 				this->createOutputVolume();
 
+			bool createOutputMesh = false;
+			if(createOutputMeshList.size() > classNumber)
+				createOutputMesh = (createOutputMeshList.at(classNumber) == "true");
+			else if(createOutputMeshList.size() > 0)
+				createOutputMesh = (createOutputMeshList.at(0) == "true");
 
 			if(createOutputMesh && mOutputImage)
 			{
