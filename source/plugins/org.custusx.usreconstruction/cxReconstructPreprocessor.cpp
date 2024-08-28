@@ -64,6 +64,11 @@ std::vector<ProcessedUSInputDataPtr> ReconstructPreprocessor::createProcessedInp
 											 mFileData.getMask(),
 											 mFileData.mFilename,
 											 QFileInfo(mFileData.mFilename).completeBaseName() ));
+		if(!mFileData.getMask())
+		{
+			CX_LOG_ERROR() << "ReconstructPreprocessor::createProcessedInput: No US mask";
+			return retval;
+		}
 		CX_ASSERT(Eigen::Array3i(frames[i][0]->GetDimensions()).isApprox(Eigen::Array3i(mFileData.getMask()->GetDimensions())));
 		retval.push_back(input);
 	}

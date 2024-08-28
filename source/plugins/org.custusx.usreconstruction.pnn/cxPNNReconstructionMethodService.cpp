@@ -64,7 +64,11 @@ void optimizedCoordTransform(Vector3D* p, boost::array<double, 16> tt)
 bool PNNReconstructionMethodService::reconstruct(ProcessedUSInputDataPtr input,
 		vtkImageDataPtr outputData, QDomElement settings)
 {
-	input->validate();
+	if(!input || !input->validate())
+	{
+		CX_LOG_WARNING() << "PNNReconstructionMethodService::reconstruct: Invalid input";
+		return false;
+	}
 
 	std::vector<TimedPosition> frameInfo = input->getFrames();
 	if (frameInfo.empty())
