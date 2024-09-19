@@ -256,6 +256,8 @@ void GenericScriptFilter::scriptFileChanged()
 	mOutputVariables = OutputVariables(parameterFilePath);
 	mOutputClasses = mOutputVariables.mOutputClasses;
 	mOutputColorList = mOutputVariables.mOutputColorList;
+//	mCreateOutputVolumeList = mOutputVariables.mCreateOutputVolumeList;
+//	mCreateOutputMeshList = mOutputVariables.mCreateOutputMeshList;
 }
 
 QString GenericScriptFilter::createCommandString(ImagePtr input)
@@ -863,20 +865,20 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 				continue;
 			}
 
-			bool createOutputVolume = false;
-			if(createOutputVolumeList.size() > classNumber)
-				createOutputVolume = (createOutputVolumeList.at(classNumber) == "true");
-			else if(createOutputVolumeList.size() > 0)
-				createOutputVolume = (createOutputVolumeList.at(0) == "true");
+			bool createOutputVolumeBool = false;
+			if(createOutputVolumeList.size() > 0)
+				createOutputVolumeBool = (createOutputVolumeList.at(0) == "true"); //if set to true in parameters file -> do it for all classes
+			if(!createOutputVolumeBool)
+				createOutputVolumeBool = createOutputVolumeList.contains(mOutputClasses.at(classNumber)); //only for the classes listed in the parameters file
 
-			if (createOutputVolume || (organType==otAIRWAYS))//Always create volume for Airways
+			if (createOutputVolumeBool || (organType==otAIRWAYS))//Always create volume for Airways
 				this->createOutputVolume();
 
 			bool createOutputMesh = false;
-			if(createOutputMeshList.size() > classNumber)
-				createOutputMesh = (createOutputMeshList.at(classNumber) == "true");
-			else if(createOutputMeshList.size() > 0)
-				createOutputMesh = (createOutputMeshList.at(0) == "true");
+			if(createOutputMeshList.size() > 0)
+				createOutputMesh = (createOutputMeshList.at(0) == "true"); //if set to true in parameters file -> do it for all classes
+			if(!createOutputMesh)
+				createOutputMesh = createOutputMeshList.contains(mOutputClasses.at(classNumber)); //only for the classes listed in the parameters file
 
 			if(createOutputMesh && mOutputImage)
 			{
@@ -886,7 +888,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 				this->createOutputMesh(outputColor);
 			}
 			if(!isUsingRaidionicsEngine())
-				this->deleteNotUsedFiles(filePath, createOutputVolume);
+				this->deleteNotUsedFiles(filePath, createOutputVolumeBool);
 		}
 		else if(filePath.contains(outputFileNamesNoExtention) && filePath.contains(".vtk"))
 		{
