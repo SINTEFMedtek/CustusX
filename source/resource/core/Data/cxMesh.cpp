@@ -456,4 +456,14 @@ void Mesh::save(const QString& basePath, FileManagerServicePtr fileManager)
 
 }
 
+void Mesh::setVolumeSize(double size  /*cm³/ml*/)
+{
+	mVolumeSize = size;
+}
+
+double Mesh::getVolumeSize()
+{
+	return mVolumeSize;
+}
+
 } // namespace cx
