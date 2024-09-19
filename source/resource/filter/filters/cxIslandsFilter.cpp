@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkCellData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPolyData.h>
+#include <vtkIdTypeArray.h>
 
 #include "cxIslandsFilter.h"
 #include "cxTypeConversions.h"
@@ -98,8 +99,12 @@ bool IslandsFilter::execute()
 		return false;
 	
 	int minimumSize = int(this->getMinimumSizeOption(mOptions)->getValue());
-	
-	mOutputImage = this->execute(inputImage, minimumSize);
+
+	QString uid = inputImage->getUid() + "_Islands%1";
+	QString name = inputImage->getName()+" Islands%1";
+	vtkImageDataPtr inputVtkImage = this->findIslandsInImage(inputImage->getBaseVtkImageData(), minimumSize);
+
+	mOutputImage = this->execute(inputImage, inputVtkImage, uid, name, minimumSize);
 	if(!mOutputImage)
 		return false;
 
@@ -108,22 +113,20 @@ bool IslandsFilter::execute()
 	return true;
 }
 
-ImagePtr IslandsFilter::execute(ImagePtr inputImage, int minimumSize)
+ImagePtr IslandsFilter::execute(ImagePtr baseImage, vtkImageDataPtr inputVtkImage, QString uid, QString name, int minimumSize)
 {
-	if (!inputImage)
+	if (!inputVtkImage)
 		return ImagePtr();
 
-	vtkImageDataPtr labeledImage = this->findIslandsInImage(inputImage->getBaseVtkImageData(), minimumSize);
+	vtkImageDataPtr labeledImage = this->findIslandsInImage(inputVtkImage, minimumSize);
 	if(!labeledImage)
 		return ImagePtr();
 
-	ImagePtr input = this->getCopiedInputImage(0);
+	ImagePtr baseImageCopy = baseImage->copy();
 
-	QString uid = input->getUid() + "_Islands%1";
-	QString name = input->getName()+" Islands%1";
 	ImagePtr output = createDerivedImage(mServices->patient(),
 																			 uid, name,
-																			 labeledImage, input);
+																			 labeledImage, baseImageCopy);
 	output->mergevtkSettingsIntosscTransform();
 
 	if (!output)
@@ -132,7 +135,7 @@ ImagePtr IslandsFilter::execute(ImagePtr inputImage, int minimumSize)
 	mServices->patient()->insertData(output);
 
 	// set output
-	mOutputTypes.front()->setValue(output->getUid());
+//	mOutputTypes.front()->setValue(output->getUid());
 
 	return output;
 }
@@ -151,6 +154,12 @@ bool IslandsFilter::postProcess()
 	return true;
 }
 
+std::vector<double> IslandsFilter::getIslandSizes()
+{
+	return mIslandSizes;
+}
+
+
 vtkImageDataPtr IslandsFilter::findIslandsInImage(vtkImageDataPtr image, int minimumSize)
 {
 	if(!image)
@@ -164,6 +173,17 @@ vtkImageDataPtr IslandsFilter::findIslandsInImage(vtkImageDataPtr image, int min
 	connectivityFilterPtr->SetSizeRange(minimumSize, VTK_ID_MAX);
 	connectivityFilterPtr->Update();
 	vtkImageDataPtr labeledImage = connectivityFilterPtr->GetOutput();
+	vtkIdTypeArray* regionSizes = connectivityFilterPtr->GetExtractedRegionSizes();
+
+	mIslandSizes.clear();
+	double* spacing = image->GetSpacing();
+	double voxelVolume = spacing[0]*spacing[1]*spacing[2] / 1000; //cm³
+
+	for(int i=0; i<regionSizes->GetSize(); i++)
+	{
+		mIslandSizes.push_back(regionSizes->GetValue(i)*voxelVolume);
+		//CX_LOG_DEBUG() << "Region " << i << " - Voxels: " << regionSizes->GetValue(i) << "   Volume: " << mIslandSizes[i];
+	}
 
 	return labeledImage;
 }
