@@ -155,6 +155,7 @@ void Mesh::addXml(QDomNode& dataNode)
 	elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
 	elemGlyph.setAttribute("colorArray", mColorArray.c_str());
 	elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
+	elemGlyph.setAttribute("volumeSize", mVolumeSize);
 	meshNode.appendChild(elemGlyph);
 
 }
@@ -179,6 +180,7 @@ void Mesh::parseXml(QDomNode& dataNode)
 		mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
 		mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
 		mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
+		mVolumeSize = glyphNode.toElement().attribute("volumeSize").toDouble();
 	}
 
 	emit meshChanged();
