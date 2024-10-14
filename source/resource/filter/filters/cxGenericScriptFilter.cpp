@@ -256,8 +256,6 @@ void GenericScriptFilter::scriptFileChanged()
 	mOutputVariables = OutputVariables(parameterFilePath);
 	mOutputClasses = mOutputVariables.mOutputClasses;
 	mOutputColorList = mOutputVariables.mOutputColorList;
-//	mCreateOutputVolumeList = mOutputVariables.mCreateOutputVolumeList;
-//	mCreateOutputMeshList = mOutputVariables.mCreateOutputMeshList;
 }
 
 QString GenericScriptFilter::createCommandString(ImagePtr input)
