@@ -37,8 +37,8 @@ struct cxResourceFilter_EXPORT CommandStringVariables
 
 struct cxResourceFilter_EXPORT OutputVariables
 {
-	bool mCreateOutputVolume = false;
-	bool mCreateOutputMesh = false;
+	QStringList mCreateOutputVolumeList;
+	QStringList mCreateOutputMeshList;
 	QStringList mOutputColorList;
 	QStringList mOutputClasses;
 	bool mValid = false;
@@ -101,7 +101,7 @@ protected:
 	QColor createColor(QStringList color);
 	QColor getDefaultColor();
 	void createOutputMesh(QColor color);
-	bool readGeneratedSegmentationFiles(bool createOutputVolume, bool createOutputMesh);
+	bool readGeneratedSegmentationFiles(QStringList createOutputVolume, QStringList createOutputMesh);
 	QString createImageName(QString parentName, QString filePath);
 	void createOutputVolume();
 	void deleteNotUsedFiles(QString fileNameMhd, bool createOutputVolume);

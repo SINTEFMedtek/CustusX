@@ -76,7 +76,9 @@ public:
 	}
 	bool testReadGeneratedSegmentationFile()
 	{
-		return readGeneratedSegmentationFiles(true, true);
+		QStringList meshOption = {"true"};
+		QStringList volumeOption = {"true"};
+		return readGeneratedSegmentationFiles(meshOption, volumeOption);
 	}
 
 	void setTestScriptFile(bool useLungsFile = false)
@@ -570,8 +572,8 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 
 	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
 	REQUIRE(outputVariables.mValid);
-	REQUIRE(outputVariables.mCreateOutputVolume);
-	REQUIRE(outputVariables.mCreateOutputMesh);
+	REQUIRE(outputVariables.mCreateOutputVolumeList[0] == "true");
+	REQUIRE(outputVariables.mCreateOutputMeshList[0] == "true");
 
 	REQUIRE(outputVariables.mOutputColorList.size() > 0);
 	REQUIRE(filter->testCreateColor(outputVariables.mOutputColorList[0].split(",")) != filter->testGetDefaultColor());

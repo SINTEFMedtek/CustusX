@@ -39,9 +39,10 @@ public:
 	virtual QString getHelp() const;
 	static QString getNameSuffixIslands();
 	ImagePtr getOutputImage();
+	std::vector<double> getIslandSizes();
 
 	virtual bool execute();
-	ImagePtr execute(ImagePtr inputImage, int minimumSize);
+	ImagePtr execute(ImagePtr baseImage, vtkImageDataPtr inputVtkImage, QString uid, QString name, int minimumSize);
 	virtual bool postProcess();
 
 protected:
@@ -54,6 +55,7 @@ private:
 	vtkImageDataPtr findIslandsInImage(vtkImageDataPtr image, int minimumSize);
 
 	ImagePtr mOutputImage;
+	std::vector<double> mIslandSizes;
 };
 
 typedef boost::shared_ptr<IslandsFilter> IslandsFilterPtr;

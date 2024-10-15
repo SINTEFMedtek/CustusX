@@ -93,6 +93,8 @@ public:
 	QStringList getColorArrayList();
 	const MeshPropertyData& getProperties() const;
 	const MeshTextureData& getTextureData() const;
+	void setVolumeSizeMl(double size);
+	double getVolumeSizeMl();
 
 	virtual void save(const QString &basePath, FileManagerServicePtr fileManager);
 signals:
@@ -123,6 +125,7 @@ private:
 	QStringList mColorArrayList;
 	MeshPropertyData mProperties;
 	MeshTextureData mTextureData;
+	double mVolumeSizeMl = 0.0;
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

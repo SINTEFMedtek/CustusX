@@ -155,6 +155,7 @@ void Mesh::addXml(QDomNode& dataNode)
 	elemGlyph.setAttribute("orientationArray", mOrientationArray.c_str());
 	elemGlyph.setAttribute("colorArray", mColorArray.c_str());
 	elemGlyph.setAttribute("glyphLUT", mGlyphLUT.c_str());
+	elemGlyph.setAttribute("volumeSizeMl", mVolumeSizeMl);
 	meshNode.appendChild(elemGlyph);
 
 }
@@ -179,6 +180,7 @@ void Mesh::parseXml(QDomNode& dataNode)
 		mOrientationArray = glyphNode.toElement().attribute("orientationArray").toStdString();
 		mColorArray = glyphNode.toElement().attribute("colorArray").toStdString();
 		mGlyphLUT = glyphNode.toElement().attribute("glyphLUT").toStdString();
+		mVolumeSizeMl = glyphNode.toElement().attribute("volumeSizeMl").toDouble();
 	}
 
 	emit meshChanged();
@@ -454,6 +456,16 @@ void Mesh::save(const QString& basePath, FileManagerServicePtr fileManager)
 	MeshPtr self = MeshPtr(this, null_deleter());
 	fileManager->save(self, filename);
 
+}
+
+void Mesh::setVolumeSizeMl(double size)
+{
+	mVolumeSizeMl = size;
+}
+
+double Mesh::getVolumeSizeMl()
+{
+	return mVolumeSizeMl;
 }
 
 } // namespace cx
