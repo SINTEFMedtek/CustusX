@@ -821,6 +821,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 		outputDir = mRaidionicsUtilities->getOutputFolder();
 	}
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
+//	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputFileNamesNoExtention: " << outputFileNamesNoExtention;
 
 
 

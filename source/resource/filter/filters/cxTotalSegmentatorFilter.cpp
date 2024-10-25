@@ -21,6 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkImageData.h"
 #include "cxPatientModelService.h"
 #include "cxVolumeHelpers.h"
+#include "cxGenericScriptFilter.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -62,7 +64,7 @@ void TotalSegmentatorFilter::createInputTypes()
 
 	temp = StringPropertySelectImage::New(mServices->patient());
 	temp->setValueName("Input");
-	temp->setHelp("Input volume to be segmented.");
+	temp->setHelp("Input volume to be segmented");
 	mInputTypes.push_back(temp);
 }
 
@@ -82,8 +84,12 @@ bool TotalSegmentatorFilter::execute()
 	return true;
 }
 
-ImagePtr TotalSegmentatorFilter::execute(ImagePtr baseImage, vtkImageDataPtr inputVtkImage, QString uid, QString name, int minimumSize)
+ImagePtr TotalSegmentatorFilter::execute(ImagePtr inputImage)
 {
+	GenericScriptFilterPtr scriptFilter = GenericScriptFilterPtr(new GenericScriptFilter(mServices));
+	std::vector <cx::SelectDataStringPropertyBasePtr> input = scriptFilter->getInputTypes();
+	scriptFilter->setParameterFilePath(getFilterScriptsPath() + "python_VesselsInLungs.ini"); //TO DO:Change script
+	input[0]->setValue(inputImage->getUid());
 //	if (!inputVtkImage)
 //		return ImagePtr();
 
@@ -116,6 +122,13 @@ bool TotalSegmentatorFilter::postProcess()
 		mOutputTypes.front()->setValue(mOutputTypes.front()->getData()->getUid());
 
 	return true;
+}
+
+QString TotalSegmentatorFilter::getFilterScriptsPath()
+{
+	QString configPath = DataLocations::getRootConfigPath();
+	QString retval = configPath + "/profiles/Laboratory/filter_scripts/";
+	return retval;
 }
 
 

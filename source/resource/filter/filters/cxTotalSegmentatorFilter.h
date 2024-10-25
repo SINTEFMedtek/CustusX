@@ -43,7 +43,7 @@ public:
 	ImagePtr getOutputMesh(); //TO DO: Add type or name string
 
 	virtual bool execute();
-	ImagePtr execute(ImagePtr baseImage, vtkImageDataPtr inputVtkImage, QString uid, QString name, int minimumSize);
+	ImagePtr execute(ImagePtr inputImage);
 	virtual bool postProcess();
 
 protected:
@@ -52,7 +52,7 @@ protected:
 	virtual void createOutputTypes();
 
 private:
-
+	QString getFilterScriptsPath();
 
 };
 
