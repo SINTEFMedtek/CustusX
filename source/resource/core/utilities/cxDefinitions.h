@@ -217,8 +217,8 @@ extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
 		otUNKNOWN,
 		otAIRWAYS, //Start Raidionics structures. Update otRAIDIONICS_BEGIN
 		otLUNGS,
-		otLYMPH_NODES,
 		otTUMOR,
+		otLYMPH_NODES,
 		otVENA_CAVA,
 		otAORTIC_ARCH,
 		otASCENDING_AORTA,
