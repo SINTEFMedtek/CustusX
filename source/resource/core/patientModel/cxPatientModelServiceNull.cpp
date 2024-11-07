@@ -82,6 +82,12 @@ void PatientModelServiceNull::makeAvailable(const QString &uid, bool available)
 	printWarning();
 }
 
+ImagePtr PatientModelServiceNull::getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const
+{
+	printWarning();
+	return ImagePtr();
+}
+
 std::map<QString, VideoSourcePtr> PatientModelServiceNull::getStreams() const
 {
 	printWarning();
