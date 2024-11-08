@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxReconstructCore.h"
 #include "cxPatientModelService.h"
 #include "cxViewService.h"
+#include "cxLogger.h"
 
 //Windows fix
 #ifndef M_PI
@@ -53,6 +54,11 @@ void ThreadedTimedReconstructPreprocessor::calculate()
 		angio.push_back(mCores[i]->getInputParams().mAngio);
 
 	std::vector<cx::ProcessedUSInputDataPtr> processedInput = mInput->createProcessedInput(angio);
+	if(processedInput.size() < mCores.size())
+	{
+		CX_LOG_ERROR() << "ThreadedTimedReconstructPreprocessor::calculate. Not enough data processedInput.size() < mCores.size():" << processedInput.size() << " < " << mCores.size();
+		return;
+	}
 
 	for (unsigned i=0; i<mCores.size(); ++i)
 	{
