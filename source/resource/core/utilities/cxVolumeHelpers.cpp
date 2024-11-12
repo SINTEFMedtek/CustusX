@@ -406,6 +406,48 @@ vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth
 	return retval;
 }
 
+vtkImageDataPtr shiftVtkScalarToUnsignedShort(vtkImageDataPtr input)
+{
+	vtkImageShiftScalePtr cast = vtkImageShiftScalePtr::New();
+	cast->SetInputData(input);
+	cast->ClampOverflowOn();
+
+	int shift = 0;
+	if (input->GetScalarTypeMin() < 0)
+		shift = -input->GetScalarRange()[0];
+
+	cast->SetShift(shift);
+	cast->SetOutputScalarType(VTK_UNSIGNED_SHORT);
+	cast->Update();
+
+	return cast->GetOutput();
+}
+
+vtkImageDataPtr mergeBinaryImages(vtkImageDataPtr imageA, vtkImageDataPtr imageB)
+{
+	vtkImageDataPtr imageAB = vtkImageDataPtr::New();
+
+	int* dimImageA = imageA->GetDimensions();
+	int* dimImageB = imageB->GetDimensions();
+	if(dimImageA[0]!=dimImageB[0] || dimImageA[2]!=dimImageB[2] || dimImageA[2]!=dimImageB[2])
+		return imageAB;
+
+	imageA = shiftVtkScalarToUnsignedShort(imageA);
+	imageB = shiftVtkScalarToUnsignedShort(imageB);
+
+	imageAB->DeepCopy(imageA);
+
+	unsigned short* dataPtrImageB = static_cast<unsigned short*>(imageB->GetScalarPointer());
+	unsigned short* dataPtrImageAB = static_cast<unsigned short*>(imageAB->GetScalarPointer());
+
+	int numberOfVoxels = dimImageB[0]*dimImageB[1]*dimImageB[2];
+	for (int index = 0; index<numberOfVoxels; index++)
+		if(dataPtrImageB[index] > 0)
+			dataPtrImageAB[index] = 1;
+
+	return imageAB;
+}
+
 void setDeepModified(vtkImageDataPtr image)
 {
 	image->Modified();
