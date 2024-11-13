@@ -53,6 +53,7 @@ public:
 	virtual DataPtr importData(QString fileName, QString &infoText);
 	virtual void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace);
 	virtual void removeData(QString uid);
+	virtual ImagePtr getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const;
 
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
 

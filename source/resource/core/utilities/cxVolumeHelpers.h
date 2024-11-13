@@ -72,6 +72,9 @@ cxResource_EXPORT vtkImageDataPtr convertFrom4To3Components(vtkImageDataPtr imag
 
 cxResource_EXPORT vtkImageDataPtr convertImageDataTo8Bit(vtkImageDataPtr image, double windowWidth, double windowLevel);///< Have never been used or tested. Create a test for it
 
+cxResource_EXPORT vtkImageDataPtr shiftVtkScalarToUnsignedShort(vtkImageDataPtr image);
+cxResource_EXPORT vtkImageDataPtr mergeBinaryImages(vtkImageDataPtr imageA, vtkImageDataPtr imageB);
+
 /** Call after the image contents has been changed throug GetScalarPointer()
   *
   * Set modified on a vtkImageData and inner classes.
