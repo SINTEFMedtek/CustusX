@@ -15,8 +15,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkMatrix4x4.h>
 #include <vtkImageSliceMapper.h>
 #include <vtkImageSlice.h>
-#include "cxLogger.h"
 
+#include "cxLogger.h"
 #include "cxSlicedImageProxy.h"
 #include "cxImage.h"
 #include "cxView.h"

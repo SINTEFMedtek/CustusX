@@ -11,20 +11,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxtestVideoGraphicsFixture.h"
 
-#include "cxVideoGraphics.h"
 #include <vtkCamera.h>
 #include <vtkImageData.h>
 #include <vtkActor.h>
 #include <vtkImageSliceMapper.h>
 #include <vtkImageSlice.h>
 
-#include "cxBoundingBox3D.h"
-#include "cxView.h"
-#include "cxTypeConversions.h"
-
+#include "cxVideoGraphics.h"
 #include "cxProbeDefinition.h"
 #include "cxProbeSector.h"
-#include "cxDummyTool.h"
 #include "cxUtilHelpers.h"
 #include "cxXmlOptionItem.h"
 #include "cxtestUtilities.h"
