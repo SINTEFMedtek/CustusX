@@ -14,8 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <boost/shared_ptr.hpp>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include <vtkImageActor.h>
 #include <vtkSelectVisiblePoints.h>
+#include <vtkImageSlice.h>
 
 #include "cxTypeConversions.h"
 #include "cxCustomMetric.h"
@@ -46,7 +46,7 @@ void CustomMetricRep::clear()
 	mMeshGeometry.clear();
 	for(int i = 0; i < mImageGeometryProxy.size(); ++i)
 	{
-		this->getRenderer()->RemoveActor(mImageGeometryProxy[i]->getActor());
+		this->getRenderer()->RemoveViewProp(mImageGeometryProxy[i]->getSlice());
 	}
 	mImageGeometryProxy.clear();
 }
@@ -105,7 +105,7 @@ void CustomMetricRep::updateImageModel(DataPtr model)
 			mImageGeometryProxy[i] = cx::Image2DProxy::New();
 
 		mImageGeometryProxy[i]->setImage(imageModel);
-		this->getRenderer()->AddActor(mImageGeometryProxy[i]->getActor());
+		this->getRenderer()->AddViewProp(mImageGeometryProxy[i]->getSlice());
 
 		mImageGeometryProxy[i]->setTransformOffset(pos[i]);
 	}

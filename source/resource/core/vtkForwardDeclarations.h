@@ -62,7 +62,6 @@ typedef vtkSmartPointer<class vtkGLSLShaderDeviceAdapter2 > vtkGLSLShaderDeviceA
 typedef vtkSmartPointer<class vtkGlyph3DMapper> vtkGlyph3DMapperPtr;
 typedef vtkSmartPointer<class vtkIdList> vtkIdListPtr;
 typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
-typedef vtkSmartPointer<class vtkImageActor> vtkImageActorPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 typedef vtkSmartPointer<class vtkImageAppendComponents > vtkImageAppendComponentsPtr;
 typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
@@ -79,6 +78,7 @@ typedef vtkSmartPointer<class vtkImagePlaneWidget> vtkImagePlaneWidgetPtr;
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkImageShrink3D> vtkImageShrink3DPtr;
+typedef vtkSmartPointer<class vtkImageSlice> vtkImageSlicePtr;
 typedef vtkSmartPointer<class vtkImageThreshold> vtkImageThresholdPtr;
 typedef vtkSmartPointer<class vtkInteractorStyleFlight> vtkInteractorStyleFlightPtr;
 typedef vtkSmartPointer<class vtkInteractorStyleTrackballCamera> vtkInteractorStyleTrackballCameraPtr;
