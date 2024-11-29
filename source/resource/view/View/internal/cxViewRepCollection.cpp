@@ -13,8 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
-#include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 
 #include "cxRep.h"
 #include "cxTypeConversions.h"

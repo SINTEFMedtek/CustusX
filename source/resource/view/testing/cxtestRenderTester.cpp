@@ -19,7 +19,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPNGWriter.h>
 #include <vtkPNGReader.h>
 #include <vtkRenderWindowInteractor.h>
-#include <vtkImageActor.h>
 #include <vtkCamera.h>
 #include <vtkImageClip.h>
 #include <vtkImageDifference.h>

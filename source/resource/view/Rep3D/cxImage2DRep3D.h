@@ -54,7 +54,7 @@ public:
 //	SliceProxyPtr getSliceProxy() { return mSliceProxy; }
 //	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
-	vtkImageActorPtr getActor();
+	vtkImageSlicePtr getSlice();
 
 	void setTransformOffset(Transform3D rMrr);
 protected:
@@ -67,7 +67,7 @@ private slots:
 private:
 	ApplyLUTToImage2DProxyPtr mImageWithLUTProxy;
 	ImagePtr mImage;
-	vtkImageActorPtr mActor;
+	vtkImageSlicePtr mSlice;
 	Transform3D m_rMrr;
 };
 
@@ -80,7 +80,7 @@ typedef boost::shared_ptr<class Image2DRep3D> Image2DRep3DPtr;
  *
  * The standard VolumetricRep does not handle 2D volumes,
  * because the vtkVolume does not handle it.
- * This rep handles it though the use of a vtkImageActor.
+ * This rep handles it though the use of a vtkImageSlice.
  *
  * \ingroup cx_resource_view
  * \date March 12, 2013

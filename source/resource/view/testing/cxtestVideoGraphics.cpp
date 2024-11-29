@@ -11,7 +11,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestVideoGraphicsFixture.h"
 #include "catch.hpp"
 #include "cxProbeSector.h"
-#include "cxVtkHelperClasses.h"
 
 TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Render Image", "[unit][resource][visualization]")
 {
