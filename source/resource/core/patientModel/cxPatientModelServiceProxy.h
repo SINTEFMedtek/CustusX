@@ -54,6 +54,7 @@ public:
 	virtual RegistrationHistoryPtr get_rMpr_History() const;
 
 	virtual ActiveDataPtr getActiveData() const;
+	virtual ImagePtr getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const;
 
 	virtual CLINICAL_VIEW getClinicalApplication() const;
 	virtual void setClinicalApplication(CLINICAL_VIEW application);

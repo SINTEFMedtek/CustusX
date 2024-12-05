@@ -14,29 +14,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMainWindow>
 #include <QApplication>
 
-#include "cxtestUtilities.h"
-#include "cxImage.h"
-#include "cxVtkHelperClasses.h"
-#include "cxVolumeHelpers.h"
-#include "cxTypeConversions.h"
-#include "cxViewCollectionWidget.h"
-#include "cxForwardDeclarations.h"
-#include "cxViewWidget.h"
-#include "cxMultiViewCache.h"
-#include "cxViewCollectionWidgetUsingViewWidgets.h"
-#include "cxLogger.h"
-#include "cxDataLocations.h"
-#include "cxLogicManager.h"
-#include "cxSettings.h"
-#include "cxViewGroupData.h"
-
 #include <vtkRenderWindowInteractor.h>
 #include <vtkTextMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkTextProperty.h>
 #include <vtkActor2D.h>
 #include <vtkRendererCollection.h>
-#include <vtkImageActor.h>
 #include <vtkImageData.h>
 #include <vtkCamera.h>
 #include <vtkSmartVolumeMapper.h>
@@ -44,6 +27,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPiecewiseFunction.h>
 #include <vtkGenericOpenGLRenderWindow.h>
 #include <QVTKOpenGLNativeWidget.h>
+
+#include "cxViewService.h"
+#include "cxVolumeHelpers.h"
+#include "cxTypeConversions.h"
+#include "cxViewCollectionWidget.h"
+#include "cxForwardDeclarations.h"
+#include "cxDataLocations.h"
+#include "cxLogicManager.h"
+#include "cxSettings.h"
 
 namespace cxtest
 {

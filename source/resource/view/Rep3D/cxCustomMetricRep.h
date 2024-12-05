@@ -15,11 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceVisualizationExport.h"
 
 #include "cxDataMetricRep.h"
-#include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
-#include "cxGraphicalObjectWithDirection.h"
-#include "cxTransform3D.h"
-
 
 namespace cx
 {
@@ -41,10 +37,10 @@ class cxResourceVisualization_EXPORT CustomMetricRep: public DataMetricRep
 {
 Q_OBJECT
 public:
-    static CustomMetricRepPtr New(const QString& uid = ""); ///constructor
-    virtual ~CustomMetricRep() {}
+	static CustomMetricRepPtr New(const QString& uid = ""); ///constructor
+	virtual ~CustomMetricRep() {}
 
-    virtual QString getType() const { return "CustomMetricRep"; }
+	virtual QString getType() const { return "CustomMetricRep"; }
 
 protected:
 	virtual void clear();
@@ -52,8 +48,8 @@ protected:
 
 	virtual void onEveryRender();
 private:
-    CustomMetricRep();
-    CustomMetricPtr getCustomMetric();
+	CustomMetricRep();
+	CustomMetricPtr getCustomMetric();
 	void updateModel();
 
 	std::vector<GraphicalGeometricPtr> mMeshGeometry;

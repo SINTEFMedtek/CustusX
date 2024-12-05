@@ -10,12 +10,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "cxImage2DRep3D.h"
 
-#include "vtkRenderer.h"
-#include "vtkImageActor.h"
-#include "vtkImageData.h"
-#include "vtkMatrix4x4.h"
-#include "cxLogger.h"
+#include <vtkRenderer.h>
+#include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
+#include <vtkImageSliceMapper.h>
+#include <vtkImageSlice.h>
 
+#include "cxLogger.h"
 #include "cxSlicedImageProxy.h"
 #include "cxImage.h"
 #include "cxView.h"
@@ -29,7 +30,10 @@ namespace cx
 Image2DProxy::Image2DProxy()
 {
 	m_rMrr = Transform3D::Identity();
-	mActor = vtkImageActorPtr::New();
+	mSlice = vtkImageSlicePtr::New();
+	vtkNew<vtkImageSliceMapper> imageSliceMapper;
+	mSlice->SetMapper(imageSliceMapper);
+
 	mImageWithLUTProxy.reset(new ApplyLUTToImage2DProxy());
 }
 
@@ -43,9 +47,9 @@ Image2DProxyPtr Image2DProxy::New()
 	return Image2DProxyPtr(new Image2DProxy());
 }
 
-vtkImageActorPtr Image2DProxy::getActor()
+vtkImageSlicePtr Image2DProxy::getSlice()
 {
-	return mActor;
+	return mSlice;
 }
 
 void Image2DProxy::setImage(ImagePtr image)
@@ -89,7 +93,7 @@ void Image2DProxy::setImage(ImagePtr image)
 
 void Image2DProxy::vtkImageDataChangedSlot()
 {
-	mActor->SetInputData(mImageWithLUTProxy->getOutput());
+	mSlice->GetMapper()->SetInputData(mImageWithLUTProxy->getOutput());
 }
 
 /**called when transform is changed
@@ -104,7 +108,7 @@ void Image2DProxy::transformChangedSlot()
 	Transform3D rrMd = mImage->get_rMd();
 	Transform3D rMd = m_rMrr * rrMd;
 
-	mActor->SetUserMatrix(rMd.getVtkMatrix());
+	mSlice->SetUserMatrix(rMd.getVtkMatrix());
 }
 
 void Image2DProxy::transferFunctionsChangedSlot()
@@ -142,12 +146,12 @@ void Image2DRep3D::setImage(ImagePtr image)
 
 void Image2DRep3D::addRepActorsToViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->AddActor(mProxy->getActor());
+	view->getRenderer()->AddViewProp(mProxy->getSlice());
 }
 
 void Image2DRep3D::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->RemoveActor(mProxy->getActor());
+	view->getRenderer()->RemoveViewProp(mProxy->getSlice());
 }
 
 

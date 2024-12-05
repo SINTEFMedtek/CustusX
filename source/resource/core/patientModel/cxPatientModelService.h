@@ -109,8 +109,10 @@ public:
 
 	// extended Data interface
 	template <class DATA>
-	std::map<QString, boost::shared_ptr<DATA> > getDataOfType() const;
+	std::map<QString, boost::shared_ptr<DATA> > getDataOfType(ORGAN_TYPE organtype = organtypeCOUNT) const;
 	DataPtr getData(const QString& uid) const;
+	template <class DATA>
+	boost::shared_ptr<DATA> getData(ORGAN_TYPE organtype) const;
 	template <class DATA>
 	boost::shared_ptr<DATA> getData(const QString& uid) const;
 	template<class DATA>
@@ -142,6 +144,7 @@ public:
 
 	virtual QString getActivePatientFolder() const = 0;
 	QString generateFilePath(QString folderName, QString ending);
+	virtual ImagePtr getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const = 0;
 
 	virtual bool isPatientValid() const = 0;
 	virtual DataPtr importData(QString fileName, QString &infoText) = 0;
@@ -179,7 +182,7 @@ signals:
 
 
 template <class DATA>
-std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType() const
+std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType(ORGAN_TYPE organtype) const
 {
 	std::map<QString, DataPtr> data = this->getDatas();
 	std::map<QString, boost::shared_ptr<DATA> > retval;
@@ -187,9 +190,20 @@ std::map<QString, boost::shared_ptr<DATA> > PatientModelService::getDataOfType()
 	{
 		boost::shared_ptr<DATA> val = boost::dynamic_pointer_cast<DATA>(i->second);
 		if (val)
-			retval[val->getUid()] = val;
+			if(organtype == organtypeCOUNT || organtype == val->getOrganType())
+				retval[val->getUid()] = val;
 	}
 	return retval;
+}
+
+template <class DATA>
+boost::shared_ptr<DATA> PatientModelService::getData(ORGAN_TYPE organtype) const
+{
+	std::map<QString, boost::shared_ptr<DATA>> data = this->getDataOfType<DATA>(organtype);
+	if(data.empty())
+		return boost::shared_ptr<DATA>();
+
+	return data.begin()->second;
 }
 
 template <class DATA>

@@ -229,6 +229,11 @@ ActiveDataPtr PatientModelServiceProxy::getActiveData() const
 	return mPatientModelService->getActiveData();
 }
 
+ImagePtr PatientModelServiceProxy::getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const
+{
+	return mPatientModelService->getImage(modality, subtype);
+}
+
 CLINICAL_VIEW PatientModelServiceProxy::getClinicalApplication() const
 {
 	return mPatientModelService->getClinicalApplication();

@@ -14,12 +14,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <boost/shared_ptr.hpp>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
-#include <vtkImageActor.h>
 #include <vtkSelectVisiblePoints.h>
+#include <vtkImageSlice.h>
 
-#include "cxTypeConversions.h"
 #include "cxCustomMetric.h"
-#include "cxLogger.h"
 #include "cxBoundingBox3D.h"
 #include "cxGeometricRep.h"
 #include "cxMesh.h"
@@ -27,13 +25,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage2DRep3D.h"
 #include "cxGraphicalPrimitives.h"
 
-
 namespace cx
 {
 
 CustomMetricRepPtr CustomMetricRep::New(const QString& uid)
 {
-    return wrap_new(new CustomMetricRep(), uid);
+	return wrap_new(new CustomMetricRep(), uid);
 }
 
 CustomMetricRep::CustomMetricRep()
@@ -46,14 +43,14 @@ void CustomMetricRep::clear()
 	mMeshGeometry.clear();
 	for(int i = 0; i < mImageGeometryProxy.size(); ++i)
 	{
-		this->getRenderer()->RemoveActor(mImageGeometryProxy[i]->getActor());
+		this->getRenderer()->RemoveViewProp(mImageGeometryProxy[i]->getSlice());
 	}
 	mImageGeometryProxy.clear();
 }
 
 CustomMetricPtr CustomMetricRep::getCustomMetric()
 {
-    return boost::dynamic_pointer_cast<CustomMetric>(mMetric);
+	return boost::dynamic_pointer_cast<CustomMetric>(mMetric);
 }
 
 void CustomMetricRep::onModifiedStartRender()
@@ -76,7 +73,7 @@ void CustomMetricRep::updateModel()
 	CustomMetricPtr custom = this->getCustomMetric();
 
 	if (!this->getView() || !custom)
-	   return;
+		return;
 
 	DataPtr model = custom->getModel();
 
@@ -105,7 +102,7 @@ void CustomMetricRep::updateImageModel(DataPtr model)
 			mImageGeometryProxy[i] = cx::Image2DProxy::New();
 
 		mImageGeometryProxy[i]->setImage(imageModel);
-		this->getRenderer()->AddActor(mImageGeometryProxy[i]->getActor());
+		this->getRenderer()->AddViewProp(mImageGeometryProxy[i]->getSlice());
 
 		mImageGeometryProxy[i]->setTransformOffset(pos[i]);
 	}

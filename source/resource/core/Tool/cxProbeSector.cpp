@@ -28,6 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoundingBox3D.h"
 #include "cxVolumeHelpers.h"
 #include "cxUtilHelpers.h"
+#include "cxLogger.h"
 
 typedef vtkSmartPointer<class vtkPlanes> vtkPlanesPtr;
 typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
@@ -131,7 +132,10 @@ private:
 vtkImageDataPtr ProbeSector::getMask()
 {
 	if (mData.getType()==ProbeDefinition::tNONE)
+	{
+		CX_LOG_WARNING() << "ProbeSector::getMask: Missing probe type: " << mData.getType();
 		return vtkImageDataPtr();
+	}
 	InsideMaskFunctor checkInside(mData, this->get_uMv());
 	vtkImageDataPtr retval;
 	retval = generateVtkImageData(Eigen::Array3i(mData.getSize().width(), mData.getSize().height(), 1),

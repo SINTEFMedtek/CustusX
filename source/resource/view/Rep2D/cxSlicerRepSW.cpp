@@ -12,15 +12,16 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSlicerRepSW.h"
 
-#include <vtkImageActor.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
+#include <vtkImageSliceMapper.h>
+#include <vtkImageMapper3D.h>
+#include <vtkImageAlgorithm.h>
+#include <vtkImageSlice.h>
 
 #include "cxView.h"
 #include "cxImage.h"
 #include "cxSlicedImageProxy.h"
-#include "vtkImageMapper3D.h"
-#include "vtkImageAlgorithm.h"
 
 namespace cx
 {
@@ -29,9 +30,12 @@ SliceRepSW::SliceRepSW() :
 	RepImpl()
 {
 	mImageSlicer.reset(new SlicedImageProxy());
-	mImageActor = vtkImageActorPtr::New();
-	mImageActor->GetMapper()->SetInputConnection(mImageSlicer->getOutputPort()->GetOutputPort());
-//	mImageActor->SetInput(mImageSlicer->getOutputPort());
+
+	vtkNew<vtkImageSliceMapper> imageSliceMapper;
+	imageSliceMapper->SetInputConnection(mImageSlicer->getOutputPort()->GetOutputPort());
+
+	mImageSlice = vtkImageSlicePtr::New();
+	mImageSlice->SetMapper(imageSliceMapper);
 }
 
 SliceRepSW::~SliceRepSW()
@@ -46,11 +50,6 @@ SliceRepSWPtr SliceRepSW::New(const QString& uid)
 ImagePtr SliceRepSW::getImage() 
 {
 	return mImageSlicer->getImage(); 
-}
-
-vtkImageActorPtr SliceRepSW::getActor()
-{
-	return mImageActor; 
 }
 
 /**This method set the image, that has all the information in it self.
@@ -75,12 +74,12 @@ void SliceRepSW::setSliceProxy(SliceProxyInterfacePtr slicer)
 
 void SliceRepSW::addRepActorsToViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->AddActor(mImageActor);
+	view->getRenderer()->AddActor(mImageSlice);
 }
 
 void SliceRepSW::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->RemoveActor(mImageActor);
+	view->getRenderer()->RemoveActor(mImageSlice);
 }
 
 bool SliceRepSW::hasImage(ImagePtr image) const

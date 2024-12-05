@@ -47,7 +47,6 @@ public:
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
 	ImagePtr getImage();
-	vtkImageActorPtr getActor();
 	void setSliceProxy(SliceProxyInterfacePtr slicer);
 	QString getImageUid()const;
 	void update();
@@ -60,7 +59,7 @@ protected:
 
 private:
 	SlicedImageProxyPtr mImageSlicer;
-	vtkImageActorPtr mImageActor;
+	vtkImageSlicePtr mImageSlice;
 };
 
 }// namespace cx

@@ -66,6 +66,7 @@ public:
 	virtual void exportPatient(PATIENT_COORDINATE_SYSTEM externalSpace);
 	virtual void removeData(QString uid);
 	virtual PresetTransferFunctions3DPtr getPresetTransferFunctions3D() const;
+	virtual ImagePtr getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const;
 
 	virtual void setCenter(const Vector3D& center);
 	virtual Vector3D getCenter() const;

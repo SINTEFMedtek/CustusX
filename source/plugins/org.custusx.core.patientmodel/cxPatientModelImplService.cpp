@@ -251,6 +251,22 @@ PresetTransferFunctions3DPtr PatientModelImplService::getPresetTransferFunctions
 	return dataService()->getPresetTransferFunctions3D();
 }
 
+ImagePtr PatientModelImplService::getImage(IMAGE_MODALITY modality, IMAGE_SUBTYPE subtype) const
+{
+	std::map<QString, ImagePtr> images = getDataOfType<Image>();
+	std::map<QString, ImagePtr>::iterator it = images.begin();
+	ImagePtr image;
+	for( ; it != images.end(); ++it)
+	{
+		if((it->second->getModality() == modality) && (it->second->getImageType() == subtype))
+		{
+			image = it->second;
+			return image;
+		}
+	}
+	return image;
+}
+
 void PatientModelImplService::setCenter(const Vector3D &center)
 {
 	this->dataService()->setCenter(center);
