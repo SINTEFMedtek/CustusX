@@ -52,6 +52,7 @@ private:
 	double_pair ensureNonZeroRoundedRange(double_pair range) const;
 	bool isUnsignedChar() const;
 	bool looksLikeBinaryImage() const;
+	void generateLLRDefault(ImageLUT2DPtr tf);
 };
 
 

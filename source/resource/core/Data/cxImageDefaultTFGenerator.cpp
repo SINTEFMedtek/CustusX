@@ -36,7 +36,7 @@ void ImageDefaultTFGenerator::resetShading()
 
 ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 {
-	if(mImage->getModality() == imPET)
+	if(mImage->getModality() == imPET && !this->looksLikeBinaryImage())
 		return this->generate2DTFPresetPET();
 
 	ImageLUT2DPtr tf(new ImageLUT2D());
@@ -56,8 +56,7 @@ ImageLUT2DPtr ImageDefaultTFGenerator::generate2DTFPreset()
 	colors[smax] = QColor(Qt::white);
 	tf->resetColor(colors);
 
-	if (this->looksLikeBinaryImage())
-		tf->setLLR(smin+1);//Make zero transparent for binary volumes. Why is +1 needed? Is there an issue with LLR range?
+	this->generateLLRDefault(tf);
 
 	return tf;
 }
@@ -250,6 +249,15 @@ double_pair ImageDefaultTFGenerator::guessMRRange() const
 	double_pair srange = this->getFullScalarRange();
 	srange.second *= 0.25; // usually lots of high-intensity noise of no interest
 	return srange;
+}
+
+void ImageDefaultTFGenerator::generateLLRDefault(ImageLUT2DPtr tf)
+{
+	//Make zero transparent for binary and ultrasound volumes
+	if (this->looksLikeBinaryImage())
+		tf->setLLR(1);
+	else if(mImage->getModality() == imUS)
+		tf->setLLR(1);
 }
 
 } // namespace cx

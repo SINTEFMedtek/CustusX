@@ -66,14 +66,6 @@ void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 
   mDataAlpha->setImageTFData(tf, image);
   mDataLLR->setImageTFData(tf, image);
-	updateLLR(image);
 }
-
-void TransferFunction2DOpacityWidget::updateLLR(ImagePtr image)
-{
-	if(image && image->getModality() == imUS)
-		mDataLLR->setValue(1);
-}
-
 
 }//end namespace cx
