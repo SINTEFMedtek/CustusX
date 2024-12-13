@@ -24,7 +24,6 @@ cx_add_class_qt_moc(CX_RESOURCE_FILTER_FILES
     filters/cxColorVariationFilter
     filters/cxIslandsFilter
     filters/cxMeshesFromLabelsFilter
-    filters/cxTotalSegmentatorFilter
 )
 
 cx_create_export_header("cxResourceFilter")
