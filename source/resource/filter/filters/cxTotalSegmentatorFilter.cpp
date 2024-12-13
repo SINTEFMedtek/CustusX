@@ -49,7 +49,7 @@ QString TotalSegmentatorFilter::getNameSuffixTotalSegmentator()
 
 QString TotalSegmentatorFilter::getHelp() const
 {
-	return "A filter to segment structures form CT or MR";
+	return "A filter to segment structures from CT or MR";
 }
 
 

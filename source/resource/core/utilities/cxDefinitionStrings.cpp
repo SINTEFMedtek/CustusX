@@ -160,7 +160,6 @@ DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LUNG_STRUCTURES, lsCOUNT)
 	"Esophagus",
 	"Spine",
 	"Nodules",
-//	"Lung Vessels",
 	"Airways",
 	"Centerlines",
 	"Medium Organs",
