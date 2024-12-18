@@ -168,7 +168,11 @@ ImagePtr TrackedStream::getChangingImage()
 	if(!mVideoSource)
 		return ImagePtr();
 	if (!mImage)
-		mImage = ImagePtr(new Image(this->getUid()+"_TrackedStreamHelper", mVideoSource->getVtkImageData(), this->getName()+"_TrackedStreamHelper"));
+		mImage = ImagePtr(
+			new Image(this->getUid()+"_TrackedStreamHelper",
+					  mVideoSource->getVtkImageData(),
+					  this->getName()+"_TrackedStreamHelper",
+					  mVideoSource->getModality()));
 	return mImage;
 }
 

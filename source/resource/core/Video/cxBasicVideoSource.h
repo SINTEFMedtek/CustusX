@@ -51,6 +51,7 @@ public:
 
 	virtual QString getUid();
 	virtual QString getName();
+	virtual IMAGE_MODALITY getModality();
 	virtual vtkImageDataPtr getVtkImageData();
 	virtual double getTimestamp();
 	virtual TimeInfo getAdvancedTimeInfo();

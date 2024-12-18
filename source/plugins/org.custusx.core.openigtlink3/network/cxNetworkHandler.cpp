@@ -158,9 +158,8 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 //		QString deviceName(header.deviceName.c_str());
 //		QString deviceName(header.equipmentId.c_str());//Use equipmentId
-		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image));
+		ImagePtr cximage = ImagePtr(new Image(deviceName, content.image, deviceName, imUS));
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
-		cximage->setModality(imUS);
 		//this->decode_rMd(msg, retval);
 
 

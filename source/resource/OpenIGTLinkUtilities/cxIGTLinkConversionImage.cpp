@@ -52,7 +52,7 @@ ImagePtr IGTLinkConversionImage::decode(igtl::ImageMessage *msg)
 	QDateTime timestamp = IGTLinkConversionBase().decode_timestamp(msg);
 	QString deviceName = msg->GetDeviceName();
 
-	ImagePtr retval(new Image(deviceName, vtkImage));
+	ImagePtr retval(new Image(deviceName, vtkImage, deviceName, imUS));
 	retval->setAcquisitionTime(timestamp);
 	this->decode_rMd(msg, retval);
 

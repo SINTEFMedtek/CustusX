@@ -85,7 +85,7 @@ bool PNNReconstructionMethodService::reconstruct(ProcessedUSInputDataPtr input,
 
 	//Create temporary volume
 	vtkImageDataPtr tempOutput = generateVtkImageData(targetDims, targetSpacing, 0);
-	ImagePtr tempOutputData = ImagePtr(new Image("tempOutput", tempOutput, "tempOutput"));
+	ImagePtr tempOutputData = ImagePtr(new Image("tempOutput", tempOutput, "tempOutput", imUS));
 
 	int* outputDims = tempOutput->GetDimensions();
 	//int* outputDims = target->GetDimensions();

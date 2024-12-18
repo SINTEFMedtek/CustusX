@@ -49,6 +49,7 @@ public:
 
 	virtual QString getUid() = 0;
 	virtual QString getName() = 0;
+	virtual IMAGE_MODALITY getModality() = 0;
 	virtual vtkImageDataPtr getVtkImageData() = 0;
 	virtual double getTimestamp() = 0;
 	virtual TimeInfo getAdvancedTimeInfo() = 0;

@@ -143,7 +143,7 @@ USFrameDataPtr USFrameData::create(QString inputFilename, FileManagerServicePtr 
 	{
 		vtkImageDataPtr image = fileManager->loadVtkImageData(mhdSingleFile);
 		// load from single file
-		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image)));
+		USFrameDataPtr retval = USFrameData::create(ImagePtr(new Image(mhdSingleFile, image, mhdSingleFile, imUS)));
 		retval->mName = QFileInfo(mhdSingleFile).completeBaseName();
 		timer.printElapsedms(QString("Loading single %1").arg(inputFilename));
 		return retval;

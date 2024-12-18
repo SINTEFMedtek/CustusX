@@ -131,11 +131,10 @@ ImagePtr ImageEnveloper::createEnvelopeFromParameters(ImageParameters box)
 	vtkImageDataPtr imageData = generateVtkImageDataUnsignedShort(box.getDim(), box.getSpacing(), maxRange, 1);
 
 	QString uid = QString("envelope_image_%1").arg(box.mParentVolume);
-	ImagePtr retval(new Image(uid, imageData));
+	ImagePtr retval(new Image(uid, imageData, uid, imSC));
 	retval->get_rMd_History()->setRegistration(box.m_rMd);
 	retval->get_rMd_History()->setParentSpace(box.mParentVolume);
 	retval->setAcquisitionTime(QDateTime::currentDateTime());
-	retval->setModality(imSC);
 
 	return retval;
 }

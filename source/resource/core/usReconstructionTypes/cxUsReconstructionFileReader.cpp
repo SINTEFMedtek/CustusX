@@ -136,7 +136,7 @@ ImagePtr UsReconstructionFileReader::generateMask(USReconstructInputData data)
 
   vtkImageDataPtr raw = generateVtkImageData(dim, spacing, 255);
 
-  ImagePtr image = ImagePtr(new Image("mask", raw, "mask")) ;
+  ImagePtr image = ImagePtr(new Image("mask", raw, "mask", imUNKNOWN)) ;
   return image;
 }
 
