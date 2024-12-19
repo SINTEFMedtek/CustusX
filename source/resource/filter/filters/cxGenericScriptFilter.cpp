@@ -278,6 +278,11 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh", command);
 		return command;
 		break;
+	case seTotalSegmentator:
+		command = standardCommandString(variables);
+		// createVirtualPythonEnvironment(variables.envPath, "TotalSegmentator", "", command);
+		return command;
+		break;
 	default:
 		CX_LOG_WARNING() << "Unknown Script engine: " << mScriptEngine << ". Using default setup";
 		return standardCommandString(variables);
@@ -354,6 +359,8 @@ bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 			return false;
 		mScriptEngine = seRaidionics;
 	}
+	else if(QString::compare(variables.scriptEngine, "TotalSegmentator", Qt::CaseInsensitive) == 0)
+		mScriptEngine = seTotalSegmentator;
 	else
 		mScriptEngine = seStandard;
 	return true;
@@ -459,6 +466,8 @@ bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath
 		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
 		CX_LOG_WARNING() << "Admin password may be required for the command run below";
 		QString basePath = this->getEnvironmentBasePath(environmentPath);
+		// if(!QDir(basePath).exists())//TODO: Not testet yet
+		// 	QDir().mkdir(basePath);
 		QString scriptPath = getScriptPath();
 		QString createCommand = scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath;
 		bool retval = false;

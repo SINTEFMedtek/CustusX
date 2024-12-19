@@ -68,6 +68,7 @@ public:
 		seStandard,
 		seDeepSintef,
 		seRaidionics,
+		seTotalSegmentator,
 		seCOUNT
 	};
 
