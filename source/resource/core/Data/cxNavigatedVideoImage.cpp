@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cx
 {
 NavigatedVideoImage::NavigatedVideoImage(QString uid, VideoSourcePtr source, SliceProxyPtr sliceProxy, QString name):
-	Image(uid, source->getVtkImageData(), name),
+	Image(uid, source->getVtkImageData(), name, source->getModality()),
 	mSliceProxy(sliceProxy)
 {
 	mToolPositionX = -1;

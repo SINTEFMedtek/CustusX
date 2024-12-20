@@ -235,7 +235,7 @@ void  USAcquisitionVideoPlayback::updateFrame(QString filename)
 	int timeout = 1000; // invalidate data if timestamp differ from time too much
 	mVideoSource->overrideTimeout(fabs(timestamp-*iter)>timeout);
 
-	ImagePtr image(new Image(mVideoSourceUid, mCurrentData.mUsRaw->getImageContainer()->get(index)));
+	ImagePtr image(new Image(mVideoSourceUid, mCurrentData.mUsRaw->getImageContainer()->get(index), mVideoSourceUid, imUS));
 	image->setAcquisitionTime(QDateTime::fromMSecsSinceEpoch(timestamp));
 
 	mVideoSource->setInfoString(QString("%1 - Frame %2").arg(mCurrentData.mUsRaw->getName()).arg(index));

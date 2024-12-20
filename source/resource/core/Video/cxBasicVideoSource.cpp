@@ -70,6 +70,10 @@ QString BasicVideoSource::getName()
 {
 	return mReceivedImage->getName();
 }
+IMAGE_MODALITY BasicVideoSource::getModality()
+{
+	return mReceivedImage->getModality();
+}
 
 void BasicVideoSource::timeout()
 {
@@ -181,7 +185,11 @@ void BasicVideoSource::setInput(ImagePtr input)
 		if (mReceivedImage)
 		{
 			// create an empty image with the same uid as the stream.
-			mEmptyImage.reset(new Image(mReceivedImage->getUid(), mEmptyImage->getBaseVtkImageData()));
+			mEmptyImage.reset(
+				new Image(mReceivedImage->getUid(),
+						  mEmptyImage->getBaseVtkImageData(),
+						  mReceivedImage->getName(),
+						  mReceivedImage->getModality()));
 		}
 		mReceivedImage = mEmptyImage;
 	}

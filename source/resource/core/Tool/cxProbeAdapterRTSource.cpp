@@ -56,6 +56,11 @@ QString ProbeAdapterRTSource::getName()
 	return mBase->getName();
 }
 
+IMAGE_MODALITY ProbeAdapterRTSource::getModality()
+{
+	return mBase->getModality();
+}
+
 vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
 {
 	return mRedirecter->GetOutput();

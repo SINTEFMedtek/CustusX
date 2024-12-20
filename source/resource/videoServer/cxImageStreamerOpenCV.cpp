@@ -442,7 +442,8 @@ ImagePtr ImageStreamerOpenCV::getImageMessage()
 	}
 
 	vtkImageDataPtr raw = this->convertTovtkImageData(frame);
-	ImagePtr image(new Image("openCV", raw));
+	QString uid = "openCV";
+	ImagePtr image(new Image(uid, raw, uid, imUS));
 	image->setAcquisitionTime(mLastGrabTime);
 	return image;
 #else

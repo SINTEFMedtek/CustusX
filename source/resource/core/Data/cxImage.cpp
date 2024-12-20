@@ -103,8 +103,8 @@ Image::~Image()
 {
 }
 
-Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name) :
-	Data(uid, name), mBaseImageData(data), mMaxRGBIntensity(-1), mThresholdPreview(false)
+Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& name, const IMAGE_MODALITY modality) :
+	Data(uid, name), mBaseImageData(data), mModality(modality), mMaxRGBIntensity(-1), mThresholdPreview(false)
 {
 	mInitialWindowWidth = -1;
 	mInitialWindowLevel = -1;
@@ -112,7 +112,6 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data, const QString& nam
 	mInterpolationType = VTK_LINEAR_INTERPOLATION;
 	mUseCropping = false;
 	mCroppingBox_d = this->getInitialBoundingBox();
-	mModality = imUNKNOWN;
 
 	mImageLookupTable2D.reset();
 	mImageTransferFunctions3D.reset();
@@ -129,10 +128,9 @@ ImagePtr Image::copy()
 		baseImageDataCopy->DeepCopy(mBaseImageData);
 	}
 
-	ImagePtr retval = ImagePtr(new Image(mUid, baseImageDataCopy, mName));
+	ImagePtr retval = ImagePtr(new Image(mUid, baseImageDataCopy, mName, mModality));
 
 	retval->mUnsigned = mUnsigned;
-	retval->mModality = mModality;
 	retval->mImageType = mImageType;
 	retval->mOrganType = mOrganType;
 	retval->mMaxRGBIntensity = mMaxRGBIntensity;

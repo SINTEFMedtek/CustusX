@@ -17,7 +17,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPrecompiledHeader.h"
 
 #include <map>
-#include <vector>
 #include <boost/shared_ptr.hpp>
 #include "cxBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
@@ -67,7 +66,7 @@ public:
 	ImagePtr copy();
 
 	virtual ~Image();
-	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name = "");
+	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name = "", const IMAGE_MODALITY modality = imUNKNOWN);
 
 	/** Initialize image with properties from parent image, but with separate vtkImageData and name.
 	 */

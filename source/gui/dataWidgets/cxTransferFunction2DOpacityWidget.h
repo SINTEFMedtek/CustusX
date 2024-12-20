@@ -48,8 +48,6 @@ protected:
   DoublePropertyImageTFDataBasePtr mDataAlpha, mDataLLR;
   ActiveImageProxyPtr mActiveImageProxy;
   ActiveDataPtr mActiveData;
-
-  void updateLLR(ImagePtr image);
 };
 
 /**
