@@ -280,7 +280,7 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 		break;
 	case seTotalSegmentator:
 		command = standardCommandString(variables);
-		// createVirtualPythonEnvironment(variables.envPath, "TotalSegmentator", "", command);
+		createVirtualPythonEnvironment(variables.envPath, "TotalSegmentator", "", command);
 		return command;
 		break;
 	default:
@@ -406,8 +406,8 @@ QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables
 QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
 {
 	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
+	basePath = basePath.split("venv")[0];
 	QDir dir(basePath);
-	dir.cdUp();
 	basePath = dir.absolutePath();
 	
 	if(!this->environmentExist(basePath))
@@ -466,8 +466,15 @@ bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath
 		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
 		CX_LOG_WARNING() << "Admin password may be required for the command run below";
 		QString basePath = this->getEnvironmentBasePath(environmentPath);
-		// if(!QDir(basePath).exists())//TODO: Not testet yet
-		// 	QDir().mkdir(basePath);
+		if(!QDir(basePath).exists())
+		{
+			CX_LOG_DEBUG() << "Couldn't find: " << basePath << " - Creating";
+			if(!QDir().mkpath(basePath))
+			{
+				CX_LOG_DEBUG() << "Can't create missing directory: " << basePath;
+				return false;
+			}
+		}
 		QString scriptPath = getScriptPath();
 		QString createCommand = scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath;
 		bool retval = false;
