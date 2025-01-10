@@ -63,6 +63,7 @@ public:
 
 	static bool isRunFromBuildFolder();
 	static bool isTestMode();
+	static QString getFilterScriptsPath();
 
 private:
 	static bool mTestMode;

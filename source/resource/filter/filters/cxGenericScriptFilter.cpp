@@ -43,6 +43,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxLogger.h"
 #include "cxRaidionics.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -92,7 +93,6 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services),
 	mOutputChannelName("ExternalScript"),
-	mScriptPathAddition("/filter_scripts"),
 	mCommandLine(NULL)
 {
 }
@@ -206,7 +206,7 @@ QString GenericScriptFilter::getHelp() const
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList paths;
-	paths << profile()->getPath()+mScriptPathAddition;
+	paths << DataLocations::getFilterScriptsPath();
 
 	mScriptFile =  FilePathProperty::initialize("scriptSelector",
 													"Select configuration file",
@@ -228,7 +228,7 @@ void GenericScriptFilter::setParameterFilePath(QString path)
 FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 {
 	QStringList paths;
-	paths << profile()->getPath()+mScriptPathAddition;
+	paths << DataLocations::getFilterScriptsPath();
 
 	mScriptFilePreview = FilePreviewProperty::initialize("filename", "Filename",
 											"Select a ini file for running command line script",
