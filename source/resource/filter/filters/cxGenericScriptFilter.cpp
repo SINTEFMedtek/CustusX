@@ -43,6 +43,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxProfile.h"
 #include "cxLogger.h"
 #include "cxRaidionics.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -92,7 +93,6 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 GenericScriptFilter::GenericScriptFilter(VisServicesPtr services) :
 	FilterImpl(services),
 	mOutputChannelName("ExternalScript"),
-	mScriptPathAddition("/filter_scripts"),
 	mCommandLine(NULL)
 {
 }
@@ -206,7 +206,7 @@ QString GenericScriptFilter::getHelp() const
 FilePathPropertyPtr GenericScriptFilter::getParameterFile(QDomElement root)
 {
 	QStringList paths;
-	paths << profile()->getPath()+mScriptPathAddition;
+	paths << DataLocations::getFilterScriptsPath();
 
 	mScriptFile =  FilePathProperty::initialize("scriptSelector",
 													"Select configuration file",
@@ -228,7 +228,7 @@ void GenericScriptFilter::setParameterFilePath(QString path)
 FilePreviewPropertyPtr GenericScriptFilter::getIniFileOption(QDomElement root)
 {
 	QStringList paths;
-	paths << profile()->getPath()+mScriptPathAddition;
+	paths << DataLocations::getFilterScriptsPath();
 
 	mScriptFilePreview = FilePreviewProperty::initialize("filename", "Filename",
 											"Select a ini file for running command line script",
@@ -276,6 +276,11 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 		else
 			CX_LOG_ERROR() << "GenericScriptFilter::createCommandString: No mRaidionicsUtilities";
 		createVirtualPythonEnvironment(variables.envPath, "", "cxCreateRaidionicsVenv.sh", command);
+		return command;
+		break;
+	case seTotalSegmentator:
+		command = standardCommandString(variables);
+		createVirtualPythonEnvironment(variables.envPath, "TotalSegmentator", "", command);
 		return command;
 		break;
 	default:
@@ -354,6 +359,8 @@ bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 			return false;
 		mScriptEngine = seRaidionics;
 	}
+	else if(QString::compare(variables.scriptEngine, "TotalSegmentator", Qt::CaseInsensitive) == 0)
+		mScriptEngine = seTotalSegmentator;
 	else
 		mScriptEngine = seStandard;
 	return true;
@@ -399,8 +406,8 @@ QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables
 QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
 {
 	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
+	basePath = basePath.split("venv")[0];
 	QDir dir(basePath);
-	dir.cdUp();
 	basePath = dir.absolutePath();
 	
 	if(!this->environmentExist(basePath))
@@ -459,6 +466,15 @@ bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath
 		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
 		CX_LOG_WARNING() << "Admin password may be required for the command run below";
 		QString basePath = this->getEnvironmentBasePath(environmentPath);
+		if(!QDir(basePath).exists())
+		{
+			CX_LOG_DEBUG() << "Couldn't find: " << basePath << " - Creating";
+			if(!QDir().mkpath(basePath))
+			{
+				CX_LOG_DEBUG() << "Can't create missing directory: " << basePath;
+				return false;
+			}
+		}
 		QString scriptPath = getScriptPath();
 		QString createCommand = scriptPath+"/"+createScript+" " + basePath + " " + requirementsPath;
 		bool retval = false;
@@ -821,6 +837,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 		outputDir = mRaidionicsUtilities->getOutputFolder();
 	}
 //	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputDir: " << outputDir;
+//	CX_LOG_DEBUG() << "readGeneratedSegmentationFiles outputFileNamesNoExtention: " << outputFileNamesNoExtention;
 
 
 

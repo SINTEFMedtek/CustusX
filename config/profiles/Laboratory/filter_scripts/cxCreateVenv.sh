@@ -3,8 +3,8 @@
 # Create python virtual environment
 # Usage:
 # cxCreateVenv venvBasePath reqPath
-# venvBasePath = Path to location where the venv should be craeted
-# reqPath = Path to requirements.txt
+# venvBasePath = Path to location where the venv should be created
+# reqPath = Path to requirements.txt, or program name to install
 
 venvBasePath=$1;
 reqPath=$2;
@@ -22,8 +22,30 @@ if [ -z $reqPath ]; then
 fi
 
 cd "$venvBasePath";
-python3 -m venv venv;
-source venv/bin/activate;
-pip install --upgrade pip;
-python -m pip install -r "$reqPath/requirements.txt";
+if [[ $reqPath == *"."* ]] || [[ $reqPath == *"/"* ]]; then # If using requirements.txt
+  python3 -m venv venv;
+  source venv/bin/activate;
+  pip install --upgrade pip;
+  python -m pip install -r "$reqPath/requirements.txt";
+elif [[ $reqPath == "TotalSegmentator" ]]; then
+  ubuntuVersion="$(lsb_release -rs)"
+  if [[ $ubuntuVersion == *"20.04"* ]]; then
+    echo "Ubuntu 20.04 - Installing Python 3.10 packages"
+    sudo apt install software-properties-common -y #Needed for Python 3.10 on Ubuntu20.04
+    sudo add-apt-repository ppa:deadsnakes/ppa -y #Needed for Python 3.10 on Ubuntu20.04
+  fi
+  sudo apt install -y python3.10-venv
+  python3.10 -m venv venv
+  source venv/bin/activate
+  pip install --upgrade pip
+  pip install TotalSegmentator
+  totalseg_download_weights -t total
+  totalseg_download_weights -t lung_vessels
+else #Install other program, not tested
+  python3 -m venv venv;
+  source venv/bin/activate;
+  pip install --upgrade pip;
+  python -m pip install $reqPath;
+fi
+
 deactivate

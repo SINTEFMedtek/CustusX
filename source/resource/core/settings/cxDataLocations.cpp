@@ -358,4 +358,11 @@ bool DataLocations::isRunFromBuildFolder()
 	return mRunFromBuildFolder;
 }
 
+QString DataLocations::getFilterScriptsPath()
+{
+	QString configPath = DataLocations::getRootConfigPath();
+	QString retval = configPath + "/profiles/Laboratory/filter_scripts/";
+	return retval;
+}
+
 } // namespace cx

@@ -68,6 +68,7 @@ public:
 		seStandard,
 		seDeepSintef,
 		seRaidionics,
+		seTotalSegmentator,
 		seCOUNT
 	};
 
@@ -137,7 +138,6 @@ protected:
 
 	vtkImageDataPtr mRawResult;
 	QString mOutputChannelName;
-	QString mScriptPathAddition;
 	ProcessWrapperPtr mCommandLine;
 	QString mResultFileEnding;
 	QStringList mOutoutOrgans;
