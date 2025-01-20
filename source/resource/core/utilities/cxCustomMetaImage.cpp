@@ -104,7 +104,7 @@ QString CustomMetaImage::readKey(QString key)
 			// do something with the line
 			if (line.startsWith(key, Qt::CaseInsensitive))
 			{
-				QStringList list = line.split("=", QString::SkipEmptyParts);
+				QStringList list = line.split("=", Qt::SkipEmptyParts);
 				if (list.size() >= 2)
 				{
 					list = list.mid(1);
@@ -204,14 +204,14 @@ Transform3D CustomMetaImage::readTransform()
       // do something with the line
       if (line.startsWith("Position", Qt::CaseInsensitive) || line.startsWith("Offset", Qt::CaseInsensitive))
       {
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
+        QStringList list = line.split(" ", Qt::SkipEmptyParts);
         if (list.size()>=5)
           p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
       }
       else if (line.startsWith("TransformMatrix", Qt::CaseInsensitive) || line.startsWith("Orientation",
           Qt::CaseInsensitive))
       {
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
+        QStringList list = line.split(" ", Qt::SkipEmptyParts);
 
         if (list.size()>=8)
         {

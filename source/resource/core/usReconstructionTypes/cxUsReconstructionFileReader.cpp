@@ -158,15 +158,15 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
     QString line = file.readLine();
     if(line.startsWith("ConfigurationID", Qt::CaseInsensitive))
     {
-      QStringList tempList = line.split("=", QString::SkipEmptyParts);
-      configList = tempList[1].trimmed().split(":", QString::SkipEmptyParts);
+      QStringList tempList = line.split("=", Qt::SkipEmptyParts);
+      configList = tempList[1].trimmed().split(":", Qt::SkipEmptyParts);
       if (configList.size()>=3)
       	configList[3] = configList[3].trimmed();
       foundConfig = true;
     }
     else if(line.startsWith("ProbeCalibration", Qt::CaseInsensitive))
     {
-      QStringList list = line.split("=", QString::SkipEmptyParts);
+      QStringList list = line.split("=", Qt::SkipEmptyParts);
       *calFileName = list[1].trimmed();
       foundCalFile = true;
 //      std::cout << "Calibration file used: " << *calFileName << std::endl;
