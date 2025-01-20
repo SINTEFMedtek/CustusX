@@ -42,9 +42,9 @@ void PatientModelServiceProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<PatientModelService>(
 								 mPluginContext,
-								 boost::bind(&PatientModelServiceProxy::onServiceAdded, this, _1),
+								 boost::bind(&PatientModelServiceProxy::onServiceAdded, this, boost::placeholders::_1),
 								 boost::function<void (PatientModelService*)>(),
-								 boost::bind(&PatientModelServiceProxy::onServiceRemoved, this, _1)
+								 boost::bind(&PatientModelServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();
 }

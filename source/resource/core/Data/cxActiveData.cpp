@@ -85,7 +85,7 @@ ActiveData::ActiveData(PatientModelServicePtr patientModelService, SessionStorag
 {
 	mStorage->storeVariable("activeUids",
 							boost::bind(&ActiveData::getStringToSave, this),
-							boost::bind(&ActiveData::loadFromString, this, _1));
+							boost::bind(&ActiveData::loadFromString, this, boost::placeholders::_1));
 }
 
 QString ActiveData::getStringToSave() const

@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 #include <QObject>
 #include <QList>
-#include "boost/shared_ptr.hpp"
+#include <boost/bind/bind.hpp>
 #include "cxSessionStorageService.h"
 
 namespace cx

@@ -27,7 +27,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxPatientModelService.h"
 #include "cxTypeConversions.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxVtkHelperClasses.h"
 
 namespace cx

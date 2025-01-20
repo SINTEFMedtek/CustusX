@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUtilHelpers.h"
 #include "cxNullDeleter.h"
 #include "cxLogger.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxCoreServices.h"
 
 namespace cx
@@ -35,9 +35,9 @@ void FileManagerImpService::initServiceListener(ctkPluginContext *context)
 {
 	mServiceListener.reset(new ServiceTrackerListener<FileReaderWriterService>(
 								 context,
-								 boost::bind(&FileManagerImpService::onServiceAdded, this, _1),
+								 boost::bind(&FileManagerImpService::onServiceAdded, this, boost::placeholders::_1),
 								 boost::function<void (FileReaderWriterService*)>(),
-								 boost::bind(&FileManagerImpService::onServiceRemoved, this, _1)
+								 boost::bind(&FileManagerImpService::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();
 }

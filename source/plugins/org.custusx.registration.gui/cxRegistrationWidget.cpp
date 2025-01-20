@@ -172,9 +172,9 @@ void RegistrationWidget::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<RegistrationMethodService>(
 							   mPluginContext,
-							   boost::bind(&RegistrationWidget::onServiceAdded, this, _1),
+							   boost::bind(&RegistrationWidget::onServiceAdded, this, boost::placeholders::_1),
 							   boost::function<void (RegistrationMethodService*)>(),
-							   boost::bind(&RegistrationWidget::onServiceRemoved, this, _1)
+							   boost::bind(&RegistrationWidget::onServiceRemoved, this, boost::placeholders::_1)
 							   ));
 	mServiceListener->open();
 }

@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUtilHelpers.h"
 #include "cxNullDeleter.h"
 #include "cxLogger.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxCoreServices.h"
 
 namespace cx

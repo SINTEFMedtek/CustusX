@@ -38,9 +38,9 @@ namespace cx
  *  boost::shared_ptr<ServiceTrackerListener<ReconstructionService> > mServiceListener;
  *  mServiceListener.reset(new ServiceTrackerListener<ReconstructionService>(
  *          LogicManager::getInstance()->getPluginFramework(),
- *          boost::bind(&ReconstructManager::onServiceAdded, this, _1),
- *          boost::bind(&ReconstructManager::onServiceModified, this, _1),
- *          boost::bind(&ReconstructManager::onServiceRemoved, this, _1)
+ *          boost::bind(&ReconstructManager::onServiceAdded, this, boost::placeholders::_1),
+ *          boost::bind(&ReconstructManager::onServiceModified, this, boost::placeholders::_1),
+ *          boost::bind(&ReconstructManager::onServiceRemoved, this, boost::placeholders::_1)
  *  ));
  *
  *

@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include <QtGlobal>
 #include <iostream>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QMutex>

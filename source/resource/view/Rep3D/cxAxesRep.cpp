@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxAxesRep.h"
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <vtkAxesActor.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>

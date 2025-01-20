@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLogThread.h"
 #include "cxReporterMessageRepository.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <iostream>
 
 namespace cx

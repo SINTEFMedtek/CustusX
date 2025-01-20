@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxFrameMetricRep.h"
 
 #include "cxView.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxGraphicalAxes3D.h"
 
 namespace cx

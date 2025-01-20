@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxStateServiceProxy.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxNullDeleter.h"
 
 namespace cx
@@ -32,9 +32,9 @@ void StateServiceProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<StateService>(
 								 mPluginContext,
-								 boost::bind(&StateServiceProxy::onServiceAdded, this, _1),
+								 boost::bind(&StateServiceProxy::onServiceAdded, this, boost::placeholders::_1),
 								 boost::function<void (StateService*)>(),
-								 boost::bind(&StateServiceProxy::onServiceRemoved, this, _1)
+								 boost::bind(&StateServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();
 }

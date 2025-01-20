@@ -144,9 +144,9 @@ void FiltersWidget::appendFilterServices()
     mServiceListener.reset(
             new ServiceTrackerListener<Filter>(
                     LogicManager::getInstance()->getPluginContext(),
-                    boost::bind(&FiltersWidget::onServiceAdded, this, _1),
+                    boost::bind(&FiltersWidget::onServiceAdded, this, boost::placeholders::_1),
                     boost::function<void(Filter*)>(),
-                    boost::bind(&FiltersWidget::onServiceRemoved, this, _1)));
+                    boost::bind(&FiltersWidget::onServiceRemoved, this, boost::placeholders::_1)));
     mServiceListener->open();
 }
 

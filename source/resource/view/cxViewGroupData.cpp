@@ -25,7 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxImage.h"
 #include "cxTrackedStream.h"
 #include "cxInteractiveClipper.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxXMLNodeWrapper.h"
 #include "cxSyncedValue.h"
 #include "cxCoreServices.h"

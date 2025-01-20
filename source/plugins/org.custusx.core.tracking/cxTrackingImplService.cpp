@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackingImplService.h"
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 
 #include <QTimer>
 #include <QDir>
@@ -203,9 +203,9 @@ void TrackingImplService::listenForTrackingSystemServices(ctkPluginContext *cont
 {
 	mServiceListener.reset(new ServiceTrackerListener<TrackingSystemService>(
 							   context,
-							   boost::bind(&TrackingImplService::onTrackingSystemAdded, this, _1),
-							   boost::bind(&TrackingImplService::onTrackingSystemModified, this, _1),
-							   boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, _1)
+							   boost::bind(&TrackingImplService::onTrackingSystemAdded, this, boost::placeholders::_1),
+							   boost::bind(&TrackingImplService::onTrackingSystemModified, this, boost::placeholders::_1),
+							   boost::bind(&TrackingImplService::onTrackingSystemRemoved, this, boost::placeholders::_1)
 							   ));
 	mServiceListener->open();
 }

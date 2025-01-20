@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrainingWidget.h"
 #include <QtWidgets>
 #include <QPushButton>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "boost/function.hpp"
 #include "cxHelpEngine.h"
 #include "cxHelpBrowser.h"

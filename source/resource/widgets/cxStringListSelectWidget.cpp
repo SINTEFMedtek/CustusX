@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QWidgetAction>
 #include <QCheckBox>
 #include <QMenu>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxStringListProperty.h"
 #include "cxData.h"
 
@@ -103,7 +103,7 @@ void StringListSelectWidget::prePaintEvent()
 			QString uid = range[i];
 			QString name = mData->convertInternal2Display(uid);
 			mCheckBoxes.push_back(new QCheckBox(name, mMenu));
-			boost::function<void(bool)> func = boost::bind(&StringListSelectWidget::onCheckToggled, this, uid, _1);
+			boost::function<void(bool)> func = boost::bind(&StringListSelectWidget::onCheckToggled, this, uid, boost::placeholders::_1);
 			connect(mCheckBoxes[i], &QCheckBox::toggled, func);
 			QWidgetAction *checkableAction = new QWidgetAction(mMenu);
 			checkableAction->setDefaultWidget(mCheckBoxes[i]);

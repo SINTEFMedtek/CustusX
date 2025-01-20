@@ -26,7 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QtWidgets>
 
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
@@ -215,7 +215,7 @@ void Transform3DWidget::addAngleControls(QString uid, QString name, int index, Q
 
   // use QtSignalAdapters library to work magic:
   QtSignalAdapters::connect1<void(QPointF)>(pad, SIGNAL(mouseMoved(QPointF)),
-      boost::bind(&Transform3DWidget::rotateSlot, this, _1, index));
+      boost::bind(&Transform3DWidget::rotateSlot, this, boost::placeholders::_1, index));
 
   layout->addLayout(hLayout);
   mAngleAdapter[index] = adapter;
@@ -237,7 +237,7 @@ void Transform3DWidget::addTranslationControls(QString uid, QString name, int in
 
   // use QtSignalAdapters library to work magic:
   QtSignalAdapters::connect1<void(QPointF)>(pad, SIGNAL(mouseMoved(QPointF)),
-      boost::bind(&Transform3DWidget::translateSlot, this, _1, index));
+      boost::bind(&Transform3DWidget::translateSlot, this, boost::placeholders::_1, index));
 
   layout->addLayout(hLayout);
   mTranslationAdapter[index] = adapter;

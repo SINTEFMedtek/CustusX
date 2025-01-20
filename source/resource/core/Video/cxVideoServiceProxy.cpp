@@ -37,9 +37,9 @@ void VideoServiceProxy::initServiceListener()
 {
 	mVideoServiceListener.reset(new ServiceTrackerListener<VideoService>(
 								 mPluginContext,
-								 boost::bind(&VideoServiceProxy::onVideoServiceAdded, this, _1),
+								 boost::bind(&VideoServiceProxy::onVideoServiceAdded, this, boost::placeholders::_1),
 								 boost::function<void (VideoService*)>(),
-								 boost::bind(&VideoServiceProxy::onVideoServiceRemoved, this, _1)
+								 boost::bind(&VideoServiceProxy::onVideoServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mVideoServiceListener->open();
 }

@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxPointMetricRep.h"
 #include "cxView.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxLogger.h"
 
 namespace cx

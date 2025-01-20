@@ -30,7 +30,7 @@ Clippers::Clippers(VisServicesPtr services) :
 //	mStorage(services->session(), "Clippers")
 {
 	this->createDefaultClippers();
-//	mStorage.storeVariable("clipperList", boost::bind(&Clippers::exportList, this), boost::bind(&Clippers::importList, this, _1));
+//	mStorage.storeVariable("clipperList", boost::bind(&Clippers::exportList, this), boost::bind(&Clippers::importList, this, boost::placeholders::_1));
 
 //	XmlOptionFile mOptions = profile()->getXmlSettings().descend("clippers");
 

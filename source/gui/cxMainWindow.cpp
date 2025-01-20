@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMainWindow.h"
 
 #include <QtWidgets>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 
 #include "cxConfig.h"
 #include "cxDataLocations.h"
@@ -159,9 +159,9 @@ void MainWindow::setupGUIExtenders()
 {
 	mServiceListener.reset(new ServiceTrackerListener<GUIExtenderService>(
 							   LogicManager::getInstance()->getPluginContext(),
-							   boost::bind(&MainWindow::onGUIExtenderServiceAdded, this, _1),
-							   boost::bind(&MainWindow::onGUIExtenderServiceModified, this, _1),
-							   boost::bind(&MainWindow::onGUIExtenderServiceRemoved, this, _1)
+							   boost::bind(&MainWindow::onGUIExtenderServiceAdded, this, boost::placeholders::_1),
+							   boost::bind(&MainWindow::onGUIExtenderServiceModified, this, boost::placeholders::_1),
+							   boost::bind(&MainWindow::onGUIExtenderServiceRemoved, this, boost::placeholders::_1)
 							   ));
 	mServiceListener->open();
 }
