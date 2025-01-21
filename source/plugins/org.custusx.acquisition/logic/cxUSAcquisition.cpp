@@ -122,7 +122,7 @@ void USAcquisition::checkIfReadySlot()
 		mWhatsMissing.append(QString("<font color=orange>Saving %1 acquisition data.</font><br>").arg(saving));
 
 	// remove redundant line breaks
-	QStringList list = mWhatsMissing.split("<br>", Qt::SkipEmptyParts);
+	QStringList list = mWhatsMissing.split("<br>", QString::SkipEmptyParts);
 	mWhatsMissing = list.join("<br>");
 
 	//Make sure we have at least 2 lines to avoid "bouncing buttons"

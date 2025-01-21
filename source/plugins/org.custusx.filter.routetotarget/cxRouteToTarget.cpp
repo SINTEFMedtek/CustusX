@@ -533,22 +533,22 @@ void RouteToTarget::addRouteInformationToFile(VisServicesPtr services)
 	{
 		QTextStream stream(&outfile);
 
-		stream << "#Target position:" << Qt::endl;
-		stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << Qt::endl;
+		stream << "#Target position:" << endl;
+		stream << mTargetPosition(0) << " " << mTargetPosition(1) << " " << mTargetPosition(2) << " " << endl;
 		if (mProjectedBranchPtr)
 		{
-			stream << "#Route to target generations:" << Qt::endl;
-			stream << mProjectedBranchPtr->findGenerationNumber() << Qt::endl;
+			stream << "#Route to target generations:" << endl;
+			stream << mProjectedBranchPtr->findGenerationNumber() << endl;
 		}
 
-		stream << "#Trachea length (mm):" << Qt::endl;
+		stream << "#Trachea length (mm):" << endl;
 		double tracheaLength = this->getTracheaLength();
-		stream << tracheaLength << Qt::endl;
+		stream << tracheaLength << endl;
 
-		stream << "#Route to target length - from Carina (mm):" << Qt::endl;
-		stream << calculateRouteLength(mRoutePositions) - tracheaLength << Qt::endl;
-		stream << "#Extended route to target length - from Carina (mm):" << Qt::endl;
-		stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << Qt::endl;
+		stream << "#Route to target length - from Carina (mm):" << endl;
+		stream << calculateRouteLength(mRoutePositions) - tracheaLength << endl;
+		stream << "#Extended route to target length - from Carina (mm):" << endl;
+		stream << calculateRouteLength(mExtendedRoutePositions) - tracheaLength << endl;
 	}
 }
 

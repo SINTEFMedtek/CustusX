@@ -574,16 +574,16 @@ QStringList ImportDataTypeWidget::splitStringIntoSeparateParts(QString current)
 {
 	current = removeParenthesis(current);
 
-	QStringList list = current.split(".", Qt::SkipEmptyParts);
+	QStringList list = current.split(".", QString::SkipEmptyParts);
 	QStringList list2;
 	for (int i = 0; i < list.size(); ++i)
 	{
-		list2 << list[i].split("_", Qt::SkipEmptyParts);
+		list2 << list[i].split("_", QString::SkipEmptyParts);
 	}
 	QStringList currentParts;
 	for (int i = 0; i < list2.size(); ++i)
 	{
-		currentParts << list2[i].split("-", Qt::SkipEmptyParts);
+		currentParts << list2[i].split("-", QString::SkipEmptyParts);
 	}
 	return currentParts;
 }

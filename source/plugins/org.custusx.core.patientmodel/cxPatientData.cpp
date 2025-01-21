@@ -173,7 +173,7 @@ DataPtr PatientData::importData(QString fileName, QString &infoText)
 	data->save(mSession->getRootFolder(), mFileManagerService);
 
 	// remove redundant line breaks
-	infoText = infoText.split("<br>", Qt::SkipEmptyParts).join("<br>");
+	infoText = infoText.split("<br>", QString::SkipEmptyParts).join("<br>");
 
 	return data;
 }

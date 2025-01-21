@@ -144,8 +144,8 @@ TEST_CASE("Transform3D: Convert to QString and back", "[unit][resource][core]")
   QString outText = qstring_cast(M1);
 //  std::cout << outText << std::endl;
 
-  QStringList inTextList = inText.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
-  QStringList outTextList = outText.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+  QStringList inTextList = inText.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList outTextList = outText.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
   CHECK(inTextList.size()==outTextList.size());
 

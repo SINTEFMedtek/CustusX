@@ -37,7 +37,7 @@ std::vector<double> convertQString2DoubleVector(const QString& input, bool* ok)
 {
 	if (ok)
 		*ok = true;
-	QStringList comp = input.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+	QStringList comp = input.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 	std::vector<double> retval(comp.size());
 	bool tempOk = true;
 

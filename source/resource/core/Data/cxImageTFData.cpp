@@ -90,7 +90,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	{
 		QString alphaString = alphaNode.toElement().text();
 		mOpacityMap.clear();
-		QStringList alphaStringList = alphaString.split(" ", Qt::SkipEmptyParts);
+		QStringList alphaStringList = alphaString.split(" ", QString::SkipEmptyParts);
 		for (int i = 0; i < alphaStringList.size(); i++)
 		{
 			QStringList pointStringList = alphaStringList[i].split("=");
@@ -109,7 +109,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 	if (!colorNode.isNull() && !colorNode.toElement().text().isEmpty())
 	{
 		mColorMap.clear();
-		QStringList colorStringList = colorNode.toElement().text().split(" ", Qt::SkipEmptyParts);
+		QStringList colorStringList = colorNode.toElement().text().split(" ", QString::SkipEmptyParts);
 		for (int i = 0; i < colorStringList.size(); i++)
 		{
 			QStringList pointStringList = colorStringList[i].split("=");

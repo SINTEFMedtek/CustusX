@@ -108,8 +108,8 @@ TEST_CASE("DoubleBoundingBox3D: Convert to QString and back", "[unit][resource][
 
   QString outText = qstring_cast(bb0);
 
-  QStringList inTextList = inText.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
-  QStringList outTextList = outText.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+  QStringList inTextList = inText.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+  QStringList outTextList = outText.split(QRegExp("\\s+"), QString::SkipEmptyParts);
 
   CHECK(inTextList.size()==outTextList.size());
 

@@ -100,7 +100,7 @@ QString AcquisitionImplService::getInfoText(TYPES context) const
 	text = mAcquisition->getInfoText(context) + "<br>" + mUsAcquisition->getInfoText(context);
 
 	// remove redundant line breaks
-	QStringList list = text.split("<br>", Qt::SkipEmptyParts);
+	QStringList list = text.split("<br>", QString::SkipEmptyParts);
 	text = list.join("<br>");
 
 	//Make sure we have at least 2 lines to avoid "bouncing buttons"
