@@ -58,7 +58,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mRouteToTarget->setValueName("Route to target path: ");
 	mStorage->storeVariable("routeToTarget",
 							boost::bind(&StringPropertySelectMesh::getValue, mRouteToTarget),
-							boost::bind(&StringPropertySelectMesh::setValue, mRouteToTarget, _1));
+							boost::bind(&StringPropertySelectMesh::setValue, mRouteToTarget, boost::placeholders::_1));
 
 	// Selector for route to target
 	QVBoxLayout *inputVbox = new QVBoxLayout;
