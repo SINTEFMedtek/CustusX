@@ -11,7 +11,7 @@ stages:          # List of stages for jobs, and their order of execution
   - test
   - deploy
 
-build-job:       # This job runs in the build stage, which runs first.
+.build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     # - export # For listing all gitlab variables
@@ -27,7 +27,15 @@ build-job:       # This job runs in the build stage, which runs first.
       - package_artefacts/html_dev/
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
-test-job:   # This job runs the Unit + Integration tests
+build-ubuntu20:
+  extends: .build-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
+
+build-ubuntu22:
+  extends: .build-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
+
+.test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - echo "Running unit tests... "
@@ -39,6 +47,14 @@ test-job:   # This job runs the Unit + Integration tests
       - test_results/*junit.xml
     reports:
       junit: test_results/*junit.xml
+
+test-ubuntu20:
+  extends: .test-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
+
+test-ubuntu22:
+  extends: .test-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
 
 .deploy:
   stage: deploy
