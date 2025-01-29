@@ -90,7 +90,8 @@ void BronchoscopyRegistrationWidget::setup()
 	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
 																									 mServices->acquisition(), mServices,
 																									 "bronc_path",
-																									 this);
+																									 this,
+																									 true);
 	mRecordTrackingWidget->getSessionSelector()->setHelp("Select bronchoscope path for registration");
 	mRecordTrackingWidget->getSessionSelector()->setDisplayName("Bronchoscope path");
 

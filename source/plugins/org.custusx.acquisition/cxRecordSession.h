@@ -34,6 +34,7 @@ namespace cx
 
 typedef boost::shared_ptr<class RecordSession> RecordSessionPtr;
 typedef std::map<double, Transform3D> TimedTransformMap;
+typedef std::pair<QDateTime, QDateTime> IntervalType;
 
 /**
  * RecordSession
@@ -55,6 +56,7 @@ public:
 	QString getDescription() const; ///< another legacy uid, used for folder creation etc
 	std::pair<QDateTime,QDateTime> getInterval(int i);
 	unsigned getIntervalCount() const;
+	void setInterval(int i, IntervalType interval);
 
 	void startNewInterval();
 	void stopLastInterval();
@@ -69,7 +71,6 @@ public:
 protected:
 	QDateTime getTimestamp() const;
 
-	typedef std::pair<QDateTime, QDateTime> IntervalType;
 	std::vector<IntervalType> mIntervals;
 	QDateTime mTimestamp;
 	QString mCategory;

@@ -53,6 +53,7 @@ public:
 
 	void setTool(ToolPtr tool);
 	ToolPtr getTool();
+	RecordSessionPtr getSession();
 	void setVisible(bool on);
 	TimedTransformMap getRecordedTrackerData_prMt();
 	StringPropertyPtr getSessionSelector() { return mSessionSelector; }
@@ -74,7 +75,6 @@ private:
 	ToolRep3DPtr getToolRepIn3DView(ToolPtr tool);
 	void showSelectedRecordingInView();
 	void clearTracer();
-	RecordSessionPtr getSession();
 	void warnIfNoTrackingDataInSession();
 	ToolPtr findToolContainingMostDataForSession(std::map<QString,ToolPtr> tools, RecordSessionPtr session);
 	void updateHelpText();

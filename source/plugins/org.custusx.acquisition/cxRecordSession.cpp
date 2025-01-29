@@ -247,5 +247,11 @@ unsigned RecordSession::getIntervalCount() const
 	return mIntervals.size();
 }
 
+void RecordSession::setInterval(int i, IntervalType interval)
+{
+	if(getIntervalCount() > i)
+		mIntervals[i] = interval;
+}
+
 
 }//namespace cx
