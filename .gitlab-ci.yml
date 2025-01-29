@@ -22,7 +22,8 @@ stages:          # List of stages for jobs, and their order of execution
     - echo "Compiling the code..."
     - cd $CI_PROJECT_DIR
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-    - mv package_artefacts/CustusX*.tar.gz package_artefacts/CustusX_$VERSION_$OS.tar.gz
+    # Don't work. Probably needs to rename file in .py scripts instead
+    #- mv package_artefacts/CustusX*.tar.gz package_artefacts/CustusX_$VERSION_$OS.tar.gz
     - echo "Compile complete."
     - echo "Running unit tests... "
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
