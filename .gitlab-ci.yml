@@ -58,11 +58,12 @@ build-and-test-ubuntu22:
   script:
   - echo "Deploying application..."
   - cd $CI_PROJECT_DIR/package_artefacts
-  - INSTALLER_FILE=$(find CustusX*.tar.gz)
-  - 'curl
-     --header "JOB-TOKEN: $CI_JOB_TOKEN"
-     --upload-file $INSTALLER_FILE
-     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$INSTALLER_FILE"'
+  - INSTALLER_FILES=$(find CustusX*.tar.gz)
+  - for file in $INSTALLER_FILES; do
+      'curl
+       --header "JOB-TOKEN: $CI_JOB_TOKEN"
+       --upload-file $file
+       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$file"'
 
 deploy-commmit:
   extends: .deploy
@@ -70,9 +71,9 @@ deploy-commmit:
     VERSION: ${CI_COMMIT_SHORT_SHA}
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
+      # when: never
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # Only run for changes to the default (develop) branch
-      when: never
+      # when: never
     - if: '$CI_COMMIT_TAG == null' # Run for all commits, except tags
 
 deploy-tag:
