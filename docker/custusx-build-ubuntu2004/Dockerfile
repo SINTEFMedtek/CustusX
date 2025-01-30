@@ -2,14 +2,17 @@
 # Useful docker commands.
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
-# Create:
-# sudo docker build -t custusx-build-ubuntu2004 .
-# sudo docker build --no-cache -t custusx-build-ubuntu2004 .
+# Build image:
+# sudo docker build -t gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2004 .
+# or
+# sudo docker build --no-cache -t gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2004 .
 
-# Give created image a name/tag, and upload new image
-# TODO: Create a CustusX organization on Docker
-# sudo docker tag custusx-build-ubuntu2004 olevs/custusx-build-ubuntu2004
-# sudo docker push olevs/custusx-build-ubuntu2004
+# Tag image
+# sudo docker tag custusx-build-ubuntu2004 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
+
+# Upload image
+# For gitlab docker login see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
 
 # List all docker container
 # sudo docker ps --all
