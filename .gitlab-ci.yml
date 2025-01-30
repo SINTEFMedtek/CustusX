@@ -59,11 +59,13 @@ build-and-test-ubuntu22:
   - echo "Deploying application..."
   - cd $CI_PROJECT_DIR/package_artefacts
   - INSTALLER_FILES=$(find CustusX*.tar.gz)
-  - for file in $INSTALLER_FILES; do
+  - |
+    for file in $INSTALLER_FILES; do
       'curl
        --header "JOB-TOKEN: $CI_JOB_TOKEN"
        --upload-file $file
        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$file"'
+    done
 
 deploy-commmit:
   extends: .deploy
