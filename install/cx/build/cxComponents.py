@@ -407,9 +407,10 @@ class IGSTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        base = self.controlData.gitrepo_open_site_base
-        repo = '%s/IGSTK.git' % base
-        return repo
+        #base = self.controlData.gitrepo_open_site_base
+        #repo = '%s/IGSTK.git' % base
+        #return repo
+        return 'https://github.com/SINTEFMedtek/IGSTK'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutSha('79be2fd9cd985f73662f325d8b13dd22870a2ec1')

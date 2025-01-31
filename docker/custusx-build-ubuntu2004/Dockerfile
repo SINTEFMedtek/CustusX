@@ -21,7 +21,7 @@
 # sudo docker rm ...
 
 # Explore container with the command line:
-# sudo docker run --rm -it --entrypoint=/bin/bash custusx-build-ubuntu2004
+# sudo docker run --rm -it --entrypoint=/bin/bash gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2004
 
 FROM ubuntu:20.04
 
