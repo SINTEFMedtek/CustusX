@@ -257,7 +257,7 @@ class CTK(CppComponent):
         #return '%s/CTK.git' % base
         return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
+        self._getBuilder().gitCheckoutSha('2023.07.13')
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
