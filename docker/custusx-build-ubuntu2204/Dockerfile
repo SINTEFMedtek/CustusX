@@ -31,11 +31,6 @@ RUN \
 
 # libgl1-mesa-dev #Test with mesa OpenGL (instead of NVIDIA)
 
-RUN \
-  apt-get upgrade && apt-get update && \
-  apt install -y \
-  qt6-tools-dev
-
 #Needed for Qt packages
 RUN apt-get update --fix-missing \
     && apt-get install -y software-properties-common \

@@ -59,6 +59,7 @@ build-and-test-ubuntu22:
   - echo "Deploying application..."
   - cd $CI_PROJECT_DIR/package_artefacts
   - INSTALLER_FILES=$(find CustusX*.tar.gz)
+  - echo $INSTALLER_FILES
   - |
     for file in $INSTALLER_FILES; do
       'curl
@@ -73,7 +74,7 @@ deploy-commmit:
     VERSION: ${CI_COMMIT_SHORT_SHA}
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      # when: never
+       when: never
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # Only run for changes to the default (develop) branch
       # when: never
     - if: '$CI_COMMIT_TAG == null' # Run for all commits, except tags
