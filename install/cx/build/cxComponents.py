@@ -277,7 +277,7 @@ class CTK(CppComponent):
 #        add('CMAKE_CXX_STANDARD:STRING',11) # cause build to fail?
         builder.configureCMake()
         PrintFormatter.printInfo('Build CTK during configure step, in order to create CTKConfig.cmake')
-        self.build()
+        # self.build()
 # ---------------------------------------------------------
 
 class OpenCV(CppComponent):
