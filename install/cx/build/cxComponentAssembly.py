@@ -51,7 +51,7 @@ class LibraryAssembly(object):
         #self.addComponent(cxComponents.CTK())
         #self.addComponent(cxComponents.OpenIGTLinkIO())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())
-        self.addComponent(cxComponents.QHttpServer())
+        #self.addComponent(cxComponents.QHttpServer())
         #if(platform.system() == 'Linux'):
         #  self.addComponent(cxComponents.FAST()) # NB: Using old version of FAST for macOS
         #self.addComponent(cxComponents.org_custusx_angleCorrection())
