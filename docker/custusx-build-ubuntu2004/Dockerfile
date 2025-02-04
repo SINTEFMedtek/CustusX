@@ -44,6 +44,12 @@ RUN \
 
 # libgl1-mesa-dev #Test with mesa OpenGL (instead of NVIDIA)
 
+RUN \
+  apt-get upgrade -y && apt-get update -y && \
+  DEBIAN_FRONTEND=noninteractive \
+  apt install -y \
+  libqt5serialport5-dev
+
 RUN pip install future
 
 RUN \
@@ -86,12 +92,6 @@ RUN \
   cd /builds/custusx/CustusX && \
   ./install/cxJenkinsMasterBuild.py --create_package
 
-
-RUN \
-  apt-get upgrade -y && apt-get update -y && \
-  DEBIAN_FRONTEND=noninteractive \
-  apt install -y \
-  libqt5serialport5-dev
 
 WORKDIR /builds/custusx/CustusX
 
