@@ -46,7 +46,7 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-and-test-ubuntu20:
   extends: .build-job
-  image: gitlab.sintef.no:5050/custusx/custusx/build-ubuntu2004
+  image: gitlab.sintef.no:5050/custusx/custusx/build-ubuntu2004:25.02
   variables:
     OS: Ubuntu2004
 
