@@ -21,7 +21,7 @@ stages:          # List of stages for jobs, and their order of execution
     - cd $CI_PROJECT_DIR
     - echo $OS
     - qmake --version
-    - echo Qt version of libigtlioGUI.so, libCTKCore.so, and libcxGui.so:
+    - echo "Qt version of libigtlioGUI.so, libCTKCore.so, and libcxGui.so:"
     - strings ../../OpenIGTLinkIO/build_Release/lib/libigtlioGUI.so | grep "Qt_5\."
     - strings ../../CTK/build_Release/CTK-build/bin/libCTKCore.so | grep "Qt_5\."
     - strings ../build_Release/bin/libcxGui.so | grep "Qt_5\."
