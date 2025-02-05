@@ -4,7 +4,7 @@
 
 # Build, tag, and upload on gitlab
 # For gitlab docker login (before last step) see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker build -t gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2204 .
+# sudo docker build --no-cache -t custusx-build-ubuntu2204 .
 # sudo docker tag custusx-build-ubuntu2204 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
 # sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
 

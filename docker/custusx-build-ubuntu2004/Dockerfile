@@ -3,9 +3,9 @@
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
 # Build image:
-# sudo docker build -t gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2004 .
+# sudo docker build -t custusx-build-ubuntu2004 .
 # or
-# sudo docker build --no-cache -t gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2004 .
+# sudo docker build --no-cache -t custusx-build-ubuntu2004 .
 
 # Tag image
 # sudo docker tag custusx-build-ubuntu2004 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
