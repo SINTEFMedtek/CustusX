@@ -4,7 +4,7 @@ default:
   #image: olevs/custusx-build-ubuntu2004 #Prebuilt CustusX, Dockerhub
   #image: olevs/custusx-ubuntu2004 #Empty image, with only environment
   #image: gitlab.sintef.no:5050/custusx/custusx/custusx-ubuntu2004 # Slower build if not reusing the build from last run
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
+  image: gitlab.sintef.no:5050/custusx/custusx/build-ubuntu2004:25.02
 
 stages:          # List of stages for jobs, and their order of execution
   - build
