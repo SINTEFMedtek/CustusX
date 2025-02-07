@@ -12,8 +12,8 @@ stages:          # List of stages for jobs, and their order of execution
 
 # Cleanup old builds from runners
 # Can be removed after a while
-.cleanup-old-builds
-  stage .pre
+cleanup-old-builds:
+  stage: .pre
   script:
   - cd $CI_PROJECT_DIR
   - cd ..
