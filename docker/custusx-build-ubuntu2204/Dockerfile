@@ -4,9 +4,9 @@
 
 # Build, tag, and upload on gitlab
 # For gitlab docker login (before last step) see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker build --no-cache -t custusx-build-ubuntu2204 .
-# sudo docker tag custusx-build-ubuntu2204 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
+# sudo docker build --no-cache -t custusx-build-ubuntu2204:25.02 .
+# sudo docker tag custusx-build-ubuntu2204:25.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02
 
 # List all docker container
 # sudo docker ps --all
@@ -15,7 +15,7 @@
 # sudo docker rm ...
 
 # Explore container with the command line:
-# sudo docker run --rm -it --entrypoint=/bin/bash custusx-build-ubuntu2204
+# sudo docker run --rm -it --entrypoint=/bin/bash custusx-build-ubuntu2204:25.02
 
 FROM ubuntu:22.04
 
@@ -43,6 +43,12 @@ RUN \
   apt install -y \
   qttools5-dev qttools5-dev-tools qttools5-doc qt5-doc libqt5webkit5-dev libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev
 
+RUN \
+  apt-get upgrade -y && apt-get update -y && \
+  DEBIAN_FRONTEND=noninteractive \
+  apt install -y \
+  libqt5serialport5-dev
+
 RUN pip install future
 
 RUN \
@@ -67,22 +73,15 @@ RUN \
 # Prepare gitlab build
 # gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
 RUN \
-  mkdir -p /builds/custusx && \
-  cd /builds/custusx && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git && \
-  cd CustusX && \
+  mkdir -p /builds/custusx/CustusX/Ubuntu2204/cx && \
+  cd /builds/custusx/CustusX/Ubuntu2204/cx && \
+  git clone https://gitlab.sintef.no/custusx/CustusX.git  cx && \
+  cd cx && \
   git checkout develop
 
 RUN \
-  cd /builds/custusx/CustusX && \
+  cd /builds/custusx/CustusX/Ubuntu2204/cx/cx && \
   ./install/cxJenkinsMasterBuild.py --create_package
-
-
-RUN \
-  apt-get upgrade -y && apt-get update -y && \
-  DEBIAN_FRONTEND=noninteractive \
-  apt install -y \
-  libqt5serialport5-dev
 
 WORKDIR /builds/custusx/CustusX
 

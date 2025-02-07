@@ -3,16 +3,16 @@
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
 # Build image:
-# sudo docker build -t custusx-build-ubuntu2004 .
+# sudo docker build -t custusx-build-ubuntu2004:25.02 .
 # or
-# sudo docker build --no-cache -t custusx-build-ubuntu2004 .
+# sudo docker build --no-cache -t custusx-build-ubuntu2004:25.02 .
 
 # Tag image
-# sudo docker tag custusx-build-ubuntu2004 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
+# sudo docker tag custusx-build-ubuntu2004:25.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02
 
 # Upload image
 # For gitlab docker login see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02
 
 # List all docker container
 # sudo docker ps --all
@@ -21,7 +21,7 @@
 # sudo docker rm ...
 
 # Explore container with the command line:
-# sudo docker run --rm -it --entrypoint=/bin/bash gitlab.sintef.no:5050/custusx/custusx-build-ubuntu2004
+# sudo docker run --rm -it --entrypoint=/bin/bash gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02
 
 FROM ubuntu:20.04
 
@@ -82,14 +82,14 @@ RUN \
 # Prepare gitlab build
 # gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
 RUN \
-  mkdir -p /builds/custusx && \
-  cd /builds/custusx && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git && \
-  cd CustusX && \
+  mkdir -p /builds/custusx/CustusX/Ubuntu2004/cx && \
+  cd /builds/custusx/CustusX/Ubuntu2004/cx && \
+  git clone https://gitlab.sintef.no/custusx/CustusX.git  cx && \
+  cd cx && \
   git checkout develop
 
 RUN \
-  cd /builds/custusx/CustusX && \
+  cd /builds/custusx/CustusX/Ubuntu2004/cx/cx && \
   ./install/cxJenkinsMasterBuild.py --create_package
 
 

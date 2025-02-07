@@ -35,12 +35,14 @@ cleanup-old-builds:
   - rm -rf CX
   - rm -rf CS
   - rm -rf FX
+  - rm -rf Installed
+  - rm -rf temp
 
 .build-job:       # This job runs in the build stage, which runs first.
   stage: build
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
-    OS: Ubuntu2004
+    OS: OS
     SOURCE_DIR: $CI_PROJECT_DIR/$OS/cx/cx
   script:
     # - export # For listing all gitlab variables
@@ -52,8 +54,9 @@ cleanup-old-builds:
     #- strings ../../OpenIGTLinkIO/build_Release/lib/libigtlioGUI.so | grep "Qt_5\."
     #- strings ../../CTK/build_Release/CTK-build/bin/libCTKCore.so | grep "Qt_5\."
     #- strings ../build_Release/bin/libcxGui.so | grep "Qt_5\."
-    - git clone https://gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
+    - git checkout $CI_COMMIT_BRANCH
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     # Don't work. Probably needs to rename file in .py scripts instead
     #- mv package_artefacts/CustusX*.tar.gz package_artefacts/CustusX_$VERSION_$OS.tar.gz
@@ -75,14 +78,13 @@ cleanup-old-builds:
 
 build-and-test-ubuntu20:
   extends: .build-job
-  #image: gitlab.sintef.no:5050/custusx/custusx/build-ubuntu2004:25.02
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-ubuntu2004
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02
   variables:
     OS: Ubuntu2004
 
 build-and-test-ubuntu22:
   extends: .build-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02
   variables:
     OS: Ubuntu2204
 
