@@ -41,7 +41,7 @@ stages:          # List of stages for jobs, and their order of execution
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: Ubuntu2004
-    SOURCE_DIR = $CI_PROJECT_DIR/$OS/cx/cx
+    SOURCE_DIR: $CI_PROJECT_DIR/$OS/cx/cx
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
