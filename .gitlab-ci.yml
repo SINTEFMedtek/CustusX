@@ -43,7 +43,7 @@ cleanup-old-builds:
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
-    SOURCE_DIR: $CI_PROJECT_DIR/$OS/cx/cx
+    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."

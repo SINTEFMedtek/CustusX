@@ -4,9 +4,9 @@
 
 # Build, tag, and upload on gitlab
 # For gitlab docker login (before last step) see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker build --no-cache -t custusx-build-ubuntu2204:25.02 .
-# sudo docker tag custusx-build-ubuntu2204:25.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02
+# sudo docker build --no-cache -t custusx-build-ubuntu2204:25.02.01 .
+# sudo docker tag custusx-build-ubuntu2204:25.02.01 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
 
 # List all docker container
 # sudo docker ps --all
@@ -73,14 +73,14 @@ RUN \
 # Prepare gitlab build
 # gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
 RUN \
-  mkdir -p /builds/custusx/CustusX/Ubuntu2204/cx && \
-  cd /builds/custusx/CustusX/Ubuntu2204/cx && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git  cx && \
-  cd cx && \
-  git checkout develop
+  mkdir -p /builds/custusx/CustusX/Ubuntu2204/CX && \
+  cd /builds/custusx/CustusX/Ubuntu2204/CX && \
+  git clone https://gitlab.sintef.no/custusx/CustusX.git  CX && \
+  cd CX && \
+  git checkout cx22-build-on-ubuntu-22-04
 
 RUN \
-  cd /builds/custusx/CustusX/Ubuntu2204/cx/cx && \
+  cd /builds/custusx/CustusX/Ubuntu2204/CX/CX && \
   ./install/cxJenkinsMasterBuild.py --create_package
 
 WORKDIR /builds/custusx/CustusX
