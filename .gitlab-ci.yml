@@ -68,7 +68,7 @@ cleanup-old-builds:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     paths:
     # CI_PROJECT_DIR="/builds/custusx/CustusX"
-      - package_artefacts/CustusX*.tar.gz
+      - package_artefacts/$OS/CustusX*.tar.gz
       - package_artefacts/html_pure/
       - package_artefacts/html_dev/
       - test_results/*junit.xml
@@ -95,16 +95,28 @@ build-and-test-ubuntu22:
     VERSION: ${CI_COMMIT_SHORT_SHA}
   script:
   - echo "Deploying application..."
-  - cd $CI_PROJECT_DIR/package_artefacts
-  - INSTALLER_FILES=$(find CustusX*.tar.gz)
-  - echo $INSTALLER_FILES
-  - |
-    for file in $INSTALLER_FILES; do
-      'curl
-       --header "JOB-TOKEN: $CI_JOB_TOKEN"
-       --upload-file $file
-       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$file"'
-    done
+  - cd $CI_PROJECT_DIR/package_artefacts/Ubuntu2004
+  - INSTALLER_FILE=$(find CustusX*.tar.gz)
+  - 'curl
+     --header "JOB-TOKEN: $CI_JOB_TOKEN"
+     --upload-file $INSTALLER_FILE
+     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2004/$INSTALLER_FILE"'
+  - cd $CI_PROJECT_DIR/package_artefacts/Ubuntu2204
+  - INSTALLER_FILE=$(find CustusX*.tar.gz)
+  - 'curl
+     --header "JOB-TOKEN: $CI_JOB_TOKEN"
+     --upload-file $INSTALLER_FILE
+     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2204/$INSTALLER_FILE"'
+#  - cd $CI_PROJECT_DIR/package_artefacts
+#  - INSTALLER_FILES=$(find CustusX*.tar.gz)
+#  - echo $INSTALLER_FILES
+#  - |
+#    for file in $INSTALLER_FILES; do
+#      'curl
+#       --header "JOB-TOKEN: $CI_JOB_TOKEN"
+#       --upload-file $file
+#       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$file"'
+#    done
 
 deploy-commmit:
   extends: .deploy
