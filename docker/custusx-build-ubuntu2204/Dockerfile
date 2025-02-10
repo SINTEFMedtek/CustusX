@@ -77,7 +77,7 @@ RUN \
   cd /builds/custusx/CustusX/Ubuntu2204/CX && \
   git clone https://gitlab.sintef.no/custusx/CustusX.git  CX && \
   cd CX && \
-  git checkout cx22-build-on-ubuntu-22-04
+  git checkout develop
 
 RUN \
   cd /builds/custusx/CustusX/Ubuntu2204/CX/CX && \

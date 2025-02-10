@@ -68,10 +68,10 @@ cleanup-old-builds:
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     paths:
     # CI_PROJECT_DIR="/builds/custusx/CustusX"
-      - package_artefacts/$OS/CustusX*.tar.gz
-      - package_artefacts/html_pure/
-      - package_artefacts/html_dev/
-      - test_results/*junit.xml
+      - $OS/CX/CX/package_artefacts/CustusX*.tar.gz
+      - $OS/CX/CX/package_artefacts/html_pure/
+      - $OS/CX/CX/package_artefacts/html_dev/
+      - $OS/CX/CX/test_results/*junit.xml
     reports:
       junit: test_results/*junit.xml
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
