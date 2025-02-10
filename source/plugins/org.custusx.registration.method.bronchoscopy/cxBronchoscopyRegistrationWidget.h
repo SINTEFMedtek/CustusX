@@ -90,7 +90,7 @@ private:
 	void useEBUSprobe(QDomElement root);
 	void useLocalRegistration(QDomElement root);
 	void createMaxLocalRegistrationDistance(QDomElement root);
-	void writeTrackingDataInfoToFile(std::vector<double> timestamps, std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex, Eigen::VectorXd distanceToClosestCTPosition, std::vector<std::vector<int>> branchPositionInfo);
+	void writeTrackingDataInfoToFile(std::vector<double> timestamps, std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex, Eigen::VectorXd distanceToClosestCTPosition, std::vector<std::vector<int>> branchPositionInfo, std::vector<std::vector<int> > branchCodes);
 };
 
 } //namespace cx

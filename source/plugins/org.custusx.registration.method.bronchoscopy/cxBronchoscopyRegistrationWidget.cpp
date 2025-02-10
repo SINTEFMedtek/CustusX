@@ -216,8 +216,6 @@ void BronchoscopyRegistrationWidget::registerSlot()
 
 	//	mRecordTrackingWidget->showSelectedRecordingInView();
 
-	generateTrackingDataToCTcenterlineInfoSlot(); //debug testing only - remove
-
 }
 
 void BronchoscopyRegistrationWidget::generateTrackingDataToCTcenterlineInfoSlot()
@@ -242,31 +240,38 @@ void BronchoscopyRegistrationWidget::generateTrackingDataToCTcenterlineInfoSlot(
 		trackingPositions.block(0 , i , 3 , 1) = (rMpr*Tnavigation[i]).topRightCorner(3 , 1);
 
 	BranchListPtr branchList = mBronchoscopyRegistration->getBranchList();
+	branchList->setBranchCode();
 	branchVector branches = branchList->getBranches();
 	Eigen::MatrixXd CTPositions;
 	std::vector<std::vector<int>> branchPositionInfo; //{branchNr, branchIndex, branchLength, generationNumber}
+	std::vector<std::vector<int>> branchCodes;
 
 	for (int i = 0; i < branches.size(); i++)
 	{
 		int numberOfPositionsInBranch = branches[i]->getPositions().cols();
 		Eigen::MatrixXd CTPositionsNew(3 , CTPositions.cols() + numberOfPositionsInBranch);
-		CTPositionsNew.leftCols(CTPositions.cols()) = CTPositions;
+		if(CTPositions.cols() > 0)
+			CTPositionsNew.leftCols(CTPositions.cols()) = CTPositions;
 		CTPositionsNew.rightCols(numberOfPositionsInBranch) = branches[i]->getPositions();
 		CTPositions.swap(CTPositionsNew);
 
 		int branchGenerationNumber = branches[i]->findGenerationNumber();
 		for (int j = 0; j < numberOfPositionsInBranch; j++)
+		{
 			branchPositionInfo.push_back({i, j+1, numberOfPositionsInBranch, branchGenerationNumber});
+			branchCodes.push_back(branches[i]->getBranchCode());
+		}
 	}
 
 	std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > nearestCTPositionSearchResult = dsearchn(trackingPositions, CTPositions);
 	std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex = nearestCTPositionSearchResult.first;
 	Eigen::VectorXd distanceToClosestCTPosition = nearestCTPositionSearchResult.second;
 
-	writeTrackingDataInfoToFile(timestamps, closestCTPositionIndex, distanceToClosestCTPosition, branchPositionInfo);
+	writeTrackingDataInfoToFile(timestamps, closestCTPositionIndex, distanceToClosestCTPosition, branchPositionInfo, branchCodes);
+
 }
 
-void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<double> timestamps, std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex, Eigen::VectorXd distanceToClosestCTPosition, std::vector<std::vector<int>> branchPositionInfo)
+void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<double> timestamps, std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex, Eigen::VectorXd distanceToClosestCTPosition, std::vector<std::vector<int>> branchPositionInfo, std::vector<std::vector<int>> branchCodes)
 {
 	QString path = mServices->patient()->getActivePatientFolder() + "/TrackingInformation/";
 	QDir directory(path);
@@ -287,17 +292,25 @@ void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<dou
 	{
 		QTextStream stream(&outfile);
 
-		stream << "{Timestamp, Branch number, Position in branch, Branch length, Branch generation, Offset [mm]}" << endl;
+		stream << "{Timestamp; Branch number; Position in branch; Branch length; Branch generation; branchCode; Offset [mm]}" << endl;
 
 		for (int i = 0; i<closestCTPositionIndex.size(); i++)
+		{
 			stream
-					<< qstring_cast(timestamps[i]) << ","
-					<< branchPositionInfo[closestCTPositionIndex[i]][0] << ","
-					<< branchPositionInfo[closestCTPositionIndex[i]][1] << ","
-					<< branchPositionInfo[closestCTPositionIndex[i]][2] << ","
-					<< branchPositionInfo[closestCTPositionIndex[i]][3] << ","
-					<< std::round(distanceToClosestCTPosition[i]*10)/10
-					<< endl;
+				<< qstring_cast(timestamps[i]) << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][0] << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][1] << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][2] << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][3] << ";";
+			for (int j = 0; j<branchCodes[closestCTPositionIndex[i]].size(); j++)
+			{
+				if(j>0)
+					stream << ",";
+				stream << branchCodes[closestCTPositionIndex[i]][j];
+			}
+			stream << ";" << std::round(distanceToClosestCTPosition[i]*10)/10
+				<< endl;
+		}
 	}
 }
 
