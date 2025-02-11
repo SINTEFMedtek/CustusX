@@ -61,29 +61,48 @@ cleanup-old-builds:
     # Don't work. Probably needs to rename file in .py scripts instead
     #- mv package_artefacts/CustusX*.tar.gz package_artefacts/CustusX_$VERSION_$OS.tar.gz
     - echo "Compile complete."
-    - echo "Running unit tests... "
-    - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
-    when: always
-    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     paths:
     # CI_PROJECT_DIR="/builds/custusx/CustusX"
       - $OS/CX/CX/package_artefacts/CustusX*.tar.gz
       - $OS/CX/CX/package_artefacts/html_pure/
       - $OS/CX/CX/package_artefacts/html_dev/
-      - $OS/CX/CX/test_results/*junit.xml
-    reports:
-      junit: test_results/*junit.xml
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
-build-and-test-ubuntu20:
+build-ubuntu20:
   extends: .build-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
   variables:
     OS: Ubuntu2004
 
-build-and-test-ubuntu22:
+build-ubuntu22:
   extends: .build-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
+  variables:
+    OS: Ubuntu2204
+
+test-job:   # This job runs the Unit + Integration tests
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  script:
+  - echo "Running unit tests... "
+  - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+artifacts:
+  when: always
+  name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+  paths:
+    - $OS/CX/CX/test_results/*junit.xml
+  reports:
+    junit: $OS/CX/CX/test_results/*junit.xml
+  #expire_in: never # Default is 30 days. May need to set releases to "never"?
+
+test-ubuntu20:
+  extends: .test-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
+  variables:
+    OS: Ubuntu2004
+
+test-ubuntu22:
+  extends: .test-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
   variables:
     OS: Ubuntu2204
@@ -95,13 +114,13 @@ build-and-test-ubuntu22:
     VERSION: ${CI_COMMIT_SHORT_SHA}
   script:
   - echo "Deploying application..."
-  - cd $CI_PROJECT_DIR/package_artefacts/Ubuntu2004
+  - cd $CI_PROJECT_DIR/Ubuntu2004/CX/CX/package_artefacts
   - INSTALLER_FILE=$(find CustusX*.tar.gz)
   - 'curl
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
      --upload-file $INSTALLER_FILE
      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2004/$INSTALLER_FILE"'
-  - cd $CI_PROJECT_DIR/package_artefacts/Ubuntu2204
+  - cd $CI_PROJECT_DIR/Ubuntu2204/CX/CX/package_artefacts
   - INSTALLER_FILE=$(find CustusX*.tar.gz)
   - 'curl
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
