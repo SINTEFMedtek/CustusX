@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QPushButton>
 #include <QDomElement>
+#include <QDateTime>
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
 #include "cxTool.h"
@@ -31,6 +32,8 @@ typedef boost::shared_ptr<class AcquisitionData> AcquisitionDataPtr;
 typedef std::map<QString, ToolPtr> ToolMap;
 typedef boost::shared_ptr<class SelectRecordSession> SelectRecordSessionPtr;
 
+#define ADJUST_TRACKING_DATA_OFFSET 10 //seconds
+
 /**
  *
  * Record tracking data.
@@ -47,7 +50,8 @@ public:
 						 AcquisitionServicePtr acquisitionService,
 						 VisServicesPtr services,
 						 QString category,
-						 QWidget *parent);
+						 QWidget *parent,
+						 bool useAdjustTracingData = false);
 	virtual ~RecordTrackingWidget()	{}
 
 	ToolPtr getSuitableRecordingTool();
@@ -67,6 +71,8 @@ private slots:
 	void acquisitionStarted();
 	void acquisitionStopped();
 	void acquisitionCancelled();
+	void onRecordSessionChanged();
+	void onAdjustTrackingDataTimeIntervaChanged();
 	void obscuredSlot(bool obscured);
 
 private:
@@ -82,12 +88,17 @@ private:
 	StringPropertySelectToolPtr mToolSelector;
 	BoolPropertyPtr mMergeWithExistingSession;
 	bool mDrawAqquisitionIn3D;
+	bool mUseAdjustTrackingData;
+	DoublePairPropertyPtr mAdjustTrackingDataTimeInterval;
+	std::pair<QDateTime, QDateTime> mStartStopTimeBeforeAdjustment;
 
 	boost::shared_ptr<WidgetObscuredListener> mObscuredListener;
 
 	ToolRep3DPtr getToolRepIn3DView();
 	void onToolChanged();
 	void onMergeChanged();
+	void createAdjustTrackingDataTimeInterval(QDomElement root);
+
 };
 
 } //namespace cx

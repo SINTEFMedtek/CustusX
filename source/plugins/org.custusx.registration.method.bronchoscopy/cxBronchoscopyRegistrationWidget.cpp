@@ -11,6 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxBronchoscopyRegistrationWidget.h"
 #include <vtkPolyData.h>
+#include <QDir>
+#include <QTextStream>
 #include "cxTransform3D.h"
 #include "cxDataSelectWidget.h"
 #include "cxTrackingService.h"
@@ -43,6 +45,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxAcquisitionService.h"
 #include "cxRegServices.h"
 #include "cxRecordTrackingWidget.h"
+#include "cxRecordSessionSelector.h"
+#include "cxStringPropertySelectRecordSession.h"
 
 
 namespace cx
@@ -87,10 +91,15 @@ void BronchoscopyRegistrationWidget::setup()
 	connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 	mRegisterButton->setToolTip(this->defaultWhatsThis());
 
+	mInfoFileButton = new QPushButton("Write tracking info to file");
+	connect(mInfoFileButton, SIGNAL(clicked()), this, SLOT(generateTrackingDataToCTcenterlineInfoSlot()));
+	mInfoFileButton->setToolTip("Creating a file with info about closest CT centerline position for each tracking position");
+
 	mRecordTrackingWidget = new RecordTrackingWidget(mOptions.descend("recordTracker"),
 																									 mServices->acquisition(), mServices,
 																									 "bronc_path",
-																									 this);
+																									 this,
+																									 true);
 	mRecordTrackingWidget->getSessionSelector()->setHelp("Select bronchoscope path for registration");
 	mRecordTrackingWidget->getSessionSelector()->setDisplayName("Bronchoscope path");
 
@@ -113,6 +122,8 @@ void BronchoscopyRegistrationWidget::setup()
 	mVerticalLayout->addWidget(new CheckBoxWidget(this, mUseLocalRegistration));
 	mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mMaxLocalRegistrationDistance));
 	mVerticalLayout->addWidget(mRegisterButton);
+	mVerticalLayout->addStretch();
+	mVerticalLayout->addWidget(mInfoFileButton);
 
 	mVerticalLayout->addStretch();
 }
@@ -205,6 +216,102 @@ void BronchoscopyRegistrationWidget::registerSlot()
 
 	//	mRecordTrackingWidget->showSelectedRecordingInView();
 
+}
+
+void BronchoscopyRegistrationWidget::generateTrackingDataToCTcenterlineInfoSlot()
+{
+	if(!mBronchoscopyRegistration->isCenterlineProcessed())
+	{
+		reportError("Centerline not processed");
+		return;
+	}
+
+	Transform3D rMpr = mServices->patient()->get_rMpr();
+	TimedTransformMap trackingData_prMt = mRecordTrackingWidget->getRecordedTrackerData_prMt();
+	M4Vector Tnavigation;
+	std::vector<double> timestamps;
+	for(TimedTransformMap::iterator iter=trackingData_prMt.begin(); iter!=trackingData_prMt.end(); ++iter)
+	{
+		timestamps.push_back(iter->first);
+		Tnavigation.push_back(iter->second.matrix());
+	}
+	Eigen::MatrixXd trackingPositions(3 , Tnavigation.size());
+	for (int i = 0; i < Tnavigation.size(); i++)
+		trackingPositions.block(0 , i , 3 , 1) = (rMpr*Tnavigation[i]).topRightCorner(3 , 1);
+
+	BranchListPtr branchList = mBronchoscopyRegistration->getBranchList();
+	branchList->setBranchCode();
+	branchVector branches = branchList->getBranches();
+	Eigen::MatrixXd CTPositions;
+	std::vector<std::vector<int>> branchPositionInfo; //{branchNr, branchIndex, branchLength, generationNumber}
+	std::vector<std::vector<int>> branchCodes;
+
+	for (int i = 0; i < branches.size(); i++)
+	{
+		int numberOfPositionsInBranch = branches[i]->getPositions().cols();
+		Eigen::MatrixXd CTPositionsNew(3 , CTPositions.cols() + numberOfPositionsInBranch);
+		if(CTPositions.cols() > 0)
+			CTPositionsNew.leftCols(CTPositions.cols()) = CTPositions;
+		CTPositionsNew.rightCols(numberOfPositionsInBranch) = branches[i]->getPositions();
+		CTPositions.swap(CTPositionsNew);
+
+		int branchGenerationNumber = branches[i]->findGenerationNumber();
+		for (int j = 0; j < numberOfPositionsInBranch; j++)
+		{
+			branchPositionInfo.push_back({i, j+1, numberOfPositionsInBranch, branchGenerationNumber});
+			branchCodes.push_back(branches[i]->getBranchCode());
+		}
+	}
+
+	std::pair<std::vector<Eigen::MatrixXd::Index>, Eigen::VectorXd > nearestCTPositionSearchResult = dsearchn(trackingPositions, CTPositions);
+	std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex = nearestCTPositionSearchResult.first;
+	Eigen::VectorXd distanceToClosestCTPosition = nearestCTPositionSearchResult.second;
+
+	writeTrackingDataInfoToFile(timestamps, closestCTPositionIndex, distanceToClosestCTPosition, branchPositionInfo, branchCodes);
+
+}
+
+void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<double> timestamps, std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex, Eigen::VectorXd distanceToClosestCTPosition, std::vector<std::vector<int>> branchPositionInfo, std::vector<std::vector<int>> branchCodes)
+{
+	QString path = mServices->patient()->getActivePatientFolder() + "/TrackingInformation/";
+	QDir directory(path);
+	if (!directory.exists()) // Creating TrackingInformation folder if it does not exist
+		directory.mkpath(path);
+
+	SelectRecordSessionPtr sessionSelector = mRecordTrackingWidget->getSelectRecordSession();
+	if(!sessionSelector)
+		return;
+	RecordSessionPtr session = sessionSelector->getSession();
+	if(!session)
+		return;
+
+	QString filePath = path + session->getUid() + "_TrackingInformation.txt";
+
+	QFile outfile(filePath);
+	if (outfile.open(QIODevice::ReadWrite))
+	{
+		QTextStream stream(&outfile);
+
+		stream << "{Timestamp; Branch number; Position in branch; Branch length; Branch generation; branchCode; Offset [mm]}" << endl;
+
+		for (int i = 0; i<closestCTPositionIndex.size(); i++)
+		{
+			stream
+				<< qstring_cast(timestamps[i]) << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][0] << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][1] << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][2] << ";"
+				<< branchPositionInfo[closestCTPositionIndex[i]][3] << ";";
+			for (int j = 0; j<branchCodes[closestCTPositionIndex[i]].size(); j++)
+			{
+				if(j>0)
+					stream << ",";
+				stream << branchCodes[closestCTPositionIndex[i]][j];
+			}
+			stream << ";" << std::round(distanceToClosestCTPosition[i]*10)/10
+				<< endl;
+		}
+	}
 }
 
 void BronchoscopyRegistrationWidget::createMaxNumberOfGenerations(QDomElement root)

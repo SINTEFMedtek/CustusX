@@ -3914,8 +3914,8 @@
            <Type>LinearArray</Type>
            <DefaultRTSource>DVI</DefaultRTSource>
            <RTSource>
-               <TemporalCalibration>0</TemporalCalibration>
-               <TemporalCalibrationLinux>0</TemporalCalibrationLinux>
+               <TemporalCalibration>200</TemporalCalibration>
+               <TemporalCalibrationLinux>200</TemporalCalibrationLinux>
                <Name>DVI</Name>
                <DefaultConfig>Camera</DefaultConfig>
                <ImageSize>
@@ -3930,29 +3930,29 @@
                    <Depth>1180</Depth>
                    <Offset>0</Offset>
                    <Origin>
-                       <Col>1013</Col>
+                       <Col>1226</Col>
                        <Row>0</Row>
                    </Origin>
                    <NCorners>4</NCorners>
                    <Corner>
-                       <Col>474</Col>
+                       <Col>555</Col>
                        <Row>0</Row>
                    </Corner>
                    <Corner>
-                       <Col>474</Col>
+                       <Col>555</Col>
                        <Row>1079</Row>
                    </Corner>
                    <Corner>
-                       <Col>1551</Col>
+                       <Col>1897</Col>
                        <Row>1079</Row>
                    </Corner>
                    <Corner>
-                       <Col>1551</Col>
+                       <Col>1897</Col>
                        <Row>0</Row>
                    </Corner>
                    <CroppingEdges>
-                       <Left>474</Left>
-                       <Right>1551</Right>
+                       <Left>555</Left>
+                       <Right>1897</Right>
                        <Top>0</Top>
                        <Bottom>1079</Bottom>
                    </CroppingEdges>

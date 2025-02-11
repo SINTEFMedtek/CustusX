@@ -218,6 +218,16 @@ QString Branch::getLap()
 	return mLobe;
 }
 
+void Branch::setBranchCode(std::vector<int> branchCode)
+{
+	mBranchCode = branchCode;
+}
+
+std::vector<int> Branch::getBranchCode()
+{
+	return mBranchCode;
+}
+
 
 Branch::~Branch()
 {
