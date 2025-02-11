@@ -50,17 +50,10 @@ cleanup-old-builds:
     - echo "Compiling the code..."
     - cd $CI_PROJECT_DIR
     - echo $OS
-    - qmake --version
-    #- echo "Qt version of libigtlioGUI.so, libCTKCore.so, and libcxGui.so:"
-    #- strings ../../OpenIGTLinkIO/build_Release/lib/libigtlioGUI.so | grep "Qt_5\."
-    #- strings ../../CTK/build_Release/CTK-build/bin/libCTKCore.so | grep "Qt_5\."
-    #- strings ../build_Release/bin/libcxGui.so | grep "Qt_5\."
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-    # Don't work. Probably needs to rename file in .py scripts instead
-    #- mv package_artefacts/CustusX*.tar.gz package_artefacts/CustusX_$VERSION_$OS.tar.gz
     - echo "Compile complete."
   artifacts:
     paths:
@@ -84,8 +77,15 @@ build-ubuntu22:
 
 .test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
+  variables:
+    OS: OS
+    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
   script:
   - echo "Running unit tests... "
+  - cd $CI_PROJECT_DIR
+  - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
+  - cd $SOURCE_DIR
+  - git checkout $CI_COMMIT_BRANCH
   - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
@@ -94,7 +94,6 @@ build-ubuntu22:
       - $OS/CX/CX/test_results/*junit.xml
     reports:
       junit: $OS/CX/CX/test_results/*junit.xml
-    #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
 test-ubuntu20:
   extends: .test-job
@@ -127,16 +126,6 @@ test-ubuntu22:
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
      --upload-file $INSTALLER_FILE
      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2204/$INSTALLER_FILE"'
-#  - cd $CI_PROJECT_DIR/package_artefacts
-#  - INSTALLER_FILES=$(find CustusX*.tar.gz)
-#  - echo $INSTALLER_FILES
-#  - |
-#    for file in $INSTALLER_FILES; do
-#      'curl
-#       --header "JOB-TOKEN: $CI_JOB_TOKEN"
-#       --upload-file $file
-#       "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$file"'
-#    done
 
 deploy-commmit:
   extends: .deploy
