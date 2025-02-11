@@ -244,9 +244,10 @@ void RecordTrackingWidget::drawAcquisitionIn3D(bool draw)
 
 void RecordTrackingWidget::createAdjustTrackingDataTimeInterval(QDomElement root)
 {
-	mAdjustTrackingDataTimeInterval = DoublePairProperty::initialize("Adjust tracking data", "",
-																																							"Adjust start and stop time for tracking data", DoubleRange(0, 0, 0.5), 1,
-																				root);
+	mAdjustTrackingDataTimeInterval = DoublePairProperty::initialize(
+		"Adjust tracking data", "",
+		"Adjust start and stop time for tracking data", DoubleRange(0, 0, 0.5), 1,
+		root);
 }
 
 void RecordTrackingWidget::onRecordSessionChanged()
