@@ -8,6 +8,7 @@ default:
 
 stages:          # List of stages for jobs, and their order of execution
   - build
+  - test
   - deploy
 
 # Cleanup old builds from runners
@@ -81,19 +82,19 @@ build-ubuntu22:
   variables:
     OS: Ubuntu2204
 
-test-job:   # This job runs the Unit + Integration tests
+.test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
   - echo "Running unit tests... "
   - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-artifacts:
-  when: always
-  name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
-  paths:
-    - $OS/CX/CX/test_results/*junit.xml
-  reports:
-    junit: $OS/CX/CX/test_results/*junit.xml
-  #expire_in: never # Default is 30 days. May need to set releases to "never"?
+  artifacts:
+    when: always
+    name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
+    paths:
+      - $OS/CX/CX/test_results/*junit.xml
+    reports:
+      junit: $OS/CX/CX/test_results/*junit.xml
+    #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
 test-ubuntu20:
   extends: .test-job
