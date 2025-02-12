@@ -58,9 +58,9 @@ cleanup-old-builds:
   artifacts:
     paths:
     # CI_PROJECT_DIR="/builds/custusx/CustusX"
-      - $OS/CX/CustusX/package_artefacts/CustusX*.tar.gz
-      - $OS/CX/CustusX/package_artefacts/html_pure/
-      - $OS/CX/CustusX/package_artefacts/html_dev/
+      - $SOURCE_DIR/package_artefacts/CustusX*.tar.gz
+      - $SOURCE_DIR/package_artefacts/html_pure/
+      - $SOURCE_DIR/package_artefacts/html_dev/
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
 build-ubuntu20:
@@ -91,9 +91,9 @@ build-ubuntu22:
     when: always
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     paths:
-      - $OS/CX/CustusX/test_results/*junit.xml
+      - $SOURCE_DIR/test_results/*junit.xml
     reports:
-      junit: $OS/CX/CustusX/test_results/*junit.xml
+      junit: $SOURCE_DIR/test_results/*junit.xml
 
 test-ubuntu20:
   extends: .test-job
