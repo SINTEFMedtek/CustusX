@@ -58,9 +58,9 @@ cleanup-old-builds:
   artifacts:
     paths:
     # CI_PROJECT_DIR="/builds/custusx/CustusX"
-      - $OS/CX/CX/package_artefacts/CustusX*.tar.gz
-      - $OS/CX/CX/package_artefacts/html_pure/
-      - $OS/CX/CX/package_artefacts/html_dev/
+      - $OS/CX/CustusX/package_artefacts/CustusX*.tar.gz
+      - $OS/CX/CustusX/package_artefacts/html_pure/
+      - $OS/CX/CustusX/package_artefacts/html_dev/
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
 build-ubuntu20:
@@ -81,19 +81,19 @@ build-ubuntu22:
     OS: OS
     SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
   script:
-  - echo "Running unit tests... "
-  - cd $CI_PROJECT_DIR
-  - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
-  - cd $SOURCE_DIR
-  - git checkout $CI_COMMIT_BRANCH
-  - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    - echo "Running unit tests... "
+    - cd $CI_PROJECT_DIR
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
+    - cd $SOURCE_DIR
+    - git checkout $CI_COMMIT_BRANCH
+    - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     paths:
-      - $OS/CX/CX/test_results/*junit.xml
+      - $OS/CX/CustusX/test_results/*junit.xml
     reports:
-      junit: $OS/CX/CX/test_results/*junit.xml
+      junit: $OS/CX/CustusX/test_results/*junit.xml
 
 test-ubuntu20:
   extends: .test-job
