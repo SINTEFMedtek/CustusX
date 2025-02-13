@@ -3,16 +3,16 @@
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
 # Build image:
-# sudo docker build -t custusx-build-ubuntu2004:25.02.01 .
+# sudo docker build -t custusx-build-ubuntu2004:25.02.02 .
 # or
-# sudo docker build --no-cache -t custusx-build-ubuntu2004:25.02.01 .
+# sudo docker build --no-cache -t custusx-build-ubuntu2004:25.02.02 .
 
 # Tag image
-# sudo docker tag custusx-build-ubuntu2004:25.02.01 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
+# sudo docker tag custusx-build-ubuntu2004:25.02.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
 
 # Upload image
 # For gitlab docker login see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
 
 # List all docker container
 # sudo docker ps --all
@@ -82,18 +82,17 @@ RUN \
 # Prepare gitlab build
 # gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
 RUN \
-  mkdir -p /builds/custusx/CustusX/Ubuntu2004/CX && \
-  cd /builds/custusx/CustusX/Ubuntu2004/CX && \
+  mkdir -p /builds/Ubuntu2004/CX && \
+  cd /builds/Ubuntu2004/CX && \
   git clone https://gitlab.sintef.no/custusx/CustusX.git CX && \
   cd CX && \
   git checkout develop
 
 RUN \
-  cd /builds/custusx/CustusX/Ubuntu2004/CX/CX && \
+  cd /builds/Ubuntu2004/CX/CX && \
   ./install/cxJenkinsMasterBuild.py --create_package
 
-
-WORKDIR /builds/custusx/CustusX
+WORKDIR /builds/Ubuntu2004/CX
 
 # Build-time metadata as defined at http://label-schema.org
 # BUILD_DATE is omitted to avoid unneeded rebuild

@@ -70,14 +70,11 @@ cleanup-old-builds:
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
-    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
-    BUILD_DIR: $CI_PROJECT_DIR/$OS/CX/build_Release
+    SOURCE_DIR: $CI_PROJECT_DIR/../$OS/CX/CX
+    BUILD_DIR: $CI_PROJECT_DIR/../$OS/CX/build_Release
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
-    - cd $CI_PROJECT_DIR
-    - ls
-    - echo $OS
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - ls
@@ -94,13 +91,13 @@ cleanup-old-builds:
     - echo "Compile complete."
   artifacts:
     paths:
-      - $$BUILD_DIR/CustusX*.tar.gz
-      - $$BUILD_DIR/doc/html_pure/
-      - $$BUILD_DIR/doc/html_dev/
+      - $BUILD_DIR/CustusX*.tar.gz
+      - $BUILD_DIR/doc/html_pure/
+      - $BUILD_DIR/doc/html_dev/
 
 build-ubuntu20:
   extends: .build-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
     OS: Ubuntu2004
 
@@ -110,9 +107,9 @@ build-ubuntu22:
   variables:
     OS: Ubuntu2204
 
-.quick-build-ubuntu20:
+quick-build-ubuntu20:
   extends: .quick-build-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
     OS: Ubuntu2004
 
@@ -124,6 +121,7 @@ build-ubuntu22:
   script:
     - echo "Running unit tests... "
     - cd $CI_PROJECT_DIR
+    - rm -rf $SOURCE_DIR
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
@@ -138,7 +136,7 @@ build-ubuntu22:
 
 test-ubuntu20:
   extends: .test-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
     OS: Ubuntu2004
 
@@ -147,6 +145,13 @@ test-ubuntu22:
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
   variables:
     OS: Ubuntu2204
+
+quick-test-ubuntu20:
+  extends: .test-job
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
+  variables:
+    OS: Ubuntu2004
+    SOURCE_DIR: $CI_PROJECT_DIR/../$OS/CX/CX
 
 .deploy:
   stage: deploy
@@ -189,8 +194,11 @@ deploy-tag:
 pages:
   stage: deploy
   environment: production
+  variables:
+    OS: Ubuntu2004
+    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
   script:
-    - cd $CI_PROJECT_DIR
+    - cd $SOURCE_DIR
     - mv package_artefacts/html_pure/ public/user_doc/
     - mv package_artefacts/html_dev/ public/developer_doc/
   artifacts:
