@@ -63,6 +63,8 @@ cleanup-old-builds:
       - $SOURCE_DIR/package_artefacts/html_dev/
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
+# It looks like CI_PROJECT_DIR is deleted from the Docker image before the build,
+# so a quick build will require out of source build files
 .quick-build-job:
   stage: build
   variables:
@@ -108,7 +110,7 @@ build-ubuntu22:
   variables:
     OS: Ubuntu2204
 
-quick-build-ubuntu20:
+.quick-build-ubuntu20:
   extends: .quick-build-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
   variables:
