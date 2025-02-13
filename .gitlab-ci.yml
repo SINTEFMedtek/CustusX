@@ -74,9 +74,13 @@ cleanup-old-builds:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
     - cd $CI_PROJECT_DIR
+    - ls
     - echo $OS
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
+    - ls
+    - ls ..
+    - ls ../..
     - git checkout $CI_COMMIT_BRANCH
     - ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx components CustusX
     # Create installer
