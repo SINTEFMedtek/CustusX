@@ -75,6 +75,8 @@ cleanup-old-builds:
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
+    - ls $CI_PROJECT_DIR/../..
+    - ls $CI_PROJECT_DIR/../../$OS
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - ls
@@ -103,7 +105,7 @@ build-ubuntu20:
 
 build-ubuntu22:
   extends: .build-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.02
   variables:
     OS: Ubuntu2204
 
@@ -142,7 +144,7 @@ test-ubuntu20:
 
 test-ubuntu22:
   extends: .test-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.01
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.02
   variables:
     OS: Ubuntu2204
 
