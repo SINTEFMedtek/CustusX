@@ -110,10 +110,18 @@ build-ubuntu22:
     OS: Ubuntu2204
 
 quick-build-ubuntu20:
-  extends: .quick-build-job
+  #extends: .quick-build-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
     OS: Ubuntu2004
+  script:
+    # Only print dirs/files
+    - ls
+    - ls $CI_PROJECT_DIR
+    - ls ..
+    - ls ../..
+    - ls $CI_PROJECT_DIR/../..
+    - ls $CI_PROJECT_DIR/../../$OS
 
 .test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
