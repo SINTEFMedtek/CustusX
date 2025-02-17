@@ -109,6 +109,7 @@ build-ubuntu22:
   variables:
     OS: Ubuntu2204
 
+#It looks like the files in the Docker image isn't available after all
 quick-build-ubuntu20:
   stage: build
   #extends: .quick-build-job
@@ -131,11 +132,14 @@ quick-build-ubuntu20:
     SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
   script:
     - echo "Running unit tests... "
+    #Previous artifacts are supposed to be available
+    - ls $SOURCE_DIR/package_artefacts
     - cd $CI_PROJECT_DIR
     - rm -rf $SOURCE_DIR
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
+    - ls $SOURCE_DIR/package_artefacts
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
