@@ -70,23 +70,37 @@ cleanup-old-builds:
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
-    CI_PROJECT_DIR: /builds/$OS/CX/CX
+    #CI_PROJECT_DIR: /builds/$OS/CX/CX #Don't work
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
+    BUILD_DIR: $CI_PROJECT_DIR/../build_Release
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
-    - cd $CI_PROJECT_DIR
+    - cd $GIT_CLONE_PATH
+    - pwd
     - ls $CI_PROJECT_DIR/../..
     - ls $CI_PROJECT_DIR/../../$OS
     - ls
     - ls ..
     - ls ../..
-    - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    #- ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    - git checkout $CI_COMMIT_BRANCH
+    # Build all
+    - ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    # Alternative: build only CX
+    #- ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx components CustusX
+    # Create installer
+    - cd $BUILD_DIR
+    # Remove old installer
+    - rm CustusX*.tar.gz
+    - cpack
+    # The file CustusX*.tar.gz schould now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
     - echo "Compile complete."
   artifacts:
     paths:
-      - package_artefacts/CustusX*.tar.gz
-      - package_artefacts/doc/html_pure/
-      - package_artefacts/doc/html_dev/
+      - $BUILD_DIR/CustusX*.tar.gz
+      - $BUILD_DIR/doc/html_pure/
+      - $BUILD_DIR/doc/html_dev/
 
 build-ubuntu20:
   extends: .build-job
