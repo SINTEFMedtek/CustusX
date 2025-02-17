@@ -79,7 +79,7 @@ cleanup-old-builds:
     - cd $GIT_CLONE_PATH
     - pwd
     - ls $CI_PROJECT_DIR/../..
-    - ls $CI_PROJECT_DIR/../../$OS
+    - ls $CI_PROJECT_DIR/../../..
     - ls
     - ls ..
     - ls ../..
