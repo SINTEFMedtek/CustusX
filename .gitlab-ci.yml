@@ -54,13 +54,14 @@ cleanup-old-builds:
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    - cp -r $SOURCE_DIR/package_artefacts $OS/package_artefacts
     - echo "Compile complete."
   artifacts:
     paths:
     # CI_PROJECT_DIR="/builds/custusx/CustusX"
-      - $SOURCE_DIR/package_artefacts/CustusX*.tar.gz
-      - $SOURCE_DIR/package_artefacts/html_pure/
-      - $SOURCE_DIR/package_artefacts/html_dev/
+      - $OS/package_artefacts/CustusX*.tar.gz
+      - $OS/package_artefacts/html_pure/
+      - $OS/package_artefacts/html_dev/
     #expire_in: never # Default is 30 days. May need to set releases to "never"?
 
 # It looks like CI_PROJECT_DIR is deleted from the Docker image before the build,
@@ -85,6 +86,7 @@ cleanup-old-builds:
     - ls ../..
     #- ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     - git checkout $CI_COMMIT_BRANCH
+    - git  pull
     # Build all
     - ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     # Alternative: build only CX
@@ -95,12 +97,15 @@ cleanup-old-builds:
     - rm -f CustusX*.tar.gz
     - cpack
     # The file CustusX*.tar.gz schould now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
+    - cp -r $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
+    - cp -r $BUILD_DIR/doc/html_pure/ $OS/package_artefacts/html_pure
+    - cp -r $BUILD_DIR/doc/html_dev/ $OS/package_artefacts/html_dev
     - echo "Compile complete."
   artifacts:
     paths:
-      - $BUILD_DIR/CustusX*.tar.gz
-      - $BUILD_DIR/doc/html_pure/
-      - $BUILD_DIR/doc/html_dev/
+      - $OS/package_artefacts/CustusX*.tar.gz
+      - $OS/package_artefacts/doc/html_pure/
+      - $OS/package_artefacts/doc/html_dev/
 
 build-ubuntu20:
   extends: .build-job
@@ -135,6 +140,7 @@ quick-build-ubuntu20:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
+    - cp -r $OS/package_artefacts/CustusX*.tar.gz $SOURCE_DIR/package_artefacts
     - ls $SOURCE_DIR/package_artefacts
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
@@ -172,13 +178,13 @@ quick-test-ubuntu20:
     VERSION: ${CI_COMMIT_SHORT_SHA}
   script:
   - echo "Deploying application..."
-  - cd $CI_PROJECT_DIR/Ubuntu2004/CX/CX/package_artefacts
+  - cd $CI_PROJECT_DIR/Ubuntu2004/package_artefacts
   - INSTALLER_FILE=$(find CustusX*.tar.gz)
   - 'curl
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
      --upload-file $INSTALLER_FILE
      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2004/$INSTALLER_FILE"'
-  - cd $CI_PROJECT_DIR/Ubuntu2204/CX/CX/package_artefacts
+  - cd $CI_PROJECT_DIR/Ubuntu2204/package_artefacts
   - INSTALLER_FILE=$(find CustusX*.tar.gz)
   - 'curl
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
@@ -211,8 +217,8 @@ pages:
     SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
   script:
     - cd $SOURCE_DIR
-    - mv package_artefacts/html_pure/ public/user_doc/
-    - mv package_artefacts/html_dev/ public/developer_doc/
+    - mv $OS/package_artefacts/html_pure/ public/user_doc/
+    - mv $OS/package_artefacts/html_dev/ public/developer_doc/
   artifacts:
     paths:
       - public
