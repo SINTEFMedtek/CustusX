@@ -92,7 +92,7 @@ cleanup-old-builds:
     # Create installer
     - cd $BUILD_DIR
     # Remove old installer
-    - rm CustusX*.tar.gz
+    - rm -f CustusX*.tar.gz
     - cpack
     # The file CustusX*.tar.gz schould now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
     - echo "Compile complete."
