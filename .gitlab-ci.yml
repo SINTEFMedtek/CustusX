@@ -94,6 +94,7 @@ cleanup-old-builds:
     - rm -f CustusX*.tar.gz
     - cpack
     # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
+    - mkdir $OS/package_artefacts
     - cp -r $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
     - cp -r $BUILD_DIR/doc/html_pure/ $OS/package_artefacts/html_pure
     - cp -r $BUILD_DIR/doc/html_dev/ $OS/package_artefacts/html_dev
