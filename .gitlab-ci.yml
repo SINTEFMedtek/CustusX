@@ -49,7 +49,7 @@ cleanup-old-builds:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
     - cd $CI_PROJECT_DIR
-    - echo $OS
+    - pwd
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
@@ -71,22 +71,19 @@ cleanup-old-builds:
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
     OS: OS
-    #CI_PROJECT_DIR: /builds/$OS/CX/CX #Don't work
-    GIT_CLONE_PATH: /builds/$OS/CX/CX
+    GIT_CLONE_PATH: /builds/$OS/CX/CX #Changes CI_PROJECT_DIR
     BUILD_DIR: $CI_PROJECT_DIR/../build_Release
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
+    - cd $CI_PROJECT_DIR
+    - pwd
     - cd $GIT_CLONE_PATH
     - pwd
-    - ls $CI_PROJECT_DIR/../..
-    - ls $CI_PROJECT_DIR/../../..
-    - ls
     - ls ..
     - ls ../..
+    - ls ../../..
     #- ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-    - git checkout $CI_COMMIT_BRANCH
-    - git  pull
     # Build all
     - ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     # Alternative: build only CX
@@ -96,7 +93,7 @@ cleanup-old-builds:
     # Remove old installer
     - rm -f CustusX*.tar.gz
     - cpack
-    # The file CustusX*.tar.gz schould now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
+    # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
     - cp -r $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
     - cp -r $BUILD_DIR/doc/html_pure/ $OS/package_artefacts/html_pure
     - cp -r $BUILD_DIR/doc/html_dev/ $OS/package_artefacts/html_dev
