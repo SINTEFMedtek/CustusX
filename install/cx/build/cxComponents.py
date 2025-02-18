@@ -198,7 +198,7 @@ class ITK(CppComponent):
         #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
         builder.configureCMake()
     def repository(self):
-        return 'https://github.com/SINTEFMedtek/ITK.git'
+        return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
