@@ -55,10 +55,7 @@ cleanup-old-builds:
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-    - ls
-    - ls package_artefacts
     - cd $CI_PROJECT_DIR
-    - mkdir -p $OS/package_artefacts
     - cp -R $SOURCE_DIR/package_artefacts $OS/package_artefacts/
     - echo "Compile complete."
   artifacts:
@@ -96,7 +93,7 @@ cleanup-old-builds:
     - ls doc 2> /dev/null
     - cd $CI_PROJECT_DIR
     - mkdir -p $OS/package_artefacts
-    - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
+    - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts/
     - cp -R $BUILD_DIR/doc/html_pure $OS/package_artefacts/html_pure/
     - cp -R $BUILD_DIR/doc/html_dev $OS/package_artefacts/html_dev/
     - echo "Compile complete."
@@ -134,7 +131,7 @@ quick-build-ubuntu20:
     - echo "Running unit tests... "
     - ls $OS/package_artefacts 2> /dev/null
     - mkdir -p package_artefacts
-    - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts
+    - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts/
     - ls package_artefacts
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
