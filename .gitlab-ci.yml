@@ -59,7 +59,7 @@ cleanup-old-builds:
     - ls package_artefacts
     - cd $CI_PROJECT_DIR
     - mkdir -p $OS/package_artefacts
-    - cp -R $SOURCE_DIR/package_artefacts $OS/package_artefacts
+    - cp -R $SOURCE_DIR/package_artefacts $OS/package_artefacts/
     - echo "Compile complete."
   artifacts:
     paths:
@@ -93,18 +93,18 @@ cleanup-old-builds:
     - cpack
     # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
     - ls
-    - ls doc
+    - ls doc 2> /dev/null
     - cd $CI_PROJECT_DIR
     - mkdir -p $OS/package_artefacts
     - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
-    - cp -R $BUILD_DIR/doc/html_pure/ $OS/package_artefacts/html_pure
-    - cp -R $BUILD_DIR/doc/html_dev/ $OS/package_artefacts/html_dev
+    - cp -R $BUILD_DIR/doc/html_pure $OS/package_artefacts/html_pure/
+    - cp -R $BUILD_DIR/doc/html_dev $OS/package_artefacts/html_dev/
     - echo "Compile complete."
   artifacts:
     paths:
       - $OS/package_artefacts/CustusX*.tar.gz
-      - $OS/package_artefacts/doc/html_pure/
-      - $OS/package_artefacts/doc/html_dev/
+      - $OS/package_artefacts/html_pure/
+      - $OS/package_artefacts/html_dev/
 
 .build-ubuntu20:
   extends: .build-job
@@ -132,9 +132,9 @@ quick-build-ubuntu20:
     GIT_CLONE_PATH: /builds/$OS/CX/CX
   script:
     - echo "Running unit tests... "
-    - ls $OS/package_artefacts
+    - ls $OS/package_artefacts 2> /dev/null
     - mkdir -p package_artefacts
-    - cp -R $OS/package_artefacts/CustusX*.tar.gz $package_artefacts
+    - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts
     - ls package_artefacts
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
