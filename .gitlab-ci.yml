@@ -158,13 +158,13 @@ test-ubuntu22:
   - 'curl
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
      --upload-file $INSTALLER_FILE
-     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2004/$INSTALLER_FILE"'
+     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/Ubuntu2004/$INSTALLER_FILE"'
   - cd $CI_PROJECT_DIR/Ubuntu2204/package_artefacts
   - INSTALLER_FILE=$(find CustusX*.tar.gz)
   - 'curl
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
      --upload-file $INSTALLER_FILE
-     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusS/$VERSION/Ubuntu2204/$INSTALLER_FILE"'
+     "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/Ubuntu2204/$INSTALLER_FILE"'
 
 deploy-commmit:
   extends: .deploy
