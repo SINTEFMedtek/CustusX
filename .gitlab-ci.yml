@@ -56,6 +56,7 @@ cleanup-old-builds:
     - git checkout $CI_COMMIT_BRANCH
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     - cd $CI_PROJECT_DIR
+    - mkdir -p $OS
     - cp -R $SOURCE_DIR/package_artefacts $OS/package_artefacts/
     - echo "Compile complete."
   artifacts:
@@ -89,8 +90,6 @@ cleanup-old-builds:
     - rm -f CustusX*.tar.gz
     - cpack
     # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
-    - ls
-    - ls doc 2> /dev/null
     - cd $CI_PROJECT_DIR
     - mkdir -p $OS/package_artefacts
     - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts/
@@ -103,24 +102,17 @@ cleanup-old-builds:
       - $OS/package_artefacts/html_pure/
       - $OS/package_artefacts/html_dev/
 
-.build-ubuntu20:
-  extends: .build-job
+build-ubuntu20:
+  extends: .quick-build-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
     OS: Ubuntu2004
 
 build-ubuntu22:
-  extends: .build-job
+  extends: .quick-build-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.02
   variables:
     OS: Ubuntu2204
-
-quick-build-ubuntu20:
-  stage: build
-  extends: .quick-build-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
-  variables:
-    OS: Ubuntu2004
 
 .test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
@@ -129,10 +121,8 @@ quick-build-ubuntu20:
     GIT_CLONE_PATH: /builds/$OS/CX/CX
   script:
     - echo "Running unit tests... "
-    - ls $OS/package_artefacts 2> /dev/null
     - mkdir -p package_artefacts
     - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts/
-    - ls package_artefacts
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
@@ -184,7 +174,7 @@ deploy-commmit:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: never
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # Only run for changes to the default (develop) branch
-      # when: never
+      when: never
     - if: '$CI_COMMIT_TAG == null' # Run for all commits, except tags
 
 deploy-tag:
