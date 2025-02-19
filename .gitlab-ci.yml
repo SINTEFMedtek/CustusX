@@ -16,8 +16,9 @@ stages:          # List of stages for jobs, and their order of execution
 cleanup-old-builds:
   stage: .pre
   script:
-  - cd $CI_PROJECT_DIR
+  - pwd
   - cd ..
+  - ls
   - rm -rf build_Release
   - cd ..
   - ls
@@ -54,9 +55,11 @@ cleanup-old-builds:
     - cd $SOURCE_DIR
     - git checkout $CI_COMMIT_BRANCH
     - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    - ls
+    - ls package_artefacts
     - cd $CI_PROJECT_DIR
-    - mkdir $OS/package_artefacts
-    - cp -r $SOURCE_DIR/package_artefacts $OS/package_artefacts
+    - mkdir -p $OS/package_artefacts
+    - cp -R $SOURCE_DIR/package_artefacts $OS/package_artefacts
     - echo "Compile complete."
   artifacts:
     paths:
@@ -78,14 +81,7 @@ cleanup-old-builds:
   script:
     # - export # For listing all gitlab variables
     - echo "Compiling the code..."
-    - cd $CI_PROJECT_DIR
     - pwd
-    - cd $GIT_CLONE_PATH
-    - pwd
-    - ls ..
-    - ls ../..
-    - ls ../../..
-    #- ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     # Build all
     - ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
     # Alternative: build only CX
@@ -96,11 +92,13 @@ cleanup-old-builds:
     - rm -f CustusX*.tar.gz
     - cpack
     # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
+    - ls
+    - ls doc
     - cd $CI_PROJECT_DIR
-    - mkdir $OS/package_artefacts
-    - cp -r $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
-    - cp -r $BUILD_DIR/doc/html_pure/ $OS/package_artefacts/html_pure
-    - cp -r $BUILD_DIR/doc/html_dev/ $OS/package_artefacts/html_dev
+    - mkdir -p $OS/package_artefacts
+    - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts
+    - cp -R $BUILD_DIR/doc/html_pure/ $OS/package_artefacts/html_pure
+    - cp -R $BUILD_DIR/doc/html_dev/ $OS/package_artefacts/html_dev
     - echo "Compile complete."
   artifacts:
     paths:
@@ -108,7 +106,7 @@ cleanup-old-builds:
       - $OS/package_artefacts/doc/html_pure/
       - $OS/package_artefacts/doc/html_dev/
 
-build-ubuntu20:
+.build-ubuntu20:
   extends: .build-job
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
@@ -131,26 +129,21 @@ quick-build-ubuntu20:
   stage: test    # It only starts when the job in the build stage completes successfully.
   variables:
     OS: OS
-    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
   script:
     - echo "Running unit tests... "
-    #Previous artifacts are supposed to be available
-    - ls $SOURCE_DIR/package_artefacts
-    - cd $CI_PROJECT_DIR
-    - rm -rf $SOURCE_DIR
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
-    - cd $SOURCE_DIR
-    - git checkout $CI_COMMIT_BRANCH
-    - cp -r $OS/package_artefacts/CustusX*.tar.gz $SOURCE_DIR/package_artefacts
-    - ls $SOURCE_DIR/package_artefacts
+    - ls $OS/package_artefacts
+    - mkdir -p package_artefacts
+    - cp -R $OS/package_artefacts/CustusX*.tar.gz $package_artefacts
+    - ls package_artefacts
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
     paths:
-      - $SOURCE_DIR/test_results/*junit.xml
+      - test_results/*junit.xml
     reports:
-      junit: $SOURCE_DIR/test_results/*junit.xml
+      junit: test_results/*junit.xml
 
 test-ubuntu20:
   extends: .test-job
@@ -164,19 +157,13 @@ test-ubuntu22:
   variables:
     OS: Ubuntu2204
 
-quick-test-ubuntu20:
-  extends: .test-job
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
-  variables:
-    OS: Ubuntu2004
-    CI_PROJECT_DIR: /builds/$OS/CX/CX
-    SOURCE_DIR: $CI_PROJECT_DIR
-
 .deploy:
   stage: deploy
   environment: production
   variables:
     VERSION: ${CI_COMMIT_SHORT_SHA}
+    OS: Ubuntu2004
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
   script:
   - echo "Deploying application..."
   - cd $CI_PROJECT_DIR/Ubuntu2004/package_artefacts
@@ -215,9 +202,8 @@ pages:
   environment: production
   variables:
     OS: Ubuntu2004
-    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
   script:
-    - cd $SOURCE_DIR
     - mv $OS/package_artefacts/html_pure/ public/user_doc/
     - mv $OS/package_artefacts/html_dev/ public/developer_doc/
   artifacts:
