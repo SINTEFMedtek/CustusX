@@ -1,8 +1,6 @@
 # CustusX GitLab CI/CD configuration file
 
 default:
-  #image: olevs/custusx-build-ubuntu2004 #Prebuilt CustusX, Dockerhub
-  #image: olevs/custusx-ubuntu2004 #Empty image, with only environment
   #image: gitlab.sintef.no:5050/custusx/custusx/custusx-ubuntu2004 # Slower build if not reusing the build from last run
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.01
 
@@ -40,33 +38,8 @@ cleanup-old-builds:
   - rm -rf Installed
   - rm -rf temp
 
-.build-job:       # This job runs in the build stage, which runs first.
-  stage: build
-  variables:
-    VERSION: ${CI_COMMIT_SHORT_SHA}
-    OS: OS
-    SOURCE_DIR: $CI_PROJECT_DIR/$OS/CX/CX
-  script:
-    # - export # For listing all gitlab variables
-    - echo "Compiling the code..."
-    - cd $CI_PROJECT_DIR
-    - pwd
-    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusX.git $SOURCE_DIR
-    - cd $SOURCE_DIR
-    - git checkout $CI_COMMIT_BRANCH
-    - ./install/cxJenkinsMasterBuild.py --create_package --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-    - cd $CI_PROJECT_DIR
-    - mkdir -p $OS
-    - cp -R $SOURCE_DIR/package_artefacts $OS/package_artefacts/
-    - echo "Compile complete."
-  artifacts:
-    paths:
-    # CI_PROJECT_DIR="/builds/custusx/CustusX"
-      - $OS/package_artefacts/CustusX*.tar.gz
-      - $OS/package_artefacts/html_pure/
-      - $OS/package_artefacts/html_dev/
-    #expire_in: never # Default is 30 days. May need to set releases to "never"?
-
+# CI_PROJECT_DIR is deleted from the Docker image before the build,
+# so a quick build requires out of source build files
 .build-variables:
   stage: build
   variables:
@@ -104,41 +77,6 @@ cleanup-old-builds:
   - test -d $BASE_DIR/CTK/build_Release
       && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx components CustusX
       || eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-
-# It looks like CI_PROJECT_DIR is deleted from the Docker image before the build,
-# so a quick build will require out of source build files
-.quick-build-job:
-  stage: build
-  variables:
-    VERSION: ${CI_COMMIT_SHORT_SHA}
-    OS: OS
-    GIT_CLONE_PATH: /builds/$OS/CX/CX #Changes CI_PROJECT_DIR
-    BUILD_DIR: $CI_PROJECT_DIR/../build_Release
-  script:
-    # - export # For listing all gitlab variables
-    - echo "Compiling the code..."
-    - pwd
-    # Build all
-    - ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-    # Alternative: build only CX
-    #- ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx components CustusX
-    # Create installer
-    - cd $BUILD_DIR
-    # Remove old installer
-    - rm -f CustusX*.tar.gz
-    - cpack
-    # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
-    - cd $CI_PROJECT_DIR
-    - mkdir -p $OS/package_artefacts
-    - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts/
-    - cp -R $BUILD_DIR/doc/html_pure $OS/package_artefacts/html_pure/
-    - cp -R $BUILD_DIR/doc/html_dev $OS/package_artefacts/html_dev/
-    - echo "Compile complete."
-  artifacts:
-    paths:
-      - $OS/package_artefacts/CustusX*.tar.gz
-      - $OS/package_artefacts/html_pure/
-      - $OS/package_artefacts/html_dev/
 
 build-ubuntu20:
   extends: .reuse-build
