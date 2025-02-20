@@ -96,7 +96,9 @@ cleanup-old-builds:
       - $OS/package_artefacts/html_dev/
 
 .reuse-build:
-  extends: .build-variables .create-installer
+  extends: 
+    - .build-variables 
+    - .create-installer
   before_script:
   - echo "Run cxInstaller.py"
   - test -d $BASE_DIR/CTK/build_Release
