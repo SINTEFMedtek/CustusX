@@ -111,12 +111,14 @@ build-ubuntu22:
 
 test-ubuntu20:
   extends: .test-job
+  needs: ["build-ubuntu20"]
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
   variables:
     OS: Ubuntu2004
 
 test-ubuntu22:
   extends: .test-job
+  needs: ["build-ubuntu22"]
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.02
   variables:
     OS: Ubuntu2204
