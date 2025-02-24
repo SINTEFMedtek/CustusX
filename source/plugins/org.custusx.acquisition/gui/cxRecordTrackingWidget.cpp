@@ -28,21 +28,24 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxAcquisitionService.h"
 #include "cxRecordSessionSelector.h"
 #include "cxBoolProperty.h"
+#include "cxDoublePairProperty.h"
 
 
 namespace cx
 {
 
 RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
-										   AcquisitionServicePtr acquisitionService,
-										   VisServicesPtr services,
-										   QString category,
-										   QWidget* parent) :
+											 AcquisitionServicePtr acquisitionService,
+											 VisServicesPtr services,
+											 QString category,
+											 QWidget* parent,
+											 bool useAdjustTracingData) :
 	QWidget(parent),
 	mServices(services),
 	mOptions(options),
 	mAcquisitionService(acquisitionService),
-	mDrawAqquisitionIn3D(true)
+	mDrawAqquisitionIn3D(true),
+	mUseAdjustTrackingData(useAdjustTracingData)
 {
 	QVBoxLayout* mVerticalLayout = new QVBoxLayout(this);
 
@@ -56,6 +59,13 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 														 false, QDomNode());
 	connect(mMergeWithExistingSession.get(), &BoolProperty::changed, this, &RecordTrackingWidget::onMergeChanged);
 
+	if(mUseAdjustTrackingData)
+	{
+		createAdjustTrackingDataTimeInterval(mOptions.getElement());
+		connect(mSelectRecordSession->getSessionSelector().get(), &StringProperty::changed, this, &RecordTrackingWidget::onRecordSessionChanged);
+		connect(mAdjustTrackingDataTimeInterval.get(), &DoublePairProperty::changed, this, &RecordTrackingWidget::onAdjustTrackingDataTimeIntervaChanged);
+	}
+
 	AcquisitionService::TYPES context(AcquisitionService::tTRACKING);
 	mRecordSessionWidget = new RecordSessionWidget(mAcquisitionService, this, context, category);
 
@@ -67,6 +77,8 @@ RecordTrackingWidget::RecordTrackingWidget(XmlOptionFile options,
 	mVerticalLayout->addWidget(mRecordSessionWidget);
 	mVerticalLayout->addWidget(mMergeWithExistingSessionWidget);
 	mVerticalLayout->addWidget(new LabeledComboBoxWidget(this, mSelectRecordSession->getSessionSelector()));
+	if(mUseAdjustTrackingData)
+		mVerticalLayout->addWidget(createDataWidget(mServices->view(), mServices->patient(), this, mAdjustTrackingDataTimeInterval));
 
 	mObscuredListener.reset(new WidgetObscuredListener(this));
 	connect(mObscuredListener.get(), SIGNAL(obscured(bool)), this, SLOT(obscuredSlot(bool)));
@@ -228,6 +240,58 @@ void RecordTrackingWidget::hideMergeWithExistingSession()
 void RecordTrackingWidget::drawAcquisitionIn3D(bool draw)
 {
 	mDrawAqquisitionIn3D = draw;
+}
+
+void RecordTrackingWidget::createAdjustTrackingDataTimeInterval(QDomElement root)
+{
+	mAdjustTrackingDataTimeInterval = DoublePairProperty::initialize(
+		"Adjust tracking data", "",
+		"Adjust start and stop time for tracking data", DoubleRange(0, 0, 0.5), 1,
+		root);
+}
+
+void RecordTrackingWidget::onRecordSessionChanged()
+{
+	int secondsDiff = 0;
+	if(mSelectRecordSession)
+	{
+		RecordSessionPtr recordedSession = mSelectRecordSession->getSession();
+		if(recordedSession)
+			if (recordedSession->getIntervalCount()>0)
+			{
+				mStartStopTimeBeforeAdjustment  = recordedSession->getInterval(0);
+				secondsDiff = std::floor(mStartStopTimeBeforeAdjustment.first.msecsTo(mStartStopTimeBeforeAdjustment.second) / 1000);
+			}
+	}
+
+	if(mAdjustTrackingDataTimeInterval)
+	{
+		mAdjustTrackingDataTimeInterval->setValueRange(DoubleRange(-ADJUST_TRACKING_DATA_OFFSET, secondsDiff + ADJUST_TRACKING_DATA_OFFSET, 0.5)); //Also possible to increase length with up to 10s before and after
+		mAdjustTrackingDataTimeInterval->setValue(Eigen::Vector2d(0, secondsDiff));
+	}
+}
+
+void RecordTrackingWidget::onAdjustTrackingDataTimeIntervaChanged()
+{
+	if(!mAdjustTrackingDataTimeInterval)
+		return;
+
+	Eigen::Vector2d timeInterval = mAdjustTrackingDataTimeInterval->getValue();
+	DoubleRange range = mAdjustTrackingDataTimeInterval->getValueRange();
+
+	RecordSessionPtr recordedSession = mSelectRecordSession->getSession();
+	if(recordedSession)
+	{
+		if (recordedSession->getIntervalCount()>0)
+		{
+			std::pair<QDateTime, QDateTime> startAndStopTime = recordedSession->getInterval(0);
+			startAndStopTime.first = mStartStopTimeBeforeAdjustment.first.addMSecs((timeInterval(0))*1000);
+			startAndStopTime.second = mStartStopTimeBeforeAdjustment.second.addMSecs((timeInterval(1) - (range.max()-ADJUST_TRACKING_DATA_OFFSET))*1000);
+			recordedSession->setInterval(0, startAndStopTime);
+			mSelectRecordSession->setVisible(true);
+		}
+	}
+
 }
 
 } //namespace cx

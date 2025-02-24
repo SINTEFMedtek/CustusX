@@ -852,6 +852,80 @@ bool BranchList::isRadiusAvailable()
 	return mIsRadiusAvailable;
 }
 
+/**
+ * @brief BranchList::findBranchCode
+ * Set a code to each branch based on parents and orientation
+ * Trachea: 1
+ * Left main bronchi: 1,1
+ * Right main bronchi: 1,2
+ * and so on
+ */
+void BranchList::setBranchCode()
+{
+	if(mBranches.empty())
+		return;
+
+	mBranches[0]->setBranchCode({1});
+	findBranchCodeForChildren(mBranches[0]);
+}
+
+/**
+ * @brief BranchList::findBranchCode
+ * Recurcive function to find branch code for current branch and all generations below
+ * Trachea: 1
+ * Left main bronchi: 1,1
+ * Right main bronchi: 1,2
+ * and so on
+ * Siblings are named clockwise in the x-z plane based on their normalized orientation vector:
+ * If x>=0: largest z gets lowest index number
+ * else: smallest z gets lowest index number
+ */
+void BranchList::findBranchCodeForChildren(BranchPtr branch)
+{
+	std::vector<int> branchCode = branch->getBranchCode();
+	branchVector childBranches = branch->getChildBranches();
+	if(childBranches.empty())
+		return;
+	Eigen::MatrixXd childBranchesOrientation(3,childBranches.size());
+	for (int i=0; i<childBranches.size(); i++)
+		childBranchesOrientation.col(i) = childBranches[i]->getOrientations().rowwise().mean().normalized();
+	Vector3D meanOrientation = childBranchesOrientation.rowwise().mean();
+
+	int codeNumber = 0;
+	while(childBranchesOrientation.cols() > 0)
+	{
+		Eigen::MatrixXd::Index index;
+		if(branchCode.size()<2)// First division into RMB and LMB
+			childBranchesOrientation.row(0).maxCoeff(&index);
+		else if(branchCode[1]==2)
+		{ //Right lung
+			if(meanOrientation(0) <= 0)
+				childBranchesOrientation.row(2).maxCoeff(&index);
+			else
+				childBranchesOrientation.row(2).minCoeff(&index);
+		}
+		else
+			{//Left lung
+		if(meanOrientation(0) >= 0)
+			childBranchesOrientation.row(2).maxCoeff(&index);
+		else
+			childBranchesOrientation.row(2).minCoeff(&index);
+			}
+		codeNumber++;
+		std::vector<int> newBranchCode = branchCode;
+		newBranchCode.push_back(codeNumber);
+
+		childBranches[index]->setBranchCode(newBranchCode);
+		childBranchesOrientation = eraseCol(index, childBranchesOrientation);
+		childBranches.erase(childBranches.begin() + index);
+	}
+
+	childBranches = branch->getChildBranches();
+	for (int i=0; i<childBranches.size(); i++)
+		findBranchCodeForChildren(childBranches[i]);
+
+}
+
 bool checkIfTwoPointCloudsAreClose(Eigen::MatrixXd C1, Eigen::MatrixXd C2, double maxDistance/*mm*/)
 {
 	Eigen::MatrixXd::Index index;

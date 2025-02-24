@@ -37,6 +37,7 @@ class Branch
 	Vector3D mBendingDirection;
 	double mBronchoscopeRotation = 0;
 	QString mLobe;
+	std::vector<int> mBranchCode;
 
 public:
 	Branch();
@@ -65,6 +66,8 @@ public:
 	void removeEqualPositions();
 	void setLap(QString lap);
 	QString getLap();
+	void setBranchCode(std::vector<int> branchCode);
+	std::vector<int> getBranchCode();
 
 };
 

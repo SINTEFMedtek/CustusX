@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QPushButton>
 #include <QDomElement>
+#include "cxVector3D.h"
 #include "cxRegistrationBaseWidget.h"
 #include "cxForwardDeclarations.h"
 #include "cxXmlOptionItem.h"
@@ -59,6 +60,7 @@ protected:
 private slots:
 	void processCenterlineSlot();
 	void registerSlot();
+	void generateTrackingDataToCTcenterlineInfoSlot();
 	void clearDataOnNewPatient();
 private:
 	void setup();
@@ -76,7 +78,8 @@ private:
 	StringPropertySelectMeshPtr mSelectMeshWidget;
 	QPushButton* mProcessCenterlineButton;
 	QPushButton* mRegisterButton;
-    ToolPtr mTool;
+	QPushButton* mInfoFileButton;
+	ToolPtr mTool;
 
 	RecordTrackingWidget* mRecordTrackingWidget;
 
@@ -87,6 +90,7 @@ private:
 	void useEBUSprobe(QDomElement root);
 	void useLocalRegistration(QDomElement root);
 	void createMaxLocalRegistrationDistance(QDomElement root);
+	void writeTrackingDataInfoToFile(std::vector<double> timestamps, std::vector<Eigen::MatrixXd::Index> closestCTPositionIndex, Eigen::VectorXd distanceToClosestCTPosition, std::vector<std::vector<int>> branchPositionInfo, std::vector<std::vector<int> > branchCodes);
 };
 
 } //namespace cx

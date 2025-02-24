@@ -60,6 +60,8 @@ public:
 	vtkPolyDataPtr createVtkPolyDataFromBranches(bool fullyConnected = false, bool straightBranches = false) const;
 	void setRadius(ImagePtr segmentationVolume);
 	bool isRadiusAvailable();
+	void setBranchCode();
+	void findBranchCodeForChildren(BranchPtr branch);
 
 private:
 	void splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int splitIndex);
