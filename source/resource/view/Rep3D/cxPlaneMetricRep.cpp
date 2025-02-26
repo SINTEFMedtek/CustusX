@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxView.h"
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxBoundingBox3D.h"
 
 namespace cx

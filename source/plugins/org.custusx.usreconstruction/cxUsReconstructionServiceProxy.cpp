@@ -42,9 +42,9 @@ void UsReconstructionServiceProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<UsReconstructionService>(
 								 mPluginContext,
-								 boost::bind(&UsReconstructionServiceProxy::onServiceAdded, this, _1),
+								 boost::bind(&UsReconstructionServiceProxy::onServiceAdded, this, boost::placeholders::_1),
 								 boost::function<void (UsReconstructionService*)>(),
-								 boost::bind(&UsReconstructionServiceProxy::onServiceRemoved, this, _1)
+								 boost::bind(&UsReconstructionServiceProxy::onServiceRemoved, this, boost::placeholders::_1)
 								 ));
 	mServiceListener->open();
 }

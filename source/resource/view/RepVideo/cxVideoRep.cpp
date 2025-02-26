@@ -18,7 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
  */
 #include "cxVideoRep.h"
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>

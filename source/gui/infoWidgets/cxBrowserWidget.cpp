@@ -20,7 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPopupToolbarWidget.h"
 #include <QWidgetAction>
 #include <QCheckBox>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxTreeRepository.h"
 #include "cxProfile.h"
 #include "cxStringListSelectWidget.h"

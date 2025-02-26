@@ -189,7 +189,7 @@ class ITK(CppComponent):
         self._getBuilder().gitSetRemoteURL(self.repository())
         # Using ITK v4.12.0 with a fix for gcc 9
         # Newer ITK versions makes IGSTK compilation fail
-        self._getBuilder().gitCheckoutSha('43737f0ffa907fcdb393227b8d5cb7d2dbbaea84')
+        self._getBuilder().gitCheckoutSha('d16ba4abedea55622c38275e2edfdd6ddec12dad')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -198,7 +198,7 @@ class ITK(CppComponent):
         #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
         builder.configureCMake()
     def repository(self):
-        return '%s/ITK' % self.controlData.gitrepo_open_site_base
+        return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
 class VTK(CppComponent):
@@ -258,6 +258,7 @@ class CTK(CppComponent):
         return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
         self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
+        #self._getBuilder().gitCheckoutSha('2023.07.13') # Makes DICOM import fail
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
         builder = self._getBuilder()
@@ -407,9 +408,7 @@ class IGSTK(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        base = self.controlData.gitrepo_open_site_base
-        repo = '%s/IGSTK.git' % base
-        return repo
+        return 'https://github.com/SINTEFMedtek/IGSTK.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
         self._getBuilder().gitCheckoutSha('79be2fd9cd985f73662f325d8b13dd22870a2ec1')

@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxtestUSSavingRecorderFixture.h"
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "catch.hpp"
 #include "cxDummyToolManager.h"
 #include "cxLogicManager.h"

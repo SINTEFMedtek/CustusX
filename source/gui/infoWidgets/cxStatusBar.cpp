@@ -23,7 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxTrackingService.h"
 #include "cxVideoService.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <QMetaMethod>
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"

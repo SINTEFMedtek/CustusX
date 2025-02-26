@@ -1,5 +1,5 @@
 #include "cxToolProxy.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxNullDeleter.h"
 #include "cxTrackingService.h"
 #include "cxTypeConversions.h"
@@ -23,9 +23,9 @@ void ToolProxy::initServiceListener()
 {
 	mServiceListener.reset(new ServiceTrackerListener<TrackingService>(
 							   mPluginContext,
-							   boost::bind(&ToolProxy::onServiceAdded, this, _1),
+							   boost::bind(&ToolProxy::onServiceAdded, this, boost::placeholders::_1),
 							   boost::function<void (TrackingService*)>(),
-							   boost::bind(&ToolProxy::onServiceRemoved, this, _1)
+							   boost::bind(&ToolProxy::onServiceRemoved, this, boost::placeholders::_1)
 							   ));
 	mServiceListener->open();
 }

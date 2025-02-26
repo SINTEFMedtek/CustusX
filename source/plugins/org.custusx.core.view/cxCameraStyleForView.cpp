@@ -19,7 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTrackingService.h"
 #include "cxToolRep3D.h"
 #include "cxView.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <vtkRenderWindow.h>
 #include "vtkInteractorStyleUnicam.h"
 #include "vtkInteractorStyleTrackballCamera.h"

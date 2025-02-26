@@ -96,9 +96,9 @@ class Common(object):
 
         #self.gitrepo_internal_site_base = "user@example.com/path/to/folder" #intended for use with "git checkout ssh://%s"
         if self.git_use_https:
-            self.gitrepo_open_site_base = "https://github.com/SINTEFMedtek"
+            self.gitrepo_open_site_base = "https://gitlab.sintef.no/custusx"
         else:
-            self.gitrepo_open_site_base = "git@github.com:SINTEFMedtek"
+            self.gitrepo_open_site_base = "git@gitlab.sintef.no:custusx"
         self.gitrepo_main_site_base = self.gitrepo_open_site_base 
 
         self.main_repo_folder = self.getCustusXRepositoryPath()

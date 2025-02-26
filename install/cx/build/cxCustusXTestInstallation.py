@@ -50,10 +50,10 @@ class CustusXTestInstallation(object):
         self.source_custusx_path = source_custusx_path
         
     def getTestDataPath(self):
-        return "%s/custusx/CustusX/data" % self.root_dir
+        return "%s/CX/CX/data" % self.root_dir
 
     def getLargeTestDataPath(self):
-        return "%s/custusx/CustusX/largedata" % self.root_dir
+        return "%s/CX/CX/largedata" % self.root_dir
 
     def testInstallation(self):
         PrintFormatter.printHeader('Test installation', level=2)

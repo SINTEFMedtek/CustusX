@@ -106,7 +106,7 @@ TEST_CASE("Import MNI Tag Point file", "[integration][metrics][mni]")
 
 // Copy some code from test "DicomConverter: Convert Kaisa",
 // and combine this with code from DICOMReader::importSeries()
-TEST_CASE("Import Kaisa from DICOM", "[integration]")
+TEST_CASE("Import Kaisa from DICOM", "[hide]")
 {
 	cx::LogicManager::initialize();
 	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();
@@ -155,6 +155,26 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 	REQUIRE(convertedImage);
 
 	cx::LogicManager::shutdown();
+}
+
+TEST_CASE("DICOMReader: Import Kaisa", "[integration]")
+{
+	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
+	DICOMReaderTest reader;
+
+	QString databaseDir = reader.getDICOMDatabaseDirectory();
+	QDir dir(databaseDir);
+	reader.setupDatabaseDirectory();
+	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
+	database->openDatabase(reader.setupDatabaseFiles());
+
+	cx::ImagePtr image(new cx::Image("uid1", vtkImageDataPtr()));
+	reader.readInto(image, inputDicomDataDirectory);
+	REQUIRE(image);
+
+	database->closeDatabase();
+	reader.deleteDatabase(database);
+	CHECK(dir.isEmpty());
 }
 
 TEST_CASE("DICOMReader: Create and delete database files", "[unit]")

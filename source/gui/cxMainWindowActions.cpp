@@ -12,7 +12,7 @@
 #include <QDockWidget>
 #include <QAction>
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "boost/function.hpp"
 #include "cxReporter.h"
 #include "cxLogger.h"

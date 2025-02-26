@@ -9,7 +9,7 @@ CustusX is released under a BSD 3-Clause license.
 See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <QListWidget>
 #include <QTableWidget>
 #include <QGroupBox>

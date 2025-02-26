@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUSSavingRecorder.h"
 
 #include <QtConcurrentRun>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <vtkPolyData.h>
 
 #include "cxTypeConversions.h"

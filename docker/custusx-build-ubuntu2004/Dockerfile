@@ -2,14 +2,17 @@
 # Useful docker commands.
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
-# Create:
-# sudo docker build -t custusx-build-ubuntu2004 .
-# sudo docker build --no-cache -t custusx-build-ubuntu2004 .
+# Build image:
+# sudo docker build -t custusx-build-ubuntu2004:25.02.02 .
+# or
+# sudo docker build --no-cache -t custusx-build-ubuntu2004:25.02.02 .
 
-# Give created image a name/tag, and upload new image
-# TODO: Create a CustusX organization on Docker
-# sudo docker tag custusx-build-ubuntu2004 olevs/custusx-build-ubuntu2004
-# sudo docker push olevs/custusx-build-ubuntu2004
+# Tag image
+# sudo docker tag custusx-build-ubuntu2004:25.02.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
+
+# Upload image
+# For gitlab docker login see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
 
 # List all docker container
 # sudo docker ps --all
@@ -18,7 +21,7 @@
 # sudo docker rm ...
 
 # Explore container with the command line:
-# sudo docker run --rm -it --entrypoint=/bin/bash custusx-build-ubuntu2004
+# sudo docker run --rm -it --entrypoint=/bin/bash gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02
 
 FROM ubuntu:20.04
 
@@ -40,6 +43,12 @@ RUN \
   libgl1-mesa-dev
 
 # libgl1-mesa-dev #Test with mesa OpenGL (instead of NVIDIA)
+
+RUN \
+  apt-get upgrade -y && apt-get update -y && \
+  DEBIAN_FRONTEND=noninteractive \
+  apt install -y \
+  libqt5serialport5-dev
 
 RUN pip install future
 
@@ -73,24 +82,17 @@ RUN \
 # Prepare gitlab build
 # gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
 RUN \
-  mkdir -p /builds/custusx && \
-  cd /builds/custusx && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git && \
-  cd CustusX && \
+  mkdir -p /builds/Ubuntu2004/CX && \
+  cd /builds/Ubuntu2004/CX && \
+  git clone https://gitlab.sintef.no/custusx/CustusX.git CX && \
+  cd CX && \
   git checkout develop
 
 RUN \
-  cd /builds/custusx/CustusX && \
+  cd /builds/Ubuntu2004/CX/CX && \
   ./install/cxJenkinsMasterBuild.py --create_package
 
-
-RUN \
-  apt-get upgrade -y && apt-get update -y && \
-  DEBIAN_FRONTEND=noninteractive \
-  apt install -y \
-  libqt5serialport5-dev
-
-WORKDIR /builds/custusx/CustusX
+WORKDIR /builds/Ubuntu2004/CX
 
 # Build-time metadata as defined at http://label-schema.org
 # BUILD_DATE is omitted to avoid unneeded rebuild

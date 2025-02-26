@@ -14,7 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QtWidgets>
 
 #include <QVBoxLayout>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "cxTrackingService.h"
 #include "cxLabeledComboBoxWidget.h"
 #include <vtkDoubleArray.h>

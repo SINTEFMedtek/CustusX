@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxPickerRep.h"
 
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>

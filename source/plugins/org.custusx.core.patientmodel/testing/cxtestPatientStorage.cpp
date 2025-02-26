@@ -45,7 +45,7 @@ TEST_CASE("PatientStorage save/load works", "[unit][resource][core]")
 	CHECK(variableToTest.get() == testString1);
 
 	cx::PatientStorage storage(storageFixture.mSessionStorageService, "TestNode");
-	storage.storeVariable("testVariable", boost::bind(&TestVariable::get, &variableToTest), boost::bind(&TestVariable::set, &variableToTest, _1));
+	storage.storeVariable("testVariable", boost::bind(&TestVariable::get, &variableToTest), boost::bind(&TestVariable::set, &variableToTest, boost::placeholders::_1));
 
 	storageFixture.loadSession1();
 	CHECK(variableToTest.get() == testString1);

@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <QMetaMethod>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 #include <QVBoxLayout>

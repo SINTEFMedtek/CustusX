@@ -54,9 +54,9 @@ UsReconstructionImplService::UsReconstructionImplService(ctkPluginContext *plugi
 
 	mServiceListener = boost::shared_ptr<ServiceTrackerListener<ReconstructionMethodService> >(new ServiceTrackerListener<ReconstructionMethodService>(
 			pluginContext,
-			boost::bind(&UsReconstructionImplService::onServiceAdded, this, _1),
-			boost::bind(&UsReconstructionImplService::onServiceModified, this, _1),
-			boost::bind(&UsReconstructionImplService::onServiceRemoved, this, _1)
+			boost::bind(&UsReconstructionImplService::onServiceAdded, this, boost::placeholders::_1),
+			boost::bind(&UsReconstructionImplService::onServiceModified, this, boost::placeholders::_1),
+			boost::bind(&UsReconstructionImplService::onServiceRemoved, this, boost::placeholders::_1)
 	));
 
 	mServiceListener->open();

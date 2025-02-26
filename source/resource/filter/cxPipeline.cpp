@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 
 #include <QtCore>
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
 #include "libQtSignalAdapters/ConnectionFactories.h"
 
@@ -253,7 +253,7 @@ std::vector<SelectDataStringPropertyBasePtr> Pipeline::createNodes()
 
 	for (unsigned i=0; i<retval.size(); ++i)
 		QtSignalAdapters::connect1<void(QString)>(retval[i].get(), SIGNAL(dataChanged(QString)),
-		                                          boost::bind(&Pipeline::nodeValueChanged, this, _1, i));
+		                                          boost::bind(&Pipeline::nodeValueChanged, this, boost::placeholders::_1, i));
 
 	return retval;
 }

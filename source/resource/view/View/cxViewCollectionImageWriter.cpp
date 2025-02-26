@@ -16,7 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDesktopWidget>
 #include <QApplication>
 #include "cxReporter.h"
-#include "boost/bind.hpp"
+#include "boost/bind/bind.hpp"
 #include <QScreen>
 #include <QVBoxLayout>
 #include "cxViewService.h"
