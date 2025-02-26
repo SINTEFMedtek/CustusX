@@ -106,7 +106,7 @@ TEST_CASE("Import MNI Tag Point file", "[integration][metrics][mni]")
 
 // Copy some code from test "DicomConverter: Convert Kaisa",
 // and combine this with code from DICOMReader::importSeries()
-TEST_CASE("Import Kaisa from DICOM", "[hide]")
+TEST_CASE("Import Kaisa from DICOM", "[integration]")
 {
 	cx::LogicManager::initialize();
 	ctkPluginContext* context = cx::LogicManager::getInstance()->getPluginContext();

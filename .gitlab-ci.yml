@@ -76,7 +76,8 @@ cleanup-old-builds:
   - echo "Run cxInstaller.py"
   - ls $BASE_DIR
   - test -d $BASE_DIR/CTK/build_Release
-      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx components CustusX
+      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx 
+      components CustusX CTK
       || eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
 
 build-ubuntu20:
