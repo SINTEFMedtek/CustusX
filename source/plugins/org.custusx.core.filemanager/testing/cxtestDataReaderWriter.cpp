@@ -157,6 +157,26 @@ TEST_CASE("Import Kaisa from DICOM", "[integration]")
 	cx::LogicManager::shutdown();
 }
 
+TEST_CASE("DICOMReader: Import Kaisa", "[integration]")
+{
+	QString inputDicomDataDirectory = cx::DataLocations::getTestDataPath()+"/Phantoms/Kaisa/DICOM/";
+	DICOMReaderTest reader;
+
+	QString databaseDir = reader.getDICOMDatabaseDirectory();
+	QDir dir(databaseDir);
+	reader.setupDatabaseDirectory();
+	ctkDICOMDatabasePtr database = ctkDICOMDatabasePtr(new ctkDICOMDatabase);
+	database->openDatabase(reader.setupDatabaseFiles());
+
+	cx::ImagePtr image(new cx::Image("uid1", vtkImageDataPtr()));
+	reader.readInto(image, inputDicomDataDirectory);
+	REQUIRE(image);
+
+	database->closeDatabase();
+	reader.deleteDatabase(database);
+	CHECK(dir.isEmpty());
+}
+
 TEST_CASE("DICOMReader: Create and delete database files", "[unit]")
 {
 	DICOMReaderTest reader;
