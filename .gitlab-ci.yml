@@ -76,7 +76,7 @@ cleanup-old-builds:
   - echo "Run cxInstaller.py"
   - ls $BASE_DIR
   - rm -rf $BASE_DIR/CTK # Make sure we got a fresh CTK after changing the library
-  - # Reuse previous library build folders if existing, just checking VTK build folder
+  # Reuse previous library build folders if existing, just checking VTK build folder
   - test -d $BASE_DIR/VTK/build_Release
       && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx 
       components CustusX CTK
