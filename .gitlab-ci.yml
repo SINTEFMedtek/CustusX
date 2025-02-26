@@ -11,7 +11,7 @@ stages:          # List of stages for jobs, and their order of execution
 
 # Cleanup old builds from runners
 # Can be removed after a while
-cleanup-old-builds:
+.cleanup-old-builds:
   stage: .pre
   script:
   - pwd
