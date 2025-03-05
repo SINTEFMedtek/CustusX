@@ -75,12 +75,14 @@ stages:          # List of stages for jobs, and their order of execution
   before_script:
   - echo "Run cxInstaller.py"
   - ls $BASE_DIR
+  # Use commit tag if exsiting, otherwise use branch
+  - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
   - rm -rf $BASE_DIR/CTK # Make sure we got a fresh CTK after changing the library
   # Reuse previous library build folders if existing, just checking VTK build folder
   - test -d $BASE_DIR/VTK/build_Release
-      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx 
+      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
       components CustusX CTK
-      || eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+      || eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
 
 build-ubuntu20:
   extends: .reuse-build
@@ -103,7 +105,9 @@ build-ubuntu22:
     - echo "Running unit tests... "
     - mkdir -p package_artefacts
     - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts/
-    - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CI_COMMIT_BRANCH --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    # Use commit tag if exsiting, otherwise use branch
+    - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
+    - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
