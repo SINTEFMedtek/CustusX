@@ -149,7 +149,8 @@ macro(cx_install_set_generator_filename)
 	endif()
 	# append system info if linux:
 	if(CX_LINUX)
-		set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}_${CMAKE_SYSTEM})
+		execute_process(COMMAND lsb_release -sr OUTPUT_VARIABLE UBUNTU_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
+		set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_FILE_NAME}_Ubuntu${UBUNTU_VERSION}")
 	endif(CX_LINUX)
 endmacro()
 
