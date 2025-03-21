@@ -87,7 +87,7 @@ public:
 		//CX_LOG_DEBUG() << "config path: " << configPath;
 		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_test.ini";
 		if(useLungsFile)
-			scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_Lungs_test.ini";
+			scriptFile = configPath + "/profiles/Laboratory/filter_scripts/python_LungVessels.ini";
 		CX_LOG_DEBUG() << "Using script file: " << scriptFile;
 
 		mScriptFile->setValueFromVariant(scriptFile);
@@ -137,9 +137,9 @@ public:
 	{
 		return deepSintefCommandString(variables);
 	}
-	bool testIsUsingDeepSintefEngine(cx::CommandStringVariables variables)
+	bool testIsUsingTotalSegmentatorEngine(cx::CommandStringVariables variables)
 	{
-		return (mScriptEngine == seDeepSintef);
+		return (mScriptEngine == seTotalSegmentator);
 	}
 
 	bool testEnvironmentExist(QString environmentPath)
@@ -526,7 +526,7 @@ TEST_CASE("GenericScriptFilter: Set output colors", "[unit]")
 	CHECK(filter->getOutputColors().size() == 2);
 }
 
-TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
+TEST_CASE("GenericScriptFilter: Read python_LungVessels.ini file", "[unit]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();
@@ -536,7 +536,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 
 	//Create options variables. Needed before setting script file
 	filter->getOptions();
-	filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
+	filter->setTestScriptFile(true);//Init with python_LungVessels.ini file
 
 	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
 
@@ -550,14 +550,14 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << variables.scriptEngine;
 	//CX_LOG_DEBUG() << variables.model;
 
-	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
+	//Assuming the variables in "python_LungVessels.ini" won't change in the future
 	REQUIRE_FALSE(variables.inputFilePath.isEmpty());
 	REQUIRE_FALSE(variables.outputFilePath.isEmpty());
 	REQUIRE_FALSE(variables.envPath.isEmpty());
 	REQUIRE_FALSE(variables.scriptFilePath.isEmpty());
 	REQUIRE(variables.cArguments.isEmpty());
-	REQUIRE(variables.scriptEngine == "DeepSintef");
-	REQUIRE(variables.model == "CT_Lungs");
+	REQUIRE(variables.scriptEngine == "TotalSegmentator");
+	REQUIRE(variables.model.isEmpty());
 
 	//CX_LOG_DEBUG() << "ParameterFilePath: " << filter->getParameterFilePath();
 	REQUIRE(QFileInfo::exists(filter->getParameterFilePath()));
@@ -570,16 +570,13 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	//CX_LOG_DEBUG() << outputVariables.mOutputColorList.join(";");
 	//CX_LOG_DEBUG() << outputVariables.mOutputClasses.join(";");
 
-	//Assuming the variables in "python_Lungs_test.ini" won't change in the future
+	//Assuming the variables in "python_LungVessels.ini" won't change in the future
 	REQUIRE(outputVariables.mValid);
-	REQUIRE(outputVariables.mCreateOutputVolumeList[0] == "true");
+	REQUIRE(outputVariables.mCreateOutputVolumeList[0] == "false");
 	REQUIRE(outputVariables.mCreateOutputMeshList[0] == "true");
 
-	REQUIRE(outputVariables.mOutputColorList.size() > 0);
-	REQUIRE(filter->testCreateColor(outputVariables.mOutputColorList[0].split(",")) != filter->testGetDefaultColor());
-
 	REQUIRE(outputVariables.mOutputClasses.size() > 0);
-	REQUIRE(outputVariables.mOutputClasses[0] == "Lungs");
+	REQUIRE(outputVariables.mOutputClasses[0] == "LungVessels");
 
 
 	//CX_LOG_DEBUG() << "testStandardCommandString: " << filter->testStandardCommandString(variables);
@@ -587,7 +584,7 @@ TEST_CASE("GenericScriptFilter: Read python_Lungs_testing.ini file", "[unit]")
 	REQUIRE_FALSE(filter->testStandardCommandString(variables).isEmpty());
 	REQUIRE_FALSE(filter->testDeepSintefCommandString(variables).isEmpty());
 
-	REQUIRE(filter->testIsUsingDeepSintefEngine(variables));
+	REQUIRE(filter->testIsUsingTotalSegmentatorEngine(variables));
 
 	cx::LogicManager::shutdown();
 }
@@ -603,14 +600,14 @@ TEST_CASE("GenericScriptFilter: Test environment", "[not_win64][hide]")
 	//Create options variables. Needed before setting script file
 	filter->getOptions();
 	filter->setTestScriptFile();//Use python_test.ini
-	//filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
+	//filter->setTestScriptFile(true);//Init with python_LungVessels.ini file
 
 	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
 
 	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
 	CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
 
-	//filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
+	//filter->setTestScriptFile(true);//Init with python_LungVessels.ini file
 	//variables = filter->testCreateCommandStringVariables(dummyImage);
 	//CHECK(filter->testEnvironmentExist(filter->testGetEnvironmentPath(variables)));
 
@@ -729,7 +726,7 @@ TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][n
 
 	//Create options variables. Needed before setting script file
 	filter->getOptions();
-	filter->setTestScriptFile(true);//Init with python_Lungs_test.ini file
+	filter->setTestScriptFile(true);//Init with python_LungVessels.ini file
 	cx::ImagePtr dummyImage = cxtest::Utilities::create3DImage();
 	cx::CommandStringVariables variables = filter->testCreateCommandStringVariables(dummyImage);
 
