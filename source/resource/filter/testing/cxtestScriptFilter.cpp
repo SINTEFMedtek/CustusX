@@ -96,7 +96,7 @@ public:
 	void setRaidionicsScriptFile()
 	{
 		QString configPath = cx::DataLocations::getRootConfigPath();
-		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/raidionics_Airways.ini";
+		QString scriptFile = configPath + "/profiles/Laboratory/filter_scripts/raidionics_LungAll.ini";
 		mScriptFile->setValueFromVariant(scriptFile);
 	}
 
