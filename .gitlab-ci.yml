@@ -152,10 +152,8 @@ test-ubuntu22:
      --upload-file $INSTALLER_FILE
      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/Ubuntu2204/$INSTALLER_FILE"'
   - echo "Deploying documentation"
-  - cd $CI_PROJECT_DIR/Ubuntu2004/package_artefacts
-  - pwd
-  - ls
   - cd $CI_PROJECT_DIR
+  - mkdir -p public/$VERSION
   - mv $OS/package_artefacts/html_pure/ public/$VERSION/user_doc/
   - mv $OS/package_artefacts/html_dev/ public/$VERSION/developer_doc/
 
