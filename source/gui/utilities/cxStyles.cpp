@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QStyleFactory>
 
+#include "cxSettings.h"
+
 namespace cx
 {
 QColor Styles::darkGray1(12, 14, 22);
@@ -16,10 +18,49 @@ QColor Styles::redText(255, 90, 90);
 QColor Styles::greenText(110, 255, 115);
 
 
+void Styles::setStyle()
+{
+	QString style = settings()->value("Gui/style").toString();
+	if(style == "gray")
+		setGrayStyle();
+	else
+		setDefaultStyle();
+}
+
 void Styles::setGrayStyle()
 {
 	setApplicationWindowsStyle();
 	qApp->setPalette(cx::Styles::getGrayPalette());
+}
+
+void Styles::setDefaultStyle()
+{
+
+}
+
+QColor Styles::getRed()
+{
+	QString style = settings()->value("Gui/style").toString();
+	if(style == "gray")
+		return red;
+	else
+		return Qt::red;
+}
+QColor Styles::getGreen()
+{
+	QString style = settings()->value("Gui/style").toString();
+	if(style == "gray")
+		return greenText;
+	else
+		return Qt::green;
+}
+QColor Styles::getGray()
+{
+	QString style = settings()->value("Gui/style").toString();
+	if(style == "gray")
+		return darkGray2;
+	else
+		return Qt::gray;
 }
 
 // For mac (default style) just changing palette won't change elements like:

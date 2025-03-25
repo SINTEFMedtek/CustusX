@@ -10,7 +10,13 @@ namespace cx
 class cxGui_EXPORT Styles
 {
 public:
+	static void setStyle();
 	static void setGrayStyle();
+	static void setDefaultStyle();
+
+	static QColor getRed();
+	static QColor getGreen();
+	static QColor getGray();
 
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();
