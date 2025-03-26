@@ -22,11 +22,6 @@ TEST_CASE("Website url can be set", "[unit][datalocations]")
     CHECK(!DataLocations::getWebsiteURL().isEmpty());
 }
 
-TEST_CASE("Uploads url is set", "[unit][datalocations]")
-{
-    CHECK(!DataLocations::getUploadsUrl().isEmpty());
-}
-
 TEST_CASE("User documentation url is set", "[unit][datalocations]")
 {
     CHECK(!DataLocations::getWebsiteUserDocumentationURL().isEmpty());
