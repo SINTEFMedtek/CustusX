@@ -77,8 +77,6 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 	mCreateOutputVolumeList = createOutputVolumeList.split(" ");
 	QString createOutputMeshList = settings.value("mesh").toString();
 	mCreateOutputMeshList = createOutputMeshList.split(" ");
-	QString allColors = settings.value("color").toString();
-	mOutputColorList = allColors.split(";");
 	QString outputClass = settings.value("classes").toString();
 	mOutputClasses = outputClass.split(" ");
 	if(mOutputClasses.isEmpty() || mOutputClasses[0].isEmpty())
@@ -721,6 +719,7 @@ bool GenericScriptFilter::postProcess()
 
 	this->setOutputClasses(mOutputClasses);
 	this->setOutputColorsFromClasses();
+	this->setContourFilteringFromClasses();
 
 	return readGeneratedSegmentationFiles(mOutputVariables.mCreateOutputVolumeList, mOutputVariables.mCreateOutputMeshList);
 }
@@ -734,13 +733,17 @@ void GenericScriptFilter::setOutputClasses(QStringList outputClasses)
 
 void GenericScriptFilter::setOutputColorsFromClasses()
 {
-	if(isUsingRaidionicsEngine())
-	{
-		mOutputColorList.clear();
-		for(int i = 0; i < mOutputClasses.size(); ++i)
-			mOutputColorList << Raidionics::colorForLungClass(mOutputClasses[i]);
-	}
+	mOutputColorList.clear();
+	for(int i = 0; i < mOutputClasses.size(); ++i)
+		mOutputColorList << Raidionics::colorForLungClass(mOutputClasses[i]);
 	this->setupOutputColors(mOutputColorList);
+}
+
+void GenericScriptFilter::setContourFilteringFromClasses()
+{
+	mSmoothingSettings.clear();
+	for(int i = 0; i < mOutputClasses.size(); ++i)
+		mSmoothingSettings << Raidionics::contourFilterSettingForLungClass(mOutputClasses[i]);
 }
 
 void GenericScriptFilter::setupOutputColors(QStringList colorList)
@@ -787,19 +790,10 @@ QColor GenericScriptFilter::getDefaultColor()
 	return retval;
 }
 
-void GenericScriptFilter::createOutputMesh(QColor color)
+void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 {
 	// Make contour of segmented volume
-	double threshold = 1; /// because the segmented image is 0..1
-
-	vtkPolyDataPtr rawContour = ContourFilter::execute(
-				mOutputImage->getBaseVtkImageData(),
-				threshold,
-				false, // reduce resolution
-				true, // smoothing
-				true, // keep topology
-				0 // target decimation
-				);
+	vtkPolyDataPtr rawContour = contourFilter(smoothing);
 
 	QString uidOutputMesh = mOutputImage->getUid() + "_mesh";
 	QString nameOutputMesh = mOutputImage->getName() + "_mesh";
@@ -813,6 +807,62 @@ void GenericScriptFilter::createOutputMesh(QColor color)
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
+}
+
+vtkPolyDataPtr GenericScriptFilter::contourFilter(int smoothing)
+{
+	double threshold = 1; /// because the segmented image is 0..1
+	bool reduceResoluion, applySmoothing, keepTopology;
+	double decimation, numberOfIterations, passBand;
+
+	switch(smoothing)
+	{
+		case 0:
+			reduceResoluion = false;
+			applySmoothing = false;
+			keepTopology = true;
+			decimation = 0;
+			numberOfIterations = 0;
+			passBand = 1;
+			break;
+		case 2:
+			reduceResoluion = false;
+			applySmoothing = true;
+			keepTopology = false;
+			decimation = 0.6;
+			numberOfIterations = 30;
+			passBand = 0.1;
+			break;
+		case 3:
+			reduceResoluion = false;
+			applySmoothing = true;
+			keepTopology = false;
+			decimation = 0.8;
+			numberOfIterations = 30;
+			passBand = 0.05;
+			break;
+		case 1:
+		default:
+			reduceResoluion = false;
+			applySmoothing = true;
+			keepTopology = true;
+			decimation = 0.2;
+			numberOfIterations = 15;
+			passBand = 0.3;
+			break;
+	}
+	vtkPolyDataPtr rawContour = ContourFilter::execute(
+				mOutputImage->getBaseVtkImageData(),
+				threshold,
+				reduceResoluion,
+				applySmoothing,
+				keepTopology,
+				decimation,
+				numberOfIterations,
+				passBand
+				);
+
+	return rawContour;
 }
 
 bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutputVolumeList, QStringList createOutputMeshList)
@@ -886,7 +936,7 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 			if(!createOutputVolumeBool)
 				createOutputVolumeBool = createOutputVolumeList.contains(mOutputClasses.at(classNumber)); //only for the classes listed in the parameters file
 
-			if (createOutputVolumeBool || (organType==otAIRWAYS))//Always create volume for Airways
+			if(createOutputVolumeBool || (organType==otAIRWAYS))//Always create volume for Airways
 				this->createOutputVolume();
 
 			bool createOutputMesh = false;
@@ -895,12 +945,16 @@ bool GenericScriptFilter::readGeneratedSegmentationFiles(QStringList createOutpu
 			if(!createOutputMesh)
 				createOutputMesh = createOutputMeshList.contains(mOutputClasses.at(classNumber)); //only for the classes listed in the parameters file
 
+			int smoothing = 1;
+			if(mSmoothingSettings.size() > classNumber)
+				smoothing = mSmoothingSettings.at(classNumber);
+
 			if(createOutputMesh && mOutputImage)
 			{
 				QColor outputColor = getDefaultColor();
 				if(mOutputColors.size() > classNumber)
 					outputColor = mOutputColors.at(classNumber);
-				this->createOutputMesh(outputColor);
+				this->createOutputMesh(outputColor, smoothing);
 			}
 			if(!isUsingRaidionicsEngine())
 				this->deleteNotUsedFiles(filePath, createOutputVolumeBool);

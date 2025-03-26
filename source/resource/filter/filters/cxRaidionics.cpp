@@ -265,6 +265,7 @@ QString Raidionics::colorForLungClass(QString outputClass)
 	case otLYMPH_NODES:
 		color = "0,255,0,255";break;
 	case otTUMOR:
+	case otNODULES:
 		color = "255,255,0,255";break;
 	case otVENA_CAVA:
 		color = "153,153,255,255";break;
@@ -290,6 +291,17 @@ QString Raidionics::colorForLungClass(QString outputClass)
 		color = "153,153,255,255";break;
 	case otESOPHAGUS:
 		color = "170,85,0,255";break;
+	case otLUNG_VESSELS:
+		color = "0,0,255,255";break;
+	case otLOBE_LUL:
+	case otLOBE_RUL:
+		color = "255,117,117,100";break;
+	case otLOBE_RML:
+		color = "181,255,117,100";break;
+	case otLOBE_LLL:
+	case otLOBE_RLL:
+		color = "117,186,255,100";break;
+
 	default:
 //	otUNKNOWN,
 //	organtypeCOUNT
@@ -297,6 +309,45 @@ QString Raidionics::colorForLungClass(QString outputClass)
 		break;
 	}
 	return color;
+}
+
+int Raidionics::contourFilterSettingForLungClass(QString outputClass)
+{
+	int filtering = 1;
+
+	ORGAN_TYPE target = Raidionics::getOrganType(outputClass);
+	switch (target)
+	{
+	case otLUNG_VESSELS:
+		filtering = 1;break;
+
+	case otLYMPH_NODES:
+	case otVENA_CAVA:
+	case otAORTIC_ARCH:
+	case otASCENDING_AORTA:
+	case otDESCENDING_AORTA:
+	case otSPINE:
+	case otPULMONARY_VEINS:
+	case otPULMONARY_TRUNK:
+	case otBRACHIO_CEPHALIC_VEINS:
+	case otSUBCLAVIAN_ARTERY:
+	case otAZYGOS:
+	case otESOPHAGUS:
+		filtering = 2;break;
+
+	case otLUNGS:
+	case otHEART:
+	case otLOBE_LUL:
+	case otLOBE_RUL:
+	case otLOBE_RML:
+	case otLOBE_LLL:
+	case otLOBE_RLL:
+		filtering = 3;break;
+
+	default:
+		filtering = 1;break;
+	}
+	return filtering;
 }
 
 }//cx

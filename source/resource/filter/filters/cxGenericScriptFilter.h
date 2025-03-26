@@ -39,6 +39,7 @@ struct cxResourceFilter_EXPORT OutputVariables
 {
 	QStringList mCreateOutputVolumeList;
 	QStringList mCreateOutputMeshList;
+	QList<int> mSmoothingSettingList;
 	QStringList mOutputColorList;
 	QStringList mOutputClasses;
 	bool mValid = false;
@@ -101,7 +102,8 @@ protected:
 	void setupOutputColors(QStringList colorList);
 	QColor createColor(QStringList color);
 	QColor getDefaultColor();
-	void createOutputMesh(QColor color);
+	void createOutputMesh(QColor color, int smoothing = 1);
+	vtkPolyDataPtr contourFilter(int smoothing);
 	bool readGeneratedSegmentationFiles(QStringList createOutputVolume, QStringList createOutputMesh);
 	QString createImageName(QString parentName, QString filePath);
 	void createOutputVolume();
@@ -129,6 +131,7 @@ protected:
 	bool setScriptEngine(CommandStringVariables variables);
 	bool initRaidionicsEngine(CommandStringVariables variables);
 	void setOutputColorsFromClasses();
+	void setContourFilteringFromClasses();
 	int getClassNumber(QString filePath);
 	ORGAN_TYPE getOrganType(int classNumber);
 
@@ -145,6 +148,7 @@ protected:
 	QList<QColor> mOutputColors;
 	QStringList mOutputClasses;
 	QStringList mOutputColorList;
+	QList<int> mSmoothingSettings;
 
 	SelectDataStringPropertyBasePtr mOutputImageSelectDataPtr;
 	StringPropertySelectMeshPtr mOutputMeshSelectMeshPtr;

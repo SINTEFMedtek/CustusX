@@ -34,6 +34,7 @@ public:
 	//Utility functions
 	static QStringList expandOutputClasses(QStringList targetList);
 	static QString colorForLungClass(QString outputClass);
+	static int contourFilterSettingForLungClass(QString outputClass);
 	static QStringList createTargetList(QString target);
 
 protected:
