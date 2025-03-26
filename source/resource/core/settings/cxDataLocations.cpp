@@ -323,11 +323,12 @@ QString DataLocations::getWebsiteURL()
 
 QString DataLocations::getWebsiteUserDocumentationURL()
 {
-	QString version(CustusX_VERSION_STRING);
-	if (version.contains("dev"))
-		return QString("https://custusx.pages.sintef.no/CustusX/user_doc/");
-	else
-		return QString("https://custusx.pages.sintef.no/CustusX/%1/user_doc/");
+	return QString("https://custusx.pages.sintef.no/CustusX/user_doc/");
+	// QString version(CustusX_VERSION_STRING);
+	// if (version.contains("dev"))
+	// 	return QString("https://custusx.pages.sintef.no/CustusX/user_doc/");
+	// else
+	// 	return QString("https://custusx.pages.sintef.no/CustusX/%1/user_doc/");
 }
 
 bool DataLocations::isRunFromBuildFolder()
