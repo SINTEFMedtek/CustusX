@@ -11,6 +11,7 @@ QColor Styles::darkGray2(31, 35, 49);
 QColor Styles::darkGray3(49, 52, 65);
 QColor Styles::red(165, 37, 52);
 QColor Styles::blue(25, 65, 85);
+QColor Styles::green(40, 165, 40);
 
 QColor Styles::blueText(119, 161, 226);
 QColor Styles::whiteText(240, 240, 240);
@@ -50,7 +51,7 @@ QColor Styles::getGreen()
 {
 	QString style = settings()->value("Gui/style").toString();
 	if(style == "gray")
-		return greenText;
+		return green;
 	else
 		return Qt::green;
 }
