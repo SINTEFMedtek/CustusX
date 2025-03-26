@@ -151,11 +151,6 @@ test-ubuntu22:
      --header "JOB-TOKEN: $CI_JOB_TOKEN"
      --upload-file $INSTALLER_FILE
      "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/Ubuntu2204/$INSTALLER_FILE"'
-#  - echo "Deploying documentation"
-#  - cd $CI_PROJECT_DIR
-#  - mkdir -p public/$VERSION
-#  - mv $OS/package_artefacts/html_pure/ public/$VERSION/user_doc/
-#  - mv $OS/package_artefacts/html_dev/ public/$VERSION/developer_doc/
 
 deploy-commmit:
   extends: .deploy
@@ -167,6 +162,7 @@ deploy-commmit:
     - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH # Only run for changes to the default (develop) branch
       when: never
     - if: '$CI_COMMIT_TAG == null' # Run for all commits, except tags
+      when: never # Don't deploy for develop branch either
 
 deploy-tag:
   extends: .deploy
