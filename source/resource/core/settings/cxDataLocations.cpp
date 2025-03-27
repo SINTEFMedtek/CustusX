@@ -323,7 +323,9 @@ QString DataLocations::getWebsiteURL()
 
 QString DataLocations::getWebsiteUserDocumentationURL()
 {
-	return QString("https://custusx.pages.sintef.no/CustusX/user_doc/");
+	QString appName(CX_SYSTEM_BASE_NAME);
+	return QString("https://custusx.pages.sintef.no/%1/user_doc/").arg(appName);
+
 	// QString version(CustusX_VERSION_STRING);
 	// if (version.contains("dev"))
 	// 	return QString("https://custusx.pages.sintef.no/CustusX/user_doc/");
