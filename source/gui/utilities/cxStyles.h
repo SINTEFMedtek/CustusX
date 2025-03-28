@@ -17,11 +17,12 @@ public:
 	static QColor getRed();
 	static QColor getGreen();
 	static QColor getGray();
+	static QColor getYellow();
 
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();
 
-	static QColor darkGray1, darkGray2, darkGray3, red, blue, green;
+	static QColor darkGray1, darkGray2, darkGray3, red, blue, green, yellow;
 	static QColor blueText, whiteText, redText, greenText;
 
 };

@@ -12,6 +12,7 @@ QColor Styles::darkGray3(49, 52, 65);
 QColor Styles::red(165, 37, 52);
 QColor Styles::blue(25, 65, 85);
 QColor Styles::green(40, 165, 40);
+QColor Styles::yellow(227, 153, 11);
 
 QColor Styles::blueText(119, 161, 226);
 QColor Styles::whiteText(240, 240, 240);
@@ -62,6 +63,14 @@ QColor Styles::getGray()
 		return darkGray2;
 	else
 		return Qt::gray;
+}
+QColor Styles::getYellow()
+{
+	QString style = settings()->value("Gui/style").toString();
+	if(style == "gray")
+		return yellow;
+	else
+		return Qt::yellow;
 }
 
 // For mac (default style) just changing palette won't change elements like:
