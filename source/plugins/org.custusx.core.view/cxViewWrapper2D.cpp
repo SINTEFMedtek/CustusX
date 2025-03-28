@@ -83,6 +83,9 @@ ViewWrapper2D::ViewWrapper2D(ViewPtr view, VisServicesPtr backend, bool centerTo
 	mView->getRenderer()->GetActiveCamera()->SetPosition(0,0,length);
 	mView->getRenderer()->GetActiveCamera()->SetClippingRange(length-clipDepth, length+0.1);
 
+	QColor background = settings()->value("backgroundColor").value<QColor>();
+	mView->setBackgroundColor(background);
+
 	// slice proxy
 	mSliceProxy = SliceProxy::create(mServices->patient());
 
@@ -262,6 +265,11 @@ void ViewWrapper2D::settingsChangedSlot(QString key)
 		|| (key == "View2D/useSagittalSlider") )
 	{
 		this->toggle2DSlider();
+	}
+	if (key == "backgroundColor")
+	{
+		QColor background = settings()->value("backgroundColor").value<QColor>();
+		mView->setBackgroundColor(background);
 	}
 }
 
