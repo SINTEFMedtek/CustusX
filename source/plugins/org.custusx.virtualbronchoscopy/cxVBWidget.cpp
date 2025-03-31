@@ -33,7 +33,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxRouteToTarget.h"
 #include "cxVLCRecorder.h"
-
+#include "cxStyles.h"
 
 
 namespace cx
@@ -101,7 +101,7 @@ VBWidget::VBWidget(VisServicesPtr services, QWidget *parent) :
 	mResetEndoscopeButton = new QPushButton("Reset");
 	mUseAutomaticRotationButton = new QPushButton("Automatic rotation");
 	mAutomaticRotationButtonBackgroundColor = mUseAutomaticRotationButton->palette();
-	mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+	mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Styles::getGreen());
 	mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
 
 	resetEndoscopeSlot();
@@ -353,7 +353,7 @@ void VBWidget::automaticRotationSlot()
 	mCameraPath->setAutomaticRotation(mAutomaticRotation);
 	if(mAutomaticRotation)
 	{
-		mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Qt::green);
+		mAutomaticRotationButtonBackgroundColor.setColor(QPalette::Button, Styles::getGreen());
 		mUseAutomaticRotationButton->setPalette(mAutomaticRotationButtonBackgroundColor);
 	}
 	else

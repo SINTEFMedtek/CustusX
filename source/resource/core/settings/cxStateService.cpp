@@ -113,6 +113,7 @@ void StateService::fillDefaultSettings()
 	this->fillDefault("View/shadingOn", true);
 
 	this->fillDefault("Gui/showMenuBar", true);
+	this->fillDefault("Gui/style", "default");
 
 	this->fillDefault("stillUpdateRate", 0.001);
 
