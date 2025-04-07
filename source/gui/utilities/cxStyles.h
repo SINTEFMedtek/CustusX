@@ -22,7 +22,7 @@ public:
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();
 
-	static QColor darkGray1, darkGray2, darkGray3, red, blue, green, yellow;
+	static QColor darkGray1, darkGray2, darkGray3, lightDarkGray, red, blue, green, yellow;
 	static QColor blueText, whiteText, redText, greenText;
 
 };

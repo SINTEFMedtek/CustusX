@@ -9,6 +9,7 @@ namespace cx
 QColor Styles::darkGray1(12, 14, 22);
 QColor Styles::darkGray2(31, 35, 49);
 QColor Styles::darkGray3(49, 52, 65);
+QColor Styles::lightDarkGray(105, 110, 130);
 QColor Styles::red(165, 37, 52);
 QColor Styles::blue(25, 65, 85);
 QColor Styles::green(40, 165, 40);
@@ -95,6 +96,10 @@ QPalette Styles::getGrayPalette()
 	palette.setColor(QPalette::WindowText, generalTextColor);
 	palette.setColor(QPalette::HighlightedText, highlightTextColor);
 	palette.setColor(QPalette::Base, textBackgroundColor);
+
+	//3D effects
+	//Allows more contrast between selected/not selected structures in the view righ-click menu
+	palette.setColor(QPalette::Light, lightDarkGray);
 
 	//combobox, group text. Probably the text where textBackgroundColor is used
 	// palette.setColor(QPalette::Text, generalTextColor);
