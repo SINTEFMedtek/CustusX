@@ -130,7 +130,7 @@ MeshPtr ColorVariationFilter::execute(MeshPtr inputMesh, double globaleVariance,
 	if (!inputMesh)
 		return MeshPtr();
 
-	vtkPolyDataPtr polyData = inputMesh->getTransformedPolyDataCopy(inputMesh->get_rMd());
+	vtkPolyDataPtr polyData = inputMesh->getVtkPolyData();
 	mGlobalVariance = globaleVariance;
 	mLocalVariance = localeVariance;
 	
@@ -147,6 +147,7 @@ MeshPtr ColorVariationFilter::execute(MeshPtr inputMesh, double globaleVariance,
 	outputMesh->setColor(inputMesh->getColor());
 	outputMesh->setUseColorFromPolydataScalars(true);
 	outputMesh->get_rMd_History()->setParentSpace(inputMesh->getParentSpace());
+	outputMesh->get_rMd_History()->setRegistration(inputMesh->get_rMd());
 	patientService()->insertData(outputMesh);
 
 	return outputMesh;

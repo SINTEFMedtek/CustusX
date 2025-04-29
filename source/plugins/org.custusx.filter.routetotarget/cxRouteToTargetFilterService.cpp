@@ -170,7 +170,6 @@ bool RouteToTargetFilter::execute()
 	{
 		MetricManagerPtr metricManager = MetricManagerPtr(new MetricManager(mServices->view(), mServices->patient(), mServices->tracking(), mServices->spaceProvider(), mServices->file()));
 		extraAirwayPoints = metricManager->getPointMetrics("AirwayPoint");
-		CX_LOG_DEBUG() << "extraAirwayPoints.size(): " << extraAirwayPoints.size();
 	}
 
 	MeshPtr mesh = boost::dynamic_pointer_cast<StringPropertySelectMesh>(mInputTypes[0])->getMesh();
@@ -245,7 +244,11 @@ bool RouteToTargetFilter::postProcess()
 	QString nameOutputCenterline = convertToReadableString(otROUTE_TO_TARGET);
 
 	MeshPtr outputCenterline = patientService()->createSpecificData<Mesh>(uidOutputCenterline, nameOutputCenterline);
-	outputCenterline->setVtkPolyData(mOutput);
+	outputCenterline->setVtkPolyData(mOutput); //mOutput is in reference (r) space
+	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
+	outputCenterline->get_rMd_History()->setRegistration(inputMesh->get_rMd());
+	vtkPolyDataPtr vtkPolyOutputCenterline_d = outputCenterline->getTransformedPolyDataCopy(outputCenterline->get_rMd().inverse()); //Moving polyData to data (d) space
+	outputCenterline->setVtkPolyData(vtkPolyOutputCenterline_d);
 	outputCenterline->getProperties().mLineWidth->setValue(8); //Setting thicker line for RTT
 	outputCenterline->setOrganType(otROUTE_TO_TARGET);
 	patientService()->insertData(outputCenterline, true);
@@ -253,18 +256,15 @@ bool RouteToTargetFilter::postProcess()
 	QString uidCenterlineExt = outputCenterline->getUid() + RouteToTargetFilter::getNameSuffixExtension();
 	QString nameCenterlineExt = convertToReadableString(otROUTE_TO_TARGET_EXTENDED);
 	MeshPtr outputCenterlineExt = patientService()->createSpecificData<Mesh>(uidCenterlineExt, nameCenterlineExt);
-	outputCenterlineExt->setVtkPolyData(mExtendedRoute);
+	outputCenterlineExt->setVtkPolyData(mExtendedRoute);//mExtendedRoute is in reference (r) space
+	outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
+	outputCenterlineExt->get_rMd_History()->setRegistration(inputMesh->get_rMd());
+	vtkPolyDataPtr vtkPolyOutputCenterlineExt_d = outputCenterlineExt->getTransformedPolyDataCopy(outputCenterlineExt->get_rMd().inverse()); //Moving polyData to data (d) space
+	outputCenterlineExt->setVtkPolyData(vtkPolyOutputCenterlineExt_d);
 	outputCenterlineExt->setColor(QColor(0, 0, 255, 255));
 	outputCenterlineExt->getProperties().mLineWidth->setValue(5); //Setting thicker line for RTT
 	outputCenterlineExt->setOrganType(otROUTE_TO_TARGET_EXTENDED);
 	patientService()->insertData(outputCenterlineExt, true);
-
-	//note: mOutput and outputCenterline is in reference(r) space
-
-
-	//Meshes are expected to be in data(d) space
-	outputCenterline->get_rMd_History()->setParentSpace(inputMesh->getUid());
-	outputCenterlineExt->get_rMd_History()->setParentSpace(inputMesh->getUid());
 
 	//mServices->view()->autoShowData(outputCenterlineExt);
 	//mServices->view()->autoShowData(outputCenterline);
