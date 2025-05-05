@@ -132,8 +132,6 @@ bool AirwaysFromCenterlineFilter::execute()
 	if (!mesh)
 		return false;
 
-	//vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
-
 	mAirwaysFromCenterline->processCenterline(mesh);
 
 	ImagePtr segmentedVolume = boost::dynamic_pointer_cast<StringPropertySelectImage>(mInputTypes[1])->getImage();
