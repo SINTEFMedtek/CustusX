@@ -72,14 +72,14 @@ void AirwaysFromCenterline::setSegmentedVolume(vtkImageDataPtr segmentedVolume, 
 {
 	mOriginalSegmentedVolume = segmentedVolume;
 	m_rMd = rMd;
-
 }
 
-void AirwaysFromCenterline::processCenterline(vtkPolyDataPtr airwaysCenterline_r)
+void AirwaysFromCenterline::processCenterline(MeshPtr airwaysCenterlineMesh)
 {
 	if (mBranchListPtr)
 		mBranchListPtr->deleteAllBranches();
 
+	vtkPolyDataPtr airwaysCenterline_r = airwaysCenterlineMesh->getTransformedPolyDataCopy(airwaysCenterlineMesh->get_rMd());
 	Eigen::MatrixXd airwayCenterlinePoints_r = getCenterlinePositions(airwaysCenterline_r);
 
 	mBranchListPtr->findBranchesInCenterline(airwayCenterlinePoints_r);

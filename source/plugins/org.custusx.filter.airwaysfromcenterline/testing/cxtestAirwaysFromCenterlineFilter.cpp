@@ -44,8 +44,7 @@ TEST_CASE("AirwaysFromCenterline: execute", "[integration][org.custusx.filter.ai
 
     cx::MeshPtr mesh = boost::dynamic_pointer_cast<cx::Mesh>(dataCenterline);
 
-    vtkPolyDataPtr centerline_r = mesh->getTransformedPolyDataCopy(mesh->get_rMd());
-    airwaysFromCenterline->processCenterline(centerline_r);
+		airwaysFromCenterline->processCenterline(mesh);
 
     vtkPolyDataPtr outputAirwayMesh = airwaysFromCenterline->generateTubes();
 

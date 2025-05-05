@@ -97,6 +97,7 @@ class cxResource_EXPORT RegistrationHistory: public QObject
 {
 Q_OBJECT
 public:
+	RegistrationHistoryPtr deepCopy();
 	virtual void addXml(QDomNode& parentNode) const; ///< write internal state to node
 	virtual void parseXml(QDomNode& dataNode);///< read internal state from node
 

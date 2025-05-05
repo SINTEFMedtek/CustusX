@@ -215,12 +215,20 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 	ImagePtr input = this->getCopiedInputImage();
 
+	if(!input)
+		return false;
+
+	ImagePtr input_copy = input->copy();
+	input_copy->get_rMd_History()->setParentSpace("");
+	input_copy->get_rMd_History()->setRegistration(Transform3D::Identity());
+
 	int numberOfCenterlines = mRawResult.size();
 	for(int i=0; i<numberOfCenterlines; i++)
 	{
-		ImagePtr outImage = createDerivedImage(mServices->patient(),
-											 input->getUid() + "_cl_temp%1", input->getName()+" cl_temp%1",
-											 mRawResult[i], input);
+		ImagePtr outImage = createDerivedImage(
+					mServices->patient(),input_copy->getUid() + "_cl_temp%1",
+					input_copy->getName()+" cl_temp%1",
+					mRawResult[i], input_copy);
 
 		mRawResult[i] = NULL;
 		outImage->resetTransferFunctions();
@@ -235,6 +243,7 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 		QColor color = MeshesFromLabelsFilter::generateColor(outputColor->getValue(), i, numberOfCenterlines);
 		mesh->setColor(color);
 		mesh->get_rMd_History()->setParentSpace(input->getUid());
+		mesh->get_rMd_History()->setRegistration(input->get_rMd());
 		mServices->patient()->insertData(mesh);
 
 		// set first centerline as output in filter

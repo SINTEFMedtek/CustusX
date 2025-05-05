@@ -142,7 +142,7 @@ ImagePtr Image::copy()
 
 	//From cx::Data
 	retval->mRegistrationStatus = mRegistrationStatus;
-	retval->m_rMd_History = m_rMd_History;
+	retval->m_rMd_History = m_rMd_History->deepCopy();
 
 	return retval;
 }
