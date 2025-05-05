@@ -58,7 +58,18 @@ bool OpenIGTLinkTool::doIdCorrespondToTool(QString openIGTLinkId)
 		retval = true;
 	else if(openIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkImageId, Qt::CaseInsensitive) == 0)
 		retval = true;
+	else if(isOpenIGTLinkIdArroraPortNumber(openIGTLinkId))
+		retval = true;
 	return retval;
+}
+
+bool OpenIGTLinkTool::isOpenIGTLinkIdArroraPortNumber(QString openIGTLinkId)
+{
+	bool ok;
+	int idAsNumber = openIGTLinkId.toInt(&ok);
+	if(ok && idAsNumber == this->mToolFileToolStructure->mPortNumber)
+		return true;
+	return false;
 }
 
 OpenIGTLinkTool::~OpenIGTLinkTool()

@@ -79,6 +79,7 @@ public:
 	bool applyReference();
 protected:
 	virtual ToolFileParser::ToolInternalStructurePtr getToolFileToolStructure() const;
+	bool isOpenIGTLinkIdArroraPortNumber(QString openIGTLinkId);
 private slots:
 	void toolTransformAndTimestampSlot(Transform3D prMs, double timestampMS);
 	void calculateTpsSlot();
