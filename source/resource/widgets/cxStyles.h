@@ -1,13 +1,13 @@
 #ifndef CXSTYLES_H
 #define CXSTYLES_H
 
-#include "cxGuiExport.h"
+#include "cxResourceWidgetsExport.h"
 #include <QPalette>
 
 namespace cx
 {
 
-class cxGui_EXPORT Styles
+class cxResourceWidgets_EXPORT Styles
 {
 public:
 	static void setStyle();
@@ -18,6 +18,7 @@ public:
 	static QColor getGreen();
 	static QColor getGray();
 	static QColor getYellow();
+	static QColor getTextColor();
 
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();

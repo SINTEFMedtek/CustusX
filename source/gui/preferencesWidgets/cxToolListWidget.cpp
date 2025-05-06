@@ -21,6 +21,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxTrackerConfiguration.h"
 #include "cxTrackingService.h"
+#include "cxStyles.h"
 
 namespace cx
 {
@@ -224,7 +225,7 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 		if (!trackingsystemFilter.contains(toolTrackingSystemName, Qt::CaseInsensitive) || !config->verifyTool(absoluteFilePath))
 			brush.setColor(Qt::red);
 		else
-			brush.setColor(Qt::black);
+			brush.setColor(Styles::getTextColor());
 
 		item->setForeground(brush);
 	}

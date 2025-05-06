@@ -74,6 +74,11 @@ QColor Styles::getYellow()
 		return Qt::yellow;
 }
 
+QColor Styles::getTextColor()
+{
+	return qApp->palette().color(QPalette::WindowText);
+}
+
 // For mac (default style) just changing palette won't change elements like:
 // top line, bottom line, sliders, combobox background, and toolbar.
 //Configurable styles are QCommonStyle and QProxyStyle, but using Windows style for now
