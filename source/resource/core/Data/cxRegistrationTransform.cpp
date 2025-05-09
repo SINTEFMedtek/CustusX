@@ -213,6 +213,19 @@ RegistrationHistoryPtr RegistrationHistory::getNullObject()
 	return mNull;
 }
 
+RegistrationHistoryPtr RegistrationHistory::deepCopy()
+{
+	RegistrationHistoryPtr retval = RegistrationHistoryPtr(new RegistrationHistory());
+
+	retval->mData = this->mData;
+	retval->mParentSpaces = this->mParentSpaces;
+	retval->mCurrentTime = this->mCurrentTime;
+	retval->mTransformCache = this->mTransformCache;
+	retval->mParentSpaceCache = this->mParentSpaceCache;
+
+	return retval;
+}
+
 void RegistrationHistory::addXml(QDomNode& parentNode) const ///< write internal state to node
 {
 	QDomDocument doc = parentNode.ownerDocument();
