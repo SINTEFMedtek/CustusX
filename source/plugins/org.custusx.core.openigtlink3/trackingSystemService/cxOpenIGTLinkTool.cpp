@@ -58,16 +58,23 @@ bool OpenIGTLinkTool::doIdCorrespondToTool(QString openIGTLinkId)
 		retval = true;
 	else if(openIGTLinkId.compare(this->mConfigFileToolStructure.mOpenIGTLinkImageId, Qt::CaseInsensitive) == 0)
 		retval = true;
-	else if(isOpenIGTLinkIdArroraPortNumber(openIGTLinkId))
+	else if(isOpenIGTLinkIdAuroraPortNumber(openIGTLinkId))
 		retval = true;
 	return retval;
 }
 
-bool OpenIGTLinkTool::isOpenIGTLinkIdArroraPortNumber(QString openIGTLinkId)
+bool OpenIGTLinkTool::isOpenIGTLinkIdAuroraPortNumber(QString openIGTLinkId)
 {
+	//For Aurora ports, openIGTLinkId can be like this: port_0, port_1, ...
+	QStringList list = openIGTLinkId.split('_');
+	if(list.size() < 2)
+		return false;
+	if(QString::compare(list[0], "port", Qt::CaseInsensitive) != 0)
+		return false;
+
 	bool ok;
-	int idAsNumber = openIGTLinkId.toInt(&ok);
-	if(ok && idAsNumber == this->mToolFileToolStructure->mPortNumber)
+	int portNumber = list[1].toInt(&ok);
+	if(ok && portNumber == this->mToolFileToolStructure->mPortNumber)
 		return true;
 	return false;
 }
