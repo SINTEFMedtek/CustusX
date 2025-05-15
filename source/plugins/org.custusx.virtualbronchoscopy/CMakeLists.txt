@@ -41,7 +41,6 @@ set(PLUGIN_target_libraries
     cxResource
     cxResourceVisualization
     cxResourceWidgets
-    cxGui
     Qt5::Widgets
     org_custusx_filter_routetotarget
     ${VTK_MODULES}

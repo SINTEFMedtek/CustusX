@@ -37,6 +37,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTime.h"
 #include "cxPopupToolbarWidget.h"
 #include "cxEnumConversion.h"
+#include "cxStyles.h"
 
 namespace cx
 {
@@ -48,12 +49,12 @@ LogMessageDisplayWidget::LogMessageDisplayWidget(QWidget *parent)
 
 void LogMessageDisplayWidget::createTextCharFormats()
 {
-	mFormat[mlINFO].setForeground(Qt::black);
+	mFormat[mlINFO].setForeground(Styles::getTextColor());
 	mFormat[mlSUCCESS].setForeground(QColor(60, 179, 113)); // medium sea green
 	mFormat[mlWARNING].setForeground(QColor(255, 140, 0)); //dark orange
-	mFormat[mlERROR].setForeground(Qt::red);
+	mFormat[mlERROR].setForeground(Styles::getRed());
 	mFormat[mlDEBUG].setForeground(QColor(135, 206, 250)); //sky blue
-	mFormat[mlCERR].setForeground(Qt::red);
+	mFormat[mlCERR].setForeground(Styles::getRed());
 	mFormat[mlCOUT].setForeground(Qt::darkGray);
 }
 

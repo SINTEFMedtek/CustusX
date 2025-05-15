@@ -105,7 +105,6 @@ cx_add_class(cxGui_SRCS
 	${cxGui_SRCS}
 	browser/cxReplacableContentWidget
 	browser/cxViewServicePropertiesWidget
-	utilities/cxStyles
 	cxMainWindowApplicationComponent.h
 )
 
