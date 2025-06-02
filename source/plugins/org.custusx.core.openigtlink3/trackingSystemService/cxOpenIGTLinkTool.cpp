@@ -65,6 +65,9 @@ bool OpenIGTLinkTool::doIdCorrespondToTool(QString openIGTLinkId)
 
 bool OpenIGTLinkTool::isOpenIGTLinkIdAuroraPortNumber(QString openIGTLinkId)
 {
+	if(this->mToolFileToolStructure->mTrackerType != tsAURORA)
+		return false;
+
 	//For Aurora ports, openIGTLinkId can be like this: port_0, port_1, ...
 	QStringList list = openIGTLinkId.split('_');
 	if(list.size() < 2)
