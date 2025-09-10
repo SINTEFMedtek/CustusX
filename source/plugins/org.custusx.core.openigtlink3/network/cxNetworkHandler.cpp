@@ -206,8 +206,13 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		}
 		mGotMoreThanOneImage = true;
 
-		processImageAndEmitProbeDefinition(cximage, deviceName);//Use equipmentId?
-		emit image(cximage);
+		if(mProbeDefinitionFromStringMessages->haveValidValues())
+		{
+			processImageAndEmitProbeDefinition(cximage, deviceName);//Use equipmentId?
+			emit image(cximage);
+		}
+		else
+			CX_LOG_WARNING() << "Probe sector is not valid. Dropping received image";
 
 		// CX-366: Currenly we don't use the transform from the image message, because there is no specification of what this transform should be.
 		// Only the transforms from the transform messages are used.
