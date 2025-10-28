@@ -226,9 +226,9 @@ void ImageStreamerOpenCV::initialize_local()
 	if (!mArguments.count("out_height"))
 		mArguments["out_height"] = "";
 	if (!mArguments.count("--in_width"))
-			mArguments["--in_width"] = "";
+		mArguments["--in_width"] = "";
 	if (!mArguments.count("--in_height"))
-			mArguments["--in_height"] = "";
+		mArguments["--in_height"] = "";
 
 	QString videoSource = mArguments["videoport"];
 	int videoport = convertStringWithDefault(mArguments["videoport"], 0);
