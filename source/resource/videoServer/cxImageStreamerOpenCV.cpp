@@ -219,17 +219,16 @@ void ImageStreamerOpenCV::deinitialize_local()
 void ImageStreamerOpenCV::initialize_local()
 {
 #ifdef CX_USE_OpenCV
-
 	if (!mArguments.count("videoport"))
 		mArguments["videoport"] = "0";
 	if (!mArguments.count("out_width"))
 		mArguments["out_width"] = "";
 	if (!mArguments.count("out_height"))
 		mArguments["out_height"] = "";
-    if (!mArguments.count("in_width"))
-        mArguments["in_width"] = "";
-    if (!mArguments.count("in_height"))
-        mArguments["in_height"] = "";
+	if (!mArguments.count("--in_width"))
+		mArguments["--in_width"] = "";
+	if (!mArguments.count("--in_height"))
+		mArguments["--in_height"] = "";
 
 	QString videoSource = mArguments["videoport"];
 	int videoport = convertStringWithDefault(mArguments["videoport"], 0);
@@ -272,8 +271,8 @@ void ImageStreamerOpenCV::initialize_local()
 		int default_height = mVideoCapture->get(cv::CAP_PROP_FRAME_HEIGHT);
 
 		//set input size
-		int in_width = convertStringWithDefault(mArguments["in_width"], default_width);
-		int in_height = convertStringWithDefault(mArguments["in_height"], default_height);
+		int in_width = convertStringWithDefault(mArguments["--in_width"], default_width);
+		int in_height = convertStringWithDefault(mArguments["--in_height"], default_height);
 
 		mVideoCapture->set(cv::CAP_PROP_FRAME_WIDTH, in_width);
 		mVideoCapture->set(cv::CAP_PROP_FRAME_HEIGHT, in_height);
