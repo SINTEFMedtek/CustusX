@@ -7,7 +7,7 @@ project(CustusX)
 #### Enable C++11
 set (CMAKE_CXX_STANDARD 14)
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.16.3)
 
 # kill warning about mixing full and partial paths in libs:
 # http://www.cmake.org/cmake/help/v2.8.10/cmake.html#policy%3aCMP0003
