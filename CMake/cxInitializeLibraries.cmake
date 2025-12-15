@@ -22,17 +22,15 @@
 #
 ###############################################################################
 macro(cx_initialize_cppunit)
-    find_path(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
-        /usr/local/include
-        /usr/include)
-
     if(CX_WINDOWS)
         #CPP_UNIT not used on Windows
     else(CX_WINDOWS)
+	    find_path(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
+			/usr/local/include
+			/usr/include)
         find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
+		include_directories(${CPPUNIT_INCLUDE_DIR})
     endif(CX_WINDOWS)
-
-    include_directories(${CPPUNIT_INCLUDE_DIR})
 endmacro()
 
 ###############################################################################
