@@ -58,6 +58,8 @@ class CppBuilder(object):
                 runShell('''jom -k -j%s''' % str(self.controlData.threads))
             if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):
                 runShell('''ninja''')
+            if(self.controlData.getCMakeGenerator() == 'Ninja'):
+                runShell('''ninja''')
         else:
             maker = 'make -j%s' % str(self.controlData.threads)
             if(self.controlData.getCMakeGenerator() == 'Eclipse CDT4 - Ninja'):

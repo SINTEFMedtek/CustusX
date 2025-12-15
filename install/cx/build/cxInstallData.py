@@ -173,11 +173,13 @@ class Common(object):
             return "Xcode"
         if self.jom:
             return "NMake Makefiles JOM"
+        # need to surround with ' ' instead of " " on windows for it to work
         if self.ninja:
-            return 'Eclipse CDT4 - Ninja'
+            return 'Ninja'
         if platform.system() == 'Windows':
-            return 'Eclipse CDT4 - NMake Makefiles' # need to surround with ' ' instead of " " on windows for it to work
-        return "Eclipse CDT4 - Unix Makefiles" 
+            return 'Eclipse CDT4 - NMake Makefiles'
+        # Use 'Visual Studio 17 2022'?
+        return "Unix Makefiles"
     
     def getEclipseVersion(self):
         return self.eclipse_version
