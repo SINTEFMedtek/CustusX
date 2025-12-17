@@ -28,7 +28,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXMATHBASE_H_
 #define CXMATHBASE_H_
 
-#include "cxPrecompiledHeader.h"
+//#include "cxPrecompiledHeader.h"
 
 
 // necessary includes for the addons
@@ -55,6 +55,9 @@ typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 
 // important for ssc::Vector3D, our most used class. This line moves all onto one line.
 // for default operation, use std::cout << M.format(Eigen::IOFormat()) << std::endl;
+#ifdef EIGEN_DEFAULT_IO_FORMAT
+#  undef EIGEN_DEFAULT_IO_FORMAT
+#endif
 #define EIGEN_DEFAULT_IO_FORMAT Eigen::IOFormat(6, 0, " ", " ", "","","","")
 
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "cxPlainObjectEigenAddons.h"

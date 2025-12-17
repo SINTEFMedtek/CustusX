@@ -328,6 +328,10 @@ if ($VerboseEnvSummary) {
     Write-Host "---------------------------`n"
 }
 
+# Remove the vcpkg toolchain before running CustusX python/CMake 
+Remove-Item Env:CMAKE_TOOLCHAIN_FILE
+
+
 # Turn OFF docs to avoid Documentation.cmake + Perl
 $env:ITK_BUILD_DOCUMENTATION = "OFF"
 $env:VTK_BUILD_DOCUMENTATION = "OFF"

@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #ifndef CXALGORITHMHELPERS_H_
 #define CXALGORITHMHELPERS_H_
 
+#include "cxMathBase.h"
 #include "cxResourceExport.h"
 
 #include "ItkVtkGlue/itkImageToVTKImageFilter.h"
