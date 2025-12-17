@@ -28,7 +28,7 @@ namespace cx
 
 typedef boost::shared_ptr<class MultiViewCache> MultiViewCachePtr;
 
-struct ViewAndSlider
+struct cxResourceVisualization_EXPORT ViewAndSlider
 {
 	ViewAndSlider(ViewWidget* viewWidget):
 		mViewWidget(viewWidget) {}
