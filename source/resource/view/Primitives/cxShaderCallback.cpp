@@ -11,6 +11,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxShaderCallback.h"
 
+#ifdef WIN32
+// Fixes Windows glu build errors
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <Windows.h>     // defines APIENTRY, WINGDI types, etc.
+#endif
+
 #include <vtkShaderProgram.h>
 #include <vtkShader.h>
 #include <vtkOpenGLHelper.h>

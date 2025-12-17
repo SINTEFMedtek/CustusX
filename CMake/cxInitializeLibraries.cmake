@@ -182,6 +182,7 @@ macro(cx_initialize_VTK)
 	  InteractionWidgets
 	  ParallelCore
 	  FiltersParallel
+	  ImagingFourier
 	  ImagingMath
 	  ImagingMorphological
 	  ImagingColor

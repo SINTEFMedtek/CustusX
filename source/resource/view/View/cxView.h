@@ -16,6 +16,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "sscConfig.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <vtkSmartPointer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include "vtkForwardDeclarations.h"
 #include "cxIndent.h"
 #include <QSize>

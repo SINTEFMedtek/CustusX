@@ -103,8 +103,8 @@ cxResource_EXPORT QColor string2color(QString input, QColor defaultValue=QColor(
 
 namespace cx
 {
-QString convertToReadableString(QString string);
-QString convertToReadableString(ORGAN_TYPE target);
+	cxResource_EXPORT QString convertToReadableString(QString string);
+	cxResource_EXPORT QString convertToReadableString(ORGAN_TYPE target);
 }//cx
 
 /**
