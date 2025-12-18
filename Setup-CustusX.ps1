@@ -2,13 +2,14 @@
 <#
 .SYNOPSIS
   Prepare a fast Windows build environment (Ninja) for CustusX superbuild (cxInstaller.py)
+  Mostly created by Copilot
 
 .DESCRIPTION
   - Imports VS 2022 C++ toolchain (vcvars64.bat) into the current PowerShell session.
   - Ensures Python, CMake, Git, and Ninja exist (winget installs if needed and running as Admin).
   - Detects Qt 5.15.2 (default D:\Qt\5.15.2\msvc2019_64, configurable via -QtPath).
   - Pins C++17 and selects the Ninja generator for speed.
-  - Runs cxInstaller.py with --generator Ninja.
+  - Installs GLEW with vcpkg
 
 .NOTES
   - If scripts are blocked: Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
