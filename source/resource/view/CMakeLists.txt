@@ -190,6 +190,8 @@ target_link_libraries(cxResourceVisualization
 	GLEW::GLEW
 )
 
+cx_install_add_library_dirs(${GLEW_ROOT}/bin/)
+
 vtk_module_autoinit(
   TARGETS cxResourceVisualization
   MODULES ${VTK_LIBRARIES} #Removing this cause 3D render to crash: vtkRayCastImageDisplayH:20    WARN| Error: no override found for 'vtkRayCastImageDisplayHelper'.
