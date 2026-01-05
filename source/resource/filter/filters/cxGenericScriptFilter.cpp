@@ -539,7 +539,13 @@ bool GenericScriptFilter::isVirtualEnvironment(QString path)
 
 QString GenericScriptFilter::getFixedEnvironmentSubdir()
 {
-	QString retval("bin/python");
+	QString retval;
+	retval = "bin/python";
+
+#ifdef CX_WINDOWS
+	retval = "Scripts\python.exe"
+#endif
+
 	return retval;
 }
 
