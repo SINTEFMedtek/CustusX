@@ -12,7 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxSlicePlanes3DRep.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
 #include <vtkActor2D.h>

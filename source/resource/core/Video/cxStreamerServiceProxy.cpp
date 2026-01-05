@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "cxStreamerServiceProxy.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "cxNullDeleter.h"
 
 namespace cx

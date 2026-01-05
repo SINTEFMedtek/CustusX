@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QStringList>
 #include <QDir>
 #include <QtCore>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "vtkImageImport.h"
 #include "vtkImageData.h"
 #include <vtkPolyData.h>

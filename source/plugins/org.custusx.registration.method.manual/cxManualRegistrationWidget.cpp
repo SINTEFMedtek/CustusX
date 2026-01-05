@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxManualRegistrationWidget.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <ctkPluginContext.h>
 #include "cxLabeledComboBoxWidget.h"
 
