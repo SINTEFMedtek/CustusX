@@ -64,8 +64,8 @@ private:
 
 };
 
-std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line);
-double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
+org_custusx_filter_airwaysfromcenterline_EXPORT std::pair<int, double> findDistanceToLine(Eigen::Vector3d point, Eigen::MatrixXd line);
+org_custusx_filter_airwaysfromcenterline_EXPORT double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
 
 typedef boost::shared_ptr<AirwaysFromCenterline> AirwaysFromCenterlinePtr;
 
