@@ -543,7 +543,7 @@ QString GenericScriptFilter::getFixedEnvironmentSubdir()
 	retval = "bin/python";
 
 #ifdef CX_WINDOWS
-	retval = "Scripts\python.exe"
+	retval = "Scripts\python.exe";
 #endif
 
 	return retval;
