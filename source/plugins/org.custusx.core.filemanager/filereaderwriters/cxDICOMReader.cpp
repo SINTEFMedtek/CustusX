@@ -70,6 +70,12 @@ bool DICOMReader::canReadFile(QString filename)
 	{
 		return false; //Don't look into subdirs
 	}
+	QString ext = QFileInfo(filename).suffix();
+	if(!(ext.isEmpty() || ext.contains("dcm", Qt::CaseInsensitive) || ext.contains("dicom", Qt::CaseInsensitive)))
+	{
+		return false; //Not a dicom file type
+	}
+	//TO DO: Exclude file types not relevant. For speed increase
 
 	QFile file(filename);
 	bool opened = file.open(QIODevice::ReadOnly);

@@ -202,6 +202,12 @@ void MainWindowActions::createPatientActions()
 										 "Add CT files to be imported",
 										 [=](){this->importDataSlot("AddFilesForImportWithDialogActionCT");});
 
+	this->createAction("AddFilesForImportFromUSB", "Add CT files for import from USB",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add CT files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportFromUSBCT");});
+
 	this->createAction("AddFilesForImportWithDialogPET", "Add PET files for import (Dialog)",
 										 QIcon(),
 										 QKeySequence(),

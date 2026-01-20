@@ -23,6 +23,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDesktopWidget>
 #include <QStackedWidget>
 #include <QProgressDialog>
+#include <QTextStream>
 #include "cxForwardDeclarations.h"
 #include "cxFileReaderWriterService.h"
 #include "cxVisServices.h"
@@ -224,14 +225,17 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	QAction* addFilesForImportWithDialogActionCTThorax = new QAction("AddFilesForImportWithDialogActionCTThorax", this);
 	QAction* addFilesForImportWithDialogActionPETCT = new QAction("AddFilesForImportWithDialogActionPETCT", this);
 	QAction* addFilesForImportWithDialogActionPET = new QAction("AddFilesForImportWithDialogActionPET", this);
+	QAction* addFilesForImportFromUSBActionCTThorax = new QAction("AddFilesForImportFromUSBCT", this);
 	this->addAction(addFilesForImportWithDialogAction);
 	this->addAction(addFilesForImportWithDialogActionCTThorax);
 	this->addAction(addFilesForImportWithDialogActionPETCT);
 	this->addAction(addFilesForImportWithDialogActionPET);
+	this->addAction(addFilesForImportFromUSBActionCTThorax);
 	connect(addFilesForImportWithDialogAction, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend();});
 	connect(addFilesForImportWithDialogActionCTThorax, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imCT, istTHORAX_CT);});
 	connect(addFilesForImportWithDialogActionPETCT, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imCT, istPET_CT);});
 	connect(addFilesForImportWithDialogActionPET, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imPET);});
+	connect(addFilesForImportFromUSBActionCTThorax, &QAction::triggered, this, [=](){this->addFilesForImportWithDialogTriggerend(imCT, istTHORAX_CT, true);});
 
 	QAction* importButtonClickedAction = new QAction("ImportButtonClickedAction", this);
 	this->addAction(importButtonClickedAction);
@@ -267,9 +271,9 @@ int ImportWidget::insertDataIntoTable(QString fullfilename, std::vector<DataPtr>
 	return newRowIndex;
 }
 
-void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype)
+void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype, bool fromUSB)
 {
-	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked(modalitySuggestion, subtype);
+	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked(modalitySuggestion, subtype, fromUSB);
 	if(widget && widget->getDatas().size() > 0)
 	{
 		SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
@@ -277,9 +281,13 @@ void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modality
 	}
 }
 
-ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype)
+ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype, bool fromUSB)
 {
-	QStringList filenames = this->openFileBrowserForSelectingFiles();
+	QStringList filenames;
+	if(fromUSB)
+		filenames = this->getUSBPaths();
+	else
+		filenames = this->openFileBrowserForSelectingFiles();
 
 	bool addedDICOM = false;
 
@@ -287,6 +295,7 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 	for(int i = 0; i < filenames.size(); ++i)
 	{
 		QString filename = filenames[i];
+		CX_LOG_DEBUG() << "filename: " << filename;
 		QString fileType = mFileManager->getFileReaderName(filename);
 		if(fileType == "DICOMReader")
 		{
@@ -317,6 +326,69 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 
 	this->generateParentCandidates();
 	return widget;
+}
+
+QStringList ImportWidget::getUSBPaths()
+{//Linux implementation
+	CX_LOG_DEBUG() << "In ImportWidget::getUSBPaths()";
+	QStringList usbPaths;
+//	std::ifstream mounts("/proc/mounts");
+//	if(!mounts.is_open())
+//	{
+//		CX_LOG_WARNING("No USB found in proc/mounts");
+//		return usbPaths;
+//	}
+
+	QFile file("/proc/mounts");
+	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		CX_LOG_DEBUG() << "In ImportWidget::getUSBPaths() 2";
+		QTextStream mounts(&file);
+		QString line = mounts.readLine();
+		while(!line.isNull())
+		{
+			CX_LOG_DEBUG() << "In ImportWidget::getUSBPaths() 3";
+			QStringList list = line.split(" ");
+			if(list.size()<3)
+				continue;
+			QString device = list[0];
+			QString mountPoint = list[1];
+			QString fsType = list[2];
+
+			CX_LOG_DEBUG() << "device: " << device;
+			CX_LOG_DEBUG() << "mountPoint: " << mountPoint;
+			CX_LOG_DEBUG() << "fsType: " << fsType;
+
+			if(device.startsWith("/dev/sd") && (mountPoint.startsWith("/media") || mountPoint.startsWith("/run/media")))
+				usbPaths.append(mountPoint.replace("\\040", " "));
+			line = mounts.readLine();
+		}
+		file.close();
+	}
+	else
+	{
+		CX_LOG_WARNING("No USB found in /proc/mounts");
+		return usbPaths;
+	}
+
+
+//	std::string line;
+//	while(std::getline(mounts, line))
+//	{
+//		std::istringstream iss(line);
+//		std::string device, mountPoint, fsType;
+//		if(!(iss >> device >> mountPoint >> fsType))
+//			continue;
+//		CX_LOG_DEBUG() << "device: " << device;
+//		CX_LOG_DEBUG() << "mountPoint: " << mountPoint;
+//		CX_LOG_DEBUG() << "fsType: " << fsType;
+//		if(device.find("/dev/sd")==0 && (mountPoint.find("/media")==0 || mountPoint.find("/run/media")==0))
+//			usbPaths.append(QString::fromUtf8(mountPoint.c_str()));
+//	}
+
+//	mounts.close();
+	return usbPaths;
+
 }
 
 void ImportWidget::showProgressDialog(QProgressDialog &progress)
