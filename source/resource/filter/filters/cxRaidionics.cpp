@@ -79,7 +79,6 @@ QString Raidionics::createRaidionicsIniFile()
 	settings.endGroup();
 
 	settings.beginGroup("System");
-	//settings.setValue("gpu_id", "-1");
 	settings.setValue("gpu_id", "0");
 	settings.setValue("input_folder", inputFolder);
 	settings.setValue("output_folder", mOutputFolder);
@@ -168,7 +167,6 @@ void Raidionics::createRaidionicsJasonFile(QString jsonFilePath)
 		QJsonArray targetArray = createTargetArray(target);
 		taskObject.insert("target", targetArray);
 		taskObject.insert("model", "CT_"+target+"/hr");
-		//taskObject.insert("model", "CT_"+target);
 		taskObject.insert("description", targetDescription(target)+" segmentation in "+sequence+" ("+subfolderT0()+")");
 		QString taskNumber;
 		taskNumber.setNum(i+1);
