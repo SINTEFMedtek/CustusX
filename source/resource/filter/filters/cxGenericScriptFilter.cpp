@@ -79,7 +79,7 @@ OutputVariables::OutputVariables(QString parameterFilePath)
 	mCreateOutputMeshList = createOutputMeshList.split(" ");
 	QString outputClass = settings.value("classes").toString();
 	mOutputClasses = outputClass.split(" ");
-	if(mOutputClasses.isEmpty() || mOutputClasses[0].isEmpty())
+	if(QFileInfo::exists(parameterFilePath)  && (mOutputClasses.isEmpty() || mOutputClasses[0].isEmpty()))
 	{
 		CX_LOG_DEBUG() << "OutputVariables::OutputVariables: Problem with file: " << parameterFilePath;
 		CX_LOG_WARNING() << "OutputVariables::OutputVariables: Wrong formatting of class (should be separated with space): " << outputClass;
@@ -299,6 +299,15 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
 	CommandStringVariables variables = CommandStringVariables(parameterFilePath, input);
+	//Old style use relative path ../..
+	if (!variables.envPath.startsWith("../.."))
+		variables.envPath = DataLocations::getVirtualEnvironmentsPath() + "/" + variables.envPath;
+	if (!variables.scriptFilePath.startsWith("../.."))
+		variables.scriptFilePath = findScriptFile(variables.scriptFilePath);
+
+	//Needs correct order
+	variables.scriptFilePath = updateScriptFilePathIfWindows(variables.envPath, variables.scriptFilePath);
+	variables.envPath = updateEnvPathIfWindows(variables.envPath);
 
 	// Get paths
 	variables.inputFilePath = getInputFilePath(input);
@@ -310,6 +319,31 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 		return CommandStringVariables("", input);
 	}
 	return variables;
+}
+
+QString GenericScriptFilter::updateEnvPathIfWindows(QString envPath)
+{
+	QString retval = envPath;
+#ifdef CX_WINDOWS
+	retval = getEnvironmentBasePath(envPath);
+	retval = retval + "/" + getFixedEnvironmentSubdirWindows();
+#endif //CX_WINDOWS
+	return retval;
+}
+
+QString GenericScriptFilter::updateScriptFilePathIfWindows(QString envPath, QString scriptFilePath)
+{
+	QString retval = scriptFilePath;
+#ifdef CX_WINDOWS
+	if (!scriptFilePath.endsWith(".py", Qt::CaseInsensitive))
+	{
+		QString commandFile = scriptFilePath.split("/").last();
+		retval = getEnvironmentBasePath(envPath);
+		retval = retval + "/Scripts/" + commandFile + ".exe";
+	}
+
+#endif //CX_WINDOWS
+	return retval;
 }
 
 QString GenericScriptFilter::standardCommandString(CommandStringVariables variables)
@@ -325,6 +359,11 @@ QString GenericScriptFilter::standardCommandString(CommandStringVariables variab
 
 QString GenericScriptFilter::findScriptFile(QString path)
 {
+	//Look for script in virtual environments path first
+	QDir venvPath(DataLocations::getVirtualEnvironmentsPath());
+	if (venvPath.exists(path))
+		return  venvPath.absoluteFilePath(path);
+
 	QDir appDir(qApp->applicationDirPath());
 	QDir scriptDir(getScriptPath());
 	if(QFileInfo::exists(path))
@@ -335,7 +374,7 @@ QString GenericScriptFilter::findScriptFile(QString path)
 		return  scriptDir.absoluteFilePath(path);
 
 	CX_LOG_WARNING() << "Couldn't find script file: " << path;
-	CX_LOG_WARNING() << "Looked in " << appDir.path() << " and: " << scriptDir.path();
+	CX_LOG_WARNING() << "Looked in " << venvPath.path() << ", " << appDir.path() << " and: " << scriptDir.path();
 	return path;
 }
 
@@ -404,7 +443,6 @@ QString GenericScriptFilter::getEnvironmentPath(CommandStringVariables variables
 QString GenericScriptFilter::getEnvironmentBasePath(QString environmentPath)
 {
 	QString basePath = environmentPath.split(this->getFixedEnvironmentSubdir())[0];
-	basePath = basePath.split("venv")[0];
 	QDir dir(basePath);
 	basePath = dir.absolutePath();
 	
@@ -459,6 +497,7 @@ bool GenericScriptFilter::createVirtualPythonEnvironment(QString environmentPath
 
 	environmentPath = removeTrailingPythonVariable(environmentPath);
 
+	//Automatically creating virtual environment is not implemented for Windows
 	if(!this->environmentExist(environmentPath) || !this->isVirtualEnvironment(environmentPath))
 	{
 		CX_LOG_WARNING() << "Didn't find virtual environment. Trying to create: " << environmentPath;
@@ -532,21 +571,25 @@ QString GenericScriptFilter::removeTrailingPythonVariable(QString environmentPat
 
 bool GenericScriptFilter::isVirtualEnvironment(QString path)
 {
-	if(path.contains(this->getFixedEnvironmentSubdir()))
+	QString subdir = getFixedEnvironmentSubdir();
+#ifdef CX_WINDOWS
+	subdir = getFixedEnvironmentSubdirWindows();
+#endif
+
+	if(path.contains(subdir))
 		return true;
 	return false;
 }
 
 QString GenericScriptFilter::getFixedEnvironmentSubdir()
 {
-	QString retval;
-	retval = "bin/python";
-
-#ifdef CX_WINDOWS
-	retval = "Scripts\python.exe";
-#endif
-
+	QString retval("bin/python");
 	return retval;
+}
+
+QString GenericScriptFilter::getFixedEnvironmentSubdirWindows()
+{
+	return "Scripts/python.exe";
 }
 
 QString GenericScriptFilter::getScriptPath()

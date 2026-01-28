@@ -97,8 +97,9 @@ protected:
 	virtual void createInputTypes();
 	virtual void createOutputTypes();
 	QString createCommandString(ImagePtr input);
+	QString updateEnvPathIfWindows(QString envPath);
+	QString updateScriptFilePathIfWindows(QString envPath, QString scriptFilePath);
 	bool runCommandStringAndWait(QString command);
-	QString getCustomPath();
 	void setupOutputColors(QStringList colorList);
 	QColor createColor(QStringList color);
 	QColor getDefaultColor();
@@ -125,6 +126,7 @@ protected:
 	bool createVirtualPythonEnvironment(QString environmentPath, QString requirementsPath, QString createScript = QString(), QString command = QString());
 	bool isVirtualEnvironment(QString path);
 	QString getFixedEnvironmentSubdir();
+	QString getFixedEnvironmentSubdirWindows();
 	QString removeTrailingPythonVariable(QString environmentPath);
 	bool showVenvInfoDialog(QString venvPath, QString createCommand);
 	bool createVenv(QString createCommand, QString command);

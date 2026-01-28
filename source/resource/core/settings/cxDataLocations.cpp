@@ -254,6 +254,12 @@ QString DataLocations::getModelsPath()
 	return path;
 }
 
+QString DataLocations::getVirtualEnvironmentsPath()
+{
+	QString path(getPersistentWritablePath() + "/virtualEnvironments");
+	return path;
+}
+
 QString DataLocations::findConfigFolder(QString pathRelativeToConfigRoot, QString alternativeAbsolutePath)
 {
 	return findConfigPath("", pathRelativeToConfigRoot, alternativeAbsolutePath);
