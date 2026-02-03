@@ -10,7 +10,7 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDockWidget>
-#include <QAction>
+#include <QInputDialog>
 
 #include "boost/bind/bind.hpp"
 #include "boost/function.hpp"
@@ -147,6 +147,12 @@ void MainWindowActions::createPatientActions()
 						 "Create a new patient file",
 						 [=](){this->newPatientSlot(false);});
 
+	this->createAction("CreatePatientWithPatientName", "New Patient",
+						 QIcon(),
+						 QKeySequence(),
+						 "Create a new patient file",
+						 [=](){this->newPatientSlot(false, true);});
+
 	this->createAction("SaveFile", "Save Patient",
 					   QIcon(":/icons/open_icon_library/document-save-5.png"),
 					   QKeySequence("Ctrl+S"),
@@ -243,10 +249,18 @@ QWidget* MainWindowActions::parentWidget()
 }
 
 
-void MainWindowActions::newPatientSlot(bool showDialog)
+void MainWindowActions::newPatientSlot(bool showDialog, bool useSimpleDialog)
 {
 	mServices->view()->enableRender(false);
-	QString choosenDir = this->selectNewPatientFolder(showDialog);
+	QString choosenDir;
+	if(useSimpleDialog)
+	{
+		QString patientName = getPatientNameFromUser();
+		choosenDir = this->selectNewPatientFolder(showDialog, patientName);
+	}
+	else
+		choosenDir = this->selectNewPatientFolder(showDialog);
+
 	if(!choosenDir.isEmpty())
 	{
 		// Update global patient number
@@ -258,15 +272,21 @@ void MainWindowActions::newPatientSlot(bool showDialog)
 	mServices->view()->enableRender(true);
 }
 
-QString MainWindowActions::selectNewPatientFolder(bool showDialog)
+QString MainWindowActions::selectNewPatientFolder(bool showDialog, QString patientName)
 {
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly());
-	QString filename = QString("%1_%2_%3.cx3")
-			.arg(timestamp)
-			.arg(profile()->getName())
-			.arg(settings()->value("globalPatientNumber").toString());
+
+	QString filename = timestamp;
+	if(patientName.isEmpty())
+	{
+		filename.append(profile()->getName());
+		filename.append(settings()->value("globalPatientNumber").toString());
+	}
+	else
+		filename.append("_" + patientName);
+	filename.append(".cx3");
 
 	QString choosenDir = patientDatafolder + "/" + filename;
 
@@ -285,6 +305,23 @@ QString MainWindowActions::selectNewPatientFolder(bool showDialog)
 		choosenDir += QString(".cx3");
 
 	return choosenDir;
+}
+
+QString MainWindowActions::getPatientNameFromUser()
+{
+	bool ok;
+	QString inputText = QInputDialog::getText(nullptr, "Create new patient file",
+																					 "Please enter patient name or code:", QLineEdit::Normal,
+																					 QString(), &ok);
+	if (ok && !inputText.isEmpty())
+	{
+		inputText.replace(' ', '_');
+		inputText.replace('.', '_');
+		inputText.replace('/', '_');
+		return inputText;
+	}
+	else
+		return "";
 }
 
 QString MainWindowActions::getExistingSessionFolder()
