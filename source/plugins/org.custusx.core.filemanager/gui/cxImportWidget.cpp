@@ -24,6 +24,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QStackedWidget>
 #include <QProgressDialog>
 #include <QTextStream>
+#include <QMessageBox>
 #include "cxForwardDeclarations.h"
 #include "cxFileReaderWriterService.h"
 #include "cxVisServices.h"
@@ -283,15 +284,18 @@ void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modality
 
 ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype, bool fromUSB)
 {
+	ImportDataTypeWidget *widget = NULL;
 	QStringList filenames;
 	if(fromUSB)
 		filenames = this->getUSBPaths();
 	else
 		filenames = this->openFileBrowserForSelectingFiles();
 
+	if(filenames.empty())
+		return widget;
+
 	bool addedDICOM = false;
 
-	ImportDataTypeWidget *widget = NULL;
 	for(int i = 0; i < filenames.size(); ++i)
 	{
 		QString filename = filenames[i];
@@ -324,40 +328,29 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 		}
 	}
 
+	if(!addedDICOM)
+		QMessageBox::information(this, "DICOM not found", "No DICOM data was fount on the USB device");
+
 	this->generateParentCandidates();
 	return widget;
 }
 
 QStringList ImportWidget::getUSBPaths()
 {//Linux implementation
-	CX_LOG_DEBUG() << "In ImportWidget::getUSBPaths()";
 	QStringList usbPaths;
-//	std::ifstream mounts("/proc/mounts");
-//	if(!mounts.is_open())
-//	{
-//		CX_LOG_WARNING("No USB found in proc/mounts");
-//		return usbPaths;
-//	}
 
 	QFile file("/proc/mounts");
 	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		CX_LOG_DEBUG() << "In ImportWidget::getUSBPaths() 2";
 		QTextStream mounts(&file);
 		QString line = mounts.readLine();
 		while(!line.isNull())
 		{
-			CX_LOG_DEBUG() << "In ImportWidget::getUSBPaths() 3";
 			QStringList list = line.split(" ");
 			if(list.size()<3)
 				continue;
 			QString device = list[0];
 			QString mountPoint = list[1];
-			QString fsType = list[2];
-
-			CX_LOG_DEBUG() << "device: " << device;
-			CX_LOG_DEBUG() << "mountPoint: " << mountPoint;
-			CX_LOG_DEBUG() << "fsType: " << fsType;
 
 			if(device.startsWith("/dev/sd") && (mountPoint.startsWith("/media") || mountPoint.startsWith("/run/media")))
 				usbPaths.append(mountPoint.replace("\\040", " "));
@@ -365,30 +358,14 @@ QStringList ImportWidget::getUSBPaths()
 		}
 		file.close();
 	}
-	else
+
+	if(usbPaths.isEmpty())
 	{
 		CX_LOG_WARNING("No USB found in /proc/mounts");
-		return usbPaths;
+		QMessageBox::information(this, "USB not found", "Found no USB device connected to the computer");
 	}
 
-
-//	std::string line;
-//	while(std::getline(mounts, line))
-//	{
-//		std::istringstream iss(line);
-//		std::string device, mountPoint, fsType;
-//		if(!(iss >> device >> mountPoint >> fsType))
-//			continue;
-//		CX_LOG_DEBUG() << "device: " << device;
-//		CX_LOG_DEBUG() << "mountPoint: " << mountPoint;
-//		CX_LOG_DEBUG() << "fsType: " << fsType;
-//		if(device.find("/dev/sd")==0 && (mountPoint.find("/media")==0 || mountPoint.find("/run/media")==0))
-//			usbPaths.append(QString::fromUtf8(mountPoint.c_str()));
-//	}
-
-//	mounts.close();
 	return usbPaths;
-
 }
 
 void ImportWidget::showProgressDialog(QProgressDialog &progress)
