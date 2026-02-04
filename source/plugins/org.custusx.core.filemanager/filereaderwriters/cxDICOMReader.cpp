@@ -75,7 +75,6 @@ bool DICOMReader::canReadFile(QString filename)
 	{
 		return false; //Not a dicom file type
 	}
-	//TO DO: Exclude file types not relevant. For speed increase
 
 	QFile file(filename);
 	bool opened = file.open(QIODevice::ReadOnly);
