@@ -11,6 +11,7 @@
 #include <QDesktopServices>
 #include <QDockWidget>
 #include <QInputDialog>
+#include <QDir>
 
 #include "boost/bind/bind.hpp"
 #include "boost/function.hpp"
@@ -164,6 +165,12 @@ void MainWindowActions::createPatientActions()
 					   QKeySequence("Ctrl+L"),
 					   "Load patient file",
 					   &MainWindowActions::loadPatientFileSlot);
+
+	this->createAction("LoadFileWithSimpleDialog", "Load Patient",
+						 QIcon(":/icons/open_icon_library/document-open-7.png"),
+						 QKeySequence("Ctrl+L"),
+						 "Load patient file",
+						 [=](){this->loadPatientFileSlot(true);});
 
 	this->createAction("LoadFileCopy", "Load from Patient template",
 					   QIcon(":/icons/open_icon_library/document-open-7.png"),
@@ -324,6 +331,54 @@ QString MainWindowActions::getPatientNameFromUser()
 		return "";
 }
 
+QString MainWindowActions::getUserToSelectExistingPatient()
+{
+	QStringList patients = getAllPatientsInProfile();
+	QString sessionFolder = this->getExistingSessionFolder();
+
+	if(patients.empty())
+	{
+		QString message = "Found no patients in the profile " + sessionFolder.section('/', -1);
+		CX_LOG_WARNING(message);
+		QMessageBox::information(this->parentWidget(), "Found no patients", message);
+		return {};
+	}
+	std::sort(patients.begin(), patients.end(), std::greater<QString>()); //Sort to get most recent dates first
+
+	bool ok = false;
+	QString choice = QInputDialog::getItem(
+				this->parentWidget(),
+				"Choose patient to open",
+				"Choose patient to open",
+				patients,
+				0,
+				false,
+				&ok);
+
+	if(!ok)
+		return {};
+
+	return sessionFolder + "/" + choice;
+
+}
+
+QStringList MainWindowActions::getAllPatientsInProfile()
+{
+	QString patientDatafolder = this->getExistingSessionFolder();
+	QDir directory(patientDatafolder);
+	QStringList patients;
+	if(!directory.exists())
+		return patients;
+
+	QFileInfoList entries = directory.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+
+	for(const QFileInfo& entry: entries)
+		if(entry.fileName().endsWith(".cx3"), Qt::CaseSensitive)
+			patients << entry.fileName();
+
+	return patients;
+}
+
 QString MainWindowActions::getExistingSessionFolder()
 {
 	return profile()->getSessionRootFolder();
@@ -351,13 +406,18 @@ void MainWindowActions::savePatientFileSlot()
 	mServices->view()->enableRender(true);
 }
 
-void MainWindowActions::loadPatientFileSlot()
+void MainWindowActions::loadPatientFileSlot(bool useSimpleFileDialog)
 {
 	mServices->view()->enableRender(false);
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	// Open file dialog
-	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
+	QString folder;
+	if(useSimpleFileDialog)
+		folder = getUserToSelectExistingPatient();
+	else
+		folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
+
 	if (!folder.isEmpty())
 		mServices->session()->load(folder);
 

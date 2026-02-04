@@ -13,6 +13,7 @@ class QMenu;
 class QActionGroup;
 class QDockWidget;
 class QScrollArea;
+class QDir;
 
 namespace cx
 {
@@ -36,7 +37,7 @@ public:
 private slots:
 	// File menu
 	void newPatientSlot(bool showDialog = true, bool useSimpleDialog = false); ///< Create new patient with directory structure
-	void loadPatientFileSlot();///< Load all application data from XML file
+	void loadPatientFileSlot(bool useSimpleFileDialog = false);///< Load all application data from XML file
 	void loadPatientFileCopySlot();///< Take a copy of the patient folder, and load all application data from XML file
 	void savePatientFileSlot();///< Save all application data to XML file
 	void clearPatientSlot();///< clear current patient (debug)
@@ -90,6 +91,8 @@ private:
 	QString getExistingSessionFolder();
 	QWidget* parentWidget();
 	void shootOneLayout(int index);
+	QString getUserToSelectExistingPatient();
+	QStringList getAllPatientsInProfile();
 
 	template <class T>
 	QAction* createAction(QString uid, QString text, QIcon icon,
