@@ -299,7 +299,6 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 	for(int i = 0; i < filenames.size(); ++i)
 	{
 		QString filename = filenames[i];
-		CX_LOG_DEBUG() << "filename: " << filename;
 		QString fileType = mFileManager->getFileReaderName(filename);
 		if(fileType == "DICOMReader")
 		{
