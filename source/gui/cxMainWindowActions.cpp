@@ -10,7 +10,8 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QDockWidget>
-#include <QAction>
+#include <QInputDialog>
+#include <QDir>
 
 #include "boost/bind/bind.hpp"
 #include "boost/function.hpp"
@@ -147,6 +148,12 @@ void MainWindowActions::createPatientActions()
 						 "Create a new patient file",
 						 [=](){this->newPatientSlot(false);});
 
+	this->createAction("CreatePatientWithPatientName", "New Patient",
+						 QIcon(),
+						 QKeySequence(),
+						 "Create a new patient file",
+						 [=](){this->newPatientSlot(false, true);});
+
 	this->createAction("SaveFile", "Save Patient",
 					   QIcon(":/icons/open_icon_library/document-save-5.png"),
 					   QKeySequence("Ctrl+S"),
@@ -158,6 +165,12 @@ void MainWindowActions::createPatientActions()
 					   QKeySequence("Ctrl+L"),
 					   "Load patient file",
 					   &MainWindowActions::loadPatientFileSlot);
+
+	this->createAction("LoadFileWithSimpleDialog", "Load Patient",
+						 QIcon(":/icons/open_icon_library/document-open-7.png"),
+						 QKeySequence("Ctrl+L"),
+						 "Load patient file",
+						 [=](){this->loadPatientFileSlot(true);});
 
 	this->createAction("LoadFileCopy", "Load from Patient template",
 					   QIcon(":/icons/open_icon_library/document-open-7.png"),
@@ -202,6 +215,12 @@ void MainWindowActions::createPatientActions()
 										 "Add CT files to be imported",
 										 [=](){this->importDataSlot("AddFilesForImportWithDialogActionCT");});
 
+	this->createAction("AddFilesForImportFromUSB", "Add CT files for import from USB",
+										 QIcon(),
+										 QKeySequence(),
+										 "Add CT files to be imported",
+										 [=](){this->importDataSlot("AddFilesForImportFromUSBCT");});
+
 	this->createAction("AddFilesForImportWithDialogPET", "Add PET files for import (Dialog)",
 										 QIcon(),
 										 QKeySequence(),
@@ -237,10 +256,18 @@ QWidget* MainWindowActions::parentWidget()
 }
 
 
-void MainWindowActions::newPatientSlot(bool showDialog)
+void MainWindowActions::newPatientSlot(bool showDialog, bool useSimpleDialog)
 {
 	mServices->view()->enableRender(false);
-	QString choosenDir = this->selectNewPatientFolder(showDialog);
+	QString choosenDir;
+	if(useSimpleDialog)
+	{
+		QString patientName = getPatientNameFromUser();
+		choosenDir = this->selectNewPatientFolder(showDialog, patientName);
+	}
+	else
+		choosenDir = this->selectNewPatientFolder(showDialog);
+
 	if(!choosenDir.isEmpty())
 	{
 		// Update global patient number
@@ -252,15 +279,21 @@ void MainWindowActions::newPatientSlot(bool showDialog)
 	mServices->view()->enableRender(true);
 }
 
-QString MainWindowActions::selectNewPatientFolder(bool showDialog)
+QString MainWindowActions::selectNewPatientFolder(bool showDialog, QString patientName)
 {
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	QString timestamp = QDateTime::currentDateTime().toString(timestampFormatFolderFriendly());
-	QString filename = QString("%1_%2_%3.cx3")
-			.arg(timestamp)
-			.arg(profile()->getName())
-			.arg(settings()->value("globalPatientNumber").toString());
+
+	QString filename = timestamp;
+	if(patientName.isEmpty())
+	{
+		filename.append(profile()->getName());
+		filename.append(settings()->value("globalPatientNumber").toString());
+	}
+	else
+		filename.append("_" + patientName);
+	filename.append(".cx3");
 
 	QString choosenDir = patientDatafolder + "/" + filename;
 
@@ -279,6 +312,71 @@ QString MainWindowActions::selectNewPatientFolder(bool showDialog)
 		choosenDir += QString(".cx3");
 
 	return choosenDir;
+}
+
+QString MainWindowActions::getPatientNameFromUser()
+{
+	bool ok;
+	QString inputText = QInputDialog::getText(nullptr, "Create new patient file",
+																					 "Please enter patient name or code:", QLineEdit::Normal,
+																					 QString(), &ok);
+	if (ok && !inputText.isEmpty())
+	{
+		inputText.replace(' ', '_');
+		inputText.replace('.', '_');
+		inputText.replace('/', '_');
+		return inputText;
+	}
+	else
+		return "";
+}
+
+QString MainWindowActions::getUserToSelectExistingPatient()
+{
+	QStringList patients = getAllPatientsInProfile();
+	QString sessionFolder = this->getExistingSessionFolder();
+
+	if(patients.empty())
+	{
+		QString message = "Found no patients in the profile " + sessionFolder.section('/', -1);
+		CX_LOG_WARNING(message);
+		QMessageBox::information(this->parentWidget(), "Found no patients", message);
+		return {};
+	}
+	std::sort(patients.begin(), patients.end(), std::greater<QString>()); //Sort to get most recent dates first
+
+	bool ok = false;
+	QString choice = QInputDialog::getItem(
+				this->parentWidget(),
+				"Choose patient to open",
+				"Choose patient to open",
+				patients,
+				0,
+				false,
+				&ok);
+
+	if(!ok)
+		return {};
+
+	return sessionFolder + "/" + choice;
+
+}
+
+QStringList MainWindowActions::getAllPatientsInProfile()
+{
+	QString patientDatafolder = this->getExistingSessionFolder();
+	QDir directory(patientDatafolder);
+	QStringList patients;
+	if(!directory.exists())
+		return patients;
+
+	QFileInfoList entries = directory.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+
+	for(const QFileInfo& entry: entries)
+		if(entry.fileName().endsWith(".cx3"), Qt::CaseSensitive)
+			patients << entry.fileName();
+
+	return patients;
 }
 
 QString MainWindowActions::getExistingSessionFolder()
@@ -308,13 +406,18 @@ void MainWindowActions::savePatientFileSlot()
 	mServices->view()->enableRender(true);
 }
 
-void MainWindowActions::loadPatientFileSlot()
+void MainWindowActions::loadPatientFileSlot(bool useSimpleFileDialog)
 {
 	mServices->view()->enableRender(false);
 	QString patientDatafolder = this->getExistingSessionFolder();
 
 	// Open file dialog
-	QString folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
+	QString folder;
+	if(useSimpleFileDialog)
+		folder = getUserToSelectExistingPatient();
+	else
+		folder = QFileDialog::getExistingDirectory(this->parentWidget(), "Select patient", patientDatafolder, QFileDialog::ShowDirsOnly);
+
 	if (!folder.isEmpty())
 		mServices->session()->load(folder);
 

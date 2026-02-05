@@ -57,10 +57,10 @@ signals:
 	void parentCandidatesUpdated();
 
 private slots:
-	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
+	void addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN, bool fromUSB = false);
 	void importButtonClicked();
 	void cancelButtonClicked();
-	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN);
+	ImportDataTypeWidget *addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion = imUNKNOWN, IMAGE_SUBTYPE subtype = istUNKNOWN, bool fromUSB = false);
 	void removeWidget(QWidget *widget);
 	void removeRowFromTableAndRemoveFilenameFromImportList();
 
@@ -77,6 +77,7 @@ private:
 	void clearData();
 	QStringList removeDirIfSubdirIsIncluded(QStringList importFiles);
 	void showProgressDialog(QProgressDialog &progress);
+	QStringList getUSBPaths();
 
 	QTableWidget* mTableWidget;
 	QStringList mTableHeader;
