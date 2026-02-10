@@ -328,7 +328,7 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 	}
 
 	if(!addedDICOM)
-		QMessageBox::information(this, "DICOM not found", "No DICOM data was fount on the USB device");
+		QMessageBox::information(this, "DICOM not found", "No DICOM data was found");
 
 	this->generateParentCandidates();
 	return widget;
