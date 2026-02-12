@@ -87,7 +87,7 @@ QString Raidionics::createRaidionicsIniFile()
 	settings.endGroup();
 
 	settings.beginGroup("Runtime");
-	settings.setValue("batch_size", "2");
+	settings.setValue("batch_size", "1");
 	settings.setValue("non_overlapping", "False");
 	settings.setValue("reconstruction_method", "thresholding");
 	settings.setValue("reconstruction_order", "resample_first");
