@@ -76,7 +76,7 @@ signals:
 public slots:
 	void resendProbedefinition();
 
-private slots:
+protected slots:
 	void onConnectionEvent(vtkObject* caller, void* connector, unsigned long event, void*);
 	void onDeviceAddedOrRemoved(vtkObject* caller, void* connector, unsigned long event, void*callData);
 	void onDeviceReceived(vtkObject * caller_device, void * unknown, unsigned long event, void *);

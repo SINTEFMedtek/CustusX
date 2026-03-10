@@ -71,6 +71,27 @@ public:
 	{
 		return this->createMask(result);
 	}
+	cx::ThreadResult testCreateThreadResultObject(QString deviceName, cx::ImagePtr image = cx::ImagePtr())
+	{
+		return this->createThreadResultObject(deviceName, image);
+	}
+	void testSaveThreadResult(cx::ThreadResult &threadResult)
+	{
+		return this->saveThreadResult(threadResult);
+	}
+	std::map<QString, cx::ThreadResult> getDevices()
+	{
+		return mDevices;
+	}
+	void testFutureImageFinished()
+	{
+		return this->futureImageFinished();
+	}
+	cx::ThreadResult testProcessImage(cx::ThreadResult result)
+	{
+		return this->processImage(result);
+	}
+
 };
 
 } //namespace
@@ -322,6 +343,57 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 	averageTime = timeMs/times;
 	CX_LOG_DEBUG() << "Average image conversion time (whole for loop, skipped image reload) for " << times << " images: " << averageTime << " ms.";
 	CHECK(averageTime < 10);
+}
+
+TEST_CASE("NetworkHandler ThreadResult", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
+	NetworkHandlerTester networkHandler(logic);
+
+	std::map<QString, cx::ThreadResult> devices = networkHandler.getDevices();
+	CHECK(devices.size() == 0);
+
+	QString deviceName("TestDevice");
+	cx::ThreadResult result = networkHandler.testCreateThreadResultObject(deviceName);
+	REQUIRE(result.deviceName == deviceName);
+	REQUIRE(result.probeDefinitionFromStringMessages);
+	CHECK_FALSE(result.probeDefinitionFromStringMessages->haveValidValues());
+	CHECK_FALSE(result.probeDefinitionHaveChanged);
+	CHECK_FALSE(result.image);
+	CHECK_FALSE(result.USMask);
+	CHECK_FALSE(result.zeroesInImage);
+	CHECK(result.skippedImages == 0);
+	CHECK(result.sentNumProbeDefinitions == 0);
+	CHECK(result.shouldEmitProbeDefinition());
+
+	devices = networkHandler.getDevices();
+	CHECK(devices.size() == 1);
+
+	networkHandler.testSaveThreadResult(result);
+	devices = networkHandler.getDevices();
+	CHECK(devices.size() == 1);
+}
+
+TEST_CASE("NetworkHandler Process empty ThreadResult", "[plugins][org.custusx.core.openigtlink3][unit]")
+{
+	igtlioLogicPointer logic = igtlioLogicPointer::New();
+	NetworkHandlerTester networkHandler(logic);
+	networkHandler.testFutureImageFinished();
+
+	QString deviceName("TestDevice");
+	cx::ThreadResult result = networkHandler.testCreateThreadResultObject(deviceName);
+	cx::ThreadResult processedResult = networkHandler.testProcessImage(result);
+
+	REQUIRE(processedResult.deviceName == deviceName);
+	REQUIRE(processedResult.probeDefinitionFromStringMessages);
+	CHECK_FALSE(processedResult.probeDefinitionFromStringMessages->haveValidValues());
+	CHECK_FALSE(processedResult.probeDefinitionHaveChanged);
+	CHECK_FALSE(processedResult.image);
+	CHECK_FALSE(processedResult.USMask);
+	CHECK_FALSE(processedResult.zeroesInImage);
+	CHECK(processedResult.skippedImages == 1);
+	CHECK(processedResult.sentNumProbeDefinitions == 0);
+	CHECK(processedResult.shouldEmitProbeDefinition());
 }
 
 } //namespace cxtest
