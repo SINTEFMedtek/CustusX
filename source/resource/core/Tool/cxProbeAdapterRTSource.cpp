@@ -160,8 +160,6 @@ void ProbeAdapterRTSource::probeChangedSlot()
 	if (!probe)
 		return;
 
-	mRedirecter->Update();
-
 	QString uid = mBase->getUid();
 	mRedirecter->SetOutputSpacing(probe->getProbeDefinition(uid).getSpacing().begin());
 
