@@ -63,22 +63,13 @@ public:
 	NetworkHandlerTester(igtlioLogicPointer logic) :
 		NetworkHandler(logic)
 	{}
-
-	vtkImageDataPtr getMask()
+	bool testConvertZeroesInsideSectorToOnes(cx::ThreadResult result, int threashold, int newValue)
 	{
-		return mUSMask;
+		return this->convertZeroesInsideSectorToOnes(result, threashold, newValue);
 	}
-	void setProbeDefinition(cx::ProbeDefinitionPtr probeDefinition)
+	bool testCreateMask(cx::ThreadResult &result)
 	{
-		mProbeDefinition = probeDefinition;
-	}
-	bool testConvertZeroesInsideSectorToOnes(cx::ImagePtr image, int threashold, int newValue)
-	{
-		return this->convertZeroesInsideSectorToOnes(image, threashold, newValue);
-	}
-	bool testCreateMask()
-	{
-		return this->createMask();
+		return this->createMask(result);
 	}
 };
 
@@ -256,15 +247,18 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 
 	igtlioLogicPointer logic = igtlioLogicPointer::New();
 	NetworkHandlerTester networkHandler(logic);
-	networkHandler.setProbeDefinition(probeDefinitionPtr);
 
 	cx::ImagePtr image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
 	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
-	CHECK(networkHandler.testCreateMask());
-	REQUIRE(networkHandler.getMask());
+
+	cx::ThreadResult result;
+	result.probeDefinition = probeDefinitionPtr;
+	result.image = image;
+	CHECK(networkHandler.testCreateMask(result));
+	REQUIRE(result.USMask);
 
 	unsigned char* imagePtr = static_cast<unsigned char*> (vtkImage->GetScalarPointer());
-	unsigned char* maskPtr = static_cast<unsigned char*> (networkHandler.getMask()->GetScalarPointer());
+	unsigned char* maskPtr = static_cast<unsigned char*> (result.USMask->GetScalarPointer());
 	Eigen::Array3i dims(vtkImage->GetDimensions());
 
 	unsigned pos = 200 + 200 * dims[0]; // (x, y)
@@ -273,7 +267,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 	imagePtr[pos] = 0;
 	CHECK(imagePtr[pos] == 0);
 
-	CHECK(networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255));
+	CHECK(networkHandler.testConvertZeroesInsideSectorToOnes(result, 0, 255));
 	CHECK(imagePtr[pos] == 255);
 
 	 //Renders and saves images for visual inspaction, but CHECK will fail
@@ -293,12 +287,15 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 
 	igtlioLogicPointer logic = igtlioLogicPointer::New();
 	NetworkHandlerTester networkHandler(logic);
-	networkHandler.setProbeDefinition(probeDefinitionPtr);
 
 	cx::ImagePtr image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
 	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
-	CHECK(networkHandler.testCreateMask());
-	REQUIRE(networkHandler.getMask());
+
+	cx::ThreadResult result;
+	result.probeDefinition = probeDefinitionPtr;
+	result.image = image;
+	CHECK(networkHandler.testCreateMask(result));
+	REQUIRE(result.USMask);
 
 	QTime clock;
 	unsigned times = 100;
@@ -307,7 +304,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 	{
 		image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
 		clock.start();
-		networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255);
+		networkHandler.testConvertZeroesInsideSectorToOnes(result, 0, 255);
 		timeMs += clock.elapsed();
 	}
 	int averageTime = timeMs/times;
@@ -319,7 +316,7 @@ TEST_CASE_METHOD(cxtest::VideoGraphicsFixture, "VideoGraphics: Test US sector ze
 	for(int i = 0; i < times; ++i)
 	{
 //		image = cx::ImagePtr(new cx::Image(imageFilename, videoImage0));
-		networkHandler.testConvertZeroesInsideSectorToOnes(image, 0, 255);
+		networkHandler.testConvertZeroesInsideSectorToOnes(result, 0, 255);
 	}
 	timeMs += clock.elapsed();
 	averageTime = timeMs/times;

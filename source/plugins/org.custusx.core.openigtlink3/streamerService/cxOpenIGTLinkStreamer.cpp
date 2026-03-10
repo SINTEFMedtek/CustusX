@@ -65,11 +65,11 @@ void OpenIGTLinkStreamer::receivedImage(ImagePtr image)
         mSender->send(package);
 }
 
+//Used by RT view
 //void OpenIGTLinkStreamer::receivedProbedefinition(QString not_used, ProbeDefinitionPtr probedef)//Was not used?
 //Added connect and changed name to see if this allows IGSTK tools to receive probeDefinition
 void OpenIGTLinkStreamer::receiveProbedefinition(QString not_used, ProbeDefinitionPtr probedef)
 {
-	//CX_LOG_DEBUG() << "receivedProbedefinition";
     PackagePtr package(new Package());
     package->mProbe = probedef;
     if(mSender)

@@ -198,6 +198,7 @@ void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Tr
 		tool->setCalibration_sMt(calibration);
 }
 
+//Used by probe tool. See also OpenIGTLinkStreamer::receiveProbedefinition() for RT view
 void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
 {
 	OpenIGTLinkToolPtr tool = this->getTool(devicename);

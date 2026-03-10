@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxNetworkHandler.h"
 
 #include <QTimer>
+#include <qtconcurrentrun.h>
 
 #include "igtlioLogic.h"
 #include "igtlioImageDevice.h"
@@ -31,20 +32,15 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxProbeSector.h"
 #include "cxProbeDefinition.h"
+#include "qfuturewatcher.h"
 
 namespace cx
 {
 
 NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 	mTimer(new QTimer(this)),
-	mProbeDefinitionFromStringMessages(ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages)),
 	mGotTimeOffset(false),
-	mTimestampOffsetMS(0),
-	mGotMoreThanOneImage(false),
-	mProbeDefinition(ProbeDefinitionPtr()),
-	mZeroesInImage(true),
-	mUSMask(nullptr),
-	mSkippedImages(0)
+	mTimestampOffsetMS(0)
 {
 	qRegisterMetaType<Transform3D>("Transform3D");
 	qRegisterMetaType<ImagePtr>("ImagePtr");
@@ -61,6 +57,12 @@ NetworkHandler::NetworkHandler(igtlioLogicPointer logic) :
 NetworkHandler::~NetworkHandler()
 {
 	mTimer->stop();
+	std::list<QFutureWatcher<ThreadResult>*>::iterator iter;
+	int i = 0;
+	for (iter=mSaveImageThreads.begin(); iter!=mSaveImageThreads.end();)
+	{
+		(*iter)->waitForFinished();
+	}
 }
 
 igtlioSessionPointer NetworkHandler::requestConnectToServer(std::string serverHost, int serverPort, IGTLIO_SYNCHRONIZATION_TYPE sync, double timeout_s)
@@ -88,7 +90,6 @@ void NetworkHandler::disconnectFromServer()
 		// connector2->Stop();
 		// mLogic->RemoveConnector(connector2);
 	// }
-	mProbeDefinitionFromStringMessages->reset();
 }
 
 void NetworkHandler::clearTimestampSynchronization()
@@ -142,7 +143,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 	double timestampMS = synchronizedTimestamp(header.timestamp);
 
-
 //	CX_LOG_DEBUG() << "Device is modified, device type: " << device_type << " on device: " << receivedDevice->GetDeviceName() << " equipmentId: " << header.equipmentId;
 
 	// Currently the only id available is the Device name defined in Plus xml. Looking like this: Probe_sToReference_s
@@ -162,7 +162,6 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		cximage->setAcquisitionTime( QDateTime::fromMSecsSinceEpoch(qint64(timestampMS)));
 		//this->decode_rMd(msg, retval);
 
-
 		//Use the igtlio meta data from the image message
 		std::string metaLabel;
 		std::string metaDataValue;
@@ -180,7 +179,7 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 		igtlioLabels << IGTLIO_KEY_TIMESTAMP;
 		//TODO: Use deciveNameLong when this is defined in IGTLIO and sent with Plus
 
-		mProbeDefinitionFromStringMessages->setImage(cximage);
+		ThreadResult result = createThreadResultObject(deviceName, cximage);
 
 		for (int i = 0; i < igtlioLabels.size(); ++i)
 		{
@@ -188,12 +187,12 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 			bool gotMetaData = receivedDevice->GetMetaDataElement(metaLabel, metaDataValue);
 			if(!gotMetaData)
 			{
-				if(!mProbeDefinitionFromStringMessages->haveValidValues() && mGotMoreThanOneImage)
+				if(!result.probeDefinitionFromStringMessages->haveValidValues())
 					CX_LOG_WARNING() << "Cannot get needed igtlio meta information: " << metaLabel;
 			}
 			else
 			{
-				mProbeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
+				result.probeDefinitionFromStringMessages->parseValue(metaLabel.c_str(), metaDataValue.c_str());
 				//CX_LOG_DEBUG() << "Read variable " << metaLabel << " = " << metaDataValue;
 				//It seems like we still don't get meta info from PLUS, use string messages for now (See ProbeDefinitionFromStringMessages)
 				//To fix this for now: Set ClientHeaderVersion to IGTL_HEADER_VERSION_2 in src/PlusOpenIGTLink/PlusIgtlClientInfo.cxx, instead of IGTL_HEADER_VERSION_1
@@ -204,12 +203,32 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 				}
 			}
 		}
-		mGotMoreThanOneImage = true;
 
-		if(mProbeDefinitionFromStringMessages->haveValidValues())
+		if(result.probeDefinitionFromStringMessages->haveValidValues())
 		{
-			processImageAndEmitProbeDefinition(cximage, deviceName);//Use equipmentId?
-			emit image(cximage);
+			//Use threading for processing image
+			bool thread = true;
+			if(thread)
+			{
+				//Discarding images to prevent crash, especially as debug mode can stack up a high number of threads
+				if(mSaveImageThreads.size() < 5)
+				{
+					result.image = cximage->copy();//Thread need a copy, as VTK object isn't threadsafe
+					QFuture<ThreadResult> future = QtConcurrent::run(this, &NetworkHandler::processImage, result);
+					QFutureWatcher<ThreadResult>* futureWatcher = new QFutureWatcher<ThreadResult>();
+					connect(futureWatcher, SIGNAL(finished()), this, SLOT(futureImageFinished()));
+					futureWatcher->setFuture(future);
+					mSaveImageThreads.push_back(futureWatcher);
+				}
+			}
+			else
+			{
+				result.image = cximage;
+				result = processImage(result);
+				if(result.shouldEmitProbeDefinition())
+					emit probedefinition(result.deviceName, result.probeDefinition);
+				emit image(cximage);
+			}
 		}
 		else
 			CX_LOG_WARNING() << "Probe sector is not valid. Dropping received image";
@@ -271,15 +290,80 @@ void NetworkHandler::onDeviceReceived(vtkObject* caller_device, void* unknown, u
 
 		QString message(content.string_msg.c_str());
 
+		ThreadResult result = createThreadResultObject(deviceName);
 		//Allow string messages to modify probe definition, as well as meta info.
-		mProbeDefinitionFromStringMessages->parseStringMessage(header, message);
+		result.probeDefinitionFromStringMessages->parseStringMessage(header, message);
+
 		emit string_message(message);
 	}
 	else
 	{
 		CX_LOG_WARNING() << "Found unhandled devicetype: " << device_type;
 	}
+}
 
+ThreadResult NetworkHandler::createThreadResultObject(QString deviceName, ImagePtr image)
+{
+	ThreadResult result = mDevices[deviceName];
+	if(result.deviceName.isEmpty())
+	{
+		result.deviceName = deviceName;
+		result.probeDefinitionFromStringMessages = ProbeDefinitionFromStringMessagesPtr(new ProbeDefinitionFromStringMessages);
+	}
+	if(image)
+	{
+		result.image = image;
+		result.probeDefinitionFromStringMessages->setImage(image);
+	}
+	return result;
+}
+
+void NetworkHandler::resendProbedefinition()
+{
+	std::map<QString, ThreadResult>::iterator it = mDevices.begin();
+	for( ; it != mDevices.end(); ++it)
+	{
+		it->second.sentNumProbeDefinitions = 0;
+	}
+}
+
+void NetworkHandler::futureImageFinished()
+{
+	std::list<QFutureWatcher<ThreadResult>*>::iterator iter;
+	int i = 0;
+	for (iter=mSaveImageThreads.begin(); iter!=mSaveImageThreads.end();)
+	{
+		++i;
+		if (!(*iter)->isFinished())
+		{
+			++iter;
+			continue;
+		}
+		ThreadResult threadResult = (*iter)->future().result();
+		delete *iter;
+		iter = mSaveImageThreads.erase(iter);
+
+		//Always emitting probedefinitions slows down fps from 30 to 17. No threading gives 13
+		//Probedefinitions may still need to be always be sent for combining IGSTK tracking with OpenIGTLink video?
+		if(threadResult.probeDefinitionFromStringMessages->haveValidValues())
+		{
+			if(threadResult.shouldEmitProbeDefinition())
+			{
+				// CX_LOG_DEBUG() << "emit probedefinition";
+				emit probedefinition(threadResult.deviceName, threadResult.probeDefinition);
+			}
+		}
+		emit image(threadResult.image);
+		saveThreadResult(threadResult);
+	}
+	 // CX_LOG_DEBUG() << "Threads: " << mSaveImageThreads.size();
+}
+
+void NetworkHandler::saveThreadResult(ThreadResult &threadResult)
+{
+	if (threadResult.sentNumProbeDefinitions > 1 && mDevices[threadResult.deviceName].sentNumProbeDefinitions == 0)
+		threadResult.sentNumProbeDefinitions = 0;
+	mDevices[threadResult.deviceName] = threadResult;
 }
 
 void NetworkHandler::onConnectionEvent(vtkObject* caller, void* connector, unsigned long event , void*)
@@ -344,54 +428,47 @@ void NetworkHandler::connectToDeviceEvents()
 	}
 }
 
-//TODO: Consider moving these image changing functions out of the class
-void NetworkHandler::processImageAndEmitProbeDefinition(ImagePtr cximage, QString deviceName)
+ThreadResult NetworkHandler::processImage(ThreadResult result)
 {
-	bool probeDefinitionHaveChanged = emitProbeDefinitionIfChanged(deviceName);
-
-	if (probeDefinitionHaveChanged)
+	if(result.probeDefinitionFromStringMessages->haveValidValues())
 	{
-		mZeroesInImage = true;
-		mSkippedImages = 0;
-		this->createMask(); //Only create mask once for each probeDefinition
+		result.probeDefinitionHaveChanged = result.probeDefinitionFromStringMessages->haveChanged();
+		result.probeDefinition = result.probeDefinitionFromStringMessages->createProbeDefintion(result.deviceName);
+	}
+
+	if (result.probeDefinitionHaveChanged)
+	{
+		result.zeroesInImage = true;
+		result.skippedImages = 0;
+		this->createMask(result); //Only create mask once for each probeDefinition
 	}
 
 	// Turn off zero conversion if we get a frame without zeroes. Recheck for zeroes every 30 images
-	if(mZeroesInImage || (mSkippedImages > 30))
+	if(result.zeroesInImage || (result.skippedImages > 30))
 	{
-		//			CX_LOG_DEBUG() << "*** Removing zeroes from US image ***";
-		mZeroesInImage = convertZeroesInsideSectorToOnes(cximage);
-		mSkippedImages = 0;
+		// CX_LOG_DEBUG() << "*** Removing zeroes from US image ***";
+		result.zeroesInImage = convertZeroesInsideSectorToOnes(result);
+		result.skippedImages = 0;
 	}
 	else
 	{
-		++mSkippedImages;
+		++result.skippedImages;
 		//			CX_LOG_DEBUG() << "No zeroes in incoming US image";
 	}
+
+	return result;
 }
 
-bool NetworkHandler::emitProbeDefinitionIfChanged(QString deviceName)
-{
-	//Always send probe definition - Needed for combining IGSTK tracking with OpenIGTLink video
-	if (mProbeDefinitionFromStringMessages->haveValidValues())
-	{
-		mProbeDefinition = mProbeDefinitionFromStringMessages->createProbeDefintion(deviceName);
-		emit probedefinition(deviceName, mProbeDefinition);
-		return true;
-	}
-	return false;
-}
-
-bool NetworkHandler::convertZeroesInsideSectorToOnes(ImagePtr cximage, int threshold, int newValue)
+bool NetworkHandler::convertZeroesInsideSectorToOnes(ThreadResult &result, int threshold, int newValue)
 {
 	bool retval = false;
-	if(!mUSMask)
+	if(!result.USMask)
 		return retval;
 
-	Eigen::Array3i maskDims(mUSMask->GetDimensions());
-	unsigned char* maskPtr = static_cast<unsigned char*> (mUSMask->GetScalarPointer());
-	unsigned char* imagePtr = static_cast<unsigned char*> (cximage->getBaseVtkImageData()->GetScalarPointer());
-	unsigned components = cximage->getBaseVtkImageData()->GetNumberOfScalarComponents();
+	Eigen::Array3i maskDims(result.USMask->GetDimensions());
+	unsigned char* maskPtr = static_cast<unsigned char*> (result.USMask->GetScalarPointer());
+	unsigned char* imagePtr = static_cast<unsigned char*> (result.image->getBaseVtkImageData()->GetScalarPointer());
+	unsigned components = result.image->getBaseVtkImageData()->GetNumberOfScalarComponents();
 	unsigned dimX = maskDims[0];
 	unsigned dimY = maskDims[1];
 	for (unsigned x = 0; x < dimX; x++)
@@ -414,17 +491,17 @@ bool NetworkHandler::convertZeroesInsideSectorToOnes(ImagePtr cximage, int thres
 	return retval;
 }
 
-bool NetworkHandler::createMask()
+bool NetworkHandler::createMask(ThreadResult &result)
 {
-	if(!mProbeDefinition)
+	if(!result.probeDefinition)
 	{
 		CX_LOG_WARNING() << "No ProbeDefinition";
 		return false;
 	}
 	ProbeSector probeSector;
-	probeSector.setData(*mProbeDefinition.get());
+	probeSector.setData(*result.probeDefinition.get());
 
-	mUSMask = probeSector.getMask();
+	result.USMask = probeSector.getMask();
 	return true;
 }
 
