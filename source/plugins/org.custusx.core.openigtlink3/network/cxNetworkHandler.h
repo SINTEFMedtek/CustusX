@@ -43,8 +43,11 @@ struct ThreadResult
 	bool shouldEmitProbeDefinition()
 	{
 		bool retval = probeDefinitionHaveChanged;
-		if(sentNumProbeDefinitions++ < 1)
+		if(sentNumProbeDefinitions < 2)
+		{
+			sentNumProbeDefinitions++;
 			retval = true;
+		}
 		return retval;
 	}
 };

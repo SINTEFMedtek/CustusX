@@ -349,7 +349,7 @@ void NetworkHandler::futureImageFinished()
 		{
 			if(threadResult.shouldEmitProbeDefinition())
 			{
-				// CX_LOG_DEBUG() << "emit probedefinition";
+				// CX_LOG_DEBUG() << "emit probedefinition for " << threadResult.deviceName;
 				emit probedefinition(threadResult.deviceName, threadResult.probeDefinition);
 			}
 		}
@@ -438,6 +438,7 @@ ThreadResult NetworkHandler::processImage(ThreadResult result)
 
 	if (result.probeDefinitionHaveChanged)
 	{
+		result.sentNumProbeDefinitions = 0;
 		result.zeroesInImage = true;
 		result.skippedImages = 0;
 		this->createMask(result); //Only create mask once for each probeDefinition
