@@ -39,6 +39,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUtilHelpers.h"
 #include "cxEnumConversion.h"
 
+#ifdef CX_WINDOWS
+#include <windows.h>
+#include <setupapi.h>
+#include <initguid.h>
+#include <devguid.h>
+#pragma comment(lib, "setupapi.lib")
+#endif
+
 namespace cx
 {
 /*
@@ -335,33 +343,102 @@ ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY mod
 }
 
 QStringList ImportWidget::getUSBPaths()
-{//Linux implementation
+{
 	QStringList usbPaths;
 
+#ifdef CX_LINUX
 	QFile file("/proc/mounts");
-	if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		QTextStream mounts(&file);
-		QString line = mounts.readLine();
-		while(!line.isNull())
+		QString line;
+		while (!(line = mounts.readLine()).isNull())
 		{
 			QStringList list = line.split(" ");
-			if(list.size()<3)
+			if (list.size() < 3)
 				continue;
+
 			QString device = list[0];
 			QString mountPoint = list[1];
 
-			if(device.startsWith("/dev/sd") && (mountPoint.startsWith("/media") || mountPoint.startsWith("/run/media")))
+			if (device.startsWith("/dev/sd") &&
+				(mountPoint.startsWith("/media") || mountPoint.startsWith("/run/media")))
+			{
 				usbPaths.append(mountPoint.replace("\\040", " "));
-			line = mounts.readLine();
+			}
 		}
 		file.close();
 	}
 
-	if(usbPaths.isEmpty())
+#endif // CX_LINUX
+
+#ifdef CX_WINDOWS
+
+	WCHAR drives[512];
+	DWORD len = GetLogicalDriveStringsW(512, drives);
+
+	for (DWORD i = 0; i < len; )
 	{
-		CX_LOG_WARNING("No USB found in /proc/mounts");
-		QMessageBox::information(this, "USB not found", "Found no USB device connected to the computer");
+		QString drive = QString::fromWCharArray(&drives[i]);
+		i += drive.length() + 1; // advance to next string
+
+		// Only removable drives
+		if (GetDriveTypeW((LPCWSTR)drive.utf16()) != DRIVE_REMOVABLE)
+			continue;
+
+		// Now check if the removable drive is actually USB
+		bool isUSB = false;
+
+		HDEVINFO hDevInfo = SetupDiGetClassDevsW(
+			&GUID_DEVINTERFACE_DISK, nullptr, nullptr,
+			DIGCF_PRESENT | DIGCF_DEVICEINTERFACE
+		);
+
+		if (hDevInfo == INVALID_HANDLE_VALUE)
+			continue;
+
+		SP_DEVICE_INTERFACE_DATA ifaceData;
+		ifaceData.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+
+		for (DWORD idx = 0; SetupDiEnumDeviceInterfaces(hDevInfo, nullptr,
+			&GUID_DEVINTERFACE_DISK, idx, &ifaceData); idx++)
+		{
+			DWORD needed = 0;
+			SetupDiGetDeviceInterfaceDetailW(hDevInfo, &ifaceData, nullptr, 0, &needed, nullptr);
+
+			PSP_DEVICE_INTERFACE_DETAIL_DATA_W detail =
+				(PSP_DEVICE_INTERFACE_DETAIL_DATA_W)malloc(needed);
+			detail->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA_W);
+
+			if (SetupDiGetDeviceInterfaceDetailW(hDevInfo, &ifaceData,
+				detail, needed, nullptr, nullptr))
+			{
+				QString path = QString::fromWCharArray(detail->DevicePath);
+
+				if (path.contains("USBSTOR", Qt::CaseInsensitive))
+					isUSB = true;
+			}
+
+			free(detail);
+			if (isUSB)
+				break;
+		}
+
+		SetupDiDestroyDeviceInfoList(hDevInfo);
+
+		if (isUSB)
+			usbPaths.append(drive);
+	}
+
+#endif // CX_WINDOWS
+
+
+	// Notify user if nothing found
+	if (usbPaths.isEmpty())
+	{
+		CX_LOG_WARNING("No USB storage found");
+		QMessageBox::information(this, "USB not found",
+			"Found no USB storage device connected to the computer");
 	}
 
 	return usbPaths;
