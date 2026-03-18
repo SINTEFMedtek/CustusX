@@ -373,7 +373,7 @@ QStringList MainWindowActions::getAllPatientsInProfile()
 	QFileInfoList entries = directory.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
 	for(const QFileInfo& entry: entries)
-		if(entry.fileName().endsWith(".cx3"), Qt::CaseSensitive)
+		if(entry.fileName().endsWith(".cx3", Qt::CaseSensitive))
 			patients << entry.fileName();
 
 	return patients;
