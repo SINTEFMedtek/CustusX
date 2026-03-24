@@ -192,11 +192,12 @@ bool RouteToTargetFilter::execute()
 		mRouteToTarget->setBranchList(mBranchListPtr);
 	}
 
+
     //note: mOutput is in reference space
 	if(!extraAirwayPoints.empty())
-		mOutput = mRouteToTarget->findRouteToTarget(targetPoint, extraAirwayPoints);
+		mOutput = mRouteToTarget->findRouteToTarget(targetPoint, mLobeName, extraAirwayPoints);
 	else
-		mOutput = mRouteToTarget->findRouteToTarget(targetPoint);
+		mOutput = mRouteToTarget->findRouteToTarget(targetPoint, mLobeName);
 
 	if(mMaxGenerationNumerForAutomaticRotation != 0)
 		mRouteToTarget->limitCameraRotation(mMaxGenerationNumerForAutomaticRotation);
@@ -359,6 +360,11 @@ void RouteToTargetFilter::setUseExtraAirwayPoints(bool useExtraAirwayPoints)
 void RouteToTargetFilter::setMaxGenerationForCameraRotation(int maxGenerationNumber)
 {
 	mMaxGenerationNumerForAutomaticRotation = maxGenerationNumber;
+}
+
+void RouteToTargetFilter::setLobeOfTarget(QString lobeName)
+{
+	mLobeName = lobeName;
 }
 
 std::vector< Eigen::Vector3d > RouteToTargetFilter::getRoutePositions(bool extendedRoute)

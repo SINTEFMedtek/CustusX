@@ -63,6 +63,8 @@ public:
 	Vector3D getBronchoscopeBendingDirection();
 	void setBronchoscopeRotation(double rotation);
 	double getBronchoscopeRotation();
+	QString findLobeName();
+	double getBronchoscopeRotation(QString targetLobe);
 	void removeEqualPositions();
 	void setLap(QString lap);
 	QString getLap();

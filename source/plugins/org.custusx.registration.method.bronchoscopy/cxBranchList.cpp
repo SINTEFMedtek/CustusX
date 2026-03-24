@@ -853,7 +853,7 @@ bool BranchList::isRadiusAvailable()
 }
 
 /**
- * @brief BranchList::findBranchCode
+ * @brief BranchList::setBranchCode
  * Set a code to each branch based on parents and orientation
  * Trachea: 1
  * Left main bronchi: 1,1
