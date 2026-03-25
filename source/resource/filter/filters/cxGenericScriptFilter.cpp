@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewService.h"
 
 #include "cxUtilHelpers.h"
+#include "cxStringHelpers.h"
 #include "cxRegistrationTransform.h"
 #include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
@@ -348,11 +349,12 @@ QString GenericScriptFilter::updateScriptFilePathIfWindows(QString envPath, QStr
 
 QString GenericScriptFilter::standardCommandString(CommandStringVariables variables)
 {
-	QString commandString = variables.envPath;
-	commandString.append(" " + findScriptFile(variables.scriptFilePath));
-	commandString.append(" " + variables.inputFilePath);
-	commandString.append(" " + variables.outputFilePath);
-	commandString.append(" " + variables.cArguments);
+	bool addInitialSpace = true;
+	QString commandString = wrapStringInQuotes(variables.envPath);
+	commandString.append(wrapStringInQuotes(findScriptFile(variables.scriptFilePath), addInitialSpace));
+	commandString.append(wrapStringInQuotes(variables.inputFilePath, addInitialSpace));
+	commandString.append(wrapStringInQuotes(variables.outputFilePath, addInitialSpace));
+	commandString.append(wrapStringInQuotes(variables.cArguments, addInitialSpace));
 
 	return commandString;
 }
