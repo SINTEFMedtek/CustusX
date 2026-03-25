@@ -210,13 +210,15 @@ double Branch::getBronchoscopeRotation(QString targetLobe)
 		return 0;
 	if(targetLobe == enum2string(otLOBE_RUL))
 		return 60 * M_PI/180;
+	if((targetLobe == enum2string(otLOBE_RML) || targetLobe == enum2string(otLOBE_RLL)) && generationNumber == 2)
+		return 45 * M_PI/180;
 	if(targetLobe == enum2string(otLOBE_RML) || targetLobe == enum2string(otLOBE_RLL))
 		return 0;
 	if(targetLobe == enum2string(otLOBE_LUL) && generationNumber == 2)
 			return -60 * M_PI/180;
 	if(targetLobe == enum2string(otLOBE_LUL))
-			return -90 * M_PI/180;
-	if(targetLobe == enum2string(otLOBE_LLL) && generationNumber == 2)
+			return -75 * M_PI/180;
+	if(targetLobe == enum2string(otLOBE_LLL) && (generationNumber == 2 || generationNumber == 3))
 			return -60 * M_PI/180;
 	if(targetLobe == enum2string(otLOBE_LLL))
 			return 0;
