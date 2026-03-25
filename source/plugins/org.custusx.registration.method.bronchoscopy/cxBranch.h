@@ -61,8 +61,8 @@ public:
 	int findParentIndex(branchVector bv) const;
 	void setBronchoscopeBendingDirection(Vector3D bendingDirection);
 	Vector3D getBronchoscopeBendingDirection();
-	void setBronchoscopeRotation(double rotation);
-	double getBronchoscopeRotation();
+//	void setBronchoscopeRotation(double rotation);
+//	double getBronchoscopeRotation();
 	QString findLobeName();
 	double getBronchoscopeRotation(QString targetLobe);
 	void removeEqualPositions();

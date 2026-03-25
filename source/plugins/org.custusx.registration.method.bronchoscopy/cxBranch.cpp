@@ -175,15 +175,15 @@ Vector3D Branch::getBronchoscopeBendingDirection()
 	return mBendingDirection;
 }
 
-void Branch::setBronchoscopeRotation(double rotation)
-{
-	mBronchoscopeRotation = rotation;
-}
+//void Branch::setBronchoscopeRotation(double rotation)
+//{
+//	mBronchoscopeRotation = rotation;
+//}
 
-double Branch::getBronchoscopeRotation()
-{
-	return mBronchoscopeRotation;
-}
+//double Branch::getBronchoscopeRotation()
+//{
+//	return mBronchoscopeRotation;
+//}
 
 QString Branch::findLobeName()
 {

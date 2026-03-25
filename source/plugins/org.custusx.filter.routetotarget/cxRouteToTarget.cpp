@@ -62,7 +62,7 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 
     mBranchListPtr->smoothOrientations();
 	//mBranchListPtr->smoothBranchPositions();
-	mBranchListPtr->findBronchoscopeRotation();
+//	mBranchListPtr->findBronchoscopeRotation();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }

@@ -90,6 +90,12 @@ void BranchList::selectGenerations(int maxGeneration)
 		deleteBranch(mBranches[branchNumbersToBeDeleted[i]]);
 }
 
+/**
+	BranchList::findBronchoscopeRotation is not in use, as it was replaced with
+	a sipler calculation of bronchoscope rotation based on which lung lobe the
+	target is located in: Branch::getBronchoscopeRotation(QString targetLobe)
+	*/
+/**
 void BranchList::findBronchoscopeRotation()
 {
 	if(mBranches.empty())
@@ -98,7 +104,14 @@ void BranchList::findBronchoscopeRotation()
 	if(trachea)
 		calculateBronchoscopeRotation(trachea);
 }
+*/
 
+/**
+	BranchList::calculateBronchoscopeRotation is not in use, as it was replaced with
+	a sipler calculation of bronchoscope rotation based on which lung lobe the
+	target is located in: Branch::getBronchoscopeRotation(QString targetLobe)
+	*/
+/**
 void BranchList::calculateBronchoscopeRotation(BranchPtr branch)
 // recursive function on all child branches
 {
@@ -123,7 +136,14 @@ void BranchList::calculateBronchoscopeRotation(BranchPtr branch)
 	for(int i=0; i<childBranches.size(); i++)
 		calculateBronchoscopeRotation(childBranches[i]);
 }
+*/
 
+/**
+	bendingDirectionToBronchoscopeRotation is not in use, as it was replaced with
+	a sipler calculation of bronchoscope rotation based on which lung lobe the
+	target is located in: Branch::getBronchoscopeRotation(QString targetLobe)
+	*/
+/**
 double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation, double parentRotation)
 {
 	double bronchoscopeRotation;
@@ -161,12 +181,9 @@ double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3
 	else if( rotationDifferenceFromParent < -M_PI )
 		bronchoscopeRotation = bronchoscopeRotation + M_PI;
 
-
-
-	//Sett rotasjon til samme som parent dersom endring er mindre enn 15?? grader
-
 	return bronchoscopeRotation;
 }
+*/
 
 Vector3D calculateBronchoscopeBendingDirection(Vector3D A, Vector3D B)
 {
