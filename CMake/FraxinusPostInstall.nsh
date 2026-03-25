@@ -1,8 +1,5 @@
 ; ================= Fraxinus post-install =================
 
-StrCpy $9 "$LOCALAPPDATA\\Fraxinus\\Logs"
-CreateDirectory "$9"
-
 SectionGetFlags ${RaidionicsSetup} $0
 IntOp $0 $0 & ${SF_SELECTED}
 IntCmp $0 0 +5

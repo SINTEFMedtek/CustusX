@@ -497,7 +497,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		}
 
 		filename = file.readParameterString("InitialTransformParametersFileName"); // Elastix 5.1.0
-		if(filename.isEmpty()
+		if(filename.isEmpty())
 			filename = file.readParameterString("InitialTransformParameterFileName"); // Elastix 5.3.0
 		if (filename.isEmpty() || filename == "NoInitialTransform")
 		{

@@ -3,12 +3,9 @@
 # ---------------------------------------------------------------------------
 if(CX_WINDOWS)
 
-  # Placed Additional install targets only in Fraxinus for now
+  # Placed Additional install targets in Fraxinus for now
   # See FX/org.custusx.fraxinus/CMakeLists.txt
   
-  # Show details checkbox and route plugin output to the log window
-  # set(CPACK_NSIS_ENABLE_LOG ON)
-
   # Ensure NSIS can access the custom include file
   configure_file(
 	${CMAKE_CURRENT_LIST_DIR}/FraxinusPostInstall.nsh
