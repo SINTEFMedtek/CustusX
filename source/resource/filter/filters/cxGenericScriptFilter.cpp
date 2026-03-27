@@ -303,11 +303,11 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	//Old style use relative path ../..
 	if (!variables.envPath.startsWith("../.."))
 		variables.envPath = DataLocations::getVirtualEnvironmentsPath() + "/" + variables.envPath;
+
+	variables.scriptFilePath = updateScriptFilePathIfWindows(variables.envPath, variables.scriptFilePath);
 	if (!variables.scriptFilePath.startsWith("../.."))
 		variables.scriptFilePath = findScriptFile(variables.scriptFilePath);
 
-	//Needs correct order
-	variables.scriptFilePath = updateScriptFilePathIfWindows(variables.envPath, variables.scriptFilePath);
 	variables.envPath = updateEnvPathIfWindows(variables.envPath);
 
 	// Get paths
