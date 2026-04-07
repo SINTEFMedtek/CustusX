@@ -29,6 +29,8 @@ IMAGE_MODALITY convertToModality(QString modalityString)
 
 	if(modalityString.contains(enum2string<IMAGE_MODALITY>(imUNKNOWN), Qt::CaseInsensitive))
 		retval = imUNKNOWN;
+	else if(modalityString.isEmpty())
+		retval = imUNKNOWN;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imCT), Qt::CaseInsensitive))
 		retval = imCT;
 	else if(modalityString.contains(enum2string<IMAGE_MODALITY>(imMR), Qt::CaseInsensitive))

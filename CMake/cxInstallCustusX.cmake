@@ -106,6 +106,9 @@ cx_fixup_and_add_qtplugins_to_bundle(
     "${CX_ALL_LIBRARY_DIRS}"
 )
 
+# Windows only: Inject all NSIS customizations, just before CPack
+include("${PROJECT_SOURCE_DIR}/CMake/cxSetupAdditionalNSISWindowsComponents.cmake")
+
 include(CPack)
 
 #hiding packages created by ctk: we install the plugins ourselves

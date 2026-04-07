@@ -60,6 +60,19 @@ int convertStringWithDefault(QString text, int def)
 	return def;
 }
 
+QString wrapStringInQuotes(QString string, bool initialSpace)
+{
+	QString retval;
+	if (initialSpace)
+		retval += " ";
+#ifdef CX_WINDOWS
+	if (!string.isEmpty())
+		retval += "\"" + string + "\"";
+#else
+	retval += string;
+#endif //CX_WINDOWS
+	return retval;
+}
 
 } // namespace cx
 

@@ -160,6 +160,9 @@ FilePathPropertyPtr ElastixParameters::getExecutable()
     }
 
 	QString elastixFraxinusInstallPath = DataLocations::getUserHomePath()+"/Fraxinus/elastix/bin/elastix";
+#ifdef WIN32
+	elastixFraxinusInstallPath = "C:/Elastix/elastix.exe";
+#endif
 
 	QDomElement root;
 	FilePathPropertyPtr retval;
