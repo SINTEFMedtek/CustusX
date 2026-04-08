@@ -1,7 +1,7 @@
 # ---------------------------------------------------------------------------
 # Windows specific: install scripts + define components
 # ---------------------------------------------------------------------------
-if(CX_WINDOWS AND "${CX_SYSTEM_NAME}" STREQUAL "Fraxinus")
+if(CX_WINDOWS AND "${CX_SYSTEM_BASE_NAME}" STREQUAL "Fraxinus")
 
   # Placed Additional install targets in Fraxinus for now
   # See FX/org.custusx.fraxinus/CMakeLists.txt
