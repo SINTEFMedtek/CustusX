@@ -300,8 +300,12 @@ CommandStringVariables GenericScriptFilter::createCommandStringVariables(ImagePt
 	CX_LOG_DEBUG() << "parameterFilePath: " << parameterFilePath;
 
 	CommandStringVariables variables = CommandStringVariables(parameterFilePath, input);
-	//Old style use relative path ../..
-	if (!variables.envPath.startsWith("../.."))
+	// Old style: relative path starting with ../..  → use as-is
+	// New style: relative path to a venv (contains '/') → prepend virtualEnvironments path
+	// System command (e.g. "python3 -u") or absolute path → use as-is
+	QString envCommand = variables.envPath.split(" ")[0];
+	bool isRelativeVenvPath = envCommand.contains("/") && !envCommand.startsWith("/") && !envCommand.startsWith("../");
+	if (isRelativeVenvPath)
 		variables.envPath = DataLocations::getVirtualEnvironmentsPath() + "/" + variables.envPath;
 
 	variables.scriptFilePath = updateScriptFilePathIfWindows(variables.envPath, variables.scriptFilePath);
