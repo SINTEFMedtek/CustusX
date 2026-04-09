@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #define CX_NETWORKHANDLER_H_
 
 #include "org_custusx_core_openigtlink3_Export.h"
+#include "qfuturewatcher.h"
 #include "igtlioLogic.h"
 #include "igtlioSession.h"
 
@@ -27,6 +28,29 @@ namespace cx
 {
 
 typedef boost::shared_ptr<class NetworkHandler> NetworkHandlerPtr;
+
+struct ThreadResult
+{
+	QString deviceName;
+	ImagePtr image;
+	ProbeDefinitionPtr probeDefinition;
+	bool probeDefinitionHaveChanged;
+	vtkImageDataPtr USMask;
+	ProbeDefinitionFromStringMessagesPtr probeDefinitionFromStringMessages;
+	bool zeroesInImage;
+	int skippedImages;
+	int sentNumProbeDefinitions = 0;
+	bool shouldEmitProbeDefinition()
+	{
+		bool retval = probeDefinitionHaveChanged;
+		if(sentNumProbeDefinitions < 2)
+		{
+			sentNumProbeDefinitions++;
+			retval = true;
+		}
+		return retval;
+	}
+};
 
 class org_custusx_core_openigtlink3_EXPORT NetworkHandler : public QObject
 {
@@ -50,39 +74,38 @@ signals:
 	void image(ImagePtr image);
 	void commandRespons(QString devicename, QString xml);
 	void string_message(QString message);
-	//void mesh(MeshPtr image);
 	void probedefinition(QString devicename, ProbeDefinitionPtr definition);
-	//void calibration(QString devicename, Transform3D calibration);
 
-private slots:
+public slots:
+	void resendProbedefinition();
+
+protected slots:
 	void onConnectionEvent(vtkObject* caller, void* connector, unsigned long event, void*);
 	void onDeviceAddedOrRemoved(vtkObject* caller, void* connector, unsigned long event, void*callData);
 	void onDeviceReceived(vtkObject * caller_device, void * unknown, unsigned long event, void *);
 	void periodicProcess();
+	void futureImageFinished();
 
 protected:
 	void connectToConnectionEvents();
 	void connectToDeviceEvents();
-	void processImageAndEmitProbeDefinition(ImagePtr cximage, QString deviceName);
-	bool emitProbeDefinitionIfChanged(QString deviceName);
-	bool convertZeroesInsideSectorToOnes(ImagePtr cximage, int threshold = 0, int newValue = 1);
-	bool createMask();
+	ThreadResult processImage(ThreadResult result);
+	bool convertZeroesInsideSectorToOnes(ThreadResult &result, int threshold = 0, int newValue = 1);
+	bool createMask(ThreadResult &result);
 	double synchronizedTimestamp(double receivedTimestampSec);///Synchronize with system clock: Calculate a fixed offset, and apply this to all timestamps
 	bool verifyTimestamp(double &timestampMS);
+	void saveThreadResult(ThreadResult &threadResult);
+	ThreadResult createThreadResultObject(QString deviceName, ImagePtr image = ImagePtr());
 
 	igtlioLogicPointer mLogic;
 	igtlioSessionPointer mSession;//, mSession2;
 	QTimer *mTimer;
-	ProbeDefinitionFromStringMessagesPtr mProbeDefinitionFromStringMessages;
 
 	bool mGotTimeOffset;
-	bool mGotMoreThanOneImage;
 	double mTimestampOffsetMS;
 
-	ProbeDefinitionPtr mProbeDefinition;
-	bool mZeroesInImage;
-	vtkImageDataPtr mUSMask;
-	int mSkippedImages;
+	std::list<QFutureWatcher<ThreadResult>*> mSaveImageThreads;
+	std::map<QString, ThreadResult> mDevices;
 };
 
 } // namespace cx

@@ -249,7 +249,7 @@ void VideoConnection::updateStatus(ProbeDefinitionPtr msg)
 	data.setUseDigitalVideo(true);
 
 	probe->setProbeDefinition(data);
-	probe->setActiveStream(msg->getUid());
+	// probe->setActiveStream(msg->getUid());//Should not change active stream
 }
 
 void VideoConnection::startAllSources()

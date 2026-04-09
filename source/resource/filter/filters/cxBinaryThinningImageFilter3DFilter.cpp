@@ -248,7 +248,8 @@ bool BinaryThinningImageFilter3DFilter::postProcess()
 
 		// set first centerline as output in filter
 		if(i==0)
-			mOutputTypes.front()->setValue(mesh->getUid());
+			if(!mOutputTypes.empty())
+				mOutputTypes.front()->setValue(mesh->getUid());
 
 		success = true;
 	}

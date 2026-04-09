@@ -35,6 +35,7 @@ OpenIGTLinkStreamerService::OpenIGTLinkStreamerService(NetworkHandlerPtr network
 	connect(mConnection.get(), &NetworkHandler::probedefinition, mStreamer.get(), &OpenIGTLinkStreamer::receiveProbedefinition);
 
 	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, this, &OpenIGTLinkStreamerService::stopTrackingAndOpenIGTLinkClientIfStartedFromThisObject);
+	connect(mStreamer.get(), &OpenIGTLinkStreamer::stoppedStreaming, mConnection.get(), &NetworkHandler::resendProbedefinition);
 }
 
 OpenIGTLinkStreamerService::~OpenIGTLinkStreamerService()
