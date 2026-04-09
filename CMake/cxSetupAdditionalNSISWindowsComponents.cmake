@@ -1,17 +1,10 @@
 # ---------------------------------------------------------------------------
 # Windows specific: install scripts + define components
 # ---------------------------------------------------------------------------
-if(CX_WINDOWS)
+if(CX_WINDOWS AND "${CX_SYSTEM_BASE_NAME}" STREQUAL "Fraxinus")
 
   # Placed Additional install targets in Fraxinus for now
   # See FX/org.custusx.fraxinus/CMakeLists.txt
-  
-  # Ensure NSIS can access the custom include file
-  configure_file(
-	${CMAKE_CURRENT_LIST_DIR}/FraxinusPostInstall.nsh
-    ${CMAKE_BINARY_DIR}/FraxinusPostInstall.nsh
-    COPYONLY
-  )
 
   # Provide a CPACK_* variable that the NSIS.template.in will substitute
   file(TO_CMAKE_PATH "${CMAKE_BINARY_DIR}" _FRAX_BIN_DIR)

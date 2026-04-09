@@ -23,11 +23,19 @@ static const QColor greenText(110, 255, 115);
 
 void Styles::setStyle()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		setGrayStyle();
 	else
 		setDefaultStyle();
+}
+
+bool Styles::useGrayStyle()
+{
+	bool retval = false;
+	QString style = settings()->value("Gui/style").toString();
+	if((style == "gray") || (style == "grey"))
+		retval = true;
+	return retval;
 }
 
 void Styles::setGrayStyle()
@@ -43,32 +51,28 @@ void Styles::setDefaultStyle()
 
 QColor Styles::getRed()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return red;
 	else
 		return Qt::red;
 }
 QColor Styles::getGreen()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return green;
 	else
 		return Qt::green;
 }
 QColor Styles::getGray()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return darkGray2;
 	else
 		return Qt::gray;
 }
 QColor Styles::getYellow()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return yellow;
 	else
 		return Qt::yellow;

@@ -13,6 +13,7 @@ public:
 	static void setStyle();
 	static void setGrayStyle();
 	static void setDefaultStyle();
+	static bool useGrayStyle();
 
 	static QColor getRed();
 	static QColor getGreen();
