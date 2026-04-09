@@ -97,7 +97,7 @@ double variance(Eigen::VectorXd X);
 
 org_custusx_filter_routetotarget_EXPORT QJsonArray makeMarianaCenterlineOfFullBranchTreeJSON(BranchListPtr branchList);
 org_custusx_filter_routetotarget_EXPORT double findDistance(Eigen::MatrixXd p1, Eigen::MatrixXd p2);
- std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
+org_custusx_filter_routetotarget_EXPORT std::pair<int, double> findDistanceFromPointToLine(Eigen::MatrixXd point, std::vector< Eigen::Vector3d > line);
 org_custusx_filter_routetotarget_EXPORT	Eigen::MatrixXd getCenterlinePositions(vtkPolyDataPtr centerline_r);
 
 } /* namespace cx */

@@ -10,7 +10,7 @@ endif()
 
 
 
-
+#VTK specific documentation option, removed in CMake 3.18
 INCLUDE (${CMAKE_ROOT}/Modules/Documentation.cmake OPTIONAL)
 
 MARK_AS_ADVANCED(CLEAR BUILD_DOCUMENTATION) # CLEAR means not advanced

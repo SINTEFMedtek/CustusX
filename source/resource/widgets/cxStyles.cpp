@@ -6,28 +6,36 @@
 
 namespace cx
 {
-QColor Styles::darkGray1(12, 14, 22);
-QColor Styles::darkGray2(31, 35, 49);
-QColor Styles::darkGray3(49, 52, 65);
-QColor Styles::lightDarkGray(105, 110, 130);
-QColor Styles::red(165, 37, 52);
-QColor Styles::blue(25, 65, 85);
-QColor Styles::green(40, 165, 40);
-QColor Styles::yellow(227, 153, 11);
+static const QColor darkGray1(12, 14, 22);
+static const QColor darkGray2(31, 35, 49);
+static const QColor darkGray3(49, 52, 65);
+static const QColor lightDarkGray(105, 110, 130);
+static const QColor red(165, 37, 52);
+static const QColor blue(25, 65, 85);
+static const QColor green(40, 165, 40);
+static const QColor yellow(227, 153, 11);
 
-QColor Styles::blueText(119, 161, 226);
-QColor Styles::whiteText(240, 240, 240);
-QColor Styles::redText(255, 90, 90);
-QColor Styles::greenText(110, 255, 115);
+static const QColor blueText(119, 161, 226);
+static const QColor whiteText(240, 240, 240);
+static const QColor redText(255, 90, 90);
+static const QColor greenText(110, 255, 115);
 
 
 void Styles::setStyle()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		setGrayStyle();
 	else
 		setDefaultStyle();
+}
+
+bool Styles::useGrayStyle()
+{
+	bool retval = false;
+	QString style = settings()->value("Gui/style").toString();
+	if((style == "gray") || (style == "grey"))
+		retval = true;
+	return retval;
 }
 
 void Styles::setGrayStyle()
@@ -43,32 +51,28 @@ void Styles::setDefaultStyle()
 
 QColor Styles::getRed()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return red;
 	else
 		return Qt::red;
 }
 QColor Styles::getGreen()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return green;
 	else
 		return Qt::green;
 }
 QColor Styles::getGray()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return darkGray2;
 	else
 		return Qt::gray;
 }
 QColor Styles::getYellow()
 {
-	QString style = settings()->value("Gui/style").toString();
-	if(style == "gray")
+	if(useGrayStyle())
 		return yellow;
 	else
 		return Qt::yellow;

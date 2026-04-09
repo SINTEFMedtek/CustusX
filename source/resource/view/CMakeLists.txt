@@ -2,7 +2,11 @@
 ##               Resource Visualization Library
 ###########################################################
 
+if(CX_WINDOWS)
+	set(GLEW_ROOT "C:/src/vcpkg/installed/x64-windows")
+endif(CX_WINDOWS)
 find_package(GLEW REQUIRED)
+
 cx_initialize_CTK()
 
 cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
@@ -183,7 +187,10 @@ target_link_libraries(cxResourceVisualization
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
     PRIVATE
 #    ${GLEW_LIBRARY}
+	GLEW::GLEW
 )
+
+cx_install_add_library_dirs(${GLEW_ROOT}/bin/)
 
 vtk_module_autoinit(
   TARGETS cxResourceVisualization

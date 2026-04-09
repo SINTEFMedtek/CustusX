@@ -11,7 +11,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxPatientModelServiceProxy.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <QDomElement>
 #include <ctkPluginContext.h>
 #include "cxNullDeleter.h"

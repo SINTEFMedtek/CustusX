@@ -25,8 +25,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxBoundingBox3D.h"
 #include "cxTransformFile.h"
 #include "cxCustomMetaImage.h"
-
 #include "cxPatientModelService.h"
+#include "cxStringHelpers.h"
 
 namespace cx
 {
@@ -94,13 +94,13 @@ bool ElastixExecuter::setInput(QString application,
 	mLastOutdir = outdir;
 
 	QStringList cmd;
-	cmd << "\"" + application + "\"";
-	cmd << "-f" << mServices->patient()->getActivePatientFolder()+"/"+fixed->getFilename();
-	cmd << "-m" << mServices->patient()->getActivePatientFolder()+"/"+moving->getFilename();
-	cmd << "-out" << outdir;
-	cmd << "-t0" << initFilename;
+	cmd << wrapStringInQuotes(application);
+	cmd << "-f" << wrapStringInQuotes(mServices->patient()->getActivePatientFolder()+"/"+fixed->getFilename());
+	cmd << "-m" << wrapStringInQuotes(mServices->patient()->getActivePatientFolder()+"/"+moving->getFilename());
+	cmd << "-out" << wrapStringInQuotes(outdir);
+	cmd << "-t0" << wrapStringInQuotes(initFilename);
 	for (int i=0; i<parameterfiles.size(); ++i)
-		cmd << "-p" << parameterfiles[i];
+		cmd << "-p" << wrapStringInQuotes(parameterfiles[i]);
 
 	QString commandLine = cmd.join(" ");
 	report(QString("Executing registration with command line: [%1]").arg(commandLine));
@@ -157,7 +157,11 @@ QString ElastixExecuter::createTransformixCommandLine(QString elastixApplication
 	}
 	//Assuming transformix is placed together with elastix
 	QString path = QFileInfo(elastixApplication).absolutePath();
-	QString transformixApplication = path + "/" + "transformix";
+	QString transformixApplication;
+	transformixApplication = path + "/" + "transformix";
+#ifdef WIN32
+	transformixApplication = path + "/" + "transformix.exe";
+#endif
 	if(!QFile::exists(transformixApplication))
 	{
 		CX_LOG_WARNING() << "ElastixExecuter::createTransformixCommandLine: Cannot find transformix application at: " << transformixApplication;
@@ -184,10 +188,10 @@ QString ElastixExecuter::createTransformixCommandLine(QString elastixApplication
 	//Skipping adding a CX registration from Elastix should work, or postponing it
 
 	QStringList cmd;
-	cmd << "\"" + transformixApplication + "\"";
-	cmd << "-in" << mServices->patient()->getActivePatientFolder()+"/"+mDeformImage->getFilename();
-	cmd << "-out" << outdir;
-	cmd << "-tp" << transformParametersFile;
+	cmd << wrapStringInQuotes(transformixApplication);
+	cmd << "-in" << wrapStringInQuotes(mServices->patient()->getActivePatientFolder()+"/"+mDeformImage->getFilename());
+	cmd << "-out" << wrapStringInQuotes(outdir);
+	cmd << "-tp" << wrapStringInQuotes(transformParametersFile);
 
 	QString commandLine = cmd.join(" ");
 	return commandLine;
@@ -470,6 +474,7 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		}
 
 		QString transformType = file.readParameterString("Transform");
+		bool validTransformType = true;
 		if (transformType=="EulerTransform")
 		{
 			if (ok)
@@ -488,15 +493,18 @@ Transform3D ElastixExecuter::getAffineResult_mmMff(bool* ok)
 		}
 		else
 		{
-			// accept invalid transforms, but emit warning.
-//			if (ok)
-//				*ok = false;
-			reportWarning(QString("TransformType [%1] is not supported by CustusX. Registration result from %2 ignored.").arg(transformType).arg(filename));
+			validTransformType = false;
 		}
 
-		filename = file.readParameterString("InitialTransformParametersFileName");
-		if (filename.isEmpty() || filename=="NoInitialTransform")
+		filename = file.readParameterString("InitialTransformParametersFileName"); // Elastix 5.1.0
+		if(filename.isEmpty())
+			filename = file.readParameterString("InitialTransformParameterFileName"); // Elastix 5.3.0
+		if (filename.isEmpty() || filename == "NoInitialTransform")
+		{
+			if(validTransformType)
+				reportWarning(QString("TransformType [%1] is not supported by CustusX. Registration result from %2 ignored.").arg(transformType).arg(filename));
 			break;
+		}
 	}
 
 	return mMf;

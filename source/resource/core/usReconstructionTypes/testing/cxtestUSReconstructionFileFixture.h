@@ -15,7 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUSReconstructInputData.h"
 #include "cxImageDataContainer.h"
 
-#include "cxResourceExport.h"
+#include "cxtestresourceusreconstructiontypes_export.h"
 
 namespace cxtest
 {
@@ -28,7 +28,7 @@ namespace cxtest
  * \date apr 16, 2013
  * \author christiana
  */
-class cxResource_EXPORT USReconstructionFileFixture
+class CXTESTRESOURCEUSRECONSTRUCTIONTYPES_EXPORT USReconstructionFileFixture
 {
 public:
 	USReconstructionFileFixture();

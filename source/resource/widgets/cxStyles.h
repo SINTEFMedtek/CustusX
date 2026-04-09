@@ -13,6 +13,7 @@ public:
 	static void setStyle();
 	static void setGrayStyle();
 	static void setDefaultStyle();
+	static bool useGrayStyle();
 
 	static QColor getRed();
 	static QColor getGreen();
@@ -22,10 +23,6 @@ public:
 
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();
-
-	static QColor darkGray1, darkGray2, darkGray3, lightDarkGray, red, blue, green, yellow;
-	static QColor blueText, whiteText, redText, greenText;
-
 };
 
 }//cx

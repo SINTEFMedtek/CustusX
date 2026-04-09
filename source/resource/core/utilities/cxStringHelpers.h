@@ -38,6 +38,8 @@ cxResource_EXPORT QStringList splitStringContaingQuotes(QString line);
 
 cxResource_EXPORT int convertStringWithDefault(QString text, int def);
 
+cxResource_EXPORT QString wrapStringInQuotes(QString string, bool initialSpace = false);///< Wrap string in quotes on Windows
+
 } // namespace cx
 
 /**

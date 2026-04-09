@@ -100,7 +100,7 @@ bool SeansVesselReg::execute()
 	if (mt_auto_lts)
 	{
 		context = this->linearRefineAllLTS(context);
-		report(QString("Auto LTS: Found best match using %1\%.").arg(context->mLtsRatio));
+		report(QString("Auto LTS: Found best match using %1%%.").arg(context->mLtsRatio));
 	}
 	else
 	{

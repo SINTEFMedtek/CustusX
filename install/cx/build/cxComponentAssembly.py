@@ -44,10 +44,14 @@ class LibraryAssembly(object):
 
         self.addComponent(cxComponents.Eigen())
         self.addComponent(cxComponents.VTK())
-        self.addComponent(cxComponents.ITK())
+        if(platform.system() == 'Windows'):
+            self.addComponent(cxComponents.newITK())
+        else:
+            self.addComponent(cxComponents.ITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
-        self.addComponent(cxComponents.IGSTK())
+        if(platform.system() != 'Windows'): # IGSTK won't compile with new ITK versions
+            self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         self.addComponent(cxComponents.OpenIGTLinkIO())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())

@@ -26,10 +26,10 @@ void EmbeddedFilepath::setFilepath(QString filename)
 
 void EmbeddedFilepath::evaluate(QString* foundRoot, bool* found, QString* foundRelative, QString* foundAbsolute) const
 {
-	*foundRelative = mFilePath;
+	*foundRelative = QDir::toNativeSeparators(mFilePath);
 	if (!mRoots.empty())
-		*foundRoot = mRoots.front();
-	*foundAbsolute = mFilePath;
+		*foundRoot = QDir::toNativeSeparators(mRoots.front());
+	*foundAbsolute = QDir::toNativeSeparators(mFilePath);
 	*found = false;
 
 	foreach (QString root, mRoots)
@@ -38,7 +38,7 @@ void EmbeddedFilepath::evaluate(QString* foundRoot, bool* found, QString* foundR
 		if (!mFilePath.isEmpty() && QDir(root).exists(mFilePath))
 		{
 			*foundRelative = QDir(root).relativeFilePath(mFilePath);
-			*foundRoot = root;
+			*foundRoot = QDir::toNativeSeparators(root);
 			*foundAbsolute = QDir(root).absoluteFilePath(mFilePath);
 			*found = true;
 

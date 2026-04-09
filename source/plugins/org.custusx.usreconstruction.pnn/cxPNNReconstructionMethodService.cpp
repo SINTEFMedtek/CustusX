@@ -290,7 +290,7 @@ void PNNReconstructionMethodService::interpolate(ImagePtr inputData, vtkImageDat
 	int outside = 100*double(removed)/double(total);
 	int holes = 100*double(total-ignored-removed)/double(total);
 	reportDebug(
-				QString("PNN: Size: %1Mb, Valid voxels: %2\%, Outside mask: %3\%  Filled holes [steps=%4, %5s]: %6\%")
+				QString("PNN: Size: %1Mb, Valid voxels: %2%%, Outside mask: %3%%  Filled holes [steps=%4, %5s]: %6%%")
 				.arg(total/1024/1024)
 				.arg(valid)
 				.arg(outside)

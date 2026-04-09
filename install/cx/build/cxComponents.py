@@ -201,6 +201,31 @@ class ITK(CppComponent):
         return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
 # ---------------------------------------------------------
 
+class newITK(CppComponent):
+    def name(self):
+        return "ITK"
+    def help(self):
+        return 'itk.org'
+    def sourceFolder(self):
+        return 'ITK'
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('v5.4.5')
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        append = builder.appendCMakeOption
+        add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
+        add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+        add('ITK_USE_SYSTEM_EIGEN:BOOL', True)
+        add('Eigen3_DIR:PATH', self._createSibling(Eigen).configPath())
+        builder.configureCMake()
+    def repository(self):
+        return 'https://github.com/InsightSoftwareConsortium/ITK.git'
+# ---------------------------------------------------------
+
 class VTK(CppComponent):
     def name(self):
         return "VTK"
@@ -242,6 +267,8 @@ class VTK(CppComponent):
         #VTK 9
         add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
         add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
+        
+        add('CMAKE_SUPPRESS_DEVELOPER_WARNINGS:BOOL', 'ON') # Build process prints a lot of warnings
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -289,13 +316,15 @@ class OpenCV(CppComponent):
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
-        if self.useExternalRepositories():
-           return 'https://github.com/Itseez/opencv.git'
-        else:
-            return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
+        return 'https://github.com/Itseez/opencv.git'
+        #if self.useExternalRepositories():
+        #   return 'https://github.com/Itseez/opencv.git'
+        #else:
+        #    return '%s/OpenCV.git' % self.controlData.gitrepo_main_site_base
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('3.4.18')
+        #self._getBuilder().gitCheckoutSha('3.4.18') #Won't compile on Windows
+        self._getBuilder().gitCheckoutSha('4.12.0')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -319,8 +348,6 @@ class Eigen(CppComponent):
         return "eigen"
     def help(self):
         return 'http://eigen.tuxfamily.org/'
-    def configPath(self):
-        return self.sourcePath()
     def getBuildType(self):
         return self.controlData.getBuildExternalsType()
     def repository(self):
@@ -334,15 +361,9 @@ class Eigen(CppComponent):
         tag = '3.3.5'
         self._getBuilder().gitCheckoutSha(tag)
     def configure(self):
-        pass
-    def reset(self):
-        pass
-    def build(self):
-        pass
-    def makeClean(self):
-        pass
-    def getBuildType(self):
-        pass
+        #Only needed for new ITK
+        builder = self._getBuilder()
+        builder.configureCMake()
 # ---------------------------------------------------------
 
 
@@ -484,7 +505,6 @@ class CustusX(CppComponent):
         # to version > 3.2, as the old one is depracated in version 3.3.
         append('CX_CMAKE_CXX_FLAGS:STRING', '-DEIGEN_DONT_ALIGN')
         #append('CMAKE_CXX_FLAGS:STRING', '-DEIGEN_MAX_ALIGN_BYTES=0')
-
 
         libs = self.assembly.libraries
         for lib in libs:
