@@ -124,7 +124,7 @@ TEST_CASE("Styles: getGrayPalette sets expected button and window text colors", 
 TEST_CASE("Styles: getGrayPalette sets expected highlight and base colors", "[unit][resource][widgets]")
 {
 	QPalette palette = cx::Styles::getGrayPalette();
-	CHECK(palette.color(QPalette::HighlightedText) == QColor(119, 161, 226));
+	CHECK(palette.color(QPalette::HighlightedText) == QColor(240, 240, 240));
 	CHECK(palette.color(QPalette::Base) == QColor(12, 14, 22));
 }
 

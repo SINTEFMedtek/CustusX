@@ -153,6 +153,49 @@ QColor Styles::getTextColor()
 	return qApp->palette().color(QPalette::WindowText);
 }
 
+// QIcon Styles::getIcon(const QString& defaultPath, const QString& darkPath)
+// {
+// 	return useGrayStyle() ? QIcon(darkPath) : QIcon(defaultPath);
+// }
+
+QIcon Styles::screenshotIcon(const QString& label)
+{
+	QPixmap pixmap(48, 48);
+	pixmap.fill(Qt::transparent);
+	QPainter p(&pixmap);
+	p.setRenderHint(QPainter::Antialiasing);
+
+	// Camera body
+	p.setPen(QPen(QColor(40, 120, 110), 1.5));
+	p.setBrush(QColor(93, 207, 190));
+	p.drawRoundedRect(2, 14, 44, 30, 4, 4);
+
+	// Viewfinder bump
+	QPolygonF bump;
+	bump << QPointF(16, 14) << QPointF(20, 8) << QPointF(28, 8) << QPointF(32, 14);
+	p.setPen(Qt::NoPen);
+	p.drawPolygon(bump);
+	p.setPen(QPen(QColor(40, 120, 110), 1.5));
+	p.drawLine(QPointF(16, 14), QPointF(20, 8));
+	p.drawLine(QPointF(20, 8), QPointF(28, 8));
+	p.drawLine(QPointF(28, 8), QPointF(32, 14));
+
+	// Lens housing
+	p.setBrush(QColor(26, 26, 46));
+	p.drawEllipse(QPoint(22, 29), 10, 10);
+
+	// Lens glass
+	p.setBrush(QColor(46, 74, 112));
+	p.drawEllipse(QPoint(22, 29), 7, 7);
+
+	// Label in bottom-right of camera body
+	p.setPen(QColor(80, 10, 20));
+	p.setFont(QFont("Arial", 11, QFont::Bold));
+	p.drawText(QRect(32, 30, 14, 14), Qt::AlignCenter, label);
+
+	return QIcon(pixmap);
+}
+
 // For mac (default style) just changing palette won't change elements like:
 // top line, bottom line, sliders, combobox background, and toolbar.
 //Configurable styles are QCommonStyle and QProxyStyle, but using Windows style for now
@@ -167,7 +210,7 @@ QPalette Styles::getGrayPalette()
 	QColor backGroundColor = darkGray3;
 	QColor buttonTextColor = whiteText;
 	QColor generalTextColor = whiteText;
-	QColor highlightTextColor = blueText;
+	QColor highlightTextColor = whiteText;
 	QColor textBackgroundColor = darkGray1;//Background color for text widgtes, and combobox background
 
 	QPalette palette(buttonColor, backGroundColor);
@@ -188,7 +231,6 @@ QPalette Styles::getGrayPalette()
 
 	//Active title bars (e.g. dock widget titles) — gives them a distinct color from the background
 	palette.setColor(QPalette::Highlight, blue);
-	palette.setColor(QPalette::HighlightedText, whiteText);
 
 	//combobox, group text. Probably the text where textBackgroundColor is used
 	// palette.setColor(QPalette::Text, generalTextColor);
