@@ -14,6 +14,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTimer>
 #include <QHBoxLayout>
 #include <QLabel>
+#include "cxStyles.h"
 
 namespace cx
 {
@@ -50,25 +51,30 @@ void DisplayTimerWidget::start()
 void DisplayTimerWidget::stop()
 {
 	mTimer->stop();
-	this->printText("green");
+	this->printText(QString("green"));
 }
 
 void DisplayTimerWidget::failed()
 {
 	if(mTimer)
 		mTimer->stop();
-	this->printText("red");
+	this->printText(QString("red"));
 }
 
 void DisplayTimerWidget::timeoutSlot()
 {
-	this->printText("black");
+	this->printText(Styles::getTextColor());
 }
 
 void DisplayTimerWidget::printText(QString color)
 {
 	int secs = this->elaspedSeconds(); // SmStartTime.secsTo(QDateTime::currentDateTime());
 	mLabel->setText(QString("<font size=%1 color=%2><b>%3 s</b></font>").arg(mFontSize).arg(color).arg(secs));
+}
+
+void DisplayTimerWidget::printText(QColor color)
+{
+	this->printText(color.name());
 }
 
 int DisplayTimerWidget::elaspedSeconds() const

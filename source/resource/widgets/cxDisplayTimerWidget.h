@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxResourceWidgetsExport.h"
 
+#include <QColor>
 #include <QWidget>
 #include <QDateTime>
 class QTimer;
@@ -46,6 +47,7 @@ private slots:
 	void timeoutSlot();
 private:
 	void printText(QString color);
+	void printText(QColor color);
 	QTimer* mTimer = nullptr;
 	QLabel* mLabel;
 	QDateTime mStartTime;
