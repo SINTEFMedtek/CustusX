@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMainWindow.h"
 
 #include <QtWidgets>
+#include "cxStyles.h"
 #include "boost/bind/bind.hpp"
 
 #include "cxConfig.h"
@@ -287,10 +288,10 @@ void MainWindow::createActions()
 	connect(mPreferencesToolConfigAction, &QAction::triggered, this, [this]{ preferencesSlot(5); });
 	connect(mQuitAction, &QAction::triggered, qApp, &QApplication::quit);
 
-	mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
+	mSaveDesktopAction = new QAction(Styles::workflowStateSaveIcon(), tr("Save desktop"), this);
 	mSaveDesktopAction->setToolTip("Save desktop for workflow step");
 	connect(mSaveDesktopAction, &QAction::triggered, this, &MainWindow::saveDesktopSlot);
-	mResetDesktopAction = new QAction(QIcon(":/icons/workflow_state_revert.png"), tr("Reset desktop"), this);
+	mResetDesktopAction = new QAction(Styles::workflowStateRevertIcon(), tr("Reset desktop"), this);
 	mResetDesktopAction->setToolTip("Reset desktop for workflow step");
 	connect(mResetDesktopAction, &QAction::triggered, this, &MainWindow::resetDesktopSlot);
 

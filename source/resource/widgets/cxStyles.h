@@ -21,8 +21,10 @@ public:
 	static QColor getGray();
 	static QColor getYellow();
 	static QColor getTextColor();
-	// static QIcon getIcon(const QString& defaultPath, const QString& darkPath);
 	static QIcon screenshotIcon(const QString& label);
+	static QIcon workflowStateIcon(const QString& label);
+	static QIcon workflowStateSaveIcon();
+	static QIcon workflowStateRevertIcon();
 
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();

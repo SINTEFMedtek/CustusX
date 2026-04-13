@@ -22,6 +22,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTypeConversions.h"
 #include "cxRequestEnterStateTransition.h"
 #include "cxWorkflowState.h"
+#include "cxStyles.h"
 #include "boost/shared_ptr.hpp"
 
 
@@ -37,7 +38,7 @@ public:
 					WorkflowState(parent, "PatientDataUid", "Patient Data", backend)
 	{}
 	virtual ~PatientDataWorkflowState() {}
-	virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_patient_data.png"); }
+	virtual QIcon getIcon() const { return Styles::workflowStateIcon("Data"); }
 
 	virtual bool canEnter() const { return true; }
 };
@@ -51,7 +52,7 @@ public:
 	virtual ~NavigationWorkflowState() {}
 	virtual QIcon getIcon() const
 	{
-		return QIcon(":/icons/workflow_state_navigation.png");
+		return Styles::workflowStateIcon("Nav");
 	}
 	virtual void onEntry(QEvent* event);
 	virtual bool canEnter() const;
@@ -67,7 +68,7 @@ public:
 	virtual ~RegistrationWorkflowState() {}
 	virtual QIcon getIcon() const
 	{
-		return QIcon(":/icons/workflow_state_registration.png");
+		return Styles::workflowStateIcon("Reg");
 	}
 
 	virtual bool canEnter() const;
@@ -84,7 +85,7 @@ public:
 	{}
 	virtual QIcon getIcon() const
 	{
-		return QIcon(":/icons/workflow_state_planning.png");
+		return Styles::workflowStateIcon("Plan");
 	}
 
 	virtual bool canEnter() const;
@@ -100,7 +101,7 @@ public:
 	{}
 	virtual QIcon getIcon() const
 	{
-		return QIcon(":/icons/workflow_state_acquisition.png");
+		return Styles::workflowStateIcon("Acq");
 	}
 
 	virtual void onEntry(QEvent* event);
@@ -116,7 +117,7 @@ public:
 	virtual ~PostOpControllWorkflowState() {}
 	virtual QIcon getIcon() const
 	{
-		return QIcon(":/icons/workflow_state_post_op.png");
+		return Styles::workflowStateIcon("Post");
 	}
 
 	virtual bool canEnter() const;

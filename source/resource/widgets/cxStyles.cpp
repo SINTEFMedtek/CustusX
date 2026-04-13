@@ -153,10 +153,6 @@ QColor Styles::getTextColor()
 	return qApp->palette().color(QPalette::WindowText);
 }
 
-// QIcon Styles::getIcon(const QString& defaultPath, const QString& darkPath)
-// {
-// 	return useGrayStyle() ? QIcon(darkPath) : QIcon(defaultPath);
-// }
 
 QIcon Styles::screenshotIcon(const QString& label)
 {
@@ -192,6 +188,126 @@ QIcon Styles::screenshotIcon(const QString& label)
 	p.setPen(QColor(80, 10, 20));
 	p.setFont(QFont("Arial", 11, QFont::Bold));
 	p.drawText(QRect(32, 30, 14, 14), Qt::AlignCenter, label);
+
+	return QIcon(pixmap);
+}
+
+namespace
+{
+
+// --- Workflow icon geometry constants ---
+const int    kIconSize       = 64;
+const QPoint kCircleCenter   = QPoint(32, 27);
+const int    kCircleRadius   = 22;
+const double kCircleBorder   = 2.0;
+const int    kLabelY         = 30;   // text rect top — sits in the lower half of the circle
+const int    kLabelHeight    = 28;
+const int    kLabelFontSize  = 22;
+
+// --- Workflow icon color palette ---
+struct WorkflowPalette
+{
+	QColor circleFill;
+	QColor circleBorder;
+	QColor forwardArrow;
+	QColor label;   // used for text in state icons and action arrows in save/revert icons
+};
+
+WorkflowPalette workflowPalette(bool gray)
+{
+	WorkflowPalette pal;
+	if (gray)
+	{
+		pal.circleFill   = QColor(blue);
+		pal.circleBorder = QColor(75, 130, 165);
+		pal.forwardArrow = QColor(200, 170, 60);
+		pal.label        = QColor(220, 220, 220);
+	}
+	else
+	{
+		pal.circleFill   = QColor(255, 250, 150);
+		pal.circleBorder = QColor(140, 150, 20);
+		pal.forwardArrow = QColor(67, 121, 111);
+		pal.label        = QColor(75, 25, 5);
+	}
+	return pal;
+}
+
+// Draws the shared base: circle background + right-pointing forward arrow.
+void drawWorkflowBase(QPainter& p, const WorkflowPalette& pal)
+{
+	p.setPen(QPen(pal.circleBorder, kCircleBorder));
+	p.setBrush(pal.circleFill);
+	p.drawEllipse(kCircleCenter, kCircleRadius, kCircleRadius);
+
+	QPolygonF arrow;
+	arrow << QPointF(16, 24) << QPointF(34, 24) << QPointF(34, 18)
+	      << QPointF(49, 27) << QPointF(34, 36) << QPointF(34, 30)
+	      << QPointF(16, 30);
+	p.setPen(Qt::NoPen);
+	p.setBrush(pal.forwardArrow);
+	p.drawPolygon(arrow);
+}
+
+} // namespace
+
+QIcon Styles::workflowStateIcon(const QString& label)
+{
+	WorkflowPalette pal = workflowPalette(useGrayStyle());
+	QPixmap pixmap(kIconSize, kIconSize);
+	pixmap.fill(Qt::transparent);
+	QPainter p(&pixmap);
+	p.setRenderHint(QPainter::Antialiasing);
+	drawWorkflowBase(p, pal);
+
+	p.setPen(pal.label);
+	p.setFont(QFont("Arial", kLabelFontSize, QFont::Bold));
+	p.drawText(QRect(0, kLabelY, kIconSize, kLabelHeight), Qt::AlignCenter, label);
+
+	return QIcon(pixmap);
+}
+
+QIcon Styles::workflowStateSaveIcon()
+{
+	WorkflowPalette pal = workflowPalette(useGrayStyle());
+	QPixmap pixmap(kIconSize, kIconSize);
+	pixmap.fill(Qt::transparent);
+	QPainter p(&pixmap);
+	p.setRenderHint(QPainter::Antialiasing);
+	drawWorkflowBase(p, pal);
+
+	// Downward arrow — save current desktop layout
+	// Shaft: width 10, head: width 20, tip protrudes below circle
+	QPolygonF down;
+	down << QPointF(27, 33) << QPointF(37, 33) << QPointF(37, 43)
+	     << QPointF(42, 43) << QPointF(32, 57) << QPointF(22, 43)
+	     << QPointF(27, 43);
+	p.setPen(Qt::NoPen);
+	p.setBrush(pal.label);
+	p.drawPolygon(down);
+
+	return QIcon(pixmap);
+}
+
+QIcon Styles::workflowStateRevertIcon()
+{
+	WorkflowPalette pal = workflowPalette(useGrayStyle());
+	QPixmap pixmap(kIconSize, kIconSize);
+	pixmap.fill(Qt::transparent);
+	QPainter p(&pixmap);
+	p.setRenderHint(QPainter::Antialiasing);
+	drawWorkflowBase(p, pal);
+
+	// Down-then-left L-shaped arrow — revert to default desktop layout
+	// Vertical starts at forward-arrow midpoint (y=27), horizontal sits low in the icon.
+	// Tips protrude past the circle edge intentionally.
+	QPolygonF revert;
+	revert << QPointF(42, 27) << QPointF(48, 27) << QPointF(48, 53)
+	       << QPointF(25, 53) << QPointF(25, 59) << QPointF(13, 50)
+	       << QPointF(25, 41) << QPointF(25, 47) << QPointF(42, 47);
+	p.setPen(Qt::NoPen);
+	p.setBrush(pal.label);
+	p.drawPolygon(revert);
 
 	return QIcon(pixmap);
 }
