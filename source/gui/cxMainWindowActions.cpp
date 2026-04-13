@@ -41,6 +41,7 @@
 #include "cxFileManagerService.h"
 #include "cxFileReaderWriterService.h"
 #include "cxApplication.h"
+#include "cxStyles.h"
 
 namespace cx
 {
@@ -73,12 +74,12 @@ void MainWindowActions::createActions()
 					   &MainWindowActions::onStartLogConsole);
 
 	this->createAction("ShootScreen", "Shoot Screen",
-					   QIcon(":/icons/screenshot-screen.png"),
+					   Styles::screenshotIcon("S"),
 					   QKeySequence("Ctrl+f"), "Save a screenshot to the patient folder.",
 					   &MainWindowActions::shootScreen);
 
 	this->createAction("ShootWindow", "Shoot Window",
-					   QIcon(":/icons/screenshot-window.png"),
+					   Styles::screenshotIcon("W"),
 					   QKeySequence("Ctrl+Shift+f"), "Save an image of the application to the patient folder.",
 					   &MainWindowActions::shootWindow);
 

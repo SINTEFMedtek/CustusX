@@ -2,6 +2,7 @@
 #define CXSTYLES_H
 
 #include "cxResourceWidgetsExport.h"
+#include <QIcon>
 #include <QPalette>
 
 namespace cx
@@ -20,6 +21,10 @@ public:
 	static QColor getGray();
 	static QColor getYellow();
 	static QColor getTextColor();
+	static QIcon screenshotIcon(const QString& label);
+	static QIcon workflowStateIcon(const QString& label);
+	static QIcon workflowStateSaveIcon();
+	static QIcon workflowStateRevertIcon();
 
 	static void setApplicationWindowsStyle();
 	static QPalette getGrayPalette();

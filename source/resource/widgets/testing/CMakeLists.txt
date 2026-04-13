@@ -6,6 +6,7 @@ if(BUILD_TESTING)
 
     set(CXTEST_SOURCES
         cxtestOptionsWidget.cpp
+        cxtestStyles.cpp
     )
 
     qt5_wrap_cpp(CXTEST_SOURCES_TO_MOC ${CXTEST_SOURCES_TO_MOC})
