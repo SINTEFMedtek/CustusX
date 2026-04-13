@@ -92,8 +92,9 @@ void BranchList::selectGenerations(int maxGeneration)
 
 /**
 	BranchList::findBronchoscopeRotation is not in use, as it was replaced with
-	a sipler calculation of bronchoscope rotation based on which lung lobe the
-	target is located in: Branch::getBronchoscopeRotation(QString targetLobe)
+	a simpler and more reliable way to calculate the bronchoscope rotation, based
+	on which lung lobe the target is located in.
+	See Branch::getBronchoscopeRotation(QString targetLobe)
 	*/
 /**
 void BranchList::findBronchoscopeRotation()
@@ -108,8 +109,9 @@ void BranchList::findBronchoscopeRotation()
 
 /**
 	BranchList::calculateBronchoscopeRotation is not in use, as it was replaced with
-	a sipler calculation of bronchoscope rotation based on which lung lobe the
-	target is located in: Branch::getBronchoscopeRotation(QString targetLobe)
+	a simpler and more reliable way to calculate the bronchoscope rotation, based
+	on which lung lobe the target is located in.
+	See Branch::getBronchoscopeRotation(QString targetLobe)
 	*/
 /**
 void BranchList::calculateBronchoscopeRotation(BranchPtr branch)
@@ -140,8 +142,9 @@ void BranchList::calculateBronchoscopeRotation(BranchPtr branch)
 
 /**
 	bendingDirectionToBronchoscopeRotation is not in use, as it was replaced with
-	a sipler calculation of bronchoscope rotation based on which lung lobe the
-	target is located in: Branch::getBronchoscopeRotation(QString targetLobe)
+	a simpler and more reliable way to calculate the bronchoscope rotation, based
+	on which lung lobe the target is located in.
+	See Branch::getBronchoscopeRotation(QString targetLobe)
 	*/
 /**
 double bendingDirectionToBronchoscopeRotation(Vector3D bendingDirection, Vector3D parentBranchOrientation, double parentRotation)
