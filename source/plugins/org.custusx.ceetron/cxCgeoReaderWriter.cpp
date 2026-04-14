@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxCgeoReaderWriter.h"
 
 #include <QDir>
+#include <iostream>
 #include "vtkPolyData.h"
 #include <vtkCellArray.h>
 #include "vtkIdList.h"

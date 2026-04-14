@@ -20,6 +20,7 @@
 #include <vtkTimerLog.h>
 #include <vtkTransform.h>
 #include <vtkDepthSortPolyData.h>
+#include <iostream>
 
 /**
  * Generate a bunch of overlapping spheres within one poly data set:
@@ -181,7 +182,7 @@ int main (int argc, char *argv[])
 {
   if (argc != 7)
     {
-    cerr << "Usage: " << argv[0] << " Theta Phi MaximumPeels " <<
+    std::cerr << "Usage: " << argv[0] << " Theta Phi MaximumPeels " <<
       "OcclusionRatio ForceDepthSortingFlag " <<
       "DoNotUseAnyDepthRelatedAlgorithmFlag" << std::endl;
     return EXIT_FAILURE;

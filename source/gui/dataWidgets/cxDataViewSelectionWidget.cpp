@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QAction>
 #include <QLabel>
 #include <QMenu>
+#include <iostream>
 #include "cxLogger.h"
 #include "cxImageAlgorithms.h"
 #include "cxImage.h"

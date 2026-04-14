@@ -659,11 +659,6 @@ cx_initialize_cppunit()
 cx_initialize_opencv()
 cx_initialize_OpenIGTLink()
 
-if(CX_WINDOWS)
-else()
-	cx_initialize_IGSTK()
-endif(CX_WINDOWS)
-
 find_package(Qt5Core)
 
 

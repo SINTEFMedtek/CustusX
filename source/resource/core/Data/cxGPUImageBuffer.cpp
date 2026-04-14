@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QString>
 
 #include <vector>
+#include <iostream>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>

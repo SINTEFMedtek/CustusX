@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDir>
 #include <vtkImageImport.h>
 #include <vtkImageData.h>
+#include <iostream>
 #include "cxFileManagerService.h"
 #include "cxLogger.h"
 #include "cxTypeConversions.h"

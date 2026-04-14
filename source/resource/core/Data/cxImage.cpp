@@ -26,6 +26,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkImageIterator.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkColorTransferFunction.h>
+#include <iostream>
 #include "cxImageTF3D.h"
 #include "cxBoundingBox3D.h"
 #include "cxImageLUT2D.h"

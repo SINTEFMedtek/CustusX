@@ -12,6 +12,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPositionStorageFile.h"
 #include <QDateTime>
 #include <boost/cstdint.hpp>
+#include <iostream>
 #include "cxFrame3D.h"
 #include "cxTime.h"
 

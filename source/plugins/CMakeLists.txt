@@ -10,7 +10,7 @@ set(CX_PLUGINS
   org.custusx.core.patientmodel:ON
   org.custusx.core.view:ON
   org.custusx.core.tracking:ON
-  #org.custusx.core.tracking.system.igstk:ON
+  org.custusx.core.tracking.system.igstk:OFF
   org.custusx.core.openigtlink3:ON
   org.custusx.core.video:ON
   org.custusx.core.state:ON
@@ -41,20 +41,6 @@ set(CX_PLUGINS
   org.custusx.bronchoscopynavigation:ON
   org.custusx.filter.airways:OFF
 )
-
-
-if(CX_WINDOWS)
-  set(CX_PLUGINS
-    ${CX_PLUGINS}
-	org.custusx.core.tracking.system.igstk:OFF
-	)
-else()
-  set(CX_PLUGINS
-    ${CX_PLUGINS}
-	org.custusx.core.tracking.system.igstk:ON
-	)
-endif(CX_WINDOWS)
-
 
 #if(CX_LINUX)
 #  set(CX_PLUGINS

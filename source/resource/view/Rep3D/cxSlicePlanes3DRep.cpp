@@ -331,13 +331,13 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ViewPtr view)
 	mText->textProperty()->SetJustificationToLeft();
 	mText->setPosition(baseData.mPointPos_normvp);
 	mText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-	view->getRenderer()->AddActor2D(mText->getActor());
+	view->getRenderer()->AddViewProp(mText->getActor());
 	this->changedSlot();
 }
 
 void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ViewPtr view)
 {
-	view->getRenderer()->RemoveActor(mText->getActor());
+	view->getRenderer()->RemoveViewProp(mText->getActor());
 	mText.reset();
 }
 
