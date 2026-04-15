@@ -2,12 +2,12 @@
 #
 # Build, tag, and upload on gitlab:
 # For gitlab docker login see: https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker build --no-cache -t custusx-build-ubuntu2404:26.04.01 .
-# sudo docker tag custusx-build-ubuntu2404:26.04.01 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.01
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.01
+# sudo docker build --no-cache -t custusx-build-ubuntu2404:26.04.02 .
+# sudo docker tag custusx-build-ubuntu2404:26.04.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.02
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.02
 #
 # Explore container with the command line:
-# sudo docker run --rm -it --entrypoint=/bin/bash custusx-build-ubuntu2404:26.04.01
+# sudo docker run --rm -it --entrypoint=/bin/bash custusx-build-ubuntu2404:26.04.02
 
 FROM ubuntu:24.04
 
@@ -68,17 +68,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     curl
 
 # Prepare build by downloading code (not needed if skipping build step below)
-RUN \
-  mkdir -p /builds/Ubuntu2404/CX && \
-  cd /builds/Ubuntu2404/CX && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git CX && \
-  cd CX && \
-  git checkout develop
+#RUN \
+#  mkdir -p /builds/Ubuntu2404/CX && \
+#  cd /builds/Ubuntu2404/CX && \
+#  git clone https://gitlab.sintef.no/custusx/CustusX.git CX && \
+#  cd CX && \
+#  git checkout develop
 
-# Compile and build package (may not be needed, but will speed up CI builds)
-RUN \
-  cd /builds/Ubuntu2404/CX/CX && \
-  ./install/cxJenkinsMasterBuild.py --create_package
+# Compile and build package (not needed, just for verifying that Docker image are able to build CustusX)
+#RUN \
+#  cd /builds/Ubuntu2404/CX/CX && \
+#  ./install/cxJenkinsMasterBuild.py --create_package
 
 # Install and test package (not needed, just for testing previous step)
 #RUN \
