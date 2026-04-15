@@ -38,8 +38,8 @@ RUN \
   build-essential opencl-headers libssl-dev \
   libboost-all-dev libcppunit-dev libglew-dev \
   git python3 python3-pip python-is-python3 \
-  cmake-qt-gui cmake cmake-curses-gui ninja-build \
-  qt5-default qttools5-dev qttools5-dev-tools qttools5-doc qt5-doc libqt5webkit5-dev libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev \
+  cmake ninja-build \
+  qt5-default qttools5-dev qttools5-dev-tools libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev \
   libgl1-mesa-dev
 
 # libgl1-mesa-dev #Test with mesa OpenGL (instead of NVIDIA)
@@ -58,8 +58,7 @@ RUN \
   apt install -y \
   nvidia-opencl-dev libglvnd-dev \
   vlc vlc-plugin-access-extra gstreamer1.0-libav \
-  python3-lxml \
-  nvidia-driver-525 nvidia-dkms-525
+  python3-lxml
 
 # apt install nvidia-driver-525 nvidia-dkms-525 #Test with some new nvidia drivers
 
@@ -70,8 +69,8 @@ RUN \
   apt-get upgrade -y && apt-get update -y && \
   DEBIAN_FRONTEND=noninteractive \
   apt install -y \
-  doxygen gnuplot \
-  xvfb gcovr curl
+  doxygen \
+  xvfb curl
 
 # Ubuntu 20.04, from https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/linux.html
 #RUN DEBIAN_FRONTEND=noninteractive apt install -y git subversion build-essential cmake cmake-curses-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5xmlpatterns5-dev libqt5svg5-dev qtwebengine5-dev qtscript5-dev qtbase5-private-dev libqt5x11extras5-dev libxt-dev

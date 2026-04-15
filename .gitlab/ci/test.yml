@@ -33,3 +33,10 @@ test-ubuntu22:
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
+
+test-ubuntu24:
+  extends: .test-job
+  needs: ["build-ubuntu24"]
+  image: $IMAGE_UBUNTU2404
+  variables:
+    OS: Ubuntu2404

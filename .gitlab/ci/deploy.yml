@@ -9,7 +9,7 @@
   script:
     - echo "Deploying application..."
     - |
-      for OS in Ubuntu2004 Ubuntu2204; do
+      for OS in Ubuntu2004 Ubuntu2204 Ubuntu2404; do
         cd $CI_PROJECT_DIR/$OS/package_artefacts
         INSTALLER_FILE=$(find CustusX*.tar.gz)
         curl \
