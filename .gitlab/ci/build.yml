@@ -40,6 +40,7 @@
   # Use commit tag if existing, otherwise use branch
   - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
   - rm -rf $BASE_DIR/IGSTK  # IGSTK removed from build; clean up old agents
+  - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true  # Remove stale IGSTK plugin artifacts from previous builds
   # Reuse previous library build folders if the correct library versions are already built.
   # Using version-specific paths so agents with outdated libraries automatically do a full rebuild once.
   - test -f $BASE_DIR/VTK/build_Release/lib/cmake/vtk-9.6/VTKConfig.cmake
