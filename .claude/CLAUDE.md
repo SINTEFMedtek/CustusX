@@ -125,6 +125,8 @@ Closed source repositories are typically handled by a similar cxPrivateComponent
 - Namespaces: `cx` (production) and `cxtest` (tests)
 
 **Structure rules:**
+- Indentation: tabs (not spaces)
+- Prefer explicit variable types over `auto`; explicit types make the code easier to read and understand
 - Always use `{}` for `if`/`while`/`for`/`do` bodies
 - Brackets on their own line
 - `.cpp` files include their own header first
