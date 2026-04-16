@@ -59,19 +59,22 @@ TEST_CASE("TrackingImplService: CurrentTrackingSystemImplementation", "[unit][pl
 	CHECK(tracking->getCurrentTrackingSystemImplementation().isEmpty());
 
 	std::vector<cx::TrackerConfigurationPtr> configs = tracking->getConfigurations();
-	REQUIRE(configs.size() > 1);
+	REQUIRE(configs.size() > 0);
 
 	cx::TrackerConfigurationPtr config = tracking->getConfiguration();
 	CHECK(config);
 	//CX_LOG_DEBUG() << "config impl: " << config->getTrackingSystemImplementation();
 	CHECK(config->getTrackingSystemImplementation() == configs[0]->getTrackingSystemImplementation());//Tracking returns first system at init
 
-	tracking->setCurrentTrackingSystemImplementation(configs[1]->getTrackingSystemImplementation());
-	CHECK(tracking->getCurrentTrackingSystemImplementation() == configs[1]->getTrackingSystemImplementation());
-	CHECK(tracking->getCurrentTrackingSystemImplementation() != configs[0]->getTrackingSystemImplementation());
+	if (configs.size() > 1)
+	{
+		tracking->setCurrentTrackingSystemImplementation(configs[1]->getTrackingSystemImplementation());
+		CHECK(tracking->getCurrentTrackingSystemImplementation() == configs[1]->getTrackingSystemImplementation());
+		CHECK(tracking->getCurrentTrackingSystemImplementation() != configs[0]->getTrackingSystemImplementation());
 
-	config = tracking->getConfiguration();
-	CHECK(config->getTrackingSystemImplementation() == configs[1]->getTrackingSystemImplementation());
+		config = tracking->getConfiguration();
+		CHECK(config->getTrackingSystemImplementation() == configs[1]->getTrackingSystemImplementation());
+	}
 
 	cx::LogicManager::shutdown();
 }

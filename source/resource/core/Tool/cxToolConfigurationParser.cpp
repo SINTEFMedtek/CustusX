@@ -72,9 +72,9 @@ QString ConfigurationFileParser::getTrackingSystemImplementation()
 
 	if (trackingsystemImplementationNodes.count() == 0)
 	{
-		// Old config files without a tag were IGSTK-based. IGSTK has been removed;
-		// fall back to NDI which is the direct replacement for NDI hardware.
-		retval = TRACKING_SYSTEM_IMPLEMENTATION_NDI;
+		// Old config files without a tag are assumed to be IGSTK/NDI-based.
+		// The NDI tracking service accepts this value as a legacy fallback.
+		retval = TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
 	}
 	else if(trackingsystemImplementationNodes.count() > 1)
 	{
