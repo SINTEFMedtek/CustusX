@@ -25,6 +25,7 @@ namespace cx
 
 extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
 extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK;
+extern cxResource_EXPORT const char* TRACKING_SYSTEM_IMPLEMENTATION_NDI;
 
 	/** orientation type
 	 */
