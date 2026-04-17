@@ -6,8 +6,6 @@ from __future__ import print_function
 #
 #####################################################
 
-from builtins import input
-from builtins import object
 import os.path
 import os
 import sys
