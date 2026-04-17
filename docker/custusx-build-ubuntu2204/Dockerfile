@@ -4,9 +4,9 @@
 
 # Build, tag, and upload on gitlab
 # For gitlab docker login (before last step) see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker build --no-cache -t custusx-build-ubuntu2204:26.04.01 .
-# sudo docker tag custusx-build-ubuntu2204:26.04.01 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.01
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.01
+# sudo docker build --no-cache -t custusx-build-ubuntu2204:26.04.02 .
+# sudo docker tag custusx-build-ubuntu2204:26.04.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.02
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.02
 
 # List all docker container
 # sudo docker ps --all
@@ -41,7 +41,7 @@ RUN \
   apt-get upgrade -y && apt-get update -y && \
   DEBIAN_FRONTEND=noninteractive \
   apt install -y \
-  qttools5-dev qttools5-dev-tools libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev
+  qttools5-dev qttools5-dev-tools libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev libqt5webkit5
 
 RUN \
   apt-get upgrade -y && apt-get update -y && \
