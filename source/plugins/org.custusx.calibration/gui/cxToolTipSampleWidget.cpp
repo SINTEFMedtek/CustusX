@@ -112,7 +112,7 @@ void ToolTipSampleWidget::sampleSlot()
 
   QTextStream streamer(&samplingFile);
   streamer << sampledPoint;
-  streamer << endl;
+  streamer << "\n";
 
   reporter()->playSampleSound();
   report("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);

@@ -43,7 +43,11 @@ inline RealScalar length() const
  */
 static PlainObject fromString(const QString& text)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
+	QStringList v = text.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+#else
 	QStringList v = text.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+#endif
 	if (v.size() != 3)
 		return PlainObject(0, 0, 0);
 	return PlainObject(v[0].toDouble(), v[1].toDouble(), v[2].toDouble());

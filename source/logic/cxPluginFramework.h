@@ -58,7 +58,7 @@ public:
 	void install(const QString& symbolicName);
 	void uninstall(const QString& symbolicName);
 	bool start(const QString& symbolicName, ctkPlugin::StartOptions options = ctkPlugin::START_ACTIVATION_POLICY);
-	bool stop(const QString& symbolicName, ctkPlugin::StopOptions options = 0);
+	bool stop(const QString& symbolicName, ctkPlugin::StopOptions options = {});
 	bool start();
 	bool stop();
 
