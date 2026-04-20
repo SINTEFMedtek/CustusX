@@ -11,6 +11,9 @@
     - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts/
     # Use commit tag if existing, otherwise use branch
     - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
+    # Ensure test data is present (new Docker images do not include pre-built data)
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx/CustusXData.git $CI_PROJECT_DIR/data || git -C $CI_PROJECT_DIR/data fetch --all
+    - git -C $CI_PROJECT_DIR/data reset --hard origin/HEAD
     - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
