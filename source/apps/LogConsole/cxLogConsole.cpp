@@ -11,7 +11,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include "cxLogConsole.h"
 
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QApplication>
 #include <QFileDialog>
 #include <QAction>
@@ -51,8 +52,7 @@ void LogConsole::initializeGeometry()
 
 void LogConsole::setDefaultGeometry()
 {
-	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
-	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
+	QRect screen = QGuiApplication::primaryScreen()->geometry();
 	screen.adjust(screen.width()*0.5, screen.height()*0.25, 0, 0);
 	this->setGeometry(screen);
 }

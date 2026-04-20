@@ -5,7 +5,6 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopServices>

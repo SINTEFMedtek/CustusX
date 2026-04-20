@@ -12,7 +12,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxViewContainerItem.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include "vtkRenderer.h"
 #include "cxBoundingBox3D.h"
 #include "cxViewLinkingViewContainerItem.h"
@@ -82,10 +83,11 @@ double ViewItem::mmPerPix() const
 {
 	// use mean mm/pix over entire screen. DONT use the height of the widget in mm,
 	// this is truncated to the nearest integer.
-	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
-	QWidget* screen = desktop->screen(desktop->screenNumber(mParent));
-	double r_h = (double) screen->heightMM() / (double) screen->geometry().height();
-	double r_w = (double) screen->widthMM() / (double) screen->geometry().width();
+	QScreen* screen = QGuiApplication::screenAt(mParent->mapToGlobal(mParent->rect().center()));
+	if (!screen)
+		screen = QGuiApplication::primaryScreen();
+	double r_h = screen->physicalSize().height() / screen->geometry().height();
+	double r_w = screen->physicalSize().width() / screen->geometry().width();
 	double retval = (r_h + r_w) / 2.0;
 	return retval;
 }

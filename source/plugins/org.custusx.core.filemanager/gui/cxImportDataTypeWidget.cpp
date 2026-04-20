@@ -16,7 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QFileInfo>
@@ -95,7 +96,7 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
-	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+	mTableWidget->setGeometry(QGuiApplication::primaryScreen()->geometry());
 	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportDataTypeWidget::tableItemSelected);
 
 	mCheckBoxWidgetCT = this->createCheckbox("CT");
@@ -697,7 +698,7 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	simpleTableWidget->setSelectionMode(QAbstractItemView::NoSelection);
 	simpleTableWidget->setShowGrid(true);
 	simpleTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
-	simpleTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+	simpleTableWidget->setGeometry(QGuiApplication::primaryScreen()->geometry());
 
 
 	simpleTableWidget->setRowCount(mTableWidget->rowCount());

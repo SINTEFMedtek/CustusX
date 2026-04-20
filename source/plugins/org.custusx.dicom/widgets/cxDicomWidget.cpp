@@ -10,7 +10,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QDir>
 #undef REGISTERED
 #include "ctkServiceTracker.h"
@@ -158,7 +159,9 @@ void DicomWidget::onViewHeader()
 	window->setWindowTitle("DICOM File Header");
 	window->setFileList(files);
 
-	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(this));
+	QScreen* screen = QGuiApplication::screenAt(this->mapToGlobal(this->rect().center()));
+	if (!screen)
+		screen = QGuiApplication::primaryScreen();
 	QRect rect = screen->geometry();
 	rect.setWidth(rect.width()*0.66);
 	window->setGeometry(rect);
