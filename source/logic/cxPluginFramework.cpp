@@ -138,6 +138,7 @@ void PluginFrameworkManager::loadState()
 				CX_LOG_CHANNEL_INFO("plugin") << QString("Starting plugin %1").arg(info[i].symbolicName);
 
 			this->start(info[i].symbolicName, ctkPlugin::START_TRANSIENT);
+			CX_LOG_CHANNEL_INFO("plugin") << QString("Done starting plugin %1").arg(info[i].symbolicName);
 		}
 		else
 		{
