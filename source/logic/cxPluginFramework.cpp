@@ -118,12 +118,14 @@ void PluginFrameworkManager::loadState()
 	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
 
 	// install all plugins, must do this first in order to let FW handle dependencies.
-	CX_LOG_CHANNEL_INFO("plugin") << "Installing all plugins...";
+	CX_LOG_CHANNEL_INFO("plugin") << QString("Installing %1 plugins...").arg(info.size());
 	for (unsigned i=0; i< info.size(); ++i)
 	{
 		if (info[i].targetState != ctkPlugin::UNINSTALLED)
         {
+			CX_LOG_CHANNEL_INFO("plugin") << QString("Installing plugin %1").arg(info[i].symbolicName);
 			this->install(info[i].symbolicName);
+			CX_LOG_CHANNEL_INFO("plugin") << QString("Done installing plugin %1").arg(info[i].symbolicName);
         }
 	}
 
