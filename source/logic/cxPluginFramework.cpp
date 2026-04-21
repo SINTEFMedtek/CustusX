@@ -16,6 +16,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QDebug>
+#include <iostream>
 
 #include "ctkPluginFrameworkFactory.h"
 #include "ctkPluginFramework.h"
@@ -118,6 +119,7 @@ void PluginFrameworkManager::loadState()
 	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
 
 	// install all plugins, must do this first in order to let FW handle dependencies.
+	std::cerr << "CX_DIAG: loadState installing " << info.size() << " plugins" << std::endl;
 	CX_LOG_CHANNEL_INFO("plugin") << "Installing all plugins...";
 	for (unsigned i=0; i< info.size(); ++i)
 	{
@@ -137,8 +139,9 @@ void PluginFrameworkManager::loadState()
 			else
 				CX_LOG_CHANNEL_INFO("plugin") << QString("Starting plugin %1").arg(info[i].symbolicName);
 
+			std::cerr << "CX_DIAG: Starting plugin " << info[i].symbolicName.toStdString() << std::endl;
 			this->start(info[i].symbolicName, ctkPlugin::START_TRANSIENT);
-			CX_LOG_CHANNEL_INFO("plugin") << QString("Done starting plugin %1").arg(info[i].symbolicName);
+			std::cerr << "CX_DIAG: Done starting plugin " << info[i].symbolicName.toStdString() << std::endl;
 		}
 		else
 		{
