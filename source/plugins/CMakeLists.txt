@@ -81,3 +81,18 @@ endif(NOT QT_QMAKE_EXECUTABLE)
 ctkMacroSetupPlugins(
     ${CX_PLUGINS}
     BUILD_OPTION_PREFIX ${CX_PLUGIN_BUILD_OPTION_PREFIX})
+
+# Generate a manifest of actually-built CTK plugins for runtime filtering of stale artifacts.
+# Uses if(TARGET ...) which is only true for plugins that have actual cmake targets in this build,
+# reliably excluding plugins from sibling apps (e.g. Fraxinus) even if CMakeCache has their options set.
+set(_cx_built_plugins "")
+foreach(_cx_plugin_entry IN LISTS CX_PLUGINS)
+    string(REGEX REPLACE ":.*$" "" _cx_plugin_name "${_cx_plugin_entry}")
+    string(REPLACE "." "_" _cx_target_name "${_cx_plugin_name}")
+    if(TARGET ${_cx_target_name})
+        list(APPEND _cx_built_plugins "${_cx_plugin_name}")
+    endif()
+endforeach()
+string(REPLACE ";" "\n" _cx_built_plugins_str "${_cx_built_plugins}")
+file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/doc")
+file(WRITE "${CMAKE_BINARY_DIR}/doc/cxBuiltPlugins.txt" "${_cx_built_plugins_str}\n")

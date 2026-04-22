@@ -82,7 +82,7 @@ private:
 	QStringList getPluginSymbolicNames(const QString& searchPath);
 	bool nameIsProbablyPlugin(QString name) const;
 	std::vector<PluginFrameworkManager::PluginLoadInfo> getPluginLoadInfo(QStringList symbolicNames);
-	QStringList getDisabledPluginsFromConfig();
+	bool getEnabledPluginsFromManifest(QStringList& enabledPlugins);
 
 	QScopedPointer<ctkPluginFrameworkFactory> mFrameworkFactory;
 	QSharedPointer<ctkPluginFramework> mFramework;

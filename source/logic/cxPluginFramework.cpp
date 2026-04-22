@@ -481,13 +481,27 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames()
 	}
 	result.removeDuplicates();
 
-	QStringList disabled = this->getDisabledPluginsFromConfig();
-	foreach (QString name, disabled)
-		result.removeAll(name);
-	if (!disabled.isEmpty())
-		CX_LOG_CHANNEL_INFO("plugin") << QString("Skipping %1 plugins not enabled in build: %2")
-										 .arg(disabled.size())
-										 .arg(disabled.join(", "));
+	QStringList enabledInManifest;
+	if (this->getEnabledPluginsFromManifest(enabledInManifest))
+	{
+		QStringList skipped;
+		foreach (QString name, result)
+		{
+			if (!enabledInManifest.contains(name))
+				skipped << name;
+		}
+		if (!skipped.isEmpty())
+			CX_LOG_CHANNEL_INFO("plugin") << QString("Skipping %1 plugins not in build manifest: %2")
+											 .arg(skipped.size())
+											 .arg(skipped.join(", "));
+		QStringList filtered;
+		foreach (QString name, result)
+		{
+			if (enabledInManifest.contains(name))
+				filtered << name;
+		}
+		result = filtered;
+	}
 
 	return result;
 }
@@ -511,41 +525,25 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames(const QString& search
 	return result;
 }
 
-QStringList PluginFrameworkManager::getDisabledPluginsFromConfig()
+bool PluginFrameworkManager::getEnabledPluginsFromManifest(QStringList& enabledPlugins)
 {
-	QStringList result;
-	QString configPath = DataLocations::getDocPath() + "/cxConfigDescription.txt";
-	QFile file(configPath);
+	QString manifestPath = DataLocations::getDocPath() + "/cxBuiltPlugins.txt";
+	QFile file(manifestPath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		CX_LOG_CHANNEL_WARNING("plugin") << "Could not find plugin build config: " << configPath;
-		return result;
+		CX_LOG_CHANNEL_WARNING("plugin") << "Could not find plugin build manifest: " << manifestPath;
+		return false;
 	}
 
 	QTextStream in(&file);
-	bool inPluginsSection = false;
 	while (!in.atEnd())
 	{
 		QString line = in.readLine().trimmed();
-		if (line == "Plugins:")
-		{
-			inPluginsSection = true;
-			continue;
-		}
-		if (!inPluginsSection || line.isEmpty())
-			continue;
-
-		QStringList parts = line.simplified().split(' ');
-		if (parts.size() < 2)
-			continue;
-
-		QString name = parts[0];
-		QString state = parts[1];
-		if (state.compare("ON", Qt::CaseInsensitive) != 0)
-			result << name;
+		if (!line.isEmpty())
+			enabledPlugins << line;
 	}
 
-	return result;
+	return true;
 }
 
 bool PluginFrameworkManager::nameIsProbablyPlugin(QString name) const
