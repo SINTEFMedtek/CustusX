@@ -555,6 +555,14 @@ void MainWindow::createToolBars()
 
 	QToolBar* helpToolBar = this->registerToolBar("Help");
 	helpToolBar->addAction(mShowContextSensitiveHelpAction);
+
+	mSpacerToolBar = this->registerToolBar("Spacer");
+	mSpacerToolBar->setMovable(false);
+	mSpacerToolBar->setFloatable(false);
+	mSpacerToolBar->toggleViewAction()->setVisible(false);
+	QWidget *spacerWidget = new QWidget(mSpacerToolBar);
+	spacerWidget->setMinimumWidth(200);
+	mSpacerToolBar->addWidget(spacerWidget);
 }
 
 QToolBar* MainWindow::registerToolBar(QString name, QString groupname)
