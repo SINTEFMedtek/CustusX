@@ -13,6 +13,10 @@ configure_file(
   "${CustusX_BINARY_DIR}/doc/cxConfigDescription.txt"
   )
 
+install(FILES
+  "${CustusX_BINARY_DIR}/doc/cxConfigDescription.txt"
+  DESTINATION ${CX_INSTALL_DOC_DIR}/)
+
 get_property(CX_LICENSE_FILE GLOBAL PROPERTY CX_LICENSE_FILE)
 
 configure_file(
