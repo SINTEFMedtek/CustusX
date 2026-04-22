@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "cxBranch.h"
 #include "cxLog.h"
+#include "cxEnumConversion.h"
 
 namespace cx
 {
@@ -174,14 +175,55 @@ Vector3D Branch::getBronchoscopeBendingDirection()
 	return mBendingDirection;
 }
 
-void Branch::setBronchoscopeRotation(double rotation)
+//void Branch::setBronchoscopeRotation(double rotation)
+//{
+//	mBronchoscopeRotation = rotation;
+//}
+
+//double Branch::getBronchoscopeRotation()
+//{
+//	return mBronchoscopeRotation;
+//}
+
+QString Branch::findLobeName()
 {
-	mBronchoscopeRotation = rotation;
+	if(mBranchCode.size() < 3)
+		return ""; //
+
+	if(mBranchCode[1] == 2 && mBranchCode[2] == 1)
+		return enum2string(otLOBE_RUL);
+	if(mBranchCode[1] == 2 && mBranchCode[2] == 2)
+		return enum2string(otLOBE_RLL);
+	if(mBranchCode[1] == 1 && mBranchCode[2] == 1)
+		return enum2string(otLOBE_LUL);
+	if(mBranchCode[1] == 1 && mBranchCode[2] == 2)
+		return enum2string(otLOBE_LLL);
+
+	return "";
 }
 
-double Branch::getBronchoscopeRotation()
+double Branch::getBronchoscopeRotation(QString targetLobe)
 {
-	return mBronchoscopeRotation;
+	int generationNumber = this->findGenerationNumber();
+
+	if(generationNumber == 1) //Trachea
+		return 0;
+	if(targetLobe == enum2string(otLOBE_RUL))
+		return 60 * M_PI/180;
+	if((targetLobe == enum2string(otLOBE_RML) || targetLobe == enum2string(otLOBE_RLL)) && generationNumber == 2)
+		return 45 * M_PI/180;
+	if(targetLobe == enum2string(otLOBE_RML) || targetLobe == enum2string(otLOBE_RLL))
+		return 0;
+	if(targetLobe == enum2string(otLOBE_LUL) && generationNumber == 2)
+			return -60 * M_PI/180;
+	if(targetLobe == enum2string(otLOBE_LUL))
+			return -75 * M_PI/180;
+	if(targetLobe == enum2string(otLOBE_LLL) && (generationNumber == 2 || generationNumber == 3))
+			return -60 * M_PI/180;
+	if(targetLobe == enum2string(otLOBE_LLL))
+			return 0;
+
+	return 0;
 }
 
 void Branch::removeEqualPositions()
