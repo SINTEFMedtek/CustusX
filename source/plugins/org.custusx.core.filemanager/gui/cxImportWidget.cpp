@@ -310,6 +310,8 @@ bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
 	// Case 1: Single CT series
 	if(images.size() == 1 && images[0]->getModality() == imCT)
 	{
+		if(mVisServices->patient()->getImage(imCT, istTHORAX_CT))
+			return false;
 		images[0]->setModality(imCT);
 		images[0]->setImageType(istTHORAX_CT);
 		widget->setData(datas);
@@ -332,6 +334,11 @@ bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
 
 		if(petImage && ctImages.size() == 2)
 		{
+			if(mVisServices->patient()->getImage(imCT, istTHORAX_CT)
+			        || mVisServices->patient()->getImage(imCT, istPET_CT)
+			        || mVisServices->patient()->getImage(imPET, istPET))
+				return false;
+
 			int petDims[3];
 			petImage->getBaseVtkImageData()->GetDimensions(petDims);
 
