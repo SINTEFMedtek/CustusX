@@ -86,13 +86,13 @@ stages:          # List of stages for jobs, and their order of execution
 
 build-ubuntu20:
   extends: .reuse-build
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
   variables:
     OS: Ubuntu2004
 
 build-ubuntu22:
   extends: .reuse-build
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.02
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.02
   variables:
     OS: Ubuntu2204
 
@@ -119,14 +119,14 @@ build-ubuntu22:
 test-ubuntu20:
   extends: .test-job
   needs: ["build-ubuntu20"]
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
   variables:
     OS: Ubuntu2004
 
 test-ubuntu22:
   extends: .test-job
   needs: ["build-ubuntu22"]
-  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:25.02.02
+  image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.02
   variables:
     OS: Ubuntu2204
 
