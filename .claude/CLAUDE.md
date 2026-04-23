@@ -101,7 +101,6 @@ Application (CustusX main)
 
 While CustusX is open source, most other repositories are closed sorce, and Claude should avoid looking into this code unless ordered:
 - CustusS in root_dir/CS/CS
-- Fraxinus in root_dir/FX/FX
 - The plugings in source/plugins that come from separate repositories, like:
   - source/plugins/org.custusx.ussimulator
   - source/plugins/org.custusx.gestreamer
@@ -112,7 +111,8 @@ While CustusX is open source, most other repositories are closed sorce, and Clau
   - root_dir/medtekAI
   
 The used open source repositories are configured in:
-- root_dir/CX/CX/install/cx/build/cxComponentAssembly.py
+- root_dir/CX/CX/install/cx/build/cxComponentAssembly.py for CustusX
+- root_dir/FX/FX/script/cxsetup/cxPrivateComponentAssembly.py for Fraxinus
 
 Closed source repositories are typically handled by a similar cxPrivateComponentAssembly.py in the closed source repositories
 
