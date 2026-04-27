@@ -53,6 +53,8 @@ public:
 
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual bool hasReferencePointWithId(QString id);
+	virtual QString getOpenIGTLinkImageId() const;
+
 protected:
 	virtual void set_prMt(const Transform3D& prMt, double timestamp);
 	void createToolGraphic();

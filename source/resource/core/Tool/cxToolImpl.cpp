@@ -154,5 +154,11 @@ std::map<QString, Vector3D> ToolImpl::getReferencePoints() const
 	return getToolFileToolStructure()->mReferencePoints;
 }
 
+QString ToolImpl::getOpenIGTLinkImageId() const
+{
+	ToolFileParser::ToolInternalStructurePtr structure = this->getToolFileToolStructure();
+	return structure ? structure->mOpenigtlinkImageId : "";
+}
+
 } // namespace cx
 
