@@ -69,7 +69,7 @@ class CustusXTestInstallation(object):
 
     def runUnitTests(self):
         PrintFormatter.printHeader('Run unit tests', level=2)
-        self._runCatchTestsOnInstalled('[unit]~[unstable]')
+        self._runCatchTestsWrappedInCTestOnInstalled('[unit]~[unstable]')
 
     def runIntegrationTests(self):
         PrintFormatter.printHeader('Run integration tests', level=2)
