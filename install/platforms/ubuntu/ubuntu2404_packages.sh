@@ -2,18 +2,10 @@
 
 #####################################################
 # Ubuntu setup script
-# Author: Christian Askeland, SINTEF Medical Technology
-# Author: Janne Beate Bakeng, SINTEF Medical Technology
-# Date:   2012.05.19
-#         2014.09.09
-#         2026.04.17
-#
-# Description:
 #   Install all packages needed to:
-#     * Develop in C++/Eclipse
+#     * Develop in C++
 #     * Run CustusX
 #     * Several nice-to-have utilities.
-#
 #
 #####################################################
 
