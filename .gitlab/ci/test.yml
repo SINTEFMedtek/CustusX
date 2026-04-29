@@ -2,25 +2,16 @@
 
 .test-job:   # This job runs the Unit + Integration tests
   stage: test    # It only starts when the job in the build stage completes successfully.
-  retry:
-    max: 2
-    # All tests segfault after an OOM kill on shared runners with low memory.
-    # A retry gives a fresh container with clean memory state.
-    when: always
   variables:
     OS: OS
     GIT_CLONE_PATH: /builds/$OS/CX/CX
-    # Force software OpenGL rendering to avoid GPU library issues in headless containers
-    # and reduce GPU memory initialization overhead.
-    LIBGL_ALWAYS_SOFTWARE: "1"
-    GALLIUM_DRIVER: "softpipe"
   script:
     - echo "Running unit tests... "
     - mkdir -p package_artefacts
     - cp -R $OS/package_artefacts/CustusX*.tar.gz package_artefacts/
     # Use commit tag if existing, otherwise use branch
     - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
-    - xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24 -ac" ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+    - xvfb-run ./install/cxJenkinsMasterBuild.py --test_package --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
   artifacts:
     when: always
     name: ${CI_JOB_NAME}-${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHA}
@@ -35,6 +26,7 @@ test-ubuntu20:
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
+    CX_WRAP_UNIT_TESTS_IN_CTEST: "1"
 
 test-ubuntu22:
   extends: .test-job
@@ -42,6 +34,7 @@ test-ubuntu22:
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
+    CX_WRAP_UNIT_TESTS_IN_CTEST: "1"
 
 test-ubuntu24:
   extends: .test-job
