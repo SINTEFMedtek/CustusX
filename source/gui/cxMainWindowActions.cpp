@@ -264,6 +264,8 @@ void MainWindowActions::newPatientSlot(bool showDialog, bool useSimpleDialog)
 	if(useSimpleDialog)
 	{
 		QString patientName = getPatientNameFromUser();
+		if(patientName.isEmpty())
+			return;
 		choosenDir = this->selectNewPatientFolder(showDialog, patientName);
 	}
 	else
