@@ -410,6 +410,8 @@ class OpenIGTLinkIO(CppComponent):
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('BUILD_TESTING:BOOL', False)
+        add('IGTLIO_USE_EXAMPLES:BOOL', False)
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
