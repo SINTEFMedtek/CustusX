@@ -52,8 +52,6 @@ cx_install_add_library_dirs(
     ${OpenCV_DIR}/bin
     ${OpenCV_DIR}/lib
     ${OPENCL_LIBRARY_DIRS}
-    ${IGSTK_DIR}/bin
-    ${IGSTK_DIR}/lib
     ${OpenIGTLink_LIBRARY_DIRS}
     ${OpenIGTLinkIO_DIR}/lib
     ${OpenIGTLinkIO_DIR}/bin

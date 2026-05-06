@@ -11,9 +11,6 @@
 #################################################
 
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import subprocess
 import optparse
 import re
@@ -238,7 +235,7 @@ class VTK(CppComponent):
         return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v9.2.4')
+        self._getBuilder().gitCheckout('v9.6.1')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -405,13 +402,16 @@ class OpenIGTLinkIO(CppComponent):
             return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('f144a2e66eb7d4361af91ecee48caf6f80465d48') # 15. Nov 2023
+        # self._getBuilder().gitCheckoutSha('f144a2e66eb7d4361af91ecee48caf6f80465d48') # 15. Nov 2023
+        self._getBuilder().gitCheckoutSha('d7f6aef826d934577a39b48d9485bc0848f27cb8') # 18. Jul 2025
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('BUILD_TESTING:BOOL', False)
+        add('IGTLIO_USE_EXAMPLES:BOOL', False)
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
@@ -488,6 +488,7 @@ class CustusX(CppComponent):
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('CX_PLUGIN_org.custusx.filter.airways:BOOL', False); # Airways plugin requires FAST library
+        add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False); # IGSTK removed from build (incompatible with VTK 9.3+)
         #if(platform.system() == 'Linux'):
         #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)

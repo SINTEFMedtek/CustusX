@@ -15,4 +15,5 @@ namespace cx
 {
 const char* TRACKING_SYSTEM_IMPLEMENTATION_IGSTK = "igstk";
 const char* TRACKING_SYSTEM_IMPLEMENTATION_IGTLINK = "openigtlink";
+const char* TRACKING_SYSTEM_IMPLEMENTATION_NDI = "ndi";
 }

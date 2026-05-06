@@ -15,6 +15,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
+#include <iostream>
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
 #include "vtkMetaImageReader.h"
@@ -247,7 +248,7 @@ void ImageStreamerOpenCV::initialize_local()
 
 	if (!mVideoCapture->isOpened())
 	{
-		cerr << "ImageStreamerOpenCV: Failed to open a video device or video file!\n" << endl;
+		std::cerr << "ImageStreamerOpenCV: Failed to open a video device or video file!\n" << endl;
 		return;
 	}
 

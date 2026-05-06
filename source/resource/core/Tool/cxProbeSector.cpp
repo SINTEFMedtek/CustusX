@@ -25,6 +25,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <vtkPlanes.h>
 #include <vtkCutter.h>
 #include <vtkAppendPolyData.h>
+#include <iostream>
 #include "cxBoundingBox3D.h"
 #include "cxVolumeHelpers.h"
 #include "cxUtilHelpers.h"

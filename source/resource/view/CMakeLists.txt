@@ -183,7 +183,7 @@ target_include_directories(cxResourceVisualization
 )
 target_link_libraries(cxResourceVisualization
     PUBLIC
-    ${VTK_MODULES}
+    ${VTK_LIBRARIES}
     ${CX_RESOURCE_VISUALIZATION_LIBRARIES}
     PRIVATE
 #    ${GLEW_LIBRARY}

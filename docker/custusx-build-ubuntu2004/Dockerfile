@@ -3,16 +3,16 @@
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
 # Build image:
-# sudo docker build -t custusx-build-ubuntu2004:25.02.02 .
+# sudo docker build -t custusx-build-ubuntu2004:26.04.01 .
 # or
-# sudo docker build --no-cache -t custusx-build-ubuntu2004:25.02.02 .
+# sudo docker build --no-cache -t custusx-build-ubuntu2004:26.04.01 .
 
 # Tag image
-# sudo docker tag custusx-build-ubuntu2004:25.02.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
+# sudo docker tag custusx-build-ubuntu2004:26.04.01 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.01
 
 # Upload image
 # For gitlab docker login see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02.02
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.01
 
 # List all docker container
 # sudo docker ps --all
@@ -38,8 +38,8 @@ RUN \
   build-essential opencl-headers libssl-dev \
   libboost-all-dev libcppunit-dev libglew-dev \
   git python3 python3-pip python-is-python3 \
-  cmake-qt-gui cmake cmake-curses-gui ninja-build \
-  qt5-default qttools5-dev qttools5-dev-tools qttools5-doc qt5-doc libqt5webkit5-dev libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev \
+  cmake ninja-build \
+  qt5-default qttools5-dev qttools5-dev-tools libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev \
   libgl1-mesa-dev
 
 # libgl1-mesa-dev #Test with mesa OpenGL (instead of NVIDIA)
@@ -58,8 +58,7 @@ RUN \
   apt install -y \
   nvidia-opencl-dev libglvnd-dev \
   vlc vlc-plugin-access-extra gstreamer1.0-libav \
-  python3-lxml \
-  nvidia-driver-525 nvidia-dkms-525
+  python3-lxml
 
 # apt install nvidia-driver-525 nvidia-dkms-525 #Test with some new nvidia drivers
 
@@ -70,8 +69,8 @@ RUN \
   apt-get upgrade -y && apt-get update -y && \
   DEBIAN_FRONTEND=noninteractive \
   apt install -y \
-  doxygen gnuplot \
-  xvfb gcovr curl
+  doxygen \
+  xvfb curl
 
 # Ubuntu 20.04, from https://slicer.readthedocs.io/en/latest/developer_guide/build_instructions/linux.html
 #RUN DEBIAN_FRONTEND=noninteractive apt install -y git subversion build-essential cmake cmake-curses-gui cmake-qt-gui qt5-default qtmultimedia5-dev qttools5-dev libqt5xmlpatterns5-dev libqt5svg5-dev qtwebengine5-dev qtscript5-dev qtbase5-private-dev libqt5x11extras5-dev libxt-dev
@@ -79,18 +78,21 @@ RUN \
 
 # Install Xvfb - to be run from gitlab runner
 
+
+# These steps are not needed.
+# They are just for verifying that Docker image are able to build CustusX
 # Prepare gitlab build
 # gitlab CI_PROJECT_DIR="/builds/custusx/CustusX"
-RUN \
-  mkdir -p /builds/Ubuntu2004/CX && \
-  cd /builds/Ubuntu2004/CX && \
-  git clone https://gitlab.sintef.no/custusx/CustusX.git CX && \
-  cd CX && \
-  git checkout develop
+#RUN \
+#  mkdir -p /builds/Ubuntu2004/CX && \
+#  cd /builds/Ubuntu2004/CX && \
+#  git clone https://gitlab.sintef.no/custusx/CustusX.git CX && \
+#  cd CX && \
+#  git checkout develop
 
-RUN \
-  cd /builds/Ubuntu2004/CX/CX && \
-  ./install/cxJenkinsMasterBuild.py --create_package
+#RUN \
+#  cd /builds/Ubuntu2004/CX/CX && \
+#  ./install/cxJenkinsMasterBuild.py --create_package
 
 WORKDIR /builds/Ubuntu2004/CX
 

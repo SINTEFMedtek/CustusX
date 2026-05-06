@@ -1,0 +1,68 @@
+# Build stage templates and jobs
+
+# CI_PROJECT_DIR is deleted from the Docker image before the build,
+# so a quick build requires out of source build files
+.build-variables:
+  stage: build
+  variables:
+    VERSION: ${CI_COMMIT_SHORT_SHA}
+    OS: OS
+    BASE_DIR: /builds/$OS
+    GIT_CLONE_PATH: /builds/$OS/CX/CX #Changes CI_PROJECT_DIR
+    BUILD_DIR: $CI_PROJECT_DIR/../build_Release
+
+.create-installer:
+  script:
+    - cd $BUILD_DIR
+    # Remove old installer
+    - rm -f CustusX*.tar.gz
+    - cpack
+    # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
+    - cd $CI_PROJECT_DIR
+    - mkdir -p $OS/package_artefacts
+    - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts/
+    - cp -R $BUILD_DIR/doc/html_pure $OS/package_artefacts/html_pure/
+    - cp -R $BUILD_DIR/doc/html_dev $OS/package_artefacts/html_dev/
+    - echo "Compile complete."
+  artifacts:
+    paths:
+      - $OS/package_artefacts/CustusX*.tar.gz
+      - $OS/package_artefacts/html_pure/
+      - $OS/package_artefacts/html_dev/
+
+.reuse-build:
+  extends:
+    - .build-variables
+    - .create-installer
+  before_script:
+  - echo "Run cxInstaller.py"
+  - ls $BASE_DIR
+  # Use commit tag if existing, otherwise use branch
+  - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
+  - rm -rf $BASE_DIR/IGSTK  # IGSTK removed from build; clean up old agents
+  - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true  # Remove stale IGSTK plugin artifacts from previous builds
+  # Reuse previous library build folders if the correct library versions are already built.
+  # Using version-specific paths so agents with outdated libraries automatically do a full rebuild once.
+  - test -f $BASE_DIR/VTK/build_Release/lib/cmake/vtk-9.6/VTKConfig.cmake
+      && test -d $BASE_DIR/ITK/build_Release/lib/cmake/ITK-5.4
+      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+      components CustusX
+      || eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+
+build-ubuntu20:
+  extends: .reuse-build
+  image: $IMAGE_UBUNTU2004
+  variables:
+    OS: Ubuntu2004
+
+build-ubuntu22:
+  extends: .reuse-build
+  image: $IMAGE_UBUNTU2204
+  variables:
+    OS: Ubuntu2204
+
+build-ubuntu24:
+  extends: .reuse-build
+  image: $IMAGE_UBUNTU2404
+  variables:
+    OS: Ubuntu2404

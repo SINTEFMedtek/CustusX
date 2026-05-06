@@ -72,8 +72,9 @@ QString ConfigurationFileParser::getTrackingSystemImplementation()
 
 	if (trackingsystemImplementationNodes.count() == 0)
 	{
-		//CX_LOG_DEBUG() << "Cannot find " << CONFIG_TRACKINGSYSTEMIMPLEMENTATION_TAG << " tag. Selecting " << TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
-		retval = TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;//Revert to igstk implementation for old config files
+		// Old config files without a tag are assumed to be IGSTK/NDI-based.
+		// The NDI tracking service accepts this value as a legacy fallback.
+		retval = TRACKING_SYSTEM_IMPLEMENTATION_IGSTK;
 	}
 	else if(trackingsystemImplementationNodes.count() > 1)
 	{
