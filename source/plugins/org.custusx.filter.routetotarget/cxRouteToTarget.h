@@ -32,7 +32,7 @@ public:
 	void findRoutePositionsInBloodVessels();
 	void searchBranchUp(BranchPtr searchBranchPtr, int startIndex);
 	void searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int startIndex);
-	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint, std::map<QString, PointMetricPtr> extraAirwayPoints = std::map<QString, PointMetricPtr>());
+	vtkPolyDataPtr findRouteToTarget(PointMetricPtr targetPoint, QString lobeName = "", std::map<QString, PointMetricPtr> extraAirwayPoints = std::map<QString, PointMetricPtr>());
 	std::vector<Eigen::Vector3d> findRouteAlongExtraPoints(Vector3D targetPosition, std::map<QString, PointMetricPtr> extraAirwayPoints);
 	vtkPolyDataPtr findExtendedRoute(PointMetricPtr targetPoint);
 	vtkPolyDataPtr findRouteToTargetAlongBloodVesselCenterlines(MeshPtr bloodVesselCenterlineMesh, PointMetricPtr targetPoint);
@@ -69,6 +69,7 @@ private:
 	int mProjectedBloodVesselIndex;
 	ImagePtr mBloodVesselVolume;
 	Vector3D mTargetPosition;
+	QString mLobeName;
 	Vector3D mEndPointAlongCenterline;
 	std::vector< Eigen::Vector3d > mExtraAirwayPoints;
 	std::vector< Eigen::Vector3d > mRoutePositions;

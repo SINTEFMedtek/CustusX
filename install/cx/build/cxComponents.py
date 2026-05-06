@@ -11,9 +11,6 @@
 #################################################
 
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import subprocess
 import optparse
 import re
@@ -413,6 +410,8 @@ class OpenIGTLinkIO(CppComponent):
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('BUILD_TESTING:BOOL', False)
+        add('IGTLIO_USE_EXAMPLES:BOOL', False)
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption

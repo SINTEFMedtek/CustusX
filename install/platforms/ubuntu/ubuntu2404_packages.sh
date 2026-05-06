@@ -9,10 +9,15 @@
 #
 #####################################################
 
-#Ubuntu 22.04
+#Ubuntu 24.04
 
 sudo apt-get -y update
 sudo apt-get -y upgrade
+
+# Enable universe repo (required for some Qt5 packages on 24.04)
+sudo apt-get install -y software-properties-common
+sudo add-apt-repository universe
+sudo apt-get update
 
 # developer stuff
 sudo apt-get install -y build-essential opencl-headers libssl-dev
@@ -35,8 +40,8 @@ sudo apt-get install -y subversion cvs git-gui
 # v4l
 sudo apt-get install -y libv4l-dev
 
-# used by CI
-sudo apt-get install -y cppcheck sloccount tigervnc-standalone-server
+# used by jenkins/CI
+sudo apt-get install -y cppcheck tigervnc-standalone-server
 
 # run x11 unit tests on jenkins user
 sudo apt-get install -y xvfb
@@ -48,7 +53,7 @@ sudo apt-get install -y dkms
 sudo apt-get install -y python3-pip python3-lxml
 
 # used by IMFusion
-#sudo apt-get install -y libcrypto++-dev libnlopt-dev
+sudo apt-get install -y libcrypto++-dev libnlopt-dev
 
 # utilities
 sudo apt-get install -y synaptic aptitude apt-file dia gimp mesa-utils
@@ -87,14 +92,3 @@ sudo apt install -y vlc-plugin-access-extra gstreamer1.0-libav
 
 # For more convenient use of CustusX build scripts
 sudo apt install -y python-is-python3
-
-# For using TensorRT 8 with Ubuntu 22.04, use nvidia-driver-535 with CUDA 12.0:
-#  sudo apt-get update
-#  sudo apt-get install -y nvidia-driver-535
-#  sudo reboot
-
-# After reboot, verify with:
-#  nvidia-smi
-
-# After this the script install_tensorrt8_unified.sh from the HoloSurge project can be used to install TensorRT 8
-

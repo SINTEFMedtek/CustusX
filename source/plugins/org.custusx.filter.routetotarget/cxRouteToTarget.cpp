@@ -63,7 +63,7 @@ void RouteToTarget::processCenterline(MeshPtr mesh)
 
     mBranchListPtr->smoothOrientations();
 	//mBranchListPtr->smoothBranchPositions();
-	mBranchListPtr->findBronchoscopeRotation();
+//	mBranchListPtr->findBronchoscopeRotation();
 
 	std::cout << "Number of branches in CT centerline: " << mBranchListPtr->getBranches().size() << std::endl;
 }
@@ -188,7 +188,11 @@ void RouteToTarget::findRoutePositions(std::vector<Eigen::Vector3d> initialRoute
 
 	mRoutePositions = initialRoutePositions;
 
-	double cameraRotation = mProjectedBranchPtr->getBronchoscopeRotation();
+
+	if(mLobeName.isEmpty())
+		mLobeName = mProjectedBranchPtr->findLobeName();
+	double cameraRotation = mProjectedBranchPtr->getBronchoscopeRotation(mLobeName);
+
 	std::vector< double > initialRouteRotations(mRoutePositions.size(), cameraRotation);
 	mCameraRotation = initialRouteRotations;
 
@@ -219,13 +223,22 @@ void RouteToTarget::searchBranchUp(BranchPtr searchBranchPtr, int startIndex)
 	else
 		positions = getBranchPositions(searchBranchPtr, startIndex);
 
-    double cameraRotation = searchBranchPtr->getBronchoscopeRotation();
+	double cameraRotation = searchBranchPtr->getBronchoscopeRotation(mLobeName);
+
+	double previousBranchCameraRotation;
+	if(!mCameraRotation.empty())
+		previousBranchCameraRotation = mCameraRotation.back();
+	else
+		previousBranchCameraRotation = cameraRotation;
 
 	for (int i = 0; i<=startIndex && i<positions.size(); i++)
 	{
 		mRoutePositions.push_back(positions[i]);
 		mRoutePositionsBranch.push_back(searchBranchPtr);
-		mCameraRotation.push_back(cameraRotation);
+		if(i<startIndex/2) //start rotation for child branch half way through parent branch
+			mCameraRotation.push_back(previousBranchCameraRotation);
+		else
+			mCameraRotation.push_back(cameraRotation);
 		mGenerationNumber.push_back(searchBranchPtr->findGenerationNumber());
 		Eigen::VectorXd radius = searchBranchPtr->getRadius();
 
@@ -266,9 +279,10 @@ void RouteToTarget::searchBloodVesselBranchUp(BranchPtr searchBranchPtr, int sta
 }
 
 
-vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint, std::map<QString, PointMetricPtr> extraAirwayPoints)
+vtkPolyDataPtr RouteToTarget::findRouteToTarget(PointMetricPtr targetPoint, QString lobeName, std::map<QString, PointMetricPtr> extraAirwayPoints)
 {
 	mTargetPosition = targetPoint->getCoordinate();
+	mLobeName = lobeName;
 	Vector3D startPosition;
 	std::vector<Eigen::Vector3d> initialRoutePositions;
 	if(!extraAirwayPoints.empty())
