@@ -480,7 +480,6 @@ class CustusX(CppComponent):
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        # add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
@@ -488,7 +487,11 @@ class CustusX(CppComponent):
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('CX_PLUGIN_org.custusx.filter.airways:BOOL', False); # Airways plugin requires FAST library
-        add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False); # IGSTK removed from build (incompatible with VTK 9.3+)
+        if self.controlData.mBuildIGSTK:
+            add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
+            add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
+        else:
+            add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
         #if(platform.system() == 'Linux'):
         #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
