@@ -89,7 +89,7 @@ void AirwaysFromCenterline::processCenterline(MeshPtr airwaysCenterlineMesh)
 	this->smoothAllBranchesForVB();
 
 	mBranchListPtr->smoothOrientations();
-	mBranchListPtr->findBronchoscopeRotation();
+//	mBranchListPtr->findBronchoscopeRotation();
 }
 
 BranchListPtr AirwaysFromCenterline::getBranchList()
