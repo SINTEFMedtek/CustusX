@@ -55,9 +55,10 @@ class CppBuilder(object):
             if(self.controlData.getCMakeGenerator() == 'Ninja'):
                 runShell('''ninja''')
         else:
-            maker = 'make -j%s' % str(self.controlData.threads)
             if(self.controlData.getCMakeGenerator() == 'Ninja'):
-                maker = 'ninja'
+                maker = 'ninja -j%s' % str(self.controlData.threads)
+            else:
+                maker = 'make -j%s' % str(self.controlData.threads)
 
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html

@@ -50,9 +50,9 @@
   - test -f $BASE_DIR/VTK/build_Release/lib/cmake/vtk-9.6/VTKConfig.cmake
       && test -d $BASE_DIR/ITK/build_Release/lib/cmake/ITK-5.4
       && test -f $DOCKER_SENTINEL
-      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+      && eval ./install/cxInstaller.py -s --full -j 4 -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
       components CustusX
-      || (eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+      || (eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
       && touch $DOCKER_SENTINEL)
 
 build-ubuntu20:
