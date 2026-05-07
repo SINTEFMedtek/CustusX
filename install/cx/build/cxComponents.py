@@ -192,7 +192,7 @@ class ITK(CppComponent):
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
-        #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
+        add('CMAKE_CXX_STANDARD:STRING', 14)
         builder.configureCMake()
     def repository(self):
         return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
@@ -442,6 +442,7 @@ class IGSTK(CppComponent):
         add('IGSTK_SERIAL_PORT_0', self._getSerialPort())
         add('BUILD_TESTING:BOOL', False)
         add('BUILD_EXAMPLES:BOOL', False)
+        add('CMAKE_CXX_STANDARD:STRING', 14)
         builder.configureCMake()
     def _getSerialPort(self):
         serialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
@@ -491,6 +492,7 @@ class CustusX(CppComponent):
             add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
             add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
+            add('CMAKE_CXX_STANDARD:STRING', 14)
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
         #if(platform.system() == 'Linux'):
