@@ -218,6 +218,7 @@ class newITK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('ITK_USE_SYSTEM_EIGEN:BOOL', True)
         add('Eigen3_DIR:PATH', self._createSibling(Eigen).configPath())
+        add('CMAKE_CXX_STANDARD:STRING', 17)
         builder.configureCMake()
     def repository(self):
         return 'https://github.com/InsightSoftwareConsortium/ITK.git'
