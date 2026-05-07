@@ -35,6 +35,7 @@ set(CX_PLUGINS
   org.custusx.help:ON
   org.custusx.training:ON
   org.custusx.filter.accusurf:ON
+  org.custusx.filter.cpd:ON
   org.custusx.ceetron:ON
   org.custusx.virtualbronchoscopy:ON
   org.custusx.filter.airwaysfromcenterline:ON
