@@ -119,15 +119,18 @@ class CppBuilder(object):
 
     def gitCheckoutTag(self, tag):
         '''
-        Update git to the given tag.
-        Skip if HEAD already is at tag.
+        Update git to the given tag or SHA.
+        Skip if HEAD already is at tag/SHA, but warn if local modifications exist.
         '''
         self._changeDirToSource()
         if self._checkGitIsAtTag(tag):
-            return        
+            return
         runShell('git fetch')
+        if self._checkGitIsAtRef(tag):
+            self._warnIfLocalModifications(tag)
+            return
         runShell('git checkout %s' % tag)
-        
+
     def gitCheckout(self, tag):
         '''
         Backwards compatibility
@@ -142,6 +145,9 @@ class CppBuilder(object):
         '''
         self._changeDirToSource()
         runShell('git fetch')
+        if self._checkGitIsAtRef(sha):
+            self._warnIfLocalModifications(sha)
+            return
         runShell('git checkout %s' % sha)
 
     def _checkGitIsAtTag(self, tag):
@@ -152,6 +158,22 @@ class CppBuilder(object):
             print("Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath))
             return True
         return False
+
+    def _checkGitIsAtRef(self, ref):
+        'Return True if HEAD resolves to the same commit as ref'
+        head = shell.evaluate('git rev-parse HEAD')
+        target = shell.evaluate('git rev-parse %s^{}' % ref)
+        if head and target and head.stdout.strip() == target.stdout.strip():
+            return True
+        return False
+
+    def _warnIfLocalModifications(self, ref):
+        result = shell.evaluate('git diff --name-only HEAD')
+        if not result or not result.stdout.strip():
+            return
+        print('WARNING: Already at %s in %s, but the following files have local modifications:' % (ref, self.mSourcePath))
+        print(result.stdout.strip())
+        print('These may affect the build. Run "git reset --hard HEAD" in that folder to restore committed state.')
                     
     def _getPathToModule(self):
         # alternatively use  sys.argv[0] ?? 
