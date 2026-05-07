@@ -432,7 +432,7 @@ class IGSTK(CppComponent):
         return 'https://github.com/SINTEFMedtek/IGSTK.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('79be2fd9cd985f73662f325d8b13dd22870a2ec1')
+        self._getBuilder().gitCheckoutSha('fa6eb05b045e5456c1b85f7fe3297bd235f07590')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -490,6 +490,7 @@ class CustusX(CppComponent):
         if self.controlData.mBuildIGSTK:
             add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
         #if(platform.system() == 'Linux'):
