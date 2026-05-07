@@ -493,6 +493,7 @@ class CustusX(CppComponent):
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
             add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
             add('CMAKE_CXX_STANDARD:STRING', 14)
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive') # old ITK throw() specs are forbidden in C++17
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
         #if(platform.system() == 'Linux'):
