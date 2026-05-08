@@ -1,0 +1,76 @@
+# Builds all external C++ libraries and publishes them to the Package Registry.
+#
+# The package version key encodes library versions (via a hash of cxComponents.py,
+# where all git SHAs are pinned) and the Docker image tag (compiler/system libs).
+# Any change to either automatically produces a new package version.
+#
+# Trigger conditions:
+#   - Automatically when install/cx/build/cxComponents.py changes
+#   - Manually from the GitLab CI/CD UI at any time
+#
+# The build-ubuntu* jobs in build.yml download these packages instead of
+# rebuilding from source. If no package is found, they fall back to a full
+# rebuild and upload the result so the next run can reuse it.
+
+.build-and-publish-libs:
+  stage: build-libs
+  variables:
+    OS: OS
+    BASE_DIR: /builds/$OS
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
+  script:
+    - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
+    - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
+    - PACKAGE_NAME="custusx-external-libs"
+    - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${LIBS_HASH}"
+    - PACKAGE_FILE="cx-external-libs-${OS}.tar.gz"
+    - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
+    - echo "Libs package version $PACKAGE_VERSION"
+    - |
+      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
+      if [ "$HTTP_CODE" = "200" ]; then
+        echo "Package $PACKAGE_VERSION already in registry, nothing to do."
+        exit 0
+      fi
+      echo "Package not found (HTTP $HTTP_CODE), building external libs..."
+    # Build all external libraries. CustusX and CustusX-Data are intentionally
+    # excluded here; they are built in the downstream build-ubuntu* jobs.
+    - eval ./install/cxInstaller.py -s --full -j 4 -t Release
+        eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer
+    # Pack lib directories. Exclude CMakeFiles (*.o intermediates) and .git
+    # history to keep the tarball small; neither is needed at configure time.
+    - |
+      cd $BASE_DIR
+      tar -czf /tmp/$PACKAGE_FILE \
+        --exclude='*/CMakeFiles' \
+        --exclude='*/.git' \
+        eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer
+      echo "Packed $(du -sh /tmp/$PACKAGE_FILE | cut -f1)"
+    - |
+      curl --fail --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL"
+      echo "Published $PACKAGE_VERSION to Package Registry."
+  rules:
+    - changes:
+        - install/cx/build/cxComponents.py
+    - when: manual
+      allow_failure: true
+
+build-external-libs-ubuntu20:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2004
+  variables:
+    OS: Ubuntu2004
+
+build-external-libs-ubuntu22:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2204
+  variables:
+    OS: Ubuntu2204
+
+build-external-libs-ubuntu24:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2404
+  variables:
+    OS: Ubuntu2404
