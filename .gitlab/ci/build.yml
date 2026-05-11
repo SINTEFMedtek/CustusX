@@ -10,6 +10,7 @@
     BASE_DIR: /builds/$OS
     GIT_CLONE_PATH: /builds/$OS/CX/CX #Changes CI_PROJECT_DIR
     BUILD_DIR: $CI_PROJECT_DIR/../build_Release
+    BUILD_IGSTK: "false"
 
 .create-installer:
   script:
@@ -37,19 +38,31 @@
   before_script:
   - ls $BASE_DIR
   - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
-  - rm -rf $BASE_DIR/IGSTK  # IGSTK removed from build; clean up old agents
+  # Set IGSTK variant variables. Must come first so cleanup below is conditional.
+  - |
+    if [ "${BUILD_IGSTK}" = "true" ]; then
+      IGSTK_SUFFIX="igstk"
+      IGSTK_FLAG="--igstk"
+      IGSTK_LIBS="eigen VTK ITK IGSTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+    else
+      IGSTK_SUFFIX="noigstk"
+      IGSTK_FLAG=""
+      IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+      rm -rf $BASE_DIR/IGSTK  # not used in this build; remove stale dir from old agents
+    fi
   - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true
-  # Compute a version key that changes when library versions (cxComponents.py) or
-  # the Docker image change. If the local sentinel matches, skip the download.
+  # Compute a version key that changes when library versions (cxComponents.py),
+  # the Docker image, or the IGSTK variant changes.
   - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
   - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
   - PACKAGE_NAME="custusx-external-libs"
-  - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${LIBS_HASH}"
-  - PACKAGE_FILE="cx-external-libs-${OS}.tar.gz"
+  - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${IGSTK_SUFFIX}-${LIBS_HASH}"
+  - PACKAGE_FILE="cx-external-libs-${OS}-${IGSTK_SUFFIX}.tar.gz"
   - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
   - LIBS_SENTINEL="$BASE_DIR/.lib_version_${PACKAGE_VERSION}"
   - echo "Libs package version $PACKAGE_VERSION"
   # Try to use prebuilt libs: local cache first, then Package Registry, then full rebuild.
+  # All cd $BASE_DIR calls use subshells to keep the working directory at CI_PROJECT_DIR.
   - |
     LIBS_READY=false
     if [ -f "$LIBS_SENTINEL" ]; then
@@ -61,9 +74,7 @@
         --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
       if [ "$HTTP_CODE" = "200" ]; then
         echo "Downloaded prebuilt libs, extracting to $BASE_DIR..."
-        cd $BASE_DIR
-        rm -rf eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer
-        tar -xzf /tmp/$PACKAGE_FILE
+        ( cd $BASE_DIR && rm -rf $IGSTK_LIBS && tar -xzf /tmp/$PACKAGE_FILE )
         rm -f $BASE_DIR/.lib_version_*
         touch "$LIBS_SENTINEL"
         LIBS_READY=true
@@ -74,21 +85,20 @@
   - |
     if [ "$LIBS_READY" = "true" ]; then
       echo "Building CustusX only..."
-      eval ./install/cxInstaller.py -s --full -j 4 -t Release --user_doc --developer_doc \
+      eval ./install/cxInstaller.py -s --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
         --main_branch $CX_COMMIT \
         --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
         components CustusX
     else
       echo "Full build (all external libs + CustusX)..."
-      eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc \
+      eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
         --main_branch $CX_COMMIT \
         --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
       echo "Uploading libs to Package Registry for future runs..."
-      cd $BASE_DIR
-      tar -czf /tmp/$PACKAGE_FILE \
+      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
         --exclude='*/CMakeFiles' \
         --exclude='*/.git' \
-        eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer
+        $IGSTK_LIBS )
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
         --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL" || true
       rm -f $BASE_DIR/.lib_version_*

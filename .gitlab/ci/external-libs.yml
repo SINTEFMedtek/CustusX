@@ -18,12 +18,24 @@
     OS: OS
     BASE_DIR: /builds/$OS
     GIT_CLONE_PATH: /builds/$OS/CX/CX
+    BUILD_IGSTK: "false"
   script:
+    # Set IGSTK variant variables
+    - |
+      if [ "${BUILD_IGSTK}" = "true" ]; then
+        IGSTK_SUFFIX="igstk"
+        IGSTK_FLAG="--igstk"
+        IGSTK_LIBS="eigen VTK ITK IGSTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+      else
+        IGSTK_SUFFIX="noigstk"
+        IGSTK_FLAG=""
+        IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+      fi
     - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
     - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
     - PACKAGE_NAME="custusx-external-libs"
-    - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${LIBS_HASH}"
-    - PACKAGE_FILE="cx-external-libs-${OS}.tar.gz"
+    - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${IGSTK_SUFFIX}-${LIBS_HASH}"
+    - PACKAGE_FILE="cx-external-libs-${OS}-${IGSTK_SUFFIX}.tar.gz"
     - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
     - echo "Libs package version $PACKAGE_VERSION"
     - |
@@ -36,16 +48,14 @@
       echo "Package not found (HTTP $HTTP_CODE), building external libs..."
     # Build all external libraries. CustusX and CustusX-Data are intentionally
     # excluded here; they are built in the downstream build-ubuntu* jobs.
-    - eval ./install/cxInstaller.py -s --full -j 4 -t Release
-        eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer
+    - eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $IGSTK_LIBS
     # Pack lib directories. Exclude CMakeFiles (*.o intermediates) and .git
     # history to keep the tarball small; neither is needed at configure time.
     - |
-      cd $BASE_DIR
-      tar -czf /tmp/$PACKAGE_FILE \
+      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
         --exclude='*/CMakeFiles' \
         --exclude='*/.git' \
-        eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer
+        $IGSTK_LIBS )
       echo "Packed $(du -sh /tmp/$PACKAGE_FILE | cut -f1)"
     - |
       curl --fail --header "JOB-TOKEN: $CI_JOB_TOKEN" \
