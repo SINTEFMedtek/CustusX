@@ -270,6 +270,54 @@ class VTK(CppComponent):
         builder.configureCMake()
 # ---------------------------------------------------------
 
+# VTK 9.3+ enforces C++17 via target_compile_features, which breaks ITK 4.12.0
+# headers when CustusX is compiled against both. Use oldVTK (9.2.x) for IGSTK
+# builds where old ITK is required. Shares the same name/paths as VTK so all
+# _createSibling(VTK) references in IGSTK, CTK, CustusX resolve correctly.
+class oldVTK(CppComponent):
+    def name(self):
+        return "VTK"
+    def help(self):
+        return 'vtk.org'
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def repository(self):
+        return 'https://gitlab.kitware.com/vtk/vtk.git'
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('v9.2.6')
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('VTK_USE_PARALLEL:BOOL', 'ON')
+        add('VTK_REQUIRED_OBJCXX_FLAGS:STRING', "")
+        add('VTK_USE_RPATH:BOOL', 'ON')
+
+        use_qt5 = True
+        if use_qt5:
+            add('VTK_QT_VERSION:STRING', "5")
+            add('VTK_Group_Qt:BOOL', "ON")
+            if(platform.system() == 'Darwin'):
+              add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+            if(platform.system() == 'Linux'):
+              add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
+        else:
+            add('DESIRED_QT_VERSION:STRING', 4)
+            add('Module_vtkGUISupportQt:BOOL', 'ON')
+            add('VTK_USE_PARALLEL:BOOL', 'ON')
+            add('VTK_USE_RPATH:BOOL', 'ON')
+
+        add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
+        add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+        add('Module_vtkGUISupportQt:BOOL', 'ON')
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
+        add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
+        add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
+
+        add('CMAKE_SUPPRESS_DEVELOPER_WARNINGS:BOOL', 'ON')
+        builder.configureCMake()
+# ---------------------------------------------------------
+
 class CTK(CppComponent):
     def name(self):
         return "CTK"
