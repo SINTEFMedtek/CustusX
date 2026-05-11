@@ -40,11 +40,12 @@ class LibraryAssembly(object):
         self.custusx = cxComponents.CustusX()
 
         self.addComponent(cxComponents.Eigen())
-        self.addComponent(cxComponents.VTK())
         if self.controlData.mBuildIGSTK:
+            self.addComponent(cxComponents.oldVTK())
             self.addComponent(cxComponents.ITK())
             self.addComponent(cxComponents.IGSTK())
         else:
+            self.addComponent(cxComponents.VTK())
             self.addComponent(cxComponents.newITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
