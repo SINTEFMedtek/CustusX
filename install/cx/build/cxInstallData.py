@@ -59,7 +59,7 @@ class Common(object):
         self.ninja = self.ninja_installed()                
         self.eclipse_version = '3.6'
         self.setBuildType("Debug") 
-        self.threads = 1
+        self.threads = 15
         self.xcode = False
         self.mBuildTesting = True
         self.short_pathnames = False
