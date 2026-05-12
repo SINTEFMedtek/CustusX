@@ -412,6 +412,49 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 
 		splitBranch(newBranch, branchToSplit, splitIndex);
 	}
+
+	mergeTracheasSingleChildIntoTrachea();
+}
+
+void BranchList::mergeTracheasSingleChildIntoTrachea()
+{
+	if (mBranches.empty())
+		return;
+
+	BranchPtr trachea = mBranches[0];
+
+	while (trachea->getChildBranches().size() == 1)
+	{
+		BranchPtr onlyChild = trachea->getChildBranches()[0];
+
+		Eigen::MatrixXd combinedPositions(3, trachea->getPositions().cols() + onlyChild->getPositions().cols());
+		combinedPositions.leftCols(trachea->getPositions().cols()) = trachea->getPositions();
+		combinedPositions.rightCols(onlyChild->getPositions().cols()) = onlyChild->getPositions();
+
+		Eigen::MatrixXd combinedOrientations(3, trachea->getOrientations().cols() + onlyChild->getOrientations().cols());
+		combinedOrientations.leftCols(trachea->getOrientations().cols()) = trachea->getOrientations();
+		combinedOrientations.rightCols(onlyChild->getOrientations().cols()) = onlyChild->getOrientations();
+
+		trachea->setPositions(combinedPositions);
+		trachea->setOrientations(combinedOrientations);
+
+		branchVector grandchildren = onlyChild->getChildBranches();
+		trachea->deleteChildBranches();
+		for (BranchPtr grandchild : grandchildren)
+		{
+			grandchild->setParentBranch(trachea);
+			trachea->addChildBranch(grandchild);
+		}
+
+		for (int i = 0; i < mBranches.size(); i++)
+		{
+			if (mBranches[i] == onlyChild)
+			{
+				mBranches.erase(mBranches.begin() + i);
+				break;
+			}
+		}
+	}
 }
 
 void BranchList::splitBranch(BranchPtr newBranch, BranchPtr branchToSplit, int splitIndex)
