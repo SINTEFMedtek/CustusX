@@ -18,11 +18,14 @@ class Controller(cx.script.cxInstallScript.Controller):
     '''
     def __init__(self, assembly=None):
         ''
-        # Pre-parse CLI flags so the assembly sees the correct mBuildIGSTK value
-        # before its __init__ runs. Without this, LibraryAssembly() always uses
-        # the default (False), so the IGSTK conditional never takes effect.
+        # Check --igstk early so LibraryAssembly.__init__ sees the correct
+        # mBuildIGSTK and includes oldVTK/ITK/IGSTK in the component list.
+        # Full argument parsing happens in super().__init__(); we only set
+        # this one flag here to avoid changing the add_boolean_inverter
+        # default before the parsers are built.
         controlData = cx.build.cxInstallData.Common()
-        controlData.applyCommandLine(sys.argv[1:])
+        if '--igstk' in sys.argv:
+            controlData.mBuildIGSTK = True
         assembly = cx.build.cxComponentAssembly.LibraryAssembly(controlData)
         super(Controller, self).__init__(assembly)
 
