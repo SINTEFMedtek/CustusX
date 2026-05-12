@@ -73,11 +73,25 @@ build-external-libs-ubuntu20:
   variables:
     OS: Ubuntu2004
 
+build-external-libs-ubuntu20-igstk:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2004
+  variables:
+    OS: Ubuntu2004
+    BUILD_IGSTK: "true"
+
 build-external-libs-ubuntu22:
   extends: .build-and-publish-libs
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
+
+build-external-libs-ubuntu22-igstk:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2204
+  variables:
+    OS: Ubuntu2204
+    BUILD_IGSTK: "true"
 
 build-external-libs-ubuntu24:
   extends: .build-and-publish-libs
