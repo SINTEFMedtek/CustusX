@@ -79,6 +79,8 @@ build-external-libs-ubuntu20-igstk:
   variables:
     OS: Ubuntu2004
     BUILD_IGSTK: "true"
+    BASE_DIR: /builds/Ubuntu2004igstk
+    GIT_CLONE_PATH: /builds/Ubuntu2004igstk/CX/CX
 
 build-external-libs-ubuntu22:
   extends: .build-and-publish-libs
@@ -92,6 +94,8 @@ build-external-libs-ubuntu22-igstk:
   variables:
     OS: Ubuntu2204
     BUILD_IGSTK: "true"
+    BASE_DIR: /builds/Ubuntu2204igstk
+    GIT_CLONE_PATH: /builds/Ubuntu2204igstk/CX/CX
 
 build-external-libs-ubuntu24:
   extends: .build-and-publish-libs
