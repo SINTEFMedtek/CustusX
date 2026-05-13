@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Unix setup script
@@ -230,9 +230,14 @@ class CppBuilder(object):
         if(platform.system() != 'Windows'):
             # append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override -Wno-self-assign-field')
             append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
-        add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
+        add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
+        if(platform.system() == 'Darwin' and platform.machine() == 'arm64'):
+            if('CMAKE_OSX_ARCHITECTURES' not in self.cmakeOptions and 'CMAKE_OSX_ARCHITECTURES:STRING' not in self.cmakeOptions):
+                add('CMAKE_OSX_ARCHITECTURES:STRING', 'arm64')
+            if('CMAKE_PREFIX_PATH:PATH' not in self.cmakeOptions):
+                add('CMAKE_PREFIX_PATH:PATH', '/opt/homebrew')
         if('BUILD_SHARED_LIBS:BOOL' not in self.cmakeOptions):
             add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         add('CMAKE_ECLIPSE_VERSION', self.controlData.getEclipseVersion())

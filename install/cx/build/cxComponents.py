@@ -249,12 +249,14 @@ class VTK(CppComponent):
             add('VTK_QT_VERSION:STRING', "5")
             add('VTK_Group_Qt:BOOL', "ON")
             if(platform.system() == 'Darwin'):
-              add('CMAKE_PREFIX_PATH:PATH', "/usr/local/opt/qt@5/lib/cmake")
-              add('Qt5_DIR:PATH', "/usr/local/opt/qt@5/lib/cmake/Qt5")
-              add('Qt5Core_DIR:PATH', "/usr/local/opt/qt@5/lib/cmake/Qt5Core")
-              add('Qt5Gui_DIR:PATH', "/usr/local/opt/qt@5/lib/cmake/Qt5Gui")
-              add('Qt5Widgets_DIR:PATH', "/usr/local/opt/qt@5/lib/cmake/Qt5Widgets")
-              add('Qt5OpenGL_DIR:PATH', "/usr/local/opt/qt@5/lib/cmake/Qt5OpenGL")
+              add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake")
+              add('Qt5_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5")
+              add('Qt5Core_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5Core")
+              add('Qt5Gui_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5Gui")
+              add('Qt5Widgets_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5Widgets")
+              add('Qt5OpenGL_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5OpenGL")
+              sdk_path = subprocess.check_output(['xcrun', '--show-sdk-path']).decode().strip()
+              add('CMAKE_OSX_SYSROOT:PATH', sdk_path)
             if(platform.system() == 'Linux'):
               add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         else:
@@ -348,6 +350,8 @@ class CTK(CppComponent):
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         if(platform.system() == 'Darwin'):
           add('CMAKE_PREFIX_PATH:PATH', "/usr/local/opt/qt@5/lib/cmake")
+          if (platform.machine() == 'arm64'):
+            add('CMAKE_OSX_ARCHITECTURES:STRING', 'arm64')
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
@@ -711,7 +715,7 @@ class QHttpServer(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         if(platform.system() == 'Darwin'):
-          add('CMAKE_PREFIX_PATH:PATH', "/usr/local/opt/qt@5/lib/cmake")
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         builder.configureCMake()
