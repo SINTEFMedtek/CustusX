@@ -46,6 +46,11 @@
         exit 0
       fi
       echo "Package not found (HTTP $HTTP_CODE), building external libs..."
+    # Remove stale CTK build dir so CTK's ExternalProjects (DCMTK etc.) are
+    # re-cloned with a proper .git. A prior tarball extraction strips .git dirs,
+    # which breaks DCMTK's git-update step on warm runners that previously
+    # downloaded a prebuilt package.
+    - rm -rf $BASE_DIR/CTK
     # Build all external libraries. CustusX and CustusX-Data are intentionally
     # excluded here; they are built in the downstream build-ubuntu* jobs.
     - eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $IGSTK_LIBS
