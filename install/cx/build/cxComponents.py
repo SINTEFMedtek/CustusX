@@ -337,7 +337,10 @@ class CTK(CppComponent):
         #return '%s/CTK.git' % base
         return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
+        if (platform.system() == 'Darwin'):
+            self._getBuilder().gitCheckoutSha('a54983b07cfc64cde7b6de9351b32531623ad1e1')
+        else:
+            self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
         #self._getBuilder().gitCheckoutSha('2023.07.13') # Makes DICOM import fail
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
@@ -349,7 +352,7 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         if(platform.system() == 'Darwin'):
-          add('CMAKE_PREFIX_PATH:PATH', "/usr/local/opt/qt@5/lib/cmake")
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake")
           if (platform.machine() == 'arm64'):
             add('CMAKE_OSX_ARCHITECTURES:STRING', 'arm64')
         if(platform.system() == 'Linux'):
@@ -563,7 +566,7 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         if(platform.system() == 'Darwin'):
-          add('CMAKE_PREFIX_PATH:PATH', "/usr/local/opt/qt@5/lib/cmake")
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake;/opt/homebrew")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         # See CX-208 about this Eigen flag and about updating Eigen.
