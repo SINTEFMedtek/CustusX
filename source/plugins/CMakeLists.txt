@@ -86,9 +86,12 @@ ctkMacroSetupPlugins(
 # Generate a manifest of actually-built CTK plugins for runtime filtering of stale artifacts.
 # Uses if(TARGET ...) which is only true for plugins that have actual cmake targets in this build,
 # reliably excluding plugins from sibling apps (e.g. Fraxinus) even if CMakeCache has their options set.
+# External plugins (e.g. from Fraxinus) are stored as full paths in CX_PLUGINS, so we extract
+# just the leaf directory name (the plugin's symbolic name) before checking for the target.
 set(_cx_built_plugins "")
 foreach(_cx_plugin_entry IN LISTS CX_PLUGINS)
-    string(REGEX REPLACE ":.*$" "" _cx_plugin_name "${_cx_plugin_entry}")
+    string(REGEX REPLACE ":.*$" "" _cx_plugin_path "${_cx_plugin_entry}")
+    get_filename_component(_cx_plugin_name "${_cx_plugin_path}" NAME)
     string(REPLACE "." "_" _cx_target_name "${_cx_plugin_name}")
     if(TARGET ${_cx_target_name})
         list(APPEND _cx_built_plugins "${_cx_plugin_name}")
