@@ -88,6 +88,7 @@ public:
 	void setOutputClasses(QStringList outputClasses);
 
 signals:
+	void scriptOutput(const QString& line);
 	void launchDialog(QString venvPath, QString createCommand, QString command);
 public slots:
 	void launchDialogSlot(QString venvPath, QString createCommand, QString command);

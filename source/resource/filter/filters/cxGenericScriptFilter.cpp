@@ -170,7 +170,17 @@ void GenericScriptFilter::processReadyRead()
 		return;
 
 	QProcess* process = mCommandLine->getProcess();
-	CX_LOG_CHANNEL_INFO(mOutputChannelName) << QString(process->readAllStandardOutput());
+	QString output = QString(process->readAllStandardOutput());
+	QStringList lines = output.split('\n');
+	for(const QString& line : lines)
+	{
+		QString trimmed = line.trimmed();
+		if(!trimmed.isEmpty())
+		{
+			CX_LOG_CHANNEL_INFO(mOutputChannelName) << trimmed;
+			emit scriptOutput(trimmed);
+		}
+	}
 }
 
 void GenericScriptFilter::processReadyReadError()
@@ -728,6 +738,11 @@ bool GenericScriptFilter::createProcess()
 	// Merge channels to get all output in same channel in CustusX console
 	mCommandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
 
+	// Disable Python stdout buffering so output arrives in real time
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	env.insert("PYTHONUNBUFFERED", "1");
+	mCommandLine->getProcess()->setProcessEnvironment(env);
+
 	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	/**************************************************************************
 	* NB: For Python output to be written Python buffering must be turned off:
@@ -855,10 +870,10 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidOutputMesh, nameOutputMesh);
 	outputMesh->setVtkPolyData(rawContour);
 	outputMesh->setColor(color);
+	outputMesh->setOrganType(mOutputImage->getOrganType());
 	patientService()->insertData(outputMesh);
 	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
 	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
-	outputMesh->setOrganType(mOutputImage->getOrganType());
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());
