@@ -15,45 +15,30 @@
 		font-family: Arial, Helvetica, sans-serif;
 		font-size: 14px;
 		color: #333;
-		background: #f5f5f5;
+		background: #f0f4f4;
 	}
 
 	/* Header */
 	#header {
-		background: #1a3a5c;
-		color: white;
+		background: #ffffff;
+		border-bottom: 3px solid #1e6b65;
 		padding: 0;
 	}
 
 	#header-inner {
 		max-width: 960px;
 		margin: 0 auto;
-		padding: 16px 20px;
-		display: flex;
-		align-items: center;
-		gap: 16px;
+		padding: 12px 20px;
 	}
 
-	#header h1 {
-		font-size: 28px;
-		font-weight: bold;
-		letter-spacing: 1px;
-	}
-
-	#header h1 span {
-		color: #7ec8e3;
-	}
-
-	#header p {
-		font-size: 13px;
-		color: #cce0f0;
-		margin-top: 4px;
+	#header img {
+		height: 72px;
+		display: block;
 	}
 
 	/* Navigation */
 	#nav {
-		background: #2a5a8c;
-		border-bottom: 3px solid #1a3a5c;
+		background: #1e6b65;
 	}
 
 	#nav ul {
@@ -67,7 +52,7 @@
 	#nav ul li a {
 		display: block;
 		padding: 12px 20px;
-		color: #cce0f0;
+		color: #c8e8e6;
 		text-decoration: none;
 		font-size: 14px;
 		font-weight: bold;
@@ -76,8 +61,8 @@
 
 	#nav ul li a:hover,
 	#nav ul li a.active {
-		background: #1a3a5c;
-		color: white;
+		background: #155550;
+		color: #ffffff;
 	}
 
 	/* Content */
@@ -91,7 +76,7 @@
 	.tab-panel {
 		display: none;
 		background: white;
-		border: 1px solid #ddd;
+		border: 1px solid #c8dedd;
 		padding: 30px;
 		line-height: 1.7;
 	}
@@ -102,15 +87,15 @@
 
 	.tab-panel h2 {
 		font-size: 22px;
-		color: #1a3a5c;
+		color: #1e6b65;
 		margin-bottom: 16px;
 		padding-bottom: 8px;
-		border-bottom: 2px solid #2a5a8c;
+		border-bottom: 2px solid #2e8b84;
 	}
 
 	.tab-panel h3 {
 		font-size: 17px;
-		color: #2a5a8c;
+		color: #2e8b84;
 		margin-top: 24px;
 		margin-bottom: 10px;
 	}
@@ -130,7 +115,7 @@
 	}
 
 	.tab-panel a {
-		color: #2a5a8c;
+		color: #1e6b65;
 		text-decoration: none;
 	}
 
@@ -159,23 +144,23 @@
 	.doc-card {
 		flex: 1;
 		min-width: 200px;
-		border: 1px solid #2a5a8c;
+		border: 1px solid #2e8b84;
 		padding: 24px 20px;
 		text-align: center;
-		background: #f0f6fc;
+		background: #eef6f5;
 		border-radius: 4px;
 		transition: background 0.2s;
 	}
 
 	.doc-card:hover {
-		background: #dceefb;
+		background: #d6edeb;
 	}
 
 	.doc-card a {
 		display: block;
 		font-size: 16px;
 		font-weight: bold;
-		color: #1a3a5c;
+		color: #1e6b65;
 		text-decoration: none;
 	}
 
@@ -187,8 +172,8 @@
 
 	/* Contact section */
 	.contact-block {
-		background: #f0f6fc;
-		border: 1px solid #c0d8ee;
+		background: #eef6f5;
+		border: 1px solid #aad4d1;
 		padding: 20px 24px;
 		margin-top: 16px;
 		border-radius: 4px;
@@ -198,10 +183,41 @@
 		margin-bottom: 6px;
 	}
 
+	/* Downloads section */
+	.download-box {
+		background: #eef6f5;
+		border: 1px solid #2e8b84;
+		border-radius: 4px;
+		padding: 28px 24px;
+		margin-top: 20px;
+		text-align: center;
+	}
+
+	.download-box p {
+		margin-bottom: 20px;
+		font-size: 15px;
+	}
+
+	.download-btn {
+		display: inline-block;
+		background: #1e6b65;
+		color: #ffffff !important;
+		text-decoration: none !important;
+		padding: 12px 32px;
+		font-size: 15px;
+		font-weight: bold;
+		border-radius: 4px;
+		transition: background 0.2s;
+	}
+
+	.download-btn:hover {
+		background: #155550 !important;
+	}
+
 	/* Footer */
 	#footer {
-		background: #1a3a5c;
-		color: #aac4d8;
+		background: #1e6b65;
+		color: #a8d4d0;
 		text-align: center;
 		padding: 14px;
 		font-size: 12px;
@@ -213,10 +229,7 @@
 
 <div id="header">
 	<div id="header-inner">
-		<div>
-			<h1>Custusx</h1>
-			<p>An Open Source Research Platform for Image-Guided Intervention</p>
-		</div>
+		<img src="CustusX_full.png" alt="CustusX - Image-Guided Intervention">
 	</div>
 </div>
 
@@ -226,6 +239,7 @@
 		<li><a href="#" onclick="showTab('about', this); return false;">About</a></li>
 		<li><a href="#" onclick="showTab('developers', this); return false;">Developers</a></li>
 		<li><a href="#" onclick="showTab('documentation', this); return false;">Documentation</a></li>
+		<li><a href="#" onclick="showTab('downloads', this); return false;">Downloads</a></li>
 	</ul>
 </div>
 
@@ -315,7 +329,7 @@
 
 		<h3>Source Code</h3>
 		<p>
-			The source code is available on <a href="https://github.com/SINTEFMedtek/CustusX" target="_blank">GitHub</a>.
+			The source code is available on <a href="https://gitlab.sintef.no/custusx/CustusX" target="_blank">GitLab</a>.
 		</p>
 	</div>
 
@@ -326,7 +340,7 @@
 		<h3>Code</h3>
 		<p>
 			The source code is available on
-			<a href="https://github.com/SINTEFMedtek/CustusX" target="_blank">GitHub</a>.
+			<a href="https://gitlab.sintef.no/custusx/CustusX" target="_blank">GitLab</a>.
 			Build instructions are provided in the repository.
 		</p>
 		<p>
@@ -354,13 +368,13 @@
 			</li>
 			<li>
 				<strong>Bug reports:</strong> File issues at
-				<a href="https://github.com/SINTEFMedisinskTeknologi/CustusX/issues" target="_blank">GitHub Issues</a>
+				<a href="https://gitlab.sintef.no/custusx/CustusX/-/issues" target="_blank">GitLab Issues</a>
 			</li>
 		</ul>
 
 		<h3>Contribute</h3>
 		<p>
-			The project welcomes contributions through GitHub forks and pull requests.
+			The project welcomes contributions through GitLab forks and merge requests.
 			Developers can participate via the mailing list or answer questions on Stack Overflow.
 		</p>
 	</div>
@@ -379,6 +393,26 @@
 				<a href="/CustusX/developer_doc">Developer Documentation</a>
 				<p>API references, architecture overview, and instructions for extending CustusX.</p>
 			</div>
+		</div>
+	</div>
+
+	<!-- DOWNLOADS TAB -->
+	<div id="tab-downloads" class="tab-panel">
+		<h2>Downloads</h2>
+		<p>
+			CustusX releases are published on GitLab. Each release includes installers and release notes
+			describing what has changed.
+		</p>
+
+		<div class="disclaimer">
+			CustusX is a research tool: It is not intended for normal clinical use, and is not FDA nor CE approved.
+		</div>
+
+		<div class="download-box">
+			<p>Download the latest CustusX release from GitLab:</p>
+			<a class="download-btn" href="https://gitlab.sintef.no/custusx/CustusX/-/releases" target="_blank">
+				View Releases on GitLab
+			</a>
 		</div>
 	</div>
 
