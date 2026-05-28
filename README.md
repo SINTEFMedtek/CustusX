@@ -22,5 +22,5 @@ CustusX is written in C++ using CMake, Qt, CTK, VTK, ITK, Eigen, OpenCV, OpenIGT
 
 ## Contributors
 
-CustusX is maintained by [SINTEF Medical Technology](https://www.sintef.no/en/digital/departments/department-of-health-research/medical-technology/), in cooperation with the [MiDT reseach center](https://www.stolav.no/avdelinger/sentral-stab/utviklingsavdelingen/senter-for-innovasjon-medisinsk-utstyr-og-teknologi/midt/) ([St. Olavs Hospital](http://www.stolav.no/en/), [SINTEF](https://www.sintef.no/en/), [NTNU](http://www.ntnu.edu/)). 
+CustusX is maintained by [SINTEF Medical Technology](https://www.sintef.no/en/digital/departments/department-of-health-research/medical-technology/), in cooperation with the [Norwegian National Research Center for Minimally Invasive and Image-Guided Diagnostics and Therapy](https://www.stolav.no/avdelinger/sentral-stab/utviklingsavdelingen/senter-for-innovasjon-medisinsk-utstyr-og-teknologi/midt/) ([St. Olavs Hospital](http://www.stolav.no/en/), [SINTEF](https://www.sintef.no/en/), [NTNU](http://www.ntnu.edu/)). 
 
