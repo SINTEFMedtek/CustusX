@@ -223,7 +223,11 @@ void BranchList::smoothOrientations()
 		for (int j = 0; j < numberOfColumns; j++)
 		{
 			newOrientations.col(j) = orientations.block(0,std::max(j-2,0),orientations.rows(),std::min(5,numberOfColumns-j)).rowwise().mean(); //smoothing
-			newOrientations.col(j) = newOrientations.col(j) / newOrientations.col(j).norm(); // normalizing
+			double n = newOrientations.col(j).norm();
+			if (n > 1e-10)
+					newOrientations.col(j) = newOrientations.col(j)/n; // normalizing
+			else
+					newOrientations.col(j) = orientations.col(j); // fallback to original - avoid dividing by zero
 		}
 		mBranches[i]->setOrientations(newOrientations);
 	}

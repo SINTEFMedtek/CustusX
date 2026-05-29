@@ -100,8 +100,21 @@ void Branch::calculateOrientations()
 	}
 	Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
 	Eigen::MatrixXd orientations(numberOfRows,numberOfCols);
-	for (int i=0; i<numberOfCols-1; i++)
-		orientations.col(i) = diff.col(i) / diff.col(i).norm();
+	for (int i = 0; i < numberOfCols-1; i++)
+	{
+		double n = diff.col(i).norm();
+		if (n > 1e-10)
+			orientations.col(i) = diff.col(i) / n;
+		else
+		{// Two consecutive positions are identical; reuse the previous orientation
+			if (i > 0)
+				orientations.col(i) = orientations.col(i-1);
+			else
+				orientations.col(i) = Eigen::Vector3d::UnitZ(); // fallback: no previous orientation available
+		}
+	}
+
+
 	orientations.rightCols(1) = orientations.col(orientations.cols() - 2);
 	this->setOrientations(orientations);
 }
