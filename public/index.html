@@ -1,14 +1,413 @@
-<HTML>
+<!DOCTYPE html>
+<html lang="en">
 <HEAD>
-CustusX documentation
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CustusX - Image-Guided Intervention</title>
+<style>
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+
+	body {
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 14px;
+		color: #333;
+		background: #f0f4f4;
+	}
+
+	/* Header */
+	#header {
+		background: #ffffff;
+		border-bottom: 3px solid #1e6b65;
+		padding: 0;
+	}
+
+	#header-inner {
+		max-width: 960px;
+		margin: 0 auto;
+		padding: 12px 20px;
+	}
+
+	#header img {
+		height: 72px;
+		display: block;
+	}
+
+	/* Navigation */
+	#nav {
+		background: #1e6b65;
+	}
+
+	#nav ul {
+		max-width: 960px;
+		margin: 0 auto;
+		padding: 0 20px;
+		list-style: none;
+		display: flex;
+	}
+
+	#nav ul li a {
+		display: block;
+		padding: 12px 20px;
+		color: #c8e8e6;
+		text-decoration: none;
+		font-size: 14px;
+		font-weight: bold;
+		transition: background 0.2s, color 0.2s;
+	}
+
+	#nav ul li a:hover,
+	#nav ul li a.active {
+		background: #155550;
+		color: #ffffff;
+	}
+
+	/* Content */
+	#wrapper {
+		max-width: 960px;
+		margin: 0 auto;
+		padding: 20px;
+	}
+
+	/* Tab panels */
+	.tab-panel {
+		display: none;
+		background: white;
+		border: 1px solid #c8dedd;
+		padding: 30px;
+		line-height: 1.7;
+	}
+
+	.tab-panel.active {
+		display: block;
+	}
+
+	.tab-panel h2 {
+		font-size: 22px;
+		color: #1e6b65;
+		margin-bottom: 16px;
+		padding-bottom: 8px;
+		border-bottom: 2px solid #2e8b84;
+	}
+
+	.tab-panel h3 {
+		font-size: 17px;
+		color: #2e8b84;
+		margin-top: 24px;
+		margin-bottom: 10px;
+	}
+
+	.tab-panel p {
+		margin-bottom: 14px;
+		color: #444;
+	}
+
+	.tab-panel ul {
+		margin: 10px 0 14px 24px;
+		color: #444;
+	}
+
+	.tab-panel ul li {
+		margin-bottom: 6px;
+	}
+
+	.tab-panel a {
+		color: #1e6b65;
+		text-decoration: none;
+	}
+
+	.tab-panel a:hover {
+		text-decoration: underline;
+	}
+
+	/* Disclaimer box */
+	.disclaimer {
+		background: #fff8e1;
+		border-left: 4px solid #f0a500;
+		padding: 12px 16px;
+		margin: 20px 0;
+		font-style: italic;
+		color: #555;
+	}
+
+	/* Documentation cards */
+	.doc-cards {
+		display: flex;
+		gap: 20px;
+		margin-top: 20px;
+		flex-wrap: wrap;
+	}
+
+	.doc-card {
+		flex: 1;
+		min-width: 200px;
+		border: 1px solid #2e8b84;
+		padding: 24px 20px;
+		text-align: center;
+		background: #eef6f5;
+		border-radius: 4px;
+		transition: background 0.2s;
+	}
+
+	.doc-card:hover {
+		background: #d6edeb;
+	}
+
+	.doc-card a {
+		display: block;
+		font-size: 16px;
+		font-weight: bold;
+		color: #1e6b65;
+		text-decoration: none;
+	}
+
+	.doc-card p {
+		margin-top: 8px;
+		font-size: 13px;
+		color: #555;
+	}
+
+	/* Contact section */
+	.contact-block {
+		background: #eef6f5;
+		border: 1px solid #aad4d1;
+		padding: 20px 24px;
+		margin-top: 16px;
+		border-radius: 4px;
+	}
+
+	.contact-block p {
+		margin-bottom: 6px;
+	}
+
+	/* Downloads section */
+	.download-box {
+		background: #eef6f5;
+		border: 1px solid #2e8b84;
+		border-radius: 4px;
+		padding: 28px 24px;
+		margin-top: 20px;
+		text-align: center;
+	}
+
+	.download-box p {
+		margin-bottom: 20px;
+		font-size: 15px;
+	}
+
+	.download-btn {
+		display: inline-block;
+		background: #1e6b65;
+		color: #ffffff !important;
+		text-decoration: none !important;
+		padding: 12px 32px;
+		font-size: 15px;
+		font-weight: bold;
+		border-radius: 4px;
+		transition: background 0.2s;
+	}
+
+	.download-btn:hover {
+		background: #155550 !important;
+	}
+
+	/* Footer */
+	#footer {
+		background: #1e6b65;
+		color: #a8d4d0;
+		text-align: center;
+		padding: 14px;
+		font-size: 12px;
+		margin-top: 20px;
+	}
+</style>
 </HEAD>
 <BODY>
 
-<p>Select a type of documentation depending on your needs:</p>
-<ul>
-<li><a href="/CustusX/user_doc">User Documentation</a></li>
-<li><a href="/CustusX/developer_doc">Developer Documentation</a></li>
-</ul>
+<div id="header">
+	<div id="header-inner">
+		<img src="CustusX_full.png" alt="CustusX - Image-Guided Intervention">
+	</div>
+</div>
+
+<div id="nav">
+	<ul>
+		<li><a href="#" class="active" onclick="showTab('home', this); return false;">Home</a></li>
+		<li><a href="#" onclick="showTab('about', this); return false;">About</a></li>
+		<li><a href="#" onclick="showTab('documentation', this); return false;">Documentation</a></li>
+		<li><a href="#" onclick="showTab('downloads', this); return false;">Downloads</a></li>
+	</ul>
+</div>
+
+<div id="wrapper">
+
+	<!-- HOME TAB -->
+	<div id="tab-home" class="tab-panel active">
+		<img src="Lap_oversiktsbilde_1.jpg" alt="Image-guided surgery in the operating room"
+			style="width: 100%; display: block; margin-bottom: 24px;">
+		<h2>Image-Guided Intervention</h2>
+		<p>
+			CustusX is a Navigation System for Image-Guided Intervention developed by the team of clinicians
+			and engineers at the Norwegian National Competence Centre for Ultrasound and Image-Guided Therapy.
+			From its start fifteen years ago, CustusX has been used in different clinical areas like neuro-,
+			laparoscopic- and vascular surgery, interventional radiology and bronchoscopy. The navigation
+			system has been designed to merge and visualise information from multiple medical imaging
+			modalities, but with a focus on ultrasound and intra-procedure imaging.
+		</p>
+		<p>
+			The application and code is free to download and use under a BSD-3 license, which means it can
+			be used by everyone for any purpose.
+		</p>
+
+		<div class="disclaimer">
+			CustusX is a research tool: It is not intended for normal clinical use, and is not FDA nor CE approved.
+		</div>
+
+		<h3>Source Code</h3>
+		<p>
+			The source code is available on <a href="https://gitlab.sintef.no/custusx/CustusX" target="_blank">GitLab</a>.
+		</p>
+
+		<h3>Contact</h3>
+		<div class="contact-block">
+			<p><strong>SINTEF Digital</strong></p>
+			<p>Department of Health Research</p>
+			<p>Medical Technology</p>
+			<p>P.O. Box 4760 Torgarden</p>
+			<p>NO-7465 Trondheim</p>
+			<p>Norway</p>
+			<p style="margin-top: 10px;">
+				Web: <a href="https://www.sintef.no/en/medical-technology/" target="_blank">https://www.sintef.no/en/medical-technology/</a>
+			</p>
+		</div>
+	</div>
+
+	<!-- ABOUT TAB -->
+	<div id="tab-about" class="tab-panel">
+		<img src="fraxinus_image.jpg" alt="CustusX in clinical use"
+			style="width: 100%; display: block; margin-bottom: 24px;">
+		<h2>About CustusX</h2>
+		<p>
+			CustusX is specialized software designed as a Navigation System for Image-Guided Intervention.
+			It serves researchers in medical imaging and surgical navigation by integrating images, tracked
+			instruments, and display systems into a cohesive platform.
+		</p>
+		<p>
+			The system emphasizes intraoperative ultrasound applications, though it supports multiple imaging
+			modalities including CT, MRI, and fluoroscopy. It enables real-time tracking and visualization
+			of surgical instruments during minimally invasive procedures.
+		</p>
+		<p>
+			CustusX functions as both a customizable navigation platform and a development toolkit.
+			Researchers can conduct clinical studies or create specialized applications for particular
+			surgical procedures and imaging techniques.
+		</p>
+
+		<h3>License</h3>
+		<p>
+			The software is free to download and use under a
+			<a href="https://opensource.org/licenses/BSD-3-Clause" target="_blank">BSD-3 license</a>,
+			which means it can be used by anyone for any purpose.
+		</p>
+
+		<div class="disclaimer">
+			CustusX is intended for research only, and is not approved for routine clinical use in any way.
+			Any clinical research implementation requires appropriate regulatory approvals and safety
+			compliance from the end user.
+		</div>
+
+		<h3>Videos</h3>
+		<p>
+			Clinical use cases and demonstrations are available on the
+			<a href="https://www.youtube.com/channel/UCcb08NvLcoWphEc360F5D6w" target="_blank">USIGT YouTube channel</a>.
+		</p>
+
+		<h3>Acknowledgements</h3>
+		<p>
+			CustusX is developed and maintained by the Norwegian National Competence Centre for Ultrasound
+			and Image-Guided Therapy at SINTEF Medical Technology, in collaboration with clinicians and
+			engineers at St. Olavs Hospital, Trondheim University Hospital.
+		</p>
+		<p>
+			The project has received funding from the Norwegian Research Council and several EU projects.
+			Related applications built on the CustusX platform include
+			<a href="https://www.fraxinus.no" target="_blank">Fraxinus</a>,
+			<a href="https://normit.no" target="_blank">NorMIT-Nav</a>,
+			and NAVICAD.
+		</p>
+		<p>
+			When publishing scientific work that uses CustusX, please cite the following publication:
+		</p>
+		<p style="margin-left: 1.5em; border-left: 3px solid #2e8b84; padding-left: 1em; color: #333;">
+			Christian Askeland, Ole Vegard Solberg, Janne Beate Lervik Bakeng, Ingerid Reinertsen,
+			Geir Arne Tangen, Erlend Fagertun Hofstad, Daniel Høyer Iversen, Cecilie Våpenstad,
+			Tormod Selbekk, Thomas Langø, Toril A. Nagelhus Hernes, Håkon Olav Leira, Geirmund Unsgård,
+			Frank Lindseth.
+			<em>CustusX: an open-source research platform for image-guided therapy</em>,
+			International Journal of Computer Assisted Radiology and Surgery, 09/2015,
+			<a href="https://doi.org/10.1007/s11548-015-1292-0" target="_blank">DOI: 10.1007/s11548-015-1292-0</a>
+		</p>
+
+	</div>
+
+	<!-- DOCUMENTATION TAB -->
+	<div id="tab-documentation" class="tab-panel">
+		<h2>Documentation</h2>
+		<p>Select a type of documentation depending on your needs:</p>
+
+		<div class="doc-cards">
+			<div class="doc-card">
+				<a href="https://custusx.pages.sintef.no/CustusX/user_doc/">User Documentation</a>
+				<p>Guides and references for using CustusX in your research workflow.</p>
+			</div>
+			<div class="doc-card">
+				<a href="https://custusx.pages.sintef.no/CustusX/developer_doc/">Developer Documentation</a>
+				<p>API references, architecture overview, and instructions for extending CustusX.</p>
+			</div>
+		</div>
+	</div>
+
+	<!-- DOWNLOADS TAB -->
+	<div id="tab-downloads" class="tab-panel">
+		<h2>Downloads</h2>
+		<p>
+			CustusX releases are published on GitLab. Each release includes installers and release notes
+			describing what has changed.
+		</p>
+
+		<div class="disclaimer">
+			CustusX is a research tool: It is not intended for normal clinical use, and is not FDA nor CE approved.
+		</div>
+
+		<div class="download-box">
+			<p>Download the latest CustusX release from GitLab:</p>
+			<a class="download-btn" href="https://gitlab.sintef.no/custusx/CustusX/-/releases" target="_blank">
+				View Releases on GitLab
+			</a>
+		</div>
+	</div>
+
+</div><!-- /wrapper -->
+
+<div id="footer">
+	&copy; SINTEF &mdash; CustusX is a research tool and is not intended for normal clinical use.
+</div>
+
+<script>
+	function showTab(name, link) {
+		document.querySelectorAll('.tab-panel').forEach(function(p) {
+			p.classList.remove('active');
+		});
+		document.querySelectorAll('#nav a').forEach(function(a) {
+			a.classList.remove('active');
+		});
+		document.getElementById('tab-' + name).classList.add('active');
+		link.classList.add('active');
+	}
+</script>
 
 </BODY>
 </HTML>
