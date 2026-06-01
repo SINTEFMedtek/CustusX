@@ -1,7 +1,7 @@
 Installation {#installation}
 ===================
 
-The easiest way to install is to use the installers from the [website](http://custusx.org/index.php/downloads). Check out the \ref supported_platforms.
+The easiest way to install is to use the installers from the [releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases). Check out the \ref supported_platforms.
 
 Hardware setup:
 ---------------
