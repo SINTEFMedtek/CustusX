@@ -86,7 +86,7 @@ QPixmap ScreenShotImageWriter::grab(unsigned screenid)
 //		name.replace("\\", "");
 //		name.replace(".", "");
 //	}
-	QPixmap pixmap = screens[screenid]->grabWindow(0, geo.left(), geo.top(), geo.width(), geo.height());
+	QPixmap pixmap = screens[screenid]->grabWindow(0, 0, 0, geo.width(), geo.height());
 	return pixmap;
 }
 
