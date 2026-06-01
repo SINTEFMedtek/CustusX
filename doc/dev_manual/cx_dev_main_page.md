@@ -21,5 +21,5 @@ From the user documentation:
 * \ref definitions
 * \ref plugins
 
-See also <http://custusx.org/uploads/user_doc/nightly/>.
+See also <https://custusx.pages.sintef.no/CustusX/user_doc/>.
 
