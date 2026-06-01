@@ -12,15 +12,10 @@
 # rebuilding from source. If no package is found, they fall back to a full
 # rebuild and upload the result so the next run can reuse it.
 
-.build-and-publish-libs:
-  stage: build-libs
-  variables:
-    OS: OS
-    BASE_DIR: /builds/$OS
-    GIT_CLONE_PATH: /builds/$OS/CX/CX
-    BUILD_IGSTK: "false"
+# Shared script steps for computing IGSTK variant flags and package coordinates.
+# Referenced by both .build-and-publish-libs (this file) and .reuse-build (build.yml).
+.lib-package-vars:
   script:
-    # Set IGSTK variant variables
     - |
       if [ "${BUILD_IGSTK}" = "true" ]; then
         IGSTK_SUFFIX="igstk"
@@ -30,6 +25,7 @@
         IGSTK_SUFFIX="noigstk"
         IGSTK_FLAG=""
         IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+        rm -rf $BASE_DIR/IGSTK
       fi
     - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
     - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
@@ -37,6 +33,16 @@
     - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${IGSTK_SUFFIX}-${LIBS_HASH}"
     - PACKAGE_FILE="cx-external-libs-${OS}-${IGSTK_SUFFIX}.tar.gz"
     - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
+
+.build-and-publish-libs:
+  stage: build-libs
+  variables:
+    OS: OS
+    BASE_DIR: /builds/$OS
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
+    BUILD_IGSTK: "false"
+  script:
+    - !reference [.lib-package-vars, script]
     - echo "Libs package version $PACKAGE_VERSION"
     - |
       HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \

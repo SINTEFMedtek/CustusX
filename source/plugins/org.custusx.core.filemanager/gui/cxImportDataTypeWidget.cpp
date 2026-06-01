@@ -96,7 +96,8 @@ ImportDataTypeWidget::ImportDataTypeWidget(ImportWidget *parent, VisServicesPtr 
 	mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
-	mTableWidget->setGeometry(QGuiApplication::primaryScreen()->geometry());
+	if (QScreen* primaryScreen = QGuiApplication::primaryScreen())
+		mTableWidget->setGeometry(primaryScreen->geometry());
 	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportDataTypeWidget::tableItemSelected);
 
 	mCheckBoxWidgetCT = this->createCheckbox("CT");
@@ -698,7 +699,8 @@ QTableWidget* ImportDataTypeWidget::getSimpleTableWidget()
 	simpleTableWidget->setSelectionMode(QAbstractItemView::NoSelection);
 	simpleTableWidget->setShowGrid(true);
 	simpleTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
-	simpleTableWidget->setGeometry(QGuiApplication::primaryScreen()->geometry());
+	if (QScreen* primaryScreen = QGuiApplication::primaryScreen())
+		simpleTableWidget->setGeometry(primaryScreen->geometry());
 
 
 	simpleTableWidget->setRowCount(mTableWidget->rowCount());

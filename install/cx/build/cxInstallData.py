@@ -122,7 +122,7 @@ class Common(object):
 
     def getArgParser_core_build(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
+        p.add_argument('-j', '--threads', type=int, default=self.threads, dest='threads', help='Number of make threads, default=%d' % self.threads)
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out core repositories. None means checkout default branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type, default=%s'%self.build_type)
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')

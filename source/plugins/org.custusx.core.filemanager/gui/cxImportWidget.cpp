@@ -200,7 +200,8 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
-	mTableWidget->setGeometry(QGuiApplication::primaryScreen()->geometry());
+	if (QScreen* primaryScreen = QGuiApplication::primaryScreen())
+		mTableWidget->setGeometry(primaryScreen->geometry());
 	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportWidget::tableItemSelected);
 
 	mStackedWidget = new QStackedWidget;

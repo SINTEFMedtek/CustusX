@@ -38,27 +38,8 @@
   before_script:
   - ls $BASE_DIR
   - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
-  # Set IGSTK variant variables. Must come first so cleanup below is conditional.
-  - |
-    if [ "${BUILD_IGSTK}" = "true" ]; then
-      IGSTK_SUFFIX="igstk"
-      IGSTK_FLAG="--igstk"
-      IGSTK_LIBS="eigen VTK ITK IGSTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
-    else
-      IGSTK_SUFFIX="noigstk"
-      IGSTK_FLAG=""
-      IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
-      rm -rf $BASE_DIR/IGSTK  # not used in this build; remove stale dir from old agents
-    fi
+  - !reference [.lib-package-vars, script]
   - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true
-  # Compute a version key that changes when library versions (cxComponents.py),
-  # the Docker image, or the IGSTK variant changes.
-  - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
-  - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
-  - PACKAGE_NAME="custusx-external-libs"
-  - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${IGSTK_SUFFIX}-${LIBS_HASH}"
-  - PACKAGE_FILE="cx-external-libs-${OS}-${IGSTK_SUFFIX}.tar.gz"
-  - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
   - LIBS_SENTINEL="$BASE_DIR/.lib_version_${PACKAGE_VERSION}"
   - echo "Libs package version $PACKAGE_VERSION"
   # Try to use prebuilt libs: local cache first, then Package Registry, then full rebuild.

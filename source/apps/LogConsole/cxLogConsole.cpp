@@ -52,7 +52,10 @@ void LogConsole::initializeGeometry()
 
 void LogConsole::setDefaultGeometry()
 {
-	QRect screen = QGuiApplication::primaryScreen()->geometry();
+	QScreen* primaryScreen = QGuiApplication::primaryScreen();
+	if (!primaryScreen)
+		return;
+	QRect screen = primaryScreen->geometry();
 	screen.adjust(screen.width()*0.5, screen.height()*0.25, 0, 0);
 	this->setGeometry(screen);
 }
