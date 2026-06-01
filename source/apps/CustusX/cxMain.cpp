@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX/CustusX.png"));
   app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
-  cx::DataLocations::setWebsiteURL("http://www.custusx.org");
+  cx::DataLocations::setWebsiteURL("custusx.pages.sintef.no/CustusX/");
   cx::ApplicationComponentPtr mainwindow(new cx::MainWindowApplicationComponent<cx::MainWindow>());
   cx::LogicManager::initialize(mainwindow);
 
