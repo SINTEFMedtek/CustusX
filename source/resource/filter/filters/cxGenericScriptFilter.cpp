@@ -276,9 +276,6 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	case seStandard:
 		return standardCommandString(variables);
 		break;
-	case seDeepSintef:
-		return deepSintefCommandString(variables);
-		break;
 	case seRaidionics:
 		if(mRaidionicsUtilities)
 			command =  mRaidionicsUtilities->raidionicsCommandString();
@@ -404,9 +401,7 @@ bool GenericScriptFilter::isUsingRaidionicsEngine()
 
 bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 {
-	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
-		mScriptEngine = seDeepSintef;
-	else if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
+	if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
 	{
 		if(!this->initRaidionicsEngine(variables))
 			return false;
@@ -425,22 +420,6 @@ bool GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
 		return false;
 	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, mOutputClasses));
 	return true;
-}
-
-QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
-{
-	QString commandString = variables.envPath;
-	commandString.append(" " + findScriptFile(variables.scriptFilePath));
-	commandString.append(" --Task database --Arguments ");
-	commandString.append("\"");
-	commandString.append("InputVolume ");
-	commandString.append(variables.inputFilePath);
-	commandString.append(",OutputLabel ");
-	commandString.append(variables.outputFilePath);
-	commandString.append(",ModelsList ");
-	commandString.append(variables.model);
-	commandString.append("\"");
-	return commandString;
 }
 
 bool GenericScriptFilter::environmentExist(QString path)

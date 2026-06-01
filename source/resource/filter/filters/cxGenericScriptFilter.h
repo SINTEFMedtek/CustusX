@@ -67,7 +67,6 @@ public:
 	{
 		seUnknown,
 		seStandard,
-		seDeepSintef,
 		seRaidionics,
 		seTotalSegmentator,
 		seCOUNT
@@ -118,8 +117,6 @@ protected:
 	QString standardCommandString(CommandStringVariables variables);
 	QString findScriptFile(QString path);
 	bool isUsingRaidionicsEngine();
-	QString deepSintefCommandString(CommandStringVariables variables);
-	
 	bool environmentExist(QString path);
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
