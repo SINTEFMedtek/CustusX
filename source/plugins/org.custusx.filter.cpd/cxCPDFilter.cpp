@@ -143,29 +143,19 @@ bool CPDFilter::readTransform(const QString& filePath, Transform3D& deltaRMd)
 
 	for (int row = 0; row < 3; ++row)
 	{
-		QString line = stream.readLine().trimmed();
-        QStringList parts = line.split(" ", QString::SkipEmptyParts);
-		if (parts.size() < 3)
+		stream >> R(row, 0) >> R(row, 1) >> R(row, 2);
+		if (stream.status() != QTextStream::Ok)
 		{
 			CX_LOG_ERROR() << "CPDFilter: Malformed transform file at R row " << row;
 			return false;
 		}
-		R(row, 0) = parts[0].toDouble();
-		R(row, 1) = parts[1].toDouble();
-		R(row, 2) = parts[2].toDouble();
 	}
 
+	stream >> t(0) >> t(1) >> t(2);
+	if (stream.status() != QTextStream::Ok)
 	{
-		QString line = stream.readLine().trimmed();
-        QStringList parts = line.split(" ", QString::SkipEmptyParts);
-		if (parts.size() < 3)
-		{
-			CX_LOG_ERROR() << "CPDFilter: Malformed transform file for translation";
-			return false;
-		}
-		t(0) = parts[0].toDouble();
-		t(1) = parts[1].toDouble();
-		t(2) = parts[2].toDouble();
+		CX_LOG_ERROR() << "CPDFilter: Malformed transform file for translation";
+		return false;
 	}
 
 	deltaRMd.setIdentity();

@@ -138,21 +138,21 @@ TEST_CASE("CPDFilter: writeMeshPoints writes correct point coordinates", "[unit]
 	REQUIRE(file.open(QIODevice::ReadOnly | QIODevice::Text));
 	QTextStream stream(&file);
 
+	double x, y, z;
+
 	// First point
-	QString line = stream.readLine();
-	QStringList parts = line.trimmed().split(" ", Qt::SkipEmptyParts);
-	REQUIRE(parts.size() == 3);
-	CHECK(parts[0].toDouble() == Approx(1.0));
-	CHECK(parts[1].toDouble() == Approx(2.0));
-	CHECK(parts[2].toDouble() == Approx(3.0));
+	stream >> x >> y >> z;
+	REQUIRE(stream.status() == QTextStream::Ok);
+	CHECK(x == Approx(1.0));
+	CHECK(y == Approx(2.0));
+	CHECK(z == Approx(3.0));
 
 	// Second point
-	line = stream.readLine();
-	parts = line.trimmed().split(" ", Qt::SkipEmptyParts);
-	REQUIRE(parts.size() == 3);
-	CHECK(parts[0].toDouble() == Approx(4.5));
-	CHECK(parts[1].toDouble() == Approx(-6.0));
-	CHECK(parts[2].toDouble() == Approx(0.0));
+	stream >> x >> y >> z;
+	REQUIRE(stream.status() == QTextStream::Ok);
+	CHECK(x == Approx(4.5));
+	CHECK(y == Approx(-6.0));
+	CHECK(z == Approx(0.0));
 
 	cx::LogicManager::shutdown();
 }
