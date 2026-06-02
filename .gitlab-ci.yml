@@ -4,6 +4,7 @@ default:
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
 
 stages:
+  - build-libs
   - build
   - test
   - deploy
@@ -15,6 +16,7 @@ variables:
   IMAGE_UBUNTU2404: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.02"
 
 include:
+  - local: '.gitlab/ci/external-libs.yml'
   - local: '.gitlab/ci/build.yml'
   - local: '.gitlab/ci/test.yml'
   - local: '.gitlab/ci/deploy.yml'

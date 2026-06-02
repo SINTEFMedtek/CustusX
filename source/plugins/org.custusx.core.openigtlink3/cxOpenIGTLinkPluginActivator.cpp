@@ -43,7 +43,7 @@ void OpenIGTLinkPluginActivator::start(ctkPluginContext* context)
 	mNetworkHandler.reset(new NetworkHandler(logic));
 	OpenIGTLink3GuiExtenderService* gui = new OpenIGTLink3GuiExtenderService(context, logic);
 
-	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mNetworkHandler);
+	OpenIGTLinkTrackingSystemService* tracking = new OpenIGTLinkTrackingSystemService(mNetworkHandler, trackingService);
 	OpenIGTLinkStreamerService *streamer = new OpenIGTLinkStreamerService(mNetworkHandler, trackingService);
 
 	mRegistrationGui = RegisteredService::create<OpenIGTLink3GuiExtenderService>(context, gui, GUIExtenderService_iid);

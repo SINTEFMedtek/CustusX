@@ -10,6 +10,7 @@
     BASE_DIR: /builds/$OS
     GIT_CLONE_PATH: /builds/$OS/CX/CX #Changes CI_PROJECT_DIR
     BUILD_DIR: $CI_PROJECT_DIR/../build_Release
+    BUILD_IGSTK: "false"
 
 .create-installer:
   script:
@@ -35,19 +36,55 @@
     - .build-variables
     - .create-installer
   before_script:
-  - echo "Run cxInstaller.py"
   - ls $BASE_DIR
-  # Use commit tag if existing, otherwise use branch
   - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
-  - rm -rf $BASE_DIR/IGSTK  # IGSTK removed from build; clean up old agents
-  - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true  # Remove stale IGSTK plugin artifacts from previous builds
-  # Reuse previous library build folders if the correct library versions are already built.
-  # Using version-specific paths so agents with outdated libraries automatically do a full rebuild once.
-  - test -f $BASE_DIR/VTK/build_Release/lib/cmake/vtk-9.6/VTKConfig.cmake
-      && test -d $BASE_DIR/ITK/build_Release/lib/cmake/ITK-5.4
-      && eval ./install/cxInstaller.py -s --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
-      components CustusX
-      || eval ./install/cxInstaller.py -s --all --full -t Release --user_doc --developer_doc --main_branch $CX_COMMIT --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+  - !reference [.lib-package-vars, script]
+  - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true
+  - LIBS_SENTINEL="$BASE_DIR/.lib_version_${PACKAGE_VERSION}"
+  - echo "Libs package version $PACKAGE_VERSION"
+  # Try to use prebuilt libs: local cache first, then Package Registry, then full rebuild.
+  # All cd $BASE_DIR calls use subshells to keep the working directory at CI_PROJECT_DIR.
+  - |
+    LIBS_READY=false
+    if [ -f "$LIBS_SENTINEL" ]; then
+      echo "Lib cache hit: $LIBS_SENTINEL"
+      LIBS_READY=true
+    else
+      echo "Lib cache miss, checking Package Registry..."
+      HTTP_CODE=$(curl -s -o /tmp/$PACKAGE_FILE -w "%{http_code}" \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
+      if [ "$HTTP_CODE" = "200" ]; then
+        echo "Downloaded prebuilt libs, extracting to $BASE_DIR..."
+        ( cd $BASE_DIR && rm -rf $IGSTK_LIBS && tar -xzf /tmp/$PACKAGE_FILE )
+        rm -f $BASE_DIR/.lib_version_*
+        touch "$LIBS_SENTINEL"
+        LIBS_READY=true
+      else
+        echo "Package not found (HTTP $HTTP_CODE), will build all from scratch."
+      fi
+    fi
+  - |
+    if [ "$LIBS_READY" = "true" ]; then
+      echo "Building CustusX only..."
+      eval ./install/cxInstaller.py -s --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+        --main_branch $CX_COMMIT \
+        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
+        components CustusX
+    else
+      echo "Full build (all external libs + CustusX)..."
+      eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+        --main_branch $CX_COMMIT \
+        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+      echo "Uploading libs to Package Registry for future runs..."
+      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
+        --exclude='*/CMakeFiles' \
+        --exclude='*/.git' \
+        $IGSTK_LIBS )
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL" || true
+      rm -f $BASE_DIR/.lib_version_*
+      touch "$LIBS_SENTINEL"
+    fi
 
 build-ubuntu20:
   extends: .reuse-build

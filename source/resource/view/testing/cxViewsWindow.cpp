@@ -20,9 +20,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "vtkCamera.h"
 #include "cxBoundingBox3D.h"
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QGuiApplication>
 #include <QScreen>
 
 namespace cxtest
@@ -50,10 +50,7 @@ void ViewsWindow::clearLayoutWidget()
 
 void ViewsWindow::setNiceSize()
 {
-	QDesktopWidget* desktop = dynamic_cast<QApplication*>(QApplication::instance())->desktop();
-	 QScreen* screen__ = qApp->screens()[0];
-	//	 std::cout << "dpr " << screen__->devicePixelRatio() << std::endl;
-	QRect screen = desktop->screenGeometry(desktop->primaryScreen());
+	QRect screen = QGuiApplication::primaryScreen()->geometry();
 	//	std::cout << "screen: w=" << screen.width() << ", h=" << screen.height() << std::endl;
 	screen.adjust(screen.width()*0.15, screen.height()*0.15, -screen.width()*0.15, -screen.height()*0.15);
 	this->setGeometry(screen);

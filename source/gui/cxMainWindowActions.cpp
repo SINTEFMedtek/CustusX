@@ -5,7 +5,6 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QApplication>
 #include <QDesktopServices>
@@ -499,7 +498,26 @@ void MainWindowActions::importDataSlot(QString actionText)
 
 void MainWindowActions::shootScreen()
 {
-	mScreenShotWriter->grabAllScreensToFile();
+	QWidget* mainWindow = this->parentWidget();
+	QList<QWidget*> windows;
+	windows.append(mainWindow);
+
+	int index = 1;
+	QWidget* layoutWidget = mServices->view()->getLayoutWidget(index);
+	while (layoutWidget)
+	{
+		QWidget* window = layoutWidget->window();
+		if (!windows.contains(window))
+			windows.append(window);
+		layoutWidget = mServices->view()->getLayoutWidget(++index);
+	}
+
+	for (int i = 0; i < windows.size(); ++i)
+	{
+		QPixmap pm = windows[i]->grab();
+		QString id = (windows.size() > 1) ? QString::number(i) : "";
+		mScreenShotWriter->save(pm.toImage(), id);
+	}
 }
 
 void MainWindowActions::shootWindow()

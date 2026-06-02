@@ -373,14 +373,14 @@ public:
 
 GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume)
 {
-	std::auto_ptr<GPUImageDataBufferImpl> retval(new GPUImageDataBufferImpl);
+	std::unique_ptr<GPUImageDataBufferImpl> retval(new GPUImageDataBufferImpl);
 	retval->SetImage(volume);
 	return GPUImageDataBufferPtr(retval.release());
 }
 
 GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut)
 {
-	std::auto_ptr<GPUImageLutBufferImpl> retval(new GPUImageLutBufferImpl);
+	std::unique_ptr<GPUImageLutBufferImpl> retval(new GPUImageLutBufferImpl);
 	retval->SetColorMap(lut);
 	return GPUImageLutBufferPtr(retval.release());
 }

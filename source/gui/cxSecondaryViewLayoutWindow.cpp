@@ -13,7 +13,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include <iostream>
 #include "cxTypeConversions.h"
 #include "cxViewService.h"
@@ -49,18 +50,18 @@ void SecondaryViewLayoutWindow::tryShowOnSecondaryScreen()
 
 	int bestScreen = this->findSmallestSecondaryScreen();
 
-	QDesktopWidget* desktop = QApplication::desktop();
+	QList<QScreen*> screens = QGuiApplication::screens();
 
-	if (desktop->primaryScreen()==bestScreen)
+	if (bestScreen >= screens.size() || screens[bestScreen] == QGuiApplication::primaryScreen())
 	{
 		report(QString("No secondary screen found. Displaying secondary view layout on primary screen."));
 	}
 	else
 	{
-		QRect rect = desktop->screenGeometry(bestScreen);
+		QRect rect = screens[bestScreen]->geometry();
 		report(QString("Displaying secondary view layout on fullscreen %1 of %2, size=[%3]")
 								   .arg(bestScreen+1)
-								   .arg(desktop->screenCount())
+								   .arg(screens.size())
 								   .arg(this->toString(rect)));
 		this->setGeometry(rect);
 		this->move(rect.topLeft());
@@ -70,18 +71,19 @@ void SecondaryViewLayoutWindow::tryShowOnSecondaryScreen()
 
 int SecondaryViewLayoutWindow::findSmallestSecondaryScreen()
 {
-	QDesktopWidget* desktop = QApplication::desktop();
+	QList<QScreen*> screens = QGuiApplication::screens();
+	QScreen* primary = QGuiApplication::primaryScreen();
 
 	int best = 0;
-	for (int i=1; i<desktop->screenCount(); ++i)
+	for (int i=1; i<screens.size(); ++i)
 	{
-		if (desktop->primaryScreen()==i)
+		if (screens[i] == primary)
 			continue;
-		QRect last = desktop->screenGeometry(best);
-		QRect current = desktop->screenGeometry(i);
+		QRect last = screens[best]->geometry();
+		QRect current = screens[i]->geometry();
 		if (current.height()*current.width() < last.height()*last.width())
 			best = i;
-		if (desktop->primaryScreen()==best)
+		if (screens[best] == primary)
 			best = i;
 	}
 

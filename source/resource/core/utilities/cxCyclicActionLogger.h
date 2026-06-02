@@ -14,7 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxResourceExport.h"
 
 #include "boost/shared_ptr.hpp"
-#include <QTime>
+#include <QElapsedTimer>
+#include <QString>
 #include <vector>
 
 namespace cx
@@ -59,9 +60,9 @@ private:
 		std::vector<double> time;
 	};
 	std::vector<Entry> mTiming;
-	QTime mRenderClock; ///< clock for counting time between and inside renderings
+	QElapsedTimer mRenderClock; ///< clock for counting time between and inside renderings
 	int mInterval; ///< the interval between each readout+reset of the calculated values.
-	QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
+	QElapsedTimer mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
 
 	double getMeanTime(std::vector<double> &time);
 	double getMaxTime(std::vector<double> &time);

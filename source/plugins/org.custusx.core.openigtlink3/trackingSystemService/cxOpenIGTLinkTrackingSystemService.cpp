@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLogger.h"
 #include "cxOpenIGTLinkTool.h"
 #include "cxProfile.h"
-
 #include "cxToolConfigurationParser.h"
 #include "cxTrackerConfigurationImpl.h"
 
@@ -34,8 +33,10 @@ std::vector<ToolPtr> toVector(std::map<QString, OpenIGTLinkToolPtr> map, ToolPtr
 	return retval;
 }
 
-OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler) :
-	mNetworkHandler(networkHandler)
+OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService) :
+	mNetworkHandler(networkHandler),
+	mTrackingService(trackingService),
+	mLastTrackingState(Tool::tsNONE)
 {
 	if(mNetworkHandler == NULL)
 		return;
@@ -47,6 +48,11 @@ OpenIGTLinkTrackingSystemService::OpenIGTLinkTrackingSystemService(NetworkHandle
 	connect(mNetworkHandler.get(), &NetworkHandler::probedefinition, this, &OpenIGTLinkTrackingSystemService::receiveProbedefinition);
 
 	connect(this, &OpenIGTLinkTrackingSystemService::setInternalState, this, &OpenIGTLinkTrackingSystemService::internalSetState);
+
+	if (mTrackingService)
+		connect(mTrackingService.get(), &TrackingService::stateChanged,
+				this, &OpenIGTLinkTrackingSystemService::applyPendingProbeDefinitions,
+				Qt::QueuedConnection);
 
 	this->setConfigurationFile(profile()->getToolConfigFilePath());
 }
@@ -198,22 +204,79 @@ void OpenIGTLinkTrackingSystemService::receiveCalibration(QString devicename, Tr
 		tool->setCalibration_sMt(calibration);
 }
 
+void OpenIGTLinkTrackingSystemService::applyProbeDefinition(ToolPtr tool, ProbeDefinitionPtr definition)
+{
+	ProbePtr probe = tool->getProbe();
+	if (probe)
+	{
+		ProbeDefinition old_def = probe->getProbeDefinition();
+		definition->setUid(old_def.getUid());
+		definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
+		probe->setProbeDefinition(*(definition.get()));
+		emit stateChanged();
+	}
+}
+
 //Used by probe tool. See also OpenIGTLinkStreamer::receiveProbedefinition() for RT view
 void OpenIGTLinkTrackingSystemService::receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition)
 {
-	OpenIGTLinkToolPtr tool = this->getTool(devicename);
-	if(tool)
+	OpenIGTLinkToolPtr ownTool = this->getTool(devicename);
+	if (ownTool)
 	{
-		ProbePtr probe = tool->getProbe();
-		if(probe)
+		applyProbeDefinition(ownTool, definition);
+	}
+	else if (mTrackingService)
+	{
+		bool applied = false;
+		std::map<QString, ToolPtr> allTools = mTrackingService->getTools();
+		for (std::pair<const QString, ToolPtr>& kv : allTools)
 		{
-			ProbeDefinition old_def = probe->getProbeDefinition();
-			definition->setUid(old_def.getUid());
-			definition->applySoundSpeedCompensationFactor(old_def.getSoundSpeedCompensationFactor());
-
-			probe->setProbeDefinition(*(definition.get()));
-			emit stateChanged();
+			if (kv.second->getOpenIGTLinkImageId().compare(devicename, Qt::CaseInsensitive) == 0)
+			{
+				applyProbeDefinition(kv.second, definition);
+				applied = true;
+				break;
+			}
 		}
+		if (!applied)
+			mPendingProbeDefinitions[devicename] = definition;
+	}
+}
+
+void OpenIGTLinkTrackingSystemService::applyPendingProbeDefinitions()
+{
+	if (!mTrackingService)
+		return;
+
+	Tool::State currentState = mTrackingService->getState();
+	bool trackingStarted = (currentState == Tool::tsTRACKING && mLastTrackingState != Tool::tsTRACKING);
+	mLastTrackingState = currentState;
+
+	if (trackingStarted && mNetworkHandler)
+		mNetworkHandler->resendProbedefinition();
+
+	if (mPendingProbeDefinitions.empty())
+		return;
+
+	std::map<QString, ToolPtr> allTools = mTrackingService->getTools();
+	std::map<QString, ProbeDefinitionPtr>::iterator it = mPendingProbeDefinitions.begin();
+	while (it != mPendingProbeDefinitions.end())
+	{
+		bool applied = false;
+		for (std::pair<const QString, ToolPtr>& kv : allTools)
+		{
+			if (kv.second->getOpenIGTLinkImageId().compare(it->first, Qt::CaseInsensitive) == 0)
+			{
+				ProbeDefinitionPtr definition = it->second;
+				ToolPtr tool = kv.second;
+				it = mPendingProbeDefinitions.erase(it);
+				applyProbeDefinition(tool, definition);
+				applied = true;
+				break;
+			}
+		}
+		if (!applied)
+			++it;
 	}
 }
 

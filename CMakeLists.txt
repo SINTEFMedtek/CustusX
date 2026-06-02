@@ -9,6 +9,8 @@ project(CustusX)
 #### Enable C++14
 set (CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # kill warning about mixing full and partial paths in libs:
 # http://www.cmake.org/cmake/help/v2.8.10/cmake.html#policy%3aCMP0003
 if(COMMAND cmake_policy)

@@ -13,7 +13,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPixmap>
 #include "cxPatientModelService.h"
 #include <QtConcurrent>
-#include <QDesktopWidget>
 #include <QApplication>
 #include "cxReporter.h"
 #include "boost/bind/bind.hpp"

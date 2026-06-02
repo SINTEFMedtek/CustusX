@@ -129,7 +129,7 @@ void forceNewlineBeforeEof(QString path)
 	{
 		CX_LOG_WARNING() << "File does not end with whitespace, adding newline to the file: " << path;
 		QTextStream out(&the_file);
-		out << endl;
+		out << "\n";
 	}
 	the_file.close();
 

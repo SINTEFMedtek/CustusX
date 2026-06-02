@@ -71,8 +71,8 @@ public:
 	void connectTestSlotsAndTurnOffOtherReporting()
 	{
 		mCommandLine->turnOffReporting();
-		disconnect(mCommandLine->getProcess(), &QProcess::readyReadStandardOutput, this, &cxtest::TestGenericScriptFilter::processReadyRead);
-		connect(this->getProcessWrapper()->getProcess(), &QProcess::readyReadStandardOutput, this, &cxtest::TestGenericScriptFilter::testProcessReadyRead);
+		disconnect(mCommandLine->getProcess(), &QProcess::readyRead, this, &cxtest::TestGenericScriptFilter::processReadyRead);
+		connect(this->getProcessWrapper()->getProcess(), &QProcess::readyRead, this, &cxtest::TestGenericScriptFilter::testProcessReadyRead);
 	}
 	bool testReadGeneratedSegmentationFile()
 	{
@@ -407,7 +407,7 @@ TEST_CASE("GenericScriptFilter: Detailed test of option adapters", "[unit]")
 	REQUIRE(scriptSelectorOption);
 }
 
-TEST_CASE("GenericScriptFilter: Test running of external process", "[integration][hide]")
+TEST_CASE("GenericScriptFilter: Test running of external process", "[unit]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 
@@ -431,7 +431,7 @@ TEST_CASE("GenericScriptFilter: Test ProcessWrapper simple usage", "[unit][not_w
 	REQUIRE(exe->waitForFinished());
 }
 
-TEST_CASE("GenericScriptFilter: Get output from process", "[integration][hide]")
+TEST_CASE("GenericScriptFilter: Get output from process", "[unit]")
 {
 	cxtest::TestGenericScriptFilterPtr filter(new cxtest::TestGenericScriptFilter());
 	QString validCommand("echo  test");
@@ -716,7 +716,7 @@ TEST_CASE("Raidionics: target conversion", "[unit]")
 }
 
 #ifdef CX_CUSTUS_SINTEF
-TEST_CASE("GenericScriptFilter: Create environment", "[integration][not_win32][not_win64][hide]")
+TEST_CASE("GenericScriptFilter: Create environment", "[not_win32][not_win64][hide]")
 {
 	cx::LogicManager::initialize();
 	cx::DataLocations::setTestMode();

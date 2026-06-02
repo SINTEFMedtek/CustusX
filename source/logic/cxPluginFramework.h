@@ -58,7 +58,7 @@ public:
 	void install(const QString& symbolicName);
 	void uninstall(const QString& symbolicName);
 	bool start(const QString& symbolicName, ctkPlugin::StartOptions options = ctkPlugin::START_ACTIVATION_POLICY);
-	bool stop(const QString& symbolicName, ctkPlugin::StopOptions options = 0);
+	bool stop(const QString& symbolicName, ctkPlugin::StopOptions options = {});
 	bool start();
 	bool stop();
 
@@ -82,6 +82,7 @@ private:
 	QStringList getPluginSymbolicNames(const QString& searchPath);
 	bool nameIsProbablyPlugin(QString name) const;
 	std::vector<PluginFrameworkManager::PluginLoadInfo> getPluginLoadInfo(QStringList symbolicNames);
+	bool getEnabledPluginsFromManifest(QStringList& enabledPlugins);
 
 	QScopedPointer<ctkPluginFrameworkFactory> mFrameworkFactory;
 	QSharedPointer<ctkPluginFramework> mFramework;
