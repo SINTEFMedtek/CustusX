@@ -10,6 +10,10 @@
 # =========================================================================
 
 if(BUILD_TESTING)
+	set(VTK_MODULES
+		VTK::CommonDataModel
+	)
+
 	cx_add_class(CXTEST_SOURCES ${CXTEST_SOURCES}
 		cxtestCPDFilter.cpp
 	)
@@ -33,7 +37,14 @@ if(BUILD_TESTING)
 		cxCatch
 		cxResource
 		cxResourceFilter
+		${VTK_MODULES}
 	)
+
+	vtk_module_autoinit(
+		TARGETS cxtest_org_custusx_filter_cpd
+		MODULES ${VTK_MODULES}
+	)
+
 	cx_add_tests_to_catch(cxtest_org_custusx_filter_cpd)
 
 endif(BUILD_TESTING)

@@ -14,15 +14,71 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDataLocations.h"
 #include "cxLogicManager.h"
 #include "cxVisServices.h"
+
+#include <QFile>
 #include <QFileInfo>
+#include <QTemporaryFile>
+#include <QTextStream>
+
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
 
 namespace cxtest {
 
-TEST_CASE("CPDFilter: instantiate and check script exists", "[unit][org.custusx.filter.cpd]")
+// Exposes the two protected methods for direct testing.
+class TestableCPDFilter : public cx::CPDFilter
+{
+public:
+	TestableCPDFilter(cx::VisServicesPtr services) : CPDFilter(services) {}
+
+	bool callWriteMeshPoints(vtkPolyDataPtr poly, const QString& path)
+	{
+		return writeMeshPoints(poly, path);
+	}
+
+	bool callReadTransform(const QString& path, cx::Transform3D& deltaRMd)
+	{
+		return readTransform(path, deltaRMd);
+	}
+};
+
+// ---------------------------------------------------------------------------
+// Helpers
+
+cx::VisServicesPtr initServices()
 {
 	cx::LogicManager::initialize();
+	return cx::VisServices::create(cx::logicManager()->getPluginContext());
+}
 
-	cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+vtkPolyDataPtr makePolyDataWithPoints(std::initializer_list<std::array<double, 3>> pts)
+{
+	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+	for (const auto& p : pts)
+		points->InsertNextPoint(p[0], p[1], p[2]);
+	vtkPolyDataPtr pd = vtkPolyDataPtr::New();
+	pd->SetPoints(points);
+	return pd;
+}
+
+// Writes a transform file in the format produced by the Python script:
+//   3 rows of R_col (= R.T from pycpd), then 1 row of t.
+void writeTransformFile(const QString& path, const Eigen::Matrix3d& R_col, const Eigen::Vector3d& t)
+{
+	QFile file(path);
+	REQUIRE(file.open(QIODevice::WriteOnly | QIODevice::Text));
+	QTextStream stream(&file);
+	for (int row = 0; row < 3; ++row)
+		stream << R_col(row, 0) << " " << R_col(row, 1) << " " << R_col(row, 2) << "\n";
+	stream << t(0) << " " << t(1) << " " << t(2) << "\n";
+}
+
+// ---------------------------------------------------------------------------
+// Tests
+
+TEST_CASE("CPDFilter: instantiate and check script exists", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
 	cx::CPDFilterPtr filter = cx::CPDFilterPtr(new cx::CPDFilter(services));
 
 	REQUIRE(filter);
@@ -36,4 +92,167 @@ TEST_CASE("CPDFilter: instantiate and check script exists", "[unit][org.custusx.
 	cx::LogicManager::shutdown();
 }
 
-} // end cxtest namespace
+
+TEST_CASE("CPDFilter: option defaults", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	cx::CPDFilter filter(services);
+
+	QDomDocument doc;
+	QDomElement root = doc.createElement("options");
+
+	CHECK(filter.getMaxIterationsOption(root)->getValue() == Approx(100.0));
+	CHECK(filter.getToleranceOption(root)->getValue() == Approx(1e-5));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: input and output type counts", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	cx::CPDFilter filter(services);
+
+	CHECK(filter.getInputTypes().size() == 2);
+	CHECK(filter.getOutputTypes().size() == 0);
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: writeMeshPoints writes correct point coordinates", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	TestableCPDFilter filter(services);
+
+	vtkPolyDataPtr pd = makePolyDataWithPoints({{1.0, 2.0, 3.0}, {4.5, -6.0, 0.0}});
+
+	QTemporaryFile tmpFile;
+	REQUIRE(tmpFile.open());
+	QString path = tmpFile.fileName();
+	tmpFile.close();
+
+	REQUIRE(filter.callWriteMeshPoints(pd, path));
+
+	QFile file(path);
+	REQUIRE(file.open(QIODevice::ReadOnly | QIODevice::Text));
+	QTextStream stream(&file);
+
+	// First point
+	QString line = stream.readLine();
+	QStringList parts = line.trimmed().split(" ", Qt::SkipEmptyParts);
+	REQUIRE(parts.size() == 3);
+	CHECK(parts[0].toDouble() == Approx(1.0));
+	CHECK(parts[1].toDouble() == Approx(2.0));
+	CHECK(parts[2].toDouble() == Approx(3.0));
+
+	// Second point
+	line = stream.readLine();
+	parts = line.trimmed().split(" ", Qt::SkipEmptyParts);
+	REQUIRE(parts.size() == 3);
+	CHECK(parts[0].toDouble() == Approx(4.5));
+	CHECK(parts[1].toDouble() == Approx(-6.0));
+	CHECK(parts[2].toDouble() == Approx(0.0));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: writeMeshPoints returns false for null polydata", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	TestableCPDFilter filter(services);
+
+	QTemporaryFile tmpFile;
+	REQUIRE(tmpFile.open());
+	QString path = tmpFile.fileName();
+	tmpFile.close();
+
+	vtkPolyDataPtr pd = vtkPolyDataPtr::New();  // has no points
+	CHECK_FALSE(filter.callWriteMeshPoints(pd, path));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: readTransform parses identity transform", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	TestableCPDFilter filter(services);
+
+	QTemporaryFile tmpFile;
+	REQUIRE(tmpFile.open());
+	QString path = tmpFile.fileName();
+	tmpFile.close();
+
+	writeTransformFile(path, Eigen::Matrix3d::Identity(), Eigen::Vector3d::Zero());
+
+	cx::Transform3D deltaRMd;
+	REQUIRE(filter.callReadTransform(path, deltaRMd));
+
+	// Identity rotation and zero translation → identity 4x4
+	CHECK(deltaRMd.matrix().isApprox(Eigen::Matrix4d::Identity(), 1e-9));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: readTransform parses rotation and translation", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	TestableCPDFilter filter(services);
+
+	QTemporaryFile tmpFile;
+	REQUIRE(tmpFile.open());
+	QString path = tmpFile.fileName();
+	tmpFile.close();
+
+	// 90-degree rotation around Z axis (column-vector convention): R_col
+	Eigen::Matrix3d R_col;
+	R_col << 0, -1, 0,
+	         1,  0, 0,
+	         0,  0, 1;
+	Eigen::Vector3d t(10.0, -5.0, 3.0);
+
+	writeTransformFile(path, R_col, t);
+
+	cx::Transform3D deltaRMd;
+	REQUIRE(filter.callReadTransform(path, deltaRMd));
+
+	CHECK(deltaRMd.linear().isApprox(R_col, 1e-9));
+	CHECK(deltaRMd.translation().isApprox(t, 1e-9));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: readTransform returns false for missing file", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	TestableCPDFilter filter(services);
+
+	cx::Transform3D deltaRMd;
+	CHECK_FALSE(filter.callReadTransform("/nonexistent/path/transform.txt", deltaRMd));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: readTransform returns false for malformed file", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	TestableCPDFilter filter(services);
+
+	QTemporaryFile tmpFile;
+	REQUIRE(tmpFile.open());
+	tmpFile.write("1.0 2.0\n");  // Only 2 values on row 0, expects 3
+	QString path = tmpFile.fileName();
+	tmpFile.close();
+
+	cx::Transform3D deltaRMd;
+	CHECK_FALSE(filter.callReadTransform(path, deltaRMd));
+
+	cx::LogicManager::shutdown();
+}
+
+} // namespace cxtest
