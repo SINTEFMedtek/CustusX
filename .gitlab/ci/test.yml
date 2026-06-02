@@ -20,7 +20,7 @@
     reports:
       junit: test_results/*junit.xml
 
-.test-ubuntu20:
+test-ubuntu20:
   extends: .test-job
   needs: ["build-ubuntu20"]
   image: $IMAGE_UBUNTU2004
@@ -28,7 +28,7 @@
     OS: Ubuntu2004
     CX_WRAP_UNIT_TESTS_IN_CTEST: "1"
 
-.test-ubuntu22:
+test-ubuntu22:
   extends: .test-job
   needs: ["build-ubuntu22"]
   image: $IMAGE_UBUNTU2204
