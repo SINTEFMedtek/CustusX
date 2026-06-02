@@ -561,6 +561,7 @@ void MainWindow::createToolBars()
 	mSpacerToolBar->setFloatable(false);
 	mSpacerToolBar->toggleViewAction()->setVisible(false);
 	QWidget *spacerWidget = new QWidget(mSpacerToolBar);
+	spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	spacerWidget->setMinimumWidth(200);
 	mSpacerToolBar->addWidget(spacerWidget);
 }

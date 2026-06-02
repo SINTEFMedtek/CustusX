@@ -170,15 +170,16 @@ void GenericScriptFilter::processReadyRead()
 		return;
 
 	QProcess* process = mCommandLine->getProcess();
-	QString output = QString(process->readAllStandardOutput());
-	QStringList lines = output.split('\n');
-	for(const QString& line : lines)
+	mLineBuffer += QString(process->readAllStandardOutput());
+	int newlinePos;
+	while ((newlinePos = mLineBuffer.indexOf('\n')) != -1)
 	{
-		QString trimmed = line.trimmed();
-		if(!trimmed.isEmpty())
+		QString line = mLineBuffer.left(newlinePos).trimmed();
+		mLineBuffer = mLineBuffer.mid(newlinePos + 1);
+		if(!line.isEmpty())
 		{
-			CX_LOG_CHANNEL_INFO(mOutputChannelName) << trimmed;
-			emit scriptOutput(trimmed);
+			CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
+			emit scriptOutput(line);
 		}
 	}
 }
@@ -711,6 +712,7 @@ bool GenericScriptFilter::execute()
 bool GenericScriptFilter::createProcess()
 {
 	mCommandLine.reset();//delete
+	mLineBuffer.clear();
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
 	mCommandLine->turnOffReporting();//Handle output in this class instead
 

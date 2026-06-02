@@ -22,7 +22,7 @@ signal.signal(signal.SIGTERM, lambda sig, frame: sys.exit(0))
 def runTotalSegmentator(filenameInput):
     global _child_process
     venv_path = os.path.dirname(sys.executable)
-    if os.path.splitext(filenameInput)[1:] != '.nii.gz':
+    if not filenameInput.endswith('.nii.gz'):
         filenameInput_nii_gz = os.path.splitext(filenameInput)[0] + '.nii.gz'
         sitk.WriteImage(sitk.ReadImage(filenameInput), filenameInput_nii_gz)
         filenameInput = filenameInput_nii_gz
@@ -64,6 +64,9 @@ def runTotalSegmentator(filenameInput):
                 pass
 
     process.wait()
+    if process.returncode != 0:
+        print("ERROR: TotalSegmentator failed with exit code {}".format(process.returncode), flush=True)
+        sys.exit(process.returncode)
 
 def copyOutput(filenameInput):
     venv_path = os.path.dirname(sys.executable)

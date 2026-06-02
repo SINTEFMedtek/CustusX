@@ -435,12 +435,7 @@ void BranchList::mergeTracheasSingleChildIntoTrachea()
 		combinedPositions.leftCols(trachea->getPositions().cols()) = trachea->getPositions();
 		combinedPositions.rightCols(onlyChild->getPositions().cols()) = onlyChild->getPositions();
 
-		Eigen::MatrixXd combinedOrientations(3, trachea->getOrientations().cols() + onlyChild->getOrientations().cols());
-		combinedOrientations.leftCols(trachea->getOrientations().cols()) = trachea->getOrientations();
-		combinedOrientations.rightCols(onlyChild->getOrientations().cols()) = onlyChild->getOrientations();
-
 		trachea->setPositions(combinedPositions);
-		trachea->setOrientations(combinedOrientations);
 
 		branchVector grandchildren = onlyChild->getChildBranches();
 		trachea->deleteChildBranches();

@@ -265,7 +265,10 @@ void MainWindowActions::newPatientSlot(bool showDialog, bool useSimpleDialog)
 	{
 		QString patientName = getPatientNameFromUser();
 		if(patientName.isEmpty())
+		{
+			mServices->view()->enableRender(true);
 			return;
+		}
 		choosenDir = this->selectNewPatientFolder(showDialog, patientName);
 	}
 	else

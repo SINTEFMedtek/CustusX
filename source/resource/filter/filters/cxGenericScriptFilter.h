@@ -155,6 +155,7 @@ protected:
 	BoolPropertyPtr mOutputMeshOption;
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
 	RaidionicsPtr mRaidionicsUtilities = nullptr;
+	QString mLineBuffer;
 
 protected slots:
 	void scriptFileChanged();

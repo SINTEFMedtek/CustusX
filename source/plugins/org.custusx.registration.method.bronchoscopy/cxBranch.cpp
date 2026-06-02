@@ -110,7 +110,7 @@ void Branch::calculateOrientations()
 			if (i > 0)
 				orientations.col(i) = orientations.col(i-1);
 			else
-				orientations.col(i) = Eigen::Vector3d::UnitZ(); // fallback: no previous orientation available
+				orientations.col(i) = Eigen::Vector3d::Zero(); // fallback: excluded by RemoveInvalidData in registration
 		}
 	}
 
@@ -249,7 +249,7 @@ void Branch::removeEqualPositions()
 
 	for (int i = positions.cols() - 1; i > 0; i--)
 	{
-		if (similar( (positions.col(i)-positions.col(i-1)).cwiseAbs().sum(), 0))
+		if ((positions.col(i)-positions.col(i-1)).norm() < 1e-10)
 		{
 			positions.block(0 , i , positions.rows() , positions.cols() - i - 1) = positions.rightCols(positions.cols() - i - 1);
 			positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);
