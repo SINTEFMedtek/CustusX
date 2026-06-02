@@ -379,7 +379,7 @@ void UsReconstructionFileMaker::writeREADMEFile(QString reconstructionFolder, QS
 	QString text = ""
 "* ==== Format description												\n"
 "* Refer to 																		    \n"
-"*		http://custusx.org/uploads/developer_doc/nightly/org_custusx_acquisition.html   \n"
+"*		https://custusx.pages.sintef.no/CustusX/developer_doc/org_custusx_acquisition.html   \n"
 "* for a description of the files.                                                      \n"
 "*/																		\n";
 

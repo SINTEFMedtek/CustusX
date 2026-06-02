@@ -9,7 +9,7 @@ Overview {#mainpage_overview}
 CustusX is an application for research in image-guided therapy with a 
 focus on intraoperative use and ultrasound imaging.
 
-<http://www.custusx.org>
+<https://custusx.pages.sintef.no/CustusX/>
 
 To get started quickly, try out the 
 

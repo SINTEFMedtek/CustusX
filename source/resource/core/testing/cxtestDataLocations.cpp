@@ -18,7 +18,7 @@ namespace cx
 TEST_CASE("Website url can be set", "[unit][datalocations]")
 {
     CHECK(DataLocations::getWebsiteURL().isEmpty());
-    cx::DataLocations::setWebsiteURL("www.custusx.org");
+    cx::DataLocations::setWebsiteURL("custusx.pages.sintef.no/CustusX/");
     CHECK(!DataLocations::getWebsiteURL().isEmpty());
 }
 
