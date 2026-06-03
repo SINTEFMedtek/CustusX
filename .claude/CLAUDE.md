@@ -151,9 +151,126 @@ Closed source repositories are typically handled by a similar cxPrivateComponent
 
 Plugins follow the CTK OSGi pattern. Look at an existing small plugin (e.g., `source/plugins/org.custusx.filter.airways/`) for the CMakeLists.txt structure and service registration boilerplate. Tests go in `<plugin>/testing/` and are wired in via `cx_add_tests_to_catch()`.
 
+### Required files for a new Filter plugin
+
+Use `org.custusx.filter.cpd` or `org.custusx.filter.clipmesh` as a reference. Every new `org.custusx.filter.<name>` plugin needs:
+
+| File | Purpose |
+|------|---------|
+| `CMakeLists.txt` | Build, `vtk_module_autoinit`, `cx_doc_define_plugin_user_docs`, `add_subdirectory(testing)` |
+| `manifest_headers.cmake` | Plugin-Name, Plugin-Version, Plugin-Vendor, Plugin-Category |
+| `target_libraries.cmake` | CTKPluginFramework + additional deps |
+| `cxMyFilter.h` / `.cpp` | Filter implementation (subclass `FilterImpl`) |
+| `cxFilterMyPluginActivator.h` / `.cpp` | CTK plugin entry point; registers filter with `FilterService_iid` |
+| `doc/org.custusx.filter.<name>.md` | User documentation (see Documentation section for format rules) |
+| `testing/CMakeLists.txt` | Test library wired via `cx_add_tests_to_catch()` |
+| `testing/cxtestMyFilter.cpp` | Unit/integration tests |
+
+Also add `org.custusx.filter.<name>:ON` to the plugin list in `source/plugins/CMakeLists.txt`.
+
+### Filter plugin threading model
+
+**Critical — misunderstanding this causes crashes and race conditions:**
+
+- `FilterImpl::preProcess()` runs on the **main thread** before the filter starts. It populates `mCopiedInput` by calling `mInputTypes[i]->getData()` (raw pointers, not deep copies) and clones `mOptions` into `mCopiedOptions`.
+- `execute()` runs on a **worker thread** (via `QtConcurrent::run`). Use `mCopiedInput` and `mCopiedOptions` here — never `mInputTypes` or `mOutputTypes`.
+- `postProcess()` runs back on the **main thread** via `QFutureWatcher::finished`. Use `mInputTypes` and `mOutputTypes` here to read selections and insert output data.
+
+**Common pitfalls:**
+- Any GUI call (e.g. `QMessageBox::exec()`) inside `execute()` will crash — it must be dispatched to the main thread:
+  ```cpp
+  QMetaObject::invokeMethod(qApp, [&]() { /* GUI work */ }, Qt::BlockingQueuedConnection);
+  ```
+- Both `getInputTypes()` **and** `getOutputTypes()` must be called before `preProcess()`. These lazily populate `mInputTypes` / `mOutputTypes`. If `getOutputTypes()` is never called, `mOutputTypes` is empty and `mOutputTypes[0]->setValue(...)` in `postProcess()` will crash.
+
+### Testing Filter plugins
+
+**Minimal unit test** (instantiation, no patient session needed):
+```cpp
+cx::LogicManager::initialize();
+cx::VisServicesPtr services = cx::VisServices::create(cx::logicManager()->getPluginContext());
+// ... test filter metadata, options, public methods
+cx::LogicManager::shutdown();
+```
+
+**Integration test** (full pipeline with patient model):
+- Use `cxtest::SessionStorageTestFixture` from `cxtestSessionStorageTestFixture.h`
+- Link against `cxtest_org_custusx_core_patientmodel` and `cxtestResource` in the test CMakeLists
+- Call `filter.getInputTypes()` **and** `filter.getOutputTypes()` before `filter.preProcess()` (see threading pitfalls above)
+- Insert test data with `services->patient()->insertData(...)` before `preProcess()`
+
+**To test private filter methods** (e.g. file I/O helpers): move them from `private` to `protected` and expose them via a thin test subclass inside the test file. This avoids changing the public API.
+
+**Test CMakeLists** that uses VTK directly needs `vtk_module_autoinit`:
+```cmake
+vtk_module_autoinit(TARGETS cxtest_my_filter MODULES VTK::FiltersCore VTK::FiltersGeneral)
+```
+
 ## Documentation
 
 - Developer manual: `doc/dev_manual/` (architecture, build instructions, code style)
 - User manual: `doc/user_manual/`
 - Built with Doxygen: CMake targets `UserDoc` and `DoxygenDoc`
 - Code style reference: `doc/dev_manual/cx_dev_code_style.md`
+- Incremental rebuild: run `ninja UserDoc` inside the build directory
+
+### Markdown rules for plugin doc files
+
+The doc files are processed by Doxygen and then compiled into Qt Help (`.qhp` XML). Certain Markdown constructs cause the `qcollectiongenerator` step to fail with "Opening and ending tag mismatch" on older Qt/Doxygen versions. Follow these rules:
+
+**Safe heading styles** (match what existing CustusX filter docs use):
+```markdown
+Page Title {#org_custusx_filter_name}
+======================================
+
+Section heading
+---------------
+
+Sub-section heading
+-------------------
+```
+
+**Do NOT use:**
+- `####` or `###` headings — no existing CustusX plugin doc uses them; they create nesting that breaks older Qt Help builders
+- `---` (3-dash setext) for headings — older Doxygen versions parse this as a horizontal rule instead of H2, leaving unclosed XML tags
+- `<angle bracket placeholders>` in text or code blocks — even inside indented code blocks these may be left unescaped and break XML
+
+**Required elements for a plugin doc file:**
+```markdown
+Page Title {#org_custusx_filter_name}      ← page anchor, must be unique
+===================
+
+\addindex filter_type_string               ← must match getType() return value exactly
+                                           ← (used by Qt Help for context-sensitive help)
+...content...
+
+\addtogroup cx_user_doc_group_filter       ← adds page to the Filters group in the TOC
+
+* \ref org_custusx_filter_name             ← self-reference (required by the group mechanism)
+```
+
+The `\addindex` keyword is matched against the widget's `objectName()` at runtime to show context-sensitive help. For filter widgets the name is set to `getType()`.
+
+The doc folder must be registered in the plugin's `CMakeLists.txt`:
+```cmake
+cx_doc_define_plugin_user_docs("${PROJECT_NAME}" "${CMAKE_CURRENT_SOURCE_DIR}/doc")
+cx_add_non_source_file("doc/org.custusx.filter.name.md")
+```
+
+## Qt Version Compatibility
+
+CustusX CI runs on Ubuntu 20.04 (Qt 5.12) and Ubuntu 22.04 (Qt 5.15). Several Qt APIs changed between these versions:
+
+| Avoid | Use instead | Reason |
+|-------|-------------|--------|
+| `Qt::SkipEmptyParts` | `QTextStream >>` | Added in Qt 5.14; not available on Ubuntu 20 |
+| `QString::SkipEmptyParts` | `QTextStream >>` | Deprecated in Qt 5.14; generates warnings on Ubuntu 22 |
+| `QString::split(sep, Qt::SkipEmptyParts)` | `stream >> val` | See above |
+
+For parsing whitespace-separated numbers (e.g. reading point files or transform matrices), prefer `QTextStream >>` directly:
+```cpp
+QTextStream stream(&file);
+double x, y, z;
+stream >> x >> y >> z;
+if (stream.status() != QTextStream::Ok) { /* handle error */ }
+```
