@@ -57,32 +57,68 @@ class _RigidRegistrationNoScale:
 
 def _preprocess(fixed, moving):
     """
-    Center both clouds to zero mean and scale to unit RMS radius.
+    Normalise both point clouds using the MOVING cloud as the shared reference.
 
-    Pre-normalization stabilises pycpd's E-step, particularly when w > 0.
-    Without it, sigma2 is initialised from all pairwise distances and can be
-    enormous when the clouds are far apart, making the outlier constant c so
-    large that all posterior probabilities collapse to zero (Np = 0 → NaN / SVD
-    failure).
+    Why the moving (US) cloud, not independent centering:
+      Independent centering (fixed - mean_fixed, moving - mean_moving) places
+      BOTH clouds at the origin.  This discards the approximate initial
+      registration: CPD then searches for the moving cloud near the centroid
+      of the FIXED (CT) cloud rather than at its actual approximate position —
+      completely wrong when the US covers only a small sub-region of the CT.
 
-    Rotation is invariant to centering and isotropic scaling, so R from the
-    normalised run is identical to R from the original run. The translation is
-    recovered in the original space via centroid mapping after the run.
+    Why shared-reference normalisation works:
+      Using the moving centroid as the common offset preserves the relative
+      position (the approximate registration).  After normalisation:
+        - The moving (US) cloud is centred at the origin.
+        - The fixed (CT) cloud is shifted by the same amount, so the correct
+          CT sub-region (where the US is already approximately placed) stays
+          near the origin.
+      CPD therefore starts iterating from the right neighbourhood.
+
+    Why this also fixes w > 0 numerical failure:
+      sigma2 is initialised by pycpd from all pairwise cross-cloud distances.
+      Without normalisation those distances are dominated by the large
+      inter-cloud translation (e.g. 150 mm), making sigma2 ≈ 22 500 mm²
+      and the outlier constant c ≈ 800 000 — all posterior probabilities
+      collapse to zero (Np = 0 → NaN → SVD failure).
+      With shared-reference normalisation, the US cloud is at the origin and
+      the relevant CT points are also near the origin, so pairwise distances
+      are governed by the US cloud's own spread (~10 mm), making sigma2 ≈ 10–50
+      and c ≈ 20–200 — well within the tractable range.
+
+    Returns: X_n, Y_n, mean_ref, scale_ref
+      Denormalise with: T_orig(y) = y @ R + t_orig
+      where t_orig = _denormalize_t(R, t_n, mean_ref, scale_ref)
     """
-    mean_X = np.mean(fixed, axis=0)
-    mean_Y = np.mean(moving, axis=0)
-    fixed_c = fixed - mean_X
-    moving_c = moving - mean_Y
-    rms_X = np.sqrt(np.mean(np.sum(fixed_c ** 2, axis=1)))
-    rms_Y = np.sqrt(np.mean(np.sum(moving_c ** 2, axis=1)))
-    scale = (rms_X + rms_Y) / 2.0
-    if scale < 1e-10:
-        scale = 1.0
-    return fixed_c / scale, moving_c / scale, mean_X, mean_Y
+    mean_ref = np.mean(moving, axis=0)
+    scale_ref = np.sqrt(np.mean(np.sum((moving - mean_ref) ** 2, axis=1)))
+    if scale_ref < 1.0:   # guard against degenerate / single-point clouds
+        scale_ref = 1.0
+
+    # Both clouds shifted by the SAME moving centroid, scaled by the moving spread.
+    X_n = (fixed - mean_ref) / scale_ref
+    Y_n = (moving - mean_ref) / scale_ref   # centred at origin, unit RMS radius
+
+    return X_n, Y_n, mean_ref, scale_ref
+
+
+def _denormalize_t(R, t_n, mean_ref, scale_ref):
+    """
+    Recover the translation in the original coordinate space.
+
+    Derivation (row-vector convention):
+      T_norm(y_n) = y_n @ R + t_n      (pycpd, normalised space)
+      y_n = (y - mean_ref) / scale_ref
+      T_orig(y) = mean_ref + scale_ref * T_norm((y - mean_ref) / scale_ref)
+               = (y - mean_ref) @ R + scale_ref * t_n + mean_ref
+               = y @ R + (mean_ref - mean_ref @ R + scale_ref * t_n)
+      =>  t_orig = mean_ref - mean_ref @ R + scale_ref * t_n
+    """
+    return mean_ref - np.dot(mean_ref, R) + scale_ref * t_n
 
 
 def _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w):
-    """Run rigid CPD (no scale) on pre-normalised data. Returns R."""
+    """Run rigid CPD (no scale) on pre-normalised data. Returns (R, t_n)."""
     from pycpd import RigidRegistration
 
     class RigidRegistrationNoScale(_RigidRegistrationNoScale, RigidRegistration):
@@ -91,48 +127,48 @@ def _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w):
     reg = RigidRegistrationNoScale(X=X_n, Y=Y_n,
                                    max_iterations=max_iter, tolerance=tolerance, w=w)
     reg.register()
-    return reg.R
+    return reg.R, reg.t
 
 
 def _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w):
-    """Run rigid CPD with scale on pre-normalised data. Returns (R, s)."""
+    """Run rigid CPD with scale on pre-normalised data. Returns (R, t_n, s).
+
+    Because Y_n is centred at origin (mean(Y_n) = 0), the scale factor s has
+    negligible effect on t_n:
+        t_n = muX_n - s * muY_n @ R  ≈  muX_n  (since muY_n ≈ 0)
+    so no additional scale correction to t_n is needed here.
+    """
     from pycpd import RigidRegistration
     reg = RigidRegistration(X=X_n, Y=Y_n,
                             max_iterations=max_iter, tolerance=tolerance, w=w)
     reg.register()
-    return reg.R, reg.s
+    return reg.R, reg.t, reg.s
 
 
 def run_rigid_cpd(fixed, moving, max_iter, tolerance, w, scale_mode, scale_threshold):
     print(f"Starting rigid CPD: {len(moving)} moving -> {len(fixed)} fixed points, "
           f"mode={scale_mode}, w={w}, tol={tolerance}", flush=True)
 
-    # Normalise both clouds before running CPD for numerical stability.
-    # Rotation is recovered from the normalised run; translation is computed
-    # from the original centroids afterwards, which is exact for rigid registration.
-    X_n, Y_n, mean_X, mean_Y = _preprocess(fixed, moving)
+    X_n, Y_n, mean_ref, scale_ref = _preprocess(fixed, moving)
 
     if scale_mode == "Rigid+scale":
-        R, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
+        R, t_n, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
         print(f"CPD complete (rigid+scale). Scale s={s:.4f}", flush=True)
 
     elif scale_mode == "Auto":
-        R, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
+        R, t_n, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
         if abs(s - 1.0) > scale_threshold:
             print(f"CPD auto: scale s={s:.4f} exceeds threshold {scale_threshold}, "
                   f"rerunning without scale.", flush=True)
-            R = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
+            R, t_n = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
         else:
             print(f"CPD auto: scale s={s:.4f} within threshold {scale_threshold}.", flush=True)
 
     else:  # "Rigid" (default)
-        R = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
+        R, t_n = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
         print("CPD complete (rigid, no scale).", flush=True)
 
-    # Translation: map centroid of moving to centroid of fixed under rotation R.
-    # Exact for rigid registration regardless of whether scale was used to find R.
-    # Row-vector form: t = mean_X - mean_Y @ R
-    t = mean_X - np.dot(mean_Y, R)
+    t = _denormalize_t(R, t_n, mean_ref, scale_ref)
     return R, t
 
 
