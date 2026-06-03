@@ -102,7 +102,29 @@ TEST_CASE("CPDFilter: option defaults", "[unit][org.custusx.filter.cpd]")
 	QDomElement root = doc.createElement("options");
 
 	CHECK(filter.getMaxIterationsOption(root)->getValue() == Approx(100.0));
-	CHECK(filter.getToleranceOption(root)->getValue() == Approx(1e-5));
+	CHECK(filter.getToleranceOption(root)->getValue() == Approx(1e-3));
+	CHECK(filter.getOutlierWeightOption(root)->getValue() == Approx(0.0));
+	CHECK(filter.getScaleModeOption(root)->getValue() == "Rigid");
+	CHECK(filter.getScaleThresholdOption(root)->getValue() == Approx(0.1));
+
+	cx::LogicManager::shutdown();
+}
+
+
+TEST_CASE("CPDFilter: scale mode option has correct values", "[unit][org.custusx.filter.cpd]")
+{
+	cx::VisServicesPtr services = initServices();
+	cx::CPDFilter filter(services);
+
+	QDomDocument doc;
+	QDomElement root = doc.createElement("options");
+	cx::StringPropertyPtr scaleProp = filter.getScaleModeOption(root);
+
+	CHECK(scaleProp->getValue() == "Rigid");
+	scaleProp->setValue("Rigid+scale");
+	CHECK(scaleProp->getValue() == "Rigid+scale");
+	scaleProp->setValue("Auto");
+	CHECK(scaleProp->getValue() == "Auto");
 
 	cx::LogicManager::shutdown();
 }

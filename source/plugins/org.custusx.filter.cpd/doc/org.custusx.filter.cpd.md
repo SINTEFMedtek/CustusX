@@ -30,7 +30,18 @@ Parameters
 ----------
 
 - **Max iterations**: Maximum number of EM iterations (default: 100)
-- **Tolerance**: Convergence tolerance — smaller values give more precise results (default: 1e-5)
+- **Tolerance**: EM convergence threshold — smaller values require more iterations (default: 1e-3)
+- **Outlier weight (w)**: Fraction of points treated as noise rather than valid correspondences.
+  Increase for noisy data or when the meshes only partially overlap (default: 0 = all points valid).
+  Range 0–0.9.
+- **Scale mode**: Controls whether CPD is allowed to optimise a global scale factor.
+  - *Rigid* (default): No scaling. Safe for CT/US volumes which cannot be scaled clinically.
+  - *Rigid+scale*: CPD optimises scale internally for better point correspondence, but only
+    rotation and translation are applied to the data (scale is removed from the result).
+  - *Auto*: Tries *Rigid+scale* first; falls back to *Rigid* if the scale deviation exceeds
+    the threshold below.
+- **Scale threshold**: Used only in *Auto* mode. If `|scale − 1|` exceeds this value the
+  registration falls back to *Rigid* (default: 0.1).
 
 \addtogroup cx_user_doc_group_filter
 

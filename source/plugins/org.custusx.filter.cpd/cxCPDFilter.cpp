@@ -28,10 +28,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPatientModelService.h"
 #include "cxSelectDataStringProperty.h"
 #include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
 #include "cxDataLocations.h"
 #include "cxRegistrationTransform.h"
 #include "cxRegistrationApplicator.h"
-#include "cxTypeConversions.h"
 
 namespace cx
 {
@@ -76,13 +76,48 @@ DoublePropertyPtr CPDFilter::getMaxIterationsOption(QDomElement root)
 DoublePropertyPtr CPDFilter::getToleranceOption(QDomElement root)
 {
 	return DoubleProperty::initialize("Tolerance", "",
-		"Convergence tolerance (smaller = more precise)", 1e-5, DoubleRange(1e-8, 1e-2, 1e-8), 8, root);
+		"Convergence tolerance for the EM algorithm (default 1e-3 matches pycpd). "
+		"Smaller values require more iterations but may improve precision.",
+		1e-3, DoubleRange(1e-8, 1e-2, 1e-8), 8, root);
+}
+
+DoublePropertyPtr CPDFilter::getOutlierWeightOption(QDomElement root)
+{
+	return DoubleProperty::initialize("Outlier weight (w)", "",
+		"Fraction of points treated as outliers (uniform noise). "
+		"Increase for noisy data or when the meshes only partially overlap. "
+		"0 = all points are valid correspondences; 0.9 = mostly noise.",
+		0.0, DoubleRange(0.0, 0.9, 0.05), 2, root);
+}
+
+StringPropertyPtr CPDFilter::getScaleModeOption(QDomElement root)
+{
+	QStringList modes;
+	modes << "Rigid" << "Rigid+scale" << "Auto";
+	return StringProperty::initialize("Scale mode", "",
+		"Rigid: no scaling (safe for CT/US volumes — cannot be scaled clinically).\n"
+		"Rigid+scale: CPD optimises scale internally for better correspondence, "
+		"but only rotation and translation are applied to the data.\n"
+		"Auto: use Rigid+scale result if scale deviation is within the threshold, "
+		"otherwise fall back to Rigid.",
+		"Rigid", modes, root);
+}
+
+DoublePropertyPtr CPDFilter::getScaleThresholdOption(QDomElement root)
+{
+	return DoubleProperty::initialize("Scale threshold", "",
+		"Auto mode only: if |scale - 1| exceeds this value the registration "
+		"falls back to Rigid (no scale). Typical range 0.05 - 0.2.",
+		0.1, DoubleRange(0.01, 0.5, 0.01), 2, root);
 }
 
 void CPDFilter::createOptions()
 {
 	mOptionsAdapters.push_back(getMaxIterationsOption(mOptions));
 	mOptionsAdapters.push_back(getToleranceOption(mOptions));
+	mOptionsAdapters.push_back(getOutlierWeightOption(mOptions));
+	mOptionsAdapters.push_back(getScaleModeOption(mOptions));
+	mOptionsAdapters.push_back(getScaleThresholdOption(mOptions));
 }
 
 void CPDFilter::createInputTypes()
@@ -289,11 +324,11 @@ bool CPDFilter::execute()
 	if (!writeMeshPoints(movingPoly, movingPtsFile))
 		return false;
 
-	DoublePropertyPtr maxIterOption = getMaxIterationsOption(mCopiedOptions);
-	DoublePropertyPtr tolOption = getToleranceOption(mCopiedOptions);
-
-	int maxIter = static_cast<int>(maxIterOption->getValue());
-	double tolerance = tolOption->getValue();
+	int maxIter = static_cast<int>(getMaxIterationsOption(mCopiedOptions)->getValue());
+	double tolerance = getToleranceOption(mCopiedOptions)->getValue();
+	double outlierWeight = getOutlierWeightOption(mCopiedOptions)->getValue();
+	QString scaleMode = getScaleModeOption(mCopiedOptions)->getValue();
+	double scaleThreshold = getScaleThresholdOption(mCopiedOptions)->getValue();
 
 	QStringList args;
 	args << scriptPath
@@ -301,7 +336,10 @@ bool CPDFilter::execute()
 		 << movingPtsFile
 		 << resultFile
 		 << QString::number(maxIter)
-		 << QString::number(tolerance, 'g', 10);
+		 << QString::number(tolerance, 'g', 10)
+		 << QString::number(outlierWeight, 'g', 10)
+		 << scaleMode
+		 << QString::number(scaleThreshold, 'g', 10);
 
 	CX_LOG_INFO() << "CPDFilter: Running rigid CPD registration...";
 

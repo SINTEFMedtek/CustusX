@@ -14,8 +14,9 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_filter_cpd_Export.h"
 
 #include "cxFilterImpl.h"
-#include "cxMesh.h"
 #include "cxTransform3D.h"
+#include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
 
 namespace cx
 {
@@ -48,6 +49,9 @@ public:
 
 	DoublePropertyPtr getMaxIterationsOption(QDomElement root);
 	DoublePropertyPtr getToleranceOption(QDomElement root);
+	DoublePropertyPtr getOutlierWeightOption(QDomElement root);
+	StringPropertyPtr getScaleModeOption(QDomElement root);
+	DoublePropertyPtr getScaleThresholdOption(QDomElement root);
 
 protected:
 	virtual void createOptions();
