@@ -66,7 +66,7 @@
   - |
     if [ "$LIBS_READY" = "true" ]; then
       echo "Building CustusX only..."
-      eval ./install/cxInstaller.py -s --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+      eval ./install/cxInstaller.py -s --full -j 15 -t Release --user_doc --developer_doc $IGSTK_FLAG \
         --main_branch $CX_COMMIT \
         --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
         components CustusX
