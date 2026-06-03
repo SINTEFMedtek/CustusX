@@ -105,7 +105,7 @@ StringPropertyPtr CPDFilter::getScaleModeOption(QDomElement root)
 
 DoublePropertyPtr CPDFilter::getScaleThresholdOption(QDomElement root)
 {
-	return DoubleProperty::initialize("Scale threshold", "",
+	return DoubleProperty::initialize("Scale threshold", "  Scale threshold",
 		"Auto mode only: if |scale - 1| exceeds this value the registration "
 		"falls back to Rigid (no scale). Typical range 0.05 - 0.2.",
 		0.1, DoubleRange(0.01, 0.5, 0.01), 2, root);
@@ -113,11 +113,11 @@ DoublePropertyPtr CPDFilter::getScaleThresholdOption(QDomElement root)
 
 void CPDFilter::createOptions()
 {
-	mOptionsAdapters.push_back(getMaxIterationsOption(mOptions));
-	mOptionsAdapters.push_back(getToleranceOption(mOptions));
 	mOptionsAdapters.push_back(getOutlierWeightOption(mOptions));
 	mOptionsAdapters.push_back(getScaleModeOption(mOptions));
 	mOptionsAdapters.push_back(getScaleThresholdOption(mOptions));
+	mOptionsAdapters.push_back(getMaxIterationsOption(mOptions));
+	mOptionsAdapters.push_back(getToleranceOption(mOptions));
 }
 
 void CPDFilter::createInputTypes()
