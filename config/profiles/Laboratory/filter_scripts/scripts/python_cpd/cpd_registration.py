@@ -12,7 +12,7 @@ Arguments:
     max_iter       Maximum EM iterations (default: 100)
     tolerance      Convergence tolerance (default: 1e-3, pycpd default)
     w              Outlier weight [0, 0.9] — fraction of points treated as noise (default: 0.0)
-    scale_mode     Scaling behaviour: "Rigid", "Rigid+scale", or "Auto" (default: "Rigid")
+    scale_mode     "Rigid", "Rigid+scale", or "Auto" (default: "Rigid")
     scale_threshold In Auto mode, fall back to Rigid if |scale - 1| > threshold (default: 0.1)
 
 Install dependency: pip install pycpd
@@ -26,7 +26,7 @@ def read_points(path):
 
 
 def write_transform(path, R, t):
-    # pycpd uses row-vector convention: TY = s * Y @ R + t
+    # pycpd uses row-vector convention: TY = Y @ R + t
     # CustusX/Eigen uses column-vector convention: T(y) = R_col @ y + t
     # R_col = R.T
     R_col = R.T
@@ -55,63 +55,85 @@ class _RigidRegistrationNoScale:
         self.t = np.transpose(muX) - np.dot(np.transpose(self.R), np.transpose(muY))
 
 
-def _correct_translation_for_scale(R, s, t, moving):
+def _preprocess(fixed, moving):
     """
-    CPD computes t with scale baked in: t = muX - s * muY @ R
-    For a rigid (no-scale) application, correct to: t_rigid = muX - muY @ R
-    Using: t_rigid = t + (s - 1) * mean(moving) @ R
+    Center both clouds to zero mean and scale to unit RMS radius.
+
+    Pre-normalization stabilises pycpd's E-step, particularly when w > 0.
+    Without it, sigma2 is initialised from all pairwise distances and can be
+    enormous when the clouds are far apart, making the outlier constant c so
+    large that all posterior probabilities collapse to zero (Np = 0 → NaN / SVD
+    failure).
+
+    Rotation is invariant to centering and isotropic scaling, so R from the
+    normalised run is identical to R from the original run. The translation is
+    recovered in the original space via centroid mapping after the run.
     """
-    mean_moving = np.mean(moving, axis=0)
-    return t + (s - 1) * np.dot(mean_moving, R)
+    mean_X = np.mean(fixed, axis=0)
+    mean_Y = np.mean(moving, axis=0)
+    fixed_c = fixed - mean_X
+    moving_c = moving - mean_Y
+    rms_X = np.sqrt(np.mean(np.sum(fixed_c ** 2, axis=1)))
+    rms_Y = np.sqrt(np.mean(np.sum(moving_c ** 2, axis=1)))
+    scale = (rms_X + rms_Y) / 2.0
+    if scale < 1e-10:
+        scale = 1.0
+    return fixed_c / scale, moving_c / scale, mean_X, mean_Y
 
 
-def _run_no_scale(fixed, moving, max_iter, tolerance, w):
+def _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w):
+    """Run rigid CPD (no scale) on pre-normalised data. Returns R."""
     from pycpd import RigidRegistration
 
     class RigidRegistrationNoScale(_RigidRegistrationNoScale, RigidRegistration):
         pass
 
-    reg = RigidRegistrationNoScale(X=fixed, Y=moving,
+    reg = RigidRegistrationNoScale(X=X_n, Y=Y_n,
                                    max_iterations=max_iter, tolerance=tolerance, w=w)
     reg.register()
-    print(f"CPD complete (rigid, no scale). s={reg.s:.4f}", flush=True)
-    return reg.R, reg.t
+    return reg.R
 
 
-def _run_with_scale(fixed, moving, max_iter, tolerance, w):
-    """Returns (R, t_corrected, s) — t is corrected to remove the scale effect."""
+def _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w):
+    """Run rigid CPD with scale on pre-normalised data. Returns (R, s)."""
     from pycpd import RigidRegistration
-
-    reg = RigidRegistration(X=fixed, Y=moving,
+    reg = RigidRegistration(X=X_n, Y=Y_n,
                             max_iterations=max_iter, tolerance=tolerance, w=w)
     reg.register()
-    s = reg.s
-    t_corrected = _correct_translation_for_scale(reg.R, s, reg.t, moving)
-    return reg.R, t_corrected, s
+    return reg.R, reg.s
 
 
 def run_rigid_cpd(fixed, moving, max_iter, tolerance, w, scale_mode, scale_threshold):
     print(f"Starting rigid CPD: {len(moving)} moving -> {len(fixed)} fixed points, "
           f"mode={scale_mode}, w={w}, tol={tolerance}", flush=True)
 
+    # Normalise both clouds before running CPD for numerical stability.
+    # Rotation is recovered from the normalised run; translation is computed
+    # from the original centroids afterwards, which is exact for rigid registration.
+    X_n, Y_n, mean_X, mean_Y = _preprocess(fixed, moving)
+
     if scale_mode == "Rigid+scale":
-        R, t, s = _run_with_scale(fixed, moving, max_iter, tolerance, w)
-        print(f"CPD complete (rigid+scale). s={s:.4f}, translation corrected to remove scale.", flush=True)
-        return R, t
+        R, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
+        print(f"CPD complete (rigid+scale). Scale s={s:.4f}", flush=True)
 
     elif scale_mode == "Auto":
-        R, t, s = _run_with_scale(fixed, moving, max_iter, tolerance, w)
-        if abs(s - 1.0) <= scale_threshold:
-            print(f"CPD auto: s={s:.4f} within threshold {scale_threshold}, "
-                  f"keeping scaled result (translation corrected).", flush=True)
-            return R, t
-        else:
-            print(f"CPD auto: s={s:.4f} exceeds threshold {scale_threshold}, "
+        R, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
+        if abs(s - 1.0) > scale_threshold:
+            print(f"CPD auto: scale s={s:.4f} exceeds threshold {scale_threshold}, "
                   f"rerunning without scale.", flush=True)
-            return _run_no_scale(fixed, moving, max_iter, tolerance, w)
+            R = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
+        else:
+            print(f"CPD auto: scale s={s:.4f} within threshold {scale_threshold}.", flush=True)
 
     else:  # "Rigid" (default)
-        return _run_no_scale(fixed, moving, max_iter, tolerance, w)
+        R = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
+        print("CPD complete (rigid, no scale).", flush=True)
+
+    # Translation: map centroid of moving to centroid of fixed under rotation R.
+    # Exact for rigid registration regardless of whether scale was used to find R.
+    # Row-vector form: t = mean_X - mean_Y @ R
+    t = mean_X - np.dot(mean_Y, R)
+    return R, t
 
 
 if __name__ == '__main__':
