@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Unix setup script
@@ -11,7 +11,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import object
 import subprocess
 import optparse
 import sys

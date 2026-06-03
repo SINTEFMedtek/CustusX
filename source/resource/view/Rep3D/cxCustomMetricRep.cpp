@@ -88,7 +88,7 @@ void CustomMetricRep::updateImageModel(DataPtr model)
 {
 	ImagePtr imageModel = boost::dynamic_pointer_cast<Image>(model);
 
-	if(!imageModel && !imageModel->is2D())
+	if(!imageModel || !imageModel->is2D())
 		return;
 
 	CustomMetricPtr custom = this->getCustomMetric();

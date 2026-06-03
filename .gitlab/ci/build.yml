@@ -1,0 +1,105 @@
+# Build stage templates and jobs
+
+# CI_PROJECT_DIR is deleted from the Docker image before the build,
+# so a quick build requires out of source build files
+.build-variables:
+  stage: build
+  variables:
+    VERSION: ${CI_COMMIT_SHORT_SHA}
+    OS: OS
+    BASE_DIR: /builds/$OS
+    GIT_CLONE_PATH: /builds/$OS/CX/CX #Changes CI_PROJECT_DIR
+    BUILD_DIR: $CI_PROJECT_DIR/../build_Release
+    BUILD_IGSTK: "false"
+
+.create-installer:
+  script:
+    - cd $BUILD_DIR
+    # Remove old installer
+    - rm -f CustusX*.tar.gz
+    - cpack
+    # The file CustusX*.tar.gz should now be in ../build_Release, and html_pure and html_dev in ../build_Release/doc
+    - cd $CI_PROJECT_DIR
+    - mkdir -p $OS/package_artefacts
+    - cp -R $BUILD_DIR/CustusX*.tar.gz $OS/package_artefacts/
+    - cp -R $BUILD_DIR/doc/html_pure $OS/package_artefacts/html_pure/
+    - cp -R $BUILD_DIR/doc/html_dev $OS/package_artefacts/html_dev/
+    - echo "Compile complete."
+  artifacts:
+    paths:
+      - $OS/package_artefacts/CustusX*.tar.gz
+      - $OS/package_artefacts/html_pure/
+      - $OS/package_artefacts/html_dev/
+
+.reuse-build:
+  extends:
+    - .build-variables
+    - .create-installer
+  before_script:
+  - ls $BASE_DIR
+  - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=$CI_COMMIT_BRANCH; fi
+  - !reference [.lib-package-vars, script]
+  - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true
+  - LIBS_SENTINEL="$BASE_DIR/.lib_version_${PACKAGE_VERSION}"
+  - echo "Libs package version $PACKAGE_VERSION"
+  # Try to use prebuilt libs: local cache first, then Package Registry, then full rebuild.
+  # All cd $BASE_DIR calls use subshells to keep the working directory at CI_PROJECT_DIR.
+  - |
+    LIBS_READY=false
+    if [ -f "$LIBS_SENTINEL" ]; then
+      echo "Lib cache hit: $LIBS_SENTINEL"
+      LIBS_READY=true
+    else
+      echo "Lib cache miss, checking Package Registry..."
+      HTTP_CODE=$(curl -s -o /tmp/$PACKAGE_FILE -w "%{http_code}" \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
+      if [ "$HTTP_CODE" = "200" ]; then
+        echo "Downloaded prebuilt libs, extracting to $BASE_DIR..."
+        ( cd $BASE_DIR && rm -rf $IGSTK_LIBS && tar -xzf /tmp/$PACKAGE_FILE )
+        rm -f $BASE_DIR/.lib_version_*
+        touch "$LIBS_SENTINEL"
+        LIBS_READY=true
+      else
+        echo "Package not found (HTTP $HTTP_CODE), will build all from scratch."
+      fi
+    fi
+  - |
+    if [ "$LIBS_READY" = "true" ]; then
+      echo "Building CustusX only..."
+      eval ./install/cxInstaller.py -s --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+        --main_branch $CX_COMMIT \
+        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx \
+        components CustusX
+    else
+      echo "Full build (all external libs + CustusX)..."
+      eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
+        --main_branch $CX_COMMIT \
+        --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
+      echo "Uploading libs to Package Registry for future runs..."
+      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
+        --exclude='*/CMakeFiles' \
+        --exclude='*/.git' \
+        $IGSTK_LIBS )
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL" || true
+      rm -f $BASE_DIR/.lib_version_*
+      touch "$LIBS_SENTINEL"
+    fi
+
+build-ubuntu20:
+  extends: .reuse-build
+  image: $IMAGE_UBUNTU2004
+  variables:
+    OS: Ubuntu2004
+
+build-ubuntu22:
+  extends: .reuse-build
+  image: $IMAGE_UBUNTU2204
+  variables:
+    OS: Ubuntu2204
+
+build-ubuntu24:
+  extends: .reuse-build
+  image: $IMAGE_UBUNTU2404
+  variables:
+    OS: Ubuntu2404

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxRegistrationTransform.h"
 //#include <QtXML>
 #include <QDomElement>
+#include <iostream>
 #include "cxTime.h"
 #include "cxTypeConversions.h"
 #include "cxLogger.h"

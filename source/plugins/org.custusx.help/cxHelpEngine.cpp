@@ -132,7 +132,7 @@ QString HelpEngine::findBestMatchingKeyword(QObject* object)
 		if (id.contains("help_widget"))
 			return "";
 
-		QMap<QString, QUrl> links = this->engine()->linksForIdentifier(id);
+		QMap<QString, QUrl> links = this->engine()->linksForKeyword(id);
 		if (!links.empty())
 		{
 			return id;

@@ -131,6 +131,7 @@ TEST_CASE("Can load NIfTi files as images", "[unit][nifti][core][resource]")
 	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 
 	cx::ImagePtr image = readNIfTITestImage(filemanager);
+	REQUIRE(image->getBaseVtkImageData());
 	REQUIRE(((int)image->getBaseVtkImageData()->GetActualMemorySize()) > 0);
 	cx::LogicManager::shutdown();
 }
@@ -141,6 +142,7 @@ TEST_CASE("Can load Mhd files as images", "[unit][mhd][core][resource]")
 	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 
 	cx::ImagePtr image = readMhdTestImage(filemanager);
+	REQUIRE(image->getBaseVtkImageData());
 	REQUIRE(((int)image->getBaseVtkImageData()->GetActualMemorySize()) > 0);
 	cx::LogicManager::shutdown();
 }
@@ -184,6 +186,7 @@ TEST_CASE("Image copy: Voxels equal", "[unit][resource][core]")
 	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 
 	cx::ImagePtr image = readMhdTestImage(filemanager);
+	REQUIRE(image->getBaseVtkImageData());
 	cx::ImagePtr imageCopy = image->copy();
 	vtkImageDataPtr vtkImage = image->getBaseVtkImageData();
 	vtkImageDataPtr vtkImageCopy = imageCopy->getBaseVtkImageData();
@@ -252,6 +255,7 @@ TEST_CASE("Image: Initial window is kept after using UnsignedDerivedImage", "[un
 	cx::FileManagerServicePtr filemanager = cx::FileManagerServiceProxy::create(cx::logicManager()->getPluginContext());
 
 	cx::ImagePtr image = readKaisaTestImage(filemanager);
+	REQUIRE(image->getBaseVtkImageData());
 	image->resetTransferFunctions();
 	double initialWindowWidth = image->getInitialWindowWidth();
 	double initialWindowlevel = image->getInitialWindowLevel();

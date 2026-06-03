@@ -34,7 +34,7 @@ Q_OBJECT
 public:
 	ViewRepCollectionPtr getView();
 
-	ViewWidget(QWidget *parent, const QString& uid="", const QString& name = "", Qt::WindowFlags f = 0); ///< constructor
+	ViewWidget(QWidget *parent, const QString& uid="", const QString& name = "", Qt::WindowFlags f = {}); ///< constructor
 	virtual ~ViewWidget();
 
 	virtual vtkRenderWindowPtr getRenderWindow() { return this->getView()->getRenderWindow(); } ///< Get the vtkRenderWindow used by this \a View.

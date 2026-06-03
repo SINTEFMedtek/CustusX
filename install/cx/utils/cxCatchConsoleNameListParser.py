@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Catch helper
@@ -12,7 +12,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from builtins import object
 import sys
 import re
 import pprint

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Unix setup script
@@ -11,9 +11,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import input
 import subprocess
 import argparse
 import re

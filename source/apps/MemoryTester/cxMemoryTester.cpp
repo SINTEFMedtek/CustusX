@@ -10,6 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 
 #include "cxMemoryTester.h"
+#include <iostream>
 #include <vtkImageData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPointData.h>

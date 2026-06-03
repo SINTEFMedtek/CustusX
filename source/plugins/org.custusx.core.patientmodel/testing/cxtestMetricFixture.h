@@ -20,6 +20,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxPointMetric.h"
 #include "cxPlaneMetric.h"
 #include <QDomNode>
+#include <iostream>
 #include "cxtestVisServices.h"
 #include "cxMessageListener.h"
 #include "cxPatientModelService.h"

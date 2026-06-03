@@ -21,7 +21,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QListView>
 #include <QHeaderView>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QGuiApplication>
+#include <QScreen>
 #include <QStackedWidget>
 #include <QProgressDialog>
 #include <QTextStream>
@@ -200,7 +201,8 @@ ImportWidget::ImportWidget(cx::FileManagerServicePtr filemanager, cx::VisService
 	mTableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	mTableWidget->setShowGrid(false);
 	mTableWidget->setStyleSheet("QTableView {selection-background-color: #ACCEF7;}");
-	mTableWidget->setGeometry(QApplication::desktop()->screenGeometry());
+	if (QScreen* primaryScreen = QGuiApplication::primaryScreen())
+		mTableWidget->setGeometry(primaryScreen->geometry());
 	connect(mTableWidget, &QTableWidget::currentCellChanged, this, &ImportWidget::tableItemSelected);
 
 	mStackedWidget = new QStackedWidget;

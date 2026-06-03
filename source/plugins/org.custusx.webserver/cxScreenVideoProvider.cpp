@@ -13,7 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPixmap>
 #include "cxPatientModelService.h"
 #include <QtConcurrent>
-#include <QDesktopWidget>
+#include <QGuiApplication>
 #include <QApplication>
 #include "cxReporter.h"
 #include "boost/bind.hpp"
@@ -126,10 +126,12 @@ void ScreenVideoProvider::showSecondaryLayout(QSize size, QString layout)
 
 void ScreenVideoProvider::setWidgetToNiceSizeInLowerRightCorner(QSize size)
 {
-	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
-	QRect rect_s = desktop->availableGeometry(mTopWindow);
+	QScreen* screen = QGuiApplication::screenAt(mTopWindow->mapToGlobal(mTopWindow->rect().center()));
+	if (!screen)
+		screen = QGuiApplication::primaryScreen();
+	QRect rect_s = screen->availableGeometry();
 
 	// default to 33% of the screen
 	if (size.width()==0 || size.height()==0)

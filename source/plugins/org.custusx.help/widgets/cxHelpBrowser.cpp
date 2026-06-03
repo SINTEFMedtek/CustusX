@@ -28,7 +28,7 @@ void HelpBrowser::showHelpForKeyword(const QString &id)
 {
 	if (mEngine->engine())
 	{
-		QMap<QString, QUrl> links = mEngine->engine()->linksForIdentifier(id);
+		QMap<QString, QUrl> links = mEngine->engine()->linksForKeyword(id);
 		if (links.count())
 		{
 			setSource(links.first());

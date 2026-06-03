@@ -11,9 +11,6 @@
 #################################################
 
 from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import subprocess
 import optparse
 import re
@@ -195,7 +192,7 @@ class ITK(CppComponent):
         add = builder.addCMakeOption
         add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
-        #add('CMAKE_CXX_STANDARD:STRING',11) # Cause build to fail on Ubuntu 16.04 and macOS
+        add('CMAKE_CXX_STANDARD:STRING', 14)
         builder.configureCMake()
     def repository(self):
         return '%s/ITK.git' % self.controlData.gitrepo_main_site_base
@@ -221,6 +218,7 @@ class newITK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('ITK_USE_SYSTEM_EIGEN:BOOL', True)
         add('Eigen3_DIR:PATH', self._createSibling(Eigen).configPath())
+        add('CMAKE_CXX_STANDARD:STRING', 17)
         builder.configureCMake()
     def repository(self):
         return 'https://github.com/InsightSoftwareConsortium/ITK.git'
@@ -238,7 +236,63 @@ class VTK(CppComponent):
         return 'https://gitlab.kitware.com/vtk/vtk.git' # Switch to local repo copy for speedup later?
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckout('v9.2.4')
+        self._getBuilder().gitCheckout('v9.6.1')
+    def configure(self):
+        builder = self._getBuilder()
+        add = builder.addCMakeOption
+        add('VTK_USE_PARALLEL:BOOL', 'ON')
+        add('VTK_REQUIRED_OBJCXX_FLAGS:STRING', "")
+        add('VTK_USE_RPATH:BOOL', 'ON')
+
+        use_qt5 = True
+        if use_qt5:
+            add('VTK_QT_VERSION:STRING', "5")
+            add('VTK_Group_Qt:BOOL', "ON")
+            if(platform.system() == 'Darwin'):
+              add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake")
+              add('Qt5_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5")
+              add('Qt5Core_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5Core")
+              add('Qt5Gui_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5Gui")
+              add('Qt5Widgets_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5Widgets")
+              add('Qt5OpenGL_DIR:PATH', "/opt/homebrew/opt/qt@5/lib/cmake/Qt5OpenGL")
+              sdk_path = subprocess.check_output(['xcrun', '--show-sdk-path']).decode().strip()
+              add('CMAKE_OSX_SYSROOT:PATH', sdk_path)
+            if(platform.system() == 'Linux'):
+              add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
+        else:
+            add('DESIRED_QT_VERSION:STRING', 4)
+            add('Module_vtkGUISupportQt:BOOL', 'ON')
+            add('VTK_USE_PARALLEL:BOOL', 'ON')
+            add('VTK_USE_RPATH:BOOL', 'ON')
+
+        add('BUILD_TESTING:BOOL', self.controlData.mBuildExAndTest)
+        add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
+        add('Module_vtkGUISupportQt:BOOL', 'ON')
+        add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
+        #VTK 9
+        add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
+        add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
+        
+        add('CMAKE_SUPPRESS_DEVELOPER_WARNINGS:BOOL', 'ON') # Build process prints a lot of warnings
+        builder.configureCMake()
+# ---------------------------------------------------------
+
+# VTK 9.3+ enforces C++17 via target_compile_features, which breaks ITK 4.12.0
+# headers when CustusX is compiled against both. Use oldVTK (9.2.x) for IGSTK
+# builds where old ITK is required. Shares the same name/paths as VTK so all
+# _createSibling(VTK) references in IGSTK, CTK, CustusX resolve correctly.
+class oldVTK(CppComponent):
+    def name(self):
+        return "VTK"
+    def help(self):
+        return 'vtk.org'
+    def getBuildType(self):
+        return self.controlData.getBuildExternalsType()
+    def repository(self):
+        return 'https://gitlab.kitware.com/vtk/vtk.git'
+    def update(self):
+        self._getBuilder().gitSetRemoteURL(self.repository())
+        self._getBuilder().gitCheckout('v9.2.6')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -264,11 +318,10 @@ class VTK(CppComponent):
         add('BUILD_EXAMPLES:BOOL', self.controlData.mBuildExAndTest)
         add('Module_vtkGUISupportQt:BOOL', 'ON')
         add('VTK_RENDERING_BACKEND:STRING', "OpenGL2")
-        #VTK 9
         add('VTK_MODULE_ENABLE_VTK_GuiSupportQt:STRING', 'YES')
         add('VTK_MODULE_ENABLE_VTK_ViewsQt:STRING', 'YES')
-        
-        add('CMAKE_SUPPRESS_DEVELOPER_WARNINGS:BOOL', 'ON') # Build process prints a lot of warnings
+
+        add('CMAKE_SUPPRESS_DEVELOPER_WARNINGS:BOOL', 'ON')
         builder.configureCMake()
 # ---------------------------------------------------------
 
@@ -284,7 +337,10 @@ class CTK(CppComponent):
         #return '%s/CTK.git' % base
         return 'https://github.com/commontk/CTK.git' # Switch to local repo copy for speedup later?
     def update(self):
-        self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
+        if (platform.system() == 'Darwin'):
+            self._getBuilder().gitCheckoutSha('a54983b07cfc64cde7b6de9351b32531623ad1e1')
+        else:
+            self._getBuilder().gitCheckoutSha('dec834fccffebdc3b0896c157d39e3c0031c4a0a')
         #self._getBuilder().gitCheckoutSha('2023.07.13') # Makes DICOM import fail
         self._getBuilder().gitSetRemoteURL(self.repository())
     def configure(self):
@@ -296,7 +352,9 @@ class CTK(CppComponent):
         add('CTK_ENABLE_PluginFramework:BOOL', 'ON')
         add('CTK_BUILD_SHARED_LIBS:BOOL', 'ON')
         if(platform.system() == 'Darwin'):
-          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake")
+          if (platform.machine() == 'arm64'):
+            add('CMAKE_OSX_ARCHITECTURES:STRING', 'arm64')
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         add('CTK_LIB_Visualization/VTK/Core:BOOL', 'ON')
@@ -405,13 +463,16 @@ class OpenIGTLinkIO(CppComponent):
             return 'git@github.com:IGSIO/OpenIGTLinkIO.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('f144a2e66eb7d4361af91ecee48caf6f80465d48') # 15. Nov 2023
+        # self._getBuilder().gitCheckoutSha('f144a2e66eb7d4361af91ecee48caf6f80465d48') # 15. Nov 2023
+        self._getBuilder().gitCheckoutSha('d7f6aef826d934577a39b48d9485bc0848f27cb8') # 18. Jul 2025
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
+        add('BUILD_TESTING:BOOL', False)
+        add('IGTLIO_USE_EXAMPLES:BOOL', False)
         builder.configureCMake()
     def addConfigurationToDownstreamLib(self, builder):
         add = builder.addCMakeOption
@@ -432,7 +493,7 @@ class IGSTK(CppComponent):
         return 'https://github.com/SINTEFMedtek/IGSTK.git'
     def update(self):
         self._getBuilder().gitSetRemoteURL(self.repository())
-        self._getBuilder().gitCheckoutSha('79be2fd9cd985f73662f325d8b13dd22870a2ec1')
+        self._getBuilder().gitCheckoutSha('fa6eb05b045e5456c1b85f7fe3297bd235f07590')
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
@@ -442,6 +503,7 @@ class IGSTK(CppComponent):
         add('IGSTK_SERIAL_PORT_0', self._getSerialPort())
         add('BUILD_TESTING:BOOL', False)
         add('BUILD_EXAMPLES:BOOL', False)
+        add('CMAKE_CXX_STANDARD:STRING', 14)
         builder.configureCMake()
     def _getSerialPort(self):
         serialPort = "/Library/CustusX/igstk.links/cu.CustusX.dev0"
@@ -480,7 +542,6 @@ class CustusX(CppComponent):
         add('EIGEN_INCLUDE_DIR:PATH', '%s' % self._createSibling(Eigen).sourcePath())
         add('ITK_DIR:PATH', self._createSibling(ITK).configPath())
         add('VTK_DIR:PATH', self._createSibling(VTK).configPath())
-        add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
         add('OpenIGTLink_DIR:PATH', self._createSibling(OpenIGTLink).configPath())
         add('OpenIGTLinkIO_DIR:PATH', self._createSibling(OpenIGTLinkIO).configPath())
         add('OpenCV_DIR:PATH', self._createSibling(OpenCV).configPath())
@@ -488,6 +549,15 @@ class CustusX(CppComponent):
         add('CTK_DIR:PATH', self._createSibling(CTK).configPath())
         add('OpenCLUtilityLibrary_DIR:PATH', self._createSibling(OpenCLUtilityLibrary).configPath())
         add('CX_PLUGIN_org.custusx.filter.airways:BOOL', False); # Airways plugin requires FAST library
+        if self.controlData.mBuildIGSTK:
+            add('IGSTK_DIR:PATH', self._createSibling(IGSTK).configPath())
+            add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', True)
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
+            add('CMAKE_CXX_STANDARD:STRING', 14)
+            append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive') # old ITK throw() specs are forbidden in C++17
+        else:
+            add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', True)
         #if(platform.system() == 'Linux'):
         #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
@@ -497,7 +567,7 @@ class CustusX(CppComponent):
         add('CX_SYSTEM_BASE_NAME:STRING', self.controlData.system_base_name)
         add('CX_SYSTEM_DEFAULT_APPLICATION:STRING', self.controlData.system_base_name)
         if(platform.system() == 'Darwin'):
-          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake;/opt/homebrew")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         # See CX-208 about this Eigen flag and about updating Eigen.
@@ -649,7 +719,7 @@ class QHttpServer(CppComponent):
         builder = self._getBuilder()
         add = builder.addCMakeOption
         if(platform.system() == 'Darwin'):
-          add('CMAKE_PREFIX_PATH:PATH', "/Users/dev/Qt/5.15.2/clang_64/lib/cmake")
+          add('CMAKE_PREFIX_PATH:PATH', "/opt/homebrew/opt/qt@5/lib/cmake")
         if(platform.system() == 'Linux'):
           add('CMAKE_PREFIX_PATH:PATH', "/home/dev/Qt/5.15.2/gcc_64/lib/cmake")
         builder.configureCMake()

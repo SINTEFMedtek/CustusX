@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # CustusX setup script
@@ -8,7 +8,6 @@
 #####################################################
 
 from __future__ import print_function
-from builtins import object
 import logging
 import time    
 import subprocess

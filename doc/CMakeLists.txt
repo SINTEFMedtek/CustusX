@@ -195,8 +195,12 @@ function(cx_build_user_documentation_qt_help)
     # works on mac
     get_target_property(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE Qt5::qcollectiongenerator LOCATION)
     if (NOT TARGET Qt5::qcollectiongenerator)
-      # required on ubuntu
-      set(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator)
+      # qcollectiongenerator was merged into qhelpgenerator in Qt 5.13; use the right tool per version
+      if(Qt5Core_VERSION VERSION_GREATER_EQUAL "5.13")
+        set(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qhelpgenerator)
+      else()
+        set(CX_QT_QCOLLECTIONGENERATOR_EXECUTABLE qcollectiongenerator)
+      endif()
     endif()
     # .. not tested on win
 

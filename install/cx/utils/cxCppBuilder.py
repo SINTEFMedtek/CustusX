@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Unix setup script
@@ -12,10 +12,6 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
 import subprocess
 import optparse
 import re
@@ -59,9 +55,10 @@ class CppBuilder(object):
             if(self.controlData.getCMakeGenerator() == 'Ninja'):
                 runShell('''ninja''')
         else:
-            maker = 'make -j%s' % str(self.controlData.threads)
             if(self.controlData.getCMakeGenerator() == 'Ninja'):
-                maker = 'ninja'
+                maker = 'ninja -j%s' % str(self.controlData.threads)
+            else:
+                maker = 'make -j%s' % str(self.controlData.threads)
 
             # the export DYLD... line is a hack to get shared linking to work on MacOS with vtk5.6
             # - http://www.mail-archive.com/paraview@paraview.org/msg07520.html
@@ -122,15 +119,18 @@ class CppBuilder(object):
 
     def gitCheckoutTag(self, tag):
         '''
-        Update git to the given tag.
-        Skip if HEAD already is at tag.
+        Update git to the given tag or SHA.
+        Skip if HEAD already is at tag/SHA, but warn if local modifications exist.
         '''
         self._changeDirToSource()
         if self._checkGitIsAtTag(tag):
-            return        
+            return
         runShell('git fetch')
+        if self._checkGitIsAtRef(tag):
+            self._warnIfLocalModifications(tag)
+            return
         runShell('git checkout %s' % tag)
-        
+
     def gitCheckout(self, tag):
         '''
         Backwards compatibility
@@ -145,6 +145,9 @@ class CppBuilder(object):
         '''
         self._changeDirToSource()
         runShell('git fetch')
+        if self._checkGitIsAtRef(sha):
+            self._warnIfLocalModifications(sha)
+            return
         runShell('git checkout %s' % sha)
 
     def _checkGitIsAtTag(self, tag):
@@ -155,6 +158,22 @@ class CppBuilder(object):
             print("Skipping git update: Tag %s already at HEAD in %s" % (tag, self.mSourcePath))
             return True
         return False
+
+    def _checkGitIsAtRef(self, ref):
+        'Return True if HEAD resolves to the same commit as ref'
+        head = shell.evaluate('git rev-parse HEAD')
+        target = shell.evaluate('git rev-parse %s^{}' % ref)
+        if head and target and head.stdout.strip() == target.stdout.strip():
+            return True
+        return False
+
+    def _warnIfLocalModifications(self, ref):
+        result = shell.evaluate('git diff --name-only HEAD')
+        if not result or not result.stdout.strip():
+            return
+        print('WARNING: Already at %s in %s, but the following files have local modifications:' % (ref, self.mSourcePath))
+        print(result.stdout.strip())
+        print('These may affect the build. Run "git reset --hard HEAD" in that folder to restore committed state.')
                     
     def _getPathToModule(self):
         # alternatively use  sys.argv[0] ?? 
@@ -211,9 +230,14 @@ class CppBuilder(object):
         if(platform.system() != 'Windows'):
             # append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override -Wno-self-assign-field')
             append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
-        add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)        
+        add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
+        if(platform.system() == 'Darwin' and platform.machine() == 'arm64'):
+            if('CMAKE_OSX_ARCHITECTURES' not in self.cmakeOptions and 'CMAKE_OSX_ARCHITECTURES:STRING' not in self.cmakeOptions):
+                add('CMAKE_OSX_ARCHITECTURES:STRING', 'arm64')
+            if('CMAKE_PREFIX_PATH:PATH' not in self.cmakeOptions):
+                add('CMAKE_PREFIX_PATH:PATH', '/opt/homebrew')
         if('BUILD_SHARED_LIBS:BOOL' not in self.cmakeOptions):
             add('BUILD_SHARED_LIBS:BOOL', self.controlData.getBuildShared())
         add('CMAKE_ECLIPSE_VERSION', self.controlData.getEclipseVersion())

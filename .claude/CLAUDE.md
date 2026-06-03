@@ -125,6 +125,8 @@ Closed source repositories are typically handled by a similar cxPrivateComponent
 - Namespaces: `cx` (production) and `cxtest` (tests)
 
 **Structure rules:**
+- Indentation: tabs (not spaces)
+- Prefer explicit variable types over `auto`; explicit types make the code easier to read and understand
 - Always use `{}` for `if`/`while`/`for`/`do` bodies
 - Brackets on their own line
 - `.cpp` files include their own header first
@@ -132,6 +134,9 @@ Closed source repositories are typically handled by a similar cxPrivateComponent
 - Use `const` wherever possible
 - No globals; no `delete` (use Qt/VTK/smart pointers)
 - No commented-out dead code
+- Try to only use a single return point in functions
+- Keep function size small, usually not more than 30 lines
+- All commit messages should be tagged with issue reference (If the branch name starts with cx[number], the issue reference is usually CustusX#[number])
 
 **Units (always follow these unless explicitly stated otherwise):**
 - Distances: millimeters

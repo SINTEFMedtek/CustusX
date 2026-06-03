@@ -18,6 +18,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <Windows.h>     // defines APIENTRY, WINGDI types, etc.
 #endif
 
+#include <iostream>
 #include <vtkShaderProgram.h>
 #include <vtkShader.h>
 #include <vtkOpenGLHelper.h>

@@ -11,9 +11,6 @@
 #################################################             
 
 from __future__ import absolute_import
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 import subprocess
 import argparse
 import re
@@ -43,15 +40,15 @@ class LibraryAssembly(object):
         self.custusx = cxComponents.CustusX()
 
         self.addComponent(cxComponents.Eigen())
-        self.addComponent(cxComponents.VTK())
-        if(platform.system() == 'Windows'):
-            self.addComponent(cxComponents.newITK())
-        else:
+        if self.controlData.mBuildIGSTK:
+            self.addComponent(cxComponents.oldVTK())
             self.addComponent(cxComponents.ITK())
+            self.addComponent(cxComponents.IGSTK())
+        else:
+            self.addComponent(cxComponents.VTK())
+            self.addComponent(cxComponents.newITK())
         self.addComponent(cxComponents.OpenCV())
         self.addComponent(cxComponents.OpenIGTLink())
-        if(platform.system() != 'Windows'): # IGSTK won't compile with new ITK versions
-            self.addComponent(cxComponents.IGSTK())
         self.addComponent(cxComponents.CTK())
         self.addComponent(cxComponents.OpenIGTLinkIO())
         self.addComponent(cxComponents.OpenCLUtilityLibrary())

@@ -19,6 +19,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QThread>
 #include <QDateTime>
 #include <QTimer>
+#include <iostream>
 
 #include <vtkPolyData.h>
 

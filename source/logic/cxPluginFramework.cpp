@@ -16,6 +16,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
 
 #include "ctkPluginFrameworkFactory.h"
 #include "ctkPluginFramework.h"
@@ -118,13 +120,15 @@ void PluginFrameworkManager::loadState()
 	std::vector<PluginLoadInfo> info = this->getPluginLoadInfo(names);
 
 	// install all plugins, must do this first in order to let FW handle dependencies.
-	CX_LOG_CHANNEL_INFO("plugin") << "Installing all plugins...";
+	CX_LOG_CHANNEL_INFO("plugin") << QString("Installing %1 plugins...").arg(info.size());
 	for (unsigned i=0; i< info.size(); ++i)
 	{
 		if (info[i].targetState != ctkPlugin::UNINSTALLED)
-        {
+		{
+			// CX_LOG_CHANNEL_INFO("plugin") << QString("Installing plugin %1").arg(info[i].symbolicName);
 			this->install(info[i].symbolicName);
-        }
+			// CX_LOG_CHANNEL_INFO("plugin") << QString("Done installing plugin %1").arg(info[i].symbolicName);
+		}
 	}
 
 	// start all plugins
@@ -138,6 +142,7 @@ void PluginFrameworkManager::loadState()
 				CX_LOG_CHANNEL_INFO("plugin") << QString("Starting plugin %1").arg(info[i].symbolicName);
 
 			this->start(info[i].symbolicName, ctkPlugin::START_TRANSIENT);
+			// CX_LOG_CHANNEL_INFO("plugin") << QString("Done starting plugin %1").arg(info[i].symbolicName);
 		}
 		else
 		{
@@ -475,6 +480,29 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames()
 		result.append(this->getPluginSymbolicNames(searchPath));
 	}
 	result.removeDuplicates();
+
+	QStringList enabledInManifest;
+	if (this->getEnabledPluginsFromManifest(enabledInManifest))
+	{
+		QStringList skipped;
+		foreach (QString name, result)
+		{
+			if (!enabledInManifest.contains(name))
+				skipped << name;
+		}
+		if (!skipped.isEmpty())
+			CX_LOG_CHANNEL_INFO("plugin") << QString("Skipping %1 plugins not in build manifest: %2")
+											 .arg(skipped.size())
+											 .arg(skipped.join(", "));
+		QStringList filtered;
+		foreach (QString name, result)
+		{
+			if (enabledInManifest.contains(name))
+				filtered << name;
+		}
+		result = filtered;
+	}
+
 	return result;
 }
 
@@ -495,6 +523,27 @@ QStringList PluginFrameworkManager::getPluginSymbolicNames(const QString& search
 	}
 
 	return result;
+}
+
+bool PluginFrameworkManager::getEnabledPluginsFromManifest(QStringList& enabledPlugins)
+{
+	QString manifestPath = DataLocations::getDocPath() + "/cxBuiltPlugins.txt";
+	QFile file(manifestPath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		CX_LOG_CHANNEL_WARNING("plugin") << "Could not find plugin build manifest: " << manifestPath;
+		return false;
+	}
+
+	QTextStream in(&file);
+	while (!in.atEnd())
+	{
+		QString line = in.readLine().trimmed();
+		if (!line.isEmpty())
+			enabledPlugins << line;
+	}
+
+	return true;
 }
 
 bool PluginFrameworkManager::nameIsProbablyPlugin(QString name) const

@@ -74,6 +74,7 @@ public:
   {
 	  QMutexLocker sentry(&mOrigMutex);
 	  mOrig->sputn(sequence.toLatin1(), sequence.size());
+	  mOrig->pubsync();
   }
 
 private:

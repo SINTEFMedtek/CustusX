@@ -25,7 +25,7 @@ int checkConnection(QObject* qobject, const char* signal,
 	int code = (signal[0] - '0') & 0x03;
 	if ( code != QSIGNAL_CODE )
 	{
-		cerr << "Error connecting " << norm.constData() << "; not a signal" <<
+		std::cerr << "Error connecting " << norm.constData() << "; not a signal" <<
 			endl;
 		return -1;
 	}
@@ -34,7 +34,7 @@ int checkConnection(QObject* qobject, const char* signal,
 	if ( (signalId =qobject->metaObject()->indexOfSignal(norm.constData())) <
 		0 )
 	{
-		cerr << "Error connecting " << norm.constData() << "; signal does not exist on object " << qobject->objectName().toStdString() << endl;
+		std::cerr << "Error connecting " << norm.constData() << "; signal does not exist on object " << qobject->objectName().toStdString() << endl;
 		return -1;
 	}
 
@@ -44,7 +44,7 @@ int checkConnection(QObject* qobject, const char* signal,
 
 	if ( arity != pn.size() )
 	{
-		cerr << "Error connecting " << norm.constData() << "; # of arguments do not match" << endl;
+		std::cerr << "Error connecting " << norm.constData() << "; # of arguments do not match" << endl;
 		return -1;
 	}
 

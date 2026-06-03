@@ -241,6 +241,8 @@ void LogicManager::shutdownLegacyStoredServices()
 	this->shutdownService(mSpaceProvider, "SpaceProvider"); // remove before patmodel and track
 	this->shutdownService(mStateService, "StateService");
 	this->shutdownService(mViewService, "ViewService");
+	if (mTrackingService)
+		mTrackingService->setState(Tool::tsNONE); // stop hardware threads before teardown
 	this->shutdownService(mTrackingService, "TrackingService");
 	this->shutdownService(mPatientModelService, "PatientModelService");
 	this->shutdownService(mVideoService, "VideoService");

@@ -190,7 +190,7 @@ void USAcquisitionVideoPlayback::usDataLoadFinishedSlot()
 	if (tool)
 	{
 		ProbePtr probe = tool->getProbe();
-		if (probe)
+		if (probe && probe->isValid())
 			probe->setProbeDefinition(mCurrentData.mProbeDefinition.mData);
 	}
 

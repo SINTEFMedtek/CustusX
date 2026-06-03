@@ -1,6 +1,7 @@
 
 
 #include "cxBronchoscopePositionProjection.h"
+#include <iostream>
 #include <vtkPolyData.h>
 #include "cxDoubleProperty.h"
 #include "cxBranchList.h"

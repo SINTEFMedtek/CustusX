@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Author: Christian Askeland, SINTEF Medical Technology
@@ -7,7 +7,6 @@
 #################################################  
 
 from __future__ import print_function
-from builtins import object
 import subprocess
 import platform
 
