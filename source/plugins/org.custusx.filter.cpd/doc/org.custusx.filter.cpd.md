@@ -29,8 +29,6 @@ Run the filter. The moving mesh and all associated data are moved to the registe
 Parameters
 ----------
 
-- **Max iterations**: Maximum number of EM iterations (default: 100)
-- **Tolerance**: EM convergence threshold — smaller values require more iterations (default: 1e-3)
 - **Outlier weight (w)**: Fraction of points treated as noise rather than valid correspondences.
   Increase for noisy data or when the meshes only partially overlap (default: 0 = all points valid).
   Range 0–0.9.
@@ -42,6 +40,8 @@ Parameters
     the threshold below.
 - **Scale threshold**: Used only in *Auto* mode. If `|scale − 1|` exceeds this value the
   registration falls back to *Rigid* (default: 0.1).
+- **Max iterations**: Maximum number of EM iterations (default: 100)
+- **Tolerance**: EM convergence threshold — smaller values require more iterations (default: 1e-3)
 
 \addtogroup cx_user_doc_group_filter
 
