@@ -46,7 +46,7 @@ Q_OBJECT
 public:
 	explicit GraphicalBox();
 	virtual ~GraphicalBox();
-	void setRenderWindow(vtkRenderWindowPtr renderWindow); ///< adds an interactive box widget to the view. Press 'I' to show
+	void setRenderWindow(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer = vtkRendererPtr()); ///< adds an interactive box widget to the view. Press 'I' to show
 
 	DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
 	void setBoundingBox(const DoubleBoundingBox3D& bb_d); ///< set BB in d space
@@ -86,6 +86,7 @@ private:
 	void setBoxTransform(const Transform3D& M);
 
 	vtkRenderWindowPtr mRenderWindow;
+	vtkRendererPtr mRenderer;
 	vtkBoxWidgetPtr mBoxWidget;
 	GraphicalBoxCallbackPtr mGraphicalBoxCallback;
 	GraphicalBoxEnableCallbackPtr mGraphicalBoxEnableCallback;

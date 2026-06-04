@@ -145,6 +145,7 @@ private:
 
 	static void ProcessEvents(vtkObject *object, unsigned long event, void *clientdata, void *calldata);
 	vtkCallbackCommandPtr mCallbackCommand = nullptr;
+	InteractiveCropperPtr mInteractiveCropper;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 

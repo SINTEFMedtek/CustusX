@@ -79,6 +79,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
 #include "cxVisServices.h"
+#include "cxInteractiveCropper.h"
 #include "cxNavigation.h"
 
 #include "cxTrackedStream.h"
@@ -110,6 +111,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	this->mCallbackCommand->SetClientData(this);
 	this->mCallbackCommand->SetCallback(ViewWrapper3D::ProcessEvents);
 	mView->getRenderWindow()->GetInteractor()->AddObserver(vtkCommand::AnyEvent, this->mCallbackCommand, 1.0);//Catch all events
+	mInteractiveCropper = mServices->view()->getCropper();
 
 	QString index = QString::number(startIndex);
 	QColor background = settings()->value("backgroundColor").value<QColor>();
@@ -178,6 +180,7 @@ void ViewWrapper3D::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long e
 	//All events makes VTK do additional rendering, but some needs to be sent further to allow the use of VTK interactor
 	//Block all other events
 	if(event == vtkCommand::LeftButtonPressEvent
+			|| event == vtkCommand::LeftButtonReleaseEvent
 			|| event == vtkCommand::MouseWheelForwardEvent
 			|| event == vtkCommand::MouseWheelBackwardEvent
 			|| event == vtkCommand::CharEvent
@@ -186,6 +189,12 @@ void ViewWrapper3D::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long e
 //			|| event == vtkCommand::ModifiedEvent
 //			|| event == vtkCommand::RenderEvent
 			)
+		return;
+	// Allow MouseMoveEvent only during active box-widget drag so the sphere handles
+	// can be dragged without also triggering camera rotation via the VTK interactor style.
+	if(event == vtkCommand::MouseMoveEvent
+			&& self->mInteractiveCropper
+			&& self->mInteractiveCropper->isInteracting())
 		return;
 //	CX_LOG_DEBUG() << "Block VTK event: " << vtkCommand::GetStringFromEventId(event);
 	self->mCallbackCommand.Get()->SetAbortFlag(1);

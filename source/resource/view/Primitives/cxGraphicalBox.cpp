@@ -102,9 +102,10 @@ GraphicalBox::~GraphicalBox()
 	}
 }
 
-void GraphicalBox::setRenderWindow(vtkRenderWindowPtr renderWindow)
+void GraphicalBox::setRenderWindow(vtkRenderWindowPtr renderWindow, vtkRendererPtr renderer)
 {
 	mRenderWindow = renderWindow;
+	mRenderer = renderer;
 	this->updateBoxWidgetInteractor();
 }
 
@@ -204,6 +205,8 @@ void GraphicalBox::initialize()
 	mGraphicalBoxDisableCallback->SetCropper(false, this);
 
 	mBoxWidget->SetInteractor(mRenderWindow->GetInteractor());
+	if (mRenderer)
+		mBoxWidget->SetDefaultRenderer(mRenderer.GetPointer());
 
 	mBoxWidget->SetEnabled(mVisible);
 }
