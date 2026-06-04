@@ -73,6 +73,8 @@
         --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL"
       echo "Published $PACKAGE_VERSION to Package Registry."
   rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
     - changes:
         - install/cx/build/cxComponents.py
     - when: manual

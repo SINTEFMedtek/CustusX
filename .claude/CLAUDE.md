@@ -88,9 +88,10 @@ Application (CustusX main)
 **Sibling applications and build directories**
 - CustusS and Fraxinus are sibling applications using CustusX as a base code
 - CustusX, CustusS and Fraxinus are typically located in the same directory structure
-- CustusX source code: root_dir/CX/CX
-- CustusS source code: root_dir/CS/CS
-- Fraxinus source code: root_dir/FX/FX
+- root_dir is usually ~/gitlab/cx for CustusX/CustusC and ~/gitlab/fx for Fraxinus                                                                                               
+- CustusX source code: root_dir/CX/CX  (~/ gitlab/cx/CX/CX)                                                                                           
+- CustusS source code: root_dir/CS/CS  (~/gitlab/cx/CS/CS)                                                                                            
+- Fraxinus source code: root_dir/FX/FX  (~/gitlab/fx/FX/FX)  
 - CustusX build folders (Sibling applications will look the same):
   - root_dir/CX/build_Release 
   - root_dir/CX/build_Debug
