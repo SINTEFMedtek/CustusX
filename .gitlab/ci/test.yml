@@ -26,7 +26,6 @@ test-ubuntu20:
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
-    CX_WRAP_UNIT_TESTS_IN_CTEST: "1"
 
 test-ubuntu22:
   extends: .test-job
@@ -34,7 +33,6 @@ test-ubuntu22:
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
-    CX_WRAP_UNIT_TESTS_IN_CTEST: "1"
 
 test-ubuntu24:
   extends: .test-job
