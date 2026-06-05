@@ -301,7 +301,7 @@ bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
 	std::vector<DataPtr> datas = widget->getDatas();
 
 	std::vector<ImagePtr> images;
-	for(auto& data : datas)
+	for(DataPtr& data : datas)
 	{
 		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
 		if(!image)
@@ -326,7 +326,7 @@ bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
 		ImagePtr petImage;
 		std::vector<ImagePtr> ctImages;
 
-		for(auto& image : images)
+		for(ImagePtr& image : images)
 		{
 			if(image->getModality() == imPET)
 				petImage = image;

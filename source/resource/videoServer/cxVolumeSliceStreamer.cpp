@@ -1,33 +1,12 @@
 /*=========================================================================
 This file is part of CustusX, an Image Guided Therapy Application.
 
-Copyright (c) 2008-2014, SINTEF Department of Medical Technology
+Copyright (c) SINTEF Department of Medical Technology.
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+CustusX is released under a BSD 3-Clause license.
 
-1. Redistributions of source code must retain the above copyright notice,
-   this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice,
-   this list of conditions and the following disclaimer in the documentation
-   and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors
-   may be used to endorse or promote products derived from this software
-   without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt) for details.
 =========================================================================*/
 
 #include "cxVolumeSliceStreamer.h"
@@ -159,7 +138,7 @@ void VolumeSliceStreamer::setSourceImage(ImagePtr image)
 ImagePtr VolumeSliceStreamer::calculateSlice(ImagePtr source)
 {
 	vtkImageDataPtr slice = this->sliceOriginal(source);
-	return this->convertToSscImage(slice, source);
+	return this->convertToCxImage(slice, source);
 }
 
 vtkImageDataPtr VolumeSliceStreamer::sliceOriginal(ImagePtr source)
@@ -204,7 +183,7 @@ vtkImageDataPtr VolumeSliceStreamer::maskSlice(vtkImageDataPtr unmaskedSlice)
 	return maskFilter->GetOutput();
 }
 
-ImagePtr VolumeSliceStreamer::convertToSscImage(vtkImageDataPtr slice, ImagePtr volume)
+ImagePtr VolumeSliceStreamer::convertToCxImage(vtkImageDataPtr slice, ImagePtr volume)
 {
 	ImagePtr retval = ImagePtr(new Image("Volume Slice", slice, "Volume Slice"));
 	mTimer->time("Convert");
@@ -225,14 +204,6 @@ Transform3D VolumeSliceStreamer::getTransform_vMr()
 	Transform3D prMr = mPatientModelService->get_rMpr().inv();
 
 	return vMt * tMpr * prMr;
-}
-
-int VolumeSliceStreamer::getAverageTimePerSimulatedFrame()
-{
-	cx::reporter()->sendDebug("Grab frame: " + qstring_cast(mTimer->getTime(QString("Grab"))));
-	cx::reporter()->sendDebug("Mask frame: " + qstring_cast(mTimer->getTime(QString("Mask"))));
-	cx::reporter()->sendDebug("Convert frame to Image: " + qstring_cast(mTimer->getTime(QString("Convert"))));
-	return mTimer->getTotalLoggedTime();
 }
 
 } /* namespace cx */
