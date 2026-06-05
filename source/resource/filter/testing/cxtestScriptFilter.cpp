@@ -133,10 +133,6 @@ public:
 	{
 		return standardCommandString(variables);
 	}
-	QString testDeepSintefCommandString(cx::CommandStringVariables variables)
-	{
-		return deepSintefCommandString(variables);
-	}
 	bool testIsUsingTotalSegmentatorEngine(cx::CommandStringVariables variables)
 	{
 		return (mScriptEngine == seTotalSegmentator);
@@ -580,9 +576,7 @@ TEST_CASE("GenericScriptFilter: Read python_LungVessels.ini file", "[unit]")
 
 
 	//CX_LOG_DEBUG() << "testStandardCommandString: " << filter->testStandardCommandString(variables);
-	//CX_LOG_DEBUG() << "testDeepSintefCommandString: " << filter->testDeepSintefCommandString(variables);
 	REQUIRE_FALSE(filter->testStandardCommandString(variables).isEmpty());
-	REQUIRE_FALSE(filter->testDeepSintefCommandString(variables).isEmpty());
 
 	REQUIRE(filter->testIsUsingTotalSegmentatorEngine(variables));
 

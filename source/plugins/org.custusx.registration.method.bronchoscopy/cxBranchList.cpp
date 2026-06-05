@@ -223,7 +223,11 @@ void BranchList::smoothOrientations()
 		for (int j = 0; j < numberOfColumns; j++)
 		{
 			newOrientations.col(j) = orientations.block(0,std::max(j-2,0),orientations.rows(),std::min(5,numberOfColumns-j)).rowwise().mean(); //smoothing
-			newOrientations.col(j) = newOrientations.col(j) / newOrientations.col(j).norm(); // normalizing
+			double n = newOrientations.col(j).norm();
+			if (n > 1e-10)
+					newOrientations.col(j) = newOrientations.col(j)/n; // normalizing
+			else
+					newOrientations.col(j) = orientations.col(j); // fallback to original - avoid dividing by zero
 		}
 		mBranches[i]->setOrientations(newOrientations);
 	}
@@ -411,6 +415,44 @@ void BranchList::findBranchesInCenterline(Eigen::MatrixXd positions_r, bool sort
 			continue;
 
 		splitBranch(newBranch, branchToSplit, splitIndex);
+	}
+
+	mergeTracheasSingleChildIntoTrachea();
+}
+
+void BranchList::mergeTracheasSingleChildIntoTrachea()
+{
+	if (mBranches.empty())
+		return;
+
+	BranchPtr trachea = mBranches[0];
+
+	while (trachea->getChildBranches().size() == 1)
+	{
+		BranchPtr onlyChild = trachea->getChildBranches()[0];
+
+		Eigen::MatrixXd combinedPositions(3, trachea->getPositions().cols() + onlyChild->getPositions().cols());
+		combinedPositions.leftCols(trachea->getPositions().cols()) = trachea->getPositions();
+		combinedPositions.rightCols(onlyChild->getPositions().cols()) = onlyChild->getPositions();
+
+		trachea->setPositions(combinedPositions);
+
+		branchVector grandchildren = onlyChild->getChildBranches();
+		trachea->deleteChildBranches();
+		for (BranchPtr grandchild : grandchildren)
+		{
+			grandchild->setParentBranch(trachea);
+			trachea->addChildBranch(grandchild);
+		}
+
+		for (int i = 0; i < mBranches.size(); i++)
+		{
+			if (mBranches[i] == onlyChild)
+			{
+				mBranches.erase(mBranches.begin() + i);
+				break;
+			}
+		}
 	}
 }
 

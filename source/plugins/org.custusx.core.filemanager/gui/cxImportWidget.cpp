@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 
 #include <QTreeWidgetItem>
 
+#include <vtkImageData.h>
 #include <QFileDialog>
 #include <QPushButton>
 #include <QLabel>
@@ -287,9 +288,94 @@ void ImportWidget::addFilesForImportWithDialogTriggerend(IMAGE_MODALITY modality
 	ImportDataTypeWidget* widget = this->addMoreFilesButtonClicked(modalitySuggestion, subtype, fromUSB);
 	if(widget && widget->getDatas().size() > 0)
 	{
-		SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
-		dialog->exec();
+		if(!this->tryAutoAssignModalitiesForCT(widget))
+		{
+			SimpleImportDataDialog* dialog = new SimpleImportDataDialog(widget, this);
+			dialog->exec();
+		}
 	}
+}
+
+bool ImportWidget::tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget)
+{
+	std::vector<DataPtr> datas = widget->getDatas();
+
+	std::vector<ImagePtr> images;
+	for(DataPtr& data : datas)
+	{
+		ImagePtr image = boost::dynamic_pointer_cast<Image>(data);
+		if(!image)
+			return false;
+		images.push_back(image);
+	}
+
+	// Case 1: Single CT series
+	if(images.size() == 1 && images[0]->getModality() == imCT)
+	{
+		if(mVisServices->patient()->getImage(imCT, istTHORAX_CT))
+			return false;
+		images[0]->setModality(imCT);
+		images[0]->setImageType(istTHORAX_CT);
+		widget->setData(datas);
+		return true;
+	}
+
+	// Case 2: Three series - one PET and two CT; match CT with same slice count as PET → PET CT
+	if(images.size() == 3)
+	{
+		ImagePtr petImage;
+		std::vector<ImagePtr> ctImages;
+
+		for(ImagePtr& image : images)
+		{
+			if(image->getModality() == imPET)
+				petImage = image;
+			else if(image->getModality() == imCT)
+				ctImages.push_back(image);
+		}
+
+		if(petImage && ctImages.size() == 2)
+		{
+			if(mVisServices->patient()->getImage(imCT, istTHORAX_CT)
+			        || mVisServices->patient()->getImage(imCT, istPET_CT)
+			        || mVisServices->patient()->getImage(imPET, istPET))
+				return false;
+
+			int petDims[3];
+			petImage->getBaseVtkImageData()->GetDimensions(petDims);
+
+			int ct0Dims[3], ct1Dims[3];
+			ctImages[0]->getBaseVtkImageData()->GetDimensions(ct0Dims);
+			ctImages[1]->getBaseVtkImageData()->GetDimensions(ct1Dims);
+
+			ImagePtr petCtImage, plainCtImage;
+			if(ct0Dims[2] == petDims[2] && ct1Dims[2] != petDims[2])
+			{
+				petCtImage = ctImages[0];
+				plainCtImage = ctImages[1];
+			}
+			else if(ct1Dims[2] == petDims[2] && ct0Dims[2] != petDims[2])
+			{
+				petCtImage = ctImages[1];
+				plainCtImage = ctImages[0];
+			}
+			else
+			{
+				return false;
+			}
+
+			petImage->setModality(imPET);
+			petImage->setImageType(istPET);
+			petCtImage->setModality(imCT);
+			petCtImage->setImageType(istPET_CT);
+			plainCtImage->setModality(imCT);
+			plainCtImage->setImageType(istTHORAX_CT);
+			widget->setData(datas);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 ImportDataTypeWidget* ImportWidget::addMoreFilesButtonClicked(IMAGE_MODALITY modalitySuggestion, IMAGE_SUBTYPE subtype, bool fromUSB)

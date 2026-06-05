@@ -146,6 +146,7 @@ private:
 	QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
 	QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 	QToolBar* mScreenshotToolBar;
+	QToolBar* mSpacerToolBar;
 
 	boost::shared_ptr<ServiceTrackerListener<GUIExtenderService> > mServiceListener;
 

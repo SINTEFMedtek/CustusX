@@ -288,7 +288,7 @@ void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<dou
 	QString filePath = path + session->getUid() + "_TrackingInformation.txt";
 
 	QFile outfile(filePath);
-	if (outfile.open(QIODevice::ReadWrite))
+	if (outfile.open(QIODevice::WriteOnly))
 	{
 		QTextStream stream(&outfile);
 

@@ -68,6 +68,7 @@ private:
 	BranchPtr findBranchToConnect(BranchPtr newBranch, double maxDistanceToExistingBranch);
 	bool findRemainingPointClosestToExistingBranch(bool connectSeparateSegments, Eigen::MatrixXd positionsNotUsed_r, double& minDistance, Eigen::MatrixXd::Index& startIndex, int &splitIndex, BranchPtr& branchToSplit);
 	double maxDistanceToExistingBranch(bool connectSeparateSegments);
+	void mergeTracheasSingleChildIntoTrachea();
 	std::vector<BranchPtr> findClosesBranches(Vector3D position, double maxDistance);
 	double findDistance(Vector3D p1, Vector3D p2);
 	BranchPtr findClosestBranch(Vector3D targetCoordinate_r);

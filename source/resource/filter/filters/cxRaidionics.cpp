@@ -39,6 +39,7 @@ QString Raidionics::raidionicsCommandString()
 
 	commandString.append(" " + mVariables.scriptFilePath);
 	commandString.append(" " + raidionicsIni);
+	commandString.append(" --verbose info");
 //	commandString.append(" " + variables.cArguments);
 	return commandString;
 }

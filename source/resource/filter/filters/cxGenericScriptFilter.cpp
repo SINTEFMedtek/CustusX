@@ -170,7 +170,18 @@ void GenericScriptFilter::processReadyRead()
 		return;
 
 	QProcess* process = mCommandLine->getProcess();
-	CX_LOG_CHANNEL_INFO(mOutputChannelName) << QString(process->readAllStandardOutput());
+	mLineBuffer += QString(process->readAllStandardOutput());
+	int newlinePos;
+	while ((newlinePos = mLineBuffer.indexOf('\n')) != -1)
+	{
+		QString line = mLineBuffer.left(newlinePos).trimmed();
+		mLineBuffer = mLineBuffer.mid(newlinePos + 1);
+		if(!line.isEmpty())
+		{
+			CX_LOG_CHANNEL_INFO(mOutputChannelName) << line;
+			emit scriptOutput(line);
+		}
+	}
 }
 
 void GenericScriptFilter::processReadyReadError()
@@ -265,9 +276,6 @@ QString GenericScriptFilter::createCommandString(ImagePtr input)
 	{
 	case seStandard:
 		return standardCommandString(variables);
-		break;
-	case seDeepSintef:
-		return deepSintefCommandString(variables);
 		break;
 	case seRaidionics:
 		if(mRaidionicsUtilities)
@@ -394,9 +402,7 @@ bool GenericScriptFilter::isUsingRaidionicsEngine()
 
 bool GenericScriptFilter::setScriptEngine(CommandStringVariables variables)
 {
-	if(QString::compare(variables.scriptEngine, "DeepSintef", Qt::CaseInsensitive) == 0)
-		mScriptEngine = seDeepSintef;
-	else if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
+	if(QString::compare(variables.scriptEngine, "Raidionics", Qt::CaseInsensitive) == 0)
 	{
 		if(!this->initRaidionicsEngine(variables))
 			return false;
@@ -415,22 +421,6 @@ bool GenericScriptFilter::initRaidionicsEngine(CommandStringVariables variables)
 		return false;
 	mRaidionicsUtilities = RaidionicsPtr(new Raidionics(mServices, variables, mOutputClasses));
 	return true;
-}
-
-QString GenericScriptFilter::deepSintefCommandString(CommandStringVariables variables)
-{
-	QString commandString = variables.envPath;
-	commandString.append(" " + findScriptFile(variables.scriptFilePath));
-	commandString.append(" --Task database --Arguments ");
-	commandString.append("\"");
-	commandString.append("InputVolume ");
-	commandString.append(variables.inputFilePath);
-	commandString.append(",OutputLabel ");
-	commandString.append(variables.outputFilePath);
-	commandString.append(",ModelsList ");
-	commandString.append(variables.model);
-	commandString.append("\"");
-	return commandString;
 }
 
 bool GenericScriptFilter::environmentExist(QString path)
@@ -722,11 +712,17 @@ bool GenericScriptFilter::execute()
 bool GenericScriptFilter::createProcess()
 {
 	mCommandLine.reset();//delete
+	mLineBuffer.clear();
 	mCommandLine = ProcessWrapperPtr(new cx::ProcessWrapper("ScriptFilter"));
 	mCommandLine->turnOffReporting();//Handle output in this class instead
 
 	// Merge channels to get all output in same channel in CustusX console
 	mCommandLine->getProcess()->setProcessChannelMode(QProcess::MergedChannels);
+
+	// Disable Python stdout buffering so output arrives in real time
+	QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+	env.insert("PYTHONUNBUFFERED", "1");
+	mCommandLine->getProcess()->setProcessEnvironment(env);
 
 	connect(mCommandLine.get(), &ProcessWrapper::stateChanged, this, &GenericScriptFilter::processStateChanged);
 	/**************************************************************************
@@ -855,10 +851,10 @@ void GenericScriptFilter::createOutputMesh(QColor color, int smoothing)
 	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uidOutputMesh, nameOutputMesh);
 	outputMesh->setVtkPolyData(rawContour);
 	outputMesh->setColor(color);
+	outputMesh->setOrganType(mOutputImage->getOrganType());
 	patientService()->insertData(outputMesh);
 	outputMesh->get_rMd_History()->setRegistration(mOutputImage->get_rMd());
 	outputMesh->get_rMd_History()->setParentSpace(mOutputImage->getUid());
-	outputMesh->setOrganType(mOutputImage->getOrganType());
 	mServices->view()->autoShowData(outputMesh);
 
 	mOutputMeshSelectMeshPtr->setValue(outputMesh->getUid());

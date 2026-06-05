@@ -67,7 +67,6 @@ public:
 	{
 		seUnknown,
 		seStandard,
-		seDeepSintef,
 		seRaidionics,
 		seTotalSegmentator,
 		seCOUNT
@@ -88,6 +87,7 @@ public:
 	void setOutputClasses(QStringList outputClasses);
 
 signals:
+	void scriptOutput(const QString& line);
 	void launchDialog(QString venvPath, QString createCommand, QString command);
 public slots:
 	void launchDialogSlot(QString venvPath, QString createCommand, QString command);
@@ -117,8 +117,6 @@ protected:
 	QString standardCommandString(CommandStringVariables variables);
 	QString findScriptFile(QString path);
 	bool isUsingRaidionicsEngine();
-	QString deepSintefCommandString(CommandStringVariables variables);
-	
 	bool environmentExist(QString path);
 	QString getEnvironmentPath(CommandStringVariables variables);
 	QString getEnvironmentBasePath(QString environmentPath);
@@ -157,6 +155,7 @@ protected:
 	BoolPropertyPtr mOutputMeshOption;
 	SCRIPT_ENGINE mScriptEngine = seUnknown;
 	RaidionicsPtr mRaidionicsUtilities = nullptr;
+	QString mLineBuffer;
 
 protected slots:
 	void scriptFileChanged();
