@@ -16,8 +16,11 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFileInfo>
 #include <QDir>
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QMessageBox>
+#include <QThread>
 #include <QApplication>
+#include <functional>
 
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
@@ -239,8 +242,7 @@ bool CPDFilter::ensureVenv()
 		return false;
 	}
 
-	// QMessageBox must run on the GUI thread; this method is called from a worker thread
-	QMetaObject::invokeMethod(qApp, [venvBasePath]()
+	std::function<void()> showInfoBox = [venvBasePath]()
 	{
 		QMessageBox messageBox;
 		messageBox.setWindowModality(Qt::WindowModal);
@@ -250,13 +252,19 @@ bool CPDFilter::ensureVenv()
 			"There is no virtual environment for pycpd at:<br><code>" + venvBasePath + "</code><br><br>"
 			"CustusX will create one now by running <code>pip install pycpd</code>.");
 		messageBox.exec();
-	}, Qt::BlockingQueuedConnection);
+	};
+	// BlockingQueuedConnection deadlocks when caller and qApp share the same thread
+	if (QThread::currentThread() == qApp->thread())
+		showInfoBox();
+	else
+		QMetaObject::invokeMethod(qApp, showInfoBox, Qt::BlockingQueuedConnection);
 
 	CX_LOG_INFO() << "CPDFilter: Creating pycpd venv at " << venvBasePath;
 
 	QProcess process;
 	process.setProcessChannelMode(QProcess::MergedChannels);
-	process.start("bash", QStringList() << createScript << venvBasePath << "pycpd");
+	QString requirementsDir = DataLocations::getFilterScriptsPath() + "scripts/python_cpd";
+	process.start("bash", QStringList() << createScript << venvBasePath << requirementsDir);
 
 	if (!process.waitForStarted(10000))
 	{
@@ -353,14 +361,25 @@ bool CPDFilter::execute()
 		return false;
 	}
 
+	const int timeoutMs = 5 * 60 * 1000;
+	QElapsedTimer timer;
+	timer.start();
+
 	while (process.state() != QProcess::NotRunning)
 	{
 		process.waitForReadyRead(500);
 		QByteArray output = process.readAllStandardOutput();
 		if (!output.isEmpty())
 			CX_LOG_INFO() << "CPD: " << QString(output).trimmed();
+		if (timer.elapsed() > timeoutMs)
+		{
+			CX_LOG_ERROR() << "CPDFilter: Python script timed out after 5 minutes — killing process";
+			process.kill();
+			process.waitForFinished(5000);
+			return false;
+		}
 	}
-	process.waitForFinished(60 * 60 * 1000);
+	process.waitForFinished(5000);
 
 	QByteArray remaining = process.readAllStandardOutput();
 	if (!remaining.isEmpty())

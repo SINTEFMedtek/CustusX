@@ -15,10 +15,23 @@ Arguments:
     scale_mode     "Rigid", "Rigid+scale", or "Auto" (default: "Rigid")
     scale_threshold In Auto mode, fall back to Rigid if |scale - 1| > threshold (default: 0.1)
 
-Install dependency: pip install pycpd
+Install dependency: pip install pycpd==2.0.0
 """
 import sys
 import numpy as np
+
+_PYCPD_REQUIRED_VERSION = "2.0.0"
+
+try:
+    import importlib.metadata as _meta
+    _installed = _meta.version("pycpd")
+    if _installed != _PYCPD_REQUIRED_VERSION:
+        print(f"ERROR: pycpd version mismatch: installed {_installed!r}, "
+              f"required {_PYCPD_REQUIRED_VERSION!r}. "
+              f"Delete the pycpd venv and let CustusX recreate it.", flush=True)
+        sys.exit(1)
+except Exception:
+    pass  # pycpd not installed yet — ImportError raised later with a clear message
 
 
 def read_points(path):
@@ -37,7 +50,11 @@ def write_transform(path, R, t):
 
 
 class _RigidRegistrationNoScale:
-    """Mixin that forces scale=1 in pycpd's RigidRegistration EM iterations."""
+    """Mixin that forces scale=1 in pycpd's RigidRegistration EM iterations.
+
+    Accesses private pycpd attributes (P, Np, X_hat, A, YPY, P1, R, s, t, D, N, M, Y, X).
+    Verified against pycpd==2.0.0 only — see _PYCPD_REQUIRED_VERSION.
+    """
     def update_transform(self):
         muX = np.divide(np.sum(np.dot(self.P, self.X), axis=0), self.Np)
         muY = np.divide(np.sum(np.dot(np.transpose(self.P), self.Y), axis=0), self.Np)
@@ -87,8 +104,7 @@ def _preprocess(fixed, moving):
       and c ≈ 20–200 — well within the tractable range.
 
     Returns: X_n, Y_n, mean_ref, scale_ref
-      Denormalise with: T_orig(y) = y @ R + t_orig
-      where t_orig = _denormalize_t(R, t_n, mean_ref, scale_ref)
+      Denormalise with: R_eff, t_orig = _denormalize(R, t_n, mean_ref, scale_ref, s)
     """
     mean_ref = np.mean(moving, axis=0)
     scale_ref = np.sqrt(np.mean(np.sum((moving - mean_ref) ** 2, axis=1)))
@@ -102,19 +118,23 @@ def _preprocess(fixed, moving):
     return X_n, Y_n, mean_ref, scale_ref
 
 
-def _denormalize_t(R, t_n, mean_ref, scale_ref):
+def _denormalize(R, t_n, mean_ref, scale_ref, s=1.0):
     """
-    Recover the translation in the original coordinate space.
+    Recover (R_eff, t_orig) in original coordinate space, including scale s.
 
     Derivation (row-vector convention):
-      T_norm(y_n) = y_n @ R + t_n      (pycpd, normalised space)
+      T_norm(y_n) = s * y_n @ R + t_n      (pycpd, normalised space)
       y_n = (y - mean_ref) / scale_ref
-      T_orig(y) = mean_ref + scale_ref * T_norm((y - mean_ref) / scale_ref)
-               = (y - mean_ref) @ R + scale_ref * t_n + mean_ref
-               = y @ R + (mean_ref - mean_ref @ R + scale_ref * t_n)
-      =>  t_orig = mean_ref - mean_ref @ R + scale_ref * t_n
+      T_orig(y) = scale_ref * T_norm((y - mean_ref) / scale_ref) + mean_ref
+               = s * (y - mean_ref) @ R + scale_ref * t_n + mean_ref
+               = y @ (s * R) + (mean_ref - s * mean_ref @ R + scale_ref * t_n)
+
+      R_eff  = s * R   (pure rotation for s=1, similarity rotation for s≠1)
+      t_orig = mean_ref - s * mean_ref @ R + scale_ref * t_n
     """
-    return mean_ref - np.dot(mean_ref, R) + scale_ref * t_n
+    R_eff = s * R
+    t_orig = mean_ref - s * np.dot(mean_ref, R) + scale_ref * t_n
+    return R_eff, t_orig
 
 
 def _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w):
@@ -131,13 +151,7 @@ def _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w):
 
 
 def _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w):
-    """Run rigid CPD with scale on pre-normalised data. Returns (R, t_n, s).
-
-    Because Y_n is centred at origin (mean(Y_n) = 0), the scale factor s has
-    negligible effect on t_n:
-        t_n = muX_n - s * muY_n @ R  ≈  muX_n  (since muY_n ≈ 0)
-    so no additional scale correction to t_n is needed here.
-    """
+    """Run rigid CPD with scale on pre-normalised data. Returns (R, t_n, s)."""
     from pycpd import RigidRegistration
     reg = RigidRegistration(X=X_n, Y=Y_n,
                             max_iterations=max_iter, tolerance=tolerance, w=w)
@@ -154,6 +168,7 @@ def run_rigid_cpd(fixed, moving, max_iter, tolerance, w, scale_mode, scale_thres
     if scale_mode == "Rigid+scale":
         R, t_n, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
         print(f"CPD complete (rigid+scale). Scale s={s:.4f}", flush=True)
+        R_eff, t = _denormalize(R, t_n, mean_ref, scale_ref, s)
 
     elif scale_mode == "Auto":
         R, t_n, s = _run_scaled_normalized(X_n, Y_n, max_iter, tolerance, w)
@@ -161,15 +176,17 @@ def run_rigid_cpd(fixed, moving, max_iter, tolerance, w, scale_mode, scale_thres
             print(f"CPD auto: scale s={s:.4f} exceeds threshold {scale_threshold}, "
                   f"rerunning without scale.", flush=True)
             R, t_n = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
+            R_eff, t = _denormalize(R, t_n, mean_ref, scale_ref, 1.0)
         else:
             print(f"CPD auto: scale s={s:.4f} within threshold {scale_threshold}.", flush=True)
+            R_eff, t = _denormalize(R, t_n, mean_ref, scale_ref, s)
 
     else:  # "Rigid" (default)
         R, t_n = _run_rigid_normalized(X_n, Y_n, max_iter, tolerance, w)
         print("CPD complete (rigid, no scale).", flush=True)
+        R_eff, t = _denormalize(R, t_n, mean_ref, scale_ref, 1.0)
 
-    t = _denormalize_t(R, t_n, mean_ref, scale_ref)
-    return R, t
+    return R_eff, t
 
 
 if __name__ == '__main__':
