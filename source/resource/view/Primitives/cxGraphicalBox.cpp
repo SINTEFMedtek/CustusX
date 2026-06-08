@@ -207,6 +207,7 @@ void GraphicalBox::initialize()
 	mBoxWidget->SetInteractor(mRenderWindow->GetInteractor());
 	if (mRenderer)
 		mBoxWidget->SetDefaultRenderer(mRenderer.GetPointer());
+	mBoxWidget->SetPriority(0.5);
 
 	mBoxWidget->SetEnabled(mVisible);
 }

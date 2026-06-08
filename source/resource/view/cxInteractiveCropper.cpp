@@ -201,6 +201,8 @@ void InteractiveCropper::showBoxWidget(bool on)
 
 	if (on)
 		mBoxWidget->SetDefaultRenderer(mView->getRenderer().GetPointer());
+	else
+		setInteracting(false);
 	mBoxWidget->SetEnabled(on);
 	emit changed();
 }
