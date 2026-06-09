@@ -33,6 +33,7 @@ namespace cx
 {
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
 typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
+typedef vtkSmartPointer<class CropBoxInteractionCallback> CropBoxInteractionCallbackPtr;
 typedef boost::shared_ptr<class ActiveImageProxy> ActiveImageProxyPtr;
 
 /**
@@ -59,6 +60,7 @@ public:
 	bool getUseCropping();
 	bool getShowBoxWidget() const;
 	std::vector<int>  getDimensions();
+	bool isInteracting() const;
 signals:
 	void changed();
 public slots:
@@ -70,8 +72,10 @@ private slots:
 
 private:
 	void boxWasShown(bool val);
+	void setInteracting(bool on);
 	friend class CropBoxCallback;
 	friend class CropBoxEnableCallback;
+	friend class CropBoxInteractionCallback;
 	void setBoxWidgetSize(const DoubleBoundingBox3D& bb_d);
 	DoubleBoundingBox3D getBoxWidgetSize();
 	void setCroppingRegion(DoubleBoundingBox3D bb_d);
@@ -84,7 +88,10 @@ private:
 	CropBoxCallbackPtr mCropBoxCallback;
 	CropBoxEnableCallbackPtr mCropBoxEnableCallback;
 	CropBoxEnableCallbackPtr mCropBoxDisableCallback;
+	CropBoxInteractionCallbackPtr mCropBoxStartInteractionCallback;
+	CropBoxInteractionCallbackPtr mCropBoxEndInteractionCallback;
 	bool mShowBoxWidget;
+	bool mInteracting = false;
 	ActiveImageProxyPtr mActiveImageProxy;
 	ActiveDataPtr mActiveData;
 };
