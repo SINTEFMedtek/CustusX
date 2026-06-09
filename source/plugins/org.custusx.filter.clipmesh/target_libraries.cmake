@@ -6,5 +6,4 @@
 
 set(target_libraries
   CTKPluginFramework
-  org_custusx_registration
 )

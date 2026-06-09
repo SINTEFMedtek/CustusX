@@ -93,7 +93,7 @@ class TestRunner(object):
         if(platform.system() == 'Windows'):
             cmd = 'set_run_environment.bat %s %s --reporter junit --out %s' % (exe, tag, outfile)
         else:
-            cmd = '%s %s --reporter junit --out %s' % (exe, tag, outfile)
+            cmd = 'QT_QPA_PLATFORM=offscreen %s %s --reporter junit --out %s' % (exe, tag, outfile)
         result = shell.run(cmd, ignoreFailure=True, keep_output=True)
         if result.returncode >= 0:
             PrintFormatter.printInfo('catch reported %s failing tests' % result.returncode)                        
@@ -164,8 +164,8 @@ class TestRunner(object):
         catchExe = self._getCatchExecutable(path)
         catchExe = catchExe.replace(os.sep, posixpath.sep)
         for testname in testnames:
-            line = 'ADD_TEST("%s" %s "%s")' % (testname, catchExe, testname)
-            lines.append(line)
+            lines.append('ADD_TEST("%s" %s "%s")' % (testname, catchExe, testname))
+            lines.append('SET_TESTS_PROPERTIES("%s" PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen")' % testname)
         cx.utils.cxUtilities.writeToNewFile(filename=targetFile, text='\n'.join(lines))
 
     def _writeDartConfigurationFile(self, path):

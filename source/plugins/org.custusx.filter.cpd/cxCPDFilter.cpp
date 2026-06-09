@@ -14,6 +14,13 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QFile>
 #include <QTextStream>
 #include <QFileInfo>
+#include <QDir>
+#include <QDateTime>
+#include <QElapsedTimer>
+#include <QMessageBox>
+#include <QThread>
+#include <QApplication>
+#include <functional>
 
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
@@ -23,18 +30,18 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxVisServices.h"
 #include "cxPatientModelService.h"
 #include "cxSelectDataStringProperty.h"
-#include "cxStringProperty.h"
 #include "cxDoubleProperty.h"
+#include "cxStringProperty.h"
 #include "cxDataLocations.h"
 #include "cxRegistrationTransform.h"
-#include "cxTypeConversions.h"
-#include "cxViewService.h"
+#include "cxRegistrationApplicator.h"
 
 namespace cx
 {
 
 CPDFilter::CPDFilter(VisServicesPtr services) :
-	FilterImpl(services)
+	FilterImpl(services),
+	mDeltaRMd(Transform3D::Identity())
 {
 }
 
@@ -52,21 +59,15 @@ QString CPDFilter::getHelp() const
 {
 	return "<html>"
 		"<h3>Coherent Point Drift (CPD)</h3>"
-		"<p>Registers two meshes using the Coherent Point Drift algorithm "
+		"<p>Registers two meshes using the Coherent Point Drift rigid algorithm "
 		"via the pycpd Python library.</p>"
-		"<p>Requires Python 3 with pycpd installed: <code>pip install pycpd</code></p>"
+		"<p>The computed rigid transform is applied as a registration to the moving mesh, "
+		"so all data in the same frame tree moves together.</p>"
+		"<p>Requires a Python virtual environment with pycpd. "
+		"The environment is created automatically on first use.</p>"
 		"<p>The fixed mesh is the target (stays unchanged). "
-		"The moving mesh is warped to match the fixed mesh.</p>"
+		"The moving mesh is registered to match the fixed mesh.</p>"
 		"</html>";
-}
-
-StringPropertyPtr CPDFilter::getRegistrationTypeOption(QDomElement root)
-{
-	QStringList list;
-	list << "rigid" << "affine" << "deformable";
-	return StringProperty::initialize("Registration type", "",
-		"rigid: rotation+translation, affine: adds scaling/shear, deformable: non-rigid (GMM)",
-		list[0], list, root);
 }
 
 DoublePropertyPtr CPDFilter::getMaxIterationsOption(QDomElement root)
@@ -78,12 +79,46 @@ DoublePropertyPtr CPDFilter::getMaxIterationsOption(QDomElement root)
 DoublePropertyPtr CPDFilter::getToleranceOption(QDomElement root)
 {
 	return DoubleProperty::initialize("Tolerance", "",
-		"Convergence tolerance (smaller = more precise)", 1e-5, DoubleRange(1e-8, 1e-2, 1e-8), 8, root);
+		"Convergence tolerance for the EM algorithm (default 1e-3 matches pycpd). "
+		"Smaller values require more iterations but may improve precision.",
+		1e-3, DoubleRange(1e-8, 1e-2, 1e-8), 8, root);
+}
+
+DoublePropertyPtr CPDFilter::getOutlierWeightOption(QDomElement root)
+{
+	return DoubleProperty::initialize("Outlier weight (w)", "",
+		"Fraction of points treated as outliers (uniform noise). "
+		"Increase for noisy data or when the meshes only partially overlap. "
+		"0 = all points are valid correspondences; 0.9 = mostly noise.",
+		0.0, DoubleRange(0.0, 0.9, 0.05), 2, root);
+}
+
+StringPropertyPtr CPDFilter::getScaleModeOption(QDomElement root)
+{
+	QStringList modes;
+	modes << "Rigid" << "Rigid+scale" << "Auto";
+	return StringProperty::initialize("Scale mode", "",
+		"Rigid: no scaling (safe for CT/US volumes — cannot be scaled clinically).\n"
+		"Rigid+scale: CPD optimises scale internally for better correspondence, "
+		"but only rotation and translation are applied to the data.\n"
+		"Auto: use Rigid+scale result if scale deviation is within the threshold, "
+		"otherwise fall back to Rigid.",
+		"Rigid", modes, root);
+}
+
+DoublePropertyPtr CPDFilter::getScaleThresholdOption(QDomElement root)
+{
+	return DoubleProperty::initialize("Scale threshold", "  Scale threshold",
+		"Auto mode only: if |scale - 1| exceeds this value the registration "
+		"falls back to Rigid (no scale). Typical range 0.05 - 0.2.",
+		0.1, DoubleRange(0.01, 0.5, 0.01), 2, root);
 }
 
 void CPDFilter::createOptions()
 {
-	mOptionsAdapters.push_back(getRegistrationTypeOption(mOptions));
+	mOptionsAdapters.push_back(getOutlierWeightOption(mOptions));
+	mOptionsAdapters.push_back(getScaleModeOption(mOptions));
+	mOptionsAdapters.push_back(getScaleThresholdOption(mOptions));
 	mOptionsAdapters.push_back(getMaxIterationsOption(mOptions));
 	mOptionsAdapters.push_back(getToleranceOption(mOptions));
 }
@@ -97,16 +132,12 @@ void CPDFilter::createInputTypes()
 
 	StringPropertySelectMeshPtr moving = StringPropertySelectMesh::New(mServices->patient());
 	moving->setValueName("Moving mesh");
-	moving->setHelp("Source mesh — will be warped to match the fixed mesh");
+	moving->setHelp("Source mesh — will be registered to the fixed mesh");
 	mInputTypes.push_back(moving);
 }
 
 void CPDFilter::createOutputTypes()
 {
-	StringPropertySelectMeshPtr output = StringPropertySelectMesh::New(mServices->patient());
-	output->setValueName("Output mesh");
-	output->setHelp("Registered moving mesh");
-	mOutputTypes.push_back(output);
 }
 
 bool CPDFilter::writeMeshPoints(vtkPolyDataPtr polyData, const QString& filePath)
@@ -135,39 +166,39 @@ bool CPDFilter::writeMeshPoints(vtkPolyDataPtr polyData, const QString& filePath
 	return true;
 }
 
-bool CPDFilter::readResultPoints(vtkPolyDataPtr polyData, const QString& filePath)
+bool CPDFilter::readTransform(const QString& filePath, Transform3D& deltaRMd)
 {
 	QFile file(filePath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		CX_LOG_ERROR() << "CPDFilter: Cannot read result file: " << filePath;
+		CX_LOG_ERROR() << "CPDFilter: Cannot read transform file: " << filePath;
 		return false;
 	}
 
 	QTextStream stream(&file);
-	vtkPoints* points = polyData->GetPoints();
-	vtkIdType expectedCount = points->GetNumberOfPoints();
-	vtkIdType count = 0;
+	Eigen::Matrix3d R;
+	Eigen::Vector3d t;
 
-	while (!stream.atEnd() && count < expectedCount)
+	for (int row = 0; row < 3; ++row)
 	{
-		QString line = stream.readLine().trimmed();
-		if (line.isEmpty())
-			continue;
-		QStringList parts = line.split(" ", QString::SkipEmptyParts);
-		if (parts.size() < 3)
-			continue;
-		points->SetPoint(count++, parts[0].toDouble(), parts[1].toDouble(), parts[2].toDouble());
+		stream >> R(row, 0) >> R(row, 1) >> R(row, 2);
+		if (stream.status() != QTextStream::Ok)
+		{
+			CX_LOG_ERROR() << "CPDFilter: Malformed transform file at R row " << row;
+			return false;
+		}
 	}
 
-	points->Modified();
-	polyData->Modified();
-
-	if (count != expectedCount)
+	stream >> t(0) >> t(1) >> t(2);
+	if (stream.status() != QTextStream::Ok)
 	{
-		CX_LOG_ERROR() << "CPDFilter: Expected " << expectedCount << " result points, got " << count;
+		CX_LOG_ERROR() << "CPDFilter: Malformed transform file for translation";
 		return false;
 	}
+
+	deltaRMd.setIdentity();
+	deltaRMd.linear() = R;
+	deltaRMd.translation() = t;
 	return true;
 }
 
@@ -179,6 +210,88 @@ QString CPDFilter::findCPDScript() const
 
 	CX_LOG_ERROR() << "CPDFilter: Script not found at " << scriptPath;
 	return QString();
+}
+
+QString CPDFilter::getVenvPythonPath() const
+{
+	QString venvBase = DataLocations::getVirtualEnvironmentsPath() + "/pycpd/venv";
+#ifdef CX_WINDOWS
+	return venvBase + "/Scripts/python.exe";
+#else
+	return venvBase + "/bin/python";
+#endif
+}
+
+bool CPDFilter::ensureVenv()
+{
+	QString pythonPath = getVenvPythonPath();
+	if (QFileInfo::exists(pythonPath))
+		return true;
+
+	QString venvBasePath = DataLocations::getVirtualEnvironmentsPath() + "/pycpd";
+	if (!QDir().mkpath(venvBasePath))
+	{
+		CX_LOG_ERROR() << "CPDFilter: Cannot create directory: " << venvBasePath;
+		return false;
+	}
+
+	QString createScript = DataLocations::getFilterScriptsPath() + "cxCreateVenv.sh";
+	if (!QFileInfo::exists(createScript))
+	{
+		CX_LOG_ERROR() << "CPDFilter: Venv creation script not found: " << createScript;
+		return false;
+	}
+
+	std::function<void()> showInfoBox = [venvBasePath]()
+	{
+		QMessageBox messageBox;
+		messageBox.setWindowModality(Qt::WindowModal);
+		messageBox.setTextFormat(Qt::RichText);
+		messageBox.setText("Virtual environment missing");
+		messageBox.setInformativeText(
+			"There is no virtual environment for pycpd at:<br><code>" + venvBasePath + "</code><br><br>"
+			"CustusX will create one now by running <code>pip install pycpd</code>.");
+		messageBox.exec();
+	};
+	// BlockingQueuedConnection deadlocks when caller and qApp share the same thread
+	if (QThread::currentThread() == qApp->thread())
+		showInfoBox();
+	else
+		QMetaObject::invokeMethod(qApp, showInfoBox, Qt::BlockingQueuedConnection);
+
+	CX_LOG_INFO() << "CPDFilter: Creating pycpd venv at " << venvBasePath;
+
+	QProcess process;
+	process.setProcessChannelMode(QProcess::MergedChannels);
+	QString requirementsDir = DataLocations::getFilterScriptsPath() + "scripts/python_cpd";
+	process.start("bash", QStringList() << createScript << venvBasePath << requirementsDir);
+
+	if (!process.waitForStarted(10000))
+	{
+		CX_LOG_ERROR() << "CPDFilter: Failed to start venv creation script";
+		return false;
+	}
+
+	process.waitForFinished(5 * 60 * 1000);
+
+	QByteArray output = process.readAllStandardOutput();
+	if (!output.isEmpty())
+		CX_LOG_INFO() << "CPD venv: " << QString(output).trimmed();
+
+	if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0)
+	{
+		CX_LOG_ERROR() << "CPDFilter: Venv creation failed with exit code " << process.exitCode();
+		return false;
+	}
+
+	if (!QFileInfo::exists(pythonPath))
+	{
+		CX_LOG_ERROR() << "CPDFilter: Python binary not found after venv creation: " << pythonPath;
+		return false;
+	}
+
+	CX_LOG_INFO() << "CPDFilter: Virtual environment created successfully";
+	return true;
 }
 
 bool CPDFilter::execute()
@@ -206,44 +319,51 @@ bool CPDFilter::execute()
 	if (scriptPath.isEmpty())
 		return false;
 
+	if (!ensureVenv())
+		return false;
+
 	QString patientFolder = mServices->patient()->getActivePatientFolder();
 	QString fixedPtsFile = patientFolder + "/cpd_fixed_pts.txt";
 	QString movingPtsFile = patientFolder + "/cpd_moving_pts.txt";
-	QString resultPtsFile = patientFolder + "/cpd_result_pts.txt";
+	QString resultFile = patientFolder + "/cpd_result_transform.txt";
 
 	if (!writeMeshPoints(fixedPoly, fixedPtsFile))
 		return false;
 	if (!writeMeshPoints(movingPoly, movingPtsFile))
 		return false;
 
-	StringPropertyPtr regTypeOption = getRegistrationTypeOption(mCopiedOptions);
-	DoublePropertyPtr maxIterOption = getMaxIterationsOption(mCopiedOptions);
-	DoublePropertyPtr tolOption = getToleranceOption(mCopiedOptions);
-
-	QString regType = regTypeOption->getValue();
-	int maxIter = static_cast<int>(maxIterOption->getValue());
-	double tolerance = tolOption->getValue();
+	int maxIter = static_cast<int>(getMaxIterationsOption(mCopiedOptions)->getValue());
+	double tolerance = getToleranceOption(mCopiedOptions)->getValue();
+	double outlierWeight = getOutlierWeightOption(mCopiedOptions)->getValue();
+	QString scaleMode = getScaleModeOption(mCopiedOptions)->getValue();
+	double scaleThreshold = getScaleThresholdOption(mCopiedOptions)->getValue();
 
 	QStringList args;
 	args << scriptPath
 		 << fixedPtsFile
 		 << movingPtsFile
-		 << resultPtsFile
-		 << regType
+		 << resultFile
 		 << QString::number(maxIter)
-		 << QString::number(tolerance, 'g', 10);
+		 << QString::number(tolerance, 'g', 10)
+		 << QString::number(outlierWeight, 'g', 10)
+		 << scaleMode
+		 << QString::number(scaleThreshold, 'g', 10);
 
-	CX_LOG_INFO() << "CPDFilter: Running " << regType << " CPD registration...";
+	CX_LOG_INFO() << "CPDFilter: Running rigid CPD registration...";
 
 	QProcess process;
 	process.setProcessChannelMode(QProcess::MergedChannels);
-	process.start("python3", args);
+	process.start(getVenvPythonPath(), args);
 
 	if (!process.waitForStarted(10000))
 	{
-		CX_LOG_ERROR() << "CPDFilter: Failed to start Python. Is python3 available?";
+		CX_LOG_ERROR() << "CPDFilter: Failed to start Python from venv: " << getVenvPythonPath();
 		return false;
 	}
+
+	const int timeoutMs = 5 * 60 * 1000;
+	QElapsedTimer timer;
+	timer.start();
 
 	while (process.state() != QProcess::NotRunning)
 	{
@@ -251,8 +371,15 @@ bool CPDFilter::execute()
 		QByteArray output = process.readAllStandardOutput();
 		if (!output.isEmpty())
 			CX_LOG_INFO() << "CPD: " << QString(output).trimmed();
+		if (timer.elapsed() > timeoutMs)
+		{
+			CX_LOG_ERROR() << "CPDFilter: Python script timed out after 5 minutes — killing process";
+			process.kill();
+			process.waitForFinished(5000);
+			return false;
+		}
 	}
-	process.waitForFinished(60 * 60 * 1000);
+	process.waitForFinished(5000);
 
 	QByteArray remaining = process.readAllStandardOutput();
 	if (!remaining.isEmpty())
@@ -261,18 +388,11 @@ bool CPDFilter::execute()
 	if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0)
 	{
 		CX_LOG_ERROR() << "CPDFilter: Python script failed with exit code " << process.exitCode();
-		CX_LOG_ERROR() << "CPDFilter: " << QString(process.readAllStandardError());
 		return false;
 	}
 
-	// Deep-copy moving mesh polydata and update point positions with CPD result
-	vtkPolyDataPtr resultPoly = vtkPolyDataPtr::New();
-	resultPoly->DeepCopy(movingPoly);
-
-	if (!readResultPoints(resultPoly, resultPtsFile))
+	if (!readTransform(resultFile, mDeltaRMd))
 		return false;
-
-	mResultPolyData = resultPoly;
 
 	CX_LOG_INFO() << "CPDFilter: Registration complete";
 	return true;
@@ -280,27 +400,19 @@ bool CPDFilter::execute()
 
 bool CPDFilter::postProcess()
 {
-	if (!mResultPolyData)
-		return false;
-
 	MeshPtr movingMesh = boost::dynamic_pointer_cast<Mesh>(mInputTypes[1]->getData());
-	if (!movingMesh)
+	MeshPtr fixedMesh = boost::dynamic_pointer_cast<Mesh>(mInputTypes[0]->getData());
+	if (!movingMesh || !fixedMesh)
 		return false;
 
-	QString uid = movingMesh->getUid() + "_cpd";
-	QString name = movingMesh->getName() + "_cpd";
-	MeshPtr outputMesh = patientService()->createSpecificData<Mesh>(uid, name);
-	outputMesh->setVtkPolyData(mResultPolyData);
-	outputMesh->setColor(movingMesh->getColor());
-	patientService()->insertData(outputMesh);
+	RegistrationTransform regTrans(mDeltaRMd, QDateTime::currentDateTime(), "CPD registration");
+	regTrans.mFixed = fixedMesh->getUid();
+	regTrans.mMoving = movingMesh->getUid();
 
-	// Result points are in reference space (rMd = identity)
-	outputMesh->get_rMd_History()->setRegistration(Transform3D::Identity());
+	RegistrationApplicator applicator(mServices->patient()->getDatas());
+	applicator.updateRegistration(QDateTime(), regTrans);
 
-	mServices->view()->autoShowData(outputMesh);
-	mOutputTypes[0]->setValue(outputMesh->getUid());
-
-	mResultPolyData = nullptr;
+	mDeltaRMd = Transform3D::Identity();
 	return true;
 }
 
