@@ -627,7 +627,7 @@ install(DIRECTORY "${QT_QML_DIR}/"
         # entry for it even when IGSTK tracking is disabled, and the file is not available.
         set(_cx_bundle_ignore_igstk "")
         if(NOT TARGET org_custusx_core_tracking_system_igstk)
-            set(_cx_bundle_ignore_igstk "IGNORE_ITEM \\\"libIGSTK.so\\\"")
+            set(_cx_bundle_ignore_igstk "IGNORE_ITEM libIGSTK.so")
         endif()
 
         install(CODE "
