@@ -44,7 +44,8 @@ public:
 	static boost::shared_ptr<Slice3DProxy> New();
 	~Slice3DProxy();
 
-	void setSliceProxy(SliceProxyInterfacePtr sliceProxy);
+	void setSliceProxy(SliceProxyPtr sliceProxy);
+	SliceProxyPtr getSliceProxy() const;
 	void setImage(ImagePtr image);
 	vtkImageSlicePtr getActor();
 
@@ -53,7 +54,7 @@ private slots:
 
 private:
 	Slice3DProxy();
-	SliceProxyInterfacePtr mSliceProxy;
+	SliceProxyPtr mSliceProxy;
 	SlicedImageProxyPtr mSlicer;
 	vtkImageSlicePtr mActor;
 };
@@ -78,8 +79,9 @@ public:
 	virtual ~Slices3DRep();
 	virtual QString getType() const { return "Slices3DRep"; }
 
-	void addPlane(PLANE_TYPE plane, PatientModelServicePtr dataManager);
-	void setImages(std::vector<ImagePtr> images);
+	void setPatientModelService(PatientModelServicePtr dataManager);
+	void addPlane(PLANE_TYPE plane);
+	void setImage(ImagePtr image);
 	void setTool(ToolPtr tool);
 
 protected:
@@ -89,7 +91,7 @@ protected:
 private:
 	Slices3DRep();
 	std::vector<Slice3DProxyPtr> mProxies;
-	std::vector<SliceProxyPtr> mSliceProxies;
+	PatientModelServicePtr mDataManager;
 };
 
 } // namespace cx

@@ -52,7 +52,7 @@ vtkImageSlicePtr Slice3DProxy::getActor()
 	return mActor;
 }
 
-void Slice3DProxy::setSliceProxy(SliceProxyInterfacePtr sliceProxy)
+void Slice3DProxy::setSliceProxy(SliceProxyPtr sliceProxy)
 {
 	if (mSliceProxy)
 		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot(Transform3D)));
@@ -65,6 +65,11 @@ void Slice3DProxy::setSliceProxy(SliceProxyInterfacePtr sliceProxy)
 		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot(Transform3D)));
 		this->transformChangedSlot(mSliceProxy->get_sMr());
 	}
+}
+
+SliceProxyPtr Slice3DProxy::getSliceProxy() const
+{
+	return mSliceProxy;
 }
 
 void Slice3DProxy::setImage(ImagePtr image)
@@ -98,38 +103,52 @@ Slices3DRepPtr Slices3DRep::New(const QString& uid)
 	return wrap_new(new Slices3DRep(), uid);
 }
 
-void Slices3DRep::addPlane(PLANE_TYPE plane, PatientModelServicePtr dataManager)
+void Slices3DRep::setPatientModelService(PatientModelServicePtr dataManager)
 {
-	SliceProxyPtr sliceProxy = SliceProxy::create(dataManager);
+	mDataManager = dataManager;
+}
+
+void Slices3DRep::addPlane(PLANE_TYPE plane)
+{
+	if (!mDataManager)
+	{
+		reportError("Slices3DRep::addPlane: call setPatientModelService() first.");
+		return;
+	}
+	SliceProxyPtr sliceProxy = SliceProxy::create(mDataManager);
 	sliceProxy->initializeFromPlane(plane, false, true, 150, 0.25);
 	sliceProxy->setAlwaysUseDefaultCenter(true);
-	mSliceProxies.push_back(sliceProxy);
 
 	Slice3DProxyPtr proxy = Slice3DProxy::New();
 	proxy->setSliceProxy(sliceProxy);
 	mProxies.push_back(proxy);
 }
 
-void Slices3DRep::setImages(std::vector<ImagePtr> images)
+void Slices3DRep::setImage(ImagePtr image)
 {
-	if (images.empty())
+	if (!image)
 	{
-		reportWarning("Slices3DRep::setImages: No images");
+		reportWarning("Slices3DRep::setImage: No image");
+		return;
+	}
+	if (mProxies.empty())
+	{
+		reportWarning("Slices3DRep::setImage: No planes added, call addPlane() first.");
 		return;
 	}
 
-	Vector3D center_r = images[0]->get_rMd().coord(images[0]->boundingBox().center());
-	for (unsigned i = 0; i < mSliceProxies.size(); ++i)
-		mSliceProxies[i]->setDefaultCenter(center_r);
-
+	Vector3D center_r = image->get_rMd().coord(image->boundingBox().center());
 	for (unsigned i = 0; i < mProxies.size(); ++i)
-		mProxies[i]->setImage(images[0]);
+	{
+		mProxies[i]->getSliceProxy()->setDefaultCenter(center_r);
+		mProxies[i]->setImage(image);
+	}
 }
 
 void Slices3DRep::setTool(ToolPtr tool)
 {
-	for (unsigned i = 0; i < mSliceProxies.size(); ++i)
-		mSliceProxies[i]->setTool(tool);
+	for (unsigned i = 0; i < mProxies.size(); ++i)
+		mProxies[i]->getSliceProxy()->setTool(tool);
 }
 
 void Slices3DRep::addRepActorsToViewRenderer(ViewPtr view)

@@ -138,6 +138,8 @@ private:
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
 	Slices3DRepPtr mSlices3DRep;
+	std::vector<ImagePtr> mCurrentSliceImages;
+	std::vector<PLANE_TYPE> mCurrentSlicePlanes;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 
 	ViewPtr mView;

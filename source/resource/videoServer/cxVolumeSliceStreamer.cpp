@@ -50,7 +50,7 @@ bool VolumeSliceStreamer::initialize(ImagePtr image, ToolPtr tool)
 
 bool VolumeSliceStreamer::initialize(ToolPtr tool)
 {
-	if(!mSourceImage || !tool)
+	if(!mSourceImage || !tool || !tool->getProbe())
 	{
 		this->setInitialized(false);
 		return false;
@@ -60,6 +60,7 @@ bool VolumeSliceStreamer::initialize(ToolPtr tool)
 	mTool = tool;
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(sliceSlot()));
 	connect(mTool->getProbe().get(), SIGNAL(activeConfigChanged()), this, SLOT(resetMask()));
+	connect(mPatientModelService.get(), SIGNAL(rMprChanged()), this, SLOT(sliceSlot()));
 
 	this->resetMask();
 	this->setInitialized(true);
@@ -129,6 +130,8 @@ void VolumeSliceStreamer::sliceSlot()
 
 void VolumeSliceStreamer::setSourceImage(ImagePtr image)
 {
+	if(mSourceImage)
+		disconnect(mSourceImage.get(), &Image::transferFunctionsChanged, this, &VolumeSliceStreamer::sliceSlot);
 	mSourceImage = image;
 	if(mSourceImage)
 		connect(mSourceImage.get(), &Image::transferFunctionsChanged, this, &VolumeSliceStreamer::sliceSlot);

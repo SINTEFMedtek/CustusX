@@ -836,25 +836,30 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
 
 void ViewWrapper3D::updateSlices()
 {
-	if (mSlices3DRep)
-		mView->removeRep(mSlices3DRep);
-	mSlices3DRep.reset();
-
 	if (!mGroupData)
 		return;
 
 	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice3D());
-	if (images.empty())
+	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
+
+	if (images == mCurrentSliceImages && planes == mCurrentSlicePlanes)
 		return;
 
-	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
-	if (planes.empty())
+	mCurrentSliceImages = images;
+	mCurrentSlicePlanes = planes;
+
+	if (mSlices3DRep)
+		mView->removeRep(mSlices3DRep);
+	mSlices3DRep.reset();
+
+	if (images.empty() || planes.empty())
 		return;
 
 	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
+	mSlices3DRep->setPatientModelService(mServices->patient());
 	for (unsigned i = 0; i < planes.size(); ++i)
-		mSlices3DRep->addPlane(planes[i], mServices->patient());
-	mSlices3DRep->setImages(images);
+		mSlices3DRep->addPlane(planes[i]);
+	mSlices3DRep->setImage(images[0]);
 	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
 	mView->addRep(mSlices3DRep);
 }
