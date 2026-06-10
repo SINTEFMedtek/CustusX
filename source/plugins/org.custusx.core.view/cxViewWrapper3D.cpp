@@ -855,7 +855,7 @@ void ViewWrapper3D::updateSlices()
 	if (images.empty() || planes.empty())
 		return;
 
-	mSlices3DRep = Slices3DRep::New("MultiSliceRep_" + mView->getName());
+	mSlices3DRep = Slices3DRep::New("3DSliceRep_" + mView->getName());
 	mSlices3DRep->setPatientModelService(mServices->patient());
 	for (unsigned i = 0; i < planes.size(); ++i)
 		mSlices3DRep->addPlane(planes[i]);
