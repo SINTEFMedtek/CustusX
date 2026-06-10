@@ -29,16 +29,11 @@ namespace cx
 typedef boost::shared_ptr<class Image2DProxy> Image2DProxyPtr;
 
 /**
- * \brief Slice volumes using a SliceProxy.
+ * \brief Display a 2D image in 3D space using a vtkImageSlice.
  *
- * The functionality is equal to SlicedImageProxy, but the actual slicing
- * is performed by loading the image into the GPU as a 3D texture and
- * slicing it there, using the GPU.
- *
- * Used by Sonowand and Sintef.
- *
- *  Created on: Oct 13, 2011
- *      Author: christiana
+ * Positions the image using the image's rMd transform plus an optional offset,
+ * and applies the image's LUT via ApplyLUTToImage2DProxy.
+ * Only accepts already-2D images (asserts image->is2D()).
  *
  * \ingroup cx_resource_view
  */
@@ -48,11 +43,7 @@ Q_OBJECT
 public:
 	static Image2DProxyPtr New();
 	virtual ~Image2DProxy();
-//	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImage(ImagePtr image);
-//	void setSliceProxy(SliceProxyPtr slicer);
-//	SliceProxyPtr getSliceProxy() { return mSliceProxy; }
-//	void update();
 	void setTargetSpaceToR(); ///< use to draw the slice in 3D r space instead of in 2D s space.
 	vtkImageSlicePtr getSlice();
 
