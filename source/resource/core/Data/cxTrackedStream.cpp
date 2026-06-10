@@ -17,6 +17,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxTool.h"
 #include "cxRegistrationTransform.h"
 #include "cxVideoSource.h"
+#include "cxImageLUT2D.h"
 
 #include "cxProbeSector.h"
 #include "cxSpaceProvider.h"
@@ -168,11 +169,14 @@ ImagePtr TrackedStream::getChangingImage()
 	if(!mVideoSource)
 		return ImagePtr();
 	if (!mImage)
+	{
 		mImage = ImagePtr(
 			new Image(this->getUid()+"_TrackedStreamHelper",
 					  mVideoSource->getVtkImageData(),
 					  this->getName()+"_TrackedStreamHelper",
 					  mVideoSource->getModality()));
+		mImage->getLookupTable2D()->setLLR(1);
+	}
 	return mImage;
 }
 
