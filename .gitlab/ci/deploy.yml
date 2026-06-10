@@ -44,6 +44,8 @@ pages:
     OS: Ubuntu2004
     GIT_CLONE_PATH: /builds/$OS/CX/CX
   script:
+    - '[ -d $OS/package_artefacts/html_pure/ ] || exit 0'
+    - mkdir -p public
     - mv $OS/package_artefacts/html_pure/ public/user_doc/
     - mv $OS/package_artefacts/html_dev/ public/developer_doc/
   artifacts:
