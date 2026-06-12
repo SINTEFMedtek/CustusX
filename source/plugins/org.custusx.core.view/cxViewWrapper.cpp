@@ -31,7 +31,8 @@ namespace cx
 
 DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr services, ViewGroupDataPtr groupData) :
 	mServices(services),
-	mGroupData(groupData)
+	mGroupData(groupData),
+	mExclusive(false)
 {
 	mProperties = DataViewProperties::createDefault();
 }
@@ -39,6 +40,11 @@ DataViewPropertiesInteractor::DataViewPropertiesInteractor(VisServicesPtr servic
 void DataViewPropertiesInteractor::setDataViewProperties(DataViewProperties properties)
 {
 	mProperties = properties;
+}
+
+void DataViewPropertiesInteractor::setExclusive(bool exclusive)
+{
+	mExclusive = exclusive;
 }
 
 void DataViewPropertiesInteractor::addDataAction(QString uid, QWidget* parent)
@@ -85,6 +91,16 @@ void DataViewPropertiesInteractor::dataActionSlot()
 
 	if (theAction->isChecked())
 	{
+		if (mExclusive)
+		{
+			std::vector<DataPtr> currentlyVisible = mGroupData->getData(mProperties);
+			for (DataPtr item : currentlyVisible)
+			{
+				DataViewProperties itemProps = mGroupData->getProperties(item->getUid());
+				mGroupData->setProperties(item->getUid(), itemProps.removeFlagsIn(mProperties));
+			}
+		}
+
 		DataViewProperties props = old.addFlagsIn(mProperties);
 		mGroupData->setProperties(uid, props);
 
@@ -133,6 +149,7 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 	mShow3DSlicesInteractor.reset(new DataViewPropertiesInteractor(mServices, mGroupData));
 	mShow3DSlicesInteractor->setDataViewProperties(DataViewProperties::createSlice3D());
+	mShow3DSlicesInteractor->setExclusive(true);
 
 	connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 }

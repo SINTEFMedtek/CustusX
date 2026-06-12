@@ -47,6 +47,7 @@ typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
 typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
 typedef boost::shared_ptr<class MultiVolume3DRepProducer> MultiVolume3DRepProducerPtr;
 typedef boost::shared_ptr<class AxisConnector> AxisConnectorPtr;
+typedef boost::shared_ptr<class Slices3DRep> Slices3DRepPtr;
 
 /**
  * \file
@@ -108,8 +109,6 @@ private:
 	void updateSlices();
 	NavigationPtr getNavigation();
 
-	QAction* createSlicesAction(QString title, QWidget* parent);
-
 	void createSlicesActions(QWidget *parent);
 	QAction* createSlicesAction(PlaneTypeCollection planes, QWidget* parent);
 
@@ -138,6 +137,9 @@ private:
 
 	bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 	SlicePlanes3DRepPtr mSlicePlanes3DRep;
+	Slices3DRepPtr mSlices3DRep;
+	std::vector<ImagePtr> mCurrentSliceImages;
+	std::vector<PLANE_TYPE> mCurrentSlicePlanes;
 	OrientationAnnotation3DRepPtr mAnnotationMarker;
 
 	ViewPtr mView;

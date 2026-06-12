@@ -52,6 +52,7 @@ class org_custusx_core_view_EXPORT DataViewPropertiesInteractor : public QObject
 public:
 	DataViewPropertiesInteractor(VisServicesPtr services, ViewGroupDataPtr groupData);
 	void setDataViewProperties(DataViewProperties properties);
+	void setExclusive(bool exclusive);
 
 	template <class DATA>
 	void addDataActionsOfType(QWidget* parent);
@@ -63,6 +64,7 @@ private:
 	VisServicesPtr mServices;
 	ViewGroupDataPtr mGroupData;
 	DataViewProperties mProperties;
+	bool mExclusive;
 
 	QString mLastDataActionUid;
 };

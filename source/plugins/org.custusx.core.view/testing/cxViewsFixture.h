@@ -85,7 +85,6 @@ private:
 	cx::SliceProxyPtr createSliceProxy(cx::PLANE_TYPE plane);
 	RenderTesterPtr getRenderTesterForRenderWindow(int viewIndex);
 
-	QString mShaderFolder;
 	cxtest::TestVisServicesPtr mServices;
 	cx::MessageListenerPtr mMessageListener;
 	ViewsWindowPtr mWindow;

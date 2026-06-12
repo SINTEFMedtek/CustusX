@@ -40,6 +40,7 @@ cx_add_class_qt_moc(CX_RESOURCE_VISUALIZATION_FILES
     Rep3D/cxLandmarkRep
     Rep3D/cxOrientationAnnotation3DRep
     Rep3D/cxImage2DRep3D
+    Rep3D/cxSlices3DRep
     Rep3D/cxSphereMetricRep
     Rep3D/cxDonutMetricRep
     Rep3D/cxCustomMetricRep
@@ -108,7 +109,6 @@ cx_add_class( CX_RESOURCE_VISUALIZATION_FILES
     Primitives/cxDepthPeeling
     Primitives/cxGraphicalTorus3D
     Primitives/cxVtkHelperClasses
-#    Primitives/cxTextureSlicePainter
     Primitives/cxUltrasoundSectorSource
     Rep3D/cxAxesRep
     Rep/cxDisplayTextRep
