@@ -357,11 +357,8 @@ void RegistrationHistory::addParentSpace(const QString& newParent)
 
 void RegistrationHistory::addParentSpace(const ParentSpace& newParent)
 {
-	for (int i = 0; i < mParentSpaces.size(); ++i)
-	{
-		if(mParentSpaces[i].mUid == newParent.mUid)
-			return;// ignore if already present
-	}
+	if (mParentSpaceCache.mUid == newParent.mUid) // ignore if parent is unchanged
+		return;
 
 	mParentSpaces.push_back(newParent);
 	std::sort(mParentSpaces.begin(), mParentSpaces.end());
