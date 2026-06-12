@@ -357,7 +357,7 @@ void RegistrationHistory::addParentSpace(const QString& newParent)
 
 void RegistrationHistory::addParentSpace(const ParentSpace& newParent)
 {
-	if (mParentSpaceCache.mUid == newParent.mUid) // ignore if parent is unchanged
+	if (!mParentSpaces.empty() && mParentSpaces.back().mUid == newParent.mUid) // ignore if parent is unchanged
 		return;
 
 	mParentSpaces.push_back(newParent);
