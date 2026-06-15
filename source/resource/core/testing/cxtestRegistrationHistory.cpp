@@ -15,6 +15,12 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 namespace cxtest
 {
 
+class TestableRegistrationHistory : public cx::RegistrationHistory
+{
+public:
+	using cx::RegistrationHistory::addParentSpace;
+};
+
 TEST_CASE("RegistrationHistory: addParentSpace sets parent", "[unit][resource][core][registration]")
 {
 	cx::RegistrationHistory history;
@@ -98,7 +104,7 @@ TEST_CASE("RegistrationHistory: addParentSpace does not duplicate entry in playb
 	// Regression test: with a historical active time pinned, mParentSpaceCache reflects an older
 	// entry while mParentSpaces.back() holds the latest. addParentSpace must compare against
 	// back(), not the cache, or it pushes a duplicate of the already-latest entry.
-	cx::RegistrationHistory history;
+	TestableRegistrationHistory history;
 
 	QDateTime t1 = QDateTime::fromSecsSinceEpoch(1000);
 	QDateTime t2 = QDateTime::fromSecsSinceEpoch(2000);

@@ -125,7 +125,7 @@ public:
 
 signals:
 	void currentChanged();
-private:
+protected:
 	virtual void addParentSpace(const ParentSpace& newParent);
 	virtual void addRegistrationInternal(const RegistrationTransform& transform);
 	void setCache(const RegistrationTransform& val, const ParentSpace& parent, const QDateTime& timestamp);
