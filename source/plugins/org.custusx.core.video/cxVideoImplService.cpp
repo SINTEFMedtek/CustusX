@@ -57,6 +57,7 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 
     connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
     connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
+    connect(mVideoConnection.get(), &VideoConnection::probeDefinitionUpdated, this, &VideoImplService::setActiveVideoSource);
     connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
     connect(mBackend->tracking().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
     connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
@@ -71,6 +72,7 @@ VideoImplService::~VideoImplService()
     // recursive calls back to this during deletion.
     disconnect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
     disconnect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
+    disconnect(mVideoConnection.get(), &VideoConnection::probeDefinitionUpdated, this, &VideoImplService::setActiveVideoSource);
     disconnect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
     disconnect(mBackend->tracking().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
     disconnect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
