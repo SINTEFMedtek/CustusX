@@ -558,7 +558,7 @@ class CustusX(CppComponent):
             append('CX_CMAKE_CXX_FLAGS:STRING', '-fpermissive') # old ITK throw() specs are forbidden in C++17
         else:
             add('CX_PLUGIN_org.custusx.core.tracking.system.igstk:BOOL', False)
-            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', True)
+            add('CX_PLUGIN_org.custusx.core.tracking.system.ndi:BOOL', False)
         #if(platform.system() == 'Linux'):
         #  add('FAST_DIR:PATH', self._createSibling(FAST).configPath())
         add('BUILD_DOCUMENTATION:BOOL', self.controlData.build_developer_doc)
