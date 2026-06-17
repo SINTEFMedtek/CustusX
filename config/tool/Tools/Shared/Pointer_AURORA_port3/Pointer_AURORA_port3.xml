@@ -14,6 +14,7 @@
   <geo_file></geo_file>
   <pic_file></pic_file>
   <doc_file></doc_file>  
+  <openigtlinktransformid>port_2</openigtlinktransformid>
 
   <!-- Instrument -->
   <instrument>

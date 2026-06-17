@@ -220,6 +220,8 @@ void ProbeImpl::setActiveStream(QString uid)
 {
 	if (uid.isEmpty())
 		return;
+	if (mActiveUid == uid)
+		return;
 	mActiveUid = uid;
 	emit sectorChanged();
 }
