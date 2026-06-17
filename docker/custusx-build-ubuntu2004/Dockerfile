@@ -3,16 +3,16 @@
 # It seems like we need to use sudo with all commands on Ubuntu 20.04 for now
 
 # Build image:
-# sudo docker build -t custusx-build-ubuntu2004:26.04.01 .
+# sudo docker build -t custusx-build-ubuntu2004:26.04.02 .
 # or
-# sudo docker build --no-cache -t custusx-build-ubuntu2004:26.04.01 .
+# sudo docker build --no-cache -t custusx-build-ubuntu2004:26.04.02 .
 
 # Tag image
-# sudo docker tag custusx-build-ubuntu2004:26.04.01 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.01
+# sudo docker tag custusx-build-ubuntu2004:26.04.02 gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
 
 # Upload image
 # For gitlab docker login see:  https://gitlab.sintef.no/custusx/CustusS/-/wikis/Docker-image-creation
-# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.01
+# sudo docker push gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
 
 # List all docker container
 # sudo docker ps --all
@@ -21,7 +21,7 @@
 # sudo docker rm ...
 
 # Explore container with the command line:
-# sudo docker run --rm -it --entrypoint=/bin/bash gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:25.02
+# sudo docker run --rm -it --entrypoint=/bin/bash gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
 
 FROM ubuntu:20.04
 
@@ -39,7 +39,7 @@ RUN \
   libboost-all-dev libcppunit-dev libglew-dev \
   git python3 python3-pip python-is-python3 \
   cmake ninja-build \
-  qt5-default qttools5-dev qttools5-dev-tools libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev \
+  qt5-default qttools5-dev qttools5-dev-tools libqt5xmlpatterns5-dev libqt5x11extras5-dev qtmultimedia5-dev libxt-dev libqt5webkit5 \
   libgl1-mesa-dev
 
 # libgl1-mesa-dev #Test with mesa OpenGL (instead of NVIDIA)

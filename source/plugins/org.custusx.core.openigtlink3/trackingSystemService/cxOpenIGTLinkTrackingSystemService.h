@@ -15,8 +15,10 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "org_custusx_core_openigtlink3_Export.h"
 
 #include <QThread>
+#include <map>
 
 #include "cxNetworkHandler.h"
+#include "cxTrackingService.h"
 #include "cxTrackingSystemService.h"
 
 namespace cx
@@ -38,7 +40,7 @@ class org_custusx_core_openigtlink3_EXPORT OpenIGTLinkTrackingSystemService : pu
 	Q_INTERFACES(cx::TrackingSystemService)
 
 public:
-	OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler);
+	OpenIGTLinkTrackingSystemService(NetworkHandlerPtr networkHandler, TrackingServicePtr trackingService = TrackingServicePtr());
 	virtual ~OpenIGTLinkTrackingSystemService();
 
 	virtual QString getUid() const;
@@ -67,12 +69,17 @@ private slots:
 
 	void receiveCalibration(QString devicename, Transform3D calibration);
 	void receiveProbedefinition(QString devicename, ProbeDefinitionPtr definition);
+	void applyPendingProbeDefinitions();
 
 private:
+	void applyProbeDefinition(ToolPtr tool, ProbeDefinitionPtr definition);
 
 	std::map<QString, OpenIGTLinkToolPtr> mTools;
 	ToolPtr mReference;
 	NetworkHandlerPtr mNetworkHandler;
+	TrackingServicePtr mTrackingService;
+	std::map<QString, ProbeDefinitionPtr> mPendingProbeDefinitions;
+	Tool::State mLastTrackingState;
 
 signals:
 	void setInternalState(const Tool::State val);

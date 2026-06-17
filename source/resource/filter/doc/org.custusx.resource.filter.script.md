@@ -9,7 +9,7 @@ Uses a .ini file for configuration:
 
 script:
 - path: Relative/abolute path to script file to run
-- engine: Supported script engine. E.g.: Raidionics or DeepSintef. Leave empty for default functionality
+- engine: Supported script engine. E.g.: Raidionics or TotalSegmentator. Leave empty for default functionality
 - arguments: Additional input arguments to the script if required
 
 environment:

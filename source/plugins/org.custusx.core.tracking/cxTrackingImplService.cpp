@@ -76,7 +76,6 @@ TrackingImplService::~TrackingImplService()
 		this->unInstallTrackingSystem(mTrackingSystems.back());
 }
 
-
 bool TrackingImplService::isNull()
 {
 	return false;
@@ -685,6 +684,12 @@ ToolPtr TrackingImplService::getFirstProbe()
 	// pick the first probe, visible or not.
 	for (ToolMap::iterator iter = tools.begin(); iter != tools.end(); ++iter)
 		if (iter->second->getProbe() && iter->second->getProbe()->isValid())
+			return iter->second;
+
+	// last resort: any probe even without a valid definition (for digital/network probes where
+	// definition arrives after streaming starts, matching the active-tool path above)
+	for (ToolMap::iterator iter = tools.begin(); iter != tools.end(); ++iter)
+		if (iter->second->getProbe())
 			return iter->second;
 
 	return ToolPtr();

@@ -14,7 +14,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QPixmap>
 #include "cxPatientModelService.h"
 #include <QtConcurrent>
-#include <QDesktopWidget>
 #include <QApplication>
 #include "cxReporter.h"
 #include "boost/bind/bind.hpp"
@@ -54,10 +53,9 @@ ScreenShotImageWriter::ScreenShotImageWriter(PatientModelServicePtr patient) :
 
 void ScreenShotImageWriter::grabAllScreensToFile()
 {
-	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
-	for (int i=0; i<desktop->screenCount(); ++i)
+	for (int i=0; i<screens.size(); ++i)
 	{
 		QPixmap pm = this->grab(i);
 		QString name = this->getName(i);
@@ -76,12 +74,9 @@ void ScreenShotImageWriter::save(QImage image, QString id)
 
 QPixmap ScreenShotImageWriter::grab(unsigned screenid)
 {
-	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
-	QWidget* screenWidget = desktop->screen(screenid);
-	WId screenWinId = screenWidget->winId();
-	QRect geo = desktop->screenGeometry(screenid);
+	QRect geo = screens[screenid]->geometry();
 //	QString name = "";
 //	if (desktop->screenCount()>1)
 //	{
@@ -91,17 +86,16 @@ QPixmap ScreenShotImageWriter::grab(unsigned screenid)
 //		name.replace("\\", "");
 //		name.replace(".", "");
 //	}
-	QPixmap pixmap = screens[screenid]->grabWindow(screenWinId, geo.left(), geo.top(), geo.width(), geo.height());
+	QPixmap pixmap = screens[screenid]->grabWindow(0, 0, 0, geo.width(), geo.height());
 	return pixmap;
 }
 
 QString ScreenShotImageWriter::getName(unsigned screenid)
 {
-	QDesktopWidget* desktop = qApp->desktop();
 	QList<QScreen*> screens = qApp->screens();
 
 	QString name = "";
-	if (desktop->screenCount()>1)
+	if (screens.size()>1)
 	{
 		name = screens[screenid]->name().split(" ").join("");
 		//On windows screens[i]->name() is "\\.\DISPLAY1",

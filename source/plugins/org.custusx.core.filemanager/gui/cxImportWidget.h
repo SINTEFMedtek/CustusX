@@ -71,6 +71,7 @@ private:
 	QStringList openFileBrowserForSelectingFiles();
 	QString generateFileTypeFilter() const;
 
+	bool tryAutoAssignModalitiesForCT(ImportDataTypeWidget* widget);
 	QString generateUid(QString filename) const;
 	void generateParentCandidates();
 	int insertDataIntoTable(QString filename, std::vector<DataPtr> data);

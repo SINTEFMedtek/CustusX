@@ -79,12 +79,14 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxMultiVolume3DRepProducer.h"
 #include "cxMetricNamesRep.h"
 #include "cxVisServices.h"
+#include "cxInteractiveCropper.h"
 #include "cxNavigation.h"
 
 #include "cxTrackedStream.h"
 #include "cxStreamRep3D.h"
 #include "cxStream2DRep3D.h"
 #include "cxActiveData.h"
+#include "cxSlices3DRep.h"
 
 namespace cx
 {
@@ -110,6 +112,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ViewPtr view, VisServicesPtr servic
 	this->mCallbackCommand->SetClientData(this);
 	this->mCallbackCommand->SetCallback(ViewWrapper3D::ProcessEvents);
 	mView->getRenderWindow()->GetInteractor()->AddObserver(vtkCommand::AnyEvent, this->mCallbackCommand, 1.0);//Catch all events
+	mInteractiveCropper = mServices->view()->getCropper();
 
 	QString index = QString::number(startIndex);
 	QColor background = settings()->value("backgroundColor").value<QColor>();
@@ -178,6 +181,7 @@ void ViewWrapper3D::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long e
 	//All events makes VTK do additional rendering, but some needs to be sent further to allow the use of VTK interactor
 	//Block all other events
 	if(event == vtkCommand::LeftButtonPressEvent
+			|| event == vtkCommand::LeftButtonReleaseEvent
 			|| event == vtkCommand::MouseWheelForwardEvent
 			|| event == vtkCommand::MouseWheelBackwardEvent
 			|| event == vtkCommand::CharEvent
@@ -186,6 +190,12 @@ void ViewWrapper3D::ProcessEvents(vtkObject* vtkNotUsed(object), unsigned long e
 //			|| event == vtkCommand::ModifiedEvent
 //			|| event == vtkCommand::RenderEvent
 			)
+		return;
+	// Allow MouseMoveEvent only during active box-widget drag so the sphere handles
+	// can be dragged without also triggering camera rotation via the VTK interactor style.
+	if(event == vtkCommand::MouseMoveEvent
+			&& self->mInteractiveCropper
+			&& self->mInteractiveCropper->isInteracting())
 		return;
 //	CX_LOG_DEBUG() << "Block VTK event: " << vtkCommand::GetStringFromEventId(event);
 	self->mCallbackCommand.Get()->SetAbortFlag(1);
@@ -830,13 +840,28 @@ void ViewWrapper3D::updateSlices()
 		return;
 
 	std::vector<ImagePtr> images = mGroupData->getImages(DataViewProperties::createSlice3D());
-//	std::vector<ImagePtr> images = mGroupData->get3DSliceImages();
-	if (images.empty())
+	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
+
+	if (images == mCurrentSliceImages && planes == mCurrentSlicePlanes)
 		return;
 
-	std::vector<PLANE_TYPE> planes = mGroupData->getSliceDefinitions().get();
-	if (planes.empty())
+	mCurrentSliceImages = images;
+	mCurrentSlicePlanes = planes;
+
+	if (mSlices3DRep)
+		mView->removeRep(mSlices3DRep);
+	mSlices3DRep.reset();
+
+	if (images.empty() || planes.empty())
 		return;
+
+	mSlices3DRep = Slices3DRep::New("3DSliceRep_" + mView->getName());
+	mSlices3DRep->setPatientModelService(mServices->patient());
+	for (unsigned i = 0; i < planes.size(); ++i)
+		mSlices3DRep->addPlane(planes[i]);
+	mSlices3DRep->setImage(images[0]);
+	mSlices3DRep->setTool(mServices->tracking()->getActiveTool());
+	mView->addRep(mSlices3DRep);
 }
 
 ViewPtr ViewWrapper3D::getView()
@@ -850,8 +875,8 @@ void ViewWrapper3D::activeToolChangedSlot()
 	//CX_LOG_DEBUG() << "ViewWrapper3D::activeToolChangedSlot - controllingTool: " << controllingTool->getName();
 
 	mPickerRep->setTool(controllingTool);
-//	if (mSlices3DRep)
-//		mSlices3DRep->setTool(controllingTool);
+	if (mSlices3DRep)
+		mSlices3DRep->setTool(controllingTool);
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

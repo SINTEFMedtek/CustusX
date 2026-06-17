@@ -4138,7 +4138,7 @@ namespace Clara {
                     else if( m_arg.isAnyPositional() ) {
                         if( m_cl->m_arg.get() )
                             throw std::logic_error( "Only one unpositional argument can be added" );
-                        m_cl->m_arg = std::auto_ptr<Arg>( new Arg( m_arg ) );
+                        m_cl->m_arg = std::unique_ptr<Arg>( new Arg( m_arg ) );
                     }
                     else
                         m_cl->m_options.push_back( m_arg );
@@ -4182,7 +4182,7 @@ namespace Clara {
             m_highestSpecifiedArgPosition( other.m_highestSpecifiedArgPosition )
         {
             if( other.m_arg.get() )
-                m_arg = std::auto_ptr<Arg>( new Arg( *other.m_arg ) );
+                m_arg = std::unique_ptr<Arg>( new Arg( *other.m_arg ) );
         }
 
         template<typename F>
@@ -4352,7 +4352,7 @@ namespace Clara {
         Detail::BoundArgFunction<ConfigT> m_boundProcessName;
         std::vector<Arg> m_options;
         std::map<int, Arg> m_positionalArgs;
-        std::auto_ptr<Arg> m_arg;
+        std::unique_ptr<Arg> m_arg;
         int m_highestSpecifiedArgPosition;
     };
 

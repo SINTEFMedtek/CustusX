@@ -212,16 +212,16 @@ void CXVBcameraPath::writePositionToFile(Transform3D prMt)
 	if (positionFile.open(QIODevice::Append))
 	{
 		QTextStream stream(&positionFile);
-		stream << prMt(0,0) << " " << prMt(0,1) << " " << prMt(0,2) << " " << prMt(0,3) << endl;
-		stream << prMt(1,0) << " " << prMt(1,1) << " " << prMt(1,2) << " " << prMt(1,3) << endl;
-		stream << prMt(2,0) << " " << prMt(2,1) << " " << prMt(2,2) << " " << prMt(2,3) << endl;
+		stream << prMt(0,0) << " " << prMt(0,1) << " " << prMt(0,2) << " " << prMt(0,3) << "\n";
+		stream << prMt(1,0) << " " << prMt(1,1) << " " << prMt(1,2) << " " << prMt(1,3) << "\n";
+		stream << prMt(2,0) << " " << prMt(2,1) << " " << prMt(2,2) << " " << prMt(2,3) << "\n";
 	}
 
 	QFile timestampFile(mPositionsFilePath + "_timestamps.txt");
 	if (timestampFile.open(QIODevice::Append))
 	{
 		QTextStream stream(&timestampFile);
-		stream << mTimeSinceStartRecording.elapsed() << endl;
+		stream << mTimeSinceStartRecording.elapsed() << "\n";
 	}
 
 	QFile branchingPositionFile(mPositionsFilePath + "_branching.txt");
@@ -232,7 +232,7 @@ void CXVBcameraPath::writePositionToFile(Transform3D prMt)
 		if (std::find(mBranchingIndex.begin(), mBranchingIndex.end(), originalRouteIndex) != mBranchingIndex.end())
 			branchingPoint = 1;
 		QTextStream stream(&branchingPositionFile);
-		stream << branchingPoint << endl;
+		stream << branchingPoint << "\n";
 	}
 }
 

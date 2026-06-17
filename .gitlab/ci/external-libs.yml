@@ -1,0 +1,184 @@
+# Builds all external C++ libraries and publishes them to the Package Registry.
+#
+# The package version key encodes library versions (via a hash of cxComponents.py,
+# where all git SHAs are pinned) and the Docker image tag (compiler/system libs).
+# Any change to either automatically produces a new package version.
+#
+# Trigger conditions:
+#   - Automatically when install/cx/build/cxComponents.py changes
+#   - Manually from the GitLab CI/CD UI at any time
+#
+# The build-ubuntu* jobs in build.yml download these packages instead of
+# rebuilding from source. If no package is found, they fall back to a full
+# rebuild and upload the result so the next run can reuse it.
+
+# Shared script steps for computing IGSTK variant flags and package coordinates.
+# Referenced by both .build-and-publish-libs (this file) and .reuse-build (build.yml).
+.lib-package-vars:
+  script:
+    - |
+      if [ "${BUILD_IGSTK}" = "true" ]; then
+        IGSTK_SUFFIX="igstk"
+        IGSTK_FLAG="--igstk"
+        IGSTK_LIBS="eigen VTK ITK IGSTK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+      else
+        IGSTK_SUFFIX="noigstk"
+        IGSTK_FLAG=""
+        IGSTK_LIBS="eigen VTK ITK OpenCV OpenIGTLink CTK OpenIGTLinkIO OpenCLUtilityLibrary QHttpServer"
+        rm -rf $BASE_DIR/IGSTK
+      fi
+    - LIBS_HASH=$(sha256sum install/cx/build/cxComponents.py | awk '{print $1}' | cut -c1-16)
+    - IMAGE_TAG=$(echo $CI_JOB_IMAGE | sed 's|.*/||' | tr ':' '_')
+    - PACKAGE_NAME="custusx-external-libs"
+    - PACKAGE_VERSION="${OS}-${IMAGE_TAG}-${IGSTK_SUFFIX}-${LIBS_HASH}"
+    - PACKAGE_FILE="cx-external-libs-${OS}-${IGSTK_SUFFIX}.tar.gz"
+    - PACKAGE_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${PACKAGE_VERSION}/${PACKAGE_FILE}"
+
+.build-and-publish-libs:
+  stage: build-libs
+  variables:
+    OS: OS
+    BASE_DIR: /builds/$OS
+    GIT_CLONE_PATH: /builds/$OS/CX/CX
+    BUILD_IGSTK: "false"
+  script:
+    - !reference [.lib-package-vars, script]
+    - echo "Libs package version $PACKAGE_VERSION"
+    - |
+      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" "$PACKAGE_URL")
+      if [ "$HTTP_CODE" = "200" ]; then
+        echo "Package $PACKAGE_VERSION already in registry, nothing to do."
+        exit 0
+      fi
+      echo "Package not found (HTTP $HTTP_CODE), building external libs..."
+    # Remove stale CTK build dir so CTK's ExternalProjects (DCMTK etc.) are
+    # re-cloned with a proper .git. A prior tarball extraction strips .git dirs,
+    # which breaks DCMTK's git-update step on warm runners that previously
+    # downloaded a prebuilt package.
+    - rm -rf $BASE_DIR/CTK
+    # Build all external libraries. CustusX and CustusX-Data are intentionally
+    # excluded here; they are built in the downstream build-ubuntu* jobs.
+    - eval ./install/cxInstaller.py -s --full -j 4 -t Release $IGSTK_FLAG $IGSTK_LIBS
+    # Pack lib directories. Exclude CMakeFiles (*.o intermediates) and .git
+    # history to keep the tarball small; neither is needed at configure time.
+    - |
+      ( cd $BASE_DIR && tar -czf /tmp/$PACKAGE_FILE \
+        --exclude='*/CMakeFiles' \
+        --exclude='*/.git' \
+        $IGSTK_LIBS )
+      echo "Packed $(du -sh /tmp/$PACKAGE_FILE | cut -f1)"
+    - |
+      curl --fail --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --upload-file /tmp/$PACKAGE_FILE "$PACKAGE_URL"
+      echo "Published $PACKAGE_VERSION to Package Registry."
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
+    - changes:
+        - install/cx/build/cxComponents.py
+    - when: manual
+      allow_failure: true
+
+build-external-libs-ubuntu20:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2004
+  variables:
+    OS: Ubuntu2004
+
+build-external-libs-ubuntu20-igstk:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2004
+  variables:
+    OS: Ubuntu2004
+    BUILD_IGSTK: "true"
+    BASE_DIR: /builds/Ubuntu2004igstk
+    GIT_CLONE_PATH: /builds/Ubuntu2004igstk/CX/CX
+
+build-external-libs-ubuntu22:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2204
+  variables:
+    OS: Ubuntu2204
+
+build-external-libs-ubuntu22-igstk:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2204
+  variables:
+    OS: Ubuntu2204
+    BUILD_IGSTK: "true"
+    BASE_DIR: /builds/Ubuntu2204igstk
+    GIT_CLONE_PATH: /builds/Ubuntu2204igstk/CX/CX
+
+build-external-libs-ubuntu24:
+  extends: .build-and-publish-libs
+  image: $IMAGE_UBUNTU2404
+  variables:
+    OS: Ubuntu2404
+
+# Keeps only the KEEP_VERSIONS newest packages per OS/variant group in the
+# custusx-external-libs registry. Run on a schedule (e.g. weekly) to prevent
+# unbounded accumulation. Also available as a manual job.
+cleanup-old-external-libs:
+  stage: build-libs
+  image: $IMAGE_UBUNTU2404
+  variables:
+    KEEP_VERSIONS: "1"
+  script:
+    - |
+      python3 << 'PYEOF'
+      import json, os, sys
+      import urllib.request, urllib.error
+      from collections import defaultdict
+
+      api   = os.environ['CI_API_V4_URL']
+      proj  = os.environ['CI_PROJECT_ID']
+      token = os.environ['CI_JOB_TOKEN']
+      keep  = int(os.environ.get('KEEP_VERSIONS', '1'))
+      pkg_name = 'custusx-external-libs'
+
+      def api_request(path, method='GET'):
+          req = urllib.request.Request(
+              f'{api}/projects/{proj}/{path}',
+              headers={'JOB-TOKEN': token},
+              method=method)
+          with urllib.request.urlopen(req) as r:
+              body = r.read()
+              return json.loads(body) if body else None
+
+      packages, page = [], 1
+      while True:
+          batch = api_request(f'packages?package_name={pkg_name}&per_page=100&page={page}')
+          if not batch:
+              break
+          packages.extend(batch)
+          if len(batch) < 100:
+              break
+          page += 1
+      print(f'Found {len(packages)} package(s) named "{pkg_name}"')
+
+      # Group by OS/image/variant prefix (everything except the trailing -HASH)
+      groups = defaultdict(list)
+      for p in packages:
+          prefix = p['version'].rsplit('-', 1)[0]
+          groups[prefix].append(p)
+
+      deleted = 0
+      for prefix, pkgs in sorted(groups.items()):
+          pkgs.sort(key=lambda p: p['created_at'], reverse=True)
+          kept = [p['version'] for p in pkgs[:keep]]
+          print(f'{prefix}: keeping {kept}')
+          for old in pkgs[keep:]:
+              try:
+                  api_request(f'packages/{old["id"]}', method='DELETE')
+                  print(f'  Deleted {old["version"]} (id={old["id"]})')
+                  deleted += 1
+              except urllib.error.HTTPError as e:
+                  print(f'  WARNING: failed to delete {old["version"]}: {e}', file=sys.stderr)
+
+      print(f'Done. Deleted {deleted} old package(s).')
+      PYEOF
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - when: manual
+      allow_failure: true

@@ -132,7 +132,7 @@ void VideoRecorderSaveThread::writeTimeStampsFile(TimeInfo timeStamps)
 {
 	QTextStream stream(&mTimestampsFile);
 	stream << qstring_cast(timeStamps.getAcquisitionTime());
-	stream << endl;
+	stream << "\n";
 }
 
 /** Write all pending images to file.

@@ -67,6 +67,7 @@ signals:
 	bool connected(bool);
 	void fps(QString source, int fps);
 	void videoSourcesChanged();
+	void probeDefinitionUpdated(QString uid);
 
 private slots:
 	void onConnected();

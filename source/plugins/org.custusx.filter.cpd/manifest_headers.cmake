@@ -1,0 +1,5 @@
+set(Require-Plugin org.custusx.registration)
+set(Plugin-Name "CPD Filter")
+set(Plugin-Version "0.1.0")
+set(Plugin-Vendor "SINTEF")
+set(Plugin-Category "Filter")

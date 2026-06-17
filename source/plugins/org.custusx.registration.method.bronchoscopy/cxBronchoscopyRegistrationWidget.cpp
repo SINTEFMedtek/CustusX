@@ -288,11 +288,11 @@ void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<dou
 	QString filePath = path + session->getUid() + "_TrackingInformation.txt";
 
 	QFile outfile(filePath);
-	if (outfile.open(QIODevice::ReadWrite))
+	if (outfile.open(QIODevice::WriteOnly))
 	{
 		QTextStream stream(&outfile);
 
-		stream << "{Timestamp; Branch number; Position in branch; Branch length; Branch generation; branchCode; Offset [mm]}" << endl;
+		stream << "{Timestamp; Branch number; Position in branch; Branch length; Branch generation; branchCode; Offset [mm]}" << "\n";
 
 		for (int i = 0; i<closestCTPositionIndex.size(); i++)
 		{
@@ -309,7 +309,7 @@ void BronchoscopyRegistrationWidget::writeTrackingDataInfoToFile(std::vector<dou
 				stream << branchCodes[closestCTPositionIndex[i]][j];
 			}
 			stream << ";" << std::round(distanceToClosestCTPosition[i]*10)/10
-				<< endl;
+				<< "\n";
 		}
 	}
 }

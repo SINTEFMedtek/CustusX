@@ -168,7 +168,7 @@ bool UsReconstructionFileMaker::writeTimestamps(QString filename, std::vector<Ti
 			stream << qstring_cast(ts[i].mTime); // Is the same as mTimeInfo.getAcquisitionTime()
 			break;
 		}
-		stream << endl;
+		stream << "\n";
 	}
 	file.close();
 	success = true;
@@ -214,7 +214,7 @@ bool UsReconstructionFileMaker::writeMetadata(QString filename, const std::map<d
 
 	for (std::map<double, ToolPositionMetadata>::const_iterator i=ts.begin(); i!=ts.end(); ++i)
 	{
-		stream << i->second.toString() << endl;
+		stream << i->second.toString() << "\n";
 	}
 	file.close();
 	success = true;
@@ -248,17 +248,17 @@ bool UsReconstructionFileMaker::writeTransforms(QString filename, std::vector<Ti
 		stream << transform(0,1) << " ";
 		stream << transform(0,2) << " ";
 		stream << transform(0,3);
-		stream << endl;
+		stream << "\n";
 		stream << transform(1,0) << " ";
 		stream << transform(1,1) << " ";
 		stream << transform(1,2) << " ";
 		stream << transform(1,3);
-		stream << endl;
+		stream << "\n";
 		stream << transform(2,0) << " ";
 		stream << transform(2,1) << " ";
 		stream << transform(2,2) << " ";
 		stream << transform(2,3);
-		stream << endl;
+		stream << "\n";
 	}
 	file.close();
 	success = true;

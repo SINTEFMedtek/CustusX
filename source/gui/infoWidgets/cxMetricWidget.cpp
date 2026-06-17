@@ -31,6 +31,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
 #include "cxTimeKeeper.h"
+#include <QElapsedTimer>
 #include "cxTime.h"
 #include "cxMetricManager.h"
 #include "cxMetricUtilities.h"
@@ -276,7 +277,7 @@ void MetricWidget::updateTableContents()
 {
 	mTable->blockSignals(true);
 	// update contents:
-	QTime timer;
+	QElapsedTimer timer;
 	timer.start();
 
 	for (unsigned i = 0; i < mMetrics.size(); ++i)

@@ -145,7 +145,7 @@ TEST_CASE("vtkGenericOpenGLRenderWindow init", "[integration][resource][visualiz
 }
 
 //Manual test - needs to manually quit viewing
-TEST_CASE("QVTKOpenGLNativeWidget render", "[integration][resource][visualization][hide][vkt9]")
+TEST_CASE("QVTKOpenGLNativeWidget render", "[manual][resource][visualization][hide][vkt9]")
 {
 	QSurfaceFormat::setDefaultFormat(QVTKOpenGLNativeWidget::defaultFormat());
 	vtkImageDataPtr image = cx::generateVtkImageData(Eigen::Array3i(3,3,3), Eigen::Vector3d(1, 1, 1), 200);
@@ -197,7 +197,7 @@ TEST_CASE("QVTKOpenGLNativeWidget render", "[integration][resource][visualizatio
 }
 
 //Manual test - needs to manually quit viewing
-TEST_CASE("ViewService::createLayoutWidget", "[resource][visualization][viewservice][integration][hide][vkt9]")
+TEST_CASE("ViewService::createLayoutWidget", "[resource][visualization][viewservice][manual][hide][vkt9]")
 {
 	cx::DataLocations::setTestMode();
 	cx::LogicManager::initialize();

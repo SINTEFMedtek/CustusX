@@ -59,7 +59,7 @@ class Common(object):
         self.ninja = self.ninja_installed()                
         self.eclipse_version = '3.6'
         self.setBuildType("Debug") 
-        self.threads = 1
+        self.threads = 15
         self.xcode = False
         self.mBuildTesting = True
         self.short_pathnames = False
@@ -69,6 +69,7 @@ class Common(object):
             self.mBuildTesting = True
         self.mBuildExAndTest = False
         self.mCoverage = False
+        self.mBuildIGSTK = False
         self.build_developer_doc = False
         self.build_user_doc = False
         self.mGraphviz = False
@@ -115,12 +116,13 @@ class Common(object):
         print('    CMakeGenerator:', self.getCMakeGenerator())
         print('    BuildTesting:', self.mBuildTesting)
         print('    Coverage:', self.mCoverage)
+        print('    BuildIGSTK:', self.mBuildIGSTK)
         print('    Make dependency graph:', self.mGraphviz)
         print('')
 
     def getArgParser_core_build(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
-        p.add_argument('-j', '--threads', type=int, default=1, dest='threads', help='Number of make threads')
+        p.add_argument('-j', '--threads', type=int, default=self.threads, dest='threads', help='Number of make threads, default=%d' % self.threads)
         p.add_argument('-g', '--git_tag', default=None, metavar='TAG', dest='git_tag', help='Git tag to use when checking out core repositories. None means checkout default branch.')
         p.add_argument('-t', '--build_type', default=self.build_type, dest='build_type', choices=self._getAllowedBuildTypes(), help='Build type, default=%s'%self.build_type)
         p.add_boolean_inverter('--b32', default=self.m32bit, dest='m32bit', help='Build 32 bit.')
@@ -143,6 +145,7 @@ class Common(object):
     def getArgParser_extended_build(self):
         p = cx.utils.cxArgParse.ArgumentParser(add_help=False)
         p.add_boolean_inverter('--coverage', default=self.mCoverage, dest='mCoverage', help='gcov code coverage')
+        p.add_boolean_inverter('--igstk', default=self.mBuildIGSTK, dest='mBuildIGSTK', help='Build with IGSTK tracking plugin. Uses old ITK (v4.12.0), incompatible with VTK 9.3+.')
         p.add_boolean_inverter('--developer_doc', default=self.build_developer_doc, dest='build_developer_doc', help='Build developer documentation')
         p.add_boolean_inverter('--user_doc', default=self.build_user_doc, dest='build_user_doc', help='Build user documentation')
         return p

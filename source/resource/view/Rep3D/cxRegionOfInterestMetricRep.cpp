@@ -58,7 +58,7 @@ void RegionOfInterestMetricRep::onModifiedStartRender()
 	if (!mGraphicalBox && this->getView())
 	{
 		mGraphicalBox.reset(new GraphicalBox());
-		mGraphicalBox->setRenderWindow(this->getView()->getRenderWindow());
+		mGraphicalBox->setRenderWindow(this->getView()->getRenderWindow(), this->getView()->getRenderer());
 	}
 
 	if (mGraphicalBox)

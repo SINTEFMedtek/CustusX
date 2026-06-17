@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 #####################################################
 # Script for commiting to git with specified name, email and commit message

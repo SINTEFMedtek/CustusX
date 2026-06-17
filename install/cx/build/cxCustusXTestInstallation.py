@@ -15,8 +15,9 @@ import logging
 import time    
 import subprocess
 import sys
-import argparse        
+import argparse
 import glob
+import os
 import platform
 import shlex
 
@@ -67,7 +68,10 @@ class CustusXTestInstallation(object):
 
     def runUnitTests(self):
         PrintFormatter.printHeader('Run unit tests', level=2)
-        self._runCatchTestsOnInstalled('[unit]~[unstable]')
+        if os.environ.get('CX_WRAP_UNIT_TESTS_IN_CTEST'):
+            self._runCatchTestsWrappedInCTestOnInstalled('[unit]~[unstable]')
+        else:
+            self._runCatchTestsOnInstalled('[unit]~[unstable]')
 
     def runIntegrationTests(self):
         PrintFormatter.printHeader('Run integration tests', level=2)

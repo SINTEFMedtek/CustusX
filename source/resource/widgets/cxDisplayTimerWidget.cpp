@@ -68,8 +68,13 @@ void DisplayTimerWidget::timeoutSlot()
 
 void DisplayTimerWidget::printText(QString color)
 {
-	int secs = this->elaspedSeconds(); // SmStartTime.secsTo(QDateTime::currentDateTime());
-	mLabel->setText(QString("<font size=%1 color=%2><b>%3 s</b></font>").arg(mFontSize).arg(color).arg(secs));
+	int secs = this->elaspedSeconds();
+	int mins = secs / 60;
+	int remainingSecs = secs % 60;
+	QString timeText = mins > 0
+		? QString("%1 m %2 s").arg(mins).arg(remainingSecs)
+		: QString("%1 s").arg(secs);
+	mLabel->setText(QString("<font size=%1 color=%2><b>%3</b></font>").arg(mFontSize).arg(color).arg(timeText));
 }
 
 void DisplayTimerWidget::printText(QColor color)

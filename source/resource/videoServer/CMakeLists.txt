@@ -53,6 +53,7 @@ set(CX_QT_MOC_HEADER_FILES
     cxDirectlyLinkedSender.h
     SonixHelper.h
     cxtestSender.h
+    cxVolumeSliceStreamer.h
 )
 
 if(CX_WINDOWS)
@@ -97,6 +98,9 @@ set(cxOpenIGTLinkServer_FILES
 
     cxtestSender.h
     cxtestSender.cpp
+
+    cxVolumeSliceStreamer.h
+    cxVolumeSliceStreamer.cpp
 )
 
 cx_create_export_header("cxGrabber")

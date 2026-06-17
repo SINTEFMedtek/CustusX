@@ -87,6 +87,29 @@ public:
 	InteractiveCropper* mCropper;
 };
 
+class CropBoxInteractionCallback: public vtkCommand
+{
+public:
+	CropBoxInteractionCallback() : mCropper(NULL), mInteracting(false)
+	{
+	}
+	static CropBoxInteractionCallback* New()
+	{
+		return new CropBoxInteractionCallback;
+	}
+	void SetCropper(bool interacting, InteractiveCropper* cropper)
+	{
+		mInteracting = interacting;
+		mCropper = cropper;
+	}
+	virtual void Execute(vtkObject*, unsigned long, void*)
+	{
+		mCropper->setInteracting(mInteracting);
+	}
+	bool mInteracting;
+	InteractiveCropper* mCropper;
+};
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -118,6 +141,17 @@ void InteractiveCropper::initialize()
 	mCropBoxEnableCallback->SetCropper(true, this);
 	mCropBoxDisableCallback = CropBoxEnableCallbackPtr::New();
 	mCropBoxDisableCallback->SetCropper(false, this);
+
+	mCropBoxStartInteractionCallback = CropBoxInteractionCallbackPtr::New();
+	mCropBoxStartInteractionCallback->SetCropper(true, this);
+	mCropBoxEndInteractionCallback = CropBoxInteractionCallbackPtr::New();
+	mCropBoxEndInteractionCallback->SetCropper(false, this);
+	mBoxWidget->AddObserver(vtkCommand::StartInteractionEvent, mCropBoxStartInteractionCallback);
+	mBoxWidget->AddObserver(vtkCommand::EndInteractionEvent, mCropBoxEndInteractionCallback);
+
+	// Run at higher priority than the default camera interactor style (0.0),
+	// so the box widget can absorb events before the camera style sees them.
+	mBoxWidget->SetPriority(0.5);
 
 	mBoxWidget->SetInteractor(mView->getRenderWindow()->GetInteractor());
 
@@ -165,6 +199,10 @@ void InteractiveCropper::showBoxWidget(bool on)
 	if (!mImage->getCropping() && on)
 		this->useCropping(true);
 
+	if (on)
+		mBoxWidget->SetDefaultRenderer(mView->getRenderer().GetPointer());
+	else
+		setInteracting(false);
 	mBoxWidget->SetEnabled(on);
 	emit changed();
 }
@@ -222,6 +260,16 @@ void InteractiveCropper::imageChangedSlot()
 
 	this->imageCropChangedSlot();
 	emit changed();
+}
+
+bool InteractiveCropper::isInteracting() const
+{
+	return mInteracting;
+}
+
+void InteractiveCropper::setInteracting(bool on)
+{
+	mInteracting = on;
 }
 
 bool InteractiveCropper::getUseCropping()

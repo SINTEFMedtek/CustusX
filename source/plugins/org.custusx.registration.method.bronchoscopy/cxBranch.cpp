@@ -100,8 +100,21 @@ void Branch::calculateOrientations()
 	}
 	Eigen::MatrixXd diff = positions.rightCols(positions.cols() - 1) - positions.leftCols(positions.cols() - 1);
 	Eigen::MatrixXd orientations(numberOfRows,numberOfCols);
-	for (int i=0; i<numberOfCols-1; i++)
-		orientations.col(i) = diff.col(i) / diff.col(i).norm();
+	for (int i = 0; i < numberOfCols-1; i++)
+	{
+		double n = diff.col(i).norm();
+		if (n > 1e-10)
+			orientations.col(i) = diff.col(i) / n;
+		else
+		{// Two consecutive positions are identical; reuse the previous orientation
+			if (i > 0)
+				orientations.col(i) = orientations.col(i-1);
+			else
+				orientations.col(i) = Eigen::Vector3d::Zero(); // fallback: excluded by RemoveInvalidData in registration
+		}
+	}
+
+
 	orientations.rightCols(1) = orientations.col(orientations.cols() - 2);
 	this->setOrientations(orientations);
 }
@@ -236,7 +249,7 @@ void Branch::removeEqualPositions()
 
 	for (int i = positions.cols() - 1; i > 0; i--)
 	{
-		if (similar( (positions.col(i)-positions.col(i-1)).cwiseAbs().sum(), 0))
+		if ((positions.col(i)-positions.col(i-1)).norm() < 1e-10)
 		{
 			positions.block(0 , i , positions.rows() , positions.cols() - i - 1) = positions.rightCols(positions.cols() - i - 1);
 			positions.conservativeResize(Eigen::NoChange, positions.cols() - 1);

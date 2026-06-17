@@ -1,20 +1,30 @@
 # CustusX GitLab CI/CD configuration file
 
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BEFORE_SHA == "0000000000000000000000000000000000000000" && $CI_COMMIT_TAG == null
+      when: never
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE != "web"
+      when: never
+    - when: always
+
 default:
   image: gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02
 
 stages:
+  - build-libs
   - build
   - test
   - deploy
 
-#TODO: Make new docker files for all platforms, as several libraries are updated
 variables:
   IMAGE_UBUNTU2004: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2004:26.04.02"
   IMAGE_UBUNTU2204: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2204:26.04.02"
   IMAGE_UBUNTU2404: "gitlab.sintef.no:5050/custusx/custusx/custusx-build-ubuntu2404:26.04.02"
 
 include:
+  - local: '.gitlab/ci/external-libs.yml'
   - local: '.gitlab/ci/build.yml'
   - local: '.gitlab/ci/test.yml'
   - local: '.gitlab/ci/deploy.yml'

@@ -13,6 +13,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxUltrasoundSectorSource.h"
 
 #include "vtkObjectFactory.h"
+#include <vtkFloatArray.h>
 #include <vtkPointData.h>
 #include "vtkInformation.h"
 #include "vtkInformationVector.h"
@@ -44,20 +45,24 @@ int UltrasoundSectorSource::RequestData(
   vtkInformationVector **vtkNotUsed(inputVector),
   vtkInformationVector *outputVector)
 {
-	if (!mSector)
+	vtkInformation *outInfo = outputVector->GetInformationObject(0);
+	vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
+
+	if (!mSector || mSector->GetNumberOfPoints() == 0)
+	{
+		// Set an empty (non-null) TCoords array so downstream vtkTransformTextureCoords
+		// does not error on a null TCoords pointer when the sector is unavailable.
+		vtkSmartPointer<vtkFloatArray> emptyTCoords = vtkSmartPointer<vtkFloatArray>::New();
+		emptyTCoords->SetNumberOfComponents(2);
+		output->GetPointData()->SetTCoords(emptyTCoords);
 		return 1;
+	}
 
-	// get the info object
-  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+	output->SetPoints(mSector->GetPoints());
+	output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
+	output->SetStrips(mSector->GetStrips());
 
-  // get the ouptut
-  vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
-
-  output->SetPoints(mSector->GetPoints());
-  output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
-  output->SetStrips(mSector->GetStrips());
-
-  return 1;
+	return 1;
 }
 
 //----------------------------------------------------------------------------

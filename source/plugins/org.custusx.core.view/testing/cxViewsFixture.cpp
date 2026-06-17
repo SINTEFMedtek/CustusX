@@ -18,7 +18,6 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxDummyToolManager.h"
 #include "cxSliceProxy.h"
 #include "cxSlicerRepSW.h"
-#include "cxDataLocations.h"
 #include "cxtestRenderTester.h"
 #include "cxViewsWindow.h"
 #include <QApplication>
@@ -50,8 +49,6 @@ ViewsFixture::ViewsFixture(QString displayText)
 
 	mServices = cxtest::TestVisServices::create();
 	mMessageListener = cx::MessageListener::createWithQueue();
-
-	mShaderFolder = cx::DataLocations::findConfigFolder("/shaders");
 
 	// Initialize dummy toolmanager.
 	mServices->tracking()->setState(cx::Tool::tsTRACKING);
