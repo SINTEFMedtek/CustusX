@@ -465,7 +465,7 @@ class OpenIGTLinkIO(CppComponent):
         self._getBuilder().gitSetRemoteURL(self.repository())
         # self._getBuilder().gitCheckoutSha('f144a2e66eb7d4361af91ecee48caf6f80465d48') # 15. Nov 2023
         # self._getBuilder().gitCheckoutSha('d7f6aef826d934577a39b48d9485bc0848f27cb8') # 18. Jul 2025
-        self._getBuilder().gitCheckoutSha('5e21822faed1835c21152ae35b4857b2eea52d4a') # 09. Jun 2026, fix Stop() hang and Sockets race
+        self._getBuilder().gitCheckoutSha('0798095394093d5c4939c4423443e25b8d6fe9c4') # 19. Jun 2026, fix Stop() hang: prevent reconnect race and ensure clientID found
     def configure(self):
         builder = self._getBuilder()
         add = builder.addCMakeOption
