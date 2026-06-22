@@ -1,16 +1,16 @@
 Supported Platforms {#supported_platforms}
 ===================
-**The supported platform for CustusX is Ubuntu 20.04**
+**The supported platforms for CustusX are Ubuntu 20.04, 22.04, and 24.04**
 
-As a convenience CustusX is built continously on the following platforms, 
-and installers can be downloaded, 
-but full functionality cannot be expected:
+All platforms have been tested with NVidia GPUs. Other GPUs may also work.
 
-| Name                          | Description
-| ----------------------------- | -----------------------------
-| Ubuntu 20.04, with NVidia GPU | Supported platform
-| macOS 10.13 (High Sierra)     | Mac Pro
-| Ubuntu 16.04                  | NVidia GPU
-| Windows 10                    | NVidia GPU
+CustusX is built and tested continuously on the following platforms,
+and installers can be downloaded from the [releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases):
 
-In addition, CustusX may also work partially on a number of other platforms, but may have to be built from source.
+| Name         | Description
+| ------------ | -----------------------------
+| Ubuntu 20.04 | Supported platform
+| Ubuntu 22.04 | Supported platform
+| Ubuntu 24.04 | Supported platform
+
+CustusX may also work partially on Windows and macOS, but these platforms require building from source and are not officially supported.

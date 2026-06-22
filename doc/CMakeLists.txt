@@ -125,8 +125,8 @@ macro(cx_doc_set_common_userdoc_definitions)
     TO_LIST_SPACES(CX_DOXYGEN_IMAGE_PATH CX_DOXYGEN_IMAGE_PATH)
 
     # set input files
-    SET(CX_DOXYGEN_INPUT 
-        ${CX_DOC_INPUT_DIRECTORY}/user_manual 
+    SET(CX_DOXYGEN_INPUT
+        ${CX_DOC_INPUT_DIRECTORY}/user_manual
         ${CX_DOC_INPUT_DIRECTORY}/shared_manual
         ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md
         ${PLUGIN_DOC_FOLDERS})
@@ -135,13 +135,19 @@ macro(cx_doc_set_common_userdoc_definitions)
     cx_doc_generate_plugin_page()
 
     SET(CX_DOXYGEN_EXCLUDE )
-    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/*")   
+    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/*")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
 
     get_property(CX_DOC_USER_MAINPAGE_OVERRIDE GLOBAL PROPERTY CX_DOC_USER_MAINPAGE_OVERRIDE)
     # remove the default mainpage if an override is defined:
     if(CX_DOC_USER_MAINPAGE_OVERRIDE)
         set(CX_DOXYGEN_EXCLUDE ${CX_DOXYGEN_EXCLUDE} "${CX_DOC_INPUT_DIRECTORY}/user_manual/cx_user_doc_main_page.md")
+    endif()
+
+    # Allow applications to exclude specific user doc pages (e.g. to replace with app-specific versions)
+    get_property(CX_USER_DOC_EXCLUDE_FILES GLOBAL PROPERTY CX_USER_DOC_EXCLUDE_FILES)
+    if(CX_USER_DOC_EXCLUDE_FILES)
+        set(CX_DOXYGEN_EXCLUDE ${CX_DOXYGEN_EXCLUDE} ${CX_USER_DOC_EXCLUDE_FILES})
     endif()
     
     # tweaks that remove source code stuff
@@ -273,17 +279,27 @@ function(cx_build_dev_documentation_html)
     SET(CX_DOXYGEN_OUTPUT_DIRECTORY ${CX_DOC_OUTPUT_DIRECTORY})
     SET(CX_DOXYGEN_PROJECT_LOGO ${CustusX_SOURCE_DIR}/source/gui/icons/CustusX/CustusX_64x64.png)
 
-    SET(CX_DOXYGEN_INPUT 
-        ${CX_DOC_INPUT_DIRECTORY}/dev_manual 
-        ${CX_DOC_INPUT_DIRECTORY}/shared_manual 
+    # Allow applications to provide extra developer doc pages
+    get_property(CX_DEV_DOC_EXTRA_INPUT GLOBAL PROPERTY CX_DEV_DOC_EXTRA_INPUT)
+
+    SET(CX_DOXYGEN_INPUT
+        ${CX_DOC_INPUT_DIRECTORY}/dev_manual
+        ${CX_DOC_INPUT_DIRECTORY}/shared_manual
         ${CX_DOC_OUTPUT_DIRECTORY}/cx_user_doc_plugins.md
         ${PLUGIN_DOC_FOLDERS}
-        ${CustusX_SOURCE_DIR}/source 
-        ${CustusX_SOURCE_DIR}/CMake)
+        ${CustusX_SOURCE_DIR}/source
+        ${CustusX_SOURCE_DIR}/CMake
+        ${CX_DEV_DOC_EXTRA_INPUT})
     TO_LIST_SPACES(CX_DOXYGEN_INPUT CX_DOXYGEN_INPUT)
-    
+
     SET(CX_DOXYGEN_EXCLUDE )
     SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */ThirdParty/* README.md")
+
+    # Allow applications to exclude specific dev doc pages (e.g. to replace with app-specific versions)
+    get_property(CX_DEV_DOC_EXCLUDE_FILES GLOBAL PROPERTY CX_DEV_DOC_EXCLUDE_FILES)
+    if(CX_DEV_DOC_EXCLUDE_FILES)
+        set(CX_DOXYGEN_EXCLUDE ${CX_DOXYGEN_EXCLUDE} ${CX_DEV_DOC_EXCLUDE_FILES})
+    endif()
     SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
      

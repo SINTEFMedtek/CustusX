@@ -5,21 +5,22 @@ Recommended build procedure {#build_instructions2}
 ===================
 
 Make sure you:
-* Are on a \ref supported_platforms (For building on newer operating systems it might be nessecary to change to the develop branch).
+* Are on a \ref supported_platforms.
 * Fulfill the \ref prerequisites.
-* Have a github account with [SSH authentication](https://help.github.com/articles/set-up-git/).
+* Have [Git](https://git-scm.com/) installed.
 
 Choose a root folder for the project, e.g. `~/dev/cx`. It will be populated as described in \ref build_instructions_folder_structure.
 
-Then run the following commands in your user's home folder:
+Then run the following commands:
 
     mkdir dev
     mkdir dev/cx
     cd dev/cx
-    git clone git@github.com:SINTEFMedTek/CustusX.git CX/CX
+    git clone https://gitlab.sintef.no/custusx/CustusX.git CX/CX
     cd CX/CX
     (git checkout develop)
     ./install/cxInstaller.py --full --all --build_type Release --user_doc
+
 
 Run `cxInstaller.py -h` for a list of the components in CustusX to build, and an explanation of the input arguments.
 The `--full` argument is a combination of the following arguments:
@@ -42,60 +43,19 @@ and thus does not need to be installed separately.
 For convenience, setup scripts for some platforms are available in the
 repository. They will help setup a machine from scratch, but might not be fully updated or give
 you more than you expected. Look for your platform in
-[install/platforms](https://github.com/SINTEFMedtek/CustusX/tree/master/install/platforms).
+[install/platforms](https://gitlab.sintef.no/custusx/CustusX/-/tree/develop/install/platforms).
 
-### Mac and Linux
+### Linux
 
-On Linux, one can most likely use the package manager to install the required software below. On Mac, it is adviced to use
-regular installers for:
+On Ubuntu, most required packages can be installed via the package manager.
+See the platform setup scripts in
+[install/platforms](https://gitlab.sintef.no/custusx/CustusX/-/tree/develop/install/platforms)
+for the complete list.
 
- * **Xcode.** *Mac only.* Use the *App store* to download. You need to start *Xcode* after downloading it to finish the installation.
- * **CMake.** On Mac, add cmake to the PATH in your `.profile` file and restart the machine:<br>
-`export PATH=/Applications/CMake.app/Contents/bin:$PATH`
- * **Qt open source.** We use Qt Creator as our IDE. On Mac you might need to add a path to the Qt CMake files to your `.profile` file
-   (or .bashrc or .bash_profile) and restart the machine. Edit the path below so that it is correct on your machine:<br>
-   `export CMAKE_PREFIX_PATH=/Users/"Your username"/"Qt installation path"/"Qt version number"/clang_64/lib/cmake`
+**Python and Git**: Make sure that *Python* and *Git* are installed and available on the command line.
 
-
-
-
-The following software can be installed on Mac as well through a package manager like *MacPorts* or *HomeBrew*:
-
- * **Boost**
- * **Cppunit.** For the tests.
- * **Glew**
- * **Doxygen.** To build the user/developer documentation.
- * **[Ninja](https://ninja-build.org).** Increases build speed. The build script will detect that ninja is installed automatically.
-
-**Python and Git**: Make sure that you have *Python* and *Git* installed and that you can run them from the command line.
-To run the tests you need some additional python packages. You can use *pip* to install them:
-
-    sudo easy_install pip
-    sudo pip install lxml
-    sudo pip install pycrypto
-
-**Cuda**: On Linux you might need to install *Cuda* to get *OpenCL* working. It is
+**Cuda**: You might need to install *Cuda* to get *OpenCL* working. It is
 recommended to download and use the regular installer from the web site.
-
-### Windows
-
-The Windows build environment can be a bit harder to setup. After you have generated .ssh keys and
-cloned the *CustusX* repo, you can look for the Windows setup scripts in the `CX/install/platforms` folder.
-There is a readme file to follow. Basically, the most of the instructions are found there.
-You must manually install *Visual studio* and then update the paths in the main script. The script will
-download and install many applications, including the ones described above. It will also create a folder
-in your build tree with a build environment to run the build script in, *CustusX_environment*.
-You will use this command to run the build script:
-
-    CX/install/run_python.bat win64 PATH_to_CustusX_environment "cxInstaller.py --full --all --build_type Release --user_doc"
-
-After you have run the build script, you can use the `set_run_environment.bat` script in the build folder to start
-*Qt Creator*. You also use this script to start the executable:
-
-    CX/b_Release/set_run_environment.bat PATH_to_QtCreator
-    set_run_environment.bat CustusX.exe
-
-If you want to use *Qt Creator* for debugging, it is important to use the script in the *Debug* build folder to start it.
 
 ### Practical information
 
@@ -106,10 +66,7 @@ To start writing code, open the file
 in *Qt Creator.* Make sure that the build folder(s) for your selected configuration(s) (Debug/Release)
 matches the build folder(s) in your build tree.
 
-On Mac/Linux, you have to add the path to ninja (most likely `/opt/local/bin`)
-to the *PATH* variable in the *Build environment* in the prooject settings in Qt Creator.
-
-You might need to rerun the build script, and CMake to get everything working.
+You might need to rerun the build script and CMake to get everything working.
 
 ## Running the tests
 
