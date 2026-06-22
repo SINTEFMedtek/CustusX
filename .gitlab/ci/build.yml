@@ -72,6 +72,9 @@
         components CustusX
     else
       echo "Full build (all external libs + CustusX)..."
+      # Remove stale CTK build dir — a prior tarball extraction strips .git dirs,
+      # which breaks DCMTK's git-update step on warm runners.
+      rm -rf $BASE_DIR/CTK
       eval ./install/cxInstaller.py -s --all --full -j 4 -t Release --user_doc --developer_doc $IGSTK_FLAG \
         --main_branch $CX_COMMIT \
         --gitrepo_main_site_base https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.sintef.no/custusx
