@@ -13,4 +13,4 @@ and installers can be downloaded from the [releases page](https://gitlab.sintef.
 | Ubuntu 22.04 | Supported platform
 | Ubuntu 24.04 | Supported platform
 
-CustusX may also work partially on Windows and macOS, but these platforms require building from source and are not officially supported.
+CustusX may also work partially on Windows, but this requires building from source and is not officially supported.
