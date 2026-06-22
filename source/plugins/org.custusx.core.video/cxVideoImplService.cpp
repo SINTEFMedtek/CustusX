@@ -57,7 +57,7 @@ VideoImplService::VideoImplService(ctkPluginContext *context) :
 
     connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
     connect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
-    connect(mVideoConnection.get(), &VideoConnection::probeDefinitionUpdated, this, &VideoImplService::setActiveVideoSource);
+    connect(mVideoConnection.get(), &VideoConnection::probeDefinitionUpdated, this, &VideoImplService::updateProbeActiveStream);
     connect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
     connect(mBackend->tracking().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
     connect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
@@ -72,7 +72,7 @@ VideoImplService::~VideoImplService()
     // recursive calls back to this during deletion.
     disconnect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::autoSelectActiveVideoSource);
     disconnect(mVideoConnection.get(), &VideoConnection::videoSourcesChanged, this, &VideoImplService::autoSelectActiveVideoSource);
-    disconnect(mVideoConnection.get(), &VideoConnection::probeDefinitionUpdated, this, &VideoImplService::setActiveVideoSource);
+    disconnect(mVideoConnection.get(), &VideoConnection::probeDefinitionUpdated, this, &VideoImplService::updateProbeActiveStream);
     disconnect(mVideoConnection.get(), &VideoConnection::fps, this, &VideoImplService::fpsSlot);
     disconnect(mBackend->tracking().get(), &TrackingService::activeToolChanged, this, &VideoImplService::autoSelectActiveVideoSource);
     disconnect(mVideoConnection.get(), &VideoConnection::connected, this, &VideoImplService::connected);
@@ -125,24 +125,34 @@ void VideoImplService::setActiveVideoSource(QString uid)
 
     std::vector<VideoSourcePtr> sources = this->getVideoSources();
     for (unsigned i=0; i<sources.size(); ++i)
+    {
         if (sources[i]->getUid()==uid)
+        {
             mActiveVideoSource = sources[i];
+        }
+    }
 
-    // set active stream in all probes if stream is present:
+    this->updateProbeActiveStream(uid);
+
+    emit activeVideoSourceChanged();
+}
+
+void VideoImplService::updateProbeActiveStream(QString uid)
+{
     TrackingService::ToolMap tools = mBackend->tracking()->getTools();
     for (TrackingService::ToolMap::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
     {
         ProbePtr probe = iter->second->getProbe();
         if (!probe)
+        {
             continue;
-        if (!probe->getAvailableVideoSources().count(uid)){
-            report("No active streams");
+        }
+        if (!probe->getAvailableVideoSources().count(uid))
+        {
             continue;
         }
         probe->setActiveStream(uid);
     }
-
-    emit activeVideoSourceChanged();
 }
 
 VideoSourcePtr VideoImplService::getGuessForActiveVideoSource(VideoSourcePtr old)
