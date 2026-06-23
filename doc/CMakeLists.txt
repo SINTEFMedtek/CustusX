@@ -135,7 +135,8 @@ macro(cx_doc_set_common_userdoc_definitions)
     cx_doc_generate_plugin_page()
 
     SET(CX_DOXYGEN_EXCLUDE )
-    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/*")
+    # Exclude dev_manual folders so they never leak into the user doc build
+    SET(CX_DOXYGEN_EXCLUDE_PATTERNS "*/.git/* */testing/* */dev_manual/*")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
 
     get_property(CX_DOC_USER_MAINPAGE_OVERRIDE GLOBAL PROPERTY CX_DOC_USER_MAINPAGE_OVERRIDE)
@@ -149,6 +150,8 @@ macro(cx_doc_set_common_userdoc_definitions)
     if(CX_USER_DOC_EXCLUDE_FILES)
         set(CX_DOXYGEN_EXCLUDE ${CX_DOXYGEN_EXCLUDE} ${CX_USER_DOC_EXCLUDE_FILES})
     endif()
+    # Convert CMake semicolon-separated list to space-separated for Doxygen
+    TO_LIST_SPACES(CX_DOXYGEN_EXCLUDE CX_DOXYGEN_EXCLUDE)
     
     # tweaks that remove source code stuff
     SET(CX_DOXYGEN_SOURCE_BROWSER NO)
@@ -300,6 +303,8 @@ function(cx_build_dev_documentation_html)
     if(CX_DEV_DOC_EXCLUDE_FILES)
         set(CX_DOXYGEN_EXCLUDE ${CX_DOXYGEN_EXCLUDE} ${CX_DEV_DOC_EXCLUDE_FILES})
     endif()
+    # Convert CMake semicolon-separated list to space-separated for Doxygen
+    TO_LIST_SPACES(CX_DOXYGEN_EXCLUDE CX_DOXYGEN_EXCLUDE)
     SET(CX_DOXYGEN_IMAGE_PATH "${CustusX_SOURCE_DIR}/doc/images")
     SET(CX_DOXYGEN_HTML_EXTRA_FILES )
      
