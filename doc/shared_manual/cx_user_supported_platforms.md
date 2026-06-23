@@ -4,13 +4,16 @@ Supported Platforms {#supported_platforms}
 
 All platforms have been tested with NVidia GPUs. Other GPUs may also work.
 
-CustusX is built and tested continuously on the following platforms,
-and installers can be downloaded from the [releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases):
+Ubuntu is the primary development and test platform. CustusX is built and tested
+continuously on the following Ubuntu versions, and installers can be downloaded
+from the [releases page](https://gitlab.sintef.no/custusx/CustusX/-/releases):
 
 | Name         | Description
 | ------------ | -----------------------------
 | Ubuntu 20.04 | Supported platform
 | Ubuntu 22.04 | Supported platform
 | Ubuntu 24.04 | Supported platform
+| Windows      | Can be built from source; not tested in CI
 
-CustusX may also work partially on Windows, but this requires building from source and is not officially supported.
+Windows builds are not part of the continuous integration pipeline and may be less
+stable than Ubuntu builds. See the developer documentation for build instructions.

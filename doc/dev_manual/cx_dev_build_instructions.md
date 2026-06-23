@@ -57,6 +57,42 @@ for the complete list.
 **Cuda**: You might need to install *Cuda* to get *OpenCL* working. It is
 recommended to download and use the regular installer from the web site.
 
+### Windows
+
+Ubuntu is the primary development and test platform. Windows builds are not part of
+the continuous integration pipeline and may be less stable. That said, CustusX can
+be built on Windows using the same Python build script as on Ubuntu.
+
+Install the following prerequisites before building:
+
+- **Visual Studio 2022** with the **Desktop development with C++** workload.
+- **Qt 5.15.2 msvc2019\_64** — install via the Qt Online Installer to `D:\Qt` or `C:\Qt` (the default locations the build script searches).
+- **Ninja** — install via `winget install Ninja-build.Ninja` or from [ninja-build.org](https://ninja-build.org).
+
+A PowerShell setup script `Setup-CustusX.ps1` is included at the repository root.
+Run it **once** (as Administrator) to install any missing tools via winget and vcpkg.
+If script execution is blocked, first run:
+
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+Then:
+
+    . .\Setup-CustusX.ps1
+
+Once the tools are installed, just run the build script directly — it detects and
+initializes the Visual Studio environment automatically:
+
+    python .\install\cxInstaller.py --full --all --build_type Release --user_doc
+
+If Qt is not in a default location, pass `--qt-path`:
+
+    python .\install\cxInstaller.py --full --all --build_type Release --user_doc --qt-path "C:\Qt\5.15.2\msvc2019_64"
+
+After the build, use the generated `set_run_environment.bat` in the build folder
+to launch *Qt Creator* or *CustusX* with the correct DLL paths:
+
+    CX\build_Release\set_run_environment.bat CustusX.exe
+
 ### Practical information
 
 To start writing code, open the file
