@@ -16,12 +16,9 @@ class ArgumentParser(argparse.ArgumentParser):
     def add_boolean_inverter(self, name, default, dest, help):
         '''
         Variant of argparse.ArgumentParser.add_argument().
-        Add a zero-argument option to enable/disable the attribute 'dest',
-        depending on its default value.
+        Add both --name and --skip_name options for the attribute 'dest'.
         '''
         name = name.lstrip('-')
-        #print 'Adding option', name, default
-        if default==True:
-            self.add_argument('--skip_%s'%name, action='store_false', dest=dest, help=help)
-        else:
-            self.add_argument('--%s'%name, action='store_true', dest=dest, help=help)
+        self.add_argument('--%s'%name, action='store_true', dest=dest, help=help)
+        self.add_argument('--skip_%s'%name, action='store_false', dest=dest, help=help)
+        self.set_defaults(**{dest: default})
