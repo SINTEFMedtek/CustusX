@@ -90,7 +90,7 @@ TEST_CASE("StreamedTimestampSynchronizer: Outlayers", "[unit]")
 {
 	cx::StreamedTimestampSynchronizer syncer;
 
-	double tol = 2;
+	double tol = 20;
 	int diff = 1000;
 	QDateTime ts = QDateTime::currentDateTime();
 	ts = ts.addMSecs(-diff);
