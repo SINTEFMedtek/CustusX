@@ -63,6 +63,7 @@ private slots:
 	  * autoGuessVideoSource().
 	  */
 	void autoSelectActiveVideoSource();
+	void updateProbeActiveStream(QString uid);
 	void fpsSlot(QString source, int val);
 
 private:
