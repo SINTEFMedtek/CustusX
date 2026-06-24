@@ -9,26 +9,14 @@ Hardware setup:
 - \subpage cx_video_setup
 - \subpage cx_probe_setup
 
-Troubleshooting:
+Tracking using PlusToolkit
 ---------------
-- CustusX use OpenCL. If you get errors about OpenCL, e.g. "Missing OpenCL.dll", try installing the latest driver for your graphics card.
 
+Instead of using the integrated tracking based on IGSTK, the PlusToolkit may be used instead.
+See \ref org_custusx_core_openigtlink_plus_install for installation instructions.
 
-Experimental additions:
----------------
-Some parts of CustusX are more experimental or unfinished.
-These may not be thoroughly tested, be more cumbersome to use,
-and some documentation may be lacking.
-
-### Tracking using PlusToolkit
-
-Instead on using the integrated tracking based on IGTSK, the PlusToolkit may be used instead.
-See \ref org_custusx_core_openigtlink_plus_install for Ubuntu 16.04 installation instructions.
-
-- CustusX release 18.04 require *PlusToolkit version 2.6*.
-- CustusX nightly build (and next release) require *PlusToolkit version 2.7* or newer.
-
-CustusX communicate with the PlusServer through OpenIGTLink.
+CustusX communicates with the PlusServer through OpenIGTLink.
 For instructions on how to run PlusServer see https://plustoolkit.github.io.
-In addition, CustusX tool config files have to math the config files for PlusServer.
+In addition, CustusX tool config files have to match the config files for PlusServer.
 See \ref using_plus_config_files_with_custusx.
+
