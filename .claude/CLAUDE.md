@@ -88,21 +88,41 @@ Application (CustusX main)
 **Sibling applications and build directories**
 - CustusS and Fraxinus are sibling applications using CustusX as a base code
 - CustusX, CustusS and Fraxinus are typically located in the same directory structure
-- root_dir is usually ~/gitlab/cx for CustusX/CustusC and ~/gitlab/fx for Fraxinus                                                                                               
-- CustusX source code: root_dir/CX/CX  (~/ gitlab/cx/CX/CX)                                                                                           
-- CustusS source code: root_dir/CS/CS  (~/gitlab/cx/CS/CS)                                                                                            
-- Fraxinus source code: root_dir/FX/FX  (~/gitlab/fx/FX/FX)  
+- root_dir is usually ~/gitlab/cx for CustusX/CustusC and ~/gitlab/fx for Fraxinus
+- CustusX source code: root_dir/CX/CX  (~/gitlab/cx/CX/CX)
+- CustusS source code: root_dir/CS/CS  (~/gitlab/cx/CS/CS)
+- Fraxinus source code (public): root_dir/FX/FX  (~/gitlab/fx/FX/FX)
+- Fraxinus private extension: root_dir/FX/FX/org.custusx.fraxinus.private  (separate git repo cloned inside the public repo)
 - CustusX build folders (Sibling applications will look the same):
-  - root_dir/CX/build_Release 
+  - root_dir/CX/build_Release
   - root_dir/CX/build_Debug
 - In addition, all external repositories are also added to the same directory structure. Example:
   - VTK as root_dir/VTK/VTK, root_dir/VTK/build_Release
 
+**Fraxinus public/private split**
+
+Fraxinus is divided into a public part (root_dir/FX/FX) and a private extension (root_dir/FX/FX/org.custusx.fraxinus.private):
+- The public part builds a standalone Fraxinus without any private plugins
+- The private part extends the public part with additional closed-source plugins
+
+Build scripts:
+- Public build: `root_dir/FX/FX/script/cxFraxinusInstaller.py` — uses `script/cxsetup/cxPublicComponentAssembly.py` and `script/cxsetup/cxPublicComponents.py`
+- Private build: `root_dir/FX/FX/org.custusx.fraxinus.private/script/cxFraxinusPrivateInstaller.py` — uses `script/cxPrivateComponentAssembly.py` and `script/cxPrivateComponents.py` from the private repo; automatically clones the public FX/FX repo if it is absent
+
+Both repos have their own `.gitlab-ci.yml` and `.gitlab/ci/` CI pipelines. The private CI sets `GIT_CLONE_PATH` to place the private repo inside `FX/FX/` on the runner, then clones the public repo alongside it before building.
+
+CI external lib caching:
+- The public CI (`FX/FX`) uses `BASE_DIR=/builds/Ubuntu2004igstk` (etc.) and can reuse prebuilt libs from the CX package registry
+- The private CI uses `BASE_DIR=/builds/FraxinusPrivate/Ubuntu2004igstk` (etc.) and cannot reuse CX prebuilt libs because those have the public `BASE_DIR` baked into their CMake config files; instead it maintains its own lib cache in the private project's package registry — the first run always does a full build
+
+The private plugin (`org.custusx.fraxinus.private`) follows the standard CTK plugin structure and requires `manifest_headers.cmake` like all other plugins. A missing `manifest_headers.cmake` or a stale `.so` from a renamed plugin causes a "Skipping N plugins not in build manifest" warning at startup; fix by adding the file and doing a clean rebuild.
+
 **Open/Closed code**
 
-While CustusX is open source, most other repositories are closed sorce, and Claude should avoid looking into this code unless ordered:
+While CustusX is open source, most other repositories are closed source, and Claude should avoid looking into this code unless ordered:
 - CustusS in root_dir/CS/CS
-- The plugings in source/plugins that come from separate repositories, like:
+- Fraxinus private extension in root_dir/FX/FX/org.custusx.fraxinus.private
+- The plugins in source/plugins that come from separate repositories, like:
   - source/plugins/org.custusx.ussimulator
   - source/plugins/org.custusx.gestreamer
   - source/plugins/org.custusx.tracking.shape
@@ -110,10 +130,11 @@ While CustusX is open source, most other repositories are closed sorce, and Clau
 - Some external libraries are also closed code like:
   - root_dir/ISB_DataStreaming
   - root_dir/medtekAI
-  
+
 The used open source repositories are configured in:
 - root_dir/CX/CX/install/cx/build/cxComponentAssembly.py for CustusX
-- root_dir/FX/FX/script/cxsetup/cxPrivateComponentAssembly.py for Fraxinus
+- root_dir/FX/FX/script/cxsetup/cxPublicComponentAssembly.py for Fraxinus (public)
+- root_dir/FX/FX/org.custusx.fraxinus.private/script/cxPrivateComponentAssembly.py for Fraxinus (private)
 
 Closed source repositories are typically handled by a similar cxPrivateComponentAssembly.py in the closed source repositories
 
