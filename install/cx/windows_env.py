@@ -16,7 +16,7 @@ from typing import Dict, Optional, Tuple
 def _detect_qt_root(qt_path: Optional[str], qt_version: str, qt_module: str) -> Optional[str]:
     """
     Mimic the PS script: detect Qt by looking for qmake.exe under a few standard locations.
-    Returns the Qt root (e.g. C:\Qt\5.15.2\msvc2019_64) or None.
+    Returns the Qt root (e.g. C:/Qt/5.15.2/msvc2019_64) or None.
     """
     # If user passed an explicit path, trust it if it looks valid
     if qt_path:
