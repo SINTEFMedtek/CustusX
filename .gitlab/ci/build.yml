@@ -37,6 +37,15 @@
     - .create-installer
   before_script:
   - ls $BASE_DIR
+  # Manual escape hatch: set FORCE_CLEAN_APP_BUILD=true (CI/CD > Run pipeline variables)
+  # to wipe this runner's incrementally-reused CustusX build tree and force a from-scratch
+  # rebuild. Does not touch the external-libs cache/sentinel below. Useful when a runner's
+  # persistent build tree is suspected stale (e.g. didn't pick up a downstream plugin fix).
+  - |
+    if [ "$FORCE_CLEAN_APP_BUILD" = "true" ]; then
+      echo "FORCE_CLEAN_APP_BUILD set - wiping $BASE_DIR/CX/build_Release for a clean rebuild"
+      rm -rf $BASE_DIR/CX/build_Release
+    fi
   - if [ $CI_COMMIT_TAG ]; then CX_COMMIT=$CI_COMMIT_TAG; else CX_COMMIT=${CI_COMMIT_BRANCH:-$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}; fi
   - !reference [.lib-package-vars, script]
   - find $BASE_DIR/CX/build_Release -name "*igstk*" -delete 2>/dev/null || true
