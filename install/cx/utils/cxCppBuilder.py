@@ -230,6 +230,13 @@ class CppBuilder(object):
         if(platform.system() != 'Windows'):
             # append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated -Wno-unknown-warning-option -Wno-inconsistent-missing-override -Wno-self-assign-field')
             append('CX_CMAKE_CXX_FLAGS:STRING', '-Wno-deprecated')
+        if(platform.system() == 'Windows' and self.controlData.getCMakeGenerator() == 'Ninja'):
+            # Without this, Ninja builds compile commands as a single CreateProcess call.
+            # The superbuild's VTK/ITK/CTK include-path lists routinely exceed Windows'
+            # 32767-char command-line limit, causing "CreateProcess failed... is the
+            # command line too long?" errors on targets like cxResourceVisualization.
+            # Forcing response files makes cl.exe read args from an @file instead.
+            add('CMAKE_NINJA_FORCE_RESPONSE_FILE:BOOL', 'ON')
         add('CMAKE_BUILD_TYPE:STRING', self.mBuildType)
         if self.controlData.m32bit: # todo: add if darwin
             add('CMAKE_OSX_ARCHITECTURES', 'i386')
