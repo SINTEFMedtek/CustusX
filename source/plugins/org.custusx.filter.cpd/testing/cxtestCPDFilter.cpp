@@ -20,6 +20,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include <QTemporaryFile>
 #include <QTextStream>
 
+#include <vector>
+
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 
@@ -51,10 +53,10 @@ cx::VisServicesPtr initServices()
 	return cx::VisServices::create(cx::logicManager()->getPluginContext());
 }
 
-vtkPolyDataPtr makePolyDataWithPoints(std::initializer_list<std::array<double, 3>> pts)
+vtkPolyDataPtr makePolyDataWithPoints(std::initializer_list<std::vector<double> > pts)
 {
 	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
-	for (const auto& p : pts)
+	for (const std::vector<double>& p : pts)
 		points->InsertNextPoint(p[0], p[1], p[2]);
 	vtkPolyDataPtr pd = vtkPolyDataPtr::New();
 	pd->SetPoints(points);
