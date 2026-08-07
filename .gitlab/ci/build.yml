@@ -103,12 +103,14 @@ build-ubuntu20:
   image: $IMAGE_UBUNTU2004
   variables:
     OS: Ubuntu2004
+    BUILD_IGSTK: "true"
 
 build-ubuntu22:
   extends: .reuse-build
   image: $IMAGE_UBUNTU2204
   variables:
     OS: Ubuntu2204
+    BUILD_IGSTK: "true"
 
 build-ubuntu24:
   extends: .reuse-build

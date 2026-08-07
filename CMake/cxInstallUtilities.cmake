@@ -622,9 +622,10 @@ install(DIRECTORY "${QT_QML_DIR}/"
         # fixup_bundle resets link paths for all targets within the bundle.
         # this code appears in cmake_install.cmake in the CURRENT_BINARY_DIR. Check there when changing.
 
-        # libIGSTK.so should only be bundled when IGSTK is part of this build (Fraxinus on Ubuntu 20/22).
-        # For CustusX/CustusS it must be ignored: ISB_DataStreaming may carry a transitive ELF NEEDED
-        # entry for it even when IGSTK tracking is disabled, and the file is not available.
+        # libIGSTK.so should only be bundled when IGSTK is part of this build (CustusX/Fraxinus on
+        # Ubuntu 20/22). For CustusS, and for CustusX/Fraxinus on other platforms, it must be ignored:
+        # ISB_DataStreaming may carry a transitive ELF NEEDED entry for it even when IGSTK tracking
+        # is disabled, and the file is not available.
         set(_cx_bundle_ignore_igstk "")
         if(NOT TARGET org_custusx_core_tracking_system_igstk)
             set(_cx_bundle_ignore_igstk "IGNORE_ITEM libIGSTK.so")
