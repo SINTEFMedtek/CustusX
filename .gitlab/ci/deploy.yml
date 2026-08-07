@@ -37,6 +37,45 @@ deploy-tag:
   rules:
     - if: '$CI_COMMIT_TAG != null' # Run if a tag is present (= release or release candidate)
 
+create-release:
+  stage: deploy
+  image: alpine:latest
+  needs: ["deploy-tag"]
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
+  script:
+    - apk add --no-cache curl jq
+    - |
+      set -e
+      NOTES_MD="doc/release_notes/release_notes_${CI_COMMIT_TAG}.md"
+      NOTES_HTML="doc/release_notes/release_notes_${CI_COMMIT_TAG}.html"
+      if [ ! -f "$NOTES_MD" ] || [ ! -f "$NOTES_HTML" ]; then
+        echo "WARNING: $NOTES_MD or $NOTES_HTML not found for tag ${CI_COMMIT_TAG}. Skipping release creation."
+        exit 0
+      fi
+
+      # Upload the release notes alongside the installers already uploaded by deploy-tag
+      curl --fail --header "JOB-TOKEN: $CI_JOB_TOKEN" --upload-file "$NOTES_HTML" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}/release_notes_${CI_COMMIT_TAG}.html"
+
+      # Discover the installer files deploy-tag already uploaded, to link them from the Release
+      PACKAGE_ID=$(curl --silent --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages?package_name=CustusX&package_version=${CI_COMMIT_TAG}" \
+        | jq -r '.[0].id')
+
+      LINKS=$(curl --silent --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/${PACKAGE_ID}/package_files" \
+        | jq -c --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
+            '[.[] | {name: .file_name, url: ($base + "/" + .file_name), link_type: "package"}]')
+
+      DESCRIPTION=$(jq -Rs . < "$NOTES_MD")
+
+      curl --fail --request POST --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --header "Content-Type: application/json" \
+        --data "$(jq -n --arg tag "$CI_COMMIT_TAG" --argjson links "$LINKS" --argjson desc "$DESCRIPTION" \
+          '{tag_name: $tag, name: $tag, description: $desc, assets: {links: $links}}')" \
+        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+
 pages:
   stage: deploy
   environment: production
