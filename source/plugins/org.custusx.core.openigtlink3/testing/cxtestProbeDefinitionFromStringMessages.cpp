@@ -14,6 +14,8 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 #include "cxtestUtilities.h"
 #include "cxTypeConversions.h"
 
+#include <igtlioUsSectorDefinitions.h>
+
 namespace cxtest
 {
 typedef boost::shared_ptr<class ProbeDefinitionFromStringMessagesTest> ProbeDefinitionFromStringMessagesTestPtr;
