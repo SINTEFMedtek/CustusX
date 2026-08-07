@@ -10,7 +10,7 @@ See Lisence.txt (https://github.com/SINTEFMedtek/CustusX/blob/master/License.txt
 =========================================================================*/
 #include "catch.hpp"
 
-#include "cxProbeDefinitionFromStringMessages.cpp"
+#include "cxProbeDefinitionFromStringMessages.h"
 #include "cxtestUtilities.h"
 #include "cxTypeConversions.h"
 
