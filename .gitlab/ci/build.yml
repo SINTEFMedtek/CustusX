@@ -104,6 +104,10 @@ build-ubuntu20:
   variables:
     OS: Ubuntu2004
     BUILD_IGSTK: "true"
+    # BASE_DIR must match build-external-libs-ubuntu20-igstk's BASE_DIR: VTK/ITK's
+    # generated CMake config files embed absolute paths and are not relocatable.
+    BASE_DIR: /builds/Ubuntu2004igstk
+    GIT_CLONE_PATH: /builds/Ubuntu2004igstk/CX/CX
 
 build-ubuntu22:
   extends: .reuse-build
@@ -111,6 +115,10 @@ build-ubuntu22:
   variables:
     OS: Ubuntu2204
     BUILD_IGSTK: "true"
+    # BASE_DIR must match build-external-libs-ubuntu22-igstk's BASE_DIR: VTK/ITK's
+    # generated CMake config files embed absolute paths and are not relocatable.
+    BASE_DIR: /builds/Ubuntu2204igstk
+    GIT_CLONE_PATH: /builds/Ubuntu2204igstk/CX/CX
 
 build-ubuntu24:
   extends: .reuse-build
