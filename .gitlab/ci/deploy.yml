@@ -47,8 +47,12 @@ create-release:
     - apk add --no-cache curl jq
     - |
       set -e
-      NOTES_MD="doc/release_notes/release_notes_${CI_COMMIT_TAG}.md"
-      NOTES_HTML="doc/release_notes/release_notes_${CI_COMMIT_TAG}.html"
+      # Release-notes files are committed per release cycle (e.g. v26.08), not per
+      # rc tag -- strip a trailing -rcN so v26.08-rc1, v26.08-rc2, ... and the final
+      # v26.08 tag all resolve to the same doc/release_notes/release_notes_v26.08.* files.
+      BASE_VERSION=$(echo "$CI_COMMIT_TAG" | sed -E 's/-rc[0-9]+$//')
+      NOTES_MD="doc/release_notes/release_notes_${BASE_VERSION}.md"
+      NOTES_HTML="doc/release_notes/release_notes_${BASE_VERSION}.html"
       if [ ! -f "$NOTES_MD" ] || [ ! -f "$NOTES_HTML" ]; then
         echo "WARNING: $NOTES_MD or $NOTES_HTML not found for tag ${CI_COMMIT_TAG}. Skipping release creation."
         exit 0
