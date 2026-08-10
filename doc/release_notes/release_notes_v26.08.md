@@ -6,15 +6,10 @@ _Changes since v22.09_
 
 | Key | Summary | Release Note |
 |---|---|---|
-| [CustusX#39](https://gitlab.sintef.no/custusx/custusx/-/issues/39) | Update documentation | Updated user and developer documentation, including build instructions and supported platforms. |
-| [CustusX#30](https://gitlab.sintef.no/custusx/custusx/-/issues/30) | Update .gitlab-ci.yml | CustusX now builds and runs on Ubuntu 24.04. |
-| [CustusX#34](https://gitlab.sintef.no/custusx/custusx/-/issues/34) | Update CustusX web-pages | Redesigned and updated the CustusX website with current information and screenshots. |
-| [CustusX#33](https://gitlab.sintef.no/custusx/custusx/-/issues/33) | Add CPD algorithm to CustusX | Added a Coherent Point Drift (CPD) registration filter and a ClipMeshByVolume mesh-clipping filter. |
-| [Fraxinus#22](https://gitlab.sintef.no/custusx/fraxinus/-/issues/22) | Look into Qt styles | Added a gray application style/theme option for Fraxinus and CustusS. |
-| [Fraxinus#35](https://gitlab.sintef.no/custusx/fraxinus/-/issues/35) | Make Fraxinus segmentations run on Windows | Raidionics and TotalSegmentator segmentation now also work on Windows. |
-| [CustusX#22](https://gitlab.sintef.no/custusx/custusx/-/issues/22) | Build on Ubuntu 22.04 | CustusX now builds and runs on Ubuntu 22.04. |
-| [Fraxinus#20](https://gitlab.sintef.no/custusx/fraxinus/-/issues/20) | Integrate TotalSegmentator | Integrated TotalSegmentator for segmenting lung blood vessels and lung lobes. |
-| [Fraxinus#9](https://gitlab.sintef.no/custusx/fraxinus/-/issues/9) | Option to add more via points | Added the option to add extra via points between the segmented airway and the target. |
+| [CustusX#30](https://gitlab.sintef.no/custusx/custusx/-/issues/30) | Ubuntu 24.04 support | CustusX now builds and runs on Ubuntu 24.04 (in addition to Ubuntu 20.04 and 22.04). VTK is updated to 9.6.1 and ITK to 5.4.5. |
+| [CustusX#33](https://gitlab.sintef.no/custusx/custusx/-/issues/33) | New registration and mesh filters | Added a Coherent Point Drift (CPD) registration filter and a ClipMeshByVolume mesh-clipping filter. |
+| [Fraxinus#22](https://gitlab.sintef.no/custusx/fraxinus/-/issues/22) | Optional gray application style | Added an optional gray application style for all applications, activated with `-style gray` on the command line. |
+| [CustusX#22](https://gitlab.sintef.no/custusx/custusx/-/issues/22) | Ubuntu 22.04 support | CustusX now builds and runs on Ubuntu 22.04. |
 
 ## Bugfixes
 
@@ -28,9 +23,17 @@ _Changes since v22.09_
 | [CustusX#20](https://gitlab.sintef.no/custusx/custusx/-/issues/20) | GenericScriptFilter issues | Fixed script configuration file path handling for GenericScriptFilter in CustusS and Fraxinus. |
 | [CustusX#3](https://gitlab.sintef.no/custusx/custusx/-/issues/3) | Opacity in 2D views after VTK version change | Fixed 2D view overlay rendering after the VTK 9 migration. |
 
+## Known Issues
+
+| Key | Summary | Release Note |
+|---|---|---|
+| [CustusX#30](https://gitlab.sintef.no/custusx/custusx/-/issues/30) | Tracking on Ubuntu 24.04 | Tracking hardware support is not available in the open-source CustusX build on Ubuntu 24.04. |
+
 <details>
 <summary>Internal changes not included above (CI/build/tooling)</summary>
 
+- CustusX#39 — Update documentation
+- CustusX#34 — Update CustusX web-pages
 - CustusX#42 — 26.08 Release
 - CustusX#16 — Check if Image2DProxy can be removed
 - CustusX#36 — Configure external visibility
