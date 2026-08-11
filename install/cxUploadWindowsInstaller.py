@@ -37,17 +37,29 @@ import sys
 GITLAB_BASE = 'https://gitlab.sintef.no'
 
 APP_CONFIG = {
+    'custusx': {
+        'project_path': 'custusx/custusx',
+        'package_name': 'CustusX',
+        'link_name': 'CustusX Windows installer',
+        'upload_filename': 'CustusXWindows.exe',
+    },
+    'custusx-s': {
+        'project_path': 'custusx/custuss',
+        'package_name': 'CustusS',
+        'link_name': 'CustusS Windows installer',
+        'upload_filename': 'CustusSWindows.exe',
+    },
     'fraxinus': {
         'project_path': 'custusx/fraxinus',
         'package_name': 'Fraxinus',
         'link_name': 'Fraxinus Windows installer',
         'upload_filename': 'FraxinusWindows.exe',
     },
-    'custusx': {
-        'project_path': 'custusx/custusx',
-        'package_name': 'CustusX',
-        'link_name': 'CustusX Windows installer',
-        'upload_filename': 'CustusXWindows.exe',
+    'fraxinus-private': {
+        'project_path': 'custusx/org.custusx.fraxinus.private',
+        'package_name': 'Fraxinus',
+        'link_name': 'Fraxinus Private Windows installer',
+        'upload_filename': 'FraxinusPrivateWindows.exe',
     },
 }
 
