@@ -15,7 +15,7 @@
         curl \
           --header "JOB-TOKEN: $CI_JOB_TOKEN" \
           --upload-file $INSTALLER_FILE \
-          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/$OS/$INSTALLER_FILE"
+          "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/$VERSION/CustusX-${OS}.tar.gz"
       done
 
 deploy-commit:
@@ -57,25 +57,12 @@ create-release:
         exit 0
       fi
 
-      # Discover the installer files deploy-tag already uploaded, to link them from the Release
-      PACKAGE_ID=$(curl --silent --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages?package_name=CustusX&package_version=${CI_COMMIT_TAG}" \
-        | jq -r '.[0].id')
-
-      LINKS=$(curl --silent --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/${PACKAGE_ID}/package_files" \
-        | jq -c --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
-            '[.[] | select(.file_name | endswith(".tar.gz")) | {
-              name: (
-                if (.file_name | startswith("Ubuntu2004/")) then "CustusX Ubuntu 20.04 installer"
-                elif (.file_name | startswith("Ubuntu2204/")) then "CustusX Ubuntu 22.04 installer"
-                elif (.file_name | startswith("Ubuntu2404/")) then "CustusX Ubuntu 24.04 installer"
-                else .file_name
-                end
-              ),
-              url: ($base + "/" + .file_name),
-              link_type: "package"
-            }]')
+      LINKS=$(jq -n --arg base "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/CustusX/${CI_COMMIT_TAG}" \
+        '[
+          {name: "CustusX Ubuntu 20.04 installer", url: ($base + "/CustusX-Ubuntu2004.tar.gz"), link_type: "package"},
+          {name: "CustusX Ubuntu 22.04 installer", url: ($base + "/CustusX-Ubuntu2204.tar.gz"), link_type: "package"},
+          {name: "CustusX Ubuntu 24.04 installer", url: ($base + "/CustusX-Ubuntu2404.tar.gz"), link_type: "package"}
+        ]')
 
       DESCRIPTION=$(jq -Rs . < "$NOTES_MD")
 
